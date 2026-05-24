@@ -3596,7 +3596,7 @@ struct s_planet_data {
     int8_t orbit;
     int8_t planet_type;
     int8_t size;
-    char gravity_class;
+    int8_t gravity_class;
     char group;
     int8_t climate;
     char climate_bg_type;

@@ -250,7 +250,7 @@ namespace BOMB {
             }
 
             if (colony->military[0] != 0) {
-                if (random::Random_((int)colony->military[1] + (int)colony->military[0]) <= (int)colony->military[0]) {
+                if ((int)random::Random_((int)colony->military[1] + (int)colony->military[0]) <= (int)colony->military[0]) {
                     colony->military[0]--;
                     result->infantry_killed++;
                     return;
@@ -264,7 +264,7 @@ namespace BOMB {
 
         // Single population colony logic
         if (colony->military[0] != 0) {
-            if (random::Random_((int)colony->military[1] + (int)colony->military[0]) <= (int)colony->military[0]) {
+            if ((int)random::Random_((int)colony->military[1] + (int)colony->military[0]) <= (int)colony->military[0]) {
                 colony->military[0]--;
                 result->infantry_killed++;
                 return;

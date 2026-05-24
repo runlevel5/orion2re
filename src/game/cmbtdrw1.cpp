@@ -863,7 +863,7 @@ skip_cursor:
                     for (int16_t i = 0x60; i < 0x70; ++i) {
                         int16_t shade = i - blip_frame;
                         if (shade < 0x60) shade = 0x60;
-                        replace::Replace_Color_(p_bmp, i, shade);
+                        replace::Replace_Color_(p_bmp, i, (int8_t)shade);
                     }
 
                     animate::Draw_(blip_x + p_size - 7, blip_y + p_size - 7, p_bmp);
@@ -3293,7 +3293,7 @@ skip_cursor:
         }
 
         row_y = static_cast<int16_t>(row_y + 0x1A);
-        if (MOX::_global_combat_data.marine_count != -1) {
+        if (MOX::_global_combat_data.marine_count != 0xFF) {
             KEN::Ken_Get_Text_Message_(12, message_text, 0x50);
             fonts::Print_(view_x + 0x6F, row_y, message_text);
             fonts::Print_Integer_Right_(

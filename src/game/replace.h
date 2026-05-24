@@ -25,5 +25,5 @@ namespace replace {
 
     void __cdecl Establish_Color_Gradient_(int16_t scale, int16_t invert);
 
-    void __cdecl Interlaced_Gray_Scale_Off_Page_(int8_t color_offset1, int16_t gradient_start1, int8_t color_offset2, int16_t gradient_start2, int16_t gradient_end);
+    void __cdecl Interlaced_Gray_Scale_Off_Page_(uint8_t color_offset1, int16_t gradient_start1, uint8_t color_offset2, int16_t gradient_start2, int16_t gradient_end);
 }

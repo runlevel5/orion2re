@@ -7,8 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/aidesign.{h,cpp}
-- [pending] src/game/aidudes.{h,cpp}
 - [pending] src/game/aileader.{h,cpp}
 - [pending] src/game/aimove.{h,cpp}
 - [pending] src/game/aipower.{h,cpp}
@@ -219,6 +217,8 @@
 - [reviewed] src/game/aibomb.{h,cpp} — Added a brief header docstring for AI_Invasion_Will_Succeed_; no naming or comment cleanup changes were needed.
 - [reviewed] src/game/aibuild.{h,cpp} — Added concise header docstrings, aligned a few parameter names with existing conventions, and removed several speculative or redundant implementation comments.
 - [reviewed] src/game/aidata.{h,cpp} — Applied concise C-style header docstrings, clarified several range/comparator/value parameter names, and removed redundant implementation comments.
+- [reviewed] src/game/aidesign.{h,cpp} — Added concise header docstrings, clarified several decompiler-style local names in weapon-selection helpers, and removed a speculative bug note plus a few redundant comments.
+- [reviewed] src/game/aidudes.{h,cpp} — Added concise header docstrings, clarified several decompiler-style comparator and weighting variable names, and removed a few redundant implementation comments.
 
 ## Blocked
 - none

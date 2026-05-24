@@ -2372,7 +2372,7 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
                             dist_friendly += 1;
                         }
                     } else {
-                        int8_t has_security = COMBINIT::Does_Combat_Ship_Have_Special_(i, 0x23);
+                        int8_t has_security = (int8_t)COMBINIT::Does_Combat_Ship_Have_Special_(i, 0x23);
                         bool add_marines = false;
                         
                         if (range <= 1) {
@@ -2464,7 +2464,7 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
     }
 
     if (score > 0) {
-        if (random::Random_(100) < score) {
+        if ((int)random::Random_(100) < score) {
             if (ship->current_speed == 0) {
                 ret_val = 1;
             }

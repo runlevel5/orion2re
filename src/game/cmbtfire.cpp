@@ -184,9 +184,9 @@ namespace CMBTFIRE {
         int8_t new_owner;
 
         if (ship.owner == MOX::_combat_attacker_player) {
-            new_owner = static_cast<int8_t>(MOX::_combat_defender_player);
+            new_owner = (int8_t)MOX::_combat_defender_player;
         } else {
-            new_owner = static_cast<int8_t>(MOX::_combat_attacker_player);
+            new_owner = (int8_t)MOX::_combat_attacker_player;
         }
 
         ship.is_retreating = 0;
@@ -889,7 +889,7 @@ namespace CMBTFIRE {
                     *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
                 }
 
-                if (random::Random_(100) <= *damage) {
+                if ((int)random::Random_(100) <= *damage) {
                     colony_hits = 1;
                     bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                     _combat_bomb_result.bio_hits_remaining += 1;
@@ -1355,7 +1355,7 @@ namespace CMBTFIRE {
             case 32:
                 if (target_idx != 0 && target_type == 0) {
                     CMBTSPEC::Draw_Stasis_Beam_(ship_idx, target_idx);
-                    Place_Ship_In_Stasis_(target_idx, ship_idx);
+                    Place_Ship_In_Stasis_(target_idx, (uint8_t)ship_idx);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 }
                 break;
@@ -1546,7 +1546,7 @@ namespace CMBTFIRE {
                 }
 
                 if (COMBINIT::Does_Combat_Ship_Have_Special_(target, 0x1A)) {
-                    if (random::Random_(current_damage + 15) > current_damage) {
+                    if ((int)random::Random_(current_damage + 15) > current_damage) {
                         *damage += current_damage;
                         current_damage = 0;
                     }

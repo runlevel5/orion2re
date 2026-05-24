@@ -1151,30 +1151,30 @@ namespace COLCALC {
     }
 
     int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx) {
-        int16_t local_4;
-        const s_colony* c = colony;
-        if (c->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
+        if (colony->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
             return 4;
         }
 
-        int16_t planet_idx = c->planet;
-        int8_t gravity_class = MOX::_planet[planet_idx].gravity_class;
-        
-        auto& player = MOX::_player[player_idx];
+        int8_t gravity_class = MOX::_planet[colony->planet].gravity_class;
 
         if (gravity_class == PLANET_GRAVITY_LOW_G) { // Low Gravity
+            const s_player& player = MOX::_player[player_idx];
             return (player.traits[TRAIT_LOW_G_WORLD] == 0) ? 3 : 4;
         }
 
         if (gravity_class == PLANET_GRAVITY_NORMAL_G) { // Normal Gravity
+            const s_player& player = MOX::_player[player_idx];
             return (player.traits[TRAIT_LOW_G_WORLD] == 0) ? 4 : 3;
         }
 
         if (gravity_class == PLANET_GRAVITY_HEAVY_G) { // Heavy Gravity
+            const s_player& player = MOX::_player[player_idx];
             return (player.traits[TRAIT_HEAVY_G_WORLD] == 0) ? 2 : 4;
         }
 
-        return local_4;
+        // The original binary falls through with an undefined register value here.
+        // Valid game data should only use the 0..2 gravity classes above.
+        return 4;
     }
 
     int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const uint32_t* pop_unit, int16_t mode) {

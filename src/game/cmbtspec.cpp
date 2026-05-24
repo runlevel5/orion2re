@@ -1540,7 +1540,6 @@ namespace CMBTSPEC {
 
         int16_t center_dx_2;
         int16_t center_dy_2;
-        int16_t dummy_hits;
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0 && CMBTDRW1::Ship_Completely_On_Screen_(param_1) == 0) {
             COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[param_1].x, MOX::_combat_data[param_1].y);
@@ -1829,7 +1828,7 @@ namespace CMBTSPEC {
 
                     if (qty > 0) {
                         for (int16_t k = 0; k < qty; ++k) {
-                            if (random::Random_(100) <= (int32_t)(chance * 25) / missile_hits) {
+                            if ((int)random::Random_(100) <= (int32_t)(chance * 25) / missile_hits) {
                                 MOX::_missile[i].quantity--;
                             }
                         }

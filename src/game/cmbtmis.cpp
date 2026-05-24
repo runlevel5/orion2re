@@ -110,7 +110,7 @@ namespace CMBTMIS {
                 dist = missile->travel_dist;
             }
 
-            Coord_Movement_(missile->x, missile->y, target_x, target_y, dist, &dx, &dy);
+            Coord_Movement_(missile->x, missile->y, target_x, target_y, (uint8_t)dist, &dx, &dy);
 
             missile->x += dx;
             missile->y += dy;
@@ -237,7 +237,7 @@ namespace CMBTMIS {
                         if (reload_count >= MOX::_combat_data[source_unit_idx].weapons[i].count) {
                             reload_count -= MOX::_combat_data[source_unit_idx].weapons[i].count;
                         } else {
-                            MOX::_combat_data[source_unit_idx].weapons[i].count = reload_count;
+                            MOX::_combat_data[source_unit_idx].weapons[i].count = (int8_t)reload_count;
                             reload_count = 0;
                         }
                     }

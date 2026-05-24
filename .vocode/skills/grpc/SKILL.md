@@ -9,6 +9,17 @@ Use this skill whenever you need to inspect the currently open Ghidra program th
 
 The RPC server executes arbitrary Python code inside the running PyGhidra process, so snippets can use normal Python plus the available Ghidra APIs and any helpers exposed by the server.
 
+## Correctness rules
+
+When using this skill for reverse engineering or code restoration:
+
+- treat assembly and disassembly as the primary source of truth
+- treat decompiler output as a hint that must be validated against assembly before relying on it
+- assume Ghidra project types may be wrong, including parameter types, local types, structure fields, pointer types, and signedness
+- verify control flow, memory accesses, call arguments, and side effects from the disassembly rather than trusting recovered C-like output
+- be especially careful around small integer loads, casts, sign extension, zero extension, and packed structures
+- if disassembly and decompiler output disagree, prefer the disassembly and report the mismatch explicitly
+
 ## When to use this skill
 
 Use this skill for tasks such as:
@@ -66,6 +77,8 @@ When recovering jump tables, pointer tables, or individual code/data pointers, r
 If a recovered target does not have a corresponding local project symbol, treat that as an error and report it explicitly rather than guessing, inventing a name, or silently returning the address.
 
 When reporting recovered targets, prefer the existing symbol name and include the raw address only as supporting detail.
+
+When using decompiler helpers such as `decomp(...)`, pair them with disassembly and lower-level inspection helpers such as `disasm(...)`, byte reads, references, and direct Ghidra API queries as needed.
 
 ## Core endpoints
 
@@ -219,6 +232,8 @@ When using this skill:
 - summarize the intent before the request
 - keep snippets small and inspectable
 - prefer printing structured intermediate values for clarity
+- if analyzing function behavior, inspect the disassembly first or alongside decompiler output instead of relying on decompilation alone
+- if a type looks suspicious, confirm it from observed loads, stores, call setup, and data layout rather than from Ghidra's recovered types alone
 - when inspecting jump tables or pointers, validate that each recovered target maps to an existing local symbol before returning results
 - if any recovered target lacks a local symbol, surface it as an error instead of returning unresolved addresses
 - if the server times out, note that the remote snippet may still be running

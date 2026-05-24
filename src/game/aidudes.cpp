@@ -246,10 +246,10 @@ namespace aidudes {
                     }
                 }
 
-                int8_t choice = RUSS::Get_Weighted_Choice_Char_(weights, 50);
+                int16_t choice = RUSS::Get_Weighted_Choice_Char_(weights, 50);
                 if (choice < 49) {
                     COLBLDG::Clear_Colony_Queue_(colony_idx);
-                    colony->producing[0] = static_cast<int16_t>(choice);
+                    colony->producing[0] = choice;
                 }
             }
         }
@@ -361,8 +361,9 @@ namespace aidudes {
 
         if (plr->surplus_freighters < 0 || plr->surplus_food < 0) {
             int32_t threshold = 1 - (int32_t)MOX::_settings.game_difficulty * (int32_t)plr->surplus_freighters;
+            int32_t roll = (int32_t)random::Random_(50);
 
-            if (threshold >= random::Random_(50)) {
+            if (threshold >= roll) {
                 plr->n_freighters += 5;
             } else if (plr->n_freighters == 0 && MOX::_settings.game_difficulty >= 1) {
                 plr->n_freighters = 5;
@@ -383,11 +384,13 @@ namespace aidudes {
         }
 
         // Determine if AI is eligible for an upgrade cheat based on difficulty and last refit entry desirability
-        int desirability = refit_player->entry[num_entries - 1].desirability;
-        int difficulty_bonus = AIBUILD::_difficulty_ship_design[MOX::_settings.game_difficulty];
+        int32_t desirability = refit_player->entry[num_entries - 1].desirability;
+        uint8_t difficulty_idx = (uint8_t)MOX::_settings.game_difficulty;
+        int32_t difficulty_bonus = (int32_t)AIBUILD::_difficulty_ship_design[difficulty_idx];
+        int32_t upgrade_threshold = (difficulty_bonus + desirability) * 2;
         int upgrade_count = 0;
 
-        if (random::Random_(900) <= (difficulty_bonus + desirability) * 2) {
+        if ((int32_t)random::Random_(900) <= upgrade_threshold) {
             upgrade_count = 1;
         }
 
@@ -395,8 +398,8 @@ namespace aidudes {
         if ((*AIDATA::_ai_player_info)[aidudes::_i_ai].colony_count < 2) {
             upgrade_count = 0;
         } else {
-            int total_pop = MOX::_player[aidudes::_i_ai].total_pop;
-            if (random::Random_(total_pop) <= 8) {
+            int32_t total_pop = MOX::_player[aidudes::_i_ai].total_pop;
+            if ((int32_t)random::Random_((uint32_t)total_pop) <= 8) {
                 upgrade_count = 0;
             }
         }
@@ -822,7 +825,7 @@ namespace aidudes {
 
                             bool delete_from_queue = false;
                             int16_t prod = temp_colony->producing[0];
-                            if (prod < -100) {
+                            if (prod <= -100) {
                                 if (MOX::_ship[-prod - 100].d.ship_type != 0) {
                                     delete_from_queue = true;
                                 }
@@ -988,7 +991,7 @@ namespace aidudes {
                     i--;
                     s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
-                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < random::Random_(100)) {
+                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < (int32_t)random::Random_(100)) {
                             INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
                             int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)colony_queue[i]);
                             if (ship_idx == -1) {
@@ -1489,7 +1492,7 @@ namespace aidudes {
         }
 
         if (freighter_shortage_flag) {
-            if (random::Random_(10) <= (int)MOX::_settings.game_difficulty) {
+            if ((int)random::Random_(10) <= (int)MOX::_settings.game_difficulty) {
                 aidudes::_p_ai->n_freighters += 5;
             }
         }

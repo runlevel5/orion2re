@@ -2,8 +2,8 @@
 #include <cstdint>
 
 namespace AIBUILD {
-    inline int8_t (&_difficulty_ship_design)[12] =
-        *reinterpret_cast<int8_t (*)[12]>(std::uintptr_t{0x0054F054});
+    inline uint8_t (&_difficulty_ship_design)[12] =
+        *reinterpret_cast<uint8_t (*)[12]>(std::uintptr_t{0x0054F054});
     inline int8_t (&_difficulty_intel_bias)[8] =
         *reinterpret_cast<int8_t (*)[8]>(std::uintptr_t{0x0054F060});
     inline uint8_t* _player_ship_size_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F068});

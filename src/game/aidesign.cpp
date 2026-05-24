@@ -77,13 +77,13 @@ namespace aidesign {
         comp_bonus += MOX::_player[player_idx].traits[7];
 
         int16_t target_defense;
-        int16_t local_d4;
+        int16_t target_shield_value;
 
         if (MOX::_player[player_idx].objectives == 100) {
-            local_d4 = 1;
+            target_shield_value = 1;
             target_defense = TECHDATA::_drives[2].combat_speed_min[2] + 20;
         } else {
-            local_d4 = AIPOWER::Get_Best_Ship_Shield_Value_(first_living_player);
+            target_shield_value = AIPOWER::Get_Best_Ship_Shield_Value_(first_living_player);
             int16_t best_drive = INITSHIP::Best_Warp_Drive_(first_living_player);
             target_defense = MOX::_player[first_living_player].traits[6] + TECHDATA::_drives[best_drive].combat_speed_min[2] * 5;
         }
@@ -233,7 +233,7 @@ namespace aidesign {
                                 int32_t damage = TECHDATA::_weapons[w_id].max_damage;
 
                                 if ((natural_mods & 0x100) == 0) {
-                                    damage -= local_d4;
+                                    damage -= target_shield_value;
                                 }
 
                                 int32_t val = (damage * 10) / space;
@@ -280,7 +280,7 @@ namespace aidesign {
                                 int32_t damage = TECHDATA::_weapons[w_id].max_damage * 3;
 
                                 if ((natural_mods & 0x100) == 0) {
-                                    damage = damage / 2 - local_d4;
+                                    damage = damage / 2 - target_shield_value;
                                 } else {
                                     damage = damage / 2;
                                 }
@@ -320,30 +320,30 @@ namespace aidesign {
         int16_t comp_tech = Get_Competition_Player_Tech_Values_(player_idx, 0x12);
         int16_t r_base = (int16_t)((0x14 - comp_tech) * hull_size);
 
-        int16_t cnt_4 = 0;
+        int16_t spec0_mod_count = 0;
         for (uint16_t m = 8; m < 0x200; m *= 2) {
             if ((m & *spec0) != 0) {
-                cnt_4++;
+                spec0_mod_count++;
             }
         }
 
-        int16_t cnt_7 = 0;
+        int16_t spec1_mod_count = 0;
         for (uint16_t m = 8; m < 0x200; m *= 2) {
             if ((m & *spec1) != 0) {
-                cnt_7++;
+                spec1_mod_count++;
             }
         }
 
-        int16_t cnt_10 = 0;
+        int16_t spec2_mod_count = 0;
         for (uint16_t m = 8; m < 0x200; m *= 2) {
             if ((m & *spec2) != 0) {
-                cnt_10++;
+                spec2_mod_count++;
             }
         }
 
-        int32_t arc0_threshold = (int32_t)r_base + (int32_t)cnt_4 * 20;
+        int32_t arc0_threshold = (int32_t)r_base + (int32_t)spec0_mod_count * 20;
         if ((int32_t)random::Random_(100) < arc0_threshold) {
-            int32_t arc0_inner_threshold = (int32_t)(r_base / 2) + (int32_t)cnt_4 * 20;
+            int32_t arc0_inner_threshold = (int32_t)(r_base / 2) + (int32_t)spec0_mod_count * 20;
             if ((int32_t)random::Random_(100) < arc0_inner_threshold) {
                 *arc0 = 16;
             } else {
@@ -351,12 +351,12 @@ namespace aidesign {
             }
         }
 
-        int32_t arc1_threshold = (int32_t)cnt_7 * 20 + (int32_t)(r_base / 2);
+        int32_t arc1_threshold = (int32_t)spec1_mod_count * 20 + (int32_t)(r_base / 2);
         if ((int32_t)random::Random_(100) < arc1_threshold) {
             *arc1 = 2;
         }
 
-        int32_t arc2_threshold = (int32_t)cnt_10 * 20 + (int32_t)(r_base / 4);
+        int32_t arc2_threshold = (int32_t)spec2_mod_count * 20 + (int32_t)(r_base / 4);
         if ((int32_t)random::Random_(100) < arc2_threshold) {
             *arc2 = 2;
         }
@@ -371,7 +371,6 @@ namespace aidesign {
             int16_t item_id = spcl[i].id;
 
             if (spcl[i].type == 0) {
-                // Processing Special Device
                 int16_t tech_app_id = TECHDATA::_specials[item_id].tech_app_id;
 
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
@@ -392,7 +391,6 @@ namespace aidesign {
                     }
                 }
             } else {
-                // Processing Weapon
                 if (*weapon_slot_idx_ptr < 8) {
                     if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
                         for (int16_t slot = 0; slot < *weapon_slot_idx_ptr; ++slot) {
@@ -943,9 +941,9 @@ namespace aidesign {
             comp_idx++;
         }
 
-        uint16_t val_mini = Get_Competition_Player_Tech_Values_(comp_idx, 0x21 /* AI_GROUP_MINIATURIZATION */);
-        uint16_t val_ff = Get_Competition_Player_Tech_Values_(comp_idx, 10 /* AI_GROUP_FORCE_FIELDS */);
-        int threshold = (val_mini * 2 + 2) / 3 + val_ff;
+        uint16_t miniaturization_tech_value = Get_Competition_Player_Tech_Values_(comp_idx, 0x21 /* AI_GROUP_MINIATURIZATION */);
+        uint16_t force_field_tech_value = Get_Competition_Player_Tech_Values_(comp_idx, 10 /* AI_GROUP_FORCE_FIELDS */);
+        int threshold = (miniaturization_tech_value * 2 + 2) / 3 + force_field_tech_value;
 
         int i = 0;
         for (; i < num_candidates; ++i) {
@@ -1087,8 +1085,6 @@ namespace aidesign {
                 if (TECHDATA::_weapons[w_idx].max_damage < max_shield + 4) {
                     weapon_indices[i] = 0;
                     sort_keys[i] = 0;
-                    // Note: Potentially a memory corruption bug in original game where parameter pointer 
-                    // is used as an array. Translated faithfully from original assembly.
                     out_weapon_mods[i] = 0;
                 } else {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, TECHDATA::_weapons[w_idx].tech_app_id);
@@ -1251,14 +1247,12 @@ namespace aidesign {
 
         ship_class = Get_Ship_Class_(player_idx);
 
-        // Check for Stellar Converter
         if (hull_idx == 5 && (player->tech_applications[TECH_APP_STELLAR_CONVERTER] == 3)) {
             if (random::Random_(4) < 4) {
                 ship_class = 6;
             }
         }
 
-        // Check for Black Hole Generator
         if (player->tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == 3 && hull_idx > 3) {
             if (random::Random_(4) < 4) {
                 ship_class = 6;
@@ -1291,7 +1285,6 @@ namespace aidesign {
 
         remaining_space = TECHDATA::_hull_data[hull_idx].size;
 
-        // Check for Battle Pods
         if (player->tech_applications[TECH_APP_BATTLE_PODS] == 3) {
             remaining_space += remaining_space / 2;
             struct_::Set_Bit_Field_(design->special_device_flags, 4);
@@ -1457,7 +1450,6 @@ namespace aidesign {
                 break;
 
             case 7:
-                // Check for Extended Fuel Tanks
                 if (player->tech_applications[TECH_APP_EXTENDED_FUEL_TANKS] == 3) {
                     struct_::Set_Bit_Field_(design->special_device_flags, 11);
                     int8_t cat = DESIGN::Miniaturization_Category_(63);

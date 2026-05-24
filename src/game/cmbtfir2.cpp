@@ -836,7 +836,7 @@ namespace CMBTFIR2 {
                                 int32_t threshold_denom = ((-2 - MOX::_combat_data[attacker_idx].ai_range_tactic) / 3) + 9;
                                 int16_t threshold = (int16_t)((100 * (9 - range1)) / threshold_denom);
 
-                                if (random::Random_(100) <= threshold) {
+                                if ((int)random::Random_(100) <= threshold) {
                                     for (int16_t i = 0; i < 8; ++i) {
                                         active_backup[i] = MOX::_combat_data[attacker_idx].weapons[i].active;
                                         int16_t weapon_id = MOX::_combat_data[attacker_idx].weapons[i].weapon_id;

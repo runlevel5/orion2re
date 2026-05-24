@@ -1,12 +1,4 @@
 #include "pch.h"
-#include "beams.h"
-#include "animate.h"
-#include "palette.h"
-#include "firepts.h"
-#include "farload.h"
-#include "colony.h"
-#include "mox.h"
-#include "techdata.h"
 
 namespace BEAMS {
     void __cdecl Reset_Beam_Swapping_Colors_() {
@@ -1316,8 +1308,8 @@ namespace BEAMS {
                                         if (shield_radius <= max_radius) {
                                             max_radius = shield_radius;
                                         }
-                                        rand_offsets[i * 2 + 1] = (int16_t)random::Random_(max_radius) - max_radius / 2;
-                                        rand_offsets[i * 2] = (int16_t)random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i + 2] = (int16_t)random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i] = (int16_t)random::Random_(max_radius) - max_radius / 2;
                                     }
                                     else {
                                         apply_random = true;
@@ -1328,10 +1320,10 @@ namespace BEAMS {
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
                                     int16_t base = max_radius / 2;
-                                    rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
-                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i + 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i + 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i] *= (int16_t)(random::Random_(2) - 1);
                                 }
                                 else {
                                     apply_random = true;
@@ -1343,10 +1335,10 @@ namespace BEAMS {
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
                                     int16_t base = max_radius / 2;
-                                    rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
-                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i + 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i + 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i] *= (int16_t)(random::Random_(2) - 1);
                                 }
                                 else {
                                     apply_random = true;
@@ -1355,8 +1347,8 @@ namespace BEAMS {
 
                             if (apply_random) {
                                 if (is_non_ship_target == 0 || fx->accum_hit_x != 0) {
-                                    rand_offsets[i * 2 + 1] = 0;
-                                    rand_offsets[i * 2] = 0;
+                                    rand_offsets[i + 2] = 0;
+                                    rand_offsets[i] = 0;
                                 }
                                 else {
                                     int16_t max_radius = ship_range / 2;
@@ -1366,10 +1358,10 @@ namespace BEAMS {
                                     }
                                     int16_t radius = (shield_radius + (shield_radius >> 31 & 3)) / 4 + 1;
                                     int16_t base = shield_radius / 2;
-                                    rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
-                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i + 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i + 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i] *= (int16_t)(random::Random_(2) - 1);
                                 }
                             }
                         }
@@ -1380,12 +1372,12 @@ namespace BEAMS {
                                 if (attacker_ship_id > 0) {
                                     FIREPTS::Calc_FP_Offsets_(&fp_x, &fp_y, weapon_id, shot_count,
                                         attacker_owner, attacker_ship_id,
-                                        attacker_picture_num, attacker_facing_dir,
-                                        target_bearing, fp_idx_val);
+                                        attacker_picture_num, (uint8_t)attacker_facing_dir,
+                                        (uint8_t)target_bearing, fp_idx_val);
                                 }
                                 Fire_Weapon_(attacker_center_x + fp_x, attacker_center_y + fp_y,
-                                    target_center_x + rand_offsets[i * 2],
-                                    target_center_y + rand_offsets[i * 2 + 1],
+                                    target_center_x + rand_offsets[i + 2],
+                                    target_center_y + rand_offsets[i],
                                     attacker_facing_dir, target_facing_dir,
                                     fx->weapon_id, frame_idx[i], i,
                                     MOX::_combat_data[target_id].size_class,
@@ -1393,7 +1385,7 @@ namespace BEAMS {
                                     is_non_ship_target, fp_idx_val,
                                     _g_reflection_state_flag,
                                     MOX::_combat_data[attacker_ship_id].size_class,
-                                    fx->specials, 0);
+                                    fx->specials, 1);
                             }
                         }
                     }
@@ -1602,7 +1594,7 @@ namespace BEAMS {
                         if (fx_idx_val > -1 && _ship_hit_now_flag[i] != 0) {
                             s_beam_fx_entry* fx = &param_7[fx_idx_val];
                             if (fx->accum_hit_x > 0 || fx->accum_hit_y > 0) {
-                                int16_t hit_facing = Do_Get_SFX_Draw_Shield_Facing_(attacker_ship_id, target_id);
+                                uint8_t hit_facing = (uint8_t)Do_Get_SFX_Draw_Shield_Facing_(attacker_ship_id, target_id);
                                 Add_Damage_Indicator_For_Ship_(target_x, target_y, target_id, hit_facing, fx->accum_hit_x, fx->accum_hit_y);
                                 ERICNET::Mox_Play_Sound_(0x1d);
                                 fx->accum_hit_x = -1;
