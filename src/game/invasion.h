@@ -42,7 +42,7 @@ namespace invasion {
 
     int32_t __cdecl Colony_Tank_Limit_(s_colony* colony);
 
-    uint32_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony);
+    int16_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony);
 
     void __cdecl Get_Invasion_Info_(int16_t* ship_list, int16_t n_ships, s_colony* colony, s_invasion_side_info* attacker_side, s_invasion_side_info* defender_side);
 

@@ -410,7 +410,7 @@ namespace DESBOX {
                     if (_field_item_chosen > -1 && type == 0) {
                         int16_t rx = _replacement_box_base_x + 0x77;
                         int16_t ry = _replacement_box_base_y + arc_y_offset + 0x54;
-                        New_Arc_Space_(i);
+                        New_Arc_Space_((uint8_t)i);
                         MOX::_weapon_arc_field[i] = fields::Add_Hidden_Field_(
                             rx,
                             ry,
@@ -446,7 +446,7 @@ namespace DESBOX {
 
         for (int16_t i = 1; i < 15; i++) {
             if (_field_item_chosen > -1) {
-                if (Mod_Allowed_On_Weapon_Type_(i)) {
+                if (Mod_Allowed_On_Weapon_Type_((uint8_t)i)) {
                     if (Should_Add_Mod_(i)) {
                         int16_t mod_y = mods_base_y + mod_ys[i];
                         int16_t mod_x = _replacement_box_base_x + mod_xs[i];
@@ -1705,7 +1705,7 @@ namespace DESBOX {
                 int16_t size1, size2;
 
                 if (needs_rack != 0) {
-                    int16_t m_cat = DESIGN::Miniaturization_Category_(tech_app_id);
+                    int8_t m_cat = DESIGN::Miniaturization_Category_(tech_app_id);
                     int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                     size1 = static_cast<int16_t>(DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[w_idx].size, tech_level, m_cat));
 
@@ -1713,7 +1713,7 @@ namespace DESBOX {
                     int16_t rack_size = DESIGN::Weapon_Rack_Size_(2);
                     size2 = static_cast<int16_t>(DESIGN::Space_Given_M_Level_(rack_size, tech_level2, m_cat));
                 } else {
-                    int16_t m_cat = DESIGN::Miniaturization_Category_(tech_app_id);
+                    int8_t m_cat = DESIGN::Miniaturization_Category_(tech_app_id);
                     int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                     size1 = static_cast<int16_t>(DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[w_idx].size, tech_level, m_cat));
                     size2 = 0;
@@ -1751,7 +1751,7 @@ namespace DESBOX {
 
         for (int16_t i = 1; i < 15; i++) {
             if (_field_item_chosen > -1) {
-                if (Mod_Allowed_On_Weapon_Type_(i)) {
+                if (Mod_Allowed_On_Weapon_Type_((uint8_t)i)) {
                     if (Should_Add_Mod_(i)) {
                         int32_t frame;
 
@@ -1810,8 +1810,8 @@ namespace DESBOX {
     }
 
     int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx) {
-        int16_t local_2;
-        int16_t weapon_space;
+        int16_t rack_space = 0;
+        int16_t weapon_space = 0;
 
         if (weapon_idx > 0) {
             if (DESIGN::Weapon_Needs_Racks_(weapon_idx)) {
@@ -1824,19 +1824,16 @@ namespace DESBOX {
                 category = DESIGN::Miniaturization_Category_(tech_app_id);
                 tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                 int16_t rack_base_size = DESIGN::Weapon_Rack_Size_(2);
-                local_2 = (int16_t)DESIGN::Space_Given_M_Level_(rack_base_size, tech_level, category);
+                rack_space = (int16_t)DESIGN::Space_Given_M_Level_(rack_base_size, tech_level, category);
             } else {
                 uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
                 int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
                 int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                 weapon_space = (int16_t)DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[weapon_idx].size, tech_level, category);
-                local_2 = 0;
             }
-        } else {
-            weapon_space = local_2;
         }
 
-        int16_t total_space = (int16_t)MOX::_design->space_used + local_2 + weapon_space;
+        int16_t total_space = (int16_t)MOX::_design->space_used + rack_space + weapon_space;
 
         if (MOX::_design_screen_replacement_slot > -1) {
             int slot = MOX::_design_screen_replacement_slot;

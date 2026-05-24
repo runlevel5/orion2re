@@ -426,7 +426,7 @@ namespace COLONY {
 
     void __cdecl Clear_Galaxy_Map_Fields_();
 
-    inline int32_t& _g_count = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E4C});
+    inline int16_t& _g_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E4C});
 
     void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index);
 

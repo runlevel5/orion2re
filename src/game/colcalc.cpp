@@ -2209,7 +2209,7 @@ namespace COLCALC {
         player->research_breakthrough = 0;
         player->research_accumulated += (int32_t)player->research_produced;
 
-        if (random::Random_(100) <= breakthrough_chance) {
+        if ((int32_t)random::Random_(100) <= breakthrough_chance) {
             player->research_breakthrough = 1;
             player->research_accumulated = 0;
             Give_Player_Field_(player, field, 0);

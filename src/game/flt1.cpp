@@ -1361,7 +1361,7 @@ namespace FLT1 {
 
             for (int i = 0; i < num_new_techs; i++) {
                 if (i != first_idx) {
-                    if ((random::Random_(100) - 1) < ((6 - num_acquired) * 5)) {
+                    if (((int32_t)random::Random_(100) - 1) < ((6 - num_acquired) * 5)) {
                         got_tech_apps[num_acquired++] = tech_apps[i];
                     }
                 }

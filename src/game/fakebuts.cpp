@@ -57,7 +57,7 @@ namespace FAKEBUTS {
     }
 
     int16_t __cdecl Add_Click_Thru_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, char **data, int16_t count, int16_t *var, uint8_t color, const char* str, int16_t unk2, int16_t hidden_id) {
-        int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, str, unk2);
+        int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, str, (int8_t)unk2);
         Add_Click_Thru_Field_To_List_(x1, y1, x2, y2, field_id, data, count, var, color, hidden_id);
         return field_id;
     }

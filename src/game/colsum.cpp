@@ -214,8 +214,8 @@ namespace COLSUM {
         static const int16_t buy_btn_y_coords[] = {35, 65, 96, 128, 159, 190, 221, 251, 283, 314};
 
         _x_fields[1] = fields::Add_Button_Field_(619, 15, ESTRINGS::E_Strings_(12), _anims[2], ESTRINGS::E_Strings_(137), 40);
-        _x_fields[2] = fields::Add_Button_Field_(619, 316, ESTRINGS::E_Strings_(11), _anims[3], ESTRINGS::E_Strings_(12), 40);
-        _x_fields[3] = fields::Add_Button_Field_(531, 445, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(12), 40);
+        _x_fields[2] = fields::Add_Button_Field_(619, 316, ESTRINGS::E_Strings_(12), _anims[3], ESTRINGS::E_Strings_(11), 40);
+        _x_fields[3] = fields::Add_Button_Field_(531, 445, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(40), 40);
         _x_fields[4] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(135));
         _x_fields[5] = fields::Add_Multi_Button_Field_(89, 446, ESTRINGS::E_Strings_(12), _anims[4], &_g_sort_index, 0, ESTRINGS::E_Strings_(384), 41);
         _x_fields[6] = fields::Add_Multi_Button_Field_(140, 446, s_p_005510fc, _anims[5], &_g_sort_index, 1, ESTRINGS::E_Strings_(12), 41);
@@ -373,26 +373,27 @@ namespace COLSUM {
 
         COLONY::Set_Colony_Font_To_(2);
 
-        auto& player = MOX::_player[MOX::_PLAYER_NUM];
+        int16_t player_num = MOX::_PLAYER_NUM;
+        s_player* player = &MOX::_player[player_num];
 
         // Part 0: BC
-        ERIC::String_Builder2_(buffer, 0, ESTRINGS::E_Strings_(0x76 /* 118 */), s_0_0055110c, s_1_00551110, player.bc);
+        ERIC::String_Builder2_(buffer, 0, ESTRINGS::E_Strings_(0x76 /* 118 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->bc);
 
         // Part 1: Surplus BC (with color formatting)
-        const char* red_fmt = ERIC::Red_If_Negative_Fmt_String_(player.surplus_bc);
-        ERIC::String_Builder2_(buffer, 1, ESTRINGS::E_Strings_(0x6a /* 106 */), s_0_0055110c, s_1_00551110, red_fmt, (int)player.surplus_bc);
+        const char* red_fmt = ERIC::Red_If_Negative_Fmt_String_(player->surplus_bc);
+        ERIC::String_Builder2_(buffer, 1, ESTRINGS::E_Strings_(0x6a /* 106 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, red_fmt, player->surplus_bc);
 
         // Part 2: Total Population
-        ERIC::String_Builder2_(buffer, 2, ESTRINGS::E_Strings_(0x72 /* 114 */), s_0_0055110c, s_1_00551110, (int)player.total_pop);
+        ERIC::String_Builder2_(buffer, 2, ESTRINGS::E_Strings_(0x72 /* 114 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->total_pop);
 
         // Part 3: Surplus Freighters
-        ERIC::String_Builder2_(buffer, 3, ESTRINGS::E_Strings_(0x67 /* 103 */), s_0_0055110c, s_1_00551110, (int)player.surplus_freighters);
+        ERIC::String_Builder2_(buffer, 3, ESTRINGS::E_Strings_(0x67 /* 103 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->surplus_freighters);
 
         // Part 4: Surplus Food
-        ERIC::String_Builder2_(buffer, 4, ESTRINGS::E_Strings_(0x66 /* 102 ESTR_SFOOD_SD */), s_0_0055110c, s_1_00551110, (int)player.surplus_food);
+        ERIC::String_Builder2_(buffer, 4, ESTRINGS::E_Strings_(0x66 /* 102 ESTR_SFOOD_SD */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->surplus_food);
 
         // Part 5: Research Produced
-        ERIC::String_Builder2_(buffer, 5, ESTRINGS::E_Strings_(0x75 /* 117 */), s_0_0055110c, s_1_00551110, (int)player.research_produced);
+        ERIC::String_Builder2_(buffer, 5, ESTRINGS::E_Strings_(0x75 /* 117 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->research_produced);
 
         // Render the built strings
         FMTPARA::Print_Formatted_Paragraph_(520 /* 0x208 */, 354 /* 0x162 */, 104 /* 0x68 */, buffer, 3);
@@ -437,7 +438,7 @@ namespace COLSUM {
         Draw_Scan_Info_();
 
         if (COLMOVE::_cluster_colony_n != -1 && COLONY::_g_colony_n != -1) {
-            s_colors colors;
+            s_colors colors = {};
             colors.colors[0] = 0xE8;
             colors.colors[1] = 0xE9;
             colors.colors[2] = 0xEA;
@@ -672,7 +673,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             x2 + 2,
             y2 + 2,
             pattern,
-            static_cast<int16_t>(COLONY::_g_count % 6)
+            COLONY::_g_count % 6
         );
     }
 
@@ -682,7 +683,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
 
         if (num_colonies >= 10) {
             int32_t y1 = (271 * (int32_t)COLSUM::_first) / (int32_t)num_colonies + 40;
-            int32_t y2 = (((271 * (int32_t)COLSUM::_first) + 10) / (int32_t)num_colonies) + 40;
+            int32_t y2 = (271 * ((int32_t)COLSUM::_first + 10)) / (int32_t)num_colonies + 40;
 
             graphics::Set_Window_(0, 0, 639, 479);
             video::Clip_On_();
@@ -976,11 +977,11 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
     }
 
     int16_t __cdecl cmp_(int16_t param_1, int16_t param_2) {
-        if (param_2 < param_1) {
+        if (param_1 < param_2) {
             return -1;
         }
 
-        return (int16_t)(param_1 < param_2);
+        return (int16_t)(param_2 < param_1);
     }
 
     int16_t __cdecl cmp_Pops_(int16_t colony_idx1, int16_t colony_idx2) {
@@ -991,23 +992,23 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
     }
 
     int16_t __cdecl cmp_Food_(int16_t colony_idx1, int16_t colony_idx2) {
-        return cmp_(static_cast<uint16_t>(MOX::_colony[colony_idx1].production[0]),
-                    static_cast<uint16_t>(MOX::_colony[colony_idx2].production[0]));
+        return cmp_(MOX::_colony[colony_idx1].production[0],
+                    MOX::_colony[colony_idx2].production[0]);
     }
 
     int16_t __cdecl cmp_Industry_(int16_t param_1, int16_t param_2) {
-        return cmp_(static_cast<uint16_t>(MOX::_colony[param_1].production[ECON_INDUSTRY]),
-                    static_cast<uint16_t>(MOX::_colony[param_2].production[ECON_INDUSTRY]));
+        return cmp_(MOX::_colony[param_1].production[ECON_INDUSTRY],
+                    MOX::_colony[param_2].production[ECON_INDUSTRY]);
     }
 
     int16_t __cdecl cmp_Research_(int16_t colony_idx_1, int16_t colony_idx_2) {
-        return cmp_(static_cast<uint16_t>(MOX::_colony[colony_idx_1].production[ECON_RESEARCH]),
-                    static_cast<uint16_t>(MOX::_colony[colony_idx_2].production[ECON_RESEARCH]));
+        return cmp_(MOX::_colony[colony_idx_1].production[ECON_RESEARCH],
+                    MOX::_colony[colony_idx_2].production[ECON_RESEARCH]);
     }
 
     int16_t __cdecl cmp_BC_(int16_t param_1, int16_t param_2) {
-        return cmp_(static_cast<uint16_t>(MOX::_colony[param_1].production[ECON_BC]),
-                    static_cast<uint16_t>(MOX::_colony[param_2].production[ECON_BC]));
+        return cmp_(MOX::_colony[param_1].production[ECON_BC],
+                    MOX::_colony[param_2].production[ECON_BC]);
     }
 
     int16_t __cdecl cmp_Prod_(int16_t colony_idx_1, int16_t colony_idx_2) {

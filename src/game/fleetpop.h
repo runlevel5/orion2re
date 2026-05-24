@@ -1,13 +1,6 @@
 #pragma once
 #include <cstdint>
 
-#pragma pack(push, 1)
-struct s_window_status_and_height {
-    uint16_t window_status;
-    int16_t fleet_box_inner_height;
-};
-#pragma pack(pop)
-
 struct s_fleet_box;
 
 namespace FLEETPOP {

@@ -91,9 +91,10 @@ namespace FLEETPOP {
 void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
     int16_t local_a = -1;
     int16_t local_8 = -1;
+    int16_t stack_node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
 
-    if (node_ptr == MOX::_first_node_ptr_in_stack_) {
-        node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+    if (stack_node == MOX::_first_node_ptr_in_stack_) {
+        node_ptr = stack_node;
         int16_t num_icons = N_Fleet_Icons_(node_ptr);
         Fleet_Box_Data_(num_icons);
 
@@ -282,12 +283,13 @@ void __cdecl Reload_Ship_Selection_Status_() {
     int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
     int16_t stack_owner = HACCESS::Ship_Stack_Owner_(node_ptr);
 
-    if (static_cast<int16_t>(MOX::_PLAYER_NUM) == stack_owner) {
+    if (MOX::_PLAYER_NUM == stack_owner) {
         for (int16_t i = 0; i < 500; ++i) {
             int16_t ship_idx = MOX::_ship_node[i].ship_idx;
+            int16_t bit_set = struct_::Test_Bit_Field_(MOX::_fleet_icon_selection_status, ship_idx);
 
             bool is_selectable = false;
-            if (struct_::Test_Bit_Field_(&MOX::_black_hole_anim_bitfield, ship_idx)) {
+            if (bit_set != 0) {
                 if (MAINSCR::Ship_Can_Be_Selected_(ship_idx)) {
                     is_selectable = true;
                 }
@@ -336,9 +338,9 @@ void __cdecl Save_Ship_Selection_Status_() {
                 s_ship_node& node = MOX::_ship_node[ship_node_idx];
 
                 if (node.selected == 0) {
-                    struct_::Clear_Bit_Field_(&MOX::_black_hole_anim_bitfield, node.ship_idx);
+                    struct_::Clear_Bit_Field_(MOX::_fleet_icon_selection_status, node.ship_idx);
                 } else {
-                    struct_::Set_Bit_Field_(&MOX::_black_hole_anim_bitfield, node.ship_idx);
+                    struct_::Set_Bit_Field_(MOX::_fleet_icon_selection_status, node.ship_idx);
                 }
             }
         }
@@ -1242,20 +1244,21 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
         int16_t y_offset,
         uint32_t unused_param_5,
         int16_t* current_y) {
-    s_window_status_and_height window_status;
+    uint16_t window_status;
+    int16_t fleet_box_inner_height;
     s_animation_header* segment;
     int16_t frame_left;
     int32_t window_bottom;
 
     frame_left = static_cast<int16_t>(x + x_offset);
-    window_status.fleet_box_inner_height = FLEETPOP::_fleet_box_field8_0xe;
+    fleet_box_inner_height = FLEETPOP::_fleet_box_field8_0xe;
     *current_y = static_cast<int16_t>(y_offset + y);
 
     MISC::Save_Window_Status_(&window_status);
 
     window_bottom =
             static_cast<int32_t>(y) +
-            static_cast<int32_t>(window_status.fleet_box_inner_height) +
+            static_cast<int32_t>(fleet_box_inner_height) +
             static_cast<int32_t>(y_offset);
     if (window_bottom >= 0x1A5) {
         window_bottom = 0x1A5;
@@ -1272,27 +1275,27 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
             static_cast<int16_t>(frame_left + 6),
             static_cast<int16_t>(*current_y + 0x29),
             static_cast<int16_t>(frame_left + FLEETPOP::_fleet_box_width - 6),
-            static_cast<int16_t>(*current_y + window_status.fleet_box_inner_height + 0x1D),
+            static_cast<int16_t>(*current_y + fleet_box_inner_height + 0x1D),
             0);
 
-    MISC::Restore_Window_Status_(*reinterpret_cast<uint32_t*>(&window_status));
+    MISC::Restore_Window_Status_(window_status);
 
     segment = (s_animation_header*)buffer::Buffer_Reload_(
-            (char*)FLEETPOP::s_BUFFER0_LBX,
+            FLEETPOP::s_BUFFER0_LBX,
             0x33,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, segment);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(segment));
 
     MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(
-            (char*)FLEETPOP::s_BUFFER0_LBX,
+            FLEETPOP::s_BUFFER0_LBX,
             0x35,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, MOX::_fleet_box_grid_lg_seg);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(MOX::_fleet_box_grid_lg_seg));
 
     segment = (s_animation_header*)buffer::Buffer_Reload_(
-            (char*)FLEETPOP::s_BUFFER0_LBX,
+            FLEETPOP::s_BUFFER0_LBX,
             0x37,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, segment);

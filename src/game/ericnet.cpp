@@ -173,7 +173,7 @@ namespace ERICNET {
 
     void __cdecl Calc_Ship_Level_(int16_t ship_idx) {
         s_ship_data* ship = &MOX::_ship[ship_idx];
-        uint16_t level = 0;
+        int16_t level = 0;
 
         // Iterate through experience thresholds to determine ship level
         for (int i = 0; i < 4; ++i) {
@@ -183,7 +183,7 @@ namespace ERICNET {
         }
 
         // Add level bonus for Warlord trait
-        s_player* owner = &MOX::_player[static_cast<uint8_t>(ship->owner)];
+        s_player* owner = &MOX::_player[(int16_t)ship->owner];
         if (owner->traits[TRAIT_WARLORD] != 0) {
             level++;
         }
@@ -193,7 +193,7 @@ namespace ERICNET {
             level = 5;
         }
 
-        ship->crew_quality = static_cast<int8_t>(level);
+        ship->crew_quality = (int8_t)level;
     }
 
     void __cdecl Do_XP_For_Ship_(int16_t ship_index, int16_t xp_gain) {

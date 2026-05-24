@@ -790,7 +790,7 @@ void __cdecl Enforce_Population_Limits_At_Colony_(s_colony* colony) {
     }
 }
 
-uint32_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony) {
+int16_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony) {
     int32_t limit = static_cast<uint8_t>(colony->n_pops);
 
     if (MOX::_player[colony->owner].traits[TRAIT_WARLORD] == 0) {
@@ -801,7 +801,7 @@ uint32_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony) {
         limit = 1;
     }
 
-    return limit;
+    return (int16_t)limit;
 }
 
 int __cdecl Colony_Tank_Barracks_Limit_(s_colony* colony) {

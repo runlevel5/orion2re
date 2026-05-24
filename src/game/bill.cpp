@@ -92,12 +92,8 @@ namespace BILL {
                 dos::Delete_File_(dir_entry);
             }
 
-            char* d = source_path;
-            char* s = farload::_secondary_drive_path;
-            while ((*d++ = *s++) != '\0');
-            d--;
-            s = BILL::_dest_file_name;
-            while ((*d++ = *s++) != '\0');
+            strcpy(source_path, farload::_secondary_drive_path);
+            strcat(source_path, BILL::_dest_file_name);
 
             Copy_File_To_File_(source_path, BILL::_dest_file_name);
         }
@@ -318,7 +314,7 @@ namespace BILL {
         if (is_formatted) {
             FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(x, y, width, text, (int16_t)param_6, anim);
         } else {
-            BILL::_Print_Paragraph_Bill_(x, y, width, text, (uint16_t)param_6, 1, reinterpret_cast<int16_t*>(anim));
+            BILL::_Print_Paragraph_Bill_(x, y, width, text, (uint16_t)param_6, 1, anim);
         }
 
         fonts::_font_header.font_style_spacing = saved_spacing;
@@ -520,7 +516,7 @@ namespace BILL {
     /**
      * @address 00407730
      */
-    void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, int16_t* aux) {
+    void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text, s_animation_header* bitmap) {
         int16_t max_height = _Get_Paragraph_Max_Height_(width, text);
         int16_t current_height = static_cast<int16_t>(fonts::_font_header_current_height);
 
@@ -530,18 +526,18 @@ namespace BILL {
             new_y = 0;
         }
 
-        if (aux == nullptr) {
+        if (bitmap == nullptr) {
             _Print_Paragraph_(x, new_y, width, text, 2);
         } else {
-            _Print_Paragraph_Bill_Aux_(x, new_y, width, text, 2, aux);
+            _Print_Paragraph_Bill_Aux_(x, new_y, width, text, 2, bitmap);
         }
     }
 
     /**
      * @address 004077a0
      */
-    void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp) {
-        _Print_1_Or_More_Lines_Centered_(static_cast<int16_t>(x), static_cast<int16_t>(y), static_cast<int16_t>(width), str, reinterpret_cast<int16_t*>(bmp));
+    void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, const char* str, s_animation_header* bmp) {
+        _Print_1_Or_More_Lines_Centered_(static_cast<int16_t>(x), static_cast<int16_t>(y), static_cast<int16_t>(width), str, bmp);
     }
 
     /**
@@ -808,14 +804,14 @@ namespace BILL {
     /**
      * @address 004080c0
      */
-    void __cdecl _Print_Paragraph_Bill_Aux_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4, int16_t param_5, int16_t* param_6) {
-        _Print_Paragraph_Bill_(param_1, param_2, param_3, param_4, (uint16_t)param_5, 1, param_6);
+    void __cdecl _Print_Paragraph_Bill_Aux_(int16_t x, int16_t y, int16_t width, const char* text, int16_t color, s_animation_header* bitmap) {
+        _Print_Paragraph_Bill_(x, y, width, text, (uint16_t)color, 1, bitmap);
     }
 
     /**
      * @address 00407dd0
      */
-    void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, int32_t param_6, int16_t* param_7) {
+    void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, uint8_t draw_flag, s_animation_header* bitmap) {
         if (width >= 10 && width <= 0x280 && x >= 0 && x < 0x280 && y >= 0 && y < 0x1E0 && text != nullptr) {
             int16_t char_index = 0;
             char break_char = 0;
@@ -826,7 +822,7 @@ namespace BILL {
             int16_t last_break_out_index = 0;
             int16_t current_y = y;
             int16_t max_y = 0x1DF - (int16_t)fonts::_font_header.current_height;
-            char local_c8[184];
+            char local_c8[200];
 
             char current_char = text[0];
             while (current_char != '\0') {
@@ -886,7 +882,7 @@ namespace BILL {
                         }
 
                         local_c8[out_index] = '\0';
-                        _Print_String_Bill_(x, current_y, width, local_c8, color, (uint8_t)param_6, reinterpret_cast<s_animation_header*>(param_7));
+                        _Print_String_Bill_(x, current_y, width, local_c8, color, draw_flag, bitmap);
 
                         current_y += (int16_t)fonts::_font_header.line_height;
                         out_index = 0;
@@ -909,7 +905,7 @@ namespace BILL {
                 if (color == 3) {
                     color = 0;
                 }
-                _Print_String_Bill_(x, current_y, width, local_c8, color, (uint8_t)param_6, reinterpret_cast<s_animation_header*>(param_7));
+                _Print_String_Bill_(x, current_y, width, local_c8, color, draw_flag, bitmap);
             }
 
             __pp_max_height = current_y - y + (int16_t)fonts::_font_header.current_height;

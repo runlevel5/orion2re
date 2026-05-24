@@ -247,7 +247,7 @@ namespace council {
             result_code = 0;
         }
 
-        council::Council_Vote_Result_(result_code, MOX::_PLAYER_NUM);
+        council::Council_Vote_Result_((int8_t)result_code, (uint8_t)MOX::_PLAYER_NUM);
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
         council::_council_voter = -1;
@@ -345,7 +345,7 @@ namespace council {
 
                 _council_vote_cast = _council_member_votes[i];
                 _council_voter = member_id;
-                Council_Vote_Result_(vote_target, member_id);
+                Council_Vote_Result_((int8_t)vote_target, member_id);
             }
         }
 
@@ -356,7 +356,7 @@ namespace council {
 
             _council_vote_cast = votes;
             _council_voter = _council_nominee_[0];
-            Council_Vote_Result_(vote_target, _council_nominee_[0]);
+            Council_Vote_Result_((int8_t)vote_target, _council_nominee_[0]);
         }
 
         if ((int16_t)_council_nominee_[1] != MOX::_PLAYER_NUM) {
@@ -365,7 +365,7 @@ namespace council {
 
             _council_vote_cast = votes;
             _council_voter = _council_nominee_[1];
-            Council_Vote_Result_(vote_target, _council_nominee_[1]);
+            Council_Vote_Result_((int8_t)vote_target, _council_nominee_[1]);
         }
 
         Council_Player_Vote_();
@@ -743,7 +743,7 @@ namespace council {
         }
 
         // Determine if the vote is cast based on the final score
-        return random::Random_(200) <= (int32_t)vote_score;
+        return (int32_t)random::Random_(200) <= (int32_t)vote_score;
     }
 
     void __cdecl Get_Player_Voted_Winner_Message_(int16_t player_idx) {

@@ -1319,7 +1319,7 @@ namespace DIP_SCRN {
             }
         }
 
-        JIM::_jim_current_stream = 0xFFFF;
+        JIM::_jim_current_stream = -1;
         JIM::Play_Background_Music_();
         fields::Deactivate_Auto_Function_();
         fields::Clear_Fields_();
@@ -1344,7 +1344,7 @@ namespace DIP_SCRN {
         fields::Deactivate_Auto_Function_();
         fields::Clear_Fields_();
         _current_ambassador = static_cast<uint8_t>(player_idx);
-        _old_response_message = 0xFFFF;
+        _old_response_message = -1;
         ERIC::Set_Fade_Percent_(0);
         ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
@@ -1527,7 +1527,7 @@ namespace DIP_SCRN {
         ERIC::Set_Fade_Percent_(0);
         ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
-        JIM::_jim_current_stream = 0xFFFF;
+        JIM::_jim_current_stream = -1;
         JIM::Play_Background_Music_();
     }
 

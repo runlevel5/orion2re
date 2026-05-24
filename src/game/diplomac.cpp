@@ -34,7 +34,7 @@ namespace diplomac {
         }
 
         if (MOX::_player[player_id].personality == 3 /* RUTHLESS */) {
-            if (random::Random_(200) <= MOX::_settings.game_difficulty + 1) {
+            if ((int16_t)random::Random_(200) <= MOX::_settings.game_difficulty + 1) {
                 msg_id = 109 /* 0x6D */;
                 severity = 100;
                 min_mod = -150;
@@ -42,7 +42,7 @@ namespace diplomac {
             }
         }
 
-        if (random::Random_(100) < MOX::_player[player_id].food_shortage_duration) {
+        if ((int16_t)random::Random_(100) < MOX::_player[player_id].food_shortage_duration) {
             msg_id = 119 /* 0x77 */;
             min_mod = -150;
             score = -150;
@@ -63,7 +63,7 @@ namespace diplomac {
         }
 
         if (MOX::_player[player_id].personality == 0 /* XENOPHOBIC */) {
-            if (aitech::System_Proximity_Count_(player_id, (uint8_t)target_id) >= random::Random_(400)) {
+            if (aitech::System_Proximity_Count_(player_id, (uint8_t)target_id) >= (int16_t)random::Random_(400)) {
                 msg_id = 121 /* 0x79 */;
                 min_mod = -150;
                 score = -150;
@@ -156,8 +156,8 @@ namespace diplomac {
             demands_count = 0;
         }
 
-        if (random::Random_(100) <= final_prob && last_threat_turn > 9) {
-            if (random::Random_(16) + MOX::_settings.game_difficulty < 16) {
+        if ((int16_t)random::Random_(100) <= final_prob && last_threat_turn > 9) {
+            if ((int16_t)random::Random_(16) + MOX::_settings.game_difficulty < 16) {
                 if (demands_count > 0 && min_mod != -150) {
                     bool is_most_populous = true;
                     for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -248,7 +248,7 @@ namespace diplomac {
                     if (plr1->peace_duration[p2] != 0) {
                         int16_t personality = Get_Player_Diplomacy_Personality_(p1, p2);
                         int16_t break_chance = _personality_break_peace_treaty_chance[personality];
-                        if (random::Random_(100) > (int32_t)break_chance) {
+                        if ((int32_t)random::Random_(100) > (int32_t)break_chance) {
                             if (eval_results[p2] != 0) {
                                 plr1->war_buildup_duration = (int8_t)random::Random_(20) + 20;
                             }
@@ -263,7 +263,7 @@ namespace diplomac {
                                 plr1->opportunity_actual_attacker_ratio[p2] <= (int32_t)eval_ratios[p2]) 
                             {
                                 plr1->war_buildup_duration = (int8_t)random::Random_(20) + 20;
-                                if (npc_war_count > 0 && random::Random_(4) < (int32_t)MOX::_settings.game_difficulty) {
+                                if (npc_war_count > 0 && (int32_t)random::Random_(4) < (int32_t)MOX::_settings.game_difficulty) {
                                     for (int16_t p3 = 0; p3 < (int16_t)MOX::_NUM_PLAYERS; ++p3) {
                                         if (MOX::_player[p3].objectives != 100 && plr1->treaty[p3] >= 4) {
                                             Declare_Peace_(p1, p3);
@@ -692,7 +692,7 @@ namespace diplomac {
                     if (diplodef::_COUNCIL_FLAG == 3 /* COUNCIL_FINAL_VOTE */) {
                         if (incident >= 1 && incident <= 11) {
                             int severity_abs = abs(player_i.diplomacy_severity[j] / 10);
-                            if (severity_abs >= random::Random_(100)) {
+                            if (severity_abs >= (int16_t)random::Random_(100)) {
                                 player_i.diplomacy_message[j] = '{';
                             }
                         }
@@ -960,7 +960,7 @@ namespace diplomac {
                     
                     if (plr->ship_war_losses[i] > plr->ship_war_losses[i]) { /* Dead code branch */
                         int16_t chance = diplodef::_personality_reward_proposal_chance[(uint8_t)plr->personality];
-                        if (chance > random::Random_(100)) {
+                        if (chance > (int16_t)random::Random_(100)) {
                             int16_t random_amount = (int16_t)random::Random_(15) + 15;
                             Change_Relations_(random_amount, param_2, i, 15, param_4, param_3);
                         }
@@ -999,7 +999,7 @@ namespace diplomac {
         if (amount == -10000) {
             if (MOX::_player[p_a].objectives == 100 /* 'd' */ && incident > 0) {
                 MOX::_player[p_b].diplomacy_severity[p_a] = 10000;
-                MOX::_player[p_b].diplomacy_incident[p_a] = incident;
+                MOX::_player[p_b].diplomacy_incident[p_a] = (uint8_t)incident;
                 MOX::_player[p_b].diplomacy_value[p_a] = value;
                 MOX::_player[p_b].diplomacy_system[p_a] = system;
             }
@@ -1105,7 +1105,7 @@ namespace diplomac {
                 int final_chg_abs = abs((int)final_change);
                 if (current_sev_abs < final_chg_abs) {
                     MOX::_player[p_b].diplomacy_severity[p_a] = final_change;
-                    MOX::_player[p_b].diplomacy_incident[p_a] = incident;
+                    MOX::_player[p_b].diplomacy_incident[p_a] = (uint8_t)incident;
                     MOX::_player[p_b].diplomacy_value[p_a] = value;
                     MOX::_player[p_b].diplomacy_system[p_a] = system;
                 }
@@ -1327,7 +1327,7 @@ namespace diplomac {
             chance = 20;
         }
 
-        if (random::Random_(100) > chance) {
+        if ((int16_t)random::Random_(100) > chance) {
             return;
         }
 
@@ -1412,13 +1412,13 @@ namespace diplomac {
                 adj_severity -= (int16_t)plr->relations[target_player];
             }
 
-            if (random::Random_(100) <= adj_severity) {
+            if ((int16_t)random::Random_(100) <= adj_severity) {
                 plr->threats[target_player]++;
             }
-            if (random::Random_(100) <= adj_severity / 2) {
+            if ((int16_t)random::Random_(100) <= adj_severity / 2) {
                 plr->threats[target_player]++;
             }
-            if (random::Random_(100) <= adj_severity / 4) {
+            if ((int16_t)random::Random_(100) <= adj_severity / 4) {
                 plr->threats[target_player]++;
             }
 
@@ -1456,7 +1456,7 @@ namespace diplomac {
                 if (threats == 2 && has_active_bond) {
                     int16_t p_idx = Get_Player_Diplomacy_Personality_(current_player, target_player);
                     int16_t demand_chance = diplodef::_threat_demand_chance[p_idx];
-                    if (random::Random_(100) <= demand_chance) {
+                    if ((int16_t)random::Random_(100) <= demand_chance) {
                         if (Get_Demands_(current_player, target_player, 6, 1, 1, 1, 1) == 1) {
                             plr->diplomacy_message[target_player] = incident + 0x1B;
                             Set_Demands_(current_player, target_player);
@@ -1516,7 +1516,7 @@ namespace diplomac {
             roll_threshold = (int16_t)((uint32_t)base_chance / root);
         }
 
-        if (random::Random_(100) > roll_threshold) {
+        if ((int16_t)random::Random_(100) > roll_threshold) {
             return;
         }
 
@@ -1649,7 +1649,7 @@ namespace diplomac {
 
         if (choice == 2) {
             int threshold = (diplodef::_personality_relation_modifiers[(uint8_t)player.personality] + (10 - MOX::_settings.game_difficulty) * 25) * 2;
-            if (random::Random_(threshold) >= Fleet_Strength_Comparison_(player_idx, target_idx)) {
+            if ((int32_t)random::Random_((uint32_t)threshold) >= Fleet_Strength_Comparison_(player_idx, target_idx)) {
                 player.diplomacy_message[target_idx] = 'a' /* PROPOSAL_PEACE */;
                 npcdiplo::Clear_Last_Proposal_Turn_(player_idx, target_idx);
                 return;
@@ -1658,7 +1658,7 @@ namespace diplomac {
 
         if (choice == 3) {
             int threshold = (diplodef::_personality_relation_modifiers[(uint8_t)player.personality] + (7 - MOX::_settings.game_difficulty) * 25) * 2;
-            if (random::Random_(threshold) >= Fleet_Strength_Comparison_(player_idx, target_idx)) {
+            if ((int32_t)random::Random_((uint32_t)threshold) >= Fleet_Strength_Comparison_(player_idx, target_idx)) {
                 player.diplomacy_message[target_idx] = 'b' /* PROPOSAL_ALLIANCE */;
                 npcdiplo::Clear_Last_Proposal_Turn_(player_idx, target_idx);
                 return;
@@ -1669,7 +1669,7 @@ namespace diplomac {
             int threshold = Tech_Strength_Comparison_(player_idx, target_idx) + (MOX::_settings.game_difficulty * 25 - diplodef::_personality_relation_modifiers[(uint8_t)player.personality]) * 2;
             if (player.treaty[target_idx] == 1) threshold -= 25;
             if (player.treaty[target_idx] == 2) threshold -= 50;
-            if (random::Random_(300) >= threshold) {
+            if ((int32_t)random::Random_(300) >= threshold) {
                 player.diplomacy_message[target_idx] = 'd' /* PROPOSAL_RESEARCH_TREATY */;
                 npcdiplo::Clear_Last_Proposal_Turn_(player_idx, target_idx);
                 return;
@@ -1682,7 +1682,7 @@ namespace diplomac {
             if (player.treaty[target_idx] == 2) threshold -= 50;
             
             bool trade_offered = false;
-            if (random::Random_(300) >= threshold) {
+            if ((int32_t)random::Random_(300) >= threshold) {
                 player.diplomacy_message[target_idx] = 'c' /* PROPOSAL_TRADE_TREATY */;
                 trade_offered = true;
             }
@@ -1794,19 +1794,19 @@ namespace diplomac {
                     }
 
                     if (MOX::_player[p1].treaty[p2] == 1 /* Peace */) {
-                        if (random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
+                        if ((int16_t)random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
                             Change_Relations_(random::Random_(3), p1, p2, 0, 0, 0);
                         }
                     }
 
                     if (MOX::_player[p1].trade_treaty[p2] == 1) {
-                        if (random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
+                        if ((int16_t)random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
                             Change_Relations_(random::Random_(3), p1, p2, 12 /* TRADE_TREATY */, 0, 0);
                         }
                     }
 
                     if (MOX::_player[p1].research_treaty[p2] == 1) {
-                        if (random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
+                        if ((int16_t)random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
                             Change_Relations_(random::Random_(3), p1, p2, 13 /* RESEARCH_TREATY */, 0, 0);
                         }
                     }
@@ -1816,13 +1816,13 @@ namespace diplomac {
                     }
 
                     if (MOX::_player[p1].tribute_treaty[p2] == 1) {
-                        if (random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
+                        if ((int16_t)random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
                             Change_Relations_(random::Random_(3), p1, p2, 14 /* TRIBUTE */, 0, 0);
                         }
                     }
 
                     if (MOX::_player[p1].tribute_treaty[p2] == 2) {
-                        if (random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
+                        if ((int16_t)random::Random_(100) <= (100 - MOX::_player[p1].relations[p2])) {
                             Change_Relations_(random::Random_(8), p1, p2, 14 /* TRIBUTE */, 0, 0);
                         }
                     }
@@ -3199,10 +3199,10 @@ namespace diplomac {
         }
 
         if (diff_percent < 0) {
-            return -random::Random_(-diff_percent);
+            return -(int32_t)random::Random_((uint32_t)(-diff_percent));
         }
 
-        return random::Random_(diff_percent);
+        return (int32_t)random::Random_((uint32_t)diff_percent);
     }
 
     int16_t __cdecl Diplomacy_Test_(int16_t evaluator_idx, int16_t proposer_idx, int16_t difficulty_mod, int16_t treaty_type) {

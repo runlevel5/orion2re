@@ -999,7 +999,7 @@ namespace COMBAT {
         int16_t hits = (uint8_t)colony->n_pops + colony->military[0] + colony->military[1];
 
         // Add 1 hit for every building that is not a combat satellite
-        for (int16_t i = 0; i < 49; ++i) {
+        for (uint8_t i = 0; i < 49; ++i) {
             if (colony->buildings[i] != 0) {
                 if (Combat_Satelite_Check_(i) == 0) {
                     hits++;

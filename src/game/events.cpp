@@ -408,7 +408,7 @@ namespace EVENTS {
 
                 case 14:
                     if (_event_data[i].status != 6) {
-                        if (random::Random_(100) <= (int)_event_data[i].amount * 100 / (int)_event_data[i].max_amount) {
+                        if ((int32_t)random::Random_(100) <= (int)_event_data[i].amount * 100 / (int)_event_data[i].max_amount) {
                             for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                                 if ((MOX::_star[_event_data[i].target_id].has_colony >> j) & 1) {
                                     if (MOX::_player[j].n_freighters > 0) {
@@ -686,7 +686,7 @@ namespace EVENTS {
             case 4: probability = (delay * 5) / 6; break;
             }
 
-            if (random::Random_(512) <= probability) {
+            if ((int32_t)random::Random_(512) <= probability) {
                 is_random_event_due = true;
             }
         }
@@ -2463,7 +2463,7 @@ namespace EVENTS {
                     out_str[0] -= 0x20;
                 }
             }
-            out_len = strlen(out_str);
+            out_len = (int16_t)strlen(out_str);
         }
         out_str[out_len] = '\0';
 

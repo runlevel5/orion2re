@@ -577,7 +577,7 @@ namespace fields {
 
         field->detail.multi_hotkey.help = const_cast<char*>(help_text);
         field->detail.multi_hotkey.help_start = 0;
-        field->detail.multi_hotkey.help_len = strlen(help_text);
+        field->detail.multi_hotkey.help_len = (short)strlen(help_text);
 
         _multi_hotkey_active_field = 1;
         _fields_count++;
@@ -2745,7 +2745,7 @@ namespace fields {
         char buffer[64];
         strcpy(buffer, field->detail.cont_input.buffer);
 
-        len = strlen(buffer);
+        len = (int16_t)strlen(buffer);
 
         while (max_width < fonts::Get_String_Width_(buffer) && len > 0) {
             buffer[0] = '\0';

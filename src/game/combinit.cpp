@@ -469,12 +469,12 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_super_fast_flag = 0;
     COMBINIT::_real_attack_flag = 0;
 
-    MOX::_shields_flag = MOX::_settings.combat_shields_arc_flag;
-    MOX::_speedx2_flag = MOX::_settings.combat_speedx2_flag;
-    MOX::_saved_msl_warning = MOX::_settings.combat_missile_impact_flag;
-    MOX::_msl_impact_warning_flag = MOX::_settings.combat_missile_impact_flag;
-    MOX::_draw_legal_boxes_flag = MOX::_settings.combat_legal_moves_flag;
-    MOX::_grid_flag = MOX::_settings.combat_grid_flag;
+    MOX::_shields_flag = (uint8_t)MOX::_settings.combat_shields_arc_flag;
+    MOX::_speedx2_flag = (uint8_t)MOX::_settings.combat_speedx2_flag;
+    MOX::_saved_msl_warning = (uint8_t)MOX::_settings.combat_missile_impact_flag;
+    MOX::_msl_impact_warning_flag = (uint8_t)MOX::_settings.combat_missile_impact_flag;
+    MOX::_draw_legal_boxes_flag = (uint8_t)MOX::_settings.combat_legal_moves_flag;
+    MOX::_grid_flag = (uint8_t)MOX::_settings.combat_grid_flag;
     MOX::_combat_init = MOX::_settings.ship_initiative;
 
     MOX::_take_control_flag = 0;
@@ -547,6 +547,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                 has_cloaking = 1;
             }
 
+            // Original binary calls this and discards the result.
             Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 10);
             if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 26) != 0) {
                 has_special_26 = 1;
@@ -760,6 +761,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                         has_cloaking = 1;
                     }
 
+                    // Original binary calls this and discards the result.
                     Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 10);
                     if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 26) != 0) {
                         has_special_26 = 1;
@@ -933,7 +935,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             if (MOX::_PLAYER_NUM == MOX::_combat_attacker_player) {
                 net_plr = MOX::_combat_defender_player;
             }
-            NETMOX::Mox_Send_Message_(MOX::_player[net_plr].network_player_id, 1005, &MOX::_combat_init, 2);
+            NETMOX::Mox_Send_Message_(MOX::_player[net_plr].network_player_id, 0x3ED, &MOX::_combat_init, 2);
             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(0);
         }
         
@@ -982,6 +984,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                 if (combat_winner == 0) {
                     MOX::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr1, 1);
+                    COMBAT1::Check_For_Winner_();
                     Increment_Bhg_(turn_plr1);
                 }
 
@@ -991,6 +994,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                 if (combat_winner == 0) {
                     MOX::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr2, 1);
+                    COMBAT1::Check_For_Winner_();
                     Increment_Bhg_(turn_plr2);
                 }
 
@@ -1385,8 +1389,8 @@ int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx) {
         }
 
         // Check proximity to the primary combat object (usually a colony/starbase)
-        if (MOX::_combat_data[0].x <= x + 2 && x <= MOX::_combat_data[0].x + size_threshold) {
-            if (MOX::_combat_data[0].y + size_threshold >= y && y + 2 >= MOX::_combat_data[0].y) {
+        if (MOX::_combat_data->x <= x + 2 && x <= MOX::_combat_data->x + size_threshold) {
+            if (MOX::_combat_data->y + size_threshold >= y && y + 2 >= MOX::_combat_data->y) {
                 result = 0;
             }
         }
@@ -2000,7 +2004,7 @@ void __cdecl Deploy_Ships_() {
         } else {
             if (ship->owner == MOX::_combat_attacker_player) {
                 if (!(attacker_ship_count & 1)) {
-                    ship->x = attacker_deploy_x;
+                    ship->x = (int8_t)attacker_deploy_x;
                     ship->y = (int8_t)attacker_deploy_y_down;
                     int16_t offset = Ship_Size_Offset_(ship->size_class);
                     attacker_deploy_y_down += (int16_t)(offset + 1);
@@ -2025,7 +2029,7 @@ void __cdecl Deploy_Ships_() {
                     }
                     int16_t offset = Ship_Size_Offset_(ship->size_class);
                     attacker_deploy_y_up -= (int16_t)(offset + 1);
-                    ship->x = attacker_deploy_x;
+                    ship->x = (int8_t)attacker_deploy_x;
                     ship->y = (int8_t)attacker_deploy_y_up;
                 }
                 attacker_ship_count++;
@@ -2239,10 +2243,10 @@ void __cdecl Scroll_Combat_Screen_() {
     int16_t diff_y;
 
     while (true) {
-        int16_t mouse_x = mouse::Pointer_X_();
-        int16_t mouse_y = mouse::Pointer_Y_();
-
-        if (mouse_x >= 5 && mouse_x <= 0x27B /* 635 */ && mouse_y >= 5 && mouse_y <= 0x1DB /* 475 */) {
+        if (mouse::Pointer_X_() >= 5 &&
+            mouse::Pointer_X_() <= 0x27B /* 635 */ &&
+            mouse::Pointer_Y_() >= 5 &&
+            mouse::Pointer_Y_() <= 0x1DB /* 475 */) {
             COMBAT1::Assign_Combat_Grids_(MOX::_cur_ship);
             COMBAT1::Add_Tactical_Combat_Fields_();
             CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -2288,14 +2292,14 @@ void __cdecl Scroll_Combat_Screen_() {
             next_combat_y = 0x32;
         }
 
-        diff_x = old_combat_x - next_combat_x;
+        diff_x = (int16_t)(old_combat_x - next_combat_x);
         if (diff_x < 0) {
             dir_x = 1;
         } else {
             dir_x = (diff_x > 0) ? -1 : 0;
         }
 
-        diff_y = old_combat_y - next_combat_y;
+        diff_y = (int16_t)(old_combat_y - next_combat_y);
         if (diff_y < 0) {
             dir_y = 1;
         } else {
@@ -2305,13 +2309,13 @@ void __cdecl Scroll_Combat_Screen_() {
         if (next_combat_x != old_combat_x) {
             MOX::_combat_near_x += dir_x * -0x50; // -80
             MOX::_combat_mid_x += dir_x * -0x28;  // -40
-            MOX::_combat_far_x += (dir_x * -20) / 2; // -10
+            MOX::_combat_far_x += (int16_t)(((int32_t)dir_x * -20) / 2); // -10
         }
 
         if (next_combat_y != old_combat_y) {
             MOX::_combat_near_y += dir_y * -0x50; // -80
             MOX::_combat_mid_y += dir_y * -0x28;  // -40
-            MOX::_combat_far_y += (dir_y * -20) / 2; // -10
+            MOX::_combat_far_y += (int16_t)(((int32_t)dir_y * -20) / 2); // -10
         }
 
         if (MOX::_combat_near_x < 0) MOX::_combat_near_x += 0x280; // 640

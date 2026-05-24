@@ -4387,7 +4387,7 @@ struct s_ship_data {
     char shield_damage_percent;
     char drive_damage_percent;
     char computer_damage;
-    char crew_quality;
+    int8_t crew_quality;
     short crew_experience;
     short officer_index;
     byte special_device_damage_flags[5];

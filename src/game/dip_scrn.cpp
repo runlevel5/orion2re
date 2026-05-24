@@ -272,7 +272,7 @@ namespace DIP_SCRN {
     void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2) {
         do {
             timer::Mark_Time_();
-            DIP_SCRN::Diplomacy_Chat_(param_1, param_2);
+            DIP_SCRN::Diplomacy_Chat_(param_1, (uint8_t)param_2);
 
             if (DIP_SCRN::_chat_mode_flag != 1) {
                 break;
@@ -337,7 +337,7 @@ namespace DIP_SCRN {
         DIP_SCRN::_net_diplomacy_message.arg2 = -1;
 
         do {
-            DIP_SCRN::Diplomacy_Listen_Mode_(target_player_id, player_id);
+            DIP_SCRN::Diplomacy_Listen_Mode_(target_player_id, (uint8_t)player_id);
             if (DIP_SCRN::_net_diplomacy_message.arg2 != -1) {
                 break;
             }
@@ -964,7 +964,7 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.arg2 = -2;
 
                         do {
-                            Diplomacy_Listen_Mode_(player_2, player_1);
+                            Diplomacy_Listen_Mode_(player_2, (uint8_t)player_1);
                             if (_net_diplomacy_message.arg2 != -2) {
                                 break;
                             }
@@ -1112,7 +1112,7 @@ namespace DIP_SCRN {
                         Get_Listen_Mode_Message_(target_player_idx);
                         _net_diplomacy_message.arg2 = -1;
                         do {
-                            Diplomacy_Listen_Mode_(target_player_idx, player_idx);
+                            Diplomacy_Listen_Mode_(target_player_idx, (uint8_t)player_idx);
                             if (_net_diplomacy_message.arg2 != -1) break;
                         } while (_net_diplomacy_esc_pressed == 0);
 
@@ -1166,7 +1166,7 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.arg2 = -1;
                         Get_Listen_Mode_Message_(target_player_idx);
                         do {
-                            Diplomacy_Listen_Mode_(target_player_idx, player_idx);
+                            Diplomacy_Listen_Mode_(target_player_idx, (uint8_t)player_idx);
                             if (_net_diplomacy_message.arg2 != -1) break;
                         } while (_net_diplomacy_esc_pressed == 0);
 
@@ -1209,7 +1209,7 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.arg2 = -1;
                         Get_Listen_Mode_Message_(target_player_idx);
                         do {
-                            Diplomacy_Listen_Mode_(target_player_idx, player_idx);
+                            Diplomacy_Listen_Mode_(target_player_idx, (uint8_t)player_idx);
                             if (_net_diplomacy_message.arg2 != -1) break;
                         } while (_net_diplomacy_esc_pressed == 0);
 
@@ -1290,7 +1290,7 @@ namespace DIP_SCRN {
             demand_list_flags[7] = 1;
         }
 
-        if (SHIPMOVE::Player_Has_Ships_Pestering_Other_Player_(ambassador_idx, player_num) == 1) {
+        if (SHIPMOVE::Player_Has_Ships_Pestering_Other_Player_(ambassador_idx, (uint8_t)player_num) == 1) {
             demand_list_flags[8] = 1;
         }
 

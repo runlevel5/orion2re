@@ -61,20 +61,20 @@ namespace BILL {
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width);
 
-    void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp);
+    void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, const char* str, s_animation_header* bmp);
 
-    void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, int16_t* aux);
+    void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text, s_animation_header* bitmap);
 
     void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit);
 
     void __cdecl _Print_Paragraph_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment);
 
-    void __cdecl _Print_Paragraph_Bill_Aux_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4, int16_t param_5, int16_t* param_6);
+    void __cdecl _Print_Paragraph_Bill_Aux_(int16_t x, int16_t y, int16_t width, const char* text, int16_t color, s_animation_header* bitmap);
 
     inline int16_t& __pp_max_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BBE});
     inline int16_t& __pp_max_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BC0});
 
-    void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, int32_t param_6, int16_t* param_7);
+    void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, uint8_t draw_flag, s_animation_header* bitmap);
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t max_width, char* text, int16_t font_style);
 

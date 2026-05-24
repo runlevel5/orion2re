@@ -553,7 +553,6 @@ namespace MOX {
 
     inline s_animation_header*& _mid_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B610});
     inline s_animation_header*& _far_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B0});
-    inline uint32_t& _black_hole_anim_bitfield = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A17C0});
     inline uint8_t (&_fleet_icon_selection_status)[64] =
         *reinterpret_cast<uint8_t(*)[64]>(std::uintptr_t{0x005A17C0});
 
