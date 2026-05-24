@@ -4914,8 +4914,8 @@ struct s_tech_drive_data {
     uint16_t tech_app_id;
     uint16_t space_per_ship_type[6];
     uint16_t cost_per_ship_type[6];
-    uint8_t combat_speed_min[6];
-    uint8_t combat_speed_max[6];
+    int8_t combat_speed_min[6];
+    int8_t combat_speed_max[6];
     uint16_t warp_speed;
 };
 

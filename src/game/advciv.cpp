@@ -96,9 +96,9 @@ namespace ADVCIV {
 
             int16_t home_star_idx = (int16_t)MOX::_planet[MOX::_player[plr_idx].home_planet_id].star_index;
             for (int16_t star_idx = 1; star_idx < 72; ++star_idx) {
-                int16_t d = (int16_t)_parsec[home_star_idx].dist[star_idx];
-                if (max_dist_so_far < d) {
-                    max_dist_so_far = d;
+                int16_t distance = (int16_t)_parsec[home_star_idx].dist[star_idx];
+                if (max_dist_so_far < distance) {
+                    max_dist_so_far = distance;
                 }
             }
 
@@ -110,11 +110,11 @@ namespace ADVCIV {
                     Player_Has_Colony_At_Star_(plr_idx, colonized_star)) {
 
                     for (int16_t target_star = 1; target_star < MOX::_NUM_STARS; ++target_star) {
-                        int16_t d = (int16_t)_parsec[colonized_star].dist[target_star];
-                        if (d < 10 && MOX::_star[target_star].system_special != SYSTEM_SPECIAL_SPACE_MONSTER) {
+                        int16_t distance = (int16_t)_parsec[colonized_star].dist[target_star];
+                        if (distance < 10 && MOX::_star[target_star].system_special != SYSTEM_SPECIAL_SPACE_MONSTER) {
                             auto& star_proximity = _adv_civ_player[plr_idx].stars[target_star];
-                            if (d <= star_proximity.min_dist_to_colony) {
-                                star_proximity.min_dist_to_colony = d;
+                            if (distance <= star_proximity.min_dist_to_colony) {
+                                star_proximity.min_dist_to_colony = distance;
                             }
                             star_proximity.star_idx = target_star;
                         }
@@ -217,16 +217,16 @@ namespace ADVCIV {
         return static_cast<int16_t>(result_val / 10) - 1;
     }
 
-    void __cdecl Build_Parsec_Star_Distances_(s_parsec* parsec) {
+    void __cdecl Build_Parsec_Star_Distances_(s_parsec* parsec_distances) {
         for (int16_t i = 0; i < 72; ++i) {
-            memset(parsec[i].dist, 0xFF, sizeof(parsec[i].dist));
+            memset(parsec_distances[i].dist, 0xFF, sizeof(parsec_distances[i].dist));
 
             if (i < MOX::_NUM_STARS) {
                 for (int16_t j = 0; j < MOX::_NUM_STARS; ++j) {
                     if (i == j) {
-                        parsec[i].dist[j] = 0;
+                        parsec_distances[i].dist[j] = 0;
                     } else {
-                        parsec[i].dist[j] = GEO::Parsecs_Between_Stars_(i, j);
+                        parsec_distances[i].dist[j] = GEO::Parsecs_Between_Stars_(i, j);
                     }
                 }
             }
@@ -317,10 +317,8 @@ namespace ADVCIV {
                     }
                 }
             } else {
-                // If round picking fails, undo current flags and terminate choosing process
                 for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
                     short cand_idx = player_status[i + 8];
-                    // BUG: uses candidate list index as global planet index for undo
                     if (cand_idx >= 0 && cand_idx < 360) {
                         _planet_selected_flag[cand_idx] = -1;
                     }
@@ -336,14 +334,14 @@ namespace ADVCIV {
         for (int16_t planet_idx = 0; planet_idx < (int16_t)MOX::_planet_count; ++planet_idx) {
             if (ADVCIV::_planet_selected_flag[planet_idx] == player_idx) {
                 int32_t planet_worth;
-                int8_t is_homeworld;
+                int8_t has_colony_at_star;
                 int16_t proximity_bonus;
 
                 ADVCIV::Get_Adv_Civ_Planet_Worthiness_(
                     player_idx,
                     planet_idx,
                     &planet_worth,
-                    &is_homeworld,
+                    &has_colony_at_star,
                     &proximity_bonus
                 );
 
@@ -596,8 +594,6 @@ namespace ADVCIV {
 
     void __cdecl Init_Non_Homeworld_Colonies_() {
         for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
-            // Check if the planet at index 'i' has a valid selection flag (not -1).
-            // A flag of -1 indicates the planet is not selected for colony initialization.
             int8_t flag = _planet_selected_flag[i];
             if (flag != -1) {
                 ERICNET::Init_Non_Homeworld_Colony_(i, static_cast<int16_t>(flag));

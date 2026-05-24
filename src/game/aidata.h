@@ -50,33 +50,110 @@ namespace AIDATA {
         *reinterpret_cast<uint16_t (**)[2880]>(std::uintptr_t{0x0055A6B8});
     inline uint16_t& _n_all_ships = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005953E0 });
 
+    /*
+     * Returns the player with the strongest population claim on a colony.
+     * @param colony Colony to inspect.
+     */
     int16_t __cdecl Colony_Dominant_Player_(s_colony* colony);
 
+    /*
+     * Updates per-star AI range summaries for each player.
+     */
     void __cdecl Compute_Star_Player_Range_Info_();
 
-    int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player);
+    /*
+     * Estimates how valuable a colony is to a specific player.
+     * @param colony Colony being evaluated.
+     * @param evaluating_player Player perspective used for the estimate.
+     */
+    int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* evaluating_player);
 
-    int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* player);
+    /*
+     * Estimates the strategic range value of a colony to a specific player.
+     * @param colony Colony being evaluated.
+     * @param evaluating_player Player perspective used for the estimate.
+     */
+    int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* evaluating_player);
 
+    /*
+     * Computes the base per-player value table for all known planets.
+     */
     void __cdecl Compute_Base_Planet_Values_();
 
+    /*
+     * Computes per-player planet values adjusted by same-system context.
+     */
     void __cdecl Compute_Contextual_Planet_Values_();
 
+    /*
+     * Scores how worthwhile it is to refit a ship against current tech.
+     * @param ship Ship to evaluate.
+     */
     int32_t __cdecl Refit_Desirability_(s_ship_data* ship);
 
-    int16_t __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(int16_t player, int16_t star_a, int16_t star_b, int16_t* inter_star_out, bool use_extended);
+    /*
+     * Returns cached travel turns between two stars and an optional intermediate stop.
+     * @param player_idx Player whose travel rules are used.
+     * @param source_star_idx Starting star.
+     * @param dest_star_idx Destination star.
+     * @param intermediate_star_idx_out Receives the chosen intermediate star, or -1.
+     * @param use_extended_range Whether to use the extended-range result.
+     */
+    int16_t __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+        int16_t player_idx, int16_t source_star_idx, int16_t dest_star_idx, int16_t* intermediate_star_idx_out, bool use_extended_range);
 
-    int16_t __cdecl Ship_N_Turns_To_Star_With_Intermediate_(int16_t ship_idx, int16_t star_idx, int16_t* inter_star_out);
+    /*
+     * Returns cached travel turns from a ship to a destination star and an optional stop.
+     * @param ship_idx Ship to evaluate.
+     * @param dest_star_idx Destination star.
+     * @param intermediate_star_idx_out Receives the chosen intermediate star, or -1.
+     */
+    int16_t __cdecl Ship_N_Turns_To_Star_With_Intermediate_(int16_t ship_idx, int16_t dest_star_idx, int16_t* intermediate_star_idx_out);
 
-    int __cdecl airefit_cmp_(const void* a, const void* b);
+    /*
+     * Compares refit entries by desirability for qsort.
+     * @param lhs Left entry.
+     * @param rhs Right entry.
+     */
+    int __cdecl airefit_cmp_(const void* lhs, const void* rhs);
 
-    int __cdecl sort_ships_(const void* a, const void* b);
+    /*
+     * Orders combat ships by owner and map position for qsort.
+     * @param lhs Left ship index.
+     * @param rhs Right ship index.
+     */
+    int __cdecl sort_ships_(const void* lhs, const void* rhs);
 
+    /*
+     * Releases the temporary AI data block allocated for turn analysis.
+     */
     void __cdecl Deallocate_AI_Data_();
 
-    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range);
-    void __cdecl Compute_AI_Data_();
-    void __cdecl Find_Players_In_Range_(int16_t star_idx, int8_t* in_range_900, int8_t* in_range_2025);
+    /*
+     * Checks whether a target star is reachable from a source star or its wormhole exit.
+     * @param target_star_idx Star being tested.
+     * @param source_star_idx Source star.
+     * @param max_range_parsecs Maximum allowed distance in parsecs.
+     */
+    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range_parsecs);
 
-    int32_t __cdecl Uncolonized_Planet_Worth_To_Player_(s_planet_data* planet, s_player* plr);
+    /*
+     * Builds AI caches for ships, colonies, stars, and per-player planning data.
+     */
+    void __cdecl Compute_AI_Data_();
+
+    /*
+     * Marks which players can reach a star within normal and extended range.
+     * @param star_idx Star being tested.
+     * @param in_normal_range_out Receives players within normal range.
+     * @param in_extended_range_out Receives players within extended range.
+     */
+    void __cdecl Find_Players_In_Range_(int16_t star_idx, int8_t* in_normal_range_out, int8_t* in_extended_range_out);
+
+    /*
+     * Estimates how valuable settling an uncolonized planet is to a player.
+     * @param planet Planet being evaluated.
+     * @param evaluating_player Player perspective used for the estimate.
+     */
+    int32_t __cdecl Uncolonized_Planet_Worth_To_Player_(s_planet_data* planet, s_player* evaluating_player);
 }

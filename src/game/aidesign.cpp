@@ -341,19 +341,23 @@ namespace aidesign {
             }
         }
 
-        if (random::Random_(100) < r_base + cnt_4 * 20) {
-            if (random::Random_(100) < (r_base / 2) + cnt_4 * 20) {
+        int32_t arc0_threshold = (int32_t)r_base + (int32_t)cnt_4 * 20;
+        if ((int32_t)random::Random_(100) < arc0_threshold) {
+            int32_t arc0_inner_threshold = (int32_t)(r_base / 2) + (int32_t)cnt_4 * 20;
+            if ((int32_t)random::Random_(100) < arc0_inner_threshold) {
                 *arc0 = 16;
             } else {
                 *arc0 = 2;
             }
         }
 
-        if (random::Random_(100) < cnt_7 * 20 + (r_base / 2)) {
+        int32_t arc1_threshold = (int32_t)cnt_7 * 20 + (int32_t)(r_base / 2);
+        if ((int32_t)random::Random_(100) < arc1_threshold) {
             *arc1 = 2;
         }
 
-        if (random::Random_(100) < cnt_10 * 20 + (r_base / 4)) {
+        int32_t arc2_threshold = (int32_t)cnt_10 * 20 + (int32_t)(r_base / 4);
+        if ((int32_t)random::Random_(100) < arc2_threshold) {
             *arc2 = 2;
         }
     }
@@ -698,7 +702,7 @@ namespace aidesign {
         return result;
     }
 
-    int16_t __cdecl Get_Competition_Player_Tech_Values_(int16_t, int16_t tech_type) {
+    int16_t __cdecl Get_Competition_Player_Tech_Values_(int16_t player_idx, int16_t tech_type) {
         int16_t max_ai_group = 0;
         int16_t i = 0;
 
@@ -706,7 +710,7 @@ namespace aidesign {
             auto& app = TECHDATA::_technology_applications[i];
 
             if (app.ai_group == tech_type) {
-                if (MOX::_player->tech_applications[i] == 3) {
+                if (MOX::_player[player_idx].tech_applications[i] == 3) {
                     int16_t field_id = app.tech_field_id;
                     uint8_t field_group = TECHDATA::_technology_fields[field_id].ai_group;
 

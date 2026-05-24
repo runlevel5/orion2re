@@ -76,7 +76,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Cost_();
 
-    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, uint8_t firing_arc, uint8_t ammo, uint16_t specials);
+    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, uint16_t specials);
 
     int32_t __cdecl Total_Space_Used_();
 

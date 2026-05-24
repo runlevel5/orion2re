@@ -11,7 +11,7 @@ namespace AIBUILD {
             uint32_t count = 0;
 
             for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-                if (i != owner && !MOX::_player[i].eliminated && MOX::_player[i].objectives == 100 /* 'd' */) {
+                if (i != owner && !MOX::_player[i].eliminated && MOX::_player[i].objectives == 100) {
                     count++;
                     total_str += (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
                 }
@@ -33,7 +33,7 @@ namespace AIBUILD {
                 if (i != owner && !MOX::_player[i].eliminated && (*AIDATA::_ai_player_info)[owner].reachable_players[i]) {
                     uint32_t str = (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
 
-                    if (MOX::_player[i].objectives == 100 /* 'd' */) {
+                    if (MOX::_player[i].objectives == 100) {
                         total_human += str;
                         if (str < min_human) {
                             min_human = str;
@@ -98,17 +98,17 @@ namespace AIBUILD {
             if (player_idx != i && MOX::_player[player_idx].contact[i] != 0) {
                 int8_t treaty_type = MOX::_player[player_idx].treaty[i];
 
-                if (treaty_type == 4 /* War */) {
+                if (treaty_type == 4) {
                     if (max_war_level < 1) {
                         max_war_level = 1;
                     }
                 }
-                else if (treaty_type == 5 /* Aggression */) {
+                else if (treaty_type == 5) {
                     if (max_war_level < 2) {
                         max_war_level = 2;
                     }
                 }
-                else if (treaty_type == 6 /* Truce */) {
+                else if (treaty_type == 6) {
                     if (max_war_level < 3) {
                         max_war_level = 3;
                     }
@@ -179,9 +179,9 @@ namespace AIBUILD {
         }
     }
 
-    void __cdecl Compute_Colony_Ship_Need_(int16_t player_num) {
-        if (_player_n_colony_ships[player_num][0] == 0) {
-            _player_n_colony_ships[player_num][1] = 1;
+    void __cdecl Compute_Colony_Ship_Need_(int16_t player_idx) {
+        if (_player_n_colony_ships[player_idx][0] == 0) {
+            _player_n_colony_ships[player_idx][1] = 1;
         }
     }
 
@@ -190,21 +190,16 @@ namespace AIBUILD {
      * surplus and existing colony ship requirements.
      */
     void __cdecl Compute_Freighter_Need_(int16_t player_idx) {
-        int32_t i = player_idx;
-        int16_t surplus = MOX::_player[i].surplus_freighters;
+        int16_t surplus = MOX::_player[player_idx].surplus_freighters;
         
-        // Zero-extend byte value as per assembly sequence MOV AL, byte / AND EAX, 0xFFFF00FF / SUB CX, AX
-        uint16_t colony_ship_need = static_cast<uint8_t>(_player_n_colony_ships[i][2]);
+        uint16_t colony_ship_need = _player_n_colony_ships[player_idx][2];
         
-        _player_n_freighter_groups_wanted[i] = 0;
+        _player_n_freighter_groups_wanted[player_idx] = 0;
         
         int16_t diff = surplus - static_cast<int16_t>(colony_ship_need);
         
-        // If the player has a deficit in freighters
         if (diff < 0) {
-            // Calculate groups needed: (4 - deficit) / 5.
-            // This logic performs a ceiling division of the absolute deficit by 5.
-            _player_n_freighter_groups_wanted[i] = static_cast<int8_t>((4 - static_cast<int32_t>(diff)) / 5);
+            _player_n_freighter_groups_wanted[player_idx] = static_cast<int8_t>((4 - static_cast<int32_t>(diff)) / 5);
         }
     }
 
@@ -243,7 +238,7 @@ namespace AIBUILD {
 
                 if (aware) {
                     total_contacts++;
-                    int transports = (uint8_t)AIBUILD::_player_n_transports[i][0];
+                    int transports = AIBUILD::_player_n_transports[i][0];
                     total_transports += transports;
                     if (max_transports < transports) {
                         max_transports = transports;
@@ -259,7 +254,7 @@ namespace AIBUILD {
                         max_strength_vs_colonies = AIBUILD::_player_total_strength_vs_colonies[i];
                     }
 
-                    int spies = (uint8_t)AIBUILD::_player_n_spies[i][0];
+                    int spies = AIBUILD::_player_n_spies[i][0];
                     if (max_spies < spies) {
                         max_spies = spies;
                     }
@@ -289,7 +284,6 @@ namespace AIBUILD {
         }
 
         AIBUILD::_player_n_transports[player_idx][1] = 0;
-        // Index 189 in tech_applications is likely TECH_APP_TRANSPORT
         if (MOX::_player[player_idx].tech_applications[189] == 3 && AIBUILD::_player_ship_sizes[player_idx][13] > 1) {
             int colony_limit = ((*AIDATA::_ai_player_info)[player_idx].colony_count + 2) / 3;
             int transport_avg = (max_transports + 1 + total_transports / total_contacts) / 2;
@@ -376,12 +370,14 @@ namespace AIBUILD {
         if (AIBUILD::_player_total_strength_vs_ships[player_idx][0] > 0) {
             int spy_limit = 0x3F - BILL::Get_Their_Spy_Number_(player_idx, player_idx);
             if ((*AIDATA::_ai_player_info)[player_idx].n_contacts > 0 && spy_limit > 0) {
-                int current_spies = (uint8_t)AIBUILD::_player_n_spies[player_idx][0];
+                int current_spies = AIBUILD::_player_n_spies[player_idx][0];
                 if (current_spies < max_spies) {
-                    AIBUILD::_player_n_spies[player_idx][1] = (int8_t)(max_spies - current_spies);
+                    AIBUILD::_player_n_spies[player_idx][1] = (uint8_t)(max_spies - current_spies);
                 }
 
-                if (current_spies < max_spies + 2 && random::Random_(100) <= MOX::_player[player_idx].traits[9]) {
+                int32_t spy_trait = MOX::_player[player_idx].traits[9];
+                int32_t spy_roll = (int32_t)random::Random_(100);
+                if (current_spies < max_spies + 2 && spy_roll <= spy_trait) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
@@ -389,7 +385,7 @@ namespace AIBUILD {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
-                int8_t spy_need = AIBUILD::_player_n_spies[player_idx][1];
+                uint8_t spy_need = AIBUILD::_player_n_spies[player_idx][1];
                 if (spy_need != 0) {
                     int cap = (*AIDATA::_ai_player_info)[player_idx].n_contacts * ((MOX::_player[player_idx].traits[9] > 0 ? 1 : 0) + 1) * 2;
                     if (cap < current_spies) {
@@ -400,13 +396,13 @@ namespace AIBUILD {
                                 AIBUILD::_player_n_spies[player_idx][1] = 1;
                             }
                         } else {
-                            AIBUILD::_player_n_spies[player_idx][1] = (int8_t)special::isqrt_((uint8_t)spy_need);
+                            AIBUILD::_player_n_spies[player_idx][1] = (uint8_t)special::isqrt_(spy_need);
                         }
                     }
                 }
 
-                if (spy_limit < (uint8_t)AIBUILD::_player_n_spies[player_idx][1]) {
-                    AIBUILD::_player_n_spies[player_idx][1] = (int8_t)spy_limit;
+                if (spy_limit < AIBUILD::_player_n_spies[player_idx][1]) {
+                    AIBUILD::_player_n_spies[player_idx][1] = (uint8_t)spy_limit;
                 }
             }
         }
@@ -511,7 +507,6 @@ namespace AIBUILD {
         if (colony->outpost_flag == 0 && colony->n_pops != 0) {
             int16_t current_production = colony->producing[0];
 
-            // Check if producing specific special projects (values -38, or -3 to -1)
             if (current_production == -38 || (current_production >= -3 && current_production <= -1)) {
                 Assign_Colony_New_Building_(colony);
             }
@@ -520,7 +515,6 @@ namespace AIBUILD {
 
     void __cdecl Find_Buildable_Buildings_(s_colony* colony, uint16_t* buildable_flags) {
         for (int16_t product_id = 1; product_id < 0x31; ++product_id) {
-            // Check if the specific colony can build the product identified by product_id
             if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
                 buildable_flags[product_id] = 1;
             }
@@ -932,7 +926,7 @@ namespace AIBUILD {
         }
 
         int difficulty = MOX::_settings.game_difficulty;
-        if (MOX::_player[static_cast<int>(colony->owner)].objectives == 100 /* ECON_INDUSTRY */) {
+        if (MOX::_player[static_cast<int>(colony->owner)].objectives == 100) {
             difficulty = 4;
         }
 
@@ -964,21 +958,12 @@ namespace AIBUILD {
         }
     }
 
-    void __cdecl Force_Produce_(uint8_t* id_list, int16_t index, int32_t* list_count, int16_t production_id) {
-        // Retrieve the colony index from the provided list at the specified index
-        uint8_t colony_idx = id_list[index];
-
-        // Set the primary production item for the colony
+    void __cdecl Force_Produce_(uint8_t* id_list, int16_t list_index, int32_t* list_count, int16_t production_id) {
+        uint8_t colony_idx = id_list[list_index];
         MOX::_colony[colony_idx].producing[0] = production_id;
-
-        // Decrement the list counter
         *list_count -= 1;
-
-        // Calculate the number of items to move to fill the gap in the list
-        int32_t items_to_move = *list_count - index;
-
-        // Shift the list left to remove the entry at the specified index
-        memmove(&id_list[index], &id_list[index + 1], items_to_move);
+        int32_t items_to_move = *list_count - list_index;
+        memmove(&id_list[list_index], &id_list[list_index + 1], items_to_move);
     }
 
     int16_t __cdecl Industry_Worth(s_colony* colony) {
@@ -991,8 +976,7 @@ namespace AIBUILD {
      * @return A pointer to the product name string.
      */
     char* __cdecl Product_Name_(int16_t product_id) {
-        // 0xffdb is -37, which represents "Trade Goods" in AI contexts
-        if (product_id == -37 /* 0xffdb */) {
+        if (product_id == -37) {
             return s_AI_trade_goods_00557670;
         }
 

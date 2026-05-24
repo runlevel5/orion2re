@@ -586,7 +586,7 @@ namespace DESIGN {
     }
 
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
-                                  uint8_t firing_arc, uint8_t ammo, uint16_t specials) {
+                                  int16_t firing_arc, int16_t ammo, uint16_t specials) {
         int16_t base_size = TECHDATA::_weapons[weapon_idx].size;
         int32_t rack_size = 0;
 
