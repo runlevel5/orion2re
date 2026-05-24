@@ -452,7 +452,7 @@ namespace INITGAME {
     /**
      * @address 004794b0
      */
-    void __cdecl Init_Colony_(int colony_idx, int planet_idx, uint8_t player_num) {
+    void __cdecl Init_Colony_(int16_t colony_idx, int16_t planet_idx, uint8_t player_num) {
         s_colony* colony = &MOX::_colony[colony_idx];
 
         // Zero-initialize the entire colony structure

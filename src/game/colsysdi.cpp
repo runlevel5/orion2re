@@ -149,7 +149,7 @@ namespace COLSYSDI {
             strcpy(pop_str, ESTRINGS::E_Strings_(0xC));
         } else {
             if (param_3 != -1) {
-                COLONY::Set_Colony_Font_To_Player_(param_3, MOX::_colony[colony_idx].owner);
+                COLONY::Set_Colony_Font_To_Player_((uint8_t)param_3, MOX::_colony[colony_idx].owner);
             }
             short max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_colony[colony_idx].owner);
             sprintf(pop_str, ESTRINGS::E_Strings_(0x8), (int)MOX::_colony[colony_idx].n_pops, (int)max_pop);

@@ -805,7 +805,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                 (*_star_has_player)[star_idx][player_idx].colony_count = 1;
                 colony = Free_Colony_Slot_();
                 planet_idx = Find_Planet_At_Star_Satisfying_(star, Planet_Has_Splinter_Colony_);
-                INITGAME::Init_Colony_((int)(colony - MOX::_colony), planet_idx, player_idx);
+                INITGAME::Init_Colony_((int16_t)(colony - MOX::_colony), planet_idx, (uint8_t)player_idx);
                 
                 limit = COLCALC::Colony_Race_Pop_Limit_(colony, player_idx);
                 colony->n_pops = (int8_t)limit;

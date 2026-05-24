@@ -245,7 +245,7 @@ namespace COLMOVE {
                         }
 
                         if (show_confirmation) {
-                            settle_result.can_settle = GENDRAW::Do_Confirmation_Box_(message);
+                            settle_result.can_settle = (uint8_t)GENDRAW::Do_Confirmation_Box_(message);
                             COLONY::_full_draw = 1;
                             COLONY::Clear_Mouse_Picture_();
                         }

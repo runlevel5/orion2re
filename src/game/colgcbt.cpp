@@ -234,7 +234,7 @@ namespace COLGCBT {
         if (COLONY::_full_draw != 0) {
             graphics::Darken_Fill_(2, 0x29, 0x103, 0xb8);
             animate::Draw_(1, 0x28, _frame_anim);
-            COLONY::Set_Colony_Font_To_Player_(2, _g_attack_ptr->player_id);
+            COLONY::Set_Colony_Font_To_Player_(2, (uint8_t)_g_attack_ptr->player_id);
             char* str = ESTRINGS::E_Strings_(0xbb);
             fonts::Print_Centered_(0x82, row * 11 + 50, str);
 
@@ -1309,6 +1309,7 @@ namespace COLGCBT {
         int16_t p12;
         int16_t p13;
         int16_t p14;
+        int16_t shared_mode = 0;
 
         uint8_t rifle_id = side_info->combat_modifiers.rifle_tech_app_id;
 
@@ -1324,6 +1325,7 @@ namespace COLGCBT {
                 p13 = 0;
                 p14 = 0;
                 p12 = 0;
+                shared_mode = 0;
                 break;
             case 101: /* Fusion Rifle */
                 p5 = 236;
@@ -1336,6 +1338,7 @@ namespace COLGCBT {
                 p13 = 0;
                 p14 = 0;
                 p12 = 1;
+                shared_mode = 1;
                 break;
             case 128: /* Phasor Rifle */
                 p8 = 2;
@@ -1348,6 +1351,7 @@ namespace COLGCBT {
                 p11 = 0;
                 p13 = 1;
                 p12 = 1;
+                shared_mode = 1;
                 break;
             case 138: /* Plasma Rifle */
                 p8 = 2;
@@ -1360,6 +1364,7 @@ namespace COLGCBT {
                 p7 = 70;
                 p10 = 239;
                 p12 = 0;
+                shared_mode = 0;
                 break;
             case 145: /* Disruptor Rifle */
                 p6 = 11;
@@ -1372,15 +1377,16 @@ namespace COLGCBT {
                 p9 = 96;
                 p11 = 1;
                 p12 = 0;
+                shared_mode = 0;
                 break;
             default:
-                p5 = p12;
-                p8 = p12;
-                p9 = p12;
-                p11 = p12;
-                p12 = p12;
-                p13 = p12;
-                p14 = p12;
+                p5 = shared_mode;
+                p8 = shared_mode;
+                p9 = shared_mode;
+                p11 = shared_mode;
+                p12 = shared_mode;
+                p13 = shared_mode;
+                p14 = shared_mode;
                 break;
         }
 

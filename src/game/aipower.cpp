@@ -62,8 +62,8 @@ namespace AIPOWER {
                 case 14:
                     return 0;
                 default: {
-                    int16_t local_2;
-                    return local_2;
+                    // Original returns uninitialized variable, we return 0
+                    return 0;
                 }
             }
         }

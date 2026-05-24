@@ -78,7 +78,6 @@ namespace COLLAND {
     void Add_Fields_() {
         fields::Clear_Fields_();
 
-        int16_t sound = 0;
         char* hotkey = ESTRINGS::E_Strings_(12);
 
         _fields = (uint16_t)fields::Add_Hidden_Field_(
@@ -87,7 +86,7 @@ namespace COLLAND {
             639,
             479,
             hotkey,
-            sound
+            0
         );
     }
 

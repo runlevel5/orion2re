@@ -16,7 +16,7 @@ namespace INITGAME {
 
     void __cdecl Make_System_Monsters_Into_Ships_();
 
-    void __cdecl Init_Colony_(int colony_idx, int planet_idx, uint8_t player_num);
+    void __cdecl Init_Colony_(int16_t colony_idx, int16_t planet_idx, uint8_t player_num);
 
     void __cdecl Set_Initial_Colony_Auto_Selects_();
 

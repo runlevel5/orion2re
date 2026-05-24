@@ -766,7 +766,7 @@ namespace COLONY {
             char* fmt = ESTRINGS::E_Strings_(ESTR_ANNIHILATING_S);
             sprintf(buffer, fmt, planet_name);
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
-            Set_Colony_Font_To_Red_(4, cycle_val);
+            Set_Colony_Font_To_Red_(4, (uint8_t)cycle_val);
         }
         else {
             char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
@@ -785,13 +785,13 @@ namespace COLONY {
         int16_t status_msg_id = -1;
         if ((MOX::_star[star_idx].blockaded >> (MOX::_PLAYER_NUM & 0x1F)) & 1) {
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
-            Set_Colony_Font_To_Red_(4, cycle_val);
+            Set_Colony_Font_To_Red_(4, (uint8_t)cycle_val);
             fonts::Set_Font_Spacing_(2);
             status_msg_id = ESTR_BLOCKADED1;
         }
         else if (EVENTS::Event_Check_Plague_(static_cast<int16_t>(handle))) {
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
-            Set_Colony_Font_To_Red_(4, cycle_val);
+            Set_Colony_Font_To_Red_(4, (uint8_t)cycle_val);
             fonts::Set_Font_Spacing_(2);
             status_msg_id = ESTR_PLAGUE;
         }

@@ -430,7 +430,7 @@ namespace COLONY {
             int16_t colony_idx = static_cast<int16_t>(MOX::_NUM_COLONIES);
             MOX::_NUM_COLONIES++;
 
-            INITGAME::Init_Colony_(colony_idx, planet_idx, MOX::_PLAYER_NUM);
+            INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)MOX::_PLAYER_NUM);
 
             return true;
         }

@@ -278,7 +278,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
     }
 
     if (ship->d.ship_type == 0 && ship->owner < 9) {
-        combat->marine_count = TECHDATA::_hull_data[combat->size_class].marines;
+        combat->marine_count = (uint8_t)TECHDATA::_hull_data[combat->size_class].marines;
         if (struct_::Test_Bit_Field_(combat->special_device_flags, 0x24 /* 36 */) == 1 &&
             struct_::Test_Bit_Field_(combat->special_device_damage_flags, 0x24 /* 36 */) == 0) {
             combat->marine_count *= 2;
@@ -789,7 +789,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             CMBTDRW1::Create_Ship_Darken_Map_();
         }
 
-        BEAMS::Load_Combat_Beam_Stuff_(has_special_26);
+        BEAMS::Load_Combat_Beam_Stuff_((int8_t)has_special_26);
 
         MOX::_shield_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
         RUSS::Mox_Update_();
@@ -1476,8 +1476,8 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     int16_t shield_id = INITSHIP::Best_Ship_Shield_(MOX::_combat_defender_player);
     MOX::_combat_data->shield_arc_current[0] += TECHDATA::_shields[shield_id].shield_class;
 
-    MOX::_combat_data->computer_type = INITSHIP::Best_Computer_(MOX::_colony[colony_idx].owner);
-    MOX::_combat_data->armor_type = INITSHIP::Best_Armor_(MOX::_colony[colony_idx].owner);
+    MOX::_combat_data->computer_type = (int8_t)INITSHIP::Best_Computer_(MOX::_colony[colony_idx].owner);
+    MOX::_combat_data->armor_type = (int8_t)INITSHIP::Best_Armor_(MOX::_colony[colony_idx].owner);
 
     MOX::_combat_data->size_class = 5;
     MOX::_combat_data->unit_status = 0;
@@ -1919,7 +1919,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
     MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality = 1;
     MOX::_combat_data[MOX::_combat_total_ship_count].officer_idx = -1;
-    MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = TECHDATA::_hull_data[station_type].marines;
+    MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = (uint8_t)TECHDATA::_hull_data[station_type].marines;
     MOX::_combat_data[MOX::_combat_total_ship_count].current_speed = 0;
     MOX::_combat_data[MOX::_combat_total_ship_count].structure_damage = 0;
     MOX::_combat_data[MOX::_combat_total_ship_count].is_retreating = 0;
