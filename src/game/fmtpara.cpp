@@ -66,7 +66,7 @@ namespace FMTPARA {
 
         _line_p->font_spacing = fonts::_font_header.font_spacing[font_id];
 
-        _style_p->char_widths = (int8_t*)fonts::_font_header.font_glyph_widths[font_id];
+        _style_p->char_widths = fonts::_font_header.font_glyph_widths[font_id];
 
         Reset_Font_Spacing_Width_();
     }
@@ -1933,8 +1933,8 @@ namespace FMTPARA {
 
     void __cdecl Set_Max_Min_X_(short current_x, s_fmtpara_char* char_info) {
         if (FMTPARA::_first_char_p->x_advance < current_x) {
-            uint8_t font_index = char_info->font_id & 0x7F;
-            current_x += fonts::_font_header.font_glyph_widths[font_index][(uint8_t)char_info->ch];
+            int16_t glyph_offset = (int16_t)(((char_info->font_id & 0x7F) << 8) + char_info->ch);
+            current_x += (&fonts::_font_header.font_glyph_widths[0][0])[glyph_offset];
         }
 
         if (current_x < FMTPARA::_para_global.min_x) {

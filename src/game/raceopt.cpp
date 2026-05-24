@@ -287,10 +287,10 @@ namespace raceopt {
         int16_t y_coords[5] = { 72, 147, 222, 297, 372 };
         s_colors color1 = {{ 0x91, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95 }};
         
-        s_animation_header* bg1 = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 4, MOX::_global_cache_seg));
+        s_animation_header* bg1 = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 4, MOX::_global_cache_seg);
         animate::Draw_(0, 0, bg1);
         
-        s_animation_header* bg2 = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_patch13_lbx_00556330, 0, MOX::_global_cache_seg));
+        s_animation_header* bg2 = (s_animation_header*)buffer::Buffer_Reload_(s_patch13_lbx_00556330, 0, MOX::_global_cache_seg);
         animate::Draw_(131 /* 0x83 */, 0, bg2);
 
         int16_t col_idx = 0;
@@ -323,10 +323,11 @@ namespace raceopt {
                 char str_buf[12];
                 
                 str_buf[0] = s__00551100[0];
+                str_buf[1] = '\0';
 
                 int cost_idx = opt_string_idx + (-3 - opt_string_idx) / 4;
                 itoa(_ability_costs[cost_idx], num_buf, 10);
-                strcat(str_buf, num_buf);
+                strcpy(str_buf + strlen(str_buf), num_buf);
 
                 fonts::Print_(col_start_x, current_y, _opt_string[opt_string_idx]);
 
@@ -376,8 +377,6 @@ namespace raceopt {
             itoa(_ability_costs[cost_idx], num_buf, 10);
             strcpy(str_buf, num_buf);
 
-            fonts::Print_(col_start_x, current_y, _opt_string[opt_string_idx]);
-
             int16_t dots_start = col_start_x + fonts::Get_String_Width_(_opt_string[opt_string_idx]) - 1;
             int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
@@ -386,6 +385,7 @@ namespace raceopt {
                 dots_start += 4;
             }
 
+            fonts::Print_(col_start_x, current_y, _opt_string[opt_string_idx]);
             fonts::Print_Right_(right_align_x, current_y, str_buf);
             opt_string_idx++;
             current_y += 13;
@@ -400,10 +400,10 @@ namespace raceopt {
         opt_string_idx++;
 
         current_y = 72;
-        int16_t block_sizes[4];
-        block_sizes[0] = 22;
+        int16_t block_sizes[4] = { 22, 0, 0, 0 };
 
-        for (int loop_idx = 0; opt_string_idx < 64; loop_idx++) {
+        int16_t loop_idx = 0;
+        while (opt_string_idx < 64) {
             int16_t count = block_sizes[loop_idx];
             if (count > 0) {
                 int16_t col_2_start_x = col_x[col_idx];
@@ -421,8 +421,6 @@ namespace raceopt {
                     itoa(_ability_costs[opt_string_idx - 11], num_buf, 10);
                     strcpy(str_buf, num_buf);
 
-                    fonts::Print_(col_2_start_x, current_y, _opt_string[opt_string_idx]);
-
                     int16_t dots_start = col_2_start_x + fonts::Get_String_Width_(_opt_string[opt_string_idx]) - 1;
                     int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
@@ -431,12 +429,14 @@ namespace raceopt {
                         dots_start += 4;
                     }
 
+                    fonts::Print_(col_2_start_x, current_y, _opt_string[opt_string_idx]);
                     fonts::Print_Right_(col_2_right_align_x, current_y, str_buf);
                     opt_string_idx++;
                     current_y += 16;
                 }
             }
             current_y += 9;
+            loop_idx++;
         }
 
         fonts::Set_Font_Style_Shadow_Down_(4, &_color_opt);
@@ -912,12 +912,16 @@ namespace raceopt {
     }
 
     void __cdecl Convert_Flags_To_Player_EM_(int8_t *flags_out) {
-        for (int i = 1; i < 10; ++i) {
-            int16_t val = _button_variable[i - 1];
+        for (int16_t i = 1; i < 10; ++i) {
+            const int16_t val = _button_variable[i - 1];
             if (val == 0) {
                 flags_out[i] = 0;
+            } else if (val == 3) {
+                // Original code uses a flat byte lookup that maps the third selection
+                // to the first byte of the next 3-byte row.
+                flags_out[i] = MOX::_special_bonus[i][0];
             } else {
-                flags_out[i] = MOX::_special_bonus[i - 1][val - 1];
+                flags_out[i] = MOX::_special_bonus[i - 1][val];
             }
         }
 

@@ -700,8 +700,9 @@ namespace BEAMS {
                     return 0;
                 }
 
+                int16_t extra_flag = ((i % 3) == 0) ? 1 : 0;
                 BEAMS::Fire_Weapon_(fx, fy, target_x, target_y, dir1, dir2, weapon_type, frame, 
-                                    0, 0, 0, 0, 1, 0, 0, -1, 0);
+                                    0, 0, 0, 0, 1, 0, 0, -1, 0, extra_flag);
             }
         }
 
@@ -761,8 +762,11 @@ namespace BEAMS {
                               int16_t attacker_facing, int16_t target_facing, int16_t weapon_id, int16_t current_frame,
                               int16_t fx_slot_idx, int16_t target_size_class, int16_t hit_result_flags,
                               int16_t special_flag, int16_t is_non_ship_target, int16_t fire_point_idx,
-                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials)
+                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials,
+                              int16_t unused_fighter_beam_flag)
     {
+        (void)unused_fighter_beam_flag;
+
         int16_t v_duration;
         int16_t v_color;
         int16_t v_mount_scale_mod;
@@ -1389,7 +1393,7 @@ namespace BEAMS {
                                     is_non_ship_target, fp_idx_val,
                                     _g_reflection_state_flag,
                                     MOX::_combat_data[attacker_ship_id].size_class,
-                                    fx->specials);
+                                    fx->specials, 0);
                             }
                         }
                     }

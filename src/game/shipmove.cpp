@@ -553,7 +553,7 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 00437290
+     * @address 004363e0
      */
     void __cdecl Ships_Try_To_Move_To_(int16_t* ship_list, int16_t target_star_idx, s_ship_move_info* move_info) {
         int16_t start_x = 0;
@@ -573,17 +573,7 @@ namespace SHIPMOVE {
             ship_speed = 1;
         }
 
-        move_info->blackhole_blocks = 0;
-        move_info->immobile = 0;
-        move_info->turns_left = 0;
-        move_info->moving = 0;
-        move_info->out_of_range = 0;
-        move_info->has_navigator = 0;
-        move_info->traveling_speed = 0;
-        move_info->parsecs = 0;
-        move_info->uses_wormhole = 0;
-        move_info->has_stargate_route = 0;
-        move_info->hyperspace_flux = 0;
+        std::memset(move_info, 0, sizeof(*move_info));
 
         int8_t has_jumpgate_route = 0;
 
@@ -683,7 +673,7 @@ namespace SHIPMOVE {
             } else {
                 int16_t cur_x = start_x;
                 int16_t cur_y = start_y;
-                int8_t turn_count = 0;
+                uint8_t turn_count = 0;
                 if (has_jumpgate_route != 0) {
                     base_speed += 3;
                 }
@@ -700,7 +690,7 @@ namespace SHIPMOVE {
                         (int16_t)base_speed, 
                         &cur_x, 
                         &cur_y, 
-                        (int8_t*)(navigator_bonus == 0 ? nullptr : &dummy_nav_flag), 
+                        (navigator_bonus == 0) ? &dummy_nav_flag : nullptr,
                         &dummy_dir
                     );
                 }

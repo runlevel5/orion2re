@@ -589,7 +589,7 @@ namespace aidudes {
         qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
               (uint8_t)colony->n_pops - (uint8_t)colony_info->first_assignable_pop_idx,
               4,
-              Sort_Pops_FR_I_);
+              Sort_Pops_FI_);
 
         if (colony->food2_per_farmer == 0) {
             int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((uint16_t)(uint8_t)colony_info->colony_idx);
@@ -609,12 +609,13 @@ namespace aidudes {
                                             (uint8_t)colony->food2_needed_for_conquered +
                                             (uint8_t)colony->food2_needed_for_natives;
 
-                if (total_food_needed > colony->production[0] * 2 &&
-                    (uint8_t)colony_info->n_farmers < (uint8_t)colony->max_farms) {
-                    colony->pop[(uint8_t)colony_info->cur_pop_idx] &= 0xFFFFFE7F;
-                    colony->pop[(uint8_t)colony_info->cur_pop_idx] |= 0x200;
-                    colony_info->cur_pop_idx++;
-                    colony_info->n_farmers++;
+                if (total_food_needed > colony->production[0] * 2) {
+                    if ((uint8_t)colony_info->n_farmers < (uint8_t)colony->max_farms) {
+                        colony->pop[(uint8_t)colony_info->cur_pop_idx] &= 0xFFFFFE7F;
+                        colony->pop[(uint8_t)colony_info->cur_pop_idx] |= 0x200;
+                        colony_info->cur_pop_idx++;
+                        colony_info->n_farmers++;
+                    }
                 } else {
                     colony_info->pop_end_idx--;
                     colony->pop[(uint8_t)colony_info->pop_end_idx] = (colony->pop[(uint8_t)colony_info->pop_end_idx] & 0xFFFFFEFF) | 0x80;

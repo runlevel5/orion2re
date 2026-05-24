@@ -1759,7 +1759,7 @@ struct s_fmtpara_char {
     uint8_t font_id;
     uint8_t fg_and_attr;
     uint8_t bg_color;
-    char ch;
+    int8_t ch;
 };
 
 typedef struct s_fmtpara_global s_fmtpara_global, *Ps_fmtpara_global;
@@ -1855,7 +1855,7 @@ struct s_font {
     short font_heights[8];
     short font_spacing[8];
     short leading_extra[8];
-    byte font_glyph_widths[6][256];
+    int8_t font_glyph_widths[6][256];
     uint32_t font_glyph_offsets[6][256];
 };
 

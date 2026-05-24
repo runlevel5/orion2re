@@ -180,7 +180,8 @@ namespace BEAMS {
                               int16_t attacker_facing, int16_t target_facing, int16_t weapon_id, int16_t current_frame,
                               int16_t fx_slot_idx, int16_t target_size_class, int16_t hit_result_flags,
                               int16_t special_flag, int16_t is_non_ship_target, int16_t fire_point_idx,
-                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials);
+                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials,
+                              int16_t unused_fighter_beam_flag);
 
     int8_t __cdecl Draw_Fighter_Beam_(int16_t* fighter_coords, int16_t count, int16_t target_x, int16_t target_y, int16_t weapon_type, int16_t frame);
 

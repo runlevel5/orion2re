@@ -1122,14 +1122,20 @@ namespace DESIGN {
         fonts::Set_Font_Style_(font_style, &local_colors);
         fonts::Set_Font_Spacing_(spacing);
 
-        MOX::_multi_colored_line_start += (int16_t)DESBOX::_incr_value;
+        int8_t incr_value = DESBOX::_incr_value;
+        int16_t next_color_start = (int16_t)(MOX::_multi_colored_line_start + incr_value);
+        MOX::_multi_colored_line_start = next_color_start;
 
-        if (MOX::_multi_colored_line_start >= 3) {
-            DESBOX::_incr_value = -DESBOX::_incr_value;
+        if (next_color_start >= 3) {
+            DESBOX::_incr_value = (int8_t)-incr_value;
             MOX::_multi_colored_line_start = 3;
-        } else if (MOX::_multi_colored_line_start <= -2) {
-            DESBOX::_incr_value = -DESBOX::_incr_value;
+            return;
+        }
+
+        MOX::_multi_colored_line_start = next_color_start;
+        if (next_color_start <= -2) {
             MOX::_multi_colored_line_start = -2;
+            DESBOX::_incr_value = (int8_t)-incr_value;
         }
     }
 
