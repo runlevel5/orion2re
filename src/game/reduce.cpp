@@ -91,7 +91,7 @@ namespace reduce {
 
         if (count > 0) {
             for (int16_t i = 0; i < count; ++i) {
-                int16_t dest_idx = start_index + i;
+                int32_t dest_idx = start_index + i;
                 video::_current_palette[dest_idx].changed = 1;
                 video::_current_palette[dest_idx].r = _reduced_palette_list[i].r;
                 video::_current_palette[dest_idx].g = _reduced_palette_list[i].g;

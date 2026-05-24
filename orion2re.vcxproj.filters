@@ -1221,6 +1221,12 @@
     <None Include=".vocode\workflows\mass-validator.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
+    <None Include=".vocode\workflows\cleanup.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
+    <None Include=".vocode\workflows\vars.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="validate.txt" />

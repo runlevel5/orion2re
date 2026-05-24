@@ -1409,14 +1409,15 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        uint8_t star_updates[1704]; // Supports up to 71 stars locally
+        uint8_t star_updates[72 * sizeof(s_net_pack_star_order)];
         memcpy(star_updates, ptr, MOX::_NUM_STARS * 24);
         ptr += MOX::_NUM_STARS * 24;
 
         if (MOX::_NUM_STARS > 0) {
             for (int i = 0; i < MOX::_NUM_STARS; ++i) {
                 uint8_t* update = star_updates + i * 24;
-                uint32_t flags = *(uint32_t*)update;
+                uint32_t flags;
+                memcpy(&flags, update, sizeof(flags));
                 s_star_data* star = &MOX::_star[i];
 
                 if (flags & 0x1) star->ignore_colony_ships |= (1 << player_idx);
@@ -1461,16 +1462,18 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        uint16_t max_colonies = *(uint16_t*)ptr;
-        ptr += 2;
+        int16_t max_colonies;
+        memcpy(&max_colonies, ptr, sizeof(max_colonies));
+        ptr += sizeof(max_colonies);
         if (MOX::_NUM_COLONIES < max_colonies) {
             MOX::_NUM_COLONIES = max_colonies;
         }
 
         while (true) {
-            uint16_t colony_idx = *(uint16_t*)ptr;
-            ptr += 2;
-            if (colony_idx == 0xFFFF) {
+            int16_t colony_idx;
+            memcpy(&colony_idx, ptr, sizeof(colony_idx));
+            ptr += sizeof(colony_idx);
+            if (colony_idx == -1) {
                 break;
             }
 
@@ -1487,17 +1490,19 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        uint16_t max_ships = *(uint16_t*)ptr;
-        ptr += 2;
+        int16_t max_ships;
+        memcpy(&max_ships, ptr, sizeof(max_ships));
+        ptr += sizeof(max_ships);
         if (MOX::_NUM_SHIPS < max_ships) {
             MOX::_NUM_SHIPS = max_ships;
         }
 
         int ship_idx_prev = 0;
         while (true) {
-            uint16_t ship_idx = *(uint16_t*)ptr;
-            ptr += 2;
-            if (ship_idx == 0xFFFF) {
+            int16_t ship_idx;
+            memcpy(&ship_idx, ptr, sizeof(ship_idx));
+            ptr += sizeof(ship_idx);
+            if (ship_idx == -1) {
                 break;
             }
 
@@ -1526,9 +1531,10 @@ namespace NETMOX {
 
         int leader_idx_prev = 0;
         while (true) {
-            uint16_t leader_idx = *(uint16_t*)ptr;
-            ptr += 2;
-            if (leader_idx == 0xFFFF) {
+            int16_t leader_idx;
+            memcpy(&leader_idx, ptr, sizeof(leader_idx));
+            ptr += sizeof(leader_idx);
+            if (leader_idx == -1) {
                 break;
             }
 

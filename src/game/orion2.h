@@ -3593,7 +3593,7 @@ typedef struct s_planet_data s_planet_data, *Ps_planet_data;
 struct s_planet_data {
     short colony_index;
     int8_t star_index;
-    char orbit;
+    int8_t orbit;
     int8_t planet_type;
     int8_t size;
     char gravity_class;

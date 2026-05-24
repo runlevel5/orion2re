@@ -800,10 +800,10 @@ namespace COLCALC {
         return pop_limit;
     }
 
-    short __cdecl Get_First_Player_Colony_Idx(int player_idx) {
-        short index = 0;
-        while (MOX::_colony[index].owner != (int8_t)player_idx) {
-            index++;
+    int16_t __cdecl Get_First_Player_Colony_Idx(int32_t player_idx) {
+        int16_t index = 0;
+        while (MOX::_colony[index].owner != player_idx) {
+            ++index;
         }
         return index;
     }
@@ -983,11 +983,11 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Tribute_Received_From_(int32_t receiver_idx, int32_t payer_idx) {
-        s_player* receiver = &MOX::_player[receiver_idx];
+        s_player* payer = &MOX::_player[payer_idx];
 
-        int32_t tribute_percent = static_cast<int32_t>(receiver->tribute_treaty[payer_idx]);
+        int32_t tribute_percent = static_cast<int32_t>(payer->tribute_treaty[receiver_idx]);
 
-        int32_t net_production = static_cast<int32_t>(receiver->bc_produced) - receiver->tribute_income;
+        int32_t net_production = static_cast<int32_t>(payer->bc_produced) - payer->tribute_income;
 
         int32_t result = (tribute_percent * net_production) / 20;
 

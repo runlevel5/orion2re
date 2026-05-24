@@ -141,9 +141,9 @@ namespace AIDATA {
         _base_star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
         _star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
         _n_turns_from_to = (uint8_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 41472 /* 0xA200 */);
-        _n_turns_from_to_intermediate = (int32_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 165888 /* 0x28800 */);
+        _n_turns_from_to_intermediate = (s_turns_from_to_intermediate_cache_entry(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 165888 /* 0x28800 */);
         _ship_n_turns_to = (int8_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 36000);
-        _ship_n_turns_to_intermediate = (int16_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 72000);
+        _ship_n_turns_to_intermediate = (s_ship_n_turns_to_intermediate_cache_entry(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 72000);
         _possible_ship_strengths = (int32_t(*)[72][8][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, 184320);
         _ai_colony_info = (s_ai_colony_info(*)[250])allocate::Allocate_Next_Block_(MOX::_screen_seg, 1750 /* 0x6D6 */);
         _ai_player_info = (s_ai_player_info(*)[8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 464 /* 0x1D0 */);
@@ -1010,10 +1010,10 @@ namespace AIDATA {
         return total_worth;
     }
 
-    short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(short player, short star_a, short star_b, int16_t* inter_star_out, bool use_extended) {
-        uint8_t* info = (uint8_t*)&(*_n_turns_from_to_intermediate)[star_a][star_b][player];
+    int16_t __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(int16_t player, int16_t star_a, int16_t star_b, int16_t* inter_star_out, bool use_extended) {
+        s_turns_from_to_intermediate_cache_entry& info = (*_n_turns_from_to_intermediate)[star_a][star_b][player];
 
-        if (info[1] == 0xFF) {
+        if (info.intermediate_star == 0xFF) {
             s_player* plr = &MOX::_player[player];
 
             // Check if player can reach the star directly
@@ -1029,17 +1029,17 @@ namespace AIDATA {
 
                 if ((uint8_t)(*_n_turns_from_to)[star_a][star_b][player] <= turns) {
                     if (((*_star_in_range_of_player)[star_b] >> player) & 1) {
-                        info[0] = (uint8_t)turns;
-                        info[1] = (uint8_t)star_b;
+                        info.turns = (uint8_t)turns;
+                        info.intermediate_star = (uint8_t)star_b;
                     } else {
-                        info[1] = MAX_STARS;
+                        info.intermediate_star = MAX_STARS;
                     }
-                    info[2] = (uint8_t)turns;
-                    info[3] = (uint8_t)star_b;
+                    info.extended_turns = (uint8_t)turns;
+                    info.extended_intermediate_star = (uint8_t)star_b;
                 }
             }
 
-            if (info[1] == 0xFF) {
+            if (info.intermediate_star == 0xFF) {
                 for (int i = MOX::_NUM_STARS - 1; i >= 0; --i) {
                     // Check if Star i is in range and not blocked
                     if (((*_star_in_extended_range_of_player)[i] >> player) & 1) {
@@ -1053,56 +1053,56 @@ namespace AIDATA {
                             uint8_t dist_i_b = (uint8_t)(*_n_turns_from_to)[i][star_b][player];
                             int total_turns = dist_a_i + dist_i_b;
 
-                            if ((((*_star_in_range_of_player)[i] >> player) & 1) && total_turns < info[0]) {
-                                info[0] = total_turns;
-                                info[1] = (i == star_a) ? (uint8_t)star_b : (uint8_t)i;
+                            if ((((*_star_in_range_of_player)[i] >> player) & 1) && total_turns < info.turns) {
+                                info.turns = (uint8_t)total_turns;
+                                info.intermediate_star = (i == star_a) ? (uint8_t)star_b : (uint8_t)i;
                             }
 
-                            if (total_turns < info[2]) {
-                                info[2] = total_turns;
-                                info[3] = (i == star_a) ? (uint8_t)star_b : (uint8_t)i;
+                            if (total_turns < info.extended_turns) {
+                                info.extended_turns = (uint8_t)total_turns;
+                                info.extended_intermediate_star = (i == star_a) ? (uint8_t)star_b : (uint8_t)i;
                             }
                         }
                     }
-                    if (info[0] <= 1) break;
+                    if (info.turns <= 1) break;
                 }
 
-                if (info[1] == 0xFF) {
-                    info[1] = 0x48 /* NUM_STARS (72) */;
+                if (info.intermediate_star == 0xFF) {
+                    info.intermediate_star = 0x48 /* NUM_STARS (72) */;
                 }
-                if (info[3] == 0xFF) {
-                    info[3] = 0x48 /* NUM_STARS (72) */;
+                if (info.extended_intermediate_star == 0xFF) {
+                    info.extended_intermediate_star = 0x48 /* NUM_STARS (72) */;
                 }
             }
         }
 
         if (inter_star_out) {
-            uint8_t inter_star = use_extended ? info[3] : info[1];
+            uint8_t inter_star = use_extended ? info.extended_intermediate_star : info.intermediate_star;
             if (inter_star < 0x48 /* NUM_STARS (72) */) {
-                *inter_star_out = (uint16_t)inter_star;
+                *inter_star_out = (int16_t)inter_star;
             } else {
                 *inter_star_out = 0xffff;
             }
         }
 
         if (use_extended) {
-            return (short)info[2];
+            return (int16_t)info.extended_turns;
         }
-        return (short)info[0];
+        return (int16_t)info.turns;
     }
 
-    short __cdecl Ship_N_Turns_To_Star_With_Intermediate_(short ship_idx, short dest_star_idx, int16_t* intermediate_star_idx) {
-        uint8_t* cached_info = (uint8_t*)&(*_ship_n_turns_to_intermediate)[ship_idx][dest_star_idx];
+    int16_t __cdecl Ship_N_Turns_To_Star_With_Intermediate_(int16_t ship_idx, int16_t dest_star_idx, int16_t* intermediate_star_idx) {
+        s_ship_n_turns_to_intermediate_cache_entry& cached_info = (*_ship_n_turns_to_intermediate)[ship_idx][dest_star_idx];
 
         bool has_stargate = struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, 11);
 
-        if (cached_info[1] == 0xff) {
+        if (cached_info.intermediate_star == 0xff) {
             int16_t loc = MOX::_ship[ship_idx].location;
             if (loc >= 72 && loc < 1000) {
                 int owner = MOX::_ship[ship_idx].owner;
                 int ship_dest_star = loc - 500;
 
-                if (cached_info[0] > 1) {
+                if (cached_info.turns > 1) {
                     for (int i = MOX::_NUM_STARS - 1; i >= 0; i--) {
                         bool in_range = ((*_star_in_range_of_player)[i] >> owner) & 1;
                         bool in_ext_range = ((*_star_in_extended_range_of_player)[i] >> owner) & 1;
@@ -1120,28 +1120,28 @@ namespace AIDATA {
 
                                 if (!blocked) {
                                     uint32_t total_turns = (uint8_t)(*_n_turns_from_to)[i][dest_star_idx][owner] + (uint8_t)(*_ship_n_turns_to)[ship_idx][i];
-                                    if (total_turns < cached_info[0]) {
-                                        cached_info[0] = static_cast<uint8_t>(total_turns);
-                                        cached_info[1] = static_cast<uint8_t>(i);
+                                    if (total_turns < cached_info.turns) {
+                                        cached_info.turns = static_cast<uint8_t>(total_turns);
+                                        cached_info.intermediate_star = static_cast<uint8_t>(i);
                                     }
                                 }
                             }
                         }
-                        if (cached_info[0] <= 1) {
+                        if (cached_info.turns <= 1) {
                             break;
                         }
                     }
                 }
 
-                if (cached_info[1] == 0xff) {
-                    cached_info[1] = 72;
+                if (cached_info.intermediate_star == 0xff) {
+                    cached_info.intermediate_star = 72;
                 }
             } else {
                 if (loc >= 1000) {
                     loc = HAROLD::XY_To_Star_Id_(MOX::_ship[ship_idx].x, MOX::_ship[ship_idx].y);
                 }
 
-                cached_info[0] = static_cast<uint8_t>(AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+                cached_info.turns = static_cast<uint8_t>(AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
                     MOX::_ship[ship_idx].owner,
                     loc,
                     dest_star_idx,
@@ -1150,19 +1150,19 @@ namespace AIDATA {
                 ));
 
                 // BUG: intermediate_star_idx is dereferenced here without null check
-                cached_info[1] = static_cast<uint8_t>(*intermediate_star_idx);
+                cached_info.intermediate_star = static_cast<uint8_t>(*intermediate_star_idx);
             }
         }
 
         if (intermediate_star_idx != nullptr) {
-            if (cached_info[1] < 72) {
-                *intermediate_star_idx = cached_info[1];
+            if (cached_info.intermediate_star < 72) {
+                *intermediate_star_idx = cached_info.intermediate_star;
             } else {
                 *intermediate_star_idx = 0xffff;
             }
         }
 
-        return cached_info[0];
+        return cached_info.turns;
     }
 
     int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player) {

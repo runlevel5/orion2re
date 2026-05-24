@@ -423,9 +423,11 @@
     <None Include=".vocode\config-ng.yaml" />
     <None Include=".vocode\workflows\agent.yaml" />
     <None Include=".vocode\workflows\chat.yaml" />
+    <None Include=".vocode\workflows\cleanup.yaml" />
     <None Include=".vocode\workflows\decompiler.yaml" />
     <None Include=".vocode\workflows\struct.yaml" />
     <None Include=".vocode\workflows\mass-validator.yaml" />
+    <None Include=".vocode\workflows\vars.yaml" />
     <None Include=".vocode\workflows\verifier.yaml" />
     <None Include="notes.md" />
   </ItemGroup>

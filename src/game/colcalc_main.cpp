@@ -645,7 +645,7 @@ namespace COLCALC {
                 }
             }
 
-            if (plr->tribute_treaty[i] != 0) {
+            if (MOX::_player[i].tribute_treaty[player_idx] != 0) {
                 int tribute = Tribute_Received_From_(player_idx, i);
                 plr->tribute_income += tribute;
             }
@@ -665,7 +665,10 @@ namespace COLCALC {
             plr->research_produced = static_cast<int16_t>(total_research);
         }
 
-        int surplus_food = total_surplus_food - total_food_maintenance;
+        uint16_t surplus_food_u =
+            static_cast<uint16_t>(total_surplus_food) -
+            static_cast<uint16_t>(total_food_maintenance);
+        int16_t surplus_food = static_cast<int16_t>(surplus_food_u);
         plr->surplus_food = static_cast<int16_t>(surplus_food);
 
         if (surplus_food > 0) {

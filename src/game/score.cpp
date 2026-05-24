@@ -1433,8 +1433,6 @@ namespace SCORE {
                     *out_pop_idx = (int16_t)entry->pop_idx;
                     found_unused = true;
                     unused_index = i;
-                    // Loop terminates immediately when an unused match is found
-                    break;
                 }
             }
         }

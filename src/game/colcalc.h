@@ -251,7 +251,7 @@ namespace COLCALC {
 
     int32_t __cdecl Chance_For_Research_Breakthrough_(s_player* plr);
 
-    short __cdecl Get_First_Player_Colony_Idx(int player_idx);
+    int16_t __cdecl Get_First_Player_Colony_Idx(int32_t player_idx);
 
     inline bool __cdecl Monster_At_Star_(int star_idx);
 
