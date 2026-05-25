@@ -108,9 +108,10 @@ namespace settler {
                 do {
                     uint32_t val = settlers_raw[settler_idx];
 
-                    // Decrement eta (bits 20-23) handling bit borrowing, and force source_colony (bits 0-7) to 250 (0xFA).
-                    val = ((val - 0x100000) ^ val) & 0xf00000 ^ val;
-                    val = (val & 0xfffffffa) | 0xfa;
+                    // Settler records are packed into one dword: bits 0-7 are source_colony and bits 20-23 are ETA.
+                    // Each turn the original code wraps ETA modulo 16 and stamps source_colony to 0xFA.
+                    uint32_t eta = ((val >> 20) - 1u) & 0x0fu;
+                    val = (val & 0xff0fff00u) | (eta << 20) | 0xfau;
                     settlers_raw[settler_idx] = val;
 
                     if ((val & 0xf00000) == 0) {
@@ -119,9 +120,10 @@ namespace settler {
                         arrivals_per_planet[dest_planet]++;
 
                         int player_idx = curr_player - MOX::_player;
-                        int star_index = MOX::_planet[dest_planet].star_index;
+                        int16_t star_index = (int16_t)MOX::_planet[dest_planet].star_index;
+                        uint8_t blockaded = MOX::_star[star_index].blockaded;
 
-                        if (((MOX::_star[star_index].blockaded >> player_idx) & 1) == 0) {
+                        if ((((uint8_t)(blockaded >> ((uint8_t)player_idx & 0x1f))) & 1) == 0) {
                             if (EVENTS::Event_Check_Space_Anomaly_At_Star_(star_index) == 0) {
                                 int colony_index = MOX::_planet[dest_planet].colony_index;
                                 if (colony_index != -1) {
@@ -160,8 +162,9 @@ namespace settler {
                         msg.u.colony.c.settlers.over_limit = over_limit_per_planet[planet_idx];
                         
                         int player_idx = curr_player - MOX::_player;
-                        int star_index = MOX::_planet[planet_idx].star_index;
-                        msg.u.colony.c.settlers.blockaded = (MOX::_star[star_index].blockaded >> player_idx) & 1;
+                        int16_t star_index = (int16_t)MOX::_planet[planet_idx].star_index;
+                        msg.u.colony.c.settlers.blockaded =
+                                (uint8_t)(MOX::_star[star_index].blockaded >> ((uint8_t)player_idx & 0x1f)) & 1;
 
                         MSG_::Add_Msg_(msg, player_idx);
                     }
@@ -274,7 +277,9 @@ namespace settler {
         result->can_settle = 1;
     }
 
-    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
+    int32_t __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
+        int32_t ret_value = (int32_t)(uintptr_t)dest_colony;
+
         if (dest_colony != source_colony) {
             s_player* owner_player = &MOX::_player[static_cast<int32_t>(source_colony->owner)];
             const int32_t source_planet_index = static_cast<int32_t>(source_colony->planet);
@@ -285,7 +290,7 @@ namespace settler {
                     static_cast<int16_t>(static_cast<int8_t>(MOX::_planet[dest_planet_index].star_index));
             uint32_t* pop_slot = &source_colony->pop[static_cast<int32_t>(pop_index)];
             const uint32_t pop_value = *pop_slot;
-            uint32_t encoded_settler; // BUG: original code uses this dword without initialization
+            uint32_t encoded_settler = pop_value;
 
             encoded_settler ^= ((pop_value << 16) ^ encoded_settler) & 0x000F0000;
             encoded_settler ^= ((pop_value << 17) ^ encoded_settler) & 0x03000000;
@@ -312,8 +317,13 @@ namespace settler {
 
             const uint8_t last_pop_index =
                     static_cast<uint8_t>(static_cast<uint8_t>(source_colony->n_pops) - 1);
+            const uint32_t last_pop_value = source_colony->pop[last_pop_index];
+
             source_colony->n_pops = last_pop_index;
-            *pop_slot = source_colony->pop[last_pop_index];
+            ret_value = (int32_t)last_pop_value;
+            *pop_slot = last_pop_value;
         }
+
+        return ret_value;
     }
 }

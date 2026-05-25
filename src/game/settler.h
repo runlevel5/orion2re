@@ -17,5 +17,5 @@ namespace settler {
 
     int32_t __cdecl Settler_ETA_(s_player* player, int16_t source_star, int16_t dest_star);
 
-    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
+    int32_t __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
 }

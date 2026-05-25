@@ -586,7 +586,7 @@ namespace raceopt {
 
                 if (draw_text) {
                     char local_5c[12];
-                    local_50[0] = disabled_cost_color.colors[0];
+                    local_50[0] = s__00551100[0];
                     local_50[1] = '\0';
                     itoa(_ability_costs[neg_idx], local_5c, 10);
                     strcpy(local_50 + 1, local_5c);
