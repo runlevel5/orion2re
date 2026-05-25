@@ -358,11 +358,11 @@ namespace INITGAME {
         for (int16_t trait_idx = 1; trait_idx < 10; ++trait_idx) {
           uint8_t v = (uint8_t)player.traits[trait_idx];
           player.traits[trait_idx] =
-              v ? MOX::_special_bonus_at_00559037[trait_idx * 3 + v] : 0;
+              v ? MOX::_special_bonus[trait_idx - 1][v - 1] : 0;
 
           v = (uint8_t)player.evolutionary_upgrade_traits[trait_idx];
           player.evolutionary_upgrade_traits[trait_idx] =
-              v ? MOX::_special_bonus_at_00559037[trait_idx * 3 + v] : 0;
+              v ? MOX::_special_bonus[trait_idx - 1][v - 1] : 0;
         }
 
         RUSS::Mox_Update_();

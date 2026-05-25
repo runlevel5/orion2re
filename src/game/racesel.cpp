@@ -7,15 +7,14 @@ void __cdecl Convert_Custom_Race_Flags_(uint8_t* custom_race_flags) {
     for (int16_t bonus_idx = 0; bonus_idx < 9; ++bonus_idx) {
         const uint8_t bonus_value = custom_race_flags[bonus_idx + 1];
 
-        if (MOX::_special_bonus[bonus_idx][1] == bonus_value) {
+        if (MOX::_special_bonus[bonus_idx][0] == (int8_t)bonus_value) {
             custom_race_flags[bonus_idx + 1] = 1;
-        } else if (MOX::_special_bonus[bonus_idx][2] == bonus_value) {
+        } else if (MOX::_special_bonus[bonus_idx][1] == (int8_t)bonus_value) {
             custom_race_flags[bonus_idx + 1] = 2;
-        } else {
+        } else if (MOX::_special_bonus[bonus_idx][2] == (int8_t)bonus_value) {
             custom_race_flags[bonus_idx + 1] = 3;
-            if (MOX::_special_bonus[bonus_idx + 1][0] != bonus_value) {
-                custom_race_flags[bonus_idx + 1] = 0;
-            }
+        } else {
+            custom_race_flags[bonus_idx + 1] = 0;
         }
     }
 }
@@ -250,7 +249,8 @@ short Race_Selection_Screen_(s_player* plr) {
                         if (screen_state == 2) {
                             for (int trait_idx = 1; trait_idx < 10; ++trait_idx) {
                                 if (plr->traits[trait_idx] != 0) {
-                                    plr->traits[trait_idx] = MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx]];
+                                    plr->traits[trait_idx] =
+                                        MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx] - 1];
                                 }
                             }
                             done_flag = 1;
@@ -986,7 +986,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
                 const int32_t special_level = static_cast<int8_t>(race_specials[ability_id]);
                 const int8_t bonus =
-                        static_cast<int8_t>(MOX::_special_bonus[ability_id - 1][special_level]);
+                        MOX::_special_bonus[ability_id - 1][special_level - 1];
 
                 if (ability_id == 5) {
                     if (bonus == 1) {

@@ -132,11 +132,11 @@ namespace SHIPS {
         return GEO::Parsecs_Between_Points_(MOX::_star[star_idx].x, MOX::_star[star_idx].y, MOX::_ship[ship_idx].x, MOX::_ship[ship_idx].y);
     }
 
-    int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t system_idx, int16_t type, s_ship_design* design, uint8_t owner) {
+    int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t system_idx, int16_t type, s_ship_design* design, uint8_t randomize_xy) {
         int16_t final_x_upscaled;
         int16_t final_y_upscaled;
 
-        if (owner == 0) {
+        if (randomize_xy == 0) {
             final_x_upscaled = MOX::_star[system_idx].x;
             final_y_upscaled = MOX::_star[system_idx].y;
         } else {

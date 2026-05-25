@@ -367,6 +367,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
         MOX::_g_ship_move_info.traveling_speed = 0;
         MOX::_g_ship_move_info.parsecs = 0;
         MOX::_g_ship_move_info.uses_wormhole = 0;
+        MOX::_g_ship_move_info.has_jumpgate_route = 0;
         MOX::_g_ship_move_info.has_stargate_route = 0;
         MOX::_g_ship_move_info.hyperspace_flux = 0;
 

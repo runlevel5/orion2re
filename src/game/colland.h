@@ -10,7 +10,7 @@ namespace COLLAND {
     inline uint16_t& _fields =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00564DCC});
 
-    inline const char*& s_format_comma_space = *reinterpret_cast<const char**>(std::uintptr_t{0x0055238C});
+    inline const char* s_format_comma_space = reinterpret_cast<const char*>(std::uintptr_t{0x0055238C});
 
     void __cdecl Load_Anims_();
     void Add_Fields_();

@@ -50,6 +50,14 @@ namespace DESIGN {
             }
 
             if (d->weapon_type[i] > 0) {
+                d->weapon_space[i] = Weapon_Space_(
+                    MOX::_PLAYER_NUM,
+                    d->weapon_type[i],
+                    d->weapon_count[i],
+                    (int16_t)d->weapon_firing_arc[i],
+                    (int16_t)d->weapon_ammo[i],
+                    d->weapon_specials[i]
+                );
                 d->num_weapon_slots++;
             }
         }
@@ -369,7 +377,7 @@ namespace DESIGN {
         // Calculate FTL drive space
         int16_t ftl_type = design->ftl_type;
         int16_t drive_tech_app = TECHDATA::_drives[ftl_type].tech_app_id;
-        uint8_t drive_min_cat = static_cast<uint8_t>(Miniaturization_Category_(drive_tech_app));
+        int8_t drive_min_cat = Miniaturization_Category_(drive_tech_app);
         int16_t drive_tech_level = Tech_Level_(player_num, drive_tech_app);
 
         int16_t base_drive_space = TECHDATA::_drives[ftl_type].space_per_ship_type[design->ship_size];
@@ -384,8 +392,8 @@ namespace DESIGN {
                     MOX::_PLAYER_NUM,
                     design->weapon_type[i],
                     design->weapon_count[i],
-                    (uint8_t)design->weapon_firing_arc[i],
-                    (uint8_t)design->weapon_ammo[i],
+                    (int16_t)design->weapon_firing_arc[i],
+                    (int16_t)design->weapon_ammo[i],
                     design->weapon_specials[i]
                 );
             }
@@ -403,7 +411,7 @@ namespace DESIGN {
                     design->special_device_space[i] = TECHDATA::_specials[4].space_per_ship_type[design->ship_size];
                 } else {
                     int16_t tech_app = TECHDATA::_specials[device_id].tech_app_id;
-                    uint8_t min_cat = static_cast<uint8_t>(Miniaturization_Category_(tech_app));
+                    int8_t min_cat = Miniaturization_Category_(tech_app);
                     int16_t tech_level = Tech_Level_(player_num, tech_app);
 
                     int16_t base_device_space = TECHDATA::_specials[device_id].space_per_ship_type[design->ship_size];
@@ -586,7 +594,9 @@ namespace DESIGN {
     }
 
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
-                                  int16_t firing_arc, int16_t ammo, uint16_t specials) {
+                                  int16_t firing_arc, int16_t ammo, int16_t specials) {
+        // The original helpers consume this bitmap as a plain 16-bit stack word.
+        // Keep the design-time interface as int16_t to match the binary even though callers use it as flags.
         int16_t base_size = TECHDATA::_weapons[weapon_idx].size;
         int32_t rack_size = 0;
 
@@ -607,14 +617,14 @@ namespace DESIGN {
         Bonus_For_Regular_Mods_(specials, &dummy_out, &regular_mod_add);
 
         int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
-        uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
+        int8_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
         int16_t tech_level = Tech_Level_(player_idx, tech_app_id);
 
         int32_t intermediate = (special_mod_mult * (base_size + rack_size)) / 100;
 
-        int32_t raw_space_calc = ((regular_mod_add + mod_rack_offset + 100) * intermediate) / 100;
+        int16_t raw_space_calc = (int16_t)(((regular_mod_add + mod_rack_offset + 100) * intermediate) / 100);
 
-        int32_t space_per_weapon = Space_Given_M_Level_(static_cast<int16_t>(raw_space_calc), tech_level, static_cast<uint8_t>(miniaturization_cat));
+        int32_t space_per_weapon = Space_Given_M_Level_(raw_space_calc, tech_level, miniaturization_cat);
 
         int32_t total_space = static_cast<int32_t>(quantity) * space_per_weapon;
 
@@ -626,6 +636,8 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
+        // The original helpers consume this bitmap as a plain 16-bit stack word.
+        // Keep the design-time interface as int16_t to match the binary even though callers use it as flags.
         int32_t rack_size = 0;
         if (Weapon_Needs_Racks_(weapon_idx) != 0) {
             rack_size = static_cast<int32_t>(Weapon_Rack_Size_(ammo));
@@ -687,8 +699,8 @@ namespace DESIGN {
                         MOX::_PLAYER_NUM,
                         MOX::_design->weapon_type[i],
                         1,
-                        (int8_t)MOX::_design->weapon_firing_arc[i],
-                        (int8_t)MOX::_design->weapon_ammo[i],
+                        (int16_t)MOX::_design->weapon_firing_arc[i],
+                        (int16_t)MOX::_design->weapon_ammo[i],
                         MOX::_design->weapon_specials[i]
                     );
 
@@ -861,7 +873,7 @@ namespace DESIGN {
         }
     }
 
-    void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t* refresh, int16_t* out_status) {
+    void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t* /* unused */, int16_t* out_status) {
         char description_buffer[1332];
 
         for (int16_t i = 0; i < 8; ++i) {
@@ -1168,15 +1180,18 @@ namespace DESIGN {
         int16_t needs_racks = Weapon_Needs_Racks_(weapon_id);
 
         int16_t tech_id = TECHDATA::_weapons[weapon_id].tech_app_id;
-        uint8_t category = static_cast<uint8_t>(Miniaturization_Category_(tech_id));
+        int8_t category = Miniaturization_Category_(tech_id);
         int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
 
         int16_t base_weapon_size = TECHDATA::_weapons[weapon_id].size;
         int16_t space_req = static_cast<int16_t>(Space_Given_M_Level_(base_weapon_size, tech_lvl, category));
 
         if (needs_racks != 0) {
+            tech_id = TECHDATA::_weapons[weapon_id].tech_app_id;
+            int8_t rack_category = Miniaturization_Category_(tech_id);
+            int16_t rack_tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
             int16_t rack_base_size = Weapon_Rack_Size_(2);
-            int16_t rack_space = static_cast<int16_t>(Space_Given_M_Level_(rack_base_size, tech_lvl, category));
+            int16_t rack_space = (int16_t)Space_Given_M_Level_(rack_base_size, rack_tech_lvl, rack_category);
             return space_req + rack_space;
         }
 
@@ -1295,7 +1310,7 @@ namespace DESIGN {
 
                             if (!already_on_ship) {
                                 uint16_t tech_id = TECHDATA::_specials[special_idx].tech_app_id;
-                                uint8_t category = (uint8_t)Miniaturization_Category_(tech_id);
+                                int8_t category = Miniaturization_Category_(tech_id);
                                 int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
 
                                 int16_t base_space = TECHDATA::_specials[special_idx].space_per_ship_type[MOX::_design->ship_size];
@@ -1356,41 +1371,32 @@ namespace DESIGN {
         char buffer[8];
         dest_str[0] = s__00551100[0];
 
-        auto copy_buffer_to_dest = [&]() {
-            char* d = dest_str;
-            while (*d != '\0') {
-                d++;
-            }
-            char* s = buffer;
-            while ((*d++ = *s++) != '\0');
-        };
-
         if (arc_flags & 0x01) {
             KEN::Ken_Get_Text_Message_(3, buffer, 6);
-            copy_buffer_to_dest();
+            strcat(dest_str, buffer);
             return;
         }
 
         if (arc_flags & 0x02) {
             KEN::Ken_Get_Text_Message_(4, buffer, 6);
-            copy_buffer_to_dest();
+            strcat(dest_str, buffer);
             return;
         }
 
         if (arc_flags & 0x04) {
             KEN::Ken_Get_Text_Message_(6, buffer, 6);
-            copy_buffer_to_dest();
+            strcat(dest_str, buffer);
             return;
         }
 
         if (arc_flags & 0x08) {
             KEN::Ken_Get_Text_Message_(5, buffer, 6);
-            copy_buffer_to_dest();
+            strcat(dest_str, buffer);
             return;
         }
 
         if (arc_flags & 0x10) {
-            *reinterpret_cast<uint32_t*>(dest_str) = *reinterpret_cast<const uint32_t*>(s_360_00556164);
+            strcpy(dest_str, s_360_00556164);
         }
     }
 
@@ -1472,13 +1478,13 @@ namespace DESIGN {
         return (int16_t)result;
     }
 
-    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3) {
+    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer) {
         bool any_mod = false;
         out_buffer[0] = '\0';
 
         for (int16_t i = 0; i < 15; ++i) {
             if ((mod_mask >> (i & 0x1f)) & 1) {
-                const char* mod_name = TECHDATA::_weapon_modifications[i].name;
+                const char* mod_name = TECHDATA::_weapon_modifications[i].name_plural;
 
                 char* p = out_buffer;
                 while (*p) p++;

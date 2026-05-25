@@ -20,7 +20,8 @@ namespace SHIPMOVE {
             if (col->owner != -1 && col->outpost_flag == 0) {
                 for (int j = 0; j < 7; ++j) {
                     if (col->producing[j] > -100) {
-                        colony_production_slots[(uint8_t)col->owner]++;
+                        int owner = col->owner;
+                        colony_production_slots[owner]++;
                     }
                 }
             }
@@ -39,10 +40,10 @@ namespace SHIPMOVE {
         for (int i = 0; i < 500; ++i) {
             if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status == 5) {
                 if (antaran_assigned < antaran_max_slots) {
-                    MOX::_ship[i].owner = 8;
+                    MOX::_ship[i].owner = (int8_t)8;
                     antaran_assigned++;
                 } else if (player_assigned < player_max_slots) {
-                    MOX::_ship[i].owner = (char)MOX::_PLAYER_NUM;
+                    MOX::_ship[i].owner = (int8_t)MOX::_PLAYER_NUM;
                     player_assigned++;
                 } else {
                     unassigned_indices[unassigned_count++] = i;
@@ -55,19 +56,19 @@ namespace SHIPMOVE {
 
         int current_player = (int)MOX::_stardate % (int)MOX::_NUM_PLAYERS;
         int assigned_from_unassigned = 0;
-        int players_tried = 0;
+        int fail_count = 0;
 
         if (unassigned_count > 0) {
             while (assigned_from_unassigned < unassigned_count) {
-                if (players_tried >= (int)MOX::_NUM_PLAYERS) break;
+                if (fail_count >= (int)MOX::_NUM_PLAYERS) break;
 
                 if (ships_assigned_per_player[current_player] < colony_production_slots[current_player]) {
                     int ship_idx = unassigned_indices[assigned_from_unassigned++];
-                    MOX::_ship[ship_idx].owner = (char)current_player;
+                    MOX::_ship[ship_idx].owner = (int8_t)current_player;
                     ships_assigned_per_player[current_player]++;
-                    players_tried = 0;
+                    fail_count = 0;
                 } else {
-                    players_tried++;
+                    fail_count++;
                 }
 
                 current_player++;
@@ -80,7 +81,7 @@ namespace SHIPMOVE {
         while (assigned_from_unassigned < unassigned_count) {
             if (MOX::_player[current_player].eliminated == 0) {
                 int ship_idx = unassigned_indices[assigned_from_unassigned++];
-                MOX::_ship[ship_idx].owner = (char)current_player;
+                MOX::_ship[ship_idx].owner = (int8_t)current_player;
                 ships_assigned_per_player[current_player]++;
             }
 
@@ -346,7 +347,7 @@ namespace SHIPMOVE {
     /**
      * @address 00436e30
      */
-    int32_t __cdecl Create_Nonplayer_Ship_(int16_t owner, s_ship_design* design, int16_t x, int16_t y) {
+    int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y) {
         int16_t i;
 
         // Search for an available ship slot
@@ -374,7 +375,7 @@ namespace SHIPMOVE {
             memcpy(&MOX::_ship[i].d, design, sizeof(s_ship_design));
         }
 
-        MOX::_ship[i].owner = (char)owner;
+        MOX::_ship[i].owner = owner;
         MOX::_ship[i].d.previous_owner = (uint8_t)owner;
         MOX::_ship[i].status = 0;
 
@@ -561,21 +562,19 @@ namespace SHIPMOVE {
         int32_t navigator_bonus = 0;
         int32_t min_range = 30000;
         int8_t first_ship_flag = 0;
-        int32_t player_idx;
+        int8_t player_idx;
         int32_t ship_speed;
 
         s_star_data* target_star = &MOX::_star[target_star_idx];
         player_idx = MOX::_ship[*ship_list].owner;
 
         if (player_idx < 8) {
-            ship_speed = MOX::_player[player_idx].ship_speed;
+            ship_speed = (uint8_t)MOX::_player[player_idx].ship_speed;
         } else {
             ship_speed = 1;
         }
 
         std::memset(move_info, 0, sizeof(*move_info));
-
-        int8_t has_jumpgate_route = 0;
 
         if (MOX::_NUM_STARS != target_star_idx && player_idx < 8) {
             if (MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
@@ -649,12 +648,12 @@ namespace SHIPMOVE {
 
                 if (((MOX::_star[start_star_id].has_jumpgate >> (player_idx & 0x1F)) & 1) &&
                     ((target_star->has_jumpgate >> (player_idx & 0x1F)) & 1)) {
-                    has_jumpgate_route = 1;
+                    move_info->has_jumpgate_route = 1;
                 }
 
                 if (struct_::Test_Bit_Field_(MOX::_star[start_star_id].black_hole_blocks, target_star_idx)) {
                     if (navigator_bonus == 0 && move_info->uses_wormhole == 0) {
-                        if (move_info->has_stargate_route == 0 && has_jumpgate_route == 0) {
+                        if (move_info->has_stargate_route == 0 && move_info->has_jumpgate_route == 0) {
                             move_info->blackhole_blocks = 1;
                         }
                     }
@@ -674,7 +673,7 @@ namespace SHIPMOVE {
                 int16_t cur_x = start_x;
                 int16_t cur_y = start_y;
                 uint8_t turn_count = 0;
-                if (has_jumpgate_route != 0) {
+                if (move_info->has_jumpgate_route != 0) {
                     base_speed += 3;
                 }
 
@@ -706,9 +705,15 @@ namespace SHIPMOVE {
         move_info->has_navigator = (navigator_bonus > 0);
         
         // Final validation
-        if ((move_info->blackhole_blocks != 0 && has_jumpgate_route == 0 && 
-            move_info->has_stargate_route == 0 && navigator_bonus <= 0) || 
-            (move_info->out_of_range != 0) ||
+        if (((move_info->blackhole_blocks != 0 && move_info->has_jumpgate_route == 0 && 
+              move_info->has_stargate_route == 0 && navigator_bonus <= 0) && 
+             move_info->out_of_range == 0 &&
+             move_info->uses_wormhole == 0) ||
+            (move_info->out_of_range != 0 &&
+             (move_info->blackhole_blocks != 0 ||
+              move_info->has_jumpgate_route != 0 ||
+              move_info->has_stargate_route != 0 ||
+              navigator_bonus > 0)) ||
             (ship_speed == 0 && (target_star->x != start_x || target_star->y != start_y))) {
             move_info->turns_left = -1;
             move_info->moving = 0;

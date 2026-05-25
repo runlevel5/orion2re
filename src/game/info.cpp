@@ -1,6 +1,18 @@
 #include "pch.h"
 
 namespace INFO {
+    static int Compare_Unsigned_Strings_(const char* lhs, const char* rhs) {
+        while ((uint8_t)*lhs == (uint8_t)*rhs) {
+            if (*lhs == '\0') {
+                return 0;
+            }
+            ++lhs;
+            ++rhs;
+        }
+
+        return (int)(uint8_t)*lhs - (int)(uint8_t)*rhs;
+    }
+
     void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap) {
         uint16_t idx = (uint16_t)player_idx;
         if (idx >= (uint16_t)MOX::_NUM_PLAYERS) {
@@ -688,7 +700,7 @@ namespace INFO {
         for (i = 0; i < count; i++) {
             char* data = (char*)farload::Far_Reload_Data_(lbx_name, INFO::_g_reference_ix, out_buffer, i, 1, 84 /* 0x54 */);
             strcpy(items[i].group_name, data);
-            record_offsets[i] = *reinterpret_cast<uint32_t*>(data + 80 /* 0x50 */);
+            memcpy(&record_offsets[i], data + 80, sizeof(record_offsets[i]));
             items[i].group_id = (uint8_t)i;
             items[i].group_color_index = 0;
             items[i].app_count = 1;
@@ -697,7 +709,7 @@ namespace INFO {
         // Alphabetical sort of categories
         for (i = 0; i < count; i++) {
             for (j = 0; j < (count - 1); j++) {
-                if (strcmp(items[j].group_name, items[j + 1].group_name) > 0) {
+                if (Compare_Unsigned_Strings_(items[j].group_name, items[j + 1].group_name) > 0) {
                     char temp_name[64];
                     strcpy(temp_name, items[j].group_name);
                     strcpy(items[j].group_name, items[j + 1].group_name);
@@ -710,12 +722,16 @@ namespace INFO {
             }
         }
 
+        for (i = 0; i < count; ++i) {
+            items[i].group_id = (uint8_t)i;
+        }
+
         LIST::Init_List_Data_(&INFO::_g_category_header);
         short close_btn_id = fields::Add_Button_Field_(386, 427, s__00551100, anims[21], s__00551100, '(');
         short up_btn_id = fields::Add_Button_Field_(398, 96, s__00551100, anims[14], s__00551120, '(');
         short down_btn_id = fields::Add_Button_Field_(398, 396, s__00551100, anims[15], s__00551120, '(');
 
-        fields::Assign_Auto_Function_(reinterpret_cast<void(*)()>(0x004295D0 /* INFO::Draw_Reference_Category_Subscreen_ */), 2);
+        fields::Assign_Auto_Function_(INFO::Draw_Reference_Category_Subscreen_, 2);
         INFO::_g_reference_screen_type = 0;
 
         while (true) {
@@ -1011,7 +1027,7 @@ namespace INFO {
     void __cdecl Display_Graphed_Players_Names_() {
         int16_t x_pos = 351;
         int16_t y_pos = 64;
-        int16_t spacing;
+        int16_t spacing = 0;
         int16_t active_count = MOX::_active_count;
 
         if (active_count > 3) {
@@ -1028,7 +1044,7 @@ namespace INFO {
             int16_t i = 0;
 
             do {
-                uint8_t player_idx = (uint8_t)MOX::_active_player[i];
+                uint8_t player_idx = MOX::_active_player[i];
 
                 fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[player_idx]);
 
@@ -1126,7 +1142,10 @@ namespace INFO {
         uint32_t sum = (uint32_t)val0 + (uint32_t)val1 + (uint32_t)val2;
         int32_t average = (int32_t)(sum / 3);
 
-        int32_t result = abs(val1 - average);
+        int32_t diff = val1 - average;
+        // Match the original 32-bit SUB/CDQ/XOR/SUB sequence and avoid abs(INT_MIN) UB.
+        int32_t sign = diff >> 31;
+        int32_t result = (diff ^ sign) - sign;
 
         if (start_idx + 1 < end_idx) {
             data[start_idx + 1] = average;
@@ -1229,7 +1248,7 @@ namespace INFO {
         uint16_t x = 0xed; /* 237 */
 
         do {
-            uint8_t offset = (uint8_t)INFO::_graph_offsets[offset_idx++];
+            uint8_t offset = INFO::_graph_offsets[offset_idx++];
             if (offset_idx >= 10) {
                 offset_idx = 0;
             }
@@ -1247,7 +1266,7 @@ namespace INFO {
 
         uint16_t y = 0x186; /* 390 */
         do {
-            uint8_t offset = (uint8_t)INFO::_graph_offsets[offset_idx++];
+            uint8_t offset = INFO::_graph_offsets[offset_idx++];
             if (offset_idx >= 10) {
                 offset_idx = 0;
             }
@@ -1262,8 +1281,9 @@ namespace INFO {
         int32_t current_val = 0x88b8; /* 35000 */
         int16_t return_val;
         int16_t step;
+        int32_t stardate = MOX::_stardate;
 
-        uint16_t check_date = (uint16_t)MOX::_stardate + 0x7748 /* 30536 */;
+        uint16_t check_date = (uint16_t)(stardate + 0x7748 /* 30536 */);
 
         if (check_date <= 0x23 /* 35 */) {
             return_val = 10;
@@ -1278,7 +1298,7 @@ namespace INFO {
             return_val = 1;
             step = 50 /* 0x32 */;
             if (check_date > 0x15e /* 350 */) {
-                current_val = ((int32_t)(MOX::_stardate - 0x159 /* 345 */) / 10) * 10;
+                current_val = ((stardate - 0x159 /* 345 */) / 10) * 10;
             }
         }
 
@@ -1451,11 +1471,11 @@ namespace INFO {
         s_help_topic_record* record;
         int16_t category_count;
 
-        const char* s_bullet_fmt = "^ %s";
-        const char* s_empty = "";
+        const char* s_bullet_fmt = INFO::s_bullet_fmt_00556078;
+        const char* s_empty = INFO::empty_string;
 
-        INFO::_g_category_str_p = (char*)category_strs;
-        INFO::_g_how_to_str_ = (char*)how_to_strs;
+        INFO::_g_category_str_p = category_strs;
+        INFO::_g_how_to_str_ = how_to_strs;
 
         INFO::Draw_Multiple_Drop_Areas_(INFO::_reference_drops, 4);
 
@@ -1637,7 +1657,7 @@ namespace INFO {
                 item->app_count = (uint8_t)(height / font_lf);
 
                 // Binary executes this initialization loop at least once.
-                int i = 0;
+                uint8_t i = 0;
                 do {
                     item->tech_app_status[i] = 0;
                     item->tech_app_ids[i + 1] = 0xff;
@@ -1661,12 +1681,10 @@ namespace INFO {
 
         if (field_idx >= INFO::_g_first_how_to_field) {
             int16_t offset = field_idx - INFO::_g_first_how_to_field;
-            // TYPE MISMATCH: _g_how_to_str_ is char* in header but used as char[][48]
-            fonts::Print_(0x1a5, (offset + 5) * 20, &INFO::_g_how_to_str_[offset * 48]);
+            fonts::Print_(0x1a5, (offset + 5) * 20, INFO::_g_how_to_str_[offset]);
         } else if (field_idx >= INFO::_g_first_category_field) {
             int16_t offset = field_idx - INFO::_g_first_category_field;
-            // TYPE MISMATCH: _g_category_str_p is char* in header but used as char[][48]
-            fonts::Print_(0xdd, (offset + 5) * 20, &INFO::_g_category_str_p[offset * 48]);
+            fonts::Print_(0xdd, (offset + 5) * 20, INFO::_g_category_str_p[offset]);
         }
 
         palette::Cycle_Palette_Color_(0xbf, 8, 0x20, 0, 0x28, 0x3f, 8, 8);
@@ -1686,7 +1704,7 @@ namespace INFO {
 
         int16_t msg_count = MSG_::N_Msgs_For_Player_(MOX::_PLAYER_NUM);
         int16_t up_button;
-        int16_t down_button;
+        int16_t down_button = 0;
 
         if (msg_count > 0) {
             up_button = fields::Add_Button_Field_(0x250, 0x54, s__00551100, anim_data[0xe], s__00551120, '(');

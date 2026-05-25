@@ -236,7 +236,7 @@ namespace MOX {
     inline s_animation_header*& _draw_ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B328});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline int16_t* _design_choice_item_selected = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD40});
-    inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
+    inline int8_t& _first_special_system_ctr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596D4A});
     inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
     inline int16_t(&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{ 0x00597470 });
     inline uint8_t& _first_design_screen_call = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B5C9});
@@ -666,9 +666,8 @@ namespace MOX {
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });
     inline int8_t (&_class_to_num_satellites)[10][6] =
         *reinterpret_cast<int8_t (*)[10][6]>(std::uintptr_t{0x005594C8});
-    inline uint8_t (&_special_bonus)[10][3] =
-        *reinterpret_cast<uint8_t(*)[10][3]>(std::uintptr_t{0x0055903A});
-    inline int8_t (&_special_bonus_at_00559037)[93] = *reinterpret_cast<int8_t (*)[93]>(std::uintptr_t{0x00559037});
+    inline int8_t (&_special_bonus)[9][3] =
+        *reinterpret_cast<int8_t(*)[9][3]>(std::uintptr_t{0x0055903B});
     inline uint16_t (&_star_fields_dim)[6] = *reinterpret_cast<uint16_t(*)[6]>(std::uintptr_t{ 0x005A47B0 });
 
     inline s_ship_data*& _ship =

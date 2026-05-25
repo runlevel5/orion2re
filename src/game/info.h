@@ -26,6 +26,9 @@ namespace INFO {
     inline int16_t (&_tech_rev_field)[8] =
         *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00555CB0});
 
+    inline const char* s_bullet_fmt_00556078 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00556078}); // "^ %s"
+
     inline s_drop_area (&_tech_review_drops)[4] =
         *reinterpret_cast<s_drop_area(*)[4]>(std::uintptr_t{0x00555CE8});
 
@@ -83,8 +86,8 @@ namespace INFO {
     inline int16_t& _g_reference_ix =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DA4});
 
-    inline char*& _g_how_to_str_ =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00564DA8});
+    inline char (*&_g_how_to_str_)[48] =
+        *reinterpret_cast<char (**)[48]>(std::uintptr_t{0x00564DA8});
 
     inline int16_t& _g_first_how_to_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DAC});
@@ -92,8 +95,8 @@ namespace INFO {
     inline int16_t& _g_first_category_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DB0});
 
-    inline char*& _g_category_str_p =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00564DB4});
+    inline char (*&_g_category_str_p)[48] =
+        *reinterpret_cast<char (**)[48]>(std::uintptr_t{0x00564DB4});
 
     inline uint8_t& _race_statistics_page =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B9D});
@@ -157,7 +160,7 @@ namespace INFO {
     inline const char* s_pct_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x0055600C}); // "%3i%%"
     inline const char* s_int_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00556014}); // "%i"
 
-    inline int8_t (&_graph_offsets)[10] = *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00555E38});
+    inline uint8_t (&_graph_offsets)[10] = *reinterpret_cast<uint8_t(*)[10]>(std::uintptr_t{0x00555E38});
     inline const char* s_fmt_comma = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
     inline const char* s_fmt_dot = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8});   // "%i.%i"
 

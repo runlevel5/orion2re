@@ -4466,7 +4466,8 @@ struct s_ship_move_info {
     int8_t has_navigator;
     int8_t traveling_speed;
     uint8_t parsecs;
-    short uses_wormhole;
+    int8_t uses_wormhole;
+    int8_t has_jumpgate_route;
     int8_t has_stargate_route;
     int8_t hyperspace_flux;
 };
@@ -4869,7 +4870,7 @@ struct s_tech_armor_data {
     undefined field3_0x8;
     uint8_t troops_bonus;
     int16_t ships_bonus;
-    uint16_t cost_percent;
+    int16_t cost_percent;
     uint8_t strategic_hp;
 };
 
@@ -4922,7 +4923,7 @@ struct s_tech_drive_data {
     uint16_t space_per_ship_type[6];
     uint16_t cost_per_ship_type[6];
     int8_t combat_speed_min[6];
-    int8_t combat_speed_max[6];
+    uint8_t combat_speed_max[6];
     uint16_t warp_speed;
 };
 
@@ -5139,7 +5140,12 @@ struct s_weapon_filter_item {
 typedef struct s_weapon_visual_fx s_weapon_visual_fx, *Ps_weapon_visual_fx;
 
 struct s_weapon_visual_fx {
-    struct s_colors colors[3];
+    int32_t r1;
+    int32_t g1;
+    int32_t b1;
+    int32_t r2;
+    int32_t g2;
+    int32_t b2;
     int32_t thickness;
     int32_t anim_style;
     int32_t sfx_sprite_id;

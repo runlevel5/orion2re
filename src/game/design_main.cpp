@@ -84,7 +84,7 @@ namespace DESIGN {
         fonts::Set_Font_Style_(3, &style3_colors);
         fonts::Set_Font_Spacing_(1);
         fonts::Print_(0x1B5, 0x7D, HAROLD::H_Message_(HESTR_05C_BEAM_DEFENSE));
-        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? "+" : "-"), (int)bonus_beam_def);
+        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? s_plus : s_minus), (int16_t)bonus_beam_def);
         fonts::Print_Right_(0x26A, 0x7D, buffer);
 
         fonts::Print_(0x1B5, 0x89, HAROLD::H_Message_(HESTR_05D_MISSILE_EVASION));
@@ -105,7 +105,7 @@ namespace DESIGN {
         bool show_replacement_msg = false;
         int y_pos = 0xAA;
         for (int i = 0; i < 8; ++i) {
-            int slot = i + MOX::_first_weapon_ctr;
+            int16_t slot = (int16_t)i + (int16_t)MOX::_first_weapon_ctr;
             if (i - (int)MOX::_scanned_field == -1000) {
                 if (MOX::_design->weapon_type[slot] < 1) {
                     show_replacement_msg = true;
@@ -119,7 +119,7 @@ namespace DESIGN {
             }
 
             if (MOX::_design->weapon_type[slot] > 0) {
-                Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str, 1);
+                Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str);
                 Weapon_Arc_String_(MOX::_design->weapon_firing_arc[i], arc_str);
 
                 const char* base_name = (MOX::_design->weapon_count[slot] < 2) ?
@@ -201,7 +201,7 @@ namespace DESIGN {
         y_pos = 0x140;
         show_replacement_msg = false;
         for (int i = 0; i < 8; ++i) {
-            int slot = i + MOX::_first_special_system_ctr;
+            int16_t slot = (int16_t)i + (int16_t)MOX::_first_special_system_ctr;
             if (i - (int)MOX::_scanned_field == -2000) {
                 if (MOX::_design->special_devices[slot] < 1) {
                     show_replacement_msg = true;
@@ -670,9 +670,13 @@ namespace DESIGN {
         MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &colors);
         fonts::Set_Font_Style_(4, &colors);
 
-        int16_t line_height = fonts::Get_Font_Height_();
-        int16_t name_y = ((0x1B - line_height) / 2) + 0x11;
-        MOX::_design_name_field = fields::Add_Continuous_String_Input_Field_(0x12, name_y, 0x86, line_height + 2, MOX::_design->name, 15, 0, 0, 0x29 /* ) */, 0);
+        int16_t input_h = fonts::Get_Font_Height_() + 2;
+        int16_t text_h = fonts::Get_Font_Height_();
+        int16_t name_y = ((0x1B - text_h) / 2) + 0x11;
+        MOX::_design_name_field = fields::Add_Continuous_String_Input_Field_(
+            0x12, name_y, 0x86, input_h,
+            MOX::_design->name, 15, 0, 0, 0x29 /* ) */, 0
+        );
 
         _design_shield_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x38, 0x273, 0x5F, s__00551100, 0x29 /* ) */);
         _design_computer_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x61, 0x273, 0x7B, s__00551100, 0x29 /* ) */);

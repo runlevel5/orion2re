@@ -593,9 +593,7 @@ namespace FMTPARA {
 
     char* __cdecl _Print_Formatted_Paragraph_(short x, short y, short width, char* str, short justify, s_animation_header* seg, bool do_render) {
         s_fmtpara_para para;
-        short* unused_tabs;
-        s_fmtpara_global* unused_para_global;
-        s_fmtpara_line linep[2];
+        s_fmtpara_line linep;
         s_fmtpara_style stylep;
         s_fmtpara_break breakp;
         s_fmtpara_char endp[150];
@@ -606,7 +604,7 @@ namespace FMTPARA {
             str != nullptr) {
 
             _para_p = &para;
-            _line_p = linep;
+            _line_p = &linep;
             _style_p = &stylep;
             _break_p = &breakp;
             _first_char_p = endp;
@@ -623,19 +621,16 @@ namespace FMTPARA {
             para.first_line_indent = 0;
             para.right_indent = 0;
             para.left_indent = 0;
-            para.justify_mode = static_cast<int8_t>(justify);
+            para.justify_mode = justify;
             para.paragraph_break = 1;
             para.nest_depth = 0;
-            para.line = linep;
-
-            unused_tabs = _tabs;
-            unused_para_global = &_para_global;
+            para.line = &linep;
 
             para.y_origin = 479;
 
-            stylep.font_id = static_cast<int8_t>(fonts::_current_font_style);
+            stylep.font_id = fonts::_current_font_style;
             stylep.highlight = 0;
-            stylep.fg_color = static_cast<uint8_t>(fonts::_font_header.font_style);
+            stylep.fg_color = fonts::_font_header.font_style;
 
             _style_p->color_attr = Get_Current_Color_Set_();
 
@@ -714,14 +709,9 @@ namespace FMTPARA {
             _break_p->char_count = _line_p->char_count;
             _break_p->space_count = _line_p->space_count;
 
-            // Copy next line configuration into break point state
-            _break_p->x = _line_p[1].x;
-            _break_p->left_limit_x = _line_p[1].left_limit_x;
-            _break_p->right_limit_x = _line_p[1].right_limit_x;
-            _break_p->exclusion_left_x = _line_p[1].exclusion_left_x;
-            _break_p->exclusion_right_x = _line_p[1].exclusion_right_x;
-            _break_p->x_candidate = _line_p[1].x_candidate;
-            _break_p->line_char_count = (int8_t)_line_p[1].char_count;
+            // The original stack frame copies the 13 bytes immediately following s_fmtpara_line.
+            // In this function those bytes are occupied by the adjacent s_fmtpara_style local.
+            memcpy(&_break_p->x, _style_p, sizeof(s_fmtpara_style));
 
             _break_p->break_is_backspace = false;
             if (char_code == '\b') {
@@ -1122,7 +1112,8 @@ namespace FMTPARA {
 
     void __cdecl Set_Current_Colors_() {
         _para_p->str++;
-        _style_p->color_attr = (uint8_t)(*_para_p->str << 5);
+        uint8_t color_code = (uint8_t)*_para_p->str;
+        _style_p->color_attr = (uint8_t)(color_code << 5);
     }
 
     uint32_t __cdecl Get_Item_Value_(uint16_t index) {
@@ -1492,7 +1483,7 @@ namespace FMTPARA {
                 v_spacing += _para_p->line_advance_y;
             }
 
-            int32_t abs_v_spacing = v_spacing;
+            int64_t abs_v_spacing = v_spacing;
             if (abs_v_spacing < 0) {
                 abs_v_spacing = -abs_v_spacing;
             }
@@ -1689,13 +1680,7 @@ namespace FMTPARA {
         _line_p->char_count = _break_p->char_count;
         _line_p->space_count = _break_p->space_count;
 
-        _line_p[1].x = _break_p->x;
-        _line_p[1].left_limit_x = _break_p->left_limit_x;
-        _line_p[1].right_limit_x = _break_p->right_limit_x;
-        _line_p[1].exclusion_left_x = _break_p->exclusion_left_x;
-        _line_p[1].exclusion_right_x = _break_p->exclusion_right_x;
-        _line_p[1].x_candidate = _break_p->x_candidate;
-        *reinterpret_cast<int8_t*>(&_line_p[1].char_count) = _break_p->line_char_count;
+        memcpy(_style_p, &_break_p->x, sizeof(s_fmtpara_style));
 
         if (_break_p->break_is_backspace && &_first_char_p[_line_p->char_count - 1] == _char_p) {
             Add_Character_To_Line_('-');
@@ -1895,18 +1880,19 @@ namespace FMTPARA {
     }
 
     void __cdecl Pick_Font_Number_(uint8_t font_id) {
-        uint8_t saved_selected_colors[8];
+        s_colors saved_selected_colors;
         s_colors saved_current_colors;
 
         // Backup original font color states
-        memcpy(saved_selected_colors, &fonts::_font_header.selected_colors, 8);
+        saved_selected_colors = fonts::_font_header.selected_colors;
         saved_current_colors = fonts::_current_font_color_array;
 
-        // Apply the font selection for all font ids; the high bit is an attribute flag.
-        fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), &fonts::_font_header.normal_colors);
+        if ((font_id & 0x80) != 0) {
+            fonts::Set_Remap_Font_Style_(font_id & 0x7F, &fonts::_font_header.normal_colors);
+        }
 
         // Restore the original font color states that might have been modified by Set_Remap_Font_Style_
-        memcpy(&fonts::_font_header.selected_colors, saved_selected_colors, 8);
+        fonts::_font_header.selected_colors = saved_selected_colors;
         fonts::_current_font_color_array = saved_current_colors;
     }
 

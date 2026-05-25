@@ -16,7 +16,7 @@ namespace DESIGN {
     inline int16_t& _selected_weapon_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline uint8_t& _changed_design_name = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056504C});
     inline int16_t& _player_design_num = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B28});
-    inline uint8_t (&_add_size_button_flag)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x00565064});
+    inline uint8_t (&_add_size_button_flag)[6] = *reinterpret_cast<uint8_t(*)[6]>(std::uintptr_t{0x00565064});
 
     inline const char* s_cstdes_log = reinterpret_cast<const char*>(0x005560ec);
     inline const char* s_plus = reinterpret_cast<const char*>(0x00551118); // "+"
@@ -76,7 +76,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Cost_();
 
-    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, uint16_t specials);
+    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, int16_t specials);
 
     int32_t __cdecl Total_Space_Used_();
 
@@ -144,7 +144,7 @@ namespace DESIGN {
 
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_();
 
-    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3);
+    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer);
 
     void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str);
 

@@ -1,6 +1,21 @@
 #include "pch.h"
 
 namespace BEAMS {
+    static const s_colors* Build_Damage_Indicator_Color_Window_(s_colors* dst, const uint8_t* src) {
+        memcpy(dst->colors, src, sizeof(dst->colors));
+        return dst;
+    }
+
+    static void Set_Weapon_Visual_FX_Colors_(s_weapon_visual_fx* fx, int32_t r1, int32_t g1, int32_t b1,
+                                             int32_t r2, int32_t g2, int32_t b2) {
+        fx->r1 = r1;
+        fx->g1 = g1;
+        fx->b1 = b1;
+        fx->r2 = r2;
+        fx->g2 = g2;
+        fx->b2 = b2;
+    }
+
     void __cdecl Reset_Beam_Swapping_Colors_() {
         BEAMS::_old_color[0] = -1;
         BEAMS::_old_color[1] = -1;
@@ -263,28 +278,41 @@ namespace BEAMS {
      * @address 00422a70
      */
     void __cdecl Draw_Damage_Indicator_(int16_t x, int16_t y, int16_t total_dmg, int16_t hull_dmg, int16_t shield_dmg, uint8_t side, int16_t anim_timer) {
-        const uint8_t total_dmg_colors[27] = {
+        const uint8_t total_dmg_color_steps[27] = {
             0xb0, 0xb9, 0xba, 0xb0, 0xb8, 0xb9, 0xb0, 0xb7, 0xb8,
             0xb0, 0xb6, 0xb7, 0xb0, 0xb5, 0xb6, 0xb0, 0xb4, 0xb5,
             0xb0, 0xb3, 0xb4, 0xb0, 0xb2, 0xb3, 0xb0, 0xb1, 0xb2
         };
 
-        const uint8_t shield_dmg_colors[27] = {
+        const uint8_t shield_dmg_color_steps[27] = {
             0x50, 0x57, 0x57, 0x50, 0x56, 0x57, 0x50, 0x55, 0x56,
             0x50, 0x54, 0x55, 0x50, 0x53, 0x54, 0x50, 0x52, 0x53,
             0x50, 0x51, 0x52, 0x50, 0x50, 0x51, 0x50, 0x50, 0x50
         };
 
-        const uint8_t hull_dmg_colors[27] = {
+        const uint8_t hull_dmg_color_steps[27] = {
             0xc0, 0xcc, 0xc5, 0xc0, 0xcc, 0xc5, 0xc0, 0xcc, 0xc5,
             0xc0, 0xc4, 0xcc, 0xc0, 0xcb, 0xc4, 0xc0, 0xc3, 0xcb,
             0xc0, 0xc3, 0xcb, 0xc0, 0xca, 0xc3, 0xc0, 0xc2, 0xca
         };
-        uint8_t dmg_color_blob[0x53];
+        const uint8_t dmg_color_blob_template[0x58] = {
+            0xb0, 0xb9, 0xba, 0xb0, 0xb8, 0xb9, 0xb0, 0xb7, 0xb8,
+            0xb0, 0xb6, 0xb7, 0xb0, 0xb5, 0xb6, 0xb0, 0xb4, 0xb5,
+            0xb0, 0xb3, 0xb4, 0xb0, 0xb2, 0xb3, 0xb0, 0xb1, 0xb2,
+            0x00,
+            0x50, 0x57, 0x57, 0x50, 0x56, 0x57, 0x50, 0x55, 0x56,
+            0x50, 0x54, 0x55, 0x50, 0x53, 0x54, 0x50, 0x52, 0x53,
+            0x50, 0x51, 0x52, 0x50, 0x50, 0x51, 0x50, 0x50, 0x50,
+            0x00,
+            0xc0, 0xcc, 0xc5, 0xc0, 0xcc, 0xc5, 0xc0, 0xcc, 0xc5,
+            0xc0, 0xc4, 0xcc, 0xc0, 0xcb, 0xc4, 0xc0, 0xc3, 0xcb,
+            0xc0, 0xc3, 0xcb, 0xc0, 0xca, 0xc3, 0xc0, 0xc2, 0xca,
+            0x00, 0x00, 0x00, 0x00, 0x00
+        };
+        uint8_t dmg_color_blob[sizeof(dmg_color_blob_template)];
+        s_colors font_colors;
 
-        memcpy(&dmg_color_blob[0x00], total_dmg_colors, sizeof(total_dmg_colors));
-        memcpy(&dmg_color_blob[0x1c], shield_dmg_colors, sizeof(shield_dmg_colors));
-        memcpy(&dmg_color_blob[0x38], hull_dmg_colors, sizeof(hull_dmg_colors));
+        memcpy(dmg_color_blob, dmg_color_blob_template, sizeof(dmg_color_blob));
 
         y -= anim_timer;
 
@@ -302,17 +330,17 @@ namespace BEAMS {
         video::Clip_On_();
 
         if (total_dmg > 0) {
-            fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[anim_timer * 3]);
+            fonts::Set_Font_Style_Shadow_Down_(1, Build_Damage_Indicator_Color_Window_(&font_colors, &dmg_color_blob[anim_timer * 3]));
             fonts::Print_Integer_(x, y, total_dmg);
         }
 
         if (shield_dmg > 0) {
-            fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[0x1c + anim_timer * 3]);
+            fonts::Set_Font_Style_Shadow_Down_(1, Build_Damage_Indicator_Color_Window_(&font_colors, &dmg_color_blob[0x1c + anim_timer * 3]));
             fonts::Print_Integer_(x - 10, y, shield_dmg);
         }
 
         if (hull_dmg > 0) {
-            fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[0x38 + anim_timer * 3]);
+            fonts::Set_Font_Style_Shadow_Down_(1, Build_Damage_Indicator_Color_Window_(&font_colors, &dmg_color_blob[0x38 + anim_timer * 3]));
             fonts::Print_Integer_(x - 20, y, hull_dmg);
         }
 
@@ -718,7 +746,8 @@ namespace BEAMS {
             0, 1, 2, 3, 4, 3, 2, 1
         };
 
-        return base_rotations[rot % 16];
+        int16_t idx = (rot < 0) ? (int16_t)-((-rot) & 0xF) : (int16_t)(rot & 0xF);
+        return *(base_rotations + idx);
     }
 
     /**
@@ -732,7 +761,8 @@ namespace BEAMS {
             3, 3, 3, 3
         };
 
-        return methods[rot % 16];
+        int16_t idx = (rot < 0) ? (int16_t)-((-rot) & 0xF) : (int16_t)(rot & 0xF);
+        return *(methods + idx);
     }
 
     /**
@@ -1772,6 +1802,7 @@ namespace BEAMS {
 
     void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t param_1, uint16_t param_2, s_weapon_visual_fx* param_3) {
         if (param_1 <= 0 || param_1 > 46) {
+            memset(param_3, 0, sizeof(*param_3));
             return;
         }
 
@@ -1779,265 +1810,222 @@ namespace BEAMS {
 
         switch (param_1) {
             case 1:
-                local_2c.colors[0] = s_colors{{0x59, 0, 0, 0, 0x6b, 0, 0, 0}};
-                local_2c.colors[1] = s_colors{{0xc3, 0, 0, 0, 0xda, 0, 0, 0}};
-                local_2c.colors[2] = s_colors{{0xfc, 0, 0, 0, 0xff, 0, 0, 0}};
+                Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x6b, 0xc3, 0xda, 0xfc, 0xff);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 1;
                 local_2c.sfx_sprite_id = 4;
                 local_2c.duration = 20;
                 local_2c.unk = 0;
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 2:
-                local_2c.colors[0] = s_colors{{0x59, 0, 0, 0, 0x67, 0, 0, 0}};
-                local_2c.colors[1] = s_colors{{0x6c, 0, 0, 0, 0xb2, 0, 0, 0}};
-                local_2c.colors[2] = s_colors{{0xc8, 0, 0, 0, 0xc8, 0, 0, 0}};
+                Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x67, 0x6c, 0xb2, 0xc8, 0xc8);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 1;
                 local_2c.sfx_sprite_id = 6;
                 local_2c.duration = 20;
                 local_2c.unk = 0;
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 3:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0xc8, 0, 0, 0, 0x14, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x20, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0x50, 0, 0, 0, 0x0a, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 0;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 } else {
-                    local_2c.colors[0] = s_colors{{0xc8, 0, 0, 0, 0x14, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x20, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0x50, 0, 0, 0, 0x0a, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 4:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0x5e, 0, 0, 0, 0x70, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0xcd, 0, 0, 0, 0xba, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xdd, 0, 0, 0, 0xff, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
                     local_2c.thickness = 0;
                     local_2c.anim_style = 0;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 } else {
-                    local_2c.colors[0] = s_colors{{0x5e, 0, 0, 0, 0x70, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0xcd, 0, 0, 0, 0xba, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xdd, 0, 0, 0, 0xff, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
                     local_2c.thickness = 0;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 5:
                 if (((param_2 & 0x10) != 0) && ((param_2 & 0x100) != 0)) {
-                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 3;
                     local_2c.sfx_sprite_id = 100;
                     local_2c.duration = 25;
                     local_2c.unk = 1;
                 } else if ((param_2 & 0x10) != 0) {
-                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 120;
                     local_2c.duration = 30;
                     local_2c.unk = 0;
                 } else if ((param_2 & 0x100) != 0) {
-                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 1;
                     local_2c.sfx_sprite_id = 100;
                     local_2c.duration = 25;
                     local_2c.unk = 1;
                 } else {
-                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 1;
                     local_2c.sfx_sprite_id = 120;
                     local_2c.duration = 30;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 6:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0x94, 0, 0, 0, 0x9b, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x49, 0, 0, 0, 0xfe, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xfe, 0, 0, 0, 0x94, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 1;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 } else {
-                    local_2c.colors[0] = s_colors{{0x94, 0, 0, 0, 0x9b, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x49, 0, 0, 0, 0xfe, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xfe, 0, 0, 0, 0x94, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 7:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0x44, 0, 0, 0, 0x98, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x8f, 0, 0, 0, 0x93, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0xff, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 3;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 } else {
-                    local_2c.colors[0] = s_colors{{0x44, 0, 0, 0, 0x98, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x8f, 0, 0, 0, 0x93, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0xff, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 3;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 8:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0x92, 0, 0, 0, 0x53, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0xba, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xb8, 0, 0, 0, 0xff, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 1;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 } else {
-                    local_2c.colors[0] = s_colors{{0x92, 0, 0, 0, 0x53, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0xba, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xb8, 0, 0, 0, 0xff, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 9:
             case 41:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0xa9, 0, 0, 0, 0x2b, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xa6, 0, 0, 0, 0x60, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 0;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 } else {
-                    local_2c.colors[0] = s_colors{{0xa9, 0, 0, 0, 0x2b, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xa6, 0, 0, 0, 0x60, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 200;
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 10:
-                local_2c.colors[0] = s_colors{{0x6b, 0, 0, 0, 0xa2, 0, 0, 0}};
-                local_2c.colors[1] = s_colors{{0x16, 0, 0, 0, 0xf2, 0, 0, 0}};
-                local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0x35, 0, 0, 0}};
+                Set_Weapon_Visual_FX_Colors_(&local_2c, 0x6b, 0xa2, 0x16, 0xf2, 0xff, 0x35);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 1;
                 local_2c.sfx_sprite_id = 40;
                 local_2c.duration = 30;
                 local_2c.unk = 0;
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 11:
             case 42:
-                local_2c.colors[0] = s_colors{{0xc9, 0, 0, 0, 0x53, 0, 0, 0}};
-                local_2c.colors[1] = s_colors{{0xc4, 0, 0, 0, 0xff, 0, 0, 0}};
-                local_2c.colors[2] = s_colors{{0xb8, 0, 0, 0, 0xff, 0, 0, 0}};
+                Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc9, 0x53, 0xc4, 0xff, 0xb8, 0xff);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 3;
                 local_2c.sfx_sprite_id = 200;
                 local_2c.duration = 50;
                 local_2c.unk = 0;
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 12:
                 if ((param_2 & 0x10) == 0) {
-                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x53, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0x52, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 1;
                     local_2c.sfx_sprite_id = 100;
                     local_2c.duration = 30;
                     local_2c.unk = 1;
                 } else {
-                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x53, 0, 0, 0}};
-                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
-                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0x52, 0, 0, 0}};
+                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 3;
                     local_2c.sfx_sprite_id = 100;
                     local_2c.duration = 30;
                     local_2c.unk = 1;
                 }
-                *param_3 = local_2c;
+                memcpy(param_3, &local_2c, sizeof(local_2c));
                 break;
 
             case 27:
             case 40:
             case 43:
             case 46:
-                *param_3 = s_weapon_visual_fx{};
+                memset(param_3, 0, sizeof(*param_3));
                 break;
 
             default:
+                memset(param_3, 0, sizeof(*param_3));
                 return;
         }
     }
@@ -2604,12 +2592,12 @@ namespace BEAMS {
         }
 
         Set_Beam_Colors_(palette_base_index,
-                         *(int32_t*)&fx.colors[0].colors[0],
-                         *(int32_t*)&fx.colors[0].colors[4],
-                         *(int32_t*)&fx.colors[1].colors[0],
-                         *(int32_t*)&fx.colors[1].colors[4],
-                         *(int32_t*)&fx.colors[2].colors[0],
-                         *(int32_t*)&fx.colors[2].colors[4],
+                         fx.r1,
+                         fx.g1,
+                         fx.b1,
+                         fx.r2,
+                         fx.g2,
+                         fx.b2,
                          fx.thickness);
         palette::Refresh_Palette_();
     }

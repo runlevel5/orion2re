@@ -36,7 +36,7 @@ namespace SHIPS {
 
     int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* ship_icon_id, int16_t threshold_x, int16_t threshold_y);
 
-    int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t system_idx, int16_t type, s_ship_design* design, uint8_t owner);
+    int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t system_idx, int16_t type, s_ship_design* design, uint8_t randomize_xy);
 
     int16_t __cdecl Set_Nonplayer_Ship_Destination_(int16_t star_idx, int16_t ship_idx, uint8_t is_moving);
 

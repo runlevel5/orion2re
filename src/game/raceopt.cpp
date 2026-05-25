@@ -499,8 +499,10 @@ namespace raceopt {
         int16_t x_coords[4] = { 0x50, 0xFE, 0x1BA, 0x283 };
         int16_t y_coords[5] = { 0x48, 0x93, 0xDE, 0x129, 0x174 };
 
-        int16_t stack_vars[4];
-        stack_vars[0] = 0x16;
+        int16_t block_size = 0x16;
+        int16_t loop3_i = 0;
+        int16_t loop3_j = 0;
+        int16_t cost_diff = 0;
 
         s_colors local_64;
         local_64.colors[0] = 0x89;
@@ -512,8 +514,8 @@ namespace raceopt {
         local_64.colors[6] = 0x91;
         local_64.colors[7] = 0x91;
 
-        char local_50[12] = { 0 };
-        memset(&local_50[1], 0x95, 7);
+        s_colors disabled_cost_color = {{ 0x89, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95 }};
+        char local_50[12];
 
         fonts::Set_Font_Style_Shadow_Down_(3, &_color_opt);
         fonts::Set_Outline_Color_(0x77, 0);
@@ -567,8 +569,9 @@ namespace raceopt {
                     animate::Draw_(x_coords[col_idx] - 0x14, y, _off_button_seg);
                 }
 
-                bool draw_text = true;
+                bool draw_text = false;
                 if (btn_var - loop1_j == 1) {
+                    draw_text = true;
                     fonts::Set_Font_Style_Shadow_Down_(2, &_color_opt);
                 } else {
                     if (_ability_costs[neg_idx] + _negative_picks < -10 ||
@@ -576,15 +579,15 @@ namespace raceopt {
                         (item_idx > 3 && item_idx < 8 && _option_toggle[9] == 1) ||
                         _group_button[item_idx] == -1000) 
                     {
+                        draw_text = true;
                         fonts::Set_Font_Style_Shadow_Down_(2, &local_64);
-                    } else {
-                        draw_text = false;
                     }
                 }
 
                 if (draw_text) {
                     char local_5c[12];
-                    local_50[0] = s__00551100[0];
+                    local_50[0] = disabled_cost_color.colors[0];
+                    local_50[1] = '\0';
                     itoa(_ability_costs[neg_idx], local_5c, 10);
                     strcpy(local_50 + 1, local_5c);
 
@@ -620,8 +623,7 @@ namespace raceopt {
 
         do {
             int16_t neg_idx = item_idx + (-3 - item_idx) / 4;
-            int16_t cost_diff = _ability_costs[neg_idx] - _ability_costs[_button_variable[9] + 0x1B];
-            stack_vars[3] = cost_diff;
+            cost_diff = _ability_costs[neg_idx] - _ability_costs[_button_variable[9] + 0x1B];
 
             bool draw_off = false;
             if (_group_button[item_idx] < 0) draw_off = true;
@@ -635,14 +637,14 @@ namespace raceopt {
                 animate::Draw_(x_coords[col_idx] - 0x14, y2, _special_button_seg);
             }
 
-            bool draw_text2 = true;
+            bool draw_text2 = false;
             if (loop2_j == _button_variable[9]) {
+                draw_text2 = true;
                 fonts::Set_Font_Style_Shadow_Down_(2, &_color_opt);
             } else {
                 if (_ability_costs[neg_idx] + _negative_picks < -10 || _picks - cost_diff < 0) {
+                    draw_text2 = true;
                     fonts::Set_Font_Style_Shadow_Down_(2, &local_64);
-                } else {
-                    draw_text2 = false;
                 }
             }
 
@@ -669,8 +671,8 @@ namespace raceopt {
             item_idx++;
         } while (loop2_j < 4);
 
-        stack_vars[2] = 0; // loop3_i
-        stack_vars[1] = 0; // loop3_j
+        loop3_i = 0;
+        loop3_j = 0;
         int16_t y3 = 0x48;
         col_idx++;
 
@@ -680,20 +682,20 @@ namespace raceopt {
 
             do {
                 int16_t k = 0;
-                int16_t limit = block_sizes[stack_vars[2]];
+                int16_t limit = block_sizes[loop3_i];
 
                 if (limit > 0) {
                     do {
                         bool draw_text3 = true;
                         
-                        if (_option_toggle[stack_vars[1]] == 1) {
+                        if (_option_toggle[loop3_j] == 1) {
                             animate::Set_Animation_Frame_(_special_button_seg, 1);
                             animate::Draw_(x_coords[col_idx] - 0x14, y3, _special_button_seg);
                             fonts::Set_Font_Style_Shadow_Down_(2, &_color_opt);
                         } else {
-                            stack_vars[3] = Real_Ability_Cost_(k);
-                            if (_option_button[stack_vars[1]] < 0 ||
-                                _picks - stack_vars[3] < 0 ||
+                            cost_diff = Real_Ability_Cost_(k);
+                            if (_option_button[loop3_j] < 0 ||
+                                _picks - cost_diff < 0 ||
                                 _ability_costs[item_idx - 11] + _negative_picks < -10) 
                             {
                                 animate::Draw_(x_coords[col_idx] - 0x14, y3, _off_button_seg);
@@ -722,14 +724,14 @@ namespace raceopt {
                         }
 
                         y3 += 0x10;
-                        stack_vars[1]++;
+                        loop3_j++;
                         k++;
                         item_idx++;
                     } while (k < limit);
                 }
 
                 y3 += 9;
-                stack_vars[2]++;
+                loop3_i++;
             } while (item_idx < 64);
         }
 
@@ -744,15 +746,14 @@ namespace raceopt {
         for (int16_t i = 0; i < 9; ++i) {
             uint8_t bonus_value = static_cast<uint8_t>(player_flags[i + 1]);
 
-            if (_special_bonus[i][1] == bonus_value) {
+            if (_special_bonus[i][0] == (int8_t)bonus_value) {
                 _button_variable[i] = 1;
-            } else if (_special_bonus[i][2] == bonus_value) {
+            } else if (_special_bonus[i][1] == (int8_t)bonus_value) {
                 _button_variable[i] = 2;
-            } else {
+            } else if (_special_bonus[i][2] == (int8_t)bonus_value) {
                 _button_variable[i] = 3;
-                if (_special_bonus[i + 1][0] != bonus_value) {
-                    _button_variable[i] = 0;
-                }
+            } else {
+                _button_variable[i] = 0;
             }
         }
 
@@ -916,12 +917,8 @@ namespace raceopt {
             const int16_t val = _button_variable[i - 1];
             if (val == 0) {
                 flags_out[i] = 0;
-            } else if (val == 3) {
-                // Original code uses a flat byte lookup that maps the third selection
-                // to the first byte of the next 3-byte row.
-                flags_out[i] = MOX::_special_bonus[i][0];
             } else {
-                flags_out[i] = MOX::_special_bonus[i - 1][val];
+                flags_out[i] = MOX::_special_bonus[i - 1][val - 1];
             }
         }
 
@@ -1263,8 +1260,8 @@ namespace raceopt {
             if (selection == 0) {
                 player->traits[trait_index] = 0;
             } else {
-                player->traits[trait_index] = static_cast<int8_t>(
-                    MOX::_special_bonus[trait_index - 1][selection - 1]);
+                player->traits[trait_index] =
+                    MOX::_special_bonus[trait_index - 1][selection - 1];
             }
         }
 
