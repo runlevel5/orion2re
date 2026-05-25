@@ -13,7 +13,7 @@ namespace SCIENCE {
         JIM::Decode_Text_System_(text_buffer, message_arg, 0x100);
 
         char* trooper_anim = BILL::Cache_Player_Trooper_Anim_();
-        SCIENCE::Science_Room_(trooper_anim, tech_count, reinterpret_cast<uint16_t*>(captured_tech_ids), text_buffer);
+        SCIENCE::Science_Room_(trooper_anim, tech_count, captured_tech_ids, text_buffer);
 
         file_ani::Reset_File_Animation_Buffer_();
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -45,6 +45,7 @@ namespace SCIENCE {
 
     void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_idx) {
         char message_text[0x100];
+        int16_t discovered_tech = (int16_t)tech_idx;
         void* animation_block;
         char* spy_anim;
 
@@ -54,14 +55,14 @@ namespace SCIENCE {
         JIM::Get_Text_Message_(SCIENCE::s_billtext_lbx_0055135c, 2, message_text, 0x100);
         JIM::Decode_Text_Tech_And_Other_Name_(message_text, MOX::_PLAYER_NUM, tech_idx, other_idx, 0x100);
         spy_anim = BILL::Cache_Player_Spy_Anim_();
-        SCIENCE::Science_Room_(spy_anim, 1, &tech_idx, message_text);
+        SCIENCE::Science_Room_(spy_anim, 1, &discovered_tech, message_text);
         file_ani::Reset_File_Animation_Buffer_();
         allocate::Pop_Block_(MOX::_screen_seg);
         COLONY::Reset_Mouse_Picture_();
         JIM::Play_Background_Music_();
     }
 
-    void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, uint16_t* discovery_data, char* footer_text) {
+    void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, int16_t* discovery_data, char* footer_text) {
         MOX2::action_func_t saved_auto_function = nullptr;
         int16_t science_hot_key;
         uint16_t remaining_discoveries;
@@ -77,7 +78,7 @@ namespace SCIENCE {
         void* unused_strip_bitmap;
         char help_lbx_name[20];
         char bill_text[80];
-        char animation_lbx_names[4][64];
+        char animation_lbx_names[8][64];
         char weapon_mod_text[256];
 
         MOX2::Get_Auto_Function_(&saved_auto_function);
@@ -174,8 +175,8 @@ namespace SCIENCE {
             first_entry = true;
             room_animation_ready = false;
             current_entry_index = 0;
-            jumble_amount = *reinterpret_cast<int16_t*>(animation_lbx_names[0]);
-            jumble_steps = *reinterpret_cast<int16_t*>(animation_lbx_names[0]);
+            memcpy(&jumble_amount, animation_lbx_names[0], sizeof(jumble_amount));
+            memcpy(&jumble_steps, animation_lbx_names[0], sizeof(jumble_steps));
 
             bool should_close = false;
 
@@ -227,14 +228,14 @@ namespace SCIENCE {
 
                         ++current_entry_index;
 
-                        uint32_t weapon_mask = discovery_data[current_entry_index];
+                        int32_t weapon_mask = discovery_data[current_entry_index];
                         uint16_t weapon_mod_index = 1;
                         weapon_mod_text[0] = '\0';
 
                         while (weapon_mask != 0) {
                             if ((weapon_mask & 1) != 0) {
-                                strcat(weapon_mod_text, TECHDATA::_weapon_modifications[weapon_mod_index].name);
-                                strcat(weapon_mod_text, s__0055136c);
+                                strcpy(&weapon_mod_text[strlen(weapon_mod_text)], TECHDATA::_weapon_modifications[weapon_mod_index].name);
+                                strcpy(&weapon_mod_text[strlen(weapon_mod_text)], s__0055136c);
                             }
 
                             weapon_mask >>= 1;
@@ -345,7 +346,7 @@ namespace SCIENCE {
     }
 
     void __cdecl Show_Off_Researched_Tech_(int16_t player_idx) {
-        uint16_t researched_tech_ids[4];
+        int16_t researched_tech_ids[4];
         char science_room_lbx[64];
         char decoded_text[256];
         short found_count = 0;
@@ -361,7 +362,7 @@ namespace SCIENCE {
             for (int tech_slot = 0; tech_slot < 4; ++tech_slot) {
                 const uint16_t tech_id = field_tech_ids[tech_slot];
                 if (tech_id > 0 && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
-                    researched_tech_ids[found_count++] = tech_id;
+                    researched_tech_ids[found_count++] = (int16_t)tech_id;
                 }
             }
 

@@ -47,7 +47,7 @@ namespace SCIENCE {
 
     void __cdecl Draw_Science_Room_();
 
-    void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, uint16_t* discovery_data, char* footer_text);
+    void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, int16_t* discovery_data, char* footer_text);
 
     void __cdecl Show_Off_Researched_Tech_(int16_t player_idx);
 

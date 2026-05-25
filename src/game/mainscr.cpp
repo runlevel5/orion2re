@@ -3921,7 +3921,7 @@ namespace MAINSCR {
         }
         case 0x27: {
             if (CHAT::_chat_info != nullptr) {
-                CHAT::Receive_Chat_Msg_(from_player_id, data);
+                CHAT::Receive_Chat_Msg_(from_player_id, (char*)data);
             }
             break;
         }
@@ -3960,7 +3960,7 @@ namespace MAINSCR {
         }
         case 0x2D: {
             if (CHAT::_chat_info != nullptr) {
-                CHAT::Receive_Chat_Msg_(8, data);
+                CHAT::Receive_Chat_Msg_(8, (char*)data);
             }
             break;
         }

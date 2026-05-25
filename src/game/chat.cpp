@@ -1,8 +1,8 @@
 #include "pch.h"
 
 namespace CHAT {
-    void __cdecl Receive_Chat_Msg_(uint8_t player_id, void* pack) {
-        const char* text = (const char*)pack;
+    void __cdecl Receive_Chat_Msg_(uint8_t player_id, const char* text) {
+        size_t len = strlen(text) + 1;
 
         if (_chat_info->count == 14) {
             memmove(_chat_info, _chat_info->messages + 1, 0x42A);
@@ -10,7 +10,7 @@ namespace CHAT {
         }
 
         _chat_info->messages[_chat_info->count].player_id = player_id;
-        strcpy(_chat_info->messages[_chat_info->count].text, text);
+        memcpy(_chat_info->messages[_chat_info->count].text, text, len);
         _chat_info->count++;
     }
 

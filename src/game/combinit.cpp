@@ -56,12 +56,14 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         }
     }
 
-    memset(MOX::_global_combat_data.weapon_slot_active, 1, 8);
+    for (int i = 0; i < 8; ++i) {
+        MOX::_global_combat_data.weapon_slot_active[i] = 1;
+    }
 
     MOX::_global_combat_data.crew_quality = MOX::_ship[ship_idx].crew_quality;
     MOX::_global_combat_data.officer_idx = MOX::_ship[ship_idx].officer_index;
 
-    if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner <= 8) {
+    if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner < 9) {
         MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.hull_size].marines;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 36)) {
@@ -87,7 +89,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     MOX::_global_combat_data.field33_0x4b = 0;
 
-    CMBTFIR2::Init_Internal_Space_(reinterpret_cast<s_combat_data*>(&MOX::_global_combat_data));
+    CMBTFIR2::Init_Internal_Space_((s_combat_data*)&MOX::_global_combat_data);
 
     MOX::_global_combat_data.shield_hp_current =
         ((100 - MOX::_ship[ship_idx].shield_damage_percent) * MOX::_global_combat_data.shield_hp_max) / 100;
@@ -1109,15 +1111,21 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->computer_type = 5;
     ship->armor_type = 6;
 
-    strcpy(ship->name, TECHDATA::_hull_data[8].name);
+    strcpy(ship->name, s_Antaran_Star_Fortress_005558D4);
 
-    ship->structure_max = (TECHDATA::_hull_data[8].structure_hp +
-        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].structure_hp) / 100) * 3;
+    ship->structure_max = (int16_t)(
+        _antaran_star_fortress_structure_hp +
+        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * _antaran_star_fortress_structure_hp) / 100);
+    ship->structure_max = (int16_t)(ship->structure_max * 3);
 
-    ship->armor_remaining = (TECHDATA::_hull_data[8].armor_hp +
-        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].armor_hp) / 100) * 3;
+    ship->armor_remaining = (int16_t)(
+        _antaran_star_fortress_armor_hp +
+        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * _antaran_star_fortress_armor_hp) / 100);
+    ship->armor_remaining = (int16_t)(ship->armor_remaining * 3);
 
-    int16_t sVar2 = (TECHDATA::_hull_data[8].size * 5 / 4) / 2;
+    int32_t fortress_size_scaled = (int32_t)_antaran_star_fortress_size * 5;
+    fortress_size_scaled = (fortress_size_scaled + ((fortress_size_scaled >> 31) & 3)) >> 2;
+    int16_t sVar2 = (int16_t)((fortress_size_scaled - (fortress_size_scaled >> 31)) >> 1);
 
     ship->size_class = 4;
     ship->picture_num = 5;
@@ -1242,7 +1250,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 
     ship->crew_quality = 3;
     ship->officer_idx = 0x42;
-    ship->marine_count = static_cast<int8_t>(TECHDATA::_hull_data[8].marines);
+    ship->marine_count = _antaran_star_fortress_marines;
     ship->current_speed = 0;
     ship->structure_damage = 0;
     ship->is_retreating = 0;
@@ -1314,14 +1322,10 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
     }
 
     if (player_idx < 8) {
-        *reinterpret_cast<uint32_t*>(&lbx_filename[0]) = *reinterpret_cast<const uint32_t*>(s_cmbtshp_lbx_0055125c);
-        *reinterpret_cast<uint32_t*>(&lbx_filename[4]) = *reinterpret_cast<const uint32_t*>(s_cmbtshp_lbx_0055125c + 4);
-        *reinterpret_cast<uint32_t*>(&lbx_filename[8]) = *reinterpret_cast<const uint32_t*>(s_cmbtshp_lbx_0055125c + 8);
+        memcpy(lbx_filename, s_cmbtshp_lbx_0055125c, 12);
         lbx_index = (int)MOX::_player[player_idx].color * 45 + 44;
     } else {
-        *reinterpret_cast<uint32_t*>(&lbx_filename[0]) = *reinterpret_cast<const uint32_t*>(s_monster_lbx_00551250);
-        *reinterpret_cast<uint32_t*>(&lbx_filename[4]) = *reinterpret_cast<const uint32_t*>(s_monster_lbx_00551250 + 4);
-        *reinterpret_cast<uint32_t*>(&lbx_filename[8]) = *reinterpret_cast<const uint32_t*>(s_monster_lbx_00551250 + 8);
+        memcpy(lbx_filename, s_monster_lbx_00551250, 12);
         lbx_index = player_idx + 5;
     }
 
@@ -1345,7 +1349,7 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
         if (planet_size > 0) {
             replace::Shift_Palette_Range_(ship_anim, 0x60);
             animate::Draw_Palette_(ship_anim);
-            replace::Replace_Color_Range_(MOX::_combat_map_planet_seg, &color_table[4], 0x50, 0x10);
+            replace::Replace_Color_Range_(MOX::_combat_map_planet_seg, color_table, 0x50, 0x10);
         }
     }
 
@@ -1457,7 +1461,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->is_retreating = 0;
 
-    uint16_t max_hits = 0;
+    int16_t max_hits = 0;
     if (MOX::_colony[colony_idx].buildings[BUILDING_RADIATION_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x1c;
         max_hits = COMBINIT::radiation_shield_hits;
@@ -1520,12 +1524,12 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         int32_t count_1 = 225 / space_1;
 
         MOX::_combat_data->weapons[0].weapon_id = weapon_id_1;
-        MOX::_combat_data->weapons[0].count = (uint8_t)count_1;
+        MOX::_combat_data->weapons[0].count = (int8_t)count_1;
         MOX::_combat_data->weapons[0].arc = 0xf;
         MOX::_combat_data->weapons[0].specials = specials_1;
         MOX::_combat_data->weapons[0].ammo = -1;
         MOX::_combat_data->weapons[0].active = 1;
-        MOX::_combat_data->weapons[0].shots_left = (uint8_t)count_1;
+        MOX::_combat_data->weapons[0].shots_left = (int8_t)count_1;
         MOX::_combat_data->weapons[0].status = 0;
 
         int16_t weapon_id_2 = INITSHIP::Best_Point_Defense_Weapon_By_Size_(MOX::_colony[colony_idx].owner);
@@ -1544,12 +1548,12 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         int32_t count_2 = 75 / space_2;
 
         MOX::_combat_data->weapons[1].weapon_id = weapon_id_2;
-        MOX::_combat_data->weapons[1].count = (uint8_t)count_2;
+        MOX::_combat_data->weapons[1].count = (int8_t)count_2;
         MOX::_combat_data->weapons[1].arc = 0xf;
         MOX::_combat_data->weapons[1].specials = specials_2;
         MOX::_combat_data->weapons[1].ammo = -1;
         MOX::_combat_data->weapons[1].active = 1;
-        MOX::_combat_data->weapons[1].shots_left = (uint8_t)count_2;
+        MOX::_combat_data->weapons[1].shots_left = (int8_t)count_2;
         MOX::_combat_data->weapons[1].status = 0;
 
         weapon_index = 2;
@@ -1581,13 +1585,13 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
 
         for (int i = 0; i < 2; i++) {
             MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_sc;
-            MOX::_combat_data->weapons[weapon_index].count = (uint8_t)count_sc;
+            MOX::_combat_data->weapons[weapon_index].count = (int8_t)count_sc;
             MOX::_combat_data->weapons[weapon_index].arc = 0xf;
             MOX::_combat_data->weapons[weapon_index].specials = 0;
             MOX::_combat_data->weapons[weapon_index].status = 0;
             MOX::_combat_data->weapons[weapon_index].ammo = 1;
             MOX::_combat_data->weapons[weapon_index].active = 1;
-            MOX::_combat_data->weapons[weapon_index].shots_left = (uint8_t)count_sc;
+            MOX::_combat_data->weapons[weapon_index].shots_left = (int8_t)count_sc;
             weapon_index++;
         }
     }
@@ -2219,12 +2223,14 @@ void __cdecl End_Of_Turn_Bookeeping_() {
     Recharge_Shields_();
     Repair_All_Combat_Ships_();
 
-    if (MOX::_combat_data->unit_status == 0 && (MOX::_combat_turn % 10) == 0) {
-        for (int i = 0; i < 8; ++i) {
-            uint16_t weapon_id = MOX::_combat_data->weapons[i].weapon_id;
+    int16_t turn = MOX::_combat_turn;
+    if (MOX::_combat_data->unit_status == 0 && (int16_t)(turn % 10) == 0) {
+        for (int16_t i = 0; i < 8; ++i) {
+            s_combat_weapon_slot* slot = &MOX::_combat_data->weapons[i];
+            uint16_t weapon_id = slot->weapon_id;
 
             if (TECHDATA::_weapons[weapon_id].type == 4) {
-                MOX::_combat_data->weapons[i].ammo = 1;
+                slot->ammo = 1;
             }
         }
     }

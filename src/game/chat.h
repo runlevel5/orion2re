@@ -10,5 +10,5 @@ namespace CHAT {
 
     void __cdecl Send_GNN_Chat_Msg_(char* msg);
 
-    void __cdecl Receive_Chat_Msg_(uint8_t player_id, void* text);
+    void __cdecl Receive_Chat_Msg_(uint8_t player_id, const char* text);
 }
