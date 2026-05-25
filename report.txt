@@ -587,3 +587,1471 @@ Discrepancies:
 
 The rest is close, but this addressing/type discrepancy is fundamental and prevents validation as an exact match.
 ---------------------------------------
+0x0042CEF0 CHAT::Receive_Chat_Msg_
+
+- The current implementation does not preserve the binary’s copy length semantics. The assembly computes the source string length including the terminator via `repne scasb`, then copies exactly that many bytes into the message text field. The restored code uses `strlen(text) + 1` and `memcpy`, which is only equivalent if `text` is guaranteed NUL-terminated before an invalid page and never exceeds the destination. The binary also performs the copy through the exact REP move sequence derived from the scan result; there is no bounds clamp, so correctness depends on matching that raw byte-count behavior exactly. This is a validation risk because the implementation silently reinterprets that behavior at higher level.
+
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl CHAT::Receive_Chat_Msg_(uint8_t player_id, const char* text) {
+      const char* src;
+      size_t len;
+
+      if (_chat_info->count == 14) {
+          memmove(_chat_info, _chat_info->messages + 1, 0x42A);
+          _chat_info->count = 13;
+      }
+
+      _chat_info->messages[_chat_info->count].player_id = player_id;
+
+      src = text;
+      while (*src != '\0') {
+          ++src;
+      }
+      len = (size_t)(src - text) + 1;
+
+      memcpy(_chat_info->messages[_chat_info->count].text, text, len);
+      _chat_info->count++;
+  }
+  ```
+
+- The project implementation lacks explicit evidence that the emitted machine code will match the original memory access pattern for the string scan/copy path. The original function uses raw byte scanning and REP block copies without any abstraction beyond CRT `memmove`; validation cannot be considered exact enough from the current source alone because compiler lowering of `strlen` + `memcpy` is not guaranteed to preserve the same side effects and fault behavior.
+
+  Suggested diff snippet:
+  ```cpp
+  // Avoid library composition that may alter exact scan/copy behavior
+  const char* end = text;
+  while (*end != '\0') {
+      ++end;
+  }
+  memcpy(_chat_info->messages[_chat_info->count].text, text, (size_t)(end - text) + 1);
+  ```
+
+fail
+
+0x0042D080 DESIGN::Add_Design_Buttons_
+
+- Name input field height/placement is wrong. The assembly makes two `fonts::Get_Font_Height_()` calls with different arguments on the stack: first with the design name pointer and metadata already pushed, then again after pushing `0x86`. The returned height from the first call is incremented by 2 and used as the field height; the second call is used only to vertically center within `0x1B`. Current code uses a single `Get_Font_Height_()` result for both purposes, which does not match the stack/flow and may produce wrong field rectangle.
+  Suggested diff:
+  ```cpp
+  s_colors colors;
+  MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &colors);
+  fonts::Set_Font_Style_(4, &colors);
+
+  int16_t input_h = fonts::Get_Font_Height_() + 2;
+  int16_t text_h = fonts::Get_Font_Height_();
+  int16_t name_y = ((0x1B - text_h) / 2) + 0x11;
+  MOX::_design_name_field =
+      fields::Add_Continuous_String_Input_Field_(0x12, name_y, 0x86, input_h,
+          MOX::_design->name, 15, 0, 0, 0x29, 0);
+  ```
+
+- The current restoration assumes the two `Get_Font_Height_()` calls are equivalent and parameterless. The disassembly shows they are called with different stack states, so without validating the real callee ABI/side effects this function cannot be considered matched with enough precision.
+
+- Potential type/size mismatch on `_add_size_button_flag`. The binary accesses 6 bytes at `0x565064`, but the project declares `uint8_t (&_add_size_button_flag)[12]`. This function only uses indices 0..5, but the declared object extent does not match the recovered global for this validation target.
+  Suggested diff:
+  ```cpp
+  inline uint8_t (&_add_size_button_flag)[6] =
+      *reinterpret_cast<uint8_t(*)[6]>(std::uintptr_t{0x00565064});
+  ```
+
+---------------------------------------0042DC20 DESIGN::Check_Special_System_Fields_
+
+---------------------------------------
+
+
+---------------------------------------
+fail
+
+---------------------------------------
+
+
+---------------------------------------
+Discrepancies:
+
+---------------------------------------
+- Help/hover path indexes the wrong special slot.
+
+---------------------------------------
+  - Assembly uses `EDX = EBX*2` from the loop-local field index `i`, then loads `design->special_devices[i]` at `[design + 0xb5 + EDX]`.
+
+---------------------------------------
+  - Current code uses `int16_t special_id = MOX::_design->special_devices[i];` only because `i` is the loop index, which is correct for the hover path, but the clicked path uses `slot_idx = first_special_system_ctr + i` and then dereferences `special_devices[slot_idx]`. That matches the assembly, but it creates an out-of-bounds risk whenever `first_special_system_ctr != 0`, since `special_devices` has only 8 entries and the assembly itself appears to rely on page-local slot indexing. This needs clarification before validation can pass.
+
+---------------------------------------
+  - Minimal suggested diff snippet:
+
+---------------------------------------
+    ```cpp
+
+---------------------------------------
+    // clarify intended indexing; if page-local:
+
+---------------------------------------
+    int16_t slot_idx = i;
+
+---------------------------------------
+    // or, if current code is intentional, document why first_special_system_ctr cannot be nonzero here
+
+---------------------------------------
+    ```
+
+---------------------------------------
+
+
+---------------------------------------
+- Parameter/unused handling does not match the binary closely enough.
+
+---------------------------------------
+  - The second parameter is completely unused in assembly and decompiler. Current signature names it `refresh` in the implementation, which is misleading during restoration review.
+
+---------------------------------------
+  - Minimal suggested diff snippet:
+
+---------------------------------------
+    ```cpp
+
+---------------------------------------
+    void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t* /* unused */, int16_t* out_status)
+
+---------------------------------------
+    ```
+
+---------------------------------------
+
+
+---------------------------------------
+- Global type mismatch around `_printed_cost` remains suspicious at this call site.
+
+---------------------------------------
+  - Disassembly loads/stores through 32-bit registers at `0x00565058`, while the supplied external symbol says `short`. Project header defines it as `int32_t`, which may be correct globally, but this function validation cannot fully pass without reconciling the symbol/type conflict because arithmetic side effects depend on width.
+
+---------------------------------------
+  - Minimal suggested diff snippet:
+
+---------------------------------------
+    ```cpp
+
+---------------------------------------
+    // verify and document actual storage width at 0x00565058
+
+---------------------------------------
+    inline int32_t& _printed_cost = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565058});
+
+---------------------------------------
+    ```
+
+---------------------------------------
+---------------------------------------
+    // verify and document actual storage width at 0x00565058
+
+---------------------------------------
+    inline int32_t& _printed_cost = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565058});
+
+---------------------------------------
+    ```
+
+---------------------------------------
+0x0042E650 DESIGN::Current_Design_Max_Combat_Speed_
+
+- `combat_speed_max` signedness/type mismatch: the binary does a raw byte load into `AL` (`MOV AL, byte ptr [...]`) and returns that byte unchanged. In the project, `s_tech_drive_data::combat_speed_max` is `int8_t[6]` in `orion2.h`, while the decompiler input and binary semantics require an unsigned/raw byte table. This is a data-model discrepancy that can affect promotion/comparisons elsewhere.
+  Suggested diff snippet:
+  ```cpp
+  struct s_tech_drive_data {
+      ...
+  -   int8_t combat_speed_max[6];
+  +   uint8_t combat_speed_max[6];
+      uint16_t warp_speed;
+  };
+  ```
+
+- Related function return path depends on the above incorrect field type. While the implementation body in `src/game/design.cpp` is otherwise structurally correct, it indexes through a field currently typed as signed bytes, which is not precise enough for validation against the supplied binary.
+  Suggested diff snippet:
+  ```cpp
+  uint8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design) {
+      return TECHDATA::_drives[design->ftl_type].combat_speed_max[design->ship_size];
+  }
+  ```
+
+fail
+---------------------------------------
+0042EDD0 DESIGN::Design_Template_Costs_
+
+- Armor cost field typing is incorrect relative to the assembly. The function loads `_armor[armor_type].cost_percent` with `MOVSX` from a 16-bit field, so it is treated as signed `int16_t`, not `uint16_t`. Current code uses `uint16_t cost_percent`, which changes semantics for negative values and is not an exact restoration.
+  Suggested diff:
+  ```cpp
+  struct s_tech_armor_data {
+      ...
+  -   uint16_t cost_percent;
+  +   int16_t cost_percent;
+      ...
+  };
+  ```
+
+- The armor-cost expression inherits that typing mismatch. The assembly performs signed 32-bit multiply and signed divide by 100:
+  `hull_data[ship_size].cost * armor[armor_type].cost_percent / 100`.
+  With the current unsigned field type, the restored expression is not provably equivalent.
+  Suggested diff:
+  ```cpp
+  - int32_t armor_unit_cost = TECHDATA::_armor[design->armor_type].cost_percent;
+  + int32_t armor_unit_cost = (int16_t)TECHDATA::_armor[design->armor_type].cost_percent;
+  ```
+
+- Weapon cost store width differs in decompiler-visible semantics and should be checked with the callee contract. The assembly stores the full 32-bit `EAX` into `design->weapon_cost[i]`, while the current source relies on `Weapon_Cost_` returning `int16_t` and implicit widening to `int32_t`. This is only safe if `Weapon_Cost_` is definitively validated as always producing sign-correct 16-bit results. Otherwise this is an unresolved exactness issue in this function’s writeback path.
+  Suggested diff:
+  ```cpp
+  - design->weapon_cost[i] = Weapon_Cost_(...);
+  + design->weapon_cost[i] = (int32_t)Weapon_Cost_(...);
+  ```
+
+fail
+---------------------------------------
+0042EFC0 DESIGN::Design_Template_Space_Requirements_
+
+- Discrepancy: special-case slot for special device id 4 indexes `_specials[4].space_per_ship_type` directly with `ship_size`, but the assembly sign-extends `ship_size` and uses it as a raw signed index. If `ship_size` is typed as wider/unsigned elsewhere this can mask behavior; this function should preserve `int16_t` signed semantics consistently.
+  ```cpp
+  int16_t ship_size = design->ship_size;
+  design->special_device_space[i] = TECHDATA::_specials[4].space_per_ship_type[ship_size];
+  ```
+
+- Discrepancy: `Miniaturization_Category_` results are stored as `uint8_t` in this function (`drive_min_cat`, `min_cat`), while the callee signature and assembly use signed byte semantics (`int8_t` via register push / stack arg). This matters for exact type restoration and signedness validation.
+  ```cpp
+  int8_t drive_min_cat = Miniaturization_Category_(drive_tech_app);
+  ...
+  int8_t min_cat = Miniaturization_Category_(tech_app);
+  ```
+
+- Discrepancy: weapon arc and ammo are cast to `uint8_t` before passing to `Weapon_Space_`, but the assembly uses `movsx` from byte fields, i.e. signed extension. Current casts alter source signedness semantics before integer promotion.
+  ```cpp
+  design->weapon_space[i] = Weapon_Space_(
+      MOX::_PLAYER_NUM,
+      design->weapon_type[i],
+      design->weapon_count[i],
+      (int16_t)design->weapon_firing_arc[i],
+      (int16_t)design->weapon_ammo[i],
+      design->weapon_specials[i]
+  );
+  ```
+
+- Discrepancy: the function parameter is named `player_num`, but the assembly clearly passes the incoming parameter to `Tech_Level_` while independently using global `MOX::_PLAYER_NUM` for `Weapon_Space_` and shield space. This is functionally fine in the current body, but exact restoration is uncertain because the mixed semantics deserve explicit preservation and review against surrounding call sites.
+
+fail
+---------------------------------------
+0x0042F8B0 DESIGN::Get_Ship_Size_Button_Field_XY_
+
+Discrepancies:
+- Parameter-to-output mapping is wrong for the last four pointer arguments relative to the binary.
+  - Assembly writes `param_3/param_5` first for per-size Y bounds, then `param_2/param_4` for constant X bounds when `size_idx` is in range.
+  - Current implementation instead treats `param_2/param_4` as X outputs and `param_3/param_5` as Y outputs. This only “works” at current call sites because callers pass arguments swapped to compensate, which means the function itself does not match the original ABI/behavior.
+  - Minimal suggested diff:
+    ```cpp
+    void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* y_const1, int16_t* y1, int16_t* x_const2, int16_t* y2) {
+        if (size_idx >= 0 && size_idx <= 5) {
+            *y_const1 = 118;
+            *x_const2 = 227;
+            ...
+        } else {
+            *y2 = 0;
+            *x_const2 = 0;
+            *y1 = 0;
+            *y_const1 = 0;
+        }
+    }
+    ```
+- Header prototype preserves the incorrect semantic ordering, reinforcing the mismatch against the binary interface.
+  - Minimal suggested diff:
+    ```cpp
+    - void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2);
+    + void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* out_118, int16_t* out_y1, int16_t* out_227, int16_t* out_y2);
+    ```
+- Related call sites are adapted to the wrong implementation instead of matching the original call ABI.
+  - Example in `Add_Design_Buttons_` and `Draw_Down_Buttons_`: arguments are intentionally swapped (`&x2, &y1, &x1, &y2` / local names `btn_x, btn_y, btn_w, btn_h`) to compensate.
+  - Minimal suggested diff:
+    ```cpp
+    - Get_Ship_Size_Button_Field_XY_(i, &x2, &y1, &x1, &y2);
+    + Get_Ship_Size_Button_Field_XY_(i, &x1, &y1, &x2, &y2);
+    ```
+
+fail
+---------------------------------------
+---------------------------------------
+004307D0 DESIGN::Print_Current_Design_
+
+- Beam defense sign/value formatting is wrong.
+  - Assembly pushes the signed defense value directly, then selects "+" only when the value is non-negative and "-" otherwise. It does not negate the magnitude for negative values, so the `%d` receives the signed integer exactly as-is. Current code prints "-" plus the already-negative value, producing "--N" for negatives.
+  - Minimal suggested diff:
+    ```cpp
+    -        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? "+" : "-"), (int)bonus_beam_def);
+    +        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? s_plus : s_minus), (int16_t)bonus_beam_def);
+    ```
+    If preserving exact original output semantics matters, the format/string logic should match the assembly literally.
+
+- Weapon row replacement-field comparison uses the wrong signedness/range source for `_first_weapon_ctr`.
+  - Assembly does `movsx cx, byte ptr [MOX::_first_weapon_ctr]`, so `_first_weapon_ctr` is treated as signed 8-bit. Current expression `int slot = i + MOX::_first_weapon_ctr;` relies on the project declaration, but the later scan comparison is driven by `i` and a signed-extended scanned field delta; this is only safe if the type remains signed 8-bit everywhere. The header currently declares `_first_weapon_ctr` as `int8_t`, which is correct, but this function mixes `int` arithmetic and direct array indexing in a way that obscures the signed byte semantics and increases risk of divergence.
+  - Minimal suggested diff:
+    ```cpp
+    -            int slot = i + MOX::_first_weapon_ctr;
+    +            int16_t slot = (int16_t)i + (int16_t)MOX::_first_weapon_ctr;
+    ```
+
+- Special-system row replacement-field comparison has the same issue, with `_first_special_system_ctr`.
+  - Assembly does `movsx ax, byte ptr [MOX::_first_special_system_ctr]`; current code uses plain `int slot = i + MOX::_first_special_system_ctr;`. Project header currently types `_first_special_system_ctr` as `uint8_t`, while the assembly uses signed extension.
+  - This is a type discrepancy in a directly used symbol.
+  - Minimal suggested diff:
+    ```cpp
+    -    inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
+    +    inline int8_t& _first_special_system_ctr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596D4A});
+    ```
+    and in this function:
+    ```cpp
+    -            int slot = i + MOX::_first_special_system_ctr;
+    +            int16_t slot = (int16_t)i + (int16_t)MOX::_first_special_system_ctr;
+    ```
+
+- There is unnecessary dependency on `strcmp` for the "special" check instead of the fixed 8-byte compare used by the binary.
+  - Assembly compares exactly 8 bytes against "special" (including terminator semantics implied by the stored literal region) after `Design_Weapon_Damage_String_`. Current `strcmp` is functionally close but not instruction-equivalent and depends on stronger string termination assumptions.
+  - Minimal suggested diff:
+    ```cpp
+    -                if (strcmp(buffer, s_special_tag) == 0) {
+    +                if (memcmp(buffer, s_special_tag, 8) == 0) {
+    ```
+
+fail
+
+00431850 DESIGN::Print_Ship_Size_Error_Message_
+
+- `_add_size_button_flag` is declared with the wrong extent in `src/game/design.h`. The binary accesses a 6-byte object at `0x00565064`; the project declares 12 bytes. That is a recovered global type mismatch for this validation target.
+  Suggested diff:
+  ```cpp
+  - inline uint8_t (&_add_size_button_flag)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x00565064});
+  + inline uint8_t (&_add_size_button_flag)[6] = *reinterpret_cast<uint8_t(*)[6]>(std::uintptr_t{0x00565064});
+  ```
+
+- The function body otherwise lines up closely, but with the global type mismatch present I cannot validate it as exact enough under the stated rules.
+
+---------------------------------------
+00431C50 DESIGN::Space_For_System_Replacement_
+
+- Discrepancy: `Miniaturization_Category_` result is stored as `uint8_t`, but the callee signature and assembly use signed-byte semantics for the 3rd argument to `Space_Given_M_Level_`. This is an exact type mismatch and should stay `int8_t`.
+  ```diff
+-                                uint8_t category = (uint8_t)Miniaturization_Category_(tech_id);
++                                int8_t category = Miniaturization_Category_(tech_id);
+  ```
+
+- Discrepancy: the current code compares `TECHDATA::_technology_applications[app_idx].tech_app_id` against `TECHDATA::_specials[special_idx].tech_app_id`, while the assembly clearly uses raw table-address arithmetic (`_technology_applications[app_idx].tech_app_id` at 13-byte stride and `_specials[special_idx].tech_app_id` at 47-byte stride). This likely matches if the struct packing is exact, but validation cannot be completed from source alone because the project’s actual compiled layouts/types for those arrays are not shown here and exact restoration requires certainty.
+  ```diff
+-                        if (TECHDATA::_technology_applications[app_idx].tech_app_id == TECHDATA::_specials[special_idx].tech_app_id) {
++                        if (TECHDATA::_technology_applications[app_idx].tech_app_id == TECHDATA::_specials[special_idx].tech_app_id) { // verify packed table layout matches 13/47-byte strides exactly
+  ```
+
+- Discrepancy: return is simplified to `found_count > 0`, while assembly ends with `SETG` after `CMP found_count,0`, i.e. signed-greater-than on a 16-bit local. This is functionally equivalent under normal flow, but exact restoration is not demonstrated and the mandated validation standard requires flags/condition fidelity.
+  ```diff
+-        return found_count > 0;
++        return found_count > 0; // exact asm uses signed SETG after CMP local_count,0
+  ```
+
+fail
+---------------------------------------
+00431FB0 DESIGN::Tech_Level_
+
+- Discrepancy: invalid-tech diagnostic call does not match the call sequence. Assembly pushes the bad `tech_idx` as a 4th argument to `RUSS::PFMT_`; the current code relies on a variadic-style call, which may compile equivalently, but exact restoration is not guaranteed without the true prototype. This matters because the assembly explicitly sign-extends `DI` before passing it.
+  ```diff
+  - RUSS::PFMT_(0, 2, s_Bad_required_tech_in_Tech_Level, (int32_t)tech_idx);
+  + RUSS::PFMT_(0, 2, s_Bad_required_tech_in_Tech_Level, (int32_t)tech_idx); // verify prototype matches 4 pushed args exactly
+  ```
+
+- Discrepancy: the `tech_applications` field is typed as `byte[212]`/`uint8_t[]`, while the assembly uses a raw byte load and compares against literal `1` after signed index arithmetic. The current expression is likely functionally correct, but exact signedness/semantic meaning of the field value should be confirmed because this function depends on distinguishing `0`, `1`, and other states exactly.
+  ```diff
+  - if (tech_idx != 0 && MOX::_player[player_idx].tech_applications[tech_idx] != 1) {
+  + if (tech_idx != 0 && MOX::_player[player_idx].tech_applications[tech_idx] != 1 /* exact byte state */) {
+  ```
+
+- Uncertainty: the current source matches the control flow well, but exact validation depends on confirming `RUSS::PFMT_` prototype and calling convention from surrounding declarations, which were not provided here. Without that, I cannot certify the implementation with extreme precision.
+
+fail
+---------------------------------------
+00432620 DESIGN::Weapon_Cost_
+
+fail
+
+Discrepancies:
+- Parameter type/sign mismatch for `specials`: assembly treats it as a 16-bit word (`MOV BX, word ptr [...]`) and the call chain uses bitmasks; current signature uses `int16_t` instead of an unsigned 16-bit mask. This can affect promotions and comparisons on high bits such as `0x4000`.
+  Suggested diff:
+  ```cpp
+  - int16_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials)
+  + int16_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, uint16_t specials)
+  ```
+
+- Intermediate passed to `Cost_Given_M_Level_` is computed as 32-bit in the current code, but the callee prototype is `int16_t __cdecl Cost_Given_M_Level_(int16_t base_cost, int16_t m_level)`. The original call sequence pushes a 32-bit register value, but the restored source currently relies on an implicit narrowing conversion at the call boundary. That is not precise enough for validation without confirming the callee’s exact stack usage/sign handling from disassembly.
+  Suggested diff:
+  ```cpp
+  - return Cost_Given_M_Level_(total_modified_cost * static_cast<int32_t>(count), tech_level);
+  + return Cost_Given_M_Level_((int16_t)(total_modified_cost * (int32_t)count), tech_level);
+  ```
+
+- Related uncertainty in nearby interface typing: `Bonus_For_Regular_Mods_` and `Bonus_For_Special_Mods_` also accept signed `int16_t` flags in the project even though they operate on bitmasks. Because `Weapon_Cost_` forwards this value directly, I cannot validate the signedness behavior with high-bit flags as exact without broader type correction or the referenced function disassemblies.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Bonus_For_Regular_Mods_(int16_t mods, int16_t* bonus1, int16_t* bonus2);
+  + void __cdecl Bonus_For_Regular_Mods_(uint16_t mods, int16_t* bonus1, int16_t* bonus2);
+
+  - void __cdecl Bonus_For_Special_Mods_(int16_t flags, int16_t *bonus1_out, int16_t *bonus2_out);
+  + void __cdecl Bonus_For_Special_Mods_(uint16_t flags, int16_t *bonus1_out, int16_t *bonus2_out);
+  ```
+
+---------------------------------------
+00432740 DESIGN::One_Weapon_Space_
+
+fail
+
+Discrepancies:
+- `Miniaturization_Category_` result is typed/stored incorrectly.
+  - Assembly passes the category as signed byte semantics into `Space_Given_M_Level_` both times. Current code stores it as `uint8_t category = static_cast<uint8_t>(Miniaturization_Category_(tech_id));`.
+  - Minimal suggested diff:
+    ```cpp
+    -        uint8_t category = static_cast<uint8_t>(Miniaturization_Category_(tech_id));
+    +        int8_t category = Miniaturization_Category_(tech_id);
+    ```
+
+- Exact call/dataflow is collapsed across the rack branch instead of preserving the binary’s duplicated sequence.
+  - In the `needs_racks != 0` path, assembly recomputes `tech_app_id`, calls `Miniaturization_Category_` again, calls `Tech_Level_` again, then computes rack space. Current code reuses the earlier `tech_lvl` and `category`. This is likely functionally equivalent today, but it is not an instruction-faithful restoration under the stated validation standard.
+  - Minimal suggested diff:
+    ```cpp
+    if (needs_racks != 0) {
+    -    int16_t rack_base_size = Weapon_Rack_Size_(2);
+    -    int16_t rack_space = static_cast<int16_t>(Space_Given_M_Level_(rack_base_size, tech_lvl, category));
+    +    tech_id = TECHDATA::_weapons[weapon_id].tech_app_id;
+    +    int8_t rack_category = Miniaturization_Category_(tech_id);
+    +    int16_t rack_tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
+    +    int16_t rack_base_size = Weapon_Rack_Size_(2);
+    +    int16_t rack_space = (int16_t)Space_Given_M_Level_(rack_base_size, rack_tech_lvl, rack_category);
+         return space_req + rack_space;
+    }
+    ```
+
+- Validation uncertainty from surrounding interface typing remains unresolved.
+  - This function’s exactness depends on `Space_Given_M_Level_` third parameter being signed `int8_t` throughout the project and on nearby weapon-space helpers preserving the same signedness. The current local use of `uint8_t` conflicts with that contract and is enough to block precise validation.
+
+---------------------------------------
+00432830 DESIGN::Weapon_Space_
+
+- `specials` signedness does not match the call/stack semantics closely enough for exact validation.
+  - Assembly pushes the 6th argument as a 16-bit value and downstream helpers are currently declared with `int16_t`, while this function takes `uint16_t specials`. That changes promotion/bit-test semantics at the interface and conflicts with the restoration rule on exact signedness.
+  - Minimal suggested diff:
+    ```diff
+    - int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, uint16_t specials);
+    + int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, int16_t specials);
+    ```
+    ```diff
+    - int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
+    -                               int16_t firing_arc, int16_t ammo, uint16_t specials) {
+    + int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
+    +                               int16_t firing_arc, int16_t ammo, int16_t specials) {
+    ```
+
+- `Miniaturization_Category_` result is stored/passed with the wrong type.
+  - Assembly pushes the return value directly as the 3rd argument to `Space_Given_M_Level_`; project signature for that callee is `int8_t mode`. Current code stores it as `uint32_t` and then casts to `uint8_t`, which is a type mismatch and not instruction-faithful.
+  - Minimal suggested diff:
+    ```diff
+    -        uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
+    +        int8_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
+    ...
+    -        int32_t space_per_weapon = Space_Given_M_Level_(static_cast<int16_t>(raw_space_calc), tech_level, static_cast<uint8_t>(miniaturization_cat));
+    +        int32_t space_per_weapon = Space_Given_M_Level_((int16_t)raw_space_calc, tech_level, miniaturization_cat);
+    ```
+
+- There is an unnecessary explicit cast on the `Space_Given_M_Level_` first argument that obscures exact source typing.
+  - Assembly computes a 32-bit intermediate, then pushes its low 16 bits as the first argument. The current `static_cast<int16_t>(raw_space_calc)` may be functionally equivalent, but under the project rules explicit casts are a code smell and this one hides whether the upstream local should really be `int16_t`.
+  - Minimal suggested diff:
+    ```diff
+    -        int32_t raw_space_calc = ((regular_mod_add + mod_rack_offset + 100) * intermediate) / 100;
+    -        int32_t space_per_weapon = Space_Given_M_Level_(static_cast<int16_t>(raw_space_calc), tech_level, static_cast<uint8_t>(miniaturization_cat));
+    +        int16_t raw_space_calc = (int16_t)(((regular_mod_add + mod_rack_offset + 100) * intermediate) / 100);
+    +        int32_t space_per_weapon = Space_Given_M_Level_(raw_space_calc, tech_level, miniaturization_cat);
+    ```
+
+fail
+
+---------------------------------------
+
+00432830 DESIGN::Weapon_Space_
+
+- `specials` signedness does not match the call/stack semantics closely enough for exact validation.
+  - Assembly pushes the 6th argument as a 16-bit value and downstream helpers are currently declared with `int16_t`, while this function takes `uint16_t specials`. That changes promotion/bit-test semantics at the interface and conflicts with the restoration rule on exact signedness.
+  - Minimal suggested diff:
+    ```diff
+    - int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, uint16_t specials);
+    + int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, int16_t firing_arc, int16_t ammo, int16_t specials);
+    ```
+    ```diff
+    - int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
+    -                               int16_t firing_arc, int16_t ammo, uint16_t specials) {
+    + int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
+    +                               int16_t firing_arc, int16_t ammo, int16_t specials) {
+    ```
+
+- `Miniaturization_Category_` result is stored/passed with the wrong type.
+  - Assembly pushes the return value directly as the 3rd argument to `Space_Given_M_Level_`; project signature for that callee is `int8_t mode`. Current code stores it as `uint32_t` and then casts to `uint8_t`, which is a type mismatch and not instruction-faithful.
+  - Minimal suggested diff:
+    ```diff
+    -        uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
+    +        int8_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
+    ...
+    -        int32_t space_per_weapon = Space_Given_M_Level_(static_cast<int16_t>(raw_space_calc), tech_level, static_cast<uint8_t>(miniaturization_cat));
+    +        int32_t space_per_weapon = Space_Given_M_Level_((int16_t)raw_space_calc, tech_level, miniaturization_cat);
+    ```
+
+- There is an unnecessary explicit cast on the `Space_Given_M_Level_` first argument that obscures exact source typing.
+  - Assembly computes a 32-bit intermediate, then pushes its low 16 bits as the first argument. The current `static_cast<int16_t>(raw_space_calc)` may be functionally equivalent, but under the project rules explicit casts are a code smell and this one hides whether the upstream local should really be `int16_t`.
+  - Minimal suggested diff:
+    ```diff
+    -        int32_t raw_space_calc = ((regular_mod_add + mod_rack_offset + 100) * intermediate) / 100;
+    -        int32_t space_per_weapon = Space_Given_M_Level_(static_cast<int16_t>(raw_space_calc), tech_level, static_cast<uint8_t>(miniaturization_cat));
+    +        int16_t raw_space_calc = (int16_t)(((regular_mod_add + mod_rack_offset + 100) * intermediate) / 100);
+    +        int32_t space_per_weapon = Space_Given_M_Level_(raw_space_calc, tech_level, miniaturization_cat);
+    ```
+
+fail
+
+---------------------------------------
+0x00432960 DESIGN::Weapon_Arc_String_
+
+Fail:
+- The `0x10` case uses a 32-bit type-punning store/load:
+  ```cpp
+  *reinterpret_cast<uint32_t*>(dest_str) = *reinterpret_cast<const uint32_t*>(s_360_00556164);
+  ```
+  This is not how the original expresses the operation semantically, and it violates the project rule about explicit casts and byte-array style writes. It also introduces potential UB on unaligned `dest_str`. The assembly does a plain 4-byte move from the global string literal to `dest_str`; restored C should use a normal string copy primitive / literal copy, not `reinterpret_cast<uint32_t*>`.
+
+  Minimal suggested diff:
+  ```diff
+  -        if (arc_flags & 0x10) {
+  -            *reinterpret_cast<uint32_t*>(dest_str) = *reinterpret_cast<const uint32_t*>(s_360_00556164);
+  -        }
+  +        if (arc_flags & 0x10) {
+  +            strcpy(dest_str, s_360_00556164);
+  +        }
+  ```
+
+- The implementation introduces a lambda with manual append logic instead of using an existing string primitive. While the control flow is equivalent, this restoration style makes validation less certain around exact low-level intent and conflicts with the project guidance to prefer existing library functions over hand-rolled loops for primitive string ops.
+
+  Minimal suggested diff:
+  ```diff
+  -        auto copy_buffer_to_dest = [&]() {
+  -            char* d = dest_str;
+  -            while (*d != ' ') {
+  -                d++;
+  -            }
+  -            char* s = buffer;
+  -            while ((*d++ = *s++) != ' ');
+  -        };
+  +        auto copy_buffer_to_dest = [&]() {
+  +            strcat(dest_str, buffer);
+  +        };
+  ```
+
+---------------------------------------
+0x00432AC0 DESIGN::Weapon_Mod_String_
+
+- Uses the wrong structure field: the disassembly loads `_weapon_modifications[i].name_plural` from offset `+4`, but the current implementation appends `.name`.
+  ```diff
+  - const char* mod_name = TECHDATA::_weapon_modifications[i].name;
+  + const char* mod_name = TECHDATA::_weapon_modifications[i].name_plural;
+  ```
+
+- The validated binary signature is effectively two parameters (`short`, `char*`); no access to a third argument occurs anywhere in the function. The current declaration/definition adds an unused `int p3`, which does not match the recovered function interface and may hide calling-convention mistakes at call sites.
+  ```diff
+  - void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3);
+  + void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer);
+  ```
+
+- Related call site currently passes a spurious third argument, again inconsistent with the recovered function.
+  ```diff
+  - Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str, 1);
+  + Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str);
+  ```
+
+fail
+---------------------------------------
+00432F20 FMTPARA::_Print_Formatted_Paragraph_
+
+- `linep` local has the wrong size/type shape. The assembly allocates a single `s_fmtpara_line` at `ESP+0x6c`, while the current code uses `s_fmtpara_line linep[2]`. That changes stack layout and masks that the break-state copies are actually reading/writing adjacent raw bytes past the line struct.
+  Suggested diff:
+  ```cpp
+  -        s_fmtpara_line linep[2];
+  +        s_fmtpara_line linep;
+  ```
+- The function relies on raw adjacent stack layout for break-state snapshot/restore, but the current source models it as `_line_p[1]`. The disassembly sets `_break_p = &ESP+0x93`, which is immediately after the 0x1A-byte line struct at `ESP+0x6c`; later code in related functions copies fields from those exact overlapping raw offsets, not from a second real `s_fmtpara_line`. Current typing changes aliasing semantics and can hide UB/offset bugs.
+  Suggested diff:
+  ```cpp
+  -            _break_p->x = _line_p[1].x;
+  -            _break_p->left_limit_x = _line_p[1].left_limit_x;
+  +            /* use explicit byte/field copies matching packed stack layout after linep */
+  ```
+- There are unnecessary C++ casts on values whose widths already match the instruction behavior, reducing confidence in exact source typing. In particular `static_cast<int8_t>(justify)`, `static_cast<int8_t>(fonts::_current_font_style)`, and `static_cast<uint8_t>(fonts::_font_header.font_style)` should be treated suspiciously under the project rules; the assembly simply stores low bytes/words. This may indicate surrounding types are not modeled exactly.
+  Suggested diff:
+  ```cpp
+  -            para.justify_mode = static_cast<int8_t>(justify);
+  -            stylep.font_id = static_cast<int8_t>(fonts::_current_font_style);
+  -            stylep.fg_color = static_cast<uint8_t>(fonts::_font_header.font_style);
+  +            para.justify_mode = justify;
+  +            stylep.font_id = fonts::_current_font_style;
+  +            stylep.fg_color = fonts::_font_header.font_style;
+  ```
+- The stack-preserved dummy locals (`unused_tabs`, `unused_para_global`) are only a decompiler artifact, but without validating exact nearby raw layout use in the related break/line logic, this function cannot be accepted as-is because its correctness depends on that precise layout.
+
+fail
+---------------------------------------
+00433e40 FMTPARA::Set_Current_Colors_
+
+Fail:
+- Potential signedness/shift mismatch on the byte load. The assembly does `MOV CL,[EDX]` then `SHL CL,5`, i.e. an 8-bit load and 8-bit shift/writeback. Current code uses `*_para_p->str << 5` where `str` is `char*`; that promotes possibly signed `char` to `int` before shifting. While the final cast to `uint8_t` often recovers the same low byte, this is not a precise type match and can invoke implementation-defined behavior for negative `char` values.
+  Suggested diff:
+  ```cpp
+  void __cdecl Set_Current_Colors_() {
+      _para_p->str++;
+      _style_p->color_attr = (uint8_t)((uint8_t)*_para_p->str << 5);
+  }
+  ```
+
+- The current expression does not make the 8-bit-only dataflow explicit, which matters here because the instruction sequence operates strictly on `CL` and stores one byte at offset `+0x4`.
+  Suggested diff:
+  ```cpp
+  uint8_t color_code = (uint8_t)*_para_p->str;
+  _style_p->color_attr = (uint8_t)(color_code << 5);
+  ```
+---------------------------------------
+00434F70 FMTPARA::FN_Set_V_Spacing_
+
+- The implementation ignores `arg_index`/`param_3`, which is fine for this function, but it incorrectly uses `arg_ret == 0` as the gate. Assembly gates only on `param_4` byte, so this must exactly correspond to the decompiler’s `param_4`; if the project prototype/usage interprets that boolean differently, validation cannot be considered precise enough. The current names obscure that mapping.
+  ```cpp
+  // clarify exact semantics to match stack param_4
+  char __cdecl FN_Set_V_Spacing_(char func_char, int32_t val, int16_t arg_index, bool param_4, bool param_5) {
+      if (param_4 == 0) {
+  ```
+
+- Absolute value logic is potentially UB for `INT32_MIN`. Assembly uses `cdq/xor/sub`, i.e. two’s-complement absolute value without C++ signed-overflow rules. Current code:
+  ```cpp
+  if (abs_v_spacing < 0) {
+      abs_v_spacing = -abs_v_spacing;
+  }
+  ```
+  can overflow for `-2147483648`. Minimal safer form matching assembly intent:
+  ```cpp
+  uint32_t sign = (uint32_t)v_spacing >> 31;
+  uint32_t abs_v_spacing = ((uint32_t)v_spacing ^ (0u - sign)) - (0u - sign);
+  if (abs_v_spacing < 0x40) {
+      _para_p->line_advance_y = (int16_t)v_spacing;
+  }
+  ```
+
+- Return type/signature confidence is incomplete because the project uses `int32_t val`, while assembly consumes a 32-bit stack value and writes only `CX` to `[eax+0x1d]`. That is acceptable only if callers preserve the original 32-bit semantics and the truncation to 16-bit happens exactly at the final store. Given the first issue’s ambiguity around boolean parameter mapping, this needs follow-up before validating.
+
+fail
+---------------------------------------
+00435B90 FMTPARA::Pick_Font_Number_
+
+- The function incorrectly calls `fonts::Set_Remap_Font_Style_` unconditionally. In the assembly, the call happens only when `font_id & 0x80` is set; otherwise the function only saves/restores color state and returns.
+  ```diff
+   void __cdecl Pick_Font_Number_(uint8_t font_id) {
+  -    fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), &fonts::_font_header.normal_colors);
+  +    if ((font_id & 0x80) != 0) {
+  +        fonts::Set_Remap_Font_Style_(font_id & 0x7F, &fonts::_font_header.normal_colors);
+  +    }
+   }
+   ```
+
+- Because of that unconditional call, the current implementation changes font style state for non-highlighted font IDs, which does not match the original control flow or side effects.
+
+- The current body saves/restores the right 8-byte regions, but the temporary type for `selected_colors` is weaker than the actual object-level copy used by the assembly. Using `s_colors` for the saved selected colors would better reflect the exact 8-byte struct copy and avoid byte-array style handling.
+  ```diff
+  -    uint8_t saved_selected_colors[8];
+  +    s_colors saved_selected_colors;
+  ...
+  -    memcpy(saved_selected_colors, &fonts::_font_header.selected_colors, 8);
+  +    saved_selected_colors = fonts::_font_header.selected_colors;
+  ...
+  -    memcpy(&fonts::_font_header.selected_colors, saved_selected_colors, 8);
+  +    fonts::_font_header.selected_colors = saved_selected_colors;
+  ```
+
+fail
+---------------------------------------
+004363e0 SHIPMOVE::Ships_Try_To_Move_To_
+
+fail
+
+Discrepancies:
+- Out-of-range final rejection is too broad.
+  - Assembly only rejects when `out_of_range` is set in the branch where `blackhole_blocks || has_stargate_route || has_jumpgate_route || navigator_bonus>0` is already forcing the slow path (`0043686b -> 004368c5`). The current code rejects unconditionally on `move_info->out_of_range != 0`, which can incorrectly force `turns_left = 0xFF` even when the original continues to a valid moving result.
+  - Minimal diff snippet:
+    ```cpp
+    -        if ((move_info->blackhole_blocks != 0 && has_jumpgate_route == 0 &&
+    -            move_info->has_stargate_route == 0 && navigator_bonus <= 0) ||
+    -            (move_info->out_of_range != 0) ||
+    -            (ship_speed == 0 && (target_star->x != start_x || target_star->y != start_y))) {
+    +        if (((move_info->blackhole_blocks != 0 && has_jumpgate_route == 0 &&
+    +             move_info->has_stargate_route == 0 && navigator_bonus <= 0) &&
+    +             move_info->out_of_range == 0 &&
+    +             move_info->uses_wormhole == 0) ||
+    +            (move_info->out_of_range != 0 && (move_info->blackhole_blocks != 0 ||
+    +             has_jumpgate_route != 0 || move_info->has_stargate_route != 0 || navigator_bonus > 0)) ||
+    +            (ship_speed == 0 && (target_star->x != start_x || target_star->y != start_y))) {
+    ```
+- `uses_wormhole` / jumpgate byte semantics are not modeled like the binary.
+  - In the assembly, offset `+0x0A` is `uses_wormhole` low byte and offset `+0x0B` is independently used as a jumpgate-route flag via the high byte of the same `short`. The current implementation introduces a local `has_jumpgate_route` and never writes `move_info[0x0B]`. That means memory side effects differ from the original function, which is important because this project uses packed structs and raw field layout.
+  - Minimal diff snippet:
+    ```cpp
+    -        int8_t has_jumpgate_route = 0;
+    +        // high byte of uses_wormhole acts as jumpgate-route flag in original layout
+
+    -                    has_jumpgate_route = 1;
+    +                    *(((int8_t*)&move_info->uses_wormhole) + 1) = 1;
+    ```
+- Because of the above, final control flow is implemented against a local instead of the struct byte the original code tests.
+  - Assembly repeatedly tests `byte ptr [ESI+0x0B]` after prior writes, including before setting black hole blockage and in the final accept/reject path. Current code substitutes that with `has_jumpgate_route`, which is not layout-equivalent and misses the original side effect on `move_info`.
+  - Minimal diff snippet:
+    ```cpp
+    -        if (has_jumpgate_route != 0) {
+    +        if (*(((int8_t*)&move_info->uses_wormhole) + 1) != 0) {
+                 base_speed += 3;
+             }
+    ```
+- Type precision/sign handling around owner-derived speed is weaker than the binary.
+  - Assembly sign-extends ship owner from `int8_t` and zero-extends `player.ship_speed` from a byte. Current code stores both in `int32_t` and indexes with `player_idx` directly. This likely works for normal values, but it is less exact than the original and obscures the signed/unsigned behavior the function relies on.
+  - Minimal diff snippet:
+    ```cpp
+    -        int32_t player_idx;
+    -        int32_t ship_speed;
+    +        int8_t player_idx;
+    +        int32_t ship_speed;
+
+    -        player_idx = MOX::_ship[*ship_list].owner;
+    +        player_idx = MOX::_ship[*ship_list].owner;
+    ...
+    -            ship_speed = MOX::_player[player_idx].ship_speed;
+    +            ship_speed = (uint8_t)MOX::_player[player_idx].ship_speed;
+    ```
+---------------------------------------
+00436E30 SHIPMOVE::Create_Nonplayer_Ship_
+
+- Prototype signedness/width does not match the call ABI. The assembly reads `player_idx` with `MOV CL,[ESP+0x14]`, i.e. a 1-byte argument, but the project declares `int16_t owner`. That is not just cosmetic: callers may rely on byte-sized semantics and sign/zero behavior through the stack layout. Use `int8_t`/`char`, not `int16_t`.
+  ```diff
+  - int32_t __cdecl Create_Nonplayer_Ship_(int16_t owner, s_ship_design* design, int16_t x, int16_t y)
+  + int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y)
+  ```
+
+- Header prototype has the same mismatch and should agree with the implementation and disassembly.
+  ```diff
+  - int32_t __cdecl Create_Nonplayer_Ship_(int16_t owner, s_ship_design* design, int16_t x, int16_t y);
+  + int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y);
+  ```
+
+- There is avoidable narrowing cast smell on the owner store, which is a symptom of the wrong parameter type. The assembly stores the byte directly from `CL` into both `owner` and `d.previous_owner`; with the proper parameter type these casts should not be needed.
+  ```diff
+  - MOX::_ship[i].owner = (char)owner;
+  - MOX::_ship[i].d.previous_owner = (uint8_t)owner;
+  + MOX::_ship[i].owner = owner;
+  + MOX::_ship[i].d.previous_owner = owner;
+  ```
+
+fail
+---------------------------------------
+00436F50 SHIPMOVE::Allocate_New_Ship_Slots_
+
+- The current code reads the Antaran ship counts through `MOX::_antarans.offensive_ships[i]`, but the disassembly sums raw 16-bit values from `0x59BA38` up to `0x59BA4A` exclusive, i.e. exactly 9 contiguous `short`s starting at `offensive_ships[0]`. That matches the packed layout only if `_antarans` is typed exactly as expected in the project. This function should avoid depending on any possibly mismatched higher-level aggregate typing unless confirmed. Minimal suggested diff:
+```cpp
+int antaran_max_slots = 0;
+for (int i = 0; i < 9; ++i) {
+    antaran_max_slots += _antarans.offensive_ships[i];
+}
+```
+
+- The owner index for `colony_production_slots` is currently cast to `uint8_t`:
+```cpp
+colony_production_slots[(uint8_t)col->owner]++;
+```
+Assembly uses `MOVSX` on `owner` and indexes with the signed value. If `owner == -1`, it is filtered earlier, but the current cast still changes semantics relative to the original and obscures the signed source type. Minimal suggested diff:
+```cpp
+int owner = col->owner;
+colony_production_slots[owner]++;
+```
+
+- The function currently types and writes ship owners with plain `char` casts:
+```cpp
+MOX::_ship[i].owner = (char)MOX::_PLAYER_NUM;
+MOX::_ship[ship_idx].owner = (char)current_player;
+```
+Assembly writes raw bytes, but the field type is `int8_t`; using `char` is implementation-defined signedness and is not precise enough for validation. Minimal suggested diff:
+```cpp
+MOX::_ship[i].owner = (int8_t)MOX::_PLAYER_NUM;
+MOX::_ship[ship_idx].owner = (int8_t)current_player;
+```
+
+- The loop control in the first redistribution pass is expressed as `players_tried`, but the assembly uses `EBX` as a consecutive-fail counter that is reset only on successful assignment and compared against `_NUM_PLAYERS`. This is semantically similar, but given the restoration rules, the current formulation is not instruction-faithful enough without further confirmation, especially around edge cases when `_NUM_PLAYERS <= 0`. Minimal suggested diff:
+```cpp
+int assigned = 0;
+int fail_count = 0;
+while (assigned < unassigned_count) {
+    if (fail_count >= (int)MOX::_NUM_PLAYERS) {
+        break;
+    }
+
+    if (ships_assigned_per_player[current_player] < colony_production_slots[current_player]) {
+        int ship_idx = unassigned_indices[assigned++];
+        MOX::_ship[ship_idx].owner = (int8_t)current_player;
+        ships_assigned_per_player[current_player]++;
+        fail_count = 0;
+    } else {
+        fail_count++;
+    }
+
+    current_player++;
+    if (current_player == (int)MOX::_NUM_PLAYERS) {
+        current_player = 0;
+    }
+}
+```
+
+- There is type uncertainty around indexing with `MOX::_PLAYER_NUM` and `current_player` directly into fixed 8-element arrays. Assembly sign-extends 16-bit globals each time. The current code mixes implicit integer promotions and plain array indexing, which is probably fine in practice, but not strict enough for precise restoration validation without checking the exact project declarations of these globals.
+
+fail
+---------------------------------------
+00438200 RACEOPT::Draw_Racial_Option_Screen_
+
+fail
+
+- Uses wrong string symbols/names for the percent and dot literals.
+  - Disassembly prints `s_%_0055633c` and `s_._0055632c`; current code uses `s_percent_0055633c` / `s_dot_0055632c`. If those are not exact aliases, this is a symbol mismatch that needs verification.
+  - Minimal diff snippet:
+    ```cpp
+    - fonts::Print_Right_(0x1C5, 0x1C1, s_percent_0055633c);
+    + fonts::Print_Right_(0x1C5, 0x1C1, s_%_0055633c);
+
+    - fonts::Print_(x, y, s_dot_0055632c);
+    + fonts::Print_(x, y, s_._0055632c);
+    ```
+
+- The local buffer initialization does not match the exact stack writes and introduces unnecessary library behavior.
+  - Assembly writes `local_50[0] = 0x89`, then fills a distinct later 7-byte color struct with `0x95`; `local_50` itself is not zero-initialized at function start. Current code does `char local_50[12] = { 0 }; memset(&local_50[1], 0x95, 7);`, which changes the initial contents and layout semantics.
+  - Minimal diff snippet:
+    ```cpp
+    - char local_50[12] = { 0 };
+    - memset(&local_50[1], 0x95, 7);
+    + char local_50[12];
+    + s_colors disabled_cost_color = {{0x89, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95}};
+    ```
+    or otherwise mirror the actual stack-local objects exactly.
+
+- The code relies on a fragile local-layout reconstruction via `int16_t stack_vars[4]` instead of matching the actual short locals, and later aliases `stack_vars[3]` as a cost temp. This is not proven equivalent to the assembly stack accesses and is too loose for validation.
+  - The original uses distinct 16-bit locals at specific offsets (`local_8a`, `local_82`, `local_80`, `local_7e`, `local_7c`, `sStack_84`, etc.). Current code compresses them into a synthetic array plus unrelated locals, which obscures signed 16-bit behavior and exact lifetime.
+  - Minimal diff snippet:
+    ```cpp
+    - int16_t stack_vars[4];
+    - stack_vars[0] = 0x16;
+    + int16_t block_sizes_first = 0x16;
+    + int16_t col_header_idx = 0;
+    + int16_t row_choice_idx = 0;
+    + int16_t cost_diff = 0;
+    ```
+    and use dedicated `int16_t` locals matching the original roles.
+
+- The selected/disabled text-path control flow is inverted into `draw_text = false` style logic, which is harder to prove against the assembly and may hide a behavioral mismatch in cases where no style change should occur.
+  - In assembly, text is only drawn on selected or disabled/sentinel paths; current code defaults `draw_text = true` and clears it in the “normal” path. This may be equivalent, but given the other local/layout issues, it is not precise enough to validate with confidence.
+  - Minimal diff snippet:
+    ```cpp
+    - bool draw_text = true;
+    + bool draw_text = false;
+      if (btn_var - loop1_j == 1) {
+    +     draw_text = true;
+          fonts::Set_Font_Style_Shadow_Down_(2, &_color_opt);
+      } else if (...) {
+    +     draw_text = true;
+          fonts::Set_Font_Style_Shadow_Down_(2, &disabled_color);
+      }
+    ```
+
+- There is unresolved uncertainty around exact symbol/type definitions used by this function (`fonts::Print_Integer_Right_` vs direct `Print_Integer_Right_`, and the unprovided declarations for the percent/dot strings). Because this validation requires exact matching and the function already deviates in local object reconstruction, I cannot confirm equivalence without follow-up.
+---------------------------------------
+004399C0 RACEOPT::Convert_Flags_To_Player_
+
+- The implementation reads the wrong backing array for option flags. The assembly uses word data at 0x005A7AAC / 0x005A7AAE and byte reads from the same base (`_trait_option_flags` / `DAT_005a7ab6`), but the current code uses `_trait_option_flags[15]`, `_trait_option_flags[16]`, and `_trait_option_flags[button_index]`. That maps to indices `15..31`, while the binary accesses memory corresponding to indices `0..22` via addresses `0x005A7AAC + 2*DX` with `DX=15..31`. This is a layout mismatch and changes which flags are copied.
+  ```diff
+  -        while (button_index < 32) {
+  +        while (button_index < 32) {
+               if (button_index == 15) {
+  -                if (_trait_option_flags[15] == 1) {
+  +                if (_trait_option_flags[5] == 1) {
+                       skipped_button = 1;
+                       player->traits[15] = 1;
+  -                } else if (_trait_option_flags[16] == 1) {
+  +                } else if (_trait_option_flags[6] == 1) {
+                       player->traits[15] = -1;
+                       skipped_button = 1;
+                   } else {
+                       player->traits[15] = 0;
+                       skipped_button = 1;
+                   }
+                   button_index += 2;
+               } else {
+  -                player->traits[button_index - skipped_button] = (int8_t)_trait_option_flags[button_index];
+  +                player->traits[button_index - skipped_button] = (int8_t)_trait_option_flags[button_index - 10];
+                   ++button_index;
+               }
+           }
+  ```
+
+- The first 9 trait conversions do not match the special-case flat-table lookup used by the binary for selection value `3`. Assembly reads from `0x559037 + (3 * trait_index) + selection`, i.e. from a flat byte table starting 3 bytes before `_special_bonus`, so selection `3` intentionally lands on the next row’s first byte. Current code uses `MOX::_special_bonus[trait_index - 1][selection - 1]`, which instead reads the third byte of the current row. This is incorrect for selection `3`.
+  ```diff
+  -            if (selection == 0) {
+  +            if (selection == 0) {
+                   player->traits[trait_index] = 0;
+               } else {
+  -                player->traits[trait_index] = static_cast<int8_t>(
+  -                    MOX::_special_bonus[trait_index - 1][selection - 1]);
+  +                player->traits[trait_index] =
+  +                    MOX::_special_bonus_at_00559037[trait_index * 3 + selection];
+               }
+  ```
+
+- Type/semantic mismatch on the option-flag source is obscured by naming: the assembly mixes 16-bit comparisons and 8-bit loads from the same storage region. Current code treats all accesses as `int16_t` array elements, which is not what the memory accesses do in the second loop and risks validating the wrong structure model. The source type for the copied flags should reflect byte semantics for the per-trait writes, or use explicit byte-addressed access against the correct base.
+  ```diff
+  -                player->traits[button_index - skipped_button] = (int8_t)_trait_option_flags[button_index];
+  +                player->traits[button_index - skipped_button] =
+  +                    *reinterpret_cast<int8_t*>(
+  +                        reinterpret_cast<uint8_t*>(&_trait_option_flags[0]) + (button_index - 10) * 2);
+  ```
+
+fail
+---------------------------------------
+0043A270 RACEOPT::Evolutionary_Mutation_Screen_
+
+---------------------------------------
+
+---------------------------------------
+0043BBC0 SETTLER::Settle_Pop_
+
+fail
+
+Discrepancies:
+- Uninitialized local is modeled explicitly in C++, creating undefined behavior not justified by the binary.
+  - Assembly does not read an uninitialized stack local. It seeds the working dword from the incoming pop value and then selectively splices fields into a register copy. The current source declares `uint32_t encoded_settler;` and immediately XORs with it, which is UB and not an accurate restoration.
+  - Minimal suggested diff:
+    ```diff
+    -            uint32_t encoded_settler; // BUG: original code uses this dword without initialization
+    +            uint32_t encoded_settler = pop_value;
+    ```
+
+- Missing final return type/ABI match.
+  - The binary returns with plain `RET` and leaves `EAX` holding either `source_colony` when no move occurs or the moved pop dword when a move occurs. Current project declares and defines the function as `void`, which does not match the observed machine-level behavior.
+  - Minimal suggested diff:
+    ```diff
+    -    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
+    +    int32_t __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
+    ```
+    ```diff
+    -    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
+    +    int32_t __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
+         ...
+    +        return result_value;
+         }
+    ```
+  - Note: if the project intentionally treats the return as unused, this still remains a validation mismatch against the provided function signature/body.
+
+- Return-value semantics are not preserved.
+  - Assembly’s last write to `EAX` before `RET` is `MOV EAX,[ESI + ECX*4 + 0xC]`, then `MOV [EBX],EAX`; when `dest != source`, returned `EAX` is the last-pop dword copied into the vacated slot. When `dest == source`, `EAX` remains the destination/source pointer loaded at entry. Current `void` implementation discards this observable behavior entirely.
+  - Minimal suggested diff:
+    ```diff
+    +        int32_t ret_value = (int32_t)dest_colony;
+             if (dest_colony != source_colony) {
+         ...
+    -            *pop_slot = source_colony->pop[last_pop_index];
+    +            ret_value = (int32_t)source_colony->pop[last_pop_index];
+    +            *pop_slot = source_colony->pop[last_pop_index];
+             }
+    +        return ret_value;
+    ```
+0043BE10 SETTLER::Move_Settlers_
+
+fail
+
+Discrepancies:
+- Blockade bit extraction lacks the original x86 variable-count shift masking behavior.
+  - Assembly does `SHR AL, CL` after loading `CL` from the player index quotient. On x86 this effectively masks count to 0..31. Current code uses `blockaded >> player_idx` directly.
+  - This matters if the value is not provably constrained the same way at the point of use; the original semantics are CPU-defined, not C++-equivalent for oversized shifts.
+  - Minimal suggested diff:
+    ```cpp
+    int player_idx = curr_player - MOX::_player;
+    uint8_t blockaded = MOX::_star[star_index].blockaded;
+    uint8_t blocked = (uint8_t)(blockaded >> ((uint8_t)player_idx & 0x1f));
+    if ((blocked & 1) == 0) {
+    ```
+
+- Message construction does not faithfully preserve the original bytewise stack layout semantics.
+  - Assembly builds the `s_MSG` object by writing individual bytes/words on the stack, then passes three dwords plus a word as raw argument chunks to `MSG::Add_Msg_`.
+  - Current code reconstructs a typed `s_MSG` via field assignment. While likely equivalent in many builds, this is not precise validation for a packed legacy layout function whose original behavior is byte-accurate.
+  - Minimal suggested diff:
+    ```cpp
+    s_MSG msg;
+    memset(&msg, 0, sizeof(msg));
+    msg.msg_type = 0;
+    msg.priority = 0;
+    msg.u.colony.planet_idx = (uint8_t)planet_idx;
+    msg.u.colony.subtype = 5;
+    msg.u.colony.c.settlers.settlers = arrivals_per_planet[planet_idx];
+    msg.u.colony.c.settlers.over_limit = over_limit_per_planet[planet_idx];
+    msg.u.colony.c.settlers.blockaded =
+            (uint8_t)(MOX::_star[star_index].blockaded >> ((uint8_t)player_idx & 0x1f)) & 1;
+    ```
+  - This still uses typed access, but the validation concern is that the current implementation should be reviewed against exact packed field offsets and calling ABI, not only logical field names.
+
+- Potential strict-aliasing / layout-dependent access on settler entries.
+  - Current code uses `reinterpret_cast<uint32_t*>(curr_player->settlers)` and then indexed dword loads/stores into a bitfield array type.
+  - This is exactly the kind of cast the rules call out as suspicious: it treats structured storage as raw dwords and depends on layout/aliasing assumptions.
+  - The assembly absolutely operates on 4-byte settler records, but the source type may be wrong or should be represented via a byte-packed dword-compatible type/accessor rather than aliasing a bitfield array through `uint32_t*`.
+  - Minimal suggested diff:
+    ```cpp
+    // Prefer a raw packed 32-bit representation for in-transit settler records
+    uint32_t val;
+    memcpy(&val, &curr_player->settlers[settler_idx], sizeof(val));
+    ...
+    memcpy(&curr_player->settlers[settler_idx], &val, sizeof(val));
+    ```
+  - Or better, define the storage type compatibly instead of reinterpreting.
+
+- Signedness/typing remains insufficiently explicit in a few places where assembly uses sign extension from byte fields.
+  - `star_index` is sign-extended in assembly (`MOVSX`) both on arrival processing and message creation. Current code uses plain `int star_index = MOX::_planet[...].star_index;`, which relies on host `char` signedness and field typedef consistency rather than making the sign extension explicit at use sites.
+  - Minimal suggested diff:
+    ```cpp
+    int16_t star_index = (int16_t)MOX::_planet[dest_planet].star_index;
+    ```
+  - Same issue for the message-generation loop’s `planet_idx -> star_index` path.
+
+Because of these precision concerns, especially the aliasing issue and the need to mirror exact x86 shift/byte-layout behavior, I cannot validate this as an exact match yet.
+---------------------------------------
+0043C0F0 FILEDEF::Load_Game_
+
+fail
+
+- Uses `fopen` instead of the binary’s `_wfopen`. This is not a cosmetic change in this function because the call target and ABI differ from the disassembly at `0043C1A9`.
+  ```diff
+- FILE* file = fopen(filename, "rb");
++ FILE* file = _wfopen(filename, s_rb_0055117c);
+  ```
+
+- Invalid-save path does not close the opened file before returning. The assembly branches to the warning path after a successful open and never shows `_fclose`, so this is a behavioral/resource-management discrepancy in the restored source.
+  ```diff
+        GENDRAW::Warning_Box_(err_msg);
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 639, 479, 0);
++       fclose(file);
+        return 0;
+  ```
+
+- Wrong slot clamp for the save description read. Assembly does `CMP BX,0x9 / JL ... / MOV BX,0x9`, so values `>= 9` clamp to 9. Current code only clamps `> 9`, letting slot 9 pass unmodified by coincidence but differing in condition semantics.
+  ```diff
+- int desc_idx = (save_idx > 9) ? 9 : (int)save_idx;
++ int16_t desc_idx = (save_idx >= 9) ? 9 : save_idx;
+  ```
+
+- Missing `RUSS::Mox_Update_()` between the player block and ship count read. The assembly has no update after finishing player reads at `0043C421`; the next update happens only after map dimension reads at `0043C4ED`. Current structure is mostly aligned there, but there is also a missing required update immediately after the ship loop before movable-box reads in the original (`0043C45D` path continues with reads; no issue), while earlier sections must preserve exact placement. The current source omits the update at `0043C54B`/report section boundary placement fidelity around neighboring reads and should be rechecked instruction-by-instruction.
+
+- Calls `HAROLD::Load_Leader_Titles()` while the validated symbol is hooked as `HAROLD::Load_Leader_Titles` at `004F26F0`; however the disassembly names `Load_Leader_Titles_`. If this is only naming it is fine, but the source must be verified against the exact hooked symbol declaration. Current mismatch introduces uncertainty because both underscore and non-underscore naming conventions coexist in this codebase.
+  ```diff
+- HAROLD::Load_Leader_Titles();
++ HAROLD::Load_Leader_Titles_();
+  ```
+
+- The invalid-file message buffer can be passed uninitialized when language is outside 0..4. Assembly intentionally skips `_sprintf` and still calls `Warning_Box_` with stack contents at `LAB_0043C25B`; current code reproduces that by leaving `err_msg` uninitialized, which is unsafe C++ and should be treated as a restoration issue unless there is proof `_settings.language` is always constrained here.
+  ```diff
+- char err_msg[128];
++ char err_msg[128] = {};
+  ```
+  or constrain language before the switch.
+
+- Return-on-open-failure path calls `hgetch_()` unqualified, while the binary target is `assert::hgetch_` at `004AB400`. If this relies on a global alias from `pch.h`, it needs confirmation; otherwise it is a symbol mismatch in the validated function.
+  ```diff
+- hgetch_();
++ assert::hgetch_();
+  ```
+---------------------------------------
+0043C840 FILEDEF::Save_Game_
+
+- Uses `fopen` with a narrow `char filename[]`, while the disassembly calls `_wfopen` and passes the local filename buffer directly. This is a calling/API mismatch and may affect path encoding/ABI assumptions.
+  ```diff
+  - FILE* fp = fopen(filename, s_wb_00551178);
+  + FILE* fp = _wfopen(filename, s_wb_00551178);
+  ```
+
+- The filename and error-message construction use hard `reinterpret_cast` pointers and manual typed stores that introduce UB/code-smell against the original byte-copy behavior. In particular:
+  - `const char* prefix = reinterpret_cast<const char*>(0x005568FC);`
+  - `const char* suffix = reinterpret_cast<const char*>(0x005568F4);`
+  - `((uint32_t*)error_msg)[i] = ((const uint32_t*)err_src)[i];`
+
+  The assembly performs byte/string copies on stack buffers; the current explicit casts to unrelated pointer types are not restoration-accurate and violate the project rule about suspicious casts.
+  ```diff
+  - const char* prefix = reinterpret_cast<const char*>(0x005568FC);
+  - const char* suffix = reinterpret_cast<const char*>(0x005568F4);
+  + const char* prefix = s_SAVE_005568fc;
+  + const char* suffix = s__GAM_005568f4;
+
+  - for (int i = 0; i < 5; ++i) {
+  -     ((uint32_t*)error_msg)[i] = ((const uint32_t*)err_src)[i];
+  - }
+  + memcpy(error_msg, err_src, 20);
+  ```
+
+- Namespace/symbol mismatch for council globals versus provided namespace context. Disassembly references `DIPLODEF::_COUNCIL_FLAG` / `DIPLODEF::_next_council_meeting_turn`; implementation uses `diplodef::...`. This may be benign locally, but without confirming exact symbol mapping it is not precise enough for validation of this restoration.
+  ```diff
+  - fwrite(&diplodef::_COUNCIL_FLAG, 2, 1, fp);
+  - fwrite(&diplodef::_next_council_meeting_turn, 2, 1, fp);
+  + fwrite(&DIPLODEF::_COUNCIL_FLAG, 2, 1, fp);
+  + fwrite(&DIPLODEF::_next_council_meeting_turn, 2, 1, fp);
+  ```
+
+- Namespace/symbol mismatch for message globals. Disassembly uses `MSG::_msgs/_first_msg/_max_msgs/_n_msgs`; implementation uses `MSG_::...`. As above, this blocks exact validation without explicit proof they are the same linked symbols.
+  ```diff
+  - fwrite(&MSG_::_msgs, 18, 100, fp);
+  + fwrite(&MSG::_msgs, 18, 100, fp);
+  ```
+
+fail
+
+---------------------------------------
+0043cdb0 FILEDEF::Save_Game_Settings_
+
+fail
+
+Discrepancies:
+- The current implementation omits the second `fclose(file)` present in the binary after the post-write `RUSS::Assert_Settings_()`. The assembly clearly performs `_fclose` twice on the same handle on the success path; current code only closes once, so control flow and side effects do not match.
+  ```diff
+   bool Save_Game_Settings_(void) {
+       RUSS::Assert_Settings_();
+       FILE* file = fopen("MOX.SET", "wb");
+       if (file == nullptr) {
+           return false;
+       }
+       fwrite(&MOX::_settings, 0x229, 1, file);
+       fclose(file);
+       RUSS::Assert_Settings_();
+  +    fclose(file);
+       return true;
+   }
+  ```
+
+- The decompiled/binary function returns a boolean in `AL` (`1` on success, `0` on open failure), but the supplied Ghidra decompiler signature says `void`; the project uses `bool`, which is fine. However, because of the missing second close, the actual success-path instruction sequence still does not match well enough for validation.
+
+- Minor symbol mismatch in the user-supplied decompiler note: the import labeled `_wfopen` is actually hooked to `fopen` in this project (`0x00540c00 -> fopen`). The project’s `fopen("MOX.SET", "wb")` choice is consistent with the hook table, so no issue there; the failure is specifically the missing duplicate close.
+
+---------------------------------------
+0043E410 officer::Officer_Skill_Value_
+
+fail
+
+Discrepancies:
+- General skill indices 2 and 3 ignore `_skill_data[skill_idx].cost` in the current code.
+  The assembly first loads `cost` unconditionally after `Officer_Has_General_Skill_`, then adds an extra bonus/multiplier only for skills 2 and 3. Current code replaces the cost with `1/3` or `2/6`, which undercounts whenever the stored cost is nonzero.
+
+  Minimal suggested diff:
+  ```cpp
+  if (OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
+      int16_t val = (int8_t)skill.cost;
+      if (skill_idx == 2 || skill_idx == 3) {
+          int16_t bonus = (leader.type == 0) ? 3 : 1;
+          if (skill_idx == 3) {
+              bonus *= 2;
+          }
+          val += bonus;
+      }
+      total_value += val;
+  }
+  ```
+
+- The function relies on `(int8_t)skill.cost` because the binary uses `MOVSX` from an 8-bit field. In the project, `cost` is typed as `uint8_t`, forcing explicit signed casts at every use. That is a type mismatch against the binary-visible semantics and is a likely source-type issue.
+
+  Minimal suggested diff:
+  ```cpp
+  struct s_skill_data {
+      uint8_t skill_id;
+      uint32_t skill_mask;
+      uint8_t skill_type;
+      int16_t strength;
+      int8_t level_up;
+      int8_t cost;
+      char* name;
+      char* format_str;
+  };
+  ```
+
+- Validation remains blocked until the above semantic mismatch is resolved, since it changes the returned value for skill ids 2 and 3.
+
+---------------------------------------
+
+0043E8C0 OFFICER::Officer_Maintenance_
+
+- Signed division semantics are not preserved exactly. The assembly does `MOVSX EAX,AX` after `Officer_Cost_`, then `(int16_t)cost + 99`, then signed `IDIV 100`. Current code uses full 32-bit `Officer_Cost_` result in `(cost + 99) / 100`. If `Officer_Cost_` ever returns outside 16-bit range or negative, behavior diverges from the binary.
+  Suggested diff snippet:
+  ```cpp
+  int16_t cost16 = (int16_t)OFFICER::Officer_Cost_(player_idx, leader_idx);
+  int16_t maintenance = (int16_t)(((int32_t)cost16 + 99) / 100);
+  ```
+
+- The current implementation uses an explicit widening cast on the `Officer_Cost_` result that obscures the original 16-bit truncation before arithmetic. This is a likely type-restoration issue, not just style.
+  Suggested diff snippet:
+  ```cpp
+  - int32_t cost = (int32_t)OFFICER::Officer_Cost_(player_idx, leader_idx);
+  - int16_t maintenance = (int16_t)((cost + 99) / 100);
+  + int16_t cost = (int16_t)OFFICER::Officer_Cost_(player_idx, leader_idx);
+  + int16_t maintenance = (int16_t)(((int32_t)cost + 99) / 100);
+  ```
+
+- Minimum clamp condition is slightly looser than the assembly. Binary does `CMP BX,1 / JG ... / MOV BX,1`, i.e. clamp when `maintenance <= 1`. Current code matches numerically, but because it is fed by the wrong-width intermediate, the resulting behavior remains uncertain.
+
+fail
+
+---------------------------------------
+
+0043E9A0 OFFICER::Officers_Screen_
+
+- Scan_Small_Ship_Icons_ return handling is inverted in the implementation.  
+  Assembly uses `JNZ` after `TEST AX,AX`, so non-zero means a ship/icon was found and enables updating `_scanned_small_ship`; zero triggers the fleet-screen refresh path. Current code does the opposite.
+  ```diff
+  - if (FLT1::Scan_Small_Ship_Icons_(scanned_id, input, &scanned_ship_id, &scanned_ship_idx) == 0) {
+  + if (FLT1::Scan_Small_Ship_Icons_(scanned_id, input, &scanned_ship_id, &scanned_ship_idx) != 0) {
+  - } else if (scanned_ship_id > -1) {
+  + } else if (Is_Fleet_Officer_Screen_()) {
+  ```
+
+- The hire/cancel button local IDs are passed to Add_Officer_Screen_Fields_ in the wrong order, so later comparisons against `hire_btn`/`cancel_btn` do not correspond to the assembly stack layout. In assembly, `[esp+34]` is cancel and `[esp+36]` is hire, but current source passes `&hire_btn, &cancel_btn` and then tests `cancel_btn` first, `hire_btn` second.
+  ```diff
+  - int16_t hire_btn, cancel_btn, ...
+  + int16_t cancel_btn, hire_btn, ...
+  
+  - Add_Officer_Screen_Fields_(&hire_btn, &cancel_btn, ...)
+  + Add_Officer_Screen_Fields_(&cancel_btn, &hire_btn, ...)
+  ```
+
+- `MOX::_officer_scanned` is initialized with the wrong signed value.  
+  Assembly clears `BL` then stores `BL` to `0x00596e70`, so the initial value is `0`, not `-1`. Current code writes `-1`.
+  ```diff
+  - MOX::_officer_scanned = -1;
+  + MOX::_officer_scanned = 0;
+  ```
+
+- `_global_var` binding is likely using the wrong symbol/type in this function.  
+  Assembly explicitly accesses `MOX::_global_var @ 0x0059B4AA` as an `int8_t`. Current code writes `MOX::_global_var_byte`, which may alias a different symbol; this needs confirmation against headers/definitions because correctness here is address-sensitive.
+  ```diff
+  - MOX::_global_var_byte = 1;
+  + MOX::_global_var = 1;
+  
+  - MOX::_global_var_byte = 0;
+  + MOX::_global_var = 0;
+  ```
+
+fail
+
+---------------------------------------
+00441F90 OFFICER::Scan_Offscrn_Big_Icon_Fields_
+
+- Off-by-one end bound: assembly computes `end_idx = min(start_idx + 0x14, _n_fltscrn_big_icons)` and iterates while `i < end_idx`, i.e. scans at most 20 entries. Current code uses `start_idx + 20`, which is numerically correct, but this should remain tied to the exact 0x14 window semantics from the binary; acceptable by itself, but see below for type/control-flow issues.
+- Return value typing/control-flow mismatch: binary tracks the result in `AX` as a 16-bit value initialized to `0xFFFF`, then compared as `CMP AX,0xFFFF`. Current code uses `uint32_t result` and tests `static_cast<uint16_t>(result) == 0xFFFF`. This is not ideal restoration and obscures the 16-bit semantics.
+  Suggested diff:
+  ```cpp
+  uint16_t result = 0xFFFF;
+  ...
+  if (result == 0xFFFF) {
+  ```
+- Incorrect signedness/cast smell on `_big_icon_display_columns`: assembly does `MOVSX CX, byte ptr [...]`, so the source object is signed 8-bit and sign-extended before multiply. Current code does `static_cast<int16_t>(static_cast<int8_t>(MOX::_big_icon_display_columns))`. This works only because `_big_icon_display_columns` is currently typed as `int8_t`, making the extra cast redundant and a smell under the project rules. The underlying type should be used directly.
+  Suggested diff:
+  ```cpp
+  int16_t start_idx = MOX::_scroll_bar->first_visible_row * MOX::_big_icon_display_columns;
+  ```
+- Sentinel/flag handling is not restored faithfully: the binary uses `BL` as a shared “stop searching / invalid range encountered / hit found” flag across both loops, with specific early exits when either bound is negative. Current code collapses this into `bool found`, which makes the high-level behavior look similar but loses the precise distinction between “invalid range” and “match encountered” that governs the second scan. This needs stricter restoration if the function is being validated instruction-by-instruction.
+  Suggested diff:
+  ```cpp
+  bool stop = false;
+  ...
+  if (start_idx < 0 || end_idx < 0) {
+      stop = true;
+  }
+  ...
+  if (stop) {
+      break;
+  }
+  ...
+  if (result == 0xFFFF && start_idx < end_idx && !stop) {
+  ```
+- Exact equality form differs from assembly in the alternate-button test. The binary performs signed 32-bit addition of sign-extended `button_id` and `param_2`, then tests for zero; current code rewrites this as `icon.button_id == -param_2`. Usually equivalent, but not the exact restored form requested, and it matters for precise signed semantics.
+  Suggested diff:
+  ```cpp
+  else if ((int32_t)icon.button_id + (int32_t)param_2 == 0) {
+  ```
+
+fail
+
+---------------------------------------
+00442110 OFFICER::Set_Officer_To_Player_
+
+- Status assignment is reversed for `param_3 == 0/!=0`.
+  - Assembly computes `status = 4` when `param_3 == 0`, otherwise `status = 0`:
+    - `CMP CL,0x1 / SBB DL,DL / AND DL,0x4 / TEST CL,CL`
+  - Current code uses:
+    ```cpp
+    target.status = (is_instant == 0) ? 4 : 0;
+    ```
+    This is only correct if `is_instant` is guaranteed 0/1. The binary treats any nonzero as `0`, and specifically compares against `1` before `sbb`; for values >1, current C still yields 0, so behavior happens to align. However the naming and semantics are misleading versus the actual binary: `param_3 != 0` means specials granted and status 0, `param_3 == 0` means status 4.
+  - Minimal suggested diff:
+    ```cpp
+    - void __cdecl Set_Officer_To_Player_(int16_t officer_idx, int16_t player_idx, uint8_t is_instant) {
+    + void __cdecl Set_Officer_To_Player_(int16_t officer_idx, int16_t player_idx, uint8_t param_3) {
+    ...
+    -     target.status = (is_instant == 0) ? 4 : 0;
+    +     target.status = (param_3 != 0) ? 0 : 4;
+    ...
+    -     if (is_instant != 0) {
+    +     if (param_3 != 0) {
+              Give_Leader_Specials_To_Player_(officer_idx, player_idx);
+          }
+    ```
+- Temporary ETA-tracking variable type is signedness-sensitive and currently modeled less precisely than the assembly.
+  - Assembly stores and compares the best ETA candidate in a 16-bit signed local initialized to 0 and compares against `MOVSX AX, byte ptr [ESI + 0x37]`.
+  - Current code uses `int16_t max_eta = 0;` with `(int16_t)leader.eta > max_eta`, which is close, but the variable name suggests maximum while assembly is signed compare on promoted `sbyte eta`.
+  - This is a minor precision concern because `eta` is `sbyte`; negative values would participate in signed comparison.
+  - Minimal suggested diff:
+    ```cpp
+    -     int16_t max_eta = 0;
+    +     int16_t best_eta = 0;
+    ...
+    -                             if (leader.status == 4 && (int16_t)leader.eta > max_eta) {
+    +                             if (leader.status == 4 && (int16_t)leader.eta > best_eta) {
+                                      replace_idx = i;
+    -                                 max_eta = (int16_t)leader.eta;
+    +                                 best_eta = (int16_t)leader.eta;
+                                  }
+    ```
+
+Main issue is the semantic mismatch around `param_3`/status meaning; please confirm whether you want validation against exact binary semantics or just equivalent behavior under current callsites.
+
+fail
+
+---------------------------------------
+00442440 OFFICER::Add_Skill_Description_Help_Fields_
+
+fail
+
+Discrepancies:
+- Wrong global namespace qualifier used for the help string constant.
+  - The disassembly pushes absolute address `0x00551100`, which is the external/global `s__00551100`, not necessarily an `OFFICER`-owned symbol. The implementation uses `OFFICER::s__00551100`, while the header declares it inside `OFFICER`; this is inconsistent with the provided externals and should be verified/fixed to match the original symbol ownership.
+  - Minimal diff:
+    ```cpp
+    -                OFFICER::s__00551100,
+    +                s__00551100,
+    ```
+
+- Parameter 3 handling is not matched precisely.
+  - Assembly never reads `param_3` at all; it always loads `MOX::_PLAYER_NUM` directly before both skill checks. The current signature names it `unused` and discards it, which is behaviorally fine, but this creates a mismatch with call sites that pass `(uint32_t)MOX::_PLAYER_NUM` and can hide a prototype/source mismatch. Given restoration precision requirements, this should be reconciled explicitly with the original unused calling convention expectations.
+  - Minimal diff:
+    ```cpp
+    -    uint32_t unused,
+    +    uint32_t player_num_ignored,
+         int16_t leader_index,
+         int16_t* help_fields
+     ) {
+    -    (void)unused;
+    +    (void)player_num_ignored;
+    ```
+
+- Signedness/type precision around leader type is potentially off.
+  - Assembly zero-extends the loaded byte via `MOV AL,[...+0x23]` then `AND EAX,0xffff00ff`, storing a 16-bit non-negative value. The implementation uses `uint16_t leader_type = static_cast<uint8_t>(...)`, which is close, but the underlying field in `s_leader_data` is `char`. Elsewhere in the codebase this field is treated as signed `char` in many places. This inconsistent source typing can affect comparisons if any non-0/1 values occur and should be normalized at the struct/type level before validation can be considered precise.
+  - Minimal diff:
+    ```cpp
+    -    char type;
+    +    uint8_t type;
+    ```
+
+---------------------------------------
+---------------------------------------
+0x00442690 OFFICER::Wrapper_To_Add_Officer_Popup_Help_Fields_
+
+- Parameter type mismatch: the third parameter is pushed via `PUSH EAX` after loading only the low 16-bit value from stack in the surrounding call pattern; this wrapper then forwards it as a 16-bit leader index to `Add_Skill_Description_Help_Fields_`. Current signature uses `int32_t popup_param`, which is not an exact restoration and obscures the callee contract.
+  Suggested diff:
+  ```cpp
+  -void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(int16_t skill_id_base, int16_t skill_count_minus_one, int32_t popup_param)
+  +void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(int16_t skill_id_base, int16_t skill_count_minus_one, int16_t popup_param)
+  ```
+
+- Exact call-width preservation is muddied by explicit casts: assembly builds 32-bit stack arguments from 16-bit `AX/CX` values, relying on upper-half state being irrelevant to the callee. The current implementation forces `static_cast<int16_t>`/`static_cast<uint32_t>` at the call site. Functionally likely fine, but for strict validation this introduces uncertainty about intended source types instead of matching the original short-based interface.
+  Suggested diff:
+  ```cpp
+  -    OFFICER::Add_Skill_Description_Help_Fields_(
+  -        static_cast<int16_t>(skill_id_base + 0x61),
+  -        static_cast<int16_t>(skill_count_minus_one + 1),
+  -        static_cast<uint32_t>(MOX::_PLAYER_NUM),
+  -        static_cast<int16_t>(popup_param),
+  -        reinterpret_cast<int16_t*>(OFFICER::_officer_skill_help));
+  +    OFFICER::Add_Skill_Description_Help_Fields_(
+  +        skill_id_base + 0x61,
+  +        skill_count_minus_one + 1,
+  +        (uint16_t)MOX::_PLAYER_NUM,
+  +        popup_param,
+  +        (int16_t*)OFFICER::_officer_skill_help);
+  ```
+
+- Potential restoration-style issue: passing `_officer_skill_help` via `reinterpret_cast<int16_t*>` is unnecessary and should be expressed in C-style form per project conventions. Not a behavioral mismatch by itself, but it contributes to source-type ambiguity in a function this small.
+  Suggested diff:
+  ```cpp
+  -        reinterpret_cast<int16_t*>(OFFICER::_officer_skill_help));
+  +        (int16_t*)OFFICER::_officer_skill_help);
+  ```
+
+fail
+
+---------------------------------------
+00442950 OFFICER::N_Fleet_Officers_Owned_By_Player_
+
+fail
+
+- The implementation narrows the parameter comparison to `int8_t`, while the assembly compares a sign-extended byte `player_index` against the full 16-bit input parameter in `SI`. Current code:
+  ```cpp
+  if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == 0) {
+  ```
+  Assembly:
+  - `MOVSX DX, byte ptr [ECX + 0x3a]`
+  - `CMP DX, SI`
+
+  Minimal suggested diff:
+  ```diff
+  - if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == 0) {
+  + if ((int16_t)MOX::_leaders[i].player_index == player_index && MOX::_leaders[i].type == 0) {
+  ```
+
+- Because of that cast, out-of-range 16-bit inputs do not preserve original behavior. Example: input `0x00FF` compares as `255` in assembly after sign semantics on the stored byte side, but current code converts the parameter to `-1` before comparison. This is a real control-flow discrepancy, not cosmetic.
+
+---------------------------------------
+00442CD0 OFFICER::Generate_Random_Officer_
+
+fail
+
+Discrepancies:
+- `officer_for_hire` is typed as `char`, but the assembly relies on a signed 8-bit comparison (`MOV DL, [..]; CMP DL,0xFF; JLE`), i.e. `-1` sentinel semantics. With plain `char`, behavior is implementation-defined on platforms where `char` is unsigned, which changes the branch and breaks correctness.
+  Suggested diff:
+  ```diff
+  -    char officer_for_hire;
+  +    int8_t officer_for_hire;
+  ```
+
+- The function writes `static_cast<int8_t>(leader_index)` into `officer_for_hire` and then tests `> -1`. That cast is compensating for the field being typed incorrectly rather than reflecting the real source type. Per the binary, the stored field itself is signed 8-bit.
+  Suggested diff:
+  ```diff
+  -        MOX::_player[player_index].officer_for_hire = static_cast<int8_t>(leader_index);
+  +        MOX::_player[player_index].officer_for_hire = leader_index;
+  ```
+
+- Related initialization also uses a casted `char` sentinel instead of the natural signed 8-bit `-1`, again indicating the field type mismatch propagates into nearby code.
+  Suggested diff:
+  ```diff
+  -        player.officer_for_hire = static_cast<char>(0xFF);
+  +        player.officer_for_hire = -1;
+  ```
+
+---------------------------------------
