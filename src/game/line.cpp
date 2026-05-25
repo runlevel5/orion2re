@@ -2,7 +2,9 @@
 
 namespace line {
 
-    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t offset) {
+    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int32_t offset) {
+        int16_t color_index = (int16_t)offset;
+
         if (animate::_clipping_flag == 1) {
             if (line::Clip_Line_(&x1, &y1, &x2, &y2) == 1) {
                 return;
@@ -29,8 +31,8 @@ namespace line {
         if (abs_dx == 0) {
             int16_t count = dy + 1;
             while (count > 0) {
-                *local_ptr = colors->colors[offset & 7];
-                offset++;
+                *local_ptr = colors->colors[color_index & 7];
+                color_index++;
                 local_ptr += g_screen_res_x;
                 count--;
             }
@@ -45,8 +47,8 @@ namespace line {
         if (dy == 0) {
             int16_t count = abs_dx + 1;
             while (count > 0) {
-                *local_ptr = colors->colors[offset & 7];
-                offset++;
+                *local_ptr = colors->colors[color_index & 7];
+                color_index++;
                 local_ptr += x_dir;
                 count--;
             }
@@ -62,8 +64,8 @@ namespace line {
         if (abs_dx == dy) {
             int16_t count = abs_dx + 1;
             while (count > 0) {
-                *local_ptr = colors->colors[offset & 7];
-                offset++;
+                *local_ptr = colors->colors[color_index & 7];
+                color_index++;
                 local_ptr += g_screen_res_x + x_dir;
                 count--;
             }
@@ -95,7 +97,7 @@ namespace line {
                 err += dy;
             }
 
-            line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, first_run_adj, colors, &offset);
+            line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, first_run_adj, colors, &color_index);
 
             if (video::screen_refresh_flag >= 2) {
                 if (x_dir > 0) {
@@ -116,7 +118,7 @@ namespace line {
                     run++;
                     err -= 2 * dy;
                 }
-                line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, run, colors, &offset);
+                line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, run, colors, &color_index);
 
                 if (video::screen_refresh_flag >= 2) {
                     if (x_dir > 0) {
@@ -130,7 +132,7 @@ namespace line {
                 }
             }
 
-            line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, first_run, colors, &offset);
+            line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, first_run, colors, &color_index);
 
             if (video::screen_refresh_flag >= 2) {
                 if (x_dir > 0) {
@@ -153,7 +155,7 @@ namespace line {
                 err += abs_dx;
             }
 
-            line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, first_run_adj, colors, &offset);
+            line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, first_run_adj, colors, &color_index);
 
             if (video::screen_refresh_flag >= 2) {
                 for (int16_t i = 0; i < first_run_adj; i++) {
@@ -171,7 +173,7 @@ namespace line {
                     run++;
                     err -= 2 * abs_dx;
                 }
-                line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, run, colors, &offset);
+                line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, run, colors, &color_index);
 
                 if (video::screen_refresh_flag >= 2) {
                     for (int16_t j = 0; j < run; j++) {
@@ -182,7 +184,7 @@ namespace line {
                 }
             }
 
-            line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, first_run, colors, &offset);
+            line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, first_run, colors, &color_index);
 
             if (video::screen_refresh_flag >= 2) {
                 for (int16_t i = 0; i < first_run; i++) {

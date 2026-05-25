@@ -70,37 +70,36 @@ namespace SHIPS {
         }
     }
 
-    int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, int16_t owner) {
+    int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, uint8_t owner) {
         s_ship_design design;
-        uint8_t ship_owner = (uint8_t)owner;
 
         switch (type) {
         case 9 /* Guardian */:
             INITSHIP::Load_Guardian_Ship_Design_(&design);
             break;
         case 10 /* Amoeba */:
-            INITSHIP::Load_Amoeba_Ship_Design_(&design, ship_owner);
+            INITSHIP::Load_Amoeba_Ship_Design_(&design, owner);
             break;
         case 11 /* Crystal */:
-            INITSHIP::Load_Crystal_Ship_Design_(&design, ship_owner);
+            INITSHIP::Load_Crystal_Ship_Design_(&design, owner);
             break;
         case 12 /* Dragon */:
-            INITSHIP::Load_Dragon_Ship_Design_(&design, ship_owner);
+            INITSHIP::Load_Dragon_Ship_Design_(&design, owner);
             break;
         case 13 /* Eel */:
-            INITSHIP::Load_Eel_Ship_Design_(&design, ship_owner);
+            INITSHIP::Load_Eel_Ship_Design_(&design, owner);
             break;
         case 14 /* Hydra */:
-            INITSHIP::Load_Hydra_Ship_Design_(&design, ship_owner);
+            INITSHIP::Load_Hydra_Ship_Design_(&design, owner);
             break;
         default:
             return -1;
         }
 
-        int16_t ship_idx = Set_Nonplayer_Ship_XY_(system_idx, type, &design, ship_owner);
+        int16_t ship_idx = Set_Nonplayer_Ship_XY_(system_idx, type, &design, owner);
 
         if (ship_idx > -1) {
-            Set_Nonplayer_Ship_Destination_(system_idx, ship_idx, ship_owner);
+            Set_Nonplayer_Ship_Destination_(system_idx, ship_idx, owner);
         }
 
         return ship_idx;
@@ -274,7 +273,7 @@ namespace SHIPS {
     }
 
     void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t phase) {
-        int16_t inv_phase = 7 - phase;
+        int32_t inv_phase = 7 - phase;
         if (inv_phase <= 0) {
             inv_phase = 0;
         }
@@ -349,13 +348,13 @@ namespace SHIPS {
     /**
      * @address 0041fef0
      */
-    void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, int8_t* width, int8_t* height) {
+    void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, uint8_t* width, uint8_t* height) {
         s_animation_header* anim;
 
         anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int)zoom_level + 0xCD, MOX::_global_cache_seg);
 
-        *width = (int8_t)animate::Get_Width_(anim);
-        *height = (int8_t)animate::Get_Height_(anim);
+        *width = (uint8_t)animate::Get_Width_(anim);
+        *height = (uint8_t)animate::Get_Height_(anim);
     }
 
     /**
@@ -548,20 +547,20 @@ namespace SHIPS {
         int16_t ship_id = HACCESS::Ship_Icon_Ship_Id_(icon_id);
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
 
-        int8_t* width_ptr = &MOX::_ship_icon_width[zoom_level];
-        int8_t* height_ptr = &MOX::_ship_icon_height[zoom_level];
+        uint8_t* width_ptr = &MOX::_ship_icon_width[zoom_level];
+        uint8_t* height_ptr = &MOX::_ship_icon_height[zoom_level];
 
         SHIPS::Get_Ship_Icon_Dimensions_(zoom_level, width_ptr, height_ptr);
 
         // s_ship_data size is 129 (0x81)
         s_ship_data* ship = &MOX::_ship[ship_id];
 
-        int16_t base_x = (int16_t)(ship->x - MOX::_cur_map_x);
+        int16_t base_x = ship->x - MOX::_cur_map_x;
         int16_t scaled_x = HAROLD::Get_Scaled_Value_(base_x);
         // icon_width is shifted right by 1 to center the icon (division by 2)
         *x = (scaled_x - (int16_t)(*width_ptr >> 1)) + 21 /* 0x15 */;
 
-        int16_t base_y = (int16_t)(ship->y - MOX::_cur_map_y);
+        int16_t base_y = ship->y - MOX::_cur_map_y;
         int16_t scaled_y = HAROLD::Get_Scaled_Value_(base_y);
         // icon_height is shifted right by 1 to center the icon (division by 2)
         *y = (scaled_y - (int16_t)(*height_ptr >> 1)) + 21 /* 0x15 */;

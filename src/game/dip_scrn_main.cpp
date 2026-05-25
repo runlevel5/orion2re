@@ -865,7 +865,7 @@ namespace DIP_SCRN {
      * @param planet_indices Output: Array of indices for the planets owned by the player.
      * @return The player index if colonies exist, otherwise the original star owner.
      */
-    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, int8_t* planet_indices) {
+    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, uint8_t* planet_indices) {
         *artemis_planet_idx = -1;
         *owned_count = 0;
 
@@ -880,7 +880,7 @@ namespace DIP_SCRN {
                     if (colony_idx != -1) {
                         s_colony* colony = &MOX::_colony[colony_idx];
                         if (colony->owner == (int8_t)player_idx) {
-                            planet_indices[*owned_count] = (int8_t)planet_idx;
+                            planet_indices[*owned_count] = (uint8_t)planet_idx;
 
                             // Check for Artemis Net (building 9)
                             if (colony->buildings[9] != 0) {

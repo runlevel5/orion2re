@@ -83,15 +83,15 @@ namespace INITSHIP {
 
     void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design);
 
-    void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large);
+    void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large);
 
-    void __cdecl Load_Crystal_Ship_Design_(s_ship_design* design, int16_t variant);
+    void __cdecl Load_Crystal_Ship_Design_(s_ship_design* design, uint8_t variant);
 
-    void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster);
+    void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster);
 
-    void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel);
+    void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel);
 
-    void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster);
+    void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster);
 
     void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design);
 

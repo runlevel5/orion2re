@@ -111,7 +111,9 @@ namespace EVANHELP {
     }
 
     void __cdecl Set_Null_Modem_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset) {
-        memcpy(&_null_modem_setup_screen_help_list, &_static_null_modem_setup_screen_help_list, 40);
+        memcpy(_null_modem_setup_screen_help_list,
+               _static_null_modem_setup_screen_help_list,
+               sizeof(_static_null_modem_setup_screen_help_list));
         Offset_Help_Field_XYs_(_null_modem_setup_screen_help_list, 4, x_offset, y_offset);
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_null_modem_setup_screen_help_list, 4);
     }
@@ -305,13 +307,12 @@ namespace EVANHELP {
             4);
     }
 
-    void __cdecl Append_Help_List_(s_help_box* help_list, int16_t* list_count, int32_t unused, int16_t help_id, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-        int16_t count = *list_count;
-        help_list[count].help_id = help_id;
-        help_list[count].x1 = x1;
-        help_list[count].y1 = y1;
-        help_list[count].x2 = x2;
-        help_list[count].y2 = y2;
-        *list_count = count + 1;
+    void __cdecl Append_Help_List_(s_help_box* help_list, int16_t* list_count, int32_t, int16_t help_id, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        help_list[*list_count].help_id = help_id;
+        help_list[*list_count].x1 = x1;
+        help_list[*list_count].y1 = y1;
+        help_list[*list_count].x2 = x2;
+        help_list[*list_count].y2 = y2;
+        ++*list_count;
     }
 }

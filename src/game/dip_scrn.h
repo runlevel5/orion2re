@@ -294,7 +294,7 @@ namespace DIP_SCRN {
 
     void __cdecl Start_Diplomacy_Music_(int16_t music_type);
 
-    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, int8_t* planet_indices);
+    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, uint8_t* planet_indices);
 
     void __cdecl Diplomacy_Generic_System_List_Draw_();
 }

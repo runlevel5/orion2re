@@ -721,8 +721,8 @@ namespace MOX {
     inline s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4A9C});
     inline uint16_t& _skip_fields = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B5A});
 
-    inline int8_t (&_ship_icon_width)[4] = *reinterpret_cast<int8_t(*)[4]>(std::uintptr_t{0x005a49ec});
-    inline int8_t (&_ship_icon_height)[4] = *reinterpret_cast<int8_t(*)[4]>(std::uintptr_t{0x0059c460});
+    inline uint8_t (&_ship_icon_width)[4] = *reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x005a49ec});
+    inline uint8_t (&_ship_icon_height)[4] = *reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x0059c460});
     inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059c440});
 
     inline s_star_data*& _star =

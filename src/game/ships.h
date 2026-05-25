@@ -8,7 +8,7 @@ struct s_ship_icon;
 struct s_colors;
 
 namespace SHIPS {
-    int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, int16_t owner);
+    int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, uint8_t owner);
 
     void __cdecl Build_Ship_Icons_();
 
@@ -24,7 +24,7 @@ namespace SHIPS {
 
     void __cdecl Get_XYs_For_Orbiting_Ships_(int16_t star_idx, int16_t ship_icon_idx, int16_t* out_x1, int16_t* out_y1, int16_t* out_x2, int16_t* out_y2, int16_t* out_arr_x, int16_t* out_arr_y);
 
-    void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, int8_t* width, int8_t* height);
+    void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, uint8_t* width, uint8_t* height);
 
     s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t ship_type_idx, uint8_t is_highlighted);
 

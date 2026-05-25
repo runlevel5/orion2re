@@ -1,216 +1,5 @@
 Findings:
 
-00419E70 DIP_SCRN::Diplomacy_System_Scan_
-
-- `planet_indices` element type is wrong for the actual store width/semantics. The assembly writes a raw planet index byte (`MOV byte ptr [EBP + EDX],BL`), while the function takes `int8_t*` and writes `(int8_t)planet_idx`. That can turn valid planet IDs >= 128 negative and changes later consumers’ semantics.
-  Suggested diff:
-  ```diff
-  - int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, int8_t* planet_indices) {
-  + int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, uint8_t* planet_indices) {
-  ...
-  -     planet_indices[*owned_count] = (int8_t)planet_idx;
-  +     planet_indices[*owned_count] = (uint8_t)planet_idx;
-  ```
-- Declaration/use sites are inconsistent with the actual unsigned-byte data flow. `_diplomacy_system_planet_list` is already `uint8_t*`, but callers cast it to `int8_t*` to satisfy the current signature. That is a type mismatch around an externally stored byte array.
-  Suggested diff:
-  ```diff
-  - if (DIP_SCRN::Diplomacy_System_Scan_(..., (int8_t*)DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
-  + if (DIP_SCRN::Diplomacy_System_Scan_(..., DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
-  ```
-- The current implementation relies on `MOX::_star[star_idx]` indexing using the restored struct, but the supplied type data labels offset `0x38` as a single `byte has_colony` while the assembly clearly treats it as a per-player bitfield (`SHR DL,CL` / `TEST DL,1`). This is a project type discrepancy that directly affects validation confidence for this function and its callers.
-  Suggested diff:
-  ```diff
-  - byte has_colony;
-  + uint8_t has_colony; /* bitmask: bit N => player N has colony in system */
-  ```
-
-fail
----------------------------------------
-0041b290 DIP_SCRN::An_
-
-- Returns the wrong pointers. The binary returns globals at 0x00552414 (`s_a`) and 0x00552418 (`s_an`), but the implementation returns local static arrays. That changes pointer identity and observable memory addresses.
-  Suggested diff:
-  ```cpp
-  -        static char s_a_local[] = "a";
-  -        static char s_an_local[] = "an";
-  ...
-  -            return s_an_local;
-  +            return s_an;
-  ...
-  -        return s_a_local;
-  +        return s_a;
-  ```
-
-- The function uses undeclared replacement storage instead of the recovered data symbols explicitly referenced by the disassembly. This is a concrete mismatch in memory access behavior even though string contents match.
-  Suggested diff:
-  ```cpp
-  -        if (MOX::_settings.language != 0) {
-  -            return const_cast<char*>(s__00551100);
-  -        }
-  +        if (MOX::_settings.language != 0) {
-  +            return const_cast<char*>(s__00551100);
-  +        }
-  +        // Use fixed globals for articles:
-  +        // s_a  @ 0x00552414
-  +        // s_an @ 0x00552418
-  ```
-
-fail
----------------------------------------
-0041E3C0 EVANHELP::Set_Null_Modem_Setup_Screen_Help_List_
-
-- Global type is wrong for the source copy buffer. `_static_null_modem_setup_screen_help_list` is declared as `uint32_t&`, but the function copies 40 bytes from `0x00552C50` with `rep movsd`, i.e. a contiguous block of 4 `s_help_box` entries. The current declaration hides the true object extent and makes the `memcpy` source expression type-invalid semantically.
-  Suggested diff:
-  ```cpp
-  - inline uint32_t& _static_null_modem_setup_screen_help_list =
-  -     *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00552C50 });
-  + inline s_help_box (&_static_null_modem_setup_screen_help_list)[4] =
-  +     *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{ 0x00552C50 });
-  ```
-
-- The implementation uses a hardcoded byte count `40` instead of expressing the copied object size from the actual source object. This currently works only because the list is 4×10 bytes, but with the wrong source type above it obscures the true memory access pattern from the assembly.
-  Suggested diff:
-  ```cpp
-  - memcpy(&_null_modem_setup_screen_help_list, &_static_null_modem_setup_screen_help_list, 40);
-  + memcpy(_null_modem_setup_screen_help_list,
-  +        _static_null_modem_setup_screen_help_list,
-  +        sizeof(_static_null_modem_setup_screen_help_list));
-  ```
-
-fail
----------------------------------------
-0041E490 EVANHELP::Append_Help_List_
-
-- Disassembly shows the third stack argument is completely unused, but the current implementation names and types it as `int32_t unused`. That is acceptable by itself; however, the function body introduces a local cached copy of `*list_count`, which changes the observable memory access pattern from the original repeated reloads of `word ptr [EDX]` before every store. With reverse-engineering validation rules requiring memory-access fidelity, this is not a precise match.
-  Suggested diff:
-  ```cpp
-  void __cdecl Append_Help_List_(s_help_box* help_list, int16_t* list_count, int32_t, int16_t help_id, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-      help_list[*list_count].help_id = help_id;
-      help_list[*list_count].x1 = x1;
-      help_list[*list_count].y1 = y1;
-      help_list[*list_count].x2 = x2;
-      help_list[*list_count].y2 = y2;
-      ++*list_count;
-  }
-  ```
-
-- The original uses `MOVSX` on `*list_count` for each index computation, so the index is explicitly sign-extended from `int16_t` every time. The local `count` temporary is fine only if it is guaranteed to stay `int16_t`; otherwise this can silently drift in future edits. The current form is less exact than the assembly and should be rewritten directly in terms of `*list_count`.
-  Suggested diff:
-  ```cpp
-  -    int16_t count = *list_count;
-  -    help_list[count].help_id = help_id;
-  +    help_list[*list_count].help_id = help_id;
-  ```
-
-- There is uncertainty around the decompiler’s extra `param_3` / current `unused` parameter versus the real intended prototype. The assembly proves an 8-argument cdecl with one dead 32-bit parameter slot, but without matching original declaration context this remains an ABI-level ambiguity that should be resolved before considering the restoration exact.
-
-fail
----------------------------------------
-  ```cpp
-  -    int16_t count = *list_count;
-  -    help_list[count].help_id = help_id;
-  +    help_list[*list_count].help_id = help_id;
-  ```
-
-- There is uncertainty around the decompiler’s extra `param_3` / current `unused` parameter versus the real intended prototype. The assembly proves an 8-argument cdecl with one dead 32-bit parameter slot, but without matching original declaration context this remains an ABI-level ambiguity that should be resolved before considering the restoration exact.
-
-fail
----------------------------------------
-0041F150 SHIPS::Get_Ship_Icon_Coords_In_Space_
-
-fail
-
-Discrepancies:
-- `Get_Ship_Icon_Dimensions_` arguments are swapped in the implementation.
-  - Assembly pushes `ESI` then `EBX`, so callee receives `(zoom_level, width=&_ship_icon_width[zoom], height=&_ship_icon_height[zoom])`.
-  - Current code builds `width_ptr = &_ship_icon_width[zoom_level]`, `height_ptr = &_ship_icon_height[zoom_level]`, but then calls `Get_Ship_Icon_Dimensions_(zoom_level, width_ptr, height_ptr)`. Since `Get_Ship_Icon_Dimensions_` itself writes `*width` then `*height`, this is source-correct only if the formal parameter order is truly `(width,height)`. However the disassembly and Ghidra for this function use the opposite conceptual order in the call site, and nearby validated call sites consistently pass `&_ship_icon_width[...]` first only because the callee prototype in source may already be compensating. This function needs cross-check against 0041FEF0/call ABI before it can be validated with confidence.
-  - Minimal suggested diff snippet:
-    ```cpp
-    // verify callee prototype/implementation pair, then make call-site consistent
-    SHIPS::Get_Ship_Icon_Dimensions_(zoom_level, &MOX::_ship_icon_width[zoom_level], &MOX::_ship_icon_height[zoom_level]);
-    ```
-
-- Potential signedness mismatch in width/height halving.
-  - Assembly uses `MOV CL, byte ptr [EBX]` / `SHR CL,1`, i.e. zero-extended unsigned byte halved logically.
-  - Current code uses `(*width_ptr >> 1)` and `(*height_ptr >> 1)` on `int8_t`. If icon dimension ever exceeds 127, this becomes implementation-defined/sign-propagating and no longer matches `SHR` on an unsigned byte.
-  - Minimal suggested diff snippet:
-    ```cpp
-    *x = (scaled_x - (int16_t)((uint8_t)*width_ptr >> 1)) + 0x15;
-    *y = (scaled_y - (int16_t)((uint8_t)*height_ptr >> 1)) + 0x15;
-    ```
-
-- Unnecessary explicit narrowing casts obscure whether the subtraction is intentionally 16-bit.
-  - Assembly performs 16-bit `SUB AX, [cur_map_x]` / `SUB AX, [cur_map_y]` before scaling. Source uses `(int16_t)(ship->x - MOX::_cur_map_x)` and `(int16_t)(ship->y - MOX::_cur_map_y)`. This likely matches, but because explicit casts are a code smell under project rules, and because signed overflow/truncation behavior is being forced in source, this should be clarified before validation is accepted.
-  - Minimal suggested diff snippet:
-    ```cpp
-    int16_t base_x = ship->x - MOX::_cur_map_x;
-    int16_t base_y = ship->y - MOX::_cur_map_y;
-    ```
----------------------------------------
-0041F560 SHIPS::Draw_Directional_Multi_Colored_Line_
-
-- Discrepancy: `inv_phase` clamp condition is wrong. Assembly computes `7 - phase` in 32-bit signed arithmetic and clamps only when `<= 0`, preserving positive values above 0. Current code uses `int16_t inv_phase`; `7 - phase` can overflow/truncate for large negative `phase`, changing behavior before the clamp.
-  Suggested diff:
-  ```diff
-  -        int16_t inv_phase = 7 - phase;
-  +        int inv_phase = 7 - phase;
-           if (inv_phase <= 0) {
-               inv_phase = 0;
-           }
-  ```
-
-- Discrepancy: call-site type/width mismatch for the last argument to `line::Multi_Colored_Line_`. Assembly pushes a full 32-bit value for the non-reversed path from computed `ESI` and for the reversed path from the original stack slot, while the project prototype narrows it to `int16_t`. This makes the implementation not instruction-accurate for out-of-range inputs and hides the 32-bit signed clamp behavior seen in assembly.
-  Suggested diff:
-  ```diff
-  -    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t offset);
-  +    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int offset);
-  ```
-  and
-  ```diff
-  -    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t phase) {
-  +    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t phase) {
-           int inv_phase = 7 - phase;
-  ```
-
-- Discrepancy: related callee implementation uses `int16_t offset` and increments it repeatedly. The validated function’s correctness depends directly on that symbol, and current typing can alter masking/indexing semantics versus the 32-bit caller-visible behavior from assembly.
-  Suggested diff:
-  ```diff
-  -    void __cdecl Multi_Colored_Line_(..., int16_t offset) {
-  +    void __cdecl Multi_Colored_Line_(..., int offset) {
-  ```
-
-fail
----------------------------------------
-0x0041F940 SHIPS::Build_Nonplayer_Ship_
-
-fail
-
-Discrepancies:
-- Monster type mapping is shifted relative to the switch table. Assembly maps `10->Amoeba`, `11->Crystal`, `12->Dragon`, `13->Eel`, `14->Hydra`, but the current implementation labels and dispatches `10->Amoeba`, `11->Crystal`, `12->Dragon`, `13->Eel`, `14->Hydra` while project call sites/comments indicate `10 /* Space Eel */`, `11 /* Hydra */`, `12 /* Space Crystal */`, `13 /* Amoeba */`, `14 /* Dragon */`. This creates a concrete namespace-wide mismatch/uncertainty in semantic type IDs and likely wrong callers or comments around this function.
-  Suggested diff snippet:
-  ```cpp
-  // reconcile numeric IDs consistently across callers/comments and Build_Nonplayer_Ship_
-  SHIPS::Build_Nonplayer_Ship_(13 /* Amoeba */, ...);
-  SHIPS::Build_Nonplayer_Ship_(11 /* Crystal? or Hydra? */, ...);
-  // etc., matching the assembly jump table exactly
-  ```
-
-- Parameter 3 type is too wide in `Build_Nonplayer_Ship_`. Assembly only uses the low byte: it loads `BL` from the stack byte and passes that byte onward, with zero-extended low 8-bit value to the design loaders. Current signature takes `int16_t owner`, which obscures the true source type and permits invalid high-byte semantics.
-  Suggested diff snippet:
-  ```cpp
-  int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, uint8_t owner);
-  ```
-
-- Related loader parameter usage is semantically byte-sized in this caller, but headers use `int16_t` for the monster-variant flags. The assembly explicitly masks to 8 bits before calls. That should be reviewed before validation can pass, because the current typing may hide signedness/width mistakes in adjacent restored interfaces.
-  Suggested diff snippet:
-  ```cpp
-  void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large);
-  void __cdecl Load_Crystal_Ship_Design_(s_ship_design* design, uint8_t variant);
-  void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster);
-  void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel);
-  void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster);
-  ```
----------------------------------------
 0041FA50 — SHIPS::Set_Nonplayer_Ship_XY_
 
 fail
@@ -768,4 +557,33 @@ Discrepancies:
 - The sort comparison does not match the assembly’s unsigned byte-wise comparison. The binary uses the `strcmp`-style loop with `SBB` flags from unsigned byte compares; plain `strcmp` on platforms with signed `char` can order bytes ≥ `0x80` differently.
 - There is UB-prone type punning when reading the 32-bit record offset from LBX data via `reinterpret_cast<uint32_t*>(data + 80)`. Per project rules, explicit casts like this are suspicious; it also assumes alignment. The binary performs a plain 32-bit load from byte storage.
 - The auto-function assignment uses a hardcoded function address cast instead of the real symbol, which is unnecessary here and obscures validation of the intended callback.
+---------------------------------------
+0x00429F50 COLLAND::Print_Planet_Data_
+
+- Header symbol at 0x0055238C is typed incorrectly in `src/game/colland.h`. The disassembly uses `PUSH 0x55238c`, i.e. the literal address of the format string `"%s, %s"`, not an indirection through a pointer variable. Current code declares:
+  ```cpp
+  inline const char*& s_format_comma_space = *reinterpret_cast<const char**>(std::uintptr_t{0x0055238C});
+  ```
+  and then passes `s_format_comma_space` to `sprintf`. That dereferences bytes of the string as a pointer, which is semantically wrong and can crash / misread memory.
+
+  Minimal suggested diff:
+  ```diff
+  - inline const char*& s_format_comma_space = *reinterpret_cast<const char**>(std::uintptr_t{0x0055238C});
+  + inline const char* s_format_comma_space = reinterpret_cast<const char*>(std::uintptr_t{0x0055238C});
+  ```
+
+- Related type issue in the function body: because of the bad header type, this line currently inherits the wrong semantics:
+  ```cpp
+  fmt_size_climate = s_format_comma_space;
+  ```
+  It should use the raw string address, not a referenced pointer object.
+
+  Minimal suggested diff:
+  ```diff
+  - fmt_size_climate = s_format_comma_space;
+  + fmt_size_climate = s_format_comma_space;
+  ```
+  with the header fix above.
+
+The rest is close, but this addressing/type discrepancy is fundamental and prevents validation as an exact match.
 ---------------------------------------

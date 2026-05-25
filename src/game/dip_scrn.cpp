@@ -642,7 +642,7 @@ namespace DIP_SCRN {
                 if (scanned_input == exit_field_id) {
                     DIP_SCRN::_diplomacy_scan_input_flag = 1000;
                 } else if (scanned_input >= DIP_SCRN::_diplomacy_system_fields[1] && scanned_input <= DIP_SCRN::_diplomacy_system_fields[MOX::_NUM_STARS]) {
-                    if (DIP_SCRN::Diplomacy_System_Scan_(scanned_input - 1, giver_idx, &DIP_SCRN::_diplomacy_system_homeworld_flag, &DIP_SCRN::_diplomacy_system_planet_count, (int8_t*)DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
+                    if (DIP_SCRN::Diplomacy_System_Scan_(scanned_input - 1, giver_idx, &DIP_SCRN::_diplomacy_system_homeworld_flag, &DIP_SCRN::_diplomacy_system_planet_count, DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
                         MOX::_galaxy_map_scanned_star = scanned_input - 1;
                         DIP_SCRN::_diplomacy_system_population = COLCALC::Get_System_Population_(giver_idx, MOX::_galaxy_map_scanned_star);
                         JIM::Get_Text_Message_(DIP_SCRN::s_jimtext2_lbx, 0x38, DIP_SCRN::_system_million_colonists_buffer, 0x1E);
@@ -668,7 +668,7 @@ namespace DIP_SCRN {
                 for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                     if (done) break;
                     if (DIP_SCRN::_diplomacy_system_fields[i + 1] == input) {
-                        if (DIP_SCRN::Diplomacy_System_Scan_(input - 1, giver_idx, &DIP_SCRN::_diplomacy_system_homeworld_flag, &DIP_SCRN::_diplomacy_system_planet_count, (int8_t*)DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
+                        if (DIP_SCRN::Diplomacy_System_Scan_(input - 1, giver_idx, &DIP_SCRN::_diplomacy_system_homeworld_flag, &DIP_SCRN::_diplomacy_system_planet_count, DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
                             if (COLCALC::May_Surrender_Star_(input - 1, (int16_t)DIP_SCRN::_diplomacy_system_giver, (int16_t)DIP_SCRN::_diplomacy_system_receiver)) {
                                 if (DIP_SCRN::_diplomacy_system_homeworld_flag == -1) {
                                     done = true;
@@ -2020,9 +2020,6 @@ namespace DIP_SCRN {
     }
 
     char* __cdecl An_(char* text) {
-        static char s_a_local[] = "a";
-        static char s_an_local[] = "an";
-
         if (MOX::_settings.language != 0) {
             return const_cast<char*>(s__00551100);
         }
@@ -2035,10 +2032,10 @@ namespace DIP_SCRN {
             first_char == 'I' || first_char == 'i' ||
             first_char == 'O' || first_char == 'o' ||
             first_char == 'U' || first_char == 'u') {
-            return s_an_local;
+            return s_an;
         }
 
-        return s_a_local;
+        return s_a;
     }
 
     void __cdecl Diplomacy_Give_In_To_Demand_(int16_t asking_player_idx, int16_t giving_player_idx, int16_t demand_type, int16_t demand_data) {
@@ -2199,7 +2196,7 @@ namespace DIP_SCRN {
         _diplomacy_system_giver = (uint8_t)giver_player_idx;
         _diplomacy_system_receiver = (uint8_t)receiver_player_idx;
 
-        Diplomacy_System_Scan_(star_idx, giver_player_idx, &_diplomacy_system_homeworld_flag, &_diplomacy_system_planet_count, (int8_t*)_diplomacy_system_planet_list);
+        Diplomacy_System_Scan_(star_idx, giver_player_idx, &_diplomacy_system_homeworld_flag, &_diplomacy_system_planet_count, _diplomacy_system_planet_list);
         
         _diplomacy_system_population = COLCALC::Get_System_Population_(giver_player_idx, star_idx);
         
@@ -2283,7 +2280,7 @@ namespace DIP_SCRN {
 
                 sprintf(text_buffer, "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
 
-                if (planet_idx == (uint8_t)selected_planet_idx) {
+                if ((int16_t)planet_idx == selected_planet_idx) {
                     strcat(text_buffer, DIP_SCRN::_system_homeworld_buffer);
                 }
 

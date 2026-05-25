@@ -7,7 +7,7 @@ namespace line {
     inline int32_t& g_screen_res_x =
         *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
 
-    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t offset);
+    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int32_t offset);
 
     int16_t __cdecl Clip_Line_(int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2);
 

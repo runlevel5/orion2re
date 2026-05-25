@@ -4,8 +4,8 @@ namespace EVANHELP {
     inline s_help_box(&_main_screen_help_list)[25] =
         *reinterpret_cast<s_help_box(*)[25]>(std::uintptr_t{ 0x00552428 });
 
-    inline uint32_t& _static_null_modem_setup_screen_help_list =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00552C50 });
+    inline s_help_box (&_static_null_modem_setup_screen_help_list)[4] =
+        *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{ 0x00552C50 });
 
     inline s_help_box(&_null_modem_setup_screen_help_list)[4] =
         *reinterpret_cast<s_help_box(*)[4]>(std::uintptr_t{ 0x005649D8 });

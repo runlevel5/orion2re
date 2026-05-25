@@ -2061,7 +2061,7 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
     design->previous_owner = 9;
 }
 
-void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large) {
+void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
     strcpy(design->name, MOX::_race_names[15]);
 
@@ -2112,7 +2112,7 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large) {
 }
 
 // Suggested name: INITSHIP::Load_Crystal_Ship_Design_
-void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
+void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
     struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
     
     // Copy "Crystal" or specific race name from the race names array
@@ -2170,7 +2170,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
     design->cost = 0;
 }
 
-void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster) {
+void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
     strcpy(design->name, MOX::_race_names[17]);
 
@@ -2236,7 +2236,7 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster)
  * @param design The ship design structure to populate.
  * @param is_greater_eel If non-zero, loads Greater Eel design; otherwise, Young/Small Eel.
  */
-void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel) {
+void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
 
     // MOX::_race_names[18] is the design name for Eels
@@ -2289,7 +2289,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel
     design->cost = 0;
 }
 
-void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster) {
+void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
 
     strcpy(design->name, MOX::_race_names[19]);
