@@ -972,8 +972,7 @@ namespace HAROLD {
             return 1;
         }
 
-        int16_t local_2;
-        return local_2;
+        return 0;
     }
 
     /**

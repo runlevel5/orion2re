@@ -3063,7 +3063,6 @@ skip_cursor:
 
     void __cdecl Combat_Draw_View_Ship_(void) {
         char message_text[0x50];
-        char number_text[0x10];
         char line_text[0x100];
         char quantity_text[0x100];
         char arc_text[0x50];

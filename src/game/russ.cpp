@@ -4,7 +4,7 @@ namespace RUSS {
     void __cdecl Assert_Settings_() {
     }
 
-    int16_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int16_t count) {
+    int8_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int16_t count) {
         uint32_t total_weight = 0;
         for (int16_t i = 0; i < count; ++i) {
             total_weight += weights[i];
@@ -25,7 +25,7 @@ namespace RUSS {
             } while (weights[index] < r);
         }
 
-        return index;
+        return (int8_t)index;
     }
 
     int16_t __cdecl Get_Weighted_Choice_Short_(const uint16_t* weights, int16_t count) {

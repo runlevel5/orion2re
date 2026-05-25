@@ -36,15 +36,15 @@ void __cdecl Setup_Input_Box_Popup_() {
     int16_t animate_width = animate::Get_Width_(_input_box.bg);
     animate::Get_Height_(_input_box.bg);
     
-    if (_input_box.show_cancel_anim == 0) {
-        animate::Draw_(_input_box.x, _input_box.y, _input_box.bg);
-        _input_box.colors2 = _input_box.font_colors;
-    } else {
+    if (_input_box.show_cancel_anim != 0) {
         remap::Calculate_Picture_Remap_Colors_(_input_box.bg);
         remap::Calculate_Picture_Remap_Colors_(_input_box.pic);
         animate::Remap_Draw_(_input_box.x, _input_box.y, _input_box.bg);
         animate::Reset_Animation_Frame_(_input_box.pic);
         animate::Remap_Draw_(_input_box.cancel_x, _input_box.cancel_y, _input_box.pic);
+    } else {
+        animate::Draw_(_input_box.x, _input_box.y, _input_box.bg);
+        _input_box.colors2 = _input_box.font_colors;
     }
     
     MISC::Set_Fitted_Font_Style_(_input_box.prompt_text, &_input_box.font_colors, 4, 2, 0, animate_width - 54, 1);
@@ -74,7 +74,7 @@ void __cdecl Setup_Input_Box_Popup_() {
     int16_t font_height = fonts::Get_Font_Height_();
     
     int16_t text_x = _input_box.x + (animate_width - string_width) / 2;
-    int16_t text_y = _input_box.prompt_y + (_input_box.bg_width - font_height) / 2;
+    int16_t text_y = _input_box.y + (_input_box.bg_height - font_height) / 2;
     
     fonts::Print_(text_x, text_y, _input_box.prompt_text);
     
@@ -316,14 +316,14 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
         _input_box.prompt_text[59] = '\0';
     }
 
-    _input_box.bg_width = 0x36;
+    _input_box.bg_height = 0x36;
     _input_box.input_type = input_type;
     _input_box.prompt_y = y + 3;
     _input_box.show_cancel_anim = show_cancel_anim;
-    _input_box.cancel_x = x + 100;
-    _input_box.cancel_y = y + 0x60;
-    _input_box.input_y = y + 0x22;
-    _input_box.input_x = x + 0x36;
+    _input_box.cancel_x = x + 0x60;
+    _input_box.cancel_y = y + 0x64;
+    _input_box.input_x = x + 0x22;
+    _input_box.input_y = y + 0x36;
 
     if (max_length == 0) {
         _input_box.max_input_length = 205;
@@ -362,8 +362,8 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     Setup_Input_Box_Popup_();
 
     int8_t status = 1;
-    int action = 0;
-    int bp_counter = 1;
+    int16_t action = 0;
+    int16_t bp_counter = 1;
 
     do {
         action = 0;

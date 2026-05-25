@@ -283,6 +283,10 @@ typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
 typedef short int16_t;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#endif
 struct s_animation_header {
     int16_t width;
     int16_t height;
@@ -293,6 +297,9 @@ struct s_animation_header {
     undefined1 flags;
     uint32_t frame_offsets[0];
 };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
 
@@ -2271,13 +2278,13 @@ struct s_input_box_state {
     struct s_colors font_colors;
     struct s_colors colors2;
     char prompt_text[60];
-    int16_t bg_width;
-    uint8_t show_cancel_anim;
-    int16_t cancel_x;
+    int16_t bg_height;
+    int8_t show_cancel_anim;
     int16_t prompt_y;
+    int16_t cancel_x;
     int16_t cancel_y;
-    int16_t input_y;
     int16_t input_x;
+    int16_t input_y;
     int16_t x;
     int16_t y;
     int16_t input_type;

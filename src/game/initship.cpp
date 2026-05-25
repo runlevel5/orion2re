@@ -1982,7 +1982,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 
     ship->crew_quality = 3;
     ship->officer_idx = -1;
-    ship->marine_count = TECHDATA::_hull_data[ship->size_class].marines;
+    ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = 6;
 
     int16_t abs_pct = TECHDATA::_armor[ship->armor_type].ships_bonus;

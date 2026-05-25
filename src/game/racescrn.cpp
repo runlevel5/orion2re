@@ -477,10 +477,10 @@ namespace RACESCRN {
             if (display->agent_mission_idx > 0) {
                 BILL::Set_My_Spy_Mission_(display->player_idx, display->agent_mission_idx - 1);
             }
-            BILL::Set_My_Spy_Number_(display->player_idx, display->spy_icons_group.count);
+            BILL::Set_My_Spy_Number_(display->player_idx, (uint8_t)display->spy_icons_group.count);
         }
 
-        BILL::Set_My_Agent_Number_(RACESCRN::_g_agent_group_p->count);
+        BILL::Set_My_Agent_Number_((uint8_t)RACESCRN::_g_agent_group_p->count);
     }
 
     void __cdecl Draw_Race_Screen_() {
@@ -876,7 +876,7 @@ namespace RACESCRN {
                             if (MOX::_player[target_player_idx].objectives != 100) {
                                 _net_state = 1;
                                 net_cancel_requested = 0;
-                                NETMOX::Net_Request_AI_Diplomacy_(target_player_idx);
+                                NETMOX::Net_Request_AI_Diplomacy_((uint8_t)target_player_idx);
                                 if (NETMOX::Net_May_Begin_AI_Diplomacy_() == 0) {
                                     if (net_cancel_requested == 0) {
                                         if (NETMOX::No_AI_Diplomacy_Allowed_() == 0) {

@@ -82,7 +82,7 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
 
         if (bonuses->officer_bonus > 0) {
             // Accessing the low byte of the officer short field
-            bonuses->officer_idx = colony->officer;
+            bonuses->officer_idx = (int8_t)colony->officer;
         }
     }
 }
@@ -396,7 +396,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         chance *= 2;
     }
 
-    if (random::Random_(1000) <= chance) {
+    if ((int32_t)random::Random_(1000) <= chance) {
         int rebel_count = random::Random_(total_rebel_pop);
         s_invasion_side_info local_70;
         s_invasion_side_info local_38;
@@ -551,7 +551,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
             if (colony->buildings[i] != 0) {
                 int16_t tech_app = TECHDATA::_buildings[i].tech_app;
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[new_owner_idx], tech_app)) {
-                    if (random::Random_(1000) <= (chance_base / (captured_count + 1))) {
+                    if ((int32_t)random::Random_(1000) <= (chance_base / (captured_count + 1))) {
                         captured_techs[captured_count] = tech_app;
                         captured_count++;
                         COLCALC::Player_Gets_Tech_App_(&MOX::_player[new_owner_idx], tech_app);
@@ -584,7 +584,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
             int32_t n_tries = (uint8_t)colony->n_pops;
             while (n_tries > 0 && captured_count < 4) {
-                if (random::Random_(1000) <= (chance_random / (captured_count + 1))) {
+                if ((int32_t)random::Random_(1000) <= (chance_random / (captured_count + 1))) {
                     int16_t tech_id = RUSS::Get_Weighted_Choice_Short_(weights, 204);
                     if (tech_id == -1) {
                         n_tries = 0; // No more techs to capture

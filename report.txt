@@ -1,538 +1,5 @@
 Findings:
 
-00411710 NAMESTAR::Input_Box_Popup_
-
-Fail:
-- `_input_box` struct layout in `src/game/orion2.h` does not match the supplied layout. `cancel_x` and `prompt_y` are swapped, so this function writes to the wrong fields semantically. The source happens to compensate locally, but the global type is still incorrect and will mislead/affect related code.
-  ```diff
-  struct s_input_box_state {
-      ...
-      uint8_t show_cancel_anim;
-  -   int16_t cancel_x;
-      int16_t prompt_y;
-  +   int16_t cancel_x;
-      int16_t cancel_y;
-      ...
-  };
-  ```
-
-- Header parameter order does not match the validated calling convention from the disassembly context. The binary uses `(input_text, input_type, max_length, prompt_text, y, x, show_cancel_anim)` at stack offsets, while the project declares `(…, x, y, …)`. The implementation compensates internally, but the public prototype is misleading and unsafe for validation across callers.
-  ```diff
-  -int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim);
-  +int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x, int8_t show_cancel_anim);
-  ```
-
-- The implementation uses plain `int` locals for state/control variables (`action`, `bp_counter`) where the binary uses 16-bit registers (`BX`, `BP`). This is not proven harmful here, but it is a type drift from the actual function and adds uncertainty in a restoration task that requires precise calling/data behavior.
-  ```diff
-  -    int action = 0;
-  -    int bp_counter = 1;
-  +    int16_t action = 0;
-  +    int16_t bp_counter = 1;
-  ```
-
-- There is nearby type confusion already visible from the mismatched `_input_box` layout, so validating this implementation as “matches well enough” would be unsafe without first correcting the underlying packed structure definition and prototype.
-
-fail
----------------------------------------
-
-00411AA0 NAMESTAR::Setup_Input_Box_Popup_
-
-fail
-
-Discrepancies:
-- `s_input_box_state` field order in project does not match the binary layout used by this function.
-  - Assembly accesses:
-    - `0x56` = `show_cancel_anim`
-    - `0x57` = `prompt_y`
-    - `0x59` = `cancel_y`
-    - `0x5B` = `cancel_x`
-    - `0x5D` = `input_y`
-    - `0x5F` = `input_x`
-  - Project `orion2.h` defines `0x57` as `cancel_x` and shifts the rest, so all member-based accesses in this function are wrong relative to the binary.
-  - Minimal suggested diff:
-    ```cpp
-    struct s_input_box_state {
-        s_animation_header* pic;
-        s_animation_header* bg;
-        s_colors font_colors;
-        s_colors colors2;
-        char prompt_text[60];
-        int16_t bg_width;
-        uint8_t show_cancel_anim;
-        int16_t prompt_y;
-        int16_t cancel_y;
-        int16_t cancel_x;
-        int16_t input_y;
-        int16_t input_x;
-        ...
-    };
-    ```
-
-- Because of the bad struct layout, this function’s argument ordering at several calls is effectively reversed from the binary.
-  - `animate::Remap_Draw_(_input_box.cancel_x, _input_box.cancel_y, _input_box.pic);`
-  - `fields::Add_Button_Field_(_input_box.cancel_x, _input_box.cancel_y, ...);`
-  - `fields::Add_Hidden_Field_(_input_box.cancel_x, _input_box.cancel_y, _input_box.cancel_x + pic_height, _input_box.cancel_y + pic_width, ...);`
-  - `fields::Add_Continuous_String_Input_Field_(_input_box.input_x, _input_box.input_y, ...);`
-  - These look source-correct only under the project’s incorrect struct definition; against the actual memory layout used by the binary, they do not validate.
-  - Minimal suggested diff:
-    ```cpp
-    // after fixing struct layout, these member uses should align without swapping call arguments
-    ```
-
-- The related initializer in `Input_Box_Popup_` writes the same misordered fields, so validation of this function cannot pass in isolation.
-  - Binary semantics require:
-    - `prompt_y = y + 3`
-    - `cancel_y = y + 0x60`
-    - `cancel_x = x + 100`
-    - `input_y = y + 0x22`
-    - `input_x = x + 0x36`
-  - Current source writes these into a mismatched struct layout.
-  - Minimal suggested diff:
-    ```cpp
-    _input_box.prompt_y = y + 3;
-    _input_box.cancel_y = y + 0x60;
-    _input_box.cancel_x = x + 100;
-    _input_box.input_y = y + 0x22;
-    _input_box.input_x = x + 0x36;
-    // valid only once struct layout is corrected
-    ```
-
----------------------------------------
-    ```cpp
-    _input_box.prompt_y = y + 3;
-    _input_box.cancel_y = y + 0x60;
-    _input_box.cancel_x = x + 100;
-    _input_box.input_y = y + 0x22;
-    _input_box.input_x = x + 0x36;
-    // valid only once struct layout is corrected
-    ```
-
----------------------------------------
-
-00412BE0 GEO::Point_Is_In_Warp_Field_Interdictor_Of_Star_
-
-fail
-
-- `player_idx` masking does not match the x86 shift semantics exactly.
-  - Assembly does `MOV CL, param_3` then `SHL DL, CL`, so the effective shift count is the CPU’s 8-bit shift behavior, not a C++ `1 << player_idx` on promoted `int`.
-  - Current code uses:
-    ```cpp
-    uint8_t other_players_mask = ~(1 << player_idx);
-    ```
-  - This is problematic because shifting by `player_idx >= 32` is undefined in C++, while Ghidra’s `& 0x1f` note is decompiler-inserted and the machine code itself uses the x86 shift rule. Since the source type is `uint8_t`, exact emulation should avoid UB and preserve byte semantics.
-  - Minimal suggested diff snippet:
-    ```cpp
-    uint8_t bit = 1;
-    bit = (uint8_t)(bit << (player_idx & 7));
-    uint8_t other_players_mask = (uint8_t)~bit;
-    ```
-
-- The current implementation relies on implicit narrowing after `~`, which obscures the original 8-bit register behavior.
-  - Assembly keeps the computation in `DL` and tests a byte field at offset `0x39`.
-  - Current code computes `~(1 << player_idx)` as `int`, then narrows to `uint8_t`. While often equivalent for expected inputs, it is less exact and introduces unnecessary dependence on integer promotions.
-  - Minimal suggested diff snippet:
-    ```cpp
-    uint8_t other_players_mask = (uint8_t)~((uint8_t)1 << (player_idx & 7));
-    ```
-
-- There is uncertainty around accepted `player_idx` range versus implementation semantics.
-  - Related project code often masks owners with `& 0x1F` when shifting interdictor bits, which suggests surrounding code may pass values outside `0..7`. This function currently does not guard or normalize that input safely in C++.
-  - Because exact binary-equivalent behavior is required and this function is used in movement/interdiction logic, this needs clarification or correction before validation can pass.
-  - Minimal suggested diff snippet:
-    ```cpp
-    uint8_t shift = player_idx & 7;
-    uint8_t other_players_mask = (uint8_t)~((uint8_t)1 << shift);
-    ```
-
----------------------------------------
-0x00412C30 GEO::Move_Player_1_Turn_To_Star_
-
-fail
-
-- `interdictor_flag` nullability/type does not match the binary.
-  - Assembly unconditionally does `MOV byte ptr [EAX],0x0` on `param_9` before any checks, so the last argument must be a required writable byte pointer, not an optional/signed `int8_t *`.
-  - The current prototype uses `int8_t *interdictor_flag`; the decompiler input shows `char *param_9`, and the code uses it as a byte flag only.
-  - Minimal diff snippet:
-    ```cpp
-    - void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int32_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag);
-    + void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int32_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, char *interdictor_flag);
-    ```
-
-- The implementation dereferences `interdictor_flag` in loop termination, which the binary does, but the source signature/documentation implies optional semantics only for `nebula_flag`; this mismatch leaves ambiguity in call contracts.
-  - In assembly, only `param_8` is null-checked; `param_9` is always assumed valid and written at entry and on WFI hit.
-  - Minimal diff snippet:
-    ```cpp
-    - void __cdecl Move_Player_1_Turn_To_Star_(..., int8_t *nebula_flag, int8_t *interdictor_flag) {
-    + void __cdecl Move_Player_1_Turn_To_Star_(..., int8_t *nebula_flag, char *interdictor_flag) {
-          *interdictor_flag = 0;
-          ...
-      }
-    ```
-
-- Signedness/flag typing is imprecise for the WFI result byte.
-  - The machine code uses raw byte loads/stores and zero/nonzero tests only; a signed 8-bit type is unnecessarily specific and can mislead future restoration work.
-  - Minimal diff snippet:
-    ```cpp
-    - int8_t *interdictor_flag
-    + char *interdictor_flag
-    ```
-
----------------------------------------
-0x00413080 GEO::Parsecs_Between_Points_
-
-fail
-
-- Return type is too narrow and changes calling-contract semantics. The assembly returns EAX with no truncation on return, while the project declares/defines `int16_t`. Even if current map coordinates usually keep results small, validation must match the binary interface exactly.
-  Suggested diff:
-  ```cpp
-  // src/game/geo.h
-  - int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
-  + int32_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
-
-  // src/game/geo.cpp
-  - int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-  + int32_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-  ...
-  -     return (int16_t)parsecs;
-  +     return (int32_t)parsecs;
-  }
-  ```
-
-- The implementation uses `uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);`, which relies on signed 32-bit multiplication/addition before the cast. The assembly performs plain 32-bit `imul` and unsigned `div`, so the wraparound behavior is defined by machine arithmetic, but in C++ this expression can invoke signed-overflow UB if coordinates ever exceed the safe range. This is not a faithful restoration standard under the project rules.
-  Suggested diff:
-  ```cpp
-  int32_t dx = (int32_t)x1 - (int32_t)x2;
-  int32_t dy = (int32_t)y1 - (int32_t)y2;
-  - uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
-  + uint32_t dist_sq =
-  +     (uint32_t)((uint32_t)dx * (uint32_t)dx + (uint32_t)dy * (uint32_t)dy);
-  ```
-
-- The correction loop multiplies `parsecs * parsecs * 900` as `uint32_t`, which can overflow in C++ depending on range and does not document the exact machine-width behavior. The assembly recomputes the comparison through LEA chains in 32-bit registers after `imul`, so this should be expressed more explicitly if kept.
-  Suggested diff:
-  ```cpp
-  - while (parsecs * parsecs * 900 < dist_sq) {
-  + while ((uint32_t)((parsecs * parsecs) * 900U) < dist_sq) {
-        parsecs++;
-    }
-  ```
-
----------------------------------------
-0x004130F0 GEO::Parsecs_Between_Stars_
-
-- Return type does not match the callee contract propagated through this wrapper. The assembly tail-returns whatever `GEO::Parsecs_Between_Points_` leaves in `EAX`; in the project both declarations are `int16_t`, but the validated analysis for `0x00413080` already shows the callee should be `int32_t`. Keeping this wrapper as `int16_t` narrows the binary-visible result.
-  Suggested diff:
-  ```cpp
-  // src/game/geo.h
-  - int16_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
-  + int32_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
-
-  // src/game/geo.cpp
-  - int16_t __cdecl Parsecs_Between_Stars_(int16_t star_idx_1, int16_t star_idx_2) {
-  + int32_t __cdecl Parsecs_Between_Stars_(int16_t star_idx_1, int16_t star_idx_2) {
-        return GEO::Parsecs_Between_Points_(
-            MOX::_star[star_idx_1].x,
-            MOX::_star[star_idx_1].y,
-            MOX::_star[star_idx_2].x,
-            MOX::_star[star_idx_2].y
-        );
-    }
-  ```
-
-- Validation is blocked by the referenced callee mismatch at `0x00413080`. This function is only a thin wrapper, so until `Parsecs_Between_Points_` matches the binary interface exactly, this one cannot be considered validated.
-  Suggested diff:
-  ```cpp
-  - return GEO::Parsecs_Between_Points_(...);
-  + return GEO::Parsecs_Between_Points_(...); // after widening callee/this wrapper to int32_t
-  ```
-
-fail
-
----------------------------------------
-00413140 GEO::Get_Orbit_Display_X_Y_
-
-fail
-
-- Wrong global base for orbit radii/constants indexing in the implementation. The assembly reads from `0x54F00C` and `0x54F00E`, i.e. `orbit_idx * 4 + base`, with no `+1` logical index adjustment. Current code uses `GEO::_orbit_radiuses[orbit_idx+1][0]` and `[1]`, but `_orbit_radiuses` is declared at `0x0054F008`, so this changes which entries are read.
-  Suggested diff snippet:
-  ```cpp
-  // current
-  int cos_res = angle::Cos_(angle, GEO::_orbit_radiuses[orbit_idx+1][0]);
-  int sin_res = angle::Sin_(angle, GEO::_orbit_radiuses[orbit_idx+1][1]);
-
-  // suggested
-  int cos_res = angle::Cos_((int16_t)angle, *(int16_t*)((uint8_t*)GEO::_orbit_radiuses + orbit_idx * 4 + 4));
-  int sin_res = angle::Sin_((int16_t)angle, *(int16_t*)((uint8_t*)GEO::_orbit_radiuses + orbit_idx * 4 + 6));
-  ```
-
-- Header/global typing does not match the referenced symbol layout. Disassembly names `_orbit_radiuses @ 0x0054F00C : short[7][2]`, but project declares `_orbit_radiuses` at `0x0054F008` and invents `_orbit_consts_end` instead of a typed second symbol. This is directly related to the bad indexing above and prevents exact validation.
-  Suggested diff snippet:
-  ```cpp
-  // geo.h
-  inline int16_t (&_orbit_radiuses)[7][2] = *reinterpret_cast<int16_t (*)[7][2]>(std::uintptr_t{0x0054F00C});
-  // add a proper typed alias for 0x0054F00E if needed, matching the overlapping layout
-  ```
-
-- Angle argument type is not restored precisely. Assembly stores the post-modulo value in `ESI/EDX` and passes it as a 16-bit signed angle (`angle::Cos_` / `Sin_` prototypes take `int16_t`). Current function passes `int` without an explicit narrowing at the call site. This is likely harmless for 0..359, but it is not an exact restoration and depends on C++ implicit conversion.
-  Suggested diff snippet:
-  ```cpp
-  int16_t angle16 = (int16_t)angle;
-  int cos_res = angle::Cos_(angle16, ...);
-  int sin_res = angle::Sin_(angle16, ...);
-  ```
-
-fail
-
----------------------------------------
-00413220 GEO::Get_Orbit_From_X_Y_
-
-- Global base/type does not match the disassembly. The function reads from `0x54F008` as `_orbit_consts` and iterates to `0x54F024`, but the project exposes only `_orbit_radiuses` at `0x0054F008` and `_orbit_consts_end` as `void*&`. This prevents exact validation of the accessed symbol layout and conflates the data names.
-  ```diff
-  - inline int16_t (&_orbit_radiuses)[7][2] = *reinterpret_cast<int16_t (*)[7][2]>(std::uintptr_t{0x0054F008});
-  - inline void*& _orbit_consts_end = *reinterpret_cast<void**>(std::uintptr_t{0x0054F024});
-  + inline int16_t (&_orbit_consts)[7][2] = *reinterpret_cast<int16_t (*)[7][2]>(std::uintptr_t{0x0054F008});
-  + inline int16_t (*_orbit_consts_end)[2] = reinterpret_cast<int16_t (*)[2]>(std::uintptr_t{0x0054F024});
-  ```
-
-- The implementation uses the wrong logical data symbol throughout the function. The assembly indexes `EDI` from `_orbit_consts`, not a separately named `_orbit_radiuses`. Even if the bytes happen to overlap, the restored source does not accurately model the referenced global and its semantics.
-  ```diff
-  - int16_t angle_val = angle::Get_Angle_(GEO::_orbit_radiuses[i][1] * x, GEO::_orbit_radiuses[i][0] * -y);
-  - int cos_raw = angle::Cos_(angle_val, GEO::_orbit_radiuses[i][0]);
-  - int sin_raw = angle::Sin_(angle_val, GEO::_orbit_radiuses[i][1]);
-  + int16_t angle_val = angle::Get_Angle_(GEO::_orbit_consts[i][1] * x, GEO::_orbit_consts[i][0] * -y);
-  + int cos_raw = angle::Cos_(angle_val, GEO::_orbit_consts[i][0]);
-  + int sin_raw = angle::Sin_(angle_val, GEO::_orbit_consts[i][1]);
-  ```
-
-- `_orbit_consts_end` is typed as a dereferenced memory variable (`void*&`), but the assembly uses it as a fixed end address constant in the loop compare (`CMP EDI,0x54f024`). That project type can misrepresent accesses and is not an exact restoration of the control-flow boundary.
-  ```diff
-  - inline void*& _orbit_consts_end = *reinterpret_cast<void**>(std::uintptr_t{0x0054F024});
-  + inline int16_t (*_orbit_consts_end)[2] = reinterpret_cast<int16_t (*)[2]>(std::uintptr_t{0x0054F024});
-  ```
-
-fail
-
----------------------------------------
-0x00417260 DIP_SCRN::Npc_Diplomacy_Screen_
-
-- Discrepancy: accepted `0x6a` rejection path declares war on the wrong target.  
-  Assembly at `00417a58` pushes `_PLAYER_NUM` second and current ambassador first, matching `Declare_War_((ushort)_current_ambassador, MOX::_PLAYER_NUM)` in the decompiler, not `Declare_War_(MOX::_PLAYER_NUM, _current_ambassador)`. Current source reverses attacker/defender.
-  Suggested diff:
-  ```cpp
-  -                        diplomac::Declare_War_(MOX::_PLAYER_NUM, _current_ambassador);
-  +                        diplomac::Declare_War_(_current_ambassador, MOX::_PLAYER_NUM);
-  ```
-
-- Discrepancy: type/sign mismatch on sneak-attack and diplomacy message load into `_response_message`.  
-  Assembly loads a byte into `AL`, clears upper byte with `AND EAX,0xffff00ff`, then stores `AX` to `_response_message`, i.e. zero-extends an 8-bit message ID. Source currently assigns `char` fields directly into `int16_t`, which may sign-extend on platforms where `char` is signed and produce incorrect negative values for IDs `>= 0x80`.
-  Suggested diff:
-  ```cpp
-  -            _response_message = MOX::_player[_current_ambassador].sneak_attack_message;
-  +            _response_message = (uint8_t)MOX::_player[_current_ambassador].sneak_attack_message;
-  ...
-  -            _response_message = MOX::_player[_current_ambassador].diplomacy_message[MOX::_PLAYER_NUM];
-  +            _response_message = (uint8_t)MOX::_player[_current_ambassador].diplomacy_message[MOX::_PLAYER_NUM];
-  ```
-
-- Discrepancy: type/sign mismatch on `diplomacy_demand_rejection_message` writeback to `sneak_attack_message`.  
-  Assembly copies a raw byte (`MOV DL, byte ptr ...+0x887`) into the destination byte at `+0x7c9`. Source copies through `char`-typed fields; this is likely harmless on Win32/x86, but the project rule requires platform-independent signedness, and this field participates in later zero-extended message comparisons.
-  Suggested diff:
-  ```cpp
-  -                        MOX::_player[_current_ambassador].sneak_attack_message = MOX::_player[_current_ambassador].diplomacy_demand_rejection_message[MOX::_PLAYER_NUM];
-  +                        MOX::_player[_current_ambassador].sneak_attack_message =
-  +                            (uint8_t)MOX::_player[_current_ambassador].diplomacy_demand_rejection_message[MOX::_PLAYER_NUM];
-  ```
-
-fail
-
----------------------------------------
-0x00417CA0 DIP_SCRN::Get_Non_Player_Proposals_
-
-- Discrepancy: local flag buffer is initialized with `memset`, which writes 10 bytes from a typed `uint8_t[10]` object, while the original writes exactly 10 bytes on stack via two dword stores plus one word store. This specific function itself is safe, but the project rules explicitly require flagging byte-wise stack buffer initialization patterns when represented through typed bulk writes because nearby restoration relies on exact byte semantics. Minimal safer/source-faithful form:
-```cpp
-uint8_t hotkey_flags[10];
-hotkey_flags[0] = 1; hotkey_flags[1] = 1; hotkey_flags[2] = 1; hotkey_flags[3] = 1;
-hotkey_flags[4] = 1; hotkey_flags[5] = 1; hotkey_flags[6] = 1; hotkey_flags[7] = 1;
-hotkey_flags[8] = 1; hotkey_flags[9] = 1;
-```
-
-- Discrepancy: the tech-list scratch array is typed as `uint8_t tech_list[212]`, but the assembly passes a pointer to stack slot `[ESP+0x7c]` while later indexing it with `MOV AL,[ESP + EAX + 0x74]`, i.e. as raw bytes adjacent to other stack locals under exact stack layout. The current C++ layout is plausible but not fully validated against the original stack object partitioning because the decompiler’s `abStack_424`/`aiStack_350` split is known-imperfect and no exact local packing proof exists in source. Minimal source-faithful alternative:
-```cpp
-uint8_t abStack_424[212];
-int32_t aiStack_350[212];
-```
-
-- Discrepancy/uncertainty: the function uses `_current_ambassador` directly as `uint8_t` actual arguments to `npcdiplo::Get_Differential_Tech_List_` and `Diplomacy_Generic_Exchange_Tech_List_`. The assembly explicitly zero-extends for one call path (`MOV CL`, `AND ECX,0xffff00ff`) and separately loads `_PLAYER_NUM` as signed 16-bit for others. This should be made explicit in source to avoid integral-promotion ambiguity and preserve original calling semantics. Minimal diff:
-```cpp
-npcdiplo::Get_Differential_Tech_List_(
-    MOX::_PLAYER_NUM,
-    (int16_t)_current_ambassador,
-    0,
-    MOX::_player[_current_ambassador].diplomacy_proposal_exchange_max_value[MOX::_PLAYER_NUM],
-    tech_list,
-    aiStack_350,
-    &sStack_488,
-    1
-);
-
-result = Diplomacy_Generic_Exchange_Tech_List_(
-    (int16_t)_current_ambassador,
-    MOX::_PLAYER_NUM,
-    text_buffer,
-    tech_list,
-    sStack_488,
-    1
-);
-```
-
-fail
-
----------------------------------------
-004187C0 DIP_SCRN::Get_Human_Demand_Response_
-
-Failing discrepancies:
-
-- Wrong ambassador reloaded in single-player path before choice.
-  - Assembly calls `Diplomacy_Load_New_Ambassador_(param_1)` after building the message, but current code does that with `player_id` only because the function named params imply the opposite side later; this makes the subsequent flow ambiguous against the actual calling pattern and surrounding net handler usage. The function’s semantic naming is misleading enough that validation cannot be completed confidently without clarifying intended actor/target roles across this call family.
-  - Minimal suggested diff snippet:
-    ```cpp
-    // clarify roles to match assembly exactly
-    void __cdecl Get_Human_Demand_Response_(int16_t sender_player_id, int16_t target_player_id,
-                                            int16_t demand_type, int16_t demand_arg, int16_t* out_choice)
-    {
-        ...
-        Get_Human_Demand_Message_(sender_player_id, target_player_id, demand_type, demand_arg);
-        Diplomacy_Load_New_Ambassador_(sender_player_id);
-        int16_t choice = Get_Human_Demand_Choice_(target_player_id, sender_player_id, demand_type, demand_arg);
-        ...
-        Diplomacy_Load_New_Ambassador_(target_player_id);
-    }
-    ```
-
-- Intentional uninitialized local in default switch case introduces UB in restored C++.
-  - Assembly copies whatever 16-bit stack garbage is in `local_2` into both SI/DI for out-of-range `demand_type`; the current code models this with an uninitialized local variable, which is undefined behavior in C++ and not acceptable for precise restoration rules.
-  - Minimal suggested diff snippet:
-    ```cpp
-    int16_t choice_1_response;
-    int16_t choice_else_response;
-
-    if ((uint16_t)demand_type <= 8) {
-        choice_1_response = 0xA9;
-        choice_else_response = 0xA8;
-    }
-    // else: preserve original behavior without UB only if project has an accepted helper/pattern;
-    // otherwise this needs explicit project guidance.
-    ```
-
-- Signedness/range handling of the switch selector is not proven equivalent.
-  - Assembly does `movsx eax, bp; cmp eax, 8; ja ...`, so negative values fall through the jump-table range check and would index before the table if they occurred; the decompiled/current source uses a normal `switch`, which does not model that exact flags-dependent behavior. This is a control-flow mismatch for invalid negative `demand_type`.
-  - Minimal suggested diff snippet:
-    ```cpp
-    // needs explicit handling if exact invalid-input behavior matters
-    if ((uint16_t)demand_type <= 8) {
-        choice_1_response = 0xA9;
-        choice_else_response = 0xA8;
-    } else {
-        ...
-    }
-    ```
-
-fail
-
----------------------------------------
-
-00419020 DIP_SCRN::Diplomacy_Human_Need_Better_Offer_
-
-fail
-
-Discrepancies:
-- Wrong ambassador loaded in the single-player system-offer branch.
-  - Assembly calls `Diplomacy_Load_New_Ambassador_(target_player_idx)` before the confirmation list.
-  - Current code matches that part, but later tech and money branches do not consistently preserve the same “other side answers” flow as encoded by the assembly around ambassador switching; this makes the function’s side-effect sequence uncertain relative to the binary.
-  - Minimal diff snippet:
-    ```cpp
-    // verify all single-player confirm branches use the same ambassador-switch pattern
-    Diplomacy_Load_New_Ambassador_(target_player_idx);
-    // ...
-    Diplomacy_Load_New_Ambassador_(target_player_idx);
-    ```
-
-- `Check_Surrender_System_` used by this function is not faithful to the binary’s memory semantics.
-  - The binary tests `star->owner == player_a` via byte compare at offset `+0x14`.
-  - Current implementation tests `has_colony` as a bitmask, but the recovered struct declares `has_colony` as a single byte flag, so shifting it by player index is incorrect and changes control flow for whether the “offer system” option appears.
-  - Minimal diff snippet:
-    ```cpp
-    // wrong
-    if (((MOX::_star[star_idx].has_colony >> (player_a & 0x1F)) & 1) != 0)
-
-    // expected by asm
-    if (MOX::_star[star_idx].owner == (int8_t)player_a)
-    ```
-
-- Related type/layout issue in `s_star_data` causes incorrect field access for this function’s dependency.
-  - Assembly uses `MOX::_star + star_idx * 0x71 + 0x14` as owner byte.
-  - Current struct places `owner` at `0x14`, but the implementation still reads `has_colony` for ownership logic, indicating a semantic mismatch in restored code.
-  - Minimal diff snippet:
-    ```cpp
-    // Use owner for surrender eligibility prefilter
-    if (MOX::_star[star_idx].owner == (int8_t)player_a) {
-        ...
-    }
-    ```
-
-- Signedness/width handling around network sender/target IDs is not fully trustworthy.
-  - Binary writes `sender_player_id` and `target_player_id` from low bytes only, and computes network player offset from `BX` with sign-extension where needed.
-  - Current code generally casts to `uint8_t`, but because the function parameters are `int16_t`, any negative/sentinel misuse would diverge silently. This is minor in isolation, but combined with the above mismatch it prevents clean validation.
-  - Minimal diff snippet:
-    ```cpp
-    _net_diplomacy_message.sender_player_id = (uint8_t)player_idx;
-    _net_diplomacy_message.target_player_id = (uint8_t)target_player_idx;
-    // and ensure all player indexing uses int16_t / sign-extended values explicitly
-    ```
-
-Primary blocker: this function depends directly on `Check_Surrender_System_`, and that helper does not match the disassembly semantics, so the offered menu construction cannot be validated as correct.
-
----------------------------------------
-00419C80 DIP_SCRN::Draw_Diplomacy_System_Text_
-
-- Planet size/climate argument order is reversed in `_sprintf`.
-  - Assembly pushes climate string first, then size string, so with cdecl `_sprintf(dst, "%s, %s", size, climate)` the rendered text is `size, climate`.
-  - Current code happens to print `size, climate`, but only because it also reversed the source expressions relative to the push order. This is fragile against the validated instruction trace and obscures the actual call shape.
-  - Minimal suggested diff:
-    ```cpp
-    sprintf(text_buffer, "%s, %s",
-            MOX::_planet_size_string[planet->size],
-            MOX::_planet_climate_string[planet->climate]);
-    ```
-
-- Homeworld comparison uses `uint8_t planet_idx == (uint8_t)selected_planet_idx`, but the assembly compares zero-extended list byte against sign-extended `selected_planet_idx`.
-  - This matters for the sentinel `-1`: assembly compares `0..255` to `-1`, never equal. Current cast turns `-1` into `255`, which could append `_system_homeworld_buffer` if byte value 255 were ever present.
-  - Minimal suggested diff:
-    ```cpp
-    if ((int16_t)planet_idx == selected_planet_idx) {
-        strcat(text_buffer, DIP_SCRN::_system_homeworld_buffer);
-    }
-    ```
-
-- Type mismatch on the second parameter in declaration/definition versus original usage.
-  - Disassembly and decompiler indicate a 16-bit value compared against `0xFFFF` / `-1`; user input also used `ushort param_2` in Ghidra output. Current code uses `int16_t`, which works for most flow but does not preserve the original unsigned call-site interpretation around sentinel handling.
-  - Minimal suggested diff:
-    ```cpp
-    void __cdecl Draw_Diplomacy_System_Text_(int16_t star_idx, uint16_t selected_planet_idx);
-    ```
-
-- Explicit cast `selected_planet_idx != (int16_t)0xFFFF` is a code smell and unnecessary.
-  - The assembly is a direct 16-bit compare to `-1`; this should be expressed directly with the proper source type, not via a forced cast.
-  - Minimal suggested diff:
-    ```cpp
-    if (selected_planet_idx != 0xFFFF || use_special_colors) {
-    ```
-
-fail
-
----------------------------------------
-
----------------------------------------
 00419E70 DIP_SCRN::Diplomacy_System_Scan_
 
 - `planet_indices` element type is wrong for the actual store width/semantics. The assembly writes a raw planet index byte (`MOV byte ptr [EBP + EDX],BL`), while the function takes `int8_t*` and writes `(int8_t)planet_idx`. That can turn valid planet IDs >= 128 negative and changes later consumers’ semantics.
@@ -816,4 +283,489 @@ Discrepancies:
 Instruction trace otherwise matches, but the signedness discrepancy on byte outputs means I cannot validate it with confidence.
 
 fail
+---------------------------------------
+00422A70 BEAMS::Draw_Damage_Indicator_
+
+- Uses byte-buffer-to-`s_colors*` casts for 3-byte stepped palette tables. `s_colors` is 8 bytes, so this reads past each 3-byte triplet into adjacent data and relies on object reinterpretation; that is a type/layout mismatch and potential UB. The assembly passes raw addresses into contiguous stack bytes, but in restored C++ this should be represented with a byte-addressable type matching the actual access pattern, not forged `s_colors*`.
+  ```diff
+  - uint8_t dmg_color_blob[0x53];
+  - fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[anim_timer * 3]);
+  + struct DamageIndicatorColors { uint8_t colors[8]; };
+  + DamageIndicatorColors total_colors[9];
+  + fonts::Set_Font_Style_Shadow_Down_(1, (const s_colors*)&total_colors[anim_timer]);
+  ```
+  Or equivalent explicit 9-entry 8-byte tables matching what `Set_Font_Style_` actually consumes.
+
+- The current representation collapses the three separate 9-step color tables from the stack layout into memcpy’d blobs with overlapping logical 8-byte reads. While it may accidentally work because neighboring bytes are contiguous, it is not a precise source restoration of the original memory model and obscures the exact per-step 8-byte color windows used by the function.
+  ```diff
+  - const uint8_t total_dmg_colors[27] = { ... };
+  - const uint8_t shield_dmg_colors[27] = { ... };
+  - const uint8_t hull_dmg_colors[27] = { ... };
+  + static const s_colors total_dmg_colors[9] = { ... };
+  + static const s_colors shield_dmg_colors[9] = { ... };
+  + static const s_colors hull_dmg_colors[9] = { ... };
+  ```
+
+fail
+---------------------------------------
+00423980 BEAMS::Rot_To_Base_Rot_
+
+- Negative rotation handling is incorrect. The assembly implements a signed `% 16` with sign-preserving remainder via `cdq / xor / sub / and / xor / sub`, so inputs in `[-15, -1]` produce negative indices and read before the local table. The current code uses C++ `rot % 16` as an array index directly, which is not equivalent to the exact machine behavior and relies on UB for negative values.
+- Return-path memory access semantics are not faithfully represented. The original indexes a stack-local table with a signed 16-bit index after `MOVSX ECX,AX`; the current source abstracts this to normal array indexing, hiding the signed out-of-bounds possibility present in the binary.
+
+Minimal suggested diff snippet:
+```cpp
+int16_t __cdecl Rot_To_Base_Rot_(int16_t rot) {
+    int16_t base_rotations[16] = {
+        0, 1, 2, 3, 4, 3, 2, 1,
+        0, 1, 2, 3, 4, 3, 2, 1
+    };
+
+    int32_t r = rot;
+    int32_t sign = r >> 31;
+    int16_t idx = (int16_t)((((r ^ sign) - sign) & 0xF) ^ sign) - (int16_t)sign;
+    return *(base_rotations + idx);
+}
+```
+
+fail
+---------------------------------------
+0x00423A10 BEAMS::Rot_To_Rot_Method_
+
+fail
+
+- Negative rotation handling is not validated exactly. The assembly does not use a plain C `% 16`; it computes a sign-preserving nibble reduction with:
+  - `movsx eax, rot`
+  - `cdq`
+  - `xor/sub`
+  - `and 0xf`
+  - `xor/sub`
+  This can yield negative indices for negative inputs, followed by `mov ax, [esp + ecx*2]`. The current source uses `methods[rot % 16]`, which is not an instruction-faithful reconstruction of that path and relies on C++ indexing UB for negative `rot`.
+
+- The source does not preserve the original signed indexed stack access semantics. The binary explicitly sign-extends the final 16-bit index (`MOVSX ECX,AX`) and indexes the local 16-entry table with that signed value. The restored code normalizes this into regular array indexing, which hides the original memory-access behavior.
+
+Minimal suggested diff snippet:
+```cpp
+int16_t __cdecl Rot_To_Rot_Method_(int16_t rot) {
+    int16_t methods[16] = {
+        0, 0, 0, 0, 0,
+        1, 1, 1, 1,
+        2, 2, 2,
+        3, 3, 3, 3
+    };
+
+    int32_t r = rot;
+    int32_t sign = r >> 31;
+    int16_t idx = (int16_t)(((((r ^ sign) - sign) & 0xF) ^ sign) - sign);
+    return *(methods + idx);
+}
+```
+---------------------------------------
+00423BD0 BEAMS::Reflection_Field_Anims_
+
+fail
+
+Discrepancies:
+- Parameter types are too wide in both declaration and definition. The disassembly reads both arguments as 16-bit values from the stack (`MOV CX,[ESP+8]`, `MOV AX,[ESP+4]`) and performs the core arithmetic in 16-bit registers before `MOVSX EAX,CX`. Current code exposes `int32_t p1, int32_t p2`, which weakens the contract and can admit values the original function would truncate before use.
+  Suggested diff snippet:
+  ```cpp
+  - s_animation_header* __cdecl Reflection_Field_Anims_(int32_t p1, int32_t p2);
+  + s_animation_header* __cdecl Reflection_Field_Anims_(int16_t p1, int16_t p2);
+
+  - s_animation_header* __cdecl Reflection_Field_Anims_(int32_t p1, int32_t p2) {
+  + s_animation_header* __cdecl Reflection_Field_Anims_(int16_t p1, int16_t p2) {
+  ```
+
+- The implementation does not mirror the exact 16-bit overflow/sign-extension behavior of the original instruction sequence with sufficient precision. Original flow is:
+  `CX = param_2; CX = CX * 5 (16-bit); AX = param_1; ECX = ECX + EAX + 0x59; EAX = MOVSX CX`.
+  Current code relies on C++ usual arithmetic promotions:
+  `int16_t entry_num = (int16_t)p2 * 5 + (int16_t)p1 + 89;`
+  This may end up equivalent for many inputs, but it does not explicitly model the 16-bit intermediate operation and final sign-extension semantics required for exact restoration.
+  Suggested diff snippet:
+  ```cpp
+  -     int16_t entry_num = (int16_t)p2 * 5 + (int16_t)p1 + 89;
+  +     int16_t entry_num = (int16_t)((int16_t)(p2 * 5) + p1 + 89);
+  ```
+
+- There is unnecessary explicit casting around the `Buffer_Reload_` call, which is a code smell under the project rules and obscures the intended signed 16-bit to 32-bit promotion path from the original `MOVSX`.
+  Suggested diff snippet:
+  ```cpp
+  -     return (s_animation_header*)buffer::Buffer_Reload_(
+  +     return (s_animation_header*)buffer::Buffer_Reload_(
+           COLONY::_BEAMS_LBX,
+  -         static_cast<int32_t>(entry_num),
+  +         entry_num,
+           MOX::_global_cache_seg
+       );
+  ```
+---------------------------------------
+00424250 BEAMS::Build_Steve_Stuff_Struct_For_Weapon_
+
+- Default/out-of-range handling is wrong. The assembly zeroes the entire 44-byte output for specific cases and for any unmapped switch target, while the current function often just returns without writing anything.
+  ```diff
+  - if (param_1 <= 0 || param_1 > 46) {
+  -     return;
+  - }
+  + if (param_1 <= 0 || param_1 > 46) {
+  +     memset(param_3, 0, sizeof(*param_3));
+  +     return;
+  + }
+  ```
+  And:
+  ```diff
+  - default:
+  -     return;
+  + default:
+  +     memset(param_3, 0, sizeof(*param_3));
+  +     return;
+  ```
+
+- Weapon 5 control flow is inverted relative to the flags in assembly. The real logic is:
+  1) if bit 0x10 and bit 0x100 -> style 3, sprite 100, duration 25, unk 1  
+  2) else if bit 0x10 -> style 2, sprite 120, duration 30, unk 0  
+  3) else if bit 0x100 -> style 1, sprite 100, duration 25, unk 1  
+  4) else -> style 1, sprite 120, duration 30, unk 0  
+  The current source matches this superficially, but the assembly checks CH & 1 after preserving DX = CX & 0x10, so this depends on param_2 being exactly uint16_t. Any widening/signed mismatch in callers would break semantics; this function should be validated only if that exact 16-bit contract is preserved throughout use.
+
+- The implementation uses whole-struct assignment and aggregate color writes instead of the assembly’s explicit 11 dword copy. That changes memory-write behavior and can hide padding/aliasing issues. Per project rules, explicit type-punning/casting around packed byte arrays is suspect, and this function’s consumers rely on exact byte layout.
+  ```diff
+  - *param_3 = local_2c;
+  + memcpy(param_3, &local_2c, sizeof(local_2c));
+  ```
+
+- Zero-fill cases are incomplete. The assembly zeroes output for case values corresponding to weapon IDs 0x1b, 0x28, 0x2b, 0x2e after the jump table decode; the current switch only handles 27, 40, 43, 46 explicitly, but unmapped decoded entries still fall through to `default:return`, leaving output untouched.
+
+- There is validation uncertainty caused by switch reconstruction. The binary uses a compressed jump table via `byte ptr [EAX + 0x424bec]` and indirect targets, not a direct `switch(param_1)`. Because the current source models it as a plain switch, every unmapped weapon ID in 1..46 must be proven to map to zero-fill or an exact case body. That proof is missing in code.
+fail
+---------------------------------------
+  ```diff
+  - *param_3 = local_2c;
+  + memcpy(param_3, &local_2c, sizeof(local_2c));
+  ```
+
+- Zero-fill cases are incomplete. The assembly zeroes output for case values corresponding to weapon IDs 0x1b, 0x28, 0x2b, 0x2e after the jump table decode; the current switch only handles 27, 40, 43, 46 explicitly, but unmapped decoded entries still fall through to `default:return`, leaving output untouched.
+
+- There is validation uncertainty caused by switch reconstruction. The binary uses a compressed jump table via `byte ptr [EAX + 0x424bec]` and indirect targets, not a direct `switch(param_1)`. Because the current source models it as a plain switch, every unmapped weapon ID in 1..46 must be proven to map to zero-fill or an exact case body. That proof is missing in code.
+fail
+---------------------------------------
+0x00424CA0 BEAMS::Draw_Beam2_
+
+- UB-prone and likely type-mis-modeled color extraction in the `Set_Beam_Colors_` call. The assembly pushes seven 32-bit dwords copied directly from the packed `fx` stack object at offsets `+0x0, +0x4, +0x8, +0xC, +0x10, +0x14, +0x18`, i.e. raw packed bytes. The current code reinterprets `uint8_t[8]` subobjects as `int32_t*`, which violates strict aliasing and is exactly the kind of byte-array cast that should be flagged here.
+-  Suggested diff:
+  ```cpp
+  Set_Beam_Colors_(palette_base_index,
+                   fx.colors[0].colors[0] | (fx.colors[0].colors[1] << 8) | (fx.colors[0].colors[2] << 16) | (fx.colors[0].colors[3] << 24),
+                   fx.colors[0].colors[4] | (fx.colors[0].colors[5] << 8) | (fx.colors[0].colors[6] << 16) | (fx.colors[0].colors[7] << 24),
+                   fx.colors[1].colors[0] | (fx.colors[1].colors[1] << 8) | (fx.colors[1].colors[2] << 16) | (fx.colors[1].colors[3] << 24),
+                   fx.colors[1].colors[4] | (fx.colors[1].colors[5] << 8) | (fx.colors[1].colors[6] << 16) | (fx.colors[1].colors[7] << 24),
+                   fx.colors[2].colors[0] | (fx.colors[2].colors[1] << 8) | (fx.colors[2].colors[2] << 16) | (fx.colors[2].colors[3] << 24),
+                   fx.colors[2].colors[4] | (fx.colors[2].colors[5] << 8) | (fx.colors[2].colors[6] << 16) | (fx.colors[2].colors[7] << 24),
+                   fx.thickness);
+  ```
+
+- Parameter typing around the effect/frame arguments is weaker than the machine code and obscures signed behavior. The assembly uses signed comparisons for `param_10`/frame index in style 0 (`JL`, `JGE`) and signed arithmetic with `CDQ/IDIV` in styles 2 and 3. The current prototype uses `int32_t frame_index`, which is fine, but the decompiler input shows earlier confusion (`uint param_10`), and the implementation introduces `mod_thick = frame_index % 2` instead of preserving the original signed absolute-parity computation:
+  `(((n ^ (n >> 31)) - (n >> 31)) & 1)` then converted back through sign. For negative inputs the current `% 2` form is not instruction-equivalent.
+  Suggested diff:
+  ```cpp
+  int32_t sign = frame_index >> 31;
+  int32_t parity = (((frame_index ^ sign) - sign) & 1 ^ sign) - sign;
+  ```
+  and use `parity` in styles 2/3.
+
+- Case 2 and case 3 rely on the signed-parity transform above, not plain `% 2`. While current callers likely pass nonnegative frame values, the implementation is not instruction-faithful for negative values because x86 `IDIV` paths are driven by the signed-normalized parity result, not C `%` semantics.
+  Suggested diff:
+  ```cpp
+  int32_t sign = frame_index >> 31;
+  int32_t p = (((frame_index ^ sign) - sign) & 1 ^ sign) - sign;
+  int32_t div_val = p + 1;
+  ```
+
+- Cosmetic but accuracy-relevant: `hit_flag` is explicitly ignored, yet the original function still receives and pushes it through to bolt routines as a 16-bit value derived from the stack argument. Even though this specific assembly path does not branch on it directly, dropping semantic naming with `(void)hit_flag;` makes the restoration less precise.
+  Suggested diff:
+  ```cpp
+  uint16_t hit_phase = (uint16_t)hit_flag;
+  ```
+  and pass/use that named value where the stack argument is forwarded.
+
+fail
+---------------------------------------
+00426920 INFO::Draw_The_History_Graph_
+
+Discrepancies:
+- Wrong signedness/width for graph offsets. Assembly uses `MOV BL`/`MOV AL` from `int8_t[10]` and then zero-extends with `AND ...00ff`, so values are treated as unsigned bytes. Current code casts each element to `uint8_t`, but the backing declaration remains `int8_t (&_graph_offsets)[10]`, which is a type mismatch against actual byte semantics and invites accidental signed use elsewhere.
+  ```cpp
+  - inline int8_t (&_graph_offsets)[10] = *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00555E38});
+  + inline uint8_t (&_graph_offsets)[10] = *reinterpret_cast<uint8_t(*)[10]>(std::uintptr_t{0x00555E38});
+  ```
+
+- Label-loop counter/return storage does not mirror the register behavior. Assembly reuses `BX` as the 8-iteration counter after saving the step value to a stack local, then returns the 16-bit stack local. Current code uses a C `for (int i = 0; i < 8; ++i)` and separate `step`/`return_val`. Functionally close, but not precise enough for register/width-sensitive restoration.
+  ```cpp
+  - int16_t return_val;
+  - int16_t step;
+  + int16_t graph_scale;
+  + int16_t step;
+  + int16_t label_count;
+  
+  - for (int i = 0; i < 8; ++i) {
+  + label_count = 8;
+  + do {
+        ...
+  - }
+  +     --label_count;
+  + } while (label_count != 0);
+  
+  - return return_val;
+  + return graph_scale;
+  ```
+
+- The year-threshold logic is expressed against a truncated `uint16_t check_date`, while assembly derives `ECX = EAX + 0x7748` from full 32-bit `MOX::_stardate`, compares `CX`, and in the final branch performs signed 32-bit arithmetic directly on `EAX`. The current mix of 16-bit and 32-bit temporaries obscures that exact behavior and can mislead future maintenance.
+  ```cpp
+  - uint16_t check_date = (uint16_t)MOX::_stardate + 0x7748;
+  + int32_t stardate = MOX::_stardate;
+  + uint16_t check_date = (uint16_t)(stardate + 0x7748);
+    ...
+  - current_val = ((int32_t)(MOX::_stardate - 0x159) / 10) * 10;
+  + current_val = ((stardate - 0x159) / 10) * 10;
+  ```
+
+fail
+---------------------------------------
+00426B90 INFO::Smooth_History_Data_
+
+Fail:
+- Return value on early-exit is wrong. Assembly does `XOR AX,AX` and returns with upper 16 bits of EAX preserved; current code returns full `0`. That does not match register-level behavior.
+  ```diff
+   int32_t __cdecl Smooth_History_Data_(int32_t* data, int16_t start_idx, int16_t end_idx) {
+       if (end_idx <= start_idx) {
+  -        return 0;
+  +        // preserve upper 16 bits of EAX; only AX is zeroed in original
+  +        return in_eax_like & 0xffff0000;
+       }
+  ```
+- Absolute-difference computation does not match the instruction sequence for `INT_MIN` edge case. Assembly uses `sub/cdq/xor/sub` on signed 32-bit value; `abs(val1 - average)` is UB for `INT_MIN` in C/C++ and is not guaranteed to reproduce machine behavior.
+  ```diff
+  -    int32_t result = abs(val1 - average);
+  +    int32_t diff = val1 - average;
+  +    int32_t sign = diff >> 31;
+  +    int32_t result = (diff ^ sign) - sign;
+  ```
+- Intermediate arithmetic type is suspicious versus the original. The binary performs 32-bit modular addition followed by unsigned `DIV 3`. Current code forces unsigned casts on each addend before summing; although often equivalent on two's-complement targets, this is an unnecessary cast-heavy formulation and obscures the exact register behavior being validated.
+  ```diff
+  -    uint32_t sum = (uint32_t)val0 + (uint32_t)val1 + (uint32_t)val2;
+  -    int32_t average = (int32_t)(sum / 3);
+  +    uint32_t sum = (uint32_t)(val0 + val1 + val2);
+  +    int32_t average = (int32_t)(sum / 3);
+  ```
+---------------------------------------
+0x00426C00 INFO::Display_Graphed_Players_Names_
+
+fail
+
+Discrepancies:
+- `spacing` is used uninitialized when `MOX::_active_count <= 3`.
+  - In the assembly, the stack local at `[ESP+0x12]` is only written when `active_count > 3` or `> 6`, and it is only consumed on iterations `i == 2` or `i == 5`. Those iterations are unreachable unless `active_count >= 3` / `>= 6`, so original behavior is safe by control flow. The restored C++ declares `int16_t spacing;` and later uses `x_pos += spacing;`, which is undefined behavior in the source language even if runtime control flow happens to avoid it.
+  - Minimal suggested diff snippet:
+    ```cpp
+    void __cdecl Display_Graphed_Players_Names_() {
+        int16_t x_pos = 351;
+        int16_t y_pos = 64;
+        int16_t spacing = 0;
+        int16_t active_count = MOX::_active_count;
+        ...
+    }
+    ```
+
+- Player index signedness/extension does not match the instruction sequence precisely enough.
+  - The assembly loads `MOX::_active_player[i]` as a byte, clears the upper half with `AND EAX,0xffff00ff`, then `MOVSX EBP,AX`, yielding a zero-extended 8-bit player index in practice. The current code uses `uint8_t player_idx = (uint8_t)MOX::_active_player[i];`, which is likely correct operationally, but the surrounding project typing keeps `_active_player` as `char[9]`; this function relies on treating it as an unsigned byte index. Given the restoration rules, the source type mismatch should be resolved or at least explicitly justified nearby, because array indexing through a signed `char` source is a recurring correctness risk.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // Prefer the underlying global to be typed as uint8_t[9];
+    uint8_t player_idx = MOX::_active_player[i];
+    fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[player_idx]);
+    fonts::Print_(x_pos, y_pos, MOX::_player[player_idx].race_name);
+    ```
+---------------------------------------
+- Player index signedness/extension does not match the instruction sequence precisely enough.
+  - The assembly loads `MOX::_active_player[i]` as a byte, clears the upper half with `AND EAX,0xffff00ff`, then `MOVSX EBP,AX`, yielding a zero-extended 8-bit player index in practice. The current code uses `uint8_t player_idx = (uint8_t)MOX::_active_player[i];`, which is likely correct operationally, but the surrounding project typing keeps `_active_player` as `char[9]`; this function relies on treating it as an unsigned byte index. Given the restoration rules, the source type mismatch should be resolved or at least explicitly justified nearby, because array indexing through a signed `char` source is a recurring correctness risk.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // Prefer the underlying global to be typed as uint8_t[9];
+    uint8_t player_idx = MOX::_active_player[i];
+    fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[player_idx]);
+    fonts::Print_(x_pos, y_pos, MOX::_player[player_idx].race_name);
+    ```
+---------------------------------------
+004284D0 INFO::_Init_Turn_Summary_List_
+
+fail
+
+- Calls use the wrong namespace symbol names relative to the hooked binary interface.
+  The binary references `MSG::First_Msg_For_Player_`, `MSG::sprintf_msg_`, and `MSG::_msgs`, but the project implementation uses `MSG_::...`. If `MSG_` is not aliased everywhere expected by the restoration layer, this is not a precise match.
+  Suggested diff snippet:
+  ```cpp
+  int16_t msg_idx = MSG::First_Msg_For_Player_(MOX::_PLAYER_NUM);
+  ...
+  MSG::sprintf_msg_(buffer, &MSG::_msgs[msg_idx]);
+  ```
+
+- Potential divide-by-zero / missing precondition handling on `font_lf`.
+  The assembly performs signed `idiv edi` with `font_lf` as divisor and does not guard it locally; validation requires certainty from the C side too. Current code directly does `height / font_lf` without documenting or constraining nonzero input, so exact safety/behavior cannot be confirmed from this function alone.
+  Suggested diff snippet:
+  ```cpp
+  // requires font_lf != 0, matches original caller contract
+  item->app_count = (uint8_t)(height / font_lf);
+  ```
+
+- Signedness/loop condition is not expressed as tightly as the assembly.
+  The binary compares `app_count` as zero-extended byte against signed loop index in 32-bit registers after a guaranteed first iteration. The current `int i` / `i < item->app_count` formulation is probably equivalent for normal values, but it obscures the byte-sized semantics required for exact validation.
+  Suggested diff snippet:
+  ```cpp
+  uint8_t i = 0;
+  do {
+      item->tech_app_status[i] = 0;
+      item->tech_app_ids[i + 1] = 0xff;
+      ++i;
+  } while (i < item->app_count);
+  ```
+---------------------------------------
+00428600 INFO::Turn_Summary_Subscreen_
+
+fail
+
+- The no-message path returns the raw `fields::Get_Input_()` value even when it is `>= min_field`; the assembly returns any non-zero input directly from this path, so that part is fine, but the implementation does not preserve the exact full-draw behavior split used by the binary. In the binary, `MOX::_FULL_DRAW_SCREEN_FLAG != 0` exits through a dedicated path immediately after `Get_Input_()` in both loops. Here it is merged structurally; this is likely okay semantically, but combined with other issues below leaves validation uncertain.
+
+- The initialized value of `down_button` in the `msg_count == 0` case is taken from `list_items[0].x`, which is uninitialized stack data in C++. The binary also reads an uninitialized stack slot into `BP`, but only along a path that never uses it before jumping to the no-message loop. This is source-level UB and should be flagged.
+  Suggested diff snippet:
+  ```cpp
+  int16_t down_button = 0;
+  ...
+  if (msg_count > 0) {
+      ...
+  }
+  ```
+
+- The call argument to `MSG_::Goto_Msg_Colony_` is type-suspicious. Assembly computes `&MSG::_msgs[_g_selected_msg_p->group_id]` via `group_id * 0x12` and passes that exact `s_MSG*`. The implementation does:
+  ```cpp
+  MSG_::Goto_Msg_Colony_(&MSG_::_msgs[_g_selected_msg_p->group_id])
+  ```
+  which is only correct if `MSG_::_msgs` is typed as a true `s_MSG[100]`. This should be verified in the declaration; otherwise pointer arithmetic mismatch would be critical. I cannot fully validate without that symbol definition.
+
+- The implementation relies on high-level control restructuring around page navigation and redraw, but the binary’s exact flow distinguishes:
+  - list-field click
+  - nav-button range check using `min_field`
+  - `input == 0` redraw path
+  - termination when `input != 0 && input < min_field`
+
+  The current code is close, but because it folds conditions into nested `if`s and uses `refresh_outer`, it is not possible to confirm exact equivalence without stronger type/context confirmation for the involved field IDs and globals. In particular, the binary tests `msg_count <= 0` redundantly in a branch that is unreachable on this path; the source omits that exact structure.
+
+Minimal suggested diff snippets:
+```cpp
+int16_t down_button = 0;
+```
+
+```cpp
+// confirm declaration is exactly:
+extern s_MSG _msgs[100];
+```
+
+```cpp
+// if exact control-flow restoration is desired, mirror the assembly’s
+// post-input termination checks explicitly rather than via refresh_outer
+if (input_field != 0 && input_field < min_field) {
+    return input_field;
+}
+```
+---------------------------------------
+00428AE0 INFO::Reference_Main_Subscreen_
+
+- `topic_ids` is typed/stored incorrectly. The binary writes each help-topic `id` as a 32-bit value from `[record + 0x50]` into a dword table, but on selection it loads only the low 16 bits into `_g_reference_ix`. The project uses `uint32_t topic_ids[16]` and then casts to `int16_t` at the end. That is not equivalent enough for a restoration task because it obscures the real storage/type behavior and can hide signedness/width issues around the local table and record field.
+  ```cpp
+-        uint32_t topic_ids[16];
++        int16_t topic_ids[16];
+  ...
+-            topic_ids[i] = record->id;
++            topic_ids[i] = (int16_t)record->id;
+  ...
+-            INFO::_g_reference_ix = (int16_t)topic_ids[input - INFO::_g_first_how_to_field];
++            INFO::_g_reference_ix = topic_ids[input - INFO::_g_first_how_to_field];
+  ```
+
+- The local farload count / loop typing does not match the instruction behavior closely enough. The assembly keeps the record count and loop indices in 16-bit registers (`AX/DI/BX`) and uses an unsigned comparison (`JA`) against the count. The current code mixes `uint16_t record_count` with `int i` and a signed `<` loop, which is a type/control-flow mismatch for validation.
+  ```cpp
+-        uint16_t record_count;
++        uint16_t record_count;
++        uint16_t i;
+  ...
+-        for (int i = 0; i < (int)record_count; ++i) {
++        for (i = 0; i < record_count; ++i) {
+  ```
+
+- The function-local string constants are not restored from the referenced globals provided in the disassembly (`s_^_%s_00556078` and `s__00551100`), and instead are reintroduced as C string literals. For this codebase/validation task that is a discrepancy in referenced data usage and can matter for exact binary-matching restoration.
+  ```cpp
+-        const char* s_bullet_fmt = "^ %s";
+-        const char* s_empty = "";
++        const char* s_bullet_fmt = s_^_%s_00556078;
++        const char* s_empty = s__00551100;
+  ```
+
+- Header/global typing for `_g_how_to_str_` and `_g_category_str_p` is wrong and already acknowledged in comments. The binary stores pointers to contiguous `char[48]` tables on the stack, but the project declares them as `char*&` and then relies on byte-offset arithmetic. This is a real type restoration issue and a potential source of UB-prone misuse elsewhere.
+  ```cpp
+-    inline char*& _g_how_to_str_ =
+-        *reinterpret_cast<char**>(std::uintptr_t{0x00564DA8});
++    inline char (*&_g_how_to_str_)[48] =
++        *reinterpret_cast<char (**)[48]>(std::uintptr_t{0x00564DA8});
+
+-    inline char*& _g_category_str_p =
+-        *reinterpret_cast<char**>(std::uintptr_t{0x00564DB4});
++    inline char (*&_g_category_str_p)[48] =
++        *reinterpret_cast<char (**)[48]>(std::uintptr_t{0x00564DB4});
+  ```
+
+fail
+---------------------------------------
+00428E30 INFO::Draw_Reference_Main_Subscreen_
+
+fail
+
+Discrepancies:
+- Global types are restored incorrectly for the string tables. The binary uses `_g_how_to_str_` and `_g_category_str_p` as pointers to contiguous `char[48]` entries, but the project declares them as `char*&` and compensates with manual byte indexing. That is a real type mismatch against the assembly/decompiler and leaks into nearby setup code.
+  ```diff
+  - inline char*& _g_how_to_str_ =
+  -     *reinterpret_cast<char**>(std::uintptr_t{0x00564DA8});
+  + inline char (*&_g_how_to_str_)[48] =
+  +     *reinterpret_cast<char(**)[48]>(std::uintptr_t{0x00564DA8});
+
+  - inline char*& _g_category_str_p =
+  -     *reinterpret_cast<char**>(std::uintptr_t{0x00564DB4});
+  + inline char (*&_g_category_str_p)[48] =
+  +     *reinterpret_cast<char(**)[48]>(std::uintptr_t{0x00564DB4});
+  ```
+
+- The corresponding assignments in `Reference_Main_Subscreen_` preserve the same bad typing by casting 2D arrays down to `char*`. Binary semantics are table-of-48-byte-strings, not flat byte pointers.
+  ```diff
+  - INFO::_g_category_str_p = (char*)category_strs;
+  - INFO::_g_how_to_str_ = (char*)how_to_strs;
+  + INFO::_g_category_str_p = category_strs;
+  + INFO::_g_how_to_str_ = how_to_strs;
+  ```
+
+- `Draw_Reference_Main_Subscreen_` relies on byte-offset arithmetic derived from the wrong globals instead of expressing the actual indexed access the assembly performs (`base + offset * 48`). While current code likely works on Win32, the restored source type is still incorrect and should be validated after fixing the globals.
+  ```diff
+  - fonts::Print_(0x1a5, (offset + 5) * 20, &INFO::_g_how_to_str_[offset * 48]);
+  + fonts::Print_(0x1a5, (offset + 5) * 20, INFO::_g_how_to_str_[offset]);
+
+  - fonts::Print_(0xdd, (offset + 5) * 20, &INFO::_g_category_str_p[offset * 48]);
+  + fonts::Print_(0xdd, (offset + 5) * 20, INFO::_g_category_str_p[offset]);
+  ```
+---------------------------------------
+
+0x00429020 INFO::Reference_Category_Subscreen_
+
+fail
+
+Discrepancies:
+- `group_id` is used as a sorted-position index in the binary, but the implementation stores the original unsorted index before sorting and only swaps `record_offsets`. In the update path, the binary indexes `record_offsets[_g_selected_list_p->group_id]`, so `group_id` must track the post-sort slot. Current code can fetch the wrong help record after sorting.
+- The sort comparison does not match the assembly’s unsigned byte-wise comparison. The binary uses the `strcmp`-style loop with `SBB` flags from unsigned byte compares; plain `strcmp` on platforms with signed `char` can order bytes ≥ `0x80` differently.
+- There is UB-prone type punning when reading the 32-bit record offset from LBX data via `reinterpret_cast<uint32_t*>(data + 80)`. Per project rules, explicit casts like this are suspicious; it also assumes alignment. The binary performs a plain 32-bit load from byte storage.
+- The auto-function assignment uses a hardcoded function address cast instead of the real symbol, which is unnecessary here and obscures validation of the intended callback.
 ---------------------------------------

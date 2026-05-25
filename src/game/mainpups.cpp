@@ -270,7 +270,7 @@ namespace MAINPUPS {
         hotkey = ESTRINGS::E_Strings_(12 /* 0xc */);
 
         // Creates a full-screen (640x480) hidden input field
-        MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, hotkey, sound);
+        MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, hotkey, (int8_t)sound);
     }
 
     void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer) {
@@ -1702,7 +1702,7 @@ namespace MAINPUPS {
 
             hidden_field_id = 0;
             base_text = ESTRINGS::E_Strings_(0xc);
-            MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, base_text, hidden_field_id);
+            MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, base_text, (int8_t)hidden_field_id);
         }
 
         OFFICER::Wrapper_To_Add_Officer_Popup_Help_Fields_(MAINPUPS::_g_x, MAINPUPS::_g_y + 0x35, MAINPUPS::_g_officer);
@@ -2522,7 +2522,7 @@ namespace MAINPUPS {
         char* format_pop = ESTRINGS::E_Strings_(0x6E); /* 110 */
         sprintf(msg_ptr, format_pop, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)max_pop);
 
-        int8_t result = GENDRAW::Confirmation_Box_(msg_buffer);
+        int8_t result = (int8_t)GENDRAW::Confirmation_Box_(msg_buffer);
         fields::Deactivate_Help_List_();
 
         return result;

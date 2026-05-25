@@ -1550,13 +1550,14 @@ namespace SYS {
             origin_y = 0x0011;
             left_padding = 0;
         } else {
-            paragraph_width = local_4_stack;
-            box_width = local_4_stack;
-            paragraph_height = local_4_stack;
-            left_padding = local_4_stack;
-            paragraph_top = local_4_stack;
-            origin_x = local_4_stack;
-            origin_y = local_4_stack;
+            // The binary seeds these layout values from an uninitialized stack slot here; use a stable zero fallback.
+            paragraph_width = 0;
+            box_width = 0;
+            paragraph_height = 0;
+            left_padding = 0;
+            paragraph_top = 0;
+            origin_x = 0;
+            origin_y = 0;
         }
 
         local_4_stack = static_cast<int16_t>(left_padding + origin_x);

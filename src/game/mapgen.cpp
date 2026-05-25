@@ -713,7 +713,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             monster_chance = 5;
         }
 
-        if (random::Random_(100) - 1 < (int32_t)monster_chance) {
+        if ((int32_t)random::Random_(100) - 1 < (int32_t)monster_chance) {
             _n_space_monsters++;
         }
 

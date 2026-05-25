@@ -122,6 +122,9 @@ namespace platform {
 
     // Hooks
     void __cdecl entry() {
+#ifdef _MSC_VER
+#pragma warning(suppress : 4996)
+#endif
         uint32_t version_info = GetVersion();
 
         g_os_ver = version_info;

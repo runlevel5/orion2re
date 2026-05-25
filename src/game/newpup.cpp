@@ -211,7 +211,7 @@ namespace NEWPUP {
             const int16_t displayed_column = static_cast<int16_t>(displayed_column_base + 1);
             const int16_t row_index = 2;
 
-            COLONY::Set_Colony_Font_To_Player_(1, player_id);
+            COLONY::Set_Colony_Font_To_Player_(1, (uint8_t)player_id);
 
             sprintf(
                 text_buffer,

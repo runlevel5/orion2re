@@ -1115,7 +1115,7 @@ namespace HOMEGEN {
                                     nearest_empty_star = star_idx;
                                 }
                             } else {
-                                uint8_t food_planets = HAROLD::N_Food_Planets_In_System_(star_idx);
+                                uint8_t food_planets = (uint8_t)HAROLD::N_Food_Planets_In_System_(star_idx);
                                 if (food_planets == 0) {
                                     Add_Non_Food_Planets_To_List_(star_idx, planet_buffer, &buffer_count);
                                 } else {

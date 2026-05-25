@@ -748,7 +748,7 @@ namespace NETSTART {
                     if (netcode::Net_Get_Users_(nullptr) == connected_count) {
                         if (fields::Get_Input_() == MOX::_mp_screen->field_id_begin) {
                             if (NETMOX::_net.num_connected_players > connected_count) {
-                                payload[0] = GENDRAW::Confirmation_Box_(_really_begin_game_with_unused_slots_msg);
+                                payload[0] = (uint8_t)GENDRAW::Confirmation_Box_(_really_begin_game_with_unused_slots_msg);
                             } else {
                                 payload[0] = 1;
                             }

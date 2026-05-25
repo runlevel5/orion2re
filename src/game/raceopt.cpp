@@ -1283,7 +1283,7 @@ namespace raceopt {
                 }
                 button_index += 2;
             } else {
-                player->traits[button_index - skipped_button] = _trait_option_flags[button_index];
+                player->traits[button_index - skipped_button] = (int8_t)_trait_option_flags[button_index];
                 ++button_index;
             }
         }

@@ -4,15 +4,15 @@
 namespace GEO {
     inline int16_t*& _dads = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00564840});
     inline int16_t (&_orbit_radiuses)[7][2] = *reinterpret_cast<int16_t (*)[7][2]>(std::uintptr_t{0x0054F008});
-    inline void*& _orbit_consts_end = *reinterpret_cast<void**>(std::uintptr_t{0x0054F024});
+    inline int16_t (*const _orbit_consts_end)[2] = reinterpret_cast<int16_t (*)[2]>(std::uintptr_t{0x0054F024});
 
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance);
     void __cdecl Initialize_Star_In_Nebula_Info_();
 
     uint8_t __cdecl Star_Is_In_Some_Nebula_(int32_t star_idx);
 
-    int16_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
-    int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+    int32_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
+    int32_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
     bool __cdecl Black_Hole_Blocks_Points_(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 

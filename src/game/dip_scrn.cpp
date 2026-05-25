@@ -1968,36 +1968,17 @@ namespace DIP_SCRN {
      * If the current game language is not English, it returns an empty string.
      */
     void __cdecl Get_Human_Demand_Response_(int16_t player_id, int16_t target_player_id, int16_t demand_type, int16_t demand_arg, int16_t* out_choice) {
-        int16_t choice_1_response;
-        int16_t choice_else_response;
-
-        switch (demand_type) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                choice_1_response = 0xA9;
-                choice_else_response = 0xA8;
-                break;
-            default:
-                // Reading uninitialized stack garbage as per disassembly 0x00418835
-                int16_t garbage; 
-                choice_1_response = garbage;
-                choice_else_response = garbage;
-                break;
-        }
+        int16_t choice_1_response = 0xA9;
+        int16_t choice_else_response = 0xA8;
 
         if (MOX::_game_type == 1 /* SINGLE_PLAYER */) {
             _old_response_message = _response_message;
             Get_Human_Demand_Message_(player_id, target_player_id, demand_type, demand_arg);
             Diplomacy_Load_New_Ambassador_(player_id);
-            
-            int16_t choice = Get_Human_Demand_Choice_(target_player_id, player_id, demand_type, demand_arg);
+
+            // The binary keeps the demander's ambassador loaded for both the prompt and
+            // follow-up response handling, and uses the same player ordering here.
+            int16_t choice = Get_Human_Demand_Choice_(player_id, target_player_id, demand_type, demand_arg);
             *out_choice = choice;
             
             _old_response_message = -1;
@@ -2007,7 +1988,7 @@ namespace DIP_SCRN {
                 _response_message = choice_else_response;
             }
             
-            Diplomacy_Load_New_Ambassador_(target_player_id);
+            Diplomacy_Load_New_Ambassador_(player_id);
         } else {
             _net_diplomacy_message.sender_player_id = (uint8_t)player_id;
             _net_diplomacy_message.target_player_id = (uint8_t)target_player_id;

@@ -91,7 +91,7 @@ namespace JIM {
             // Play Simtex cinematic if Simtex logo is present
             SMACK::Play_Cinematic_(s_simtex_lbx, 0, 0);
             sound::Stop_Stream_();
-            _jim_current_stream = 0xFFFF;
+            _jim_current_stream = -1;
         }
 
         // Second Logo (Master of Orion / Microprose)
@@ -180,7 +180,7 @@ namespace JIM {
             return;
         }
 
-        _jim_old_music_id = 0xFFFF;
+        _jim_old_music_id = -1;
 
         // If one of the background tracks (1, 2, or 3) is already playing, do nothing
         if (_jim_current_stream == 1 || _jim_current_stream == 2 || _jim_current_stream == 3) {
@@ -208,7 +208,7 @@ namespace JIM {
         sound::Play_Stream_(_jim_current_stream);
         sound::Loop_Stream_(-1);
 
-        _jim_old_music_id = 0xFFFF;
+        _jim_old_music_id = -1;
         sound::Set_Stream_Volume_(0);
         sound::Fade_Stream_Up_(30);
     }
@@ -381,7 +381,7 @@ namespace JIM {
 
     void __cdecl Play_Combat_Music_() {
         if (MOX::_settings.music_on == 1) {
-            _jim_old_music_id = 0xFFFF;
+            _jim_old_music_id = -1;
             sound::Fade_Stream_Down_(35);
 
             if (sound::Get_Stream_Volume_() > 0) {

@@ -1355,10 +1355,10 @@ namespace DIP_SCRN {
         _ambassador_option = 1;
 
         if (is_sneak_attack == 1) {
-            _response_message = MOX::_player[_current_ambassador].sneak_attack_message;
+            _response_message = (uint8_t)MOX::_player[_current_ambassador].sneak_attack_message;
         }
         else {
-            _response_message = MOX::_player[_current_ambassador].diplomacy_message[MOX::_PLAYER_NUM];
+            _response_message = (uint8_t)MOX::_player[_current_ambassador].diplomacy_message[MOX::_PLAYER_NUM];
         }
 
         Diplomacy_Fade_In_();
@@ -1506,10 +1506,11 @@ namespace DIP_SCRN {
                 case 0x6a:
                     if (MOX::_player[_current_ambassador].opportunity_planet_num[MOX::_PLAYER_NUM] != -1) {
                         MOX::_player[_current_ambassador].sneak_attack_planet = MOX::_player[_current_ambassador].opportunity_planet_num[MOX::_PLAYER_NUM];
-                        MOX::_player[_current_ambassador].sneak_attack_message = MOX::_player[_current_ambassador].diplomacy_demand_rejection_message[MOX::_PLAYER_NUM];
+                        MOX::_player[_current_ambassador].sneak_attack_message =
+                            (uint8_t)MOX::_player[_current_ambassador].diplomacy_demand_rejection_message[MOX::_PLAYER_NUM];
                     }
                     else {
-                        diplomac::Declare_War_(MOX::_PLAYER_NUM, _current_ambassador);
+                        diplomac::Declare_War_(_current_ambassador, MOX::_PLAYER_NUM);
                         _response_message = 0xb3;
                         Diplomacy_Display_Response_();
                     }

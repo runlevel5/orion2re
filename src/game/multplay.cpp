@@ -1133,7 +1133,6 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
     int16_t __cdecl Load_Multi_Player_Game_Screen_(void) {
         MOX2::action_func_t auto_func_state;
         int32_t dates[10];
-        s_game_popup_fields* star_date_fields; // Part of local stack
         char warning_msg[100];
         bool exit_loop = false;
         int16_t result = -1;

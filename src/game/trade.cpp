@@ -11,7 +11,7 @@ namespace TRADE {
 
             // Determine if an additional progress point is gained based on the remainder of the goal
             if (remainder != 0) {
-                if (random::Random_(5) <= (int32_t)remainder) {
+                if ((int16_t)random::Random_(5) <= remainder) {
                     increment = 1;
                 }
             }
@@ -44,7 +44,7 @@ namespace TRADE {
 
             // Roll for a bonus increment based on the remainder of the goal
             if (remainder != 0) {
-                if (random::Random_(5) <= remainder) {
+                if ((int16_t)random::Random_(5) <= remainder) {
                     increment = 1;
                 }
             }

@@ -111,7 +111,7 @@ namespace npcdiplo {
 
                     if (severity > 0) {
                         // Positive severity reduces threats over time
-                        if (random::Random_(100) < (severity * 2)) {
+                        if ((int16_t)random::Random_(100) < (severity * 2)) {
                             p1.threats[p2_idx]--;
                             if (p1.threats[p2_idx] < 0) {
                                 p1.threats[p2_idx] = 0;
@@ -131,7 +131,7 @@ namespace npcdiplo {
                         }
 
                         // Severity is negative, so subtracting it increases the random threshold
-                        if (random::Random_(100) < (threat_threshold - severity * 2) || increment == 2) {
+                        if ((int16_t)random::Random_(100) < (threat_threshold - severity * 2) || increment == 2) {
                             p1.threats[p2_idx] += increment;
                             p2.threats[p1_idx] = p1.threats[p2_idx];
                         } else {
@@ -201,7 +201,7 @@ namespace npcdiplo {
                         if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
                             int diff = MOX::_settings.game_difficulty;
                             int threshold = (-5 - p_source.relations[j]) / (diff * 2 + 1);
-                            if (random::Random_(100) <= threshold) {
+                            if ((int16_t)random::Random_(100) <= threshold) {
                                 decision[j] = 1;
                                 reason[j] = 68 /* OPPORTUNISTIC_ATTACK */;
                             }
@@ -228,7 +228,7 @@ namespace npcdiplo {
             }
 
             // Case 4: Food Shortage desperation
-            if (random::Random_(100) < p_source.food_shortage_duration) {
+            if ((int16_t)random::Random_(100) < p_source.food_shortage_duration) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     auto& p_target = MOX::_player[j];
                     if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
@@ -385,8 +385,8 @@ namespace npcdiplo {
 
                         s_player* p2 = &MOX::_player[p2_idx];
                         if (p2->objectives != 100 && p2->traits[TRAIT_REPULSIVE] == 0 && p1->contact[p2_idx] != 0) {
-                            if (random::Random_(100) < (int)p1->relations[p2_idx] + 50) {
-                                if (random::Random_(4) <= (int)MOX::_settings.game_difficulty) {
+                            if ((int16_t)random::Random_(100) < (int)p1->relations[p2_idx] + 50) {
+                                if ((int16_t)random::Random_(4) <= (int)MOX::_settings.game_difficulty) {
                                     int16_t best_tech_for_p1 = -1;
                                     uint32_t max_val_for_p1 = 0;
                                     int16_t best_tech_for_p2 = -1;
@@ -539,7 +539,7 @@ namespace npcdiplo {
                             p_i.relations[k] -= (int8_t)(hatred_score / 100);
 
                             // Probabilistic reduction for the remainder
-                            if (random::Random_(100) <= (hatred_score % 100)) {
+                            if ((int32_t)random::Random_(100) <= (hatred_score % 100)) {
                                 p_i.relations[k] -= 1;
                             }
 
@@ -644,7 +644,7 @@ namespace npcdiplo {
             surrender_prob = loss_factor;
         }
 
-        if (random::Random_(100) > surrender_prob) {
+        if ((int32_t)random::Random_(100) > surrender_prob) {
             return -1;
         }
 
@@ -872,7 +872,7 @@ namespace npcdiplo {
                     if (tribute_score_val > 150 && !is_paying_tribute) {
                         if (diplomac::Fleet_Strength_Comparison_(i, j) < 100) {
                             if (plr_i.bc_produced < plr_j.bc_produced && 
-                                random::Random_(20) <= (int32_t)MOX::_settings.game_difficulty + 1) {
+                                (int32_t)random::Random_(20) <= (int32_t)MOX::_settings.game_difficulty + 1) {
                                 
                                 random::Random_(4);
                                 diplomac::Start_Tribute_Treaty_(i, j, 2);
@@ -1125,20 +1125,20 @@ namespace npcdiplo {
                 break;
             case 1:
             case 2:
-                rejection_val = static_cast<int16_t>(-1 - random::Random_(3));
+                rejection_val = static_cast<int16_t>(-1 - (int32_t)random::Random_(3));
                 break;
             case 3:
-                rejection_val = static_cast<int16_t>(-random::Random_(4));
+                rejection_val = static_cast<int16_t>(-(int32_t)random::Random_(4));
                 break;
             case 4:
                 if (MOX::_player[player_idx].dishonored_flag[target_idx] == 1) {
                     rejection_val = static_cast<int16_t>(random::Random_(4) - 6);
                 } else {
-                    rejection_val = static_cast<int16_t>(-random::Random_(3));
+                    rejection_val = static_cast<int16_t>(-(int32_t)random::Random_(3));
                 }
                 break;
             case 5:
-                rejection_val = static_cast<int16_t>(-random::Random_(3));
+                rejection_val = static_cast<int16_t>(-(int32_t)random::Random_(3));
                 break;
             default:
                 break;

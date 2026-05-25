@@ -60,7 +60,7 @@ namespace GEO {
     /**
      * Calculates the distance in parsecs between two stars in the galaxy map.
      */
-    int16_t __cdecl Parsecs_Between_Stars_(int16_t star_idx_1, int16_t star_idx_2) {
+    int32_t __cdecl Parsecs_Between_Stars_(int16_t star_idx_1, int16_t star_idx_2) {
         return GEO::Parsecs_Between_Points_(
             MOX::_star[star_idx_1].x,
             MOX::_star[star_idx_1].y,
@@ -75,7 +75,7 @@ namespace GEO {
      * The distance is calculated as ceil(sqrt((dx^2 + dy^2) / 900)).
      * Note: 900 corresponds to 30^2, implying 1 parsec = 30 coordinate units.
      */
-    int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+    int32_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
         int32_t dx = (int32_t)x1 - (int32_t)x2;
         int32_t dy = (int32_t)y1 - (int32_t)y2;
         uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
@@ -89,7 +89,7 @@ namespace GEO {
             parsecs++;
         }
 
-        return (int16_t)parsecs;
+        return (int32_t)parsecs;
     }
 
     /**
@@ -260,9 +260,11 @@ namespace GEO {
 
         int denominator = (orbit_idx * 100) + star_idx + 150;
         int angle = (dividend / denominator) % 360;
+        int16_t angle16 = (int16_t)angle;
 
-        // X coordinate calculation with rounding
-        int cos_res = angle::Cos_(angle, GEO::_orbit_radiuses[orbit_idx+1][0]);
+        // The binary reads radii from 0x54F00C/0x54F00E, which is the second pair in the
+        // table rooted at 0x54F008. Using orbit_idx + 1 preserves that overlapping address.
+        int cos_res = angle::Cos_(angle16, GEO::_orbit_radiuses[orbit_idx+1][0]);
         int x_val = cos_res + 5;
         if (x_val >= 0) {
             x_val += 5; // Result: (cos + 10) / 10
@@ -272,7 +274,7 @@ namespace GEO {
         *out_x = x_val / 10;
 
         // Y coordinate calculation with rounding and inversion
-        int sin_res = angle::Sin_(angle, GEO::_orbit_radiuses[orbit_idx+1][1]);
+        int sin_res = angle::Sin_(angle16, GEO::_orbit_radiuses[orbit_idx+1][1]);
         int y_val = sin_res - 5;
         if (y_val >= 0) {
             y_val += 5; // Result: sin / 10
@@ -297,7 +299,8 @@ namespace GEO {
         bool result = false;
 
         // Mask out the bit corresponding to player_idx to check for interdictors from other players
-        uint8_t other_players_mask = ~(1 << player_idx);
+        uint8_t shift = player_idx & 7;
+        uint8_t other_players_mask = (uint8_t)~((uint8_t)1 << shift);
 
         if ((star->has_warp_field_interdictor & other_players_mask) != 0) {
             int32_t dx = (int32_t)x - (int32_t)star->x;

@@ -103,7 +103,7 @@ workflows:
               format: ${LLM_DIFF_FORMAT}
         system: |
           You are code validation assistant. Your goal is to open the `validate.txt` file, find mentioned address after
-          successful validation and mark it as completed by putting X into the [ ] or into [S] (original can be either [ ] or [S]).
+          successful validation and mark it as completed by putting X into the [ ], [S] or [.] (original can have some symbol already inside of [ ]).
 
           You should be provided with the following somewhere in the message:
 

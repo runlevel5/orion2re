@@ -3562,8 +3562,8 @@ namespace MAINSCR {
                 exitm::Exit_With_Message(error_msg);
             }
 
-            NETMOX::_net.host_election_id = pack->net_host_id;
-            NETMOX::_net.num_connected_players = pack->num_connected_players;
+            NETMOX::_net.host_election_id = (int16_t)pack->net_host_id;
+            NETMOX::_net.num_connected_players = (int8_t)pack->num_connected_players;
             MOX::_PLAYER_NUM = -1;
 
             if (MOX::_NUM_PLAYERS > 0) {

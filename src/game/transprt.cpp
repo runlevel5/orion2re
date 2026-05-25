@@ -222,7 +222,7 @@ namespace transprt {
                 }
 
                 bool found = false;
-                for (int32_t i = 0; i < _queuedSenderCount; ++i) {
+                for (uint32_t i = 0; i < _queuedSenderCount; ++i) {
                     if (_queuedSenders[i] == sender) {
                         found = true;
                         break;
