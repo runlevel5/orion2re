@@ -12,6 +12,14 @@ namespace AIMOVE {
             };
         };
     };
+
+    struct s_attack_info {
+        int16_t target_player;
+        int16_t min_value;
+        int16_t target_star;
+        int16_t value_a;
+        int16_t value_b;
+    };
 #pragma pack(pop)
 
     inline s_player*& _p_ai = *reinterpret_cast<s_player**>(std::uintptr_t{0x00565E80});
@@ -31,17 +39,17 @@ namespace AIMOVE {
 
     void __cdecl Launch_Attacks_(int param_1, int param_2);
 
-    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, uint8_t* target_info, int mission_type, int param_4);
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, s_attack_info* target_info, int mission_type, int param_4);
 
     int8_t __cdecl AI_May_Attack_Player_(int16_t player_idx, int16_t target_idx);
 
     uint16_t __cdecl Compute_Attack_Worthiness_(
         int16_t colony_idx,
         int16_t* ship_list,
-        int16_t eta,
+        uint8_t eta,
         int8_t* out_attack_type,
-        int8_t* out_flee,
-        uint8_t* target_info,
+        uint8_t* out_flee,
+        s_attack_info* target_info,
         int32_t min_pop
     );
 

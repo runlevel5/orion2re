@@ -1713,20 +1713,20 @@ namespace MAINPUPS {
 
         const int16_t value = *input;
 
-        if (value == _mp_fields_3[0]) {
+        if (value == _mp_fields[3]) {
             *done = 1;
         }
 
-        if (value == _mp_fields_2[0]) {
+        if (value == _mp_fields[2]) {
             *done = 1;
             _g_var = -1;
         }
 
-        if (value == _mp_fields_9[0]) {
+        if (value == _mp_fields[9]) {
             ++_g_var;
         }
 
-        if (value == _mp_fields_10[0]) {
+        if (value == _mp_fields[10]) {
             --_g_var;
         }
     }

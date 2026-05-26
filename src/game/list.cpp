@@ -22,14 +22,20 @@ namespace LIST {
                 return;
             }
 
-            current++;
+            ++current;
+
+            if (current >= items_end) {
+                break;
+            }
 
             // Check if we hit a boundary that signifies the start of a new page/group.
             if (current->stop_flag != 0) {
-                target_page--;
-                list->cur_page++;
+                --target_page;
+                ++list->cur_page;
             }
         }
+
+        list->selected_item = items_start;
     }
 
     void __cdecl Display_List_Text_(s_list_state* state, s_list_item* item) {

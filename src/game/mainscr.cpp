@@ -2055,30 +2055,29 @@ namespace MAINSCR {
     }
 
     /**
-     * @address 004c8c70
+     * @address 0045f3f0
      */
     void __cdecl Tax_Rate_Popup_() {
         int16_t scan_val;
         int16_t input_val;
         int16_t exit_flag;
-        uint8_t font_colors[8];
+        s_colors font_colors;
 
-        font_colors[0] = 0x9f;
-        font_colors[1] = 0xa0;
-        font_colors[2] = 0xa1;
-        font_colors[3] = 0xa2;
+        font_colors.colors[0] = 0x9f;
+        font_colors.colors[1] = 0xa0;
+        font_colors.colors[2] = 0xa1;
+        font_colors.colors[3] = 0xa2;
         input_val = 0;
-        font_colors[4] = 0;
+        font_colors.colors[4] = 0;
         exit_flag = 0;
-        font_colors[5] = 0;
-        font_colors[6] = 0;
-        font_colors[7] = 0;
+        font_colors.colors[5] = 0;
+        font_colors.colors[6] = 0;
+        font_colors.colors[7] = 0;
 
-        s_player* current_player = &MOX::_player[MOX::_PLAYER_NUM];
-        MAINPUPS::_g_temp_tax_rate = static_cast<int16_t>(static_cast<uint8_t>(current_player->tax_rate));
+        MAINPUPS::_g_temp_tax_rate = (int16_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].tax_rate;
 
         MAINPUPS::_last_scanned_field = -1;
-        fonts::Set_Font_Style_Shadow_Down_(1, reinterpret_cast<s_colors*>(font_colors));
+        fonts::Set_Font_Style_Shadow_Down_(1, &font_colors);
         MAINPUPS::Load_Tax_Rate_Popup_();
         MAINPUPS::Do_Popup_Setup_(-1, MAINPUPS::_anims[0x24]);
         ERICHELP::Set_Tax_Rate_Popup_Help_List_();

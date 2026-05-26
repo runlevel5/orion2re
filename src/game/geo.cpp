@@ -452,10 +452,10 @@ namespace GEO {
         int32_t iVar17 = (int32_t)x2 - (int32_t)x1;
 
         int32_t dot_product = (px - x2) * iVar15 + (py - y2) * iVar17;
-        uint32_t abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
+        int32_t abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
 
-        uint32_t uVar8 = (uint32_t)iVar17 * (uint32_t)iVar17 + (uint32_t)iVar15 * (uint32_t)iVar15;
-        uint32_t uVar13 = (uint32_t)d * (uint32_t)d;
+        int32_t uVar8 = iVar17 * iVar17 + iVar15 * iVar15;
+        int32_t uVar13 = d * d;
 
         if (0xFFFFFFFFu / uVar13 < uVar8) {
             do {
@@ -464,13 +464,13 @@ namespace GEO {
                     break;
                 }
 
-                uint32_t sqrt_uVar8 = special::isqrt_(uVar8);
-                if (abs_dot <= sqrt_uVar8 * (uint32_t)d) {
+                int32_t sqrt_uVar8 = special::isqrt_(uVar8);
+                if (abs_dot <= sqrt_uVar8 * d) {
                     bVar1 = true;
                     break;
                 }
 
-                if ((sqrt_uVar8 + 1) * (uint32_t)d < abs_dot) {
+                if ((sqrt_uVar8 + 1) * d < abs_dot) {
                     return false;
                 }
 
@@ -487,8 +487,8 @@ namespace GEO {
                 dot_product = (px - x2) * iVar15 + (py - y2) * iVar17;
                 abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
 
-                uVar8 = (uint32_t)iVar17 * (uint32_t)iVar17 + (uint32_t)iVar15 * (uint32_t)iVar15;
-                uVar13 = (uint32_t)d * (uint32_t)d;
+                uVar8 = iVar17 * iVar17 + iVar15 * iVar15;
+                uVar13 = d * d;
 
             } while (0xFFFFFFFFu / uVar13 < uVar8);
         }
@@ -521,7 +521,7 @@ namespace GEO {
             }
             return true;
         } else {
-            uint32_t sum_sq = (uint32_t)iVar15 * (uint32_t)iVar15 + (uint32_t)iVar17 * (uint32_t)iVar17;
+            int32_t sum_sq = iVar15 * iVar15 + iVar17 * iVar17;
             int32_t iVar12 = iVar15;
             int32_t local_10 = iVar17;
 
@@ -529,7 +529,7 @@ namespace GEO {
                 do {
                     iVar12 += iVar15;
                     local_10 += iVar17;
-                    sum_sq = (uint32_t)iVar12 * (uint32_t)iVar12 + (uint32_t)local_10 * (uint32_t)local_10;
+                    sum_sq = iVar12 * iVar12 + local_10 * local_10;
                 } while (sum_sq <= uVar13);
             }
 

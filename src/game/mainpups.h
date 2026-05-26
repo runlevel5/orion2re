@@ -110,17 +110,6 @@ namespace MAINPUPS {
     inline int16_t (&_mp_fields)[26] =
         *reinterpret_cast<int16_t(*)[26]>(std::uintptr_t{0x00565E38});
 
-    inline int16_t(&_mp_fields_2)[26] =
-        *reinterpret_cast<int16_t(*)[26]>(std::uintptr_t{0x00565E3C});
-
-    inline int16_t(&_mp_fields_3)[26] =
-        *reinterpret_cast<int16_t(*)[26]>(std::uintptr_t{0x00565E3E});
-
-    inline int16_t(&_mp_fields_9)[26] =
-        *reinterpret_cast<int16_t(*)[26]>(std::uintptr_t{0x00565E4A});
-
-    inline int16_t(&_mp_fields_10)[26] =
-        *reinterpret_cast<int16_t(*)[26]>(std::uintptr_t{0x00565E4C});
 
     void __cdecl Eric_Push_Fields_();
 

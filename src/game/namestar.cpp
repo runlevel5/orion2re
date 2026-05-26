@@ -74,7 +74,7 @@ void __cdecl Setup_Input_Box_Popup_() {
     int16_t font_height = fonts::Get_Font_Height_();
     
     int16_t text_x = _input_box.x + (animate_width - string_width) / 2;
-    int16_t text_y = _input_box.y + (_input_box.bg_height - font_height) / 2;
+    int16_t text_y = (_input_box.bg_height - font_height) / 2 + _input_box.prompt_y;
     
     fonts::Print_(text_x, text_y, _input_box.prompt_text);
     
@@ -106,8 +106,8 @@ void __cdecl Setup_Input_Box_Popup_() {
         _input_box.cancel_field_id = fields::Add_Hidden_Field_(
             _input_box.cancel_x,
             _input_box.cancel_y,
-            _input_box.cancel_x + pic_height,
-            _input_box.cancel_y + pic_width,
+            _input_box.cancel_x + pic_width,
+            _input_box.cancel_y + pic_height,
             MOX::s__00551100,
             40
         );

@@ -351,33 +351,37 @@ namespace AIMOVE {
 
     void __cdecl Get_Colonizable_Planets_(s_ai_colonizable_planet* colonizable_planets, int16_t* count) {
         *count = 0;
-        int16_t planet_count = (int16_t)MOX::_planet_count;
-        s_planet_data* planets = MOX::_planet;
+        s_planet_data* planet = MOX::_planet;
+        s_planet_data* end = planet + (int16_t)MOX::_planet_count;
+        int16_t i = 0;
 
-        for (int i = 0; i < planet_count; ++i) {
-            s_planet_data* planet = &planets[i];
+        while (planet < end) {
 
             // Only consider uncolonized planets. 
             // planet_type == 3 is a standard colonizable planet (excluding gas giants, asteroids).
             if (planet->colony_index == -1 && planet->planet_type == 3) {
                 // Each byte in the array represents a star, with bits corresponding to players
                 // who have that star within their extended travel range.
-                uint8_t star_range_mask = (*AIDATA::_star_in_extended_range_of_player)[(uint8_t)planet->star_index];
+                int32_t star_idx = (int32_t)planet->star_index;
+                uint8_t star_range_mask = (*AIDATA::_star_in_extended_range_of_player)[star_idx];
 
-                if ((1 << (AIMOVE::_i_ai & 0x1F)) & (uint32_t)star_range_mask) {
+                if (((1u << ((uint8_t)AIMOVE::_i_ai & 0x1F)) & (uint32_t)star_range_mask) != 0) {
                     int16_t current_count = *count;
 
-                    colonizable_planets[current_count].planet_idx = (int16_t)i;
+                    colonizable_planets[current_count].planet_idx = i;
 
                     // Lookup contextual value for the planet relative to the current AI player.
                     // The table contains 360 entries per player (2880 total).
-                    int contextual_idx = i + (static_cast<int>(AIMOVE::_i_ai) * 360);
-                    uint16_t val = static_cast<uint16_t>((*AIDATA::_contextual_planet_values)[contextual_idx]);
-                    colonizable_planets[current_count].contextual_value = static_cast<int32_t>(val);
+                    int contextual_idx = i + AIMOVE::_i_ai * 360;
+                    colonizable_planets[current_count].contextual_value =
+                        (int32_t)(uint16_t)(*AIDATA::_contextual_planet_values)[contextual_idx];
 
                     *count = current_count + 1;
                 }
             }
+
+            ++planet;
+            ++i;
         }
     }
 
@@ -1113,6 +1117,8 @@ namespace AIMOVE {
     }
 
     void __cdecl Move_Transports_() {
+        int16_t ai_idx = _i_ai;
+        uint8_t ai_shift = (uint8_t)_i_ai;
         uint8_t dest_turns_colony[72];
         uint8_t dest_turns_outpost[72];
         int8_t dest_star_arr[72];
@@ -1129,7 +1135,7 @@ namespace AIMOVE {
         for (int16_t i = 0; i < MOX::_NUM_SHIPS; i++) {
             s_ship_data *ship = &MOX::_ship[i];
 
-            if (ship->owner == _i_ai && ship->status < 3) {
+            if (ship->owner == ai_idx && ship->status < 3) {
                 uint8_t ship_type = ship->d.ship_type;
 
                 if (ship_type == 0) {
@@ -1165,7 +1171,7 @@ namespace AIMOVE {
                     if (loc < 72) {
                         RUSS::Mox_Update_();
                         if (MOX::_settings.game_difficulty > 0) {
-                            if (((MOX::_star[loc].has_colony >> _i_ai) & 1) != 0) {
+                            if (((MOX::_star[loc].has_colony >> ai_shift) & 1) != 0) {
                                 if (MOX::_settings.game_difficulty >= 2 || _p_ai->objectives == 1) {
                                     int16_t ship_idx = i;
                                     for (int j = 4; j >= 0; j--) {
@@ -1174,7 +1180,7 @@ namespace AIMOVE {
                                             int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
                                             if (colony_idx != -1) {
                                                 s_colony *colony = &MOX::_colony[colony_idx];
-                                                if (colony->owner == _i_ai && colony->outpost_flag == 0) {
+                                                if (colony->owner == ai_idx && colony->outpost_flag == 0) {
                                                     if ((*AIDATA::_ai_colony_info)[colony_idx].threatened != 0 ||
                                                         colony->military[0] < (*AIDATA::_ai_colony_info)[colony_idx].n_flagged_pops * 2) {
                                                         if (invasion::Unload_Transports_(colony, &ship_idx, 1) == 1) {
@@ -1289,7 +1295,7 @@ namespace AIMOVE {
                         int16_t stagepoint = _p_ai->offensive_stagepoint;
                         need_to_move = 0;
                         if (_flee_stars[stagepoint * 10 + 9] == 0 &&
-                            ((MOX::_star[stagepoint].blockaded >> _i_ai) & 1) == 0 &&
+                            ((MOX::_star[stagepoint].blockaded >> ai_shift) & 1) == 0 &&
                             loc != stagepoint) {
                             s_ship_move_info move_info;
                             SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, stagepoint, &move_info);
@@ -1304,7 +1310,7 @@ namespace AIMOVE {
                             int32_t best_dest_32 = -1;
                             for (int16_t i = 0; i < MOX::_NUM_STARS; i++) {
                                 if (_flee_stars[i * 10 + 9] == 0 &&
-                                    ((MOX::_star[i].has_colony >> _i_ai) & 1) != 0) {
+                                    ((MOX::_star[i].has_colony >> ai_shift) & 1) != 0) {
                                     s_ship_move_info move_info;
                                     SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, i, &move_info);
                                     if (move_info.moving != 0) {
@@ -1490,12 +1496,12 @@ namespace AIMOVE {
 
             RUSS::Mox_Update_();
 
-            char ship_target_star[500];
+            int8_t ship_target_star[500];
             for (int i = 0; i < 500; ++i) {
                 ship_target_star[i] = -1;
             }
 
-            char ship_intermediate_star[500];
+            int8_t ship_intermediate_star[500];
             for (int i = 0; i < 500; ++i) {
                 ship_intermediate_star[i] = -1;
             }
@@ -1505,8 +1511,8 @@ namespace AIMOVE {
                 strength_totals[i] = 0;
             }
 
-            char target_min_eta[72];
-            char target_best_eta[72];
+            int8_t target_min_eta[72];
+            int8_t target_best_eta[72];
 
             if (num_intercepting_ships > 0) {
                 uint8_t ship_min_eta[500];
@@ -1665,8 +1671,7 @@ namespace AIMOVE {
                                 }
 
                                 if (move_star != -1) {
-                                    int16_t intermediate = (int16_t)(uint8_t)ship_intermediate_star[ship_id];
-                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, intermediate, &move_info);
+                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, move_star, &move_info);
                                     (*AIDATA::_i_all_combat_ships)[_i_ai][ship_loc] = -1;
                                 }
                             }
@@ -1860,24 +1865,24 @@ namespace AIMOVE {
         }
     }
 
-    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, uint8_t* target_info, int mission_type, int param_4)
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, s_attack_info* target_info, int mission_type, int param_4)
     {
-        uint8_t target_info_copy[10];
-        uint8_t* puVar8 = nullptr;
+        s_attack_info target_info_copy;
+        s_attack_info* puVar8 = nullptr;
         int16_t max_score = 0;
         bool valid_target_found = false;
         
         s_ship_move_info move_info;
-        int8_t visited_stars[72];
-        int8_t mission_array[250];
+        uint8_t visited_stars[72];
+        int8_t mission_array[252];
         uint16_t scores[250];
-        int16_t ship_list[500];
+        int16_t ship_list[502];
 
         // Initialize copy of target_info
         if (target_info != nullptr) {
-            memcpy(target_info_copy, target_info, sizeof(target_info_copy));
+            memcpy(&target_info_copy, target_info, 10);
 
-            puVar8 = target_info_copy;
+            puVar8 = &target_info_copy;
         }
 
         for (int i = 0; i < 72; i++) {
@@ -1900,7 +1905,7 @@ namespace AIMOVE {
                             continue;
                         }
                     } else {
-                        if (*(int16_t*)target_info != owner) {
+                        if (target_info->target_player != owner) {
                             continue;
                         }
                     }
@@ -1926,10 +1931,10 @@ namespace AIMOVE {
                                         }
                                         if (max_score < score) {
                                             max_score = score;
-                                            if (puVar8 != nullptr && *(int16_t*)(puVar8 + 4) != -1) {
-                                                *(int16_t*)(target_info + 4) = *(int16_t*)(puVar8 + 4);
-                                                *(int16_t*)(target_info + 6) = *(int16_t*)(puVar8 + 6);
-                                                *(int16_t*)(target_info + 8) = *(int16_t*)(puVar8 + 8);
+                                            if (puVar8 != nullptr && puVar8->target_star != -1) {
+                                                target_info->target_star = puVar8->target_star;
+                                                target_info->value_a = puVar8->value_a;
+                                                target_info->value_b = puVar8->value_b;
                                             }
                                         }
                                     } else if (mission == 2) {
@@ -2201,10 +2206,10 @@ namespace AIMOVE {
     uint16_t __cdecl Compute_Attack_Worthiness_(
         int16_t colony_idx,
         int16_t* ship_list,
-        int16_t eta,
+        uint8_t eta,
         int8_t* out_attack_type,
-        int8_t* out_flee,
-        uint8_t* target_info,
+        uint8_t* out_flee,
+        s_attack_info* target_info,
         int32_t min_pop
     ) {
         s_colony* colony = &MOX::_colony[colony_idx];
@@ -2360,11 +2365,11 @@ namespace AIMOVE {
                 if (target_info != nullptr) {
                     uint32_t target_val = (total_space_strength * 100 / defending_space * total_bomb_strength) / defending_ground;
 
-                    *reinterpret_cast<int16_t*>(target_info + 8) = static_cast<int16_t>(target_val);
+                    target_info->value_b = (int16_t)target_val;
 
-                    if (*reinterpret_cast<int16_t*>(target_info + 2) < static_cast<int16_t>(target_val)) {
-                        *reinterpret_cast<int16_t*>(target_info + 4) = planet_idx;
-                        *reinterpret_cast<int16_t*>(target_info + 6) = static_cast<int16_t>(colony_worth);
+                    if (target_info->min_value < (int16_t)target_val) {
+                        target_info->target_star = planet_idx;
+                        target_info->value_a = (int16_t)colony_worth;
                     }
                     else {
                         attack_worthiness = 0;
@@ -2590,12 +2595,12 @@ namespace AIMOVE {
                     fleet[num_escorts] = -1;
 
                     if (MOX::_ship[fleet[0]].location - star_idx == 500) {
-                        int16_t turns = MOX::_ship[fleet[0]].turns_left;
+                        uint8_t turns = MOX::_ship[fleet[0]].turns_left;
                         if (turns < 10 && turns <= max_turns) {
                             if (turns < best_max_turn && enemy_strength2[turns] < strength) {
                                 bool can_escort = true;
                                 for (int32_t t = turns + 1; t < 10; ++t) {
-                                    if (enemy_strength[t] >= strength) {
+                                    if (enemy_strength[t] > strength) {
                                         can_escort = false;
                                         break;
                                     }
@@ -2619,7 +2624,7 @@ namespace AIMOVE {
                             if (turns < best_max_turn && enemy_strength2[turns] < strength) {
                                 bool can_escort = true;
                                 for (int32_t t = turns + 1; t < 10; ++t) {
-                                    if (enemy_strength[t] >= strength) {
+                                    if (enemy_strength[t] > strength) {
                                         can_escort = false;
                                         break;
                                     }
@@ -2706,30 +2711,22 @@ namespace AIMOVE {
             MOX::_settings.game_difficulty > 1) {
             int8_t flee_stars[720];
 
-#pragma pack(push, 1)
-            struct {
-                int16_t val1;
-                int16_t val2;
-                int16_t target_star;
-                int16_t out_val6;
-                int16_t out_val7;
-            } attack_info;
-#pragma pack(pop)
+            s_attack_info attack_info;
 
-            attack_info.val1 = val1;
-            attack_info.val2 = val2;
+            attack_info.target_player = val1;
+            attack_info.min_value = val2;
             attack_info.target_star = -1;
 
             _flee_stars = flee_stars;
             _i_ai = player_id;
             _p_ai = &MOX::_player[player_id];
 
-            Find_Best_Attack_From_Star_(star_idx, reinterpret_cast<uint8_t*>(&attack_info), 1, 2);
+            Find_Best_Attack_From_Star_(star_idx, &attack_info, 1, 2);
 
             if (attack_info.target_star != -1) {
                 *out_target_star = attack_info.target_star;
-                *out_param_6 = attack_info.out_val6;
-                *out_param_7 = (int32_t)attack_info.out_val7;
+                *out_param_6 = attack_info.value_a;
+                *out_param_7 = (int32_t)attack_info.value_b;
             }
 
             _flee_stars = nullptr;
