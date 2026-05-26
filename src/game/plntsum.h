@@ -13,7 +13,7 @@ namespace PLNTSUM {
     inline const char* s_4 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B04}); // "4"
     inline const char* s_5 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B00}); // "5"
 
-    inline int16_t (&_plntscrn_delta_y)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556A78});
+    inline int16_t (&_plntscrn_delta_y)[9] = *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x00556A78});
     inline int16_t& _sort_choice = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556ACC});
     inline int16_t& _filter_out_adverse_gravity_planets = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556AD0});
     inline int16_t& _filter_out_hostile_environment_planets = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556AD4});

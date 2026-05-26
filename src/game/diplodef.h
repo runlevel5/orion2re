@@ -16,3 +16,5 @@ namespace diplodef {
     inline int16_t (&_personality_break_treaty_war)[10] =
         *reinterpret_cast<int16_t (*)[10]>(std::uintptr_t{0x00559C28});
 }
+
+namespace DIPLODEF = diplodef;

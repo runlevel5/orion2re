@@ -76,7 +76,7 @@ namespace aidudes {
     void __cdecl Assign_Additional_Unblockaded_Farmers_();
 
     void __cdecl Colony_AI_(int16_t i_ai);
-    void All_Colony_AI_();
+    void __cdecl All_Colony_AI_();
 
     void __cdecl Assign_Buildings_();
     int __cdecl colony_less_industry_cmp_(const void* p1, const void* p2);

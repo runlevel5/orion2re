@@ -11,6 +11,7 @@ namespace FILEDEF {
     inline const char* const s_rb_0055117c = reinterpret_cast<const char*>(std::uintptr_t{0x0055117C});
     inline const char* const s_GAM_005568f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005568F4});
     inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(std::uintptr_t{0x005568FC});
+    inline const char* const s_Error_saving_game_00556904 = reinterpret_cast<const char*>(std::uintptr_t{0x00556904});
     inline const char* const s_no_description_00556920 = reinterpret_cast<const char*>(std::uintptr_t{0x00556920});
     inline const char* const s_Auto_Save_00556938 = reinterpret_cast<const char*>(std::uintptr_t{0x00556938});
     int8_t __cdecl Get_Game_Type_From_Saved_Game_(int16_t save_slot);

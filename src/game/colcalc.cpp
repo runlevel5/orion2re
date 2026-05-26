@@ -3670,7 +3670,7 @@ namespace COLCALC {
 
                 if (player->settlers_freighted > 0) {
                     for (int32_t settler_idx = 0; settler_idx < player->settlers_freighted; ++settler_idx) {
-                        if (player->settlers[settler_idx].dest_planet == colony->planet) {
+                        if ((int32_t)((player->settlers[settler_idx].val >> 8) & 0xffu) == colony->planet) {
                             has_incoming_settlers = true;
                         }
                     }

@@ -501,7 +501,7 @@ namespace FLT1 {
         FLT2::Set_Initial_Stack_Pointer_();
 
         MOX::_old_small_ship_stack_ptr = -1;
-        MOX::_global_var_byte = 0;
+        MOX::_global_var = 0;
         MOX::_skip_draw_ships = 1;
         _fleet_screen_bad_ship_id = -1;
 

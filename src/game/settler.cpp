@@ -74,10 +74,10 @@ namespace settler {
             if (player->settlers_freighted > 0) {
                 for (int i = 0; i < (int32_t)player->settlers_freighted; ++i) {
                     s_settler_info& settler = player->settlers[i];
+                    uint8_t dest_planet = (uint8_t)((settler.val >> 8) & 0xffu);
 
-                    if ((int32_t)MOX::_planet[settler.dest_planet].colony_index == colony_idx) {
-                        // Note: eta field is used as race index
-                        if (COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)settler.eta) <= pop_limit) {
+                    if ((int32_t)MOX::_planet[dest_planet].colony_index == colony_idx) {
+                        if (COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)((settler.val >> 16) & 0x0fu)) <= pop_limit) {
                             matching_pop_count++;
                         }
                     }
@@ -104,15 +104,14 @@ namespace settler {
             memset(over_limit_per_planet, 0, sizeof(over_limit_per_planet));
 
             if (curr_player->settlers_freighted > 0) {
-                uint32_t* settlers_raw = reinterpret_cast<uint32_t*>(curr_player->settlers);
                 do {
-                    uint32_t val = settlers_raw[settler_idx];
+                    uint32_t val = curr_player->settlers[settler_idx].val;
 
                     // Settler records are packed into one dword: bits 0-7 are source_colony and bits 20-23 are ETA.
                     // Each turn the original code wraps ETA modulo 16 and stamps source_colony to 0xFA.
                     uint32_t eta = ((val >> 20) - 1u) & 0x0fu;
                     val = (val & 0xff0fff00u) | (eta << 20) | 0xfau;
-                    settlers_raw[settler_idx] = val;
+                    curr_player->settlers[settler_idx].val = val;
 
                     if ((val & 0xf00000) == 0) {
                         uint8_t dest_planet = (val >> 8) & 0xff;
@@ -141,7 +140,10 @@ namespace settler {
 
                         curr_player->settlers_freighted--;
                         int to_copy = curr_player->settlers_freighted - settler_idx;
-                        memmove(&settlers_raw[settler_idx], &settlers_raw[settler_idx + 1], to_copy * 4);
+                        memmove(
+                                &curr_player->settlers[settler_idx],
+                                &curr_player->settlers[settler_idx + 1],
+                                to_copy * sizeof(curr_player->settlers[0]));
                     } else {
                         settler_idx++;
                     }
@@ -310,7 +312,7 @@ namespace settler {
                          0x0000FF00);
 
                 const int32_t freighted_index = static_cast<int32_t>(owner_player->settlers_freighted);
-                memcpy(&owner_player->settlers[freighted_index], &encoded_settler, sizeof(encoded_settler));
+                owner_player->settlers[freighted_index].val = encoded_settler;
                 owner_player->settlers_freighted =
                         static_cast<int16_t>(owner_player->settlers_freighted + 1);
             }

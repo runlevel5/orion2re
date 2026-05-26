@@ -27,10 +27,10 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
             char color_choice = 0;
             if (PLNTSUM::_send_choice == 0 || PLNTSUM::_send_choice == 1) {
-                if (scroll_row == PLNTSUM::_box_field_scanned) {
+                if (scroll_row == (int16_t)PLNTSUM::_box_field_scanned) {
                     color_choice = (PLNTSUM::_can_reach_scanned_planet != 0) ? 1 : 2;
                 }
-            } else if (PLNTSUM::_box_field_scanned == scroll_row) {
+            } else if ((int16_t)PLNTSUM::_box_field_scanned == scroll_row) {
                 color_choice = 1;
             }
 
@@ -66,9 +66,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
                 }
 
                 if (special_str) {
-                    char temp_str[80];
-                    strcpy(temp_str, special_str);
-                    fonts::Print_Centered_(0x3d, y_base, temp_str);
+                    fonts::Print_Centered_(0x3d, y_base, special_str);
                 }
             }
 
@@ -662,7 +660,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             if (_planet_summary[row].colony_eta >= 0) {
                 Add_Colony_Ship_Icon_Field_(&_screen->colony_icons[i], i);
                 // Note: The original assembly writes a byte to the low byte of the short global_var.
-                *reinterpret_cast<int8_t*>(&MOX::_global_var) = static_cast<int8_t>(_screen->colony_icons[i]);
+                MOX::_global_var = (int8_t)_screen->colony_icons[i];
             }
             if (_planet_summary[row].outpost_eta >= 0) {
                 Add_Outpost_Ship_Icon_Field_(&_screen->output_icons[i], i);
@@ -816,7 +814,9 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     if (can_order && ship->status != 1) {
                         if (Ship_Is_Not_Colonizing_(ship)) {
                             _draw_outpost_button_status = 1;
-                            _found_outpost_ship = 1;
+                            // The original binary sets the colony-found flag here as well,
+                            // and the early-exit check depends on preserving that behavior.
+                            _found_colony_ship = 1;
                         }
                     }
                 }

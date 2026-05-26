@@ -203,7 +203,7 @@ namespace hooks {
         { 0x004f0e90, &HAROLD::Init_Fleet_Movement_Box_ },
         { 0x004f0f60, &HAROLD::Init_System_Display_Box_ },
         { 0x004f21d0, &HAROLD::Restore_Mouse_List_ },
-        { 0x004f26f0, &HAROLD::Load_Leader_Titles },
+        { 0x004f26f0, &HAROLD::Load_Leader_Titles_ },
         { 0x00525fd0, &fonts::Print_Character_No_Alias_ },
         { 0x00525f00, &fonts::Set_Normal_Colors_On_ },
         { 0x00525f20, &fonts::Set_Highlight_Colors_On_ },

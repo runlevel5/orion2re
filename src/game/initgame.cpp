@@ -412,7 +412,7 @@ namespace INITGAME {
       for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
         s_player& player = MOX::_player[player_idx];
 
-        player.officer_for_hire = static_cast<char>(0xFF);
+        player.officer_for_hire = -1;
         player.offensive_stagepoint = static_cast<char>(0xFF);
         player.contact[player_idx] = 1;
         player.player_done_flags = 0;

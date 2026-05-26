@@ -592,8 +592,7 @@ namespace MOX {
     inline char* (&_government_labels)[8] = *reinterpret_cast<char* (*)[8]>(std::uintptr_t{0x00596FB0});
     inline char** _special_ability_names = reinterpret_cast<char**>(std::uintptr_t{0x0059B350});
     inline int32_t& _stardate_at_beg_of_turn = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0059B344});
-    inline int16_t& _global_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4AA});
-    inline int8_t& _global_var_byte = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B4AA});
+    inline int8_t& _global_var = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B4AA});
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
     inline uint16_t& _combat_init = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005596D8});
     inline void*& _warp_core_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596430});

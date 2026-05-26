@@ -306,13 +306,13 @@ namespace LOADSAVE {
         if (!from_menu) {
             EVANHELP::Set_Load_Game_Screen_Help_List_();
             fields::Clear_Fields_();
-            MOX::_global_var_byte = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41));
+            MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41));
         }
 
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
         fields::Clear_Fields_();
         Add_Game_Popup_Fields_(&unused1, &unused2);
-        MOX::_global_var_byte = 0;
+        MOX::_global_var = 0;
 
         do {
             int16_t input_id = fields::Get_Input_();
@@ -406,13 +406,13 @@ namespace LOADSAVE {
         EVANHELP::Set_Options_Game_Screen_Help_List_();
         fields::Clear_Fields_();
         int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29);
-        MOX::_global_var_byte = (int8_t)hidden_field;
+        MOX::_global_var = (int8_t)hidden_field;
 
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(_Draw_Options_Game_Popup_, 1);
         Add_Game_Popup_Fields_(&dummy_x, &dummy_y);
 
-        MOX::_global_var_byte = 0;
+        MOX::_global_var = 0;
 
         while (true) {
             int16_t input = fields::Get_Input_();
@@ -466,11 +466,11 @@ namespace LOADSAVE {
         EVANHELP::Set_Save_Game_Screen_Help_List_();
         fields::Clear_Fields_();
 
-        *reinterpret_cast<int8_t*>(&MOX::_global_var) = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, 0x29);
+        MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, 0x29);
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
         Add_Game_Popup_Fields_(&sStack_6c, &sStack_6a);
-        *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
+        MOX::_global_var = 0;
 
         do {
             bool copy_continuous_string = false;
@@ -1689,7 +1689,7 @@ namespace LOADSAVE {
     void __cdecl Set_Sound_For_Game_Popup_(char play_sound_effect) {
         s_game_popup_fields* popup = LOADSAVE::_game_popup_fields;
 
-        *reinterpret_cast<uint8_t*>(&MOX::_global_var) = 0;
+        MOX::_global_var = 0;
 
         int32_t volume = ((int32_t)popup->sound_fx_level * 100) / 0x9b;
         MOX::_settings.sound_fx_level = (int8_t)volume;
@@ -1767,7 +1767,7 @@ namespace LOADSAVE {
         RUSS::Load_Russ_Strings_();
         ESTRINGS::Load_E_Strings_();
         HAROLD::Load_Language_Fonts_();
-        HAROLD::Load_Leader_Titles();
+        HAROLD::Load_Leader_Titles_();
         HAROLD::Set_Language_Race_Names_();
         TECHINIT::Load_Tech_Names_();
         INITSHIP::Update_Ship_Names_To_New_Language_();

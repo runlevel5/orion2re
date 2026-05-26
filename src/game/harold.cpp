@@ -697,7 +697,7 @@ namespace HAROLD {
         }
     }
 
-    void __cdecl Load_Leader_Titles() {
+    void __cdecl Load_Leader_Titles_() {
         if (MOX::_screen_seg != NULL) {
             char lbx_filename[20];
             Get_Officer_Data_LBX_Name_(lbx_filename);
@@ -1298,26 +1298,26 @@ namespace HAROLD {
             break;
 
         case 4:
-            if (*reinterpret_cast<int8_t*>(&MOX::_global_var) < 0) {
-                *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0x7E; /* '~' */
+            if (MOX::_global_var < 0) {
+                MOX::_global_var = 0x7E; /* '~' */
             }
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
-            TEXTBOX::Timed_Text_Box_(buffer, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
+            TEXTBOX::Timed_Text_Box_(buffer, message, static_cast<int16_t>(MOX::_global_var));
             *refresh_flag = 1;
             video::Set_Refresh_Stencil_();
             break;
 
         case 5:
-            if (*reinterpret_cast<int8_t*>(&MOX::_global_var) < 0) {
-                *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0x7E; /* '~' */
+            if (MOX::_global_var < 0) {
+                MOX::_global_var = 0x7E; /* '~' */
             }
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
-            TEXTBOX::Timed_Text_Box_(nullptr, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
+            TEXTBOX::Timed_Text_Box_(nullptr, message, static_cast<int16_t>(MOX::_global_var));
             *refresh_flag = 1;
             video::Set_Refresh_Stencil_();
-            *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
+            MOX::_global_var = 0;
             break;
 
         default:
@@ -1459,7 +1459,7 @@ namespace HAROLD {
         MOX::_fleet_movement_bar_value = 0x66;
         MOX::_first_node_ptr_in_stack_ = -1;
         MOX::_eta_star_id = -1;
-        reinterpret_cast<uint8_t&>(MOX::_global_var) = 0;
+        MOX::_global_var = 0;
         MOX::_stencil_box_id = -1;
         MOX::_mainscr_palette = 0xFF;
         MOX::_draw_main_screen_stencilled = 0;

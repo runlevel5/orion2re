@@ -2,11 +2,12 @@
 
 namespace aidudes {
 
-    void All_Colony_AI_() {
+    void __cdecl All_Colony_AI_() {
         int16_t num_players = (int16_t)MOX::_NUM_PLAYERS;
+        s_player* plr = MOX::_player;
 
-        for (int16_t i = 0; i < num_players; ++i) {
-            if (MOX::_player[i].objectives != 100) {
+        for (int16_t i = 0; i < num_players; ++i, ++plr) {
+            if (plr->objectives != 100) {
                 RUSS::Mox_Update_();
                 Colony_AI_(i);
             }
@@ -14,11 +15,13 @@ namespace aidudes {
 
         RUSS::Mox_Update_();
 
-        int16_t num_colonies = (int16_t)MOX::_NUM_COLONIES;
-        for (int i = 0; i < num_colonies; ++i) {
-            if (MOX::_colony[i].producing[0] == -37) {
-                MOX::_colony[i].producing[0] = -2;
+        s_colony* col = MOX::_colony;
+        s_colony* end = MOX::_colony + (int16_t)MOX::_NUM_COLONIES;
+        while (col < end) {
+            if (col->producing[0] == -37) {
+                col->producing[0] = -2;
             }
+            ++col;
         }
     }
 
@@ -346,13 +349,13 @@ namespace aidudes {
     }
 
     void __cdecl Assign_Buildings_() {
-        int count = (int)_n_our_colonies;
+        s_aidudes_colony_info* it = *_our_colonies;
+        s_aidudes_colony_info* end = it + _n_our_colonies;
 
-        if (count > 0) {
-            for (int i = 0; i < count; ++i) {
-                uint8_t colony_idx = (uint8_t)(*_our_colonies)[i].colony_idx;
-                AIBUILD::Assign_Colony_Building_(&MOX::_colony[colony_idx]);
-            }
+        while (it < end) {
+            AIBUILD::Assign_Colony_Building_(&MOX::_colony[it->colony_idx]);
+            ++it;
+            end = (*_our_colonies) + _n_our_colonies;
         }
     }
 

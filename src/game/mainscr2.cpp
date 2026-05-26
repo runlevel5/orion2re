@@ -32,7 +32,7 @@ namespace MAINSCR2 {
         graphics::Set_Window_(22, 22, 527, 421);
         video::Clip_On_();
 
-        *reinterpret_cast<int8_t*>(&MOX::_global_var) = static_cast<int8_t>(MOX::_temp_star_handle);
+        MOX::_global_var = static_cast<int8_t>(MOX::_temp_star_handle);
 
         if (star_idx > -1) {
             MAINSCR::Highlight_Star_(star_idx);
@@ -50,7 +50,7 @@ namespace MAINSCR2 {
                     }
 
                     if (MOX::_temp_star_handle > -1 && MOX::_temp_star_handle != star_idx) {
-                        if (static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)) == MOX::_temp_star_handle) {
+                        if (static_cast<int16_t>(MOX::_global_var) == MOX::_temp_star_handle) {
                             int16_t x1, y1;
                             int16_t x2, y2;
 
@@ -203,7 +203,7 @@ namespace MAINSCR2 {
 
         video::Copy_Off_To_Back_();
 
-        *reinterpret_cast<uint8_t*>(&MOX::_global_var) = 0xFF;
+        MOX::_global_var = (int8_t)0xFF;
 
         do {
             timer::Mark_Time_();
@@ -532,7 +532,7 @@ namespace MAINSCR2 {
         char msg_buffer[80];
 
         _in_reports_phase = 1;
-        *reinterpret_cast<uint8_t*>(&MOX::_global_var) = 0;
+        MOX::_global_var = 0;
 
         Begin_Of_Turn_(&cancel_turn);
 

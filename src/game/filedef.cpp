@@ -30,6 +30,7 @@ namespace FILEDEF {
 
         // Re-assert state after saving
         RUSS::Assert_Settings_();
+        fclose(file);
 
         return true;
     }
@@ -49,18 +50,9 @@ namespace FILEDEF {
         itoa(slot + 1, slot_str, 10);
 
         char filename[260];
-        const char* prefix = reinterpret_cast<const char*>(0x005568FC); // "SAVE"
-        const char* suffix = reinterpret_cast<const char*>(0x005568F4); // ".GAM"
-
-        char* dst = filename;
-        const char* src = prefix;
-        while ((*dst++ = *src++) != '\0');
-        dst--;
-        src = slot_str;
-        while ((*dst++ = *src++) != '\0');
-        dst--;
-        src = suffix;
-        while ((*dst++ = *src++) != '\0');
+        strcpy(filename, FILEDEF::s_SAVE_005568fc);
+        strcat(filename, slot_str);
+        strcat(filename, FILEDEF::s_GAM_005568f4);
 
         RUSS::Assert_Settings_();
 
@@ -68,10 +60,7 @@ namespace FILEDEF {
 
         if (fp == nullptr) {
             char error_msg[20];
-            const char* err_src = reinterpret_cast<const char*>(0x00556904); // "Error saving game."
-            for (int i = 0; i < 5; ++i) {
-                ((uint32_t*)error_msg)[i] = ((const uint32_t*)err_src)[i];
-            }
+            memcpy(error_msg, FILEDEF::s_Error_saving_game_00556904, sizeof(error_msg));
             GENDRAW::Message_Box_(error_msg);
             return;
         }
@@ -143,8 +132,8 @@ namespace FILEDEF {
         fwrite(&REPORT::_displayed_gnn, 1, 1, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&diplodef::_COUNCIL_FLAG, 2, 1, fp);
-        fwrite(&diplodef::_next_council_meeting_turn, 2, 1, fp);
+        fwrite(&DIPLODEF::_COUNCIL_FLAG, 2, 1, fp);
+        fwrite(&DIPLODEF::_next_council_meeting_turn, 2, 1, fp);
         fwrite(&MOX::_antaran_resource_level, 2, 1, fp);
         fwrite(&MOX::_chance_for_antaran_invasion, 2, 1, fp);
         fwrite(&MOX::_disallow_saves_code, 2, 1, fp);
@@ -167,7 +156,7 @@ namespace FILEDEF {
 
     uint32_t __cdecl Load_Game_(int16_t save_idx) {
         char filename[256];
-        char err_msg[128];
+        char err_msg[128] = {};
         uint32_t header_val;
         uint32_t random_seed;
         s_settings saved_settings;
@@ -183,7 +172,7 @@ namespace FILEDEF {
         FILE* file = fopen(filename, "rb");
         if (file == nullptr) {
             RUSS::PFMT_(0, 0, "File read error");
-            hgetch_();
+            assert::hgetch_();
             return 0;
         }
 
@@ -203,12 +192,13 @@ namespace FILEDEF {
             GENDRAW::Warning_Box_(err_msg);
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 639, 479, 0);
+            fclose(file);
             return 0;
         }
 
         MISC::Increment_Mouse_Clock_Image_();
 
-        int desc_idx = (save_idx > 9) ? 9 : (int)save_idx;
+        int16_t desc_idx = (save_idx >= 9) ? 9 : save_idx;
         fread(&MOX::_save_game_description[desc_idx], 37, 1, file);
         fread(&MOX::_stardate, 4, 1, file);
         fread(&MOX::_game_type, 1, 1, file);
@@ -244,6 +234,7 @@ namespace FILEDEF {
             fread(&MOX::_player[i], sizeof(s_player), 1, file);
         }
 
+        RUSS::Mox_Update_();
         fread(&MOX::_NUM_SHIPS, 2, 1, file);
         for (int i = 0; i < MAX_SHIPS; ++i) {
             fread(&MOX::_ship[i], sizeof(s_ship_data), 1, file);
@@ -294,6 +285,8 @@ namespace FILEDEF {
         fread(&EVENTS::_last_event_year, 4, 1, file);
         fread(&EVENTS::_event_delay_count, 2, 1, file);
         fread(&MOX::_antarans, 66, 1, file);
+
+        RUSS::Mox_Update_();
         fread(&MOX::_cur_map_scale, 2, 1, file);
         fread(&MOX::_cur_map_x, 2, 1, file);
         fread(&MOX::_cur_map_y, 2, 1, file);
@@ -321,7 +314,7 @@ namespace FILEDEF {
         RUSS::Assert_Settings_();
         MAINSCR::Update_Star_Owners_();
         RUSS::Assert_Settings_();
-        HAROLD::Load_Leader_Titles();
+        HAROLD::Load_Leader_Titles_();
 
         for (int i = 0; i < 8; ++i) {
             if (MOX::_player[i].dead_field != 0) {

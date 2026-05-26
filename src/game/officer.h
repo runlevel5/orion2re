@@ -291,7 +291,7 @@ namespace OFFICER {
     void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(
         int16_t skill_id_base,
         int16_t skill_count_minus_one,
-        int32_t popup_param);
+        int16_t popup_param);
 
     void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts);
 

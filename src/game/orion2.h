@@ -2344,7 +2344,7 @@ typedef struct s_leader_data s_leader_data, *Ps_leader_data;
 struct s_leader_data {
     char name[15];
     char title[20];
-    char type;
+    uint8_t type;
     short xp;
     uint32_t general_skills;
     uint32_t special_skills;
@@ -3101,11 +3101,9 @@ struct s_ship_design {
 };
 
 struct s_settler_info {
-    byte source_colony:8;
-    byte dest_planet:8;
-    byte eta:4;
-    byte player:4;
-    byte job:2;
+    // Packed transit-settler record used as a raw dword by the original code:
+    // bits 0-7 source_colony, 8-15 dest_planet, 16-19 race, 20-23 eta, 24-25 job.
+    uint32_t val;
 };
 
 struct s_player {
@@ -3172,7 +3170,7 @@ struct s_player {
     char offensive_stagepoint;
     char best_ftl_drive;
     uint8_t ship_speed;
-    char officer_for_hire;
+    int8_t officer_for_hire;
     short n_trade_pops;
     short current_trade_agreement_level[8];
     short trade_agreement_goal[8];
@@ -4488,7 +4486,7 @@ struct s_skill_data {
     uint8_t skill_type;
     int16_t strength;
     int8_t level_up;
-    uint8_t cost;
+    int8_t cost;
     char *name;
     char *format_str;
 };
