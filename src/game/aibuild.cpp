@@ -70,7 +70,7 @@ namespace AIBUILD {
 
     int16_t __cdecl Refit_Cost_(int16_t player_idx, s_ship_design* old_design, s_ship_design* new_design) {
         // Minimum cost is half of the hull's available space
-        int32_t min_cost = (int32_t)TECHDATA::_hull_data[(uint8_t)new_design->size].cost / 2;
+        int32_t min_cost = (int32_t)TECHDATA::_hull_data[(int16_t)new_design->size].cost / 2;
         
         // Base refit cost is twice the difference in design costs
         int32_t refit_cost = ((int32_t)new_design->cost - (int32_t)old_design->cost) * 2;
@@ -413,7 +413,7 @@ namespace AIBUILD {
 
     void __cdecl Empire_Buy_Outright_(int16_t player_idx) {
         s_player* player = &MOX::_player[player_idx];
-        int16_t total_maintenance = *reinterpret_cast<int16_t*>(&player->total_maintenance);
+        int16_t total_maintenance = (int16_t)(uint16_t)player->total_maintenance;
         
         int32_t limit = (player->bc * 3) / 4;
         if (limit > 1500) {

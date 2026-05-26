@@ -32,15 +32,8 @@ namespace INITGAME {
      * Clears the entire array and sets initial sentinel values for owner, planet, and officer.
      */
     void Init_Colonies_Array_() {
-        // The array consists of 250 colonies, each of 361 bytes (total 90250 bytes).
-        // The assembly clears this memory using REP STOSD (0x5822 * 4 bytes) and STOSW (2 bytes).
-        uint8_t* raw_colony_data = reinterpret_cast<uint8_t*>(MOX::_colony);
-        for (uint32_t i = 0; i < 90250; ++i) {
-            raw_colony_data[i] = 0;
-        }
+        memset(MOX::_colony, 0, 250 * sizeof(s_colony));
 
-        // Loop through all 250 colony slots to set initial state.
-        // The size of s_colony is 361 (0x169) bytes.
         for (MOX::_NUM_COLONIES = 0; MOX::_NUM_COLONIES < 250; ++MOX::_NUM_COLONIES) {
             s_colony& colony = MOX::_colony[MOX::_NUM_COLONIES];
 
@@ -49,7 +42,6 @@ namespace INITGAME {
             colony.officer = -1;
         }
 
-        // Reset the active colony counter to 0 after initialization.
         MOX::_NUM_COLONIES = 0;
     }
 

@@ -60,7 +60,7 @@ namespace EVENTS {
 
     int16_t __cdecl Pick_Random_Colony_No_Capitol_(int16_t player_idx);
 
-    int16_t __cdecl Pick_Random_Colony_No_Outpost_(int16_t player_idx);
+    int16_t __cdecl Pick_Random_Colony_No_Outpost_(int8_t player_idx);
 
     int16_t __cdecl Pick_Random_Star_(int16_t player_idx);
 

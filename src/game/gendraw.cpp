@@ -70,7 +70,7 @@ namespace GENDRAW {
         _animation_frame += _direction;
 
         animate::Remap_Draw_(0x9A, _message_box_y, _image_seg[0]);
-        animate::Draw_(0xD0, box_y, (s_animation_header*)_box_bitmap);
+        animate::Draw_(0xD0, box_y, _box_bitmap);
     }
 
     void __cdecl Message_Box_Exploding_(char* str) {
@@ -79,11 +79,11 @@ namespace GENDRAW {
         fonts::Set_Font_Style_(4, &_message_text_colors);
         fonts::Set_Font_LF_(0x12);
 
-        _image_seg[0] = (s_animation_header*)buffer::Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
+        _image_seg[0] = (s_animation_header*)buffer::Buffer_Reload_(s_warning_lbx_00557650, 0, MOX::_global_cache_seg);
         remap::Calculate_Picture_Remap_Colors_(_image_seg[0]);
 
         uint32_t size = bitmap::Get_Bitmap_Size_(0x14B, 0xBF);
-        _box_bitmap = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+        _box_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
         bitmap::Create_Blank_Bitmap_(0x14B, 0xBF, _box_bitmap);
 
         _message_box_y = 0x90;
@@ -91,7 +91,6 @@ namespace GENDRAW {
         _first_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29);
 
         s_colors font_colors;
-        // Potential bug in original code: font_colors is passed uninitialized
         fonts::Set_Remap_Font_Style_(4, &font_colors);
         fonts::Set_Font_LF_(0x12);
 
@@ -105,13 +104,13 @@ namespace GENDRAW {
         uint8_t base_color1;
         uint8_t base_color2;
         TEXTBOX::Get_Mox_Text_Box_Base_Colors_(1, &base_color1, &base_color2);
-        s_colors* psVar2 = MISC::Font_Colors2_(mode, base_color1, base_color2);
+        s_colors* psVar2 = MISC::Font_Colors2_(mode, base_color2, base_color1);
         font_colors = *psVar2;
 
         fonts::Set_Remap_Font_Style_(mode, &font_colors);
         fonts::Set_Font_LF_(0x12);
 
-        _image_seg[0] = (s_animation_header*)buffer::Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
+        _image_seg[0] = (s_animation_header*)buffer::Buffer_Reload_(s_warning_lbx_00557650, 0, MOX::_global_cache_seg);
         animate::Remap_Draw_(0x9A, _message_box_y, _image_seg[0]);
 
         Do_Print_1_Or_More_Formatted_Lines_Centered_(0xD0, 0xE8, 0xE2, str);
@@ -120,7 +119,7 @@ namespace GENDRAW {
         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
         RUSS::Mox_Sync_Update_();
 
-        bitmap::Screen_Bitmap_Capture_(0xD0, _message_box_y + 0x25, 0x1B2, _message_box_y + 0x9D, (s_animation_header*)_box_bitmap);
+        bitmap::Screen_Bitmap_Capture_(0xD0, _message_box_y + 0x25, 0x1B2, _message_box_y + 0x9D, _box_bitmap);
 
         fields::Assign_Auto_Function_(Draw_Animating_Message_Box_, 2);
 

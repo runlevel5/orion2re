@@ -355,13 +355,13 @@ namespace TEXTBOX {
 
         s_animation_header* textbox_lbx_ptr = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, _textbox_seg));
 
-        tmp_block = (uint32_t)reinterpret_cast<uintptr_t>(allocate::Allocate_Next_Block_(_textbox_seg, 0x30D4));
+        tmp_block = (s_animation_header*)allocate::Allocate_Next_Block_(_textbox_seg, 0x30D4);
 
         int16_t title_y[9];
         uint8_t anim_frames[9];
         int16_t draw_x[9];
         int16_t format_width[9];
-        void* anim_ptrs[9];
+        s_animation_header* anim_ptrs[9];
         int16_t body_y[9];
         int16_t draw_y[9];
 
@@ -373,21 +373,21 @@ namespace TEXTBOX {
             int16_t bmp_y_val = 0;
 
             if (has_anim[i]) {
-                uint32_t anim_info = records[i].anim_info;
-                uint16_t rec_idx = static_cast<uint16_t>(anim_info & 0xFFFF);
-                uint8_t frame = (anim_info >> 16) & 0xFF;
+                int32_t anim_info = (int32_t)records[i].anim_info;
+                uint16_t rec_idx = (uint16_t)anim_info;
+                uint8_t frame = (uint8_t)(anim_info >> 16);
 
                 anim_frames[i] = frame;
-                anim_ptrs[i] = farload::Far_Reload_Next_(records[i].anim_lbx, rec_idx, _textbox_seg);
-                animate::Set_Animation_Frame_(static_cast<s_animation_header*>(anim_ptrs[i]), frame);
-                bitmap::Draw_Picture_To_Bitmap_(reinterpret_cast<s_animation_header*>(tmp_block), static_cast<s_animation_header*>(anim_ptrs[i]));
+                anim_ptrs[i] = (s_animation_header*)farload::Far_Reload_Next_(records[i].anim_lbx, rec_idx, _textbox_seg);
+                animate::Set_Animation_Frame_(anim_ptrs[i], frame);
+                bitmap::Draw_Picture_To_Bitmap_(tmp_block, anim_ptrs[i]);
 
-                int16_t bmp_w, bmp_h, bmp_x;
-                bitmap::Get_Bitmap_Actual_Size_(reinterpret_cast<s_animation_header*>(tmp_block), &bmp_w, &bmp_h, &bmp_x, &bmp_y_val);
+                int16_t min_x, min_y, actual_width;
+                bitmap::Get_Bitmap_Actual_Size_(tmp_block, &min_x, &min_y, &actual_width, &bmp_y_val);
 
-                draw_x[i] = 354 - bmp_x - bmp_w;
-                draw_y[i] = current_y - bmp_h;
-                format_width[i] = 333 - bmp_x;
+                draw_x[i] = 0x162 - actual_width - min_x;
+                draw_y[i] = current_y - min_y;
+                format_width[i] = 0x14D - actual_width;
             }
 
             fonts::Set_Font_Style_(4, &color_1);
@@ -438,11 +438,11 @@ namespace TEXTBOX {
             );
 
             if (has_anim[i]) {
-                animate::Set_Animation_Frame_(static_cast<s_animation_header*>(anim_ptrs[i]), anim_frames[i]);
+                animate::Set_Animation_Frame_(anim_ptrs[i], anim_frames[i]);
                 animate::Draw_(
                     draw_x[i] + box_x,
                     draw_y[i] + box_y,
-                    static_cast<s_animation_header*>(anim_ptrs[i])
+                    anim_ptrs[i]
                 );
             }
         }

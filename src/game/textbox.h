@@ -15,7 +15,7 @@ struct s_help_record {
 namespace TEXTBOX {
     inline int16_t& _bottom_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EC8});
     inline uint8_t*& _textbox_seg = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00565ed8});
-    inline uint32_t& tmp_block = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565EDC});
+    inline s_animation_header*& tmp_block = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565EDC});
     inline uint16_t& _field_save_ix = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00557434});
     inline const char* s_textbox_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
     inline const char* s_textbox_lbx_00557444 = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});

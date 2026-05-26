@@ -825,7 +825,7 @@ namespace EVENTS {
             }
 
             if (event_type == 16) {
-                target_id = EVENTS::Pick_Random_Colony_No_Capitol_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Colony_No_Capitol_(player_idx);
                 if (target_id != -1) {
                     if (EVENTS::_event_data[17].status == 2 && EVENTS::_event_data[17].target_id == target_id) {
                         event_type = -1;
@@ -896,7 +896,7 @@ namespace EVENTS {
                 EVENTS::_event_data[event_type].target_id = MOX::_colony[target_id].planet;
                 break;
             case 2:
-                target_id = EVENTS::Pick_Random_Colony_No_Capitol_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Colony_No_Capitol_(player_idx);
                 EVENTS::_event_data[event_type].target_id = target_id;
                 if (target_id == -1 || EVENTS::Colony_Has_Event_(target_id) != -1) {
                     EVENTS::_event_data[event_type].status = 0;
@@ -923,7 +923,7 @@ namespace EVENTS {
                 EVENTS::_event_data[event_type].target_id = (((MOX::_stardate - 35000) / 20) + 1) * 100;
                 break;
             case 7:
-                target_id = EVENTS::Pick_Random_Colony_No_Capitol_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Colony_No_Capitol_(player_idx);
                 EVENTS::_event_data[event_type].target_id = target_id;
                 if (target_id == -1) {
                     EVENTS::_event_data[event_type].status = 0;
@@ -1240,7 +1240,7 @@ namespace EVENTS {
 
         // Attempt to pick a random colony that satisfies the climate condition
         for (int i = 0; i < 200; ++i) {
-            int16_t picked = Pick_Random_Colony_No_Outpost_(player_idx);
+            int16_t picked = Pick_Random_Colony_No_Outpost_((int8_t)player_idx);
             if (picked != -1) {
                 int16_t planet_idx = MOX::_colony[picked].planet;
                 if (MOX::_planet[planet_idx].climate < 8) {
@@ -1375,7 +1375,7 @@ namespace EVENTS {
         int16_t attempts = 0;
 
         while (attempts < 200) {
-            int16_t random_idx = Pick_Random_Colony_No_Outpost_(player_idx);
+            int16_t random_idx = Pick_Random_Colony_No_Outpost_((int8_t)player_idx);
 
             if (random_idx != -1) {
                 int16_t planet_idx = MOX::_colony[random_idx].planet;
@@ -1397,13 +1397,13 @@ namespace EVENTS {
         return colony_idx;
     }
 
-    int16_t __cdecl Pick_Random_Colony_No_Outpost_(int16_t player_idx) {
+    int16_t __cdecl Pick_Random_Colony_No_Outpost_(int8_t player_idx) {
         int16_t selected_colony_idx = -1;
         int16_t match_count = 0;
 
         for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             // Check if the colony is owned by the specified player and is not an outpost (outpost_flag == 0)
-            if (MOX::_colony[i].owner == (int8_t)player_idx && MOX::_colony[i].outpost_flag == 0) {
+            if (MOX::_colony[i].owner == player_idx && MOX::_colony[i].outpost_flag == 0) {
                 match_count++;
 
                 // Using reservoir sampling: for the n-th match found, the probability of selecting it is 1/n.
@@ -1425,7 +1425,7 @@ namespace EVENTS {
 
             // 0x13F is buildings[9]. Index 9 is BUILDING_CAPITOL.
             // 0x6 is outpost_flag.
-            if (colony->owner == (int8_t)player_idx && 
+            if (colony->owner == player_idx && 
                 colony->buildings[BUILDING_CAPITOL] == 0 && 
                 colony->outpost_flag == 0) {
                 

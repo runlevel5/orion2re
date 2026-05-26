@@ -288,9 +288,8 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             }
 
             if (test_move_result != 0) {
-                int32_t diff = facing_dir - ship->facing_dir + 16;
-                int32_t turns = diff % 16;
-                move_cost = turns * Turn_Cost_(ship_idx);
+                int32_t turns = ((int32_t)facing_dir - (int32_t)ship->facing_dir + 16) & 0x0F;
+                move_cost = (int16_t)(turns * Turn_Cost_(ship_idx));
             } else {
                 move_cost = Move_Cost_(ship_idx, dest_x_px / 20, dest_y_px / 20);
             }

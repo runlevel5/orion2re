@@ -944,9 +944,8 @@ namespace aidudes {
 
                     int deficit = (*AIDATA::_ai_player_info)[player_idx].colony_deficit;
                     int bonus = deficit * 10;
-                    int half_adjusted = (val - deficit * 5) / 2;
-                    if (half_adjusted < bonus) {
-                        bonus = half_adjusted;
+                    if (val / 2 < bonus) {
+                        bonus = val / 2;
                     }
                     val += bonus;
 

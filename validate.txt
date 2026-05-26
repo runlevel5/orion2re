@@ -1301,7 +1301,7 @@
 [X] 0046F0B0 - Rotate_Ship_Until_Impact_
 [.] 0046F350 - Ship_In_Legal_Square_
 [X] 0046F3F0 - Test_Move_Until_Impact_
-[.] 0046F810 - Move_Ship_
+[V] 0046F810 - Move_Ship_
 [X] 00470070 - Get_Facing_
 [X] 004700D0 - Rotate_Ship_
 [X] 00470440 - Turn_Cost_
@@ -1312,7 +1312,7 @@
 [X] 00470900 - Lose_Out_Of_Range_Ships_
 [X] 00470960 - Compute_Stars_In_Range_Of_Player_
 [X] 00470A00 - Player_Lose_Out_Of_Range_Ships_
-[.] 00470A90 - Draw_Help_Entry_
+[V] 00470A90 - Draw_Help_Entry_
 [X] 00471070 - Text_Box_
 [X] 00471090 - Timed_Text_Box_
 [X] 004710B0 - Do_Text_Box_
@@ -1337,7 +1337,7 @@
 [X] 00473AF0 - Add_Alliance_Msg_
 [X] 00473B10 - Add_Nonaggression_Msg_
 [X] 00473B30 - Add_Peace_Ended_Msg_
-[.] 00473B50 - Add_Ongoing_Event_Msgs_
+[V] 00473B50 - Add_Ongoing_Event_Msgs_
 [X] 00473DF0 - Init_Events_
 [X] 00473E50 - Reset_Events_
 [X] 00473EA0 - Check_For_Event_Message_
@@ -1349,7 +1349,7 @@
 [X] 004741A0 - Event_Fade_In_
 [X] 004742A0 - Event_Twiddle_
 [X] 00474F60 - Setup_Next_Event_
-[.] 00475910 - Get_Event_Message_
+[V] 00475910 - Get_Event_Message_
 [X] 00476160 - Event_Get_Fleet_Strength_
 [X] 004761C0 - Determine_Event_
 [X] 00476DE0 - Get_Event_Victim_
@@ -1381,8 +1381,8 @@
 [X] 00477E10 - Pick_Random_Player_In_Contact_
 [X] 00477EB0 - Pick_Random_Star_
 [.] 00477F90 - Pick_Random_Ship_
-[.] 00478000 - Pick_Random_Colony_No_Outpost_
-[.] 00478080 - Pick_Random_Colony_No_Capitol_
+[V] 00478000 - Pick_Random_Colony_No_Outpost_
+[V] 00478080 - Pick_Random_Colony_No_Capitol_
 [X] 00478110 - Event_Check_Colony_Researching_
 [X] 00478190 - Colony_Has_Event_
 [X] 00478290 - Kill_All_Events_At_Colony_
@@ -1391,11 +1391,11 @@
 [X] 00478640 - Event_Pirate_Activity_Strength_
 [X] 00478700 - Determine_Lucky_Players_Events_
 [X] 004787C0 - Update_Lucky_Players_Events_
-[.] 00478820 - Init_New_Game_
+[V] 00478820 - Init_New_Game_
 [X] 00478B30 - Init_Ships_Array_
 [X] 00478BC0 - Make_System_Monsters_Into_Ships_
 [X] 00478D10 - Set_Initial_Colony_Auto_Selects_
-[.] 00478D80 - Init_Colonies_Array_
+[V] 00478D80 - Init_Colonies_Array_
 [X] 00478E20 - Init_Map_Pictures_Default__
 [X] 00478E30 - Init_Map_Defaults_
 [X] 00478E80 - Set_Default_Game_Settings_
@@ -1405,11 +1405,11 @@
 [X] 00479580 - Init_Leaders_
 [X] 004796B0 - Message_Box_
 [X] 004796D0 - Message_Box_Exploding_Star_
-[.] 004796E0 - Warning_Box_
+[V] 004796E0 - Warning_Box_
 [X] 00479700 - Do_Confirmation_Box_
-[.] 00479710 - Message_Box_Exploding_
+[V] 00479710 - Message_Box_Exploding_
 [X] 00479960 - Confirmation_Box_
-[.] 00479BA0 - Draw_Animating_Message_Box_
+[V] 00479BA0 - Draw_Animating_Message_Box_
 [X] 00479C30 - Draw_Confirm_Box_
 [X] 00479CC0 - Message_Box_Startup_
 [X] 00479D70 - Message_Box_Cleanup_
@@ -1423,9 +1423,9 @@
 [X] 0047A9E0 - Compute_Freighter_Need_
 [X] 0047AA40 - Colony_Is_Conquered_
 [X] 0047AAB0 - Assign_Colony_New_Building_
-[.] 0047AC30 - Find_Buildable_Buildings_
-[.] 0047AC70 - Colony_Building_Score_
-[.] 0047BA30 - Empire_Buy_Outright_
+[V] 0047AC30 - Find_Buildable_Buildings_
+[V] 0047AC70 - Colony_Building_Score_
+[V] 0047BA30 - Empire_Buy_Outright_
 [X] 0047BD10 - Player_War_Level_
 [.] 0047BDB0 - Refit_Cost_
 [.] 0047BE10 - Assign_Empire_Building_
@@ -1506,211 +1506,211 @@
 [X] 004828D0 - INITSHIP::Load_Hydra_Ship_Design_
 [X] 004829F0 - INITSHIP::Load_Amoeba_Ship_Design_
 [X] 00482B30 - INITSHIP::Load_Eel_Ship_Design_
-[.] 00482C60 - INITSHIP::Load_Crystal_Ship_Design_
-[.] 00482DA0 - INITSHIP::Load_Guardian_Ship_Design_
+[X] 00482C60 - INITSHIP::Load_Crystal_Ship_Design_
+[X] 00482DA0 - INITSHIP::Load_Guardian_Ship_Design_
 [.] 00482F10 - Repair_Ships_At_Colonies_
-[.] 00483050 - Repair_Ship_Full_
-[.] 004830D0 - Ship_Has_Weapon_
+[X] 00483050 - Repair_Ship_Full_
+[X] 004830D0 - Ship_Has_Weapon_
 [.] 00483120 - Get_Design_Structure_
-[.] 004831A0 - Get_Structure_
-[.] 004831F0 - Get_Ship_Structure_
-[.] 004832D0 - Get_Ship_Armor_Hits_
-[.] 00483340 - Load_Loknar_Ship_Design_
+[X] 004831A0 - Get_Structure_
+[X] 004831F0 - Get_Ship_Structure_
+[X] 004832D0 - Get_Ship_Armor_Hits_
+[X] 00483340 - Load_Loknar_Ship_Design_
 [.] 00483470 - main2_
-[.] 00483830 - Screen_Control_
-[.] 00483C80 - Mox_Sync_Update_
-[.] 00483C90 - Get_Auto_Function_
-[.] 00483CA0 - Put_Auto_Function_
+[X] 00483830 - Screen_Control_
+[X] 00483C80 - Mox_Sync_Update_
+[X] 00483C90 - Get_Auto_Function_
+[X] 00483CA0 - Put_Auto_Function_
 [.] 00483CB0 - Execute_Auto_Function_
-[.] 00483CC0 - Set_Game_Random_Seed_
-[.] 00483CE0 - Set_Mox_Alt_Path_
+[X] 00483CC0 - Set_Game_Random_Seed_
+[X] 00483CE0 - Set_Mox_Alt_Path_
 [.] 00483EF0 - Set_Mox_Language_
-[.] 00483F60 - Load_Strings
-[.] 00483FF0 - Tech_Select_
-[.] 00484040 - Tech_Change_
-[.] 00484080 - Reset_Screen_
+[X] 00483F60 - Load_Strings
+[X] 00483FF0 - Tech_Select_
+[X] 00484040 - Tech_Change_
+[X] 00484080 - Reset_Screen_
 [.] 004840C0 - _Tech_Select_
 [.] 004849B0 - Draw_Tech_Select_
-[.] 00484A60 - Draw_Little_Arrow_
+[X] 00484A60 - Draw_Little_Arrow_
 [.] 00484BC0 - _Tech_List_
-[.] 00485240 - Draw_Tech_List_
-[.] 004852A0 - Display_All_Entry_Text_
-[.] 004852D0 - Display_Entry_Text_
+[X] 00485240 - Draw_Tech_List_
+[X] 004852A0 - Display_All_Entry_Text_
+[X] 004852D0 - Display_Entry_Text_
 [.] 00485460 - Display_Selected_Entry_Text_
-[.] 00485550 - Set_Selected_Entry_
-[.] 004855D0 - Get_Selected_Entry_
-[.] 00485600 - Init_Entry_Positions_
-[.] 004856C0 - Init_Entry_Data_
-[.] 00485AC0 - Setup_Entry_Buttons_
-[.] 00485B40 - Get_Group_List_
-[.] 00485D10 - Draw_Application_Description_
-[.] 00485EC0 - Technology_Fields_Name_
-[.] 00485F20 - Technology_Applications_Name_
-[.] 00486050 - New_Get_Tech_Cost_
-[.] 004860A0 - Save_Hyper_Tech_Values_
-[.] 004860E0 - Restore_Hyper_Tech_Values_
-[.] 00486120 - Promote_Hyper_Field_Values_
+[X] 00485550 - Set_Selected_Entry_
+[X] 004855D0 - Get_Selected_Entry_
+[X] 00485600 - Init_Entry_Positions_
+[X] 004856C0 - Init_Entry_Data_
+[X] 00485AC0 - Setup_Entry_Buttons_
+[X] 00485B40 - Get_Group_List_
+[X] 00485D10 - Draw_Application_Description_
+[X] 00485EC0 - Technology_Fields_Name_
+[X] 00485F20 - Technology_Applications_Name_
+[X] 00486050 - New_Get_Tech_Cost_
+[X] 004860A0 - Save_Hyper_Tech_Values_
+[X] 004860E0 - Restore_Hyper_Tech_Values_
+[X] 00486120 - Promote_Hyper_Field_Values_
 [.] 00486160 - Load_New_Game_Strings_
-[.] 00486390 - Reload_Newgame_Screen_
+[X] 00486390 - Reload_Newgame_Screen_
 [.] 004865A0 - Draw_Newgame_Screen_
-[.] 00486690 - Draw_Pictures_
-[.] 004867A0 - Newgame_Screen_
-[.] 00486AC0 - Update_Fields_
-[.] 00486F60 - Temps_To_Globals_
-[.] 00486FD0 - Globals_To_Temps_
-[.] 00487060 - Troop_Popup_
-[.] 004870F0 - Reset_Fields_
-[.] 00487130 - Draw_Troop_Popup_
-[.] 00487270 - Print_Best_Summary_
-[.] 00487320 - Print_Data_
-[.] 004873C0 - Print_Race_Summary_
-[.] 004874B0 - Print_Troop_Totals_
-[.] 00487750 - Save_Field_Stats_
-[.] 004877E0 - Restore_Field_Stats_
-[.] 00487840 - Crew_Description_String_
-[.] 004879A0 - Add_Fltscrn_Big_Icon_Fields_
+[X] 00486690 - Draw_Pictures_
+[X] 004867A0 - Newgame_Screen_
+[X] 00486AC0 - Update_Fields_
+[X] 00486F60 - Temps_To_Globals_
+[X] 00486FD0 - Globals_To_Temps_
+[X] 00487060 - Troop_Popup_
+[X] 004870F0 - Reset_Fields_
+[X] 00487130 - Draw_Troop_Popup_
+[X] 00487270 - Print_Best_Summary_
+[X] 00487320 - Print_Data_
+[X] 004873C0 - Print_Race_Summary_
+[X] 004874B0 - Print_Troop_Totals_
+[X] 00487750 - Save_Field_Stats_
+[X] 004877E0 - Restore_Field_Stats_
+[X] 00487840 - Crew_Description_String_
+[X] 004879A0 - Add_Fltscrn_Big_Icon_Fields_
 [.] 00487B10 - Add_Fltscrn_Small_Icon_Fields_
-[.] 00487B90 - Build_Fltscrn_Big_Icon_Fields_
-[.] 00487D50 - Move_Ship_To_Front_Of_List_
-[.] 00487DE0 - Build_Fltscrn_Ship_List_
-[.] 00487E70 - Draw_Captains_Picture_
-[.] 00488040 - Fix_Palette_
-[.] 00488070 - Fleet_Screen_Big_Icon_Fields_
-[.] 00488250 - Fltscrn_Move_Ships_
-[.] 00488490 - Fltscrn_Ships_To_Be_Displayed_
-[.] 00488550 - Get_Filter_Button_Status_
-[.] 004885A0 - Get_Fltscrn_Big_Icon_XY_
-[.] 00488600 - Ok_To_Add_Ship_
-[.] 00488660 - Print_Fltscrn_Scanned_Star_Name_
-[.] 00488C70 - Print_Scanned_Ship_Data_
-[.] 004894C0 - Scan_Fltscrn_Big_Icons_
-[.] 004895D0 - Set_Fleet_Screen_Stack_Owner_
-[.] 00489610 - Set_Fltscrn_Small_Ship_Icon_XYs_
-[.] 004898D0 - Set_Initial_Stack_Pointer_
-[.] 004898E0 - Set_Small_Ship_Stack_Pointer_
-[.] 004899A0 - Clear_All_Selection_Status_
+[X] 00487B90 - Build_Fltscrn_Big_Icon_Fields_
+[X] 00487D50 - Move_Ship_To_Front_Of_List_
+[X] 00487DE0 - Build_Fltscrn_Ship_List_
+[X] 00487E70 - Draw_Captains_Picture_
+[X] 00488040 - Fix_Palette_
+[X] 00488070 - Fleet_Screen_Big_Icon_Fields_
+[X] 00488250 - Fltscrn_Move_Ships_
+[X] 00488490 - Fltscrn_Ships_To_Be_Displayed_
+[X] 00488550 - Get_Filter_Button_Status_
+[X] 004885A0 - Get_Fltscrn_Big_Icon_XY_
+[X] 00488600 - Ok_To_Add_Ship_
+[X] 00488660 - Print_Fltscrn_Scanned_Star_Name_
+[X] 00488C70 - Print_Scanned_Ship_Data_
+[X] 004894C0 - Scan_Fltscrn_Big_Icons_
+[X] 004895D0 - Set_Fleet_Screen_Stack_Owner_
+[X] 00489610 - Set_Fltscrn_Small_Ship_Icon_XYs_
+[X] 004898D0 - Set_Initial_Stack_Pointer_
+[X] 004898E0 - Set_Small_Ship_Stack_Pointer_
+[X] 004899A0 - Clear_All_Selection_Status_
 [.] 004899D0 - Get_Small_Icon_Animation_Size_
-[.] 00489A70 - Message_Box_Titled_
-[.] 00489A90 - QLoad_Combat_Antaran_Ship_
+[X] 00489A70 - Message_Box_Titled_
+[X] 00489A90 - QLoad_Combat_Antaran_Ship_
 [.] 00489C40 - QLoad_Antaran_Defense_Fleet_
-[.] 00489EA0 - Get_Leader_Combat_Bonuses_
+[X] 00489EA0 - Get_Leader_Combat_Bonuses_
 [.] 00489FE0 - Strategic_Combat_
-[.] 0048AB60 - Apply_Damage_To_Qship_
-[.] 0048ABF0 - FUN_0048abf0
-[.] 0048AD30 - Build_End_Of_Combat_Message_
+[X] 0048AB60 - Apply_Damage_To_Qship_
+[X] 0048ABF0 - FUN_0048abf0
+[X] 0048AD30 - Build_End_Of_Combat_Message_
 [.] 0048BE60 - Qload_Ships_
-[.] 0048CC30 - QGet_Target_
-[.] 0048CD00 - QGet_Target_SC_
+[X] 0048CC30 - QGet_Target_
+[X] 0048CD00 - QGet_Target_SC_
 [.] 0048CD80 - Missile_Attack_
-[.] 0048CEE0 - Strat_Bomb_Attack_
-[.] 0048CF80 - Stellar_Converter_Attack_
-[.] 0048CFB0 - Strat_Special_Attack_
-[.] 0048D0B0 - Beam_Attack_
-[.] 0048D1E0 - _no_op3
-[.] 0048D1F0 - FUN_0048d1f0
-[.] 0048D220 - Get_Colony_Hits_
-[.] 0048D2A0 - Resolve_Strat_Colony_Damage_
-[.] 0048D450 - Strategic_Bombardment_
-[.] 0048D570 - Bombardment_
+[X] 0048CEE0 - Strat_Bomb_Attack_
+[X] 0048CF80 - Stellar_Converter_Attack_
+[X] 0048CFB0 - Strat_Special_Attack_
+[X] 0048D0B0 - Beam_Attack_
+[X] 0048D1E0 - _no_op3
+[X] 0048D1F0 - FUN_0048d1f0
+[X] 0048D220 - Get_Colony_Hits_
+[X] 0048D2A0 - Resolve_Strat_Colony_Damage_
+[X] 0048D450 - Strategic_Bombardment_
+[X] 0048D570 - Bombardment_
 [.] 0048D670 - Tactical_Bombardment_
-[.] 0048D990 - qsort_ship_array_by_size_
-[.] 0048D9E0 - Update_Vertical_Scroll_Bar_State_
-[.] 0048DA10 - Get_Vertical_Scroll_Bar_First_Item_
-[.] 0048DAD0 - Get_Vertical_Scroll_Bar_Height_
-[.] 0048DB10 - Set_Vertical_Scroll_Bar_Maxima_
-[.] 0048DB60 - Scroll_Down_One_Item_
-[.] 0048DBD0 - Scroll_Up_One_Item_
-[.] 0048DC40 - Draw_Generic_Vertical_Scroll_Bar_
-[.] 0048DCF0 - Application_Type_
-[.] 0048DD10 - Draw_Special_Systems_Scroll_Bar_
-[.] 0048DE50 - Draw_Weapons_Scroll_Bar_
-[.] 0048DFB0 - Generic_Replacement_Box_
-[.] 0048E190 - Add_Generic_Replacement_Fields_
-[.] 0048E320 - Draw_Darkened_Design_Screen_
+[X] 0048D990 - qsort_ship_array_by_size_
+[X] 0048D9E0 - Update_Vertical_Scroll_Bar_State_
+[X] 0048DA10 - Get_Vertical_Scroll_Bar_First_Item_
+[X] 0048DAD0 - Get_Vertical_Scroll_Bar_Height_
+[X] 0048DB10 - Set_Vertical_Scroll_Bar_Maxima_
+[X] 0048DB60 - Scroll_Down_One_Item_
+[X] 0048DBD0 - Scroll_Up_One_Item_
+[X] 0048DC40 - Draw_Generic_Vertical_Scroll_Bar_
+[X] 0048DCF0 - Application_Type_
+[X] 0048DD10 - Draw_Special_Systems_Scroll_Bar_
+[X] 0048DE50 - Draw_Weapons_Scroll_Bar_
+[X] 0048DFB0 - Generic_Replacement_Box_
+[X] 0048E190 - Add_Generic_Replacement_Fields_
+[X] 0048E320 - Draw_Darkened_Design_Screen_
 [.] 0048E380 - Draw_Generic_Replacement_Box_Help_
 [.] 0048E580 - Draw_Generic_Replacement_Box_
-[.] 0048E690 - Generic_Replacement_Box_Choices_
-[.] 0048E820 - Generic_Replacement_Box_Dimensions_
-[.] 0048E8F0 - Print_Computer_Data_
-[.] 0048ECE0 - Print_Shield_Data_
-[.] 0048F0E0 - Redraw_Main_Design_Screen_To_Background_
+[X] 0048E690 - Generic_Replacement_Box_Choices_
+[X] 0048E820 - Generic_Replacement_Box_Dimensions_
+[X] 0048E8F0 - Print_Computer_Data_
+[X] 0048ECE0 - Print_Shield_Data_
+[X] 0048F0E0 - Redraw_Main_Design_Screen_To_Background_
 [.] 0048F140 - Space_With_Weapon_
-[.] 0048F280 - Special_System_Choices_
-[.] 0048F4D0 - Special_Systems_Box_
+[X] 0048F280 - Special_System_Choices_
+[X] 0048F4D0 - Special_Systems_Box_
 [.] 0048FB20 - Add_Special_System_Fields_
-[.] 0048FDA0 - Draw_Special_Systems_Replacement_Box
+[X] 0048FDA0 - Draw_Special_Systems_Replacement_Box
 [.] 0048FE80 - Items_Selected_
-[.] 0048FEC0 - Print_Special_System_Data_
-[.] 004904D0 - Set_Up_Special_System_Scroll_Bar_
-[.] 00490570 - Special_System_Exclusion_
-[.] 00490610 - Special_System_Replacement_Box_Dimensions_
-[.] 004906C0 - System_Added_Cost_And_Space_
-[.] 00490780 - Weapons_Replacement_Box_
-[.] 00491100 - Add_Replacement_Weapon_Fields_
-[.] 00491850 - Clear_Weapon_Replacement_Fields_
-[.] 004918B0 - Draw_Weapons_Replacement_Box_
-[.] 00491B40 - Draw_Weapons_Arc_Box_
-[.] 00491C40 - Draw_Weapons_Mod_Box_
-[.] 00491D60 - Draw_Weapons_Rack_Box_
-[.] 00491E30 - Get_Weapon_Mod_Field_XYs_
-[.] 00492020 - Get_Weapons_Box_Base_Dimensions_
-[.] 004920B0 - Mod_Allowed_On_Weapon_Type_
+[X] 0048FEC0 - Print_Special_System_Data_
+[X] 004904D0 - Set_Up_Special_System_Scroll_Bar_
+[X] 00490570 - Special_System_Exclusion_
+[X] 00490610 - Special_System_Replacement_Box_Dimensions_
+[X] 004906C0 - System_Added_Cost_And_Space_
+[X] 00490780 - Weapons_Replacement_Box_
+[X] 00491100 - Add_Replacement_Weapon_Fields_
+[X] 00491850 - Clear_Weapon_Replacement_Fields_
+[X] 004918B0 - Draw_Weapons_Replacement_Box_
+[X] 00491B40 - Draw_Weapons_Arc_Box_
+[X] 00491C40 - Draw_Weapons_Mod_Box_
+[X] 00491D60 - Draw_Weapons_Rack_Box_
+[X] 00491E30 - Get_Weapon_Mod_Field_XYs_
+[X] 00492020 - Get_Weapons_Box_Base_Dimensions_
+[X] 004920B0 - Mod_Allowed_On_Weapon_Type_
 [.] 00492120 - New_Arc_Space_
-[.] 00492170 - Print_Main_Weapon_Box_
-[.] 00492810 - Print_Weapon_Mod_Help_Description_
-[.] 00492980 - Print_Weapon_Modification_Message_
-[.] 00492BD0 - New_Mod_Space_
-[.] 00492C50 - Scan_Replacement_Fields_
-[.] 00492D30 - Set_Up_Weapon_Display_
-[.] 00492E90 - Set_Up_Weapon_Scroll_Bar_
-[.] 00492FC0 - Should_Add_Mod_
-[.] 00492FF0 - Space_With_Weapons_
-[.] 004930A0 - Update_Field_Item_Chosen_
-[.] 00493100 - Update_Weapon_Modification_Data_
-[.] 00493140 - Update_Weapon_Replacement_
-[.] 004933B0 - Set_New_Weapon_Modifications_
-[.] 00493400 - Valid_Modifications_
-[.] 00493530 - Weapon_Choice_Valid_
-[.] 004935D0 - Weapon_Choices_
-[.] 00493940 - Have_Tractor_Beam_Weapon_
-[.] 00493990 - Weapon_Index_
+[X] 00492170 - Print_Main_Weapon_Box_
+[X] 00492810 - Print_Weapon_Mod_Help_Description_
+[X] 00492980 - Print_Weapon_Modification_Message_
+[X] 00492BD0 - New_Mod_Space_
+[X] 00492C50 - Scan_Replacement_Fields_
+[X] 00492D30 - Set_Up_Weapon_Display_
+[X] 00492E90 - Set_Up_Weapon_Scroll_Bar_
+[X] 00492FC0 - Should_Add_Mod_
+[X] 00492FF0 - Space_With_Weapons_
+[X] 004930A0 - Update_Field_Item_Chosen_
+[X] 00493100 - Update_Weapon_Modification_Data_
+[X] 00493140 - Update_Weapon_Replacement_
+[X] 004933B0 - Set_New_Weapon_Modifications_
+[X] 00493400 - Valid_Modifications_
+[X] 00493530 - Weapon_Choice_Valid_
+[X] 004935D0 - Weapon_Choices_
+[X] 00493940 - Have_Tractor_Beam_Weapon_
+[X] 00493990 - Weapon_Index_
 [.] 004939B0 - Weapon_Replacement_Help_
-[.] 00493A00 - qsort_by_research_cost_
-[.] 00493A20 - Add_System_Display_Popup_Fields_
-[.] 00493E60 - Build_System_Popup_Ships_
-[.] 00493F30 - Clear_System_Display_Loaded_Flag_
-[.] 00493F50 - Clear_System_Display_Ship_Fields_
-[.] 00493F90 - Draw_Sun_Seg_
+[X] 00493A00 - qsort_by_research_cost_
+[X] 00493A20 - Add_System_Display_Popup_Fields_
+[X] 00493E60 - Build_System_Popup_Ships_
+[X] 00493F30 - Clear_System_Display_Loaded_Flag_
+[X] 00493F50 - Clear_System_Display_Ship_Fields_
+[X] 00493F90 - Draw_Sun_Seg_
 [.] 00494050 - Draw_System_Display_Popup_
-[.] 00494940 - Draw_Colony_Marker_
-[.] 004949C0 - Draw_Gate_Icons_
-[.] 00494AB0 - Draw_Outpost_Marker_
-[.] 00494B20 - Draw_System_Display_Border_
-[.] 00494B60 - Draw_System_Display_Planets_
-[.] 00494C60 - Draw_Planet_With_Pierced_Ring_
-[.] 00494FB0 - Draw_System_Highlight_
-[.] 004951B0 - Draw_System_Ship_Icons_
-[.] 00495330 - Get_Gate_Icon_XY_
-[.] 00495370 - Print_Planet_Info_Short_
-[.] 004953A0 - Do_Print_Planet_Info_
-[.] 00495A40 - Get_Rotating_Planet_Segment_
-[.] 00495AF0 - Get_System_Display_Ship_Icon_XY_
-[.] 00495BF0 - Measure_System_Ship_Data_
-[.] 00495C20 - Do_Print_System_Ship_Data_
-[.] 00496190 - Hide_System_Display_
-[.] 00496250 - Init_System_Display_
-[.] 004962D0 - Load_New_System_Display_
-[.] 00496620 - N_Ships_By_Type_At_Location_
-[.] 00496700 - Need_To_Reload_System_Display_
-[.] 00496790 - Ok_To_View_System_
-[.] 004967F0 - Potential_Colony_Info_Popup_
-[.] 00496E20 - Print_Gate_Info_
-[.] 00497270 - Print_Planet_Info_
-[.] 004972B0 - Print_System_Display_Box_Title_
-[.] 00497420 - Print_System_Ship_Data_
-[.] 00497460 - Set_System_Display_Loaded_Flag_
-[.] 004974F0 - Wrapper_For_Informational_System_Fields_
-[.] 00497540 - Wrapper_For_Normal_System_Fields_
+[X] 00494940 - Draw_Colony_Marker_
+[X] 004949C0 - Draw_Gate_Icons_
+[X] 00494AB0 - Draw_Outpost_Marker_
+[X] 00494B20 - Draw_System_Display_Border_
+[X] 00494B60 - Draw_System_Display_Planets_
+[X] 00494C60 - Draw_Planet_With_Pierced_Ring_
+[X] 00494FB0 - Draw_System_Highlight_
+[X] 004951B0 - Draw_System_Ship_Icons_
+[X] 00495330 - Get_Gate_Icon_XY_
+[X] 00495370 - Print_Planet_Info_Short_
+[X] 004953A0 - Do_Print_Planet_Info_
+[X] 00495A40 - Get_Rotating_Planet_Segment_
+[X] 00495AF0 - Get_System_Display_Ship_Icon_XY_
+[X] 00495BF0 - Measure_System_Ship_Data_
+[X] 00495C20 - Do_Print_System_Ship_Data_
+[X] 00496190 - Hide_System_Display_
+[X] 00496250 - Init_System_Display_
+[X] 004962D0 - Load_New_System_Display_
+[X] 00496620 - N_Ships_By_Type_At_Location_
+[X] 00496700 - Need_To_Reload_System_Display_
+[X] 00496790 - Ok_To_View_System_
+[X] 004967F0 - Potential_Colony_Info_Popup_
+[X] 00496E20 - Print_Gate_Info_
+[X] 00497270 - Print_Planet_Info_
+[X] 004972B0 - Print_System_Display_Box_Title_
+[X] 00497420 - Print_System_Ship_Data_
+[X] 00497460 - Set_System_Display_Loaded_Flag_
+[X] 004974F0 - Wrapper_For_Informational_System_Fields_
+[X] 00497540 - Wrapper_For_Normal_System_Fields_
 [.] 004975B0 - Wrapper_For_Normal_System_Popup_
 [.] 00497640 - qsort_sys_disp_
 [.] 00497660 - Calculate_Remap_Gray_Palettes_
@@ -2279,956 +2279,956 @@
 [.] 004C0B70 - Strategic_Results_Popup_
 [.] 004C0BE0 - Bomb_Results_Popups_
 [.] 004C0CA0 - Do_Net_Combat_Update_
-[ ] 004C14E0 - GNN_Reports_Combat_
-[ ] 004C1550 - Do_Nonhuman_Attack_Against_Human_
-[ ] 004C1710 - Init_Turn_Summary_List_
-[ ] 004C1730 - Draw_Turn_Summary_Popup_
-[ ] 004C1790 - Turn_Summary_Popup_
-[ ] 004C1B20 - thunk_main2_
-[ ] 004C1B30 - Load_Player_Ship_Palette_
-[ ] 004C1C90 - Get_Ship_Id_Picture_Seg_
-[ ] 004C1CC0 - Get_Ship_Picture_Seg_
-[ ] 004C1CE0 - Do_Get_Ship_Picture_Seg
-[ ] 004C1D40 - Ken_Init_
-[ ] 004C1D50 - Ken_Init2_
-[ ] 004C1D60 - Get_Weighted_Choice_
-[ ] 004C1DF0 - Get_Derelict_Applications_
-[ ] 004C1FC0 - Init_NPC_Personalities_Objectives_Themes_
-[ ] 004C2630 - Ken_Get_Text_Message_
-[ ] 004C2670 - Load_Netstart_Strings_
-[ ] 004C2740 - Mox_Net_Uninit_
-[ ] 004C2780 - Dump_Users_
-[ ] 004C27A0 - Join_Net_Screen_
-[ ] 004C2A40 - Do_Net_Init_
-[ ] 004C2A80 - Net_Select_Race_
-[ ] 004C2C90 - Net_Pick_Position_
-[ ] 004C2F40 - Do_Answer_
-[ ] 004C2FB0 - Load_Net_Screen_
-[ ] 004C35B0 - Russ_Net_Create_Game_
-[ ] 004C3600 - Do_Dial_
-[ ] 004C36B0 - Start_Net_Screen_
-[ ] 004C3DE0 - Request_Banner_Color_
-[ ] 004C3E70 - Request_Race_
-[ ] 004C3F30 - Unrequest_Race_
-[ ] 004C3F60 - Compute_Defensive_Stage_Points_
-[ ] 004C43E0 - Get_Star_Picture_Seg_
-[ ] 004C4430 - Add_Map_Fields_
-[ ] 004C48B0 - Add_Star_Fields_
-[ ] 004C4980 - Allocate_First_Screen_Seg_
-[ ] 004C49D0 - Center_Map_
-[ ] 004C4B00 - thunk_Clear_Main_Screen_Fields_
-[ ] 004C4B10 - Clear_Twinkling_Star_Data_
-[ ] 004C4B60 - Cycle_Ship_Icons_
-[ ] 004C4DB0 - Cycle_Star_Icons_
-[ ] 004C4E90 - Do_Next_Turn_
-[ ] 004C4FE0 - Do_System_Popup_
-[ ] 004C50C0 - Draw_Black_Holes_
-[ ] 004C5220 - Draw_Exploding_Plasma_Box_
-[ ] 004C56B0 - Draw_Game_Turn_Buttons_
-[ ] 004C5700 - Draw_Main_Main_Screen_
-[ ] 004C5830 - Draw_Diplomacy_Request_Lights_
-[ ] 004C5980 - Draw_Gate_Icons_
-[ ] 004C59B0 - Draw_A_Gate_Icon_
-[ ] 004C5E20 - Draw_Main_Screen_
-[ ] 004C61D0 - Check_Mouse_XY_Fields_
-[ ] 004C62D0 - Draw_ETA_Destination_Line_
-[ ] 004C6430 - Draw_Fleet_Box_Selected_Ship_Seg_
-[ ] 004C64B0 - Draw_Main_Screen_Before_Stencil_
-[ ] 004C6550 - Draw_Main_Screen_Filled_
-[ ] 004C6690 - Draw_Main_Screen_While_Moving_Boxes_
-[ ] 004C6780 - Draw_Mini_Main_Screen_
-[ ] 004C6880 - Draw_Nebulae_
-[ ] 004C6930 - Draw_Paralax_
-[ ] 004C6B40 - Draw_Player_Done_Lights_
-[ ] 004C6C90 - Draw_Relocation_Links_
-[ ] 004C6DA0 - Draw_Scanned_Ship_Seg_
-[ ] 004C6E50 - Draw_Stars_
-[ ] 004C6EB0 - Draw_A_Star_
-[ ] 004C6FE0 - Draw_Wormhole_Links_
-[ ] 004C70E0 - Set_Popup_Draw_XY_
-[ ] 004C7160 - Popup_XY_
-[ ] 004C7260 - Get_New_Paralax_XYs_
-[ ] 004C7440 - Get_PointXY_Draw_Coords_
-[ ] 004C7490 - Get_Ship_Stack_For_Officers_Screen_
-[ ] 004C7510 - Map_Scale_Star_Size_To_Zoom_Level_
-[ ] 004C7550 - Get_Star_Draw_Coords_
-[ ] 004C75B0 - Get_Star_Id_For_Officers_Screen_
-[ ] 004C7680 - Highlight_Star_
-[ ] 004C76E0 - MAINSCR::Is_Main_Screen_Palette_
-[ ] 004C7720 - Main_Screen_
-[ ] 004C8B80 - Add_Cheats_
-[ ] 004C8BF0 - Change_Home_Star_Name_
-[ ] 004C8C70 - Check_For_Diplomacy_Request_
-[ ] 004C8D00 - Check_Function_Keys_
-[ ] 004C90C0 - Check_Hot_Keys_
-[ ] 004C9410 - Check_Ships_XY_
-[ ] 004C9500 - Check_Stars_XY_
-[ ] 004C9650 - Clear_Mouse_XY_
-[ ] 004C9670 - Do_Colony_Screen_
-[ ] 004C9740 - Do_Fleet_Popup_
-[ ] 004C99B0 - Do_Reply_To_Diplomacy_Request_
-[ ] 004C9B00 - Add_Reply_To_Diplomacy_Request_Fields_
-[ ] 004C9C30 - Draw_Main_Screen_For_Zooming_
-[ ] 004C9E10 - Draw_Reply_To_Diplomacy_Request_
-[ ] 004C9F20 - Get_Mouse_Field_
-[ ] 004CA090 - Give_Me_All_Tech_Advances_
-[ ] 004CA140 - Load_Reply_To_Diplomacy_Request_Popup_
-[ ] 004CA1C0 - Mini_Main_Screen_Text_Box_
-[ ] 004CA210 - Print_Galaxy_Map_Scanned_Star_
-[ ] 004CA360 - Print_Highlighted_Star_Name_
-[ ] 004CA430 - Get_Star_Name_
-[ ] 004CA720 - Print_A_Star_Name_
-[ ] 004CA990 - Print_Main_Screen_Data_
-[ ] 004CB8B0 - Set_Post_Fitted_Font_Style_
-[ ] 004CB910 - Print_Star_Name_To_Bitmap_
-[ ] 004CBA80 - Print_Star_Names_
-[ ] 004CBB40 - Redraw_Main_Screen_
-[ ] 004CBC60 - Draw_Mini_Main_Offscreen_
-[ ] 004CBC80 - Restore_Hotseat_Map_Info_
-[ ] 004CBD70 - Save_Hotseat_Map_Info_
-[ ] 004CBE00 - Scan_Galaxy_Map_Fields_
-[ ] 004CBED0 - Scan_Moveable_Box_Fields
-[ ] 004CC480 - Scan_Fleet_Movement_Box_Fields_
-[ ] 004CC5B0 - Scan_Ships_XY_
-[ ] 004CC700 - Scan_Stars_XY_
-[ ] 004CC920 - Scan_System_Display_Fields_
-[ ] 004CCD90 - Scroll_Map_
-[ ] 004CCF30 - Clear_Main_Screen_Fields_
-[ ] 004CD040 - Set_Painted_Fleet_Fields_
-[ ] 004CD0D0 - Set_Reload_Fleet_Box_Palette_Flag_
-[ ] 004CD0F0 - Ship_Can_Be_Selected_
-[ ] 004CD120 - Star_On_Screen_
-[ ] 004CD170 - Exit_Zooming_Mode_
-[ ] 004CD1B0 - Toggle_Game_Option_
-[ ] 004CD460 - Get_Star_Name_Info_
-[ ] 004CD550 - Update_Ship_Icons_In_Between_Turns_
-[ ] 004CD560 - Update_Star_Owners_
-[ ] 004CD5B0 - Zoom_Box_Height_
-[ ] 004CD5D0 - Zoom_Box_Width_
-[ ] 004CD5F0 - Set_Player_Cheated_Flag_
-[ ] 004CD630 - Warn_About_Cheating_Players_
-[ ] 004CD7F0 - Fade_Into_Main_Screen_
-[ ] 004CD930 - Get_Research_Unit_String_
-[ ] 004CD9E0 - Draw_Super_Fast_Screen_
-[ ] 004CDA90 - Refresh_Combat_Screen_Full_
-[ ] 004CDB50 - Full_Draw_Combat_Screen_
-[ ] 004CE0E0 - Draw_Grey_Damage_Bars_
-[ ] 004CE740 - Draw_Ship_Status_
-[ ] 004CF810 - Draw_Weapon_Status_Display_
-[ ] 004D0070 - Draw_Special_Status_Display_
-[ ] 004D0220 - Draw_Blip2_
-[ ] 004D0280 - Draw_Blip3_
-[ ] 004D0340 - Draw_Blip4_
-[ ] 004D04A0 - Draw_Blip5_
-[ ] 004D06B0 - Draw_Reduced_Map_Box_
-[ ] 004D08D0 - Draw_Reduced_Combat_Map_
-[ ] 004D0AC0 - Draw_Option_Panel_Lights_
-[ ] 004D0BC0 - Draw_Crew_Level_Stars_
-[ ] 004D0CA0 - Draw_Main_Combat_Screen_
-[ ] 004D1980 - Draw_Ship_
-[ ] 004D1F80 - Combat_Draw_View_Ship_
-[ ] 004D3C10 - Detailed_View_Ship_
-[ ] 004D3F50 - Draw_Shield_Arcs_
-[ ] 004D4580 - Relative_Bearing_XY_
-[ ] 004D4630 - Relative_Bearing_
-[ ] 004D4730 - Get_Weapon_Arc_
-[ ] 004D4780 - Draw_Ship_To_Bitmap_
-[ ] 004D4A20 - Draw_Retreating_Ship_
-[ ] 004D4E40 - Get_Ship_Actual_Size_
-[ ] 004D4E80 - Remap_Draw_Ship_Status_
-[ ] 004D5370 - Scroll_Draw_Combat_Screen_
-[ ] 004D5820 - Ship_Completely_On_Screen_
-[ ] 004D59A0 - Ship_On_Screen_
-[ ] 004D5B60 - Display_Combat_View_Ship_
-[ ] 004D5C70 - Crew_Quality_String_
-[ ] 004D5DA0 - Plasma_Darken_
-[ ] 004D5FC0 - Draw_Bombs_
-[ ] 004D6380 - Create_Ship_Darken_Map_
-[ ] 004D6520 - Get_Draw_Ship_Offsets_
-[ ] 004D6650 - Get_Ship_Center_Draw_XY_
-[ ] 004D66D0 - Draw_Internals_Display_
-[ ] 004D6AB0 - Draw_Fake_Combat_Buttons_
-[ ] 004D6CB0 - Draw_Legal_Boxes_
-[ ] 004D6E60 - Move_Options_Background_
-[ ] 004D7120 - Board_Popup_
-[ ] 004D73F0 - Draw_Board_Popup_
-[ ] 004D7500 - Play_Cinematic_
-[ ] 004D7780 - Smack_Fade_
-[ ] 004D77F0 - Draw_Smacker_Animation_
-[ ] 004D7810 - Assert_Settings_
-[ ] 004D7820 - Mox_Update_
-[ ] 004D7830 - Release_All_Blocks_
-[ ] 004D7840 - nullsub
-[ ] 004D7850 - PFMT_
-[ ] 004D7860 - Get_Weighted_Choice_Char_
-[ ] 004D78E0 - Get_Weighted_Choice_Short_
-[ ] 004D7950 - Get_Weighted_Choice_Int_
-[ ] 004D79B0 - Shuffle_Char_
-[ ] 004D7A10 - Shuffle_Sint_
-[ ] 004D7A70 - Shuffle_Int_
-[ ] 004D7AD0 - Shuffle_
-[ ] 004D7C10 - Star_To_Monster_
-[ ] 004D7C30 - Star_Name_
-[ ] 004D7C60 - Compare_Ratios_
-[ ] 004D7D30 - init
-[ ] 004D7D80 - FUN_004d7d80
-[ ] 004D7DA0 - FUN_004d7da0
-[ ] 004D7DC0 - Make_Player_Into_AI_
-[ ] 004D7E70 - Make_All_AI_Game_
-[ ] 004D7ED0 - Load_Russ_Strings_
-[ ] 004D7F50 - Main_Council_Screen_
-[ ] 004D80A0 - Control_Main_Council_Screen_
-[ ] 004D8130 - Draw_Main_Council_Screen_
-[ ] 004D8440 - Reload_Main_Council_Screen_
-[ ] 004D8940 - Get_Num_Votes_
-[ ] 004D89A0 - Get_Council_Message_
-[ ] 004D8BD0 - Next_Council_State_
-[ ] 004D8C30 - Council_Finished_Voting_
-[ ] 004D8CE0 - Council_Votes_
-[ ] 004D8E60 - Vote_Check_
-[ ] 004D8FF0 - Council_Vote_Result_
-[ ] 004D9180 - Council_Player_Vote_
-[ ] 004D9430 - Council_Accept_Ruling_
-[ ] 004D9700 - Check_For_Council_Meeting_
-[ ] 004D97E0 - Load_Council_Text_Messages_
-[ ] 004D9840 - Council_Player_Voted_Winner_
-[ ] 004D98E0 - Drive_Council_Player_Voted_Winner_
-[ ] 004D9990 - Draw_Council_Player_Voted_Winner_
-[ ] 004D9AE0 - Get_Player_Voted_Winner_Message_
-[ ] 004D9B40 - Building_Outposts_In_Main_Screen_
-[ ] 004D9D10 - Distance_Between_Stars_Screen_
-[ ] 004D9F30 - Draw_Main_Screen_For_Star_Distan
-[ ] 004DA200 - Planet_Colonization_In_Main_Screen_
-[ ] 004DA420 - Scrap_Freighters_
-[ ] 004DA6D0 - Unloading_Transports_In_Main_Screen_
-[ ] 004DA870 - Reports_Screen_
-[ ] 004DA9F0 - Do_Begin_Of_Turn_
-[ ] 004DABF0 - Begin_Of_Turn_
-[ ] 004DAD10 - Check_Fleet_Movement_Box_Status_
-[ ] 004DAD40 - Main_Screen_Report_Handler_
-[ ] 004DAEC0 - Redraw_Main_Screen_After_Popups_
-[ ] 004DAEE0 - Restore_Fleet_Box_Palette_
-[ ] 004DAF20 - Show_Command_Points_Screen_
-[ ] 004DAFB0 - Reload_Hotseat_Screen_
-[ ] 004DB050 - Draw_Hotseat_Screen_
-[ ] 004DB170 - Hotseat_Screen_
-[ ] 004DB4E0 - Init_Hotseat_Screen_
-[ ] 004DB600 - Fade_Into_Hotseat_Screen_
-[ ] 004DB690 - N_Colonies_And_Outposts_At_Star_
-[ ] 004DB6F0 - Draw_Pop_Dark_
-[ ] 004DB760 - N_Bldgs_
-[ ] 004DB7A0 - Fix_Colony_Queue_
-[ ] 004DB800 - Defragment_Colony_Queue_
-[ ] 004DB850 - Squish_Out_Colony_Queue_Slot_
-[ ] 004DB8C0 - Remap_Draw_Ship_Centered_
-[ ] 004DBA50 - Remap_Draw_Ship_Seg_N_Centered_
-[ ] 004DBBD0 - Remap_Draw_Ship_D_Centered_
-[ ] 004DBC20 - Print_Sys_Disp_Scanned_String_
-[ ] 004DBC40 - Get_Effective_Pop_Player_
-[ ] 004DBC90 - Pop_Race_String_
-[ ] 004DBD00 - Reset_Field_Arrays_
-[ ] 004DBD90 - Set_Colony_Font_
-[ ] 004DBDB0 - Set_Colony_Font_To_Player_
-[ ] 004DBE20 - Set_Colony_Font_To_Blue_
-[ ] 004DBE80 - Set_Colony_Font_To_Reg_Blue_
-[ ] 004DBEF0 - Set_Colony_Font_To_Red_
-[ ] 004DBF40 - Set_Colony_Font_To_
-[ ] 004DBF80 - Colonize_Planet_
-[ ] 004DBFD0 - Init_Colonies_
-[ ] 004DBFE0 - Job_String_
-[ ] 004DC030 - Conquered_String_
-[ ] 004DC060 - Pop_State_String_
-[ ] 004DC0C0 - Set_Colony_Globals_
-[ ] 004DC110 - Col_Calc_Wrapper_
-[ ] 004DC190 - Reset_Field_Mode_
-[ ] 004DC1E0 - Drop_Military_
-[ ] 004DC240 - Restore_Control_
-[ ] 004DC270 - Clear_Move_Military_
-[ ] 004DC290 - Do_Load_Colony_Anims_
-[ ] 004DC2D0 - Spy_Anim_
-[ ] 004DC300 - Turn_To_Rubble_CR_Bldg_
-[ ] 004DC350 - CR_Building_Name_
-[ ] 004DC3A0 - Real_Building_Name_
-[ ] 004DC3B0 - Real_Building_Name2_
-[ ] 004DC3C0 - Colony_Pop_Anim_
-[ ] 004DC470 - Colony_Pop_Icon_
-[ ] 004DC4A0 - People_Anim_
-[ ] 004DC550 - Military_Anims_
-[ ] 004DC580 - Military_Anim_
-[ ] 004DC650 - Player_Troop_Name_
-[ ] 004DC720 - Player_Troop_Anim_
-[ ] 004DC800 - Load_Bldg_Bitm_
-[ ] 004DC830 - Load_Ship_Bitm_
-[ ] 004DC880 - thunk_Load_Road_List_Anims_
-[ ] 004DC890 - Load_Galaxy_Map_Anims_
-[ ] 004DC8D0 - Load_Colony_Screen_Seg_
-[ ] 004DC9E0 - Load_Officer_Anim_
-[ ] 004DCA30 - thunk_Load_Planet_Screen_
-[ ] 004DCA40 - Load_Planet_Screen_
-[ ] 004DCA50 - C_Anims_
-[ ] 004DCC90 - Load_Govt_Anim_
-[ ] 004DCCB0 - Govt_Anim_
-[ ] 004DCCC0 - Buffer_Reload_Colony_
-[ ] 004DCCE0 - Satellite_Anim_Pic_
-[ ] 004DCD60 - Load_Colony_Anims_
-[ ] 004DCD70 - Prod_Anims_
-[ ] 004DCDB0 - Import_Anims_
-[ ] 004DCDF0 - Short_Anims_
-[ ] 004DCE50 - Get_Bldg_CR_
-[ ] 004DCEF0 - Make_Bldg_Array_For_Colony_
-[ ] 004DD1B0 - Clear_Satellite_Array_
-[ ] 004DD1D0 - Clear_Colony_Buidlings_
-[ ] 004DD1F0 - Sort_Bldg_Array_Columns_
-[ ] 004DD340 - Insert_Bldg_Into_Array_
-[ ] 004DD5B0 - N_Houses_In_Bldg_Array_
-[ ] 004DD600 - Find_Replacement_Slot_For_Building_
-[ ] 004DD6B0 - Insert_Satellite_Into_Array_
-[ ] 004DD6E0 - Sat_Should_Be_Replaced_
-[ ] 004DD760 - CR_To_XY_
-[ ] 004DD790 - Get_Bldg_Box_
-[ ] 004DD840 - Bldg_Coords_To_Centered_Screen_Coord_
-[ ] 004DD880 - Bldg_Coords_To_Effective_Frame_
-[ ] 004DD8C0 - Reset_Step_Squish_
-[ ] 004DD8D0 - Colony_Has_Natives_
-[ ] 004DD920 - Sum_Colonists_
-[ ] 004DDA60 - Pop_To_Pop_State_
-[ ] 004DDAB0 - Draw_Building_With_Bottom_Centered_
-[ ] 004DDBA0 - Draw_Current_Production_Graph_
-[ ] 004DDC10 - Draw_Current_Building2_
-[ ] 004DDCD0 - Calculate_Colony_Turn_Count_From_Scrap_For_Prod_
-[ ] 004DDD30 - Calculate_Current_Production_Turn_Count_
-[ ] 004DDD80 - Satellite_Anim_
-[ ] 004DDDA0 - Bldg_Back_To_Front_
-[ ] 004DDF20 - Draw_Colony_Bldgs_
-[ ] 004DE000 - Draw_Colony_Bldg_
-[ ] 004DE110 - Draw_Bldg_CR_Dark_
-[ ] 004DE1F0 - Draw_Colony_Screen_
-[ ] 004DE3F0 - Draw_Colony_Info_Background_
-[ ] 004DE460 - Draw_Colony_Info_
-[ ] 004DE490 - Draw_Colony_Info_Pop_
-[ ] 004DE4C0 - Draw_Colony_Info_Pop_For_
-[ ] 004DE520 - Draw_Colony_Info_Pop_Scanned_
-[ ] 004DE670 - Print_Scanned_String_
-[ ] 004DE6D0 - Draw_Colony_Info_Production_
-[ ] 004DE700 - Draw_Colony_Info_Production_For_
-[ ] 004DE750 - Draw_Colony_Info_Military_
-[ ] 004DE780 - Draw_Colony_Info_Military_For_
-[ ] 004DE7A0 - Do_Colony_Info_Military_Stuff_For_
-[ ] 004DEB10 - thunk_Draw_Info_Build_
-[ ] 004DEB20 - Draw_Colony_Info_Officer_
-[ ] 004DECB0 - Draw_Colony_Info_Morale_
-[ ] 004DECD0 - Draw_Info_Name_And_Pop_
-[ ] 004DEF50 - Colony_Type_
-[ ] 004DEFD0 - Draw_Colony_Info_Scanned_
-[ ] 004DF000 - Print_Scanned_Satellite_
-[ ] 004DF020 - Print_Scanned_Military_
-[ ] 004DF0A0 - Draw_Info_Build_
-[ ] 004DF390 - Draw_Current_Building_
-[ ] 004DF3B0 - Draw_Current_Ship_
-[ ] 004DF3F0 - Draw_Turn_Count_
-[ ] 004DF450 - Draw_Colony_Satellites_
-[ ] 004DF520 - Draw_Satellite_Dark_
-[ ] 004DF5C0 - Print_Building_Name_
-[ ] 004DF600 - No_Op1_
-[ ] 004DF610 - thunk_Draw_Road_List_
-[ ] 004DF620 - Box_Galaxy_Map_Star_
-[ ] 004DF680 - Colony_Can_Buy_Product_0_
-[ ] 004DF710 - Clear_Sys_Disp_Fields_
-[ ] 004DF750 - Clear_Galaxy_Map_Fields_
-[ ] 004DF780 - Update_Colony_Palette_
-[ ] 004DF7B0 - Draw_Sys_Disp_Scanned_
-[ ] 004DF820 - Tested_Colony_Buys_Outright_
-[ ] 004DFAB0 - Get_Next_Colony_
-[ ] 004DFB30 - Set_Colony_Screen_To_New_Colony_
-[ ] 004DFBD0 - Cleanup_Colony_Queue_
-[ ] 004DFC10 - Colony_Screen_
-[ ] 004DFF60 - Update_Fields_
-[ ] 004DFFF0 - Add_Job_Fields_
-[ ] 004E0030 - Add_Job_Field_For_
-[ ] 004E0090 - Add_Move_Colonist_Job_Field_For_
-[ ] 004E00E0 - Add_Military_Fields_
-[ ] 004E0110 - Do_Colony_Info_Military_Stuff_For_Aux_
-[ ] 004E0130 - Add_Screen_Fields_
-[ ] 004E04E0 - Add_Satellite_Fields_
-[ ] 004E05B0 - Add_Bldg_Fields_
-[ ] 004E07B0 - Add_Stacking_Fields_
-[ ] 004E0870 - Evaluate_Input_
-[ ] 004E08E0 - Check_Satellite_Fields_
-[ ] 004E0AC0 - Remove_Satellite_From_Array_
-[ ] 004E0B40 - Check_Bldg_Fields_
-[ ] 004E0E80 - XY_In_Bldg_Poly_
-[ ] 004E0F40 - Check_Job_Fields_
-[ ] 004E1010 - Pickup_Colonists_
-[ ] 004E1050 - Get_Selected_Pop_
-[ ] 004E10B0 - Get_Scanned_Pop_
-[ ] 004E1120 - Check_Military_Fields_
-[ ] 004E11A0 - Check_System_Display_Fields_
-[ ] 004E15E0 - Evaluate_Screen_Input_
-[ ] 004E1990 - Do_Informational_And_Decision_Popups_
-[ ] 004E1BD0 - Allocate_Mini_Planet_Cache_
-[ ] 004E1BE0 - Cache_Load_Planet_
-[ ] 004E1C00 - Picture_To_Mouse_
-[ ] 004E1C90 - Clear_Mouse_Picture_
-[ ] 004E1CD0 - Reset_Mouse_Picture_
-[ ] 004E1CF0 - Create_Shadow_Farmer_
-[ ] 004E1D90 - Shadow_Farmer_Bitm_
-[ ] 004E1DA0 - Do_Cheats_
-[ ] 004E2030 - Draw_Planet_Summary_
-[ ] 004E20F0 - Mini_Planet_Anim_
-[ ] 004E2170 - Do_Calculate_Hi_Score_
-[ ] 004E21D0 - Calculate_Hi_Scores_
-[ ] 004E2330 - Get_Antares_Score_
-[ ] 004E2350 - Captured_Antares_
-[ ] 004E2380 - Get_Captured_Colonist_Score_
-[ ] 004E23E0 - Get_Elimination_Score_
-[ ] 004E2450 - Get_Orion_Score_
-[ ] 004E2470 - Captured_Orion_
-[ ] 004E24A0 - Get_Population_Score_
-[ ] 004E24D0 - Get_Technology_Score_
-[ ] 004E2510 - Get_Technology_
-[ ] 004E2590 - Get_Time_Score_
-[ ] 004E25E0 - Get_Total_Population_
-[ ] 004E2630 - Get_Won_Council_Score_
-[ ] 004E2650 - Hi_Score_Screen_
-[ ] 004E2750 - Add_Hi_Score_Screen_Fields_
-[ ] 004E2780 - Build_Captured_Colonists_Array_
-[ ] 004E28F0 - Init_Hi_Score_
-[ ] 004E2920 - Draw_Hi_Score_Screen_
-[ ] 004E2990 - Draw_Antares_Score_
-[ ] 004E29C0 - Draw_Captured_Colonies_Score_
-[ ] 004E2A20 - Draw_Cap_Pop_
-[ ] 004E2A40 - Draw_Council_Score_
-[ ] 004E2A70 - Draw_Total_Score_
-[ ] 004E2CF0 - Draw_Elimination_Score_
-[ ] 004E2D90 - Draw_Eliminated_Race_Pictures_
-[ ] 004E3070 - Draw_Generic_Score_
-[ ] 004E30E0 - Draw_Orion_Score_
-[ ] 004E3110 - Draw_Pop_
-[ ] 004E3380 - Draw_Population_Score_
-[ ] 004E33E0 - Draw_Reg_Pop_
-[ ] 004E3400 - Draw_Technology_Score_
-[ ] 004E3430 - Draw_Time_Score_
-[ ] 004E34C0 - Get_Hi_Score_Colors_
-[ ] 004E3540 - Load_Hi_Score_Screen_
-[ ] 004E3650 - Won_Council_Vote_
-[ ] 004E3680 - Print_Score_String_
-[ ] 004E3810 - Player_Score_
-[ ] 004E3880 - Hall_Of_Fame_Screen_
-[ ] 004E3AD0 - Load_Hall_Of_Fame_Screen_
-[ ] 004E3B40 - Draw_Hall_Of_Fame_Screen_
-[ ] 004E3FA0 - Read_HOF_File_
-[ ] 004E4010 - Create_Default_HOF_File_
-[ ] 004E4290 - End_Of_Game_Hi_Score_
-[ ] 004E45A0 - Write_HOF_File_
-[ ] 004E45E0 - Init_Hall_Of_Fame_Screen_
-[ ] 004E4870 - Get_Hall_Of_Fame_Colors_
-[ ] 004E48D0 - qsort_hof_scores_descending_
-[ ] 004E4920 - HOF_Version_Number_
-[ ] 004E4940 - Sort_HOF_Scores_
-[ ] 004E4980 - qsort_hof_scores_ascending_
-[ ] 004E49D0 - Move_Sorted_HOF_Data_
-[ ] 004E4AD0 - Set_Hi_Score_Pop_Icon_Ids_
-[ ] 004E4D70 - Get_From_Tmp_Pop_
-[ ] 004E4E40 - ascending_qsort_uchar_
-[ ] 004E4E60 - Apply_Internal_Damage_
-[ ] 004E5450 - Repair_Combat_Ship_
-[ ] 004E5830 - Clear_Internal_Space_
-[ ] 004E5850 - Computer_Bonus_
-[ ] 004E5890 - Crew_Boarding_Combat_Bonus_
-[ ] 004E58C0 - Crew_Defensive_Combat_Bonus_
-[ ] 004E58F0 - Crew_Offensive_Combat_Bonus_
-[ ] 004E5920 - Defensive_Combat_Bonus_
-[ ] 004E5A40 - Get_Fleet_Engineer_Bonus_
-[ ] 004E5AC0 - Fighter_Pilot_Bonus_
-[ ] 004E5B20 - Get_Fleet_Pilot_Bonus_
-[ ] 004E5BA0 - Set_Combat_Ordnance_Values_
-[ ] 004E5BF0 - Leader_Ordnance_Bonus_
-[ ] 004E5C50 - Get_Fleet_Ordnance_Bonus_
-[ ] 004E5CD0 - Get_Fleet_Commando_Bonus_
-[ ] 004E5D50 - Commando_Bonus_
-[ ] 004E5DB0 - Engineer_Bonus_
-[ ] 004E5E10 - Get_Fleet_Security_Bonus_
-[ ] 004E5E90 - Security_Bonus_
-[ ] 004E5EF0 - Fleet_Defensive_Bonus_
-[ ] 004E6040 - Fleet_Offensive_Bonus_
-[ ] 004E6180 - Init_Internal_Space_
-[ ] 004E63D0 - Kill_Crew_
-[ ] 004E6410 - Offensive_Combat_Bonus_
-[ ] 004E64B0 - Helmsman_Bonus_
-[ ] 004E6510 - Weaponry_Bonus_
-[ ] 004E6570 - Galactic_Lore_Bonus_
-[ ] 004E65D0 - Select_Internal_
-[ ] 004E6810 - Ship_Specials_Defensive_Bonus_
-[ ] 004E6900 - Ship_Specials_Offensive_Bonus_
-[ ] 004E6930 - Total_Internal_Space_
-[ ] 004E69B0 - Max_Total_Internal_Space_
-[ ] 004E6A30 - Final_Fire_
-[ ] 004E6C70 - Defensive_Fire_Check_
-[ ] 004E6F40 - Max_Defensive_Fire_Range_
-[ ] 004E7050 - Get_Combat_Ship_Special_Id_
-[ ] 004E70C0 - Init_Boarding_Action_
-[ ] 004E7120 - Resolve_Raid_
-[ ] 004E7EA0 - Resolve_Capture_
-[ ] 004E8530 - Capture_Ship_
-[ ] 004E86C0 - Select_Raid_Internal_
-[ ] 004E8860 - Damage_From_Ship_Exploding_
-[ ] 004E88B0 - Apply_Combat_Artemis_Net_
-[ ] 004E8A90 - Combat_Ship_Done_
-[ ] 004E8AC0 - Set_Combat_Ship_Done_
-[ ] 004E8AF0 - Used_Teleporter_
-[ ] 004E8B20 - Set_Teleporter_Used_
-[ ] 004E8B50 - Already_Boarded_
-[ ] 004E8B80 - Set_Boarded_Flag_
-[ ] 004E8BB0 - Being_Captured_
-[ ] 004E8BE0 - Set_Capturing_Flag_
-[ ] 004E8C10 - Clear_Capturing_Flag_
-[ ] 004E8C40 - Get_File_Animation_Block_Space_
-[ ] 004E8C60 - Get_File_Animation_Total_Frames_
-[ ] 004E8C90 - Main_Menu_Screen_
-[ ] 004E90B0 - Add_Main_Menu_Fields_
-[ ] 004E9250 - Do_Main_Menu_File_Animation_
-[ ] 004E94D0 - Do_Mainmenu_Load_Screen_
-[ ] 004E9560 - Main_Menu_Fade_Function_
-[ ] 004E9580 - Main_Menu_Fade_Function2_
-[ ] 004E95A0 - thunk_Draw_File_Animation_
-[ ] 004E95B0 - Draw_Main_Menu_Screen_
-[ ] 004E9780 - Draw_Credits_
-[ ] 004E9A20 - Fade_Credit_Colors_
-[ ] 004E9A40 - Copy_Credit_String_To_Bitmap_
-[ ] 004E9B70 - Load_Credits_
-[ ] 004E9D50 - Reload_Main_Menu_Screen_
-[ ] 004E9E30 - Init_Credits_
-[ ] 004E9F80 - NPC_Diplomacy_
-[ ] 004E9FB0 - NPC_Threats_
-[ ] 004EA1F0 - NPC_To_NPC_Treaty_Negotiations_
-[ ] 004EA780 - Honor_Alliances_
-[ ] 004EA890 - Eliminate_NPC_Treaty_Conflicts_
-[ ] 004EA9A0 - NPC_Diplomacy_Buildup_Penalties_
-[ ] 004EAB20 - NPC_Declarations_Of_War_
-[ ] 004EB500 - NPC_Peace_Negotiations_
-[ ] 004EB6C0 - NPC_Required_Alliances_
-[ ] 004EB7C0 - NoOp3
-[ ] 004EB7D0 - NPC_Tech_Exchange_
-[ ] 004EBA80 - Get_Tech_Exchange_Reaction_
-[ ] 004EBBD0 - compare_tech_
-[ ] 004EBBE0 - reverse_compare_tech_
-[ ] 004EBBF0 - Get_Exchange_Tech_List_
-[ ] 004EBEC0 - Get_Tech_Exchange_Expectation_
-[ ] 004EBFA0 - Get_Differential_Tech_List_
-[ ] 004EC180 - NPC_Tech_Exchange_Check_
-[ ] 004EC330 - NPC_Good_Proposal_Check_
-[ ] 004EC4C0 - Clear_Last_Proposal_Turn_
-[ ] 004EC520 - NPC_Message_Rejection_Check_
-[ ] 004EC6A0 - NPC_Proposal_Rejection_Accept_
-[ ] 004EC7B0 - NPC_Treaty_Hatred_
-[ ] 004ECA10 - NPC_Surrender_Check_
-[ ] 004ECF80 - Uncolonized_Planet_Worth_To_Player_
-[ ] 004ED310 - Colony_Worth_To_Player_
-[ ] 004ED7C0 - Proximity_Worth_To_Player_
-[ ] 004ED9B0 - Star_In_Range_Of_Given_Star_
-[ ] 004EDA10 - airefit_cmp_
-[ ] 004EDA30 - Player_N_Turns_From_Star_To_Star_With_Intermediate_
-[ ] 004EDD30 - Ship_N_Turns_To_Star_With_Intermediate_
-[ ] 004EDF80 - Compute_AI_Data_
-[ ] 004EFB70 - Colony_Dominant_Player_
-[ ] 004EFC30 - Compute_Base_Planet_Values_
-[ ] 004EFD60 - Compute_Contextual_Planet_Values_
-[ ] 004EFFA0 - sort_ships_
-[ ] 004F0070 - Refit_Desirability_
-[ ] 004F0230 - Compute_Star_Player_Range_Info_
-[ ] 004F0430 - Find_Players_In_Range_
-[ ] 004F05A0 - Deallocate_AI_Data_
-[ ] 004F05C0 - Absolute_Location_
-[ ] 004F05F0 - Actual_Star_Id_
-[ ] 004F0640 - Confirm_Planet_And_Star_Index_Link_
-[ ] 004F0760 - Contact_With_One_Colony_
-[ ] 004F07F0 - Contact_With_Player_
-[ ] 004F0840 - Decrement_Zoom_Count_
-[ ] 004F0860 - Empty_System_
-[ ] 004F0880 - Get_Map_Scale_
-[ ] 004F0910 - Get_Player_Font_Colors_
-[ ] 004F0A30 - Get_Scaled_Value_
-[ ] 004F0A50 - Get_Up_Scaled_Value_
-[ ] 004F0A70 - Habitable_Spectral_Class_
-[ ] 004F0AA0 - Harold_Defaults_
-[ ] 004F0DD0 - Harold_Init_
-[ ] 004F0E20 - Increment_Zoom_Count_
-[ ] 004F0E50 - Increment_Zoom_Count_With_Limit_
-[ ] 004F0E90 - Init_Fleet_Movement_Box_
-[ ] 004F0ED0 - Init_Moving_Boxes_
-[ ] 004F0F60 - Init_System_Display_Box_
-[ ] 004F0FD0 - Is_Colony_Star_
-[ ] 004F1030 - Is_Home_Star_
-[ ] 004F1050 - Galaxy_Size_From_N_Stars_
-[ ] 004F1090 - Map_Scale_To_Zoom_Level_
-[ ] 004F10F0 - N_Colony_Owners_
-[ ] 004F1190 - Colony_Owners_
-[ ] 004F1270 - N_Food_Planets_In_System_
-[ ] 004F12D0 - N_Planets_In_System_
-[ ] 004F1330 - N_Player_Ships_
-[ ] 004F1380 - N_Satellites_
-[ ] 004F13D0 - N_Turns_To_Star_
-[ ] 004F1420 - Planet_Data_Screen_
-[ ] 004F1430 - Planet_Has_Outpost_
-[ ] 004F1480 - Planet_Index_
-[ ] 004F14B0 - Planet_Number_
-[ ] 004F1520 - Planet_Type_
-[ ] 004F1560 - Player_Has_Artemis_Net_
-[ ] 004F1590 - Player_Has_Colony_
-[ ] 004F15C0 - Star_Has_Dimensional_Portal_
-[ ] 004F15D0 - Star_Has_Artemis_Net_
-[ ] 004F15E0 - Player_Has_Dimensional_Portal_
-[ ] 004F1610 - Player_Has_Jumpgate_
-[ ] 004F1640 - Player_Has_Outpost_
-[ ] 004F16D0 - Player_Has_Stargate_
-[ ] 004F1700 - Player_Is_Omniscient_
-[ ] 004F1750 - Player_Has_Visited_
-[ ] 004F1780 - Player_Sighted_Monster_
-[ ] 004F17D0 - Players_Home_Star_
-[ ] 004F1860 - Randomize_List_
-[ ] 004F18F0 - Set_All_Visited_Flags_
-[ ] 004F1930 - Set_Player_Font_Style_
-[ ] 004F1970 - Set_Sound_Volume_To_Settings_
-[ ] 004F19E0 - Star_Is_Orion_
-[ ] 004F1A20 - Star_Is_Outpost_Star_
-[ ] 004F1AB0 - Star_Owner_
-[ ] 004F1B50 - User_Box_
-[ ] 004F1D00 - First_Ship_Orbiting_Star_
-[ ] 004F1D30 - Star_XY_To_Ship_Id_
-[ ] 004F1DC0 - XY_To_Star_Id_
-[ ] 004F1E30 - Zoom_Level_Font_Style_
-[ ] 004F1E80 - Star_Guarded_By_Monster_
-[ ] 004F1F50 - Get_N_Remaining_Humans_
-[ ] 004F1FB0 - Draw_Multi_Colored_Box_
-[ ] 004F2190 - Save_Mouse_List_
-[ ] 004F21D0 - Restore_Mouse_List_
-[ ] 004F2200 - Was_Mouse_List_Saved_
-[ ] 004F2210 - Load_H_Strings_
-[ ] 004F2440 - H_Message_
-[ ] 004F2470 - Reload_Language_Strings_
-[ ] 004F24A0 - Load_Language_Fonts_
-[ ] 004F24D0 - Get_Font_File_
-[ ] 004F25C0 - Write_Language_Setting_File_
-[ ] 004F2610 - Get_Officer_Data_LBX_Name_
-[ ] 004F26F0 - Load_Leader_Titles_
-[ ] 004F27A0 - Get_Monetary_Unit_String_
-[ ] 004F2850 - Set_Language_Race_Names_
-[ ] 004F28E0 - Load_Colcalc_Strings_
-[ ] 004F2DE0 - Colony_Officer_
-[ ] 004F2E40 - Format_Quotient_
-[ ] 004F2F00 - Show_Morale_
-[ ] 004F2F50 - Colony_Morale_
-[ ] 004F33B0 - Mixed_Race_Morale_Penalty_
-[ ] 004F3410 - Gravity_Player_Production_Factor_
-[ ] 004F3500 - Colony_Pop_Prod_Produced_
-[ ] 004F3580 - Colony_Food2_Per_Farmer_
-[ ] 004F3630 - Colony_Empire_Base_Food2_Produced_
-[ ] 004F37A0 - Show_Food_Production_
-[ ] 004F37F0 - Colony_Food_Production_
-[ ] 004F3D50 - Colony_Job_Production_
-[ ] 004F42B0 - Colony_Pop_Base_Prod_Produced_
-[ ] 004F4310 - Colony_Industry_Per_Worker_
-[ ] 004F43F0 - Colony_Empire_Base_Industry_Produced_
-[ ] 004F44D0 - Show_Industry_Production_
-[ ] 004F4520 - Colony_Industry_Production_
-[ ] 004F4D50 - Colony_Is_Blockaded
-[ ] 004F4D90 - Colony_Research_Per_Scientist_
-[ ] 004F4E60 - Colony_Empire_Base_Research_Produced_
-[ ] 004F4F60 - Show_Research_Production_
-[ ] 004F4FB0 - Colony_Research_Production_
-[ ] 004F54D0 - Show_BC_Production_
-[ ] 004F5520 - Colony_BC_Production_
-[ ] 004F5A80 - Double_Add_Two_
-[ ] 004F5A90 - Planet_Max_Population_For_Player_
-[ ] 004F5B90 - Size_And_Climate_Race_Pop_Limit_
-[ ] 004F5C30 - Size_And_Climate_Max_Population_
-[ ] 004F5C70 - Calc_Player_Climate_
-[ ] 004F5CD0 - Colony_Race_Pop_Limit_
-[ ] 004F5D40 - Colony_N_Pops_Of_Empire_
-[ ] 004F5D70 - Room_For_Another_Dude_
-[ ] 004F5E90 - Ship_Type_Cost_For_Player_
-[ ] 004F5EE0 - Colony_Product_Cost_
-[ ] 004F6100 - Colony_Producing_Product_Cost_
-[ ] 004F6120 - Colony_N_Turns_To_Produce_
-[ ] 004F6190 - Colony_Cost_To_Buy_Given_Product_
-[ ] 004F6260 - Colony_Cost_To_Buy_Producing_Product_
-[ ] 004F6280 - Colony_Buy_Outright_
-[ ] 004F62F0 - Colony_Can_Afford_To_Buy_Product_
-[ ] 004F6340 - Star_Has_Asteroid_Or_Gas_Giant_
-[ ] 004F63A0 - Delete_Obsolete_Artifical_Planets_Under_Construction_
-[ ] 004F6410 - Colony_Can_Build_Product_
-[ ] 004F6BD0 - Colony_Environmental_Stuff_
-[ ] 004F6C50 - Pre_Import_Computing_
-[ ] 004F6D50 - Colony_Food_Maintenance_
-[ ] 004F6ED0 - Colony_Industry_Maintenance_
-[ ] 004F7030 - Colony_Replicators_
-[ ] 004F72A0 - Colony_Industry_To_Tax_
-[ ] 004F7310 - Colony_BC_Maintenance_
-[ ] 004F73E0 - Player_Research_Cost_
-[ ] 004F7430 - Chance_For_Research_Breakthrough_
-[ ] 004F7470 - Chance_For_Research_Breakthrough_Aux_
-[ ] 004F74B0 - Player_N_Turns_Until_Research_Complete_
-[ ] 004F7560 - Leader_At_Anomaly_
-[ ] 004F75A0 - Compute_Player_Maintenance_
-[ ] 004F7CE0 - Tribute_Received_From_
-[ ] 004F7D40 - Show_Command_Points_
-[ ] 004F7D90 - Compute_Total_Building_Costs_
-[ ] 004F7E20 - Player_Owns_Officer_
-[ ] 004F7E60 - Update_Player_Stats_
-[ ] 004F8230 - Colony_Calculation_
-[ ] 004F8290 - Recalculate_Colony_
-[ ] 004F82B0 - Pass_Out_Imports_
-[ ] 004F8750 - Post_Import_Computing_
-[ ] 004F8770 - Colony_Pop_Grows_
-[ ] 004F8D00 - Colony_Specialty_
-[ ] 004F8D50 - Star_Colony_Calculation_
-[ ] 004F8DF0 - All_Colony_Calculations_
-[ ] 004F90A0 - Do_Player_Colony_Post_Production_
-[ ] 004F9140 - Do_Player_Colony_Calculations_
-[ ] 004F91D0 - thunk_All_Colony_Calculations_
-[ ] 004F91E0 - Apply_All_Colony_Changes_
-[ ] 004F9240 - Apply_Colony_Changes_
+[.] 004C14E0 - GNN_Reports_Combat_
+[.] 004C1550 - Do_Nonhuman_Attack_Against_Human_
+[.] 004C1710 - Init_Turn_Summary_List_
+[.] 004C1730 - Draw_Turn_Summary_Popup_
+[.] 004C1790 - Turn_Summary_Popup_
+[.] 004C1B20 - thunk_main2_
+[.] 004C1B30 - Load_Player_Ship_Palette_
+[.] 004C1C90 - Get_Ship_Id_Picture_Seg_
+[.] 004C1CC0 - Get_Ship_Picture_Seg_
+[.] 004C1CE0 - Do_Get_Ship_Picture_Seg
+[.] 004C1D40 - Ken_Init_
+[.] 004C1D50 - Ken_Init2_
+[.] 004C1D60 - Get_Weighted_Choice_
+[.] 004C1DF0 - Get_Derelict_Applications_
+[.] 004C1FC0 - Init_NPC_Personalities_Objectives_Themes_
+[.] 004C2630 - Ken_Get_Text_Message_
+[.] 004C2670 - Load_Netstart_Strings_
+[.] 004C2740 - Mox_Net_Uninit_
+[.] 004C2780 - Dump_Users_
+[.] 004C27A0 - Join_Net_Screen_
+[.] 004C2A40 - Do_Net_Init_
+[.] 004C2A80 - Net_Select_Race_
+[.] 004C2C90 - Net_Pick_Position_
+[.] 004C2F40 - Do_Answer_
+[.] 004C2FB0 - Load_Net_Screen_
+[.] 004C35B0 - Russ_Net_Create_Game_
+[.] 004C3600 - Do_Dial_
+[.] 004C36B0 - Start_Net_Screen_
+[.] 004C3DE0 - Request_Banner_Color_
+[.] 004C3E70 - Request_Race_
+[.] 004C3F30 - Unrequest_Race_
+[.] 004C3F60 - Compute_Defensive_Stage_Points_
+[.] 004C43E0 - Get_Star_Picture_Seg_
+[.] 004C4430 - Add_Map_Fields_
+[.] 004C48B0 - Add_Star_Fields_
+[.] 004C4980 - Allocate_First_Screen_Seg_
+[.] 004C49D0 - Center_Map_
+[.] 004C4B00 - thunk_Clear_Main_Screen_Fields_
+[.] 004C4B10 - Clear_Twinkling_Star_Data_
+[.] 004C4B60 - Cycle_Ship_Icons_
+[.] 004C4DB0 - Cycle_Star_Icons_
+[.] 004C4E90 - Do_Next_Turn_
+[.] 004C4FE0 - Do_System_Popup_
+[.] 004C50C0 - Draw_Black_Holes_
+[.] 004C5220 - Draw_Exploding_Plasma_Box_
+[.] 004C56B0 - Draw_Game_Turn_Buttons_
+[.] 004C5700 - Draw_Main_Main_Screen_
+[.] 004C5830 - Draw_Diplomacy_Request_Lights_
+[.] 004C5980 - Draw_Gate_Icons_
+[.] 004C59B0 - Draw_A_Gate_Icon_
+[.] 004C5E20 - Draw_Main_Screen_
+[.] 004C61D0 - Check_Mouse_XY_Fields_
+[.] 004C62D0 - Draw_ETA_Destination_Line_
+[.] 004C6430 - Draw_Fleet_Box_Selected_Ship_Seg_
+[.] 004C64B0 - Draw_Main_Screen_Before_Stencil_
+[.] 004C6550 - Draw_Main_Screen_Filled_
+[.] 004C6690 - Draw_Main_Screen_While_Moving_Boxes_
+[.] 004C6780 - Draw_Mini_Main_Screen_
+[.] 004C6880 - Draw_Nebulae_
+[.] 004C6930 - Draw_Paralax_
+[.] 004C6B40 - Draw_Player_Done_Lights_
+[.] 004C6C90 - Draw_Relocation_Links_
+[.] 004C6DA0 - Draw_Scanned_Ship_Seg_
+[.] 004C6E50 - Draw_Stars_
+[.] 004C6EB0 - Draw_A_Star_
+[.] 004C6FE0 - Draw_Wormhole_Links_
+[.] 004C70E0 - Set_Popup_Draw_XY_
+[.] 004C7160 - Popup_XY_
+[.] 004C7260 - Get_New_Paralax_XYs_
+[.] 004C7440 - Get_PointXY_Draw_Coords_
+[.] 004C7490 - Get_Ship_Stack_For_Officers_Screen_
+[.] 004C7510 - Map_Scale_Star_Size_To_Zoom_Level_
+[.] 004C7550 - Get_Star_Draw_Coords_
+[.] 004C75B0 - Get_Star_Id_For_Officers_Screen_
+[.] 004C7680 - Highlight_Star_
+[.] 004C76E0 - MAINSCR::Is_Main_Screen_Palette_
+[.] 004C7720 - Main_Screen_
+[.] 004C8B80 - Add_Cheats_
+[.] 004C8BF0 - Change_Home_Star_Name_
+[.] 004C8C70 - Check_For_Diplomacy_Request_
+[.] 004C8D00 - Check_Function_Keys_
+[.] 004C90C0 - Check_Hot_Keys_
+[.] 004C9410 - Check_Ships_XY_
+[.] 004C9500 - Check_Stars_XY_
+[.] 004C9650 - Clear_Mouse_XY_
+[.] 004C9670 - Do_Colony_Screen_
+[.] 004C9740 - Do_Fleet_Popup_
+[.] 004C99B0 - Do_Reply_To_Diplomacy_Request_
+[.] 004C9B00 - Add_Reply_To_Diplomacy_Request_Fields_
+[.] 004C9C30 - Draw_Main_Screen_For_Zooming_
+[.] 004C9E10 - Draw_Reply_To_Diplomacy_Request_
+[.] 004C9F20 - Get_Mouse_Field_
+[.] 004CA090 - Give_Me_All_Tech_Advances_
+[.] 004CA140 - Load_Reply_To_Diplomacy_Request_Popup_
+[.] 004CA1C0 - Mini_Main_Screen_Text_Box_
+[.] 004CA210 - Print_Galaxy_Map_Scanned_Star_
+[.] 004CA360 - Print_Highlighted_Star_Name_
+[.] 004CA430 - Get_Star_Name_
+[.] 004CA720 - Print_A_Star_Name_
+[.] 004CA990 - Print_Main_Screen_Data_
+[.] 004CB8B0 - Set_Post_Fitted_Font_Style_
+[.] 004CB910 - Print_Star_Name_To_Bitmap_
+[.] 004CBA80 - Print_Star_Names_
+[.] 004CBB40 - Redraw_Main_Screen_
+[.] 004CBC60 - Draw_Mini_Main_Offscreen_
+[.] 004CBC80 - Restore_Hotseat_Map_Info_
+[.] 004CBD70 - Save_Hotseat_Map_Info_
+[.] 004CBE00 - Scan_Galaxy_Map_Fields_
+[.] 004CBED0 - Scan_Moveable_Box_Fields
+[.] 004CC480 - Scan_Fleet_Movement_Box_Fields_
+[.] 004CC5B0 - Scan_Ships_XY_
+[.] 004CC700 - Scan_Stars_XY_
+[.] 004CC920 - Scan_System_Display_Fields_
+[.] 004CCD90 - Scroll_Map_
+[.] 004CCF30 - Clear_Main_Screen_Fields_
+[.] 004CD040 - Set_Painted_Fleet_Fields_
+[.] 004CD0D0 - Set_Reload_Fleet_Box_Palette_Flag_
+[.] 004CD0F0 - Ship_Can_Be_Selected_
+[.] 004CD120 - Star_On_Screen_
+[.] 004CD170 - Exit_Zooming_Mode_
+[.] 004CD1B0 - Toggle_Game_Option_
+[.] 004CD460 - Get_Star_Name_Info_
+[.] 004CD550 - Update_Ship_Icons_In_Between_Turns_
+[.] 004CD560 - Update_Star_Owners_
+[.] 004CD5B0 - Zoom_Box_Height_
+[.] 004CD5D0 - Zoom_Box_Width_
+[.] 004CD5F0 - Set_Player_Cheated_Flag_
+[.] 004CD630 - Warn_About_Cheating_Players_
+[.] 004CD7F0 - Fade_Into_Main_Screen_
+[.] 004CD930 - Get_Research_Unit_String_
+[.] 004CD9E0 - Draw_Super_Fast_Screen_
+[.] 004CDA90 - Refresh_Combat_Screen_Full_
+[.] 004CDB50 - Full_Draw_Combat_Screen_
+[.] 004CE0E0 - Draw_Grey_Damage_Bars_
+[.] 004CE740 - Draw_Ship_Status_
+[.] 004CF810 - Draw_Weapon_Status_Display_
+[.] 004D0070 - Draw_Special_Status_Display_
+[.] 004D0220 - Draw_Blip2_
+[.] 004D0280 - Draw_Blip3_
+[.] 004D0340 - Draw_Blip4_
+[.] 004D04A0 - Draw_Blip5_
+[.] 004D06B0 - Draw_Reduced_Map_Box_
+[.] 004D08D0 - Draw_Reduced_Combat_Map_
+[.] 004D0AC0 - Draw_Option_Panel_Lights_
+[.] 004D0BC0 - Draw_Crew_Level_Stars_
+[.] 004D0CA0 - Draw_Main_Combat_Screen_
+[.] 004D1980 - Draw_Ship_
+[.] 004D1F80 - Combat_Draw_View_Ship_
+[.] 004D3C10 - Detailed_View_Ship_
+[.] 004D3F50 - Draw_Shield_Arcs_
+[.] 004D4580 - Relative_Bearing_XY_
+[.] 004D4630 - Relative_Bearing_
+[.] 004D4730 - Get_Weapon_Arc_
+[.] 004D4780 - Draw_Ship_To_Bitmap_
+[.] 004D4A20 - Draw_Retreating_Ship_
+[.] 004D4E40 - Get_Ship_Actual_Size_
+[.] 004D4E80 - Remap_Draw_Ship_Status_
+[.] 004D5370 - Scroll_Draw_Combat_Screen_
+[.] 004D5820 - Ship_Completely_On_Screen_
+[.] 004D59A0 - Ship_On_Screen_
+[.] 004D5B60 - Display_Combat_View_Ship_
+[.] 004D5C70 - Crew_Quality_String_
+[.] 004D5DA0 - Plasma_Darken_
+[.] 004D5FC0 - Draw_Bombs_
+[.] 004D6380 - Create_Ship_Darken_Map_
+[.] 004D6520 - Get_Draw_Ship_Offsets_
+[.] 004D6650 - Get_Ship_Center_Draw_XY_
+[.] 004D66D0 - Draw_Internals_Display_
+[.] 004D6AB0 - Draw_Fake_Combat_Buttons_
+[.] 004D6CB0 - Draw_Legal_Boxes_
+[.] 004D6E60 - Move_Options_Background_
+[.] 004D7120 - Board_Popup_
+[.] 004D73F0 - Draw_Board_Popup_
+[.] 004D7500 - Play_Cinematic_
+[.] 004D7780 - Smack_Fade_
+[.] 004D77F0 - Draw_Smacker_Animation_
+[.] 004D7810 - Assert_Settings_
+[.] 004D7820 - Mox_Update_
+[.] 004D7830 - Release_All_Blocks_
+[.] 004D7840 - nullsub
+[.] 004D7850 - PFMT_
+[.] 004D7860 - Get_Weighted_Choice_Char_
+[.] 004D78E0 - Get_Weighted_Choice_Short_
+[.] 004D7950 - Get_Weighted_Choice_Int_
+[.] 004D79B0 - Shuffle_Char_
+[.] 004D7A10 - Shuffle_Sint_
+[.] 004D7A70 - Shuffle_Int_
+[.] 004D7AD0 - Shuffle_
+[.] 004D7C10 - Star_To_Monster_
+[.] 004D7C30 - Star_Name_
+[.] 004D7C60 - Compare_Ratios_
+[.] 004D7D30 - init
+[.] 004D7D80 - FUN_004d7d80
+[.] 004D7DA0 - FUN_004d7da0
+[.] 004D7DC0 - Make_Player_Into_AI_
+[.] 004D7E70 - Make_All_AI_Game_
+[.] 004D7ED0 - Load_Russ_Strings_
+[.] 004D7F50 - Main_Council_Screen_
+[.] 004D80A0 - Control_Main_Council_Screen_
+[.] 004D8130 - Draw_Main_Council_Screen_
+[.] 004D8440 - Reload_Main_Council_Screen_
+[.] 004D8940 - Get_Num_Votes_
+[.] 004D89A0 - Get_Council_Message_
+[.] 004D8BD0 - Next_Council_State_
+[.] 004D8C30 - Council_Finished_Voting_
+[.] 004D8CE0 - Council_Votes_
+[.] 004D8E60 - Vote_Check_
+[.] 004D8FF0 - Council_Vote_Result_
+[.] 004D9180 - Council_Player_Vote_
+[.] 004D9430 - Council_Accept_Ruling_
+[.] 004D9700 - Check_For_Council_Meeting_
+[.] 004D97E0 - Load_Council_Text_Messages_
+[.] 004D9840 - Council_Player_Voted_Winner_
+[.] 004D98E0 - Drive_Council_Player_Voted_Winner_
+[.] 004D9990 - Draw_Council_Player_Voted_Winner_
+[.] 004D9AE0 - Get_Player_Voted_Winner_Message_
+[.] 004D9B40 - Building_Outposts_In_Main_Screen_
+[.] 004D9D10 - Distance_Between_Stars_Screen_
+[.] 004D9F30 - Draw_Main_Screen_For_Star_Distan
+[.] 004DA200 - Planet_Colonization_In_Main_Screen_
+[.] 004DA420 - Scrap_Freighters_
+[.] 004DA6D0 - Unloading_Transports_In_Main_Screen_
+[.] 004DA870 - Reports_Screen_
+[.] 004DA9F0 - Do_Begin_Of_Turn_
+[.] 004DABF0 - Begin_Of_Turn_
+[.] 004DAD10 - Check_Fleet_Movement_Box_Status_
+[.] 004DAD40 - Main_Screen_Report_Handler_
+[.] 004DAEC0 - Redraw_Main_Screen_After_Popups_
+[.] 004DAEE0 - Restore_Fleet_Box_Palette_
+[.] 004DAF20 - Show_Command_Points_Screen_
+[.] 004DAFB0 - Reload_Hotseat_Screen_
+[.] 004DB050 - Draw_Hotseat_Screen_
+[.] 004DB170 - Hotseat_Screen_
+[.] 004DB4E0 - Init_Hotseat_Screen_
+[.] 004DB600 - Fade_Into_Hotseat_Screen_
+[.] 004DB690 - N_Colonies_And_Outposts_At_Star_
+[.] 004DB6F0 - Draw_Pop_Dark_
+[.] 004DB760 - N_Bldgs_
+[.] 004DB7A0 - Fix_Colony_Queue_
+[.] 004DB800 - Defragment_Colony_Queue_
+[.] 004DB850 - Squish_Out_Colony_Queue_Slot_
+[.] 004DB8C0 - Remap_Draw_Ship_Centered_
+[.] 004DBA50 - Remap_Draw_Ship_Seg_N_Centered_
+[.] 004DBBD0 - Remap_Draw_Ship_D_Centered_
+[.] 004DBC20 - Print_Sys_Disp_Scanned_String_
+[.] 004DBC40 - Get_Effective_Pop_Player_
+[.] 004DBC90 - Pop_Race_String_
+[.] 004DBD00 - Reset_Field_Arrays_
+[.] 004DBD90 - Set_Colony_Font_
+[.] 004DBDB0 - Set_Colony_Font_To_Player_
+[.] 004DBE20 - Set_Colony_Font_To_Blue_
+[.] 004DBE80 - Set_Colony_Font_To_Reg_Blue_
+[.] 004DBEF0 - Set_Colony_Font_To_Red_
+[.] 004DBF40 - Set_Colony_Font_To_
+[.] 004DBF80 - Colonize_Planet_
+[.] 004DBFD0 - Init_Colonies_
+[.] 004DBFE0 - Job_String_
+[.] 004DC030 - Conquered_String_
+[.] 004DC060 - Pop_State_String_
+[.] 004DC0C0 - Set_Colony_Globals_
+[.] 004DC110 - Col_Calc_Wrapper_
+[.] 004DC190 - Reset_Field_Mode_
+[.] 004DC1E0 - Drop_Military_
+[.] 004DC240 - Restore_Control_
+[.] 004DC270 - Clear_Move_Military_
+[.] 004DC290 - Do_Load_Colony_Anims_
+[.] 004DC2D0 - Spy_Anim_
+[.] 004DC300 - Turn_To_Rubble_CR_Bldg_
+[.] 004DC350 - CR_Building_Name_
+[.] 004DC3A0 - Real_Building_Name_
+[.] 004DC3B0 - Real_Building_Name2_
+[.] 004DC3C0 - Colony_Pop_Anim_
+[.] 004DC470 - Colony_Pop_Icon_
+[.] 004DC4A0 - People_Anim_
+[.] 004DC550 - Military_Anims_
+[.] 004DC580 - Military_Anim_
+[.] 004DC650 - Player_Troop_Name_
+[.] 004DC720 - Player_Troop_Anim_
+[.] 004DC800 - Load_Bldg_Bitm_
+[.] 004DC830 - Load_Ship_Bitm_
+[.] 004DC880 - thunk_Load_Road_List_Anims_
+[.] 004DC890 - Load_Galaxy_Map_Anims_
+[.] 004DC8D0 - Load_Colony_Screen_Seg_
+[.] 004DC9E0 - Load_Officer_Anim_
+[.] 004DCA30 - thunk_Load_Planet_Screen_
+[.] 004DCA40 - Load_Planet_Screen_
+[.] 004DCA50 - C_Anims_
+[.] 004DCC90 - Load_Govt_Anim_
+[.] 004DCCB0 - Govt_Anim_
+[.] 004DCCC0 - Buffer_Reload_Colony_
+[.] 004DCCE0 - Satellite_Anim_Pic_
+[.] 004DCD60 - Load_Colony_Anims_
+[.] 004DCD70 - Prod_Anims_
+[.] 004DCDB0 - Import_Anims_
+[.] 004DCDF0 - Short_Anims_
+[.] 004DCE50 - Get_Bldg_CR_
+[.] 004DCEF0 - Make_Bldg_Array_For_Colony_
+[.] 004DD1B0 - Clear_Satellite_Array_
+[.] 004DD1D0 - Clear_Colony_Buidlings_
+[.] 004DD1F0 - Sort_Bldg_Array_Columns_
+[.] 004DD340 - Insert_Bldg_Into_Array_
+[.] 004DD5B0 - N_Houses_In_Bldg_Array_
+[.] 004DD600 - Find_Replacement_Slot_For_Building_
+[.] 004DD6B0 - Insert_Satellite_Into_Array_
+[.] 004DD6E0 - Sat_Should_Be_Replaced_
+[.] 004DD760 - CR_To_XY_
+[.] 004DD790 - Get_Bldg_Box_
+[.] 004DD840 - Bldg_Coords_To_Centered_Screen_Coord_
+[.] 004DD880 - Bldg_Coords_To_Effective_Frame_
+[.] 004DD8C0 - Reset_Step_Squish_
+[.] 004DD8D0 - Colony_Has_Natives_
+[.] 004DD920 - Sum_Colonists_
+[.] 004DDA60 - Pop_To_Pop_State_
+[.] 004DDAB0 - Draw_Building_With_Bottom_Centered_
+[.] 004DDBA0 - Draw_Current_Production_Graph_
+[.] 004DDC10 - Draw_Current_Building2_
+[.] 004DDCD0 - Calculate_Colony_Turn_Count_From_Scrap_For_Prod_
+[.] 004DDD30 - Calculate_Current_Production_Turn_Count_
+[.] 004DDD80 - Satellite_Anim_
+[.] 004DDDA0 - Bldg_Back_To_Front_
+[.] 004DDF20 - Draw_Colony_Bldgs_
+[.] 004DE000 - Draw_Colony_Bldg_
+[.] 004DE110 - Draw_Bldg_CR_Dark_
+[.] 004DE1F0 - Draw_Colony_Screen_
+[.] 004DE3F0 - Draw_Colony_Info_Background_
+[.] 004DE460 - Draw_Colony_Info_
+[.] 004DE490 - Draw_Colony_Info_Pop_
+[.] 004DE4C0 - Draw_Colony_Info_Pop_For_
+[.] 004DE520 - Draw_Colony_Info_Pop_Scanned_
+[.] 004DE670 - Print_Scanned_String_
+[.] 004DE6D0 - Draw_Colony_Info_Production_
+[.] 004DE700 - Draw_Colony_Info_Production_For_
+[.] 004DE750 - Draw_Colony_Info_Military_
+[.] 004DE780 - Draw_Colony_Info_Military_For_
+[.] 004DE7A0 - Do_Colony_Info_Military_Stuff_For_
+[.] 004DEB10 - thunk_Draw_Info_Build_
+[.] 004DEB20 - Draw_Colony_Info_Officer_
+[.] 004DECB0 - Draw_Colony_Info_Morale_
+[.] 004DECD0 - Draw_Info_Name_And_Pop_
+[.] 004DEF50 - Colony_Type_
+[.] 004DEFD0 - Draw_Colony_Info_Scanned_
+[.] 004DF000 - Print_Scanned_Satellite_
+[.] 004DF020 - Print_Scanned_Military_
+[.] 004DF0A0 - Draw_Info_Build_
+[.] 004DF390 - Draw_Current_Building_
+[.] 004DF3B0 - Draw_Current_Ship_
+[.] 004DF3F0 - Draw_Turn_Count_
+[.] 004DF450 - Draw_Colony_Satellites_
+[.] 004DF520 - Draw_Satellite_Dark_
+[.] 004DF5C0 - Print_Building_Name_
+[.] 004DF600 - No_Op1_
+[.] 004DF610 - thunk_Draw_Road_List_
+[.] 004DF620 - Box_Galaxy_Map_Star_
+[.] 004DF680 - Colony_Can_Buy_Product_0_
+[.] 004DF710 - Clear_Sys_Disp_Fields_
+[.] 004DF750 - Clear_Galaxy_Map_Fields_
+[.] 004DF780 - Update_Colony_Palette_
+[.] 004DF7B0 - Draw_Sys_Disp_Scanned_
+[.] 004DF820 - Tested_Colony_Buys_Outright_
+[.] 004DFAB0 - Get_Next_Colony_
+[.] 004DFB30 - Set_Colony_Screen_To_New_Colony_
+[.] 004DFBD0 - Cleanup_Colony_Queue_
+[.] 004DFC10 - Colony_Screen_
+[.] 004DFF60 - Update_Fields_
+[.] 004DFFF0 - Add_Job_Fields_
+[.] 004E0030 - Add_Job_Field_For_
+[.] 004E0090 - Add_Move_Colonist_Job_Field_For_
+[.] 004E00E0 - Add_Military_Fields_
+[.] 004E0110 - Do_Colony_Info_Military_Stuff_For_Aux_
+[.] 004E0130 - Add_Screen_Fields_
+[.] 004E04E0 - Add_Satellite_Fields_
+[.] 004E05B0 - Add_Bldg_Fields_
+[.] 004E07B0 - Add_Stacking_Fields_
+[.] 004E0870 - Evaluate_Input_
+[.] 004E08E0 - Check_Satellite_Fields_
+[.] 004E0AC0 - Remove_Satellite_From_Array_
+[.] 004E0B40 - Check_Bldg_Fields_
+[.] 004E0E80 - XY_In_Bldg_Poly_
+[.] 004E0F40 - Check_Job_Fields_
+[.] 004E1010 - Pickup_Colonists_
+[.] 004E1050 - Get_Selected_Pop_
+[.] 004E10B0 - Get_Scanned_Pop_
+[.] 004E1120 - Check_Military_Fields_
+[.] 004E11A0 - Check_System_Display_Fields_
+[.] 004E15E0 - Evaluate_Screen_Input_
+[.] 004E1990 - Do_Informational_And_Decision_Popups_
+[.] 004E1BD0 - Allocate_Mini_Planet_Cache_
+[.] 004E1BE0 - Cache_Load_Planet_
+[.] 004E1C00 - Picture_To_Mouse_
+[.] 004E1C90 - Clear_Mouse_Picture_
+[.] 004E1CD0 - Reset_Mouse_Picture_
+[.] 004E1CF0 - Create_Shadow_Farmer_
+[.] 004E1D90 - Shadow_Farmer_Bitm_
+[.] 004E1DA0 - Do_Cheats_
+[.] 004E2030 - Draw_Planet_Summary_
+[.] 004E20F0 - Mini_Planet_Anim_
+[.] 004E2170 - Do_Calculate_Hi_Score_
+[.] 004E21D0 - Calculate_Hi_Scores_
+[.] 004E2330 - Get_Antares_Score_
+[.] 004E2350 - Captured_Antares_
+[.] 004E2380 - Get_Captured_Colonist_Score_
+[.] 004E23E0 - Get_Elimination_Score_
+[.] 004E2450 - Get_Orion_Score_
+[.] 004E2470 - Captured_Orion_
+[.] 004E24A0 - Get_Population_Score_
+[.] 004E24D0 - Get_Technology_Score_
+[.] 004E2510 - Get_Technology_
+[.] 004E2590 - Get_Time_Score_
+[.] 004E25E0 - Get_Total_Population_
+[.] 004E2630 - Get_Won_Council_Score_
+[.] 004E2650 - Hi_Score_Screen_
+[.] 004E2750 - Add_Hi_Score_Screen_Fields_
+[.] 004E2780 - Build_Captured_Colonists_Array_
+[.] 004E28F0 - Init_Hi_Score_
+[.] 004E2920 - Draw_Hi_Score_Screen_
+[.] 004E2990 - Draw_Antares_Score_
+[.] 004E29C0 - Draw_Captured_Colonies_Score_
+[.] 004E2A20 - Draw_Cap_Pop_
+[.] 004E2A40 - Draw_Council_Score_
+[.] 004E2A70 - Draw_Total_Score_
+[.] 004E2CF0 - Draw_Elimination_Score_
+[.] 004E2D90 - Draw_Eliminated_Race_Pictures_
+[.] 004E3070 - Draw_Generic_Score_
+[.] 004E30E0 - Draw_Orion_Score_
+[.] 004E3110 - Draw_Pop_
+[.] 004E3380 - Draw_Population_Score_
+[.] 004E33E0 - Draw_Reg_Pop_
+[.] 004E3400 - Draw_Technology_Score_
+[.] 004E3430 - Draw_Time_Score_
+[.] 004E34C0 - Get_Hi_Score_Colors_
+[.] 004E3540 - Load_Hi_Score_Screen_
+[.] 004E3650 - Won_Council_Vote_
+[.] 004E3680 - Print_Score_String_
+[.] 004E3810 - Player_Score_
+[.] 004E3880 - Hall_Of_Fame_Screen_
+[.] 004E3AD0 - Load_Hall_Of_Fame_Screen_
+[.] 004E3B40 - Draw_Hall_Of_Fame_Screen_
+[.] 004E3FA0 - Read_HOF_File_
+[.] 004E4010 - Create_Default_HOF_File_
+[.] 004E4290 - End_Of_Game_Hi_Score_
+[.] 004E45A0 - Write_HOF_File_
+[.] 004E45E0 - Init_Hall_Of_Fame_Screen_
+[.] 004E4870 - Get_Hall_Of_Fame_Colors_
+[.] 004E48D0 - qsort_hof_scores_descending_
+[.] 004E4920 - HOF_Version_Number_
+[.] 004E4940 - Sort_HOF_Scores_
+[.] 004E4980 - qsort_hof_scores_ascending_
+[.] 004E49D0 - Move_Sorted_HOF_Data_
+[.] 004E4AD0 - Set_Hi_Score_Pop_Icon_Ids_
+[.] 004E4D70 - Get_From_Tmp_Pop_
+[.] 004E4E40 - ascending_qsort_uchar_
+[.] 004E4E60 - Apply_Internal_Damage_
+[.] 004E5450 - Repair_Combat_Ship_
+[.] 004E5830 - Clear_Internal_Space_
+[.] 004E5850 - Computer_Bonus_
+[.] 004E5890 - Crew_Boarding_Combat_Bonus_
+[.] 004E58C0 - Crew_Defensive_Combat_Bonus_
+[.] 004E58F0 - Crew_Offensive_Combat_Bonus_
+[.] 004E5920 - Defensive_Combat_Bonus_
+[.] 004E5A40 - Get_Fleet_Engineer_Bonus_
+[.] 004E5AC0 - Fighter_Pilot_Bonus_
+[.] 004E5B20 - Get_Fleet_Pilot_Bonus_
+[.] 004E5BA0 - Set_Combat_Ordnance_Values_
+[.] 004E5BF0 - Leader_Ordnance_Bonus_
+[.] 004E5C50 - Get_Fleet_Ordnance_Bonus_
+[.] 004E5CD0 - Get_Fleet_Commando_Bonus_
+[.] 004E5D50 - Commando_Bonus_
+[.] 004E5DB0 - Engineer_Bonus_
+[.] 004E5E10 - Get_Fleet_Security_Bonus_
+[.] 004E5E90 - Security_Bonus_
+[.] 004E5EF0 - Fleet_Defensive_Bonus_
+[.] 004E6040 - Fleet_Offensive_Bonus_
+[.] 004E6180 - Init_Internal_Space_
+[.] 004E63D0 - Kill_Crew_
+[.] 004E6410 - Offensive_Combat_Bonus_
+[.] 004E64B0 - Helmsman_Bonus_
+[.] 004E6510 - Weaponry_Bonus_
+[.] 004E6570 - Galactic_Lore_Bonus_
+[.] 004E65D0 - Select_Internal_
+[.] 004E6810 - Ship_Specials_Defensive_Bonus_
+[.] 004E6900 - Ship_Specials_Offensive_Bonus_
+[.] 004E6930 - Total_Internal_Space_
+[.] 004E69B0 - Max_Total_Internal_Space_
+[.] 004E6A30 - Final_Fire_
+[.] 004E6C70 - Defensive_Fire_Check_
+[.] 004E6F40 - Max_Defensive_Fire_Range_
+[.] 004E7050 - Get_Combat_Ship_Special_Id_
+[.] 004E70C0 - Init_Boarding_Action_
+[.] 004E7120 - Resolve_Raid_
+[.] 004E7EA0 - Resolve_Capture_
+[.] 004E8530 - Capture_Ship_
+[.] 004E86C0 - Select_Raid_Internal_
+[.] 004E8860 - Damage_From_Ship_Exploding_
+[.] 004E88B0 - Apply_Combat_Artemis_Net_
+[.] 004E8A90 - Combat_Ship_Done_
+[.] 004E8AC0 - Set_Combat_Ship_Done_
+[.] 004E8AF0 - Used_Teleporter_
+[.] 004E8B20 - Set_Teleporter_Used_
+[.] 004E8B50 - Already_Boarded_
+[.] 004E8B80 - Set_Boarded_Flag_
+[.] 004E8BB0 - Being_Captured_
+[.] 004E8BE0 - Set_Capturing_Flag_
+[.] 004E8C10 - Clear_Capturing_Flag_
+[.] 004E8C40 - Get_File_Animation_Block_Space_
+[.] 004E8C60 - Get_File_Animation_Total_Frames_
+[.] 004E8C90 - Main_Menu_Screen_
+[.] 004E90B0 - Add_Main_Menu_Fields_
+[.] 004E9250 - Do_Main_Menu_File_Animation_
+[.] 004E94D0 - Do_Mainmenu_Load_Screen_
+[.] 004E9560 - Main_Menu_Fade_Function_
+[.] 004E9580 - Main_Menu_Fade_Function2_
+[.] 004E95A0 - thunk_Draw_File_Animation_
+[.] 004E95B0 - Draw_Main_Menu_Screen_
+[.] 004E9780 - Draw_Credits_
+[.] 004E9A20 - Fade_Credit_Colors_
+[.] 004E9A40 - Copy_Credit_String_To_Bitmap_
+[.] 004E9B70 - Load_Credits_
+[.] 004E9D50 - Reload_Main_Menu_Screen_
+[.] 004E9E30 - Init_Credits_
+[.] 004E9F80 - NPC_Diplomacy_
+[.] 004E9FB0 - NPC_Threats_
+[.] 004EA1F0 - NPC_To_NPC_Treaty_Negotiations_
+[.] 004EA780 - Honor_Alliances_
+[.] 004EA890 - Eliminate_NPC_Treaty_Conflicts_
+[.] 004EA9A0 - NPC_Diplomacy_Buildup_Penalties_
+[.] 004EAB20 - NPC_Declarations_Of_War_
+[.] 004EB500 - NPC_Peace_Negotiations_
+[.] 004EB6C0 - NPC_Required_Alliances_
+[.] 004EB7C0 - NoOp3
+[.] 004EB7D0 - NPC_Tech_Exchange_
+[.] 004EBA80 - Get_Tech_Exchange_Reaction_
+[.] 004EBBD0 - compare_tech_
+[.] 004EBBE0 - reverse_compare_tech_
+[.] 004EBBF0 - Get_Exchange_Tech_List_
+[.] 004EBEC0 - Get_Tech_Exchange_Expectation_
+[.] 004EBFA0 - Get_Differential_Tech_List_
+[.] 004EC180 - NPC_Tech_Exchange_Check_
+[.] 004EC330 - NPC_Good_Proposal_Check_
+[.] 004EC4C0 - Clear_Last_Proposal_Turn_
+[.] 004EC520 - NPC_Message_Rejection_Check_
+[.] 004EC6A0 - NPC_Proposal_Rejection_Accept_
+[.] 004EC7B0 - NPC_Treaty_Hatred_
+[.] 004ECA10 - NPC_Surrender_Check_
+[.] 004ECF80 - Uncolonized_Planet_Worth_To_Player_
+[.] 004ED310 - Colony_Worth_To_Player_
+[.] 004ED7C0 - Proximity_Worth_To_Player_
+[.] 004ED9B0 - Star_In_Range_Of_Given_Star_
+[.] 004EDA10 - airefit_cmp_
+[.] 004EDA30 - Player_N_Turns_From_Star_To_Star_With_Intermediate_
+[.] 004EDD30 - Ship_N_Turns_To_Star_With_Intermediate_
+[.] 004EDF80 - Compute_AI_Data_
+[.] 004EFB70 - Colony_Dominant_Player_
+[.] 004EFC30 - Compute_Base_Planet_Values_
+[.] 004EFD60 - Compute_Contextual_Planet_Values_
+[.] 004EFFA0 - sort_ships_
+[.] 004F0070 - Refit_Desirability_
+[.] 004F0230 - Compute_Star_Player_Range_Info_
+[.] 004F0430 - Find_Players_In_Range_
+[.] 004F05A0 - Deallocate_AI_Data_
+[.] 004F05C0 - Absolute_Location_
+[.] 004F05F0 - Actual_Star_Id_
+[.] 004F0640 - Confirm_Planet_And_Star_Index_Link_
+[.] 004F0760 - Contact_With_One_Colony_
+[.] 004F07F0 - Contact_With_Player_
+[.] 004F0840 - Decrement_Zoom_Count_
+[.] 004F0860 - Empty_System_
+[.] 004F0880 - Get_Map_Scale_
+[.] 004F0910 - Get_Player_Font_Colors_
+[.] 004F0A30 - Get_Scaled_Value_
+[.] 004F0A50 - Get_Up_Scaled_Value_
+[.] 004F0A70 - Habitable_Spectral_Class_
+[.] 004F0AA0 - Harold_Defaults_
+[.] 004F0DD0 - Harold_Init_
+[.] 004F0E20 - Increment_Zoom_Count_
+[.] 004F0E50 - Increment_Zoom_Count_With_Limit_
+[.] 004F0E90 - Init_Fleet_Movement_Box_
+[.] 004F0ED0 - Init_Moving_Boxes_
+[.] 004F0F60 - Init_System_Display_Box_
+[.] 004F0FD0 - Is_Colony_Star_
+[.] 004F1030 - Is_Home_Star_
+[.] 004F1050 - Galaxy_Size_From_N_Stars_
+[.] 004F1090 - Map_Scale_To_Zoom_Level_
+[.] 004F10F0 - N_Colony_Owners_
+[.] 004F1190 - Colony_Owners_
+[.] 004F1270 - N_Food_Planets_In_System_
+[.] 004F12D0 - N_Planets_In_System_
+[.] 004F1330 - N_Player_Ships_
+[.] 004F1380 - N_Satellites_
+[.] 004F13D0 - N_Turns_To_Star_
+[.] 004F1420 - Planet_Data_Screen_
+[.] 004F1430 - Planet_Has_Outpost_
+[.] 004F1480 - Planet_Index_
+[.] 004F14B0 - Planet_Number_
+[.] 004F1520 - Planet_Type_
+[.] 004F1560 - Player_Has_Artemis_Net_
+[.] 004F1590 - Player_Has_Colony_
+[.] 004F15C0 - Star_Has_Dimensional_Portal_
+[.] 004F15D0 - Star_Has_Artemis_Net_
+[.] 004F15E0 - Player_Has_Dimensional_Portal_
+[.] 004F1610 - Player_Has_Jumpgate_
+[.] 004F1640 - Player_Has_Outpost_
+[.] 004F16D0 - Player_Has_Stargate_
+[.] 004F1700 - Player_Is_Omniscient_
+[.] 004F1750 - Player_Has_Visited_
+[.] 004F1780 - Player_Sighted_Monster_
+[.] 004F17D0 - Players_Home_Star_
+[.] 004F1860 - Randomize_List_
+[.] 004F18F0 - Set_All_Visited_Flags_
+[.] 004F1930 - Set_Player_Font_Style_
+[.] 004F1970 - Set_Sound_Volume_To_Settings_
+[.] 004F19E0 - Star_Is_Orion_
+[.] 004F1A20 - Star_Is_Outpost_Star_
+[.] 004F1AB0 - Star_Owner_
+[.] 004F1B50 - User_Box_
+[.] 004F1D00 - First_Ship_Orbiting_Star_
+[.] 004F1D30 - Star_XY_To_Ship_Id_
+[.] 004F1DC0 - XY_To_Star_Id_
+[.] 004F1E30 - Zoom_Level_Font_Style_
+[.] 004F1E80 - Star_Guarded_By_Monster_
+[.] 004F1F50 - Get_N_Remaining_Humans_
+[.] 004F1FB0 - Draw_Multi_Colored_Box_
+[.] 004F2190 - Save_Mouse_List_
+[.] 004F21D0 - Restore_Mouse_List_
+[.] 004F2200 - Was_Mouse_List_Saved_
+[.] 004F2210 - Load_H_Strings_
+[.] 004F2440 - H_Message_
+[.] 004F2470 - Reload_Language_Strings_
+[.] 004F24A0 - Load_Language_Fonts_
+[.] 004F24D0 - Get_Font_File_
+[.] 004F25C0 - Write_Language_Setting_File_
+[.] 004F2610 - Get_Officer_Data_LBX_Name_
+[.] 004F26F0 - Load_Leader_Titles_
+[.] 004F27A0 - Get_Monetary_Unit_String_
+[.] 004F2850 - Set_Language_Race_Names_
+[.] 004F28E0 - Load_Colcalc_Strings_
+[.] 004F2DE0 - Colony_Officer_
+[.] 004F2E40 - Format_Quotient_
+[.] 004F2F00 - Show_Morale_
+[.] 004F2F50 - Colony_Morale_
+[.] 004F33B0 - Mixed_Race_Morale_Penalty_
+[.] 004F3410 - Gravity_Player_Production_Factor_
+[.] 004F3500 - Colony_Pop_Prod_Produced_
+[.] 004F3580 - Colony_Food2_Per_Farmer_
+[.] 004F3630 - Colony_Empire_Base_Food2_Produced_
+[.] 004F37A0 - Show_Food_Production_
+[.] 004F37F0 - Colony_Food_Production_
+[.] 004F3D50 - Colony_Job_Production_
+[.] 004F42B0 - Colony_Pop_Base_Prod_Produced_
+[.] 004F4310 - Colony_Industry_Per_Worker_
+[.] 004F43F0 - Colony_Empire_Base_Industry_Produced_
+[.] 004F44D0 - Show_Industry_Production_
+[.] 004F4520 - Colony_Industry_Production_
+[.] 004F4D50 - Colony_Is_Blockaded
+[.] 004F4D90 - Colony_Research_Per_Scientist_
+[.] 004F4E60 - Colony_Empire_Base_Research_Produced_
+[.] 004F4F60 - Show_Research_Production_
+[.] 004F4FB0 - Colony_Research_Production_
+[.] 004F54D0 - Show_BC_Production_
+[.] 004F5520 - Colony_BC_Production_
+[.] 004F5A80 - Double_Add_Two_
+[.] 004F5A90 - Planet_Max_Population_For_Player_
+[.] 004F5B90 - Size_And_Climate_Race_Pop_Limit_
+[.] 004F5C30 - Size_And_Climate_Max_Population_
+[.] 004F5C70 - Calc_Player_Climate_
+[.] 004F5CD0 - Colony_Race_Pop_Limit_
+[.] 004F5D40 - Colony_N_Pops_Of_Empire_
+[.] 004F5D70 - Room_For_Another_Dude_
+[.] 004F5E90 - Ship_Type_Cost_For_Player_
+[.] 004F5EE0 - Colony_Product_Cost_
+[.] 004F6100 - Colony_Producing_Product_Cost_
+[.] 004F6120 - Colony_N_Turns_To_Produce_
+[.] 004F6190 - Colony_Cost_To_Buy_Given_Product_
+[.] 004F6260 - Colony_Cost_To_Buy_Producing_Product_
+[.] 004F6280 - Colony_Buy_Outright_
+[.] 004F62F0 - Colony_Can_Afford_To_Buy_Product_
+[.] 004F6340 - Star_Has_Asteroid_Or_Gas_Giant_
+[.] 004F63A0 - Delete_Obsolete_Artifical_Planets_Under_Construction_
+[.] 004F6410 - Colony_Can_Build_Product_
+[.] 004F6BD0 - Colony_Environmental_Stuff_
+[.] 004F6C50 - Pre_Import_Computing_
+[.] 004F6D50 - Colony_Food_Maintenance_
+[.] 004F6ED0 - Colony_Industry_Maintenance_
+[.] 004F7030 - Colony_Replicators_
+[.] 004F72A0 - Colony_Industry_To_Tax_
+[.] 004F7310 - Colony_BC_Maintenance_
+[.] 004F73E0 - Player_Research_Cost_
+[.] 004F7430 - Chance_For_Research_Breakthrough_
+[.] 004F7470 - Chance_For_Research_Breakthrough_Aux_
+[.] 004F74B0 - Player_N_Turns_Until_Research_Complete_
+[.] 004F7560 - Leader_At_Anomaly_
+[.] 004F75A0 - Compute_Player_Maintenance_
+[.] 004F7CE0 - Tribute_Received_From_
+[.] 004F7D40 - Show_Command_Points_
+[.] 004F7D90 - Compute_Total_Building_Costs_
+[.] 004F7E20 - Player_Owns_Officer_
+[.] 004F7E60 - Update_Player_Stats_
+[.] 004F8230 - Colony_Calculation_
+[.] 004F8290 - Recalculate_Colony_
+[.] 004F82B0 - Pass_Out_Imports_
+[.] 004F8750 - Post_Import_Computing_
+[.] 004F8770 - Colony_Pop_Grows_
+[.] 004F8D00 - Colony_Specialty_
+[.] 004F8D50 - Star_Colony_Calculation_
+[.] 004F8DF0 - All_Colony_Calculations_
+[.] 004F90A0 - Do_Player_Colony_Post_Production_
+[.] 004F9140 - Do_Player_Colony_Calculations_
+[.] 004F91D0 - thunk_All_Colony_Calculations_
+[.] 004F91E0 - Apply_All_Colony_Changes_
+[.] 004F9240 - Apply_Colony_Changes_
 [ ] 004F92D0 - Apply_Colony_Pop_Growth_
-[ ] 004F9A30 - Apply_Assimilation_
-[ ] 004F9C90 - Produce_Ground_Military_
-[ ] 004F9D50 - Apply_Production_
-[ ] 004FA4F0 - Housing_Is_Useless_
-[ ] 004FA530 - Ghost_Colony_Stuff_
-[ ] 004FA600 - Player_May_Get_Tech_App_
-[ ] 004FA730 - Field_Is_Gray_Box_
-[ ] 004FA790 - Player_Gets_Tech_App_
-[ ] 004FAA00 - Advance_Player_Field_
-[ ] 004FAA80 - Ensure_Uncreative_Field_OK_
-[ ] 004FAB40 - Give_Player_Field_
-[ ] 004FAC60 - Check_For_Research_Breakthrough_
-[ ] 004FACD0 - Compute_Player_Total_Known_Tech_Cost_
-[ ] 004FADC0 - May_Surrender_Star_
-[ ] 004FAEB0 - Surrender_Star_
-[ ] 004FAF60 - May_Surrender_Empire_
-[ ] 004FAFB0 - Surrender_Empire_
-[ ] 004FB090 - Do_Surrenders_
-[ ] 004FB130 - Do_Surrender_Star_
-[ ] 004FB230 - Do_Surrender_Colony_
-[ ] 004FB320 - Do_Surrender_Empire_
-[ ] 004FB520 - Eliminate_Player_
-[ ] 004FB7F0 - Init_Surrenders_
-[ ] 004FB870 - Check_For_Eliminated_Players_
-[ ] 004FB920 - Apply_All_Player_Changes_
-[ ] 004FBA20 - N_Living_Players_
-[ ] 004FBA70 - N_Living_Human_Players_
-[ ] 004FBAC0 - Compute_Blockades_
-[ ] 004FBD10 - Colony_Can_Build_Large_Ships_
-[ ] 004FBD40 - Compute_Star_Colony_Stuff_
-[ ] 004FBEA0 - Do_Colony_Owner_Change_Star_Colony_Stuff_
-[ ] 004FBEF0 - No_Op1_
-[ ] 004FBF00 - Compute_All_Star_Colony_Stuff_
-[ ] 004FBF50 - Compute_Potential_Colony_Info_
-[ ] 004FC110 - Get_First_Player_Colony_Idx
-[ ] 004FC140 - Twiddle_Initial_Homeworlds_
-[ ] 004FC4B0 - Twiddle_Initial_Homeworld_
-[ ] 004FC700 - Monster_At_Star_
-[ ] 004FC750 - Colony_Planetary_Shield_
-[ ] 004FC780 - Get_Player_Max_Population_
-[ ] 004FC800 - Get_System_Population_
-[ ] 004FC880 - Get_Surrender_System_
-[ ] 004FC9B0 - Sort_star_weights_
-[ ] 004FC9D0 - Get_Possible_Surrender_Systems_
-[ ] 004FCB40 - Player_Name_
-[ ] 004FCB70 - Best_Leader_Diplomat_Bonus_
-[ ] 004FCC40 - Load_Tech_Names_
-[ ] 004FD020 - Init_Tech_
-[ ] 004FD2B0 - Tech_Is_Legal_For_Player_
-[ ] 004FD390 - Init_Player_Tech_
-[ ] 004FD8D0 - Missile_Owner_
-[ ] 004FD8F0 - Missile_Type_
-[ ] 004FD9C0 - Coord_Movement_
-[ ] 004FDA60 - Kill_Missile_
-[ ] 004FDAD0 - Did_Missile_Hit_
-[ ] 004FDB50 - Draw_Missile_
-[ ] 004FDE10 - Picture_Count_
-[ ] 004FDEB0 - Get_Multiple_Torpedo_Coords_
-[ ] 004FE040 - Get_Multiple_Missile_Coords_
-[ ] 004FE3E0 - Draw_Missile_Status_
-[ ] 004FE760 - Draw_Missiles_
-[ ] 004FE7B0 - Fire_Missile_
-[ ] 004FEC90 - Missile_Facing_To_XY_
-[ ] 004FECD0 - Missile_Facing_
-[ ] 004FED80 - Missile_Speed_
-[ ] 004FEF30 - Missile_On_Combat_Screen_
-[ ] 004FEF70 - Move_Missile_
-[ ] 004FF2B0 - Next_Missile_Id_
-[ ] 004FF300 - On_Combat_Screen_
-[ ] 004FF340 - Is_Missile_Target_Alive_
-[ ] 004FF3C0 - Resolve_Missile_
-[ ] 004FFE00 - Find_Weakest_Shield_
-[ ] 004FFE50 - Draw_Fighter_
-[ ] 00500070 - Retarget_Missile_
-[ ] 00500280 - Fighter_Ocv_
-[ ] 005002F0 - Missile_Dcv_
-[ ] 00500410 - Get_Missile_Hits_
-[ ] 00500580 - Fighter_Combat_SFX_
-[ ] 005009A0 - AI_Invasion_Will_Succeed_
-[ ] 00500AC0 - Has_Defending_Troops_
-[ ] 00500B20 - Allocate_Data_Space_
-[ ] 00500C80 - AI_Tech_Select_
-[ ] 00500D00 - Player_Best_Ship_Shield_
-[ ] 00500D30 - Player_Best_Armor_
-[ ] 00500D60 - Player_Best_Computer_
-[ ] 00500D90 - Player_Best_Fuel_
-[ ] 00500DC0 - Player_Best_Planetary_Shield_
-[ ] 00500E00 - Player_Best_Drive_
-[ ] 00500E30 - Player_Best_Rifle_
-[ ] 00500E60 - Player_Best_Personal_Shield_
-[ ] 00500E90 - Compute_AI_Tech_Info_
-[ ] 005014C0 - All_AI_Tech_Select_
-[ ] 00501590 - Get_Max_Technology_Value_
-[ ] 005015F0 - System_Proximity_Count_
-[ ] 00501690 - Apply_Evolutionary_Upgrades_
-[ ] 00501730 - Add_Net_Next_Turn_Fields_
-[ ] 00501900 - Add_Waiting_For_Joiners_Field_
-[ ] 00501950 - Choose_Multi_Network_Game_Screen_
-[ ] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
-[ ] 00501C80 - Choose_Network_Plyrs_Screen_
-[ ] 00501F50 - Add_Choose_Net_Plyrs_Fields_
-[ ] 00502150 - Add_Banner_Field_
-[ ] 00502210 - Draw_Net_Next_Turn_Screen_
-[ ] 00502930 - Draw_Choose_Net_Plyrs_Screen_
-[ ] 00502D70 - Draw_Generic_Net_Info_Screen_
-[ ] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
-[ ] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
-[ ] 005031D0 - Draw_Fill_Seg_
-[ ] 00503260 - Draw_Multi_Player_Banner_
-[ ] 00503390 - Draw_SendGet_Net_Info_Screen_
-[ ] 00503560 - Draw_Wait_For_New_Joiners_Screen_
-[ ] 00503740 - Draw_Wait_For_Race_Info_Screen_
-[ ] 00503920 - Get_Main_Palette_Base_Colors_
-[ ] 005039A0 - Get_Player_Colors_
-[ ] 00503A50 - Hotseat_Select_Player_
-[ ] 00503D30 - Hotseat_Add_Next_Player_Fields_
-[ ] 00503E30 - Hotseat_Draw_Next_Player_
-[ ] 00504190 - Hotseat_Load_Next_Player_
-[ ] 00504300 - Hotseat_Get_Colors_
-[ ] 005043F0 - Hotseat_Get_N_Valid_Players_
-[ ] 00504420 - Hotseat_Print_Player_Data_
-[ ] 00504500 - Fade_In_Function_
-[ ] 00504520 - Hotseat_Set_Next_Player_Status_
-[ ] 005045F0 - Hotseat_Player_Status_
-[ ] 00504640 - Load_Net_Next_Turn_Screen_
-[ ] 00504830 - Get_Net_Next_Turn_Player_Colors_
-[ ] 00504A10 - Load_Choose_Net_Plyrs_Screen_
-[ ] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
-[ ] 00504C70 - Set_Default_Modem_Settings_
-[ ] 00504D20 - Load_Multi_Player_Game_Screen_
-[ ] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
-[ ] 005050A0 - Get_Valid_MP_Save_Games_
-[ ] 005050D0 - Draw_Load_MP_Game_Screen_
-[ ] 00505510 - Do_Get_Valid_MP_Save_Games_
-[ ] 00505560 - Load_Load_MP_Game_Screen_
-[ ] 005056F0 - Multi_Player_Screen_
-[ ] 00505C10 - Add_MP_Setup_Screen_Fields_
-[ ] 00506010 - Warning_Box_Has_Opponent_Pressed_
-[ ] 00506030 - Draw_MP_Setup_Screen_
-[ ] 005062B0 - Load_MP_Setup_Pictures_
-[ ] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
-[ ] 00506600 - Modem_Setup_Screen_
-[ ] 005069A0 - Add_Modem_Setup_Fields2_
-[ ] 00506BD0 - Add_Modem_Setup_Fields_
-[ ] 00506D40 - Check_Modem_Init_Help_Fields_
-[ ] 00506E50 - Draw_Modem_Setup_Screen_
-[ ] 005072B0 - Print_Modem_Strings_
-[ ] 005073A0 - Load_Modem_Setup_Screen_
-[ ] 00507510 - NullModem_Setup_Screen_
-[ ] 00507720 - Add_NullModem_Setup_Fields_
-[ ] 00507920 - Draw_NullModem_Setup_Screen_
-[ ] 00507CE0 - Load_NullModem_Setup_Screen_
-[ ] 00507E80 - Reload_Generating_Map_Info_
-[ ] 00507EA0 - Reload_Generic_Net_Info_
-[ ] 00507FE0 - Reload_Getting_Data_Info_
-[ ] 00508000 - Reload_Initializing_Net_Info_
-[ ] 00508020 - Reload_Join_Net_Screen_
-[ ] 00508040 - Reload_Sending_Data_Info_
-[ ] 00508080 - Reload_Wait_For_Race_Info_
-[ ] 005080A0 - Reload_Waiting_For_Joiners_Screen_
-[ ] 005080F0 - Chat_Box_Input_Loop_
-[ ] 005081D0 - Set_Multi_Player_Game_Type_
-[ ] 00508300 - Change_MP_Game_Name_
-[ ] 00508480 - Load_FP_Data_From_LBX_
-[ ] 005084E0 - N_Fire_Points_
-[ ] 00508550 - Calc_FP_Offsets_
-[ ] 00508670 - Base_Generic_Dcv_
-[ ] 005086E0 - Base_Generic_Ocv_
-[ ] 00508730 - Satelite_Strength_Vs_Ships_
-[ ] 00508990 - Modified_Weapon_Strength_
-[ ] 00508A50 - Strength_Hits_Modifier_
-[ ] 00508A90 - Ship_Strength_Vs_Ships_In_Nebula_
-[ ] 00508AB0 - Ship_Strength_Vs_Ships_
-[ ] 00508AD0 - Ship_Strength_Vs_Shield_
-[ ] 00508E10 - Current_Ship_Hits_
-[ ] 00508E50 - Max_Ship_Hits_
-[ ] 00508F00 - Ship_Strength_Vs_Planetary_Shield_
-[ ] 00509080 - Missile_Base_Strength_
-[ ] 00509110 - Phasor_Base_Strength_
-[ ] 005091C0 - Fighter_Garrison_Strength_
-[ ] 005092D0 - Colony_Ground_Strength_Vs_Player_
-[ ] 00509390 - Colony_Space_Strength_Vs_Player_
-[ ] 005093F0 - Get_Best_Ship_Shield_Value_
-[ ] 00509480 - Clear_Last_App_Desc_
-[ ] 005094A0 - Create_Ship_
-[ ] 00509750 - Has_Prod_In_Queue_
-[ ] 00509780 - Get_Setting_Description_String_
-[ ] 005097F0 - Clear_Last_App_Description_String_
-[ ] 00509800 - Get_App_Description_String_
-[ ] 00509880 - Option_String_
-[ ] 00509A30 - N_Prods_In_Colony_Queue_
-[ ] 00509A80 - Calculate_Building_Array_
-[ ] 00509B30 - qsort_building_by_name_
-[ ] 00509B80 - Draw_Buildings_List_
-[ ] 00509C80 - Calc_Font_Off_
-[ ] 00509CA0 - Get_Font_Off_For_Buildings_
-[ ] 00509D60 - Draw_Militarys_List_
-[ ] 00509FA0 - Get_Font_Off_For_Military_
-[ ] 0050A020 - Add_Buildings_Fields_
-[ ] 0050A0B0 - Add_Militarys_Fields_
-[ ] 0050A140 - Load_Build_Anims_
-[ ] 0050A1B0 - Draw_Building_Info_
-[ ] 0050A290 - Print_App_Description_
-[ ] 0050A370 - Draw_Building_Centered_In_Window_
-[ ] 0050A3B0 - Build_Weapon_String_
-[ ] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
-[ ] 0050ABE0 - Draw_Ship_Design_Info_
-[ ] 0050AD10 - Draw_Ship_Design_Info2_
-[ ] 0050AD80 - Draw_Ship_Info_
-[ ] 0050AE50 - Draw_Active_Prod_
-[ ] 0050B090 - Auto_Design_Type_
-[ ] 0050B0C0 - First_Prod_Colony_Queue_Slot_
-[ ] 0050B1C0 - First_Prod_Queue_Slot_
-[ ] 0050B270 - Delete_From_Colony_Queue_
-[ ] 0050B2D0 - Delete_Ship_
-[ ] 0050B300 - Delete_Prod_From_Colony_Queue_
-[ ] 0050B340 - Clear_Colony_Queue_
-[ ] 0050B360 - Squish_Out_Colony_Queue_Slot_
-[ ] 0050B3E0 - Remove_Ships_
-[ ] 0050B4D0 - Do_Exit_Screen_Cleanup_
-[ ] 0050B520 - Evaluate_Input_
-[ ] 0050BFF0 - Do_Draw_Build_Queue_
-[ ] 0050C020 - N_Prods_In_Queue_
-[ ] 0050C050 - Star_N_Uncolonized_Worlds_
-[ ] 0050C0E0 - Calculate_Military_Array_
-[ ] 0050C570 - Something_Behind_Settting_
-[ ] 0050C5C0 - Add_To_Queue_
-[ ] 0050CBD0 - Colbldg_Create_Ship_
-[ ] 0050CC20 - Get_Prod_Queue_Len_
-[ ] 0050CC50 - Delete_From_Queue_
-[ ] 0050CE20 - Defragment_Queue_
-[ ] 0050CE60 - Squish_Out_Queue_Slot_
-[ ] 0050CEB0 - Add_Refited_Ship_To_Queue_
-[ ] 0050D070 - Insert_Before_Queue_Slot_
-[ ] 0050D170 - Selection_Name_
-[ ] 0050D220 - Draw_Icon_
-[ ] 0050D240 - Draw_Current_Selection_
-[ ] 0050DC10 - Print_Setting_Description_
-[ ] 0050DC80 - Print_Selection_Centered_
-[ ] 0050DCA0 - Draw_Cost_And_Time_Info_
+[.] 004F9A30 - Apply_Assimilation_
+[.] 004F9C90 - Produce_Ground_Military_
+[.] 004F9D50 - Apply_Production_
+[.] 004FA4F0 - Housing_Is_Useless_
+[.] 004FA530 - Ghost_Colony_Stuff_
+[.] 004FA600 - Player_May_Get_Tech_App_
+[.] 004FA730 - Field_Is_Gray_Box_
+[.] 004FA790 - Player_Gets_Tech_App_
+[.] 004FAA00 - Advance_Player_Field_
+[.] 004FAA80 - Ensure_Uncreative_Field_OK_
+[.] 004FAB40 - Give_Player_Field_
+[.] 004FAC60 - Check_For_Research_Breakthrough_
+[.] 004FACD0 - Compute_Player_Total_Known_Tech_Cost_
+[.] 004FADC0 - May_Surrender_Star_
+[.] 004FAEB0 - Surrender_Star_
+[.] 004FAF60 - May_Surrender_Empire_
+[.] 004FAFB0 - Surrender_Empire_
+[.] 004FB090 - Do_Surrenders_
+[.] 004FB130 - Do_Surrender_Star_
+[.] 004FB230 - Do_Surrender_Colony_
+[.] 004FB320 - Do_Surrender_Empire_
+[.] 004FB520 - Eliminate_Player_
+[.] 004FB7F0 - Init_Surrenders_
+[.] 004FB870 - Check_For_Eliminated_Players_
+[.] 004FB920 - Apply_All_Player_Changes_
+[.] 004FBA20 - N_Living_Players_
+[.] 004FBA70 - N_Living_Human_Players_
+[.] 004FBAC0 - Compute_Blockades_
+[.] 004FBD10 - Colony_Can_Build_Large_Ships_
+[.] 004FBD40 - Compute_Star_Colony_Stuff_
+[.] 004FBEA0 - Do_Colony_Owner_Change_Star_Colony_Stuff_
+[.] 004FBEF0 - No_Op1_
+[.] 004FBF00 - Compute_All_Star_Colony_Stuff_
+[.] 004FBF50 - Compute_Potential_Colony_Info_
+[.] 004FC110 - Get_First_Player_Colony_Idx
+[.] 004FC140 - Twiddle_Initial_Homeworlds_
+[.] 004FC4B0 - Twiddle_Initial_Homeworld_
+[.] 004FC700 - Monster_At_Star_
+[.] 004FC750 - Colony_Planetary_Shield_
+[.] 004FC780 - Get_Player_Max_Population_
+[.] 004FC800 - Get_System_Population_
+[.] 004FC880 - Get_Surrender_System_
+[.] 004FC9B0 - Sort_star_weights_
+[.] 004FC9D0 - Get_Possible_Surrender_Systems_
+[.] 004FCB40 - Player_Name_
+[.] 004FCB70 - Best_Leader_Diplomat_Bonus_
+[.] 004FCC40 - Load_Tech_Names_
+[.] 004FD020 - Init_Tech_
+[.] 004FD2B0 - Tech_Is_Legal_For_Player_
+[.] 004FD390 - Init_Player_Tech_
+[.] 004FD8D0 - Missile_Owner_
+[.] 004FD8F0 - Missile_Type_
+[.] 004FD9C0 - Coord_Movement_
+[.] 004FDA60 - Kill_Missile_
+[.] 004FDAD0 - Did_Missile_Hit_
+[.] 004FDB50 - Draw_Missile_
+[.] 004FDE10 - Picture_Count_
+[.] 004FDEB0 - Get_Multiple_Torpedo_Coords_
+[.] 004FE040 - Get_Multiple_Missile_Coords_
+[.] 004FE3E0 - Draw_Missile_Status_
+[.] 004FE760 - Draw_Missiles_
+[.] 004FE7B0 - Fire_Missile_
+[.] 004FEC90 - Missile_Facing_To_XY_
+[.] 004FECD0 - Missile_Facing_
+[.] 004FED80 - Missile_Speed_
+[.] 004FEF30 - Missile_On_Combat_Screen_
+[.] 004FEF70 - Move_Missile_
+[.] 004FF2B0 - Next_Missile_Id_
+[.] 004FF300 - On_Combat_Screen_
+[.] 004FF340 - Is_Missile_Target_Alive_
+[.] 004FF3C0 - Resolve_Missile_
+[.] 004FFE00 - Find_Weakest_Shield_
+[.] 004FFE50 - Draw_Fighter_
+[.] 00500070 - Retarget_Missile_
+[.] 00500280 - Fighter_Ocv_
+[.] 005002F0 - Missile_Dcv_
+[.] 00500410 - Get_Missile_Hits_
+[.] 00500580 - Fighter_Combat_SFX_
+[.] 005009A0 - AI_Invasion_Will_Succeed_
+[.] 00500AC0 - Has_Defending_Troops_
+[.] 00500B20 - Allocate_Data_Space_
+[.] 00500C80 - AI_Tech_Select_
+[.] 00500D00 - Player_Best_Ship_Shield_
+[.] 00500D30 - Player_Best_Armor_
+[.] 00500D60 - Player_Best_Computer_
+[.] 00500D90 - Player_Best_Fuel_
+[.] 00500DC0 - Player_Best_Planetary_Shield_
+[.] 00500E00 - Player_Best_Drive_
+[.] 00500E30 - Player_Best_Rifle_
+[.] 00500E60 - Player_Best_Personal_Shield_
+[.] 00500E90 - Compute_AI_Tech_Info_
+[.] 005014C0 - All_AI_Tech_Select_
+[.] 00501590 - Get_Max_Technology_Value_
+[.] 005015F0 - System_Proximity_Count_
+[.] 00501690 - Apply_Evolutionary_Upgrades_
+[.] 00501730 - Add_Net_Next_Turn_Fields_
+[.] 00501900 - Add_Waiting_For_Joiners_Field_
+[.] 00501950 - Choose_Multi_Network_Game_Screen_
+[.] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
+[.] 00501C80 - Choose_Network_Plyrs_Screen_
+[.] 00501F50 - Add_Choose_Net_Plyrs_Fields_
+[.] 00502150 - Add_Banner_Field_
+[.] 00502210 - Draw_Net_Next_Turn_Screen_
+[.] 00502930 - Draw_Choose_Net_Plyrs_Screen_
+[.] 00502D70 - Draw_Generic_Net_Info_Screen_
+[.] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
+[.] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
+[.] 005031D0 - Draw_Fill_Seg_
+[.] 00503260 - Draw_Multi_Player_Banner_
+[.] 00503390 - Draw_SendGet_Net_Info_Screen_
+[.] 00503560 - Draw_Wait_For_New_Joiners_Screen_
+[.] 00503740 - Draw_Wait_For_Race_Info_Screen_
+[.] 00503920 - Get_Main_Palette_Base_Colors_
+[.] 005039A0 - Get_Player_Colors_
+[.] 00503A50 - Hotseat_Select_Player_
+[.] 00503D30 - Hotseat_Add_Next_Player_Fields_
+[.] 00503E30 - Hotseat_Draw_Next_Player_
+[.] 00504190 - Hotseat_Load_Next_Player_
+[.] 00504300 - Hotseat_Get_Colors_
+[.] 005043F0 - Hotseat_Get_N_Valid_Players_
+[.] 00504420 - Hotseat_Print_Player_Data_
+[.] 00504500 - Fade_In_Function_
+[.] 00504520 - Hotseat_Set_Next_Player_Status_
+[.] 005045F0 - Hotseat_Player_Status_
+[.] 00504640 - Load_Net_Next_Turn_Screen_
+[.] 00504830 - Get_Net_Next_Turn_Player_Colors_
+[.] 00504A10 - Load_Choose_Net_Plyrs_Screen_
+[.] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
+[.] 00504C70 - Set_Default_Modem_Settings_
+[.] 00504D20 - Load_Multi_Player_Game_Screen_
+[.] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
+[.] 005050A0 - Get_Valid_MP_Save_Games_
+[.] 005050D0 - Draw_Load_MP_Game_Screen_
+[.] 00505510 - Do_Get_Valid_MP_Save_Games_
+[.] 00505560 - Load_Load_MP_Game_Screen_
+[.] 005056F0 - Multi_Player_Screen_
+[.] 00505C10 - Add_MP_Setup_Screen_Fields_
+[.] 00506010 - Warning_Box_Has_Opponent_Pressed_
+[.] 00506030 - Draw_MP_Setup_Screen_
+[.] 005062B0 - Load_MP_Setup_Pictures_
+[.] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
+[.] 00506600 - Modem_Setup_Screen_
+[.] 005069A0 - Add_Modem_Setup_Fields2_
+[.] 00506BD0 - Add_Modem_Setup_Fields_
+[.] 00506D40 - Check_Modem_Init_Help_Fields_
+[.] 00506E50 - Draw_Modem_Setup_Screen_
+[.] 005072B0 - Print_Modem_Strings_
+[.] 005073A0 - Load_Modem_Setup_Screen_
+[.] 00507510 - NullModem_Setup_Screen_
+[.] 00507720 - Add_NullModem_Setup_Fields_
+[.] 00507920 - Draw_NullModem_Setup_Screen_
+[.] 00507CE0 - Load_NullModem_Setup_Screen_
+[.] 00507E80 - Reload_Generating_Map_Info_
+[.] 00507EA0 - Reload_Generic_Net_Info_
+[.] 00507FE0 - Reload_Getting_Data_Info_
+[.] 00508000 - Reload_Initializing_Net_Info_
+[.] 00508020 - Reload_Join_Net_Screen_
+[.] 00508040 - Reload_Sending_Data_Info_
+[.] 00508080 - Reload_Wait_For_Race_Info_
+[.] 005080A0 - Reload_Waiting_For_Joiners_Screen_
+[.] 005080F0 - Chat_Box_Input_Loop_
+[.] 005081D0 - Set_Multi_Player_Game_Type_
+[.] 00508300 - Change_MP_Game_Name_
+[.] 00508480 - Load_FP_Data_From_LBX_
+[.] 005084E0 - N_Fire_Points_
+[.] 00508550 - Calc_FP_Offsets_
+[.] 00508670 - Base_Generic_Dcv_
+[.] 005086E0 - Base_Generic_Ocv_
+[.] 00508730 - Satelite_Strength_Vs_Ships_
+[.] 00508990 - Modified_Weapon_Strength_
+[.] 00508A50 - Strength_Hits_Modifier_
+[.] 00508A90 - Ship_Strength_Vs_Ships_In_Nebula_
+[.] 00508AB0 - Ship_Strength_Vs_Ships_
+[.] 00508AD0 - Ship_Strength_Vs_Shield_
+[.] 00508E10 - Current_Ship_Hits_
+[.] 00508E50 - Max_Ship_Hits_
+[.] 00508F00 - Ship_Strength_Vs_Planetary_Shield_
+[.] 00509080 - Missile_Base_Strength_
+[.] 00509110 - Phasor_Base_Strength_
+[.] 005091C0 - Fighter_Garrison_Strength_
+[.] 005092D0 - Colony_Ground_Strength_Vs_Player_
+[.] 00509390 - Colony_Space_Strength_Vs_Player_
+[.] 005093F0 - Get_Best_Ship_Shield_Value_
+[.] 00509480 - Clear_Last_App_Desc_
+[.] 005094A0 - Create_Ship_
+[.] 00509750 - Has_Prod_In_Queue_
+[.] 00509780 - Get_Setting_Description_String_
+[.] 005097F0 - Clear_Last_App_Description_String_
+[.] 00509800 - Get_App_Description_String_
+[.] 00509880 - Option_String_
+[.] 00509A30 - N_Prods_In_Colony_Queue_
+[.] 00509A80 - Calculate_Building_Array_
+[.] 00509B30 - qsort_building_by_name_
+[.] 00509B80 - Draw_Buildings_List_
+[.] 00509C80 - Calc_Font_Off_
+[.] 00509CA0 - Get_Font_Off_For_Buildings_
+[.] 00509D60 - Draw_Militarys_List_
+[.] 00509FA0 - Get_Font_Off_For_Military_
+[.] 0050A020 - Add_Buildings_Fields_
+[.] 0050A0B0 - Add_Militarys_Fields_
+[.] 0050A140 - Load_Build_Anims_
+[.] 0050A1B0 - Draw_Building_Info_
+[.] 0050A290 - Print_App_Description_
+[.] 0050A370 - Draw_Building_Centered_In_Window_
+[.] 0050A3B0 - Build_Weapon_String_
+[.] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
+[.] 0050ABE0 - Draw_Ship_Design_Info_
+[.] 0050AD10 - Draw_Ship_Design_Info2_
+[.] 0050AD80 - Draw_Ship_Info_
+[.] 0050AE50 - Draw_Active_Prod_
+[.] 0050B090 - Auto_Design_Type_
+[.] 0050B0C0 - First_Prod_Colony_Queue_Slot_
+[.] 0050B1C0 - First_Prod_Queue_Slot_
+[.] 0050B270 - Delete_From_Colony_Queue_
+[.] 0050B2D0 - Delete_Ship_
+[.] 0050B300 - Delete_Prod_From_Colony_Queue_
+[.] 0050B340 - Clear_Colony_Queue_
+[.] 0050B360 - Squish_Out_Colony_Queue_Slot_
+[.] 0050B3E0 - Remove_Ships_
+[.] 0050B4D0 - Do_Exit_Screen_Cleanup_
+[.] 0050B520 - Evaluate_Input_
+[.] 0050BFF0 - Do_Draw_Build_Queue_
+[.] 0050C020 - N_Prods_In_Queue_
+[.] 0050C050 - Star_N_Uncolonized_Worlds_
+[.] 0050C0E0 - Calculate_Military_Array_
+[.] 0050C570 - Something_Behind_Settting_
+[.] 0050C5C0 - Add_To_Queue_
+[.] 0050CBD0 - Colbldg_Create_Ship_
+[.] 0050CC20 - Get_Prod_Queue_Len_
+[.] 0050CC50 - Delete_From_Queue_
+[.] 0050CE20 - Defragment_Queue_
+[.] 0050CE60 - Squish_Out_Queue_Slot_
+[.] 0050CEB0 - Add_Refited_Ship_To_Queue_
+[.] 0050D070 - Insert_Before_Queue_Slot_
+[.] 0050D170 - Selection_Name_
+[.] 0050D220 - Draw_Icon_
+[.] 0050D240 - Draw_Current_Selection_
+[.] 0050DC10 - Print_Setting_Description_
+[.] 0050DC80 - Print_Selection_Centered_
+[.] 0050DCA0 - Draw_Cost_And_Time_Info_
 [ ] 0050DEB0 - Draw_Build_Queue_Popup_
 [ ] 0050E060 - Draw_Build_Queue_
 [ ] 0050E240 - Update_Fields_
