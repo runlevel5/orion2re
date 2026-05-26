@@ -905,8 +905,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         Update_Ship_Etas_();
     }
 
-    void __cdecl Filter_Explored_Planets_(short* summary_count) {
-        short original_count = *summary_count;
+    void __cdecl Filter_Explored_Planets_(int16_t* summary_count) {
+        int16_t original_count = *summary_count;
         allocate::Push_Block_(MOX::_screen_seg);
 
         // Allocate buffer for 360 planets (0x2760 / 28 bytes)
@@ -964,7 +964,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 s_plntsum_planet* p_sum = &temp_buffer[*summary_count];
                 p_sum->max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[i], MOX::_PLAYER_NUM);
                 p_sum->food_per_farmer = (int16_t)(int8_t)MOX::_planet[i].food_per_farmer;
-                p_sum->minerals = (int16_t)COLCALC::_minerals_per_mine[(uint8_t)MOX::_planet[i].mineral_class];
+                p_sum->minerals = (int16_t)COLCALC::_minerals_per_mine[MOX::_planet[i].mineral_class];
                 p_sum->mineral_class = (int16_t)MOX::_planet[i].mineral_class;
                 p_sum->climate = (int16_t)MOX::_planet[i].climate;
                 p_sum->explored = i;

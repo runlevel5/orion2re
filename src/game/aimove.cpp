@@ -159,9 +159,7 @@ namespace AIMOVE {
         }
 
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
-            // total_ship_strength is an array of 8 ints starting at offset 0x1A of s_ai_player_info
-            int32_t* strength_array = reinterpret_cast<int32_t*>(reinterpret_cast<uintptr_t>(&(*AIDATA::_ai_player_info)[plr1]) + 0x1A);
-            uint32_t current_strength = static_cast<uint32_t>(strength_array[plr2]);
+            uint32_t current_strength = (uint32_t)(*AIDATA::_ai_player_info)[plr1].total_ship_strength[plr2];
             uint32_t possible_strength = static_cast<uint32_t>((*AIDATA::_possible_ship_strengths)[i][plr1][plr2][0]);
 
             // AI logic: check if existing strength ratio allows for a threat/attack opportunity
@@ -930,8 +928,9 @@ namespace AIMOVE {
                     int32_t dest = AIMOVE::Npc_Dest_(ship_idx, star_flag2);
                     ship->d.date_of_design = 0;
 
-                    // Note: Original buggy logic preserved. If dest == -1, the monster count 
-                    // array scan is bypassed, enabling monster duplication beyond the cap.
+                    // Assembly uses d.date_of_design at ship offset +0x61 as the 30-turn eel timer.
+                    // Original bug preserved: if dest == -1 and monster_count is still -1,
+                    // the spawn gate below still passes because -1 < 4.
                     if (dest != -1) {
                         if (monster_count == -1) {
                             monster_count = 0;
@@ -952,11 +951,12 @@ namespace AIMOVE {
                         int32_t new_ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(13, &eel_design, star->x, star->y);
 
                         if (new_ship_idx != -1) {
-                            s_MSG msg;
+                            s_MSG msg = {};
                             msg.msg_type = 18; // MSG_TYPE_EEL_SPAWNED
                             msg.u.eel.star_idx = (uint8_t)ship->location;
                             MSG_::Add_Msg_All_(msg);
 
+                            // Assembly clears the same +0x61 timer field on the spawned eel.
                             MOX::_ship[new_ship_idx].d.date_of_design = 0;
                         }
                         monster_count++;
@@ -968,7 +968,7 @@ namespace AIMOVE {
                 int32_t dest = AIMOVE::Npc_Dest_(ship_idx, star_flag2);
 
                 if (dest == -1) {
-                    s_MSG msg;
+                    s_MSG msg = {};
                     msg.msg_type = 19; // MSG_TYPE_EEL_VANISHED
                     msg.u.eel.star_idx = (uint8_t)ship->location;
                     MSG_::Add_Msg_All_(msg);
@@ -1931,8 +1931,8 @@ namespace AIMOVE {
                                         }
                                         if (max_score < score) {
                                             max_score = score;
-                                            if (puVar8 != nullptr && puVar8->target_star != -1) {
-                                                target_info->target_star = puVar8->target_star;
+                                            if (puVar8 != nullptr && puVar8->target_planet != -1) {
+                                                target_info->target_planet = puVar8->target_planet;
                                                 target_info->value_a = puVar8->value_a;
                                                 target_info->value_b = puVar8->value_b;
                                             }
@@ -2368,7 +2368,7 @@ namespace AIMOVE {
                     target_info->value_b = (int16_t)target_val;
 
                     if (target_info->min_value < (int16_t)target_val) {
-                        target_info->target_star = planet_idx;
+                        target_info->target_planet = planet_idx;
                         target_info->value_a = (int16_t)colony_worth;
                     }
                     else {
@@ -2715,7 +2715,7 @@ namespace AIMOVE {
 
             attack_info.target_player = val1;
             attack_info.min_value = val2;
-            attack_info.target_star = -1;
+            attack_info.target_planet = -1;
 
             _flee_stars = flee_stars;
             _i_ai = player_id;
@@ -2723,8 +2723,8 @@ namespace AIMOVE {
 
             Find_Best_Attack_From_Star_(star_idx, &attack_info, 1, 2);
 
-            if (attack_info.target_star != -1) {
-                *out_target_star = attack_info.target_star;
+            if (attack_info.target_planet != -1) {
+                *out_target_star = attack_info.target_planet;
                 *out_param_6 = attack_info.value_a;
                 *out_param_7 = (int32_t)attack_info.value_b;
             }

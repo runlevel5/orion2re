@@ -268,6 +268,8 @@ namespace aidesign {
                 if (max_damage_idx < 0) {
                     *type2 = 0;
                     *spec2 = 0;
+                } else if (weapon_count == 1 && (TECHDATA::_weapons[weapon_id[0]].available_mods & 2) == 0) {
+                    *type2 = 0;
                 } else {
                     int16_t best_idx = 0;
                     if (max_damage_idx != 0) {
@@ -787,29 +789,23 @@ namespace aidesign {
     }
 
     int16_t __cdecl Special_Devices_Available_(int16_t player_idx) {
-        int16_t result = 0;
+        for (int16_t i = 0; i < 12; ++i) {
+            int16_t tech_app_id;
+            uint8_t id = _special_device_spcl[i].id;
+            uint8_t type = _special_device_spcl[i].type;
 
-        for (int i = 0; i < 12; ++i) {
-            if (result != 0) {
-                break;
-            }
-
-            int tech_app_id;
-            int id_lookup = *reinterpret_cast<const int16_t*>(&_special_device_spcl[i].id);
-            int16_t type_lookup = *reinterpret_cast<const int16_t*>(&_special_device_spcl[i].type);
-
-            if (type_lookup == 0) {
-                tech_app_id = TECHDATA::_specials[id_lookup].tech_app_id;
+            if (type == 0) {
+                tech_app_id = (int16_t)TECHDATA::_specials[id].tech_app_id;
             } else {
-                tech_app_id = TECHDATA::_weapons[id_lookup].tech_app_id;
+                tech_app_id = (int16_t)TECHDATA::_weapons[id].tech_app_id;
             }
 
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
-                result = 1;
+                return 1;
             }
         }
 
-        return result;
+        return 0;
     }
 
     int16_t __cdecl Fighters_Available_(int16_t player_idx) {

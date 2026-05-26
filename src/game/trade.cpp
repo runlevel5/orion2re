@@ -2,7 +2,7 @@
 
 namespace TRADE {
     void __cdecl Process_Research_Agreement_(s_player* plr, int16_t target_plr_idx) {
-        int16_t goal = Research_Agreement_Goal_(plr, target_plr_idx);
+        int32_t goal = Research_Agreement_Goal_(plr, target_plr_idx);
         int16_t current_level = plr->current_research_agreement_level[target_plr_idx];
 
         if (current_level < goal) {
@@ -159,10 +159,10 @@ namespace TRADE {
         return (static_cast<int>(base_goal) * (max_leader_bonus + trait_multiplier)) / 100;
     }
 
-    int16_t __cdecl Research_Agreement_Goal_(s_player* plr, int16_t target_plr_idx) {
-        int combined_points = Get_Combined_Research_Points_(plr, target_plr_idx);
+    int32_t __cdecl Research_Agreement_Goal_(s_player* plr, int16_t target_plr_idx) {
+        int32_t combined_points = Get_Combined_Research_Points_(plr, target_plr_idx);
         // The original logic truncates the combined points to 16 bits before applying modifiers.
-        int16_t base_value = static_cast<int16_t>(combined_points);
+        int16_t base_value = (int16_t)combined_points;
 
         switch (plr->traits[TRAIT_CURRENT_GOVERNMENT]) {
             case 0:
@@ -175,7 +175,7 @@ namespace TRADE {
                 return static_cast<int16_t>((static_cast<int>(base_value) * 7) / 4);
             default:
                 // For other traits (e.g., cases 2, 3 or values > 5), the original 32-bit result is returned.
-                return static_cast<int16_t>(combined_points);
+                return combined_points;
         }
     }
 
@@ -206,8 +206,8 @@ namespace TRADE {
                     }
                 }
 
-                MOX::_player[(uint8_t)colony.owner].n_trade_pops += colony_trade_pops;
-                MOX::_player[(uint8_t)colony.owner].n_research_pops += colony_research_pops;
+                MOX::_player[colony.owner].n_trade_pops += colony_trade_pops;
+                MOX::_player[colony.owner].n_research_pops += colony_research_pops;
             }
         }
     }
@@ -234,7 +234,7 @@ namespace TRADE {
         int16_t combined_pts;
         int16_t player_a_idx;
         s_player* player_b;
-        int16_t goal;
+        int32_t goal;
 
         combined_pts = static_cast<int16_t>(TRADE::Get_Combined_Research_Points_(player_a, player_b_idx));
 

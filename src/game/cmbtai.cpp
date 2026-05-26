@@ -1554,7 +1554,7 @@ void __cdecl Release_Smallest_Ship_From_Stasis_(int16_t owner_idx) {
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
 
-        if (ship->unit_status == 0 && ship->is_captured == 0 && ship->owner == (int8_t)owner_idx) {
+        if (ship->unit_status == 0 && ship->is_captured == 0 && ship->owner == owner_idx) {
             if (CMBTMOV1::Ship_Is_In_Stasis_(i)) {
                 if (ship->size_class < min_size_class) {
                     min_size_class = ship->size_class;

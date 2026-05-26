@@ -142,7 +142,7 @@ namespace PLNTSUM {
     int __cdecl qsort_by_max_population_(const void* a, const void* b);
 
     void __cdecl Sort_Planet_Summary_();
-    void __cdecl Filter_Explored_Planets_(short* summary_count);
+    void __cdecl Filter_Explored_Planets_(int16_t* summary_count);
     int16_t __cdecl Planet_Summary_Id_(int16_t explored_id);
 
     int16_t __cdecl Nearest_Ship_Id_(int16_t index);

@@ -1506,6 +1506,7 @@ namespace DIP_SCRN {
                 case 0x6a:
                     if (MOX::_player[_current_ambassador].opportunity_planet_num[MOX::_PLAYER_NUM] != -1) {
                         MOX::_player[_current_ambassador].sneak_attack_planet = MOX::_player[_current_ambassador].opportunity_planet_num[MOX::_PLAYER_NUM];
+                        MOX::_player[_current_ambassador].sneak_attack_player = (int8_t)MOX::_PLAYER_NUM;
                         MOX::_player[_current_ambassador].sneak_attack_message =
                             (uint8_t)MOX::_player[_current_ambassador].diplomacy_demand_rejection_message[MOX::_PLAYER_NUM];
                     }

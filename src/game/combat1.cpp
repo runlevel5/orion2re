@@ -272,6 +272,8 @@ namespace COMBAT1 {
                         if (MOX::_net_flag != 0) {
                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                         }
+                        timer::Release_Time_(1);
+                        continue;
                     } else {
                         MOX::_cur_ship = MOX::_ship_turn_order[MOX::_cur_ptr];
                         if (CMBTMOV1::Ship_Is_In_Stasis_(MOX::_cur_ship) == 0) {
@@ -311,7 +313,7 @@ namespace COMBAT1 {
                                         MOX::_msl_impact_warning_flag = 1 - MOX::_msl_impact_warning_flag;
                                         MOX::_saved_msl_warning = MOX::_msl_impact_warning_flag;
                                         if (MOX::_net_flag != 0) {
-                                            NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003, reinterpret_cast<uint8_t*>(&MOX::_msl_impact_warning_flag), 2);
+                                            NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003, &MOX::_msl_impact_warning_flag, 2);
                                         }
                                         input_val = 0;
                                     }
@@ -409,7 +411,7 @@ namespace COMBAT1 {
                                             MOX::_super_fast_flag = 0;
                                         }
                                         fields::Clear_Fields_();
-                                        MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, MOX::s__00551100, 0);
+                                        MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
                                         if (MOX::_net_flag != 0) {
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
@@ -751,6 +753,7 @@ namespace COMBAT1 {
                                                     if (used_tp1 == used_tp2) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
                                                     }
+                                                    Assign_Combat_Grids_(MOX::_cur_ship);
                                                     CMBTDRW1::Refresh_Combat_Screen_Full_();
                                                     if (Ship_Done_Check_() != 0 || MOX::_combat_data[MOX::_cur_ship].owner != orig_owner) {
                                                         MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
@@ -779,7 +782,7 @@ namespace COMBAT1 {
                                                     break;
                                                 case 10008:
                                                     fields::Clear_Fields_();
-                                                    MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, MOX::s__00551100, 0);
+                                                    MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
                                                     if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_attacker_player) {
                                                         MOX::_auto_combat_flag[0] = 1 - MOX::_auto_combat_flag[0];
                                                         MOX::_auto_combat = MOX::_auto_combat_flag[0];

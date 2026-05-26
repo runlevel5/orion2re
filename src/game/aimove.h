@@ -16,7 +16,7 @@ namespace AIMOVE {
     struct s_attack_info {
         int16_t target_player;
         int16_t min_value;
-        int16_t target_star;
+        int16_t target_planet;
         int16_t value_a;
         int16_t value_b;
     };

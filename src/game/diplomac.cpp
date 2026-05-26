@@ -272,6 +272,7 @@ namespace diplomac {
                                 }
                             } else if (plr1->opportunity_planet_value[p2] > 0) {
                                 plr1->sneak_attack_planet = plr1->opportunity_planet_num[p2];
+                                plr1->sneak_attack_player = (int8_t)p2;
                                 plr1->sneak_attack_message = (int8_t)eval_messages[p2];
                                 plr1->war_buildup_duration = (int8_t)random::Random_(20) + 20;
                                 if (npc_war_count > 0) {
@@ -610,6 +611,7 @@ namespace diplomac {
             int16_t personality = Get_Player_Diplomacy_Personality_(attacker_idx, target_idx);
             if (personality != 4) {
                 attacker.sneak_attack_planet = planet_num;
+                attacker.sneak_attack_player = (int8_t)target_idx;
                 attacker.sneak_attack_message = message_idx + 70;
                 return;
             }
