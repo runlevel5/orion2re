@@ -798,8 +798,8 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty < 2 && _on_officer_screen_flag != 1) {
-                        COLONY::_full_draw = 1;
+                    if (MOX::_settings.game_difficulty <= 0 && _on_officer_screen_flag != 0) {
+                        COLONY::_full_draw = 0;
                     } else {
                         done = true;
                     }
@@ -813,8 +813,8 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty < 2 && _on_officer_screen_flag != 1) {
-                        COLONY::_full_draw = 1;
+                    if (MOX::_settings.game_difficulty <= 0 && _on_officer_screen_flag != 0) {
+                        COLONY::_full_draw = 0;
                     } else {
                         _field_state = 0;
                         done = true;
@@ -825,10 +825,10 @@ namespace MAINPUPS {
                 } else if (input == -_mp_fields[8]) {
                     int16_t info_cost = static_cast<int16_t>(OFFICER::Calculate_Officer_Cost_(_g_player_n, _g_officer));
                     s_leader_data* leader = &MOX::_leaders[_g_officer];
-                    char* level_name = MOX::_officer_level_names[static_cast<uint8_t>(leader->level)];
+                    char* level_name = MOX::_officer_level_names[leader->level];
                     char buffer[500];
 
-                    sprintf(buffer, ESTRINGS::E_Strings_(0x1fb), level_name, leader->name, info_cost);
+                    sprintf(buffer, ESTRINGS::E_Strings_(0x1fb), level_name, leader, info_cost);
                     TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1bf), buffer);
 
                     fields::Deactivate_Auto_Function_();
@@ -840,10 +840,10 @@ namespace MAINPUPS {
                 } else if (input == -_mp_fields[7]) {
                     int16_t info_cost = static_cast<int16_t>(OFFICER::Calculate_Officer_Cost_(_g_player_n, _g_officer));
                     s_leader_data* leader = &MOX::_leaders[_g_officer];
-                    char* level_name = MOX::_officer_level_names[static_cast<uint8_t>(leader->level)];
+                    char* level_name = MOX::_officer_level_names[leader->level];
                     char buffer[500];
 
-                    sprintf(buffer, ESTRINGS::E_Strings_(0x1fa), level_name, leader->name, info_cost);
+                    sprintf(buffer, ESTRINGS::E_Strings_(0x1fa), level_name, leader, info_cost);
                     TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x141), buffer);
 
                     fields::Deactivate_Auto_Function_();
@@ -2021,7 +2021,7 @@ namespace MAINPUPS {
         Get_Picture_Draw_XY_(_anim_10);
 
         animate::Draw_(_g_x, _g_y, _anim_10);
-        OFFICER::Wrapper_For_Colony_Officer_Popup_Data_((int32_t)_g_x, (int32_t)(_g_y + 53), (int32_t)_g_officer);
+        OFFICER::Wrapper_For_Colony_Officer_Popup_Data_(_g_x, _g_y + 53, _g_officer);
         animate::Draw_(_g_x + 13, _g_y + 55, _anim_11);
 
         if (_officer_gains_level_state == 0) {
@@ -2039,6 +2039,8 @@ namespace MAINPUPS {
             char* format = ESTRINGS::E_Strings_(585);
             sprintf(message_buffer, format, name);
         }
+        // Preserve the original binary behavior for unexpected state values by
+        // intentionally leaving message_buffer untouched.
 
         ERIC::Print_Paragraph_Centered_(_g_x + 14, _g_y + 149, 281, 62, message_buffer);
 
@@ -2077,6 +2079,30 @@ namespace MAINPUPS {
         int16_t dummy_a;
         int16_t dummy_8;
 
+        auto redraw_selection_popup = []() {
+            Eric_Pop_Fields_();
+            Update_Selection_Fields_();
+            video::Copy_Back_To_Off_();
+            Draw_Selection_Popup_();
+            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+        };
+
+        auto fail_selection = [&]() -> int16_t {
+            redraw_selection_popup();
+            return -1;
+        };
+
+        auto fail_with_help = [&](int16_t help_string_id, bool mark_full_draw, bool redraw_twice) -> int16_t {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(help_string_id));
+            if (mark_full_draw) {
+                COLONY::_full_draw = 1;
+            }
+            if (redraw_twice) {
+                redraw_selection_popup();
+            }
+            return fail_selection();
+        };
+
         int16_t scan_res = MAINSCR::Scan_System_Display_Fields_(
             *y, *x, MOX::_planet_buttons,
             &dummy_a, &planet_scanned, &ship_scanned, &dummy_8, &icon_scanned
@@ -2091,43 +2117,40 @@ namespace MAINPUPS {
             int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_((int16_t)COLONY::_sys_disp_star_handle, planet_scanned);
 
             if (_selection_state_flag == 0) {
-                if (MOX::_planet[planet_idx].planet_type != 3 /* PLANET_TYPE_GAS_GIANT */) {
-                    goto help_236_inline_redraw;
+                if (MOX::_planet[planet_idx].planet_type != 3 /* exact original compare */) {
+                    return fail_with_help(0x236, true, true);
                 }
 
                 int16_t col_idx = MOX::_planet[planet_idx].colony_index;
-                if (col_idx != -1) {
-                    if (MOX::_colony[col_idx].outpost_flag == 0) {
-                        goto help_236_inline_redraw;
-                    }
+                if (col_idx != -1 && MOX::_colony[col_idx].outpost_flag == 0) {
+                    return fail_with_help(0x236, true, true);
                 }
             }
 
             if (_selection_state_flag == 1) {
                 if (MOX::_planet[planet_idx].colony_index != -1) {
-                    goto help_236_inline_redraw;
+                    return fail_with_help(0x236, true, true);
                 }
             }
 
             if (_selection_state_flag == 2) {
                 int16_t col_idx = MOX::_planet[planet_idx].colony_index;
                 if (col_idx == -1) {
-                    goto help_23b_inline_redraw;
+                    return fail_with_help(0x23b, true, true);
                 }
 
                 if (MOX::_colony[col_idx].outpost_flag != 0) {
-                    goto help_23b_inline_redraw;
+                    return fail_with_help(0x23b, true, true);
                 }
 
                 if (MOX::_colony[col_idx].owner != MOX::_PLAYER_NUM) {
-                    goto help_23b_inline_redraw;
+                    return fail_with_help(0x23b, true, true);
                 }
             }
 
             if (_selection_state_flag == 3) {
-                if (MOX::_planet[planet_idx].planet_type == 3 /* PLANET_TYPE_GAS_GIANT */) {
-                    GENDRAW::Help_(ESTRINGS::E_Strings_(0x235));
-                    goto common_redraw_and_fail;
+                if (MOX::_planet[planet_idx].planet_type == 3 /* exact original compare */) {
+                    return fail_with_help(0x235, false, false);
                 }
 
                 *selection_confirmed = 1;
@@ -2144,36 +2167,9 @@ namespace MAINPUPS {
                 return planet_idx;
             }
 
-        common_redraw_and_fail:
-            Eric_Pop_Fields_();
-            Update_Selection_Fields_();
-            video::Copy_Back_To_Off_();
-            Draw_Selection_Popup_();
-            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
-
-            goto function_fail;
-
-        help_236_inline_redraw:
-            GENDRAW::Help_(ESTRINGS::E_Strings_(0x236));
-            COLONY::_full_draw = 1;
-            Eric_Pop_Fields_();
-            Update_Selection_Fields_();
-            video::Copy_Back_To_Off_();
-            Draw_Selection_Popup_();
-            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
-            goto common_redraw_and_fail;
-
-        help_23b_inline_redraw:
-            GENDRAW::Help_(ESTRINGS::E_Strings_(0x23b));
-            COLONY::_full_draw = 1;
-            Eric_Pop_Fields_();
-            Update_Selection_Fields_();
-            video::Copy_Back_To_Off_();
-            Draw_Selection_Popup_();
-            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+            return fail_selection();
         }
 
-    function_fail:
         return -1;
     }
 

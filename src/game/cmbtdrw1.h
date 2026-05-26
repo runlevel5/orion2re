@@ -90,7 +90,7 @@ namespace CMBTDRW1 {
 
     void __cdecl Get_Ship_Actual_Size_(int16_t ship_id, int16_t* width, int16_t* height);
 
-    int8_t __cdecl Get_Weapon_Arc_(int16_t bearing);
+    uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing);
 
     int16_t __cdecl Board_Popup_(int16_t min_val, int16_t max_val, char* msg, int16_t* out_val);
 

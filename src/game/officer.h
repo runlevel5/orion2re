@@ -286,7 +286,7 @@ namespace OFFICER {
 
     void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t field_x, int16_t officer_idx);
 
-    void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int32_t officer_idx);
+    void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int16_t officer_idx);
 
     void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(
         int16_t skill_id_base,

@@ -941,7 +941,7 @@
 [X] 004495A0 - Build_Ship_Summary_
 [ ] 004497F0 - Check_For_Colony_And_Outpost_Ships_
 [X] 00449930 - Determine_Button_Status_
-[ ] 004499E0 - Filter_Explored_Planets_
+[.] 004499E0 - Filter_Explored_Planets_
 [X] 00449C80 - Load_Planet_Pictures_
 [X] 00449CB0 - Load_Planet_Segment_
 [X] 00449D00 - Load_Planet_Summary_Pictures_
@@ -978,13 +978,13 @@
 [X] 0044B9C0 - Does_Ship_Have_Missiles_Incoming_
 [X] 0044BA50 - Safe_To_Fire_Sphere_Weapon_
 [X] 0044BC60 - Ai_Self_Destruct_Check_
-[ ] 0044C110 - Release_Smallest_Ship_From_Stasis_
+[.] 0044C110 - Release_Smallest_Ship_From_Stasis_
 [X] 0044C1A0 - Ai_Stasis_Check_
 [X] 0044C260 - Range_To_XY_
 [X] 0044C360 - Range_To_Missile_
 [X] 0044C390 - Range_To_Ship_
-[.] 0044C510 - Expected_Weapon_Damage_
-[.] 0044CB10 - Expected_Missile_Damage_
+[X] 0044C510 - Expected_Weapon_Damage_
+[X] 0044CB10 - Expected_Missile_Damage_
 [X] 0044CD80 - Expected_Beam_Bomb_Damage_
 [X] 0044D0B0 - Missile_Overkill_Check_
 [X] 0044D180 - Check_For_Launched_Fighters_
@@ -992,9 +992,9 @@
 [X] 0044D310 - Is_Ship_Targeted_By_Missile_
 [X] 0044D360 - Toggle_Auto_Combat_Flags_
 [X] 0044D530 - Crystal_Control_
-[.] 0044D610 - Do_Auto_Ship_Turn_
+[V] 0044D610 - Do_Auto_Ship_Turn_
 [X] 0044DE30 - Target_Missile_Value_
-[.] 0044E070 - Target_Ship_Value_
+[V] 0044E070 - Target_Ship_Value_
 [X] 0044E2D0 - Select_Ship_To_Target_
 [X] 0044E380 - Choose_Target_
 [X] 0044E3E0 - Combat_Ship_Class_
@@ -1005,12 +1005,12 @@
 [X] 0044EE10 - Get_Current_Missile_Target_
 [X] 0044EF10 - Get_Current_Target_
 [X] 0044F010 - Get_Effective_Missile_Strength_
-[.] 0044F5A0 - Convert_Ordinal_To_Msl_Type_
+[V] 0044F5A0 - Convert_Ordinal_To_Msl_Type_
 [X] 0044F640 - Average_Missile_Kills_
 [X] 0044F860 - Get_Effective_Weapon_Damage_
 [X] 0044F8D0 - Get_Effective_Beam_Strength_
 [X] 0044F980 - Get_Total_Hits_
-[.] 0044FA40 - Retreat_Check_
+[V] 0044FA40 - Retreat_Check_
 [X] 0044FD10 - Get_Long_Range_Beam_Strength_
 [X] 0044FE50 - Resolve_Ai_Boarding_
 [X] 00450020 - Boarding_Action_Type_
@@ -1018,20 +1018,20 @@
 [X] 00450480 - Init_Diplomatic_Relations_
 [X] 00450910 - End_Of_Turn_Diplomacy_Adjustments_
 [X] 00450CB0 - Diplomacy_Growth_
-[.] 004513F0 - Change_Relations_
+[V] 004513F0 - Change_Relations_
 [X] 00451960 - Reward_Check_
 [X] 00451A90 - Determine_Diplomacy_Messages_
-[.] 00451F40 - Determine_Bad_Message_
+[V] 00451F40 - Determine_Bad_Message_
 [X] 00452320 - Sneak_Attack_Or_Declare_War_
 [X] 00452420 - Peace_Proposal_
-[.] 004526D0 - Get_Demands_
+[V] 004526D0 - Get_Demands_
 [X] 00452BE0 - Required_Alliances_
-[.] 00452CF0 - Determine_Good_Message_
+[V] 00452CF0 - Determine_Good_Message_
 [X] 00452F10 - Get_War_Count_
 [X] 00452FA0 - Fleet_Strength_Comparison_
 [X] 00453040 - Tech_Strength_Comparison_
 [X] 004530A0 - Maintenance_Strength_Comparison_
-[.] 00453100 - Unprovoked_Good_Messages_
+[V] 00453100 - Unprovoked_Good_Messages_
 [X] 00453750 - Clear_Diplomacy_Messages_
 [X] 004539D0 - Limit_Treaty_Modifiers_
 [X] 00453A80 - Determine_First_Contacts_
@@ -1040,10 +1040,10 @@
 [X] 00453E90 - Find_Worst_Modifier_
 [X] 00453F20 - Declare_War_
 [X] 00454290 - Break_Treaties_
-[.] 004546B0 - Break_Research_
+[V] 004546B0 - Break_Research_
 [X] 00454920 - Break_Trade_
-[.] 00454B90 - Break_Tribute_
-[.] 00454D90 - Fleet_Comparison_
+[V] 00454B90 - Break_Tribute_
+[V] 00454D90 - Fleet_Comparison_
 [X] 00454E20 - Tech_Comparison_
 [X] 00454EA0 - Population_Comparison_
 [X] 00454F50 - Total_War_Loss_Comparison_
@@ -1054,11 +1054,11 @@
 [X] 004553B0 - Adjust_Diplomat_Modifiers_
 [X] 00455410 - Declare_Peace_
 [X] 00455590 - Diplomacy_Broken_Contacts_
-[.] 00455620 - Valid_Treaty_Proposal_
+[V] 00455620 - Valid_Treaty_Proposal_
 [X] 004556F0 - Check_Treaty_Proposal_
-[.] 00456530 - Diplomacy_Test_
+[V] 00456530 - Diplomacy_Test_
 [X] 00456770 - Get_Break_Treaty_Message_
-[.] 00456870 - Get_Break_Research_Message_
+[V] 00456870 - Get_Break_Research_Message_
 [X] 00456940 - Get_Break_Trade_Message_
 [X] 00456A10 - Get_Break_Tribute_Treaty_Message_
 [X] 00456AE0 - Get_Declare_War_Message_
@@ -1066,7 +1066,7 @@
 [X] 00456E10 - Get_Demand_Response_
 [X] 00457380 - Get_Player_Diplomacy_Personality_
 [X] 004573D0 - NPC_Sneak_Attacks_
-[.] 00457940 - Sneak_Attack_Evaluations_
+[V] 00457940 - Sneak_Attack_Evaluations_
 [X] 00458110 - Set_Demands_
 [X] 004581F0 - Clear_Last_Threat_Turn_
 [X] 00458240 - Free_Flic_Queue_And_Pointers_
@@ -1079,7 +1079,7 @@
 [X] 00458470 - Do_Colony_Info_Pop_Stuff_For_Pop_
 [X] 00458A20 - Draw_Info_Morale_
 [X] 00458A40 - Draw_Info_Wee_Morale_
-[.] 00458A60 - Draw_Info_Morale_Both_
+[V] 00458A60 - Draw_Info_Morale_Both_
 [X] 00458BE0 - Draw_Colony_Prod_
 [X] 00458C10 - Draw_Colony_Wee_Prod_
 [X] 00458C40 - Draw_Colony_Prod_Both_
@@ -1109,10 +1109,10 @@
 [X] 0045A470 - Draw_Special_Info_Popup_
 [X] 0045A570 - Leader_Technology_String_
 [X] 0045A680 - Hire_Officer_Popup_
-[.] 0045A6C0 - Random_New_Officer_Popup_
+[V] 0045A6C0 - Random_New_Officer_Popup_
 [X] 0045AB30 - Do_Popup_Setup_
 [X] 0045ADC0 - Do_Popup_Cleanup_
-[.] 0045AE40 - Update_Random_New_Officer_Fields_
+[V] 0045AE40 - Update_Random_New_Officer_Fields_
 [X] 0045B040 - Draw_Random_New_Officer_Popup_
 [X] 0045B2B0 - Load_New_Officer_Popup_
 [X] 0045B350 - Load_New_Officer_Popup_For_Officer_Screen_
@@ -1123,7 +1123,7 @@
 [X] 0045B540 - Officer_Gains_Level_Popup_
 [X] 0045B610 - Update_Officer_Gains_Level_Fields_
 [X] 0045B620 - Add_Officer_Gains_Level_Fields_
-[.] 0045B650 - Draw_Officer_Gains_Level_Popup_
+[V] 0045B650 - Draw_Officer_Gains_Level_Popup_
 [X] 0045B7F0 - Load_Officer_Gains_Level_Popup_
 [X] 0045B850 - New_System_Discovery_Popup_
 [X] 0045BA20 - Load_System_Discovery_Popup_
@@ -1139,12 +1139,12 @@
 [X] 0045BE40 - Add_Selection_Fields_
 [X] 0045BEA0 - Draw_Selection_Popup_
 [X] 0045C050 - Evaluate_Selection_Input_
-[.] 0045C170 - Check_System_Display_Fields_Selection_
+[V] 0045C170 - Check_System_Display_Fields_Selection_
 [X] 0045C420 - Set_G_Special_Value_
 [X] 0045C4A0 - Defense_Colony_Selection_Popup_
 [X] 0045C5C0 - Load_Colony_Defense_Selection_Popup_
 [X] 0045C610 - Update_Colony_Defense_Fields_
-[.] 0045C650 - Draw_Defense_Selection_Popup_
+[V] 0045C650 - Draw_Defense_Selection_Popup_
 [X] 0045C710 - Evaluate_Defense_Selection_Input_
 [X] 0045C740 - Check_System_Display_Fields_Defense_Selection_
 [X] 0045C9B0 - Player_Attacked_Popup_
@@ -1242,44 +1242,44 @@
 [X] 00465E00 - Find_Opportunity_Attack_
 [X] 00465E80 - Find_Opportunity_Attack_Aux_
 [.] 00465F70 - Player_Threatens_Player_
-[.] 00466080 - Number_Of_Attacks_Underway_
-[.] 00466160 - Base_Trade_Agreement_Goal_
-[.] 004661F0 - Get_Combined_Research_Points_
-[.] 00466240 - Process_Trade_And_Research_Agreements_
+[X] 00466080 - Number_Of_Attacks_Underway_
+[X] 00466160 - Base_Trade_Agreement_Goal_
+[X] 004661F0 - Get_Combined_Research_Points_
+[X] 00466240 - Process_Trade_And_Research_Agreements_
 [.] 004662F0 - Compute_N_Trade_And_Research_Pops_
-[.] 00466430 - Process_Trade_Agreement_
-[.] 004664C0 - Trade_Agreement_Goal_
-[.] 00466600 - Process_Research_Agreement_
+[X] 00466430 - Process_Trade_Agreement_
+[X] 004664C0 - Trade_Agreement_Goal_
+[X] 00466600 - Process_Research_Agreement_
 [.] 00466690 - Research_Agreement_Goal_
-[.] 00466710 - Start_Trade_Agreement_
-[.] 004667D0 - Start_Research_Agreement_
-[.] 00466890 - Get_Number_Of_Ships_In_Stasis_
-[.] 004668E0 - Combat_Ship_Is_Functional_
-[.] 00466930 - Enemy_Dissipator_Exists_
-[.] 004669B0 - Ship_Controlled_By_Computer_
-[.] 00466A20 - Send_Tactical_Combat_Message_
-[.] 00466AB0 - Init_Ship_For_Start_Of_Turn_
+[X] 00466710 - Start_Trade_Agreement_
+[X] 004667D0 - Start_Research_Agreement_
+[X] 00466890 - Get_Number_Of_Ships_In_Stasis_
+[X] 004668E0 - Combat_Ship_Is_Functional_
+[X] 00466930 - Enemy_Dissipator_Exists_
+[X] 004669B0 - Ship_Controlled_By_Computer_
+[X] 00466A20 - Send_Tactical_Combat_Message_
+[X] 00466AB0 - Init_Ship_For_Start_Of_Turn_
 [.] 00466D10 - Do_Combat_Turn_
-[.] 00468ED0 - qsort_ship_initiative_
-[.] 00468F30 - Ship_Initiative_Value_
-[.] 00468F70 - Seeking_Missiles_
-[.] 004693D0 - Calc_Current_Speed_
-[.] 004695D0 - Check_For_Winner_
-[.] 004696B0 - Set_Cur_Ship_To_
-[.] 00469750 - Next_Ship_
-[.] 00469A00 - Weapon_Is_On_
-[.] 00469A30 - Remove_Continuing_Effect_Specials_
-[.] 00469AC0 - Ship_Done_Check_
-[.] 00469B20 - Retreat_Ship_
-[.] 00469BD0 - Initiate_Boarding_Action_
-[.] 0046A0F0 - Add_Missile_Fields_
-[.] 0046A2C0 - Set_Combat_Help_Fields_
-[.] 0046A8A0 - Add_Tactical_Combat_Fields_
-[.] 0046AFC0 - Assign_Combat_Grids_
-[.] 0046B260 - Assign_Mouse_Images_
-[.] 0046B920 - Set_Legal_Moves_
+[X] 00468ED0 - qsort_ship_initiative_
+[X] 00468F30 - Ship_Initiative_Value_
+[X] 00468F70 - Seeking_Missiles_
+[X] 004693D0 - Calc_Current_Speed_
+[X] 004695D0 - Check_For_Winner_
+[X] 004696B0 - Set_Cur_Ship_To_
+[X] 00469750 - Next_Ship_
+[X] 00469A00 - Weapon_Is_On_
+[X] 00469A30 - Remove_Continuing_Effect_Specials_
+[X] 00469AC0 - Ship_Done_Check_
+[X] 00469B20 - Retreat_Ship_
+[X] 00469BD0 - Initiate_Boarding_Action_
+[X] 0046A0F0 - Add_Missile_Fields_
+[X] 0046A2C0 - Set_Combat_Help_Fields_
+[X] 0046A8A0 - Add_Tactical_Combat_Fields_
+[X] 0046AFC0 - Assign_Combat_Grids_
+[X] 0046B260 - Assign_Mouse_Images_
+[X] 0046B920 - Set_Legal_Moves_
 [.] 0046BC20 - Get_Competition_Player_Tech_Values_
-[.] 0046BC90 - Human_Player_Best_Weapons_Are_Beams_
+[X] 0046BC90 - Human_Player_Best_Weapons_Are_Beams_
 [.] 0046BCF0 - Fighters_Available_
 [.] 0046BD40 - Special_Weapons_Available_
 [.] 0046BDB0 - Special_Devices_Available_
@@ -1340,7 +1340,7 @@
 [.] 00473B50 - Add_Ongoing_Event_Msgs_
 [.] 00473DF0 - Init_Events_
 [.] 00473E50 - Reset_Events_
-[.] 00473EA0 - Check_For_Event_Message_
+[ ] 00473EA0 - Check_For_Event_Message_
 [.] 00473ED0 - Check_For_Event_
 [.] 00473F80 - Start_Main_Event_
 [.] 00474030 - Load_Event_Picture_
@@ -1420,7 +1420,7 @@
 [.] 0047A070 - Compute_Empire_Building_Needs_
 [.] 0047A2E0 - Compute_Needs_
 [.] 0047A9C0 - Compute_Colony_Ship_Need_
-[.] 0047A9E0 - Compute_Freighter_Need_
+[ ] 0047A9E0 - Compute_Freighter_Need_
 [.] 0047AA40 - Colony_Is_Conquered_
 [.] 0047AAB0 - Assign_Colony_New_Building_
 [.] 0047AC30 - Find_Buildable_Buildings_
@@ -1887,7 +1887,7 @@
 [.] 004A2520 - Evaluate2_Input_
 [.] 004A2800 - Add_Explosion_Anim_
 [.] 004A2830 - Colony_Combat_Screen_
-[.] 004A2AA0 - Add_Global_Fields_
+[ ] 004A2AA0 - Add_Global_Fields_
 [.] 004A2B00 - Load_Combat_Anims_
 [.] 004A2FD0 - Draw_Colony_Combat_Screen_
 [.] 004A3210 - Draw_Summary_
@@ -2078,7 +2078,7 @@
 [.] 004B3870 - Build_Antaran_Offensive_Ships_
 [.] 004B38C0 - Build_Antaran_Ships_
 [.] 004B3C80 - Antaran_Delay_
-[.] 004B3CB0 - Delta_Stardate_
+[ ] 004B3CB0 - Delta_Stardate_
 [.] 004B3CC0 - Deploy_Antaran_Ships_
 [.] 004B3F30 - Get_Antaran_Target_Star_
 [.] 004B3F90 - Build_List_Of_Stars_By_Player_
@@ -2102,7 +2102,7 @@
 [.] 004B4970 - All_But_Capitol_
 [.] 004B4980 - Kill_Buildings_
 [.] 004B4BA0 - Building_Worth_
-[.] 004B4D20 - Kill_Spy_
+[ ] 004B4D20 - Kill_Spy_
 [.] 004B4DE0 - Kill_Ships_
 [.] 004B4FD0 - Kill_Leaders_
 [.] 004B50E0 - Reference_Help_
@@ -2206,35 +2206,35 @@
 [.] 004BA930 - Global_Cycler_
 [.] 004BA950 - Pulsing_Box_
 [.] 004BA9A0 - Print_Paragraph_Centered_Vertically_
-[ ] 004BA9F0 - Print_Paragraph_Centered_
-[ ] 004BAA30 - Eric_Init_
-[ ] 004BAA40 - Eric_Defaults_
-[ ] 004BAA50 - Pick_Random_Colony_
-[ ] 004BAAC0 - Player_Capitol_World_
-[ ] 004BAB20 - Red_If_Negative_Fmt_String_
-[ ] 004BAB40 - Player_Has_Leader_With_General_Skill_At_Star_
-[ ] 004BABE0 - Player_Has_Ship_Size_Or_Larger_At_Star_
-[ ] 004BAC40 - Player_Can_Mind_Control_Colony_With_Help_
-[ ] 004BADB0 - Player_Can_Mind_Control_Colony_
-[ ] 004BAEC0 - Play_Amoeba_Flic_
-[ ] 004BAEE0 - Do_Cinematic_Popup_Setup_
-[ ] 004BAF80 - Cinematic_Autofunction_
-[ ] 004BB040 - Do_Cinematic_Popup_Cleanup_
-[ ] 004BB0A0 - Play_Planetary_Destruction_Flic_
-[ ] 004BB0C0 - Play_Dimensional_Portal_Flic_
-[ ] 004BB0E0 - Play_Antarans_Attack_Flic_
-[ ] 004BB110 - Play_Take_Orion_Flic_
-[ ] 004BB140 - Play_Diplomatic_Win_Flic_
-[ ] 004BB1B0 - Play_Normal_Win_Flic_
-[ ] 004BB1F0 - Play_All_Flics_
-[ ] 004BB260 - Play_Loose_Flic_
-[ ] 004BB2A0 - Calc_Tech_Value_
-[ ] 004BBAC0 - Get_Competition_Player_Tech_Value_
-[ ] 004BBB40 - Set_Competition_Tech_Values_
-[ ] 004BBC20 - Get_Competition_Tech_Values_
-[ ] 004BBCD0 - All_Gray_Boxes_Researched_
-[ ] 004BBD20 - Choose_Tech_Application_
-[ ] 004BC030 - Choose_Hyper_Advanced_Tech_
+[.] 004BA9F0 - Print_Paragraph_Centered_
+[.] 004BAA30 - Eric_Init_
+[.] 004BAA40 - Eric_Defaults_
+[.] 004BAA50 - Pick_Random_Colony_
+[.] 004BAAC0 - Player_Capitol_World_
+[.] 004BAB20 - Red_If_Negative_Fmt_String_
+[.] 004BAB40 - Player_Has_Leader_With_General_Skill_At_Star_
+[.] 004BABE0 - Player_Has_Ship_Size_Or_Larger_At_Star_
+[.] 004BAC40 - Player_Can_Mind_Control_Colony_With_Help_
+[.] 004BADB0 - Player_Can_Mind_Control_Colony_
+[.] 004BAEC0 - Play_Amoeba_Flic_
+[.] 004BAEE0 - Do_Cinematic_Popup_Setup_
+[.] 004BAF80 - Cinematic_Autofunction_
+[.] 004BB040 - Do_Cinematic_Popup_Cleanup_
+[.] 004BB0A0 - Play_Planetary_Destruction_Flic_
+[.] 004BB0C0 - Play_Dimensional_Portal_Flic_
+[.] 004BB0E0 - Play_Antarans_Attack_Flic_
+[.] 004BB110 - Play_Take_Orion_Flic_
+[.] 004BB140 - Play_Diplomatic_Win_Flic_
+[.] 004BB1B0 - Play_Normal_Win_Flic_
+[.] 004BB1F0 - Play_All_Flics_
+[.] 004BB260 - Play_Loose_Flic_
+[.] 004BB2A0 - Calc_Tech_Value_
+[.] 004BBAC0 - Get_Competition_Player_Tech_Value_
+[.] 004BBB40 - Set_Competition_Tech_Values_
+[.] 004BBC20 - Get_Competition_Tech_Values_
+[.] 004BBCD0 - All_Gray_Boxes_Researched_
+[.] 004BBD20 - Choose_Tech_Application_
+[.] 004BC030 - Choose_Hyper_Advanced_Tech_
 [ ] 004BC0D0 - Load_Combfind_Strings_
 [ ] 004BC1B0 - Copy_Target_Info_
 [ ] 004BC1D0 - Send_Star_Player_Presence_

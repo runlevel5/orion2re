@@ -155,12 +155,12 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
             } else {
                 bearing = CMBTDRW1::Relative_Bearing_XY_(source_idx, MOX::_missile[target_idx].x, MOX::_missile[target_idx].y);
             }
-            int8_t arc = CMBTDRW1::Get_Weapon_Arc_(bearing);
+            int16_t arc = (int16_t)CMBTDRW1::Get_Weapon_Arc_(bearing);
             count = 0;
 
             if (COMBAT1::Weapon_Is_On_(source_idx, weapon_slot)) {
-                if ((arc & MOX::_combat_data[source_idx].weapons[weapon_slot].arc) != 0) {
-                    int8_t rack = (int8_t)TECHDATA::_weapons[weapon_id].type;
+                if ((arc & (int16_t)MOX::_combat_data[source_idx].weapons[weapon_slot].arc) != 0) {
+                    uint8_t rack = TECHDATA::_weapons[weapon_id].type;
                     bool can_fire = false;
 
                     if (rack == 2) {
@@ -181,7 +181,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
         }
 
         if (count > 0) {
-            int8_t rack = (int8_t)TECHDATA::_weapons[weapon_id].type;
+            uint8_t rack = TECHDATA::_weapons[weapon_id].type;
 
             if (rack == 1 || rack == 4 || rack == 2) {
                 expected_damage = Expected_Missile_Damage_(target_idx, weapon_id, count, specials, MOX::_combat_data[source_idx].owner);
@@ -190,7 +190,8 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
             } else if (rack == 5) {
                 int16_t min_dam = TECHDATA::_weapons[weapon_id].min_damage;
                 int16_t max_dam = TECHDATA::_weapons[weapon_id].max_damage;
-                int avg_dam = (min_dam + max_dam) / 2;
+                int avg_sum = (int)min_dam + (int)max_dam;
+                int avg_dam = (avg_sum - (avg_sum >> 31)) >> 1;
 
                 switch (weapon_id) {
                     case 0xD: // 13
@@ -243,9 +244,9 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
         expected_damage >>= 2;
     }
 
-    int8_t rack = TECHDATA::_weapons[weapon_id].type;
+    uint8_t rack = TECHDATA::_weapons[weapon_id].type;
     if (rack == 0 || rack == 3) {
-        expected_damage = (expected_damage + 99) / 100;
+        expected_damage = (int32_t)(((uint32_t)(expected_damage + 99)) / 100);
     }
 
     return (int16_t)expected_damage;
@@ -565,7 +566,7 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
     Ai_Stasis_Check_(ship->owner);
     COMBAT1::Assign_Combat_Grids_(MOX::_cur_ship);
 
-    int16_t move_result = 0;
+    int16_t action_result = 0;
     do {
         int16_t target_idx = Choose_Target_(MOX::_cur_ship);
         if (fields::Get_Input_() == MOX::_auto_button) {
@@ -574,11 +575,11 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
 
         if (target_idx == -1) {
             did_move = 0;
-            move_result = 0;
+            action_result = 0;
         } else {
             ship->ai_range_tactic = Combat_Ship_Class_(MOX::_cur_ship, target_idx);
-            move_result = Auto_Move_Ship_(MOX::_cur_ship, target_idx);
-            if (move_result == 0) {
+            action_result = Auto_Move_Ship_(MOX::_cur_ship, target_idx);
+            if (action_result == 0) {
                 MOX::_missile_warning = 2;
                 did_move = 1 - did_move;
             } else {
@@ -600,6 +601,7 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
             do {
                 int16_t weapon_id = ship->weapons[weapon_idx].weapon_id;
                 bool skip_fire = false;
+                bool advance_weapon = false;
 
                 if (weapon_id == 13 /* Pulsar/Torpedo */) {
                     if (!Does_Ship_Have_Missiles_Incoming_(MOX::_cur_ship)) {
@@ -661,11 +663,11 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
                             if (ship->target_type_flag == 1 /* Missile */) {
                                 t_x = MOX::_missile[target_idx_inner].x;
                                 t_y = MOX::_missile[target_idx_inner].y;
-                                CMBTFIRE::Fire_Ship_(MOX::_cur_ship, ship->x * 20, ship->y * 20, target_idx_inner, t_x, t_y, 1);
+                                action_result = CMBTFIRE::Fire_Ship_(MOX::_cur_ship, ship->x * 20, ship->y * 20, target_idx_inner, t_x, t_y, 1);
                             } else {
                                 t_x = MOX::_combat_data[target_idx_inner].x * 20;
                                 t_y = MOX::_combat_data[target_idx_inner].y * 20;
-                                CMBTFIRE::Fire_Ship_(MOX::_cur_ship, ship->x * 20, ship->y * 20, target_idx_inner, t_x, t_y, 0);
+                                action_result = CMBTFIRE::Fire_Ship_(MOX::_cur_ship, ship->x * 20, ship->y * 20, target_idx_inner, t_x, t_y, 0);
                                 if (ship->owner == 11 /* Crystal */) {
                                     Crystal_Control_(target_idx_inner);
                                 }
@@ -673,10 +675,12 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
                         }
                     } else {
                         skip_fire = true;
+                        advance_weapon = true;
                     }
                 }
 
                 if (skip_fire) {
+                    advance_weapon = true;
                     ship->weapons[weapon_idx].active = -1;
                 }
 
@@ -684,7 +688,9 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
                 CMBTDRW1::Draw_Main_Combat_Screen_();
                 RUSS::Mox_Sync_Update_();
                 Ai_Stasis_Check_(ship->owner);
-                weapon_idx++;
+                if (advance_weapon) {
+                    weapon_idx++;
+                }
                 if (weapon_idx >= 8) {
                     break;
                 }
@@ -694,7 +700,7 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
                 ship->weapons[i].active = 1;
             }
         }
-    } while (ship->movement_left > 0 && (move_result != 0 || did_move != 0));
+    } while (ship->movement_left > 0 && (action_result != 0 || did_move != 0));
 
     if (COMBAT1::Combat_Ship_Is_Functional_(MOX::_cur_ship)) {
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
@@ -721,12 +727,14 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
 }
 
 int16_t __cdecl Retreat_Check_(int16_t player_idx) {
+    static const uint32_t kThreatSentinel = 3000000000u;
+    static const int32_t kThreatPercentScale = 100;
     int16_t retreat_result = 0;
     int32_t enemy_expected_damage = 0;
     int32_t enemy_total_hits = 0;
     int32_t player_expected_damage = 0;
     int32_t player_total_hits = 0;
-    int16_t ship_remaining_hits[210];
+    int16_t ship_remaining_hits[210] = {};
 
     if (player_idx < 8 && MOX::_player[player_idx].objectives != 100 /* 'd' */ && MOX::_ai_retreat_flag == 1) {
         if (COMBAT1::Enemy_Dissipator_Exists_(player_idx) == 0) {
@@ -796,14 +804,14 @@ int16_t __cdecl Retreat_Check_(int16_t player_idx) {
                 }
             }
 
-            uint32_t player_threat = 0xb2d05e00;
+            uint32_t player_threat = kThreatSentinel;
             if (enemy_total_hits != 0) {
-                player_threat = (player_expected_damage * 100) / enemy_total_hits;
+                player_threat = (uint32_t)((player_expected_damage * kThreatPercentScale) / enemy_total_hits);
             }
 
-            uint32_t enemy_threat = 0xb2d05e00;
+            uint32_t enemy_threat = kThreatSentinel;
             if (player_total_hits != 0) {
-                enemy_threat = (enemy_expected_damage * 100) / player_total_hits;
+                enemy_threat = (uint32_t)((enemy_expected_damage * kThreatPercentScale) / player_total_hits);
             }
 
             if (player_threat * 5 < enemy_threat) {
@@ -1044,9 +1052,8 @@ int32_t __cdecl Target_Ship_Value_(int16_t attacker_idx, int16_t target_idx, int
         return -10000;
     }
 
-    int32_t value = static_cast<int32_t>(
-        (static_cast<uint32_t>(static_cast<int32_t>(damage_dealt) * damage_received * 3)) / static_cast<uint32_t>(total_hits)
-    );
+    uint32_t value_num = (uint32_t)((int64_t)damage_dealt * damage_received * 3);
+    int32_t value = (int32_t)(value_num / (uint32_t)total_hits);
 
     if (distance_flag != 0) {
         if (target_idx != 0) {
@@ -1921,16 +1928,19 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
 
     s_tech_weapon_data* weapon = &TECHDATA::_weapons[weapon_id];
     if (weapon->type == 4) {
-        int16_t base_damage;
+        int16_t base_damage = result_damage;
         switch (weapon_id) {
             case 28:
                 base_damage = 100;
                 break;
             case 29:
+            case 30:
                 base_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[attacker_player_idx]].max_damage;
                 break;
             case 31:
                 base_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[attacker_player_idx]].max_damage;
+                break;
+            default:
                 break;
         }
 
@@ -2074,8 +2084,6 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
 }
 
 int16_t __cdecl Convert_Ordinal_To_Msl_Type_(int16_t ordinal) {
-    int16_t uninitialized_val;
-
     switch (ordinal) {
         case 0:
             return 14 /* 0x0e */;
@@ -2098,8 +2106,7 @@ int16_t __cdecl Convert_Ordinal_To_Msl_Type_(int16_t ordinal) {
         case 9:
             return 38 /* 0x26 */;
         default:
-            // Note: The original code returns an uninitialized value from the stack in the default case.
-            return uninitialized_val;
+            return ordinal;
     }
 }
 

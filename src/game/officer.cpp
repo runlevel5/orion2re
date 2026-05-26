@@ -3456,9 +3456,9 @@ s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, i
     return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX_00556990, (int)image_id, buffer);
 }
 
-void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int32_t officer_idx) {
+void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int16_t officer_idx) {
     _offscrn_ask_for_hire_popup = 1;
-    Print_Officer_Data_(-1, (int16_t)officer_idx, x + 0x5f, y + 5, x + 10, y + 2, 0x50, 0x5a, 0xc3, 0xe);
+    Print_Officer_Data_(-1, officer_idx, x + 0x5f, y + 5, x + 10, y + 2, 0x50, 0x5a, 0xc3, 0xe);
     _offscrn_ask_for_hire_popup = 0;
 }
 

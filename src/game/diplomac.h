@@ -22,6 +22,8 @@ namespace diplomac {
 
     inline int16_t* _personality_break_peace_treaty_chance = reinterpret_cast<int16_t*>(std::uintptr_t{0x00556CE0});
 
+    inline int16_t* _personality_sneak_attack_modifiers = reinterpret_cast<int16_t*>(std::uintptr_t{0x00556CF0});
+
     void Init_Diplomatic_Relations_();
 
     void __cdecl Change_Relations_(int16_t amount, int16_t p_a, int16_t p_b, int16_t incident, int16_t system, int16_t value);
@@ -80,7 +82,7 @@ namespace diplomac {
 
     void __cdecl End_Of_Turn_Diplomacy_Adjustments_();
 
-    void __cdecl Reward_Check_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5);
+    void __cdecl Reward_Check_(int16_t amount, int16_t p_a, int16_t p_b, int16_t system, int16_t value);
 
     void __cdecl NPC_Sneak_Attacks_();
 
@@ -120,7 +122,7 @@ namespace diplomac {
 
     int16_t __cdecl Find_Worst_Modifier_(int16_t player_idx, int16_t target_idx);
 
-    int8_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type);
+    int16_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type);
 
     int16_t __cdecl Check_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t proposal_type, int16_t* response, int16_t* demand_type, int16_t* demand_tech, int16_t* demand_gold, int16_t* demand_system, int16_t* demand_tribute);
 

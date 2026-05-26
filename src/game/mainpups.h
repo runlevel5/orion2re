@@ -26,8 +26,8 @@ namespace MAINPUPS {
     inline int16_t& _g_officer =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D3C});
 
-    inline uint16_t& _officer_gains_level_state =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00556D40});
+    inline int16_t& _officer_gains_level_state =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D40});
 
     inline char*& _g_str_ptr =
         *reinterpret_cast<char**>(std::uintptr_t{0x00565E28});

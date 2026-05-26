@@ -186,26 +186,27 @@ void __cdecl Draw_Colony_Prod_(int16_t param_1, int16_t param_2, int16_t param_3
 
 void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, int width, char is_mini) {
     s_colony* colony = &MOX::_colony[colony_idx];
-    int16_t morale_div2 = (int16_t)colony->morale / 2;
+    int16_t morale_div2 = (int16_t)((int8_t)colony->morale / 2);
 
     int32_t morale_count_abs = abs((int32_t)morale_div2);
     int32_t morale_count = morale_count_abs;
 
-    s_player* player = &MOX::_player[(uint8_t)colony->owner];
+    s_player* player = &MOX::_player[(int8_t)colony->owner];
+    int8_t govt_trait = player->traits[0];
 
-    if (player->traits[0] >= 6) {
+    if (govt_trait >= 6) {
         morale_count = 0;
     }
 
     if (is_mini == 0) {
-        s_animation_header* govt_anim = COLONY::Govt_Anim_((int16_t)player->traits[0]);
+        s_animation_header* govt_anim = COLONY::Govt_Anim_((int16_t)govt_trait);
         animate::Draw_(x, y - 1, govt_anim);
         x += 30;
     }
 
     Calculate_Squish_Step_(x, (int16_t)width, (int16_t)morale_count, 30);
 
-    if (player->traits[0] < 6) {
+    if (govt_trait < 6) {
         int32_t loop_limit = morale_count_abs;
         if (loop_limit > 20) {
             loop_limit = 20;
