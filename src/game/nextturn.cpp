@@ -88,13 +88,9 @@ void Next_Turn_() {
     MOX::_old_system_index = -1;
 }
 
-void __cdecl No_Op() {
-    // Empty stub
-}
-
 void __cdecl Next_Turn_Calc_() {
-    if (MOX::_game_type < 2) {
-        fields::Assign_Auto_Function_(No_Op, 1);
+    if (MOX::_game_type <= 1) {
+        fields::Assign_Auto_Function_(SCORE::nullsub, 1);
     }
 
     MSG_::Allocate_Msg_Slots_();

@@ -445,7 +445,7 @@ inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055
 inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::uintptr_t{0x005578E0});
 
 inline const char* const s_Memory_Corruption_val_00558028 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"
+    reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n"
 
 inline LPCSTR s_max_file_buffer_count_went_over__0055b334 =
     reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B334}); /* "max file buffer count went over.." */

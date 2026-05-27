@@ -51,6 +51,9 @@ namespace BOMB {
         int16_t leader_idx;
         s_MSG msg;
 
+        static_assert(sizeof(s_MSG) == 0x12, "s_MSG size mismatch");
+        static_assert(sizeof(s_colony) == 0x169, "s_colony size mismatch");
+
         star = &MOX::_star[MOX::_planet[colony->planet].star_index];
         colony_idx = (int16_t)(colony - MOX::_colony);
 
@@ -59,13 +62,13 @@ namespace BOMB {
         leader_idx = BOMB::Handle_Leader_At_Lost_Colony_(colony);
 
         if (capturing_player != -1) {
+            const int16_t capture_reason = (int16_t)capturing_player;
+
             memset(&msg, 0, sizeof(s_MSG));
             msg.msg_type = 7 /* MSG_TYPE_LOST_COLONY */;
             msg.u.lost_colony.planet_idx = colony->planet;
-            // TYPE MISMATCH: using 'reason' from orion2.h for 'player_idx'
-            msg.u.lost_colony.reason = (int16_t)capturing_player;
+            msg.u.lost_colony.reason = capture_reason;
             msg.u.lost_colony.leader_idx = leader_idx;
-            // TYPE MISMATCH: using 'colony_or_outpost' from orion2.h for 'outpost_flag'
             msg.u.lost_colony.colony_or_outpost = colony->outpost_flag;
             MSG_::Add_Msg_(msg, colony->owner);
         }

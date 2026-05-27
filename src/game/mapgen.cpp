@@ -194,7 +194,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         };
 
         for (int i = 0; i < 5; ++i) {
-            weights[i] = weight_table[i * 3 + MOX::_settings_galaxy_age];
+            weights[i] = weight_table[i * 3 + MOX::_settings.galaxy_age];
         }
 
         int16_t choice;

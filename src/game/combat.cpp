@@ -10,7 +10,7 @@ namespace COMBAT {
         }
 
         MOX2::Get_Auto_Function_(&auto_fn);
-        fields::Assign_Auto_Function_(reinterpret_cast<void(*)()>(MAINSCR::Draw_Mini_Main_Screen_), 1);
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
 
         MOX::_cmbt_colony_id = colony_idx;
         MOX::_combat_turn = 0;
@@ -34,6 +34,7 @@ namespace COMBAT {
             for (int i = 0; i < plr2_ship_count; i++) {
                 SHIPS::Kill_Ship_(plr2_ships[i]);
             }
+            MOX2::Put_Auto_Function_(&auto_fn);
             return 1;
         }
 
@@ -41,6 +42,7 @@ namespace COMBAT {
             for (int i = 0; i < plr1_ship_count; i++) {
                 SHIPS::Kill_Ship_(plr1_ships[i]);
             }
+            MOX2::Put_Auto_Function_(&auto_fn);
             return -1;
         }
 
@@ -61,7 +63,7 @@ namespace COMBAT {
         int16_t colony_defense_flags = 0;
         int16_t survived_officers_count = 0;
         int16_t size_sum = 0;
-        int16_t survived_officer_ids[8];
+        int16_t survived_officer_ids[8] = {};
         bool skip_combat = false;
 
         if (MOX::_combat_defender_player < 8 && star_idx < MOX::_NUM_STARS) {
@@ -177,7 +179,7 @@ namespace COMBAT {
 
             int16_t ship_design_idx = MOX::_qcombat_data[i].ship_design_idx;
             if (ship_design_idx != -1) {
-                int8_t player = MOX::_qcombat_data[i].player;
+                uint8_t player = (uint8_t)MOX::_qcombat_data[i].player;
                 if (leader_combat_bonuses[player] <= 0 && 
                    (player >= 8 || (MOX::_player[player].tech_applications[4] != 3 && MOX::_player[player].traits[17] == 0))) {
                     if (MOX::_settings.strategic_combat_flag == 1) {
@@ -229,11 +231,11 @@ namespace COMBAT {
                 bool found = false;
                 bool move_to_pool = false;
                 int16_t officer_idx = survived_officer_ids[j];
-                int8_t player_idx = MOX::_leaders[officer_idx].player_index;
+                int16_t player_idx = MOX::_leaders[officer_idx].player_index;
 
                 for (int16_t i = 1; i < MOX::_combat_total_ship_count; i++) {
                     if (MOX::_qcombat_data[i].status == 0 && MOX::_qcombat_data[i].ship_design_idx != -1) {
-                        if (MOX::_qcombat_data[i].player == player_idx) {
+                        if ((uint8_t)MOX::_qcombat_data[i].player == player_idx) {
                             if (MOX::_qcombat_data[i].officer_idx == -1) {
                                 found = true;
                                 MOX::_ship[MOX::_qcombat_data[i].ship_design_idx].officer_index = officer_idx;
@@ -689,13 +691,12 @@ namespace COMBAT {
         qship->bomb_weapon_id = 0;
         qship->special_weapon_id = 0;
         qship->shield_id = 7;
-        qship->max_hits = (int16_t)((TECHDATA::_hull_data[8].strat_hits * 1000) / 100);
+        qship->max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[8].strat_hits * 1000) / 100);
         qship->missile_defense_bonus = 0;
         qship->beam_defense_bonus = TECHDATA::_hull_data[8].strat_def_bonus + 45 /* 0x2d */;
         qship->base_ocv = AIPOWER::Base_Generic_Ocv_(8) + 45 /* 0x2d */;
         qship->missile_damage_modifier = 0;
         qship->beam_damage_modifier = 105 /* 0x69 */;
-        qship->officer_idx = -1;
         qship->structural_damage = 0;
 
         MOX::_combat_total_ship_count++;

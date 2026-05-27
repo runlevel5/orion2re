@@ -849,17 +849,16 @@ namespace COLGCBT {
 
         random::Set_Random_Seed_(random_seed);
 
-        do {
+        for (;;) {
             _g_ctr++;
 
-            bool combat_active = static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
-                                 static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4;
-
-            if (combat_active) {
+            if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
+                (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
                 if (_start_combat == 0) {
                     _start_combat = 1;
                 } else {
-                    if (static_cast<int16_t>(_g_ctr) % 6 == 0 || _display_fast != 0) {
+                    int16_t ctr = _g_ctr;
+                    if ((ctr % 6) == 0 || _display_fast != 0) {
                         invasion::Ground_Combat_Round_(_g_attack_ptr, _g_defend_ptr);
                     }
 
@@ -867,18 +866,19 @@ namespace COLGCBT {
                         timer::Release_Time_(1);
                     }
                 }
-            } else {
-                if (_start_combat == 0) {
-                    _start_combat = 1;
-                }
+            } else if (_start_combat == 0) {
+                _start_combat = 1;
             }
 
             if (_display_fast == 0) {
-                break;
+                return;
             }
 
-        } while (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
-                 static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4);
+            if ((uint8_t)_g_attack_ptr->current_troop_type_idx >= 4 ||
+                (uint8_t)_g_defend_ptr->current_troop_type_idx >= 4) {
+                return;
+            }
+        }
     }
 
     void __cdecl Print_Troop_Totals_(int16_t x, int16_t y, s_invasion_side_info* side_info) {

@@ -23,7 +23,7 @@ void __cdecl Load_Tech_Names_() {
     uint32_t string_offset = 0;
     char* string_block = static_cast<char*>(farload::Far_Reload_(
         s_techname_lbx_0055a96c,
-        static_cast<uint32_t>(MOX::_settings_language),
+        static_cast<uint32_t>(MOX::_settings.language),
         MOX::_techname_seg));
 
     RUSS::Mox_Update_();

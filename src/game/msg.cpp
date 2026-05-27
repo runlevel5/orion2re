@@ -364,7 +364,7 @@ namespace MSG_ {
                     sprintf(param_1, _msg_spy_assassinated_fmt, local_c8);
                     return;
                 }
-                if (MOX::_settings_language == 4) {
+                if (MOX::_settings.language == 4) {
                     sprintf(param_1, _msg_spy_assassinated_victim_fmt,
                                  &MOX::_leaders[(uint8_t)(param_2->u).spy_assasination.leader_id], local_c8,
                                  MOX::_player[plr_a].name);

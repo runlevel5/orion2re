@@ -86,9 +86,8 @@ namespace COLSYSDI {
     }
 
     void __cdecl Planet_Summary_String_(char* param_1, int16_t param_2, int16_t param_3) {
-        char* gravity_str[3];
+        char* gravity_and_mineral_str[8];
         char* size_str[5];
-        char* mineral_str[5];
         char* gas_giant_str;
         char* asteroid_str;
         char pop_str[500];
@@ -97,9 +96,9 @@ namespace COLSYSDI {
         s_planet_data* planet = &MOX::_planet[planet_idx];
         short colony_idx = planet->colony_index;
 
-        gravity_str[0] = ESTRINGS::E_Strings_(0x169);
-        gravity_str[1] = ESTRINGS::E_Strings_(0xC);
-        gravity_str[2] = ESTRINGS::E_Strings_(0x25B);
+        gravity_and_mineral_str[0] = ESTRINGS::E_Strings_(0x169);
+        gravity_and_mineral_str[1] = ESTRINGS::E_Strings_(0xC);
+        gravity_and_mineral_str[2] = ESTRINGS::E_Strings_(0x25B);
 
         size_str[0] = ESTRINGS::E_Strings_(0x1F6);
         size_str[1] = ESTRINGS::E_Strings_(0x25C);
@@ -107,11 +106,11 @@ namespace COLSYSDI {
         size_str[3] = ESTRINGS::E_Strings_(0x25E);
         size_str[4] = ESTRINGS::E_Strings_(0x25F);
 
-        mineral_str[0] = ESTRINGS::E_Strings_(0x222);
-        mineral_str[1] = ESTRINGS::E_Strings_(0x1A7);
-        mineral_str[2] = ESTRINGS::E_Strings_(0xC);
-        mineral_str[3] = ESTRINGS::E_Strings_(0x1C2);
-        mineral_str[4] = ESTRINGS::E_Strings_(0x223);
+        gravity_and_mineral_str[3] = ESTRINGS::E_Strings_(0x222);
+        gravity_and_mineral_str[4] = ESTRINGS::E_Strings_(0x1A7);
+        gravity_and_mineral_str[5] = ESTRINGS::E_Strings_(0xC);
+        gravity_and_mineral_str[6] = ESTRINGS::E_Strings_(0x1C2);
+        gravity_and_mineral_str[7] = ESTRINGS::E_Strings_(0x223);
 
         ESTRINGS::E_Strings_(0x1B9);
         ESTRINGS::E_Strings_(0x14E);
@@ -159,14 +158,14 @@ namespace COLSYSDI {
             sprintf(param_1, ESTRINGS::E_Strings_(0x2C),
                     size_str[(int)planet->size],
                     MOX::_planet_climate_string[(int)climate],
-                    gravity_str[(int)planet->gravity_class],
-                    mineral_str[(int)planet->mineral_class],
+                    gravity_and_mineral_str[(int)planet->gravity_class],
+                    gravity_and_mineral_str[(int)planet->mineral_class + 3],
                     pop_str);
         } else {
             sprintf(param_1, ESTRINGS::E_Strings_(0x29),
                     MOX::_player[(int)MOX::_colony[colony_idx].owner].race_name,
-                    gravity_str[(int)planet->gravity_class],
-                    mineral_str[(int)planet->mineral_class],
+                    gravity_and_mineral_str[(int)planet->gravity_class],
+                    gravity_and_mineral_str[(int)planet->mineral_class + 3],
                     pop_str);
         }
     }

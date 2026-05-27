@@ -304,9 +304,12 @@ namespace SYS {
         return (int)p1->y - (int)p2->y;
     }
 
-    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h) {
+    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode) {
+        (void)content_h;
+        (void)x_offset;
+        (void)y_offset;
         MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
-        animate::Draw_(content_w + base_x, content_h + base_y, MOX::_moveable_box_pict[0]);
+        animate::Draw_(content_w + base_x, mode + base_y, MOX::_moveable_box_pict[0]);
     }
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner) {
@@ -352,7 +355,7 @@ namespace SYS {
         SYS::_mask_header = mask_hdr;
 
         uint8_t* anim_frame = reinterpret_cast<uint8_t*>(anim_hdr) + anim_hdr->frame_offsets[anim_hdr->current_frame];
-        uint8_t* mask_frame = reinterpret_cast<uint8_t*>(mask_hdr) + mask_hdr->frame_offsets[mask_hdr->current_frame];
+        int8_t* mask_frame = reinterpret_cast<int8_t*>(mask_hdr) + mask_hdr->frame_offsets[mask_hdr->current_frame];
 
         if (!is_clipped) {
             if (video::screen_refresh_flag >= 2) {
@@ -678,7 +681,7 @@ namespace SYS {
                 if (draw_border == '\0') {
                     return;
                 }
-                Draw_System_Display_Border_(base_x, base_y, content_w, content_h);
+                Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 0);
                 const char* pcVar5;
                 if (HAROLD::Contact_With_One_Colony_(star_idx) == '\0') {
                     pcVar5 = HAROLD::H_Message_(0x16b);
@@ -688,13 +691,13 @@ namespace SYS {
                     pcVar5 = local_64;
                 }
                 Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, pcVar5);
-                Print_Empty_System_Data_();
+                Print_Empty_System_Data_(star_idx);
                 return;
             }
 
             Hide_System_Display_(base_x, base_y, content_w, content_h, x_offset, y_offset, '\x01');
             if (draw_border != '\0') {
-                Draw_System_Display_Border_(base_x, base_y, content_w, content_h);
+                Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
             }
 
             if (MOX::_current_screen == 0x1d) {
@@ -715,7 +718,7 @@ namespace SYS {
         }
 
         if (draw_border != '\0') {
-            Draw_System_Display_Border_(base_x, base_y, content_w, content_h);
+            Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
         }
 
         MOX::_system_star_id_for_auto_select = star_idx;
@@ -1522,7 +1525,8 @@ namespace SYS {
         *total_height = static_cast<int16_t>(*total_height + 2);
     }
 
-    void __cdecl Print_Empty_System_Data_() {
+    void __cdecl Print_Empty_System_Data_(int16_t star_idx) {
+        (void)star_idx;
         int16_t local_4_stack;
         int16_t paragraph_top;
         int16_t box_width;
@@ -1531,7 +1535,7 @@ namespace SYS {
         int16_t left_padding;
         int16_t origin_x;
         int16_t origin_y;
-        int16_t saved_window_status;
+        uint16_t saved_window_status;
 
         if (MOX::_current_screen == 0) {
             left_padding = 0x0D;
@@ -1550,14 +1554,16 @@ namespace SYS {
             origin_y = 0x0011;
             left_padding = 0;
         } else {
-            // The binary seeds these layout values from an uninitialized stack slot here; use a stable zero fallback.
-            paragraph_width = 0;
-            box_width = 0;
-            paragraph_height = 0;
-            left_padding = 0;
-            paragraph_top = 0;
-            origin_x = 0;
-            origin_y = 0;
+            // The binary seeds these layout values from one uninitialized stack slot here.
+            // Use a defined fallback while preserving the single-source dataflow shape.
+            const int16_t safe_fallback = 0;
+            paragraph_width = safe_fallback;
+            box_width = safe_fallback;
+            paragraph_height = safe_fallback;
+            left_padding = safe_fallback;
+            paragraph_top = safe_fallback;
+            origin_x = safe_fallback;
+            origin_y = safe_fallback;
         }
 
         local_4_stack = static_cast<int16_t>(left_padding + origin_x);
@@ -1570,18 +1576,18 @@ namespace SYS {
 
         const int16_t max_width =
             BILL::_Get_Paragraph_Max_Width_(paragraph_width, SYS::_star_description_string, 3);
+        int32_t delta = (int32_t)(int16_t)box_width - (int32_t)(int16_t)max_width;
+        int32_t centered = delta / 2;
 
         ERIC::Print_Paragraph_Centered_Vertically_(
-            static_cast<int16_t>(
-                ((static_cast<int32_t>(box_width) - static_cast<int32_t>(max_width)) / 2) +
-                static_cast<int32_t>(local_4_stack)),
+            (int16_t)(centered + (int32_t)(int16_t)local_4_stack),
             text_y,
             paragraph_width,
             paragraph_height,
             SYS::_star_description_string,
             3);
 
-        MISC::Restore_Window_Status_(static_cast<uint32_t>(saved_window_status));
+        MISC::Restore_Window_Status_(saved_window_status);
     }
 
     void __cdecl Print_Gate_Info_(
@@ -1929,7 +1935,7 @@ namespace SYS {
         int16_t x,
         int16_t y,
         const uint8_t* sprite_data,
-        const uint8_t* mask_data) {
+        const int8_t* mask_data) {
       const int16_t* const sprite_words =
           reinterpret_cast<const int16_t*>(sprite_data);
 
@@ -1964,8 +1970,7 @@ namespace SYS {
                 static_cast<int32_t>(sprite_width) * current_row + static_cast<int32_t>(delta);
 
             do {
-              const int8_t mask_value =
-                  static_cast<int8_t>(mask_data[mask_offset + pixel_index]);
+              const int8_t mask_value = mask_data[mask_offset + pixel_index];
 
               uint8_t color;
               if (mask_value != 0) {
@@ -1994,7 +1999,7 @@ namespace SYS {
         int16_t x,
         int16_t y,
         const uint8_t* encoded_sprite,
-        const uint8_t* mask_bitmap) {
+        const int8_t* mask_bitmap) {
         const uint16_t* const sprite_words =
             reinterpret_cast<const uint16_t*>(encoded_sprite);
         const int32_t sprite_width = animate::_animation_header->width;
@@ -2099,14 +2104,13 @@ namespace SYS {
                         sprite_width * row_index + static_cast<int32_t>(run_x) + skipped_pixels;
 
                     while (dest_x < clipped_run_end) {
-                        const uint8_t mask_value = mask_bitmap[mask_index];
+                        const int8_t mask_value = mask_bitmap[mask_index];
                         const uint8_t remapped_color =
                             remap::_picture_remap_color_list[encoded_sprite[pixel_byte_index]];
 
                         uint8_t out_color;
                         if (mask_value != 0) {
-                            const int32_t mask_lookup =
-                                static_cast<int32_t>(static_cast<int8_t>(mask_value)) << 8;
+                            const int32_t mask_lookup = static_cast<int32_t>(mask_value) << 8;
                             out_color = video::DAT_005A56E0[
                                 mask_lookup + static_cast<int32_t>(remapped_color)];
                         } else {

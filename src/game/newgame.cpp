@@ -118,7 +118,7 @@ void __cdecl Globals_To_Temps_() {
 }
 
 void __cdecl Reload_Newgame_Screen_() {
-    _background_seg = farload::Far_Reload_(s_RACEOPT_LBX, 0, MOX::_screen_seg);
+    _background_seg = (s_animation_header*)farload::Far_Reload_(s_RACEOPT_LBX, 0, MOX::_screen_seg);
     RUSS::Mox_Update_();
 
     int16_t index = 0;
@@ -257,7 +257,7 @@ void __cdecl Draw_Newgame_Screen_() {
 
     if (COLONY::_full_draw != 0) {
         graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
-        animate::Draw_(0, 0, (s_animation_header*)_background_seg);
+        animate::Draw_(0, 0, _background_seg);
         fonts::Set_Font_Style_(3, &_color_ken);
         video::Copy_Off_To_Back_();
         COLONY::_full_draw = 0;
@@ -284,22 +284,22 @@ void Load_New_Game_Strings_() {
     _gal_size_button_strings[0] = ESTRINGS::E_Strings_(0x1e0 /* ESTR_SMALL */);
     // Special case for Italian language
     if (MOX::_settings.language == 4) {
-        sprintf(&_hack_msg, s_Piccola_00557dc4);
-        _gal_size_button_strings[0] = &_hack_msg;
+        sprintf(_hack_msg, s_Piccola_00557dc4);
+        _gal_size_button_strings[0] = _hack_msg;
     }
 
     _gal_size_button_strings[1] = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
 
     if (MOX::_settings.language == 2) {
         char* medium_str = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
-        sprintf(&_hack_msg, s_sen_00557dbc, medium_str);
-        _gal_size_button_strings[2] = &_hack_msg;
+        sprintf(_hack_msg, s_sen_00557dbc, medium_str);
+        _gal_size_button_strings[2] = _hack_msg;
     } else if (MOX::_settings.language == 4) {
-        sprintf(&_hack_msg, s_Media_00557db4);
-        _gal_size_button_strings[2] = &_hack_msg;
+        sprintf(_hack_msg, s_Media_00557db4);
+        _gal_size_button_strings[2] = _hack_msg;
     }
 
-    // Logic Note: The following assignments overwrite the results of the specific language logic above
+    // Original behavior: this unconditional assignment overwrites any temporary localized hack string.
     _gal_size_button_strings[2] = ESTRINGS::E_Strings_(0x168);
     _gal_size_button_strings[3] = ESTRINGS::E_Strings_(0x143);
 

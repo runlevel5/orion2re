@@ -59,7 +59,7 @@ namespace SYS {
 
     void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, char mode);
 
-    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h);
+    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
 
     void __cdecl Draw_System_Special_Popup_(int16_t x, int16_t y, int16_t special_idx, int16_t anim_idx);
 
@@ -77,9 +77,9 @@ namespace SYS {
         int16_t x,
         int16_t y,
         const uint8_t* sprite_data,
-        const uint8_t* mask_data);
+        const int8_t* mask_data);
 
-    void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, const uint8_t* encoded_sprite, const uint8_t* mask_bitmap);
+    void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, const uint8_t* encoded_sprite, const int8_t* mask_bitmap);
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner);
 
@@ -156,7 +156,7 @@ namespace SYS {
 
     void __cdecl Print_System_Display_Box_Title_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, const char* title_text);
 
-    void __cdecl Print_Empty_System_Data_();
+    void __cdecl Print_Empty_System_Data_(int16_t star_idx);
 
     inline char (&_star_description_string)[256] =
         *reinterpret_cast<char (*)[256]>(std::uintptr_t{0x00566440});

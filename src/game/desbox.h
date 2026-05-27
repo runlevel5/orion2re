@@ -114,7 +114,7 @@ namespace DESBOX {
 
     void __cdecl Clear_Weapon_Replacement_Fields_();
 
-    int __cdecl New_Arc_Space_(uint8_t arc_index);
+    int32_t __cdecl New_Arc_Space_(uint8_t arc_index);
 
     void __cdecl Get_Weapon_Mod_Field_XYs_(int16_t* mod_indices, int16_t* x_coords, int16_t* y_coords);
 

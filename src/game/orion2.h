@@ -292,7 +292,7 @@ struct s_animation_header {
     int16_t height;
     int16_t current_frame;
     int16_t frame_count;
-    int8_t loop_frame;
+    uint8_t loop_frame;
     short keyframe_interval;
     undefined1 flags;
     uint32_t frame_offsets[0];
@@ -3803,7 +3803,7 @@ struct s_racescrn_icon_layout {
     int16_t x2;
     int16_t y2;
     int16_t spacing_x;
-    void *render_fn;
+    void (__cdecl *render_fn)(struct s_racescrn_mouse_group*);
 };
 
 typedef struct s_racescrn_mouse_group s_racescrn_mouse_group, *Ps_racescrn_mouse_group;
@@ -3821,7 +3821,7 @@ struct s_racescrn_mouse_group {
     int16_t spacing_x;
     struct s_animation_header *sprite1;
     struct s_animation_header *sprite2;
-    void *render_fn;
+    void (__cdecl *render_fn)(struct s_racescrn_mouse_group*);
 };
 
 typedef struct s_racescrn_race_display s_racescrn_race_display, *Ps_racescrn_race_display;

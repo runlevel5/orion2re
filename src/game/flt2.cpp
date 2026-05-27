@@ -5,13 +5,13 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
 {
     int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
     int16_t owner = HACCESS::Ship_Stack_Owner_(node_idx);
-    int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
 
     s_animation_header* anim;
     if (owner < 8) {
-        anim = MOX::_fltscrn_small_ship_icon_seg[static_cast<uint8_t>(MOX::_player[owner].color)];
+        anim = MOX::_fltscrn_small_ship_icon_seg[MOX::_player[owner].color];
     }
     else {
+        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
         anim = MOX::_shield_div_bitmap[MOX::_ship[ship_idx].owner];
     }
 

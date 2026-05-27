@@ -101,8 +101,17 @@ namespace HACCESS {
     }
 
     int16_t __cdecl Node_Ptr_From_Ship_Stack_(int16_t index) {
-        if (index < 0 || index >= MOX::_ship_stack_count) {
-            return -1;
+        if (MOX::_ship_stack_count == 0) {
+            return 0;
+        }
+
+        if (MOX::_ship_stack_count < index) {
+            MOVEBOX::Vanish_Fleet_Movement_Box_();
+            return 0;
+        }
+
+        if (MOX::_ship_stack_count == index) {
+            return Ship_Stack_From_Saved_Array_();
         }
 
         return MOX::_ship_stack_start[index];
@@ -134,7 +143,7 @@ namespace HACCESS {
                 if (colony_idx > -1) {
                     colony_found = colony_idx;
                     // Check if colony belongs to the player and is not an outpost
-                    if (MOX::_colony[colony_idx].outpost_flag == 0 && MOX::_colony[colony_idx].owner == (char)player_idx) {
+                    if (MOX::_colony[colony_idx].outpost_flag == 0 && MOX::_colony[colony_idx].owner == player_idx) {
                         MOX::_star[star_idx].last_planet_selected[player_idx] = (int8_t)i;
                         found = true;
                     } else {
@@ -206,17 +215,18 @@ namespace HACCESS {
     void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
-        *reinterpret_cast<uint16_t*>(buffer) = *reinterpret_cast<const uint16_t*>(s__005510f0);
+        buffer[0] = s__005510f0[0];
+        buffer[1] = s__005510f0[1];
 
         int8_t star_idx = MOX::_planet[planet_idx].star_index;
         int8_t planet_num = HAROLD::Planet_Number_(planet_idx);
 
         const char* numeral_str;
         if (localized_flag == 0) {
-            numeral_str = MOX::_roman_literals[planet_num + 1];
+            numeral_str = MOX::_roman_literals[planet_num];
         } else {
-            numeral_str = MOX::_roman_literals[planet_num + 1];
-            if (strcmp(numeral_str, s_I) == 0) {
+            numeral_str = MOX::_roman_literals[planet_num];
+            if (numeral_str[0] == s_I[0] && numeral_str[1] == s_I[1]) {
                 numeral_str = HAROLD::H_Message_(0xa0);
             }
         }
@@ -229,7 +239,8 @@ namespace HACCESS {
             buffer[30] = '\0';
         }
 
-        strcpy(out_str, buffer);
+        size_t len = strlen(buffer) + 1;
+        memcpy(out_str, buffer, len);
     }
 
     char* __cdecl Get_Planet_Name_(int16_t planet_idx) {
@@ -256,14 +267,14 @@ namespace HACCESS {
             planet_idx = MOX::_star[star_idx].planet_index[last_sel_idx];
         }
 
-        if (planet_idx >= 0 && planet_idx < (int16_t)MOX::_planet_count) {
+        if (planet_idx >= 0 && planet_idx < MOX::_planet_count) {
             colony_idx = MOX::_planet[planet_idx].colony_index;
         }
 
-        if (colony_idx == -1 || MOX::_colony[colony_idx].owner != (int8_t)player_idx) {
+        if (colony_idx == -1 || MOX::_colony[colony_idx].owner != player_idx) {
             Set_Colony_Auto_Select_For_Star_(star_idx, player_idx, &planet_idx);
 
-            if (planet_idx >= 0 && planet_idx < (int16_t)MOX::_planet_count) {
+            if (planet_idx >= 0 && planet_idx < MOX::_planet_count) {
                 return MOX::_planet[planet_idx].colony_index;
             }
             return -1;
@@ -563,7 +574,7 @@ namespace HACCESS {
             // Check if player has a colony or presence in the system
             if (HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, i)) {
                 // Check if the system is blockaded for the current player
-                if (!((MOX::_star[i].blockaded >> (static_cast<uint8_t>(MOX::_PLAYER_NUM) & 0x1F)) & 1)) {
+                if (((MOX::_star[i].blockaded >> (uint8_t)MOX::_PLAYER_NUM) & 1) == 0) {
                     SHIPMOVE::Ships_Try_To_Move_To_(coords, i, &move_info);
 
                     // If ships can actually move to this star

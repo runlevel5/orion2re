@@ -58,7 +58,7 @@ namespace RACESCRN {
 
     void __cdecl Draw_Race_Text_(s_racescrn_race_display* display) {
         char buffer[200];
-        char string2[100];
+        char string2[64];
         int16_t spy_bonus;
         int16_t agent_bonus;
 
@@ -109,7 +109,7 @@ namespace RACESCRN {
                         int16_t research_level = MOX::_cur_plyr_ptr->current_research_agreement_level[display->player_idx];
                         const char* type_str;
 
-                        switch (MOX::_settings_language) {
+                        switch (MOX::_settings.language) {
                             case 0:
                                 type_str = research_level >= 0 ? s_rp_str : s_bc_str;
                                 break;
@@ -136,7 +136,7 @@ namespace RACESCRN {
 
                     if (MOX::_cur_plyr_ptr->trade_treaty[display->player_idx] != 0) {
                         int16_t trade_level = MOX::_cur_plyr_ptr->current_trade_agreement_level[display->player_idx];
-                        const char* format = (MOX::_settings_language == 1) ? s_trade_mc_fmt : s_trade_bc_fmt;
+                        const char* format = (MOX::_settings.language == 1) ? s_trade_mc_fmt : s_trade_bc_fmt;
                         sprintf(string2, format, _trade_treaty_buffer, trade_level);
                         strcat(buffer, string2);
                     }
@@ -238,12 +238,12 @@ namespace RACESCRN {
             race_display[i].relationship_slider_img = slider_sprite;
 
             if (i < MOX::_active_count) {
-                uint8_t active_player_idx = MOX::_active_player[i];
+                int16_t active_player_idx = (uint8_t)MOX::_active_player[i];
                 s_player* player = &MOX::_player[active_player_idx];
                 int16_t relations_val = MOX::_cur_plyr_ptr->relations[active_player_idx] + 100;
 
                 int16_t relation_idx = 0;
-                while (RACESCRN::_relation_name_table[relation_idx] < (uint8_t)relations_val) {
+                while ((int16_t)RACESCRN::_relation_name_table[relation_idx] < relations_val) {
                     relation_idx++;
                 }
 
@@ -256,7 +256,7 @@ namespace RACESCRN {
                 race_display[i].player = player;
                 race_display[i].player_name = player->name;
                 race_display[i].race = (int16_t)(uint8_t)player->race;
-                race_display[i].relationship_slider_y = RACESCRN::_race_bar_y[i * 2] + (int16_t)slider_remap_idx - 6;
+                race_display[i].relationship_slider_y = RACESCRN::_race_bar[i * 2 + 1] + (int16_t)slider_remap_idx - 6;
                 race_display[i].eliminated_overlay_img = eliminated_overlay_sprite;
 
                 if (!player->eliminated) {
@@ -612,8 +612,7 @@ namespace RACESCRN {
 
     void __cdecl Draw_Icon_Group_(s_racescrn_mouse_group* group) {
         if (group->render_fn != nullptr) {
-            auto fn = reinterpret_cast<render_fn>(group->render_fn);
-            fn(group);
+            group->render_fn(group);
         }
 
         if (group->count > 0) {

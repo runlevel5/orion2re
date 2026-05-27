@@ -304,8 +304,6 @@ namespace MOX {
     inline int8_t& _first_weapon_ctr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059D6C8});
     inline int16_t& _fleet_box_colonize_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059D6BA});
     inline uint8_t& _reloaded_ship_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6BC});
-    inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
-    inline int8_t& _settings_galaxy_age = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00597157 });
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
     inline int16_t& _ship_data_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1782});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
@@ -457,7 +455,7 @@ namespace MOX {
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
-    inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559424});
+    inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559428});
 
     inline char* (&_planet_special_string)[12] = *reinterpret_cast<char* (*)[12]>(std::uintptr_t{0x00597780});
     inline char* (&_planet_climate_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x0059BA80});
@@ -683,7 +681,7 @@ namespace MOX {
     inline uint8_t& _colony_defense_flags = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B4BA});
     inline int16_t& _cmbt_colony_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A47BC});
     inline int16_t& _combat_defender_player = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49CC});
-    inline s_combat_bomb_result& _combat_bomb_result = *reinterpret_cast<s_combat_bomb_result*>(std::uintptr_t{0x005972B2});
+    inline s_combat_bomb_result& _combat_bomb_result = *reinterpret_cast<s_combat_bomb_result*>(std::uintptr_t{0x005972B0});
 
     inline s_global_combat_data& _global_combat_data = *reinterpret_cast<s_global_combat_data*>(std::uintptr_t{0x0059BD90});
 

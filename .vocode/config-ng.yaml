@@ -1,6 +1,8 @@
 # Default Vocode configuration
 logging:
   #default_level: debug
+debugging:
+  #capture_llm_payload: true
 know_enabled: false
 variables:
 # OpenAI

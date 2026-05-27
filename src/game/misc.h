@@ -44,12 +44,12 @@ namespace MISC {
     void __cdecl Get_Advancing_Bitmap_String_Range_(int16_t tick, int16_t max_width, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, const char* text, uint8_t is_full_range);
 
     void __cdecl Replace_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end,
-                                       uint8_t unused_flag, uint8_t* old_colors, uint8_t* new_colors,
+                                       uint8_t full_bitmap, uint8_t* old_colors, uint8_t* new_colors,
                                        int8_t color_count, s_animation_header* anim);
 
     void __cdecl Save_Window_Status_(void* status);
 
-    void __cdecl Restore_Window_Status_(uint32_t status);
+    void __cdecl Restore_Window_Status_(int16_t status);
 
     void __cdecl Get_LBX_Message_(int16_t message_id, char* buffer);
 
@@ -83,7 +83,7 @@ namespace MISC {
 
     void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t shadow_color, const char* text);
 
-    int16_t __cdecl Substring_(char* haystack, char* needle);
+    int32_t __cdecl Substring_(char* haystack, char* needle);
 
     void __cdecl Get_Time_Stamp_(
         const char* input,

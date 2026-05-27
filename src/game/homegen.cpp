@@ -996,7 +996,7 @@ namespace HOMEGEN {
                 return;
             } else {
                 // If the current star's spectral class cannot support this climate, regenerate it
-                MOX::_star[star_idx].spectral_class = MAPGEN::Generate_Spectral_Class_((int16_t)MOX::_settings_galaxy_age);
+                MOX::_star[star_idx].spectral_class = MAPGEN::Generate_Spectral_Class_((int16_t)MOX::_settings.galaxy_age);
             }
         }
     }
@@ -1272,7 +1272,7 @@ namespace HOMEGEN {
             }
 
             // If class is Dwarf (>=5) or richness not allowed for this class, regenerate spectral class
-            star->spectral_class = MAPGEN::Generate_Spectral_Class_((int16_t)MOX::_settings_galaxy_age);
+            star->spectral_class = MAPGEN::Generate_Spectral_Class_((int16_t)MOX::_settings.galaxy_age);
         }
 
         // Update gravity class based on mineral class and planet size

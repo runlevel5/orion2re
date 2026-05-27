@@ -89,12 +89,7 @@ namespace MISC {
 
     void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors) {
         s_colors* colors_ptr = MISC::Font_Colors2_(font_idx, color_idx_1, color_idx_2);
-
-        uint32_t* src = reinterpret_cast<uint32_t*>(colors_ptr);
-        uint32_t* dst = reinterpret_cast<uint32_t*>(out_colors);
-
-        dst[0] = src[0];
-        dst[1] = src[1];
+        memcpy(out_colors->colors, colors_ptr->colors, 8);
     }
 
     int16_t __cdecl Get_Font_Spacing_() {
@@ -138,10 +133,9 @@ namespace MISC {
         *(int16_t*)status = animate::_clipping_flag;
     }
 
-    void __cdecl Restore_Window_Status_(uint32_t status) {
-        int16_t clip_enabled = (int16_t)status;
+    void __cdecl Restore_Window_Status_(int16_t status) {
         graphics::Restore_Window_();
-        if (clip_enabled != 0) {
+        if (status != 0) {
             video::Clip_On_();
         } else {
             video::Clip_Off_();
@@ -158,14 +152,14 @@ namespace MISC {
     }
 
     void __cdecl Replace_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end,
-                                       uint8_t unused_flag, uint8_t* old_colors, uint8_t* new_colors,
+                                       uint8_t full_bitmap, uint8_t* old_colors, uint8_t* new_colors,
                                        int8_t color_count, s_animation_header* anim) {
         int16_t width;
         int16_t height;
 
         MISC::Get_Bitmap_Dimensions_(anim, &width, &height);
 
-        if (color_count != 0) {
+        if (full_bitmap != 0) {
             x_start = 0;
             y_start = 0;
             x_end = width;
@@ -610,7 +604,7 @@ namespace MISC {
      */
     char* __cdecl Get_Comma_String_(int32_t val) {
         char separator = ',';
-        if (settings::language == 1 /* French/German separator variant */) {
+        if (MOX::_settings.language == 1 /* French/German separator variant */) {
             separator = ' ';
         }
 
@@ -729,14 +723,14 @@ namespace MISC {
         *out_second = static_cast<int16_t>(time_info->tm_sec);
     }
 
-    int16_t __cdecl Substring_(char* haystack, char* needle) {
+    int32_t __cdecl Substring_(char* haystack, char* needle) {
         char* found_ptr = strstr(haystack, needle);
 
         if (found_ptr != nullptr) {
-            return static_cast<int16_t>(found_ptr - haystack);
+            return (int32_t)(found_ptr - haystack);
         }
 
-        return static_cast<int16_t>(strlen(haystack));
+        return (uint16_t)strlen(haystack);
     }
 
     void __cdecl Diagonal_Line_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t spacing, uint8_t color1, uint8_t color2) {

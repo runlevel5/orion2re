@@ -205,22 +205,14 @@ namespace MOX2 {
         char dir_buffer[80];
         char line_buffer[80];
 
-        // Check if language.ini exists
         if (dos::DIR_(s_language_ini, dir_buffer) != 0) {
             FILE* file = fopen(s_language_ini, s_rt);
-            if (file) {
-                // Read language code from file
-                fgets(line_buffer, 0x3C, file);
-                fclose(file);
-
-                // Convert value (offset 16 used in assembly, likely skipping a header)
-                // but the result is currently discarded in this implementation.
-                atoi(line_buffer);
-            }
+            fgets(line_buffer, 0x3C, file);
+            fclose(file);
+            atoi(line_buffer + 4);
         }
 
-        // Hardcoded language override to 0 (English)
-        MOX::_settings_language = 0;
+        MOX::_settings.language = 0;
     }
 
     void __cdecl main2_() {
@@ -382,19 +374,19 @@ namespace MOX2 {
         const char* error_text = nullptr;
 
         if (!dos::DIR_(s_orioncd_ini_00557bec, alternate_path)) {
-            if (MOX::_settings_language == 0) {
+            if (MOX::_settings.language == 0) {
                 error_text = s_ORIONCD_INI_not_found_005579e4;
             }
-            else if (MOX::_settings_language == 1) {
+            else if (MOX::_settings.language == 1) {
                 error_text = s_ORIONCD_INI_nicht_gefunden_005579a4;
             }
-            else if (MOX::_settings_language == 2) {
+            else if (MOX::_settings.language == 2) {
                 error_text = s_ORIONCD_INI_introuvable_0055796c;
             }
-            else if (MOX::_settings_language == 3) {
+            else if (MOX::_settings.language == 3) {
                 error_text = s_ORIONCD_INI_no_se_ha_encontrado_0055792c;
             }
-            else if (MOX::_settings_language == 4) {
+            else if (MOX::_settings.language == 4) {
                 error_text = s_Non_trovo_il_file_ORIONCD_INI_005578ec;
             }
 
@@ -441,19 +433,19 @@ namespace MOX2 {
 
         error_text = nullptr;
 
-        if (MOX::_settings_language == 0) {
+        if (MOX::_settings.language == 0) {
             error_text = s_Cannot_locate_all_game_files_00557b84;
         }
-        else if (MOX::_settings_language == 1) {
+        else if (MOX::_settings.language == 1) {
             error_text = s_Nicht_alle_Spieldateien_auffindb_00557b34;
         }
-        else if (MOX::_settings_language == 2) {
+        else if (MOX::_settings.language == 2) {
             error_text = s_Echec_de_la_localisation_de_tous_00557ad4;
         }
-        else if (MOX::_settings_language == 3) {
+        else if (MOX::_settings.language == 3) {
             error_text = s_No_se_puede_localizar_todos_los_f_00557a70;
         }
-        else if (MOX::_settings_language == 4) {
+        else if (MOX::_settings.language == 4) {
             error_text = s_Non_riesco_a_trovare_qualche_fil_00557a18;
         }
 

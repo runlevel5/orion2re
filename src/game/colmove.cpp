@@ -548,7 +548,7 @@ namespace COLMOVE {
     void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer) {
         uint32_t pop_value = MOX::_colony[colony_idx].pop[pop_idx];
 
-        if (MOX::_settings_language == 4) {
+        if (MOX::_settings.language == 4) {
             int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
             char* pop_state_string = COLONY::Pop_State_String_(pop_state);
             char* conquered_string = COLONY::Conquered_String_(static_cast<bool>((pop_value >> 10) & 1U));

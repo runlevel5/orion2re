@@ -21,13 +21,13 @@ namespace NEWGAME {
     inline s_animation_header** _num_players_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A6220});
     inline s_animation_header** _gal_age_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A6240});
     inline s_animation_header** _gal_size_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A6250});
-    inline void*& _background_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A6268});
+    inline s_animation_header*& _background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A6268});
     inline char* (&_gal_size_button_strings)[4] = *reinterpret_cast<char*(*)[4]>(std::uintptr_t{0x005662F0});
     inline char* (&_civ_button_strings)[3] = *reinterpret_cast<char*(*)[3]>(std::uintptr_t{0x00566308});
     inline char* (&_diff_button_strings)[5] = *reinterpret_cast<char*(*)[5]>(std::uintptr_t{0x00566318});
     inline char* (&_gal_age_button_strings)[3] = *reinterpret_cast<char*(*)[3]>(std::uintptr_t{0x00566350});
     inline char* (&_combat_button_strings)[2] = *reinterpret_cast<char*(*)[2]>(std::uintptr_t{0x00566360});
-    inline char& _hack_msg = *reinterpret_cast<char*>(std::uintptr_t{0x00566370});
+    inline char* _hack_msg = reinterpret_cast<char*>(std::uintptr_t{0x00566370});
     inline char* (&_opp_button_strings)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x00566388});
 
     inline const char* s_Media_00557db4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DB4}); // "Media"

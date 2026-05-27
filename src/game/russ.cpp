@@ -100,7 +100,7 @@ namespace RUSS {
     void __cdecl Load_Russ_Strings_() {
         char filename_buffer[20];
 
-        uint8_t language = MOX::_settings_language;
+        uint8_t language = MOX::_settings.language;
 
         sprintf(filename_buffer, s_rstring_d_lbx, (uint32_t)language);
 
