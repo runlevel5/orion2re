@@ -1604,15 +1604,15 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
             }
         }
     } else {
-        int32_t retreat_flag = 1;
+        int8_t retreat_flag = 1;
 
         if (attacker_idx < 8 && defender_idx < 8) {
             if (plr1_is_human) {
                 if (!plr2_is_human) {
-                    retreat_flag = AI_Can_Retreat_(defender_idx, colony_idx);
+                    retreat_flag = AI_Can_Retreat_((int8_t)defender_idx, colony_idx);
                 }
             } else {
-                retreat_flag = AI_Can_Retreat_(attacker_idx, -1);
+                retreat_flag = AI_Can_Retreat_((int8_t)attacker_idx, -1);
             }
         } else {
             retreat_flag = 0;

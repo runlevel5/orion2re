@@ -690,7 +690,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     void __cdecl Generate_Star_Special_(int16_t star_idx, int16_t* wormhole_out, uint8_t* special_counts) {
         int8_t special_type = 0;
 
-        if (MOX::_planet_special < random::Random_(100)) {
+        if ((int16_t)MOX::_planet_special < (int16_t)random::Random_(100)) {
             Get_A_Planet_Or_Star_Special_(star_idx, wormhole_out, &special_type, 1, 0);
         } else {
             special_type = 0;

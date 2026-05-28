@@ -211,7 +211,7 @@ namespace SHIPS {
             final_y_upscaled = (int16_t)HAROLD::Get_Up_Scaled_Value_(final_y_scaled);
         }
 
-        return (int16_t)SHIPMOVE::Create_Nonplayer_Ship_(type, design, final_x_upscaled, final_y_upscaled);
+        return (int16_t)SHIPMOVE::Create_Nonplayer_Ship_((int8_t)type, design, final_x_upscaled, final_y_upscaled);
     }
 
     void __cdecl Get_Ship_Icon_Coords_(int16_t ship_idx, int16_t* x, int16_t* y) {

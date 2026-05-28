@@ -1808,7 +1808,7 @@ namespace DESBOX {
     }
 
     int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx) {
-        int16_t local_2;
+        int16_t local_2 = 0;
         int16_t rack_space;
         int16_t weapon_space;
 

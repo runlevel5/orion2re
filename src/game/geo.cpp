@@ -457,7 +457,7 @@ namespace GEO {
         int32_t uVar8 = iVar17 * iVar17 + iVar15 * iVar15;
         int32_t uVar13 = d * d;
 
-        if (0xFFFFFFFFu / uVar13 < uVar8) {
+        if ((uint32_t)(0xFFFFFFFFu / (uint32_t)uVar13) < (uint32_t)uVar8) {
             do {
                 if (abs_dot <= 0xFFFF) {
                     bVar1 = true;
@@ -490,7 +490,7 @@ namespace GEO {
                 uVar8 = iVar17 * iVar17 + iVar15 * iVar15;
                 uVar13 = d * d;
 
-            } while (0xFFFFFFFFu / uVar13 < uVar8);
+            } while ((uint32_t)(0xFFFFFFFFu / (uint32_t)uVar13) < (uint32_t)uVar8);
         }
 
         if (!bVar1) {

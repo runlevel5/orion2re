@@ -1907,7 +1907,7 @@ int16_t __cdecl Missile_Overkill_Check_(int16_t target_idx) {
 int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon_id, int16_t weapon_count, uint16_t weapon_specials, int16_t attacker_player_idx) {
     int16_t shield_reduction = 0;
     int16_t damage;
-    int16_t result_damage;
+    int16_t result_damage = 0;
 
     if (target_ship_idx == 0) {
         if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() != 0) {
@@ -1928,7 +1928,7 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
 
     s_tech_weapon_data* weapon = &TECHDATA::_weapons[weapon_id];
     if (weapon->type == 4) {
-        int16_t base_damage = result_damage;
+        int16_t base_damage = 0;
         switch (weapon_id) {
             case 28:
                 base_damage = 100;

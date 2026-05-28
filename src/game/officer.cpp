@@ -2277,7 +2277,7 @@ namespace OFFICER {
         if (MOX::_player[player_index].officer_for_hire > -1) {
             MOX::_player[player_index].stardate_last_offered_hero = static_cast<uint16_t>(MOX::_stardate);
 
-            MOX::_leaders[leader_index].player_index = static_cast<int8_t>(player_index);
+            MOX::_leaders[leader_index].player_index = (int8_t)player_index;
         }
     }
 

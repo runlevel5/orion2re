@@ -621,16 +621,16 @@ namespace FMTPARA {
             para.first_line_indent = 0;
             para.right_indent = 0;
             para.left_indent = 0;
-            para.justify_mode = justify;
+            para.justify_mode = (int8_t)justify;
             para.paragraph_break = 1;
             para.nest_depth = 0;
             para.line = &linep;
 
             para.y_origin = 479;
 
-            stylep.font_id = fonts::_current_font_style;
+            stylep.font_id = (int8_t)fonts::_current_font_style;
             stylep.highlight = 0;
-            stylep.fg_color = fonts::_font_header.font_style;
+            stylep.fg_color = (uint8_t)fonts::_font_header.font_style;
 
             _style_p->color_attr = Get_Current_Color_Set_();
 

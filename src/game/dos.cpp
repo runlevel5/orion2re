@@ -9,7 +9,7 @@ namespace dos {
      */
     bool __cdecl DIR_(const char* pattern, char* output_name) {
         intptr_t result;
-        intptr_t search_handle;
+        intptr_t search_handle = 0;
 
         if (pattern[0] == '\0') {
             result = _findnext32(search_handle, &_fileinfo);
