@@ -19,7 +19,7 @@ namespace MOX {
     inline uint8_t& _galaxy_star_anim_count = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597AEA});
     inline int16_t& _fltscrn_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5E});
     inline int8_t& _big_icon_display_columns = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059BD14});
-    inline uint8_t& _big_icon_display_rows = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005974E4});
+    inline int8_t& _big_icon_display_rows = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005974E4});
     inline uint16_t& _ken_trace = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005974EE});
     inline int8_t& _big_icon_display_max_icons = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00597828});
     inline int16_t& _big_icon_x_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2BEA});
@@ -149,7 +149,7 @@ namespace MOX {
     inline s_animation_header*& _officer_hire_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059D6C4});
     inline s_animation_header*& _officer_return_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B440});
     inline s_animation_header*& _officer_cancel_hire_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5FC});
-    inline void*& _selected_box_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005977E8});
+    inline s_animation_header*& _selected_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977E8});
     inline s_animation_header*& _scanned_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977E4});
     inline s_animation_header*& _fleet_scroll_anim_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B40});
     inline void*& _officer_normal_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059BD2C});
@@ -338,7 +338,7 @@ namespace MOX {
     inline int16_t& _galaxy_map_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597762});
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
     inline uint8_t& _need_to_restore_help_list = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597D60});
-    inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
+    inline int16_t& _ship_icon_player_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B322});
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
     inline uint8_t& _previous_report = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CB2});
     inline int16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AC8});
@@ -387,8 +387,8 @@ namespace MOX {
     inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
 
     // Suggested name: MOX::_planet_special
-    inline uint8_t& _planet_special =
-            *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596A0});
+    inline int8_t& _planet_special =
+            *reinterpret_cast<int8_t*>(std::uintptr_t{0x005596A0});
 
     // Suggested name: MOX::_planet_special_weighted_chance
     inline uint8_t* _planet_special_weighted_chance = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596B0});

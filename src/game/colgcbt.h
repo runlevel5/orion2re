@@ -51,7 +51,7 @@ namespace COLGCBT {
 
     void __cdecl Resort_Units_(uint8_t side_idx);
 
-    s_animation_header* __cdecl Action_Anim_(uint8_t side, uint8_t state, uint8_t type);
+    s_animation_header* __cdecl Action_Anim_(uint8_t side, uint8_t state, int8_t type);
 
     int16_t __cdecl Top_Line_Y_();
 

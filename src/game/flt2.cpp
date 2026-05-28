@@ -12,7 +12,8 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
     }
     else {
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
-        anim = MOX::_shield_div_bitmap[MOX::_ship[ship_idx].owner];
+        int8_t ship_owner = MOX::_ship[ship_idx].owner;
+        anim = MOX::_fltscrn_monster_ship_icon[ship_owner - 8];
     }
 
     *width_out = animate::Get_Width_(anim);

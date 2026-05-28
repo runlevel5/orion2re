@@ -35,9 +35,10 @@ namespace CMBTSPEC {
                 duration = 36;
                 break;
             default:
-                // Preserve the original stack-slot aliasing bug: the binary reads the
-                // future sound-handle local here before it is initialized.
-                duration = (int16_t)sound_handle;
+                // The original code reads the stack slot later reused for
+                // sound_handle here. Use a safe fallback instead of depending
+                // on that stack-alias UB in C++.
+                duration = 0;
                 break;
         }
 
@@ -512,7 +513,7 @@ namespace CMBTSPEC {
             }
 
             while (true) {
-                int16_t temp = abs(rotations_left) % 16;
+                int16_t temp = rotations_left % 16;
                 if (temp != 15 && temp >= 2) break;
                 rotations_left += (int16_t)random::Random_(13);
             }
@@ -525,7 +526,11 @@ namespace CMBTSPEC {
                 do {
                     video::Set_Page_Off_();
                     int16_t next_dir = MOX::_combat_data[target_idx].facing_dir + 1;
-                    MOX::_combat_data[target_idx].facing_dir = (int8_t)(abs(next_dir) % 16);
+                    int16_t wrapped_dir = abs(next_dir) % 16;
+                    if (next_dir < 0) {
+                        wrapped_dir = -wrapped_dir;
+                    }
+                    MOX::_combat_data[target_idx].facing_dir = (int8_t)wrapped_dir;
 
                     graphics::Set_Window_(0, 0, 639, 350);
                     video::Clip_On_();
@@ -1465,9 +1470,12 @@ namespace CMBTSPEC {
 
             bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, block);
 
-            int32_t dir = MOX::_combat_data[param_2].facing_dir + 1;
-            int32_t sign = dir >> 31;
-            MOX::_combat_data[param_2].facing_dir = (int8_t)(((((dir ^ sign) - sign) & 0xF) ^ sign) - sign);
+            int32_t next_dir = MOX::_combat_data[param_2].facing_dir + 1;
+            int32_t wrapped_dir = abs(next_dir) % 16;
+            if (next_dir < 0) {
+                wrapped_dir = -wrapped_dir;
+            }
+            MOX::_combat_data[param_2].facing_dir = (int8_t)wrapped_dir;
 
             CMBTDRW1::Draw_Ship_(
                 param_2,
@@ -1822,7 +1830,7 @@ namespace CMBTSPEC {
                         damage = param_5;
                     }
 
-                    int32_t chance = ((100 - kill_ratio) * damage) / 100;
+                    int32_t chance = ((100 - kill_ratio) * (int32_t)damage) / 100;
                     int16_t missile_hits = CMBTMIS::Get_Missile_Hits_(MOX::_missile[i].type, owner, MOX::_missile[i].specials);
                     int16_t qty = MOX::_missile[i].quantity;
 
@@ -1893,7 +1901,8 @@ namespace CMBTSPEC {
             }
 
             if (sfx_type == 2) {
-                MOX::_combat_data[ship_idx].structure_damage += (int16_t)chance;
+                MOX::_combat_data[ship_idx].structure_damage =
+                    (int16_t)(MOX::_combat_data[ship_idx].structure_damage + (int16_t)chance);
                 struct_damage = 0;
                 damage_out = (int16_t)chance;
             }

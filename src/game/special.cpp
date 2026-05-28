@@ -128,11 +128,7 @@ namespace special {
                     *x_ptr = x2;
                 }
             }
-            *y_ptr = y1 + static_cast<int16_t>(
-                static_cast<int32_t>(
-                    static_cast<uint32_t>(*x_ptr - x1) * static_cast<uint32_t>(y2 - y1)
-                ) / (x2 - x1)
-            );
+            *y_ptr = y1 + (int16_t)(((int32_t)(*x_ptr - x1) * (int32_t)(y2 - y1)) / (int32_t)(x2 - x1));
         } else {
             int16_t curr_y = *y_ptr;
             if (y1 < y2) {
@@ -148,11 +144,7 @@ namespace special {
                     *y_ptr = y2;
                 }
             }
-            *x_ptr = x1 + static_cast<int16_t>(
-                static_cast<int32_t>(
-                    static_cast<uint32_t>(x2 - x1) * static_cast<uint32_t>(*y_ptr - y1)
-                ) / (y2 - y1)
-            );
+            *x_ptr = x1 + (int16_t)(((int32_t)(x2 - x1) * (int32_t)(*y_ptr - y1)) / (int32_t)(y2 - y1));
         }
     }
 

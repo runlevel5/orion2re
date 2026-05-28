@@ -32,7 +32,7 @@ namespace maintain {
             return;
         }
 
-        int worths[500];
+        int16_t worths[500];
         memset(worths, 0, sizeof(worths));
         _ship_worths = &worths;
 
@@ -73,10 +73,10 @@ namespace maintain {
                 if (ship.owner == player_idx && ship.status < 5 && ship.d.ship_type == 0) {
                     for (int k = 0; k < (int)MOX::_NUM_PLAYERS; ++k) {
                         if (eligible_players[k]) {
-                            worths[j] += AIPOWER::Ship_Strength_Vs_Ships_(j, (int16_t)k) & 0xFFFF;
+                            worths[j] += (int16_t)AIPOWER::Ship_Strength_Vs_Ships_(j, (int16_t)k);
                         }
                     }
-                    worths[j] /= (ship.d.size + 1) * eligible_count;
+                    worths[j] = (int16_t)(worths[j] / ((ship.d.size + 1) * eligible_count));
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace maintain {
     bool __cdecl Ship_Is_At_Colony_(s_ship_data* ship) {
         int16_t star_id;
         int8_t status = ship->status;
-        int8_t owner = ship->owner;
+        uint8_t owner = (uint8_t)ship->owner;
 
         if (status == 0 || status == 4) {
             star_id = ship->location;
@@ -254,7 +254,7 @@ namespace maintain {
                         }
                     }
 
-                    int16_t worth = (int16_t)(*maintain::_ship_worths)[i];
+                    int16_t worth = (*maintain::_ship_worths)[i];
                     if (worth < min_worth) {
                         min_worth = worth;
                         cheapest_ship = ship;
@@ -319,7 +319,7 @@ namespace maintain {
                     if (num_spies != 0) {
                         if (deficit < (int)num_spies) {
                             int16_t new_spy_count = num_spies - (int16_t)deficit;
-                            BILL::Set_Their_Spy_Number_(player_idx, (int16_t)i, (uint8_t)new_spy_count);
+                            BILL::Set_Their_Spy_Number_(player_idx, (int16_t)i, new_spy_count);
                             deficit = 0;
                         } else {
                             deficit -= (int)num_spies;

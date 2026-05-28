@@ -870,8 +870,8 @@ skip_cursor:
                     allocate::Pop_Block_(MOX::_screen_seg);
                 }
             } else {
-                int16_t diff = (int16_t)MOX::_combat_data[MOX::_cur_ship].owner - MOX::_combat_attacker_player;
-                int16_t blip_color = (diff < 1) ? 0x20 : 0x60;
+                int8_t owner = MOX::_combat_data[MOX::_cur_ship].owner;
+                int16_t blip_color = (owner == (int8_t)MOX::_combat_attacker_player) ? 0x20 : 0x60;
 
                 switch (MOX::_combat_data[MOX::_cur_ship].size_class) {
                     case 0:
@@ -2042,23 +2042,23 @@ skip_cursor:
                     itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, local_b4, 10);
                 }
                 
-                strcat(local_a0, local_b4);
-                strcat(local_a0, s__00559998);
+                strcpy(local_a0 + strlen(local_a0), local_b4);
+                strcpy(local_a0 + strlen(local_a0), s__00559998);
 
                 if (MOX::_cmbt_colony_id != -1) {
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[1] > 0) {
                         KEN::Ken_Get_Text_Message_(1, local_50, 0x50);
-                        strcat(local_a0, local_50);
+                        strcpy(local_a0 + strlen(local_a0), local_50);
                         itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], local_b4, 10);
-                        strcat(local_a0, local_b4);
-                        strcat(local_a0, s__00559998);
+                        strcpy(local_a0 + strlen(local_a0), local_b4);
+                        strcpy(local_a0 + strlen(local_a0), s__00559998);
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[0] > 0) {
                         KEN::Ken_Get_Text_Message_(2, local_50, 0x50);
-                        strcat(local_a0, local_50);
+                        strcpy(local_a0 + strlen(local_a0), local_50);
                         itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], local_b4, 10);
-                        strcat(local_a0, local_b4);
-                        strcat(local_a0, s__00559998);
+                        strcpy(local_a0 + strlen(local_a0), local_b4);
+                        strcpy(local_a0 + strlen(local_a0), s__00559998);
                     }
                 }
 
@@ -2090,16 +2090,22 @@ skip_cursor:
             
             int idx = (int)param_3;
             s_combat_data* ship = &MOX::_combat_data[idx];
-            int8_t facing = ship->facing_dir;
-            int dir = (facing - 1) / 4;
-            if (dir < 0) {
-                dir = 0;
+            int8_t facing = MOX::_combat_data[idx].facing_dir;
+            int8_t shield_type = MOX::_combat_data[idx].shield_type;
+            int16_t shield_current_hits = MOX::_combat_data[idx].shield_current_hits;
+            int16_t current_speed = MOX::_combat_data[idx].current_speed;
+            // The original code uses signed IDIV-style quotient/remainder on facing_dir,
+            // then clamps the quadrant to 0 for the negative case before building the mask index.
+            int32_t facing_quadrant = ((int32_t)facing - 1) / 4;
+            if (facing_quadrant < 0) {
+                facing_quadrant = 0;
             }
+            int32_t facing_mod = (int32_t)facing % 4;
 
-            int16_t x_offset = (dir == 1 || dir == 2) ? 14 : 16;
+            int16_t x_offset = (facing_quadrant == 1 || facing_quadrant == 2) ? 14 : 16;
             bitmap::Add_Picture_To_Bitmap_(x_offset, 11, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
 
-            if (ship->shield_type > 0 && ship->shield_current_hits > 0) {
+            if (shield_type > 0 && shield_current_hits > 0) {
                 bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
                 bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
                 
@@ -2117,12 +2123,12 @@ skip_cursor:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x51, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x52, 0);
                             for (int i = 0; i < 4; i++) {
-                                if (ship->shield_arc_current[i] < 11) {
+                                if (ship->shield_arc_current[i] < 0x0B) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = ((i - (facing / 4) + 4) % 4) + (facing % 4) * 4;
+                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x52, 1);
-                                    if (ship->shield_arc_current[i] <= 0) {
+                                    if (ship->shield_arc_current[i] < 1) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x51, 1);
                                     }
                                     bitmap::Add_Picture_To_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
@@ -2138,18 +2144,18 @@ skip_cursor:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x54, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x56, 0);
                             for (int i = 0; i < 4; i++) {
-                                if (ship->shield_arc_current[i] < 31) {
+                                if (ship->shield_arc_current[i] < 0x1F) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = ((i - (facing / 4) + 4) % 4) + (facing % 4) * 4;
+                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x56, 1);
-                                    if (ship->shield_arc_current[i] <= 21) {
+                                    if (ship->shield_arc_current[i] < 0x16) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x54, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 11) {
+                                    if (ship->shield_arc_current[i] < 0x0C) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x52, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 0) {
+                                    if (ship->shield_arc_current[i] < 1) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x50, 1);
                                     }
                                     bitmap::Add_Picture_To_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
@@ -2167,24 +2173,24 @@ skip_cursor:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x55, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x56, 0);
                             for (int i = 0; i < 4; i++) {
-                                if (ship->shield_arc_current[i] < 51) {
+                                if (ship->shield_arc_current[i] < 0x33) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = ((i - (facing / 4) + 4) % 4) + (facing % 4) * 4;
+                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x56, 1);
-                                    if (ship->shield_arc_current[i] <= 41) {
+                                    if (ship->shield_arc_current[i] < 0x2A) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x55, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 31) {
+                                    if (ship->shield_arc_current[i] < 0x20) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x54, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 21) {
+                                    if (ship->shield_arc_current[i] < 0x16) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x53, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 11) {
+                                    if (ship->shield_arc_current[i] < 0x0C) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x51, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 0) {
+                                    if (ship->shield_arc_current[i] < 1) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x50, 1);
                                     }
                                     bitmap::Add_Picture_To_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
@@ -2202,30 +2208,30 @@ skip_cursor:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x56, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x57, 0);
                             for (int i = 0; i < 4; i++) {
-                                if (ship->shield_arc_current[i] < 71) {
+                                if (ship->shield_arc_current[i] < 0x47) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = ((i - (facing / 4) + 4) % 4) + (facing % 4) * 4;
+                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x57, 1);
-                                    if (ship->shield_arc_current[i] <= 61) {
+                                    if (ship->shield_arc_current[i] < 0x3E) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x56, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 51) {
+                                    if (ship->shield_arc_current[i] < 0x34) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x55, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 41) {
+                                    if (ship->shield_arc_current[i] < 0x2A) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x54, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 31) {
+                                    if (ship->shield_arc_current[i] < 0x20) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x53, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 21) {
+                                    if (ship->shield_arc_current[i] < 0x16) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x52, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 11) {
+                                    if (ship->shield_arc_current[i] < 0x0C) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x51, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 0) {
+                                    if (ship->shield_arc_current[i] < 1) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x50, 1);
                                     }
                                     bitmap::Add_Picture_To_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
@@ -2245,30 +2251,30 @@ skip_cursor:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x56, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x57, 0);
                             for (int i = 0; i < 4; i++) {
-                                if (ship->shield_arc_current[i] < 91) {
+                                if (ship->shield_arc_current[i] < 0x5B) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = ((i - (facing / 4) + 4) % 4) + (facing % 4) * 4;
+                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x57, 1);
-                                    if (ship->shield_arc_current[i] <= 81) {
+                                    if (ship->shield_arc_current[i] < 0x52) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x56, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 71) {
+                                    if (ship->shield_arc_current[i] < 0x48) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x55, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 61) {
+                                    if (ship->shield_arc_current[i] < 0x3E) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x54, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 41) {
+                                    if (ship->shield_arc_current[i] < 0x2A) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x53, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 21) {
+                                    if (ship->shield_arc_current[i] < 0x16) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x52, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 11) {
+                                    if (ship->shield_arc_current[i] < 0x0C) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x51, 1);
                                     }
-                                    if (ship->shield_arc_current[i] <= 0) {
+                                    if (ship->shield_arc_current[i] < 1) {
                                         replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x50, 1);
                                     }
                                     bitmap::Add_Picture_To_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
@@ -2278,10 +2284,10 @@ skip_cursor:
                     }
                 }
 
-                bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_combat_bitmap, (s_animation_header*)MOX::_shield_div_bitmap[facing % 4], 0);
+                bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_combat_bitmap, (s_animation_header*)MOX::_shield_div_bitmap[facing_mod], 0);
                 Draw_Ship_To_Bitmap_(param_3, 1, 0, 0);
 
-                int dir2 = (facing - 1) / 4;
+                int32_t dir2 = ((int32_t)facing - 1) / 4;
                 if (dir2 < 0) {
                     dir2 = 0;
                 }
@@ -2296,7 +2302,10 @@ skip_cursor:
 
             if (ship->current_speed <= 0) {
                 struct s_colors shadow_color;
-                memcpy(shadow_color.colors, "HJJJJJJJ", 8);
+                shadow_color.colors[0] = 0x48;
+                for (int i = 1; i < 8; ++i) {
+                    shadow_color.colors[i] = 0x4A;
+                }
                 fonts::Set_Font_Style_Shadow_Down_(1, &shadow_color);
                 
                 char local_50[80];
@@ -2384,12 +2393,11 @@ skip_cursor:
         if (draw_y < 4) {
             draw_y = 4;
         }
-        // BUG: Comparisons of draw_y should ideally account for height to prevent overflow.
-        if (draw_y > 0x15E) {
+        if (draw_y + effect_height > 0x15E) {
             draw_y = 0x15A - effect_height;
         }
 
-        uint32_t window_status = 0;
+        int16_t window_status = 0;
         MISC::Save_Window_Status_(&window_status);
 
         int16_t x1, y1, x2, y2;
@@ -2712,10 +2720,10 @@ skip_cursor:
     }
 
     void __cdecl Draw_Weapon_Status_Display_(int16_t param_1, int16_t param_2) {
-        uint8_t color_b0[8] = { 0x53, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56 };
-        uint8_t color_b8[8] = { 0x50, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53 };
-        uint8_t color_a8[8] = { 0xdf, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc };
-        uint8_t color_6c[8] = { 0x48, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a };
+        s_colors color_b0 = {{ 0x53, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56 }};
+        s_colors color_b8 = {{ 0x50, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53 }};
+        s_colors color_a8 = {{ 0xdf, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc }};
+        s_colors color_6c = {{ 0x48, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a }};
 
         char local_a0[52];
         char local_64[20];
@@ -2773,7 +2781,7 @@ skip_cursor:
                     display_color_mode = 0;
                 }
 
-                int8_t rack = TECHDATA::_weapons[w_id].type;
+                uint8_t rack = TECHDATA::_weapons[w_id].type;
                 int16_t ammo = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].ammo;
                 int8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
                 uint8_t status = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].status;
@@ -2784,18 +2792,18 @@ skip_cursor:
                     display_color_mode = 2;
                 }
 
-                uint8_t* font_color;
+                s_colors* font_color;
                 if (display_color_mode == 0) {
-                    font_color = color_b8;
+                    font_color = &color_b8;
                 } else if (display_color_mode == 1) {
-                    font_color = color_b0;
+                    font_color = &color_b0;
                 } else if (display_color_mode == 2) {
-                    font_color = color_a8;
+                    font_color = &color_a8;
                 } else {
-                    font_color = color_6c;
+                    font_color = &color_6c;
                 }
 
-                fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)font_color);
+                fonts::Set_Font_Style_Shadow_Down_(1, font_color);
                 fonts::Set_Outline_Color_(0, 0);
                 fonts::Set_Font_Spacing_(1);
 
@@ -2820,18 +2828,18 @@ skip_cursor:
                     strcat(local_a0, s_space_005510f0);
                 }
 
-                if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].count == 1) {
+                if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left == 1) {
                     strcat(local_a0, TECHDATA::_weapons[w_id].name);
                 } else {
                     strcat(local_a0, TECHDATA::_weapons[w_id].name_plural);
                 }
 
                 if (display_color_mode == 0) {
-                    fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)color_b8);
+                    fonts::Set_Font_Style_Shadow_Down_(1, &color_b8);
                 } else if (display_color_mode == 1) {
-                    fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)color_b0);
+                    fonts::Set_Font_Style_Shadow_Down_(1, &color_b0);
                 } else if (display_color_mode == 2) {
-                    fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)color_a8);
+                    fonts::Set_Font_Style_Shadow_Down_(1, &color_a8);
                 }
 
                 if (rack == 1 || rack == 3 || rack == 4 || w_id == 0x21) {
@@ -3021,7 +3029,7 @@ skip_cursor:
             BEAMS::Add_Damage_Indicator_For_Missile_(target_x, target_y, 1, damage);
         }
 
-        int16_t sound_handle = (int16_t)ERICNET::Mox_Play_Sound_(24 /* 0x18 */);
+        int32_t sound_handle = ERICNET::Mox_Play_Sound_(24 /* 0x18 */);
         s_animation_header* explosion_anim = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
         int16_t frame_count = animate::Get_Animation_Frame_Count_(explosion_anim);
 
@@ -3042,7 +3050,7 @@ skip_cursor:
         }
 
         BEAMS::Draw_Damage_Message_Queue_Until_Done_();
-        sound::Fadeout_Sound_(sound_handle, 10);
+        sound::Fadeout_Sound_((int16_t)sound_handle, 10);
     }
 
     static void Build_Signed_Bonus_String(char* out_text, int32_t value) {
@@ -3114,8 +3122,8 @@ skip_cursor:
                 view_y,
                 view_x + 0x145,
                 view_y + 0x183,
-                CMBTDRW1::_green[1],
-                CMBTDRW1::_green[1],
+                CMBTDRW1::_green[0],
+                CMBTDRW1::_green[0],
                 0);
 
             graphics::Interlaced_Fill_(
@@ -3154,14 +3162,12 @@ skip_cursor:
             text_colors.colors[6] = CMBTDRW1::_green[4];
             text_colors.colors[7] = CMBTDRW1::_green[4];
 
-            CMBTDRW1::Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18), MOX::_ship_data_id);
+            CMBTDRW1::Draw_Ship_Status_((int16_t)(view_x + 0x0A), (int16_t)(view_y + 0x18), MOX::_ship_data_id);
 
             player_idx = MOX::_global_combat_data.player_idx;
-            if (player_idx <= 8) {
+            if (player_idx < 9) {
                 if (MOX::_global_combat_data.officer_idx == -1) {
-                    if (player_idx < 8) {
-                        animate::Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
-                    }
+                    animate::Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
                 } else {
                     for (int32_t i = 0; i < 0x20; ++i) {
                         grayscale_table[i] = static_cast<uint8_t>(i);
@@ -3231,7 +3237,7 @@ skip_cursor:
             text_colors.colors[6] = CMBTDRW1::_green[4];
             text_colors.colors[7] = CMBTDRW1::_green[4];
 
-            CMBTDRW1::Remap_Draw_Ship_Status_(view_x + 0x0A, view_y + 0x18);
+            CMBTDRW1::Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18), MOX::_ship_data_id);
 
             if (MOX::_global_combat_data.player_idx < 8) {
                 if (MOX::_global_combat_data.officer_idx == -1) {

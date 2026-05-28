@@ -561,8 +561,8 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     }
 
     const int16_t stack_owner = HACCESS::Ship_Stack_Owner_(head_node_ptr);
-    if (stack_owner != (int16_t)MOX::_ship_icon_player_id) {
-        MOX::_ship_icon_player_id = (uint16_t)stack_owner;
+    if (stack_owner != MOX::_ship_icon_player_id) {
+        MOX::_ship_icon_player_id = stack_owner;
     }
 
     FLEETPOP::Buffer_Reload_Fleetpop_Frame_();

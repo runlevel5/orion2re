@@ -448,6 +448,7 @@ namespace ADVCIV {
             bool player_satisfied = false;
             for (int16_t j = 0; j < (int16_t)MOX::_planet_count && !player_satisfied; ++j) {
                 if (_planet_selected_flag[j] == i) {
+                    int8_t generated_special = 0;
                     uint8_t targets[3];
                     targets[0] = (uint8_t)(4 - MOX::_planet[j].size);
                     int climate_diff = 8 - MOX::_planet[j].climate;
@@ -459,7 +460,6 @@ namespace ADVCIV {
                         MOX::_planet[j].planet_special == 0 &&
                         MOX::_star[MOX::_planet[j].star_index].system_special == 0)
                     {
-                        int8_t generated_special = 0;
                         // Skip special generation for Ancient Home World home planets (trait 16)
                         if (!(MOX::_player[i].home_planet_id == j && MOX::_player[i].traits[TRAIT_ANCIENT_HOME_WORLD] != 0)) {
                             int attempts = 0;
@@ -486,15 +486,20 @@ namespace ADVCIV {
                         }
                     }
 
-                    // Perform iterative quality improvements (max 6 iterations per planet)
-                    for (int k = 0; k < 6 && !player_satisfied; ++k) {
-                        if (Twiddle_Planet_(j, targets) != 0) {
-                            // If Twiddle_Planet returns non-zero, no more improvements are possible for this planet
-                            break;
-                        }
-                        MAPGEN::Set_Secondary_Planet_Data_(MOX::_planet[j].star_index, j);
-                        if (Get_Players_Planet_Worthiness_Average_(i) >= (max_worthiness * 90 / 100)) {
-                            player_satisfied = true;
+                    // The original control flow skips the twiddle loop after a
+                    // successful special-generation path.
+                    if (generated_special == 0) {
+                        // Perform iterative quality improvements (max 6 iterations per planet)
+                        for (int k = 0; k < 6 && !player_satisfied; ++k) {
+                            int8_t twiddle_result = Twiddle_Planet_(j, targets);
+                            if (twiddle_result != 0) {
+                                // If Twiddle_Planet returns non-zero, no more improvements are possible for this planet
+                                break;
+                            }
+                            MAPGEN::Set_Secondary_Planet_Data_(MOX::_planet[j].star_index, j);
+                            if (Get_Players_Planet_Worthiness_Average_(i) >= (max_worthiness * 90 / 100)) {
+                                player_satisfied = true;
+                            }
                         }
                     }
                 }

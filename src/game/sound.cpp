@@ -666,9 +666,9 @@ namespace sound {
     /**
      * @address 0052e850
      */
-    void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx) {
+    void __cdecl Fadeout_Sound_(int32_t channel_idx, int32_t volume_idx) {
         if (channel_idx >= 0 && channel_idx < 16) {
-            _sound_channels[channel_idx].volume_index = volume_idx;
+            _sound_channels[channel_idx].volume_index = (int8_t)volume_idx;
         }
     }
 

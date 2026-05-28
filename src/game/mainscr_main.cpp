@@ -355,9 +355,10 @@ namespace MAINSCR {
         MOX::_at_least_one_tactical_combat = 0;
 
         if (MOX::_game_type != 0) {
-            int player_bit = 1 << MOX::_PLAYER_NUM;
-            if (_warn_about_cheaters & player_bit) {
-                _warn_about_cheaters &= ~player_bit;
+            uint8_t player_num = (uint8_t)MOX::_PLAYER_NUM;
+            uint8_t mask = (uint8_t)(1u << player_num);
+            if ((((uint8_t)_warn_about_cheaters >> player_num) & 1u) != 0) {
+                _warn_about_cheaters &= (uint8_t)~mask;
                 MAINSCR::Warn_About_Cheating_Players_();
             }
         }
@@ -402,13 +403,11 @@ namespace MAINSCR {
                 RUSS::Mox_Sync_Update_();
                 input = _next_button;
             }
-            else {
-                if (MOX::_player[MOX::_PLAYER_NUM].surrender_to != -1) {
-                    video::Set_Page_Off_();
-                    MAINSCR::Draw_Main_Screen_();
-                    RUSS::Mox_Sync_Update_();
-                    input = _next_button;
-                }
+            if (MOX::_player[MOX::_PLAYER_NUM].surrender_to != -1) {
+                video::Set_Page_Off_();
+                MAINSCR::Draw_Main_Screen_();
+                RUSS::Mox_Sync_Update_();
+                input = _next_button;
             }
 
             int16_t mouse_input = fields::Scan_Input_();
@@ -473,14 +472,14 @@ namespace MAINSCR {
                     if (icon_selected_flag) {
                         if (mouse_field_2 > -1 && mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
                         HACCESS::Get_Fleet_Box_Selected_Ship_Ids_((int16_t*)ship_ids, 500, 0xff);
-                        SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, mouse_field_2, &SHIPMOVE::_g_ship_move_info);
+                        SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, mouse_field_2, &MOX::_g_ship_move_info);
 
-                        if (SHIPMOVE::_g_ship_move_info.moving == 0) {
+                        if (MOX::_g_ship_move_info.moving == 0) {
                             int msg_id = 0;
-                            if (SHIPMOVE::_g_ship_move_info.blackhole_blocks != 0) msg_id = HESTR_021_A_BLACK_HOLE_BLOCKS_MO;
-                            else if (SHIPMOVE::_g_ship_move_info.insufficient_fuel != 0) msg_id = HESTR_022_ONE_OR_MORE_SHIPS_DOES;
-                            else if (SHIPMOVE::_g_ship_move_info.immobile != 0) msg_id = HESTR_023_ONE_OR_MORE_SHIPS_CHOS;
-                            else if (SHIPMOVE::_g_ship_move_info.hyperspace_flux != 0) msg_id = HESTR_024_SHIP_MOVEMENT_IS_NOT_A;
+                            if (MOX::_g_ship_move_info.blackhole_blocks != 0) msg_id = HESTR_021_A_BLACK_HOLE_BLOCKS_MO;
+                            else if (MOX::_g_ship_move_info.insufficient_fuel != 0) msg_id = HESTR_022_ONE_OR_MORE_SHIPS_DOES;
+                            else if (MOX::_g_ship_move_info.immobile != 0) msg_id = HESTR_023_ONE_OR_MORE_SHIPS_CHOS;
+                            else if (MOX::_g_ship_move_info.hyperspace_flux != 0) msg_id = HESTR_024_SHIP_MOVEMENT_IS_NOT_A;
 
                             if (msg_id != 0) {
                                 const char* msg = HAROLD::H_Message_(msg_id);
@@ -490,7 +489,7 @@ namespace MAINSCR {
                         }
                         else {
                             int ships_count = FLEETPOP::Fleet_Buttons_Chosen_();
-                            SHIPMOVE::Make_Ships_Move_To_(ship_ids, mouse_field_2, &SHIPMOVE::_g_ship_move_info);
+                            SHIPMOVE::Make_Ships_Move_To_(ship_ids, mouse_field_2, &MOX::_g_ship_move_info);
                             MOX::_eta_star_id = -1;
 
                             int16_t next_icon = 0;

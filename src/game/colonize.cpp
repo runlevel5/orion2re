@@ -77,14 +77,14 @@ namespace COLONIZE {
             if (ship->status == 0) { // Active
                 if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
                     int16_t star_idx = ship->location;
-                    if (star_idx < 72) {
+                    if (star_idx >= 0 && star_idx < 72) {
                         s_star_data* star = &MOX::_star[star_idx];
                         if (star->colonize_player == 8) {
                             star->colonize_player = ship->owner;
                             if (ship->d.ship_type == SHIP_TYPE_OUTPOST) {
-                                outpost_bits[star_idx] |= (1 << (ship->owner & 0x1F));
-                            } else {
                                 colony_bits[star_idx] |= (1 << (ship->owner & 0x1F));
+                            } else {
+                                outpost_bits[star_idx] |= (1 << (ship->owner & 0x1F));
                             }
                         } else if (star->colonize_player != ship->owner) {
                             star->colonize_player = -1; // Conflict
@@ -121,7 +121,8 @@ namespace COLONIZE {
                     if (Star_N_Colonizable_Planets_For_Player_(star, priority_player) > 0) {
                         keep = true;
                     }
-                } else if ((outpost_bits[i] >> (priority_player & 0x1F)) & 1) {
+                }
+                if (!keep && ((outpost_bits[i] >> (priority_player & 0x1F)) & 1)) {
                     if (Star_N_Outpostable_Planets_For_Player_(star, priority_player) > 0) {
                         keep = true;
                     }
@@ -138,7 +139,7 @@ namespace COLONIZE {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->status == 0 && ship->d.ship_type == SHIP_TYPE_COMBAT) {
                 int16_t star_idx = ship->location;
-                if (star_idx < 72) {
+                if (star_idx >= 0 && star_idx < 72) {
                     s_star_data* star = &MOX::_star[star_idx];
                     int8_t colonizer = star->colonize_player;
                     if (colonizer >= 0 && colonizer < 8 && ship->owner != colonizer) {
@@ -172,16 +173,17 @@ namespace COLONIZE {
 
                 if (remove_base) {
                     int16_t owner = colony->owner;
-                    int refund = TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
+                    int32_t refund32 = TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
+                    int16_t refund16 = (int16_t)refund32;
                     colony->buildings[BUILDING_COLONY_BASE] = 0;
-                    MOX::_player[owner].bc += refund;
+                    MOX::_player[owner].bc += refund32;
 
                     s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_COLONY;
                     msg.u.colony.planet_idx = (uint8_t)colony->planet;
                     msg.u.colony.subtype = 0;
-                    msg.u.colony.c.scrap.bc = refund;
                     msg.u.colony.c.scrap.building_id = BUILDING_COLONY_BASE;
+                    msg.u.colony.c.scrap.bc = refund16;
                     MSG_::Add_Msg_(msg, owner);
                 }
             }
@@ -216,7 +218,7 @@ namespace COLONIZE {
             return;
         }
 
-        int16_t current_player = (int16_t)(MOX::_stardate % (int32_t)MOX::_NUM_PLAYERS);
+        int16_t current_player = (int16_t)((int32_t)MOX::_stardate % MOX::_NUM_PLAYERS);
         int16_t skipped_players = 0;
         int16_t free_slot_ptr = 0;
 

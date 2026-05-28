@@ -47,7 +47,7 @@ namespace REPORT {
         int8_t result = 0;
 
         // Check if the summary for this player hasn't been displayed yet
-        if (!((REPORT::_displayed_msgs >> (player_idx & 0x1F)) & 1)) {
+        if ((((uint8_t)REPORT::_displayed_msgs >> (uint8_t)player_idx) & 1) == 0) {
             int16_t num_msgs = MSG_::N_Msgs_For_Player_(player_idx);
 
             if (num_msgs > 0 && MOX::_settings.end_of_turn_summary != 0) {
@@ -89,8 +89,11 @@ namespace REPORT {
                         break;
 
                     case 9:
-                        // Check specific criteria for message type 9
-                        if (msg->u.hyperspace_beast.ship_idx != -1 && msg->u.hyperspace_beast.fate != 0) {
+                        // Use raw offsets here to match the original message
+                        // payload access rather than relying on an uncertain
+                        // union member interpretation for this message type.
+                        if (*(int16_t*)((uint8_t*)msg + 2) != -1 &&
+                            *(uint8_t*)((uint8_t*)msg + 7) != 0) {
                             should_show = true;
                         }
                         else {
@@ -99,7 +102,7 @@ namespace REPORT {
                         break;
 
                     case 17:
-                        if ((uint8_t)msg->u.diplomacy.plr_a == (uint8_t)MOX::_PLAYER_NUM) {
+                        if (*(uint8_t*)((uint8_t*)msg + 3) == (uint8_t)MOX::_PLAYER_NUM) {
                             should_show = false;
                         }
                         else {
@@ -125,7 +128,9 @@ namespace REPORT {
                         MOX::_current_screen = 0x28 /* SCREEN_TURN_SUMMARY */;
                         MOX::_return_screen = 0x27 /* SCREEN_REPORTS */;
                         MOX::_global_esc = 1;
-                        REPORT::_displayed_msgs |= (1 << (player_idx & 0x1F));
+                        uint8_t mask = 1;
+                        mask = (uint8_t)(mask << (uint8_t)player_idx);
+                        REPORT::_displayed_msgs |= mask;
                     }
                 }
             }
@@ -410,14 +415,15 @@ namespace REPORT {
      */
     int8_t __cdecl Has_GNN_(uint8_t index, bool mark_as_displayed) {
         int8_t status = 0;
+        uint8_t displayed_mask = REPORT::_displayed_gnn;
 
         // Check if the GNN event at the specified index has already been displayed
-        if (!((REPORT::_displayed_gnn >> index) & 0x1)) {
+        if ((((uint8_t)(displayed_mask >> index)) & 1u) == 0) {
             if (EVENTS::Check_For_Event_Message_() != 0) {
                 status = 7;
                 if (mark_as_displayed) {
                     EVENTS::Check_For_Event_();
-                    REPORT::_displayed_gnn |= (1 << index);
+                    REPORT::_displayed_gnn = (uint8_t)(REPORT::_displayed_gnn | (uint8_t)(1u << index));
                 }
             }
         }

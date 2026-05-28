@@ -262,7 +262,7 @@ namespace COLGCBT {
         return -1;
     }
 
-    s_animation_header* __cdecl Action_Anim_(uint8_t side, uint8_t state, uint8_t type) {
+    s_animation_header* __cdecl Action_Anim_(uint8_t side, uint8_t state, int8_t type) {
         switch (state) {
             case 0:
                 return _explosion_anim;
@@ -319,9 +319,9 @@ namespace COLGCBT {
             graphics::Darken_Fill_(0x17B, 0x29, 0x27E, 0xB8);
             animate::Draw_(0x17A, 0x28, _frame_anim);
 
-            COLONY::Set_Colony_Font_To_Player_(2, static_cast<int8_t>(_g_defend_ptr->player_id));
+            COLONY::Set_Colony_Font_To_Player_(2, (uint8_t)_g_defend_ptr->player_id);
 
-            const char* str = ESTRINGS::E_Strings_(0x100);
+            char* str = ESTRINGS::E_Strings_(0x100);
             fonts::Print_Centered_(0x1FC, line_y_offset * 11 + 50, str);
 
             line_y_offset++;
@@ -944,8 +944,11 @@ namespace COLGCBT {
     int16_t __cdecl N_Left_Active_To_Process_(s_ground_unit* start_unit) {
         int16_t count = 0;
         s_ground_unit* current_unit = start_unit;
-        s_ground_unit* end_unit = _g_units[start_unit->side + 1];
+        int8_t side = start_unit->side;
+        s_ground_unit* end_unit = &_g_units[side][40];
 
+        // High-level intent is scanning this side's 40-unit block, but keep
+        // the pointer-based do-while to match the original assembly exactly.
         do {
             if (current_unit->state != 0 && current_unit->state != 1 && current_unit->type == start_unit->type) {
                 count++;
@@ -1091,34 +1094,39 @@ namespace COLGCBT {
     }
 
     void __cdecl Play_Unit_Beam_Sound_(s_ground_unit* unit) {
-        uint32_t side_info_bits;
+        uint32_t side_info_bits = 0;
+        s_invasion_side_info* side_info = nullptr;
         int16_t sound_id;
 
         if (unit->side == 0) {
-            side_info_bits = (uint32_t)(uintptr_t)_g_attack_ptr;
+            side_info = _g_attack_ptr;
         } else if (unit->side == 1) {
-            side_info_bits = (uint32_t)(uintptr_t)_g_defend_ptr;
+            side_info = _g_defend_ptr;
         }
 
-        switch (((s_invasion_side_info*)(uintptr_t)side_info_bits)->combat_modifiers.rifle_tech_app_id) {
-            case 73:
-                sound_id = 9;
-                break;
-            case 101:
-                sound_id = 1;
-                break;
-            case 128:
-                sound_id = 19;
-                break;
-            case 138:
-                sound_id = 13;
-                break;
-            case 145:
-                sound_id = 12;
-                break;
-            default:
-                sound_id = (int16_t)side_info_bits;
-                break;
+        if (side_info != nullptr) {
+            switch (side_info->combat_modifiers.rifle_tech_app_id) {
+                case 73:
+                    sound_id = 9;
+                    break;
+                case 101:
+                    sound_id = 1;
+                    break;
+                case 128:
+                    sound_id = 19;
+                    break;
+                case 138:
+                    sound_id = 13;
+                    break;
+                case 145:
+                    sound_id = 12;
+                    break;
+                default:
+                    sound_id = (int16_t)(uint16_t)side_info_bits;
+                    break;
+            }
+        } else {
+            sound_id = (int16_t)(uint16_t)side_info_bits;
         }
 
         unit->sound_id = ERICNET::Mox_Play_Sound_(sound_id);
@@ -1152,8 +1160,8 @@ namespace COLGCBT {
                 break;
 
             case 1:
-                sound::Fadeout_Sound_(static_cast<int16_t>(unit->sound_handle), 10); // TYPE MISMATCH: unit->sound_handle is int32_t
                 unit->state = 0;
+                sound::Fadeout_Sound_(unit->sound_handle, 10);
                 COLONY::_full_draw = 1;
                 break;
 
@@ -1190,7 +1198,7 @@ namespace COLGCBT {
                 s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
                 animate::Get_Width_(anim);
                 
-                sound::Fadeout_Sound_(static_cast<int16_t>(unit->sound_handle), 10); // TYPE MISMATCH: unit->sound_handle is int32_t
+                sound::Fadeout_Sound_(unit->sound_handle, 10);
                 unit->sound_handle = 0;
 
                 if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
@@ -1262,25 +1270,29 @@ namespace COLGCBT {
     }
 
     int16_t __cdecl Get_CGCBT_Beam_Len_(uint8_t side_idx) {
-        s_invasion_side_info* side; // Potential bug: uninitialized if side_idx is not 0 or 1
+        s_invasion_side_info* side; // binary leaves this stack local indeterminate for side_idx != 0/1
 
         if (side_idx == 0) {
             side = _g_attack_ptr;
-        }
-        else if (side_idx == 1) {
+        } else if (side_idx == 1) {
             side = _g_defend_ptr;
         }
 
-        switch (side->combat_modifiers.rifle_tech_app_id) {
-        case 73:
+        uint8_t rifle_idx = (uint8_t)(side->combat_modifiers.rifle_tech_app_id - 73);
+        if (rifle_idx > 72) {
+            return 1;
+        }
+
+        switch (rifle_idx) {
+        case 0:
             return 70;
-        case 101:
+        case 28:
             return 100;
-        case 128:
+        case 55:
             return 20;
-        case 138:
+        case 65:
             return 70;
-        case 145:
+        case 72:
             return 1;
         default:
             return 1;
@@ -1292,12 +1304,16 @@ namespace COLGCBT {
             return;
         }
 
-        s_invasion_side_info* side_info;
+        uint8_t rifle_id = 0;
         if (side == 0) {
-            side_info = _g_attack_ptr;
+            rifle_id = _g_attack_ptr->combat_modifiers.rifle_tech_app_id;
         } else if (side == 1) {
-            side_info = _g_defend_ptr;
+            rifle_id = _g_defend_ptr->combat_modifiers.rifle_tech_app_id;
         }
+
+        // The original code only meaningfully handles sides 0 and 1. Use a
+        // zero rifle id for any other value so we take the default beam setup
+        // instead of relying on the original undefined dereference path.
 
         int16_t p5;
         int16_t p6;
@@ -1309,9 +1325,6 @@ namespace COLGCBT {
         int16_t p12;
         int16_t p13;
         int16_t p14;
-        int16_t shared_mode = 0;
-
-        uint8_t rifle_id = side_info->combat_modifiers.rifle_tech_app_id;
 
         switch (rifle_id) {
             case 73:  /* Laser Rifle */
@@ -1325,7 +1338,6 @@ namespace COLGCBT {
                 p13 = 0;
                 p14 = 0;
                 p12 = 0;
-                shared_mode = 0;
                 break;
             case 101: /* Fusion Rifle */
                 p5 = 236;
@@ -1338,7 +1350,6 @@ namespace COLGCBT {
                 p13 = 0;
                 p14 = 0;
                 p12 = 1;
-                shared_mode = 1;
                 break;
             case 128: /* Phasor Rifle */
                 p8 = 2;
@@ -1351,7 +1362,6 @@ namespace COLGCBT {
                 p11 = 0;
                 p13 = 1;
                 p12 = 1;
-                shared_mode = 1;
                 break;
             case 138: /* Plasma Rifle */
                 p8 = 2;
@@ -1364,7 +1374,6 @@ namespace COLGCBT {
                 p7 = 70;
                 p10 = 239;
                 p12 = 0;
-                shared_mode = 0;
                 break;
             case 145: /* Disruptor Rifle */
                 p6 = 11;
@@ -1377,16 +1386,18 @@ namespace COLGCBT {
                 p9 = 96;
                 p11 = 1;
                 p12 = 0;
-                shared_mode = 0;
                 break;
             default:
-                p5 = shared_mode;
-                p8 = shared_mode;
-                p9 = shared_mode;
-                p11 = shared_mode;
-                p12 = shared_mode;
-                p13 = shared_mode;
-                p14 = shared_mode;
+                p5 = 0;
+                p6 = 0;
+                p7 = 0;
+                p8 = 0;
+                p9 = 0;
+                p10 = 0;
+                p11 = 0;
+                p12 = 0;
+                p13 = 0;
+                p14 = 0;
                 break;
         }
 

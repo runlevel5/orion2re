@@ -35,7 +35,7 @@ namespace council {
 
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
-    void __cdecl Get_Player_Voted_Winner_Message_(int16_t player_idx);
+    void __cdecl Get_Player_Voted_Winner_Message_(int16_t unused);
 
     void __cdecl Draw_Council_Player_Voted_Winner_();
 

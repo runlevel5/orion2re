@@ -140,7 +140,7 @@ namespace BEAMS {
 
     void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7);
 
-    s_animation_header* __cdecl Reflection_Field_Anims_(int32_t p1, int32_t p2);
+    s_animation_header* __cdecl Reflection_Field_Anims_(int16_t p1, int16_t p2);
 
     void __cdecl Load_Reflection_Field_Hit_(int8_t should_load);
 

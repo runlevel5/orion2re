@@ -139,7 +139,7 @@ namespace BILL {
      * @param target_player_idx The index of the player being spied upon.
      * @param count The new spy count (masked to 0-63).
      */
-    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_player_idx, uint8_t count) {
+    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_player_idx, int16_t count) {
         // s_player size: 0xEA9 (3753 bytes)
         // spies offset: 0xE57
         

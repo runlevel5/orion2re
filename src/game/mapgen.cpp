@@ -68,23 +68,17 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             while (MOX::_star[i].name[name_len] != '\0') name_len++;
 
             if (name_len < 7) {
-                const char* src = "w";
-                uint32_t src_len = 0;
-                while (src[src_len] != '\0') src_len++;
-
-                char* dst_end = formatted_name;
-                while (*dst_end != '\0') dst_end++;
-
-                for (uint32_t j = 0; j <= src_len; ++j) {
-                    dst_end[j] = src[j];
-                }
+                strcpy(formatted_name + strlen(formatted_name), "w");
             }
 
             collision_w = fonts::Get_String_Width_(formatted_name);
             if (MAPGEN::_n_maps_generated <= 2) goto START_POS_GEN;
         }
 
-        collision_w = random::Random_(8) + random::Random_(8) + 0x20 + random::Random_(8);
+        collision_w = (int16_t)((int16_t)random::Random_(8) +
+                                (int16_t)random::Random_(8) +
+                                0x20 +
+                                (int16_t)random::Random_(8));
 
     START_POS_GEN:
         int16_t retry_count = 0;
@@ -115,12 +109,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 bool fallback_found = false;
                 do {
                     RUSS::Mox_Update_();
-                    int16_t fx = (int16_t)random::Random_(0x189) + 0x14;
-                    int16_t fy = (int16_t)random::Random_(0x155) + 0x14;
-                    MOX::_star[i].x = HAROLD::Get_Up_Scaled_Value_(fx);
-                    MOX::_star[i].y = HAROLD::Get_Up_Scaled_Value_(fy);
+                    int32_t fx = (int16_t)random::Random_(0x189) + 0x14;
+                    int32_t fy = (int16_t)random::Random_(0x155) + 0x14;
+                    MOX::_star[i].x = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fx);
+                    MOX::_star[i].y = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fy);
 
-                    if (!MAPGEN::Star_XY_Invalid_(i, collision_w, collision_h, fx)) {
+                    if (!MAPGEN::Star_XY_Invalid_(i, collision_w, collision_h, (int16_t)fx)) {
                         fallback_found = true;
                     }
                     else {
@@ -514,9 +508,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
     void __cdecl Generate_Wormhole_Links_() {
         uint8_t star_used[72];
-        for (int i = 0; i < 18; ++i) {
-            reinterpret_cast<uint32_t*>(star_used)[i] = 0;
-        }
+        memset(star_used, 0, sizeof(star_used));
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -527,14 +519,14 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
 
         if (_n_wormholes != 0) {
-            for (int wormhole_idx = 0; wormhole_idx < (int)_n_wormholes; ++wormhole_idx) {
+            for (int16_t wormhole_idx = 0; wormhole_idx < (int16_t)_n_wormholes; ++wormhole_idx) {
                 int16_t found_star_idx = -1;
                 for (int attempt = 0; attempt <= 200; ++attempt) {
-                    int32_t star_idx = random::Random_(static_cast<int32_t>(MOX::_NUM_STARS) - 1);
+                    int16_t star_idx = (int16_t)random::Random_((int16_t)MOX::_NUM_STARS - 1);
                     if (star_idx != 0 &&
                         star_used[star_idx] == 0 &&
                         MOX::_star[star_idx].system_special == SYSTEM_SPECIAL_NO_SPECIAL &&
-                        !HAROLD::Empty_System_(static_cast<int16_t>(star_idx)) &&
+                        !HAROLD::Empty_System_(star_idx) &&
                         MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE &&
                         MOX::_star[star_idx].wormhole_star_id == 0xFF)
                     {
@@ -695,11 +687,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
     }
 
-    void __cdecl Generate_Star_Special_(int16_t star_idx, void* param_2, uint8_t* special_counts) {
-        uint8_t special_type = 0;
+    void __cdecl Generate_Star_Special_(int16_t star_idx, int16_t* wormhole_out, uint8_t* special_counts) {
+        int8_t special_type = 0;
 
-        if ((int16_t)MOX::_planet_special < (int16_t)random::Random_(100)) {
-            Get_A_Planet_Or_Star_Special_(star_idx, (int16_t*)param_2, (int8_t*)&special_type, 1, 0);
+        if (MOX::_planet_special < random::Random_(100)) {
+            Get_A_Planet_Or_Star_Special_(star_idx, wormhole_out, &special_type, 1, 0);
         } else {
             special_type = 0;
         }
@@ -782,16 +774,14 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     void __cdecl Generate_Nebulas_() {
         int16_t widths[12];
         int16_t heights[12];
-        int16_t nebula_types[12];
-        uint8_t raw_retry_bytes[12];
+        uint8_t nebula_types[4];
         int16_t min_dist_param = 0x14;
         int16_t attempts = 0;
 
         allocate::Push_Block_(MOX::_screen_seg);
-        int32_t* point_buffer = (int32_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 120000);
-        int32_t* coord_buffer = (int32_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40000);
-        int32_t* weight_buffer32 = (int32_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20000);
-        uint16_t* weight_buffer = (uint16_t*)weight_buffer32;
+        int16_t* point_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 120000);
+        int16_t* coord_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40000);
+        uint16_t* weight_buffer = (uint16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20000);
 
         RUSS::Mox_Update_();
 
@@ -803,25 +793,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         if (MOX::_NUM_NEBULAS != 0) {
             for (int16_t i = 0; i < (int16_t)(uint16_t)MOX::_NUM_NEBULAS; ++i) {
-                int16_t done = 0;
-                int16_t inner_attempts = 0;
-                int16_t type = 0;
-
-                do {
-                    RUSS::Mox_Update_();
-                    type = (int16_t)random::Random_(12) - 1;
-
-                    if (raw_retry_bytes[type] == 0) {
-                        done = 1;
-                    }
-
-                    ++inner_attempts;
-                    if (inner_attempts > 0xF0) {
-                        done = 1;
-                    }
-                } while (done == 0);
-
-                nebula_types[i] = type;
+                RUSS::Mox_Update_();
+                // The original reads an uninitialized stack byte array before accepting
+                // a type. Use a direct random choice here instead of encoding UB.
+                nebula_types[i] = (uint8_t)((int16_t)random::Random_(12) - 1);
                 RUSS::Mox_Update_();
             }
         }
@@ -839,10 +814,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 break;
             }
 
-            memset(raw_retry_bytes, 0, sizeof(raw_retry_bytes));
             memset(point_buffer, 0, 120000);
             memset(coord_buffer, 0, 40000);
-            memset(weight_buffer32, 0, 20000);
+            memset(weight_buffer, 0, 20000);
             RUSS::Mox_Update_();
 
             int16_t start_x = (int16_t)random::Random_(0x1FA - widths[0]);
@@ -859,7 +833,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             int32_t dy = (int32_t)(scaled_y_limit_plus_20 + min_dist_param);
             int32_t dist_sq_threshold = dx * dx + dy * dy;
 
-            Build_Min_Point_Distances_(start_x, start_y, 10, 10, 0x1FA - scaled_x_limit, 0x190 - scaled_y_limit, dist_sq_threshold, (int16_t*)point_buffer, &valid_points_count, 30000);
+            Build_Min_Point_Distances_(start_x, start_y, 10, 10, 0x1FA - scaled_x_limit, 0x190 - scaled_y_limit, dist_sq_threshold, point_buffer, &valid_points_count, 30000);
             RUSS::Mox_Update_();
 
             if (valid_points_count < (int16_t)(uint16_t)MOX::_NUM_NEBULAS) {
@@ -867,21 +841,20 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 continue;
             }
 
-            coord_buffer[0] = (int32_t)((uint16_t)start_x | ((uint32_t)(uint16_t)start_y << 16));
+            coord_buffer[0] = start_x;
+            coord_buffer[1] = start_y;
             weight_buffer[0] = 1;
             int16_t placed_count = 1;
             int16_t buffer_full = 0;
 
             for (int16_t i = 0; i < valid_points_count && buffer_full == 0; ++i) {
-                uint32_t packed_point = (uint32_t)point_buffer[i];
-                int16_t px = (int16_t)(uint16_t)packed_point;
-                int16_t py = (int16_t)(uint16_t)(packed_point >> 16);
+                int16_t px = point_buffer[i * 2];
+                int16_t py = point_buffer[i * 2 + 1];
 
                 int16_t too_close = 0;
                 for (int16_t j = 0; j < placed_count; ++j) {
-                    uint32_t packed_coord = (uint32_t)coord_buffer[j];
-                    int16_t coord_x = (int16_t)(uint16_t)packed_coord;
-                    int16_t coord_y = (int16_t)(uint16_t)(packed_coord >> 16);
+                    int16_t coord_x = coord_buffer[j * 2];
+                    int16_t coord_y = coord_buffer[j * 2 + 1];
 
                     if (px != coord_x || py != coord_y) {
                         if (HOMEGEN::Dist_Between_Points_(px, py, coord_x, coord_y) < dist_sq_threshold) {
@@ -892,7 +865,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 }
 
                 if (too_close == 0) {
-                    coord_buffer[placed_count] = point_buffer[i];
+                    coord_buffer[placed_count * 2] = point_buffer[i * 2];
+                    coord_buffer[placed_count * 2 + 1] = point_buffer[i * 2 + 1];
                     weight_buffer[placed_count] = 1;
                     ++placed_count;
                     if (placed_count >= 10000) {
@@ -905,11 +879,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             if ((int16_t)(uint16_t)MOX::_NUM_NEBULAS <= placed_count) {
                 for (int16_t i = 0; i < (int16_t)(uint16_t)MOX::_NUM_NEBULAS; ++i) {
                     int16_t choice = RUSS::Get_Weighted_Choice_Short_(weight_buffer, placed_count);
-                    uint32_t packed_coord = (uint32_t)coord_buffer[choice];
 
                     MOX::_nebula[i].type = (int8_t)nebula_types[i];
-                    MOX::_nebula[i].x = HAROLD::Get_Up_Scaled_Value_((int16_t)(uint16_t)packed_coord);
-                    MOX::_nebula[i].y = HAROLD::Get_Up_Scaled_Value_((int16_t)(uint16_t)(packed_coord >> 16));
+                    MOX::_nebula[i].x = HAROLD::Get_Up_Scaled_Value_(coord_buffer[choice * 2]);
+                    MOX::_nebula[i].y = HAROLD::Get_Up_Scaled_Value_(coord_buffer[choice * 2 + 1]);
                     weight_buffer[choice] = 0;
                 }
                 break;
@@ -932,7 +905,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      *             HAROLD::Galaxy_Size_From_N_Stars_().
      */
     void __cdecl Init_Main_Screen_(uint8_t gal_size) {
-        switch (gal_size) {
+        (void)gal_size;
+
+        int16_t size = HAROLD::Galaxy_Size_From_N_Stars_();
+
+        switch (size) {
         case 0:
             MOX::_MAP_MAX_X = 0x1FA;
             MOX::_MAP_MAX_Y = 0x190;
@@ -978,7 +955,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             return;
         }
 
-        for (int8_t neb_idx = 0; neb_idx < num_nebulas; ++neb_idx) {
+        for (int16_t neb_idx = 0; neb_idx < (int16_t)(uint16_t)num_nebulas; ++neb_idx) {
             int16_t entry_counter = 0;
             for (int16_t type_val = 0; type_val < 12; ++type_val) {
                 // Update system twice per inner loop set
@@ -987,7 +964,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     RUSS::Mox_Update_();
 
                     // If the current nebula matches this nebula type index (0-11)
-                    if (MOX::_nebula[neb_idx].type == (int8_t)type_val) {
+                    if (MOX::_nebula[neb_idx].type == type_val) {
                         s_animation_header* loaded_segment;
                         int entry_num = entry_counter + 6;
 

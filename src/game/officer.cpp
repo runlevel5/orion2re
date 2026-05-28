@@ -2235,7 +2235,7 @@ namespace OFFICER {
 
         RUSS::Mox_Update_();
 
-        MOX::_selected_box_seg = farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
+        MOX::_selected_box_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
         MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
         MOX::_fleet_scroll_anim_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
         MOX::_officer_hire_replace_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg));

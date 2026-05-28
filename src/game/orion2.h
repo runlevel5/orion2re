@@ -3085,7 +3085,7 @@ struct s_ship_weapons {
 struct s_ship_design {
     char name[16];
     int8_t size;
-    byte ship_type;
+    int8_t ship_type;
     char shield_type;
     int8_t ftl_type;
     char speed;
@@ -3225,7 +3225,7 @@ struct s_player {
     short diplomacy_proposal_system_bribe[8];
     short sneak_attack_planet;
     char sneak_attack_message;
-    char sneak_attack_player;
+    int8_t sneak_attack_player;
     int8_t council_threat;
     short reward_amount[8];
     char reward_tech[8];
@@ -4790,7 +4790,7 @@ struct s_star_data {
     int8_t system_special;
     int8_t wormhole_star_id;
     byte blockaded;
-    char blockaded_by[8];
+    uint8_t blockaded_by[8];
     uint8_t visited;
     byte just_visited;
     byte ignore_colony_ships;

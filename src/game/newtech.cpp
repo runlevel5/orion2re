@@ -235,21 +235,21 @@ namespace newtech {
 
         uint32_t val = 0;
         if (category_is_multi == 0) {
-            int max_field_ai_group = 0;
+            int last_known_field_ai_group = 0;
             for (int i = 0; i < 204; ++i) {
                 if (TECHDATA::_technology_applications[i].ai_group == ai_group &&
                     MOX::_player[player_idx].tech_applications[i] == 3) {
-                    max_field_ai_group = TECHDATA::_technology_fields[TECHDATA::_technology_applications[i].tech_field_id].ai_group;
+                    last_known_field_ai_group = TECHDATA::_technology_fields[TECHDATA::_technology_applications[i].tech_field_id].ai_group;
                 }
             }
 
-            if (max_field_ai_group + 3 <= tech_field_ai_group) {
-                val = (tech_field_ai_group - max_field_ai_group) * base_value * modifier / 3;
+            if (last_known_field_ai_group + 3 <= tech_field_ai_group) {
+                val = (tech_field_ai_group - last_known_field_ai_group) * base_value * modifier / 3;
             } else {
                 if (ai_group == 0xE || ai_group == 0x10 || ai_group == 0x12 || ai_group == 0x18 || ai_group == 0x19 || ai_group == 0x20 || ai_group == 0x27) {
                     val = 0;
                 } else {
-                    val = (base_value * modifier * 2) / (max_field_ai_group - tech_field_ai_group + 3);
+                    val = (base_value * modifier * 2) / (last_known_field_ai_group - tech_field_ai_group + 3);
                 }
             }
         } else {

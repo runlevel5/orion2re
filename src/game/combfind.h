@@ -92,7 +92,7 @@ namespace COMBFIND {
 
     short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short planet_idx, s_battle_results *result, int8_t is_sneak_attack);
 
-    bool __cdecl AI_Can_Retreat_(int player_idx, int excluded_colony_idx);
+    int8_t __cdecl AI_Can_Retreat_(int8_t player_idx, int16_t excluded_colony_idx);
 
     int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx);
 
@@ -112,7 +112,7 @@ namespace COMBFIND {
 
     int32_t __cdecl N_Enemy_Stars_In_Range_(int16_t player_idx, uint8_t enemy_player_idx);
 
-    int32_t __cdecl N_Enemy_Stars_(uint8_t player_idx);
+    int32_t __cdecl N_Enemy_Stars_(int8_t player_idx);
 
     int8_t __cdecl Player_Owns_Transports_(int player_idx);
 
@@ -120,7 +120,7 @@ namespace COMBFIND {
 
     void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx);
 
-    void __cdecl Do_Net_Combat_Update_(bool message_sent);
+    void __cdecl Do_Net_Combat_Update_(bool unused_message_sent);
 
     void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx);
 }

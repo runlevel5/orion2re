@@ -37,6 +37,7 @@
     <ClCompile Include="src\game\antarans.cpp" />
     <ClCompile Include="src\game\antaroom.cpp" />
     <ClCompile Include="src\game\arith1e.cpp" />
+    <ClCompile Include="src\game\assert.cpp" />
     <ClCompile Include="src\game\beams.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
     <ClCompile Include="src\game\billhelp.cpp" />

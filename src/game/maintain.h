@@ -7,8 +7,8 @@ namespace maintain {
     void __cdecl Make_Scrap_Ships_Dead_();
     void __cdecl Player_Maintenance_(s_player* param_1);
 
-    inline int (*&_ship_worths)[500] =
-        *reinterpret_cast<int (**)[500]>(std::uintptr_t{0x0056CD8C});
+    inline int16_t (*&_ship_worths)[500] =
+        *reinterpret_cast<int16_t (**)[500]>(std::uintptr_t{0x0056CD8C});
 
     int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship);
 

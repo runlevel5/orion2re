@@ -18,7 +18,7 @@ namespace BILL {
     void __cdecl Bill_Default_(void);
 
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx);
-    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_player_idx, uint8_t count);
+    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_player_idx, int16_t count);
 
     void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width);
 

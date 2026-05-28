@@ -430,17 +430,21 @@ namespace KEN {
 
     s_animation_header* __cdecl Get_Ship_Id_Picture_Seg_(int16_t ship_idx) {
         return Do_Get_Ship_Picture_Seg(
-            MOX::_ship[ship_idx].d.previous_owner,
+            (int16_t)(int8_t)MOX::_ship[ship_idx].d.previous_owner,
             MOX::_ship[ship_idx].d.picture_num
         );
     }
 
     s_animation_header* __cdecl Do_Get_Ship_Picture_Seg(int16_t player_idx, int16_t ship_type) {
-        int32_t color = 8;
+        int8_t color = 8;
         if (player_idx < 8) {
-            color = MOX::_player[player_idx].color;
+            color = (int8_t)MOX::_player[player_idx].color;
         }
 
-        return (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, ship_type + (color * 50), MOX::_global_cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(
+            s_ships_lbx_005597b4,
+            (int16_t)(ship_type + color * 50),
+            MOX::_global_cache_seg
+        );
     }
 }

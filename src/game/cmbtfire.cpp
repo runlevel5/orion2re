@@ -1556,16 +1556,16 @@ namespace CMBTFIRE {
                     if ((specials & 0x100) != 0) {
                         for (int16_t shield_idx = 0; shield_idx < 4; ++shield_idx) {
                             int16_t dmg_val = current_damage;
-                            int16_t achilles = COMBINIT::Does_Combat_Ship_Have_Special_(source, 1);
-                            int16_t struct_analyzer = COMBINIT::Does_Combat_Ship_Have_Special_(source, 32);
-                            return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &dmg_val, &local_e, shield_idx, specials, weapon_flags_00, struct_analyzer, achilles, 0);
+                            int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 1);
+                            int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 32);
+                            return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &dmg_val, &local_e, shield_idx, specials, weapon_flags_00, special20, special1, 0);
                             *hit_x += dmg_val;
                             *hit_y += local_e;
                         }
                     } else {
-                        int16_t achilles = COMBINIT::Does_Combat_Ship_Have_Special_(source, 1);
-                        int16_t struct_analyzer = COMBINIT::Does_Combat_Ship_Have_Special_(source, 32);
-                        return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &current_damage, &local_e, shield_arc, specials, weapon_flags_00, struct_analyzer, achilles, 0);
+                        int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 1);
+                        int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 32);
+                        return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &current_damage, &local_e, shield_arc, specials, weapon_flags_00, special20, special1, 0);
                         *hit_x += current_damage;
                         *hit_y += local_e;
                     }
@@ -1576,6 +1576,10 @@ namespace CMBTFIRE {
                 for (int16_t i = 0; i < missile_hits; ++i) {
                     int16_t dmg_val = current_damage;
                     CMBTFIRE::Apply_Damage_To_Missile_(target, &dmg_val, specials, weapon_flags_00);
+                    MOX::_missile[target].quantity -= dmg_val;
+                    if (MOX::_missile[target].quantity <= 0) {
+                        MOX::_missile[target].type = 0;
+                    }
                     if (MOX::_missile[target].quantity <= 0 || MOX::_missile[target].type == 0) {
                         continue_firing = 0;
                     }

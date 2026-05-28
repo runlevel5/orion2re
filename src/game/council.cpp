@@ -218,7 +218,10 @@ namespace council {
 
         JIM::Get_Text_Message_("jimtext.lbx", 25 /* ABSTAIN */, list_items[2], 25);
 
-        *reinterpret_cast<uint32_t*>(active_mask) = 0x01010101;
+        active_mask[0] = 1;
+        active_mask[1] = 1;
+        active_mask[2] = 1;
+        active_mask[3] = 1;
         fonts::Set_Outline_Color_(0, 0);
         fonts::Set_Font_Style_(4, &council::_council_normal_colors);
         fonts::Set_Font_Highlight_Colors_(&council::_council_highlight_colors);
@@ -538,13 +541,14 @@ namespace council {
     }
 
     void __cdecl Council_Finished_Voting_() {
-        int32_t threshold = (static_cast<int32_t>(council::_council_total_votes) * 2 + 2) / 3;
+        int16_t total_votes = council::_council_total_votes;
+        int32_t threshold = (total_votes * 2 + 2) / 3;
 
         if (council::_council_nominee_vote_total[0] >= threshold) {
             council::_council_vote_for = 0;
             council::_council_state = 4;
 
-            if (council::_council_nominee_[0] == static_cast<uint8_t>(MOX::_PLAYER_NUM)) {
+            if ((int16_t)council::_council_nominee_[0] == MOX::_PLAYER_NUM) {
                 diplodef::_COUNCIL_FLAG = 2;
             } else {
                 diplodef::_COUNCIL_FLAG = 3;
@@ -553,7 +557,7 @@ namespace council {
             council::_council_vote_for = 1;
             council::_council_state = 4;
 
-            if (council::_council_nominee_[1] == static_cast<uint8_t>(MOX::_PLAYER_NUM)) {
+            if ((int16_t)council::_council_nominee_[1] == MOX::_PLAYER_NUM) {
                 diplodef::_COUNCIL_FLAG = 2;
             } else {
                 diplodef::_COUNCIL_FLAG = 3;
@@ -587,7 +591,10 @@ namespace council {
             JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1C, list_items, 0x28);
 
             list_metadata = 0;
-            *(uint32_t*)active_mask = 0x01010101;
+            active_mask[0] = 1;
+            active_mask[1] = 1;
+            active_mask[2] = 1;
+            active_mask[3] = 1;
 
             int16_t selection = fields::Get_List_Field_(
                 0xD6, 0x184, 0xB4, 
@@ -619,7 +626,7 @@ namespace council {
                 council::_council_state = 6;
                 if (diplodef::_COUNCIL_FLAG == 2) {
                     council::_winning_player = council::_council_nominee_[0];
-                    if (council::_council_nominee_[0] == MOX::_PLAYER_NUM) {
+                    if ((int16_t)council::_council_nominee_[0] == MOX::_PLAYER_NUM) {
                         council::_winning_player = council::_council_nominee_[1];
                     }
                 }
@@ -746,7 +753,8 @@ namespace council {
         return (int32_t)random::Random_(200) <= (int32_t)vote_score;
     }
 
-    void __cdecl Get_Player_Voted_Winner_Message_(int16_t player_idx) {
+    void __cdecl Get_Player_Voted_Winner_Message_(int16_t unused) {
+        (void)unused;
         int16_t message_idx;
         do {
             // BUG: message_idx can be -1 if Random_(14) returns 0
@@ -769,10 +777,10 @@ namespace council {
     }
 
     void Drive_Council_Player_Voted_Winner_(int16_t player_idx, int16_t unused) {
-        Get_Player_Voted_Winner_Message_(player_idx);
+        Get_Player_Voted_Winner_Message_(unused);
 
         int16_t race_anim_id = (int16_t)((uint8_t)MOX::_player[player_idx].race + 0xB8);
-        file_ani::Open_Multi_File_Animation_((char*)s_council_lbx, race_anim_id, 1);
+        file_ani::Open_Multi_File_Animation_(s_council_lbx, race_anim_id, 1);
 
         bool exit_loop = false;
         while (!exit_loop) {

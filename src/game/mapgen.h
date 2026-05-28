@@ -85,7 +85,7 @@ namespace MAPGEN {
     void __cdecl Get_Star_Name_(int16_t star_idx);
     int16_t __cdecl Generate_Number_Of_Satellites_(int16_t star_idx);
     void __cdecl Planet_Generation_(int16_t star_idx);
-    void __cdecl Generate_Star_Special_(int16_t star_idx, void* param_2, uint8_t* special_counts);
+    void __cdecl Generate_Star_Special_(int16_t star_idx, int16_t* wormhole_out, uint8_t* special_counts);
     void __cdecl Black_Hole_Fix_(int16_t gal_age);
 
     void __cdecl Enforce_Planet_Max_(int16_t max_planets);

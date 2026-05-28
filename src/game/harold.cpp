@@ -265,10 +265,10 @@ namespace HAROLD {
             }
 
             if (invalidated_count < count) {
-                int iters = (count * 5) / 3;
-                for (int i = 0; i < iters; ++i) {
-                    int idx1 = random::Random_(count);
-                    int idx2 = random::Random_(count);
+                int32_t iters = ((int32_t)count * 5) / 3;
+                for (int32_t i = 0; i < iters; ++i) {
+                    int16_t idx1 = (int16_t)random::Random_(count);
+                    int16_t idx2 = (int16_t)random::Random_(count);
                     if (idx1 != idx2 && candidates[idx1] != -1 && candidates[idx2] != -1) {
                         int16_t temp = candidates[idx1];
                         candidates[idx1] = candidates[idx2];
@@ -277,7 +277,7 @@ namespace HAROLD {
                 }
 
                 int16_t wormhole_exit_id = -1;
-                int pick_counter = 1;
+                int16_t pick_counter = 1;
                 for (int i = 0; i < count; ++i) {
                     if (candidates[i] != -1) {
                         if (random::Random_(pick_counter) == 1) {
@@ -790,11 +790,9 @@ namespace HAROLD {
      * @address 004f1ab0
      */
     int16_t __cdecl XY_To_Star_Id_(int16_t x, int16_t y) {
-        int32_t count = (int32_t)MOX::_NUM_STARS + 1;
-
-        for (int32_t i = 0; i < count; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             if (MOX::_star[i].x == x && MOX::_star[i].y == y) {
-                return (int16_t)i;
+                return i;
             }
         }
 

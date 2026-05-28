@@ -260,7 +260,7 @@ namespace sound {
 
     int32_t __cdecl Play_Sound_(int32_t resource_id);
 
-    void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx);
+    void __cdecl Fadeout_Sound_(int32_t channel_idx, int32_t volume_idx);
 
     void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch);
 

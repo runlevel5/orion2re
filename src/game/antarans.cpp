@@ -466,28 +466,31 @@ namespace antarans {
     }
 
     bool __cdecl Antarans_Should_Attack_() {
-        Delta_Stardate_();
+        (void)Delta_Stardate_();
 
         bool should_attack = false;
 
-        int16_t defensive_force = Antaran_Total_Resources_();
+        int16_t total_resources = Antaran_Total_Resources_();
         int16_t offensive_force = Antaran_Offensive_Force_();
 
-        // Offensive force must be at least 1/4 of defensive force to consider an attack
-        if ((int32_t)offensive_force * 4 < (int32_t)defensive_force) {
+        // Offensive force must be at least 1/4 of total resources to consider an attack.
+        if ((int32_t)offensive_force * 4 < (int32_t)total_resources) {
             return false;
         }
 
-        bool has_undeployed_ships = false;
-        for (int i = 0; i < 9; ++i) {
-            if (MOX::_antarans.offensive_ships[i] > MOX::_antarans.offensive_deployed[i]) {
-                has_undeployed_ships = true;
-                break;
+        bool found = false;
+        for (int16_t i = 0; i < 9 && !found; ++i) {
+            int32_t available_ships =
+                (int32_t)MOX::_antarans.offensive_ships[i] -
+                (int32_t)MOX::_antarans.offensive_deployed[i];
+
+            if (available_ships > 0) {
+                found = true;
             }
         }
 
         // If Antarans have ships that aren't already deployed elsewhere, build up pressure
-        if (has_undeployed_ships) {
+        if (found) {
             MOX::_antarans.attack_pressure++;
         }
 

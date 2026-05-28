@@ -1569,7 +1569,7 @@ namespace MAINSCR {
             sprintf(print_buffer, MOX::s_fmt_scanned_star_info, star->name, race_name);
         } else if (owner == -1) {
             for (int16_t i = 0; i < 8; ++i) {
-                if (i / 2 == 0) {
+                if (i < 2) {
                     text_colors.colors[i] = 0x08;
                 } else {
                     text_colors.colors[i] = 0x0C;
@@ -1578,7 +1578,7 @@ namespace MAINSCR {
             sprintf(print_buffer, MOX::s_fmt_s, star->name);
         } else if (owner == -2) {
             for (int16_t i = 0; i < 8; ++i) {
-                if (i / 2 == 0) {
+                if (i < 2) {
                     text_colors.colors[i] = 0x14;
                 } else {
                     text_colors.colors[i] = 0x1F;
@@ -1587,7 +1587,9 @@ namespace MAINSCR {
             sprintf(print_buffer, MOX::s_fmt_contested, star->name);
         }
 
-        fonts::Set_Font_Style_(2, &text_colors);
+        if (owner == -1 || owner == -2) {
+            fonts::Set_Font_Style_(2, &text_colors);
+        }
 
         s_movable_box box = MOX::_moveable_box[1];
         int16_t final_x = box.x + (int16_t)box.content_offset_x + 15;
@@ -2132,7 +2134,7 @@ namespace MAINSCR {
 
     void __cdecl Set_Reload_Fleet_Box_Palette_Flag_() {
         MOX::_mainscr_palette = 101;
-        MOX::_ship_icon_player_id = (uint16_t)-1;
+        MOX::_ship_icon_player_id = -1;
     }
 
     /**
@@ -2852,7 +2854,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Main_Screen_For_Zooming_() {
-        uint8_t color_table[8];
+        s_colors color_table;
         uint32_t saved_seed;
         int16_t width;
         int16_t height;
@@ -2861,13 +2863,13 @@ namespace MAINSCR {
 
         for (int16_t i = 0; i < 8; ++i) {
             if (i < 2 || i > 5) {
-                color_table[i] = 12;
+                color_table.colors[i] = 0x0C;
             }
             else if (i == 2 || i == 5) {
-                color_table[i] = 16;
+                color_table.colors[i] = 0x10;
             }
             else {
-                color_table[i] = 19;
+                color_table.colors[i] = 0x13;
             }
         }
 
@@ -2905,7 +2907,7 @@ namespace MAINSCR {
             _zoom_box_y,
             _zoom_box_x + width,
             _zoom_box_y + height,
-            reinterpret_cast<s_colors*>(color_table),
+            &color_table,
             static_cast<uint16_t>(_zoom_box_color_increment)
         );
 
@@ -2925,6 +2927,10 @@ namespace MAINSCR {
     }
 
     void __cdecl Toggle_Game_Option_(int16_t option_idx) {
+        if (option_idx < 0 || option_idx > 7 || option_idx == 3) {
+            return;
+        }
+
         char option_name[32];
         char message[100];
         int8_t status_flag;
@@ -2975,10 +2981,8 @@ namespace MAINSCR {
                 status_flag = MOX::_settings.show_relocation_lines;
                 break;
 
-            case 3:
             default:
-                status_flag = message[0];
-                break;
+                return;
         }
 
         const char* status_text = HAROLD::H_Message_(status_flag ? 0xe7 /* ON */ : 0xe8 /* OFF */);

@@ -659,8 +659,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             int row = MOX::_scroll_bar->first_visible_row + i;
             if (_planet_summary[row].colony_eta >= 0) {
                 Add_Colony_Ship_Icon_Field_(&_screen->colony_icons[i], i);
-                // Note: The original assembly writes a byte to the low byte of the short global_var.
-                MOX::_global_var = (int8_t)_screen->colony_icons[i];
+                // Preserve the original byte store from the field handle into _global_var.
+                memcpy(&MOX::_global_var, &_screen->colony_icons[i], sizeof(MOX::_global_var));
             }
             if (_planet_summary[row].outpost_eta >= 0) {
                 Add_Outpost_Ship_Icon_Field_(&_screen->output_icons[i], i);

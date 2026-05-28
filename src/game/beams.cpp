@@ -29,13 +29,12 @@ namespace BEAMS {
         Reset_Beam_Swapping_Colors_();
     }
 
-    s_animation_header* __cdecl Reflection_Field_Anims_(int32_t p1, int32_t p2) {
-        // The index calculation is performed in 16-bit registers in disassembly
-        int16_t entry_num = (int16_t)p2 * 5 + (int16_t)p1 + 89;
+    s_animation_header* __cdecl Reflection_Field_Anims_(int16_t p1, int16_t p2) {
+        int16_t entry_num = (int16_t)(p2 * 5 + p1 + 0x59);
 
         return (s_animation_header*)buffer::Buffer_Reload_(
             COLONY::_BEAMS_LBX,
-            static_cast<int32_t>(entry_num),
+            (int32_t)entry_num,
             MOX::_global_cache_seg
         );
     }

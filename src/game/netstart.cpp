@@ -1,5 +1,27 @@
 #include "pch.h"
 
+#pragma pack(push, 1)
+struct s_load_net_screen_packet {
+    int16_t begin_state;
+    uint8_t field2_0x2;
+    uint8_t field3_0x3;
+    uint8_t field4_0x4;
+    uint8_t field5_0x5;
+    int32_t network_ids[8];
+    uint8_t field38_0x26;
+    uint8_t field39_0x27;
+    int8_t number_of_players;
+    uint8_t field41_0x29;
+    uint8_t field42_0x2a;
+    uint8_t field43_0x2b;
+    uint8_t field44_0x2c;
+    uint8_t field45_0x2d;
+    char version_string[50];
+};
+#pragma pack(pop)
+
+static_assert(sizeof(s_load_net_screen_packet) == 0x60, "s_load_net_screen_packet size mismatch");
+
 namespace NETSTART {
     int8_t __cdecl Net_Select_Race_() {
         uint8_t fade_flag;
@@ -630,7 +652,7 @@ namespace NETSTART {
     uint8_t __cdecl Load_Net_Screen_() {
         uint8_t fade_flag = 0;
         int8_t status[8] = { 0 };
-        uint8_t payload[96] = { 0 };
+        s_load_net_screen_packet payload = {};
         uint8_t user_list[256];
 
         NETMOX::_net.sync_state = 36;
@@ -685,23 +707,24 @@ namespace NETSTART {
             NETMOX::_net.network_sync_complete_flag = 0;
         }
 
-        int16_t player_0 = MULTPLAY::Choose_Network_Plyrs_Screen_(reinterpret_cast<int16_t*>(payload), status, 0, 1);
+        int16_t choose_result = MULTPLAY::Choose_Network_Plyrs_Screen_(&payload.begin_state, status, 0, 1);
         
         fields::Clear_Fields_();
         fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
 
-        if (player_0 == -1) {
+        if (choose_result == -1) {
             NETMOX::_net.sync_state = 0;
             MOX::_current_screen = 15;
             return 0;
         }
 
+        int16_t player_0 = payload.begin_state;
         status[player_0] = 1;
         MOX::_player[player_0].network_player_id = NETMOX::_net.net_host_id;
         NETMOX::_net.joining_net_id = -1;
         MOX::_PLAYER_NUM = player_0;
 
-        payload[0] = 0;
+        payload.begin_state = 0;
 
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Wait_For_New_Joiners_Screen_, 2);
 
@@ -743,14 +766,14 @@ namespace NETSTART {
             if (NETMOX::_net.joining_net_id == -1) {
                 if (NETMOX::_net.num_connected_players == connected_count ||
                     (connected_count == 2 && (NETMOX::_net.mode == 1 || NETMOX::_net.mode == 2))) {
-                    payload[0] = 1;
+                    payload.begin_state = 1;
                 } else {
                     if (netcode::Net_Get_Users_(nullptr) == connected_count) {
                         if (fields::Get_Input_() == MOX::_mp_screen->field_id_begin) {
                             if (NETMOX::_net.num_connected_players > connected_count) {
-                                payload[0] = (uint8_t)GENDRAW::Confirmation_Box_(_really_begin_game_with_unused_slots_msg);
+                                payload.begin_state = (int16_t)(uint8_t)GENDRAW::Confirmation_Box_(_really_begin_game_with_unused_slots_msg);
                             } else {
-                                payload[0] = 1;
+                                payload.begin_state = 1;
                             }
                         }
                     }
@@ -761,7 +784,7 @@ namespace NETSTART {
             MULTPLAY::Draw_Wait_For_New_Joiners_Screen_();
             RUSS::Mox_Sync_Update_();
 
-            if (payload[0] != 0) {
+            if (payload.begin_state != 0) {
                 break;
             }
         }
@@ -821,15 +844,15 @@ namespace NETSTART {
             }
         }
 
-        payload[40] = static_cast<uint8_t>(MOX::_NUM_PLAYERS);
+        payload.number_of_players = (int8_t)MOX::_NUM_PLAYERS;
         if (MOX::_NUM_PLAYERS > 0) {
             for (int32_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                *reinterpret_cast<int32_t*>(&payload[6 + i * 4]) = static_cast<int32_t>(MOX::_player[i].network_player_id);
+                payload.network_ids[i] = MOX::_player[i].network_player_id;
             }
         }
 
-        sprintf(reinterpret_cast<char*>(&payload[46]), s__s_00551130, s_Mar_26_1997_005578e0);
-        NETMOX::Mox_Send_Message_(0x7FFE, 42, payload, 96);
+        sprintf(payload.version_string, s__s_00551130, s_Mar_26_1997_005578e0);
+        NETMOX::Mox_Send_Message_(0x7FFE, 42, &payload, sizeof(payload));
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
         transprt::_num_net_players = NETMOX::_net.num_connected_players;

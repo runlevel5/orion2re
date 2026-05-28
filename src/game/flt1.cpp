@@ -19,18 +19,18 @@ namespace FLT1 {
     }
 
     void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t param_1) {
-        int16_t local_6;
-        int16_t local_8;
-        int16_t local_a;
+        int16_t damage_width;
+        int16_t damage_y_off;
+        int16_t damage_x_off;
 
         if (param_1 == 0x1d) {
-            local_a = 3;
-            local_6 = 0x39;
-            local_8 = 0x39;
+            damage_width = 3;
+            damage_y_off = 0x39;
+            damage_x_off = 0x39;
         } else {
-            local_6 = 0x38;
-            local_8 = 0x39;
-            local_a = 1;
+            damage_x_off = 0x38;
+            damage_y_off = 0x39;
+            damage_width = 1;
         }
 
         int16_t index_global = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
@@ -53,10 +53,12 @@ namespace FLT1 {
             int16_t y;
             FLT2::Get_Fltscrn_Big_Icon_XY_(index, &x, &y);
 
-            int16_t half_w_diff = (0x39 - width) / 2;
-            int16_t half_h_diff = (0x39 - height) / 2;
+            int32_t width_diff = 0x39 - width;
+            int16_t half_w_diff = (int16_t)((width_diff - (width_diff >> 31)) >> 1);
+            int32_t height_diff = 0x39 - height;
+            int16_t half_h_diff = (int16_t)((height_diff - (height_diff >> 31)) >> 1);
 
-            HACCESS::Ship_Owner_(ship_idx);
+            (void)HACCESS::Ship_Owner_(ship_idx);
 
             if (MOX::_scanned_big_ship == index_global && MOX::_current_screen == 4) {
                 Draw_Box_Around_Scanned_Ship_(index_global);
@@ -72,14 +74,14 @@ namespace FLT1 {
                     draw_y = y - 1;
                     draw_x = x - 1;
                 }
-                animate::Draw_(draw_x, draw_y, (s_animation_header*)MOX::_selected_box_seg);
+                animate::Draw_(draw_x, draw_y, MOX::_selected_box_seg);
             }
 
             pic_seg = KEN::Get_Ship_Id_Picture_Seg_(ship_idx);
             animate::Draw_(x + half_w_diff + 1, y + half_h_diff + 2, pic_seg);
 
             if (HACCESS::Is_Combat_Ship_(ship_idx)) {
-                FLEETPOP::Draw_Damage_Bars_(x, y, local_6, local_8, local_a, ship_idx);
+                FLEETPOP::Draw_Damage_Bars_(x, y, damage_width, damage_y_off, damage_x_off, ship_idx);
             }
 
             index++;
@@ -192,15 +194,13 @@ namespace FLT1 {
             int16_t owner = HACCESS::Ship_Stack_Owner_(node_idx);
 
             if (owner < 8) {
-                uint8_t color = static_cast<uint8_t>(MOX::_player[owner].color);
+                uint8_t color = MOX::_player[owner].color;
                 animate::Reset_Animation_Frame_(MOX::_fltscrn_small_ship_icon_seg[color]);
                 anim = MOX::_fltscrn_small_ship_icon_seg[color];
             } else {
                 int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
                 int8_t ship_owner = MOX::_ship[ship_idx].owner;
-                // Note: Indexing _shield_div_bitmap with ship_owner >= 8 accesses memory adjacent to it.
-                // In the original binary, this effectively resolves to pointers in _fltscrn_monster_ship_icon.
-                animate::Reset_Animation_Frame_(reinterpret_cast<s_animation_header**>(MOX::_shield_div_bitmap)[ship_owner]);
+                animate::Reset_Animation_Frame_(MOX::_fltscrn_monster_ship_icon[ship_owner - 8]);
                 anim = MOX::_fltscrn_monster_ship_icon[ship_owner - 8];
             }
 
@@ -381,7 +381,7 @@ namespace FLT1 {
 
         if (FLT1::_relocate_button_mode != 1) {
             if (mouse::Mouse_Button_() == 1) {
-                int16_t icon_limit = (int16_t)MOX::_big_icon_display_rows * (int16_t)MOX::_big_icon_display_columns;
+                int16_t icon_limit = MOX::_big_icon_display_rows * (int16_t)MOX::_big_icon_display_columns;
                 int16_t start_idx = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
 
                 for (int16_t i = 0; i < icon_limit; ++i) {
@@ -448,8 +448,8 @@ namespace FLT1 {
             animate::Draw_(342, 430, (s_animation_header*)MOX::_dimmed_officers_button_seg);
         }
 
-        int16_t next_idx = MOX::_multi_colored_line_start + 1;
-        MOX::_multi_colored_line_start = (int16_t)(((abs(next_idx) & 7) ^ (next_idx < 0 ? -1 : 0)) - (next_idx < 0 ? -1 : 0));
+        int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
+        MOX::_multi_colored_line_start = (int16_t)(next_idx % 8);
     }
 
     void Fleet_Screen_() {
@@ -1122,10 +1122,10 @@ namespace FLT1 {
         MOX::_dimmed_relocate_button_seg = farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 14, MOX::_screen_seg);
         MOX::_dimmed_scrap_button_seg = farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 15, MOX::_screen_seg);
         MOX::_dimmed_officers_button_seg = farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 16, MOX::_screen_seg);
-        MOX::_selected_box_seg = farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 17, MOX::_screen_seg);
+        MOX::_selected_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 17, MOX::_screen_seg);
         MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 18, MOX::_screen_seg);
 
-        MOX::_temp_officers_pict = (s_animation_header**)allocate::Allocate_Next_Block_(MOX::_screen_seg, 67 /* 0x43 */);
+        MOX::_temp_officers_pict = (s_animation_header**)allocate::Allocate_Next_Block_(MOX::_screen_seg, 67 * sizeof(s_animation_header*));
         FLT1::Allocate_Fltscrn_Next_Screen_Seg_();
 
         for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
