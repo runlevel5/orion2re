@@ -217,7 +217,7 @@ namespace DIP_SCRN {
             fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_normal_colors);
 
             DIP_SCRN::_chat_message[0] = *DIP_SCRN::s__00551100;
-            *reinterpret_cast<char*>(0x00572C18) = *DIP_SCRN::s__00551100;
+            DIP_SCRN::_continuous_string = *DIP_SCRN::s__00551100;
 
             DIP_SCRN::_diplomacy_quit_chat_field = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, DIP_SCRN::s__00551100, 0);
 

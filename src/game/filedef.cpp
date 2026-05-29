@@ -180,11 +180,11 @@ namespace FILEDEF {
         if (header_val != 0xe0) {
             const char* fmt = nullptr;
             switch (MOX::_settings.language) {
-            case 0: fmt = reinterpret_cast<const char*>(0x005568A0); break;
-            case 1: fmt = reinterpret_cast<const char*>(0x00556844); break;
-            case 2: fmt = reinterpret_cast<const char*>(0x005567D4); break;
-            case 3: fmt = reinterpret_cast<const char*>(0x0055677C); break;
-            case 4: fmt = reinterpret_cast<const char*>(0x00556720); break;
+            case 0: fmt = s_invalid_save_slot_english; break;
+            case 1: fmt = s_invalid_save_slot_german; break;
+            case 2: fmt = s_invalid_save_slot_french; break;
+            case 3: fmt = s_invalid_save_slot_spanish; break;
+            case 4: fmt = s_invalid_save_slot_italian; break;
             }
             if (fmt) {
                 sprintf(err_msg, fmt, save_idx + 1);

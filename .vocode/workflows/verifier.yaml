@@ -73,6 +73,7 @@ workflows:
           * If a global/field is loaded via MOV AL (or AX) / zero-extension / masked to 0xFF, treat unsignedness as suspect and verify the declaration.”
           * Exclude validate.txt, report.txt, and similar validation artifacts from search commands.
           * Make sure to verify all switch case side effects and loop exits.
+          * If a variable is no longer pointing to a raw address in memory, you must validate its type, size and its default value against Ghidra project.
 
           # EXCEPTIONS
           * Be extra careful with `platform` namespace - there were custom adjustments to support windowed mode and implementation might be slightly different from original code.

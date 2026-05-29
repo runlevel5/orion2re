@@ -73,6 +73,7 @@ workflows:
           * All structures are guaranteed to be packed to a byte in the project.
           * Source project inlined a lot of primitive functions, such as memset, memcpy, strcpy and others. Restored code must use existing library functions instead of hand-rolled loops.
           * Even though this is a C++ project, we're restoring C codebase and prefer C-style type casts.
+          * If a variable is no longer pointing to a raw address in memory, you must validate its type, size and its default value against Ghidra project.
 
           # EXCEPTIONS
           * Be extra careful with `platform` namespace - there were custom adjustments to support windowed mode and implementation might be slightly different from original code.

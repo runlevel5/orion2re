@@ -358,8 +358,8 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        auto receive_msg_ptr = reinterpret_cast<void*>(std::uintptr_t{0x00513f40});
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(receive_msg_ptr), &NETMOX::_net) == 0) {
+        void* receive_msg_ptr = (void*)NETMOX::Receive_Message_;
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETSTART::GUID_0054F150, receive_msg_ptr, &NETMOX::_net) == 0) {
             NETMOX::_net.sync_state = 0;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;

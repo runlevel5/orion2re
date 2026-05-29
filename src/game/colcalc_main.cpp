@@ -76,47 +76,47 @@ namespace COLCALC {
             debug += sprintf(debug, (const char*)0x00551130, (const char*)0x0055A8A4);
             debug += sprintf(debug, (const char*)0x00551130, (const char*)0x0055110C);
 
-            debug += sprintf(debug, (const char*)0x0055A894,
+            debug += sprintf(debug, s_fmt_plus_d_pct_s_s,
                 _morale_lookup_table[govt] * 5, _government_morale_msg, msg_barracks);
 
             if (no_capital_penalty != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     no_capital_penalty * 5, _no_capital_msg);
 
             if (mixed_race_penalty != 0)
-                debug += sprintf(debug, (const char*)0x0055A87C,
+                debug += sprintf(debug, s_fmt_d_pct_s,
                     mixed_race_penalty * 5, _mixed_races_msg);
 
             if (barracks_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     barracks_bonus * 5, TECHDATA::_buildings[BUILDING_ARMOR_BARRACKS].name);
 
             if (marine_barracks_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     marine_barracks_bonus * 5, TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].name);
 
             if (psychophysics_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     psychophysics_bonus * 5, TECHDATA::_technology_applications[TECH_APP_PSIONICS].name);
 
             if (holo_simulator_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     holo_simulator_bonus * 5, TECHDATA::_buildings[BUILDING_HOLO_SIMULATOR].name);
 
             if (vr_network_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     vr_network_bonus * 5, TECHDATA::_technology_applications[TECH_APP_VIRTUAL_REALITY_NETWORK].name);
 
             if (pleasure_dome_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     pleasure_dome_bonus * 5, TECHDATA::_buildings[BUILDING_PLEASURE_DOME].name);
 
             if (leader_bonus != 0)
-                debug += sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     leader_bonus * 5, _leader_bonus_msg);
 
             debug += sprintf(debug, (const char*)0x0055136C);
-            sprintf(debug, (const char*)0x0055A888,
+            sprintf(debug, s_fmt_plus_d_pct_s,
                 colony->morale * 5, _total_morale_msg);
         }
     }
@@ -729,10 +729,10 @@ namespace COLCALC {
             bool advance_field = true;
             if (plr->traits[TRAIT_CREATIVE] != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
                 auto& field_data = TECHDATA::_technology_fields[static_cast<uint8_t>(plr->current_research_field)];
-                uint16_t* field_techs = field_data.tech;
+                int16_t* field_techs = field_data.tech;
 
                 for (int i = 0; i < 4; ++i) {
-                    if (field_techs[i] != static_cast<uint16_t>(tech_app_id) && plr->tech_applications[field_techs[i]] == 1) {
+                    if (field_techs[i] != tech_app_id && plr->tech_applications[field_techs[i]] == 1) {
                         advance_field = false;
                         plr->current_research_application = static_cast<char>(field_techs[i]);
                     }

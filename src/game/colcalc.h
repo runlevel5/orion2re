@@ -174,6 +174,9 @@ namespace COLCALC {
     inline char*& _base_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B2C});
 
     inline const char* const s_T_15_65 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8A4}); // "T+15,+65."
+    inline const char* const s_fmt_plus_d_pct_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A894}); // "\t%+d%%\t%s%s\r"
+    inline const char* const s_fmt_plus_d_pct_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A888}); // "\t%+d%%\t%s\r"
+    inline const char* const s_fmt_d_pct_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A87C}); // "\t%d%%\t%s\r"
     inline const char* const s_fmt_s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
     inline const char* const s_0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // "0"
     inline const char* const s_fmt_plus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8DC}); // "\t%+d\t%s\r"
@@ -235,7 +238,7 @@ namespace COLCALC {
 
     void __cdecl Eliminate_Player_(s_player* player);
 
-    bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx);
+    bool __cdecl May_Surrender_Empire_(int16_t player_idx, int16_t target_idx);
 
     int32_t __cdecl Sort_star_weights_(const void* a, const void* b);
 

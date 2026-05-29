@@ -126,13 +126,14 @@ namespace COLCALC {
                     pool_remaining = 0;
                 }
 
-                int max_design_idx = 0;
-                if (starting_ship_points >= 0) {
+                int max_design_idx;
+                if (starting_ship_points < 0) {
+                    max_design_idx = 0;
+                } else {
                     max_design_idx = starting_ship_points;
-                    if (starting_ship_points >= 4) {
-                        if (player->tech_applications[TECH_APP_TITAN_CONSTRUCTION] == 3) {
-                            max_design_idx = 4;
-                        } else {
+                    if (max_design_idx >= 4) {
+                        max_design_idx = 4;
+                        if (player->tech_applications[TECH_APP_TITAN_CONSTRUCTION] != 3) {
                             max_design_idx = 3;
                         }
                     }
@@ -144,16 +145,14 @@ namespace COLCALC {
                         break;
                     }
 
-                    int ship_design = max_design_idx;
-                    if (pool_remaining - 1 < ship_design) {
-                        ship_design = pool_remaining - 1;
+                    if (pool_remaining - 1 < max_design_idx) {
+                        max_design_idx = pool_remaining - 1;
                     }
 
                     MOX::_ship[MOX::_NUM_SHIPS].owner = (int8_t)i;
                     INITSHIP::Update_Player_Ship_Designs_((int16_t)i);
-                    COLBLDG::Create_Ship_((int16_t)i, (int16_t)ship_design, first_colony);
 
-                    pool_remaining -= (ship_design + 1);
+                    pool_remaining -= (max_design_idx + 1);
                 }
             }
             All_Colony_Calculations_();
@@ -213,8 +212,8 @@ namespace COLCALC {
             if (c_idx == -1) continue;
 
             s_colony* colony = &MOX::_colony[c_idx];
-            uint8_t owner = colony->owner;
-            uint8_t owner_bit = 1 << owner;
+            int8_t owner = colony->owner;
+            uint8_t owner_bit = (uint8_t)(1 << (owner & 0x1F));
 
             col->has_colony |= owner_bit;
 
@@ -289,12 +288,12 @@ namespace COLCALC {
     }
 
     void __cdecl Surrender_Empire_(int16_t player_id, int16_t target_id) {
-        MOX::_player[player_id].surrender_to = (char)target_id;
+        MOX::_player[player_id].surrender_to = (int8_t)target_id;
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-                if (MOX::_player[i].surrender_to == (char)player_id) {
-                    MOX::_player[i].surrender_to = (char)target_id;
+                if (MOX::_player[i].surrender_to == (int8_t)player_id) {
+                    MOX::_player[i].surrender_to = (int8_t)target_id;
                 }
             }
         }
@@ -302,7 +301,7 @@ namespace COLCALC {
         if (MOX::_player[target_id].surrender_to != -1) {
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-                    if (MOX::_player[i].surrender_to == (char)target_id) {
+                    if (MOX::_player[i].surrender_to == (int8_t)target_id) {
                         MOX::_player[i].surrender_to = MOX::_player[target_id].surrender_to;
                     }
                 }
@@ -322,8 +321,8 @@ namespace COLCALC {
         }
     }
 
-    bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx) {
-        if (MOX::_player[player_idx].surrender_to != target_idx && MOX::_player[target_idx].surrender_to == -1) {
+    bool __cdecl May_Surrender_Empire_(int16_t player_idx, int16_t target_idx) {
+        if (MOX::_player[player_idx].surrender_to != (int8_t)target_idx && MOX::_player[target_idx].surrender_to == -1) {
             return true;
         }
         return false;
@@ -1404,7 +1403,7 @@ namespace COLCALC {
         int owned_count = 0;
 
         s_tech_field_data* field = &TECHDATA::_technology_fields[field_idx];
-        uint16_t* techs = field->tech;
+        int16_t* techs = field->tech;
 
         for (int i = 0; i < 4; ++i) {
             int tech_id = (int)(int16_t)techs[i];
@@ -1467,9 +1466,9 @@ namespace COLCALC {
             }
 
             techs_known = 0;
-            uint16_t* techs_in_field = TECHDATA::_technology_fields[field_idx].tech;
+            int16_t* techs_in_field = TECHDATA::_technology_fields[field_idx].tech;
             for (int i = 0; i < 4; ++i) {
-                uint16_t tech_id = techs_in_field[i];
+                int16_t tech_id = techs_in_field[i];
                 if (tech_id > 0 && player_tech_applications[tech_id] == 1) {
                     techs_known++;
                 }
@@ -2219,7 +2218,7 @@ namespace COLCALC {
 
     bool __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t recipient_idx) {
         if (MOX::_player[player_idx].home_planet_id != -1) {
-            if (MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index == (char)star_idx) {
+            if (MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index == star_idx) {
                 return false;
             }
         }
@@ -2243,7 +2242,7 @@ namespace COLCALC {
         // Verify player has colonies in other star systems
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
             // has_colony is a bitmask of players present in the system
-            if ((MOX::_star[i].has_colony >> (uint8_t)player_idx) & 1) {
+            if (((uint8_t)MOX::_star[i].has_colony >> (uint8_t)player_idx) & 1) {
                 if (&MOX::_star[i] != &MOX::_star[star_idx]) {
                     has_other_colony = true;
                 }
@@ -2349,9 +2348,9 @@ namespace COLCALC {
 
             if (get_all) {
                 // Creative players or forced breakthrough: get all available technologies in the field
-                uint16_t* techs = TECHDATA::_technology_fields[field_id].tech;
+                int16_t* techs = TECHDATA::_technology_fields[field_id].tech;
                 for (int i = 0; i < 4; ++i) {
-                    uint16_t tech_id = techs[i];
+                    int16_t tech_id = techs[i];
                     // tech_applications[id] == 1 usually means it was just researched but not yet applied
                     if (tech_id > 0 && player->tech_applications[tech_id] == 1) {
                         Player_Gets_Tech_App_(player, (int16_t)tech_id);
@@ -2464,10 +2463,10 @@ namespace COLCALC {
             int divisor = 1;
             int numerator = (player->tech_fields[i] == 3) ? 1 : 0;
 
-            uint16_t* techs = field.tech;
+            int16_t* techs = field.tech;
 
             for (int j = 0; j < 4; ++j) {
-                uint16_t tech_id = techs[j];
+                int16_t tech_id = techs[j];
                 if (tech_id > 0) {
                     divisor++;
                     if (player->tech_applications[tech_id] == 3) {

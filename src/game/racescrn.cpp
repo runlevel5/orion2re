@@ -418,7 +418,7 @@ namespace RACESCRN {
         fields::Clear_Fields_Above_(field_id_base);
 
         int16_t x_offset = 0;
-        auto race_picture = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558128});
+        int16_t* race_picture = _race_picture;
 
         for (int16_t i = 0; i < (int16_t)MOX::_active_count; ++i) {
             if (i == 4) {

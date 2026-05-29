@@ -122,7 +122,7 @@ namespace WINNET {
     }
 
     int32_t __cdecl Init_Providers_() {
-        void* callback = reinterpret_cast<void*>(std::uintptr_t{0x005385c0}); /* WINNET::Enumerate_Providers_ */
+        void* callback = (void*)Enumerate_Providers_;
         DPLAY_DLL::Ordinal_2(callback, platform::g_main_window);
         return 0;
     }

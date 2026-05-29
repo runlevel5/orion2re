@@ -3,7 +3,7 @@
 namespace assert {
 
     int __cdecl hgetch_() {
-        fonts::PSTRS_(0, 24, reinterpret_cast<char*>(std::uintptr_t{0x00558490}));
+        fonts::PSTRS_(0, 24, s__00558490);
 
         int key = __getch();
 
@@ -15,7 +15,7 @@ namespace assert {
             capture::Screen_Flic_Capture_();
         }
 
-        fonts::PSTRS_(0, 24, reinterpret_cast<char*>(std::uintptr_t{0x00558488}));
+        fonts::PSTRS_(0, 24, s__00558488);
 
         return key;
     }

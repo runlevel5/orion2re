@@ -373,7 +373,7 @@ namespace newtech {
         }
     }
 
-    int32_t __cdecl Choose_Tech_Application_(int16_t player_idx) {
+    int16_t __cdecl Choose_Tech_Application_(int16_t player_idx) {
         uint32_t tech_values[212] = { 0 };
         uint32_t weighted_choices[212] = { 0 };
         uint32_t max_weighted_choice = 0;

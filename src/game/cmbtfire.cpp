@@ -1711,7 +1711,7 @@ namespace CMBTFIRE {
         int32_t sound_handle;
         int16_t speed_step;
         int16_t loop_counter;
-        const char* s_cmbtsfx_lbx_local = reinterpret_cast<const char*>(std::uintptr_t{0x00551228}); // "cmbtsfx.lbx"
+        const char* s_cmbtsfx_lbx_local = COMBINIT::s_cmbtsfx_lbx_00551228;
 
         if (MOX::_apply_damage_to_planet != 0 && MOX::_super_fast_flag == 0) {
             anim_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F /* 47 */, MOX::_global_cache_seg);

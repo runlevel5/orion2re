@@ -22,5 +22,5 @@ namespace newtech {
 
     int32_t __cdecl Choose_Hyper_Advanced_Tech_();
 
-    int32_t __cdecl Choose_Tech_Application_(int16_t player_idx);
+    int16_t __cdecl Choose_Tech_Application_(int16_t player_idx);
 }

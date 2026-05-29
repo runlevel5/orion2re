@@ -358,9 +358,9 @@ namespace SCIENCE {
 
             TECH::Technology_Fields_Name_(research_field);
 
-            const uint16_t* field_tech_ids = SCIENCE::_technology_fields[research_field].tech;
+            const int16_t* field_tech_ids = SCIENCE::_technology_fields[research_field].tech;
             for (int tech_slot = 0; tech_slot < 4; ++tech_slot) {
-                const uint16_t tech_id = field_tech_ids[tech_slot];
+                const int16_t tech_id = field_tech_ids[tech_slot];
                 if (tech_id > 0 && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
                     researched_tech_ids[found_count++] = (int16_t)tech_id;
                 }

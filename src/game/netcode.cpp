@@ -13,8 +13,8 @@ namespace netcode {
         _connection_type = mode;
 
         if (mode == 0) {
-            time_::_time = reinterpret_cast<time_::Fn>(0x00534A70);  /* time::time_ */
-            time_::_time2 = reinterpret_cast<time_::Fn>(0x00534A70); /* time::time_ */
+            time_::_time = time_::time_;
+            time_::_time2 = time_::time_;
 
             result = WINNET::Init_Connection_(1);
             WINNET::Refresh_Game_List_(guid);

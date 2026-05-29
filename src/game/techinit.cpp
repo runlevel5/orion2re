@@ -172,7 +172,7 @@ int16_t __cdecl Tech_Is_Legal_For_Player_(int16_t player_idx, int16_t tech_id) {
 
 void __cdecl Init_Player_Tech_(int16_t player_idx) {
   s_player *player = &MOX::_player[player_idx];
-  int16_t starting_tech_count;
+  int16_t starting_tech_count = 0;
 
   player->tech_fields[0x12] = 2;
   player->tech_fields[0x37] = 2;
@@ -193,6 +193,8 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   case 2:
     starting_tech_count = 25;
     break;
+  default:
+    break;
   }
 
   player->tech_fields[0] = 3;
@@ -206,7 +208,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
       } else if ((player->traits[0x15] == 0 || tech_field_id == -1 ||
                   TECHDATA::_technology_fields[tech_field_id].cost == 0x32 ||
                   tech_field_id == 0x17) &&
-                 TECHINIT::Tech_Is_Legal_For_Player_(player_idx, static_cast<int16_t>(app_idx))) {
+                 TECHINIT::Tech_Is_Legal_For_Player_(player_idx, app_idx)) {
         player->tech_applications[app_idx] = 1;
       } else {
         player->tech_applications[app_idx] = 0;
@@ -248,7 +250,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   player->tech_applications[0] = 0;
 
   for (int field_idx = 1; field_idx < 0x4A; ++field_idx) {
-    const uint16_t *field_tech_ids = TECHDATA::_technology_fields[field_idx].tech;
+    const int16_t *field_tech_ids = TECHDATA::_technology_fields[field_idx].tech;
     int missing_count = 0;
     bool has_app = false;
 
@@ -257,7 +259,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     }
 
     for (int slot = 0; slot < 4; ++slot) {
-      int16_t tech_app_id = static_cast<int16_t>(field_tech_ids[slot]);
+      int16_t tech_app_id = field_tech_ids[slot];
       if (tech_app_id == 0) {
         break;
       }
@@ -273,7 +275,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
       int16_t tech_app_id;
       do {
         int random_slot = random::Random_(missing_count) - 1;
-        tech_app_id = static_cast<int16_t>(field_tech_ids[random_slot]);
+        tech_app_id = field_tech_ids[random_slot];
       } while (!TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id));
 
       player->tech_applications[tech_app_id] = 1;
@@ -296,13 +298,13 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   for (int tier = 0; tier < starting_tech_count; ++tier) {
     if (tier < 6) {
       int16_t field_id = TECHDATA::_starting_tech_field_ids[tier];
-      const uint16_t *field_tech_ids = TECHDATA::_technology_fields[field_id].tech;
+      const int16_t *field_tech_ids = TECHDATA::_technology_fields[field_id].tech;
 
       player->tech_fields[field_id] = 3;
       player->tech_fields[TECHDATA::_technology_fields[field_id].next_field_id] = 2;
 
       for (int slot = 0; slot < 4; ++slot) {
-        int16_t tech_app_id = static_cast<int16_t>(field_tech_ids[slot]);
+        int16_t tech_app_id = field_tech_ids[slot];
         if (tech_app_id == 0) {
           break;
         }
@@ -312,9 +314,9 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
         }
       }
     } else {
-      int16_t selected_app = static_cast<int16_t>(newtech::Choose_Tech_Application_(player_idx));
+      int16_t selected_app = newtech::Choose_Tech_Application_(player_idx);
       int16_t field_id = TECHDATA::_technology_applications[selected_app].tech_field_id;
-      const uint16_t *field_tech_ids = TECHDATA::_technology_fields[field_id].tech;
+      const int16_t *field_tech_ids = TECHDATA::_technology_fields[field_id].tech;
 
       player->tech_fields[field_id] = 3;
       player->tech_fields[TECHDATA::_technology_fields[field_id].next_field_id] = 2;
@@ -323,7 +325,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
         player->tech_applications[selected_app] = 3;
       } else {
         for (int slot = 0; slot < 4; ++slot) {
-          int16_t tech_app_id = static_cast<int16_t>(field_tech_ids[slot]);
+          int16_t tech_app_id = field_tech_ids[slot];
           if (tech_app_id == 0) {
             break;
           }
@@ -403,7 +405,7 @@ void __cdecl Init_Tech_() {
 
         if (tech_field_id != 0 && tech_field_id != -1 && tech_field_id != 0x4A) {
             s_tech_field_data& tech_field = TECHDATA::_technology_fields[tech_field_id];
-            uint16_t* tech_slots[4] = {
+            int16_t* tech_slots[4] = {
                 &tech_field.tech[0],
                 &tech_field.tech[1],
                 &tech_field.tech[2],
@@ -423,7 +425,7 @@ void __cdecl Init_Tech_() {
                 strcat(message, s_tech_has_too_many_apps_0055a97c);
                 exitm::Exit_With_Message(message);
             } else {
-                *tech_slots[free_slot] = static_cast<uint16_t>(tech_app_index);
+                *tech_slots[free_slot] = tech_app_index;
             }
         }
 

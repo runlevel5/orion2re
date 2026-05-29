@@ -102,6 +102,7 @@ namespace DIP_SCRN {
 
     inline uint8_t& DAT_005a8712 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8712});
     inline uint8_t& DAT_005a8744 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8744});
+    inline char& _continuous_string = *reinterpret_cast<char*>(std::uintptr_t{0x00572C18});
 
     int16_t __cdecl Check_Better_Offer_Available_(int16_t player_idx, int16_t other_player_idx);
 

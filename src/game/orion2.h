@@ -3271,7 +3271,7 @@ struct s_player {
     short cur_map_x;
     short cur_map_y;
     char council_voted_for;
-    char surrender_to;
+    int8_t surrender_to;
     short time_since_last_lucky_event;
     char has_galactic_lore;
     char warned_about_cheating_player;
@@ -4819,7 +4819,7 @@ struct s_star_data {
     int8_t twinkling1;
     int8_t twinkling2;
     byte not_used3;
-    char surrender_to[8];
+    int8_t surrender_to[8];
     byte in_nebula;
     byte artifacts_gave_app;
 };
@@ -4939,7 +4939,7 @@ struct s_tech_field_data {
     short tech_field_id;
     short prev_field_id;
     short next_field_id;
-    ushort tech[4];
+    int16_t tech[4];
     uint cost;
     byte ai_group;
 };

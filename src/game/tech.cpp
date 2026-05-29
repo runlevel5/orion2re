@@ -457,9 +457,9 @@ namespace TECH {
 
             if (tech_field_id < 75 /* 0x4B */) {
                 int visible_app_count = 0;
-                uint16_t* techs = _technology_fields[tech_field_id].tech;
+                int16_t* techs = _technology_fields[tech_field_id].tech;
                 for (int app_index = 0; app_index < 4; ++app_index) {
-                    uint16_t app_id = techs[app_index];
+                    int16_t app_id = techs[app_index];
                     if (MOX::_cur_plyr_ptr->tech_applications[app_id] == 1) {
                         strcpy(item->app_names[visible_app_count], Technology_Applications_Name_(app_id, MOX::_PLAYER_NUM));
                         item->app_ids[visible_app_count] = app_id;
@@ -950,7 +950,7 @@ namespace TECH {
             if (status != 3) {
                 if (status == 0) {
                     for (int i = 0; i < 4; ++i) {
-                        uint16_t tech_id = _technology_fields[field_id].tech[i];
+                        int16_t tech_id = _technology_fields[field_id].tech[i];
 
                         if (MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
                             status = 1;
@@ -962,7 +962,7 @@ namespace TECH {
                 if (status >= 1) {
                     uint8_t app_count = 0;
                     for (int i = 0; i < 4; ++i) {
-                        uint16_t tech_id = _technology_fields[field_id].tech[i];
+                        int16_t tech_id = _technology_fields[field_id].tech[i];
 
                         uint8_t app_status = MOX::_cur_plyr_ptr->tech_applications[tech_id];
 
