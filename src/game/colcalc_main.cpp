@@ -73,8 +73,8 @@ namespace COLCALC {
                 return;
             }
 
-            debug += sprintf(debug, (const char*)0x00551130, (const char*)0x0055A8A4);
-            debug += sprintf(debug, (const char*)0x00551130, (const char*)0x0055110C);
+            debug += sprintf(debug, s_fmt_s_00551130, s_T_15_65);
+            debug += sprintf(debug, s_fmt_s_00551130, s_0);
 
             debug += sprintf(debug, s_fmt_plus_d_pct_s_s,
                 _morale_lookup_table[govt] * 5, _government_morale_msg, msg_barracks);
@@ -115,7 +115,7 @@ namespace COLCALC {
                 debug += sprintf(debug, s_fmt_plus_d_pct_s,
                     leader_bonus * 5, _leader_bonus_msg);
 
-            debug += sprintf(debug, (const char*)0x0055136C);
+            debug += sprintf(debug, s_newline_0055136c);
             sprintf(debug, s_fmt_plus_d_pct_s,
                 colony->morale * 5, _total_morale_msg);
         }
