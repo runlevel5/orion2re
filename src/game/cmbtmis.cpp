@@ -1201,7 +1201,8 @@ namespace CMBTMIS {
     }
 
     int16_t __cdecl Get_Missile_Hits_(int16_t missile_id, int16_t ship_idx, uint16_t flags) {
-        int16_t hits;
+        // Unmapped or out-of-range missile IDs fall back to returning the original missile_id.
+        int16_t hits = missile_id;
         int16_t armor_idx;
         int16_t absorption;
 
@@ -1232,25 +1233,25 @@ namespace CMBTMIS {
             case 0x1C: // 28
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
                 absorption = TECHDATA::_armor[armor_idx].ships_bonus;
-                hits = (int16_t)(((absorption * 3 + 300) * 2) / 200);
+                hits = (int16_t)((((int32_t)absorption * 3) + 300) * 2 / 200);
                 break;
 
             case 0x1D: // 29
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
                 absorption = TECHDATA::_armor[armor_idx].ships_bonus;
-                hits = (int16_t)(((absorption * 5 + 500) * 2) / 200);
+                hits = (int16_t)((((int32_t)absorption * 5) + 500) * 2 / 200);
                 break;
 
             case 0x1E: // 30
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
                 absorption = TECHDATA::_armor[armor_idx].ships_bonus;
-                hits = (int16_t)((absorption * 8 + 800) / 200);
+                hits = (int16_t)((((int32_t)absorption * 8) + 800) / 200);
                 break;
 
             case 0x1F: // 31
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
                 absorption = TECHDATA::_armor[armor_idx].ships_bonus;
-                hits = (int16_t)((absorption * 4 + 400) / 200);
+                hits = (int16_t)((((int32_t)absorption * 4) + 400) / 200);
                 break;
 
             default:

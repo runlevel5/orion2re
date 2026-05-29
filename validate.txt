@@ -211,7 +211,7 @@
 [X] 00412420 - Set_Planet_Selection_Popup_Help_List_
 [X] 00412430 - Set_Officer_Information_Popup_Help_List_
 [X] 00412440 - Points_On_Same_Side_Of_Line_
-[ ] 004124B0 - Point_Within_D_Of_Seg_
+[.] 004124B0 - Point_Within_D_Of_Seg_
 [X] 004127F0 - Collect_Black_Holes_
 [X] 00412840 - Black_Hole_Blocks_Points_
 [X] 004128E0 - Initialize_Black_Hole_Blocks_
@@ -1299,7 +1299,7 @@
 [X] 0046EE10 - Ship_In_Black_Hole_
 [X] 0046EE40 - Draw_Teleporting_Ship_
 [X] 0046F0B0 - Rotate_Ship_Until_Impact_
-[ ] 0046F350 - Ship_In_Legal_Square_
+[.] 0046F350 - Ship_In_Legal_Square_
 [X] 0046F3F0 - Test_Move_Until_Impact_
 [V] 0046F810 - Move_Ship_
 [X] 00470070 - Get_Facing_
@@ -2843,19 +2843,19 @@
 [V] 004F0640 - Confirm_Planet_And_Star_Index_Link_
 [X] 004F0760 - Contact_With_One_Colony_
 [X] 004F07F0 - Contact_With_Player_
-[ ] 004F0840 - Decrement_Zoom_Count_
+[.] 004F0840 - Decrement_Zoom_Count_
 [X] 004F0860 - Empty_System_
 [X] 004F0880 - Get_Map_Scale_
 [X] 004F0910 - Get_Player_Font_Colors_
 [X] 004F0A30 - Get_Scaled_Value_
 [X] 004F0A50 - Get_Up_Scaled_Value_
 [X] 004F0A70 - Habitable_Spectral_Class_
-[ ] 004F0AA0 - Harold_Defaults_
+[.] 004F0AA0 - Harold_Defaults_
 [X] 004F0DD0 - Harold_Init_
 [X] 004F0E20 - Increment_Zoom_Count_
 [X] 004F0E50 - Increment_Zoom_Count_With_Limit_
 [X] 004F0E90 - Init_Fleet_Movement_Box_
-[ ] 004F0ED0 - Init_Moving_Boxes_
+[.] 004F0ED0 - Init_Moving_Boxes_
 [X] 004F0F60 - Init_System_Display_Box_
 [X] 004F0FD0 - Is_Colony_Star_
 [X] 004F1030 - Is_Home_Star_
@@ -3065,392 +3065,392 @@
 [X] 00500070 - Retarget_Missile_
 [X] 00500280 - Fighter_Ocv_
 [X] 005002F0 - Missile_Dcv_
-[.] 00500410 - Get_Missile_Hits_
+[V] 00500410 - Get_Missile_Hits_
 [X] 00500580 - Fighter_Combat_SFX_
 [X] 005009A0 - AI_Invasion_Will_Succeed_
 [X] 00500AC0 - Has_Defending_Troops_
-[.] 00500B20 - Allocate_Data_Space_
-[.] 00500C80 - AI_Tech_Select_
-[.] 00500D00 - Player_Best_Ship_Shield_
-[.] 00500D30 - Player_Best_Armor_
-[.] 00500D60 - Player_Best_Computer_
-[.] 00500D90 - Player_Best_Fuel_
-[.] 00500DC0 - Player_Best_Planetary_Shield_
-[.] 00500E00 - Player_Best_Drive_
-[.] 00500E30 - Player_Best_Rifle_
-[.] 00500E60 - Player_Best_Personal_Shield_
-[.] 00500E90 - Compute_AI_Tech_Info_
-[.] 005014C0 - All_AI_Tech_Select_
-[.] 00501590 - Get_Max_Technology_Value_
-[.] 005015F0 - System_Proximity_Count_
-[.] 00501690 - Apply_Evolutionary_Upgrades_
-[.] 00501730 - Add_Net_Next_Turn_Fields_
-[.] 00501900 - Add_Waiting_For_Joiners_Field_
-[ ] 00501950 - Choose_Multi_Network_Game_Screen_
+[X] 00500B20 - Allocate_Data_Space_
+[X] 00500C80 - AI_Tech_Select_
+[X] 00500D00 - Player_Best_Ship_Shield_
+[X] 00500D30 - Player_Best_Armor_
+[X] 00500D60 - Player_Best_Computer_
+[X] 00500D90 - Player_Best_Fuel_
+[X] 00500DC0 - Player_Best_Planetary_Shield_
+[X] 00500E00 - Player_Best_Drive_
+[X] 00500E30 - Player_Best_Rifle_
+[X] 00500E60 - Player_Best_Personal_Shield_
+[X] 00500E90 - Compute_AI_Tech_Info_
+[X] 005014C0 - All_AI_Tech_Select_
+[X] 00501590 - Get_Max_Technology_Value_
+[X] 005015F0 - System_Proximity_Count_
+[X] 00501690 - Apply_Evolutionary_Upgrades_
+[X] 00501730 - Add_Net_Next_Turn_Fields_
+[X] 00501900 - Add_Waiting_For_Joiners_Field_
+[X] 00501950 - Choose_Multi_Network_Game_Screen_
 [.] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
 [.] 00501C80 - Choose_Network_Plyrs_Screen_
-[.] 00501F50 - Add_Choose_Net_Plyrs_Fields_
-[.] 00502150 - Add_Banner_Field_
-[.] 00502210 - Draw_Net_Next_Turn_Screen_
-[.] 00502930 - Draw_Choose_Net_Plyrs_Screen_
-[.] 00502D70 - Draw_Generic_Net_Info_Screen_
-[.] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
+[X] 00501F50 - Add_Choose_Net_Plyrs_Fields_
+[X] 00502150 - Add_Banner_Field_
+[X] 00502210 - Draw_Net_Next_Turn_Screen_
+[X] 00502930 - Draw_Choose_Net_Plyrs_Screen_
+[X] 00502D70 - Draw_Generic_Net_Info_Screen_
+[X] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
 [.] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
-[.] 005031D0 - Draw_Fill_Seg_
-[.] 00503260 - Draw_Multi_Player_Banner_
-[.] 00503390 - Draw_SendGet_Net_Info_Screen_
-[.] 00503560 - Draw_Wait_For_New_Joiners_Screen_
-[.] 00503740 - Draw_Wait_For_Race_Info_Screen_
-[.] 00503920 - Get_Main_Palette_Base_Colors_
-[.] 005039A0 - Get_Player_Colors_
-[.] 00503A50 - Hotseat_Select_Player_
-[.] 00503D30 - Hotseat_Add_Next_Player_Fields_
-[.] 00503E30 - Hotseat_Draw_Next_Player_
-[.] 00504190 - Hotseat_Load_Next_Player_
-[.] 00504300 - Hotseat_Get_Colors_
-[.] 005043F0 - Hotseat_Get_N_Valid_Players_
-[.] 00504420 - Hotseat_Print_Player_Data_
-[.] 00504500 - Fade_In_Function_
-[.] 00504520 - Hotseat_Set_Next_Player_Status_
-[.] 005045F0 - Hotseat_Player_Status_
-[.] 00504640 - Load_Net_Next_Turn_Screen_
-[.] 00504830 - Get_Net_Next_Turn_Player_Colors_
-[.] 00504A10 - Load_Choose_Net_Plyrs_Screen_
-[.] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
-[.] 00504C70 - Set_Default_Modem_Settings_
-[.] 00504D20 - Load_Multi_Player_Game_Screen_
-[.] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
-[.] 005050A0 - Get_Valid_MP_Save_Games_
+[X] 005031D0 - Draw_Fill_Seg_
+[X] 00503260 - Draw_Multi_Player_Banner_
+[X] 00503390 - Draw_SendGet_Net_Info_Screen_
+[X] 00503560 - Draw_Wait_For_New_Joiners_Screen_
+[X] 00503740 - Draw_Wait_For_Race_Info_Screen_
+[X] 00503920 - Get_Main_Palette_Base_Colors_
+[X] 005039A0 - Get_Player_Colors_
+[X] 00503A50 - Hotseat_Select_Player_
+[X] 00503D30 - Hotseat_Add_Next_Player_Fields_
+[X] 00503E30 - Hotseat_Draw_Next_Player_
+[X] 00504190 - Hotseat_Load_Next_Player_
+[X] 00504300 - Hotseat_Get_Colors_
+[X] 005043F0 - Hotseat_Get_N_Valid_Players_
+[X] 00504420 - Hotseat_Print_Player_Data_
+[X] 00504500 - Fade_In_Function_
+[X] 00504520 - Hotseat_Set_Next_Player_Status_
+[X] 005045F0 - Hotseat_Player_Status_
+[X] 00504640 - Load_Net_Next_Turn_Screen_
+[X] 00504830 - Get_Net_Next_Turn_Player_Colors_
+[X] 00504A10 - Load_Choose_Net_Plyrs_Screen_
+[X] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
+[X] 00504C70 - Set_Default_Modem_Settings_
+[X] 00504D20 - Load_Multi_Player_Game_Screen_
+[X] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
+[X] 005050A0 - Get_Valid_MP_Save_Games_
 [.] 005050D0 - Draw_Load_MP_Game_Screen_
-[.] 00505510 - Do_Get_Valid_MP_Save_Games_
-[.] 00505560 - Load_Load_MP_Game_Screen_
-[.] 005056F0 - Multi_Player_Screen_
-[.] 00505C10 - Add_MP_Setup_Screen_Fields_
+[X] 00505510 - Do_Get_Valid_MP_Save_Games_
+[X] 00505560 - Load_Load_MP_Game_Screen_
+[X] 005056F0 - Multi_Player_Screen_
+[X] 00505C10 - Add_MP_Setup_Screen_Fields_
 [.] 00506010 - Warning_Box_Has_Opponent_Pressed_
-[.] 00506030 - Draw_MP_Setup_Screen_
-[.] 005062B0 - Load_MP_Setup_Pictures_
-[.] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
-[.] 00506600 - Modem_Setup_Screen_
-[.] 005069A0 - Add_Modem_Setup_Fields2_
-[.] 00506BD0 - Add_Modem_Setup_Fields_
-[.] 00506D40 - Check_Modem_Init_Help_Fields_
-[.] 00506E50 - Draw_Modem_Setup_Screen_
-[.] 005072B0 - Print_Modem_Strings_
+[X] 00506030 - Draw_MP_Setup_Screen_
+[X] 005062B0 - Load_MP_Setup_Pictures_
+[X] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
+[X] 00506600 - Modem_Setup_Screen_
+[X] 005069A0 - Add_Modem_Setup_Fields2_
+[X] 00506BD0 - Add_Modem_Setup_Fields_
+[X] 00506D40 - Check_Modem_Init_Help_Fields_
+[X] 00506E50 - Draw_Modem_Setup_Screen_
+[X] 005072B0 - Print_Modem_Strings_
 [.] 005073A0 - Load_Modem_Setup_Screen_
-[.] 00507510 - NullModem_Setup_Screen_
-[.] 00507720 - Add_NullModem_Setup_Fields_
-[.] 00507920 - Draw_NullModem_Setup_Screen_
+[X] 00507510 - NullModem_Setup_Screen_
+[X] 00507720 - Add_NullModem_Setup_Fields_
+[X] 00507920 - Draw_NullModem_Setup_Screen_
 [.] 00507CE0 - Load_NullModem_Setup_Screen_
-[.] 00507E80 - Reload_Generating_Map_Info_
-[.] 00507EA0 - Reload_Generic_Net_Info_
-[.] 00507FE0 - Reload_Getting_Data_Info_
-[.] 00508000 - Reload_Initializing_Net_Info_
-[.] 00508020 - Reload_Join_Net_Screen_
-[.] 00508040 - Reload_Sending_Data_Info_
-[.] 00508080 - Reload_Wait_For_Race_Info_
+[X] 00507E80 - Reload_Generating_Map_Info_
+[X] 00507EA0 - Reload_Generic_Net_Info_
+[X] 00507FE0 - Reload_Getting_Data_Info_
+[X] 00508000 - Reload_Initializing_Net_Info_
+[X] 00508020 - Reload_Join_Net_Screen_
+[X] 00508040 - Reload_Sending_Data_Info_
+[X] 00508080 - Reload_Wait_For_Race_Info_
 [.] 005080A0 - Reload_Waiting_For_Joiners_Screen_
-[.] 005080F0 - Chat_Box_Input_Loop_
-[.] 005081D0 - Set_Multi_Player_Game_Type_
+[X] 005080F0 - Chat_Box_Input_Loop_
+[X] 005081D0 - Set_Multi_Player_Game_Type_
 [.] 00508300 - Change_MP_Game_Name_
-[.] 00508480 - Load_FP_Data_From_LBX_
+[X] 00508480 - Load_FP_Data_From_LBX_
 [.] 005084E0 - N_Fire_Points_
 [.] 00508550 - Calc_FP_Offsets_
-[.] 00508670 - Base_Generic_Dcv_
-[.] 005086E0 - Base_Generic_Ocv_
-[.] 00508730 - Satelite_Strength_Vs_Ships_
-[.] 00508990 - Modified_Weapon_Strength_
-[.] 00508A50 - Strength_Hits_Modifier_
-[.] 00508A90 - Ship_Strength_Vs_Ships_In_Nebula_
-[.] 00508AB0 - Ship_Strength_Vs_Ships_
-[.] 00508AD0 - Ship_Strength_Vs_Shield_
-[.] 00508E10 - Current_Ship_Hits_
-[.] 00508E50 - Max_Ship_Hits_
-[.] 00508F00 - Ship_Strength_Vs_Planetary_Shield_
-[.] 00509080 - Missile_Base_Strength_
-[.] 00509110 - Phasor_Base_Strength_
-[.] 005091C0 - Fighter_Garrison_Strength_
-[.] 005092D0 - Colony_Ground_Strength_Vs_Player_
-[.] 00509390 - Colony_Space_Strength_Vs_Player_
+[X] 00508670 - Base_Generic_Dcv_
+[X] 005086E0 - Base_Generic_Ocv_
+[X] 00508730 - Satelite_Strength_Vs_Ships_
+[X] 00508990 - Modified_Weapon_Strength_
+[X] 00508A50 - Strength_Hits_Modifier_
+[X] 00508A90 - Ship_Strength_Vs_Ships_In_Nebula_
+[X] 00508AB0 - Ship_Strength_Vs_Ships_
+[X] 00508AD0 - Ship_Strength_Vs_Shield_
+[X] 00508E10 - Current_Ship_Hits_
+[X] 00508E50 - Max_Ship_Hits_
+[X] 00508F00 - Ship_Strength_Vs_Planetary_Shield_
+[X] 00509080 - Missile_Base_Strength_
+[X] 00509110 - Phasor_Base_Strength_
+[X] 005091C0 - Fighter_Garrison_Strength_
+[X] 005092D0 - Colony_Ground_Strength_Vs_Player_
+[X] 00509390 - Colony_Space_Strength_Vs_Player_
 [.] 005093F0 - Get_Best_Ship_Shield_Value_
-[.] 00509480 - Clear_Last_App_Desc_
-[.] 005094A0 - Create_Ship_
-[.] 00509750 - Has_Prod_In_Queue_
-[.] 00509780 - Get_Setting_Description_String_
-[.] 005097F0 - Clear_Last_App_Description_String_
-[.] 00509800 - Get_App_Description_String_
+[X] 00509480 - Clear_Last_App_Desc_
+[X] 005094A0 - Create_Ship_
+[X] 00509750 - Has_Prod_In_Queue_
+[X] 00509780 - Get_Setting_Description_String_
+[X] 005097F0 - Clear_Last_App_Description_String_
+[X] 00509800 - Get_App_Description_String_
 [.] 00509880 - Option_String_
-[.] 00509A30 - N_Prods_In_Colony_Queue_
-[.] 00509A80 - Calculate_Building_Array_
-[.] 00509B30 - qsort_building_by_name_
-[.] 00509B80 - Draw_Buildings_List_
-[.] 00509C80 - Calc_Font_Off_
-[.] 00509CA0 - Get_Font_Off_For_Buildings_
+[X] 00509A30 - N_Prods_In_Colony_Queue_
+[X] 00509A80 - Calculate_Building_Array_
+[X] 00509B30 - qsort_building_by_name_
+[X] 00509B80 - Draw_Buildings_List_
+[X] 00509C80 - Calc_Font_Off_
+[X] 00509CA0 - Get_Font_Off_For_Buildings_
 [.] 00509D60 - Draw_Militarys_List_
-[.] 00509FA0 - Get_Font_Off_For_Military_
-[.] 0050A020 - Add_Buildings_Fields_
-[.] 0050A0B0 - Add_Militarys_Fields_
-[.] 0050A140 - Load_Build_Anims_
-[.] 0050A1B0 - Draw_Building_Info_
-[.] 0050A290 - Print_App_Description_
-[.] 0050A370 - Draw_Building_Centered_In_Window_
+[X] 00509FA0 - Get_Font_Off_For_Military_
+[X] 0050A020 - Add_Buildings_Fields_
+[X] 0050A0B0 - Add_Militarys_Fields_
+[X] 0050A140 - Load_Build_Anims_
+[X] 0050A1B0 - Draw_Building_Info_
+[X] 0050A290 - Print_App_Description_
+[X] 0050A370 - Draw_Building_Centered_In_Window_
 [.] 0050A3B0 - Build_Weapon_String_
 [.] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
-[.] 0050ABE0 - Draw_Ship_Design_Info_
+[X] 0050ABE0 - Draw_Ship_Design_Info_
 [.] 0050AD10 - Draw_Ship_Design_Info2_
-[.] 0050AD80 - Draw_Ship_Info_
+[X] 0050AD80 - Draw_Ship_Info_
 [.] 0050AE50 - Draw_Active_Prod_
-[.] 0050B090 - Auto_Design_Type_
-[.] 0050B0C0 - First_Prod_Colony_Queue_Slot_
-[.] 0050B1C0 - First_Prod_Queue_Slot_
+[X] 0050B090 - Auto_Design_Type_
+[X] 0050B0C0 - First_Prod_Colony_Queue_Slot_
+[X] 0050B1C0 - First_Prod_Queue_Slot_
 [.] 0050B270 - Delete_From_Colony_Queue_
-[.] 0050B2D0 - Delete_Ship_
-[.] 0050B300 - Delete_Prod_From_Colony_Queue_
-[.] 0050B340 - Clear_Colony_Queue_
-[.] 0050B360 - Squish_Out_Colony_Queue_Slot_
-[.] 0050B3E0 - Remove_Ships_
-[.] 0050B4D0 - Do_Exit_Screen_Cleanup_
+[X] 0050B2D0 - Delete_Ship_
+[X] 0050B300 - Delete_Prod_From_Colony_Queue_
+[X] 0050B340 - Clear_Colony_Queue_
+[X] 0050B360 - Squish_Out_Colony_Queue_Slot_
+[X] 0050B3E0 - Remove_Ships_
+[X] 0050B4D0 - Do_Exit_Screen_Cleanup_
 [.] 0050B520 - Evaluate_Input_
-[.] 0050BFF0 - Do_Draw_Build_Queue_
-[.] 0050C020 - N_Prods_In_Queue_
-[.] 0050C050 - Star_N_Uncolonized_Worlds_
-[.] 0050C0E0 - Calculate_Military_Array_
-[.] 0050C570 - Something_Behind_Settting_
-[.] 0050C5C0 - Add_To_Queue_
-[.] 0050CBD0 - Colbldg_Create_Ship_
-[.] 0050CC20 - Get_Prod_Queue_Len_
-[.] 0050CC50 - Delete_From_Queue_
-[.] 0050CE20 - Defragment_Queue_
-[.] 0050CE60 - Squish_Out_Queue_Slot_
-[.] 0050CEB0 - Add_Refited_Ship_To_Queue_
-[.] 0050D070 - Insert_Before_Queue_Slot_
-[.] 0050D170 - Selection_Name_
-[.] 0050D220 - Draw_Icon_
-[.] 0050D240 - Draw_Current_Selection_
-[.] 0050DC10 - Print_Setting_Description_
-[.] 0050DC80 - Print_Selection_Centered_
-[.] 0050DCA0 - Draw_Cost_And_Time_Info_
-[.] 0050DEB0 - Draw_Build_Queue_Popup_
-[.] 0050E060 - Draw_Build_Queue_
-[.] 0050E240 - Update_Fields_
-[.] 0050E440 - Add_Build_Queue_Fields_
-[.] 0050E490 - Build_Queue_Popup_
-[.] 0050E7D0 - Build_Arrays_
-[.] 0050E7E0 - Check_For_Saved_Games_
-[.] 0050E910 - Do_Load_Game_Popup_
+[X] 0050BFF0 - Do_Draw_Build_Queue_
+[X] 0050C020 - N_Prods_In_Queue_
+[X] 0050C050 - Star_N_Uncolonized_Worlds_
+[X] 0050C0E0 - Calculate_Military_Array_
+[X] 0050C570 - Something_Behind_Settting_
+[X] 0050C5C0 - Add_To_Queue_
+[X] 0050CBD0 - Colbldg_Create_Ship_
+[X] 0050CC20 - Get_Prod_Queue_Len_
+[X] 0050CC50 - Delete_From_Queue_
+[X] 0050CE20 - Defragment_Queue_
+[X] 0050CE60 - Squish_Out_Queue_Slot_
+[X] 0050CEB0 - Add_Refited_Ship_To_Queue_
+[X] 0050D070 - Insert_Before_Queue_Slot_
+[X] 0050D170 - Selection_Name_
+[X] 0050D220 - Draw_Icon_
+[X] 0050D240 - Draw_Current_Selection_
+[X] 0050DC10 - Print_Setting_Description_
+[X] 0050DC80 - Print_Selection_Centered_
+[X] 0050DCA0 - Draw_Cost_And_Time_Info_
+[X] 0050DEB0 - Draw_Build_Queue_Popup_
+[X] 0050E060 - Draw_Build_Queue_
+[X] 0050E240 - Update_Fields_
+[X] 0050E440 - Add_Build_Queue_Fields_
+[X] 0050E490 - Build_Queue_Popup_
+[X] 0050E7D0 - Build_Arrays_
+[X] 0050E7E0 - Check_For_Saved_Games_
+[X] 0050E910 - Do_Load_Game_Popup_
 [.] 0050EBF0 - Add_Game_Popup_Fields_
 [.] 0050F4C0 - Bad_Game_File_Message_
-[.] 0050F530 - Game_Popup_User_Box_
-[.] 0050F5D0 - Restore_Game_Popup_
-[.] 0050F630 - Restore_Main_Screen_
-[.] 0050F650 - Get_File_Date_String_
-[.] 0050F730 - Get_Game_Popup_Colors_
-[.] 0050F7D0 - Get_Save_Game_Date_Strings_
-[.] 0050F8D0 - Get_Star_Date_Strings_
-[.] 0050FA10 - Load_Month_Names_
-[.] 0050FC70 - Animate_Game_Popup_Pic_Height_
-[.] 0050FCA0 - Animate_Game_Popup_
-[.] 0050FE50 - _Draw_Load_Save_Game_Popup_To_Bitmap_
-[.] 0050FE70 - _Draw_Main_Game_Popup_To_Bitmap_
-[.] 0050FEC0 - _Draw_Options_Game_Popup_To_Bitmap_
-[.] 0050FEE0 - _Draw_Load_Save_Game_Popup_
-[.] 00510420 - _Draw_Main_Game_Popup_
+[X] 0050F530 - Game_Popup_User_Box_
+[X] 0050F5D0 - Restore_Game_Popup_
+[X] 0050F630 - Restore_Main_Screen_
+[X] 0050F650 - Get_File_Date_String_
+[X] 0050F730 - Get_Game_Popup_Colors_
+[X] 0050F7D0 - Get_Save_Game_Date_Strings_
+[X] 0050F8D0 - Get_Star_Date_Strings_
+[X] 0050FA10 - Load_Month_Names_
+[X] 0050FC70 - Animate_Game_Popup_Pic_Height_
+[X] 0050FCA0 - Animate_Game_Popup_
+[X] 0050FE50 - _Draw_Load_Save_Game_Popup_To_Bitmap_
+[X] 0050FE70 - _Draw_Main_Game_Popup_To_Bitmap_
+[X] 0050FEC0 - _Draw_Options_Game_Popup_To_Bitmap_
+[X] 0050FEE0 - _Draw_Load_Save_Game_Popup_
+[X] 00510420 - _Draw_Main_Game_Popup_
 [.] 00510750 - _Draw_Options_Game_Popup_
-[.] 00510DB0 - _Game_Popup_
-[.] 00511020 - Allocate_Data_Space_For_Game_Popup_
-[.] 005110A0 - Do_Main_Game_Popup_
-[.] 005113F0 - Do_Options_Game_Popup_
+[X] 00510DB0 - _Game_Popup_
+[X] 00511020 - Allocate_Data_Space_For_Game_Popup_
+[X] 005110A0 - Do_Main_Game_Popup_
+[X] 005113F0 - Do_Options_Game_Popup_
 [.] 00511530 - Do_Save_Game_Popup_
-[.] 00511930 - Load_Game_Popup_Pictures_
-[.] 00511C50 - Animate_Game_Popup_Pic_
-[.] 00511C70 - Set_Current_Game_Option_Flags_
-[ ] 00511E80 - Update_Game_Settings_
+[X] 00511930 - Load_Game_Popup_Pictures_
+[X] 00511C50 - Animate_Game_Popup_Pic_
+[X] 00511C70 - Set_Current_Game_Option_Flags_
+[X] 00511E80 - Update_Game_Settings_
 [.] 00511F40 - Mainmenu_Load_Game_Popup_
-[.] 00511FF0 - Load_Mainmenu_Load_Game_Popup_
-[.] 005120E0 - Set_Up_Load_Save_Popup_
-[.] 00512200 - Active_Save_Slot_Invalid_
-[.] 00512230 - Remove_Embedded_Special_Codes_
-[.] 00512290 - Embed_Special_Color_Codes_
-[.] 00512320 - Auto_Load_Last_Saved_Game_
-[.] 005123D0 - Auto_Save_Last_Saved_Game_
-[.] 00512490 - Draw_Popup_Pic1_
-[.] 005124C0 - Draw_Popup_Pic2_
-[.] 005124F0 - Set_Music_For_Game_Popup_
-[.] 00512590 - Set_Sound_For_Game_Popup_
-[.] 00512640 - Add_Galaxy_Map_Fields_2_
-[.] 005127B0 - Add_Moveable_Box_Fields_
-[.] 00512870 - Add_Whole_Window_Field_
-[.] 005128D0 - Box_Field_Selected_
-[.] 00512940 - Box_Fleet_Screen_Scanned_Star_
-[.] 005129D0 - Clear_Moveable_Box_Fields_
+[X] 00511FF0 - Load_Mainmenu_Load_Game_Popup_
+[X] 005120E0 - Set_Up_Load_Save_Popup_
+[X] 00512200 - Active_Save_Slot_Invalid_
+[X] 00512230 - Remove_Embedded_Special_Codes_
+[X] 00512290 - Embed_Special_Color_Codes_
+[X] 00512320 - Auto_Load_Last_Saved_Game_
+[X] 005123D0 - Auto_Save_Last_Saved_Game_
+[X] 00512490 - Draw_Popup_Pic1_
+[X] 005124C0 - Draw_Popup_Pic2_
+[X] 005124F0 - Set_Music_For_Game_Popup_
+[X] 00512590 - Set_Sound_For_Game_Popup_
+[X] 00512640 - Add_Galaxy_Map_Fields_2_
+[X] 005127B0 - Add_Moveable_Box_Fields_
+[X] 00512870 - Add_Whole_Window_Field_
+[X] 005128D0 - Box_Field_Selected_
+[X] 00512940 - Box_Fleet_Screen_Scanned_Star_
+[X] 005129D0 - Clear_Moveable_Box_Fields_
 [.] 00512AB0 - Draw_Galaxy_Map_Box_
-[.] 00512F40 - Do_Fleet_Screen_Stuff_
+[X] 00512F40 - Do_Fleet_Screen_Stuff_
 [.] 00512F90 - Box_Fleet_Screen_Scanned_Ship_
 [.] 00512FD0 - Do_Officer_Screen_Stuff_
-[.] 005132B0 - Box_Officer_Screen_Chosen_Star_
-[.] 005133A0 - Box_Officer_Screen_Scanned_Star_
-[.] 00513440 - Draw_Moveable_Box_
-[.] 00513510 - Get_Galaxy_Map_Space_XY_
-[.] 005135B0 - Get_Galaxy_Map_Star_XY_
+[X] 005132B0 - Box_Officer_Screen_Chosen_Star_
+[X] 005133A0 - Box_Officer_Screen_Scanned_Star_
+[X] 00513440 - Draw_Moveable_Box_
+[X] 00513510 - Get_Galaxy_Map_Space_XY_
+[X] 005135B0 - Get_Galaxy_Map_Star_XY_
 [.] 00513680 - Move_Box_To_Top_
-[ ] 00513740 - Move_Moveable_Box_
-[.] 00513B00 - Moveable_Box_Dimensions_
-[.] 00513B90 - Moveable_Box_Selected_
-[.] 00513BC0 - N_Moveable_Boxes_Selected_
-[.] 00513C00 - Restore_Boxes_
-[.] 00513C80 - Box_Was_Open_
-[.] 00513C90 - Save_And_Remove_Boxes_
-[.] 00513D20 - Remove_Box_Check_
-[.] 00513D30 - Vanish_Fleet_Movement_Box_
-[.] 00513DB0 - Vanish_System_Display_Box_
-[.] 00513E10 - Mouse_Within_Fleet_Box_
-[.] 00513E80 - Load_Netmox_Strings_
-[.] 00513F40 - Receive_Message_
-[.] 00513FD0 - Main_Receive_Message_
+[X] 00513740 - Move_Moveable_Box_
+[X] 00513B00 - Moveable_Box_Dimensions_
+[X] 00513B90 - Moveable_Box_Selected_
+[X] 00513BC0 - N_Moveable_Boxes_Selected_
+[X] 00513C00 - Restore_Boxes_
+[X] 00513C80 - Box_Was_Open_
+[X] 00513C90 - Save_And_Remove_Boxes_
+[X] 00513D20 - Remove_Box_Check_
+[X] 00513D30 - Vanish_Fleet_Movement_Box_
+[X] 00513DB0 - Vanish_System_Display_Box_
+[X] 00513E10 - Mouse_Within_Fleet_Box_
+[X] 00513E80 - Load_Netmox_Strings_
+[X] 00513F40 - Receive_Message_
+[X] 00513FD0 - Main_Receive_Message_
 [.] 00514157 - caseD_1
-[.] 005141EC - caseD_2
-[.] 00514251 - caseD_3
-[.] 005142AC - caseD_4
-[.] 00514300 - caseD_5
-[.] 0051437F - caseD_6
-[.] 005143A2 - caseD_7
-[.] 005143C1 - caseD_8
-[.] 00514455 - caseD_9
-[.] 0051446E - caseD_a
-[.] 0051455F - caseD_b
-[.] 00514578 - caseD_c
-[.] 0051458A - caseD_d
+[X] 005141EC - caseD_2
+[X] 00514251 - caseD_3
+[X] 005142AC - caseD_4
+[X] 00514300 - caseD_5
+[X] 0051437F - caseD_6
+[X] 005143A2 - caseD_7
+[X] 005143C1 - caseD_8
+[X] 00514455 - caseD_9
+[X] 0051446E - caseD_a
+[X] 0051455F - caseD_b
+[X] 00514578 - caseD_c
+[X] 0051458A - caseD_d
 [.] 005145DB - caseD_e
-[.] 00514675 - caseD_f
-[.] 00514695 - caseD_10
+[X] 00514675 - caseD_f
+[X] 00514695 - caseD_10
 [.] 005146C4 - caseD_11
-[.] 00514702 - caseD_12
-[.] 0051472A - caseD_13
-[.] 0051473C - caseD_14
+[X] 00514702 - caseD_12
+[X] 0051472A - caseD_13
+[X] 0051473C - caseD_14
 [.] 005147AC - caseD_15
-[.] 005147D4 - caseD_16
-[.] 005147FE - caseD_17
-[.] 0051482B - caseD_18
-[.] 00514855 - caseD_19
+[X] 005147D4 - caseD_16
+[X] 005147FE - caseD_17
+[X] 0051482B - caseD_18
+[X] 00514855 - caseD_19
 [.] 00514867 - caseD_1a
-[.] 00514879 - caseD_1b
-[.] 005149B7 - caseD_1c
-[.] 00514AAA - caseD_1d
-[.] 00514ABC - caseD_1f
+[X] 00514879 - caseD_1b
+[X] 005149B7 - caseD_1c
+[X] 00514AAA - caseD_1d
+[X] 00514ABC - caseD_1f
 [.] 00514B4E - caseD_20
-[.] 00514B8B - caseD_21
-[.] 00514BCE - caseD_22
+[X] 00514B8B - caseD_21
+[X] 00514BCE - caseD_22
 [.] 00514C6A - caseD_23
-[.] 00514C99 - caseD_24
-[.] 00514CB6 - caseD_25
-[.] 00514CE3 - caseD_26
-[.] 00514D16 - caseD_27
+[X] 00514C99 - caseD_24
+[X] 00514CB6 - caseD_25
+[X] 00514CE3 - caseD_26
+[X] 00514D16 - caseD_27
 [.] 00514D46 - caseD_2a
-[.] 00514DFB - caseD_2b
-[.] 00514E3D - caseD_2c
-[.] 00514E8E - caseD_2d
+[X] 00514DFB - caseD_2b
+[X] 00514E3D - caseD_2c
+[X] 00514E8E - caseD_2d
 [.] 00514EB8 - caseD_2e
-[.] 00514F10 - caseD_2f
-[.] 00514F6B - caseD_30
-[.] 00514F88 - caseD_31
+[X] 00514F10 - caseD_2f
+[X] 00514F6B - caseD_30
+[X] 00514F88 - caseD_31
 [.] 00514F9A - caseD_32
-[.] 00514FF2 - caseD_33
+[X] 00514FF2 - caseD_33
 [.] 0051504D - caseD_34
-[.] 005150A5 - caseD_35
-[.] 00515100 - caseD_36
-[.] 00515119 - caseD_37
-[.] 0051513C - caseD_38
-[.] 0051515F - caseD_39
-[.] 005151BE - caseD_3a
-[.] 0051520F - caseD_3b
-[.] 0051523E - caseD_3c
-[.] 00515264 - caseD_3d
-[.] 00515282 - caseD_3e
-[.] 005152AF - caseD_3f
-[.] 005152C1 - caseD_40
-[.] 005152D3 - caseD_41
-[.] 005152E5 - caseD_42
-[.] 00515308 - caseD_43
-[.] 00515340 - caseD_44
-[.] 005153BB - caseD_64
-[.] 005153D6 - caseD_1e
-[.] 00515560 - Mox_Send_Message_
-[.] 00515690 - Exit_With_message2_
-[.] 005156A0 - Update_
-[.] 005156C0 - Mox_Net_Update_
-[.] 00515D10 - Make_Difference_Buffer_
-[.] 00515F90 - fseek_modem_file_
-[.] 00515FF0 - fgetc_modem_file_
-[.] 00516040 - Open_Modem_File_
-[.] 00516100 - Close_Modem_File_
-[.] 00516140 - Write_Modem_File_
-[.] 005161A0 - fwrite_modem_file_
-[ ] 00516220 - Broadcast_Game_Data_Differential_
+[X] 005150A5 - caseD_35
+[X] 00515100 - caseD_36
+[X] 00515119 - caseD_37
+[X] 0051513C - caseD_38
+[X] 0051515F - caseD_39
+[X] 005151BE - caseD_3a
+[X] 0051520F - caseD_3b
+[X] 0051523E - caseD_3c
+[X] 00515264 - caseD_3d
+[X] 00515282 - caseD_3e
+[X] 005152AF - caseD_3f
+[X] 005152C1 - caseD_40
+[X] 005152D3 - caseD_41
+[X] 005152E5 - caseD_42
+[X] 00515308 - caseD_43
+[X] 00515340 - caseD_44
+[X] 005153BB - caseD_64
+[X] 005153D6 - caseD_1e
+[X] 00515560 - Mox_Send_Message_
+[X] 00515690 - Exit_With_message2_
+[X] 005156A0 - Update_
+[X] 005156C0 - Mox_Net_Update_
+[X] 00515D10 - Make_Difference_Buffer_
+[X] 00515F90 - fseek_modem_file_
+[X] 00515FF0 - fgetc_modem_file_
+[X] 00516040 - Open_Modem_File_
+[X] 00516100 - Close_Modem_File_
+[X] 00516140 - Write_Modem_File_
+[X] 005161A0 - fwrite_modem_file_
+[.] 00516220 - Broadcast_Game_Data_Differential_
 [.] 005166A0 - Decode_Broadcast_Game_Data_Differential_
-[.] 00516AB0 - Decode_Difference_Buffer_
-[.] 00516C00 - fread_modem_file_
-[.] 00516C80 - Send_Game_Orders_
+[X] 00516AB0 - Decode_Difference_Buffer_
+[X] 00516C00 - fread_modem_file_
+[X] 00516C80 - Send_Game_Orders_
 [.] 005171C0 - Decode_Game_Orders_
-[.] 00517700 - Ditch_Leader_
-[.] 00517750 - Send_Pick_Target_Info_
-[.] 00517B90 - Decode_Pick_Target_Info_
+[X] 00517700 - Ditch_Leader_
+[X] 00517750 - Send_Pick_Target_Info_
+[X] 00517B90 - Decode_Pick_Target_Info_
 [.] 00517F50 - Send_You_Are_Target_Info_
-[.] 00518440 - Decode_You_Are_Target_Info_
-[.] 005187C0 - Russ_Event_Monster_Update_
+[X] 00518440 - Decode_You_Are_Target_Info_
+[X] 005187C0 - Russ_Event_Monster_Update_
 [.] 00518820 - Russ_Change_Relations_
-[.] 005188B0 - Send_Battle_Results_
-[.] 00518E30 - Decode_Battle_Results_
-[.] 005192B0 - Send_Pick_Your_Position_
-[.] 00519360 - Decode_Pick_Your_Position_
-[.] 005193A0 - Send_Dragon_Info_
-[.] 005193F0 - Decode_Dragon_Info_
-[.] 00519430 - Net_Id_To_Player_Id_
+[X] 005188B0 - Send_Battle_Results_
+[X] 00518E30 - Decode_Battle_Results_
+[X] 005192B0 - Send_Pick_Your_Position_
+[X] 00519360 - Decode_Pick_Your_Position_
+[X] 005193A0 - Send_Dragon_Info_
+[X] 005193F0 - Decode_Dragon_Info_
+[X] 00519430 - Net_Id_To_Player_Id_
 [.] 00519470 - Get_Next_AI_Talker_
-[.] 00519560 - Net_Request_AI_Diplomacy_
+[X] 00519560 - Net_Request_AI_Diplomacy_
 [.] 005195A0 - Net_May_Begin_AI_Diplomacy_
-[.] 005195D0 - Net_End_AI_Diplomacy_
-[.] 005196D0 - Net_Cancel_AI_Diplomacy_Request_
-[.] 00519720 - Net_Cancel_AI_Diplomacy_Confirmed_
-[.] 00519730 - No_AI_Diplomacy_Allowed_
-[.] 00519750 - Net_Request_Human_Diplomacy_
+[X] 005195D0 - Net_End_AI_Diplomacy_
+[X] 005196D0 - Net_Cancel_AI_Diplomacy_Request_
+[X] 00519720 - Net_Cancel_AI_Diplomacy_Confirmed_
+[X] 00519730 - No_AI_Diplomacy_Allowed_
+[X] 00519750 - Net_Request_Human_Diplomacy_
 [.] 005198D0 - Net_May_Begin_Human_Diplomacy_
-[.] 00519950 - Allowed_To_Cancel_Human_Diplomacy_
-[.] 00519960 - Net_Cancel_Human_Diplomacy_Request_
-[.] 005199C0 - Human_Hit_Next_Turn_
-[.] 005199D0 - Net_End_Human_Diplomacy_
-[.] 005199E0 - Human_Diplomat_Says_Wait_
-[.] 005199F0 - Net_Diplomacy_With_
-[.] 00519A00 - Human_Requesting_Diplomacy_
-[.] 00519A80 - Accept_Diplomacy_Request_
-[.] 00519B80 - Refuse_Diplomacy_Request_
-[.] 00519C10 - Tell_Diplomacy_Requester_To_Wait_
-[.] 00519C40 - Humans_Requesting_Diplomacy_
-[.] 00519C50 - Net_Human_Rejected_Diplomacy_
-[.] 00519C70 - Decode_Drop_Out_Info_
-[.] 00519D50 - Human_Abdicates_
-[.] 00519D60 - Send_Drop_Out_Info_
-[.] 00519E90 - Human_Surrenders_
-[.] 00519EA0 - Assign_Home_Star_Names_
-[.] 00519F90 - Dist_Between_Stars_
+[X] 00519950 - Allowed_To_Cancel_Human_Diplomacy_
+[X] 00519960 - Net_Cancel_Human_Diplomacy_Request_
+[X] 005199C0 - Human_Hit_Next_Turn_
+[X] 005199D0 - Net_End_Human_Diplomacy_
+[X] 005199E0 - Human_Diplomat_Says_Wait_
+[X] 005199F0 - Net_Diplomacy_With_
+[X] 00519A00 - Human_Requesting_Diplomacy_
+[X] 00519A80 - Accept_Diplomacy_Request_
+[X] 00519B80 - Refuse_Diplomacy_Request_
+[X] 00519C10 - Tell_Diplomacy_Requester_To_Wait_
+[X] 00519C40 - Humans_Requesting_Diplomacy_
+[X] 00519C50 - Net_Human_Rejected_Diplomacy_
+[X] 00519C70 - Decode_Drop_Out_Info_
+[X] 00519D50 - Human_Abdicates_
+[X] 00519D60 - Send_Drop_Out_Info_
+[X] 00519E90 - Human_Surrenders_
+[X] 00519EA0 - Assign_Home_Star_Names_
+[X] 00519F90 - Dist_Between_Stars_
 [.] 00519FE0 - Dist_Between_Points_
-[.] 0051A010 - Enforce_3_Planet_Minimum_
-[.] 0051A150 - Enforce_Planet_Abundant_Mineral_Class
-[.] 0051A170 - Enforce_Climate_
-[.] 0051A410 - Enforce_Gravity_
-[.] 0051A490 - Enforce_Medium_Planet_Size_
+[X] 0051A010 - Enforce_3_Planet_Minimum_
+[X] 0051A150 - Enforce_Planet_Abundant_Mineral_Class
+[X] 0051A170 - Enforce_Climate_
+[X] 0051A410 - Enforce_Gravity_
+[X] 0051A490 - Enforce_Medium_Planet_Size_
 [.] 0051A4D0 - Enforce_Mineral_Richness_
-[.] 0051A5C0 - Enforce_Planet_Type_
-[.] 0051A620 - Generate_Home_Worlds_
+[X] 0051A5C0 - Enforce_Planet_Type_
+[X] 0051A620 - Generate_Home_Worlds_
 [.] 0051A950 - Build_Home_Star_List_
-[.] 0051ACA0 - Build_Min_Star_Distances_
-[.] 0051AD50 - Generate_Orion_
-[.] 0051AF90 - Get_Orion_Star_Id_
-[.] 0051B190 - Is_Added_Food_World_
-[.] 0051B1D0 - Make_One_Planet_
-[.] 0051B300 - Modify_Home_Worlds_
-[.] 0051B530 - Set_System_Planet_Artifact_Special
-[.] 0051B570 - Set_Planet_Size
+[X] 0051ACA0 - Build_Min_Star_Distances_
+[X] 0051AD50 - Generate_Orion_
+[X] 0051AF90 - Get_Orion_Star_Id_
+[X] 0051B190 - Is_Added_Food_World_
+[X] 0051B1D0 - Make_One_Planet_
+[X] 0051B300 - Modify_Home_Worlds_
+[X] 0051B530 - Set_System_Planet_Artifact_Special
+[X] 0051B570 - Set_Planet_Size
 [.] 0051B590 - Ensure_At_Least_1_Food_Planet_
-[.] 0051B870 - Add_Non_Food_Planets_To_List_
+[X] 0051B870 - Add_Non_Food_Planets_To_List_
 [.] 0051B8C0 - Guarantee_A_Planet_At_Min_Dist_
 [.] 0051BBC0 - Randomize_Home_Worlds_
 [.] 0051BC20 - Remove_Specials_
@@ -3473,7 +3473,7 @@
 [.] 0051CA30 - Farload_Library_Data_
 [.] 0051CD30 - Get_Farload_Data_Record_Count_
 [.] 0051CF00 - Error_Handler_
-[ ] 0051D0F0 - Set_Alternate_Path_
+[.] 0051D0F0 - Set_Alternate_Path_
 [.] 0051D170 - Get_Field_Counter_
 [.] 0051D180 - Disable_Cancel_
 [.] 0051D190 - Disable_Mouse_Wait_
@@ -3485,7 +3485,7 @@
 [.] 0051D290 - Scan_Input_
 [.] 0051D370 - Add_Hidden_Field_
 [.] 0051D4D0 - Add_Clipped_Hidden_Field_
-[ ] 0051D6C0 - Add_Hot_Key_
+[.] 0051D6C0 - Add_Hot_Key_
 [.] 0051D7F0 - Add_Grid_Field_
 [.] 0051D9D0 - Add_Button_Info_
 [.] 0051DB80 - Add_Button_Field_
@@ -3551,7 +3551,7 @@
 [.] 00523E10 - Timed_Wait_For_Input_
 [.] 00523E70 - Draw_Animated_Sprite_Back_Diff_
 [.] 00523FB0 - Draw_No_Glass_
-[ ] 00524340 - Draw_No_Glassed_Animated_Sprite_
+[.] 00524340 - Draw_No_Glassed_Animated_Sprite_
 [.] 00524400 - Draw_No_Glassed_Bitmap_Sprite_
 [.] 00524490 - Draw_
 [.] 00524830 - Draw_Glassed_Animated_Sprite_
@@ -3857,11 +3857,11 @@
 [.] 00530570 - Replace_Color_
 [.] 00530710 - Replace_Color_All_
 [.] 00530880 - Exit_With_Message_
-[ ] 00530890 - Replace_Color_Range_
+[.] 00530890 - Replace_Color_Range_
 [.] 00530A80 - Establish_Color_Gradient_
 [.] 00530AF0 - Shift_Palette_Range_
 [.] 00530B40 - Interlaced_Gray_Scale_Off_Page_
-[ ] 00530BF0 - Open_File_Animation_
+[.] 00530BF0 - Open_File_Animation_
 [.] 00530DB0 - Draw_File_Animation_
 [.] 00530FD0 - Open_Multi_File_Animation_
 [.] 005311E0 - Draw_Multi_File_Animation_
@@ -3927,7 +3927,7 @@
 [.] 00533C90 - FUN_00533c90
 [.] 00533CD0 - Reduce_Palette_
 [.] 00533E60 - Split_Cube_
-[ ] 00534250 - Sort_Cube_Points_
+[.] 00534250 - Sort_Cube_Points_
 [.] 00534420 - Find_Longest_Axis_
 [.] 00534480 - Initial_Cube_
 [.] 005344E0 - Find_Next_Lowest_Cube_Level_
@@ -3981,87 +3981,87 @@
 [.] 00535A00 - Get_Smacker_Animation_Frame_
 [.] 00535A20 - Do_Draw_Smacker_Animation_
 [.] 00535BA0 - Close_Smacker_Animation_
-[ ] 00535BC0 - Set_Smacker_Palette_
-[ ] 00535C00 - Clipped_Draw_Glassed_Bitmap_Sprite_
-[ ] 00535D20 - Clipped_Draw_Bitmap_Sprite_
-[ ] 00535E50 - Clipped_Draw_Glassed_Animated_Sprite_
-[ ] 00536040 - Clipped_Draw_Animated_Sprite_
-[ ] 00536280 - Clipped_Draw_Stenciled_Animated_Sprite_
-[ ] 00536508 - Draw_Animated_Sprite_
-[ ] 005365B0 - Draw_Bitmap_Sprite_
-[ ] 00536623 - Color_Stream_Copy_
-[ ] 0053665C - Print_Character_ASM_
-[ ] 005366AE - Print_Character_No_Alias_ASM_
-[ ] 00536710 - WndProc
-[ ] 00536EE8 - Fill_Column_
-[ ] 00536F23 - Fill_Region_
-[ ] 00536F71 - Interlaced_Fill_Column_
-[ ] 00536FAE - Interlaced_Fill_Region_
-[ ] 0053701E - Tri_Interlaced_Fill_Column_
-[ ] 00537076 - Tri_Interlaced_Fill_Region_
-[ ] 00537121 - Tint_Fill_Column_
-[ ] 0053717A - Tint_Fill_Region_
-[ ] 005371E8 - FUN_005371e8
-[ ] 0053721D - FUN_0053721d
-[ ] 00537254 - FUN_00537254
-[ ] 005372AD - FUN_005372ad
-[ ] 00537324 - Flip_Bitmap_Down_Same_
-[ ] 00537366 - Flip_Bitmap_Down_Different_
-[ ] 005373A1 - Flip_Bitmap_Left_Same_
-[ ] 005373EE - Flip_Bitmap_Left_Different_
-[ ] 0053743F - Capture_Screen_Block_
-[ ] 00537475 - Enlarge_Bitmap_
-[ ] 00537561 - Reduce_Bitmap_
-[ ] 00537620 - Vanish_Bitmap_Pixels_
-[ ] 00537701 - Outline_Bitmap_Pixels_
-[ ] 005377F8 - Outline_Bitmap_Pixels_No_Glass_
-[ ] 005378F7 - FUN_005378f7
-[ ] 0053796A - FUN_0053796a
-[ ] 005379B7 - FUN_005379b7
-[ ] 00537A09 - Tint_Bitmap_Pixels_
-[ ] 00537A5D - Gray_Scale_Fill_Pixels_
-[ ] 00537AB1 - Jumble_Bitmap_Pixels_
-[ ] 00537B62 - Mask_Bitmap_Pixels_
-[ ] 00537BB5 - Mask_Brighten_Bitmap_Pixels_
-[ ] 00537C2F - Mask_Bitmap_Pixels_Inverse_
-[ ] 00537C82 - Mask_Bitmap_Colors_Pixels_
-[ ] 00537D02 - FUN_00537d02
-[ ] 00537D60 - FUN_00537d60
-[ ] 00537DBE - FUN_00537dbe
-[ ] 00537E1C - FUN_00537e1c
-[ ] 00537E7A - FUN_00537e7a
+[.] 00535BC0 - Set_Smacker_Palette_
+[.] 00535C00 - Clipped_Draw_Glassed_Bitmap_Sprite_
+[.] 00535D20 - Clipped_Draw_Bitmap_Sprite_
+[.] 00535E50 - Clipped_Draw_Glassed_Animated_Sprite_
+[.] 00536040 - Clipped_Draw_Animated_Sprite_
+[.] 00536280 - Clipped_Draw_Stenciled_Animated_Sprite_
+[.] 00536508 - Draw_Animated_Sprite_
+[.] 005365B0 - Draw_Bitmap_Sprite_
+[.] 00536623 - Color_Stream_Copy_
+[.] 0053665C - Print_Character_ASM_
+[.] 005366AE - Print_Character_No_Alias_ASM_
+[.] 00536710 - WndProc
+[.] 00536EE8 - Fill_Column_
+[.] 00536F23 - Fill_Region_
+[.] 00536F71 - Interlaced_Fill_Column_
+[.] 00536FAE - Interlaced_Fill_Region_
+[.] 0053701E - Tri_Interlaced_Fill_Column_
+[.] 00537076 - Tri_Interlaced_Fill_Region_
+[.] 00537121 - Tint_Fill_Column_
+[.] 0053717A - Tint_Fill_Region_
+[.] 005371E8 - FUN_005371e8
+[.] 0053721D - FUN_0053721d
+[.] 00537254 - FUN_00537254
+[.] 005372AD - FUN_005372ad
+[.] 00537324 - Flip_Bitmap_Down_Same_
+[.] 00537366 - Flip_Bitmap_Down_Different_
+[.] 005373A1 - Flip_Bitmap_Left_Same_
+[.] 005373EE - Flip_Bitmap_Left_Different_
+[.] 0053743F - Capture_Screen_Block_
+[.] 00537475 - Enlarge_Bitmap_
+[.] 00537561 - Reduce_Bitmap_
+[.] 00537620 - Vanish_Bitmap_Pixels_
+[.] 00537701 - Outline_Bitmap_Pixels_
+[.] 005377F8 - Outline_Bitmap_Pixels_No_Glass_
+[.] 005378F7 - FUN_005378f7
+[.] 0053796A - FUN_0053796a
+[.] 005379B7 - FUN_005379b7
+[.] 00537A09 - Tint_Bitmap_Pixels_
+[.] 00537A5D - Gray_Scale_Fill_Pixels_
+[.] 00537AB1 - Jumble_Bitmap_Pixels_
+[.] 00537B62 - Mask_Bitmap_Pixels_
+[.] 00537BB5 - Mask_Brighten_Bitmap_Pixels_
+[.] 00537C2F - Mask_Bitmap_Pixels_Inverse_
+[.] 00537C82 - Mask_Bitmap_Colors_Pixels_
+[.] 00537D02 - FUN_00537d02
+[.] 00537D60 - FUN_00537d60
+[.] 00537DBE - FUN_00537dbe
+[.] 00537E1C - FUN_00537e1c
+[.] 00537E7A - FUN_00537e7a
 [ ] 00537EC9 - Interlace_Scale_Off_Page_ASM_
-[ ] 00537F35 - FUN_00537f35
-[ ] 00537F5A - FUN_00537f5a
-[ ] 00537FC0 - LBX_init_stream_
-[ ] 00538170 - Init_Wave_Header_From_Memory_
-[ ] 00538260 - Copy_FourCC2_
-[ ] 00538270 - Load_Stream_Wave_Header_
-[ ] 005383A0 - Copy_FourCC_
-[ ] 005383B0 - Load_System_Font_
-[ ] 00538500 - Load_System_Mouse_
-[ ] 005385C0 - Enumerate_Providers_
-[ ] 00538680 - Find_Provider_
-[ ] 005386D0 - Init_Connection_
-[ ] 00538760 - Init_Providers_
-[ ] 00538780 - Player_Enumerate_Callback_
-[ ] 005387A0 - Register_Player_
-[ ] 00538850 - Drop_Player_
-[ ] 00538940 - Create_Player_
-[ ] 00538990 - Refresh_Game_List_Callback_
-[ ] 00538AB0 - Compress_Data_
-[ ] 00538B80 - Uncompress_Data_
-[ ] 00538C40 - uninit_model_
-[ ] 00538C60 - buffer_remove_symbol_from_stream_
-[ ] 00538D40 - buffer_initialize_arithmetic_decoder_
-[ ] 00538D90 - buffer_encode_symbol_
-[ ] 00538EA0 - buffer_flush_arithmetic_encoder_
-[ ] 00538F10 - initialize_model_
-[ ] 00538F70 - update_model_
-[ ] 00539000 - convert_int_to_symbol_
-[ ] 00539060 - get_symbol_scale_
-[ ] 00539080 - convert_symbol_to_int_
-[ ] 005390C0 - initialize_arithmetic_encoder_
+[.] 00537F35 - FUN_00537f35
+[.] 00537F5A - FUN_00537f5a
+[.] 00537FC0 - LBX_init_stream_
+[.] 00538170 - Init_Wave_Header_From_Memory_
+[.] 00538260 - Copy_FourCC2_
+[.] 00538270 - Load_Stream_Wave_Header_
+[.] 005383A0 - Copy_FourCC_
+[.] 005383B0 - Load_System_Font_
+[.] 00538500 - Load_System_Mouse_
+[.] 005385C0 - Enumerate_Providers_
+[.] 00538680 - Find_Provider_
+[.] 005386D0 - Init_Connection_
+[.] 00538760 - Init_Providers_
+[.] 00538780 - Player_Enumerate_Callback_
+[.] 005387A0 - Register_Player_
+[.] 00538850 - Drop_Player_
+[.] 00538940 - Create_Player_
+[.] 00538990 - Refresh_Game_List_Callback_
+[.] 00538AB0 - Compress_Data_
+[.] 00538B80 - Uncompress_Data_
+[.] 00538C40 - uninit_model_
+[.] 00538C60 - buffer_remove_symbol_from_stream_
+[.] 00538D40 - buffer_initialize_arithmetic_decoder_
+[.] 00538D90 - buffer_encode_symbol_
+[.] 00538EA0 - buffer_flush_arithmetic_encoder_
+[.] 00538F10 - initialize_model_
+[.] 00538F70 - update_model_
+[.] 00539000 - convert_int_to_symbol_
+[.] 00539060 - get_symbol_scale_
+[.] 00539080 - convert_symbol_to_int_
+[.] 005390C0 - initialize_arithmetic_encoder_
 [ ] 005390E0 - get_current_count_
 [ ] 00539120 - InitModemTransportLayer_
 [ ] 005391B0 - FUN_005391b0
