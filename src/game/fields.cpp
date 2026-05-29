@@ -146,18 +146,13 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str) {
-        if (_fields_count >= _max_fields_count) {
-            char error_msg[80];
-            const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
-            uint32_t* dst = reinterpret_cast<uint32_t*>(error_msg);
+        char error_msg[44];
+        uint32_t local_24[9];
 
-            for (int i = 0; i < 11; ++i) {
-                dst[i] = src[i];
-            }
-            for (int i = 11; i < 20; ++i) {
-                dst[i] = 0;
-            }
+        memcpy(error_msg, s_You_exceeded_the_max_number_of_fields, sizeof(error_msg));
+        memset(local_24, 0, sizeof(local_24));
 
+        if ((int32_t)_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(error_msg);
         }
 
@@ -214,7 +209,7 @@ namespace fields {
         }
     }
 
-    void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
+    void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
         s_field* field = &_fields[_fields_count];
 
         field->x = x;
@@ -227,7 +222,7 @@ namespace fields {
         field->font_style = fonts::Get_Current_Font_Style_();
         field->font_color = fonts::Get_Current_Font_Color_();
 
-        field->sound = static_cast<int8_t>(sound);
+        field->sound = sound;
         field->detail.button.pic = pic;
         field->detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
 
@@ -267,19 +262,13 @@ namespace fields {
         return field_index;
     }
 
-    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int16_t sound) {
+    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int8_t sound) {
         char error_msg[80];
 
-        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
-        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
-        for (int i = 0; i < 11; ++i) {
-            dest[i] = src[i];
-        }
-        for (int i = 11; i < 20; ++i) {
-            dest[i] = 0;
-        }
+        // A simple string copy is sufficient here because the buffer is only used as a C string.
+        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
 
-        if (_fields_count >= _max_fields_count) {
+        if ((int32_t)_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(error_msg);
         }
 
@@ -297,7 +286,7 @@ namespace fields {
         return current_index;
     }
 
-    int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
+    int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
         char error_msg[80];
 
         const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
@@ -323,7 +312,7 @@ namespace fields {
         return current_id;
     }
 
-    int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int16_t sound) {
+    int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int8_t sound) {
         char error_msg[80];
 
         const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
@@ -335,7 +324,7 @@ namespace fields {
             dest[i] = 0;
         }
 
-        if (_fields_count >= _max_fields_count) {
+        if ((int32_t)_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(error_msg);
         }
 
@@ -350,15 +339,9 @@ namespace fields {
         return current_field;
     }
 
-    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
+    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
         char error_msg[80];
-        // The original code manually copies the error message into a local buffer.
-        for (int i = 0; i < 11; ++i) {
-            reinterpret_cast<uint32_t*>(error_msg)[i] = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields)[i];
-        }
-        for (int i = 0; i < 9; ++i) {
-            reinterpret_cast<uint32_t*>(error_msg + 44)[i] = 0;
-        }
+        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
 
         if (animate::_clipping_flag == 1) {
             int16_t width = animate::Get_Width_(pic);
@@ -373,7 +356,7 @@ namespace fields {
             }
         }
 
-        if ((int32_t)_fields_count >= _max_fields_count_raw) {
+        if (_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(error_msg);
         }
 
@@ -427,18 +410,9 @@ namespace fields {
 
     int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound) {
         if (_fields_count >= _max_fields_count) {
-            char error_msg[80];
-            const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
-            uint32_t* dst = reinterpret_cast<uint32_t*>(error_msg);
-
-            for (int i = 0; i < 11; ++i) {
-                dst[i] = src[i];
-            }
-            for (int i = 11; i < 20; ++i) {
-                dst[i] = 0;
-            }
-
-            exitm::Exit_With_Message(error_msg);
+            char error_message[44];
+            memcpy(error_message, s_You_exceeded_the_max_number_of_fields, sizeof(error_message));
+            exitm::Exit_With_Message(error_message);
         }
 
         s_field& field = _fields[_fields_count];
@@ -470,11 +444,10 @@ namespace fields {
     int16_t __cdecl Add_Continuous_String_Input_Field_(
         int16_t x, int16_t y, int16_t width, int16_t height, char* value,
         int16_t max_length, int16_t background_color, s_animation_header* pic,
-        int16_t sound, int16_t font_shadow_style)
+        int8_t sound, int16_t font_shadow_style)
     {
         char error_msg[80];
-        memcpy(error_msg, s_You_exceeded_the_max_number_of_fields, 44);
-        memset(error_msg + 44, 0, 36);
+        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
 
         if (_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(error_msg);
@@ -505,7 +478,7 @@ namespace fields {
 
         _fields[current].detail.cont_input.max_length = max_length;
         _fields[current].hotkey = 0;
-        _fields[current].sound = (int8_t)sound;
+        _fields[current].sound = sound;
         _fields[current].detail.cont_input.buffer = value;
         _fields[current].detail.cont_input.full_store_flag = 0;
         _fields[current].detail.cont_input.pic = pic;
@@ -526,7 +499,7 @@ namespace fields {
         memcpy(err_msg, s_You_exceeded_the_max_number_of_f_0055b080, 44);
         memset(err_msg + 44, 0, 36);
 
-        if (_fields_count >= _max_fields_count) {
+        if ((int32_t)_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(err_msg);
         }
 
@@ -641,9 +614,15 @@ namespace fields {
         return 0;
     }
 
-    int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int16_t sound) {
-        if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);
+    int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int8_t sound) {
+        char error_msg[44];
+        uint32_t zero_pad[9];
+
+        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
+        memset(zero_pad, 0, sizeof(zero_pad));
+
+        if ((int32_t)_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
         }
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
@@ -663,7 +642,7 @@ namespace fields {
         _input_delay = _old_input_delay;
         _down_mouse_button = _old_down_mouse_button;
 
-        _max_fields_count_raw = 0xfa;
+        _max_fields_count = 0xfa;
 
         _auto_input_variable = _old_auto_input_variable;
         _input_field_active = _old_input_field_active;
@@ -679,13 +658,13 @@ namespace fields {
         int16_t param_5,
         int8_t* value,
         int16_t help_start,
-        int16_t count,
-        char** strings,
-        int32_t param_10,
-        s_animation_header* pic,
-        int32_t param_12,
+        int16_t gradient_mode,
+        uint8_t* gradient_palette,
+        int32_t gradient_extra,
+        s_animation_header* gradient_pic,
+        int32_t unused_param_12,
         char* hotkey_str,
-        char* param_14
+        char* unused_param_14
     ) {
         int16_t index = _fields_count;
 
@@ -697,7 +676,7 @@ namespace fields {
         _fields[index].font_color = &_list_normal_color;
 
         _fields[index].detail.strings.highlight_color = &_list_highlight_colors;
-        _fields[index].detail.strings.special_color = &_list_special_colors;
+        _fields[index].detail.strings.gradient_colors = &_list_special_colors;
 
         _fields[index].y_end = y + fonts::Get_Font_Height_() + 1;
         _fields[index].detail.strings.help_start = help_start;
@@ -711,10 +690,12 @@ namespace fields {
 
         _fields[index].detail.strings.help = help;
         _fields[index].detail.strings.value = value;
-        _fields[index].detail.strings.count = count;
-        _fields[index].detail.strings.strings = strings;
-        _fields[index].detail.strings.field8_0x18 = param_10;
-        _fields[index].detail.strings.pic = pic;
+        _fields[index].detail.strings.gradient_mode = gradient_mode;
+        _fields[index].detail.strings.gradient_palette = gradient_palette;
+        _fields[index].detail.strings.gradient_extra = gradient_extra;
+        _fields[index].detail.strings.gradient_pic = gradient_pic;
+        (void)unused_param_12;
+        (void)unused_param_14;
         _fields[index].field_type = FIELD_TYPE_10;
 
         _fields_count++;
@@ -1088,11 +1069,11 @@ namespace fields {
                         _active_input_field_first = 0;
                     }
                 } else {
-                    int16_t chr = key_code & 0xFF;
+                    int16_t chr = (int16_t)((int32_t)key_code % 0x100);
                     if (chr >= 0x20 && chr <= 0x7E && chr != 0x5F) {
                         _active_input_field_first = 0;
                         if (_active_input_field_number >= 0 && _active_input_field_number < _fields_count) {
-                            int16_t font_shadow = _fields[_active_input_field_number].detail.button.font_shadow_style;
+                            int16_t font_shadow = _fields[_active_input_field_number].detail.cont_input.font_shadow_style;
                             if (font_shadow == -1) {
                                 fonts::Set_Font_Style_Shadow_Down_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
                             } else if (font_shadow == 0) {
@@ -1351,7 +1332,7 @@ namespace fields {
                 mouse::Mouse_Buffer2_();
             }
             
-            if (_auto_input_variable != 0 && _fields[_auto_input_variable].field_type == 6) {
+            if (_fields[_auto_input_variable].field_type == 6) {
                 Invoke_Auto_Function_();
             }
             _auto_input_variable = 0;
@@ -1441,9 +1422,9 @@ namespace fields {
     }
 
     short __cdecl Get_List_Field_(
-        int16_t x, int16_t y, int16_t width, char *help, char *list_ptr, int32_t item_size,
-        int8_t *selected_index, uint8_t *item_flags, int16_t param_9, char **param_10,
-        int32_t param_11, s_animation_header *pic, int32_t param_13, char *param_14)
+        int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size,
+        int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette,
+        int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, char* unused_param_14)
     {
         _list_field_on = 1;
         Set_Input_Delay_(1);
@@ -1479,9 +1460,9 @@ namespace fields {
 
                 Add_String_List_Field_(
                     x, cur_y, width, list_ptr, flag, 
-                    selected_index, index, param_9,
-                    param_10, param_11, pic, param_13, 
-                    s__00551100, param_14
+                    selected_index, index, gradient_mode,
+                    gradient_palette, gradient_extra, gradient_pic, unused_param_13,
+                    s__00551100, unused_param_14
                 );
 
                 index++;
@@ -1504,7 +1485,7 @@ namespace fields {
 
         int8_t local_4 = 0;
         int16_t help_field_idx = Add_String_List_Field_(
-            x, y, width, help, 1, &local_4, 1, 0, nullptr, 0, nullptr, 0, s__00551100, DAT_0055afc0
+            x, y, width, help, 1, &local_4, 1, 0, nullptr, 0, nullptr, 0, s__00551100, unused_param_14
         );
 
         int8_t cur_selection = *selected_index;
@@ -1636,9 +1617,14 @@ namespace fields {
         *field->detail.scroll.value = new_value;
     }
 
-    int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound) {
+    int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound) {
+        char error_msg[44];
+        uint32_t local_24[9];
+
+        memcpy(error_msg, s_You_exceeded_the_max_number_of_fields, sizeof(error_msg));
+        memset(local_24, 0, sizeof(local_24));
+
         if (_fields_count >= _max_fields_count) {
-            char error_msg[80] = "You exceeded the max number of fields (150)";
             exitm::Exit_With_Message(error_msg);
         }
 
@@ -1668,7 +1654,7 @@ namespace fields {
         _fields[_fields_count].y = y;
         _fields[_fields_count].y_end = y_end;
         _fields[_fields_count].field_type = FIELD_TYPE_HIDDEN;
-        _fields[_fields_count].sound = (int16_t)(int8_t)sound;
+        _fields[_fields_count].sound = sound;
         _fields[_fields_count].hotkey = *hotkey;
 
         char c = _fields[_fields_count].hotkey;
@@ -1780,14 +1766,14 @@ namespace fields {
                     case 4:
                         if (_down_mouse_button != i) {
                             fonts::Set_Font_Style_(f->font_style, f->font_color);
-                            fonts::Set_Font_Highlight_Colors_(f->detail.button.highlight_color);
-                            if (f->detail.button.background_color != 0) {
-                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.button.background_color));
+                            fonts::Set_Font_Highlight_Colors_(f->detail.input.highlight_color);
+                            if (f->detail.input.background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.input.background_color));
                             }
-                            if (f->detail.button.draw_style == 0) {
-                                fonts::Print_(f->x, f->y, f->detail.button.help);
+                            if (f->detail.input.draw_style == 0) {
+                                fonts::Print_(f->x, f->y, f->detail.input.buffer);
                             } else {
-                                fonts::Print_Right_(f->x_end, f->y, f->detail.button.help);
+                                fonts::Print_Right_(f->x_end, f->y, f->detail.input.buffer);
                             }
                         }
                         break;
@@ -1819,11 +1805,11 @@ namespace fields {
                                 f->y - spacing + 1,
                                 f->x_end,
                                 f->y + font_height + 1,
-                                f->detail.strings.count,
-                                (char*)f->detail.strings.strings,
-                                f->detail.strings.field8_0x18,
-                                f->detail.strings.pic,
-                                f->detail.strings.special_color
+                                f->detail.strings.gradient_mode,
+                                f->detail.strings.gradient_palette,
+                                f->detail.strings.gradient_extra,
+                                f->detail.strings.gradient_pic,
+                                f->detail.strings.gradient_colors
                             );
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
                         } else if (f->detail.strings.field1_0x2 == 0) {
@@ -1880,7 +1866,8 @@ namespace fields {
                                         }
                                     }
                                     if (len < f->detail.cont_input.max_length - 1) {
-                                        strcat(_continuous_string, s___0055b0ac);
+                                        _continuous_string[len] = '_';
+                                        _continuous_string[len + 1] = '\0';
                                     }
                                 }
                             }
@@ -2119,14 +2106,14 @@ namespace fields {
                     case 4: {
                         if (_down_mouse_button != i) {
                             fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
-                            fonts::Set_Font_Highlight_Colors_(_fields[i].detail.button.highlight_color);
-                            if (_fields[i].detail.button.background_color != 0) {
-                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.button.background_color);
+                            fonts::Set_Font_Highlight_Colors_(_fields[i].detail.input.highlight_color);
+                            if (_fields[i].detail.input.background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.input.background_color);
                             }
-                            if (_fields[i].detail.button.draw_style == 0) {
-                                fonts::Print_(_fields[i].x, _fields[i].y, _fields[i].detail.button.help);
+                            if (_fields[i].detail.input.draw_style == 0) {
+                                fonts::Print_(_fields[i].x, _fields[i].y, _fields[i].detail.input.buffer);
                             } else {
-                                fonts::Print_Right_(_fields[i].x_end, _fields[i].y, _fields[i].detail.button.help);
+                                fonts::Print_Right_(_fields[i].x_end, _fields[i].y, _fields[i].detail.input.buffer);
                             }
                         }
                         break;
@@ -2152,24 +2139,20 @@ namespace fields {
                         }
                         int font_height = fonts::Get_Font_Height_();
                         if (*_fields[i].detail.strings.value == _fields[i].detail.strings.help_start) {
-                            if (_fields[i].detail.strings.count == 0x11) {
-                                fonts::Set_Font_Style_(_fields[i].font_style, &_list_highlight_colors);
-                            } else {
-                                graphics::Gradient_Fill_(
-                                    _fields[i].x - 1,
-                                    (_fields[i].y - spacing) + 1,
-                                    _fields[i].x_end,
-                                    _fields[i].y + font_height + 1,
-                                    _fields[i].detail.strings.count,
-                                    reinterpret_cast<char*>(_fields[i].detail.strings.strings),
-                                    _fields[i].detail.strings.field8_0x18,
-                                    _fields[i].detail.strings.pic,
-                                    _fields[i].detail.strings.special_color
-                                );
-                            }
+                            graphics::Gradient_Fill_(
+                                _fields[i].x - 1,
+                                (_fields[i].y - spacing) + 1,
+                                _fields[i].x_end,
+                                _fields[i].y + font_height + 1,
+                                _fields[i].detail.strings.gradient_mode,
+                                _fields[i].detail.strings.gradient_palette,
+                                _fields[i].detail.strings.gradient_extra,
+                                _fields[i].detail.strings.gradient_pic,
+                                _fields[i].detail.strings.gradient_colors
+                            );
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
                         } else if (_fields[i].detail.strings.field1_0x2 == 0) {
-                            fonts::Set_Font_Style_(_fields[i].font_style, &_list_special_colors);
+                            fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.highlight_color);
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
                         } else {
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
@@ -2429,11 +2412,11 @@ namespace fields {
         int16_t* value_ptr = field->detail.scroll.value;
         int32_t range_diff = field->detail.scroll.range_max - range_min;
 
-        int16_t percent = static_cast<int16_t>(((*value_ptr - range_min) * 100) / range_diff) + 5;
+        int32_t percent = (((int32_t)*value_ptr - (int32_t)range_min) * 100) / range_diff + 5;
 
         int16_t new_val;
         if (percent <= 100) {
-            new_val = range_min + static_cast<int16_t>((percent * range_diff) / 100);
+            new_val = (int16_t)(range_min + ((percent * range_diff) / 100));
         } else {
             new_val = field->detail.scroll.set_value;
         }
@@ -2735,7 +2718,7 @@ namespace fields {
         _cursor_position = 0;
 
         s_field* field = &_fields[field_idx];
-        int16_t max_length = field->detail.cont_input.max_length;
+        int16_t max_length = field->detail.input.max_length;
         int16_t max_width = field->x_end - field->x;
         bool is_editing_started = false;
 
@@ -2743,7 +2726,7 @@ namespace fields {
         fonts::Set_Font_Style_(field->font_style, field->font_color);
 
         char buffer[64];
-        strcpy(buffer, field->detail.cont_input.buffer);
+        strcpy(buffer, field->detail.input.buffer);
 
         len = (int16_t)strlen(buffer);
 
@@ -2758,7 +2741,7 @@ namespace fields {
             _cursor_count = max_length;
         }
 
-        strcpy(field->detail.cont_input.buffer, buffer);
+        strcpy(field->detail.input.buffer, buffer);
         int16_t font_height = fonts::Get_Font_Height_();
         Display_Input_Field_(field_idx, buffer);
 
@@ -2898,7 +2881,7 @@ namespace fields {
             }
         }
 
-        strcpy(_fields[field_idx].detail.cont_input.buffer, buffer);
+        strcpy(_fields[field_idx].detail.input.buffer, buffer);
 
         if (done != 0) {
             while (mouse::Mouse_Button_() != 0) {
@@ -2919,7 +2902,7 @@ namespace fields {
         timer::Mark_Time_();
         video::Set_Page_Off_();
 
-        strcpy(reinterpret_cast<char*>(local_50), reinterpret_cast<const char*>(_fields[field_idx].detail.strings.special_color));
+        strcpy(reinterpret_cast<char*>(local_50), _fields[field_idx].detail.input.cursor_colors);
         strcpy(local_40, input_buffer);
 
         Invoke_Auto_Function_();
@@ -2927,20 +2910,20 @@ namespace fields {
         fonts::Set_Font_Style_(_fields[field_idx].font_style, _fields[field_idx].font_color);
         short font_height = fonts::Get_Font_Height_() - 1;
 
-        if (_fields[field_idx].detail.cont_input.background_color != 0) {
+        if (_fields[field_idx].detail.input.background_color != 0) {
             graphics::Fill_(
                 _fields[field_idx].x - 1,
                 _fields[field_idx].y,
                 _fields[field_idx].x_end,
                 _fields[field_idx].y_end,
-                static_cast<uint8_t>(_fields[field_idx].detail.cont_input.background_color)
+                static_cast<uint8_t>(_fields[field_idx].detail.input.background_color)
             );
         }
 
         char char_str[2];
         char_str[1] = '\0';
 
-        short input_mode = _fields[field_idx].detail.scroll.range_max;
+        short input_mode = _fields[field_idx].detail.input.input_mode;
 
         if (input_mode == 0) {
             char_str[0] = local_40[_cursor_count];

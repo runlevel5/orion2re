@@ -1,11 +1,11 @@
 #pragma once
 
 namespace mouse {
-    inline int16_t& _mouse_enabled =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B178 });
+    inline uint16_t& _mouse_enabled =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B178 });
 
-    inline int16_t& _mouse_state =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DE4 });
+    inline uint16_t& _mouse_state =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578DE4 });
 
     inline int16_t& _current_mouse_list_count =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A90 });

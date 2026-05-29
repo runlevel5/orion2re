@@ -27,8 +27,8 @@ namespace HOMEGEN {
 
     #pragma pack(push, 1)
     struct CandidateList {
-        uint16_t stars[20];
-        uint16_t count;
+        int16_t stars[20];
+        int16_t count;
     };
 
     struct s_orion_candidate {
@@ -44,7 +44,7 @@ namespace HOMEGEN {
 
     int __cdecl qsort_1_(const void* candidate_a, const void* candidate_b);
 
-    uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist);
+    uint8_t __cdecl Build_Home_Star_List_(int16_t* home_stars_out, int32_t min_dist);
 
     int32_t __cdecl qsort_star_dist_list_(const void* param_1, const void* param_2);
 
@@ -56,7 +56,7 @@ namespace HOMEGEN {
 
     void __cdecl Build_Min_Star_Distances_(int32_t min_dist_sq);
 
-    void __cdecl Randomize_Home_Worlds_(uint16_t* arr);
+    void __cdecl Randomize_Home_Worlds_(int16_t* arr);
 
     void __cdecl Modify_Home_Worlds_();
 

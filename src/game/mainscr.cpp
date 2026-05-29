@@ -3588,7 +3588,7 @@ namespace MAINSCR {
         }
         case 0x01: {
             NETMOX::_net.player_connected_flags[from_player_id] = 1;
-            memcpy(&MOX::_player[from_player_id], data, sizeof(s_player));
+            memcpy(&MOX::_player[from_player_id], data, (uint16_t)len);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -3604,7 +3604,8 @@ namespace MAINSCR {
         case 0x2E:
         case 0x32:
         case 0x34: {
-            NETMOX::_net.total_chunk_count = *(int16_t*)data;
+            const s_chunk_count_packet* packet = (const s_chunk_count_packet*)data;
+            NETMOX::_net.total_chunk_count = packet->total_chunk_count;
             NETMOX::_net.received_chunk_count = 0;
             NETMOX::_net.total_bytes_received = 0;
             allocate::Push_Block_(MOX::_screen_seg);
@@ -3638,7 +3639,7 @@ namespace MAINSCR {
 
             if (msg_type == 0x0E && NETMOX::_net.total_chunk_count == NETMOX::_net.received_chunk_count) {
                 NETMOX::_net.host_sync_counter++;
-                if (NETMOX::_net.host_sync_counter == MOX::_NUM_PLAYERS) {
+                if ((uint8_t)NETMOX::_net.host_sync_counter == MOX::_NUM_PLAYERS) {
                     NETMOX::_net.sync_state = 0x0B;
                 }
                 else {
@@ -3748,9 +3749,9 @@ namespace MAINSCR {
             break;
         }
         case 0x11: {
-            NETMOX::_net.player_net_info[from_player_id].sync_star_id = *(int16_t*)data;
-            NETMOX::_net.player_net_info[from_player_id].sync_planet_id = *(int16_t*)((uint8_t*)data + 2);
-            NETMOX::_net.player_net_info[from_player_id].sync_colony_id = *(int16_t*)((uint8_t*)data + 4);
+            const s_case11_packet* packet = (const s_case11_packet*)data;
+            memcpy(&NETMOX::_net.player_net_info[from_player_id].sync_star_id, packet, 4);
+            NETMOX::_net.player_net_info[from_player_id].sync_colony_id = packet->sync_colony_id;
             NETMOX::_net.player_net_info[from_player_id].sync_state = 0x11;
             break;
         }
@@ -3775,7 +3776,7 @@ namespace MAINSCR {
             break;
         }
         case 0x15: {
-            NETMOX::Decode_Battle_Results_(data);
+            NETMOX::Decode_Battle_Results_(data, (uint16_t)len);
             break;
         }
         case 0x16:
@@ -3881,7 +3882,7 @@ namespace MAINSCR {
         case 0x20: {
             NETMOX::_net.sync_state = ',';
             NETMOX::_net.host_election_id = param_2;
-            NETMOX::Decode_Pick_Your_Position_((s_net_pack_pick_your_position*)data);
+            NETMOX::Decode_Pick_Your_Position_((s_net_pack_pick_your_position*)data, (uint16_t)len);
             break;
         }
         case 0x21: {
@@ -3904,7 +3905,7 @@ namespace MAINSCR {
         }
         case 0x23: {
             NETMOX::_net.sync_state = 0x1C;
-            NETMOX::Decode_Dragon_Info_((int32_t*)data);
+            NETMOX::Decode_Dragon_Info_((int32_t*)data, (uint16_t)len);
             break;
         }
         case 0x24: {

@@ -75,7 +75,7 @@ namespace LOADSAVE {
 
     void __cdecl Save_Session_Related_Settings_();
 
-    void __cdecl Bad_Game_File_Message_(int16_t type, int16_t file_index);
+    void __cdecl Bad_Game_File_Message_(uint8_t type, int16_t file_index);
 
     void __cdecl _Draw_Options_Game_Popup_();
 
@@ -97,7 +97,7 @@ namespace LOADSAVE {
     inline const char* s__ALT_F5__0055ad00 = reinterpret_cast<const char*>(0x0055AD00); // "(ALT F5)"
     inline const char* s__ALT_F6__0055acf4 = reinterpret_cast<const char*>(0x0055ACF4); // "(ALT F6)"
     inline const char* s__ALT_F7__0055ace8 = reinterpret_cast<const char*>(0x0055ACE8); // "(ALT F7)"
-    inline const char* s__ALT_F8__0055addc = reinterpret_cast<const char*>(0x0055ACDC); // "(ALT F8)"
+    inline const char* s__ALT_F8__0055acdc = reinterpret_cast<const char*>(0x0055ACDC); // "(ALT F8)"
 
     inline const char* s__ALT_F1__0055acd0 = reinterpret_cast<const char*>(0x0055ACD0); // "(ALT-F1)"
     inline const char* s__ALT_F2__0055acc4 = reinterpret_cast<const char*>(0x0055ACC4); // "(ALT-F2)"

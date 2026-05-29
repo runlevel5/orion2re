@@ -292,7 +292,7 @@ struct s_animation_header {
     int16_t height;
     int16_t current_frame;
     int16_t frame_count;
-    uint8_t loop_frame;
+    int8_t loop_frame;
     short keyframe_interval;
     undefined1 flags;
     uint32_t frame_offsets[0];
@@ -1445,6 +1445,8 @@ typedef struct s_field_scroll s_field_scroll, *Ps_field_scroll;
 
 typedef struct s_field_cont_input s_field_cont_input, *Ps_field_cont_input;
 
+typedef struct s_field_input_string s_field_input_string, *Ps_field_input_string;
+
 typedef struct s_field_multi_button s_field_multi_button, *Ps_field_multi_button;
 
 typedef struct s_field_string_list s_field_string_list, *Ps_field_string_list;
@@ -1560,18 +1562,41 @@ struct s_field_button {
     undefined field18_0x23;
 };
 
+struct s_field_input_string {
+    int16_t field0_0x0;
+    short field2_0x2;
+    struct s_colors *highlight_color;
+    char *buffer;
+    short field6_0xc;
+    undefined field7_0xe;
+    undefined field8_0xf;
+    short background_color;
+    undefined field10_0x12;
+    undefined field11_0x13;
+    short draw_style;
+    undefined field13_0x16;
+    undefined field14_0x17;
+    short input_mode;
+    undefined field16_0x1a;
+    undefined field17_0x1b;
+    short max_length;
+    undefined field19_0x1e;
+    undefined field20_0x1f;
+    char *cursor_colors;
+};
+
 struct s_field_string_list {
-    int16_t count;
+    int16_t gradient_mode;
     int16_t field1_0x2;
     struct s_colors *highlight_color;
     char *help;
     int16_t help_start;
     undefined2 field5_0xe;
     int8_t *value;
-    char **strings;
-    undefined4 field8_0x18;
-    struct s_animation_header *pic;
-    struct s_colors *special_color;
+    uint8_t *gradient_palette;
+    int32_t gradient_extra;
+    struct s_animation_header *gradient_pic;
+    struct s_colors *gradient_colors;
 };
 
 struct s_field_radio {
@@ -1642,6 +1667,7 @@ union s_field_detail {
     struct s_field_grid grid;
     struct s_field_radio radio;
     struct s_field_scroll scroll;
+    struct s_field_input_string input;
     struct s_field_cont_input cont_input;
     struct s_field_multi_button multibtn;
     struct s_field_string_list strings;
@@ -2742,7 +2768,7 @@ struct s_mp_screen {
     uint8_t is_host_flag;
     uint8_t player_connected_flags[8];
     int16_t bg_height;
-    uint8_t subscreen_mode;
+    int8_t subscreen_mode;
     int8_t msg_layout_alt;
     int8_t player_button_status[8];
     struct s_colors player_font_colors_1[8];
@@ -3085,7 +3111,7 @@ struct s_ship_weapons {
     char count;
     char current_count;
     char firing_arc;
-    short specials;
+    uint16_t specials;
     char ammo;
 };
 
@@ -3311,6 +3337,16 @@ typedef struct s_net_pack_pick_your_position s_net_pack_pick_your_position, *Ps_
 struct s_net_pack_pick_your_position {
     int16_t num_players;
     struct s_player players[8];
+};
+
+struct s_chunk_count_packet {
+    int16_t total_chunk_count;
+};
+
+struct s_case11_packet {
+    int16_t sync_star_id;
+    int16_t sync_planet_id;
+    int16_t sync_colony_id;
 };
 
 typedef struct s_net_pack_req_human_diplomacy s_net_pack_req_human_diplomacy, *Ps_net_pack_req_human_diplomacy;
@@ -3620,6 +3656,8 @@ struct s_planet_data {
     int8_t planet_special;
     char environmental_alterations;
 };
+
+static_assert(sizeof(s_planet_data) == 0x11, "s_planet_data size mismatch");
 
 typedef struct s_planet_max_farms s_planet_max_farms, *Ps_planet_max_farms;
 
@@ -4823,6 +4861,8 @@ struct s_star_data {
     byte in_nebula;
     byte artifacts_gave_app;
 };
+
+static_assert(sizeof(s_star_data) == 0x71, "s_star_data size mismatch");
 
 typedef struct s_star_weight s_star_weight, *Ps_star_weight;
 

@@ -62,7 +62,8 @@ namespace AIPOWER {
                 case 14:
                     return 0;
                 default: {
-                    // Original returns uninitialized variable, we return 0
+                    // The binary returns an uninitialized 16-bit stack value here for out-of-range player_idx.
+                    // We intentionally normalize that undefined behavior to 0.
                     return 0;
                 }
             }

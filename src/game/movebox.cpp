@@ -112,7 +112,10 @@ namespace MOVEBOX {
             if (MOX::_galaxy_map_scanned_star > -1) {
                 Do_Fleet_Screen_Stuff_(map_x_off, map_y_off, scale_x, scale_y);
             }
-        } else if (MOX::_current_screen == SCREEN_OFFICERS) {
+            return;
+        }
+
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             Do_Officer_Screen_Stuff_(map_x_off, map_y_off, scale_x, scale_y);
         }
     }
@@ -196,7 +199,7 @@ namespace MOVEBOX {
         graphics::Box_(x, y, 11 /* 0xb */, 12 /* 0xc */, 1 /* 0x1 */, 113 /* 0x71, 'q' */);
     }
 
-    void __cdecl Box_Fleet_Screen_Scanned_Ship_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y) {
+    void __cdecl Box_Fleet_Screen_Scanned_Ship_() {
         int16_t ship_idx = MOX::_scanned_small_ship;
         auto& icon = MOX::_ship_icon[ship_idx];
 
@@ -218,12 +221,12 @@ namespace MOVEBOX {
         if (MOX::_scanned_small_ship > -1) {
             int16_t stack_id = HACCESS::Ship_Stack_From_Ship_Icon_(MOX::_scanned_small_ship);
             if (stack_id > -1 && stack_id != MOX::_small_ship_stack_ptr) {
-                MOVEBOX::Box_Fleet_Screen_Scanned_Ship_(map_x_off, map_y_off, scale_x, scale_y);
+                MOVEBOX::Box_Fleet_Screen_Scanned_Ship_();
             }
         }
     }
 
-    void __cdecl Do_Officer_Screen_Stuff_(int16_t param_1, int16_t param_2, int param_3, int param_4) {
+    void __cdecl Do_Officer_Screen_Stuff_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4) {
         bool is_fleet_officer = OFFICER::Is_Fleet_Officer_Screen_();
         int16_t scanned_star_idx = MOX::_galaxy_map_scanned_star;
 
@@ -265,18 +268,18 @@ namespace MOVEBOX {
                     strcpy(buffer, star.name);
                 } else {
                     s_leader_data& leader = MOX::_leaders[off_idx];
-                    int8_t status = leader.status;
+                    int8_t eta = leader.eta;
 
-                    if (status <= 0) {
+                    if (eta <= 0) {
                         sprintf(buffer, MOVEBOX::s_geggggg_format, star.name, leader.name);
                     } else {
                         const char* fmt;
-                        if (status == 1) {
+                        if (eta == 1) {
                             fmt = HAROLD::H_Message_(146 /* 0x92 */);
                         } else {
                             fmt = HAROLD::H_Message_(147 /* 0x93 */);
                         }
-                        sprintf(buffer, fmt, star.name, leader.name, (int)status);
+                        sprintf(buffer, fmt, star.name, leader.name, eta);
                     }
                 }
             } else {
@@ -304,18 +307,22 @@ namespace MOVEBOX {
             }
         }
 
-        // Extract the box from the global array and mark the slot as empty (0xFFFF)
-        // If the box was not found, this logic extracts the padding word before the array.
-        int16_t* const moveable_box_order = reinterpret_cast<int16_t*>(&MOX::_moveable_box_order);
-        int16_t target_box_id = moveable_box_order[found_idx];
-        moveable_box_order[found_idx] = -1; // 0xFFFF
+        // If not found, original code accesses MOX::DAT_0059bd1e at 0x0059BD1E.
+        int16_t target_box_id;
+        if (found_idx >= 0) {
+            target_box_id = MOX::_moveable_box_order[found_idx];
+            MOX::_moveable_box_order[found_idx] = -1;
+        } else {
+            target_box_id = MOX::DAT_0059bd1e;
+            MOX::DAT_0059bd1e = -1;
+        }
 
         // The specified box is now at the top (index 0) of our local sorted list
         local_order[0] = target_box_id;
 
         // Fill slots 1 through 4 with the remaining boxes in their existing relative order
-        for (int i = 1; i < 5; ++i) {
-            for (int j = 0; j < 5; ++j) {
+        for (int16_t i = 1; i < 5; ++i) {
+            for (int16_t j = 0; j < 5; ++j) {
                 if (MOX::_moveable_box_order[j] != -1) {
                     local_order[i] = MOX::_moveable_box_order[j];
                     MOX::_moveable_box_order[j] = -1;
@@ -325,7 +332,7 @@ namespace MOVEBOX {
         }
 
         // Copy the reorganized local list back to the global order array
-        for (int i = 0; i < 5; ++i) {
+        for (int16_t i = 0; i < 5; ++i) {
             MOX::_moveable_box_order[i] = local_order[i];
         }
     }

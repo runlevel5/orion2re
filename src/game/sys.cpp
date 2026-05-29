@@ -404,7 +404,7 @@ namespace SYS {
         animate::_animation_header->current_frame++;
 
         if (static_cast<uint8_t>(animate::_animation_header->flags) & 0x20) {
-            int16_t loop_frame = static_cast<int8_t>(animate::_animation_header->loop_frame);
+            int16_t loop_frame = animate::_animation_header->loop_frame;
             if (animate::_animation_header->current_frame > loop_frame) {
                 if (loop_frame - animate::_animation_header->current_frame == -1) {
                     animate::_animation_header->current_frame = 0;
@@ -414,12 +414,12 @@ namespace SYS {
             }
         } else {
             if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
-                animate::_animation_header->current_frame = static_cast<int8_t>(animate::_animation_header->loop_frame);
+                animate::_animation_header->current_frame = animate::_animation_header->loop_frame;
             }
         }
 
         if (static_cast<uint8_t>(SYS::_mask_header->flags) & 0x20) {
-            int16_t loop_frame = static_cast<int8_t>(SYS::_mask_header->loop_frame);
+            int16_t loop_frame = SYS::_mask_header->loop_frame;
             if (SYS::_mask_header->current_frame > loop_frame) {
                 if (loop_frame - SYS::_mask_header->current_frame == -1) {
                     SYS::_mask_header->current_frame = 0;
@@ -429,7 +429,7 @@ namespace SYS {
             }
         } else {
             if (SYS::_mask_header->current_frame >= SYS::_mask_header->frame_count) {
-                SYS::_mask_header->current_frame = static_cast<int8_t>(SYS::_mask_header->loop_frame);
+                SYS::_mask_header->current_frame = SYS::_mask_header->loop_frame;
             }
         }
     }

@@ -3555,7 +3555,7 @@ namespace hooks {
         { 0x004BAF80, &ERIC::Cinematic_Autofunction_ },
         { 0x004ba550, &ERIC::String_Builder2_ },
         { 0x00534a60, &capture::Screen_Flic_Capture_ },
-        { 0x0050a5c0, &COLBLDG::Build_Ship_Design_Info_Formatted_Paragraph_ },
+        { 0x0050a5c0, &COLBLDG::Build_Ship_Info_Formatted_Paragraph_Binary_ },
         { 0x0050ceb0, &COLBLDG::Add_Refited_Ship_To_Queue_ },
         { 0x0050c570, &COLBLDG::Something_Behind_Settting_ },
         { 0x0050CE60, &COLBLDG::Squish_Out_Queue_Slot_ },

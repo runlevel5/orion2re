@@ -39,11 +39,11 @@ namespace video {
 	inline int32_t& screen_refresh_flag =
 		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1B4 });
 
-	inline int32_t& _old_screen_dump_flag =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x005792F4 });
+	inline int16_t& _old_screen_dump_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005792F4 });
 
-	inline int32_t& _old_screen_refresh_flag =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00579340 });
+	inline int16_t& _old_screen_refresh_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00579340 });
 
 	inline s_scan_list_entry*& _refresh_scan_list =
 		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x00579348 });

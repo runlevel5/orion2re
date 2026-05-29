@@ -1729,7 +1729,7 @@ namespace FMTPARA {
 
                 if (_para_p->do_render) {
                     if (fonts::_font_header.font_style != 0) {
-                        uint8_t outline_byte = static_cast<uint8_t>(fonts::_outline_color);
+                        uint8_t outline_byte = fonts::_outline_color;
 
                         for (int i = 0; i < 8; i++) {
                             fonts::_font_header.selected_colors.colors[i] = outline_byte;

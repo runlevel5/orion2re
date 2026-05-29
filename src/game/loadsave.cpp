@@ -136,7 +136,7 @@ namespace LOADSAVE {
         }
 
         sound::Sound_Update_();
-        Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
+        Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
         sound::Sound_Update_();
 
         Get_Star_Date_Strings_(LOADSAVE::_game_popup_fields->slot_occupied_flags, MOX::_save_game_stardates);
@@ -163,7 +163,7 @@ namespace LOADSAVE {
         _music_level_field = -1000;
         _sfx_level_field = -1000;
 
-        switch (MOX::_screen_data) {
+        switch ((int16_t)MOX::_screen_data) {
         case 0: {
             MOX::_popup_base_x = 0x90;
             MOX::_popup_base_y = 0x19;
@@ -209,10 +209,10 @@ namespace LOADSAVE {
         case 2:
         case 3: {
             if (MOX::_current_screen == SCREEN_MAIN_MENU) {
-                int16_t w = animate::Get_Width_(_game_anims->pictures[0xb]);
-                MOX::_popup_base_x = (0x280 - w) / 2;
-                int16_t h = animate::Get_Height_(_game_anims->pictures[0xb]);
-                MOX::_popup_base_y = (0x1e0 - h) / 2;
+                int32_t dx = 0x280 - animate::Get_Width_(_game_anims->pictures[0xb]);
+                MOX::_popup_base_x = (int16_t)((dx - (dx >> 31)) >> 1);
+                int32_t dy = 0x1e0 - animate::Get_Height_(_game_anims->pictures[0xb]);
+                MOX::_popup_base_y = (int16_t)((dy - (dy >> 31)) >> 1);
             } else {
                 MOX::_popup_base_x = 0x90;
                 MOX::_popup_base_y = 0x19;
@@ -243,9 +243,7 @@ namespace LOADSAVE {
             if (MOX::_screen_data == 2) {
                 for (int16_t i = 0; i < 10; ++i) {
                     if (_game_popup_fields->slot_status[i] == 2) {
-                        *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58);
-                        *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 4) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 4);
-                        *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 8) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 8);
+                        memcpy(MOX::_save_game_description[i].description, s_INVALID_STR, 12);
                     }
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
                     _game_popup_fields->saved_game_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, MOX::_popup_base_y + 0x18 + i * 0x1f, MOX::_popup_base_x + 0xe2, MOX::_popup_base_y + 0x18 + i * 0x1f + 0x18, s__00551100, ')');
@@ -256,12 +254,10 @@ namespace LOADSAVE {
                 for (int16_t i = 0; i < 10; ++i) {
                     fonts::Set_Font_Style_(2, &colors_style);
                     if (_game_popup_fields->slot_status[i] == 2) {
-                        *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58);
-                        *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 4) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 4);
-                        *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 8) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 8);
+                        memcpy(MOX::_save_game_description[i].description, s_INVALID_STR, 12);
                     }
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
-                    _game_popup_fields->saved_game_fields[i] = (int16_t)fields::Add_Continuous_String_Input_Field_(MOX::_popup_base_x + 0x1a, MOX::_popup_base_y + 0x18 + i * 0x1f, 200, fonts::Get_Font_Height_(), (char*)&MOX::_save_game_description[i], 0x1e, 0, 0, ')', 0);
+                    _game_popup_fields->saved_game_fields[i] = fields::Add_Continuous_String_Input_Field_(MOX::_popup_base_x + 0x1a, MOX::_popup_base_y + 0x18 + i * 0x1f, 200, fonts::Get_Font_Height_(), MOX::_save_game_description[i].description, 0x1e, 0, 0, ')', 0);
                 }
                 for (int16_t i = 0; i < 10; ++i) {
                     int16_t y_start = MOX::_popup_base_y + 0x18 + i * 0x1f;
@@ -473,7 +469,7 @@ namespace LOADSAVE {
         MOX::_global_var = 0;
 
         do {
-            bool copy_continuous_string = false;
+            bool copy_saved_field_text = false;
             bool trigger_save = false;
             int16_t input_id = fields::Get_Input_();
 
@@ -481,7 +477,7 @@ namespace LOADSAVE {
                 for (int16_t i = 0; i < 10; ++i) {
                     if (input_id == _game_popup_fields->saved_game_fields[i]) {
                         if (active_slot_idx == i) {
-                            copy_continuous_string = true;
+                            copy_saved_field_text = true;
                             trigger_save = true;
                         }
                         active_slot_idx = i;
@@ -534,25 +530,29 @@ namespace LOADSAVE {
                         temp_buffer[0x24] = '\0';
                     }
                     strcpy(target_desc, temp_buffer);
-                } else if (copy_continuous_string) {
+                } else if (copy_saved_field_text) {
                     strcpy(target_desc, fields::_continuous_string);
                 }
 
                 FILEDEF::Save_Game_(active_slot_idx);
                 Save_Session_Related_Settings_();
                 saved_successfully = true;
-                Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
-                Get_Star_Date_Strings_(_game_popup_fields->slot_occupied_flags, (char*)MOX::_save_game_stardates);
+                Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
+                Get_Star_Date_Strings_(_game_popup_fields->slot_occupied_flags, MOX::_save_game_stardates);
                 exit_popup = 1;
                 *out_should_close = 1;
             }
 
-            if (input_id == _game_popup_fields->btn_popup_close_id ||
-                (input_id < 0 &&
-                 _game_popup_fields->saved_game_fields[0] <= -(int)input_id &&
-                 -(int)input_id <= _game_popup_fields->saved_game_fields[9])) {
+            if (input_id == _game_popup_fields->btn_popup_close_id) {
                 MOX::_screen_data = 0;
                 exit_popup = 1;
+            } else if (input_id < 0) {
+                int32_t abs_input = abs((int32_t)input_id);
+                if (_game_popup_fields->saved_game_fields[0] <= abs_input &&
+                    abs_input <= _game_popup_fields->saved_game_fields[9]) {
+                    MOX::_screen_data = 0;
+                    exit_popup = 1;
+                }
             } else if (input_id == _game_popup_fields->screen_cancel_field_id) {
                 exit_popup = 1;
                 *out_should_close = 1;
@@ -906,8 +906,9 @@ namespace LOADSAVE {
     /**
      * @address 0050f4c0
      */
-    void __cdecl Bad_Game_File_Message_(int16_t type, int16_t file_index) {
+    void __cdecl Bad_Game_File_Message_(uint8_t type, int16_t file_index) {
         char buffer[256];
+        buffer[0] = '\0';
         int16_t message_id = 0;
 
         if (type == 1) {
@@ -920,7 +921,7 @@ namespace LOADSAVE {
 
         if (message_id != 0) {
             const char* format = HAROLD::H_Message_(message_id);
-            sprintf(buffer, format, (int)(file_index + 1));
+            sprintf(buffer, format, (int)(int16_t)(file_index + 1));
         }
 
         Game_Popup_User_Box_(buffer, 3);
@@ -1429,8 +1430,8 @@ namespace LOADSAVE {
             if (_print_data_to_bitmap == 0) {
                 animate::Draw_(x, y, _game_anims->pictures[9]);
             } else {
-                bitmap::Add_Picture_To_Bitmap_(0, 0, _game_anims->pictures[9], reinterpret_cast<s_animation_header*>(MAINSCR::_temp_bitmap));
-                bitmap::Add_Picture_To_Bitmap_(x - MOX::_popup_base_x, y - MOX::_popup_base_y, reinterpret_cast<s_animation_header*>(MAINSCR::_temp_bitmap), _bitmap);
+                bitmap::Add_Picture_To_Bitmap_(0, 0, _game_anims->pictures[9], MAINSCR::_temp_bitmap);
+                bitmap::Add_Picture_To_Bitmap_(x - MOX::_popup_base_x, y - MOX::_popup_base_y, MAINSCR::_temp_bitmap, _bitmap);
             }
         }
 
@@ -1462,7 +1463,7 @@ namespace LOADSAVE {
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC), _bitmap);
             fonts::Print_To_Bitmap_(text_x2, draw_y + 0x68, s__ALT_F7__0055ace8, _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, s__ALT_F8__0055addc, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, s__ALT_F8__0055acdc, _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE), _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF), _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0), _bitmap);

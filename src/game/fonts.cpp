@@ -505,11 +505,11 @@ namespace fonts {
         }
 
         if (_font_header.font_style != 0) {
-            _font_header.selected_colors.colors[0] = (uint8_t)_alias_outline_color;
+            _font_header.selected_colors.colors[0] = _alias_outline_color;
             _draw_alias_flag = 1;
 
             for (int i = 1; i < 8; ++i) {
-                _font_header.selected_colors.colors[i] = (uint8_t)_outline_color;
+                _font_header.selected_colors.colors[i] = _outline_color;
             }
 
             if (_font_header.font_style != 2) {
@@ -608,9 +608,9 @@ namespace fonts {
 
         if (_font_header.font_style != 0) {
             for (int i = 1; i < 8; ++i) {
-                _font_header.selected_colors.colors[i] = (uint8_t)_outline_color;
+                _font_header.selected_colors.colors[i] = _outline_color;
             }
-            _font_header.selected_colors.colors[0] = (uint8_t)_alias_outline_color;
+            _font_header.selected_colors.colors[0] = _alias_outline_color;
             _draw_alias_flag = 1;
 
             if (_font_header.font_style == 3 || _font_header.font_style == 5) {
@@ -759,7 +759,7 @@ namespace fonts {
         return _font_header.font_style_height;
     }
 
-    int16_t __cdecl Get_Font_Vertical_Spacing_() {
+    uint16_t __cdecl Get_Font_Vertical_Spacing_() {
         return _font_header.leading_offset;
     }
 
@@ -889,7 +889,6 @@ namespace fonts {
         int16_t width = anim->width;
         int32_t dest_offset = x + y * width - clip_x;
 
-        // BUG: letter is explicitly sign-extended, which may result in a negative array index for characters >= 128
         int16_t font_offset = static_cast<int16_t>(_font_header.font_style_offsets[static_cast<int8_t>(letter)]);
 
         if (static_cast<int16_t>(_font_header.current_height) < static_cast<int16_t>(clip_height)) {
@@ -917,7 +916,7 @@ namespace fonts {
                     do {
                         if (data <= 0x80) {
                             if (data != 0 && dest_clip_start <= current_dest_offset && current_dest_offset < dest_clip_end) {
-                                frame_ptr[current_dest_offset] = (&_palette_block__unk)[data];
+                                frame_ptr[current_dest_offset] = _palette_block__unk[data];
                             }
                             current_dest_offset++;
                         } else {
@@ -966,7 +965,7 @@ namespace fonts {
                             screen_idx += (pixel & 0x7F);
                         } else {
                             if (screen_idx >= clip_start_idx && screen_idx < clip_end_idx) {
-                                video::_current_video_page[screen_idx] = (&_palette_block__unk)[pixel];
+                                video::_current_video_page[screen_idx] = _palette_block__unk[pixel];
                             }
                             ++screen_idx;
                         }

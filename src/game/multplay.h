@@ -72,11 +72,11 @@ namespace MULTPLAY {
     inline const char* s_Moo_II_0055aa88 = 
         reinterpret_cast<const char*>(std::uintptr_t{0x0055AA88}); // "Moo II "
 
-    inline uint32_t (&_green_pal_colors)[16] =
-        *reinterpret_cast<uint32_t (*)[16]>(std::uintptr_t{0x0055A9A0});
+    inline s_palette_entry (&_green_pal_colors)[16] =
+        *reinterpret_cast<s_palette_entry (*)[16]>(std::uintptr_t{0x0055A9A0});
 
-    inline uint32_t (&_cur_pal_colors)[16] =
-        *reinterpret_cast<uint32_t (*)[16]>(std::uintptr_t{0x00579590});
+    inline s_palette_entry (&_cur_pal_colors)[16] =
+        *reinterpret_cast<s_palette_entry (*)[16]>(std::uintptr_t{0x00579590});
 
     inline char (&_baud_rate_strings)[8][6] =
         *reinterpret_cast<char (*)[8][6]>(std::uintptr_t{0x0055A9E0});
@@ -170,7 +170,7 @@ namespace MULTPLAY {
 
     void __cdecl Draw_Choose_Net_Plyrs_Screen_();
 
-    int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, int8_t* connected_flags, int8_t is_host, int8_t should_load);
+    int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, uint8_t* connected_flags, int8_t is_host, int8_t should_load);
 
     void __cdecl Reload_Wait_For_Race_Info_();
 

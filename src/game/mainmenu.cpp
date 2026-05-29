@@ -174,16 +174,10 @@ namespace MAINMENU {
         _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 0x15, MOX::_screen_seg);
 
         LOADSAVE::_game_anims = (s_game_anims*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x65);
-        uint8_t* anims_ptr = (uint8_t*)LOADSAVE::_game_anims;
-        for (int i = 0; i < 0x65; ++i) {
-            anims_ptr[i] = 0;
-        }
+        memset(LOADSAVE::_game_anims, 0, 0x65);
 
         LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
-        uint32_t* fields_ptr = (uint32_t*)LOADSAVE::_game_popup_fields;
-        for (int i = 0; i < 0x9E; ++i) {
-            fields_ptr[i] = 0xFFFFFFFF;
-        }
+        memset(LOADSAVE::_game_popup_fields, 0xFF, 0x278);
 
         LOADSAVE::Load_Month_Names_();
         Load_Mainmenu_Load_Game_Popup_();

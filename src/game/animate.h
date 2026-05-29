@@ -22,7 +22,7 @@ namespace animate {
     inline const char* s_Refresh_Mask_cant_be_drawn = reinterpret_cast<const char*>(0x0055B10C);
 
     short __cdecl Get_Full_Store_Flag_(s_animation_header* header);
-    void __cdecl Set_Animation_Frame_(s_animation_header* anim, int16_t frame);
+    void __cdecl Set_Animation_Frame_(s_animation_header* anim, int32_t frame);
     void __cdecl Reset_Animation_Frame_(s_animation_header* anim);
     int16_t __cdecl Get_Animation_Frame_Count_(s_animation_header* seg);
     int16_t __cdecl Get_Current_Frame_(s_animation_header* animation);

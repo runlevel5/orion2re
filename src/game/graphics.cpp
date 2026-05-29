@@ -486,19 +486,19 @@ namespace graphics {
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
-    void __cdecl Gradient_Fill_(int x1, int y1, int x2, int y2, int mode, char *color_ptr, int extra, s_animation_header*pic, s_colors* colors) {
+    void __cdecl Gradient_Fill_(int x1, int y1, int x2, int y2, int mode, uint8_t* palette, int extra, s_animation_header* pic, s_colors* colors) {
         switch (mode) {
         case 1:
-            Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), static_cast<int8_t>(*color_ptr));
+            Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), (int8_t)*palette);
             break;
         case 3:
             Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), 0);
             break;
         case 15:
-            Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), static_cast<int8_t>(*color_ptr));
+            Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), (int8_t)*palette);
             break;
         case 16:
-            Gray_Scale_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), reinterpret_cast<uint8_t*>(color_ptr), extra, 0);
+            Gray_Scale_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), palette, extra, 0);
             break;
         }
     }

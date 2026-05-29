@@ -87,7 +87,7 @@ namespace NETSTART {
     }
 
     int8_t __cdecl Net_Pick_Position_() {
-        int8_t connected_players[8];
+        uint8_t connected_players[8];
         int16_t selection;
         int32_t message_buffer;
 
@@ -651,7 +651,7 @@ namespace NETSTART {
 
     uint8_t __cdecl Load_Net_Screen_() {
         uint8_t fade_flag = 0;
-        int8_t status[8] = { 0 };
+        uint8_t status[8] = { 0 };
         s_load_net_screen_packet payload = {};
         uint8_t user_list[256];
 

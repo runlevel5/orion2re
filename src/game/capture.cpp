@@ -5,7 +5,7 @@ namespace capture {
         _release_flag = 1;
     }
 
-    int16_t __cdecl Check_Release_Version_() {
+    uint16_t __cdecl Check_Release_Version_() {
         return _release_flag;
     }
 

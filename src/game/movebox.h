@@ -37,14 +37,14 @@ namespace MOVEBOX {
 
     void __cdecl Box_Officer_Screen_Chosen_Star_(int16_t left, int16_t top, int16_t x_divisor, int16_t y_divisor);
 
-    void __cdecl Box_Fleet_Screen_Scanned_Ship_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
+    void __cdecl Box_Fleet_Screen_Scanned_Ship_();
 
     inline const char* s_geggggg_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0}); // ">GEGGGGG%s (%s)"
     inline const char* const s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
     void __cdecl Do_Fleet_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
 
-    void __cdecl Do_Officer_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int scale_x, int scale_y);
+    void __cdecl Do_Officer_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int16_t scale_x, int16_t scale_y);
 
     void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* anim2,
                                     int16_t x_base, int16_t y_base,

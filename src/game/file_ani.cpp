@@ -153,11 +153,11 @@ namespace file_ani {
         // This identical branching mimics the original compiled code accurately
         if ((animate::_animation_header->flags & 0x20) == 0) {
             if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
-                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+                animate::_animation_header->current_frame = animate::_animation_header->loop_frame;
             }
         } else {
             if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
-                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+                animate::_animation_header->current_frame = animate::_animation_header->loop_frame;
             }
         }
     }
@@ -211,7 +211,7 @@ namespace file_ani {
 
         if (animate::_animation_header->flags & 0x20) {
             if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
-                int16_t loop_frame = (int16_t)(int8_t)animate::_animation_header->loop_frame;
+                int16_t loop_frame = animate::_animation_header->loop_frame;
                 if (loop_frame - animate::_animation_header->frame_count != -1) {
                     animate::_animation_header->current_frame = loop_frame;
                 } else {
@@ -364,10 +364,10 @@ namespace file_ani {
 
         if (animate::_animation_header->flags & 0x20) {
             if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
-                if ((static_cast<int32_t>(static_cast<int8_t>(animate::_animation_header->loop_frame)) - animate::_animation_header->frame_count) == -1) {
+                if ((static_cast<int32_t>(animate::_animation_header->loop_frame) - animate::_animation_header->frame_count) == -1) {
                     animate::_animation_header->current_frame = 0;
                 } else {
-                    animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+                    animate::_animation_header->current_frame = animate::_animation_header->loop_frame;
                 }
             }
         } else {
@@ -441,11 +441,11 @@ namespace file_ani {
 
         if ((animate::_animation_header->flags & 0x20) != 0) {
             if (animate::_animation_header->frame_count <= animate::_animation_header->current_frame) {
-                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+                animate::_animation_header->current_frame = animate::_animation_header->loop_frame;
             }
         } else {
             if (animate::_animation_header->frame_count <= animate::_animation_header->current_frame) {
-                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+                animate::_animation_header->current_frame = animate::_animation_header->loop_frame;
             }
         }
     }

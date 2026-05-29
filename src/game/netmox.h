@@ -56,7 +56,7 @@ namespace NETMOX {
 
     uint8_t Humans_Requesting_Diplomacy_();
 
-    void __cdecl Russ_Change_Relations_(int32_t change, int16_t attacker, int16_t defender, int32_t reason, int16_t star_idx, int32_t param6);
+    void __cdecl Russ_Change_Relations_(int16_t change, int16_t attacker, int16_t defender, int16_t reason, int16_t star_idx, int16_t param6);
 
     void __cdecl Send_Drop_Out_Info_(int player_idx, uint16_t msg_type);
 
@@ -157,17 +157,17 @@ namespace NETMOX {
 
     void __cdecl Human_Surrenders_(int player_idx);
 
-    int8_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id);
+    int16_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id);
 
     void __cdecl Decode_Pick_Target_Info_(void* packet_data, uint32_t len);
 
     void __cdecl Decode_You_Are_Target_Info_(void* packet_data, uint32_t len);
 
-    void __cdecl Decode_Battle_Results_(void* packet_data);
+    void __cdecl Decode_Battle_Results_(void* packet_data, uint16_t len);
 
-    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1);
+    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1, uint16_t len);
 
-    void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr);
+    void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr, uint16_t len);
 
     void __cdecl Send_Dragon_Info_(int32_t colony_id);
 
@@ -185,18 +185,6 @@ namespace NETMOX {
         int16_t other_player_idx;
         int16_t param_3;
         int16_t colony_idx;
-    };
-
-    struct s_packet_0x34 {
-        int16_t chunks;
-    };
-
-    struct s_packet_2E_chunks {
-        int16_t chunks;
-    };
-
-    struct s_packet_32 {
-        int16_t chunks;
     };
 
     struct s_NET_MSG_SYNC_PLAYER {

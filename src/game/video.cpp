@@ -230,12 +230,12 @@ namespace video {
 
 	void __cdecl Save_Refresh_() {
 		video::_old_screen_dump_flag = video::screen_refresh_flag;
-		video::_old_screen_refresh_flag = static_cast<int32_t>(video::screen_dump_flag);
+		video::_old_screen_refresh_flag = video::screen_dump_flag;
 	}
 
 	void __cdecl Restore_Refresh_() {
 		video::screen_refresh_flag = video::_old_screen_dump_flag;
-		video::screen_dump_flag = static_cast<uint32_t>(video::_old_screen_refresh_flag);
+		video::screen_dump_flag = video::_old_screen_refresh_flag;
 	}
 
 	void __cdecl Set_Refresh_Differential_No_Full_() {

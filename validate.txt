@@ -3087,15 +3087,15 @@
 [X] 00501730 - Add_Net_Next_Turn_Fields_
 [X] 00501900 - Add_Waiting_For_Joiners_Field_
 [X] 00501950 - Choose_Multi_Network_Game_Screen_
-[.] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
-[.] 00501C80 - Choose_Network_Plyrs_Screen_
+[V] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
+[V] 00501C80 - Choose_Network_Plyrs_Screen_
 [X] 00501F50 - Add_Choose_Net_Plyrs_Fields_
 [X] 00502150 - Add_Banner_Field_
 [X] 00502210 - Draw_Net_Next_Turn_Screen_
 [X] 00502930 - Draw_Choose_Net_Plyrs_Screen_
 [X] 00502D70 - Draw_Generic_Net_Info_Screen_
 [X] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
-[.] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
+[V] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
 [X] 005031D0 - Draw_Fill_Seg_
 [X] 00503260 - Draw_Multi_Player_Banner_
 [X] 00503390 - Draw_SendGet_Net_Info_Screen_
@@ -3121,12 +3121,12 @@
 [X] 00504D20 - Load_Multi_Player_Game_Screen_
 [X] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
 [X] 005050A0 - Get_Valid_MP_Save_Games_
-[.] 005050D0 - Draw_Load_MP_Game_Screen_
+[V] 005050D0 - Draw_Load_MP_Game_Screen_
 [X] 00505510 - Do_Get_Valid_MP_Save_Games_
 [X] 00505560 - Load_Load_MP_Game_Screen_
 [X] 005056F0 - Multi_Player_Screen_
 [X] 00505C10 - Add_MP_Setup_Screen_Fields_
-[.] 00506010 - Warning_Box_Has_Opponent_Pressed_
+[V] 00506010 - Warning_Box_Has_Opponent_Pressed_
 [X] 00506030 - Draw_MP_Setup_Screen_
 [X] 005062B0 - Load_MP_Setup_Pictures_
 [X] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
@@ -3136,11 +3136,11 @@
 [X] 00506D40 - Check_Modem_Init_Help_Fields_
 [X] 00506E50 - Draw_Modem_Setup_Screen_
 [X] 005072B0 - Print_Modem_Strings_
-[.] 005073A0 - Load_Modem_Setup_Screen_
+[V] 005073A0 - Load_Modem_Setup_Screen_
 [X] 00507510 - NullModem_Setup_Screen_
 [X] 00507720 - Add_NullModem_Setup_Fields_
 [X] 00507920 - Draw_NullModem_Setup_Screen_
-[.] 00507CE0 - Load_NullModem_Setup_Screen_
+[V] 00507CE0 - Load_NullModem_Setup_Screen_
 [X] 00507E80 - Reload_Generating_Map_Info_
 [X] 00507EA0 - Reload_Generic_Net_Info_
 [X] 00507FE0 - Reload_Getting_Data_Info_
@@ -3148,13 +3148,13 @@
 [X] 00508020 - Reload_Join_Net_Screen_
 [X] 00508040 - Reload_Sending_Data_Info_
 [X] 00508080 - Reload_Wait_For_Race_Info_
-[.] 005080A0 - Reload_Waiting_For_Joiners_Screen_
+[V] 005080A0 - Reload_Waiting_For_Joiners_Screen_
 [X] 005080F0 - Chat_Box_Input_Loop_
 [X] 005081D0 - Set_Multi_Player_Game_Type_
-[.] 00508300 - Change_MP_Game_Name_
+[V] 00508300 - Change_MP_Game_Name_
 [X] 00508480 - Load_FP_Data_From_LBX_
-[.] 005084E0 - N_Fire_Points_
-[.] 00508550 - Calc_FP_Offsets_
+[V] 005084E0 - N_Fire_Points_
+[V] 00508550 - Calc_FP_Offsets_
 [X] 00508670 - Base_Generic_Dcv_
 [X] 005086E0 - Base_Generic_Ocv_
 [X] 00508730 - Satelite_Strength_Vs_Ships_
@@ -3171,21 +3171,21 @@
 [X] 005091C0 - Fighter_Garrison_Strength_
 [X] 005092D0 - Colony_Ground_Strength_Vs_Player_
 [X] 00509390 - Colony_Space_Strength_Vs_Player_
-[.] 005093F0 - Get_Best_Ship_Shield_Value_
+[V] 005093F0 - Get_Best_Ship_Shield_Value_
 [X] 00509480 - Clear_Last_App_Desc_
 [X] 005094A0 - Create_Ship_
 [X] 00509750 - Has_Prod_In_Queue_
 [X] 00509780 - Get_Setting_Description_String_
 [X] 005097F0 - Clear_Last_App_Description_String_
 [X] 00509800 - Get_App_Description_String_
-[.] 00509880 - Option_String_
+[V] 00509880 - Option_String_
 [X] 00509A30 - N_Prods_In_Colony_Queue_
 [X] 00509A80 - Calculate_Building_Array_
 [X] 00509B30 - qsort_building_by_name_
 [X] 00509B80 - Draw_Buildings_List_
 [X] 00509C80 - Calc_Font_Off_
 [X] 00509CA0 - Get_Font_Off_For_Buildings_
-[.] 00509D60 - Draw_Militarys_List_
+[V] 00509D60 - Draw_Militarys_List_
 [X] 00509FA0 - Get_Font_Off_For_Military_
 [X] 0050A020 - Add_Buildings_Fields_
 [X] 0050A0B0 - Add_Militarys_Fields_
@@ -3193,23 +3193,23 @@
 [X] 0050A1B0 - Draw_Building_Info_
 [X] 0050A290 - Print_App_Description_
 [X] 0050A370 - Draw_Building_Centered_In_Window_
-[.] 0050A3B0 - Build_Weapon_String_
-[.] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
+[V] 0050A3B0 - Build_Weapon_String_
+[V] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
 [X] 0050ABE0 - Draw_Ship_Design_Info_
-[.] 0050AD10 - Draw_Ship_Design_Info2_
+[V] 0050AD10 - Draw_Ship_Design_Info2_
 [X] 0050AD80 - Draw_Ship_Info_
-[.] 0050AE50 - Draw_Active_Prod_
+[V] 0050AE50 - Draw_Active_Prod_
 [X] 0050B090 - Auto_Design_Type_
 [X] 0050B0C0 - First_Prod_Colony_Queue_Slot_
 [X] 0050B1C0 - First_Prod_Queue_Slot_
-[.] 0050B270 - Delete_From_Colony_Queue_
+[V] 0050B270 - Delete_From_Colony_Queue_
 [X] 0050B2D0 - Delete_Ship_
 [X] 0050B300 - Delete_Prod_From_Colony_Queue_
 [X] 0050B340 - Clear_Colony_Queue_
 [X] 0050B360 - Squish_Out_Colony_Queue_Slot_
 [X] 0050B3E0 - Remove_Ships_
 [X] 0050B4D0 - Do_Exit_Screen_Cleanup_
-[.] 0050B520 - Evaluate_Input_
+[V] 0050B520 - Evaluate_Input_
 [X] 0050BFF0 - Do_Draw_Build_Queue_
 [X] 0050C020 - N_Prods_In_Queue_
 [X] 0050C050 - Star_N_Uncolonized_Worlds_
@@ -3237,8 +3237,8 @@
 [X] 0050E7D0 - Build_Arrays_
 [X] 0050E7E0 - Check_For_Saved_Games_
 [X] 0050E910 - Do_Load_Game_Popup_
-[.] 0050EBF0 - Add_Game_Popup_Fields_
-[.] 0050F4C0 - Bad_Game_File_Message_
+[V] 0050EBF0 - Add_Game_Popup_Fields_
+[V] 0050F4C0 - Bad_Game_File_Message_
 [X] 0050F530 - Game_Popup_User_Box_
 [X] 0050F5D0 - Restore_Game_Popup_
 [X] 0050F630 - Restore_Main_Screen_
@@ -3254,17 +3254,17 @@
 [X] 0050FEC0 - _Draw_Options_Game_Popup_To_Bitmap_
 [X] 0050FEE0 - _Draw_Load_Save_Game_Popup_
 [X] 00510420 - _Draw_Main_Game_Popup_
-[.] 00510750 - _Draw_Options_Game_Popup_
+[V] 00510750 - _Draw_Options_Game_Popup_
 [X] 00510DB0 - _Game_Popup_
 [X] 00511020 - Allocate_Data_Space_For_Game_Popup_
 [X] 005110A0 - Do_Main_Game_Popup_
 [X] 005113F0 - Do_Options_Game_Popup_
-[.] 00511530 - Do_Save_Game_Popup_
+[V] 00511530 - Do_Save_Game_Popup_
 [X] 00511930 - Load_Game_Popup_Pictures_
 [X] 00511C50 - Animate_Game_Popup_Pic_
 [X] 00511C70 - Set_Current_Game_Option_Flags_
 [X] 00511E80 - Update_Game_Settings_
-[.] 00511F40 - Mainmenu_Load_Game_Popup_
+[V] 00511F40 - Mainmenu_Load_Game_Popup_
 [X] 00511FF0 - Load_Mainmenu_Load_Game_Popup_
 [X] 005120E0 - Set_Up_Load_Save_Popup_
 [X] 00512200 - Active_Save_Slot_Invalid_
@@ -3282,16 +3282,16 @@
 [X] 005128D0 - Box_Field_Selected_
 [X] 00512940 - Box_Fleet_Screen_Scanned_Star_
 [X] 005129D0 - Clear_Moveable_Box_Fields_
-[.] 00512AB0 - Draw_Galaxy_Map_Box_
+[V] 00512AB0 - Draw_Galaxy_Map_Box_
 [X] 00512F40 - Do_Fleet_Screen_Stuff_
-[.] 00512F90 - Box_Fleet_Screen_Scanned_Ship_
-[.] 00512FD0 - Do_Officer_Screen_Stuff_
+[V] 00512F90 - Box_Fleet_Screen_Scanned_Ship_
+[V] 00512FD0 - Do_Officer_Screen_Stuff_
 [X] 005132B0 - Box_Officer_Screen_Chosen_Star_
 [X] 005133A0 - Box_Officer_Screen_Scanned_Star_
 [X] 00513440 - Draw_Moveable_Box_
 [X] 00513510 - Get_Galaxy_Map_Space_XY_
 [X] 005135B0 - Get_Galaxy_Map_Star_XY_
-[.] 00513680 - Move_Box_To_Top_
+[V] 00513680 - Move_Box_To_Top_
 [X] 00513740 - Move_Moveable_Box_
 [X] 00513B00 - Moveable_Box_Dimensions_
 [X] 00513B90 - Moveable_Box_Selected_
@@ -3306,7 +3306,7 @@
 [X] 00513E80 - Load_Netmox_Strings_
 [X] 00513F40 - Receive_Message_
 [X] 00513FD0 - Main_Receive_Message_
-[.] 00514157 - caseD_1
+[V] 00514157 - caseD_1
 [X] 005141EC - caseD_2
 [X] 00514251 - caseD_3
 [X] 005142AC - caseD_4
@@ -3319,42 +3319,42 @@
 [X] 0051455F - caseD_b
 [X] 00514578 - caseD_c
 [X] 0051458A - caseD_d
-[.] 005145DB - caseD_e
+[V] 005145DB - caseD_e
 [X] 00514675 - caseD_f
 [X] 00514695 - caseD_10
-[.] 005146C4 - caseD_11
+[V] 005146C4 - caseD_11
 [X] 00514702 - caseD_12
 [X] 0051472A - caseD_13
 [X] 0051473C - caseD_14
-[.] 005147AC - caseD_15
+[V] 005147AC - caseD_15
 [X] 005147D4 - caseD_16
 [X] 005147FE - caseD_17
 [X] 0051482B - caseD_18
 [X] 00514855 - caseD_19
-[.] 00514867 - caseD_1a
+[V] 00514867 - caseD_1a
 [X] 00514879 - caseD_1b
 [X] 005149B7 - caseD_1c
 [X] 00514AAA - caseD_1d
 [X] 00514ABC - caseD_1f
-[.] 00514B4E - caseD_20
+[V] 00514B4E - caseD_20
 [X] 00514B8B - caseD_21
 [X] 00514BCE - caseD_22
-[.] 00514C6A - caseD_23
+[V] 00514C6A - caseD_23
 [X] 00514C99 - caseD_24
 [X] 00514CB6 - caseD_25
 [X] 00514CE3 - caseD_26
 [X] 00514D16 - caseD_27
-[.] 00514D46 - caseD_2a
+[V] 00514D46 - caseD_2a
 [X] 00514DFB - caseD_2b
 [X] 00514E3D - caseD_2c
 [X] 00514E8E - caseD_2d
-[.] 00514EB8 - caseD_2e
+[V] 00514EB8 - caseD_2e
 [X] 00514F10 - caseD_2f
 [X] 00514F6B - caseD_30
 [X] 00514F88 - caseD_31
-[.] 00514F9A - caseD_32
+[V] 00514F9A - caseD_32
 [X] 00514FF2 - caseD_33
-[.] 0051504D - caseD_34
+[V] 0051504D - caseD_34
 [X] 005150A5 - caseD_35
 [X] 00515100 - caseD_36
 [X] 00515119 - caseD_37
@@ -3384,19 +3384,19 @@
 [X] 00516100 - Close_Modem_File_
 [X] 00516140 - Write_Modem_File_
 [X] 005161A0 - fwrite_modem_file_
-[.] 00516220 - Broadcast_Game_Data_Differential_
-[.] 005166A0 - Decode_Broadcast_Game_Data_Differential_
+[V] 00516220 - Broadcast_Game_Data_Differential_
+[V] 005166A0 - Decode_Broadcast_Game_Data_Differential_
 [X] 00516AB0 - Decode_Difference_Buffer_
 [X] 00516C00 - fread_modem_file_
 [X] 00516C80 - Send_Game_Orders_
-[.] 005171C0 - Decode_Game_Orders_
+[V] 005171C0 - Decode_Game_Orders_
 [X] 00517700 - Ditch_Leader_
 [X] 00517750 - Send_Pick_Target_Info_
 [X] 00517B90 - Decode_Pick_Target_Info_
-[.] 00517F50 - Send_You_Are_Target_Info_
+[V] 00517F50 - Send_You_Are_Target_Info_
 [X] 00518440 - Decode_You_Are_Target_Info_
 [X] 005187C0 - Russ_Event_Monster_Update_
-[.] 00518820 - Russ_Change_Relations_
+[V] 00518820 - Russ_Change_Relations_
 [X] 005188B0 - Send_Battle_Results_
 [X] 00518E30 - Decode_Battle_Results_
 [X] 005192B0 - Send_Pick_Your_Position_
@@ -3404,15 +3404,15 @@
 [X] 005193A0 - Send_Dragon_Info_
 [X] 005193F0 - Decode_Dragon_Info_
 [X] 00519430 - Net_Id_To_Player_Id_
-[.] 00519470 - Get_Next_AI_Talker_
+[V] 00519470 - Get_Next_AI_Talker_
 [X] 00519560 - Net_Request_AI_Diplomacy_
-[.] 005195A0 - Net_May_Begin_AI_Diplomacy_
+[V] 005195A0 - Net_May_Begin_AI_Diplomacy_
 [X] 005195D0 - Net_End_AI_Diplomacy_
 [X] 005196D0 - Net_Cancel_AI_Diplomacy_Request_
 [X] 00519720 - Net_Cancel_AI_Diplomacy_Confirmed_
 [X] 00519730 - No_AI_Diplomacy_Allowed_
 [X] 00519750 - Net_Request_Human_Diplomacy_
-[.] 005198D0 - Net_May_Begin_Human_Diplomacy_
+[V] 005198D0 - Net_May_Begin_Human_Diplomacy_
 [X] 00519950 - Allowed_To_Cancel_Human_Diplomacy_
 [X] 00519960 - Net_Cancel_Human_Diplomacy_Request_
 [X] 005199C0 - Human_Hit_Next_Turn_
@@ -3431,16 +3431,16 @@
 [X] 00519E90 - Human_Surrenders_
 [X] 00519EA0 - Assign_Home_Star_Names_
 [X] 00519F90 - Dist_Between_Stars_
-[.] 00519FE0 - Dist_Between_Points_
+[V] 00519FE0 - Dist_Between_Points_
 [X] 0051A010 - Enforce_3_Planet_Minimum_
 [X] 0051A150 - Enforce_Planet_Abundant_Mineral_Class
 [X] 0051A170 - Enforce_Climate_
 [X] 0051A410 - Enforce_Gravity_
 [X] 0051A490 - Enforce_Medium_Planet_Size_
-[.] 0051A4D0 - Enforce_Mineral_Richness_
+[V] 0051A4D0 - Enforce_Mineral_Richness_
 [X] 0051A5C0 - Enforce_Planet_Type_
 [X] 0051A620 - Generate_Home_Worlds_
-[.] 0051A950 - Build_Home_Star_List_
+[V] 0051A950 - Build_Home_Star_List_
 [X] 0051ACA0 - Build_Min_Star_Distances_
 [X] 0051AD50 - Generate_Orion_
 [X] 0051AF90 - Get_Orion_Star_Id_
@@ -3449,244 +3449,244 @@
 [X] 0051B300 - Modify_Home_Worlds_
 [X] 0051B530 - Set_System_Planet_Artifact_Special
 [X] 0051B570 - Set_Planet_Size
-[.] 0051B590 - Ensure_At_Least_1_Food_Planet_
+[V] 0051B590 - Ensure_At_Least_1_Food_Planet_
 [X] 0051B870 - Add_Non_Food_Planets_To_List_
-[.] 0051B8C0 - Guarantee_A_Planet_At_Min_Dist_
-[.] 0051BBC0 - Randomize_Home_Worlds_
-[.] 0051BC20 - Remove_Specials_
-[.] 0051BC90 - Set_Up_Home_Gen_Msg_
-[.] 0051BE20 - Star_Has_Planet_
-[.] 0051BEA0 - Random_Planet_
-[.] 0051BF50 - Upgrade_Planet_Guarded_By_Monster_
-[.] 0051C160 - Set_Special_For_Star_Guarded_By_Monster_
-[.] 0051C2B0 - Usable_Orbit_
-[.] 0051C3B0 - qsort_star_dist_list_
-[.] 0051C3E0 - qsort_1_
-[.] 0051C3F0 - Make_System_Monsters_
-[.] 0051C6F0 - Farload_
-[.] 0051C710 - Far_Reload_
-[.] 0051C730 - Far_Reload_Next_
-[.] 0051C750 - Far_Reload_Data_
-[.] 0051C780 - Far_Reload_Next_Data_
-[.] 0051C7B0 - Farload_Data_Static_
-[.] 0051C7E0 - Farload_Library_
-[.] 0051CA30 - Farload_Library_Data_
-[.] 0051CD30 - Get_Farload_Data_Record_Count_
-[.] 0051CF00 - Error_Handler_
-[.] 0051D0F0 - Set_Alternate_Path_
-[.] 0051D170 - Get_Field_Counter_
-[.] 0051D180 - Disable_Cancel_
-[.] 0051D190 - Disable_Mouse_Wait_
-[.] 0051D1A0 - Enable_Mouse_Wait_
-[.] 0051D1B0 - Pressed_Mouse_X_
-[.] 0051D1C0 - Pressed_Mouse_Y_
-[.] 0051D1D0 - Auto_Input_
-[.] 0051D1E0 - Scan_Field_
-[.] 0051D290 - Scan_Input_
-[.] 0051D370 - Add_Hidden_Field_
-[.] 0051D4D0 - Add_Clipped_Hidden_Field_
-[.] 0051D6C0 - Add_Hot_Key_
-[.] 0051D7F0 - Add_Grid_Field_
-[.] 0051D9D0 - Add_Button_Info_
-[.] 0051DB80 - Add_Button_Field_
-[.] 0051DC20 - Add_Radio_Button_Field_
-[.] 0051DCE0 - Add_Locked_Button_Field_
-[.] 0051DDA0 - Add_Multi_Button_Field_
-[.] 0051DE80 - Add_Scroll_Field_
-[.] 0051E0C0 - Find_Bar_Position_
-[.] 0051E1C0 - Increment_Scroll_Bar_
-[.] 0051E240 - Decrement_Scroll_Bar_
-[.] 0051E2B0 - Add_Continuous_String_Input_Field_
-[.] 0051E520 - Input_String_
-[.] 0051EA80 - Display_Input_Field_
-[.] 0051EDD0 - Set_Input_Delay_
-[.] 0051EDF0 - Get_Input_
-[.] 0051EE70 - F11_Key_
-[.] 0051EE80 - Disable_Draw_All_Fields_
-[.] 0051EE90 - Enable_Draw_All_Fields_
-[.] 0051EEA0 - Disable_Draw_Field_
-[.] 0051EEF0 - Enable_Draw_Field_
-[.] 0051EF40 - Draw_All_Fields_
-[.] 0051EF60 - Draw_Visible_Fields_Back_
-[.] 0051FD10 - Push_Field_Down_
-[.] 0051FE90 - Assign_Auto_Function_
-[.] 0051FED0 - Save_Auto_Function_
-[.] 0051FEE0 - Restore_Auto_Function_
-[.] 0051FF00 - Deactivate_Auto_Function_
-[.] 0051FF10 - Activate_Auto_Function_
-[.] 0051FF20 - Invoke_Auto_Function_
-[.] 0051FF40 - Invoke_Saved_Auto_Function_
-[.] 0051FF50 - Quick_Call_Auto_Function_
-[.] 0051FF90 - Call_Auto_Function_
-[.] 0051FFD0 - Clear_Fields_Above_
-[.] 0051FFF0 - Clear_Mouse_Buffer_
-[.] 00520000 - Set_Field_Outline_Color_
-[.] 00520010 - Enable_Mouse_Pressed_Field_Update_
-[.] 00520030 - Disable_Mouse_Pressed_Field_Update_
-[.] 00520040 - Set_Help_List_
-[.] 00520060 - Deactivate_Help_List_
-[.] 00520080 - Check_Help_List_
-[.] 00520120 - Mark_Fields_
-[.] 00520190 - Release_Fields_
-[.] 00520200 - Release_Version_
-[.] 00520210 - Check_Release_Version_
-[.] 00520220 - Add_Irregular_Button_Field_
-[.] 00520460 - Get_Alt_Alpha_Key_
-[.] 00520690 - Add_Multi_Hot_Key_Field_
-[.] 005207D0 - Clear_Multi_Hot_Key_Offsets_
-[.] 00520820 - Check_Multi_Hot_Key_Fields_
-[.] 005208A0 - Draw_Field_
-[.] 00521080 - Clear_Fields_
-[.] 005210C0 - Clipped_Dot_
-[.] 00521100 - Add_Clipped_Button_Field_
-[.] 00521210 - Get_List_Field_
-[.] 005214C0 - Add_String_List_Field_
-[.] 00521730 - Interpret_Keyboard_Input_
-[.] 00521A60 - Interpret_Mouse_Input_
-[.] 00522C80 - Draw_Visible_Fields_
-[.] 00523A60 - Copy_Continuous_String_
-[.] 00523B00 - Add_Clipped_Circle_Field_
-[.] 00523DF0 - Exit_List_Field_
-[.] 00523E00 - Assign_Update_Function_
-[.] 00523E10 - Timed_Wait_For_Input_
-[.] 00523E70 - Draw_Animated_Sprite_Back_Diff_
-[.] 00523FB0 - Draw_No_Glass_
-[.] 00524340 - Draw_No_Glassed_Animated_Sprite_
-[.] 00524400 - Draw_No_Glassed_Bitmap_Sprite_
-[.] 00524490 - Draw_
-[.] 00524830 - Draw_Glassed_Animated_Sprite_
-[.] 00524930 - Set_Animation_Palette_
-[.] 00524990 - Draw_Glassed_Bitmap_Sprite_
-[.] 00524A50 - Draw_Screen_Background_Off_
-[.] 00524AE0 - Draw_Screen_Background_On_
-[.] 00524BB0 - Draw_Glassed_Screen_Background_Off_
-[.] 00524C30 - Draw_Glassed_Screen_Background_On_
-[.] 00524D00 - Clip_On_
-[.] 00524D10 - Clip_Off_
-[.] 00524D20 - Get_Width_
-[.] 00524D30 - Get_Height_
-[.] 00524D40 - Get_Current_Frame_
-[.] 00524D50 - Get_Animation_Frame_Count_
-[.] 00524D60 - Get_Full_Store_Flag_
-[.] 00524D80 - Reset_Animation_Frame_
-[.] 00524D90 - Set_Animation_Frame_
-[.] 00524DB0 - Draw_Palette_
-[.] 00524DD0 - Remap_Draw_
-[.] 00525010 - Remap_Draw_Animated_Sprite_
-[.] 005250F0 - Remap_Clipped_Draw_Animated_Sprite_
-[.] 00525340 - Load_Font_File_
-[.] 00525400 - Load_Palette_
-[.] 00525470 - Get_String_Width_
-[.] 005254C0 - Set_Remap_Font_Style_
-[.] 005255A0 - Set_Font_Style_
-[.] 00525670 - Set_Font_Style_Shadow_Down_
-[.] 00525690 - Set_Font_Style_Shadow_Up_
-[.] 005256B0 - Set_Font_Style_Outline_
-[.] 005256D0 - Set_Font_Style_Outline_Heavy_
-[.] 005256F0 - Set_Outline_Color_
-[.] 00525710 - Set_Font_LF_
-[.] 00525730 - Set_Font_Spacing_Width_
-[.] 00525740 - Set_Font_Spacing_
-[.] 00525750 - Set_Font_Highlight_Colors_
-[.] 00525770 - Set_Font_Special_Colors_
-[.] 00525790 - Set_Alias_Color_
-[.] 005257B0 - Print_Integer_
-[.] 005257F0 - Print_Right_
-[.] 00525820 - Print_Centered_
-[.] 00525860 - Print_Integer_Right_
-[.] 005258A0 - Print_Integer_Centered_
-[.] 005258E0 - Print_Display_Auto_Width_
-[.] 00525910 - Print_
-[.] 00525930 - Print_Display_
-[.] 00525CF0 - Print_String_
-[.] 00525F00 - Set_Normal_Colors_On_
-[.] 00525F20 - Set_Highlight_Colors_On_
-[.] 00525F40 - Set_Special_Colors_On_
-[.] 00525F60 - Print_Character_
-[.] 00525FD0 - Print_Character_No_Alias_
-[.] 00526040 - Get_Current_Font_Style_
-[.] 00526050 - Get_Current_Font_Color_
-[.] 00526060 - Get_Font_Height_
-[.] 00526070 - Get_Font_Vertical_Spacing_
-[.] 00526080 - Get_Current_Highlight_Color_
-[.] 00526090 - Get_Current_Special_Color_
-[.] 005260A0 - Print_String_Clipped_
-[.] 005262D0 - Print_Character_Clipped_
-[.] 00526440 - Print_Clipped_Letter_
-[.] 00526560 - Print_Right_Aligned_To_Bitmap_
-[.] 005265A0 - Print_Centered_To_Bitmap_
-[.] 005265E0 - Print_Display_To_Bitmap_Auto_Width_
-[.] 00526610 - Print_To_Bitmap_
-[.] 00526630 - Print_Display_To_Bitmap_
-[.] 005268C0 - Print_String_To_Bitmap_
-[.] 00526AE0 - Print_Character_To_Bitmap_
-[.] 00526BD0 - Print_Clipped_Letter_To_Bitmap_
-[.] 00526D00 - Set_PSTR_Style_
-[.] 00526D10 - Init_Video_Drivers_
-[.] 00526DD0 - User_Mouse_Handler_
-[.] 00526EF0 - Force_Cursor_Pos
-[.] 00526F20 - Pointer_X_
-[.] 00526F30 - Get_Pointer_Offset_
-[.] 00526F50 - Get_Pointer_Image_Number_
-[.] 00526F70 - Pointer_Y_
-[.] 00526F80 - Update_Cursor_Image_
-[.] 00527000 - Restore_Mouse_Off_Page_
-[.] 00527090 - Draw_Auto_Cursor
-[.] 00527120 - Save_Mouse_Offscreen_
-[.] 005271A0 - Save_Mouse_
-[.] 00527220 - Draw_Cursor_XY_Offscreen_
-[.] 005272F0 - Draw_Cursor_XY
-[.] 005273C0 - Create_Cursor_Surface
-[.] 00527460 - Lock_Cursor_Surface_
-[.] 005274B0 - Unlock_Cursor_Surface_
-[.] 005274D0 - Set_Mouse_List_
-[.] 00527510 - Check_Mouse_Shape_
-[.] 005275C0 - Check_Mouse_Buffer_
-[.] 00527630 - Mouse_Buffer_
-[.] 00527640 - Mouse_Buffer2_
-[.] 00527650 - Mouse_Buffer_X_
-[.] 00527660 - Mouse_Buffer_Y_
-[.] 00527670 - Mouse_Buffer_Button_
-[.] 00527680 - Mouse_Button_
-[.] 005276A0 - Disable_Mouse_
-[.] 005276B0 - Enable_Mouse_
-[.] 005276C0 - Restore_Mouse_State_
-[.] 005276D0 - Save_Mouse_State_
-[.] 005276F0 - parse_ten_cmd_parameter
-[.] 005277B0 - WinMain_Proxy
-[.] 00527950 - Get_Current_Video_Page_Flag_
-[.] 00527960 - Create_Direct_Draw
-[.] 00527C60 - Toggle_Pages_On_Odd_Frame_
-[.] 00527C80 - Set_Refresh_Full_
-[.] 00527C90 - Save_Refresh_
-[.] 00527CB0 - Restore_Refresh_
-[.] 00527CD0 - Set_Refresh_Stencil_
-[.] 00527CF0 - Get_Refresh_Mode_
-[.] 00527D00 - Set_Refresh_Differential_
-[.] 00527D20 - Set_Refresh_Differential_No_Full_
-[.] 00527D30 - Cleanup_Surfaces
-[.] 00527E10 - Blit_To_Back_Buffer
-[.] 00527E60 - Flip_Surface
-[.] 00527EA0 - Toggle_Pages_Stub_
-[.] 00527ED0 - Toggle_Pages_
-[.] 00528030 - _Masked_Screen_Dump
-[.] 00528040 - _Partial_Screen_Dump
-[.] 00528110 - Stencil_Out_Background_
-[.] 005281A0 - Unlock_Appropriate_Render_Buffer
-[.] 005282D0 - Lock_Appropriate_Render_Buffer
-[.] 00528470 - Lock_Primary_Surface
-[.] 00528500 - Unlock_Primary_Surface
-[.] 00528520 - Lock_Alt_Offscreen_Surface_
-[.] 005285B0 - Lock_Offscreen_Surface_
-[.] 00528640 - Unlock_Offscreen_Surface_
-[.] 00528660 - Unlock_Alt_Offscreen_Surface_
-[.] 00528680 - Set_Page_Off_
-[.] 005286A0 - Set_Page_Back_
-[.] 005286C0 - Copy_Off_To_Back_
-[.] 00528700 - Copy_Back_To_Off_
-[.] 00528740 - Allocate_Refresh_Lists_
-[.] 005287A0 - Clear_Scan_List_
-[.] 005287C0 - Clear_Stencil_List_
+[X] 0051B8C0 - Guarantee_A_Planet_At_Min_Dist_
+[X] 0051BBC0 - Randomize_Home_Worlds_
+[X] 0051BC20 - Remove_Specials_
+[X] 0051BC90 - Set_Up_Home_Gen_Msg_
+[X] 0051BE20 - Star_Has_Planet_
+[X] 0051BEA0 - Random_Planet_
+[V] 0051BF50 - Upgrade_Planet_Guarded_By_Monster_
+[X] 0051C160 - Set_Special_For_Star_Guarded_By_Monster_
+[X] 0051C2B0 - Usable_Orbit_
+[X] 0051C3B0 - qsort_star_dist_list_
+[X] 0051C3E0 - qsort_1_
+[X] 0051C3F0 - Make_System_Monsters_
+[X] 0051C6F0 - Farload_
+[X] 0051C710 - Far_Reload_
+[X] 0051C730 - Far_Reload_Next_
+[X] 0051C750 - Far_Reload_Data_
+[X] 0051C780 - Far_Reload_Next_Data_
+[X] 0051C7B0 - Farload_Data_Static_
+[V] 0051C7E0 - Farload_Library_
+[V] 0051CA30 - Farload_Library_Data_
+[X] 0051CD30 - Get_Farload_Data_Record_Count_
+[X] 0051CF00 - Error_Handler_
+[V] 0051D0F0 - Set_Alternate_Path_
+[X] 0051D170 - Get_Field_Counter_
+[X] 0051D180 - Disable_Cancel_
+[X] 0051D190 - Disable_Mouse_Wait_
+[X] 0051D1A0 - Enable_Mouse_Wait_
+[X] 0051D1B0 - Pressed_Mouse_X_
+[X] 0051D1C0 - Pressed_Mouse_Y_
+[X] 0051D1D0 - Auto_Input_
+[X] 0051D1E0 - Scan_Field_
+[X] 0051D290 - Scan_Input_
+[X] 0051D370 - Add_Hidden_Field_
+[V] 0051D4D0 - Add_Clipped_Hidden_Field_
+[V] 0051D6C0 - Add_Hot_Key_
+[V] 0051D7F0 - Add_Grid_Field_
+[V] 0051D9D0 - Add_Button_Info_
+[V] 0051DB80 - Add_Button_Field_
+[V] 0051DC20 - Add_Radio_Button_Field_
+[V] 0051DCE0 - Add_Locked_Button_Field_
+[V] 0051DDA0 - Add_Multi_Button_Field_
+[V] 0051DE80 - Add_Scroll_Field_
+[X] 0051E0C0 - Find_Bar_Position_
+[V] 0051E1C0 - Increment_Scroll_Bar_
+[X] 0051E240 - Decrement_Scroll_Bar_
+[V] 0051E2B0 - Add_Continuous_String_Input_Field_
+[X] 0051E520 - Input_String_
+[X] 0051EA80 - Display_Input_Field_
+[X] 0051EDD0 - Set_Input_Delay_
+[X] 0051EDF0 - Get_Input_
+[X] 0051EE70 - F11_Key_
+[X] 0051EE80 - Disable_Draw_All_Fields_
+[X] 0051EE90 - Enable_Draw_All_Fields_
+[X] 0051EEA0 - Disable_Draw_Field_
+[X] 0051EEF0 - Enable_Draw_Field_
+[X] 0051EF40 - Draw_All_Fields_
+[V] 0051EF60 - Draw_Visible_Fields_Back_
+[X] 0051FD10 - Push_Field_Down_
+[X] 0051FE90 - Assign_Auto_Function_
+[X] 0051FED0 - Save_Auto_Function_
+[X] 0051FEE0 - Restore_Auto_Function_
+[X] 0051FF00 - Deactivate_Auto_Function_
+[X] 0051FF10 - Activate_Auto_Function_
+[X] 0051FF20 - Invoke_Auto_Function_
+[X] 0051FF40 - Invoke_Saved_Auto_Function_
+[X] 0051FF50 - Quick_Call_Auto_Function_
+[X] 0051FF90 - Call_Auto_Function_
+[X] 0051FFD0 - Clear_Fields_Above_
+[X] 0051FFF0 - Clear_Mouse_Buffer_
+[X] 00520000 - Set_Field_Outline_Color_
+[X] 00520010 - Enable_Mouse_Pressed_Field_Update_
+[X] 00520030 - Disable_Mouse_Pressed_Field_Update_
+[X] 00520040 - Set_Help_List_
+[X] 00520060 - Deactivate_Help_List_
+[X] 00520080 - Check_Help_List_
+[V] 00520120 - Mark_Fields_
+[X] 00520190 - Release_Fields_
+[X] 00520200 - Release_Version_
+[V] 00520210 - Check_Release_Version_
+[X] 00520220 - Add_Irregular_Button_Field_
+[X] 00520460 - Get_Alt_Alpha_Key_
+[X] 00520690 - Add_Multi_Hot_Key_Field_
+[X] 005207D0 - Clear_Multi_Hot_Key_Offsets_
+[X] 00520820 - Check_Multi_Hot_Key_Fields_
+[X] 005208A0 - Draw_Field_
+[X] 00521080 - Clear_Fields_
+[X] 005210C0 - Clipped_Dot_
+[V] 00521100 - Add_Clipped_Button_Field_
+[V] 00521210 - Get_List_Field_
+[X] 005214C0 - Add_String_List_Field_
+[X] 00521730 - Interpret_Keyboard_Input_
+[V] 00521A60 - Interpret_Mouse_Input_
+[V] 00522C80 - Draw_Visible_Fields_
+[X] 00523A60 - Copy_Continuous_String_
+[X] 00523B00 - Add_Clipped_Circle_Field_
+[X] 00523DF0 - Exit_List_Field_
+[X] 00523E00 - Assign_Update_Function_
+[V] 00523E10 - Timed_Wait_For_Input_
+[X] 00523E70 - Draw_Animated_Sprite_Back_Diff_
+[V] 00523FB0 - Draw_No_Glass_
+[X] 00524340 - Draw_No_Glassed_Animated_Sprite_
+[X] 00524400 - Draw_No_Glassed_Bitmap_Sprite_
+[V] 00524490 - Draw_
+[V] 00524830 - Draw_Glassed_Animated_Sprite_
+[V] 00524930 - Set_Animation_Palette_
+[V] 00524990 - Draw_Glassed_Bitmap_Sprite_
+[V] 00524A50 - Draw_Screen_Background_Off_
+[X] 00524AE0 - Draw_Screen_Background_On_
+[X] 00524BB0 - Draw_Glassed_Screen_Background_Off_
+[X] 00524C30 - Draw_Glassed_Screen_Background_On_
+[X] 00524D00 - Clip_On_
+[X] 00524D10 - Clip_Off_
+[X] 00524D20 - Get_Width_
+[X] 00524D30 - Get_Height_
+[X] 00524D40 - Get_Current_Frame_
+[X] 00524D50 - Get_Animation_Frame_Count_
+[X] 00524D60 - Get_Full_Store_Flag_
+[X] 00524D80 - Reset_Animation_Frame_
+[V] 00524D90 - Set_Animation_Frame_
+[X] 00524DB0 - Draw_Palette_
+[V] 00524DD0 - Remap_Draw_
+[X] 00525010 - Remap_Draw_Animated_Sprite_
+[V] 005250F0 - Remap_Clipped_Draw_Animated_Sprite_
+[X] 00525340 - Load_Font_File_
+[X] 00525400 - Load_Palette_
+[X] 00525470 - Get_String_Width_
+[X] 005254C0 - Set_Remap_Font_Style_
+[X] 005255A0 - Set_Font_Style_
+[X] 00525670 - Set_Font_Style_Shadow_Down_
+[X] 00525690 - Set_Font_Style_Shadow_Up_
+[X] 005256B0 - Set_Font_Style_Outline_
+[X] 005256D0 - Set_Font_Style_Outline_Heavy_
+[X] 005256F0 - Set_Outline_Color_
+[X] 00525710 - Set_Font_LF_
+[X] 00525730 - Set_Font_Spacing_Width_
+[X] 00525740 - Set_Font_Spacing_
+[X] 00525750 - Set_Font_Highlight_Colors_
+[X] 00525770 - Set_Font_Special_Colors_
+[X] 00525790 - Set_Alias_Color_
+[X] 005257B0 - Print_Integer_
+[X] 005257F0 - Print_Right_
+[X] 00525820 - Print_Centered_
+[X] 00525860 - Print_Integer_Right_
+[X] 005258A0 - Print_Integer_Centered_
+[X] 005258E0 - Print_Display_Auto_Width_
+[X] 00525910 - Print_
+[V] 00525930 - Print_Display_
+[X] 00525CF0 - Print_String_
+[X] 00525F00 - Set_Normal_Colors_On_
+[X] 00525F20 - Set_Highlight_Colors_On_
+[X] 00525F40 - Set_Special_Colors_On_
+[X] 00525F60 - Print_Character_
+[V] 00525FD0 - Print_Character_No_Alias_
+[X] 00526040 - Get_Current_Font_Style_
+[X] 00526050 - Get_Current_Font_Color_
+[X] 00526060 - Get_Font_Height_
+[V] 00526070 - Get_Font_Vertical_Spacing_
+[X] 00526080 - Get_Current_Highlight_Color_
+[X] 00526090 - Get_Current_Special_Color_
+[V] 005260A0 - Print_String_Clipped_
+[X] 005262D0 - Print_Character_Clipped_
+[X] 00526440 - Print_Clipped_Letter_
+[X] 00526560 - Print_Right_Aligned_To_Bitmap_
+[X] 005265A0 - Print_Centered_To_Bitmap_
+[X] 005265E0 - Print_Display_To_Bitmap_Auto_Width_
+[X] 00526610 - Print_To_Bitmap_
+[V] 00526630 - Print_Display_To_Bitmap_
+[X] 005268C0 - Print_String_To_Bitmap_
+[X] 00526AE0 - Print_Character_To_Bitmap_
+[V] 00526BD0 - Print_Clipped_Letter_To_Bitmap_
+[X] 00526D00 - Set_PSTR_Style_
+[X] 00526D10 - Init_Video_Drivers_
+[X] 00526DD0 - User_Mouse_Handler_
+[V] 00526EF0 - Force_Cursor_Pos
+[X] 00526F20 - Pointer_X_
+[X] 00526F30 - Get_Pointer_Offset_
+[X] 00526F50 - Get_Pointer_Image_Number_
+[X] 00526F70 - Pointer_Y_
+[X] 00526F80 - Update_Cursor_Image_
+[X] 00527000 - Restore_Mouse_Off_Page_
+[X] 00527090 - Draw_Auto_Cursor
+[X] 00527120 - Save_Mouse_Offscreen_
+[X] 005271A0 - Save_Mouse_
+[X] 00527220 - Draw_Cursor_XY_Offscreen_
+[X] 005272F0 - Draw_Cursor_XY
+[V] 005273C0 - Create_Cursor_Surface
+[X] 00527460 - Lock_Cursor_Surface_
+[X] 005274B0 - Unlock_Cursor_Surface_
+[X] 005274D0 - Set_Mouse_List_
+[X] 00527510 - Check_Mouse_Shape_
+[X] 005275C0 - Check_Mouse_Buffer_
+[X] 00527630 - Mouse_Buffer_
+[X] 00527640 - Mouse_Buffer2_
+[X] 00527650 - Mouse_Buffer_X_
+[X] 00527660 - Mouse_Buffer_Y_
+[X] 00527670 - Mouse_Buffer_Button_
+[X] 00527680 - Mouse_Button_
+[X] 005276A0 - Disable_Mouse_
+[X] 005276B0 - Enable_Mouse_
+[X] 005276C0 - Restore_Mouse_State_
+[V] 005276D0 - Save_Mouse_State_
+[V] 005276F0 - parse_ten_cmd_parameter
+[V] 005277B0 - WinMain_Proxy
+[X] 00527950 - Get_Current_Video_Page_Flag_
+[V] 00527960 - Create_Direct_Draw
+[X] 00527C60 - Toggle_Pages_On_Odd_Frame_
+[X] 00527C80 - Set_Refresh_Full_
+[V] 00527C90 - Save_Refresh_
+[V] 00527CB0 - Restore_Refresh_
+[X] 00527CD0 - Set_Refresh_Stencil_
+[V] 00527CF0 - Get_Refresh_Mode_
+[X] 00527D00 - Set_Refresh_Differential_
+[X] 00527D20 - Set_Refresh_Differential_No_Full_
+[X] 00527D30 - Cleanup_Surfaces
+[X] 00527E10 - Blit_To_Back_Buffer
+[V] 00527E60 - Flip_Surface
+[V] 00527EA0 - Toggle_Pages_Stub_
+[X] 00527ED0 - Toggle_Pages_
+[X] 00528030 - _Masked_Screen_Dump
+[X] 00528040 - _Partial_Screen_Dump
+[X] 00528110 - Stencil_Out_Background_
+[V] 005281A0 - Unlock_Appropriate_Render_Buffer
+[V] 005282D0 - Lock_Appropriate_Render_Buffer
+[V] 00528470 - Lock_Primary_Surface
+[V] 00528500 - Unlock_Primary_Surface
+[X] 00528520 - Lock_Alt_Offscreen_Surface_
+[X] 005285B0 - Lock_Offscreen_Surface_
+[X] 00528640 - Unlock_Offscreen_Surface_
+[X] 00528660 - Unlock_Alt_Offscreen_Surface_
+[X] 00528680 - Set_Page_Off_
+[X] 005286A0 - Set_Page_Back_
+[X] 005286C0 - Copy_Off_To_Back_
+[X] 00528700 - Copy_Back_To_Off_
+[X] 00528740 - Allocate_Refresh_Lists_
+[X] 005287A0 - Clear_Scan_List_
+[X] 005287C0 - Clear_Stencil_List_
 [.] 005287E0 - Add_Square_To_Scan_List_
 [.] 00528970 - Add_Dot_To_Scan_List_
 [.] 00528A30 - Add_Line_To_Scan_List_
@@ -3804,10 +3804,10 @@
 [.] 0052E420 - Merge_Free_Sound_Blocks_
 [.] 0052E4A0 - Audio_Clear_Cache_
 [.] 0052E520 - Remove_Sound_Instance_
-[.] 0052E5A0 - getFreeSoundIndex_
+[ ] 0052E5A0 - getFreeSoundIndex_
 [.] 0052E5D0 - Stop_Sound_Timer_And_Wait2_
 [.] 0052E600 - Resume_Timer2_
-[.] 0052E610 - Sound_On_
+[ ] 0052E610 - Sound_On_
 [.] 0052E630 - Sound_Update_
 [.] 0052E6B0 - Stop_Sound_
 [.] 0052E710 - Stop_All_Sounds_
@@ -4030,7 +4030,7 @@
 [.] 00537DBE - FUN_00537dbe
 [.] 00537E1C - FUN_00537e1c
 [.] 00537E7A - FUN_00537e7a
-[ ] 00537EC9 - Interlace_Scale_Off_Page_ASM_
+[.] 00537EC9 - Interlace_Scale_Off_Page_ASM_
 [.] 00537F35 - FUN_00537f35
 [.] 00537F5A - FUN_00537f5a
 [.] 00537FC0 - LBX_init_stream_
@@ -4062,451 +4062,451 @@
 [.] 00539060 - get_symbol_scale_
 [.] 00539080 - convert_symbol_to_int_
 [.] 005390C0 - initialize_arithmetic_encoder_
-[ ] 005390E0 - get_current_count_
-[ ] 00539120 - InitModemTransportLayer_
-[ ] 005391B0 - FUN_005391b0
-[ ] 005391E0 - Send_Receive_Ack_
-[ ] 00539220 - Send_Receive_Nack_
-[ ] 00539260 - Modem_Send_Message_
-[ ] 00539290 - Modem_Status_
-[ ] 005392B0 - Send_Modem_Message_
-[ ] 005394C0 - FUN_005394c0
-[ ] 005394F0 - Modem_Update_
-[ ] 00539570 - Receive_Modem_Packet_
-[ ] 00539800 - ComInit_
-[ ] 00539940 - ComDoComms_
-[ ] 00539950 - ComSendUserMessage_
-[ ] 00539A60 - GetMessages_
-[ ] 00539AD0 - NetPoll_
-[ ] 00539B80 - HandleSessionMessage_
-[ ] 00539BC0 - Handle_Destroy_Player_
-[ ] 00539BE0 - Handle_Create_Player_
-[ ] 00539C00 - HandleControlMessage_
-[ ] 00539C90 - SetPlayerLastKeepAlive_
-[ ] 00539CE0 - Exit_With_DPlay_Error_
-[ ] 00539DB0 - InitTransportLayer_
-[ ] 00539E50 - UpdateTransportLayer_
-[ ] 00539F00 - ResetSending_
-[ ] 00539F50 - ResetReceiving_
-[ ] 00539F70 - SendAck_
-[ ] 00539FC0 - NumUsers_
-[ ] 00539FD0 - AllAcknowledged_
-[ ] 0053A050 - ReceiveLargeUserMessage_
-[ ] 0053A3D0 - NotifyNextQueuedSender_
-[ ] 0053A450 - SendPacket_
-[ ] 0053A560 - SendLargeUserMessage_
-[ ] 0053A6C0 - OpenOutputBitBuffer_
-[ ] 0053A6F0 - OpenInputBitBuffer_
-[ ] 0053A720 - CloseOutputBitBuffer_
-[ ] 0053A750 - CloseInputBitBuffer_
-[ ] 0053A760 - BufferOutputBit_
-[ ] 0053A7C0 - BufferOutputBits_
-[ ] 0053A840 - BufferInputBit_
-[ ] 0053A8A0 - FUN_0053a8a0
-[ ] 0053A8CA - DirectDrawCreate
-[ ] 0053A8D0 - Ordinal_1
-[ ] 0053A8D6 - Ordinal_2
-[ ] 0053A8DC - DirectSoundCreate
-[ ] 0053A8F0 - FUN_0053a8f0
-[ ] 0053A920 - FUN_0053a920
-[ ] 0053A9D0 - FUN_0053a9d0
-[ ] 0053A9F0 - FUN_0053a9f0
-[ ] 0053AAF0 - FUN_0053aaf0
-[ ] 0053AB30 - FUN_0053ab30
-[ ] 0053AC10 - ClearRXBuffer_
+[.] 005390E0 - get_current_count_
+[.] 00539120 - InitModemTransportLayer_
+[.] 005391B0 - FUN_005391b0
+[.] 005391E0 - Send_Receive_Ack_
+[.] 00539220 - Send_Receive_Nack_
+[.] 00539260 - Modem_Send_Message_
+[.] 00539290 - Modem_Status_
+[.] 005392B0 - Send_Modem_Message_
+[.] 005394C0 - FUN_005394c0
+[.] 005394F0 - Modem_Update_
+[.] 00539570 - Receive_Modem_Packet_
+[.] 00539800 - ComInit_
+[.] 00539940 - ComDoComms_
+[.] 00539950 - ComSendUserMessage_
+[.] 00539A60 - GetMessages_
+[.] 00539AD0 - NetPoll_
+[.] 00539B80 - HandleSessionMessage_
+[.] 00539BC0 - Handle_Destroy_Player_
+[.] 00539BE0 - Handle_Create_Player_
+[.] 00539C00 - HandleControlMessage_
+[.] 00539C90 - SetPlayerLastKeepAlive_
+[.] 00539CE0 - Exit_With_DPlay_Error_
+[.] 00539DB0 - InitTransportLayer_
+[.] 00539E50 - UpdateTransportLayer_
+[.] 00539F00 - ResetSending_
+[.] 00539F50 - ResetReceiving_
+[.] 00539F70 - SendAck_
+[.] 00539FC0 - NumUsers_
+[.] 00539FD0 - AllAcknowledged_
+[.] 0053A050 - ReceiveLargeUserMessage_
+[.] 0053A3D0 - NotifyNextQueuedSender_
+[.] 0053A450 - SendPacket_
+[.] 0053A560 - SendLargeUserMessage_
+[.] 0053A6C0 - OpenOutputBitBuffer_
+[.] 0053A6F0 - OpenInputBitBuffer_
+[.] 0053A720 - CloseOutputBitBuffer_
+[.] 0053A750 - CloseInputBitBuffer_
+[.] 0053A760 - BufferOutputBit_
+[.] 0053A7C0 - BufferOutputBits_
+[.] 0053A840 - BufferInputBit_
+[.] 0053A8A0 - FUN_0053a8a0
+[.] 0053A8CA - DirectDrawCreate
+[.] 0053A8D0 - Ordinal_1
+[.] 0053A8D6 - Ordinal_2
+[.] 0053A8DC - DirectSoundCreate
+[.] 0053A8F0 - FUN_0053a8f0
+[.] 0053A920 - FUN_0053a920
+[.] 0053A9D0 - FUN_0053a9d0
+[.] 0053A9F0 - FUN_0053a9f0
+[.] 0053AAF0 - FUN_0053aaf0
+[.] 0053AB30 - FUN_0053ab30
+[.] 0053AC10 - ClearRXBuffer_
 [!] 0053AC40 - GetCd_
-[ ] 0053AC50 - FUN_0053ac50
-[ ] 0053AD00 - FUN_0053ad00
-[ ] 0053AD40 - FUN_0053ad40
+[.] 0053AC50 - FUN_0053ac50
+[.] 0053AD00 - FUN_0053ad00
+[.] 0053AD40 - FUN_0053ad40
 [!] 0053AD70 - FUN_0053ad70
-[ ] 0053ADA0 - FUN_0053ada0
-[ ] 0053AE30 - FUN_0053ae30
-[ ] 0053AEA0 - FUN_0053aea0
-[ ] 0053AF00 - FUN_0053af00
-[ ] 0053B020 - FUN_0053b020
-[ ] 0053B040 - FUN_0053b040
-[ ] 0053B140 - FUN_0053b140
-[ ] 0053B190 - FUN_0053b190
-[ ] 0053B200 - FUN_0053b200
-[ ] 0053B280 - FUN_0053b280
-[ ] 0053B390 - FUN_0053b390
-[ ] 0053B4E0 - FUN_0053b4e0
-[ ] 0053B530 - FUN_0053b530
-[ ] 0053B680 - SetDefaultBufferSize_
-[ ] 0053B690 - FUN_0053b690
-[ ] 0053B6A0 - FUN_0053b6a0
-[ ] 0053B6B0 - FUN_0053b6b0
-[ ] 0053B6E0 - FUN_0053b6e0
-[ ] 0053B760 - GetTickCount
-[ ] 0053B770 - FUN_0053b770
-[ ] 0053B7D0 - FUN_0053b7d0
-[ ] 0053B880 - FUN_0053b880
-[ ] 0053B8A0 - FUN_0053b8a0
-[ ] 0053B950 - FUN_0053b950
-[ ] 0053B980 - FUN_0053b980
-[ ] 0053B9C0 - FUN_0053b9c0
-[ ] 0053BC40 - FUN_0053bc40
-[ ] 0053BC50 - FUN_0053bc50
-[ ] 0053BC60 - FUN_0053bc60
-[ ] 0053BC70 - FUN_0053bc70
-[ ] 0053BD30 - FUN_0053bd30
-[ ] 0053BD50 - FUN_0053bd50
-[ ] 0053BD91 - FUN_0053bd91
-[ ] 0053BDF9 - FUN_0053bdf9
-[ ] 0053BE10 - FUN_0053be10
-[ ] 0053BE7E - FUN_0053be7e
-[ ] 0053BE90 - FUN_0053be90
-[ ] 0053C060 - FUN_0053c060
-[ ] 0053C070 - FUN_0053c070
-[ ] 0053C120 - FUN_0053c120
-[ ] 0053C2F0 - FUN_0053c2f0
-[ ] 0053C3A0 - FUN_0053c3a0
-[ ] 0053C410 - FUN_0053c410
-[ ] 0053C490 - FUN_0053c490
-[ ] 0053C4E0 - FUN_0053c4e0
-[ ] 0053C590 - FUN_0053c590
-[ ] 0053C640 - FUN_0053c640
-[ ] 0053C6B0 - FUN_0053c6b0
-[ ] 0053C740 - FUN_0053c740
-[ ] 0053CAD0 - FUN_0053cad0
-[ ] 0053CB70 - FUN_0053cb70
-[ ] 0053CBB0 - FUN_0053cbb0
-[ ] 0053CC20 - FUN_0053cc20
-[ ] 0053CD40 - FUN_0053cd40
-[ ] 0053CE21 - FUN_0053ce21
-[ ] 0053CE30 - FUN_0053ce30
-[ ] 0053CEE7 - FUN_0053cee7
-[ ] 0053CEF0 - FUN_0053cef0
-[ ] 0053CFA4 - FUN_0053cfa4
-[ ] 0053CFB0 - FUN_0053cfb0
-[ ] 0053D07F - FUN_0053d07f
-[ ] 0053D090 - FUN_0053d090
-[ ] 0053D11F - FUN_0053d11f
-[ ] 0053D130 - FUN_0053d130
-[ ] 0053D1BF - FUN_0053d1bf
-[ ] 0053D1D0 - FUN_0053d1d0
-[ ] 0053D1E0 - FUN_0053d1e0
-[ ] 0053D1F0 - FUN_0053d1f0
-[ ] 0053D200 - FUN_0053d200
-[ ] 0053D210 - FUN_0053d210
-[ ] 0053D220 - FUN_0053d220
-[ ] 0053D230 - FUN_0053d230
-[ ] 0053D250 - FUN_0053d250
-[ ] 0053D260 - FUN_0053d260
-[ ] 0053D270 - FUN_0053d270
-[ ] 0053D280 - FUN_0053d280
-[ ] 0053D2A0 - FUN_0053d2a0
-[ ] 0053D380 - FUN_0053d380
-[ ] 0053D470 - FUN_0053d470
-[ ] 0053D570 - FUN_0053d570
-[ ] 0053D6B0 - FUN_0053d6b0
-[ ] 0053D7C0 - FUN_0053d7c0
-[ ] 0053D8E0 - FUN_0053d8e0
-[ ] 0053D960 - timeGetTime
-[ ] 0053D970 - FUN_0053d970
-[ ] 0053DA00 - FUN_0053da00
-[ ] 0053DA20 - FUN_0053da20
-[ ] 0053DAA0 - FUN_0053daa0
-[ ] 0053DAF3 - FUN_0053daf3
-[ ] 0053DB00 - FUN_0053db00
-[ ] 0053DB80 - FUN_0053db80
-[ ] 0053DCA2 - FUN_0053dca2
-[ ] 0053DCB0 - FUN_0053dcb0
-[ ] 0053DD60 - FUN_0053dd60
-[ ] 0053DF50 - FUN_0053df50
-[ ] 0053DF90 - FUN_0053df90
-[ ] 0053DFE0 - FUN_0053dfe0
-[ ] 0053E120 - FUN_0053e120
-[ ] 0053E180 - FUN_0053e180
-[ ] 0053E1A0 - FUN_0053e1a0
-[ ] 0053E1C0 - FUN_0053e1c0
-[ ] 0053E310 - FUN_0053e310
-[ ] 0053E3D0 - FUN_0053e3d0
-[ ] 0053E440 - FUN_0053e440
-[ ] 0053E4D0 - FUN_0053e4d0
-[ ] 0053E600 - FUN_0053e600
-[ ] 0053E710 - FUN_0053e710
-[ ] 0053E870 - FUN_0053e870
-[ ] 0053E950 - FUN_0053e950
-[ ] 0053E9C0 - FUN_0053e9c0
-[ ] 0053EA00 - FUN_0053ea00
-[ ] 0053EA20 - FUN_0053ea20
-[ ] 0053EA40 - FUN_0053ea40
-[ ] 0053EAA0 - FUN_0053eaa0
-[ ] 0053EAB0 - FUN_0053eab0
-[ ] 0053EAF0 - FUN_0053eaf0
-[ ] 0053EBD0 - FUN_0053ebd0
-[ ] 0053EC40 - FUN_0053ec40
-[ ] 0053EC80 - FUN_0053ec80
-[ ] 0053ECF0 - FUN_0053ecf0
-[ ] 0053EDA0 - FUN_0053eda0
-[ ] 0053EDC0 - FUN_0053edc0
-[ ] 0053EE27 - FUN_0053ee27
-[ ] 0053EE30 - FUN_0053ee30
-[ ] 0053EE80 - FUN_0053ee80
-[ ] 0053EEA0 - FUN_0053eea0
-[ ] 0053EF40 - FUN_0053ef40
-[ ] 0053F1D0 - FUN_0053f1d0
-[ ] 0053F230 - FUN_0053f230
-[ ] 0053F280 - FUN_0053f280
-[ ] 0053F2B0 - FUN_0053f2b0
-[ ] 0053F480 - FUN_0053f480
-[ ] 0053F590 - FUN_0053f590
-[ ] 0053F5A0 - FUN_0053f5a0
-[ ] 0053F630 - FUN_0053f630
-[ ] 0053F720 - FUN_0053f720
-[ ] 0053F770 - FUN_0053f770
-[ ] 0053F8C0 - FUN_0053f8c0
-[ ] 0053F8F0 - FUN_0053f8f0
-[ ] 0053F9A0 - FUN_0053f9a0
-[ ] 0053FA40 - FUN_0053fa40
-[ ] 0053FC60 - FUN_0053fc60
-[ ] 0053FD50 - FUN_0053fd50
-[ ] 0053FDB0 - FUN_0053fdb0
-[ ] 0053FE10 - FUN_0053fe10
-[ ] 0053FE40 - FUN_0053fe40
-[ ] 0053FFB0 - FUN_0053ffb0
-[ ] 0053FFE0 - FUN_0053ffe0
-[ ] 005400B0 - FUN_005400b0
-[ ] 005400D0 - FUN_005400d0
-[ ] 00540100 - FUN_00540100
-[ ] 00540180 - FUN_00540180
-[ ] 005401B0 - FUN_005401b0
-[ ] 005401F0 - FUN_005401f0
-[ ] 00540250 - FUN_00540250
-[ ] 005402B0 - FUN_005402b0
-[ ] 005402F0 - FUN_005402f0
-[ ] 00540310 - FUN_00540310
-[ ] 00540350 - FUN_00540350
-[ ] 005403A0 - FUN_005403a0
-[ ] 00540400 - FUN_00540400
-[ ] 00540490 - FUN_00540490
-[ ] 005404D0 - WSACleanup
-[ ] 005404D6 - WSAStartup
-[ ] 005404DC - gethostbyname
-[ ] 005404E2 - inet_addr
-[ ] 005404E8 - htons
-[ ] 005404EE - ntohs
-[ ] 005404F4 - WSAGetLastError
-[ ] 005404FA - setsockopt
-[ ] 00540500 - ioctlsocket
-[ ] 00540506 - connect
-[ ] 0054050C - socket
-[ ] 00540512 - closesocket
-[ ] 00540518 - __WSAFDIsSet
-[ ] 0054051E - select
-[ ] 00540524 - recv
-[ ] 0054052A - send
-[ ] 00540530 - listen
-[ ] 00540536 - getsockname
-[ ] 0054053C - bind
-[ ] 00540542 - accept
-[ ] 00540550 - _sprintf
-[ ] 005405C0 - __alloca_probe
-[ ] 005405F0 - _fclose
-[ ] 00540630 - __fclose_lk
-[ ] 00540690 - _fflush
-[ ] 005406D0 - __fflush_lk
-[ ] 00540710 - __flush
-[ ] 00540790 - flsall
-[ ] 00540860 - _fwrite
-[ ] 005408A0 - __fwrite_lk
-[ ] 00540A30 - _fread
-[ ] 00540A70 - __fread_lk
-[ ] 00540BC0 - __fsopen
-[ ] 00540C00 - _wfopen
-[ ] 00540C20 - _qsort
-[ ] 00540D90 - shortsort
-[ ] 00540DF0 - swap
-[ ] 00540E20 - _strncpy
-[ ] 00540F20 - _clock
-[ ] 00540F70 - __memmove
-[ ] 005410C0 - __isctype
-[ ] 00541160 - _toupper
-[ ] 005411D0 - __toupper_lk
-[ ] 005412C0 - _tolower
-[ ] 00541330 - __tolower_lk
-[ ] 00541430 - _strchr
-[ ] 00541436 - strchr
-[ ] 005414F0 - _atol
-[ ] 005415A0 - _atoi
-[ ] 005415B0 - _sscanf
-[ ] 00541600 - __cinit
-[ ] 00541630 - __exit
-[ ] 00541650 - __exit
-[ ] 00541670 - doexit
-[ ] 00541730 - FID_conflict:__lockexit
-[ ] 00541740 - FID_conflict:__lockexit
-[ ] 00541750 - __initterm
-[ ] 00541770 - _fseek
-[ ] 005417B0 - __fseek_lk
-[ ] 00541850 - _localtime
-[ ] 00541A20 - _time
-[ ] 00541B30 - strstr
-[ ] 00541BB0 - _fgets
-[ ] 00541C30 - _strncmp
-[ ] 00541C70 - __findfirst
-[ ] 00541DC0 - __findnext
-[ ] 00541F00 - ___timet_from_ft
-[ ] 00541F90 - _vsprintf
-[ ] 00542000 - __onexit
-[ ] 00542090 - _atexit
-[ ] 005420F0 - _fputs
-[ ] 00542160 - _fgetc
-[ ] 005421A0 - _malloc
-[ ] 005421C0 - __nh_malloc
-[ ] 00542210 - __heap_alloc
-[ ] 00542270 - _free
-[ ] 005422E0 - entry
-[ ] 00542490 - __amsg_exit
-[ ] 005424C0 - __beginthread
-[ ] 00542550 - FUN_00542550
-[ ] 00542610 - __endthread
-[ ] 00542660 - _ctime
-[ ] 00542680 - __getdiskfree
-[ ] 005426F0 - remove_
-[ ] 00542720 - __ftell_lk
-[ ] 005428D0 - __strcmpi
-[ ] 005429A0 - _printf
-[ ] 00542A00 - _fputc
-[ ] 00542A50 - _putc
-[ ] 00542A70 - _calloc
-[ ] 00542B20 - __dosmaperr
-[ ] 00542BA0 - __errno
-[ ] 00542BB0 - FUN_00542bb0
-[ ] 00542CB0 - _vprintf
-[ ] 00542D10 - __itoa
-[ ] 00542D50 - xtoa
-[ ] 00542DB0 - _JumpToContinuation
-[ ] 00542DF0 - _CallMemberFunction0
-[ ] 00542E00 - FID_conflict:_CallMemberFunction1
-[ ] 00542E10 - FID_conflict:_CallMemberFunction1
-[ ] 00542E20 - _UnwindNestedFrames
-[ ] 00542E80 - ___CxxFrameHandler
-[ ] 00542EC0 - _CallCatchBlock2
-[ ] 00542F60 - _CallSETranslator
-[ ] 00543040 - TranslatorGuardHandler
-[ ] 005430AC - __global_unwind2
-[ ] 005430EE - __local_unwind2
-[ ] 00543156 - __abnormal_termination
-[ ] 00543179 - FUN_00543179
-[ ] 00543182 - FUN_00543182
-[ ] 005431A0 - FUN_005431a0
-[ ] 005431B0 - _fprintf
-[ ] 00543200 - __fpmath
-[ ] 00543220 - FUN_00543220
-[ ] 00543230 - FUN_00543230
-[ ] 00543270 - operator_new
-[ ] 00543280 - FUN_00543280
-[ ] 005432A0 - _mktime
-[ ] 005432B0 - __make_time_t
-[ ] 00543510 - __flsbuf
-[ ] 00543660 - ~type_info
-[ ] 00543690 - `scalar_deleting_destructor'
-[ ] 005436B0 - __CxxThrowException@8
-[ ] 00543700 - __getenv_lk
-[ ] 005437B0 - __output
-[ ] 00544160 - write_char
-[ ] 005441B0 - write_multi_char
-[ ] 005441F0 - write_string
-[ ] 00544230 - get_int_arg
-[ ] 00544240 - get_int64_arg
-[ ] 00544260 - get_short_arg
-[ ] 00544270 - __mtinitlocks
-[ ] 005442A0 - __lock
-[ ] 00544310 - FUN_00544310
-[ ] 00544330 - __lock_file
-[ ] 00544370 - FID_conflict:__lock_file2
-[ ] 005443A0 - __unlock_file
-[ ] 005443E0 - FID_conflict:__lock_file2
-[ ] 00544410 - __close
-[ ] 00544480 - __close_lk
-[ ] 00544510 - __freebuf
-[ ] 00544550 - __commit
-[ ] 00544600 - __write
-[ ] 00544680 - __write_lk
-[ ] 00544880 - __filbuf
-[ ] 00544980 - __read
-[ ] 00544A00 - __read_lk
-[ ] 00544C30 - __openfile
-[ ] 00544E40 - __getstream
-[ ] 00544F30 - __ftime
-[ ] 00544FE0 - ___crtGetStringTypeW
-[ ] 005451A0 - ___crtGetStringTypeA
-[ ] 005452E0 - ___crtLCMapStringA
-[ ] 00545510 - _strncnt
-[ ] 00545540 - __allmul
-[ ] 00545580 - __input
-[ ] 00546220 - __hextodec
-[ ] 00546260 - __inc
-[ ] 00546290 - __un_inc
-[ ] 005462B0 - __whiteout
-[ ] 005462E0 - __lseek
-[ ] 00546360 - __lseek_lk
-[ ] 005463F0 - ___tzset
-[ ] 00546430 - __tzset_lk
-[ ] 00546710 - __isindst
-[ ] 00546740 - __isindst_lk
-[ ] 005469A0 - cvtdate
-[ ] 00546B30 - _gmtime
-[ ] 00546C90 - ___loctotime_t
-[ ] 00546D80 - _realloc
-[ ] 00546F50 - __msize
-[ ] 00546FC0 - __stbuf
-[ ] 00547060 - __ftbuf
-[ ] 005470A0 - __callnewh
-[ ] 005470E0 - __heap_init
-[ ] 00547120 - ___sbh_new_region
-[ ] 00547290 - ___sbh_release_region
-[ ] 005472F0 - ___sbh_decommit_pages
-[ ] 005473D0 - ___sbh_find_block
-[ ] 00547430 - ___sbh_free_block
-[ ] 00547480 - ___sbh_alloc_block
-[ ] 00547700 - ___sbh_alloc_block_from_page
-[ ] 00547880 - ___sbh_resize_block
-[ ] 00547950 - __XcptFilter
-[ ] 00547AA0 - xcptlookup
-[ ] 00547AD0 - __ismbblead
-[ ] 00547AF0 - x_ismbbtype
-[ ] 00547B30 - __setenvp
-[ ] 00547C20 - __setargv
-[ ] 00547CC0 - parse_cmdline
-[ ] 00547E90 - ___crtGetEnvironmentStringsA
-[ ] 00548020 - __setmbcp
-[ ] 00548250 - getSystemCP
-[ ] 005482A0 - _CPtoLCID
-[ ] 00548300 - setSBCS
-[ ] 00548330 - ___initmbctable
-[ ] 00548340 - __ioinit
-[ ] 00548520 - __mtinit
-[ ] 00548580 - __initptd
-[ ] 005485A0 - __getptd
-[ ] 00548610 - __freeptd
-[ ] 00548779 - __seh_longjmp_unwind@4
-[ ] 005487A0 - __FF_MSGBANNER
-[ ] 005487E0 - __NMSG_WRITE
-[ ] 005489E0 - _asctime
-[ ] 00548AC0 - store_dt
-[ ] 00548AF0 - __fcloseall
-[ ] 00548B90 - __aulldiv
-[ ] 00548C00 - __aullrem
-[ ] 00548C80 - ___InternalCxxFrameHandler
-[ ] 00548D40 - FindHandler
-[ ] 00548FE0 - FindHandlerForForeignException
-[ ] 005490C0 - GetRangeOfTrysToCheck
-[ ] 00549160 - ___FrameUnwindToState
-[ ] 00549250 - CatchIt
-[ ] 005492F0 - CallCatchBlock
-[ ] 005493BD - FUN_005493bd
-[ ] 00549440 - BuildCatchObject
-[ ] 00549640 - DestructExceptionObject
-[ ] 005496C0 - AdjustPointer
-[ ] 005496F0 - __CallSettingFrame@12
-[ ] 00549740 - __setdefaultprecision
-[ ] 00549760 - __ms_p5_test_fdiv
-[ ] 005497B0 - __ms_p5_mp_test_fdiv
-[ ] 00549920 - __cftoe
-[ ] 005499A0 - __cftoe2
+[.] 0053ADA0 - FUN_0053ada0
+[.] 0053AE30 - FUN_0053ae30
+[.] 0053AEA0 - FUN_0053aea0
+[.] 0053AF00 - FUN_0053af00
+[.] 0053B020 - FUN_0053b020
+[.] 0053B040 - FUN_0053b040
+[.] 0053B140 - FUN_0053b140
+[.] 0053B190 - FUN_0053b190
+[.] 0053B200 - FUN_0053b200
+[.] 0053B280 - FUN_0053b280
+[.] 0053B390 - FUN_0053b390
+[.] 0053B4E0 - FUN_0053b4e0
+[.] 0053B530 - FUN_0053b530
+[.] 0053B680 - SetDefaultBufferSize_
+[.] 0053B690 - FUN_0053b690
+[.] 0053B6A0 - FUN_0053b6a0
+[.] 0053B6B0 - FUN_0053b6b0
+[.] 0053B6E0 - FUN_0053b6e0
+[.] 0053B760 - GetTickCount
+[.] 0053B770 - FUN_0053b770
+[.] 0053B7D0 - FUN_0053b7d0
+[.] 0053B880 - FUN_0053b880
+[.] 0053B8A0 - FUN_0053b8a0
+[.] 0053B950 - FUN_0053b950
+[.] 0053B980 - FUN_0053b980
+[.] 0053B9C0 - FUN_0053b9c0
+[.] 0053BC40 - FUN_0053bc40
+[.] 0053BC50 - FUN_0053bc50
+[.] 0053BC60 - FUN_0053bc60
+[.] 0053BC70 - FUN_0053bc70
+[.] 0053BD30 - FUN_0053bd30
+[.] 0053BD50 - FUN_0053bd50
+[.] 0053BD91 - FUN_0053bd91
+[.] 0053BDF9 - FUN_0053bdf9
+[.] 0053BE10 - FUN_0053be10
+[.] 0053BE7E - FUN_0053be7e
+[.] 0053BE90 - FUN_0053be90
+[.] 0053C060 - FUN_0053c060
+[.] 0053C070 - FUN_0053c070
+[.] 0053C120 - FUN_0053c120
+[.] 0053C2F0 - FUN_0053c2f0
+[.] 0053C3A0 - FUN_0053c3a0
+[.] 0053C410 - FUN_0053c410
+[.] 0053C490 - FUN_0053c490
+[.] 0053C4E0 - FUN_0053c4e0
+[.] 0053C590 - FUN_0053c590
+[.] 0053C640 - FUN_0053c640
+[.] 0053C6B0 - FUN_0053c6b0
+[.] 0053C740 - FUN_0053c740
+[.] 0053CAD0 - FUN_0053cad0
+[.] 0053CB70 - FUN_0053cb70
+[.] 0053CBB0 - FUN_0053cbb0
+[.] 0053CC20 - FUN_0053cc20
+[.] 0053CD40 - FUN_0053cd40
+[.] 0053CE21 - FUN_0053ce21
+[.] 0053CE30 - FUN_0053ce30
+[.] 0053CEE7 - FUN_0053cee7
+[.] 0053CEF0 - FUN_0053cef0
+[.] 0053CFA4 - FUN_0053cfa4
+[.] 0053CFB0 - FUN_0053cfb0
+[.] 0053D07F - FUN_0053d07f
+[.] 0053D090 - FUN_0053d090
+[.] 0053D11F - FUN_0053d11f
+[.] 0053D130 - FUN_0053d130
+[.] 0053D1BF - FUN_0053d1bf
+[.] 0053D1D0 - FUN_0053d1d0
+[.] 0053D1E0 - FUN_0053d1e0
+[.] 0053D1F0 - FUN_0053d1f0
+[.] 0053D200 - FUN_0053d200
+[.] 0053D210 - FUN_0053d210
+[.] 0053D220 - FUN_0053d220
+[.] 0053D230 - FUN_0053d230
+[.] 0053D250 - FUN_0053d250
+[.] 0053D260 - FUN_0053d260
+[.] 0053D270 - FUN_0053d270
+[.] 0053D280 - FUN_0053d280
+[.] 0053D2A0 - FUN_0053d2a0
+[.] 0053D380 - FUN_0053d380
+[.] 0053D470 - FUN_0053d470
+[.] 0053D570 - FUN_0053d570
+[.] 0053D6B0 - FUN_0053d6b0
+[.] 0053D7C0 - FUN_0053d7c0
+[.] 0053D8E0 - FUN_0053d8e0
+[.] 0053D960 - timeGetTime
+[.] 0053D970 - FUN_0053d970
+[.] 0053DA00 - FUN_0053da00
+[.] 0053DA20 - FUN_0053da20
+[.] 0053DAA0 - FUN_0053daa0
+[.] 0053DAF3 - FUN_0053daf3
+[.] 0053DB00 - FUN_0053db00
+[.] 0053DB80 - FUN_0053db80
+[.] 0053DCA2 - FUN_0053dca2
+[.] 0053DCB0 - FUN_0053dcb0
+[.] 0053DD60 - FUN_0053dd60
+[.] 0053DF50 - FUN_0053df50
+[.] 0053DF90 - FUN_0053df90
+[.] 0053DFE0 - FUN_0053dfe0
+[.] 0053E120 - FUN_0053e120
+[.] 0053E180 - FUN_0053e180
+[.] 0053E1A0 - FUN_0053e1a0
+[.] 0053E1C0 - FUN_0053e1c0
+[.] 0053E310 - FUN_0053e310
+[.] 0053E3D0 - FUN_0053e3d0
+[.] 0053E440 - FUN_0053e440
+[.] 0053E4D0 - FUN_0053e4d0
+[.] 0053E600 - FUN_0053e600
+[.] 0053E710 - FUN_0053e710
+[.] 0053E870 - FUN_0053e870
+[.] 0053E950 - FUN_0053e950
+[.] 0053E9C0 - FUN_0053e9c0
+[.] 0053EA00 - FUN_0053ea00
+[.] 0053EA20 - FUN_0053ea20
+[.] 0053EA40 - FUN_0053ea40
+[.] 0053EAA0 - FUN_0053eaa0
+[.] 0053EAB0 - FUN_0053eab0
+[.] 0053EAF0 - FUN_0053eaf0
+[.] 0053EBD0 - FUN_0053ebd0
+[.] 0053EC40 - FUN_0053ec40
+[.] 0053EC80 - FUN_0053ec80
+[.] 0053ECF0 - FUN_0053ecf0
+[.] 0053EDA0 - FUN_0053eda0
+[.] 0053EDC0 - FUN_0053edc0
+[.] 0053EE27 - FUN_0053ee27
+[.] 0053EE30 - FUN_0053ee30
+[.] 0053EE80 - FUN_0053ee80
+[.] 0053EEA0 - FUN_0053eea0
+[.] 0053EF40 - FUN_0053ef40
+[.] 0053F1D0 - FUN_0053f1d0
+[.] 0053F230 - FUN_0053f230
+[.] 0053F280 - FUN_0053f280
+[.] 0053F2B0 - FUN_0053f2b0
+[.] 0053F480 - FUN_0053f480
+[.] 0053F590 - FUN_0053f590
+[.] 0053F5A0 - FUN_0053f5a0
+[.] 0053F630 - FUN_0053f630
+[.] 0053F720 - FUN_0053f720
+[.] 0053F770 - FUN_0053f770
+[.] 0053F8C0 - FUN_0053f8c0
+[.] 0053F8F0 - FUN_0053f8f0
+[.] 0053F9A0 - FUN_0053f9a0
+[.] 0053FA40 - FUN_0053fa40
+[.] 0053FC60 - FUN_0053fc60
+[.] 0053FD50 - FUN_0053fd50
+[.] 0053FDB0 - FUN_0053fdb0
+[.] 0053FE10 - FUN_0053fe10
+[.] 0053FE40 - FUN_0053fe40
+[.] 0053FFB0 - FUN_0053ffb0
+[.] 0053FFE0 - FUN_0053ffe0
+[.] 005400B0 - FUN_005400b0
+[.] 005400D0 - FUN_005400d0
+[.] 00540100 - FUN_00540100
+[.] 00540180 - FUN_00540180
+[.] 005401B0 - FUN_005401b0
+[.] 005401F0 - FUN_005401f0
+[.] 00540250 - FUN_00540250
+[.] 005402B0 - FUN_005402b0
+[.] 005402F0 - FUN_005402f0
+[.] 00540310 - FUN_00540310
+[.] 00540350 - FUN_00540350
+[.] 005403A0 - FUN_005403a0
+[.] 00540400 - FUN_00540400
+[.] 00540490 - FUN_00540490
+[.] 005404D0 - WSACleanup
+[.] 005404D6 - WSAStartup
+[.] 005404DC - gethostbyname
+[.] 005404E2 - inet_addr
+[.] 005404E8 - htons
+[.] 005404EE - ntohs
+[.] 005404F4 - WSAGetLastError
+[.] 005404FA - setsockopt
+[.] 00540500 - ioctlsocket
+[.] 00540506 - connect
+[.] 0054050C - socket
+[.] 00540512 - closesocket
+[.] 00540518 - __WSAFDIsSet
+[.] 0054051E - select
+[.] 00540524 - recv
+[.] 0054052A - send
+[.] 00540530 - listen
+[.] 00540536 - getsockname
+[.] 0054053C - bind
+[.] 00540542 - accept
+[.] 00540550 - _sprintf
+[.] 005405C0 - __alloca_probe
+[.] 005405F0 - _fclose
+[.] 00540630 - __fclose_lk
+[.] 00540690 - _fflush
+[.] 005406D0 - __fflush_lk
+[.] 00540710 - __flush
+[.] 00540790 - flsall
+[.] 00540860 - _fwrite
+[.] 005408A0 - __fwrite_lk
+[.] 00540A30 - _fread
+[.] 00540A70 - __fread_lk
+[.] 00540BC0 - __fsopen
+[.] 00540C00 - _wfopen
+[.] 00540C20 - _qsort
+[.] 00540D90 - shortsort
+[.] 00540DF0 - swap
+[.] 00540E20 - _strncpy
+[.] 00540F20 - _clock
+[.] 00540F70 - __memmove
+[.] 005410C0 - __isctype
+[.] 00541160 - _toupper
+[.] 005411D0 - __toupper_lk
+[.] 005412C0 - _tolower
+[.] 00541330 - __tolower_lk
+[.] 00541430 - _strchr
+[.] 00541436 - strchr
+[.] 005414F0 - _atol
+[.] 005415A0 - _atoi
+[.] 005415B0 - _sscanf
+[.] 00541600 - __cinit
+[.] 00541630 - __exit
+[.] 00541650 - __exit
+[.] 00541670 - doexit
+[.] 00541730 - FID_conflict:__lockexit
+[.] 00541740 - FID_conflict:__lockexit
+[.] 00541750 - __initterm
+[.] 00541770 - _fseek
+[.] 005417B0 - __fseek_lk
+[.] 00541850 - _localtime
+[.] 00541A20 - _time
+[.] 00541B30 - strstr
+[.] 00541BB0 - _fgets
+[.] 00541C30 - _strncmp
+[.] 00541C70 - __findfirst
+[.] 00541DC0 - __findnext
+[.] 00541F00 - ___timet_from_ft
+[.] 00541F90 - _vsprintf
+[.] 00542000 - __onexit
+[.] 00542090 - _atexit
+[.] 005420F0 - _fputs
+[.] 00542160 - _fgetc
+[.] 005421A0 - _malloc
+[.] 005421C0 - __nh_malloc
+[.] 00542210 - __heap_alloc
+[.] 00542270 - _free
+[.] 005422E0 - entry
+[.] 00542490 - __amsg_exit
+[.] 005424C0 - __beginthread
+[.] 00542550 - FUN_00542550
+[.] 00542610 - __endthread
+[.] 00542660 - _ctime
+[.] 00542680 - __getdiskfree
+[.] 005426F0 - remove_
+[.] 00542720 - __ftell_lk
+[.] 005428D0 - __strcmpi
+[.] 005429A0 - _printf
+[.] 00542A00 - _fputc
+[.] 00542A50 - _putc
+[.] 00542A70 - _calloc
+[.] 00542B20 - __dosmaperr
+[.] 00542BA0 - __errno
+[.] 00542BB0 - FUN_00542bb0
+[.] 00542CB0 - _vprintf
+[.] 00542D10 - __itoa
+[.] 00542D50 - xtoa
+[.] 00542DB0 - _JumpToContinuation
+[.] 00542DF0 - _CallMemberFunction0
+[.] 00542E00 - FID_conflict:_CallMemberFunction1
+[.] 00542E10 - FID_conflict:_CallMemberFunction1
+[.] 00542E20 - _UnwindNestedFrames
+[.] 00542E80 - ___CxxFrameHandler
+[.] 00542EC0 - _CallCatchBlock2
+[.] 00542F60 - _CallSETranslator
+[.] 00543040 - TranslatorGuardHandler
+[.] 005430AC - __global_unwind2
+[.] 005430EE - __local_unwind2
+[.] 00543156 - __abnormal_termination
+[.] 00543179 - FUN_00543179
+[.] 00543182 - FUN_00543182
+[.] 005431A0 - FUN_005431a0
+[.] 005431B0 - _fprintf
+[.] 00543200 - __fpmath
+[.] 00543220 - FUN_00543220
+[.] 00543230 - FUN_00543230
+[.] 00543270 - operator_new
+[.] 00543280 - FUN_00543280
+[.] 005432A0 - _mktime
+[.] 005432B0 - __make_time_t
+[.] 00543510 - __flsbuf
+[.] 00543660 - ~type_info
+[.] 00543690 - `scalar_deleting_destructor'
+[.] 005436B0 - __CxxThrowException@8
+[.] 00543700 - __getenv_lk
+[.] 005437B0 - __output
+[.] 00544160 - write_char
+[.] 005441B0 - write_multi_char
+[.] 005441F0 - write_string
+[.] 00544230 - get_int_arg
+[.] 00544240 - get_int64_arg
+[.] 00544260 - get_short_arg
+[.] 00544270 - __mtinitlocks
+[.] 005442A0 - __lock
+[.] 00544310 - FUN_00544310
+[.] 00544330 - __lock_file
+[.] 00544370 - FID_conflict:__lock_file2
+[.] 005443A0 - __unlock_file
+[.] 005443E0 - FID_conflict:__lock_file2
+[.] 00544410 - __close
+[.] 00544480 - __close_lk
+[.] 00544510 - __freebuf
+[.] 00544550 - __commit
+[.] 00544600 - __write
+[.] 00544680 - __write_lk
+[.] 00544880 - __filbuf
+[.] 00544980 - __read
+[.] 00544A00 - __read_lk
+[.] 00544C30 - __openfile
+[.] 00544E40 - __getstream
+[.] 00544F30 - __ftime
+[.] 00544FE0 - ___crtGetStringTypeW
+[.] 005451A0 - ___crtGetStringTypeA
+[.] 005452E0 - ___crtLCMapStringA
+[.] 00545510 - _strncnt
+[.] 00545540 - __allmul
+[.] 00545580 - __input
+[.] 00546220 - __hextodec
+[.] 00546260 - __inc
+[.] 00546290 - __un_inc
+[.] 005462B0 - __whiteout
+[.] 005462E0 - __lseek
+[.] 00546360 - __lseek_lk
+[.] 005463F0 - ___tzset
+[.] 00546430 - __tzset_lk
+[.] 00546710 - __isindst
+[.] 00546740 - __isindst_lk
+[.] 005469A0 - cvtdate
+[.] 00546B30 - _gmtime
+[.] 00546C90 - ___loctotime_t
+[.] 00546D80 - _realloc
+[.] 00546F50 - __msize
+[.] 00546FC0 - __stbuf
+[.] 00547060 - __ftbuf
+[.] 005470A0 - __callnewh
+[.] 005470E0 - __heap_init
+[.] 00547120 - ___sbh_new_region
+[.] 00547290 - ___sbh_release_region
+[.] 005472F0 - ___sbh_decommit_pages
+[.] 005473D0 - ___sbh_find_block
+[.] 00547430 - ___sbh_free_block
+[.] 00547480 - ___sbh_alloc_block
+[.] 00547700 - ___sbh_alloc_block_from_page
+[.] 00547880 - ___sbh_resize_block
+[.] 00547950 - __XcptFilter
+[.] 00547AA0 - xcptlookup
+[.] 00547AD0 - __ismbblead
+[.] 00547AF0 - x_ismbbtype
+[.] 00547B30 - __setenvp
+[.] 00547C20 - __setargv
+[.] 00547CC0 - parse_cmdline
+[.] 00547E90 - ___crtGetEnvironmentStringsA
+[.] 00548020 - __setmbcp
+[.] 00548250 - getSystemCP
+[.] 005482A0 - _CPtoLCID
+[.] 00548300 - setSBCS
+[.] 00548330 - ___initmbctable
+[.] 00548340 - __ioinit
+[.] 00548520 - __mtinit
+[.] 00548580 - __initptd
+[.] 005485A0 - __getptd
+[.] 00548610 - __freeptd
+[.] 00548779 - __seh_longjmp_unwind@4
+[.] 005487A0 - __FF_MSGBANNER
+[.] 005487E0 - __NMSG_WRITE
+[.] 005489E0 - _asctime
+[.] 00548AC0 - store_dt
+[.] 00548AF0 - __fcloseall
+[.] 00548B90 - __aulldiv
+[.] 00548C00 - __aullrem
+[.] 00548C80 - ___InternalCxxFrameHandler
+[.] 00548D40 - FindHandler
+[.] 00548FE0 - FindHandlerForForeignException
+[.] 005490C0 - GetRangeOfTrysToCheck
+[.] 00549160 - ___FrameUnwindToState
+[.] 00549250 - CatchIt
+[.] 005492F0 - CallCatchBlock
+[.] 005493BD - FUN_005493bd
+[.] 00549440 - BuildCatchObject
+[.] 00549640 - DestructExceptionObject
+[.] 005496C0 - AdjustPointer
+[.] 005496F0 - __CallSettingFrame@12
+[.] 00549740 - __setdefaultprecision
+[.] 00549760 - __ms_p5_test_fdiv
+[.] 005497B0 - __ms_p5_mp_test_fdiv
+[.] 00549920 - __cftoe
+[.] 005499A0 - __cftoe2
 [ ] 00549A90 - __cftof
 [ ] 00549B00 - __cftof2
 [ ] 00549BC0 - __cftog

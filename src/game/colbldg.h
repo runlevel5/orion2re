@@ -2,7 +2,9 @@
 #include <cstdint>
 
 struct s_colors;
+struct s_ship_data;
 struct s_ship_design;
+struct s_ship_weapons;
 
 namespace COLBLDG {
     inline int16_t* _building_indexes = reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AB30});
@@ -55,7 +57,7 @@ namespace COLBLDG {
     inline int16_t& _colony_bldg_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571EDC});
     inline int16_t& _scanned_prod = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571EFC});
     inline int16_t& _refitting_ship_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F00});
-    inline int16_t& _colony_auto_building = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F78});
+    inline uint8_t& _colony_auto_building = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00571F78});
     inline int16_t (&_fields)[11] = *reinterpret_cast<int16_t (*)[11]>(std::uintptr_t{0x00571F80});
     inline s_colors& _l_font_color_array =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x0055AB00});
@@ -103,19 +105,23 @@ namespace COLBLDG {
 
     void __cdecl Draw_Ship_Design_Info2_(s_ship_design* design);
 
-    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer, char show_crew);
+    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, char* buffer);
 
-    void __cdecl Build_Weapon_String_(uint8_t* weapon_inst, char* dest, uint8_t param_3, uint8_t count);
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer);
+
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, char* buffer, char show_crew);
+
+    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon_inst, char* dest, uint8_t param_3, uint8_t count);
 
     int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t product_id);
 
-    void __cdecl Delete_From_Colony_Queue_(short colony_idx, short queue_idx);
+    void __cdecl Delete_From_Colony_Queue_(int16_t colony_idx, int16_t queue_idx);
 
     void __cdecl Delete_Prod_From_Colony_Queue_(int16_t colony_idx, int16_t product_id);
 
-    void __cdecl Delete_Ship_(short ship_index);
+    void __cdecl Delete_Ship_(int16_t ship_index);
 
-    void __cdecl Squish_Out_Colony_Queue_Slot_(short colony_idx, short queue_idx);
+    void __cdecl Squish_Out_Colony_Queue_Slot_(int16_t colony_idx, int16_t queue_idx);
 
     void __cdecl Clear_Colony_Queue_(int16_t colony_idx);
 

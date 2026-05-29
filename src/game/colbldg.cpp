@@ -304,7 +304,7 @@ namespace COLBLDG {
         _fields[9] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(140));
         _fields[10] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(193));
 
-        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], &_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
+        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
 
         if (MOX::_settings.strategic_combat_flag != 0) {
             _fields[4] = -1000;
@@ -545,48 +545,34 @@ namespace COLBLDG {
 
         for (int16_t i = 0; i < _n_military_indexes; ++i) {
             int16_t mil_idx = _military_indexes[i];
-            bool use_dimmed_font = false;
+            s_colors* current_palette = &_l_font_color_array;
 
             if (mil_idx > -100 && mil_idx <= -50) {
                 s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
 
-                if (colony->buildings[40] == 0 && colony->buildings[41] == 0 && colony->buildings[8] == 0) {
-                    int design_idx = -50 - mil_idx;
-                    if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size >= 2) {
-                        if (_field_mode != 1) {
-                            use_dimmed_font = true;
-                        }
-                    }
-                }
-            }
-
-            if (!use_dimmed_font) {
-                if (_field_mode == 1 && mil_idx == _scanned_prod && mil_idx > -100 && mil_idx <= -50) {
+                if (colony->buildings[BUILDING_STAR_BASE] == 0 &&
+                    colony->buildings[BUILDING_STAR_FORTRESS] == 0 &&
+                    colony->buildings[BUILDING_BATTLESTATION] == 0 &&
+                    MOX::_player[MOX::_PLAYER_NUM].ship_designs[-50 - mil_idx].size >= 2 &&
+                    _field_mode != 1) {
+                    current_palette = &_l_font_dim_color_array;
+                } else if (_field_mode == 1 && mil_idx == _scanned_prod) {
                     if (ERIC::Global_Cycler_(30, 2) != 0) {
-                        use_dimmed_font = true;
+                        current_palette = &_l_font_dim_color_array;
                     }
-                }
-            }
-
-            if (!use_dimmed_font && mil_idx > -100 && mil_idx <= -50) {
-                if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], mil_idx)) {
+                } else if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], mil_idx)) {
                     if (_field_mode != 1) {
-                        use_dimmed_font = true;
+                        current_palette = &_l_font_dim_color_array;
+                    }
+                }
+            } else if (mil_idx == -11 || mil_idx == -12 || mil_idx == -13 || mil_idx == -17 || mil_idx == -16) {
+                if (Auto_Design_Type_(mil_idx) == 0) {
+                    if (mil_idx != -16 || !COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
+                        current_palette = &_l_font_dim_color_array;
                     }
                 }
             }
 
-            if (!use_dimmed_font) {
-                if (mil_idx == -11 || mil_idx == -12 || mil_idx == -13 || mil_idx == -17 || mil_idx == -16) {
-                    if (Auto_Design_Type_(mil_idx) == 0) {
-                        if (mil_idx != -16 || !COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
-                            use_dimmed_font = true;
-                        }
-                    }
-                }
-            }
-
-            s_colors* current_palette = use_dimmed_font ? &_l_font_dim_color_array : &_l_font_color_array;
             fonts::Set_Font_Style_Shadow_Down_(style_y_offset, current_palette);
 
             char* selection_name = Selection_Name_(mil_idx);
@@ -1165,11 +1151,11 @@ namespace COLBLDG {
         fonts::Set_Font_Spacing_(1);
         fonts::Set_Font_Spacing_Width_(2);
 
-        Build_Ship_Design_Info_Formatted_Paragraph_((s_ship_data*)design, buffer, 0);
+        Build_Ship_Design_Info_Formatted_Paragraph_(design, buffer);
         BILL::Squeeze_Print_Formatted_Paragraph_(212, 114, 248, 186, buffer, 0);
     }
 
-    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer, char show_crew) {
+    static char* Append_Ship_Design_Info_Formatted_Paragraph_Details_(s_ship_design* design, char* buffer) {
         char prefix_str[16];
         char wide_item_strings[8][200];
 
@@ -1180,38 +1166,11 @@ namespace COLBLDG {
             wide_item_strings[i][0] = '\0';
         }
 
-        if (show_crew != '\0') {
-            if (ship->officer_index <= 0) {
-                buffer += sprintf(
-                    buffer,
-                    ESTRINGS::E_Strings_(79),
-                    strings::s_0_0055110c,
-                    ship->d.name,
-                    FLT2::Crew_Description_String_((int16_t)(ship - MOX::_ship)),
-                    strings::s_1_00551110
-                );
-            } else {
-                char leader_name[500];
-                char crew_desc[500];
-                strcpy(leader_name, OFFICER::Leader_Name_(ship->officer_index, '\0'));
-                strcpy(crew_desc, FLT2::Crew_Description_String_((int16_t)(ship - MOX::_ship)));
-
-                buffer += sprintf(
-                    buffer,
-                    ESTRINGS::E_Strings_(78),
-                    strings::s_0_0055110c,
-                    ship->d.name,
-                    leader_name,
-                    crew_desc
-                );
-            }
-        }
-
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(99), strings::s_0_0055110c, strings::s__0055ac34, ship->d.cost);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(119), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_shields[ship->d.shield_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(98), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_computers[ship->d.computer_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(91), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_armor[ship->d.armor_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(104), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_drives[ship->d.ftl_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(99), strings::s_0_0055110c, strings::s__0055ac34, design->cost);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(119), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_shields[design->shield_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(98), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_computers[design->computer_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(91), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_armor[design->armor_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(104), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_drives[design->ftl_type].name);
         buffer += sprintf(buffer, ESTRINGS::E_Strings_(130), strings::s_0_0055110c);
 
         int weapons_added = 0;
@@ -1219,17 +1178,17 @@ namespace COLBLDG {
         int wide_weapon_counts[8];
 
         for (int i = 0; i < 8; i++) {
-            if (ship->d.ship_weapon[i].type != 0) {
+            if (design->ship_weapon[i].type != 0) {
                 char temp_weapon_str[500];
-                Build_Weapon_String_(reinterpret_cast<uint8_t*>(&ship->d.ship_weapon[i].type), temp_weapon_str, '\0', ship->d.ship_weapon[i].count);
+                Build_Weapon_String_(&design->ship_weapon[i], temp_weapon_str, '\0', design->ship_weapon[i].count);
 
                 if (fonts::Get_String_Width_(temp_weapon_str) <= 110) {
                     int str_id = ((weapons_added % 2) == 0) ? 87 : 88;
-                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, (int)ship->d.ship_weapon[i].count, temp_weapon_str);
+                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, (int)design->ship_weapon[i].count, temp_weapon_str);
                     weapons_added++;
                 } else {
                     strcpy(wide_item_strings[num_wide_weapons], temp_weapon_str);
-                    wide_weapon_counts[num_wide_weapons] = ship->d.ship_weapon[i].count;
+                    wide_weapon_counts[num_wide_weapons] = design->ship_weapon[i].count;
                     num_wide_weapons++;
                 }
             }
@@ -1257,7 +1216,7 @@ namespace COLBLDG {
         bool has_specials_prefix = false;
 
         for (int i = 0; i < 39; i++) {
-            if (struct_::Test_Bit_Field_(ship->d.special_device_flags, i)) {
+            if (struct_::Test_Bit_Field_(design->special_device_flags, i)) {
                 if (!has_specials_prefix) {
                     has_specials_prefix = true;
                     buffer += sprintf(buffer, ESTRINGS::E_Strings_(129), strings::s_0_0055110c);
@@ -1281,6 +1240,53 @@ namespace COLBLDG {
             for (int i = 0; i < num_wide_specials; i++) {
                 buffer += sprintf(buffer, ESTRINGS::E_Strings_(90), strings::s_0_0055110c, wide_item_strings[i]);
             }
+        }
+
+        return buffer;
+    }
+
+    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, char* buffer) {
+        Append_Ship_Design_Info_Formatted_Paragraph_Details_(design, buffer);
+    }
+
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer) {
+        char* out = buffer;
+
+        if (ship->officer_index <= 0) {
+            out += sprintf(
+                out,
+                ESTRINGS::E_Strings_(79),
+                strings::s_0_0055110c,
+                ship->d.name,
+                FLT2::Crew_Description_String_((int16_t)(ship - MOX::_ship)),
+                strings::s_1_00551110
+            );
+        } else {
+            char leader_name[500];
+            char crew_desc[500];
+            strcpy(leader_name, OFFICER::Leader_Name_(ship->officer_index, '\0'));
+            strcpy(crew_desc, FLT2::Crew_Description_String_((int16_t)(ship - MOX::_ship)));
+
+            out += sprintf(
+                out,
+                ESTRINGS::E_Strings_(78),
+                strings::s_0_0055110c,
+                ship->d.name,
+                leader_name,
+                crew_desc
+            );
+        }
+
+        Append_Ship_Design_Info_Formatted_Paragraph_Details_(&ship->d, out);
+    }
+
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, char* buffer, char show_crew) {
+        // The original binary routes both plain design pointers and ship-backed design subobjects through 0050A5C0.
+        // Split the source API into design-only and ship-only entry points, and keep this wrapper only for binary call compatibility.
+        if (show_crew != '\0') {
+            Build_Ship_Info_Formatted_Paragraph_((s_ship_data*)ship_or_design, buffer);
+        } else {
+            Build_Ship_Design_Info_Formatted_Paragraph_((s_ship_design*)ship_or_design, buffer);
         }
     }
 
@@ -1388,7 +1394,7 @@ namespace COLBLDG {
         if (_fields[3] == input_field) {
             _field_mode = 0;
             COLONY::Reset_Mouse_Picture_();
-            MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
+            MOX::_colony[COLONY::_colony_handle].auto_building = _colony_auto_building;
 
             if (Something_Behind_Settting_() == 0) {
                 Do_Exit_Screen_Cleanup_();
@@ -1518,7 +1524,7 @@ namespace COLBLDG {
                 int16_t next_colony = COLONY::Get_Next_Colony_(COLONY::_colony_handle, 0);
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
+                MOX::_colony[COLONY::_colony_handle].auto_building = _colony_auto_building;
                 Do_Exit_Screen_Cleanup_();
                 if (next_colony != COLONY::_colony_handle) {
                     COLONY::Set_Colony_Screen_To_New_Colony_(next_colony);
@@ -1531,7 +1537,7 @@ namespace COLBLDG {
                 }
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
+                MOX::_colony[COLONY::_colony_handle].auto_building = _colony_auto_building;
                 Do_Exit_Screen_Cleanup_();
                 COLONY::_full_draw = 1;
             } else if (_fields[7] == input_field) {
@@ -1688,17 +1694,16 @@ namespace COLBLDG {
 
         if (active_idx >= 49 /* 0x31 */) {
             int16_t rel_idx = active_idx - 49;
-            int16_t* active_prod_ptr = &_active_prod[0];
-            int16_t current = active_prod_ptr[4 + rel_idx];
+            int16_t current = _current_item[rel_idx];
             int16_t scanned_prod = _scanned_prod;
             int16_t scanned_field = _scanned_field;
 
             bool is_match = false;
             if (current == scanned_prod) {
                 is_match = true;
-            } else if (rel_idx != 0 && current == -10 && active_prod_ptr[3 + rel_idx] == scanned_prod) {
+            } else if (rel_idx != 0 && current == -10 && _current_item[rel_idx - 1] == scanned_prod) {
                 is_match = true;
-            } else if (rel_idx < 6 && active_prod_ptr[5 + rel_idx] == -10 && active_prod_ptr[5 + rel_idx] == scanned_prod) {
+            } else if (rel_idx < 6 && _current_item[rel_idx + 1] == -10 && scanned_prod == -10) {
                 is_match = true;
             }
 
@@ -1710,7 +1715,7 @@ namespace COLBLDG {
                     graphics::Box_(207, base_y + 312, 252, 16, 1, 239);
                 }
 
-                if (rel_idx < 6 && active_prod_ptr[5 + rel_idx] == -10) {
+                if (rel_idx < 6 && _current_item[rel_idx + 1] == -10) {
                     graphics::Box_(207, base_y + 352, 252, 16, 1, 239);
                 }
 
@@ -1723,7 +1728,7 @@ namespace COLBLDG {
                     graphics::Box_(207, base_y + 312, 252, 16, 1, 100);
                 }
 
-                if (rel_idx < 6 && active_prod_ptr[5 + rel_idx] == -10) {
+                if (rel_idx < 6 && _current_item[rel_idx + 1] == -10) {
                     graphics::Box_(207, base_y + 352, 252, 16, 1, 100);
                 }
 
@@ -1770,7 +1775,7 @@ namespace COLBLDG {
     /**
      * @address 0050b2d0
      */
-    void __cdecl Delete_Ship_(short ship_index) {
+    void __cdecl Delete_Ship_(int16_t ship_index) {
         // status 5 likely indicates a deleted or inactive state
         MOX::_ship[ship_index].status = 5;
         // -1 (0xFFFF) location indicates the ship is no longer on the map
@@ -1805,11 +1810,11 @@ namespace COLBLDG {
         COLONY::Remap_Draw_Ship_Centered_(244, 56, index);
     }
 
-    void __cdecl Squish_Out_Colony_Queue_Slot_(short colony_idx, short queue_idx) {
+    void __cdecl Squish_Out_Colony_Queue_Slot_(int16_t colony_idx, int16_t queue_idx) {
         s_colony* col = &MOX::_colony[colony_idx];
 
         do {
-            for (short i = queue_idx; i < 6; i++) {
+            for (int16_t i = queue_idx; i < 6; i++) {
                 col->producing[i] = col->producing[i + 1];
             }
             col->producing[6] = -1;
@@ -1822,14 +1827,14 @@ namespace COLBLDG {
      * @param colony_idx Index of the colony in the global colony array.
      * @param queue_idx Index of the production queue slot to delete.
      */
-    void __cdecl Delete_From_Colony_Queue_(short colony_idx, short queue_idx) {
+    void __cdecl Delete_From_Colony_Queue_(int16_t colony_idx, int16_t queue_idx) {
         if (queue_idx != -1) {
-            short producing_id = MOX::_colony[colony_idx].producing[queue_idx];
+            int16_t producing_id = MOX::_colony[colony_idx].producing[queue_idx];
 
             // Ship-related production items have IDs <= -100
             if (producing_id <= -100) {
                 // Calculate original ship design ID or instance ID from the queue value
-                COLBLDG::Delete_Ship_(-100 - (int)producing_id);
+                COLBLDG::Delete_Ship_((int16_t)(-100 - producing_id));
             }
 
             COLBLDG::Squish_Out_Colony_Queue_Slot_(colony_idx, queue_idx);
@@ -1976,7 +1981,7 @@ namespace COLBLDG {
                 } else {
                     MOX::_temp_star_handle = 4;
                     COLBLDG::_return_to_build_popup_from_custom_design = 1;
-                    MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)COLBLDG::_colony_auto_building;
+                    MOX::_colony[COLONY::_colony_handle].auto_building = COLBLDG::_colony_auto_building;
                     return 1;
                 }
             }
@@ -2190,12 +2195,12 @@ namespace COLBLDG {
         }
     }
 
-    void __cdecl Build_Weapon_String_(uint8_t* weapon_inst, char* dest, uint8_t param_3, uint8_t count) {
+    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon_inst, char* dest, uint8_t param_3, uint8_t count) {
         char buf1[500];
         char buf2[500];
         char buf3[500];
 
-        int16_t weapon_id = *reinterpret_cast<int16_t*>(weapon_inst);
+        int16_t weapon_id = weapon_inst->type;
 
         char* name;
         if (count <= 1) {
@@ -2208,7 +2213,7 @@ namespace COLBLDG {
         strcpy(buf1, ESTRINGS::E_Strings_(0xC));
         strcpy(buf3, ESTRINGS::E_Strings_(0xC));
 
-        uint8_t* mods_ptr = weapon_inst + 5;
+        uint8_t* mods_ptr = (uint8_t*)&weapon_inst->specials;
         for (int16_t bit = 0; bit < 15; bit++) {
             if (struct_::Test_Bit_Field_(mods_ptr, bit)) {
                 if (bit == 1 || bit == 2) {

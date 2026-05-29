@@ -22,8 +22,8 @@ namespace fonts {
 
     inline uint8_t*& _font_data = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00576434});
 
-    inline uint8_t& _palette_block__unk =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576447});
+    inline uint8_t* const _palette_block__unk =
+        reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576447});
 
     inline s_font& _font_header =
         *reinterpret_cast<s_font*>(std::uintptr_t{0x00576448});
@@ -75,11 +75,11 @@ namespace fonts {
 
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
-    inline uint16_t& _outline_color =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B148});
+    inline uint8_t& _outline_color =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B148});
 
-    inline uint16_t& _alias_outline_color =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B14C});
+    inline uint8_t& _alias_outline_color =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B14C});
 
     void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color);
 
@@ -103,7 +103,7 @@ namespace fonts {
 
     int16_t __cdecl Get_Font_Height_();
 
-    int16_t __cdecl Get_Font_Vertical_Spacing_();
+    uint16_t __cdecl Get_Font_Vertical_Spacing_();
 
     void __cdecl Set_Font_Style_Outline_(int16_t style, s_colors* colors);
 

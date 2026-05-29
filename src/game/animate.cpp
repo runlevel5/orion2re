@@ -93,11 +93,11 @@ namespace animate {
         return animation->current_frame;
     }
 
-    void __cdecl Set_Animation_Frame_(s_animation_header* anim, int16_t frame) {
+    void __cdecl Set_Animation_Frame_(s_animation_header* anim, int32_t frame) {
         if (frame >= anim->frame_count) {
             frame = anim->frame_count - 1;
         }
-        anim->current_frame = frame;
+        anim->current_frame = (int16_t)frame;
     }
 
     int16_t __cdecl Get_Animation_Frame_Count_(s_animation_header* anim) {
@@ -123,7 +123,7 @@ namespace animate {
             Set_Animation_Palette_();
         }
 
-        uint8_t* data = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
+        uint8_t* data = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
 
         int16_t x_end = anim->width + x - 1;
         int16_t y_end = anim->height + y - 1;
@@ -193,7 +193,7 @@ namespace animate {
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
                 case 2:
-                    if (video::_copy_to_on_page_flag == 1) Draw_Screen_Background_On_(reinterpret_cast<uint32_t*>(data));
+                    if (video::_copy_to_on_page_flag == 1) Draw_Screen_Background_On_((uint32_t*)data);
                     else Draw_Screen_Background_Off_(data);
 
                     if (video::screen_refresh_flag > 1) {
@@ -232,13 +232,13 @@ namespace animate {
         anim->current_frame++;
         if (anim->flags & 0x20) {
             if (anim->current_frame >= anim->frame_count) {
-                anim->current_frame = static_cast<int16_t>(anim->loop_frame);
+                anim->current_frame = anim->loop_frame;
                 return;
             }
         }
         else {
             if (anim->current_frame >= anim->frame_count) {
-                anim->current_frame = static_cast<int16_t>(anim->loop_frame);
+                anim->current_frame = anim->loop_frame;
             }
         }
     }
@@ -280,43 +280,42 @@ namespace animate {
     void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int16_t current_y_offset = *reinterpret_cast<int16_t*>(&sprite[2]);
-        uint32_t word_idx = 2;
+        int32_t current_y_offset = *(uint16_t*)(sprite + 2);
+        int32_t word_idx = 2;
 
-        uint32_t dest_idx = (static_cast<int32_t>(y) + current_y_offset) * platform::g_screen_res_x + x;
-        uint32_t line_start_idx = dest_idx;
+        int32_t dest_idx = (int32_t)x + ((int32_t)y + current_y_offset) * platform::g_screen_res_x;
+        int32_t line_start_idx = dest_idx;
 
-        int32_t total_height = static_cast<int32_t>(_animation_header->height);
+        int32_t total_height = (int32_t)_animation_header->height;
         uint8_t* video_ptr = video::_current_video_page;
 
-        while (static_cast<int32_t>(current_y_offset) < total_height) {
-            int16_t* cmd_stream = reinterpret_cast<int16_t*>(&sprite[word_idx * 2]);
-            int16_t pixel_count = cmd_stream[0];
-            int16_t skip_val = cmd_stream[1];
+        while (current_y_offset < total_height) {
+            int16_t pixel_count = *(int16_t*)(sprite + word_idx * 2);
+            int16_t skip_val = *(int16_t*)(sprite + word_idx * 2 + 2);
             word_idx += 2;
 
             if (pixel_count == 0) {
                 current_y_offset += skip_val;
-                line_start_idx += static_cast<int32_t>(skip_val) * 640;
+                line_start_idx += (int32_t)skip_val * 640;
                 dest_idx = line_start_idx;
             }
             else {
                 dest_idx += skip_val;
                 uint8_t* pixel_data = &sprite[word_idx * 2];
 
-                for (int i = 0; i < static_cast<int32_t>(pixel_count); ++i) {
+                for (int32_t i = 0; i < (int32_t)pixel_count; ++i) {
                     uint8_t pixel = pixel_data[i];
                     if (pixel < 0xF0) {
                         video_ptr[dest_idx] = pixel;
                     }
                     else {
                         uint8_t background_pixel = video_ptr[dest_idx];
-                        video_ptr[dest_idx] = video::_glass_remap_colors[pixel - 0xF0][background_pixel];
+                        video_ptr[dest_idx] = draw::_glass_lookup_table[((uint32_t)pixel << 8) + background_pixel];
                     }
                     dest_idx++;
                 }
 
-                word_idx += (static_cast<int32_t>(pixel_count) + 1) / 2;
+                word_idx += ((int32_t)pixel_count + 1) / 2;
             }
         }
 
@@ -348,7 +347,7 @@ namespace animate {
                             }
                             else {
                                 uint8_t existing_pixel = v_page[screen_offset];
-                                v_page[screen_offset] = video::_glass_remap_colors[pixel - 0xF0][existing_pixel];
+                                v_page[screen_offset] = draw::_glass_lookup_table[((uint32_t)pixel << 8) + existing_pixel];
                             }
                         }
                         sprite_idx++;
@@ -436,20 +435,23 @@ namespace animate {
     }
 
     void __cdecl Set_Animation_Palette_() {
-        _palette_header = reinterpret_cast<s_palette_header*>(
+        _palette_header = (s_palette_header*)(
             &_animation_header->frame_offsets[_animation_header->frame_count + 1]
         );
 
-        if (_palette_header->count > 0) {
-            s_palette_entry* dst = &video::_current_palette[_palette_header->start_index];
-            uint32_t* src = reinterpret_cast<uint32_t*>(_palette_header + 1);
+        const int16_t start_index = _palette_header->start_index;
+        const int16_t count = _palette_header->count;
 
-            for (int i = 0; i < _palette_header->count; ++i) {
+        if (count > 0) {
+            s_palette_entry* dst = &video::_current_palette[start_index];
+            uint32_t* dst_val = (uint32_t*)dst;
+            const uint32_t* src = (const uint32_t*)((const uint8_t*)_palette_header + 4);
+
+            for (int16_t i = 0; i < count; ++i) {
                 uint32_t src_val = src[i];
-                uint32_t& dst_val = reinterpret_cast<uint32_t&>(dst[i]);
 
-                if (dst_val != src_val) {
-                    dst_val = src_val + 1;
+                if (dst_val[i] != src_val) {
+                    dst_val[i] = src_val + 1;
                     dst[i].changed = 1;
                 }
             }
@@ -543,7 +545,7 @@ namespace animate {
                 switch (anim->flags & 3) {
                 case 0:
                     Remap_Clipped_Draw_Animated_Sprite_(x, y, frame_ptr);
-                    return; // Note: Returns directly without advancing frame
+                    return;
                 case 1:
                     exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
                     break;
@@ -581,11 +583,11 @@ namespace animate {
 
         if ((anim->flags & 0x20) == 0) {
             if (anim->current_frame >= anim->frame_count) {
-                anim->current_frame = static_cast<int8_t>(anim->loop_frame);
+                anim->current_frame = anim->loop_frame;
             }
         }
         else {
-            int32_t loop32 = static_cast<int8_t>(anim->loop_frame);
+            int32_t loop32 = anim->loop_frame;
             int32_t curr32 = anim->current_frame;
 
             if (loop32 < curr32) {
@@ -715,7 +717,7 @@ namespace animate {
         _animation_header->current_frame++;
 
         if ((_animation_header->flags & 0x20) != 0) {
-            int8_t loop_frame = static_cast<int8_t>(_animation_header->loop_frame);
+            int8_t loop_frame = _animation_header->loop_frame;
             if (loop_frame < _animation_header->current_frame) {
                 if (loop_frame - _animation_header->current_frame == -1) {
                     _animation_header->current_frame = 0;
@@ -728,7 +730,7 @@ namespace animate {
             }
         } else {
             if (_animation_header->current_frame >= _animation_header->frame_count) {
-                _animation_header->current_frame = static_cast<int16_t>(_animation_header->loop_frame);
+                _animation_header->current_frame = _animation_header->loop_frame;
             }
         }
     }
@@ -833,15 +835,15 @@ namespace animate {
         }
         int32_t draw_height = max_y - draw_y + 1;
 
-        int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
+        int32_t current_y = *(uint16_t*)(frame_data + 2);
         int32_t screen_offset = x + draw_y * platform::g_screen_res_x;
         int32_t start_y = y_off;
         int32_t idx = 2;
 
         while (current_y < start_y) {
-            int16_t cmd = *reinterpret_cast<int16_t*>(frame_data + idx * 2);
+            int16_t cmd = *(int16_t*)(frame_data + idx * 2);
             if (cmd == 0) {
-                current_y += *reinterpret_cast<uint16_t*>(frame_data + idx * 2 + 2);
+                current_y += *(uint16_t*)(frame_data + idx * 2 + 2);
             } else {
                 idx += (cmd + 1) / 2;
             }
@@ -859,8 +861,8 @@ namespace animate {
         int32_t clip_right = line_start_offset + right_limit_offset;
 
         while (current_y < draw_height) {
-            int16_t cmd = *reinterpret_cast<int16_t*>(frame_data + idx * 2);
-            int16_t skip = *reinterpret_cast<int16_t*>(frame_data + idx * 2 + 2);
+            int16_t cmd = *(int16_t*)(frame_data + idx * 2);
+            int16_t skip = *(int16_t*)(frame_data + idx * 2 + 2);
             idx += 2;
 
             if (cmd == 0) {

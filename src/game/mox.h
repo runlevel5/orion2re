@@ -384,7 +384,7 @@ namespace MOX {
         *reinterpret_cast<s_help_box(*)[50]>(std::uintptr_t{0x005A1900});
 
     // Suggested name: MOX::_class_to_mineral
-    inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
+    inline int8_t (&_class_to_mineral)[60] = *reinterpret_cast<int8_t(*)[60]>(std::uintptr_t{0x00559540});
 
     // Suggested name: MOX::_planet_special
     inline int8_t& _planet_special =
@@ -394,7 +394,7 @@ namespace MOX {
     inline uint8_t* _planet_special_weighted_chance = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596B0});
 
     // Suggested name: MOX::_gravity_table
-    inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
+    inline int8_t (&_gravity_table)[30] = *reinterpret_cast<int8_t(*)[30]>(std::uintptr_t{0x00559580});
 
     inline s_mouse_list &_mouse_list_arrow = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D10});
     inline s_mouse_list& _mouse_list_relocation = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005598D8});

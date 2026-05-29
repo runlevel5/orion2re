@@ -16,7 +16,7 @@ namespace FIREPTS {
     }
 
     int16_t __cdecl N_Fire_Points_(int16_t param_1, int16_t param_2) {
-        int16_t result; // BUG: Original code uses uninitialized stack memory if param_2 > 99
+        int16_t result = 0;
 
         if (param_2 <= 10 || BEAMS::_g_firing_reflected_beam_flag != 0) {
             result = 1;
@@ -28,6 +28,8 @@ namespace FIREPTS {
             result = 4;
         } else if (param_2 == 99) {
             result = 5;
+        } else {
+            result = 0;
         }
 
         if (param_1 == 27 && result <= 2) {
@@ -53,17 +55,21 @@ namespace FIREPTS {
             color_idx = MOX::_player[attacker_owner].color;
         }
 
-        int point_idx = ((static_cast<int>(fp_idx) + static_cast<int>(target_bearing)) % 4) + (attacker_picture_num * 4);
-        int16_t* fp_data = reinterpret_cast<int16_t*>(_fp_data_ptr[color_idx]);
+        int32_t point_idx = (int32_t)fp_idx + (uint8_t)target_bearing;
+        while (point_idx < 0) {
+            point_idx += 4;
+        }
+        point_idx = (point_idx % 4) + (int32_t)attacker_picture_num * 4;
+        int16_t* fp_data = (int16_t*)_fp_data_ptr[color_idx];
 
         int32_t local_x = fp_data[point_idx * 2] - 0x1A;
         int32_t local_y = fp_data[point_idx * 2 + 1] - 0x18;
 
-        int rotation_angle = (static_cast<int>(attacker_facing_dir) * -360) / 16;
+        int rotation_angle = ((int)attacker_facing_dir * -360) / 16;
 
         angle::Rotate_Coordinates_(rotation_angle, &local_x, &local_y);
 
-        *fp_x = static_cast<int16_t>(local_x);
-        *fp_y = static_cast<int16_t>(local_y);
+        *fp_x = (int16_t)local_x;
+        *fp_y = (int16_t)local_y;
     }
 }

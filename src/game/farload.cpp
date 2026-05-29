@@ -3,7 +3,7 @@
 namespace farload {
 
 void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type) {
-    char temp_path[60];
+    char temp_path[44];
     void* dest_buf = nullptr;
 
     if (idx < 0) {
@@ -52,7 +52,7 @@ void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int
         farload::_farload_file_flag = 1;
     }
 
-    if (static_cast<int>(farload::_lbx_header.entry_count) <= idx) {
+    if ((uint32_t)farload::_lbx_header.entry_count <= (uint32_t)idx) {
         farload::Error_Handler_(lib_name, 8, idx);
     }
 
@@ -77,7 +77,7 @@ void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int
         }
     } else {
         // Fallback: uses the start of the local scratch buffer as a pointer
-        dest_buf = *reinterpret_cast<void**>(temp_path);
+        memcpy(&dest_buf, temp_path, sizeof(dest_buf));
     }
 
     fread(dest_buf, size, 1, farload::_farload_fptr);
@@ -97,7 +97,7 @@ void* __cdecl Farload_(char* file_name, int param_2) {
 }
 
     void* __cdecl Farload_Library_Data_(const char* fname, int32_t idx, void* out, int16_t alloc_type, uint32_t start_idx, uint16_t count, uint16_t expected_element_size) {
-        char full_path[60];
+        uint8_t local_3c[60];
 
         if (idx < 0) {
             Error_Handler_(fname, 4, idx);
@@ -123,10 +123,10 @@ void* __cdecl Farload_(char* file_name, int param_2) {
                     Error_Handler_(fname, 1, idx);
                 }
 
-                strcpy(full_path, _secondary_drive_path);
-                strcat(full_path, _farload_file_name);
+                strcpy((char*)local_3c, _secondary_drive_path);
+                strcat((char*)local_3c, _farload_file_name);
 
-                _farload_fptr = fopen(full_path, s_rb_0055117c);
+                _farload_fptr = fopen((char*)local_3c, s_rb_0055117c);
                 if (_farload_fptr == nullptr) {
                     Error_Handler_(fname, 1, idx);
                 }
@@ -139,8 +139,7 @@ void* __cdecl Farload_(char* file_name, int param_2) {
             _farload_file_flag = 1;
         }
 
-        // Uninitialized stack values are safely managed up to this point due to checks inside the header loader logic
-        if (_lbx_header.entry_count <= idx) {
+        if ((uint32_t)_lbx_header.entry_count <= (uint32_t)idx) {
             Error_Handler_(fname, 8, idx);
         }
 
@@ -151,6 +150,10 @@ void* __cdecl Farload_(char* file_name, int param_2) {
 
         fread(&total_count, 2, 1, _farload_fptr);
         fread(&element_size, 2, 1, _farload_fptr);
+
+        if (count == 0xFFFFu) {
+            count = (uint16_t)(total_count - start_idx);
+        }
 
         if (total_count <= start_idx) {
             Error_Handler_(fname, 10, idx);
@@ -186,8 +189,7 @@ void* __cdecl Farload_(char* file_name, int param_2) {
             case 3:
                 break;
             default:
-                // This preserves the unusual fallback logic from assembly exactly, loading a pointer from path buffer boundary
-                out = *reinterpret_cast<void**>(full_path);
+                out = *reinterpret_cast<void**>(&local_3c[0]);
                 break;
         }
 
@@ -319,18 +321,16 @@ void* __cdecl Farload_Data_Static_(const char* filename, int32_t resource_id, vo
 }
 
 void __cdecl Set_Alternate_Path_(char* input_path) {
-    char* const secondary_drive_path = _secondary_drive_path;
-
-    strcpy(secondary_drive_path, input_path);
+    strcpy(_secondary_drive_path, input_path);
 
     int32_t path_length = 0;
-    while (path_length < 100 && secondary_drive_path[path_length] != '\0') {
+    while (path_length < 100 && _secondary_drive_path[path_length] != '\0') {
         ++path_length;
     }
 
     // Potential bug: empty input reads one byte before _secondary_drive_path.
-    if (secondary_drive_path[path_length - 1] != '\\') {
-        strcat(secondary_drive_path, k_backslash);
+    if (*((char*)_secondary_drive_path + path_length - 1) != '\\') {
+        strcat(_secondary_drive_path, k_backslash);
     }
 }
 

@@ -9,5 +9,5 @@ namespace capture {
 
     void __cdecl Screen_Flic_Capture_();
 
-    int16_t __cdecl Check_Release_Version_();
+    uint16_t __cdecl Check_Release_Version_();
 }

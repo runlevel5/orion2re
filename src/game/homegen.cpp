@@ -164,7 +164,7 @@ namespace HOMEGEN {
         }
     }
 
-    uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist) {
+    uint8_t __cdecl Build_Home_Star_List_(int16_t* home_stars_out, int32_t min_dist) {
         s_colors colors1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
         s_colors colors2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
@@ -197,14 +197,14 @@ namespace HOMEGEN {
                     RUSS::Mox_Update_();
                     if (star_j == current_star) continue;
 
-                    uint8_t* field = (uint8_t*)&_good_stars[current_star];
+                    s_good_star* field = &_good_stars[current_star];
                     if (struct_::Test_Bit_Field_(field, star_j)) {
                         bool valid = true;
                         for (int k = 0; k < list->count; ++k) {
-                            uint16_t existing_star = list->stars[k];
+                            int16_t existing_star = list->stars[k];
                             int32_t dist = Dist_Between_Stars_(existing_star, star_j);
-                            uint8_t* field_k = (uint8_t*)&_good_stars[existing_star];
-                            uint16_t bit = struct_::Test_Bit_Field_(field_k, star_j);
+                            s_good_star* field_k = &_good_stars[existing_star];
+                            int16_t bit = struct_::Test_Bit_Field_(field_k, star_j);
 
                             RUSS::Mox_Update_();
                             if (existing_star != star_j && (bit == 0 || dist < min_dist)) {
@@ -219,7 +219,7 @@ namespace HOMEGEN {
                             list->stars[list->count] = star_j;
                             int32_t next_count = (int32_t)list->count + 1;
                             if (next_count > 20) next_count = 20;
-                            list->count = (uint16_t)next_count;
+                            list->count = (int16_t)next_count;
                         }
                     }
                 }
@@ -243,13 +243,13 @@ namespace HOMEGEN {
             for (int i = 0; i < 4; ++i) {
                 int idx1 = random::Random_(sel_list->count) - 1;
                 int idx2 = random::Random_(sel_list->count) - 1;
-                uint16_t tmp = sel_list->stars[idx1];
+                int16_t tmp = sel_list->stars[idx1];
                 sel_list->stars[idx1] = sel_list->stars[idx2];
                 sel_list->stars[idx2] = tmp;
             }
 
             // Initialize output buffer (8 uint16_t slots as per 0xFFFFFFFF x 4)
-            for (int i = 0; i < 8; ++i) home_stars_out[i] = 0xFFFF;
+            for (int i = 0; i < 8; ++i) home_stars_out[i] = -1;
 
             for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
                 home_stars_out[i] = sel_list->stars[i];
@@ -281,7 +281,7 @@ namespace HOMEGEN {
         return false;
     }
 
-    void __cdecl Randomize_Home_Worlds_(uint16_t* arr) {
+    void __cdecl Randomize_Home_Worlds_(int16_t* arr) {
         for (int32_t i = 0; i < 100; ++i) {
             // Random_ likely returns a value from 1 to N, so we subtract 1 for 0-based indexing.
             int16_t idx1 = static_cast<uint16_t>(random::Random_(static_cast<int32_t>(MOX::_NUM_PLAYERS))) - 1;
@@ -296,7 +296,7 @@ namespace HOMEGEN {
     }
 
     uint16_t __cdecl Generate_Home_Worlds_() {
-        uint16_t home_star_ids[8];
+        int16_t home_star_ids[8];
 
         s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
         s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
@@ -773,27 +773,28 @@ namespace HOMEGEN {
 
         planet->planet_type = 3;
 
-        uint16_t new_size = RUSS::Get_Weighted_Choice_Short_(size_weights, 5);
-        if (planet->size < (int8_t)new_size) {
+        int16_t new_size = RUSS::Get_Weighted_Choice_Short_(size_weights, 5);
+        if ((int16_t)planet->size < new_size) {
             planet->size = (int8_t)new_size;
         }
 
-        uint16_t new_minerals = RUSS::Get_Weighted_Choice_Short_(mineral_weights, 5);
-        if (planet->mineral_class < (int8_t)new_minerals) {
+        int16_t new_minerals = RUSS::Get_Weighted_Choice_Short_(mineral_weights, 5);
+        if ((int16_t)planet->mineral_class < new_minerals) {
             planet->mineral_class = (int8_t)new_minerals;
         }
 
         if (should_upgrade_climate) {
-            uint16_t new_climate = RUSS::Get_Weighted_Choice_Short_(climate_weights, 10);
-            if (planet->climate < (int8_t)new_climate) {
+            int16_t new_climate = RUSS::Get_Weighted_Choice_Short_(climate_weights, 10);
+            if ((int16_t)planet->climate < new_climate) {
                 planet->climate = (int8_t)new_climate;
             }
         }
 
         int16_t planet_index = static_cast<int16_t>(planet - MOX::_planet);
-        MAPGEN::Set_Secondary_Planet_Data_(static_cast<int16_t>(planet->star_index), planet_index);
+        int16_t star_idx = (int16_t)planet->star_index;
+        MAPGEN::Set_Secondary_Planet_Data_(star_idx, planet_index);
 
-        s_star_data* star = &MOX::_star[planet->star_index];
+        s_star_data* star = &MOX::_star[star_idx];
         Set_Special_For_Star_Guarded_By_Monster_(star, monster_type);
     }
 
@@ -1092,12 +1093,12 @@ namespace HOMEGEN {
                 int16_t nearest_empty_star = -1;
                 int16_t nearest_star_in_range = -1;
                 int16_t min_dist = 999;
-                uint8_t food_count_in_system = 0;
+                uint8_t found_food_system = 0;
 
                 int8_t colony_star = MOX::_planet[planet_idx].star_index;
 
                 for (int16_t star_idx = 1; star_idx < MOX::_NUM_STARS; ++star_idx) {
-                    if (food_count_in_system != 0) break;
+                    if (found_food_system != 0) break;
 
                     if (star_idx != colony_star) {
                         int16_t dist = GEO::Parsecs_Between_Stars_(colony_star, star_idx);
@@ -1115,11 +1116,10 @@ namespace HOMEGEN {
                                     nearest_empty_star = star_idx;
                                 }
                             } else {
-                                uint8_t food_planets = (uint8_t)HAROLD::N_Food_Planets_In_System_(star_idx);
-                                if (food_planets == 0) {
+                                found_food_system = (uint8_t)HAROLD::N_Food_Planets_In_System_(star_idx);
+                                if (found_food_system == 0) {
                                     Add_Non_Food_Planets_To_List_(star_idx, planet_buffer, &buffer_count);
                                 } else {
-                                    food_count_in_system = food_planets;
                                     if (food_star == -1) {
                                         food_star = star_idx;
                                     }
@@ -1129,7 +1129,7 @@ namespace HOMEGEN {
                     }
                 }
 
-                if (food_count_in_system == 0) {
+                if (found_food_system == 0) {
                     if (nearest_empty_star != -1) {
                         int16_t orbit = Usable_Orbit_(nearest_empty_star);
                         Make_One_Planet_(nearest_empty_star, MOX::_planet_count, orbit, 1);
@@ -1140,6 +1140,7 @@ namespace HOMEGEN {
                         int16_t target_p_idx = planet_buffer[rnd - 1];
                         int8_t original_special = MOX::_planet[target_p_idx].planet_special;
                         int16_t star_of_planet = MOX::_planet[target_p_idx].star_index;
+                        food_star = star_of_planet;
 
                         int16_t saved_planet_count = MOX::_planet_count;
                         MOX::_planet_count = target_p_idx;
@@ -1150,8 +1151,10 @@ namespace HOMEGEN {
                         MOX::_planet[target_p_idx].planet_special = original_special;
                         MOX::_planet_count = saved_planet_count;
                     }
-                } else if (buffer_count > 0 && food_star == -1) {
-                    food_star = MOX::_planet[planet_buffer[0]].star_index;
+                } else {
+                    if (buffer_count > 0 && food_star == -1) {
+                        food_star = MOX::_planet[planet_buffer[0]].star_index;
+                    }
                 }
 
                 _nearest_food_worlds[owner] = food_star;
@@ -1260,7 +1263,7 @@ namespace HOMEGEN {
             if (star->spectral_class < STAR_CLASS_DWARF) {
                 for (int i = 0; i < 10; ++i) {
                     // _class_to_mineral is a 10x6 table mapping star classes to valid minerals
-                    if (MOX::_class_to_mineral[i * 6 + star->spectral_class] == (uint8_t)mineral_class) {
+                    if (MOX::_class_to_mineral[i * 6 + star->spectral_class] == (int8_t)mineral_class) {
                         richness_is_valid = true;
                         break;
                     }

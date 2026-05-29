@@ -327,7 +327,7 @@ namespace HACCESS {
         return MOX::_player[player_idx].ship_designs[design_idx].ship_weapon[weapon_idx].count;
     }
 
-    int16_t __cdecl Design_Weapon_Specials_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx) {
+    uint16_t __cdecl Design_Weapon_Specials_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx) {
         return MOX::_player[player_idx].ship_designs[design_idx].ship_weapon[weapon_idx].specials;
     }
 
