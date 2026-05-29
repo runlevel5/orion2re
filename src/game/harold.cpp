@@ -213,7 +213,7 @@ namespace HAROLD {
                 int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
                 if (colony_idx > -1) {
-                    uint8_t owner_id = static_cast<uint8_t>(MOX::_colony[colony_idx].owner);
+                    int8_t owner_id = MOX::_colony[colony_idx].owner;
 
                     if (owners_seen[owner_id] == 0) {
                         unique_count++;
@@ -406,10 +406,7 @@ namespace HAROLD {
      * @address 004f0ed0
      */
     void __cdecl Init_Moving_Boxes_() {
-        uint32_t* raw_ptr = reinterpret_cast<uint32_t*>(MOX::_moveable_box);
-        for (int i = 0; i < 35; ++i) {
-            raw_ptr[i] = 0;
-        }
+        memset(MOX::_moveable_box, 0, sizeof(MOX::_moveable_box));
 
         for (int i = 0; i < 5; ++i) {
             MOX::_moveable_box[i].index = static_cast<uint16_t>(i);
@@ -453,8 +450,10 @@ namespace HAROLD {
     /**
      * @address 004f1750
      */
-    bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx) {
-        return (MOX::_star[star_idx].visited & (1 << (static_cast<uint8_t>(player_idx) & 0x1F))) != 0;
+    uint8_t __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx) {
+        uint8_t mask = (uint8_t)(1u << ((uint8_t)player_idx & 0x1F));
+
+        return MOX::_star[star_idx].visited & mask;
     }
 
     /**
@@ -604,7 +603,7 @@ namespace HAROLD {
             int16_t idx1, idx2;
 
             if (use_clock == 0) {
-                // random::Random_ likely returns a value in range [1, size]
+                // Binary returns a 1-based random index here; convert to 0-based with -1
                 idx1 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
                 idx2 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
             } else {
@@ -676,7 +675,7 @@ namespace HAROLD {
         }
 
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
-            int16_t orbit_taken[5] = { 0, 0, 0, 0, 0 };
+            int16_t orbit_taken[5] = { 0, 0, 0, 0, 0 }; /* keep exact 5-entry bitmap, indexed by planet->orbit */
             s_star_data* star = &MOX::_star[star_idx];
 
             for (int16_t orbit_idx = 0; orbit_idx < 5; ++orbit_idx) {
@@ -689,9 +688,9 @@ namespace HAROLD {
                         RUSS::PFMT_(0, 1, s_orbit__d_of_star__d_has_more_tha_0055a704, (int32_t)planet_orbit, (int32_t)star_idx);
                         RUSS::PFMT_(0, 2, s_relate_game_conditions_EXACTLY_a_0055a6cc);
                         RUSS::PFMT_(0, 3, s___s__00556ae4, star->name);
-                        hgetch_();
+                        assert::hgetch_();
                     }
-                    orbit_taken[orbit_idx] = 1;
+                    orbit_taken[planet_orbit] = 1;
                 }
             }
         }
@@ -787,10 +786,10 @@ namespace HAROLD {
     }
 
     /**
-     * @address 004f1ab0
+     * @address 004f1dc0
      */
     int16_t __cdecl XY_To_Star_Id_(int16_t x, int16_t y) {
-        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS + 1; ++i) {
             if (MOX::_star[i].x == x && MOX::_star[i].y == y) {
                 return i;
             }
@@ -970,6 +969,8 @@ namespace HAROLD {
             return 1;
         }
 
+        // The original binary returns an uninitialized stack word here for unexpected scale values.
+        // Preserve defined behavior in the restored source and fall back to style 0 instead.
         return 0;
     }
 

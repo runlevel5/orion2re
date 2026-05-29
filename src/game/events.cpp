@@ -1308,7 +1308,7 @@ namespace EVENTS {
             // MOX::_ship is an array of s_ship_data (size 129 / 0x81)
             s_ship_data* ship = &MOX::_ship[i];
 
-            if (ship->owner == (char)owner_idx) {
+            if (ship->owner == owner_idx) {
                 // status 0 or 1 usually indicates active ships (e.g., normal or in transit)
                 if (ship->status == 0 || ship->status == 1) {
                     match_count++;

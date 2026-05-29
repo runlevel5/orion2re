@@ -1078,7 +1078,7 @@ struct s_colony {
     char research_per_scientist;
     uint8_t max_farms;
     char max_population;
-    char climate;
+    uint8_t climate;
     short ground_strength;
     short space_strength;
     short production[4];
@@ -1142,10 +1142,15 @@ struct s_colony_combat_popup_data {
 
 typedef struct s_colony_job_production s_colony_job_production, *Ps_colony_job_production;
 
+enum {
+    COLONY_JOB_RACIAL_BONUS_ANDROID = 8,
+    COLONY_JOB_RACIAL_BONUS_NATIVE = 9,
+    COLONY_JOB_RACIAL_BONUS_COUNT = 10,
+};
+
 struct s_colony_job_production {
     int base_prod;
-    short racial_bonuses[8];
-    short android_bonuses[2];
+    short racial_bonuses[COLONY_JOB_RACIAL_BONUS_COUNT];
     short tech_apps[212];
     short buildings_prod[49];
     int food_bonus;
@@ -1162,6 +1167,8 @@ struct s_colony_job_production {
     int difficulty_bonus;
     int final_prod;
 };
+
+static_assert(sizeof(s_colony_job_production) == 0x256, "s_colony_job_production size mismatch");
 
 typedef struct s_colors s_colors, *Ps_colors;
 
@@ -3604,7 +3611,7 @@ struct s_planet_data {
     int8_t gravity_class;
     char group;
     int8_t climate;
-    char climate_bg_type;
+    int8_t climate_bg_type;
     int8_t mineral_class;
     int8_t food_per_farmer;
     char n_terraforms;

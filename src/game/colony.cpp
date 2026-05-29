@@ -370,7 +370,7 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint8_t is_bright) {
+    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, int8_t is_bright) {
         fonts::Set_Outline_Color_(0x50, 0x50);
 
         s_colors* primary_colors;
@@ -382,7 +382,7 @@ namespace COLONY {
 
         fonts::Set_Font_Style_Shadow_Down_(style & 0xFF, primary_colors);
         fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
-        fonts::Set_Font_Special_Colors_(&_red_font_color_array[is_bright]);
+        fonts::Set_Font_Special_Colors_(&_red_font_color_array[(uint8_t)is_bright]);
     }
 
     void __cdecl Set_Colony_Font_() {
@@ -656,7 +656,7 @@ namespace COLONY {
 
     void __cdecl Print_Scanned_Satellite_() {
         if (_scanned_satellite != -1) {
-            char* building_name = Real_Building_Name_(_scanned_satellite);
+            char* building_name = Real_Building_Name2_(_scanned_satellite);
             Print_Scanned_String_(building_name);
         }
     }
@@ -1025,7 +1025,7 @@ namespace COLONY {
 
         fonts::Set_Font_Highlight_Colors_(&COLONY::_bright_blue_font_color_array);
 
-        // _red_font_color_array is s_colors[2], passed as a pointer
+        // _red_font_color_array is the special-colors table passed by pointer
         fonts::Set_Font_Special_Colors_(COLONY::_red_font_color_array);
     }
 
@@ -1048,10 +1048,12 @@ namespace COLONY {
     }
 
     void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3) {
-        uint8_t local_20[32];
-
-        // Manual assembly initialization of local buffer
-        memcpy(local_20, "QRSTUVWXYZ[\\]^_`abcdefghijklmno", 31);
+        uint8_t ship_palette_map[31] = {
+            0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
+            0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60,
+            0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68,
+            0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f
+        };
 
         if (COLONY::_ship_bitm_n != param_3) {
             COLONY::_ship_bitm_n = param_3;
@@ -1060,13 +1062,12 @@ namespace COLONY {
             s_animation_header* ship_seg = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, param_3);
             bitmap::Draw_Picture_To_Bitmap_(COLONY::_ship_bitm, ship_seg);
 
-            // remap starting from local_20[8] which is 'Y'
-            replace::Replace_Color_Range_(COLONY::_ship_bitm, &local_20[8], 1, 31 /* 0x1f */);
+            replace::Replace_Color_Range_(COLONY::_ship_bitm, ship_palette_map, 1, 31 /* 0x1f */);
 
             for (int16_t i = 0; i < 16; ++i) {
-                uint8_t remap_color = local_20[i * 2];
-                replace::Replace_Color_(COLONY::_ship_bitm, i + 0xc0, remap_color);
-                replace::Replace_Color_(COLONY::_ship_bitm, i + 0xd0, remap_color);
+                uint8_t palette_index = ship_palette_map[i * 2];
+                replace::Replace_Color_(COLONY::_ship_bitm, i + 0xc0, palette_index);
+                replace::Replace_Color_(COLONY::_ship_bitm, i + 0xd0, palette_index);
             }
         }
 
@@ -1392,9 +1393,9 @@ namespace COLONY {
 
         int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
-        (&MOX::_screen_data)[0] = static_cast<int16_t>(MOX::_planet[planet_idx].star_index);
-        (&MOX::_screen_data)[1] = static_cast<int16_t>(MOX::_planet[planet_idx].orbit);
-        (&MOX::_screen_data)[2] = colony_idx;
+        MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+        _orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
+        _temp_colony_idx = colony_idx;
 
         Reset_Field_Mode_();
         fields::Clear_Fields_();
@@ -1641,7 +1642,7 @@ namespace COLONY {
                         if (COLONY::_field_mode == 1) {
                             int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                             COLMOVE::Send_Cluster_(MOX::_planet[planet_idx].colony_index, -1);
-                            COLONY::Show_Colony_Screen_();
+                            COLONY::Restore_Control_();
                         } else {
                             int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                             int16_t col_idx = MOX::_planet[planet_idx].colony_index;
@@ -1651,9 +1652,9 @@ namespace COLONY {
                                 col_idx != COLONY::_colony_handle &&
                                 MOX::_colony[col_idx].owner == MOX::_PLAYER_NUM) 
                             {
-                                (&MOX::_screen_data)[0] = (int16_t)COLONY::_sys_disp_star_handle;
-                                (&MOX::_screen_data)[1] = i;
-                                (&MOX::_screen_data)[2] = col_idx;
+                                MOX::_screen_data = (int16_t)COLONY::_sys_disp_star_handle;
+                                COLONY::_orbit_temp = i;
+                                COLONY::_temp_colony_idx = col_idx;
 
                                 COLONY::Cleanup_Colony_Queue_(COLONY::_colony_handle);
                                 COLONY::Reset_Field_Mode_();
@@ -1706,9 +1707,9 @@ namespace COLONY {
         } else if (COLONY::_drawing_display == 2) {
             MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(COLONY::_planet_display_handle, description);
             COLONY::_drawing_display = 0;
-            COLONY::_planet_display_handle = (uint16_t)-1;
+            COLONY::_planet_display_handle = -1;
             GENDRAW::Help_(description);
-            COLONY::Show_Colony_Screen_();
+            COLONY::Restore_Control_();
         }
 
         return 1;

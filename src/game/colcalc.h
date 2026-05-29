@@ -1,7 +1,7 @@
 #pragma once
 
 namespace COLCALC {
-    typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, uint32_t pop_masked, s_colony_job_production* out);
+    typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int16_t player_idx, s_colony_job_production* out);
 
     inline ColonyBaseFunc (&_colony_empire_base_functions)[3] =
         *reinterpret_cast<ColonyBaseFunc (*)[3]>(std::uintptr_t{0x0055A858});
@@ -80,7 +80,7 @@ namespace COLCALC {
 
     bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx);
 
-    int16_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id);
+    int32_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id);
 
     int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony);
 
@@ -189,7 +189,7 @@ namespace COLCALC {
     char* __cdecl Load_Colcalc_Strings_(char* strings);
 
     int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, s_colony_job_production* out);
-    int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out);
+    int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, s_colony_job_production* out);
     inline s_colony*& _colony_calc_research_colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{0x0055A874});
 
@@ -292,15 +292,15 @@ namespace COLCALC {
     int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const uint32_t* pop_unit, int16_t mode);
 
     inline char (&_tmp_quotient)[20] = *reinterpret_cast<char (*)[20]>(std::uintptr_t{0x00571AC0});
-    char* __cdecl Format_Quotient_(int value, int divisor);
+    char* __cdecl Format_Quotient_(int32_t value, int32_t divisor);
 
     void __cdecl Colony_Food_Production_(s_colony* colony, char* buffer);
 
-    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, uint32_t pop_masked, s_colony_job_production* out);
+    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, uint32_t pop_masked, s_colony_job_production* out);
+    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, int16_t player_idx, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, uint32_t pop_masked, s_colony_job_production* out);
+    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out);
 
     void __cdecl Colony_Food_Maintenance_(s_colony* colony);
 
@@ -325,7 +325,7 @@ namespace COLCALC {
 
     int __cdecl Calc_Player_Climate_(int player_idx, int climate);
 
-    int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, bool is_immune);
+    int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune);
 
     short __cdecl Double_Add_Two_(short value);
 

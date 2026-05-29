@@ -340,11 +340,15 @@ namespace CMBTFIR2 {
     int16_t __cdecl Get_Fleet_Engineer_Bonus_(int16_t player_idx) {
         int16_t max_bonus = 0;
 
+        if (MOX::_combat_total_ship_count <= 0) {
+            return max_bonus;
+        }
+
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
             s_combat_data* ship = &MOX::_combat_data[i];
 
             // Only check ships belonging to the player that are not captured and active
-            if (ship->owner == (int8_t)player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
+            if ((int16_t)ship->owner == player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
                 if (ship->officer_idx > -1) {
                     int16_t current_bonus = CMBTFIR2::Engineer_Bonus_(ship->officer_idx);
                     if (current_bonus > max_bonus) {
@@ -1260,7 +1264,7 @@ namespace CMBTFIR2 {
             raid_results[i] = 0;
         }
 
-        int16_t marines = target->marine_count;
+        int16_t marines = (uint8_t)target->marine_count;
         int16_t target_raiders = *raiders;
 
         int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_(attacker_owner);
@@ -1441,8 +1445,8 @@ namespace CMBTFIR2 {
             strcat(body_str, temp_str);
         }
 
-        if (marines < (int16_t)target->marine_count) {
-            int16_t lost = target->marine_count - marines;
+        if (marines < (int16_t)(uint8_t)target->marine_count) {
+            int16_t lost = (int16_t)(uint8_t)target->marine_count - marines;
             itoa(lost, num_buf, 10);
             strcat(body_str, s__005569f8);
             strcat(body_str, num_buf);
@@ -1494,9 +1498,10 @@ namespace CMBTFIR2 {
             return;
         }
 
-        int16_t defender_marines_start = (int16_t)defender->marine_count;
+        int16_t defender_marines_start = (uint8_t)defender->marine_count;
         int16_t defender_marines_current = defender_marines_start;
         int16_t attacker_marines_start = attacker_marines;
+        int16_t defender_marines_orig = defender_marines_start;
 
         int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_((int16_t)attacker->owner);
         int16_t has_dashboards = COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, 0x1D);
@@ -1551,26 +1556,26 @@ namespace CMBTFIR2 {
         }
 
         FMTPARA::Set_Paragraph_Sint_Pointer_(0, &attacker_marines_start);
-        FMTPARA::Set_Paragraph_Sint_Pointer_(1, &defender_marines_start);
+        FMTPARA::Set_Paragraph_Sint_Pointer_(1, &defender_marines_orig);
         FMTPARA::Set_Paragraph_Sint_Pointer_(2, &attacker_marines);
-        FMTPARA::Set_Paragraph_Sint_Pointer_(3, &defender_marines_start);
-        FMTPARA::Set_Paragraph_Sint_Pointer_(4, &attacker_marines_lost);
+        FMTPARA::Set_Paragraph_Sint_Pointer_(3, &attacker_marines_lost);
+        FMTPARA::Set_Paragraph_Sint_Pointer_(4, &defender_marines_lost);
         FMTPARA::Set_Paragraph_Sint_Pointer_(5, &defender_marines_current);
         FMTPARA::Set_Paragraph_Sint_Pointer_(6, &side1.unit_strengths[1]);
         FMTPARA::Set_Paragraph_Sint_Pointer_(7, &side2.unit_strengths[1]);
 
-        strcpy(msg_buf, const_cast<char*>(s__00557e5c));
+        strcpy(msg_buf, s__00557e5c);
         KEN::Ken_Get_Text_Message_(0x5C, tmp_buf, 0x50);
         strcat(msg_buf, tmp_buf);
-        strcat(msg_buf, const_cast<char*>(s__0055a5d0));
+        strcat(msg_buf, s__0055a5d0);
         KEN::Ken_Get_Text_Message_(0x5D, tmp_buf, 0x50);
         strcat(msg_buf, tmp_buf);
         KEN::Ken_Get_Text_Message_(0x64, tmp_buf, 0x50);
-        strcat(msg_buf, const_cast<char*>(s__0055a5a0));
+        strcat(msg_buf, s__0055a5a0);
         strcat(msg_buf, tmp_buf);
-        strcat(msg_buf, const_cast<char*>(s__0055a588));
+        strcat(msg_buf, s__0055a588);
         strcat(msg_buf, tmp_buf);
-        strcat(msg_buf, const_cast<char*>(s__0055a550));
+        strcat(msg_buf, s__0055a550);
 
         bool is_timed = true;
         int16_t auto_combat_flag = (defender->owner == MOX::_combat_attacker_player) ? MOX::_auto_combat_flag[0] : MOX::_auto_combat_flag[1];

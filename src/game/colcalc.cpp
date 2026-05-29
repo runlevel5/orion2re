@@ -341,7 +341,7 @@ namespace COLCALC {
         }
 
         int32_t produced = (int32_t)plr->research_produced;
-        int32_t cost = Player_Research_Cost_(plr, (uint16_t)field_idx);
+        int32_t cost = Player_Research_Cost_(plr, field_idx);
         int32_t accumulated = plr->research_accumulated;
 
         if (produced == 0 && accumulated <= cost) {
@@ -350,9 +350,11 @@ namespace COLCALC {
 
         int16_t turns = 0;
 
-        while (accumulated <= cost) {
-            turns++;
-            accumulated += produced;
+        if (accumulated <= cost) {
+            do {
+                turns++;
+                accumulated += produced;
+            } while (accumulated <= cost);
         }
 
         int32_t total_chance = 0;
@@ -400,7 +402,7 @@ namespace COLCALC {
         colony->maintenance[ECON_RESEARCH] = 0;
         colony->maintenance[ECON_BC] = 0;
 
-        colony->food2_per_farmer = (int8_t)Colony_Food2_Per_Farmer_(colony, static_cast<int16_t>(static_cast<int8_t>(colony->owner)), nullptr);
+        colony->food2_per_farmer = (int8_t)Colony_Food2_Per_Farmer_(colony, (int16_t)colony->owner, nullptr);
         Colony_Environmental_Stuff_(colony);
         colony->industry_per_worker = (int8_t)Colony_Industry_Per_Worker_(colony, static_cast<int16_t>(static_cast<int8_t>(colony->owner)), nullptr);
         colony->research_per_scientist = (int8_t)Colony_Research_Per_Scientist_(colony, static_cast<int16_t>(static_cast<int8_t>(colony->owner)), nullptr);
@@ -448,12 +450,12 @@ namespace COLCALC {
         return static_cast<int>(total_cost);
     }
 
-    int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out) {
-        // TECH_APP_BIOMORPHIC_FUNGI is assumed to be index 8 in tech_applications array.
+    int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
+        // TECH_APP_BIOMORPHIC_FUNGI maps to tech_applications[29].
         int16_t food_total = (int16_t)MOX::_planet[colony->planet].food_per_farmer * 2;
 
         if (out != nullptr) {
-            *reinterpret_cast<int32_t*>(out) = (int32_t)food_total;
+            out->base_prod = food_total;
         }
 
         if (food_total == 0) {
@@ -461,7 +463,7 @@ namespace COLCALC {
             if (MOX::_player[player_idx].tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == 3) {
                 food_total = 2;
                 if (out != nullptr) {
-                    *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x52) = 2; // Offset 0x52
+                    out->tech_apps[TECH_APP_BIOMORPHIC_FUNGI] = 2;
                 }
             }
         }
@@ -472,14 +474,14 @@ namespace COLCALC {
             if (colony->buildings[BUILDING_WEATHER_CONTROLLER] != 0) {
                 food_total += 4;
                 if (out != nullptr) {
-                    *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x21c) = 4; // Offset 0x21c
+                    out->buildings_prod[BUILDING_WEATHER_CONTROLLER] = 4;
                 }
             }
             // Astro University bonus: +2 food
             if (colony->buildings[BUILDING_ASTRO_UNIVERSITY] != 0) {
                 food_total += 2;
                 if (out != nullptr) {
-                    *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1c8) = 2; // Offset 0x1c8
+                    out->buildings_prod[BUILDING_ASTRO_UNIVERSITY] = 2;
                 }
             }
         }
@@ -700,7 +702,11 @@ namespace COLCALC {
             }
         }
 
-        int16_t pop_limit = Size_And_Climate_Race_Pop_Limit_(planet->size, planet->climate, player_idx);
+        int16_t pop_limit = Size_And_Climate_Race_Pop_Limit_(planet->size, (int)planet->climate, player_idx);
+
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == 3) {
+            pop_limit += 5;
+        }
 
         return pop_limit;
     }
@@ -1011,7 +1017,7 @@ namespace COLCALC {
         if (colony->n_pops == 0) {
             colony->maintenance[ECON_BC] = 0;
         } else {
-            int16_t colony_idx = (int16_t)(((uintptr_t)colony - (uintptr_t)MOX::_colony) / sizeof(s_colony));
+            int16_t colony_idx = (int16_t)(((int32_t)colony - (int32_t)MOX::_colony) / 0x169);
             if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
                 colony->maintenance[ECON_BC] = 0;
             } else {
@@ -1022,11 +1028,11 @@ namespace COLCALC {
                     }
                 }
 
-                int32_t climate_modifier = static_cast<int32_t>(_climate_maintenance_modifiers[static_cast<uint8_t>(colony->climate)]) + 100;
-                int32_t base_cost = static_cast<uint8_t>(colony->n_food_replicated) + total_building_maintenance;
+                int32_t climate_modifier = _climate_maintenance_modifiers[(uint8_t)colony->climate] + 100;
+                int32_t base_cost = (uint8_t)colony->n_food_replicated + total_building_maintenance;
 
                 int32_t calculated_bc = (((climate_modifier * base_cost) * 4 + 200) * 25) / 10000;
-                colony->maintenance[ECON_BC] = static_cast<int8_t>(calculated_bc);
+                colony->maintenance[ECON_BC] = (byte)calculated_bc;
             }
         }
 
@@ -1037,9 +1043,9 @@ namespace COLCALC {
         return (value * 2) + 2;
     }
 
-    int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, bool is_immune) {
+    int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune) {
         // Calculate population factor based on size and climate
-        int32_t population_factor = (int32_t)(is_immune ? 1 : 0) * 25 + _size_climate_max_pop_lookup[climate];
+        int32_t population_factor = (int32_t)is_immune * 25 + _size_climate_max_pop_lookup[climate];
 
         // Cap the factor at 100%
         if (population_factor > 100) {
@@ -1184,7 +1190,7 @@ namespace COLCALC {
         int16_t base_prod = _colony_empire_base_functions[mode](
             colony,
             static_cast<int16_t>(colony->owner),
-            pop_mask & 0xFFFF000F,
+            (int16_t)(pop_mask & 0x0000000F),
             nullptr
         );
 
@@ -1197,7 +1203,7 @@ namespace COLCALC {
             }
 
             // Apply the production factor (e.g., gravity modifier)
-            int16_t gravity_factor = Gravity_Player_Production_Factor_(colony, static_cast<int16_t>(pop_mask & 0xFFFF000F));
+            int16_t gravity_factor = Gravity_Player_Production_Factor_(colony, (int16_t)(pop_mask & 0x0000000F));
             base_prod = (int16_t)(gravity_factor * base_prod);
         }
 
@@ -1216,7 +1222,7 @@ namespace COLCALC {
         base_produced = _colony_empire_base_functions[job_type](
             colony, 
             static_cast<int16_t>(colony->owner), 
-            *pop & 0xffff000f, 
+            (int16_t)(*pop & 0x0000000f), 
             out
         );
 
@@ -1362,9 +1368,9 @@ namespace COLCALC {
     }
 
     bool __cdecl Housing_Is_Useless_(s_colony* colony) {
-        int16_t max_pop = Planet_Max_Population_For_Player_(&MOX::_planet[colony->planet], (int16_t)colony->owner);
+        int16_t max_pop = Planet_Max_Population_For_Player_(&MOX::_planet[colony->planet], colony->owner);
 
-        return (uint32_t)(uint16_t)max_pop == (uint32_t)(uint8_t)colony->n_pops;
+        return max_pop == (uint8_t)colony->n_pops;
     }
 
     void __cdecl Colony_Calculation_(int16_t colony_idx) {
@@ -2030,17 +2036,17 @@ namespace COLCALC {
                 msg.u.colony.subtype = 4;
 
                 if (food_shortage > 0) {
-                    msg.u.colony.c.starvation.a = static_cast<int8_t>(food_shortage);
+                    msg.u.colony.c.starvation.a = (int8_t)food_shortage;
                 }
                 if (industry_shortage > 0) {
-                    msg.u.colony.c.starvation.b = static_cast<int8_t>(industry_shortage);
+                    msg.u.colony.c.starvation.b = (int8_t)industry_shortage;
                 }
 
                 MSG_::Add_Msg_(msg, static_cast<int16_t>(static_cast<int8_t>(colony->owner)));
             }
         }
 
-        int16_t player_order[9] = {};
+        int16_t player_order[10] = {};
 
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             player_order[i] = i;
@@ -2147,7 +2153,7 @@ namespace COLCALC {
                 }
 
                 if (job_class == -1) {
-                    int32_t job_counts[3] = {};
+                    uint32_t job_counts[3] = {};
 
                     for (int32_t i = 0; i < pop_count; ++i) {
                         ++job_counts[(colony->pop[i] & 0x180) >> 7];
@@ -2156,7 +2162,7 @@ namespace COLCALC {
                     job_class = 1;
                     if (job_counts[1] + job_counts[2] != 0) {
                         job_counts[0] = 0;
-                        job_class = RUSS::Get_Weighted_Choice_Int_(reinterpret_cast<uint32_t*>(job_counts), 3);
+                        job_class = RUSS::Get_Weighted_Choice_Int_(job_counts, 3);
                     }
                 }
 
@@ -2174,28 +2180,23 @@ namespace COLCALC {
     }
 
     void __cdecl Apply_All_Colony_Changes_() {
+        s_colony* current = MOX::_colony;
         int16_t num_colonies = MOX::_NUM_COLONIES;
-        s_colony* colonies = MOX::_colony;
-
         if (num_colonies <= 0) {
             return;
         }
-
-        s_colony* current = colonies;
-        s_colony* end = &colonies[num_colonies];
 
         do {
             if (current->owner != -1 && current->outpost_flag == 0) {
                 Apply_Colony_Changes_(current);
             }
 
-            current++;
-
+            ++current;
             num_colonies = MOX::_NUM_COLONIES;
-            colonies = MOX::_colony;
-            end = &colonies[num_colonies];
-
-        } while (current < end);
+            if (num_colonies <= 0) {
+                break;
+            }
+        } while (current < &MOX::_colony[num_colonies]);
     }
 
     void __cdecl Check_For_Research_Breakthrough_(s_player* player) {
@@ -2373,9 +2374,9 @@ namespace COLCALC {
         }
     }
 
-    int16_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id) {
+    int32_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id) {
         if (product_id >= 1 && product_id < BUILDING_COUNT) {
-            int base_cost = TECHDATA::_buildings[product_id].cost;
+            int32_t base_cost = TECHDATA::_buildings[product_id].cost;
 
             switch (product_id) {
                 case BUILDING_BARRIER_SHIELD:
@@ -2410,7 +2411,7 @@ namespace COLCALC {
 
                 case BUILDING_TERRAFORMING:
                 {
-                    int n_terraforms = MOX::_planet[colony->planet].n_terraforms;
+                    int32_t n_terraforms = (int8_t)MOX::_planet[colony->planet].n_terraforms;
                     return base_cost + (n_terraforms * 250);
                 }
 
@@ -2442,10 +2443,7 @@ namespace COLCALC {
             case -7: // Spy
                 return 100;
 
-            case -16: // Housing / Trade Goods
             case -15: // Outpost?
-            case -14:
-            case -13:
             case -6:
             case -5:
             case -4:
@@ -2547,36 +2545,37 @@ namespace COLCALC {
         }
     }
 
-    char* __cdecl Format_Quotient_(int numerator, int denominator) {
-        int val = numerator;
+    char* __cdecl Format_Quotient_(int32_t numerator, int32_t denominator) {
+        int32_t val = numerator;
 
         if (val < 0) {
-            val = -val;
+            val = (int32_t)(0u - (uint32_t)val);
             _tmp_quotient[0] = '-';
         } else {
             _tmp_quotient[0] = '+';
         }
 
-        int n_chars = sprintf(&_tmp_quotient[1], DESIGN::s_pct_d, val / denominator);
+        int32_t n_chars = sprintf(&_tmp_quotient[1], DESIGN::s_pct_d, val / denominator);
         char* fraction_ptr = &_tmp_quotient[1] + n_chars;
 
-        int remainder = val % denominator;
+        int32_t remainder = val % denominator;
         if (remainder != 0) {
-            int multiplier = 10;
-            int count = 1;
+            int32_t multiplier = 10;
+            int32_t count = 1;
+            int32_t scaled_remainder = (int32_t)((uint32_t)remainder * (uint32_t)multiplier);
 
-            if ((remainder * 10) % denominator != 0) {
-                while (count < 5) {
-                    multiplier *= 10;
-                    count++;
-                    if ((remainder * multiplier) % denominator == 0) {
-                        break;
-                    }
+            while (((scaled_remainder / denominator) * denominator) != scaled_remainder) {
+                if (count >= 5) {
+                    break;
                 }
+
+                multiplier = (int32_t)((uint32_t)multiplier * 10u);
+                count++;
+                scaled_remainder = (int32_t)((uint32_t)remainder * (uint32_t)multiplier);
             }
 
             if (multiplier != 0) {
-                sprintf(fraction_ptr, s_dot_d_0055a528, (remainder * multiplier) / denominator);
+                sprintf(fraction_ptr, s_dot_d_0055a528, scaled_remainder / denominator);
             }
         }
 

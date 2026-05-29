@@ -9,7 +9,7 @@ struct s_animation_header;
 namespace TECH {
     void __cdecl Tech_Select_();
 
-    void __cdecl _Tech_Select_(int32_t arg0);
+    void __cdecl _Tech_Select_(uint8_t arg0);
 
     void __cdecl Reset_Screen_();
 

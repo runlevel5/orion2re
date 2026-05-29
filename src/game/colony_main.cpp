@@ -218,7 +218,7 @@ namespace COLONY {
         if (_colony_handle == -1) {
             _valid_colony = 0;
             _drawing_display = 2;
-            _planet_display_handle = static_cast<uint16_t>(planet_idx);
+            _planet_display_handle = planet_idx;
         }
         else {
             _valid_colony = 1;
@@ -231,6 +231,7 @@ namespace COLONY {
         ERICHELP::Set_Colony_Screen_Help_List_();
 
         int16_t saved_player_num = MOX::_PLAYER_NUM;
+        // UB: _colony_handle may be -1 here, matching binary behavior but not safe C++.
         MOX::_PLAYER_NUM = static_cast<int16_t>(MOX::_colony[_colony_handle].owner);
 
         Load_Colony_Screen_Seg_();
@@ -238,6 +239,9 @@ namespace COLONY {
 
         if (!_valid_colony) {
             MOX::_current_screen = MOX::_return_screen;
+            MOX::_PLAYER_NUM = saved_player_num;
+            _using_colony_screen_palette = 0;
+            random::Set_Random_Seed_(saved_seed);
             return;
         }
 
@@ -429,7 +433,7 @@ namespace COLONY {
         switch (anim_id) {
             case 0:
                 return Cache_Load_Planet_(
-                    static_cast<int16_t>(MOX::_planet[MOX::_colony[_colony_handle].planet].climate_bg_type +
+                    static_cast<int16_t>(static_cast<int8_t>(MOX::_planet[MOX::_colony[_colony_handle].planet].climate_bg_type) +
                     static_cast<uint8_t>(MOX::_colony[_colony_handle].climate) * 3)
                 );
             case 1:
@@ -626,7 +630,7 @@ namespace COLONY {
         }
 
         if (bldg_id >= 0) {
-            COLONY::_colony_bldgs[row].buildings[col] = (int32_t)bldg_id;
+            COLONY::_colony_bldgs[row].buildings[col] = bldg_id;
         }
         else if (bldg_id == -3) {
             house_mod++;
@@ -898,7 +902,7 @@ namespace COLONY {
             }
             else {
                 char* err_msg = ESTRINGS::E_Strings_(0xf7);
-                RUSS::PFMT_(0, 0, err_msg);
+                RUSS::PFMT_(0, 0, err_msg, producing_id);
                 assert::hgetch_();
             }
             break;
@@ -986,9 +990,9 @@ namespace COLONY {
         }
 
         if (_colony_fields[17] == field_val) {
-            (&MOX::_screen_data)[4] = static_cast<int16_t>(_star_handle);
+            MOX::_temp_star_handle = (int16_t)_star_handle;
             MOX::_return_screen = MOX::_current_screen;
-            (&MOX::_screen_data)[3] = 1;
+            MOX::_screen_mouse_list_type = 1;
             MOX::_current_screen = 29 /* 0x1d */;
             return 0;
         }

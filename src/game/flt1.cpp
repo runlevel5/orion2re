@@ -1057,10 +1057,10 @@ namespace FLT1 {
 
                     if (is_selected != 0) {
                         if (selected_count == 0) {
-                            _screen_data[3] = MOX::_fltscrn_big_icon[i].ship_idx;
+                            MOX::_screen_mouse_list_type = MOX::_fltscrn_big_icon[i].ship_idx;
                         }
                         if (selected_count == 1) {
-                            _screen_data[4] = MOX::_fltscrn_big_icon[i].ship_idx;
+                            MOX::_temp_star_handle = MOX::_fltscrn_big_icon[i].ship_idx;
                         }
                         selected_count++;
                     }

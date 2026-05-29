@@ -13,7 +13,7 @@ namespace TECH {
         TECH::Reset_Screen_();
     }
 
-    void __cdecl _Tech_Select_(int32_t param_1) {
+    void __cdecl _Tech_Select_(uint8_t param_1) {
         int16_t extra_fields_cnt;
         int16_t first_btn_field;
         int16_t last_btn_field;
@@ -25,7 +25,7 @@ namespace TECH {
         s_animation_header* tech_select_lbx_images[9];
         s_animation_header* entry_buttons[8];
         s_animation_header* science_lbx = nullptr;
-        int16_t saved_current_field;
+        uint8_t saved_current_field;
         int16_t input_val;
 
         RUSS::Mox_Update_();

@@ -200,8 +200,7 @@ void __cdecl Draw_Hotseat_Screen_(void)
     bg_x = (640 - animate::Get_Width_(HOTPOP::_hot_pop_background_seg)) / 2;
     bg_y = (480 - animate::Get_Height_(HOTPOP::_hot_pop_background_seg)) / 2;
 
-    *reinterpret_cast<uint32_t*>(&unused_colors.colors[0]) = 0xa7a7a7a7;
-    *reinterpret_cast<uint32_t*>(&unused_colors.colors[4]) = 0xa7a7a7a7;
+    memset(&unused_colors, 0xA7, sizeof(unused_colors));
 
     animate::Draw_(bg_x, bg_y, HOTPOP::_hot_pop_background_seg);
 

@@ -137,7 +137,7 @@ namespace HAROLD {
 
     int8_t __cdecl Planet_Has_Outpost_(int16_t planet_idx);
 
-    bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
+    uint8_t __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
 
     bool __cdecl Star_Has_Artemis_Net_(s_star_data* star);
 
@@ -158,8 +158,8 @@ namespace HAROLD {
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
 
     inline const char* s___s__00556ae4 = reinterpret_cast<const char*>(0x00556AE4); // "(%s)"
-    inline const char* s_relate_game_conditions_EXACTLY_a_0055a6cc = reinterpret_cast<const char*>(0x0055A6CC); // "relate game conditions EXACTLY as they occurred to technical support"
-    inline const char* s_orbit__d_of_star__d_has_more_tha_0055a704 = reinterpret_cast<const char*>(0x0055A704); // "orbit %d of star %d has more than one planet linked to it"
+    inline const char* s_relate_game_conditions_EXACTLY_a_0055a6cc = reinterpret_cast<const char*>(0x0055A6CC); // "relate game conditions EXACTLY as they just happened"
+    inline const char* s_orbit__d_of_star__d_has_more_tha_0055a704 = reinterpret_cast<const char*>(0x0055A704); // "orbit %d of star %d has more than 1 planet in it"
 
     inline const char* s_HERODATI_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A808 }); // "HERODATI.LBX"
     inline const char* s_HERODATS_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A818 }); // "HERODATS.LBX"

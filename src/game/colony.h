@@ -75,12 +75,14 @@ namespace COLONY {
     inline int16_t& _colony_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EA68});
     inline int16_t& _g_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EBC8});
     inline int16_t& _g_scanned_planet = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E6C});
-    inline uint16_t& _planet_display_handle = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00559E20});
+    inline int16_t& _planet_display_handle = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E20});
 
     inline uint16_t& _colonists_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056E9FC});
 
     inline int16_t& _orbit_temp =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B22});
+    inline int16_t& _temp_colony_idx =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B24});
 
     inline int16_t& _ship_bitm_n =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559F78});
@@ -412,10 +414,10 @@ namespace COLONY {
     inline s_colors& _font_dim_color_array =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F98});
     inline s_colors& _font_bright_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559FA0});
-    inline s_colors (&_red_font_color_array)[2] =
-        *reinterpret_cast<s_colors(*)[2]>(std::uintptr_t{0x00559FA8});
+    inline s_colors (&_red_font_color_array)[3] =
+        *reinterpret_cast<s_colors(*)[3]>(std::uintptr_t{0x00559FA8});
 
-    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint8_t is_bright);
+    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, int8_t is_bright);
 
     void __cdecl Set_Colony_Font_();
 
@@ -426,7 +428,7 @@ namespace COLONY {
 
     void __cdecl Clear_Galaxy_Map_Fields_();
 
-    inline int16_t& _g_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E4C});
+    inline int32_t& _g_count = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E4C});
 
     void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index);
 

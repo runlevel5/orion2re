@@ -64,9 +64,9 @@ namespace AIDATA {
 
     int32_t __cdecl Refit_Desirability_(s_ship_data* ship) {
         int32_t desirability = 0;
-        int owner = (int)ship->owner;
+        int owner = (int)(int8_t)ship->owner;
 
-        if (ship->d.previous_owner != owner) {
+        if ((int)(int8_t)ship->d.previous_owner != owner) {
             return 0;
         }
 
@@ -115,8 +115,9 @@ namespace AIDATA {
             desirability += (ai_tech->best_weapon2 - best_missile_cost) * 6;
         }
 
-        if (desirability != 0 && ship->d.size < 5) {
-            s_ship_design* standard_design = &MOX::_player[owner].ship_designs[(int)ship->d.size];
+        int size = (int)(int8_t)ship->d.size;
+        if (desirability != 0 && size < 5) {
+            s_ship_design* standard_design = &MOX::_player[owner].ship_designs[size];
             if (memcmp(&ship->d, standard_design, 99 /* sizeof(s_ship_design) */) == 0) {
                 return 0;
             }
@@ -182,7 +183,7 @@ namespace AIDATA {
                     turn_idx = 0;
                 }
 
-                if (star_idx < MOX::_NUM_STARS && star_idx >= 0) {
+                if (star_idx < MOX::_NUM_STARS) {
                     bool in_nebula = MOX::_star[star_idx].in_nebula != 0;
                     if (owner < 8 && turn_idx < 10 && MOX::_player[owner].objectives == 100) {
                         (*_enroute_human_ships)[star_idx][turn_idx] = 1;
@@ -498,7 +499,7 @@ namespace AIDATA {
 
         for (int i_as = 0; i_as < _n_all_ships; ++i_as) {
             int i = (*_all_ships)[i_as];
-            bool stealth = struct_::Test_Bit_Field_(MOX::_ship[i].d.special_device_flags, 11);
+            int8_t stealth = (int8_t)struct_::Test_Bit_Field_(MOX::_ship[i].d.special_device_flags, 11);
             int start_star = MOX::_ship[i].location;
             int owner = MOX::_ship[i].owner;
             int initial_delay = 0;
@@ -1151,26 +1152,25 @@ namespace AIDATA {
     }
 
     int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* evaluating_player) {
-        int evaluating_player_idx = (evaluating_player - MOX::_player);
+        int16_t evaluating_player_idx = (int16_t)(evaluating_player - MOX::_player);
         s_planet_data* planet = &MOX::_planet[colony->planet];
-        int colony_idx = (colony - MOX::_colony);
-        int colony_race = (*AIDATA::_ai_colony_info)[colony_idx].race;
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
+        int16_t colony_race = (int16_t)(*AIDATA::_ai_colony_info)[colony_idx].race;
         s_player* race_player = &MOX::_player[colony_race];
 
-        int max_pop_race = COLCALC::Planet_Max_Population_For_Player_(planet, (int16_t)colony_race);
-        int max_pop_target = COLCALC::Planet_Max_Population_For_Player_(planet, (int16_t)evaluating_player_idx);
-        int avg_max_pop = (max_pop_target + max_pop_race + 1) / 2;
-
-        bool is_hostile = (planet->climate == PLANET_CLIMATE_TOXIC || planet->climate == PLANET_CLIMATE_RADIATED);
+        int16_t max_pop_race = COLCALC::Planet_Max_Population_For_Player_(planet, colony_race);
+        int16_t max_pop_target = COLCALC::Planet_Max_Population_For_Player_(planet, evaluating_player_idx);
+        int avg_sum = max_pop_target + max_pop_race + 1;
+        int avg_max_pop = (avg_sum - (avg_sum >> 31)) >> 1;
 
         if (colony->outpost_flag != 0) {
             return AIDATA::Proximity_Worth_To_Player_(colony, evaluating_player);
         }
 
-        int food_base = COLCALC::Colony_Empire_Base_Food2_Produced_(colony, (int16_t)evaluating_player_idx, (uint32_t)colony_race, nullptr);
-        int food = food_base / 2;
-        int industry = COLCALC::Colony_Empire_Base_Industry_Produced_(colony, (uint16_t)evaluating_player_idx, (uint32_t)colony_race, nullptr);
-        int research = COLCALC::Colony_Empire_Base_Research_Produced_(colony, (int16_t)evaluating_player_idx, (uint32_t)colony_race, nullptr);
+        int food_base = COLCALC::Colony_Empire_Base_Food2_Produced_(colony, evaluating_player_idx, colony_race, nullptr);
+        int food = (food_base - (food_base >> 31)) >> 1;
+        int industry = COLCALC::Colony_Empire_Base_Industry_Produced_(colony, (uint16_t)evaluating_player_idx, colony_race, nullptr);
+        int research = COLCALC::Colony_Empire_Base_Research_Produced_(colony, (int16_t)evaluating_player_idx, colony_race, nullptr);
 
         int prod_mult;
         if (race_player->traits[TRAIT_EATS_MINERALS] != 0) {
@@ -1201,14 +1201,17 @@ namespace AIDATA {
                 break;
         }
 
-        int worth = (avg_max_pop - colony->n_pops + 100) * growth_mult * prod_mult / 100;
+        int worth = (avg_max_pop - colony->n_pops + 100) * growth_mult * prod_mult;
+        worth /= 100;
 
-        if (!is_hostile || race_player->traits[12] == 0) {
+        bool is_swamp_or_ocean = (planet->climate == PLANET_CLIMATE_OCEAN || planet->climate == PLANET_CLIMATE_SWAMP);
+        if (!is_swamp_or_ocean || race_player->traits[TRAIT_AQUATIC] == 0) {
             int climate_modifier = COLCALC::_climate_maintenance_modifiers[(int)planet->climate] >> 2;
             worth = worth * (100 - climate_modifier) / 100;
 
-            if (is_hostile) {
-                worth = (worth * 3) / 4;
+            if (is_swamp_or_ocean) {
+                int adjusted_worth = worth * 3;
+                worth = (adjusted_worth + ((uint32_t)adjusted_worth >> 31 & 3)) >> 2;
             }
         }
 
@@ -1248,17 +1251,17 @@ namespace AIDATA {
             worth += 2000;
         }
 
-        int final_worth = worth / 64;
+        int final_worth = (worth + ((uint32_t)worth >> 31 & 0x3F)) >> 6;
 
         if (MOX::_settings.game_difficulty >= 2 /* DIFFICULTY_NORMAL */) {
-            short proximity_worth = AIDATA::Proximity_Worth_To_Player_(colony, evaluating_player);
-            final_worth += (proximity_worth / 8);
+            int16_t proximity_worth = AIDATA::Proximity_Worth_To_Player_(colony, evaluating_player);
+            final_worth += (proximity_worth + ((uint32_t)proximity_worth >> 31 & 7)) >> 3;
             if (final_worth < proximity_worth) {
                 final_worth = proximity_worth;
             }
         }
 
-        if (final_worth > 65535) {
+        if (final_worth >= 65535) {
             final_worth = 65535;
         }
 

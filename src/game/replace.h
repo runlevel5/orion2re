@@ -21,7 +21,7 @@ namespace replace {
 
     void __cdecl Shift_Palette_Range_(s_animation_header* anim, int shift);
 
-    void __cdecl Replace_Color_(s_animation_header *anim, int16_t old_color, int8_t new_color);
+    void __cdecl Replace_Color_(s_animation_header *anim, int16_t old_color, uint8_t new_color);
 
     void __cdecl Establish_Color_Gradient_(int16_t scale, int16_t invert);
 

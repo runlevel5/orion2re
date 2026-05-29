@@ -221,7 +221,6 @@ inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsig
     return fn(start_address, stack_size, arglist);
 }
 
-inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 
 inline int16_t& _mouse_XY_star_idx =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5C4});
@@ -232,6 +231,8 @@ inline const char* s_fmt_modifier_full_005523a4 = reinterpret_cast<const char*>(
 inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(std::uintptr_t{0x00556104}); // "%d"
 inline const char* s_0_00556108 = reinterpret_cast<const char*>(std::uintptr_t{0x00556108});
 inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
+inline const char* s_scor_0055a510 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A510}); // "scor"
+inline const char* s__0055a514 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A514}); // ""
 inline const char* const s_RACEOPT_LBX_00556320 = reinterpret_cast<const char*>(std::uintptr_t{0x00556320}); // "RACEOPT.LBX"
 inline const char* const s___lo_00556a4c = reinterpret_cast<const char*>(std::uintptr_t{0x00556A4C});
 inline const char* const s__00556a50 = reinterpret_cast<const char*>(std::uintptr_t{0x00556A50});

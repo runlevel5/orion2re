@@ -195,7 +195,8 @@ namespace npcdiplo {
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
                 if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
-                    if (p_source.within_range[j] == 1 && p_source.peace_duration[j] < 1 &&
+                    if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
+                        p_source.peace_duration[j] < 1 &&
                         decision[j] == 0) {
                         
                         if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
@@ -278,8 +279,9 @@ namespace npcdiplo {
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
                 if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
-                    if (p_source.within_range[j] == 1 && decision[j] == 0 &&
-                        p_source.peace_duration[j] < 1 && (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
+                    if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
+                        decision[j] == 0 && p_source.peace_duration[j] < 1 &&
+                        (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
                         
                         int personality_idx = diplomac::Get_Player_Diplomacy_Personality_(i, j);
                         int threshold = diplodef::_personality_relation_modifiers[personality_idx] * 3 +
@@ -586,12 +588,12 @@ namespace npcdiplo {
             }
         }
 
-        uint32_t max_strength = 1;
+        int32_t max_strength = 1;
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 if (i != player_idx && j != player_idx && i != j) {
                     if (!MOX::_player[i].eliminated && !MOX::_player[j].eliminated) {
-                        if (max_strength < (uint32_t)MOX::_player[i].total_ship_strength[j]) {
+                        if (max_strength < MOX::_player[i].total_ship_strength[j]) {
                             max_strength = MOX::_player[i].total_ship_strength[j];
                         }
                     }
@@ -651,23 +653,21 @@ namespace npcdiplo {
         int16_t best_target = -1;
         int16_t best_pop = 0;
 
-        // Search 1: Pick best contact (Max Pop) with no war
+        // Search 1: Pick best contact (max pop) with no war.
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (plr->contact[i] == 1 && i != player_idx && !MOX::_player[i].eliminated) {
-                if (COLCALC::May_Surrender_Empire_(player_idx, i) &&
-                    MOX::_player[i].objectives != 100 /* d */ &&
-                    plr->treaty[i] < 4 /* NO_WAR */) 
-                {
-                    if (best_pop <= MOX::_player[i].total_pop) {
-                        best_target = i;
-                        best_pop = MOX::_player[i].total_pop;
-                    }
+                if (!COLCALC::May_Surrender_Empire_(player_idx, i)) continue;
+                if (MOX::_player[i].objectives == 100 /* d */) continue;
+                if (plr->treaty[i] >= 4 /* NO_WAR */) continue;
+                if (best_pop <= MOX::_player[i].total_pop) {
+                    best_target = i;
+                    best_pop = MOX::_player[i].total_pop;
                 }
             }
         }
 
         if (best_target == -1) {
-            // Search 2: Pick best contact with minimal pop (Broken logic in original code, likely unreachable)
+            // Search 2: Pick best contact with minimal pop.
             best_pop = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
                 if (plr->contact[i] == 1 && i != player_idx && !MOX::_player[i].eliminated) {
@@ -684,7 +684,7 @@ namespace npcdiplo {
         }
 
         if (best_target == -1 && MOX::_settings.game_difficulty < 3 /* HARD */) {
-            // Search 3: Low difficulty fallback (Broken logic, likely unreachable)
+            // Search 3: Low difficulty fallback.
             best_pop = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
                 if (plr->contact[i] == 1 && i != player_idx && !MOX::_player[i].eliminated) {
@@ -797,7 +797,8 @@ namespace npcdiplo {
 
                     if (plr_i.treaty[j] == 1 /* TREATY_PEACE */) score_base += 20;
                     if (plr_i.treaty[j] == 2 /* TREATY_NON_AGGRESSION */) score_base += 40;
-                    if (plr_i.trade_treaty[j] != 0) score_base += 20;
+                    if (plr_i.trade_treaty[j] != 0) score_base += 10;
+                    if (plr_i.trade_treaty[j] != 0) score_base += 10;
 
                     int32_t common_score = score_base;
                     for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
@@ -808,22 +809,22 @@ namespace npcdiplo {
                         }
                     }
 
-                    int32_t num_human_allies = 0;
-                    int32_t num_ai_allies = 0;
+                    int32_t num_player_allies = 0;
+                    int32_t num_nonplayer_allies = 0;
                     for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
                         if (k != i && k != j) {
                             if (plr_j.treaty[k] >= 4) {
-                                if (MOX::_player[k].objectives == 100 /* HUMAN_PLAYER */) {
-                                    num_human_allies++;
+                                if (MOX::_player[k].objectives == 100) {
+                                    num_player_allies++;
                                 } else {
-                                    num_ai_allies++;
+                                    num_nonplayer_allies++;
                                 }
                             }
                             if (plr_i.treaty[k] >= 4) {
-                                if (MOX::_player[k].objectives == 100 /* HUMAN_PLAYER */) {
-                                    num_human_allies++;
+                                if (MOX::_player[k].objectives == 100) {
+                                    num_player_allies++;
                                 } else {
-                                    num_ai_allies++;
+                                    num_nonplayer_allies++;
                                 }
                             }
                         }
@@ -832,9 +833,9 @@ namespace npcdiplo {
                     int32_t alliance_score = common_score + 
                                              diplodef::_personality_relation_modifiers[(uint8_t)plr_j.personality] +
                                              diplodef::_personality_relation_modifiers[(uint8_t)plr_i.personality] +
-                                             plr_i.treaty_modifier[j] + random::Random_(100) + (num_human_allies * 50);
+                                             plr_i.treaty_modifier[j] + random::Random_(100) + (num_nonplayer_allies * 50);
 
-                    if (alliance_score >= 200 && plr_i.treaty[j] == 1 /* TREATY_PEACE */ && num_ai_allies == 0) {
+                    if (alliance_score >= 200 && plr_i.treaty[j] == 1 /* TREATY_PEACE */ && num_nonplayer_allies == 0) {
                         diplomac::Start_Treaty_(i, j, 2 /* ALLIANCE_TYPE */);
                     } else if (alliance_score >= 100 && plr_i.treaty[j] != 1 && plr_i.treaty[j] != 2) {
                         diplomac::Start_Treaty_(i, j, 1 /* PEACE_TYPE */);
@@ -862,11 +863,13 @@ namespace npcdiplo {
                                                 plr_i.treaty_modifier[j] + random::Random_(100);
 
                     bool is_paying_tribute = false;
-                    // BUG: loop index k not used, but exactly as decompiled
-                    for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
-                        if (plr_i.tribute_treaty[j] < 0) {
-                            is_paying_tribute = true;
-                        }
+                    if (MOX::_NUM_PLAYERS > 0) {
+                        int16_t n = (int16_t)MOX::_NUM_PLAYERS;
+                        do {
+                            if (plr_i.tribute_treaty[j] < 0) {
+                                is_paying_tribute = true;
+                            }
+                        } while (--n != 0);
                     }
 
                     if (tribute_score_val > 150 && !is_paying_tribute) {
@@ -1176,9 +1179,9 @@ namespace npcdiplo {
     }
 
     void __cdecl NPC_Tech_Exchange_Check_(int16_t player_idx, int16_t target_player_idx) {
-        int16_t local_43a = 0;
-        int16_t local_424[106];
-        int32_t local_350[212];
+        int16_t available_tech_count = 0;
+        uint8_t available_tech_ids[212];
+        int32_t available_tech_values[212];
         
         if (MOX::_player[player_idx].diplomacy_message[target_player_idx] == '\0' &&
             MOX::_player[player_idx].treaty[target_player_idx] < 4) 
@@ -1193,9 +1196,9 @@ namespace npcdiplo {
             
             for (int32_t i = 0; i < 204; ++i) {
                 if (MOX::_player[target_player_idx].tech_applications[i] == 3) {
-                    int32_t tech_value = static_cast<int32_t>(newtech::Calc_Tech_Value_(player_idx, static_cast<int16_t>(i)));
-                    if ((tech_value * 2) != 0) {
-                        _human_tech[num_elements].index = static_cast<uint8_t>(i);
+                    int32_t tech_value = newtech::Calc_Tech_Value_(player_idx, i);
+                    if (tech_value * 2 != 0) {
+                        _human_tech[num_elements].index = i;
                         _human_tech[num_elements].value = tech_value * 2;
                         num_elements++;
                     }
@@ -1204,13 +1207,13 @@ namespace npcdiplo {
             
             if (num_elements > 0) {
                 qsort(_human_tech, num_elements, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
-                int32_t rand_idx = random::Random_((num_elements + 1) / 2) - 1;
-                uint8_t selected_tech_index = _human_tech[rand_idx].index;
-                int32_t exchange_val = (_human_tech[rand_idx].value * expectation) / 100;
+                int32_t random_pick = random::Random_((num_elements + 1) / 2);
+                uint8_t selected_tech_index = _human_tech[random_pick - 1].index;
+                int32_t exchange_val = (_human_tech[random_pick - 1].value * expectation) / 100;
                 
-                Get_Differential_Tech_List_(target_player_idx, player_idx, 0, (uint32_t)exchange_val, (uint8_t*)local_424, local_350, &local_43a, 0);
+                Get_Differential_Tech_List_(target_player_idx, player_idx, 0, (uint32_t)exchange_val, available_tech_ids, available_tech_values, &available_tech_count, 0);
                 
-                if (local_43a > 0) {
+                if (available_tech_count > 0) {
                     MOX::_player[player_idx].diplomacy_message[target_player_idx] = 101; /* 'e' */
                     MOX::_player[player_idx].diplomacy_proposal_exchange_max_value[target_player_idx] = exchange_val;
                     MOX::_player[player_idx].diplomacy_proposal_exchange_tech[target_player_idx] = selected_tech_index;

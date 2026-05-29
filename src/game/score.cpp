@@ -836,8 +836,8 @@ namespace SCORE {
         char scor_buf[16];
 
         // This local string copy appears in the original binary but is not explicitly used.
-        *(uint32_t*)scor_buf = *reinterpret_cast<const uint32_t*>(std::uintptr_t{0x0055A510}); /* "scor" */
-        scor_buf[4] = *reinterpret_cast<const char*>(std::uintptr_t{0x0055A514}); /* "" */
+        memcpy(scor_buf, s_scor_0055a510, 4);
+        scor_buf[4] = s__0055a514[0];
 
         SCORE::_hi->score_elimination = SCORE::Get_Elimination_Score_(player_idx);
         SCORE::_hi->score_technology = SCORE::Get_Technology_Score_(player_idx);
@@ -848,18 +848,20 @@ namespace SCORE {
         SCORE::_hi->score_population = SCORE::Get_Population_Score_(player_idx);
         SCORE::_hi->score_time = SCORE::Get_Time_Score_();
 
-        SCORE::_hi->score_raw_subtotal = (SCORE::_hi->score_time +
-                                          SCORE::_hi->score_antares +
-                                          SCORE::_hi->score_council +
-                                          SCORE::_hi->score_captured_colonists +
-                                          SCORE::_hi->score_orion +
-                                          SCORE::_hi->score_population +
-                                          SCORE::_hi->score_technology +
-                                          SCORE::_hi->score_elimination);
+        uint16_t raw_subtotal = (uint16_t)SCORE::_hi->score_time;
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_antares);
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_council);
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_captured_colonists);
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_orion);
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_population);
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_technology);
+        raw_subtotal = (uint16_t)(raw_subtotal + (uint16_t)SCORE::_hi->score_elimination);
+        SCORE::_hi->score_raw_subtotal = (int16_t)raw_subtotal;
 
         SCORE::_hi->score_modifier_pct = raceopt::Player_Score_Modifier_((int16_t)(uint8_t)SCORE::_hi->player_idx);
 
-        SCORE::_hi->score_final = (int16_t)(((int32_t)SCORE::_hi->score_modifier_pct * (int32_t)SCORE::_hi->score_raw_subtotal + 50) / 100);
+        int32_t product = (int32_t)SCORE::_hi->score_modifier_pct * (int32_t)SCORE::_hi->score_raw_subtotal;
+        SCORE::_hi->score_final = (int16_t)((product + 50) / 100);
     }
 
     /**
@@ -1130,7 +1132,7 @@ namespace SCORE {
         int16_t total_pop = 0;
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
-            if (MOX::_colony[i].owner == (int8_t)player_idx) {
+            if ((int16_t)MOX::_colony[i].owner == player_idx) {
                 // Assembly zero-extends the n_pops byte into CX before adding to AX
                 total_pop += (uint8_t)MOX::_colony[i].n_pops;
             }

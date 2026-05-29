@@ -91,7 +91,7 @@ namespace replace {
         }
     }
 
-    void __cdecl Replace_Color_(s_animation_header *anim, int16_t old_color, int8_t new_color) {
+    void __cdecl Replace_Color_(s_animation_header *anim, int16_t old_color, uint8_t new_color) {
         animate::_animation_header = anim;
 
         if (anim->frame_count > 0) {
