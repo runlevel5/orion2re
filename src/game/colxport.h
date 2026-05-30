@@ -1,32 +1,29 @@
 #pragma once
 
 namespace COLXPORT {
-    inline uint8_t& _cheezy_hack_col_count_state =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005560C8});
+    extern uint8_t _cheezy_hack_col_count_state;
 
-    inline int16_t (&_cheezy_hack_col_count)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00564DE0});
+    extern int16_t _cheezy_hack_col_count[8];
 
     short __cdecl N_Colonies_(short player_idx);
 
-    inline int16_t*& _g_colony_list_ptr = *reinterpret_cast<int16_t**>(std::uintptr_t{0x005A7B74});
+    extern int16_t* _g_colony_list_ptr;
 
-    inline MOX2::action_func_t& _saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x0056501C});
+    extern MOX2::action_func_t _saved_autofunction;
 
-    inline int16_t (&_list_col)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00564DF0});
+    extern int16_t _list_col[6];
 
-    inline int16_t (&_list_col_pop_ref)[252] = *reinterpret_cast<int16_t(*)[252]>(std::uintptr_t{0x00564E00});
+    extern s_colsum_col_pop_ref _list_col_pop_ref[6];
 
-    inline int16_t (&_list_col_coord_vars)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00565010});
+    extern int16_t _list_col_coord_vars[6];
 
-    inline int16_t (&_list_col_pop_count)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00565020});
+    extern int16_t _list_col_pop_count[6];
 
-    inline int16_t (&_list_col_job_fields)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00565030});
+    extern int16_t _list_col_job_fields[6];
 
-    inline int16_t (&_list_fields)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00565000});
+    extern int16_t _list_fields[6];
 
-    inline int16_t& _x_fields = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564FF8});
-    inline int16_t (&_x_fields_array)[4] = *reinterpret_cast<int16_t(*)[4]>(std::uintptr_t{0x00564FF8});
+    extern int16_t _x_fields_array[4];
 
     void __cdecl Build_Global_Colony_List_();
 
@@ -42,8 +39,7 @@ namespace COLXPORT {
 
     void __cdecl Add_Fields_();
 
-    inline s_animation_header* (&_anims)[4] =
-        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x005560B8});
+    extern s_animation_header* _anims[4];
 
     void __cdecl Load_Xport_Anims_();
 

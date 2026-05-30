@@ -1,6 +1,43 @@
 #include "pch.h"
 
 namespace COLSUM {
+    int16_t _x_fields[14];
+    int16_t _g_sort_index;
+    s_animation_header* _anims[21];
+    uint8_t _draw_planet_sum;
+
+    int16_t _first;
+    int16_t _slider_bar_position;
+
+    int16_t _list_col_prod_fields[10];
+    int16_t _list_col[10];
+    s_colsum_col_pop_ref _list_col_pop_ref[30];
+    int16_t _list_col_coord_vars[32];
+    int16_t _list_col_pop_count[32];
+    int16_t _list_buy_fields[10];
+    int16_t _list_fields[10];
+    int16_t _list_buy_data[10];
+    int16_t _list_col_job_fields[30];
+    int16_t _colony_summary_saved_screen;
+
+    uint8_t _colsum_strings_been_loaded;
+
+    int8_t _event_good_lookup[36] = {
+        1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1,
+    };
+
+    char* _wee_event_strings[36];
+
+    const char s_0_0055110c[3] = "\0320";
+    const char s_1_00551110[3] = "\0321";
+
+    const char s__005510f0[2] = " ";
+    const char s_s_005510f4[2] = "s";
+    const char s_f_005510f8[2] = "f";
+    const char s_p_005510fc[2] = "p";
+
     void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2) {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             int16_t best_planet = Pick_Best_Planet_To_Goto_At_Star_(star_idx);

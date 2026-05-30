@@ -40,13 +40,13 @@ namespace COMBAT {
 
     int16_t __cdecl Combat_Satelite_Check_(uint8_t type);
 
-    inline const char* s_Crystal_00557e24 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E24}); // "Crystal"
-    inline const char* s_Eel_00557e2c = reinterpret_cast<const char*>(std::uintptr_t{0x00557E2C});     // "Eel"
-    inline const char* s_Hydra_00557e30 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E30});   // "Hydra"
-    inline const char* s_Dragon_00557e38 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E38});   // "Dragon"
-    inline const char* s_Amoeba_00557e40 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E40});   // "Amoeba"
-    inline const char* s_Guardian_00557e48 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E48}); // "Guardian"
-    inline const char* s_Antaran_00557e54 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E54});  // "Antaran"
+    extern const char s_Crystal_00557e24[8];   // "Crystal"
+    extern const char s_Eel_00557e2c[4];       // "Eel"
+    extern const char s_Hydra_00557e30[8];     // "Hydra"
+    extern const char s_Dragon_00557e38[8];    // "Dragon"
+    extern const char s_Amoeba_00557e40[8];    // "Amoeba"
+    extern const char s_Guardian_00557e48[12]; // "Guardian"
+    extern const char s_Antaran_00557e54[8];   // "Antaran"
 
     void __cdecl Get_Non_Player_Name_(int16_t param_1, char* param_2);
 

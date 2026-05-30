@@ -2,7 +2,7 @@
 #include <cstdint>
 
 namespace COMBAT1 {
-    inline int32_t& _end_of_turn_button = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565E98});
+    extern int32_t _end_of_turn_button;
 
     int16_t __cdecl Combat_Ship_Is_Functional_(int16_t ship_idx);
 
@@ -12,7 +12,7 @@ namespace COMBAT1 {
 
     int16_t __cdecl Ship_Initiative_Value_(int16_t ship_idx);
 
-    inline uint16_t& _start_of_turn = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A6E10});
+    extern int16_t _start_of_turn;
 
     int16_t __cdecl Next_Ship_(int16_t param_1);
 

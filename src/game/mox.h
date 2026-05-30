@@ -60,7 +60,6 @@ namespace MOX {
     inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
     inline int8_t (&_player_mode)[15] =
         *reinterpret_cast<int8_t(*)[15]>(std::uintptr_t{0x0059D650});
-    inline int16_t& _start_of_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a6e10});
     inline int16_t& _cur_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6c0});
     inline int16_t& _net_destination = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b8});
     inline int16_t& _done_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b4});

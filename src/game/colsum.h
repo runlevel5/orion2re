@@ -5,35 +5,30 @@ struct s_animation_header;
 struct s_colsum_col_pop_ref;
 
 namespace COLSUM {
-    inline int16_t (&_x_fields)[14] = *reinterpret_cast<int16_t(*)[14]>(std::uintptr_t{0x00551040});
-    inline int16_t& _g_sort_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055105C});
-    inline s_animation_header* (&_anims)[21] = *reinterpret_cast<s_animation_header* (*)[21]>(std::uintptr_t{0x00551060});
-    inline uint8_t& _draw_planet_sum = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005510C0});
+    extern int16_t _x_fields[14];
+    extern int16_t _g_sort_index;
+    extern s_animation_header* _anims[21];
+    extern uint8_t _draw_planet_sum;
 
-    inline int16_t& _first =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005510B4});
+    extern int16_t _first;
 
-    inline int16_t& _slider_bar_position = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005510B8});
+    extern int16_t _slider_bar_position;
 
-    inline int16_t (&_list_col_prod_fields)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x00563B98});
-    inline int16_t (&_list_col)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x00563BB0});
+    extern int16_t _list_col_prod_fields[10];
+    extern int16_t _list_col[10];
 
-    inline s_colsum_col_pop_ref (&_list_col_pop_ref)[30] =
-        *reinterpret_cast<s_colsum_col_pop_ref(*)[30]>(std::uintptr_t{0x00563BC8});
+    extern s_colsum_col_pop_ref _list_col_pop_ref[30];
 
-    inline int16_t (&_list_col_coord_vars)[32] =
-        *reinterpret_cast<int16_t(*)[32]>(std::uintptr_t{0x005645D0});
+    extern int16_t _list_col_coord_vars[32];
 
-    inline int16_t (&_list_col_pop_count)[32] =
-        *reinterpret_cast<int16_t(*)[32]>(std::uintptr_t{0x00564628});
+    extern int16_t _list_col_pop_count[32];
 
-    inline int16_t (&_list_buy_fields)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x005645A0});
-    inline int16_t (&_list_fields)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x005645B8});
-    inline int16_t (&_list_buy_data)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x00564610});
+    extern int16_t _list_buy_fields[10];
+    extern int16_t _list_fields[10];
+    extern int16_t _list_buy_data[10];
 
-    inline int16_t (&_list_col_job_fields)[30] =
-        *reinterpret_cast<int16_t(*)[30]>(std::uintptr_t{0x005646F8});
-    inline int16_t& _colony_summary_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564624});
+    extern int16_t _list_col_job_fields[30];
+    extern int16_t _colony_summary_saved_screen;
 
     void __cdecl Clear_List_Col_Array_();
 
@@ -49,14 +44,11 @@ namespace COLSUM {
 
     void __cdecl Load_Col_Sum_Anims_();
 
-    inline uint8_t& _colsum_strings_been_loaded =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005510ec});
+    extern uint8_t _colsum_strings_been_loaded;
 
-    inline int8_t (&_event_good_lookup)[36] =
-        *reinterpret_cast<int8_t(*)[36]>(std::uintptr_t{0x005510C8});
+    extern int8_t _event_good_lookup[36];
 
-    inline char* (&_wee_event_strings)[36] =
-        *reinterpret_cast<char* (*)[36]>(std::uintptr_t{0x00564668});
+    extern char* _wee_event_strings[36];
 
     void __cdecl Load_Colsum_Strings_();
 
@@ -92,13 +84,13 @@ namespace COLSUM {
 
     void __cdecl Increment_First_(int16_t count);
 
-    inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // " 0"
-    inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
+    extern const char s_0_0055110c[3];
+    extern const char s_1_00551110[3];
 
-    inline const char* s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F0});
-    inline const char* s_s_005510f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F4});
-    inline const char* s_f_005510f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F8});
-    inline const char* s_p_005510fc = reinterpret_cast<const char*>(std::uintptr_t{0x005510FC});
+    extern const char s__005510f0[2];
+    extern const char s_s_005510f4[2];
+    extern const char s_f_005510f8[2];
+    extern const char s_p_005510fc[2];
 
     void __cdecl Draw_Empire_Info_();
 

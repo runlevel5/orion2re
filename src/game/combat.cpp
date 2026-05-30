@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace COMBAT {
+    const char s_Crystal_00557e24[8] = "Crystal";
+    const char s_Eel_00557e2c[4] = "Eel";
+    const char s_Hydra_00557e30[8] = "Hydra";
+    const char s_Dragon_00557e38[8] = "Dragon";
+    const char s_Amoeba_00557e40[8] = "Amoeba";
+    const char s_Guardian_00557e48[12] = "Guardian";
+    const char s_Antaran_00557e54[8] = "Antaran";
+
     int16_t __cdecl Strategic_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, char* summary, char* details) {
         MOX2::action_func_t auto_fn;
         int16_t leader_combat_bonuses[20];

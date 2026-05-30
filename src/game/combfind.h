@@ -1,27 +1,27 @@
 #pragma once
 
 namespace COMBFIND {
-    inline uint8_t& _messed_up_fleet_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD0});
-    inline uint8_t& _in_net_update = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD4});
-    inline s_combfind_target& _target = *reinterpret_cast<s_combfind_target*>(std::uintptr_t{0x0056CE38});
-    inline uint16_t (*&_player_needs_to_attack)[73] = *reinterpret_cast<uint16_t (**)[73]>(std::uintptr_t{0x0056CE08});
-    inline int8_t (*&_battle_stars) = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CE14});
-    inline uint8_t (*&_star_has_nonplayer)[73] = *reinterpret_cast<uint8_t (**)[73]>(std::uintptr_t{0x0056CE20});
-    inline int16_t& _n_battle_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CE2C});
-    inline int8_t(*&_attack_confirmed)[8][8] = *reinterpret_cast<int8_t(**)[8][8]>(std::uintptr_t{ 0x0056CE64 });
-    inline s_combfind_star_has_player (*&_star_has_player)[73][8] = *reinterpret_cast<s_combfind_star_has_player (**)[73][8]>(std::uintptr_t{0x0056CE68});
-    inline uint8_t*& _current_star_has_nonplayer = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005A4AAC});
-    inline s_combfind_star_has_player*& _current_star_has_player = *reinterpret_cast<s_combfind_star_has_player**>(std::uintptr_t{0x005A4AB0});
-    inline char*& _research_treaty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE00});
-    inline char*& _s_attacks_you_at_s_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE04});
-    inline char*& _outpost_destroyed_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE0C});
-    inline char*& _combat_is_reported_between_s_and_s_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE10});
-    inline char*& _you_have_following_treaties_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE18});
-    inline char*& _receiving_tribute_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE1C});
-    inline char*& _noncombat_ships_destroyed_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE24});
-    inline char*& _colony_seized_by_mind_control_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE28});
-    inline char*& _really_risk_war_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE30});
-    inline char*& _trade_treaty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE6C});
+    extern uint8_t _messed_up_fleet_palette;
+    extern uint8_t _in_net_update;
+    extern s_combfind_target _target;
+    extern uint16_t (*_player_needs_to_attack)[73];
+    extern int8_t* _battle_stars;
+    extern uint8_t (*_star_has_nonplayer)[73];
+    extern int16_t _n_battle_stars;
+    extern int8_t (*_attack_confirmed)[8][8];
+    extern s_combfind_star_has_player (*_star_has_player)[73][8];
+    extern uint8_t* _current_star_has_nonplayer;
+    extern s_combfind_star_has_player* _current_star_has_player;
+    extern char* _research_treaty_msg;
+    extern char* _s_attacks_you_at_s_msg;
+    extern char* _outpost_destroyed_msg;
+    extern char* _combat_is_reported_between_s_and_s_msg;
+    extern char* _you_have_following_treaties_msg;
+    extern char* _receiving_tribute_msg;
+    extern char* _noncombat_ships_destroyed_msg;
+    extern char* _colony_seized_by_mind_control_msg;
+    extern char* _really_risk_war_msg;
+    extern char* _trade_treaty_msg;
 
     void __cdecl Search_For_Battles_();
 

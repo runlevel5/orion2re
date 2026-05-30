@@ -1,41 +1,35 @@
 #pragma once
 
 namespace COLGCBT {
-    inline s_help_box (&_colony_ground_combat_screen_help)[3] =
-        *reinterpret_cast<s_help_box(*)[3]>(std::uintptr_t{ 0x00558448 });
-    inline s_mouse_list& _mouse_list_blank = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x005583A8 });
-    inline uint8_t& _N_DEF_UNIT_ROWS = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005583B8 });
-    inline uint8_t& _N_ATK_UNIT_ROWS = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005583BC });
-    inline uint8_t& _title_changed_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005583C0 });
-    inline int16_t& _old_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005583C4 });
-    inline int16_t& _g_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005583B4 });
-    inline s_invasion_side_info*& _g_attack_ptr = *reinterpret_cast<s_invasion_side_info**>(std::uintptr_t{ 0x0056C470 });
-    inline const char* s_t_T0_124_500_550_600_620__00558468 = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x00558468}); /* " t T0,124,500,550,600,620." */
-    inline s_animation_header*& _explosion_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056C474});
-    inline uint16_t& _display_fast = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0056C478 });
-    inline s_animation_header*& _heart_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056C47C});
-    inline uint16_t& _start_combat = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0056C480 });
-    inline s_animation_header*& _frame_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056C484});
-    inline s_invasion_side_info*& _g_defend_ptr = *reinterpret_cast<s_invasion_side_info**>(std::uintptr_t{ 0x0056C488 });
-    inline int16_t (&_fields)[2] =
-        *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x0056CC60});
+    extern s_help_box _colony_ground_combat_screen_help[3];
+    extern s_mouse_list _mouse_list_blank;
+    extern uint8_t _N_DEF_UNIT_ROWS;
+    extern uint8_t _N_ATK_UNIT_ROWS;
+    extern uint8_t _title_changed_flag;
+    extern int16_t _old_ctr;
+    extern int16_t _g_ctr;
+    extern s_invasion_side_info* _g_attack_ptr;
+    extern const char s_t_T0_124_500_550_600_620__00558468[27];
+    extern s_animation_header* _explosion_anim;
+    extern uint16_t _display_fast;
+    extern s_animation_header* _heart_anim;
+    extern uint16_t _start_combat;
+    extern s_animation_header* _frame_anim;
+    extern s_invasion_side_info* _g_defend_ptr;
+    extern int16_t _fields[2];
 
-    inline int16_t& _top_line =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CC64});
+    extern int16_t _top_line;
 
-    inline s_animation_header* (&_anims)[40] =
-        *reinterpret_cast<s_animation_header*(*)[40]>(std::uintptr_t{0x005A5280});
+    extern s_animation_header* _anims[40];
 
-    inline uint8_t& _player_color_array = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005583C8});
-    inline uint8_t& _short_player_color_array = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558408});
+    extern uint8_t _player_color_array[64];
+    extern uint8_t _short_player_color_array[64];
 
     void __cdecl Replace_Colgcbt_Color_With_Player_Colors_(s_animation_header* anim, int16_t player_idx);
 
     void __cdecl Load_Combat_Anims_();
 
-    inline s_ground_unit(&_g_units)[2][40] =
-        *reinterpret_cast<s_ground_unit(*)[2][40]>(std::uintptr_t{ 0x0056C490 });
+    extern s_ground_unit _g_units[2][40];
 
     int16_t __cdecl N_Slots_Left_(uint8_t side);
 

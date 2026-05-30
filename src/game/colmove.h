@@ -2,8 +2,8 @@
 #include <cstdint>
 
 namespace COLMOVE {
-    inline int16_t& _cluster_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558284});
-    inline uint8_t& _g_hacky_dont_draw_cluster_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558288});
+    extern int16_t _cluster_colony_n;
+    extern uint8_t _g_hacky_dont_draw_cluster_flag;
 
     void __cdecl Draw_Cluster_(int16_t x, int16_t y);
 

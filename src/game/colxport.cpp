@@ -1,6 +1,29 @@
 #include "pch.h"
 
 namespace COLXPORT {
+    uint8_t _cheezy_hack_col_count_state;
+
+    int16_t _cheezy_hack_col_count[8];
+
+    int16_t* _g_colony_list_ptr;
+
+    MOX2::action_func_t _saved_autofunction;
+
+    int16_t _list_col[6];
+
+    s_colsum_col_pop_ref _list_col_pop_ref[6];
+
+    int16_t _list_col_coord_vars[6];
+
+    int16_t _list_col_pop_count[6];
+
+    int16_t _list_col_job_fields[6];
+
+    int16_t _list_fields[6];
+
+    int16_t _x_fields_array[4];
+
+    s_animation_header* _anims[4];
 
     void __cdecl Draw_Xport_Popup_() {
         COLONY::Set_Colony_Font_();
@@ -298,7 +321,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t entry_index) {
         y,
         0x1B9,
         0,
-        &COLXPORT::_list_col_pop_ref[index * 42],
+        COLXPORT::_list_col_pop_ref[index].refs,
         &COLXPORT::_list_col_pop_count[index],
         &COLXPORT::_list_col_coord_vars[index],
         &COLXPORT::_list_col_job_fields[index]

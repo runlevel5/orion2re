@@ -2,6 +2,23 @@
 
 namespace COLREFIT {
 
+    int16_t _first_ship;
+    int16_t _slider_bar_position;
+    int16_t _fields[12];
+    int16_t _esc;
+    int16_t _scanned_ship_index = -1;
+    s_animation_header* _anims[4];
+    int16_t _scanned_ship_d_index = -1;
+    int16_t _lscanned_field = -1000;
+    const char s_refitpup_LBX_00558394[13] = "refitpup.LBX";
+    int16_t* _g_ship_field_list_ptr;
+    MOX2::action_func_t _saved_autofunction;
+    int16_t* _g_ship_list_ptr;
+    int16_t _n_ships_in_list;
+    int16_t _g_ship_n;
+    s_scroll_state* _g_scroll_ptr;
+    char s_colon_005583a4[2] = ":";
+
     void __cdecl Update_First_Ship_(int16_t* param_1, int16_t* param_2) {
         int16_t sVar1 = ((_n_ships_in_list + 5) / 5) * 5;
 

@@ -7,48 +7,36 @@ namespace COLREFIT {
     };
 #pragma pack(pop)
 
-    inline int16_t& _first_ship =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558368});
+    extern int16_t _first_ship;
 
-    inline int16_t& _slider_bar_position =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055836C});
+    extern int16_t _slider_bar_position;
 
-    inline int16_t (&_fields)[12] =
-        *reinterpret_cast<int16_t(*)[12]>(std::uintptr_t{0x0056C450});
+    extern int16_t _fields[12];
 
-    inline int16_t& _esc =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558370});
+    extern int16_t _esc;
 
-    inline int16_t& _scanned_ship_index =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558388});
+    extern int16_t _scanned_ship_index;
 
-    inline s_animation_header* (&_anims)[4] =
-        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x00558378});
+    extern s_animation_header* _anims[4];
 
-    inline int16_t& _scanned_ship_d_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055838C});
-    inline int16_t& _lscanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558390});
+    extern int16_t _scanned_ship_d_index;
+    extern int16_t _lscanned_field;
 
-    inline const char* s_refitpup_LBX_00558394 = reinterpret_cast<const char*>(std::uintptr_t{0x00558394});
+    extern const char s_refitpup_LBX_00558394[13]; // "refitpup.LBX"
 
     void __cdecl Update_First_Ship_(int16_t* first_ship_ptr, int16_t* slider_pos_ptr);
 
-    inline int16_t*& _g_ship_field_list_ptr =
-        *reinterpret_cast<int16_t**>(std::uintptr_t{0x0056C438});
+    extern int16_t* _g_ship_field_list_ptr;
 
-    inline MOX2::action_func_t& _saved_autofunction =
-        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x0056C43C});
+    extern MOX2::action_func_t _saved_autofunction;
 
-    inline int16_t*& _g_ship_list_ptr =
-        *reinterpret_cast<int16_t**>(std::uintptr_t{0x0056C440});
+    extern int16_t* _g_ship_list_ptr;
 
-    inline int16_t& _n_ships_in_list =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056C448});
+    extern int16_t _n_ships_in_list;
 
-    inline int16_t& _g_ship_n =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056C468});
+    extern int16_t _g_ship_n;
 
-    inline s_scroll_state*& _g_scroll_ptr =
-        *reinterpret_cast<s_scroll_state**>(std::uintptr_t{0x005A5320});
+    extern s_scroll_state* _g_scroll_ptr;
 
     void __cdecl Build_Ship_List_();
 
@@ -76,7 +64,7 @@ namespace COLREFIT {
 
     void __cdecl Draw_Ship_D_List_();
 
-    inline char* s_colon_005583a4 = reinterpret_cast<char*>(0x005583A4); // ":"
+    extern char s_colon_005583a4[2]; // ":"
 
     void __cdecl Show_Ship_Design_(s_ship_design* design);
 

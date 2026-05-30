@@ -2,6 +2,15 @@
 
 namespace COMBINIT {
 
+const char s_combat_lbx_00551244[11] = "combat.lbx";
+const char s_monster_lbx_00551250[12] = "monster.lbx";
+const char s_cmbtshp_lbx_0055125c[12] = "cmbtshp.lbx";
+const char s_cmbtmisl_lbx_00551234[13] = "cmbtmisl.lbx";
+const char s_cmbtsfx_lbx_00551228[12] = "cmbtsfx.lbx";
+const char s_sphersfx_lbx_00551218[13] = "sphersfx.lbx";
+
+uint8_t _real_attack_flag;
+
 void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     if (MOX::_settings.strategic_combat_flag == 1) {
         INITSHIP::Update_Strategic_Ship_(ship_idx);

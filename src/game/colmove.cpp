@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace COLMOVE {
+    int16_t _cluster_colony_n = -1;
+    uint8_t _g_hacky_dont_draw_cluster_flag;
+
     void __cdecl Draw_Cluster_(int16_t x, int16_t y) {
         if (_cluster_colony_n != -1 && !COLONY::_full_draw) {
             if (Get_First_Unemployed_(_cluster_colony_n) != -1) {

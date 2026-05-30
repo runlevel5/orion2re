@@ -2,6 +2,55 @@
 
 namespace COLGCBT {
 
+    s_help_box _colony_ground_combat_screen_help[3] = {
+        { 541, 1, 40, 260, 185 },
+        { 542, 378, 40, 639, 185 },
+        { 540, 0, 0, 639, 479 },
+    };
+
+    s_mouse_list _mouse_list_blank = { 0, 0, 0, 0, 639, 479 };
+
+    uint8_t _N_DEF_UNIT_ROWS = 3;
+    uint8_t _N_ATK_UNIT_ROWS = 3;
+    uint8_t _title_changed_flag;
+    int16_t _old_ctr = -1;
+    int16_t _g_ctr;
+    s_invasion_side_info* _g_attack_ptr;
+    const char s_t_T0_124_500_550_600_620__00558468[27] = "\x17t\aT0,124,500,550,600,620.";
+    s_animation_header* _explosion_anim;
+    uint16_t _display_fast;
+    s_animation_header* _heart_anim;
+    uint16_t _start_combat;
+    s_animation_header* _frame_anim;
+    s_invasion_side_info* _g_defend_ptr;
+    int16_t _fields[2];
+    int16_t _top_line;
+    s_animation_header* _anims[40];
+
+    uint8_t _player_color_array[64] = {
+        146, 236, 237, 238, 239, 150, 151, 152,
+        218, 219, 220, 212, 222, 223, 224, 225,
+        192, 193, 194, 195, 196, 197, 198, 199,
+        89, 93, 97, 99, 101, 103, 105, 108,
+        112, 114, 115, 116, 117, 118, 119, 135,
+        210, 211, 212, 213, 214, 215, 216, 217,
+        121, 122, 123, 124, 124, 125, 126, 127,
+        183, 184, 185, 186, 187, 188, 189, 189,
+    };
+
+    uint8_t _short_player_color_array[64] = {
+        236, 237, 238, 239, 0, 0, 0, 0,
+        219, 221, 223, 225, 0, 0, 0, 0,
+        232, 232, 234, 235, 0, 0, 0, 0,
+        86, 97, 103, 107, 0, 0, 0, 0,
+        114, 116, 118, 119, 0, 0, 0, 0,
+        211, 213, 214, 216, 0, 0, 0, 0,
+        121, 123, 125, 127, 0, 0, 0, 0,
+        184, 185, 186, 187, 0, 0, 0, 0,
+    };
+
+    s_ground_unit _g_units[2][40];
+
     void __cdecl Calc_Top_Line_() {
         if (COLONY::_colony_bldgs[0].buildings[0] > 0) {
             COLONY::_colony_bldgs[0].buildings[0] = 0;
@@ -33,8 +82,8 @@ namespace COLGCBT {
         uint8_t color = static_cast<uint8_t>(MOX::_player[player_idx].color);
 
         if (color != 2) {
-            replace::Replace_Color_Range_(anim, &_player_color_array + color * 8, 0xC0, 8);
-            replace::Replace_Color_Range_(anim, &_short_player_color_array + color * 8, 0xE8, 4);
+            replace::Replace_Color_Range_(anim, _player_color_array + color * 8, 0xC0, 8);
+            replace::Replace_Color_Range_(anim, _short_player_color_array + color * 8, 0xE8, 4);
         }
     }
 

@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace COLLAND {
+    s_animation_header* _l_anims;
+    int32_t _pod1l_sfx;
+    int32_t _pod2d_sfx;
+    int32_t _pod2l_sfx;
+    int32_t _pod1d_sfx;
+    uint16_t _fields;
+    const char s_format_comma_space[] = "%s, %s";
+
     /**
      * @address 00429f50
      */

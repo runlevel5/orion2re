@@ -2,6 +2,28 @@
 
 namespace COMBFIND {
 
+uint8_t _messed_up_fleet_palette;
+uint8_t _in_net_update;
+s_combfind_target _target;
+uint16_t (*_player_needs_to_attack)[73];
+int8_t* _battle_stars;
+uint8_t (*_star_has_nonplayer)[73];
+int16_t _n_battle_stars;
+int8_t (*_attack_confirmed)[8][8];
+s_combfind_star_has_player (*_star_has_player)[73][8];
+uint8_t* _current_star_has_nonplayer;
+s_combfind_star_has_player* _current_star_has_player;
+char* _research_treaty_msg;
+char* _s_attacks_you_at_s_msg;
+char* _outpost_destroyed_msg;
+char* _combat_is_reported_between_s_and_s_msg;
+char* _you_have_following_treaties_msg;
+char* _receiving_tribute_msg;
+char* _noncombat_ships_destroyed_msg;
+char* _colony_seized_by_mind_control_msg;
+char* _really_risk_war_msg;
+char* _trade_treaty_msg;
+
 void __cdecl Search_For_Battles_() {
     MOX2::action_func_t saved_auto_fn;
     MOX2::Get_Auto_Function_(&saved_auto_fn);

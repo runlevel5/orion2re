@@ -13,12 +13,12 @@ namespace COMBINIT {
     inline int8_t* s__00579612 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579612});
     inline int8_t* s__00579613 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579613});
 
-    inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
-    inline const char* s_monster_lbx_00551250 = reinterpret_cast<const char*>(std::uintptr_t{0x00551250});
-    inline const char* s_cmbtshp_lbx_0055125c = reinterpret_cast<const char*>(std::uintptr_t{0x0055125C});
-    inline char* s_cmbtmisl_lbx_00551234 = reinterpret_cast<char*>(std::uintptr_t{0x00551234});
-    inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
-    inline char* s_sphersfx_lbx_00551218 = reinterpret_cast<char*>(std::uintptr_t{0x00551218});
+    extern const char s_combat_lbx_00551244[11];
+    extern const char s_monster_lbx_00551250[12];
+    extern const char s_cmbtshp_lbx_0055125c[12];
+    extern const char s_cmbtmisl_lbx_00551234[13];
+    extern const char s_cmbtsfx_lbx_00551228[12];
+    extern const char s_sphersfx_lbx_00551218[13];
 
     void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx);
 
@@ -72,7 +72,7 @@ namespace COMBINIT {
 
     void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int16_t param_3);
 
-    inline uint8_t& _real_attack_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8BBC});
+    extern uint8_t _real_attack_flag;
     int __cdecl qsort_ship_array_by_size_(const void* param_1, const void* param_2);
 
     void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y);

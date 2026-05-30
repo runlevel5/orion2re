@@ -2,6 +2,10 @@
 
 namespace COMBAT1 {
 
+    int32_t _end_of_turn_button;
+
+    int16_t _start_of_turn;
+
     void __cdecl Add_Tactical_Combat_Fields_(void) {
         short auto_combat_idx = 0;
         const char* info_hotkey;
@@ -227,7 +231,7 @@ namespace COMBAT1 {
             }
 
             RUSS::Mox_Update_();
-            MOX::_start_of_turn = 1;
+            COMBAT1::_start_of_turn = 1;
             MOX::_cur_ptr = -1;
             int16_t next_ship_flag = Next_Ship_(param_1);
 
@@ -247,7 +251,6 @@ namespace COMBAT1 {
                     }
                 }
 
-                MOX::_start_of_turn = 0;
                 
                 while (MOX::_ship_turn_order[MOX::_cur_ptr] >= 0) {
                     if (next_ship_flag != 0) break;
