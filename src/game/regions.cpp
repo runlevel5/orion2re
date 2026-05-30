@@ -7,7 +7,7 @@ namespace regions {
 
     void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height) {
         const uint32_t width_bytes = width_blocks << 2;
-        const int32_t stride_skip = platform::g_screen_res_x - (int32_t)width_bytes;
+        const int32_t stride_skip = video::g_screen_res_x - (int32_t)width_bytes;
         uint32_t remaining = height;
 
         do {
@@ -19,7 +19,7 @@ namespace regions {
     }
 
     void __cdecl Fill_Column_(uint8_t color, uint8_t* surface, uint32_t fill_width, uint32_t fill_height) {
-        int32_t stride_skip = platform::g_screen_res_x - (int32_t)fill_width;
+        int32_t stride_skip = video::g_screen_res_x - (int32_t)fill_width;
         uint32_t remaining = fill_height;
 
         do {
@@ -37,7 +37,7 @@ namespace regions {
         _rows_remaining = row_count;
 
         uint32_t width_bytes = width_dwords << 2;
-        int32_t row_skip = platform::g_screen_res_x - (int32_t)width_bytes;
+        int32_t row_skip = video::g_screen_res_x - (int32_t)width_bytes;
 
         _saved_width = width_bytes >> 2;
 
@@ -59,7 +59,7 @@ namespace regions {
     void __cdecl Tint_Fill_Column_(uint8_t* tint_table, uint8_t* pixels, uint32_t width, uint32_t height) {
         uint8_t* dst = pixels;
         uint8_t* src = pixels;
-        const int32_t row_skip = platform::g_screen_res_x - static_cast<int32_t>(width);
+        const int32_t row_skip = video::g_screen_res_x - static_cast<int32_t>(width);
 
         _rows_remaining = height;
         _saved_width = width;
@@ -79,7 +79,7 @@ namespace regions {
     }
 
     void __cdecl Interlaced_Fill_Column_(uint32_t interlace_pattern, uint8_t* dst, int32_t span, int32_t row_count) {
-        const uint32_t row_padding = static_cast<uint32_t>(platform::g_screen_res_x) - static_cast<uint32_t>(span);
+        const uint32_t row_padding = static_cast<uint32_t>(video::g_screen_res_x) - static_cast<uint32_t>(span);
 
         do {
             memset(dst, static_cast<int>(static_cast<uint8_t>(interlace_pattern)), static_cast<size_t>(span));
@@ -124,7 +124,7 @@ namespace regions {
 
         int32_t shifted_width_bytes = width_dwords;
         shifted_width_bytes <<= 2;
-        int32_t row_advance = platform::g_screen_res_x - shifted_width_bytes;
+        int32_t row_advance = video::g_screen_res_x - shifted_width_bytes;
         int32_t fill_count = shifted_width_bytes >> 2;
         int32_t remaining_rows = height;
 
@@ -145,7 +145,7 @@ namespace regions {
     }
 
     void __cdecl Tri_Interlaced_Fill_Column_(uint32_t color, uint8_t* dest, int32_t width, int32_t height) {
-        const int32_t row_advance = platform::g_screen_res_x - width;
+        const int32_t row_advance = video::g_screen_res_x - width;
 
         do {
             memset(dest, (uint8_t)color, width);
@@ -181,7 +181,7 @@ namespace regions {
 
         const uint32_t fill_width = width & 0x3FFFFFFFu;
         const uint32_t fill_width_bytes = fill_width * 4;
-        const uint32_t row_advance = platform::g_screen_res_x - fill_width_bytes;
+        const uint32_t row_advance = video::g_screen_res_x - fill_width_bytes;
 
         while (true) {
             memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),

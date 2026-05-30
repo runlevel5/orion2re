@@ -64,7 +64,7 @@ namespace animate {
 
     void __cdecl Draw_Screen_Background_Off_(uint8_t* data) {
         uint32_t* sprite = reinterpret_cast<uint32_t*>(data);
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         uint32_t* vpage = reinterpret_cast<uint32_t*>(video::_current_video_page);
 
         int sprite_idx = 0;
@@ -191,12 +191,12 @@ namespace animate {
             if (!glassed) {
                 switch (type) {
                 case 0:
-                    platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+                    video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Animated_Sprite_(x, y, data);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
                 case 1:
-                    platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+                    video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Bitmap_Sprite_(x, y, data);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
@@ -253,7 +253,7 @@ namespace animate {
 
     void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
         int y_offset = *reinterpret_cast<uint16_t*>(frame_data + 2);
-        int dest_line_base = (y + y_offset) * static_cast<int>(platform::g_screen_res_x) + x;
+        int dest_line_base = (y + y_offset) * static_cast<int>(video::g_screen_res_x) + x;
         int dest_ptr = dest_line_base;
         int frame_idx = 2;
         int height = _animation_header->height;
@@ -286,12 +286,12 @@ namespace animate {
     }
 
     void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int32_t current_y_offset = *(uint16_t*)(sprite + 2);
         int32_t word_idx = 2;
 
-        int32_t dest_idx = (int32_t)x + ((int32_t)y + current_y_offset) * platform::g_screen_res_x;
+        int32_t dest_idx = (int32_t)x + ((int32_t)y + current_y_offset) * video::g_screen_res_x;
         int32_t line_start_idx = dest_idx;
 
         int32_t total_height = (int32_t)_animation_header->height;
@@ -331,15 +331,15 @@ namespace animate {
     }
 
     void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         s_animation_header* header = animate::_animation_header;
         int16_t sprite_w = header->width;
         int16_t sprite_h = header->height;
 
-        int32_t screen_stride = platform::g_screen_res_x - (int32_t)sprite_w;
+        int32_t screen_stride = video::g_screen_res_x - (int32_t)sprite_w;
         uint8_t* v_page = video::_current_video_page;
-        uint32_t screen_offset = (int32_t)y * platform::g_screen_res_x + (int32_t)x;
+        uint32_t screen_offset = (int32_t)y * video::g_screen_res_x + (int32_t)x;
         uint32_t sprite_idx = 0;
 
         if (sprite_h > 0) {
@@ -372,7 +372,7 @@ namespace animate {
     }
 
     void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int32_t sprite_idx = 0;
 
@@ -467,14 +467,14 @@ namespace animate {
     }
 
     void __cdecl Draw_Animated_Sprite_Back_Diff_(int16_t x, int16_t y, uint8_t* frame_data) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         platform::Lock_Offscreen_Surface_();
 
         int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
         int32_t draw_y = y + current_y;
         int32_t data_offset_words = 2;
         int32_t draw_x = x;
-        int32_t screen_offset = draw_y * platform::g_screen_res_x + x;
+        int32_t screen_offset = draw_y * video::g_screen_res_x + x;
         int32_t line_start_offset = screen_offset;
         int32_t height = _animation_header->height;
 
@@ -745,10 +745,10 @@ namespace animate {
 
     void __cdecl Remap_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite_data)
     {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int32_t cur_y_offset = *reinterpret_cast<uint16_t*>(sprite_data + 2);
-        int32_t line_start_offset = (y + cur_y_offset) * platform::g_screen_res_x + x;
+        int32_t line_start_offset = (y + cur_y_offset) * video::g_screen_res_x + x;
         int32_t sprite_idx = 2;
         int32_t screen_offset = line_start_offset;
         int32_t header_height = _animation_header->height;
@@ -787,8 +787,8 @@ namespace animate {
         int16_t width = _animation_header->width;
         int16_t height = _animation_header->height;
         int32_t src_offset = 0;
-        int32_t dest_offset = y * platform::g_screen_res_x + x;
-        int32_t row_skip = platform::g_screen_res_x - width;
+        int32_t dest_offset = y * video::g_screen_res_x + x;
+        int32_t row_skip = video::g_screen_res_x - width;
 
         if (height > 0) {
             for (int32_t h = 0; h < height; ++h) {
@@ -808,7 +808,7 @@ namespace animate {
     }
 
     void __cdecl Remap_Clipped_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int16_t x_off;
         int16_t draw_x;
@@ -844,7 +844,7 @@ namespace animate {
         int32_t draw_height = max_y - draw_y + 1;
 
         int32_t current_y = *(uint16_t*)(frame_data + 2);
-        int32_t screen_offset = x + draw_y * platform::g_screen_res_x;
+        int32_t screen_offset = x + draw_y * video::g_screen_res_x;
         int32_t start_y = y_off;
         int32_t idx = 2;
 
@@ -859,7 +859,7 @@ namespace animate {
         }
 
         if (start_y < current_y) {
-            screen_offset += (current_y - start_y) * platform::g_screen_res_x;
+            screen_offset += (current_y - start_y) * video::g_screen_res_x;
         }
 
         current_y -= start_y;

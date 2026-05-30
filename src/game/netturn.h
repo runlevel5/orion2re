@@ -10,6 +10,7 @@ struct s_net_election_msg {
 
 namespace NETTURN {
     void __cdecl Net_Next_Turn_();
+    extern const char s_craziness_00557680[10];
 
     void __cdecl Host_Next_Turn_();
 

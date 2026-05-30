@@ -1,5 +1,9 @@
 #pragma once
 
+extern uint8_t DAT_00578820;
+extern uint32_t DAT_00578dc8;
+extern uint32_t DAT_00578dcc;
+
 struct IDirectDrawPalette;
 struct tagPALETTEENTRY;
 struct IDirectDrawSurface;

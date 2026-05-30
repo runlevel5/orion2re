@@ -4,6 +4,7 @@ namespace FLT2 {
     s_colors _normal_colors = {{111, 116, 114, 116, 116, 116, 116, 116}};
     s_colors _neutral_colors = {{4, 16, 12, 16, 16, 16, 16, 16}};
     s_colors _red_colors = {{75, 129, 78, 129, 129, 129, 129, 129}};
+    const char s_fmt_to_00557e00[9] = "%s to %s";
 
     const char s__00551100[] = "";
 

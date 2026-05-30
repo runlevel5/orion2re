@@ -94,10 +94,10 @@ namespace bitmap {
 
         Create_Bitmap_Header_(width, height, header);
 
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         uint8_t* dest = reinterpret_cast<uint8_t*>(header) + 0x10;
-        uint8_t* src = video::_current_video_page + (static_cast<int32_t>(y1) * platform::g_screen_res_x) + static_cast<int32_t>(x1);
+        uint8_t* src = video::_current_video_page + (static_cast<int32_t>(y1) * video::g_screen_res_x) + static_cast<int32_t>(x1);
 
         shear::Capture_Screen_Block_(src, width, height, dest);
 
@@ -294,7 +294,7 @@ namespace bitmap {
             return;
         }
 
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         uint8_t* video_page = reinterpret_cast<uint8_t*>(video::_current_video_page);
 
         int32_t mid_x = (x1 + x2) / 2;

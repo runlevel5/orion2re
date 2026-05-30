@@ -67,7 +67,7 @@ namespace fonts {
                 }
             }
 
-            current_row += platform::g_screen_res_x;
+            current_row += video::g_screen_res_x;
         } while (--rows != 0);
     }
 
@@ -384,7 +384,7 @@ namespace fonts {
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, int8_t c) {
         uint32_t res_x = (uint32_t)platform::Lock_Appropriate_Render_Buffer();
-        platform::g_screen_res_x = (int32_t)res_x;
+        video::g_screen_res_x = (int32_t)res_x;
 
         uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + (static_cast<int32_t>(y) * res_x) + x;
 
@@ -403,11 +403,11 @@ namespace fonts {
     }
 
     int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character) {
-        platform::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
 
         int32_t char_idx = (int32_t)character;
 
-        int32_t pixel_offset = (int32_t)y * (int32_t)platform::g_screen_res_x + (int32_t)x;
+        int32_t pixel_offset = (int32_t)y * (int32_t)video::g_screen_res_x + (int32_t)x;
         uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + pixel_offset;
 
         uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + _font_header.font_style_offsets[char_idx];
@@ -732,11 +732,11 @@ namespace fonts {
             y_start = 0;
         }
 
-        if (x_end >= platform::g_screen_res_x) {
-            x_end = platform::g_screen_res_x - 1;
+        if (x_end >= video::g_screen_res_x) {
+            x_end = video::g_screen_res_x - 1;
         }
-        if (y_end >= platform::g_screen_res_y) {
-            y_end = platform::g_screen_res_y - 1;
+        if (y_end >= video::g_screen_res_y) {
+            y_end = video::g_screen_res_y - 1;
         }
 
         if (video::screen_refresh_flag >= 2) {
@@ -960,9 +960,9 @@ namespace fonts {
     }
 
     void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, int8_t letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int screen_idx_start = y * platform::g_screen_res_x - clip_left + x;
+        int screen_idx_start = y * video::g_screen_res_x - clip_left + x;
 
         if (static_cast<int16_t>(_font_header.current_height) < end_y) {
             end_y = static_cast<int16_t>(_font_header.current_height);
@@ -1000,7 +1000,7 @@ namespace fonts {
                     } while (pixel != 0x80);
                 }
                 ++offset;
-                screen_idx_start += platform::g_screen_res_x;
+                screen_idx_start += video::g_screen_res_x;
             }
         }
 

@@ -19,6 +19,7 @@ namespace fields {
     extern uint16_t _draw_fields_flag;
     extern const char s_You_exceeded_the_max_number_of_fields[44];
     extern const char s_Maximum_number_of_button_fields_e_0055b0b0[46];
+    extern const char s_Avail_Mem_0055b390[34];
     extern char s__00551100[1];
     extern char* DAT_0055afc0;
     extern int32_t _max_fields_count;

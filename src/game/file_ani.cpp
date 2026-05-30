@@ -148,12 +148,12 @@ namespace file_ani {
         } else {
             switch (flags & 3) {
                 case 0:
-                    platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+                    video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Animated_Sprite_(0, 0, _file_animation_buffer);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
                 case 1:
-                    platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+                    video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Bitmap_Sprite_(0, 0, _file_animation_buffer);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;

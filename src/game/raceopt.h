@@ -21,6 +21,7 @@ namespace raceopt {
     extern int16_t _button_variable[10];
     extern s_animation_header* _special_button_seg;
     extern const char s__00551100[1];
+    extern const char s_racestuf_lbx_00556310[13];
     extern int16_t _name_button;
     extern char _cur_race_name[16];
 

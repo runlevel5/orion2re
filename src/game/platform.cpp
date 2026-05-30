@@ -3,6 +3,10 @@
 //#define FULLSCREEN
 
 uint8_t g_ten_game_number;
+int16_t g_cached_mouse_x;
+int16_t g_cached_mouse_y;
+int g_window_focus_state;
+uint32_t g_last_scan_code;
 
 namespace platform {
 	uint32_t g_os_ver;
@@ -20,18 +24,12 @@ namespace platform {
 	bool g_pending_toggle_pages;
 	int16_t g_video_mode;
 	uint32_t g_available_mem;
-	int32_t& g_screen_res_x = video::g_screen_res_x;
-	int32_t& g_screen_res_y = video::g_screen_res_y;
 	LPDIRECTDRAWSURFACE g_primary_surface;
 	LPDIRECTDRAWSURFACE g_backbuffer_surface;
-	LPDIRECTDRAWSURFACE& g_offscreen_surface_1 = video::g_offscreen_surface_1;
-	LPDIRECTDRAWSURFACE& g_offscreen_surface_2 = video::g_offscreen_surface_2;
 	LPDIRECTDRAWSURFACE g_cursor_surface_1;
 	int32_t _offscreen_mouse_shape;
 	LPDIRECTDRAWSURFACE g_cursor_surface_2;
 	LPVOID _cursor_surface;
-	LPDIRECTDRAWPALETTE& g_palette = video::g_palette;
-	tagPALETTEENTRY (&g_palette_entries)[256] = video::g_palette_entries;
 	uint32_t DAT_00578e20;
 	uint16_t DAT_0057931c;
 	uint32_t g_frame_count;
@@ -108,8 +106,8 @@ namespace platform {
         l_temp_surface->GetPixelFormat(&DDpf);
         BytesPerPixel = DDpf.dwRGBBitCount / 8;
 
-        if (g_palette)
-            g_palette->GetEntries(0, 0, 256, &palette[0]);
+        if (video::g_palette)
+            video::g_palette->GetEntries(0, 0, 256, &palette[0]);
 
         lpSurface->Lock(NULL, &srcDesc, DDLOCK_READONLY, NULL);
         l_temp_surface->Lock(NULL, &dstDesc, DDLOCK_WRITEONLY, NULL);
@@ -304,26 +302,26 @@ namespace platform {
 
         switch (video_mode) {
         case 0:
-            g_screen_res_x = 320;
-            g_screen_res_y = 200;
+            video::g_screen_res_x = 320;
+            video::g_screen_res_y = 200;
             break;
         case 2:
-            g_screen_res_x = 320;
-            g_screen_res_y = 240;
+            video::g_screen_res_x = 320;
+            video::g_screen_res_y = 240;
             break;
         case 4:
-            g_screen_res_x = 640;
-            g_screen_res_y = 480;
+            video::g_screen_res_x = 640;
+            video::g_screen_res_y = 480;
             break;
         case 5:
-            g_screen_res_x = scaleX;
-            g_screen_res_y = scaleY;
+            video::g_screen_res_x = scaleX;
+            video::g_screen_res_y = scaleY;
         default:
             break;
         }
 
-        video::_screen_pixel_size = g_screen_res_x * g_screen_res_y;
-        video::Allocate_Refresh_Lists_(video::_screen_pixel_size, g_screen_res_y);
+        video::_screen_pixel_size = video::g_screen_res_x * video::g_screen_res_y;
+        video::Allocate_Refresh_Lists_(video::_screen_pixel_size, video::g_screen_res_y);
         DAT_0057931c = 0;
 
         DDSURFACEDESC surface_desc;
@@ -331,7 +329,7 @@ namespace platform {
         surface_desc.dwSize = sizeof(DDSURFACEDESC);
 
 #ifdef FULLSCREEN
-        if (g_direct_draw->SetDisplayMode(g_screen_res_x, g_screen_res_y, 8) != DD_OK) {
+        if (g_direct_draw->SetDisplayMode(video::g_screen_res_x, video::g_screen_res_y, 8) != DD_OK) {
             cleanup();
             return cleanup();
         }
@@ -350,8 +348,8 @@ namespace platform {
         // Create "fake" primary surface for MOO2 with 8 bit palette
         memset(&surface_desc, 0, sizeof(surface_desc));
         surface_desc.dwSize = sizeof(surface_desc);
-        surface_desc.dwWidth = g_screen_res_x;
-        surface_desc.dwHeight = g_screen_res_y;
+        surface_desc.dwWidth = video::g_screen_res_x;
+        surface_desc.dwHeight = video::g_screen_res_y;
         surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
         surface_desc.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
@@ -374,8 +372,8 @@ namespace platform {
         DDSURFACEDESC	desc2;
         memset(&desc2, 0, sizeof(desc2));
         desc2.dwSize = sizeof(desc2);
-        desc2.dwWidth = g_screen_res_x;
-        desc2.dwHeight = g_screen_res_y;
+        desc2.dwWidth = video::g_screen_res_x;
+        desc2.dwHeight = video::g_screen_res_y;
         desc2.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         desc2.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
 
@@ -407,8 +405,8 @@ namespace platform {
         memset(&surface_desc, 0, sizeof(surface_desc));
         surface_desc.dwSize = sizeof(DDSURFACEDESC);
         surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-        surface_desc.dwWidth = g_screen_res_x;
-        surface_desc.dwHeight = g_screen_res_y;
+        surface_desc.dwWidth = video::g_screen_res_x;
+        surface_desc.dwHeight = video::g_screen_res_y;
         surface_desc.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
         surface_desc.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
         surface_desc.ddpfPixelFormat.dwFlags = DDPF_PALETTEINDEXED8 | DDPF_RGB;
@@ -429,26 +427,26 @@ namespace platform {
         }
 #endif
 
-        if (g_direct_draw->CreateSurface(&surface_desc, &g_offscreen_surface_1, nullptr) != DD_OK || g_offscreen_surface_1 == nullptr) {
+        if (g_direct_draw->CreateSurface(&surface_desc, &video::g_offscreen_surface_1, nullptr) != DD_OK || video::g_offscreen_surface_1 == nullptr) {
             return cleanup();
         }
 
-        if (g_direct_draw->CreateSurface(&surface_desc, &g_offscreen_surface_2, nullptr) != DD_OK || g_offscreen_surface_2 == nullptr) {
+        if (g_direct_draw->CreateSurface(&surface_desc, &video::g_offscreen_surface_2, nullptr) != DD_OK || video::g_offscreen_surface_2 == nullptr) {
             return cleanup();
         }
 
-        if (g_palette != nullptr) {
-            g_palette->Release();
-            g_palette = nullptr;
+        if (video::g_palette != nullptr) {
+            video::g_palette->Release();
+            video::g_palette = nullptr;
         }
 
         // Create Palette (DDPCAPS_8BIT | DDPCAPS_ALLOW256)
-        if (g_direct_draw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, g_palette_entries, &g_palette, nullptr) != DD_OK) {
+        if (g_direct_draw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, video::g_palette_entries, &video::g_palette, nullptr) != DD_OK) {
             return cleanup();
         }
 
 #ifdef FULLSCREEN
-        if (g_primary_surface->SetPalette(g_palette) != DD_OK) {
+        if (g_primary_surface->SetPalette(video::g_palette) != DD_OK) {
             return cleanup();
         }
 #endif
@@ -475,11 +473,11 @@ namespace platform {
         if (g_backbuffer_surface != NULL)
             g_backbuffer_surface->Restore();
 
-        if (g_offscreen_surface_1 != NULL)
-            g_offscreen_surface_1->Restore();
+        if (video::g_offscreen_surface_1 != NULL)
+            video::g_offscreen_surface_1->Restore();
 
-        if (g_offscreen_surface_2 != NULL)
-            g_offscreen_surface_2->Restore();
+        if (video::g_offscreen_surface_2 != NULL)
+            video::g_offscreen_surface_2->Restore();
 
         if (platform::g_cursor_surface_1 != NULL)
             platform::g_cursor_surface_1->Restore();
@@ -518,22 +516,22 @@ namespace platform {
                 g_primary_surface = NULL;
             }
 
-            if (g_offscreen_surface_1 != NULL)
+            if (video::g_offscreen_surface_1 != NULL)
             {
-                g_offscreen_surface_1->Release();
-                g_offscreen_surface_1 = NULL;
+                video::g_offscreen_surface_1->Release();
+                video::g_offscreen_surface_1 = NULL;
             }
 
-            if (g_offscreen_surface_2 != NULL)
+            if (video::g_offscreen_surface_2 != NULL)
             {
-                g_offscreen_surface_2->Release();
-                g_offscreen_surface_2 = NULL;
+                video::g_offscreen_surface_2->Release();
+                video::g_offscreen_surface_2 = NULL;
             }
 
-            if (g_palette != NULL)
+            if (video::g_palette != NULL)
             {
-                g_palette->Release();
-                g_palette = NULL;
+                video::g_palette->Release();
+                video::g_palette = NULL;
             }
 
             if (platform::g_cursor_surface_1 != NULL)
@@ -597,9 +595,9 @@ namespace platform {
         platform::DDSURFACEDESC_00578e70.dwSize = sizeof(DDSURFACEDESC);
         platform::DDSURFACEDESC_00578e70.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
 
-        platform::g_offscreen_surface_1->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
+        video::g_offscreen_surface_1->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
 
-        HRESULT result = platform::g_offscreen_surface_2->Lock(
+        HRESULT result = video::g_offscreen_surface_2->Lock(
             nullptr,
             &platform::DDSURFACEDESC_00578e70,
             0,
@@ -623,7 +621,7 @@ namespace platform {
     }
 
     void __cdecl Unlock_Offscreen_Surface_() {
-        g_offscreen_surface_2->Unlock(nullptr);
+        video::g_offscreen_surface_2->Unlock(nullptr);
     }
 
     void __cdecl Lock_Cursor_Surface_() {
@@ -660,12 +658,12 @@ namespace platform {
         switch (g_render_buffer)
         {
         case 1:
-            g_offscreen_surface_1->GetSurfaceDesc(&desc);
-            hr = g_offscreen_surface_1->Lock(NULL, &desc, DDLOCK_WAIT, NULL);
+            video::g_offscreen_surface_1->GetSurfaceDesc(&desc);
+            hr = video::g_offscreen_surface_1->Lock(NULL, &desc, DDLOCK_WAIT, NULL);
             break;
         case 2:
-            g_offscreen_surface_2->GetSurfaceDesc(&desc);
-            hr = g_offscreen_surface_2->Lock(NULL, &desc, DDLOCK_WAIT, NULL);
+            video::g_offscreen_surface_2->GetSurfaceDesc(&desc);
+            hr = video::g_offscreen_surface_2->Lock(NULL, &desc, DDLOCK_WAIT, NULL);
             break;
         case 0:
             g_primary_surface->GetSurfaceDesc(&desc);
@@ -726,11 +724,11 @@ namespace platform {
         }
         else if (g_render_buffer == 1)
         {
-            hr = g_offscreen_surface_1->Unlock(NULL);
+            hr = video::g_offscreen_surface_1->Unlock(NULL);
         }
         else if (g_render_buffer == 2)
         {
-            hr = g_offscreen_surface_2->Unlock(NULL);
+            hr = video::g_offscreen_surface_2->Unlock(NULL);
         }
         else
         {
@@ -808,10 +806,10 @@ namespace platform {
         RECT	rect;
         rect.left = 0;
         rect.top = 0;
-        rect.right = g_screen_res_x;
-        rect.bottom = g_screen_res_y;
+        rect.right = video::g_screen_res_x;
+        rect.bottom = video::g_screen_res_y;
 
-        while (g_backbuffer_surface->BltFast(0, 0, g_offscreen_surface_1, &rect, DDBLTFAST_WAIT) != DD_OK);
+        while (g_backbuffer_surface->BltFast(0, 0, video::g_offscreen_surface_1, &rect, DDBLTFAST_WAIT) != DD_OK);
     }
 
     void	Draw_Cursor_XY(int32_t x, int32_t y)
@@ -828,13 +826,13 @@ namespace platform {
             rect.left = 0;
             rect.top = 0;
 
-            if (x + 24 >= g_screen_res_x - 1)
-                rect.right = g_screen_res_x - x - 1;
+            if (x + 24 >= video::g_screen_res_x - 1)
+                rect.right = video::g_screen_res_x - x - 1;
             else
                 rect.right = 24;
 
-            if (y + 24 >= g_screen_res_y - 1)
-                rect.bottom = g_screen_res_y - y - 1;
+            if (y + 24 >= video::g_screen_res_y - 1)
+                rect.bottom = video::g_screen_res_y - y - 1;
             else
                 rect.bottom = 24;
 
@@ -853,8 +851,8 @@ namespace platform {
 
     void __cdecl Save_Mouse_(int16_t mouse_x, int16_t mouse_y) {
         RECT save_rect;
-        const LONG max_x = g_screen_res_x - 1;
-        const LONG max_y = g_screen_res_y - 1;
+        const LONG max_x = video::g_screen_res_x - 1;
+        const LONG max_y = video::g_screen_res_y - 1;
 
         save_rect.left = static_cast<LONG>(mouse_x);
         save_rect.top = static_cast<LONG>(mouse_y);
@@ -887,20 +885,20 @@ namespace platform {
         saved_rect.left = static_cast<LONG>(mouse_x);
         saved_rect.top = static_cast<LONG>(mouse_y);
 
-        saved_rect.right = g_screen_res_x - 1;
-        if (saved_rect.left + 0x18 < g_screen_res_x - 1) {
+        saved_rect.right = video::g_screen_res_x - 1;
+        if (saved_rect.left + 0x18 < video::g_screen_res_x - 1) {
             saved_rect.right = saved_rect.left + 0x18;
         }
 
-        saved_rect.bottom = g_screen_res_y - 1;
-        if (saved_rect.top + 0x18 < g_screen_res_y - 1) {
+        saved_rect.bottom = video::g_screen_res_y - 1;
+        if (saved_rect.top + 0x18 < video::g_screen_res_y - 1) {
             saved_rect.bottom = saved_rect.top + 0x18;
         }
 
         g_cursor_surface_2->BltFast(
             0,
             0,
-            g_offscreen_surface_1,
+            video::g_offscreen_surface_1,
             &saved_rect,
             DDBLTFAST_WAIT
         );
@@ -928,24 +926,24 @@ namespace platform {
         source_rect.top = 0;
 
         x = static_cast<int32_t>(mouse_x);
-        if (x + 0x18 < g_screen_res_x - 1) {
+        if (x + 0x18 < video::g_screen_res_x - 1) {
             source_rect.right = 0x18;
         } else {
-            source_rect.right = g_screen_res_x - x - 1;
+            source_rect.right = video::g_screen_res_x - x - 1;
         }
 
         y = static_cast<int32_t>(mouse_y);
-        if (y + 0x18 < g_screen_res_y - 1) {
+        if (y + 0x18 < video::g_screen_res_y - 1) {
             source_rect.bottom = 0x18;
         } else {
-            source_rect.bottom = g_screen_res_y - y - 1;
+            source_rect.bottom = video::g_screen_res_y - y - 1;
         }
 
         color_key.dwColorSpaceLowValue = 0;
         color_key.dwColorSpaceHighValue = 0;
 
         platform::g_cursor_surface_1->SetColorKey(8, &color_key);
-        g_offscreen_surface_1->BltFast(
+        video::g_offscreen_surface_1->BltFast(
             static_cast<DWORD>(x),
             static_cast<DWORD>(y),
             platform::g_cursor_surface_1,
@@ -961,19 +959,19 @@ namespace platform {
         src_rect.left = 0;
         src_rect.top = 0;
 
-        if (mouse_x + 0x18 < g_screen_res_x - 1) {
+        if (mouse_x + 0x18 < video::g_screen_res_x - 1) {
             src_rect.right = 0x18;
         } else {
-            src_rect.right = g_screen_res_x - mouse_x - 1;
+            src_rect.right = video::g_screen_res_x - mouse_x - 1;
         }
 
-        if (mouse_y + 0x18 < g_screen_res_y - 1) {
+        if (mouse_y + 0x18 < video::g_screen_res_y - 1) {
             src_rect.bottom = 0x18;
         } else {
-            src_rect.bottom = g_screen_res_y - mouse_y - 1;
+            src_rect.bottom = video::g_screen_res_y - mouse_y - 1;
         }
 
-        g_offscreen_surface_1->BltFast(
+        video::g_offscreen_surface_1->BltFast(
             static_cast<DWORD>(mouse_x),
             static_cast<DWORD>(mouse_y),
             platform::g_cursor_surface_2,
@@ -1023,13 +1021,13 @@ namespace platform {
         rect.left = 0;
         rect.top = 0;
 
-        if (mouse_x + 24 >= g_screen_res_x - 1)
-            rect.right = g_screen_res_x - mouse_x - 1;
+        if (mouse_x + 24 >= video::g_screen_res_x - 1)
+            rect.right = video::g_screen_res_x - mouse_x - 1;
         else
             rect.right = 24;
 
-        if (mouse_y + 24 >= g_screen_res_y - 1)
-            rect.bottom = g_screen_res_y - mouse_y - 1;
+        if (mouse_y + 24 >= video::g_screen_res_y - 1)
+            rect.bottom = video::g_screen_res_y - mouse_y - 1;
         else
             rect.bottom = 24;
 
@@ -1327,9 +1325,9 @@ namespace platform {
         platform::DDSURFACEDESC_00578e70.dwSize = sizeof(DDSURFACEDESC);
         platform::DDSURFACEDESC_00578e70.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
 
-        platform::g_offscreen_surface_1->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
+        video::g_offscreen_surface_1->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
 
-        HRESULT lock_result = platform::g_offscreen_surface_1->Lock(
+        HRESULT lock_result = video::g_offscreen_surface_1->Lock(
             nullptr,
             &platform::DDSURFACEDESC_00578e70,
             0,
@@ -1353,6 +1351,6 @@ namespace platform {
     }
 
     void __cdecl Unlock_Alt_Offscreen_Surface_() {
-        platform::g_offscreen_surface_1->Unlock(nullptr);
+        video::g_offscreen_surface_1->Unlock(nullptr);
     }
 }

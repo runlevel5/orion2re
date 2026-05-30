@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace WINNET {
+    const char s_modem_005607dc[6] = "modem";
+    const char s_ipx_005607e4[4] = "ipx";
+    const char s_tcp_005607e8[4] = "tcp";
 
     int8_t __cdecl Find_Provider_(const char* name) {
         int8_t found_index = -1;

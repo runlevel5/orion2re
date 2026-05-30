@@ -118,6 +118,7 @@ namespace DESBOX {
     int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out);
 
     extern const char s__00551100[];
+    extern const char s_0_00556108[2];
     extern const char s_plus[];
     extern const char s_minus[];
     extern const char s_space[];

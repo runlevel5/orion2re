@@ -8,7 +8,7 @@ namespace graphics {
     int16_t _old_screen_window_x1;
 
     void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         if (x2 < x1) {
             strings::Swap_Short_(&x1, &x2);
@@ -38,7 +38,7 @@ namespace graphics {
         int right_block = x2 / 4;
 
         if (right_block == left_block) {
-            uint8_t* surface = reinterpret_cast<uint8_t*>(video::_current_video_page + (y1 * platform::g_screen_res_x) + x1);
+            uint8_t* surface = reinterpret_cast<uint8_t*>(video::_current_video_page + (y1 * video::g_screen_res_x) + x1);
             regions::Fill_Column_(color, surface, (x2 - x1) + 1, (y2 - y1) + 1);
         } else {
             uint32_t left_partial_width = 4 - (x1 & 3);
@@ -54,7 +54,7 @@ namespace graphics {
                 mid_blocks++;
             }
 
-            int y_offset = y1 * platform::g_screen_res_x;
+            int y_offset = y1 * video::g_screen_res_x;
             uint32_t height = (y2 - y1) + 1;
 
             if (left_partial_width == 0) {
@@ -83,8 +83,8 @@ namespace graphics {
     {
         video::_screen_window_x1 = 0;
         video::_screen_window_y1 = 0;
-        video::_screen_window_x2 = (short)platform::g_screen_res_x + -1;
-        video::_screen_window_y2 = (short)platform::g_screen_res_y + -1;
+        video::_screen_window_x2 = (short)video::g_screen_res_x + -1;
+        video::_screen_window_y2 = (short)video::g_screen_res_y + -1;
         return;
     }
 
@@ -97,12 +97,12 @@ namespace graphics {
             y1 = 0;
         }
 
-        if (static_cast<int32_t>(x2) >= platform::g_screen_res_x) {
-            x2 = static_cast<int16_t>(platform::g_screen_res_x - 1);
+        if (static_cast<int32_t>(x2) >= video::g_screen_res_x) {
+            x2 = static_cast<int16_t>(video::g_screen_res_x - 1);
         }
 
-        if (static_cast<int32_t>(y2) >= platform::g_screen_res_y) {
-            y2 = static_cast<int16_t>(platform::g_screen_res_y - 1);
+        if (static_cast<int32_t>(y2) >= video::g_screen_res_y) {
+            y2 = static_cast<int16_t>(video::g_screen_res_y - 1);
         }
 
         video::_screen_window_x1 = x1;
@@ -157,21 +157,21 @@ namespace graphics {
             }
         }
 
-        platform::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
 
         if (video::screen_refresh_flag >= 2) {
             video::Add_Dot_To_Scan_List_(static_cast<int32_t>(x), static_cast<int32_t>(y));
         }
 
         uint8_t* framebuffer = video::_current_video_page;
-        int32_t offset = static_cast<int32_t>(y) * platform::g_screen_res_x + static_cast<int32_t>(x);
+        int32_t offset = static_cast<int32_t>(y) * video::g_screen_res_x + static_cast<int32_t>(x);
         framebuffer[offset] = color;
 
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
     void __cdecl Tint_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t tint_color) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         if (x2 < x1) {
             strings::Swap_Short_(&x1, &x2);
@@ -203,7 +203,7 @@ namespace graphics {
         int end_col = x2 / 4;
 
         if (start_col == end_col) {
-            uint8_t* dest = video::_current_video_page + (y1 * platform::g_screen_res_x) + x1;
+            uint8_t* dest = video::_current_video_page + (y1 * video::g_screen_res_x) + x1;
             int height = y2 - y1 + 1;
             int width = x2 - x1 + 1;
             uint8_t* color_map = (uint8_t*)&video::_glass_remap_colors + (tint_color * 256);
@@ -214,7 +214,7 @@ namespace graphics {
             int middle_blocks = end_col - start_col - 1;
             int height = y2 - y1 + 1;
             int end_pixels = x2 & 3;
-            int offset_y = y1 * platform::g_screen_res_x;
+            int offset_y = y1 * video::g_screen_res_x;
 
             if (start_pixels == 4) {
                 // Exact binary behavior: if x1 is 4-byte aligned and there are no middle dword blocks, no region call is made.
@@ -265,7 +265,7 @@ namespace graphics {
         int32_t height;
         uint32_t fill_val;
 
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         fill_val = (color2 << 8) + color1;
 
         if (animate::_clipping_flag == 1) {
@@ -303,7 +303,7 @@ namespace graphics {
         if (end_col == start_col) {
             regions::Interlaced_Fill_Column_(
                 fill_val,
-                video::_current_video_page + y1 * platform::g_screen_res_x + x1,
+                video::_current_video_page + y1 * video::g_screen_res_x + x1,
                 x2 - x1 + 1,
                 y2 - y1 + 1
             );
@@ -322,7 +322,7 @@ namespace graphics {
                 mid_cols++;
             }
 
-            offset = y1 * platform::g_screen_res_x;
+            offset = y1 * video::g_screen_res_x;
             height = y2 - y1 + 1;
 
             if (left_rem == 0) {
@@ -363,7 +363,7 @@ namespace graphics {
     }
 
     void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2, int16_t color3) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         uint32_t color = (static_cast<uint32_t>(color3) << 16) + (static_cast<uint32_t>(color2) << 8) + static_cast<uint32_t>(color1);
 
@@ -398,7 +398,7 @@ namespace graphics {
         int32_t x2_blk = x2 / 4;
 
         if (x1_blk == x2_blk) {
-            int32_t y_offset = y1 * platform::g_screen_res_x;
+            int32_t y_offset = y1 * video::g_screen_res_x;
             uint8_t* dest_ptr = video::_current_video_page + y_offset + x1;
             int32_t height = y2 - y1 + 1;
             int32_t width = x2 - x1 + 1;
@@ -419,7 +419,7 @@ namespace graphics {
             }
 
             int32_t height = y2 - y1 + 1;
-            int32_t y_offset = y1 * platform::g_screen_res_x;
+            int32_t y_offset = y1 * video::g_screen_res_x;
 
             if (left_cols != 0) {
                 uint8_t* dest_ptr = video::_current_video_page + y_offset + x1;
@@ -444,7 +444,7 @@ namespace graphics {
     }
 
     void __cdecl Gray_Scale_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_ptr, int32_t extra, int32_t param_7) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         if (x2 < x1) {
             strings::Swap_Short_(&x1, &x2);
@@ -475,14 +475,14 @@ namespace graphics {
         replace::_palette_color_list = replace::_graphics_buffer;
         replace::Establish_Color_Gradient_(static_cast<int16_t>(extra), static_cast<int16_t>(param_7));
 
-        int32_t gap = platform::g_screen_res_x - (x2 - x1) - 1;
+        int32_t gap = video::g_screen_res_x - (x2 - x1) - 1;
 
         for (int i = 0; i < 256; ++i) {
             uint8_t color_idx = replace::_palette_color_list[i];
             replace::_palette_color_list[i] = color_ptr[color_idx];
         }
 
-        uint8_t* dest_ptr = video::_current_video_page + (y1 * platform::g_screen_res_x) + x1;
+        uint8_t* dest_ptr = video::_current_video_page + (y1 * video::g_screen_res_x) + x1;
         int32_t width = (x2 - x1) + 1;
         int32_t height = (y2 - y1) + 1;
 

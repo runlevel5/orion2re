@@ -23,6 +23,7 @@ namespace fields {
     uint16_t _draw_fields_flag = 1;
     const char s_You_exceeded_the_max_number_of_fields[44] = "You exceeded the max number of fields (150)";
     const char s_Maximum_number_of_button_fields_e_0055b0b0[46] = "Maximum number of button fields exceeded (%d)";
+    const char s_Avail_Mem_0055b390[34] = "Avail Mem = %dk   Total Mem = %dk";
     char s__00551100[1] = "";
     char* DAT_0055afc0 = reinterpret_cast<char*>(std::uintptr_t{0xFFFFFFFF});
     int32_t _max_fields_count = 250;

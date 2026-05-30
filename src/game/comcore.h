@@ -4,6 +4,8 @@
 
 namespace comcore {
     using recv_handler_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
+    extern const char s_Sending_Message_To_Individual[35];
+    extern const char s_Sending_Message_To_All[28];
 
     int16_t __cdecl ComDoComms_();
 

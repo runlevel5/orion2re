@@ -3,6 +3,30 @@
 namespace FMTPARA {
     extern const char _legal_functions[] = "FRTXYSHVPIMOC^=";
     extern const char _legal_fn_arg_chars[] = "1234567890+- ";
+    uint8_t _font_base_offsets[6] = {5, 7, 10, 11, 14, 19};
+    int8_t _reset_parameters_lookup[16] = {1, 2, 4, 8, 12, 13, 16, 32, 29, 0, 0, 0, 0, 0, 0, 0};
+    short _tabs[11];
+    s_fmtpara_style _saved_superscript;
+    s_fmtpara_style* _style_p;
+    s_fmtpara_char* _char_p;
+    s_fmtpara_char* _end_char_p;
+    uint8_t _last_fg_and_attr;
+    s_fmtpara_para* _para_p;
+    int16_t _insert_case;
+    s_fmtpara_break* _break_p;
+    s_fmtpara_line* _line_p;
+    s_fmtpara_char* _first_char_p;
+    char justify_spread_flags[24] = {
+        1, 3, 1, 0, 0, 0, 0, 0,
+        1, 1, 1, 3, 1, 0, 0, 0,
+        1, 1, 1, 1, 3, 1, 3, 0,
+    };
+    uint16_t _var_index;
+    uint8_t _last_font_id;
+    s_fmtpara_global _para_global;
+    uint32_t _variable[16];
+    char _tmp_str[16];
+    char _tmp_str2[32];
     extern const char s_s_00556218[] = "s";
     extern const char s_es_0055621c[] = "es";
     extern const char* const _ordinal_ending[10] = {
@@ -31,6 +55,8 @@ namespace FMTPARA {
         "tenth",
     };
     extern const char _ordinal_fmt[] = "%s\a^2.%s\a^0.";
+    uint8_t* _tabs_3_plus_1 = reinterpret_cast<uint8_t*>(&_tabs[3]) + 1;
+    uint32_t _user_fn_arg;
 
     /**
      * @address 00432ef0
@@ -1838,12 +1864,12 @@ namespace FMTPARA {
     char __cdecl FN_Superscript_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
         if (val == 0) {
             // Restore style from saved buffer
-            memcpy(_style_p, _saved_superscript, 13 /* sizeof(s_fmtpara_style) */);
+            memcpy(_style_p, &_saved_superscript, sizeof(_saved_superscript));
             return 0;
         }
 
         // Backup current style to saved buffer
-        memcpy(_saved_superscript, _style_p, 13 /* sizeof(s_fmtpara_style) */);
+        memcpy(&_saved_superscript, _style_p, sizeof(_saved_superscript));
 
         // Calculate new font ID based on superscript depth (val)
         // font_id is at offset 0 of s_fmtpara_style

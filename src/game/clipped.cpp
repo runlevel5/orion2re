@@ -3,7 +3,7 @@
 namespace clipped {
     // TODO: This can be greatly simplified
     void __cdecl Clipped_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int16_t clip_x_skip_count;
         int16_t draw_x_start;
@@ -41,7 +41,7 @@ namespace clipped {
         int32_t draw_height = draw_y_end - draw_y_start + 1;
 
         int32_t current_sprite_y = *(uint16_t*)(sprite + 2);
-        int32_t line_base = (int32_t)x + (int32_t)draw_y_start * platform::g_screen_res_x;
+        int32_t line_base = (int32_t)x + (int32_t)draw_y_start * video::g_screen_res_x;
         int32_t sprite_word_idx = 2;
 
         // Skip segments above the clipping window
@@ -58,7 +58,7 @@ namespace clipped {
 
         // Adjust buffer pointer if first visible segment starts below initial drawing line
         if (clip_y_skip_count < current_sprite_y) {
-            line_base += (current_sprite_y - clip_y_skip_count) * platform::g_screen_res_x;
+            line_base += (current_sprite_y - clip_y_skip_count) * video::g_screen_res_x;
         }
 
         int32_t current_line_idx = current_sprite_y - clip_y_skip_count;
@@ -121,7 +121,7 @@ namespace clipped {
     }
 
     void __cdecl Clipped_Draw_Stenciled_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         auto read_u16 = [](const uint8_t* ptr) {
             return (uint16_t)ptr[0] | ((uint16_t)ptr[1] << 8);
@@ -159,7 +159,7 @@ namespace clipped {
         int16_t draw_height_limit = sprite_bottom_limit - render_y_start + 1;
 
         int32_t current_row_rel = read_u16(sprite + 2);
-        int32_t line_base = (int32_t)render_y_start * platform::g_screen_res_x + (int32_t)x;
+        int32_t line_base = (int32_t)render_y_start * video::g_screen_res_x + (int32_t)x;
 
         uint32_t sprite_word_idx = 2; // Offset in 16-bit words
 
@@ -176,7 +176,7 @@ namespace clipped {
 
         // Adjust screen offset if we skipped rows
         if (current_row_rel > top_excess) {
-            line_base += (current_row_rel - top_excess) * platform::g_screen_res_x;
+            line_base += (current_row_rel - top_excess) * video::g_screen_res_x;
         }
 
         int32_t current_line_idx = current_row_rel - top_excess;
@@ -259,7 +259,7 @@ namespace clipped {
     }
 
     void __cdecl Clipped_Draw_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* pixels) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         s_animation_header* header = animate::_animation_header;
         int32_t sprite_width = (int32_t)header->width;
@@ -284,7 +284,7 @@ namespace clipped {
         int32_t visible_height = y_end - clamped_y_start + 1;
 
         // Initial destination pointer based on unclipped signed (x, y)
-        uint8_t* dst = video::_current_video_page + (int32_t)y * platform::g_screen_res_x + (int32_t)x;
+        uint8_t* dst = video::_current_video_page + (int32_t)y * video::g_screen_res_x + (int32_t)x;
 
         // Adjust pointers and tracking for clipping
         int32_t scan_x = (int32_t)x;
@@ -299,7 +299,7 @@ namespace clipped {
         if (y < video::_screen_window_y1) {
             int32_t top_clip = (int32_t)video::_screen_window_y1 - (int32_t)y;
             pixels += top_clip * sprite_width;
-            dst += top_clip * platform::g_screen_res_x;
+            dst += top_clip * video::g_screen_res_x;
             scan_y = top_clip;
         }
 
@@ -318,7 +318,7 @@ namespace clipped {
             for (int32_t i = 0; i < visible_height; ++i) {
                 draw::Color_Stream_Copy_(pixels, dst, visible_width);
                 pixels += sprite_width;
-                dst += platform::g_screen_res_x;
+                dst += video::g_screen_res_x;
             }
         }
 
@@ -349,9 +349,9 @@ namespace clipped {
         int32_t draw_height = y_end - y_start;
         int32_t draw_width = x_end - x_start;
 
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        uint8_t* screen_ptr = video::_current_video_page + (y * platform::g_screen_res_x) + x;
+        uint8_t* screen_ptr = video::_current_video_page + (y * video::g_screen_res_x) + x;
 
         if (x < (int32_t)video::_screen_window_x1) {
             int32_t diff_x = (int32_t)video::_screen_window_x1 - x;
@@ -361,7 +361,7 @@ namespace clipped {
 
         if (y < (int32_t)video::_screen_window_y1) {
             int32_t diff_y = (int32_t)video::_screen_window_y1 - y;
-            screen_ptr += diff_y * platform::g_screen_res_x;
+            screen_ptr += diff_y * video::g_screen_res_x;
             sprite_data += diff_y * animate::_animation_header->width;
         }
 
@@ -386,7 +386,7 @@ namespace clipped {
                     } while (count != 0);
                 }
 
-                screen_ptr += platform::g_screen_res_x;
+                screen_ptr += video::g_screen_res_x;
                 sprite_data += animate::_animation_header->width;
                 draw_height--;
             } while (draw_height > 0);
@@ -396,7 +396,7 @@ namespace clipped {
     }
 
     void __cdecl Clipped_Draw_Glassed_Animated_Sprite_(int32_t x, int32_t y, uint8_t* sprite) {
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int32_t clipped_x = x;
         int32_t clipped_y = y;
@@ -422,7 +422,7 @@ namespace clipped {
         }
 
         int32_t start_y = (int32_t)*(int16_t*)(sprite + 2) + y;
-        uint8_t* line_base = video::_current_video_page + x + start_y * platform::g_screen_res_x;
+        uint8_t* line_base = video::_current_video_page + x + start_y * video::g_screen_res_x;
         uint8_t* p = line_base;
         int32_t current_x = x;
 

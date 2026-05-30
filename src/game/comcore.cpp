@@ -2,6 +2,10 @@
 
 namespace comcore {
 
+const char s_Sending_Message_To_Individual[35] = "Sending Message To Individual....\n";
+
+const char s_Sending_Message_To_All[28] = "Sending Message To All....\n";
+
 void* _sendBuffer;
 
 void* _userReceiveBuffer;

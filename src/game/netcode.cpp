@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace netcode {
+    const char s_Lost_Player_Connection_0055bf3c[26] = "Lost Player Connection...";
+    const char s_REENTERING_Net_Send_Message_0055bf58[34] = "REENTERING (Net_Send_Message)!!!!";
+
     uint32_t _netInitialized;
     int8_t _tpSending;
     uint8_t _inComms;

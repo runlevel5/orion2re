@@ -17,6 +17,8 @@ namespace TECH {
         '%', 's', '\0',
     };
 
+    char s__00559488[64];
+
     uint8_t _saved_hyper_advanced_tech[8];
 
     const char _tech_select_lbx[12] = "TECHSEL.LBX";

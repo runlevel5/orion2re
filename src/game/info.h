@@ -14,6 +14,8 @@ namespace INFO {
     extern s_tech_review_achievement* _review_list[4];
 
     extern const char s_billtex2_lbx[13];
+    extern const char s_app_pics_lbx_00556028[13];
+    extern const char s_APP_PICS_LBX_00556018[13];
 
     extern s_colors _info_normal_color;
 

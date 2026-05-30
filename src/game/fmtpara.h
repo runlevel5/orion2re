@@ -7,35 +7,33 @@ namespace FMTPARA {
 
     extern const char _legal_functions[];
     extern const char _legal_fn_arg_chars[];
-    inline uint8_t* _font_base_offsets = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562C8});
-    inline int8_t (&_reset_parameters_lookup)[16] = *reinterpret_cast<int8_t(*)[16]>(std::uintptr_t{0x005562D0});
-    inline short (&_tabs)[11] = *reinterpret_cast<short(*)[11]>(std::uintptr_t{0x005562B0});
-    inline uint8_t (&_saved_superscript)[13] = *reinterpret_cast<uint8_t (*)[13]>(std::uintptr_t{0x005650D8});
-    inline s_fmtpara_style*& _style_p = *reinterpret_cast<s_fmtpara_style**>(std::uintptr_t{0x005650C4});
-    inline s_fmtpara_char*& _char_p = *reinterpret_cast<s_fmtpara_char**>(std::uintptr_t{0x005650C8});
-    inline s_fmtpara_char*& _end_char_p = *reinterpret_cast<s_fmtpara_char**>(std::uintptr_t{0x005650CC});
-    inline uint8_t& _last_fg_and_attr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005650D0});
-    inline s_fmtpara_para*& _para_p = *reinterpret_cast<s_fmtpara_para**>(std::uintptr_t{0x005650D4});
-    inline int16_t& _insert_case = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005650E8});
-    inline s_fmtpara_line*& _line_p = *reinterpret_cast<s_fmtpara_line**>(std::uintptr_t{0x005650F0});
-    inline s_fmtpara_break*& _break_p = *reinterpret_cast<s_fmtpara_break**>(std::uintptr_t{0x005650EC});
-    inline s_fmtpara_char*& _first_char_p = *reinterpret_cast<s_fmtpara_char**>(std::uintptr_t{0x00565118});
-    inline char (&justify_spread_flags)[24] = *reinterpret_cast<char (*)[24]>(std::uintptr_t{0x005562E0});
-    inline uint16_t& _var_index = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056511C});
-    inline uint8_t& _last_font_id = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565120});
-    inline s_fmtpara_global& _para_global = *reinterpret_cast<s_fmtpara_global*>(std::uintptr_t{0x005A7B10});
-    inline uint32_t (&_variable)[16] =
-        *reinterpret_cast<uint32_t(*)[16]>(std::uintptr_t{0x00565070});
-    inline char* _tmp_str = reinterpret_cast<char*>(std::uintptr_t{0x005650b0});
-    inline char* _tmp_str2 = reinterpret_cast<char*>(std::uintptr_t{0x005650f8});
+    extern uint8_t _font_base_offsets[6];
+    extern int8_t _reset_parameters_lookup[16];
+    extern short _tabs[11];
+    extern s_fmtpara_style _saved_superscript;
+    extern s_fmtpara_style* _style_p;
+    extern s_fmtpara_char* _char_p;
+    extern s_fmtpara_char* _end_char_p;
+    extern uint8_t _last_fg_and_attr;
+    extern s_fmtpara_para* _para_p;
+    extern int16_t _insert_case;
+    extern s_fmtpara_line* _line_p;
+    extern s_fmtpara_break* _break_p;
+    extern s_fmtpara_char* _first_char_p;
+    extern char justify_spread_flags[24];
+    extern uint16_t _var_index;
+    extern uint8_t _last_font_id;
+    extern s_fmtpara_global _para_global;
+    extern uint32_t _variable[16];
+    extern char _tmp_str[16];
+    extern char _tmp_str2[32];
     extern const char* const _ordinal_ending[10];
     extern const char* const _ordinal_word[11];
     extern const char _ordinal_fmt[];
-    inline uint8_t* _tabs_3_plus_1 = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562B7});
+    extern uint8_t* _tabs_3_plus_1;
     extern const char s_s_00556218[];
     extern const char s_es_0055621c[];
-    inline uint32_t& _user_fn_arg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005650C0 });
+    extern uint32_t _user_fn_arg;
 
     void __cdecl Init_();
 

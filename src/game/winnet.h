@@ -44,6 +44,9 @@ namespace WINNET {
     inline char* s_Buffer_To_Small_00560a14 = reinterpret_cast<char*>(std::uintptr_t{0x00560A14}); // "Buffer To Small"
     inline char* s_No_Messages_00560a24 = reinterpret_cast<char*>(std::uintptr_t{0x00560A24}); // "No Messages"
     inline char* s_DirectPlay_ERR_00560a30 = reinterpret_cast<char*>(std::uintptr_t{0x00560A30}); // "DirectPlay ERR: "
+    extern const char s_modem_005607dc[6];
+    extern const char s_ipx_005607e4[4];
+    extern const char s_tcp_005607e8[4];
 
     uint32_t __cdecl Get_Player_Network_Id_(int32_t player_idx);
 

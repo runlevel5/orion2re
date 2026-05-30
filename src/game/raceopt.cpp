@@ -19,6 +19,7 @@ namespace raceopt {
     int16_t _button_variable[10];
     s_animation_header* _special_button_seg;
     const char s__00551100[1] = "";
+    const char s_racestuf_lbx_00556310[13] = "racestuf.lbx";
     int16_t _name_button;
     char _cur_race_name[16];
 

@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace FLT2 {
+    extern const char s_fmt_to_00557e00[9];
+
     void __cdecl Add_Fltscrn_Small_Icon_Fields_();
 
     void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out, int16_t* height_out);

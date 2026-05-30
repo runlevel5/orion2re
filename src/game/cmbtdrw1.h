@@ -2,6 +2,7 @@
 
 namespace CMBTDRW1 {
     extern const char s_combat_lbx[11];
+    extern const char s__00559998[3];
     extern uint8_t _green[16];
     extern MOX2::action_func_t _k_save;
 

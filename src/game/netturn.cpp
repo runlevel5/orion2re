@@ -2,6 +2,8 @@
 
 namespace NETTURN {
 
+    const char s_craziness_00557680[10] = "craziness";
+
     char* _waiting_fmt;
 
     char* _have_d_of_d_chunks_fmt;

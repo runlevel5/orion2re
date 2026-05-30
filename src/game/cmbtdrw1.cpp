@@ -2,6 +2,7 @@
 
 namespace CMBTDRW1 {
     const char s_combat_lbx[11] = "combat.lbx";
+    const char s__00559998[3] = "  ";
     uint8_t _green[16];
     MOX2::action_func_t _k_save;
 

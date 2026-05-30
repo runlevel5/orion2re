@@ -10,6 +10,7 @@ struct s_fieldsav_data;
 
 namespace TECH {
     void __cdecl Tech_Select_();
+    extern char s__00559488[64];
 
     void __cdecl _Tech_Select_(uint8_t arg0);
 

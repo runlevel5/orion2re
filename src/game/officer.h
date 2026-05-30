@@ -32,6 +32,8 @@ namespace OFFICER {
     extern const char s_FRESKLLS_LBX_00556a1c[16]; // "FRESKLLS.LBX"
     extern const char s_GERSKLLS_LBX_00556a2c[16]; // "GERSKLLS.LBX"
     extern const char s_SKILDESC_LBX_00556a3c[16]; // "SKILDESC.LBX"
+    extern const char s_comma_lo_00556a4c[6];
+    extern const char s___005569ec[3];
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 

@@ -2,6 +2,8 @@
 
 namespace netcode {
     using recv_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
+    extern const char s_Lost_Player_Connection_0055bf3c[26];
+    extern const char s_REENTERING_Net_Send_Message_0055bf58[34];
 
     extern uint32_t _netInitialized;
 

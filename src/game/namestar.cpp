@@ -2,6 +2,8 @@
 
 namespace namestar {
 
+const char s_inbox_lbx_00551370[10] = "inbox.lbx";
+
 s_input_box_state _input_box;
 
 int16_t __cdecl Star_Name_Popup_Screen_Center_X_() {

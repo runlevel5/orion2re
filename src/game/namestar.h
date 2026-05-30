@@ -1,6 +1,8 @@
 #pragma once
 
 namespace namestar {
+    extern const char s_inbox_lbx_00551370[10];
+
     int16_t __cdecl Star_Name_Popup_Screen_Center_X_();
     int16_t __cdecl Star_Name_Popup_Screen_Center_Y_();
     void __cdecl Change_Star_Name_Popup_(int16_t x, int16_t y, int16_t star_idx, int8_t mode);

@@ -109,6 +109,8 @@ namespace INFO {
     };
 
     const char s_billtex2_lbx[13] = "billtex2.lbx";
+    const char s_app_pics_lbx_00556028[13] = "app_pics.lbx";
+    const char s_APP_PICS_LBX_00556018[13] = "APP_PICS.LBX";
 
     s_colors _info_normal_color = {{178, 185, 183, 182, 184, 185, 185, 186}};
 

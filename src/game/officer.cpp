@@ -24,6 +24,8 @@ namespace OFFICER {
     const char s_FRESKLLS_LBX_00556a1c[16] = "FRESKLLS.LBX";
     const char s_GERSKLLS_LBX_00556a2c[16] = "GERSKLLS.LBX";
     const char s_SKILDESC_LBX_00556a3c[16] = "SKILDESC.LBX";
+    const char s_comma_lo_00556a4c[6] = ", lo ";
+    const char s___005569ec[3] = " .";
     char* _officer_skill_description_string[27];
     char* _officer_skill_name_string[27];
     s_officer_skill_help _officer_skill_help[4];
@@ -3695,7 +3697,7 @@ void __cdecl Print_Officer_Data_(
         current_y = static_cast<int16_t>(current_y + 0x10);
     }
 
-    memcpy(dot_text, ::s___005569ec, 3);
+    memcpy(dot_text, s___005569ec, 3);
     fonts::Get_String_Width_(dot_text);
     OFFICER::Get_Skill_Data_Max_Pixel_Width_(officer_id);
 

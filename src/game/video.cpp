@@ -1,5 +1,9 @@
 #include "pch.h"
 
+uint8_t DAT_00578820;
+uint32_t DAT_00578dc8;
+uint32_t DAT_00578dcc;
+
 namespace video {
 	int32_t g_screen_res_x;
 	int32_t g_screen_res_y;
@@ -311,11 +315,11 @@ namespace video {
         uint32_t* const alt_surface = platform::_alt_offscreen_surface;
         uint32_t* const video_memory = (uint32_t*)video::_video_memory;
 
-        if (platform::g_screen_res_y > 0) {
+        if (g_screen_res_y > 0) {
             int32_t dst_row_offset = 0;
             int32_t src_row_offset = 0;
 
-            for (int32_t y = 0; y < platform::g_screen_res_y; ++y) {
+            for (int32_t y = 0; y < g_screen_res_y; ++y) {
                 const s_scan_list_entry& scan = video::_refresh_scan_list[y];
                 if (scan.min_x != -1) {
                     const int32_t min_x = scan.min_x;
@@ -391,13 +395,13 @@ namespace video {
         platform::Create_Cursor_Surface();
 
         video::_default_mouse_list.x2 =
-            static_cast<int16_t>(static_cast<uint16_t>(platform::g_screen_res_x) - 1);
+            static_cast<int16_t>(static_cast<uint16_t>(g_screen_res_x) - 1);
         video::_default_mouse_list.y2 =
-            static_cast<int16_t>(static_cast<uint16_t>(platform::g_screen_res_y) - 1);
+            static_cast<int16_t>(static_cast<uint16_t>(g_screen_res_y) - 1);
 
         mouse::Set_Mouse_List_(&video::_default_mouse_list, 1);
 
-        platform::Force_Cursor_Pos(platform::g_screen_res_x / 2, platform::g_screen_res_y / 2);
+        platform::Force_Cursor_Pos(g_screen_res_x / 2, g_screen_res_y / 2);
 
         video::_is_initializing = 0;
         mouse::_mouse_enabled = 1;

@@ -16,7 +16,7 @@ namespace line {
             strings::Swap_Short_(&x1, &x2);
         }
 
-        uint8_t* local_ptr = video::_current_video_page + y1 * platform::g_screen_res_x + x1;
+        uint8_t* local_ptr = video::_current_video_page + y1 * video::g_screen_res_x + x1;
         int16_t dx = x2 - x1;
         int16_t abs_dx = dx;
         int16_t x_dir = 1;
@@ -33,7 +33,7 @@ namespace line {
             while (count > 0) {
                 *local_ptr = colors->colors[color_index & 7];
                 color_index++;
-                local_ptr += platform::g_screen_res_x;
+                local_ptr += video::g_screen_res_x;
                 count--;
             }
             if (video::screen_refresh_flag >= 2 && y1 <= y2) {
@@ -66,7 +66,7 @@ namespace line {
             while (count > 0) {
                 *local_ptr = colors->colors[color_index & 7];
                 color_index++;
-                local_ptr += platform::g_screen_res_x + x_dir;
+                local_ptr += video::g_screen_res_x + x_dir;
                 count--;
             }
             if (video::screen_refresh_flag >= 2 && y1 <= y2) {
@@ -315,9 +315,9 @@ namespace line {
             strings::Swap_Short_(&x1, &x2);
         }
 
-        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         uint8_t* render_ptr =
-            video::_current_video_page + (int32_t)y1 * platform::g_screen_res_x + (int32_t)x1;
+            video::_current_video_page + (int32_t)y1 * video::g_screen_res_x + (int32_t)x1;
 
         int16_t dx = x2 - x1;
         int16_t x_step;
@@ -335,7 +335,7 @@ namespace line {
             int16_t count = dy + 1;
             do {
                 *render_ptr = color;
-                render_ptr += platform::g_screen_res_x;
+                render_ptr += video::g_screen_res_x;
                 count--;
             } while (count != 0);
 
@@ -371,7 +371,7 @@ namespace line {
             int16_t count = dx + 1;
             do {
                 *render_ptr = color;
-                render_ptr += (platform::g_screen_res_x + x_step);
+                render_ptr += (video::g_screen_res_x + x_step);
                 count--;
             } while (count != 0);
 
@@ -503,7 +503,7 @@ namespace line {
             int32_t remaining = static_cast<int32_t>(count);
             do {
                 *current_ptr = color;
-                current_ptr += platform::g_screen_res_x;
+                current_ptr += video::g_screen_res_x;
                 remaining--;
             } while (remaining != 0);
         }
@@ -524,7 +524,7 @@ namespace line {
         }
 
         // Advance buffer pointer to the next line based on screen resolution
-        *buf = current_pos + platform::g_screen_res_x;
+        *buf = current_pos + video::g_screen_res_x;
     }
 
     void __cdecl Plasma_Box_(int16_t x, int16_t y, uint16_t width, int16_t height, int16_t thickness,
@@ -565,7 +565,7 @@ namespace line {
                 count--;
             } while (count != 0);
         }
-        *dest_ptr = ptr + platform::g_screen_res_x;
+        *dest_ptr = ptr + video::g_screen_res_x;
     }
 
     void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, uint16_t* color_idx) {
@@ -574,7 +574,7 @@ namespace line {
         for (int16_t i = 0; i < height; ++i) {
             *dest = colors->colors[*color_idx & 7];
             (*color_idx)++;
-            dest += platform::g_screen_res_x;
+            dest += video::g_screen_res_x;
         }
 
         *screen_ptr = dest + offset;
@@ -592,7 +592,7 @@ namespace line {
             strings::Swap_Short_(&x1, &x2);
         }
 
-        uint8_t* ptr = video::_current_video_page + y1 * platform::g_screen_res_x + x1;
+        uint8_t* ptr = video::_current_video_page + y1 * video::g_screen_res_x + x1;
         int16_t dx = x2 - x1;
         int16_t x_dir;
 
@@ -611,7 +611,7 @@ namespace line {
                 do {
                     *ptr = color_map[color_index & 0x3ff];
                     color_index++;
-                    ptr += platform::g_screen_res_x;
+                    ptr += video::g_screen_res_x;
                     count--;
                 } while (count != 0);
             }
@@ -654,7 +654,7 @@ namespace line {
                 do {
                     *ptr = color_map[color_index & 0x3ff];
                     color_index++;
-                    ptr += platform::g_screen_res_x + x_dir;
+                    ptr += video::g_screen_res_x + x_dir;
                     count--;
                 } while (count != 0);
             }
@@ -841,7 +841,7 @@ namespace line {
 
                 // Increment cyclic index and move to the next screen row
                 *plasma_index_ptr = index + 1;
-                current_pixels += platform::g_screen_res_x;
+                current_pixels += video::g_screen_res_x;
 
                 count--;
             } while (count != 0);
@@ -864,7 +864,7 @@ namespace line {
             } while (count != 0);
         }
 
-        *dest_ptr = dest + platform::g_screen_res_x;
+        *dest_ptr = dest + video::g_screen_res_x;
     }
 
     void __cdecl Create_Plasma_Line_(int16_t seed, uint16_t start_value, const uint8_t* color_map) {

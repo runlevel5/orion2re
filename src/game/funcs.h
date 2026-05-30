@@ -4,7 +4,6 @@
 #include <cstdint>
 
 inline char* s___0055b0ac = reinterpret_cast<char*>(std::uintptr_t{0x0055B0AC});
-inline const char* s_Avail_Mem_0055b390 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B390});
 inline const char* s_tech_has_too_many_apps_0055a97c =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055A97C}); /* " tech has too many apps" */
 
@@ -15,13 +14,10 @@ inline s_animation_header** _anims =
     reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565D90});
 
 inline char* s_Outpost_Ship_00558f48 = reinterpret_cast<char*>(std::uintptr_t{0x00558F48});
-inline char* s_inbox_lbx_00551370 = reinterpret_cast<char*>(std::uintptr_t{0x00551370});
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
 inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
 inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
-inline char* s__00559998 = reinterpret_cast<char*>(std::uintptr_t{0x00559998});
-inline char (&s__00559488)[64] = *reinterpret_cast<char(*)[64]>(std::uintptr_t{0x00559488});
 inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x00551250});
 inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
 inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{0x00557670}); // "AI trade goods"
@@ -86,19 +82,12 @@ inline int (__stdcall *&PTR_SetBkMode_005aa3b4)(HDC hdc, int mode) =
 inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
     *reinterpret_cast<int (__stdcall **)(const char*)>(std::uintptr_t{0x005AA3C4});
 
-inline uint8_t& DAT_00578820 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00578820});
-inline uint32_t& DAT_00578dc8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578DC8});
-inline uint32_t& DAT_00578dcc = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578DCC});
 inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055B270}); /* "Add Square to scan list failed.." */
 inline const char* s__d___d___d_0055b2d0 =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055B2D0}); // "%d, %d, %d"
 inline const char* s_Get_Picture_Color_Picture_Must_H_0055b2dc =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055B2DC}); // "Get_Picture_Color  Picture Must Have Palette"
-inline int16_t& g_cached_mouse_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578AB8});
-inline int16_t& g_cached_mouse_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578ABC});
-inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
-inline uint32_t& g_last_scan_code = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00589A1C });
 
 inline uint8_t& g_main_screen_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596196});
 inline int16_t& g_map_unknown_word = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5B4});
@@ -118,10 +107,6 @@ inline MMRESULT (__stdcall*& PTR_timeEndPeriod_005aa5c4)(uint32_t) =
 inline MMRESULT (__stdcall*& PTR_timeKillEvent_005aa5cc)(uint32_t) =
     *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5CC});
 
-inline const char* s_modem_005607dc = reinterpret_cast<const char*>(std::uintptr_t{0x005607DC});
-inline const char* s_ipx_005607e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E4});
-inline const char* s_tcp_005607e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E8});
-
 inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter) {
     using Fn = HRESULT(__stdcall*)(GUID*, LPDIRECTDRAW*, IUnknown*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0053a8ca });
@@ -132,20 +117,15 @@ inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IU
 inline int16_t& _mouse_XY_star_idx =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5C4});
 
-inline const char* s_fmt_to_00557e00 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E00});
-
 inline const char* s_fmt_modifier_full_005523a4 = reinterpret_cast<const char*>(std::uintptr_t{0x005523A4}); // "%d.%d"
 inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(std::uintptr_t{0x00556104}); // "%d"
-inline const char* s_0_00556108 = reinterpret_cast<const char*>(std::uintptr_t{0x00556108});
 inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
 inline const char* s_scor_0055a510 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A510}); // "scor"
 inline const char* const s_RACEOPT_LBX_00556320 = reinterpret_cast<const char*>(std::uintptr_t{0x00556320}); // "RACEOPT.LBX"
-inline const char* const s_comma_lo_00556a4c = reinterpret_cast<const char*>(std::uintptr_t{0x00556A4C});
 inline char* s___0055632c = reinterpret_cast<char*>(std::uintptr_t{0x0055632C}); // "."
 inline char* s_patch13_lbx_00556330 = reinterpret_cast<char*>(std::uintptr_t{0x00556330}); // "patch13.lbx"
 inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
 inline const char* s_percent_s_percent_d_00556d98 = reinterpret_cast<const char*>(std::uintptr_t{0x00556D98}); /* "%s: %d" */
-inline const char* s_racestuf_lbx_00556310 = reinterpret_cast<const char*>(std::uintptr_t{0x00556310});
 inline const char* const s_RACESTUF_lbx_00558550 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558550}); // "RACESTUF.lbx"
 
@@ -186,7 +166,6 @@ inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x005576
 inline const char* s_WWWWWWW_0055137c = reinterpret_cast<const char*>(std::uintptr_t{0x0055137c}); // "WWWWWWW"
 inline const char* s__s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
 inline const char* s___s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
-inline const char* s___005569ec = reinterpret_cast<const char*>(std::uintptr_t{0x005569EC});
 struct s_colors;
 inline s_colors& s__GEGGGGG_s___s__005569b8 = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569B8});
 inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });

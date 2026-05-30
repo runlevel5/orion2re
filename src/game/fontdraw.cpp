@@ -22,7 +22,7 @@ namespace fontdraw {
                     dest += (val & 0x7F);
                 }
             }
-            dest = line_start + platform::g_screen_res_x;
+            dest = line_start + video::g_screen_res_x;
         }
     }
 

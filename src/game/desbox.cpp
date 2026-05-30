@@ -28,6 +28,7 @@ namespace DESBOX {
     uint8_t _valid_arcs_racks[5];
 
     const char s__00551100[] = "";
+    const char s_0_00556108[2] = "0";
     const char s_plus[] = "+";
     const char s_minus[] = "-";
     const char s_space[] = "\x1b";
