@@ -3,17 +3,13 @@
 struct s_combat_bomb_result;
 
 namespace COLBOMB {
-    inline s_combat_bomb_result*& _results_ptr =
-        *reinterpret_cast<s_combat_bomb_result**>(std::uintptr_t{0x005A7798});
+    extern s_combat_bomb_result* _results_ptr;
 
-    inline s_combat_bomb_result*& _backup_results_ptr =
-        *reinterpret_cast<s_combat_bomb_result**>(std::uintptr_t{0x005A779C});
+    extern s_combat_bomb_result* _backup_results_ptr;
 
-    inline char* s_Perdita_di_s_00556b14 =
-        reinterpret_cast<char*>(std::uintptr_t{0x00556B14});
+    extern char s_Perdita_di_s_00556b14[14];
 
-    inline char* s_Edificio_distrutto_s_00556b24 =
-        reinterpret_cast<char*>(std::uintptr_t{0x00556B24});
+    extern char s_Edificio_distrutto_s_00556b24[23];
 
     void __cdecl Do_Summary_String_Popup_();
 

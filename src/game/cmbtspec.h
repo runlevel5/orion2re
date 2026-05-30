@@ -2,8 +2,7 @@
 #include <cstdint>
 
 namespace CMBTSPEC {
-    inline int& _g_engine_sfx_handle =
-        *reinterpret_cast<int*>(std::uintptr_t{0x00558484});
+    extern int32_t _g_engine_sfx_handle;
 
     void __cdecl Draw_Cloak_(int16_t ship_idx, int16_t cloak_type);
 

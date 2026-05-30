@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace capture {
+    uint16_t _release_flag;
+
     void Release_Version_() {
         _release_flag = 1;
     }

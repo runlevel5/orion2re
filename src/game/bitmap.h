@@ -22,7 +22,7 @@ namespace bitmap {
         int16_t end_color
     );
 
-    inline char* s_Add_Picture_To_Bitmap_targetmust_0055b770 = reinterpret_cast<char*>(std::uintptr_t{0x0055B770});
+    extern const char s_Add_Picture_To_Bitmap_targetmust_0055b770[];
 
     void __cdecl Add_Picture_To_Bitmap_(int16_t x, int16_t y, s_animation_header* src, s_animation_header* dest);
 
@@ -32,14 +32,11 @@ namespace bitmap {
 
     void __cdecl Tint_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t tint_color_index);
 
-    inline uint32_t& _pixel_count =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0D8});
+    extern uint32_t _pixel_count;
 
-    inline uint8_t*& _bitmap_temp1 =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055C0E4});
+    extern uint8_t* _bitmap_temp1;
 
-    inline uint32_t& _bitmap_temp2 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0E8});
+    extern uint32_t _bitmap_temp2;
 
     void __cdecl Tint_Bitmap_Pixels_(uint8_t* src, uint8_t* tint_table, int unused, uint8_t* dest, int width, int height);
 
@@ -57,20 +54,15 @@ namespace bitmap {
 
     void __cdecl Copy_Bitmap_To_Bitmap_(s_animation_header* dst, s_animation_header* src);
 
-    inline const char* s_Brighten_perecnt_needs_to_be_bet_0055b714 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B714}); /* "Brighten perecnt needs to be between 0 - 100" */
+    extern const char s_Brighten_perecnt_needs_to_be_bet_0055b714[];
 
-    inline const char* s_Not_Enough_Space_For_Brighten_Pa_0055b744 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B744}); /* "Not Enough Space For Brighten Palette Block" */
+    extern const char s_Not_Enough_Space_For_Brighten_Pa_0055b744[];
 
-    inline uint8_t*& _brighten_palette_seg =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0057E040});
+    extern uint8_t* _brighten_palette_seg;
 
-    inline int8_t& _brighten_palette_levels =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x0057E068});
+    extern int8_t _brighten_palette_levels;
 
-    inline int32_t& _brighten_start_color =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057E06C});
+    extern int32_t _brighten_start_color;
 
     void __cdecl Scale_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t scale_x, int16_t scale_y);
 

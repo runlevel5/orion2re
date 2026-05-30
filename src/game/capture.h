@@ -2,8 +2,7 @@
 #include <cstdint>
 
 namespace capture {
-    inline uint16_t& _release_flag =
-            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055AFC8});
+    extern uint16_t _release_flag;
 
     void Release_Version_();
 

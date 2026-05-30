@@ -1,6 +1,28 @@
 #include "pch.h"
 
 namespace CMBTDRW1 {
+    const char s_combat_lbx[11] = "combat.lbx";
+    uint8_t _green[16];
+    MOX2::action_func_t _k_save;
+
+    int16_t _g_max;
+    int16_t _g_min;
+    char* _g_msg;
+    int16_t _g_var;
+
+    s_animation_header* _board_capture_button_seg;
+    s_animation_header* _board_raid_button_seg;
+    s_animation_header* _board_left_button_seg;
+    s_animation_header* _board_right_button_seg;
+
+    const char s_B_005560e4[2] = "B";
+    const char s_L_005560e8[2] = "L";
+    const char s_S_005569cc[2] = "S";
+    const char s_D_005569dc[2] = "D";
+    const char s_A_00557ed4[2] = "A";
+    const char s_I_0055801c[2] = "I";
+    const char s_R_0055824c[2] = "R";
+    const char s_F_005598f4[2] = "F";
 
     void __cdecl Draw_Shield_Arcs_() {
         if (MOX::_cur_ship == 0) {

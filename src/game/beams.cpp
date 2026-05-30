@@ -1,6 +1,63 @@
 #include "pch.h"
 
 namespace BEAMS {
+    uint8_t _g_pierced_shield_flag;
+    int16_t _old_color[2] = { -1, -1 };
+    int16_t _g_weapon_n;
+    int16_t _g_sfx_n;
+    s_animation_header* _mauler_ball_seg;
+    s_animation_header* _l_anims;
+    uint8_t _shield_hit_now_flag;
+    uint8_t _reflection_field_hit_now_flag;
+    uint8_t _ship_hit_now_flag[2];
+    uint8_t _ship_firing_now_flag[2];
+    int32_t _g_beam_fire_sfx_handle[10];
+    int32_t _g_shield_sfx_handle;
+    int32_t _g_reflection_field_sfx_handle;
+    int16_t _max_frames;
+    int16_t _beam_angle = 15;
+    uint8_t _shield_diameters[8] = { 25, 46, 63, 76, 117, 155, 193, 215 };
+    int16_t _shield_hit_draw_facing;
+    int16_t _reflection_field_hit_draw_facing;
+    int16_t _shield_display_status;
+    uint8_t _reflection_field_diameters[4] = { 29, 52, 71, 86 };
+    int16_t _reflection_field_display_status;
+    int16_t _g_reflection_state_flag;
+    uint8_t _g_firing_reflected_beam_flag;
+    int32_t _low_ramp_values[20] = {
+        7, 25, 35, 45, 55, 70, 89, 100, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int32_t _low_primary_cross_values[20] = {
+        80, 60, 40, 20, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int32_t _low_saturated_values[20] = {
+        110, 125, 155, 250, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int32_t _moderate_primary_cross_values[20] = {
+        90, 80, 60, 40, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int32_t _moderate_saturated_values[20] = {
+        115, 140, 200, 250, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int32_t _high_primary_cross_values[20] = {
+        95, 85, 70, 50, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int32_t _high_saturated_values[20] = {
+        150, 200, 300, 300, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    int16_t _n_damage_msgs;
+    s_beam_dmg_msg _msg_queue[35];
+    s_animation_header* _laser_burst_anim[2][2][16];
+    s_animation_header* _explosion_anim[2][16];
+    s_animation_header* _shield_anims[5][4][2];
+
     static const s_colors* Build_Damage_Indicator_Color_Window_(s_colors* dst, const uint8_t* src) {
         memcpy(dst->colors, src, sizeof(dst->colors));
         return dst;

@@ -7,13 +7,12 @@ namespace BEAMS {
         int32_t r;
     };
 
-    inline uint8_t& _g_pierced_shield_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D08});
+    extern uint8_t _g_pierced_shield_flag;
 
-    inline int16_t (&_old_color)[2] =
-        *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x00552D0C});
+    extern int16_t _old_color[2];
 
-    inline int16_t& _g_weapon_n = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00564D6C });
-    inline int16_t& _g_sfx_n = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00564D70 });
+    extern int16_t _g_weapon_n;
+    extern int16_t _g_sfx_n;
 
     int8_t __cdecl Is_Steve_Stuff_Weapon_(int16_t weapon_id);
 
@@ -33,96 +32,75 @@ namespace BEAMS {
         int16_t attacker_size_class, s_weapon_visual_fx* param_34
     );
 
-    inline s_animation_header*& _mauler_ball_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00564D64});
+    extern s_animation_header* _mauler_ball_seg;
 
-    inline s_animation_header*& _l_anims =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00564D68});
+    extern s_animation_header* _l_anims;
 
-    inline uint8_t& _shield_hit_now_flag =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D10});
+    extern uint8_t _shield_hit_now_flag;
 
-    inline uint8_t& _reflection_field_hit_now_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D14});
+    extern uint8_t _reflection_field_hit_now_flag;
 
-    inline uint8_t (&_ship_hit_now_flag)[2] = *reinterpret_cast<uint8_t(*)[2]>(std::uintptr_t{0x00552D18});
+    extern uint8_t _ship_hit_now_flag[2];
 
-    inline uint8_t (&_ship_firing_now_flag)[2] = *reinterpret_cast<uint8_t (*)[2]>(std::uintptr_t{ 0x00552D1C });
+    extern uint8_t _ship_firing_now_flag[2];
 
-    inline int32_t (&_g_beam_fire_sfx_handle)[10] = *reinterpret_cast<int32_t(*)[10]>(std::uintptr_t{0x00552D20});
+    extern int32_t _g_beam_fire_sfx_handle[10];
 
-    inline int32_t& _g_shield_sfx_handle =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00552D48});
+    extern int32_t _g_shield_sfx_handle;
 
-    inline uint32_t& _g_reflection_field_sfx_handle =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00552D4C});
+    extern int32_t _g_reflection_field_sfx_handle;
 
-    inline int16_t& _max_frames =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D50});
+    extern int16_t _max_frames;
 
-    inline int16_t& _beam_angle = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D54});
+    extern int16_t _beam_angle;
 
-    inline uint8_t (&_shield_diameters)[8] =
-        *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x00552D58});
+    extern uint8_t _shield_diameters[8];
 
-    inline int16_t& _shield_hit_draw_facing = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D60});
+    extern int16_t _shield_hit_draw_facing;
 
-    inline int16_t& _reflection_field_hit_draw_facing = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D64});
+    extern int16_t _reflection_field_hit_draw_facing;
 
-    inline int16_t& _shield_display_status =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D68});
+    extern int16_t _shield_display_status;
 
-    inline uint8_t (&_reflection_field_diameters)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00552D6C});
+    extern uint8_t _reflection_field_diameters[4];
 
-    inline int16_t& _reflection_field_display_status = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D70});
+    extern int16_t _reflection_field_display_status;
 
-    inline int16_t& _g_reflection_state_flag =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D74});
+    extern int16_t _g_reflection_state_flag;
 
-    inline uint8_t& _g_firing_reflected_beam_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D78});
+    extern uint8_t _g_firing_reflected_beam_flag;
 
-    inline int32_t (&_low_ramp_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552D80});
+    extern int32_t _low_ramp_values[20];
 
-    inline int32_t (&_low_primary_cross_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552DD0});
+    extern int32_t _low_primary_cross_values[20];
 
-    inline int32_t (&_low_saturated_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552E20});
+    extern int32_t _low_saturated_values[20];
 
-    inline int32_t (&_moderate_primary_cross_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552EC0});
+    extern int32_t _moderate_primary_cross_values[20];
 
-    inline int32_t (&_moderate_saturated_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552F10});
+    extern int32_t _moderate_saturated_values[20];
 
-    inline int32_t (&_high_primary_cross_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552FB0});
+    extern int32_t _high_primary_cross_values[20];
 
-    inline int32_t (&_high_saturated_values)[20] =
-        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00553000});
+    extern int32_t _high_saturated_values[20];
 
-    inline int16_t& _n_damage_msgs =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D7C});
+    extern int16_t _n_damage_msgs;
 
-    inline s_beam_dmg_msg (&_msg_queue)[35] =
-        *reinterpret_cast<s_beam_dmg_msg(*)[35]>(std::uintptr_t{0x005A7FC0});
+    extern s_beam_dmg_msg _msg_queue[35];
 
     void __cdecl Reset_Beam_Swapping_Colors_();
 
     void __cdecl Init_Beams_();
 
-    inline s_animation_header* (&_laser_burst_anim)[2][2][16] = 
-        *reinterpret_cast<s_animation_header* (*)[2][2][16]>(std::uintptr_t{0x005A7EC0});
+    extern s_animation_header* _laser_burst_anim[2][2][16];
 
     void __cdecl Load_Ship_Burst_();
 
-    inline s_animation_header* (&_explosion_anim)[2][16] =
-        *reinterpret_cast<s_animation_header* (*)[2][16]>(std::uintptr_t{0x005A7DA0});
+    extern s_animation_header* _explosion_anim[2][16];
 
     void __cdecl Load_Ship_Explosion_();
 
-    inline s_animation_header* (&_shield_anims)[5][4][2] =
-        *reinterpret_cast<s_animation_header* (*)[5][4][2]>(std::uintptr_t{0x005A7E20});
+    extern s_animation_header* _shield_anims[5][4][2];
 
     void __cdecl Load_Shield_Hit_();
 

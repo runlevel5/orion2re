@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace arith1e {
+    const char s_Failure_allocating_context__d_00560838[] = "Failure allocating context %d";
+    const char s_Fatal_error__00560ab0[] = "Fatal error: ";
+
     struct SYMBOL {
         uint16_t low_count;
         uint16_t high_count;

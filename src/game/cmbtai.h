@@ -68,7 +68,7 @@ namespace CMBTAI {
 
     int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int16_t param_3);
 
-    inline int16_t& _fleet_target = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7794});
+    extern int16_t _fleet_target;
 
     int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out);
 

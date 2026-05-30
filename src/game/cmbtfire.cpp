@@ -876,7 +876,7 @@ namespace CMBTFIRE {
 
         if (flags & 0x80 /* BIO_WEAPON */) {
             MOX::_bio_weapon_flag = 1;
-            _combat_bomb_result.is_bio_weapon = 1;
+            MOX::_combat_bomb_result.is_bio_weapon = 1;
             bomb_stats.is_bio_weapon = 1;
 
             if (MOX::_combat_data->shield_type != 0x17) {
@@ -892,12 +892,12 @@ namespace CMBTFIRE {
                 if ((int)random::Random_(100) <= *damage) {
                     colony_hits = 1;
                     bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
-                    _combat_bomb_result.bio_hits_remaining += 1;
+                    MOX::_combat_bomb_result.bio_hits_remaining += 1;
                     bomb_stats.bomb_hits_remaining = 0;
                     bomb_stats.colony_idx = (uint8_t)MOX::_cmbt_colony_id;
                     bomb_stats.bio_hits_remaining = 1;
                     bomb_stats.is_planetary_hit = 0;
-                    _combat_bomb_result.is_bio_weapon = 1;
+                    MOX::_combat_bomb_result.is_bio_weapon = 1;
 
                     if (MOX::_apply_damage_to_planet != 0 && MOX::_cmbt_colony_id != -1) {
                         BOMB::Apply_Bomb_Hits_(&bomb_stats);
@@ -956,7 +956,7 @@ namespace CMBTFIRE {
                         bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                         bomb_stats.colony_idx = (uint8_t)MOX::_cmbt_colony_id;
                         bomb_stats.is_planetary_hit = 1;
-                        _combat_bomb_result.is_planetary_hit = 1;
+                        MOX::_combat_bomb_result.is_planetary_hit = 1;
                         bomb_stats.bomb_hits_remaining = MOX::_combat_data->structure_max / 100;
 
                         if (MOX::_apply_damage_to_planet != 0 && MOX::_cmbt_colony_id != -1) {

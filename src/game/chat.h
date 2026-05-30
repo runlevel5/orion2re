@@ -4,7 +4,7 @@
 struct s_net_chat;
 
 namespace CHAT {
-    inline s_net_chat*& _chat_info = *reinterpret_cast<s_net_chat**>(std::uintptr_t{0x005A7B70});
+    extern s_net_chat* _chat_info;
 
     void __cdecl Send_Chat_Msg_(char* msg);
 

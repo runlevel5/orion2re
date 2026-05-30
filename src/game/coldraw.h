@@ -8,10 +8,9 @@ struct s_coldraw_veggie_cell;
 namespace COLDRAW {
     void __cdecl Calculate_Squish_Step_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
 
-    inline s_coldraw_road (&_road_list)[7][7] = *reinterpret_cast<s_coldraw_road(*)[7][7]>(std::uintptr_t{0x005A71D0});
+    extern s_coldraw_road _road_list[7][7];
 
-    inline s_coldraw_veggie_cell (&_veggie_list)[6][6] =
-        *reinterpret_cast<s_coldraw_veggie_cell (*)[6][6]>(std::uintptr_t{0x005A6E70});
+    extern s_coldraw_veggie_cell _veggie_list[6][6];
 
     void __cdecl Road_Back_To_Front_(int16_t index, int16_t* y, int16_t* x);
 
@@ -21,8 +20,8 @@ namespace COLDRAW {
 
     void __cdecl Build_Road_List_Based_On_Bldg_List_();
 
-    inline uint8_t& _DAT_5a7760 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7760});
-    inline uint8_t& _DAT_5a778a = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A778A});
+    extern uint8_t _DAT_5a7760;
+    extern uint8_t _DAT_5a778a;
 
     void __cdecl Draw_Simplest_Path_(int16_t prev_y, int16_t prev_x, int16_t local_y, int16_t local_x, uint8_t* p1, uint8_t* p2);
 

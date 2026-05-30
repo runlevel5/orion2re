@@ -1,28 +1,28 @@
 #pragma once
 
 namespace CMBTDRW1 {
-    inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
-    inline uint8_t (&_green)[16] = *reinterpret_cast<uint8_t(*)[16]>(std::uintptr_t{0x0056CEF0});
-    inline MOX2::action_func_t& _k_save = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005960FC});
+    extern const char s_combat_lbx[11];
+    extern uint8_t _green[16];
+    extern MOX2::action_func_t _k_save;
 
-    inline int16_t& _g_max = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE0});
-    inline int16_t& _g_min = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE4});
-    inline char*& _g_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CEE8});
-    inline int16_t& _g_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CF00});
+    extern int16_t _g_max;
+    extern int16_t _g_min;
+    extern char* _g_msg;
+    extern int16_t _g_var;
 
-    inline s_animation_header*& _board_capture_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005960F4});
-    inline s_animation_header*& _board_raid_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005960F8});
-    inline s_animation_header*& _board_left_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596100});
-    inline s_animation_header*& _board_right_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596104});
+    extern s_animation_header* _board_capture_button_seg;
+    extern s_animation_header* _board_raid_button_seg;
+    extern s_animation_header* _board_left_button_seg;
+    extern s_animation_header* _board_right_button_seg;
 
-    inline const char* s_B_005560e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005560E4}); // "B"
-    inline const char* s_L_005560e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005560E8}); // "L"
-    inline const char* s_S_005569cc = reinterpret_cast<const char*>(std::uintptr_t{0x005569CC}); // "S"
-    inline const char* s_D_005569dc = reinterpret_cast<const char*>(std::uintptr_t{0x005569DC}); // "D"
-    inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED4}); // "A"
-    inline const char* s_I_0055801c = reinterpret_cast<const char*>(std::uintptr_t{0x0055801C}); // "I"
-    inline const char* s_R_0055824c = reinterpret_cast<const char*>(std::uintptr_t{0x0055824C}); // "R"
-    inline const char* s_F_005598f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005598F4}); // "F"
+    extern const char s_B_005560e4[2]; // "B"
+    extern const char s_L_005560e8[2]; // "L"
+    extern const char s_S_005569cc[2]; // "S"
+    extern const char s_D_005569dc[2]; // "D"
+    extern const char s_A_00557ed4[2]; // "A"
+    extern const char s_I_0055801c[2]; // "I"
+    extern const char s_R_0055824c[2]; // "R"
+    extern const char s_F_005598f4[2]; // "F"
 
     void __cdecl Detailed_View_Ship_(int16_t ship_idx);
 

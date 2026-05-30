@@ -1,6 +1,13 @@
 #include "pch.h"
 
 namespace buffer {
+  int32_t _global_load_count;
+  int16_t _file_buffer_count;
+  s_file_buffer_entry* _file_buffer;
+  void* _buffer_space_seg;
+  int32_t _buffer_space_size;
+  void* _buffer_space_ptr;
+
   int8_t __cdecl Flush_Buffer_Space_(void* param_1) {
     (void)param_1;
 

@@ -71,8 +71,8 @@ namespace BILL {
 
     void __cdecl _Print_Paragraph_Bill_Aux_(int16_t x, int16_t y, int16_t width, const char* text, int16_t color, s_animation_header* bitmap);
 
-    inline int16_t& __pp_max_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BBE});
-    inline int16_t& __pp_max_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BC0});
+    extern int16_t __pp_max_width;
+    extern int16_t __pp_max_height;
 
     void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, uint8_t draw_flag, s_animation_header* bitmap);
 
@@ -80,8 +80,7 @@ namespace BILL {
 
     int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text);
 
-    inline uint8_t (&_space_limits)[8] =
-        *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00551138});
+    extern uint8_t _space_limits[8];
 
     void __cdecl Print_Display_Auto_Width_(int16_t x, int16_t y, const char* text, int32_t width);
 
@@ -99,14 +98,14 @@ namespace BILL {
 
     int16_t __cdecl Add_Their_Spy_(int16_t player_idx, int16_t other_player_idx);
 
-    inline char (&_dest_file_name)[32] = *reinterpret_cast<char(*)[32]>(std::uintptr_t{0x00564738});
-    inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"
-    inline const char* s_SR_R_wildcard_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512E0}); // "SR_R?_SC.LBX"
+    extern char _dest_file_name[32];
+    extern const char s_SR_R_x_SC_LBX[14]; // "SR_R%x_SC.LBX"
+    extern const char s_SR_R_wildcard_SC_LBX[13]; // "SR_R?_SC.LBX"
 
-    inline const char* const s_Could_not_open_s = reinterpret_cast<const char*>(std::uintptr_t{0x00551140}); // "Could not open %s"
-    inline const char* const s_Error_copying_s_to_s_bytes_i = reinterpret_cast<const char*>(std::uintptr_t{0x00551154}); // "Error copying %s to %s (bytes: %i)"
-    inline const char* const s_wb = reinterpret_cast<const char*>(std::uintptr_t{0x00551178}); // "wb"
-    inline const char* const s_rb = reinterpret_cast<const char*>(std::uintptr_t{0x0055117c}); // "rb"
+    extern const char s_Could_not_open_s[18]; // "Could not open %s"
+    extern const char s_Error_copying_s_to_s_bytes_i[35]; // "Error copying %s to %s (bytes: %i)"
+    extern const char s_wb[3]; // "wb"
+    extern const char s_rb[3]; // "rb"
 
     char* __cdecl Cache_Player_Spy_Anim_();
 

@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace COLBOMB {
+    s_combat_bomb_result* _results_ptr;
+    s_combat_bomb_result* _backup_results_ptr;
+    char s_Perdita_di_s_00556b14[14] = "Perdita di:%s";
+    char s_Edificio_distrutto_s_00556b24[23] = "Edificio distrutto: %s";
+
     void __cdecl Colony_Bombing_Screen_(s_combat_bomb_result* results) {
         s_combat_bomb_result backup;
 

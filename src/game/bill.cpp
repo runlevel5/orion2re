@@ -1,6 +1,20 @@
 #include "pch.h"
 
 namespace BILL {
+    int16_t __pp_max_width;
+    int16_t __pp_max_height;
+
+    uint8_t _space_limits[8] = {0, 1, 1, 1, 2, 3, 3, 0};
+
+    char _dest_file_name[32];
+    const char s_SR_R_x_SC_LBX[14] = "SR_R%x_SC.LBX";
+    const char s_SR_R_wildcard_SC_LBX[13] = "SR_R?_SC.LBX";
+
+    const char s_Could_not_open_s[18] = "Could not open %s";
+    const char s_Error_copying_s_to_s_bytes_i[35] = "Error copying %s to %s (bytes: %i)";
+    const char s_wb[3] = "wb";
+    const char s_rb[3] = "rb";
+
     /**
      * @address 00406780
      */

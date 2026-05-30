@@ -2,6 +2,43 @@
 
 namespace COLBLDG {
 
+    s_mouse_list _mouse_list_to[4] = {
+        {18, 0, 199, 324, 465, 472},
+        {16, 0, 476, 10, 632, 306},
+        {16, 0, 10, 10, 188, 471},
+        {1, 0, 0, 0, 639, 479},
+    };
+    s_mouse_list _mouse_list_what = {16, 0, 0, 0, 639, 479};
+    s_mouse_list _mouse_list_which_ship = {17, 0, 0, 0, 639, 479};
+    s_colors _l_font_color_array = {{184, 187, 186, 0, 0, 0, 0, 0}};
+    s_colors _l_font_dim_color_array = {{183, 203, 202, 0, 0, 0, 0, 0}};
+    uint8_t _return_to_build_popup_from_custom_design;
+    uint8_t _hacky_speed_refitted_ship_flag;
+    uint8_t _field_mode;
+    int16_t _queue_fields[7] = {-1, -1, -1, -1, -1, 0, 0};
+    int16_t _building_indexes[54] = {-1};
+    int16_t _n_building_indexes;
+    int16_t _military_indexes[54] = {-1};
+    int16_t _n_military_indexes;
+    int16_t _active_prod[4] = {-1, 0, 0, 0};
+    int16_t _current_item[7] = {-1, -1, -1, -1, -1, 0, 0};
+    int16_t _last_app = -1;
+    int16_t _last_setting = -1;
+    int16_t _scanned_field = -1000;
+    int16_t _military_fields[54];
+    int16_t _colony_bldg_saved_screen;
+    s_animation_header* _anims[7];
+    int16_t _scanned_prod;
+    int16_t _refitting_ship_n;
+    int16_t _building_fields[54];
+    uint8_t* _desc_record_ptr;
+    uint8_t _colony_auto_building;
+    int16_t _fields[11];
+    char _g_msg[800];
+    s_animation_header* _colsum_pal_anim;
+    s_animation_header* _bldg_bitm;
+    uint8_t* _buffer;
+
     int16_t __cdecl Calc_Font_Off_() {
         if (COLONY::_step_squish == 0) {
             return 0;

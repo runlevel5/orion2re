@@ -964,7 +964,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             }
             RUSS::Mox_Update_();
 
-            MOX::_fleet_target = -1;
+            CMBTAI::_fleet_target = -1;
 
             if (MOX::_combat_init == 0) {
                 COMBAT1::Do_Combat_Turn_(turn_plr1, 0);
@@ -974,7 +974,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
                 combat_winner = COMBAT1::Check_For_Winner_();
                 if (combat_winner == 0) {
-                    MOX::_fleet_target = -1;
+                    CMBTAI::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr2, 0);
                     COMBAT1::Check_For_Winner_();
                 }
@@ -984,7 +984,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
                 combat_winner = COMBAT1::Check_For_Winner_();
                 if (combat_winner == 0) {
-                    MOX::_fleet_target = -1;
+                    CMBTAI::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr1, 1);
                     COMBAT1::Check_For_Winner_();
                     Increment_Bhg_(turn_plr1);
@@ -994,7 +994,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
                 combat_winner = COMBAT1::Check_For_Winner_();
                 if (combat_winner == 0) {
-                    MOX::_fleet_target = -1;
+                    CMBTAI::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr2, 1);
                     COMBAT1::Check_For_Winner_();
                     Increment_Bhg_(turn_plr2);

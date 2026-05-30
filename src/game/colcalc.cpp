@@ -1,6 +1,102 @@
 #include "pch.h"
 
 namespace COLCALC {
+    ColonyBaseFunc _colony_empire_base_functions[3] = {
+        Colony_Empire_Base_Food2_Produced_,
+        Colony_Empire_Base_Industry_Produced_,
+        Colony_Empire_Base_Research_Produced_,
+    };
+
+    int8_t _minerals_per_mine[8] = {1, 2, 3, 5, 8, 0, 0, 0};
+    int8_t _climate_maintenance_modifiers[10] = {50, 25, 0, 25, 0, 0, 0, 0, 0, 0};
+    int8_t _morale_lookup_table[8] = {-4, -4, -4, 0, 0, 0, 0, 0};
+    int8_t _non_capital_morale_lookup[8] = {-10, -7, -4, 0, 0, 0, 0, 0};
+    int8_t _barracks_morale_lookup[8] = {4, 4, 4, 4, 0, 0, 0, 0};
+    int8_t _colony_job_production_difficulty_lookup[8] = {-10, 0, 10, 20, 40, 0, 0, 0};
+
+    char* _government_morale_msg;
+    char* _mixed_races_msg;
+    char* _unification_has_no_morale_msg;
+    char* _research_summary_msg;
+    char* _no_capital_msg;
+    char* _no_barracks_msg;
+    char* _morale_summary_msg;
+    char* _total_morale_msg;
+    char* _command_summary_msg;
+    int8_t _colony_calc_food_cache[10];
+    char* _ship_maintenance_costs_msg;
+    char* _d_from_1_s_ship_msg;
+    char* _d_from_d_battlestations_msg;
+    char* _from_warlord_msg;
+    char* _d_from_1_star_base_msg;
+    char* _d_from_1_noncombat_ship_msg;
+    char* _d_from_d_fortresses_msg;
+    char* _starting_command_points_msg;
+    char* _d_from_d_star_bases_msg;
+    char* _total_command_point_used_msg;
+    char* _d_from_d_s_ships_msg;
+    char* _d_from_d_noncombat_ships_msg;
+    char* _total_command_points_msg;
+    char* _bc_summary_msg;
+    char* _total_command_points_used_msg;
+    char* _from_imperium_msg;
+    char* _d_from_1_battlestation_msg;
+    char* _d_from_1_fortress_msg;
+
+    const s_colony* _colony_calc_food_colony;
+    uint8_t _colony_calc_food_type;
+    const s_colony* _colony_calc_industry_colony;
+    uint8_t _colony_calc_industry_type;
+    int8_t _colony_calc_industry_cache[10];
+
+    int8_t _assimilation_rate_by_government[8] = {30, 60, 30, 60, 60, 120, 12, 16};
+
+    int8_t _difficulty_bc_lookup_table[8] = {0, 0, 1, 2, 3, 0, 0, 0};
+    int8_t _size_climate_max_pop_lookup[10] = {25, 25, 25, 25, 25, 25, 40, 60, 80, 100};
+    char* _government_bonus_msg;
+    char* _produced_by_farmers_msg;
+    char* _produced_by_workers_msg;
+    char* _government_penalty_msg;
+    char* _native_bonus_msg;
+    char* _conquered_penalty_msg;
+    char* _produced_by_scientists_msg;
+    char* _anomaly_msg;
+    char* _bonus_msg;
+    char* _food_summary_msg;
+    char* _blockaded_penalty_msg;
+    char* _morale_penalty_msg;
+    char* _total_research_produced_msg;
+    char* _artifacts_bonus_msg;
+    char* _total_food_produced_msg;
+    char* _gravity_penalty_msg;
+    char* _aquatic_bonus_msg;
+    char* _leader_bonus_msg;
+    char* _android_bonus_msg;
+    char* _intelligence_bonus_msg;
+    char* _morale_bonus_msg;
+    char* _special_income_msg;
+    char* _taxed_from_industry_msg;
+    char* _used_msg;
+    char* _pollution_penalty_msg;
+    char* _replicated_to_d_food_msg;
+    char* _taxes_collected_msg;
+    char* _trade_goods_msg;
+    char* _total_industry_produced_msg;
+    char* _total_income_msg;
+    char* _industry_summary_msg;
+
+    int8_t _planet_robotic_factory_lookup[8] = {5, 8, 10, 15, 20, 0, 0, 0};
+    int8_t _industry_planet_size_lookup[8] = {2, 4, 6, 8, 10, 0, 0, 0};
+
+    char* _taxed_msg;
+    char* _base_msg;
+
+    const s_colony* _colony_calc_research_colony;
+    uint8_t _colony_calc_research_type;
+    int8_t _colony_calc_research_cache[10];
+
+    char _tmp_quotient[20];
+
     int16_t __cdecl Get_System_Population_(int16_t player_idx, int16_t star_idx) {
         int16_t total_pop = 0;
 
@@ -449,7 +545,7 @@ namespace COLCALC {
         return static_cast<int>(total_cost);
     }
 
-    int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Food2_Per_Farmer_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         // TECH_APP_BIOMORPHIC_FUNGI maps to tech_applications[29].
         int16_t food_total = (int16_t)MOX::_planet[colony->planet].food_per_farmer * 2;
 
@@ -489,7 +585,7 @@ namespace COLCALC {
     }
 
     // Suggested name: Colony_Industry_Per_Worker
-    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Industry_Per_Worker_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         int16_t industry;
 
         int8_t mineral_class = MOX::_planet[colony->planet].mineral_class;
@@ -538,7 +634,7 @@ namespace COLCALC {
     }
 
     // Suggested name: Colony_Research_Per_Scientist
-    int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Research_Per_Scientist_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         int16_t research_per_scientist = 3;
 
         if (out != nullptr) {

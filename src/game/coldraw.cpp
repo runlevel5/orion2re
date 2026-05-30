@@ -2,6 +2,13 @@
 
 namespace COLDRAW {
 
+s_coldraw_road _road_list[7][7];
+
+s_coldraw_veggie_cell _veggie_list[6][6];
+
+uint8_t _DAT_5a7760;
+uint8_t _DAT_5a778a;
+
 void __cdecl Calculate_Squish_Step_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4) {
     int16_t divisor = param_3;
     int16_t base_val = param_4;

@@ -1,16 +1,18 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
 struct s_colors;
+struct s_mouse_list;
 struct s_ship_data;
 struct s_ship_design;
 struct s_ship_weapons;
 
 namespace COLBLDG {
-    inline int16_t* _building_indexes = reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AB30});
-    inline int16_t& _n_building_indexes = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AB9C});
+    extern int16_t _building_indexes[54];
+    extern int16_t _n_building_indexes;
     // Size: short[54]
-    inline int16_t* _building_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F08});
+    extern int16_t _building_fields[54];
 
     int __cdecl qsort_building_by_name_(const void* a, const void* b);
 
@@ -34,9 +36,9 @@ namespace COLBLDG {
 
     void __cdecl Draw_Icon_(s_animation_header* anim);
 
-    inline int16_t& _n_military_indexes = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AC0C});
-    inline int16_t* _military_indexes = reinterpret_cast<int16_t*>(std::uintptr_t{0x0055ABA0});
-    inline int16_t (&_military_fields)[54] = *reinterpret_cast<int16_t(*)[54]>(std::uintptr_t{0x00571E70});
+    extern int16_t _n_military_indexes;
+    extern int16_t _military_indexes[54];
+    extern int16_t _military_fields[54];
 
     void __cdecl Build_Arrays_();
 
@@ -46,34 +48,31 @@ namespace COLBLDG {
 
     int16_t __cdecl Colbldg_Create_Ship_(int16_t design_slot);
 
-    inline uint8_t& _return_to_build_popup_from_custom_design = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AB10});
-    inline uint8_t& _field_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AB18});
-    inline int16_t (&_active_prod)[4] = *reinterpret_cast<int16_t(*)[4]>(std::uintptr_t{0x0055AC10});
-    inline int16_t (&_current_item)[7] = *reinterpret_cast<int16_t (*)[7]>(std::uintptr_t{0x0055AC18});
-    inline int16_t& _last_app = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AC28});
-    inline int16_t& _last_setting = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AC2C});
-    inline int16_t& _scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AC30});
-    inline char (&_g_msg)[800] = *reinterpret_cast<char (*)[800]>(std::uintptr_t{0x00571F98});
-    inline int16_t& _colony_bldg_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571EDC});
-    inline int16_t& _scanned_prod = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571EFC});
-    inline int16_t& _refitting_ship_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F00});
-    inline uint8_t& _colony_auto_building = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00571F78});
-    inline int16_t (&_fields)[11] = *reinterpret_cast<int16_t (*)[11]>(std::uintptr_t{0x00571F80});
-    inline s_colors& _l_font_color_array =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x0055AB00});
-    inline s_colors& _l_font_dim_color_array =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x0055AB08});
-    inline int16_t (&_queue_fields)[7] = *reinterpret_cast<int16_t(*)[7]>(std::uintptr_t{0x0055AB20});
+    extern uint8_t _return_to_build_popup_from_custom_design;
+    extern uint8_t _field_mode;
+    extern int16_t _active_prod[4];
+    extern int16_t _current_item[7];
+    extern int16_t _last_app;
+    extern int16_t _last_setting;
+    extern int16_t _scanned_field;
+    extern char _g_msg[800];
+    extern int16_t _colony_bldg_saved_screen;
+    extern int16_t _scanned_prod;
+    extern int16_t _refitting_ship_n;
+    extern uint8_t _colony_auto_building;
+    extern int16_t _fields[11];
+    extern s_colors _l_font_color_array;
+    extern s_colors _l_font_dim_color_array;
+    extern int16_t _queue_fields[7];
 
-    inline uint8_t*& _buffer = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00595388});
+    extern uint8_t* _buffer;
 
-    inline s_animation_header*& _bldg_bitm = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595384});
+    extern s_animation_header* _bldg_bitm;
 
-    inline uint8_t*& _desc_record_ptr = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00571F74});
+    extern uint8_t* _desc_record_ptr;
 
-    inline s_animation_header* (&_anims)[7] =
-        *reinterpret_cast<s_animation_header* (*)[7]>(std::uintptr_t{0x00571EE0});
-    inline s_animation_header*& _colsum_pal_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595380});
+    extern s_animation_header* _anims[7];
+    extern s_animation_header* _colsum_pal_anim;
 
     void __cdecl Load_Build_Anims_();
 
@@ -145,10 +144,10 @@ namespace COLBLDG {
 
     char* __cdecl Selection_Name_(int16_t id);
 
-    inline s_mouse_list (&_mouse_list_to)[4] = *reinterpret_cast<s_mouse_list(*)[4]>(std::uintptr_t{0x0055AAB0});
-    inline s_mouse_list& _mouse_list_what = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x0055AAE0});
-    inline s_mouse_list& _mouse_list_which_ship = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x0055AAF0});
-    inline uint8_t& _hacky_speed_refitted_ship_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AB14});
+    extern s_mouse_list _mouse_list_to[4];
+    extern s_mouse_list _mouse_list_what;
+    extern s_mouse_list _mouse_list_which_ship;
+    extern uint8_t _hacky_speed_refitted_ship_flag;
 
     void __cdecl Add_Refited_Ship_To_Queue_();
     int8_t __cdecl Something_Behind_Settting_();

@@ -6,6 +6,8 @@ namespace CMBTSPEC {
     static_assert(sizeof(s_combat_weapon_slot) == 11);
     static_assert(sizeof(s_missile) == 0x1A);
 
+    int32_t _g_engine_sfx_handle;
+
     void __cdecl Draw_Cloak_(int16_t ship_idx, int16_t cloak_type) {
         int16_t unused_x, unused_y;
         int16_t offset_x, offset_y;

@@ -2,9 +2,6 @@
 #include <cstdint>
 
 namespace CMBTFIRE {
-    inline s_combat_bomb_result& _combat_bomb_result =
-        *reinterpret_cast<s_combat_bomb_result*>(std::uintptr_t{ 0x005972b0 });
-
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);
 
     void __cdecl Destroy_Colony_Defense_(int16_t n_to_destroy);

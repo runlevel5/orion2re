@@ -2,8 +2,8 @@
 #include <cstdint>
 
 namespace bolt {
-    inline int16_t (&_head_wide_bolts)[192] = *reinterpret_cast<int16_t(*)[192]>(std::uintptr_t{0x0055BA20});
-    inline int16_t (&_tail_wide_bolts)[192] = *reinterpret_cast<int16_t(*)[192]>(std::uintptr_t{0x0055BBA0});
+    extern int16_t _head_wide_bolts[192];
+    extern int16_t _tail_wide_bolts[192];
 
     void __cdecl Bolt_Segment_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color_base,
                                int16_t color_range, int16_t rand_chance, int16_t rand_range, int16_t min_color, int16_t max_color,

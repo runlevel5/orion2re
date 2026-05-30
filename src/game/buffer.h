@@ -5,23 +5,17 @@
 struct s_file_buffer_entry;
 
 namespace buffer {
-    inline int32_t& _global_load_count =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B30C});
+    extern int32_t _global_load_count;
 
-    inline int16_t& _file_buffer_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057B5BC});
+    extern int16_t _file_buffer_count;
 
-    inline s_file_buffer_entry*& _file_buffer =
-        *reinterpret_cast<s_file_buffer_entry**>(std::uintptr_t{0x0057B5C0});
+    extern s_file_buffer_entry* _file_buffer;
 
-    inline void*& _buffer_space_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0057B5C4});
+    extern void* _buffer_space_seg;
 
-    inline int32_t& _buffer_space_size =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057B5C8});
+    extern int32_t _buffer_space_size;
 
-    inline void*& _buffer_space_ptr =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0057B5CC});
+    extern void* _buffer_space_ptr;
 
     void __cdecl Free_Buffer_Space_();
 

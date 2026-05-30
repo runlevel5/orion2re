@@ -1,6 +1,17 @@
 #include "pch.h"
 
 namespace CMBTFIR2 {
+    int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
+
+    const char s__005510f0[2] = " ";
+    const char s__00557e5c[3] = "\0322";
+    const char s__00557e60[3] = "\n\n";
+    const char s__0055a588[21] = "\0321\030B4\aX255.\0320\aX257. ";
+    const char s__0055a5a0[47] = "\030B7\n\0321\030B0\aX80.\0321\030B3\aX255.\0320\n\0321\030B1\aX80.\0320\aX82. ";
+    const char s__0055a5d0[10] = "\030B6\aX175.";
+    const char s__0055a550[55] = "\n\aX48.-------\aX223.-------\n\0321\030B2\aX80.\0321\030B5\aX255.\0320\n\n\0322";
+    const char s__0055a544[11] = "          ";
+
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx) {
         int16_t bonus = 0;
         uint32_t special_skills = MOX::_leaders[leader_idx].special_skills;

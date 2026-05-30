@@ -71,6 +71,8 @@ workflows:
              - Do not suggest broad rewrites, logic changes, formatting-only churn, or speculative renames.
              - Always present suggested source edits as diff-style patches to the user, not only as high-level prose.
              - Suggested diffs must stay narrowly scoped to the approved cleanup categories.
+             - Variable definitions should be above function definitions.
+             - String constant variables should be inlined in the corresponding CPP file.
 
           4. Record progress in `progress.md`
              - When you begin a review unit, mark it in_progress.

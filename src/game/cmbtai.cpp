@@ -2,6 +2,8 @@
 
 namespace CMBTAI {
 
+int16_t _fleet_target;
+
 /**
  * Checks if all active enemy ships are currently in stasis.
  * If so, releases the smallest enemy ship from stasis to prevent a combat deadlock.

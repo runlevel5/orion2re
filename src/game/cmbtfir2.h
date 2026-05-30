@@ -3,7 +3,7 @@
 #include <cstdint>
 
 namespace CMBTFIR2 {
-    inline int16_t* _artemis_net_chance = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055A538 });
+    extern int16_t _artemis_net_chance[6];
 
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx);
 
@@ -21,7 +21,6 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Get_Fleet_Ordnance_Bonus_(int16_t owner);
 
-    extern int16_t* _artemis_net_chance;
     bool __cdecl Apply_Combat_Artemis_Net_(char strategic);
 
     int16_t __cdecl Used_Teleporter_(int16_t ship_idx);
@@ -30,14 +29,14 @@ namespace CMBTFIR2 {
 
     void __cdecl Set_Boarded_Flag_(int16_t ship_idx);
 
-    inline const char* s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005510F0 }); /* " " */
-    inline const char* s__00557e5c = reinterpret_cast<const char*>(std::uintptr_t{ 0x00557E5C });
-    inline const char* s__00557e60 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00557E60 });
-    inline const char* s__0055a588 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A588 });
-    inline const char* s__0055a5a0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A5A0 });
-    inline const char* s__0055a5d0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A5D0 });
-    inline const char* s__0055a550 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A550 });
-    inline const char* s__0055a544 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A544 });
+    extern const char s__005510f0[2];
+    extern const char s__00557e5c[3];
+    extern const char s__00557e60[3];
+    extern const char s__0055a588[21];
+    extern const char s__0055a5a0[47];
+    extern const char s__0055a5d0[10];
+    extern const char s__0055a550[55];
+    extern const char s__0055a544[11];
 
     int16_t __cdecl Commando_Bonus_(int16_t leader_idx);
 

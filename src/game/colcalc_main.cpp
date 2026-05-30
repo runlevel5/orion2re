@@ -1,5 +1,36 @@
 #include "pch.h"
 
+namespace {
+    const char s_msg_bc_calc[] = "(%s %d * %d + %d * %d : %d BC)\n";
+    const char s_msg_bc_zero[] = "(%s 0 BC)\n";
+    const char s_separator[] = "-------------------\n";
+    const char s_fmt_val_name[] = "%d : %s\n";
+    const char s_fmt_val_msg[] = "%d %s\n";
+
+    const char s_T_15_65[] = "\x07" "T+15,+65.";
+    const char s_fmt_plus_d_pct_s_s[] = "\t%+d%%\t%s%s\r";
+    const char s_fmt_plus_d_pct_s[] = "\t%+d%%\t%s\r";
+    const char s_fmt_d_pct_s[] = "\t%d%%\t%s\r";
+    const char s_fmt_s_00551130[] = "%s";
+    const char s_0[] = "\x1A" "0";
+    const char s_fmt_plus_d_s[] = "\t%+d\t%s\r";
+    const char s_fmt_plus_d_s_2[] = "\t%+d\t %s\r";
+    const char s_fmt_plus_d_s_s[] = "\t%+d\t%s %s\r";
+    const char s_fmt_s_s_s[] = "\t%s\t%s %s\r";
+    const char s_fmt_s_s[] = "\t%s\t%s\r";
+    const char s_fmt_d_s[] = "\t%d\t%s\r";
+    const char s_fmt_minus_d_s[] = "\t-%d\t%s\r";
+    const char s_fmt_plus_d_s_3[] = "\t+%d\t%s\r";
+    const char s_newline_0055136c[] = "\r";
+
+    const char* const s_str = s_fmt_s_00551130;
+    const char* const s_newline = s_newline_0055136c;
+    const char* const s_tab_s_s_r = s_fmt_s_s;
+    const char* const s_tab_d_s_s_r = s_fmt_plus_d_s_s;
+    const char* const s_tab_d_s_r = s_fmt_plus_d_s;
+    const char* const s_tab_plus_d_s_r = s_fmt_plus_d_s_3;
+}
+
 namespace COLCALC {
     void __cdecl Colony_Morale_(s_colony* colony, char* debug) {
         int8_t owner = colony->owner;
@@ -1699,7 +1730,7 @@ namespace COLCALC {
     }
 
 
-    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(const s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out) {
         int32_t idx = (int32_t)player_idx;
         int16_t food_per_farmer;
 
@@ -1767,7 +1798,7 @@ namespace COLCALC {
         return (int16_t)(int8_t)_colony_calc_food_cache[idx];
     }
 
-    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(const s_colony* colony, int16_t type, int16_t player_idx, s_colony_job_production* out) {
         int16_t base_industry;
 
         if ((int16_t)colony->owner == (int16_t)type && out == nullptr) {
@@ -1806,7 +1837,7 @@ namespace COLCALC {
 
         return (int16_t)(int8_t)_colony_calc_industry_cache[idx];
     }
-    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Empire_Base_Research_Produced_(const s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out) {
         int32_t idx = (int32_t)player_idx;
         uint16_t base_research_per_scientist;
 

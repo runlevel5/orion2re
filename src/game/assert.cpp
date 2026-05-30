@@ -2,6 +2,9 @@
 
 namespace assert {
 
+    char s__00558488[8] = "    ";
+    char s__00558490[8] = "*";
+
     int __cdecl hgetch_() {
         fonts::PSTRS_(0, 24, s__00558490);
 

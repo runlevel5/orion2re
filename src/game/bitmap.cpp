@@ -1,6 +1,16 @@
 #include "pch.h"
 
 namespace bitmap {
+    const char s_Add_Picture_To_Bitmap_targetmust_0055b770[] = "Add_Picture_To_Bitmap targetmust be a bitmap.";
+    uint32_t _pixel_count;
+    uint8_t* _bitmap_temp1;
+    uint32_t _bitmap_temp2;
+    const char s_Brighten_perecnt_needs_to_be_bet_0055b714[] = "Brighten perecnt needs to be between 0 - 100";
+    const char s_Not_Enough_Space_For_Brighten_Pa_0055b744[] = "Not Enough Space For Brighten Palette Block";
+    uint8_t* _brighten_palette_seg;
+    int8_t _brighten_palette_levels;
+    int32_t _brighten_start_color;
+
     void __cdecl Get_Bitmap_Actual_Size_(s_animation_header* header, int16_t* out_min_x, int16_t* out_min_y, int16_t* out_actual_width, int16_t* out_actual_height) {
         animate::_animation_header = header;
         int16_t width = header->width;

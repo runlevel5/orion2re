@@ -67,6 +67,11 @@ workflows:
             - arrays must use the correct element type and element count
             - structs must use the correct structure type already present in the project
           * Recover the initializer from memory contents when one exists.
+            - when restoring any non-zero, non-null, or mixed initializer, read the full proven storage span of the variable, not just an initial prefix
+            - for arrays, read every element in the proven array extent and account for the entire array contents before deciding whether to emit an explicit initializer or rely on zero-initialization for a verified all-zero tail
+            - for structs or arrays of structs, inspect enough typed fields and raw bytes to cover the entire proven object extent; do not stop after finding the first few meaningful members
+            - if the variable has any non-zero bytes, continue reading until the full object boundary is verified against layout, next symbol, and code-proven size
+            - if a reader truncates output or returns suspicious data, re-read in smaller chunks or with helper readers until the entire object has been covered with confidence
           * Replace the inline address stub in the header with an extern declaration.
           * Add or update the real variable definition and, if needed, its default value in the matching .cpp file.
 
@@ -79,6 +84,9 @@ workflows:
           * If the variable is actually an array, declare it as an array instead of pointer-like storage.
           * If Ghidra shows a scalar but project usage or disassembly proves an array or larger object, use the larger correct shape.
           * If the variable has a non-zero or non-null initial value, emit that value in the .cpp definition.
+          * Never recover an initializer from a partial read of the object.
+          * Before emitting any explicit initializer, verify that you have read the full proven object extent and that no unread bytes inside that extent could change the emitted value.
+          * If only part of an array, struct, or aggregate initializer has been read, stop and continue reading until the full value is known instead of guessing or emitting a prefix-only initializer.
           * If the variable is zero-initialized, use an explicit zero-style initializer only when it matches local code style.
           * If the variable points at another known symbol, prefer the project symbol over a raw address literal when you can prove it.
           * If a pointer field or initializer targets a known symbol, prefer the symbol name over a raw address literal.
@@ -105,6 +113,29 @@ workflows:
           * Verify the symbol in Ghidra before trusting the project or decompiler.
           * Explicitly verify whether the address is the primary storage for a single variable or an alias into another object before recovering it.
           * Inspect memory bytes, labels, data definitions, xrefs, and nearby disassembly to determine the real variable shape.
+          * Validate array lengths explicitly instead of trusting the current Ghidra array type.
+          * For every candidate array, determine length from disassembly first:
+            - identify every code path that materializes the base address or references the symbol
+            - inspect loop bounds, compare-immediates, end pointers, and induction-variable increments to recover the highest proven accessed element index
+            - convert proven index range and stride into a minimum proven element count
+            - if the code uses pointer-end comparison, compute the exact covered byte range from start address, increment, and terminating address
+            - if the code uses scaled indexing or base-plus-register addressing, verify the maximum reachable register value in that loop rather than assuming larger nearby data belongs to the same array
+          * Validate array lengths against surrounding storage layout:
+            - inspect the next labeled symbol and next defined data object to find the maximum non-overlapping size supported by the current memory map
+            - if adjacent unlabeled bytes exist, do not automatically absorb them into the array; first prove they are reached by code or belong to the same logical object
+            - if a larger span contains repeated patterns or non-zero bytes but no proven accesses, treat that as separate anonymous data until proven otherwise
+          * Validate array lengths with raw bytes:
+            - dump the exact byte span from the candidate base to the next symbol and decode it using the candidate element width
+            - if a raw reader returns suspicious all-zero data, re-read with helper readers like `bytes_at`, `u8`, `u16`, and `u32` before drawing conclusions
+            - use raw bytes to confirm both initialized prefix values and any zero-filled tail that would become part of the definition
+          * Validate array lengths against cross-references:
+            - check direct xrefs to the base symbol
+            - also scan for direct operands or references into interior addresses of the candidate array and any adjacent anonymous blocks
+            - if no code reaches the adjacent block, do not widen the named array just because the bytes are non-zero
+          * When evidence disagrees, distinguish these cases explicitly:
+            - Ghidra array markup is too small and code proves accesses past the current end: widen the array
+            - Ghidra array markup is large but code only proves a prefix and the rest overlaps another symbol: shrink or split as required by layout
+            - nearby anonymous bytes exist but are not proven accesses: keep the named array conservative and report the anonymous block separately
           * For tables and structs, prefer typed listing and component reads over a single raw memory read.
           * When reading raw data through Ghidra RPC, verify that the extraction method actually returned populated bytes; if a direct byte read looks suspicious, unexpectedly zero-filled, or conflicts with the listing UI, re-read through typed data/components or helper readers such as `bytes_at`, `u8`, `u16`, and `u32` before trusting the result.
           * Cross-check structured reads with raw bytes when values look suspicious.

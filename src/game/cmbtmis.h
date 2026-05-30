@@ -2,10 +2,8 @@
 #include <cstdint>
 
 namespace CMBTMIS {
-    inline int16_t (&_missile_group_offset)[16][16] =
-        *reinterpret_cast<int16_t(*)[16][16]>(std::uintptr_t{0x0054F1C8});
-    inline int16_t (&_torpedo_group_offset)[16][8] =
-        *reinterpret_cast<int16_t (*)[16][8]>(std::uintptr_t{0x0054F3C8});
+    extern int16_t _missile_group_offset[16][16];
+    extern int16_t _torpedo_group_offset[16][8];
 
     int16_t __cdecl Missile_Type_(int16_t missile_idx);
 
@@ -51,8 +49,8 @@ namespace CMBTMIS {
 
     void __cdecl Fire_Missile_(int16_t source_idx, int16_t target_idx, int16_t weapon_slot, int16_t is_anti_rocket);
 
-    inline char* s__005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
-    inline const char* s_combat_lbx_00551244 = reinterpret_cast<const char*>(std::uintptr_t{0x00551244}); // "combat.lbx"
+    extern const char s__005510f0[2];
+    extern const char s_combat_lbx_00551244[11];
 
     void __cdecl Draw_Missile_Status_(int16_t x_off, int16_t y_off, int16_t missile_idx);
 
