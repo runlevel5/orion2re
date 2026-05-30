@@ -3,96 +3,74 @@
 namespace transprt {
     using user_rec_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
-    inline uint32_t& _num_net_players = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00596200});
+    extern uint32_t _num_net_players;
 
-    inline int32_t& _tpSending =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A78});
+    extern int32_t _tpSending;
 
-    inline uint32_t& _tpRecNum =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A7C});
+    extern uint32_t _tpRecNum;
 
-    inline uint32_t& _tpMessageIsProcessed = 
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A80});
+    extern uint8_t _tpMessageIsProcessed;
 
-    inline uint32_t& _tpSendImmediateBurst = 
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A84});
+    extern uint32_t _tpSendImmediateBurst;
 
-    inline uint32_t& _tpRecSrc =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A88});
+    extern uint32_t _tpRecSrc;
 
-    inline int32_t& _tpLastSendSuccessful =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A8C});
+    extern int32_t _tpLastSendSuccessful;
 
-    inline int32_t& _tpInitialized = 
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A4C});
+    extern int32_t _tpInitialized;
 
-    inline uint8_t*& _tpFullSendBuffer = 
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00560A54});
+    extern uint8_t* _tpFullSendBuffer;
 
-    inline uint8_t*& _tpRecPacketBuffer = 
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00560A58});
+    extern uint8_t* _tpRecPacketBuffer;
 
-    inline uint8_t*& _tpRecUserBuffer = 
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00560A5C});
+    extern uint8_t* _tpRecUserBuffer;
 
-    inline uint16_t& _tpBufferSize = 
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00560A60});
+    extern uint16_t _tpBufferSize;
 
-    inline uint8_t*& _tpMessageData = 
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00560A64});
+    extern uint8_t* _tpMessageData;
 
-    inline uint16_t& _tpSendDataLength = 
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00560A68});
+    extern uint16_t _tpSendDataLength;
 
-    inline uint8_t& _tpForceBurstSend = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560A48});
+    extern uint8_t _tpForceBurstSend;
 
-    inline uint32_t& _tpDestID = 
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A6C});
+    extern uint32_t _tpDestID;
 
-    inline uint32_t& _tpMessageStamp = 
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A74});
+    extern uint32_t _tpMessageStamp;
 
-    inline uint32_t& DAT_00560a70 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A70});
+    extern uint32_t DAT_00560a70;
 
-    inline uint16_t& _tpCurrentUserType = 
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00560A90});
+    extern uint16_t _tpCurrentUserType;
 
-    inline int32_t& _tpTotalPackets = 
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A98});
+    extern int32_t _tpTotalPackets;
 
-    inline int32_t& _tpBurstNum = 
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A9C});
+    extern int32_t _tpBurstNum;
 
-    inline DWORD& _tpLastBurstTickCount = *reinterpret_cast<DWORD*>(std::uintptr_t{0x00560AA0});
+    extern DWORD _tpLastBurstTickCount;
 
-    inline int32_t& _tpLastBurstStartPacket = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560AAC});
+    extern int32_t _tpLastBurstStartPacket;
 
-    inline clock_t& _tpLastBurstClock = *reinterpret_cast<clock_t*>(std::uintptr_t{0x00592588});
+    extern clock_t _tpLastBurstClock;
 
-    inline uint32_t& DAT_00560a94 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A94});
+    extern uint32_t DAT_00560a94;
 
-    inline uint8_t& _tpSendImmediateBurstFlag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560AA8});
+    extern uint8_t _tpSendImmediateBurstFlag;
 
-    inline uint32_t& _queuedSenderCount = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A44});
-    inline int32_t& _tpBlockReceiving = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560AA4});
-    inline uint32_t (&_queuedSenders)[20] = *reinterpret_cast<uint32_t(*)[20]>(std::uintptr_t{0x00591F50});
+    extern uint32_t _queuedSenderCount;
+    extern int32_t _tpBlockReceiving;
+    extern uint32_t _queuedSenders[20];
 
-    inline s_transport_packet& _tpSendBuffer =
-        *reinterpret_cast<s_transport_packet*>(std::uintptr_t{0x00592428});
+    extern s_transport_packet _tpSendBuffer;
 
-    inline uint8_t (&_tpAckFlags)[128] =
-        *reinterpret_cast<uint8_t(*)[128]>(std::uintptr_t{0x005923A8});
+    extern uint8_t _tpAckFlags[128];
 
     struct s_tp_receive_state {
         uint8_t packets_received[256];
         uint8_t unknown_100[768];
     };
 
-    inline s_tp_receive_state& _tpReceiveState =
-        *reinterpret_cast<s_tp_receive_state*>(std::uintptr_t{0x00591FA0});
+    extern s_tp_receive_state _tpReceiveState;
 
-    inline uint32_t (&_tpOldMessages)[128] = 
-        *reinterpret_cast<uint32_t(*)[128]>(std::uintptr_t{0x00592590});
+    extern uint32_t _tpOldMessages[128];
 
     void __cdecl ResetSending_();
 
@@ -108,8 +86,7 @@ namespace transprt {
 
     int32_t __cdecl SendLargeUserMessage_(uint16_t type, uint8_t* data, uint16_t len, uint32_t dest);
 
-    inline user_rec_fn& _userRecFunc =
-        *reinterpret_cast<user_rec_fn*>(std::uintptr_t{0x005923A0});
+    extern user_rec_fn _userRecFunc;
 
     int8_t __cdecl InitTransportLayer_(uint16_t buffer_size);
 

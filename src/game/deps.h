@@ -6,10 +6,13 @@
 #include <mmsystem.h>
 #include <time.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <conio.h>
 #include <io.h>
+#include <process.h>
 #include <math.h>
 #include <direct.h>
 
@@ -20,7 +23,6 @@
 #include "../dplay.h"
 
 #include "funcs.h"
-#include "accss.h"
 
 #include "consts.h"
 
@@ -32,7 +34,6 @@
 
 #include "random.h"
 #include "platform.h"
-#include "alloc.h"
 #include "allocate.h"
 #include "animate.h"
 #include "clipped.h"
@@ -192,7 +193,6 @@
 #include "cmbtdrw1.h"
 #include "dip_scrn.h"
 #include "colsysdi.h"
-#include "_antarans.h"
 #include "antarans.h"
 #include "antaroom.h"
 #include "aitech.h"
@@ -221,4 +221,3 @@
 #include "colbomb.h"
 #include "aibomb.h"
 #include "flcqueue.h"
-#include "_global_combat_data.h"

@@ -20,18 +20,18 @@ namespace platform {
 	bool g_pending_toggle_pages;
 	int16_t g_video_mode;
 	uint32_t g_available_mem;
-	int32_t g_screen_res_x = 640;
-	int32_t g_screen_res_y = 480;
+	int32_t& g_screen_res_x = video::g_screen_res_x;
+	int32_t& g_screen_res_y = video::g_screen_res_y;
 	LPDIRECTDRAWSURFACE g_primary_surface;
 	LPDIRECTDRAWSURFACE g_backbuffer_surface;
-	LPDIRECTDRAWSURFACE g_offscreen_surface_1;
-	LPDIRECTDRAWSURFACE g_offscreen_surface_2;
+	LPDIRECTDRAWSURFACE& g_offscreen_surface_1 = video::g_offscreen_surface_1;
+	LPDIRECTDRAWSURFACE& g_offscreen_surface_2 = video::g_offscreen_surface_2;
 	LPDIRECTDRAWSURFACE g_cursor_surface_1;
 	int32_t _offscreen_mouse_shape;
 	LPDIRECTDRAWSURFACE g_cursor_surface_2;
 	LPVOID _cursor_surface;
-	LPDIRECTDRAWPALETTE g_palette;
-	tagPALETTEENTRY g_palette_entries[256];
+	LPDIRECTDRAWPALETTE& g_palette = video::g_palette;
+	tagPALETTEENTRY (&g_palette_entries)[256] = video::g_palette_entries;
 	uint32_t DAT_00578e20;
 	uint16_t DAT_0057931c;
 	uint32_t g_frame_count;
@@ -178,34 +178,19 @@ namespace platform {
         // Original code overwrites g_os_ver with the build number (high word)
         g_os_ver >>= 16;
 
-        if (!__heap_init()) {
-            __amsg_exit(28); // _RT_HEAP
-        }
-
-        if (!__mtinit()) {
-            __amsg_exit(16); // _RT_THREAD
-        }
-
-        __ioinit();
-        ___initmbctable();
-
         g_command_line = GetCommandLineA();
-        g_env_strings = ___crtGetEnvironmentStringsA();
+        g_env_strings = nullptr;
 
-        if (g_env_strings == nullptr || g_command_line == nullptr) {
-            __exit(-1);
+        if (g_command_line == nullptr) {
+            ExitProcess(static_cast<UINT>(-1));
         }
-
-        __setargv();
-        __setenvp();
-        __cinit();
 
         // Skip the executable name in the command line
         char* cmd_args = g_command_line;
         if (cmd_args[0] == '"') {
             cmd_args++;
             while (*cmd_args != '\0' && *cmd_args != '"') {
-                if (__ismbblead(static_cast<uint8_t>(*cmd_args))) {
+                if (IsDBCSLeadByteEx(CP_ACP, static_cast<BYTE>(*cmd_args))) {
                     cmd_args++;
                 }
                 if (*cmd_args != '\0') {
@@ -238,7 +223,7 @@ namespace platform {
         HINSTANCE h_instance = GetModuleHandleA(nullptr);
         int return_code = WinMain_Proxy(h_instance, nullptr, cmd_args, static_cast<int>(show_cmd));
 
-        __exit(return_code);
+        ExitProcess(static_cast<UINT>(return_code));
     }
 
     void __cdecl Parse_Ten_Cmd_Parameter(const char* input_str) {
@@ -255,7 +240,7 @@ namespace platform {
             return;
         }
 
-        char* copy_buffer = static_cast<char*>(_malloc(input_len + 4));
+        char* copy_buffer = static_cast<char*>(malloc(input_len + 4));
         if (copy_buffer == nullptr) {
             return;
         }
@@ -281,7 +266,7 @@ namespace platform {
             ::g_ten_game_number = (uint8_t)parsed_val;
         }
 
-        _free(copy_buffer);
+        free(copy_buffer);
     }
 
     HWND cleanup() {
@@ -1255,7 +1240,7 @@ namespace platform {
         HWND existing_window = FindWindowA("Microprose", "Microprose");
         if (existing_window != nullptr) {
             MessageBoxA(nullptr, "MOO II is already running.", "Microprose", MB_OK | MB_ICONHAND); // 0x10
-            __exit(1);
+            exit(1);
         }
 
 #ifdef FULSCREEN
@@ -1289,7 +1274,7 @@ namespace platform {
         Create_Direct_Draw(4);
 
         bool has_lost_focus = false;
-        g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(MOX2::thunk_main2_, 0xFFFF, nullptr));
+        g_worker_thread_handle = reinterpret_cast<HANDLE>(_beginthread(MOX2::thunk_main2_, 0xFFFF, nullptr));
 
         do {
             if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {

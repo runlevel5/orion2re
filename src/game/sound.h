@@ -3,93 +3,64 @@
 extern "C" HRESULT WINAPI DirectSoundCreate(LPCGUID pcGuidDevice, struct IDirectSound** ppDS, IUnknown* pUnkOuter);
 
 namespace sound {
-    inline int16_t (&_ds_volume_table)[101] =
-        *reinterpret_cast<int16_t (*)[101]>(std::uintptr_t{0x0055B3B8});
+    extern int16_t _ds_volume_table[101];
 
-    inline int16_t* _stream_volume_table_end =
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B482});
+    extern uint32_t _audioInitialized;
 
-    inline uint32_t& _audioInitialized =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B484});
+    extern uint8_t _soundOn;
 
-    inline uint8_t& _soundOn =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B488});
+    extern uint8_t _soundErrorOccurred;
 
-    inline uint8_t& _soundErrorOccurred =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B48C});
+    extern MMRESULT _soundTimerId;
 
-    inline MMRESULT& _soundTimerId =
-        *reinterpret_cast<MMRESULT*>(std::uintptr_t{0x0055B490});
+    extern uint8_t _soundTimerActive;
 
-    inline uint8_t& _soundTimerActive =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B494});
+    extern uint32_t _soundTimerRunning;
 
-    inline uint32_t& _soundTimerRunning =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B498});
+    extern uint32_t _soundTimerStopFlag;
 
-    inline uint32_t& _soundTimerStopFlag =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B49C});
+    extern const char _default_sound_file_name[10]; // "sound.lbx"
 
-    inline const char* _default_sound_file_name =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B4A8}); // "sound.lbx"
+    extern const char _default_music_file_name[10]; // "music.lbx"
 
-    inline const char* _default_music_file_name =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B4D0}); // "music.lbx"
+    extern const char _stream_file_name[11]; // "stream.lbx"
 
-    inline const char* _stream_file_name =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B4F8}); // "stream.lbx"
+    extern void* _soundBuffer;
 
-    inline void*& _soundBuffer =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x0055B520 });
+    extern uint32_t _soundBufferSize;
 
-    inline uint32_t& _soundBufferSize =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B524 });
+    extern uint32_t _soundTimerLock;
 
-    inline uint32_t& _soundTimerLock =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B534});
+    extern void* _streamBuffer1;
 
-    inline void*& _streamBuffer1 =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0055B4A0});
+    extern void* _streamBuffer2;
 
-    inline void*& _streamBuffer2 =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0055B4A4});
+    extern uint8_t _soundFxActive;
 
-    inline uint8_t& _soundFxActive =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B8F8});
+    extern int32_t _global_stream_volume;
 
-    inline int32_t& _global_stream_volume =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B8FC});
+    extern uint8_t _loopStream;
 
-    inline uint8_t& _loopStream =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B900});
+    extern int32_t _doubleBufferLoops;
 
-    inline int32_t& _doubleBufferLoops =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B904});
+    extern uint8_t _command;
 
-    inline uint8_t& _command =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B908});
+    extern uint8_t _streamIncVal;
 
-    inline uint8_t& _streamIncVal =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B90C});
+    extern const char s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910[68]; // "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
 
-    inline const char* s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B910}); // "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
+    extern const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954[65]; // "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
 
-    inline const char* s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B954}); // "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
+    extern const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998[64]; // "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
 
-    inline const char* s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B998}); // "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
+    extern const char s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer[52]; // "STREAM ERROR: (Play_Stream) Unable to lock buffer."
 
-    inline const char* s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B9D8}); // "STREAM ERROR: (Play_Stream) Unable to lock buffer."
+    extern const char s_Cant_Read[18];
 
-    inline const char* s_Cant_Read = reinterpret_cast<const char*>(std::uintptr_t{0x0055BA0C});
-
-    inline const char* s_data_0055c20c = reinterpret_cast<const char*>(std::uintptr_t{0x0055C20C}); // "data"
-    inline const char* s_fmt_0055c214 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C214});  // "fmt "
-    inline const char* s_WAVE_0055c21c = reinterpret_cast<const char*>(std::uintptr_t{0x0055C21C}); // "WAVE"
-    inline const char* s_RIFF_0055c224 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C224}); // "RIFF"
+    extern const char s_data_0055c20c[5]; // "data"
+    extern const char s_fmt_0055c214[5];  // "fmt "
+    extern const char s_WAVE_0055c21c[5]; // "WAVE"
+    extern const char s_RIFF_0055c224[5]; // "RIFF"
 
     void __cdecl Copy_FourCC_(char* dest, const char* src);
 
@@ -111,51 +82,35 @@ namespace sound {
         return fn(hmmio, lpmmioinfo, wFlags);
     }
 
-    inline uint32_t& _streamAvailable2 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0057B700});
+    extern uint32_t _streamAvailable2;
 
-    inline s_lbx_stream_header& _musicLbxHandle =
-        *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057B708});
+    extern s_lbx_stream_header _musicLbxHandle;
 
-    inline IDirectSound*& _dsound =
-        *reinterpret_cast<IDirectSound**>(std::uintptr_t{0x0057C754});
+    extern IDirectSound* _dsound;
 
-    inline HRESULT& _dsound_hr =
-        *reinterpret_cast<HRESULT*>(std::uintptr_t{0x0057C758});
+    extern HRESULT _dsound_hr;
 
-    inline uint32_t& _streamAvailable1 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0057C75C});
+    extern uint32_t _streamAvailable1;
 
-    inline int32_t& _dsMasterVolume =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057C760});
+    extern int32_t _dsMasterVolume;
 
-    inline int32_t& _dsMasterPan =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057C764});
+    extern int32_t _dsMasterPan;
 
-    inline s_sound_index (&_soundIndices)[33] =
-        *reinterpret_cast<s_sound_index (*)[33]>(std::uintptr_t{0x0057C768});
+    extern s_sound_index _soundIndices[33];
 
-    inline LPDIRECTSOUNDBUFFER& _dsound_buffer =
-        *reinterpret_cast<LPDIRECTSOUNDBUFFER*>(std::uintptr_t{0x0057CC90});
+    extern LPDIRECTSOUNDBUFFER _dsound_buffer;
 
-    inline DSBUFFERDESC1& _dsound_buffer_desc =
-        *reinterpret_cast<DSBUFFERDESC1*>(std::uintptr_t{0x0057CC98});
+    extern DSBUFFERDESC1 _dsound_buffer_desc;
 
     // Sound_Update_ walks one extra 0x20-byte slot in the binary while helper
     // functions still treat 0..15 as the valid channel index range.
-    inline s_sound_channel (&_soundChannels)[16] =
-        *reinterpret_cast<s_sound_channel (*)[16]>(std::uintptr_t{0x0057CCB0});
+    extern s_sound_channel _soundChannels[16];
 
-    inline const char* s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B538}); // "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
-    inline const char* s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B57C}); // "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
-    inline const char* s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B5BC}); // "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
-    inline const char* s_SOUND_ERROR___Play_Sound_File__U_0055b5fc =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B5FC}); // "SOUND ERROR: (Play_Sound_File) Unable to lock buffer."
-    inline const char* s_SOUND_ERROR__Reading_Wave_0055b634 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B634}); // "SOUND ERROR: Reading Wave"
+    extern const char s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538[67]; // "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
+    extern const char s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c[64]; // "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
+    extern const char s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc[63]; // "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
+    extern const char s_SOUND_ERROR___Play_Sound_File__U_0055b5fc[56]; // "SOUND ERROR: (Play_Sound_File) Unable to lock buffer."
+    extern const char s_SOUND_ERROR__Reading_Wave_0055b634[26]; // "SOUND ERROR: Reading Wave"
 
     void __cdecl Stop_Sound_Timer_And_Wait2_();
 
@@ -169,20 +124,15 @@ namespace sound {
 
     void __cdecl Resume_Timer2_();
 
-    inline s_lbx_stream_header& _soundLbxHandle =
-        *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057CEB0});
+    extern s_lbx_stream_header _soundLbxHandle;
 
-    inline s_wave_stream_header& _streamLbxHandle =
-        *reinterpret_cast<s_wave_stream_header*>(std::uintptr_t{0x00589A20});
+    extern s_wave_stream_header _streamLbxHandle;
 
-    inline uint8_t& _close_stream =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055C208});
+    extern uint8_t _close_stream;
 
-    inline uint8_t& _musicActive =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0058AA6C});
+    extern uint8_t _musicActive;
 
-    inline s_sound_stream& _stream_data =
-        *reinterpret_cast<s_sound_stream*>(std::uintptr_t{0x0057E130});
+    extern s_sound_stream _stream_data;
 
     void __stdcall Sound_Timer_Callback_(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4, uint32_t p5);
 

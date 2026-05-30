@@ -864,7 +864,7 @@ namespace fonts {
             blob = (uint8_t*)farload::Farload_(filename, 0);
             _palette_block = allocate::Allocate_Space_(0x3164);
         } else {
-            _free(_current_font_blob);
+            free(_current_font_blob);
             _current_font_blob = nullptr;
             blob = (uint8_t*)farload::Farload_(filename, 0);
         }

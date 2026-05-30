@@ -6,17 +6,13 @@ struct s_network;
 namespace simmodem {
     using recv_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
-    inline uint8_t*& _open_game_port =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055C050});
+    extern uint8_t* _open_game_port;
 
-    inline uint8_t& _modemInitialized =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055C054});
+    extern uint8_t _modemInitialized;
 
-    inline int8_t& _connected_to_id =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x00589A18});
+    extern int8_t _connected_to_id;
 
-    inline recv_fn& _modemUserRecFunc =
-        *reinterpret_cast<recv_fn*>(std::uintptr_t{0x00589A14});
+    extern recv_fn _modemUserRecFunc;
 
     inline void __cdecl Uninit_Modem_() {
         using Fn = void(__cdecl*)();

@@ -6,94 +6,68 @@ struct IDirectDrawSurface;
 
 namespace video {
 	// Variables
-	inline int32_t& g_screen_res_x =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1A8 });
+	extern int32_t g_screen_res_x;
 
-	inline int32_t& g_screen_res_y =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1AC });
+	extern int32_t g_screen_res_y;
 
-	inline IDirectDrawSurface*& g_offscreen_surface_1 =
-		*reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{ 0x00578E58 });
+	extern IDirectDrawSurface* g_offscreen_surface_1;
 
-	inline IDirectDrawSurface*& g_offscreen_surface_2 =
-		*reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{ 0x00579334 });
+	extern IDirectDrawSurface* g_offscreen_surface_2;
 
-	inline uint8_t*& _video_memory = *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x005792F0 });
+	extern uint8_t* _video_memory;
 
-	inline int16_t& _current_mouse_list_ptr =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A94 });
+	extern int16_t _current_mouse_list_ptr;
 
-	inline int16_t& _current_mouse_shape =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578AC4 });
+	extern int16_t _current_mouse_shape;
 
-	inline uint8_t*& _current_video_page = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005792F8});
+	extern uint8_t* _current_video_page;
 
-	inline uint32_t& screen_dump_flag =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1A0 });
+	extern uint32_t screen_dump_flag;
 
 	struct s_scan_list_entry {
 		int16_t min_x;
 		int16_t max_x;
 	};
 
-	inline int32_t& screen_refresh_flag =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1B4 });
+	extern int32_t screen_refresh_flag;
 
-	inline int16_t& _old_screen_dump_flag =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005792F4 });
+	extern int16_t _old_screen_dump_flag;
 
-	inline int16_t& _old_screen_refresh_flag =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00579340 });
+	extern int16_t _old_screen_refresh_flag;
 
-	inline s_scan_list_entry*& _refresh_scan_list =
-		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x00579348 });
+	extern s_scan_list_entry* _refresh_scan_list;
 
-	inline s_scan_list_entry*& _refresh_stencil_list =
-		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x0057934C });
+	extern s_scan_list_entry* _refresh_stencil_list;
 
-	inline uint8_t*& _mouse_palette =
-		*reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00578AB0 });
+	extern uint8_t* _mouse_palette;
 
-	inline uint32_t& _screen_pixel_size =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b0 });
+	extern uint32_t _screen_pixel_size;
 
-	inline auto& _glass_remap_colors = *reinterpret_cast<uint8_t(*)[16][256]>(std::uintptr_t{ 0x00579998 });
+	extern uint8_t _glass_remap_colors[16][256];
 
-	inline s_glass_color (&_glass_colors)[16] =
-		*reinterpret_cast<s_glass_color(*)[16]>(std::uintptr_t{ 0x00579858 });
+	extern s_glass_color _glass_colors[16];
 
-	inline IDirectDrawPalette*& g_palette =
-		*reinterpret_cast<IDirectDrawPalette**>(std::uintptr_t{ 0x00578E64 });
+	extern IDirectDrawPalette* g_palette;
 
-	inline tagPALETTEENTRY (&g_palette_entries)[256] =
-		*reinterpret_cast<tagPALETTEENTRY (*)[256]>(std::uintptr_t{ 0x00578EE8 });
+	extern tagPALETTEENTRY g_palette_entries[256];
 
 	// Address 0x579350 is the base of the current palette status array
-	inline s_palette_entry (&_current_palette)[256] =
-		*reinterpret_cast<s_palette_entry(*)[256]>(std::uintptr_t{ 0x00579350 });
+	extern s_palette_entry _current_palette[256];
 
-	inline uint8_t* (&_palette_list)[65] =
-		*reinterpret_cast<uint8_t*(*)[65]>(std::uintptr_t{ 0x00579750 });
+	extern uint8_t* _palette_list[65];
 
-	inline uint8_t* _palette_reds =
-		reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579898 });
+	extern uint8_t _palette_reds[256];
 
-	inline uint8_t& DAT_00579354 =
-		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579354 });
+	extern uint16_t _is_initializing;
+	extern s_mouse_list _default_mouse_list;
+	extern uint8_t DAT_00578b58;
 
-	inline uint16_t& _is_initializing = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B17C });
-	inline s_mouse_list& _default_mouse_list = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x0055B190 });
-	inline uint8_t& DAT_00578b58 = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578B58 });
+	extern int16_t _copy_to_on_page_flag;
 
-	inline int16_t& _copy_to_on_page_flag =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578e60 });
-
-	inline int16_t& _screen_window_y1 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DF4 });
-	inline int16_t& _screen_window_y2 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DF8 });
-	inline int16_t& _screen_window_x1 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DFC });
-	inline int16_t& _screen_window_x2 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578E00 });
-
-	inline uint8_t* DAT_005A56E0 = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A56E0 });
+	extern int16_t _screen_window_y1;
+	extern int16_t _screen_window_y2;
+	extern int16_t _screen_window_x1;
+	extern int16_t _screen_window_x2;
 
 	// Functions
 	void __cdecl Set_Refresh_Stencil_();

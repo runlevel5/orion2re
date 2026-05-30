@@ -7,21 +7,21 @@ namespace strings {
 
     void __cdecl Swap_Char_(uint8_t* a, uint8_t* b);
 
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
-    inline const char* s_plus_00551118 = reinterpret_cast<const char*>(std::uintptr_t{0x00551118});
-    inline const char* s_minus_0055111c = reinterpret_cast<const char*>(std::uintptr_t{0x0055111C});
-    inline const char* s_space_00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
-    inline const char* s_B_005560e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005560E4});
-    inline const char* s_S_005569cc = reinterpret_cast<const char*>(std::uintptr_t{0x005569CC});
-    inline const char* s_O_00556afc = reinterpret_cast<const char*>(std::uintptr_t{0x00556AFC});
-    inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED4});
-    inline const char* s_M_00557ed8 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED8});
-    inline const char* s_fmt_plus_d_00557ed0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED0});
-    inline const char* s_ld_00558280 = reinterpret_cast<const char*>(std::uintptr_t{0x00558280}); // "%ld"
-    inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
-    inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); /* " 1" */
-    inline const char* s__0055ac34 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC34}); /* "\t" */
-    inline const char* s_t_T0_5_124__0055ac38 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC38}); /* " t T0,5,124." */
+    extern const char s__00551100[1];
+    extern const char s_plus_00551118[2];
+    extern const char s_minus_0055111c[2];
+    extern const char s_space_00551120[2];
+    extern const char s_B_005560e4[2];
+    extern const char s_S_005569cc[2];
+    extern const char s_O_00556afc[2];
+    extern const char s_A_00557ed4[2];
+    extern const char s_M_00557ed8[2];
+    extern const char s_fmt_plus_d_00557ed0[4];
+    extern const char s_ld_00558280[4]; // "%ld"
+    extern const char s_0_0055110c[3];
+    extern const char s_1_00551110[3];
+    extern const char s__0055ac34[2]; /* "\t" */
+    extern const char s_t_T0_5_124__0055ac38[13];
 
     void Load_Strings();
 

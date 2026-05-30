@@ -2,7 +2,7 @@
 
 namespace bitio {
     BIT_BUF* __cdecl OpenInputBitBuffer_(uint8_t* buffer) {
-        BIT_BUF* bit_buf = (BIT_BUF*)_malloc(sizeof(BIT_BUF));
+        BIT_BUF* bit_buf = (BIT_BUF*)malloc(sizeof(BIT_BUF));
         if (bit_buf != nullptr) {
             bit_buf->buf = buffer;
             bit_buf->rack = 0;
@@ -13,7 +13,7 @@ namespace bitio {
     }
 
     BIT_BUF* __cdecl OpenOutputBitBuffer_(uint8_t* buffer) {
-        BIT_BUF* bit_buf = (BIT_BUF*)_malloc(sizeof(BIT_BUF));
+        BIT_BUF* bit_buf = (BIT_BUF*)malloc(sizeof(BIT_BUF));
         if (bit_buf != nullptr) {
             bit_buf->buf = buffer;
             bit_buf->rack = 0;
@@ -24,7 +24,7 @@ namespace bitio {
     }
 
     void __cdecl CloseInputBitBuffer_(BIT_BUF* bit_buf) {
-        _free(bit_buf);
+        free(bit_buf);
     }
 
     uint32_t __cdecl CloseOutputBitBuffer_(BIT_BUF* bit_buf) {
@@ -33,7 +33,7 @@ namespace bitio {
             bit_buf->bit_index++;
         }
         uint32_t size = bit_buf->bit_index;
-        _free(bit_buf);
+        free(bit_buf);
         return size;
     }
 

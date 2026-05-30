@@ -1,6 +1,22 @@
 #include "pch.h"
 
 namespace strings {
+    const char s__00551100[1] = "";
+    const char s_plus_00551118[2] = "+";
+    const char s_minus_0055111c[2] = "-";
+    const char s_space_00551120[2] = { '\x1B', '\0' };
+    const char s_B_005560e4[2] = "B";
+    const char s_S_005569cc[2] = "S";
+    const char s_O_00556afc[2] = "O";
+    const char s_A_00557ed4[2] = "A";
+    const char s_M_00557ed8[2] = "M";
+    const char s_fmt_plus_d_00557ed0[4] = "+%d";
+    const char s_ld_00558280[4] = "%ld";
+    const char s_0_0055110c[3] = "\x1A" "0";
+    const char s_1_00551110[3] = "\x1A" "1";
+    const char s__0055ac34[2] = "\t";
+    const char s_t_T0_5_124__0055ac38[13] = "\x17" "t" "\a" "T0,5,124.";
+
     void Load_Strings() {
         HAROLD::Load_H_Strings_();
         RUSS::Load_Russ_Strings_();

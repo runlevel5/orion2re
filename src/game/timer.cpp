@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace timer {
+    uint32_t _time_mark;
+
     void __cdecl Mark_Time_() {
         _time_mark = GetTickCount();
     }

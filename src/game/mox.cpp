@@ -1,5 +1,28 @@
 #include "pch.h"
 
+namespace {
+    char s_roman_literal_I[] = "I";
+    char s_roman_literal_II[] = "II";
+    char s_roman_literal_III[] = "III";
+    char s_roman_literal_IV[] = "IV";
+    char s_roman_literal_V[] = "V";
+    char s_roman_literal_VI[] = "VI";
+    char s_roman_literal_VII[] = "VII";
+    char s_roman_literal_VIII[] = "VIII";
+    char s_roman_literal_IX[] = "IX";
+    char s_roman_literal_X[] = "X";
+    char s_roman_literal_XI[] = "XI";
+    char s_roman_literal_XII[] = "XII";
+    char s_roman_literal_XIII[] = "XIII";
+    char s_roman_literal_XIV[] = "XIV";
+    char s_roman_literal_XV[] = "XV";
+    char s_roman_literal_XVI[] = "XVI";
+    char s_roman_literal_XVII[] = "XVII";
+    char s_roman_literal_XVIII[] = "XVIII";
+    char s_roman_literal_XIX[] = "XIX";
+    char s_roman_literal_XX[] = "XX";
+}
+
 namespace MOX {
     const char _ship_type_names[5][6][16] = {
         {
@@ -387,6 +410,226 @@ namespace MOX {
     int16_t _fleet_movement_all_button;
     int16_t _galaxy_map_scanned_star;
     int8_t _draw_system_display_without_button;
+    uint8_t _need_to_restore_help_list;
+    int16_t _ship_icon_player_id;
+    int8_t _at_least_one_report;
+    uint8_t _previous_report;
+    int16_t _first_node_ptr_in_stack_;
+    int16_t _system_display_ring_radius[5];
+    uint8_t _rot_plan_dim[5];
+    int16_t _system_star_id;
+    int16_t _system_star_id_for_auto_select;
+    uint8_t _draw_fleet_screen_to_back;
+    s_mouse_xy _mouse_XY;
+    int16_t _system_display_ship_scanned;
+    int16_t _system_icon_scanned;
+    uint16_t _global_exit_field;
+    int16_t _eta_star_id;
+    int16_t _stencil_box_id;
+    int16_t _draw_main_screen_stencilled;
+    uint16_t _animated_star;
+    int8_t _just_moved_stack;
+    int16_t _first_fleet_movement_icon;
+    int16_t _next_free_node;
+    int16_t _mid_star_x;
+    int16_t _mid_star_y;
+    int16_t _design_screen_replacement_item;
+    int16_t _far_star_x;
+    int16_t _far_star_y;
+    int16_t _near_star_y;
+    int16_t _near_star_x;
+    const char s_fmt_contested[15] = "%s (contested)";
+    void* _special_names_seg;
+    void* _global_data_seg;
+    s_nebula* _nebula;
+    uint8_t _NUM_NEBULAS;
+    int16_t _NUM_COLONIES;
+    int16_t _planet_count;
+    int8_t _climate_modifier_table[5] = {0, 0, 0, -10, -20};
+    s_planet_data* _planet;
+    char* _roman_literals[21] = {
+        nullptr,
+        s_roman_literal_I,
+        s_roman_literal_II,
+        s_roman_literal_III,
+        s_roman_literal_IV,
+        s_roman_literal_V,
+        s_roman_literal_VI,
+        s_roman_literal_VII,
+        s_roman_literal_VIII,
+        s_roman_literal_IX,
+        s_roman_literal_X,
+        s_roman_literal_XI,
+        s_roman_literal_XII,
+        s_roman_literal_XIII,
+        s_roman_literal_XIV,
+        s_roman_literal_XV,
+        s_roman_literal_XVI,
+        s_roman_literal_XVII,
+        s_roman_literal_XVIII,
+        s_roman_literal_XIX,
+        s_roman_literal_XX,
+    };
+    char* _planet_special_string[12];
+    char* _planet_climate_string[10];
+    char* _mineral_class_string[5];
+    uint8_t _red_color2;
+    char* _planet_size_string[5];
+    char* _planet_type_string[10];
+    char* _planet_group_string[4];
+    char* _planet_atmosphere_string[3];
+    char* _spectral_class_string[7];
+    char* _admin_skill_names[9];
+    char* _planet_gravity_string[3];
+    int16_t _NUM_SHIPS;
+    void* _global_bitmap_seg;
+    uint8_t _first_time_drawn;
+    uint8_t _draw_main_screen_to_back;
+    uint8_t _dont_draw_main_screen_to_back;
+    int16_t _zoom_count;
+    int16_t _max_zoom_count;
+    uint8_t _star_bg_index;
+    s_animation_header* _star_bg_seg;
+    void* _scan_ship_seg;
+    s_animation_header* _detail_fleet_icon_seg;
+    uint16_t _fleet_icon_button_count;
+    int16_t _weapons_count_plus_button[8];
+    int16_t _weapons_count_minus_button[8];
+    int16_t _design_ship_size_field[6];
+    void* _techname_seg;
+    void* _tech_desc_seg;
+    s_animation_header* _main_screen_seg;
+    s_animation_header* _design_screen_seg;
+    s_animation_header* _design_icon_lf_arrow_seg;
+    s_animation_header* _design_icon_rt_arrow_seg;
+    s_animation_header* _clear_design_button_seg;
+    s_animation_header* _cancel_design_button_seg;
+    s_animation_header* _build_design_button_seg;
+    s_animation_header* _plus_button_seg;
+    s_animation_header* _minus_button_seg;
+    s_animation_header* _d_scroll_up_button_seg;
+    s_animation_header* _d_scroll_dn_button_seg;
+    s_animation_header* _dull_d_scroll_up_button_seg;
+    s_animation_header* _dull_d_scroll_dn_button_seg;
+    s_animation_header* _beam_filter_button_seg;
+    s_animation_header* _missile_filter_button_seg;
+    s_animation_header* _bomb_filter_button_seg;
+    s_animation_header* _special_filter_button_seg;
+    s_animation_header* _weapons_cancel_button_seg;
+    s_animation_header* _weapons_accept_button_seg;
+    s_animation_header* _weapons_top_box_seg;
+    s_animation_header* _weapons_mid_box_seg;
+    s_animation_header* _weapons_bot_box_seg;
+    s_animation_header* _weapons_selected_seg;
+    s_animation_header* _weapons_blank_mods_seg;
+    s_animation_header* _system_repl_scroll_bar_seg;
+    s_animation_header* _system_repl_box_top_seg;
+    s_animation_header* _system_repl_box_mid_seg;
+    s_animation_header* _system_repl_box_btm_seg;
+    s_animation_header* _system_repl_box_cancel_btn;
+    int16_t _weapons_clear_button[8];
+    int16_t _special_system_clear_button[8];
+    s_animation_header* _design_size_button_seg[6];
+    s_animation_header* _darkened_size_button_seg[6];
+    s_animation_header* _weapons_arc_pict_seg[5];
+    s_animation_header* _weapons_arc_text_seg[5];
+    s_animation_header* _weapons_rack_text_seg[5];
+    s_animation_header* _weapons_special_seg[18];
+    s_weapon_filter_item* _weapon_filter;
+    char* _special_desc_string[39];
+    char* _weapon_notes_string[40];
+    s_animation_header* _d_scroll_bar_seg;
+    s_animation_header* _weapons_rack_seg;
+    s_animation_header* _mainscrn_diplo_lights_seg;
+    s_animation_header* _diplomacy_request_wait_seg;
+    s_animation_header* _diplomacy_request_invoke_seg;
+    s_animation_header* _diplomacy_request_accept_seg;
+    void* _global_screen_seg;
+    void* _global_cache_seg;
+    s_animation_header* _mid_star_seg;
+    s_animation_header* _far_star_seg;
+    uint8_t _fleet_icon_selection_status[64];
+    s_animation_header* _star_seg[40];
+    s_animation_header* _sun_seg[6];
+    uint16_t _n_stats_to_generate;
+    uint32_t _global_cache_size;
+    uint32_t _cmd_line_seed;
+    int16_t _ship_icon_lf_button;
+    int16_t _ship_icon_rt_button;
+    uint8_t _zoom_in;
+    s_animation_header* _main_zoom_in_button_seg;
+    s_animation_header* _main_zoom_out_button_seg;
+    s_animation_header* _main_game_button_seg;
+    s_animation_header* _main_next_button_seg;
+    s_animation_header* _main_colonies_button_seg;
+    s_animation_header* _main_planets_button_seg;
+    s_animation_header* _main_fleets_button_seg;
+    s_animation_header* _main_leaders_button_seg;
+    s_animation_header* _main_races_button_seg;
+    s_animation_header* _main_info_button_seg;
+    int16_t _star_button[72];
+    int16_t _main_screen_grid_field;
+    int16_t _main_screen_grid_x;
+    int16_t _main_screen_grid_y;
+    int16_t _NUM_PLAYERS;
+    uint8_t _red_color1;
+    char* _government_labels[8];
+    char* _special_ability_names[32];
+    int32_t _stardate_at_beg_of_turn;
+    int8_t _global_var;
+    uint16_t _FULL_DRAW_SCREEN_FLAG;
+    uint16_t _combat_init;
+    void* _warp_core_remap_colors;
+    s_mouse_list* _combat_mouse_grid;
+    void* _stasis_bubble_remap_colors;
+
+    s_mouse_list _mouse_list_zoom_mode[5] = {
+        {6, 0, 22, 22, 526, 420},
+        {1, 0, 0, 0, 639, 21},
+        {1, 0, 0, 0, 21, 479},
+        {1, 0, 527, 0, 639, 479},
+        {1, 0, 0, 421, 639, 479},
+    };
+    uint8_t _main_palette_player_colors[8] = {73, 98, 110, 32, 62, 148, 45, 85};
+    int16_t _h_string_ix[397];
+    char _h_strings[0x4074];
+    s_help_box _help_entry_list[50];
+    int8_t _class_to_mineral[60] = {
+        2, 1, 1, 0, 0, 1,
+        2, 1, 1, 1, 0, 2,
+        2, 2, 1, 1, 1, 2,
+        2, 2, 2, 1, 1, 2,
+        3, 2, 2, 1, 1, 2,
+        3, 2, 2, 2, 1, 2,
+        3, 3, 2, 2, 2, 3,
+        3, 3, 3, 2, 2, 3,
+        4, 3, 3, 2, 2, 3,
+        4, 4, 4, 3, 2, 4,
+    };
+    int8_t _planet_special = 64;
+    uint8_t _planet_special_weighted_chance[12] = {64, 5, 3, 2, 3, 2, 9, 4, 3, 0, 5, 0};
+    int8_t _gravity_table[30] = {
+        0, 0, 0, 1, 1,
+        0, 0, 1, 1, 1,
+        0, 1, 1, 1, 2,
+        1, 1, 1, 2, 2,
+        1, 1, 2, 2, 2,
+        0, 0, 0, 0, 0,
+    };
+    s_mouse_list _mouse_list_arrow = {1, 0, 0, 0, 639, 479};
+    s_mouse_list _mouse_list_relocation = {2, 0, 0, 0, 639, 479};
+    s_mouse_list _cmbt_mouse_list_clock = {1, 0, 0, 0, 639, 479};
+    s_mouse_list _mouse_list_variable = {20, 0, 0, 0, 639, 479};
+    s_mouse_list _mouse_list_none = {0, 0, 0, 0, 639, 479};
+    s_animation_header* _near_star_seg;
+    const char s_ATZ_0055AA7C[4] = "ATZ";
+    const char s_AT_K0_M1_D2_0055AA6C[14] = "AT &K0 M1 &D2";
+    const char s_AT_H0_S0_0_0055AA60[11] = "AT H0 S0=0";
+    const char s_5551212_0055AA58[8] = "5551212";
+    const char s_fmt_s[3] = "%s";
+    const char s_fmt_scanned_star_info[8] = "%s (%s)";
+
+    s_ship_move_info _g_ship_move_info;
 
     s_fleet_movement_icon _fleet_movement_icon[500];
 

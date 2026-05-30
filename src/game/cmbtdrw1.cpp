@@ -3819,17 +3819,17 @@ skip_cursor:
     }
 
     void __cdecl Remap_Draw_Ship_Status_(int16_t x, int16_t y) {
-        s_animation_header* ship_picture = KEN::Get_Ship_Id_Picture_Seg_(_global_combat_data::design_idx);
+        s_animation_header* ship_picture = KEN::Get_Ship_Id_Picture_Seg_(MOX::_global_combat_data.design_idx);
 
         bitmap::Draw_Picture_To_Bitmap_(MOX::_draw_ship_bitmap, ship_picture);
         bitmap::Create_Blank_Bitmap_(0x62, 0x62, MOX::_combat_bitmap);
         bitmap::Add_Picture_To_Bitmap_(0x10, 0x0B, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
 
-        if (_global_combat_data::shield_type > 0) {
+        if (MOX::_global_combat_data.shield_type > 0) {
             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
 
-            switch (_global_combat_data::shield_type) {
+            switch (MOX::_global_combat_data.shield_type) {
             case 1:
                 bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
                 bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);

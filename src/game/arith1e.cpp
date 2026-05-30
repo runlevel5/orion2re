@@ -27,7 +27,7 @@ namespace arith1e {
         printf(s_Fatal_error__00560ab0);
         vprintf(format, args);
         va_end(args);
-        __exit(-1);
+        exit(-1);
     }
 
     static void __cdecl update_model_(int symbol, int context) {

@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace SMACK {
+    s_mouse_list _smack_mouse = {0, 0, 0, 0, 639, 479};
+    MOX2::action_func_t _smack_auto_function;
+    int16_t _smack_x;
+    int16_t _smack_y;
+
     void __cdecl Smack_Fade_(int16_t mode) {
         int16_t fade_step;
         int16_t palette_level;

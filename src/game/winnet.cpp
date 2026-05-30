@@ -54,7 +54,7 @@ namespace WINNET {
         if (_session_count != 0) {
             for (uint32_t i = 0; i < _session_count; ++i) {
                 if (_sessions[i] != nullptr) {
-                    ::_free(_sessions[i]);
+                    ::free(_sessions[i]);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace WINNET {
         for (uint32_t i = 0; i < _session_count; ++i) {
             if (_strcmpi(session_desc->szSessionName, _sessions[i]->szSessionName) < 0) {
                 insert_idx = i;
-                _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(_malloc(sizeof(DPSESSIONDESC)));
+                _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(malloc(sizeof(DPSESSIONDESC)));
 
                 for (uint32_t j = _session_count; j > i; --j) {
                     memcpy(_sessions[j], _sessions[j - 1], sizeof(DPSESSIONDESC));
@@ -113,7 +113,7 @@ namespace WINNET {
         }
 
         if (insert_idx == _session_count) {
-            _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(_malloc(sizeof(DPSESSIONDESC)));
+            _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(malloc(sizeof(DPSESSIONDESC)));
             memcpy(_sessions[_session_count], session_desc, sizeof(DPSESSIONDESC));
         }
 
@@ -129,7 +129,7 @@ namespace WINNET {
 
     BOOL __stdcall Enumerate_Providers_(GUID* guid, char* name, DWORD major_version, DWORD minor_version, void* context) {
         if (_provider_count < 9) {
-            s_winnet_provider* provider = static_cast<s_winnet_provider*>(_malloc(sizeof(s_winnet_provider)));
+            s_winnet_provider* provider = static_cast<s_winnet_provider*>(malloc(sizeof(s_winnet_provider)));
             _providers[_provider_count] = provider;
 
             provider->guid = *guid;
@@ -160,7 +160,7 @@ namespace WINNET {
     int32_t __cdecl Refresh_Player_List_(DWORD session_id) {
         for (uint32_t i = 0; i < _player_count; ++i) {
             if (_player_list[i] != nullptr) {
-                ::_free(_player_list[i]);
+                ::free(_player_list[i]);
             }
         }
 
@@ -187,7 +187,7 @@ namespace WINNET {
     }
 
     void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str) {
-        s_net_player* player = reinterpret_cast<s_net_player*>(_malloc(sizeof(s_net_player)));
+        s_net_player* player = reinterpret_cast<s_net_player*>(malloc(sizeof(s_net_player)));
 
         _player_list[_player_count] = player;
         player->player_id = player_id;
@@ -271,7 +271,7 @@ namespace WINNET {
                 }
             }
 
-            ::_free(_player_list[_player_count - 1]);
+            ::free(_player_list[_player_count - 1]);
             _player_count--;
         }
     }

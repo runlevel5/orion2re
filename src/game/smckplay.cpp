@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace smckplay {
+    s_smack_video* _smk;
+    uint32_t _lastkey;
+
     int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char mode, uint32_t options) {
         char path_buffer[100];
         IDirectSound* direct_sound = sound::_dsound;
@@ -124,7 +127,7 @@ namespace smckplay {
 
     void __cdecl Close_Smacker_Animation_(void) {
         if (_smk != nullptr) {
-            PTR__SmackClose_4_005aa644(_smk);
+            _SmackClose_4(_smk);
             _smk = nullptr;
         }
     }

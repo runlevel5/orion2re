@@ -304,7 +304,7 @@ namespace DESIGN {
         else {
             MOX::_draw_design_screen_to_back = 1;
             Load_Design_Screen_Pictures_();
-            Build_Initial_Design_Template_(MOX::_PLAYER_NUM, _player_design_num);
+            Build_Initial_Design_Template_(MOX::_PLAYER_NUM, design);
             MOX::_original_cost = Total_Design_Cost_();
             if (MOX::_refit_ship != 0) {
                 MOX::_design->total_cost = 0;
@@ -345,7 +345,7 @@ namespace DESIGN {
             MOX::_scanned_field = fields::Scan_Input_();
 
             if (_changed_design_name == 0) {
-                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, _player_design_num);
+                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design);
                 char* p1 = MOX::_design->name;
                 char* p2 = default_name;
                 while (*p1 && *p1 == *p2) { p1++; p2++; }

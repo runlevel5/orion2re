@@ -1890,7 +1890,7 @@ namespace COLONY {
         RUSS::PFMT_(0, 0x13, ESTRINGS::E_Strings_(ESTR_F__ADD_FREIGHTERS_TO_POOL));
         RUSS::PFMT_(0, 0x12, ESTRINGS::E_Strings_(ESTR_B__ADD_BCS_TO_TREASURY));
 
-        int key = __getch();
+        int key = _getch();
         input_buf[0] = (char)key;
         input_buf[1] = '\0';
 
@@ -2261,7 +2261,7 @@ namespace COLONY {
             if (_debug_flag != 0) {
                 fonts::PSTRS_(0, 1, ESTRINGS::E_Strings_(0x122));
             }
-            ::__getch();
+            ::_getch();
         }
 
         bitmap::Draw_Picture_To_Bitmap_(_mouse_bitm, anim_header);

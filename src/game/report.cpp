@@ -693,9 +693,9 @@ namespace REPORT {
         int8_t result = 0;
 
         // Check if stardate is exactly one day past invasion date
-        if (((int32_t)_antarans::invasion_stardate - (int32_t)MOX::_stardate) == -1) {
+        if (((int32_t)MOX::_antarans.invasion_stardate - (int32_t)MOX::_stardate) == -1) {
             // Check if current player was already notified
-            if (!((_antarans::attack_notified_mask >> (uint8_t)MOX::_PLAYER_NUM) & 1)) {
+            if (!((MOX::_antarans.attack_notified_mask >> (uint8_t)MOX::_PLAYER_NUM) & 1)) {
                 result = 6;
                 if (param_2 != 0) {
                     int32_t target_star_idx = -1;
@@ -717,7 +717,7 @@ namespace REPORT {
                         // Check if player has a colony at the target system
                         if ((MOX::_star[target_star_idx].has_colony >> (uint8_t)MOX::_PLAYER_NUM) & 1) {
                             if (random::Random_(10) <= 4) {
-                                ANTAROOM::Main_Antaran_Room_Screen_(_antarans::invasion_stardate < 35000 /* 0x88B8 */);
+                                ANTAROOM::Main_Antaran_Room_Screen_(MOX::_antarans.invasion_stardate < 35000 /* 0x88B8 */);
                                 room_screen_shown = true;
                             }
                         }
@@ -729,7 +729,7 @@ namespace REPORT {
                     }
 
                     // Mark player as notified
-                    _antarans::attack_notified_mask |= (1 << (uint8_t)MOX::_PLAYER_NUM);
+                    MOX::_antarans.attack_notified_mask |= (1 << (uint8_t)MOX::_PLAYER_NUM);
                 }
             }
         }

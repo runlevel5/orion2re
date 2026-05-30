@@ -1,6 +1,106 @@
 #include "pch.h"
 
+namespace {
+    void __cdecl Draw_Tech_List_App_(int16_t x, int16_t y, uint8_t tech_app_id) {
+        char buffer[80];
+
+        buffer[0] = '^';
+        strcpy(buffer + 1, TECH::Technology_Applications_Name_(tech_app_id, MOX::_PLAYER_NUM));
+        BILL::Squeeze_Print_(x, y, buffer, 0xD5);
+    }
+}
+
 namespace TECH {
+    const char _research_desc_fmt[19] = {
+        '\x07', 'F', '3', '.', '\x1A', '3', '%', 's',
+        '\r', '\x07', 'Y', '+', '3', '.', '\x1A', '2',
+        '%', 's', '\0',
+    };
+
+    uint8_t _saved_hyper_advanced_tech[8];
+
+    const char _tech_select_lbx[12] = "TECHSEL.LBX";
+
+    int32_t _tech_select_pos[8] = {
+        0x001E00B0, 0x001F0193, 0x008700B0, 0x00870193,
+        0x00F000B0, 0x00F00193, 0x015B00B0, 0x015B0193,
+    };
+
+    int32_t _tech_change_pos[8] = {
+        0x001E005F, 0x001F0142, 0x0087005F, 0x00870142,
+        0x00F0005F, 0x00F00142, 0x015B005F, 0x015B0142,
+    };
+
+    int16_t _tech_field_y1[4] = {0, 34, 49, 64};
+
+    int16_t _tech_field_y2[4] = {33, 48, 63, 78};
+
+    int16_t _app_name_y[8] = {19, 34, 49, 64, 79, 0, 0, 0};
+
+    int16_t _list_window_x_offsets[8] = {205, 6, 205, 6, 205, 6, 205, 6};
+
+    int16_t _tech_button_pos[16] = {
+        21, 30, 248, 31,
+        21, 135, 248, 135,
+        21, 240, 248, 240,
+        21, 347, 248, 347,
+    };
+
+    uint8_t _entry_to_group[8] = {4, 2, 6, 8, 7, 1, 3, 5};
+
+    s_colors _tech_select_colors[5] = {
+        {{241, 244, 244, 244, 243, 243, 244, 245}},
+        {{241, 247, 247, 247, 245, 246, 247, 248}},
+        {{241, 248, 248, 248, 247, 248, 248, 249}},
+        {{241, 245, 245, 245, 244, 245, 245, 245}},
+        {{241, 244, 244, 244, 243, 243, 244, 244}},
+    };
+
+    s_colors _tech_change_colors[5] = {
+        {{225, 228, 228, 228, 227, 227, 228, 229}},
+        {{225, 231, 231, 231, 229, 230, 231, 232}},
+        {{225, 232, 232, 232, 231, 232, 232, 232}},
+        {{225, 229, 229, 229, 228, 229, 229, 229}},
+        {{225, 228, 228, 228, 227, 227, 228, 228}},
+    };
+
+    int16_t _g_scrn_y;
+    int16_t _g_scrn_x;
+    int16_t _g_first_tech_field;
+    s_fieldsav_data _tech_field_save;
+    s_list_item* _g_selected_list_entry_p;
+    int16_t _g_last_tech_field;
+    uint8_t _g_cursor_box_color;
+    uint8_t _g_changing_tech;
+    s_list_item_research* _g_selected_entry_p;
+    char _tech_group_names[10][20];
+    s_list_item_research* _g_entries_p;
+    s_colors _tech_color[5];
+
+    s_list_state _g_tech_list_header = {
+        0,
+        73,
+        223,
+        424,
+        _app_name_y,
+        _tech_field_y1,
+        _tech_field_y2,
+        8,
+        0,
+        nullptr,
+        nullptr,
+        0,
+        0,
+        4,
+        3,
+        reinterpret_cast<void*>(Draw_Tech_List_App_),
+        10,
+        0xFF,
+        &_tech_color[1],
+        {&_tech_color[4], &_tech_color[3], &_tech_color[0], &_tech_color[3]},
+        &_tech_color[2],
+    };
+
     void __cdecl Tech_Select_() {
         void* animation_buffer;
 
@@ -446,7 +546,7 @@ namespace TECH {
                         MOX::_cur_plyr_ptr->current_research_field != tech_field_id) {
                         break;
                     }
-                    tech_field_id = _technology_fields[tech_field_id].next_field_id;
+                    tech_field_id = TECHDATA::_technology_fields[tech_field_id].next_field_id;
                     if (tech_field_id == 0) {
                         break;
                     }
@@ -457,7 +557,7 @@ namespace TECH {
 
             if (tech_field_id < 75 /* 0x4B */) {
                 int visible_app_count = 0;
-                int16_t* techs = _technology_fields[tech_field_id].tech;
+                int16_t* techs = TECHDATA::_technology_fields[tech_field_id].tech;
                 for (int app_index = 0; app_index < 4; ++app_index) {
                     int16_t app_id = techs[app_index];
                     if (MOX::_cur_plyr_ptr->tech_applications[app_id] == 1) {
@@ -950,7 +1050,7 @@ namespace TECH {
             if (status != 3) {
                 if (status == 0) {
                     for (int i = 0; i < 4; ++i) {
-                        int16_t tech_id = _technology_fields[field_id].tech[i];
+                        int16_t tech_id = TECHDATA::_technology_fields[field_id].tech[i];
 
                         if (MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
                             status = 1;
@@ -962,7 +1062,7 @@ namespace TECH {
                 if (status >= 1) {
                     uint8_t app_count = 0;
                     for (int i = 0; i < 4; ++i) {
-                        int16_t tech_id = _technology_fields[field_id].tech[i];
+                        int16_t tech_id = TECHDATA::_technology_fields[field_id].tech[i];
 
                         uint8_t app_status = MOX::_cur_plyr_ptr->tech_applications[tech_id];
 
@@ -988,7 +1088,7 @@ namespace TECH {
                 }
             }
 
-            field_id = _technology_fields[field_id].next_field_id;
+            field_id = TECHDATA::_technology_fields[field_id].next_field_id;
         }
 
         state->num_items = num_items;

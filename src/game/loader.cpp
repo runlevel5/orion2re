@@ -104,7 +104,7 @@ namespace LOADER {
         char* const loaded_names = (char*)farload::Far_Reload_(
             s_RACESTUF_lbx_00558550,
             static_cast<int32_t>(static_cast<uint8_t>(MOX::_settings.language)) + 8,
-            (void*)alloc::_special_names_seg);
+            MOX::_special_names_seg);
 
         int16_t name_offset = 0;
         int16_t name_index = 1;

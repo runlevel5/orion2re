@@ -6,7 +6,7 @@
 
 namespace hooks {
 
-#define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
+#define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); exit(1); }
 
     void Assert_Types() {
         ASSERT(sizeof(s_current_design) == 0x125, "s_current_design");

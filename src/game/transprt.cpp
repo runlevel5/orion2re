@@ -2,6 +2,74 @@
 
 namespace transprt {
 
+    uint32_t _num_net_players;
+
+    int32_t _tpSending;
+
+    uint32_t _tpRecNum;
+
+    uint8_t _tpMessageIsProcessed;
+
+    uint32_t _tpSendImmediateBurst;
+
+    uint32_t _tpRecSrc;
+
+    int32_t _tpLastSendSuccessful;
+
+    int32_t _tpInitialized;
+
+    uint8_t* _tpFullSendBuffer;
+
+    uint8_t* _tpRecPacketBuffer;
+
+    uint8_t* _tpRecUserBuffer;
+
+    uint16_t _tpBufferSize;
+
+    uint8_t* _tpMessageData;
+
+    uint16_t _tpSendDataLength;
+
+    uint8_t _tpForceBurstSend;
+
+    uint32_t _tpDestID;
+
+    uint32_t _tpMessageStamp = 1;
+
+    uint32_t DAT_00560a70;
+
+    uint16_t _tpCurrentUserType;
+
+    int32_t _tpTotalPackets;
+
+    int32_t _tpBurstNum;
+
+    DWORD _tpLastBurstTickCount;
+
+    int32_t _tpLastBurstStartPacket;
+
+    clock_t _tpLastBurstClock;
+
+    uint32_t DAT_00560a94;
+
+    uint8_t _tpSendImmediateBurstFlag = 1;
+
+    uint32_t _queuedSenderCount;
+
+    int32_t _tpBlockReceiving;
+
+    uint32_t _queuedSenders[20];
+
+    s_transport_packet _tpSendBuffer;
+
+    uint8_t _tpAckFlags[128];
+
+    s_tp_receive_state _tpReceiveState;
+
+    uint32_t _tpOldMessages[128];
+
+    user_rec_fn _userRecFunc;
+
     int8_t __cdecl InitTransportLayer_(uint16_t buffer_size) {
         if (buffer_size == 0) {
             return 0;
@@ -9,9 +77,9 @@ namespace transprt {
 
         uint32_t size = buffer_size;
 
-        _tpRecUserBuffer = static_cast<uint8_t*>(_malloc(size));
-        _tpRecPacketBuffer = static_cast<uint8_t*>(_malloc(size));
-        _tpFullSendBuffer = static_cast<uint8_t*>(_malloc(size));
+        _tpRecUserBuffer = static_cast<uint8_t*>(malloc(size));
+        _tpRecPacketBuffer = static_cast<uint8_t*>(malloc(size));
+        _tpFullSendBuffer = static_cast<uint8_t*>(malloc(size));
 
         if (_tpRecUserBuffer != nullptr && 
             _tpRecPacketBuffer != nullptr && 

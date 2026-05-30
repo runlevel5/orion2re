@@ -2,65 +2,45 @@
 #include <cstdint>
 
 namespace shear {
-    inline uint16_t& _x_step_8_8 =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055C0A8});
+    extern uint16_t _x_step_8_8;
 
-    inline uint16_t& _dst_width =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055C0AE});
+    extern uint16_t _dst_width;
 
-    inline uint32_t& _y_accum_8_8 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0B4});
+    extern uint32_t _y_accum_8_8;
 
-    inline int32_t& _y_step_8_8 =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055C0B8});
+    extern int32_t _y_step_8_8;
 
-    inline uint8_t& _noise_threshold =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055C0BC});
+    extern uint32_t _noise_threshold;
 
-    inline uint32_t& _src_width =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0C0});
+    extern uint32_t _src_width;
 
-    inline uint32_t& _src_height =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0C4});
+    extern uint32_t _src_height;
 
-    inline uint32_t& _row_dword_count =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0C8});
+    extern uint32_t _row_dword_count;
 
-    inline uint32_t& _row_dword_counter =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0CC});
+    extern uint32_t _row_dword_counter;
 
-    inline uint32_t& _noise_start_index =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0D0});
+    extern uint32_t _noise_start_index;
 
-    inline uint32_t& _jumble_mask =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0EC});
+    extern uint32_t _jumble_mask;
 
-    inline uint32_t& _jumble_direction_toggle =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0F0});
+    extern uint32_t _jumble_direction_toggle;
 
-    inline int32_t& _src_row_skip =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055C0F4});
+    extern int32_t _src_row_skip;
 
-    inline int32_t& _dst_row_skip =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055C0F8});
+    extern int32_t _dst_row_skip;
 
-    inline uint32_t& _col_temp =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0FC});
+    extern uint32_t _col_temp;
 
-    inline uint32_t& _outline_color =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0D4});
+    extern uint32_t _outline_color;
 
-    inline uint32_t& _temp =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0DC});
+    extern uint32_t _temp;
 
-    inline uint8_t*& _src_bitmap_end =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055C0E0});
+    extern uint8_t* _src_bitmap_end;
 
-    inline uint32_t& _row_temp =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C100});
+    extern uint32_t _row_temp;
 
-    inline uint8_t* _noise_table =
-        reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055C104});
+    extern uint8_t _noise_table[258];
 
     void __cdecl Outline_Bitmap_Pixels_(uint8_t* src, uint32_t outline_color, uint32_t unused, uint8_t* dest, uint32_t width, uint32_t height);
 

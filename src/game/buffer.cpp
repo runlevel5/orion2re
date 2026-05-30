@@ -23,8 +23,8 @@ namespace buffer {
 
   void __cdecl Free_Buffer_Space_() {
     if (_buffer_space_ptr != nullptr) {
-      _free(_buffer_space_ptr);
-      _free(_file_buffer);
+      free(_buffer_space_ptr);
+      free(_file_buffer);
       _buffer_space_ptr = nullptr;
     }
   }

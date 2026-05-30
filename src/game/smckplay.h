@@ -1,45 +1,37 @@
 #pragma once
 
 namespace smckplay {
-    inline s_smack_video*& _smk =
-        *reinterpret_cast<s_smack_video**>(std::uintptr_t{0x0055C07C});
-    inline uint32_t& _lastkey =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C080});
+    extern s_smack_video* _smk;
+    extern uint32_t _lastkey;
 
-    using SmackWaitFn = int32_t(__stdcall*)(s_smack_video*);
-    inline SmackWaitFn& PTR__SmackWait_4_005aa640 =
-        *reinterpret_cast<SmackWaitFn*>(std::uintptr_t{ 0x005aa640 });
+    extern "C" __declspec(dllimport) int32_t __stdcall _SmackWait(s_smack_video* smk);
 
-    using SmackToBufferRectFn = int32_t(__stdcall*)(s_smack_video*, int32_t);
-    inline SmackToBufferRectFn& PTR__SmackToBufferRect_8_005aa634 =
-        *reinterpret_cast<SmackToBufferRectFn*>(std::uintptr_t{ 0x005aa634 });
+    extern "C" __declspec(dllimport) int32_t __stdcall _SmackToBufferRect(s_smack_video* smk, int32_t mode);
 
-    using SmackDoFrameFn = void(__stdcall*)(s_smack_video*);
-    inline SmackDoFrameFn& PTR__SmackDoFrame_4_005aa638 =
-        *reinterpret_cast<SmackDoFrameFn*>(std::uintptr_t{ 0x005aa638 });
+    extern "C" __declspec(dllimport) void __stdcall _SmackDoFrame(s_smack_video* smk);
 
-    using SmackToBufferFn = void(__stdcall*)(s_smack_video*, int32_t, int32_t, uint32_t, uint32_t, void*, uint32_t);
-    inline SmackToBufferFn& PTR__SmackToBuffer_28_005aa63c =
-        *reinterpret_cast<SmackToBufferFn*>(std::uintptr_t{ 0x005aa63c });
+    extern "C" __declspec(dllimport) void __stdcall _SmackToBuffer(s_smack_video* smk,
+        int32_t left,
+        int32_t top,
+        uint32_t pitch,
+        uint32_t destheight,
+        void* buf,
+        uint32_t flags);
 
-    using SmackNextFrameFn = void(__stdcall*)(s_smack_video*);
-    inline SmackNextFrameFn& PTR__SmackNextFrame_4_005aa630 =
-        *reinterpret_cast<SmackNextFrameFn*>(std::uintptr_t{ 0x005aa630 });
+    extern "C" __declspec(dllimport) void __stdcall _SmackNextFrame(s_smack_video* smk);
 
-    using SmackCloseFn = void(__stdcall*)(s_smack_video*);
-    inline SmackCloseFn& PTR__SmackClose_4_005aa644 =
-        *reinterpret_cast<SmackCloseFn*>(std::uintptr_t{ 0x005aa644 });
+    extern "C" __declspec(dllimport) void __stdcall _SmackClose(s_smack_video* smk);
 
     inline int32_t __stdcall _SmackWait_4(s_smack_video* smk) {
-        return PTR__SmackWait_4_005aa640(smk);
+        return _SmackWait(smk);
     }
 
     inline int32_t __stdcall _SmackToBufferRect_8(s_smack_video* smk, int32_t mode) {
-        return PTR__SmackToBufferRect_8_005aa634(smk, mode);
+        return _SmackToBufferRect(smk, mode);
     }
 
     inline void __stdcall _SmackDoFrame_4(s_smack_video* smk) {
-        PTR__SmackDoFrame_4_005aa638(smk);
+        _SmackDoFrame(smk);
     }
 
     inline void __stdcall _SmackToBuffer_28(s_smack_video* smk,
@@ -49,15 +41,15 @@ namespace smckplay {
         uint32_t destheight,
         void* buf,
         uint32_t flags) {
-        PTR__SmackToBuffer_28_005aa63c(smk, left, top, pitch, destheight, buf, flags);
+        _SmackToBuffer(smk, left, top, pitch, destheight, buf, flags);
     }
 
     inline void __stdcall _SmackNextFrame_4(s_smack_video* smk) {
-        PTR__SmackNextFrame_4_005aa630(smk);
+        _SmackNextFrame(smk);
     }
 
     inline void __stdcall _SmackClose_4(s_smack_video* smk) {
-        PTR__SmackClose_4_005aa644(smk);
+        _SmackClose(smk);
     }
 
     void __cdecl Set_Smacker_Palette_();

@@ -27,8 +27,6 @@ namespace SHIPMOVE {
 
     int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y);
 
-    inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059C440});
-
     bool __cdecl Player_Has_Ships_Pestering_Other_Player_(int player_idx, uint8_t colony_bit_idx);
 
     void __cdecl Unmark_Just_Built_AI_Ships_();

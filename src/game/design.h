@@ -13,7 +13,6 @@ namespace DESIGN {
     // 0x004321e0 stores EAX directly to 0x00565058, so this global is 32-bit here.
     extern int32_t _printed_cost;
     extern uint8_t _changed_design_name;
-    inline int16_t& _player_design_num = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B28});
     extern uint8_t _add_size_button_flag[6];
 
     extern const char s_cstdes_log[13];

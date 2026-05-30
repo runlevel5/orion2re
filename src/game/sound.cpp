@@ -1,6 +1,72 @@
 #include "pch.h"
 
 namespace sound {
+    int16_t _ds_volume_table[101] = {
+        -10000, -10000, -10000, -10000, -9287, -8643, -8117, -7673, -7287, -6947,
+        -6643, -6368, -6117, -5886, -5673, -5473, -5287, -5112, -4947, -4791,
+        -4643, -4503, -4368, -4240, -4117, -4000, -3886, -3777, -3673, -3571,
+        -3473, -3379, -3287, -3198, -3112, -3029, -2947, -2868, -2791, -2716,
+        -2643, -2572, -2503, -2435, -2368, -2304, -2240, -2178, -2117, -2058,
+        -2000, -1942, -1886, -1831, -1777, -1724, -1673, -1621, -1571, -1522,
+        -1473, -1426, -1379, -1333, -1287, -1242, -1198, -1155, -1112, -1070,
+        -1029, -988, -947, -908, -868, -830, -791, -754, -716, -680,
+        -643, -608, -572, -537, -503, -468, -435, -401, -368, -336,
+        -304, -272, -240, -209, -178, -148, -117, -87, -58, -28,
+        0
+    };
+
+    uint32_t _audioInitialized;
+    uint8_t _soundOn;
+    uint8_t _soundErrorOccurred;
+    MMRESULT _soundTimerId;
+    uint8_t _soundTimerActive;
+    uint32_t _soundTimerRunning = 1;
+    uint32_t _soundTimerStopFlag;
+    const char _default_sound_file_name[10] = "sound.lbx";
+    const char _default_music_file_name[10] = "music.lbx";
+    const char _stream_file_name[11] = "stream.lbx";
+    void* _soundBuffer;
+    uint32_t _soundBufferSize;
+    uint32_t _soundTimerLock;
+    void* _streamBuffer1;
+    void* _streamBuffer2;
+    uint8_t _soundFxActive;
+    int32_t _global_stream_volume = 100;
+    uint8_t _loopStream;
+    int32_t _doubleBufferLoops;
+    uint8_t _command;
+    uint8_t _streamIncVal;
+    const char s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910[68] = "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. ";
+    const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954[65] = "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. ";
+    const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998[64] = "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. ";
+    const char s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer[52] = "STREAM ERROR: (Play_Stream) Unable to lock buffer.";
+    const char s_Cant_Read[18] = "Cant Read........";
+    const char s_data_0055c20c[5] = "data";
+    const char s_fmt_0055c214[5] = "fmt ";
+    const char s_WAVE_0055c21c[5] = "WAVE";
+    const char s_RIFF_0055c224[5] = "RIFF";
+    uint32_t _streamAvailable2;
+    s_lbx_stream_header _musicLbxHandle;
+    IDirectSound* _dsound;
+    HRESULT _dsound_hr;
+    uint32_t _streamAvailable1;
+    int32_t _dsMasterVolume;
+    int32_t _dsMasterPan;
+    s_sound_index _soundIndices[33];
+    LPDIRECTSOUNDBUFFER _dsound_buffer;
+    DSBUFFERDESC1 _dsound_buffer_desc;
+    s_sound_channel _soundChannels[16];
+    const char s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538[67] = "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. ";
+    const char s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c[64] = "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. ";
+    const char s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc[63] = "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. ";
+    const char s_SOUND_ERROR___Play_Sound_File__U_0055b5fc[56] = "SOUND ERROR: (Play_Sound_File) Unable to lock buffer.";
+    const char s_SOUND_ERROR__Reading_Wave_0055b634[26] = "SOUND ERROR: Reading Wave";
+    s_lbx_stream_header _soundLbxHandle;
+    s_wave_stream_header _streamLbxHandle;
+    uint8_t _close_stream = 1;
+    uint8_t _musicActive;
+    s_sound_stream _stream_data;
+
     /**
      * @brief Iterates through active sound channels and updates their volume levels via DirectSound.
      * Stops and removes channels if the volume delta is out of bounds.
@@ -421,7 +487,7 @@ namespace sound {
             _stream_data.ds_buffer->GetVolume(&current_volume);
 
             int32_t index = 0;
-            for (int16_t* entry = sound::_ds_volume_table; entry < sound::_stream_volume_table_end; ++entry) {
+            for (int16_t* entry = sound::_ds_volume_table; entry < sound::_ds_volume_table + 101; ++entry) {
                 if (static_cast<int32_t>(*entry) == current_volume) {
                     return index;
                 }

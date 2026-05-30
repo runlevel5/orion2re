@@ -1,6 +1,33 @@
 #include "pch.h"
 
 namespace SYS {
+    void* _sys_data_buffer;
+    const char s_fmt_star_display[7] = "%d> %s";
+    const char s_1[3] = "\x1A" "1";
+    const char s_percent_d_nl[6] = "%d%%\n";
+    const char s_0s_1[7] = "\x1A" "0%s" "\x1A" "1";
+    const char s_0s[5] = "\x1A" "0%s";
+    const char s_m25_17[9] = "\a" "M25,17.";
+    const char s_0s_1_dash[10] = "\x1A" "0%s" "\x1A" "1--\n";
+    const char s_m25_27[9] = "\a" "M25,27.";
+    const char s_0s_1d_nl[10] = "\x1A" "0%s" "\x1A" "1%d\n";
+    const char s_0s_10_nl[9] = "\x1A" "0%s" "\x1A" "10\n";
+    const char s_d_nl[4] = "%d\n";
+    const char s_m25_30_0s[13] = "\a" "M25,30." "\x1A" "0%s";
+
+    uint8_t _draw_sun_before_planet;
+    int8_t _skip_draw_system_planets;
+    char s__00551100[1] = "";
+    const char s__00551120[2] = { '\x1B', '\0' };
+    int16_t _planet_buttons[5];
+    uint8_t _skip_draw_system_display;
+    s_animation_header* _system_display_sun_seg;
+    void* _sys_disp_bitmap;
+    int8_t _remap_gray_percentages[10] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+    uint8_t _remap_gray_mask_palette[10][256];
+    s_animation_header* _mask_header;
+    char _star_description_string[256];
+
     void __cdecl Clear_System_Display_Ship_Fields_() {
         memset(MOX::_system_display_ships, 0, sizeof(MOX::_system_display_ships));
 
@@ -14,7 +41,7 @@ namespace SYS {
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_index) {
         char buffer[120];
 
-        sprintf(buffer, s_fmt_00557F18, (int)star_index, &MOX::_star[star_index]);
+        sprintf(buffer, SYS::s_fmt_star_display, (int)star_index, &MOX::_star[star_index]);
 
         size_t len = strlen(buffer);
         if (len >= 20) {
@@ -1774,7 +1801,7 @@ namespace SYS {
                 static_cast<int16_t>(popup_left + 0x107),
                 static_cast<int16_t>(popup_top + 0xEC),
                 SYS::s__00551100,
-                SYS::_moveable_box_pict_4,
+                MOX::_moveable_box_pict[4],
                 SYS::s__00551120,
                 0x28);
 
@@ -1977,7 +2004,7 @@ namespace SYS {
                 const uint8_t remapped_color =
                     remap::_picture_remap_color_list[sprite_data[sprite_byte_index]];
                 color =
-                    video::DAT_005A56E0[(static_cast<int32_t>(mask_value) << 8) + remapped_color];
+                    SYS::_remap_gray_mask_palette[mask_value][remapped_color];
               } else {
                 color = remap::_picture_remap_color_list[sprite_data[sprite_byte_index]];
               }
@@ -2110,9 +2137,7 @@ namespace SYS {
 
                         uint8_t out_color;
                         if (mask_value != 0) {
-                            const int32_t mask_lookup = static_cast<int32_t>(mask_value) << 8;
-                            out_color = video::DAT_005A56E0[
-                                mask_lookup + static_cast<int32_t>(remapped_color)];
+                            out_color = SYS::_remap_gray_mask_palette[mask_value][remapped_color];
                         } else {
                             out_color = remapped_color;
                         }

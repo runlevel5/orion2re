@@ -3,8 +3,7 @@
 struct s_leader_data;
 
 namespace spy {
-    inline int8_t (&_lookup_table)[8] =
-        *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F090});
+    extern int8_t _lookup_table[8];
 
     int16_t __cdecl Tech_Spy_Bonus_(s_player* player);
 
@@ -12,8 +11,7 @@ namespace spy {
 
     void __cdecl Resolve_Spies_();
 
-    inline int16_t* _spy_bonuses =
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CDD8});
+    extern int16_t _spy_bonuses[16];
 
     void __cdecl Resolve_Assassins_();
 

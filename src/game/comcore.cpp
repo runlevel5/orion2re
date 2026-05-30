@@ -87,12 +87,12 @@ int32_t __cdecl ComInit_(uint16_t msg_size, char* name, recv_handler_fn rec_fn) 
     _recFunc = reinterpret_cast<comcore::rec_fn>(transprt::ReceiveLargeUserMessage_);
     _recBufferLength = msg_size + 10;
 
-    _userReceiveBuffer = _malloc(_recBufferLength);
+    _userReceiveBuffer = malloc(_recBufferLength);
     if (_userReceiveBuffer == nullptr) {
         return -202;
     }
 
-    _sendBuffer = _malloc(_recBufferLength);
+    _sendBuffer = malloc(_recBufferLength);
     if (_sendBuffer == nullptr) {
         return -202;
     }
@@ -100,7 +100,7 @@ int32_t __cdecl ComInit_(uint16_t msg_size, char* name, recv_handler_fn rec_fn) 
     _sendReq.buf_size = 0;
     _sendReq.send_buf = static_cast<uint8_t*>(_sendBuffer);
 
-    _pollBuffer = static_cast<uint8_t*>(_malloc(_recBufferLength));
+    _pollBuffer = static_cast<uint8_t*>(malloc(_recBufferLength));
     if (_pollBuffer == nullptr) {
         return -202;
     }
@@ -132,7 +132,7 @@ int16_t __cdecl ComDoComms_() {
 
 void __cdecl GetMessages_() {
     int16_t attempts = 100;
-    *__errno() = 0;
+    errno = 0;
 
     while (true) {
         if (net::NetPoll_(&_pollReq) != 3) {

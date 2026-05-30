@@ -1,29 +1,28 @@
 #pragma once
 
 namespace SYS {
-    inline void*& _sys_data_buffer = *reinterpret_cast<void**>(std::uintptr_t{0x005A57D0});
-    inline const char* s_fmt_star_display = reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
-    inline const char* s_1 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
-    inline const char* s_percent_d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f20}); // "%d%%\n"
-    inline const char* s_0s_1 = reinterpret_cast<const char*>(std::uintptr_t{0x00557f28}); // " 0%s 1"
-    inline const char* s_0s = reinterpret_cast<const char*>(std::uintptr_t{0x00557f30}); // " 0%s"
-    inline const char* s_m25_17 = reinterpret_cast<const char*>(std::uintptr_t{0x00557f38}); // " M25,17."
-    inline const char* s_0s_1_dash = reinterpret_cast<const char*>(std::uintptr_t{0x00557f44}); // " 0%s 1--\n"
-    inline const char* s_m25_27 = reinterpret_cast<const char*>(std::uintptr_t{0x00557f50}); // " M25,27."
-    inline const char* s_0s_1d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f5c}); // " 0%s 1%d\n"
-    inline const char* s_0s_10_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f68}); // " 0%s 10\n"
-    inline const char* s_d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f74}); // "%d\n"
-    inline const char* s_m25_30_0s = reinterpret_cast<const char*>(std::uintptr_t{0x00557f78}); // " M25,30. 0%s"
+    extern void* _sys_data_buffer;
+    extern const char s_fmt_star_display[7]; // "%d> %s"
+    extern const char s_1[3];
+    extern const char s_percent_d_nl[6]; // "%d%%\n"
+    extern const char s_0s_1[7];
+    extern const char s_0s[5];
+    extern const char s_m25_17[9];
+    extern const char s_0s_1_dash[10];
+    extern const char s_m25_27[9];
+    extern const char s_0s_1d_nl[10];
+    extern const char s_0s_10_nl[9];
+    extern const char s_d_nl[4]; // "%d\n"
+    extern const char s_m25_30_0s[13];
 
-    inline uint8_t& _draw_sun_before_planet = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566438});
-    inline int8_t& _skip_draw_system_planets = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A57CC});
-    inline char* const s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
-    inline char* const s__00551120 = reinterpret_cast<char*>(std::uintptr_t{0x00551120});
-    inline int16_t (&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00597470});
-    inline s_animation_header*& _moveable_box_pict_4 = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B70});
-    inline uint8_t& _skip_draw_system_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A57D4});
-    inline s_animation_header*& _system_display_sun_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056654C});
-    inline void*& _sys_disp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00566434});
+    extern uint8_t _draw_sun_before_planet;
+    extern int8_t _skip_draw_system_planets;
+    extern char s__00551100[1];
+    extern const char s__00551120[2];
+    extern int16_t _planet_buttons[5];
+    extern uint8_t _skip_draw_system_display;
+    extern s_animation_header* _system_display_sun_seg;
+    extern void* _sys_disp_bitmap;
 
     void __cdecl Clear_System_Display_Loaded_Flag_();
 
@@ -41,11 +40,9 @@ namespace SYS {
 
     void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t arg3, int32_t arg4);
 
-    inline int8_t (&_remap_gray_percentages)[10] =
-        *reinterpret_cast<int8_t (*)[10]>(std::uintptr_t{0x00557EE0});
+    extern int8_t _remap_gray_percentages[10];
 
-    inline uint8_t (&_remap_gray_mask_palette)[10][256] =
-        *reinterpret_cast<uint8_t (*)[10][256]>(std::uintptr_t{0x005A57E0});
+    extern uint8_t _remap_gray_mask_palette[10][256];
 
     void __cdecl Calculate_Remap_Gray_Palettes_();
 
@@ -69,7 +66,7 @@ namespace SYS {
 
     void __cdecl Remap_Draw_With_Mask_(int16_t x, int16_t y, s_animation_header* anim_hdr, s_animation_header* mask_hdr);
 
-    inline s_animation_header*& _mask_header = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A57D8});
+    extern s_animation_header* _mask_header;
 
     void __cdecl Remap_Draw_Animated_Sprite_Mask_(
         int16_t x,
@@ -156,8 +153,7 @@ namespace SYS {
 
     void __cdecl Print_Empty_System_Data_(int16_t star_idx);
 
-    inline char (&_star_description_string)[256] =
-        *reinterpret_cast<char (*)[256]>(std::uintptr_t{0x00566440});
+    extern char _star_description_string[256];
 
     void __cdecl Draw_System_Display_Popup_(int16_t star_idx, int8_t draw_border, const char* title_text, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset);
 

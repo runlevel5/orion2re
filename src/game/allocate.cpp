@@ -168,7 +168,7 @@ namespace allocate {
     }
 
     void* __cdecl Allocate_Far_Space_(uint32_t size) {
-        void* ptr = ::_malloc(size);
+        void* ptr = ::malloc(size);
 
         if (ptr == nullptr) {
             exitm::Exit_With_Message(s_Null_Pointer_0055b658);

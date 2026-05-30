@@ -29,17 +29,17 @@ namespace platform {
 
 	extern uint32_t g_available_mem;
 
-	extern int32_t g_screen_res_x;
+	extern int32_t& g_screen_res_x;
 
-	extern int32_t g_screen_res_y;
+	extern int32_t& g_screen_res_y;
 
 	extern LPDIRECTDRAWSURFACE g_primary_surface;
 
 	extern LPDIRECTDRAWSURFACE g_backbuffer_surface;
 
-	extern LPDIRECTDRAWSURFACE g_offscreen_surface_1;
+	extern LPDIRECTDRAWSURFACE& g_offscreen_surface_1;
 
-	extern LPDIRECTDRAWSURFACE g_offscreen_surface_2;
+	extern LPDIRECTDRAWSURFACE& g_offscreen_surface_2;
 
 	extern LPDIRECTDRAWSURFACE g_cursor_surface_1;
 
@@ -49,9 +49,9 @@ namespace platform {
 
 	extern LPVOID _cursor_surface;
 
-	extern LPDIRECTDRAWPALETTE g_palette;
+	extern LPDIRECTDRAWPALETTE& g_palette;
 
-	extern tagPALETTEENTRY g_palette_entries[256];
+	extern tagPALETTEENTRY (&g_palette_entries)[256];
 
 	extern uint32_t DAT_00578e20;
 

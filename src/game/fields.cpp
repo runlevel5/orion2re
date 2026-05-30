@@ -1635,7 +1635,7 @@ namespace fields {
 
         ::DestroyWindow(platform::g_main_window);
 
-        __exit(1);
+        exit(1);
     }
 
     void __cdecl Find_Bar_Position_(int16_t field_idx) {

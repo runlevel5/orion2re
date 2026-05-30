@@ -1600,12 +1600,12 @@ namespace NETMOX {
         RUSS::Mox_Update_();
 
         if (_secret_modem_file.mode == 2 && size != 0 && size != _secret_modem_file.buffer_size) {
-            _free(_secret_modem_file.buffer);
+            free(_secret_modem_file.buffer);
             _secret_modem_file.mode = 0;
         }
 
         if (_secret_modem_file.mode == 0) {
-            _secret_modem_file.buffer = static_cast<uint8_t*>(_malloc(size));
+            _secret_modem_file.buffer = static_cast<uint8_t*>(malloc(size));
             if (_secret_modem_file.buffer != nullptr) {
                 _secret_modem_file.buffer_size = size;
                 _secret_modem_file.current_ptr = _secret_modem_file.buffer;

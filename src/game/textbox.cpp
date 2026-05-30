@@ -1,6 +1,27 @@
 #include "pch.h"
 
 namespace TEXTBOX {
+    int16_t _bottom_y;
+    uint8_t* _textbox_seg;
+    s_animation_header* tmp_block;
+    uint16_t _field_save_ix;
+    const char s_textbox_lbx[12] = "textbox.lbx";
+    const char (&s_textbox_lbx_00557444)[12] = s_textbox_lbx;
+    const char s_SPA_HELP_LBX[16] = "SPA_HELP.LBX";
+    const char s_ITA_HELP_LBX[16] = "ITA_HELP.LBX";
+    const char s_FRE_HELP_LBX[16] = "FRE_HELP.LBX";
+    const char s_GER_HELP_LBX[16] = "GER_HELP.LBX";
+    const char s_HELP_LBX[9] = "HELP.LBX";
+    s_fieldsav_data _textbox_field_save[2];
+    uint8_t _reload_saved_block;
+    int16_t _box_x;
+    int16_t _box_y;
+    uint16_t _old_draw_fields_flag;
+    MOX2::action_func_t _textbox_af;
+    uint16_t _old_help_list_active;
+    const char s__00551120[2] = {'\x1B', '\0'};
+    int32_t _base_colors[3] = {160, 192, 224};
+
     void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name) {
         switch (MOX::_settings.language) {
             case 1: /* German */

@@ -1,48 +1,36 @@
 #pragma once
 
 namespace SCIENCE {
-    inline const char* const s_SR_R_x_SC_LBX_005512b0 =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x005512B0 }); // "SR_R%x_SC.LBX"
+    extern const char s_SR_R_x_SC_LBX_005512b0[14]; // "SR_R%x_SC.LBX"
 
-    inline const char* _spy_anim_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x005512C0});
-    inline const char* _trooper_anim_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x005512D0});
-    inline const char* _spy_anim_find_pat = reinterpret_cast<const char*>(std::uintptr_t{0x005512F0});
-    inline const char* _trooper_anim_find_pat = reinterpret_cast<const char*>(std::uintptr_t{0x00551300});
+    extern const char _spy_anim_fmt[14];
+    extern const char _trooper_anim_fmt[14];
+    extern const char _spy_anim_find_pat[13];
+    extern const char _trooper_anim_find_pat[13];
 
-    inline const char* const s_billtext_lbx_0055135c =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x0055135C }); // "billtext.lbx"
-
-    inline s_tech_field_data* const _technology_fields =
-        reinterpret_cast<s_tech_field_data*>(std::uintptr_t{ 0x00553050 });
+    extern const char s_billtext_lbx_0055135c[13]; // "billtext.lbx"
 
     void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_idx);
 
-    inline char* s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
-    inline char* s__00551120 = reinterpret_cast<char*>(std::uintptr_t{0x00551120}); /* " " */
-    inline char* s__0055136c = reinterpret_cast<char*>(std::uintptr_t{0x0055136C}); /* "\r" */
+    extern const char s__00551100[1];
+    extern const char s__00551120[2];
+    extern const char s__0055136c[2]; /* "\r" */
 
-    inline s_colors& _science_high_color =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00551310});
+    extern s_colors _science_high_color;
 
-    inline s_colors& _science_normal_color =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00551318});
+    extern s_colors _science_normal_color;
 
-    inline int16_t (&_bm_scale_x)[5] =
-        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00551320});
+    extern int16_t _bm_scale_x[5];
 
-    inline int16_t (&_bm_scale_y)[5] =
-        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00551330});
+    extern int16_t _bm_scale_y[5];
 
-    inline int16_t (&_bm_scaled_x1)[5] =
-        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00551340});
+    extern int16_t _bm_scaled_x1[5];
 
-    inline int16_t (&_bm_scaled_y1)[5] =
-        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00551350});
+    extern int16_t _bm_scaled_y1[5];
 
-    inline void*& _science_mouse_bitmap =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005A8BB8});
+    extern void* _science_mouse_bitmap;
 
-    inline char* s_SCIENCE_LBX_00551290 = reinterpret_cast<char*>(std::uintptr_t{0x00551290});
+    extern const char s_SCIENCE_LBX_00551290[12];
     void __cdecl Update_Science_Anims_(int unused, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1);
 
     void __cdecl Draw_Science_Room_();

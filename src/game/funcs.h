@@ -112,113 +112,20 @@ inline const char* s_percent_0055633c = reinterpret_cast<const char*>(0x0055633C
 inline const char* s_slash_005599a4 = reinterpret_cast<const char*>(0x005599A4); // "/"
 inline const char* s_lparen_005599a8 = reinterpret_cast<const char*>(0x005599A8); // "("
 
-inline int32_t* __cdecl __errno() {
-    using Fn = int32_t*(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542ba0});
-    return fn();
-}
-
-// CRT Internal Function Wrappers
-inline int __cdecl __heap_init() {
-    using Fn = int(__cdecl*)();
-    return reinterpret_cast<Fn>(std::uintptr_t{ 0x005470e0 })();
-}
-
-inline void __cdecl __amsg_exit(int code) {
-    using Fn = void(__cdecl*)(int);
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00542490 })(code);
-}
-
-inline int __cdecl __mtinit() {
-    using Fn = int(__cdecl*)();
-    return reinterpret_cast<Fn>(std::uintptr_t{ 0x00548520 })();
-}
-
-inline void __cdecl __ioinit() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00548340 })();
-}
-
-inline void __cdecl ___initmbctable() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00548330 })();
-}
-
-inline void* __cdecl ___crtGetEnvironmentStringsA() {
-    using Fn = void* (__cdecl*)();
-    return reinterpret_cast<Fn>(std::uintptr_t{ 0x00547e90 })();
-}
-
 inline MMRESULT (__stdcall*& PTR_timeEndPeriod_005aa5c4)(uint32_t) =
     *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5C4});
 
 inline MMRESULT (__stdcall*& PTR_timeKillEvent_005aa5cc)(uint32_t) =
     *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5CC});
 
-inline void __cdecl __exit(int code) {
-    using Fn = void(__cdecl*)(int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541630 });
-    fn(code);
-}
-
-inline void __cdecl __setargv() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00547c20 })();
-}
-
-inline void __setenvp() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00547b30 })();
-}
-
-inline void __cdecl __cinit() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00541600 })();
-}
-
-inline int __cdecl __ismbblead(uint32_t c) {
-    using Fn = int(__cdecl*)(uint32_t c);
-    return reinterpret_cast<Fn>(std::uintptr_t{ 0x00547ad0 })(c);
-}
-
 inline const char* s_modem_005607dc = reinterpret_cast<const char*>(std::uintptr_t{0x005607DC});
 inline const char* s_ipx_005607e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E4});
 inline const char* s_tcp_005607e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E8});
-
-inline void* __cdecl _malloc(size_t size) {
-    using Fn = void* (__cdecl*)(size_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005421a0 });
-    return fn(size);
-}
-
-inline void __cdecl _free(void* ptr) {
-    using Fn = void(__cdecl*)(void*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00542270 });
-    fn(ptr);
-}
-
-inline int __cdecl hgetch_() {
-    using Fn = int(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
-    return fn();
-}
-
-inline int __cdecl __getch() {
-    using Fn = int(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0054EAC0});
-    return fn();
-}
 
 inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter) {
     using Fn = HRESULT(__stdcall*)(GUID*, LPDIRECTDRAW*, IUnknown*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0053a8ca });
     return fn(lpGUID, lplpDD, pUnkOuter);
-}
-
-inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsigned stack_size, void* arglist) {
-    using Fn = uintptr_t(__cdecl*)(void(__cdecl*)(void*), unsigned, void*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005424C0 });
-    return fn(start_address, stack_size, arglist);
 }
 
 

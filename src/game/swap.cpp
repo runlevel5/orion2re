@@ -2,6 +2,9 @@
 
 namespace swap {
 
+int32_t _swap_block_size;
+uint8_t* _swap_block_address;
+
 void __cdecl Save_Block_To_Drive_(uint8_t* block_address, int32_t block_size) {
     int32_t saved_block_size = block_size + 0x0c;
     FILE* swap_file;

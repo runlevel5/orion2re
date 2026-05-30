@@ -366,7 +366,7 @@ namespace FILEDEF {
             strcat(filename, num_str);
             strcat(filename, s_GAM_005568f4);
 
-            if (accss::_access_(filename, 0) == 0) {
+            if (_access(filename, 0) == 0) {
                 FILE* fp = fopen(filename, s_rb_0055117c);
                 if (fp != nullptr) {
                     int32_t type;

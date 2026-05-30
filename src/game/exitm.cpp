@@ -14,7 +14,7 @@ namespace exitm {
         platform::Prepare_Exit_();
 
         DestroyWindow(platform::g_main_window);
-        __exit(1);
+        exit(1);
     }
 
     void __cdecl Exit_With_message2_(const char* msg) {

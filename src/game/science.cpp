@@ -1,6 +1,28 @@
 #include "pch.h"
 
 namespace SCIENCE {
+    const char s_SR_R_x_SC_LBX_005512b0[14] = "SR_R%x_SC.LBX";
+    const char _spy_anim_fmt[14] = "SR_R%x_SP.LBX";
+    const char _trooper_anim_fmt[14] = "SR_R%x_TR.LBX";
+    const char _spy_anim_find_pat[13] = "SR_R?_SP.LBX";
+    const char _trooper_anim_find_pat[13] = "SR_R?_TR.LBX";
+    const char s_billtext_lbx_0055135c[13] = "billtext.lbx";
+    const char s__00551100[1] = "";
+    const char s__00551120[2] = { 0x1B, '\0' };
+    const char s__0055136c[2] = "\r";
+
+    s_colors _science_high_color = {{240, 246, 243, 244, 244, 245, 246, 247}};
+    s_colors _science_normal_color = {{242, 245, 244, 244, 244, 244, 245, 246}};
+
+    int16_t _bm_scale_x[5] = {6, 21, 37, 60, 85};
+    int16_t _bm_scale_y[5] = {6, 20, 37, 58, 85};
+    int16_t _bm_scaled_x1[5] = {373, 349, 320, 283, 239};
+    int16_t _bm_scaled_y1[5] = {203, 179, 149, 113, 69};
+
+    void* _science_mouse_bitmap;
+
+    const char s_SCIENCE_LBX_00551290[12] = "SCIENCE.LBX";
+
     void __cdecl Show_Off_Captured_Tech_(int16_t* captured_tech_ids, uint16_t tech_count, int16_t message_arg) {
         char text_buffer[0x100];
 
@@ -358,7 +380,7 @@ namespace SCIENCE {
 
             TECH::Technology_Fields_Name_(research_field);
 
-            const int16_t* field_tech_ids = SCIENCE::_technology_fields[research_field].tech;
+            const int16_t* field_tech_ids = TECHDATA::_technology_fields[research_field].tech;
             for (int tech_slot = 0; tech_slot < 4; ++tech_slot) {
                 const int16_t tech_id = field_tech_ids[tech_slot];
                 if (tech_id > 0 && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {

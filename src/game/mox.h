@@ -286,255 +286,224 @@ namespace MOX {
     extern int16_t _fleet_movement_all_button;
     extern int16_t _galaxy_map_scanned_star;
     extern int8_t _draw_system_display_without_button;
-    inline uint8_t& _need_to_restore_help_list = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597D60});
-    inline int16_t& _ship_icon_player_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B322});
-    inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
-    inline uint8_t& _previous_report = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CB2});
-    inline int16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AC8});
-    inline int16_t (&_system_display_ring_radius)[5] =
-        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x00597AE0});
-    inline uint8_t (&_rot_plan_dim)[5] =
-        *reinterpret_cast<uint8_t (*)[5]>(std::uintptr_t{0x00597758});
-    inline int16_t& _system_star_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1CB8});
-    inline int16_t& _system_star_id_for_auto_select = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA1A});
-    inline uint8_t& _draw_fleet_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059770C});
-    inline s_mouse_xy& _mouse_XY = *reinterpret_cast<s_mouse_xy*>(std::uintptr_t{0x0059B5C0});
-    inline int16_t& _system_display_ship_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BFB0});
-    inline int16_t& _system_icon_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597A98});
-    inline uint16_t& _global_exit_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D7A});
-    inline uint16_t& _player_design_num = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B28});
-    inline int16_t& _eta_star_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAAE});
-    inline int16_t& _stencil_box_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2C});
-    inline int16_t& _draw_main_screen_stencilled = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1864});
-    inline uint16_t& _animated_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B5F0});
-    inline s_mouse_list (&_mouse_list_zoom_mode)[5] = *reinterpret_cast<s_mouse_list(*)[5]>(std::uintptr_t{0x00559898});
-    inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
-    inline int16_t& _first_fleet_movement_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D4A});
+    extern uint8_t _need_to_restore_help_list;
+    extern int16_t _ship_icon_player_id;
+    extern int8_t _at_least_one_report;
+    extern uint8_t _previous_report;
+    extern int16_t _first_node_ptr_in_stack_;
+    extern int16_t _system_display_ring_radius[5];
+    extern uint8_t _rot_plan_dim[5];
+    extern int16_t _system_star_id;
+    extern int16_t _system_star_id_for_auto_select;
+    extern uint8_t _draw_fleet_screen_to_back;
+    extern s_mouse_xy _mouse_XY;
+    extern int16_t _system_display_ship_scanned;
+    extern int16_t _system_icon_scanned;
+    extern uint16_t _global_exit_field;
+    extern int16_t _eta_star_id;
+    extern int16_t _stencil_box_id;
+    extern int16_t _draw_main_screen_stencilled;
+    extern uint16_t _animated_star;
+    extern s_mouse_list _mouse_list_zoom_mode[5];
+    extern int8_t _just_moved_stack;
+    extern int16_t _first_fleet_movement_icon;
 
-    inline int16_t& _next_free_node =\
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4aa4});
+    extern int16_t _next_free_node;
 
-    inline uint8_t* _main_palette_player_colors = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F098});
+    extern uint8_t _main_palette_player_colors[8];
 
-    inline int16_t (&_h_string_ix)[397] =
-            *reinterpret_cast<int16_t(*)[397]>(std::uintptr_t{0x0059B6E0});
-    inline char (&_h_strings)[0x4074] =
-            *reinterpret_cast<char(*)[0x4074]>(std::uintptr_t{0x0059D6E0});
+    extern int16_t _h_string_ix[397];
+    extern char _h_strings[0x4074];
 
-    inline s_help_box (&_help_entry_list)[50] =
-        *reinterpret_cast<s_help_box(*)[50]>(std::uintptr_t{0x005A1900});
+    extern s_help_box _help_entry_list[50];
 
     // Suggested name: MOX::_class_to_mineral
-    inline int8_t (&_class_to_mineral)[60] = *reinterpret_cast<int8_t(*)[60]>(std::uintptr_t{0x00559540});
+    extern int8_t _class_to_mineral[60];
 
     // Suggested name: MOX::_planet_special
-    inline int8_t& _planet_special =
-            *reinterpret_cast<int8_t*>(std::uintptr_t{0x005596A0});
+    extern int8_t _planet_special;
 
     // Suggested name: MOX::_planet_special_weighted_chance
-    inline uint8_t* _planet_special_weighted_chance = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596B0});
+    extern uint8_t _planet_special_weighted_chance[12];
 
     // Suggested name: MOX::_gravity_table
-    inline int8_t (&_gravity_table)[30] = *reinterpret_cast<int8_t(*)[30]>(std::uintptr_t{0x00559580});
+    extern int8_t _gravity_table[30];
 
-    inline s_mouse_list &_mouse_list_arrow = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D10});
-    inline s_mouse_list& _mouse_list_relocation = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005598D8});
-    inline s_mouse_list (&_cmbt_mouse_list_clock) = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558DB8});
-    inline s_mouse_list &_mouse_list_variable = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D20});
-    inline s_mouse_list& _mouse_list_none = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D70});
+    extern s_mouse_list _mouse_list_arrow;
+    extern s_mouse_list _mouse_list_relocation;
+    extern s_mouse_list _cmbt_mouse_list_clock;
+    extern s_mouse_list _mouse_list_variable;
+    extern s_mouse_list _mouse_list_none;
 
-    inline int16_t& _mid_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059643C});
-    inline int16_t& _mid_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596444});
-    inline int16_t& _design_screen_replacement_item = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C41C});
-    inline int16_t& _far_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CAE});
-    inline int16_t& _far_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CB6});
-    inline int16_t& _near_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA6});
-    inline int16_t& _near_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA8});
-    inline s_animation_header*& _near_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597424});
+    extern int16_t _mid_star_x;
+    extern int16_t _mid_star_y;
+    extern int16_t _design_screen_replacement_item;
+    extern int16_t _far_star_x;
+    extern int16_t _far_star_y;
+    extern int16_t _near_star_y;
+    extern int16_t _near_star_x;
+    extern s_animation_header* _near_star_seg;
 
-    inline const char* s_ATZ_0055AA7C =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA7C}); // "ATZ"
+    extern const char s_ATZ_0055AA7C[4];
 
-    inline const char* s_AT_K0_M1_D2_0055AA6C =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA6C}); // "AT &K0 M1 &D2"
+    extern const char s_AT_K0_M1_D2_0055AA6C[14];
 
-    inline const char* s_AT_H0_S0_0_0055AA60 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA60}); // "AT H0 S0=0"
+    extern const char s_AT_H0_S0_0_0055AA60[11];
 
-    inline const char* s_5551212_0055AA58 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA58}); // "5551212"
+    extern const char s_5551212_0055AA58[8];
 
-    inline const char* s_fmt_s =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
+    extern const char s_fmt_s[3];
 
-    inline const char* s_fmt_scanned_star_info =
-        reinterpret_cast<const char*>(std::uintptr_t{0x005569C0});
+    extern const char s_fmt_scanned_star_info[8];
 
-    inline const char* s_fmt_contested =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00559930}); // "%s (contested)"
+    extern const char s_fmt_contested[15];
 
-    inline void*& _special_names_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x00595390 });
+    extern void* _special_names_seg;
 
-    inline void*& _global_data_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x00597410 });
+    extern void* _global_data_seg;
 
-    inline s_nebula*& _nebula =
-        *reinterpret_cast<s_nebula**>(std::uintptr_t{ 0x00597770 });
+    extern s_nebula* _nebula;
 
-    inline uint8_t& _NUM_NEBULAS = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D10});
+    extern uint8_t _NUM_NEBULAS;
 
-    inline int16_t& _NUM_COLONIES =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00597856 });
+    extern int16_t _NUM_COLONIES;
 
-    inline int16_t& _planet_count = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059700E });
+    extern int16_t _planet_count;
 
     // Suggested name: MOX::_climate_modifier_table
-    inline int8_t (&_climate_modifier_table)[5] =
-        *reinterpret_cast<int8_t(*)[5]>(std::uintptr_t{0x00559688});
+    extern int8_t _climate_modifier_table[5];
 
-    inline s_planet_data*& _planet =
-        *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
+    extern s_planet_data* _planet;
 
-    inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559428});
+    extern char* _roman_literals[21];
 
-    inline char* (&_planet_special_string)[12] = *reinterpret_cast<char* (*)[12]>(std::uintptr_t{0x00597780});
-    inline char* (&_planet_climate_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x0059BA80});
-    inline char* (&_mineral_class_string)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A2C30});
-    inline uint8_t& _red_color2 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A2C44});
-    inline char* (&_planet_size_string)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A47C0});
-    inline char* (&_planet_type_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x00596C70});
-    inline char* (&_planet_group_string)[4] = *reinterpret_cast<char* (*)[4]>(std::uintptr_t{0x00596D00});
-    inline char* (&_planet_atmosphere_string)[3] = *reinterpret_cast<char* (*)[3]>(std::uintptr_t{0x0059B600});
-    inline char* (&_spectral_class_string)[7] = *reinterpret_cast<char* (*)[7]>(std::uintptr_t{0x0059BED0});
-    inline char* (&_admin_skill_names)[9] = *reinterpret_cast<char* (*)[9]>(std::uintptr_t{0x0059BF70});
+    extern char* _planet_special_string[12];
+    extern char* _planet_climate_string[10];
+    extern char* _mineral_class_string[5];
+    extern uint8_t _red_color2;
+    extern char* _planet_size_string[5];
+    extern char* _planet_type_string[10];
+    extern char* _planet_group_string[4];
+    extern char* _planet_atmosphere_string[3];
+    extern char* _spectral_class_string[7];
+    extern char* _admin_skill_names[9];
 
-    inline char* (&_planet_gravity_string)[3] =
-        *reinterpret_cast<char*(*)[3]>(std::uintptr_t{0x005A49E0});
+    extern char* _planet_gravity_string[3];
 
-    inline int16_t& _NUM_SHIPS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059B4BC });
-    inline void*& _global_bitmap_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596DC4});
-    inline uint8_t& _first_time_drawn = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D1A});
-    inline uint8_t& _draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E98});
-    inline uint8_t& _dont_draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BFB2});
-    inline int16_t& _zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BFDC});
-    inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
-    inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
-    inline s_animation_header*& _star_bg_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1790});
-    inline void*& _scan_ship_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005973FC});
-    inline s_animation_header*& _detail_fleet_icon_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49D4});
-    inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
-    inline int16_t (&_weapons_count_plus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597D50});
-    inline int16_t (&_weapons_count_minus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005A1810});
-    inline int16_t (&_design_ship_size_field)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x0059BAC0});
+    extern int16_t _NUM_SHIPS;
+    extern void* _global_bitmap_seg;
+    extern uint8_t _first_time_drawn;
+    extern uint8_t _draw_main_screen_to_back;
+    extern uint8_t _dont_draw_main_screen_to_back;
+    extern int16_t _zoom_count;
+    extern int16_t _max_zoom_count;
+    extern uint8_t _star_bg_index;
+    extern s_animation_header* _star_bg_seg;
+    extern void* _scan_ship_seg;
+    extern s_animation_header* _detail_fleet_icon_seg;
+    extern uint16_t _fleet_icon_button_count;
+    extern int16_t _weapons_count_plus_button[8];
+    extern int16_t _weapons_count_minus_button[8];
+    extern int16_t _design_ship_size_field[6];
+    extern void* _techname_seg;
+    extern void* _tech_desc_seg;
+    extern s_animation_header* _main_screen_seg;
+    extern s_animation_header* _design_screen_seg;
+    extern s_animation_header* _design_icon_lf_arrow_seg;
+    extern s_animation_header* _design_icon_rt_arrow_seg;
+    extern s_animation_header* _clear_design_button_seg;
+    extern s_animation_header* _cancel_design_button_seg;
+    extern s_animation_header* _build_design_button_seg;
+    extern s_animation_header* _plus_button_seg;
+    extern s_animation_header* _minus_button_seg;
+    extern s_animation_header* _d_scroll_up_button_seg;
+    extern s_animation_header* _d_scroll_dn_button_seg;
+    extern s_animation_header* _dull_d_scroll_up_button_seg;
+    extern s_animation_header* _dull_d_scroll_dn_button_seg;
+    extern s_animation_header* _beam_filter_button_seg;
+    extern s_animation_header* _missile_filter_button_seg;
+    extern s_animation_header* _bomb_filter_button_seg;
+    extern s_animation_header* _special_filter_button_seg;
+    extern s_animation_header* _weapons_cancel_button_seg;
+    extern s_animation_header* _weapons_accept_button_seg;
+    extern s_animation_header* _weapons_top_box_seg;
+    extern s_animation_header* _weapons_mid_box_seg;
+    extern s_animation_header* _weapons_bot_box_seg;
+    extern s_animation_header* _weapons_selected_seg;
+    extern s_animation_header* _weapons_blank_mods_seg;
+    extern s_animation_header* _system_repl_scroll_bar_seg;
+    extern s_animation_header* _system_repl_box_top_seg;
+    extern s_animation_header* _system_repl_box_mid_seg;
+    extern s_animation_header* _system_repl_box_btm_seg;
+    extern s_animation_header* _system_repl_box_cancel_btn;
+    extern int16_t _weapons_clear_button[8];
+    extern int16_t _special_system_clear_button[8];
+    extern s_animation_header* _design_size_button_seg[6];
+    extern s_animation_header* _darkened_size_button_seg[6];
+    extern s_animation_header* _weapons_arc_pict_seg[5];
+    extern s_animation_header* _weapons_arc_text_seg[5];
+    extern s_animation_header* _weapons_rack_text_seg[5];
+    extern s_animation_header* _weapons_special_seg[18];
+    extern s_weapon_filter_item* _weapon_filter;
+    extern char* _special_desc_string[39];
+    extern char* _weapon_notes_string[40];
+    extern s_animation_header* _d_scroll_bar_seg;
+    extern s_animation_header* _weapons_rack_seg;
 
-    inline void*& _techname_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
+    extern s_animation_header* _mainscrn_diplo_lights_seg;
 
-    inline void*& _tech_desc_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005977EC});
+    extern s_animation_header* _diplomacy_request_wait_seg;
+    extern s_animation_header* _diplomacy_request_invoke_seg;
+    extern s_animation_header* _diplomacy_request_accept_seg;
 
-    inline s_animation_header*& _main_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B400});
-    inline s_animation_header*& _design_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059D6CC});
-    inline s_animation_header*& _design_icon_lf_arrow_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B33C});
-    inline s_animation_header*& _design_icon_rt_arrow_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BAB4});
-    inline s_animation_header*& _clear_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597004});
-    inline s_animation_header*& _cancel_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005978F0});
-    inline s_animation_header*& _build_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596EAC});
-    inline s_animation_header*& _plus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005973F8});
-    inline s_animation_header*& _minus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4AC});
-    inline s_animation_header*& _d_scroll_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597714});
-    inline s_animation_header*& _d_scroll_dn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1868});
-    inline s_animation_header*& _dull_d_scroll_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596F7C});
-    inline s_animation_header*& _dull_d_scroll_dn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597404});
-    inline s_animation_header*& _beam_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF3C});
-    inline s_animation_header*& _missile_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005972FC});
-    inline s_animation_header*& _bomb_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B334});
-    inline s_animation_header*& _special_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1834});
-    inline s_animation_header*& _weapons_cancel_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005974A0});
-    inline s_animation_header*& _weapons_accept_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059783C});
-    inline s_animation_header*& _weapons_top_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4B0});
-    inline s_animation_header*& _weapons_mid_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596FD4});
-    inline s_animation_header*& _weapons_bot_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BCC4});
-    inline s_animation_header*& _weapons_selected_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C024});
-    inline s_animation_header*& _weapons_blank_mods_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597000});
-    inline s_animation_header*& _system_repl_scroll_bar_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597418});
-    inline s_animation_header*& _system_repl_box_top_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1824});
-    inline s_animation_header*& _system_repl_box_mid_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B3C});
-    inline s_animation_header*& _system_repl_box_btm_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596FA4});
-    inline s_animation_header*& _system_repl_box_cancel_btn = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BD30});
-    inline int16_t (&_weapons_clear_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005974B0});
-    inline int16_t (&_special_system_clear_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597480});
-    inline s_animation_header* (&_design_size_button_seg)[6] = *reinterpret_cast<s_animation_header*(*)[6]>(std::uintptr_t{0x00597740});
-    inline s_animation_header** _darkened_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B410});
-    inline s_animation_header** _weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
-    inline s_animation_header** _weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
-    inline s_animation_header** _weapons_rack_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597980});
-    inline s_animation_header** _weapons_special_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597930});
-    inline s_weapon_filter_item*& _weapon_filter = *reinterpret_cast<s_weapon_filter_item**>(std::uintptr_t{0x0059BA0C});
-    inline char** _special_desc_string = reinterpret_cast<char**>(std::uintptr_t{0x00596EB0});
-    inline char** _weapon_notes_string = reinterpret_cast<char**>(std::uintptr_t{0x00596DD0});
-    inline s_animation_header*& _d_scroll_bar_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597994});
-    inline s_animation_header*& _weapons_rack_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005979A0});
+    extern void* _global_screen_seg;
 
-    inline s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B464});
+    extern void* _global_cache_seg;
 
-    inline uint32_t& _diplomacy_request_wait_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00597014});
-    inline uint32_t& _diplomacy_request_invoke_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A1840});
-    inline uint32_t& _diplomacy_request_accept_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A47D4});
-
-    inline void*& _global_screen_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5A8 });
-
-    inline void*& _global_cache_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5B8 });
-
-    inline s_animation_header*& _mid_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B610});
-    inline s_animation_header*& _far_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B0});
-    inline uint8_t (&_fleet_icon_selection_status)[64] =
-        *reinterpret_cast<uint8_t(*)[64]>(std::uintptr_t{0x005A17C0});
+    extern s_animation_header* _mid_star_seg;
+    extern s_animation_header* _far_star_seg;
+    extern uint8_t _fleet_icon_selection_status[64];
 
     // Suggested name: MOX::_star_seg
-    inline s_animation_header** _star_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4C0});
-    inline s_animation_header** _sun_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF50});
+    extern s_animation_header* _star_seg[40];
+    extern s_animation_header* _sun_seg[6];
 
-    inline uint16_t& _n_stats_to_generate = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A182E});
+    extern uint16_t _n_stats_to_generate;
 
-    inline uint32_t& _global_cache_size =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA10 });
+    extern uint32_t _global_cache_size;
 
-    inline uint32_t& _cmd_line_seed =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA08 });
+    extern uint32_t _cmd_line_seed;
 
-    inline int16_t& _ship_icon_lf_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA14});
-    inline int16_t& _ship_icon_rt_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597374});
+    extern int16_t _ship_icon_lf_button;
+    extern int16_t _ship_icon_rt_button;
 
-    inline uint8_t& _zoom_in = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597704});
-    inline s_animation_header*& _main_zoom_in_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B318});
-    inline s_animation_header*& _main_zoom_out_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597910});
-    inline s_animation_header*& _main_game_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596DC0});
-    inline s_animation_header*& _main_next_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5EC});
-    inline s_animation_header*& _main_colonies_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4B4});
-    inline s_animation_header*& _main_planets_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597844});
-    inline s_animation_header*& _main_fleets_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597378});
-    inline s_animation_header*& _main_leaders_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A2BF0});
-    inline s_animation_header*& _main_races_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B42C});
-    inline s_animation_header*& _main_info_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596E74});
-    inline int16_t* _star_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2C50});
-    inline int16_t& _main_screen_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977F2});
-    inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});
-    inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
+    extern uint8_t _zoom_in;
+    extern s_animation_header* _main_zoom_in_button_seg;
+    extern s_animation_header* _main_zoom_out_button_seg;
+    extern s_animation_header* _main_game_button_seg;
+    extern s_animation_header* _main_next_button_seg;
+    extern s_animation_header* _main_colonies_button_seg;
+    extern s_animation_header* _main_planets_button_seg;
+    extern s_animation_header* _main_fleets_button_seg;
+    extern s_animation_header* _main_leaders_button_seg;
+    extern s_animation_header* _main_races_button_seg;
+    extern s_animation_header* _main_info_button_seg;
+    extern int16_t _star_button[72];
+    extern int16_t _main_screen_grid_field;
+    extern int16_t _main_screen_grid_x;
+    extern int16_t _main_screen_grid_y;
 
-    inline int16_t& _NUM_PLAYERS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A2C1C });
-    inline uint8_t& _red_color1 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A2C1E});
-    inline char* (&_government_labels)[8] = *reinterpret_cast<char* (*)[8]>(std::uintptr_t{0x00596FB0});
-    inline char** _special_ability_names = reinterpret_cast<char**>(std::uintptr_t{0x0059B350});
-    inline int32_t& _stardate_at_beg_of_turn = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0059B344});
-    inline int8_t& _global_var = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B4AA});
-    inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
-    inline uint16_t& _combat_init = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005596D8});
-    inline void*& _warp_core_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596430});
-    inline s_mouse_list*& _combat_mouse_grid = *reinterpret_cast<s_mouse_list**>(std::uintptr_t{0x00596CB8});
-    inline void*& _stasis_bubble_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596CBC});
+    extern int16_t _NUM_PLAYERS;
+    extern uint8_t _red_color1;
+    extern char* _government_labels[8];
+    extern char* _special_ability_names[32];
+    extern int32_t _stardate_at_beg_of_turn;
+    extern int8_t _global_var;
+    extern uint16_t _FULL_DRAW_SCREEN_FLAG;
+    extern uint16_t _combat_init;
+    extern void* _warp_core_remap_colors;
+    extern s_mouse_list* _combat_mouse_grid;
+    extern void* _stasis_bubble_remap_colors;
     inline s_animation_header*& _combat_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596F80});
     inline s_animation_header*& _combat_far_star = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1CB0});
     inline s_animation_header*& _combat_mid_star = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D14});
@@ -658,7 +627,7 @@ namespace MOX {
 
     inline uint8_t (&_ship_icon_width)[4] = *reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x005a49ec});
     inline uint8_t (&_ship_icon_height)[4] = *reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x0059c460});
-    inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059c440});
+    extern s_ship_move_info _g_ship_move_info;
 
     inline s_star_data*& _star =
         *reinterpret_cast<s_star_data**>(std::uintptr_t{ 0x005A18F4 });

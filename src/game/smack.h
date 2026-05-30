@@ -5,17 +5,13 @@
 struct s_mouse_list;
 
 namespace SMACK {
-    inline s_mouse_list& _smack_mouse =
-        *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005599D8});
+    extern s_mouse_list _smack_mouse;
 
-    inline MOX2::action_func_t& _smack_auto_function =
-        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005960EC});
+    extern MOX2::action_func_t _smack_auto_function;
 
-    inline int16_t& _smack_x =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005960F0});
+    extern int16_t _smack_x;
 
-    inline int16_t& _smack_y =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005960F2});
+    extern int16_t _smack_y;
 
     void __cdecl Smack_Fade_(int16_t mode);
 

@@ -1052,7 +1052,7 @@ namespace DESIGN {
             Build_Design_Template_(&new_design);
 
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            s_ship_design* old_design = &player->ship_designs[_player_design_num];
+            s_ship_design* old_design = &player->ship_designs[MOX::_temp_star_handle];
 
             return AIBUILD::Refit_Cost_(MOX::_PLAYER_NUM, old_design, &new_design);
         }

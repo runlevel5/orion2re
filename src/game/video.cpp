@@ -1,6 +1,38 @@
 #include "pch.h"
 
 namespace video {
+	int32_t g_screen_res_x;
+	int32_t g_screen_res_y;
+	IDirectDrawSurface* g_offscreen_surface_1;
+	IDirectDrawSurface* g_offscreen_surface_2;
+	uint8_t* _video_memory;
+	int16_t _current_mouse_list_ptr;
+	int16_t _current_mouse_shape;
+	uint8_t* _current_video_page;
+	uint32_t screen_dump_flag;
+	int32_t screen_refresh_flag;
+	int16_t _old_screen_dump_flag;
+	int16_t _old_screen_refresh_flag;
+	s_scan_list_entry* _refresh_scan_list;
+	s_scan_list_entry* _refresh_stencil_list;
+	uint8_t* _mouse_palette;
+	uint32_t _screen_pixel_size = 0x4B000;
+	uint8_t _glass_remap_colors[16][256];
+	s_glass_color _glass_colors[16];
+	IDirectDrawPalette* g_palette;
+	tagPALETTEENTRY g_palette_entries[256];
+	s_palette_entry _current_palette[256];
+	uint8_t* _palette_list[65];
+	uint8_t _palette_reds[256];
+	uint16_t _is_initializing;
+	s_mouse_list _default_mouse_list;
+	uint8_t DAT_00578b58;
+	int16_t _copy_to_on_page_flag;
+	int16_t _screen_window_y1;
+	int16_t _screen_window_y2;
+	int16_t _screen_window_x1;
+	int16_t _screen_window_x2;
+
 	void Set_Page_Off_() {
 		platform::g_render_buffer = 1;
 		_copy_to_on_page_flag = 0;

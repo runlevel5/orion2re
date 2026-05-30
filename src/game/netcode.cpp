@@ -78,7 +78,7 @@ namespace netcode {
             if (WINNET::_session_count != 0) {
                 for (uint32_t i = 0; i < WINNET::_session_count; ++i) {
                     if (WINNET::_sessions[i] != nullptr) {
-                        ::_free(WINNET::_sessions[i]);
+                        ::free(WINNET::_sessions[i]);
                         WINNET::_sessions[i] = nullptr;
                     }
                 }
@@ -301,7 +301,7 @@ namespace netcode {
             return 0;
         }
 
-        DPSESSIONDESC* new_session = reinterpret_cast<DPSESSIONDESC*>(::_malloc(sizeof(DPSESSIONDESC)));
+        DPSESSIONDESC* new_session = reinterpret_cast<DPSESSIONDESC*>(::malloc(sizeof(DPSESSIONDESC)));
         WINNET::_sessions[WINNET::_session_count] = new_session;
         memcpy(new_session, &local_7c, sizeof(DPSESSIONDESC));
         WINNET::_session_count++;

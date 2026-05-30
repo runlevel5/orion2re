@@ -8,7 +8,7 @@ namespace assert {
     int __cdecl hgetch_() {
         fonts::PSTRS_(0, 24, s__00558490);
 
-        int key = __getch();
+        int key = _getch();
 
         if ((key == 27 || key == 'Q' || key == 'q') && MOX::_global_var != 'u') {
             fields::F11_Key_();

@@ -5,37 +5,37 @@ namespace AIPOWER {
         int16_t total_space = 100;
 
         if ((modification_flags & 0x0002) != 0) {
-            total_space = static_cast<int16_t>(TECHDATA::_weapon_modifications_1_space + 100);
+            total_space = static_cast<int16_t>(TECHDATA::_weapon_modifications[1].space + 100);
         }
         if ((modification_flags & 0x0004) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_2_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[2].space);
         }
         if ((modification_flags & 0x0020) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_5_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[5].space);
         }
         if ((modification_flags & 0x0080) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_7_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[7].space);
         }
         if ((modification_flags & 0x0100) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_8_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[8].space);
         }
         if ((modification_flags & 0x0200) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_9_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[9].space);
         }
         if ((modification_flags & 0x0400) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_10_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[10].space);
         }
         if ((modification_flags & 0x0800) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_11_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[11].space);
         }
         if ((modification_flags & 0x1000) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_12_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[12].space);
         }
         if ((modification_flags & 0x2000) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_13_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[13].space);
         }
         if ((modification_flags & 0x4000) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_14_space);
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[14].space);
         }
 
         int32_t result =

@@ -13,32 +13,26 @@ struct s_help_record {
 #pragma pack(pop)
 
 namespace TEXTBOX {
-    inline int16_t& _bottom_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EC8});
-    inline uint8_t*& _textbox_seg = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00565ed8});
-    inline s_animation_header*& tmp_block = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565EDC});
-    inline uint16_t& _field_save_ix = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00557434});
-    inline const char* s_textbox_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
-    inline const char* s_textbox_lbx_00557444 = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
-    inline const char* const s_SPA_HELP_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00557450}); // "SPA_HELP.LBX"
-    inline const char* const s_ITA_HELP_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00557460}); // "ITA_HELP.LBX"
-    inline const char* const s_FRE_HELP_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00557470}); // "FRE_HELP.LBX"
-    inline const char* const s_GER_HELP_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00557480}); // "GER_HELP.LBX"
-    inline const char* const s_HELP_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
-    inline s_fieldsav_data* _textbox_field_save = reinterpret_cast<s_fieldsav_data*>(std::uintptr_t{0x00565ea0});
-    inline uint8_t& _reload_saved_block = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565ECC});
-    inline int16_t& _box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE4});
-    inline int16_t& _box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE0});
-    inline uint16_t& _old_draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565ED0});
-    inline MOX2::action_func_t& _textbox_af = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00565ED4});
-    inline uint16_t& _old_help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565EEC});
-    inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
-    inline int32_t (&_base_colors)[3] =
-        *reinterpret_cast<int32_t(*)[3]>(std::uintptr_t{0x00557438});
+    extern int16_t _bottom_y;
+    extern uint8_t* _textbox_seg;
+    extern s_animation_header* tmp_block;
+    extern uint16_t _field_save_ix;
+    extern const char s_textbox_lbx[12];
+    extern const char (&s_textbox_lbx_00557444)[12];
+    extern const char s_SPA_HELP_LBX[16];
+    extern const char s_ITA_HELP_LBX[16];
+    extern const char s_FRE_HELP_LBX[16];
+    extern const char s_GER_HELP_LBX[16];
+    extern const char s_HELP_LBX[9];
+    extern s_fieldsav_data _textbox_field_save[2];
+    extern uint8_t _reload_saved_block;
+    extern int16_t _box_x;
+    extern int16_t _box_y;
+    extern uint16_t _old_draw_fields_flag;
+    extern MOX2::action_func_t _textbox_af;
+    extern uint16_t _old_help_list_active;
+    extern const char s__00551120[2];
+    extern int32_t _base_colors[3];
 
     void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name);
 

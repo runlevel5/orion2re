@@ -187,17 +187,20 @@
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\ships.cpp" />
     <ClCompile Include="src\game\shipstak.cpp" />
+    <ClCompile Include="src\game\simmodem.cpp" />
     <ClCompile Include="src\game\smack.cpp" />
     <ClCompile Include="src\game\smckplay.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\special.cpp" />
     <ClCompile Include="src\game\spy.cpp" />
+    <ClCompile Include="src\game\string.cpp" />
     <ClCompile Include="src\game\strings.cpp" />
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\swap.cpp" />
     <ClCompile Include="src\game\sys.cpp" />
     <ClCompile Include="src\game\sysfont.cpp" />
     <ClCompile Include="src\game\tech.cpp" />
+    <ClCompile Include="src\game\techdata.cpp" />
     <ClCompile Include="src\game\techinit.cpp" />
     <ClCompile Include="src\game\textbox.cpp" />
     <ClCompile Include="src\game\time.cpp" />
@@ -215,7 +218,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\game\accss.h" />
     <ClInclude Include="src\game\advciv.h" />
     <ClInclude Include="src\game\aibomb.h" />
     <ClInclude Include="src\game\aibuild.h" />
@@ -227,7 +229,6 @@
     <ClInclude Include="src\game\aipower.h" />
     <ClInclude Include="src\game\aistage.h" />
     <ClInclude Include="src\game\aitech.h" />
-    <ClInclude Include="src\game\alloc.h" />
     <ClInclude Include="src\game\allocate.h" />
     <ClInclude Include="src\game\angle.h" />
     <ClInclude Include="src\game\animate.h" />
@@ -413,8 +414,6 @@
     <ClInclude Include="src\game\types.h" />
     <ClInclude Include="src\game\video.h" />
     <ClInclude Include="src\game\winnet.h" />
-    <ClInclude Include="src\game\_antarans.h" />
-    <ClInclude Include="src\game\_global_combat_data.h" />
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\patch.h" />
     <ClInclude Include="src\pch.h" />
@@ -431,6 +430,8 @@
     <None Include=".vocode\workflows\vars.yaml" />
     <None Include=".vocode\workflows\verifier.yaml" />
     <None Include="notes.md" />
+    <None Include="smackw32.def" />
+    <None Include="src\game\sysfont_font_pixel_data.inc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="report.txt" />
@@ -508,13 +509,17 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>lib /def:"$(ProjectDir)smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"$(IntDir)smackw32.lib"</Command>
+    </PreBuildEvent>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
-      <AdditionalDependencies>$(CoreLibraryDependencies);winmm.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>smackw32.lib;$(CoreLibraryDependencies);winmm.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -531,11 +536,15 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>lib /def:"$(ProjectDir)smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"$(IntDir)smackw32.lib"</Command>
+    </PreBuildEvent>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);winmm.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>smackw32.lib;$(CoreLibraryDependencies);winmm.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

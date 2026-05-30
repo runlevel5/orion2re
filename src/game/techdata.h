@@ -5,64 +5,29 @@ struct s_unit_data;
 
 namespace TECHDATA {
     // Correct addresses for various TECHDATA structures. If address does not match, then it points inside of structure.
-    inline s_techdata_planetary_shield* _planetary_shields =
-        reinterpret_cast<s_techdata_planetary_shield*>(std::uintptr_t{ 0x0054F048 });
-    inline s_tech_armor_data (&_armor)[7] = *reinterpret_cast<s_tech_armor_data (*)[7]>(std::uintptr_t{0x00554D90});
-    inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554290});
-    inline s_tech_hull_data (&_hull_data)[9] =
-        *reinterpret_cast<s_tech_hull_data(*)[9]>(std::uintptr_t{0x00555798});
-    inline s_tech_fuel_data (&_fuel)[6] = *reinterpret_cast<s_tech_fuel_data (*)[6]>(std::uintptr_t{0x00555758});
-    inline s_tech_app_data (&_technology_applications)[212] =
-        *reinterpret_cast<s_tech_app_data(*)[212]>(std::uintptr_t{0x005537C8});
-    inline s_tech_field_data (&_technology_fields)[83] =
-        *reinterpret_cast<s_tech_field_data (*)[83]>(std::uintptr_t{ 0x00553050 });
-    inline s_tech_drive_data (&_drives)[7] = *reinterpret_cast<s_tech_drive_data (*)[7]>(std::uintptr_t{0x005555E0});
-    inline s_tech_shield_data (&_shields)[6] = *reinterpret_cast<s_tech_shield_data (*)[6]>(std::uintptr_t{0x00554E00});
-    inline s_tech_computer_data (&_computers)[6] = *reinterpret_cast<s_tech_computer_data (*)[6]>(std::uintptr_t{0x00555558});
-    inline s_tech_specials_data (&_specials)[40] =
-        *reinterpret_cast<s_tech_specials_data(*)[40]>(std::uintptr_t{0x00554638});
-    inline s_tech_weapon_data (&_weapons)[46] =
-        *reinterpret_cast<s_tech_weapon_data(*)[46]>(std::uintptr_t{0x00554F68});
-    inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
-        *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
+    extern s_techdata_planetary_shield _planetary_shields[4];
+    extern s_tech_armor_data _armor[7];
+    extern s_tech_building_data _buildings[49];
+    extern s_tech_hull_data _hull_data[9];
+    extern s_tech_fuel_data _fuel[6];
+    extern s_tech_app_data _technology_applications[212];
+    extern s_tech_field_data _technology_fields[83];
+    extern s_tech_drive_data _drives[7];
+    extern s_tech_shield_data _shields[6];
+    extern s_tech_computer_data _computers[6];
+    extern s_tech_specials_data _specials[40];
+    extern s_tech_weapon_data _weapons[46];
+    extern s_tech_weapon_mod_data _weapon_modifications[15];
 
-    inline int16_t& _weapon_modifications_1_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055548B});
-    inline int16_t& _weapon_modifications_2_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055549A});
-    inline int16_t& _weapon_modifications_5_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005554C7});
-    inline int16_t& _weapon_modifications_7_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005554E5});
-    inline int16_t& _weapon_modifications_8_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005554F4});
-    inline int16_t& _weapon_modifications_9_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555503});
-    inline int16_t& _weapon_modifications_10_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555512});
-    inline int16_t& _weapon_modifications_11_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555521});
-    inline int16_t& _weapon_modifications_12_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555530});
-    inline int16_t& _weapon_modifications_13_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055553F});
-    inline int16_t& _weapon_modifications_14_space =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055554E});
+    extern int16_t _starting_tech_field_ids[6];
 
-    inline int16_t (&_starting_tech_field_ids)[6] =
-        *reinterpret_cast<int16_t (*)[6]>(std::uintptr_t{0x0055A960});
+    extern s_unit_data _units[4];
 
-    inline s_unit_data (&_units)[4] = *reinterpret_cast<s_unit_data (*)[4]>(std::uintptr_t{0x00555728});
+    extern s_tech_data_rifle _rifles[6];
 
-    inline s_tech_data_rifle (&_rifles)[6] =
-        *reinterpret_cast<s_tech_data_rifle(*)[6]>(std::uintptr_t{0x0054F028});
-
-    inline s_tech_data_personal_shield (&_personal_shields)[6] =
-        *reinterpret_cast<s_tech_data_personal_shield(*)[6]>(std::uintptr_t{0x0054F040});
+    extern s_tech_data_personal_shield _personal_shields[2];
 
     inline uint16_t& _fuel_ship_range(int32_t fuel_idx) {
-      return *reinterpret_cast<uint16_t*>(
-          reinterpret_cast<uint8_t*>(std::uintptr_t{0x00555760}) +
-          fuel_idx * static_cast<int32_t>(sizeof(s_tech_fuel_data)));
+      return _fuel[fuel_idx].ship_range;
     }
 }

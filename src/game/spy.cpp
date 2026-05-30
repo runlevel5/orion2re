@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace spy {
+    int8_t _lookup_table[8] = {0, 0, 10, 15, -10, -10, 15, 15};
+
+    int16_t _spy_bonuses[16];
+
     // Suggested name: spy::Tech_Spy_Bonus_
     int16_t __cdecl Tech_Spy_Bonus_(s_player* player) {
         int16_t bonus = 0;
