@@ -3,23 +3,17 @@
 #include <cstdint>
 
 namespace motrans {
-    inline uint8_t& _modemTransportInitialized =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560858});
+    extern uint8_t _modemTransportInitialized;
 
-    inline uint8_t& _mtp_receiving =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056085C});
+    extern uint8_t _mtp_receiving;
 
-    inline uint32_t& _modem_receive_buffer_full =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560860});
+    extern uint32_t _modem_receive_buffer_full;
 
-    inline uint8_t*& _modem_receive_buffer =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00591E88});
+    extern uint8_t* _modem_receive_buffer;
 
-    inline uint32_t& _modem_amount_received =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591E9C});
+    extern uint32_t _modem_amount_received;
 
-    inline uint32_t& _mtp_user_type =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591EC8});
+    extern uint32_t _mtp_user_type;
 
     uint32_t __cdecl Modem_Status_();
 

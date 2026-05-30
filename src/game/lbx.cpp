@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace lbx {
+    const char s_r_b_0055bf20[4] = "r+b";
+
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename) {
         memset(header, 0, sizeof(s_lbx_stream_header));
 

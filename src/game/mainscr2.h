@@ -4,14 +4,14 @@
 struct s_mouse_list;
 
 namespace MAINSCR2 {
-    inline s_mouse_list* _mouse_list_from = reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00559A90});
-    inline s_mouse_list* _mouse_list_to = reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00559AD0});
+    extern s_mouse_list _mouse_list_from[5];
+    extern s_mouse_list _mouse_list_to[5];
 
     void __cdecl Draw_Main_Screen_For_Star_Distan();
-    inline uint8_t& _main_screen_fade_in_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596013});
-    inline uint8_t& _force_main_screen_fade = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596014});
+    extern uint8_t _main_screen_fade_in_flag;
+    extern uint8_t _force_main_screen_fade;
 
-    inline uint8_t& _in_reports_phase = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596012});
+    extern uint8_t _in_reports_phase;
 
     void __cdecl Begin_Of_Turn_(int8_t* p_report_flag);
 

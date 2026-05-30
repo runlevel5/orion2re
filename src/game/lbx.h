@@ -5,7 +5,7 @@ struct s_lbx_stream_header;
 struct s_wave_stream_header;
 
 namespace lbx {
-    inline const char* s_r_b_0055bf20 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF20}); /* "r+b" */
+    extern const char s_r_b_0055bf20[4];
 
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename);
 

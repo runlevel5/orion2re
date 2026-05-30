@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace maintain {
+    int32_t (*_ship_worths)[500];
+    uint8_t _research_building_table[4] = {6, 30, 19, 35};
+
     /**
      * Determines if a building is processed in the first maintenance phase.
      * Buildings with no maintenance, specific AI groups, or the Star Base (index 9) are excluded.
@@ -32,7 +35,7 @@ namespace maintain {
             return;
         }
 
-        int16_t worths[500];
+        int32_t worths[500];
         memset(worths, 0, sizeof(worths));
         _ship_worths = &worths;
 
@@ -73,10 +76,10 @@ namespace maintain {
                 if (ship.owner == player_idx && ship.status < 5 && ship.d.ship_type == 0) {
                     for (int k = 0; k < (int)MOX::_NUM_PLAYERS; ++k) {
                         if (eligible_players[k]) {
-                            worths[j] += (int16_t)AIPOWER::Ship_Strength_Vs_Ships_(j, (int16_t)k);
+                            worths[j] += AIPOWER::Ship_Strength_Vs_Ships_(j, (int16_t)k);
                         }
                     }
-                    worths[j] = (int16_t)(worths[j] / ((ship.d.size + 1) * eligible_count));
+                    worths[j] = worths[j] / ((ship.d.size + 1) * eligible_count);
                 }
             }
         }

@@ -1,6 +1,47 @@
 #include "pch.h"
 
 namespace LOADSAVE {
+    const char s_INVALID_STR[12] = "* INVALID *";
+
+    char _months[12][6];
+
+    uint8_t _draw_game_popup_to_back;
+    uint8_t _dont_draw_darkened_buttons;
+    uint8_t _draw_down;
+    char _empty_save_slot_message[20];
+
+    int16_t _music_level_field;
+    int16_t _sfx_level_field;
+    uint8_t _print_data_to_bitmap;
+    s_animation_header* _bitmap;
+
+    s_game_anims* _game_anims;
+
+    s_game_popup_fields* _game_popup_fields;
+    uint8_t _loaded_new_game;
+    uint8_t _loaded_debug_save;
+
+    const char s_dot_GAM_005568f4[5] = ".GAM";
+    const char s_SAVE_005568fc[5] = "SAVE";
+    const char s_format_0055ad30[14] = "%s, %s, %d %s";
+
+    const char s__ALT_F1__0055ad24[9] = "(ALT_F1)";
+    const char s__ALT_F2__0055ad18[9] = "(ALT_F2)";
+    const char s__ALT_F3__0055ad0c[9] = "(ALT_F3)";
+    const char s__ALT_F5__0055ad00[9] = "(ALT_F5)";
+    const char s__ALT_F6__0055acf4[9] = "(ALT_F6)";
+    const char s__ALT_F7__0055ace8[9] = "(ALT_F7)";
+    const char s__ALT_F8__0055acdc[9] = "(ALT_F8)";
+
+    const char s__ALT_F1__0055acd0[9] = "(ALT-F1)";
+    const char s__ALT_F2__0055acc4[9] = "(ALT-F2)";
+    const char s__ALT_F3__0055acb8[9] = "(ALT-F3)";
+    const char s__ALT_F4__0055acac[9] = "(ALT-F4)";
+    const char s__ALT_F5__0055aca0[9] = "(ALT-F5)";
+    const char s__ALT_F6__0055ac94[9] = "(ALT-F6)";
+    const char s__ALT_F7__0055ac88[9] = "(ALT-F7)";
+    const char s__ALT_F8__0055ac7c[9] = "(ALT-F8)";
+
     /**
      * @address 00511020
      */
@@ -593,7 +634,7 @@ namespace LOADSAVE {
             while ((*dest++ = *src++) != '\0');
             dest--;
 
-            src = s__GAM_005568f4;
+            src = s_dot_GAM_005568f4;
             while ((*dest++ = *src++) != '\0');
 
             games[game_index] = 0;

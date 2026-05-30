@@ -2,11 +2,9 @@
 #include <cstdint>
 
 namespace MOVEBOX {
-    inline s_movable_box (&_moveable_box)[5] =
-        *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
+    extern s_movable_box _moveable_box[5];
 
-    inline s_fleet_box& _fleet_box =
-        *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
+    extern s_fleet_box _fleet_box;
 
     void __cdecl Clear_Moveable_Box_Fields_(int16_t box_index);
 
@@ -39,7 +37,7 @@ namespace MOVEBOX {
 
     void __cdecl Box_Fleet_Screen_Scanned_Ship_();
 
-    inline const char* const s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    extern const char s__00551100[1];
 
     void __cdecl Do_Fleet_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
 

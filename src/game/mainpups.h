@@ -8,70 +8,55 @@ struct s_invasion_side_info;
 struct s_potential_colony_info;
 
 namespace MAINPUPS {
-    inline char*& _g_msg_ptr =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00556D18});
+    extern char* _g_msg_ptr;
 
-    inline s_animation_header* (&_anims)[38] =
-        *reinterpret_cast<s_animation_header*(*)[38]>(std::uintptr_t{0x00565D90});
+    extern s_animation_header* _anims[38];
 
-    inline s_animation_header*& _anim_10 =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565DB8});
+    extern uint8_t _on_officer_screen_flag;
 
-    inline s_animation_header*& _anim_11 =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565DBC});
+    extern int16_t _g_officer;
 
-    inline uint8_t& _on_officer_screen_flag =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D38});
+    extern int16_t _officer_gains_level_state;
 
-    inline int16_t& _g_officer =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D3C});
+    extern char* _g_str_ptr;
 
-    inline int16_t& _officer_gains_level_state =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D40});
+    extern int16_t _last_scanned_field;
+    extern int16_t _g_state;
+    extern int8_t _selection_state_flag;
+    extern uint8_t _g_using_colony_ship;
+    extern int16_t _g_max;
+    extern int16_t _g_min;
+    extern char* _g_msg;
+    extern int16_t _g_var;
+    extern int16_t _g_temp_tax_rate;
+    extern int16_t _field_state;
+    extern s_colors _main_scr_font_colors;
 
-    inline char*& _g_str_ptr =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00565E28});
+    extern uint8_t _g_special;
+    extern int16_t _g_x;
+    extern int16_t _g_y;
+    extern int16_t _g_star_n;
+    extern int16_t _g_player_n;
+    extern int16_t _field_mode;
+    extern int16_t _g_scanned_star;
+    extern int16_t _g_old_scanned_star;
+    extern uint8_t _no_flicker_between_mainpups_flag;
+    extern int16_t _autofunction_ctr;
+    extern int16_t _num_field_saves;
+    extern s_fieldsav_data _stats_array[3];
+    extern uint8_t _explode_flag;
+    extern int16_t _g_refresh_mode;
+    extern MOX2::action_func_t _eric_saved_autofunction2;
+    extern MOX2::action_func_t _eric_saved_autofunction;
 
-    inline int16_t& _last_scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D8C});
-    inline int16_t& _g_state = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E6C});
-    inline int8_t& _selection_state_flag = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00556D44});
-    inline uint8_t& _g_using_colony_ship = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D48});
-    inline int16_t& _g_max = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E70});
-    inline int16_t& _g_min = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E74});
-    inline char*& _g_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00565E78});
-    inline int16_t& _g_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E7C});
-    inline int16_t& _g_temp_tax_rate = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E30});
-    inline int16_t& _field_state = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E34});
-    inline s_colors& _main_scr_font_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556D20});
+    extern MOX2::action_func_t _temp_af;
 
-    inline uint8_t& _g_special = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D0C});
-    inline int16_t& _g_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D84});
-    inline int16_t& _g_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D88});
-    inline int16_t& _g_star_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D08});
-    inline int16_t& _g_player_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D14});
-    inline int16_t& _field_mode = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D4C});
-    inline int16_t& _g_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D50});
-    inline int16_t& _g_old_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D54});
-    inline uint8_t& _no_flicker_between_mainpups_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D1C});
-    inline int16_t& _autofunction_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D2C});
-    inline int16_t& _num_field_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D30});
-    inline s_fieldsav_data (&_stats_array)[3] =
-        *reinterpret_cast<s_fieldsav_data(*)[3]>(std::uintptr_t{0x005A6E20});
-    inline uint8_t& _explode_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D34});
-    inline int16_t& _g_refresh_mode = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D80});
-    inline MOX2::action_func_t& _eric_saved_autofunction2 = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A6E58});
-    inline MOX2::action_func_t& _eric_saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A6E5C});
+    extern s_colony_combat_popup_data* _g_data_ptr;
 
-    inline MOX2::action_func_t& _temp_af =
-        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00565E2C});
+    extern const char s_str_fmt_00556d98[7];
 
-    inline s_colony_combat_popup_data*& _g_data_ptr =
-        *reinterpret_cast<s_colony_combat_popup_data**>(std::uintptr_t{0x005A6E60});
-
-    inline const char* s_str_fmt_00556d98 = reinterpret_cast<const char*>(std::uintptr_t{0x00556D98}); /* "%s: %d" */
-
-    inline const char* s_format_string = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
-    inline const char* s_SI_COMBATTE_NEL_SISTEMA = reinterpret_cast<const char*>(std::uintptr_t{0x00556D58});
+    extern const char s_format_string[3];
+    extern const char s_SI_COMBATTE_NEL_SISTEMA[61];
 
     void __cdecl Load_Tax_Rate_Popup_();
     void __cdecl Get_Picture_Draw_XY_(s_animation_header* anim);
@@ -107,8 +92,7 @@ namespace MAINPUPS {
 
     void __cdecl Draw_Random_New_Officer_Popup_();
 
-    inline int16_t (&_mp_fields)[26] =
-        *reinterpret_cast<int16_t(*)[26]>(std::uintptr_t{0x00565E38});
+    extern int16_t _mp_fields[26];
 
 
     void __cdecl Eric_Push_Fields_();

@@ -13,27 +13,25 @@ namespace MAINMENU {
     };
  #pragma pack(pop)
 
-    inline s_main_menu*& _mainmenu =
-        *reinterpret_cast<s_main_menu**>(std::uintptr_t{0x0056ECF0});
+    extern s_main_menu* _mainmenu;
 
-    inline s_animation_header*& _main_menu_background =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0056ECDC });
+    extern s_animation_header* _main_menu_background;
 
-    inline s_animation_header*& _mainmenu_first_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595c58});
-    inline s_animation_header*& _mainmenu_last_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595C5C});
-    inline void*& __gametype = *reinterpret_cast<void**>(std::uintptr_t{0x0056ece8});
-    inline int16_t& _max_credits = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ECE0});
-    inline int32_t& _credit_count = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ECE4});
-    inline int16_t& _credits_font_style = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ECF4});
-    inline uint8_t& _credit_num = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECF8});
-    inline uint8_t& _credits_font_spacing = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECFC});
-    inline s_animation_header*& _bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056ED00});
-    inline s_credit_y_slot& _credit_y_slot = *reinterpret_cast<s_credit_y_slot*>(std::uintptr_t{0x0056ED0C});
-    inline int32_t& _credit_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ed10});
-    inline int16_t& _delay_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ed18});
-    inline int16_t& _fade_in_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055A5E4});
-    inline int16_t& _fade_out_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055A5E8});
-    inline char (*&_credits)[2][127] = *reinterpret_cast<char (**)[2][127]>(std::uintptr_t{0x00595C54});
+    extern s_animation_header* _mainmenu_first_seg;
+    extern s_animation_header* _mainmenu_last_seg;
+    extern void* __gametype;
+    extern int16_t _max_credits;
+    extern int32_t _credit_count;
+    extern int16_t _credits_font_style;
+    extern uint8_t _credit_num;
+    extern uint8_t _credits_font_spacing;
+    extern s_animation_header* _bitmap;
+    extern s_credit_y_slot _credit_y_slot;
+    extern int32_t _credit_x;
+    extern int16_t _delay_count;
+    extern int16_t _fade_in_count;
+    extern int16_t _fade_out_count;
+    extern char (*_credits)[2][127];
 
     inline const char* const s_MAINMENU_LBX_0055a630 = reinterpret_cast<const char*>(0x0055A630); // "MAINMENU.LBX"
     inline const char* const s_C_00552420 = reinterpret_cast<const char*>(0x00552420); // "C"
@@ -57,8 +55,7 @@ namespace MAINMENU {
 
     void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors);
 
-    inline uint8_t& _credits_column_one =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECEC});
+    extern uint8_t _credits_column_one;
 
     void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, s_animation_header* bitmap);
 

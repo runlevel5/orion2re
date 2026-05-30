@@ -11,13 +11,11 @@ namespace KEN {
 
     void __cdecl Ken_Get_Text_Message_(int32_t msg_index, char* buffer, int16_t param_3);
 
-    // Suggested name: KEN::s_kentext_lbx
-    inline const char* s_KENTEXT_LBX_005597c0 = reinterpret_cast<const char*>(std::uintptr_t{0x005597C0}); /* "KENTEXT.LBX" */
+    extern const char s_KENTEXT_LBX_005597c0[12]; /* "KENTEXT.LBX" */
 
-    // Suggested name: KEN::s_kentext1_lbx
-    inline const char* s_KENTEXT1_LBX_005597cc = reinterpret_cast<const char*>(std::uintptr_t{0x005597CC}); /* "KENTEXT1.LBX" */
+    extern const char s_KENTEXT1_LBX_005597cc[13]; /* "KENTEXT1.LBX" */
 
-    inline uint8_t* _personalities = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559728});
+    extern uint8_t _personalities[140];
 
     void __cdecl Init_NPC_Personalities_Objectives_Themes_();
 

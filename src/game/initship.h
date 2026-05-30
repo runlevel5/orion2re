@@ -95,13 +95,11 @@ namespace INITSHIP {
 
     void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design);
 
-    inline char* s_Avenger_005576c4 = reinterpret_cast<char*>(std::uintptr_t{0x005576C4});
+    extern const char s_Avenger_005576c4[8];
 
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design);
 
     void __cdecl Load_Outpost_Ship_Design_(int16_t player_idx, s_ship_design* design);
-
-    inline char* s_Colony_Ship_Localized = reinterpret_cast<char*>(std::uintptr_t{0x00558E28});
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design);
 
@@ -134,9 +132,6 @@ namespace INITSHIP {
     void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bonus_out, int16_t* defense_rating_out, int16_t* missile_defense_out);
 
     void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design);
-
-    inline const char* const s_Transport_00558e88 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00558E88});
 
     void __cdecl Update_Ship_Names_To_New_Language_();
 

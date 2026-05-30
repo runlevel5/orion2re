@@ -2,6 +2,24 @@
 
 namespace JIM {
 
+    int16_t _jim_current_stream = -1;
+    int16_t _jim_old_music_id = -1;
+    int16_t _jim_fade_music_flag = -1;
+    int16_t _jim_old_transition_id = -1;
+    const char s_STREAM_LBX[] = "STREAM.LBX";
+    const char s_STREAMHD_LBX_00555908[] = "STREAMHD.LBX";
+    s_mouse_list _logo_mouse_list = {0, 0, 0, 0, 639, 479};
+    int16_t _darken_palette_value;
+    const char jimtext_lbx[] = "jimtext.lbx";
+    const char s_intro_lbx[] = "intro.lbx";
+    const char s_simtex_lbx[] = "simtex.lbx";
+    const char s_logo_lbx[] = "logo.LBX";
+    const char s_fmt_ssimtex_lbx[] = "%ssimtex.lbx";
+    const char s_Message_too_long[] = "Message #%d in %s too long (%d).";
+    const char s_d_comma_d_0055239c[] = "%d,%d";
+    const char s_d_dot_d_005523a4[] = "%d.%d";
+    const char s_Decode_message_too_long_0055593c[] = "Decode message too long (%d).\n%s";
+
     bool __cdecl Check_For_Simtex_Logo_() {
         char find_buffer[80];
         char secondary_path[80];
@@ -437,7 +455,7 @@ namespace JIM {
             sound::Stop_Stream_();
 
             if (_jim_old_music_id <= 100) {
-                sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
+                sound::Set_Stream_Filename_(s_STREAM_LBX);
                 sound::Play_Stream_(_jim_old_music_id);
             } else {
                 sound::Set_Stream_Filename_(s_STREAMHD_LBX_00555908);
@@ -468,11 +486,11 @@ namespace JIM {
             if (_jim_old_transition_id == -2) {
                 int32_t ticks = static_cast<int32_t>(clock());
                 _jim_current_stream = static_cast<int16_t>((ticks % 3) + 1);
-                sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
+                sound::Set_Stream_Filename_(s_STREAM_LBX);
                 sound::Play_Stream_(_jim_current_stream);
             } else {
                 if (_jim_old_transition_id <= 100) {
-                    sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
+                    sound::Set_Stream_Filename_(s_STREAM_LBX);
                     sound::Play_Stream_(_jim_old_transition_id);
                 } else {
                     sound::Set_Stream_Filename_(s_STREAMHD_LBX_00555908);

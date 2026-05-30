@@ -4,6 +4,8 @@
 
 namespace PLNTSUM {
 
+int8_t _can_reach_star[72];
+
 void __cdecl Summary_Screen_Print_Data_(void) {
     int16_t monster_race = -1;
     int first_visible = static_cast<int>(MOX::_scroll_bar->first_visible_row);
@@ -1807,7 +1809,7 @@ void __cdecl Summary_Screen_Print_Scanned_() {
             status = 1;
         } else if (!visited) {
             if (PLNTSUM::_send_choice == 0 || PLNTSUM::_send_choice == 1) {
-                if (MAINSCR::_twinkling_stars[scanned_field] != 0) {
+                if (PLNTSUM::_can_reach_star[star_id] != 0) {
                     int16_t eta = Get_ETA_To_Star_(star_id);
                     if (eta > 0) {
                         if (eta == 1) {
@@ -1829,7 +1831,7 @@ void __cdecl Summary_Screen_Print_Scanned_() {
             strcpy(star_name_buffer, MOX::_star[star_id].name);
             suffix_buffer[0] = '\0';
             if (PLNTSUM::_send_choice == 0 || PLNTSUM::_send_choice == 1) {
-                if (MAINSCR::_twinkling_stars[scanned_field] == 0) {
+                if (PLNTSUM::_can_reach_star[star_id] == 0) {
                     strcpy(suffix_buffer, HAROLD::H_Message_(326 /* HESTR_146_CANNOT_REACH */));
                     status = 1;
                 } else {

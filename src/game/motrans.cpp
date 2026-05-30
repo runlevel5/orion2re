@@ -2,6 +2,18 @@
 
 namespace motrans {
 
+uint8_t _modemTransportInitialized;
+
+uint8_t _mtp_receiving;
+
+uint32_t _modem_receive_buffer_full;
+
+uint8_t* _modem_receive_buffer;
+
+uint32_t _modem_amount_received;
+
+uint32_t _mtp_user_type;
+
 void __cdecl Modem_Update_() {
     if (simmodem::_modemInitialized == 0) {
         return;

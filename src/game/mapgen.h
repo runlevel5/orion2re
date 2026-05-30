@@ -2,43 +2,39 @@
 #include <cstdint>
 
 namespace MAPGEN {
-    inline uint8_t& _n_marooned_heroes = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055899C});
-    inline uint8_t& _n_wormholes = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005589A0});
-    inline uint8_t& _make_food_planet = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4AF4});
-    inline uint8_t& _n_space_monsters = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4B56});
-    inline uint16_t& _companion_star_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A4B18});
-    inline uint16_t& _is_companion_star = _companion_star_flag;
-    inline char* _companion_star = reinterpret_cast<char*>(std::uintptr_t{0x0055632C});
-    inline uint8_t& _n_maps_generated = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CD90});
-    inline uint16_t (&_tests_failed)[4] = *reinterpret_cast<uint16_t(*)[4]>(std::uintptr_t{0x0056CD98});
-    inline int8_t*& __evan_ptr = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CDA8});
-    inline uint32_t& _num_maps_to_generate = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDD0});
-    inline void*& _name_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0056CDB8});
-    inline uint16_t*& _name_index = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x0056CDA0});
-    inline s_animation_header*& _fill_msg_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4B20});
-    inline char (&_fill_msg)[36] = *reinterpret_cast<char (*)[36]>(std::uintptr_t{0x005A4B30});
-    inline int16_t& _fill_msg_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A4B54});
-    inline int8_t& _first_time_map_is_generated = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005589A4});
-    inline uint8_t (&_special_count)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x0056CDC0});
-    inline uint32_t& _n_stars = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDB0});
-    inline uint32_t& _n_planets = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDBC});
-    inline int16_t& _t_roll = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CDA4});
-    inline uint32_t& DAT_0056CDC8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDC8});
-    inline uint32_t (&_satellite_stat)[6] = *reinterpret_cast<uint32_t (*)[6]>(std::uintptr_t{0x005A4B00});
-    inline uint32_t (&_nebula_stat)[5] = *reinterpret_cast<uint32_t (*)[5]>(std::uintptr_t{0x005A4AE0});
-    inline uint16_t& _star_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056CDB4});
-    inline s_planet_data*& _pl = *reinterpret_cast<s_planet_data**>(std::uintptr_t{0x005A4B1C});
-    inline const char* s_raceopt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558B24}); // "RACEOPT.LBX"
-    inline const char* s_starname_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558B30}); // "starname.lbx"
-    inline const char* s_starbg_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558A10}); // "starbg.lbx"
-    inline const char* s_Stat_d__start_d__diff_d__total_d_d = reinterpret_cast<const char*>(std::uintptr_t{0x00558A90}); // "Stat %d  (start: %d)  (diff %d)  (total: %d.%d)"
-    inline const char* s_Blank_Stat_Line = reinterpret_cast<const char*>(std::uintptr_t{0x00558AC0}); // "                                                                      "
-    inline const char* s_Moving_planet_d_to_planet_d = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x005589AC}); // "Moving planet %d to planet %d"
-    inline const char* s_Colony_Planets_d_Max_d = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x005589CC}); // "Colony Planets: %d Max: %d Plane..."
-    inline const char* s_Star_d_orbit_d_has_a_0_sat_t_00558a1c = reinterpret_cast<const char*>(std::uintptr_t{0x00558A1C}); // "Star %d, orbit %d, has a 0 sat t"
-    inline uint8_t& _MAPGEN_TRACE = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005589A8});
+    extern uint8_t _n_marooned_heroes;
+    extern uint8_t _n_wormholes;
+    extern uint8_t _make_food_planet;
+    extern uint8_t _n_space_monsters;
+    extern uint16_t _companion_star_flag;
+    extern const char _companion_star[2];
+    extern uint8_t _n_maps_generated;
+    extern uint16_t _tests_failed[4];
+    extern int8_t* __evan_ptr;
+    extern uint32_t _num_maps_to_generate;
+    extern void* _name_seg;
+    extern uint16_t* _name_index;
+    extern s_animation_header* _fill_msg_bitmap;
+    extern char _fill_msg[36];
+    extern int16_t _fill_msg_ctr;
+    extern int8_t _first_time_map_is_generated;
+    extern uint8_t _special_count[12];
+    extern uint32_t _n_stars;
+    extern uint32_t _n_planets;
+    extern int16_t _t_roll;
+    extern uint32_t _satellite_stat[6];
+    extern uint32_t _nebula_stat[5];
+    extern uint16_t _star_count;
+    extern s_planet_data* _pl;
+    extern const char s_raceopt_lbx[12]; // "raceopt.lbx"
+    extern const char s_starname_lbx[13]; // "starname.lbx"
+    extern const char s_starbg_lbx[11]; // "starbg.lbx"
+    extern const char s_Stat_d__start_d__diff_d__total_d_d[48]; // "Stat %d  (start: %d)  (diff %d)  (total: %d.%d)"
+    extern const char s_Blank_Stat_Line[71]; // "                                                                      "
+    extern const char s_Moving_planet_d_to_planet_d[30]; // "Moving planet %d to planet %d"
+    extern const char s_Colony_Planets_d_Max_d[67]; // "Colony Planets: %d  Max: %d  Planet Count: %d  Removing %d planets"
+    extern const char s_Star_d_orbit_d_has_a_0_sat_t_00558a1c[58]; // "Star %d, orbit %d, has a 0 sat type.  Roll: %d  Table: %d"
+    extern uint8_t _MAPGEN_TRACE;
 
     void __cdecl Clear_Planets_In_Star_Structure_();
 

@@ -2,66 +2,60 @@
 #include <cstdint>
 
 namespace MAINSCR {
-    inline int16_t& _zoom_in_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059613C});
-    inline int16_t& _zoom_out_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596108});
-    inline int16_t& _whole_screen_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596134});
-    inline int16_t& _game_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059613E});
-    inline int16_t& _next_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F2});
-    inline int16_t& _design_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596182});
-    inline int16_t& _colonies_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619C});
-    inline int16_t& _planets_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961A8});
-    inline int16_t& _fleets_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596194});
-    inline int16_t& _leaders_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059618A});
-    inline int16_t& _races_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059610A});
-    inline int16_t& _info_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F0});
-    inline int16_t& _treasury_window_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596190});
-    inline int16_t& _command_points_window_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596138});
-    inline int16_t& _food_window_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961FA});
-    inline int16_t& _freighters_window_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961FE});
-    inline int16_t& _research_window_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596186});
-    inline int16_t& _first_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596198});
-    inline uint8_t& _debug_enabled = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596136});
-    inline int16_t& _debug_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F4});
-    inline int16_t& _exit_game_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619A});
-    inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
-    inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});
-    inline s_animation_header*& _temp_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596130});
-    inline int16_t& _main_screen_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEB0});
-    inline int8_t& _moving_a_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEB4});
-    inline int8_t& _track_time_flag = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC0});
-    inline int8_t& _clear_fleet_fields = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC4});
-    inline int8_t& _mouse_btn_pressed = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC8});
-    inline int8_t& _merging_relocations = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED0});
-    inline uint8_t& _warn_about_cheaters = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CED4});
-    inline uint8_t& _zoom_box_counter = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CEA4 });
-    inline uint8_t& _zoom_box_color_increment = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CEAC });
-    inline uint8_t& _zoom_box_increment_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CED8 });
-    inline int8_t& _officer_screen_return_screen = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00596184 });
-    inline int8_t& _next_turn_hit = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059618C });
-    inline int16_t& _zoom_box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059618E });
-    inline int16_t& _zoom_box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00596192 });
-    inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
-    inline int16_t& _fleet_icon_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F6});
+    extern int16_t _zoom_in_button;
+    extern int16_t _zoom_out_button;
+    extern int16_t _whole_screen_field;
+    extern int16_t _game_button;
+    extern int16_t _next_button;
+    extern int16_t _design_button;
+    extern int16_t _colonies_button;
+    extern int16_t _planets_button;
+    extern int16_t _fleets_button;
+    extern int16_t _leaders_button;
+    extern int16_t _races_button;
+    extern int16_t _info_button;
+    extern int16_t _treasury_window_field;
+    extern int16_t _command_points_window_field;
+    extern int16_t _food_window_field;
+    extern int16_t _freighters_window_field;
+    extern int16_t _research_window_field;
+    extern int16_t _first_field;
+    extern uint8_t _debug_enabled;
+    extern int16_t _debug_field;
+    extern int16_t _exit_game_hot_key;
+    extern int16_t _main_screen_grid_y;
+    extern int16_t _main_screen_grid_x;
+    extern s_animation_header* _temp_bitmap;
+    extern int16_t _main_screen_scanned_star;
+    extern int8_t _moving_a_stack;
+    extern int8_t _track_time_flag;
+    extern int8_t _clear_fleet_fields;
+    extern int8_t _mouse_btn_pressed;
+    extern int8_t _merging_relocations;
+    extern uint8_t _warn_about_cheaters;
+    extern uint8_t _zoom_box_counter;
+    extern uint8_t _zoom_box_color_increment;
+    extern uint8_t _zoom_box_increment_value;
+    extern int8_t _officer_screen_return_screen;
+    extern int8_t _next_turn_hit;
+    extern int16_t _zoom_box_x;
+    extern int16_t _zoom_box_y;
+    extern int8_t _fleet_ship_selection_status;
+    extern int16_t _fleet_icon_chosen;
 
-    inline s_hotseat_system_box_state (&_hotseat_system_box)[8] =
-            *reinterpret_cast<s_hotseat_system_box_state(*)[8]>(std::uintptr_t{0x00596140});
+    extern s_hotseat_system_box_state _hotseat_system_box[8];
 
-    inline uint8_t (&_hotseat_map_scale)[8] =
-            *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x005961A0});
+    extern uint8_t _hotseat_map_scale[8];
 
-    inline s_hotseat_fleet_box_state (&_hotseat_fleet_box)[8] =
-            *reinterpret_cast<s_hotseat_fleet_box_state(*)[8]>(std::uintptr_t{0x005961B0});
+    extern s_hotseat_fleet_box_state _hotseat_fleet_box[8];
 
     inline int16_t& _hotseat_fleet_box_stack_ship_id(int32_t index) {
-        return *reinterpret_cast<int16_t*>(
-            std::uintptr_t{0x005961B6} + static_cast<std::uintptr_t>(index * sizeof(s_hotseat_fleet_box_state)));
+        return _hotseat_fleet_box[index].stack_ship_id;
     }
 
-    inline int8_t& _star_name_highlight_direction =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559840});
+    extern int8_t _star_name_highlight_direction;
 
-    inline uint8_t& _star_name_highlight_value =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559844});
+    extern uint8_t _star_name_highlight_value;
 
     void* __cdecl Allocate_First_Screen_Seg_(int32_t p);
 
@@ -73,16 +67,14 @@ namespace MAINSCR {
 
     void __cdecl Main_Screen_();
 
-    inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
-    inline uint8_t* _twinkling_stars = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565460});
-    inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
-    inline int16_t& _main_screen_ship_icon_scanned =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
-    inline s_colors& _ship_direction_line_green_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559830});
-    inline s_colors& _ship_direction_line_red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559838});
-    inline uint8_t& _fltpop_field_selection_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CECC});
-    inline int8_t (&_diplo_lights_anim_frame)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0056CEB8});
-    inline s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});
+    extern uint8_t _check_next_turn_exit_field;
+    extern int16_t _n_twinkling_stars;
+    extern int16_t _main_screen_ship_icon_scanned;
+    extern s_colors _ship_direction_line_green_colors;
+    extern s_colors _ship_direction_line_red_colors;
+    extern uint8_t _fltpop_field_selection_status;
+    extern int8_t _diplo_lights_anim_frame[8];
+    extern s_animation_header* _player_lights_seg[8];
 
     void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* out_x, int16_t* out_y);
 
@@ -120,8 +112,8 @@ namespace MAINSCR {
 
     void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, s_animation_header** param_5);
 
-    inline uint8_t& _already_faded_into_main_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596180});
-    inline uint8_t& _in_auto_next_turn_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005961F8});
+    extern uint8_t _already_faded_into_main_screen;
+    extern uint8_t _in_auto_next_turn_mode;
 
     void __cdecl Add_Map_Fields_();
 
@@ -173,24 +165,24 @@ namespace MAINSCR {
 
     void __cdecl Give_Me_All_Tech_Advances_();
 
-    inline int16_t& _omniscient_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559860});
-    inline int16_t& _all_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559864});
-    inline int16_t& _leader_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559868});
-    inline int16_t& _more_money_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055986C});
-    inline int16_t& _get_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559870});
-    inline int16_t& _omniscience_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559874});
-    inline int16_t& _all_ai_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559878});
-    inline int16_t& _hi_score_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559880});
-    inline int16_t& _last_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEDC});
+    extern int16_t _omniscient_hot_key;
+    extern int16_t _all_tech_cheat;
+    extern int16_t _leader_cheat;
+    extern int16_t _more_money_cheat;
+    extern int16_t _get_tech_cheat;
+    extern int16_t _omniscience_cheat;
+    extern int16_t _all_ai_cheat;
+    extern int16_t _hi_score_cheat;
+    extern int16_t _last_field;
 
-    inline const char* const s_EINSTEIN_005597e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005597E8});
-    inline const char* const s_MOOLA_005597f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005597F8});
-    inline const char* const s_MENLO_00559800 = reinterpret_cast<const char*>(std::uintptr_t{0x00559800});
-    inline const char* const s_ISEEALL_00559808 = reinterpret_cast<const char*>(std::uintptr_t{0x00559808});
-    inline const char* const s_SCORE_00559820 = reinterpret_cast<const char*>(std::uintptr_t{0x00559820});
-    inline const char* s_Current_score_for_s_is_d = reinterpret_cast<const char*>(std::uintptr_t{0x00559908});
-    inline const char* const s_fmt_star_len_00559984 = reinterpret_cast<const char*>(0x00559984);
-    inline const char* s_ship_icon_idx_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00559974});
+    extern const char s_EINSTEIN_005597e8[];
+    extern const char s_MOOLA_005597f8[];
+    extern const char s_MENLO_00559800[];
+    extern const char s_ISEEALL_00559808[];
+    extern const char s_SCORE_00559820[];
+    extern const char s_Current_score_for_s_is_d[];
+    extern const char s_fmt_star_len_00559984[];
+    extern const char s_ship_icon_idx_fmt[];
 
     void __cdecl Check_Hot_Keys_(int16_t key, int param_2);
 
@@ -285,7 +277,7 @@ namespace MAINSCR {
 
     void __cdecl Center_Map_(int16_t x, int16_t y);
 
-    inline s_fleet_box& _fleet_box = *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
+    extern s_fleet_box _fleet_box;
 
     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx);
 

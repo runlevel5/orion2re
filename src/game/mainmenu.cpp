@@ -1,6 +1,25 @@
 #include "pch.h"
 
 namespace MAINMENU {
+    s_main_menu* _mainmenu;
+    s_animation_header* _main_menu_background;
+    s_animation_header* _mainmenu_first_seg;
+    s_animation_header* _mainmenu_last_seg;
+    void* __gametype;
+    int16_t _max_credits;
+    int32_t _credit_count;
+    int16_t _credits_font_style;
+    uint8_t _credit_num;
+    uint8_t _credits_font_spacing;
+    s_animation_header* _bitmap;
+    s_credit_y_slot _credit_y_slot;
+    int32_t _credit_x;
+    int16_t _delay_count;
+    int16_t _fade_in_count;
+    int16_t _fade_out_count;
+    char (*_credits)[2][127];
+    uint8_t _credits_column_one;
+
     void __cdecl Main_Menu_Fade_Function_() {
         animate::Draw_(0, 0, _main_menu_background);
     }

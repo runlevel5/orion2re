@@ -7,8 +7,7 @@ namespace maintain {
     void __cdecl Make_Scrap_Ships_Dead_();
     void __cdecl Player_Maintenance_(s_player* param_1);
 
-    inline int16_t (*&_ship_worths)[500] =
-        *reinterpret_cast<int16_t (**)[500]>(std::uintptr_t{0x0056CD8C});
+    extern int32_t (*_ship_worths)[500];
 
     int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship);
 
@@ -18,8 +17,7 @@ namespace maintain {
 
     bool __cdecl All_But_Capitol_(int16_t b);
 
-    inline uint8_t (&_research_building_table)[4] =
-        *reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x0054F088});
+    extern uint8_t _research_building_table[4];
 
     void __cdecl Kill_Research_Buildings_(s_player* player);
 

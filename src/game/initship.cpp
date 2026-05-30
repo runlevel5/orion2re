@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace INITSHIP {
+    const char s_Avenger_005576c4[8] = "Avenger";
+
     void __cdecl Init_Ship_Designs_(int16_t player_idx) {
         s_player* plr = &MOX::_player[player_idx];
         int16_t design_flag = 0;
@@ -723,7 +725,7 @@ namespace INITSHIP {
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design) {
         struct_::Clear_Structure_(design, 99);
 
-        const char* localized_name = &s_Colony_Ship_Localized[MOX::_settings.language * 16];
+        const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_COLONY][(uint8_t)MOX::_settings.language];
         strcpy(design->name, localized_name);
 
         design->size = 0;
@@ -2329,7 +2331,7 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
 
     // Copy localized "Transport" name
-    const char* localized_name = &s_Transport_00558e88[MOX::_settings.language * 16];
+    const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_TRANSPORT][(uint8_t)MOX::_settings.language];
     strcpy(design->name, localized_name);
 
     design->size = 0;          // Small/Transport size
@@ -2440,9 +2442,7 @@ void __cdecl Update_Ship_Names_To_New_Language_(void) {
         const int32_t ship_type = (int32_t)ship->d.ship_type;
 
         if (ship_type != 0) {
-            const char* localized_name =
-                MOX::_ship_type_names +
-                ((int32_t)(uint8_t)MOX::_settings.language + ship_type * 6) * 16;
+            const char* localized_name = MOX::_ship_type_names[ship_type][(uint8_t)MOX::_settings.language];
 
             strcpy(ship->d.name, localized_name);
         }

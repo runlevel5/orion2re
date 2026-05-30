@@ -1,6 +1,24 @@
 #include "pch.h"
 
 namespace MAINSCR2 {
+    s_mouse_list _mouse_list_from[5] = {
+        {17, 0, 0, 0, 639, 479},
+        {1, 0, 0, 21, 0, 479},
+        {1, 0, 0, 0, 639, 21},
+        {1, 0, 527, 0, 639, 479},
+        {1, 0, 11, 434, 617, 479},
+    };
+    s_mouse_list _mouse_list_to[5] = {
+        {18, 0, 0, 0, 639, 479},
+        {1, 0, 0, 21, 0, 479},
+        {1, 0, 0, 0, 639, 21},
+        {1, 0, 527, 0, 639, 479},
+        {1, 0, 11, 434, 617, 479},
+    };
+    uint8_t _main_screen_fade_in_flag;
+    uint8_t _force_main_screen_fade;
+    uint8_t _in_reports_phase;
+
     void Show_Command_Points_Screen_() {
         fields::Deactivate_Help_List_();
         fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);

@@ -1,6 +1,39 @@
 #include "pch.h"
 
 namespace MAPGEN {
+    uint8_t _n_marooned_heroes;
+    uint8_t _n_wormholes;
+    uint8_t _make_food_planet;
+    uint8_t _n_space_monsters;
+    uint16_t _companion_star_flag;
+    const char _companion_star[2] = ".";
+    uint8_t _n_maps_generated;
+    uint16_t _tests_failed[4];
+    int8_t* __evan_ptr;
+    uint32_t _num_maps_to_generate;
+    void* _name_seg;
+    uint16_t* _name_index;
+    s_animation_header* _fill_msg_bitmap;
+    char _fill_msg[36];
+    int16_t _fill_msg_ctr;
+    int8_t _first_time_map_is_generated = 1;
+    uint8_t _special_count[12];
+    uint32_t _n_stars;
+    uint32_t _n_planets;
+    int16_t _t_roll;
+    uint32_t _satellite_stat[6];
+    uint32_t _nebula_stat[5];
+    uint16_t _star_count;
+    s_planet_data* _pl;
+    const char s_raceopt_lbx[12] = "raceopt.lbx";
+    const char s_starname_lbx[13] = "starname.lbx";
+    const char s_starbg_lbx[11] = "starbg.lbx";
+    const char s_Stat_d__start_d__diff_d__total_d_d[48] = "Stat %d  (start: %d)  (diff %d)  (total: %d.%d)";
+    const char s_Blank_Stat_Line[71] = "                                                                      ";
+    const char s_Moving_planet_d_to_planet_d[30] = "Moving planet %d to planet %d";
+    const char s_Colony_Planets_d_Max_d[67] = "Colony Planets: %d  Max: %d  Planet Count: %d  Removing %d planets";
+    const char s_Star_d_orbit_d_has_a_0_sat_t_00558a1c[58] = "Star %d, orbit %d, has a 0 sat type.  Roll: %d  Table: %d";
+    uint8_t _MAPGEN_TRACE = 1;
 
 bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, int8_t generate_spectral, int8_t use_names) {
     int16_t x_cell_size = MOX::_MAP_MAX_X / x_cells;

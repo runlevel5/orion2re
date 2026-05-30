@@ -3,11 +3,9 @@
 struct s_animation_header;
 
 namespace MISC {
-    inline uint8_t& _mouse_clock_image_num =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566578});
+    extern uint8_t _mouse_clock_image_num;
 
-    inline s_mouse_list (&_mouse_list_clock)[4] =
-        *reinterpret_cast<s_mouse_list(*)[4]>(std::uintptr_t{0x00558250});
+    extern s_mouse_list _mouse_list_clock[4];
 
     void __cdecl Increment_Mouse_Clock_Image_();
 
@@ -17,8 +15,7 @@ namespace MISC {
 
     void __cdecl Change_Font_Style_(int16_t font_id);
 
-    inline s_colors& _mox_font_colors =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x005A5328});
+    extern s_colors _mox_font_colors;
 
     s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3);
 

@@ -34,7 +34,7 @@ namespace PLNTSUM {
         *reinterpret_cast<s_plntsum_ship**>(std::uintptr_t{0x005658A0});
 
     inline int16_t& _n_ships_in_summary = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565898});
-    inline int8_t (&_can_reach_star)[72] = *reinterpret_cast<int8_t(*)[72]>(std::uintptr_t{0x00565848});
+    extern int8_t _can_reach_star[72];
 
     inline uint8_t (&_explored_bitmap)[45] =
         *reinterpret_cast<uint8_t(*)[45]>(std::uintptr_t{0x005657F8});

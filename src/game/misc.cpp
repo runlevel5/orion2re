@@ -1,6 +1,17 @@
 #include "pch.h"
 
 namespace MISC {
+    uint8_t _mouse_clock_image_num;
+
+    s_mouse_list _mouse_list_clock[4] = {
+        {7, 0, 0, 0, 639, 479},
+        {8, 0, 0, 0, 639, 479},
+        {9, 0, 0, 0, 639, 479},
+        {10, 0, 0, 0, 639, 479},
+    };
+
+    s_colors _mox_font_colors;
+
     void __cdecl Increment_Mouse_Clock_Image_() {
         if (_mouse_clock_image_num >= 16) {
             _mouse_clock_image_num = 0;

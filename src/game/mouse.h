@@ -1,29 +1,21 @@
 #pragma once
 
 namespace mouse {
-    inline uint16_t& _mouse_enabled =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B178 });
+    extern uint16_t _mouse_enabled;
 
-    inline uint16_t& _mouse_state =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578DE4 });
+    extern uint16_t _mouse_state;
 
-    inline int16_t& _current_mouse_list_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A90 });
+    extern int16_t _current_mouse_list_count;
 
-    inline uint32_t& _num =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578AC0 });
+    extern uint32_t _num;
 
-    inline int16_t& _mouse_buffer_button =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578AC8 });
+    extern int16_t _mouse_buffer_button;
 
-    inline int16_t& _mouse_buffer_x =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578B44 });
+    extern int16_t _mouse_buffer_x;
 
-    inline int16_t& _mouse_buffer_y =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578B48 });
+    extern int16_t _mouse_buffer_y;
 
-    inline s_mouse_list*& _current_mouse_list =
-        *reinterpret_cast<s_mouse_list**>(std::uintptr_t{ 0x00578A98 });
+    extern s_mouse_list* _current_mouse_list;
 
     void __cdecl Check_Mouse_Shape_();
 
@@ -31,26 +23,19 @@ namespace mouse {
 
     void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons);
 
-    inline int32_t& _in_mouse_handler =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B19C });
+    extern int32_t _in_mouse_handler;
 
-    inline int16_t& _mouse_overide_flag =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B180 });
+    extern int16_t _mouse_overide_flag;
 
-    inline int16_t& _mouse_overide_right_button =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B184 });
+    extern int16_t _mouse_overide_right_button;
 
-    inline int16_t& _mouse_overide_left_button =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B188 });
+    extern int16_t _mouse_overide_left_button;
 
-    inline int16_t& _mouse_buttons =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578DE0});
+    extern int16_t _mouse_buttons;
 
-    inline int16_t& _mouse_buffer_flag =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DD8 });
+    extern int16_t _mouse_buffer_flag;
 
-    inline uint16_t& _mouse_buffer_flag2 =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578B50 });
+    extern uint16_t _mouse_buffer_flag2;
 
     int16_t __cdecl Mouse_Buffer_();
 

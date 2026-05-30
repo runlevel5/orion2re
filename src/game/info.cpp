@@ -1,6 +1,250 @@
 #include "pch.h"
 
 namespace INFO {
+    s_tech_review_achievement* _review_list[4] = {
+        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555998}),
+        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555A10}),
+        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555A80}),
+        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555AD8}),
+    };
+
+    const char s_billtex2_lbx[13] = "billtex2.lbx";
+
+    s_colors _info_normal_color = {{178, 185, 183, 182, 184, 185, 185, 186}};
+
+    s_colors _info_high_color = {{178, 191, 183, 185, 187, 188, 191, 191}};
+
+    int16_t _tech_rev_field[8] = {216, 427, 318, 427, 373, 427, 438, 427};
+
+    const char s_bullet_fmt_00556078[5] = "^ %s";
+
+    s_drop_area _tech_review_drops[4] = {
+        {218, 60, 425, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {433, 60, 612, 104, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {433, 114, 612, 254, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {433, 264, 612, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+    };
+
+    uint16_t _list_sizes[4] = {9164, 8374, 6952, 12640};
+
+    s_list_state _tech_review_list_header = {
+        223,
+        64,
+        187,
+        409,
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555E50}),
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555E78}),
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555EA0}),
+        6,
+        0,
+        nullptr,
+        nullptr,
+        0,
+        1,
+        3,
+        2,
+        reinterpret_cast<void*>(std::uintptr_t{0x004273A0}),
+        10,
+        0xBF,
+        &_info_high_color,
+        {&_info_normal_color, &_info_normal_color, &_info_normal_color, &_info_normal_color},
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BA8}),
+    };
+
+    int16_t _tech_review_tab_index;
+
+    void* _g_tech_image_seg;
+
+    int16_t _g_last_list_field;
+
+    uint16_t _g_selected_app_id;
+
+    s_list_state* _g_header_p;
+
+    s_animation_header* _g_bitmap1_p;
+
+    s_animation_header* _g_bitmap2_p;
+
+    int16_t _g_prior_choice;
+
+    s_list_item* _g_selected_list_p;
+
+    uint8_t _g_list_update_needed;
+
+    int16_t _g_first_list_field;
+
+    s_colors _info_red_color = {{178, 168, 166, 167, 167, 168, 168, 169}};
+
+    uint8_t _sub_scr_field[10] = {21, 50, 21, 77, 21, 102, 21, 128, 21, 154};
+
+    uint8_t _g_reference_screen_type;
+
+    uint8_t _g_turn_message_ix;
+
+    int16_t _g_reference_ix;
+
+    char (*_g_how_to_str_)[48];
+
+    int16_t _g_first_how_to_field;
+
+    int16_t _g_first_category_field;
+
+    char (*_g_category_str_p)[48];
+
+    uint8_t _race_statistics_page;
+
+    s_drop_area _turn_summary_drop = {
+        218, 60, 612, 414, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}
+    };
+
+    s_drop_area _reference_drops[4] = {
+        {218, 60, 414, 86, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {218, 93, 414, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {418, 60, 613, 86, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {418, 93, 613, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+    };
+
+    s_list_state _g_turn_header = {
+        223,
+        96,
+        345,
+        408,
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F28}),
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F28}),
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F48}),
+        8,
+        0,
+        nullptr,
+        nullptr,
+        0,
+        0,
+        4,
+        4,
+        reinterpret_cast<void*>(std::uintptr_t{0x00428450}),
+        13,
+        0,
+        &_info_high_color,
+        {&_info_normal_color, &_info_normal_color, &_info_normal_color, &_info_normal_color},
+        &_info_normal_color,
+    };
+
+    s_list_state _g_category_header = {
+        223,
+        96,
+        175,
+        410,
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555FA8}),
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555FA8}),
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555FAA}),
+        0,
+        0,
+        nullptr,
+        nullptr,
+        0,
+        0,
+        3,
+        3,
+        nullptr,
+        0,
+        0,
+        &_info_high_color,
+        {&_info_normal_color, &_info_normal_color, &_info_normal_color, &_info_normal_color},
+        &_info_normal_color,
+    };
+
+    uint16_t _g_exit_field;
+
+    s_list_item* _g_selected_msg_p;
+
+    s_drop_area _how_to_drops[2] = {
+        {218, 60, 610, 86, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {218, 93, 610, 416, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+    };
+
+    s_drop_area _category_drops[3] = {
+        {218, 60, 613, 86, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {218, 93, 414, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {418, 93, 613, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+    };
+
+    s_drop_area _race_stats_drops[4] = {
+        {223, 60, 410, 230, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {419, 60, 606, 230, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {223, 243, 410, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {419, 243, 606, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+    };
+
+    int16_t _race_bitmap_x[4] = {226, 422, 226, 422};
+
+    int16_t _race_bitmap_y[4] = {64, 64, 247, 247};
+
+    int16_t _race_statistics_specials_help_count;
+
+    s_help_box _race_statistics_specials_help[50];
+
+    s_colors _info_dark_color = {{178, 2, 2, 3, 3, 3, 4, 5}};
+
+    s_colors* _maintenance_bar_colors[7] = {
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BB0}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BB8}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BC0}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BC8}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BD0}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BD8}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BE0}),
+    };
+
+    s_colors* PTR__orange_text_colors[8] = {
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C08}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C10}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C18}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C20}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C28}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C30}),
+        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C38}),
+        nullptr,
+    };
+
+    s_colors _hist_palettes[8] = {
+        {{178, 198, 167, 195, 196, 197, 198, 199}},
+        {{178, 206, 203, 203, 204, 205, 206, 207}},
+        {{178, 214, 211, 211, 212, 213, 214, 215}},
+        {{178, 222, 219, 219, 220, 221, 222, 223}},
+        {{178, 230, 227, 227, 228, 229, 230, 231}},
+        {{178, 238, 235, 235, 236, 237, 238, 239}},
+        {{178, 246, 243, 243, 244, 245, 246, 247}},
+        {{178, 254, 251, 251, 252, 253, 254, 255}},
+    };
+
+    s_colors* _hist_graph_palettes[8];
+
+    const char s_billtext_lbx[13] = "billtext.lbx";
+    const char lbx_billtext[13] = "billtext.lbx";
+    const char empty_string[1] = "";
+
+    s_drop_area _history_graph_drops[2] = {
+        {220, 60, 609, 122, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+        {220, 132, 609, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
+    };
+
+    int16_t _graph_button_x[4] = {233, 323, 404, 457};
+
+    const char s_pct_fmt[6] = "%3i%%";
+    const char s_int_fmt[3] = "%i";
+
+    uint8_t _graph_offsets[10] = {7, 3, 3, 3, 3, 5, 3, 3, 3, 3};
+    const char s_fmt_comma[6] = "%i,%i";
+    const char s_fmt_dot[6] = "%i.%i";
+
+    const char s_plus_00551118[2] = "+";
+    const char s_minus_0055111C[2] = "-";
+    const char s_fmt_00556048[6] = "%s%+i";
+    const char s_plus_2_00556050[3] = "+2";
+    const char s_plus_1_00556054[3] = "+1";
+    const char s_minus_0_5_00556058[5] = "-0.5";
+    const char s_0_5_BC_00556060[7] = "0.5 BC";
+    const char s_1_BC_00556068[5] = "1 BC";
+
     static int Compare_Unsigned_Strings_(const char* lhs, const char* rhs) {
         while ((uint8_t)*lhs == (uint8_t)*rhs) {
             if (*lhs == '\0') {
@@ -410,7 +654,7 @@ namespace INFO {
         }
 
         allocate::Pop_Block_(MOX::_screen_seg);
-        INFO::_info_dark_color = 0xB0;
+        INFO::_info_dark_color.colors[0] = 0xB0;
     }
 
     void __cdecl Draw_Maint_Income_Chart_(s_animation_header** headers_a, s_animation_header** headers_b, int16_t param_3) {
@@ -1609,7 +1853,7 @@ namespace INFO {
     int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2) {
         char text_buffer[40];
 
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 9, text_buffer, 40);
+        JIM::Get_Text_Message_(s_billtext_lbx, 9, text_buffer, 40);
         fonts::Print_Centered_(416, 31, text_buffer);
         fonts::Set_Font_Style_(4, &_info_normal_color);
 

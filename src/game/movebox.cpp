@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace MOVEBOX {
+    s_movable_box _moveable_box[5];
+    s_fleet_box _fleet_box;
+    const char s__00551100[1] = "";
+
     void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* anim2,
                                     int16_t x_base, int16_t y_base,
                                     int16_t width, int16_t height,

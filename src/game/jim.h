@@ -4,28 +4,25 @@ struct s_animation_header;
 struct s_mouse_list;
 
 namespace JIM {
-    inline int16_t& _jim_current_stream =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005558E0 });
+    extern int16_t _jim_current_stream;
 
-    inline int16_t& _jim_old_music_id =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005558E8 });
+    extern int16_t _jim_old_music_id;
 
-    inline int16_t& _jim_fade_music_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558E4});
-    inline int16_t& _jim_old_transition_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558EC});
+    extern int16_t _jim_fade_music_flag;
+    extern int16_t _jim_old_transition_id;
 
-    // Potential string literal: "STREAM.LBX"
-    inline const char* s_STREAM_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x005558FC });
+    extern const char s_STREAM_LBX[];
+    extern const char s_STREAMHD_LBX_00555908[];
 
-    inline s_mouse_list& _logo_mouse_list = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x005558F0 });
-    inline int16_t& _darken_palette_value = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A7D96 });
+    extern s_mouse_list _logo_mouse_list;
+    extern int16_t _darken_palette_value;
 
-    inline const char* jimtext_lbx = reinterpret_cast<const char*>(0x00552360);
+    extern const char jimtext_lbx[];
 
-    inline const char* s_intro_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555960 });   // "intro.lbx"
-    inline const char* s_simtex_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055596C });  // "simtex.lbx"
-    inline const char* s_logo_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555978 });    // "logo.lbx"
-    inline const char* s_fmt_ssimtex_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555984 }); // "%ssimtex.lbx"
+    extern const char s_intro_lbx[];
+    extern const char s_simtex_lbx[];
+    extern const char s_logo_lbx[];
+    extern const char s_fmt_ssimtex_lbx[];
 
     // External functions
     bool __cdecl Check_For_Simtex_Logo_();
@@ -45,7 +42,7 @@ namespace JIM {
 
     void __cdecl Get_Text_Message_(const char* filename, int16_t msg_idx, char* dest, int16_t max_len);
 
-    inline char* s_Message_too_long = reinterpret_cast<char*>(std::uintptr_t{0x00555918});
+    extern const char s_Message_too_long[];
 
     void __cdecl Decode_Text_Name_And_Tech_(char* text, int16_t id1, int16_t id2, int16_t id3);
 
@@ -71,9 +68,9 @@ namespace JIM {
 
     void __cdecl Decode_Text_Message_(char* text, int16_t player1_id, int16_t star_id, int16_t tech_app1_id, int16_t number, int16_t player2_id, int16_t tech_app2_id, int16_t tech_field_id, int16_t max_len);
 
-    inline const char* s_d_comma_d_0055239c = reinterpret_cast<const char*>(0x0055239C);
-    inline const char* s_d_dot_d_005523a4 = reinterpret_cast<const char*>(0x005523A4);
-    inline const char* s_Decode_message_too_long_0055593c = reinterpret_cast<const char*>(0x0055593C);
+    extern const char s_d_comma_d_0055239c[];
+    extern const char s_d_dot_d_005523a4[];
+    extern const char s_Decode_message_too_long_0055593c[];
 
     void __cdecl Decode_Text_Year_(char* buffer, int16_t year);
 

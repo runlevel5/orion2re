@@ -1,6 +1,59 @@
 #include "pch.h"
 
 namespace MAINPUPS {
+    char* _g_msg_ptr;
+
+    s_animation_header* _anims[38];
+
+    uint8_t _on_officer_screen_flag;
+
+    int16_t _g_officer = -1;
+
+    int16_t _officer_gains_level_state;
+
+    char* _g_str_ptr;
+
+    int16_t _last_scanned_field;
+    int16_t _g_state;
+    int8_t _selection_state_flag;
+    uint8_t _g_using_colony_ship;
+    int16_t _g_max;
+    int16_t _g_min;
+    char* _g_msg;
+    int16_t _g_var;
+    int16_t _g_temp_tax_rate;
+    int16_t _field_state;
+    s_colors _main_scr_font_colors = {{0xA0, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9}};
+
+    uint8_t _g_special;
+    int16_t _g_x;
+    int16_t _g_y;
+    int16_t _g_star_n = -1;
+    int16_t _g_player_n = -1;
+    int16_t _field_mode;
+    int16_t _g_scanned_star = -1;
+    int16_t _g_old_scanned_star = -1;
+    uint8_t _no_flicker_between_mainpups_flag;
+    int16_t _autofunction_ctr;
+    int16_t _num_field_saves;
+    s_fieldsav_data _stats_array[3];
+    uint8_t _explode_flag = 1;
+    int16_t _g_refresh_mode;
+    MOX2::action_func_t _eric_saved_autofunction2;
+    MOX2::action_func_t _eric_saved_autofunction;
+
+    MOX2::action_func_t _temp_af;
+
+    s_colony_combat_popup_data* _g_data_ptr;
+
+    const char s_str_fmt_00556d98[7] = "%s: %d";
+
+    const char s_format_string[3] = "%s";
+    const char s_SI_COMBATTE_NEL_SISTEMA[61] =
+        "SI COMBATTE NEL SISTEMA %s\n\n  Attaccante: %s\n  Difensore: %s";
+
+    int16_t _mp_fields[26];
+
     void __cdecl Load_Colony_Fields_() {
         allocate::Push_Block_(MOX::_screen_seg);
         _anims[0] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0, MOX::_screen_seg);
@@ -2018,11 +2071,11 @@ namespace MAINPUPS {
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
 
         Mainpups_Tested_Execute_Autofunction_();
-        Get_Picture_Draw_XY_(_anim_10);
+        Get_Picture_Draw_XY_(_anims[10]);
 
-        animate::Draw_(_g_x, _g_y, _anim_10);
+        animate::Draw_(_g_x, _g_y, _anims[10]);
         OFFICER::Wrapper_For_Colony_Officer_Popup_Data_(_g_x, _g_y + 53, _g_officer);
-        animate::Draw_(_g_x + 13, _g_y + 55, _anim_11);
+        animate::Draw_(_g_x + 13, _g_y + 55, _anims[11]);
 
         if (_officer_gains_level_state == 0) {
             char* name = OFFICER::Leader_Name_(_g_officer, 0);

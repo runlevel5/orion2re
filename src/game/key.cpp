@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace key {
+    int32_t _last_key_pressed[10];
+
+    uint8_t _key_pressed;
+
+    uint8_t _key_write;
+
+    int8_t _key_read;
+
     uint8_t Keyboard_Status_() {
         if (_key_pressed == 1) {
             _key_pressed = 0;

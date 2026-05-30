@@ -11,122 +11,85 @@ struct s_list_state;
 struct s_tech_review_achievement;
 
 namespace INFO {
-    inline s_tech_review_achievement** _review_list =
-        reinterpret_cast<s_tech_review_achievement**>(std::uintptr_t{0x00555B78});
+    extern s_tech_review_achievement* _review_list[4];
 
-    inline const char* s_billtex2_lbx =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00556038}); // "billtex2.lbx"
+    extern const char s_billtex2_lbx[13];
 
-    inline s_colors& _info_normal_color =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00555B88});
+    extern s_colors _info_normal_color;
 
-    inline s_colors& _info_high_color =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00555B90});
+    extern s_colors _info_high_color;
 
-    inline int16_t (&_tech_rev_field)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00555CB0});
+    extern int16_t _tech_rev_field[8];
 
-    inline const char* s_bullet_fmt_00556078 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00556078}); // "^ %s"
+    extern const char s_bullet_fmt_00556078[5];
 
-    inline s_drop_area (&_tech_review_drops)[4] =
-        *reinterpret_cast<s_drop_area(*)[4]>(std::uintptr_t{0x00555CE8});
+    extern s_drop_area _tech_review_drops[4];
 
-    inline uint16_t (&_list_sizes)[4] =
-        *reinterpret_cast<uint16_t(*)[4]>(std::uintptr_t{0x00555EC8});
+    extern uint16_t _list_sizes[4];
 
-    inline s_list_state& _tech_review_list_header =
-        *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00555ED0});
+    extern s_list_state _tech_review_list_header;
 
-    inline int16_t& _tech_review_tab_index =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F10});
+    extern int16_t _tech_review_tab_index;
 
-    inline void*& _g_tech_image_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005A7B80});
+    extern void* _g_tech_image_seg;
 
-    inline int16_t& _g_last_list_field =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7B84});
+    extern int16_t _g_last_list_field;
 
-    inline uint16_t& _g_selected_app_id =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A7B86});
+    extern uint16_t _g_selected_app_id;
 
-    inline s_list_state*& _g_header_p =
-        *reinterpret_cast<s_list_state**>(std::uintptr_t{0x005A7B88});
+    extern s_list_state* _g_header_p;
 
-    inline s_animation_header*& _g_bitmap1_p =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A7B8C});
+    extern s_animation_header* _g_bitmap1_p;
 
-    inline s_animation_header*& _g_bitmap2_p =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A7B90});
+    extern s_animation_header* _g_bitmap2_p;
 
-    inline int16_t& _g_prior_choice =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7B94});
+    extern int16_t _g_prior_choice;
 
-    inline s_list_item*& _g_selected_list_p =
-        *reinterpret_cast<s_list_item**>(std::uintptr_t{0x005A7B98});
+    extern s_list_item* _g_selected_list_p;
 
-    inline uint8_t& _g_list_update_needed =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B9C});
+    extern uint8_t _g_list_update_needed;
 
-    inline int16_t& _g_first_list_field =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7D94});
+    extern int16_t _g_first_list_field;
 
-    inline s_colors& _info_red_color =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00555B98});
+    extern s_colors _info_red_color;
 
-    inline uint8_t (&_sub_scr_field)[10] =
-        *reinterpret_cast<uint8_t(*)[10]>(std::uintptr_t{0x00555CA0});
+    extern uint8_t _sub_scr_field[10];
 
-    inline uint8_t& _g_reference_screen_type =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00564D78});
+    extern uint8_t _g_reference_screen_type;
 
-    inline uint8_t& _g_turn_message_ix =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00564D7C});
+    extern uint8_t _g_turn_message_ix;
 
-    inline int16_t& _g_reference_ix =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DA4});
+    extern int16_t _g_reference_ix;
 
-    inline char (*&_g_how_to_str_)[48] =
-        *reinterpret_cast<char (**)[48]>(std::uintptr_t{0x00564DA8});
+    extern char (*_g_how_to_str_)[48];
 
-    inline int16_t& _g_first_how_to_field =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DAC});
+    extern int16_t _g_first_how_to_field;
 
-    inline int16_t& _g_first_category_field =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DB0});
+    extern int16_t _g_first_category_field;
 
-    inline char (*&_g_category_str_p)[48] =
-        *reinterpret_cast<char (**)[48]>(std::uintptr_t{0x00564DB4});
+    extern char (*_g_category_str_p)[48];
 
-    inline uint8_t& _race_statistics_page =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B9D});
+    extern uint8_t _race_statistics_page;
 
-    inline s_drop_area& _turn_summary_drop =
-        *reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555D78});
+    extern s_drop_area _turn_summary_drop;
 
-    inline s_drop_area (&_reference_drops)[4] =
-        *reinterpret_cast<s_drop_area(*)[4]>(std::uintptr_t{0x00555D90});
+    extern s_drop_area _reference_drops[4];
 
-    inline s_list_state& _g_turn_header =
-        *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00555F68});
+    extern s_list_state _g_turn_header;
 
-    inline s_list_state& _g_category_header =
-        *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00555FB0});
+    extern s_list_state _g_category_header;
 
-    inline uint16_t& _g_exit_field =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A7B9E});
+    extern uint16_t _g_exit_field;
 
-    inline s_list_item*& _g_selected_msg_p =
-        *reinterpret_cast<s_list_item**>(std::uintptr_t{0x00564DA0});
+    extern s_list_item* _g_selected_msg_p;
 
-    inline s_drop_area* _how_to_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555DD8});
-    inline s_drop_area* _category_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555E00});
-    inline s_drop_area* _race_stats_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555D30});
-    inline int16_t* _race_bitmap_x = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F18});
-    inline int16_t* _race_bitmap_y = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F20});
-    inline int16_t& _race_statistics_specials_help_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7B96});
-    inline s_help_box (&_race_statistics_specials_help)[50] =
-        *reinterpret_cast<s_help_box (*)[50]>(std::uintptr_t{0x005A7BA0});
+    extern s_drop_area _how_to_drops[2];
+    extern s_drop_area _category_drops[3];
+    extern s_drop_area _race_stats_drops[4];
+    extern int16_t _race_bitmap_x[4];
+    extern int16_t _race_bitmap_y[4];
+    extern int16_t _race_statistics_specials_help_count;
+    extern s_help_box _race_statistics_specials_help[50];
 
     int16_t __cdecl Get_Plyr_Info_Btns_();
 
@@ -134,35 +97,30 @@ namespace INFO {
 
     void __cdecl Build_Maint_Chart_Bitmaps_(s_animation_header** sprites, s_animation_header** bars, s_animation_header** labels, int32_t* values);
 
-    inline uint8_t& _info_dark_color = 
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00555BA0});
+    extern s_colors _info_dark_color;
 
-    inline s_colors* (&_maintenance_bar_colors)[7] = 
-        *reinterpret_cast<s_colors*(*)[7]>(std::uintptr_t{0x00555BE8});
+    extern s_colors* _maintenance_bar_colors[7];
 
-    inline s_colors* (&PTR__orange_text_colors)[8] = 
-        *reinterpret_cast<s_colors*(*)[8]>(std::uintptr_t{0x00555C40});
+    extern s_colors* PTR__orange_text_colors[8];
 
-    inline s_colors (&_hist_palettes)[8] = 
-        *reinterpret_cast<s_colors(*)[8]>(std::uintptr_t{0x00555C60});
+    extern s_colors _hist_palettes[8];
 
-    inline s_colors* (&_hist_graph_palettes)[8] = 
-        *reinterpret_cast<s_colors*(*)[8]>(std::uintptr_t{0x00564D80});
+    extern s_colors* _hist_graph_palettes[8];
 
     void __cdecl Colorize_Bitmap_(s_animation_header* anim, s_colors* color_table, uint8_t range_start, uint8_t range_end);
 
-    inline const char* s_billtext_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x0055135C}); // "billtext.lbx"
-    inline const char* lbx_billtext = reinterpret_cast<const char*>(std::uintptr_t{0x0055135C});
-    inline const char* empty_string = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
-    inline s_drop_area* _history_graph_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555CC0});
-    inline int16_t* _graph_button_x = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555E48});
+    extern const char s_billtext_lbx[13];
+    extern const char lbx_billtext[13];
+    extern const char empty_string[1];
+    extern s_drop_area _history_graph_drops[2];
+    extern int16_t _graph_button_x[4];
 
-    inline const char* s_pct_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x0055600C}); // "%3i%%"
-    inline const char* s_int_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00556014}); // "%i"
+    extern const char s_pct_fmt[6];
+    extern const char s_int_fmt[3];
 
-    inline uint8_t (&_graph_offsets)[10] = *reinterpret_cast<uint8_t(*)[10]>(std::uintptr_t{0x00555E38});
-    inline const char* s_fmt_comma = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
-    inline const char* s_fmt_dot = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8});   // "%i.%i"
+    extern uint8_t _graph_offsets[10];
+    extern const char s_fmt_comma[6];
+    extern const char s_fmt_dot[6];
 
     void __cdecl Draw_Maint_Income_Chart_(s_animation_header** chart_bars, s_animation_header** chart_labels, int16_t val);
 
@@ -200,14 +158,14 @@ namespace INFO {
 
     int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** param_1, int16_t param_2);
 
-    inline const char* s_plus_00551118 = reinterpret_cast<const char*>(std::uintptr_t{0x00551118}); // "+"
-    inline const char* s_minus_0055111C = reinterpret_cast<const char*>(std::uintptr_t{0x0055111C}); // "-"
-    inline const char* s_fmt_00556048 = reinterpret_cast<const char*>(std::uintptr_t{0x00556048}); // "%s%+i"
-    inline const char* s_plus_2_00556050 = reinterpret_cast<const char*>(std::uintptr_t{0x00556050}); // "+2"
-    inline const char* s_plus_1_00556054 = reinterpret_cast<const char*>(std::uintptr_t{0x00556054}); // "+1"
-    inline const char* s_minus_0_5_00556058 = reinterpret_cast<const char*>(std::uintptr_t{0x00556058}); // "-0.5"
-    inline const char* s_0_5_BC_00556060 = reinterpret_cast<const char*>(std::uintptr_t{0x00556060}); // "0.5 BC"
-    inline const char* s_1_BC_00556068 = reinterpret_cast<const char*>(std::uintptr_t{0x00556068}); // "1 BC"
+    extern const char s_plus_00551118[2];
+    extern const char s_minus_0055111C[2];
+    extern const char s_fmt_00556048[6];
+    extern const char s_plus_2_00556050[3];
+    extern const char s_plus_1_00556054[3];
+    extern const char s_minus_0_5_00556058[5];
+    extern const char s_0_5_BC_00556060[7];
+    extern const char s_1_BC_00556068[5];
 
     void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap);
 

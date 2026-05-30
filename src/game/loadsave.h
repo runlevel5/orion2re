@@ -2,9 +2,9 @@
 #include <cstdint>
 
 namespace LOADSAVE {
-    inline const char* s_INVALID_STR = reinterpret_cast<const char*>(0x0055AC58);
+    extern const char s_INVALID_STR[12];
 
-    inline char (&_months)[12][6] = *reinterpret_cast<char(*)[12][6]>(std::uintptr_t{0x005722F8});
+    extern char _months[12][6];
 
     void __cdecl Load_Month_Names_();
 
@@ -18,22 +18,21 @@ namespace LOADSAVE {
 
     void __cdecl Reload_Language_Strings_();
 
-    inline uint8_t& _draw_game_popup_to_back =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722F4});
-    inline uint8_t& _dont_draw_darkened_buttons = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722C4});
-    inline uint8_t& _draw_down = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AC50});
-    inline char (&_empty_save_slot_message)[20] = *reinterpret_cast<char(*)[20]>(std::uintptr_t{0x005722D8});
+    extern uint8_t _draw_game_popup_to_back;
+    extern uint8_t _dont_draw_darkened_buttons;
+    extern uint8_t _draw_down;
+    extern char _empty_save_slot_message[20];
 
-    inline int16_t& _music_level_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572344});
-    inline int16_t& _sfx_level_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005722B8});
-    inline uint8_t& _print_data_to_bitmap = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722EC});
-    inline struct s_animation_header*& _bitmap = *reinterpret_cast<struct s_animation_header**>(std::uintptr_t{0x005722F0});
+    extern int16_t _music_level_field;
+    extern int16_t _sfx_level_field;
+    extern uint8_t _print_data_to_bitmap;
+    extern struct s_animation_header* _bitmap;
 
-    inline s_game_anims*& _game_anims = *reinterpret_cast<s_game_anims**>(std::uintptr_t{0x00572354});
+    extern s_game_anims* _game_anims;
 
-    inline s_game_popup_fields*& _game_popup_fields = *reinterpret_cast<s_game_popup_fields**>(std::uintptr_t{0x0059537c});
-    inline uint8_t& _loaded_new_game = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572340});
-    inline uint8_t& _loaded_debug_save = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572350});
+    extern s_game_popup_fields* _game_popup_fields;
+    extern uint8_t _loaded_new_game;
+    extern uint8_t _loaded_debug_save;
 
     int32_t __cdecl Check_Magic_Number_(const char* filename);
 
@@ -83,30 +82,30 @@ namespace LOADSAVE {
 
     void __cdecl Get_Star_Date_Strings_(int32_t* fields, char* output_buf);
 
-    inline const char* const s_dot_GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4);
-    inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC);
-    inline const char* s_format_0055ad30 = reinterpret_cast<const char*>(0x0055AD30); // "%s, %s, %d %s"
+    extern const char s_dot_GAM_005568f4[5];
+    extern const char s_SAVE_005568fc[5];
+    extern const char s_format_0055ad30[14];
 
     void __cdecl Auto_Save_Last_Saved_Game_(int16_t* flag);
 
     void __cdecl Auto_Load_Last_Saved_Game_(int16_t* flag);
 
-    inline const char* s__ALT_F1__0055ad24 = reinterpret_cast<const char*>(0x0055AD24); // "(ALT F1)"
-    inline const char* s__ALT_F2__0055ad18 = reinterpret_cast<const char*>(0x0055AD18); // "(ALT F2)"
-    inline const char* s__ALT_F3__0055ad0c = reinterpret_cast<const char*>(0x0055AD0C); // "(ALT F3)"
-    inline const char* s__ALT_F5__0055ad00 = reinterpret_cast<const char*>(0x0055AD00); // "(ALT F5)"
-    inline const char* s__ALT_F6__0055acf4 = reinterpret_cast<const char*>(0x0055ACF4); // "(ALT F6)"
-    inline const char* s__ALT_F7__0055ace8 = reinterpret_cast<const char*>(0x0055ACE8); // "(ALT F7)"
-    inline const char* s__ALT_F8__0055acdc = reinterpret_cast<const char*>(0x0055ACDC); // "(ALT F8)"
+    extern const char s__ALT_F1__0055ad24[9];
+    extern const char s__ALT_F2__0055ad18[9];
+    extern const char s__ALT_F3__0055ad0c[9];
+    extern const char s__ALT_F5__0055ad00[9];
+    extern const char s__ALT_F6__0055acf4[9];
+    extern const char s__ALT_F7__0055ace8[9];
+    extern const char s__ALT_F8__0055acdc[9];
 
-    inline const char* s__ALT_F1__0055acd0 = reinterpret_cast<const char*>(0x0055ACD0); // "(ALT-F1)"
-    inline const char* s__ALT_F2__0055acc4 = reinterpret_cast<const char*>(0x0055ACC4); // "(ALT-F2)"
-    inline const char* s__ALT_F3__0055acb8 = reinterpret_cast<const char*>(0x0055ACB8); // "(ALT-F3)"
-    inline const char* s__ALT_F4__0055acac = reinterpret_cast<const char*>(0x0055ACAC); // "(ALT-F4)"
-    inline const char* s__ALT_F5__0055aca0 = reinterpret_cast<const char*>(0x0055ACA0); // "(ALT-F5)"
-    inline const char* s__ALT_F6__0055ac94 = reinterpret_cast<const char*>(0x0055AC94); // "(ALT-F6)"
-    inline const char* s__ALT_F7__0055ac88 = reinterpret_cast<const char*>(0x0055AC88); // "(ALT-F7)"
-    inline const char* s__ALT_F8__0055ac7c = reinterpret_cast<const char*>(0x0055AC7C); // "(ALT-F8)"
+    extern const char s__ALT_F1__0055acd0[9];
+    extern const char s__ALT_F2__0055acc4[9];
+    extern const char s__ALT_F3__0055acb8[9];
+    extern const char s__ALT_F4__0055acac[9];
+    extern const char s__ALT_F5__0055aca0[9];
+    extern const char s__ALT_F6__0055ac94[9];
+    extern const char s__ALT_F7__0055ac88[9];
+    extern const char s__ALT_F8__0055ac7c[9];
 
     void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer);
 

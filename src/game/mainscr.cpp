@@ -1,6 +1,90 @@
 #include "pch.h"
 
 namespace MAINSCR {
+    int16_t _zoom_in_button;
+    int16_t _zoom_out_button;
+    int16_t _whole_screen_field;
+    int16_t _game_button;
+    int16_t _next_button;
+    int16_t _design_button;
+    int16_t _colonies_button;
+    int16_t _planets_button;
+    int16_t _fleets_button;
+    int16_t _leaders_button;
+    int16_t _races_button;
+    int16_t _info_button;
+    int16_t _treasury_window_field;
+    int16_t _command_points_window_field;
+    int16_t _food_window_field;
+    int16_t _freighters_window_field;
+    int16_t _research_window_field;
+    int16_t _first_field;
+    uint8_t _debug_enabled;
+    int16_t _debug_field;
+    int16_t _exit_game_hot_key;
+    int16_t _main_screen_grid_y;
+    int16_t _main_screen_grid_x;
+    s_animation_header* _temp_bitmap;
+    int16_t _main_screen_scanned_star;
+    int8_t _moving_a_stack;
+    int8_t _track_time_flag;
+    int8_t _clear_fleet_fields;
+    int8_t _mouse_btn_pressed;
+    int8_t _merging_relocations;
+    uint8_t _warn_about_cheaters;
+    uint8_t _zoom_box_counter;
+    uint8_t _zoom_box_color_increment;
+    uint8_t _zoom_box_increment_value;
+    int8_t _officer_screen_return_screen;
+    int8_t _next_turn_hit;
+    int16_t _zoom_box_x;
+    int16_t _zoom_box_y;
+    int8_t _fleet_ship_selection_status;
+    int16_t _fleet_icon_chosen;
+
+    s_hotseat_system_box_state _hotseat_system_box[8];
+
+    uint8_t _hotseat_map_scale[8];
+
+    s_hotseat_fleet_box_state _hotseat_fleet_box[8];
+
+    int8_t _star_name_highlight_direction = 1;
+
+    uint8_t _star_name_highlight_value;
+
+    uint8_t _check_next_turn_exit_field;
+    int16_t _n_twinkling_stars;
+    int16_t _main_screen_ship_icon_scanned;
+    s_colors _ship_direction_line_green_colors = {{0x6E, 0x6F, 0x72, 0x74, 0x74, 0x72, 0x6F, 0x6E}};
+    s_colors _ship_direction_line_red_colors = {{0x49, 0x4A, 0x4D, 0x4F, 0x4F, 0x4D, 0x4A, 0x49}};
+    uint8_t _fltpop_field_selection_status;
+    int8_t _diplo_lights_anim_frame[8];
+    s_animation_header* _player_lights_seg[8];
+
+    uint8_t _already_faded_into_main_screen;
+    uint8_t _in_auto_next_turn_mode;
+
+    int16_t _omniscient_hot_key = -1000;
+    int16_t _all_tech_cheat = -1000;
+    int16_t _leader_cheat = -1000;
+    int16_t _more_money_cheat = -1000;
+    int16_t _get_tech_cheat = -1000;
+    int16_t _omniscience_cheat = -1000;
+    int16_t _all_ai_cheat = -1000;
+    int16_t _hi_score_cheat = -1000;
+    int16_t _last_field;
+
+    const char s_EINSTEIN_005597e8[] = "EINSTEIN";
+    const char s_MOOLA_005597f8[] = "MOOLA";
+    const char s_MENLO_00559800[] = "MENLO";
+    const char s_ISEEALL_00559808[] = "ISEEALL";
+    const char s_SCORE_00559820[] = "SCORE";
+    const char s_Current_score_for_s_is_d[] = "Current score for %s is %d";
+    const char s_fmt_star_len_00559984[] = "%s, len = %d";
+    const char s_ship_icon_idx_fmt[] = "ship icon %d";
+
+    s_fleet_box _fleet_box;
+
     bool __cdecl Is_Main_Screen_Palette_() {
         uint8_t screen = static_cast<uint8_t>(MOX::_previous_screen);
 

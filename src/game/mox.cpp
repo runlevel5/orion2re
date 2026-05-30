@@ -1,6 +1,49 @@
 #include "pch.h"
 
 namespace MOX {
+    const char _ship_type_names[5][6][16] = {
+        {
+            "combat ships",
+            "not used",
+            "",
+            "",
+            "",
+            "",
+        },
+        {
+            "Colony Ship",
+            "Kolonieschiff",
+            "Colonial",
+            "Nave Colonia",
+            "Nave colonia",
+            "Colony Ship",
+        },
+        {
+            "Transport",
+            "Transporter",
+            "Transport",
+            "Transporte",
+            "Nave truppa",
+            "Transport",
+        },
+        {
+            "tanks",
+            "not used",
+            "",
+            "",
+            "",
+            "",
+        },
+        {
+            "Outpost Ship",
+            "Au|enposten",
+            "Avante-poste",
+            "Puesto Avanzado",
+            "Nave avamposto",
+            "Outpost Ship",
+        },
+    };
+
     s_fleet_movement_icon _fleet_movement_icon[500];
 
     void __cdecl Apply_Save_Settings(s_settings* s) {

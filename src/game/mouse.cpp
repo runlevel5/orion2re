@@ -1,6 +1,22 @@
 #include "pch.h"
 
 namespace mouse {
+    uint16_t _mouse_enabled;
+    uint16_t _mouse_state;
+    int16_t _current_mouse_list_count;
+    uint32_t _num;
+    int16_t _mouse_buffer_button;
+    int16_t _mouse_buffer_x;
+    int16_t _mouse_buffer_y;
+    s_mouse_list* _current_mouse_list;
+    int32_t _in_mouse_handler;
+    int16_t _mouse_overide_flag;
+    int16_t _mouse_overide_right_button;
+    int16_t _mouse_overide_left_button;
+    int16_t _mouse_buttons;
+    int16_t _mouse_buffer_flag;
+    uint16_t _mouse_buffer_flag2;
+
     int16_t __cdecl Mouse_Buffer_() {
         int16_t old_flag = _mouse_buffer_flag;
         _mouse_buffer_flag = 0;
