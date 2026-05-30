@@ -14,9 +14,9 @@ namespace random {
         return seed;
     }
 
-    void __cdecl Randomize_() {
+    uint32_t __cdecl Randomize_() {
         uint32_t current_time = (uint32_t)time(nullptr);
-        Set_Random_Seed_(current_time);
+        return Set_Random_Seed_(current_time);
     }
 
     uint32_t __cdecl Random_(uint32_t max_val) {

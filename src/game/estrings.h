@@ -4,7 +4,7 @@
 namespace ESTRINGS {
     inline char* (&_strings)[812] =
         *reinterpret_cast<char* (*)[812]>(std::uintptr_t{0x0056B788});
-    inline const char*& s_0_0055110c = *reinterpret_cast<const char**>(std::uintptr_t{0x0055110C}); // " 0"
+    inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // " 0"
     inline const char*& s_1_00551110 = *reinterpret_cast<const char**>(std::uintptr_t{0x00551110}); // " 1"
 
     inline char (&_string_data)[21000] = *reinterpret_cast<char (*)[21000]>(std::uintptr_t{0x00566580});

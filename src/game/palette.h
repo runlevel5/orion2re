@@ -35,13 +35,13 @@ namespace palette {
 
     void* __cdecl Allocate_Glass_Remap_Next_Block_(void* block);
 
-    void __cdecl Set_Glass_Remap_Color_(int16_t idx, int16_t r, int16_t g, int16_t b, int16_t c);
+    void __cdecl Set_Glass_Remap_Color_(int16_t idx, uint8_t r, uint8_t g, uint8_t b, uint8_t c);
 
     void __cdecl Restore_Glass_Remap_Block_(void* buffer);
 
     void __cdecl RGB_To_HLS_(int8_t r, int8_t g, int8_t b, int32_t* h, int32_t* l, int32_t* s);
 
-    void __cdecl HLS_To_RGB_(int h, int l, int s, uint8_t* r, uint8_t* g, uint8_t* b);
+    void __cdecl HLS_To_RGB_(int32_t h, int32_t l, int32_t s, uint8_t* r, uint8_t* g, uint8_t* b);
 
     int32_t __cdecl Value_(int32_t p, int32_t q, int32_t t);
 }

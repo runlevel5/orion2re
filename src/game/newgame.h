@@ -14,7 +14,6 @@ namespace NEWGAME {
     inline int16_t& _random_events_button_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005663C4});
     inline int16_t& _gal_age_button_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005663C8});
     inline int16_t* _fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x005663B0});
-    inline char* DAT_0059532e = reinterpret_cast<char*>(std::uintptr_t{0x0059532E});
     inline s_animation_header** _anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00566330});
     inline s_animation_header** _tech_level_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A61F0});
     inline s_animation_header** _difficulty_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A6200});

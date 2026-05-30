@@ -38,8 +38,6 @@ namespace FLT2 {
     inline s_colors& _neutral_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DE0});
     inline s_colors& _red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DD8});
 
-    inline char* s_s_s_005569c0 = reinterpret_cast<char*>(std::uintptr_t{0x005569C0});
-
     char* __cdecl Crew_Description_String_(int16_t ship_idx);
 
     uint8_t __cdecl Draw_Captains_Picture_(int16_t ship_idx);

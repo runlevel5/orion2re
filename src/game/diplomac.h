@@ -20,9 +20,11 @@ namespace diplomac {
     inline int16_t (&_personality_peace_duration)[12] = 
         *reinterpret_cast<int16_t(*)[12]>(std::uintptr_t{0x00556CC8});
 
-    inline int16_t* _personality_break_peace_treaty_chance = reinterpret_cast<int16_t*>(std::uintptr_t{0x00556CE0});
+    inline int16_t (&_personality_break_peace_treaty_chance)[8] =
+        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556CE0});
 
-    inline int16_t* _personality_sneak_attack_modifiers = reinterpret_cast<int16_t*>(std::uintptr_t{0x00556CF0});
+    inline int16_t (&_personality_sneak_attack_modifiers)[8] =
+        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556CF0});
 
     void Init_Diplomatic_Relations_();
 

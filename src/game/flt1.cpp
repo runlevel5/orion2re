@@ -1373,9 +1373,9 @@ namespace FLT1 {
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_id], tech_id);
 
                     strcat(message, s_0_0055110c);
-                    strcat(message, s___00556070);
+                    strcat(message, s_caret_space_00556070);
                     strcat(message, TECHDATA::_technology_applications[tech_id].name);
-                    strcat(message, s__005569f8);
+                    strcat(message, string::s_Newline);
                 }
             }
 

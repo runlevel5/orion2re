@@ -2,8 +2,8 @@
 
 namespace line {
 
-    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int32_t offset) {
-        int16_t color_index = (int16_t)offset;
+    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t offset) {
+        uint16_t color_index = (uint16_t)offset;
 
         if (animate::_clipping_flag == 1) {
             if (line::Clip_Line_(&x1, &y1, &x2, &y2) == 1) {
@@ -16,7 +16,7 @@ namespace line {
             strings::Swap_Short_(&x1, &x2);
         }
 
-        uint8_t* local_ptr = video::_current_video_page + y1 * g_screen_res_x + x1;
+        uint8_t* local_ptr = video::_current_video_page + y1 * platform::g_screen_res_x + x1;
         int16_t dx = x2 - x1;
         int16_t abs_dx = dx;
         int16_t x_dir = 1;
@@ -33,7 +33,7 @@ namespace line {
             while (count > 0) {
                 *local_ptr = colors->colors[color_index & 7];
                 color_index++;
-                local_ptr += g_screen_res_x;
+                local_ptr += platform::g_screen_res_x;
                 count--;
             }
             if (video::screen_refresh_flag >= 2 && y1 <= y2) {
@@ -66,7 +66,7 @@ namespace line {
             while (count > 0) {
                 *local_ptr = colors->colors[color_index & 7];
                 color_index++;
-                local_ptr += g_screen_res_x + x_dir;
+                local_ptr += platform::g_screen_res_x + x_dir;
                 count--;
             }
             if (video::screen_refresh_flag >= 2 && y1 <= y2) {
@@ -316,7 +316,8 @@ namespace line {
         }
 
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
-        uint8_t* render_ptr = reinterpret_cast<uint8_t*>(static_cast<std::uintptr_t>(y1 * platform::g_screen_res_x + x1 + (uintptr_t)video::_current_video_page));
+        uint8_t* render_ptr =
+            video::_current_video_page + (int32_t)y1 * platform::g_screen_res_x + (int32_t)x1;
 
         int16_t dx = x2 - x1;
         int16_t x_step;
@@ -391,11 +392,11 @@ namespace line {
 
         // Bresenham-based line drawing
         if (dy < dx) {
-            uint16_t run_len = dx / dy;
+            int16_t run_len = dx / dy;
             int16_t rem = (dx % dy) * 2;
             int16_t error = (dx % dy) - (dy * 2);
-            uint16_t initial_run = (run_len / 2) + 1;
-            uint16_t final_run = initial_run;
+            int16_t initial_run = (run_len / 2) + 1;
+            int16_t final_run = initial_run;
 
             if (rem == 0) {
                 if ((run_len & 1) == 0) initial_run--;
@@ -418,7 +419,7 @@ namespace line {
 
             for (int i = 0; i < dy - 1; ++i) {
                 error += rem;
-                uint16_t current_run = run_len;
+                int16_t current_run = run_len;
                 if (error > 0) {
                     current_run++;
                     error -= (dy * 2);
@@ -445,11 +446,11 @@ namespace line {
                 }
             }
         } else {
-            uint16_t run_len = dy / dx;
+            int16_t run_len = dy / dx;
             int16_t rem = (dy % dx) * 2;
             int16_t error = (dy % dx) - (dx * 2);
-            uint16_t initial_run = (run_len / 2) + 1;
-            uint16_t final_run = initial_run;
+            int16_t initial_run = (run_len / 2) + 1;
+            int16_t final_run = initial_run;
 
             if (rem == 0) {
                 if ((run_len & 1) == 0) initial_run--;
@@ -469,7 +470,7 @@ namespace line {
 
             for (int i = 0; i < dx - 1; ++i) {
                 error += rem;
-                uint16_t current_run = run_len;
+                int16_t current_run = run_len;
                 if (error > 0) {
                     current_run++;
                     error -= (dx * 2);
@@ -526,20 +527,20 @@ namespace line {
         *buf = current_pos + platform::g_screen_res_x;
     }
 
-    void __cdecl Plasma_Box_(int16_t x, int16_t y, uint16_t w, int16_t h, int16_t thickness,
-                             int16_t val1, uint8_t val2, int32_t val3) {
-        Create_Plasma_Line_(val1, val2, reinterpret_cast<const uint8_t*>(val3));
+    void __cdecl Plasma_Box_(int16_t x, int16_t y, uint16_t width, int16_t height, int16_t thickness,
+                             int16_t seed, uint8_t start_value, const uint8_t* color_map) {
+        Create_Plasma_Line_(seed, start_value, color_map);
 
         if (thickness > 0) {
             for (int16_t i = 0; i < thickness; ++i) {
                 int16_t y1 = y + i;
-                int16_t x2 = x - i + w - 1;
+                int16_t x2 = x - i + width - 1;
                 int16_t x1 = x + i;
 
                 Plasma_Line_(x1, y1, x2, y1, replace::_graphics_buffer, 0);
 
-                int16_t y2 = y - i + h - 1;
-                Plasma_Line_(x2, y1, x2, y2, replace::_graphics_buffer, w);
+                int16_t y2 = y - i + height - 1;
+                Plasma_Line_(x2, y1, x2, y2, replace::_graphics_buffer, width);
 
                 for (int j = 0; j < 511; ++j) {
                     uint8_t tmp = replace::_graphics_buffer[j];
@@ -547,13 +548,13 @@ namespace line {
                     replace::_graphics_buffer[1022 - j] = tmp;
                 }
 
-                Plasma_Line_(x1, y1, x1, y2, replace::_graphics_buffer, h + w);
-                Plasma_Line_(x1, y2, x2, y2, replace::_graphics_buffer, h + w * 2);
+                Plasma_Line_(x1, y1, x1, y2, replace::_graphics_buffer, height + width);
+                Plasma_Line_(x1, y2, x2, y2, replace::_graphics_buffer, height + width * 2);
             }
         }
     }
 
-    void __cdecl Draw_Horizontal_Run_Multi_(uint8_t** dest_ptr, int16_t step, int16_t length, s_colors* colors, int16_t* color_index) {
+    void __cdecl Draw_Horizontal_Run_Multi_(uint8_t** dest_ptr, int16_t step, int16_t length, s_colors* colors, uint16_t* color_index) {
         uint8_t* ptr = *dest_ptr;
         if (length > 0) {
             int32_t count = length;
@@ -564,16 +565,16 @@ namespace line {
                 count--;
             } while (count != 0);
         }
-        *dest_ptr = ptr + g_screen_res_x;
+        *dest_ptr = ptr + platform::g_screen_res_x;
     }
 
-    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, int16_t* color_idx) {
+    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, uint16_t* color_idx) {
         uint8_t* dest = *screen_ptr;
 
         for (int16_t i = 0; i < height; ++i) {
             *dest = colors->colors[*color_idx & 7];
             (*color_idx)++;
-            dest += g_screen_res_x;
+            dest += platform::g_screen_res_x;
         }
 
         *screen_ptr = dest + offset;
@@ -591,7 +592,7 @@ namespace line {
             strings::Swap_Short_(&x1, &x2);
         }
 
-        uint8_t* ptr = video::_current_video_page + y1 * g_screen_res_x + x1;
+        uint8_t* ptr = video::_current_video_page + y1 * platform::g_screen_res_x + x1;
         int16_t dx = x2 - x1;
         int16_t x_dir;
 
@@ -610,7 +611,7 @@ namespace line {
                 do {
                     *ptr = color_map[color_index & 0x3ff];
                     color_index++;
-                    ptr += g_screen_res_x;
+                    ptr += platform::g_screen_res_x;
                     count--;
                 } while (count != 0);
             }
@@ -653,7 +654,7 @@ namespace line {
                 do {
                     *ptr = color_map[color_index & 0x3ff];
                     color_index++;
-                    ptr += g_screen_res_x + x_dir;
+                    ptr += platform::g_screen_res_x + x_dir;
                     count--;
                 } while (count != 0);
             }
@@ -840,7 +841,7 @@ namespace line {
 
                 // Increment cyclic index and move to the next screen row
                 *plasma_index_ptr = index + 1;
-                current_pixels += g_screen_res_x;
+                current_pixels += platform::g_screen_res_x;
 
                 count--;
             } while (count != 0);
@@ -863,14 +864,14 @@ namespace line {
             } while (count != 0);
         }
 
-        *dest_ptr = dest + g_screen_res_x;
+        *dest_ptr = dest + platform::g_screen_res_x;
     }
 
-    void __cdecl Create_Plasma_Line_(int16_t seed, uint16_t start_val, const uint8_t* color_map) {
+    void __cdecl Create_Plasma_Line_(int16_t seed, uint16_t start_value, const uint8_t* color_map) {
         random::Save_Random_Seed_();
         random::Set_Random_Seed_(seed);
 
-        replace::_graphics_buffer[0] = static_cast<uint8_t>(start_val & 0x7);
+        replace::_graphics_buffer[0] = static_cast<uint8_t>(start_value & 0x7);
 
         int8_t direction_state = static_cast<int8_t>(random::Random_(4)) - 1;
         int8_t step_dir = (direction_state == 0) ? -1 : 1;

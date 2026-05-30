@@ -9,6 +9,8 @@ namespace dos {
      */
     bool __cdecl DIR_(const char* pattern, char* output_name) {
         intptr_t result;
+        // Binary note: the empty-pattern path passes an uninitialized stack local to _findnext32.
+        // Keeping a safe default here avoids reintroducing that undefined behavior directly.
         intptr_t search_handle = 0;
 
         if (pattern[0] == '\0') {

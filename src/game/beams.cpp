@@ -1235,7 +1235,6 @@ namespace BEAMS {
         if (fire_point_idx == current_frame || current_frame == 0) {
             _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = ERICNET::Mox_Play_Sound_(v_sfx_n);
         } else if (_ship_firing_now_flag[fx_slot_idx] == 0 || Get_Max_Frames_() - 1 <= current_frame) {
-            // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
             sound::Fadeout_Sound_(_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
             _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = 0;
         }
@@ -1704,8 +1703,7 @@ namespace BEAMS {
         } else {
             s_animation_header* anim = Reflection_Field_Anims_(base_rot, shield_size);
             if ((animate::Get_Animation_Frame_Count_(anim) - 1) <= frame) {
-                // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
-                sound::Fadeout_Sound_((int16_t)_g_reflection_field_sfx_handle, 10);
+                sound::Fadeout_Sound_(_g_reflection_field_sfx_handle, 10);
                 _g_reflection_field_sfx_handle = 0;
             }
         }

@@ -31,5 +31,5 @@ namespace strings {
 
     void __cdecl Trim_(char* str);
 
-    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, int32_t element_size, int32_t count);
+    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, uint32_t element_size, uint32_t count);
 }

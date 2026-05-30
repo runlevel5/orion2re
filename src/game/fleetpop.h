@@ -7,15 +7,6 @@ namespace FLEETPOP {
     inline s_fleet_box& _fleet_box =
         *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
 
-    inline int16_t& _fleet_box_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
-
-    inline int8_t& _fleet_box_attack_btn_active =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DC});
-
-    inline int8_t& _fleet_box_engage_btn_active =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DD});
-
     bool __cdecl Set_Attack_Antares_Button_Flag_(void);
 
     int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count);
@@ -34,9 +25,6 @@ namespace FLEETPOP {
 
     inline int16_t& _fleet_box_width =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
-
-    inline int16_t& _fleet_box_field8_0xe =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CE});
 
     void __cdecl Reload_Fleet_Box_Data_(void);
 

@@ -3050,7 +3050,7 @@ skip_cursor:
         }
 
         BEAMS::Draw_Damage_Message_Queue_Until_Done_();
-        sound::Fadeout_Sound_((int16_t)sound_handle, 10);
+        sound::Fadeout_Sound_(sound_handle, 10);
     }
 
     static void Build_Signed_Bonus_String(char* out_text, int32_t value) {
@@ -3388,7 +3388,7 @@ skip_cursor:
             sprintf(
                 line_text,
                 "%s%d%s",
-                s___00556070,
+                s_caret_space_00556070,
                 static_cast<int32_t>(TECHDATA::_drives[MOX::_global_combat_data.ftl_type].warp_speed),
                 message_text);
             fonts::Print_(left_value_x, row_y, line_text);
@@ -3407,7 +3407,7 @@ skip_cursor:
             sprintf(
                 line_text,
                 "%s%d%s%s",
-                s___00556070,
+                s_caret_space_00556070,
                 static_cast<int32_t>(TECHDATA::_armor[best_armor].ships_bonus) + 100,
                 s_space_005510f0,
                 [&]() -> const char* {
@@ -3426,7 +3426,7 @@ skip_cursor:
         sprintf(
             line_text,
             "%s%d%s",
-            s___00556070,
+            s_caret_space_00556070,
             static_cast<int32_t>(MOX::_global_combat_data.tactical_speed),
             message_text);
         fonts::Print_(left_value_x, row_y, line_text);
@@ -3464,7 +3464,7 @@ skip_cursor:
             } else {
                 KEN::Ken_Get_Text_Message_(0x14, message_text, 0x50);
                 fonts::Print_(
-                    right_panel_x + fonts::Get_String_Width_(s___00556070) + 0x03,
+                    right_panel_x + fonts::Get_String_Width_(s_caret_space_00556070) + 0x03,
                     row_y,
                     message_text);
             }

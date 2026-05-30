@@ -136,7 +136,7 @@ namespace COLSUM {
             RUSS::Mox_Sync_Update_();
             timer::Release_Time_(1);
 
-            if (input_val == COLSUM::_x_fields_3) {
+            if (input_val == COLSUM::_x_fields[3]) {
                 break;
             }
         }

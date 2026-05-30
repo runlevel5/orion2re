@@ -141,7 +141,9 @@ namespace sound {
     inline DSBUFFERDESC1& _dsound_buffer_desc =
         *reinterpret_cast<DSBUFFERDESC1*>(std::uintptr_t{0x0057CC98});
 
-    inline s_sound_channel (&_sound_channels)[16] =
+    // Sound_Update_ walks one extra 0x20-byte slot in the binary while helper
+    // functions still treat 0..15 as the valid channel index range.
+    inline s_sound_channel (&_soundChannels)[16] =
         *reinterpret_cast<s_sound_channel (*)[16]>(std::uintptr_t{0x0057CCB0});
 
     inline const char* s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538 =
@@ -163,7 +165,7 @@ namespace sound {
 
     bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header);
 
-    void __cdecl Reset_Sound_Channel_(int32_t channel_idx);
+    void __cdecl Reset_Sound_Channel_(int8_t channel_idx);
 
     void __cdecl Resume_Timer2_();
 
@@ -256,11 +258,11 @@ namespace sound {
 
     int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size);
 
-    void* __cdecl Allocate_Sound_Block_(int32_t channel, int32_t resource_id, int32_t size);
+    void* __cdecl Allocate_Sound_Block_(int8_t channel, int32_t resource_id, int32_t size);
 
     int32_t __cdecl Play_Sound_(int32_t resource_id);
 
-    void __cdecl Fadeout_Sound_(int32_t channel_idx, int32_t volume_idx);
+    void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx);
 
     void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch);
 

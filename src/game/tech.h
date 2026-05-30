@@ -66,7 +66,6 @@ namespace TECH {
     void __cdecl Promote_Hyper_Field_Values_(int16_t player_idx);
 
     char* __cdecl Technology_Applications_Name_(int16_t param_1, int16_t param_2);
-    inline char* s__005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
     int16_t __cdecl Get_Hyper_Tech_App_ID_(int16_t tech_field_id);
     char* __cdecl Technology_Fields_Name_(int16_t tech_field_id);
     inline short (&_tech_field_y1)[4] = *reinterpret_cast<short(*)[4]>(0x00557C80);

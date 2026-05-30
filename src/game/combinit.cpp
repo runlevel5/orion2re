@@ -1111,19 +1111,19 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->computer_type = 5;
     ship->armor_type = 6;
 
-    strcpy(ship->name, s_Antaran_Star_Fortress_005558D4);
+    strcpy(ship->name, TECHDATA::_hull_data[8].name);
 
     ship->structure_max = (int16_t)(
-        _antaran_star_fortress_structure_hp +
-        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * _antaran_star_fortress_structure_hp) / 100);
+        TECHDATA::_hull_data[8].structure_hp +
+        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].structure_hp) / 100);
     ship->structure_max = (int16_t)(ship->structure_max * 3);
 
     ship->armor_remaining = (int16_t)(
-        _antaran_star_fortress_armor_hp +
-        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * _antaran_star_fortress_armor_hp) / 100);
+        TECHDATA::_hull_data[8].armor_hp +
+        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].armor_hp) / 100);
     ship->armor_remaining = (int16_t)(ship->armor_remaining * 3);
 
-    int32_t fortress_size_scaled = (int32_t)_antaran_star_fortress_size * 5;
+    int32_t fortress_size_scaled = (int32_t)TECHDATA::_hull_data[8].size * 5;
     fortress_size_scaled = (fortress_size_scaled + ((fortress_size_scaled >> 31) & 3)) >> 2;
     int16_t sVar2 = (int16_t)((fortress_size_scaled - (fortress_size_scaled >> 31)) >> 1);
 
@@ -1250,7 +1250,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 
     ship->crew_quality = 3;
     ship->officer_idx = 0x42;
-    ship->marine_count = _antaran_star_fortress_marines;
+    ship->marine_count = (uint8_t)TECHDATA::_hull_data[8].marines;
     ship->current_speed = 0;
     ship->structure_damage = 0;
     ship->is_retreating = 0;
@@ -1464,13 +1464,13 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     int16_t max_hits = 0;
     if (MOX::_colony[colony_idx].buildings[BUILDING_RADIATION_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x1c;
-        max_hits = COMBINIT::radiation_shield_hits;
+        max_hits = TECHDATA::_planetary_shields[1].absorption;
     } else if (MOX::_colony[colony_idx].buildings[BUILDING_BARRIER_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x17;
-        max_hits = COMBINIT::barrier_shield_hits;
+        max_hits = TECHDATA::_planetary_shields[3].absorption;
     } else if (MOX::_colony[colony_idx].buildings[BUILDING_FLUX_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x18;
-        max_hits = COMBINIT::flux_shield_hits;
+        max_hits = TECHDATA::_planetary_shields[2].absorption;
     } else {
         MOX::_combat_data->shield_type = 0;
         max_hits = 0;

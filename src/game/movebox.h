@@ -39,7 +39,6 @@ namespace MOVEBOX {
 
     void __cdecl Box_Fleet_Screen_Scanned_Ship_();
 
-    inline const char* s_geggggg_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0}); // ">GEGGGGG%s (%s)"
     inline const char* const s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
     void __cdecl Do_Fleet_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);

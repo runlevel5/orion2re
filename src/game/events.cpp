@@ -2468,7 +2468,7 @@ namespace EVENTS {
         out_str[out_len] = '\0';
 
         if (event_type == 0x21) {
-            strcat(out_str, s__005569f8);
+            strcat(out_str, string::s_Newline);
 
             int32_t bldg_costs[8];
             if (event_subtype == 0) {
@@ -2519,7 +2519,7 @@ namespace EVENTS {
                 strcat(out_str, temp_str);
 
                 if (((k + 1) % 3) == 0) {
-                    strcat(out_str, s__005569f8);
+                    strcat(out_str, string::s_Newline);
                     spacing = initial_spacing;
                 } else {
                     spacing += 0x7D;

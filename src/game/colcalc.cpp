@@ -1538,11 +1538,11 @@ namespace COLCALC {
                 switch (planet->climate) {
                     case PLANET_CLIMATE_TUNDRA:
                     case PLANET_CLIMATE_SWAMP:
-                        bonus_base = MOX::food_bonus_base_4_6;
+                        bonus_base = MOX::_food_per_farmer_table[8];
                         break;
                     case PLANET_CLIMATE_OCEAN:
                     case PLANET_CLIMATE_TERRAN:
-                        bonus_base = MOX::food_bonus_base_5_8;
+                        bonus_base = MOX::_food_per_farmer_table[9];
                         break;
                     default:
                         has_bonus = false;

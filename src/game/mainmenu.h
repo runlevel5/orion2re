@@ -42,7 +42,6 @@ namespace MAINMENU {
     inline const char* const s_M_00557ED8 = reinterpret_cast<const char*>(0x00557ED8); // "M"
     inline const char* const s_H_005569D4 = reinterpret_cast<const char*>(0x005569D4); // "H"
     inline const char* const s_Q_005598F0 = reinterpret_cast<const char*>(0x005598F0); // "Q"
-    inline const char* const s_hotkeys_005510f0 = reinterpret_cast<const char*>(0x005510F0);
     inline const char* const s_empty_00551120 = reinterpret_cast<const char*>(0x00551120);
     inline const char* const s_N_0055765C = reinterpret_cast<const char*>(0x0055765C); // "N"
     inline const char* const s_save_question_gam = reinterpret_cast<const char*>(0x0055A640); // "SAVE?.GAM"

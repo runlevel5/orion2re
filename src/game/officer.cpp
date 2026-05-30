@@ -680,7 +680,7 @@ namespace OFFICER {
             int8_t eta = leader->eta;
 
             if (eta < 1) {
-                sprintf(buffer, s_GEGGGGG_format, ship->d.name, leader->name);
+                sprintf(buffer, MOX::s_fmt_scanned_star_info, ship->d.name, leader->name);
             } else {
                 const char* format;
                 if (eta == 1) {
@@ -2272,7 +2272,7 @@ namespace OFFICER {
     void __cdecl Generate_Random_Officer_(int16_t player_index) {
         int16_t leader_index = Select_Leader_For_Hire_(player_index);
 
-        MOX::_player[player_index].officer_for_hire = leader_index;
+        MOX::_player[player_index].officer_for_hire = (int8_t)leader_index;
 
         if (MOX::_player[player_index].officer_for_hire > -1) {
             MOX::_player[player_index].stardate_last_offered_hero = static_cast<uint16_t>(MOX::_stardate);
@@ -3261,9 +3261,9 @@ void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int
   if (tech_app_count > 0) {
     for (int16_t tech_index = 0; tech_index < tech_app_count; ++tech_index) {
       strcat(output, s_0_0055110c);
-      strcat(output, s___00556070);
+      strcat(output, s_caret_space_00556070);
       strcat(output, TECHDATA::_technology_applications[tech_app_ids[tech_index]].name);
-      strcat(output, s__005569f8);
+      strcat(output, string::s_Newline);
     }
   }
 }
@@ -3434,7 +3434,7 @@ void __cdecl Get_Italian_The_(int16_t leader_idx, char* output) {
     }
 
     if (leader_idx == 0x1a || leader_idx == 0x2b || leader_idx == 0x34) {
-        strcpy(output, s___lo_00556a4c);
+        strcpy(output, s_comma_lo_00556a4c);
         return;
     }
 

@@ -100,7 +100,7 @@ short __cdecl Newgame_Screen_(void) {
     fields::Deactivate_Auto_Function_();
 
     if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-        strcpy(MOX::_settings.net_game_name, NETMOX::net_field_1be);
+        strcpy(MOX::_settings.net_game_name, NETMOX::_net.cur_game_name);
     }
 
     return result;
@@ -238,8 +238,8 @@ void __cdecl Update_Fields_() {
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings_(0x0C), _anims[1], (int16_t*)&_combat_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
 
     if (MOX::_game_type == 2 /* NET_GAME */) {
-        strcpy(DAT_0059532e, MOX::_settings.net_game_name);
-        fields::Add_Continuous_String_Input_Field_(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, DAT_0059532e, 8, 0, 0, 0, 0);
+        strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
+        fields::Add_Continuous_String_Input_Field_(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, NETMOX::_net.cur_game_name, 8, 0, 0, 0, 0);
     }
 
     // Accept and Cancel buttons

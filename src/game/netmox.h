@@ -121,8 +121,6 @@ namespace NETMOX {
 
     void __cdecl Receive_Message_(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
-    inline char* net_field_1be = reinterpret_cast<char*>(std::uintptr_t{0x0059532E});
-
     void __cdecl Net_Request_AI_Diplomacy_(uint8_t player_idx);
 
     int8_t __cdecl Net_May_Begin_AI_Diplomacy_();

@@ -722,7 +722,7 @@ void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char
             strcat(output, local_50);
         }
     } else if (next_count > 1) {
-        strcat(output, s___00556168);
+        strcat(output, DESIGN::s_comma_space);
     }
 }
 

@@ -839,8 +839,8 @@ namespace HACCESS {
     void __cdecl Build_Saved_Ship_Array_() {
         memset(MOX::_fleet_box_ship_ids, 0, sizeof(MOX::_fleet_box_ship_ids));
 
-        if ((MOX::_ship_stack_count > 0) && (HACCESS::_fleet_box_count > 0)) {
-            for (int16_t saved_ship_idx = 0; saved_ship_idx < HACCESS::_fleet_box_count; ++saved_ship_idx) {
+        if ((MOX::_ship_stack_count > 0) && (MOX::_fleet_box.count > 0)) {
+            for (int16_t saved_ship_idx = 0; saved_ship_idx < MOX::_fleet_box.count; ++saved_ship_idx) {
                 const int32_t ship_node_idx = HACCESS::_fleet_movement_icon[saved_ship_idx].ship_node_idx;
                 struct_::Set_Bit_Field_(
                     MOX::_fleet_box_ship_ids,

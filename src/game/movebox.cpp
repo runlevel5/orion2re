@@ -271,7 +271,7 @@ namespace MOVEBOX {
                     int8_t eta = leader.eta;
 
                     if (eta <= 0) {
-                        sprintf(buffer, MOVEBOX::s_geggggg_format, star.name, leader.name);
+                        sprintf(buffer, MOX::s_fmt_scanned_star_info, star.name, leader.name);
                     } else {
                         const char* fmt;
                         if (eta == 1) {

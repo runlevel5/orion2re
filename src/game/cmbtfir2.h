@@ -31,7 +31,6 @@ namespace CMBTFIR2 {
     void __cdecl Set_Boarded_Flag_(int16_t ship_idx);
 
     inline const char* s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005510F0 }); /* " " */
-    inline const char* s__005569f8 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005569F8 }); /* "\n" */
     inline const char* s__00557e5c = reinterpret_cast<const char*>(std::uintptr_t{ 0x00557E5C });
     inline const char* s__00557e60 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00557E60 });
     inline const char* s__0055a588 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A588 });

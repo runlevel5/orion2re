@@ -1,37 +1,12 @@
 #include "pch.h"
 
 namespace struct_ {
-    void __cdecl Set_Memory_(void* dest, int32_t size, int32_t value) {
-        memset(dest, value, size);
+    void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t fill) {
+        memset(dest, fill, size);
     }
 
     void __cdecl Clear_Structure_(void* s, uint32_t len) {
-        if (len == 0) {
-            return;
-        }
-
-        // TODO: Just use memset
-        uint8_t* ptr = static_cast<uint8_t*>(s);
-
-        // Align to 2-byte boundary if pointer is odd
-        if (reinterpret_cast<std::uintptr_t>(ptr) & 1) {
-            *ptr++ = 0;
-            len--;
-        }
-
-        // Fill memory in 4-byte chunks
-        uint32_t* dword_ptr = reinterpret_cast<uint32_t*>(ptr);
-        uint32_t dword_count = len >> 2;
-        for (uint32_t i = 0; i < dword_count; ++i) {
-            dword_ptr[i] = 0;
-        }
-
-        // Fill remaining bytes (0-3 bytes)
-        uint8_t* tail_ptr = reinterpret_cast<uint8_t*>(&dword_ptr[dword_count]);
-        uint32_t remaining_count = len & 3;
-        for (uint32_t i = 0; i < remaining_count; ++i) {
-            tail_ptr[i] = 0;
-        }
+        memset(s, 0, len);
     }
 
     void __cdecl Copy_Structure_Aligned_(void* dest, void* src, uint32_t size) {
@@ -69,9 +44,9 @@ namespace struct_ {
         }
     }
 
-    int16_t __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
+    int16_t __cdecl Test_Bit_Field_(void* field, uint16_t bit_index) {
         const uint8_t* data = reinterpret_cast<const uint8_t*>(field);
-        uint32_t byte_offset = static_cast<uint16_t>(bit_index) >> 3;
+        uint32_t byte_offset = bit_index >> 3;
         uint32_t bit_in_byte = bit_index & 7;
 
         return (data[byte_offset] >> bit_in_byte) & 1;
@@ -118,9 +93,10 @@ namespace struct_ {
             uint32_t dword_count = byte_count >> 2;
             if (dword_count != 0) {
                 do {
-                    uint32_t temp = *reinterpret_cast<uint32_t*>(right);
-                    *reinterpret_cast<uint32_t*>(right) = *reinterpret_cast<uint32_t*>(left);
-                    *reinterpret_cast<uint32_t*>(left) = temp;
+                    uint32_t temp;
+                    memcpy(&temp, right, sizeof(temp));
+                    memcpy(right, left, sizeof(temp));
+                    memcpy(left, &temp, sizeof(temp));
                     right += 4;
                     left += 4;
                 } while (--dword_count != 0);
@@ -151,9 +127,10 @@ namespace struct_ {
         uint32_t dword_count = byte_count >> 2;
         if (dword_count != 0) {
             do {
-                uint32_t temp = *reinterpret_cast<uint32_t*>(right);
-                *reinterpret_cast<uint32_t*>(right) = *reinterpret_cast<uint32_t*>(left);
-                *reinterpret_cast<uint32_t*>(left) = temp;
+                uint32_t temp;
+                memcpy(&temp, right, sizeof(temp));
+                memcpy(right, left, sizeof(temp));
+                memcpy(left, &temp, sizeof(temp));
                 right += 4;
                 left += 4;
             } while (--dword_count != 0);

@@ -1523,10 +1523,10 @@ struct s_field_multi_button {
     short field4_0x8;
     undefined field5_0xa;
     undefined field6_0xb;
-    short count;
+    short button_value;
     undefined field8_0xe;
     undefined field9_0xf;
-    short *value;
+    short *selection;
     short field11_0x14;
     undefined field12_0x16;
     undefined field13_0x17;
@@ -1582,12 +1582,12 @@ struct s_field_input_string {
     short max_length;
     undefined field19_0x1e;
     undefined field20_0x1f;
-    char *cursor_colors;
+    char *cursor_color_ramp;
 };
 
 struct s_field_string_list {
     int16_t gradient_mode;
-    int16_t field1_0x2;
+    int16_t is_selectable;
     struct s_colors *highlight_color;
     char *help;
     int16_t help_start;

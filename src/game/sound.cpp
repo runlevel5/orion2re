@@ -6,8 +6,8 @@ namespace sound {
      * Stops and removes channels if the volume delta is out of bounds.
      */
     void __cdecl Sound_Update_() {
-        for (int i = 0; i < 17; ++i) {
-            s_sound_channel& channel = _sound_channels[i];
+        for (int i = 0; i < 16; ++i) {
+            s_sound_channel& channel = _soundChannels[i];
 
             // Check if bit 0 is set (active flag) and volume is non-zero
             if ((channel.flags & 1) && channel.volume_index != 0) {
@@ -55,16 +55,16 @@ namespace sound {
         Audio_Clear_Cache_();
     }
 
-    void __cdecl Reset_Sound_Channel_(int32_t channel_idx) {
-        _sound_channels[channel_idx].sample_data = nullptr;
-        _sound_channels[channel_idx].sample_size = 0;
-        _sound_channels[channel_idx].sample_offset = 0;
-        _sound_channels[channel_idx].ds_buffer_size = 0;
-        _sound_channels[channel_idx].field7_0x13 = 0;
-        _sound_channels[channel_idx].write_cursor = 0;
-        _sound_channels[channel_idx].flags = 0;
-        _sound_channels[channel_idx].volume_index = 0;
-        _sound_channels[channel_idx].buffer->Stop();
+    void __cdecl Reset_Sound_Channel_(int8_t channel_idx) {
+        _soundChannels[channel_idx].sample_data = nullptr;
+        _soundChannels[channel_idx].sample_size = 0;
+        _soundChannels[channel_idx].sample_offset = 0;
+        _soundChannels[channel_idx].ds_buffer_size = 0;
+        _soundChannels[channel_idx].field7_0x13 = 0;
+        _soundChannels[channel_idx].write_cursor = 0;
+        _soundChannels[channel_idx].flags = 0;
+        _soundChannels[channel_idx].volume_index = 0;
+        _soundChannels[channel_idx].buffer->Stop();
     }
 
     void __cdecl Audio_Clear_Cache_() {
@@ -221,21 +221,21 @@ namespace sound {
                     _dsound_buffer_desc.dwBufferBytes = 16384 /* 0x4000 */;
 
                     for (int i = 0; i < 16; ++i) {
-                        _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_sound_channels[i].buffer, nullptr);
+                        _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_soundChannels[i].buffer, nullptr);
                         if (_dsound_hr != DS_OK) {
                             _dsound->Release();
                             return;
                         }
                         
-                        _sound_channels[i].sample_data = nullptr;
-                        _sound_channels[i].sample_size = 0;
-                        _sound_channels[i].sample_offset = 0;
-                        _sound_channels[i].ds_buffer_size = 0;
-                        _sound_channels[i].field7_0x13 = 0;
-                        _sound_channels[i].write_cursor = 0;
-                        _sound_channels[i].flags = 0;
+                        _soundChannels[i].sample_data = nullptr;
+                        _soundChannels[i].sample_size = 0;
+                        _soundChannels[i].sample_offset = 0;
+                        _soundChannels[i].ds_buffer_size = 0;
+                        _soundChannels[i].field7_0x13 = 0;
+                        _soundChannels[i].write_cursor = 0;
+                        _soundChannels[i].flags = 0;
 
-                        _sound_channels[i].buffer->Stop();
+                        _soundChannels[i].buffer->Stop();
                     }
 
                     _dsound_buffer->SetFormat(&wfx);
@@ -376,7 +376,7 @@ namespace sound {
 
             if (channel_idx >= 0 && channel_idx < 16) {
                 int16_t ds_volume = sound::_ds_volume_table[volume];
-                LPDIRECTSOUNDBUFFER ds_buffer = _sound_channels[channel_idx].buffer;
+                LPDIRECTSOUNDBUFFER ds_buffer = _soundChannels[channel_idx].buffer;
 
                 ds_buffer->SetVolume((long)ds_volume);
             }
@@ -394,7 +394,7 @@ namespace sound {
         }
 
         if (channel_idx >= 0 && channel_idx < 16) {
-            s_sound_channel* channel = &sound::_sound_channels[channel_idx];
+            s_sound_channel* channel = &sound::_soundChannels[channel_idx];
             if ((channel->flags & 1) != 0) {
                 channel->buffer->Stop();
                 channel->flags ^= 1;
@@ -452,7 +452,7 @@ namespace sound {
 
     void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch) {
         if (handle >= 1) {
-            LPDIRECTSOUNDBUFFER buffer = _sound_channels[handle].buffer;
+            LPDIRECTSOUNDBUFFER buffer = _soundChannels[handle].buffer;
 
             DWORD frequency;
             buffer->GetFrequency(&frequency);
@@ -666,16 +666,16 @@ namespace sound {
     /**
      * @address 0052e850
      */
-    void __cdecl Fadeout_Sound_(int32_t channel_idx, int32_t volume_idx) {
+    void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx) {
         if (channel_idx >= 0 && channel_idx < 16) {
-            _sound_channels[channel_idx].volume_index = (int8_t)volume_idx;
+            _soundChannels[channel_idx].volume_index = volume_idx;
         }
     }
 
     void __cdecl Loop_Sound_(int channel_idx, int8_t loop_count) {
         if (channel_idx >= 1) {
-            _sound_channels[channel_idx].flags |= 0x08;
-            _sound_channels[channel_idx].loop_count = loop_count;
+            _soundChannels[channel_idx].flags |= 0x08;
+            _soundChannels[channel_idx].loop_count = loop_count;
         }
     }
 
@@ -687,7 +687,7 @@ namespace sound {
         }
 
         if (channel_idx >= 0 && channel_idx < 16) {
-            _sound_channels[channel_idx].buffer->GetVolume(&volume);
+            _soundChannels[channel_idx].buffer->GetVolume(&volume);
 
             for (int i = 0; i < 101; ++i) {
                 if (sound::_ds_volume_table[i] == volume) {
@@ -710,7 +710,7 @@ namespace sound {
         DWORD pos1;
         DWORD pos2;
 
-        s_sound_channel* channel = &_sound_channels[channel_idx];
+        s_sound_channel* channel = &_soundChannels[channel_idx];
 
         _dsound_hr = channel->buffer->GetCurrentPosition(&play_cursor, &write_cursor);
         if (_dsound_hr == 0) {
@@ -816,8 +816,8 @@ namespace sound {
     void __cdecl Update_Sound_Channels_() {
         if (sound::_soundOn == 1) {
             for (int i = 0; i < 16; ++i) {
-                if (sound::_sound_channels[i].flags & 1) {
-                    if (sound::_sound_channels[i].flags & 2) {
+                if (sound::_soundChannels[i].flags & 1) {
+                    if (sound::_soundChannels[i].flags & 2) {
                         sound::Refill_Sound_Channel_Buffer_(i);
                     } else {
                         sound::Update_Sound_Channel_Status_(i);
@@ -840,7 +840,7 @@ namespace sound {
             int16_t ds_volume = sound::_ds_volume_table[volume];
 
             for (int i = 0; i < 16; ++i) {
-                LPDIRECTSOUNDBUFFER ds_buffer = sound::_sound_channels[i].buffer;
+                LPDIRECTSOUNDBUFFER ds_buffer = sound::_soundChannels[i].buffer;
                 ds_buffer->SetVolume((long)ds_volume);
             }
         }
@@ -1051,9 +1051,9 @@ namespace sound {
             exitm::Exit_With_Message(s_SOUND_ERROR__Reading_Wave_0055b634);
         }
 
-        _sound_channels[channel_idx].buffer->Stop();
+        _soundChannels[channel_idx].buffer->Stop();
         Reset_Sound_Channel_(channel_idx);
-        _dsound_hr = _sound_channels[channel_idx].buffer->Release();
+        _dsound_hr = _soundChannels[channel_idx].buffer->Release();
 
         memset(&_dsound_buffer_desc, 0, sizeof(DSBUFFERDESC1));
         _dsound_buffer_desc.dwSize = 0x14;
@@ -1076,19 +1076,19 @@ namespace sound {
 
         _dsound_buffer_desc.lpwfxFormat = &wfx;
 
-        _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_sound_channels[channel_idx].buffer, NULL);
+        _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_soundChannels[channel_idx].buffer, NULL);
 
-        _sound_channels[channel_idx].sample_size = info.data_size;
-        _sound_channels[channel_idx].sample_data = (uint8_t*)info.data_ptr;
-        _sound_channels[channel_idx].volume_index = 0;
+        _soundChannels[channel_idx].sample_size = info.data_size;
+        _soundChannels[channel_idx].sample_data = (uint8_t*)info.data_ptr;
+        _soundChannels[channel_idx].volume_index = 0;
 
-        dwBytes = _sound_channels[channel_idx].sample_size;
+        dwBytes = _soundChannels[channel_idx].sample_size;
         if (dwBytes > 0x4000) {
-            _sound_channels[channel_idx].flags |= 0x2;
+            _soundChannels[channel_idx].flags |= 0x2;
             dwBytes = 0x4000;
         }
 
-        _dsound_hr = _sound_channels[channel_idx].buffer->Lock(0, dwBytes, &_streamBuffer1, (LPDWORD)&_streamAvailable1, &_streamBuffer2, (LPDWORD)&_streamAvailable2, 0);
+        _dsound_hr = _soundChannels[channel_idx].buffer->Lock(0, dwBytes, &_streamBuffer1, (LPDWORD)&_streamAvailable1, &_streamBuffer2, (LPDWORD)&_streamAvailable2, 0);
 
         if (_dsound_hr != 0) {
             strcpy(error_msg, s_SOUND_ERROR___Play_Sound_File__U_0055b5fc);
@@ -1096,16 +1096,16 @@ namespace sound {
         }
 
         if (_streamAvailable1 != 0) {
-            memcpy(_streamBuffer1, _sound_channels[channel_idx].sample_data + _sound_channels[channel_idx].sample_offset, _streamAvailable1);
-            _sound_channels[channel_idx].sample_offset += _streamAvailable1;
+            memcpy(_streamBuffer1, _soundChannels[channel_idx].sample_data + _soundChannels[channel_idx].sample_offset, _streamAvailable1);
+            _soundChannels[channel_idx].sample_offset += _streamAvailable1;
         }
 
         if (_streamAvailable2 != 0) {
-            memcpy(_streamBuffer2, _sound_channels[channel_idx].sample_data + _sound_channels[channel_idx].sample_offset, _streamAvailable2);
-            _sound_channels[channel_idx].sample_offset += _streamAvailable2;
+            memcpy(_streamBuffer2, _soundChannels[channel_idx].sample_data + _soundChannels[channel_idx].sample_offset, _streamAvailable2);
+            _soundChannels[channel_idx].sample_offset += _streamAvailable2;
         }
 
-        _dsound_hr = _sound_channels[channel_idx].buffer->Unlock(_streamBuffer1, _streamAvailable1, _streamBuffer2, _streamAvailable2);
+        _dsound_hr = _soundChannels[channel_idx].buffer->Unlock(_streamBuffer1, _streamAvailable1, _streamBuffer2, _streamAvailable2);
 
         if (_dsound_hr != 0) {
             const char* fmt = nullptr;
@@ -1123,12 +1123,12 @@ namespace sound {
             exitm::Exit_With_Message(error_msg);
         }
 
-        _sound_channels[channel_idx].ds_buffer_size = dwBytes;
-        _sound_channels[channel_idx].flags |= 0x1;
+        _soundChannels[channel_idx].ds_buffer_size = dwBytes;
+        _soundChannels[channel_idx].flags |= 0x1;
 
         int32_t master_vol = _dsMasterVolume;
-        _sound_channels[channel_idx].buffer->SetVolume((LONG)_ds_volume_table[master_vol]);
-        _sound_channels[channel_idx].buffer->Play(0, 0, (dwBytes >= 0x4000) ? 1 /* DSBPLAY_LOOPING */ : 0);
+        _soundChannels[channel_idx].buffer->SetVolume((LONG)_ds_volume_table[master_vol]);
+        _soundChannels[channel_idx].buffer->Play(0, 0, (dwBytes >= 0x4000) ? 1 /* DSBPLAY_LOOPING */ : 0);
 
         Resume_Timer2_();
 
@@ -1147,7 +1147,7 @@ namespace sound {
      */
     int8_t __cdecl Find_Free_Channel_() {
         for (int8_t i = 0; i < 16; ++i) {
-            s_sound_channel& channel = _sound_channels[i];
+            s_sound_channel& channel = _soundChannels[i];
 
             if (channel.buffer == nullptr) {
                 return i;
@@ -1227,7 +1227,7 @@ namespace sound {
         DWORD status;
         uint32_t distance;
 
-        s_sound_channel& channel = _sound_channels[channel_idx];
+        s_sound_channel& channel = _soundChannels[channel_idx];
 
         channel.buffer->GetCurrentPosition(&play_cursor, &ds_write_cursor);
 
@@ -1284,7 +1284,7 @@ namespace sound {
     /**
      * @address 0052e2b0
      */
-    void* __cdecl Allocate_Sound_Block_(int32_t channel, int32_t resource_id, int32_t size) {
+    void* __cdecl Allocate_Sound_Block_(int8_t channel, int32_t resource_id, int32_t size) {
         if (size > (int32_t)_soundBufferSize) {
             return nullptr;
         }

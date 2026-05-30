@@ -45,6 +45,4 @@ namespace NETSTART {
     inline char* s_myname_005597dc = reinterpret_cast<char*>(std::uintptr_t{0x005597DC});
     inline const char* s__s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
     inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::uintptr_t{0x005578E0});
-
-    inline GUID& GUID_0054F150 = *reinterpret_cast<GUID*>(std::uintptr_t{0x0054F150});
 }

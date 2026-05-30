@@ -13,7 +13,6 @@ namespace DESIGN {
     inline int16_t& _design_computer_replacement_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565060});
     // 0x004321e0 stores EAX directly to 0x00565058, so this global is 32-bit here.
     inline int32_t& _printed_cost = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565058});
-    inline int16_t& _selected_weapon_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline uint8_t& _changed_design_name = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056504C});
     inline int16_t& _player_design_num = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B28});
     inline uint8_t (&_add_size_button_flag)[6] = *reinterpret_cast<uint8_t(*)[6]>(std::uintptr_t{0x00565064});

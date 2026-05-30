@@ -142,7 +142,7 @@ void __cdecl Search_For_Battles_() {
         }
         _attack_confirmed = nullptr;
     } else if (MOX::_game_type < 4) { /* Case 2 (Client IP), Case 3 (Ten) */
-        net::state = 0xE;
+        NETMOX::_net.sync_state = 0xE;
         Client_Combat_Loop_();
         NETMOX::Mox_Send_Message_(0x7FFE, 0x1A, nullptr, 0);
     }
@@ -1181,7 +1181,7 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *play
 char* __cdecl Load_Combfind_Strings_(char* strings_block) {
     char* current = strings_block;
 
-    _combfind_strings_base = current;
+    _noncombat_ships_destroyed_msg = current;
     current += strlen(current) + 1;
 
     _you_have_following_treaties_msg = current;

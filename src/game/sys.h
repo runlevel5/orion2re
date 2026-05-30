@@ -20,8 +20,6 @@ namespace SYS {
     inline char* const s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
     inline char* const s__00551120 = reinterpret_cast<char*>(std::uintptr_t{0x00551120});
     inline int16_t (&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00597470});
-    inline int16_t& _moveable_box_0_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597864});
-    inline int16_t& _moveable_box_0_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597866});
     inline s_animation_header*& _moveable_box_pict_4 = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B70});
     inline uint8_t& _skip_draw_system_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A57D4});
     inline s_animation_header*& _system_display_sun_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056654C});

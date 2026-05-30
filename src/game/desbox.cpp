@@ -1131,11 +1131,11 @@ namespace DESBOX {
 
         int16_t current_y = y + 84;
         for (int i = 0; i < 5; ++i) {
-            animate::Set_Animation_Frame_(MOX::weapons_arc_text_seg[i], (int16_t)arc_status[i]);
-            animate::Draw_(x + 119, current_y, MOX::weapons_arc_text_seg[i]);
+            animate::Set_Animation_Frame_(MOX::_weapons_arc_text_seg[i], (int16_t)arc_status[i]);
+            animate::Draw_(x + 119, current_y, MOX::_weapons_arc_text_seg[i]);
 
             if (arc_status[i] == 1) {
-                animate::Draw_(x + 33, y + 73, MOX::weapons_arc_pict_seg[i]);
+                animate::Draw_(x + 33, y + 73, MOX::_weapons_arc_pict_seg[i]);
             }
             current_y += 16;
         }

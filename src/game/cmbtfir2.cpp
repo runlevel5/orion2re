@@ -1433,7 +1433,7 @@ namespace CMBTFIR2 {
         if (target_raiders < *raiders) {
             int16_t lost = *raiders - target_raiders;
             itoa(lost, num_buf, 10);
-            strcat(body_str, s__005569f8);
+            strcat(body_str, string::s_Newline);
             strcat(body_str, num_buf);
             strcat(body_str, s__005510f0);
 
@@ -1448,7 +1448,7 @@ namespace CMBTFIR2 {
         if (marines < (int16_t)(uint8_t)target->marine_count) {
             int16_t lost = (int16_t)(uint8_t)target->marine_count - marines;
             itoa(lost, num_buf, 10);
-            strcat(body_str, s__005569f8);
+            strcat(body_str, string::s_Newline);
             strcat(body_str, num_buf);
             strcat(body_str, s__005510f0);
 

@@ -10,13 +10,13 @@ namespace replace {
         }
 
         for (int16_t frame = 0; frame < animate::_animation_header->frame_count; frame++) {
-            uint8_t *frame_data = reinterpret_cast<uint8_t*>(animate::_animation_header) + animate::_animation_header->frame_offsets[frame];
+            uint8_t *frame_data = (uint8_t*)animate::_animation_header + animate::_animation_header->frame_offsets[frame];
             uint8_t flags = animate::_animation_header->flags & 3;
 
             switch (flags) {
             case 0:
             {
-                int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
+                int32_t current_y = *(uint16_t*)(frame_data + 2);
                 int32_t word_offset = 2;
                 int32_t height = animate::_animation_header->height;
 
@@ -24,8 +24,8 @@ namespace replace {
                     uint8_t *ptr = frame_data + word_offset * 2;
                     word_offset += 2;
                     
-                    int16_t count = *reinterpret_cast<int16_t*>(ptr);
-                    int16_t arg = *reinterpret_cast<int16_t*>(ptr + 2);
+                    int16_t count = *(int16_t*)ptr;
+                    int16_t arg = *(int16_t*)(ptr + 2);
 
                     if (count == 0) {
                         current_y += arg;
@@ -63,14 +63,14 @@ namespace replace {
                         uint8_t *ptr = frame_data + offset;
                         offset += 8;
 
-                        int16_t v1 = *reinterpret_cast<int16_t*>(ptr);
-                        int16_t v2 = *reinterpret_cast<int16_t*>(ptr + 4);
+                        int16_t v1 = *(int16_t*)ptr;
+                        int16_t quad_count = *(int16_t*)(ptr + 4);
 
-                        if (v1 == 0 && v2 == 0) {
+                        if (v1 == 0 && quad_count == 0) {
                             break;
                         }
 
-                        int16_t count = v2 * 4;
+                        int16_t count = (int16_t)((uint16_t)quad_count << 2);
                         if (count > 0) {
                             for (int32_t i = 0; i < count; i++) {
                                 if (frame_data[offset + i] != 0) {
@@ -203,14 +203,16 @@ namespace replace {
         int32_t end_color = num_colors + start_color - 1;
         animate::_animation_header = anim;
 
-        if (anim->frame_count > 0) {
-            for (int16_t frame = 0; frame < anim->frame_count; frame++) {
-                uint8_t* frame_data = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[frame];
+        if (animate::_animation_header->frame_count > 0) {
+            for (int16_t frame = 0; frame < animate::_animation_header->frame_count; frame++) {
+                uint8_t* frame_data =
+                    reinterpret_cast<uint8_t*>(animate::_animation_header) +
+                    animate::_animation_header->frame_offsets[frame];
 
-                switch (anim->flags & 3) {
+                switch (animate::_animation_header->flags & 3) {
                 case 0: {
                     int32_t line_y = reinterpret_cast<uint16_t*>(frame_data)[1];
-                    int32_t height = anim->height;
+                    int32_t height = animate::_animation_header->height;
                     int32_t word_offset = 2;
 
                     while (line_y < height) {
@@ -234,7 +236,7 @@ namespace replace {
                     break;
                 }
                 case 1: {
-                    int32_t area = anim->width * anim->height;
+                    int32_t area = animate::_animation_header->width * animate::_animation_header->height;
                     if (area > 0) {
                         for (int32_t i = 0; i < area; i++) {
                             uint8_t pixel = frame_data[i];
@@ -250,24 +252,26 @@ namespace replace {
                     int32_t offset = 0;
                     do {
                         while (true) {
-                            int16_t val1 = *reinterpret_cast<int16_t*>(frame_data + offset);
-                            int16_t val2 = *reinterpret_cast<int16_t*>(frame_data + offset + 4);
+                            int16_t quad_count = *reinterpret_cast<int16_t*>(frame_data + offset + 4);
+                            int16_t header0 = *reinterpret_cast<int16_t*>(frame_data + offset);
                             offset += 8;
 
-                            if (val1 == 0 && val2 == 0) {
+                            if (quad_count == 0 && header0 == 0) {
                                 break;
                             }
 
-                            int16_t count = val2 << 2;
-                            if (count > 0) {
-                                for (int32_t i = 0; i < count; i++) {
+                            uint16_t shifted = (uint16_t)quad_count << 2;
+                            int16_t byte_count16 = (int16_t)shifted;
+                            int32_t byte_count = byte_count16;
+                            if (byte_count > 0) {
+                                for (int32_t i = 0; i < byte_count; i++) {
                                     uint8_t pixel = frame_data[offset + i];
                                     if (pixel != 0 && pixel >= start_color && pixel <= end_color) {
                                         frame_data[offset + i] = palette_map[pixel - start_color];
                                     }
                                 }
                             }
-                            offset += count;
+                            offset += byte_count;
                         }
                         blocks--;
                     } while (blocks != 0);

@@ -2,9 +2,6 @@
 #include "deps.h"
 
 namespace HACCESS {
-    inline const char* const s__005510f0 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x005510F0});
-
     inline const char* const s_format_star_roman = reinterpret_cast<const char*>(0x00558014); // "%s %s"
     inline const char* const s_I = reinterpret_cast<const char*>(0x0055801C); // "I"
 
@@ -89,9 +86,6 @@ namespace HACCESS {
     int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx);
 
     int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx);
-
-    inline int16_t& _fleet_box_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
 
     inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
         *reinterpret_cast<s_fleet_movement_icon (*)[500]>(std::uintptr_t{0x0059C470});

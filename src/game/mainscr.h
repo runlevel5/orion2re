@@ -57,30 +57,6 @@ namespace MAINSCR {
             std::uintptr_t{0x005961B6} + static_cast<std::uintptr_t>(index * sizeof(s_hotseat_fleet_box_state)));
     }
 
-    inline int16_t& _moveable_box_0_id =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597862});
-
-    inline int16_t& _moveable_box_0_x =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597868});
-
-    inline int16_t& _moveable_box_0_y =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059786A});
-
-    inline int16_t& _moveable_box_0_drag_field =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059786E});
-
-    inline int16_t& _moveable_box_0_close_btn =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597870});
-
-    inline int16_t& _moveable_box_0_window_field_id =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597872});
-
-    inline int16_t& _moveable_box_0_content_offset_x =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597878});
-
-    inline int16_t& _moveable_box_0_content_offset_y =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059787A});
-
     inline int8_t& _star_name_highlight_direction =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559840});
 

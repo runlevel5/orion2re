@@ -51,11 +51,11 @@ void __cdecl Race_Report_Screen_(int16_t param_1) {
             if (i != param_1) {
                 if (MOX::_cur_plyr_ptr->treaty[i] == 2) {
                     strcat(acStack_200, MOX::_player[i].race_name);
-                    strcat(acStack_200, s__005569f8);
+                    strcat(acStack_200, string::s_Newline);
                     num_alliances++;
                 } else if (MOX::_cur_plyr_ptr->treaty[i] >= 4) {
                     strcat(acStack_280, MOX::_player[i].race_name);
-                    strcat(acStack_280, s__005569f8);
+                    strcat(acStack_280, string::s_Newline);
                     num_wars++;
                 }
             }
@@ -64,11 +64,11 @@ void __cdecl Race_Report_Screen_(int16_t param_1) {
 
     if (num_alliances == 0) {
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x1D, acStack_200, 0x28);
-        strcat(acStack_200, s__005569f8);
+        strcat(acStack_200, string::s_Newline);
     }
     if (num_wars == 0) {
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x1E, acStack_280, 0x28);
-        strcat(acStack_280, s__005569f8);
+        strcat(acStack_280, string::s_Newline);
     }
 
     RUSS::Mox_Update_();

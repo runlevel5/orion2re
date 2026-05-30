@@ -11,7 +11,7 @@ namespace random {
 
     uint32_t __cdecl Set_Random_Seed_(uint32_t seed);
 
-    void __cdecl Randomize_();
+    uint32_t __cdecl Randomize_();
 
     uint32_t __cdecl Random_(uint32_t max_val);
 

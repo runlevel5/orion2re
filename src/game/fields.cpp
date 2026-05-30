@@ -262,7 +262,7 @@ namespace fields {
         return field_index;
     }
 
-    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int8_t sound) {
+    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t button_value, const char* hotkey, int8_t sound) {
         char error_msg[80];
 
         // A simple string copy is sufficient here because the buffer is only used as a C string.
@@ -277,8 +277,8 @@ namespace fields {
         s_field* field = &_fields[_fields_count];
 
         field->field_type = FIELD_TYPE_MULTI_BUTTON;
-        field->detail.multibtn.value = value;
-        field->detail.multibtn.count = count;
+        field->detail.multibtn.selection = value;
+        field->detail.multibtn.button_value = button_value;
 
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -370,7 +370,7 @@ namespace fields {
         return current_index;
     }
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, int8_t sound) {
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound) {
         char buffer[80];
 
         if (_max_fields_count < _fields_count) {
@@ -398,8 +398,8 @@ namespace fields {
             field.hotkey -= 32;
         }
 
-        field.detail.button.help_start = help_start;
-        field.detail.button.background_color = background_color;
+        field.detail.button.help_start = draw_x;
+        field.detail.button.background_color = draw_y;
         field.field_type = FIELD_TYPE_IRREGULAR_INPUT;
 
         int16_t current_index = _fields_count;
@@ -576,7 +576,7 @@ namespace fields {
         }
 
         if (type == 10) {
-            if (field->detail.radio.is_active == 0) {
+            if (field->detail.strings.is_selectable == 0) {
                 return 0;
             }
         }
@@ -655,7 +655,7 @@ namespace fields {
         int16_t y,
         int16_t width,
         char* help,
-        int16_t param_5,
+        int16_t is_selectable,
         int8_t* value,
         int16_t help_start,
         int16_t gradient_mode,
@@ -682,7 +682,7 @@ namespace fields {
         _fields[index].detail.strings.help_start = help_start;
         _fields[index].hotkey = *hotkey_str;
 
-        _fields[index].detail.strings.field1_0x2 = param_5;
+        _fields[index].detail.strings.is_selectable = is_selectable;
 
         if (_fields[index].hotkey >= 'a' && _fields[index].hotkey <= 'z') {
             _fields[index].hotkey -= 0x20;
@@ -1019,7 +1019,7 @@ namespace fields {
                 
                 if (_list_field_on != 0) {
                     for (int16_t i = 1; i < _fields_count; ++i) {
-                        if (_fields[i].field_type == 10 && *_fields[i].detail.strings.value == _fields[i].detail.strings.help_start && _fields[i].detail.strings.field1_0x2 != 0) {
+                        if (_fields[i].field_type == 10 && *_fields[i].detail.strings.value == _fields[i].detail.strings.help_start && _fields[i].detail.strings.is_selectable != 0) {
                             _down_mouse_button = -1;
                             return i;
                         }
@@ -1733,7 +1733,7 @@ namespace fields {
                         }
                         break;
                     case 3:
-                        if (*f->detail.radio.selection == f->detail.radio.value) {
+                        if (*f->detail.multibtn.selection == f->detail.multibtn.button_value) {
                             if (f->detail.radio.field9_0x14 == 0) {
                                 animate::Reset_Animation_Frame_(f->detail.radio.pic);
                             } else {
@@ -1812,7 +1812,7 @@ namespace fields {
                                 f->detail.strings.gradient_colors
                             );
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
-                        } else if (f->detail.strings.field1_0x2 == 0) {
+                        } else if (f->detail.strings.is_selectable == 0) {
                             fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
                         } else {
@@ -1968,7 +1968,7 @@ namespace fields {
 
                 if ((type_down != 3 || _fields[field_idx].field_type == 3) &&
                     (type_down != 10 || (_fields[field_idx].field_type == 10 &&
-                                         _fields[field_idx].detail.button.field2_0x2 != 0))) {
+                                         _fields[field_idx].detail.strings.is_selectable != 0))) {
                     Draw_Field_(down_idx, 0);
                 }
 
@@ -2076,7 +2076,7 @@ namespace fields {
                         break;
                     }
                     case 3: {
-                        if (*_fields[i].detail.radio.selection == _fields[i].detail.radio.value) {
+                        if (*_fields[i].detail.multibtn.selection == _fields[i].detail.multibtn.button_value) {
                             if (_fields[i].detail.radio.field9_0x14 == 0) {
                                 animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
                             } else {
@@ -2151,7 +2151,7 @@ namespace fields {
                                 _fields[i].detail.strings.gradient_colors
                             );
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
-                        } else if (_fields[i].detail.strings.field1_0x2 == 0) {
+                        } else if (_fields[i].detail.strings.is_selectable == 0) {
                             fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.highlight_color);
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
                         } else {
@@ -2564,12 +2564,12 @@ namespace fields {
             }
             case 3: {
                 if (action == 0) {
-                    *field->detail.radio.selection = -1000;
+                    *field->detail.multibtn.selection = -1000;
                 } else {
-                    *field->detail.radio.selection = field->detail.button.help_start;
+                    *field->detail.multibtn.selection = field->detail.multibtn.button_value;
                 }
 
-                if (*field->detail.radio.selection != field->detail.button.help_start) {
+                if (*field->detail.multibtn.selection != field->detail.multibtn.button_value) {
                     animate::Reset_Animation_Frame_(field->detail.button.pic);
                     animate::Draw_(field->x, field->y, field->detail.button.pic);
 
@@ -2896,13 +2896,13 @@ namespace fields {
     }
 
     void __cdecl Display_Input_Field_(int16_t field_idx, char* input_buffer) {
-        uint8_t local_50[16];
+        char cursor_color_ramp[16];
         char local_40[64];
 
         timer::Mark_Time_();
         video::Set_Page_Off_();
 
-        strcpy(reinterpret_cast<char*>(local_50), _fields[field_idx].detail.input.cursor_colors);
+        strcpy(cursor_color_ramp, _fields[field_idx].detail.input.cursor_color_ramp);
         strcpy(local_40, input_buffer);
 
         Invoke_Auto_Function_();
@@ -2944,7 +2944,7 @@ namespace fields {
                         short color_idx = 0;
                         do {
                             short line_y = _fields[field_idx].y + lines - 1;
-                            line::Line_(cursor_x, line_y, cursor_x + char_width + 1, line_y, local_50[font_height - color_idx - 1]);
+                            line::Line_(cursor_x, line_y, cursor_x + char_width + 1, line_y, (uint8_t)cursor_color_ramp[font_height - color_idx - 1]);
                             color_idx++;
                             lines--;
                         } while (lines != 0);
@@ -2956,7 +2956,7 @@ namespace fields {
                 short color_idx = 0;
                 do {
                     short line_y = line_y_base - lines + 1;
-                    line::Line_(cursor_x, line_y, cursor_x + char_width + 1, line_y, local_50[color_idx]);
+                    line::Line_(cursor_x, line_y, cursor_x + char_width + 1, line_y, (uint8_t)cursor_color_ramp[color_idx]);
                     color_idx++;
                     lines--;
                 } while (lines != 0);
@@ -2983,7 +2983,7 @@ namespace fields {
 
             if (_cursor_on != 0) {
                 short line_y = _fields[field_idx].y + font_height + 1;
-                line::Line_(cursor_x, line_y, cursor_x + char_width + 1, line_y, local_50[0]);
+                line::Line_(cursor_x, line_y, cursor_x + char_width + 1, line_y, (uint8_t)cursor_color_ramp[0]);
             }
         }
 

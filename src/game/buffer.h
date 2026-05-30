@@ -25,7 +25,7 @@ namespace buffer {
 
     void __cdecl Free_Buffer_Space_();
 
-    int8_t __cdecl Flush_Buffer_Space_(void* buffer_context);
+    int8_t __cdecl Flush_Buffer_Space_(void* param_1);
 
     uint8_t* __cdecl Allocate_Buffer_Space_(uint32_t requested_size);
 

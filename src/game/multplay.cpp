@@ -2449,7 +2449,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 fonts::Set_Font_Style_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, font_colors);
                 char* race_name = HACCESS::Race_Name_String_(player_idx);
                 char buffer[100];
-                sprintf(buffer, s_fmt_player_race, plr->name, race_name);
+                sprintf(buffer, MOX::s_fmt_scanned_star_info, plr->name, race_name);
 
                 int16_t font_h = fonts::Get_Font_Height_();
                 int16_t print_y = screen_y + 0x40 + y_offset_for_player_row + (29 - font_h) / 2;
@@ -2759,7 +2759,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             MOX::_mp_screen->flag_modem_disabled = 1;
             MOX::_mp_screen->flag_serial_type = 0;
             MOX::_mp_screen->flag_network_disabled = 0;
-            MOX::_net.mode = 1;
+            NETMOX::_net.mode = 1;
             return;
         }
 
@@ -2769,7 +2769,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             MOX::_mp_screen->flag_modem_disabled = 0;
             MOX::_mp_screen->flag_serial_type = 1;
             MOX::_mp_screen->flag_network_disabled = 0;
-            MOX::_net.mode = 2;
+            NETMOX::_net.mode = 2;
             return;
         }
 
@@ -2787,7 +2787,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen->flag_modem_disabled = 0;
         MOX::_mp_screen->flag_serial_type = 0;
         MOX::_mp_screen->flag_network_disabled = 0;
-        MOX::_net.mode = 0;
+        NETMOX::_net.mode = 0;
     }
 
     void __cdecl Fade_In_Function_() {

@@ -1512,7 +1512,7 @@ namespace COLGCBT {
                 case 4:
                     unit->state = 2;
                     if (unit->sound_handle != 0) {
-                        sound::Fadeout_Sound_(static_cast<int16_t>(unit->sound_handle), 10); // TYPE MISMATCH: unit->sound_handle is int32_t
+                        sound::Fadeout_Sound_(unit->sound_handle, 10);
                         unit->sound_handle = 0;
                     }
                     break;

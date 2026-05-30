@@ -52,12 +52,12 @@ namespace strings {
         *ptr2 = temp;
     }
 
-    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, int32_t element_size, int32_t count) {
-        if (index < count - 1) {
+    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, uint32_t element_size, uint32_t count) {
+        if (index < (int32_t)(count - 1)) {
             struct_::Copy_Structure_(
-                static_cast<uint8_t*>(array_ptr) + index * element_size,
-                static_cast<uint8_t*>(array_ptr) + (index + 1) * element_size,
-                (count - index - 1) * element_size
+                (uint8_t*)array_ptr + (uint32_t)index * element_size,
+                (uint8_t*)array_ptr + ((uint32_t)index + 1) * element_size,
+                (count - (uint32_t)index - 1) * element_size
             );
         }
     }

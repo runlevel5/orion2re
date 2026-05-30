@@ -268,7 +268,7 @@ namespace NETSTART {
         RUSS::Mox_Update_();
 
         // TYPE MISMATCH: Receive_Message_ signature differs from WINNET::Init expectation
-        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_), &NETMOX::_net)) {
+        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_), &NETMOX::_net)) {
             RUSS::Mox_Update_();
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
@@ -359,7 +359,7 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
 
         void* receive_msg_ptr = (void*)NETMOX::Receive_Message_;
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETSTART::GUID_0054F150, receive_msg_ptr, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, receive_msg_ptr, &NETMOX::_net) == 0) {
             NETMOX::_net.sync_state = 0;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
@@ -367,7 +367,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(NETSTART::GUID_0054F150, NETMOX::_net.cur_game_name, 8, const_cast<char*>(s__00551100), const_cast<char*>(s_myname_005597dc)) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, const_cast<char*>(s__00551100), const_cast<char*>(s_myname_005597dc)) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -664,7 +664,7 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, GUID_0054F150, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
             NETMOX::_net.sync_state = 0;
@@ -672,7 +672,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(GUID_0054F150, NETMOX::_net.cur_game_name, 8, s__00551100, s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, s__00551100, s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;

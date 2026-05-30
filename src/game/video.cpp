@@ -44,8 +44,8 @@ namespace video {
 		if (y < 0) {
 			y = 0;
 		}
-		if (x2 >= (int32_t)g_screen_res_x) {
-			x2 = (int32_t)g_screen_res_x - 1;
+		if (x2 >= g_screen_res_x) {
+			x2 = g_screen_res_x - 1;
 		}
 		if (y >= g_screen_res_y) {
 			y = g_screen_res_y - 1;
@@ -61,15 +61,15 @@ namespace video {
 			if (scan_entry.min_x == -1) {
 				scan_entry.min_x = min_x_scaled;
 				scan_entry.max_x = max_x_scaled;
+				return;
 			}
-			else {
-				if (scan_entry.min_x > min_x_scaled) {
-					scan_entry.min_x = min_x_scaled;
-				}
-				if (scan_entry.max_x < max_x_scaled) {
-					scan_entry.max_x = max_x_scaled;
-				}
+			if (scan_entry.min_x > min_x_scaled) {
+				scan_entry.min_x = min_x_scaled;
 			}
+			if (scan_entry.max_x < max_x_scaled) {
+				scan_entry.max_x = max_x_scaled;
+			}
+			return;
 		}
 		else {
 			// Update the primary scan list

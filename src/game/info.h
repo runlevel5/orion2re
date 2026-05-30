@@ -208,7 +208,6 @@ namespace INFO {
     inline const char* s_minus_0_5_00556058 = reinterpret_cast<const char*>(std::uintptr_t{0x00556058}); // "-0.5"
     inline const char* s_0_5_BC_00556060 = reinterpret_cast<const char*>(std::uintptr_t{0x00556060}); // "0.5 BC"
     inline const char* s_1_BC_00556068 = reinterpret_cast<const char*>(std::uintptr_t{0x00556068}); // "1 BC"
-    inline const char* s_caret_space_00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); // "^ "
 
     void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap);
 

@@ -126,7 +126,6 @@ namespace EVENTS {
     inline char* s_s_005510f4 = reinterpret_cast<char*>(std::uintptr_t{0x005510F4}); // "s"
     inline char* s_0_0055110c = reinterpret_cast<char*>(std::uintptr_t{0x0055110C}); // " 0"
     inline char* s_jimtext2_lbx_00552340 = reinterpret_cast<char*>(std::uintptr_t{0x00552340}); // "jimtext2.lbx"
-    inline char* s__005569f8 = reinterpret_cast<char*>(std::uintptr_t{0x005569F8}); // "\n"
     inline char* s_X_d__d___s_00557548 = reinterpret_cast<char*>(std::uintptr_t{0x00557548}); // " X%d.%d. %s"
     inline char* s_EVENTMSP_LBX_00557554 = reinterpret_cast<char*>(std::uintptr_t{0x00557554}); // "EVENTMSP.LBX"
     inline char* s_EVENTMSI_LBX_00557564 = reinterpret_cast<char*>(std::uintptr_t{0x00557564}); // "EVENTMSI.LBX"

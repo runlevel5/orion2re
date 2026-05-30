@@ -6,7 +6,6 @@ struct s_colsum_col_pop_ref;
 
 namespace COLSUM {
     inline int16_t (&_x_fields)[14] = *reinterpret_cast<int16_t(*)[14]>(std::uintptr_t{0x00551040});
-    inline int16_t& _x_fields_3 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00551046});
     inline int16_t& _g_sort_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055105C});
     inline s_animation_header* (&_anims)[21] = *reinterpret_cast<s_animation_header* (*)[21]>(std::uintptr_t{0x00551060});
     inline uint8_t& _draw_planet_sum = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005510C0});

@@ -478,7 +478,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
             } else {
                 s_leader_data* leader = &MOX::_leaders[leader_idx];
                 if (leader->eta <= 0) {
-                    sprintf(local_50, s_s_s_005569c0, MOX::_star[val].name, leader->name);
+                    sprintf(local_50, MOX::s_fmt_scanned_star_info, MOX::_star[val].name, leader->name);
                 } else if (leader->eta == 1) {
                     sprintf(local_50, HAROLD::H_Message_(0x92), MOX::_star[val].name, leader->name, leader->eta);
                 } else {

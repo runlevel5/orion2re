@@ -12,7 +12,6 @@ namespace OFFICER {
     );
     inline s_colors& _normal_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569A0});
     inline s_colors& _red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556998});
-    inline const char* s_GEGGGGG_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0});
     inline int16_t& _officer_dismiss_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056566C});
     inline uint8_t& _offscrn_skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565670});
     inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005656C8});
@@ -278,9 +277,6 @@ namespace OFFICER {
     void __cdecl Add_Display_Popup_Fields_(int16_t star_displayed);
 
     bool __cdecl Officer_Is_Female_(int16_t officer_idx);
-
-    inline char (&s__005510f0)[2] =
-        *reinterpret_cast<char(*)[2]>(std::uintptr_t{0x005510F0}); /* " " */
 
     void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest);
 

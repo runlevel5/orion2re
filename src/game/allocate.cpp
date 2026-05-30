@@ -14,7 +14,11 @@ namespace allocate {
 
         auto* header = static_cast<s_alloc_header*>(Allocate_Far_Space_(total_alloc_size));
         if (header == nullptr) {
-            return Allocate_Dos_Space_(size);
+            header = static_cast<s_alloc_header*>(Allocate_Dos_Space_(total_alloc_size));
+
+            if (header == nullptr) {
+                Allocation_Error_(size);
+            }
         }
 
         header->current = 0;
@@ -93,27 +97,31 @@ namespace allocate {
         // Custom alignment: if the requested size is odd, align it to the next 4-byte boundary.
         // Note: Even sizes (like 2 or 6) remain unaligned to 4-byte boundaries.
         if ((size & 1) != 0) {
-            aligned_size = (size & 0xFFFFFFFC) + 4;
+            aligned_size = (size & 0xFFFFFFFCu) + 4u;
         }
 
-        auto* pool_header = static_cast<s_alloc_header*>(block) - 1;
+        s_alloc_header* pool_header = (s_alloc_header*)block - 1;
 
-        int32_t current_offset = static_cast<int32_t>(pool_header->current);
+        uint32_t current_offset = pool_header->current;
         int32_t capacity = static_cast<int32_t>(pool_header->size);
 
-        // Total required space for the new sub-block includes a 12-byte internal header
-        int32_t total_required = current_offset + (int32_t)aligned_size + sizeof(s_alloc_header);
+        // Total required space for the new sub-block includes a 12-byte internal header.
+        int32_t total_required =
+            (int32_t)(current_offset + aligned_size + sizeof(s_alloc_header));
 
         if (total_required > capacity) {
-            Reallocation_Error_(size, (current_offset - capacity) + (int32_t)size, capacity);
+            Reallocation_Error_(
+                size,
+                (int32_t)(current_offset - pool_header->size + size),
+                capacity);
         }
 
         // Pointer to the start of the new sub-block (header starts here)
-        uint8_t* pool_base = static_cast<uint8_t*>(block);
-        auto* sub_block_header = reinterpret_cast<s_alloc_header*>(pool_base + current_offset);
+        uint8_t* pool_base = (uint8_t*)block;
+        s_alloc_header* sub_block_header = (s_alloc_header*)(pool_base + current_offset);
 
         // Advance the pool's allocation pointer for future allocations
-        pool_header->current = static_cast<uint32_t>(total_required);
+        pool_header->current = current_offset + aligned_size + sizeof(s_alloc_header);
 
         // Initialize the sub-block header.
         sub_block_header->current = 0;
@@ -137,11 +145,11 @@ namespace allocate {
             allocation_size = (size & 0xFFFFFFFC) + 4;
         }
 
-        auto* header = static_cast<s_alloc_header*>(
-            Allocate_Far_Space_(allocation_size + sizeof(s_alloc_header)));
+        s_alloc_header* header = (s_alloc_header*)Allocate_Far_Space_(
+            allocation_size + sizeof(s_alloc_header));
 
         if (header == nullptr) {
-            return nullptr;
+            Allocation_Error_(size);
         }
 
         header->current = 0;
@@ -152,7 +160,13 @@ namespace allocate {
     }
 
     void* __cdecl Allocate_Far_Space_(uint32_t size) {
-        return ::_malloc(size);
+        void* ptr = ::_malloc(size);
+
+        if (ptr == nullptr) {
+            exitm::Exit_With_Message(s_Null_Pointer_0055b658);
+        }
+
+        return ptr;
     }
 
     void __cdecl Push_Block_(void* block) {
@@ -222,8 +236,7 @@ namespace allocate {
      * @return void* Pointer to the start of the newly allocated region, or nullptr if capacity is exceeded.
      */
     void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size) {
-        uint8_t* base_ptr = reinterpret_cast<uint8_t*>(block_ptr);
-        auto* pool_header = static_cast<s_alloc_header*>(block_ptr) - 1;
+        auto* pool_header = (s_alloc_header*)block_ptr - 1;
 
         uint32_t aligned_size = size;
 
@@ -234,27 +247,22 @@ namespace allocate {
         }
 
         uint32_t current_offset = pool_header->current;
-        uint32_t pool_capacity = pool_header->size;
         uint32_t next_offset = current_offset + aligned_size;
 
-        // Capacity check
-        if (next_offset > pool_capacity) {
+        if ((int32_t)pool_header->size < (int32_t)next_offset) {
             return nullptr;
         }
 
-        // Pointer to the start of the new block within the pool.
-        uint8_t* new_block_ptr = base_ptr + current_offset;
+        void* new_block_ptr = (uint8_t*)block_ptr + current_offset;
 
-        // Update the current offset in the pool header.
         pool_header->current = next_offset;
 
-        // Returned pointer is the block start itself; metadata is written in-place.
-        uint32_t* new_block_words = reinterpret_cast<uint32_t*>(new_block_ptr);
+        uint32_t* new_block_words = (uint32_t*)new_block_ptr;
         new_block_words[0] = 0;
         new_block_words[1] = size;
         new_block_words[2] = 0;
 
-        return static_cast<void*>(new_block_ptr);
+        return new_block_ptr;
     }
 
     void* __cdecl Release_Block_(void* ptr) {

@@ -83,18 +83,27 @@ workflows:
           * If the variable is zero-initialized, use an explicit zero-style initializer only when it matches local code style.
           * If the variable points at another known symbol, prefer the project symbol over a raw address literal when you can prove it.
           * If a pointer field or initializer targets a known symbol, prefer the symbol name over a raw address literal.
+          * Resolve strings from their real backing storage:
+            - if the object stores character bytes inline, recover it as a character array with the correct element type and count
+            - if the object stores an address of string data, recover it as a pointer and initialize it from the referenced string or symbol as appropriate
+            - preserve narrow vs wide character type and do not confuse pointer-to-string storage with inline string arrays
           * If names are patched at runtime, recover the binary default pointer value, not the post-init runtime string pointer.
           * Validate each recovered field against project-side usage for signedness, width, pointer-vs-array shape, element count, and plausible ranges.
           * If the initializer cannot be recovered with confidence, stop and report the exact blocker instead of guessing.
           * If variable is a pointer, it might be an array in the memory. You must correctly recover array type along with any default values in this case.
           * If variable is static and has a default zero value, do not set it to `0` - it will be handled by C++ compiler.
           * Do not invent non-zero initializers unless supported by binary data or verified init code.
+          * Before restoring any variable, verify that the target address represents a singular project variable and not an alias of another object.
+          * Treat overlapping symbols, direct references to structure fields, array elements, or a differently named Ghidra variable at the same address as alias candidates.
+          * Check whether the address resolves in Ghidra to a different named variable, a component inside a larger structure, or another already-defined storage object.
+          * If the requested variable is an alias candidate, do not restore it automatically. Report the alias details to the user and ask how to proceed.
 
           GHIDRA ANALYSIS RULES
           * Use the grpc skill before making live RPC calls and follow its read-only defaults unless mutation is explicitly required.
           * Ask the user for the RPC port and bearer token if they were not provided.
           * Start from the C++ stub: record address, current type, array count, and symbol name.
           * Verify the symbol in Ghidra before trusting the project or decompiler.
+          * Explicitly verify whether the address is the primary storage for a single variable or an alias into another object before recovering it.
           * Inspect memory bytes, labels, data definitions, xrefs, and nearby disassembly to determine the real variable shape.
           * For tables and structs, prefer typed listing and component reads over a single raw memory read.
           * Cross-check structured reads with raw bytes when values look suspicious.
@@ -140,6 +149,8 @@ workflows:
           * All targeted inline variable stubs were converted to extern declarations.
           * All recovered variables were defined in the correct .cpp file.
           * Any recovered initializer matches the best-supported value from Ghidra memory and project usage.
+          * You verified that each recovered variable was not an alias, overlapping symbol, or structure subcomponent before applying changes.
+          * You stopped and asked the user how to proceed for any alias candidate instead of guessing.
           * You verified correctness against the Ghidra project before reporting back to the user.
           * You used the `apply_patch` tool for code changes.
         outcomes:

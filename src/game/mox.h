@@ -58,7 +58,6 @@ namespace MOX {
     inline short& _fltscrn_support_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x0059776C});
     inline short& _fltscrn_combat_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x00597464});
     inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
-    inline s_network& _net = *reinterpret_cast<s_network*>(std::uintptr_t{0x00595170});
     inline int8_t (&_player_mode)[15] =
         *reinterpret_cast<int8_t(*)[15]>(std::uintptr_t{0x0059D650});
     inline int16_t& _start_of_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a6e10});
@@ -83,10 +82,12 @@ namespace MOX {
     inline int16_t& DAT_0059730e = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059730E});
     inline int16_t (&_design_choice_items)[40] =
         *reinterpret_cast<int16_t (*)[40]>(std::uintptr_t{0x00597310});
-    inline int16_t* _weapon_mod_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FE0});
-    inline int16_t* _weapon_arc_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597900});
-    inline int16_t* _weapon_rack_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49C0});
-    inline int16_t& DAT_005a49c2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49C2});
+    inline int16_t (&_weapon_mod_fields)[15] =
+        *reinterpret_cast<int16_t(*)[15]>(std::uintptr_t{0x00596FE0});
+    inline int16_t (&_weapon_arc_field)[5] =
+        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x00597900});
+    inline int16_t (&_weapon_rack_field)[5] =
+        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A49C0});
     inline int16_t& _multi_colored_box_color_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059776A});
     inline int16_t& _beam_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2BE8});
     inline int16_t& _missile_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597428});
@@ -94,9 +95,6 @@ namespace MOX {
     inline int16_t& _replacement_box_accept_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005978F4});
     inline int16_t& _bomb_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597662});
     inline int16_t& ENDOF__save_game_description = _bomb_filter_button;
-    inline int16_t& DAT_00596fe2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FE2});
-    inline int16_t& DAT_00596fe4 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FE4});
-    inline int16_t& DAT_00597902 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597902});
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
     inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
@@ -176,8 +174,6 @@ namespace MOX {
     // References
     inline int8_t (&_food_per_farmer_table)[10] =
         *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00559690});
-    inline int8_t& food_bonus_base_4_6 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559698});
-    inline int8_t& food_bonus_base_5_8 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559699});
     inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
     inline int16_t (&_ranged_to_hit_penalty)[9] =
         *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x005596E0});
@@ -360,14 +356,6 @@ namespace MOX {
     inline uint16_t& _animated_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B5F0});
     inline s_mouse_list (&_mouse_list_zoom_mode)[5] = *reinterpret_cast<s_mouse_list(*)[5]>(std::uintptr_t{0x00559898});
     inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
-    inline int16_t& _box_off_flag_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
-    inline int16_t& _fleet_box_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
-    inline int16_t& _fleet_box_field8_0xe = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CE});
-    inline int8_t& _fleet_box_attack_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DC});
-    inline int8_t& _fleet_box_engage_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DD});
-    inline int8_t& _fleet_box_colonize_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DE});
-    inline int8_t& _fleet_box_transport_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DF});
-    inline int8_t& _fleet_box_outpost_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977E0});
     inline int16_t& _first_fleet_movement_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D4A});
 
     inline int16_t& _next_free_node =\
@@ -427,7 +415,7 @@ namespace MOX {
         reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
 
     inline const char* s_fmt_scanned_star_info =
-        reinterpret_cast<const char*>(std::uintptr_t{0x005569C0}); // ">GEGGGGG%s (%s)"
+        reinterpret_cast<const char*>(std::uintptr_t{0x005569C0});
 
     inline const char* s_fmt_contested =
         reinterpret_cast<const char*>(std::uintptr_t{0x00559930}); // "%s (contested)"
@@ -526,9 +514,7 @@ namespace MOX {
     inline s_animation_header* (&_design_size_button_seg)[6] = *reinterpret_cast<s_animation_header*(*)[6]>(std::uintptr_t{0x00597740});
     inline s_animation_header** _darkened_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B410});
     inline s_animation_header** _weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
-    inline s_animation_header** weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
     inline s_animation_header** _weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
-    inline s_animation_header** weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
     inline s_animation_header** _weapons_rack_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597980});
     inline s_animation_header** _weapons_special_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597930});
     inline s_weapon_filter_item*& _weapon_filter = *reinterpret_cast<s_weapon_filter_item**>(std::uintptr_t{0x0059BA0C});

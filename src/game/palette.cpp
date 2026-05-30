@@ -67,10 +67,9 @@ namespace palette {
             do {
                 entry->changed = 1;
 
-                // BUG: Original assembly divides by zero if count == 1
-                entry->r = static_cast<uint8_t>(start_r + (current_r_diff / count_minus_1));
-                entry->g = static_cast<uint8_t>(start_g + (current_g_diff / count_minus_1));
-                entry->b = static_cast<uint8_t>(start_b + (current_b_diff / count_minus_1));
+                entry->r = start_r + (current_r_diff / count_minus_1);
+                entry->g = start_g + (current_g_diff / count_minus_1);
+                entry->b = start_b + (current_b_diff / count_minus_1);
 
                 current_r_diff += r_diff;
                 current_g_diff += g_diff;
@@ -83,31 +82,27 @@ namespace palette {
     }
 
     void __cdecl Refresh_Palette_() {
-        int i = 0;
-        while (i < 256) {
-            while (video::_current_palette[i].changed == 0) {
-                if (reinterpret_cast<std::uintptr_t>(&video::_current_palette[i]) >=
-                    reinterpret_cast<std::uintptr_t>(&video::_palette_list)) {
-                    break;
-                }
-                i++;
+        const int32_t palette_entry_count =
+            (int32_t)(sizeof(video::_current_palette) / sizeof(video::_current_palette[0]));
+        int32_t i = 0;
+        s_palette_entry* const palette_end = video::_current_palette + palette_entry_count;
+
+        while (i < palette_entry_count) {
+            s_palette_entry* entry = &video::_current_palette[i];
+            while (entry < palette_end && entry->changed == 0) {
+                ++i;
+                ++entry;
             }
 
-            if (i >= 256) {
+            if (entry >= palette_end) {
                 break;
             }
 
-            int count = 1;
-            while (video::_current_palette[i + count].changed != 0) {
-                if (reinterpret_cast<std::uintptr_t>(&video::_current_palette[i + count]) >=
-                    reinterpret_cast<std::uintptr_t>(&video::_palette_list)) {
-                    break;
-                }
-                count++;
-            }
-
-            if (count >= 256) {
-                count = 256;
+            int32_t count = 1;
+            s_palette_entry* run = entry + 1;
+            while (run < palette_end && run->changed != 0) {
+                ++count;
+                ++run;
             }
 
             platform::g_direct_draw->WaitForVerticalBlank(1, nullptr);
@@ -232,11 +227,11 @@ namespace palette {
         return allocate::Allocate_Next_Block_(block, 0x1040);
     }
 
-    void __cdecl Set_Glass_Remap_Color_(int16_t idx, int16_t r, int16_t g, int16_t b, int16_t c) {
-        video::_glass_colors[idx].intensity = static_cast<uint8_t>(c);
-        video::_glass_colors[idx].r = static_cast<uint8_t>(r);
-        video::_glass_colors[idx].g = static_cast<uint8_t>(g);
-        video::_glass_colors[idx].b = static_cast<uint8_t>(b);
+    void __cdecl Set_Glass_Remap_Color_(int16_t idx, uint8_t r, uint8_t g, uint8_t b, uint8_t c) {
+        video::_glass_colors[idx].intensity = c;
+        video::_glass_colors[idx].r = r;
+        video::_glass_colors[idx].g = g;
+        video::_glass_colors[idx].b = b;
     }
 
     void __cdecl Restore_Glass_Remap_Block_(void* buffer) {
@@ -317,8 +312,8 @@ namespace palette {
         return p * 63 / 1000;
     }
 
-    void __cdecl HLS_To_RGB_(int h, int l, int s, uint8_t* r, uint8_t* g, uint8_t* b) {
-        int m2;
+    void __cdecl HLS_To_RGB_(int32_t h, int32_t l, int32_t s, uint8_t* r, uint8_t* g, uint8_t* b) {
+        int32_t m2;
 
         if (l <= 500) {
             m2 = ((s + 1000) * l) / 1000;
@@ -326,11 +321,11 @@ namespace palette {
             m2 = (s * l) / -1000 + s + l;
         }
 
-        int m1 = l * 2 - m2;
+        int32_t m1 = l * 2 - m2;
 
         if (s == 0) {
             if (h == -1) {
-                uint8_t val = static_cast<uint8_t>((l * 63) / 1000);
+                uint8_t val = (l * 63) / 1000;
                 *b = val;
                 *g = val;
                 *r = val;
@@ -342,9 +337,9 @@ namespace palette {
             return;
         }
 
-        *r = static_cast<uint8_t>(Value_(m1, m2, h + 120));
-        *g = static_cast<uint8_t>(Value_(m1, m2, h));
-        *b = static_cast<uint8_t>(Value_(m1, m2, h - 120));
+        *r = Value_(m1, m2, h + 120);
+        *g = Value_(m1, m2, h);
+        *b = Value_(m1, m2, h - 120);
     }
 }
 

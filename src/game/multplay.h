@@ -107,7 +107,6 @@ namespace MULTPLAY {
     inline const char* s_name_fmt = reinterpret_cast<const char*>(0x0055AA28);
     inline const char* s_gnn_fmt = reinterpret_cast<const char*>(0x0055AA30);
     inline const char* s_chat_msg_fmt = reinterpret_cast<const char*>(0x0055AA3C);
-    inline const char* s_fmt_player_race = reinterpret_cast<const char*>(0x005569C0);
 
     void __cdecl Get_Player_Colors_(int16_t player_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary);
 

@@ -1734,11 +1734,11 @@ namespace COLCALC {
                     switch (climate) {
                     case PLANET_CLIMATE_TUNDRA:
                     case PLANET_CLIMATE_SWAMP:
-                        extra_food = ((int32_t)MOX::food_bonus_base_4_6 - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
+                        extra_food = ((int32_t)MOX::_food_per_farmer_table[8] - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
                         break;
                     case PLANET_CLIMATE_OCEAN:
                     case PLANET_CLIMATE_TERRAN:
-                        extra_food = ((int32_t)MOX::food_bonus_base_5_8 - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
+                        extra_food = ((int32_t)MOX::_food_per_farmer_table[9] - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
                         break;
                     default:
                         break;

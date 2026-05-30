@@ -1,15 +1,6 @@
 #pragma once
 
 namespace COMBINIT {
-    inline int8_t& radiation_shield_hits = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F04D});
-    inline int8_t& flux_shield_hits = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F050});
-    inline int8_t& barrier_shield_hits = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F053});
-    inline const char* s_Antaran_Star_Fortress_005558D4 = reinterpret_cast<const char*>(std::uintptr_t{0x005558D4});
-    inline int16_t& _antaran_star_fortress_structure_hp = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558C0});
-    inline int16_t& _antaran_star_fortress_armor_hp = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558BE});
-    inline int8_t& _antaran_star_fortress_marines = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005558BC});
-    inline int16_t& _antaran_star_fortress_size = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558BA});
-
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
 
     inline int8_t* s__00579491 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579491});

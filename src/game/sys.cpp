@@ -1781,7 +1781,7 @@ namespace SYS {
             *out_popup_hidden_field = fields::Add_Hidden_Field_(
                 popup_left,
                 popup_top,
-                static_cast<int16_t>(popup_left + SYS::_moveable_box_0_width),
+                static_cast<int16_t>(popup_left + MOX::_moveable_box[0].width),
                 static_cast<int16_t>(popup_top + 0x2F),
                 SYS::s__00551100,
                 0);
@@ -1925,8 +1925,8 @@ namespace SYS {
         *out_system_field = fields::Add_Hidden_Field_(
             static_cast<int16_t>(base_x + popup_offset_x),
             static_cast<int16_t>(base_y + popup_offset_y),
-            static_cast<int16_t>(base_x + popup_offset_x + SYS::_moveable_box_0_width),
-            static_cast<int16_t>(base_y + popup_offset_y + SYS::_moveable_box_0_height),
+            static_cast<int16_t>(base_x + popup_offset_x + MOX::_moveable_box[0].width),
+            static_cast<int16_t>(base_y + popup_offset_y + MOX::_moveable_box[0].height),
             SYS::s__00551100,
             0);
     }

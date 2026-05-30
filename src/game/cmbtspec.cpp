@@ -792,7 +792,7 @@ namespace CMBTSPEC {
             timer::Release_Time_(1);
         }
 
-        sound::Fadeout_Sound_(static_cast<int16_t>(sound_handle), 10);
+        sound::Fadeout_Sound_(sound_handle, 10);
         MOX::_dont_draw_ship = -1;
         graphics::Restore_Window_();
         allocate::Pop_Block_(MOX::_screen_seg);

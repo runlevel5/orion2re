@@ -91,7 +91,10 @@ namespace fields {
 
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound);
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, int8_t sound);
+    // Type 13 irregular buttons reuse the button payload, but the two legacy short
+    // fields at detail+0x1c/+0x20 are alternate sprite draw coordinates rather than
+    // help metadata.
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
     int16_t __cdecl Check_Multi_Hot_Key_Fields_(int16_t hotkey);
@@ -106,9 +109,13 @@ namespace fields {
 
     int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max, int16_t return_value, int16_t set_value, int16_t width, int16_t height, int16_t* value, const char* hotkey_str, char sound);
 
+    // Type 11 is the newer continuous editor used by screen text boxes.
+    // It uses detail.cont_input and is distinct from the older type 4 inline editor.
     int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* value, int16_t max_length, int16_t background_color, s_animation_header* pic, int8_t sound, int16_t font_shadow_style);
 
-    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int8_t sound);
+    // Type 3 multi-buttons share one selection variable across several button fields.
+    // The payload stores the shared selection pointer plus this field's selected value.
+    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t button_value, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, char* hotkey, int8_t sound);
 
@@ -149,6 +156,8 @@ namespace fields {
     void __cdecl Increment_Scroll_Bar_(int16_t field_idx);
     void __cdecl Decrement_Scroll_Bar_(int16_t field_idx);
 
+    // Type 4 is the older inline input field renderer/editor.
+    // It uses detail.input, including input_mode and a cursor color ramp.
     void __cdecl Display_Input_Field_(int16_t field_idx, char* input_buffer);
 
     void __cdecl Input_String_(int16_t field_idx);
@@ -183,7 +192,8 @@ namespace fields {
 
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int8_t sound);
 
-    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, int8_t* value, int16_t help_start, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_12, char* hotkey_str, char* unused_param_14);
+    // Type 10 list rows store a per-row selectability flag at detail+0x2.
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t is_selectable, int8_t* value, int16_t help_start, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_12, char* hotkey_str, char* unused_param_14);
 
     void __cdecl Mark_Fields_();
 

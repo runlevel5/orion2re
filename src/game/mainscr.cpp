@@ -3386,9 +3386,9 @@ namespace MAINSCR {
         Draw_Main_Main_Screen_();
         video::Copy_Off_To_Back_();
 
-        uint8_t acStack_8[8];
+        uint8_t plasma_color_map[8];
         for (int i = 0; i < 8; ++i) {
-            acStack_8[i] = static_cast<uint8_t>((i * 2) + 14);
+            plasma_color_map[i] = static_cast<uint8_t>((i * 2) + 14);
         }
 
         int16_t unk_color = (int16_t)random::Random_(8) - 1;
@@ -3476,7 +3476,7 @@ namespace MAINSCR {
                 video::Set_Page_Off_();
             }
 
-            line::Plasma_Box_(draw_x, draw_y, (uint16_t)w_offset, h_offset, 3, color_anim, (uint8_t)unk_color, (int32_t)acStack_8);
+            line::Plasma_Box_(draw_x, draw_y, (uint16_t)w_offset, h_offset, 3, color_anim, (uint8_t)unk_color, plasma_color_map);
 
             color_anim = (random::Random_(10) + color_anim) & 0xFF;
             RUSS::Mox_Sync_Update_();
@@ -3500,7 +3500,7 @@ namespace MAINSCR {
             }
         }
 
-        line::Plasma_Box_(original_x2, original_y2, (uint16_t)param_5, param_6, 3, color_anim, (uint8_t)unk_color, (int32_t)acStack_8);
+        line::Plasma_Box_(original_x2, original_y2, (uint16_t)param_5, param_6, 3, color_anim, (uint8_t)unk_color, plasma_color_map);
         RUSS::Mox_Sync_Update_();
         fields::Enable_Draw_All_Fields_();
         MOX::_draw_main_screen_to_back = 1;
@@ -4073,24 +4073,20 @@ namespace MAINSCR {
     }
 
     void __cdecl Wrapper_For_Normal_System_Fields_() {
-        int16_t content_offset_y = MAINSCR::_moveable_box_0_content_offset_y;
-        int16_t content_offset_x = MAINSCR::_moveable_box_0_content_offset_x;
-        int16_t y = MAINSCR::_moveable_box_0_y;
-        int16_t x = MAINSCR::_moveable_box_0_x;
-        int16_t movable_box_id = MAINSCR::_moveable_box_0_id;
+        s_movable_box& box = MOX::_moveable_box[0];
 
-        SYS::Init_System_Display_(movable_box_id);
+        SYS::Init_System_Display_(box.id);
         SYS::Add_System_Display_Popup_Fields_(
-                movable_box_id,
-                x,
-                y,
-                content_offset_x,
-                content_offset_y,
+                box.id,
+                box.x,
+                box.y,
+                box.content_offset_x,
+                box.content_offset_y,
                 0x0D,
                 0x2F,
-                &MAINSCR::_moveable_box_0_drag_field,
-                &MAINSCR::_moveable_box_0_close_btn,
-                &MAINSCR::_moveable_box_0_window_field_id);
+                &box.drag_field,
+                &box.close_btn,
+                &box.window_field_id);
     }
 
     void __cdecl Mini_Main_Screen_Text_Box_(char* text_1, char* text_2) {

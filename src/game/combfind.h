@@ -19,7 +19,6 @@ namespace COMBFIND {
     inline char*& _you_have_following_treaties_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE18});
     inline char*& _receiving_tribute_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE1C});
     inline char*& _noncombat_ships_destroyed_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE24});
-    inline char*& _combfind_strings_base = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE24});
     inline char*& _colony_seized_by_mind_control_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE28});
     inline char*& _really_risk_war_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE30});
     inline char*& _trade_treaty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE6C});

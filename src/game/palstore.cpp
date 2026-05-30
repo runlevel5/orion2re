@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace palstore {
-    void __cdecl Store_Palette_Block_(int first_entry, int entry_count) {
+    void __cdecl Store_Palette_Block_(int32_t first_entry, int32_t entry_count) {
         if (first_entry < first_entry + entry_count) {
             int palette_index = first_entry;
             int remaining = entry_count;

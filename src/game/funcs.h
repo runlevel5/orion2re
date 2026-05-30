@@ -232,10 +232,8 @@ inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(s
 inline const char* s_0_00556108 = reinterpret_cast<const char*>(std::uintptr_t{0x00556108});
 inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
 inline const char* s_scor_0055a510 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A510}); // "scor"
-inline const char* s__0055a514 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A514}); // ""
 inline const char* const s_RACEOPT_LBX_00556320 = reinterpret_cast<const char*>(std::uintptr_t{0x00556320}); // "RACEOPT.LBX"
-inline const char* const s___lo_00556a4c = reinterpret_cast<const char*>(std::uintptr_t{0x00556A4C});
-inline const char* const s__00556a50 = reinterpret_cast<const char*>(std::uintptr_t{0x00556A50});
+inline const char* const s_comma_lo_00556a4c = reinterpret_cast<const char*>(std::uintptr_t{0x00556A4C});
 inline char* s___0055632c = reinterpret_cast<char*>(std::uintptr_t{0x0055632C}); // "."
 inline char* s_patch13_lbx_00556330 = reinterpret_cast<char*>(std::uintptr_t{0x00556330}); // "patch13.lbx"
 inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
@@ -265,8 +263,6 @@ inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uint
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
 inline char* s_360_00556164 = reinterpret_cast<char*>(std::uintptr_t{0x00556164}); // "360"
 inline const char* s_comma_space_00556168 = reinterpret_cast<const char*>(std::uintptr_t{0x00556168}); // ", "
-inline const char* const s___00556168 = reinterpret_cast<const char*>(std::uintptr_t{0x00556168}); // ", "
-inline const char* const s__00556169 = reinterpret_cast<const char*>(std::uintptr_t{0x00556169}); // ", "
 
 inline uint8_t& DAT_00590000 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00590000});
 
@@ -406,17 +402,12 @@ inline const char* const s_cmbtplnt_lbx = reinterpret_cast<const char*>(std::uin
 inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
 inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); /* " 1" */
 inline const char* s_0_0055110d = reinterpret_cast<const char*>(std::uintptr_t{0x0055110D});
-inline const char* s___00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */
-inline const char* s__00556071 = reinterpret_cast<const char*>(std::uintptr_t{0x00556071});
-inline const char* s__005569f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569F8}); /* "\n" */
-inline const char* s__005569f9 = reinterpret_cast<const char*>(std::uintptr_t{0x005569F9});
+inline const char* s_caret_space_00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 inline const char* s_BUFFER0_LBX_00551124 =
         reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
 inline int16_t& _fleet_box_width =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
-inline int16_t& _fleet_box_field8_0xe =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CE});
 inline const char* s__s___s_0055238c = reinterpret_cast<const char*>(std::uintptr_t{0x0055238C}); // "%s, %s"
 inline const char* s__s_005569e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569E8}); // "%s "
 inline const char* s___s_00557f0c = reinterpret_cast<const char*>(std::uintptr_t{0x00557F0C}); // "(%s"
@@ -506,8 +497,6 @@ inline void*& PTR_s_OFFICER_LBX_00556990 =
 inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
 inline const char* s__3s__2d____4d__2d__2d_0055ac64 = reinterpret_cast<const char*>(0x0055AC64); // "%3s %2d, %-4d  %2d:%2d"
 
-inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});
-
 inline char* s_fmt_d_s_s_00557e0c = reinterpret_cast<char*>(std::uintptr_t{0x00557E0C}); /* "%d %s (%s)" */
 inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00557E18}); /* "%s (%d EP)" */
 
@@ -560,3 +549,5 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
 }
 
 inline const char* k_backslash = reinterpret_cast<const char*>(std::uintptr_t{0x00557BE4}); // "\\"
+
+inline const char* const s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005510F0 });

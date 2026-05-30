@@ -876,7 +876,7 @@ namespace TECH {
     void __cdecl Do_Get_Planet_Name_(short planet_idx, char* out_str, char param_3) {
         char buffer[200];
 
-        *reinterpret_cast<uint16_t*>(buffer) = *reinterpret_cast<const uint16_t*>(s__005510f0);
+        strcpy(buffer, s__005510f0);
 
         char star_idx = MOX::_planet[planet_idx].star_index;
         char planet_num = HAROLD::Planet_Number_(planet_idx);
