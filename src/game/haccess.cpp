@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace HACCESS {
+    const char s_format_star_roman[6] = "%s %s";
+    const char s_I[2] = "I";
+
     /**
      * @address 0049b210
      */
@@ -841,7 +844,7 @@ namespace HACCESS {
 
         if ((MOX::_ship_stack_count > 0) && (MOX::_fleet_box.count > 0)) {
             for (int16_t saved_ship_idx = 0; saved_ship_idx < MOX::_fleet_box.count; ++saved_ship_idx) {
-                const int32_t ship_node_idx = HACCESS::_fleet_movement_icon[saved_ship_idx].ship_node_idx;
+                const int32_t ship_node_idx = MOX::_fleet_movement_icon[saved_ship_idx].ship_node_idx;
                 struct_::Set_Bit_Field_(
                     MOX::_fleet_box_ship_ids,
                     static_cast<uint16_t>(MOX::_ship_node[ship_node_idx].ship_idx));
@@ -854,7 +857,7 @@ namespace HACCESS {
      */
     void __cdecl Save_Hotseat_Fleet_Box_Ship_(int16_t fleet_box_idx) {
         if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
-            const int32_t ship_node_idx = MOX::_fleet_movement_icon_0_ship_node_idx;
+            const int32_t ship_node_idx = MOX::_fleet_movement_icon[0].ship_node_idx;
             MAINSCR::_hotseat_fleet_box_stack_ship_id(fleet_box_idx) =
                 MOX::_ship_node[ship_node_idx].ship_idx;
             return;

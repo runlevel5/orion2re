@@ -1,6 +1,12 @@
 #include "pch.h"
 
 namespace FLT2 {
+    s_colors _normal_colors = {{111, 116, 114, 116, 116, 116, 116, 116}};
+    s_colors _neutral_colors = {{4, 16, 12, 16, 16, 16, 16, 16}};
+    s_colors _red_colors = {{75, 129, 78, 129, 129, 129, 129, 129}};
+
+    const char s__00551100[] = "";
+
 void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out, int16_t* height_out)
 {
     int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;

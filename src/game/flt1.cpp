@@ -1,6 +1,46 @@
 #include "pch.h"
 
 namespace FLT1 {
+
+    const char s_empty[] = "";
+    const char s_plus[] = "+";
+    const char s_minus[] = "-";
+    const char s_space[] = "\x1b";
+    const char s_C[] = "C";
+    const char s_L[] = "L";
+    const char s_dot[] = ".";
+    const char s_comma[] = ",";
+    const char s_S[] = "S";
+    const char s_A[] = "A";
+    const char s_R[] = "R";
+    const char s_U[] = "U";
+
+    int16_t _fleet_screen_bad_ship_id;
+    int16_t _combat_filter_button;
+    uint8_t _relocate_button_mode;
+    int16_t _n_player_ships;
+    int16_t _support_filter_button;
+    void* _multi_button_support_seg;
+    uint8_t _merging_relocations;
+    void* _multi_button_combat_seg;
+    s_mouse_list _mouse_list_from[4] = {
+        {2, 0, 0, 0, 639, 479},
+        {17, 0, 15, 52, 319, 233},
+        {17, 0, 447, 383, 517, 405},
+        {1, 0, 345, 428, 625, 458},
+    };
+    s_mouse_list _mouse_list_to[4] = {
+        {2, 0, 0, 0, 639, 479},
+        {18, 0, 15, 52, 319, 233},
+        {1, 0, 447, 383, 517, 405},
+        {1, 0, 345, 428, 625, 458},
+    };
+    s_mouse_list _mouse_list_all_to[4] = {
+        {2, 0, 0, 0, 639, 479},
+        {16, 0, 15, 52, 319, 233},
+        {1, 0, 447, 383, 517, 405},
+        {1, 0, 345, 428, 625, 458},
+    };
     void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* sb) {
         int16_t scroll_height;
 

@@ -3012,13 +3012,13 @@ namespace MAINSCR {
         int16_t i = MOX::_first_fleet_movement_icon;
         while (i < static_cast<int16_t>(limit) && !found) {
             if (FLEETPOP::Can_Select_Fleet_Box_Ship_(i)) {
-                if (_fleet_movement_icon[i].field == field_id_b) {
+                if (MOX::_fleet_movement_icon[i].field == field_id_b) {
                     found = true;
                     result = 0;
                     *out_chosen_offset = counter;
                     *out_scanned_icon_idx = i;
                 }
-                else if (_fleet_movement_icon[i].field + field_id_b == 0) {
+                else if (MOX::_fleet_movement_icon[i].field + field_id_b == 0) {
                     *out_chosen_offset = counter;
                     found = true;
                     result = 1;
@@ -3036,7 +3036,7 @@ namespace MAINSCR {
             }
 
             for (int16_t j = MOX::_first_fleet_movement_icon; j < static_cast<int16_t>(limit2); ++j) {
-                if (_fleet_movement_icon[j].field == field_id_a) {
+                if (MOX::_fleet_movement_icon[j].field == field_id_a) {
                     *out_scanned_icon_idx = j;
                     return 4;
                 }

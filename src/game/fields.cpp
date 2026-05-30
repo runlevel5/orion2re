@@ -1,6 +1,71 @@
 #include "pch.h"
 
 namespace fields {
+    namespace {
+        s_field g_fields_storage[250];
+    }
+
+    MOX2::action_func_t _update_function;
+    uint16_t _auto_active_flag;
+    uint16_t _list_field_on;
+    int16_t _auto_function_delay = 2;
+    uint16_t _list_field_scan_flag = 1;
+    int16_t _down_mouse_button = -1;
+    int16_t _auto_input_variable;
+    uint16_t _input_field_active;
+    int16_t _active_input_field_number = -1;
+    int16_t _cursor_count;
+    int16_t _cursor_position;
+    int16_t _cursor_on;
+    int16_t _help_list_active;
+    int16_t _help_list_count;
+    int16_t _multi_hotkey_active_field;
+    uint16_t _draw_fields_flag = 1;
+    const char s_You_exceeded_the_max_number_of_fields[44] = "You exceeded the max number of fields (150)";
+    const char s_Maximum_number_of_button_fields_e_0055b0b0[46] = "Maximum number of button fields exceeded (%d)";
+    char s__00551100[1] = "";
+    char* DAT_0055afc0 = reinterpret_cast<char*>(std::uintptr_t{0xFFFFFFFF});
+    int32_t _max_fields_count = 250;
+    uint8_t _exit_the_list_field;
+    s_field* _fields = g_fields_storage;
+    s_field* _old_fields = g_fields_storage;
+    int16_t _pointer_offset;
+    uint16_t _old_input_field_active;
+    int16_t _old_active_input_field_number;
+    int16_t _old_down_mouse_button;
+    int16_t _old_fields_count;
+    int16_t _old_input_delay;
+    int16_t _old_auto_input_variable;
+    int16_t _fields_count;
+    int16_t _selected_count;
+    int16_t mouse_saved_center_y;
+    int16_t mouse_saved_center_x;
+    uint16_t _pressed_mouse_x_value;
+    uint16_t _pressed_mouse_y_value;
+    int16_t _pressed_button_flag;
+    int16_t _last_button_number;
+    int16_t _last_button_x;
+    int16_t _last_button_y;
+    s_colors _list_normal_color;
+    s_colors _list_highlight_colors;
+    s_colors _list_special_colors;
+    int16_t _input_delay;
+    MOX2::action_func_t _function;
+    MOX2::action_func_t _function2;
+    s_help_box* _help_struct_pointer;
+    char _continuous_string[256];
+    uint8_t _active_input_field_first;
+    uint16_t _field_outline_color = 14;
+    uint16_t _help_field_outline_color = 180;
+    int16_t _selected_button_text_x_offset = 1;
+    int16_t _selected_button_text_y_offset = -1;
+    uint16_t _mouse_cancel_disabled;
+    uint16_t _dynamic_field_refresh = 1;
+    uint16_t _field_box_mode;
+    uint16_t _help_box_mode;
+    int16_t _mouse_auto_exit;
+    uint32_t _draw_override_flag;
+
     void __cdecl Assign_Update_Function_(MOX2::action_func_t fn) {
         _update_function = fn;
     }

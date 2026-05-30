@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace MOX {
+    s_fleet_movement_icon _fleet_movement_icon[500];
+
     void __cdecl Apply_Save_Settings(s_settings* s) {
         MOX::_settings.xenons_exist = s->xenons_exist;
         MOX::_settings.game_difficulty = s->game_difficulty;

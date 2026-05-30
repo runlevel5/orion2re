@@ -5,8 +5,8 @@ struct s_animation_header;
 namespace FMTPARA {
     using user_fn = void(*)(s_fmtpara_para*, uint32_t, int32_t);
 
-    inline char* const _legal_functions = reinterpret_cast<char*>(0x00556288);
-    inline char* const _legal_fn_arg_chars = reinterpret_cast<char*>(0x00556298);
+    extern const char _legal_functions[];
+    extern const char _legal_fn_arg_chars[];
     inline uint8_t* _font_base_offsets = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562C8});
     inline int8_t (&_reset_parameters_lookup)[16] = *reinterpret_cast<int8_t(*)[16]>(std::uintptr_t{0x005562D0});
     inline short (&_tabs)[11] = *reinterpret_cast<short(*)[11]>(std::uintptr_t{0x005562B0});
@@ -28,19 +28,14 @@ namespace FMTPARA {
         *reinterpret_cast<uint32_t(*)[16]>(std::uintptr_t{0x00565070});
     inline char* _tmp_str = reinterpret_cast<char*>(std::uintptr_t{0x005650b0});
     inline char* _tmp_str2 = reinterpret_cast<char*>(std::uintptr_t{0x005650f8});
-    inline char** _ordinal_ending = reinterpret_cast<char**>(std::uintptr_t{0x00556220});
-    inline char** _ordinal_word = reinterpret_cast<char**>(std::uintptr_t{0x00556248});
-    inline const char* _ordinal_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00556278});
+    extern const char* const _ordinal_ending[10];
+    extern const char* const _ordinal_word[11];
+    extern const char _ordinal_fmt[];
     inline uint8_t* _tabs_3_plus_1 = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562B7});
-    inline const char* s_s_00556218 = reinterpret_cast<const char*>(std::uintptr_t{0x00556218});
-    inline const char* s_es_0055621c = reinterpret_cast<const char*>(std::uintptr_t{0x0055621C});
+    extern const char s_s_00556218[];
+    extern const char s_es_0055621c[];
     inline uint32_t& _user_fn_arg =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005650C0 });
-
-    inline void **_para_global_item_ptr =
-        reinterpret_cast<void **>(std::uintptr_t{0x005A7B18}); // _para_global.item_ptr[0]
-    inline int8_t *_para_global_item_type =
-        reinterpret_cast<int8_t *>(std::uintptr_t{0x005A7B58}); // _para_global.item_type[0]
 
     void __cdecl Init_();
 

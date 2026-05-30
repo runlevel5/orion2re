@@ -4,9 +4,6 @@
 struct s_fleet_box;
 
 namespace FLEETPOP {
-    inline s_fleet_box& _fleet_box =
-        *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
-
     bool __cdecl Set_Attack_Antares_Button_Flag_(void);
 
     int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count);
@@ -21,11 +18,6 @@ namespace FLEETPOP {
 
     int8_t __cdecl Planet_Is_Colonizable_(int16_t planet_idx);
 
-    inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
-
-    inline int16_t& _fleet_box_width =
-            *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
-
     void __cdecl Reload_Fleet_Box_Data_(void);
 
     bool __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx);
@@ -35,15 +27,6 @@ namespace FLEETPOP {
     void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* scroll_bar, int16_t total_rows);
 
     void __cdecl Buffer_Reload_Fleetpop_Frame_();
-
-    inline s_animation_header*& _fleet_box_name_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977D2});
-
-    inline s_animation_header*& _fleet_box_bottom_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977D6});
-
-    inline int8_t& _fleet_box_is_small_frame =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DA});
 
     void __cdecl Draw_Large_Fleet_Box_Frame_(
         int16_t x,
@@ -75,8 +58,7 @@ namespace FLEETPOP {
 
     void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text);
 
-    inline uint8_t& _n_added_buttons =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00564734});
+    extern uint8_t _n_added_buttons;
 
     bool __cdecl Check_For_Colonization_Button_();
 

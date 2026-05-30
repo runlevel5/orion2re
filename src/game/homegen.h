@@ -16,10 +16,10 @@ namespace HOMEGEN {
 
     inline const char* s_Orion = reinterpret_cast<const char*>(std::uintptr_t{0x0055a738}); // "Orion"
 
-    inline int32_t& _HOME_WORLD_GEN_MAX_CTR = *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00572390 });
-    inline s_good_star*& _good_stars = *reinterpret_cast<s_good_star**>(std::uintptr_t{ 0x00572398 });
-    inline int16_t (&_nearest_food_worlds)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005723A0});
-    inline s_star_dist*& _star_list = *reinterpret_cast<s_star_dist**>(0x005723B0);
+    extern int32_t _HOME_WORLD_GEN_MAX_CTR;
+    extern s_good_star* _good_stars;
+    extern int16_t _nearest_food_worlds[8];
+    extern s_star_dist* _star_list;
 
     bool __cdecl Is_Added_Food_World_(int16_t world_id);
 

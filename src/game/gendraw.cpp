@@ -1,6 +1,20 @@
 #include "pch.h"
 
 namespace GENDRAW {
+    s_colors _message_text_colors = {{0xA0, 0xA3, 0xA3, 0xA5, 0xAB, 0xAB, 0xAB, 0xAB}};
+    uint8_t _warning_box;
+    int16_t _message_box_y;
+    s_animation_header* _box_bitmap;
+    int16_t _animation_frame;
+    int16_t _direction;
+    int16_t _first_field;
+    s_animation_header* _image_seg[4];
+    s_fieldsav_data _message_field_save;
+    MOX2::action_func_t _gendraw_af;
+    int16_t _save_refresh_mode;
+    int16_t _old_draw_fields_flag;
+    int16_t _old_help_list_active;
+
     void __cdecl Message_Box_(const char* text) {
         TEXTBOX::Do_Text_Box_(nullptr, (char*)text, 0);
     }

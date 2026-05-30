@@ -1,6 +1,32 @@
 #include "pch.h"
 
 namespace fonts {
+    uint16_t _PSTR_style;
+
+    uint8_t* _current_font_blob;
+
+    void* _palette_block;
+
+    char _font_name[80];
+
+    int16_t _print_xpos;
+    int16_t _print_ypos;
+
+    int16_t _current_font_style;
+
+    uint8_t* _font_data;
+
+    s_font _font_header;
+
+    int16_t _draw_alias_flag = 1;
+
+    s_colors _current_font_color_array;
+
+    uint16_t _outline_color;
+    uint16_t _alias_outline_color;
+
+    extern const char s_Print_only_works_on_bitmaps[] = "Print only works on bitmaps";
+
     void __cdecl Set_Normal_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
             _font_header.selected_colors.colors[i] = _font_header.normal_colors.colors[i];
@@ -916,7 +942,7 @@ namespace fonts {
                     do {
                         if (data <= 0x80) {
                             if (data != 0 && dest_clip_start <= current_dest_offset && current_dest_offset < dest_clip_end) {
-                                frame_ptr[current_dest_offset] = _palette_block__unk[data];
+                                frame_ptr[current_dest_offset] = _font_header.selected_colors.colors[data - 1];
                             }
                             current_dest_offset++;
                         } else {
@@ -965,7 +991,7 @@ namespace fonts {
                             screen_idx += (pixel & 0x7F);
                         } else {
                             if (screen_idx >= clip_start_idx && screen_idx < clip_end_idx) {
-                                video::_current_video_page[screen_idx] = _palette_block__unk[pixel];
+                                video::_current_video_page[screen_idx] = _font_header.selected_colors.colors[pixel - 1];
                             }
                             ++screen_idx;
                         }

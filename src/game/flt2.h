@@ -34,9 +34,9 @@ namespace FLT2 {
 
     int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list);
 
-    inline s_colors& _normal_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DD0});
-    inline s_colors& _neutral_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DE0});
-    inline s_colors& _red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DD8});
+    extern s_colors _normal_colors;
+    extern s_colors _neutral_colors;
+    extern s_colors _red_colors;
 
     char* __cdecl Crew_Description_String_(int16_t ship_idx);
 
@@ -48,5 +48,5 @@ namespace FLT2 {
 
     void __cdecl Fix_Palette_(int16_t player_idx);
 
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    extern const char s__00551100[];
 }

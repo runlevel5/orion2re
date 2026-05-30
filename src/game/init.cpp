@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace init {
+    s_animation_header* _io_buffer;
+
     void __cdecl Create_IO_Buffer_() {
         _io_buffer = (s_animation_header*)malloc(0x2000);
         memset(_io_buffer, 0, 0x2000);

@@ -871,11 +871,7 @@ namespace MOX {
 
     inline int8_t& _mouse_button_pressed = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A1B58});
 
-    inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
-        *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
-
-    inline int16_t& _fleet_movement_icon_0_ship_node_idx =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C477});
+    extern s_fleet_movement_icon _fleet_movement_icon[500];
 
     inline s_save_game_description (&_save_game_description)[10] = *reinterpret_cast<s_save_game_description(*)[10]>(std::uintptr_t{0x005974F0});
 

@@ -11,29 +11,24 @@ namespace GENDRAW {
 
     void __cdecl Warning_Box_(const char* message);
 
-    inline s_colors& _message_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557640});
-    inline uint8_t& _warning_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566068});
-    inline int16_t& _message_box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056603C});
-    inline s_animation_header*& _box_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00566040});
-    inline int16_t& _animation_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056606C});
-    inline int16_t& _direction = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566074});
-    inline int16_t& _first_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566064});
-    inline s_animation_header* (&_image_seg)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x00566078});
+    extern s_colors _message_text_colors;
+    extern uint8_t _warning_box;
+    extern int16_t _message_box_y;
+    extern s_animation_header* _box_bitmap;
+    extern int16_t _animation_frame;
+    extern int16_t _direction;
+    extern int16_t _first_field;
+    extern s_animation_header* _image_seg[4];
 
-    inline s_fieldsav_data& _message_field_save =
-        *reinterpret_cast<s_fieldsav_data*>(std::uintptr_t{0x00566050});
+    extern s_fieldsav_data _message_field_save;
 
-    inline MOX2::action_func_t& _gendraw_af =
-        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00566044});
+    extern MOX2::action_func_t _gendraw_af;
 
-    inline int16_t& _save_refresh_mode =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566038});
+    extern int16_t _save_refresh_mode;
 
-    inline int16_t& _old_draw_fields_flag =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566048});
+    extern int16_t _old_draw_fields_flag;
 
-    inline int16_t& _old_help_list_active =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566070});
+    extern int16_t _old_help_list_active;
 
     void __cdecl Draw_Confirm_Box_();
 

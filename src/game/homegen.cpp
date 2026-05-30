@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace HOMEGEN {
+    int32_t _HOME_WORLD_GEN_MAX_CTR;
+    s_good_star* _good_stars;
+    int16_t _nearest_food_worlds[8];
+    s_star_dist* _star_list;
+
     int __cdecl qsort_1_(const void* a, const void* b) {
         const s_orion_candidate* candidate_a = (const s_orion_candidate*)a; 
         const s_orion_candidate* candidate_b = (const s_orion_candidate*)b;

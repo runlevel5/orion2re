@@ -50,14 +50,9 @@ namespace HAROLD {
 
     void __cdecl Save_Mouse_List_();
 
-    inline s_mouse_list (&_saved_mouse_list)[10] =
-        *reinterpret_cast<s_mouse_list(*)[10]>(std::uintptr_t{0x00571A40});
+    extern s_mouse_list _saved_mouse_list[10];
 
-    inline uint32_t& _saved_mouse_list_offset_4 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00571A44});
-
-    inline uint16_t& _saved_mouse_list_count =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00571AB8});
+    extern uint16_t _saved_mouse_list_count;
 
     void __cdecl Init_Fleet_Movement_Box_();
 
@@ -117,7 +112,7 @@ namespace HAROLD {
 
     bool __cdecl Player_Is_Omniscient_(int16_t player_idx);
 
-    inline uint8_t& _set_fade_for_first_fltpop = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00595394});
+    extern uint8_t _set_fade_for_first_fltpop;
 
     int16_t __cdecl Zoom_Level_Font_Style_();
 
@@ -155,21 +150,21 @@ namespace HAROLD {
 
     int16_t __cdecl Planet_Index_(int16_t star_idx, int16_t planet_idx);
 
-    inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
+    extern const char s_after_home_world_gen[];
 
-    inline const char* s___s__00556ae4 = reinterpret_cast<const char*>(0x00556AE4); // "(%s)"
-    inline const char* s_relate_game_conditions_EXACTLY_a_0055a6cc = reinterpret_cast<const char*>(0x0055A6CC); // "relate game conditions EXACTLY as they just happened"
-    inline const char* s_orbit__d_of_star__d_has_more_tha_0055a704 = reinterpret_cast<const char*>(0x0055A704); // "orbit %d of star %d has more than 1 planet in it"
+    extern const char s___s__00556ae4[];
+    extern const char s_relate_game_conditions_EXACTLY_a_0055a6cc[];
+    extern const char s_orbit__d_of_star__d_has_more_tha_0055a704[];
 
-    inline const char* s_HERODATI_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A808 }); // "HERODATI.LBX"
-    inline const char* s_HERODATS_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A818 }); // "HERODATS.LBX"
-    inline const char* s_HERODATF_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A828 }); // "HERODATF.LBX"
-    inline const char* s_HERODATG_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A838 }); // "HERODATG.LBX"
-    inline const char* s_HERODATA_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A848 }); // "HERODATA.LBX"
+    extern const char s_HERODATI_LBX[16];
+    extern const char s_HERODATS_LBX[16];
+    extern const char s_HERODATF_LBX[16];
+    extern const char s_HERODATG_LBX[16];
+    extern const char s_HERODATA_LBX[16];
 
-    inline const char* s_MC_0055823c = reinterpret_cast<const char*>(std::uintptr_t{0x0055823c}); // "MC"
-    inline const char* s_BC_00558244 = reinterpret_cast<const char*>(std::uintptr_t{0x00558244}); // "BC"
-    inline const char* s_in_next_turn = reinterpret_cast<const char*>(std::uintptr_t{0x00558004}); // "in next-turn"
+    extern const char s_MC_0055823c[];
+    extern const char s_BC_00558244[];
+    extern const char s_in_next_turn[];
 
     bool __cdecl Star_Guarded_By_Monster_(int16_t location_idx, int16_t* monster_owner);
 

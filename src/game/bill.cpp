@@ -532,7 +532,7 @@ namespace BILL {
      */
     void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text, s_animation_header* bitmap) {
         int16_t max_height = _Get_Paragraph_Max_Height_(width, text);
-        int16_t current_height = static_cast<int16_t>(fonts::_font_header_current_height);
+        int16_t current_height = static_cast<int16_t>(fonts::_font_header.current_height);
 
         int16_t new_y = y + static_cast<int16_t>((current_height - max_height) / 2);
 

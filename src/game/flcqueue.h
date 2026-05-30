@@ -2,10 +2,9 @@
 #include <cstdint>
 
 namespace FLCQUEUE {
-    inline int16_t& _n_queue_entries = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D00});
+    extern int16_t _n_queue_entries;
 
-    inline s_flic_queue_entry (&_flic_queue)[100] =
-        *reinterpret_cast<s_flic_queue_entry(*)[100]>(std::uintptr_t{0x005658D0});
+    extern s_flic_queue_entry _flic_queue[100];
 
     void __cdecl Allocate_Flic_Queue_And_Pointers_();
 

@@ -47,18 +47,18 @@ namespace FLT1 {
 
     bool __cdecl At_Least_One_Officer_(int16_t player_num);
 
-    inline const char* const s_empty = reinterpret_cast<const char*>(0x00551100);
-    inline const char* const s_plus = reinterpret_cast<const char*>(0x00551118);
-    inline const char* const s_minus = reinterpret_cast<const char*>(0x0055111C);
-    inline const char* const s_space = reinterpret_cast<const char*>(0x00551120);
-    inline const char* const s_C = reinterpret_cast<const char*>(0x00552420);
-    inline const char* const s_L = reinterpret_cast<const char*>(0x005560E8);
-    inline const char* const s_dot = reinterpret_cast<const char*>(0x0055632C);
-    inline const char* const s_comma = reinterpret_cast<const char*>(0x005569C8);
-    inline const char* const s_S = reinterpret_cast<const char*>(0x005569CC);
-    inline const char* const s_A = reinterpret_cast<const char*>(0x00557ED4);
-    inline const char* const s_R = reinterpret_cast<const char*>(0x0055824C);
-    inline const char* const s_U = reinterpret_cast<const char*>(0x00558540);
+    extern const char s_empty[];
+    extern const char s_plus[];
+    extern const char s_minus[];
+    extern const char s_space[];
+    extern const char s_C[];
+    extern const char s_L[];
+    extern const char s_dot[];
+    extern const char s_comma[];
+    extern const char s_S[];
+    extern const char s_A[];
+    extern const char s_R[];
+    extern const char s_U[];
 
     void __cdecl Cancel_Star_Relocation_(int16_t star_id);
 
@@ -92,16 +92,16 @@ namespace FLT1 {
 
     int16_t __cdecl Update_Selection_Flags_();
 
-    inline uint8_t& _relocate_button_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CD6C});
-    inline int16_t& _fleet_screen_bad_ship_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CD64});
-    inline int16_t& _combat_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CD68});
-    inline int16_t& _n_player_ships = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CD70});
-    inline int16_t& _support_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CD74});
-    inline void*& _multi_button_support_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0056CD78});
-    inline uint8_t& _merging_relocations = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CD7C});
-    inline void*& _multi_button_combat_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0056CD80});
-    inline s_mouse_list* _mouse_list_from = reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005584B0});
-    inline s_mouse_list* _mouse_list_to = reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005584E0});
-    inline s_mouse_list* _mouse_list_all_to = reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558510});
+    extern uint8_t _relocate_button_mode;
+    extern int16_t _fleet_screen_bad_ship_id;
+    extern int16_t _combat_filter_button;
+    extern int16_t _n_player_ships;
+    extern int16_t _support_filter_button;
+    extern void* _multi_button_support_seg;
+    extern uint8_t _merging_relocations;
+    extern void* _multi_button_combat_seg;
+    extern s_mouse_list _mouse_list_from[4];
+    extern s_mouse_list _mouse_list_to[4];
+    extern s_mouse_list _mouse_list_all_to[4];
     inline const char* PTR_s_FLEET_LBX = "fleet.lbx";
 }

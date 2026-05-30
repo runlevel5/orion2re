@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace FLCQUEUE {
+    int16_t _n_queue_entries;
+
+    s_flic_queue_entry _flic_queue[100];
+
     void __cdecl Allocate_Flic_Queue_And_Pointers_() {
         _n_queue_entries = 0;
     }

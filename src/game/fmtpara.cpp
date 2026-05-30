@@ -1,6 +1,37 @@
 #include "pch.h"
 
 namespace FMTPARA {
+    extern const char _legal_functions[] = "FRTXYSHVPIMOC^=";
+    extern const char _legal_fn_arg_chars[] = "1234567890+- ";
+    extern const char s_s_00556218[] = "s";
+    extern const char s_es_0055621c[] = "es";
+    extern const char* const _ordinal_ending[10] = {
+        "th",
+        "st",
+        "nd",
+        "rd",
+        "th",
+        "th",
+        "th",
+        "th",
+        "th",
+        "th",
+    };
+    extern const char* const _ordinal_word[11] = {
+        "zeroeth",
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+        "seventh",
+        "eighth",
+        "ninth",
+        "tenth",
+    };
+    extern const char _ordinal_fmt[] = "%s\a^2.%s\a^0.";
+
     /**
      * @address 00432ef0
      */
@@ -2024,8 +2055,8 @@ namespace FMTPARA {
      */
     void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t item_index, void *value_ptr, int8_t value_type) {
         if (item_index < 0x10) {
-            _para_global_item_ptr[item_index] = value_ptr;
-            _para_global_item_type[item_index] = value_type;
+            _para_global.item_ptr[item_index] = value_ptr;
+            _para_global.item_type[item_index] = value_type;
         }
     }
 }

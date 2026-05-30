@@ -2,6 +2,26 @@
 #include <cstring>
 
 namespace HAROLD {
+    s_mouse_list _saved_mouse_list[10];
+    uint16_t _saved_mouse_list_count;
+    uint8_t _set_fade_for_first_fltpop;
+
+    const char s_after_home_world_gen[] = "after home world gen";
+
+    const char s___s__00556ae4[] = "(%s)";
+    const char s_relate_game_conditions_EXACTLY_a_0055a6cc[] = "relate game conditions EXACTLY as they just happened";
+    const char s_orbit__d_of_star__d_has_more_tha_0055a704[] = "orbit %d of star %d has more than 1 planet in it";
+
+    const char s_HERODATI_LBX[16] = "HERODATI.LBX";
+    const char s_HERODATS_LBX[16] = "HERODATS.LBX";
+    const char s_HERODATF_LBX[16] = "HERODATF.LBX";
+    const char s_HERODATG_LBX[16] = "HERODATG.LBX";
+    const char s_HERODATA_LBX[16] = "HERODATA.LBX";
+
+    const char s_MC_0055823c[] = "MC";
+    const char s_BC_00558244[] = "BC";
+    const char s_in_next_turn[] = "in next-turn";
+
     uint32_t __cdecl Is_Colony_Star_(int16_t star_idx) {
         uint32_t has_colony = 0;
 

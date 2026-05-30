@@ -2,6 +2,11 @@
 
 namespace graphics {
 
+    int16_t _old_screen_window_y2;
+    int16_t _old_screen_window_y1;
+    int16_t _old_screen_window_x2;
+    int16_t _old_screen_window_x1;
+
     void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 

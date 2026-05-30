@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace HOTPOP {
+    int16_t _hotseat_human_players;
+    s_animation_header* _hot_pop_background_seg;
+    s_animation_header* _grid_background[4];
 
     void __cdecl Fade_Into_Hotseat_Screen_() {
         ERIC::Fast_Fade_Out_();

@@ -418,8 +418,8 @@ namespace ERICNET {
                     tp->mineral_class = 2; /* Abundant */
                     tp->food_per_farmer = 0;
                     tp->n_terraforms = 0;
-                    tp->max_farms = global::_max_farms_by_size[size];
-                    tp->max_population = global::_max_pop_by_size[size];
+                    tp->max_farms = MOX::_planet_max_farms[size];
+                    tp->max_population = MOX::_planet_max_population[size];
                     tp->environmental_alterations = 0;
                 }
                 add_to_list = 0;

@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace FLEETPOP {
+    uint8_t _n_added_buttons;
 
     void __cdecl Draw_Damage_Bars_(int16_t x, int16_t y, int16_t width, int16_t y_offset, int16_t x_offset, int16_t ship_idx) {
         int16_t effective_width = width - 4;
@@ -856,7 +857,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     }
 
     const int16_t left_x = static_cast<int16_t>(x + x_offset);
-    const int16_t right_x = static_cast<int16_t>(left_x + ::_fleet_box_width);
+    const int16_t right_x = static_cast<int16_t>(left_x + MOX::_fleet_box.width);
     const int16_t start_y = static_cast<int16_t>(y + y_offset);
     uint32_t saved_window_status = 0;
 
@@ -1251,7 +1252,7 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
     int32_t window_bottom;
 
     frame_left = static_cast<int16_t>(x + x_offset);
-    fleet_box_inner_height = FLEETPOP::_fleet_box.field8_0xe;
+    fleet_box_inner_height = MOX::_fleet_box.field8_0xe;
     *current_y = static_cast<int16_t>(y_offset + y);
 
     MISC::Save_Window_Status_(&window_status);
@@ -1267,35 +1268,35 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
     graphics::Set_Window_(
             frame_left,
             *current_y,
-            static_cast<int16_t>(x + FLEETPOP::_fleet_box_width + x_offset),
+            static_cast<int16_t>(x + MOX::_fleet_box.width + x_offset),
             static_cast<int16_t>(window_bottom));
     video::Clip_On_();
 
     graphics::Fill_(
             static_cast<int16_t>(frame_left + 6),
             static_cast<int16_t>(*current_y + 0x29),
-            static_cast<int16_t>(frame_left + FLEETPOP::_fleet_box_width - 6),
+            static_cast<int16_t>(frame_left + MOX::_fleet_box.width - 6),
             static_cast<int16_t>(*current_y + fleet_box_inner_height + 0x1D),
             0);
 
     MISC::Restore_Window_Status_(window_status);
 
     segment = (s_animation_header*)buffer::Buffer_Reload_(
-            FLEETPOP::s_BUFFER0_LBX,
+            ::s_BUFFER0_LBX,
             0x33,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, segment);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(segment));
 
     MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(
-            FLEETPOP::s_BUFFER0_LBX,
+            ::s_BUFFER0_LBX,
             0x35,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, MOX::_fleet_box_grid_lg_seg);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(MOX::_fleet_box_grid_lg_seg));
 
     segment = (s_animation_header*)buffer::Buffer_Reload_(
-            FLEETPOP::s_BUFFER0_LBX,
+            ::s_BUFFER0_LBX,
             0x37,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, segment);
@@ -1323,24 +1324,24 @@ void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* scroll_bar, int16_t total_rows
 void __cdecl Buffer_Reload_Fleetpop_Frame_() {
     s_animation_header* seg;
 
-    if (FLEETPOP::_fleet_box_is_small_frame == 0) {
+    if (MOX::_fleet_box.is_small_frame == 0) {
         seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x37, MOX::_global_cache_seg);
         MOX::_fleet_box_bottom_lg_seg = seg;
-        FLEETPOP::_fleet_box_bottom_seg = seg;
+        MOX::_fleet_box.bottom_seg = seg;
 
         seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x33, MOX::_global_cache_seg);
         MOX::_fleet_box_name_lg_seg = seg;
-        FLEETPOP::_fleet_box_name_seg = seg;
+        MOX::_fleet_box.name_seg = seg;
         return;
     }
 
     seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x38, MOX::_global_cache_seg);
     MOX::_fleet_box_bottom_sm_seg = seg;
-    FLEETPOP::_fleet_box_bottom_seg = seg;
+    MOX::_fleet_box.bottom_seg = seg;
 
     seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x34, MOX::_global_cache_seg);
     MOX::_fleet_box_name_sm_seg = seg;
-    FLEETPOP::_fleet_box_name_seg = seg;
+    MOX::_fleet_box.name_seg = seg;
 }
 
 void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
@@ -1372,9 +1373,9 @@ void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
 
 bool __cdecl Check_For_Colonization_Button_() {
     const uint8_t colonize_button_flag =
-            FLEETPOP::Set_Colonize_Button_Flag_(FLEETPOP::_fleet_box.count);
+            FLEETPOP::Set_Colonize_Button_Flag_(MOX::_fleet_box.count);
 
-    FLEETPOP::_fleet_box.colonize_btn_active =
+    MOX::_fleet_box.colonize_btn_active =
             static_cast<int8_t>(colonize_button_flag);
 
     return colonize_button_flag != 0;
@@ -1382,9 +1383,9 @@ bool __cdecl Check_For_Colonization_Button_() {
 
 bool __cdecl Check_For_Transport_Troops_Button_(void) {
     const uint8_t transport_button_state =
-        FLEETPOP::Set_Transport_Troops_Flag_(FLEETPOP::_fleet_box.count);
+        FLEETPOP::Set_Transport_Troops_Flag_(MOX::_fleet_box.count);
 
-    FLEETPOP::_fleet_box.transport_btn_active =
+    MOX::_fleet_box.transport_btn_active =
         static_cast<int8_t>(transport_button_state);
 
     return transport_button_state != 0;
@@ -1392,9 +1393,9 @@ bool __cdecl Check_For_Transport_Troops_Button_(void) {
 
 bool __cdecl Check_For_Build_Outpost_Button_() {
     const uint8_t outpost_button_flag =
-        FLEETPOP::Set_Build_Outpost_Button_Flag_(FLEETPOP::_fleet_box.count);
+        FLEETPOP::Set_Build_Outpost_Button_Flag_(MOX::_fleet_box.count);
 
-    FLEETPOP::_fleet_box.outpost_btn_active =
+    MOX::_fleet_box.outpost_btn_active =
         static_cast<int8_t>(outpost_button_flag);
 
     return outpost_button_flag != 0;
@@ -1402,9 +1403,9 @@ bool __cdecl Check_For_Build_Outpost_Button_() {
 
 bool __cdecl Check_For_Engage_Enemy_Forces_Button_(void) {
     const uint8_t engage_btn_active =
-        FLEETPOP::Set_Engage_Enemy_Forces_Flag_(FLEETPOP::_fleet_box.count);
+        FLEETPOP::Set_Engage_Enemy_Forces_Flag_(MOX::_fleet_box.count);
 
-    FLEETPOP::_fleet_box.engage_btn_active =
+    MOX::_fleet_box.engage_btn_active =
         static_cast<int8_t>(engage_btn_active);
 
     return engage_btn_active != 0;
@@ -1412,7 +1413,7 @@ bool __cdecl Check_For_Engage_Enemy_Forces_Button_(void) {
 
 bool __cdecl Check_For_Attack_Antares_Button_() {
     const uint8_t attack_btn_active = FLEETPOP::Set_Attack_Antares_Button_Flag_();
-    FLEETPOP::_fleet_box.attack_btn_active = static_cast<int8_t>(attack_btn_active);
+    MOX::_fleet_box.attack_btn_active = static_cast<int8_t>(attack_btn_active);
     return attack_btn_active != 0;
 }
 

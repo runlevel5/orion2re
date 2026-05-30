@@ -2,39 +2,29 @@
 #include "misc.h"
 
 namespace fonts {
-    inline int16_t& _font_header_current_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057646C});
-    inline uint16_t& _PSTR_style = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005787B4});
+    extern uint16_t _PSTR_style;
 
-    inline uint8_t*& _current_font_blob = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055B158});
+    extern uint8_t* _current_font_blob;
 
-    inline void*& _palette_block =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x005787B8 });
+    extern void* _palette_block;
 
-    inline char* const _font_name =
-        reinterpret_cast<char*>(std::uintptr_t{ 0x005787C0 });
+    extern char _font_name[80];
 
-    inline int16_t& _print_xpos = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576430});
-    inline int16_t& _print_ypos = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576440});
+    extern int16_t _print_xpos;
+    extern int16_t _print_ypos;
 
-    inline int16_t& _current_font_style =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057643C});
-    inline int16_t& _current_font_style_2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578e1c});
+    extern int16_t _current_font_style;
 
-    inline uint8_t*& _font_data = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00576434});
+    extern uint8_t* _font_data;
 
-    inline uint8_t* const _palette_block__unk =
-        reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576447});
-
-    inline s_font& _font_header =
-        *reinterpret_cast<s_font*>(std::uintptr_t{0x00576448});
+    extern s_font _font_header;
 
     void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, uint32_t height);
     void __cdecl Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index);
 
-    inline int16_t& _draw_alias_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B150});
+    extern int16_t _draw_alias_flag;
 
-    inline s_colors& _current_font_color_array =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x005787A8});
+    extern s_colors _current_font_color_array;
 
     void __cdecl Set_PSTR_Style_(uint16_t style);
     void __cdecl Set_Font_Style_(int font_style, const s_colors *new_colors);
@@ -75,15 +65,13 @@ namespace fonts {
 
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
-    inline uint8_t& _outline_color =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B148});
+    extern uint16_t _outline_color;
 
-    inline uint8_t& _alias_outline_color =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B14C});
+    extern uint16_t _alias_outline_color;
 
     void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color);
 
-    inline const char* s_Print_only_works_on_bitmaps = reinterpret_cast<const char*>(0x0055B15C);
+    extern const char s_Print_only_works_on_bitmaps[];
 
     void __cdecl Print_String_To_Bitmap_(int16_t x, int16_t y, const char* string, int16_t color_flags, int16_t max_width, s_animation_header* bitmap);
 

@@ -1,8 +1,7 @@
 #pragma once
 
 namespace init {
-    inline s_animation_header*& _io_buffer =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0057E184 });
+    extern s_animation_header* _io_buffer;
 
     void __cdecl Create_IO_Buffer_();
 
