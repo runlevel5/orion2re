@@ -12,8 +12,7 @@ namespace namestar {
     int16_t __cdecl Max_Pixel_Width_Star_Name_Can_Be_(int16_t star_idx);
     int8_t __cdecl Can_Change_Star_Name_(int16_t star_idx);
 
-    inline s_input_box_state& _input_box =
-        *reinterpret_cast<s_input_box_state*>(std::uintptr_t{0x00564760});
+    extern s_input_box_state _input_box;
 
     void __cdecl Setup_Input_Box_Popup_();
 

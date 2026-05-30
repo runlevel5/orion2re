@@ -72,6 +72,7 @@ workflows:
             - for structs or arrays of structs, inspect enough typed fields and raw bytes to cover the entire proven object extent; do not stop after finding the first few meaningful members
             - if the variable has any non-zero bytes, continue reading until the full object boundary is verified against layout, next symbol, and code-proven size
             - if a reader truncates output or returns suspicious data, re-read in smaller chunks or with helper readers until the entire object has been covered with confidence
+            - nested address restoration is mandatory: if a recovered definition would still contain raw absolute addresses inside its initializer, helper tables, callback pointers, subordinate arrays, or pointed-to local data, keep recovering those nested targets into real named variables or functions until the emitted .cpp definition is free of raw address literals wherever a project-side symbol can be established
           * Replace the inline address stub in the header with an extern declaration.
           * Add or update the real variable definition and, if needed, its default value in the matching .cpp file.
 
@@ -90,6 +91,7 @@ workflows:
           * If the variable is zero-initialized, use an explicit zero-style initializer only when it matches local code style.
           * If the variable points at another known symbol, prefer the project symbol over a raw address literal when you can prove it.
           * If a pointer field or initializer targets a known symbol, prefer the symbol name over a raw address literal.
+          * Do not stop at the first-level stub conversion if the resulting definition still embeds raw addresses for nested local objects, callback functions, array backing storage, or canonical nearby variables. Recover those nested targets too.
           * Resolve strings from their real backing storage:
             - if the object stores character bytes inline, recover it as a character array with the correct element type and count
             - if the object stores an address of string data, recover it as a pointer and initialize it from the referenced string or symbol as appropriate
@@ -184,6 +186,7 @@ workflows:
           * You verified that each recovered variable was not an alias, overlapping symbol, or structure subcomponent before applying changes.
           * You stopped and asked the user how to proceed for any alias candidate instead of guessing.
           * You verified correctness against the Ghidra project before reporting back to the user.
+          * You verified that the final patched .cpp does not retain raw absolute-address literals introduced by partial recovery when those targets could be restored as real named objects or functions.
           * You used the `apply_patch` tool for code changes.
         outcomes:
           - name: done

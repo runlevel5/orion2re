@@ -1,11 +1,111 @@
 #include "pch.h"
 
+namespace {
+    const char s_caret_00556074[2] = "^";
+
+    int16_t _turn_summary_list_y[16] = {
+        0, 10, 20, 30, 40, 50, 60, 70,
+        80, 90, 100, 110, 120, 130, 140, 0,
+    };
+
+    int16_t _turn_summary_field_y2[16] = {
+        9, 19, 29, 39, 49, 59, 69, 79,
+        89, 99, 109, 119, 129, 139, 149, 0,
+    };
+
+    int16_t _category_list_y[2] = {0, 17};
+    int16_t _category_field_y2[1] = {17};
+
+    void __cdecl Draw_Tech_Review_App_(int16_t x, int16_t y, uint8_t tech_app_id) {
+        char* name = TECH::Technology_Applications_Name_(tech_app_id, MOX::_PLAYER_NUM);
+        FMTPARA::Print_Formatted_Paragraph_(x, y, 197, name, 0);
+    }
+
+    void __cdecl Draw_Turn_Summary_App_(int16_t x, int16_t y, uint8_t msg_idx) {
+        char buffer[256];
+
+        fonts::Set_Font_LF_(10);
+        MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
+        fonts::Print_(x, y, s_caret_00556074);
+        FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 345, buffer, 0);
+    }
+}
+
 namespace INFO {
+    s_tech_review_achievement _review_achievements[60] = {
+        {1, 4}, {55, 2}, {16, 2}, {186, 2}, {189, 2}, {109, 2}, {69, 2}, {41, 2}, {40, 2}, {2, 4},
+        {43, 2}, {173, 2}, {147, 2}, {182, 2}, {114, 2}, {166, 2}, {3, 4}, {170, 2}, {99, 2}, {195, 2},
+        {29, 2}, {8, 2}, {7, 2}, {6, 2}, {3, 2}, {113, 2}, {108, 2}, {193, 2}, {107, 2}, {5, 4},
+        {89, 2}, {46, 2}, {59, 2}, {4, 2}, {179, 2}, {4, 4}, {24, 2}, {144, 2}, {124, 2}, {9, 2},
+        {138, 2}, {128, 2}, {73, 2}, {101, 2}, {145, 2}, {0, 4}, {91, 2}, {176, 2}, {180, 2}, {92, 2},
+        {77, 2}, {65, 2}, {42, 2}, {200, 2}, {84, 2}, {62, 2}, {32, 2}, {0, 8}, {0, 0}, {0, 0},
+    };
+
+    s_tech_review_achievement _review_colony[56] = {
+        {6, 4}, {198, 2}, {68, 2}, {162, 2}, {87, 2}, {74, 2}, {178, 2}, {183, 2}, {7, 4}, {50, 2},
+        {19, 2}, {142, 2}, {9, 4}, {49, 2}, {154, 2}, {152, 2}, {156, 2}, {22, 2}, {11, 4}, {76, 2},
+        {136, 2}, {21, 2}, {155, 2}, {12, 4}, {75, 2}, {135, 2}, {164, 2}, {10, 4}, {15, 2}, {129, 2},
+        {130, 2}, {134, 2}, {169, 2}, {27, 2}, {168, 2}, {133, 2}, {132, 2}, {67, 2}, {14, 2}, {103, 2},
+        {8, 4}, {141, 2}, {86, 2}, {0, 4}, {61, 2}, {197, 2}, {52, 2}, {5, 2}, {131, 2}, {39, 2},
+        {163, 2}, {18, 2}, {0, 8}, {0, 0}, {0, 0}, {0, 0},
+    };
+
+    s_tech_review_achievement _review_weapons[44] = {
+        {13, 4}, {174, 2}, {47, 2}, {123, 2}, {105, 2}, {54, 2}, {137, 2}, {79, 2}, {127, 2}, {97, 2},
+        {115, 2}, {78, 2}, {70, 2}, {104, 2}, {100, 2}, {14, 4}, {139, 2}, {146, 2}, {12, 2}, {202, 2},
+        {149, 2}, {106, 2}, {121, 2}, {15, 4}, {28, 2}, {48, 2}, {118, 2}, {10, 2}, {71, 2}, {119, 2},
+        {16, 4}, {83, 2}, {31, 2}, {66, 2}, {17, 2}, {17, 4}, {165, 2}, {30, 2}, {171, 2}, {148, 2},
+        {140, 2}, {80, 2}, {13, 2}, {0, 8},
+    };
+
+    s_tech_review_achievement _review_equipment[80] = {
+        {18, 4}, {81, 2}, {112, 2}, {161, 2}, {37, 2}, {36, 2}, {35, 2}, {34, 2}, {33, 2}, {19, 4},
+        {56, 2}, {82, 2}, {201, 2}, {2, 2}, {117, 2}, {203, 2}, {191, 2}, {187, 2}, {20, 4}, {20, 2},
+        {95, 2}, {88, 2}, {11, 2}, {96, 2}, {72, 2}, {120, 2}, {22, 4}, {63, 2}, {184, 2}, {194, 2},
+        {98, 2}, {51, 2}, {167, 2}, {21, 4}, {110, 2}, {44, 2}, {143, 2}, {122, 2}, {58, 2}, {24, 4},
+        {160, 2}, {116, 2}, {181, 2}, {157, 2}, {23, 4}, {45, 2}, {153, 2}, {60, 2}, {53, 2}, {102, 2},
+        {126, 2}, {38, 2}, {93, 2}, {94, 2}, {199, 2}, {111, 2}, {57, 2}, {25, 4}, {1, 2}, {175, 2},
+        {85, 2}, {151, 2}, {26, 2}, {0, 4}, {150, 2}, {125, 2}, {185, 2}, {90, 2}, {177, 2}, {190, 2},
+        {188, 2}, {23, 2}, {172, 2}, {159, 2}, {64, 2}, {196, 2}, {158, 2}, {25, 2}, {192, 2}, {0, 8},
+    };
+
+    int16_t _tech_review_list_y[16] = {
+        16, 29, 42, 55, 68, 81, 94, 107,
+        120, 133, 146, 159, 172, 185, 198, 211,
+    };
+
+    int16_t _tech_review_field_y1[16] = {
+        0, 27, 40, 53, 66, 79, 92, 105,
+        118, 131, 144, 157, 170, 183, 196, 209,
+    };
+
+    int16_t _tech_review_field_y2[16] = {
+        26, 39, 52, 65, 78, 91, 104, 117,
+        130, 143, 156, 169, 182, 195, 208, 221,
+    };
+
+    s_colors _info_jim_hack_color = {{178, 190, 183, 185, 187, 188, 189, 189}};
+    s_colors _orange_bar_colors = {{176, 152, 153, 154, 155, 156, 157, 0}};
+    s_colors _grey_bar_colors = {{176, 13, 15, 17, 19, 20, 22, 0}};
+    s_colors _red_bar_colors = {{176, 164, 165, 166, 167, 168, 169, 0}};
+    s_colors _purple_bar_colors = {{176, 170, 171, 172, 173, 174, 175, 0}};
+    s_colors _yellow_bar_colors = {{176, 158, 159, 160, 161, 162, 163, 0}};
+    s_colors _blue_bar_colors = {{176, 146, 147, 148, 149, 150, 151, 0}};
+    s_colors _green_bar_colors = {{176, 181, 182, 183, 184, 185, 186, 0}};
+
+    s_colors _orange_text_colors = {{155, 2, 2, 2, 3, 3, 4, 4}};
+    s_colors _grey_text_colors = {{13, 2, 2, 2, 3, 3, 4, 4}};
+    s_colors _red_text_colors = {{164, 2, 2, 2, 3, 3, 4, 4}};
+    s_colors _purple_text_colors = {{170, 2, 2, 2, 3, 3, 4, 4}};
+    s_colors _yellow_text_colors = {{158, 2, 2, 2, 3, 3, 4, 4}};
+    s_colors _blue_text_colors = {{146, 2, 3, 3, 3, 3, 4, 4}};
+    s_colors _green_text_colors = {{181, 2, 2, 2, 3, 3, 4, 4}};
+
     s_tech_review_achievement* _review_list[4] = {
-        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555998}),
-        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555A10}),
-        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555A80}),
-        reinterpret_cast<s_tech_review_achievement*>(std::uintptr_t{0x00555AD8}),
+        _review_achievements,
+        _review_colony,
+        _review_weapons,
+        _review_equipment,
     };
 
     const char s_billtex2_lbx[13] = "billtex2.lbx";
@@ -32,9 +132,9 @@ namespace INFO {
         64,
         187,
         409,
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555E50}),
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555E78}),
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555EA0}),
+        _tech_review_list_y,
+        _tech_review_field_y1,
+        _tech_review_field_y2,
         6,
         0,
         nullptr,
@@ -43,12 +143,12 @@ namespace INFO {
         1,
         3,
         2,
-        reinterpret_cast<void*>(std::uintptr_t{0x004273A0}),
+        reinterpret_cast<void*>(Draw_Tech_Review_App_),
         10,
         0xBF,
         &_info_high_color,
         {&_info_normal_color, &_info_normal_color, &_info_normal_color, &_info_normal_color},
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BA8}),
+        &_info_jim_hack_color,
     };
 
     int16_t _tech_review_tab_index;
@@ -109,9 +209,9 @@ namespace INFO {
         96,
         345,
         408,
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F28}),
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F28}),
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F48}),
+        _turn_summary_list_y,
+        _turn_summary_list_y,
+        _turn_summary_field_y2,
         8,
         0,
         nullptr,
@@ -120,7 +220,7 @@ namespace INFO {
         0,
         4,
         4,
-        reinterpret_cast<void*>(std::uintptr_t{0x00428450}),
+        reinterpret_cast<void*>(Draw_Turn_Summary_App_),
         13,
         0,
         &_info_high_color,
@@ -133,9 +233,9 @@ namespace INFO {
         96,
         175,
         410,
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555FA8}),
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555FA8}),
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00555FAA}),
+        _category_list_y,
+        _category_list_y,
+        _category_field_y2,
         0,
         0,
         nullptr,
@@ -185,23 +285,23 @@ namespace INFO {
     s_colors _info_dark_color = {{178, 2, 2, 3, 3, 3, 4, 5}};
 
     s_colors* _maintenance_bar_colors[7] = {
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BB0}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BB8}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BC0}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BC8}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BD0}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BD8}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555BE0}),
+        &_orange_bar_colors,
+        &_grey_bar_colors,
+        &_red_bar_colors,
+        &_purple_bar_colors,
+        &_yellow_bar_colors,
+        &_blue_bar_colors,
+        &_green_bar_colors,
     };
 
     s_colors* PTR__orange_text_colors[8] = {
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C08}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C10}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C18}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C20}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C28}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C30}),
-        reinterpret_cast<s_colors*>(std::uintptr_t{0x00555C38}),
+        &_orange_text_colors,
+        &_grey_text_colors,
+        &_red_text_colors,
+        &_purple_text_colors,
+        &_yellow_text_colors,
+        &_blue_text_colors,
+        &_green_text_colors,
         nullptr,
     };
 

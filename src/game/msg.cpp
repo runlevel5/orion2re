@@ -1,6 +1,80 @@
 #include "pch.h"
 
 namespace MSG_ {
+    uint8_t _first_msg[8];
+    uint8_t _n_msgs[8];
+    s_MSG _msgs[100];
+    uint8_t _max_msgs[8];
+
+    char* _msg_artifacts_fmt;
+    char* _msg_colony_your_rebellion_lost_fmt;
+    char* _msg_colony_starvation_food_fmt;
+    char* _msg_colony_1_rebel_won_fmt;
+    char* _msg_colony_assimilation_fmt;
+    char* _msg_scrap_leader_fmt;
+    char* _msg_colony_genocide_fmt;
+    char* _msg_hyperspace_beast_hungry_fmt;
+    char* _msg_lost_ship_fmt;
+    char* _s_and_s_declare_war_fmt;
+    char* _msg_colony_built_freighter_fmt;
+    char* _msg_lost_attacking_spy_fmt;
+    char* _msg_1_ship_killed_retreating_fmt;
+    char* _msg_colony_built_next_queue_fmt;
+    char* _lost_colony_reason_strings[4];
+    char* _msg_lost_defending_spies_fmt;
+    char* _s_and_s_declare_alliance_fmt;
+    char* _msg_colony_d_rebels_won_fmt;
+    char* _msg_hyperspace_flux_fmt;
+    char* _msg_financial_fmt;
+    char* _msg_lost_colony_leader_fmt;
+    char* _msg_colony_built_android_farmer_fmt;
+    char* _native_msg;
+    char* _msg_scrap_ship_hyperspace_fmt;
+    char* _msg_offensive_spy_fmt;
+    char* _msg_colony_built_android_scientist_fmt;
+    char* _msg_lost_defending_spy_fmt;
+    char* _msg_april1_fmt;
+    char* _msg_lost_colony_fmt;
+    char* _msg_colony_boom_fmt;
+    char* _msg_defensive_spy_fmt;
+    char* _msg_eel_vanished_fmt;
+    char* _msg_colony_built_ship_fmt;
+    char* _leader_fate_strings[3];
+    char* _msg_colony_built_auto_build_fmt;
+    char* _msg_colony_android_killed_organic_fmt;
+    char* _msg_colony_settlers_arrived_blockaded_fmt;
+    char* _msg_colony_comet_fmt;
+    char* _msg_colony_d_settlers_arrived_fmt;
+    char* _msg_colony_starvation_ind_fmt;
+    char* _msg_d_ships_killed_retreating_fmt;
+    char* _msg_failed_retreat_leader_fmt;
+    char* _msg_colony_or_outpost[2];
+    char* _msg_colony_1_settler_arrived_over_limit_fmt;
+    char* _msg_spy_assassinated_fmt;
+    char* _msg_spy_assassinated_victim_fmt;
+    char* _msg_colony_no_room_for_android_fmt;
+    char* _failed_retreat_reason_strings[3];
+    char* _msg_eel_spawned_fmt;
+    char* _msg_scrap_ship_bc_fmt;
+    char* _msg_colony_d_rebels_lost_fmt;
+    char* _msg_colony_scrap_building_fmt;
+    char* _msg_hyperspace_beast_ate_other_ship_fmt;
+    char* _msg_colony_built_android_worker_fmt;
+    char* _msg_colony_built_refit_fmt;
+    char* _msg_artemis_leader_fmt;
+    char* _msg_colony_your_rebellion_won_fmt;
+    char* _msg_colony_plague_fmt;
+    char* _msg_anomaly_fmt;
+    char* _msg_diplomacy_strings[5];
+    char* _msg_colony_starvation_both_fmt;
+    char* _msg_colony_built_spy_fmt;
+    char* _msg_colony_built_building_fmt;
+    char* _msg_artemis_fmt;
+    char* _msg_colony_1_rebel_lost_fmt;
+    char* _msg_hyperspace_beast_ate_your_ship_fmt;
+    char* _msg_colony_1_settler_arrived_fmt;
+    char* _msg_colony_d_settlers_arrived_over_limit_fmt;
+
     int16_t __cdecl N_Msgs_For_Player_(int16_t player_idx) {
         return (int16_t)_n_msgs[player_idx];
     }

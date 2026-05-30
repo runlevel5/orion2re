@@ -2,6 +2,8 @@
 
 namespace namestar {
 
+s_input_box_state _input_box;
+
 int16_t __cdecl Star_Name_Popup_Screen_Center_X_() {
     return 0xb1;
 }

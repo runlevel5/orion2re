@@ -4,11 +4,9 @@
 struct s_player;
 
 namespace newtech {
-    inline int16_t* _best_category =
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x005A4AC0});
+    extern int16_t _best_category[12];
 
-    inline int32_t* _tech_research_level_values =
-        reinterpret_cast<int32_t*>(std::uintptr_t{0x00558B58});
+    extern int32_t _tech_research_level_values[23];
 
     int16_t __cdecl Get_Competition_Tech_Values_(int16_t category, int16_t player_idx);
 

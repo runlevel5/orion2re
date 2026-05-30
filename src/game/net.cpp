@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace net {
+    uint32_t _thisHost;
+
     int32_t __cdecl NetPoll_(s_comcore_poll_buf* poll_buf) {
         HRESULT receive_result;
         uint32_t id_from;

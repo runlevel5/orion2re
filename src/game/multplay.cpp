@@ -2,6 +2,70 @@
 
 namespace MULTPLAY {
 
+    char _global_chat_string[60];
+
+    s_mp_screen _g_mp_screen;
+
+    const char s_Evan_Axelrad_0055aa48[16] = "Evan Axelrad";
+
+    const char s_MULTIGM_LBX_00558d04[12] = "MULTIGM.LBX";
+
+    const char* PTR_00558D3C = s_MULTIGM_LBX_00558d04;
+
+    const char s_Moo_II_0055aa88[8] = "Moo II ";
+
+    s_palette_entry _green_pal_colors[16] = {
+        {1, 4, 8, 1},
+        {1, 4, 11, 2},
+        {1, 5, 14, 2},
+        {1, 5, 17, 2},
+        {1, 5, 20, 2},
+        {1, 5, 22, 2},
+        {1, 5, 25, 3},
+        {1, 5, 28, 3},
+        {1, 5, 31, 3},
+        {1, 5, 34, 3},
+        {1, 5, 36, 3},
+        {1, 5, 39, 4},
+        {1, 5, 42, 4},
+        {1, 5, 45, 4},
+        {1, 5, 48, 4},
+        {1, 5, 50, 4},
+    };
+
+    s_palette_entry _cur_pal_colors[16];
+
+    char _baud_rate_strings[8][6] = {
+        "1200",
+        "2400",
+        "4800",
+        "9600",
+        "14400",
+        "19200",
+        "28800",
+        "38400",
+    };
+
+    const char s_COM_PORT_FMT[7] = "COM:%d";
+
+    const char s_COM_PORT_FMT_v2[6] = "COM%d";
+
+    const char s_BAUD_RATE_FMT[4] = "%ld";
+
+    const char s_name_fmt[7] = "(%s)  ";
+
+    const char s_gnn_fmt[12] = "( GNN )  %s";
+
+    const char s_chat_msg_fmt[9] = "(%s)  %s";
+
+    uint8_t _allow_chat_mode;
+
+    const char s__00551100[1] = "";
+
+    const char s__00551120[2] = "\x1B";
+
+    const char s_S_005569cc[2] = "S";
+
     void __cdecl Draw_Modem_Setup_Screen_(void) {
         char buffer[128];
         s_colors local_colors;
@@ -1241,7 +1305,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         style_colors = *MISC::Font_Colors2_(4, 146, 152);
         fonts::Set_Font_Style_(4, &style_colors);
 
-        s_modem_settings* settings = reinterpret_cast<s_modem_settings*>(&NETMOX::_net);
+        s_modem_settings* settings = &NETMOX::_net.modem_settings;
 
         sprintf(buffer, s_COM_PORT_FMT, settings->com_port_index + 1);
         fonts::Print_(x + 119, y + 83, buffer);
@@ -1303,15 +1367,14 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         fonts::Set_Font_Style_(static_cast<uint8_t>(MOX::_mp_screen->subscreen_mode), &local_colors);
         
         MOX::_mp_screen->game_list_field_ids[3] = fields::Add_Continuous_String_Input_Field_(
-            x_offset, sy + 0x81, 0x9A, 0x10, net::modem_settings_cmd_reset, 0x1E, 0, 0, 0x29, 0
+            x_offset, sy + 0x81, 0x9A, 0x10, NETMOX::_net.modem_settings.cmd_reset, 0x1E, 0, 0, 0x29, 0
         );
-        
         MOX::_mp_screen->game_list_field_ids[4] = fields::Add_Continuous_String_Input_Field_(
-            x_offset, sy + 0x99, 0x9A, 0x10, net::modem_settings_cmd_init, 0x1E, 0, 0, 0x29, 0
-        );
+            x_offset, sy + 0x99, 0x9A, 0x10, NETMOX::_net.modem_settings.cmd_init, 0x1E, 0, 0, 0x29, 0
         
+        );
         MOX::_mp_screen->game_list_field_ids[6] = fields::Add_Continuous_String_Input_Field_(
-            x_offset, sy + 0xB1, 0x9A, 0x10, net::modem_settings_cmd_hangup, 0x1E, 0, 0, 0x29, 0
+            x_offset, sy + 0xB1, 0x9A, 0x10, NETMOX::_net.modem_settings.cmd_hangup, 0x1E, 0, 0, 0x29, 0
         );
         
         MOX::_mox_font_colors_offset = 0x96;
@@ -1322,7 +1385,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         fonts::Set_Font_Style_(4, &local_colors);
         
         MOX::_mp_screen->game_list_field_ids[2] = fields::Add_Continuous_String_Input_Field_(
-            sx + 0x91, sy + 0x5B, 0x96, 0x10, net::modem_settings_dial_number, 0x20, 0, 0, 0x29, 0
+            sx + 0x91, sy + 0x5B, 0x96, 0x10, NETMOX::_net.modem_settings.dial_number, 0x20, 0, 0, 0x29, 0
         );
     }
 
@@ -1641,7 +1704,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
             }
 
             if (icon_entry > 0) {
-                const char* lbx_ptr = *MULTPLAY::PTR_00558D3C;
+                const char* lbx_ptr = MULTPLAY::PTR_00558D3C;
                 s_animation_header* icon_anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_ptr, icon_entry, MOX::_global_cache_seg);
                 animate::Draw_(MOX::_mp_screen->screen_x + 0x17C, y_date, icon_anim);
             }
@@ -1709,7 +1772,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
     fonts::Set_Font_Special_Colors_(&local_colors2);
     
     char name_buffer[80];
-    sprintf(name_buffer, s_format_0055aa28, MOX::_player[MOX::_PLAYER_NUM].name);
+    sprintf(name_buffer, s_name_fmt, MOX::_player[MOX::_PLAYER_NUM].name);
     
     int16_t name_width = fonts::Get_String_Width_(name_buffer);
     MULTPLAY::_global_chat_string[0] = '\0';
@@ -2328,7 +2391,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             x = screen_x + 40 /* 0x28 */;
             y = screen_y + 65 /* 0x41 */ + row_idx * 36 /* 0x24 */;
 
-            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
+            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, entry_id, MOX::_global_cache_seg);
             animate::Draw_(x, y, MOX::_mp_screen->player_banner_anims[player_idx]);
         } else {
             entry_id = (uint8_t)player->race * 8 + (uint8_t)player->color + 150 /* 0x96 */;
@@ -2337,7 +2400,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             // Vertical position depends on player_idx pair (rows of 2)
             y = (int16_t)(player_idx / 2) * 36 /* 0x24 */ + screen_y + 65 /* 0x41 */;
 
-            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
+            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, entry_id, MOX::_global_cache_seg);
             animate::Draw_(x, y, MOX::_mp_screen->player_banner_anims[player_idx]);
         }
     }
@@ -2348,16 +2411,16 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
         memset(MOX::_mp_screen, 0, sizeof(s_mp_screen));
 
-        memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055AA48, 13);
+        memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
         MOX::_mp_screen->needs_full_redraw = 1;
 
-        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 0, MOX::_global_cache_seg);
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 27 /* 0x1B */, MOX::_global_cache_seg);
-        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 28 /* 0x1C */, MOX::_global_cache_seg);
-        MOX::_mp_screen->anim_turn_screen_bot = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 29 /* 0x1D */, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 27 /* 0x1B */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 28 /* 0x1C */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_bot = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 29 /* 0x1D */, MOX::_global_cache_seg);
 
-        MOX::_mp_screen->anim_btn_begin = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558D04, 16 /* 0x10 */, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558D04, 257 /* 0x101 */, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_begin = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 16 /* 0x10 */, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 257 /* 0x101 */, MOX::_screen_seg);
 
         MOX::_mp_screen->num_remaining_humans = HAROLD::Get_N_Remaining_Humans_();
     }

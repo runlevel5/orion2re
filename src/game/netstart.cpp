@@ -23,6 +23,20 @@ struct s_load_net_screen_packet {
 static_assert(sizeof(s_load_net_screen_packet) == 0x60, "s_load_net_screen_packet size mismatch");
 
 namespace NETSTART {
+    char* _dialing_failed_error;
+    char* _receiving_chunk_d_of_d;
+    char* _really_begin_game_with_unused_slots_msg;
+    char* _really_start_with_only_1_msg;
+    char* _no_more_player_slots_error;
+    char* _game_full_string;
+    char* _answering_failed_error;
+    char* _windows_string;
+
+    char s__00551100[1] = "";
+    char s_myname_005597dc[12] = "myname";
+    const char s__s_00551130[8] = "%s";
+    const char s_Mar_26_1997_005578e0[12] = "Mar 26 1997";
+
     int8_t __cdecl Net_Select_Race_() {
         uint8_t fade_flag;
         s_player* local_player = &MOX::_player[MOX::_PLAYER_NUM];
@@ -102,7 +116,7 @@ namespace NETSTART {
         }
 
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, s__00551100, 0);
+        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, const_cast<char*>(s__00551100), 0);
 
         NETMOX::_net.sync_state = 7;
         message_buffer = (int32_t)selection;
@@ -365,7 +379,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, const_cast<char*>(s__00551100), const_cast<char*>(s_myname_005597dc)) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, s__00551100, s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;

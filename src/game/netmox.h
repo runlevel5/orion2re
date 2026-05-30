@@ -1,50 +1,35 @@
 #pragma once
 
 namespace NETMOX {
-    inline s_network& _net = *reinterpret_cast<s_network*>(std::uintptr_t{0x00595170});
+    extern s_network _net;
 
-    inline uint8_t& _sending_msg =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AD40});
+    extern uint8_t _sending_msg;
 
-    inline char*& _lost_net_user_error =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00572358});
+    extern char* _lost_net_user_error;
 
-    inline char*& _only_1_host_allowed_error =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00572374});
+    extern char* _only_1_host_allowed_error;
 
-    inline char*& _modem_diff_buffer_error =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00572378});
+    extern char* _modem_diff_buffer_error;
 
-    inline char*& _modem_disk_error =
-        *reinterpret_cast<char**>(std::uintptr_t{0x0057237C});
+    extern char* _modem_disk_error;
 
-    inline s_net_modem_file& _secret_modem_file =
-        *reinterpret_cast<s_net_modem_file*>(std::uintptr_t{0x00572360});
+    extern s_net_modem_file _secret_modem_file;
 
-    inline const char* s_modem_tmp_0055ad4c =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AD4C}); // "modem.tmp"
+    extern const char s_modem_tmp_0055ad4c[10]; // "modem.tmp"
 
-    inline char*& _sending_chunk_d_of_d_fmt =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00572380});
+    extern char* _sending_chunk_d_of_d_fmt;
 
-    inline char*& _incompatible_versions_error =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00572384});
+    extern char* _incompatible_versions_error;
 
-    inline char*& _ambassador_left_before_you_arrived_fmt =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00572388});
+    extern char* _ambassador_left_before_you_arrived_fmt;
 
-    inline char*& _net_send_error =
-        *reinterpret_cast<char**>(std::uintptr_t{0x0057238C});
+    extern char* _net_send_error;
 
-    inline uint8_t& _in_receive_message =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057235C});
+    extern uint8_t _in_receive_message;
 
-    inline uint8_t& _is_updating = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AD44});
+    extern uint8_t _is_updating;
 
-    inline uint8_t& _next_update_player_counter = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AD48});
-
-    inline uint8_t& _net_players_active_mask =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00595300});
+    extern uint8_t _next_update_player_counter;
 
     int32_t __cdecl Human_Requesting_Diplomacy_();
 
@@ -91,15 +76,15 @@ namespace NETMOX {
 
     int8_t __cdecl Decode_Broadcast_Game_Data_Differential_(void* buffer, size_t size, uint8_t flag);
 
-    inline char* s_wb_00551178 = reinterpret_cast<char*>(std::uintptr_t{0x00551178});
-    inline char* s_rb_0055117c = reinterpret_cast<char*>(std::uintptr_t{0x0055117C});
-    inline char* s_error_decoding_broadcast_0055ad58 = reinterpret_cast<char*>(std::uintptr_t{0x0055AD58});
-    inline const char* s_p_limit_p_diff_0055ad74 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AD74}); /* "p_limit < p_diff" */
-    inline const char* s_fseek_ahead_modem_file_0055ad88 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AD88}); /* "fseek ahead modem_file" */
-    inline const char* s_fread_modem_file_0055ada0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055ADA0}); /* "fread modem_file" */
-    inline const char* s_fseek_modem_file_0055adb4 = reinterpret_cast<const char*>(std::uintptr_t{0x0055ADB4}); /* "fseek modem_file" */
+    extern const char s_wb_00551178[3];
+    extern const char s_rb_0055117c[3];
+    extern const char s_error_decoding_broadcast_0055ad58[25];
+    extern const char s_p_limit_p_diff_0055ad74[17]; /* "p_limit < p_diff" */
+    extern const char s_fseek_ahead_modem_file_0055ad88[23]; /* "fseek ahead modem_file" */
+    extern const char s_fread_modem_file_0055ada0[17]; /* "fread modem_file" */
+    extern const char s_fseek_modem_file_0055adb4[17]; /* "fseek modem_file" */
 
-    s_net_modem_file* __cdecl Open_Modem_File_(char* mode, uint32_t size);
+    s_net_modem_file* __cdecl Open_Modem_File_(const char* mode, uint32_t size);
 
     int __cdecl fseek_modem_file_(s_net_modem_file* mod_file, int offset, int origin);
 

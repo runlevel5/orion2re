@@ -3,6 +3,43 @@
 namespace ALLOC = allocate;
 
 namespace MOX2 {
+    int8_t _user_wants_n_space_monsters;
+    uint8_t _pan_main_menu_panel;
+    uint8_t _skip_intro;
+    uint8_t _quick_start;
+    char _leave_game_message[100];
+
+    const char s_MOX_SET[8] = "MOX.SET";
+    const char s_language_ini[13] = "language.ini";
+    const char s_language_ini_write_mode[3] = "wt";
+    const char s_rt[3] = "rt";
+    const char s_Thanks_English[38] = "Thanks for playing Master of Orion ][";
+    const char s_Thanks_German[49] = "Danke, da\xDF Sie Master of Orion II gew\xE4hlt haben.";
+    const char s_Thanks_French[36] = "Merci de jouer \xE0 Master of Orion II";
+    const char s_Thanks_Spanish[41] = "Gracias por jugar con Master of Orion II";
+    const char s_Thanks_Italian[47] = "Grazie per aver giocato a Master of Orion II !";
+
+    const char s_Loading_English[44] = "Loading Master of Orion II, please wait....";
+    const char s_Loading_German[50] = "Master of Orion II wird geladen, bitte warten....";
+    const char s_Loading_French[66] = "Chargement de Master of Orion II en cours, veuillez patienter....";
+    const char s_Loading_Spanish[50] = "Cargando Master of Orion II, espera, por favor...";
+    const char s_Loading_Italian[55] = "Caricamento di Master of Orion II. Attendere, prego...";
+
+    const char s_Non_trovo_il_file_ORIONCD_INI_005578ec[62] = "Non trovo il file ORIONCD.INI. Bisogna reinstallare Orion II.";
+    const char s_ORIONCD_INI_no_se_ha_encontrado_0055792c[61] = "ORIONCD.INI no se ha encontrado. Vuelve a instalar Orion ][.";
+    const char s_ORIONCD_INI_introuvable_0055796c[56] = "ORIONCD.INI introuvable. Veuillez r\x82installer Orion II.";
+    const char s_ORIONCD_INI_nicht_gefunden_005579a4[61] = "ORIONCD.INI nicht gefunden. Bitte Orion II neu installieren.";
+    const char s_ORIONCD_INI_not_found_005579e4[51] = "ORIONCD.INI not found. Please Re-Install Orion ][.";
+    const char s_Non_riesco_a_trovare_qualche_fil_00557a18[85] = "Non riesco a trovare qualche file. Bisogna reinserire il CD o reinstallare il gioco.";
+    const char s_No_se_puede_localizar_todos_los_f_00557a70[99] = "No se puede localizar todos los ficheros del juego.  Por favor mete el CD-ROM o vuelve a instalar.";
+    const char s_Echec_de_la_localisation_de_tous_00557ad4[93] = "Echec de la localisation de tous les fichiers de jeu. Veuillez ins\x82rer le CD ou r\x82installer.";
+    const char s_Nicht_alle_Spieldateien_auffindb_00557b34[77] = "Nicht alle Spieldateien auffindbar. Bitte CD einlegen oder neu installieren.";
+    const char s_Cannot_locate_all_game_files_00557b84[63] = "Cannot locate all game files.  Please insert CD or re-install.";
+    const char s_diplomat_lbx_00557bc4[13] = "diplomat.lbx";
+    const char s__sdiplomat_lbx_00557bd4[15] = "%sdiplomat.lbx";
+    const char s_backslash_00557be4[2] = "\\";
+    const char s_orioncd_ini_00557bec[12] = "orioncd.ini";
+
     void __cdecl Init_Map_Pictures_Default__() {
         MAPGEN::Load_Nebula_Pictures_();
         Init_Map_Defaults_();

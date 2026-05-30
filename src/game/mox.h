@@ -2,165 +2,139 @@
 
 namespace MOX {
     extern const char _ship_type_names[5][6][16];
-    inline int8_t (*_tech_categories)[2] = reinterpret_cast<int8_t(*)[2]>(std::uintptr_t{0x00558FD0});
-    inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
-    inline uint8_t (&_first_field_in_group)[10] = *reinterpret_cast<uint8_t(*)[10]>(0x00558D30);
-    inline s_animation_header* (&_fighter_seg)[15][64] =
-        *reinterpret_cast<s_animation_header* (*)[15][64]>(std::uintptr_t{0x005A1CC0});
-    inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
-    inline int16_t (&_ordnance_bonus)[15] =
-        *reinterpret_cast<int16_t(*)[15]>(std::uintptr_t{0x00597050});
-    inline int16_t& _n_fltscrn_big_icons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597018});
-    inline int16_t& _n_fltscrn_big_icons = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005973E2});
-    inline int8_t& _n_fltscrn_rows = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00597A92});
-    inline int16_t& _old_small_ship_stack_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAA8});
-    inline int16_t& _old_first_fltscrn_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183C});
-    inline int16_t& _n_big_icons_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1838});
-    inline uint8_t& _galaxy_star_anim_count = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597AEA});
-    inline int16_t& _fltscrn_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5E});
-    inline int8_t& _big_icon_display_columns = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059BD14});
-    inline int8_t& _big_icon_display_rows = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005974E4});
-    inline uint16_t& _ken_trace = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005974EE});
-    inline int8_t& _big_icon_display_max_icons = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00597828});
-    inline int16_t& _big_icon_x_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2BEA});
-    inline int16_t& _big_icon_y_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784E});
-    inline int16_t& _offpop_big_icon_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C456});
-    inline uint8_t& _drawing_officer_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D50});
-    inline int16_t*& _fltscrn_ship_icon_selection_list = *reinterpret_cast<int16_t**>(std::uintptr_t{ 0x0059b4a0 });
-    inline uint8_t& _look_at_colonies = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A185F});
-    inline s_big_icon*& _fltscrn_big_icon = *reinterpret_cast<s_big_icon**>(std::uintptr_t{0x00597460});
-    inline uint8_t& _add_help_fields = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597024});
-    inline uint8_t& _first_time = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059749C});
-    inline int16_t& _fleet_movement_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597820});
-    inline uint8_t& _draw_expanding_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BF32});
-    inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
-    inline s_scroll_bar*& _scroll_bar = *reinterpret_cast<s_scroll_bar**>(std::uintptr_t{0x00597370});
-    inline int16_t& _fltscrn_stack_owner = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059D6B6});
-    inline uint8_t& _add_scrap_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E1});
-    inline uint8_t& _skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059bef0 });
-    inline uint8_t& _fix_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059baac });
-    inline s_animation_header*& _scrap_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597824});
-    inline s_animation_header* (&_colony_marker_seg)[8] = *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x00597800});
-    inline s_animation_header* (&_outpost_marker_seg)[8] = *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x005A2BC0});
-    inline s_animation_header*& _o_highlight_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597708});
-    inline uint8_t& _add_all_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B438});
-    inline s_animation_header*& _fleet_all_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D4C});
-    inline s_animation_header*& _fleet_return_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597920});
-    inline int16_t& _old_fltscrn_stack_owner =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597918});
-    inline s_animation_header*& _up_scroll_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597914});
-    inline s_animation_header*& _down_scroll_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C45C});
-    inline s_animation_header*& _prev_fleet_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BD10});
-    inline s_animation_header*& _next_fleet_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D20});
-    inline s_animation_header*& _relocate_fleet_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C450});
-    inline s_animation_header*& _officers_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1820});
-    inline uint8_t& _add_officers_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B4BB});
-    inline short& _fltscrn_support_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x0059776C});
-    inline short& _fltscrn_combat_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x00597464});
-    inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
-    inline int8_t (&_player_mode)[15] =
-        *reinterpret_cast<int8_t(*)[15]>(std::uintptr_t{0x0059D650});
-    inline int16_t& _cur_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6c0});
-    inline int16_t& _net_destination = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b8});
-    inline int16_t& _done_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b4});
-    inline int16_t& _msl_impact_warning_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a98});
-    inline int16_t& _draw_legal_boxes_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059bfb4});
-    inline int16_t& _msl_warning_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059c028});
-    inline int16_t& _wait_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6be});
-    inline int16_t& _scan_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059bf30});
-    inline int16_t (&_missile_field)[300] =
-        *reinterpret_cast<int16_t(*)[300]>(std::uintptr_t{0x00597AF0});
-    inline int16_t (&_combat_grid)[81][68] =
-        *reinterpret_cast<int16_t (*)[81][68]>(std::uintptr_t{0x00598770});
-    inline int16_t (&_weapon_mod_field_status)[15] =
-        *reinterpret_cast<int16_t(*)[15]>(std::uintptr_t{0x00596CE0});
-    inline int16_t* _weapon_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E80});
-    inline int16_t* _ship_turn_order = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BB20});
-    inline int16_t* _repl_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D30});
-    inline int16_t* _side_end_of_turn = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596DA0});
-    inline int16_t& DAT_0059730e = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059730E});
-    inline int16_t (&_design_choice_items)[40] =
-        *reinterpret_cast<int16_t (*)[40]>(std::uintptr_t{0x00597310});
-    inline int16_t (&_weapon_mod_fields)[15] =
-        *reinterpret_cast<int16_t(*)[15]>(std::uintptr_t{0x00596FE0});
-    inline int16_t (&_weapon_arc_field)[5] =
-        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x00597900});
-    inline int16_t (&_weapon_rack_field)[5] =
-        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A49C0});
-    inline int16_t& _multi_colored_box_color_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059776A});
-    inline int16_t& _beam_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2BE8});
-    inline int16_t& _missile_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597428});
-    inline int16_t& _special_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059790A});
-    inline int16_t& _replacement_box_accept_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005978F4});
-    inline int16_t& _bomb_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597662});
-    inline int16_t& ENDOF__save_game_description = _bomb_filter_button;
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    extern int8_t _tech_categories[51][2];
+    extern const char s_combat_lbx[11];
+    extern uint8_t _first_field_in_group[10];
+    extern s_animation_header* _fighter_seg[15][64];
+    extern uint8_t _draw_officer_to_back;
+    extern int16_t _ordnance_bonus[15];
+    extern int16_t _n_fltscrn_big_icons_added;
+    extern int16_t _n_fltscrn_big_icons;
+    extern int8_t _n_fltscrn_rows;
+    extern int16_t _old_small_ship_stack_ptr;
+    extern int16_t _old_first_fltscrn_icon;
+    extern int16_t _n_big_icons_selected;
+    extern uint8_t _galaxy_star_anim_count;
+    extern int16_t _fltscrn_bar_value;
+    extern int8_t _big_icon_display_columns;
+    extern int8_t _big_icon_display_rows;
+    extern uint16_t _ken_trace;
+    extern int8_t _big_icon_display_max_icons;
+    extern int16_t _big_icon_x_offset;
+    extern int16_t _big_icon_y_offset;
+    extern int16_t _offpop_big_icon_selected;
+    extern uint8_t _drawing_officer_popup;
+    extern int16_t* _fltscrn_ship_icon_selection_list;
+    extern uint8_t _look_at_colonies;
+    extern s_big_icon* _fltscrn_big_icon;
+    extern uint8_t _add_help_fields;
+    extern uint8_t _first_time;
+    extern int16_t _fleet_movement_bar_value;
+    extern uint8_t _draw_expanding_box;
+    extern uint8_t _mainscr_palette;
+    extern s_scroll_bar* _scroll_bar;
+    extern int16_t _fltscrn_stack_owner;
+    extern uint8_t _add_scrap_button;
+    extern uint8_t _skip_draw_ships;
+    extern uint8_t _fix_palette;
+    extern s_animation_header* _scrap_button_seg;
+    extern s_animation_header* _colony_marker_seg[8];
+    extern s_animation_header* _outpost_marker_seg[8];
+    extern s_animation_header* _o_highlight_seg;
+    extern uint8_t _add_all_button;
+    extern s_animation_header* _fleet_all_button_seg;
+    extern s_animation_header* _fleet_return_button_seg;
+    extern int16_t _old_fltscrn_stack_owner;
+    extern s_animation_header* _up_scroll_button_seg;
+    extern s_animation_header* _down_scroll_button_seg;
+    extern s_animation_header* _prev_fleet_button_seg;
+    extern s_animation_header* _next_fleet_button_seg;
+    extern s_animation_header* _relocate_fleet_button_seg;
+    extern s_animation_header* _officers_button_seg;
+    extern uint8_t _add_officers_button;
+    extern short _fltscrn_support_button_status;
+    extern short _fltscrn_combat_button_status;
+    extern s_mp_screen* _mp_screen;
+    extern int8_t _player_mode[15];
+    extern int16_t _cur_ship;
+    extern int16_t _net_destination;
+    extern int16_t _done_button;
+    extern int16_t _msl_impact_warning_button;
+    extern int16_t _draw_legal_boxes_button;
+    extern int16_t _msl_warning_button;
+    extern int16_t _wait_button;
+    extern int16_t _scan_button;
+    extern int16_t _missile_field[300];
+    extern int16_t _combat_grid[81][68];
+    extern int16_t _weapon_mod_field_status[15];
+    extern int16_t _weapon_button[8];
+    extern int16_t _ship_turn_order[210];
+    extern int16_t _repl_fields[10];
+    extern int16_t _side_end_of_turn[15];
+    extern int16_t DAT_0059730e;
+    extern int16_t _design_choice_items[40];
+    extern int16_t _weapon_mod_fields[15];
+    extern int16_t _weapon_arc_field[5];
+    extern int16_t _weapon_rack_field[5];
+    extern int16_t _multi_colored_box_color_start;
+    extern int16_t _beam_filter_button;
+    extern int16_t _missile_filter_button;
+    extern int16_t _special_filter_button;
+    extern int16_t _replacement_box_accept_button;
+    extern int16_t _bomb_filter_button;
+    extern const char s__00551100[1];
 
-    inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
+    extern uint16_t _fleet_box_map_height;
     inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
-    inline s_current_design*& _design =
-        *reinterpret_cast<s_current_design**>(std::uintptr_t{0x0059B330});
+    extern s_current_design* _design;
 
-    inline int16_t& _scanned_big_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2A});
-    inline int16_t& _small_ship_stack_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977B4});
-    inline int16_t& _scanned_small_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49B2});
-    inline int16_t& _n_fltscrn_officers = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183A});
-    inline int16_t*& _officer_id_list = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00596E94});
+    extern int16_t _scanned_big_ship;
+    extern int16_t _small_ship_stack_ptr;
+    extern int16_t _scanned_small_ship;
+    extern int16_t _n_fltscrn_officers;
+    extern int16_t* _officer_id_list;
     // Suggested name: MOX::_star_colors_seg
-    inline s_animation_header* (&_star_colors_seg)[11] =
-        *reinterpret_cast<s_animation_header* (*)[11]>(std::uintptr_t{0x00597430});
-    inline s_animation_header* (&_fleet_galaxy_star_seg)[11] =
-        *reinterpret_cast<s_animation_header*(*)[11]>(std::uintptr_t{0x00596F50});
-    inline s_animation_header* (&_colony_galaxy_star_seg)[10] =
-        *reinterpret_cast<s_animation_header* (*)[10]>(std::uintptr_t{0x00597AA0});
-    inline s_animation_header* (&_officer_skill_icon_seg)[27] =
-        *reinterpret_cast<s_animation_header*(*)[27]>(std::uintptr_t{0x005A1BD0});
-    inline s_animation_header* (&_hl_antaran_ship_icon_seg)[24] =
-        *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597380});
-    inline s_animation_header* (&_antaran_ship_icons)[24] =
-        *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597670});
-    inline s_animation_header* (&_o_ring_seg)[5] =
-        *reinterpret_cast<s_animation_header* (*)[5]>(std::uintptr_t{0x00596D80});
-    inline s_animation_header* (&_planet_mask_seg)[5] =
-        *reinterpret_cast<s_animation_header* (*)[5]>(std::uintptr_t{0x00596F90});
-    inline s_animation_header* (& _fltscrn_small_ship_icon_seg)[8] =
-        *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x005A1760});
-    inline s_animation_header* (&_monster_ship_seg)[4] =
-        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x0059BF10});
-    inline s_animation_header* (&_hl_monster_ship_icon_seg)[4] =
-        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x005A17A0});
-    inline s_animation_header* (&_ship_icon_seg)[32] =
-        *reinterpret_cast<s_animation_header* (*)[32]>(std::uintptr_t{0x005A1870});
-    inline s_animation_header* (&_hl_ship_icon_seg)[32] =
-        *reinterpret_cast<s_animation_header* (*)[32]>(std::uintptr_t{0x005A4A00});
-    inline s_animation_header*& _fleet_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005a47d8 });
-    inline void*& _officer_pictures_screen_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597778});
-    inline s_animation_header*& _officer_main_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597830});
-    inline s_animation_header*& _officer_colony_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B44C});
-    inline s_animation_header*& _officer_colony_ldrs_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596FAC});
-    inline s_animation_header*& _officer_ship_ldrs_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596C98});
-    inline s_animation_header*& _officer_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B54});
-    inline s_animation_header*& _officer_dn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596E9C});
-    inline s_animation_header*& _officer_prev_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596440});
-    inline s_animation_header*& _officer_next_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597008});
-    inline s_animation_header*& _officer_hire_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059D6C4});
-    inline s_animation_header*& _officer_return_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B440});
-    inline s_animation_header*& _officer_cancel_hire_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5FC});
-    inline s_animation_header*& _selected_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977E8});
-    inline s_animation_header*& _scanned_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977E4});
-    inline s_animation_header*& _fleet_scroll_anim_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B40});
-    inline void*& _officer_normal_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059BD2C});
-    inline void*& _officer_bright_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597020});
-    inline s_animation_header**& _temp_officers_pict = *reinterpret_cast<s_animation_header***>(std::uintptr_t{0x0059B338});
-    inline s_animation_header*& _officer_dismiss_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5E4});
-    inline s_animation_header*& _officer_fleet_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005979A8});
-    inline s_animation_header*& _dull_officer_dismiss_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005979AC});
-    inline s_animation_header*& _dull_officer_pool_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059b468});
-    inline s_animation_header*& _officer_pool_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597acc});
-    inline s_animation_header*& _dull_officer_hire_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1BC4});
-    inline s_animation_header*& _officer_hire_replace_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B48});
-    inline int8_t& _officer_scanned = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596E70});
-    inline int8_t& _officer_scrn_type = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00597414 });
+    extern s_animation_header* _star_colors_seg[11];
+    extern s_animation_header* _fleet_galaxy_star_seg[11];
+    extern s_animation_header* _colony_galaxy_star_seg[10];
+    extern s_animation_header* _officer_skill_icon_seg[27];
+    extern s_animation_header* _hl_antaran_ship_icon_seg[24];
+    extern s_animation_header* _antaran_ship_icons[24];
+    extern s_animation_header* _o_ring_seg[5];
+    extern s_animation_header* _planet_mask_seg[5];
+    extern s_animation_header* _fltscrn_small_ship_icon_seg[8];
+    extern s_animation_header* _monster_ship_seg[4];
+    extern s_animation_header* _hl_monster_ship_icon_seg[4];
+    extern s_animation_header* _ship_icon_seg[32];
+    extern s_animation_header* _hl_ship_icon_seg[32];
+    extern s_animation_header* _fleet_background_seg;
+    extern void* _officer_pictures_screen_seg;
+    extern s_animation_header* _officer_main_seg;
+    extern s_animation_header* _officer_colony_box_seg;
+    extern s_animation_header* _officer_colony_ldrs_button_seg;
+    extern s_animation_header* _officer_ship_ldrs_button_seg;
+    extern s_animation_header* _officer_up_button_seg;
+    extern s_animation_header* _officer_dn_button_seg;
+    extern s_animation_header* _officer_prev_button_seg;
+    extern s_animation_header* _officer_next_button_seg;
+    extern s_animation_header* _officer_hire_button_seg;
+    extern s_animation_header* _officer_return_button_seg;
+    extern s_animation_header* _officer_cancel_hire_button_seg;
+    extern s_animation_header* _selected_box_seg;
+    extern s_animation_header* _scanned_box_seg;
+    extern s_animation_header* _fleet_scroll_anim_seg;
+    extern void* _officer_normal_window_seg;
+    extern void* _officer_bright_window_seg;
+    extern s_animation_header** _temp_officers_pict;
+    extern s_animation_header* _officer_dismiss_button_seg;
+    extern s_animation_header* _officer_fleet_box_seg;
+    extern s_animation_header* _dull_officer_dismiss_button_seg;
+    extern s_animation_header* _dull_officer_pool_button_seg;
+    extern s_animation_header* _officer_pool_button_seg;
+    extern s_animation_header* _dull_officer_hire_button_seg;
+    extern s_animation_header* _officer_hire_replace_seg;
+    extern int8_t _officer_scanned;
+    extern int8_t _officer_scrn_type;
     inline int8_t& _officer_selected = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059D6D0 });
 
     inline int16_t& _special_scroll_dn_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596434});

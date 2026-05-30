@@ -1,6 +1,13 @@
 #include "pch.h"
 
 namespace newtech {
+    int16_t _best_category[12];
+
+    int32_t _tech_research_level_values[23] = {
+        0, 1, 3, 6, 12, 22, 36, 62, 102, 172, 292, 492,
+        812, 1372, 2372, 3972, 6372, 9972, 10400, 10800, 11200, 11600, 12000,
+    };
+
     int16_t __cdecl Get_Competition_Tech_Values_(int16_t target_ai_group, int16_t exclude_player_idx) {
         int16_t max_ai_group = 0;
 

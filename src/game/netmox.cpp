@@ -1,6 +1,44 @@
 #include "pch.h"
 
 namespace NETMOX {
+    s_network _net;
+
+    uint8_t _sending_msg;
+
+    char* _lost_net_user_error;
+
+    char* _only_1_host_allowed_error;
+
+    char* _modem_diff_buffer_error;
+
+    char* _modem_disk_error;
+
+    s_net_modem_file _secret_modem_file;
+
+    const char s_modem_tmp_0055ad4c[10] = "modem.tmp";
+
+    char* _sending_chunk_d_of_d_fmt;
+
+    char* _incompatible_versions_error;
+
+    char* _ambassador_left_before_you_arrived_fmt;
+
+    char* _net_send_error;
+
+    uint8_t _in_receive_message;
+
+    uint8_t _is_updating;
+
+    uint8_t _next_update_player_counter;
+
+    const char s_wb_00551178[3] = "wb";
+    const char s_rb_0055117c[3] = "rb";
+    const char s_error_decoding_broadcast_0055ad58[25] = "error decoding broadcast";
+    const char s_p_limit_p_diff_0055ad74[17] = "p_limit < p_diff";
+    const char s_fseek_ahead_modem_file_0055ad88[23] = "fseek ahead modem_file";
+    const char s_fread_modem_file_0055ada0[17] = "fread modem_file";
+    const char s_fseek_modem_file_0055adb4[17] = "fseek modem_file";
+
     int32_t __cdecl Net_Id_To_Player_Id_(int32_t player_idx) {
         for (int32_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].network_player_id == player_idx) {
@@ -219,7 +257,7 @@ namespace NETMOX {
     }
 
     uint8_t Humans_Requesting_Diplomacy_() {
-        return _net_players_active_mask;
+        return _net.players_active_mask;
     }
 
     int32_t __cdecl Human_Requesting_Diplomacy_() {
@@ -1558,7 +1596,7 @@ namespace NETMOX {
         RUSS::Mox_Update_();
     }
 
-    s_net_modem_file* __cdecl Open_Modem_File_(char* mode_str, uint32_t size) {
+    s_net_modem_file* __cdecl Open_Modem_File_(const char* mode_str, uint32_t size) {
         RUSS::Mox_Update_();
 
         if (_secret_modem_file.mode == 2 && size != 0 && size != _secret_modem_file.buffer_size) {

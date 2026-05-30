@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace NEWPUP {
+    MOX2::action_func_t _saved_autofunction;
+
+    s_animation_header* _anims;
+
+    const char s__00551100[] = "";
+    const char s_0_0055110c[3] = "\0320";
+    const char s_1_00551110[3] = "\0321";
+
     // Patch: { 0x00487060, &NEWPUP::Troop_Popup_ },
     void __cdecl Troop_Popup_() {
         COLONY::_full_draw = 1;

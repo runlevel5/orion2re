@@ -50,45 +50,33 @@ namespace MULTPLAY {
     void __cdecl Load_Load_MP_Game_Screen_();
     void __cdecl Draw_Load_MP_Game_Screen_();
 
-    inline char (&_global_chat_string)[60] =
-        *reinterpret_cast<char(*)[60]>(std::uintptr_t{0x00571BF8});
+    extern char _global_chat_string[60];
 
-    inline s_mp_screen& _g_mp_screen = 
-        *reinterpret_cast<s_mp_screen*>(std::uintptr_t{0x00571C58});
+    extern s_mp_screen _g_mp_screen;
 
-    inline char* const s_Evan_Axelrad = reinterpret_cast<char*>(std::uintptr_t{0x0055AA48});
-    inline const char* s_Evan_Axelrad_0055aa48 = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA48}); // "Evan Axelrad"
-    inline const char* s_signature_axelrad = s_Evan_Axelrad_0055aa48;
+    extern const char s_Evan_Axelrad_0055aa48[16];
+    inline const char* const s_Evan_Axelrad = s_Evan_Axelrad_0055aa48;
+    inline const char* const s_signature_axelrad = s_Evan_Axelrad_0055aa48;
 
-    inline char* const s_MULTIGM_LBX = reinterpret_cast<char*>(std::uintptr_t{0x00558D04});
-    inline const char* s_MULTIGM_LBX_00558d04 = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x00558D04}); // "MULTIGM.LBX"
-    inline const char* lbx_filename = s_MULTIGM_LBX_00558d04;
+    extern const char s_MULTIGM_LBX_00558d04[12];
+    inline const char* const s_MULTIGM_LBX = s_MULTIGM_LBX_00558d04;
+    inline const char* const lbx_filename = s_MULTIGM_LBX_00558d04;
 
-    inline const char** PTR_00558D3C =
-        reinterpret_cast<const char**>(std::uintptr_t{0x00558D3C});
+    extern const char* PTR_00558D3C;
 
-    inline const char* s_Moo_II_0055aa88 = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA88}); // "Moo II "
+    extern const char s_Moo_II_0055aa88[8];
 
-    inline s_palette_entry (&_green_pal_colors)[16] =
-        *reinterpret_cast<s_palette_entry (*)[16]>(std::uintptr_t{0x0055A9A0});
+    extern s_palette_entry _green_pal_colors[16];
 
-    inline s_palette_entry (&_cur_pal_colors)[16] =
-        *reinterpret_cast<s_palette_entry (*)[16]>(std::uintptr_t{0x00579590});
+    extern s_palette_entry _cur_pal_colors[16];
 
-    inline char (&_baud_rate_strings)[8][6] =
-        *reinterpret_cast<char (*)[8][6]>(std::uintptr_t{0x0055A9E0});
+    extern char _baud_rate_strings[8][6];
 
-    inline const char* s_COM_PORT_FMT =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA9C}); // "COM:%d"
+    extern const char s_COM_PORT_FMT[7];
 
-    inline const char* s_COM_PORT_FMT_v2 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA94}); // "COM%d"
+    extern const char s_COM_PORT_FMT_v2[6];
 
-    inline const char* s_BAUD_RATE_FMT =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00558280}); // "%ld"
+    extern const char s_BAUD_RATE_FMT[4];
 
     int8_t __cdecl Do_Get_Valid_MP_Save_Games_(int8_t* valid_types_out);
 
@@ -104,9 +92,9 @@ namespace MULTPLAY {
 
     void __cdecl Hotseat_Print_Player_Data_(int16_t player_idx, int16_t row_idx);
 
-    inline const char* s_name_fmt = reinterpret_cast<const char*>(0x0055AA28);
-    inline const char* s_gnn_fmt = reinterpret_cast<const char*>(0x0055AA30);
-    inline const char* s_chat_msg_fmt = reinterpret_cast<const char*>(0x0055AA3C);
+    extern const char s_name_fmt[7];
+    extern const char s_gnn_fmt[12];
+    extern const char s_chat_msg_fmt[9];
 
     void __cdecl Get_Player_Colors_(int16_t player_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary);
 
@@ -128,8 +116,7 @@ namespace MULTPLAY {
 
     void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num);
 
-    inline uint8_t& _allow_chat_mode =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059538C});
+    extern uint8_t _allow_chat_mode;
 
     void __cdecl Reload_Generating_Map_Info_();
 
@@ -153,9 +140,9 @@ namespace MULTPLAY {
 
     void __cdecl Load_Choose_Multi_Net_Game_Screen_();
 
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
-    inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
-    inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC);
+    extern const char s__00551100[1];
+    extern const char s__00551120[2];
+    extern const char s_S_005569cc[2];
 
     void __cdecl Add_Banner_Field_(int16_t player_idx, int16_t vertical_idx);
 

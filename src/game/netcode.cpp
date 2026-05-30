@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace netcode {
+    uint32_t _netInitialized;
+    int8_t _tpSending;
+    uint8_t _inComms;
+    IDirectPlay* _dplay;
+    recv_fn _recv_fn;
+    int32_t _connection_type;
+    int32_t _in_send_message;
+
     int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
         RUSS::Mox_Update_();
         int32_t result = Net_Init_(mode, guid, recv_fn_ptr, network);
@@ -84,7 +92,7 @@ namespace netcode {
     }
 
     int32_t __cdecl Net_Is_Sending_() {
-        return (int32_t)netcode::_isSending;
+        return (int32_t)netcode::_tpSending;
     }
 
     int32_t __cdecl Net_Join_Game_(char* game_name, char* password, char* player_name) {
