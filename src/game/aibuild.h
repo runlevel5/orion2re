@@ -2,19 +2,16 @@
 #include <cstdint>
 
 namespace AIBUILD {
-    inline uint8_t (&_difficulty_ship_design)[12] =
-        *reinterpret_cast<uint8_t (*)[12]>(std::uintptr_t{0x0054F054});
-    inline int8_t (&_difficulty_intel_bias)[8] =
-        *reinterpret_cast<int8_t (*)[8]>(std::uintptr_t{0x0054F060});
-    inline uint8_t* _player_ship_size_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F068});
-    inline int (&_player_ship_sizes)[8][14] = *reinterpret_cast<int (*)[8][14]>(std::uintptr_t{0x00566088});
-    inline int (&_player_total_strength_vs_colonies)[8] = *reinterpret_cast<int (*)[8]>(std::uintptr_t{0x00566248});
-    inline uint8_t (&_player_n_transports)[8][2] = *reinterpret_cast<uint8_t (*)[8][2]>(std::uintptr_t{0x00566268});
-    inline int8_t (&_player_n_freighter_groups_wanted)[8] =
-        *reinterpret_cast<int8_t (*)[8]>(std::uintptr_t{0x00566278});
-    inline uint8_t (&_player_n_spies)[8][2] = *reinterpret_cast<uint8_t (*)[8][2]>(std::uintptr_t{0x00566280});
-    inline uint8_t (&_player_n_colony_ships)[8][3] = *reinterpret_cast<uint8_t (*)[8][3]>(std::uintptr_t{0x00566290});
-    inline int (&_player_total_strength_vs_ships)[8][3] = *reinterpret_cast<int (*)[8][3]>(std::uintptr_t{0x005A63F0});
+    extern uint8_t _difficulty_ship_design[12];
+    extern int8_t _difficulty_intel_bias[8];
+    extern uint8_t _player_ship_size_table[9];
+    extern int _player_ship_sizes[8][14];
+    extern int _player_total_strength_vs_colonies[8];
+    extern uint8_t _player_n_transports[8][2];
+    extern int8_t _player_n_freighter_groups_wanted[8];
+    extern uint8_t _player_n_spies[8][2];
+    extern uint8_t _player_n_colony_ships[8][3];
+    extern int _player_total_strength_vs_ships[8][3];
 
     /** Returns the refit cost for replacing one ship design with another.
      * @param player_idx Player paying for the refit.

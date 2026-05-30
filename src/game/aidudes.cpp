@@ -2,6 +2,17 @@
 
 namespace aidudes {
 
+    int16_t _n_our_blockaded;
+    int16_t _n_our_unblockaded;
+    s_aidudes_colony_info* _our_blockaded;
+    s_player* _p_ai;
+    s_aidudes_colony_info* _our_unblockaded;
+    int16_t _n_our_colonies;
+    s_aidudes_colony_info* _Sort_Pops_colony_info;
+    s_colony* _Sort_Pops_colony_data;
+    int16_t _i_ai;
+    s_aidudes_colony_info (*_our_colonies)[250];
+
     void __cdecl All_Colony_AI_() {
         int16_t num_players = (int16_t)MOX::_NUM_PLAYERS;
         s_player* plr = MOX::_player;

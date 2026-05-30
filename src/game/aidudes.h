@@ -4,26 +4,21 @@ struct s_colony;
 struct s_aidudes_colony_info;
 
 namespace aidudes {
-    inline int16_t& _n_our_blockaded = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657C0});
-    inline int16_t& _n_our_unblockaded = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657C4});
-    inline s_aidudes_colony_info*& _our_blockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657C8});
+    extern int16_t _n_our_blockaded;
+    extern int16_t _n_our_unblockaded;
+    extern s_aidudes_colony_info* _our_blockaded;
 
-    inline s_player*& _p_ai =
-        *reinterpret_cast<s_player**>(std::uintptr_t{0x005657CC});
+    extern s_player* _p_ai;
 
-    inline s_aidudes_colony_info*& _our_unblockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657D0});
-    inline int16_t& _n_our_colonies = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657D4});
-    inline s_aidudes_colony_info*& _Sort_Pops_colony_info =
-        *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657BC});
+    extern s_aidudes_colony_info* _our_unblockaded;
+    extern int16_t _n_our_colonies;
+    extern s_aidudes_colony_info* _Sort_Pops_colony_info;
 
-    inline s_colony*& _Sort_Pops_colony_data =
-        *reinterpret_cast<s_colony**>(std::uintptr_t{0x005657D8});
+    extern s_colony* _Sort_Pops_colony_data;
 
-    inline int16_t& _i_ai =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657DC});
+    extern int16_t _i_ai;
 
-    inline s_aidudes_colony_info (*&_our_colonies)[250] =
-        *reinterpret_cast<s_aidudes_colony_info (**)[250]>(std::uintptr_t{0x005657E0});
+    extern s_aidudes_colony_info (*_our_colonies)[250];
 
     int __cdecl Sort_Colonies_Blockaded_(const void* a, const void* b);
 

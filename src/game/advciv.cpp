@@ -1,6 +1,12 @@
 #include "pch.h"
 
 namespace ADVCIV {
+    int8_t* _star_colony_owner;
+    int8_t* _planet_selected_flag;
+    s_adv_civ_player* _adv_civ_player;
+    s_parsec* _parsec;
+    s_adv_planet_worth* _planet_worth_to_player;
+
     bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
         return static_cast<int16_t>(_star_colony_owner[star_idx]) == player_idx;
     }

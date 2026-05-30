@@ -9,17 +9,15 @@ namespace animate {
         int16_t count;
     };
 
-    inline s_palette_header*& _palette_header =
-        *reinterpret_cast<s_palette_header**>(std::uintptr_t{0x00576328});
+    extern s_palette_header* _palette_header;
 
-    inline s_animation_header*& _animation_header =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0057632C });
+    extern s_animation_header* _animation_header;
 
-    inline int16_t& _clipping_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B0E0 });
-    inline int16_t& _dot_stencil_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B0E4 });
+    extern int16_t _clipping_flag;
+    extern int16_t _dot_stencil_flag;
 
-    inline const char* s_Screen_Background_cant_be_clipp = reinterpret_cast<const char*>(0x0055B0E8);
-    inline const char* s_Refresh_Mask_cant_be_drawn = reinterpret_cast<const char*>(0x0055B10C);
+    extern char s_Screen_Background_cant_be_clipp[35];
+    extern char s_Refresh_Mask_cant_be_drawn[28];
 
     short __cdecl Get_Full_Store_Flag_(s_animation_header* header);
     void __cdecl Set_Animation_Frame_(s_animation_header* anim, int32_t frame);

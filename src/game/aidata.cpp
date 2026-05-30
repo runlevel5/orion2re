@@ -2,6 +2,37 @@
 
 namespace AIDATA {
 
+    uint16_t _g_base_planet_values[8][360];
+    uint16_t (*_ship_strengths)[500][8];
+    uint16_t (*_ship_strengths_in_nebula)[500][8];
+    uint16_t (*_ship_bomb_strengths)[500][4];
+    int16_t (*_planet_stage_weights)[360][8];
+    uint32_t (*_base_star_stage_weights)[72][8];
+    uint32_t (*_star_stage_weights)[72][8];
+    uint8_t (*_n_turns_from_to)[72][72][8];
+    s_turns_from_to_intermediate_cache_entry (*_n_turns_from_to_intermediate)[72][72][8];
+    int8_t (*_ship_n_turns_to)[500][72];
+    s_ship_n_turns_to_intermediate_cache_entry (*_ship_n_turns_to_intermediate)[500][72];
+    int32_t (*_possible_ship_strengths)[72][8][8][10];
+    s_ai_colony_info (*_ai_colony_info)[250];
+    s_ai_player_info (*_ai_player_info)[8];
+    s_ai_star_info (*_ai_star_info)[72];
+    uint8_t (*_star_in_range_of_player)[72];
+    uint8_t (*_star_in_extended_range_of_player)[72];
+    int32_t (*_enroute_ship_strengths)[72][8][8][10];
+    int8_t (*_enroute_ships)[72][8][10];
+    int8_t (*_enroute_human_ships)[72][10];
+    int8_t (*_enroute_nonstealthy_ships)[72][8];
+    int16_t (*_all_ships)[500];
+    int16_t (*_i_all_combat_ships)[8][73];
+    s_ai_tech_info* _aitech;
+    s_ai_refit_player (*_airefit)[8];
+    int32_t (*_ship_refit_desirabilities)[500];
+    uint16_t (*_base_planet_values)[8][360] = &_g_base_planet_values;
+    uint16_t _g_contextual_planet_values[2880];
+    uint16_t (*_contextual_planet_values)[2880] = &_g_contextual_planet_values;
+    uint16_t _n_all_ships;
+
     int16_t __cdecl Colony_Dominant_Player_(s_colony* colony) {
         uint8_t player_counts[8] = { 0 };
         int total_pops = 0;

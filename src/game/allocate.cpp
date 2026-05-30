@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace allocate {
+    int32_t _mark_stack_pos[2];
+
+    s_mark_stack_entry _mark_stack[40];
+
+    const char s_Mark_Block_Stack_Size_Exceeded_0055b6dc[] = "Mark Block Stack Size Exceeded";
+
+    const char s_Mark_Block_Stack_Empty_0055b6fc[] = "Mark Block Stack Empty";
+
     void* __cdecl Allocate_Space_(uint32_t size) {
         uint32_t padded_size = size;
 

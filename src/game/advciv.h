@@ -2,8 +2,7 @@
 #include <cstdint>
 
 namespace ADVCIV {
-    inline int8_t*& _star_colony_owner =
-        *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CD60});
+    extern int8_t* _star_colony_owner;
 
     /** Returns whether another player owns a colony at the specified star.
      * @param player_idx Player to exclude from the ownership check.
@@ -22,14 +21,12 @@ namespace ADVCIV {
     /** Initializes starting fleets for all advanced-civilization players. */
     void __cdecl Assign_Advanced_Civilization_Starting_Ships_();
 
-    inline int8_t*& _planet_selected_flag = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CD54});
-    inline s_adv_civ_player*& _adv_civ_player = *reinterpret_cast<s_adv_civ_player**>(std::uintptr_t{0x0056CD58});
+    extern int8_t* _planet_selected_flag;
+    extern s_adv_civ_player* _adv_civ_player;
 
-    inline s_parsec*& _parsec =
-        *reinterpret_cast<s_parsec**>(std::uintptr_t{0x0056CD5C});
+    extern s_parsec* _parsec;
 
-    inline s_adv_planet_worth*& _planet_worth_to_player =
-        *reinterpret_cast<s_adv_planet_worth**>(std::uintptr_t{0x0056CD50});
+    extern s_adv_planet_worth* _planet_worth_to_player;
 
     /** Fills the inter-star distance table used during colony selection.
      * @param parsec_distances Output buffer of per-star parsec distances.

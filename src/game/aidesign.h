@@ -2,24 +2,23 @@
 #include <cstdint>
 
 namespace aidesign {
-    inline int16_t (&_min_weapon_count_table)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556F60});
+    extern int16_t _min_weapon_count_table[8];
 
-    inline s_spcl (&_bio_weapon_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556DC0});
-    inline s_spcl (&_capture_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556DD8});
-    inline s_spcl (&_cloaking_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556DF0});
-    inline s_spcl (&_beam_defense_spcl)[4] = *reinterpret_cast<s_spcl(*)[4]>(std::uintptr_t{0x00556E00});
-    inline s_spcl (&_missile_defense_spcl)[8] = *reinterpret_cast<s_spcl(*)[8]>(std::uintptr_t{0x00556E10});
-    inline s_spcl (&_armor_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556E30});
-    inline s_spcl (&_shield_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556E40});
+    extern s_spcl _bio_weapon_spcl[5];
+    extern s_spcl _capture_spcl[5];
+    extern s_spcl _cloaking_spcl[3];
+    extern s_spcl _beam_defense_spcl[4];
+    extern s_spcl _missile_defense_spcl[8];
+    extern s_spcl _armor_spcl[3];
+    extern s_spcl _shield_spcl[3];
 
-    inline s_aidesign_ship_design (&_ship_design_tables)[7][6] = *reinterpret_cast<s_aidesign_ship_design(*)[7][6]>(std::uintptr_t{0x00556F70});
-    inline s_spcl (&_beam_offense_spcl)[7] = *reinterpret_cast<s_spcl(*)[7]>(std::uintptr_t{0x00556E50});
-    inline s_spcl (&_missile_offense_spcl)[2] = *reinterpret_cast<s_spcl(*)[2]>(std::uintptr_t{0x00556E70});
-    inline s_spcl (&_special_weapons_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556E78});
-    inline s_spcl (&_special_device_spcl)[12] = *reinterpret_cast<s_spcl(*)[12]>(std::uintptr_t{0x00556E90});
-    inline s_spcl (&_defense_specials_f_spcl)[20] = *reinterpret_cast<s_spcl(*)[20]>(std::uintptr_t{0x00556EC0});
-    inline s_spcl (&_defense_specials_t_spcl)[20] = *reinterpret_cast<s_spcl(*)[20]>(std::uintptr_t{0x00556F10});
+    extern s_aidesign_ship_design _ship_design_tables[7][6];
+    extern s_spcl _beam_offense_spcl[7];
+    extern s_spcl _missile_offense_spcl[2];
+    extern s_spcl _special_weapons_spcl[5];
+    extern s_spcl _special_device_spcl[12];
+    extern s_spcl _defense_specials_f_spcl[20];
+    extern s_spcl _defense_specials_t_spcl[20];
 
     /**
      * Adds legal learned specials or special weapons to a ship design until the available space is exhausted.

@@ -22,12 +22,12 @@ namespace AIMOVE {
     };
 #pragma pack(pop)
 
-    inline s_player*& _p_ai = *reinterpret_cast<s_player**>(std::uintptr_t{0x00565E80});
-    inline s_ai_colonizable_planet*& _colonizable = *reinterpret_cast<s_ai_colonizable_planet**>(std::uintptr_t{0x00565E84});
-    inline int8_t (*&_nonplayer_here)[72] = *reinterpret_cast<int8_t (**)[72]>(std::uintptr_t{0x00565E88});
-    inline int8_t*& _flee_stars = *reinterpret_cast<int8_t**>(std::uintptr_t{0x00565E8C});
-    inline int16_t& _i_ai = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E90});
-    inline int16_t& _n_colonizable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E94});
+    extern s_player* _p_ai;
+    extern s_ai_colonizable_planet* _colonizable;
+    extern int8_t (*_nonplayer_here)[72];
+    extern int8_t* _flee_stars;
+    extern int16_t _i_ai;
+    extern int16_t _n_colonizable;
 
     void __cdecl Move_AI_(int16_t player_idx);
 

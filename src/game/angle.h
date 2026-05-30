@@ -4,11 +4,9 @@
 namespace angle {
     int16_t __cdecl Get_Angle_(int32_t dx, int32_t dy);
 
-    inline uint8_t (&_atan_lookup_table)[128] =
-        *reinterpret_cast<uint8_t(*)[128]>(std::uintptr_t{0x0054F4C8});
+    extern uint8_t _atan_lookup_table[128];
 
-    inline uint16_t (&_sin_table)[90] =
-        *reinterpret_cast<uint16_t(*)[90]>(std::uintptr_t{0x0054F548});
+    extern uint16_t _sin_table[90];
 
     int32_t __cdecl Cos_(int16_t angle, int32_t magnitude);
     int32_t __cdecl Sin_(int16_t angle, int32_t magnitude);

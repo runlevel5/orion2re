@@ -1,6 +1,16 @@
 #include "pch.h"
 
 namespace antarans {
+    uint8_t _antaran_ship_cost[9] = {2, 5, 12, 30, 75, 0, 0, 0, 0};
+    uint8_t _n_max_antaran_off_ships[9] = {4, 4, 3, 2, 2, 0, 0, 0, 0};
+    const char s_offensive_00558598[12] = "offensive";
+    uint8_t _offensive_titan_ship_built;
+    const char s_defensive_0055858c[12] = "defensive";
+    uint8_t _n_max_antaran_def_ships[9] = {0, 0, 3, 2, 7, 0, 0, 0, 0};
+    const char s_2d_fmt[5] = "%2d ";
+    const char s_ships_by_size[31] = "-< ships (by size)          : ";
+    const char s_ships_deployed_by_size[31] = "-< ships deployed (by size) : ";
+
     int32_t __cdecl Delta_Stardate_() {
         return MOX::_stardate - 35000;
     }

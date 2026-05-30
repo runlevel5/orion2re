@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace animate {
+    s_palette_header* _palette_header;
+    s_animation_header* _animation_header;
+    int16_t _clipping_flag;
+    int16_t _dot_stencil_flag;
+
+    char s_Screen_Background_cant_be_clipp[35] = "Screen Background can't be clipped";
+    char s_Refresh_Mask_cant_be_drawn[28] = "Refresh Mask can't be drawn";
+
     short __cdecl Get_Full_Store_Flag_(s_animation_header* header) {
         _animation_header = header;
         return (header->flags & 0x04) != 0;

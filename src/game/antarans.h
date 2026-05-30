@@ -26,10 +26,10 @@ namespace antarans {
 
     int16_t __cdecl No_Medium_Ships_After_N_Turns_();
 
-    inline uint8_t (&_antaran_ship_cost)[9] = *reinterpret_cast<uint8_t (*)[9]>(std::uintptr_t{0x00558560});
-    inline uint8_t (&_n_max_antaran_off_ships)[9] = *reinterpret_cast<uint8_t (*)[9]>(std::uintptr_t{0x00558570});
-    inline const char* s_offensive_00558598 = reinterpret_cast<const char*>(std::uintptr_t{0x00558598});
-    inline uint8_t& _offensive_titan_ship_built = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CD84});
+    extern uint8_t _antaran_ship_cost[9];
+    extern uint8_t _n_max_antaran_off_ships[9];
+    extern const char s_offensive_00558598[12];
+    extern uint8_t _offensive_titan_ship_built;
 
     void __cdecl Build_Antaran_Ships_(short *resources, short *ships, uint8_t *max_ships, char is_offensive);
     void __cdecl Build_Antaran_Offensive_Ships_();
@@ -38,13 +38,13 @@ namespace antarans {
 
     short __cdecl Get_Antaran_Target_Star_(short player_idx);
 
-    inline const char* s_defensive_0055858c = reinterpret_cast<const char*>(std::uintptr_t{0x0055858C});
-    inline uint8_t (&_n_max_antaran_def_ships)[9] = *reinterpret_cast<uint8_t (*)[9]>(std::uintptr_t{0x00558580});
+    extern const char s_defensive_0055858c[12];
+    extern uint8_t _n_max_antaran_def_ships[9];
     void __cdecl Build_Antaran_Defensive_Ships_();
 
-    inline const char* s_2d_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00558690});
-    inline const char* s_ships_by_size = reinterpret_cast<const char*>(std::uintptr_t{0x0055871C});
-    inline const char* s_ships_deployed_by_size = reinterpret_cast<const char*>(std::uintptr_t{0x005586FC});
+    extern const char s_2d_fmt[5];
+    extern const char s_ships_by_size[31];
+    extern const char s_ships_deployed_by_size[31];
 
     bool __cdecl Deploy_Antaran_Ships_();
 

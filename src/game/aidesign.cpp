@@ -8,6 +8,24 @@ namespace aidesign {
     };
 #pragma pack(pop)
 
+    int16_t _min_weapon_count_table[8];
+
+    s_spcl _bio_weapon_spcl[5];
+    s_spcl _capture_spcl[5];
+    s_spcl _cloaking_spcl[3];
+    s_spcl _beam_defense_spcl[4];
+    s_spcl _missile_defense_spcl[8];
+    s_spcl _armor_spcl[3];
+    s_spcl _shield_spcl[3];
+
+    s_aidesign_ship_design _ship_design_tables[7][6];
+    s_spcl _beam_offense_spcl[7];
+    s_spcl _missile_offense_spcl[2];
+    s_spcl _special_weapons_spcl[5];
+    s_spcl _special_device_spcl[12];
+    s_spcl _defense_specials_f_spcl[20];
+    s_spcl _defense_specials_t_spcl[20];
+
     void __cdecl Determine_Beam_Weapon_Modifications_(
         int16_t player_idx,
         int16_t hull_size,

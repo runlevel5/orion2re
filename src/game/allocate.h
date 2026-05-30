@@ -27,17 +27,13 @@ namespace allocate {
 
     void __cdecl Allocation_Error_(int bytes_requested);
 
-    inline int32_t (&_mark_stack_pos)[2] =
-        *reinterpret_cast<int32_t (*)[2]>(std::uintptr_t{ 0x0055B650 });
+    extern int32_t _mark_stack_pos[2];
 
-    inline s_mark_stack_entry (&_mark_stack)[40] =
-        *reinterpret_cast<s_mark_stack_entry (*)[40]>(std::uintptr_t{ 0x0057DF00 });
+    extern s_mark_stack_entry _mark_stack[40];
 
-    inline const char* s_Mark_Block_Stack_Size_Exceeded_0055b6dc =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B6DC }); // "Mark Block Stack Size Exceeded"
+    extern const char s_Mark_Block_Stack_Size_Exceeded_0055b6dc[];
 
-    inline const char* s_Mark_Block_Stack_Empty_0055b6fc =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B6FC }); // "Mark Block Stack Empty"
+    extern const char s_Mark_Block_Stack_Empty_0055b6fc[];
 
     void __cdecl Push_Block_(void* block);
 

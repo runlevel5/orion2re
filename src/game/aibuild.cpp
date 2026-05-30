@@ -1,6 +1,17 @@
 #include "pch.h"
 
 namespace AIBUILD {
+    uint8_t _difficulty_ship_design[12] = {2, 10, 35, 50, 115, 0, 0, 0, 45, 0, 0, 0};
+    int8_t _difficulty_intel_bias[8] = {1, 1, 2, 3, 4, 0, 0, 0};
+    uint8_t _player_ship_size_table[9] = {1, 2, 3, 5, 8, 13, 0, 0, 0};
+    int _player_ship_sizes[8][14];
+    int _player_total_strength_vs_colonies[8];
+    uint8_t _player_n_transports[8][2];
+    int8_t _player_n_freighter_groups_wanted[8];
+    uint8_t _player_n_spies[8][2];
+    uint8_t _player_n_colony_ships[8][3];
+    int _player_total_strength_vs_ships[8][3];
+
     int16_t __cdecl Mean_Ship_Strength_(s_ship_data* ship) {
         int ship_idx = (int)(ship - MOX::_ship);
         int owner = (int)ship->owner;

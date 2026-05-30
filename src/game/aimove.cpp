@@ -1,6 +1,13 @@
 #include "pch.h"
 
 namespace AIMOVE {
+    s_player* _p_ai;
+    s_ai_colonizable_planet* _colonizable;
+    int8_t (*_nonplayer_here)[72];
+    int8_t* _flee_stars;
+    int16_t _i_ai;
+    int16_t _n_colonizable;
+
     int __cdecl Sort_colonizable_(const void* a, const void* b) {
         auto p1 = static_cast<const s_ai_colonizable_planet*>(a);
         auto p2 = static_cast<const s_ai_colonizable_planet*>(b);
