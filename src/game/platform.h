@@ -1,93 +1,69 @@
 #pragma once
 
+extern uint8_t g_ten_game_number;
+
 namespace platform {
 	// Variables
-	inline uint32_t& g_os_ver = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005617a4 });
-	inline uint32_t& g_win_minor = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005617b0 });
-	inline uint32_t& g_win_major = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005617ac });
-	inline uint32_t& g_win_ver = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005617a8 });
-	inline char*& g_command_line = *reinterpret_cast<char**>(std::uintptr_t{ 0x005a9cf4 });
-	inline void*& g_env_strings = *reinterpret_cast<void**>(std::uintptr_t{ 0x005617f0 });
-	inline uint8_t& g_parsed_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055b1c0 });
-	inline MSG& g_main_msg = *reinterpret_cast<MSG*>(std::uintptr_t{ 0x00579300 });
-	inline HANDLE& g_worker_thread_handle = *reinterpret_cast<HANDLE*>(std::uintptr_t{ 0x0055B1BC });
-	inline int32_t& g_window_focus_state = *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00579328 });
-	inline uint32_t& _updating_cursor_img = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055C08C });
-	inline uint8_t& g_should_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055B1A4 });
+	extern uint32_t g_os_ver;
+	extern uint32_t g_win_minor;
+	extern uint32_t g_win_major;
+	extern uint32_t g_win_ver;
+	extern char* g_command_line;
+	extern void* g_env_strings;
+	extern MSG g_main_msg;
+	extern HANDLE g_worker_thread_handle;
+	using ::g_window_focus_state;
+	extern uint32_t _updating_cursor_img;
+	extern uint8_t g_should_exit;
 
-	// Fixed string literal "/ten" used for pattern matching.
+	// Fixed string literal "/ten=" used for pattern matching.
 	inline char* const s_slash_ten = reinterpret_cast<char*>(std::uintptr_t{ 0x0055b1c4 });
 
-	inline LPDIRECTDRAW& g_direct_draw =
-		*reinterpret_cast<LPDIRECTDRAW*>(std::uintptr_t{ 0x00578e04 });
+	extern LPDIRECTDRAW g_direct_draw;
 
-	inline HWND& g_main_window =
-		*reinterpret_cast<HWND*>(std::uintptr_t{ 0x00579320 });
+	extern HWND g_main_window;
 
-	inline bool& g_pending_toggle_pages =
-		*reinterpret_cast<bool*>(std::uintptr_t{ 0x005792FC });
+	extern bool g_pending_toggle_pages;
 
-	inline int16_t& g_video_mode =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578e5c });
+	extern int16_t g_video_mode;
 
-	inline uint32_t& g_available_mem =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578e10 });
+	extern uint32_t g_available_mem;
 
-	inline int32_t& g_screen_res_x =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055b1a8 });
+	extern int32_t g_screen_res_x;
 
-	inline int32_t& g_screen_res_y =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055b1ac });
+	extern int32_t g_screen_res_y;
 
-	inline LPDIRECTDRAWSURFACE& g_primary_surface =
-		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x005792ec });
+	extern LPDIRECTDRAWSURFACE g_primary_surface;
 
-	inline LPDIRECTDRAWSURFACE& g_backbuffer_surface =
-		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00578e18 });
+	extern LPDIRECTDRAWSURFACE g_backbuffer_surface;
 
-	inline LPDIRECTDRAWSURFACE& g_offscreen_surface_1 =
-		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00578e58 });
+	extern LPDIRECTDRAWSURFACE g_offscreen_surface_1;
 
-	inline LPDIRECTDRAWSURFACE& g_offscreen_surface_2 =
-		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00579334 });
+	extern LPDIRECTDRAWSURFACE g_offscreen_surface_2;
 
-	inline LPDIRECTDRAWSURFACE& g_cursor_surface_1 =
-		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00578810 });
+	extern LPDIRECTDRAWSURFACE g_cursor_surface_1;
 
-	inline int32_t& _offscreen_mouse_shape =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00578B54 });
+	extern int32_t _offscreen_mouse_shape;
 
-	inline LPDIRECTDRAWSURFACE& g_cursor_surface_2 =
-		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00578814 });
+	extern LPDIRECTDRAWSURFACE g_cursor_surface_2;
 
-	inline LPVOID& _cursor_surface =
-		*reinterpret_cast<LPVOID*>(std::uintptr_t{ 0x0057881C });
+	extern LPVOID _cursor_surface;
 
-	inline LPDIRECTDRAWPALETTE& g_palette =
-		*reinterpret_cast<LPDIRECTDRAWPALETTE*>(std::uintptr_t{ 0x00578e64 });
+	extern LPDIRECTDRAWPALETTE g_palette;
 
-	inline tagPALETTEENTRY (&g_palette_entries)[256] =
-		*reinterpret_cast<tagPALETTEENTRY(*)[256]>(std::uintptr_t{ 0x00578ee8 });
+	extern tagPALETTEENTRY g_palette_entries[256];
 
-	inline uint32_t& DAT_00578e20 =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578e20 });
+	extern uint32_t DAT_00578e20;
 
-	inline uint32_t& DAT_00579350 =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00579350 });
-
-	inline uint16_t& DAT_0057931c =
-		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0057931c });
+	extern uint16_t DAT_0057931c;
 
 	extern uint8_t _need_quit;
 
-	inline uint32_t& g_frame_count =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b8 });
+	extern uint32_t g_frame_count;
 
-	inline int8_t& g_render_buffer =
-		*reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00578edc });
+	extern int8_t g_render_buffer;
 
-	inline DDSURFACEDESC& DDSURFACEDESC_00578e70 =
-		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578E70 });
+	extern DDSURFACEDESC DDSURFACEDESC_00578e70;
 
 	inline LONG& _surface_lock_flag =
 		platform::DDSURFACEDESC_00578e70.lPitch;
@@ -95,28 +71,18 @@ namespace platform {
 	inline LPVOID& _current_locked_page =
 		platform::DDSURFACEDESC_00578e70.lpSurface;
 
-	inline uint8_t*& _offscreen_surface = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00578E54});
+	extern uint8_t* _offscreen_surface;
 
-	inline int16_t& DAT_578AC4 =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578ac4 });
+	extern DDSURFACEDESC _cursor_surface_desc;
 
-	inline DDSURFACEDESC& _cursor_surface_desc =
-		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578AD0 });
+	extern int32_t DAT_578B3C;
 
-	inline int32_t& DAT_578B3C =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00578b3c });
+	extern int16_t g_mouse_x;
 
-	inline int16_t& g_mouse_x =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578aa0 });
+	extern int16_t g_mouse_y;
 
-	inline int16_t& g_mouse_y =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578a9c });
-
-	inline int16_t& g_cached_mouse_x =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578abc });
-
-	inline int16_t& g_cached_mouse_y =
-		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578ab8 });
+	using ::g_cached_mouse_x;
+	using ::g_cached_mouse_y;
 
 	// Functions
 	void __cdecl entry();
@@ -150,7 +116,7 @@ namespace platform {
 	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
 	void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count);
 
-	inline uint32_t*& _alt_offscreen_surface = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00579324 });
+	extern uint32_t* _alt_offscreen_surface;
 
 	int32_t __cdecl Lock_Alt_Offscreen_Surface_();
 	void __cdecl Unlock_Alt_Offscreen_Surface_();

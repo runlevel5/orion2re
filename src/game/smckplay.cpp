@@ -58,8 +58,8 @@ namespace smckplay {
 
             surface_desc.dwSize = 0x6c;
             surface_desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
-            platform::g_offscreen_surface_1->GetSurfaceDesc(surface_desc_ptr);
-            platform::g_offscreen_surface_1->Lock(nullptr, surface_desc_ptr, DDLOCK_WAIT, nullptr);
+            video::g_offscreen_surface_1->GetSurfaceDesc(surface_desc_ptr);
+            video::g_offscreen_surface_1->Lock(nullptr, surface_desc_ptr, DDLOCK_WAIT, nullptr);
 
             smckplay::_SmackToBuffer_28(smckplay::_smk,
                 left,
@@ -70,7 +70,7 @@ namespace smckplay {
                 0);
 
             smckplay::_SmackDoFrame_4(smckplay::_smk);
-            platform::g_offscreen_surface_1->Unlock(nullptr);
+            video::g_offscreen_surface_1->Unlock(nullptr);
 
             int32_t rect_result = smckplay::_SmackToBufferRect_8(smckplay::_smk, 0);
             while (rect_result != 0) {

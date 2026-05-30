@@ -2,7 +2,48 @@
 
 //#define FULLSCREEN
 
+uint8_t g_ten_game_number;
+
 namespace platform {
+	uint32_t g_os_ver;
+	uint32_t g_win_minor;
+	uint32_t g_win_major;
+	uint32_t g_win_ver;
+	char* g_command_line;
+	void* g_env_strings;
+	MSG g_main_msg;
+	HANDLE g_worker_thread_handle;
+	uint32_t _updating_cursor_img;
+	uint8_t g_should_exit;
+	LPDIRECTDRAW g_direct_draw;
+	HWND g_main_window;
+	bool g_pending_toggle_pages;
+	int16_t g_video_mode;
+	uint32_t g_available_mem;
+	int32_t g_screen_res_x = 640;
+	int32_t g_screen_res_y = 480;
+	LPDIRECTDRAWSURFACE g_primary_surface;
+	LPDIRECTDRAWSURFACE g_backbuffer_surface;
+	LPDIRECTDRAWSURFACE g_offscreen_surface_1;
+	LPDIRECTDRAWSURFACE g_offscreen_surface_2;
+	LPDIRECTDRAWSURFACE g_cursor_surface_1;
+	int32_t _offscreen_mouse_shape;
+	LPDIRECTDRAWSURFACE g_cursor_surface_2;
+	LPVOID _cursor_surface;
+	LPDIRECTDRAWPALETTE g_palette;
+	tagPALETTEENTRY g_palette_entries[256];
+	uint32_t DAT_00578e20;
+	uint16_t DAT_0057931c;
+	uint32_t g_frame_count;
+	int8_t g_render_buffer;
+	DDSURFACEDESC DDSURFACEDESC_00578e70;
+	uint8_t* _offscreen_surface;
+	DDSURFACEDESC _cursor_surface_desc;
+	int32_t DAT_578B3C;
+	int16_t g_mouse_x;
+	int16_t g_mouse_y;
+	uint32_t* _alt_offscreen_surface;
+
     uint8_t _need_quit;
 
     LPDIRECTDRAWSURFACE	l_primary_window_surface = NULL;
@@ -237,7 +278,7 @@ namespace platform {
             target[1] = '\0';
 
             int parsed_val = atoi(target);
-            g_parsed_value = static_cast<uint8_t>(parsed_val);
+            ::g_ten_game_number = (uint8_t)parsed_val;
         }
 
         _free(copy_buffer);
@@ -259,7 +300,7 @@ namespace platform {
 
         g_video_mode = video_mode;
         g_available_mem = mem_status.dwAvailPhys;
-        DAT_00578e20 = reinterpret_cast<uint32_t>(&DAT_00579350);
+        DAT_00578e20 = (uint32_t)&video::_current_palette[0];
 
         if (DirectDrawCreate(nullptr, &g_direct_draw, nullptr) != DD_OK) {
             return cleanup();
@@ -790,12 +831,12 @@ namespace platform {
 
     void	Draw_Cursor_XY(int32_t x, int32_t y)
     {
-        if (DAT_578AC4 > 0)
+        if (video::_current_mouse_shape > 0)
         {
-            if (DAT_578AC4 != DAT_578B3C)
+            if ((int32_t)video::_current_mouse_shape != DAT_578B3C)
             {
                 Update_Cursor_Image_();
-                DAT_578B3C = DAT_578AC4;
+                DAT_578B3C = (int32_t)video::_current_mouse_shape;
             }
 
             RECT rect;

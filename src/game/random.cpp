@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace random {
+    uint32_t _random_seed;
+    uint32_t _saved_random_seed;
+
     uint32_t __cdecl Get_Random_Seed_() {
         return _random_seed;
     }

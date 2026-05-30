@@ -245,6 +245,9 @@ namespace MOX {
         {1, 2, 3},
         {2, 4, 6},
     };
+    int8_t _food_per_farmer_table[10] = {0, 0, 0, 1, 1, 2, 2, 1, 2, 3};
+    int16_t _ranged_to_hit_penalty[9] = {0, 0, -10, -20, -30, -40, -55, -70, -85};
+    int16_t _ranged_damage_penalty[9] = {0, 0, -10, -20, -30, -40, -50, -60, -65};
     int16_t _cur_missile_count;
     int16_t _NUM_STARS;
     s_scroll_bar _fltpop_scroll_bar;
@@ -267,6 +270,7 @@ namespace MOX {
     short _current_screen;
     int16_t _design_screen_replacement_type;
     int16_t _design_screen_replacement_slot;
+    int16_t _weapons_field[8];
     s_animation_header* _asteroid_seg;
     s_animation_header* _screen_seg;
     s_animation_header* _diplomacy_request_popup_seg;
@@ -274,7 +278,10 @@ namespace MOX {
     s_animation_header* _combat_map_planet_seg;
     s_animation_header* _combat_planet_seg;
     s_animation_header* _combat_planet_seg2;
+    uint8_t _ship_darken_map[128][16];
+    uint8_t _given_chance_to_rename_home_star[8];
     uint8_t _player_has_ship_in_system;
+    s_animation_header* _moveable_box_pict[25];
     int8_t _game_type;
     s_antaran _antarans;
     int8_t _maps_to_generate;
@@ -286,9 +293,52 @@ namespace MOX {
     int16_t _multi_colored_line_start;
     int16_t _design_choice_item_selected[40];
     int8_t _first_special_system_ctr;
+    int16_t _special_system_field[8];
+    int16_t _planet_buttons[5];
     uint8_t _first_design_screen_call;
     int16_t _design_size;
     uint8_t _refresh_mode;
+    uint8_t _mox_font_colors_offset;
+    int16_t _star_width;
+    int16_t _star_height;
+    char _temp_string[512];
+    char _temp_string_buf[64];
+    int16_t _take_control_button;
+    int16_t _auto_cmbt_button_value;
+    int16_t _PLAYER_NUM;
+    uint8_t _active_player[9];
+    int16_t _active_count;
+    int16_t _ai_retreat_flag;
+    int16_t _bio_weapon_flag;
+    int16_t _last_ship_status;
+    int16_t _ship_status_display;
+    int16_t _dont_draw_ship;
+    int16_t _draw_active_missiles;
+    int16_t _order_info_flag;
+    int16_t _super_fast_flag;
+    int8_t _real_attack_flag;
+    int16_t _shields_flag;
+    int16_t _msl_impact_warning_flag;
+    int16_t _draw_legal_boxes_flag;
+    int16_t _take_control_flag;
+    int16_t _combat_far_x;
+    int16_t _combat_mid_x;
+    int16_t _combat_far_y;
+    int16_t _combat_mid_y;
+    int16_t _net_flag;
+    int16_t _in_nebula_flag;
+    int16_t _skan_flag;
+    int16_t _fleet_target;
+    uint8_t _draw_design_screen_to_back;
+    uint8_t _refit_ship;
+    int _original_cost;
+    int16_t _design_name_field;
+    int16_t _design_cancel_button;
+    int16_t _design_clear_button;
+    int16_t _design_build_button;
+    s_player* _player;
+    s_player* _cur_plyr_ptr;
+    char* _personality_labels[7];
 
     s_fleet_movement_icon _fleet_movement_icon[500];
 

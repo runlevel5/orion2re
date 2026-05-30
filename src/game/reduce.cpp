@@ -1,6 +1,13 @@
 #include "pch.h"
 
 namespace reduce {
+    s_palette_entry _reduced_palette_list[512];
+    int16_t _ncubes;
+    uint16_t _active_cube_count;
+    int16_t _HistPtr[512];
+    s_palette_cube _cube_list[256];
+    uint8_t _color_weight[512];
+
     void __cdecl Reduce_Palette_(s_palette_entry* palette, int16_t start_index, int16_t num_colors_src, int16_t num_colors_dst) {
         if (num_colors_src > 512) {
             exitm::Exit_With_Message(s_Too_many_colors_to_reduce_from_);

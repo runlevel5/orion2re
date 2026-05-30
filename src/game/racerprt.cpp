@@ -2,6 +2,12 @@
 
 namespace RACERPRT {
 
+char _TREATIES_FMT[12] = "%s\n%s\n%s\n%s";
+char _PERSONALITY_FMT[6] = "%s\r%s";
+s_colors _report_normal_color = {{0x14, 0xB9, 0xB8, 0xB6, 0xB8, 0xB9, 0xB9, 0xBA}};
+uint8_t _race_report_jim_hack;
+s_racescrn_icon_layout _spy_group_data = {24, 216, 187, 239, 24, nullptr};
+
 void __cdecl Race_Report_Screen_(int16_t param_1) {
     int32_t local_31c;
     char acStack_318[40];

@@ -1,32 +1,28 @@
 #pragma once
 
 namespace RACESEL {
-    inline int16_t& _custom_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A577E});
-    inline int16_t& _displayed_race = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A5780});
-    inline int16_t& _old_race = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A5720});
-    inline int16_t (&_race_button_status)[14] = *reinterpret_cast<int16_t (*)[14]>(std::uintptr_t{0x005A56F0});
+    extern int16_t _custom_flag;
+    extern int16_t _displayed_race;
+    extern int16_t _old_race;
+    extern int16_t _race_button_status[14];
 
-    inline uint8_t* (&_race_specials)[14] =
-        *reinterpret_cast<uint8_t*(*)[14]>(std::uintptr_t{0x005A5730});
+    extern uint8_t* _race_specials[14];
 
-    inline s_animation_header* (&_race_button)[14] =
-        *reinterpret_cast<s_animation_header*(*)[14]>(std::uintptr_t{0x005A5790});
+    extern s_animation_header* _race_button[14];
 
-    inline char (&_last_race_name)[15] =
-        *reinterpret_cast<char(*)[15]>(std::uintptr_t{0x005A5710});
+    extern char _last_race_name[15];
 
-    inline s_animation_header*& _last_race_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A5724});
+    extern s_animation_header* _last_race_seg;
 
-    inline uint8_t (&_color_flag)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005A56E8});
-    inline uint8_t (&_race_flag)[14] = *reinterpret_cast<uint8_t(*)[14]>(std::uintptr_t{0x005A5770});
+    extern uint8_t _color_flag[8];
+    extern uint8_t _race_flag[14];
 
-    inline const char* s_patch13_lbx = reinterpret_cast<const char*>(0x00556330);
-    inline const char* s_lastrace_rac = reinterpret_cast<const char*>(0x00556340);
-    inline const char* s_RACESEL_LBX = reinterpret_cast<const char*>(0x00557FE4);
-    inline const char* s_rb_0055117C = reinterpret_cast<const char*>(0x0055117C);
-    inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
-    inline const char* s_space_00551120 = reinterpret_cast<const char*>(0x00551120);
+    extern const char s_patch13_lbx[12];
+    extern const char s_lastrace_rac[13];
+    extern const char s_RACESEL_LBX[12];
+    extern const char s_rb_0055117C[3];
+    extern const char s_empty_00551100[1];
+    extern const char s_space_00551120[2];
 
     void __cdecl Convert_Custom_Race_Flags_(uint8_t* custom_race_flags);
 
@@ -41,7 +37,7 @@ namespace RACESEL {
     void __cdecl Draw_Flag_Screen_();
     void __cdecl Set_Flag_Screen_Help_();
 
-    inline char*& _temp_ruler_name = *reinterpret_cast<char**>(std::uintptr_t{0x005A57C8});
+    extern char* _temp_ruler_name;
 
     void __cdecl Draw_Naming_Popup_();
     void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output);

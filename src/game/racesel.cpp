@@ -3,6 +3,24 @@
 
 namespace RACESEL {
 
+int16_t _custom_flag;
+int16_t _displayed_race;
+int16_t _old_race;
+int16_t _race_button_status[14];
+uint8_t* _race_specials[14];
+s_animation_header* _race_button[14];
+char _last_race_name[15];
+s_animation_header* _last_race_seg;
+uint8_t _color_flag[8];
+uint8_t _race_flag[14];
+const char s_patch13_lbx[12] = "patch13.lbx";
+const char s_lastrace_rac[13] = "lastrace.rac";
+const char s_RACESEL_LBX[12] = "RACESEL.LBX";
+const char s_rb_0055117C[3] = "rb";
+const char s_empty_00551100[1] = "";
+const char s_space_00551120[2] = "\x1b";
+char* _temp_ruler_name;
+
 void __cdecl Convert_Custom_Race_Flags_(uint8_t* custom_race_flags) {
     for (int16_t bonus_idx = 0; bonus_idx < 9; ++bonus_idx) {
         const uint8_t bonus_value = custom_race_flags[bonus_idx + 1];
@@ -123,7 +141,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
         RUSS::Mox_Update_();
     }
 
-    FILE* file = fopen(s_lastrace_rac, s_rb_0055117c);
+    FILE* file = fopen(s_lastrace_rac, s_rb_0055117C);
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
         _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, 12, 1, 0x1F);

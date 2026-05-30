@@ -1,23 +1,17 @@
 #pragma once
 
 namespace reduce {
-    inline s_palette_entry (&_reduced_palette_list)[512] =
-        *reinterpret_cast<s_palette_entry(*)[512]>(std::uintptr_t{0x005865D8});
+    extern s_palette_entry _reduced_palette_list[512];
 
-    inline int16_t& _ncubes =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00587FE0});
+    extern int16_t _ncubes;
 
-    inline uint16_t& _active_cube_count =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00586FD8});
+    extern uint16_t _active_cube_count;
 
-    inline int16_t (&_HistPtr)[512] =
-        *reinterpret_cast<int16_t(*)[512]>(std::uintptr_t{0x00586FE0});
+    extern int16_t _HistPtr[512];
 
-    inline s_palette_cube (&_cube_list)[256] =
-        *reinterpret_cast<s_palette_cube(*)[256]>(std::uintptr_t{0x005873E0});
+    extern s_palette_cube _cube_list[256];
 
-    inline uint8_t (&_color_weight)[512] =
-        *reinterpret_cast<uint8_t(*)[512]>(std::uintptr_t{0x00586DD8});
+    extern uint8_t _color_weight[512];
 
     void __cdecl Clear_Reduced_Palette_Groups_();
 

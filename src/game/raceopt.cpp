@@ -2,6 +2,26 @@
 
 namespace raceopt {
 
+    int16_t _negative_picks;
+    int16_t _exit_ken;
+    s_colors _color_opt;
+    int8_t* _ability_costs;
+    char* _opt_string[64];
+    uint8_t* _accept_button_seg;
+    uint8_t* _default_button_seg;
+    int16_t _option_button[22];
+    int16_t _defalt;
+    int16_t _group_button[41];
+    int16_t _accept;
+    int16_t _picks;
+    s_animation_header* _off_button_seg;
+    int16_t _option_toggle[24];
+    int16_t _button_variable[10];
+    s_animation_header* _special_button_seg;
+    const char s__00551100[1] = "";
+    int16_t _name_button;
+    char _cur_race_name[16];
+
     void __cdecl Setup_Evolutionary_Upgrade_(short player_idx) {
         s_player& plr = MOX::_player[player_idx];
         int8_t original_traits0 = plr.traits[0];
@@ -1250,8 +1270,6 @@ namespace raceopt {
     }
 
     void __cdecl Convert_Flags_To_Player_(s_player* player) {
-        int16_t skipped_button = 0;
-
         player->traits[0] =
             static_cast<int8_t>(static_cast<uint8_t>(_button_variable[9]) << 1);
 
@@ -1265,29 +1283,24 @@ namespace raceopt {
             }
         }
 
-        int16_t button_index = 10;
-        while (button_index < 32) {
-            if (button_index == 15) {
-                if (_trait_option_flags[15] == 1) {
-                    skipped_button = 1;
-                    player->traits[15] = 1;
-                } else if (_trait_option_flags[16] == 1) {
-                    player->traits[15] = -1;
-                    skipped_button = 1;
-                } else {
-                    player->traits[15] = 0;
-                    skipped_button = 1;
-                }
-                button_index += 2;
-            } else {
-                player->traits[button_index - skipped_button] = (int8_t)_trait_option_flags[button_index];
-                ++button_index;
-            }
+        for (int16_t trait_index = 10; trait_index < 15; ++trait_index) {
+            player->traits[trait_index] = static_cast<int8_t>(_option_toggle[trait_index - 10]);
+        }
+
+        if (_option_toggle[5] == 1) {
+            player->traits[15] = 1;
+        } else if (_option_toggle[6] == 1) {
+            player->traits[15] = -1;
+        } else {
+            player->traits[15] = 0;
+        }
+
+        for (int16_t trait_index = 16; trait_index < 31; ++trait_index) {
+            player->traits[trait_index] = static_cast<int8_t>(_option_toggle[trait_index - 9]);
         }
     }
 
     void __cdecl Convert_Player_To_Flags_(s_player* player) {
-        int16_t group_shift = 0;
         int16_t trait_index = 0;
 
         _button_variable[9] = static_cast<int16_t>(player->traits[0] / 2);
@@ -1297,19 +1310,22 @@ namespace raceopt {
                 static_cast<int16_t>(player->traits[trait_index + 1]);
         }
 
-        for (trait_index = 10; trait_index < 31; ++trait_index) {
-            _trait_option_flags[trait_index + group_shift] =
+        for (trait_index = 10; trait_index < 15; ++trait_index) {
+            _option_toggle[trait_index - 10] =
                 static_cast<int16_t>(player->traits[trait_index]);
+        }
 
-            if (trait_index == 15) {
-                if (_trait_option_flags[trait_index] == -1) {
-                    _trait_option_flags[trait_index] = 0;
-                    _trait_option_flags[trait_index + 1] = 1;
-                } else {
-                    _trait_option_flags[trait_index + 1] = 0;
-                }
-                group_shift = 1;
-            }
+        _option_toggle[5] = static_cast<int16_t>(player->traits[15]);
+        if (_option_toggle[5] == -1) {
+            _option_toggle[5] = 0;
+            _option_toggle[6] = 1;
+        } else {
+            _option_toggle[6] = 0;
+        }
+
+        for (trait_index = 16; trait_index < 31; ++trait_index) {
+            _option_toggle[trait_index - 9] =
+                static_cast<int16_t>(player->traits[trait_index]);
         }
     }
 

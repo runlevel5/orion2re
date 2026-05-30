@@ -2,8 +2,8 @@
 #include <cstdint>
 
 namespace random {
-    inline uint32_t& _random_seed = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0057B6F0});
-    inline uint32_t& _saved_random_seed = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0057B6FC});
+    extern uint32_t _random_seed;
+    extern uint32_t _saved_random_seed;
 
     uint32_t __cdecl Get_Random_Seed_();
 
