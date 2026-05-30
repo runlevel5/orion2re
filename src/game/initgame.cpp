@@ -103,10 +103,9 @@ namespace INITGAME {
         MOX::_settings.sound_driver_id = 2;
         MOX::_settings.music_driver_id = 1;
 
-        // Clear the first byte of 10 consecutive records starting at 0x5974F0 (stride 0x25)
-        // TODO: Unknown
-        for (uint8_t* ptr = &DAT_005974f0; ptr < &DAT_00597662; ptr += 0x25) {
-            *ptr = 0;
+        // Clear the first byte of each save-game description record.
+        for (auto& save_game_description : MOX::_save_game_description) {
+            save_game_description.description[0] = '\0';
         }
 
         // Generate default network name: MOX-<clock % 10>

@@ -25,7 +25,7 @@ namespace fonts {
     uint16_t _outline_color;
     uint16_t _alias_outline_color;
 
-    extern const char s_Print_only_works_on_bitmaps[] = "Print only works on bitmaps";
+    const char s_Print_only_works_on_bitmaps[] = "Print only works on bitmaps";
 
     void __cdecl Set_Normal_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {

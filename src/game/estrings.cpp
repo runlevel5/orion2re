@@ -52,7 +52,7 @@ void __cdecl Load_E_Strings_() {
         current_ptr += strlen(current_ptr) + 1;
     }
 
-    if ((uintptr_t)current_ptr > (uintptr_t)ESTRINGS::_strings) {
+    if (current_ptr > ESTRINGS::_string_data + sizeof(ESTRINGS::_string_data)) {
         exitm::Exit_With_Message(s_you_blew_the_array_eric);
     }
 
