@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace remap {
+    uint8_t _picture_remap_color_list[256];
+
+    extern const char s_Remapped_Picture_Must_Have_Palet_0055b2ac[] = "Remapped Picture Must Have Palette";
+
     void __cdecl Sort_Palette_List_() {
         for (int i = 0; i < 255; ++i) {
             int insert_pos = i;

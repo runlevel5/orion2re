@@ -5,6 +5,8 @@ namespace council {
     const char s__00551100[] = "";
     const char s_council_lbx[] = "council.LBX";
     const char s_empty_string[] = "";
+    const char lbx_00559a68[12] = "council.lbx";
+    const char LBX_00559a74[12] = "council.LBX";
 
     s_mouse_list _council_blank_mouse = {0, 0, 0, 0, 639, 479};
     s_colors _council_normal_colors = {{150, 154, 155, 151, 152, 153, 154, 155}};
@@ -412,7 +414,7 @@ namespace council {
         int16_t player_idx;
 
         _council_mouse_bitmap = allocate::Allocate_First_Block_(MOX::_screen_seg, 917 /* 0x395 */);
-        mouse_h = (s_animation_header*)farload::Far_Reload_Next_(s_council::LBX_00559a74, 0, MOX::_screen_seg);
+        mouse_h = (s_animation_header*)farload::Far_Reload_Next_(council::LBX_00559a74, 0, MOX::_screen_seg);
         bitmap::Clear_Mouse_Image_(0);
         bitmap::Create_Blank_Bitmap_(30, 30, _council_mouse_bitmap);
         bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)_council_mouse_bitmap, mouse_h);
@@ -491,18 +493,18 @@ namespace council {
             uint8_t race = (uint8_t)MOX::_player[_council_members[i]].race;
             int16_t resource_idx = (int16_t)race * 6 + i + 2;
             if (i == 0) {
-                _council_light_race_seg[i] = (s_animation_header*)farload::Far_Reload_(s_council::lbx_00559a68, resource_idx, MOX::_screen_seg);
+                _council_light_race_seg[i] = (s_animation_header*)farload::Far_Reload_(council::lbx_00559a68, resource_idx, MOX::_screen_seg);
             } else {
-                _council_light_race_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(s_council::lbx_00559a68, resource_idx, MOX::_screen_seg);
+                _council_light_race_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(council::lbx_00559a68, resource_idx, MOX::_screen_seg);
             }
-            _council_dark_race_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(s_council::lbx_00559a68, (int16_t)race * 6 + i + 80 /* 0x50 */, MOX::_screen_seg);
+            _council_dark_race_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(council::lbx_00559a68, (int16_t)race * 6 + i + 80 /* 0x50 */, MOX::_screen_seg);
         }
 
         RUSS::Mox_Update_();
         uint8_t nominee0_race = MOX::_player[_council_nominee_[0]].race;
-        _council_nominees_seg[0] = (s_animation_header*)farload::Far_Reload_Next_(s_council::lbx_00559a68, (int16_t)nominee0_race * 2 + 158 /* 0x9E */, MOX::_screen_seg);
+        _council_nominees_seg[0] = (s_animation_header*)farload::Far_Reload_Next_(council::lbx_00559a68, (int16_t)nominee0_race * 2 + 158 /* 0x9E */, MOX::_screen_seg);
         uint8_t nominee1_race = MOX::_player[_council_nominee_[1]].race;
-        _council_nominees_seg[1] = (s_animation_header*)farload::Far_Reload_Next_(s_council::lbx_00559a68, (int16_t)nominee1_race * 2 + 159 /* 0x9F */, MOX::_screen_seg);
+        _council_nominees_seg[1] = (s_animation_header*)farload::Far_Reload_Next_(council::lbx_00559a68, (int16_t)nominee1_race * 2 + 159 /* 0x9F */, MOX::_screen_seg);
 
         _council_no_votes_message = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30 /* 0x1E */);
         _council_vote_message = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30 /* 0x1E */);
@@ -514,7 +516,7 @@ namespace council {
         void* ani_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, ani_buffer_size);
         file_ani::Set_File_Animation_Buffer_(ani_buffer);
         video::Set_Refresh_Stencil_();
-        file_ani::Open_Multi_File_Animation_(s_council::LBX_00559a74, 1, 0);
+        file_ani::Open_Multi_File_Animation_(council::LBX_00559a74, 1, 0);
         video::Set_Page_Off_();
         file_ani::Draw_Multi_File_Animation_(0);
         video::Copy_Off_To_Back_();

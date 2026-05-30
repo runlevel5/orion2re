@@ -3,7 +3,7 @@
 
 namespace RUSS {
     void __cdecl PFMT_(int32_t unused1, int32_t unused2, const char* unused_str, ...);
-    inline int8_t& _all_ai_game = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x005960E9 });
+    extern int8_t _all_ai_game;
 
     int16_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int16_t count);
 
@@ -39,11 +39,10 @@ namespace RUSS {
 
     void __cdecl Load_Russ_Strings_();
 
-    inline char& _russ_strings = *reinterpret_cast<char*>(std::uintptr_t{0x0056CF08});
+    extern char _russ_strings[0x1964];
 
-    inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
-    inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"
+    extern const char s_Seed_ld[];
+    extern const char s_Map_d[];
 
-    inline const char* s_This_isnt_a_single_player_game =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00559A08}); // "This isn't a single player game, cheeky monkey!"
+    extern const char s_This_isnt_a_single_player_game[];
 }

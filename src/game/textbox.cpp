@@ -44,9 +44,9 @@ namespace TEXTBOX {
             *y_ptr + 5,
             *x_ptr + 375,
             *y_ptr + total_height - 5,
-            remap::color_2,
-            remap::color_3,
-            remap::color_4
+            remap::_picture_remap_color_list[2],
+            remap::_picture_remap_color_list[3],
+            remap::_picture_remap_color_list[4]
         );
 
         int16_t y_mid = *y_ptr;

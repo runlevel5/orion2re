@@ -400,10 +400,6 @@
     <ClInclude Include="src\game\swap.h" />
     <ClInclude Include="src\game\sys.h" />
     <ClInclude Include="src\game\sysfont.h" />
-    <ClInclude Include="src\game\s_billtext.h" />
-    <ClInclude Include="src\game\s_council.h" />
-    <ClInclude Include="src\game\s_score.h" />
-    <ClInclude Include="src\game\s_starname.h" />
     <ClInclude Include="src\game\tech.h" />
     <ClInclude Include="src\game\techdata.h" />
     <ClInclude Include="src\game\techinit.h" />

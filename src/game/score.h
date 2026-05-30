@@ -4,26 +4,22 @@
 struct s_hof;
 
 namespace SCORE {
-    inline s_hof& _hof = *reinterpret_cast<s_hof*>(std::uintptr_t{0x00595C60});
-    inline char (&_default_names)[10][20] = *reinterpret_cast<char (*)[10][20]>(std::uintptr_t{0x0055A448});
+    extern s_hof _hof;
+    extern char _default_names[10][20];
+    extern const char LBX_0055a430[10];
 
-    inline const char* s_wb = reinterpret_cast<const char*>(std::uintptr_t{0x00551178}); // "wb"
-    inline const char* s_HOF_M2 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A52C}); // "HOF.M2"
+    extern const char s_wb[3]; // "wb"
+    extern const char s_HOF_M2[7]; // "HOF.M2"
 
-    inline s_hiscore*& _hi = 
-        *reinterpret_cast<s_hiscore**>(std::uintptr_t{0x0056EC8C});
+    extern s_hiscore* _hi;
 
-    inline const char* s__d__d_005523a4 = 
-        reinterpret_cast<const char*>(std::uintptr_t{0x005523A4}); // "%d.%d"
+    extern const char s__d__d_005523a4[6]; // "%d.%d"
 
-    inline void*& PTR_s_SCORE_LBX_0055a440 =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0055A440});
+    extern const char* PTR_s_SCORE_LBX_0055a440;
 
-    inline int16_t& _entry_to_flash =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EC88});
+    extern int16_t _entry_to_flash;
 
-    inline char (&_difficulty_string)[5][15] =
-        *reinterpret_cast<char (*)[5][15]>(std::uintptr_t{0x0056EC90});
+    extern char _difficulty_string[5][15];
 
     int16_t __cdecl HOF_Version_Number_();
 

@@ -5,6 +5,9 @@ struct s_animation_header;
 struct s_mouse_list;
 
 namespace council {
+    extern const char lbx_00559a68[12];
+    extern const char LBX_00559a74[12];
+
     extern s_colors _council_normal_colors;
     extern s_colors _council_highlight_colors;
     extern uint8_t _council_nominee_[2];

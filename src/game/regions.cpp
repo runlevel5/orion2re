@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace regions {
+    uint32_t _rows_remaining;
+    uint32_t _saved_width;
+    uint32_t _interlaced_fill_next_pattern;
+
     void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height) {
         const uint32_t width_bytes = width_blocks << 2;
         const int32_t stride_skip = platform::g_screen_res_x - (int32_t)width_bytes;

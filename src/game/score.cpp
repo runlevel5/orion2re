@@ -1,6 +1,35 @@
 #include "pch.h"
 
 namespace SCORE {
+    s_hof _hof;
+    const char LBX_0055a430[10] = "SCORE.LBX";
+
+    char _default_names[10][20] = {
+        "Moise",
+        "Irma",
+        "Justin",
+        "Jalen",
+        "Cereal",
+        "Lan_Doan",
+        "Cadfael",
+        "J W R",
+        "Ripping_Fang",
+        "Chewy",
+    };
+
+    const char s_wb[3] = "wb";
+    const char s_HOF_M2[7] = "HOF.M2";
+
+    s_hiscore* _hi;
+
+    const char s__d__d_005523a4[6] = "%d.%d";
+
+    const char* PTR_s_SCORE_LBX_0055a440 = SCORE::LBX_0055a430;
+
+    int16_t _entry_to_flash;
+
+    char _difficulty_string[5][15];
+
     void __cdecl nullsub() {
         return;
     }
@@ -59,14 +88,14 @@ namespace SCORE {
         // Load specific background and cursor animations from SCORE.LBX.
         // Entry 15 (0xF) is the hall of fame background.
         _hi->background_anim = (s_animation_header*)farload::Far_Reload_Next_(
-            s_SCORE::LBX_0055a430, 
+            SCORE::LBX_0055a430,
             0xF, 
             MOX::_screen_seg
         );
 
         // Entry 16 (0x10) is the custom mouse cursor for this screen.
         _hi->mouse_cursor_anim = (s_animation_header*)farload::Far_Reload_Next_(
-            s_SCORE::LBX_0055a430, 
+            SCORE::LBX_0055a430,
             0x10, 
             MOX::_screen_seg
         );

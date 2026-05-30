@@ -1,6 +1,22 @@
 #include "pch.h"
 
 namespace REPORT {
+    int16_t _n_reports;
+    s_report _reports[50];
+    uint8_t _done_player_reports;
+    uint8_t _something_interesting_happened[8];
+    uint8_t _done_colonize_check[9];
+    uint8_t _displayed_msgs;
+    uint8_t _displayed_gnn;
+
+    char* _your_spy_destroys_fmt;
+    char* _your_spy_steals_fmt;
+    char* _you_framed_fmt;
+    char* _colonize_preselected_planet_fmt;
+    char* _enemy_spy_destroys_fmt;
+    char* _really_trash_colony_base_fmt;
+    char* _enemy_spy_steals_fmt;
+    char* _outpost_preselected_planet_fmt;
 
     s_colony* __cdecl Player_Colony_Base_At_Star_(short player_idx, short star_idx) {
         for (int i = 0; i < 5; ++i) {

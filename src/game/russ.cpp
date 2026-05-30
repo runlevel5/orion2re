@@ -1,6 +1,12 @@
 #include "pch.h"
 
 namespace RUSS {
+    int8_t _all_ai_game;
+    char _russ_strings[0x1964];
+    const char s_Seed_ld[] = "Seed: %ld";
+    const char s_Map_d[] = "Map:  %d";
+    const char s_This_isnt_a_single_player_game[] = "This isn't a single player game, cheeky monkey!";
+
     void __cdecl Assert_Settings_() {
     }
 
@@ -107,7 +113,7 @@ namespace RUSS {
         farload::Farload_Data_Static_(filename_buffer, 0, &RUSS::_russ_strings, 0, 1, 0x1964);
 
         char* string_ptr;
-        string_ptr = COLCALC::Load_Colcalc_Strings_(&RUSS::_russ_strings);
+        string_ptr = COLCALC::Load_Colcalc_Strings_(RUSS::_russ_strings);
         string_ptr = COMBFIND::Load_Combfind_Strings_(string_ptr);
         string_ptr = MSG_::Load_Msg_Strings_(string_ptr);
         string_ptr = NETMOX::Load_Netmox_Strings_(string_ptr);

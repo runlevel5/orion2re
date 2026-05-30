@@ -440,7 +440,7 @@ namespace HOMEGEN {
             is_race_assigned[i] = 0;
         }
 
-        char* star_names = (char*)farload::Far_Reload_Data_(s_starname::lbx_00558b30, 0, MOX::_screen_seg, 0, 0x0D, 0x0F);
+        char* star_names = (char*)farload::Far_Reload_Data_(MAPGEN::s_starname_lbx, 0, MOX::_screen_seg, 0, 0x0D, 0x0F);
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             s_player* plr = &MOX::_player[i];

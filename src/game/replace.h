@@ -4,11 +4,9 @@
 struct s_animation_header;
 
 namespace replace {
-    inline uint8_t (&_graphics_buffer)[1023] =
-        *reinterpret_cast<uint8_t(*)[1023]>(std::uintptr_t{0x0057A9A8});
+    extern uint8_t _graphics_buffer[1023];
 
-    inline uint8_t*& _palette_color_list =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0057E07C});
+    extern uint8_t* _palette_color_list;
 
     void __cdecl Replace_Color_All_(s_animation_header* anim, uint8_t color);
 
@@ -16,8 +14,7 @@ namespace replace {
 
     void __cdecl Replace_Color_Range_(s_animation_header* anim, uint8_t* palette_map, int16_t start_color, int16_t num_colors);
 
-    inline const char* s_Shift_Palette_Range_exceeds_25_0055b7c4 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055B7C4});
+    extern const char s_Shift_Palette_Range_exceeds_25_0055b7c4[41];
 
     void __cdecl Shift_Palette_Range_(s_animation_header* anim, int shift);
 

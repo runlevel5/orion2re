@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace replace {
+    uint8_t _graphics_buffer[1023];
+    uint8_t* _palette_color_list;
+    const char s_Shift_Palette_Range_exceeds_25_0055b7c4[41] = "Shift_Palette_Range() exceeds 256 colors";
 
     void __cdecl Replace_Color_All_(s_animation_header *anim, uint8_t color)
     {

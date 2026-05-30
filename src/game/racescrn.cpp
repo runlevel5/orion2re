@@ -2,6 +2,78 @@
 
 namespace RACESCRN {
 
+    static void __cdecl FUN_0049DAC0(s_racescrn_mouse_group* group) {
+        bitmap::Create_Blank_Bitmap_(187, 25, group->sprite2);
+    }
+
+    const char s_billtext_lbx_0055135c[13] = "billtext.lbx";
+    const char s_billtex2_lbx_00556038[13] = "billtex2.lbx";
+    const char s_races_lbx_005574e8[10] = "races.lbx";
+    s_racescrn_icon_layout _mouse_group_data = {0, 0, 186, 24, 25, FUN_0049DAC0};
+    int16_t _g_spy_xfer_count;
+    s_racescrn_mouse_group* _g_agent_group_p;
+    s_racescrn_mouse_group* _g_mouse_group_p;
+    int32_t _net_state;
+    s_racescrn_race_display* _g_display_p;
+    uint8_t _g_in_who_mode;
+    s_animation_header* _g_mouse_seg;
+    int16_t _g_agent_field;
+    uint8_t _g_in_spy_mode;
+    s_animation_header* _arrow_seg;
+    char _trade_treaty_buffer[30];
+    char _ignoring_str[20];
+    s_animation_header* _netbox_seg;
+    char _agent_bonus_str[20];
+    char _no_contact_str[20];
+    char _declare_war_buffer[120];
+    char _spy_bonus_str[20];
+    char _giving_treaty_buffer[80];
+    char _research_treaty_buffer[30];
+    char _relation_text[17][15];
+    uint8_t _slider_remap_list[26] = {74, 72, 68, 66, 62, 60, 56, 54, 50, 48, 44, 42, 38, 36, 32, 30, 26, 24, 20, 18, 14, 12, 8, 6, 2, 0};
+    uint8_t _relation_name_table[17] = {9, 21, 33, 45, 57, 69, 81, 93, 107, 119, 131, 143, 155, 167, 179, 191, 255};
+    s_racescrn_icon_layout _spy_group_data[7] = {
+        {121, 98, 307, 122, 25, nullptr},
+        {121, 205, 307, 229, 25, nullptr},
+        {121, 311, 307, 335, 25, nullptr},
+        {121, 417, 307, 441, 25, nullptr},
+        {333, 98, 519, 122, 25, nullptr},
+        {333, 206, 519, 230, 25, nullptr},
+        {333, 311, 519, 335, 25, nullptr},
+    };
+    int16_t _race_bar[14] = {105, 49, 105, 155, 105, 262, 105, 370, 528, 49, 528, 156, 528, 261};
+    int16_t _race_spies[14] = {121, 98, 121, 205, 121, 311, 121, 417, 333, 98, 333, 206, 333, 311};
+    int16_t _race_spy_btns[14] = {120, 126, 120, 233, 120, 338, 120, 445, 332, 126, 332, 233, 332, 338};
+    int16_t _race_slider_x[7] = {96, 96, 96, 96, 520, 520, 520};
+    s_racescrn_icon_layout _agent_group_data = {332, 392, 613, 415, 24, nullptr};
+    int16_t _race_picture[14] = {21, 49, 21, 156, 21, 262, 21, 369, 544, 50, 544, 157, 544, 262};
+    int16_t _race_text[14] = {125, 50, 125, 157, 125, 262, 125, 366, 333, 50, 333, 157, 333, 262};
+    s_colors _race_normal_color = {{176, 185, 181, 182, 184, 185, 185, 186}};
+    s_colors _race_high_color = {{176, 191, 183, 185, 187, 188, 191, 191}};
+    s_colors _banner_color_high = {{67, 139, 147, 38, 61, 95, 106, 47}};
+    s_colors _banner_color_low = {{70, 138, 149, 35, 59, 96, 110, 49}};
+    s_colors _banner_color_edge = {{72, 97, 150, 26, 57, 116, 158, 73}};
+    char _receiving_treaty_buffer[80];
+    const char s_empty_string[1] = "";
+    const char s_carriage_return[2] = "\r";
+    const char s_spy_bonus_fmt[8] = "%s%hi%%";
+    const char s_agent_bonus_fmt[8] = "%s%hi%%";
+    const char s_trade_bc_fmt[8] = "\r%s%iBC";
+    const char s_trade_mc_fmt[8] = "\r%s%iMC";
+    const char s_research_fmt[8] = "\r%s%i%s";
+    const char s_pr_str[3] = "PR";
+    const char s_mc_str[3] = "MC";
+    const char s_fp_str[4] = "FP";
+    const char s_bc_str[3] = "BC";
+    const char s_rp_str[3] = "RP";
+    const char s_space[2] = "\x1b";
+    const char s_I[2] = "I";
+    const char s_R[2] = "R";
+    const char s_A[2] = "A";
+    const char s_D[2] = "D";
+    char _diplomacy_net_wait_buffer[100];
+    char _diplomacy_net_requeting_buffer[100];
+
     void __cdecl Calculate_Icon_Group_Data_(s_racescrn_mouse_group* group) {
         int16_t width = (group->x2 - group->x1) + 1;
         group->total_height = (group->y2 - group->y1) + 1;
@@ -178,7 +250,7 @@ namespace RACESCRN {
 
     void __cdecl Draw_Relations_Sliders_(s_racescrn_race_display* displays) {
         allocate::Push_Block_(MOX::_screen_seg);
-        s_animation_header* bar_anim = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 3, MOX::_screen_seg);
+        s_animation_header* bar_anim = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 3, MOX::_screen_seg);
 
         for (int16_t i = 0; i < 7; ++i) {
             int16_t x;
@@ -230,9 +302,9 @@ namespace RACESCRN {
     void __cdecl Init_Race_Display_Data_(s_racescrn_race_display* race_display, s_racescrn_mouse_group* agent_group) {
         memset(race_display, 0, sizeof(s_racescrn_race_display) * 7);
 
-        s_animation_header* spy_agent_icon_sprite = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, MOX::_player[MOX::_PLAYER_NUM].race + 0x2E, MOX::_screen_seg);
-        s_animation_header* slider_sprite = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, 2, MOX::_screen_seg);
-        s_animation_header* eliminated_overlay_sprite = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, 0x1F, MOX::_screen_seg);
+        s_animation_header* spy_agent_icon_sprite = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, MOX::_player[MOX::_PLAYER_NUM].race + 0x2E, MOX::_screen_seg);
+        s_animation_header* slider_sprite = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 2, MOX::_screen_seg);
+        s_animation_header* eliminated_overlay_sprite = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 0x1F, MOX::_screen_seg);
 
         for (int16_t i = 0; i < 7; ++i) {
             race_display[i].relationship_slider_img = slider_sprite;
@@ -265,14 +337,14 @@ namespace RACESCRN {
 
                     RACESCRN::Setup_Icon_Group_Data_(&race_display[i].spy_icons_group, &RACESCRN::_spy_group_data[i], spy_count, spy_agent_icon_sprite, nullptr);
 
-                    race_display[i].spy_icon_img = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, i + 10, MOX::_screen_seg);
-                    race_display[i].sabotage_icon_img = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, i + 17, MOX::_screen_seg);
-                    race_display[i].assassination_icon_img = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, i + 24, MOX::_screen_seg);
+                    race_display[i].spy_icon_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, i + 10, MOX::_screen_seg);
+                    race_display[i].sabotage_icon_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, i + 17, MOX::_screen_seg);
+                    race_display[i].assassination_icon_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, i + 24, MOX::_screen_seg);
                 } else {
                     race_display[i].is_eliminated = 1;
                 }
 
-                race_display[i].race_portrait_img = (s_animation_header*)farload::Far_Reload_Next_(races_lbx, race_display[i].race + 32, MOX::_screen_seg);
+                race_display[i].race_portrait_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, race_display[i].race + 32, MOX::_screen_seg);
             } else {
                 race_display[i].is_empty_slot = 1;
             }
@@ -288,7 +360,7 @@ namespace RACESCRN {
     {
         fields::Clear_Fields_();
 
-        s_animation_header* img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 9, MOX::_screen_seg);
+        s_animation_header* img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 9, MOX::_screen_seg);
         *ok_btn_id = fields::Add_Button_Field_(535, 433, s_empty_string, img, s_space, 40 /* '(' */);
 
         *agriculture_field_id = 0;
@@ -302,16 +374,16 @@ namespace RACESCRN {
             *agriculture_btn_id = 0;
             *diplomacy_btn_id = 0;
         } else {
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 6, MOX::_screen_seg);
+            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 6, MOX::_screen_seg);
             *industry_btn_id = fields::Add_Radio_Button_Field_(429, 444, s_empty_string, img, industry_field_id, s_I, 40 /* '(' */);
 
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 7, MOX::_screen_seg);
+            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 7, MOX::_screen_seg);
             *research_btn_id = fields::Add_Radio_Button_Field_(429, 423, s_empty_string, img, research_field_id, s_R, 40 /* '(' */);
 
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 8, MOX::_screen_seg);
+            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 8, MOX::_screen_seg);
             *agriculture_btn_id = fields::Add_Radio_Button_Field_(334, 423, s_empty_string, img, agriculture_field_id, s_A, 40 /* '(' */);
 
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 60, MOX::_screen_seg);
+            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx_005574e8, 60, MOX::_screen_seg);
             *diplomacy_btn_id = fields::Add_Radio_Button_Field_(334, 444, s_empty_string, img, diplomacy_field_id, s_D, 40 /* '(' */);
         }
 
@@ -717,7 +789,8 @@ namespace RACESCRN {
                 farload::Far_Reload_Next_(s_races_lbx_005574e8, sprite_idx, MOX::_screen_seg));
             RUSS::Mox_Update_();
 
-            _netbox_seg = farload::Far_Reload_Next_(s_races_lbx_005574e8, 59, MOX::_screen_seg);
+            _netbox_seg = reinterpret_cast<s_animation_header*>(
+                farload::Far_Reload_Next_(s_races_lbx_005574e8, 59, MOX::_screen_seg));
             RUSS::Mox_Update_();
 
             JIM::Bill_Picture_To_Mouse_(_g_mouse_seg);

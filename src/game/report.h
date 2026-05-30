@@ -1,27 +1,27 @@
 #pragma once
 
 namespace REPORT {
-    inline int16_t& _n_reports = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A4EAA});
-    inline s_report (&_reports)[50] = *reinterpret_cast<s_report(*)[50]>(std::uintptr_t{0x005A4EC0});
-    inline uint8_t& _done_player_reports = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4EB8});
-    inline uint8_t (&_something_interesting_happened)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005A4EB0});
-    inline uint8_t (&_done_colonize_check)[9] = *reinterpret_cast<uint8_t(*)[9]>(std::uintptr_t{0x005A4EA0});
-    inline uint8_t& _displayed_msgs = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A5276});
-    inline uint8_t& _displayed_gnn = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4EAC});
+    extern int16_t _n_reports;
+    extern s_report _reports[50];
+    extern uint8_t _done_player_reports;
+    extern uint8_t _something_interesting_happened[8];
+    extern uint8_t _done_colonize_check[9];
+    extern uint8_t _displayed_msgs;
+    extern uint8_t _displayed_gnn;
 
     void __cdecl Client_Initialize_Reports_();
 
     void __cdecl Initialize_Reports_();
     void __cdecl Add_Report_(s_report* report);
 
-    inline char*& _your_spy_destroys_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC68});
-    inline char*& _your_spy_steals_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC6C});
-    inline char*& _you_framed_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC70});
-    inline char*& _colonize_preselected_planet_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC74});
-    inline char*& _enemy_spy_destroys_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC78});
-    inline char*& _really_trash_colony_base_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC7C});
-    inline char*& _enemy_spy_steals_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC80});
-    inline char*& _outpost_preselected_planet_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056CC84});
+    extern char* _your_spy_destroys_fmt;
+    extern char* _your_spy_steals_fmt;
+    extern char* _you_framed_fmt;
+    extern char* _colonize_preselected_planet_fmt;
+    extern char* _enemy_spy_destroys_fmt;
+    extern char* _really_trash_colony_base_fmt;
+    extern char* _enemy_spy_steals_fmt;
+    extern char* _outpost_preselected_planet_fmt;
 
     char* __cdecl Load_Report_Strings_(char* data);
 
