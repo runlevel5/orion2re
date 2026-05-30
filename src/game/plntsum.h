@@ -1,67 +1,46 @@
 #pragma once
 
 namespace PLNTSUM {
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
-    inline const char* s_plus = reinterpret_cast<const char*>(std::uintptr_t{0x00551118}); // "+"
-    inline const char* s_minus = reinterpret_cast<const char*>(std::uintptr_t{0x0055111C}); // "-"
-    inline const char* s_space = reinterpret_cast<const char*>(std::uintptr_t{0x00551120}); // " "
-    inline const char* s_C = reinterpret_cast<const char*>(std::uintptr_t{0x00552420}); // "C"
-    inline const char* s_O = reinterpret_cast<const char*>(std::uintptr_t{0x00556AFC}); // "O"
-    inline const char* s_1 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B10}); // "1"
-    inline const char* s_2 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B0C}); // "2"
-    inline const char* s_3 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B08}); // "3"
-    inline const char* s_4 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B04}); // "4"
-    inline const char* s_5 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B00}); // "5"
+    extern int16_t _plntscrn_delta_y[9];
+    extern int16_t _sort_choice;
+    extern int16_t _filter_out_adverse_gravity_planets;
+    extern int16_t _filter_out_hostile_environment_planets;
+    extern int16_t _filter_out_mineral_scarcity_planets;
+    extern int16_t _filter_out_enemy_controlled_planets;
+    extern int16_t _filter_out_planets_out_of_range;
 
-    inline int16_t (&_plntscrn_delta_y)[9] = *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x00556A78});
-    inline int16_t& _sort_choice = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556ACC});
-    inline int16_t& _filter_out_adverse_gravity_planets = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556AD0});
-    inline int16_t& _filter_out_hostile_environment_planets = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556AD4});
-    inline int16_t& _filter_out_mineral_scarcity_planets = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556AD8});
-    inline int16_t& _filter_out_enemy_controlled_planets = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556ADC});
-    inline int16_t& _filter_out_planets_out_of_range = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556AE0});
+    extern s_plntsum_screen* _screen;
 
-    inline s_plntsum_screen*& _screen = *reinterpret_cast<s_plntsum_screen**>(std::uintptr_t{0x0056582C});
+    extern s_colors _hi_neutral_colors;
+    extern s_colors _red_colors;
+    extern s_colors _green_colors;
 
-    inline s_colors& _hi_neutral_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556A60});
-    inline s_colors& _red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556A68});
-    inline s_colors& _green_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556A70});
+    extern s_plntsum_planet* _planet_summary;
 
-    inline s_plntsum_planet*& _planet_summary =
-        *reinterpret_cast<s_plntsum_planet**>(std::uintptr_t{0x005657E8});
+    extern s_plntsum_ship* _ship_summary;
 
-    inline s_plntsum_ship*& _ship_summary =
-        *reinterpret_cast<s_plntsum_ship**>(std::uintptr_t{0x005658A0});
-
-    inline int16_t& _n_ships_in_summary = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565898});
+    extern int16_t _n_ships_in_summary;
     extern int8_t _can_reach_star[72];
 
-    inline uint8_t (&_explored_bitmap)[45] =
-        *reinterpret_cast<uint8_t(*)[45]>(std::uintptr_t{0x005657F8});
+    extern uint8_t _explored_bitmap[45];
 
     void __cdecl Reset_Explored_Planets_();
 
-    inline uint8_t& _found_outpost_ship =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565828});
+    extern uint8_t _found_outpost_ship;
 
-    inline uint8_t& _draw_colony_button_status =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565890});
+    extern uint8_t _draw_colony_button_status;
 
-    inline int16_t& _send_choice =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565894});
+    extern int16_t _send_choice;
 
-    inline uint8_t& _found_colony_ship =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005658AC});
+    extern uint8_t _found_colony_ship;
 
-    inline uint8_t& _draw_outpost_button_status =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005658C4});
+    extern uint8_t _draw_outpost_button_status;
 
-    inline uint16_t& _plntsum_scroll_bar =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565844});
+    extern int16_t _plntsum_scroll_bar;
 
-    inline uint32_t& DAT_0056583c = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056583C});
+    extern uint32_t DAT_0056583c;
 
-    inline uint8_t& DAT_00565840 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565840});
+    extern uint8_t DAT_00565840;
 
     void __cdecl Add_Planet_Summary_Bar_Field_();
 
@@ -111,17 +90,13 @@ namespace PLNTSUM {
 
     void __cdecl Update_Ship_Etas_();
 
-    inline int16_t& _last_ship_moved =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005658C8});
+    extern int16_t _last_ship_moved;
 
-    inline char*& PTR_s_PLNTSUM_LBX_00556AC0 =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00556AC0});
+    extern const char* PTR_s_PLNTSUM_LBX_00556AC0;
 
-    inline s_animation_header*& _send_colony_ship_button_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00556AC4});
+    extern s_animation_header* _send_colony_ship_button_seg;
 
-    inline s_animation_header*& _send_outpost_ship_button_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00556AC8});
+    extern s_animation_header* _send_outpost_ship_button_seg;
 
     void __cdecl Load_Player_Icon_();
 
@@ -153,11 +128,9 @@ namespace PLNTSUM {
 
     void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type);
 
-    inline bool& _can_reach_scanned_planet =
-        *reinterpret_cast<bool*>(std::uintptr_t{0x00565830});
+    extern bool _can_reach_scanned_planet;
 
-    inline int8_t& _box_field_scanned =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x005658BC});
+    extern int8_t _box_field_scanned;
 
     void __cdecl Scan_Summary_Box_Fields_(int16_t input_field_id, int16_t clicked_field_id, int16_t* last_input_field_id_ptr);
 
@@ -169,21 +142,17 @@ namespace PLNTSUM {
 
     void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t colony, int8_t outpost);
 
-    inline bool& _recalc_first_planet =
-        *reinterpret_cast<bool*>(std::uintptr_t{0x005658C0});
+    extern bool _recalc_first_planet;
 
-    inline uint8_t& _fade_flag =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056589C});
+    extern uint8_t _fade_flag;
 
-    inline uint8_t& DAT_005658a4 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005658A4});
+    extern uint8_t DAT_005658a4;
 
-    inline uint8_t& _skip_draw_planets =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005658A8});
+    extern uint8_t _skip_draw_planets;
 
     void __cdecl Fill_Summary_Screen_Scroll_Bar_();
 
-    inline s_animation_header**& _p_rotating_planet =
-        *reinterpret_cast<s_animation_header***>(std::uintptr_t{ 0x00565838 });
+    extern s_animation_header** _p_rotating_planet;
 
     void __cdecl Draw_Rotating_Planets_();
 

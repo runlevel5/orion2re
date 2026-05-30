@@ -218,8 +218,8 @@ namespace MOX {
     s_animation_header* _selected_box_seg;
     s_animation_header* _scanned_box_seg;
     s_animation_header* _fleet_scroll_anim_seg;
-    void* _officer_normal_window_seg;
-    void* _officer_bright_window_seg;
+    s_animation_header* _officer_normal_window_seg;
+    s_animation_header* _officer_bright_window_seg;
     s_animation_header** _temp_officers_pict;
     s_animation_header* _officer_dismiss_button_seg;
     s_animation_header* _officer_fleet_box_seg;
@@ -230,6 +230,65 @@ namespace MOX {
     s_animation_header* _officer_hire_replace_seg;
     int8_t _officer_scanned;
     int8_t _officer_scrn_type;
+
+    int8_t _officer_selected;
+    int16_t _special_scroll_dn_button;
+    int8_t _n_weapons_loaded;
+    uint8_t _n_special_systems;
+    int8_t* _fltscrn_icon_selection_status;
+    uint8_t _star_class_table[7][3] = {
+        {20, 10, 5},
+        {25, 15, 5},
+        {10, 16, 30},
+        {10, 16, 21},
+        {32, 37, 30},
+        {1, 2, 3},
+        {2, 4, 6},
+    };
+    int16_t _cur_missile_count;
+    int16_t _NUM_STARS;
+    s_scroll_bar _fltpop_scroll_bar;
+    int16_t _cur_map_scale;
+    int16_t _cur_map_x;
+    int16_t _cur_map_y;
+    uint16_t _global_esc;
+    short _return_screen;
+    char* _save_game_dates;
+    char* _save_game_stardates;
+    char* _star_name_loaded_string;
+    int16_t _scanned_field;
+    int8_t _previous_screen;
+    int16_t _max_debug_saves;
+    int16_t _first_debug_save;
+    int16_t _debug_saves_on;
+    uint8_t _turns_between_debug_saves;
+    void* _sound_buffer;
+    int16_t _hot_seat_flag;
+    short _current_screen;
+    int16_t _design_screen_replacement_type;
+    int16_t _design_screen_replacement_slot;
+    s_animation_header* _asteroid_seg;
+    s_animation_header* _screen_seg;
+    s_animation_header* _diplomacy_request_popup_seg;
+    s_animation_header* _combat_bitmap;
+    s_animation_header* _combat_map_planet_seg;
+    s_animation_header* _combat_planet_seg;
+    s_animation_header* _combat_planet_seg2;
+    uint8_t _player_has_ship_in_system;
+    int8_t _game_type;
+    s_antaran _antarans;
+    int8_t _maps_to_generate;
+    uint8_t _auto_turn_exit;
+    int16_t _special_scroll_up_button[2];
+    uint8_t _blue_color2;
+    int16_t _auto_msl_warning_off;
+    s_animation_header* _draw_ship_bitmap;
+    int16_t _multi_colored_line_start;
+    int16_t _design_choice_item_selected[40];
+    int8_t _first_special_system_ctr;
+    uint8_t _first_design_screen_call;
+    int16_t _design_size;
+    uint8_t _refresh_mode;
 
     s_fleet_movement_icon _fleet_movement_icon[500];
 

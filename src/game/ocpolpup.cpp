@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace OCPOLPUP {
+    uint16_t _value;
+
+    MOX2::action_func_t _saved_autofunction;
+
     void __cdecl Occupation_Policy_Popup_() {
         uint8_t font_colors[4] = {0x9f, 0xa0, 0xa1, 0xa2};
         int16_t planet_index;

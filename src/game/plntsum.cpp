@@ -4,7 +4,64 @@
 
 namespace PLNTSUM {
 
+static const char s__00551100[1] = "";
+static const char s_plus[2] = "+";
+static const char s_minus[2] = "-";
+static const char s_space[2] = "\x1B";
+static const char s_C[2] = "C";
+static const char s_O[2] = "O";
+static const char s_1[2] = "1";
+static const char s_2[2] = "2";
+static const char s_3[2] = "3";
+static const char s_4[2] = "4";
+static const char s_5[2] = "5";
+
+static const char s_PLNTSUM_LBX_00556a54[12] = "PLNTSUM.LBX";
+static const char s_o_00556af4[2] = "o";
+static const char s_oc_00556af8[3] = "oc";
+static const char s_c_00556350[2] = "c";
+
+s_colors _hi_neutral_colors = {{0x40, 0xFF, 0x43, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
+s_colors _red_colors = {{0xCF, 0xD3, 0xD2, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3}};
+s_colors _green_colors = {{0xDB, 0xDE, 0xDD, 0xDE, 0xDE, 0xDE, 0xDE, 0xDE}};
+
+int16_t _plntscrn_delta_y[9] = {0, 55, 109, 164, 219, 274, 329, 383, 479};
+int16_t _sort_choice;
+int16_t _filter_out_adverse_gravity_planets;
+int16_t _filter_out_hostile_environment_planets;
+int16_t _filter_out_mineral_scarcity_planets;
+int16_t _filter_out_enemy_controlled_planets;
+int16_t _filter_out_planets_out_of_range = 1;
+
+s_plntsum_screen* _screen;
+s_plntsum_planet* _planet_summary;
+s_plntsum_ship* _ship_summary;
+int16_t _n_ships_in_summary;
 int8_t _can_reach_star[72];
+uint8_t _explored_bitmap[45];
+
+uint8_t _found_outpost_ship;
+uint8_t _draw_colony_button_status;
+int16_t _send_choice;
+uint8_t _found_colony_ship;
+uint8_t _draw_outpost_button_status;
+int16_t _plntsum_scroll_bar;
+uint32_t DAT_0056583c;
+uint8_t DAT_00565840;
+
+int16_t _last_ship_moved;
+const char* PTR_s_PLNTSUM_LBX_00556AC0 = s_PLNTSUM_LBX_00556a54;
+s_animation_header* _send_colony_ship_button_seg;
+s_animation_header* _send_outpost_ship_button_seg;
+
+bool _can_reach_scanned_planet;
+int8_t _box_field_scanned;
+bool _recalc_first_planet;
+uint8_t _fade_flag;
+uint8_t DAT_005658a4;
+uint8_t _skip_draw_planets;
+
+s_animation_header** _p_rotating_planet;
 
 void __cdecl Summary_Screen_Print_Data_(void) {
     int16_t monster_race = -1;

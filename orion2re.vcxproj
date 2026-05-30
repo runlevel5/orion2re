@@ -163,6 +163,7 @@
     <ClCompile Include="src\game\officer.cpp" />
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
+    <ClCompile Include="src\game\paragrph.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
     <ClCompile Include="src\game\plntsum.cpp" />
     <ClCompile Include="src\game\racecust.cpp" />

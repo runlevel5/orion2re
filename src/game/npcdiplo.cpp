@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace npcdiplo {
+    s_npcdiplo_tech _human_tech[212];
+    s_npcdiplo_tech _target_tech[212];
+
     void __cdecl Clear_Last_Proposal_Turn_(int16_t player_id_1, int16_t player_id_2) {
         MOX::_player[player_id_1].last_diplomacy_proposal_turn[player_id_2] = 0;
         MOX::_player[player_id_2].last_diplomacy_proposal_turn[player_id_1] = 0;

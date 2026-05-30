@@ -3,8 +3,7 @@
 namespace palette {
     void __cdecl Set_Palette_Gradient_(int32_t start_index, int32_t count, int32_t start_r, int32_t start_g, int32_t start_b, int32_t end_r, int32_t end_g, int32_t end_b);
 
-    inline s_palette_entry (&_saved_palette)[256] =
-        *reinterpret_cast<s_palette_entry(*)[256]>(std::uintptr_t{0x0057B1B8});
+    extern s_palette_entry _saved_palette[256];
 
     void __cdecl Save_Palette_();
 
@@ -12,14 +11,11 @@ namespace palette {
 
     void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end);
 
-    inline int32_t& _cycle_direction_flag =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B2A8});
+    extern int32_t _cycle_direction_flag;
 
-    inline int32_t& _cycle_step_value =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057B1B0});
+    extern int32_t _cycle_step_value;
 
-    inline int32_t& _cycle_color_value =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057B1B4});
+    extern int32_t _cycle_color_value;
 
     void __cdecl Reset_Cycle_Palette_Color_();
 

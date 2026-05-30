@@ -1,6 +1,34 @@
 #include "pch.h"
 
 namespace OFFICER {
+    char s_OFFICER_LBX_00556980[16] = "OFFICER.LBX";
+    s_colors _normal_text_colors = {{61, 68, 67, 68, 68, 68, 68, 68}};
+    s_colors _red_colors = {{75, 129, 77, 129, 129, 129, 129, 129}};
+    int16_t _officer_dismiss_btn;
+    uint8_t _offscrn_skip_draw_ships;
+    uint8_t _full_draw;
+    int8_t _officer_button_mode;
+    int16_t _officer_pool_btn;
+    uint8_t _offscrn_flash_incr;
+    uint8_t _offscrn_ask_for_hire_popup;
+    int16_t _fleet_icon_ship_id_to_move;
+    int8_t _offscrn_flash_dir;
+    int16_t _officer_star_displayed;
+    uint8_t _offscrn_flash_value;
+    int16_t _officer_star_chosen;
+    s_prev_leader_data* _prev_leaders;
+    s_officer_picture_slot* _ldrpict;
+    const char* PTR_s_OFFICER_LBX = s_OFFICER_LBX_00556980;
+    const char s_ITASKLLS_LBX_005569fc[16] = "ITASKLLS.LBX";
+    const char s_SPASKLLS_LBX_00556a0c[16] = "SPASKLLS.LBX";
+    const char s_FRESKLLS_LBX_00556a1c[16] = "FRESKLLS.LBX";
+    const char s_GERSKLLS_LBX_00556a2c[16] = "GERSKLLS.LBX";
+    const char s_SKILDESC_LBX_00556a3c[16] = "SKILDESC.LBX";
+    char* _officer_skill_description_string[27];
+    char* _officer_skill_name_string[27];
+    s_officer_skill_help _officer_skill_help[4];
+    const char s__00551100[1] = "";
+
     int16_t __cdecl Get_Officer_Level_(int16_t leader_idx) {
         int16_t current_xp = MOX::_leaders[leader_idx].xp;
 
@@ -2606,9 +2634,9 @@ namespace OFFICER {
         int32_t frame_index = pic_offset + static_cast<uint8_t>(MOX::_leaders[leader_idx].pict_num);
 
         if (use_far_reload == 0) {
-            return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX_00556990, frame_index, dest);
+            return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX, frame_index, dest);
         } else {
-            return (s_animation_header*)farload::Far_Reload_(PTR_s_OFFICER_LBX_00556990, frame_index, dest);
+            return (s_animation_header*)farload::Far_Reload_(PTR_s_OFFICER_LBX, frame_index, dest);
         }
     }
 
@@ -2720,10 +2748,10 @@ namespace OFFICER {
             resource_idx++;
 
             MOX::_fltscrn_small_ship_icon_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_OFFICER_LBX_00556990, current_idx, MOX::_screen_seg);
+                PTR_s_OFFICER_LBX, current_idx, MOX::_screen_seg);
 
             MOX::_fltscrn_flashing_ship_pict_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_OFFICER_LBX_00556990, current_idx, MOX::_screen_seg);
+                PTR_s_OFFICER_LBX, current_idx, MOX::_screen_seg);
         }
 
         for (int j = 0; j < 7; ++j) {
@@ -2731,10 +2759,10 @@ namespace OFFICER {
             resource_idx++;
 
             MOX::_fltscrn_monster_ship_icon[j] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_OFFICER_LBX_00556990, current_idx, MOX::_screen_seg);
+                PTR_s_OFFICER_LBX, current_idx, MOX::_screen_seg);
 
             MOX::_fltscrn_flashing_monster_ship_icon[j] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_OFFICER_LBX_00556990, current_idx, MOX::_screen_seg);
+                PTR_s_OFFICER_LBX, current_idx, MOX::_screen_seg);
         }
 
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
@@ -2806,7 +2834,7 @@ namespace OFFICER {
             *hire_btn = fields::Add_Button_Field_(
                 0x139, 
                 0x1b9, 
-                MOX::s__00551100, 
+                s__00551100,
                 MOX::_officer_hire_button_seg, 
                 s_H_005569d4, 
                 0x28
@@ -2819,7 +2847,7 @@ namespace OFFICER {
             *cancel_hire_btn = fields::Add_Button_Field_(
                 0x1cc, 
                 0x1b7, 
-                MOX::s__00551100, 
+                s__00551100,
                 MOX::_officer_cancel_hire_button_seg, 
                 s_X_005569d0, 
                 0x28
@@ -2849,7 +2877,7 @@ namespace OFFICER {
         *return_btn = fields::Add_Button_Field_(
             0x21a, 
             0x1b9, 
-            MOX::s__00551100, 
+            s__00551100,
             MOX::_officer_return_button_seg, 
             s__00551120, 
             0x28
@@ -2865,7 +2893,7 @@ namespace OFFICER {
                     y, 
                     0x128, 
                     y + 0x6c, 
-                    MOX::s__00551100, 
+                    s__00551100,
                     0x29
                 );
                 help_field_2[i] = fields::Add_Hidden_Field_(
@@ -2873,7 +2901,7 @@ namespace OFFICER {
                     y, 
                     0x5b, 
                     y + 0x60, 
-                    MOX::s__00551100, 
+                    s__00551100,
                     0x29
                 );
             } else {
@@ -2891,7 +2919,7 @@ namespace OFFICER {
             *up_btn = fields::Add_Button_Field_(
                 0x265, 
                 0x16, 
-                MOX::s__00551100, 
+                s__00551100,
                 MOX::_officer_up_button_seg, 
                 s_minus_0055111c, 
                 0x28
@@ -2899,7 +2927,7 @@ namespace OFFICER {
             *dn_btn = fields::Add_Button_Field_(
                 0x265, 
                 0xaa, 
-                MOX::s__00551100, 
+                s__00551100,
                 MOX::_officer_dn_button_seg, 
                 s_plus_00551118, 
                 0x28
@@ -2916,7 +2944,7 @@ namespace OFFICER {
         *next_btn = fields::Add_Button_Field_(
             0x238, 
             0xcd, 
-            MOX::s__00551100, 
+            s__00551100,
             MOX::_officer_next_button_seg, 
             s_dot_0055632c, 
             0x28
@@ -2925,7 +2953,7 @@ namespace OFFICER {
         *prev_btn = fields::Add_Button_Field_(
             0x147, 
             0xcd, 
-            MOX::s__00551100, 
+            s__00551100,
             MOX::_officer_prev_button_seg, 
             s_comma_005569c8, 
             0x28
@@ -2936,7 +2964,7 @@ namespace OFFICER {
             0x1d6, 
             0xa, 
             0x1df, 
-            MOX::s__00551100, 
+            s__00551100,
             0x29
         );
 
@@ -2963,7 +2991,7 @@ namespace OFFICER {
             0x0, 
             0x27f, 
             0x1df, 
-            MOX::s__00551100, 
+            s__00551100,
             0x0
         );
     }
@@ -3450,10 +3478,10 @@ s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, i
     const int16_t image_id = static_cast<int16_t>(static_cast<uint8_t>(MOX::_leaders[leader_idx].pict_num) + 0x8f);
 
     if (load_now != 0) {
-        return (s_animation_header*)farload::Far_Reload_(PTR_s_OFFICER_LBX_00556990, image_id, buffer);
+        return (s_animation_header*)farload::Far_Reload_(PTR_s_OFFICER_LBX, image_id, buffer);
     }
 
-    return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX_00556990, (int)image_id, buffer);
+    return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX, (int)image_id, buffer);
 }
 
 void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int16_t officer_idx) {

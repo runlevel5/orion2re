@@ -6,7 +6,7 @@ struct s_player;
 namespace newtech {
     extern int16_t _best_category[12];
 
-    extern int32_t _tech_research_level_values[23];
+    extern int32_t _tech_research_level_values[30];
 
     int16_t __cdecl Get_Competition_Tech_Values_(int16_t category, int16_t player_idx);
 

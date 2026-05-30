@@ -8,11 +8,9 @@ namespace npcdiplo {
         uint8_t index;
     };
 
-    inline s_npcdiplo_tech (&_human_tech)[212] = 
-        *reinterpret_cast<s_npcdiplo_tech(*)[212]>(std::uintptr_t{0x00595830});
+    extern s_npcdiplo_tech _human_tech[212];
 
-    inline s_npcdiplo_tech(&_target_tech)[212] =
-            *reinterpret_cast<s_npcdiplo_tech(*)[212]>(std::uintptr_t{0x00595400});
+    extern s_npcdiplo_tech _target_tech[212];
 
     int16_t __cdecl Get_Tech_Exchange_Reaction_(int16_t player_a, int16_t player_b, int16_t param_3);
 

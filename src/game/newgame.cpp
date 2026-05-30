@@ -2,6 +2,37 @@
 
 namespace NEWGAME {
 
+int16_t _g_x = 15;
+int16_t _g_y = 5;
+s_colors _color_ken;
+int16_t _opp_button_variable;
+int16_t _diff_button_variable;
+int16_t _xenon_attacks_button_variable;
+int16_t _civ_button_variable;
+uint16_t _combat_button_variable;
+int16_t _gal_size_button_variable;
+int16_t _random_events_button_variable;
+int16_t _gal_age_button_variable;
+int16_t _fields[10];
+s_animation_header* _anims[7];
+s_animation_header* _tech_level_anims[3];
+s_animation_header* _difficulty_anims[5];
+s_animation_header* _num_players_anims[7];
+s_animation_header* _gal_age_anims[3];
+s_animation_header* _gal_size_anims[4];
+s_animation_header* _background_seg;
+char* _gal_size_button_strings[4];
+char* _civ_button_strings[3];
+char* _diff_button_strings[5];
+char* _gal_age_button_strings[3];
+char* _combat_button_strings[2];
+char _hack_msg[20];
+char* _opp_button_strings[7];
+
+const char s_Media_00557db4[6] = "Media";
+const char s_sen_00557dbc[5] = "%sen";
+const char s_Piccola_00557dc4[8] = "Piccola";
+
 short __cdecl Newgame_Screen_(void) {
     memcpy(NEWGAME::_color_ken.colors, "y{z|||||", 8);
 

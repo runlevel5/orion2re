@@ -85,7 +85,6 @@ namespace MOX {
     extern const char s__00551100[1];
 
     extern uint16_t _fleet_box_map_height;
-    inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
     extern s_current_design* _design;
 
     extern int16_t _scanned_big_ship;
@@ -123,8 +122,8 @@ namespace MOX {
     extern s_animation_header* _selected_box_seg;
     extern s_animation_header* _scanned_box_seg;
     extern s_animation_header* _fleet_scroll_anim_seg;
-    extern void* _officer_normal_window_seg;
-    extern void* _officer_bright_window_seg;
+    extern s_animation_header* _officer_normal_window_seg;
+    extern s_animation_header* _officer_bright_window_seg;
     extern s_animation_header** _temp_officers_pict;
     extern s_animation_header* _officer_dismiss_button_seg;
     extern s_animation_header* _officer_fleet_box_seg;
@@ -135,82 +134,74 @@ namespace MOX {
     extern s_animation_header* _officer_hire_replace_seg;
     extern int8_t _officer_scanned;
     extern int8_t _officer_scrn_type;
-    inline int8_t& _officer_selected = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059D6D0 });
+    extern int8_t _officer_selected;
 
-    inline int16_t& _special_scroll_dn_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596434});
-    inline int8_t& _n_weapons_loaded = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596E7A});
-    inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
+    extern int16_t _special_scroll_dn_button;
+    extern int8_t _n_weapons_loaded;
+    extern uint8_t _n_special_systems;
 
-    inline int8_t*& _fltscrn_icon_selection_status =
-        *reinterpret_cast<int8_t**>(std::uintptr_t{0x00596438});
+    extern int8_t* _fltscrn_icon_selection_status;
 
     // References
     inline int8_t (&_food_per_farmer_table)[10] =
         *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00559690});
-    inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
+    extern uint8_t _star_class_table[7][3];
     inline int16_t (&_ranged_to_hit_penalty)[9] =
         *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x005596E0});
     inline int16_t (&_ranged_damage_penalty)[9] = 
         *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x005596F8});
-    inline int16_t& _cur_missile_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597408});
-    inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
-    inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
-    inline s_scroll_bar& _fltpop_scroll_bar = *reinterpret_cast<s_scroll_bar*>(std::uintptr_t{0x005974C0});
-    inline int16_t& _cur_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D604 });
-    inline int16_t& _cur_map_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F0});
-    inline int16_t& _cur_map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F8});
-    inline uint16_t& _global_esc = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597774});
-    inline short& _return_screen = *reinterpret_cast<short*>(std::uintptr_t{0x005977F0});
-    inline char*& _save_game_dates = *reinterpret_cast<char**>(std::uintptr_t{0x005A1CA8});
-    inline char*& _save_game_stardates = *reinterpret_cast<char**>(std::uintptr_t{0x005974e8});
-    inline char*& _star_name_loaded_string =
-        *reinterpret_cast<char**>(std::uintptr_t{0x005A2C20});
-    inline int16_t& _scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a9a});
-    inline int8_t& _previous_screen = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00597AD0 });
-    inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
-    inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
-    inline int16_t& _debug_saves_on = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D6C2 });
-    inline uint8_t& _turns_between_debug_saves = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A49F0 });
-    inline void*& _sound_buffer = *reinterpret_cast<void**>(std::uintptr_t{ 0x005A1B34 });
-    inline int16_t& _hot_seat_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A182C});
-    inline short& _current_screen = *reinterpret_cast<short*>(std::uintptr_t{ 0x00597302 });
-    inline int16_t& _design_screen_replacement_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597402});
-    inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
+    extern int16_t _cur_missile_count;
+    extern int16_t _NUM_STARS;
+    extern s_scroll_bar _fltpop_scroll_bar;
+    extern int16_t _cur_map_scale;
+    extern int16_t _cur_map_x;
+    extern int16_t _cur_map_y;
+    extern uint16_t _global_esc;
+    extern short _return_screen;
+    extern char* _save_game_dates;
+    extern char* _save_game_stardates;
+    extern char* _star_name_loaded_string;
+    extern int16_t _scanned_field;
+    extern int8_t _previous_screen;
+    extern int16_t _max_debug_saves;
+    extern int16_t _first_debug_save;
+    extern int16_t _debug_saves_on;
+    extern uint8_t _turns_between_debug_saves;
+    extern void* _sound_buffer;
+    extern int16_t _hot_seat_flag;
+    extern short _current_screen;
+    extern int16_t _design_screen_replacement_type;
+    extern int16_t _design_screen_replacement_slot;
     inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
-    inline s_animation_header*& _asteroid_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973F4 });
-    inline s_animation_header*& _screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973E4 });
-    inline s_animation_header*& _diplomacy_request_popup_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF34});
-    inline s_animation_header*& _combat_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A94});
-    inline s_animation_header*& _combat_map_planet_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596448});
-    inline s_animation_header*& _combat_planet_seg =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B4});
-    inline s_animation_header*& _combat_planet_seg2 =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5E8});
+    extern s_animation_header* _asteroid_seg;
+    extern s_animation_header* _screen_seg;
+    extern s_animation_header* _diplomacy_request_popup_seg;
+    extern s_animation_header* _combat_bitmap;
+    extern s_animation_header* _combat_map_planet_seg;
+    extern s_animation_header* _combat_planet_seg;
+    extern s_animation_header* _combat_planet_seg2;
     inline uint8_t (&_ship_darken_map)[128][16] =
         *reinterpret_cast<uint8_t(*)[128][16]>(std::uintptr_t{0x00596450});
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
-    inline uint8_t& _player_has_ship_in_system = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4B});
+    extern uint8_t _player_has_ship_in_system;
     inline s_animation_header* (&_moveable_box_pict)[25] = *reinterpret_cast<s_animation_header* (*)[25]>(std::uintptr_t{0x005A1B60});
-    inline int8_t& _game_type = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x005974DD });
-    inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
-    inline int8_t& _maps_to_generate = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059791C });
-    inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
-    inline int16_t& _special_scroll_up_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059775E});
-    inline uint8_t& _blue_color2 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059775D});
-    inline uint8_t& _special_scroll_up_button_1 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597760});
-    inline int16_t& _auto_msl_warning_off = *reinterpret_cast<int16_t*>(0x0059790E);
-    inline s_animation_header*& _draw_ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B328});
-    inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
-    inline int16_t* _design_choice_item_selected = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD40});
-    inline int8_t& _first_special_system_ctr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596D4A});
+    extern int8_t _game_type;
+    extern s_antaran _antarans;
+    extern int8_t _maps_to_generate;
+    extern uint8_t _auto_turn_exit;
+    extern int16_t _special_scroll_up_button[2];
+    extern uint8_t _blue_color2;
+    extern int16_t _auto_msl_warning_off;
+    extern s_animation_header* _draw_ship_bitmap;
+    extern int16_t _multi_colored_line_start;
+    extern int16_t _design_choice_item_selected[40];
+    extern int8_t _first_special_system_ctr;
     inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
     inline int16_t(&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{ 0x00597470 });
-    inline uint8_t& _first_design_screen_call = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B5C9});
-    inline int16_t& _design_size = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B434});
-    inline uint8_t& _refresh_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059B5A4 });
+    extern uint8_t _first_design_screen_call;
+    extern int16_t _design_size;
+    extern uint8_t _refresh_mode;
     inline uint8_t& _mox_font_colors_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059BA6E });
     inline int16_t& _star_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5C});
     inline int16_t& _star_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA04});

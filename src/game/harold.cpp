@@ -1512,7 +1512,7 @@ namespace HAROLD {
         MOX::_rot_plan_dim[4] = 0x18;
         MOX::_galaxy_map_height = 0xA0;
         MOX::_galaxy_map_width = 0x75;
-        MOX::_special_scroll_up_button_1 = 0x3B;
+        MOX::_special_scroll_up_button[1] = 0x3B;
         MOX::_star_fields_dim[4] = 0x15;
         MOX::_system_display_ring_radius[0] = 0x15;
         MOX::_system_display_ring_radius[1] = 0x21;

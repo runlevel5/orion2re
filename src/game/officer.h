@@ -1,7 +1,7 @@
 #pragma once
 
 namespace OFFICER {
-    inline char* s_OFFICER_LBX_00556980 = reinterpret_cast<char*>(std::uintptr_t{0x00556980});
+    extern char s_OFFICER_LBX_00556980[16];
 
     s_animation_header* __cdecl Load_Officer_Picture_(
         int32_t unused,
@@ -10,36 +10,28 @@ namespace OFFICER {
         uint8_t use_far_reload,
         int16_t pic_type
     );
-    inline s_colors& _normal_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569A0});
-    inline s_colors& _red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556998});
-    inline int16_t& _officer_dismiss_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056566C});
-    inline uint8_t& _offscrn_skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565670});
-    inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005656C8});
-    inline int8_t& _officer_button_mode = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056573C});
-    inline int16_t& _officer_pool_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657B8});
-    inline uint8_t& _offscrn_flash_incr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A77A0});
-    inline uint8_t& _offscrn_ask_for_hire_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565668});
-    inline int16_t& _fleet_icon_ship_id_to_move = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77A2});
-    inline int8_t& _offscrn_flash_dir = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A77A4});
-    inline int16_t& _officer_star_displayed = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77A6});
-    inline uint8_t& _offscrn_flash_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A77A8});
-    inline int16_t& _officer_star_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77AA});
-    inline s_prev_leader_data*& _prev_leaders =
-        *reinterpret_cast<s_prev_leader_data**>(std::uintptr_t{0x00565740});
-    inline s_officer_picture_slot*& _ldrpict = *reinterpret_cast<s_officer_picture_slot**>(std::uintptr_t{0x005657B4});
-    inline const char*& PTR_s_OFFICER_LBX = *reinterpret_cast<const char**>(std::uintptr_t{0x00556990});
-    inline char*& PTR_s_OFFICER_LBX_00556990 =
-        *reinterpret_cast<char**>(std::uintptr_t{0x00556990});
-    inline const char* const s_ITASKLLS_LBX_005569fc =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x005569FC }); // "ITASKLLS.LBX"
-    inline const char* const s_SPASKLLS_LBX_00556a0c =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A0C }); // "SPASKLLS.LBX"
-    inline const char* const s_FRESKLLS_LBX_00556a1c =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A1C }); // "FRESKLLS.LBX"
-    inline const char* const s_GERSKLLS_LBX_00556a2c =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A2C }); // "GERSKLLS.LBX"
-    inline const char* const s_SKILDESC_LBX_00556a3c =
-        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A3C }); // "SKILDESC.LBX"
+    extern s_colors _normal_text_colors;
+    extern s_colors _red_colors;
+    extern int16_t _officer_dismiss_btn;
+    extern uint8_t _offscrn_skip_draw_ships;
+    extern uint8_t _full_draw;
+    extern int8_t _officer_button_mode;
+    extern int16_t _officer_pool_btn;
+    extern uint8_t _offscrn_flash_incr;
+    extern uint8_t _offscrn_ask_for_hire_popup;
+    extern int16_t _fleet_icon_ship_id_to_move;
+    extern int8_t _offscrn_flash_dir;
+    extern int16_t _officer_star_displayed;
+    extern uint8_t _offscrn_flash_value;
+    extern int16_t _officer_star_chosen;
+    extern s_prev_leader_data* _prev_leaders;
+    extern s_officer_picture_slot* _ldrpict;
+    extern const char* PTR_s_OFFICER_LBX;
+    extern const char s_ITASKLLS_LBX_005569fc[16]; // "ITASKLLS.LBX"
+    extern const char s_SPASKLLS_LBX_00556a0c[16]; // "SPASKLLS.LBX"
+    extern const char s_FRESKLLS_LBX_00556a1c[16]; // "FRESKLLS.LBX"
+    extern const char s_GERSKLLS_LBX_00556a2c[16]; // "GERSKLLS.LBX"
+    extern const char s_SKILDESC_LBX_00556a3c[16]; // "SKILDESC.LBX"
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
@@ -169,11 +161,9 @@ namespace OFFICER {
 
     void __cdecl Print_ETA_On_Officer_Picture_(int16_t leader_idx, int16_t x, int16_t y, int16_t w);
 
-    inline char* (&_officer_skill_description_string)[27] =
-        *reinterpret_cast<char*(*)[27]>(std::uintptr_t{0x005656D0});
+    extern char* _officer_skill_description_string[27];
 
-    inline char* (&_officer_skill_name_string)[27] =
-        *reinterpret_cast<char*(*)[27]>(std::uintptr_t{0x00565748});
+    extern char* _officer_skill_name_string[27];
 
     void __cdecl Text_Box_With_Refresh_(const char* title, const char* body);
 
@@ -291,11 +281,9 @@ namespace OFFICER {
 
     void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts);
 
-    inline s_officer_skill_help (&_officer_skill_help)[4] =
-        *reinterpret_cast<s_officer_skill_help (*)[4]>(std::uintptr_t{0x00565678});
+    extern s_officer_skill_help _officer_skill_help[4];
 
-    inline const char* const s__00551100 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    extern const char s__00551100[1];
 
     void __cdecl Add_Skill_Description_Help_Fields_(
         int16_t left,

@@ -239,7 +239,7 @@ namespace DESBOX {
                 }
             }
 
-            if (MOX::_special_scroll_up_button == input_field) {
+            if (MOX::_special_scroll_up_button[0] == input_field) {
                 SCROLL::Scroll_Up_One_Item_(MOX::_scroll_bar);
                 _wait_ctr = 0;
             }
@@ -2730,7 +2730,7 @@ namespace DESBOX {
 
         if (MOX::_scroll_bar->total_rows > 10 && scroll_x > 0 && scroll_y > 0) {
             int16_t up_btn_y = scroll_y - animate::Get_Height_(MOX::_d_scroll_up_button_seg) - 3;
-            MOX::_special_scroll_up_button = fields::Add_Button_Field_(
+            MOX::_special_scroll_up_button[0] = fields::Add_Button_Field_(
                 scroll_x,
                 up_btn_y,
                 s__00551100,
@@ -2749,7 +2749,7 @@ namespace DESBOX {
                 40 /* 0x28 */
             );
         } else {
-            MOX::_special_scroll_up_button = -1000 /* 0xFC18 */;
+            MOX::_special_scroll_up_button[0] = -1000 /* 0xFC18 */;
             MOX::_special_scroll_dn_button = -1000 /* 0xFC18 */;
             _replacement_scroll_field = -1000 /* 0xFC18 */;
         }
@@ -2776,7 +2776,7 @@ namespace DESBOX {
 
         *screen_field_id_out = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */, s__00551100, 41 /* 0x29 */);
 
-        MOX::_scroll_bar->up_btn = MOX::_special_scroll_up_button;
+        MOX::_scroll_bar->up_btn = MOX::_special_scroll_up_button[0];
         MOX::_scroll_bar->dn_btn = MOX::_special_scroll_dn_button;
     }
 

@@ -527,7 +527,7 @@ namespace INITGAME {
     }
 
     void __cdecl Make_System_Monsters_Into_Ships_() {
-        int16_t total_stars = MOX::num_stars;
+        int16_t total_stars = MOX::_NUM_STARS;
         s_star_data* star_ptr = MOX::_star;
         s_star_data* end_ptr = &MOX::_star[total_stars];
 

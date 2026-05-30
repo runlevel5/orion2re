@@ -173,7 +173,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         uint8_t weights[7];
 
         for (int32_t i = 0; i < 7; ++i) {
-            weights[i] = MOX::_star_class_table[i * 3 + star_type_index];
+            weights[i] = MOX::_star_class_table[i][star_type_index];
         }
 
         return (int8_t)RUSS::Get_Weighted_Choice_Char_(weights, 7);

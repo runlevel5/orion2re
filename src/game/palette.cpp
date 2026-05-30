@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace palette {
+    s_palette_entry _saved_palette[256];
+    int32_t _cycle_direction_flag = -1;
+    int32_t _cycle_step_value;
+    int32_t _cycle_color_value;
+
     void __cdecl Save_Palette_() {
         struct_::Copy_Structure_Aligned_(_saved_palette, video::_current_palette, 0x400);
     }
