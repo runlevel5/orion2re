@@ -1,6 +1,8 @@
 #pragma once
 
 namespace ten {
+    using recv_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
+
     inline void __cdecl Send_Message_(int32_t target_id, int16_t msg_type, uint8_t* data, uint32_t size) {
         using Fn = void(__cdecl*)(int32_t, int16_t, uint8_t*, uint32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005338A0});
@@ -26,10 +28,10 @@ namespace ten {
         return fn(users);
     }
 
-    inline void __cdecl Init_TEN_(uint32_t mode, GUID* guid, void* recv_fn, s_network* net) {
-        using Fn = void(__cdecl*)(uint32_t, GUID*, void*, s_network*);
+    inline void __cdecl Init_TEN_(uint32_t mode, GUID* guid, recv_fn recv_fn_ptr, s_network* net) {
+        using Fn = void(__cdecl*)(uint32_t, GUID*, recv_fn, s_network*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005337F0 });
-        fn(mode, guid, recv_fn, net);
+        fn(mode, guid, recv_fn_ptr, net);
     }
 
     inline void __cdecl Ten_Stop(int32_t val) {

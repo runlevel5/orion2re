@@ -50,24 +50,25 @@ namespace special {
         int32_t dx = dx16;
         int32_t dy = dy16;
 
-        int32_t angle_dx = dx;
-        int32_t angle_dy = dy;
+        int32_t angle_dx = (int32_t)dx16;
+        int32_t angle_dy = (int32_t)dy16;
 
         // Downscale coordinates if delta is too large to fit in Get_Angle_ precision
         if (dx < -255 || dx > 255 || dy < -255 || dy > 255) {
-            angle_dx /= 2;
-            angle_dy /= 2;
+            angle_dx = (int32_t)(int16_t)(dx16 / 2);
+            angle_dy = (int32_t)(int16_t)(dy16 / 2);
         }
 
         int16_t angle = angle::Get_Angle_(angle_dx, angle_dy);
 
         // Update X coordinate
-        int16_t move_x = angle::Cos_(angle, step);
-        int16_t new_x = current_x + move_x;
+        int16_t live_x = *x_ptr;
+        int16_t move_x = (int16_t)angle::Cos_(angle, step);
+        int16_t new_x = (int16_t)(live_x + move_x);
         *x_ptr = new_x;
 
         // Clamp to target X
-        if (target_x > current_x) {
+        if (live_x < target_x) {
             if (new_x > target_x) {
                 *x_ptr = target_x;
             }
@@ -78,12 +79,13 @@ namespace special {
         }
 
         // Update Y coordinate
-        int16_t move_y = angle::Sin_(angle, step);
-        int16_t new_y = current_y + move_y;
+        int16_t live_y = *y_ptr;
+        int16_t move_y = (int16_t)angle::Sin_(angle, step);
+        int16_t new_y = (int16_t)(live_y + move_y);
         *y_ptr = new_y;
 
         // Clamp to target Y
-        if (target_y > current_y) {
+        if (live_y < target_y) {
             if (new_y > target_y) {
                 *y_ptr = target_y;
             }

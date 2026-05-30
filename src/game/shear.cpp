@@ -503,7 +503,8 @@ void __cdecl Reduce_Bitmap_(
 }
 
 void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint32_t unused_param, uint8_t* dst, uint32_t width, uint32_t height) {
-    _noise_threshold = noise_threshold;
+    _noise_threshold = (uint8_t)noise_threshold;
+    uint8_t threshold = _noise_threshold;
 
     uint32_t rand_val = random::Random_(1000);
     _noise_start_index = (rand_val - 1) & 0xFFFE;
@@ -519,29 +520,29 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
 
     uint32_t noise_idx = _noise_start_index & 0xFE;
 
-    uint32_t* src32 = reinterpret_cast<uint32_t*>(src);
-    uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
-
     for (uint32_t ecx = dword_count; ecx > 0; ecx--) {
-        uint32_t pixels = *src32++;
-        uint32_t noise = *reinterpret_cast<uint32_t*>(_noise_table + noise_idx);
+        uint32_t pixels;
+        struct_::Copy_Structure_(&pixels, src, sizeof(pixels));
+        src += 4;
+
+        uint32_t noise;
+        struct_::Copy_Structure_(&noise, _noise_table + noise_idx, sizeof(noise));
         noise_idx = (noise_idx + 4) & 0xFF;
 
         for (int i = 0; i < 4; ++i) {
-            if (static_cast<uint8_t>(noise) < static_cast<uint8_t>(_noise_threshold)) {
+            if ((uint8_t)noise < threshold) {
                 pixels &= 0xFFFFFF00;
             }
             pixels = (pixels >> 8) | (pixels << 24);
             noise = (noise >> 8) | (noise << 24);
         }
 
-        *dst32++ = pixels;
+        struct_::Copy_Structure_(dst, &pixels, sizeof(pixels));
+        dst += 4;
 
         _row_dword_counter--;
-        // Emulates a bug in original inline assembly: `JA` was used after `DEC`.
-        // `DEC` doesn't set the Carry Flag, causing `JA` to evaluate the CF from 
-        // the preceding `ROR EAX, 8` (which is the high bit of the 4th pixel).
-        if (static_cast<int32_t>(pixels) < 0 || _row_dword_counter == 0) {
+        const bool carry_from_final_ror = (pixels & 0x80000000u) != 0;
+        if (carry_from_final_ror || _row_dword_counter == 0) {
             _row_dword_counter = _row_dword_count;
             noise_idx = (noise_idx + ecx * ecx) & 0xFE;
         }
@@ -549,7 +550,7 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
 }
 
 void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint32_t noise_threshold, uint8_t* dst_buf, uint32_t width, uint32_t height) {
-    shear::_noise_threshold = noise_threshold;
+    shear::_noise_threshold = (uint8_t)noise_threshold;
     shear::_jumble_mask = jumble_mask;
 
     shear::_noise_start_index = (random::Random_(1000) - 1) & 0xFFFF;
@@ -560,7 +561,7 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     dst_buf += shear::_jumble_mask;
 
     uint32_t noise_idx = shear::_noise_start_index;
-    uint8_t threshold = static_cast<uint8_t>(shear::_noise_threshold);
+    uint8_t threshold = shear::_noise_threshold;
 
     for (uint32_t i = 0; i < pixel_count; ++i) {
         uint8_t src_pixel = *src_buf++;
@@ -568,7 +569,7 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
 
         if (noise_val < threshold) {
             noise_val &= shear::_jumble_mask;
-            noise_val = (noise_val + 1) & 0xFF;
+            noise_val = noise_val + 1;
 
             int32_t offset = static_cast<int32_t>(noise_val);
             if (shear::_jumble_direction_toggle != 0) {
@@ -608,8 +609,6 @@ void __cdecl Gray_Scale_Fill_Pixels_(
             const uint32_t index = *pixels;
             *pixels++ = gray_scale_table[index];
         } while (--remaining != 0);
-
-        pixels += shear::_y_step_8_8;
     } while (--row_count != 0);
 }
 

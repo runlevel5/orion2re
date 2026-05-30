@@ -99,7 +99,7 @@ namespace transprt {
     void __cdecl ResetReceiving_() {
         _tpRecNum = 0;
         _tpRecSrc = 0;
-        memset(_tpPacketsReceived, 0, sizeof(_tpPacketsReceived));
+        memset(&_tpReceiveState, 0, sizeof(_tpReceiveState));
     }
 
     int32_t __cdecl NumUsers_() {
@@ -247,11 +247,11 @@ namespace transprt {
         }
 
         uint8_t pkt_idx = packet->packet_index;
-        if (_tpPacketsReceived[pkt_idx] == 1) {
+        if (_tpReceiveState.packets_received[pkt_idx] == 1) {
             bool burst_complete = true;
             uint32_t burst_start = pkt_idx & ~3u;
             for (uint32_t i = burst_start; i < burst_start + 4 && i < static_cast<uint32_t>(packet->total_packets); ++i) {
-                if (_tpPacketsReceived[i] == 0) {
+                if (_tpReceiveState.packets_received[i] == 0) {
                     burst_complete = false;
                 }
             }
@@ -260,11 +260,11 @@ namespace transprt {
                 return;
             }
         } else {
-            _tpPacketsReceived[pkt_idx] = 1;
+            _tpReceiveState.packets_received[pkt_idx] = 1;
             bool burst_complete = true;
             uint32_t burst_start = pkt_idx & ~3u;
             for (uint32_t i = burst_start; i < burst_start + 4 && i < static_cast<uint32_t>(packet->total_packets); ++i) {
-                if (_tpPacketsReceived[i] == 0) {
+                if (_tpReceiveState.packets_received[i] == 0) {
                     burst_complete = false;
                 }
             }
@@ -278,7 +278,7 @@ namespace transprt {
 
             bool all_complete = true;
             for (uint32_t i = 0; i < static_cast<uint32_t>(packet->total_packets); ++i) {
-                if (_tpPacketsReceived[i] == 0) {
+                if (_tpReceiveState.packets_received[i] == 0) {
                     all_complete = false;
                 }
             }
@@ -294,7 +294,7 @@ namespace transprt {
                     memcpy(_tpRecUserBuffer, _tpRecPacketBuffer, len);
                 }
                 
-                auto user_func = reinterpret_cast<user_rec_fn>(_userRecFunc);
+                auto user_func = _userRecFunc;
                 user_func(sender, packet->current_user_type, packet->send_data_length, _tpRecUserBuffer);
 
                 ResetReceiving_();
@@ -339,9 +339,7 @@ namespace transprt {
 
     void __cdecl NotifyNextQueuedSender_() {
         if (_queuedSenderCount != 0) {
-            uint8_t msg[20];
-
-            *reinterpret_cast<uint32_t*>(&msg[0]) = 0;
+            uint8_t msg[0x13] = {};
             msg[8] = static_cast<uint8_t>(net::_thisHost);
             msg[11] = 0;
 

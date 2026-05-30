@@ -463,14 +463,14 @@ namespace sound {
         }
     }
 
-    int8_t __cdecl Load_Stream_Wave_Header_(int entry_index, s_sound_stream* stream) {
+    int8_t __cdecl Load_Stream_Wave_Header_(int32_t entry_index, s_sound_stream* stream) {
         if (entry_index == 0) {
             return 0;
         }
 
         uint32_t entry_offset = _streamLbxHandle.entries[entry_index - 1].offset;
 
-        mmioSeek(_streamLbxHandle.file, entry_offset, SEEK_SET);
+        mmioSeek(_streamLbxHandle.file, entry_offset, 0);
 
         char tag_buffer[5];
         tag_buffer[4] = '\0';
@@ -498,7 +498,7 @@ namespace sound {
             return 0;
         }
 
-        mmioSeek(_streamLbxHandle.file, stream->data_start_offset, SEEK_SET);
+        mmioSeek(_streamLbxHandle.file, stream->data_start_offset, 0);
 
         return 1;
     }
@@ -699,8 +699,8 @@ namespace sound {
         return (int)volume;
     }
 
-    void __cdecl Copy_FourCC_(void* dest, const void* src) {
-        *static_cast<uint32_t*>(dest) = *static_cast<const uint32_t*>(src);
+    void __cdecl Copy_FourCC_(char* dest, const char* src) {
+        memcpy(dest, src, 4);
     }
 
     void __cdecl Refill_Sound_Channel_Buffer_(int channel_idx) {

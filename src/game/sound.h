@@ -91,7 +91,7 @@ namespace sound {
     inline const char* s_WAVE_0055c21c = reinterpret_cast<const char*>(std::uintptr_t{0x0055C21C}); // "WAVE"
     inline const char* s_RIFF_0055c224 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C224}); // "RIFF"
 
-    void __cdecl Copy_FourCC_(void* dest, const void* src);
+    void __cdecl Copy_FourCC_(char* dest, const char* src);
 
     inline MMRESULT __stdcall mmioGetInfo(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
         using Fn = MMRESULT(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
@@ -208,7 +208,7 @@ namespace sound {
 
     void __cdecl Enable_Sound_Timer_();
 
-    int8_t __cdecl Load_Stream_Wave_Header_(int entry_index, s_sound_stream* stream);
+    int8_t __cdecl Load_Stream_Wave_Header_(int32_t entry_index, s_sound_stream* stream);
 
     uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr);
 

@@ -41,7 +41,7 @@ namespace WINNET {
 
         HRESULT hr = DPLAY_DLL::Ordinal_1(&_providers[provider_idx]->guid, &netcode::_dplay, nullptr);
         if (hr == 0) {
-            netcode::_connection_type = mode;
+            WINNET::_provider_mode = mode;
             return 1;
         }
 

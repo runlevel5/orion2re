@@ -1,24 +1,29 @@
 #pragma once
 
 namespace netcode {
+    using recv_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
+
     inline uint32_t& _netInitialized = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055BF24});
+
+    inline int8_t& _isSending =
+        *reinterpret_cast<int8_t*>(std::uintptr_t{0x0055BF30});
 
     inline uint8_t& _inComms =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055BF34});
 
     inline IDirectPlay*& _dplay = *reinterpret_cast<IDirectPlay**>(std::uintptr_t{0x0055BF28});
 
-    inline void*& _recv_fn =
-        *reinterpret_cast<void**>(std::uintptr_t{0x00589990});
+    inline recv_fn& _recv_fn =
+        *reinterpret_cast<recv_fn*>(std::uintptr_t{0x00589990});
 
     inline int32_t& _connection_type =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0058998C});
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00589A0C});
 
     inline int32_t& _in_send_message = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055BF38});
 
-    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, void* recv_fn, s_network* network);
+    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network);
 
-    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, void* recv_fn, s_network* network);
+    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network);
 
     int32_t __cdecl Net_Get_Game_Count_();
 

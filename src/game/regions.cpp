@@ -118,27 +118,26 @@ namespace regions {
             current_pattern = previous_pattern;
         }
 
-        uint32_t shifted_width_bytes = static_cast<uint32_t>(width_dwords);
+        int32_t shifted_width_bytes = width_dwords;
         shifted_width_bytes <<= 2;
-        uint32_t row_advance = platform::g_screen_res_x - shifted_width_bytes;
-        uint32_t fill_count = shifted_width_bytes >> 2;
-        uint32_t remaining_rows = static_cast<uint32_t>(height);
+        int32_t row_advance = platform::g_screen_res_x - shifted_width_bytes;
+        int32_t fill_count = shifted_width_bytes >> 2;
+        int32_t remaining_rows = height;
 
         do {
-            uint32_t* fill_ptr = reinterpret_cast<uint32_t*>(dst);
+            int32_t remaining = fill_count;
+            do {
+                *(uint32_t*)dst = current_pattern;
+                dst += 4;
+            } while (--remaining != 0);
 
-            for (uint32_t i = 0; i < fill_count; ++i) {
-                *fill_ptr++ = current_pattern;
-            }
-
-            dst = reinterpret_cast<uint8_t*>(reinterpret_cast<std::uintptr_t>(fill_ptr) + row_advance);
+            dst += row_advance;
 
             uint32_t previous_pattern = _interlaced_fill_next_pattern;
             _interlaced_fill_next_pattern = current_pattern;
             current_pattern = previous_pattern;
 
-            --remaining_rows;
-        } while (remaining_rows != 0);
+        } while (--remaining_rows != 0);
     }
 
     void __cdecl Tri_Interlaced_Fill_Column_(uint32_t color, uint8_t* dest, int32_t width, int32_t height) {

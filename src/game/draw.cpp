@@ -6,12 +6,12 @@ namespace draw {
      * 
      * The function performs basic transparency (skips pixel value 0).
      */
-    void __cdecl Draw_Bitmap_Sprite_(short x, short y, uint8_t* sprite) {
-        uint32_t width = (uint16_t)animate::_animation_header->width;
-        uint32_t height = (uint16_t)animate::_animation_header->height;
+    void __cdecl Draw_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
+        uint16_t width = (uint16_t)animate::_animation_header->width;
+        uint16_t height = (uint16_t)animate::_animation_header->height;
         uint8_t* video_page = video::_current_video_page;
 
-        uint8_t* dst = video_page + (uint16_t)x + (uint16_t)y * 640u - 640 + width;
+        uint8_t* dst = video_page + (uint16_t)x + (uint16_t)y * 640u - 640u + width;
 
         while (height != 0) {
             --height;

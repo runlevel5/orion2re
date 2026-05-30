@@ -31,7 +31,7 @@ namespace smckplay {
         return static_cast<int32_t>(_smk->width);
     }
 
-    uint32_t __cdecl Get_Smacker_Animation_Height_() {
+    int32_t __cdecl Get_Smacker_Animation_Height_() {
         if (_smk == nullptr) {
             return 0;
         }

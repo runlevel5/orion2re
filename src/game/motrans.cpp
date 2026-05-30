@@ -26,10 +26,10 @@ void __cdecl Modem_Update_() {
 
         if (_modem_receive_buffer_full == 1) {
             simmodem::_modemUserRecFunc(
-                static_cast<int16_t>(simmodem::_connected_to_id),
-                DAT_00591ec8,
-                DAT_00591e9c,
-                DAT_00591e88
+                (int16_t)simmodem::_connected_to_id,
+                _mtp_user_type,
+                _modem_amount_received,
+                _modem_receive_buffer
             );
 
             _modem_receive_buffer_full = 0;

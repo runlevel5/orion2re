@@ -27,6 +27,9 @@ namespace WINNET {
 
     inline DPID& _local_player_id = *reinterpret_cast<DPID*>(std::uintptr_t{0x005899F8});
 
+    inline int32_t& _provider_mode =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0058998C});
+
     inline char* s_Error_Unknown_0055bf7c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF7C}); // "Error Unknown"
     inline char* s_Invalid_Object_0055bf8c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF8C}); // "Invalid Object"
     inline char* s_Invalid_Player_0055bf9c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF9C}); // "Invalid Player"

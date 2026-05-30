@@ -1,14 +1,14 @@
 #include "pch.h"
 
 namespace netcode {
-    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, void* recv_fn, s_network* network) {
+    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
         RUSS::Mox_Update_();
-        int32_t result = Net_Init_(mode, guid, recv_fn, network);
+        int32_t result = Net_Init_(mode, guid, recv_fn_ptr, network);
         RUSS::Mox_Update_();
         return result;
     }
 
-    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, void* recv_fn, s_network* network) {
+    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
         int32_t result = 0;
         _connection_type = mode;
 
@@ -19,16 +19,16 @@ namespace netcode {
             result = WINNET::Init_Connection_(1);
             WINNET::Refresh_Game_List_(guid);
 
-            _recv_fn = recv_fn;
+            _recv_fn = recv_fn_ptr;
         }
 
         if (mode == 1 || mode == 2) {
-            result = simmodem::Init_Modem_(network, recv_fn);
+            result = simmodem::Init_Modem_(network, recv_fn_ptr);
         }
 
         if (mode == 3) {
             result = 1;
-            ten::Init_TEN_(mode, &guid, recv_fn, network);
+            ten::Init_TEN_(mode, &guid, recv_fn_ptr, network);
         }
 
         return result;
@@ -84,7 +84,7 @@ namespace netcode {
     }
 
     int32_t __cdecl Net_Is_Sending_() {
-        return transprt::_tpSending;
+        return (int32_t)netcode::_isSending;
     }
 
     int32_t __cdecl Net_Join_Game_(char* game_name, char* password, char* player_name) {
@@ -227,9 +227,9 @@ namespace netcode {
 
             comcore::ComSendUserMessage_(data, size, target_id, 0x65, 2, msg_type);
 
-            int32_t start_time = clock();
+            clock_t start_time = clock();
             while (transprt::_tpSending != 0) {
-                if ((clock() - start_time) >= 120000) {
+                if ((uint32_t)(clock() - start_time) >= 120000) {
                     exitm::Exit_With_Message(s_Lost_Player_Connection_0055bf3c);
                 }
                 Net_Update_();

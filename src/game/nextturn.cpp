@@ -89,7 +89,7 @@ void Next_Turn_() {
 }
 
 void __cdecl Next_Turn_Calc_() {
-    if (MOX::_game_type <= 1) {
+    if (MOX::_game_type >= 0 && MOX::_game_type <= 1) {
         fields::Assign_Auto_Function_(SCORE::nullsub, 1);
     }
 

@@ -14,8 +14,8 @@ namespace shear {
     inline int32_t& _y_step_8_8 =
         *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055C0B8});
 
-    inline uint32_t& _noise_threshold =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0BC});
+    inline uint8_t& _noise_threshold =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055C0BC});
 
     inline uint32_t& _src_width =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0C0});

@@ -66,7 +66,7 @@ namespace smckplay {
 
     int32_t __cdecl Get_Smacker_Animation_Width_();
 
-    uint32_t __cdecl Get_Smacker_Animation_Height_();
+    int32_t __cdecl Get_Smacker_Animation_Height_();
 
     void __cdecl Do_Draw_Smacker_Animation_(int32_t left, int32_t top);
 

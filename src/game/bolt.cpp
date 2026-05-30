@@ -110,7 +110,7 @@ namespace bolt {
 
     void __cdecl Bolt_Segment_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color_base,
                                int16_t color_range, int16_t rand_chance, int16_t rand_range, int16_t min_color, int16_t max_color,
-                               int16_t unused_11, int16_t do_sparkles, int16_t sparkle_offset, int16_t tip_fade)
+                               int16_t unused_11, int16_t do_sparkles, uint16_t sparkle_offset, int16_t tip_fade)
     {
         int32_t rand_range2 = rand_range * 2 + 1;
         int32_t dx = x2 - x1;
@@ -217,7 +217,7 @@ namespace bolt {
     }
 
     void __cdecl Bolt_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t p5,
-        int16_t p6, int16_t p7, int16_t p8, int16_t p9, int16_t draw_caps,
+        int16_t p6, int16_t p7, int16_t p8, uint16_t p9, int16_t draw_caps,
         int16_t unused_11, int16_t p12, int16_t p13, int16_t p14, int16_t p15,
         int16_t color_base, int16_t p17, int16_t p18, int16_t p19) {
 
@@ -292,7 +292,8 @@ namespace bolt {
         int16_t arg5_main = p17 + p5;
 
         if (p13 == 0) {
-            arg5_main += (arg6_main * 3) / 4;
+            int32_t t = (int32_t)arg6_main * 3;
+            arg5_main += (int16_t)((t + ((t >> 31) & 3)) >> 2);
             arg6_main = 0;
         }
 

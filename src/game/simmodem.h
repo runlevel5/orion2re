@@ -4,6 +4,8 @@
 struct s_network;
 
 namespace simmodem {
+    using recv_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
+
     inline uint8_t*& _open_game_port =
         *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055C050});
 
@@ -13,8 +15,8 @@ namespace simmodem {
     inline int8_t& _connected_to_id =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00589A18});
 
-    inline void (__cdecl*& _modemUserRecFunc)(int16_t, uint32_t, uint32_t, uint32_t) =
-        *reinterpret_cast<void (__cdecl**)(int16_t, uint32_t, uint32_t, uint32_t)>(std::uintptr_t{0x00589A14});
+    inline recv_fn& _modemUserRecFunc =
+        *reinterpret_cast<recv_fn*>(std::uintptr_t{0x00589A14});
 
     inline void __cdecl Uninit_Modem_() {
         using Fn = void(__cdecl*)();
@@ -22,10 +24,10 @@ namespace simmodem {
         fn();
     }
 
-    inline int32_t __cdecl Init_Modem_(s_network* net, void* recv_fn) {
-        using Fn = int32_t(__cdecl*)(s_network*, void*);
+    inline int32_t __cdecl Init_Modem_(s_network* net, recv_fn recv_fn_ptr) {
+        using Fn = int32_t(__cdecl*)(s_network*, recv_fn);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535530});
-        return fn(net, recv_fn);
+        return fn(net, recv_fn_ptr);
     }
 
     inline void __cdecl Modem_Reset_(char* reset_cmd) {

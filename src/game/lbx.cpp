@@ -109,8 +109,10 @@ namespace lbx {
     void __cdecl LBX_readRecord_(s_lbx_stream_header* header, int32_t record_idx, void* buffer) {
         if (header != nullptr && header->file != nullptr) {
             if ((int16_t)header->entry_count >= record_idx + 1) {
-                // BUG: record_idx 0 leads to negative index entries[-1]
-                fseek(header->file, header->entries[record_idx - 1].offset, SEEK_SET);
+                uint32_t offset = (record_idx == 0)
+                    ? header->first_offset
+                    : header->entries[record_idx - 1].offset;
+                fseek(header->file, offset, SEEK_SET);
                 fread(buffer, header->entries[record_idx].size, 1, header->file);
             }
         }

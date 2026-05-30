@@ -1,7 +1,7 @@
 #pragma once
 
 namespace transprt {
-    using user_rec_fn = void(*)(int32_t, int32_t, int32_t, uint8_t*);
+    using user_rec_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
     inline uint32_t& _num_net_players = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00596200});
 
@@ -63,11 +63,11 @@ namespace transprt {
     inline int32_t& _tpBurstNum = 
         *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A9C});
 
-    inline uint32_t& _tpLastBurstTickCount = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560AA0});
+    inline DWORD& _tpLastBurstTickCount = *reinterpret_cast<DWORD*>(std::uintptr_t{0x00560AA0});
 
     inline int32_t& _tpLastBurstStartPacket = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560AAC});
 
-    inline int32_t& _tpLastBurstClock = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00592588});
+    inline clock_t& _tpLastBurstClock = *reinterpret_cast<clock_t*>(std::uintptr_t{0x00592588});
 
     inline uint32_t& DAT_00560a94 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A94});
 
@@ -83,8 +83,13 @@ namespace transprt {
     inline uint8_t (&_tpAckFlags)[128] =
         *reinterpret_cast<uint8_t(*)[128]>(std::uintptr_t{0x005923A8});
 
-    inline uint8_t (&_tpPacketsReceived)[256] =
-        *reinterpret_cast<uint8_t(*)[256]>(std::uintptr_t{0x00591FA0});
+    struct s_tp_receive_state {
+        uint8_t packets_received[256];
+        uint8_t unknown_100[768];
+    };
+
+    inline s_tp_receive_state& _tpReceiveState =
+        *reinterpret_cast<s_tp_receive_state*>(std::uintptr_t{0x00591FA0});
 
     inline uint32_t (&_tpOldMessages)[128] = 
         *reinterpret_cast<uint32_t(*)[128]>(std::uintptr_t{0x00592590});
@@ -103,8 +108,8 @@ namespace transprt {
 
     int32_t __cdecl SendLargeUserMessage_(uint16_t type, uint8_t* data, uint16_t len, uint32_t dest);
 
-    inline void*& _userRecFunc =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005923A0});
+    inline user_rec_fn& _userRecFunc =
+        *reinterpret_cast<user_rec_fn*>(std::uintptr_t{0x005923A0});
 
     int8_t __cdecl InitTransportLayer_(uint16_t buffer_size);
 

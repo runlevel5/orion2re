@@ -12,13 +12,13 @@ namespace motrans {
     inline uint32_t& _modem_receive_buffer_full =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560860});
 
-    inline uint32_t& DAT_00591e88 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591E88});
+    inline uint8_t*& _modem_receive_buffer =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00591E88});
 
-    inline uint32_t& DAT_00591e9c =
+    inline uint32_t& _modem_amount_received =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591E9C});
 
-    inline uint32_t& DAT_00591ec8 =
+    inline uint32_t& _mtp_user_type =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591EC8});
 
     uint32_t __cdecl Modem_Status_();

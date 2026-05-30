@@ -7,7 +7,7 @@ namespace bolt {
 
     void __cdecl Bolt_Segment_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color_base,
                                int16_t color_range, int16_t rand_chance, int16_t rand_range, int16_t min_color, int16_t max_color,
-                               int16_t unused_11, int16_t do_sparkles, int16_t sparkle_offset, int16_t tip_fade);
+                               int16_t unused_11, int16_t do_sparkles, uint16_t sparkle_offset, int16_t tip_fade);
 
     void __cdecl Wide_Bolt_Line_(
         int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int16_t param_6,
@@ -16,7 +16,7 @@ namespace bolt {
         int16_t param_19, int16_t param_20, int16_t param_21);
 
     void __cdecl Bolt_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t p5,
-        int16_t p6, int16_t p7, int16_t p8, int16_t p9, int16_t draw_caps,
+        int16_t p6, int16_t p7, int16_t p8, uint16_t p9, int16_t draw_caps,
         int16_t unused_11, int16_t p12, int16_t p13, int16_t p14, int16_t p15,
         int16_t color_base, int16_t p17, int16_t p18, int16_t p19);
 }

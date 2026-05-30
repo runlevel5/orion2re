@@ -211,7 +211,7 @@
 [X] 00412420 - Set_Planet_Selection_Popup_Help_List_
 [X] 00412430 - Set_Officer_Information_Popup_Help_List_
 [X] 00412440 - Points_On_Same_Side_Of_Line_
-[ ] 004124B0 - Point_Within_D_Of_Seg_
+[.] 004124B0 - Point_Within_D_Of_Seg_
 [X] 004127F0 - Collect_Black_Holes_
 [X] 00412840 - Black_Hole_Blocks_Points_
 [X] 004128E0 - Initialize_Black_Hole_Blocks_
@@ -1299,7 +1299,7 @@
 [X] 0046EE10 - Ship_In_Black_Hole_
 [X] 0046EE40 - Draw_Teleporting_Ship_
 [X] 0046F0B0 - Rotate_Ship_Until_Impact_
-[ ] 0046F350 - Ship_In_Legal_Square_
+[X] 0046F350 - Ship_In_Legal_Square_
 [X] 0046F3F0 - Test_Move_Until_Impact_
 [V] 0046F810 - Move_Ship_
 [X] 00470070 - Get_Facing_
@@ -1717,7 +1717,7 @@
 [X] 00497710 - Remap_Draw_With_Mask_
 [V] 00497A40 - Remap_Draw_Animated_Sprite_Mask_
 [X] 00497B80 - Remap_Clipped_Draw_Animated_Sprite_Mask_
-[ ] 00497E50 - Print_Empty_System_Data_
+[.] 00497E50 - Print_Empty_System_Data_
 [X] 00497F80 - Buffer_Reload_System_Ships_
 [X] 00498040 - Print_Special_Building_Data_
 [X] 00498160 - Convert_Custom_Race_Flags_
@@ -1732,7 +1732,7 @@
 [X] 004998B0 - Draw_Naming_Popup_
 [X] 00499900 - Naming_Popup_
 [X] 00499A20 - Compute_Contacts_
-[ ] 00499E50 - Next_Turn_Calc_
+[.] 00499E50 - Next_Turn_Calc_
 [X] 00499FD0 - Do_Autosave_
 [X] 0049A040 - Next_Turn_
 [X] 0049A240 - Get_Winner_
@@ -1815,7 +1815,7 @@
 [X] 0049DB80 - Setup_Icon_Group_Data_
 [X] 0049DC00 - Move_Icon_Group_Icons_
 [X] 0049DC50 - Draw_Icon_Group_Cursor_
-[ ] 0049DD40 - Draw_Icon_Group_
+[.] 0049DD40 - Draw_Icon_Group_
 [X] 0049DDB0 - Font_Colors2_
 [X] 0049DF10 - Get_Comma_String_
 [X] 0049E060 - Bit_Value_To_Num_
@@ -2288,7 +2288,7 @@
 [X] 004C1B30 - Load_Player_Ship_Palette_
 [V] 004C1C90 - Get_Ship_Id_Picture_Seg_
 [X] 004C1CC0 - Get_Ship_Picture_Seg_
-[ ] 004C1CE0 - Do_Get_Ship_Picture_Seg
+[.] 004C1CE0 - Do_Get_Ship_Picture_Seg
 [X] 004C1D40 - Ken_Init_
 [X] 004C1D50 - Ken_Init2_
 [X] 004C1D60 - Get_Weighted_Choice_
@@ -2843,19 +2843,19 @@
 [V] 004F0640 - Confirm_Planet_And_Star_Index_Link_
 [X] 004F0760 - Contact_With_One_Colony_
 [X] 004F07F0 - Contact_With_Player_
-[ ] 004F0840 - Decrement_Zoom_Count_
+[X] 004F0840 - Decrement_Zoom_Count_
 [X] 004F0860 - Empty_System_
 [X] 004F0880 - Get_Map_Scale_
 [X] 004F0910 - Get_Player_Font_Colors_
 [X] 004F0A30 - Get_Scaled_Value_
 [X] 004F0A50 - Get_Up_Scaled_Value_
 [X] 004F0A70 - Habitable_Spectral_Class_
-[ ] 004F0AA0 - Harold_Defaults_
+[X] 004F0AA0 - Harold_Defaults_
 [X] 004F0DD0 - Harold_Init_
 [X] 004F0E20 - Increment_Zoom_Count_
 [X] 004F0E50 - Increment_Zoom_Count_With_Limit_
 [X] 004F0E90 - Init_Fleet_Movement_Box_
-[ ] 004F0ED0 - Init_Moving_Boxes_
+[X] 004F0ED0 - Init_Moving_Boxes_
 [X] 004F0F60 - Init_System_Display_Box_
 [X] 004F0FD0 - Is_Colony_Star_
 [X] 004F1030 - Is_Home_Star_
@@ -3873,75 +3873,75 @@
 [X] 00531750 - Get_Multi_File_Animation_Frame_
 [X] 00531780 - Reset_File_Animation_Buffer_
 [X] 005317A0 - Set_File_Animation_Buffer_
-[.] 005317B0 - Draw_Multi_File_Animation_Palette_
-[.] 00531800 - Interpolate_Line_
-[.] 00531940 - Absolute_Interpolate_Line_
-[.] 00531A50 - Range_
-[.] 00531AA0 - isqrt_
-[.] 00531AF0 - Get_Angle_
-[.] 00531BC0 - Sin_
-[.] 00531CA0 - Cos_
-[.] 00531CC0 - Rotate_Coordinates_
+[X] 005317B0 - Draw_Multi_File_Animation_Palette_
+[V] 00531800 - Interpolate_Line_
+[X] 00531940 - Absolute_Interpolate_Line_
+[X] 00531A50 - Range_
+[X] 00531AA0 - isqrt_
+[X] 00531AF0 - Get_Angle_
+[X] 00531BC0 - Sin_
+[X] 00531CA0 - Cos_
+[X] 00531CC0 - Rotate_Coordinates_
 [.] 00531F20 - Read_Key_
-[.] 00531F60 - Scan_Key_
-[.] 00531F80 - Keyboard_Status_
-[.] 00531FA0 - Set_Stream_Filename_
-[.] 00531FC0 - Loop_Stream_
-[.] 00531FE0 - Stop_Stream_
-[.] 00532030 - thunk_Stop_Stream_
-[.] 00532040 - Stream_On_
-[.] 00532050 - Is_Stream_Playing_
-[.] 00532060 - Set_Stream_Max_Volume_
+[X] 00531F60 - Scan_Key_
+[X] 00531F80 - Keyboard_Status_
+[X] 00531FA0 - Set_Stream_Filename_
+[X] 00531FC0 - Loop_Stream_
+[X] 00531FE0 - Stop_Stream_
+[X] 00532030 - thunk_Stop_Stream_
+[X] 00532040 - Stream_On_
+[X] 00532050 - Is_Stream_Playing_
+[X] 00532060 - Set_Stream_Max_Volume_
 [.] 00532080 - Get_Stream_Volume_
-[.] 005320E0 - Set_Stream_Volume_
+[X] 005320E0 - Set_Stream_Volume_
 [.] 00532130 - Play_Stream_
-[.] 00532440 - Stop_Sound_Timer_
-[.] 00532470 - Enable_Sound_Timer_
-[.] 00532480 - Stop_Stream_Loop_
-[.] 005324C0 - Fade_Stream_Up_
-[.] 005324E0 - Fade_Stream_Down_
-[.] 00532500 - Adjust_Settings_
-[.] 005328D0 - Read_Stream_Data_
-[.] 005329D0 - Update_Stream_Status_
+[X] 00532440 - Stop_Sound_Timer_
+[X] 00532470 - Enable_Sound_Timer_
+[X] 00532480 - Stop_Stream_Loop_
+[X] 005324C0 - Fade_Stream_Up_
+[X] 005324E0 - Fade_Stream_Down_
+[X] 00532500 - Adjust_Settings_
+[X] 005328D0 - Read_Stream_Data_
+[X] 005329D0 - Update_Stream_Status_
 [.] 00532A40 - Bolt_Line_
-[.] 00532E30 - Bolt_Segment_
-[.] 00533070 - Wide_Bolt_Line_
-[.] 005335B0 - Init_Drivers_
-[.] 00533630 - Prepare_Exit_
-[.] 00533650 - Create_IO_Buffer_
-[.] 00533670 - PSTRS_
-[.] 00533690 - Disp_PSTR_
-[.] 00533770 - Blinds_Fade_
+[X] 00532E30 - Bolt_Segment_
+[X] 00533070 - Wide_Bolt_Line_
+[X] 005335B0 - Init_Drivers_
+[X] 00533630 - Prepare_Exit_
+[X] 00533650 - Create_IO_Buffer_
+[X] 00533670 - PSTRS_
+[X] 00533690 - Disp_PSTR_
+[X] 00533770 - Blinds_Fade_
 [.] 005337F0 - Init_TEN_
-[.] 00533860 - FUN_00533860
-[.] 00533890 - Ten_Update_
-[.] 005338A0 - Send_Message_
-[.] 00533930 - TEN_Get_Users_
-[.] 00533960 - TEN_Get_Host_Id_
-[.] 00533980 - FUN_00533980
-[.] 00533A80 - thunk_FUN_00533bd0
-[.] 00533A90 - FUN_00533a90
-[.] 00533AC0 - FUN_00533ac0
-[.] 00533BD0 - FUN_00533bd0
-[.] 00533C10 - FUN_00533c10
-[.] 00533C90 - FUN_00533c90
-[.] 00533CD0 - Reduce_Palette_
-[.] 00533E60 - Split_Cube_
-[.] 00534250 - Sort_Cube_Points_
-[.] 00534420 - Find_Longest_Axis_
-[.] 00534480 - Initial_Cube_
-[.] 005344E0 - Find_Next_Lowest_Cube_Level_
-[.] 005345C0 - Shrink_Cube_
-[.] 00534650 - Clear_Reduced_Palette_Groups_
-[.] 00534660 - Add_Reduced_Palette_Group_
-[.] 00534710 - Compress_Reduced_Palette_Groups_
-[.] 00534790 - Save_Block_To_Drive_
-[.] 00534830 - Restore_Block_From_Drive_
-[.] 00534880 - LBX_init_
-[.] 005349E0 - LBX_uninit_
+[X] 00533860 - FUN_00533860
+[X] 00533890 - Ten_Update_
+[X] 005338A0 - Send_Message_
+[X] 00533930 - TEN_Get_Users_
+[X] 00533960 - TEN_Get_Host_Id_
+[X] 00533980 - FUN_00533980
+[X] 00533A80 - thunk_FUN_00533bd0
+[X] 00533A90 - FUN_00533a90
+[X] 00533AC0 - FUN_00533ac0
+[X] 00533BD0 - FUN_00533bd0
+[X] 00533C10 - FUN_00533c10
+[X] 00533C90 - FUN_00533c90
+[X] 00533CD0 - Reduce_Palette_
+[X] 00533E60 - Split_Cube_
+[X] 00534250 - Sort_Cube_Points_
+[X] 00534420 - Find_Longest_Axis_
+[X] 00534480 - Initial_Cube_
+[X] 005344E0 - Find_Next_Lowest_Cube_Level_
+[X] 005345C0 - Shrink_Cube_
+[X] 00534650 - Clear_Reduced_Palette_Groups_
+[X] 00534660 - Add_Reduced_Palette_Group_
+[X] 00534710 - Compress_Reduced_Palette_Groups_
+[X] 00534790 - Save_Block_To_Drive_
+[X] 00534830 - Restore_Block_From_Drive_
+[X] 00534880 - LBX_init_
+[X] 005349E0 - LBX_uninit_
 [.] 00534A00 - LBX_readRecord_
-[.] 00534A50 - LBX_getRecordLength_
-[.] 00534A60 - Screen_Flic_Capture_
+[X] 00534A50 - LBX_getRecordLength_
+[X] 00534A60 - Screen_Flic_Capture_
 [.] 00534A70 - time_
 [.] 00534A90 - Net_Init_
 [.] 00534B40 - Net_Uninit_
@@ -3949,264 +3949,264 @@
 [.] 00534C30 - Net_Is_Sending_
 [.] 00534C40 - Net_Send_Message_
 [.] 00534D50 - Net_Status_
-[.] 00534DB0 - Refresh_Player_List_
-[.] 00534E10 - Get_Player_Network_Id_
-[.] 00534E20 - Get_Player_Count_
-[.] 00534E30 - Exit_With_Error_
+[X] 00534DB0 - Refresh_Player_List_
+[X] 00534E10 - Get_Player_Network_Id_
+[X] 00534E20 - Get_Player_Count_
+[X] 00534E30 - Exit_With_Error_
 [.] 00534FA0 - Refresh_Game_List_
-[.] 005350B0 - Net_Get_Game_Count_
-[.] 005350C0 - Net_Get_Game_Name_
-[.] 005350F0 - Net_Join_Game_
-[.] 00535290 - Net_Create_Game_
-[.] 00535400 - Net_Enable_New_Players
-[.] 00535420 - Net_Disable_New_Players_
+[X] 005350B0 - Net_Get_Game_Count_
+[X] 005350C0 - Net_Get_Game_Name_
+[X] 005350F0 - Net_Join_Game_
+[X] 00535290 - Net_Create_Game_
+[X] 00535400 - Net_Enable_New_Players
+[X] 00535420 - Net_Disable_New_Players_
 [.] 00535440 - Net_Get_Users_
-[.] 005354D0 - Set_Null_Modem_Slave_
-[.] 005354F0 - Set_Null_Modem_Host_
+[X] 005354D0 - Set_Null_Modem_Slave_
+[X] 005354F0 - Set_Null_Modem_Host_
 [.] 00535510 - Net_Host_ID_
-[.] 00535530 - Init_Modem_
-[.] 00535570 - Uninit_Modem_
-[.] 00535590 - Modem_Answer_
-[.] 005355C0 - Modem_Dial_Number_
-[.] 00535660 - Get_Modem_Error_
-[.] 00535780 - Modem_Connected_
-[.] 005357A0 - Modem_Reset_
-[.] 00535820 - FUN_00535820
-[.] 00535830 - Modem_Open_Port_
-[.] 00535880 - FUN_00535880
-[.] 005358A0 - Open_Smacker_Animation_
+[X] 00535530 - Init_Modem_
+[X] 00535570 - Uninit_Modem_
+[X] 00535590 - Modem_Answer_
+[X] 005355C0 - Modem_Dial_Number_
+[X] 00535660 - Get_Modem_Error_
+[X] 00535780 - Modem_Connected_
+[X] 005357A0 - Modem_Reset_
+[X] 00535820 - FUN_00535820
+[X] 00535830 - Modem_Open_Port_
+[X] 00535880 - FUN_00535880
+[X] 005358A0 - Open_Smacker_Animation_
 [.] 005359A0 - Get_Smacker_Animation_Height_
-[.] 005359C0 - Get_Smacker_Animation_Width_
-[.] 005359E0 - Get_Smacker_Animation_Total_Frames_
-[.] 00535A00 - Get_Smacker_Animation_Frame_
-[.] 00535A20 - Do_Draw_Smacker_Animation_
-[.] 00535BA0 - Close_Smacker_Animation_
-[.] 00535BC0 - Set_Smacker_Palette_
-[.] 00535C00 - Clipped_Draw_Glassed_Bitmap_Sprite_
+[X] 005359C0 - Get_Smacker_Animation_Width_
+[X] 005359E0 - Get_Smacker_Animation_Total_Frames_
+[X] 00535A00 - Get_Smacker_Animation_Frame_
+[X] 00535A20 - Do_Draw_Smacker_Animation_
+[X] 00535BA0 - Close_Smacker_Animation_
+[X] 00535BC0 - Set_Smacker_Palette_
+[X] 00535C00 - Clipped_Draw_Glassed_Bitmap_Sprite_
 [.] 00535D20 - Clipped_Draw_Bitmap_Sprite_
-[.] 00535E50 - Clipped_Draw_Glassed_Animated_Sprite_
+[X] 00535E50 - Clipped_Draw_Glassed_Animated_Sprite_
 [.] 00536040 - Clipped_Draw_Animated_Sprite_
-[.] 00536280 - Clipped_Draw_Stenciled_Animated_Sprite_
-[.] 00536508 - Draw_Animated_Sprite_
+[X] 00536280 - Clipped_Draw_Stenciled_Animated_Sprite_
+[X] 00536508 - Draw_Animated_Sprite_
 [.] 005365B0 - Draw_Bitmap_Sprite_
 [.] 00536623 - Color_Stream_Copy_
-[.] 0053665C - Print_Character_ASM_
+[X] 0053665C - Print_Character_ASM_
 [.] 005366AE - Print_Character_No_Alias_ASM_
-[.] 00536710 - WndProc
-[.] 00536EE8 - Fill_Column_
-[.] 00536F23 - Fill_Region_
-[.] 00536F71 - Interlaced_Fill_Column_
+[X] 00536710 - WndProc
+[X] 00536EE8 - Fill_Column_
+[X] 00536F23 - Fill_Region_
+[X] 00536F71 - Interlaced_Fill_Column_
 [.] 00536FAE - Interlaced_Fill_Region_
-[.] 0053701E - Tri_Interlaced_Fill_Column_
-[.] 00537076 - Tri_Interlaced_Fill_Region_
-[.] 00537121 - Tint_Fill_Column_
-[.] 0053717A - Tint_Fill_Region_
-[.] 005371E8 - FUN_005371e8
-[.] 0053721D - FUN_0053721d
-[.] 00537254 - FUN_00537254
-[.] 005372AD - FUN_005372ad
-[.] 00537324 - Flip_Bitmap_Down_Same_
-[.] 00537366 - Flip_Bitmap_Down_Different_
-[.] 005373A1 - Flip_Bitmap_Left_Same_
-[.] 005373EE - Flip_Bitmap_Left_Different_
-[.] 0053743F - Capture_Screen_Block_
-[.] 00537475 - Enlarge_Bitmap_
-[.] 00537561 - Reduce_Bitmap_
+[X] 0053701E - Tri_Interlaced_Fill_Column_
+[X] 00537076 - Tri_Interlaced_Fill_Region_
+[X] 00537121 - Tint_Fill_Column_
+[X] 0053717A - Tint_Fill_Region_
+[X] 005371E8 - FUN_005371e8
+[X] 0053721D - FUN_0053721d
+[X] 00537254 - FUN_00537254
+[X] 005372AD - FUN_005372ad
+[X] 00537324 - Flip_Bitmap_Down_Same_
+[X] 00537366 - Flip_Bitmap_Down_Different_
+[X] 005373A1 - Flip_Bitmap_Left_Same_
+[X] 005373EE - Flip_Bitmap_Left_Different_
+[X] 0053743F - Capture_Screen_Block_
+[X] 00537475 - Enlarge_Bitmap_
+[X] 00537561 - Reduce_Bitmap_
 [.] 00537620 - Vanish_Bitmap_Pixels_
-[.] 00537701 - Outline_Bitmap_Pixels_
-[.] 005377F8 - Outline_Bitmap_Pixels_No_Glass_
-[.] 005378F7 - FUN_005378f7
-[.] 0053796A - FUN_0053796a
-[.] 005379B7 - FUN_005379b7
-[.] 00537A09 - Tint_Bitmap_Pixels_
+[X] 00537701 - Outline_Bitmap_Pixels_
+[X] 005377F8 - Outline_Bitmap_Pixels_No_Glass_
+[X] 005378F7 - FUN_005378f7
+[X] 0053796A - FUN_0053796a
+[X] 005379B7 - FUN_005379b7
+[X] 00537A09 - Tint_Bitmap_Pixels_
 [.] 00537A5D - Gray_Scale_Fill_Pixels_
 [.] 00537AB1 - Jumble_Bitmap_Pixels_
-[.] 00537B62 - Mask_Bitmap_Pixels_
-[.] 00537BB5 - Mask_Brighten_Bitmap_Pixels_
-[.] 00537C2F - Mask_Bitmap_Pixels_Inverse_
-[.] 00537C82 - Mask_Bitmap_Colors_Pixels_
-[.] 00537D02 - FUN_00537d02
-[.] 00537D60 - FUN_00537d60
-[.] 00537DBE - FUN_00537dbe
-[.] 00537E1C - FUN_00537e1c
-[.] 00537E7A - FUN_00537e7a
-[.] 00537EC9 - Interlace_Scale_Off_Page_ASM_
-[.] 00537F35 - FUN_00537f35
-[.] 00537F5A - FUN_00537f5a
-[.] 00537FC0 - LBX_init_stream_
-[.] 00538170 - Init_Wave_Header_From_Memory_
+[X] 00537B62 - Mask_Bitmap_Pixels_
+[X] 00537BB5 - Mask_Brighten_Bitmap_Pixels_
+[X] 00537C2F - Mask_Bitmap_Pixels_Inverse_
+[X] 00537C82 - Mask_Bitmap_Colors_Pixels_
+[X] 00537D02 - FUN_00537d02
+[X] 00537D60 - FUN_00537d60
+[X] 00537DBE - FUN_00537dbe
+[X] 00537E1C - FUN_00537e1c
+[X] 00537E7A - FUN_00537e7a
+[X] 00537EC9 - Interlace_Scale_Off_Page_ASM_
+[X] 00537F35 - FUN_00537f35
+[X] 00537F5A - FUN_00537f5a
+[X] 00537FC0 - LBX_init_stream_
+[X] 00538170 - Init_Wave_Header_From_Memory_
 [.] 00538260 - Copy_FourCC2_
 [.] 00538270 - Load_Stream_Wave_Header_
 [.] 005383A0 - Copy_FourCC_
-[.] 005383B0 - Load_System_Font_
-[.] 00538500 - Load_System_Mouse_
-[.] 005385C0 - Enumerate_Providers_
-[.] 00538680 - Find_Provider_
-[.] 005386D0 - Init_Connection_
-[.] 00538760 - Init_Providers_
-[.] 00538780 - Player_Enumerate_Callback_
-[.] 005387A0 - Register_Player_
-[.] 00538850 - Drop_Player_
-[.] 00538940 - Create_Player_
-[.] 00538990 - Refresh_Game_List_Callback_
-[.] 00538AB0 - Compress_Data_
-[.] 00538B80 - Uncompress_Data_
-[.] 00538C40 - uninit_model_
-[.] 00538C60 - buffer_remove_symbol_from_stream_
-[.] 00538D40 - buffer_initialize_arithmetic_decoder_
-[.] 00538D90 - buffer_encode_symbol_
-[.] 00538EA0 - buffer_flush_arithmetic_encoder_
-[.] 00538F10 - initialize_model_
+[X] 005383B0 - Load_System_Font_
+[X] 00538500 - Load_System_Mouse_
+[X] 005385C0 - Enumerate_Providers_
+[X] 00538680 - Find_Provider_
+[X] 005386D0 - Init_Connection_
+[X] 00538760 - Init_Providers_
+[X] 00538780 - Player_Enumerate_Callback_
+[X] 005387A0 - Register_Player_
+[X] 00538850 - Drop_Player_
+[X] 00538940 - Create_Player_
+[X] 00538990 - Refresh_Game_List_Callback_
+[X] 00538AB0 - Compress_Data_
+[X] 00538B80 - Uncompress_Data_
+[X] 00538C40 - uninit_model_
+[X] 00538C60 - buffer_remove_symbol_from_stream_
+[X] 00538D40 - buffer_initialize_arithmetic_decoder_
+[X] 00538D90 - buffer_encode_symbol_
+[X] 00538EA0 - buffer_flush_arithmetic_encoder_
+[X] 00538F10 - initialize_model_
 [.] 00538F70 - update_model_
-[.] 00539000 - convert_int_to_symbol_
-[.] 00539060 - get_symbol_scale_
-[.] 00539080 - convert_symbol_to_int_
-[.] 005390C0 - initialize_arithmetic_encoder_
+[X] 00539000 - convert_int_to_symbol_
+[X] 00539060 - get_symbol_scale_
+[X] 00539080 - convert_symbol_to_int_
+[X] 005390C0 - initialize_arithmetic_encoder_
 [.] 005390E0 - get_current_count_
-[.] 00539120 - InitModemTransportLayer_
-[.] 005391B0 - FUN_005391b0
-[.] 005391E0 - Send_Receive_Ack_
-[.] 00539220 - Send_Receive_Nack_
-[.] 00539260 - Modem_Send_Message_
-[.] 00539290 - Modem_Status_
-[.] 005392B0 - Send_Modem_Message_
-[.] 005394C0 - FUN_005394c0
+[X] 00539120 - InitModemTransportLayer_
+[X] 005391B0 - FUN_005391b0
+[X] 005391E0 - Send_Receive_Ack_
+[X] 00539220 - Send_Receive_Nack_
+[X] 00539260 - Modem_Send_Message_
+[X] 00539290 - Modem_Status_
+[X] 005392B0 - Send_Modem_Message_
+[X] 005394C0 - FUN_005394c0
 [.] 005394F0 - Modem_Update_
-[.] 00539570 - Receive_Modem_Packet_
-[.] 00539800 - ComInit_
-[.] 00539940 - ComDoComms_
-[.] 00539950 - ComSendUserMessage_
-[.] 00539A60 - GetMessages_
-[.] 00539AD0 - NetPoll_
-[.] 00539B80 - HandleSessionMessage_
-[.] 00539BC0 - Handle_Destroy_Player_
-[.] 00539BE0 - Handle_Create_Player_
+[X] 00539570 - Receive_Modem_Packet_
+[X] 00539800 - ComInit_
+[X] 00539940 - ComDoComms_
+[X] 00539950 - ComSendUserMessage_
+[X] 00539A60 - GetMessages_
+[X] 00539AD0 - NetPoll_
+[X] 00539B80 - HandleSessionMessage_
+[X] 00539BC0 - Handle_Destroy_Player_
+[X] 00539BE0 - Handle_Create_Player_
 [.] 00539C00 - HandleControlMessage_
-[.] 00539C90 - SetPlayerLastKeepAlive_
-[.] 00539CE0 - Exit_With_DPlay_Error_
-[.] 00539DB0 - InitTransportLayer_
+[X] 00539C90 - SetPlayerLastKeepAlive_
+[X] 00539CE0 - Exit_With_DPlay_Error_
+[X] 00539DB0 - InitTransportLayer_
 [.] 00539E50 - UpdateTransportLayer_
-[.] 00539F00 - ResetSending_
+[X] 00539F00 - ResetSending_
 [.] 00539F50 - ResetReceiving_
 [.] 00539F70 - SendAck_
-[.] 00539FC0 - NumUsers_
-[.] 00539FD0 - AllAcknowledged_
+[X] 00539FC0 - NumUsers_
+[X] 00539FD0 - AllAcknowledged_
 [.] 0053A050 - ReceiveLargeUserMessage_
 [.] 0053A3D0 - NotifyNextQueuedSender_
 [.] 0053A450 - SendPacket_
-[.] 0053A560 - SendLargeUserMessage_
-[.] 0053A6C0 - OpenOutputBitBuffer_
-[.] 0053A6F0 - OpenInputBitBuffer_
-[.] 0053A720 - CloseOutputBitBuffer_
-[.] 0053A750 - CloseInputBitBuffer_
+[X] 0053A560 - SendLargeUserMessage_
+[X] 0053A6C0 - OpenOutputBitBuffer_
+[X] 0053A6F0 - OpenInputBitBuffer_
+[X] 0053A720 - CloseOutputBitBuffer_
+[X] 0053A750 - CloseInputBitBuffer_
 [.] 0053A760 - BufferOutputBit_
 [.] 0053A7C0 - BufferOutputBits_
 [.] 0053A840 - BufferInputBit_
-[.] 0053A8A0 - FUN_0053a8a0
-[.] 0053A8CA - DirectDrawCreate
-[.] 0053A8D0 - Ordinal_1
-[.] 0053A8D6 - Ordinal_2
-[.] 0053A8DC - DirectSoundCreate
-[.] 0053A8F0 - FUN_0053a8f0
-[.] 0053A920 - FUN_0053a920
-[.] 0053A9D0 - FUN_0053a9d0
-[.] 0053A9F0 - FUN_0053a9f0
-[.] 0053AAF0 - FUN_0053aaf0
-[.] 0053AB30 - FUN_0053ab30
-[.] 0053AC10 - ClearRXBuffer_
+[X] 0053A8A0 - FUN_0053a8a0
+[X] 0053A8CA - DirectDrawCreate
+[X] 0053A8D0 - Ordinal_1
+[X] 0053A8D6 - Ordinal_2
+[X] 0053A8DC - DirectSoundCreate
+[X] 0053A8F0 - FUN_0053a8f0
+[X] 0053A920 - FUN_0053a920
+[X] 0053A9D0 - FUN_0053a9d0
+[X] 0053A9F0 - FUN_0053a9f0
+[X] 0053AAF0 - FUN_0053aaf0
+[X] 0053AB30 - FUN_0053ab30
+[X] 0053AC10 - ClearRXBuffer_
 [!] 0053AC40 - GetCd_
-[.] 0053AC50 - FUN_0053ac50
-[.] 0053AD00 - FUN_0053ad00
-[.] 0053AD40 - FUN_0053ad40
+[X] 0053AC50 - FUN_0053ac50
+[X] 0053AD00 - FUN_0053ad00
+[X] 0053AD40 - FUN_0053ad40
 [!] 0053AD70 - FUN_0053ad70
-[.] 0053ADA0 - FUN_0053ada0
-[.] 0053AE30 - FUN_0053ae30
-[.] 0053AEA0 - FUN_0053aea0
-[.] 0053AF00 - FUN_0053af00
-[.] 0053B020 - FUN_0053b020
-[.] 0053B040 - FUN_0053b040
-[.] 0053B140 - FUN_0053b140
-[.] 0053B190 - FUN_0053b190
-[.] 0053B200 - FUN_0053b200
-[.] 0053B280 - FUN_0053b280
-[.] 0053B390 - FUN_0053b390
-[.] 0053B4E0 - FUN_0053b4e0
-[.] 0053B530 - FUN_0053b530
-[.] 0053B680 - SetDefaultBufferSize_
-[.] 0053B690 - FUN_0053b690
-[.] 0053B6A0 - FUN_0053b6a0
-[.] 0053B6B0 - FUN_0053b6b0
-[.] 0053B6E0 - FUN_0053b6e0
-[.] 0053B760 - GetTickCount
-[.] 0053B770 - FUN_0053b770
-[.] 0053B7D0 - FUN_0053b7d0
-[.] 0053B880 - FUN_0053b880
-[.] 0053B8A0 - FUN_0053b8a0
-[.] 0053B950 - FUN_0053b950
-[.] 0053B980 - FUN_0053b980
-[.] 0053B9C0 - FUN_0053b9c0
-[.] 0053BC40 - FUN_0053bc40
-[.] 0053BC50 - FUN_0053bc50
-[.] 0053BC60 - FUN_0053bc60
-[.] 0053BC70 - FUN_0053bc70
-[.] 0053BD30 - FUN_0053bd30
-[.] 0053BD50 - FUN_0053bd50
-[.] 0053BD91 - FUN_0053bd91
-[.] 0053BDF9 - FUN_0053bdf9
-[.] 0053BE10 - FUN_0053be10
-[.] 0053BE7E - FUN_0053be7e
-[.] 0053BE90 - FUN_0053be90
-[.] 0053C060 - FUN_0053c060
-[.] 0053C070 - FUN_0053c070
-[.] 0053C120 - FUN_0053c120
-[.] 0053C2F0 - FUN_0053c2f0
-[.] 0053C3A0 - FUN_0053c3a0
-[.] 0053C410 - FUN_0053c410
-[.] 0053C490 - FUN_0053c490
-[.] 0053C4E0 - FUN_0053c4e0
-[.] 0053C590 - FUN_0053c590
-[.] 0053C640 - FUN_0053c640
-[.] 0053C6B0 - FUN_0053c6b0
-[.] 0053C740 - FUN_0053c740
-[.] 0053CAD0 - FUN_0053cad0
-[.] 0053CB70 - FUN_0053cb70
-[.] 0053CBB0 - FUN_0053cbb0
-[.] 0053CC20 - FUN_0053cc20
-[.] 0053CD40 - FUN_0053cd40
-[.] 0053CE21 - FUN_0053ce21
-[.] 0053CE30 - FUN_0053ce30
-[.] 0053CEE7 - FUN_0053cee7
-[.] 0053CEF0 - FUN_0053cef0
-[.] 0053CFA4 - FUN_0053cfa4
-[.] 0053CFB0 - FUN_0053cfb0
-[.] 0053D07F - FUN_0053d07f
-[.] 0053D090 - FUN_0053d090
-[.] 0053D11F - FUN_0053d11f
-[.] 0053D130 - FUN_0053d130
-[.] 0053D1BF - FUN_0053d1bf
-[.] 0053D1D0 - FUN_0053d1d0
-[.] 0053D1E0 - FUN_0053d1e0
-[.] 0053D1F0 - FUN_0053d1f0
-[.] 0053D200 - FUN_0053d200
-[.] 0053D210 - FUN_0053d210
-[.] 0053D220 - FUN_0053d220
-[.] 0053D230 - FUN_0053d230
-[.] 0053D250 - FUN_0053d250
-[.] 0053D260 - FUN_0053d260
-[.] 0053D270 - FUN_0053d270
-[.] 0053D280 - FUN_0053d280
-[.] 0053D2A0 - FUN_0053d2a0
-[.] 0053D380 - FUN_0053d380
-[.] 0053D470 - FUN_0053d470
-[.] 0053D570 - FUN_0053d570
-[.] 0053D6B0 - FUN_0053d6b0
-[.] 0053D7C0 - FUN_0053d7c0
-[.] 0053D8E0 - FUN_0053d8e0
-[.] 0053D960 - timeGetTime
+[X] 0053ADA0 - FUN_0053ada0
+[X] 0053AE30 - FUN_0053ae30
+[X] 0053AEA0 - FUN_0053aea0
+[X] 0053AF00 - FUN_0053af00
+[X] 0053B020 - FUN_0053b020
+[X] 0053B040 - FUN_0053b040
+[X] 0053B140 - FUN_0053b140
+[X] 0053B190 - FUN_0053b190
+[X] 0053B200 - FUN_0053b200
+[X] 0053B280 - FUN_0053b280
+[X] 0053B390 - FUN_0053b390
+[X] 0053B4E0 - FUN_0053b4e0
+[X] 0053B530 - FUN_0053b530
+[X] 0053B680 - SetDefaultBufferSize_
+[X] 0053B690 - FUN_0053b690
+[X] 0053B6A0 - FUN_0053b6a0
+[X] 0053B6B0 - FUN_0053b6b0
+[X] 0053B6E0 - FUN_0053b6e0
+[X] 0053B760 - GetTickCount
+[X] 0053B770 - FUN_0053b770
+[X] 0053B7D0 - FUN_0053b7d0
+[X] 0053B880 - FUN_0053b880
+[X] 0053B8A0 - FUN_0053b8a0
+[X] 0053B950 - FUN_0053b950
+[X] 0053B980 - FUN_0053b980
+[X] 0053B9C0 - FUN_0053b9c0
+[X] 0053BC40 - FUN_0053bc40
+[X] 0053BC50 - FUN_0053bc50
+[X] 0053BC60 - FUN_0053bc60
+[X] 0053BC70 - FUN_0053bc70
+[X] 0053BD30 - FUN_0053bd30
+[X] 0053BD50 - FUN_0053bd50
+[X] 0053BD91 - FUN_0053bd91
+[X] 0053BDF9 - FUN_0053bdf9
+[X] 0053BE10 - FUN_0053be10
+[X] 0053BE7E - FUN_0053be7e
+[X] 0053BE90 - FUN_0053be90
+[X] 0053C060 - FUN_0053c060
+[X] 0053C070 - FUN_0053c070
+[X] 0053C120 - FUN_0053c120
+[X] 0053C2F0 - FUN_0053c2f0
+[X] 0053C3A0 - FUN_0053c3a0
+[X] 0053C410 - FUN_0053c410
+[X] 0053C490 - FUN_0053c490
+[X] 0053C4E0 - FUN_0053c4e0
+[X] 0053C590 - FUN_0053c590
+[X] 0053C640 - FUN_0053c640
+[X] 0053C6B0 - FUN_0053c6b0
+[X] 0053C740 - FUN_0053c740
+[X] 0053CAD0 - FUN_0053cad0
+[X] 0053CB70 - FUN_0053cb70
+[X] 0053CBB0 - FUN_0053cbb0
+[X] 0053CC20 - FUN_0053cc20
+[X] 0053CD40 - FUN_0053cd40
+[X] 0053CE21 - FUN_0053ce21
+[X] 0053CE30 - FUN_0053ce30
+[X] 0053CEE7 - FUN_0053cee7
+[X] 0053CEF0 - FUN_0053cef0
+[X] 0053CFA4 - FUN_0053cfa4
+[X] 0053CFB0 - FUN_0053cfb0
+[X] 0053D07F - FUN_0053d07f
+[X] 0053D090 - FUN_0053d090
+[X] 0053D11F - FUN_0053d11f
+[X] 0053D130 - FUN_0053d130
+[X] 0053D1BF - FUN_0053d1bf
+[X] 0053D1D0 - FUN_0053d1d0
+[X] 0053D1E0 - FUN_0053d1e0
+[X] 0053D1F0 - FUN_0053d1f0
+[X] 0053D200 - FUN_0053d200
+[X] 0053D210 - FUN_0053d210
+[X] 0053D220 - FUN_0053d220
+[X] 0053D230 - FUN_0053d230
+[X] 0053D250 - FUN_0053d250
+[X] 0053D260 - FUN_0053d260
+[X] 0053D270 - FUN_0053d270
+[X] 0053D280 - FUN_0053d280
+[X] 0053D2A0 - FUN_0053d2a0
+[X] 0053D380 - FUN_0053d380
+[X] 0053D470 - FUN_0053d470
+[X] 0053D570 - FUN_0053d570
+[X] 0053D6B0 - FUN_0053d6b0
+[X] 0053D7C0 - FUN_0053d7c0
+[X] 0053D8E0 - FUN_0053d8e0
+[X] 0053D960 - timeGetTime
 [.] 0053D970 - FUN_0053d970
-[.] 0053DA00 - FUN_0053da00
-[.] 0053DA20 - FUN_0053da20
-[.] 0053DAA0 - FUN_0053daa0
+[X] 0053DA00 - FUN_0053da00
+[X] 0053DA20 - FUN_0053da20
+[X] 0053DAA0 - FUN_0053daa0
 [.] 0053DAF3 - FUN_0053daf3
 [.] 0053DB00 - FUN_0053db00
 [.] 0053DB80 - FUN_0053db80
@@ -4507,104 +4507,104 @@
 [.] 005497B0 - __ms_p5_mp_test_fdiv
 [.] 00549920 - __cftoe
 [.] 005499A0 - __cftoe2
-[ ] 00549A90 - __cftof
-[ ] 00549B00 - __cftof2
-[ ] 00549BC0 - __cftog
-[ ] 00549CE0 - __shift
-[ ] 00549D10 - __getbuf
-[ ] 00549D60 - __isatty
-[ ] 00549DC0 - FUN_00549dc0
-[ ] 00549E20 - FUN_00549e20
-[ ] 00549E30 - __mbsnbicoll
-[ ] 00549E70 - ___wtomb_environ
-[ ] 00549F00 - _wctomb
-[ ] 00549F60 - __wctomb_lk
-[ ] 0054A000 - __alloc_osfhnd
-[ ] 0054A140 - __set_osfhnd
-[ ] 0054A1F0 - __free_osfhnd
-[ ] 0054A290 - __get_osfhandle
-[ ] 0054A2E0 - __lock_fhandle
-[ ] 0054A350 - __unlock_fhandle
-[ ] 0054A380 - __sopen
-[ ] 0054A890 - __get_lc_time
-[ ] 0054AC10 - __free_lc_time
-[ ] 0054AE50 - storeTimeFmt
-[ ] 0054AF50 - ___init_numeric
-[ ] 0054B170 - fix_grouping
-[ ] 0054B2B0 - __get_lc_lconv
-[ ] 0054B400 - fix_grouping
-[ ] 0054B450 - __free_lc_lconv
-[ ] 0054B4C0 - ___init_ctype
-[ ] 0054B780 - _strcspn
-[ ] 0054B7C0 - _strpbrk
-[ ] 0054B800 - _mbtowc
-[ ] 0054B860 - __mbtowc_lk
-[ ] 0054B970 - _isspace
-[ ] 0054B9A0 - FID_conflict:_ungetc
-[ ] 0054BA30 - _wcstombs
-[ ] 0054BA90 - __wcstombs_lk
-[ ] 0054BD00 - wcsncnt
-[ ] 0054BD40 - FUN_0054bd40
-[ ] 0054BD60 - ___crtMessageBoxA
-[ ] 0054BE00 - terminate
-[ ] 0054BE75 - _abort
-[ ] 0054BE80 - _inconsistency
+[X] 00549A90 - __cftof
+[X] 00549B00 - __cftof2
+[X] 00549BC0 - __cftog
+[X] 00549CE0 - __shift
+[X] 00549D10 - __getbuf
+[.] 00549D60 - __isatty
+[X] 00549DC0 - FUN_00549dc0
+[X] 00549E20 - FUN_00549e20
+[X] 00549E30 - __mbsnbicoll
+[X] 00549E70 - ___wtomb_environ
+[X] 00549F00 - _wctomb
+[X] 00549F60 - __wctomb_lk
+[X] 0054A000 - __alloc_osfhnd
+[X] 0054A140 - __set_osfhnd
+[X] 0054A1F0 - __free_osfhnd
+[X] 0054A290 - __get_osfhandle
+[X] 0054A2E0 - __lock_fhandle
+[X] 0054A350 - __unlock_fhandle
+[.] 0054A380 - __sopen
+[X] 0054A890 - __get_lc_time
+[X] 0054AC10 - __free_lc_time
+[X] 0054AE50 - storeTimeFmt
+[X] 0054AF50 - ___init_numeric
+[X] 0054B170 - fix_grouping
+[X] 0054B2B0 - __get_lc_lconv
+[X] 0054B400 - fix_grouping
+[X] 0054B450 - __free_lc_lconv
+[X] 0054B4C0 - ___init_ctype
+[X] 0054B780 - _strcspn
+[X] 0054B7C0 - _strpbrk
+[X] 0054B800 - _mbtowc
+[X] 0054B860 - __mbtowc_lk
+[X] 0054B970 - _isspace
+[X] 0054B9A0 - FID_conflict:_ungetc
+[.] 0054BA30 - _wcstombs
+[.] 0054BA90 - __wcstombs_lk
+[.] 0054BD00 - wcsncnt
+[.] 0054BD40 - FUN_0054bd40
+[.] 0054BD60 - ___crtMessageBoxA
+[.] 0054BE00 - terminate
+[.] 0054BE75 - _abort
+[.] 0054BE80 - _inconsistency
 [ ] 0054BEED - terminate
-[ ] 0054BF00 - _ValidateRead
-[ ] 0054BF20 - _ValidateWrite
-[ ] 0054BF40 - _ValidateExecute
-[ ] 0054BF60 - __control87
-[ ] 0054BFA0 - __controlfp
-[ ] 0054BFC0 - __abstract_cw
-[ ] 0054C070 - __hw_cw
-[ ] 0054C100 - FUN_0054c100
-[ ] 0054C110 - __ZeroTail
-[ ] 0054C180 - __IncMan
-[ ] 0054C1F0 - __RoundMan
-[ ] 0054C2A0 - __CopyMan
-[ ] 0054C2C0 - __FillZeroMan
-[ ] 0054C2D0 - __IsZeroMan
-[ ] 0054C2F0 - __ShrMan
-[ ] 0054C3A0 - __ld12cvt
-[ ] 0054C570 - FID_conflict:__ld12tod
-[ ] 0054C590 - FID_conflict:__ld12tod
-[ ] 0054C5B0 - FID_conflict:__atodbl
-[ ] 0054C5F0 - FID_conflict:__atodbl
-[ ] 0054C630 - __fptostr
-[ ] 0054C6C0 - __fltout2
-[ ] 0054C750 - ___dtold
-[ ] 0054C810 - ___crtCompareStringA
-[ ] 0054CB00 - _strncnt
-[ ] 0054CB30 - ___crtsetenv
-[ ] 0054CD80 - findenv
-[ ] 0054CDE0 - copy_environ
-[ ] 0054CE50 - __chsize_lk
-[ ] 0054CF90 - ___getlocaleinfo
-[ ] 0054D150 - ___crtGetLocaleInfoW
-[ ] 0054D280 - ___crtGetLocaleInfoA
-[ ] 0054D3C0 - _abort
-[ ] 0054D3E0 - _raise
-[ ] 0054D5C0 - siglookup
-[ ] 0054D600 - ___addl
-[ ] 0054D630 - ___add_12
-[ ] 0054D6A0 - ___shl_12
-[ ] 0054D6E0 - ___shr_12
-[ ] 0054D720 - ___mtold12
-[ ] 0054D810 - ___strgtold12
-[ ] 0054DF60 - $I10_OUTPUT
-[ ] 0054E300 - __mbschr
-[ ] 0054E3C0 - __strdup
-[ ] 0054E3F0 - __setmode_lk
-[ ] 0054E460 - ___ld12mul
-[ ] 0054E710 - ___multtenpow12
-[ ] 0054E790 - _strlen
-[ ] 0054E810 - FID_conflict:__mbscpy
-[ ] 0054E900 - RtlUnwind
-[ ] 0054E910 - __strupr
-[ ] 0054EA70 - _access_
-[ ] 0054EAC0 - __getch
-[ ] 0054EAE0 - __getch_lk
-[ ] 0054EBE0 - __getextendedkeycode
-[ ] 0054ECD0 - __strlwr
-[ ] 0054EE30 - __strnicmp
-[ ] 0054EF30 - ___initconin
+[.] 0054BF00 - _ValidateRead
+[.] 0054BF20 - _ValidateWrite
+[.] 0054BF40 - _ValidateExecute
+[.] 0054BF60 - __control87
+[.] 0054BFA0 - __controlfp
+[.] 0054BFC0 - __abstract_cw
+[.] 0054C070 - __hw_cw
+[.] 0054C100 - FUN_0054c100
+[.] 0054C110 - __ZeroTail
+[.] 0054C180 - __IncMan
+[.] 0054C1F0 - __RoundMan
+[.] 0054C2A0 - __CopyMan
+[.] 0054C2C0 - __FillZeroMan
+[.] 0054C2D0 - __IsZeroMan
+[.] 0054C2F0 - __ShrMan
+[.] 0054C3A0 - __ld12cvt
+[.] 0054C570 - FID_conflict:__ld12tod
+[.] 0054C590 - FID_conflict:__ld12tod
+[.] 0054C5B0 - FID_conflict:__atodbl
+[.] 0054C5F0 - FID_conflict:__atodbl
+[.] 0054C630 - __fptostr
+[.] 0054C6C0 - __fltout2
+[.] 0054C750 - ___dtold
+[.] 0054C810 - ___crtCompareStringA
+[.] 0054CB00 - _strncnt
+[.] 0054CB30 - ___crtsetenv
+[.] 0054CD80 - findenv
+[.] 0054CDE0 - copy_environ
+[.] 0054CE50 - __chsize_lk
+[.] 0054CF90 - ___getlocaleinfo
+[.] 0054D150 - ___crtGetLocaleInfoW
+[.] 0054D280 - ___crtGetLocaleInfoA
+[.] 0054D3C0 - _abort
+[.] 0054D3E0 - _raise
+[.] 0054D5C0 - siglookup
+[.] 0054D600 - ___addl
+[.] 0054D630 - ___add_12
+[.] 0054D6A0 - ___shl_12
+[.] 0054D6E0 - ___shr_12
+[.] 0054D720 - ___mtold12
+[.] 0054D810 - ___strgtold12
+[.] 0054DF60 - $I10_OUTPUT
+[.] 0054E300 - __mbschr
+[.] 0054E3C0 - __strdup
+[.] 0054E3F0 - __setmode_lk
+[.] 0054E460 - ___ld12mul
+[.] 0054E710 - ___multtenpow12
+[.] 0054E790 - _strlen
+[.] 0054E810 - FID_conflict:__mbscpy
+[.] 0054E900 - RtlUnwind
+[.] 0054E910 - __strupr
+[.] 0054EA70 - _access_
+[.] 0054EAC0 - __getch
+[.] 0054EAE0 - __getch_lk
+[.] 0054EBE0 - __getextendedkeycode
+[.] 0054ECD0 - __strlwr
+[.] 0054EE30 - __strnicmp
+[.] 0054EF30 - ___initconin

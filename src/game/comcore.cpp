@@ -54,7 +54,7 @@ int16_t __cdecl ComSendUserMessage_(
     return 1;
 }
 
-int32_t __cdecl ComInit_(uint16_t msg_size, char* name, void* rec_fn) {
+int32_t __cdecl ComInit_(uint16_t msg_size, char* name, recv_handler_fn rec_fn) {
     transprt::InitTransportLayer_(0x8000);
 
     if (rec_fn == nullptr) {

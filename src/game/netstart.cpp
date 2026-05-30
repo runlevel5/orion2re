@@ -267,8 +267,7 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
         RUSS::Mox_Update_();
 
-        // TYPE MISMATCH: Receive_Message_ signature differs from WINNET::Init expectation
-        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_), &NETMOX::_net)) {
+        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, NETMOX::Receive_Message_, &NETMOX::_net)) {
             RUSS::Mox_Update_();
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
@@ -358,8 +357,7 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        void* receive_msg_ptr = (void*)NETMOX::Receive_Message_;
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, receive_msg_ptr, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             NETMOX::_net.sync_state = 0;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
