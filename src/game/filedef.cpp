@@ -1,6 +1,19 @@
 #include "pch.h"
 
 namespace FILEDEF {
+    const char s_SAVE_d_GAM_00556944[11] = "SAVE%d.GAM";
+    const char s_rb_0055117c[3] = "rb";
+    const char s_GAM_005568f4[5] = ".GAM";
+    const char s_SAVE_005568fc[5] = "SAVE";
+    const char s_Error_saving_game_00556904[20] = "Error saving game.\n";
+    const char s_no_description_00556920[21] = "<< no description >>";
+    const char s_Auto_Save_00556938[12] = "(Auto Save)";
+    const char s_invalid_save_slot_english[65] = "SAVE%d.GAM is invalid! Try another save slot or start a NEW game";
+    const char s_invalid_save_slot_german[89] = "SAVE%d.GAM ist ung\x9Fltig! W\x8Ahlen Sie ein anderes Spiel, oder starten Sie ein NEUES Spiel.";
+    const char s_invalid_save_slot_french[112] = "SAUVEGARDER%d.GAM n'est pas valide! Essayez un autre emplacement de sauvegarde ou commencez une NOUVELLE partie";
+    const char s_invalid_save_slot_spanish[87] = "#SAVE%d.GAM no es v<lido! Prueba otro hueco para guardar or comienza una partida NUEVA";
+    const char s_invalid_save_slot_italian[91] = "Il file SAVE%d.GAM non > valido! Provate a caricarne un altro o iniziate una nuova partita";
+
     void __cdecl Load_Game_Settings_() {
         RUSS::Assert_Settings_();
 

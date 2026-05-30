@@ -1,30 +1,23 @@
 #pragma once
 
 namespace diplomac {
-    inline int16_t& _diplomacy_proposal_system_bribe =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A778C});
+    extern int16_t _diplomacy_proposal_system_bribe;
 
-    inline int8_t& _diplomacy_proposal_tribute_bribe =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A778E});
+    extern int8_t _diplomacy_proposal_tribute_bribe;
 
-    inline int16_t& _diplomacy_proposal_gold_bribe =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7790});
+    extern int16_t _diplomacy_proposal_gold_bribe;
 
-    inline uint8_t& _diplomacy_proposal_tech_bribe1 =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7792});
+    extern uint8_t _diplomacy_proposal_tech_bribe1;
 
-    inline uint8_t* _unprovoked_message_mapping = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00453734});
+    extern uint8_t _unprovoked_message_mapping[20];
 
-    inline int16_t* _starting_relations = reinterpret_cast<int16_t*>(std::uintptr_t{0x00556B40});
+    extern int16_t _starting_relations[196];
 
-    inline int16_t (&_personality_peace_duration)[12] = 
-        *reinterpret_cast<int16_t(*)[12]>(std::uintptr_t{0x00556CC8});
+    extern int16_t _personality_peace_duration[12];
 
-    inline int16_t (&_personality_break_peace_treaty_chance)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556CE0});
+    extern int16_t _personality_break_peace_treaty_chance[8];
 
-    inline int16_t (&_personality_sneak_attack_modifiers)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556CF0});
+    extern int16_t _personality_sneak_attack_modifiers[8];
 
     void Init_Diplomatic_Relations_();
 

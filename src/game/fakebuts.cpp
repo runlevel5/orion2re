@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace FAKEBUTS {
+    uint8_t _n_fake_buttons;
+
+    s_fake_button _fake_buttons[25];
+
+    uint8_t _n_click_thru_fields;
+
+    s_click_through_field _click_thru_fields[25];
+
     void __cdecl Clear_Click_Thru_Fields_() {
         memset(_click_thru_fields, 0, sizeof(_click_thru_fields));
         _n_click_thru_fields = 0;

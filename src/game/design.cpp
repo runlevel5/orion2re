@@ -1,8 +1,48 @@
 #include "pch.h"
 
 namespace DESIGN {
+    int16_t _repeat_count;
+    uint8_t _replacement_wait_ctr;
+    int16_t _design_size_field;
+    uint8_t _use_augmented_engines;
+
+    int32_t _printed_space_avail;
+    int16_t _design_shield_replacement_field;
+    int16_t _design_computer_replacement_field;
+    int32_t _printed_cost;
+    uint8_t _changed_design_name;
+    uint8_t _add_size_button_flag[6];
+
+    const char s_cstdes_log[13] = "cstdes%d.log";
+    const char s_plus[2] = "+";
+    const char s_minus[2] = "-";
+    const char s_pct_d[3] = "%d";
+    const char s_pct_s_pct_d[5] = "%s%d";
+    const char s_pct_d_pct[5] = "%d%%";
+    const char s_pct_s_bracket_pct_d[8] = "%s (%d)";
+    const char s_special_tag[8] = "special";
+    const char s__00551100[1] = "";
+    const char s__00551120[2] = {'\x1B', '\0'};
+    const char s_B_005560e4[2] = "B";
+    const char s_L_005560e8[2] = "L";
+    const char s_360_00556164[4] = "360";
+    const char s_comma_space[3] = ", ";
+    const char s_ITATECD_LBX[12] = "ITATECD.LBX";
+    const char s_SPATECD_LBX[12] = "SPATECD.LBX";
+    const char s_FRETECD_LBX[12] = "FRETECD.LBX";
+    const char s_GERTECD_LBX[12] = "GERTECD.LBX";
+    const char s_TECHDESC_LBX[13] = "TECHDESC.LBX";
+    const char s_DESIGN_LBX_005560cc[11] = "DESIGN.LBX";
+    const char* PTR_s_DESIGN_LBX_005560D8 = s_DESIGN_LBX_005560cc;
+    const char s_Bad_required_tech_in_Tech_Level[40] = "Bad required_tech in Tech_Level()... %d";
+    const char s_SHIPNAME_LBX_0055610C[13] = "shipname.lbx";
+
+    s_animation_header* _dull_plus_button_seg;
+    s_animation_header* _dull_minus_button_seg;
+    s_animation_header* _dark_build_design_button_seg;
+
     void __cdecl Build_Initial_Design_Template_(int16_t player_idx, int16_t design_idx) {
-        s_current_design* d = _design;
+        s_current_design* d = MOX::_design;
 
         for (int i = 0; i < sizeof(s_current_design); ++i) {
             ((uint8_t*)d)[i] = 0;
@@ -89,7 +129,7 @@ namespace DESIGN {
 
         struct_::Clear_Structure_(&local_design, sizeof(local_design));
 
-        _design = &local_design;
+        MOX::_design = &local_design;
 
         // strcpy(local_design.name, ship_design->name)
         char* src = ship_design->name;
@@ -136,7 +176,7 @@ namespace DESIGN {
             }
         }
 
-        local_design.base_combat_speed = Current_Design_Combat_Speed_(_design);
+        local_design.base_combat_speed = Current_Design_Combat_Speed_(MOX::_design);
         Update_Calculated_Design_Data_(player_idx);
 
         return static_cast<int16_t>(local_design.total_cost);
@@ -150,7 +190,7 @@ namespace DESIGN {
         int8_t count = 0;
 
         for (int i = 0; i < 8; ++i) {
-            if (_design->weapon_type[i] > 0) {
+            if (MOX::_design->weapon_type[i] > 0) {
                 count++;
             }
         }
@@ -225,25 +265,25 @@ namespace DESIGN {
         bool found_damper = false;
 
         for (int16_t i = 0; i < 8; ++i) {
-            if (_design->special_devices[i] == SPECIAL_DAMPER_FIELD) {
+            if (MOX::_design->special_devices[i] == SPECIAL_DAMPER_FIELD) {
                 found_damper = true;
                 break;
             }
         }
 
         if (found_damper) {
-            _design->shield = 0;
+            MOX::_design->shield = 0;
         }
 
         return found_damper;
     }
 
     uint8_t __cdecl Current_Design_Shield_() {
-        return static_cast<uint8_t>(_design->shield);
+        return static_cast<uint8_t>(MOX::_design->shield);
     }
 
     int16_t __cdecl Base_Shield_Cost() {
-        return _design->shield_cost;
+        return MOX::_design->shield_cost;
     }
 
     int16_t __cdecl Get_Shild_Space_() {
@@ -267,22 +307,22 @@ namespace DESIGN {
         Design_Template_Costs_(player_idx);
         Design_Template_Space_Requirements_(player_idx);
 
-        _design->total_cost = Total_Design_Cost_();
-        _design->space_used = Total_Space_Used_();
-        _design->hull_space = Total_Design_Space_();
+        MOX::_design->total_cost = Total_Design_Cost_();
+        MOX::_design->space_used = Total_Space_Used_();
+        MOX::_design->hull_space = Total_Design_Space_();
 
         MOX::_n_weapons_loaded = Count_Weapons_Loaded_();
         MOX::_n_special_systems = Count_Special_Devices_();
 
-        _printed_space_avail = _design->hull_space - _design->space_used;
-        _printed_cost = _design->total_cost;
+        _printed_space_avail = MOX::_design->hull_space - MOX::_design->space_used;
+        _printed_cost = MOX::_design->total_cost;
 
         Update_N_Spec_Systems_In_Design_();
         Update_Weapon_Count_();
 
-        if (_design->show_help != 0) {
-            EVANHELP::Set_Design_Screen_Help_List_(_design->num_weapon_slots, _design->num_special_slots);
-            _design->show_help = 0;
+        if (MOX::_design->show_help != 0) {
+            EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->num_weapon_slots, MOX::_design->num_special_slots);
+            MOX::_design->show_help = 0;
         }
     }
 
@@ -342,26 +382,26 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Cost_() {
         int16_t shield_cost = Base_Shield_Cost();
-        int16_t ship_size = _design->ship_size;
+        int16_t ship_size = MOX::_design->ship_size;
         int weapon_total_cost = 0;
 
         for (int i = 0; i < 8; ++i) {
-            if (_design->weapon_type[i] > 0) {
-                weapon_total_cost += _design->weapon_cost[i];
+            if (MOX::_design->weapon_type[i] > 0) {
+                weapon_total_cost += MOX::_design->weapon_cost[i];
             }
         }
 
         int special_device_total_cost = 0;
         for (int i = 0; i < 8; ++i) {
-            if (_design->special_devices[i] > 0) {
-                special_device_total_cost += _design->special_device_cost[i];
+            if (MOX::_design->special_devices[i] > 0) {
+                special_device_total_cost += MOX::_design->special_device_cost[i];
             }
         }
 
         int total_cost = (int32_t)(int16_t)TECHDATA::_hull_data[ship_size].cost +
-                         (int)_design->computer_cost +
-                         (int)_design->drive_cost +
-                         (int)_design->armor_cost +
+                         (int)MOX::_design->computer_cost +
+                         (int)MOX::_design->drive_cost +
+                         (int)MOX::_design->armor_cost +
                          (int32_t)(int16_t)shield_cost +
                          weapon_total_cost +
                          special_device_total_cost;
@@ -465,8 +505,8 @@ namespace DESIGN {
 
     int16_t __cdecl Current_Design_Structural_Points_() {
         int16_t player_num = MOX::_PLAYER_NUM;
-        uint8_t has_reinforced_hull = Current_Design_Has_Special_System_(_design, SPECIAL_REINFORCED_HULL);
-        return INITSHIP::Get_Structure_(_design->ship_size, has_reinforced_hull != 0, player_num);
+        uint8_t has_reinforced_hull = Current_Design_Has_Special_System_(MOX::_design, SPECIAL_REINFORCED_HULL);
+        return INITSHIP::Get_Structure_(MOX::_design->ship_size, has_reinforced_hull != 0, player_num);
     }
 
     int16_t __cdecl Current_Design_Armor_Absorption_() {
@@ -547,20 +587,20 @@ namespace DESIGN {
     }
 
     int32_t __cdecl Total_Space_Used_() {
-        int32_t total_space = (int32_t)Get_Shild_Space_() + (int32_t)_design->base_space;
+        int32_t total_space = (int32_t)Get_Shild_Space_() + (int32_t)MOX::_design->base_space;
 
         int32_t weapon_space_sum = 0;
         for (int i = 0; i < 8; ++i) {
-            if (_design->weapon_type[i] > 0) {
-                weapon_space_sum += _design->weapon_space[i];
+            if (MOX::_design->weapon_type[i] > 0) {
+                weapon_space_sum += MOX::_design->weapon_space[i];
             }
         }
         total_space += weapon_space_sum;
 
         int32_t special_space_sum = 0;
         for (int i = 0; i < 8; ++i) {
-            if (_design->special_devices[i] > 0) {
-                special_space_sum += (int32_t)_design->special_device_space[i];
+            if (MOX::_design->special_devices[i] > 0) {
+                special_space_sum += (int32_t)MOX::_design->special_device_space[i];
             }
         }
         total_space += special_space_sum;
@@ -952,7 +992,7 @@ namespace DESIGN {
 
     void __cdecl Clear_Design_() {
         int16_t player_num = MOX::_PLAYER_NUM;
-        s_current_design* design = _design;
+        s_current_design* design = MOX::_design;
 
         design->ftl_type = INITSHIP::Best_Warp_Drive_(player_num);
         design->drive_speed = TECHDATA::_drives[design->ftl_type].warp_speed;

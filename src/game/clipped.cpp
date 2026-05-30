@@ -469,7 +469,7 @@ namespace clipped {
                             uint8_t pixel = *pixel_src;
                             if (pixel != 0) {
                                 if (pixel >= 0xF0) {
-                                    pixel = draw::_glass_lookup_table[((uint32_t)pixel << 8) + *dst];
+                                    pixel = video::_glass_remap_colors[pixel - 0xF0][*dst];
                                 }
                                 *dst = pixel;
                             }
@@ -485,7 +485,7 @@ namespace clipped {
                         uint8_t pixel = *pixel_src;
                         if (pixel != 0) {
                             if (pixel >= 0xF0) {
-                                pixel = draw::_glass_lookup_table[((uint32_t)pixel << 8) + *dst];
+                                pixel = video::_glass_remap_colors[pixel - 0xF0][*dst];
                             }
                             *dst = pixel;
                         }

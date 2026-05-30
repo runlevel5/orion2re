@@ -1,50 +1,39 @@
 #pragma once
 
+#include <cstdint>
+
+struct s_help_box;
+
 namespace EVANHELP {
-    inline s_help_box(&_main_screen_help_list)[25] =
-        *reinterpret_cast<s_help_box(*)[25]>(std::uintptr_t{ 0x00552428 });
+    extern s_help_box _main_screen_help_list[25];
 
-    inline s_help_box (&_static_null_modem_setup_screen_help_list)[4] =
-        *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{ 0x00552C50 });
+    extern s_help_box _static_null_modem_setup_screen_help_list[4];
 
-    inline s_help_box(&_null_modem_setup_screen_help_list)[4] =
-        *reinterpret_cast<s_help_box(*)[4]>(std::uintptr_t{ 0x005649D8 });
+    extern s_help_box _null_modem_setup_screen_help_list[4];
 
-    inline s_help_box (&_static_design_screen_help_list)[13] =
-        *reinterpret_cast<s_help_box(*)[13]>(std::uintptr_t{0x005525C0});
+    extern s_help_box _static_design_screen_help_list[13];
 
-    inline s_help_box (&_design_screen_help_list)[13] =
-        *reinterpret_cast<s_help_box(*)[13]>(std::uintptr_t{0x00564950});
+    extern s_help_box _design_screen_help_list[13];
 
-    inline s_help_box(&_main_game_screen_help_list)[12] =
-        *reinterpret_cast<s_help_box(*)[12]>(std::uintptr_t{ 0x00552648 });
+    extern s_help_box _main_game_screen_help_list[12];
 
-    inline s_help_box(&_main_menu_screen_help_list)[6] =
-        *reinterpret_cast<s_help_box(*)[6]>(std::uintptr_t{ 0x00552B48 });
+    extern s_help_box _main_menu_screen_help_list[6];
 
-    inline s_help_box(&_multi_player_setup_screen_help_list)[10] =
-        *reinterpret_cast<s_help_box(*)[10]>(std::uintptr_t{ 0x00552B88 });
+    extern s_help_box _multi_player_setup_screen_help_list[10];
 
-    inline s_help_box(&_load_game_screen_help_list)[7] =
-        *reinterpret_cast<s_help_box(*)[7]>(std::uintptr_t{ 0x005526D0 });
+    extern s_help_box _load_game_screen_help_list[7];
 
-    inline s_help_box(&_options_game_screen_help_list)[18] =
-        *reinterpret_cast<s_help_box(*)[18]>(std::uintptr_t{ 0x00552760 });
+    extern s_help_box _options_game_screen_help_list[18];
 
-    inline s_help_box(&_save_game_screen_help_list)[7] =
-        *reinterpret_cast<s_help_box(*)[7]>(std::uintptr_t{ 0x00552718 });
+    extern s_help_box _save_game_screen_help_list[7];
 
-    inline s_help_box(&_plntsum_screen_help_list)[15] =
-        *reinterpret_cast<s_help_box(*)[15]>(std::uintptr_t{ 0x00552528 });
+    extern s_help_box _plntsum_screen_help_list[15];
 
-    inline s_help_box(&_input_box_help_list)[1] =
-        *reinterpret_cast<s_help_box(*)[1]>(std::uintptr_t{ 0x00552C78 });
+    extern s_help_box _input_box_help_list[1];
 
-    inline s_help_box (&_static_diplomacy_request_help_list)[4] =
-        *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{0x00552C88});
+    extern s_help_box _static_diplomacy_request_help_list[4];
 
-    inline s_help_box (&_static_diplomacy_request_help_list2)[4] =
-        *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{0x00564B50});
+    extern s_help_box _static_diplomacy_request_help_list2[4];
 
     void __cdecl Set_Load_Game_Screen_Help_List_();
 
@@ -72,12 +61,9 @@ namespace EVANHELP {
     void __cdecl Set_Multi_Player_Setup_Screen_Help_List_();
     void __cdecl Set_Null_Modem_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset);
 
-    inline s_help_box*& _prev_help_struct_pointer =
-        *reinterpret_cast<s_help_box**>(std::uintptr_t{0x00564848});
-    inline int16_t& _prev_help_list_active =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564B78});
-    inline int16_t& _prev_help_list_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564D60});
+    extern s_help_box* _prev_help_struct_pointer;
+    extern int16_t _prev_help_list_active;
+    extern int16_t _prev_help_list_count;
 
     void __cdecl Save_Help_List_();
 
@@ -85,43 +71,33 @@ namespace EVANHELP {
 
     void __cdecl Restore_Help_List_();
 
-    inline s_help_box(&_static_fleet_screen_help_list)[32] =
-        *reinterpret_cast<s_help_box(*)[32]>(std::uintptr_t{ 0x00552818 });
+    extern s_help_box _static_fleet_screen_help_list[32];
 
-    inline s_help_box (&_fleet_screen_help_list)[32] =
-        *reinterpret_cast<s_help_box(*)[32]>(std::uintptr_t{ 0x00564B80 });
+    extern s_help_box _fleet_screen_help_list[32];
 
-    inline s_help_box (&_static_coloff_screen_help_list)[16] = 
-        *reinterpret_cast<s_help_box(*)[16]>(std::uintptr_t{0x00552958});
+    extern s_help_box _static_coloff_screen_help_list[16];
 
-    inline s_help_box (&_coloff_screen_help_list)[16] = 
-        *reinterpret_cast<s_help_box(*)[16]>(std::uintptr_t{0x00564CC0});
+    extern s_help_box _coloff_screen_help_list[16];
 
-    inline s_help_box (&_static_shipoff_screen_help_list)[33] =
-        *reinterpret_cast<s_help_box(*)[33]>(std::uintptr_t{0x005529F8});
+    extern s_help_box _static_shipoff_screen_help_list[33];
 
-    inline s_help_box (&_shipoff_screen_help_list)[33] =
-        *reinterpret_cast<s_help_box(*)[33]>(std::uintptr_t{0x00564A00});
+    extern s_help_box _shipoff_screen_help_list[33];
 
     void __cdecl Append_Help_List_(s_help_box* help_list, int16_t* list_count, int32_t unused, int16_t help_id, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
     void __cdecl Set_Fleet_Screen_Help_List_(int16_t param_1);
 
-    inline s_help_box(&_scrap_freighters_help_list)[1] =
-        *reinterpret_cast<s_help_box(*)[1]>(std::uintptr_t{ 0x005526C0 });
+    extern s_help_box _scrap_freighters_help_list[1];
 
     void __cdecl Set_Scrap_Freighters_Help_List_();
 
     void __cdecl Set_Weapon_Replacement_Screen_Help_List_(int16_t total_rows, int16_t x, int16_t y, uint8_t needs_racks);
 
-    inline s_help_box(&_weapon_replacement_screen_help_list)[12] =
-        *reinterpret_cast<s_help_box(*)[12]>(std::uintptr_t{ 0x005648D8 });
+    extern s_help_box _weapon_replacement_screen_help_list[12];
 
-    inline s_help_box(&_static_hotseat_setup_screen_help)[4] =
-        *reinterpret_cast<s_help_box(*)[4]>(std::uintptr_t{ 0x00552CB0 });
+    extern s_help_box _static_hotseat_setup_screen_help[4];
 
-    inline s_help_box(&_hotseat_setup_screen_help_list)[4] =
-        *reinterpret_cast<s_help_box(*)[4]>(std::uintptr_t{0x00564850});
+    extern s_help_box _hotseat_setup_screen_help_list[4];
 
     void __cdecl Set_Hotseat_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset);
 

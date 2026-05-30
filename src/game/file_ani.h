@@ -3,51 +3,43 @@
 #include <cstdint>
 
 namespace file_ani {
-    inline uint8_t*& _file_animation_buffer =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x0057E0AC });
+    extern uint8_t* _file_animation_buffer;
 
-    inline uint32_t& _file_animation_open =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B7F0 });
+    extern uint32_t _file_animation_open;
 
-    inline uint32_t& _file_animation_length =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E094 });
+    extern uint32_t _file_animation_length;
 
-    inline uint32_t& _file_animation_end =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E098 });
+    extern uint32_t _file_animation_end;
 
-    inline FILE*& _file_animation_fptr =
-        *reinterpret_cast<FILE**>(std::uintptr_t{ 0x0057E0D4 });
+    extern FILE* _file_animation_fptr;
 
-    inline uint32_t (&_file_animation_opened_flag)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0055B7F8});
+    extern uint32_t _file_animation_opened_flag[3];
 
-    inline FILE* (&_file_animation)[3] = *reinterpret_cast<FILE*(*)[3]>(std::uintptr_t{0x0057E088});
+    extern FILE* _file_animation[3];
 
-    inline uint32_t (&_file_animation_start_multi)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0057E0A0});
+    extern uint32_t _file_animation_start_multi[3];
 
-    inline uint32_t (&_file_animation_end_multi)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0057E0D8});
+    extern uint32_t _file_animation_end_multi[3];
 
-    inline uint32_t*& _file_lbx_header =
-        *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x0057E0E4 });
+    extern uint32_t* _file_lbx_header;
 
-    inline uint32_t (&_file_animation_length_multi)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0057E0E8});
+    extern uint32_t _file_animation_length_multi[3];
 
-    inline uint32_t& _file_animation_start =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E0F4 });
+    extern uint32_t _file_animation_start;
 
-    inline uint8_t*& _file_animation_header =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x0057E080 });
+    extern uint8_t* _file_animation_header;
 
-    inline const char* s_File_Animation_Frame_Too_Large = reinterpret_cast<const char*>(0x0055B804);
-    inline const char* s_Refresh_Mask_can_t_be_drawn = reinterpret_cast<const char*>(std::uintptr_t{0x0055B10C});
-    inline const char* s_Refresh_Mask_cant_be_drawn = reinterpret_cast<const char*>(0x0055B10C);
+    extern const char s_File_Animation_Frame_Too_Large[31];
+    extern const char s_Refresh_Mask_can_t_be_drawn[28];
+    extern const char (&s_Refresh_Mask_cant_be_drawn)[28];
 
-    inline const char* s_Too_many_frames_for_multi_file_a = reinterpret_cast<const char*>(std::uintptr_t{0x0055B83C});
-    inline const char* s_Differentail_File_Animation_Can_n_masked = reinterpret_cast<const char*>(std::uintptr_t{0x0055B868});
-    inline const char* s_Differentail_File_Animation_Can_n_bitmap = reinterpret_cast<const char*>(std::uintptr_t{0x0055B898});
+    extern const char s_Too_many_frames_for_multi_file_a[41];
+    extern const char s_Differentail_File_Animation_Can_n_masked[46];
+    extern const char s_Differentail_File_Animation_Can_n_bitmap[46];
 
-    inline const char* s_Differential_Error_868 = reinterpret_cast<const char*>(0x0055B868);
-    inline const char* s_Differential_Error_898 = reinterpret_cast<const char*>(0x0055B898);
-    inline const char* s_Differential_Error_8C8 = reinterpret_cast<const char*>(0x0055B8C8);
+    extern const char (&s_Differential_Error_868)[46];
+    extern const char (&s_Differential_Error_898)[46];
+    extern const char s_Differential_Error_8C8[47];
 
     void __cdecl Set_File_Animation_Buffer_(void* buffer);
 

@@ -78,8 +78,7 @@ namespace platform {
 	inline uint16_t& DAT_0057931c =
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0057931c });
 
-	inline uint8_t& _need_quit =
-		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578e68 });
+	extern uint8_t _need_quit;
 
 	inline uint32_t& g_frame_count =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b8 });

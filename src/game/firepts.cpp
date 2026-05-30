@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace FIREPTS {
+    uint8_t* _fp_data_ptr[8];
+    uint8_t* _fp_seg;
+
     void __cdecl Load_FP_Data_From_LBX_() {
         _fp_seg = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1B90);
 

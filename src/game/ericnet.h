@@ -2,8 +2,8 @@
 #include <cstdint>
 
 namespace ERICNET {
-    inline int8_t* _start_civ_level = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F000});
-    inline int16_t* _buildlist = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551198});
+    extern int8_t _start_civ_level[3];
+    extern int16_t _buildlist[43];
 
     void __cdecl Add_Building_(int16_t colony_idx, int16_t building_idx);
 

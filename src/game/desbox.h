@@ -1,37 +1,30 @@
 #pragma once
 
 namespace DESBOX {
-    inline uint16_t& _weapon_replacement_mods =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00566428});
+    extern uint16_t _weapon_replacement_mods;
 
-    inline int8_t& _incr_value = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A61E0});
+    extern int8_t _incr_value;
 
-    inline int16_t& _field_item_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005663F0});
-    inline int16_t& _field_item_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056640C});
-    inline int16_t& _replacement_box_middle_height =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566410});
-    inline int16_t& _replacement_scroll_field =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005663F4});
-    inline int16_t& _replacement_box_width =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566404});
-    inline int16_t& _replacement_box_base_y =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566414});
-    inline int16_t& _replacement_box_base_x =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566418});
-    inline int16_t& _replacement_box_height =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566424});
-    inline uint8_t& _beam_filter_button_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00557EB8});
-    inline uint8_t& _missile_filter_button_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00557EBC});
-    inline uint8_t& _bomb_filter_button_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00557EC0});
-    inline uint8_t& _special_filter_button_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00557EC4});
-    inline int16_t& _replacement_scroll_dn_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005663D8});
-    inline int16_t& _replacement_scroll_up_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056641C});
-    inline int16_t& _weapon_arc_rack_box_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566420});
-    inline int16_t& _weapon_replacement_arcs = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566408});
-    inline uint16_t& _weapon_replacement_rack = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A61E2});
-    inline uint8_t& _wait_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566400});
-    inline uint8_t (&_valid_mods)[16] = *reinterpret_cast<uint8_t(*)[16]>(std::uintptr_t{0x005663E0});
-    inline uint8_t* _valid_arcs_racks = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005663F8});
+    extern int16_t _field_item_scanned;
+    extern int16_t _field_item_chosen;
+    extern int16_t _replacement_box_middle_height;
+    extern int16_t _replacement_scroll_field;
+    extern int16_t _replacement_box_width;
+    extern int16_t _replacement_box_base_y;
+    extern int16_t _replacement_box_base_x;
+    extern int16_t _replacement_box_height;
+    extern uint8_t _beam_filter_button_status;
+    extern uint8_t _missile_filter_button_status;
+    extern uint8_t _bomb_filter_button_status;
+    extern uint8_t _special_filter_button_status;
+    extern int16_t _replacement_scroll_dn_button;
+    extern int16_t _replacement_scroll_up_button;
+    extern int16_t _weapon_arc_rack_box_field;
+    extern int16_t _weapon_replacement_arcs;
+    extern uint16_t _weapon_replacement_rack;
+    extern uint8_t _wait_ctr;
+    extern uint8_t _valid_mods[16];
+    extern uint8_t _valid_arcs_racks[5];
 
     int16_t __cdecl Weapon_Choices_(int16_t player_num);
 
@@ -124,14 +117,14 @@ namespace DESBOX {
 
     int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out);
 
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
-    inline const char* s_plus = reinterpret_cast<const char*>(std::uintptr_t{0x00551118}); // "+"
-    inline const char* s_minus = reinterpret_cast<const char*>(std::uintptr_t{0x0055111c}); // "-"
-    inline const char* s_space = reinterpret_cast<const char*>(std::uintptr_t{0x00551120}); // " "
-    inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
-    inline const char* s_B = reinterpret_cast<const char*>(std::uintptr_t{0x005560e4}); // "B"
-    inline const char* s_S = reinterpret_cast<const char*>(std::uintptr_t{0x005569cc}); // "S"
-    inline const char* s_O = reinterpret_cast<const char*>(std::uintptr_t{0x00556afc}); // "O"
-    inline const char* s_A = reinterpret_cast<const char*>(std::uintptr_t{0x00557ed4}); // "A"
-    inline const char* s_M = reinterpret_cast<const char*>(std::uintptr_t{0x00557ed8}); // "M"
+    extern const char s__00551100[];
+    extern const char s_plus[];
+    extern const char s_minus[];
+    extern const char s_space[];
+    extern const char s__00551120[];
+    extern const char s_B[];
+    extern const char s_S[];
+    extern const char s_O[];
+    extern const char s_A[];
+    extern const char s_M[];
 }

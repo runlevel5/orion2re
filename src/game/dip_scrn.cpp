@@ -1,6 +1,111 @@
 #include "pch.h"
 
 namespace DIP_SCRN {
+    s_mouse_list _diplomacy_hand_mouse;
+    s_mouse_list _diplomacy_blank_mouse;
+    uint8_t _ambassador_option;
+    int16_t _main_diplomacy_help_entry[8];
+    int16_t _response_message;
+    uint16_t _synch_up_established_flag;
+    int16_t _old_response_message;
+    int16_t _propose_treaty_help_entry[6];
+    char* _main_diplomacy_title;
+    char* _propose_treaty_title;
+    uint8_t _talker_ambassador;
+    int16_t _diplomacy_current_music;
+    int16_t _net_diplomacy_esc_pressed;
+    uint8_t _target_tech_list[212];
+    uint8_t _listen_ambassador;
+    int16_t _exchange_tech_count;
+    char* _main_diplomacy_list[9];
+    char* _propose_treaty_diplomacy_list[7];
+    uint8_t _exchange_tech_list[212];
+    char _chat_message[100];
+    int16_t _diplomacy_quit_chat_field;
+    int16_t _net_diplomacy_treaty_type;
+    int16_t _diplomacy_chat_field;
+    char _net_diplomacy_chat_message[100];
+    char* _player_number_name_buffer;
+    char* _player_name_ambassador_buffer;
+    char _receive_chat_message[110];
+    uint8_t _current_ambassador;
+    char _diplomacy_message[250];
+    int16_t _main_net_diplomacy_help_entry[10];
+    int16_t _net_diplomacy_tech_offered;
+    const char s_empty_string_00551100[] = "";
+    const char s_empty_string[] = "";
+    const char s_empty[] = "";
+    const char s_jimtext_lbx[] = "jimtext.lbx";
+    const char s__00551100[] = "";
+    const char s_jimtext2_lbx_00552340[] = "jimtext2.lbx";
+    const char s_jimtext2_lbx[] = "jimtext2.lbx";
+    const char s_jimtext_lbx_00552360[] = "jimtext.lbx";
+    const char s__d_BC_00552384[] = "  %d BC";
+    const char s_fmt_s_0055236c[] = "  %s";
+    const char s__s_0055236c[] = "  %s";
+    const char s_fmt_d_bc_00552384[] = "  %d BC";
+    const char s_fmt_BC[] = "%d BC";
+    const char s_fmt_comma[] = "%d,%d";
+    const char s_fmt_dot[] = "%d.%d";
+    const char s_FWEE[] = "FWEE!";
+    const char s_DIPLOMSP_LBX[] = "DIPLOMSP.LBX";
+    const char s_DIPLOMSI_LBX[] = "DIPLOMSI.LBX";
+    const char s_DIPLOMSS_LBX[] = "DIPLOMSS.LBX";
+    const char s_DIPLOMSF_LBX[] = "DIPLOMSF.LBX";
+    const char s_DIPLOMSG_LBX[] = "DIPLOMSG.LBX";
+    const char s_DIPLOMSE_LBX[] = "DIPLOMSE.LBX";
+    uint16_t _chat_width;
+    uint16_t _chat_base_y;
+    uint16_t _chat_base_x;
+    uint16_t _chat_height;
+    uint8_t _chat_mode_flag;
+    s_colors _diplomacy_normal_colors;
+    s_colors _diplomacy_highlight_colors;
+    s_colors _diplomacy_special_colors;
+    int16_t _break_treaty_help_entry[6];
+    char* _break_treaty_title;
+    char* _break_treaty_diplomacy_list[7];
+    char _diplomacy_list_choice[15][50];
+    s_help_box _jim_help_list[15];
+    int16_t _demand_help_entry[10];
+    int16_t _main_repulsive_diplomacy_help_entry[4];
+    int16_t _main_net_repulsive_diplomacy_help_entry[5];
+    char* _main_repulsive_diplomacy_list[5];
+    char* _main_net_repulsive_diplomacy_list[6];
+    s_dipscrn_net_message _net_diplomacy_message;
+    int16_t _offer_help_entry[6];
+    char* _offer_diplomacy_list[7];
+    char* _offer_title;
+    uint8_t _diplomacy_system_planet_list[5];
+    int16_t _diplomacy_system_population;
+    uint8_t _diplomacy_system_receiver;
+    int16_t _diplomacy_system_planet_count;
+    int16_t _diplomacy_scan_input_flag;
+    uint8_t _diplomacy_system_giver;
+    char* _demand_diplomacy_list[11];
+    char* _net_listen_mode_option_buffer;
+    char* _system_unsurrenderable_buffer;
+    char* _main_net_diplomacy_list[11];
+    char* _demand_title;
+    char* _agree_diplomacy_list[4];
+    char* _system_cancel_buffer;
+    int16_t _diplomacy_system_homeworld_flag;
+    s_animation_header* _diplomacy_system_star_background_seg;
+    int16_t _diplomacy_system_fields[73];
+    uint8_t* _diplomacy_mouse_bitmap;
+    char* _system_homeworld_buffer;
+    int16_t _diplomacy_good_music;
+    char* _statement_research_treaty_buffer;
+    int16_t _diplomacy_bad_music;
+    char* _choose_a_system_buffer;
+    char* _enter_your_message_buffer;
+    char* _statement_trade_treaty_buffer;
+    char* _system_million_colonists_buffer;
+    char* _net_listen_mode_good_bye_buffer;
+    char* _system_x_star_system_buffer;
+    char* _percent_tribute_treaty_buffer;
+    char* _you_were_framed_buffer;
+
     void __cdecl Diplomacy_Load_New_Ambassador_(int16_t player_idx) {
         mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_blank_mouse, 1);
         fields::Deactivate_Auto_Function_();
@@ -217,7 +322,7 @@ namespace DIP_SCRN {
             fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_normal_colors);
 
             DIP_SCRN::_chat_message[0] = *DIP_SCRN::s__00551100;
-            DIP_SCRN::_continuous_string = *DIP_SCRN::s__00551100;
+            fields::_continuous_string[0] = DIP_SCRN::s__00551100[0];
 
             DIP_SCRN::_diplomacy_quit_chat_field = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, DIP_SCRN::s__00551100, 0);
 
@@ -1856,7 +1961,7 @@ namespace DIP_SCRN {
                     fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
                     fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
                     fonts::Set_Font_LF_(4);
-                    Setup_Diplomacy_Help_(11, reinterpret_cast<int16_t*>(&_main_net_diplomacy_help_entry));
+                    Setup_Diplomacy_Help_(11, _main_net_diplomacy_help_entry);
 
                     selected = 0;
                     int16_t main_choice = fields::Get_List_Field_(

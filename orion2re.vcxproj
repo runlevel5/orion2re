@@ -82,6 +82,7 @@
     <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
+    <ClCompile Include="src\game\diplodef.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dip_scrn.cpp" />
     <ClCompile Include="src\game\dip_scrn_main.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="src\game\aipower.h" />
     <ClInclude Include="src\game\aistage.h" />
     <ClInclude Include="src\game\aitech.h" />
+    <ClInclude Include="src\game\alloc.h" />
     <ClInclude Include="src\game\allocate.h" />
     <ClInclude Include="src\game\angle.h" />
     <ClInclude Include="src\game\animate.h" />
@@ -414,6 +416,7 @@
     <ClInclude Include="src\game\video.h" />
     <ClInclude Include="src\game\winnet.h" />
     <ClInclude Include="src\game\_antarans.h" />
+    <ClInclude Include="src\game\_global_combat_data.h" />
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\patch.h" />
     <ClInclude Include="src\pch.h" />

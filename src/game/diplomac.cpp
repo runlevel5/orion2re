@@ -1,6 +1,52 @@
 #include "pch.h"
 
 namespace diplomac {
+    int16_t _diplomacy_proposal_system_bribe;
+
+    int8_t _diplomacy_proposal_tribute_bribe;
+
+    int16_t _diplomacy_proposal_gold_bribe;
+
+    uint8_t _diplomacy_proposal_tech_bribe1;
+
+    uint8_t _unprovoked_message_mapping[20] = {
+        0, 0, 0, 0, 0,
+        1, 1, 1, 1,
+        2, 2, 2,
+        3, 3, 3,
+        4, 4, 4,
+        5, 5,
+    };
+
+    int16_t _starting_relations[196] = {
+        0, 0, -24, 24, 0, 0, -12, 0, -24, 0, 12, 0, 24, 0,
+        0, 0, -12, 24, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0,
+        -24, -12, 0, 0, 12, 0, 0, 12, 0, 0, 0, 12, 0, 0,
+        24, 24, 0, 0, -24, 0, 0, 0, 24, -12, 0, -12, 0, 0,
+        0, 0, 12, -24, 0, 0, 0, 12, -12, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0,
+        0, 0, 0, 0, 0, 0, -12, 0, -12, 12, 24, 0, 0, 0,
+        12, 0, 12, 0, 0, 0, 12, 0, 0, -12, -12, 0, -24, 0,
+        0, 24, -12, 0, -12, 12, 0, 0, 0, 0, 12, 0, 0, 0,
+        0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 12, 0,
+        0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        12, -12, 0, 0, 12, -12, 0, 0, 0, 0, 0, 0, 24, 0,
+        0, 0, 0, 0, 24, -12, 12, 12, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    };
+
+    int16_t _personality_peace_duration[12] = {
+        5, 10, 20, 5, 50, 40, 5, 0, 0, 0, 0, 0,
+    };
+
+    int16_t _personality_break_peace_treaty_chance[8] = {
+        7, 10, 1, 1, 0, 0, 5, 0,
+    };
+
+    int16_t _personality_sneak_attack_modifiers[8] = {
+        -10, -5, -3, 0, 20, 20, -10, 0,
+    };
+
     // Suggested name: Sneak_Attack_Evaluations
     int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_eval_threshold, int16_t *out_msg_id, int16_t *out_unused) {
         (void)out_unused;

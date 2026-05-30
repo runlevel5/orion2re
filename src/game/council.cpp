@@ -1,6 +1,37 @@
 #include "pch.h"
 
 namespace council {
+    const char s_format_votes[] = "%d %s";
+    const char s__00551100[] = "";
+    const char s_council_lbx[] = "council.LBX";
+    const char s_empty_string[] = "";
+
+    s_mouse_list _council_blank_mouse = {0, 0, 0, 0, 639, 479};
+    s_colors _council_normal_colors = {{150, 154, 155, 151, 152, 153, 154, 155}};
+    s_colors _council_highlight_colors = {{150, 155, 155, 152, 153, 155, 155, 155}};
+    uint8_t _council_nominee_[2];
+    int16_t _council_total_votes;
+    int16_t _council_nominee_vote_total[2];
+    uint8_t _council_members[8];
+    uint8_t _council_state;
+    char* _council_vote_message;
+    s_animation_header* _council_dark_race_seg[8];
+    int8_t _council_voter;
+    char* _council_no_votes_message;
+    int16_t _council_vote_cast;
+    int16_t _council_member_votes[8];
+    s_animation_header* _council_light_race_seg[8];
+    char* _council_message;
+    uint8_t _player_voted_winner_message_id[20];
+    char* _council_votes_message;
+    int16_t _council_nominee_votes[2];
+    void* _council_mouse_bitmap;
+    uint8_t _winning_player;
+    s_animation_header* _council_nominees_seg[2];
+    uint8_t _council_total_members;
+    char* _council_votes_total_message;
+    uint8_t _council_vote_for;
+
     void Check_For_Council_Meeting_() {
         int16_t active_players = 0;
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {

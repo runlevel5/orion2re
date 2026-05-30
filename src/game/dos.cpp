@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace dos {
+    struct tm* _tmbuf;
+
+    struct _finddata32_t _fileinfo;
+
     /**
      * Finds files matching a pattern or continues a previous search.
      * @param pattern The search pattern (e.g., "*.txt"). If empty, continues search with findnext.
@@ -53,8 +57,8 @@ namespace dos {
             return nullptr;
         }
 
-        _ctime32(&_fileinfo_time_write);
-        _tmbuf = _localtime32(&_fileinfo_time_write);
+        _ctime32(&_fileinfo.time_write);
+        _tmbuf = _localtime32(&_fileinfo.time_write);
         return _tmbuf;
     }
 }

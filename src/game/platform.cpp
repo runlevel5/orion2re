@@ -3,6 +3,8 @@
 //#define FULLSCREEN
 
 namespace platform {
+    uint8_t _need_quit;
+
     LPDIRECTDRAWSURFACE	l_primary_window_surface = NULL;
     LPDIRECTDRAWSURFACE	l_temp_surface = NULL;
 

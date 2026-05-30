@@ -10,24 +10,24 @@ namespace farload {
     // Suggested name: farload::Error_Handler
     void __cdecl Error_Handler_(const char* lib_name, int code, int idx);
 
-    inline char* s_vga_frames_error = reinterpret_cast<char*>(std::uintptr_t{0x0055AE38});
-    inline char* s_error_defined_records = reinterpret_cast<char*>(std::uintptr_t{0x0055AE70});
-    inline char* s_error_record_size = reinterpret_cast<char*>(std::uintptr_t{0x0055AE94});
-    inline char* s_error_lbx_entries = reinterpret_cast<char*>(std::uintptr_t{0x0055AEB4});
-    inline char* s_error_not_lbx = reinterpret_cast<char*>(std::uintptr_t{0x0055AED4});
-    inline char* s_error_reload_failed = reinterpret_cast<char*>(std::uintptr_t{0x0055AEE8});
-    inline char* s_error_improper_entry = reinterpret_cast<char*>(std::uintptr_t{0x0055AF10});
-    inline char* s_error_insufficient_memory = reinterpret_cast<char*>(std::uintptr_t{0x0055AF30});
-    inline char* s_error_corrupted = reinterpret_cast<char*>(std::uintptr_t{0x0055AF7C});
-    inline char* s_error_not_found = reinterpret_cast<char*>(std::uintptr_t{0x0055AF94});
-    inline char* s_entry_suffix = reinterpret_cast<char*>(std::uintptr_t{0x0055AFAC});
-    inline char* s_entry_prefix = reinterpret_cast<char*>(std::uintptr_t{0x0055AFB0});
+    extern const char s_vga_frames_error[53];
+    extern const char s_error_defined_records[35];
+    extern const char s_error_record_size[30];
+    extern const char s_error_lbx_entries[31];
+    extern const char s_error_not_lbx[20];
+    extern const char s_error_reload_failed[40];
+    extern const char s_error_improper_entry[31];
+    extern const char s_error_insufficient_memory[74];
+    extern const char s_error_corrupted[21];
+    extern const char s_error_not_found[21];
+    extern const char s_entry_suffix[3];
+    extern const char s_entry_prefix[9];
 
-    inline uint32_t& _farload_file_flag = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055AE34 });
-    inline char* _farload_file_name = reinterpret_cast<char*>(std::uintptr_t{ 0x005723B8 });
-    inline FILE*& _farload_fptr = *reinterpret_cast<FILE**>(std::uintptr_t{ 0x005723C8 });
-    inline s_lbx_header& _lbx_header = *reinterpret_cast<s_lbx_header*>(std::uintptr_t{ 0x005723D0 });
-    inline char (&_secondary_drive_path)[128] = *reinterpret_cast<char(*)[128]>(std::uintptr_t{0x0055AE00});
+    extern uint32_t _farload_file_flag;
+    extern char _farload_file_name[16];
+    extern FILE* _farload_fptr;
+    extern s_lbx_header _lbx_header;
+    extern char _secondary_drive_path[52];
 
     void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3);
 

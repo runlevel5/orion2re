@@ -579,6 +579,9 @@
     <ClCompile Include="src\game\assert.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\diplodef.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -1194,6 +1197,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\bolt.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\_global_combat_data.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\alloc.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

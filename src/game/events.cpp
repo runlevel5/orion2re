@@ -1,6 +1,36 @@
 #include "pch.h"
 
 namespace EVENTS {
+    uint8_t _current_event;
+    s_animation_header* _event_display_seg;
+    s_event_data _event_data[36];
+    MOX2::action_func_t _jim_saved_autofunction;
+    uint32_t _last_event_year;
+    int16_t _event_delay_count;
+    int8_t _event_good_array[36] = {
+        1, 1, 0, 0, 0, 1, 1, 0, 0,
+        0, 0, 0, 1, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 1, 1, 1, 1, 1, 1, 1,
+    };
+    uint8_t _event_status_flag;
+    uint8_t* _event_mouse_bitmap;
+    char _event_message[300];
+    const char s__00551100[] = "";
+    s_colors _event_normal_colors = {{248, 254, 253, 251, 252, 253, 254, 255}};
+    s_mouse_list _event_blank_mouse = {0, 0, 0, 0, 639, 479};
+    const char s_s_005510f4[] = "s";
+    const char s_0_0055110c[] = "\x1A" "0";
+    const char s_jimtext2_lbx_00552340[] = "jimtext2.lbx";
+    const char s_X_d__d___s_00557548[] = "\x07" "X%d.%d. %s";
+    const char s_EVENTMSP_LBX_00557554[] = "EVENTMSP.LBX";
+    const char s_EVENTMSI_LBX_00557564[] = "EVENTMSI.LBX";
+    const char s_EVENTMSS_LBX_00557574[] = "EVENTMSS.LBX";
+    const char s_EVENTMSF_LBX_00557584[] = "EVENTMSF.LBX";
+    const char s_EVENTMSG_LBX_00557594[] = "EVENTMSG.LBX";
+    const char s_EVENTMSE_LBX_005575a4[] = "EVENTMSE.LBX";
+    const char s_EVENTS_LBX_0055753c[] = "EVENTS.LBX";
+
     /**
      * @address 00477440
      */
@@ -2341,7 +2371,7 @@ namespace EVENTS {
         char* out_str)
     {
         out_str[0] = '\0';
-        char* event_lbx;
+        const char* event_lbx;
 
         switch (MOX::_settings.language) {
             case 0: event_lbx = s_EVENTMSE_LBX_005575a4; break;

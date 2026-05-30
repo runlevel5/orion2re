@@ -4,102 +4,89 @@
 struct s_dipscrn_net_message;
 
 namespace DIP_SCRN {
-    inline s_mouse_list& _diplomacy_hand_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005569A8});
-    inline s_mouse_list& _diplomacy_blank_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00552318});
-    inline uint8_t& _ambassador_option = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A81BC});
-    inline int16_t& _main_diplomacy_help_entry = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00552280 });
-    inline int16_t& _response_message = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A81CC});
-    inline uint16_t& _synch_up_established_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A81CE});
-    inline int16_t& _old_response_message = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A81D0});
-    inline int16_t* _propose_treaty_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522D0});
-    inline char*& _main_diplomacy_title = *reinterpret_cast<char**>(std::uintptr_t{ 0x005A82E8 });
-    inline char*& _propose_treaty_title = *reinterpret_cast<char**>(std::uintptr_t{0x005A85DC});
-    inline uint8_t& _talker_ambassador = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8378});
-    inline int16_t& _diplomacy_current_music = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89EC});
-    inline int16_t& _net_diplomacy_esc_pressed = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89FC});
-    inline uint8_t (&_target_tech_list)[212] = *reinterpret_cast<uint8_t(*)[212]>(std::uintptr_t{ 0x005A85E0 });
-    inline uint8_t& _listen_ambassador = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8A06});
-    inline int16_t& _exchange_tech_count = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A89D8 });
-    inline char* (&_main_diplomacy_list)[9] = *reinterpret_cast<char* (*)[9]>(std::uintptr_t{ 0x005A8A10 });
-    inline char* (&_propose_treaty_diplomacy_list)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A8A50});
-    inline uint8_t (&_exchange_tech_list)[212] = *reinterpret_cast<uint8_t(*)[212]>(std::uintptr_t{ 0x005A8A70 });
-    inline char (&_chat_message)[100] = *reinterpret_cast<char (*)[100]>(std::uintptr_t{0x005A82F0});
-    inline int16_t& _diplomacy_quit_chat_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A00});
-    inline int16_t& _net_diplomacy_treaty_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A04});
-    inline int16_t& _diplomacy_chat_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A40});
-    inline char (&_net_diplomacy_chat_message)[100] = *reinterpret_cast<char(*)[100]>(std::uintptr_t{0x005A8B50});
-    inline char*& _player_number_name_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89F0});
-    inline char*& _player_name_ambassador_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A81C8});
-    inline char (&_receive_chat_message)[110] = *reinterpret_cast<char (*)[110]>(std::uintptr_t{0x005A8390});
-    inline uint8_t& _current_ambassador = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8BB4});
-    inline char (&_diplomacy_message)[250] = *reinterpret_cast<char(*)[250]>(std::uintptr_t{0x005A8400});
-    inline int16_t& _main_net_diplomacy_help_entry = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552298});
-    inline int16_t& _net_diplomacy_tech_offered = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A85D0});
-    inline const char* s_empty_string_00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
-    inline const char* s_empty_string = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551100 });
-    inline const char* s_empty = reinterpret_cast<const char*>(0x00551100);
-    inline const char* s_jimtext_lbx = reinterpret_cast<const char*>(0x00552360);
-    inline const char* s__00551100 = (const char*)std::uintptr_t{0x00551100}; // ""
-    inline const char* s_jimtext2_lbx_00552340 = (const char*)std::uintptr_t{0x00552340}; // "jimtext2.lbx"
-    inline const char* s_jimtext2_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552340});
-    inline const char* s_jimtext_lbx_00552360 = (const char*)std::uintptr_t{0x00552360}; // "jimtext.lbx"
-    inline const char* s__d_BC_00552384 = (const char*)std::uintptr_t{0x00552384}; // "  %d BC"
-    inline const char* s_fmt_s_0055236c = reinterpret_cast<const char*>(0x0055236C); // "  %s"
-    inline char* const s__s_0055236c = reinterpret_cast<char*>(std::uintptr_t{0x0055236C});
-    inline const char* s_fmt_d_bc_00552384 = reinterpret_cast<const char*>(0x00552384); // "  %d BC"
-    inline const char* s_fmt_BC = reinterpret_cast<const char*>(0x00552394);
-    inline const char* s_fmt_comma = reinterpret_cast<const char*>(0x0055239C);
-    inline const char* s_fmt_dot = reinterpret_cast<const char*>(0x005523A4);
-    inline const char* s_FWEE = reinterpret_cast<const char*>(0x005523AC);
-    inline const char* s_DIPLOMSP_LBX = reinterpret_cast<const char*>(0x005523B4);
-    inline const char* s_DIPLOMSI_LBX = reinterpret_cast<const char*>(0x005523C4);
-    inline const char* s_DIPLOMSS_LBX = reinterpret_cast<const char*>(0x005523D4);
-    inline const char* s_DIPLOMSF_LBX = reinterpret_cast<const char*>(0x005523E4);
-    inline const char* s_DIPLOMSG_LBX = reinterpret_cast<const char*>(0x005523F4);
-    inline const char* s_DIPLOMSE_LBX = reinterpret_cast<const char*>(0x00552404);
+    extern s_mouse_list _diplomacy_hand_mouse;
+    extern s_mouse_list _diplomacy_blank_mouse;
+    extern uint8_t _ambassador_option;
+    extern int16_t _main_diplomacy_help_entry[8];
+    extern int16_t _response_message;
+    extern uint16_t _synch_up_established_flag;
+    extern int16_t _old_response_message;
+    extern int16_t _propose_treaty_help_entry[6];
+    extern char* _main_diplomacy_title;
+    extern char* _propose_treaty_title;
+    extern uint8_t _talker_ambassador;
+    extern int16_t _diplomacy_current_music;
+    extern int16_t _net_diplomacy_esc_pressed;
+    extern uint8_t _target_tech_list[212];
+    extern uint8_t _listen_ambassador;
+    extern int16_t _exchange_tech_count;
+    extern char* _main_diplomacy_list[9];
+    extern char* _propose_treaty_diplomacy_list[7];
+    extern uint8_t _exchange_tech_list[212];
+    extern char _chat_message[100];
+    extern int16_t _diplomacy_quit_chat_field;
+    extern int16_t _net_diplomacy_treaty_type;
+    extern int16_t _diplomacy_chat_field;
+    extern char _net_diplomacy_chat_message[100];
+    extern char* _player_number_name_buffer;
+    extern char* _player_name_ambassador_buffer;
+    extern char _receive_chat_message[110];
+    extern uint8_t _current_ambassador;
+    extern char _diplomacy_message[250];
+    extern int16_t _main_net_diplomacy_help_entry[10];
+    extern int16_t _net_diplomacy_tech_offered;
+    extern const char s_empty_string_00551100[];
+    extern const char s_empty_string[];
+    extern const char s_empty[];
+    extern const char s_jimtext_lbx[];
+    extern const char s__00551100[];
+    extern const char s_jimtext2_lbx_00552340[];
+    extern const char s_jimtext2_lbx[];
+    extern const char s_jimtext_lbx_00552360[];
+    extern const char s__d_BC_00552384[];
+    extern const char s_fmt_s_0055236c[];
+    extern const char s__s_0055236c[];
+    extern const char s_fmt_d_bc_00552384[];
+    extern const char s_fmt_BC[];
+    extern const char s_fmt_comma[];
+    extern const char s_fmt_dot[];
+    extern const char s_FWEE[];
+    extern const char s_DIPLOMSP_LBX[];
+    extern const char s_DIPLOMSI_LBX[];
+    extern const char s_DIPLOMSS_LBX[];
+    extern const char s_DIPLOMSF_LBX[];
+    extern const char s_DIPLOMSG_LBX[];
+    extern const char s_DIPLOMSE_LBX[];
 
     char* __cdecl An_(char* text);
 
     int8_t __cdecl Diplomacy_Message_Is_Interactive_(int16_t msg_id);
 
-    inline uint16_t& _chat_width =
-            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A85D8});
+    extern uint16_t _chat_width;
 
-    inline uint16_t& _chat_base_y =
-            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89DA});
+    extern uint16_t _chat_base_y;
 
-    inline uint16_t& _chat_base_x =
-            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89DC});
+    extern uint16_t _chat_base_x;
 
-    inline uint16_t& _chat_height =
-            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89FE});
+    extern uint16_t _chat_height;
 
-    inline uint8_t& _chat_mode_flag =
-            *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8A02});
+    extern uint8_t _chat_mode_flag;
 
-    inline s_colors& _diplomacy_normal_colors =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00552268});
+    extern s_colors _diplomacy_normal_colors;
 
-    inline s_colors& _diplomacy_highlight_colors =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00552270});
+    extern s_colors _diplomacy_highlight_colors;
 
-    inline s_colors& _diplomacy_special_colors =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00552278});
+    extern s_colors _diplomacy_special_colors;
 
-    inline int16_t (&_break_treaty_help_entry)[7] =
-        *reinterpret_cast<int16_t(*)[7]>(std::uintptr_t{0x005522E0});
+    extern int16_t _break_treaty_help_entry[6];
 
-    inline char*& _break_treaty_title = *reinterpret_cast<char**>(std::uintptr_t{0x005A8354});
+    extern char* _break_treaty_title;
 
-    inline char* (&_break_treaty_diplomacy_list)[7] =
-        *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A86C0});
+    extern char* _break_treaty_diplomacy_list[7];
 
-    inline char (&_diplomacy_list_choice)[15][50] =
-        *reinterpret_cast<char (*)[15][50]>(std::uintptr_t{0x005A86E0});
+    extern char _diplomacy_list_choice[15][50];
 
-    inline s_help_box (&_jim_help_list)[15] =
-        *reinterpret_cast<s_help_box(*)[15]>(std::uintptr_t{0x005A8250});
-    inline char& _continuous_string = *reinterpret_cast<char*>(std::uintptr_t{0x00572C18});
+    extern s_help_box _jim_help_list[15];
 
     int16_t __cdecl Check_Better_Offer_Available_(int16_t player_idx, int16_t other_player_idx);
 
@@ -132,7 +119,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Demand_(int16_t player_num, int16_t ambassador_idx);
 
-    inline int16_t* _demand_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522F0});
+    extern int16_t _demand_help_entry[10];
 
     void __cdecl Get_Human_Demand_Response_(int16_t player_id, int16_t target_player_id, int16_t demand_type, int16_t demand_arg, int16_t* out_choice);
 
@@ -185,11 +172,11 @@ namespace DIP_SCRN {
 
     void __cdecl Setup_Full_Screen_Diplomacy_Help_(int16_t help_id);
 
-    inline int16_t* _main_repulsive_diplomacy_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522B0});
-    inline int16_t* _main_net_repulsive_diplomacy_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522C0});
-    inline char* (&_main_repulsive_diplomacy_list)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A8230});
-    inline char* (&_main_net_repulsive_diplomacy_list)[6] = *reinterpret_cast<char* (*)[6]>(std::uintptr_t{0x005A85B0});
-    inline s_dipscrn_net_message& _net_diplomacy_message = *reinterpret_cast<s_dipscrn_net_message*>(std::uintptr_t{0x005A8370});
+    extern int16_t _main_repulsive_diplomacy_help_entry[4];
+    extern int16_t _main_net_repulsive_diplomacy_help_entry[5];
+    extern char* _main_repulsive_diplomacy_list[5];
+    extern char* _main_net_repulsive_diplomacy_list[6];
+    extern s_dipscrn_net_message _net_diplomacy_message;
 
     void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg);
 
@@ -225,40 +212,40 @@ namespace DIP_SCRN {
 
     short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag);
 
-    inline int16_t& _offer_help_entry = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552308});
-    inline char* (&_offer_diplomacy_list)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A81E0});
-    inline char*& _offer_title = *reinterpret_cast<char**>(std::uintptr_t{0x005A86B4});
+    extern int16_t _offer_help_entry[6];
+    extern char* _offer_diplomacy_list[7];
+    extern char* _offer_title;
 
-    inline uint8_t* _diplomacy_system_planet_list = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A85A0});
-    inline int16_t& _diplomacy_system_population = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A85C8});
-    inline uint8_t& _diplomacy_system_receiver = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A89D4});
-    inline int16_t& _diplomacy_system_planet_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89D6});
-    inline int16_t& _diplomacy_scan_input_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89E4});
-    inline uint8_t& _diplomacy_system_giver = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8A38});
+    extern uint8_t _diplomacy_system_planet_list[5];
+    extern int16_t _diplomacy_system_population;
+    extern uint8_t _diplomacy_system_receiver;
+    extern int16_t _diplomacy_system_planet_count;
+    extern int16_t _diplomacy_scan_input_flag;
+    extern uint8_t _diplomacy_system_giver;
 
-    inline char* (&_demand_diplomacy_list)[11] = *reinterpret_cast<char*(*)[11]>(std::uintptr_t{0x005A8190});
-    inline char*& _net_listen_mode_option_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A81C0});
-    inline char*& _system_unsurrenderable_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A81C4});
-    inline char* (&_main_net_diplomacy_list)[11] = *reinterpret_cast<char*(*)[11]>(std::uintptr_t{0x005A8200});
-    inline char*& _demand_title = *reinterpret_cast<char**>(std::uintptr_t{0x005A82EC});
-    inline char* (&_agree_diplomacy_list)[4] = *reinterpret_cast<char*(*)[4]>(std::uintptr_t{0x005A8360});
-    inline char*& _system_cancel_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A837C});
-    inline int16_t& _diplomacy_system_homeworld_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8380});
-    inline s_animation_header*& _diplomacy_system_star_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A84FC});
-    inline int16_t* _diplomacy_system_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A850E}); // short[72]
-    inline uint8_t*& _diplomacy_mouse_bitmap = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005A8500});
-    inline char*& _system_homeworld_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A85A8});
-    inline int16_t& _diplomacy_good_music = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A85CA});
-    inline char*& _statement_research_treaty_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A85CC});
-    inline int16_t& _diplomacy_bad_music = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A85D2});
-    inline char*& _choose_a_system_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A85D4});
-    inline char*& _enter_your_message_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89D0});
-    inline char*& _statement_trade_treaty_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89E0});
-    inline char*& _system_million_colonists_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89E8});
-    inline char*& _net_listen_mode_good_bye_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89F4});
-    inline char*& _system_x_star_system_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89F8});
-    inline char*& _percent_tribute_treaty_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A8A34});
-    inline char*& _you_were_framed_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A8A3C});
+    extern char* _demand_diplomacy_list[11];
+    extern char* _net_listen_mode_option_buffer;
+    extern char* _system_unsurrenderable_buffer;
+    extern char* _main_net_diplomacy_list[11];
+    extern char* _demand_title;
+    extern char* _agree_diplomacy_list[4];
+    extern char* _system_cancel_buffer;
+    extern int16_t _diplomacy_system_homeworld_flag;
+    extern s_animation_header* _diplomacy_system_star_background_seg;
+    extern int16_t _diplomacy_system_fields[73];
+    extern uint8_t* _diplomacy_mouse_bitmap;
+    extern char* _system_homeworld_buffer;
+    extern int16_t _diplomacy_good_music;
+    extern char* _statement_research_treaty_buffer;
+    extern int16_t _diplomacy_bad_music;
+    extern char* _choose_a_system_buffer;
+    extern char* _enter_your_message_buffer;
+    extern char* _statement_trade_treaty_buffer;
+    extern char* _system_million_colonists_buffer;
+    extern char* _net_listen_mode_good_bye_buffer;
+    extern char* _system_x_star_system_buffer;
+    extern char* _percent_tribute_treaty_buffer;
+    extern char* _you_were_framed_buffer;
 
     void __cdecl Load_Diplomacy_Text_Messages_();
 

@@ -4,18 +4,17 @@
 struct s_animation_header;
 
 namespace ERIC {
-    inline uint8_t& _fade_percent = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B40});
+    extern uint8_t _fade_percent;
 
-    inline uint8_t& _fade_speed_in_percent = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B44});
+    extern uint8_t _fade_speed_in_percent;
 
-    inline uint8_t& _hacky_need_to_fade_to_colony_palette_flag =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B48});
+    extern uint8_t _hacky_need_to_fade_to_colony_palette_flag;
 
-    inline uint16_t& _saved_sfx_l = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00558B4C});
+    extern uint16_t _saved_sfx_l;
 
-    inline uint16_t& _saved_music_l = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00558B50});
+    extern uint16_t _saved_music_l;
 
-    inline MOX2::action_func_t& _cinematic_saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A4AD8});
+    extern MOX2::action_func_t _cinematic_saved_autofunction;
 
     void __cdecl Eric_Init_();
 
@@ -49,9 +48,9 @@ namespace ERIC {
 
     void __cdecl String_Builder2_(char* dest, int16_t mode, const char* format, ...);
 
-    inline char* const s_2_00551108 = reinterpret_cast<char*>(std::uintptr_t{0x00551108});
+    extern const char s_2_00551108[3];
 
-    char* __cdecl Red_If_Negative_Fmt_String_(int16_t value);
+    const char* __cdecl Red_If_Negative_Fmt_String_(int16_t value);
 
     void __cdecl Pulsing_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int32_t param_6, int16_t param_7);
 

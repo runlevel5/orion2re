@@ -2,46 +2,39 @@
 
 struct s_colors;
 struct s_animation_header;
+struct s_mouse_list;
 
 namespace council {
-    inline s_colors& _council_normal_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559A58});
-    inline s_colors& _council_highlight_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559A60});
-    inline uint8_t (&_council_nominee_)[2] = *reinterpret_cast<uint8_t(*)[2]>(std::uintptr_t{0x00596016});
-    inline int16_t& _council_total_votes = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596018});
-    inline int16_t (&_council_nominee_vote_total)[2] = *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x0059601C});
-    inline uint8_t* _council_members = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596020});
-    inline uint8_t& _council_state =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596028});
-    inline char*& _council_vote_message = *reinterpret_cast<char**>(std::uintptr_t{0x0059602C});
-    inline s_animation_header** _council_dark_race_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596030});
-    inline int8_t& _council_voter = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596050});
-    inline char*& _council_no_votes_message = *reinterpret_cast<char**>(std::uintptr_t{0x00596054});
-    inline int16_t& _council_vote_cast = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596080});
-    inline int16_t (&_council_member_votes)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00596090});
-    inline s_animation_header** _council_light_race_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596060});
-    inline char*& _council_message = *reinterpret_cast<char**>(std::uintptr_t{0x005960A0});
-    inline uint8_t (&_player_voted_winner_message_id)[20] = *reinterpret_cast<uint8_t(*)[20]>(std::uintptr_t{0x005960B0});
-    inline char*& _council_votes_message = *reinterpret_cast<char**>(std::uintptr_t{0x005960C4});
-    inline int16_t (&_council_nominee_votes)[2] = *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x005960C8});
-    inline void*& _council_mouse_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x005960CC});
-    inline uint8_t& _winning_player = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005960D0});
-    inline s_animation_header** _council_nominees_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005960D8});
-    inline uint8_t& _council_total_members = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005960E0});
-    inline char*& _council_votes_total_message = *reinterpret_cast<char**>(std::uintptr_t{0x005960E4});
-    inline uint8_t& _council_vote_for =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005960E8});
-
-    inline const char* s_format_votes = reinterpret_cast<const char*>(std::uintptr_t{0x005569F0});
-
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    extern s_colors _council_normal_colors;
+    extern s_colors _council_highlight_colors;
+    extern uint8_t _council_nominee_[2];
+    extern int16_t _council_total_votes;
+    extern int16_t _council_nominee_vote_total[2];
+    extern uint8_t _council_members[8];
+    extern uint8_t _council_state;
+    extern char* _council_vote_message;
+    extern s_animation_header* _council_dark_race_seg[8];
+    extern int8_t _council_voter;
+    extern char* _council_no_votes_message;
+    extern int16_t _council_vote_cast;
+    extern int16_t _council_member_votes[8];
+    extern s_animation_header* _council_light_race_seg[8];
+    extern char* _council_message;
+    extern uint8_t _player_voted_winner_message_id[20];
+    extern char* _council_votes_message;
+    extern int16_t _council_nominee_votes[2];
+    extern void* _council_mouse_bitmap;
+    extern uint8_t _winning_player;
+    extern s_animation_header* _council_nominees_seg[2];
+    extern uint8_t _council_total_members;
+    extern char* _council_votes_total_message;
+    extern uint8_t _council_vote_for;
 
     void __cdecl Get_Player_Voted_Winner_Message_(int16_t unused);
 
     void __cdecl Draw_Council_Player_Voted_Winner_();
 
-    inline const char* s_council_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A74});
-    inline const char* s_empty_string = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
-    inline s_mouse_list& _council_blank_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x00559A48 });
+    extern s_mouse_list _council_blank_mouse;
 
     void Drive_Council_Player_Voted_Winner_(int16_t player_idx, int16_t unused);
 

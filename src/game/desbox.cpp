@@ -2,6 +2,42 @@
 
 namespace DESBOX {
 
+    uint16_t _weapon_replacement_mods;
+
+    int8_t _incr_value;
+
+    int16_t _field_item_scanned;
+    int16_t _field_item_chosen;
+    int16_t _replacement_box_middle_height;
+    int16_t _replacement_scroll_field;
+    int16_t _replacement_box_width;
+    int16_t _replacement_box_base_y;
+    int16_t _replacement_box_base_x;
+    int16_t _replacement_box_height;
+    uint8_t _beam_filter_button_status = 1;
+    uint8_t _missile_filter_button_status = 1;
+    uint8_t _bomb_filter_button_status = 1;
+    uint8_t _special_filter_button_status = 1;
+    int16_t _replacement_scroll_dn_button;
+    int16_t _replacement_scroll_up_button;
+    int16_t _weapon_arc_rack_box_field;
+    int16_t _weapon_replacement_arcs;
+    uint16_t _weapon_replacement_rack;
+    uint8_t _wait_ctr;
+    uint8_t _valid_mods[16];
+    uint8_t _valid_arcs_racks[5];
+
+    const char s__00551100[] = "";
+    const char s_plus[] = "+";
+    const char s_minus[] = "-";
+    const char s_space[] = "\x1b";
+    const char s__00551120[] = "\x1b";
+    const char s_B[] = "B";
+    const char s_S[] = "S";
+    const char s_O[] = "O";
+    const char s_A[] = "A";
+    const char s_M[] = "M";
+
     int16_t __cdecl Special_System_Choices_() {
         memset(MOX::_design->item_unlocked, 0, 40);
 
@@ -288,7 +324,7 @@ namespace DESBOX {
                     field_y,
                     _replacement_box_base_x + 0x256,
                     field_y + 0xc,
-                    strings::s__00551100,
+                    s__00551100,
                     0x29
                 );
 
@@ -309,9 +345,9 @@ namespace DESBOX {
             _replacement_scroll_up_button = fields::Add_Button_Field_(
                 _replacement_box_width + _replacement_box_base_x - 0x20,
                 _replacement_box_base_y + top_box_h + 1,
-                strings::s__00551100,
+                s__00551100,
                 MOX::_d_scroll_up_button_seg,
-                strings::s_minus_0055111c,
+                s_minus,
                 0x28
             );
         }
@@ -324,7 +360,7 @@ namespace DESBOX {
                 _replacement_box_base_y + top_box_h + 0x14,
                 0, 0x78, 0, 0x78, 9, 0x78,
                 &MOX::_scroll_bar->thumb_center_y,
-                strings::s__00551100,
+                s__00551100,
                 0
             );
         }
@@ -338,9 +374,9 @@ namespace DESBOX {
             _replacement_scroll_dn_button = fields::Add_Button_Field_(
                 _replacement_box_width + _replacement_box_base_x - 0x20,
                 _replacement_box_base_y + total_top_mid_h - 0xe,
-                strings::s__00551100,
+                s__00551100,
                 MOX::_d_scroll_dn_button_seg,
-                strings::s_plus_00551118,
+                s_plus,
                 0x28
             );
         }
@@ -353,7 +389,7 @@ namespace DESBOX {
             filters_y1,
             _replacement_box_base_x + 0xc5,
             filters_y2,
-            strings::s_B_005560e4,
+            s_B,
             0x29
         );
 
@@ -362,7 +398,7 @@ namespace DESBOX {
             filters_y1,
             _replacement_box_base_x + 0x13f,
             filters_y2,
-            strings::s_M_00557ed8,
+            s_M,
             0x29
         );
 
@@ -371,7 +407,7 @@ namespace DESBOX {
             filters_y1,
             _replacement_box_base_x + 0x1a6,
             filters_y2,
-            strings::s_O_00556afc,
+            s_O,
             0x29
         );
 
@@ -380,7 +416,7 @@ namespace DESBOX {
             filters_y1,
             _replacement_box_base_x + 0x20f,
             filters_y2,
-            strings::s_S_005569cc,
+            s_S,
             0x29
         );
 
@@ -402,7 +438,7 @@ namespace DESBOX {
                         ry,
                         rx + 0x55,
                         ry + 0xf,
-                        strings::s__00551100,
+                        s__00551100,
                         0x29
                     );
                     _valid_arcs_racks[i] = 1;
@@ -416,7 +452,7 @@ namespace DESBOX {
                             ry,
                             rx + 0x5c,
                             ry + 0xd,
-                            strings::s__00551100,
+                            s__00551100,
                             0x29
                         );
                         _valid_arcs_racks[i] = 1;
@@ -435,7 +471,7 @@ namespace DESBOX {
             rack_box_y,
             rack_box_x + animate::Get_Width_(MOX::_weapons_rack_seg),
             rack_box_y + animate::Get_Height_(MOX::_weapons_rack_seg),
-            strings::s__00551100,
+            s__00551100,
             0x29
         );
 
@@ -455,7 +491,7 @@ namespace DESBOX {
                             mod_y,
                             mod_x + 0x8c,
                             mod_y + 0xd,
-                            strings::s__00551100,
+                            s__00551100,
                             0x29
                         );
                     }
@@ -466,9 +502,9 @@ namespace DESBOX {
         *param_1 = fields::Add_Button_Field_(
             _replacement_box_base_x + 0x219,
             _replacement_box_base_y + total_top_mid_h_minus_9 + 0x5b,
-            strings::s__00551100,
+            s__00551100,
             MOX::_weapons_cancel_button_seg,
-            strings::s_space_00551120,
+            s_space,
             0x28
         );
 
@@ -482,16 +518,16 @@ namespace DESBOX {
                 accept_y,
                 accept_x + accept_w,
                 accept_y + accept_h,
-                strings::s__00551100,
+                s__00551100,
                 0x29
             );
         } else {
             MOX::_replacement_box_accept_button = fields::Add_Button_Field_(
                 _replacement_box_base_x + 0x21a,
                 _replacement_box_base_y + total_top_mid_h_minus_9 + 0x8b,
-                strings::s__00551100,
+                s__00551100,
                 MOX::_weapons_accept_button_seg,
-                strings::s_A_00557ed4,
+                s_A,
                 0x28
             );
         }
@@ -501,11 +537,11 @@ namespace DESBOX {
             _replacement_box_base_y,
             _replacement_box_base_x + animate::Get_Width_(MOX::_weapons_top_box_seg),
             _replacement_box_base_y + top_box_h + mid_box_h + bot_box_h,
-            strings::s__00551100,
+            s__00551100,
             0
         );
 
-        *param_2 = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, strings::s_space_00551120, 0x29);
+        *param_2 = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s_space, 0x29);
 
         MOX::_scroll_bar->up_btn = _replacement_scroll_up_button;
         MOX::_scroll_bar->dn_btn = _replacement_scroll_dn_button;
@@ -2659,7 +2695,7 @@ namespace DESBOX {
                     field_y1,
                     _replacement_box_base_x + 25 + 559 /* 0x22F */,
                     field_y1 + 16,
-                    strings::s__00551100,
+                    s__00551100,
                     41 /* 0x29 */
                 );
 
@@ -2685,7 +2721,7 @@ namespace DESBOX {
                 9,
                 140 /* 0x8C */,
                 &MOX::_scroll_bar->thumb_center_y,
-                strings::s__00551100,
+                s__00551100,
                 0
             );
         } else {
@@ -2697,9 +2733,9 @@ namespace DESBOX {
             MOX::_special_scroll_up_button = fields::Add_Button_Field_(
                 scroll_x,
                 up_btn_y,
-                strings::s__00551100,
+                s__00551100,
                 MOX::_d_scroll_up_button_seg,
-                strings::s_minus_0055111c,
+                s_minus,
                 40 /* 0x28 */
             );
 
@@ -2707,9 +2743,9 @@ namespace DESBOX {
             MOX::_special_scroll_dn_button = fields::Add_Button_Field_(
                 scroll_x,
                 dn_btn_y,
-                strings::s__00551100,
+                s__00551100,
                 MOX::_d_scroll_dn_button_seg,
-                strings::s_plus_00551118,
+                s_plus,
                 40 /* 0x28 */
             );
         } else {
@@ -2723,9 +2759,9 @@ namespace DESBOX {
         *cancel_field_id_out = fields::Add_Button_Field_(
             cancel_btn_x,
             cancel_btn_y,
-            strings::s__00551100,
+            s__00551100,
             MOX::_system_repl_box_cancel_btn,
-            strings::s_space_00551120,
+            s__00551120,
             40 /* 0x28 */
         );
 
@@ -2734,11 +2770,11 @@ namespace DESBOX {
             _replacement_box_base_y,
             _replacement_box_base_x + _replacement_box_width,
             _replacement_box_base_y + _replacement_box_height,
-            strings::s__00551100,
+            s__00551100,
             0
         );
 
-        *screen_field_id_out = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */, strings::s__00551100, 41 /* 0x29 */);
+        *screen_field_id_out = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */, s__00551100, 41 /* 0x29 */);
 
         MOX::_scroll_bar->up_btn = MOX::_special_scroll_up_button;
         MOX::_scroll_bar->dn_btn = MOX::_special_scroll_dn_button;

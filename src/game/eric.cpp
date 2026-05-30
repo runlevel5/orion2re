@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace ERIC {
+    uint8_t _fade_percent;
+    uint8_t _fade_speed_in_percent = 10;
+    uint8_t _hacky_need_to_fade_to_colony_palette_flag;
+    uint16_t _saved_sfx_l;
+    uint16_t _saved_music_l;
+    MOX2::action_func_t _cinematic_saved_autofunction;
+    const char s_2_00551108[3] = "\0332";
+
     uint16_t __cdecl Get_Fade_Percent_() {
         return _fade_percent;
     }
@@ -164,7 +172,7 @@ namespace ERIC {
         BILL::_Print_Paragraph_(x, y + (box_height >> 1) - (max_height / 2), width, text, color);
     }
 
-    char* __cdecl Red_If_Negative_Fmt_String_(int16_t value) {
+    const char* __cdecl Red_If_Negative_Fmt_String_(int16_t value) {
         if (value >= 0) {
             return ESTRINGS::E_Strings_(12);
         }

@@ -2,6 +2,28 @@
 
 namespace comcore {
 
+void* _sendBuffer;
+
+void* _userReceiveBuffer;
+
+s_comcore_poll_buf _pollReq;
+
+s_comcore_open_req _openReq;
+
+uint16_t _recBufferLength;
+
+s_comcore_req_buf _sendReq;
+
+uint32_t _commsInitTime3;
+
+rec_fn _recFunc;
+
+uint32_t _commsInitTime2;
+
+uint32_t _commsInitTime;
+
+uint8_t* _pollBuffer;
+
 int16_t __cdecl ComSendUserMessage_(
     void* msg_data,
     uint16_t msg_length,

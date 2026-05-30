@@ -8,60 +8,48 @@ struct s_colony;
 struct s_colony_bldg;
 
 namespace COLONY {
-    inline int32_t (&_building_cr)[170] =
-        *reinterpret_cast<int32_t(*)[170]>(std::uintptr_t{0x0055A188});
+    extern int32_t _building_cr[170];
 
-    inline int16_t (&_colony_fields)[21] =
-        *reinterpret_cast<int16_t(*)[21]>(std::uintptr_t{0x00559E28});
+    extern int16_t _colony_fields[21];
 
-    inline int16_t (&_military_fields)[2] =
-        *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x00559E54});
+    extern int16_t _military_fields[2];
 
-    inline int16_t (&_job_fields)[3] =
-        *reinterpret_cast<int16_t(*)[3]>(std::uintptr_t{0x00595E28});
+    extern int16_t _job_fields[3];
 
-    inline int16_t (&_pop_fields_count)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E30});
+    extern int16_t _pop_fields_count[8];
 
-    inline int16_t (&_sys_disp_summ_fields)[5] =
-        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00595E40});
+    extern int16_t _sys_disp_summ_fields[5];
 
-    inline int16_t (&_sys_disp_fields)[3] =
-        *reinterpret_cast<int16_t (*)[3]>(std::uintptr_t{0x00595E60});
+    extern int16_t _sys_disp_fields[3];
 
-    inline int16_t (&_sys_disp_planet_fields)[5] =
-        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x00595FE0});
+    extern int16_t _sys_disp_planet_fields[5];
 
-    inline int16_t (&_pop_fields)[42] =
-        *reinterpret_cast<int16_t(*)[42]>(std::uintptr_t{0x00595F80});
+    extern int16_t _pop_fields[42];
 
-    inline s_colony_bldg (&_colony_bldgs)[6] =
-        *reinterpret_cast<s_colony_bldg(*)[6]>(std::uintptr_t{0x00559E58});
+    extern s_colony_bldg _colony_bldgs[6];
 
-    inline int16_t (&_colony_satellites)[10] =
-        *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x0056EBF8});
+    extern int16_t _colony_satellites[10];
 
-    inline char* _FIREPTS_LBX = reinterpret_cast<char*>(std::uintptr_t{0x00559D48}); // "FIREPTS.LBX"
-    inline const char* _RACEICON_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C88}); // "RACEICON.LBX"
-    inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
-    inline const char* _AMEBAFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CB8}); // "AMEBAFIN.LBX"
-    inline const char* _COLBLDG_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CE8}); // "COLBLDG.LBX"
-    inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
-    inline const char* _COLSYSDI_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D28}); // "COLSYSDI.LBX"
-    inline const char* _DIMTVFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D38}); // "DIMTVFIN.LBX"
-    inline const char* _NEWGAME_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D90}); // "NEWGAME.LBX"
-    inline const char* _PLNTDFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DA0}); // "PLNTDFIN.LBX"
-    inline const char (&_MAINPUPS_LBX)[13] =
-        *reinterpret_cast<const char (*)[13]>(std::uintptr_t{0x00559D80});
-    inline const char* _BEAMS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CC8}); // "BEAMS.LBX"
-    inline const char* _CMBTSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CD8}); // "CMBTSFX.LBX"
-    inline const char* _SPHERSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x00559DD0 }); // "SPHERSFX.LBX"
-    inline char* _COLROADS_LBX = reinterpret_cast<char*>(std::uintptr_t{0x00559D08}); // "COLROADS.LBX"
+    extern char _FIREPTS_LBX[12];
+    extern const char _RACEICON_LBX[13];
+    extern const char _PLANETS_LBX[12];
+    extern const char _AMEBAFIN_LBX[13];
+    extern const char _COLBLDG_LBX[12];
+    extern const char _COLSUM_LBX[11];
+    extern const char _COLSYSDI_LBX[13];
+    extern const char _DIMTVFIN_LBX[13];
+    extern const char _NEWGAME_LBX[12];
+    extern const char _PLNTDFIN_LBX[13];
+    extern const char _MAINPUPS_LBX[13];
+    extern const char _BEAMS_LBX[10];
+    extern const char _CMBTSFX_LBX[12];
+    extern const char _SPHERSFX_LBX[13];
+    extern char _COLROADS_LBX[13];
 
-    inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
-    inline int16_t& _scanned_pop = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF8});
-    inline int16_t& _scanned_military = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DFC});
-    inline int16_t& _scanned_satellite = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E00});
+    extern int16_t _step_squish;
+    extern int16_t _scanned_pop;
+    extern int16_t _scanned_military;
+    extern int16_t _scanned_satellite;
 
     void __cdecl Init_Colonies_();
 
@@ -69,82 +57,65 @@ namespace COLONY {
 
     bool __cdecl Colonize_Planet_(int16_t planet_idx);
 
-    inline int16_t (&_colony_satellite_fields)[10] =
-        *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x0056EA00});
+    extern int16_t _colony_satellite_fields[10];
 
-    inline int16_t& _colony_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EA68});
-    inline int16_t& _g_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EBC8});
-    inline int16_t& _g_scanned_planet = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E6C});
-    inline int16_t& _planet_display_handle = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E20});
+    extern int16_t _colony_saved_screen;
+    extern int16_t _g_scanned_star;
+    extern int16_t _g_scanned_planet;
+    extern int16_t _planet_display_handle;
 
-    inline uint16_t& _colonists_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056E9FC});
+    extern uint16_t _colonists_count;
 
-    inline int16_t& _orbit_temp =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B22});
-    inline int16_t& _temp_colony_idx =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B24});
+    extern int16_t _orbit_temp;
+    extern int16_t _temp_colony_idx;
 
-    inline int16_t& _ship_bitm_n =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559F78});
-    inline int16_t& _bldg_bitm_n =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559F7C});
-    inline int16_t& _g_ship_pic_n =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559FFC});
-    inline int32_t& _g_ship_player_n =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00559FF8});
-    inline s_animation_header*& _ship_pic_bitm =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E68});
-    inline s_animation_header*& _ship_bitm =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595F7C});
-    inline s_animation_header*& _swap_bitm =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595FF0});
+    extern int16_t _ship_bitm_n;
+    extern int16_t _bldg_bitm_n;
+    extern int16_t _g_ship_pic_n;
+    extern int32_t _g_ship_player_n;
+    extern s_animation_header* _ship_pic_bitm;
+    extern s_animation_header* _ship_bitm;
+    extern s_animation_header* _swap_bitm;
 
-    inline s_animation_header*& _mouse_bitm =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E54});
+    extern s_animation_header* _mouse_bitm;
 
-    inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
-    inline const char* _COLVEGGIE_LBX =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00559C78}); // "COLVEGGI.LBX"
-    inline const char* _COLGCBT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CF8}); // "COLGCBT.LBX"
-    inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"
-    inline const char* _COLPUPS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C98}); // "COLPUPS.LBX"
+    extern const char _COLONY_LBX[11];
+    extern const char _COLVEGGIE_LBX[13];
+    extern const char _COLGCBT_LBX[12];
+    extern const char _COLONY2_LBX[12];
+    extern const char _COLPUPS_LBX[12];
 
-    inline s_animation_header** _c_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00559EE8});
+    extern s_animation_header* _c_anims[36];
 
     void __cdecl Set_Colony_Globals_(int16_t param_1);
 
-    inline uint8_t& _debug_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559C40});
-    inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
-    inline uint8_t& _drawing_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E10});
-    inline uint8_t& _valid_colony = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E14});
-    inline uint8_t& _field_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559DF4});
-    inline int16_t& _move_colonist =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E0C});
+    extern uint8_t _debug_flag;
+    extern uint8_t _using_colony_screen_palette;
+    extern uint8_t _drawing_display;
+    extern uint8_t _valid_colony;
+    extern uint8_t _field_mode;
+    extern int16_t _move_colonist;
 
     void __cdecl Draw_Bldg_CR_Dark_(int16_t col, int16_t row);
 
-    inline int16_t& _scanned_bldg_C = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E04});
-    inline int16_t& _scanned_bldg_R = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E08});
-    inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E18});
-    inline int32_t& _colony_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E50});
-    inline int16_t (&_building_cr_xy)[7][7][4] =
-        *reinterpret_cast<int16_t(*)[7][7][4]>(std::uintptr_t{0x0055A000});
+    extern int16_t _scanned_bldg_C;
+    extern int16_t _scanned_bldg_R;
+    extern uint8_t _full_draw;
+    extern int32_t _colony_handle;
+    extern int16_t _building_cr_xy[7][7][4];
 
-    inline int16_t (&_colony_bldg_fields)[36] =
-        *reinterpret_cast<int16_t(*)[36]>(std::uintptr_t{0x0056EA18});
+    extern int16_t _colony_bldg_fields[36];
 
-    inline int16_t (&_pop_fields_coord_var)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E70});
+    extern int16_t _pop_fields_coord_var[8];
 
-    inline int16_t (&_pop_fields_ref)[3][42] =
-        *reinterpret_cast<int16_t(*)[3][42]>(std::uintptr_t{0x00595E80});
+    extern int16_t _pop_fields_ref[3][42];
 
-    inline int32_t& _planet_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD8});
-    inline int32_t& _star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E58});
-    inline int32_t& _orbit_n = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E78});
-    inline uint8_t& _cheats = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E1C});
-    inline int32_t& _sys_disp_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD4});
-    inline int32_t& _sys_disp_scanned_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FEC});
+    extern int32_t _planet_handle;
+    extern int32_t _star_handle;
+    extern int32_t _orbit_n;
+    extern uint8_t _cheats;
+    extern int32_t _sys_disp_star_handle;
+    extern int32_t _sys_disp_scanned_star_handle;
 
     void __cdecl Load_Colony_Anims_();
     void __cdecl Load_Colony_Screen_Seg_();
@@ -407,15 +378,12 @@ namespace COLONY {
     void __cdecl Draw_Current_Building_(int16_t building_id);
     void __cdecl Draw_Current_Ship_(int16_t ship_id);
 
-    inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
-    inline s_colors& _bright_blue_font_color_array =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F88});
-    inline s_colors& _font_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F90});
-    inline s_colors& _font_dim_color_array =
-        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F98});
-    inline s_colors& _font_bright_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559FA0});
-    inline s_colors (&_red_font_color_array)[3] =
-        *reinterpret_cast<s_colors(*)[3]>(std::uintptr_t{0x00559FA8});
+    extern int16_t _g_colony_n;
+    extern s_colors _bright_blue_font_color_array;
+    extern s_colors _font_color_array;
+    extern s_colors _font_dim_color_array;
+    extern s_colors _font_bright_color_array;
+    extern s_colors (&_red_font_color_array)[3];
 
     void __cdecl Set_Colony_Font_To_Blue_(int16_t style, int8_t is_bright);
 
@@ -423,12 +391,11 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_To_Reg_Blue_(uint8_t font_idx, uint8_t state);
 
-    inline int16_t& _galaxy_map_name_field =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E5C});
+    extern int16_t _galaxy_map_name_field;
 
     void __cdecl Clear_Galaxy_Map_Fields_();
 
-    inline int32_t& _g_count = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E4C});
+    extern int32_t _g_count;
 
     void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index);
 
@@ -460,6 +427,5 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_To_Player_(uint8_t font_style, uint8_t player_idx);
 
-    inline s_colors (&_player_font_color_array)[8] =
-        *reinterpret_cast<s_colors (*)[8]>(std::uintptr_t{0x00559FB8});
+    extern s_colors (&_player_font_color_array)[8];
 }

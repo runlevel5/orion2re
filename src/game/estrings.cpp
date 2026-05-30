@@ -2,6 +2,28 @@
 
 namespace ESTRINGS {
 
+char* _strings[812];
+char _string_data[21000];
+
+const char s_0_0055110c[4] = "\0320";
+const char s_1_00551110[4] = "\0321";
+
+const char s_estrings_lbx[16] = "estrings.lbx";
+const char s_estrGERM_lbx[16] = "estrGERM.lbx";
+const char s_estrFREN_lbx[16] = "estrFREN.lbx";
+const char s_estrSPAN_lbx[16] = "estrSPAN.lbx";
+const char s_estrITAL_lbx[16] = "estrITAL.lbx";
+const char s_estrPOLI_lbx[16] = "estrPOLI.lbx";
+
+const char s_maintext_lbx[16] = "maintext.lbx";
+const char s_maingerm_lbx[16] = "maingerm.lbx";
+const char s_mainfren_lbx[16] = "mainfren.lbx";
+const char s_mainspan_lbx[16] = "mainspan.lbx";
+const char s_mainital_lbx[16] = "mainital.lbx";
+const char s_mainpoli_lbx[16] = "mainpoli.lbx";
+
+const char s_you_blew_the_array_eric[24] = "you blew the array eric";
+
 void __cdecl Load_E_Strings_() {
     char* loaded_data;
 

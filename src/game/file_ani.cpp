@@ -2,6 +2,30 @@
 
 namespace file_ani {
 
+    uint8_t* _file_animation_buffer;
+    uint32_t _file_animation_open;
+    uint32_t _file_animation_length;
+    uint32_t _file_animation_end;
+    FILE* _file_animation_fptr;
+    uint32_t _file_animation_opened_flag[3];
+    FILE* _file_animation[3];
+    uint32_t _file_animation_start_multi[3];
+    uint32_t _file_animation_end_multi[3];
+    uint32_t* _file_lbx_header;
+    uint32_t _file_animation_length_multi[3];
+    uint32_t _file_animation_start;
+    uint8_t* _file_animation_header;
+
+    const char s_File_Animation_Frame_Too_Large[31] = "File Animation Frame Too Large";
+    const char s_Refresh_Mask_can_t_be_drawn[28] = "Refresh Mask can't be drawn";
+    const char (&s_Refresh_Mask_cant_be_drawn)[28] = s_Refresh_Mask_can_t_be_drawn;
+    const char s_Too_many_frames_for_multi_file_a[41] = "Too many frames for multi file animation";
+    const char s_Differentail_File_Animation_Can_n_masked[46] = "Differentail File Animation Can not be masked";
+    const char s_Differentail_File_Animation_Can_n_bitmap[46] = "Differentail File Animation Can not be bitmap";
+    const char (&s_Differential_Error_868)[46] = s_Differentail_File_Animation_Can_n_masked;
+    const char (&s_Differential_Error_898)[46] = s_Differentail_File_Animation_Can_n_bitmap;
+    const char s_Differential_Error_8C8[47] = "Differentail File Animation Can not be glassed";
+
     int16_t __cdecl Get_File_Animation_Frame_() {
         _file_animation_header = reinterpret_cast<uint8_t*>(init::_io_buffer);
         return *reinterpret_cast<int16_t*>(_file_animation_header + 4);

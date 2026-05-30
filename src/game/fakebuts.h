@@ -2,20 +2,16 @@
 #include <cstdint>
 
 namespace FAKEBUTS {
-    inline uint8_t& _n_fake_buttons =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558994});
+    extern uint8_t _n_fake_buttons;
 
-    inline s_fake_button (&_fake_buttons)[25] =
-        *reinterpret_cast<s_fake_button(*)[25]>(std::uintptr_t{0x005A4B60});
+    extern s_fake_button _fake_buttons[25];
 
     void __cdecl Clear_Fake_Buttons_();
     void __cdecl Draw_Fake_Buttons_();
 
-    inline uint8_t& _n_click_thru_fields =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558998});
+    extern uint8_t _n_click_thru_fields;
 
-    inline s_click_through_field (&_click_thru_fields)[25] =
-        *reinterpret_cast<s_click_through_field(*)[25]>(std::uintptr_t{0x005A4C60});
+    extern s_click_through_field _click_thru_fields[25];
 
     void __cdecl Clear_Click_Thru_Fields_();
     void __cdecl Evaluate_Click_Thru_Fields_(int16_t field_id);

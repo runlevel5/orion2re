@@ -2,46 +2,45 @@
 #include <cstdint>
 
 namespace DESIGN {
-    inline s_current_design*& _design = *reinterpret_cast<s_current_design**>(std::uintptr_t{ 0x0059B330 });
-    inline int16_t& _repeat_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005560DC});
-    inline uint8_t& _replacement_wait_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B6E});
-    inline int16_t& _design_size_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565040});
-    inline uint8_t& _use_augmented_engines = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056503C});
+    extern int16_t _repeat_count;
+    extern uint8_t _replacement_wait_ctr;
+    extern int16_t _design_size_field;
+    extern uint8_t _use_augmented_engines;
 
-    inline int32_t& _printed_space_avail = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565054});
-    inline int16_t& _design_shield_replacement_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056505C});
-    inline int16_t& _design_computer_replacement_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565060});
+    extern int32_t _printed_space_avail;
+    extern int16_t _design_shield_replacement_field;
+    extern int16_t _design_computer_replacement_field;
     // 0x004321e0 stores EAX directly to 0x00565058, so this global is 32-bit here.
-    inline int32_t& _printed_cost = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565058});
-    inline uint8_t& _changed_design_name = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056504C});
+    extern int32_t _printed_cost;
+    extern uint8_t _changed_design_name;
     inline int16_t& _player_design_num = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B28});
-    inline uint8_t (&_add_size_button_flag)[6] = *reinterpret_cast<uint8_t(*)[6]>(std::uintptr_t{0x00565064});
+    extern uint8_t _add_size_button_flag[6];
 
-    inline const char* s_cstdes_log = reinterpret_cast<const char*>(0x005560ec);
-    inline const char* s_plus = reinterpret_cast<const char*>(0x00551118); // "+"
-    inline const char* s_minus = reinterpret_cast<const char*>(0x0055111C); // "-"
-    inline const char* s_pct_d = reinterpret_cast<const char*>(0x00556104); // "%d"
-    inline const char* s_pct_s_pct_d = reinterpret_cast<const char*>(0x00556134); // "%s%d"
-    inline const char* s_pct_d_pct = reinterpret_cast<const char*>(0x0055612C); // "%d%%"
-    inline const char* s_pct_s_bracket_pct_d = reinterpret_cast<const char*>(0x00556124); // "%s (%d)"
-    inline const char* s_special_tag = reinterpret_cast<const char*>(0x0055611C); // "special"
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
-    inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // " "
-    inline const char* s_B_005560e4 = reinterpret_cast<const char*>(0x005560E4); // "B"
-    inline const char* s_L_005560e8 = reinterpret_cast<const char*>(0x005560E8); // "L"
-    inline const char* s_360_00556164 = reinterpret_cast<const char*>(std::uintptr_t{0x00556164}); // "360"
-    inline const char* s_comma_space = reinterpret_cast<const char*>(std::uintptr_t{ 0x00556168 }); // ", "
-    inline const char* s_ITATECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055616C}); // "ITATECD.LBX"
-    inline const char* s_SPATECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00556178}); // "SPATECD.LBX"
-    inline const char* s_FRETECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00556184}); // "FRETECD.LBX"
-    inline const char* s_GERTECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00556190}); // "GERTECD.LBX"
-    inline const char* s_TECHDESC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055619C}); // "TECHDESC.LBX"
-    inline const char*& PTR_s_DESIGN_LBX_005560D8 = *reinterpret_cast<const char**>(std::uintptr_t{0x005560D8}); // "DESIGN.LBX"
-    inline const char* s_Bad_required_tech_in_Tech_Level = reinterpret_cast<const char*>(0x0055613C); // "Bad required_tech in Tech_Level()... %d"
-    inline const char* s_SHIPNAME_LBX_0055610C = reinterpret_cast<const char*>(std::uintptr_t{0x0055610C}); // "shipname.lbx"
-    inline s_animation_header*& _dull_plus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565044});
-    inline s_animation_header*& _dull_minus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565048});
-    inline s_animation_header*& _dark_build_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565050});
+    extern const char s_cstdes_log[13];
+    extern const char s_plus[2];
+    extern const char s_minus[2];
+    extern const char s_pct_d[3];
+    extern const char s_pct_s_pct_d[5];
+    extern const char s_pct_d_pct[5];
+    extern const char s_pct_s_bracket_pct_d[8];
+    extern const char s_special_tag[8];
+    extern const char s__00551100[1];
+    extern const char s__00551120[2];
+    extern const char s_B_005560e4[2];
+    extern const char s_L_005560e8[2];
+    extern const char s_360_00556164[4];
+    extern const char s_comma_space[3];
+    extern const char s_ITATECD_LBX[12];
+    extern const char s_SPATECD_LBX[12];
+    extern const char s_FRETECD_LBX[12];
+    extern const char s_GERTECD_LBX[12];
+    extern const char s_TECHDESC_LBX[13];
+    extern const char* PTR_s_DESIGN_LBX_005560D8;
+    extern const char s_Bad_required_tech_in_Tech_Level[40];
+    extern const char s_SHIPNAME_LBX_0055610C[13];
+    extern s_animation_header* _dull_plus_button_seg;
+    extern s_animation_header* _dull_minus_button_seg;
+    extern s_animation_header* _dark_build_design_button_seg;
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, struct s_ship_design* ship_design);
 

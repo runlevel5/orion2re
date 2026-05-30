@@ -1,6 +1,168 @@
 #include "pch.h"
 
 namespace COLONY {
+    int32_t _building_cr[170] = {
+        316, 492, 225, 461, 153, 428, 96, 401, 50, 379, 10, 361,
+        -21, 348, 406, 461, 316, 430, 242, 404, 182, 381, 130, 363,
+        88, 346, 53, 333, 480, 430, 391, 403, 317, 381, 255, 362,
+        204, 348, 158, 334, 121, 322, 539, 403, 454, 382, 380, 363,
+        319, 348, 264, 335, 219, 322, 180, 312, 587, 382, 505, 363,
+        434, 348, 372, 334, 318, 323, 271, 312, 232, 303, 629, 364,
+        549, 349, 479, 335, 419, 323, 367, 314, 318, 303, 277, 295,
+        666, 351, 586, 336, 517, 324, 459, 313, 409, 304, 360, 295,
+        320, 288, 316, 430, 242, 404, 182, 381, 130, 363, 88, 346,
+        53, 333, 391, 403, 317, 381, 255, 362, 204, 348, 158, 334,
+        121, 322, 454, 382, 380, 363, 319, 348, 264, 335, 219, 322,
+        180, 312, 505, 363, 434, 348, 372, 334, 318, 323, 271, 312,
+        232, 303, 549, 349, 479, 335, 419, 323, 367, 314, 318, 323,
+        277, 295, 586, 336, 517, 324, 517, 313, 409, 304, 360, 295,
+        320, 288
+    };
+
+    int16_t _colony_fields[21] = {
+        -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000
+    };
+
+    int16_t _military_fields[2] = {
+        -1000, -1000
+    };
+
+    int16_t _job_fields[3];
+
+    int16_t _pop_fields_count[8];
+
+    int16_t _sys_disp_summ_fields[5];
+
+    int16_t _sys_disp_fields[3];
+
+    int16_t _sys_disp_planet_fields[5];
+
+    int16_t _pop_fields[42];
+
+    s_colony_bldg _colony_bldgs[6];
+
+    int16_t _colony_satellites[10];
+
+    char _FIREPTS_LBX[12] = "FIREPTS.LBX";
+    const char _RACEICON_LBX[13] = "RACEICON.LBX";
+    const char _PLANETS_LBX[12] = "PLANETS.LBX";
+    const char _AMEBAFIN_LBX[13] = "AMEBAFIN.LBX";
+    const char _COLBLDG_LBX[12] = "COLBLDG.LBX";
+    const char _COLSUM_LBX[11] = "COLSUM.LBX";
+    const char _COLSYSDI_LBX[13] = "COLSYSDI.LBX";
+    const char _DIMTVFIN_LBX[13] = "DIMTVFIN.LBX";
+    const char _NEWGAME_LBX[12] = "NEWGAME.LBX";
+    const char _PLNTDFIN_LBX[13] = "PLNTDFIN.LBX";
+    const char _MAINPUPS_LBX[13] = "MAINPUPS.LBX";
+    const char _BEAMS_LBX[10] = "BEAMS.LBX";
+    const char _CMBTSFX_LBX[12] = "CMBTSFX.LBX";
+    const char _SPHERSFX_LBX[13] = "SPHERSFX.LBX";
+    char _COLROADS_LBX[13] = "COLROADS.LBX";
+
+    int16_t _step_squish = 0;
+    int16_t _scanned_pop = -1;
+    int16_t _scanned_military = -1;
+    int16_t _scanned_satellite = -1;
+
+    int16_t _colony_satellite_fields[10];
+
+    int16_t _colony_saved_screen;
+    int16_t _g_scanned_star;
+    int16_t _g_scanned_planet;
+    int16_t _planet_display_handle = -1;
+
+    uint16_t _colonists_count;
+
+    int16_t _orbit_temp;
+    int16_t _temp_colony_idx;
+
+    int16_t _ship_bitm_n = -1;
+    int16_t _bldg_bitm_n = -1;
+    int16_t _g_ship_pic_n = -1;
+    int32_t _g_ship_player_n = -1;
+    s_animation_header* _ship_pic_bitm;
+    s_animation_header* _ship_bitm;
+    s_animation_header* _swap_bitm;
+
+    s_animation_header* _mouse_bitm;
+
+    const char _COLONY_LBX[11] = "COLONY.LBX";
+    const char _COLVEGGIE_LBX[13] = "COLVEGGI.LBX";
+    const char _COLGCBT_LBX[12] = "COLGCBT.LBX";
+    const char _COLONY2_LBX[12] = "COLONY2.LBX";
+    const char _COLPUPS_LBX[12] = "COLPUPS.LBX";
+
+    s_animation_header* _c_anims[36];
+
+    uint8_t _debug_flag;
+    uint8_t _using_colony_screen_palette;
+    uint8_t _drawing_display;
+    uint8_t _valid_colony = 1;
+    uint8_t _field_mode;
+    int16_t _move_colonist = -1;
+
+    int16_t _scanned_bldg_C = -1;
+    int16_t _scanned_bldg_R = -1;
+    uint8_t _full_draw = 1;
+    int32_t _colony_handle;
+    int16_t _building_cr_xy[7][7][4] = {
+        316, 0, 492, 0, 225, 0, 461, 0, 153, 0, 428, 0, 96, 0, 401, 0,
+        50, 0, 379, 0, 10, 0, 361, 0, -21, -1, 348, 0, 406, 0, 461, 0,
+        316, 0, 430, 0, 242, 0, 404, 0, 182, 0, 381, 0, 130, 0, 363, 0,
+        88, 0, 346, 0, 53, 0, 333, 0, 480, 0, 430, 0, 391, 0, 403, 0,
+        317, 0, 381, 0, 255, 0, 362, 0, 204, 0, 348, 0, 158, 0, 334, 0,
+        121, 0, 322, 0, 539, 0, 403, 0, 454, 0, 382, 0, 380, 0, 363, 0,
+        319, 0, 348, 0, 264, 0, 335, 0, 219, 0, 322, 0, 180, 0, 312, 0,
+        587, 0, 382, 0, 505, 0, 363, 0, 434, 0, 348, 0, 372, 0, 334, 0,
+        318, 0, 323, 0, 271, 0, 312, 0, 232, 0, 303, 0, 629, 0, 364, 0,
+        549, 0, 349, 0, 479, 0, 335, 0, 419, 0, 323, 0, 367, 0, 314, 0,
+        318, 0, 303, 0, 277, 0, 295, 0, 666, 0, 351, 0, 586, 0, 336, 0,
+        517, 0, 324, 0, 459, 0, 313, 0, 409, 0, 304, 0, 360, 0, 295, 0,
+        320, 0, 288, 0
+    };
+
+    int16_t _colony_bldg_fields[36];
+
+    int16_t _pop_fields_coord_var[8];
+
+    int16_t _pop_fields_ref[3][42];
+
+    int32_t _planet_handle;
+    int32_t _star_handle;
+    int32_t _orbit_n;
+    uint8_t _cheats;
+    int32_t _sys_disp_star_handle;
+    int32_t _sys_disp_scanned_star_handle;
+
+    int16_t _g_colony_n = -1;
+    s_colors _bright_blue_font_color_array = {{228, 229, 229, 0, 0, 0, 0, 0}};
+    s_colors _font_color_array = {{245, 253, 252, 0, 0, 0, 0, 0}};
+    s_colors _font_dim_color_array = {{244, 249, 248, 0, 0, 0, 0, 0}};
+    s_colors _font_bright_color_array = {{244, 133, 132, 0, 0, 0, 0, 0}};
+
+    static s_colors _font_color_overlap_storage[10] = {
+        {{236, 238, 237, 0, 0, 0, 0, 0}},
+        {{236, 239, 238, 0, 0, 0, 0, 0}},
+        {{236, 238, 237, 0, 0, 0, 0, 0}},
+        {{183, 187, 185, 0, 0, 0, 0, 0}},
+        {{232, 234, 233, 0, 0, 0, 0, 0}},
+        {{83, 102, 100, 0, 0, 0, 0, 0}},
+        {{245, 251, 249, 0, 0, 0, 0, 0}},
+        {{154, 156, 155, 0, 0, 0, 0, 0}},
+        {{240, 242, 241, 0, 0, 0, 0, 0}},
+        {{154, 156, 155, 0, 0, 0, 0, 0}}
+    };
+
+    s_colors (&_red_font_color_array)[3] =
+        *reinterpret_cast<s_colors(*)[3]>(&_font_color_overlap_storage[0]);
+
+    int16_t _galaxy_map_name_field;
+
+    int32_t _g_count;
+
+    s_colors (&_player_font_color_array)[8] =
+        *reinterpret_cast<s_colors(*)[8]>(&_font_color_overlap_storage[2]);
+
     void __cdecl Init_Colonies_() {
         return;
     }

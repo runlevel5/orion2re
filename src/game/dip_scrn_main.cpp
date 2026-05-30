@@ -352,7 +352,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
         fonts::Set_Font_LF_(4);
 
-        Setup_Diplomacy_Help_(7, &_offer_help_entry);
+        Setup_Diplomacy_Help_(7, _offer_help_entry);
 
         int8_t title = 0;
 
@@ -1178,7 +1178,7 @@ namespace DIP_SCRN {
                 fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
                 fonts::Set_Font_LF_(4);
 
-                Setup_Diplomacy_Help_(9, &_main_diplomacy_help_entry);
+                Setup_Diplomacy_Help_(9, _main_diplomacy_help_entry);
 
                 int8_t search_string = 0;
 

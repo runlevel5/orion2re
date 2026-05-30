@@ -2,6 +2,25 @@
 
 namespace farload {
 
+const char s_vga_frames_error[53] = " Vga file animation frames cannot exceed 65536 bytes";
+const char s_error_defined_records[35] = " exceeds number of defined records";
+const char s_error_record_size[30] = " has an incorrect record size";
+const char s_error_lbx_entries[31] = " exceeds number of LBX entries";
+const char s_error_not_lbx[20] = " is not an LBX file";
+const char s_error_reload_failed[40] = " failed to reload. Allocation too small";
+const char s_error_improper_entry[31] = " has an improper entry number.";
+const char s_error_insufficient_memory[74] = "Insufficient memory. You need at least 575K free. Try removing all TSR's.";
+const char s_error_corrupted[21] = " has been corrupted.";
+const char s_error_not_found[21] = " could not be found.";
+const char s_entry_suffix[3] = "] ";
+const char s_entry_prefix[9] = " [entry ";
+
+uint32_t _farload_file_flag;
+char _farload_file_name[16];
+FILE* _farload_fptr;
+s_lbx_header _lbx_header;
+char _secondary_drive_path[52];
+
 void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type) {
     char temp_path[44];
     void* dest_buf = nullptr;
