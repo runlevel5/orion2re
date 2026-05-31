@@ -1431,15 +1431,15 @@ void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
     int8_t climate = planet->climate;
     int8_t size = planet->size;
 
-    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx, climate * 6 + 5, MOX::_global_cache_seg);
+    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx_00551278, climate * 6 + 5, MOX::_global_cache_seg);
     animate::Draw_Palette_(palette_anim);
     RUSS::Mox_Update_();
 
-    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx, size + (climate * 6), MOX::_screen_seg);
+    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx_00551278, size + (climate * 6), MOX::_screen_seg);
     RUSS::Mox_Update_();
 
     if (planet->size != 0) {
-        MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx, climate * 6, MOX::_screen_seg);
+        MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx_00551278, climate * 6, MOX::_screen_seg);
         RUSS::Mox_Update_();
     } else {
         MOX::_combat_planet_seg2 = MOX::_combat_planet_seg;

@@ -12,8 +12,7 @@ struct s_lbx_stream_header;
 inline s_animation_header** _anims =
     reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565D90});
 
-inline char* s_Outpost_Ship_00558f48 = reinterpret_cast<char*>(std::uintptr_t{0x00558F48});
-inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
+extern const char s_space_005510f0[2]; // " "
 extern char s_cmbtsfx_lbx_00551228[12]; // "cmbtsfx.lbx"
 extern const char s_fmt_comma_00555ff0[6]; // "%i,%i"
 extern const char s_fmt_dot_00555ff8[6]; // "%i.%i"
@@ -47,8 +46,7 @@ extern const char s_Too_many_colors_to_reduce_to_[39];
 
 extern const char s_Too_many_colors_to_reduce_from_[41];
 
-inline char const (&s_Receiving_Message_005609F0)[23] =
-    *reinterpret_cast<char const (*)[23]>(std::uintptr_t{0x005609F0}); // "Receiving Message....\n"
+extern const char s_Receiving_Message_005609F0[23]; // "Receiving Message....\n"
 
 inline void (__stdcall *&PTR_OutputDebugStringA_005aa3c0)(char const *) =
     *reinterpret_cast<void (__stdcall **)(char const *)>(std::uintptr_t{0x005AA3C0});
@@ -104,11 +102,7 @@ extern const char s_fmt_score_complex_0055a518[13]; // "(%d x %s) %d"
 extern const char s_percent_s_percent_d_00556d98[7]; /* "%s: %d" */
 extern const char s_RACESTUF_lbx_00558550[13]; // "RACESTUF.lbx"
 
-inline const char* const s_STREAM_LBX_005558fc =
-    reinterpret_cast<const char*>(std::uintptr_t{0x005558FC}); /* "STREAM.LBX" */
-
-inline const char* const s_STREAMHD_LBX_00555908 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00555908}); /* "STREAMHD.LBX" */
+extern const char s_STREAM_LBX_005558fc[11]; /* "STREAM.LBX" */
 
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
@@ -159,18 +153,24 @@ extern char s__00551100[1];   // ""
 extern const char s__d_BC_00552384[8];
 extern const char s_plus_00551118[2]; // "+"
 extern const char s_minus_0055111c[2]; // "-"
+extern const char s__00551120[2]; // "\x1b"
 extern const char s_c_00556350[2]; // "c"
 extern const char s_o_00556af4[2]; // "o"
 extern const char s_oc_00556af8[3]; // "oc"
+extern const char s_C_00552420[2]; // "C"
 extern const char s_H_005569d4[2]; // "H"
+extern const char s_S_005569cc[2]; // "S"
+extern const char s_D_005569dc[2]; // "D"
+extern const char s_L_005560e8[2]; // "L"
+extern const char s_O_00556afc[2]; // "O"
+extern const char s_A_00557ed4[2]; // "A"
 extern const char s_M_00557ed8[2]; // "M"
+extern const char s_I_0055801c[2]; // "I"
+extern const char s_R_0055824c[2]; // "R"
 extern const char DAT_00558540[2];
 extern const char DAT_0055aa90[2];
 
 extern const char s_Monster_ship_id_cannot_mov_00552cd8[46]; // "Monster (ship id: %d) cannot move to %s (%d)!"
-
-inline const char* const s_Auto_Save_00556938 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00556938}); // "(Auto Save)"
 
 extern const char s_no_description_00556920[24]; // "<< no description >>"
 
@@ -216,15 +216,11 @@ inline int16_t (&_weapon_replacement_screen_help_list)[12][10] =
     *reinterpret_cast<int16_t(*)[12][10]>(std::uintptr_t{0x005648D8});
 
 extern const char s_Antares_00551288[8];
-inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
-inline const char* const s_cmbtplnt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
-inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
-inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); /* " 1" */
-inline const char* s_0_0055110d = reinterpret_cast<const char*>(std::uintptr_t{0x0055110D});
+extern const char s_cmbtplnt_lbx_00551278[13]; // "cmbtplnt.lbx"
+extern const char s_0_0055110c[3];
+extern const char s_1_00551110[3];
 extern const char s_caret_space_00556070[3]; /* "^ " */
-inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
-inline const char* s_BUFFER0_LBX_00551124 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
+extern const char s_BUFFER0_LBX[12]; // "BUFFER0.LBX"
 inline int16_t& _fleet_box_width =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
 extern const char s__s___s_0055238c[7]; // "%s, %s"
@@ -242,8 +238,7 @@ extern char s_ITA_HELP_LBX_00557460[16]; // "ITA_HELP.LBX"
 extern char s_FRE_HELP_LBX_00557470[16]; // "FRE_HELP.LBX"
 extern char s_GER_HELP_LBX_00557480[16]; // "GER_HELP.LBX"
 extern char s_HELP_LBX_00557490[9]; // "HELP.LBX"
-inline const char* s_DIPLOMAT_LBX_00552350 = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); // "DIPLOMAT.LBX"
-inline const char* s_DIPLOMAT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); /* "DIPLOMAT.LBX" */
+extern const char s_DIPLOMAT_LBX[13]; /* "DIPLOMAT.LBX" */
 extern const char s_dipstars_lbx_00552374[13]; // "dipstars.lbx"
 
 extern const char s_______CLIMATE_modifier_is__d_Pla_00558a58[54]; // "------CLIMATE modifier is %d  Planet: %d  Mineral: %d"
@@ -256,14 +251,11 @@ extern const char s_Mar_26_1997_005578e0[12]; // "Mar 26 1997"
 
 extern const char s_Memory_Corruption_val_00558028[73]; // "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n"
 
-inline LPCSTR s_max_file_buffer_count_went_over__0055b334 =
-    reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B334}); /* "max file buffer count went over.." */
+extern const char s_max_file_buffer_count_went_over__0055b334[34]; /* "max file buffer count went over.." */
 
-inline LPCSTR s_max_buffer_segs_went_over___0055b358 =
-    reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B358}); /* "max buffer segs went over.." */
+extern const char s_max_buffer_segs_went_over___0055b358[28]; /* "max buffer segs went over.." */
 
-inline LPCSTR s_Cache_Seg_Corrupted____0055b374 =
-    reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B374}); /* "Cache Seg Corrupted..." */
+extern const char s_Cache_Seg_Corrupted____0055b374[23]; /* "Cache Seg Corrupted..." */
 
 extern const char s_File_Animation_Frame_Too_Large_0055b804[31]; // "File Animation Frame Too Large"
 
@@ -278,31 +270,22 @@ extern char s_FP_00558240[4]; // "FP"
 extern char s_RP_00558248[3]; // "RP"
 extern char s_PI_00559994[3]; // "PI"
 extern char s_G_0055241c[2]; // "G"
-inline const char* s_C_00552420 = reinterpret_cast<const char*>(0x00552420);  // "C"
-inline const char* s_L_005560e8 = reinterpret_cast<const char*>(0x005560E8);  // "L"
 extern char s_P_005569d8[2]; // "P"
-inline const char* s_I_0055801c = reinterpret_cast<const char*>(0x0055801C);  // "I"
 extern char s_W_0055992c[2]; // "W"
-inline const char* s_R_0055824c = reinterpret_cast<const char*>(0x0055824C);  // "R"
 extern char s_r_00556db0[2]; // "r"
 extern char s_Q_005598f0[2]; // "Q"
-inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
+extern const char s_F_005598f4[2]; // "F"
 extern char s_T_005598f8[2]; // "T"
-inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
 extern const char s_combat_lbx_005599c8[11]; // "combat.LBX"
 extern const char s_warning_lbx_00557650[12]; // "warning.lbx"
 
 extern char s_You_exceeded_the_max_number_of_f_0055b080[44];
 
-inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
 extern char s_X_005569d0[2]; // "X"
 extern char s_comma_005569c8[2]; // ","
-inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
-inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
 extern char s_N_0055765c[2]; // "N"
 extern char s_Y_00557660[2]; // "Y"
 extern char s_confirm_lbx_00557664[12]; // "confirm.lbx"
-inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // "A"
 extern char s_dot_d_0055a528[4]; // ".%d"
 inline char*& PTR_s_GAME_LBX_0055ac4c =
     *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
@@ -314,39 +297,27 @@ extern char s__3s__2d____4d__2d__2d_0055ac64[23]; // "%3s %2d, %-4d  %2d:%2d"
 extern char s_fmt_d_s_s_00557e0c[11]; /* "%d %s (%s)" */
 extern char s_fmt_s_d_EP_00557e18[11]; /* "%s (%d EP)" */
 
-inline char* s_Too_many_ships_in_list_00557de8 =
-    reinterpret_cast<char*>(std::uintptr_t{0x00557DE8}); /* "Too many ships in list" */
+extern char s_Too_many_ships_in_list_00557de8[23]; /* "Too many ships in list" */
 
 extern char s_i_PR_00557d84[6]; // "%i PR"
 extern char s_i_FP_00557d8c[6]; // "%i FP"
 extern char s_i_RP_00557d94[6]; // "%i RP"
-inline const char* s_jimtext_lbx_00552360 = reinterpret_cast<const char*>(0x00552360);
-inline char* s_jimtext2_lbx_00552340 = reinterpret_cast<char*>(std::uintptr_t{0x00552340});
-inline const char* s_jimtext2_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552340}); // "jimtext2.lbx"
 extern const char s_s_sez__s_00552334[11]; // "%s sez: %s"
-inline const char* s_percent_s_0055236c = reinterpret_cast<const char*>(0x0055236C);
-inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
 extern const char s_PR_00557d9c[4];
 extern const char s_FP_00557da0[4];
-inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
+extern const char s_RP_00557da4[4];
 
 struct s_fleet_movement_icon;
 
 struct IDirectSound;
 struct s_smack_video;
 
-inline const char* s___s__String___d_Too_Long__check_t_0055A740 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055A740}); // "(%s) String #%d Too Long, check terminator (strlen: %i)"
-inline const char* s_HISTRNGS_LBX_0055A778 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055A778}); // "HISTRNGS.LBX"
-inline const char* s_HSSTRNGS_LBX_0055A788 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055A788}); // "HSSTRNGS.LBX"
-inline const char* s_HFSTRNGS_LBX_0055A798 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055A798}); // "HFSTRNGS.LBX"
-inline const char* s_HGSTRNGS_LBX_0055A7A8 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055A7A8}); // "HGSTRNGS.LBX"
-inline const char* s_HESTRNGS_LBX_0055A7B8 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055A7B8}); // "HESTRNGS.LBX"
+extern const char s___s__String___d_Too_Long__check_t_0055A740[56]; // "(%s) String #%d Too Long, check terminator (strlen: %i)"
+extern const char s_HISTRNGS_LBX_0055A778[16]; // "HISTRNGS.LBX"
+extern const char s_HSSTRNGS_LBX_0055A788[16]; // "HSSTRNGS.LBX"
+extern const char s_HFSTRNGS_LBX_0055A798[16]; // "HFSTRNGS.LBX"
+extern const char s_HGSTRNGS_LBX_0055A7A8[16]; // "HGSTRNGS.LBX"
+extern const char s_HESTRNGS_LBX_0055A7B8[16]; // "HESTRNGS.LBX"
 
 inline void __stdcall SmackSoundUseDirectSound(IDirectSound* direct_sound) {
     using Fn = void(__stdcall*)(IDirectSound*);
@@ -360,6 +331,4 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
     return fn(path, flags, priority);
 }
 
-inline const char* k_backslash = reinterpret_cast<const char*>(std::uintptr_t{0x00557BE4}); // "\\"
-
-inline const char* const s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005510F0 });
+extern const char k_backslash[2]; // "\\"

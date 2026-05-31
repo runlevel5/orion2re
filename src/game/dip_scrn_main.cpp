@@ -450,7 +450,7 @@ namespace DIP_SCRN {
     void __cdecl Diplomacy_Mouse_Init_(int16_t param_1) {
         _diplomacy_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x395);
         s_animation_header* diplomat_anim = (s_animation_header*)
-            farload::Far_Reload_Next_(s_DIPLOMAT_LBX_00552350, (int)MOX::_player[param_1].race, MOX::_screen_seg);
+            farload::Far_Reload_Next_(s_DIPLOMAT_LBX, (int)MOX::_player[param_1].race, MOX::_screen_seg);
 
         bitmap::Clear_Mouse_Image_(0);
         bitmap::Create_Blank_Bitmap_(30, 30, _diplomacy_mouse_bitmap);
@@ -770,7 +770,7 @@ namespace DIP_SCRN {
         selectable[2] = 1;
 
         int16_t msg_idx = (random::Random_(2) == 1) ? 0x4A : 0x4B;
-        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, msg_idx, text_buffer, 40);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, msg_idx, text_buffer, 40);
 
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
@@ -945,9 +945,9 @@ namespace DIP_SCRN {
             }
         }
 
-        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x2E, _diplomacy_list_choice[choice_count], 0x28);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, 0x2E, _diplomacy_list_choice[choice_count], 0x28);
 
-        JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 8, title_text, 0x28);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext2_lbx_00552340, 8, title_text, 0x28);
 
         int16_t selection = fields::Get_List_Field_(
             10, 0x76, 0xF5, title_text, _diplomacy_list_choice[0], 0x32,
@@ -1628,7 +1628,7 @@ namespace DIP_SCRN {
         MOX::_FULL_DRAW_SCREEN_FLAG = 0;
 
         int anim_index = (static_cast<uint8_t>(MOX::_player[_current_ambassador].race) * 2) + 13;
-        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX_00552350, anim_index);
+        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX, anim_index);
 
         video::Set_Page_Off_();
 
@@ -1762,7 +1762,7 @@ namespace DIP_SCRN {
                 for (int16_t i = 0; i < items_to_process; i++) {
                     int16_t target_idx = i + has_prev;
                     char* tech_name = TECH::Technology_Applications_Name_((uint8_t)tech_ids[start_idx + i], tech_app_player);
-                    sprintf(_diplomacy_list_choice[target_idx], s_percent_s_0055236c, tech_name);
+                    sprintf(_diplomacy_list_choice[target_idx], GLOBALS::s_spaces_percent_s_0055236c, tech_name);
                     item_values[target_idx] = (uint8_t)tech_ids[start_idx + i];
                 }
             }

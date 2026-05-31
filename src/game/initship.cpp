@@ -753,7 +753,7 @@ namespace INITSHIP {
     void __cdecl Load_Outpost_Ship_Design_(int16_t player_idx, s_ship_design* design) {
         struct_::Clear_Structure_(design, 99);
 
-        strcpy(design->name, s_Outpost_Ship_00558f48 + MOX::_settings.language * 16);
+        strcpy(design->name, MOX::_ship_type_names[SHIP_TYPE_OUTPOST][(uint8_t)MOX::_settings.language]);
 
         design->size = 0;
         design->ship_type = 4;

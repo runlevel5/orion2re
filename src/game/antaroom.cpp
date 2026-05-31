@@ -1,12 +1,12 @@
 #include "pch.h"
 
 namespace ANTAROOM {
-    s_colors _antaran_room_normal_colors;
+    s_colors _antaran_room_normal_colors = {{250, 254, 255, 251, 252, 253, 254, 255}};
     char* _antaran_room_message;
     uint8_t* _antaran_room_mouse_bitmap;
     char const s_antaroom_LBX_00556098[13] = "antaroom.LBX";
     char const s_antarmsg_LBX_005560a8[13] = "antarmsg.LBX";
-    s_mouse_list _antaran_room_blank_mouse[1];
+    s_mouse_list _antaran_room_blank_mouse[1] = {{0, 0, 0, 0, 639, 479}};
 
     /**
      * @address 0042aa80

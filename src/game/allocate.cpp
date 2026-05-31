@@ -3,7 +3,7 @@
 namespace allocate {
     int32_t _mark_stack_pos[2];
 
-    s_mark_stack_entry _mark_stack[40];
+    s_mark_stack_entry _mark_stack[39];
 
     const char s_Mark_Block_Stack_Size_Exceeded_0055b6dc[] = "Mark Block Stack Size Exceeded";
 

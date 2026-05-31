@@ -218,8 +218,8 @@ namespace HACCESS {
     void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
-        buffer[0] = s__005510f0[0];
-        buffer[1] = s__005510f0[1];
+        buffer[0] = s_space_005510f0[0];
+        buffer[1] = s_space_005510f0[1];
 
         int8_t star_idx = MOX::_planet[planet_idx].star_index;
         int8_t planet_num = HAROLD::Planet_Number_(planet_idx);
@@ -315,7 +315,7 @@ namespace HACCESS {
 
     char* __cdecl Design_Name_(int16_t player_idx, int16_t design) {
         // Redundant operation from original code
-        *(uint16_t*)MOX::_temp_string = *reinterpret_cast<const uint16_t*>(s__005510f0);
+        *(uint16_t*)MOX::_temp_string = *reinterpret_cast<const uint16_t*>(s_space_005510f0);
 
         strcpy(MOX::_temp_string, MOX::_player[player_idx].ship_designs[design].name);
 

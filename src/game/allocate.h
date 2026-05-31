@@ -29,7 +29,7 @@ namespace allocate {
 
     extern int32_t _mark_stack_pos[2];
 
-    extern s_mark_stack_entry _mark_stack[40];
+    extern s_mark_stack_entry _mark_stack[39];
 
     extern const char s_Mark_Block_Stack_Size_Exceeded_0055b6dc[];
 

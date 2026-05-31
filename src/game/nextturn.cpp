@@ -28,7 +28,7 @@ void Do_Autosave_() {
 
     if (MOX::_settings.auto_saves != 0) {
         if ((static_cast<int32_t>(MOX::_stardate) % interval) == 0) {
-            strcpy(MOX::_save_game_description[9].description, s_Auto_Save_00556938);
+            strcpy(MOX::_save_game_description[9].description, FILEDEF::s_Auto_Save_00556938);
             FILEDEF::Save_Game_(9);
         }
     }

@@ -714,10 +714,10 @@ namespace council {
     }
 
     void __cdecl Load_Council_Text_Messages_() {
-        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 11, _council_no_votes_message, 30);
-        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 12, _council_vote_message, 30);
-        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 13, _council_votes_message, 30);
-        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 14, _council_votes_total_message, 30);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, 11, _council_no_votes_message, 30);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, 12, _council_vote_message, 30);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, 13, _council_votes_message, 30);
+        JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, 14, _council_votes_total_message, 30);
     }
 
     bool __cdecl Vote_Check_(int16_t candidate_idx, int16_t voter_idx, int16_t opponent_idx) {

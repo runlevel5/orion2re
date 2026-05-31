@@ -351,7 +351,6 @@ namespace MOX {
     int16_t _net_flag;
     int16_t _in_nebula_flag;
     int16_t _skan_flag;
-    int16_t _fleet_target;
     uint8_t _draw_design_screen_to_back;
     uint8_t _refit_ship;
     int _original_cost;

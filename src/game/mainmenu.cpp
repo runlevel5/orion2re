@@ -67,7 +67,7 @@ namespace MAINMENU {
         button_fields[4] = fields::Add_Hidden_Field_(50, 60, 65, 75, s_H_005569D4, ')');
         button_fields[5] = fields::Add_Hidden_Field_(60, 70, 75, 85, s_Q_005598F0, ')');
 
-        int16_t hotkey_field = fields::Add_Hot_Key_(s__005510f0);
+        int16_t hotkey_field = fields::Add_Hot_Key_(s_empty_00551120);
         int16_t fullscreen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty_00551120, ')');
 
         fields::Assign_Auto_Function_(file_ani::thunk_Draw_File_Animation_, 1);

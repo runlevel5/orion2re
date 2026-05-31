@@ -978,7 +978,7 @@ namespace TECH {
     void __cdecl Do_Get_Planet_Name_(short planet_idx, char* out_str, char param_3) {
         char buffer[200];
 
-        strcpy(buffer, s__005510f0);
+        strcpy(buffer, s_space_005510f0);
 
         char star_idx = MOX::_planet[planet_idx].star_index;
         char planet_num = HAROLD::Planet_Number_(planet_idx);
@@ -1117,7 +1117,7 @@ namespace TECH {
         uint8_t hyper_tech = MOX::_player[param_2].hyper_advanced_tech[param_1 - 204];
 
         strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[param_1].name);
-        strcat(MOX::_temp_string_buf + 1, s__005510f0);
+        strcat(MOX::_temp_string_buf + 1, s_space_005510f0);
 
         if (hyper_tech > 0 && hyper_tech <= 20 /* 0x14 */) {
             strcat(MOX::_temp_string_buf + 1, MOX::_roman_literals[hyper_tech]);

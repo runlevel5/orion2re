@@ -1,6 +1,6 @@
 workflows:
   mass-header:
-    description: "Mass validate recovered header-backed variables against the pre-variables branch and live Ghidra data."
+    description: "Mass verify already-recovered header-backed variables against the pre-variables branch and live Ghidra data."
     need_input: False
     nodes:
       - name: init
@@ -27,9 +27,9 @@ workflows:
           Your only job is to claim exactly one header from `headers.md` before validation starts.
 
           REQUIRED STEPS
-          * Use `rg` to locate the first unprocessed line in `headers.md`.
-          * An unprocessed line starts with the literal text `\[ ]`.
-          * Read `headers.md` and lock exactly that one line by changing only its leading marker from `\[ ]` to `\[X]`.
+          * Read the file to get first unprocessed line in `headers.md`.
+          * An unprocessed line starts with the literal text `[ ]`.
+          * Read `headers.md` and lock exactly that one line by changing only its leading marker from `[ ]` to `[X]`.
           * Do not reorder lines.
           * Do not change any other checklist entries.
           * After applying the patch, output only the claimed header path, for example:
@@ -40,7 +40,6 @@ workflows:
           RULES
           * Use `rg`, never `grep`.
           * Use `apply_patch`, never shell-based file edits.
-          * Because `headers.md` escapes brackets for markdown, the on-disk marker is `\[ ]`, not `[ ]`.
           * If duplicate paths exist, claim only the first unprocessed matching line in file order.
         outcomes:
           - name: claimed
@@ -69,10 +68,12 @@ workflows:
         system: |
           You are a professional reverse engineer focused on validating previously recovered variables in legacy Win32 C and C++ headers with high binary fidelity.
 
+          In this project, the variables in the current source tree were already recovered out of the old inline absolute-address stubs and separated from the Ghidra binary project into real C++ declarations and definitions. Your job is not to recover them again. Your job is to verify that those already-recovered project variables are correct.
+
           You receive a claimed header path from the previous node, for example:
           `src/game/advciv.h`
 
-          Your job is to validate every restored variable in that header against:
+          Your job is to validate every already-recovered variable in that header against:
           * the current project files
           * the version of the same header from the `pre-variables` git branch, which still contains raw absolute-address stubs
           * the live Ghidra project, using the `grpc` skill whenever symbol, data, memory, namespace, or cross-reference evidence is needed
@@ -84,9 +85,10 @@ workflows:
           * Read the current header file.
           * Fetch the old header text with:
             `git show pre-variables:<header-path>`
-          * Use the old header version to enumerate every inline absolute-address-backed variable stub that was restored from that header.
+          * Use the old header version only to enumerate every inline absolute-address-backed variable stub that was previously recovered from that header.
+          * Treat the current project declaration and definition as the recovered candidate implementation being verified.
           * Read the corresponding current implementation file with the same basename when needed to validate recovered definitions and initializers.
-          * For each restored variable, trace the old raw address into Ghidra and validate the current declaration and definition.
+          * For each recovered variable, trace the old raw address into Ghidra and validate the current declaration and definition.
 
           FAIL CONDITIONS
           * If any restored variable is missing, has the wrong namespace, wrong storage kind, wrong scalar width, wrong signedness, wrong pointer depth, wrong array element type, wrong array length, wrong struct type, wrong initializer, wrong default value, or still depends on a raw absolute address, you must fail.
@@ -96,7 +98,9 @@ workflows:
 
           ALIAS RULES
           * Alias detection is mandatory and must be conservative.
+          * String literals and other immutable const string backing storage are allowed to be restored locally in the project even when multiple project-side declarations ultimately refer to the same binary string data.
           * Cross-module aliasing is allowed only for const string storage backed by immutable string data. Do not fail solely because identical const string data is referenced from multiple modules.
+          * Local aliasing is also allowed for string literals and immutable const string backing storage. Do not treat a recovered local project-side string literal or const string pointer as an alias failure when the shared binary storage is clearly read-only string data.
           * Do not extend that exception to mutable storage. Any non-const variable, writable character array, writable pointer target, or otherwise changeable storage that aliases another owner must still fail validation.
           * Do not treat default interior array-element labels, component labels, or similarly derived names inside one larger proven owning object as competing owners by themselves.
           * If one containing array or structure object owns the full proven storage span, treat interior element names or component names within that same object as part of the owner, not as alias conflicts.
@@ -111,7 +115,8 @@ workflows:
           * Do not waive alias failures automatically.
 
           VALIDATION RULES
-          * The old raw-address stub is the starting point, but Ghidra listing, raw bytes, xrefs, and project usage are the source of truth.
+          * The old raw-address stub is only the historical starting point for locating the binary storage. The recovered project variable is the thing being judged, and Ghidra listing, raw bytes, xrefs, disassembly, and project usage are the source of truth for that judgment.
+          * Do not treat the current project variable as if it were still a raw Ghidra stub or unresolved binary-side object. It has already been separated into project-side code and must be verified as recovered source.
           * Do not trust Ghidra data types blindly. Validate type, size, shape, and initializer from usage and memory evidence.
           * Never trust `currentProgram.getMemory().getBytes(addr, b)` when `b` is a Python `bytearray`; in this RPC/PyGhidra environment that Java-to-Python buffer path can yield false zero-filled results.
           * Always use helper readers such as `bytes_at`, `u8`, and `u16` when reading variable values or initializer bytes during validation; use `u32` when width requires it.
@@ -141,6 +146,7 @@ workflows:
           * If validation passes, briefly summarize the result and end with the success outcome.
           * If validation fails, list only the failures and blockers concisely and end with the fail outcome.
           * For each failed variable, include the variable name, the old raw address, and the concrete reason it failed.
+          * Evaluate whether the recovered project-side variable is correct. Do not frame the task as recovering or introducing a new variable unless the current recovered one is proven wrong.
           * Show failures directly to the user. Do not edit project source files during validation.
         outcomes:
           - name: success

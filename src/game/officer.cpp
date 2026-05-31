@@ -3093,7 +3093,7 @@ namespace OFFICER {
             strcpy(MOX::_temp_string, MOX::_star_officer_level_names[level]);
         }
 
-        strcat(MOX::_temp_string, s__005510f0);
+        strcat(MOX::_temp_string, s_space_005510f0);
         strcat(MOX::_temp_string, MOX::_leaders[leader_idx].name);
 
         if (include_title == '\0') {

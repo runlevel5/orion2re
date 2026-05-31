@@ -4549,7 +4549,7 @@
 [.] 0054BE00 - terminate
 [.] 0054BE75 - _abort
 [.] 0054BE80 - _inconsistency
-[ ] 0054BEED - terminate
+[X] 0054BEED - terminate
 [.] 0054BF00 - _ValidateRead
 [.] 0054BF20 - _ValidateWrite
 [.] 0054BF40 - _ValidateExecute

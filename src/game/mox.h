@@ -227,7 +227,6 @@ namespace MOX {
     extern int16_t _net_flag;
     extern int16_t _in_nebula_flag;
     extern int16_t _skan_flag;
-    extern int16_t _fleet_target;
     extern uint8_t _draw_design_screen_to_back;
     extern uint8_t _refit_ship;
     extern int _original_cost;

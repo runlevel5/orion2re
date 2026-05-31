@@ -883,7 +883,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     *current_y = start_y;
 
     s_animation_header* top_frame =
-            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x34, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
     animate::Draw_(left_x, *current_y, top_frame);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(top_frame));
 
@@ -902,7 +902,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     video::Clip_On_();
 
     MOX::_fleet_box_grid_sm_seg4 =
-            buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x36, MOX::_global_cache_seg);
+            buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x36, MOX::_global_cache_seg);
     animate::Draw_(left_x, *current_y, (s_animation_header*)MOX::_fleet_box_grid_sm_seg4);
 
     MISC::Restore_Window_Status_(saved_window_status);
@@ -910,7 +910,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     *current_y = static_cast<int16_t>(*current_y + grid_height);
 
     s_animation_header* bottom_frame =
-            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x38, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
     animate::Draw_(left_x, *current_y, bottom_frame);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(bottom_frame));
 }
@@ -1325,21 +1325,21 @@ void __cdecl Buffer_Reload_Fleetpop_Frame_() {
     s_animation_header* seg;
 
     if (MOX::_fleet_box.is_small_frame == 0) {
-        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x37, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
         MOX::_fleet_box_bottom_lg_seg = seg;
         MOX::_fleet_box.bottom_seg = seg;
 
-        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x33, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
         MOX::_fleet_box_name_lg_seg = seg;
         MOX::_fleet_box.name_seg = seg;
         return;
     }
 
-    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x38, MOX::_global_cache_seg);
+    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
     MOX::_fleet_box_bottom_sm_seg = seg;
     MOX::_fleet_box.bottom_seg = seg;
 
-    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x34, MOX::_global_cache_seg);
+    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
     MOX::_fleet_box_name_sm_seg = seg;
     MOX::_fleet_box.name_seg = seg;
 }

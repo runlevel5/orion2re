@@ -104,9 +104,11 @@ workflows:
           * If variable is static and has a default zero value, do not set it to `0` - it will be handled by C++ compiler.
           * Do not invent non-zero initializers unless supported by binary data or verified init code.
           * Before restoring any variable, verify that the target address represents a singular project variable and not an alias of another object.
+          * String literals and other immutable const string backing storage are allowed to be restored locally in the project even when multiple project-side declarations ultimately refer to the same binary string data.
           * Treat overlapping symbols, direct references to structure fields, array elements, or a differently named Ghidra variable at the same address as alias candidates.
           * Conflict resolution for same-address candidates:
             - for const strings, resolve locally from the C++ project when the backing storage and usage clearly identify a string object
+            - local aliasing is allowed for string literals and immutable const string backing storage; do not treat a recovered local project-side string literal or const string pointer as an alias failure when the shared binary storage is clearly read-only string data
             - for all other same-address variable conflicts, the Ghidra namespace is the source of truth for which named variable owns that storage
             - if the address falls inside a larger proven array or structure, the array or structure always takes precedence over a scalar or pointer interpretation at that interior address
           * Check whether the address resolves in Ghidra to a different named variable, a component inside a larger structure, or another already-defined storage object.

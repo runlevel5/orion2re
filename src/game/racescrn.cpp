@@ -843,7 +843,7 @@ namespace RACESCRN {
 
             Setup_Race_Display_Fields_(race_display_data, display_base);
 
-            who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+            who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, strings::s__00551100, 0);
 
             fields::Assign_Auto_Function_(Draw_Race_Screen_, 2);
             RUSS::Mox_Update_();
@@ -955,7 +955,7 @@ namespace RACESCRN {
                                             while (true) {
                                                 timer::Mark_Time_();
                                                 fields::Clear_Fields_();
-                                                fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+                                                fields::Add_Hidden_Field_(0, 0, 639, 479, strings::s__00551100, 0);
                                                 if (fields::Get_Input_() != 0) {
                                                     net_cancel_requested = 1;
                                                 }
@@ -997,7 +997,7 @@ namespace RACESCRN {
                                             while (true) {
                                                 timer::Mark_Time_();
                                                 fields::Clear_Fields_();
-                                                fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+                                                fields::Add_Hidden_Field_(0, 0, 639, 479, strings::s__00551100, 0);
                                                 if (fields::Get_Input_() != 0) {
                                                     if (NETMOX::Allowed_To_Cancel_Human_Diplomacy_() != 0) {
                                                         net_cancel_requested = 1;
@@ -1093,7 +1093,7 @@ namespace RACESCRN {
                         state_ignoring = 0;
                         state_war = 0;
                         Setup_Race_Display_Fields_(race_display_data, display_base);
-                        who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+                        who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, strings::s__00551100, 0);
                         _g_in_who_mode = 0;
                     } else {
                         if (input == btn_ignoring) {
@@ -1114,7 +1114,7 @@ namespace RACESCRN {
                         video::Copy_Off_To_Back_();
 
                         Setup_Race_Who_Fields_(race_display_data, display_base);
-                        who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+                        who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, strings::s__00551100, 0);
                         COLONY::Picture_To_Mouse_(mouse_pic);
                         _g_in_who_mode = 1;
                     }

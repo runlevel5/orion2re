@@ -1848,7 +1848,7 @@ namespace DIP_SCRN {
                         case 1008: {
                             _response_message = _old_response_message;
                             char* tech_name = TECH::Technology_Applications_Name_(_net_diplomacy_message.arg1, _talker_ambassador);
-                            sprintf(msg_buf, s_percent_s_0055236c, tech_name);
+                            sprintf(msg_buf, GLOBALS::s_spaces_percent_s_0055236c, tech_name);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
                             int16_t list_choice = Diplomacy_Generic_List_(1, msg_buf, 1, title_buf);
                             if (list_choice == -1) {
