@@ -62,8 +62,6 @@ namespace MULTPLAY {
     inline const char* const s_MULTIGM_LBX = s_MULTIGM_LBX_00558d04;
     inline const char* const lbx_filename = s_MULTIGM_LBX_00558d04;
 
-    extern const char* PTR_00558D3C;
-
     extern const char s_Moo_II_0055aa88[8];
 
     extern s_palette_entry _green_pal_colors[16];

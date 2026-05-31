@@ -1,10 +1,6 @@
 #include "pch.h"
 
 namespace MOVEBOX {
-    s_movable_box _moveable_box[5];
-    s_fleet_box _fleet_box;
-    const char s__00551100[1] = "";
-
     void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* anim2,
                                     int16_t x_base, int16_t y_base,
                                     int16_t width, int16_t height,
@@ -507,7 +503,7 @@ namespace MOVEBOX {
                             star_y,
                             static_cast<int16_t>(star_x + 5),
                             static_cast<int16_t>(star_y + 5),
-                            MOVEBOX::s__00551100,
+                            MOX::s__00551100,
                             0x29);
                 } else {
                     field_id = fields::Add_Hidden_Field_(
@@ -515,7 +511,7 @@ namespace MOVEBOX {
                             static_cast<int16_t>(star_y - 3),
                             static_cast<int16_t>(star_x + 8),
                             static_cast<int16_t>(star_y + 9),
-                            MOVEBOX::s__00551100,
+                            MOX::s__00551100,
                             0x29);
                 }
 
@@ -592,11 +588,11 @@ namespace MOVEBOX {
             if (MOX::_saved_boxes[box_index].field_id != -1000) {
                 const int8_t was_open = MOX::_saved_boxes[box_index].is_open;
 
-                MOVEBOX::_moveable_box[box_index].id = MOX::_saved_boxes[box_index].field_id;
+                MOX::_moveable_box[box_index].id = MOX::_saved_boxes[box_index].field_id;
 
                 if (was_open != 0) {
                     if (box_index == 0) {
-                        SYS::Init_System_Display_(MOVEBOX::_moveable_box[0].id);
+                        SYS::Init_System_Display_(MOX::_moveable_box[0].id);
                     } else if (box_index == 2) {
                         if (HACCESS::Get_Stack_Start_From_Saved_Ship_Array_() == 0) {
                             MOVEBOX::Vanish_Fleet_Movement_Box_();
@@ -668,17 +664,17 @@ namespace MOVEBOX {
     }
 
     uint16_t __cdecl Box_Field_Selected_(int16_t box_index, int16_t field_id) {
-        if ((_moveable_box[box_index].drag_field == field_id) ||
-            (_moveable_box[box_index].window_field_id == field_id)) {
+        if ((MOX::_moveable_box[box_index].drag_field == field_id) ||
+            (MOX::_moveable_box[box_index].window_field_id == field_id)) {
             return 1;
         }
 
-        if ((_moveable_box[1].index == box_index) &&
+        if ((MOX::_moveable_box[1].index == box_index) &&
             (field_id == MOX::_galaxy_map_grid_field)) {
             return 1;
         }
 
-        if ((_moveable_box[2].index == box_index) &&
+        if ((MOX::_moveable_box[2].index == box_index) &&
             ((field_id == MOX::_fleet_movement_bar_field) ||
              (field_id == MOX::_fleet_movement_all_button))) {
             return 1;
@@ -712,7 +708,7 @@ namespace MOVEBOX {
                 MOX::_fleet_box.colonize_btn_active = 2;
             }
         } else {
-            s_movable_box& movable_box = MOVEBOX::_moveable_box[moveable_box_idx];
+            s_movable_box& movable_box = MOX::_moveable_box[moveable_box_idx];
 
             if (MOVEBOX::Moveable_Box_Selected_(moveable_box_idx) != 0) {
                 box_width = movable_box.width;
@@ -724,7 +720,7 @@ namespace MOVEBOX {
         }
 
         if (mouse_button_state != 0) {
-            s_movable_box& movable_box = MOVEBOX::_moveable_box[moveable_box_idx];
+            s_movable_box& movable_box = MOX::_moveable_box[moveable_box_idx];
 
             if (fields::Auto_Input_() == movable_box.drag_field || movable_box.active == 1) {
                 fields::Deactivate_Help_List_();
@@ -787,7 +783,7 @@ namespace MOVEBOX {
         MOX::_skip_fields = 1;
 
         {
-            s_movable_box& movable_box = MOVEBOX::_moveable_box[moveable_box_idx];
+            s_movable_box& movable_box = MOX::_moveable_box[moveable_box_idx];
 
             if (movable_box.active == 1) {
                 movable_box.x = static_cast<int16_t>(
@@ -830,8 +826,8 @@ namespace MOVEBOX {
         MOVEBOX::Move_Box_To_Top_(moveable_box_idx);
 
         if (moveable_box_idx == 2) {
-            MOX::_fleet_box.x = MOVEBOX::_moveable_box[2].x;
-            MOX::_fleet_box.y = MOVEBOX::_moveable_box[2].y;
+            MOX::_fleet_box.x = MOX::_moveable_box[2].x;
+            MOX::_fleet_box.y = MOX::_moveable_box[2].y;
         }
 
         MOX::_draw_main_screen_to_back = 1;
@@ -844,17 +840,17 @@ namespace MOVEBOX {
         int16_t* top,
         int16_t* right,
         int16_t* bottom) {
-        *left = MOVEBOX::_moveable_box[box_index].x;
-        *top = MOVEBOX::_moveable_box[box_index].y;
+        *left = MOX::_moveable_box[box_index].x;
+        *top = MOX::_moveable_box[box_index].y;
 
         if (box_index == 2) {
-            *right = *left + MOVEBOX::_fleet_box.width;
-            *bottom = *top + MOVEBOX::_fleet_box.field8_0xe;
+            *right = *left + MOX::_fleet_box.width;
+            *bottom = *top + MOX::_fleet_box.field8_0xe;
             return;
         }
 
-        *right = MOVEBOX::_moveable_box[box_index].width + *left;
-        *bottom = MOVEBOX::_moveable_box[box_index].height + *top;
+        *right = MOX::_moveable_box[box_index].width + *left;
+        *bottom = MOX::_moveable_box[box_index].height + *top;
     }
 
     void __cdecl Add_Whole_Window_Field_(int16_t moveable_box_index) {
@@ -864,7 +860,7 @@ namespace MOVEBOX {
         int16_t x;
 
         Moveable_Box_Dimensions_(moveable_box_index, &x, &y, &width, &height);
-        _moveable_box[moveable_box_index].window_field_id =
-            fields::Add_Hidden_Field_(x, y, width, height, s__00551100, 0);
+        MOX::_moveable_box[moveable_box_index].window_field_id =
+            fields::Add_Hidden_Field_(x, y, width, height, MOX::s__00551100, 0);
     }
 }

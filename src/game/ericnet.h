@@ -3,7 +3,7 @@
 
 namespace ERICNET {
     extern int8_t _start_civ_level[3];
-    extern int16_t _buildlist[43];
+    extern int16_t _buildlist[44];
 
     void __cdecl Add_Building_(int16_t colony_idx, int16_t building_idx);
 

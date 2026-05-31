@@ -22,7 +22,7 @@ namespace DESIGN {
     const char s_pct_s_bracket_pct_d[8] = "%s (%d)";
     const char s_special_tag[8] = "special";
     const char s__00551100[1] = "";
-    const char s__00551120[2] = {'\x1B', '\0'};
+    const char s__00551120[2] = "\x1B";
     const char s_B_005560e4[2] = "B";
     const char s_L_005560e8[2] = "L";
     const char s_360_00556164[4] = "360";

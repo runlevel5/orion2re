@@ -1,1 +1,37 @@
 #pragma once
+
+static_assert(sizeof(s_current_design) == 0x125, "s_current_design size mismatch");
+static_assert(sizeof(s_main_menu) == 0xd2, "s_main_menu size mismatch");
+static_assert(sizeof(s_event_data) == 9, "s_event_data size mismatch");
+static_assert(sizeof(s_movable_box) == 0x1c, "s_movable_box size mismatch");
+static_assert(sizeof(s_game_popup_fields) == 0x278, "s_game_popup_fields size mismatch");
+static_assert(sizeof(s_game_anims) == 0x65, "s_game_anims size mismatch");
+static_assert(sizeof(s_nebula) == 0x5, "s_nebula size mismatch");
+static_assert(sizeof(s_settings) == 0x229, "s_settings size mismatch");
+static_assert(sizeof(s_player) == 0xea9, "s_player size mismatch");
+static_assert(sizeof(s_planet_data) == 0x11, "s_planet_data size mismatch");
+static_assert(sizeof(s_colony) == 0x169, "s_colony size mismatch");
+static_assert(sizeof(s_tech_building_data) == 0x13, "s_tech_building_data size mismatch");
+static_assert(sizeof(s_star_data) == 0x71, "s_star_data size mismatch");
+static_assert(sizeof(s_ship_data) == 0x81, "s_ship_data size mismatch");
+static_assert(sizeof(s_leader_data) == 0x3b, "s_leader_data size mismatch");
+static_assert(sizeof(s_ship_icon) == 12, "s_ship_icon size mismatch");
+static_assert(sizeof(s_ship_node) == 5, "s_ship_node size mismatch");
+static_assert(sizeof(s_skill_data) == 0x12, "s_skill_data size mismatch");
+static_assert(sizeof(s_tech_fuel_data) == 10, "s_tech_fuel_data size mismatch");
+static_assert(sizeof(s_tech_app_data) == 13, "s_tech_app_data size mismatch");
+static_assert(sizeof(s_tech_field_data) == 0x17, "s_tech_field_data size mismatch");
+static_assert(sizeof(s_tech_drive_data) == 0x2e, "s_tech_drive_data size mismatch");
+static_assert(sizeof(s_tech_armor_data) == 15, "s_tech_armor_data size mismatch");
+static_assert(sizeof(s_tech_hull_data) == 36, "s_tech_hull_data size mismatch");
+static_assert(sizeof(s_tech_computer_data) == 22, "s_tech_computer_data size mismatch");
+static_assert(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data size mismatch");
+static_assert(sizeof(s_font) == 0x235c, "s_font size mismatch");
+static_assert(sizeof(s_MSG) == 0x12, "s_MSG size mismatch");
+static_assert(sizeof(s_palette_entry) == 4, "s_palette_entry size mismatch");
+static_assert(sizeof(s_field) == 0x37, "s_field size mismatch");
+static_assert(sizeof(s_mp_screen) == 0x1eb, "s_mp_screen size mismatch");
+static_assert(sizeof(s_network) == 0x20a, "s_network size mismatch");
+static_assert(sizeof(s_net_player_info) == 0xc, "s_net_player_info size mismatch");
+static_assert(sizeof(s_net_combat_message) == 0x10, "s_net_combat_message size mismatch");
+static_assert(sizeof(s_battle_results) == 0x6ce, "s_battle_results size mismatch");

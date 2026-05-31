@@ -3,10 +3,10 @@
 
 namespace ERICNET {
     int8_t _start_civ_level[3] = {3, 5, 9};
-    int16_t _buildlist[43] = {
+    int16_t _buildlist[44] = {
         41, 8, 40, 21, 22, 15, 7, 20, 37, 4, 31, 33, 34, 39, 2,
         12, 13, 32, 35, 10, 43, 16, 28, 25, 18, 19, 24, 26, 47, 27,
-        6, 5, 23, 36, 29, 30, 46, 14, 45, 3, 42, 38, 0,
+        6, 5, 23, 36, 29, 30, 46, 14, 45, 3, 42, 38, 0, 0,
     };
 
     void __cdecl Init_Homeworld_Colony2_(int16_t planet_idx, int16_t player_idx, uint8_t param_flag) {

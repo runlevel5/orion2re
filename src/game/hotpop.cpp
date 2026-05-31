@@ -30,11 +30,11 @@ namespace HOTPOP {
     }
 
     void __cdecl Reload_Hotseat_Screen_() {
-        _grid_background[0] = (s_animation_header*)farload::Far_Reload_(MULTPLAY::PTR_00558D3C, 0, MOX::_screen_seg);
-        _hot_pop_background_seg = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::PTR_00558D3C, 0x0B, MOX::_screen_seg);
-        _grid_background[1] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::PTR_00558D3C, 0x0C, MOX::_screen_seg);
-        _grid_background[2] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::PTR_00558D3C, 0x0D, MOX::_screen_seg);
-        _grid_background[3] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::PTR_00558D3C, 0x0E, MOX::_screen_seg);
+        _grid_background[0] = (s_animation_header*)farload::Far_Reload_(MULTPLAY::s_MULTIGM_LBX, 0, MOX::_screen_seg);
+        _hot_pop_background_seg = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::s_MULTIGM_LBX, 0x0B, MOX::_screen_seg);
+        _grid_background[1] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::s_MULTIGM_LBX, 0x0C, MOX::_screen_seg);
+        _grid_background[2] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::s_MULTIGM_LBX, 0x0D, MOX::_screen_seg);
+        _grid_background[3] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::s_MULTIGM_LBX, 0x0E, MOX::_screen_seg);
     }
 
     void __cdecl Init_Hotseat_Screen_(int16_t* btn_field_1, int16_t* btn_field_2, int16_t* btn_field_3) {

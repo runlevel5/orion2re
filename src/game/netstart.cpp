@@ -32,10 +32,7 @@ namespace NETSTART {
     char* _answering_failed_error;
     char* _windows_string;
 
-    char s__00551100[1] = "";
-    char s_myname_005597dc[12] = "myname";
-    const char s__s_00551130[8] = "%s";
-    const char s_Mar_26_1997_005578e0[12] = "Mar 26 1997";
+    char s_myname_005597dc[7] = "myname";
 
     int8_t __cdecl Net_Select_Race_() {
         uint8_t fade_flag;

@@ -27,7 +27,8 @@ namespace netcode {
             time_::_time = time_::time_;
             time_::_time2 = time_::time_;
 
-            result = WINNET::Init_Connection_(1);
+            // TCP - original wants IPX
+            result = WINNET::Init_Connection_(2);
             WINNET::Refresh_Game_List_(guid);
 
             _recv_fn = recv_fn_ptr;

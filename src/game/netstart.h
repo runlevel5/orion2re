@@ -15,10 +15,7 @@ namespace NETSTART {
     extern char* _answering_failed_error;
     extern char* _windows_string;
 
-    extern char s__00551100[1];
-    extern char s_myname_005597dc[12];
-    extern const char s__s_00551130[8];
-    extern const char s_Mar_26_1997_005578e0[12];
+    extern char s_myname_005597dc[7];
 
     int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, char* str1, char* str2);
 

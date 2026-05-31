@@ -3,10 +3,7 @@
 #include <cstdint>
 
 namespace npcdiplo {
-    struct s_npcdiplo_tech {
-        int32_t value;
-        uint8_t index;
-    };
+    static_assert(sizeof(s_npcdiplo_tech) == 5, "s_npcdiplo_tech size mismatch");
 
     extern s_npcdiplo_tech _human_tech[212];
 

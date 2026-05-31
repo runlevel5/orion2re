@@ -10,7 +10,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH:
         hooks::Install_Hooks();
-        hooks::Assert_Types();
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:

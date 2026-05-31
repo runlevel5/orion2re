@@ -5,11 +5,10 @@ namespace MAPGEN {
     uint8_t _n_wormholes;
     uint8_t _make_food_planet;
     uint8_t _n_space_monsters;
-    uint16_t _companion_star_flag;
-    const char _companion_star[2] = ".";
+    uint16_t _companion_star;
     uint8_t _n_maps_generated;
     uint16_t _tests_failed[4];
-    int8_t* __evan_ptr;
+    int8_t* _evan_ptr;
     uint32_t _num_maps_to_generate;
     void* _name_seg;
     uint16_t* _name_index;
@@ -288,7 +287,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
                 // If the roll is specific and it's the inner-most orbit, try to spawn a binary companion
                 if (roll == 1 && chance < 11 && orbit == 0) {
-                    MAPGEN::_companion_star_flag = 1;
+                    MAPGEN::_companion_star = 1;
                     int8_t spectral = MOX::_star[star_idx].spectral_class;
 
                     if (spectral == 0) {
@@ -393,7 +392,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         int16_t star_index = (int16_t)planet.star_index;
         int16_t spectral_class = (int16_t)MOX::_star[star_index].spectral_class;
 
-        if (_companion_star_flag == 1) {
+        if (_companion_star == 1) {
             orbit -= 2;
             if (orbit < 0) {
                 return 0;
@@ -1276,7 +1275,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         RUSS::Mox_Update_();
 
         while (true) {
-            __evan_ptr = MOX::_climate_modifier_table;
+            _evan_ptr = MOX::_climate_modifier_table;
             _make_food_planet = 0;
             _num_maps_to_generate = 1;
             ++_n_maps_generated;
@@ -1286,7 +1285,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
             MOX::_star_width = 37;
             MOX::_star_height = 37;
-            _companion_star_flag = 0;
+            _companion_star = 0;
             memset(MOX::_planet, 0, 0x17E8);
             RUSS::Mox_Update_();
 
@@ -1437,7 +1436,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     MOX::_star[_star_count].pict_type = (int8_t)(random::Random_(3) - 1);
                     memset(MOX::_star[_star_count].planet_index, 0xFF, sizeof(MOX::_star[_star_count].planet_index));
 
-                    _companion_star_flag = 0;
+                    _companion_star = 0;
                     if (HAROLD::Habitable_Spectral_Class_(_star_count)) {
                         int8_t n_sat = (int8_t)Generate_Number_Of_Satellites_(_star_count);
                         planets_per_star[_star_count] = n_sat;

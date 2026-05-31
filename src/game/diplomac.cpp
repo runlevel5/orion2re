@@ -13,15 +13,6 @@ namespace diplomac {
 
     uint8_t _diplomacy_proposal_tech_bribe1;
 
-    uint8_t _unprovoked_message_mapping[20] = {
-        0, 0, 0, 0, 0,
-        1, 1, 1, 1,
-        2, 2, 2,
-        3, 3, 3,
-        4, 4, 4,
-        5, 5,
-    };
-
     int16_t _starting_relations[196] = {
         0, 0, -24, 24, 0, 0, -12, 0, -24, 0, 12, 0, 24, 0,
         0, 0, -12, 24, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0,
@@ -1683,18 +1674,18 @@ namespace diplomac {
         for (int i = 0; i < 3; ++i) {
             int roll = random::Random_(20);
             if (roll > 0 && roll <= 20) {
-                uint8_t case_idx = _unprovoked_message_mapping[roll - 1];
-                switch (case_idx) {
-                    case 1: choice = 5; break;
-                    case 2: if (player.treaty[target_idx] == 0) choice = 2; break;
-                    case 3: if (player.relations[target_idx] >= 0 && player.trade_treaty[target_idx] == 0) choice = 1; break;
-                    case 4: if (player.relations[target_idx] >= 0 && player.research_treaty[target_idx] == 0) choice = 4; break;
-                    case 5: if (player.treaty[target_idx] == 1) choice = 3; break;
-                    case 6:
-                        if (player.treaty[target_idx] != 2 && random::Random_(3) == 1 && player.relations[target_idx] >= 0) {
-                            choice = 6;
-                        }
-                        break;
+                if (roll <= 5) {
+                    choice = 5;
+                } else if (roll <= 9) {
+                    if (player.treaty[target_idx] == 0) choice = 2;
+                } else if (roll <= 12) {
+                    if (player.relations[target_idx] >= 0 && player.trade_treaty[target_idx] == 0) choice = 1;
+                } else if (roll <= 15) {
+                    if (player.relations[target_idx] >= 0 && player.research_treaty[target_idx] == 0) choice = 4;
+                } else if (roll <= 18) {
+                    if (player.treaty[target_idx] == 1) choice = 3;
+                } else if (player.treaty[target_idx] != 2 && random::Random_(3) == 1 && player.relations[target_idx] >= 0) {
+                    choice = 6;
                 }
             }
         }

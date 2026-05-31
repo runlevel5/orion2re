@@ -54,6 +54,7 @@
 #include "initgame.h"
 #include "officer.h"
 #include "shipmove.h"
+#include "types.h"
 #include "harold.h"
 #include "sound.h"
 #include "ten.h"

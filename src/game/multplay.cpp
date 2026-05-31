@@ -10,8 +10,6 @@ namespace MULTPLAY {
 
     const char s_MULTIGM_LBX_00558d04[12] = "MULTIGM.LBX";
 
-    const char* PTR_00558D3C = s_MULTIGM_LBX_00558d04;
-
     const char s_Moo_II_0055aa88[8] = "Moo II ";
 
     s_palette_entry _green_pal_colors[16] = {
@@ -1704,7 +1702,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
             }
 
             if (icon_entry > 0) {
-                const char* lbx_ptr = MULTPLAY::PTR_00558D3C;
+                const char* lbx_ptr = MULTPLAY::s_MULTIGM_LBX;
                 s_animation_header* icon_anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_ptr, icon_entry, MOX::_global_cache_seg);
                 animate::Draw_(MOX::_mp_screen->screen_x + 0x17C, y_date, icon_anim);
             }

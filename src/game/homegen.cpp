@@ -409,7 +409,7 @@ namespace HOMEGEN {
         // concatenates companion star name if fill_msg is short, 
         // but fill_msg is completely overwritten later by H_Message.
         if (strlen(MAPGEN::_fill_msg) < 35) {
-            strcat(MAPGEN::_fill_msg, MAPGEN::_companion_star);
+            strcat(MAPGEN::_fill_msg, s_dot_0055632c);
         }
 
         video::Set_Page_Back_();

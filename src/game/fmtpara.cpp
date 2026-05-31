@@ -3,6 +3,7 @@
 namespace FMTPARA {
     extern const char _legal_functions[] = "FRTXYSHVPIMOC^=";
     extern const char _legal_fn_arg_chars[] = "1234567890+- ";
+    extern const uint8_t _legal_variable_types[6] = {1, 2, 3, 4, 5, 6};
     uint8_t _font_base_offsets[6] = {5, 7, 10, 11, 14, 19};
     int8_t _reset_parameters_lookup[16] = {1, 2, 4, 8, 12, 13, 16, 32, 29, 0, 0, 0, 0, 0, 0, 0};
     short _tabs[11];
@@ -55,8 +56,7 @@ namespace FMTPARA {
         "tenth",
     };
     extern const char _ordinal_fmt[] = "%s\a^2.%s\a^0.";
-    const char _insert_item_kind[] = "11110101121212120000";
-    const char* _tabs_3_plus_1 = _insert_item_kind - 'A';
+    static const char k_insert_item_kind[] = "11110101121212120000";
     uint32_t _user_fn_arg;
 
     /**
@@ -875,7 +875,7 @@ namespace FMTPARA {
         uint16_t arg_idx;
         bool has_arg = true;
 
-        if (_tabs_3_plus_1[c] != '0') {
+        if (k_insert_item_kind[c - 'A'] != '0') {
             has_arg = Get_Insert_Argument_Next_(&arg_idx);
         }
 

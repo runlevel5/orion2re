@@ -11,7 +11,7 @@ namespace DIP_SCRN {
     extern int16_t _response_message;
     extern uint16_t _synch_up_established_flag;
     extern int16_t _old_response_message;
-    extern int16_t _propose_treaty_help_entry[6];
+    extern int16_t _propose_treaty_help_entry[7];
     extern char* _main_diplomacy_title;
     extern char* _propose_treaty_title;
     extern uint8_t _talker_ambassador;
@@ -78,7 +78,7 @@ namespace DIP_SCRN {
 
     extern s_colors _diplomacy_special_colors;
 
-    extern int16_t _break_treaty_help_entry[6];
+    extern int16_t _break_treaty_help_entry[7];
 
     extern char* _break_treaty_title;
 
@@ -119,7 +119,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Demand_(int16_t player_num, int16_t ambassador_idx);
 
-    extern int16_t _demand_help_entry[10];
+    extern int16_t _demand_help_entry[11];
 
     void __cdecl Get_Human_Demand_Response_(int16_t player_id, int16_t target_player_id, int16_t demand_type, int16_t demand_arg, int16_t* out_choice);
 
@@ -172,9 +172,9 @@ namespace DIP_SCRN {
 
     void __cdecl Setup_Full_Screen_Diplomacy_Help_(int16_t help_id);
 
-    extern int16_t _main_repulsive_diplomacy_help_entry[4];
-    extern int16_t _main_net_repulsive_diplomacy_help_entry[5];
-    extern char* _main_repulsive_diplomacy_list[5];
+    extern int16_t _main_repulsive_diplomacy_help_entry[7];
+    extern int16_t _main_net_repulsive_diplomacy_help_entry[7];
+    extern char* _main_repulsive_diplomacy_list[7];
     extern char* _main_net_repulsive_diplomacy_list[6];
     extern s_dipscrn_net_message _net_diplomacy_message;
 
@@ -212,7 +212,7 @@ namespace DIP_SCRN {
 
     short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag);
 
-    extern int16_t _offer_help_entry[6];
+    extern int16_t _offer_help_entry[7];
     extern char* _offer_diplomacy_list[7];
     extern char* _offer_title;
 
@@ -232,7 +232,7 @@ namespace DIP_SCRN {
     extern char* _system_cancel_buffer;
     extern int16_t _diplomacy_system_homeworld_flag;
     extern s_animation_header* _diplomacy_system_star_background_seg;
-    extern int16_t _diplomacy_system_fields[73];
+    extern int16_t _diplomacy_system_fields[72];
     extern uint8_t* _diplomacy_mouse_bitmap;
     extern char* _system_homeworld_buffer;
     extern int16_t _diplomacy_good_music;

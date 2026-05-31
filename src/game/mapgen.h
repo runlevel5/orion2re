@@ -6,11 +6,10 @@ namespace MAPGEN {
     extern uint8_t _n_wormholes;
     extern uint8_t _make_food_planet;
     extern uint8_t _n_space_monsters;
-    extern uint16_t _companion_star_flag;
-    extern const char _companion_star[2];
+    extern uint16_t _companion_star;
     extern uint8_t _n_maps_generated;
     extern uint16_t _tests_failed[4];
-    extern int8_t* __evan_ptr;
+    extern int8_t* _evan_ptr;
     extern uint32_t _num_maps_to_generate;
     extern void* _name_seg;
     extern uint16_t* _name_index;

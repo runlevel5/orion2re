@@ -9,8 +9,6 @@ namespace diplomac {
 
     extern uint8_t _diplomacy_proposal_tech_bribe1;
 
-    extern uint8_t _unprovoked_message_mapping[20];
-
     extern int16_t _starting_relations[196];
 
     extern int16_t _personality_peace_duration[12];

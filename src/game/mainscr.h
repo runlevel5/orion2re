@@ -175,11 +175,11 @@ namespace MAINSCR {
     extern int16_t _hi_score_cheat;
     extern int16_t _last_field;
 
-    extern const char s_EINSTEIN_005597e8[];
-    extern const char s_MOOLA_005597f8[];
-    extern const char s_MENLO_00559800[];
-    extern const char s_ISEEALL_00559808[];
-    extern const char s_SCORE_00559820[];
+    extern const char _ALL_TECH_CHEAT[];
+    extern const char _MORE_MONEY_CHEAT[];
+    extern const char _GET_TECH_CHEAT[];
+    extern const char _OMNISCIENCE_CHEAT[];
+    extern const char _SCORE_CHEAT[];
     extern const char s_Current_score_for_s_is_d[];
     extern const char s_fmt_star_len_00559984[];
     extern const char s_ship_icon_idx_fmt[];
@@ -276,8 +276,6 @@ namespace MAINSCR {
     void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction);
 
     void __cdecl Center_Map_(int16_t x, int16_t y);
-
-    extern s_fleet_box _fleet_box;
 
     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx);
 

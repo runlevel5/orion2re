@@ -74,16 +74,14 @@ namespace MAINSCR {
     int16_t _hi_score_cheat = -1000;
     int16_t _last_field;
 
-    const char s_EINSTEIN_005597e8[] = "EINSTEIN";
-    const char s_MOOLA_005597f8[] = "MOOLA";
-    const char s_MENLO_00559800[] = "MENLO";
-    const char s_ISEEALL_00559808[] = "ISEEALL";
-    const char s_SCORE_00559820[] = "SCORE";
+    const char _ALL_TECH_CHEAT[] = "EINSTEIN";
+    const char _MORE_MONEY_CHEAT[] = "MOOLA";
+    const char _GET_TECH_CHEAT[] = "MENLO";
+    const char _OMNISCIENCE_CHEAT[] = "ISEEALL";
+    const char _SCORE_CHEAT[] = "SCORE";
     const char s_Current_score_for_s_is_d[] = "Current score for %s is %d";
     const char s_fmt_star_len_00559984[] = "%s, len = %d";
     const char s_ship_icon_idx_fmt[] = "ship icon %d";
-
-    s_fleet_box _fleet_box;
 
     bool __cdecl Is_Main_Screen_Palette_() {
         uint8_t screen = static_cast<uint8_t>(MOX::_previous_screen);
@@ -1347,11 +1345,11 @@ namespace MAINSCR {
     }
 
     void __cdecl Add_Cheats_() {
-        _all_tech_cheat = fields::Add_Multi_Hot_Key_Field_(s_EINSTEIN_005597e8);
-        _more_money_cheat = fields::Add_Multi_Hot_Key_Field_(s_MOOLA_005597f8);
-        _get_tech_cheat = fields::Add_Multi_Hot_Key_Field_(s_MENLO_00559800);
-        _omniscience_cheat = fields::Add_Multi_Hot_Key_Field_(s_ISEEALL_00559808);
-        _hi_score_cheat = fields::Add_Multi_Hot_Key_Field_(s_SCORE_00559820);
+        _all_tech_cheat = fields::Add_Multi_Hot_Key_Field_(_ALL_TECH_CHEAT);
+        _more_money_cheat = fields::Add_Multi_Hot_Key_Field_(_MORE_MONEY_CHEAT);
+        _get_tech_cheat = fields::Add_Multi_Hot_Key_Field_(_GET_TECH_CHEAT);
+        _omniscience_cheat = fields::Add_Multi_Hot_Key_Field_(_OMNISCIENCE_CHEAT);
+        _hi_score_cheat = fields::Add_Multi_Hot_Key_Field_(_SCORE_CHEAT);
         _last_field = fields::_fields_count - 1;
     }
 
@@ -3089,8 +3087,8 @@ namespace MAINSCR {
         *out_chosen_offset = -1;
 
         int limit = static_cast<int>(MOX::_fleet_icon_buttons_added) + static_cast<int>(MOX::_first_fleet_movement_icon);
-        if (static_cast<int>(_fleet_box.count) < limit) {
-            limit = static_cast<int>(_fleet_box.count);
+        if (static_cast<int>(MOX::_fleet_box.count) < limit) {
+            limit = static_cast<int>(MOX::_fleet_box.count);
         }
 
         int16_t i = MOX::_first_fleet_movement_icon;
@@ -3115,8 +3113,8 @@ namespace MAINSCR {
         if (result == -1) {
             // Redundantly recalculate limit as per assembly
             int limit2 = static_cast<int>(MOX::_fleet_icon_buttons_added) + static_cast<int>(MOX::_first_fleet_movement_icon);
-            if (static_cast<int>(_fleet_box.count) < limit2) {
-                limit2 = static_cast<int>(_fleet_box.count);
+            if (static_cast<int>(MOX::_fleet_box.count) < limit2) {
+                limit2 = static_cast<int>(MOX::_fleet_box.count);
             }
 
             for (int16_t j = MOX::_first_fleet_movement_icon; j < static_cast<int16_t>(limit2); ++j) {
@@ -3188,7 +3186,7 @@ namespace MAINSCR {
                 }
 
                 if (param_2 == MOX::_fleet_movement_all_button) {
-                    if (MOX::_fleet_movement_icons_on == 1 || FLEETPOP::Fleet_Buttons_Chosen_() == _fleet_box.count) {
+                    if (MOX::_fleet_movement_icons_on == 1 || FLEETPOP::Fleet_Buttons_Chosen_() == MOX::_fleet_box.count) {
                         FLEETPOP::Set_Fleet_Movement_Icon_Selections_(0, 0);
                         HACCESS::Clear_Fleet_Box_Selected_Ship_Status_();
                         MOX::_eta_star_id = -1;
@@ -3214,7 +3212,7 @@ namespace MAINSCR {
                     MOX::_draw_main_screen_to_back = 1;
                 }
 
-                if (_fleet_box.colonize_btn_active != 0 && MOX::_fleet_box_colonize_button == param_2) {
+                if (MOX::_fleet_box.colonize_btn_active != 0 && MOX::_fleet_box_colonize_button == param_2) {
                     MOX::_eta_star_id = -1;
                     MOX::_current_screen = 0x1E /* SCREEN_COLONIZATION_IN_MAIN */;
                     MOX::_return_screen = 0 /* SCREEN_MAIN */;
@@ -3222,7 +3220,7 @@ namespace MAINSCR {
                     continue;
                 }
 
-                if (_fleet_box.transport_btn_active != 0 && MOX::_fleet_box_transport_button == param_2) {
+                if (MOX::_fleet_box.transport_btn_active != 0 && MOX::_fleet_box_transport_button == param_2) {
                     if (FLEETPOP::At_Least_One_Ship_Of_Type_Selected_(2) != 0) {
                         MOX::_current_screen = 0x22 /* SCREEN_UNLOADING_TRANSPORTS_IN_MAIN */;
                         MOX::_return_screen = 0 /* SCREEN_MAIN */;
@@ -3235,14 +3233,14 @@ namespace MAINSCR {
                     continue;
                 }
 
-                if (_fleet_box.outpost_btn_active != 0 && MOX::_fleet_box_outpost_button == param_2) {
+                if (MOX::_fleet_box.outpost_btn_active != 0 && MOX::_fleet_box_outpost_button == param_2) {
                     MOX::_current_screen = 0x1F;
                     MOX::_return_screen = 0 /* SCREEN_MAIN */;
                     *param_4 = 1;
                     continue;
                 }
 
-                if (_fleet_box.engage_btn_active != 0 && MOX::_fleet_box_engage_button == param_2) {
+                if (MOX::_fleet_box.engage_btn_active != 0 && MOX::_fleet_box_engage_button == param_2) {
                     int16_t star_id = HACCESS::Ship_Stack_Star_Id_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
                     if (star_id > -1 && star_id < MOX::_NUM_STARS) {
                         MOX::_star[star_id].ignore_combat_ships &= ~(1 << MOX::_PLAYER_NUM);
@@ -3250,7 +3248,7 @@ namespace MAINSCR {
                     continue;
                 }
 
-                if (_fleet_box.attack_btn_active != 0 && MOX::_fleet_box_attack_button == param_2 && MOX::_fleet_box_attack_button > 0) {
+                if (MOX::_fleet_box.attack_btn_active != 0 && MOX::_fleet_box_attack_button == param_2 && MOX::_fleet_box_attack_button > 0) {
                     if (!FLEETPOP::Some_Icon_Selected_()) {
                         char local_4b0[200];
                         strcpy(local_4b0, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
@@ -3271,7 +3269,7 @@ namespace MAINSCR {
                             FLEETPOP::Set_Fleet_Movement_Icon_Selections_(0, 0);
                             HACCESS::Clear_Fleet_Box_Selected_Ship_Status_();
                             
-                            if (_fleet_box.count == num_deployed) {
+                            if (MOX::_fleet_box.count == num_deployed) {
                                 MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Ship_Id_(ship_id);
                                 if (MOX::_fleet_box_ship_stack == -1) {
                                     MOVEBOX::Vanish_Fleet_Movement_Box_();

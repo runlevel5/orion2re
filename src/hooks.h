@@ -7,5 +7,4 @@ namespace hooks {
     };
 
     void Install_Hooks();
-    void Assert_Types();
 };

@@ -2,10 +2,6 @@
 #include <cstdint>
 
 namespace MOVEBOX {
-    extern s_movable_box _moveable_box[5];
-
-    extern s_fleet_box _fleet_box;
-
     void __cdecl Clear_Moveable_Box_Fields_(int16_t box_index);
 
     int16_t __cdecl Moveable_Box_Selected_(int16_t index);
@@ -36,8 +32,6 @@ namespace MOVEBOX {
     void __cdecl Box_Officer_Screen_Chosen_Star_(int16_t left, int16_t top, int16_t x_divisor, int16_t y_divisor);
 
     void __cdecl Box_Fleet_Screen_Scanned_Ship_();
-
-    extern const char s__00551100[1];
 
     void __cdecl Do_Fleet_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
 
