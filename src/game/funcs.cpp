@@ -3,6 +3,11 @@
 char s___0055b0ac[2] = "_";
 const char s_tech_has_too_many_apps_0055a97c[24] = " tech has too many apps";
 const char s_space_005510f0[2] = " ";
+const char s_format_string[4] = "%s\n";
+const char* PTR_s_FLEET_LBX_005584a8 = "FLEET.LBX";
+static char s_GAME_LBX_005576e8[9] = "GAME.LBX";
+char* PTR_s_GAME_LBX_0055ac4c = s_GAME_LBX_005576e8;
+const char* PTR_s_OFFICER_LBX_00556990 = "OFFICER.LBX";
 
 char s__00551100[1] = "";
 const char s_Monster_ship_id_cannot_mov_00552cd8[46] = "Monster (ship id: %d) cannot move to %s (%d)!";
@@ -52,6 +57,41 @@ const char s_Too_many_colors_to_reduce_to_[39] = "Too many colors to reduce to (
 const char s_Too_many_colors_to_reduce_from_[41] = "Too many colors to reduce from (Max 512)";
 const char s_Receiving_Message_005609F0[23] = "Receiving Message....\n";
 
+void __cdecl Fleet_Movement_Scroll_Callback() {
+    int16_t thumb_height = MOX::_fltpop_scroll_bar.thumb_height_px;
+    int16_t track_len = MOX::_fltpop_scroll_bar.track_len_px;
+    int16_t thumb_y = MOX::_fltpop_scroll_bar.thumb_center_y;
+
+    int16_t start_y = static_cast<int16_t>(
+        MOX::_fleet_box.y +
+        MOX::_moveable_box[2].content_offset_y +
+        track_len -
+        (thumb_height / 2) -
+        thumb_y +
+        0x43);
+
+    int16_t end_y = static_cast<int16_t>(start_y + track_len);
+    int16_t x = static_cast<int16_t>(MOX::_fleet_box.x + MOX::_moveable_box[2].content_offset_x + 0xC0);
+    uint8_t color = 0x74;
+
+    for (int16_t i = 0; i < 9; ++i) {
+        line::Line_(x, start_y, x, end_y, color);
+
+        if ((i % 2) == 0) {
+            --color;
+        }
+
+        ++x;
+    }
+
+    s_animation_header* scroll_anim =
+        static_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x39, MOX::_global_cache_seg));
+    animate::Draw_(
+        static_cast<int16_t>(MOX::_fleet_box.x + MOX::_moveable_box[2].content_offset_x + 0xBD),
+        static_cast<int16_t>(MOX::_fleet_box.y + MOX::_moveable_box[2].content_offset_y + 0x42),
+        scroll_anim);
+}
+
 const char s_Add_Square_to_scan_list_failed__0055b270[33] = "Add Square to scan list failed..";
 const char s__d___d___d_0055b2d0[11] = "%d, %d, %d";
 const char s_Get_Picture_Color_Picture_Must_H_0055b2dc[45] = "Get_Picture_Color  Picture Must Have Palette";
@@ -85,6 +125,7 @@ const char s_Harbinger_005576b8[10] = "Harbinger";
 const char s_RACENAME_LBX[13] = "RACENAME.LBX";
 const char s_RACESTUF_LBX[13] = "RACESTUF.LBX";
 const char s_WWWWWWW_0055137c[8] = "WWWWWWW";
+s_colors s__GEGGGGG_s___s__005569b8 = {{0x3E, 0x47, 0x45, 0x47, 0x47, 0x47, 0x47, 0x47}};
 const char s__d_c_d_0055996c[7] = "%d%c%d";
 const char s__s_s__s_00559964[8] = "%s%s %s";
 const char s__s__s_00558014[6] = "%s %s";

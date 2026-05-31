@@ -23,7 +23,7 @@ namespace net {
             return 0;
         }
 
-        PTR_OutputDebugStringA_005aa3c0(s_Receiving_Message_005609F0);
+        OutputDebugStringA(s_Receiving_Message_005609F0);
 
         receive_result = netcode::_dplay->Receive(
             (LPDPID)&id_from,

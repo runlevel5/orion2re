@@ -893,14 +893,14 @@ namespace fonts {
             vsprintf(buffer, format, args);
             va_end(args);
 
-            PTR_SetBkMode_005aa3b4(hdc, 1);
-            PTR_SetTextColor_005aa3b0(hdc, 0xFFFFFF);
+            SetBkMode(hdc, 1);
+            SetTextColor(hdc, 0xFFFFFF);
 
-            int len = PTR_lstrlenA_005aa3c4(buffer);
-            PTR_GetTextExtentPoint32A_005aa3a8(hdc, buffer, len, &size);
+            int len = lstrlenA(buffer);
+            GetTextExtentPoint32A(hdc, buffer, len, &size);
 
-            len = PTR_lstrlenA_005aa3c4(buffer);
-            PTR_TextOutA_005aa3ac(hdc, x, y, buffer, len);
+            len = lstrlenA(buffer);
+            TextOutA(hdc, x, y, buffer, len);
 
             platform::g_primary_surface->ReleaseDC(hdc);
 

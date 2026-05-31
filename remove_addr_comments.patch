@@ -1,0 +1,3694 @@
+*** Begin Patch
+*** Update File: src/game/aileader.cpp
+         }
+     }
+
+-    /**
+-     * @address 0042a430
+-     */
+-    /**
+-     * @address 0042a6b0
+-     */
+     void __cdecl Assign_Star_Officer_(int player_index, int leader_index) {
+         int star_scores[72];
+         memset(star_scores, 0, sizeof(star_scores));
+@@
+         }
+     }
+
+-    /**
+-     * @address 0042a4a0
+-     */
+     void __cdecl Assign_Fleet_Officer_(int player_index, int leader_index) {
+         s_ship_data* best_ship = nullptr;
+         s_ship_data* ship_list = MOX::_ship;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0042a570
+-     */
+     void __cdecl Reassign_Fleet_Officer_(int player_index, int leader_index) {
+         short orig_loc = MOX::_leaders[leader_index].location;
+         s_ship_data* original_ship = &MOX::_ship[orig_loc];
+*** Update File: src/game/antaroom.cpp
+     char const s_antarmsg_LBX_005560a8[13] = "antarmsg.LBX";
+     s_mouse_list _antaran_room_blank_mouse[1] = {{0, 0, 0, 0, 639, 479}};
+
+-    /**
+-     * @address 0042aa80
+-     */
+     void __cdecl Draw_Main_Antaran_Room_Screen_() {
+         video::Set_Page_Off_();
+         fonts::Set_Outline_Color_(0xFA, 0xFA);
+*** Update File: src/game/beams.cpp
+         BEAMS::_old_color[1] = -1;
+     }
+
+-    /**
+-     * @address 00420ca0
+-     */
+     void __cdecl Init_Beams_() {
+         _l_anims = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(COLONY::_BEAMS_LBX, 0, MOX::_screen_seg));
+         Reset_Beam_Swapping_Colors_();
+@@
+         );
+     }
+
+-    /**
+-     * @address 00420c50
+-     */
+     void __cdecl Load_Ship_Explosion_() {
+         for (int i = 0; i < 2; ++i) {
+             int entry_index = i + 0x41;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00420ae0
+-     */
+     void __cdecl Draw_Ship_Explosion_(int16_t x, int16_t y, int16_t type_idx, int16_t frame_idx, int16_t size_idx) {
+         s_animation_header* anim = _explosion_anim[size_idx][type_idx];
+         int16_t count1 = animate::Get_Animation_Frame_Count_(anim);
+@@
+         bitmap::Create_Brighten_Bitmap_Palettes_(MOX::_screen_seg, palettes, 16);
+     }
+
+-    /**
+-     * @address 00422980
+-     */
+     void __cdecl Squish_Out_Msg_Queue_Slot_(int16_t index) {
+         // BUG: removing an entry from the queue while iterating it in Draw_Damage_Message_Queue_
+         // will cause the next entry to be skipped.
+@@
+         _n_damage_msgs--;
+     }
+
+-    /**
+-     * @address 004228f0
+-     */
+     void __cdecl Add_Damage_Message_To_Queue_(int16_t x, int16_t y, int16_t total_dmg, int16_t struct_dmg, int16_t shield_dmg, uint8_t side) {
+         if (BEAMS::_n_damage_msgs < 35 /* 0x23 */) {
+             // Check if there is any positive damage value to report
+@@
+         } while (Done_Drawing_Damage_Message_Queue_() == 0);
+     }
+
+-    /**
+-     * @address 00422a70
+-     */
+     void __cdecl Draw_Damage_Indicator_(int16_t x, int16_t y, int16_t total_dmg, int16_t hull_dmg, int16_t shield_dmg, uint8_t side, int16_t anim_timer) {
+         const uint8_t total_dmg_color_steps[27] = {
+             0xb0, 0xb9, 0xba, 0xb0, 0xb8, 0xb9, 0xb0, 0xb7, 0xb8,
+@@
+         video::Clip_Off_();
+     }
+
+-    /**
+-     * @address 00422a60
+-     */
+     int8_t __cdecl Done_Drawing_Damage_Message_Queue_() {
+         return _n_damage_msgs == 0;
+     }
+
+-    /**
+-     * @address 004229d0
+-     */
+     void __cdecl Draw_Damage_Message_Queue_() {
+         for (int16_t i = 0; i < BEAMS::_n_damage_msgs; ++i) {
+             s_beam_dmg_msg& msg = BEAMS::_msg_queue[i];
+@@
+         }
+     }
+
+-    /**
+-     * @address 00423370
+-     */
+     int16_t __cdecl Ship_Size_To_Shield_Size_(int16_t ship_size) {
+         int16_t shield_sizes[6];
+
+@@
+         return shield_sizes[ship_size];
+     }
+
+-    /**
+-     * @address 00422e70
+-     */
+     void __cdecl Draw_Damage_Message_Queue_Until_Done_() {
+         do {
+             timer::Mark_Time_();
+@@
+         return BEAMS::_max_frames;
+     }
+
+-    /**
+-     * @address 00420a50
+-     */
+     int16_t __cdecl Get_Ship_Range_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+         int16_t dx = x2 - x1;
+         if (dx < 0) {
+@@
+         return dx;
+     }
+
+-    /**
+-     * @address 004233f0
+-     */
+     void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7) {
+         int16_t base_rot = BEAMS::Rot_To_Base_Rot_(param_6);
+         int16_t rot_method = BEAMS::Rot_To_Rot_Method_(param_6);
+@@
+         fields::Get_Input_();
+     }
+
+-    /**
+-     * @address 00422dc0
+-     */
+     void __cdecl Add_Damage_Indicator_For_Missile_(int16_t x, int16_t y, uint8_t direction, int16_t damage) {
+         int16_t adjusted_x;
+
+@@
+         BEAMS::Add_Damage_Message_To_Queue_(adjusted_x, adjusted_y, damage, 0, 0, direction);
+     }
+
+-    /**
+-     * @address 00422e00
+-     */
+     void __cdecl Add_Damage_Indicator_For_Biological_(int16_t x, int16_t y, uint8_t side_flag, int16_t damage) {
+         int16_t target_x;
+
+@@
+         BEAMS::Add_Damage_Message_To_Queue_(target_x, y - 8, 0, 0, damage, side_flag);
+     }
+
+-    /**
+-     * @address 00422770
+-     */
+     int8_t __cdecl Draw_Fighter_Beam_(int16_t* fighter_coords, int16_t count, int16_t target_x, int16_t target_y, int16_t weapon_type, int16_t frame) {
+         uint32_t original_seed = random::Get_Random_Seed_();
+         
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 0x00423980
+-     */
+     int16_t __cdecl Rot_To_Base_Rot_(int16_t rot) {
+         int16_t base_rotations[16] = {
+             0, 1, 2, 3, 4, 3, 2, 1,
+@@
+         return *(base_rotations + idx);
+     }
+
+-    /**
+-     * @address 0x00423A10
+-     */
+     int16_t __cdecl Rot_To_Rot_Method_(int16_t rot) {
+         int16_t methods[16] = {
+             0, 0, 0, 0, 0,
+@@
+         return *(methods + idx);
+     }
+
+-    /**
+-     * @address 004233b0
+-     */
+     int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size) {
+         int16_t sizes[6];
+
+@@
+         allocate::Pop_Block_(MOX::_screen_seg);
+     }
+
+-    /**
+-     * @address 00423aa0
+-     */
+     void __cdecl Adjust_Reflection_Field_Display_Status_(int16_t* param_1) {
+         int16_t frame_count = animate::Get_Animation_Frame_Count_(Reflection_Field_Anims_(0, 0));
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0x0041ffa0
+-     */
+     void __cdecl Rob_Interpolate_Line_(int16_t* p_x, int16_t* p_y, int16_t target_x, int16_t target_y, int16_t step) {
+         int16_t start_x = *p_x;
+         int16_t start_y = *p_y;
+@@
+         *p_y += (int16_t)cur_y;
+     }
+
+-    /**
+-     * @address 00422e40
+-     */
+     int8_t __cdecl Do_Get_SFX_Draw_Shield_Facing_(int16_t attacker_id, int16_t target_id) {
+         int32_t facing = Get_SFX_Draw_Shield_Facing2_(target_id, attacker_id);
+         return ((facing + 4) % 16) < 8;
+     }
+
+-    /**
+-     * @address 00422ed0
+-     */
+     int16_t __cdecl Get_SFX_Draw_Shield_Facing2_(int16_t ship1_idx, int16_t ship2_idx) {
+         int16_t p1_x_offset;
+         int16_t p1_y_offset;
+@@
+         return (angle / 22) % 16;
+     }
+
+-    /**
+-     * @address 00420ce0
+-     */
+     void __cdecl Add_Weapon_Palette_Fragment_To_Current_Palette_(int16_t source_fragment, int16_t dest_start, int16_t count)
+     {
+         if (count > 0) {
+@@
+         }
+     }
+
+-    /**
+-     * @address 00420110
+-     */
+     void __cdecl Draw_Generic_Beam_(
+         int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
+         int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
+@@
+         palette::Refresh_Palette_();
+     }
+
+-    /**
+-     * @address 00423080
+-     */
+     bool __cdecl XY_In_Shield_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
+         int16_t shield_idx = Ship_Size_To_Shield_Size_(ship_size);
+         int16_t radius = (int16_t)((uint8_t)_shield_diameters[shield_idx] >> 1);
+@@
+         return false;
+     }
+
+-    /**
+-     * @address 00423e10
+-     */
+     bool __cdecl XY_In_Reflection_Field_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
+         int16_t shield_size = Ship_Size_To_Shield_Size_(ship_size);
+         int16_t radius = _reflection_field_diameters[shield_size] >> 1;
+*** Update File: src/game/bill.cpp
+     const char s_wb[3] = "wb";
+     const char s_rb[3] = "rb";
+
+-    /**
+-     * @address 00406780
+-     */
+     void __cdecl Bill_Init_() {
+         MOX::_bill_savegame[0] = 2;
+         MOX::_bill_savegame[1] = 0;
+@@
+         MOX::_bill_savegame[5] = 1;
+     }
+
+-    /**
+-     * @address 004077e0
+-     */
+     void __cdecl Copy_File_To_File_(const char* src_path, const char* dst_path) {
+         char msg_buf[128];
+         char read_buffer[4096];
+@@
+         return static_cast<int16_t>(MOX::_player[player_idx].spies[target_idx] & 0x3F);
+     }
+
+-    /**
+-     * @address 00407180
+-     */
+     int16_t __cdecl Add_Their_Spy_(int16_t player_idx, int16_t other_player_idx) {
+         const uint16_t spy_count =
+                 (static_cast<uint8_t>(MOX::_player[player_idx].spies[other_player_idx]) & 0x3f) + 1;
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 00406fe0
+-     */
+     int16_t __cdecl Get_My_Spy_Number_(int16_t spy_idx) {
+         // Size of s_player is 3753 (0xEA9)
+         // spies field is at offset 0xE57
+@@
+         return __pp_max_width;
+     }
+
+-    /**
+-     * @address 004080f0
+-     */
+     int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text) {
+         BILL::_Print_Paragraph_Bill_(0, 0, width, text, 0, 0, nullptr);
+         return BILL::__pp_max_height;
+     }
+
+-    /**
+-     * @address 00408090
+-     */
+     void __cdecl _Print_Paragraph_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment) {
+         BILL::_Print_Paragraph_Bill_(x, y, width, text, (uint16_t)alignment, 1, nullptr);
+     }
+@@
+         _Squeeze_Print_(x - (width / 2), y, str, width, nullptr, 2, true);
+     }
+
+-    /**
+-     * @address 00407450
+-     */
+     void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit) {
+         _Squeeze_Print_((int16_t)x, y, text, (int16_t)limit, nullptr, 2, true);
+     }
+
+-    /**
+-     * @address 004073e0
+-     */
+     void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width) {
+         _Squeeze_Print_(x, y, text, max_width, nullptr, 0, true);
+     }
+
+-    /**
+-     * @address 00407210
+-     */
+     void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, s_animation_header* pic, int16_t p6, bool adjust_y) {
+         bool resized = false;
+         int16_t current_width = fonts::Get_String_Width_(str);
+@@
+         }
+     }
+
+-    /**
+-     * @address 00407480
+-     */
+     void __cdecl _Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t max_height, char* text, int32_t param_6, s_animation_header* anim, bool is_formatted, bool center_y) {
+         int8_t saved_space_width = fonts::_font_header.font_style_widths[32];
+         int16_t saved_spacing = fonts::_font_header.font_style_spacing;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00407650
+-     */
+     void __cdecl Squeeze_Print_Paragraph_(uint16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, char* param_5, uint16_t param_6) {
+         // Calls the internal version with default terminal parameters
+         _Squeeze_Print_Paragraph_(param_1, param_2, param_3, param_4, param_5, param_6, nullptr, 0, 0);
+     }
+
+-    /**
+-     * @address 004067b0
+-     */
+     void __cdecl Bill_Default_(void) {
+         if (MOX::_settings.game_difficulty < 2) {
+             BILL::Set_Plyr_Info_Btns_(4);
+@@
+         FMTPARA::Init_();
+     }
+
+-    /**
+-     * @address 004076b0
+-     */
+     void __cdecl Squeeze_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color) {
+         // Centering logic: y_offset = height / 2
+         int16_t centered_y = (int16_t)(height / 2) + y;
+@@
+         );
+     }
+
+-    /**
+-     * @address 004076f0
+-     */
+     void __cdecl Squeeze_Formatted_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color) {
+         // The Y coordinate is centered by adding half the height of the paragraph.
+         BILL::_Squeeze_Print_Paragraph_(x, y + (height / 2), width, height, text, color, nullptr, true, true);
+     }
+
+-    /**
+-     * @address 00407680
+-     */
+     void __cdecl Squeeze_Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t flags) {
+         _Squeeze_Print_Paragraph_(
+             x,
+@@
+         );
+     }
+
+-    /**
+-     * @address 00407140
+-     */
+     void __cdecl Set_My_Spy_Mission_(int16_t target_player_idx, int8_t mission) {
+         BILL::Set_Their_Spy_Mission_(MOX::_PLAYER_NUM, target_player_idx, mission);
+     }
+
+-    /**
+-     * @address 00407120
+-     */
+     void __cdecl Set_My_Spy_Number_(int16_t target_player_idx, uint8_t n_spies) {
+         BILL::Set_Their_Spy_Number_(MOX::_PLAYER_NUM, target_player_idx, n_spies);
+     }
+
+-    /**
+-     * @address 00407160
+-     */
+     void __cdecl Set_My_Agent_Number_(uint8_t agent_num) {
+         BILL::Set_Their_Spy_Number_(MOX::_PLAYER_NUM, MOX::_PLAYER_NUM, agent_num);
+     }
+@@
+      * 
+      * @param target_player_idx The index of the player being spied upon.
+      * @return The mission type (0-3).
+-     * @address 00407010
+      */
+     int8_t __cdecl Get_My_Spy_Mission_(int16_t target_player_idx) {
+         // s_player size: 0xEA9 (3753 bytes)
+@@
+         return (uint8_t)MOX::_player[MOX::_PLAYER_NUM].spies[target_player_idx] >> 6;
+     }
+
+-    /**
+-     * @address 004070d0
+-     */
+     void __cdecl Set_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx, int8_t mission) {
+         // Offset 0xe57 in s_player is the 'spies' array
+         // The mission is stored in the top 2 bits (bits 6 and 7) of the spy byte.
+@@
+         MOX::_player[player_idx].spies[target_player_idx] |= (mission << 6);
+     }
+
+-    /**
+-     * @address 00407050
+-     */
+     int16_t __cdecl Get_My_Agent_Number_() {
+         int16_t player_num = MOX::_PLAYER_NUM;
+
+@@
+         return static_cast<int16_t>(static_cast<uint8_t>(MOX::_player[player_idx].spies[target_player_idx]) >> 6);
+     }
+
+-    /**
+-     * @address 00407730
+-     */
+     void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text, s_animation_header* bitmap) {
+         int16_t max_height = _Get_Paragraph_Max_Height_(width, text);
+         int16_t current_height = static_cast<int16_t>(fonts::_font_header.current_height);
+@@
+         }
+     }
+
+-    /**
+-     * @address 004077a0
+-     */
+     void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, const char* str, s_animation_header* bmp) {
+         _Print_1_Or_More_Lines_Centered_(static_cast<int16_t>(x), static_cast<int16_t>(y), static_cast<int16_t>(width), str, bmp);
+     }
+
+-    /**
+-     * @address 004299E0
+-     */
+     void __cdecl Set_Plyr_Info_Btns_(int16_t btn_val) {
+         MOX::_player[MOX::_PLAYER_NUM].history_btns &= 0x8F;
+         MOX::_player[MOX::_PLAYER_NUM].history_btns |= (btn_val & 0x7) << 4;
+     }
+
+-    /**
+-     * @address 00407C20
+-     */
+     void __cdecl _Print_String_Bill_(int16_t x, int16_t y, int16_t width, const char* str, uint16_t mode, uint8_t draw_flag, s_animation_header* bitmap) {
+         if (width >= 10 && width <= 640 &&
+             x >= 0 && x < 640 &&
+@@
+         }
+     }
+
+-    /**
+-     * @address 004067d0
+-     */
+     void __cdecl Record_History_()
+     {
+         uint32_t building_costs[8];
+@@
+         }
+     }
+
+-    /**
+-     * @address 00406CD0
+-     */
+     int16_t __cdecl Get_History_Params_(int16_t* out_history_param) {
+         int16_t history_param = static_cast<int16_t>(MOX::_stardate) + 30536;
+
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 005258e0
+-     */
+     void __cdecl Print_Display_Auto_Width_(int16_t x, int16_t y, const char* text, int32_t width) {
+         if (width < 0) {
+             width = 0;
+@@
+         MOX::_active_count = static_cast<int16_t>(start_idx);
+     }
+
+-    /**
+-     * @address 00526560
+-     */
+     void __cdecl Print_Right_Aligned_To_Bitmap_(int16_t x, int16_t y, const char* str, s_animation_header* bitmap) {
+         int16_t width = fonts::Get_String_Width_(str);
+         fonts::Print_To_Bitmap_(x - (width - 1), y, str, (void*)bitmap);
+     }
+
+-    /**
+-     * @address 005265e0
+-     */
+     void __cdecl Print_Display_To_Bitmap_Auto_Width_(int16_t x, int16_t y, const char* text, int16_t width, s_animation_header* bitmap) {
+         if (width < 0) {
+             width = 0;
+@@
+         fonts::Print_Display_To_Bitmap_(x, y, text, (int32_t)width, bitmap);
+     }
+
+-    /**
+-     * @address 004071f0
+-     */
+     void __cdecl Turn_Off_Palettes_(int16_t start, int16_t end) {
+         palstore::Darken_Palette_(100);
+         palette::Clear_Palette_Changes_(0, 255);
+     }
+
+-    /**
+-     * @address 004080c0
+-     */
+     void __cdecl _Print_Paragraph_Bill_Aux_(int16_t x, int16_t y, int16_t width, const char* text, int16_t color, s_animation_header* bitmap) {
+         _Print_Paragraph_Bill_(x, y, width, text, (uint16_t)color, 1, bitmap);
+     }
+
+-    /**
+-     * @address 00407dd0
+-     */
+     void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, uint8_t draw_flag, s_animation_header* bitmap) {
+         if (width >= 10 && width <= 0x280 && x >= 0 && x < 0x280 && y >= 0 && y < 0x1E0 && text != nullptr) {
+             int16_t char_index = 0;
+*** Update File: src/game/bomb.cpp
+         COLCALC::Compute_Star_Colony_Stuff_(star);
+     }
+
+-    /**
+-     * @address 0047e8e0
+-     */
+     int __cdecl Resolve_Bomb_Hit_(s_colony* colony, s_combat_bomb_result* result, int bomb_power) {
+         int target_building_count = 0;
+         int8_t target_building_indices[BUILDING_COUNT];
+@@
+         return result_code;
+     }
+
+-    /**
+-     * @address 0047ebd0
+-     */
+     void __cdecl Resolve_Biological_Hit_(s_colony* colony, s_combat_bomb_result* result) {
+         int target_pop_idx = -1;
+         int non_android_count = 0;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0047edc0
+-     */
+     void __cdecl Apply_Bomb_Hits_(s_combat_bomb_result* result) {
+         int32_t bio_hits = result->bio_hits_remaining;
+         int32_t bomb_hits = result->bomb_hits_remaining;
+*** Update File: src/game/cmbtai.cpp
+     return total_strength;
+ }
+
+-/**
+- * @address 0044f8d0
+- */
+ int16_t __cdecl Get_Effective_Beam_Strength_(int16_t player_idx) {
+     int16_t total_strength = 0;
+     int16_t ship_idx = 0;
+@@
+     return value;
+ }
+
+-/**
+- * @address 0044e3e0
+- */
+ int8_t __cdecl Combat_Ship_Class_(int16_t ship_idx, int16_t target_idx) {
+     int16_t dmg_short_range = 0;
+     int16_t dmg_med_range = 0;
+*** Update File: src/game/cmbtmis.cpp
+         return hits;
+     }
+
+-    /**
+-     * @address 004fe760
+-     */
+     void __cdecl Draw_Missiles_(void) {
+         // Iterate through all missiles in the combat buffer (300 total)
+         for (int16_t i = 299; i >= 0; --i) {
+*** Update File: src/game/cmbtspec.cpp
+         }
+     }
+
+-    /**
+-     * @address 004a59c0
+-     */
+     void __cdecl Draw_Anti_Missile_Rocket_Picture_(int16_t x, int16_t y) {
+         int16_t x1 = x - 1;
+         int16_t x2 = x + 1;
+*** Update File: src/game/colbldg.cpp
+         }
+     }
+
+-    /**
+-     * @address 0050a0b0
+-     */
+     void __cdecl Add_Militarys_Fields_() {
+         COLDRAW::Calculate_Squish_Step_(13, 308, _n_military_indexes, 19);
+
+@@
+         _colsum_pal_anim = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLSUM_LBX, 0x15, MOX::_screen_seg);
+     }
+
+-    /**
+-     * @address 0050a020
+-     */
+     void __cdecl Add_Buildings_Fields_() {
+         COLDRAW::Calculate_Squish_Step_(13 /* 0x0D */, 469 /* 0x1D5 */, _n_building_indexes, 19 /* 0x13 */);
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050e440
+-     */
+     void __cdecl Add_Build_Queue_Fields_() {
+         int16_t y_end = 350 /* 0x15e */;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050e060
+-     */
+     int16_t __cdecl Auto_Design_Type_(int16_t design_code) {
+         if (design_code == -12 /* 0xfff4 */) {
+             return 1;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00509800
+-     */
+     void __cdecl Get_App_Description_String_(char* dest_str, int16_t app_id) {
+         char lbx_name[20];
+         void* record_ptr;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050dc80
+-     */
+     void __cdecl Print_Selection_Centered_(const char* text) {
+         fonts::Print_Centered_(244, 56, text);
+     }
+
+-    /**
+-     * @address 0050deb0
+-     */
+     void __cdecl Draw_Build_Queue_Popup_() {
+         char buffer[200];
+
+@@
+         COLBLDG::Draw_Active_Prod_();
+     }
+
+-    /**
+-     * @address 0050dc10
+-     */
+     void __cdecl Print_Setting_Description_(int16_t x, int16_t y, int16_t width, int16_t setting_id) {
+         fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+         fonts::Set_Font_Spacing_(1);
+@@
+         fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+     }
+
+-    /**
+-     * @address 0050abe0
+-     */
+     void __cdecl Draw_Ship_Design_Info_(int16_t id) {
+         int16_t index = -50 - id;
+
+@@
+         COLONY::Remap_Draw_Ship_D_Centered_(244, 56, index);
+     }
+
+-    /**
+-     * @address 0050a370
+-     */
+     void __cdecl Draw_Building_Centered_In_Window_(int16_t building_id) {
+         graphics::Set_Window_(203, 9, 285, 103);
+         video::Clip_On_();
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050ae50
+-     */
+     void __cdecl Draw_Active_Prod_() {
+         int16_t active_idx = _active_prod[0];
+         if (active_idx == -1) {
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050d220
+-     */
+     void __cdecl Draw_Icon_(s_animation_header* anim) {
+         ERIC::Draw_Centered_(244, 56, anim);
+     }
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050b2d0
+-     */
+     void __cdecl Delete_Ship_(int16_t ship_index) {
+         // status 5 likely indicates a deleted or inactive state
+         MOX::_ship[ship_index].status = 5;
+@@
+         MOX::_ship[ship_index].location = -1;
+     }
+
+-    /**
+-     * @address 0050ad80
+-     */
+     void __cdecl Draw_Ship_Info_(int16_t item) {
+         int16_t index = -100 - item;
+
+@@
+         } while (_current_item[slot_idx] == -10);
+     }
+
+-    /**
+-     * @address 0050c570
+-     */
+     int8_t __cdecl Something_Behind_Settting_() {
+         int16_t found_idx = -1;
+         int8_t has_other = 0;
+@@
+         Squish_Out_Queue_Slot_(slot_idx);
+     }
+
+-    /**
+-     * @address 0050d070
+-     */
+     void __cdecl Defragment_Queue_() {
+         for (int16_t pass = 2; pass != 0; --pass) {
+             for (int16_t slot = 0; slot < 7; ++slot) {
+*** Update File: src/game/colcalc.cpp
+         return false;
+     }
+
+-    /**
+-     * @address 004fb870
+-     */
+     void __cdecl Check_For_Eliminated_Players_() {
+         uint8_t has_colonies[8];
+         memset(has_colonies, 0, sizeof(has_colonies));
+*** Update File: src/game/colland.cpp
+     uint16_t _fields;
+     const char s_format_comma_space[] = "%s, %s";
+
+-    /**
+-     * @address 00429f50
+-     */
+     void __cdecl Print_Planet_Data_(int16_t planet_idx) {
+         char buffer[500];
+         s_planet_data* planet = &MOX::_planet[planet_idx];
+@@
+         }
+     }
+
+-    /**
+-     * @address 00429d40
+-     */
+     void __cdecl Load_Anims_() {
+         COLLAND::_l_anims = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLONY_LBX, 6, MOX::_screen_seg);
+     }
+@@
+         );
+     }
+
+-    /**
+-     * @address 00429da0
+-     */
+     void __cdecl Draw_Colony_Landing_Screen_() {
+         char buffer[500];
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 00429a90
+-     */
+     void __cdecl Colony_Landing_Screen_() {
+         MOX2::action_func_t saved_auto_fn;
+         int16_t input_result;
+*** Update File: src/game/colony.cpp
+     }
+
+     /**
+-     * @address 004dc300
+      * @brief Marks a specific colony building as rubble.
+      * @param param_1 The identifier of the building to destroy.
+      */
+@@
+         return (remaining_cost / net_production) + 1;
+     }
+
+-    /**
+-     * @address 004ddd30
+-     */
+     int16_t __cdecl Calculate_Current_Production_Turn_Count_(int16_t colony_idx) {
+         int16_t turns = COLCALC::Colony_N_Turns_To_Produce_(&MOX::_colony[colony_idx]);
+
+@@
+         fonts::Set_Font_Special_Colors_(colors_ptr);
+     }
+
+-    /**
+-     * @address 004dbf40
+-     */
+     void __cdecl Set_Colony_Font_To_(int32_t style) {
+         fonts::Set_Outline_Color_(0x50, 0x50);
+
+@@
+     }
+
+     /**
+-     * @address 004dd920
+-     */
+-    /**
+-     * @address 0049aff0
+      * @brief Updates the last planet selected in a star system for a specific player based on a colony.
+      *
+      * @param colony_idx The index of the colony.
+@@
+         return (int16_t)_colonists_count;
+     }
+
+-    /**
+-     * @address 004dc0c0
+-     */
+     void __cdecl Set_Colony_Globals_(int16_t param_1) {
+         _colony_handle = param_1;
+         _planet_handle = MOX::_colony[param_1].planet;
+@@
+         _orbit_n = MOX::_planet[_planet_handle].orbit;
+     }
+
+-    /**
+-     * @address 004dcc90
+-     */
+     s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1) {
+         return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, param_1 + 0x13, MOX::_global_cache_seg);
+     }
+
+-    /**
+-     * @address 004dccb0
+-     */
+     s_animation_header* __cdecl Govt_Anim_(int16_t param_1) {
+         return Load_Govt_Anim_(param_1);
+     }
+
+-    /**
+-     * @address 004dd790
+-     */
+     void __cdecl Get_Bldg_Box_(int16_t c, int16_t r, int16_t* x_arr, int16_t* y_arr) {
+         x_arr[0] = (int16_t)CR_To_XY_(c, r, 0);
+         x_arr[1] = (int16_t)CR_To_XY_(c + 1, r, 0);
+@@
+         y_arr[3] = (int16_t)CR_To_XY_(c, r + 1, 1);
+     }
+
+-    /**
+-     * @address 004dcdb0
+-     */
+     s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
+         if (frame == 0) {
+             return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 8, MOX::_global_cache_seg));
+@@
+         return _building_cr_xy[col][row][axis * 2];
+     }
+
+-    /**
+-     * @address 004dd840
+-     */
+     int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int grid_y, int grid_x, int axis) {
+         // Calculate index based on 7-column stride and 2 components per cell
+         int index = axis + (grid_y * 7 + grid_x) * 2;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004dc290
+-     */
+     void __cdecl Do_Load_Colony_Anims_() {
+         _swap_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_global_screen_seg, 0x3A4);
+         _mouse_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_global_screen_seg, 0x3A4);
+*** Update File: src/game/colrefit.cpp
+         }
+     }
+
+-    /**
+-     * @address 004a17e0
+-     */
+     void __cdecl Scan_Ship_Info_(int16_t ship_idx) {
+         char buffer[10000];
+
+*** Update File: src/game/colsum.cpp
+         return planet_idx;
+     }
+
+-    /**
+-     * @address 00402d80
+-     */
+     void __cdecl Draw_Colony_Scan_Info_(void) {
+         int16_t total_roundoff;
+         int16_t total_growth;
+*** Update File: src/game/colxport.cpp
+     }
+ }
+
+-/**
+- * @address 0042b1e0
+- */
+-/**
+- * @address 0042b200
+- */
+ void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_idx) {
+     COLXPORT::_list_col[entry_idx] = colony_idx;
+
+*** Update File: src/game/combat.cpp
+         MOX::_combat_defender_count++;
+     }
+
+-    /**
+-     * @address 0048cf80
+-     */
+     void __cdecl Stellar_Converter_Attack_(int16_t target_idx) {
+         for (int i = 0; i < 4; ++i) {
+             Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].max_damage);
+@@
+         }
+     }
+
+-    /**
+-     * @address 0048cd80
+-     */
+     void __cdecl Missile_Attack_(int16_t attacker_idx, int16_t target_idx) {
+         s_qship* attacker = &MOX::_qcombat_data[attacker_idx];
+         int16_t defense_bonus = MOX::_qcombat_data[target_idx].missile_defense_bonus;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00489a70
+-     */
+     void __cdecl Message_Box_Titled_(char* summary, char* details) {
+         TEXTBOX::Do_Text_Box_(summary, details, 0);
+     }
+*** Update File: src/game/combfind.cpp
+     }
+ }
+
+-/**
+- * @address 004bd640
+- */
+ void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out) {
+     *target_colony_idx_out = -1;
+     *target_player_idx_out = -1;
+@@
+     }
+ }
+
+-/**
+- * @address 004bd580
+- */
+ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player, int16_t* target_colony, int8_t* is_sneak_attack) {
+     *is_sneak_attack = 0;
+     *target_player = -1;
+@@
+     }
+ }
+
+-/**
+- * @address 004bc0d0
+- */
+ char* __cdecl Load_Combfind_Strings_(char* strings_block) {
+     char* current = strings_block;
+
+@@
+     return current;
+ }
+
+-/**
+- * @address 004bd750
+- */
+ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
+     char message_buffer[400];
+     int8_t confirmed = 1;
+*** Update File: src/game/dip_scrn.cpp
+         } while (DIP_SCRN::_chat_mode_flag == 1);
+     }
+
+-    /**
+-     * @address 00418170
+-     */
+     int16_t __cdecl Check_Human_Treaty_Proposal_(int16_t player_id, int16_t target_player_id, int16_t treaty_type) {
+         int16_t choice;
+
+@@
+         RUSS::Mox_Update_();
+     }
+
+-    /**
+-     * @address 00417150
+-     */
+     void __cdecl Diplomacy_Generic_System_List_Draw_() {
+         Draw_Diplomacy_Synch_Mode_();
+         Draw_Diplomacy_System_();
+@@
+         );
+     }
+
+-    /**
+-     * @address 0041c480
+-     */
+     void __cdecl Diplomacy_Net_Switcheroo_() {
+         uint8_t original_talker = (uint8_t)DIP_SCRN::_talker_ambassador;
+         uint8_t original_listen = DIP_SCRN::_listen_ambassador;
+@@
+         DIP_SCRN::_old_response_message = 0;
+     }
+
+-    /**
+-     * @address 0041ca80
+-     */
+     int8_t __cdecl Diplomacy_Message_Is_Interactive_(int16_t msg_id) {
+         if (msg_id >= 0x53 && msg_id <= 0x55) {
+             return 1;
+*** Update File: src/game/events.cpp
+     const char s_EVENTMSE_LBX_005575a4[] = "EVENTMSE.LBX";
+     const char s_EVENTS_LBX_0055753c[] = "EVENTS.LBX";
+
+-    /**
+-     * @address 00477440
+-     */
+     int16_t __cdecl Get_Event_Mineral_Depletion_Colony_(int16_t player_idx) {
+         int16_t found_colony_idx = -1;
+         int16_t attempts = 0;
+@@
+         _event_data[32].player_idx = player_idx;
+     }
+
+-    /**
+-     * @address 00477a50
+-     */
+     void __cdecl Allocate_Comet_Hit_(int16_t colony_idx) {
+         s_combat_bomb_result result;
+         // Zero out the entire result structure (73 bytes)
+@@
+         return selected_colony_idx;
+     }
+
+-    /**
+-     * @address 00477eb0
+-     */
+     int16_t __cdecl Pick_Random_Star_(int16_t player_idx) {
+         int16_t result_star_idx = -1;
+         int16_t star_idx = 0;
+@@
+         return result_star_idx;
+     }
+
+-    /**
+-     * @address 004784e0
+-     */
+     int16_t __cdecl Star_Has_Event_(int16_t star_idx) {
+         // Event 2 (Plague/Famine/etc - Colony context)
+         if ((_event_data[2].status == 2 || _event_data[2].status == 4 || _event_data[2].status == 6)) {
+@@
+         return -1;
+     }
+
+-    /**
+-     * @address 00478640
+-     */
+     int16_t __cdecl Event_Pirate_Activity_Strength_(int16_t star_idx) {
+         int16_t total_cp = 0;
+
+@@
+         return (int16_t)scaled_cp;
+     }
+
+-    /**
+-     * @address 00477ca0
+-     */
+     int16_t __cdecl Pick_Completely_Random_Star_() {
+         int16_t found = 0;
+         int16_t counter = 0;
+@@
+         return star_idx;
+     }
+
+-    /**
+-     * @address 00477a00
+-     */
+     void __cdecl Event_Check_General_Status_() {
+         if (random::Random_(40 /* 0x28 */) == 1) {
+             // Check if stardate is past 35050 and the Galactic Council hasn't been established.
+@@
+         }
+     }
+
+-    /**
+-     * @address 00477da0
+-     */
+     int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx) {
+         int16_t total_size_points = 0;
+
+@@
+         return total_size_points;
+     }
+
+-    /**
+-     * @address 00477bb0
+-     */
+     void __cdecl Allocate_Earthquake_Hit_(int16_t colony_idx, int16_t* pop_killed, int16_t* buildings_destroyed_count) {
+         s_combat_bomb_result result;
+         memset(&result, 0, sizeof(s_combat_bomb_result));
+@@
+     }
+
+     /**
+-     * @address 00477240
+      * @brief Checks if the player has any "bad" events currently active.
+      *
+      * Iterates through the event data array to find an event that belongs to the
+@@
+         return found;
+     }
+
+-    /**
+-     * @address 00476DE0
+-     */
+     int16_t __cdecl Get_Event_Victim_(int8_t type) {
+         uint16_t weights[8];
+         int16_t candidates[8];
+@@
+         return selected_player;
+     }
+
+-    /**
+-     * @address 00477780
+-     */
+     void __cdecl Event_Check_Planet_Warning_() {
+         if (_event_data[30].amount <= 2) {
+             int16_t half_stars = MOX::_NUM_STARS / 2;
+@@
+         return false;
+     }
+
+-    /**
+-     * @address 00473ed0
+-     */
+     void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
+         int16_t event_index;
+
+@@
+         _event_data[event_index].status = 4;
+     }
+
+-    /**
+-     * @address 00474030
+-     */
+     void __cdecl Load_Event_Picture_(int16_t event_id) {
+         allocate::Mark_Block_(MOX::_screen_seg);
+         _event_display_seg = (s_animation_header*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, event_id + 2, MOX::_screen_seg);
+@@
+         EVENTS::Reset_Events_();
+     }
+
+-    /**
+-     * @address 00473E50
+-     */
+     void __cdecl Reset_Events_() {
+         if (static_cast<int32_t>(MOX::_stardate) % 20 == 0) {
+             for (int16_t i = 0; i < 36; ++i) {
+@@
+         }
+     }
+
+-    /**
+-     * @address 00473f80
+-     */
+-    /**
+-     * @address 00476160
+-     */
+     int32_t __cdecl Event_Get_Fleet_Strength_(int16_t player_idx) {
+         int32_t strength = 0;
+
+@@
+         fonts::Set_Font_Style_Outline_(4, &_event_normal_colors);
+     }
+
+-    /**
+-     * @address 004740D0
+-     */
+     void __cdecl Draw_Event_Screen_() {
+         video::Set_Page_Off_();
+
+@@
+         JIM::Play_Streaming_Music_(0x76, -1, 1);
+     }
+
+-    /**
+-     * @address 004741A0
+-     */
+     void __cdecl Event_Fade_In_() {
+         _event_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 917 /* 0x395 */);
+         s_animation_header* h2 = (s_animation_header*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, 0, MOX::_screen_seg);
+*** Update File: src/game/fade.cpp
+         video::Save_Refresh_();
+         video::Set_Refresh_Differential_No_Full_();
+
+-        // redundant check from disassembly (0x00533793)
+         if (step > 0) {
+             for (int16_t i = 0; i < step; ++i) {
+                 video::Clear_Scan_List_();
+*** Update File: src/game/fleetpop.cpp
+     return animate::Get_Width_(MOX::_fleet_box.name_seg);
+ }
+
+-/**
+- * @address 00405990
+- */
+ void __cdecl Reload_Fleet_Box_Data_(void) {
+     if (HACCESS::Get_Stack_Start_From_Saved_Ship_Array_() == 0) {
+         MOVEBOX::Vanish_Fleet_Movement_Box_();
+@@
+     MOX::_fleet_movement_icons_on = static_cast<uint8_t>(state);
+ }
+
+-/**
+- * @address 00406700
+- */
+ bool __cdecl Some_Icon_Selected_() {
+     int16_t selected_ship_ids[500];
+
+@@
+     return false;
+ }
+
+-/**
+- * @address 004059e0
+- */
+ void __cdecl Reload_Ship_Selection_Status_() {
+     int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+     int16_t stack_owner = HACCESS::Ship_Stack_Owner_(node_ptr);
+@@
+     }
+ }
+
+-/**
+- * @address 00404cc0
+- */
+ int16_t __cdecl First_Unselected_Icon_() {
+     int16_t first_unselected_index = 0;
+     bool found = false;
+@@
+     return first_unselected_index;
+ }
+
+-/**
+- * @address 00405a60
+- */
+ void __cdecl Save_Ship_Selection_Status_() {
+     int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+     int16_t owner = HACCESS::Ship_Stack_Owner_(node_ptr);
+@@
+     }
+ }
+
+-/**
+- * @address 00405070
+- */
+ int16_t __cdecl Fleet_Buttons_Chosen_() {
+     int16_t selected_count = 0;
+     int16_t i = 0;
+@@
+     return selected_count;
+ }
+
+-/**
+- * @address 00406750
+- */
+ bool __cdecl Can_Select_Fleet_Box_Ship_(int16_t index) {
+     int16_t ship_node_idx = MOX::_fleet_movement_icon[index].ship_node_idx;
+     int16_t owner_id = HACCESS::Ship_Stack_Owner_(ship_node_idx);
+@@
+     return owner_id == MOX::_PLAYER_NUM;
+ }
+
+-/**
+- * @address 00406610
+- */
+ int16_t __cdecl Icon_Selection_Status_(int16_t icon_field_id) {
+     int16_t first_icon_idx = static_cast<int16_t>(MOX::_first_fleet_movement_icon);
+     int16_t limit_idx = MOX::_fleet_icon_buttons_added + first_icon_idx;
+@@
+     return 0;
+ }
+
+-/**
+- * @address 00403ec0
+- */
+ void __cdecl Clear_Ship_Node_Selection_Flags_() {
+     MOX::_fleet_movement_icons_on = 0;
+
+@@
+     }
+ }
+
+-/**
+- * @address 004059c0
+- */
+ void __cdecl Reload_Fleet_Box_Palette_(int16_t player_idx, uint32_t is_not_player) {
+     KEN::Load_Player_Ship_Palette_(player_idx);
+     MOX::_mainscr_palette = 2;
+ }
+
+-/**
+- * @address 00406590
+- */
+ bool __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx) {
+     if (MAINSCR::Ship_Can_Be_Selected_(ship_idx) && MOX::_just_moved_stack == 0) {
+         return true;
+@@
+     }
+ }
+
+-/**
+- * @address 004051e0
+- */
+ int16_t __cdecl N_Fleet_Icons_(int16_t node_idx) {
+     int16_t count = 1;
+
+@@
+     return count;
+ }
+
+-/**
+- * @address 00403e90
+- */
+ bool __cdecl At_Least_One_Ship_Of_Type_Selected_(int16_t ship_type) {
+     int16_t selected_ship_ids[500];
+
+*** Update File: src/game/flt1.cpp
+         _fleet_screen_bad_ship_id = -1;
+     }
+
+-    /**
+-     * @address 004afd20
+-     */
+     void __cdecl Build_Scrap_List_(int16_t* scrap_list, int16_t* list_count) {
+         *list_count = 0;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 004b2920
+-     */
+     void __cdecl Plunder_Ships_For_Tech_(int16_t* ship_indices, int16_t count, int8_t flag) {
+         for (int16_t i = 0; i < count; ++i) {
+             // Structure size is 129 bytes (0x81)
+@@
+         }
+     }
+
+-    /**
+-     * @address 004b28c0
+-     */
+     int16_t __cdecl Get_Scrap_Ship_Value_() {
+         int16_t total_value = 0;
+
+@@
+         return total_value;
+     }
+
+-    /**
+-     * @address 004b30f0
+-     */
+     int16_t __cdecl N_Fltscrn_Ships_Selected_() {
+         int16_t selected_count = 0;
+         int16_t start_index = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004b2210
+-     */
+     void __cdecl Load_Galaxy_Stars_(void) {
+         int lbx_entry = 0x22 /* 34 */;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 004b2c20
+-     */
+     uint8_t __cdecl Okay_To_Set_Relocate_Star2_(int16_t star_idx) {
+         uint8_t result;
+
+*** Update File: src/game/fmtpara.cpp
+     const char* _tabs_3_plus_1 = _insert_item_kind - 'A';
+     uint32_t _user_fn_arg;
+
+-    /**
+-     * @address 00432ef0
+-     */
+     void __cdecl Init_() {
+         memset(_tabs, 0, sizeof(_tabs));
+         memset(&_para_global, 0, sizeof(_para_global));
+         Initialize_Formatted_Paragraph_System_();
+     }
+
+-    /**
+-     * @address 00433de0
+-     */
+     void __cdecl Reset_A_Paragraph_Variable_(uint16_t index) {
+         if (index < 16) {
+             uint32_t* var_ptr = &FMTPARA::_variable[index];
+@@
+         }
+     }
+
+-    /**
+-     * @address 00433dc0
+-     */
+     void __cdecl Initialize_Formatted_Paragraph_System_() {
+         for (uint16_t i = 0; i < 0x10; ++i) {
+             Reset_A_Paragraph_Variable_(i);
+@@
+         return false;
+     }
+
+-    /**
+-     * @address 00433d30
+-     */
+     void __cdecl Reset_Parameters_() {
+         uint8_t reset_flags;
+         uint16_t argument;
+@@
+         return (int16_t)((_para_global.max_y - _para_global.min_y) + 1);
+     }
+
+-    /**
+-     * @address 00432ea0
+-     */
+     int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify) {
+         _Print_Formatted_Paragraph_(0, 0, width, text, justify, nullptr, false);
+         return (int16_t)(_para_global.max_x - _para_global.min_x + 1);
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 00435210
+-     */
+     int8_t __cdecl FN_User_Call_(int8_t func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
+         // user_fn is at offset 0x58 within s_fmtpara_global
+         void* user_fn_ptr = *reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(&_para_global) + 0x58);
+@@
+         }
+     }
+
+-    /**
+-     * @address 00434780
+-     */
+     void __cdecl Insert_A_String_(char* new_str) {
+         if (_para_p->nest_depth < 10) {
+             _para_p->nest_stack[_para_p->nest_depth] = _para_p->str;
+@@
+         FMTPARA::Insert_A_String_(const_cast<char*>(param_1));
+     }
+
+-    /**
+-     * @address 00432e30
+-     */
+     void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* ptr) {
+         Set_Paragraph_Variable_Pointer_(index, ptr, 2);
+     }
+
+-    /**
+-     * @address 00432e50
+-     */
+     void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr) {
+         Set_Paragraph_Variable_Pointer_(id, ptr, 4);
+     }
+
+-    /**
+-     * @address 00432e00
+-     */
+     void __cdecl Print_Formatted_Paragraph_To_Bitmap_(short param_1, short param_2, short param_3, char* param_4, short param_5, s_animation_header* param_6) {
+         _Print_Formatted_Paragraph_(param_1, param_2, param_3, param_4, param_5, param_6, true);
+     }
+
+-    /**
+-     * @address 00433e10
+-     */
+     void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t item_index, void *value_ptr, int8_t value_type) {
+         if (item_index < 0x10) {
+             _para_global.item_ptr[item_index] = value_ptr;
+*** Update File: src/game/geo.cpp
+     /**
+      * @brief Iterates through all stars and updates their nebula status.
+      * 
+-     * Semantically equivalent to GEO::Initialize_Star_In_Nebula_Info_ at 0x00412ba0.
+      */
+     void __cdecl Initialize_Star_In_Nebula_Info_() {
+         if (MOX::_NUM_STARS > 0) {
+*** Update File: src/game/haccess.cpp
+     const char s_format_star_roman[6] = "%s %s";
+     const char s_I[2] = "I";
+
+-    /**
+-     * @address 0049b210
+-     */
+     int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx) {
+         int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
+
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 0049b240
+-     */
+     int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx) {
+         int16_t node_idx = MOX::_ship_icon[ship_icon_idx].node_idx;
+         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+@@
+         return MOX::_ship[ship_idx].location;
+     }
+
+-    /**
+-     * @address 0049b270
+-     */
+     int16_t __cdecl Ship_Owner_(int16_t ship_idx) {
+         int16_t error_code = 0;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0049A3C0
+-     */
+     void __cdecl Clear_All_Star_Relocations_(int16_t player_idx) {
+         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+             if (Star_Has_Relocation_(star_idx, player_idx)) {
+@@
+         return MOX::_ship_node[MOX::_fleet_movement_icon[icon_idx].ship_node_idx].ship_idx;
+     }
+
+-    /**
+-     * @address 0049b530
+-     */
+     int16_t __cdecl Ship_Stack_Owner_(int16_t stack_idx) {
+         return HACCESS::Ship_Owner_(MOX::_ship_node[stack_idx].ship_idx);
+     }
+@@
+         return MOX::_ship[ship_idx].y;
+     }
+
+-    /**
+-     * @address 0049ac20
+-     */
+     bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship) {
+         if (static_cast<int16_t>(ship->owner) == player_idx) {
+             return SHIPMOVE::Can_Order_Ship_(ship);
+@@
+         return selected_count;
+     }
+
+-    /**
+-     * @address 0049AC40
+-     */
+     bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx) {
+         return MOX::_player[player_idx].tech_applications[tech_idx] == 3;
+     }
+
+-    /**
+-     * @address 0049ab90
+-     */
+-    /**
+-     * @address 0049b510
+-     */
+     int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_idx) {
+         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+         return MOX::_ship[ship_idx].location;
+     }
+
+-    /**
+-     * @address 0049AB10
+-     */
+     int8_t __cdecl N_Star_Relocations_(int16_t player_idx) {
+         int16_t relocation_count = 0;
+
+@@
+         return -1;
+     }
+
+-    /**
+-     * @address 0049b5b0
+-     */
+     int8_t __cdecl Special_Is_Planet_Special_(int16_t special_type) {
+         if (special_type == 4 || special_type == 5 || special_type == 6 ||
+             special_type == 7 || special_type == 10) {
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 0049ac00
+-     */
+     int16_t __cdecl Planet_Orbit_(int16_t planet_idx) {
+         return (int16_t)MOX::_planet[planet_idx].orbit;
+     }
+@@
+         return enemy_approaching;
+     }
+
+-    /**
+-     * @address 0049acd0
+-     */
+     void __cdecl Race_Name_(int16_t id, char* race_name_out) {
+         // Initial setup with default race name "Human"
+         strcpy(race_name_out, s_Human_00558020);
+@@
+         }
+     }
+
+-    /**
+-     * @address 0049add0
+-     */
+     void __cdecl Set_All_Colony_Auto_Select_Flags_() {
+         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+             bool found_valid = false;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0049b610
+-     */
+     int16_t __cdecl System_Planet_Scanned_To_Planet_Id_(int16_t star_idx, int16_t planet_idx) {
+         return MOX::_star[star_idx].planet_index[planet_idx];
+     }
+
+-    /**
+-     * @address 0049b640
+-     */
+     int16_t __cdecl System_Ship_Scanned_To_Ship_Id_(int16_t ship_node_idx) {
+         // Each s_ship_node is 5 bytes. The disassembly calculates the offset as: ship_node_idx * 5
+         // which corresponds to indexing the array of s_ship_node structures.
+@@
+         memset(MOX::_fleet_icon_selection_status, 0, 63);
+     }
+
+-    /**
+-     * @address 0049b090
+-     */
+     void __cdecl Set_Hotseat_Fleet_Box_To_Last_Stack_(int16_t player_idx) {
+         const int16_t ship_id = MAINSCR::_hotseat_fleet_box[player_idx].stack_ship_id;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0049A360
+-     */
+     void __cdecl Build_Saved_Ship_Array_() {
+         memset(MOX::_fleet_box_ship_ids, 0, sizeof(MOX::_fleet_box_ship_ids));
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0049B050
+-     */
+     void __cdecl Save_Hotseat_Fleet_Box_Ship_(int16_t fleet_box_idx) {
+         if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
+             const int32_t ship_node_idx = MOX::_fleet_movement_icon[0].ship_node_idx;
+*** Update File: src/game/harold.cpp
+     /**
+      * Determines if a star system contains only outposts (no full colonies).
+      * Returns true if there is at least one outpost and zero established colonies.
+-     * @address 004f1a20
+      */
+     bool __cdecl Star_Is_Outpost_Star_(int16_t star_idx) {
+         int8_t outpost_count = 0;
+@@
+         return count;
+     }
+
+-    /**
+-     * @address 004f10f0
+-     */
+     int16_t __cdecl N_Colony_Owners_(int16_t star_idx) {
+         uint8_t owners_seen[8];
+         int16_t unique_count = 0;
+@@
+         MOX::_star[star_idx].wormhole_star_id = 0;
+     }
+
+-    /**
+-     * @address 004f0860
+-     */
+     bool __cdecl Empty_System_(int16_t star_idx) {
+         return N_Satellites(star_idx) == 0;
+     }
+@@
+         return Players_Home_Star_(star_idx) != -1;
+     }
+
+-    /**
+-     * @address 004f1270
+-     */
+     int16_t __cdecl N_Food_Planets_In_System_(int16_t system_index) {
+         int16_t food_planet_count = 0;
+
+@@
+         return food_planet_count;
+     }
+
+-    /**
+-     * @address 004f1930
+-     */
+     void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2) {
+         s_colors style;
+
+@@
+         sound::Set_Sound_Max_Volume_(MOX::_settings.sound_fx_level);
+     }
+
+-    /**
+-     * @address 004f0e90
+-     */
+     void __cdecl Init_Fleet_Movement_Box_() {
+         auto& box = MOX::_moveable_box[2];
+
+@@
+         box.unselected_height = 0x27;
+     }
+
+-    /**
+-     * @address 004f0f60
+-     */
+     void __cdecl Init_System_Display_Box_() {
+         MOX::_moveable_box_pict[0] = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 004f0ed0
+-     */
+     void __cdecl Init_Moving_Boxes_() {
+         memset(MOX::_moveable_box, 0, sizeof(MOX::_moveable_box));
+
+@@
+         Init_System_Display_Box_();
+     }
+
+-    /**
+-     * @address 004f1590
+-     */
+     bool __cdecl Player_Has_Colony_(int16_t player_num, int16_t star_idx) {
+         return struct_::Test_Bit_Field_(&MOX::_star[star_idx].has_colony, player_num) != 0;
+     }
+
+-    /**
+-     * @address 004f1610
+-     */
+     bool __cdecl Player_Has_Jumpgate_(int16_t player_idx, int16_t star_idx) {
+         uint8_t jumpgate_bits = MOX::_star[star_idx].has_jumpgate;
+
+         return (bool)((jumpgate_bits >> (static_cast<uint8_t>(player_idx) & 0x1f)) & 1);
+     }
+
+-    /**
+-     * @address 004f16d0
+-     */
+     bool __cdecl Player_Has_Stargate_(int16_t player_idx, int16_t star_idx) {
+         uint8_t stargate_bits = MOX::_star[star_idx].has_stargate;
+
+         return (bool)((stargate_bits >> (static_cast<uint8_t>(player_idx) & 0x1f)) & 1);
+     }
+
+-    /**
+-     * @address 004f1750
+-     */
+     uint8_t __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx) {
+         uint8_t mask = (uint8_t)(1u << ((uint8_t)player_idx & 0x1F));
+
+@@
+      * @param player_id The ID of the player.
+      * @param star_id The ID of the star system.
+      * @return true if the monster is sighted, false otherwise.
+-     * @address 004f1780
+      */
+     bool __cdecl Player_Sighted_Monster_(int16_t player_id, int16_t star_id) {
+         int8_t system_special = MOX::_star[star_id].system_special;
+@@
+     /**
+      * Finds the index of the player who has their home planet in the specified star system.
+      * Returns -1 if no home planet in the system belongs to any player.
+-     * @address 004f17d0
+      */
+     int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
+         int16_t found_player_idx = -1;
+@@
+      * Checks if the specified star system has a dimensional portal.
+      * @param star Pointer to the star data structure.
+      * @return True if a dimensional portal is present, false otherwise.
+-     * @address 004f15c0
+      */
+     bool __cdecl Star_Has_Dimensional_Portal_(s_star_data* star) {
+         return star->has_dimensional_portal != 0;
+     }
+
+-    /**
+-     * @address 004f15d0
+-     */
+     bool __cdecl Star_Has_Artemis_Net_(s_star_data* star) {
+         return star->has_artemis_net != 0;
+     }
+
+-    /**
+-     * @address 004f1560
+-     */
+     bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star) {
+         int32_t player_index = static_cast<int32_t>(player - MOX::_player);
+         return (bool)((star->has_artemis_net >> (player_index & 0x1f)) & 1);
+     }
+
+-    /**
+-     * @address 004f15e0
+-     */
+     bool __cdecl Player_Has_Dimensional_Portal_(s_player* player, s_star_data* star) {
+         int32_t player_index = static_cast<int32_t>(player - MOX::_player);
+         return (bool)((star->has_dimensional_portal >> (player_index & 0x1f)) & 1);
+@@
+      * @param list Pointer to the array of shorts to be shuffled.
+      * @param size The number of elements in the list.
+      * @param use_clock If non-zero, uses clock() % size for indices; otherwise uses Random_(size) - 1.
+-     * @address 004f1860
+      */
+     void __cdecl Randomize_List_(int16_t* list, int16_t size, uint8_t use_clock) {
+         // The number of shuffle iterations is 1.5 * size
+@@
+         } while (static_cast<int32_t>(count) < iterations);
+     }
+
+-    /**
+-     * @address 004f18f0
+-     */
+     void __cdecl Set_All_Visited_Flags_() {
+         int16_t num_stars = MOX::_NUM_STARS;
+         if (num_stars <= 0) {
+@@
+         }
+     }
+
+-    /**
+-     * @address 004f07f0
+-     */
+     bool __cdecl Contact_With_Player_(int16_t player_idx, int16_t target_idx) {
+         if (target_idx >= 0 && target_idx < (int16_t)MOX::_NUM_PLAYERS) {
+             return MOX::_player[player_idx].contact[target_idx] != 0;
+@@
+         return false;
+     }
+
+-    /**
+-     * @address 004f0760
+-     */
+     char __cdecl Contact_With_One_Colony_(int16_t star_idx) {
+         for (int16_t i = 0; i < 5; ++i) {
+             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+@@
+         return false;
+     }
+
+-    /**
+-     * @address 004f1dc0
+-     */
+     int16_t __cdecl XY_To_Star_Id_(int16_t x, int16_t y) {
+         for (int16_t i = 0; i < MOX::_NUM_STARS + 1; ++i) {
+             if (MOX::_star[i].x == x && MOX::_star[i].y == y) {
+@@
+         return -1;
+     }
+
+-    /**
+-     * @address 004f13d0
+-     */
+     int16_t __cdecl N_Turns_To_Star_(int16_t ship_id, int16_t star_id) {
+         int16_t ship_ids[2];
+         s_ship_move_info move_info;
+@@
+         return result;
+     }
+
+-    /**
+-     * @address 004f05c0
+-     */
+     int16_t __cdecl Absolute_Location_(int16_t location) {
+         if (location >= 500 && location < 1000) {
+             return location - 500;
+@@
+         return location;
+     }
+
+-    /**
+-     * @address 004f05f0
+-     */
+     int16_t __cdecl Actual_Star_Id_(int16_t star_id, int16_t* out_actual_id) {
+         int16_t type = 0;
+
+@@
+         return type;
+     }
+
+-    /**
+-     * @address 004f1e80
+-     */
+     bool __cdecl Star_Guarded_By_Monster_(int16_t location_idx, int16_t* monster_owner) {
+         *monster_owner = 0;
+         bool found = false;
+@@
+         return winner;
+     }
+
+-    /**
+-     * @address 004f1d00
+-     */
+     int16_t __cdecl First_Ship_Orbiting_Star_(s_star_data* star) {
+         int16_t ship_ids[2];
+         int16_t count = 2;
+@@
+         return ship_ids[0];
+     }
+
+-    /**
+-     * @address 004f1d30
+-     */
+     void __cdecl Star_XY_To_Ship_Id_(s_star_data* target_star, int16_t* out_indices, int16_t* count) {
+         int16_t max_count = *count;
+         if (max_count < 1 || MOX::_NUM_SHIPS < max_count) {
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 004f0dd0
+-     */
+     uint8_t* __cdecl Harold_Init_() {
+         MOX::_box_off_flag[0] = -1;
+         MOX::_box_off_flag[1] = 0x0000;
+@@
+         return has_outpost;
+     }
+
+-    /**
+-     * @address 004f1050
+-     */
+     int16_t __cdecl Galaxy_Size_From_N_Stars_() {
+         int16_t default_galaxy_size = static_cast<int16_t>(static_cast<int8_t>(MOX::_settings.galaxy_size));
+
+@@
+         return static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
+     }
+
+-    /**
+-     * @address 004f0840
+-     */
+     void __cdecl Decrement_Zoom_Count_() {
+         MOX::_zoom_count--;
+
+@@
+         return max_zoom;
+     }
+
+-    /**
+-     * @address 004f0e20
+-     */
+     void __cdecl Increment_Zoom_Count_() {
+         MOX::_zoom_count++;
+         if (MOX::_zoom_count >= MOX::_max_zoom_count) {
+@@
+     void __cdecl Planet_Data_Screen_() {
+     }
+
+-    /**
+-     * @address 004f1330
+-     */
+     int16_t __cdecl N_Player_Ships_(int16_t player_idx) {
+         int16_t ship_idx = 0;
+         int16_t ship_count = 0;
+@@
+         return result;
+     }
+
+-    /**
+-     * @address 004f2200
+-     */
+     int8_t __cdecl Was_Mouse_List_Saved_() {
+         return _saved_mouse_list_count != 0;
+     }
+
+-    /**
+-     * @address 004f1fb0
+-     */
+     void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t color_offset) {
+         int16_t inv_offset = 7 - color_offset;
+         if (inv_offset <= 0) {
+*** Update File: src/game/initgame.cpp
+         INITGAME::Write_Game_Settings_();
+     }
+
+-    /**
+-     * @address 00478fb0
+-     */
+     void Write_Game_Settings_() {
+         FILE* file = fopen(s_mox_set_0055760c, s_wb_00551178);
+
+@@
+      * Initializes leader data from LBX, sets random skills for specific officers,
+      * and calculates initial officer skill values.
+      */
+-    /**
+-     * @address 004794b0
+-     */
+     void __cdecl Init_Colony_(int16_t colony_idx, int16_t planet_idx, uint8_t player_num) {
+         s_colony* colony = &MOX::_colony[colony_idx];
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 00478d10
+-     */
+     void Set_Initial_Colony_Auto_Selects_() {
+         if (MOX::_NUM_STARS <= 0) {
+             return;
+*** Update File: src/game/initship.cpp
+     ship->weapons[7].shots_left = 6;
+     ship->weapons[7].status = 0;
+
+-    // Assembly at 0x480b0a calls Clear_Structure_ on weapon slot 7 specifically
+     struct_::Clear_Structure_(&ship->weapons[7], 11 /* sizeof(s_combat_weapon_slot) */);
+
+     struct_::Set_Bit_Field_(ship->special_device_flags, 7);
+*** Update File: src/game/loadsave.cpp
+     const char s__ALT_F7__0055ac88[9] = "(ALT-F7)";
+     const char s__ALT_F8__0055ac7c[9] = "(ALT-F8)";
+
+-    /**
+-     * @address 00511020
+-     */
+     void __cdecl Allocate_Data_Space_For_Game_Popup_() {
+         // Allocate space for game animations and clear the block
+         _game_anims = (s_game_anims*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x65);
+@@
+         _game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
+     }
+
+-    /**
+-     * @address 0050fa10
+-     */
+     void __cdecl Load_Month_Names_() {
+         auto copy_message = [](int32_t msg_id, char* dest) {
+             const char* src = HAROLD::H_Message_((int16_t)msg_id);
+@@
+         copy_message(0xC9, _months[11]); // December
+     }
+
+-    /**
+-     * @address 0050f630
+-     */
+     void __cdecl Restore_Main_Screen_() {
+         video::Set_Page_Off_();
+         MAINSCR::Draw_Mini_Main_Screen_();
+@@
+         MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+     }
+
+-    /**
+-     * @address 0050f5d0
+-     */
+     void __cdecl Restore_Game_Popup_() {
+         if (MOX::_current_screen == SCREEN_MAIN_MENU) {
+             video::Set_Page_Back_();
+@@
+         return result;
+     }
+
+-    /**
+-     * @address 00512200
+-     */
+     bool __cdecl Active_Save_Slot_Invalid_() {
+         const int8_t save_slot = static_cast<int8_t>(MOX::_settings.active_save_slot);
+
+@@
+         return true;
+     }
+
+-    /**
+-     * @address 005120e0
+-     */
+     void __cdecl Set_Up_Load_Save_Popup_() {
+         FILEDEF::Get_Saved_Game_Descriptions_(LOADSAVE::_game_popup_fields->slot_occupied_flags);
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050ebf0
+-     */
+     void __cdecl Add_Game_Popup_Fields_(int16_t *out_x, int16_t *out_y) {
+         _music_level_field = -1000;
+         _sfx_level_field = -1000;
+@@
+         _game_popup_fields->screen_cancel_field_id = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, ')');
+     }
+
+-    /**
+-     * @address 0050e910
+-     */
+     int8_t __cdecl Do_Load_Game_Popup_(int16_t* exit_flag) {
+         int16_t exit_loop = 0;
+         int8_t load_success = 0;
+@@
+         return load_success;
+     }
+
+-    /**
+-     * @address 005113f0
+-     */
+     void __cdecl Do_Options_Game_Popup_(int16_t* exit_code) {
+         uint8_t initial_language = MOX::_settings.language;
+         bool exit_loop = false;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00511530
+-     */
+     void __cdecl Do_Save_Game_Popup_(int16_t* out_should_close) {
+         char temp_buffer[37];
+         int16_t sStack_6c, sStack_6a;
+@@
+         } while (game_index < 10);
+     }
+
+-    /**
+-     * @address 0050f8d0
+-     */
+     void __cdecl Get_Star_Date_Strings_(int32_t* dates, char* output_buf) {
+         for (int16_t i = 0; i < 10; ++i) {
+             char local_str_buf[25];
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050f7d0
+-     */
+     void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer) {
+         char slot_num_str[12];
+         char filename[20];
+@@
+         return magic_number;
+     }
+
+-    /**
+-     * @address 0050fe70
+-     */
+     void __cdecl _Draw_Main_Game_Popup_To_Bitmap_(s_animation_header* bitmap_ptr) {
+         int16_t saved_x = MOX::_popup_base_x;
+         int16_t saved_y = MOX::_popup_base_y;
+@@
+         MOX::_popup_base_y = saved_y;
+     }
+
+-    /**
+-     * @address 0050fe50
+-     */
+     void __cdecl _Draw_Load_Save_Game_Popup_To_Bitmap_(s_animation_header* bitmap) {
+         _print_data_to_bitmap = 1;
+         _bitmap = bitmap;
+@@
+         _print_data_to_bitmap = 0;
+     }
+
+-    /**
+-     * @address 0050fec0
+-     */
+     void __cdecl _Draw_Options_Game_Popup_To_Bitmap_(s_animation_header* bitmap) {
+         _print_data_to_bitmap = 1;
+         _bitmap = bitmap;
+@@
+         _print_data_to_bitmap = 0;
+     }
+
+-    /**
+-     * @address 0043d070
+-     */
+     bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
+         bool is_valid = false;
+         FILE* file = fopen(filename, s_rb_0055117c);
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050f730
+-     */
+     void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary) {
+         s_colors* colors;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0050f4c0
+-     */
+     void __cdecl Bad_Game_File_Message_(uint8_t type, int16_t file_index) {
+         char buffer[256];
+         buffer[0] = '\0';
+@@
+         Game_Popup_User_Box_(buffer, 3);
+     }
+
+-    /**
+-     * @address 0043d130
+-     */
+     bool __cdecl Is_Valid_Game_Type_(uint32_t game_type) {
+         return game_type == 0xe0;
+     }
+
+-    /**
+-     * @address 0050fc70
+-     */
+     void __cdecl Animate_Game_Popup_Pic_Height_(s_animation_header* animation, uint16_t type) {
+         int16_t height = animate::Get_Height_(animation);
+         LOADSAVE::Animate_Game_Popup_(animation, height, -1, type);
+     }
+
+-    /**
+-     * @address 0050fca0
+-     */
+     void __cdecl Animate_Game_Popup_(s_animation_header* header, int16_t y_offset, int16_t direction, uint16_t type) {
+         uint16_t w = animate::Get_Width_(header);
+         uint16_t h = animate::Get_Height_(header);
+@@
+         allocate::Pop_Block_(MOX::_screen_seg);
+     }
+
+-    /**
+-     * @address 0043d1d0
+-     */
+     void __cdecl Save_Session_Related_Settings_() {
+         uint8_t file_buffer[553]; // 0x229 bytes
+         bool success = false;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00512490
+-     */
+     void __cdecl Draw_Popup_Pic1_() {
+         animate::Draw_(
+             (int16_t)MOX::_popup_base_x + 147,
+@@
+         );
+     }
+
+-    /**
+-     * @address 005124C0
+-     */
+     void __cdecl Draw_Popup_Pic2_() {
+         animate::Draw_(
+             (int16_t)MOX::_popup_base_x + 40,
+@@
+         );
+     }
+
+-    /**
+-     * @address 00511c50
+-     */
+     void __cdecl Animate_Game_Popup_Pic_(s_animation_header* animation_header) {
+         LOADSAVE::Animate_Game_Popup_(animation_header, 0, 1, 0);
+     }
+
+-    /**
+-     * @address 00511e80
+-     */
+     void __cdecl Update_Game_Settings_() {
+         s_game_popup_fields* fields = LOADSAVE::_game_popup_fields;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 00511c70
+-     */
+     void __cdecl Set_Current_Game_Option_Flags_() {
+         // Scaling logic for levels: ((level * 100) / 100) * 155) / 100
+         // Simplifies to (level * 155) / 100
+@@
+         }
+     }
+
+-    /**
+-     * @address 00511930
+-     */
+     void __cdecl Load_Game_Popup_Pictures_() {
+         RUSS::Mox_Update_();
+
+@@
+         MAINSCR::_temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+     }
+
+-    /**
+-     * @address 005110a0
+-     */
+     void __cdecl Do_Main_Game_Popup_(int16_t* out_finished) {
+         bool closed_with_exit = false;
+         bool event_processed = false;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00510420
+-     */
+     void __cdecl _Draw_Main_Game_Popup_() {
+         int16_t input_result = fields::Auto_Input_();
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 00510750
+-     */
+     void __cdecl _Draw_Options_Game_Popup_() {
+         s_colors local_8;
+         MOX::_mox_font_colors_offset = 0x55; // 'U'
+@@
+         }
+     }
+
+-    /**
+-     * @address 005123d0
+-     */
+     void __cdecl Auto_Save_Last_Saved_Game_(int16_t* result_flag) {
+         int32_t save_slots[10];
+         char message_buffer[0xC8];
+@@
+         *result_flag = 0;
+     }
+
+-    /**
+-     * @address 00512290
+-     */
+     void __cdecl Embed_Special_Color_Codes_(char* param_1, int16_t param_2) {
+         int16_t length = static_cast<int16_t>(strlen(param_1));
+         char encoded[202];
+@@
+         }
+     }
+
+-    /**
+-     * @address 00512230
+-     */
+     void __cdecl Remove_Embedded_Special_Codes_(char* text) {
+         if (*text == '\x03') {
+             char special_code[2] = { '\x01', '\0' };
+@@
+         }
+     }
+
+-    /**
+-     * @address 005124f0
+-     */
+     void __cdecl Set_Music_For_Game_Popup_() {
+         short music_volume = static_cast<short>((static_cast<int32_t>(_game_popup_fields->music_level) * 100) / 0x9B);
+
+@@
+         sound::Set_Stream_Volume_(music_volume);
+     }
+
+-    /**
+-     * @address 00512590
+-     */
+     void __cdecl Set_Sound_For_Game_Popup_(char play_sound_effect) {
+         s_game_popup_fields* popup = LOADSAVE::_game_popup_fields;
+
+@@
+         popup->sound_fx_on = 0;
+     }
+
+-    /**
+-     * @address 004f2470
+-     */
+-    /**
+-     * @address 0050f650
+-     */
+     void __cdecl Get_File_Date_String_(const char* file_path, char* out_string) {
+         FILE* file = fopen(file_path, s_r_00556db0);
+         if (file == nullptr) {
+*** Update File: src/game/mainmenu.cpp
+         anims->pictures[19] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x1a, seg);
+     }
+
+-    /**
+-     * @address 00511f40
+-     */
+     int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* save_game_list) {
+         LOADSAVE::_draw_game_popup_to_back = 1;
+         MOX::_screen_data = 2;
+@@
+
+     /**
+      * Loads and displays the main menu load game screen popup until a selection is confirmed.
+-     * @address 004e94d0
+      */
+     int8_t __cdecl Do_Mainmenu_Load_Screen_() {
+         int8_t result;
+*** Update File: src/game/mainpups.cpp
+         ERICHELP::Set_Officer_Information_Popup_Help_List_();
+     }
+
+-    /**
+-     * @address 0045b620
+-     */
+     void __cdecl Add_Officer_Gains_Level_Fields_() {
+         char* hotkey;
+         int16_t sound;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0045e510
+-     */
+     void __cdecl Update_Colony_Combat_Fields_(int16_t planet_idx, int16_t* fields_ptr) {
+         Eric_Push_Fields_();
+         Add_Colony_Combat_Fields_(planet_idx, fields_ptr);
+@@
+         return Colony_Combat_Popup_(&local_30, 1);
+     }
+
+-    /**
+-     * @address 0045a290
+-     */
+     int8_t __cdecl Player_Has_Colony_Or_Outpost_At_Star_(int16_t player_idx, int16_t star_idx) {
+         for (int16_t i = 0; i < 5; ++i) {
+             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+@@
+         Do_Evaluate_Discovery_Input_(input_1, input_2);
+     }
+
+-    /**
+-     * @address 0045bc00
+-     */
+     void __cdecl Do_Evaluate_Discovery_Input_(int16_t* mouse_x, int16_t* mouse_y) {
+         int16_t out_val1;
+         int16_t out_val2;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0045b470
+-     */
+     void __cdecl Marooned_Officer_Fails_Popup_(int16_t star_idx, int16_t officer_idx) {
+         _officer_gains_level_state = 2;
+         Officer_Gains_Level_Popup_(star_idx, officer_idx);
+         _officer_gains_level_state = 0;
+     }
+
+-    /**
+-     * @address 0045b440
+-     */
+     void __cdecl Marooned_Officer_Joins_Popup_(int16_t star_idx, int16_t officer_idx) {
+         _officer_gains_level_state = 1;
+         Officer_Gains_Level_Popup_(star_idx, officer_idx);
+@@
+         COLONY::Load_Galaxy_Map_Anims_();
+     }
+
+-    /**
+-     * @address 0045fa20
+-     */
+     void __cdecl Update_Dragon_New_Star_Fields_() {
+         Eric_Push_Fields_();
+         COLONY::Clear_Galaxy_Map_Fields_();
+@@
+         _anims[9] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x2f /* 47 */, MOX::_screen_seg);
+     }
+
+-    /**
+-     * @address 0045c610
+-     */
+     void __cdecl Update_Colony_Defense_Fields_() {
+         Eric_Push_Fields_();
+         COLONY::Clear_Sys_Disp_Fields_();
+@@
+         );
+     }
+
+-    /**
+-     * @address 0045c650
+-     */
+     void __cdecl Draw_Defense_Selection_Popup_() {
+         char buffer[500];
+
+@@
+         );
+     }
+
+-    /**
+-     * @address 0045c710
+-     */
+     int16_t __cdecl Evaluate_Defense_Selection_Input_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made) {
+         if (*field_idx == _mp_fields[6]) {
+             *selection_made = 1;
+@@
+         return best_shield_id;
+     }
+
+-    /**
+-     * @address 0045c170
+-     */
+     int16_t __cdecl Check_System_Display_Fields_Selection_(int16_t* x, int16_t* y, int16_t* selection_confirmed) {
+         int16_t planet_scanned;
+         int16_t icon_scanned;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0045fcf0
+-     */
+     int16_t __cdecl Evaluate_Dragon_New_Star_Input_(int16_t* field_idx_ptr, int16_t* mouse_pos_ptr, int16_t* status_ptr, int16_t target_star_val) {
+         MAINPUPS::_g_scanned_star = -1;
+         int16_t field_idx = *field_idx_ptr;
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 0045b7f0
+-     */
+     void __cdecl Load_Officer_Gains_Level_Popup_() {
+         allocate::Push_Block_(MOX::_screen_seg);
+
+@@
+         OFFICER::Load_Officer_Skill_Icons_(MOX::_screen_seg);
+     }
+
+-    /**
+-     * @address 0045d230
+-     */
+     int8_t __cdecl New_Colony_Confirmation_Box_(int16_t planet_idx) {
+         s_potential_colony_info potential_info;
+         char msg_buffer[2000];
+@@
+         _mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, ESTRINGS::E_Strings_(0xC), 0);
+     }
+
+-    /**
+-     * @address 0045c740
+-     */
+     int16_t __cdecl Check_System_Display_Fields_Defense_Selection_(int16_t* param_1, int16_t* param_2, int16_t* param_3) {
+         int16_t scanned_planet_field;
+         int16_t scanned_planet_icon;
+*** Update File: src/game/mainscr.cpp
+         }
+     }
+
+-    /**
+-     * @address 004cd550
+-     */
+     void __cdecl Update_Ship_Icons_In_Between_Turns_() {
+         Update_Star_Owners_();
+         SHIPS::Build_Ship_Icons_();
+@@
+         }
+     }
+
+-    /**
+-     * @address 004c6da0
+-     */
+     void __cdecl Draw_Scanned_Ship_Seg_() {
+         int16_t icon_idx = _main_screen_ship_icon_scanned;
+         int16_t owner_idx = HACCESS::Ship_Icon_Owner_(icon_idx);
+@@
+         return first_stack_idx;
+     }
+
+-    /**
+-     * @address 0045f3f0
+-     */
+     void __cdecl Tax_Rate_Popup_() {
+         int16_t scan_val;
+         int16_t input_val;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004c4980
+-     */
+     void* __cdecl Allocate_First_Screen_Seg_(int32_t param) {
+         // Allocate 76,000 bytes (0x128E0) for other ships
+         MOX::_other_ships_screen_seg = allocate::Allocate_First_Block_(MOX::_screen_seg, 76000 /* 0x128E0 */);
+@@
+         return MOX::_global_bitmap_seg;
+     }
+
+-    /**
+-     * @address 004c4e90
+-     */
+     bool __cdecl Ship_Can_Be_Selected_(int16_t ship_idx) {
+         return HACCESS::Player_Can_Order_Ship_(MOX::_PLAYER_NUM, &MOX::_ship[ship_idx]);
+     }
+@@
+         animate::Draw_(249, 5, MOX::_main_game_button_seg);
+     }
+
+-    /**
+-     * @address 004c64b0
+-     */
+     void __cdecl Draw_Main_Screen_Before_Stencil_() {
+         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+         video::Clip_On_();
+@@
+         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
+     }
+
+-    /**
+-     * @address 004cc480
+-     */
+     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx) {
+         int16_t result = -1;
+         bool found = false;
+*** Update File: src/game/misc.cpp
+         *p_frame_index += 1;
+     }
+
+-    /**
+-     * @address 0049df10
+-     */
+     char* __cdecl Get_Comma_String_(int32_t val) {
+         char separator = ',';
+         if (MOX::_settings.language == 1 /* French/German separator variant */) {
+@@
+         RUSS::Mox_Sync_Update_();
+     }
+
+-    /**
+-     * @address 0049f120
+-     */
+     void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t shadow_color, const char* text) {
+         s_colors orig_colors;
+         s_colors shadow_colors;
+@@
+         fonts::Print_(x, y, text);
+     }
+
+-    /**
+-     * @address 0049f0e0
+-     */
+     void __cdecl _Print_Centered_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text) {
+         int16_t width = fonts::Get_String_Width_(text);
+
+*** Update File: src/game/movebox.cpp
+             }
+         }
+
+-        // If not found, original code accesses MOX::DAT_0059bd1e at 0x0059BD1E.
+         int16_t target_box_id;
+         if (found_idx >= 0) {
+             target_box_id = MOX::_moveable_box_order[found_idx];
+*** Update File: src/game/newpup.cpp
+     const char s_0_0055110c[3] = "\0320";
+     const char s_1_00551110[3] = "\0321";
+
+-    // Patch: { 0x00487060, &NEWPUP::Troop_Popup_ },
+     void __cdecl Troop_Popup_() {
+         COLONY::_full_draw = 1;
+         fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
+@@
+         MOX2::Put_Auto_Function_(&NEWPUP::_saved_autofunction);
+     }
+
+-    // Patch: { 0x00487130, &NEWPUP::Draw_Troop_Popup_ },
+     void __cdecl Draw_Troop_Popup_() {
+         int16_t summary_row;
+         s_invasion_side_info invasion_info;
+@@
+         }
+     }
+
+-    // Patch: { 0x004873C0, &NEWPUP::Print_Race_Summary_ },
+     void __cdecl Print_Race_Summary_(s_invasion_side_info* side_info, int16_t* summary_buffer) {
+         char officer_name[52];
+
+@@
+         }
+     }
+
+-    // Patch: { 0x004870f0, &NEWPUP::Reset_Fields_ },
+     void __cdecl Reset_Fields_() {
+         fields::Clear_Fields_();
+         COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+         fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
+     }
+
+-    // Patch: { 0x004874B0, &NEWPUP::Print_Troop_Totals_ },
+     void __cdecl Print_Troop_Totals_(int16_t x_base, int16_t unused_param_2, s_invasion_side_info* invasion_side) {
+         (void)unused_param_2;
+
+*** Update File: src/game/officer.cpp
+         }
+     }
+
+-    /**
+-     * @address 0043D5B0
+-     */
+     void __cdecl Deassign_Officer_(int16_t leader_idx) {
+         s_leader_data& leader = MOX::_leaders[leader_idx];
+         int16_t player_idx = (int16_t)leader.player_index;
+@@
+      * Calculates the maintenance cost for an officer in a specific slot.
+      * Logic: (cost + 99) / 100, clamped to minimum 1, unless the officer has
+      * specific skills or is in a specific slot (0x41).
+-     * @address 0043e8c0
+      */
+     int16_t __cdecl Officer_Maintenance_(int16_t player_idx, int16_t leader_idx) {
+         int16_t cost = (int16_t)OFFICER::Officer_Cost_(player_idx, leader_idx);
+@@
+     /**
+      * Attempts to initiate the hiring process for an officer/leader.
+      * Checks if the leader is available (status 4) and if the player has sufficient funds.
+-     */
+-    /**
+-     * @address 00443580
+      */
+     uint8_t __cdecl Ask_For_Hire_(int16_t leader_idx) {
+         int16_t upkeep;
+@@
+         return result;
+     }
+
+-    /**
+-     * @address 00443430
+-     */
+-    /**
+-     * @address 004434c0
+-     */
+     void __cdecl Not_Enough_BCs_Message_(int16_t leader_idx, int16_t cost) {
+         char format_string[200];
+         char output_buffer[256];
+@@
+         }
+     }
+
+-    /**
+-     * @address 00443fe0
+-     */
+     void __cdecl Dismiss_Officer_(int16_t officer_idx) {
+         s_leader_data& leader = MOX::_leaders[officer_idx];
+         int16_t location = leader.location;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0043ff00
+-     */
+     void __cdecl Move_Officer_To_Limbo_(int16_t leader_idx) {
+         s_leader_data& leader = MOX::_leaders[leader_idx];
+
+@@
+         MOX::_officer_selected = -1;
+     }
+
+-    /**
+-     * @address 00442640
+-     */
+     void __cdecl Wrapper_For_Offscrn_Help_Fields_() {
+         int16_t officer_slot = 0;
+         int16_t y = 0x32;
+@@
+         );
+     }
+
+-    /**
+-     * @address 00442370
+-     */
+     bool __cdecl Leaders_In_Hiring_Pool_() {
+         bool is_fleet_screen = Is_Fleet_Officer_Screen_();
+         bool found = false;
+@@
+         return (static_cast<int32_t>(fleet_officers) + static_cast<int32_t>(star_officers)) < 8;
+     }
+
+-    /**
+-     * @address 00442cd0
+-     */
+     void __cdecl Generate_Random_Officer_(int16_t player_index) {
+         int16_t leader_index = Select_Leader_For_Hire_(player_index);
+
+*** Update File: src/game/platform.cpp
+         SendMessageA(g_main_window, 0x401, 0, 0);
+
+         // Busy wait until the message handler resets the pending flag.
+-        // Note: The original assembly (0x00527ebc - 0x00527ec3) contains a bug where
+         // the variable is not reloaded from memory inside the loop, effectively
+         // creating an infinite spin if the flag remains true after SendMessageA returns.
+         while (g_pending_toggle_pages) {
+*** Update File: src/game/racescrn.cpp
+         }
+     }
+
+-    /**
+-     * @address 0049da90
+-     */
+     void __cdecl Move_Spies_Group_(s_racescrn_mouse_group* mouse_group, s_animation_header* mouse_sprite) {
+         Move_Icon_Group_Icons_(mouse_group, RACESCRN::_g_mouse_group_p, RACESCRN::_g_spy_xfer_count);
+         Redraw_Spy_Mouse_(mouse_sprite);
+     }
+
+-    /**
+-     * @address 0049d960
+-     */
+     void __cdecl Adjust_Spy_Mission_Data_() {
+         int16_t active_count = MOX::_active_count;
+
+*** Update File: src/game/report.cpp
+         return (uint8_t)REPORT::Display_Report_Aux_(report_idx, 1);
+     }
+
+-    /**
+-     * @address 004a9e40
+-     */
+     void __cdecl sprintf_report_(char* buffer, s_report* report) {
+         if (report->type == 1 /* MSG_TYPE_REPORT_YOUR_SPY */) {
+             if (report->action == 0 /* SPY_ACTION_STEAL */) {
+@@
+         return data;
+     }
+
+-    /**
+-     * @address 004aa020
+-     */
+     void __cdecl Client_Initialize_Reports_() {
+         _done_player_reports = 0;
+         _displayed_msgs = 0;
+@@
+         MOX::_antarans.attack_notified_mask = 0;
+     }
+
+-    /**
+-     * @address 004aa050
+-     */
+     void __cdecl Initialize_Reports_() {
+         _n_reports = 0;
+
+@@
+         if (displayed == 0) {
+             REPORT::Redirect_Newly_Built_Ships_(player_num);
+
+-            // Re-checking displayed (BL) as per disassembly 0x004ab2c6
+             if (displayed == 0) {
+                 // If game type is 2 (Hotseat) or 3 (Network), perform autosave
+                 if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
+@@
+         return has_officer;
+     }
+
+-    /**
+-     * @address 004aae90
+-     */
+     int8_t __cdecl Has_Research_Breakthrough_(int16_t player_idx, int8_t do_select) {
+         int8_t status = 0;
+
+@@
+         return result;
+     }
+
+-    /**
+-     * @address 004aa550
+-     */
+-    /**
+-     * @address 004aa0d0
+-     */
+     int8_t __cdecl Draw_Special_(s_star_data* star, int16_t param_2) {
+         int8_t special = star->system_special;
+
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 004ab010
+-     */
+     int8_t __cdecl Has_Diplomacy_Messages_(int16_t receiver_idx, bool show_messages) {
+         int8_t has_messages = 0;
+
+@@
+     }
+
+     /**
+-     * @address 004aab80
+-     */
+-    /**
+      * @brief Evaluates and triggers Antaran attack notifications.
+      * 
+      * @param param_1 Unused.
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 004aaac0
+-     */
+     void __cdecl Redirect_Newly_Built_Ships_(int16_t player_idx) {
+         bool any_ships_redirected = false;
+         s_ship_data* ship = MOX::_ship;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004aa070
+-     */
+     void __cdecl Add_Report_(s_report* report) {
+         if (_n_reports < 50) {
+             _reports[_n_reports] = *report;
+*** Update File: src/game/score.cpp
+         return 0;
+     }
+
+-    /**
+-     * @address 0x004e4980
+-     */
+     int32_t __cdecl qsort_hof_scores_ascending_(const void* param_1, const void* param_2) {
+         const int16_t* p1 = (const int16_t*)param_1;
+         const int16_t* p2 = (const int16_t*)param_2;
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 004e3ad0
+-     */
+     void __cdecl Load_Hall_Of_Fame_Screen_() {
+         // Allocate space for the high score screen state and zero it out.
+         // Size 0x125 (293 bytes) corresponds to sizeof(s_hiscore).
+@@
+         return SCORE::_hi->score_final;
+     }
+
+-    /**
+-     * @address 0x004e45e0
+-     */
+     void __cdecl Init_Hall_Of_Fame_Screen_() {
+         fields::Clear_Fields_();
+
+@@
+         _hof = local_hof;
+     }
+
+-    /**
+-     * @address 0x004e45a0
+-     */
+     void __cdecl Write_HOF_File_() {
+         FILE* file;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0x004e33e0
+-     */
+     void __cdecl Draw_Reg_Pop_() {
+         SCORE::Draw_Pop_(0, 4, SCORE::_hi->reg_pop);
+     }
+
+-    /**
+-     * @address 0x004e3380
+-     */
+     void __cdecl Draw_Population_Score_() {
+         char buffer[80];
+         int raw_population = (int)SCORE::_hi->raw_population;
+@@
+         );
+     }
+
+-    /**
+-     * @address 0x004e2cf0
+-     */
+     void __cdecl Draw_Elimination_Score_() {
+         char message_buffer[80];
+         int16_t num_defeated = SCORE::_hi->num_opponents_defeated;
+@@
+         SCORE::Draw_Generic_Score_(SCORE::_hi->score_elimination, message_buffer, SCORE::Draw_Eliminated_Race_Pictures_, 0x168);
+     }
+
+-    /**
+-     * @address 0x004e2380
+-     */
+     int32_t __cdecl Get_Captured_Colonist_Score_(int16_t player_idx) {
+         int16_t captured_pop = MOX::_player[player_idx].captured_population;
+
+@@
+         return product / (int32_t)((int8_t)MOX::_settings.galaxy_size + 1);
+     }
+
+-    /**
+-     * @address 004e29c0
+-     */
+     void __cdecl Draw_Captured_Colonies_Score_(void) {
+         char buffer[80];
+         int16_t message_id;
+@@
+         SCORE::Draw_Generic_Score_(SCORE::_hi->score_captured_colonists, buffer, SCORE::Draw_Cap_Pop_, 0x168 /* 360 */);
+     }
+
+-    /**
+-     * @address 0x004e2a20
+-     */
+     void __cdecl Draw_Cap_Pop_() {
+         SCORE::Draw_Pop_(1, 2, SCORE::_hi->raw_captured_population);
+     }
+
+-    /**
+-     * @address 004e3430
+-     */
+     void __cdecl Draw_Time_Score_() {
+         char buffer[80];
+         int16_t score = SCORE::_hi->score_time;
+@@
+         SCORE::_hi->next_draw_y = font_height + 146 /* 0x92 */;
+     }
+
+-    /**
+-     * @address 0x004e2d90
+-     */
+     void __cdecl Draw_Eliminated_Race_Pictures_(void)
+     {
+         int8_t player_idx;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004e3400
+-     */
+     void __cdecl Draw_Technology_Score_() {
+         char* label = (char*)HAROLD::H_Message_(349 /* HESTR_15D_TECHNOLOGY */);
+         SCORE::Draw_Generic_Score_(SCORE::_hi->score_technology, label, nullptr, 360);
+     }
+
+-    /**
+-     * @address 0x004e30e0
+-     */
+     void __cdecl Draw_Orion_Score_() {
+         char* label = (char*)HAROLD::H_Message_(0x15B /* HESTR_15B_CAPTURED_ORION */);
+         Draw_Generic_Score_(_hi->score_orion, label, nullptr, 0);
+     }
+
+-    /**
+-     * @address 004e2990
+-     */
+     void __cdecl Draw_Antares_Score_() {
+         char* message = (char*)HAROLD::H_Message_(0x153);
+         Draw_Generic_Score_(_hi->score_antares, message, nullptr, 0);
+     }
+
+-    /**
+-     * @address 0x004e2a40
+-     */
+     void __cdecl Draw_Council_Score_(void) {
+         int16_t council_score = SCORE::_hi->score_council;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0x004e21d0
+-     */
+     void __cdecl Calculate_Hi_Scores_(int16_t player_idx) {
+         char scor_buf[16];
+
+@@
+         SCORE::_hi->score_final = (int16_t)((product + 50) / 100);
+     }
+
+-    /**
+-     * @address 004e2a70
+-     */
+     void __cdecl Draw_Total_Score_() {
+         int16_t next_draw_y = _hi->next_draw_y;
+         fonts::Set_Font_Style_(4, &_hi->colors);
+@@
+         fonts::Print_(current_x, y, score_buffer);
+     }
+
+-    /**
+-     * @address 0x004e3680
+-     */
+     void __cdecl Print_Score_String_(int16_t x, int16_t y, int16_t score, const char* label) {
+         s_colors dot_colors;
+         char dot_str[4];
+@@
+         fonts::Print_Right_(499 /* 0x1F3 */, print_y, score_buf);
+     }
+
+-    /**
+-     * @address 0x004e3070
+-     */
+     void __cdecl Draw_Generic_Score_(int16_t value, const char* label, void (__cdecl *callback)(), int width) {
+         int16_t current_y = SCORE::_hi->next_draw_y;
+
+@@
+         SCORE::_hi->flash_timer_ticks = 0;
+     }
+
+-    /**
+-     * @address 0x004e2750
+-     */
+     void __cdecl Add_Hi_Score_Screen_Fields_() {
+         _hi->screen_field_handle = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+     }
+
+-    /**
+-     * @address 0x004e28f0
+-     */
+     void __cdecl Init_Hi_Score_(int16_t player_idx) {
+         Get_Total_Population_(player_idx);
+         uint32_t saved_seed = random::Get_Random_Seed_();
+@@
+         random::Set_Random_Seed_(saved_seed);
+     }
+
+-    /**
+-     * @address 0x004e24d0
+-     */
+     int16_t __cdecl Get_Technology_Score_(int16_t player_idx) {
+         int16_t tech_points;
+         int16_t total_techs;
+@@
+         return 0;
+     }
+
+-    /**
+-     * @address 004e2450
+-     */
+     int16_t __cdecl Get_Orion_Score_(int16_t player_idx) {
+         if (SCORE::Captured_Orion_(player_idx)) {
+             return 100;
+@@
+         return _hi->raw_population;
+     }
+
+-    /**
+-     * @address 0x004e2470
+-     */
+     int8_t __cdecl Captured_Orion_(int16_t player_idx) {
+         return MOX::_player[player_idx].captured_orion;
+     }
+
+-    /**
+-     * @address 0x004e2510
+-     */
+     void __cdecl Get_Technology_(int16_t player_idx, int16_t* tech_count, int16_t* hyper_tech_count) {
+         *tech_count = 0;
+         *hyper_tech_count = 0;
+@@
+         return MOX::_player[player_idx].captured_antares;
+     }
+
+-    /**
+-     * @address 0x004e25e0
+-     */
+     int16_t __cdecl Get_Total_Population_(int16_t player_idx) {
+         int16_t total_pop = 0;
+
+@@
+         return total_pop;
+     }
+
+-    /**
+-     * @address 004e4ad0
+-     */
+     void __cdecl Set_Hi_Score_Pop_Icon_Ids_(int16_t player_idx) {
+         int16_t race_counts[14];
+         bool limit_reached = false;
+@@
+         return _hi->score_final;
+     }
+
+-    /**
+-     * @address 004e3540
+-     */
+     void __cdecl Load_Hi_Score_Screen_() {
+         uint32_t bitmap_size;
+         int16_t lbx_index;
+@@
+         SCORE::_hi->temp_colors = *MISC::Font_Colors2_(4, 208 /* 0xD0 */, 210 /* 0xD2 */);
+     }
+
+-    /**
+-     * @address 0x004e3110
+-     */
+     void __cdecl Draw_Pop_(uint8_t is_captured, int16_t max_pop, int16_t current_pop) {
+         int16_t space;
+         s_animation_header* anim;
+@@
+         SCORE::_hi->next_draw_y += 3;
+     }
+
+-    /**
+-     * @address 004e4d70
+-     */
+     void __cdecl Get_From_Tmp_Pop_(s_hiscore_tmp_pop* tmp_pop_list, uint16_t race_idx, int16_t count, int16_t* out_colony_idx, int16_t* out_pop_idx) {
+         int16_t first_match_colony = -1;
+         int16_t first_match_pop = -1;
+@@
+             tmp_pop_list[unused_index].is_used = 1;
+         } else {
+             // Potential bug: This branch performs a comparison and dereference of an 
+-            // address (0xFFFFFFFF) that is typically invalid in Win32.
+             if (reinterpret_cast<std::uintptr_t>(out_colony_idx) == kInvalidOutColonyIdxMarker) {
+                 *out_colony_idx = first_match_colony;
+                 *out_pop_idx = first_match_pop;
+*** Update File: src/game/shipmove.cpp
+      * @param ship The ship to check.
+      * @return True if the ship can be ordered.
+      */
+-    /**
+-     * @address 00436b40
+-     */
+     bool __cdecl Ship_Is_Moving_(s_ship_data* ship) {
+         if (ship->status >= 1 && ship->status <= 2) {
+             return true;
+@@
+         return false;
+     }
+
+-    /**
+-     * @address 00435fc0
+-     */
+     int16_t __cdecl Ship_Range_(s_ship_data* ship) {
+         if (ship->owner >= 8) {
+             return 0xFF;
+@@
+         return range;
+     }
+
+-    /**
+-     * @address 00437260
+-     */
+     int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship) {
+         int16_t location = ship->location;
+
+@@
+         return location;
+     }
+
+-    /**
+-     * @address 00436e30
+-     */
+     int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y) {
+         int16_t i;
+
+@@
+         return (int32_t)i;
+     }
+
+-    /**
+-     * @address 00436b60
+-     */
+     void __cdecl Move_All_Ships_Toward_Stars_() {
+         int8_t local_8;
+         int8_t local_7;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00437750
+-     */
+     void __cdecl Unmark_Just_Built_AI_Ships_() {
+         int32_t num_ships = static_cast<int32_t>(MOX::_NUM_SHIPS);
+         s_ship_data* ship_array = MOX::_ship;
+@@
+         }
+     }
+
+-    /**
+-     * @address 00436cd0
+-     */
+     void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx) {
+         ship->location = (short)star_idx;
+         ship->status = 0;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004363e0
+-     */
+     void __cdecl Ships_Try_To_Move_To_(int16_t* ship_list, int16_t target_star_idx, s_ship_move_info* move_info) {
+         int16_t start_x = 0;
+         int16_t start_y = 0;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004377d0
+-     */
+     void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
+         uint16_t presence_mask[72]; // Tracks which players have assets at each star
+         memset(presence_mask, 0, sizeof(presence_mask));
+@@
+         }
+     }
+
+-    /**
+-     * @address 004368e0
+-     */
+-    /**
+-     * @address 00437910
+-     */
+     bool __cdecl Player_Has_Ships_Pestering_Other_Player_(int player_idx, uint8_t colony_bit_idx) {
+         s_ship_data* ship = MOX::_ship;
+         s_ship_data* ship_end = MOX::_ship + static_cast<int16_t>(MOX::_NUM_SHIPS);
+@@
+         return n_turns;
+     }
+
+-    /**
+-     * @address 004374e0
+-     */
+     void __cdecl Do_Hyperspace_Beast_(int32_t player_idx) {
+         s_MSG msg;
+         msg.msg_type = MSG_TYPE_HYPERSPACE_BEAST;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004373a0
+-     */
+     void __cdecl Do_Wormhole_Event_(int32_t player_idx, s_wormhole_data* wormhole) {
+         wormhole->success = 0;
+         wormhole->dest_star_idx = 0;
+*** Update File: src/game/ships.cpp
+
+ namespace SHIPS {
+
+-    /**
+-     * @address 0041ff40
+-     */
+     void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship) {
+         uint8_t ship_type = ship->d.ship_type;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0041ff60
+-     */
+     void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
+         if (*ship_list == -1) {
+             return;
+@@
+         line::Multi_Colored_Line_(x1, y1, x2, y2, &reversed_colors, phase);
+     }
+
+-    /**
+-     * @address 0041f030
+-     */
+     void __cdecl Get_XYs_For_Orbiting_Ships_(int16_t star_idx, int16_t ship_icon_idx, int16_t* out_x1, int16_t* out_y1, int16_t* out_x2, int16_t* out_y2, int16_t* out_arr_x, int16_t* out_arr_y) {
+         s_animation_header* anim = SHIPS::Get_Ship_Icon_Pict_Seg_(ship_icon_idx, 0);
+         int16_t width = animate::Get_Width_(anim);
+@@
+         out_arr_y[2] = y_ref + 3 * diff_11_minus_zoom;
+     }
+
+-    /**
+-     * @address 0041fef0
+-     */
+     void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, uint8_t* width, uint8_t* height) {
+         s_animation_header* anim;
+
+@@
+         *height = (uint8_t)animate::Get_Height_(anim);
+     }
+
+-    /**
+-     * @address 0041f200
+-     */
+     s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t ship_type_idx, uint8_t is_highlighted) {
+         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+         int16_t inverted_zoom = 1;
+@@
+         return nullptr;
+     }
+
+-    /**
+-     * @address 0041f150
+-     */
+-    /**
+-     * @address 0041f730
+-     */
+     bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(int16_t node_idx) {
+         bool result = false;
+         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+@@
+         *y = (scaled_y - (int16_t)(*height_ptr >> 1)) + 21 /* 0x15 */;
+     }
+
+-    /**
+-     * @address 0041f370
+-     */
+-    /**
+-     * @address 0041f680
+-     */
+     void __cdecl Draw_Ship_Destination_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors) {
+         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+         int zoom_index = 3 - (int)zoom_level;
+*** Update File: src/game/sound.cpp
+         return _strcmpi(tag_buf, s_data_0055c20c) == 0;
+     }
+
+-    /**
+-     * @address 0052DC80
+-     */
+     void __cdecl Destroy_Sound_() {
+         Stop_Sound_Timer_And_Wait2_();
+         timeKillEvent(_soundTimerId);
+@@
+         sound::_soundTimerLock = 0;
+     }
+
+-    /**
+-     * @address 00532440
+-     */
+     void __cdecl Stop_Sound_Timer_() {
+         sound::_soundTimerStopFlag = 1;
+
+@@
+         }
+     }
+
+-    /**
+-     * @address 0052e7a0
+-     */
+     void __cdecl Set_Channel_Volume_(int32_t channel_idx, int32_t volume) {
+         if (sound::_soundOn == 0) {
+             return;
+@@
+         return static_cast<uint8_t>(status);
+     }
+
+-    /**
+-     * @address 0052e850
+-     */
+     void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx) {
+         if (channel_idx >= 0 && channel_idx < 16) {
+             _soundChannels[channel_idx].volume_index = volume_idx;
+@@
+         }
+     }
+
+-    /**
+-     * @address 0052e800
+-     */
+     void __cdecl Set_Master_Volume_(int32_t volume) {
+         if (sound::_soundOn != 0 && volume >= 0 && volume <= 100) {
+             // Cap volume to master volume limit
+@@
+      * indicate the channel is not busy.
+      * 
+      * @return The index of the free channel (0-15), or -2 if no channel is available.
+-     * @address 0052ddc0
+      */
+     int8_t __cdecl Find_Free_Channel_() {
+         for (int8_t i = 0; i < 16; ++i) {
+@@
+     /**
+      * Attempts to play a sound resource by ID. Checks if the resource is already
+      * cached in _soundIndices; otherwise, loads it from the LBX file.
+-     * @address 0052de10
+      */
+     int32_t __cdecl Play_Sound_(int32_t resource_id) {
+         int32_t channel_id = (int8_t)Find_Free_Channel_();
+@@
+         }
+     }
+
+-    /**
+-     * @address 0052e5a0
+-     */
+     int32_t __cdecl Get_Free_Sound_Index_() {
+         for (int32_t i = 1; i < 33; ++i) {
+             if (_soundIndices[i].next_id == -1 && _soundIndices[i].prev_id == -1) {
+@@
+
+     /**
+      * @brief Traverses the sound buffer index list and merges adjacent free blocks.
+-     */
+-    /**
+-     * @address 0052e2b0
+      */
+     void* __cdecl Allocate_Sound_Block_(int8_t channel, int32_t resource_id, int32_t size) {
+         if (size > (int32_t)_soundBufferSize) {
+*** Update File: src/game/spy.cpp
+         return bonus;
+     }
+
+-    /**
+-     * @address 004b8450
+-     */
+     void __cdecl Compute_Spy_Bonuses_(s_player* player, int16_t* defense_bonus_out, int16_t* attack_bonus_out) {
+         int32_t telepathic_bonus = player->traits[TRAIT_TELEPATHIC] * 10;
+         int32_t tech_and_trait_bonus = Tech_Spy_Bonus_(player) + player->traits[TRAIT_SPYING_BONUS];
+@@
+         }
+     }
+
+-    /**
+-     * @address 004b8660
+-     */
+     void __cdecl Allocate_AI_Spies_(s_player* player) {
+         if (player->eliminated != 0) {
+             return;
+@@
+         }
+     }
+
+-    /**
+-     * @address 004b9540
+-     */
+     // Suggested name: spy::Steal_App_
+     void __cdecl Steal_App_(s_player* attacker, s_player* victim, int8_t frame_flag) {
+         int attacker_idx = attacker - MOX::_player;
+*** Update File: src/game/sys.cpp
+         MISC::_Print_Centered_Shadow_Down_(print_x, print_y, 0x3d /* '=' */, text);
+     }
+
+-    /**
+-     * @address 00497f80
+-     */
+     s_animation_header* __cdecl Buffer_Reload_System_Ships_(int16_t display_idx) {
+         int16_t node_ship_idx = MOX::_ship_node[MOX::_system_display_ships[display_idx].ship_idx].ship_idx;
+         int16_t owner_idx = HACCESS::Ship_Owner_(node_ship_idx);
+@@
+         }
+     }
+
+-    /**
+-     * @address 00495bf0
+-     */
+     void __cdecl Measure_System_Ship_Data_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t p5, int16_t* out_w, int16_t* out_h) {
+         // Mode 0 is used for measurement calculation instead of actual drawing.
+         SYS::Do_Print_System_Ship_Data_(x, y, w, h, p5, out_w, out_h, 0);
+*** Update File: src/game/video.h
+
+ 	extern tagPALETTEENTRY g_palette_entries[256];
+
+-	// Address 0x579350 is the base of the current palette status array
+ 	extern s_palette_entry _current_palette[256];
+
+ 	extern uint8_t* _palette_list[65];
+*** End Patch

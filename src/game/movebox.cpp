@@ -625,7 +625,7 @@ namespace MOVEBOX {
                 MOVEBOX::Vanish_Fleet_Movement_Box_();
             }
 
-            _mouse_XY_star_idx = -1;
+            MOX::_mouse_XY.star_idx = -1;
             MOX::_moveable_box[box_idx].id =
                     static_cast<int16_t>(MOX::_box_off_flag[MOX::_moveable_box[box_idx].index]);
         }

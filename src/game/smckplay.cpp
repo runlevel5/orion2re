@@ -8,12 +8,12 @@ namespace smckplay {
         char path_buffer[100];
         IDirectSound* direct_sound = sound::_dsound;
 
-        ::SmackSoundUseDirectSound(direct_sound);
+        _SmackSoundUseDirectSound(direct_sound);
 
         ::strcpy(path_buffer, file_name);
 
         uint32_t open_flags = ((mode == 1) ? 0xFE000u : 0u) | options;
-        _smk = ::SmackOpen(path_buffer, open_flags, -1);
+        _smk = _SmackOpen(path_buffer, open_flags, -1);
         if (_smk == nullptr) {
             if (farload::_secondary_drive_path[0] == '\0') {
                 return 0;
@@ -21,7 +21,7 @@ namespace smckplay {
 
             ::strcpy(path_buffer, farload::_secondary_drive_path);
             ::strcat(path_buffer, file_name);
-            _smk = ::SmackOpen(path_buffer, open_flags, -1);
+            _smk = _SmackOpen(path_buffer, open_flags, -1);
         }
 
         return static_cast<int8_t>(_smk != nullptr);

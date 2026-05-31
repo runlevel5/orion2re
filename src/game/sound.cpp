@@ -218,8 +218,8 @@ namespace sound {
      */
     void __cdecl Destroy_Sound_() {
         Stop_Sound_Timer_And_Wait2_();
-        PTR_timeKillEvent_005aa5cc(_soundTimerId);
-        PTR_timeEndPeriod_005aa5c4(0xA0);
+        timeKillEvent(_soundTimerId);
+        timeEndPeriod(0xA0);
 
         if (_soundOn == 1) {
             _dsound->Release();

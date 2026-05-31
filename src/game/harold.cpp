@@ -1473,7 +1473,6 @@ namespace HAROLD {
         MOX::_star_bg_index = 2;
         MOX::_screen_data = 0;
         MOX::_animated_star = -1;
-        g_map_unknown_word = 0;
         MOX::_first_fleet_movement_icon = 0;
         MOX::_fleet_movement_bar_value = 0x66;
         MOX::_first_node_ptr_in_stack_ = -1;
@@ -1494,11 +1493,9 @@ namespace HAROLD {
         MAINSCR::_next_turn_hit = 0;
         MAINSCR::_main_screen_ship_icon_scanned = -1;
         MOX::_officer_scrn_type = 1;
-        g_ui_unknown_word = 0;
         MAINSCR2::_main_screen_fade_in_flag = 0;
         HAROLD::_set_fade_for_first_fltpop = 1;
         MOX::_star_fields_dim[0] = 0x21;
-        g_main_screen_unknown_flag = 1;
         MOX::_add_help_fields = 0xFF;
         MOX::_star_fields_dim[1] = 0x1D;
         MOX::_star_fields_dim[2] = 0x19;
@@ -1527,8 +1524,6 @@ namespace HAROLD {
         for (int16_t i = 0; i < 10; ++i) {
             MOX::_black_hole_anim_count[i] = (int8_t)(i * 2);
         }
-
-        g_map_unknown_flag = 0;
         MAINSCR::Clear_Twinkling_Star_Data_();
         memset(MOX::_fleet_icon_selection_status, 0, 63);
     }

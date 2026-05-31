@@ -763,7 +763,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
         FLEETPOP::Print_Fleet_Box_Info_();
 
         if (MOX::_fleet_box.count > 9) {
-            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(&MOX::_fltpop_scroll_bar, (void(*)())Fleet_Movement_Scroll_Callback);
+            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(&MOX::_fltpop_scroll_bar, Fleet_Movement_Scroll_Callback);
         }
     }
 

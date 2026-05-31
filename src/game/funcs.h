@@ -9,9 +9,6 @@ extern const char s_tech_has_too_many_apps_0055a97c[24]; /* " tech has too many 
 struct s_animation_header;
 struct s_lbx_stream_header;
 
-inline s_animation_header** _anims =
-    reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565D90});
-
 extern const char s_space_005510f0[2]; // " "
 extern char s_cmbtsfx_lbx_00551228[12]; // "cmbtsfx.lbx"
 extern const char s_fmt_comma_00555ff0[6]; // "%i,%i"
@@ -33,8 +30,7 @@ extern const char s_racesel_lbx_00557ff4[12]; // "racesel.lbx"
 extern const char s_1_2_00557ff0[4]; // "1/2"
 
 extern const char s_SCIENCE_LBX_00557d68[12]; // "SCIENCE.LBX"
-inline void* Fleet_Movement_Scroll_Callback =
-    reinterpret_cast<void*>(std::uintptr_t{0x00404080});
+void __cdecl Fleet_Movement_Scroll_Callback();
 extern const char s_TANM__03hi_LBX_005512a0[15]; /* "TANM_%03hi.LBX" */
 extern const char s_SR_R_x_SC_LBX_00557d74[14]; // "SR_R%x_SC.LBX"
 
@@ -48,49 +44,13 @@ extern const char s_Too_many_colors_to_reduce_from_[41];
 
 extern const char s_Receiving_Message_005609F0[23]; // "Receiving Message....\n"
 
-inline void (__stdcall *&PTR_OutputDebugStringA_005aa3c0)(char const *) =
-    *reinterpret_cast<void (__stdcall **)(char const *)>(std::uintptr_t{0x005AA3C0});
-
-inline int (__stdcall *&PTR_GetTextExtentPoint32A_005aa3a8)(HDC hdc, const char* lpString, int c, tagSIZE* psizl) =
-    *reinterpret_cast<int (__stdcall **)(HDC, const char*, int, tagSIZE*)>(std::uintptr_t{0x005AA3A8});
-
-inline int (__stdcall *&PTR_TextOutA_005aa3ac)(HDC hdc, int x, int y, const char* lpString, int c) =
-    *reinterpret_cast<int (__stdcall **)(HDC, int, int, const char*, int)>(std::uintptr_t{0x005AA3AC});
-
-inline uint32_t (__stdcall *&PTR_SetTextColor_005aa3b0)(HDC hdc, uint32_t color) =
-    *reinterpret_cast<uint32_t (__stdcall **)(HDC, uint32_t)>(std::uintptr_t{0x005AA3B0});
-
-inline int (__stdcall *&PTR_SetBkMode_005aa3b4)(HDC hdc, int mode) =
-    *reinterpret_cast<int (__stdcall **)(HDC, int)>(std::uintptr_t{0x005AA3B4});
-
-inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
-    *reinterpret_cast<int (__stdcall **)(const char*)>(std::uintptr_t{0x005AA3C4});
-
 extern const char s_Add_Square_to_scan_list_failed__0055b270[33]; /* "Add Square to scan list failed.." */
 extern const char s__d___d___d_0055b2d0[11]; // "%d, %d, %d"
 extern const char s_Get_Picture_Color_Picture_Must_H_0055b2dc[45]; // "Get_Picture_Color  Picture Must Have Palette"
 
-inline uint8_t& g_main_screen_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596196});
-inline int16_t& g_map_unknown_word = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5B4});
-inline int16_t& g_ui_unknown_word = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C02A});
-inline uint8_t& g_map_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059701A});
-
-inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
-inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
-
 extern const char s_percent_0055633c[2]; // "%"
 extern const char s_slash_005599a4[2]; // "/"
 extern const char s_lparen_005599a8[2]; // "("
-
-inline MMRESULT (__stdcall*& PTR_timeEndPeriod_005aa5c4)(uint32_t) =
-    *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5C4});
-
-inline MMRESULT (__stdcall*& PTR_timeKillEvent_005aa5cc)(uint32_t) =
-    *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5CC});
-
-
-inline int16_t& _mouse_XY_star_idx =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5C4});
 
 extern const char s_fmt_modifier_full_005523a4[6]; // "%d.%d"
 extern const char s_fmt_score_simple_00556104[3]; // "%d"
@@ -104,23 +64,13 @@ extern const char s_RACESTUF_lbx_00558550[13]; // "RACESTUF.lbx"
 
 extern const char s_STREAM_LBX_005558fc[11]; /* "STREAM.LBX" */
 
-inline void __cdecl No_Op1_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });
-    fn();
-}
-
 namespace GLOBALS {
     extern const char s_spaces_percent_s_0055236c[5];
     extern const char s_percent_s_percent_s_percent_s_005574f4[9];
 }
 
-inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
-inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
 extern char s_360_00556164[4]; // "360"
 extern const char s_comma_space_00556168[3]; // ", "
-
-inline uint8_t& DAT_00590000 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00590000});
 
 extern const char s_Raider_0055768c[7]; // "Raider"
 extern char s_rparen_00557f08[2]; // ")"
@@ -134,7 +84,7 @@ extern const char s_RACESTUF_LBX[13];
 extern const char s_WWWWWWW_0055137c[8]; // "WWWWWWW"
 extern const char s__s_00551130[3]; // "%s"
 struct s_colors;
-inline s_colors& s__GEGGGGG_s___s__005569b8 = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569B8});
+extern s_colors s__GEGGGGG_s___s__005569b8;
 
 // Suggested name: s_Null_Pointer
 extern const char s__d_c_d_0055996c[7]; // "%d%c%d"
@@ -194,9 +144,9 @@ extern const char s_fmt_00557F18[7]; // "%d> %s"
 
 extern const char s__2d__s_00557f10[7]; // "%2d %s"
 
-inline const char*& s_format_string = *reinterpret_cast<const char**>(std::uintptr_t{0x00558BD8});
+extern const char s_format_string[4]; // "%s\n"
 
-inline const char*& PTR_s_FLEET_LBX_005584a8 = *reinterpret_cast<const char**>(std::uintptr_t{0x005584A8});
+extern const char* PTR_s_FLEET_LBX_005584a8;
 
 extern const char s_RACEOPT_LBX[12]; // "RACEOPT.LBX"
 extern const char s_SAVE_005568fc[5]; // "SAVE"
@@ -212,17 +162,12 @@ extern const char s_Unable_to_open_mox_set_005575f4[23]; // "Unable to open mox.
 extern const char s_MOX_SET_00556918[8]; // "MOX.SET"
 extern const char s_Settings_file_error_00556950[46]; // "Settings file (MOX.SET) is missing or invalid"
 
-inline int16_t (&_weapon_replacement_screen_help_list)[12][10] =
-    *reinterpret_cast<int16_t(*)[12][10]>(std::uintptr_t{0x005648D8});
-
 extern const char s_Antares_00551288[8];
 extern const char s_cmbtplnt_lbx_00551278[13]; // "cmbtplnt.lbx"
 extern const char s_0_0055110c[3];
 extern const char s_1_00551110[3];
 extern const char s_caret_space_00556070[3]; /* "^ " */
 extern const char s_BUFFER0_LBX[12]; // "BUFFER0.LBX"
-inline int16_t& _fleet_box_width =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
 extern const char s__s___s_0055238c[7]; // "%s, %s"
 extern const char s__s_005569e8[4]; // "%s "
 extern const char s___s_00557f0c[4]; // "(%s"
@@ -287,10 +232,8 @@ extern char s_N_0055765c[2]; // "N"
 extern char s_Y_00557660[2]; // "Y"
 extern char s_confirm_lbx_00557664[12]; // "confirm.lbx"
 extern char s_dot_d_0055a528[4]; // ".%d"
-inline char*& PTR_s_GAME_LBX_0055ac4c =
-    *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
-inline void*& PTR_s_OFFICER_LBX_00556990 =
-    *reinterpret_cast<void**>(std::uintptr_t{0x00556990});
+extern char* PTR_s_GAME_LBX_0055ac4c;
+extern const char* PTR_s_OFFICER_LBX_00556990;
 extern char s___INVALID___0055ac58[12]; // "* INVALID *"
 extern char s__3s__2d____4d__2d__2d_0055ac64[23]; // "%3s %2d, %-4d  %2d:%2d"
 
@@ -318,17 +261,5 @@ extern const char s_HSSTRNGS_LBX_0055A788[16]; // "HSSTRNGS.LBX"
 extern const char s_HFSTRNGS_LBX_0055A798[16]; // "HFSTRNGS.LBX"
 extern const char s_HGSTRNGS_LBX_0055A7A8[16]; // "HGSTRNGS.LBX"
 extern const char s_HESTRNGS_LBX_0055A7B8[16]; // "HESTRNGS.LBX"
-
-inline void __stdcall SmackSoundUseDirectSound(IDirectSound* direct_sound) {
-    using Fn = void(__stdcall*)(IDirectSound*);
-    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA62C });
-    fn(direct_sound);
-}
-
-inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t priority) {
-    using Fn = s_smack_video*(__stdcall*)(char*, uint32_t, int32_t);
-    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA648 });
-    return fn(path, flags, priority);
-}
 
 extern const char k_backslash[2]; // "\\"
