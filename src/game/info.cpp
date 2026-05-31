@@ -22,12 +22,14 @@ namespace {
     }
 
     void __cdecl Draw_Turn_Summary_App_(int16_t x, int16_t y, uint8_t msg_idx) {
-        char buffer[256];
+        if (msg_idx <= 0xFA) {
+            char buffer[256];
 
-        fonts::Set_Font_LF_(10);
-        MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
-        fonts::Print_(x, y, s_caret_00556074);
-        FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 345, buffer, 0);
+            fonts::Set_Font_LF_(10);
+            MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
+            fonts::Print_(x, y, s_caret_00556074);
+            FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 345, buffer, 0);
+        }
     }
 }
 

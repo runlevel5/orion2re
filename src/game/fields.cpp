@@ -1878,9 +1878,12 @@ namespace fields {
                                 f->detail.strings.gradient_pic,
                                 f->detail.strings.gradient_colors
                             );
+                            if (f->detail.strings.gradient_mode == 17) {
+                                fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
+                            }
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
                         } else if (f->detail.strings.is_selectable == 0) {
-                            fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
+                            fonts::Set_Font_Style_(f->font_style, f->detail.strings.gradient_colors);
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
                         } else {
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
@@ -2217,9 +2220,12 @@ namespace fields {
                                 _fields[i].detail.strings.gradient_pic,
                                 _fields[i].detail.strings.gradient_colors
                             );
+                            if (_fields[i].detail.strings.gradient_mode == 17) {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.highlight_color);
+                            }
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
                         } else if (_fields[i].detail.strings.is_selectable == 0) {
-                            fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.highlight_color);
+                            fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.gradient_colors);
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
                         } else {
                             fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);

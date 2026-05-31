@@ -20,7 +20,6 @@ workflows:
         start_timeout: 600
         reset_policy: keep
         max_rounds: 100
-        confirmation: auto
         preprocessors:
           - name: skills
         tools:

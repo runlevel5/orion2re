@@ -155,7 +155,7 @@ extern const char s___s_0055994c[4]; // "@%s"
 extern const char s___00559948[2]; // "@"
 extern const char s_0__s_00559940[5]; // "0 %s"
 extern const char s__d__s_005569f0[6]; // "%d %s"
-inline char* s__00551100 = reinterpret_cast<char*>(0x00551100);   // ""
+extern char s__00551100[1];   // ""
 extern const char s__d_BC_00552384[8];
 extern const char s_plus_00551118[2]; // "+"
 extern const char s_minus_0055111c[2]; // "-"
@@ -167,8 +167,7 @@ extern const char s_M_00557ed8[2]; // "M"
 extern const char DAT_00558540[2];
 extern const char DAT_0055aa90[2];
 
-inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00552CD8}); // "Monster (ship id: %d) cannot move to %s (%d)!"
+extern const char s_Monster_ship_id_cannot_mov_00552cd8[46]; // "Monster (ship id: %d) cannot move to %s (%d)!"
 
 inline const char* const s_Auto_Save_00556938 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00556938}); // "(Auto Save)"
@@ -182,24 +181,18 @@ extern const char s_1_00556B10[2]; // "1"
 
 extern const char s_e_0055ac48[2]; // "e"
 
-inline const char* const s_Null_Pointer_0055b658 =
-    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B658 }); // "Null Pointer"
+extern const char s_Null_Pointer_0055b658[13]; // "Null Pointer"
 
-inline char* const s_Not_Enough_Space_For_Buffer_Spac_0055b310 =
-    reinterpret_cast<char*>(std::uintptr_t{0x0055B310}); // "Not Enough Space For Buffer Space"
+extern char s_Not_Enough_Space_For_Buffer_Spac_0055b310[34]; // "Not Enough Space For Buffer Space"
 
 // Suggested name: s_allocation_error_fmt
-inline const char* const s_Couldn_t_Allocate_0055B668 =
-    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B668 }); // "Couldn't Allocate %d. Increase Virtual Memory."
+extern const char s_Couldn_t_Allocate_0055B668[38]; // "Couldn't Allocate %d Increase Virtual"
 
-inline const char* const s_Unable_to_Allocate_bytes =
-    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%d, %d)\n"
+extern const char s_Unable_to_Allocate_bytes[73]; // "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n"
 
-inline const char* const s_fmt_00557F18 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
+extern const char s_fmt_00557F18[7]; // "%d> %s"
 
-inline const char* s__2d__s_00557f10 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00557F10}); // "%2d %s"
+extern const char s__2d__s_00557f10[7]; // "%2d %s"
 
 inline const char*& s_format_string = *reinterpret_cast<const char**>(std::uintptr_t{0x00558BD8});
 
@@ -210,14 +203,10 @@ extern const char s_SAVE_005568fc[5]; // "SAVE"
 extern const char s__GAM_005568f4[5]; // ".GAM"
 extern const char s_rb_0055117c[3]; // "rb"
 extern const char s_wb_00551178[3]; // "wb"
-inline const char* s_Error_in_swap_file_0055beb8 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055BEB8}); // "Error in swap file"
-inline const char* s_TEMP_TMP_0055becc =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055BECC}); // "TEMP.TMP"
-inline const char* s_Insufficient_disk_space_for_swap_0055bed8 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055BED8}); // "Insufficient disk space for swap"
-inline const char* s_Drive_swap_reqd_too_large_for_bl_0055befc =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055BEFC}); // "Drive swap reqd too large for block"
+extern const char s_Error_in_swap_file_0055beb8[19]; // "Error in swap file"
+extern const char s_TEMP_TMP_0055becc[9]; // "TEMP.TMP"
+extern const char s_Insufficient_disk_space_for_swap_0055bed8[33]; // "Insufficient disk space for swap"
+extern const char s_Drive_swap_reqd_too_large_for_bl_0055befc[36]; // "Drive swap reqd too large for block"
 extern const char s_mox_set_0055760c[8]; // "mox.set"
 extern const char s_Unable_to_open_mox_set_005575f4[23]; // "Unable to open mox.set"
 extern const char s_MOX_SET_00556918[8]; // "MOX.SET"
@@ -257,8 +246,7 @@ inline const char* s_DIPLOMAT_LBX_00552350 = reinterpret_cast<const char*>(std::
 inline const char* s_DIPLOMAT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); /* "DIPLOMAT.LBX" */
 extern const char s_dipstars_lbx_00552374[13]; // "dipstars.lbx"
 
-inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
+extern const char s_______CLIMATE_modifier_is__d_Pla_00558a58[54]; // "------CLIMATE modifier is %d  Planet: %d  Mineral: %d"
 
 extern char s_MULTIGM_LBX_00558D04[12]; // "MULTIGM.LBX"
 extern const char s_Evan_Axelrad_0055AA48[16]; // "Evan Axelrad"
@@ -266,8 +254,7 @@ extern char s_Moo_IIAlreadyRunning[27]; // "MOO II is already running."
 extern char s_Microprose[11]; // "Microprose"
 extern const char s_Mar_26_1997_005578e0[12]; // "Mar 26 1997"
 
-inline const char* const s_Memory_Corruption_val_00558028 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n"
+extern const char s_Memory_Corruption_val_00558028[73]; // "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n"
 
 inline LPCSTR s_max_file_buffer_count_went_over__0055b334 =
     reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B334}); /* "max file buffer count went over.." */
@@ -278,72 +265,69 @@ inline LPCSTR s_max_buffer_segs_went_over___0055b358 =
 inline LPCSTR s_Cache_Seg_Corrupted____0055b374 =
     reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B374}); /* "Cache Seg Corrupted..." */
 
-inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
-    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"
+extern const char s_File_Animation_Frame_Too_Large_0055b804[31]; // "File Animation Frame Too Large"
 
 extern const char s_Too_many_frames_for_multi_file_a_0055b83c[41]; /* "Too many frames for multi file animation" */
 
 extern const char s_Refresh_Mask_can_t_be_drawn_0055b10c[28]; // "Refresh Mask can't be drawn"
 
-inline char* s_Cannot_color_replace_refresh_mas_0055b7a0 =
-    reinterpret_cast<char*>(std::uintptr_t{0x0055B7A0}); // "Cannot color replace refresh mask."
+extern char s_Cannot_color_replace_refresh_mas_0055b7a0[35]; // "Cannot color replace refresh mask."
 
-inline const char* s_PR_00558238 = reinterpret_cast<const char*>(std::uintptr_t{0x00558238}); // "PR"
-inline const char* s_FP_00558240 = reinterpret_cast<const char*>(std::uintptr_t{0x00558240}); // "FP"
-inline const char* s_RP_00558248 = reinterpret_cast<const char*>(std::uintptr_t{0x00558248}); // "RP"
-inline const char* s_PI_00559994 = reinterpret_cast<const char*>(std::uintptr_t{0x00559994}); // "PI"
-inline const char* s_G_0055241c = reinterpret_cast<const char*>(0x0055241C);  // "G"
+extern char s_PR_00558238[3]; // "PR"
+extern char s_FP_00558240[4]; // "FP"
+extern char s_RP_00558248[3]; // "RP"
+extern char s_PI_00559994[3]; // "PI"
+extern char s_G_0055241c[2]; // "G"
 inline const char* s_C_00552420 = reinterpret_cast<const char*>(0x00552420);  // "C"
 inline const char* s_L_005560e8 = reinterpret_cast<const char*>(0x005560E8);  // "L"
-inline const char* s_P_005569d8 = reinterpret_cast<const char*>(0x005569D8);  // "P"
+extern char s_P_005569d8[2]; // "P"
 inline const char* s_I_0055801c = reinterpret_cast<const char*>(0x0055801C);  // "I"
-inline const char* s_W_0055992c = reinterpret_cast<const char*>(std::uintptr_t{0x0055992C}); // "W"
+extern char s_W_0055992c[2]; // "W"
 inline const char* s_R_0055824c = reinterpret_cast<const char*>(0x0055824C);  // "R"
-inline const char* s_r_00556db0 = reinterpret_cast<const char*>(0x00556DB0); // "r"
-inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  // "Q"
+extern char s_r_00556db0[2]; // "r"
+extern char s_Q_005598f0[2]; // "Q"
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
-inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
+extern char s_T_005598f8[2]; // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
 extern const char s_combat_lbx_005599c8[11]; // "combat.LBX"
 extern const char s_warning_lbx_00557650[12]; // "warning.lbx"
 
-inline char* s_You_exceeded_the_max_number_of_f_0055b080 =
-    reinterpret_cast<char*>(std::uintptr_t{ 0x0055B080 });
+extern char s_You_exceeded_the_max_number_of_f_0055b080[44];
 
 inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
-inline const char* s_X_005569d0 = reinterpret_cast<const char*>(0x005569D0); // "X"
-inline const char* s_comma_005569c8 = reinterpret_cast<const char*>(0x005569C8); // ","
+extern char s_X_005569d0[2]; // "X"
+extern char s_comma_005569c8[2]; // ","
 inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
 inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
-inline const char* s_N_0055765c = reinterpret_cast<const char*>(0x0055765C); // "N"
-inline char* s_Y_00557660 = reinterpret_cast<char*>(std::uintptr_t{0x00557660});
-inline char* s_confirm_lbx_00557664 = reinterpret_cast<char*>(std::uintptr_t{0x00557664});
+extern char s_N_0055765c[2]; // "N"
+extern char s_Y_00557660[2]; // "Y"
+extern char s_confirm_lbx_00557664[12]; // "confirm.lbx"
 inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // "A"
-inline const char* s_dot_d_0055a528 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A528}); // ".%d"
+extern char s_dot_d_0055a528[4]; // ".%d"
 inline char*& PTR_s_GAME_LBX_0055ac4c =
     *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
 inline void*& PTR_s_OFFICER_LBX_00556990 =
     *reinterpret_cast<void**>(std::uintptr_t{0x00556990});
-inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
-inline const char* s__3s__2d____4d__2d__2d_0055ac64 = reinterpret_cast<const char*>(0x0055AC64); // "%3s %2d, %-4d  %2d:%2d"
+extern char s___INVALID___0055ac58[12]; // "* INVALID *"
+extern char s__3s__2d____4d__2d__2d_0055ac64[23]; // "%3s %2d, %-4d  %2d:%2d"
 
-inline char* s_fmt_d_s_s_00557e0c = reinterpret_cast<char*>(std::uintptr_t{0x00557E0C}); /* "%d %s (%s)" */
-inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00557E18}); /* "%s (%d EP)" */
+extern char s_fmt_d_s_s_00557e0c[11]; /* "%d %s (%s)" */
+extern char s_fmt_s_d_EP_00557e18[11]; /* "%s (%d EP)" */
 
 inline char* s_Too_many_ships_in_list_00557de8 =
     reinterpret_cast<char*>(std::uintptr_t{0x00557DE8}); /* "Too many ships in list" */
 
-inline const char* s_i_PR_00557d84 = reinterpret_cast<const char*>(0x00557D84);
-inline const char* s_i_FP_00557d8c = reinterpret_cast<const char*>(0x00557D8C);
-inline const char* s_i_RP_00557d94 = reinterpret_cast<const char*>(0x00557D94);
+extern char s_i_PR_00557d84[6]; // "%i PR"
+extern char s_i_FP_00557d8c[6]; // "%i FP"
+extern char s_i_RP_00557d94[6]; // "%i RP"
 inline const char* s_jimtext_lbx_00552360 = reinterpret_cast<const char*>(0x00552360);
 inline char* s_jimtext2_lbx_00552340 = reinterpret_cast<char*>(std::uintptr_t{0x00552340});
 inline const char* s_jimtext2_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552340}); // "jimtext2.lbx"
-inline const char* s_s_sez__s_00552334 = reinterpret_cast<const char*>(std::uintptr_t{0x00552334}); // "%s sez: %s"
+extern const char s_s_sez__s_00552334[11]; // "%s sez: %s"
 inline const char* s_percent_s_0055236c = reinterpret_cast<const char*>(0x0055236C);
 inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
-inline const char* s_PR_00557d9c = reinterpret_cast<const char*>(std::uintptr_t{0x00557D9C});
-inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA0});
+extern const char s_PR_00557d9c[4];
+extern const char s_FP_00557da0[4];
 inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
 
 struct s_fleet_movement_icon;

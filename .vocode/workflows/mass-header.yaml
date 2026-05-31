@@ -3,13 +3,9 @@ workflows:
     description: "Mass validate recovered header-backed variables against the pre-variables branch and live Ghidra data."
     need_input: False
     nodes:
-      - name: input
-        type: input
-        message: "Waiting to validate the next header..."
-        message_mode: concatenate_final
-        confirmation: auto
-        collapse: true
-        collapse_lines: 5
+      - name: init
+        type: result
+        message: "go ahead"
         outcomes:
           - name: done
       - name: claim
@@ -49,8 +45,6 @@ workflows:
         outcomes:
           - name: claimed
             description: Select when a header path was successfully locked and returned.
-          - name: done
-            description: Select when no unprocessed headers remain.
       - name: validate
         type: llm
         model: ${LLM_STRONG_MODEL}
@@ -60,6 +54,7 @@ workflows:
         max_rounds: 100
         max_retries: 10
         hard_error_retries: 3
+        confirmation: auto
         preprocessors:
           - name: skills
         tools:
@@ -101,11 +96,18 @@ workflows:
 
           ALIAS RULES
           * Alias detection is mandatory and must be conservative.
+          * Cross-module aliasing is allowed only for const string storage backed by immutable string data. Do not fail solely because identical const string data is referenced from multiple modules.
+          * Do not extend that exception to mutable storage. Any non-const variable, writable character array, writable pointer target, or otherwise changeable storage that aliases another owner must still fail validation.
+          * Do not treat default interior array-element labels, component labels, or similarly derived names inside one larger proven owning object as competing owners by themselves.
+          * If one containing array or structure object owns the full proven storage span, treat interior element names or component names within that same object as part of the owner, not as alias conflicts.
+          * If Ghidra's listing markup is incomplete or underspecified, do not fail on that basis alone. Use disassembly, memory layout, next-symbol boundaries, and project usage to determine whether one larger object owns the span.
+          * Underspecified labels such as DAT_* at interior addresses are not by themselves alias blockers when code and layout prove they are merely parts of one larger variable.
           * If the old header stub address resolves in Ghidra to a symbol owned by a different namespace than the variable being validated, that variable is an alias and validation must fail.
           * If the address names another storage owner in Ghidra, falls inside a larger array or structure, resolves to a structure field or array element, overlaps another defined object, or otherwise points to storage that belongs to another symbol, treat it as an alias candidate and fail.
-          * Treat overlapping symbols, direct references to structure fields, array elements, or a differently named Ghidra variable at the same address as alias candidates.
+          * Treat overlapping symbols, direct references to structure fields, array elements, or a differently named Ghidra variable at the same address as alias candidates only when they indicate a different owning object rather than interior labels within the same proven container.
           * For same-address conflicts, use the Ghidra namespace as the storage owner for non-string objects, and if the address falls inside a larger proven array or structure, the larger owning object takes precedence over a scalar or pointer interpretation at that interior address.
           * Check whether the address resolves in Ghidra to a different named variable, a component inside a larger structure, or another already-defined storage object before accepting the recovered variable.
+          * Before failing an alias check, determine whether the full claimed extent is covered by one proven container object or by code-proven contiguous storage with no competing owner.
           * Do not waive alias failures automatically.
 
           VALIDATION RULES
@@ -145,18 +147,44 @@ workflows:
             description: Select when the claimed header fully validates and no failures were found.
           - name: fail
             description: Select when any variable fails validation, is aliased, or cannot be validated confidently.
-      - name: fail_input
-        type: input
-        message: "Validation failed. Waiting to retry the claimed header..."
+      - name: report
+        type: llm
+        model: ${LLM_WEAK_MODEL}
         confirmation: auto
-        collapse: true
-        collapse_lines: 5
+        tools:
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a validation reporting assistant. Your goal is to append failed header validation findings to `failures.md`.
+
+          You will be provided with a message that starts with the claimed header path followed by the validation findings.
+
+          Example:
+
+          ```
+          src/game/advciv.h
+
+          Bad_Variable at 0x0050AB10: alias candidate owned by a different namespace.
+          ```
+
+          Append the whole provided block to `failures.md` and then append the separator line:
+
+          ---------------------------------------
+
+          Make sure to append to the file instead of overwriting it. Create `failures.md` if it does not exist.
+
+          Checklist:
+          1. You appended the full failed validation block to `failures.md`.
+          2. You preserved existing contents.
         outcomes:
           - name: done
     edges:
-      - input.done -> claim
+      - init.done -> claim
       - claim.claimed -> validate
-      - claim.done -> input
-      - validate.fail -> fail_input
-      - validate.success -> claim
-      - fail_input.done -> validate:keep
+      - validate.fail -> report
+      - validate.success -> init
+      - report.done -> init
