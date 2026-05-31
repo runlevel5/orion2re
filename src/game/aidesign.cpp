@@ -1,59 +1,52 @@
 #include "pch.h"
 
 namespace aidesign {
-#pragma pack(push, 1)
-    struct s_spcl_item {
-        int16_t id;
-        int16_t type; // 0 = Special Device, non-zero = Weapon
-    };
-#pragma pack(pop)
-
     int16_t _min_weapon_count_table[8] = {1, 2, 3, 5, 7, 10, 0, 0};
 
     s_spcl _bio_weapon_spcl[5] = {
-        {22, 0, 0, 0},
-        {33, 0, 0, 0},
-        {2, 0, 0, 0},
-        {26, 0, 1, 0},
-        {25, 0, 1, 0},
+        {22, 0},
+        {33, 0},
+        {2, 0},
+        {26, 1},
+        {25, 1},
     };
     s_spcl _capture_spcl[5] = {
-        {35, 0, 0, 0},
-        {39, 0, 1, 0},
-        {28, 0, 1, 0},
-        {36, 0, 0, 0},
-        {37, 0, 0, 0},
+        {35, 0},
+        {39, 1},
+        {28, 1},
+        {36, 0},
+        {37, 0},
     };
     s_spcl _cloaking_spcl[3] = {
-        {23, 0, 0, 0},
-        {6, 0, 0, 0},
-        {31, 0, 0, 0},
+        {23, 0},
+        {6, 0},
+        {31, 0},
     };
     s_spcl _beam_defense_spcl[4] = {
-        {17, 0, 0, 0},
-        {8, 0, 0, 0},
-        {2, 0, 0, 0},
-        {18, 0, 0, 0},
+        {17, 0},
+        {8, 0},
+        {2, 0},
+        {18, 0},
     };
     s_spcl _missile_defense_spcl[8] = {
-        {38, 0, 0, 0},
-        {21, 0, 0, 0},
-        {13, 0, 1, 0},
-        {9, 0, 0, 0},
-        {36, 0, 1, 0},
-        {8, 0, 0, 0},
-        {19, 0, 0, 0},
-        {33, 0, 1, 0},
+        {38, 0},
+        {21, 0},
+        {13, 1},
+        {9, 0},
+        {36, 1},
+        {8, 0},
+        {19, 0},
+        {33, 1},
     };
     s_spcl _armor_spcl[3] = {
-        {3, 0, 0, 0},
-        {14, 0, 0, 0},
-        {27, 0, 0, 0},
+        {3, 0},
+        {14, 0},
+        {27, 0},
     };
     s_spcl _shield_spcl[3] = {
-        {13, 0, 0, 0},
-        {20, 0, 0, 0},
-        {30, 0, 0, 0},
+        {13, 0},
+        {20, 0},
+        {30, 0},
     };
 
     s_aidesign_ship_design _ship_design_tables[7][6] = {
@@ -115,82 +108,82 @@ namespace aidesign {
         },
     };
     s_spcl _beam_offense_spcl[7] = {
-        {34, 0, 0, 0},
-        {1, 0, 0, 0},
-        {15, 0, 0, 0},
-        {25, 0, 0, 0},
-        {32, 0, 0, 0},
-        {16, 0, 0, 0},
-        {5, 0, 0, 0},
+        {34, 0},
+        {1, 0},
+        {15, 0},
+        {25, 0},
+        {32, 0},
+        {16, 0},
+        {5, 0},
     };
     s_spcl _missile_offense_spcl[2] = {
-        {34, 0, 0, 0},
-        {12, 0, 0, 0},
+        {34, 0},
+        {12, 0},
     };
     s_spcl _special_weapons_spcl[5] = {
-        {38, 0, 1, 0},
-        {37, 0, 1, 0},
-        {10, 0, 0, 0},
-        {35, 0, 1, 0},
-        {34, 0, 1, 0},
+        {38, 1},
+        {37, 1},
+        {10, 0},
+        {35, 1},
+        {34, 1},
     };
     s_spcl _special_device_spcl[12] = {
-        {24, 0, 0, 0},
-        {13, 0, 1, 0},
-        {36, 0, 1, 0},
-        {32, 0, 1, 0},
-        {23, 0, 0, 0},
-        {6, 0, 0, 0},
-        {31, 0, 0, 0},
-        {26, 0, 0, 0},
-        {22, 0, 0, 0},
-        {33, 0, 0, 0},
-        {37, 0, 0, 0},
-        {28, 0, 0, 0},
+        {24, 0},
+        {13, 1},
+        {36, 1},
+        {32, 1},
+        {23, 0},
+        {6, 0},
+        {31, 0},
+        {26, 0},
+        {22, 0},
+        {33, 0},
+        {37, 0},
+        {28, 0},
     };
     s_spcl _defense_specials_f_spcl[20] = {
-        {29, 0, 0, 0},
-        {8, 0, 0, 0},
-        {19, 0, 0, 0},
-        {13, 0, 0, 0},
-        {38, 0, 0, 0},
-        {21, 0, 0, 0},
-        {14, 0, 0, 0},
-        {17, 0, 0, 0},
-        {9, 0, 0, 0},
-        {27, 0, 0, 0},
-        {18, 0, 0, 0},
-        {2, 0, 0, 0},
-        {30, 0, 0, 0},
-        {20, 0, 0, 0},
-        {33, 0, 1, 0},
-        {26, 0, 0, 0},
-        {13, 0, 1, 0},
-        {36, 0, 1, 0},
-        {3, 0, 0, 0},
-        {0, 0, 0, 0},
+        {29, 0},
+        {8, 0},
+        {19, 0},
+        {13, 0},
+        {38, 0},
+        {21, 0},
+        {14, 0},
+        {17, 0},
+        {9, 0},
+        {27, 0},
+        {18, 0},
+        {2, 0},
+        {30, 0},
+        {20, 0},
+        {33, 1},
+        {26, 0},
+        {13, 1},
+        {36, 1},
+        {3, 0},
+        {0, 0},
     };
     s_spcl _defense_specials_t_spcl[20] = {
-        {29, 0, 0, 0},
-        {8, 0, 0, 0},
-        {19, 0, 0, 0},
-        {13, 0, 0, 0},
-        {38, 0, 0, 0},
-        {21, 0, 0, 0},
-        {14, 0, 0, 0},
-        {17, 0, 0, 0},
-        {9, 0, 0, 0},
-        {27, 0, 0, 0},
-        {18, 0, 0, 0},
-        {2, 0, 0, 0},
-        {30, 0, 0, 0},
-        {20, 0, 0, 0},
-        {33, 0, 1, 0},
-        {26, 0, 0, 0},
-        {13, 0, 1, 0},
-        {36, 0, 1, 0},
-        {3, 0, 0, 0},
-        {0, 0, 0, 0},
+        {29, 0},
+        {8, 0},
+        {19, 0},
+        {13, 0},
+        {38, 0},
+        {21, 0},
+        {14, 0},
+        {17, 0},
+        {9, 0},
+        {27, 0},
+        {18, 0},
+        {2, 0},
+        {30, 0},
+        {20, 0},
+        {33, 1},
+        {26, 0},
+        {13, 1},
+        {36, 1},
+        {3, 0},
+        {0, 0},
     };
 
     void __cdecl Determine_Beam_Weapon_Modifications_(
@@ -552,12 +545,11 @@ namespace aidesign {
     int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int16_t count, int16_t player_idx, struct s_ship_design* design, int16_t space_available, int16_t* weapon_slot_idx_ptr) {
         int16_t total_space_used = 0;
         int16_t already_has_fighter_bay = 0;
-        s_spcl_item* spcl = reinterpret_cast<s_spcl_item*>(list);
 
         for (int16_t i = 0; i < count; ++i) {
-            int16_t item_id = spcl[i].id;
+            int16_t item_id = list[i].id;
 
-            if (spcl[i].type == 0) {
+            if (list[i].type == 0) {
                 int16_t tech_app_id = TECHDATA::_specials[item_id].tech_app_id;
 
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
@@ -976,8 +968,8 @@ namespace aidesign {
     int16_t __cdecl Special_Devices_Available_(int16_t player_idx) {
         for (int16_t i = 0; i < 12; ++i) {
             int16_t tech_app_id;
-            uint8_t id = _special_device_spcl[i].id;
-            uint8_t type = _special_device_spcl[i].type;
+            int16_t id = _special_device_spcl[i].id;
+            int16_t type = _special_device_spcl[i].type;
 
             if (type == 0) {
                 tech_app_id = (int16_t)TECHDATA::_specials[id].tech_app_id;

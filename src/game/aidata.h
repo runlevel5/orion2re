@@ -131,7 +131,7 @@ namespace AIDATA {
      * @param source_star_idx Source star.
      * @param max_range_parsecs Maximum allowed distance in parsecs.
      */
-    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range_parsecs);
+    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int32_t max_range_parsecs);
 
     /*
      * Builds AI caches for ships, colonies, stars, and per-player planning data.

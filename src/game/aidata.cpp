@@ -74,17 +74,17 @@ namespace AIDATA {
         return current_owner;
     }
 
-    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range_parsecs) {
+    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int32_t max_range_parsecs) {
         bool in_range = false;
 
-        int distance = GEO::Parsecs_Between_Stars_(source_star_idx, target_star_idx);
+        int32_t distance = GEO::Parsecs_Between_Stars_(source_star_idx, target_star_idx);
         if (distance <= max_range_parsecs) {
             return true;
         }
 
         int8_t wormhole_id = MOX::_star[source_star_idx].wormhole_star_id;
         if (wormhole_id != -1) {
-            distance = GEO::Parsecs_Between_Stars_(static_cast<int16_t>(wormhole_id), target_star_idx);
+            distance = GEO::Parsecs_Between_Stars_((int16_t)wormhole_id, target_star_idx);
             if (distance <= max_range_parsecs) {
                 in_range = true;
             }
@@ -149,6 +149,7 @@ namespace AIDATA {
         int size = (int)(int8_t)ship->d.size;
         if (desirability != 0 && size < 5) {
             s_ship_design* standard_design = &MOX::_player[owner].ship_designs[size];
+            // NOTE: This raw compare assumes s_ship_design has a stable packed byte layout.
             if (memcmp(&ship->d, standard_design, 99 /* sizeof(s_ship_design) */) == 0) {
                 return 0;
             }
@@ -160,32 +161,32 @@ namespace AIDATA {
     void Compute_AI_Data_() {
         RUSS::Assert_Settings_();
         allocate::Push_Block_(MOX::_screen_seg);
-        _ship_strengths = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
-        _ship_strengths_in_nebula = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
-        _ship_bomb_strengths = (uint16_t(*)[500][4])allocate::Allocate_Next_Block_(MOX::_screen_seg, 4000);
-        _planet_stage_weights = (int16_t(*)[360][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 5760);
-        _base_star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
-        _star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
-        _n_turns_from_to = (uint8_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 41472 /* 0xA200 */);
-        _n_turns_from_to_intermediate = (s_turns_from_to_intermediate_cache_entry(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 165888 /* 0x28800 */);
-        _ship_n_turns_to = (int8_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 36000);
-        _ship_n_turns_to_intermediate = (s_ship_n_turns_to_intermediate_cache_entry(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 72000);
-        _possible_ship_strengths = (int32_t(*)[72][8][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, 184320);
-        _ai_colony_info = (s_ai_colony_info(*)[250])allocate::Allocate_Next_Block_(MOX::_screen_seg, 1750 /* 0x6D6 */);
-        _ai_player_info = (s_ai_player_info(*)[8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 464 /* 0x1D0 */);
-        _ai_star_info = (s_ai_star_info(*)[72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 3528 /* 0xDC8 */);
-        _star_in_range_of_player = (uint8_t(*)[72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 72);
-        _star_in_extended_range_of_player = (uint8_t(*)[72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 72);
-        _enroute_ship_strengths = (int32_t(*)[72][8][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, 184320);
-        _enroute_ships = (int8_t(*)[72][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, 5760);
-        _enroute_human_ships = (int8_t(*)[72][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, 720);
-        _enroute_nonstealthy_ships = (int8_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 576);
-        _all_ships = (int16_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, 1000);
+        _ship_strengths = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_strengths));
+        _ship_strengths_in_nebula = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_strengths_in_nebula));
+        _ship_bomb_strengths = (uint16_t(*)[500][4])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_bomb_strengths));
+        _planet_stage_weights = (int16_t(*)[360][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_planet_stage_weights));
+        _base_star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_base_star_stage_weights));
+        _star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_star_stage_weights));
+        _n_turns_from_to = (uint8_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_n_turns_from_to));
+        _n_turns_from_to_intermediate = (s_turns_from_to_intermediate_cache_entry(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_n_turns_from_to_intermediate));
+        _ship_n_turns_to = (int8_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_n_turns_to));
+        _ship_n_turns_to_intermediate = (s_ship_n_turns_to_intermediate_cache_entry(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_n_turns_to_intermediate));
+        _possible_ship_strengths = (int32_t(*)[72][8][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_possible_ship_strengths));
+        _ai_colony_info = (s_ai_colony_info(*)[250])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ai_colony_info));
+        _ai_player_info = (s_ai_player_info(*)[8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ai_player_info));
+        _ai_star_info = (s_ai_star_info(*)[72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ai_star_info));
+        _star_in_range_of_player = (uint8_t(*)[72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_star_in_range_of_player));
+        _star_in_extended_range_of_player = (uint8_t(*)[72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_star_in_extended_range_of_player));
+        _enroute_ship_strengths = (int32_t(*)[72][8][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_ship_strengths));
+        _enroute_ships = (int8_t(*)[72][8][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_ships));
+        _enroute_human_ships = (int8_t(*)[72][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_human_ships));
+        _enroute_nonstealthy_ships = (int8_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_nonstealthy_ships));
+        _all_ships = (int16_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_all_ships));
         _base_planet_values = &_g_base_planet_values;
-        _i_all_combat_ships = (int16_t(*)[8][73])allocate::Allocate_Next_Block_(MOX::_screen_seg, 1168);
-        _aitech = (s_ai_tech_info*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 168);
-        _airefit = (s_ai_refit_player(*)[8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 24016 /* 0x5DD0 */);
-        _ship_refit_desirabilities = (int32_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2000);
+        _i_all_combat_ships = (int16_t(*)[8][73])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_i_all_combat_ships));
+        _aitech = (s_ai_tech_info*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_aitech));
+        _airefit = (s_ai_refit_player(*)[8])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_airefit));
+        _ship_refit_desirabilities = (int32_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_refit_desirabilities));
 
         memset(_ai_player_info, 0, sizeof(*_ai_player_info));
         RUSS::Mox_Update_();
@@ -794,15 +795,18 @@ namespace AIDATA {
     }
 
     int __cdecl airefit_cmp_(const void* lhs, const void* rhs) {
-        int32_t lhs_desirability = *reinterpret_cast<const int32_t*>(reinterpret_cast<const uint8_t*>(lhs) + 2);
-        int32_t rhs_desirability = *reinterpret_cast<const int32_t*>(reinterpret_cast<const uint8_t*>(rhs) + 2);
+        const s_ai_refit_entry* lhs_entry = (const s_ai_refit_entry*)lhs;
+        const s_ai_refit_entry* rhs_entry = (const s_ai_refit_entry*)rhs;
+
+        int32_t lhs_desirability = lhs_entry->desirability;
+        int32_t rhs_desirability = rhs_entry->desirability;
 
         return lhs_desirability - rhs_desirability;
     }
 
     int __cdecl sort_ships_(const void* lhs, const void* rhs) {
-        int16_t idx1 = *static_cast<const int16_t*>(lhs);
-        int16_t idx2 = *static_cast<const int16_t*>(rhs);
+        int16_t idx1 = *(const int16_t*)lhs;
+        int16_t idx2 = *(const int16_t*)rhs;
 
         s_ship_data& ship1 = MOX::_ship[idx1];
         s_ship_data& ship2 = MOX::_ship[idx2];
@@ -1108,7 +1112,7 @@ namespace AIDATA {
         return (int16_t)info.turns;
     }
 
-    int16_t __cdecl Ship_N_Turns_To_Star_With_Intermediate_(int16_t ship_idx, int16_t dest_star_idx, int16_t* intermediate_star_idx) {
+    int16_t __cdecl Ship_N_Turns_To_Star_With_Intermediate_(int16_t ship_idx, int16_t dest_star_idx, int16_t* intermediate_star_idx_out) {
         s_ship_n_turns_to_intermediate_cache_entry& cached_info = (*_ship_n_turns_to_intermediate)[ship_idx][dest_star_idx];
 
         bool has_stargate = struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, 11);
@@ -1138,8 +1142,8 @@ namespace AIDATA {
                                 if (!blocked) {
                                     uint32_t total_turns = (uint8_t)(*_n_turns_from_to)[i][dest_star_idx][owner] + (uint8_t)(*_ship_n_turns_to)[ship_idx][i];
                                     if (total_turns < cached_info.turns) {
-                                        cached_info.turns = static_cast<uint8_t>(total_turns);
-                                        cached_info.intermediate_star = static_cast<uint8_t>(i);
+                                        cached_info.turns = (uint8_t)total_turns;
+                                        cached_info.intermediate_star = (uint8_t)i;
                                     }
                                 }
                             }
@@ -1158,24 +1162,24 @@ namespace AIDATA {
                     loc = HAROLD::XY_To_Star_Id_(MOX::_ship[ship_idx].x, MOX::_ship[ship_idx].y);
                 }
 
-                cached_info.turns = static_cast<uint8_t>(AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+                cached_info.turns = (uint8_t)AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
                     MOX::_ship[ship_idx].owner,
                     loc,
                     dest_star_idx,
-                    intermediate_star_idx,
+                    intermediate_star_idx_out,
                     has_stargate
-                ));
+                );
 
-                // BUG: intermediate_star_idx is dereferenced here without null check
-                cached_info.intermediate_star = static_cast<uint8_t>(*intermediate_star_idx);
+                // BUG: intermediate_star_idx_out is dereferenced here without a null check.
+                cached_info.intermediate_star = (uint8_t)(*intermediate_star_idx_out);
             }
         }
 
-        if (intermediate_star_idx != nullptr) {
+        if (intermediate_star_idx_out != nullptr) {
             if (cached_info.intermediate_star < 72) {
-                *intermediate_star_idx = cached_info.intermediate_star;
+                *intermediate_star_idx_out = cached_info.intermediate_star;
             } else {
-                *intermediate_star_idx = -1;
+                *intermediate_star_idx_out = -1;
             }
         }
 
@@ -1308,7 +1312,7 @@ namespace AIDATA {
                 subterranean_bonus = COLCALC::Double_Add_Two_(planet->size);
             }
 
-            int16_t player_idx = static_cast<int16_t>(evaluating_player - MOX::_player);
+            int16_t player_idx = (int16_t)(evaluating_player - MOX::_player);
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, player_idx);
 
             int32_t total_pop_sum = max_pop + subterranean_bonus;

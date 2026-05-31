@@ -7,9 +7,7 @@
 - none
 
 ## Pending
-- [pending] src/game/aidata.{h,cpp}
 - [pending] src/game/aidesign.{h,cpp}
-- [pending] src/game/aidudes.{h,cpp}
 - [pending] src/game/aileader.{h,cpp}
 - [pending] src/game/aimove.{h,cpp}
 - [pending] src/game/aipower.{h,cpp}
@@ -208,9 +206,11 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
-- [reviewed] src/game/aibuild.{h,cpp} - converted shared build-need counters and several locals to fixed-width integer types, replaced remaining `static_cast` uses with C-style casts, removed redundant guessed comments, clarified a few decompiler-style local names, and inlined the lone `"AI trade goods"` string literal.
-- [reviewed] src/game/advciv.{h,cpp} - replaced remaining `static_cast` uses with C-style casts, converted several `short`/`int` locals to fixed-width integer types, removed redundant explanatory comments, and clarified a few local and parameter names.
+- [reviewed] src/game/advciv.{h,cpp} - applied conservative naming and docstring cleanup; no pointer-math UB access was found in this unit.
+- [reviewed] src/game/aidata.{h,cpp} - applied allocator `sizeof(...)` cleanup, renamed the out-parameter in the ship-turn helper, replaced remaining `static_cast` uses with C-style casts, and documented the raw `memcmp` layout assumption.
 - [reviewed] src/game/aibomb.{h,cpp} - replace plain `int` counters and size parameters with `int32_t`, and replace the remaining `static_cast` with a C-style cast.
+- [reviewed] src/game/aibuild.{h,cpp} - applied conservative comment and fixed-width helper-type cleanup; pointer-subtraction index assumptions remain noted for later review.
+- [reviewed] src/game/aidudes.{h,cpp} - suggest guarding the fixed-size colony scratch buffers against `_NUM_COLONIES` overflow, renaming leftover comparator placeholder parameters, replacing remaining `static_cast`/`reinterpret_cast` uses with C-style casts, and trimming noisy generated comments while adding concise function docstrings.
 
 ## Blocked
 - none

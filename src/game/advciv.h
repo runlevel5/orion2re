@@ -13,12 +13,12 @@ namespace ADVCIV {
     /** Builds and assigns advanced-civilization starting colonies. */
     void __cdecl Advanced_Civilization_Colonies_();
 
-    /** Initializes the starting fleet for one advanced-civilization player.
-     * @param player_index Player index to initialize.
+    /** Placeholder for per-player advanced-civilization fleet setup.
+     * @param player_index Player index passed through by the caller.
      */
     void __cdecl Init_Advanced_Civilization_Fleet_(int16_t player_index);
 
-    /** Initializes starting fleets for all advanced-civilization players. */
+    /** Invokes the advanced-civilization fleet setup placeholder for each player. */
     void __cdecl Assign_Advanced_Civilization_Starting_Ships_();
 
     extern int8_t* _planet_selected_flag;
@@ -59,9 +59,9 @@ namespace ADVCIV {
 
     /** Applies one weighted upgrade step to a planet.
      * @param planet_idx Planet index to modify.
-     * @param weight_choices Weights for size, climate, and mineral upgrades.
+     * @param upgrade_weights Weights for size, climate, and mineral upgrades.
      */
-    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* weight_choices);
+    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* upgrade_weights);
 
     /** Returns the average worthiness of a player's selected planets.
      * @param player_idx Player index whose selected planets are evaluated.

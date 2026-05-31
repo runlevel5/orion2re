@@ -147,10 +147,14 @@ static_assert(sizeof(s_player_ship_sizes) == 0x38, "s_player_ship_sizes size mis
 
 typedef struct s_ai_refit_entry s_ai_refit_entry, *Ps_ai_refit_entry;
 
+#pragma pack(push, 1)
 struct s_ai_refit_entry {
     int16_t ship_idx;
     int32_t desirability;
 };
+#pragma pack(pop)
+
+static_assert(sizeof(s_ai_refit_entry) == 6, "s_ai_refit_entry size mismatch");
 
 typedef struct s_ai_refit_player s_ai_refit_player, *Ps_ai_refit_player;
 
@@ -158,6 +162,8 @@ struct s_ai_refit_player {
     int16_t n_entries;
     struct s_ai_refit_entry entry[500];
 };
+
+static_assert(sizeof(s_ai_refit_player) == 3002, "s_ai_refit_player size mismatch");
 
 typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
 
@@ -4827,10 +4833,8 @@ struct s_sound_wav_header {
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
 struct s_spcl {
-    uint8_t id;
-    int8_t special_or_weapon_id;
-    uint8_t type;
-    int8_t category;
+    int16_t id;
+    int16_t type;
 };
 
 typedef struct s_star_data s_star_data, *Ps_star_data;

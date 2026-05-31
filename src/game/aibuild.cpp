@@ -229,7 +229,7 @@ namespace AIBUILD {
             if (player_idx != i) {
                 bool aware = ((*AIDATA::_ai_player_info)[player_idx].reachable_players[i] != 0);
                 if (!aware) {
-                    if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0 && MOX::_player[i].objectives == 100 /* 'd' */) {
+                    if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0 && MOX::_player[i].objectives == 100) {
                         aware = true;
                     }
                 }
@@ -572,8 +572,8 @@ namespace AIBUILD {
 
         switch (building_id) {
         case 2: {
-            int threatened_score = alliance_count * 3 + threatened * 2 +
-                                   out_of_range_count + neutral_count + enemy_count;
+            int32_t threatened_score = alliance_count * 3 + threatened * 2 +
+                                       out_of_range_count + neutral_count + enemy_count;
             if (colony->n_pops > 2 || bc_score != 0) {
                 if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             }
@@ -621,7 +621,7 @@ namespace AIBUILD {
 
         case 8: {
             if (building_focus && threatened == 0) break;
-            int base_threat = (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 3 + threatened * 10;
+            int32_t base_threat = (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 3 + threatened * 10;
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
@@ -661,7 +661,7 @@ namespace AIBUILD {
 
         case 16:
             if (trait_eats_minerals != 0) {
-                int base_score = 8;
+                int32_t base_score = 8;
                 if (player->surplus_food >= 0) {
                     base_score = 4;
                 }
@@ -685,18 +685,18 @@ namespace AIBUILD {
 
         case 21:
             if (trait_eats_minerals != 0) {
-                int base_val = 6;
+                int32_t base_val = 6;
                 if (colony->food2_per_farmer == 0) base_val = 12;
                 else if (colony->food2_per_farmer == 1) base_val = 11;
                 else if (colony->food2_per_farmer == 2) base_val = 10;
 
-                if (player->surplus_food < 0) base_val -= (int)player->surplus_food;
+                if (player->surplus_food < 0) base_val -= (int32_t)player->surplus_food;
                 score = base_val + objective_5_bonus * 4;
             }
             break;
 
         case 22: {
-            int threatened_score = threatened * 5 + (alliance_count * 3 + out_of_range_count) * 2 + neutral_count * 3 + enemy_count;
+            int32_t threatened_score = threatened * 5 + (alliance_count * 3 + out_of_range_count) * 2 + neutral_count * 3 + enemy_count;
             if (colony->n_pops > 1 || bc_score != 0) {
                 if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             }
@@ -710,7 +710,7 @@ namespace AIBUILD {
         case 23:
         case 24: {
             if (building_focus && threatened == 0) break;
-            int threatened_score = enemy_count + (threatened * 5 + (alliance_count * 3 + neutral_count) * 2 + out_of_range_count) * 2;
+            int32_t threatened_score = enemy_count + (threatened * 5 + (alliance_count * 3 + neutral_count) * 2 + out_of_range_count) * 2;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             if (climate == 1) score += objective_5_bonus * 2;
             score += bc_score;
@@ -730,19 +730,19 @@ namespace AIBUILD {
 
         case 26: {
             if (building_focus && threatened == 0) break;
-            int base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
+            int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
         case 27: {
             if (building_focus && threatened == 0) break;
-            int base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
+            int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
         case 28: {
             if (building_focus && threatened == 0) break;
-            int threatened_score = threatened * 10 + (alliance_count * 3 + neutral_count * 2 + out_of_range_count + enemy_count) * 4;
+            int32_t threatened_score = threatened * 10 + (alliance_count * 3 + neutral_count * 2 + out_of_range_count + enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             if (climate == 1) score += objective_5_bonus * 2;
             score += bc_score;
@@ -795,14 +795,14 @@ namespace AIBUILD {
 
         case 37:
             if (!building_focus && trait_eats_minerals != 0 && colony->food2_per_farmer != 0) {
-                int base_val = (player->surplus_food >= 0) ? 3 : 5;
+                int32_t base_val = (player->surplus_food >= 0) ? 3 : 5;
                 score = base_val + objective_5_bonus * 2;
             }
             break;
 
         case 38:
             if (!building_focus && (colony->production[1] > 16 || colony->n_pops > 4 || bc_score != 0)) {
-                score = (int)special::isqrt_((int)colony->production[1] - 15);
+                score = (int32_t)special::isqrt_((int32_t)colony->production[1] - 15);
             }
             break;
 
@@ -814,7 +814,7 @@ namespace AIBUILD {
 
         case 40: {
             if (building_focus && threatened == 0) break;
-            int base_threat = out_of_range_count * 3 + (enemy_count + (neutral_count + alliance_count * 2) * 2) * 4 + threatened * 10;
+            int32_t base_threat = out_of_range_count * 3 + (enemy_count + (neutral_count + alliance_count * 2) * 2) * 4 + threatened * 10;
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
@@ -823,7 +823,7 @@ namespace AIBUILD {
 
         case 41: {
             if (building_focus && threatened == 0) break;
-            int base_threat = (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 3 + threatened * 10;
+            int32_t base_threat = (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 3 + threatened * 10;
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
@@ -832,25 +832,25 @@ namespace AIBUILD {
 
         case 42: {
             if (building_focus && threatened == 0) break;
-            int threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
+            int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus + bc_score;
         } break;
 
         case 43:
             if (!building_focus && trait_eats_minerals != 0) {
-                int base_val = 7;
+                int32_t base_val = 7;
                 if (colony->food2_per_farmer == 0) base_val = 13;
                 else if (colony->food2_per_farmer == 1) base_val = 12;
                 else if (colony->food2_per_farmer == 2) base_val = 10;
 
-                if (player->surplus_food < 0) base_val -= (int)player->surplus_food;
+                if (player->surplus_food < 0) base_val -= (int32_t)player->surplus_food;
                 score = base_val + objective_5_bonus * 3;
             }
             break;
 
         case 44:
             if (!building_focus) {
-                int base_climate_score = 0;
+                int32_t base_climate_score = 0;
                 bool valid_climate = true;
                 bool is_aquatic = (player->traits[12 /* TRAIT_AQUATIC */] != 0);
                 switch (climate) {
@@ -881,7 +881,7 @@ namespace AIBUILD {
         case 45: {
             if (building_focus && threatened == 0) break;
             if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner_u8 & 0x1F)) & 1) == 0) {
-                int threatened_score = threatened * 5 + (enemy_count + alliance_count * 2) * 2 + neutral_count * 3 + out_of_range_count;
+                int32_t threatened_score = threatened * 5 + (enemy_count + alliance_count * 2) * 2 + neutral_count * 3 + out_of_range_count;
                 if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             }
             bc_score /= 2;
@@ -897,7 +897,7 @@ namespace AIBUILD {
 
         case 47: {
             if (building_focus && threatened == 0) break;
-            int threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
+            int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus + bc_score;
         } break;
         }
@@ -914,7 +914,7 @@ namespace AIBUILD {
 
             if (pop_owner < 8 && (int8_t)pop_owner != colony->owner) {
                 if (MOX::_player[pop_owner].eliminated == 0) {
-                    int8_t treaty_status = MOX::_player[pop_owner].treaty[(int)colony->owner];
+                    int8_t treaty_status = MOX::_player[pop_owner].treaty[(int32_t)colony->owner];
 
                     if (treaty_status >= 4 && treaty_status <= 6) {
                         return true;
@@ -967,7 +967,7 @@ namespace AIBUILD {
 
         if (colony->n_pops * 3 <= pop_limit) {
             int32_t housing_weight_base = (pop_limit - colony->n_pops) * 3;
-            weights[49] = (short)special::isqrt_(housing_weight_base);
+            weights[49] = (int16_t)special::isqrt_(housing_weight_base);
         }
 
         int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, 51);

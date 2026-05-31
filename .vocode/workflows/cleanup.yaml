@@ -16,8 +16,6 @@ workflows:
         temperature: 0.4
         reasoning_effort: high
         start_timeout: 600
-        confirmation: auto
-        reset_policy: keep
         max_rounds: 0
         tools:
           - read_files
@@ -65,6 +63,7 @@ workflows:
                c. Missing function docstrings.
                d. Platform-dependent integer types that should be replaced with explicit fixed-width types.
                e. C++-style casts that should be replaced with equivalent C-style casts.
+               f. UB-potential direct memory accesses performed via pointer arithmetic or pointer-based address math.
              - For every function that lacks a helpful description, suggest a short docstring only:
                - one sentence describing what the function does
                - parameter descriptions
@@ -72,6 +71,7 @@ workflows:
              - Do not suggest broad rewrites, logic changes, formatting-only churn, or speculative renames.
              - Always present suggested source edits as diff-style patches to the user, not only as high-level prose.
              - Suggested diffs must stay narrowly scoped to the approved cleanup categories.
+             - Always detect and explicitly call out pointer-math-based direct memory accesses that may rely on undefined behavior, even when no safe cleanup patch is obvious.
              - Variable definitions should be above function definitions.
              - Replace string constant variables with their corresponding string literals at usage sites in the relevant CPP file, and remove the now-redundant string variables when it is safe to do so.
              - When cleaning up string literals, if a string contains special control codes, binary formatting bytes, or function-sequence markers, consult `docs/fmtpara.md` and add a concise comment explaining the formatting behavior represented by those symbols.
@@ -89,6 +89,8 @@ workflows:
              - Flag parameter and local variable names that are generic, misleading, inconsistent with actual use, or obvious
                decompiler leftovers.
              - Prefer conservative descriptive renames supported by the file's behavior.
+             - Do not rename variables that already appear correct, specific, and consistent with their observed use just for stylistic reasons.
+             - Prioritize clearly incorrect names, placeholder names, generic decompiler artifacts, and unrecovered programmatic names over marginal naming improvements.
              - If confidence is low, note the problem without forcing a rename.
 
           B. Comment quality
@@ -111,19 +113,27 @@ workflows:
           E. Cast cleanup
              - Replace C++-style casts with equivalent C-style casts throughout reviewed code when the target type and behavior are clear.
 
-          F. String formatting notes
+          F. UB-risky direct memory access detection
+             - Always flag direct memory reads or writes that are performed through pointer arithmetic, integer-to-pointer casts, manual offset computation, or similar address math when they may depend on undefined behavior.
+             - Treat possible out-of-bounds access, misalignment, strict-aliasing violations, invalid provenance, and unchecked raw structure overlay as reasons to complain.
+             - Also treat suspicious type aliasing patterns as a review concern, especially when suggested by weird or repetitive casts, raw pointer field accesses, manual structure overlays, or code that appears to reinterpret one object layout as another.
+             - Use these patterns as hints that a real type alias, missing structure, or more accurate declaration may exist, and call that out when it would explain the access pattern.
+             - Call these findings out even if they appear intentional, are inherited from decompilation, or cannot be safely rewritten within cleanup scope.
+             - When a safe localized cleanup is obvious, suggest it; otherwise clearly document the concern without forcing speculative code changes.
+
+          G. String formatting notes
              - When a cleaned-up or inlined string literal contains special fmtpara symbols, formatting control characters, binary commands, or `\a` function sequences, read `docs/fmtpara.md` and use it to describe the string's formatting behavior accurately.
              - Add only concise, informational comments that clarify non-obvious formatting semantics for future readers.
              - Do not add comments for ordinary printable strings that do not use fmtpara-specific formatting constructs.
 
-          G. Scope discipline
+          H. Scope discipline
              - Stay focused on cleanup suggestions only.
              - Do not apply source-code changes unless the user explicitly asks for them.
              - You may update `progress.md` as part of normal workflow operation.
              - Even when not applying changes, always show the user concrete diff-style suggestions for the reviewed unit.
              - Avoid unrelated architectural commentary.
 
-          H. Queue management requirements
+          I. Queue management requirements
              - `progress.md` is mandatory working memory.
              - Maintain compact sections such as current focus, pending units, reviewed units, blocked units, and per-unit notes.
              - Remove stale or duplicated entries once they are superseded.
@@ -144,6 +154,8 @@ workflows:
              - missing short function docstrings and parameter descriptions
              - platform-dependent integer types that should be converted to explicit fixed-width types
              - C++-style casts that should be converted to equivalent C-style casts
+             - UB-potential direct memory accesses implemented through pointer arithmetic or pointer-based address math
+             - suspicious type aliasing hints, including odd casts, raw pointer field accesses, or probable missing aliases/struct types
              - special fmtpara symbols in cleaned-up string literals that need an explanatory comment based on `docs/fmtpara.md`
           8. Update `progress.md` with:
              - unit status changes
@@ -165,6 +177,8 @@ workflows:
           - Naming suggestions
           - Comment cleanup suggestions
           - Function docstring suggestions
+          - UB-risky pointer-math memory access findings
+          - Type-aliasing or missing-type hints
           - Confidence
 
           Suggested diffs:

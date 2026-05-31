@@ -31,9 +31,9 @@ namespace ADVCIV {
         }
     }
 
-    int __cdecl qsort_planet_worth_(const void* a, const void* b) {
-        const auto* left_planet = (const s_adv_civ_player_planet*)a;
-        const auto* right_planet = (const s_adv_civ_player_planet*)b;
+    int __cdecl qsort_planet_worth_(const void* left_record, const void* right_record) {
+        const auto* left_planet = (const s_adv_civ_player_planet*)left_record;
+        const auto* right_planet = (const s_adv_civ_player_planet*)right_record;
         return right_planet->worth - left_planet->worth;
     }
 
@@ -91,10 +91,10 @@ namespace ADVCIV {
     void __cdecl Build_Adv_Civ_Star_List_() {
         int16_t max_dist_so_far = 0;
 
-        for (int16_t plr_idx = 0; plr_idx < (int16_t)MOX::_NUM_PLAYERS; ++plr_idx) {
-            _adv_civ_player[plr_idx].candidate_star_count = 0;
+        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+            _adv_civ_player[player_idx].candidate_star_count = 0;
 
-            int16_t home_star_idx = (int16_t)MOX::_planet[MOX::_player[plr_idx].home_planet_id].star_index;
+            int16_t home_star_idx = (int16_t)MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index;
             for (int16_t star_idx = 1; star_idx < 72; ++star_idx) {
                 int16_t distance = (int16_t)_parsec[home_star_idx].dist[star_idx];
                 if (max_dist_so_far < distance) {
@@ -102,17 +102,17 @@ namespace ADVCIV {
                 }
             }
 
-            _adv_civ_player[plr_idx].furthest_star_dist_from_home = max_dist_so_far;
+            _adv_civ_player[player_idx].furthest_star_dist_from_home = max_dist_so_far;
 
             for (int16_t colonized_star = 1; colonized_star < 72; ++colonized_star) {
                 if (colonized_star < MOX::_NUM_STARS &&
                     MOX::_star[colonized_star].system_special != SYSTEM_SPECIAL_SPACE_MONSTER &&
-                    Player_Has_Colony_At_Star_(plr_idx, colonized_star)) {
+                    Player_Has_Colony_At_Star_(player_idx, colonized_star)) {
 
                     for (int16_t target_star = 1; target_star < MOX::_NUM_STARS; ++target_star) {
                         int16_t distance = (int16_t)_parsec[colonized_star].dist[target_star];
                         if (distance < 10 && MOX::_star[target_star].system_special != SYSTEM_SPECIAL_SPACE_MONSTER) {
-                            auto& star_proximity = _adv_civ_player[plr_idx].stars[target_star];
+                            auto& star_proximity = _adv_civ_player[player_idx].stars[target_star];
                             if (distance <= star_proximity.min_dist_to_colony) {
                                 star_proximity.min_dist_to_colony = distance;
                             }
@@ -132,8 +132,8 @@ namespace ADVCIV {
             return;
         }
 
-        for (int16_t p_idx = 0; p_idx < (int16_t)MOX::_NUM_PLAYERS; ++p_idx) {
-            s_adv_civ_player* player = &ADVCIV::_adv_civ_player[p_idx];
+        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+            s_adv_civ_player* player = &ADVCIV::_adv_civ_player[player_idx];
 
             for (int16_t star_list_idx = 0; star_list_idx < 72; ++star_list_idx) {
                 s_adv_civ_player_star* adv_star = &player->stars[star_list_idx];
@@ -496,8 +496,8 @@ namespace ADVCIV {
      * Applies one weighted upgrade step to the selected planet.
      * Returns 1 when no further weighted upgrade choice is available.
      */
-    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* weight_choices) {
-        int16_t choice = RUSS::Get_Weighted_Choice_Char_(weight_choices, 3);
+    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* upgrade_weights) {
+        int16_t choice = RUSS::Get_Weighted_Choice_Char_(upgrade_weights, 3);
 
         if (choice == -1) {
             return 1;
@@ -511,7 +511,7 @@ namespace ADVCIV {
                 new_size = PLANET_SIZE_HUGE;
             }
             planet.size = (int8_t)new_size;
-            weight_choices[0]--;
+            upgrade_weights[0]--;
         }
         else if (choice == 1) {
             int32_t new_climate = (int32_t)planet.climate + 1;
@@ -519,7 +519,7 @@ namespace ADVCIV {
                 new_climate = PLANET_CLIMATE_GAIA;
             }
             planet.climate = (int8_t)new_climate;
-            weight_choices[1]--;
+            upgrade_weights[1]--;
         }
         else if (choice == 2) {
             int32_t new_minerals = (int32_t)planet.mineral_class + 1;
@@ -527,7 +527,7 @@ namespace ADVCIV {
                 new_minerals = MINERAL_RESOURCE_ULTRA_RICH;
             }
             planet.mineral_class = (int8_t)new_minerals;
-            weight_choices[2]--;
+            upgrade_weights[2]--;
         }
 
         return 0;
