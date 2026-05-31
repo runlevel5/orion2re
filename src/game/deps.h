@@ -16,10 +16,6 @@
 #include <math.h>
 #include <direct.h>
 
-#include "patch.h"
-#include "hooks.h"
-
-
 #include "../dplay.h"
 
 #include "funcs.h"

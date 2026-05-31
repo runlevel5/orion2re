@@ -69,7 +69,6 @@ namespace platform {
 	using ::g_cached_mouse_y;
 
 	// Functions
-	void __cdecl entry();
 	void Parse_Ten_Cmd_Parameter(const char* input_str);
 	HWND Create_Direct_Draw(int16_t video_mode);
 	void __cdecl Flip_Surface();
