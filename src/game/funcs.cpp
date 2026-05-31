@@ -34,8 +34,6 @@ const char s_s_sez__s_00552334[11] = "%s sez: %s";
 const char s_PR_00557d9c[4] = " PR";
 const char s_FP_00557da0[4] = " FP";
 const char s_RP_00557da4[4] = " RP";
-
-char s_AI_trade_goods_00557670[15] = "AI trade goods";
 const char s_Human_00558020[8] = "Human";
 const char s_Error_Enum_Current_Games_Invalid_0055c000[40] = "Error Enum Current Games Invalid Params";
 const char s_Error_Enum_Current_Games_Invalid_0055c028[40] = "Error Enum Current Games Invalid Object";

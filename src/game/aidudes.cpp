@@ -1169,7 +1169,7 @@ namespace aidudes {
                         }
 
                         if (COLCALC::Colony_Can_Build_Large_Ships_(temp_colony)) {
-                            int size_9 = AIBUILD::_player_ship_sizes[player_idx][9];
+                            int size_9 = AIBUILD::_player_ship_sizes[player_idx].target_ship_size;
                             if (size_9 >= 2 && p->ship_designs[2].cost <= (war_level * 2 + 45) * ind_worth) {
                                 ship_weights[2] = 32;
                                 ship_weights[1] /= 5;

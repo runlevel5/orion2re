@@ -1,13 +1,12 @@
 # Source Cleanup Progress
 
 ## Current focus
-- src/game/aibuild.{h,cpp}
+- none
 
 ## In progress
-- [in_progress] src/game/aibuild.{h,cpp}
+- none
 
 ## Pending
-- [pending] src/game/aibuild.{h,cpp}
 - [pending] src/game/aidata.{h,cpp}
 - [pending] src/game/aidesign.{h,cpp}
 - [pending] src/game/aidudes.{h,cpp}
@@ -209,6 +208,7 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/aibuild.{h,cpp} - converted shared build-need counters and several locals to fixed-width integer types, replaced remaining `static_cast` uses with C-style casts, removed redundant guessed comments, clarified a few decompiler-style local names, and inlined the lone `"AI trade goods"` string literal.
 - [reviewed] src/game/advciv.{h,cpp} - replaced remaining `static_cast` uses with C-style casts, converted several `short`/`int` locals to fixed-width integer types, removed redundant explanatory comments, and clarified a few local and parameter names.
 - [reviewed] src/game/aibomb.{h,cpp} - replace plain `int` counters and size parameters with `int32_t`, and replace the remaining `static_cast` with a C-style cast.
 

@@ -114,6 +114,8 @@ struct s_ai_colony_info {
 
 typedef struct s_ai_player_info s_ai_player_info, *Ps_ai_player_info;
 
+typedef struct s_player_ship_sizes s_player_ship_sizes, *Ps_player_ship_sizes;
+
 
 /* WARNING! conflicting data type names: /orion2.h/undefined - /undefined */
 
@@ -131,6 +133,17 @@ struct s_ai_player_info {
     int16_t prev_n_contacts;
     int32_t total_ship_strength[8];
 };
+
+struct s_player_ship_sizes {
+    int32_t ship_counts[9];
+    int32_t target_ship_size;
+    int32_t combat_ship_count;
+    int32_t combat_command_points_used;
+    int32_t active_combat_command_points_used;
+    int32_t weighted_ship_size;
+};
+
+static_assert(sizeof(s_player_ship_sizes) == 0x38, "s_player_ship_sizes size mismatch");
 
 typedef struct s_ai_refit_entry s_ai_refit_entry, *Ps_ai_refit_entry;
 
