@@ -64,6 +64,7 @@ workflows:
                a. Misnamed parameters or local variables.
                b. Superfluous, stale, misleading, or decompiler-related comments, including raw addresses and incorrect notes.
                c. Missing function docstrings.
+               d. Platform-dependent integer types that should be replaced with explicit fixed-width types.
              - For every function that lacks a helpful description, suggest a short docstring only:
                - one sentence describing what the function does
                - parameter descriptions
@@ -101,14 +102,19 @@ workflows:
              - Include parameter descriptions only when the parameter meaning is reasonably clear from the code.
              - If a function's purpose is unclear, state the narrow observed behavior instead of inventing intent.
 
-          D. Scope discipline
+          D. Type cleanup
+             - Replace platform-dependent integer types with explicit fixed-width types throughout reviewed code when the intended width and signedness are clear.
+             - Prefer mappings such as `byte` to `uint8_t`, `short` to `int16_t`, `unsigned short` to `uint16_t`, `int` to `int32_t`, and `unsigned int` to `uint32_t`.
+             - Apply the same principle to other integer-like platform-dependent types where an unambiguous fixed-width replacement is evident.
+
+          E. Scope discipline
              - Stay focused on cleanup suggestions only.
              - Do not apply source-code changes unless the user explicitly asks for them.
              - You may update `progress.md` as part of normal workflow operation.
              - Even when not applying changes, always show the user concrete diff-style suggestions for the reviewed unit.
              - Avoid unrelated architectural commentary.
 
-          E. Queue management requirements
+          F. Queue management requirements
              - `progress.md` is mandatory working memory.
              - Maintain compact sections such as current focus, pending units, reviewed units, blocked units, and per-unit notes.
              - Remove stale or duplicated entries once they are superseded.
@@ -127,6 +133,7 @@ workflows:
              - misnamed parameters or locals
              - superfluous or incorrect comments
              - missing short function docstrings and parameter descriptions
+             - platform-dependent integer types that should be converted to explicit fixed-width types
           8. Update `progress.md` with:
              - unit status changes
              - concise suggested improvements

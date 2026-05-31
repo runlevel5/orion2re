@@ -17,7 +17,7 @@ typedef unsigned long long    undefined5;
 typedef unsigned long long    undefined6;
 typedef unsigned long long    undefined7;
 typedef unsigned long long    undefined8;
-typedef unsigned short    ushort;
+typedef unsigned short    uint16_t;
 typedef unsigned short    word;
 typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
 
@@ -58,22 +58,22 @@ typedef int int32_t;
 
 struct s_adv_civ_player_planet {
     int8_t is_homeworld;
-    short proximity_bonus;
+    int16_t proximity_bonus;
     int32_t worth;
-    short planet_idx;
+    int16_t planet_idx;
     int8_t is_settled;
 };
 
 struct s_adv_civ_player_star {
-    short star_idx;
-    short min_dist_to_colony;
+    int16_t star_idx;
+    int16_t min_dist_to_colony;
 };
 
 struct s_adv_civ_player {
-    short candidate_star_count;
-    short candidate_planet_count;
-    short settled_planet_count;
-    short furthest_star_dist_from_home;
+    int16_t candidate_star_count;
+    int16_t candidate_planet_count;
+    int16_t settled_planet_count;
+    int16_t furthest_star_dist_from_home;
     int8_t has_planet[360];
     struct s_adv_civ_player_star stars[72];
     struct s_adv_civ_player_planet planets[360];
@@ -84,7 +84,7 @@ typedef struct s_adv_planet_worth s_adv_planet_worth, *Ps_adv_planet_worth;
 typedef struct s_adv_planet_worth_s1 s_adv_planet_worth_s1, *Ps_adv_planet_worth_s1;
 
 struct s_adv_planet_worth_s1 {
-    short planet_idx;
+    int16_t planet_idx;
     int worth;
 };
 
@@ -96,7 +96,7 @@ struct s_adv_planet_worth {
 typedef struct s_ai_colonizable_planet s_ai_colonizable_planet, *Ps_ai_colonizable_planet;
 
 struct s_ai_colonizable_planet {
-    short planet_idx;
+    int16_t planet_idx;
     int contextual_value;
 };
 
@@ -118,31 +118,31 @@ typedef struct s_ai_player_info s_ai_player_info, *Ps_ai_player_info;
 /* WARNING! conflicting data type names: /orion2.h/undefined - /undefined */
 
 struct s_ai_player_info {
-    short colony_count;
-    short colony_deficit;
-    short colony_blockaded_count;
-    short n_stars_with_colony;
-    short n_blockaded_stars;
-    short n_contacts;
-    short n_reachable_players;
+    int16_t colony_count;
+    int16_t colony_deficit;
+    int16_t colony_blockaded_count;
+    int16_t n_stars_with_colony;
+    int16_t n_blockaded_stars;
+    int16_t n_contacts;
+    int16_t n_reachable_players;
     int8_t reachable_players[8];
     undefined field8_0x16;
     undefined field9_0x17;
-    short prev_n_contacts;
+    int16_t prev_n_contacts;
     int32_t total_ship_strength[8];
 };
 
 typedef struct s_ai_refit_entry s_ai_refit_entry, *Ps_ai_refit_entry;
 
 struct s_ai_refit_entry {
-    short ship_idx;
-    int desirability;
+    int16_t ship_idx;
+    int32_t desirability;
 };
 
 typedef struct s_ai_refit_player s_ai_refit_player, *Ps_ai_refit_player;
 
 struct s_ai_refit_player {
-    short n_entries;
+    int16_t n_entries;
     struct s_ai_refit_entry entry[500];
 };
 
@@ -189,7 +189,7 @@ struct s_ai_tech_info_player {
     uint8_t best_weapon2;
     int8_t best_weapon2_delta;
     uint8_t groun_tech_bonus;
-    short ground_bonus;
+    int16_t ground_bonus;
     int8_t ground_bonus_delta;
     uint8_t colonization_idle;
 };
@@ -201,18 +201,18 @@ struct s_ai_tech_info {
 typedef struct s_aidesign_ship_design s_aidesign_ship_design, *Ps_aidesign_ship_design;
 
 struct s_aidesign_ship_design {
-    short theme_special;
-    short beam_special;
-    short missile_special;
-    short defense_special;
-    short special_weapon;
-    short special_device;
-    short fighters;
-    short missile_weapon;
-    short heavy_beams;
-    short beams;
-    short point_defense_beams;
-    short bombs;
+    int16_t theme_special;
+    int16_t beam_special;
+    int16_t missile_special;
+    int16_t defense_special;
+    int16_t special_weapon;
+    int16_t special_device;
+    int16_t fighters;
+    int16_t missile_weapon;
+    int16_t heavy_beams;
+    int16_t beams;
+    int16_t point_defense_beams;
+    int16_t bombs;
 };
 
 typedef struct s_aidudes_colony_info s_aidudes_colony_info, *Ps_aidudes_colony_info;
@@ -226,8 +226,8 @@ struct s_aidudes_colony_info {
     uint8_t pop_end_idx;
     uint8_t pop_tail_idx;
     uint8_t pollution_at_start;
-    short best_worker_to_farmer_score;
-    short worst_worker_to_farmer_score;
+    int16_t best_worker_to_farmer_score;
+    int16_t worst_worker_to_farmer_score;
     uint8_t eats_minerals;
 };
 
@@ -241,9 +241,9 @@ struct s_aimove_alien_strength {
 typedef struct s_aimove_intercept_entry s_aimove_intercept_entry, *Ps_aimove_intercept_entry;
 
 
-/* WARNING! conflicting data type names: /types.h/ushort - /ushort */
+/* WARNING! conflicting data type names: /types.h/uint16_t - /uint16_t */
 
-typedef ushort uint16_t;
+typedef uint16_t uint16_t;
 
 typedef struct s_aimove_intercept_player s_aimove_intercept_player, *Ps_aimove_intercept_player;
 
@@ -281,7 +281,7 @@ struct s_alloc_header {
 
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
-typedef short int16_t;
+typedef int16_t int16_t;
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -293,7 +293,7 @@ struct s_animation_header {
     int16_t current_frame;
     int16_t frame_count;
     int8_t loop_frame;
-    short keyframe_interval;
+    int16_t keyframe_interval;
     undefined1 flags;
     uint32_t frame_offsets[0];
 };
@@ -304,14 +304,14 @@ struct s_animation_header {
 typedef struct s_antaran s_antaran, *Ps_antaran;
 
 struct s_antaran {
-    short attack_pressure;
-    short resource_offensive;
-    short resource_defensive;
-    short defensive_ships[9];
-    short offensive_ships[9];
-    short offensive_deployed[9];
+    int16_t attack_pressure;
+    int16_t resource_offensive;
+    int16_t resource_defensive;
+    int16_t defensive_ships[9];
+    int16_t offensive_ships[9];
+    int16_t offensive_deployed[9];
     undefined1 field6_0x3c;
-    int invasion_stardate;
+    int32_t invasion_stardate;
     uint8_t attack_notified_mask;
 };
 
@@ -342,7 +342,7 @@ struct s_invasion_player_bonuses {
     int8_t low_g_penalty;
     int8_t subterranean_bonus;
     int8_t difficulty_bonus;
-    short officer_bonus;
+    int16_t officer_bonus;
     int8_t officer_idx;
 };
 
@@ -371,7 +371,7 @@ struct s_battle_results_info {
     int16_t captured_tech_planet_id;
     int8_t planet_destroyed_flag;
     int16_t orion_techs[4];
-    short rescued_hero_id;
+    int16_t rescued_hero_id;
     char summary[100];
     char details[500];
     undefined field24_0x4d9;
@@ -939,13 +939,13 @@ struct s_beam_fx_entry {
 typedef struct s_big_icon s_big_icon, *Ps_big_icon;
 
 struct s_big_icon {
-    short grid_x;
-    short grid_y;
+    int16_t grid_x;
+    int16_t grid_y;
     int8_t selected;
-    short screen_x;
-    short screen_y;
-    short button_id;
-    short ship_idx;
+    int16_t screen_x;
+    int16_t screen_y;
+    int16_t button_id;
+    int16_t ship_idx;
 };
 
 typedef struct s_bomb s_bomb, *Ps_bomb;
@@ -964,7 +964,7 @@ struct s_bomb {
     undefined field8_0x8;
     undefined field9_0x9;
     sbyte field10_0xa;
-    short field11_0xb;
+    int16_t field11_0xb;
     undefined field12_0xd;
     undefined field13_0xe;
 };
@@ -982,8 +982,8 @@ typedef struct s_build_ship_icon_item s_build_ship_icon_item, *Ps_build_ship_ico
 
 struct s_build_ship_icon_item {
     int8_t player_idx;
-    short ship_idx;
-    short icon_idx;
+    int16_t ship_idx;
+    int16_t icon_idx;
 };
 
 typedef struct s_class_group s_class_group, *Ps_class_group;
@@ -1061,30 +1061,30 @@ typedef struct s_colony s_colony, *Ps_colony;
 
 struct s_colony {
     int8_t owner;
-    char allocated_to;
-    short planet;
-    short officer;
+    int8_t allocated_to;
+    int16_t planet;
+    int16_t officer;
     byte outpost_flag;
-    char morale;
-    short pollution;
+    int8_t morale;
+    int16_t pollution;
     uint8_t n_pops;
-    char specialty;
+    int8_t specialty;
     uint32_t pop[42];
-    short pop_roundoff[10];
-    short pop_growth[10];
-    char n_turns_existed;
-    char food2_per_farmer;
-    char industry_per_worker;
-    char research_per_scientist;
+    int16_t pop_roundoff[10];
+    int16_t pop_growth[10];
+    int8_t n_turns_existed;
+    int8_t food2_per_farmer;
+    int8_t industry_per_worker;
+    int8_t research_per_scientist;
     uint8_t max_farms;
-    char max_population;
+    int8_t max_population;
     uint8_t climate;
-    short ground_strength;
-    short space_strength;
-    short production[4];
+    int16_t ground_strength;
+    int16_t space_strength;
+    int16_t production[4];
     uint8_t maintenance[4];
-    short imports[4];
-    char n_industry_recyclers;
+    int16_t imports[4];
+    int8_t n_industry_recyclers;
     uint8_t food2_needed_for_our_empire;
     uint8_t food2_needed_for_assimilated;
     uint8_t food2_needed_for_conquered;
@@ -1093,21 +1093,21 @@ struct s_colony {
     uint8_t industry2_needed_for_androids;
     uint8_t industry2_needed_for_assimilated;
     uint8_t industry2_needed_for_conquered;
-    char food2_needed_for_empire[8];
-    char industry2_needed_for_empire[8];
-    char n_food_replicated;
-    short producing[7];
-    short just_produced;
-    short production_spent;
-    short n_industry_taxed;
+    int8_t food2_needed_for_empire[8];
+    int8_t industry2_needed_for_empire[8];
+    int8_t n_food_replicated;
+    int16_t producing[7];
+    int16_t just_produced;
+    int16_t production_spent;
+    int16_t n_industry_taxed;
     uint8_t auto_building;
-    short production_surplus;
-    short bought_outright;
-    char occupation_points;
-    char occupation_policy;
-    short military[2];
-    char tank_roundoff;
-    char infantry_roundoff;
+    int16_t production_surplus;
+    int16_t bought_outright;
+    int8_t occupation_points;
+    int8_t occupation_policy;
+    int16_t military[2];
+    int8_t tank_roundoff;
+    int8_t infantry_roundoff;
     byte buildings[49];
     uint16_t last_turn_building_destroyed;
 };
@@ -1149,23 +1149,23 @@ enum {
 };
 
 struct s_colony_job_production {
-    int base_prod;
-    short racial_bonuses[COLONY_JOB_RACIAL_BONUS_COUNT];
-    short tech_apps[212];
-    short buildings_prod[49];
-    int food_bonus;
-    int artifacts_bonus;
-    int intelligence_bonus;
-    int base_prod_scaled;
-    int gravity_penalty;
-    int conquered_penalty;
-    int pollution_penalty;
-    int morale_bonus;
-    int govt_bonus;
-    int blockaded_penalty;
-    int officer_bonus;
-    int difficulty_bonus;
-    int final_prod;
+    int32_t base_prod;
+    int16_t racial_bonuses[COLONY_JOB_RACIAL_BONUS_COUNT];
+    int16_t tech_apps[212];
+    int16_t buildings_prod[49];
+    int32_t food_bonus;
+    int32_t artifacts_bonus;
+    int32_t intelligence_bonus;
+    int32_t base_prod_scaled;
+    int32_t gravity_penalty;
+    int32_t conquered_penalty;
+    int32_t pollution_penalty;
+    int32_t morale_bonus;
+    int32_t govt_bonus;
+    int32_t blockaded_penalty;
+    int32_t officer_bonus;
+    int32_t difficulty_bonus;
+    int32_t final_prod;
 };
 
 static_assert(sizeof(s_colony_job_production) == 0x256, "s_colony_job_production size mismatch");
@@ -1179,7 +1179,7 @@ struct s_colors {
 typedef struct s_colsum_col_pop_ref s_colsum_col_pop_ref, *Ps_colsum_col_pop_ref;
 
 struct s_colsum_col_pop_ref {
-    short refs[42];
+    int16_t refs[42];
 };
 
 typedef struct s_combat_data s_combat_data, *Ps_combat_data;
@@ -1237,7 +1237,7 @@ struct s_combat_data {
     int8_t special_status_timer;
     uint8_t special_cooldown;
     int16_t plasma_web_damage;
-    short reflected_damage_pool;
+    int16_t reflected_damage_pool;
     int8_t field40_0x47;
     uint8_t combat_status_flags;
     undefined field42_0x49;
@@ -1270,7 +1270,7 @@ struct s_combat_data {
     int16_t weapon_hits[8];
     int16_t weapon_hits_per_unit[8];
     int16_t special_hits[8];
-    short shield_current_hits;
+    int16_t shield_current_hits;
     int8_t black_hole_flag;
     int8_t black_hole_source_idx;
     uint8_t previous_owner;
@@ -1283,7 +1283,7 @@ struct s_combfind_star_has_player {
     int8_t has_transport;
     int8_t has_player;
     int8_t colony_count;
-    short transport_count;
+    int16_t transport_count;
     int8_t transport_unk;
 };
 
@@ -1345,48 +1345,48 @@ typedef struct s_current_design s_current_design, *Ps_current_design;
 struct s_current_design {
     char name[16];
     undefined field1_0x10;
-    short shield;
-    short shield_cost;
-    short shield_space;
+    int16_t shield;
+    int16_t shield_cost;
+    int16_t shield_space;
     undefined field5_0x17;
     undefined field6_0x18;
     undefined field7_0x19;
     undefined field8_0x1a;
-    short ftl_type;
-    short drive_speed;
-    short drive_cost;
-    short base_space;
+    int16_t ftl_type;
+    int16_t drive_speed;
+    int16_t drive_cost;
+    int16_t base_space;
     undefined field13_0x23;
     undefined field14_0x24;
-    short base_combat_speed;
+    int16_t base_combat_speed;
     undefined field16_0x27;
     undefined field17_0x28;
-    short field18_0x29;
-    short computer_type;
-    short computer_cost;
-    short fuel_type;
-    short armor_type;
-    short armor_cost;
-    short weapon_type[8];
-    short weapon_count[8];
-    char weapon_firing_arc[8];
+    int16_t field18_0x29;
+    int16_t computer_type;
+    int16_t computer_cost;
+    int16_t fuel_type;
+    int16_t armor_type;
+    int16_t armor_cost;
+    int16_t weapon_type[8];
+    int16_t weapon_count[8];
+    int8_t weapon_firing_arc[8];
     uint16_t weapon_specials[8];
-    int weapon_cost[8];
-    int weapon_space[8];
-    char weapon_ammo[8];
-    short special_devices[8];
-    short special_device_cost[8];
-    short special_device_space[8];
-    short ship_size;
-    short picture_type;
-    int hull_space;
-    int space_used;
-    int total_cost;
+    int32_t weapon_cost[8];
+    int32_t weapon_space[8];
+    int8_t weapon_ammo[8];
+    int16_t special_devices[8];
+    int16_t special_device_cost[8];
+    int16_t special_device_space[8];
+    int16_t ship_size;
+    int16_t picture_type;
+    int32_t hull_space;
+    int32_t space_used;
+    int32_t total_cost;
     int8_t show_help;
-    short num_weapon_slots;
-    short num_special_slots;
+    int16_t num_weapon_slots;
+    int16_t num_special_slots;
     int8_t item_unlocked[41];
-    short date_of_design;
+    int16_t date_of_design;
 };
 
 typedef struct s_dipscrn_net_message s_dipscrn_net_message, *Ps_dipscrn_net_message;
@@ -1417,9 +1417,9 @@ struct s_event_data {
     int8_t player_idx;
     int8_t status;
     int8_t turn_count;
-    short target_id;
-    short amount;
-    short max_amount;
+    int16_t target_id;
+    int16_t amount;
+    int16_t max_amount;
 };
 
 typedef struct s_fake_button s_fake_button, *Ps_fake_button;
@@ -1458,19 +1458,19 @@ typedef struct s_field_multi_hotkey s_field_multi_hotkey, *Ps_field_multi_hotkey
 struct s_field_grid {
     undefined field0_0x0;
     undefined field1_0x1;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
     char *help;
-    short step_x;
+    int16_t step_x;
     undefined field6_0xe;
     undefined field7_0xf;
-    short step_y;
+    int16_t step_y;
     undefined field9_0x12;
     undefined field10_0x13;
-    short *grid_x_ptr;
-    short *grid_y_ptr;
+    int16_t *grid_x_ptr;
+    int16_t *grid_y_ptr;
     struct s_animation_header *pic;
-    short field14_0x20;
+    int16_t field14_0x20;
     undefined field15_0x22;
     undefined field16_0x23;
 };
@@ -1478,12 +1478,12 @@ struct s_field_grid {
 struct s_field_circle {
     undefined field0_0x0;
     undefined field1_0x1;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
-    short center_x;
+    int16_t center_x;
     undefined field5_0xa;
     undefined field6_0xb;
-    short center_y;
+    int16_t center_y;
     undefined field8_0xe;
     undefined field9_0xf;
     int32_t radius_squared;
@@ -1492,25 +1492,25 @@ struct s_field_circle {
 struct s_field_scroll {
     undefined field0_0x0;
     undefined field1_0x1;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
-    short return_value;
+    int16_t return_value;
     undefined field5_0xa;
     undefined field6_0xb;
-    short set_value;
+    int16_t set_value;
     undefined field8_0xe;
     undefined field9_0xf;
-    short *value;
-    short range_min;
+    int16_t *value;
+    int16_t range_min;
     undefined field12_0x16;
     undefined field13_0x17;
-    short range_max;
+    int16_t range_max;
     undefined field15_0x1a;
     undefined field16_0x1b;
-    short is_vertical;
+    int16_t is_vertical;
     undefined field18_0x1e;
     undefined field19_0x1f;
-    short field20_0x20;
+    int16_t field20_0x20;
     undefined field21_0x22;
     undefined field22_0x23;
 };
@@ -1518,68 +1518,68 @@ struct s_field_scroll {
 struct s_field_multi_button {
     undefined field0_0x0;
     undefined field1_0x1;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
-    short field4_0x8;
+    int16_t field4_0x8;
     undefined field5_0xa;
     undefined field6_0xb;
-    short button_value;
+    int16_t button_value;
     undefined field8_0xe;
     undefined field9_0xf;
-    short *selection;
-    short field11_0x14;
+    int16_t *selection;
+    int16_t field11_0x14;
     undefined field12_0x16;
     undefined field13_0x17;
-    short field14_0x18;
+    int16_t field14_0x18;
     undefined field15_0x1a;
     undefined field16_0x1b;
-    short field17_0x1c;
+    int16_t field17_0x1c;
     undefined field18_0x1e;
     undefined field19_0x1f;
-    short field20_0x20;
+    int16_t field20_0x20;
     undefined field21_0x22;
     undefined field22_0x23;
 };
 
 struct s_field_button {
     int16_t field0_0x0;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
     char *help;
-    short help_start;
+    int16_t help_start;
     undefined field6_0xe;
     undefined field7_0xf;
-    short background_color;
+    int16_t background_color;
     undefined field9_0x12;
     undefined field10_0x13;
-    short draw_style;
+    int16_t draw_style;
     undefined field12_0x16;
     undefined field13_0x17;
-    int field14_0x18;
+    int32_t field14_0x18;
     struct s_animation_header *pic;
-    short font_shadow_style;
+    int16_t font_shadow_style;
     undefined field17_0x22;
     undefined field18_0x23;
 };
 
 struct s_field_input_string {
     int16_t field0_0x0;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
     char *buffer;
-    short field6_0xc;
+    int16_t field6_0xc;
     undefined field7_0xe;
     undefined field8_0xf;
-    short background_color;
+    int16_t background_color;
     undefined field10_0x12;
     undefined field11_0x13;
-    short draw_style;
+    int16_t draw_style;
     undefined field13_0x16;
     undefined field14_0x17;
-    short input_mode;
+    int16_t input_mode;
     undefined field16_0x1a;
     undefined field17_0x1b;
-    short max_length;
+    int16_t max_length;
     undefined field19_0x1e;
     undefined field20_0x1f;
     char *cursor_color_ramp;
@@ -1602,19 +1602,19 @@ struct s_field_string_list {
 struct s_field_radio {
     undefined field0_0x0;
     undefined field1_0x1;
-    short is_active;
+    int16_t is_active;
     struct s_colors *highlight_color;
     char *help;
-    short value;
+    int16_t value;
     undefined field6_0xe;
     undefined field7_0xf;
     int16_t *selection;
-    short field9_0x14;
+    int16_t field9_0x14;
     undefined field10_0x16;
     undefined field11_0x17;
-    int field12_0x18;
+    int32_t field12_0x18;
     struct s_animation_header *pic;
-    short field14_0x20;
+    int16_t field14_0x20;
     undefined field15_0x22;
     undefined field16_0x23;
 };
@@ -1622,42 +1622,42 @@ struct s_field_radio {
 struct s_field_cont_input {
     undefined field0_0x0;
     undefined field1_0x1;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
     char *buffer;
     struct s_animation_header *pic;
-    short background_color;
+    int16_t background_color;
     undefined field7_0x12;
     undefined field8_0x13;
-    short full_store_flag;
+    int16_t full_store_flag;
     undefined field10_0x16;
     undefined field11_0x17;
-    int field12_0x18;
-    short max_length;
+    int32_t field12_0x18;
+    int16_t max_length;
     undefined field14_0x1e;
     undefined field15_0x1f;
-    short font_shadow_style;
+    int16_t font_shadow_style;
     undefined field17_0x22;
     undefined field18_0x23;
 };
 
 struct s_field_multi_hotkey {
     int16_t field0_0x0;
-    short field2_0x2;
+    int16_t field2_0x2;
     struct s_colors *highlight_color;
     char *help;
-    short help_start;
+    int16_t help_start;
     undefined field6_0xe;
     undefined field7_0xf;
-    short help_len;
+    int16_t help_len;
     undefined field9_0x12;
     undefined field10_0x13;
-    short draw_style;
+    int16_t draw_style;
     undefined field12_0x16;
     undefined field13_0x17;
-    int field14_0x18;
+    int32_t field14_0x18;
     struct s_animation_header *pic;
-    short font_shadow_style;
+    int16_t font_shadow_style;
     undefined field17_0x22;
     undefined field18_0x23;
 };
@@ -1676,16 +1676,16 @@ union s_field_detail {
 };
 
 struct s_field {
-    short x;
-    short y;
-    short x_end;
-    short y_end;
-    short field_type;
-    short font_style;
+    int16_t x;
+    int16_t y;
+    int16_t x_end;
+    int16_t y_end;
+    int16_t field_type;
+    int16_t font_style;
     struct s_colors *font_color;
     union s_field_detail detail;
     char hotkey;
-    short sound;
+    int16_t sound;
 };
 
 typedef struct s_fieldsav_data s_fieldsav_data, *Ps_fieldsav_data;
@@ -1726,16 +1726,16 @@ struct s_first_field_in_group {
 typedef struct s_fleet_box s_fleet_box, *Ps_fleet_box;
 
 struct s_fleet_box {
-    short x;
-    short y;
-    short height;
-    short width;
-    short map_height;
+    int16_t x;
+    int16_t y;
+    int16_t height;
+    int16_t width;
+    int16_t map_height;
     undefined field5_0xa;
     undefined field6_0xb;
-    short count;
-    short field8_0xe;
-    short field9_0x10;
+    int16_t count;
+    int16_t field8_0xe;
+    int16_t field9_0x10;
     struct s_animation_header *name_seg;
     struct s_animation_header *bottom_seg;
     int8_t is_small_frame;
@@ -1751,10 +1751,10 @@ typedef struct s_fleet_movement_icon s_fleet_movement_icon, *Ps_fleet_movement_i
 
 struct s_fleet_movement_icon {
     int8_t field0_0x0;
-    short x;
-    short y;
-    short field;
-    short ship_node_idx;
+    int16_t x;
+    int16_t y;
+    int16_t field;
+    int16_t ship_node_idx;
 };
 
 typedef struct s_flic_queue_entry s_flic_queue_entry, *Ps_flic_queue_entry;
@@ -1772,30 +1772,30 @@ typedef struct s_fmtpara_break s_fmtpara_break, *Ps_fmtpara_break;
 
 struct s_fmtpara_break {
     char *break_str_next;
-    short break_x;
-    short break_x_candidate;
-    short insert_case;
-    short line_y_offset;
-    short font_spacing;
-    short nest_depth;
-    short char_count;
-    short space_count;
+    int16_t break_x;
+    int16_t break_x_candidate;
+    int16_t insert_case;
+    int16_t line_y_offset;
+    int16_t font_spacing;
+    int16_t nest_depth;
+    int16_t char_count;
+    int16_t space_count;
     bool break_is_backspace;
     bool break_valid;
-    short x;
-    short left_limit_x;
-    short right_limit_x;
-    short exclusion_left_x;
-    short exclusion_right_x;
-    short x_candidate;
+    int16_t x;
+    int16_t left_limit_x;
+    int16_t right_limit_x;
+    int16_t exclusion_left_x;
+    int16_t exclusion_right_x;
+    int16_t x_candidate;
     int8_t line_char_count;
 };
 
 typedef struct s_fmtpara_char s_fmtpara_char, *Ps_fmtpara_char;
 
 struct s_fmtpara_char {
-    short x_advance;
-    short y;
+    int16_t x_advance;
+    int16_t y;
     uint8_t font_id;
     uint8_t fg_and_attr;
     uint8_t bg_color;
@@ -1805,10 +1805,10 @@ struct s_fmtpara_char {
 typedef struct s_fmtpara_global s_fmtpara_global, *Ps_fmtpara_global;
 
 struct s_fmtpara_global {
-    short min_x;
-    short min_y;
-    short max_x;
-    short max_y;
+    int16_t min_x;
+    int16_t min_y;
+    int16_t max_x;
+    int16_t max_y;
     void *item_ptr[16];
     int8_t item_type[16];
     void *user_fn;
@@ -1819,18 +1819,18 @@ struct s_fmtpara_global {
 typedef struct s_fmtpara_line s_fmtpara_line, *Ps_fmtpara_line;
 
 struct s_fmtpara_line {
-    short x;
-    short left_limit_x;
-    short right_limit_x;
-    short exclusion_left_x;
-    short exclusion_right_x;
-    short x_candidate;
-    short char_count;
-    short space_count;
-    short line_y_offset;
-    short prev_x;
-    short left_offset_abs;
-    short font_spacing;
+    int16_t x;
+    int16_t left_limit_x;
+    int16_t right_limit_x;
+    int16_t exclusion_left_x;
+    int16_t exclusion_right_x;
+    int16_t x_candidate;
+    int16_t char_count;
+    int16_t space_count;
+    int16_t line_y_offset;
+    int16_t prev_x;
+    int16_t left_offset_abs;
+    int16_t font_spacing;
     bool line_done;
     int8_t line_started;
 };
@@ -1838,25 +1838,25 @@ struct s_fmtpara_line {
 typedef struct s_fmtpara_para s_fmtpara_para, *Ps_fmtpara_para;
 
 struct s_fmtpara_para {
-    short para_y;
+    int16_t para_y;
     char *str;
-    short x1;
-    short x2;
-    short y;
-    short y_origin;
-    short width;
+    int16_t x1;
+    int16_t x2;
+    int16_t y;
+    int16_t y_origin;
+    int16_t width;
     struct s_animation_header *seg;
     bool do_render;
-    short line_start_x;
-    short line_right_limit_x;
-    short y2_limit;
+    int16_t line_start_x;
+    int16_t line_right_limit_x;
+    int16_t y2_limit;
     undefined field12_0x1b;
     undefined field13_0x1c;
-    short line_advance_y;
-    short para_advance_y;
-    short first_line_indent;
-    short right_indent;
-    short left_indent;
+    int16_t line_advance_y;
+    int16_t para_advance_y;
+    int16_t first_line_indent;
+    int16_t right_indent;
+    int16_t left_indent;
     int8_t justify_mode;
     int8_t paragraph_break;
     int16_t nest_depth;
@@ -1872,29 +1872,29 @@ struct s_fmtpara_style {
     uint8_t fg_color;
     uint8_t bg_color;
     uint8_t color_attr;
-    short font_height_px;
+    int16_t font_height_px;
     int8_t *char_widths;
-    short space_width;
+    int16_t space_width;
 };
 
 typedef struct s_font s_font, *Ps_font;
 
 struct s_font {
     struct s_colors selected_colors;
-    short font_style_height;
-    short font_style;
+    int16_t font_style_height;
+    int16_t font_style;
     struct s_colors normal_colors;
     struct s_colors highlight_colors;
     struct s_colors special_colors;
     int16_t current_height;
     uint16_t line_height;
     uint16_t leading_offset;
-    short font_style_spacing;
+    int16_t font_style_spacing;
     int8_t font_style_widths[256];
     uint32_t font_style_offsets[256];
-    short font_heights[8];
-    short font_spacing[8];
-    short leading_extra[8];
+    int16_t font_heights[8];
+    int16_t font_spacing[8];
+    int16_t leading_extra[8];
     int8_t font_glyph_widths[6][256];
     uint32_t font_glyph_offsets[6][256];
 };
@@ -1925,42 +1925,42 @@ struct s_save_game_description {
 
 struct s_game_popup_fields {
     int32_t slot_occupied_flags[10];
-    short btn_main_load_id;
-    short btn_main_save_id;
-    short btn_main_quit_id;
-    short btn_main_new_id;
-    short btn_main_options_id;
-    short btn_main_close_id;
+    int16_t btn_main_load_id;
+    int16_t btn_main_save_id;
+    int16_t btn_main_quit_id;
+    int16_t btn_main_new_id;
+    int16_t btn_main_options_id;
+    int16_t btn_main_close_id;
     undefined field7_0x34;
     undefined field8_0x35;
     undefined field9_0x36;
     undefined field10_0x37;
-    short saved_game_fields[10];
-    short debug_hotspot_id;
+    int16_t saved_game_fields[10];
+    int16_t debug_hotspot_id;
     undefined field13_0x4e;
     undefined field14_0x4f;
     undefined field15_0x50;
     undefined field16_0x51;
-    short option_names[13];
-    short btn_settings_accept_id;
-    short btn_popup_close_id;
-    short screen_cancel_field_id;
-    short field_space;
-    short music_level;
-    short sound_fx_level;
-    ushort music_on;
-    ushort sound_fx_on;
-    short save_slot_fields[10];
-    ushort options[13];
+    int16_t option_names[13];
+    int16_t btn_settings_accept_id;
+    int16_t btn_popup_close_id;
+    int16_t screen_cancel_field_id;
+    int16_t field_space;
+    int16_t music_level;
+    int16_t sound_fx_level;
+    uint16_t music_on;
+    uint16_t sound_fx_on;
+    int16_t save_slot_fields[10];
+    uint16_t options[13];
     int8_t slot_status[10];
     struct s_save_game_description descriptions[10];
     int8_t saved_game_types[10];
-    short btn_popup_load_id;
-    short btn_popup_save_id;
+    int16_t btn_popup_load_id;
+    int16_t btn_popup_save_id;
     struct s_colors color_normal;
     struct s_colors color_active;
-    short option_toggles[13];
-    ushort language;
+    int16_t option_toggles[13];
+    uint16_t language;
     undefined field37_0x260;
     undefined field38_0x261;
     undefined field39_0x262;
@@ -2013,9 +2013,9 @@ struct s_global_combat_data {
     int8_t ftl_type;
     int8_t computer_type;
     int8_t armor_type;
-    short ship_attack;
-    short ship_defense;
-    short ship_missle_defense;
+    int16_t ship_attack;
+    int16_t ship_defense;
+    int16_t ship_missle_defense;
     undefined field17_0x3a;
     int16_t tactical_speed;
     undefined field19_0x3d;
@@ -2363,12 +2363,12 @@ struct s_lbx_stream_header {
 
 struct _iobuf_copy {
     char *_ptr;
-    int _cnt;
+    int32_t _cnt;
     char *_base;
-    int _flag;
-    int _file;
-    int _charbuf;
-    int _bufsiz;
+    int32_t _flag;
+    int32_t _file;
+    int32_t _charbuf;
+    int32_t _bufsiz;
     char *_tmpfname;
 };
 
@@ -2378,14 +2378,14 @@ struct s_leader_data {
     char name[15];
     char title[20];
     uint8_t type;
-    short xp;
+    int16_t xp;
     uint32_t general_skills;
     uint32_t special_skills;
     byte tech_application[3];
     uint8_t pict_num;
-    short skill_value;
+    int16_t skill_value;
     uint8_t level;
-    short location;
+    int16_t location;
     sbyte eta;
     char display_level_popup;
     sbyte status;
@@ -2472,7 +2472,7 @@ struct s_main_menu_button {
     struct s_animation_header *field0_0x0;
     struct s_animation_header *field1_0x4;
     struct s_animation_header *field2_0x8;
-    short field;
+    int16_t field;
 };
 
 struct s_main_menu {
@@ -2608,14 +2608,14 @@ struct s_main_menu {
 typedef struct s_missile s_missile, *Ps_missile;
 
 struct s_missile {
-    short type;
-    short owner;
-    short source_unit_idx;
-    short target_unit_idx;
+    int16_t type;
+    int16_t owner;
+    int16_t source_unit_idx;
+    int16_t target_unit_idx;
     sbyte is_anti_missile_rocket;
-    short x;
-    short y;
-    short hits_taken;
+    int16_t x;
+    int16_t y;
+    int16_t hits_taken;
     int16_t quantity;
     uint16_t specials;
     int16_t travel_dist;
@@ -2654,10 +2654,10 @@ struct s_mouse_list {
 typedef struct s_mouse_xy s_mouse_xy, *Ps_mouse_xy;
 
 struct s_mouse_xy {
-    short ship_icon_idx;
-    short hovering_ship_icon_idx;
-    short star_idx;
-    short hovering_star_idx;
+    int16_t ship_icon_idx;
+    int16_t hovering_ship_icon_idx;
+    int16_t star_idx;
+    int16_t hovering_star_idx;
     int8_t selected;
 };
 
@@ -2763,7 +2763,7 @@ struct s_mp_screen {
     int16_t flag_modem_disabled;
     int16_t flag_serial_type;
     int16_t flag_network_disabled;
-    short setup_screen_state;
+    int16_t setup_screen_state;
     int16_t last_scan_id;
     uint8_t is_host_flag;
     uint8_t player_connected_flags[8];
@@ -2777,8 +2777,8 @@ struct s_mp_screen {
     struct s_colors sel_glow_colors;
     int8_t needs_full_redraw;
     int16_t num_remaining_humans;
-    short force_player_selection;
-    short forced_player_idx;
+    int16_t force_player_selection;
+    int16_t forced_player_idx;
     int8_t exit_screen_flag;
     int8_t sel_anim_frame;
     int8_t sel_anim_active;
@@ -3027,8 +3027,8 @@ struct s_MSG {
 typedef struct s_nebula s_nebula, *Ps_nebula;
 
 struct s_nebula {
-    short x;
-    short y;
+    int16_t x;
+    int16_t y;
     int8_t type;
 };
 
@@ -3049,13 +3049,13 @@ struct s_net_chat {
 typedef struct s_net_combat_message s_net_combat_message, *Ps_net_combat_message;
 
 struct s_net_combat_message {
-    short x;
-    short y;
-    int f4;
-    short f8;
-    short f10;
-    short f12;
-    short f14;
+    int16_t x;
+    int16_t y;
+    int32_t f4;
+    int16_t f8;
+    int16_t f10;
+    int16_t f12;
+    int16_t f14;
 };
 
 typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;
@@ -3107,30 +3107,30 @@ typedef struct s_ship_design s_ship_design, *Ps_ship_design;
 typedef struct s_ship_weapons s_ship_weapons, *Ps_ship_weapons;
 
 struct s_ship_weapons {
-    short type;
-    char count;
-    char current_count;
-    char firing_arc;
+    int16_t type;
+    int8_t count;
+    int8_t current_count;
+    int8_t firing_arc;
     uint16_t specials;
-    char ammo;
+    int8_t ammo;
 };
 
 struct s_ship_design {
     char name[16];
     int8_t size;
     int8_t ship_type;
-    char shield_type;
+    int8_t shield_type;
     int8_t ftl_type;
-    char speed;
-    char computer_type;
-    char armor_type;
-    char special_device_flags[5];
+    int8_t speed;
+    int8_t computer_type;
+    int8_t armor_type;
+    int8_t special_device_flags[5];
     struct s_ship_weapons ship_weapon[8];
     sbyte picture_num;
     uint8_t previous_owner;
-    short cost;
+    int16_t cost;
     byte combat_speed;
-    ushort date_of_design;
+    uint16_t date_of_design;
 };
 
 struct s_settler_info {
@@ -3140,7 +3140,7 @@ struct s_settler_info {
 };
 
 struct s_player {
-    char picture;
+    int8_t picture;
     char name[20];
     char race_name[15];
     byte eliminated;
@@ -3148,162 +3148,162 @@ struct s_player {
     uint8_t color;
     uint8_t personality;
     byte objectives;
-    short home_planet_id;
-    short network_player_id;
-    char player_done_flags;
-    short dead_field;
-    char research_breakthrough;
+    int16_t home_planet_id;
+    int16_t network_player_id;
+    int8_t player_done_flags;
+    int16_t dead_field;
+    int8_t research_breakthrough;
     uint8_t tax_rate;
-    int bc;
-    short n_freighters;
-    short surplus_freighters;
-    short command_points;
-    short command_points_used;
-    short food_freighted;
-    short settlers_freighted;
+    int32_t bc;
+    int16_t n_freighters;
+    int16_t surplus_freighters;
+    int16_t command_points;
+    int16_t command_points_used;
+    int16_t food_freighted;
+    int16_t settlers_freighted;
     struct s_settler_info settlers[25];
-    short total_pop;
-    short food_produced;
-    short industry_produced;
-    short research_produced;
-    short bc_produced;
-    short surplus_food;
-    short surplus_bc;
-    int total_maintenance;
-    short maintenance[6];
+    int16_t total_pop;
+    int16_t food_produced;
+    int16_t industry_produced;
+    int16_t research_produced;
+    int16_t bc_produced;
+    int16_t surplus_food;
+    int16_t surplus_bc;
+    int32_t total_maintenance;
+    int16_t maintenance[6];
     byte tech_fields[83];
     byte tech_applications[212];
-    int research_accumulated;
-    char captured_orion;
-    char captured_antares;
-    char won_council_vote;
+    int32_t research_accumulated;
+    int8_t captured_orion;
+    int8_t captured_antares;
+    int8_t won_council_vote;
     uint16_t player_defeated[8];
-    short captured_population;
+    int16_t captured_population;
     int8_t last_attacker;
     uint8_t ship_design_theme;
-    char ship_special_theme;
-    char tech_apps_learned[4];
-    char tech_modifiers[17];
+    int8_t ship_special_theme;
+    int8_t tech_apps_learned[4];
+    int8_t tech_modifiers[17];
     uint8_t hyper_advanced_tech[8];
-    int total_known_tech_cost;
-    char knows_racial_stats;
-    int last_tech_report_date[8];
-    char player_tech_applications[8][27];
-    char current_research_field;
-    char current_research_application;
-    char got_new_app;
-    short ship_range;
+    int32_t total_known_tech_cost;
+    int8_t knows_racial_stats;
+    int32_t last_tech_report_date[8];
+    int8_t player_tech_applications[8][27];
+    int8_t current_research_field;
+    int8_t current_research_application;
+    int8_t got_new_app;
+    int16_t ship_range;
     struct s_ship_design ship_designs[6];
-    short ships_built[6];
+    int16_t ships_built[6];
     sbyte contact[8];
-    char just_established_contact;
-    char n_times_established_contact[8];
+    int8_t just_established_contact;
+    int8_t n_times_established_contact[8];
     sbyte within_range[8];
-    char do_not_research;
-    char offensive_stagepoint;
-    char best_ftl_drive;
+    int8_t do_not_research;
+    int8_t offensive_stagepoint;
+    int8_t best_ftl_drive;
     uint8_t ship_speed;
     int8_t officer_for_hire;
-    short n_trade_pops;
-    short current_trade_agreement_level[8];
-    short trade_agreement_goal[8];
-    short n_research_pops;
-    short current_research_agreement_level[8];
-    short research_agreement_goal[8];
-    char fighter_beam_type;
-    char fighter_bomb_type;
-    short total_research;
-    short total_ships;
+    int16_t n_trade_pops;
+    int16_t current_trade_agreement_level[8];
+    int16_t trade_agreement_goal[8];
+    int16_t n_research_pops;
+    int16_t current_research_agreement_level[8];
+    int16_t research_agreement_goal[8];
+    int8_t fighter_beam_type;
+    int8_t fighter_bomb_type;
+    int16_t total_research;
+    int16_t total_ships;
     int32_t total_ship_strength[8];
-    short total_colonies;
+    int16_t total_colonies;
     sbyte failed_to_expand;
-    char first_contact[8];
+    int8_t first_contact[8];
     sbyte relations[8];
-    char base_relations[8];
+    int8_t base_relations[8];
     sbyte treaty[8];
-    char trade_treaty[8];
-    char research_treaty[8];
-    short tribute_treaty[8];
+    int8_t trade_treaty[8];
+    int8_t research_treaty[8];
+    int16_t tribute_treaty[8];
     uint8_t diplomacy_incident[8];
-    char diplomacy_message[8];
-    short diplomacy_severity[8];
-    short diplomacy_value[8];
-    short diplomacy_system[8];
-    short treaty_modifier[8];
-    short trade_modifier[8];
-    short tech_exchange_modifier[8];
-    short peace_modifier[8];
+    int8_t diplomacy_message[8];
+    int16_t diplomacy_severity[8];
+    int16_t diplomacy_value[8];
+    int16_t diplomacy_system[8];
+    int16_t treaty_modifier[8];
+    int16_t trade_modifier[8];
+    int16_t tech_exchange_modifier[8];
+    int16_t peace_modifier[8];
     sbyte last_bad_diplomatic_incident[8];
     int8_t broken_treaties_modifier[8];
-    char last_broken_treaty[8];
-    char last_gift[8];
-    short ship_war_losses[8];
-    short colony_war_losses[8];
-    char biological_weapons_flag[8];
-    char time_since_last_attack[8];
+    int8_t last_broken_treaty[8];
+    int8_t last_gift[8];
+    int16_t ship_war_losses[8];
+    int16_t colony_war_losses[8];
+    int8_t biological_weapons_flag[8];
+    int8_t time_since_last_attack[8];
     int8_t threats[8];
-    char dishonored_flag[8];
-    char peace_duration[8];
-    short last_turn_diplomacy_severity[8];
-    char last_broken_treaty_type[8];
+    int8_t dishonored_flag[8];
+    int8_t peace_duration[8];
+    int16_t last_turn_diplomacy_severity[8];
+    int8_t last_broken_treaty_type[8];
     sbyte last_turn_treaty[8];
-    char diplomacy_proposal_request[8];
-    char diplomacy_proposal_tribute_bribe[8];
-    char diplomacy_proposal_tech_bribe1[8];
-    char diplomacy_proposal_tech_bribe2[8];
-    short diplomacy_proposal_gold_bribe[8];
-    char diplomacy_proposal_war_player[8];
-    int diplomacy_proposal_exchange_max_value[8];
+    int8_t diplomacy_proposal_request[8];
+    int8_t diplomacy_proposal_tribute_bribe[8];
+    int8_t diplomacy_proposal_tech_bribe1[8];
+    int8_t diplomacy_proposal_tech_bribe2[8];
+    int16_t diplomacy_proposal_gold_bribe[8];
+    int8_t diplomacy_proposal_war_player[8];
+    int32_t diplomacy_proposal_exchange_max_value[8];
     uint8_t diplomacy_proposal_exchange_tech[8];
-    short diplomacy_proposal_system_bribe[8];
-    short sneak_attack_planet;
-    char sneak_attack_message;
+    int16_t diplomacy_proposal_system_bribe[8];
+    int16_t sneak_attack_planet;
+    int8_t sneak_attack_message;
     int8_t sneak_attack_player;
     int8_t council_threat;
-    short reward_amount[8];
-    char reward_tech[8];
+    int16_t reward_amount[8];
+    int8_t reward_tech[8];
     int8_t reward_attack_player[8];
-    short food_shortage_duration;
+    int16_t food_shortage_duration;
     int8_t trust_worthiness[8];
-    char trust_breaker_player[8];
-    char trust_breaker_treaty[8];
-    char stop_spying_duration[8];
-    char stop_blockading_duration[8];
-    char war_buildup_duration;
-    short last_diplomacy_proposal_turn[8];
-    short diplomacy_proposal_rejection[8];
-    short opportunity_planet_num[8];
-    short opportunity_planet_value[8];
-    int opportunity_actual_attacker_ratio[8];
-    short temp_diplomacy_dummy1[8];
-    char diplomacy_demand_rejection_message[8];
+    int8_t trust_breaker_player[8];
+    int8_t trust_breaker_treaty[8];
+    int8_t stop_spying_duration[8];
+    int8_t stop_blockading_duration[8];
+    int8_t war_buildup_duration;
+    int16_t last_diplomacy_proposal_turn[8];
+    int16_t diplomacy_proposal_rejection[8];
+    int16_t opportunity_planet_num[8];
+    int16_t opportunity_planet_value[8];
+    int32_t opportunity_actual_attacker_ratio[8];
+    int16_t temp_diplomacy_dummy1[8];
+    int8_t diplomacy_demand_rejection_message[8];
     uint8_t last_diplomacy_threat_turn[8];
     int8_t delayed_diplomacy_orders[8];
     int8_t traits[31];
     int8_t evolutionary_upgrade_traits[31];
-    char picked_evolutionary_upgrade;
-    char applied_evolutionary_upgrade;
-    char fleet_history[350];
-    char tech_history[350];
-    char population_history[350];
-    char production_history[350];
+    int8_t picked_evolutionary_upgrade;
+    int8_t applied_evolutionary_upgrade;
+    int8_t fleet_history[350];
+    int8_t tech_history[350];
+    int8_t population_history[350];
+    int8_t production_history[350];
     uint8_t spies[8];
-    char history_btns;
+    int8_t history_btns;
     uint8_t ignoring;
-    char peace_flags[8];
+    int8_t peace_flags[8];
     int8_t cheated;
-    ushort stardate_last_offered_hero;
-    char current_zoom_level;
-    short cur_map_x;
-    short cur_map_y;
-    char council_voted_for;
+    uint16_t stardate_last_offered_hero;
+    int8_t current_zoom_level;
+    int16_t cur_map_x;
+    int16_t cur_map_y;
+    int8_t council_voted_for;
     int8_t surrender_to;
-    short time_since_last_lucky_event;
-    char has_galactic_lore;
-    char warned_about_cheating_player;
-    char cheated_this_turn;
-    int tribute_income;
-    char filler[45];
+    int16_t time_since_last_lucky_event;
+    int8_t has_galactic_lore;
+    int8_t warned_about_cheating_player;
+    int8_t cheated_this_turn;
+    int32_t tribute_income;
+    int8_t filler[45];
 };
 
 struct s_net_pack_drop_out_info {
@@ -3417,18 +3417,18 @@ struct s_network {
     undefined field6_0x92;
     int8_t modem_initialized;
     uint8_t mode;
-    int joining_net_id;
+    int32_t joining_net_id;
     int8_t num_connected_players;
-    short net_host_id;
+    int16_t net_host_id;
     int8_t player_connected_flags[8];
-    short host_election_id;
+    int16_t host_election_id;
     uint32_t total_bytes_received;
     int16_t received_chunk_count;
     int16_t total_chunk_count;
     void *network_data_ptr;
     int8_t host_election_player_rank[8];
     int8_t players_hit_next_turn[8];
-    short local_net_id;
+    int16_t local_net_id;
     int8_t host_active_player_id;
     int8_t host_sync_counter;
     int8_t field23_0xc6;
@@ -3542,16 +3542,16 @@ struct s_network {
     uint8_t players_ready_mask[8];
     undefined field132_0x1ad;
     int8_t player_is_active_flags[8];
-    int field134_0x1b6;
-    int field135_0x1ba;
+    int32_t field134_0x1b6;
+    int32_t field135_0x1ba;
     char cur_game_name[9];
     int8_t player_color_selected_flags[8];
     undefined all_ai_game_sync_flag;
     int8_t player_race_selected_flags[8];
-    short host_election_winner_id;
+    int16_t host_election_winner_id;
     uint8_t is_network_active;
-    int field_1db;
-    int field_1df;
+    int32_t field_1db;
+    int32_t field_1df;
     uint8_t player_race_selected_alt_flags[8];
     uint8_t player_race_deselected_flags[8];
     undefined field146_0x1f3;
@@ -3603,8 +3603,8 @@ struct s_officer_skill_help {
 typedef struct s_orion_candidate s_orion_candidate, *Ps_orion_candidate;
 
 struct s_orion_candidate {
-    int dist;
-    short star_idx;
+    int32_t dist;
+    int16_t star_idx;
 };
 
 typedef struct s_palette_cube s_palette_cube, *Ps_palette_cube;
@@ -3639,22 +3639,22 @@ struct s_parsec {
 typedef struct s_planet_data s_planet_data, *Ps_planet_data;
 
 struct s_planet_data {
-    short colony_index;
+    int16_t colony_index;
     int8_t star_index;
     int8_t orbit;
     int8_t planet_type;
     int8_t size;
     int8_t gravity_class;
-    char group;
+    int8_t group;
     int8_t climate;
     int8_t climate_bg_type;
     int8_t mineral_class;
     int8_t food_per_farmer;
-    char n_terraforms;
+    int8_t n_terraforms;
     uint8_t max_farms;
-    char max_population;
+    int8_t max_population;
     int8_t planet_special;
-    char environmental_alterations;
+    int8_t environmental_alterations;
 };
 
 static_assert(sizeof(s_planet_data) == 0x11, "s_planet_data size mismatch");
@@ -3683,55 +3683,55 @@ struct s_planet_max_farms {
 typedef struct s_player_info s_player_info, *Ps_player_info;
 
 struct s_player_info {
-    char current_government;
-    char pop_growth_bonus;
-    char food_bonus;
-    char production_bonus;
-    char research_bonus;
-    char tax_bonus;
-    char ship_defense;
-    char ship_attack;
-    char ground_combat_bonus;
-    char spying_bonus;
-    char low_g_world;
-    char heavy_g_world;
+    int8_t current_government;
+    int8_t pop_growth_bonus;
+    int8_t food_bonus;
+    int8_t production_bonus;
+    int8_t research_bonus;
+    int8_t tax_bonus;
+    int8_t ship_defense;
+    int8_t ship_attack;
+    int8_t ground_combat_bonus;
+    int8_t spying_bonus;
+    int8_t low_g_world;
+    int8_t heavy_g_world;
     sbyte aquatic;
     sbyte subterranean;
-    char large_home_world;
-    char rich_home_world;
-    char ancient_home_world;
+    int8_t large_home_world;
+    int8_t rich_home_world;
+    int8_t ancient_home_world;
     sbyte cybernetic;
-    char eats_minerals;
-    char repulsive;
-    char charismatic;
-    char uncreative;
-    char creative;
+    int8_t eats_minerals;
+    int8_t repulsive;
+    int8_t charismatic;
+    int8_t uncreative;
+    int8_t creative;
     sbyte environment_immune;
-    char fantastic_traders;
+    int8_t fantastic_traders;
     sbyte telepathic;
     sbyte lucky;
-    char omniscience;
-    char stealthy_ships;
+    int8_t omniscience;
+    int8_t stealthy_ships;
     sbyte trans_dimensional;
-    char warlord;
+    int8_t warlord;
 };
 
 typedef struct s_plntsum_planet s_plntsum_planet, *Ps_plntsum_planet;
 
 struct s_plntsum_planet {
-    short max_pop;
-    short food_per_farmer;
-    short minerals;
-    short mineral_class;
-    short climate;
-    short explored;
-    short best_colony_eta;
-    short best_outpost_eta;
-    short best_colony_ship_idx;
-    short best_outpost_ship_idx;
+    int16_t max_pop;
+    int16_t food_per_farmer;
+    int16_t minerals;
+    int16_t mineral_class;
+    int16_t climate;
+    int16_t explored;
+    int16_t best_colony_eta;
+    int16_t best_outpost_eta;
+    int16_t best_colony_ship_idx;
+    int16_t best_outpost_ship_idx;
     int8_t blocked;
-    short ship_summary_idx;
-    short scan_highlight_pulse;
+    int16_t ship_summary_idx;
+    int16_t scan_highlight_pulse;
     int8_t scan_highlight_pulse_step;
     int8_t colony_eta;
     int8_t outpost_eta;
@@ -3741,24 +3741,24 @@ typedef struct s_plntsum_screen s_plntsum_screen, *Ps_plntsum_screen;
 
 struct s_plntsum_screen {
     struct s_animation_header *pics[14];
-    short buttons[10];
-    short fields[8];
-    short colony_icons[8];
-    short output_icons[8];
-    short up_button;
-    short dn_button;
-    short esc_button;
-    short planet_icons[72];
+    int16_t buttons[10];
+    int16_t fields[8];
+    int16_t colony_icons[8];
+    int16_t output_icons[8];
+    int16_t up_button;
+    int16_t dn_button;
+    int16_t esc_button;
+    int16_t planet_icons[72];
     bool refresh_fields;
-    short scanned_input;
+    int16_t scanned_input;
 };
 
 typedef struct s_plntsum_ship s_plntsum_ship, *Ps_plntsum_ship;
 
 struct s_plntsum_ship {
-    short colony_ship_idx;
-    short outpost_ship_idx;
-    short ship_icon_id;
+    int16_t colony_ship_idx;
+    int16_t outpost_ship_idx;
+    int16_t ship_icon_id;
     bool colony_available;
     bool output_available;
 };
@@ -3766,34 +3766,34 @@ struct s_plntsum_ship {
 typedef struct s_pop_info s_pop_info, *Ps_pop_info;
 
 struct s_pop_info {
-    uint race:4;
-    uint loyalty:3;
-    uint job:2;
-    uint conquered:1;
-    uint unknown1:4;
-    uint starve_priority:2;
-    uint unknown2:15;
-    uint employed:1;
+    uint32_t race:4;
+    uint32_t loyalty:3;
+    uint32_t job:2;
+    uint32_t conquered:1;
+    uint32_t unknown1:4;
+    uint32_t starve_priority:2;
+    uint32_t unknown2:15;
+    uint32_t employed:1;
 };
 
 typedef struct s_potential_colony_info s_potential_colony_info, *Ps_potential_colony_info;
 
 struct s_potential_colony_info {
-    short pop_growth_bonus;
-    short maintenance;
-    short field2_0x4;
-    short worker_bonus;
-    short food;
-    short industry;
-    short research;
+    int16_t pop_growth_bonus;
+    int16_t maintenance;
+    int16_t field2_0x4;
+    int16_t worker_bonus;
+    int16_t food;
+    int16_t industry;
+    int16_t research;
 };
 
 typedef struct s_prev_leader_data s_prev_leader_data, *Ps_prev_leader_data;
 
 struct s_prev_leader_data {
     int8_t status;
-    short location;
-    short eta;
+    int16_t location;
+    int16_t eta;
 };
 
 typedef struct s_qship s_qship, *Ps_qship;
@@ -3801,19 +3801,19 @@ typedef struct s_qship s_qship, *Ps_qship;
 struct s_qship {
     int8_t player;
     byte size;
-    short ship_design_idx;
-    short field3_0x4;
+    int16_t ship_design_idx;
+    int16_t field3_0x4;
     int8_t status;
     int16_t officer_idx;
     int16_t shield_id;
     int16_t missile_weapon_id;
-    short beam_weapon_id;
-    short bomb_weapon_id;
+    int16_t beam_weapon_id;
+    int16_t bomb_weapon_id;
     int16_t special_weapon_id;
-    short missile_defense_bonus;
-    short beam_defense_bonus;
-    short base_ocv;
-    short beam_damage_modifier;
+    int16_t missile_defense_bonus;
+    int16_t beam_defense_bonus;
+    int16_t base_ocv;
+    int16_t beam_damage_modifier;
     int16_t missile_damage_modifier;
     int16_t max_hits;
     int16_t structural_damage;
@@ -3949,7 +3949,7 @@ struct s_report {
     undefined field9_0xd;
     undefined field10_0xe;
     undefined field11_0xf;
-    short field4_0x10;
+    int16_t field4_0x10;
     int8_t field5_0x12;
 };
 
@@ -3964,7 +3964,7 @@ struct s_retreat_report {
 typedef struct s_saved_box s_saved_box, *Ps_saved_box;
 
 struct s_saved_box {
-    short field_id;
+    int16_t field_id;
     int8_t is_open;
 };
 
@@ -3978,16 +3978,16 @@ struct s_scan_list_entry {
 typedef struct s_scroll_bar s_scroll_bar, *Ps_scroll_bar;
 
 struct s_scroll_bar {
-    short thumb_center_y;
-    short last_thumb_center_y;
-    short thumb_center_y_copy;
-    short thumb_height_px;
-    short total_rows;
-    short visible_rows;
-    short first_visible_row;
-    short track_len_px;
-    short up_btn;
-    short dn_btn;
+    int16_t thumb_center_y;
+    int16_t last_thumb_center_y;
+    int16_t thumb_center_y_copy;
+    int16_t thumb_height_px;
+    int16_t total_rows;
+    int16_t visible_rows;
+    int16_t first_visible_row;
+    int16_t track_len_px;
+    int16_t up_btn;
+    int16_t dn_btn;
     undefined field10_0x14;
     undefined field11_0x15;
     undefined field12_0x16;
@@ -3995,7 +3995,7 @@ struct s_scroll_bar {
     int8_t type;
     undefined mouse_button_down;
     uint8_t row_step;
-    short thumb_y_snapshot;
+    int16_t thumb_y_snapshot;
 };
 
 typedef struct s_settings s_settings, *Ps_settings;
@@ -4033,11 +4033,11 @@ struct s_settings {
     undefined field29_0xb1;
     undefined field30_0xb2;
     int8_t modem_initialized;
-    char combat_speedx2_flag;
-    char combat_legal_moves_flag;
-    char combat_missile_impact_flag;
-    char combat_shields_arc_flag;
-    char combat_grid_flag;
+    int8_t combat_speedx2_flag;
+    int8_t combat_legal_moves_flag;
+    int8_t combat_missile_impact_flag;
+    int8_t combat_shields_arc_flag;
+    int8_t combat_grid_flag;
     undefined field37_0xb9;
     undefined field38_0xba;
     undefined field39_0xbb;
@@ -4072,8 +4072,8 @@ struct s_settings {
     byte strategic_combat_flag;
     int8_t starting_civilization_level;
     uint32_t start_of_game_seed;
-    short sound_driver_id;
-    short music_driver_id;
+    int16_t sound_driver_id;
+    int16_t music_driver_id;
     uint16_t version;
     undefined field74_0xe4;
     undefined field75_0xe5;
@@ -4428,23 +4428,23 @@ struct s_ship_data {
     struct s_ship_design d;
     int8_t owner;
     sbyte status;
-    short location;
-    short x;
-    short y;
-    char group_has_navigator;
-    char travelling_speed;
+    int16_t location;
+    int16_t x;
+    int16_t y;
+    int8_t group_has_navigator;
+    int8_t travelling_speed;
     uint8_t turns_left;
-    char shield_damage_percent;
-    char drive_damage_percent;
-    char computer_damage;
+    int8_t shield_damage_percent;
+    int8_t drive_damage_percent;
+    int8_t computer_damage;
     int8_t crew_quality;
-    short crew_experience;
-    short officer_index;
+    int16_t crew_experience;
+    int16_t officer_index;
     byte special_device_damage_flags[5];
-    short armor_damage;
-    short structural_damage;
-    char mission;
-    char just_built;
+    int16_t armor_damage;
+    int16_t structural_damage;
+    int8_t mission;
+    int8_t just_built;
 };
 
 typedef struct s_ship_drive_data s_ship_drive_data, *Ps_ship_drive_data;
@@ -4456,7 +4456,7 @@ struct s_ship_drive_data {
     undefined field3_0x3;
     undefined field4_0x4;
     undefined field5_0x5;
-    short tech_application_idx;
+    int16_t tech_application_idx;
     undefined field7_0x8;
     undefined field8_0x9;
     undefined field9_0xa;
@@ -4482,18 +4482,18 @@ struct s_ship_drive_data {
     undefined field29_0x1e;
     undefined field30_0x1f;
     uint8_t combat_speed_modifier[12];
-    short ftl_speed;
+    int16_t ftl_speed;
 };
 
 typedef struct s_ship_icon s_ship_icon, *Ps_ship_icon;
 
 struct s_ship_icon {
-    short stack_id;
-    short node_idx;
-    short star_idx;
-    short stack_slot;
-    short x;
-    short y;
+    int16_t stack_id;
+    int16_t node_idx;
+    int16_t star_idx;
+    int16_t stack_slot;
+    int16_t x;
+    int16_t y;
 };
 
 typedef struct s_ship_move_info s_ship_move_info, *Ps_ship_move_info;
@@ -4518,16 +4518,16 @@ struct s_ship_move_info {
 typedef struct s_ship_node s_ship_node, *Ps_ship_node;
 
 struct s_ship_node {
-    short ship_idx;
-    short next_node;
-    char selected;
+    int16_t ship_idx;
+    int16_t next_node;
+    int8_t selected;
 };
 
 typedef struct s_skill_data s_skill_data, *Ps_skill_data;
 
 struct s_skill_data {
     uint8_t skill_id;
-    uint skill_mask;
+    uint32_t skill_mask;
     uint8_t skill_type;
     int16_t strength;
     int8_t level_up;
@@ -4602,7 +4602,7 @@ typedef struct tWAVEFORMATEX WAVEFORMATEX;
 
 typedef long LONG;
 
-typedef ushort WORD;
+typedef uint16_t WORD;
 
 typedef struct IDirectSoundVtbl IDirectSoundVtbl, *PIDirectSoundVtbl;
 
@@ -4713,7 +4713,7 @@ struct _DSBCAPS_copy {
 };
 
 struct HWND__copy {
-    int unused;
+    int32_t unused;
 };
 
 struct IDirectSoundVtbl {
@@ -4824,14 +4824,14 @@ typedef struct s_star_data s_star_data, *Ps_star_data;
 
 struct s_star_data {
     char name[15];
-    short x;
-    short y;
+    int16_t x;
+    int16_t y;
     int8_t size;
     int8_t owner;
-    char pict_type;
+    int8_t pict_type;
     int8_t spectral_class;
     int8_t last_planet_selected[8];
-    char black_hole_blocks[9];
+    int8_t black_hole_blocks[9];
     int8_t system_special;
     int8_t wormhole_star_id;
     byte blockaded;
@@ -4852,8 +4852,8 @@ struct s_star_data {
     byte has_dimensional_portal;
     byte is_stagepoint;
     int8_t officer_index[8];
-    short planet_index[5];
-    short relocate_ship_to[8];
+    int16_t planet_index[5];
+    int16_t relocate_ship_to[8];
     int8_t twinkling1;
     int8_t twinkling2;
     byte not_used3;
@@ -4874,22 +4874,22 @@ struct s_star_weight {
 typedef struct s_sys_disp s_sys_disp, *Ps_sys_disp;
 
 struct s_sys_disp {
-    short orbit;
-    short x;
-    short y;
+    int16_t orbit;
+    int16_t x;
+    int16_t y;
     int8_t oribit_pos;
     int8_t orbit_idx;
-    short current_frame;
+    int16_t current_frame;
     struct s_animation_header *pic;
 };
 
 typedef struct s_system_display_ships s_system_display_ships, *Ps_system_display_ships;
 
 struct s_system_display_ships {
-    short x;
-    short y;
-    short button;
-    short ship_idx;
+    int16_t x;
+    int16_t y;
+    int16_t button;
+    int16_t ship_idx;
     struct s_animation_header *pic;
 };
 
@@ -4910,8 +4910,8 @@ typedef struct s_tech_armor_data s_tech_armor_data, *Ps_tech_armor_data;
 
 struct s_tech_armor_data {
     char *name;
-    short armor_id;
-    short tech_app_id;
+    int16_t armor_id;
+    int16_t tech_app_id;
     undefined field3_0x8;
     uint8_t troops_bonus;
     int16_t ships_bonus;
@@ -4925,9 +4925,9 @@ struct s_tech_building_data {
     char *name;
     undefined field1_0x4;
     undefined field2_0x5;
-    short tech_app;
-    int cost;
-    short maintenance;
+    int16_t tech_app;
+    int32_t cost;
+    int16_t maintenance;
     int8_t type;
     undefined1 field7_0xf;
     undefined1 field8_0x10;
@@ -4976,11 +4976,11 @@ typedef struct s_tech_field_data s_tech_field_data, *Ps_tech_field_data;
 
 struct s_tech_field_data {
     char *name;
-    short tech_field_id;
-    short prev_field_id;
-    short next_field_id;
+    int16_t tech_field_id;
+    int16_t prev_field_id;
+    int16_t next_field_id;
     int16_t tech[4];
-    uint cost;
+    uint32_t cost;
     byte ai_group;
 };
 
@@ -5172,7 +5172,7 @@ struct s_wave_stream_header {
 };
 
 struct HMMIO__copy {
-    int unused;
+    int32_t unused;
 };
 
 typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;
