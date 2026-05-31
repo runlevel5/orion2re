@@ -20,6 +20,7 @@ workflows:
         start_timeout: 600
         reset_policy: keep
         max_rounds: 100
+        confirmation: auto
         preprocessors:
           - name: skills
         tools:
@@ -133,7 +134,9 @@ workflows:
             - if a larger span contains repeated patterns or non-zero bytes but no proven accesses, treat that as separate anonymous data until proven otherwise
           * Validate array lengths with raw bytes:
             - dump the exact byte span from the candidate base to the next symbol and decode it using the candidate element width
-            - if a raw reader returns suspicious all-zero data, re-read with helper readers like `bytes_at`, `u8`, `u16`, and `u32` before drawing conclusions
+            - never trust `currentProgram.getMemory().getBytes(addr, b)` when `b` is a Python `bytearray`; in this RPC/PyGhidra environment that Java-to-Python buffer path can appear to succeed while leaving a misleading zero-filled buffer
+            - always use helper readers such as `bytes_at`, `u8`, and `u16` when reading variable values or initializer bytes; use `u32` when width requires it
+            - if a raw reader returns suspicious all-zero data, re-read with helper readers like `bytes_at`, `u8`, `u16`, and `u32` and confirm against typed listing data before drawing conclusions
             - use raw bytes to confirm both initialized prefix values and any zero-filled tail that would become part of the definition
           * Validate array lengths against cross-references:
             - check direct xrefs to the base symbol
@@ -144,7 +147,8 @@ workflows:
             - Ghidra array markup is large but code only proves a prefix and the rest overlaps another symbol: shrink or split as required by layout
             - nearby anonymous bytes exist but are not proven accesses: keep the named array conservative and report the anonymous block separately
           * For tables and structs, prefer typed listing and component reads over a single raw memory read.
-          * When reading raw data through Ghidra RPC, verify that the extraction method actually returned populated bytes; if a direct byte read looks suspicious, unexpectedly zero-filled, or conflicts with the listing UI, re-read through typed data/components or helper readers such as `bytes_at`, `u8`, `u16`, and `u32` before trusting the result.
+          * When validating concrete values, trust this order of evidence: `bytes_at`, then `u8` or `u16` as appropriate, then typed listing reads such as `getDefinedDataAt(address)` and `getComponent(i)`.
+          * When reading raw data through Ghidra RPC, verify that the extraction method actually returned populated bytes; if a direct byte read looks suspicious, unexpectedly zero-filled, or conflicts with the listing UI, re-read through helper readers such as `bytes_at`, `u8`, `u16`, and `u32`, and cross-check with typed data/components before trusting the result.
           * Cross-check structured reads with raw bytes when values look suspicious.
           * Next variable in the memory might give a hint about current variable size.
           * Prefer disassembly and project-side usage over decompiler guesses.

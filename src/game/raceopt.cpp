@@ -356,7 +356,7 @@ namespace raceopt {
                 int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
                 while (dots_start < dots_end - 4) {
-                    fonts::Print_(dots_start, current_y, const_cast<char*>(s___0055632c));
+                    fonts::Print_(dots_start, current_y, s_dot_0055632c);
                     dots_start += 4;
                 }
 
@@ -402,7 +402,7 @@ namespace raceopt {
             int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
             while (dots_start < dots_end - 4) {
-                fonts::Print_(dots_start, current_y, const_cast<char*>(s___0055632c));
+                fonts::Print_(dots_start, current_y, s_dot_0055632c);
                 dots_start += 4;
             }
 
@@ -446,7 +446,7 @@ namespace raceopt {
                     int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
                     while (dots_start < dots_end - 4) {
-                        fonts::Print_(dots_start, current_y, const_cast<char*>(s___0055632c));
+                        fonts::Print_(dots_start, current_y, s_dot_0055632c);
                         dots_start += 4;
                     }
 
@@ -767,11 +767,11 @@ namespace raceopt {
         for (int16_t i = 0; i < 9; ++i) {
             uint8_t bonus_value = static_cast<uint8_t>(player_flags[i + 1]);
 
-            if (_special_bonus[i][0] == (int8_t)bonus_value) {
+            if (MOX::_special_bonus[i][0] == (int8_t)bonus_value) {
                 _button_variable[i] = 1;
-            } else if (_special_bonus[i][1] == (int8_t)bonus_value) {
+            } else if (MOX::_special_bonus[i][1] == (int8_t)bonus_value) {
                 _button_variable[i] = 2;
-            } else if (_special_bonus[i][2] == (int8_t)bonus_value) {
+            } else if (MOX::_special_bonus[i][2] == (int8_t)bonus_value) {
                 _button_variable[i] = 3;
             } else {
                 _button_variable[i] = 0;
@@ -1175,7 +1175,7 @@ namespace raceopt {
             0x01C0,
             s__00551100,
             (s_animation_header*)raceopt::_accept_button_seg,
-            s_a_00552414,
+            s_a,
             0x0028);
         raceopt::_defalt = fields::Add_Button_Field_(
             0x004C,

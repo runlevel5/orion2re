@@ -56,19 +56,6 @@ namespace MOX2 {
     void __cdecl thunk_main2_(void*);
 }
 
-inline void FUN_004d7d80() {
-    using Fn = void(*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7D80 });
-    fn();
-}
-
-// Suggested name: MOX2::Finalize_Main_Screen
-inline void FUN_004d7da0() {
-    using Fn = void(*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7DA0 });
-    fn();
-}
-
 namespace MOX2 {
     typedef void(__cdecl* action_func_t)();
 

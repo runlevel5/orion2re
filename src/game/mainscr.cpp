@@ -548,7 +548,7 @@ namespace MAINSCR {
 
         if (has_portal) {
             s_animation_header* portal_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
-            MOX::gate_portal_icons[zoom_offset] = portal_pic;
+            MOX::_gate_icon_seg[zoom_offset] = portal_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[0], portal_pic);
             int16_t h = animate::Get_Height_(portal_pic);
             if (h > 0) {
@@ -559,7 +559,7 @@ namespace MAINSCR {
 
         if (has_artemis) {
             s_animation_header* artemis_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
-            MOX::gate_artemis_icons[zoom_offset] = artemis_pic;
+            MOX::_gate_icon_seg[12 + zoom_offset] = artemis_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[icon_count], artemis_pic);
             int16_t h = animate::Get_Height_(artemis_pic);
             if (h > max_icon_height) {

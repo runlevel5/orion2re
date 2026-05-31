@@ -60,6 +60,10 @@ namespace TURNSUM {
         &_turn_sum_normal_color,
     };
 
+    uint8_t _g_turn_message_ix;
+
+    s_list_item* _g_selected_msg_p;
+
     void __cdecl Draw_Turn_Summary_Popup_()
     {
         _g_turn_sum_header.group_colors[0] = &_turn_sum_high_color;

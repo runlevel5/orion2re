@@ -30,7 +30,8 @@ namespace FMTPARA {
     extern const char* const _ordinal_ending[10];
     extern const char* const _ordinal_word[11];
     extern const char _ordinal_fmt[];
-    extern uint8_t* _tabs_3_plus_1;
+    extern const char _insert_item_kind[];
+    extern const char* _tabs_3_plus_1;
     extern const char s_s_00556218[];
     extern const char s_es_0055621c[];
     extern uint32_t _user_fn_arg;

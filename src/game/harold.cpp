@@ -1462,7 +1462,7 @@ namespace HAROLD {
         for (int16_t i = 0; i < 5; ++i) {
             MOX::_saved_boxes[i].field_id = -1000;
             MOX::_saved_boxes[i].is_open = 0;
-            MOX::moveable_box_id_at(i) = MOX::_box_off_flag[i];
+            MOX::_moveable_box[i].id = MOX::_box_off_flag[i];
         }
 
         MOX::_cur_map_scale = MOX::_max_map_scale;

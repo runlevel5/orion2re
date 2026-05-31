@@ -33,18 +33,18 @@ namespace MAINMENU {
     extern int16_t _fade_out_count;
     extern char (*_credits)[2][127];
 
-    inline const char* const s_MAINMENU_LBX_0055a630 = reinterpret_cast<const char*>(0x0055A630); // "MAINMENU.LBX"
-    inline const char* const s_C_00552420 = reinterpret_cast<const char*>(0x00552420); // "C"
-    inline const char* const s_S_005569CC = reinterpret_cast<const char*>(0x005569CC); // "S"
-    inline const char* const s_L_005560E8 = reinterpret_cast<const char*>(0x005560E8); // "L"
-    inline const char* const s_M_00557ED8 = reinterpret_cast<const char*>(0x00557ED8); // "M"
-    inline const char* const s_H_005569D4 = reinterpret_cast<const char*>(0x005569D4); // "H"
-    inline const char* const s_Q_005598F0 = reinterpret_cast<const char*>(0x005598F0); // "Q"
-    inline const char* const s_empty_00551120 = reinterpret_cast<const char*>(0x00551120);
-    inline const char* const s_N_0055765C = reinterpret_cast<const char*>(0x0055765C); // "N"
-    inline const char* const s_save_question_gam = reinterpret_cast<const char*>(0x0055A640); // "SAVE?.GAM"
-    inline const char* const s_save_percent_d_gam = reinterpret_cast<const char*>(0x0055A64C); // "SAVE%d.GAM"
-    inline const char* s_Version_1_31_0055a658 = reinterpret_cast<const char*>(0x0055A658); // "Version 1.31"
+    extern const char s_MAINMENU_LBX_0055a630[13]; // "MAINMENU.LBX"
+    extern const char s_C_00552420[2]; // "C"
+    extern const char s_S_005569CC[2]; // "S"
+    extern const char s_L_005560E8[2]; // "L"
+    extern const char s_M_00557ED8[2]; // "M"
+    extern const char s_H_005569D4[2]; // "H"
+    extern const char s_Q_005598F0[2]; // "Q"
+    extern const char s_empty_00551120[2]; // "\x1b"
+    extern const char s_N_0055765C[2]; // "N"
+    extern const char s_save_question_gam[10]; // "save?.gam"
+    extern const char s_save_percent_d_gam[11]; // "save%d.gam"
+    extern const char s_Version_1_31_0055a658[13]; // "Version 1.31"
 
     void __cdecl Main_Menu_Fade_Function_();
     void __cdecl Main_Menu_Fade_Function2_();

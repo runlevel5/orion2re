@@ -531,11 +531,11 @@ namespace fonts {
         }
 
         if (_font_header.font_style != 0) {
-            _font_header.selected_colors.colors[0] = _alias_outline_color;
+            _font_header.selected_colors.colors[0] = (uint8_t)_alias_outline_color;
             _draw_alias_flag = 1;
 
             for (int i = 1; i < 8; ++i) {
-                _font_header.selected_colors.colors[i] = _outline_color;
+                _font_header.selected_colors.colors[i] = (uint8_t)_outline_color;
             }
 
             if (_font_header.font_style != 2) {
@@ -634,9 +634,9 @@ namespace fonts {
 
         if (_font_header.font_style != 0) {
             for (int i = 1; i < 8; ++i) {
-                _font_header.selected_colors.colors[i] = _outline_color;
+                _font_header.selected_colors.colors[i] = (uint8_t)_outline_color;
             }
-            _font_header.selected_colors.colors[0] = _alias_outline_color;
+            _font_header.selected_colors.colors[0] = (uint8_t)_alias_outline_color;
             _draw_alias_flag = 1;
 
             if (_font_header.font_style == 3 || _font_header.font_style == 5) {

@@ -281,8 +281,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             roll = static_cast<int16_t>(random::Random_(10) - 1);
             MAPGEN::_t_roll = roll;
 
-            // Access weight table: _orbit_to_satellite_type[roll][orbit] (row size is 5)
-            satellite_type = MOX::_orbit_to_satellite_type[roll * 5 + orbit];
+            satellite_type = MOX::_orbit_to_satellite_type[roll][orbit];
 
             if (satellite_type == 4) { // Special logic for type 4 (potential companion star)
                 int chance = random::Random_(100);
@@ -308,7 +307,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         // Debug assertion: Check for invalid satellite type 0
         if (satellite_type == 0) {
-            int table_value = (int)(int8_t)MOX::_orbit_to_satellite_type[MAPGEN::_t_roll * 5 + orbit];
+            int table_value = (int)(int8_t)MOX::_orbit_to_satellite_type[MAPGEN::_t_roll][orbit];
             RUSS::PFMT_(0, 0x0F, s_Star_d_orbit_d_has_a_0_sat_t_00558a1c,
                         static_cast<int>(star_idx),
                         static_cast<int>(orbit),

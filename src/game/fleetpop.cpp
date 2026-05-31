@@ -930,8 +930,8 @@ void __cdecl Fleet_Box_Data_(int16_t ship_count) {
 
         MOX::_fleet_box_name_lg_seg =
             (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
-        MOX::_fleet_box.x = MOX::_moveable_box_2_x;
-        MOX::_fleet_box.y = MOX::_moveable_box_2_y;
+        MOX::_fleet_box.x = MOX::_moveable_box[2].x;
+        MOX::_fleet_box.y = MOX::_moveable_box[2].y;
         MOX::_fleet_box.name_seg = MOX::_fleet_box_name_lg_seg;
 
         MOX::_fleet_box.width = Fleet_Box_Width_(ship_count);
@@ -956,8 +956,8 @@ void __cdecl Fleet_Box_Data_(int16_t ship_count) {
 
         Set_Fleet_Movement_Box_Dimensions_(ship_count);
 
-        MOX::_fleet_box.x = MOX::_moveable_box_2_x;
-        MOX::_fleet_box.y = MOX::_moveable_box_2_y;
+        MOX::_fleet_box.x = MOX::_moveable_box[2].x;
+        MOX::_fleet_box.y = MOX::_moveable_box[2].y;
         MOX::_fleet_box.width = Fleet_Box_Width_(ship_count);
         MOX::_fleet_box.height = Fleet_Box_Height_(ship_count);
         MOX::_fleet_box.map_height = MOX::_fleet_box_map_height;

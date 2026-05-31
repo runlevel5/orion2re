@@ -3,15 +3,8 @@
 namespace COMBINIT {
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
 
-    inline int8_t* s__00579491 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579491});
-    inline int8_t* s__00579492 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579492});
-    inline int8_t* s__00579493 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579493});
-    inline int8_t* s__00579591 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579591});
-    inline int8_t* s__00579592 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579592});
-    inline int8_t* s__00579593 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579593});
-    inline int8_t* s__00579611 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579611});
-    inline int8_t* s__00579612 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579612});
-    inline int8_t* s__00579613 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579613});
+    extern s_palette_entry _tractor_beam_remap_palette[8];
+    extern s_palette_entry _plasma_web_remap_palette[16];
 
     extern const char s_combat_lbx_00551244[11];
     extern const char s_monster_lbx_00551250[12];

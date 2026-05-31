@@ -453,6 +453,9 @@
     <ClCompile Include="src\game\netstart.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\netstrat.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
     <ClCompile Include="src\game\netturn.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
@@ -1151,9 +1154,6 @@
     <ClInclude Include="src\game\time.h">
       <Filter>src\game</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\dplay_dll.h">
-      <Filter>src\game</Filter>
-    </ClInclude>
     <ClInclude Include="src\game\comcore.h">
       <Filter>src\game</Filter>
     </ClInclude>
@@ -1219,6 +1219,9 @@
       <Filter>.vocode\worklows</Filter>
     </None>
     <None Include=".vocode\workflows\verifier.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
+    <None Include=".vocode\workflows\mass-header.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
     <None Include=".vocode\workflows\mass-validator.yaml">

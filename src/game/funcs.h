@@ -3,9 +3,8 @@
 #include <stdio.h>
 #include <cstdint>
 
-inline char* s___0055b0ac = reinterpret_cast<char*>(std::uintptr_t{0x0055B0AC});
-inline const char* s_tech_has_too_many_apps_0055a97c =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055A97C}); /* " tech has too many apps" */
+extern char s___0055b0ac[2];
+extern const char s_tech_has_too_many_apps_0055a97c[24]; /* " tech has too many apps" */
 
 struct s_animation_header;
 struct s_lbx_stream_header;
@@ -15,52 +14,39 @@ inline s_animation_header** _anims =
 
 inline char* s_Outpost_Ship_00558f48 = reinterpret_cast<char*>(std::uintptr_t{0x00558F48});
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
-inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
-inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
-inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
-inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x00551250});
-inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
-inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{0x00557670}); // "AI trade goods"
-inline const char* s_Human_00558020 = reinterpret_cast<const char*>(std::uintptr_t{0x00558020}); // "Human"
-inline const char* s_Error_Enum_Current_Games_Invalid_0055c000 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C000}); // "Error Enum Current Games Invalid Params"
-inline const char* s_Error_Enum_Current_Games_Invalid_0055c028 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C028}); // "Error Enum Current Games Invalid Object"
+extern char s_cmbtsfx_lbx_00551228[12]; // "cmbtsfx.lbx"
+extern const char s_fmt_comma_00555ff0[6]; // "%i,%i"
+extern const char s_fmt_dot_00555ff8[6]; // "%i.%i"
+extern char s_combat_lbx_00551244[11]; // "combat.lbx"
+extern char s_monster_lbx_00551250[12]; // "monster.lbx"
+extern char s_cmbtshp_lbx_0055125c[12]; // "cmbtshp.lbx"
+extern char s_AI_trade_goods_00557670[15]; // "AI trade goods"
+extern const char s_Human_00558020[8]; // "Human"
+extern const char s_Error_Enum_Current_Games_Invalid_0055c000[40]; // "Error Enum Current Games Invalid Params"
+extern const char s_Error_Enum_Current_Games_Invalid_0055c028[40]; // "Error Enum Current Games Invalid Object"
 
-inline const char* const s_craziness_00557680 = reinterpret_cast<const char*>(std::uintptr_t{0x00557680});
+extern const char s_techname_lbx_0055a96c[13]; // "techname.lbx"
+extern const char s_INFO_LBX_00556000[9]; // "INFO.LBX"
+extern const char s_Remap_draw_not_support_map_00557f88[27]; // "Remap draw not support map"
+extern const char s_Remap_draw_not_support_screen_00557fa4[30]; // "Remap draw not support screen"
+extern const char s_Remap_draw_not_support_bitmaps_00557fc4[31]; // "Remap draw not support bitmaps"
+extern const char s_racesel_lbx_00557ff4[12]; // "racesel.lbx"
+extern const char s_1_2_00557ff0[4]; // "1/2"
 
-inline const char* s_fmt_comma_00555ff0 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
-inline const char* s_fmt_dot_00555ff8 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8}); // "%i.%i"
-inline const char* s_techname_lbx_0055a96c =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055A96C}); // "techname.lbx"
-inline const char* s_INFO_LBX_00556000 = reinterpret_cast<const char*>(std::uintptr_t{0x00556000}); // "INFO.LBX"
-inline const char* s_Remap_draw_not_support_map_00557f88 = reinterpret_cast<const char*>(0x00557f88); // "Remap draw not support map"
-inline const char* s_Remap_draw_not_support_screen_00557fa4 = reinterpret_cast<const char*>(0x00557fa4); // "Remap draw not support screen"
-inline const char* s_Remap_draw_not_support_bitmaps_00557fc4 = reinterpret_cast<const char*>(0x00557fc4); // "Remap draw not support bitmaps"
-inline const char* s_racesel_lbx_00557ff4 = reinterpret_cast<const char*>(0x00557FF4); // "racesel.lbx"
-inline const char* const s_1_2_00557ff0 = reinterpret_cast<const char*>(0x00557FF0); // "1/2"
-
-inline const char* s_SCIENCE_LBX_00557d68 = reinterpret_cast<const char*>(0x00557D68); // "SCIENCE.LBX"
-inline const char* s_SCIENCE_LBX_00551290 = reinterpret_cast<const char*>(std::uintptr_t{0x00551290}); /* "SCIENCE.LBX" */
+extern const char s_SCIENCE_LBX_00557d68[12]; // "SCIENCE.LBX"
 inline void* Fleet_Movement_Scroll_Callback =
     reinterpret_cast<void*>(std::uintptr_t{0x00404080});
-inline const char* s_TANM__03hi_LBX_005512a0 = reinterpret_cast<const char*>(std::uintptr_t{0x005512A0}); /* "TANM%03hi.LBX" */
-inline const char* s_SR_R_x_SC_LBX_00557d74 = reinterpret_cast<const char*>(0x00557D74); // "SR_R%x_SC.LBX"
-inline char* const s_app_pics_lbx_00556028 = reinterpret_cast<char*>(0x00556028);
-inline char* const s_APP_PICS_LBX_00556018 = reinterpret_cast<char*>(0x00556018);
+extern const char s_TANM__03hi_LBX_005512a0[15]; /* "TANM_%03hi.LBX" */
+extern const char s_SR_R_x_SC_LBX_00557d74[14]; // "SR_R%x_SC.LBX"
 
-inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x0052414});
-inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x0052418});
-inline const char* s_format_0055aa28 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA28}); // "(%s)  "
+extern char s_a[4];
+extern char s_an[4];
+extern const char s_format_0055aa28[7]; // "(%s)  "
 
-inline const char* s_Too_many_colors_to_reduce_to_ =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055BE34});
+extern const char s_Too_many_colors_to_reduce_to_[39];
 
-inline const char* s_Too_many_colors_to_reduce_from_ =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055BE5C});
+extern const char s_Too_many_colors_to_reduce_from_[41];
 
-inline const char* s_Lost_Player_Connection_0055bf3c = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF3C});
-inline const char* s_REENTERING_Net_Send_Message_0055bf58 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF58});
-inline const char* s_Sending_Message_To_Individual = reinterpret_cast<const char*>(std::uintptr_t{0x005609B0});
-inline const char* s_Sending_Message_To_All = reinterpret_cast<const char*>(std::uintptr_t{0x005609D4});
 inline char const (&s_Receiving_Message_005609F0)[23] =
     *reinterpret_cast<char const (*)[23]>(std::uintptr_t{0x005609F0}); // "Receiving Message....\n"
 
@@ -82,12 +68,9 @@ inline int (__stdcall *&PTR_SetBkMode_005aa3b4)(HDC hdc, int mode) =
 inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
     *reinterpret_cast<int (__stdcall **)(const char*)>(std::uintptr_t{0x005AA3C4});
 
-inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055B270}); /* "Add Square to scan list failed.." */
-inline const char* s__d___d___d_0055b2d0 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055B2D0}); // "%d, %d, %d"
-inline const char* s_Get_Picture_Color_Picture_Must_H_0055b2dc =
-    reinterpret_cast<const char*>(std::uintptr_t{0x0055B2DC}); // "Get_Picture_Color  Picture Must Have Palette"
+extern const char s_Add_Square_to_scan_list_failed__0055b270[33]; /* "Add Square to scan list failed.." */
+extern const char s__d___d___d_0055b2d0[11]; // "%d, %d, %d"
+extern const char s_Get_Picture_Color_Picture_Must_H_0055b2dc[45]; // "Get_Picture_Color  Picture Must Have Palette"
 
 inline uint8_t& g_main_screen_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596196});
 inline int16_t& g_map_unknown_word = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5B4});
@@ -97,9 +80,9 @@ inline uint8_t& g_map_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
 
-inline const char* s_percent_0055633c = reinterpret_cast<const char*>(0x0055633C); // "%"
-inline const char* s_slash_005599a4 = reinterpret_cast<const char*>(0x005599A4); // "/"
-inline const char* s_lparen_005599a8 = reinterpret_cast<const char*>(0x005599A8); // "("
+extern const char s_percent_0055633c[2]; // "%"
+extern const char s_slash_005599a4[2]; // "/"
+extern const char s_lparen_005599a8[2]; // "("
 
 inline MMRESULT (__stdcall*& PTR_timeEndPeriod_005aa5c4)(uint32_t) =
     *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5C4});
@@ -107,27 +90,19 @@ inline MMRESULT (__stdcall*& PTR_timeEndPeriod_005aa5c4)(uint32_t) =
 inline MMRESULT (__stdcall*& PTR_timeKillEvent_005aa5cc)(uint32_t) =
     *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5CC});
 
-inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter) {
-    using Fn = HRESULT(__stdcall*)(GUID*, LPDIRECTDRAW*, IUnknown*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0053a8ca });
-    return fn(lpGUID, lplpDD, pUnkOuter);
-}
-
 
 inline int16_t& _mouse_XY_star_idx =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5C4});
 
-inline const char* s_fmt_modifier_full_005523a4 = reinterpret_cast<const char*>(std::uintptr_t{0x005523A4}); // "%d.%d"
-inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(std::uintptr_t{0x00556104}); // "%d"
-inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
-inline const char* s_scor_0055a510 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A510}); // "scor"
-inline const char* const s_RACEOPT_LBX_00556320 = reinterpret_cast<const char*>(std::uintptr_t{0x00556320}); // "RACEOPT.LBX"
-inline char* s___0055632c = reinterpret_cast<char*>(std::uintptr_t{0x0055632C}); // "."
-inline char* s_patch13_lbx_00556330 = reinterpret_cast<char*>(std::uintptr_t{0x00556330}); // "patch13.lbx"
-inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
-inline const char* s_percent_s_percent_d_00556d98 = reinterpret_cast<const char*>(std::uintptr_t{0x00556D98}); /* "%s: %d" */
-inline const char* const s_RACESTUF_lbx_00558550 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00558550}); // "RACESTUF.lbx"
+extern const char s_fmt_modifier_full_005523a4[6]; // "%d.%d"
+extern const char s_fmt_score_simple_00556104[3]; // "%d"
+extern const char s_dot_0055632c[2]; // "."
+extern const char s_scor_0055a510[5]; // "scor"
+extern const char s_RACEOPT_LBX_00556320[12]; // "RACEOPT.LBX"
+extern char s_patch13_lbx_00556330[12]; // "patch13.lbx"
+extern const char s_fmt_score_complex_0055a518[13]; // "(%d x %s) %d"
+extern const char s_percent_s_percent_d_00556d98[7]; /* "%s: %d" */
+extern const char s_RACESTUF_lbx_00558550[13]; // "RACESTUF.lbx"
 
 inline const char* const s_STREAM_LBX_005558fc =
     reinterpret_cast<const char*>(std::uintptr_t{0x005558FC}); /* "STREAM.LBX" */
@@ -142,61 +117,55 @@ inline void __cdecl No_Op1_() {
 }
 
 namespace GLOBALS {
-    inline const char* s_spaces_percent_s_0055236c = reinterpret_cast<const char*>(std::uintptr_t{0x0055236C});
-    inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
+    extern const char s_spaces_percent_s_0055236c[5];
+    extern const char s_percent_s_percent_s_percent_s_005574f4[9];
 }
 
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
-inline char* s_360_00556164 = reinterpret_cast<char*>(std::uintptr_t{0x00556164}); // "360"
-inline const char* s_comma_space_00556168 = reinterpret_cast<const char*>(std::uintptr_t{0x00556168}); // ", "
+extern char s_360_00556164[4]; // "360"
+extern const char s_comma_space_00556168[3]; // ", "
 
 inline uint8_t& DAT_00590000 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00590000});
 
-inline const char* const s_Raider_0055768c = reinterpret_cast<const char*>(0x0055768C); // "Raider"
-inline char* s_rparen_00557f08 = reinterpret_cast<char*>(std::uintptr_t{0x00557F08}); // ")"
-inline const char* const s_Marauder_00557694 = reinterpret_cast<const char*>(0x00557694); // "Marauder"
-inline char* s_space_lparen_0055999c = reinterpret_cast<char*>(std::uintptr_t{0x0055999C}); // " ("
-inline char* s_space_x_005599a0 = reinterpret_cast<char*>(std::uintptr_t{0x005599A0}); // " x"
-inline const char* const s_Interdictor_005576ac = reinterpret_cast<const char*>(0x005576AC); // "Interdictor"
-inline const char* const s_Harbinger_005576b8 = reinterpret_cast<const char*>(0x005576B8); // "Harbinger"
-inline const char* s__00557e60 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E60}); // "\n\n"
-inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);
-inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x00557624);
-inline const char* s_WWWWWWW_0055137c = reinterpret_cast<const char*>(std::uintptr_t{0x0055137c}); // "WWWWWWW"
-inline const char* s__s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
-inline const char* s___s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
+extern const char s_Raider_0055768c[7]; // "Raider"
+extern char s_rparen_00557f08[2]; // ")"
+extern const char s_Marauder_00557694[9]; // "Marauder"
+extern char s_space_lparen_0055999c[3]; // " ("
+extern char s_space_x_005599a0[3]; // " x"
+extern const char s_Interdictor_005576ac[12]; // "Interdictor"
+extern const char s_Harbinger_005576b8[10]; // "Harbinger"
+extern const char s_RACENAME_LBX[13];
+extern const char s_RACESTUF_LBX[13];
+extern const char s_WWWWWWW_0055137c[8]; // "WWWWWWW"
+extern const char s__s_00551130[3]; // "%s"
 struct s_colors;
 inline s_colors& s__GEGGGGG_s___s__005569b8 = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569B8});
-inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
-inline uint8_t (&_special_bonus)[10][3] =
-        *reinterpret_cast<uint8_t (*)[10][3]>(std::uintptr_t{0x0055903A});
 
 // Suggested name: s_Null_Pointer
-inline const char* const s__d_c_d_0055996c = reinterpret_cast<const char*>(0x0055996C); // "%d%c%d"
-inline const char* const s__s_s__s_00559964 = reinterpret_cast<const char*>(0x00559964); // "%s%s %s"
-inline const char* const s__s__s_00558014 = reinterpret_cast<const char*>(0x00558014); // "%s %s"
-inline const char* const s__s_d___d__00559958 = reinterpret_cast<const char*>(0x00559958); // "%s%d (%d)"
-inline const char* const s__s_d_00556134 = reinterpret_cast<const char*>(0x00556134); // "%s%d"
-inline const char* const s___d__00559950 = reinterpret_cast<const char*>(0x00559950); // " (%d)"
-inline const char* const s__s_s_00556aec = reinterpret_cast<const char*>(0x00556AEC); // "%s%s"
-inline const char* const s__d___0055612c = reinterpret_cast<const char*>(0x0055612C); // "%d%%"
-inline const char* const s___s_0055994c = reinterpret_cast<const char*>(0x0055994C); // "@%s"
-inline const char* const s___00559948 = reinterpret_cast<const char*>(0x00559948); // "@"
-inline const char* const s_0__s_00559940 = reinterpret_cast<const char*>(0x00559940); // "0 %s"
-inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x005569F0); // "%d %s"
+extern const char s__d_c_d_0055996c[7]; // "%d%c%d"
+extern const char s__s_s__s_00559964[8]; // "%s%s %s"
+extern const char s__s__s_00558014[6]; // "%s %s"
+extern const char s__s_d___d__00559958[10]; // "%s%d (%d)"
+extern const char s__s_d_00556134[5]; // "%s%d"
+extern const char s___d__00559950[5]; // "(%d)"
+extern const char s__s_s_00556aec[5]; // "%s%s"
+extern const char s__d___0055612c[5]; // "%d%%"
+extern const char s___s_0055994c[4]; // "@%s"
+extern const char s___00559948[2]; // "@"
+extern const char s_0__s_00559940[5]; // "0 %s"
+extern const char s__d__s_005569f0[6]; // "%d %s"
 inline char* s__00551100 = reinterpret_cast<char*>(0x00551100);   // ""
-inline const char* s__d_BC_00552384 = reinterpret_cast<const char*>(0x00552384);
-inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
-inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
-inline const char* s_c_00556350 = reinterpret_cast<const char*>(std::uintptr_t{0x00556350}); // "c"
-inline const char* s_a_00552414 = reinterpret_cast<const char*>(std::uintptr_t{0x00552414});
-inline const char* s_o_00556af4 = reinterpret_cast<const char*>(std::uintptr_t{0x00556AF4}); // "o"
-inline const char* s_oc_00556af8 = reinterpret_cast<const char*>(std::uintptr_t{0x00556AF8}); // "oc"
-inline const char* s_H_005569d4 = reinterpret_cast<const char*>(0x005569D4); // "H"
-inline const char* s_M_00557ed8 = reinterpret_cast<const char*>(0x00557ED8); // "M"
-inline const char* DAT_00558540 = reinterpret_cast<const char*>(0x00558540);
-inline const char* DAT_0055aa90 = reinterpret_cast<const char*>(0x0055AA90);
+extern const char s__d_BC_00552384[8];
+extern const char s_plus_00551118[2]; // "+"
+extern const char s_minus_0055111c[2]; // "-"
+extern const char s_c_00556350[2]; // "c"
+extern const char s_o_00556af4[2]; // "o"
+extern const char s_oc_00556af8[3]; // "oc"
+extern const char s_H_005569d4[2]; // "H"
+extern const char s_M_00557ed8[2]; // "M"
+extern const char DAT_00558540[2];
+extern const char DAT_0055aa90[2];
 
 inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00552CD8}); // "Monster (ship id: %d) cannot move to %s (%d)!"
@@ -204,14 +173,14 @@ inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
 inline const char* const s_Auto_Save_00556938 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00556938}); // "(Auto Save)"
 
-inline const char* s_no_description_00556920 = reinterpret_cast<const char*>(std::uintptr_t{0x00556920}); // "<< no description >>"
+extern const char s_no_description_00556920[24]; // "<< no description >>"
 
-inline const char* s_0_00551104 = reinterpret_cast<const char*>(0x00551104); // " 0"
-inline const char* s_2_00551108 = reinterpret_cast<const char*>(0x00551108); // " 2"
-inline const char* s_1_00551114 = reinterpret_cast<const char*>(0x00551114); // " 1"
-inline const char* const s_1_00556B10 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B10}); // "1"
+extern const char s_0_00551104[4];
+extern const char s_2_00551108[4];
+extern const char s_1_00551114[4];
+extern const char s_1_00556B10[2]; // "1"
 
-inline const char* const s_e_0055ac48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC48}); // "e"
+extern const char s_e_0055ac48[2]; // "e"
 
 inline const char* const s_Null_Pointer_0055b658 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B658 }); // "Null Pointer"
@@ -226,31 +195,6 @@ inline const char* const s_Couldn_t_Allocate_0055B668 =
 inline const char* const s_Unable_to_Allocate_bytes =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%d, %d)\n"
 
-typedef struct HMMIO__* HMMIO;
-inline long __stdcall mmioSeek(HMMIO hmmio, long lOffset, int iOrigin) {
-    using Fn = long(__stdcall*)(HMMIO, long, int);
-    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5C0});
-    return fn(hmmio, lOffset, iOrigin);
-}
-
-inline long __stdcall mmioRead(HMMIO hmmio, void* pch, long cch) {
-    using Fn = long(__stdcall*)(HMMIO, void*, long);
-    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5AC});
-    return fn(hmmio, pch, cch);
-}
-
-inline MMRESULT __stdcall mmioClose(HMMIO hmmio, uint32_t uFlags) {
-    using Fn = int32_t(__stdcall*)(HMMIO, uint32_t);
-    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5A4});
-    return fn(hmmio, uFlags);
-}
-
-inline HMMIO __stdcall mmioOpenA(const char* szFilename, void* lpmmioinfo, uint32_t dwOpenFlags) {
-    using Fn = HMMIO(__stdcall*)(const char*, void*, uint32_t);
-    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5B0});
-    return fn(szFilename, lpmmioinfo, dwOpenFlags);
-}
-
 inline const char* const s_fmt_00557F18 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
 
@@ -261,11 +205,11 @@ inline const char*& s_format_string = *reinterpret_cast<const char**>(std::uintp
 
 inline const char*& PTR_s_FLEET_LBX_005584a8 = *reinterpret_cast<const char**>(std::uintptr_t{0x005584A8});
 
-inline const char* s_RACEOPT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DB0}); // "RACEOPT.LBX"
-inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); // "SAVE"
-inline const char* s__GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4); // ".GAM"
-inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); // "rb"
-inline const char* s_wb_00551178 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551178 }); // "wb"
+extern const char s_RACEOPT_LBX[12]; // "RACEOPT.LBX"
+extern const char s_SAVE_005568fc[5]; // "SAVE"
+extern const char s__GAM_005568f4[5]; // ".GAM"
+extern const char s_rb_0055117c[3]; // "rb"
+extern const char s_wb_00551178[3]; // "wb"
 inline const char* s_Error_in_swap_file_0055beb8 =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055BEB8}); // "Error in swap file"
 inline const char* s_TEMP_TMP_0055becc =
@@ -274,53 +218,53 @@ inline const char* s_Insufficient_disk_space_for_swap_0055bed8 =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055BED8}); // "Insufficient disk space for swap"
 inline const char* s_Drive_swap_reqd_too_large_for_bl_0055befc =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055BEFC}); // "Drive swap reqd too large for block"
-inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055760C }); // "mox.set"
-inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575F4 }); // "Unable to open mox.set"
-inline const char* s_MOX_SET_00556918 = reinterpret_cast<const char*>(std::uintptr_t{0x00556918}); // "MOX.SET"
-inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*>(std::uintptr_t{0x00556950}); // "Settings file (MOX.SET) is missing..."
+extern const char s_mox_set_0055760c[8]; // "mox.set"
+extern const char s_Unable_to_open_mox_set_005575f4[23]; // "Unable to open mox.set"
+extern const char s_MOX_SET_00556918[8]; // "MOX.SET"
+extern const char s_Settings_file_error_00556950[46]; // "Settings file (MOX.SET) is missing or invalid"
 
 inline int16_t (&_weapon_replacement_screen_help_list)[12][10] =
     *reinterpret_cast<int16_t(*)[12][10]>(std::uintptr_t{0x005648D8});
 
-inline const char* s_Antares_00551288 = reinterpret_cast<const char*>(std::uintptr_t{0x00551288});
+extern const char s_Antares_00551288[8];
 inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* const s_cmbtplnt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
 inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); /* " 1" */
 inline const char* s_0_0055110d = reinterpret_cast<const char*>(std::uintptr_t{0x0055110D});
-inline const char* s_caret_space_00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */
+extern const char s_caret_space_00556070[3]; /* "^ " */
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 inline const char* s_BUFFER0_LBX_00551124 =
         reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
 inline int16_t& _fleet_box_width =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
-inline const char* s__s___s_0055238c = reinterpret_cast<const char*>(std::uintptr_t{0x0055238C}); // "%s, %s"
-inline const char* s__s_005569e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569E8}); // "%s "
-inline const char* s___s_00557f0c = reinterpret_cast<const char*>(std::uintptr_t{0x00557F0C}); // "(%s"
-inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A38}); // "rstring%d.lbx"
-inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
-inline const char* s_councmsg_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A80}); // "councmsg.lbx"
-inline const char* s_ships_lbx_005597b4 = reinterpret_cast<const char*>(std::uintptr_t{0x005597B4}); // "ships.lbx"
-inline const char* s_billtext_lbx_0055135c = reinterpret_cast<const char*>(std::uintptr_t{0x0055135C}); // "billtext.lbx"
-inline char* s_racerprt_lbx_005574d8 = reinterpret_cast<char*>(std::uintptr_t{0x005574D8});
-inline const char* const s_gstar_lbx_00558544 = reinterpret_cast<const char*>(std::uintptr_t{0x00558544}); // "gstar.lbx"
-inline char* const s_SPA_HELP_LBX_00557450 = reinterpret_cast<char*>(std::uintptr_t{0x00557450}); // "SPA_HELP.LBX"
-inline char* const s_ITA_HELP_LBX_00557460 = reinterpret_cast<char*>(std::uintptr_t{0x00557460}); // "ITA_HELP.LBX"
-inline char* const s_FRE_HELP_LBX_00557470 = reinterpret_cast<char*>(std::uintptr_t{0x00557470}); // "FRE_HELP.LBX"
-inline char* const s_GER_HELP_LBX_00557480 = reinterpret_cast<char*>(std::uintptr_t{0x00557480}); // "GER_HELP.LBX"
-inline char* const s_HELP_LBX_00557490 = reinterpret_cast<char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
+extern const char s__s___s_0055238c[7]; // "%s, %s"
+extern const char s__s_005569e8[4]; // "%s "
+extern const char s___s_00557f0c[4]; // "(%s"
+extern const char s_rstring_d_lbx[14]; // "rstring%d.lbx"
+extern const char s_STARBG_LBX[11]; // "STARBG.LBX"
+extern const char s_councmsg_lbx[13]; // "councmsg.lbx"
+extern const char s_ships_lbx_005597b4[10]; // "ships.lbx"
+extern const char s_billtext_lbx_0055135c[13]; // "billtext.lbx"
+extern char s_racerprt_lbx_005574d8[13];
+extern const char s_gstar_lbx_00558544[10]; // "gstar.lbx"
+extern char s_SPA_HELP_LBX_00557450[16]; // "SPA_HELP.LBX"
+extern char s_ITA_HELP_LBX_00557460[16]; // "ITA_HELP.LBX"
+extern char s_FRE_HELP_LBX_00557470[16]; // "FRE_HELP.LBX"
+extern char s_GER_HELP_LBX_00557480[16]; // "GER_HELP.LBX"
+extern char s_HELP_LBX_00557490[9]; // "HELP.LBX"
 inline const char* s_DIPLOMAT_LBX_00552350 = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); // "DIPLOMAT.LBX"
 inline const char* s_DIPLOMAT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); /* "DIPLOMAT.LBX" */
-inline const char* s_dipstars_lbx_00552374 = reinterpret_cast<const char*>(std::uintptr_t{0x00552374}); // "dipstars.lbx"
+extern const char s_dipstars_lbx_00552374[13]; // "dipstars.lbx"
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
 
-inline char* const s_MULTIGM_LBX_00558D04 = reinterpret_cast<char*>(std::uintptr_t{0x00558D04}); // "MULTIGM.LBX"
-inline const char* s_Evan_Axelrad_0055AA48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA48}); // "Evan Axelrad"
-inline char* const s_Moo_IIAlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1CC }); // "Moo2 is already running"
-inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1E8 });        // "Microprose"
-inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::uintptr_t{0x005578E0});
+extern char s_MULTIGM_LBX_00558D04[12]; // "MULTIGM.LBX"
+extern const char s_Evan_Axelrad_0055AA48[16]; // "Evan Axelrad"
+extern char s_Moo_IIAlreadyRunning[27]; // "MOO II is already running."
+extern char s_Microprose[11]; // "Microprose"
+extern const char s_Mar_26_1997_005578e0[12]; // "Mar 26 1997"
 
 inline const char* const s_Memory_Corruption_val_00558028 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n"
@@ -337,9 +281,9 @@ inline LPCSTR s_Cache_Seg_Corrupted____0055b374 =
 inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"
 
-inline const char* s_Too_many_frames_for_multi_file_a_0055b83c = reinterpret_cast<const char*>(std::uintptr_t{0x0055B83C}); /* "Too many frames for multi file animation" */
+extern const char s_Too_many_frames_for_multi_file_a_0055b83c[41]; /* "Too many frames for multi file animation" */
 
-inline const char* s_Refresh_Mask_can_t_be_drawn_0055b10c = reinterpret_cast<const char*>(std::uintptr_t{0x0055B10C}); // "Refresh Mask can't be drawn"
+extern const char s_Refresh_Mask_can_t_be_drawn_0055b10c[28]; // "Refresh Mask can't be drawn"
 
 inline char* s_Cannot_color_replace_refresh_mas_0055b7a0 =
     reinterpret_cast<char*>(std::uintptr_t{0x0055B7A0}); // "Cannot color replace refresh mask."
@@ -360,8 +304,8 @@ inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  //
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
-inline const char* s_combat_lbx_005599c8 = reinterpret_cast<const char*>(0x005599C8); // "combat.LBX"
-inline const char* s_warning_lbx_00557650 = reinterpret_cast<const char*>(std::uintptr_t{0x00557650}); // "warning.lbx"
+extern const char s_combat_lbx_005599c8[11]; // "combat.LBX"
+extern const char s_warning_lbx_00557650[12]; // "warning.lbx"
 
 inline char* s_You_exceeded_the_max_number_of_f_0055b080 =
     reinterpret_cast<char*>(std::uintptr_t{ 0x0055B080 });

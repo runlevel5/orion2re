@@ -111,6 +111,7 @@
     <ClCompile Include="src\game\fmtpara.cpp" />
     <ClCompile Include="src\game\fontdraw.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
+    <ClCompile Include="src\game\funcs.cpp" />
     <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\global.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="src\game\netcode.cpp" />
     <ClCompile Include="src\game\netmox.cpp" />
     <ClCompile Include="src\game\netstart.cpp" />
+    <ClCompile Include="src\game\netstrat.cpp" />
     <ClCompile Include="src\game\netturn.cpp" />
     <ClCompile Include="src\game\newgame.cpp" />
     <ClCompile Include="src\game\newpup.cpp" />
@@ -283,7 +285,6 @@
     <ClInclude Include="src\game\diplomac.h" />
     <ClInclude Include="src\game\dip_scrn.h" />
     <ClInclude Include="src\game\dos.h" />
-    <ClInclude Include="src\game\dplay_dll.h" />
     <ClInclude Include="src\game\draw.h" />
     <ClInclude Include="src\game\eric.h" />
     <ClInclude Include="src\game\erichelp.h" />
@@ -426,16 +427,12 @@
     <None Include=".vocode\workflows\cleanup.yaml" />
     <None Include=".vocode\workflows\decompiler.yaml" />
     <None Include=".vocode\workflows\struct.yaml" />
+    <None Include=".vocode\workflows\mass-header.yaml" />
     <None Include=".vocode\workflows\mass-validator.yaml" />
     <None Include=".vocode\workflows\vars.yaml" />
     <None Include=".vocode\workflows\verifier.yaml" />
-    <None Include="notes.md" />
+    <None Include="dplayx.def" />
     <None Include="smackw32.def" />
-    <None Include="src\game\sysfont_font_pixel_data.inc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="report.txt" />
-    <Text Include="validate.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -446,13 +443,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -510,7 +507,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <PreBuildEvent>
-      <Command>lib /def:"$(ProjectDir)smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"$(IntDir)smackw32.lib"</Command>
+      <Command>lib /def:"$(ProjectDir)smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"$(IntDir)smackw32.lib" &amp;&amp; lib /def:"$(ProjectDir)dplayx.def" /machine:x86 /name:DPLAYX.DLL /out:"$(IntDir)dplayx.lib"</Command>
     </PreBuildEvent>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -519,7 +516,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalLibraryDirectories>$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>smackw32.lib;$(CoreLibraryDependencies);winmm.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>smackw32.lib;$(CoreLibraryDependencies);winmm.lib;dsound.lib;ddraw.lib;dplayx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -537,14 +534,14 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <PreBuildEvent>
-      <Command>lib /def:"$(ProjectDir)smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"$(IntDir)smackw32.lib"</Command>
+      <Command>lib /def:"$(ProjectDir)smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"$(IntDir)smackw32.lib" &amp;&amp; lib /def:"$(ProjectDir)dplayx.def" /machine:x86 /name:DPLAYX.DLL /out:"$(IntDir)dplayx.lib"</Command>
     </PreBuildEvent>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>smackw32.lib;$(CoreLibraryDependencies);winmm.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>smackw32.lib;$(CoreLibraryDependencies);winmm.lib;dsound.lib;ddraw.lib;dplayx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

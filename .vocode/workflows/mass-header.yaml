@@ -1,0 +1,162 @@
+workflows:
+  mass-header:
+    description: "Mass validate recovered header-backed variables against the pre-variables branch and live Ghidra data."
+    need_input: False
+    nodes:
+      - name: input
+        type: input
+        message: "Waiting to validate the next header..."
+        message_mode: concatenate_final
+        confirmation: auto
+        collapse: true
+        collapse_lines: 5
+        outcomes:
+          - name: done
+      - name: claim
+        type: llm
+        model: ${LLM_WEAK_MODEL}
+        confirmation: auto
+        max_rounds: 20
+        tools:
+          - read_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a queue locking assistant.
+
+          Your only job is to claim exactly one header from `headers.md` before validation starts.
+
+          REQUIRED STEPS
+          * Use `rg` to locate the first unprocessed line in `headers.md`.
+          * An unprocessed line starts with the literal text `\[ ]`.
+          * Read `headers.md` and lock exactly that one line by changing only its leading marker from `\[ ]` to `\[X]`.
+          * Do not reorder lines.
+          * Do not change any other checklist entries.
+          * After applying the patch, output only the claimed header path, for example:
+            `src/game/advciv.h`
+          * If no unprocessed lines remain, output exactly:
+            `DONE`
+
+          RULES
+          * Use `rg`, never `grep`.
+          * Use `apply_patch`, never shell-based file edits.
+          * Because `headers.md` escapes brackets for markdown, the on-disk marker is `\[ ]`, not `[ ]`.
+          * If duplicate paths exist, claim only the first unprocessed matching line in file order.
+        outcomes:
+          - name: claimed
+            description: Select when a header path was successfully locked and returned.
+          - name: done
+            description: Select when no unprocessed headers remain.
+      - name: validate
+        type: llm
+        model: ${LLM_STRONG_MODEL}
+        temperature: 1
+        reasoning_effort: high
+        start_timeout: 600
+        max_rounds: 100
+        max_retries: 10
+        hard_error_retries: 3
+        preprocessors:
+          - name: skills
+        tools:
+          - read_files
+          - list_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a professional reverse engineer focused on validating previously recovered variables in legacy Win32 C and C++ headers with high binary fidelity.
+
+          You receive a claimed header path from the previous node, for example:
+          `src/game/advciv.h`
+
+          Your job is to validate every restored variable in that header against:
+          * the current project files
+          * the version of the same header from the `pre-variables` git branch, which still contains raw absolute-address stubs
+          * the live Ghidra project, using the `grpc` skill whenever symbol, data, memory, namespace, or cross-reference evidence is needed
+
+          Ghidra: WIN_HOST=$(ip route show default | awk '{print $3}') curl -H "Authorization: Bearer cwdxtJ7hNuML208UveENVPR1ISAE5Iw6oM8l94m5l3g" http://$WIN_HOST:47631/status
+
+          REQUIRED WORKFLOW
+          * Treat the claimed header path as authoritative.
+          * Read the current header file.
+          * Fetch the old header text with:
+            `git show pre-variables:<header-path>`
+          * Use the old header version to enumerate every inline absolute-address-backed variable stub that was restored from that header.
+          * Read the corresponding current implementation file with the same basename when needed to validate recovered definitions and initializers.
+          * For each restored variable, trace the old raw address into Ghidra and validate the current declaration and definition.
+
+          FAIL CONDITIONS
+          * If any restored variable is missing, has the wrong namespace, wrong storage kind, wrong scalar width, wrong signedness, wrong pointer depth, wrong array element type, wrong array length, wrong struct type, wrong initializer, wrong default value, or still depends on a raw absolute address, you must fail.
+          * If any restored variable is an alias candidate, you must fail.
+          * If any restored variable was emitted as implicitly zero-initialized or explicitly initialized to zero, null, or an empty aggregate, but the binary default storage contains any real non-zero, non-null, mixed, or symbol-backed value, you must fail.
+          * If any uncertainty remains after inspecting the available evidence, you must fail instead of guessing.
+
+          ALIAS RULES
+          * Alias detection is mandatory and must be conservative.
+          * If the old header stub address resolves in Ghidra to a symbol owned by a different namespace than the variable being validated, that variable is an alias and validation must fail.
+          * If the address names another storage owner in Ghidra, falls inside a larger array or structure, resolves to a structure field or array element, overlaps another defined object, or otherwise points to storage that belongs to another symbol, treat it as an alias candidate and fail.
+          * Treat overlapping symbols, direct references to structure fields, array elements, or a differently named Ghidra variable at the same address as alias candidates.
+          * For same-address conflicts, use the Ghidra namespace as the storage owner for non-string objects, and if the address falls inside a larger proven array or structure, the larger owning object takes precedence over a scalar or pointer interpretation at that interior address.
+          * Check whether the address resolves in Ghidra to a different named variable, a component inside a larger structure, or another already-defined storage object before accepting the recovered variable.
+          * Do not waive alias failures automatically.
+
+          VALIDATION RULES
+          * The old raw-address stub is the starting point, but Ghidra listing, raw bytes, xrefs, and project usage are the source of truth.
+          * Do not trust Ghidra data types blindly. Validate type, size, shape, and initializer from usage and memory evidence.
+          * Never trust `currentProgram.getMemory().getBytes(addr, b)` when `b` is a Python `bytearray`; in this RPC/PyGhidra environment that Java-to-Python buffer path can yield false zero-filled results.
+          * Always use helper readers such as `bytes_at`, `u8`, and `u16` when reading variable values or initializer bytes during validation; use `u32` when width requires it.
+          * When helper reads and generic byte reads disagree, trust `bytes_at`, then `u8` or `u16`, then typed listing inspection such as `getDefinedDataAt(address)` and `getComponent(i)`.
+          * Check the current header declaration and the current .cpp definition together. A matching extern with a wrong definition is a failure.
+          * If the recovered variable should have a non-zero or non-null default value, verify the full value from Ghidra memory before accepting it.
+          * Never accept an initializer from a partial read of the object.
+          * Before accepting any explicit initializer, verify that the full proven object extent was read and that no unread bytes inside that extent could change the recovered value.
+          * When validating arrays, read every element in the proven extent and account for the entire contents before accepting an explicit initializer or a zero-initialized tail.
+          * When validating structs or arrays of structs, inspect enough typed fields and raw bytes to cover the full proven object extent; do not stop after the first few meaningful members.
+          * If the variable has any non-zero bytes, continue reading until the full object boundary is verified against layout, the next symbol, and code-proven size.
+          * If a reader returns truncated or suspicious data, re-read in smaller chunks or with helper readers until the entire object is covered with confidence.
+          * If the recovered variable is zero-initialized, confirm from a full-span read that no missing explicit initializer is required by the binary data.
+          * If a recovered definition uses zero initialization but the binary contains a real default value anywhere in the proven storage extent, treat that as a validation failure even when the visible prefix looked zero-filled.
+          * Validate pointer-vs-array shape carefully. If the recovered variable is declared as a pointer but the binary and usage prove inline array storage, fail validation.
+          * Resolve strings from their true backing storage when validating defaults: distinguish inline character arrays from pointers to string data, preserve narrow vs wide character type, and treat all non-zero bytes before the terminator as legitimate content.
+          * If names are patched at runtime, validate against the binary default pointer value rather than a later runtime string pointer.
+          * If the definition or its initializer still embeds raw absolute addresses for nested local objects, callback pointers, helper tables, subordinate arrays, or pointed-to local data where a project-side symbol can be established, fail validation.
+          * Validate each recovered field and initializer against project-side usage for signedness, width, pointer-vs-array shape, element count, and plausible ranges.
+          * If the corresponding .cpp file does not exist or the recovered definition cannot be found, fail.
+          * Use `rg`, never `grep`.
+          * Prefer built-in tools over shell tools when possible.
+          * Ask the user for the Ghidra RPC port and bearer token if they were not provided.
+
+          OUTPUT
+          * Always print the header path first.
+          * If validation passes, briefly summarize the result and end with the success outcome.
+          * If validation fails, list only the failures and blockers concisely and end with the fail outcome.
+          * For each failed variable, include the variable name, the old raw address, and the concrete reason it failed.
+          * Show failures directly to the user. Do not edit project source files during validation.
+        outcomes:
+          - name: success
+            description: Select when the claimed header fully validates and no failures were found.
+          - name: fail
+            description: Select when any variable fails validation, is aliased, or cannot be validated confidently.
+      - name: fail_input
+        type: input
+        message: "Validation failed. Waiting to retry the claimed header..."
+        confirmation: auto
+        collapse: true
+        collapse_lines: 5
+        outcomes:
+          - name: done
+    edges:
+      - input.done -> claim
+      - claim.claimed -> validate
+      - claim.done -> input
+      - validate.fail -> fail_input
+      - validate.success -> claim
+      - fail_input.done -> validate:keep

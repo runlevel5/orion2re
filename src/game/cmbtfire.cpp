@@ -818,7 +818,7 @@ namespace CMBTFIRE {
         s_animation_header* h1 = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 22500 /* 0x57e4 */);
 
         int32_t entry_num = (-1 - ship->size_class) / 2 + 46 /* 0x2e */;
-        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx, entry_num, MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COMBINIT::s_cmbtsfx_lbx_00551228, entry_num, MOX::_global_cache_seg);
 
         int16_t frame = (MOX::_ship_frame / 2) % 8;
 

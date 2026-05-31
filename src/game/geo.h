@@ -2,9 +2,8 @@
 #include <cstdint>
 
 namespace GEO {
-    inline int16_t*& _dads = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00564840});
-    inline int16_t (&_orbit_radiuses)[7][2] = *reinterpret_cast<int16_t (*)[7][2]>(std::uintptr_t{0x0054F008});
-    inline int16_t (*const _orbit_consts_end)[2] = reinterpret_cast<int16_t (*)[2]>(std::uintptr_t{0x0054F024});
+    extern int16_t* _dads;
+    extern int16_t _orbit_consts[7][2];
 
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance);
     void __cdecl Initialize_Star_In_Nebula_Info_();

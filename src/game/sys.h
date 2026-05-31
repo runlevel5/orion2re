@@ -17,9 +17,7 @@ namespace SYS {
 
     extern uint8_t _draw_sun_before_planet;
     extern int8_t _skip_draw_system_planets;
-    extern char s__00551100[1];
     extern const char s__00551120[2];
-    extern int16_t _planet_buttons[5];
     extern uint8_t _skip_draw_system_display;
     extern s_animation_header* _system_display_sun_seg;
     extern void* _sys_disp_bitmap;

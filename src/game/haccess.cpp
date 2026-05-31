@@ -226,9 +226,9 @@ namespace HACCESS {
 
         const char* numeral_str;
         if (localized_flag == 0) {
-            numeral_str = MOX::_roman_literals[planet_num];
+            numeral_str = MOX::_roman_literals[planet_num + 1];
         } else {
-            numeral_str = MOX::_roman_literals[planet_num];
+            numeral_str = MOX::_roman_literals[planet_num + 1];
             if (numeral_str[0] == s_I[0] && numeral_str[1] == s_I[1]) {
                 numeral_str = HAROLD::H_Message_(0xa0);
             }

@@ -1,14 +1,14 @@
 #include "pch.h"
 
 namespace DIP_SCRN {
-    s_mouse_list _diplomacy_hand_mouse;
-    s_mouse_list _diplomacy_blank_mouse;
+    s_mouse_list _diplomacy_hand_mouse = { 19, 0, 0, 0, 639, 479 };
+    s_mouse_list _diplomacy_blank_mouse = { 0, 0, 0, 0, 639, 479 };
     uint8_t _ambassador_option;
-    int16_t _main_diplomacy_help_entry[8];
+    int16_t _main_diplomacy_help_entry[8] = { 567, 568, 569, 570, 571, 572, 573, 574 };
     int16_t _response_message;
     uint16_t _synch_up_established_flag;
     int16_t _old_response_message;
-    int16_t _propose_treaty_help_entry[6];
+    int16_t _propose_treaty_help_entry[6] = { 576, 577, 578, 579, 580, 613 };
     char* _main_diplomacy_title;
     char* _propose_treaty_title;
     uint8_t _talker_ambassador;
@@ -30,7 +30,7 @@ namespace DIP_SCRN {
     char _receive_chat_message[110];
     uint8_t _current_ambassador;
     char _diplomacy_message[250];
-    int16_t _main_net_diplomacy_help_entry[10];
+    int16_t _main_net_diplomacy_help_entry[10] = { 567, 568, 569, 570, 571, 572, 573, -1, -1, 574 };
     int16_t _net_diplomacy_tech_offered;
     const char s_empty_string_00551100[] = "";
     const char s_empty_string[] = "";
@@ -59,21 +59,21 @@ namespace DIP_SCRN {
     uint16_t _chat_base_x;
     uint16_t _chat_height;
     uint8_t _chat_mode_flag;
-    s_colors _diplomacy_normal_colors;
-    s_colors _diplomacy_highlight_colors;
-    s_colors _diplomacy_special_colors;
-    int16_t _break_treaty_help_entry[6];
+    s_colors _diplomacy_normal_colors = {{248, 253, 253, 253, 253, 253, 253, 253}};
+    s_colors _diplomacy_highlight_colors = {{250, 255, 255, 255, 255, 255, 255, 255}};
+    s_colors _diplomacy_special_colors = {{248, 250, 250, 250, 250, 250, 250, 250}};
+    int16_t _break_treaty_help_entry[6] = { 582, 583, 584, 585, 586, 613 };
     char* _break_treaty_title;
     char* _break_treaty_diplomacy_list[7];
     char _diplomacy_list_choice[15][50];
     s_help_box _jim_help_list[15];
-    int16_t _demand_help_entry[10];
-    int16_t _main_repulsive_diplomacy_help_entry[4];
-    int16_t _main_net_repulsive_diplomacy_help_entry[5];
+    int16_t _demand_help_entry[10] = { 588, 589, 590, 591, 592, 593, 594, 595, 596, 613 };
+    int16_t _main_repulsive_diplomacy_help_entry[4] = { 578, 572, 573, 574 };
+    int16_t _main_net_repulsive_diplomacy_help_entry[5] = { 578, 572, 573, -1, 574 };
     char* _main_repulsive_diplomacy_list[5];
     char* _main_net_repulsive_diplomacy_list[6];
     s_dipscrn_net_message _net_diplomacy_message;
-    int16_t _offer_help_entry[6];
+    int16_t _offer_help_entry[6] = { 598, 599, 600, 601, 602, 613 };
     char* _offer_diplomacy_list[7];
     char* _offer_title;
     uint8_t _diplomacy_system_planet_list[5];

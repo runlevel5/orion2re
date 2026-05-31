@@ -13,6 +13,7 @@ namespace platform {
 	uint32_t g_win_minor;
 	uint32_t g_win_major;
 	uint32_t g_win_ver;
+	const char s_slash_ten[6] = "/ten=";
 	char* g_command_line;
 	void* g_env_strings;
 	MSG g_main_msg;
@@ -31,7 +32,6 @@ namespace platform {
 	LPDIRECTDRAWSURFACE g_cursor_surface_2;
 	LPVOID _cursor_surface;
 	uint32_t DAT_00578e20;
-	uint16_t DAT_0057931c;
 	uint32_t g_frame_count;
 	int8_t g_render_buffer;
 	DDSURFACEDESC DDSURFACEDESC_00578e70;
@@ -164,9 +164,13 @@ namespace platform {
     // Hooks
     void __cdecl entry() {
 #ifdef _MSC_VER
-#pragma warning(suppress : 4996)
+#pragma warning(push)
+#pragma warning(disable : 4996)
 #endif
         uint32_t version_info = GetVersion();
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
         g_os_ver = version_info;
         g_win_minor = (version_info >> 8) & 0xFF;
@@ -322,7 +326,6 @@ namespace platform {
 
         video::_screen_pixel_size = video::g_screen_res_x * video::g_screen_res_y;
         video::Allocate_Refresh_Lists_(video::_screen_pixel_size, video::g_screen_res_y);
-        DAT_0057931c = 0;
 
         DDSURFACEDESC surface_desc;
         memset(&surface_desc, 0, sizeof(surface_desc));
@@ -604,8 +607,8 @@ namespace platform {
             nullptr);
 
         if (result == DD_OK) {
-            platform::_offscreen_surface = (uint8_t*)platform::_current_locked_page;
-            return platform::_surface_lock_flag;
+            platform::_offscreen_surface = (uint8_t*)platform::DDSURFACEDESC_00578e70.lpSurface;
+            return platform::DDSURFACEDESC_00578e70.lPitch;
         }
 
         if (result == E_INVALIDARG ||
@@ -1334,8 +1337,8 @@ namespace platform {
             nullptr);
 
         if (lock_result == DD_OK) {
-            platform::_alt_offscreen_surface = (uint32_t*)platform::_current_locked_page;
-            return platform::_surface_lock_flag;
+            platform::_alt_offscreen_surface = (uint32_t*)platform::DDSURFACEDESC_00578e70.lpSurface;
+            return platform::DDSURFACEDESC_00578e70.lPitch;
         }
 
         if (lock_result == E_INVALIDARG ||

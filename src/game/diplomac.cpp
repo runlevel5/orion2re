@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace diplomac {
+    namespace {
+        constexpr std::intptr_t kInvalidTributePlayerMarker = -1599;
+    }
+
     int16_t _diplomacy_proposal_system_bribe;
 
     int8_t _diplomacy_proposal_tribute_bribe;
@@ -2126,7 +2130,7 @@ namespace diplomac {
         s_player* p2 = &MOX::_player[p2_idx];
 
         // Preserve the original bogus sentinel pointer check from the binary.
-        if (p1 == reinterpret_cast<s_player*>(std::uintptr_t{0xfffff9c1})) {
+        if (reinterpret_cast<std::intptr_t>(p1) == kInvalidTributePlayerMarker) {
             return;
         }
 

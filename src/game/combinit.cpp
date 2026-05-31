@@ -2,6 +2,9 @@
 
 namespace COMBINIT {
 
+s_palette_entry _tractor_beam_remap_palette[8];
+s_palette_entry _plasma_web_remap_palette[16];
+
 const char s_combat_lbx_00551244[11] = "combat.lbx";
 const char s_monster_lbx_00551250[12] = "monster.lbx";
 const char s_cmbtshp_lbx_0055125c[12] = "cmbtshp.lbx";
@@ -808,7 +811,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
         int16_t shield_c = 23;
         for (int16_t i = 1; i < 16; ++i) {
-            palette::Set_Glass_Remap_Color_(i, i * 2 + 13, i * 2 + 30, 63, shield_c);
+            palette::Set_Glass_Remap_Color_(i, (uint8_t)(i * 2 + 13), (uint8_t)(i * 2 + 30), 63, (uint8_t)shield_c);
             shield_c += 3;
         }
         RUSS::Mox_Update_();
@@ -825,7 +828,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
         int16_t pulsar_c = 53;
         for (int16_t i = 1; i < 16; ++i) {
-            palette::Set_Glass_Remap_Color_(i, s__00579591[i * 4], s__00579592[i * 4], s__00579593[i * 4], pulsar_c);
+            palette::Set_Glass_Remap_Color_(i, MULTPLAY::_cur_pal_colors[i].r, MULTPLAY::_cur_pal_colors[i].g, MULTPLAY::_cur_pal_colors[i].b, (uint8_t)pulsar_c);
             pulsar_c += 3;
         }
         palette::Set_Palette_Changes_(0, 255);
@@ -838,7 +841,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         animate::Draw_Palette_(warp_pal);
         int16_t warp_c = 53;
         for (int16_t i = 1; i < 16; ++i) {
-            palette::Set_Glass_Remap_Color_(i, s__00579591[i * 4], s__00579592[i * 4], s__00579593[i * 4], warp_c);
+            palette::Set_Glass_Remap_Color_(i, MULTPLAY::_cur_pal_colors[i].r, MULTPLAY::_cur_pal_colors[i].g, MULTPLAY::_cur_pal_colors[i].b, (uint8_t)warp_c);
             warp_c += 3;
         }
         palette::Set_Palette_Changes_(0, 255);
@@ -852,7 +855,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             MOX::_tractor_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
             int16_t tractor_c = 23;
             for (int16_t i = 1; i < 16; ++i) {
-                palette::Set_Glass_Remap_Color_(i, s__00579491[(i / 2) * 4], s__00579492[(i / 2) * 4], s__00579493[(i / 2) * 4], tractor_c);
+                palette::Set_Glass_Remap_Color_(i, _tractor_beam_remap_palette[i / 2].r, _tractor_beam_remap_palette[i / 2].g, _tractor_beam_remap_palette[i / 2].b, (uint8_t)tractor_c);
                 tractor_c += 3;
             }
             palette::Set_Palette_Changes_(0, 255);
@@ -868,7 +871,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             s_animation_header* bhg_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x2E, MOX::_global_cache_seg));
             animate::Draw_Palette_(bhg_pal);
             for (int16_t i = 1; i < 16; ++i) {
-                palette::Set_Glass_Remap_Color_(i, s__00579591[i * 4], s__00579592[i * 4], s__00579593[i * 4], i * 2 + 60);
+                palette::Set_Glass_Remap_Color_(i, MULTPLAY::_cur_pal_colors[i].r, MULTPLAY::_cur_pal_colors[i].g, MULTPLAY::_cur_pal_colors[i].b, i * 2 + 60);
             }
             palette::Set_Palette_Gradient_(144, 32, 0, 0, 0, 0, 0, 0);
             palette::Set_Palette_Changes_(0, 255);
@@ -882,7 +885,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             for (int16_t i = 1; i < 16; ++i) {
                 int16_t c = (i * 3 + 15) * 2;
                 if (c > 100) c = 100;
-                palette::Set_Glass_Remap_Color_(i, s__00579611[i * 4], s__00579612[i * 4], s__00579613[i * 4], c);
+                palette::Set_Glass_Remap_Color_(i, _plasma_web_remap_palette[i].r, _plasma_web_remap_palette[i].g, _plasma_web_remap_palette[i].b, (uint8_t)c);
             }
             RUSS::Mox_Update_();
             palette::Set_Palette_Changes_(0, 255);
@@ -897,7 +900,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             animate::Draw_Palette_(stellar_pal);
             int16_t stellar_c = 53;
             for (int16_t i = 1; i < 16; ++i) {
-                palette::Set_Glass_Remap_Color_(i, s__00579591[i * 8], s__00579592[i * 8], s__00579593[i * 8], stellar_c);
+                palette::Set_Glass_Remap_Color_(i, MULTPLAY::_cur_pal_colors[i * 2].r, MULTPLAY::_cur_pal_colors[i * 2].g, MULTPLAY::_cur_pal_colors[i * 2].b, (uint8_t)stellar_c);
                 stellar_c += 3;
             }
             palette::Set_Palette_Changes_(0, 255);

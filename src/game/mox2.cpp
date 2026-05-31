@@ -363,9 +363,9 @@ namespace MOX2 {
         }
 
         KEN::Ken_Init_();
-        FUN_004d7d80();
+        // TEN-only startup hook removed: TEN restoration is intentionally out of scope for this codebase.
         MOX2::Screen_Control_();
-        FUN_004d7da0();
+        // TEN-only shutdown hook removed: TEN restoration is intentionally out of scope for this codebase.
 
         // Copy leave message
         const char* thanks_src = nullptr;

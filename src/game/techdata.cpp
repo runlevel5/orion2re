@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace {
-char* const kEmptyName = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
+char kEmptyName[] = "";
 }
 
 namespace TECHDATA {

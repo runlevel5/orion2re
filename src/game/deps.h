@@ -83,7 +83,6 @@
 #include "netcode.h"
 #include "winnet.h"
 #include "comcore.h"
-#include "dplay_dll.h"
 #include "timer.h"
 #include "time.h"
 #include "contact.h"

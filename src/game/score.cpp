@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace SCORE {
+    namespace {
+        constexpr std::uintptr_t kInvalidOutColonyIdxMarker = static_cast<std::uintptr_t>(-1);
+    }
+
     s_hof _hof;
     const char LBX_0055a430[10] = "SCORE.LBX";
 
@@ -1473,7 +1477,7 @@ namespace SCORE {
         } else {
             // Potential bug: This branch performs a comparison and dereference of an 
             // address (0xFFFFFFFF) that is typically invalid in Win32.
-            if (out_colony_idx == reinterpret_cast<int16_t*>(std::uintptr_t{0xFFFFFFFF})) {
+            if (reinterpret_cast<std::uintptr_t>(out_colony_idx) == kInvalidOutColonyIdxMarker) {
                 *out_colony_idx = first_match_colony;
                 *out_pop_idx = first_match_pop;
             }

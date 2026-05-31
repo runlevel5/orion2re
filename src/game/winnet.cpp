@@ -4,6 +4,32 @@ namespace WINNET {
     const char s_modem_005607dc[6] = "modem";
     const char s_ipx_005607e4[4] = "ipx";
     const char s_tcp_005607e8[4] = "tcp";
+    int32_t _provider_count;
+    s_winnet_provider* _providers[9];
+    clock_t _net_refresh_timer;
+    GUID _game_guid = {0xEBD6DA60, 0x7CCD, 0x11CF, {0xB4, 0xC3, 0x00, 0xAA, 0x00, 0x3F, 0xCD, 0x2E}};
+    uint32_t _session_count;
+    int8_t _is_searching_games;
+    DPSESSIONDESC* _sessions[100];
+    GUID _app_guid;
+    uint32_t _player_count;
+    s_net_player* _player_list[20];
+    DPID _local_player_id;
+    int32_t _provider_mode;
+    char s_Error_Unknown_0055bf7c[16] = "Error Unknown";
+    char s_Invalid_Object_0055bf8c[16] = "Invalid Object";
+    char s_Invalid_Player_0055bf9c[16] = "Invalid Player";
+    char DAT_0055bfac[8] = "Busy";
+    char s_Active_Players_0055bfb4[16] = "Active Players";
+    char s_User_Cancel_0055bfc4[12] = "User Cancel";
+    char s_Unsupported_0055bfd0[12] = "Unsupported";
+    char s_Unavailable_0055bfdc[12] = "Unavailable";
+    char s_Generic_0055bfe8[8] = "Generic";
+    char s_Invalid_Params_0055bff0[16] = "Invalid Params";
+    char s_Unknown_Err_00560a08[12] = "Unknown Err";
+    char s_Buffer_To_Small_00560a14[16] = "Buffer To Small";
+    char s_No_Messages_00560a24[12] = "No Messages";
+    char s_DirectPlay_ERR_00560a30[20] = "DirectPlay ERR: ";
 
     int8_t __cdecl Find_Provider_(const char* name) {
         int8_t found_index = -1;
@@ -42,7 +68,7 @@ namespace WINNET {
             netcode::_dplay = nullptr;
         }
 
-        HRESULT hr = DPLAY_DLL::Ordinal_1(&_providers[provider_idx]->guid, &netcode::_dplay, nullptr);
+        HRESULT hr = DirectPlayCreate(&_providers[provider_idx]->guid, &netcode::_dplay, nullptr);
         if (hr == 0) {
             WINNET::_provider_mode = mode;
             return 1;
@@ -125,8 +151,7 @@ namespace WINNET {
     }
 
     int32_t __cdecl Init_Providers_() {
-        void* callback = (void*)Enumerate_Providers_;
-        DPLAY_DLL::Ordinal_2(callback, platform::g_main_window);
+        DirectPlayEnumerateA(Enumerate_Providers_, reinterpret_cast<LPVOID>(platform::g_main_window));
         return 0;
     }
 

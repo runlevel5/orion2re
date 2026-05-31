@@ -11,11 +11,10 @@ namespace HOMEGEN {
     };
 #pragma pack(pop)    
     
-    inline const char* s_Found_no_satellites_after_3_MIN_e_0055adc8 =
-        reinterpret_cast<const char*>(std::uintptr_t{0x0055ADC8}); // "Found no satellites after 3_MIN enforcement: Star: %d"
 
-    inline const char* s_Orion = reinterpret_cast<const char*>(std::uintptr_t{0x0055a738}); // "Orion"
 
+
+    extern const char s_Orion[8];
     extern int32_t _HOME_WORLD_GEN_MAX_CTR;
     extern s_good_star* _good_stars;
     extern int16_t _nearest_food_worlds[8];

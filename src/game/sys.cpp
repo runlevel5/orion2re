@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace SYS {
+    char s__00551100[1] = "";
     void* _sys_data_buffer;
     const char s_fmt_star_display[7] = "%d> %s";
     const char s_1[3] = "\x1A" "1";
@@ -17,9 +18,7 @@ namespace SYS {
 
     uint8_t _draw_sun_before_planet;
     int8_t _skip_draw_system_planets;
-    char s__00551100[1] = "";
     const char s__00551120[2] = { '\x1B', '\0' };
-    int16_t _planet_buttons[5];
     uint8_t _skip_draw_system_display;
     s_animation_header* _system_display_sun_seg;
     void* _sys_disp_bitmap;
@@ -1800,7 +1799,7 @@ namespace SYS {
             *out_popup_title_button = fields::Add_Clipped_Button_Field_(
                 static_cast<int16_t>(popup_left + 0x107),
                 static_cast<int16_t>(popup_top + 0xEC),
-                SYS::s__00551100,
+                s__00551100,
                 MOX::_moveable_box_pict[4],
                 SYS::s__00551120,
                 0x28);
@@ -1810,7 +1809,7 @@ namespace SYS {
                 popup_top,
                 static_cast<int16_t>(popup_left + MOX::_moveable_box[0].width),
                 static_cast<int16_t>(popup_top + 0x2F),
-                SYS::s__00551100,
+                s__00551100,
                 0);
         } else {
             *out_popup_hidden_field = -1000;
@@ -1820,13 +1819,13 @@ namespace SYS {
             const int16_t planet_idx = MOX::_sys_disp[orbit_slot].orbit;
 
             if (planet_idx <= -1) {
-                SYS::_planet_buttons[orbit_slot] = -1000;
+                MOX::_planet_buttons[orbit_slot] = -1000;
                 continue;
             }
 
             const s_planet_data& planet = MOX::_planet[planet_idx];
             if (planet.planet_type == 1) {
-                SYS::_planet_buttons[orbit_slot] = -1000;
+                MOX::_planet_buttons[orbit_slot] = -1000;
                 continue;
             }
 
@@ -1852,12 +1851,12 @@ namespace SYS {
                 base_y + popup_offset_y + orbit_offset_y + static_cast<int16_t>(orbit_display_y) + 0x5A -
                 half_diameter);
 
-            SYS::_planet_buttons[orbit_slot] = fields::Add_Hidden_Field_(
+            MOX::_planet_buttons[orbit_slot] = fields::Add_Hidden_Field_(
                 left,
                 top,
                 static_cast<int16_t>(left + planet_diameter),
                 static_cast<int16_t>(top + planet_diameter),
-                SYS::s__00551100,
+                s__00551100,
                 0x29);
         }
 
@@ -1884,7 +1883,7 @@ namespace SYS {
                 ship_top,
                 ship_right,
                 ship_bottom,
-                SYS::s__00551100,
+                s__00551100,
                 0x29);
         }
 
@@ -1912,7 +1911,7 @@ namespace SYS {
                 gate_icon_y,
                 static_cast<int16_t>(gate_icon_x + 0x0F),
                 static_cast<int16_t>(gate_icon_y + 0x0F),
-                SYS::s__00551100,
+                s__00551100,
                 0);
         }
 
@@ -1923,7 +1922,7 @@ namespace SYS {
                 gate_icon_y,
                 static_cast<int16_t>(gate_icon_x + 0x0F),
                 static_cast<int16_t>(gate_icon_y + 0x0F),
-                SYS::s__00551100,
+                s__00551100,
                 0);
         }
 
@@ -1933,7 +1932,7 @@ namespace SYS {
                 static_cast<int16_t>(base_y + popup_offset_y),
                 static_cast<int16_t>(base_x + popup_offset_x + 0x13E),
                 static_cast<int16_t>(base_y + popup_offset_y + 0xB4),
-                SYS::s__00551100,
+                s__00551100,
                 0);
             return;
         }
@@ -1954,7 +1953,7 @@ namespace SYS {
             static_cast<int16_t>(base_y + popup_offset_y),
             static_cast<int16_t>(base_x + popup_offset_x + MOX::_moveable_box[0].width),
             static_cast<int16_t>(base_y + popup_offset_y + MOX::_moveable_box[0].height),
-            SYS::s__00551100,
+            s__00551100,
             0);
     }
 

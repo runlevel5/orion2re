@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace HOMEGEN {
+    const char s_Found_no_satellites_after_3_MIN_e_0055adc8[54] = "Found no satellites after 3_MIN enforcement: Star: %d";
+    const char s_Orion[8] = "Orion";
+
     int32_t _HOME_WORLD_GEN_MAX_CTR;
     s_good_star* _good_stars;
     int16_t _nearest_food_worlds[8];

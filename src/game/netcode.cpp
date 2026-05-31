@@ -38,8 +38,8 @@ namespace netcode {
         }
 
         if (mode == 3) {
-            result = 1;
-            ten::Init_TEN_(mode, &guid, recv_fn_ptr, network);
+            _connection_type = -1;
+            return 0;
         }
 
         return result;

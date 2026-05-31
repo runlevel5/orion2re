@@ -21,7 +21,7 @@ namespace platform {
 	extern uint8_t g_should_exit;
 
 	// Fixed string literal "/ten=" used for pattern matching.
-	inline char* const s_slash_ten = reinterpret_cast<char*>(std::uintptr_t{ 0x0055b1c4 });
+	extern const char s_slash_ten[6];
 
 	extern LPDIRECTDRAW g_direct_draw;
 
@@ -47,8 +47,6 @@ namespace platform {
 
 	extern uint32_t DAT_00578e20;
 
-	extern uint16_t DAT_0057931c;
-
 	extern uint8_t _need_quit;
 
 	extern uint32_t g_frame_count;
@@ -56,12 +54,6 @@ namespace platform {
 	extern int8_t g_render_buffer;
 
 	extern DDSURFACEDESC DDSURFACEDESC_00578e70;
-
-	inline LONG& _surface_lock_flag =
-		platform::DDSURFACEDESC_00578e70.lPitch;
-
-	inline LPVOID& _current_locked_page =
-		platform::DDSURFACEDESC_00578e70.lpSurface;
 
 	extern uint8_t* _offscreen_surface;
 

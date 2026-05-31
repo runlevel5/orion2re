@@ -633,6 +633,290 @@ namespace MOX {
     int16_t _missile_hit_radius[6] = {12, 20, 26, 28, 30, 30};
     s_net_combat_message _new_message;
 
+    int16_t _gate_icon_field[4];
+    int16_t _system_display_base_x;
+    int16_t _system_display_base_y;
+    s_sys_disp* _sys_disp;
+    s_system_display_ships _system_display_ships[15];
+    int16_t _system_display_grid_y[6];
+    int16_t _system_display_grid_x[6];
+    int16_t _system_display_grid_field;
+    char* _race_names[20];
+    int8_t _class_to_num_satellites[10][6] = {
+        {0, 0, 1, 2, 0, 0},
+        {1, 1, 2, 2, 1, 0},
+        {1, 1, 2, 2, 1, 0},
+        {2, 1, 2, 3, 1, 0},
+        {3, 2, 3, 3, 2, 0},
+        {3, 2, 3, 4, 2, 0},
+        {4, 3, 4, 4, 2, 0},
+        {4, 3, 4, 5, 3, 1},
+        {5, 4, 5, 5, 3, 1},
+        {5, 4, 5, 5, 4, 1},
+    };
+    uint16_t _star_fields_dim[6];
+
+    s_ship_data* _ship;
+
+    int16_t _combat_defender_count;
+    int16_t _combat_attacker_count;
+    s_qship* _qcombat_data;
+    int16_t _combat_total_ship_count;
+    uint8_t _combat_done_waiting;
+    s_colors _combat_green = {{0x81, 0x89, 0x89, 0x89, 0x89, 0x89, 0x89, 0x89}};
+    int16_t _combat_attacker_player;
+    int16_t _combat_turn;
+    uint8_t _colony_defense_flags;
+    int16_t _cmbt_colony_id;
+    int16_t _combat_defender_player;
+    s_combat_bomb_result _combat_bomb_result;
+
+    s_global_combat_data _global_combat_data;
+
+    int16_t* _officers_original_star_id;
+
+    int16_t* _officers_original_ship_id;
+
+    void* _dimmed_all_button_seg;
+    void* _dimmed_relocate_button_seg;
+    void* _dimmed_scrap_button_seg;
+    void* _dimmed_officers_button_seg;
+
+    s_leader_data* _leaders;
+
+    char* _officer_level_names[6];
+
+    char* _star_officer_level_names[6];
+
+    s_skill_data _skill_data[54] = {
+        {0, 0x1, 0, 20, 1, 2, nullptr, const_cast<char*>(s__d___0055612c)},
+        {1, 0x2, 0, 30, 1, 4, nullptr, const_cast<char*>(s__d___0055612c)},
+        {2, 0x4, 0, 20, 1, 0, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {3, 0x8, 0, 30, 1, 0, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {4, 0x10, 0, 100, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_short_00558cfc)},
+        {5, 0x20, 0, 150, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_short_00558cfc)},
+        {6, 0x1, 1, 20, 1, 3, nullptr, const_cast<char*>(s__d___0055612c)},
+        {7, 0x2, 1, 30, 1, 6, nullptr, const_cast<char*>(s__d___0055612c)},
+        {8, 0x1, 2, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_minus_d_percent_00558cf4)},
+        {9, 0x2, 2, 150, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_minus_d_percent_00558cf4)},
+        {10, 0x40, 0, 600, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_minus_d_bc_00558cec)},
+        {11, 0x80, 0, 900, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_minus_d_bc_00558cec)},
+        {12, 0x4, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {13, 0x8, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {14, 0x4, 1, 50, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {15, 0x8, 1, 75, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {16, 0x10, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {17, 0x20, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {18, 0x10, 1, 50, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {19, 0x20, 1, 75, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {20, 0x40, 1, 50, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {21, 0x80, 1, 75, 1, 8, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {22, 0x40, 2, 10, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {23, 0x80, 2, 15, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {24, 0x100, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {25, 0x200, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {26, 0x400, 2, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {27, 0x800, 2, 150, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {28, 0x100, 0, 100, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_10bc_00558cdc)},
+        {29, 0x200, 0, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_15bc_00558cd4)},
+        {30, 0x100, 1, 10, 2, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {31, 0x200, 1, 15, 2, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {32, 0x400, 0, 20, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {33, 0x800, 0, 30, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {34, 0x400, 1, 50, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {35, 0x800, 1, 75, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {36, 0x1000, 0, 50, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {37, 0x2000, 0, 75, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {38, 0x1000, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {39, 0x2000, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {40, 0x1000, 1, 20, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {41, 0x2000, 1, 30, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {42, 0x4000, 2, 50, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {43, 0x8000, 2, 75, 1, 8, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {44, 0x4000, 0, 20, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {45, 0x8000, 0, 30, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {46, 0x10000, 2, 20, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {47, 0x20000, 2, 30, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {48, 0x10000, 0, 20, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {49, 0x20000, 0, 30, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {50, 0x40000, 0, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {51, 0x80000, 0, 150, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
+        {52, 0x4000, 1, 50, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {53, 0x8000, 1, 75, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+    };
+
+    s_colony* _colony;
+
+    s_animation_header* _darkened_turn_button_seg;
+
+    s_animation_header* _fleet_box_selection_seg;
+    int16_t _ship_frame;
+    s_animation_header* _mainscrn_plyr_done_lights_seg;
+    uint16_t _skip_fields;
+
+    uint8_t _ship_icon_width[4];
+    uint8_t _ship_icon_height[4];
+
+    s_star_data* _star;
+
+    uint8_t _orbit_to_satellite_type[10][5] = {
+        {1, 1, 1, 1, 1},
+        {4, 1, 1, 1, 2},
+        {3, 2, 1, 2, 2},
+        {3, 3, 2, 2, 2},
+        {3, 3, 2, 2, 2},
+        {3, 3, 3, 3, 2},
+        {3, 3, 3, 3, 3},
+        {3, 3, 3, 3, 3},
+        {3, 3, 3, 3, 3},
+        {3, 3, 3, 3, 3},
+    };
+
+    s_ship_node _ship_node[500];
+
+    int16_t _ship_stack_count;
+
+    int16_t _ship_stack_start[500];
+
+    uint8_t _fleet_box_ship_ids[63];
+
+    int8_t _special_bonus[9][3] = {
+        {-50, 50, 100},
+        {-1, 2, 4},
+        {-1, 1, 2},
+        {-1, 1, 2},
+        {-1, 1, 2},
+        {-20, 25, 50},
+        {-20, 20, 50},
+        {-10, 10, 20},
+        {-10, 10, 20},
+    };
+    void* _other_ships_screen_seg;
+    void* _fleet_box_grid_sm_seg4;
+    int16_t _icon_overlay_y;
+    int16_t _ship_icon_count;
+    int16_t _icon_overlay_x;
+    int16_t _fleet_box_ship_stack;
+    s_ship_icon _ship_icon[572];
+    int8_t _black_hole_anim_count[10];
+    int16_t _bill_savegame[6] = {2, 0, 0, 0, 0, 0};
+    uint16_t _antaran_resource_level;
+    s_crew_data _crew_data[5] = {
+        {0, 0, 0, 0},
+        {50, 15, 15, 5},
+        {150, 30, 30, 10},
+        {500, 50, 50, 15},
+        {1000, 75, 75, 20},
+    };
+    uint16_t _chance_for_antaran_invasion;
+    uint16_t _disallow_saves_code;
+    int16_t _max_map_scale;
+    int16_t _MAP_MAX_X;
+    int16_t _MAP_MAX_Y;
+    uint8_t _g_galaxy_size;
+    void* _nebula_screen_seg;
+    s_animation_header* _nebula_pict_seg[12][4];
+    uint8_t _planet_max_farms[5] = {2, 4, 5, 7, 10};
+    int8_t _planet_max_population[5] = {5, 10, 15, 20, 25};
+    uint8_t _planet_size_table[5] = {1, 3, 7, 9, 10};
+    s_class_group _class_to_group[6] = {
+        {{0, 0, 0, 0, 1}},
+        {{0, 0, 1, 2, 3}},
+        {{0, 1, 2, 2, 3}},
+        {{1, 2, 2, 2, 3}},
+        {{1, 2, 3, 3, 3}},
+        {{0, 0, 1, 2, 3}},
+    };
+    uint8_t _climate_roll_table[10][4] = {
+        {15, 15, 10, 20},
+        {55, 50, 15, 0},
+        {25, 25, 10, 70},
+        {5, 10, 10, 0},
+        {0, 5, 10, 8},
+        {0, 0, 10, 2},
+        {0, 0, 11, 0},
+        {0, 0, 11, 0},
+        {0, 0, 11, 0},
+        {0, 0, 2, 0},
+    };
+    uint8_t _normal_gal_climate_roll_table[10][4] = {
+        {15, 15, 10, 20},
+        {55, 50, 15, 0},
+        {25, 25, 10, 70},
+        {5, 10, 10, 0},
+        {0, 5, 10, 8},
+        {0, 0, 10, 2},
+        {0, 0, 11, 0},
+        {0, 0, 11, 0},
+        {0, 0, 11, 0},
+        {0, 0, 2, 0},
+    };
+    uint8_t _old_gal_climate_roll_table[10][4] = {
+        {15, 5, 5, 20},
+        {40, 30, 8, 0},
+        {20, 20, 8, 50},
+        {25, 25, 13, 0},
+        {0, 20, 13, 30},
+        {0, 0, 13, 0},
+        {0, 0, 13, 0},
+        {0, 0, 13, 0},
+        {10, 0, 0, 0},
+        {4, 0, 0, 0},
+    };
+    s_movable_box _moveable_box[5];
+    uint8_t _fleet_movement_icons_on;
+    int16_t _fleet_icon_buttons_added;
+    int16_t _fleet_box_outpost_button;
+    int16_t _fleet_box_attack_button;
+    int16_t _fleet_box_scroll_dn_button;
+    int16_t _fleet_box_transport_button;
+    int16_t _fleet_box_engage_button;
+    int16_t _fleet_box_scroll_up_button;
+    s_animation_header* _fleet_box_name_lg_seg;
+    s_animation_header* _fleet_box_name_sm_seg;
+    s_animation_header* _fleet_box_bottom_lg_seg;
+    s_animation_header* _fleet_box_close_lg_button_seg;
+    s_animation_header* _fleet_box_close_sm_button_seg;
+    s_animation_header* _fleet_box_engage_lg_button_seg;
+    s_animation_header* _fleet_box_engage_sm_button_seg;
+    s_animation_header* _fleet_box_colonize_lg_button_seg;
+    s_animation_header* _fleet_box_colonize_sm_button_seg;
+    s_animation_header* _fleet_box_transport_lg_button_seg;
+    s_animation_header* _fleet_box_transport_sm_button_seg;
+    s_animation_header* _fleet_box_outpost_lg_button_seg;
+    s_animation_header* _fleet_box_outpost_sm_button_seg;
+    s_animation_header* _fleet_box_att_xenons_lg_button_seg;
+    s_animation_header* _fleet_box_att_xenons_sm_button_seg;
+    s_animation_header* _fleet_box_bottom_sm_seg;
+    s_animation_header* _fleet_box_grid_lg_seg;
+    int16_t _fleet_movement_box_ptr[9];
+    s_fleet_box _fleet_box;
+    s_animation_header* _fleet_box_scroll_dn_button_seg;
+    int16_t _fleet_movement_bar_field;
+    s_animation_header* _fleet_box_scroll_up_button_seg;
+    s_animation_header* _fleet_box_all_button_seg;
+    int8_t _mouse_button_pressed;
+    s_save_game_description _save_game_description[10];
+    int16_t _popup_base_x;
+    int16_t _popup_base_y;
+    int16_t _screen_data;
+    int16_t _screen_mouse_list_type;
+    int16_t _temp_star_handle;
+    s_animation_header* _gate_icon_seg[16];
+    int16_t DAT_0059bd1e;
+    int16_t _moveable_box_order[5];
+    int16_t _box_off_flag[5];
+    s_saved_box _saved_boxes[5];
+    uint8_t _fleet_box_scroll_first_ship;
+    int16_t _galaxy_map_grid_field;
+    int16_t _galaxy_map_height;
+    int16_t _galaxy_map_grid_y;
+    int16_t _galaxy_map_width;
+    int16_t _galaxy_map_grid_x;
+    int16_t _galaxy_map_star_field[72];
+    s_animation_header* _fltscrn_flashing_ship_pict_seg[8];
+    s_animation_header* _fltscrn_flashing_monster_ship_icon[7];
+
     s_mouse_list _mouse_list_zoom_mode[5] = {
         {6, 0, 22, 22, 526, 420},
         {1, 0, 0, 0, 639, 21},

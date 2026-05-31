@@ -78,9 +78,6 @@ namespace EVENTS {
 
     extern char _event_message[300];
 
-    inline int8_t* s__00557509 =
-        reinterpret_cast<int8_t*>(std::uintptr_t{0x00557509});
-
     extern const char s__00551100[];
 
     int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx);
@@ -114,8 +111,6 @@ namespace EVENTS {
     void __cdecl Event_Fade_In_();
 
     void __cdecl Draw_Event_Screen_();
-
-    inline char* s_ian_00550000 = reinterpret_cast<char*>(std::uintptr_t{0x00550000}); // "german-austrian"
     extern const char s_s_005510f4[];
     extern const char s_0_0055110c[];
     extern const char s_jimtext2_lbx_00552340[];

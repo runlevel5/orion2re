@@ -1,6 +1,19 @@
 #include "pch.h"
 
 namespace MAINMENU {
+    const char s_MAINMENU_LBX_0055a630[13] = "MAINMENU.LBX";
+    const char s_C_00552420[2] = "C";
+    const char s_S_005569CC[2] = "S";
+    const char s_L_005560E8[2] = "L";
+    const char s_M_00557ED8[2] = "M";
+    const char s_H_005569D4[2] = "H";
+    const char s_Q_005598F0[2] = "Q";
+    const char s_empty_00551120[2] = "\x1b";
+    const char s_N_0055765C[2] = "N";
+    const char s_save_question_gam[10] = "save?.gam";
+    const char s_save_percent_d_gam[11] = "save%d.gam";
+    const char s_Version_1_31_0055a658[13] = "Version 1.31";
+
     s_main_menu* _mainmenu;
     s_animation_header* _main_menu_background;
     s_animation_header* _mainmenu_first_seg;
@@ -128,7 +141,7 @@ namespace MAINMENU {
         }
 
         if (MOX::_disallow_saves_code == 0 && dos::DIR_(s_save_question_gam, find_data) == 1) {
-            _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = fields::Add_Hidden_Field_(0x19F, 0xC3, 0x237, 0xD7, s_L_005560e8, 0x29);
+            _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = fields::Add_Hidden_Field_(0x19F, 0xC3, 0x237, 0xD7, s_L_005560E8, 0x29);
         } else {
             _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = -1000; // -1000
         }
@@ -136,7 +149,7 @@ namespace MAINMENU {
         _mainmenu->fields[MAIN_MENU_BTN_NEW].field = fields::Add_Hidden_Field_(0x19F, 0xD9, 0x237, 0xEE, s_N_0055765C, 0x29);
         _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field = fields::Add_Hidden_Field_(0x19F, 0xF0, 0x237, 0x104, s_M_00557ED8, 0x29);
         _mainmenu->fields[MAIN_MENU_BTN_HELP].field = fields::Add_Hidden_Field_(0x19F, 0x106, 0x237, 0x11B, s_H_005569D4, 0x29);
-        _mainmenu->fields[MAIN_MENU_BTN_QUIT].field = fields::Add_Hidden_Field_(0x19F, 0x11D, 0x237, 0x132, s_Q_005598f0, 0x29);
+        _mainmenu->fields[MAIN_MENU_BTN_QUIT].field = fields::Add_Hidden_Field_(0x19F, 0x11D, 0x237, 0x132, s_Q_005598F0, 0x29);
     }
 
     void __cdecl Reload_Main_Menu_Screen_() {

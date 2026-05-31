@@ -11,6 +11,12 @@ namespace strings {
     const char s_A_00557ed4[2] = "A";
     const char s_M_00557ed8[2] = "M";
     const char s_fmt_plus_d_00557ed0[4] = "+%d";
+    const char s_fmt_plus_15bc_00558cd4[6] = "+15BC";
+    const char s_fmt_plus_10bc_00558cdc[6] = "+10BC";
+    const char s_fmt_plus_d_percent_00558ce4[6] = "+%d%%";
+    const char s_fmt_minus_d_bc_00558cec[6] = "-%dBC";
+    const char s_fmt_minus_d_percent_00558cf4[6] = "-%d%%";
+    const char s_fmt_plus_d_percent_short_00558cfc[5] = "+%d%";
     const char s_ld_00558280[4] = "%ld";
     const char s_0_0055110c[3] = "\x1A" "0";
     const char s_1_00551110[3] = "\x1A" "1";

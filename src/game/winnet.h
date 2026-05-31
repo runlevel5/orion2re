@@ -4,46 +4,41 @@
 
 namespace WINNET {
     void __cdecl Drop_Player_(uint32_t player_id);
-    inline int32_t& _provider_count =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560798});
+    extern int32_t _provider_count;
 
-    inline s_winnet_provider* (&_providers)[9] =
-        *reinterpret_cast<s_winnet_provider*(*)[9]>(std::uintptr_t{0x0058D770});
+    extern s_winnet_provider* _providers[9];
 
-    inline clock_t& _net_refresh_timer =
-        *reinterpret_cast<clock_t*>(std::uintptr_t{0x0055A99C});
+    extern clock_t _net_refresh_timer;
 
-    inline GUID& _game_guid = *reinterpret_cast<GUID*>(std::uintptr_t{0x0054F150});
+    extern GUID _game_guid;
 
-    inline uint32_t& _session_count = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055BF2C});
-    inline int8_t& _is_searching_games = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056079C});
-    inline DPSESSIONDESC* (&_sessions)[100] = *reinterpret_cast<DPSESSIONDESC*(*)[100]>(std::uintptr_t{0x005897F8});
-    inline GUID& _app_guid = *reinterpret_cast<GUID*>(std::uintptr_t{0x00589998});
+    extern uint32_t _session_count;
+    extern int8_t _is_searching_games;
+    extern DPSESSIONDESC* _sessions[100];
+    extern GUID _app_guid;
 
-    inline uint32_t& _player_count =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00589988});
+    extern uint32_t _player_count;
 
-    inline s_net_player** _player_list = reinterpret_cast<s_net_player**>(std::uintptr_t{0x005899A8});
+    extern s_net_player* _player_list[20];
 
-    inline DPID& _local_player_id = *reinterpret_cast<DPID*>(std::uintptr_t{0x005899F8});
+    extern DPID _local_player_id;
 
-    inline int32_t& _provider_mode =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0058998C});
+    extern int32_t _provider_mode;
 
-    inline char* s_Error_Unknown_0055bf7c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF7C}); // "Error Unknown"
-    inline char* s_Invalid_Object_0055bf8c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF8C}); // "Invalid Object"
-    inline char* s_Invalid_Player_0055bf9c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF9C}); // "Invalid Player"
-    inline char* DAT_0055bfac = reinterpret_cast<char*>(std::uintptr_t{0x0055BFAC});
-    inline char* s_Active_Players_0055bfb4 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFB4}); // "Active Players"
-    inline char* s_User_Cancel_0055bfc4 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFC4}); // "User Cancel"
-    inline char* s_Unsupported_0055bfd0 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFD0}); // "Unsupported"
-    inline char* s_Unavailable_0055bfdc = reinterpret_cast<char*>(std::uintptr_t{0x0055BFDC}); // "Unavailable"
-    inline char* s_Generic_0055bfe8 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFE8}); // "Generic"
-    inline char* s_Invalid_Params_0055bff0 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFF0}); // "Invalid Params"
-    inline char* s_Unknown_Err_00560a08 = reinterpret_cast<char*>(std::uintptr_t{0x00560A08}); // "Unknown Err"
-    inline char* s_Buffer_To_Small_00560a14 = reinterpret_cast<char*>(std::uintptr_t{0x00560A14}); // "Buffer To Small"
-    inline char* s_No_Messages_00560a24 = reinterpret_cast<char*>(std::uintptr_t{0x00560A24}); // "No Messages"
-    inline char* s_DirectPlay_ERR_00560a30 = reinterpret_cast<char*>(std::uintptr_t{0x00560A30}); // "DirectPlay ERR: "
+    extern char s_Error_Unknown_0055bf7c[16]; // "Error Unknown"
+    extern char s_Invalid_Object_0055bf8c[16]; // "Invalid Object"
+    extern char s_Invalid_Player_0055bf9c[16]; // "Invalid Player"
+    extern char DAT_0055bfac[8]; // "Busy"
+    extern char s_Active_Players_0055bfb4[16]; // "Active Players"
+    extern char s_User_Cancel_0055bfc4[12]; // "User Cancel"
+    extern char s_Unsupported_0055bfd0[12]; // "Unsupported"
+    extern char s_Unavailable_0055bfdc[12]; // "Unavailable"
+    extern char s_Generic_0055bfe8[8]; // "Generic"
+    extern char s_Invalid_Params_0055bff0[16]; // "Invalid Params"
+    extern char s_Unknown_Err_00560a08[12]; // "Unknown Err"
+    extern char s_Buffer_To_Small_00560a14[16]; // "Buffer To Small"
+    extern char s_No_Messages_00560a24[12]; // "No Messages"
+    extern char s_DirectPlay_ERR_00560a30[20]; // "DirectPlay ERR: "
     extern const char s_modem_005607dc[6];
     extern const char s_ipx_005607e4[4];
     extern const char s_tcp_005607e8[4];

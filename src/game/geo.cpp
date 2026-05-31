@@ -1,6 +1,17 @@
 #include "pch.h"
 
 namespace GEO {
+    int16_t* _dads;
+    int16_t _orbit_consts[7][2] = {
+        { 225, 118 },
+        { 464, 242 },
+        { 704, 372 },
+        { 949, 502 },
+        { 1199, 632 },
+        { 1423, 751 },
+        { 1650, 873 },
+    };
+
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance) {
         int16_t black_hole_indices[72];
         int16_t num_black_holes = Collect_Black_Holes_(black_hole_indices);
@@ -262,9 +273,8 @@ namespace GEO {
         int angle = (dividend / denominator) % 360;
         int16_t angle16 = (int16_t)angle;
 
-        // The binary reads radii from 0x54F00C/0x54F00E, which is the second pair in the
-        // table rooted at 0x54F008. Using orbit_idx + 1 preserves that overlapping address.
-        int cos_res = angle::Cos_(angle16, GEO::_orbit_radiuses[orbit_idx+1][0]);
+        // The binary reads radii from the second pair in the orbit constants table.
+        int cos_res = angle::Cos_(angle16, GEO::_orbit_consts[orbit_idx + 1][0]);
         int x_val = cos_res + 5;
         if (x_val >= 0) {
             x_val += 5; // Result: (cos + 10) / 10
@@ -274,7 +284,7 @@ namespace GEO {
         *out_x = x_val / 10;
 
         // Y coordinate calculation with rounding and inversion
-        int sin_res = angle::Sin_(angle16, GEO::_orbit_radiuses[orbit_idx+1][1]);
+        int sin_res = angle::Sin_(angle16, GEO::_orbit_consts[orbit_idx + 1][1]);
         int y_val = sin_res - 5;
         if (y_val >= 0) {
             y_val += 5; // Result: sin / 10
@@ -324,10 +334,10 @@ namespace GEO {
 
             for (int i = 0; i < 7; ++i) {
                 // Get_Angle_ arguments: (short[1]*x, short[0]*-y)
-                int16_t angle_val = angle::Get_Angle_(GEO::_orbit_radiuses[i][1] * x, GEO::_orbit_radiuses[i][0] * -y);
+                int16_t angle_val = angle::Get_Angle_(GEO::_orbit_consts[i][1] * x, GEO::_orbit_consts[i][0] * -y);
 
                 // Rounding for Cosine result
-                int cos_raw = angle::Cos_(angle_val, GEO::_orbit_radiuses[i][0]);
+                int cos_raw = angle::Cos_(angle_val, GEO::_orbit_consts[i][0]);
                 int scaled_cos;
                 if (cos_raw + 5 >= 0) {
                     scaled_cos = (cos_raw + 10) / 10;
@@ -336,7 +346,7 @@ namespace GEO {
                 }
 
                 // Rounding for Sine result
-                int sin_raw = angle::Sin_(angle_val, GEO::_orbit_radiuses[i][1]);
+                int sin_raw = angle::Sin_(angle_val, GEO::_orbit_consts[i][1]);
                 int scaled_sin;
                 if (sin_raw - 5 >= 0) {
                     scaled_sin = sin_raw / 10;

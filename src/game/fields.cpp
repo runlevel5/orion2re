@@ -3,6 +3,7 @@
 namespace fields {
     namespace {
         s_field g_fields_storage[250];
+        constexpr std::uintptr_t kInvalidStringMarker = static_cast<std::uintptr_t>(-1);
     }
 
     MOX2::action_func_t _update_function;
@@ -25,7 +26,7 @@ namespace fields {
     const char s_Maximum_number_of_button_fields_e_0055b0b0[46] = "Maximum number of button fields exceeded (%d)";
     const char s_Avail_Mem_0055b390[34] = "Avail Mem = %dk   Total Mem = %dk";
     char s__00551100[1] = "";
-    char* DAT_0055afc0 = reinterpret_cast<char*>(std::uintptr_t{0xFFFFFFFF});
+    char* DAT_0055afc0 = reinterpret_cast<char*>(kInvalidStringMarker);
     int32_t _max_fields_count = 250;
     uint8_t _exit_the_list_field;
     s_field* _fields = g_fields_storage;

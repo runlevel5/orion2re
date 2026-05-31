@@ -64,24 +64,6 @@ namespace sound {
 
     void __cdecl Copy_FourCC_(char* dest, const char* src);
 
-    inline MMRESULT __stdcall mmioGetInfo(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
-        using Fn = MMRESULT(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005AA5A8});
-        return fn(hmmio, lpmmioinfo, wFlags);
-    }
-
-    inline uint32_t __stdcall mmioAdvance(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
-        using Fn = uint32_t(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005AA5B4});
-        return fn(hmmio, lpmmioinfo, wFlags);
-    }
-
-    inline uint32_t __stdcall mmioSetInfo(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
-        using Fn = uint32_t(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005AA5B8});
-        return fn(hmmio, lpmmioinfo, wFlags);
-    }
-
     extern uint32_t _streamAvailable2;
 
     extern s_lbx_stream_header _musicLbxHandle;

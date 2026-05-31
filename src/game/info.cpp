@@ -1276,16 +1276,16 @@ namespace INFO {
                     int32_t val = 0;
 
                     if (use_pop != 0) {
-                        val += static_cast<uint8_t>(plr->population_history[hist_idx]) * MOX::_bill_savegame_2;
+                        val += static_cast<uint8_t>(plr->population_history[hist_idx]) * MOX::_bill_savegame[2];
                     }
                     if (use_tech != 0) {
-                        val += static_cast<uint8_t>(plr->tech_history[hist_idx]) * MOX::_bill_savegame_5;
+                        val += static_cast<uint8_t>(plr->tech_history[hist_idx]) * MOX::_bill_savegame[5];
                     }
                     if (use_fleet != 0) {
-                        val += static_cast<uint8_t>(plr->fleet_history[hist_idx]) * MOX::_bill_savegame_4;
+                        val += static_cast<uint8_t>(plr->fleet_history[hist_idx]) * MOX::_bill_savegame[4];
                     }
                     if (use_prod != 0) {
-                        val += static_cast<uint8_t>(plr->production_history[hist_idx]) * MOX::_bill_savegame_3;
+                        val += static_cast<uint8_t>(plr->production_history[hist_idx]) * MOX::_bill_savegame[3];
                     }
 
                     history_data[player_idx][t] = val;

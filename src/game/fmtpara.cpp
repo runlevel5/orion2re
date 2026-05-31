@@ -55,7 +55,8 @@ namespace FMTPARA {
         "tenth",
     };
     extern const char _ordinal_fmt[] = "%s\a^2.%s\a^0.";
-    uint8_t* _tabs_3_plus_1 = reinterpret_cast<uint8_t*>(&_tabs[3]) + 1;
+    const char _insert_item_kind[] = "11110101121212120000";
+    const char* _tabs_3_plus_1 = _insert_item_kind - 'A';
     uint32_t _user_fn_arg;
 
     /**
@@ -1786,7 +1787,7 @@ namespace FMTPARA {
 
                 if (_para_p->do_render) {
                     if (fonts::_font_header.font_style != 0) {
-                        uint8_t outline_byte = fonts::_outline_color;
+                        uint8_t outline_byte = (uint8_t)fonts::_outline_color;
 
                         for (int i = 0; i < 8; i++) {
                             fonts::_font_header.selected_colors.colors[i] = outline_byte;

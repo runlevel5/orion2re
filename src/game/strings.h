@@ -17,6 +17,12 @@ namespace strings {
     extern const char s_A_00557ed4[2];
     extern const char s_M_00557ed8[2];
     extern const char s_fmt_plus_d_00557ed0[4];
+    extern const char s_fmt_plus_15bc_00558cd4[6];
+    extern const char s_fmt_plus_10bc_00558cdc[6];
+    extern const char s_fmt_plus_d_percent_00558ce4[6];
+    extern const char s_fmt_minus_d_bc_00558cec[6];
+    extern const char s_fmt_minus_d_percent_00558cf4[6];
+    extern const char s_fmt_plus_d_percent_short_00558cfc[5];
     extern const char s_ld_00558280[4]; // "%ld"
     extern const char s_0_0055110c[3];
     extern const char s_1_00551110[3];

@@ -541,7 +541,7 @@ namespace sound {
         char tag_buffer[5];
         tag_buffer[4] = '\0';
 
-        mmioRead(_streamLbxHandle.file, stream, 0x30);
+        mmioRead(_streamLbxHandle.file, reinterpret_cast<HPSTR>(stream->riff_tag), 0x30);
         stream->data_start_offset = entry_offset + 0x2c;
 
         sound::Copy_FourCC_(tag_buffer, stream->riff_tag);
@@ -681,7 +681,7 @@ namespace sound {
 
     uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr) {
         MMIOINFO mmio_info;
-        MMRESULT res = sound::mmioGetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
+        MMRESULT res = mmioGetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
 
         uint32_t status = (res == 0) ? 0 : 1;
 
@@ -692,7 +692,7 @@ namespace sound {
             if (bytes_to_read != 0) {
                 while (total_copied < bytes_to_read) {
                     if (mmio_info.pchNext == mmio_info.pchEndRead) {
-                        status = sound::mmioAdvance(sound::_streamLbxHandle.file, &mmio_info, 0);
+                        status = mmioAdvance(sound::_streamLbxHandle.file, &mmio_info, 0);
                         if (status != 0) {
                             error_occurred = true;
                             break;
@@ -716,7 +716,7 @@ namespace sound {
             }
 
             if (!error_occurred) {
-                status = sound::mmioSetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
+                status = mmioSetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
                 if (status == 0) {
                     *bytes_read_ptr = bytes_to_read;
                     return 0;
