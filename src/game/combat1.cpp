@@ -4,7 +4,7 @@ namespace COMBAT1 {
 
     int32_t _end_of_turn_button;
 
-    int16_t _start_of_turn;
+    uint16_t _start_of_turn;
 
     void __cdecl Add_Tactical_Combat_Fields_(void) {
         short auto_combat_idx = 0;

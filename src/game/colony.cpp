@@ -140,10 +140,17 @@ namespace COLONY {
     s_colors _font_dim_color_array = {{244, 249, 248, 0, 0, 0, 0, 0}};
     s_colors _font_bright_color_array = {{244, 133, 132, 0, 0, 0, 0, 0}};
 
-    static s_colors _font_color_overlap_storage[10] = {
+    s_colors _red_font_color_array[3] = {
         {{236, 238, 237, 0, 0, 0, 0, 0}},
         {{236, 239, 238, 0, 0, 0, 0, 0}},
         {{236, 238, 237, 0, 0, 0, 0, 0}},
+    };
+
+    int16_t _galaxy_map_name_field;
+
+    int16_t _g_count;
+
+    s_colors _player_font_color_array[8] = {
         {{183, 187, 185, 0, 0, 0, 0, 0}},
         {{232, 234, 233, 0, 0, 0, 0, 0}},
         {{83, 102, 100, 0, 0, 0, 0, 0}},
@@ -152,16 +159,6 @@ namespace COLONY {
         {{240, 242, 241, 0, 0, 0, 0, 0}},
         {{154, 156, 155, 0, 0, 0, 0, 0}}
     };
-
-    s_colors (&_red_font_color_array)[3] =
-        *reinterpret_cast<s_colors(*)[3]>(&_font_color_overlap_storage[0]);
-
-    int16_t _galaxy_map_name_field;
-
-    int32_t _g_count;
-
-    s_colors (&_player_font_color_array)[8] =
-        *reinterpret_cast<s_colors(*)[8]>(&_font_color_overlap_storage[2]);
 
     void __cdecl Init_Colonies_() {
         return;

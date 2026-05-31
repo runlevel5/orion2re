@@ -12,7 +12,7 @@ namespace COMBAT1 {
 
     int16_t __cdecl Ship_Initiative_Value_(int16_t ship_idx);
 
-    extern int16_t _start_of_turn;
+    extern uint16_t _start_of_turn;
 
     int16_t __cdecl Next_Ship_(int16_t param_1);
 

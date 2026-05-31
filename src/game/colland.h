@@ -7,7 +7,7 @@ namespace COLLAND {
     extern int32_t _pod2d_sfx;
     extern int32_t _pod2l_sfx;
     extern int32_t _pod1d_sfx;
-    extern uint16_t _fields;
+    extern int16_t _fields;
 
     extern const char s_format_comma_space[];
 

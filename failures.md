@@ -1,18 +1,4 @@
 
----------------------------------------
-src/game/design.h
-
-Failures:
-- `_player_design_num`, old raw address `0x005A1B28`: missing from the current recovered `src/game/design.h`, and the old address is owned in Ghidra by `MOX::_temp_star_handle`, not a DESIGN variable. This is both a missing recovered variable and an alias/owner mismatch.
-- `_design_size_field`, old raw address `0x00565040`: namespace mismatch. Current header declares `DESIGN::_design_size_field`, but Ghidra’s primary owner at that address is `_DESIGN::_design_size_field`, not `DESIGN`.
-- `s_TECHDESC_LBX`, old raw address `0x0055619C`: wrong array length/initializer shape. Current header defines `const char s_TECHDESC_LBX[13] = "TECHDESC.LBX";` but Ghidra defines a string object of length 16 at that address, so the recovered object extent does not match the binary-owned storage span.
-- `s__00551120`, old raw address `0x00551120`: wrong initializer. Current definition uses `{ '\x1B', '\0' }`, but the old stub comment and Ghidra string/data at that address do not support a space string replacement in this header with confidence, and this address is part of shared immutable storage reused across modules. The current recovered local object cannot be accepted confidently as the correct restoration for this header-owned variable.
-- `s_B_005560e4`, old raw address `0x005560E4`: alias candidate. The same immutable storage is also recovered in other modules (`cmbtdrw1`, `strings`), so this header-local recovered variable is not a unique owning restoration for the old stub-backed storage.
-- `s_L_005560e8`, old raw address `0x005560E8`: alias candidate. Same issue as above; multiple project-side owners exist for the same binary storage.
-- `s__00551100`, old raw address `0x00551100`: alias candidate. The same binary string storage is recovered in multiple modules (`fields`, `science`, `strings`, `sys`, and here), so this header-local recovered variable is not a unique owning restoration for the old stub-backed storage.
-
-Outcome: fail
----------------------------------------
 src/game/dip_scrn.h
 
 Failures:

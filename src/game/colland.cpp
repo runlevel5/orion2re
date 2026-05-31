@@ -6,7 +6,7 @@ namespace COLLAND {
     int32_t _pod2d_sfx;
     int32_t _pod2l_sfx;
     int32_t _pod1d_sfx;
-    uint16_t _fields;
+    int16_t _fields;
     const char s_format_comma_space[] = "%s, %s";
 
     /**
@@ -88,7 +88,7 @@ namespace COLLAND {
 
         char* hotkey = ESTRINGS::E_Strings_(12);
 
-        _fields = (uint16_t)fields::Add_Hidden_Field_(
+        _fields = fields::Add_Hidden_Field_(
             0,
             0,
             639,

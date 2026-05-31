@@ -383,7 +383,7 @@ namespace COLONY {
     extern s_colors _font_color_array;
     extern s_colors _font_dim_color_array;
     extern s_colors _font_bright_color_array;
-    extern s_colors (&_red_font_color_array)[3];
+    extern s_colors _red_font_color_array[3];
 
     void __cdecl Set_Colony_Font_To_Blue_(int16_t style, int8_t is_bright);
 
@@ -395,7 +395,7 @@ namespace COLONY {
 
     void __cdecl Clear_Galaxy_Map_Fields_();
 
-    extern int32_t _g_count;
+    extern int16_t _g_count;
 
     void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index);
 
@@ -427,5 +427,5 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_To_Player_(uint8_t font_style, uint8_t player_idx);
 
-    extern s_colors (&_player_font_color_array)[8];
+    extern s_colors _player_font_color_array[8];
 }
