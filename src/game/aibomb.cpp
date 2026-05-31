@@ -2,7 +2,7 @@
 
 namespace aibomb {
 
-bool __cdecl AI_Invasion_Will_Succeed_(int8_t attacker_id, int16_t* ship_list, int n_ships, s_colony* colony) {
+bool __cdecl AI_Invasion_Will_Succeed_(int8_t attacker_id, int16_t* ship_list, int32_t n_ships, s_colony* colony) {
     s_invasion_side_info invader;
     s_invasion_side_info defender;
 
@@ -17,8 +17,8 @@ bool __cdecl AI_Invasion_Will_Succeed_(int8_t attacker_id, int16_t* ship_list, i
         s_invasion_side_info backup_invader = invader;
         s_invasion_side_info backup_defender = defender;
 
-        int remaining_tries = 10;
-        int invader_wins = 0;
+        int32_t remaining_tries = 10;
+        int32_t invader_wins = 0;
 
         do {
             if (invader_wins >= 7 || invader_wins + remaining_tries < 7) {
@@ -29,7 +29,7 @@ bool __cdecl AI_Invasion_Will_Succeed_(int8_t attacker_id, int16_t* ship_list, i
 
             invasion::Resolve_Ground_Combat_(&invader, &defender);
 
-            if (static_cast<uint8_t>(invader.current_troop_type_idx) < 4) {
+            if ((uint8_t)invader.current_troop_type_idx < 4) {
                 invader_wins++;
             }
 

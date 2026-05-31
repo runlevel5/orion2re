@@ -1,17 +1,12 @@
 # Source Cleanup Progress
 
 ## Current focus
-- none
+- src/game/aibuild.{h,cpp}
 
 ## In progress
-- none
+- [in_progress] src/game/aibuild.{h,cpp}
 
 ## Pending
-- [pending] src/game/_antarans.h
-- [pending] src/game/_global_combat_data.h
-- [pending] src/game/accss.h
-- [pending] src/game/advciv.{h,cpp}
-- [pending] src/game/aibomb.{h,cpp}
 - [pending] src/game/aibuild.{h,cpp}
 - [pending] src/game/aidata.{h,cpp}
 - [pending] src/game/aidesign.{h,cpp}
@@ -21,7 +16,6 @@
 - [pending] src/game/aipower.{h,cpp}
 - [pending] src/game/aistage.{h,cpp}
 - [pending] src/game/aitech.{h,cpp}
-- [pending] src/game/alloc.h
 - [pending] src/game/allocate.{h,cpp}
 - [pending] src/game/angle.{h,cpp}
 - [pending] src/game/animate.{h,cpp}
@@ -177,10 +171,6 @@
 - [pending] src/game/replace.{h,cpp}
 - [pending] src/game/report.{h,cpp}
 - [pending] src/game/russ.{h,cpp}
-- [pending] src/game/s_billtext.h
-- [pending] src/game/s_council.h
-- [pending] src/game/s_score.h
-- [pending] src/game/s_starname.h
 - [pending] src/game/science.{h,cpp}
 - [pending] src/game/score.{h,cpp}
 - [pending] src/game/scroll.{h,cpp}
@@ -207,7 +197,7 @@
 - [pending] src/game/tech.{h,cpp}
 - [pending] src/game/techdata.h
 - [pending] src/game/techinit.{h,cpp}
-- [pending] src/game/ten.h
+- [pending] src/game/ten.{h,cpp}
 - [pending] src/game/textbox.{h,cpp}
 - [pending] src/game/time.{h,cpp}
 - [pending] src/game/timer.{h,cpp}
@@ -219,7 +209,8 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
-- none
+- [reviewed] src/game/advciv.{h,cpp} - replaced remaining `static_cast` uses with C-style casts, converted several `short`/`int` locals to fixed-width integer types, removed redundant explanatory comments, and clarified a few local and parameter names.
+- [reviewed] src/game/aibomb.{h,cpp} - replace plain `int` counters and size parameters with `int32_t`, and replace the remaining `static_cast` with a C-style cast.
 
 ## Blocked
 - none

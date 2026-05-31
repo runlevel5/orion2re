@@ -93,8 +93,8 @@ namespace ADVCIV {
     bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx);
 
     /** Computes the colony-proximity bonus for a candidate planet.
-     * @param plr_idx Player index used for the distance scan.
+     * @param player_idx Player index used for the distance scan.
      * @param planet_idx Planet index whose star is being scored.
      */
-    int16_t __cdecl Proximity_Bonus_(int16_t plr_idx, int16_t planet_idx);
+    int16_t __cdecl Proximity_Bonus_(int16_t player_idx, int16_t planet_idx);
 }

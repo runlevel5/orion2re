@@ -8,13 +8,12 @@ namespace ADVCIV {
     s_adv_planet_worth* _planet_worth_to_player;
 
     bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
-        return static_cast<int16_t>(_star_colony_owner[star_idx]) == player_idx;
+        return (int16_t)_star_colony_owner[star_idx] == player_idx;
     }
 
     bool __cdecl Enemy_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
         int8_t owner = _star_colony_owner[star_idx];
 
-        // Checks if the star is owned (owner > -1) and if the owner is not the specified player
         if (owner > -1 && (int16_t)owner != player_idx) {
             return true;
         }
@@ -33,9 +32,9 @@ namespace ADVCIV {
     }
 
     int __cdecl qsort_planet_worth_(const void* a, const void* b) {
-        const auto* planet_1 = static_cast<const s_adv_civ_player_planet*>(a);
-        const auto* planet_2 = static_cast<const s_adv_civ_player_planet*>(b);
-        return planet_2->worth - planet_1->worth;
+        const auto* left_planet = (const s_adv_civ_player_planet*)a;
+        const auto* right_planet = (const s_adv_civ_player_planet*)b;
+        return right_planet->worth - left_planet->worth;
     }
 
     void __cdecl Get_Adv_Civ_Planet_Worthiness_(int16_t player_idx, int16_t planet_idx, int32_t* worth, int8_t* has_colony, int16_t* proximity_bonus) {
@@ -51,22 +50,17 @@ namespace ADVCIV {
         s_planet_data* planet = &MOX::_planet[planet_idx];
         s_player* player = &MOX::_player[player_idx];
 
-        // 1. Base worthiness calculation
         int32_t raw_worth = AIDATA::Uncolonized_Planet_Worth_To_Player_(planet, player);
         *worth = (int32_t)(raw_worth & 0xFFFF);
 
-        // 2. Proximity bonus scaling
         int16_t base_proximity = ADVCIV::Proximity_Bonus_(player_idx, planet_idx);
         *proximity_bonus = (int16_t)((int32_t)base_proximity * (*worth) / 100);
 
-        // 3. Penalty if player already has a colony at this star
         if (Player_Has_Colony_At_Star_(player_idx, (int16_t)planet->star_index)) {
-            // Worth reduced to 67%
             *worth = (*worth * 67) / 100;
             *has_colony = 1;
         }
 
-        // 4. Combine base worth with proximity bonus
         *worth += (int32_t)(*proximity_bonus);
     }
 
@@ -176,8 +170,8 @@ namespace ADVCIV {
     }
 
     /**
-     * Determines the next suitable planet index for an advanced civilization AI player to expand to.
-     * Evaluates planets based on proximity to home world and existence of enemy colonies.
+     * Returns the next available candidate planet for an advanced-civilization player.
+     * Skips planets that exceed the expansion distance limit or share a star with an enemy colony.
      */
     int16_t __cdecl Get_Next_Adv_Civ_Planet_(int16_t player_idx, int8_t* availability_map) {
         s_adv_civ_player& adv_player = _adv_civ_player[player_idx];
@@ -189,22 +183,20 @@ namespace ADVCIV {
         if (adv_player.settled_planet_count < expansion_cutoff) {
             int16_t total_planet_count = adv_player.candidate_planet_count;
 
-            // Calculate maximum allowed expansion distance based on furthest current reach
-            int32_t dist_calc = (static_cast<int32_t>(adv_player.furthest_star_dist_from_home) * 4) / 10;
-            int32_t galaxy_limit = static_cast<int32_t>(MOX::_settings.galaxy_size) + 9;
-            int16_t max_dist = static_cast<int16_t>((dist_calc > galaxy_limit) ? dist_calc : galaxy_limit);
+            int32_t dist_calc = ((int32_t)adv_player.furthest_star_dist_from_home * 4) / 10;
+            int32_t galaxy_limit = (int32_t)MOX::_settings.galaxy_size + 9;
+            int16_t max_dist = (int16_t)((dist_calc > galaxy_limit) ? dist_calc : galaxy_limit);
 
             for (int16_t i = 0; i < total_planet_count; ++i) {
                 int16_t p_idx = adv_player.planets[i].planet_idx;
 
-                // Check if planet is valid and not already assigned/claimed (availability_map entry -1)
                 if (p_idx > -1 && availability_map[p_idx] == -1) {
                     int16_t star_idx = (int16_t)MOX::_planet[p_idx].star_index;
-                    int16_t distance = static_cast<int16_t>(_parsec[home_star_idx].dist[star_idx]);
+                    int16_t distance = (int16_t)_parsec[home_star_idx].dist[star_idx];
 
                     if (!Enemy_Has_Colony_At_Star_(player_idx, star_idx)) {
                         if (distance <= max_dist) {
-                            return i; // Return the local index in the AI's planet list
+                            return i;
                         }
                     }
                 }
@@ -215,12 +207,12 @@ namespace ADVCIV {
     }
 
     int16_t Num_Adv_Civ_Planets_() {
-        int32_t stars_half = static_cast<int32_t>(MOX::_NUM_STARS) / 2;
-        int32_t scaled_stars = static_cast<int16_t>(stars_half) * 10;
-        int32_t players = static_cast<int32_t>(MOX::_NUM_PLAYERS);
+        int32_t stars_half = (int32_t)MOX::_NUM_STARS / 2;
+        int32_t scaled_stars = (int16_t)stars_half * 10;
+        int32_t players = (int32_t)MOX::_NUM_PLAYERS;
 
         int32_t result_val = (scaled_stars / players) + 9;
-        return static_cast<int16_t>(result_val / 10) - 1;
+        return (int16_t)(result_val / 10) - 1;
     }
 
     void __cdecl Build_Parsec_Star_Distances_(s_parsec* parsec_distances) {
@@ -240,58 +232,58 @@ namespace ADVCIV {
     }
 
     void __cdecl Choose_Adv_Civ_Planets_() {
-        short cutoff = Num_Adv_Civ_Planets_();
-        short active_players_count = (short)MOX::_NUM_PLAYERS;
+        int16_t target_planet_count = Num_Adv_Civ_Planets_();
+        int16_t active_players_count = (int16_t)MOX::_NUM_PLAYERS;
 
-        short player_status[16];
+        int16_t player_round_state[16];
 
-        for (int i = 0; i < 8; ++i) {
-            player_status[i] = -1;
+        for (int16_t i = 0; i < 8; ++i) {
+            player_round_state[i] = -1;
         }
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-            player_status[i] = (short)i;
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            player_round_state[i] = i;
         }
 
         while (active_players_count > 0) {
-            for (int i = 8; i < 16; ++i) {
-                player_status[i] = -1;
+            for (int16_t i = 8; i < 16; ++i) {
+                player_round_state[i] = -1;
             }
 
             Build_Adv_Civ_Star_List_();
-            HAROLD::Randomize_List_(player_status, 8, 0);
+            HAROLD::Randomize_List_(player_round_state, 8, 0);
 
-            for (int i = 0; i < 8; ++i) {
-                short plr_idx = player_status[i];
-                if (plr_idx == -1) continue;
+            for (int16_t i = 0; i < 8; ++i) {
+                int16_t player_idx = player_round_state[i];
+                if (player_idx == -1) continue;
 
-                short cand_idx = Get_Next_Adv_Civ_Planet_(plr_idx, _planet_selected_flag);
-                if (cand_idx == -1) {
+                int16_t candidate_planet_idx = Get_Next_Adv_Civ_Planet_(player_idx, _planet_selected_flag);
+                if (candidate_planet_idx == -1) {
                     active_players_count--;
-                    player_status[plr_idx] = -1;
+                    player_round_state[player_idx] = -1;
                 } else {
-                    short global_p_idx = _adv_civ_player[plr_idx].planets[cand_idx].planet_idx;
-                    int8_t star_idx = MOX::_planet[global_p_idx].star_index;
-                    player_status[plr_idx + 8] = cand_idx;
-                    _planet_selected_flag[global_p_idx] = (int8_t)plr_idx;
-                    _star_colony_owner[star_idx] = (int8_t)plr_idx;
+                    int16_t global_planet_idx = _adv_civ_player[player_idx].planets[candidate_planet_idx].planet_idx;
+                    int8_t star_idx = MOX::_planet[global_planet_idx].star_index;
+                    player_round_state[player_idx + 8] = candidate_planet_idx;
+                    _planet_selected_flag[global_planet_idx] = (int8_t)player_idx;
+                    _star_colony_owner[star_idx] = (int8_t)player_idx;
                 }
             }
 
-            short round_pick_count = 0;
-            for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-                if (player_status[i + 8] != -1) {
+            int16_t round_pick_count = 0;
+            for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+                if (player_round_state[i + 8] != -1) {
                     round_pick_count++;
                 }
             }
 
-            if (round_pick_count == (short)MOX::_NUM_PLAYERS) {
-                for (short p = 0; p < (short)MOX::_NUM_PLAYERS; ++p) {
-                    short cand_idx = player_status[p + 8];
-                    if (cand_idx == -1) continue;
+            if (round_pick_count == (int16_t)MOX::_NUM_PLAYERS) {
+                for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
+                    int16_t candidate_planet_idx = player_round_state[p + 8];
+                    if (candidate_planet_idx == -1) continue;
 
                     s_adv_civ_player& plr = _adv_civ_player[p];
-                    s_adv_civ_player_planet& cand_planet = plr.planets[cand_idx];
-                    short global_p_idx = cand_planet.planet_idx;
+                    s_adv_civ_player_planet& cand_planet = plr.planets[candidate_planet_idx];
+                    int16_t global_planet_idx = cand_planet.planet_idx;
 
                     s_adv_planet_worth& worth_rec = _planet_worth_to_player[p];
                     if (worth_rec.num_planets < 0) {
@@ -300,7 +292,7 @@ namespace ADVCIV {
 
                     int8_t w_idx = worth_rec.num_planets;
                     s_adv_planet_worth_s1* planets_ptr = (s_adv_planet_worth_s1*)worth_rec.planets;
-                    planets_ptr[w_idx].planet_idx = global_p_idx;
+                    planets_ptr[w_idx].planet_idx = global_planet_idx;
                     planets_ptr[w_idx].worth = cand_planet.worth;
 
                     worth_rec.num_planets++;
@@ -313,20 +305,20 @@ namespace ADVCIV {
                     cand_planet.worth = -32766;
 
                     if (plr.candidate_planet_count > 1) {
-                        plr.planets[cand_idx] = plr.planets[plr.candidate_planet_count - 1];
+                        plr.planets[candidate_planet_idx] = plr.planets[plr.candidate_planet_count - 1];
                     }
                     plr.candidate_planet_count--;
 
-                    if (plr.settled_planet_count >= cutoff) {
-                        player_status[p] = -1;
+                    if (plr.settled_planet_count >= target_planet_count) {
+                        player_round_state[p] = -1;
                         active_players_count--;
                     }
                 }
             } else {
-                for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-                    short cand_idx = player_status[i + 8];
-                    if (cand_idx >= 0 && cand_idx < 360) {
-                        _planet_selected_flag[cand_idx] = -1;
+                for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+                    int16_t candidate_planet_idx = player_round_state[i + 8];
+                    if (candidate_planet_idx >= 0 && candidate_planet_idx < 360) {
+                        _planet_selected_flag[candidate_planet_idx] = -1;
                     }
                 }
                 active_players_count = 0;
@@ -356,7 +348,7 @@ namespace ADVCIV {
         }
 
         return (total_worth * 10) /
-               static_cast<int32_t>(ADVCIV::_adv_civ_player[player_idx].settled_planet_count);
+               (int32_t)ADVCIV::_adv_civ_player[player_idx].settled_planet_count;
     }
 
     void __cdecl Advanced_Civilization_Colonies_() {
@@ -380,18 +372,15 @@ namespace ADVCIV {
             int16_t hw_idx = MOX::_player[p_idx].home_planet_id;
             int16_t star_idx = (int16_t)MOX::_planet[hw_idx].star_index;
 
-            // Initialize all planets for this player to -1 index
-            for (int i = 0; i < 360; ++i) {
+            for (int16_t i = 0; i < 360; ++i) {
                 _adv_civ_player[p_idx].planets[i].planet_idx = -1;
             }
 
-            // Initialize all stars for this player
-            for (int i = 0; i < 72; ++i) {
+            for (int16_t i = 0; i < 72; ++i) {
                 _adv_civ_player[p_idx].stars[i].star_idx = -1;
                 _adv_civ_player[p_idx].stars[i].min_dist_to_colony = 9999;
             }
 
-            // Setup homeworld star and colony
             _adv_civ_player[p_idx].stars[star_idx].star_idx = star_idx;
             _star_colony_owner[star_idx] = (int8_t)p_idx;
 
@@ -416,26 +405,23 @@ namespace ADVCIV {
     }
 
     /**
-     * Balances planet qualities for advanced civilizations during galaxy generation.
-     * Compares all players' start worthiness and improves under-performing players' planets
-     * until they are within 90% of the best player's starting quality.
+     * Balances weaker advanced-civilization starts against the strongest one.
+     * Improves selected planets until each player reaches at least 90% of the best average worth.
      */
     void __cdecl Twiddle_Selected_Adv_Civ_Planets_() {
         MAPGEN::_MAPGEN_TRACE = 0;
         int16_t player_special_count[8] = { 0 };
-        int max_worthiness = 0;
+        int32_t max_worthiness = 0;
         int16_t best_player_idx = 0;
 
-        // Step 1: Identify the player with the highest average planet worthiness
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-            int current_worth = Get_Players_Planet_Worthiness_Average_(i);
+            int32_t current_worth = Get_Players_Planet_Worthiness_Average_(i);
             if (current_worth > max_worthiness) {
                 max_worthiness = current_worth;
                 best_player_idx = i;
             }
         }
 
-        // Step 2: Count the "special" planets (Gems, Gold, Artifacts) for each player
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             for (int16_t j = 0; j < (int16_t)MOX::_planet_count; ++j) {
                 if (_planet_selected_flag[j] == i) {
@@ -447,7 +433,6 @@ namespace ADVCIV {
             }
         }
 
-        // Step 3: Improve planets for any player performing worse than the leader
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (i == best_player_idx) continue;
 
@@ -457,23 +442,21 @@ namespace ADVCIV {
                     int8_t generated_special = 0;
                     uint8_t targets[3];
                     targets[0] = (uint8_t)(4 - MOX::_planet[j].size);
-                    int climate_diff = 8 - MOX::_planet[j].climate;
+                    int32_t climate_diff = 8 - MOX::_planet[j].climate;
                     targets[1] = (climate_diff < 0) ? 0 : (uint8_t)climate_diff;
                     targets[2] = (uint8_t)(4 - MOX::_planet[j].mineral_class);
 
-                    // If player has fewer special systems than the leader, attempt to generate one
                     if (player_special_count[i] < player_special_count[best_player_idx] &&
                         MOX::_planet[j].planet_special == 0 &&
                         MOX::_star[MOX::_planet[j].star_index].system_special == 0)
                     {
-                        // Skip special generation for Ancient Home World home planets (trait 16)
                         if (!(MOX::_player[i].home_planet_id == j && MOX::_player[i].traits[TRAIT_ANCIENT_HOME_WORLD] != 0)) {
-                            int attempts = 0;
+                            int16_t attempts = 0;
                             do {
-                                int16_t dummy_buf;
-                                MAPGEN::Get_A_Planet_Or_Star_Special_(MOX::_planet[j].star_index, &dummy_buf, &generated_special, 0, 0);
+                                int16_t unused_special_slot;
+                                MAPGEN::Get_A_Planet_Or_Star_Special_(MOX::_planet[j].star_index, &unused_special_slot, &generated_special, 0, 0);
                                 if (generated_special == SYSTEM_SPECIAL_GEM_DEPOSITS || generated_special == SYSTEM_SPECIAL_GOLD_DEPOSITS || generated_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
-                                    attempts = 100; // Success
+                                    attempts = 100;
                                 } else {
                                     generated_special = 0;
                                 }
@@ -492,14 +475,10 @@ namespace ADVCIV {
                         }
                     }
 
-                    // The original control flow skips the twiddle loop after a
-                    // successful special-generation path.
                     if (generated_special == 0) {
-                        // Perform iterative quality improvements (max 6 iterations per planet)
-                        for (int k = 0; k < 6 && !player_satisfied; ++k) {
+                        for (int16_t k = 0; k < 6 && !player_satisfied; ++k) {
                             int8_t twiddle_result = Twiddle_Planet_(j, targets);
                             if (twiddle_result != 0) {
-                                // If Twiddle_Planet returns non-zero, no more improvements are possible for this planet
                                 break;
                             }
                             MAPGEN::Set_Secondary_Planet_Data_(MOX::_planet[j].star_index, j);
@@ -514,11 +493,8 @@ namespace ADVCIV {
     }
 
     /**
-     * @brief Modifies a planet's attributes based on weighted random selection.
-     * 
-     * @param planet_idx The index of the planet in the global planet array.
-     * @param weight_choices An array of weights for size, climate, and mineral improvements.
-     * @return int8_t Returns 1 if no choice was made (-1), otherwise 0.
+     * Applies one weighted upgrade step to the selected planet.
+     * Returns 1 when no further weighted upgrade choice is available.
      */
     int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* weight_choices) {
         int16_t choice = RUSS::Get_Weighted_Choice_Char_(weight_choices, 3);
@@ -530,7 +506,6 @@ namespace ADVCIV {
         s_planet_data& planet = MOX::_planet[planet_idx];
 
         if (choice == 0) {
-            // Increase planet size, capped at PLANET_SIZE_HUGE
             int32_t new_size = (int32_t)planet.size + 1;
             if (new_size > PLANET_SIZE_HUGE) {
                 new_size = PLANET_SIZE_HUGE;
@@ -539,7 +514,6 @@ namespace ADVCIV {
             weight_choices[0]--;
         }
         else if (choice == 1) {
-            // Increase planet climate quality, capped at PLANET_CLIMATE_GAIA
             int32_t new_climate = (int32_t)planet.climate + 1;
             if (new_climate > PLANET_CLIMATE_GAIA) {
                 new_climate = PLANET_CLIMATE_GAIA;
@@ -548,7 +522,6 @@ namespace ADVCIV {
             weight_choices[1]--;
         }
         else if (choice == 2) {
-            // Increase planet mineral class, capped at MINERAL_RESOURCE_ULTRA_RICH
             int32_t new_minerals = (int32_t)planet.mineral_class + 1;
             if (new_minerals > MINERAL_RESOURCE_ULTRA_RICH) {
                 new_minerals = MINERAL_RESOURCE_ULTRA_RICH;
@@ -560,34 +533,34 @@ namespace ADVCIV {
         return 0;
     }
 
-    int16_t __cdecl Proximity_Bonus_(int16_t plr_idx, int16_t planet_idx) {
+    int16_t __cdecl Proximity_Bonus_(int16_t player_idx, int16_t planet_idx) {
         int16_t proximity_bonus = 0;
         int16_t i = 0;
-        const int16_t target_star_idx = static_cast<int16_t>(MOX::_planet[planet_idx].star_index);
+        const int16_t target_star_idx = (int16_t)MOX::_planet[planet_idx].star_index;
         const int16_t num_stars = MOX::_NUM_STARS;
 
         if (num_stars > 0) {
             do {
-                const int16_t colony_star_idx = ADVCIV::_adv_civ_player[plr_idx].stars[i].star_idx;
+                const int16_t colony_star_idx = ADVCIV::_adv_civ_player[player_idx].stars[i].star_idx;
 
-                if (ADVCIV::Player_Has_Colony_At_Star_(plr_idx, colony_star_idx)) {
+                if (ADVCIV::Player_Has_Colony_At_Star_(player_idx, colony_star_idx)) {
                     const int16_t distance =
-                        static_cast<int16_t>(ADVCIV::_parsec[colony_star_idx].dist[target_star_idx]);
+                        (int16_t)ADVCIV::_parsec[colony_star_idx].dist[target_star_idx];
 
                     if (distance <= 9) {
                         switch (distance) {
                         case 1:
                         case 2:
-                            proximity_bonus = static_cast<int16_t>(proximity_bonus + 20);
+                            proximity_bonus = (int16_t)(proximity_bonus + 20);
                             break;
 
                         case 3:
                         case 4:
-                            proximity_bonus = static_cast<int16_t>(proximity_bonus + 10);
+                            proximity_bonus = (int16_t)(proximity_bonus + 10);
                             break;
 
                         case 5:
-                            proximity_bonus = static_cast<int16_t>(proximity_bonus + 5);
+                            proximity_bonus = (int16_t)(proximity_bonus + 5);
                             break;
 
                         default:
@@ -605,9 +578,9 @@ namespace ADVCIV {
 
     void __cdecl Init_Non_Homeworld_Colonies_() {
         for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
-            int8_t flag = _planet_selected_flag[i];
-            if (flag != -1) {
-                ERICNET::Init_Non_Homeworld_Colony_(i, static_cast<int16_t>(flag));
+            int8_t selected_player_idx = _planet_selected_flag[i];
+            if (selected_player_idx != -1) {
+                ERICNET::Init_Non_Homeworld_Colony_(i, (int16_t)selected_player_idx);
             }
         }
     }
