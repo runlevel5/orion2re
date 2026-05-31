@@ -66,6 +66,22 @@ namespace sound {
     uint8_t _close_stream = 1;
     uint8_t _musicActive;
     s_sound_stream _stream_data;
+    char _currentStreamFilename[MAX_PATH] = "stream.lbx";
+    int32_t _currentStreamId;
+    uint8_t _streamReadErrorLogged;
+
+    namespace {
+        void Debug_Log_Stream_Message_(const char* format, ...) {
+            char message[512];
+            va_list args;
+            va_start(args, format);
+            vsnprintf(message, sizeof(message), format, args);
+            va_end(args);
+
+            OutputDebugStringA(message);
+            OutputDebugStringA("\n");
+        }
+    }
 
     /**
      * @brief Iterates through active sound channels and updates their volume levels via DirectSound.
@@ -180,6 +196,8 @@ namespace sound {
 
     void __cdecl Set_Stream_Filename_(const char* filename) {
         if (sound::_dsound != nullptr) {
+            strncpy(_currentStreamFilename, filename, sizeof(_currentStreamFilename) - 1);
+            _currentStreamFilename[sizeof(_currentStreamFilename) - 1] = '\0';
             lbx::LBX_init_stream_(&sound::_streamLbxHandle, filename);
         }
     }
@@ -531,6 +549,7 @@ namespace sound {
 
     int8_t __cdecl Load_Stream_Wave_Header_(int32_t entry_index, s_sound_stream* stream) {
         if (entry_index == 0) {
+            Debug_Log_Stream_Message_("stream: rejected empty entry file=%s entry=%d", _currentStreamFilename, entry_index);
             return 0;
         }
 
@@ -546,21 +565,25 @@ namespace sound {
 
         sound::Copy_FourCC_(tag_buffer, stream->riff_tag);
         if (_strcmpi(tag_buffer, sound::s_RIFF_0055c224) != 0) {
+            Debug_Log_Stream_Message_("stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->wave_tag);
         if (_strcmpi(tag_buffer, sound::s_WAVE_0055c21c) != 0) {
+            Debug_Log_Stream_Message_("stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->fmt_tag);
         if (_strcmpi(tag_buffer, sound::s_fmt_0055c214) != 0) {
+            Debug_Log_Stream_Message_("stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->data_tag);
         if (_strcmpi(tag_buffer, sound::s_data_0055c20c) != 0) {
+            Debug_Log_Stream_Message_("stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
@@ -579,6 +602,10 @@ namespace sound {
         if (stream_id == 0 || _musicActive == 0) {
             return;
         }
+
+        _currentStreamId = stream_id;
+        _streamReadErrorLogged = 0;
+        Debug_Log_Stream_Message_("stream: play file=%s entry=%d", _currentStreamFilename, _currentStreamId);
 
         Stop_Sound_Timer_();
         int32_t volume_idx = Get_Stream_Volume_();
@@ -684,9 +711,9 @@ namespace sound {
         MMRESULT res = mmioGetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
 
         uint32_t status = (res == 0) ? 0 : 1;
+        uint32_t total_copied = 0;
 
         if (status == 0) {
-            uint32_t total_copied = 0;
             bool error_occurred = false;
 
             if (bytes_to_read != 0) {
@@ -722,6 +749,22 @@ namespace sound {
                     return 0;
                 }
             }
+        }
+
+        if (_streamReadErrorLogged == 0) {
+            _streamReadErrorLogged = 1;
+            Debug_Log_Stream_Message_(
+                "stream: read failed file=%s entry=%d status=%u requested=%u copied=%u bytes_written=%u total_data=%u data_offset=%u loop=%u",
+                _currentStreamFilename,
+                _currentStreamId,
+                status,
+                bytes_to_read,
+                total_copied,
+                _stream_data.bytes_written,
+                _stream_data.total_data_size,
+                _stream_data.data_start_offset,
+                _loopStream
+            );
         }
 
         fonts::Disp_PSTR_(320 /* 0x140 */, 0, sound::s_Cant_Read);

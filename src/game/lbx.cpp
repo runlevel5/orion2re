@@ -64,14 +64,14 @@ namespace lbx {
         memset(stream, 0, sizeof(s_wave_stream_header));
 
         LPSTR mmio_filename = const_cast<LPSTR>(filename);
-        stream->file = mmioOpenA(mmio_filename, nullptr, MMIO_READ);
+        stream->file = mmioOpenA(mmio_filename, nullptr, MMIO_READ | MMIO_ALLOCBUF);
 
         if (stream->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char local_50[80];
                 strcpy(local_50, farload::_secondary_drive_path);
                 strcat(local_50, filename);
-                stream->file = mmioOpenA(local_50, nullptr, MMIO_READ);
+                stream->file = mmioOpenA(local_50, nullptr, MMIO_READ | MMIO_ALLOCBUF);
             }
             if (stream->file == nullptr) {
                 sound::_musicActive = 0;
