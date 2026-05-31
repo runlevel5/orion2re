@@ -113,7 +113,7 @@ namespace aidudes {
 
     void __cdecl Clear_Build_Queues_If_New_Tech_(bool force_clear) {
         s_aidudes_colony_info* current_info = *_our_colonies;
-        int num_colonies = static_cast<int>(_n_our_colonies);
+        int num_colonies = (int)_n_our_colonies;
 
         if (num_colonies == 0) return;
 
@@ -124,8 +124,8 @@ namespace aidudes {
             bool should_rebuild = force_clear;
             if (!should_rebuild) {
                 int16_t producing = colony->producing[0];
-                if (producing == -1 /* Nothing */ || producing == -3 /* Housing */ || 
-                    producing == -2 /* Trade Goods */ || producing == -10 /* Spy */) {
+                if (producing == -1 || producing == -3 || 
+                    producing == -2 || producing == -10) {
                     should_rebuild = true;
                 }
             }
@@ -196,7 +196,7 @@ namespace aidudes {
                     }
                 }
 
-                int player_idx = static_cast<int>(_p_ai - MOX::_player);
+                int player_idx = (int)(_p_ai - MOX::_player);
                 int trait_check = MOX::_player[player_idx].traits[0] / 2;
 
                 if (trait_check != 3) {
@@ -230,11 +230,11 @@ namespace aidudes {
                 if (colony->pollution >= 5 && current_info->eats_minerals == 0) {
                     // TECH_APP_CORE_WASTE_DUMPS (50), BUILDING_CORE_WASTE_DUMP (13)
                     if (_p_ai->tech_applications[50] == 3 && colony->buildings[13] == 0) {
-                        weights[13] = static_cast<uint8_t>(special::isqrt_(colony->pollution)) + 8;
+                        weights[13] = (uint8_t)special::isqrt_(colony->pollution) + 8;
                     }
                     // TECH_APP_ATMOSPHERIC_RENEWER (19), BUILDING_ATMOSPHERE_RENEWER (5)
                     if (_p_ai->tech_applications[19] == 3 && colony->buildings[5] == 0) {
-                        weights[5] = static_cast<uint8_t>(special::isqrt_(colony->pollution)) + 8;
+                        weights[5] = (uint8_t)special::isqrt_(colony->pollution) + 8;
                     }
                     // TECH_APP_POLLUTION_PROCESSOR (142), BUILDING_POLLUTION_PROCESSOR (32)
                     if (_p_ai->tech_applications[142] == 3 && colony->buildings[32] == 0) {
@@ -270,8 +270,8 @@ namespace aidudes {
     }
 
     int __cdecl Sort_Colonies_Blockaded_(const void* a, const void* b) {
-        const s_aidudes_colony_info* info1 = static_cast<const s_aidudes_colony_info*>(a);
-        const s_aidudes_colony_info* info2 = static_cast<const s_aidudes_colony_info*>(b);
+        const s_aidudes_colony_info* info1 = (const s_aidudes_colony_info*)a;
+        const s_aidudes_colony_info* info2 = (const s_aidudes_colony_info*)b;
 
         s_colony* colony1 = &MOX::_colony[info1->colony_idx];
         s_colony* colony2 = &MOX::_colony[info2->colony_idx];
@@ -738,17 +738,17 @@ namespace aidudes {
     }
 
     int __cdecl Sort_Pops_Fixed_(const void* a, const void* b) {
-        const uint32_t* param_1 = static_cast<const uint32_t*>(a);
-        const uint32_t* param_2 = static_cast<const uint32_t*>(b);
+        const uint32_t* pop1 = (const uint32_t*)a;
+        const uint32_t* pop2 = (const uint32_t*)b;
         uint8_t flag1 = 0;
-        uint32_t val1 = *param_1 & 0xF;
+        uint32_t val1 = *pop1 & 0xF;
 
         if (val1 == 8 || val1 == 9) {
             flag1 = 1;
         }
 
         uint8_t flag2 = 0;
-        uint32_t val2 = *param_2 & 0xF;
+        uint32_t val2 = *pop2 & 0xF;
 
         if (val2 == 8 || val2 == 9) {
             flag2 = 1;
@@ -757,11 +757,6 @@ namespace aidudes {
         return (int)flag2 - (int)flag1;
     }
 
-    /**
-     * @brief Comparison function used for sorting colony population assignments.
-     *
-     * Compares two population units based on their production contribution and mask value.
-     */
     int __cdecl _Sort_Pops_colony(const void* a, const void* b) {
         s_colony* colony = aidudes::_Sort_Pops_colony_data;
 
@@ -786,8 +781,8 @@ namespace aidudes {
         }
 
         // Tertiary sort: masked raw value comparison
-        uint32_t val1 = *reinterpret_cast<const uint32_t*>(a);
-        uint32_t val2 = *reinterpret_cast<const uint32_t*>(b);
+        uint32_t val1 = *(const uint32_t*)a;
+        uint32_t val2 = *(const uint32_t*)b;
 
         return (int)(val1 & 0x0F) - (int)(val2 & 0x0F);
     }
@@ -893,7 +888,7 @@ namespace aidudes {
             no_range_or_speed = false;
         }
 
-        int flag_74 = 0;
+        int freighter_groups_assigned = 0;
         int16_t best_planet = AIMOVE::Best_Uncolonized_Undestined_Planet_(player_idx);
         bool is_objective_2 = (p->objectives == 2);
 
@@ -1041,61 +1036,61 @@ namespace aidudes {
             int vs_ships_2 = AIBUILD::_player_total_strength_vs_ships[player_idx][2];
             int current_colony_idx = colony_queue[i];
 
-            int temp_44 = 0;
+            int ship_build_weight = 0;
             if (vs_ships_2 > 0 && p->ship_range != 0 && p->ship_speed != 0 && !no_range_or_speed) {
                 int strength_0 = AIBUILD::_player_total_strength_vs_ships[player_idx][0];
-                temp_44 = (vs_ships_2 * 1000) / (strength_0 + vs_ships_2);
+                ship_build_weight = (vs_ships_2 * 1000) / (strength_0 + vs_ships_2);
                 if (war_level > 0) {
-                    temp_44 *= 2;
+                    ship_build_weight *= 2;
                 }
             }
 
-            int local_48 = 0;
-            int local_50 = 0;
-            int local_54 = 0;
-            int local_58 = 0;
+            int freighter_weight = 0;
+            int spy_weight = 0;
+            int transport_weight = 0;
+            int defer_weight = 0;
 
             uint8_t threatened = (*AIDATA::_ai_colony_info)[current_colony_idx].threatened;
             if (threatened == 0) {
                 if (AIBUILD::_player_n_freighter_groups_wanted[player_idx] != 0 &&
-                    flag_74 <= 1 &&
+                    freighter_groups_assigned <= 1 &&
                     p->tech_applications[69] == 3) {
 
-                    local_48 = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - flag_74 * 2) * 20 + 100;
+                    freighter_weight = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - freighter_groups_assigned * 2) * 20 + 100;
                     if (war_level > 0) {
-                        local_48 /= (war_level * war_level);
+                        freighter_weight /= (war_level * war_level);
                     }
                 }
 
                 if (AIBUILD::_player_n_spies[player_idx][1] != 0) {
-                    local_50 = (AIBUILD::_player_n_spies[player_idx][1] * 4 + 40) * 25;
+                    spy_weight = (AIBUILD::_player_n_spies[player_idx][1] * 4 + 40) * 25;
                     if (war_level > 0) {
-                        local_50 /= (war_level * war_level);
+                        spy_weight /= (war_level * war_level);
                     }
                 }
 
                 if (AIBUILD::_player_n_transports[player_idx][1] != 0 &&
                     p->tech_applications[189] == 3 &&
                     !no_range_or_speed) {
-                    local_54 = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
+                    transport_weight = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
                     if (war_level > 0) {
-                        local_54 = (local_54 * 3) / 2;
+                        transport_weight = (transport_weight * 3) / 2;
                     }
                 }
             }
 
             if (war_level == 0) {
-                local_58 = 333;
+                defer_weight = 333;
             } else {
-                local_58 = 350 - war_level * 100;
+                defer_weight = 350 - war_level * 100;
             }
 
             uint32_t choice_weights[6] = {0, 0, 0, 0, 0, 0};
-            choice_weights[0] = temp_44;
-            choice_weights[1] = local_48;
-            choice_weights[3] = local_50;
-            choice_weights[4] = local_54;
-            choice_weights[5] = local_58;
+            choice_weights[0] = ship_build_weight;
+            choice_weights[1] = freighter_weight;
+            choice_weights[3] = spy_weight;
+            choice_weights[4] = transport_weight;
+            choice_weights[5] = defer_weight;
 
             while (true) {
                 RUSS::Mox_Update_();
@@ -1257,7 +1252,7 @@ namespace aidudes {
                     case 1:
                         if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 12) {
                             AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -15);
-                            flag_74++;
+                            freighter_groups_assigned++;
                             AIBUILD::_player_n_freighter_groups_wanted[player_idx]--;
                         }
                         choice_weights[1] = 0;
@@ -1345,30 +1340,30 @@ namespace aidudes {
     }
 
     int __cdecl Sort_Pops_F_IR_(const void* a, const void* b) {
-        const uint32_t* param_1 = static_cast<const uint32_t*>(a);
-        const uint32_t* param_2 = static_cast<const uint32_t*>(b);
+        const uint32_t* pop1 = (const uint32_t*)a;
+        const uint32_t* pop2 = (const uint32_t*)b;
 
-        int prod1 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_1, 0);
-        int prod2 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_2, 0);
+        int prod1 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop1, 0);
+        int prod2 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop2, 0);
 
         int score1;
-        if ((*param_1 & 0x180) == 0x80 /* Farmer */) {
-            score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_1, 1);
+        if ((*pop1 & 0x180) == 0x80 /* Farmer */) {
+            score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop1, 1);
             if (_Sort_Pops_colony_info->pollution_at_start < _Sort_Pops_colony_data->pollution) {
                 score1 += 1000;
             }
         } else {
-            score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_1, 2);
+            score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop1, 2);
         }
 
         int score2;
-        if ((*param_2 & 0x180) == 0x80 /* Farmer */) {
-            score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_2, 1);
+        if ((*pop2 & 0x180) == 0x80 /* Farmer */) {
+            score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop2, 1);
             if (_Sort_Pops_colony_info->pollution_at_start < _Sort_Pops_colony_data->pollution) {
                 score2 += 1000;
             }
         } else {
-            score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_2, 2);
+            score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop2, 2);
         }
 
         if (score2 != score1) {
@@ -1379,8 +1374,8 @@ namespace aidudes {
             return prod1 - prod2;
         }
 
-        uint32_t val1 = *param_1;
-        uint32_t val2 = *param_2;
+        uint32_t val1 = *pop1;
+        uint32_t val2 = *pop2;
 
         if (((val1 ^ val2) & 0x180) == 0) {
             return (int)(val1 & 0xF) - (int)(val2 & 0xF);
@@ -1532,12 +1527,6 @@ namespace aidudes {
         return worthiness;
     }
 
-    /**
-     * @brief Comparison function for sorting colonies by their industry worth.
-     *
-     * Takes pointers to colony indices, calculates their industry worth, and returns the difference.
-     * Used typically as a callback for qsort or similar sorting algorithms.
-     */
     int __cdecl colony_less_industry_cmp_(const void* p1, const void* p2) {
         int16_t worth1 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p1)]);
         int16_t worth2 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p2)]);
@@ -1546,22 +1535,22 @@ namespace aidudes {
     }
 
     int __cdecl Sort_Pops_FR_I_(const void* a, const void* b) {
-        const uint32_t* param_1 = static_cast<const uint32_t*>(a);
-        const uint32_t* param_2 = static_cast<const uint32_t*>(b);
+        const uint32_t* pop1 = (const uint32_t*)a;
+        const uint32_t* pop2 = (const uint32_t*)b;
 
         if (aidudes::_Sort_Pops_colony_data->food2_per_farmer == 0) {
             return aidudes::_Sort_Pops_colony(a, b);
         }
 
-        int16_t prod_0_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, param_1, 0);
-        int16_t prod_1_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, param_1, 1);
-        int16_t prod_2_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, param_1, 2);
+        int16_t prod_0_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, pop1, 0);
+        int16_t prod_1_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, pop1, 1);
+        int16_t prod_2_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, pop1, 2);
 
         int16_t score_p1 = prod_2_p1 - (prod_1_p1 * 2) + prod_0_p1;
 
-        int16_t prod_0_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, param_2, 0);
-        int16_t prod_1_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, param_2, 1);
-        int16_t prod_2_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, param_2, 2);
+        int16_t prod_0_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, pop2, 0);
+        int16_t prod_1_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, pop2, 1);
+        int16_t prod_2_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, pop2, 2);
 
         int16_t score_p2 = prod_2_p2 - (prod_1_p2 * 2) + prod_0_p2;
 
@@ -1577,7 +1566,7 @@ namespace aidudes {
             return (int32_t)prod_1_p1 - (int32_t)prod_1_p2;
         }
 
-        return (int32_t)(*param_1 & 0x0F) - (int32_t)(*param_2 & 0x0F);
+        return (int)(*pop1 & 0x0F) - (int)(*pop2 & 0x0F);
     }
 
     int __cdecl Sort_Pops_R_I_(const void* p1, const void* p2) {

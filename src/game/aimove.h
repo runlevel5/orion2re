@@ -4,13 +4,7 @@ namespace AIMOVE {
 #pragma pack(push, 1)
     struct s_ai_stage_point {
         uint8_t star_idx;
-        union {
-            uint32_t strength;
-            struct {
-                uint8_t pad[3];
-                uint8_t turns_left;
-            };
-        };
+        uint32_t strength;
     };
 
     struct s_attack_info {
@@ -29,17 +23,41 @@ namespace AIMOVE {
     extern int16_t _i_ai;
     extern int16_t _n_colonizable;
 
+    /**
+     * Runs the full movement phase for one AI empire.
+     * @param player_idx AI player to process.
+     */
     void __cdecl Move_AI_(int16_t player_idx);
 
     int __cdecl Sort_colonizable_(const void* a, const void* b);
 
+    /**
+     * Removes colonizable planets that already have an assigned colony ship or queued colony ship.
+     * @param colonizable_planets In-place list of colonizable planets.
+     * @param num_planets In/out count for the colonizable list.
+     */
     void __cdecl Delete_Already_Assigned_Planets_(s_ai_colonizable_planet* colonizable_planets, int16_t* num_planets);
 
+    /**
+     * Launches the AI's prepared sneak attack if the target is still valid.
+     */
     void __cdecl Launch_Sneak_Attack_();
 
-    void __cdecl Launch_Attacks_(int param_1, int param_2);
+    /**
+     * Launches attacks of the requested mission type from all eligible staging stars.
+     * @param mission_type Mission code to assign to launched fleets.
+     * @param min_pop Minimum remaining population threshold used by attack scoring.
+     */
+    void __cdecl Launch_Attacks_(int mission_type, int min_pop);
 
-    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, s_attack_info* target_info, int mission_type, int param_4);
+    /**
+     * Evaluates the best attack target reachable from a staging star.
+     * @param star_idx Source staging star.
+     * @param target_info Optional output filter and detail structure.
+     * @param mission_type Mission code to search for.
+     * @param min_pop Minimum remaining population threshold used by attack scoring.
+     */
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, s_attack_info* target_info, int mission_type, int min_pop);
 
     int8_t __cdecl AI_May_Attack_Player_(int16_t player_idx, int16_t target_idx);
 
@@ -85,8 +103,17 @@ namespace AIMOVE {
 
     void __cdecl Move_All_AI_();
 
+    /**
+     * Marks stars the AI should avoid because of temporary blockade restrictions.
+     * @param player_idx AI player whose flee map is being built.
+     */
     void __cdecl Mark_Flee_Stars_(int16_t player_idx);
 
+    /**
+     * Gathers all currently colonizable planets within the AI player's extended range.
+     * @param colonizable_planets Output list of candidate planets.
+     * @param count Out number of candidate planets.
+     */
     void __cdecl Get_Colonizable_Planets_(s_ai_colonizable_planet* colonizable_planets, int16_t* count);
 
     int __cdecl Gather_Player_Ships_At_Star_(int16_t player_id, int16_t star_id, int16_t* ships_list);
@@ -109,18 +136,35 @@ namespace AIMOVE {
 
     void __cdecl Find_Opportunity_Attack_(int16_t player_idx, int16_t target_idx, int16_t threshold, int16_t* out_planet, int16_t* out_value, int32_t* out_ratio);
 
+    /**
+     * Finds a direct or intermediate waypoint movement order for the ship list.
+     * @param ship_array Null-terminated ship index list.
+     * @param dest_star Final destination star.
+     * @param out_star Out chosen immediate destination star.
+     * @param out_turns Out total travel time for the chosen route.
+     */
     void __cdecl Move_Ships_With_Possible_Intermediate_(int16_t* ship_array, int16_t dest_star, int16_t* out_star, int16_t* out_turns);
 
     int32_t __cdecl Enemy_Colony_Worth_To_Player_(int16_t colony_idx, int16_t player_idx);
 
+    /**
+     * Looks for an opportunity attack from a staging star with a minimum score threshold.
+     * @param player_id Attacking player.
+     * @param target_player_idx Defending player to evaluate.
+     * @param min_value Minimum acceptable attack value.
+     * @param star_idx Source staging star.
+     * @param out_target_star Out selected target planet.
+     * @param out_value Out colony-worth value for the selected target.
+     * @param out_ratio Out computed attack ratio/value.
+     */
     void __cdecl Find_Opportunity_Attack_Aux_(
         int16_t player_id,
-        int16_t val1,
-        int16_t val2,
+        int16_t target_player_idx,
+        int16_t min_value,
         int16_t star_idx,
         int16_t* out_target_star,
-        int16_t* out_param_6,
-        int32_t* out_param_7
+        int16_t* out_value,
+        int32_t* out_ratio
     );
 
     int __cdecl Sort_candidate_stars_(const void* candidate_star_a, const void* candidate_star_b);

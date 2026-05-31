@@ -9,8 +9,8 @@ namespace AIMOVE {
     int16_t _n_colonizable;
 
     int __cdecl Sort_colonizable_(const void* a, const void* b) {
-        auto p1 = static_cast<const s_ai_colonizable_planet*>(a);
-        auto p2 = static_cast<const s_ai_colonizable_planet*>(b);
+        auto p1 = (const s_ai_colonizable_planet*)a;
+        auto p2 = (const s_ai_colonizable_planet*)b;
         return p1->contextual_value - p2->contextual_value;
     }
 
@@ -90,7 +90,7 @@ namespace AIMOVE {
 
         Mark_Flee_Stars_(player_idx);
 
-        _nonplayer_here = reinterpret_cast<int8_t(*)[72]>(local_b88);
+        _nonplayer_here = (int8_t(*)[72])local_b88;
         memset(_nonplayer_here, 0, 72);
 
         s_ship_data* ship = MOX::_ship;
@@ -167,7 +167,7 @@ namespace AIMOVE {
 
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
             uint32_t current_strength = (uint32_t)(*AIDATA::_ai_player_info)[plr1].total_ship_strength[plr2];
-            uint32_t possible_strength = static_cast<uint32_t>((*AIDATA::_possible_ship_strengths)[i][plr1][plr2][0]);
+            uint32_t possible_strength = (uint32_t)(*AIDATA::_possible_ship_strengths)[i][plr1][plr2][0];
 
             // AI logic: check if existing strength ratio allows for a threat/attack opportunity
             if ((current_strength >> 2) <= (possible_strength / 10)) {
@@ -290,12 +290,11 @@ namespace AIMOVE {
         }
     }
 
-    void __cdecl Launch_Attacks_(int param_1, int param_2) {
+    void __cdecl Launch_Attacks_(int mission_type, int min_pop) {
         if (MOX::_NUM_STARS > 0) {
             for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
-                // Accessing ship registry for current AI player and star
                 if ((*AIDATA::_i_all_combat_ships)[AIMOVE::_i_ai][star_idx] != -1) {
-                    AIMOVE::Find_Best_Attack_From_Star_(star_idx, nullptr, param_1, param_2);
+                    AIMOVE::Find_Best_Attack_From_Star_(star_idx, nullptr, mission_type, min_pop);
                 }
             }
         }
@@ -449,7 +448,7 @@ namespace AIMOVE {
         s_ship_data* ship_end = MOX::_ship + (int16_t)MOX::_NUM_SHIPS;
 
         while (ship < ship_end) {
-            int ship_idx = (int)((char*)ship - (char*)MOX::_ship) / 0x81;
+            int ship_idx = (int)(ship - MOX::_ship);
 
             if (ship->owner != _i_ai && ship->status < 3) {
                 if (ship->location == star_idx) {
@@ -560,7 +559,7 @@ namespace AIMOVE {
                 player_idx,
                 target_idx,
                 threshold,
-                static_cast<int16_t>(MOX::_player[player_idx].offensive_stagepoint),
+                (int16_t)MOX::_player[player_idx].offensive_stagepoint,
                 out_planet,
                 out_value,
                 out_ratio
@@ -721,8 +720,8 @@ namespace AIMOVE {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (_flee_stars[star_idx * 10 + 9] == 0) {
                 if ((MOX::_star[star_idx].is_stagepoint >> _i_ai) & 1) {
-                    stage_point_map[star_idx] = static_cast<int8_t>(num_stage_points);
-                    stage_points[num_stage_points].star_idx = static_cast<uint8_t>(star_idx);
+                    stage_point_map[star_idx] = (int8_t)num_stage_points;
+                    stage_points[num_stage_points].star_idx = (uint8_t)star_idx;
                     stage_points[num_stage_points].strength = 0;
                     total_stage_weight += (*AIDATA::_star_stage_weights)[star_idx][_i_ai];
                     num_stage_points++;
@@ -769,7 +768,7 @@ namespace AIMOVE {
 
             for (int16_t i = 0; i < num_ships; ++i) {
                 int16_t ship_idx = ship_indices[i];
-                bool has_navigator = struct_::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
+                bool has_navigator = struct_::Test_Bit_Field_((uint8_t*)MOX::_ship[ship_idx].d.special_device_flags, 11);
                 ship_list[0] = ship_idx;
 
                 int16_t location = MOX::_ship[ship_idx].location;
@@ -786,10 +785,11 @@ namespace AIMOVE {
 
                 if (intermediate_star != -1) {
                     MOX::_ship[ship_idx].mission = 3;
-                    SHIPMOVE::Ships_Try_To_Move_To_(ship_list, intermediate_star, reinterpret_cast<s_ship_move_info*>(&stage_points[0]));
-                    uint8_t turns_left = stage_points[0].turns_left;
+                    s_ship_move_info move_info;
+                    SHIPMOVE::Ships_Try_To_Move_To_(ship_list, intermediate_star, &move_info);
+                    uint8_t turns_left = move_info.turns_left;
                     if (turns_left <= 1 || local_5d7 == 0) {
-                        SHIPMOVE::Make_Ships_Move_To_(ship_list, intermediate_star, reinterpret_cast<s_ship_move_info*>(&stage_points[0]));
+                        SHIPMOVE::Make_Ships_Move_To_(ship_list, intermediate_star, &move_info);
                     }
                 }
             }
@@ -837,7 +837,7 @@ namespace AIMOVE {
 
             for (int16_t i = 0; i < num_ships; ++i) {
                 int16_t ship_idx = ship_indices[i];
-                bool has_navigator = struct_::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
+                bool has_navigator = struct_::Test_Bit_Field_((uint8_t*)MOX::_ship[ship_idx].d.special_device_flags, 11);
                 int16_t location = MOX::_ship[ship_idx].location;
 
                 if (location == target_star) {
@@ -1347,11 +1347,11 @@ namespace AIMOVE {
     void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int8_t* intercept_map) {
         *ship_count = 0;
 
-        for (int32_t i = 0; i < static_cast<int32_t>(AIDATA::_n_all_ships); ++i) {
+        for (int32_t i = 0; i < (int32_t)AIDATA::_n_all_ships; ++i) {
             int16_t ship_idx = (*AIDATA::_all_ships)[i];
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
-            if (static_cast<int16_t>(ship->owner) == AIMOVE::_i_ai) {
+            if ((int16_t)ship->owner == AIMOVE::_i_ai) {
                 bool should_gather = false;
 
                 if (SHIPMOVE::Can_Order_Ship_(ship)) {
@@ -1463,7 +1463,7 @@ namespace AIMOVE {
             }
 
             for (int i = 0; i < num_my_colony_ships; i++) {
-                RUSS::Shuffle_Char_(reinterpret_cast<int8_t*>(candidate_stars), num_candidates);
+                RUSS::Shuffle_Char_((int8_t*)candidate_stars, num_candidates);
 
                 qsort(candidate_stars, num_candidates, 1, AIMOVE::Sort_candidate_stars_);
 
@@ -1593,7 +1593,7 @@ namespace AIMOVE {
                                     best_target = target_index;
                                     ship_min_eta[ship_id] = (uint8_t)eta;
                                     ship_target_star[ship_id] = (char)target->star_idx;
-                                    ship_intermediate_star[ship_id] = static_cast<char>(ship_intermediate_star_tmp);
+                                    ship_intermediate_star[ship_id] = (char)ship_intermediate_star_tmp;
                                 }
                             }
                         }
@@ -1872,7 +1872,7 @@ namespace AIMOVE {
         }
     }
 
-    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, s_attack_info* target_info, int mission_type, int param_4)
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, s_attack_info* target_info, int mission_type, int min_pop)
     {
         s_attack_info target_info_copy;
         s_attack_info* puVar8 = nullptr;
@@ -1925,7 +1925,7 @@ namespace AIMOVE {
                             SHIPMOVE::Ships_Try_To_Move_To_(ship_list, (int16_t)target_star, &move_info);
                             
                             if (move_info.moving != 0 && (uint8_t)move_info.turns_left < 10) {
-                                uint16_t score = Compute_Attack_Worthiness_(i, ship_list, (uint8_t)move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, param_4);
+                                uint16_t score = Compute_Attack_Worthiness_(i, ship_list, (uint8_t)move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, min_pop);
                                 scores[i] = score;
 
                                 if (score != 0) {
@@ -2023,7 +2023,7 @@ namespace AIMOVE {
                 if (MOX::_NUM_PLAYERS > 0) {
                     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                         if (current_entry->players[p].present) {
-                            uint32_t possible = static_cast<uint32_t>(
+                            uint32_t possible = (uint32_t)(
                                 (*AIDATA::_possible_ship_strengths)[star_idx][_i_ai][p][class_idx]
                             );
 
@@ -2031,7 +2031,7 @@ namespace AIMOVE {
                                 min_possible = possible;
                             }
 
-                            total_enroute += static_cast<uint32_t>(
+                            total_enroute += (uint32_t)(
                                 (*AIDATA::_enroute_ship_strengths)[star_idx][p][_i_ai][class_idx]
                             );
                         }
@@ -2050,7 +2050,7 @@ namespace AIMOVE {
 
                 memmove(current_entry, current_entry + 1, num_to_move * sizeof(s_aimove_intercept_entry));
 
-                knocked_out_stars[*num_knocked_out] = static_cast<int8_t>(star_idx);
+                knocked_out_stars[*num_knocked_out] = (int8_t)star_idx;
                 (*num_knocked_out)++;
 
                 memset(&_flee_stars[star_idx * 10], 1, 10);
@@ -2059,8 +2059,8 @@ namespace AIMOVE {
     }
 
     int __cdecl Sort_npc_dests_(const void* a_ptr, const void* b_ptr) {
-        auto a = static_cast<const s_aimove_npc_dest*>(a_ptr);
-        auto b = static_cast<const s_aimove_npc_dest*>(b_ptr);
+        auto a = (const s_aimove_npc_dest*)a_ptr;
+        auto b = (const s_aimove_npc_dest*)b_ptr;
         int result;
 
         result = ((int)a->has_lucky - (int)a->has_unlucky) - ((int)b->has_lucky - (int)b->has_unlucky);
@@ -2413,7 +2413,7 @@ namespace AIMOVE {
             attack_worthiness = 0xFFFF;
         }
 
-        return static_cast<uint16_t>(attack_worthiness);
+        return (uint16_t)attack_worthiness;
     }
 
     uint16_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int32_t star_idx) {
@@ -2705,12 +2705,12 @@ namespace AIMOVE {
 
     void __cdecl Find_Opportunity_Attack_Aux_(
         int16_t player_id,
-        int16_t val1,
-        int16_t val2,
+        int16_t target_player_idx,
+        int16_t min_value,
         int16_t star_idx,
         int16_t* out_target_star,
-        int16_t* out_param_6,
-        int32_t* out_param_7
+        int16_t* out_value,
+        int32_t* out_ratio
     ) {
         *out_target_star = -1;
 
@@ -2720,8 +2720,8 @@ namespace AIMOVE {
 
             s_attack_info attack_info;
 
-            attack_info.target_player = val1;
-            attack_info.min_value = val2;
+            attack_info.target_player = target_player_idx;
+            attack_info.min_value = min_value;
             attack_info.target_planet = -1;
 
             _flee_stars = flee_stars;
@@ -2732,8 +2732,8 @@ namespace AIMOVE {
 
             if (attack_info.target_planet != -1) {
                 *out_target_star = attack_info.target_planet;
-                *out_param_6 = attack_info.value_a;
-                *out_param_7 = (int32_t)attack_info.value_b;
+                *out_value = attack_info.value_a;
+                *out_ratio = (int32_t)attack_info.value_b;
             }
 
             _flee_stars = nullptr;
@@ -2752,14 +2752,14 @@ namespace AIMOVE {
                     const uint8_t star_a = *candidate_star_a;
                     if (((*AIDATA::_star_in_range_of_player)[star_a] >> (player_idx & 0x1f)) & 1) {
                         const uint32_t strength_a =
-                            static_cast<uint32_t>((*AIDATA::_possible_ship_strengths)[star_a][AIMOVE::_i_ai][player_idx][0]);
+                            (uint32_t)(*AIDATA::_possible_ship_strengths)[star_a][AIMOVE::_i_ai][player_idx][0];
                         if (strength_a < weakest_strength_a) {
                             weakest_strength_a = strength_a;
                         }
 
                         const uint8_t star_b = *candidate_star_b;
                         const uint32_t strength_b =
-                            static_cast<uint32_t>((*AIDATA::_possible_ship_strengths)[star_b][AIMOVE::_i_ai][player_idx][0]);
+                            (uint32_t)(*AIDATA::_possible_ship_strengths)[star_b][AIMOVE::_i_ai][player_idx][0];
                         if (strength_b < weakest_strength_b) {
                             weakest_strength_b = strength_b;
                         }

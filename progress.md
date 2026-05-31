@@ -7,9 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/aidesign.{h,cpp}
-- [pending] src/game/aileader.{h,cpp}
-- [pending] src/game/aimove.{h,cpp}
 - [pending] src/game/aipower.{h,cpp}
 - [pending] src/game/aistage.{h,cpp}
 - [pending] src/game/aitech.{h,cpp}
@@ -208,9 +205,11 @@
 ## Reviewed
 - [reviewed] src/game/advciv.{h,cpp} - applied conservative naming and docstring cleanup; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/aidata.{h,cpp} - applied allocator `sizeof(...)` cleanup, renamed the out-parameter in the ship-turn helper, replaced remaining `static_cast` uses with C-style casts, and documented the raw `memcmp` layout assumption.
+- [reviewed] src/game/aidesign.{h,cpp} - suggest fixing the out-parameter indexing UB in missile weapon selection, replacing the remaining `static_cast` uses with C-style casts, and renaming low-value swap temporaries in the beam/missile helpers; no new header docstrings were needed.
 - [reviewed] src/game/aibomb.{h,cpp} - replace plain `int` counters and size parameters with `int32_t`, and replace the remaining `static_cast` with a C-style cast.
 - [reviewed] src/game/aibuild.{h,cpp} - applied conservative comment and fixed-width helper-type cleanup; pointer-subtraction index assumptions remain noted for later review.
-- [reviewed] src/game/aidudes.{h,cpp} - suggest guarding the fixed-size colony scratch buffers against `_NUM_COLONIES` overflow, renaming leftover comparator placeholder parameters, replacing remaining `static_cast`/`reinterpret_cast` uses with C-style casts, and trimming noisy generated comments while adding concise function docstrings.
+- [reviewed] src/game/aidudes.{h,cpp} - applied header docstrings, decompiler-name cleanup, and remaining `static_cast`/`reinterpret_cast` replacements; fixed-size colony scratch buffers still need a separate bounds review.
+- [reviewed] src/game/aimove.{h,cpp} - applied header docstrings, attack-helper parameter renames, remaining `static_cast`/`reinterpret_cast` replacements, and the typed pointer-subtraction cleanup for `Get_Enemy_Strength_On_Turn_`; the stage-point move-info aliasing overlay remains noted for later review.
 
 ## Blocked
 - none
