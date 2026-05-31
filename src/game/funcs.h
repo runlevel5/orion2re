@@ -192,7 +192,6 @@ extern char s_MULTIGM_LBX_00558D04[12]; // "MULTIGM.LBX"
 extern const char s_Evan_Axelrad_0055AA48[16]; // "Evan Axelrad"
 extern char s_Moo_IIAlreadyRunning[27]; // "MOO II is already running."
 extern char s_Microprose[11]; // "Microprose"
-extern const char s_Mar_26_1997_005578e0[12]; // "Mar 26 1997"
 
 extern const char s_Memory_Corruption_val_00558028[73]; // "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n"
 

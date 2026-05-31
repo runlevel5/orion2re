@@ -5,7 +5,7 @@ namespace RACESCRN {
 
     extern const char s_billtext_lbx_0055135c[13];
     extern const char s_billtex2_lbx_00556038[13];
-    extern const char s_races_lbx_005574e8[10];
+    extern const char s_races_lbx[10];
 
     extern s_racescrn_icon_layout _mouse_group_data;
     extern int16_t _g_spy_xfer_count;

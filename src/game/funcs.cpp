@@ -236,7 +236,6 @@ char s_fmt_s_d_EP_00557e18[11] = "%s (%d EP)";
 char s_i_PR_00557d84[6] = "%i PR";
 char s_i_FP_00557d8c[6] = "%i FP";
 char s_i_RP_00557d94[6] = "%i RP";
-const char s_Mar_26_1997_005578e0[12] = "Mar 26 1997";
 const char s_Too_many_frames_for_multi_file_a_0055b83c[41] = "Too many frames for multi file animation";
 const char s_Refresh_Mask_can_t_be_drawn_0055b10c[28] = "Refresh Mask can't be drawn";
 const char s_combat_lbx_005599c8[11] = "combat.LBX";

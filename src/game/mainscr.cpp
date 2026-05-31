@@ -3625,8 +3625,6 @@ namespace MAINSCR {
     }
 
     void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t param_2, uint16_t msg_type, uint32_t len, void* data) {
-        char version_buffer[52];
-
         switch (msg_type) {
         case 0x00: {
             s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
@@ -3640,10 +3638,9 @@ namespace MAINSCR {
             MOX::_settings.starting_civilization_level = pack->starting_civilization_level;
             MOX::_settings.xenons_exist = pack->xenons_exist;
 
-            sprintf(version_buffer, "%s", "Mar 26 1997");
-            if (strcmp(pack->version_string, version_buffer) != 0) {
+            if (strcmp(pack->version_string, GAME_BUILD_DATE) != 0) {
                 char error_msg[256];
-                sprintf(error_msg, NETMOX::_incompatible_versions_error, pack->version_string, version_buffer);
+                sprintf(error_msg, NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
                 exitm::Exit_With_Message(error_msg);
             }
 
@@ -4013,10 +4010,9 @@ namespace MAINSCR {
         }
         case 0x2A: {
             s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
-            sprintf(version_buffer, "%s", "Mar 26 1997");
-            if (strcmp(pack->version_string, version_buffer) != 0) {
+            if (strcmp(pack->version_string, GAME_BUILD_DATE) != 0) {
                 char error_msg[256];
-                sprintf(error_msg, NETMOX::_incompatible_versions_error, pack->version_string, version_buffer);
+                sprintf(error_msg, NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
                 exitm::Exit_With_Message(error_msg);
             }
 

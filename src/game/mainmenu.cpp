@@ -12,7 +12,6 @@ namespace MAINMENU {
     const char s_N_0055765C[2] = "N";
     const char s_save_question_gam[10] = "save?.gam";
     const char s_save_percent_d_gam[11] = "save%d.gam";
-    const char s_Version_1_31_0055a658[13] = "Version 1.31";
 
     s_main_menu* _mainmenu;
     s_animation_header* _main_menu_background;
@@ -312,7 +311,7 @@ namespace MAINMENU {
 
         fonts::Set_Font_Style_(1, &color_buffer);
         int16_t font_h = fonts::Get_Font_Height_();
-        fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), s_Version_1_31_0055a658);
+        fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), GAME_VERSION_LABEL);
     }
 
     void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, s_animation_header* bitmap) {

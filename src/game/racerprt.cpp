@@ -35,8 +35,8 @@ void __cdecl Race_Report_Screen_(int16_t param_1) {
     fields::Enable_Draw_All_Fields_();
     RUSS::Mox_Update_();
 
-    s_animation_header* anim = (s_animation_header*)farload::Far_Reload_(RACESCRN::s_races_lbx_005574e8, MOX::_cur_plyr_ptr->race + 0x20, (void*)MOX::_screen_seg);
-    s_animation_header* psVar4 = (s_animation_header*)farload::Far_Reload_Next_(RACESCRN::s_races_lbx_005574e8, MOX::_player[param_1].race + 0x2E, (void*)MOX::_screen_seg);
+    s_animation_header* anim = (s_animation_header*)farload::Far_Reload_(RACESCRN::s_races_lbx, MOX::_cur_plyr_ptr->race + 0x20, (void*)MOX::_screen_seg);
+    s_animation_header* psVar4 = (s_animation_header*)farload::Far_Reload_Next_(RACESCRN::s_races_lbx, MOX::_player[param_1].race + 0x2E, (void*)MOX::_screen_seg);
     RUSS::Mox_Update_();
 
     for (uint16_t i = 0; i < 10; ++i) {

@@ -483,7 +483,7 @@ namespace NETSTART {
         msg.starting_civilization_level = MOX::_settings.starting_civilization_level;
         msg.xenons_exist = MOX::_settings.xenons_exist;
 
-        sprintf(msg.version_string, s__s_00551130, s_Mar_26_1997_005578e0);
+        strcpy(msg.version_string, GAME_BUILD_DATE);
 
         memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
         memset(NETMOX::_net.player_connected_flags, 0, sizeof(NETMOX::_net.player_connected_flags));
@@ -860,7 +860,7 @@ namespace NETSTART {
             }
         }
 
-        sprintf(payload.version_string, s__s_00551130, s_Mar_26_1997_005578e0);
+        strcpy(payload.version_string, GAME_BUILD_DATE);
         NETMOX::Mox_Send_Message_(0x7FFE, 42, &payload, sizeof(payload));
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;

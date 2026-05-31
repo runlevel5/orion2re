@@ -44,7 +44,6 @@ namespace MAINMENU {
     extern const char s_N_0055765C[2]; // "N"
     extern const char s_save_question_gam[10]; // "save?.gam"
     extern const char s_save_percent_d_gam[11]; // "save%d.gam"
-    extern const char s_Version_1_31_0055a658[13]; // "Version 1.31"
 
     void __cdecl Main_Menu_Fade_Function_();
     void __cdecl Main_Menu_Fade_Function2_();

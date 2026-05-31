@@ -16,7 +16,6 @@ namespace platform {
 	extern void* g_env_strings;
 	extern MSG g_main_msg;
 	extern HANDLE g_worker_thread_handle;
-	using ::g_window_focus_state;
 	extern uint32_t _updating_cursor_img;
 	extern uint8_t g_should_exit;
 
@@ -64,9 +63,6 @@ namespace platform {
 	extern int16_t g_mouse_x;
 
 	extern int16_t g_mouse_y;
-
-	using ::g_cached_mouse_x;
-	using ::g_cached_mouse_y;
 
 	// Functions
 	void Parse_Ten_Cmd_Parameter(const char* input_str);
