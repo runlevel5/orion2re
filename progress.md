@@ -7,8 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/antarans.{h,cpp}
-- [pending] src/game/antaroom.{h,cpp}
 - [pending] src/game/arith1e.{h,cpp}
 - [pending] src/game/assert.h
 - [pending] src/game/beams.{h,cpp}
@@ -211,6 +209,8 @@
 - [reviewed] src/game/allocate.{h,cpp} - applied header docstrings, `sizeof(...)`-based typed allocations, parameter naming cleanup, removal of local-only stack-error string globals, and remaining C++-style cast cleanup; pointer-arithmetic-based pooled header overlays still rely on legacy layout assumptions and possible misalignment.
 - [reviewed] src/game/angle.{h,cpp} - applied concise trigonometry helper docstrings, local clarity renames in `Get_Angle_`, and replacement of the remaining `static_cast`-based sine scaling expressions with equivalent C-style casts; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/animate.{h,cpp} - applied concise animation helper docstrings, conservative parameter/local clarity renames, and remaining C++-style cast cleanup; packed frame and palette overlays still rely on UB-prone pointer arithmetic and aliasing assumptions.
+- [reviewed] src/game/antarans.{h,cpp} - applied concise header docstrings, fixed-width signature cleanup, remaining `static_cast` replacement, local string literal inlining, and a conservative local rename; unchecked pointer-arithmetic appends into `MOX::_temp_string` remain noted for later review.
+- [reviewed] src/game/antaroom.{h,cpp} - suggest adding concise header docstrings, renaming the decompiler-style screen parameter and message-index local, replacing remaining `static_cast` uses, inlining CPP-local LBX string constants, and noting the raw animation-header overlay on the mouse bitmap buffer.
 
 ## Blocked
 - none

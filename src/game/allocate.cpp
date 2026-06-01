@@ -221,10 +221,9 @@ namespace allocate {
         return Allocate_Next_Block_No_Header_(block_ptr, size);
     }
 
-    int32_t __cdecl Mark_Block_(void* block_ptr) {
+    void __cdecl Mark_Block_(void* block_ptr) {
         auto* header = (s_alloc_header*)block_ptr - 1;
         header->reserved2 = header->current;
-        return (int32_t)header;
     }
 
     void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size) {
@@ -257,9 +256,8 @@ namespace allocate {
         return new_block_ptr;
     }
 
-    void* __cdecl Release_Block_(void* block) {
+    void __cdecl Release_Block_(void* block) {
         auto* header = (s_alloc_header*)block - 1;
         header->current = header->reserved2;
-        return header;
     }
 }

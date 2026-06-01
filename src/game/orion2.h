@@ -302,6 +302,7 @@ typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
 typedef int16_t int16_t;
 
+#pragma pack(push, 1)
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4200)
@@ -312,13 +313,17 @@ struct s_animation_header {
     int16_t current_frame;
     int16_t frame_count;
     int8_t loop_frame;
-    int16_t keyframe_interval;
+    int8_t keyframe_interval;
+    uint8_t unknown_0xa;
     undefined1 flags;
     uint32_t frame_offsets[0];
 };
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+#pragma pack(pop)
+
+static_assert(sizeof(s_animation_header) == 0x0c, "s_animation_header size mismatch");
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
 

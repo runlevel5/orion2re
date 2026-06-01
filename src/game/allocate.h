@@ -51,13 +51,11 @@ namespace allocate {
 
     /// Saves the current allocation offset in a block header.
     /// @param block_ptr Block whose current offset should be marked.
-    /// @return Header address encoded as an integer for legacy callers.
-    int32_t __cdecl Mark_Block_(void* block_ptr);
+    void __cdecl Mark_Block_(void* block_ptr);
 
     /// Restores a block to the offset previously saved by Mark_Block_.
     /// @param block Block whose saved offset should be restored.
-    /// @return Pointer to the internal block header.
-    void* __cdecl Release_Block_(void* block);
+    void __cdecl Release_Block_(void* block);
 
     /// Exits with a detailed sub-allocation failure message.
     /// @param requested_size Requested payload size in bytes.

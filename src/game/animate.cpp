@@ -32,8 +32,10 @@ namespace animate {
             int current_pixel_pos = chunk_base;
 
             while (true) {
-                int skip = (int)sprite[sprite_idx];
-                int count = (int)sprite[sprite_idx + 1];
+                const s_packed_screen_background_run32* run =
+                    reinterpret_cast<const s_packed_screen_background_run32*>(sprite + sprite_idx);
+                int skip = (int)run->skip_count;
+                int count = (int)run->pixel_count;
                 sprite_idx += 2;
 
                 if (skip == 0 && count == 0) {
@@ -69,8 +71,10 @@ namespace animate {
         int sprite_idx = 0;
         for (int row_base = 0; row_base < 0x14000; row_base += 0x4000) {
             while (true) {
-                uint32_t skip = sprite[sprite_idx];
-                uint32_t count = sprite[sprite_idx + 1];
+                const s_packed_screen_background_run32* run =
+                    reinterpret_cast<const s_packed_screen_background_run32*>(sprite + sprite_idx);
+                uint32_t skip = run->skip_count;
+                uint32_t count = run->pixel_count;
                 sprite_idx += 2;
 
                 if (skip == 0 && count == 0) {
@@ -251,15 +255,17 @@ namespace animate {
     }
 
     void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
-        int y_offset = *(uint16_t*)(frame_data + 2);
+        int y_offset = reinterpret_cast<const s_packed_frame_header*>(frame_data)->start_y;
         int dest_line_base = (y + y_offset) * (int)video::g_screen_res_x + x;
         int dest_ptr = dest_line_base;
         int frame_idx = 2;
         int height = _animation_header->height;
 
         while (y_offset < height) {
-            int16_t run_len = *(int16_t*)(frame_data + frame_idx * 2);
-            int16_t skip_len = *(int16_t*)(frame_data + frame_idx * 2 + 2);
+            const s_packed_frame_run* run =
+                reinterpret_cast<const s_packed_frame_run*>(frame_data + frame_idx * 2);
+            int16_t run_len = run->pixel_count;
+            int16_t skip_len = run->skip_count;
             frame_idx += 2;
 
             if (run_len == 0) {
@@ -287,7 +293,7 @@ namespace animate {
     void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int32_t current_y_offset = *(uint16_t*)(frame_data + 2);
+        int32_t current_y_offset = reinterpret_cast<const s_packed_frame_header*>(frame_data)->start_y;
         int32_t word_idx = 2;
 
         int32_t dest_idx = (int32_t)x + ((int32_t)y + current_y_offset) * video::g_screen_res_x;
@@ -297,8 +303,10 @@ namespace animate {
         uint8_t* video_ptr = video::_current_video_page;
 
         while (current_y_offset < total_height) {
-            int16_t pixel_count = *(int16_t*)(frame_data + word_idx * 2);
-            int16_t skip_val = *(int16_t*)(frame_data + word_idx * 2 + 2);
+            const s_packed_frame_run* run =
+                reinterpret_cast<const s_packed_frame_run*>(frame_data + word_idx * 2);
+            int16_t pixel_count = run->pixel_count;
+            int16_t skip_val = run->skip_count;
             word_idx += 2;
 
             if (pixel_count == 0) {
@@ -379,8 +387,10 @@ namespace animate {
             int32_t current_out_pos = page_offset;
 
             while (true) {
-                int32_t skip_count = (int8_t)sprite[sprite_idx];
-                int32_t run_length = (int8_t)sprite[sprite_idx + 1];
+                const s_packed_screen_background_run8* run =
+                    reinterpret_cast<const s_packed_screen_background_run8*>(sprite + sprite_idx);
+                int32_t skip_count = run->skip_count;
+                int32_t run_length = run->pixel_count;
                 sprite_idx += 2;
 
                 if (run_length == 0) {
@@ -407,8 +417,10 @@ namespace animate {
             int32_t current_pixel = base_pixel_offset;
 
             while (true) {
-                int8_t skip = (int8_t)sprite[sprite_idx];
-                int8_t count = (int8_t)sprite[sprite_idx + 1];
+                const s_packed_screen_background_run8* run =
+                    reinterpret_cast<const s_packed_screen_background_run8*>(sprite + sprite_idx);
+                int8_t skip = run->skip_count;
+                int8_t count = run->pixel_count;
                 sprite_idx += 2;
 
                 if (count == 0) {
@@ -452,7 +464,9 @@ namespace animate {
         if (count > 0) {
             s_palette_entry* dst = &video::_current_palette[start_index];
             uint32_t* dst_val = (uint32_t*)dst;
-            const uint32_t* src = (const uint32_t*)((const uint8_t*)_palette_header + 4);
+            const uint32_t* src = reinterpret_cast<const uint32_t*>(
+                reinterpret_cast<const uint8_t*>(_palette_header) + sizeof(s_palette_header)
+            );
 
             for (int16_t i = 0; i < count; ++i) {
                 uint32_t src_val = src[i];
@@ -469,7 +483,7 @@ namespace animate {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         platform::Lock_Offscreen_Surface_();
 
-        int32_t current_y = *(uint16_t*)(frame_data + 2);
+        int32_t current_y = reinterpret_cast<const s_packed_frame_header*>(frame_data)->start_y;
         int32_t draw_y = y + current_y;
         int32_t data_offset_words = 2;
         int32_t draw_x = x;
@@ -478,8 +492,10 @@ namespace animate {
         int32_t height = _animation_header->height;
 
         while (current_y < height) {
-            int32_t count = *(int16_t*)(frame_data + data_offset_words * 2);
-            int32_t skip = *(int16_t*)(frame_data + data_offset_words * 2 + 2);
+            const s_packed_frame_run* run =
+                reinterpret_cast<const s_packed_frame_run*>(frame_data + data_offset_words * 2);
+            int32_t count = run->pixel_count;
+            int32_t skip = run->skip_count;
             data_offset_words += 2;
 
             if (count == 0) {
@@ -746,7 +762,7 @@ namespace animate {
     {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int32_t current_y_offset = *(uint16_t*)(sprite_data + 2);
+        int32_t current_y_offset = reinterpret_cast<const s_packed_frame_header*>(sprite_data)->start_y;
         int32_t line_start_offset = (y + current_y_offset) * video::g_screen_res_x + x;
         int32_t sprite_idx = 2;
         int32_t screen_offset = line_start_offset;
@@ -754,8 +770,10 @@ namespace animate {
 
         if (current_y_offset < header_height) {
             do {
-                int16_t run_len = *(int16_t*)(sprite_data + sprite_idx * 2);
-                int16_t skip_len = *(int16_t*)(sprite_data + sprite_idx * 2 + 2);
+                const s_packed_frame_run* run =
+                    reinterpret_cast<const s_packed_frame_run*>(sprite_data + sprite_idx * 2);
+                int16_t run_len = run->pixel_count;
+                int16_t skip_len = run->skip_count;
                 sprite_idx += 2;
 
                 if (run_len == 0) {
@@ -842,15 +860,17 @@ namespace animate {
         }
         int32_t draw_height = max_y - draw_y + 1;
 
-        int32_t current_y = *(uint16_t*)(frame_data + 2);
+        int32_t current_y = reinterpret_cast<const s_packed_frame_header*>(frame_data)->start_y;
         int32_t screen_offset = x + draw_y * video::g_screen_res_x;
         int32_t start_y = y_off;
         int32_t idx = 2;
 
         while (current_y < start_y) {
-            int16_t run_length = *(int16_t*)(frame_data + idx * 2);
+            const s_packed_frame_run* run =
+                reinterpret_cast<const s_packed_frame_run*>(frame_data + idx * 2);
+            int16_t run_length = run->pixel_count;
             if (run_length == 0) {
-                current_y += *(uint16_t*)(frame_data + idx * 2 + 2);
+                current_y += static_cast<uint16_t>(run->skip_count);
             } else {
                 idx += (run_length + 1) / 2;
             }
@@ -868,8 +888,10 @@ namespace animate {
         int32_t clip_right = line_start_offset + right_limit_offset;
 
         while (current_y < draw_height) {
-            int16_t run_length = *(int16_t*)(frame_data + idx * 2);
-            int16_t skip = *(int16_t*)(frame_data + idx * 2 + 2);
+            const s_packed_frame_run* run =
+                reinterpret_cast<const s_packed_frame_run*>(frame_data + idx * 2);
+            int16_t run_length = run->pixel_count;
+            int16_t skip = run->skip_count;
             idx += 2;
 
             if (run_length == 0) {

@@ -3,20 +3,15 @@
 namespace antarans {
     uint8_t _antaran_ship_cost[9] = {2, 5, 12, 30, 75, 0, 0, 0, 0};
     uint8_t _n_max_antaran_off_ships[9] = {4, 4, 3, 2, 2, 0, 0, 0, 0};
-    const char s_offensive_00558598[12] = "offensive";
     uint8_t _offensive_titan_ship_built;
-    const char s_defensive_0055858c[12] = "defensive";
     uint8_t _n_max_antaran_def_ships[9] = {0, 0, 3, 2, 7, 0, 0, 0, 0};
-    const char s_2d_fmt[5] = "%2d ";
-    const char s_ships_by_size[31] = "-< ships (by size)          : ";
-    const char s_ships_deployed_by_size[31] = "-< ships deployed (by size) : ";
 
     int32_t __cdecl Delta_Stardate_() {
         return MOX::_stardate - 35000;
     }
 
     int16_t __cdecl Antaran_Delay_() {
-        int8_t level = static_cast<int8_t>(MOX::_settings.starting_civilization_level);
+        int8_t level = (int8_t)MOX::_settings.starting_civilization_level;
 
         switch (level) {
         case 0:
@@ -29,7 +24,6 @@ namespace antarans {
         }
     }
 
-    // Suggested name: Antarans_Defensive_Resource_Bonus
     int16_t __cdecl Antarans_Defensive_Resource_Bonus_() {
         if (MOX::_settings.game_difficulty == 3) {
             return 150;
@@ -105,7 +99,7 @@ namespace antarans {
 
             // If a ship type has a maximum threshold specified, check if current count meets it
             if (max_val != 0) {
-                if (MOX::_antarans.defensive_ships[i] < static_cast<int16_t>(max_val)) {
+                if (MOX::_antarans.defensive_ships[i] < (int16_t)max_val) {
                     return false;
                 }
             }
@@ -141,7 +135,7 @@ namespace antarans {
         }
     }
 
-    void __cdecl Build_Antaran_Ships_(short *resources, short *ships, uint8_t *max_ships, char is_offensive) {
+    void __cdecl Build_Antaran_Ships_(int16_t *resources, int16_t *ships, uint8_t *max_ships, int8_t is_offensive) {
         int32_t stardate_delta = Delta_Stardate_();
         int32_t antaran_delay = (int32_t)Antaran_Delay_();
         int32_t time_ref = stardate_delta - antaran_delay;
@@ -245,7 +239,7 @@ namespace antarans {
     }
 
     void __cdecl Build_Antaran_Defensive_Ships_() {
-        strcpy(MOX::_temp_string, s_defensive_0055858c);
+        strcpy(MOX::_temp_string, "defensive");
 
         Build_Antaran_Ships_(
             &MOX::_antarans.resource_defensive,
@@ -256,7 +250,7 @@ namespace antarans {
     }
 
     void __cdecl Build_Antaran_Offensive_Ships_() {
-        strcpy(MOX::_temp_string, s_offensive_00558598);
+        strcpy(MOX::_temp_string, "offensive");
 
         Build_Antaran_Ships_(
             &MOX::_antarans.resource_offensive,
@@ -266,7 +260,7 @@ namespace antarans {
         );
     }
 
-    void __cdecl Build_List_Of_Stars_By_Player_(short player_idx, short* star_list, short* star_count) {
+    void __cdecl Build_List_Of_Stars_By_Player_(int16_t player_idx, int16_t *star_list, int16_t *star_count) {
         *star_count = 0;
 
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
@@ -278,8 +272,8 @@ namespace antarans {
 
         int16_t shuffle_limit = *star_count / 2;
         for (int16_t i = 0; i < shuffle_limit; ++i) {
-            int16_t idx1 = static_cast<int16_t>(random::Random_(*star_count)) - 1;
-            int16_t idx2 = static_cast<int16_t>(random::Random_(*star_count)) - 1;
+            int16_t idx1 = (int16_t)random::Random_(*star_count) - 1;
+            int16_t idx2 = (int16_t)random::Random_(*star_count) - 1;
 
             if (idx1 != idx2) {
                 int16_t temp = star_list[idx1];
@@ -289,17 +283,17 @@ namespace antarans {
         }
     }
 
-    short __cdecl Get_Antaran_Target_Star_(short player_idx) {
-        short star_count;
-        short star_indices[72];
-        short target_star_idx = -1;
+    int16_t __cdecl Get_Antaran_Target_Star_(int16_t player_idx) {
+        int16_t star_count;
+        int16_t star_indices[72];
+        int16_t target_star_idx = -1;
 
         Build_List_Of_Stars_By_Player_(player_idx, star_indices, &star_count);
 
         if (star_count > 0) {
-            for (short i = 0; i < star_count; ++i) {
+            for (int16_t i = 0; i < star_count; ++i) {
                 // Reservoir sampling: pick the i-th star with 1/(i+1) probability
-                if (random::Random_(static_cast<int>(i) + 1) == 1) {
+                if (random::Random_((int32_t)i + 1) == 1) {
                     target_star_idx = star_indices[i];
                 }
             }
@@ -348,17 +342,17 @@ namespace antarans {
     bool __cdecl Deploy_Antaran_Ships_() {
         int16_t target_star = Get_Antaran_Target_Star_(EVENTS::Get_Antaran_Victim_());
 
-        sprintf(MOX::_temp_string, s_ships_by_size);
+        sprintf(MOX::_temp_string, "-< ships (by size)          : ");
         for (int i = 0; i < 9; ++i) {
             char buf[16];
-            sprintf(buf, s_2d_fmt, (int)MOX::_antarans.offensive_ships[i]);
+            sprintf(buf, "%2d ", (int)MOX::_antarans.offensive_ships[i]);
             strcat(MOX::_temp_string, buf);
         }
 
-        sprintf(MOX::_temp_string, s_ships_deployed_by_size);
+        sprintf(MOX::_temp_string, "-< ships deployed (by size) : ");
         for (int i = 0; i < 9; ++i) {
             char buf[16];
-            sprintf(buf, s_2d_fmt, (int)MOX::_antarans.offensive_deployed[i]);
+            sprintf(buf, "%2d ", (int)MOX::_antarans.offensive_deployed[i]);
             strcat(MOX::_temp_string, buf);
         }
 
@@ -488,19 +482,19 @@ namespace antarans {
             return false;
         }
 
-        bool found = false;
-        for (int16_t i = 0; i < 9 && !found; ++i) {
+        bool has_available_offensive_ships = false;
+        for (int16_t i = 0; i < 9 && !has_available_offensive_ships; ++i) {
             int32_t available_ships =
                 (int32_t)MOX::_antarans.offensive_ships[i] -
                 (int32_t)MOX::_antarans.offensive_deployed[i];
 
             if (available_ships > 0) {
-                found = true;
+                has_available_offensive_ships = true;
             }
         }
 
         // If Antarans have ships that aren't already deployed elsewhere, build up pressure
-        if (found) {
+        if (has_available_offensive_ships) {
             MOX::_antarans.attack_pressure++;
         }
 
