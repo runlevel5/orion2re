@@ -1,13 +1,12 @@
 # Source Cleanup Progress
 
 ## Current focus
-- none
+- src/game/bill.{h,cpp}
 
 ## In progress
-- none
+- [in_progress] src/game/bill.{h,cpp}
 
 ## Pending
-- [pending] src/game/bill.{h,cpp}
 - [pending] src/game/billhelp.{h,cpp}
 - [pending] src/game/bitio.{h,cpp}
 - [pending] src/game/bitmap.{h,cpp}

@@ -78,16 +78,19 @@ namespace BEAMS {
         BEAMS::_old_color[1] = -1;
     }
 
-    /**
-     * @address 00420ca0
-     */
+    /** Initialize beam animation data and reset cached beam palette state. */
     void __cdecl Init_Beams_() {
-        _l_anims = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(COLONY::_BEAMS_LBX, 0, MOX::_screen_seg));
+        _l_anims = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_BEAMS_LBX, 0, MOX::_screen_seg);
         Reset_Beam_Swapping_Colors_();
     }
 
-    s_animation_header* __cdecl Reflection_Field_Anims_(int16_t p1, int16_t p2) {
-        int16_t entry_num = (int16_t)(p2 * 5 + p1 + 0x59);
+    /**
+     * Load the reflection-field animation for the given rotation and size.
+     * @param rotation_idx Reflection-field rotation variant.
+     * @param size_idx Reflection-field size variant.
+     */
+    s_animation_header* __cdecl Reflection_Field_Anims_(int16_t rotation_idx, int16_t size_idx) {
+        int16_t entry_num = (int16_t)(size_idx * 5 + rotation_idx + 0x59);
 
         return (s_animation_header*)buffer::Buffer_Reload_(
             COLONY::_BEAMS_LBX,
@@ -135,14 +138,12 @@ namespace BEAMS {
         Load_Shield_Hit_();
         Load_Reflection_Field_Hit_(reflection_hit_param);
 
-        _mauler_ball_seg = reinterpret_cast<s_animation_header*>(
+        _mauler_ball_seg = (s_animation_header*)(
             farload::Far_Reload_Next_(COLONY::_BEAMS_LBX, 0x58, MOX::_screen_seg)
         );
     }
 
-    /**
-     * @address 00420c50
-     */
+    /** Preload the ship explosion animations. */
     void __cdecl Load_Ship_Explosion_() {
         for (int i = 0; i < 2; ++i) {
             int entry_index = i + 0x41;
@@ -156,9 +157,7 @@ namespace BEAMS {
         }
     }
 
-    /**
-     * @address 00420ae0
-     */
+    /** Draw the requested ship explosion animation frame at the given position. */
     void __cdecl Draw_Ship_Explosion_(int16_t x, int16_t y, int16_t type_idx, int16_t frame_idx, int16_t size_idx) {
         s_animation_header* anim = _explosion_anim[size_idx][type_idx];
         int16_t count1 = animate::Get_Animation_Frame_Count_(anim);
@@ -225,7 +224,8 @@ namespace BEAMS {
     }
 
     /**
-     * @address 00422980
+     * Remove a damage-message entry by shifting later entries down.
+     * @param index Queue slot to remove.
      */
     void __cdecl Squish_Out_Msg_Queue_Slot_(int16_t index) {
         // BUG: removing an entry from the queue while iterating it in Draw_Damage_Message_Queue_
@@ -237,11 +237,12 @@ namespace BEAMS {
     }
 
     /**
-     * @address 004228f0
+     * Enqueue a floating combat damage message when any damage component is nonzero.
+     * @param x Message x-position.
+     * @param y Message y-position.
      */
     void __cdecl Add_Damage_Message_To_Queue_(int16_t x, int16_t y, int16_t total_dmg, int16_t struct_dmg, int16_t shield_dmg, uint8_t side) {
         if (BEAMS::_n_damage_msgs < 35 /* 0x23 */) {
-            // Check if there is any positive damage value to report
             if (total_dmg > 0 || struct_dmg > 0 || shield_dmg > 0) {
                 int16_t current_index = BEAMS::_n_damage_msgs;
                 s_beam_dmg_msg& msg = BEAMS::_msg_queue[current_index];
@@ -265,7 +266,7 @@ namespace BEAMS {
         int16_t size_offset;
 
         // Size class: 0=Tiny, 1=Small, 2=Medium, 3=Large, 4=Huge, 5=Titan/Starbase
-        size_offset = static_cast<int16_t>(MOX::_combat_data[ship_idx].size_class) * 8;
+        size_offset = (int16_t)MOX::_combat_data[ship_idx].size_class * 8;
 
         COMBINIT::Ship_Center_Offsets_(ship_idx, &x_center, &y_center);
 
@@ -283,7 +284,7 @@ namespace BEAMS {
         BEAMS::Add_Damage_Message_To_Queue_(x_center, y_center, total_damage, struct_damage, 0, side);
     }
 
-    void __cdecl Draw_Shield_Hit_Once_Through_(int16_t ship_idx, int16_t param_2, int16_t draw_x, int16_t draw_y) {
+    void __cdecl Draw_Shield_Hit_Once_Through_(int16_t ship_idx, int16_t hit_rotation, int16_t draw_x, int16_t draw_y) {
         int8_t size_class = MOX::_combat_data[ship_idx].size_class;
         int16_t shield_size = Ship_Size_To_Shield_Size_(size_class);
 
@@ -317,7 +318,7 @@ namespace BEAMS {
                 }
 
                 Adjust_Shield_Display_Status_(&shield_status);
-                Draw_Shield_Hit_(start_x, start_y, ship_idx, 0, 0, param_2, shield_status);
+                Draw_Shield_Hit_(start_x, start_y, ship_idx, 0, 0, hit_rotation, shield_status);
                 Draw_Damage_Message_Queue_();
 
                 timer::Release_Time_(1);
@@ -330,9 +331,7 @@ namespace BEAMS {
         } while (Done_Drawing_Damage_Message_Queue_() == 0);
     }
 
-    /**
-     * @address 00422a70
-     */
+    /** Draw one floating damage indicator at its current animation offset. */
     void __cdecl Draw_Damage_Indicator_(int16_t x, int16_t y, int16_t total_dmg, int16_t hull_dmg, int16_t shield_dmg, uint8_t side, int16_t anim_timer) {
         const uint8_t total_dmg_color_steps[27] = {
             0xb0, 0xb9, 0xba, 0xb0, 0xb8, 0xb9, 0xb0, 0xb7, 0xb8,
@@ -403,16 +402,12 @@ namespace BEAMS {
         video::Clip_Off_();
     }
 
-    /**
-     * @address 00422a60
-     */
+    /** Return whether all queued damage messages have finished animating. */
     int8_t __cdecl Done_Drawing_Damage_Message_Queue_() {
         return _n_damage_msgs == 0;
     }
 
-    /**
-     * @address 004229d0
-     */
+    /** Advance and draw all active floating damage messages. */
     void __cdecl Draw_Damage_Message_Queue_() {
         for (int16_t i = 0; i < BEAMS::_n_damage_msgs; ++i) {
             s_beam_dmg_msg& msg = BEAMS::_msg_queue[i];
@@ -483,9 +478,7 @@ namespace BEAMS {
         }
     }
 
-    /**
-     * @address 00423370
-     */
+    /** Map a combat ship size to the shield animation size index. */
     int16_t __cdecl Ship_Size_To_Shield_Size_(int16_t ship_size) {
         int16_t shield_sizes[6];
 
@@ -499,9 +492,7 @@ namespace BEAMS {
         return shield_sizes[ship_size];
     }
 
-    /**
-     * @address 00422e70
-     */
+    /** Keep redrawing combat until all damage popups expire. */
     void __cdecl Draw_Damage_Message_Queue_Until_Done_() {
         do {
             timer::Mark_Time_();
@@ -521,9 +512,7 @@ namespace BEAMS {
         return BEAMS::_max_frames;
     }
 
-    /**
-     * @address 00420a50
-     */
+    /** Return the approximate tile-space distance between two combat points. */
     int16_t __cdecl Get_Ship_Range_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
         int16_t dx = x2 - x1;
         if (dx < 0) {
@@ -542,12 +531,10 @@ namespace BEAMS {
         return dx;
     }
 
-    /**
-     * @address 004233f0
-     */
-    void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7) {
-        int16_t base_rot = BEAMS::Rot_To_Base_Rot_(param_6);
-        int16_t rot_method = BEAMS::Rot_To_Rot_Method_(param_6);
+    /** Draw the current shield-hit frame for the target ship or planet. */
+    void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t is_special, int16_t is_heavy, int16_t hit_rotation, int16_t frame_index) {
+        int16_t base_rot = BEAMS::Rot_To_Base_Rot_(hit_rotation);
+        int16_t rot_method = BEAMS::Rot_To_Rot_Method_(hit_rotation);
 
         if (BEAMS::_shield_display_status == 0) {
             return;
@@ -575,7 +562,7 @@ namespace BEAMS {
         s_animation_header* sprite2 = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, buf_size);
         bitmap::Create_Blank_Bitmap_(diam, diam, sprite2);
 
-        if (param_7 == 0 && BEAMS::_g_shield_sfx_handle == 0) {
+        if (frame_index == 0 && BEAMS::_g_shield_sfx_handle == 0) {
             if (BEAMS::_g_reflection_state_flag == 0) {
                 BEAMS::_g_shield_sfx_handle = ERICNET::Mox_Play_Sound_(38);
             } else {
@@ -588,23 +575,23 @@ namespace BEAMS {
                 sound::Pitch_Bend_Sound_(BEAMS::_g_shield_sfx_handle, -15000);
             }
         } else {
-            s_animation_header* anim = BEAMS::Shield_Anims_(base_rot, shield_size, param_4, param_5);
+            s_animation_header* anim = BEAMS::Shield_Anims_(base_rot, shield_size, is_special, is_heavy);
             int16_t frame_count = animate::Get_Animation_Frame_Count_(anim);
 
-            if ((frame_count - 1 <= param_7) || (BEAMS::_g_shield_sfx_handle != 0 && BEAMS::_shield_display_status == 0)) {
+            if ((frame_count - 1 <= frame_index) || (BEAMS::_g_shield_sfx_handle != 0 && BEAMS::_shield_display_status == 0)) {
                 sound::Fadeout_Sound_(BEAMS::_g_shield_sfx_handle, 10);
                 BEAMS::_g_shield_sfx_handle = 0;
             }
         }
 
-        s_animation_header* anim = BEAMS::Shield_Anims_(base_rot, shield_size, param_4, param_5);
+        s_animation_header* anim = BEAMS::Shield_Anims_(base_rot, shield_size, is_special, is_heavy);
         int16_t anim_frame_count = animate::Get_Animation_Frame_Count_(anim);
-        int16_t anim_frame = param_7 % anim_frame_count;
+        int16_t anim_frame = frame_index % anim_frame_count;
 
-        anim = BEAMS::Shield_Anims_(base_rot, shield_size, param_4, param_5);
+        anim = BEAMS::Shield_Anims_(base_rot, shield_size, is_special, is_heavy);
         animate::Set_Animation_Frame_(anim, anim_frame);
 
-        anim = BEAMS::Shield_Anims_(base_rot, shield_size, param_4, param_5);
+        anim = BEAMS::Shield_Anims_(base_rot, shield_size, is_special, is_heavy);
         bitmap::Draw_Picture_To_Bitmap_(sprite1, anim);
 
         s_animation_header* draw_src = sprite1;
@@ -718,9 +705,7 @@ namespace BEAMS {
         fields::Get_Input_();
     }
 
-    /**
-     * @address 00422dc0
-     */
+    /** Queue a damage popup next to a missile target. */
     void __cdecl Add_Damage_Indicator_For_Missile_(int16_t x, int16_t y, uint8_t direction, int16_t damage) {
         int16_t adjusted_x;
 
@@ -735,9 +720,7 @@ namespace BEAMS {
         BEAMS::Add_Damage_Message_To_Queue_(adjusted_x, adjusted_y, damage, 0, 0, direction);
     }
 
-    /**
-     * @address 00422e00
-     */
+    /** Queue a damage popup for a biological attack result. */
     void __cdecl Add_Damage_Indicator_For_Biological_(int16_t x, int16_t y, uint8_t side_flag, int16_t damage) {
         int16_t target_x;
 
@@ -750,9 +733,7 @@ namespace BEAMS {
         BEAMS::Add_Damage_Message_To_Queue_(target_x, y - 8, 0, 0, damage, side_flag);
     }
 
-    /**
-     * @address 00422770
-     */
+    /** Draw fighter beam fire for the current frame and report whether more frames remain. */
     int8_t __cdecl Draw_Fighter_Beam_(int16_t* fighter_coords, int16_t count, int16_t target_x, int16_t target_y, int16_t weapon_type, int16_t frame) {
         uint32_t original_seed = random::Get_Random_Seed_();
         
@@ -794,7 +775,8 @@ namespace BEAMS {
     }
 
     /**
-     * @address 0x00423980
+     * Convert a 16-step facing into the base shield animation rotation index.
+     * @param rot Input facing value.
      */
     int16_t __cdecl Rot_To_Base_Rot_(int16_t rot) {
         int16_t base_rotations[16] = {
@@ -802,12 +784,13 @@ namespace BEAMS {
             0, 1, 2, 3, 4, 3, 2, 1
         };
 
-        int16_t idx = (rot < 0) ? (int16_t)-((-rot) & 0xF) : (int16_t)(rot & 0xF);
-        return *(base_rotations + idx);
+        int16_t idx = (int16_t)(rot & 0xF);
+        return base_rotations[idx];
     }
 
     /**
-     * @address 0x00423A10
+     * Convert a 16-step facing into the bitmap flip method used for that rotation.
+     * @param rot Input facing value.
      */
     int16_t __cdecl Rot_To_Rot_Method_(int16_t rot) {
         int16_t methods[16] = {
@@ -817,13 +800,11 @@ namespace BEAMS {
             3, 3, 3, 3
         };
 
-        int16_t idx = (rot < 0) ? (int16_t)-((-rot) & 0xF) : (int16_t)(rot & 0xF);
-        return *(methods + idx);
+        int16_t idx = (int16_t)(rot & 0xF);
+        return methods[idx];
     }
 
-    /**
-     * @address 004233b0
-     */
+    /** Map a planet size to the shield animation size index. */
     int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size) {
         int16_t sizes[6];
 
@@ -1264,8 +1245,8 @@ namespace BEAMS {
 
         if (Is_Steve_Stuff_Weapon_(weapon_id)) {
             Build_Steve_Stuff_Struct_For_Weapon_(weapon_id, weapon_specials, &fx);
-            v_sfx_sprite_id = static_cast<int16_t>(fx.sfx_sprite_id);
-            v_duration = static_cast<int16_t>(fx.duration);
+            v_sfx_sprite_id = (int16_t)fx.sfx_sprite_id;
+            v_duration = (int16_t)fx.duration;
             pfx = &fx;
         }
 
@@ -1297,7 +1278,11 @@ namespace BEAMS {
         }
     }
 
-    void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* param_7, int16_t is_non_ship_target) {
+    /**
+     * Drive the full beam-weapon visual sequence for one attack exchange.
+     * @param fx_entries Beam effect entries to play in sequence.
+     */
+    void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* fx_entries, int16_t is_non_ship_target) {
         int16_t current_fx_idx[2] = { 0, -1 };
         int16_t frame_idx[2] = { 0, 0 };
         int16_t rand_offsets[6] = { 0, 0, 0, 0, 0, 0 };
@@ -1312,7 +1297,7 @@ namespace BEAMS {
         Shield_Anims_(0, 0, 1, 0);
         Reset_Beam_Swapping_Colors_();
 
-        if (param_7[0].weapon_id == 0x2e || TECHDATA::_weapons[param_7[0].weapon_id].type == 0) {
+        if (fx_entries[0].weapon_id == 0x2e || TECHDATA::_weapons[fx_entries[0].weapon_id].type == 0) {
             int16_t attacker_facing_dir = MOX::_combat_data[attacker_ship_id].facing_dir;
             int16_t target_facing_dir = MOX::_combat_data[target_id].facing_dir;
 
@@ -1336,7 +1321,7 @@ namespace BEAMS {
                 _g_beam_fire_sfx_handle[i] = 0;
             }
 
-            if ((param_7[0].specials & 0x80) != 0) {
+            if ((fx_entries[0].specials & 0x80) != 0) {
                 special_timer[0] = 3;
             }
 
@@ -1359,7 +1344,7 @@ namespace BEAMS {
                 for (int16_t i = 0; i < 2; ++i) {
                     int16_t current_fx = current_fx_idx[i];
                     if (current_fx >= 0) {
-                        s_beam_fx_entry* fx = &param_7[current_fx];
+                        s_beam_fx_entry* fx = &fx_entries[current_fx];
                         int16_t weapon_id = fx->weapon_id;
                         int16_t shot_count = fx->shot_count;
                         int16_t attacker_picture_num = MOX::_combat_data[attacker_ship_id].picture_num;
@@ -1481,7 +1466,7 @@ namespace BEAMS {
                             int16_t other_i = (i == 0) ? 1 : 0;
                             int16_t other_fx = current_fx_idx[other_i];
                             if (other_fx != -1 && other_fx < 16) {
-                                if (param_7[other_fx].weapon_id <= 0 || frame_idx[other_i] >= 9) {
+                                if (fx_entries[other_fx].weapon_id <= 0 || frame_idx[other_i] >= 9) {
                                     skip_frame_increment = true;
                                 }
                             }
@@ -1498,7 +1483,7 @@ namespace BEAMS {
                             special_timer[i]--;
                             if (special_timer[i] <= 0) {
                                 special_timer[i] = 0;
-                                s_beam_fx_entry* next_fx = &param_7[fx_idx + 1];
+                                s_beam_fx_entry* next_fx = &fx_entries[fx_idx + 1];
                                 if (next_fx->weapon_id <= 0 || fx_idx + 1 >= 16) {
                                     current_fx_idx[i] = (int16_t)0xffff;
                                 }
@@ -1506,11 +1491,11 @@ namespace BEAMS {
                                     if (next_fx->is_damage_entry == 0) {
                                         fx_idx++;
                                         current_fx_idx[i] = fx_idx;
-                                        if (param_7[fx_idx + 1].is_damage_entry != 0) {
+                                        if (fx_entries[fx_idx + 1].is_damage_entry != 0) {
                                             _g_reflection_state_flag = 1;
                                             _reflection_field_display_status = 1;
                                         }
-                                        if ((param_7[fx_idx].specials & 0x80) != 0) {
+                                        if ((fx_entries[fx_idx].specials & 0x80) != 0) {
                                             special_timer[i] = 3;
                                         }
                                     }
@@ -1602,10 +1587,10 @@ namespace BEAMS {
                     Adjust_Shield_Display_Status_(&_shield_hit_draw_facing);
                     uint8_t shield_special = 0;
                     if (current_fx_idx[0] > -1) {
-                        shield_special = (uint8_t)param_7[current_fx_idx[0]].special_flag;
+                        shield_special = (uint8_t)fx_entries[current_fx_idx[0]].special_flag;
                     }
                     if (current_fx_idx[1] > -1) {
-                        shield_special = (uint8_t)(shield_special + (uint8_t)param_7[current_fx_idx[0] == 0].special_flag);
+                        shield_special = (uint8_t)(shield_special + (uint8_t)fx_entries[current_fx_idx[0] == 0].special_flag);
                     }
                     if (_g_pierced_shield_flag != 0) {
                         shield_special = 1;
@@ -1629,7 +1614,7 @@ namespace BEAMS {
                         int16_t shield_diam = _shield_diameters[shield_size];
                         int16_t specials = 0;
                         if (current_fx_idx[0] > -1) {
-                            specials = param_7[current_fx_idx[0]].specials & 0x100;
+                            specials = fx_entries[current_fx_idx[0]].specials & 0x100;
                         }
                         int16_t draw_facing = _shield_hit_draw_facing;
                         int16_t hit_facing = Get_SFX_Draw_Shield_Facing2_(attacker_ship_id, target_id);
@@ -1677,7 +1662,7 @@ namespace BEAMS {
                     if (is_non_ship_target == 0) {
                         int16_t fx_idx_val = current_fx_idx[i];
                         if (fx_idx_val > -1 && _ship_hit_now_flag[i] != 0) {
-                            s_beam_fx_entry* fx = &param_7[fx_idx_val];
+                            s_beam_fx_entry* fx = &fx_entries[fx_idx_val];
                             if (fx->accum_hit_x > 0 || fx->accum_hit_y > 0) {
                                 uint8_t hit_facing = (uint8_t)Do_Get_SFX_Draw_Shield_Facing_(attacker_ship_id, target_id);
                                 Add_Damage_Indicator_For_Ship_(target_x, target_y, target_id, hit_facing, fx->accum_hit_x, fx->accum_hit_y);
@@ -1690,7 +1675,7 @@ namespace BEAMS {
                     else {
                         int16_t fx_idx_val = current_fx_idx[i];
                         if (fx_idx_val > -1 && _ship_hit_now_flag[i] != 0) {
-                            s_beam_fx_entry* fx = &param_7[fx_idx_val];
+                            s_beam_fx_entry* fx = &fx_entries[fx_idx_val];
                             if (fx->accum_hit_x > 0 || fx->accum_hit_y > 0) {
                                 Add_Damage_Indicator_For_Missile_(target_center_x, target_center_y, 1, fx->accum_hit_x);
                                 MOX::_missile[target_id].quantity -= fx->accum_hit_x;
@@ -1808,10 +1793,8 @@ namespace BEAMS {
         allocate::Pop_Block_(MOX::_screen_seg);
     }
 
-    /**
-     * @address 00423aa0
-     */
-    void __cdecl Adjust_Reflection_Field_Display_Status_(int16_t* param_1) {
+    /** Advance the reflection-field animation state machine. */
+    void __cdecl Adjust_Reflection_Field_Display_Status_(int16_t* frame_index) {
         int16_t frame_count = animate::Get_Animation_Frame_Count_(Reflection_Field_Anims_(0, 0));
 
         if (_g_reflection_state_flag == 0 && _reflection_field_display_status != 0) {
@@ -1823,30 +1806,30 @@ namespace BEAMS {
             case 0:
                 if (_reflection_field_hit_now_flag != 0 || _g_reflection_state_flag >= 1) {
                     _reflection_field_display_status = 1;
-                    *param_1 = 0;
+                    *frame_index = 0;
                 }
                 break;
             case 1:
-                (*param_1)++;
-                if (*param_1 >= 4) {
+                (*frame_index)++;
+                if (*frame_index >= 4) {
                     _reflection_field_display_status = 2;
                 }
                 break;
             case 2:
-                (*param_1)++;
+                (*frame_index)++;
                 if (_reflection_field_hit_now_flag != 0) {
-                    if (*param_1 >= 7) {
-                        *param_1 = 4;
+                    if (*frame_index >= 7) {
+                        *frame_index = 4;
                     }
                 } else {
-                    if (*param_1 >= 7) {
+                    if (*frame_index >= 7) {
                         _reflection_field_display_status = 3;
                     }
                 }
                 break;
             case 3:
-                (*param_1)++;
-                if (frame_count <= *param_1) {
+                (*frame_index)++;
+                if (frame_count <= *frame_index) {
                     _reflection_field_display_status = 0;
                     _g_reflection_state_flag = 0;
                 }
@@ -1854,15 +1837,15 @@ namespace BEAMS {
         }
     }
 
-    void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t param_1, uint16_t param_2, s_weapon_visual_fx* param_3) {
-        if (param_1 <= 0 || param_1 > 46) {
-            memset(param_3, 0, sizeof(*param_3));
+    void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t weapon_id, uint16_t weapon_specials, s_weapon_visual_fx* out_fx) {
+        if (weapon_id <= 0 || weapon_id > 46) {
+            memset(out_fx, 0, sizeof(*out_fx));
             return;
         }
 
         s_weapon_visual_fx local_2c;
 
-        switch (param_1) {
+        switch (weapon_id) {
             case 1:
                 Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x6b, 0xc3, 0xda, 0xfc, 0xff);
                 local_2c.thickness = 1;
@@ -1870,7 +1853,7 @@ namespace BEAMS {
                 local_2c.sfx_sprite_id = 4;
                 local_2c.duration = 20;
                 local_2c.unk = 0;
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 2:
@@ -1880,11 +1863,11 @@ namespace BEAMS {
                 local_2c.sfx_sprite_id = 6;
                 local_2c.duration = 20;
                 local_2c.unk = 0;
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 3:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 0;
@@ -1899,11 +1882,11 @@ namespace BEAMS {
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 4:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
                     local_2c.thickness = 0;
                     local_2c.anim_style = 0;
@@ -1918,25 +1901,25 @@ namespace BEAMS {
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 5:
-                if (((param_2 & 0x10) != 0) && ((param_2 & 0x100) != 0)) {
+                if (((weapon_specials & 0x10) != 0) && ((weapon_specials & 0x100) != 0)) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 3;
                     local_2c.sfx_sprite_id = 100;
                     local_2c.duration = 25;
                     local_2c.unk = 1;
-                } else if ((param_2 & 0x10) != 0) {
+                } else if ((weapon_specials & 0x10) != 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 2;
                     local_2c.sfx_sprite_id = 120;
                     local_2c.duration = 30;
                     local_2c.unk = 0;
-                } else if ((param_2 & 0x100) != 0) {
+                } else if ((weapon_specials & 0x100) != 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 1;
@@ -1951,11 +1934,11 @@ namespace BEAMS {
                     local_2c.duration = 30;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 6:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 1;
@@ -1970,11 +1953,11 @@ namespace BEAMS {
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 7:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 3;
@@ -1989,11 +1972,11 @@ namespace BEAMS {
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 8:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 1;
@@ -2008,12 +1991,12 @@ namespace BEAMS {
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 9:
             case 41:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
                     local_2c.thickness = 1;
                     local_2c.anim_style = 0;
@@ -2028,7 +2011,7 @@ namespace BEAMS {
                     local_2c.duration = 50;
                     local_2c.unk = 0;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 10:
@@ -2038,7 +2021,7 @@ namespace BEAMS {
                 local_2c.sfx_sprite_id = 40;
                 local_2c.duration = 30;
                 local_2c.unk = 0;
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 11:
@@ -2049,11 +2032,11 @@ namespace BEAMS {
                 local_2c.sfx_sprite_id = 200;
                 local_2c.duration = 50;
                 local_2c.unk = 0;
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 12:
-                if ((param_2 & 0x10) == 0) {
+                if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
                     local_2c.thickness = 2;
                     local_2c.anim_style = 1;
@@ -2068,18 +2051,18 @@ namespace BEAMS {
                     local_2c.duration = 30;
                     local_2c.unk = 1;
                 }
-                memcpy(param_3, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
             case 27:
             case 40:
             case 43:
             case 46:
-                memset(param_3, 0, sizeof(*param_3));
+                memset(out_fx, 0, sizeof(*out_fx));
                 break;
 
             default:
-                memset(param_3, 0, sizeof(*param_3));
+                memset(out_fx, 0, sizeof(*out_fx));
                 return;
         }
     }
@@ -2112,9 +2095,7 @@ namespace BEAMS {
         }
     }
 
-    /**
-     * @address 0x0041ffa0
-     */
+    /** Move a point toward the target by the requested distance along the line segment. */
     void __cdecl Rob_Interpolate_Line_(int16_t* p_x, int16_t* p_y, int16_t target_x, int16_t target_y, int16_t step) {
         int16_t start_x = *p_x;
         int16_t start_y = *p_y;
@@ -2189,17 +2170,13 @@ namespace BEAMS {
         *p_y += (int16_t)cur_y;
     }
 
-    /**
-     * @address 00422e40
-     */
+    /** Return whether the shield-hit facing falls on the front half of the target. */
     int8_t __cdecl Do_Get_SFX_Draw_Shield_Facing_(int16_t attacker_id, int16_t target_id) {
         int32_t facing = Get_SFX_Draw_Shield_Facing2_(target_id, attacker_id);
         return ((facing + 4) % 16) < 8;
     }
 
-    /**
-     * @address 00422ed0
-     */
+    /** Compute the shield-hit facing from one ship toward another. */
     int16_t __cdecl Get_SFX_Draw_Shield_Facing2_(int16_t ship1_idx, int16_t ship2_idx) {
         int16_t p1_x_offset;
         int16_t p1_y_offset;
@@ -2219,9 +2196,7 @@ namespace BEAMS {
         return (angle / 22) % 16;
     }
 
-    /**
-     * @address 00420ce0
-     */
+    /** Copy a weapon palette fragment into the active palette window. */
     void __cdecl Add_Weapon_Palette_Fragment_To_Current_Palette_(int16_t source_fragment, int16_t dest_start, int16_t count)
     {
         if (count > 0) {
@@ -2249,18 +2224,22 @@ namespace BEAMS {
     }
 
     /**
-     * @address 00420110
+     * Draw a beam segment and related impact visuals for one animation frame.
+     * @param attacker_x Beam start x-position.
+     * @param attacker_y Beam start y-position.
+     * @param target_x Beam target x-position.
+     * @param target_y Beam target y-position.
      */
     void __cdecl Draw_Generic_Beam_(
         int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
         int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
         int16_t beam_width, int16_t sprite_id, int16_t draw_core_flag, int16_t draw_glow_flag,
-        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t param_17,
-        int16_t param_18, int16_t param_19, int16_t param_20, int16_t mount_scale_mod, int16_t fx_param_1,
+        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t core_flicker_min,
+        int16_t core_flicker_max, int16_t reverse_draw_flag, int16_t draw_mauler_ball_flag, int16_t mount_scale_mod, int16_t fx_param_1,
         int16_t fx_param_2, int16_t fx_param_3, int16_t fx_param_4, int16_t frame_index,
         int16_t target_size_class, uint16_t hit_result_flags, uint16_t special_flag,
         int16_t is_non_ship_target, int16_t base_damage_class, int16_t reflection_state,
-        int16_t attacker_size_class, s_weapon_visual_fx* param_34
+        int16_t attacker_size_class, s_weapon_visual_fx* weapon_visual_fx
     ) {
         int16_t angle = angle::Get_Angle_(attacker_x - target_x, target_y - attacker_y);
         _ship_hit_now_flag[0] = 0;
@@ -2283,9 +2262,9 @@ namespace BEAMS {
             sprite_id = 5;
         }
 
-        if (param_34 != nullptr) {
-            duration_frames = static_cast<int16_t>(param_34->sfx_sprite_id);
-            sprite_id = static_cast<int16_t>(param_34->duration);
+        if (weapon_visual_fx != nullptr) {
+            duration_frames = (int16_t)weapon_visual_fx->sfx_sprite_id;
+            sprite_id = (int16_t)weapon_visual_fx->duration;
         }
 
         int16_t eff_duration = duration_frames;
@@ -2310,7 +2289,7 @@ namespace BEAMS {
         if (frames < min_frames) {
             frames = min_frames;
         }
-        _max_frames = static_cast<int16_t>(frames);
+        _max_frames = (int16_t)frames;
 
         if (_max_frames <= frame_index) {
             return;
@@ -2324,7 +2303,7 @@ namespace BEAMS {
         int16_t target_len = sprite_id * frame_index;
         int16_t attacker_len = target_len - duration_frames;
 
-        if (param_34 != nullptr && param_34->anim_style == 2) {
+        if (weapon_visual_fx != nullptr && weapon_visual_fx->anim_style == 2) {
             target_len = ship_range;
             attacker_len = 0;
         }
@@ -2383,7 +2362,7 @@ namespace BEAMS {
             attacker_len = ship_range;
         }
 
-        if (param_34 != nullptr && param_34->anim_style == 2) {
+        if (weapon_visual_fx != nullptr && weapon_visual_fx->anim_style == 2) {
             attacker_len = 0;
         }
 
@@ -2400,7 +2379,7 @@ namespace BEAMS {
             Rob_Interpolate_Line_(&bx1, &by1, target_x, target_y, attacker_len);
         }
 
-        if (param_19 != 0 && param_34 == nullptr) {
+        if (reverse_draw_flag != 0 && weapon_visual_fx == nullptr) {
             int16_t temp_x = bx1;
             bx1 = bx2;
             bx2 = temp_x;
@@ -2410,27 +2389,27 @@ namespace BEAMS {
             by2 = temp_y;
         }
 
-        if (param_34 == nullptr) {
+        if (weapon_visual_fx == nullptr) {
             if (bx1 != bx2 || by1 != by2) {
                 if (mount_scale_mod == 1) {
                     bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
-                               is_autofiring, param_17, param_18, fx_param_1, fx_param_2, fx_param_3, fx_param_4);
+                               is_autofiring, core_flicker_min, core_flicker_max, fx_param_1, fx_param_2, fx_param_3, fx_param_4);
                 } else if (mount_scale_mod == 2) {
                     int16_t mid3 = (fx_param_3 + fx_param_1) / 2;
                     int16_t mid4 = (fx_param_4 + fx_param_2) / 2;
                     bolt::Wide_Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                         draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
-                                        is_autofiring, param_17, param_18, fx_param_1, fx_param_2, mid3, mid4, fx_param_3, fx_param_4);
+                                        is_autofiring, core_flicker_min, core_flicker_max, fx_param_1, fx_param_2, mid3, mid4, fx_param_3, fx_param_4);
                 } else if (mount_scale_mod == 0) {
                     if (fx_param_4 < fx_param_2) fx_param_4 = fx_param_2;
                     if (fx_param_3 < fx_param_1) fx_param_3 = fx_param_1;
                     bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
-                               is_autofiring, param_17, param_18, 0, 0, fx_param_3, fx_param_4);
+                               is_autofiring, core_flicker_min, core_flicker_max, 0, 0, fx_param_3, fx_param_4);
                 }
 
-                if (param_20 != 0 && _ship_hit_now_flag[is_palette_not_90] == 0) {
+                if (draw_mauler_ball_flag != 0 && _ship_hit_now_flag[is_palette_not_90] == 0) {
                     ERIC::Draw_Centered_(bx2, by2, _mauler_ball_seg);
                 }
             }
@@ -2441,10 +2420,10 @@ namespace BEAMS {
             }
             uint32_t hit_flag = (hit_result_flags == 0) ? 1 : 0;
             Draw_Beam2_(attacker_x, attacker_y, target_x, target_y, bx1, by1, bx2, by2, hit_flag, frame_index, palette_base_index,
-                        *param_34);
+                        *weapon_visual_fx);
         }
 
-        if (param_19 != 0 && param_34 == nullptr) {
+        if (reverse_draw_flag != 0 && weapon_visual_fx == nullptr) {
             int16_t temp_x = bx1;
             bx1 = bx2;
             bx2 = temp_x;
@@ -2578,9 +2557,9 @@ namespace BEAMS {
 
         for (int i = 0; i < 16; ++i) {
             video::_current_palette[palette_idx + i].changed = 1;
-            video::_current_palette[palette_idx + i].r = static_cast<uint8_t>(colors[i].r);
-            video::_current_palette[palette_idx + i].g = static_cast<uint8_t>(colors[i].g);
-            video::_current_palette[palette_idx + i].b = static_cast<uint8_t>(colors[i].b);
+            video::_current_palette[palette_idx + i].r = (uint8_t)colors[i].r;
+            video::_current_palette[palette_idx + i].g = (uint8_t)colors[i].g;
+            video::_current_palette[palette_idx + i].b = (uint8_t)colors[i].b;
         }
     }
 
@@ -2656,9 +2635,7 @@ namespace BEAMS {
         palette::Refresh_Palette_();
     }
 
-    /**
-     * @address 00423080
-     */
+    /** Return whether the point falls within the target shield hit radius. */
     bool __cdecl XY_In_Shield_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
         int16_t shield_idx = Ship_Size_To_Shield_Size_(ship_size);
         int16_t radius = (int16_t)((uint8_t)_shield_diameters[shield_idx] >> 1);
@@ -2671,15 +2648,13 @@ namespace BEAMS {
         return false;
     }
 
-    /**
-     * @address 00423e10
-     */
+    /** Return whether the point falls within the target reflection-field radius. */
     bool __cdecl XY_In_Reflection_Field_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
         int16_t shield_size = Ship_Size_To_Shield_Size_(ship_size);
         int16_t radius = _reflection_field_diameters[shield_size] >> 1;
 
-        if (abs(static_cast<int16_t>(x1 - x2)) <= radius &&
-            abs(static_cast<int16_t>(y1 - y2)) <= radius) {
+        if (abs((int16_t)(x1 - x2)) <= radius &&
+            abs((int16_t)(y1 - y2)) <= radius) {
             return true;
         }
 

@@ -10,13 +10,13 @@ namespace animate {
 
     short __cdecl Get_Full_Store_Flag_(s_animation_header* header) {
         _animation_header = header;
-        return (header->flags & 0x04) != 0;
+        return (header->flags & ANIMATION_FLAG_FULL_STORE) != 0;
     }
 
     void __cdecl Draw_Palette_(s_animation_header* header) {
         _animation_header = header;
 
-        if (header->flags & 0x10) {
+        if (header->flags & ANIMATION_FLAG_HAS_PALETTE) {
             Set_Animation_Palette_();
         }
     }
@@ -130,7 +130,7 @@ namespace animate {
     void __cdecl Draw_(int16_t x, int16_t y, s_animation_header* anim) {
         _animation_header = anim;
 
-        if (anim->flags & 0x10) {
+        if (anim->flags & ANIMATION_FLAG_HAS_PALETTE) {
             Set_Animation_Palette_();
         }
 
@@ -158,24 +158,24 @@ namespace animate {
                     setvesa::Add_Square_To_Scan_List_(x, y, x_end, y_end);
                 }
 
-                switch (anim->flags & 0x3) {
-                case 0:
-                    if (anim->flags & 0x8) clipped::Clipped_Draw_Glassed_Animated_Sprite_(x, y, frame_data);
+                switch (anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
+                    if (anim->flags & ANIMATION_FLAG_GLASSED) clipped::Clipped_Draw_Glassed_Animated_Sprite_(x, y, frame_data);
                     else clipped::Clipped_Draw_Animated_Sprite_(x, y, frame_data);
                     break;
-                case 1:
-                    if (anim->flags & 0x8) clipped::Clipped_Draw_Glassed_Bitmap_Sprite_(x, y, frame_data);
+                case ANIMATION_DRAW_MODE_BITMAP:
+                    if (anim->flags & ANIMATION_FLAG_GLASSED) clipped::Clipped_Draw_Glassed_Bitmap_Sprite_(x, y, frame_data);
                     else clipped::Clipped_Draw_Bitmap_Sprite_(x, y, frame_data);
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     exitm::Exit_With_Message("Screen Background can't be clipped");
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                     exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                     break;
                 }
             }
-            else if ((anim->flags & 0x3) == 0) {
+            else if ((anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK) == ANIMATION_DRAW_MODE_ANIMATED_SPRITE) {
                 clipped::Clipped_Draw_Stenciled_Animated_Sprite_(x, y, frame_data);
             }
         }
@@ -188,22 +188,22 @@ namespace animate {
                 setvesa::Add_Square_To_Scan_List_(x, y, x_end, y_end);
             }
 
-            uint8_t type = anim->flags & 0x3;
-            bool glassed = (anim->flags & 0x8) != 0;
+            uint8_t type = anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK;
+            bool glassed = (anim->flags & ANIMATION_FLAG_GLASSED) != 0;
 
             if (!glassed) {
                 switch (type) {
-                case 0:
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                     video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Animated_Sprite_(x, y, frame_data);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
-                case 1:
+                case ANIMATION_DRAW_MODE_BITMAP:
                     video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Bitmap_Sprite_(x, y, frame_data);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     if (video::_copy_to_on_page_flag == 1) Draw_Screen_Background_On_((uint32_t*)frame_data);
                     else Draw_Screen_Background_Off_(frame_data);
 
@@ -211,20 +211,20 @@ namespace animate {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                     }
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                     exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                     break;
                 }
             }
             else {
                 switch (type) {
-                case 0:
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                     Draw_Glassed_Animated_Sprite_(x, y, frame_data);
                     break;
-                case 1:
+                case ANIMATION_DRAW_MODE_BITMAP:
                     Draw_Glassed_Bitmap_Sprite_(x, y, frame_data);
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     if (video::_copy_to_on_page_flag == 1) Draw_Glassed_Screen_Background_On_(frame_data);
                     else Draw_Glassed_Screen_Background_Off_(frame_data);
 
@@ -232,7 +232,7 @@ namespace animate {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                     }
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                     exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                     break;
                 }
@@ -565,17 +565,17 @@ namespace animate {
                     setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
                 }
 
-                switch (anim->flags & 3) {
-                case 0:
+                switch (anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                     Remap_Clipped_Draw_Animated_Sprite_(x, y, frame_ptr);
                     return;
-                case 1:
+                case ANIMATION_DRAW_MODE_BITMAP:
                     exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                     exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
                     break;
                 }
@@ -586,17 +586,17 @@ namespace animate {
                 setvesa::Add_Square_To_Scan_List_(x, y, x + anim->width - 1, y + anim->height - 1);
             }
 
-            switch (anim->flags & 3) {
-            case 0:
+            switch (anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+            case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                 Remap_Draw_Animated_Sprite_(x, y, frame_ptr);
                 break;
-            case 1:
+            case ANIMATION_DRAW_MODE_BITMAP:
                 exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
                 break;
-            case 2:
+            case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                 exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
                 break;
-            case 3:
+            case ANIMATION_DRAW_MODE_REFRESH_MASK:
                 exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
                 break;
             }
@@ -632,7 +632,7 @@ namespace animate {
         int16_t x2 = x + header->width - 1;
         int16_t y2 = y + header->height - 1;
 
-        if ((header->flags & 0x10) != 0) {
+        if ((header->flags & ANIMATION_FLAG_HAS_PALETTE) != 0) {
             Set_Animation_Palette_();
         }
 
@@ -656,15 +656,15 @@ namespace animate {
                     setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
                 }
 
-                if ((header->flags & 0x8) != 0) {
-                    switch (header->flags & 3) {
-                    case 0:
+                if ((header->flags & ANIMATION_FLAG_GLASSED) != 0) {
+                    switch (header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                    case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                         Draw_No_Glassed_Animated_Sprite_(x, y, sprite);
                         break;
-                    case 1:
+                    case ANIMATION_DRAW_MODE_BITMAP:
                         Draw_No_Glassed_Bitmap_Sprite_(x, y, sprite);
                         break;
-                    case 2:
+                    case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                         if (video::_copy_to_on_page_flag == 1) {
                             Draw_Glassed_Screen_Background_On_(sprite);
                         } else {
@@ -674,19 +674,19 @@ namespace animate {
                             setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                         }
                         break;
-                    case 3:
+                    case ANIMATION_DRAW_MODE_REFRESH_MASK:
                         exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                         break;
                     }
                 } else {
-                    switch (header->flags & 3) {
-                    case 0:
+                    switch (header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                    case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                         draw::Draw_Animated_Sprite_(x, y, sprite);
                         break;
-                    case 1:
+                    case ANIMATION_DRAW_MODE_BITMAP:
                         draw::Draw_Bitmap_Sprite_(x, y, sprite);
                         break;
-                    case 2:
+                    case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                         if (video::_copy_to_on_page_flag == 1) {
                             Draw_Screen_Background_On_((uint32_t*)sprite);
                         } else {
@@ -696,14 +696,14 @@ namespace animate {
                             setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                         }
                         break;
-                    case 3:
+                    case ANIMATION_DRAW_MODE_REFRESH_MASK:
                         exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                         break;
                     }
                 }
             } else {
                 if (_dot_stencil_flag != 0) {
-                    if ((header->flags & 3) == 0) {
+                    if ((header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) == ANIMATION_DRAW_MODE_ANIMATED_SPRITE) {
                         clipped::Clipped_Draw_Stenciled_Animated_Sprite_(x, y, sprite);
                     }
                 } else {
@@ -711,25 +711,25 @@ namespace animate {
                         setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
                     }
 
-                    switch (header->flags & 3) {
-                    case 0:
-                        if ((header->flags & 0x8) != 0) {
+                    switch (header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                    case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
+                        if ((header->flags & ANIMATION_FLAG_GLASSED) != 0) {
                             clipped::Clipped_Draw_Glassed_Animated_Sprite_(x, y, sprite);
                         } else {
                             clipped::Clipped_Draw_Animated_Sprite_(x, y, sprite);
                         }
                         break;
-                    case 1:
-                        if ((header->flags & 0x8) != 0) {
+                    case ANIMATION_DRAW_MODE_BITMAP:
+                        if ((header->flags & ANIMATION_FLAG_GLASSED) != 0) {
                             clipped::Clipped_Draw_Glassed_Bitmap_Sprite_(x, y, sprite);
                         } else {
                             clipped::Clipped_Draw_Bitmap_Sprite_(x, y, sprite);
                         }
                         break;
-                    case 2:
+                    case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                         exitm::Exit_With_Message("Screen Background can't be clipped");
                         break;
-                    case 3:
+                    case ANIMATION_DRAW_MODE_REFRESH_MASK:
                         exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                         break;
                     }
