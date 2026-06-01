@@ -68,7 +68,7 @@ namespace reduce {
             exitm::Exit_With_Message("Palette Reduction Pictures Must Have Palette");
         }
 
-        animate::_palette_header = reinterpret_cast<animate::s_palette_header*>(reinterpret_cast<uint8_t*>(animate::_animation_header) +
+        animate::_palette_header = reinterpret_cast<s_palette_header*>(reinterpret_cast<uint8_t*>(animate::_animation_header) +
                                    (animate::_animation_header->frame_count * 4) + 0x10);
 
         int16_t count = animate::_palette_header->count;

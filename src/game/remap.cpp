@@ -138,7 +138,7 @@ namespace remap {
             remap_table[i] = (uint8_t)i;
         }
 
-        animate::s_palette_header* header = animate::_palette_header;
+        s_palette_header* header = animate::_palette_header;
         if (header->count > 0) {
             for (int i = 0; i < (int)header->count; ++i) {
                 uint8_t r = src_palette[i * 4 + 1];
@@ -195,7 +195,7 @@ namespace remap {
             exitm::Exit_With_Message(s_Remapped_Picture_Must_Have_Palet_0055b2ac);
         }
 
-        animate::_palette_header = reinterpret_cast<animate::s_palette_header*>(reinterpret_cast<uint8_t*>(&animate::_animation_header->frame_offsets[animate::_animation_header->frame_count]) + 4);
+        animate::_palette_header = reinterpret_cast<s_palette_header*>(reinterpret_cast<uint8_t*>(&animate::_animation_header->frame_offsets[animate::_animation_header->frame_count]) + 4);
 
         Create_Picture_Remap_Palette_(reinterpret_cast<uint8_t*>(animate::_palette_header) + 4, _picture_remap_color_list);
     }
@@ -216,7 +216,7 @@ namespace remap {
             exitm::Exit_With_Message(s_Get_Picture_Color_Picture_Must_H_0055b2dc);
         }
 
-        animate::_palette_header = reinterpret_cast<animate::s_palette_header*>(
+        animate::_palette_header = reinterpret_cast<s_palette_header*>(
                 &animate::_animation_header
                          ->frame_offsets[static_cast<int32_t>(animate::_animation_header->frame_count) + 1]);
 

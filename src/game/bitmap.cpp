@@ -845,13 +845,13 @@ namespace bitmap {
                 return;
             } else {
                 int32_t current_y =
-                    reinterpret_cast<const animate::s_packed_frame_header*>((uint8_t*)src + frame_offset)->start_y;
+                    reinterpret_cast<const s_packed_frame_header*>((uint8_t*)src + frame_offset)->start_y;
                 int32_t word_idx = 2;
                 int32_t dest_idx = y * dest_width + x;
                 
                 while (current_y < src_skip_y) {
-                    const animate::s_packed_frame_run* run =
-                        reinterpret_cast<const animate::s_packed_frame_run*>(
+                    const s_packed_frame_run* run =
+                        reinterpret_cast<const s_packed_frame_run*>(
                             (uint8_t*)src + frame_offset + word_idx * 2
                         );
                     int16_t val = run->pixel_count;
@@ -874,8 +874,8 @@ namespace bitmap {
                 int32_t run_idx = dest_idx;
                 
                 while (draw_y_idx < draw_height) {
-                    const animate::s_packed_frame_run* run =
-                        reinterpret_cast<const animate::s_packed_frame_run*>(
+                    const s_packed_frame_run* run =
+                        reinterpret_cast<const s_packed_frame_run*>(
                             (uint8_t*)src + frame_offset + word_idx * 2
                         );
                     word_idx += 2;
@@ -952,14 +952,14 @@ namespace bitmap {
                 s_animation_header* anim = animate::_animation_header;
                 uint8_t* frame_data = (uint8_t*)anim + anim->frame_offsets[frame];
 
-                int32_t y = reinterpret_cast<const animate::s_packed_frame_header*>(frame_data)->start_y;
+                int32_t y = reinterpret_cast<const s_packed_frame_header*>(frame_data)->start_y;
                 int32_t word_offset = 2;
                 int32_t pixel_offset_base = y * width;
                 int32_t pixel_offset = pixel_offset_base;
 
                 while (y < height) {
-                    const animate::s_packed_frame_run* run =
-                        reinterpret_cast<const animate::s_packed_frame_run*>(frame_data + word_offset * 2);
+                    const s_packed_frame_run* run =
+                        reinterpret_cast<const s_packed_frame_run*>(frame_data + word_offset * 2);
                     int16_t count = run->pixel_count;
                     int16_t segment_offset = run->skip_count;
                     word_offset += 2;

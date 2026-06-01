@@ -4,39 +4,6 @@
 struct s_animation_header;
 
 namespace animate {
-#pragma pack(push, 1)
-    struct s_palette_header {
-        int16_t start_index;
-        int16_t count;
-    };
-
-    struct s_packed_frame_header {
-        uint16_t unknown_0;
-        uint16_t start_y;
-    };
-
-    struct s_packed_frame_run {
-        int16_t pixel_count;
-        int16_t skip_count;
-    };
-
-    struct s_packed_screen_background_run32 {
-        uint32_t skip_count;
-        uint32_t pixel_count;
-    };
-
-    struct s_packed_screen_background_run8 {
-        int8_t skip_count;
-        int8_t pixel_count;
-    };
-#pragma pack(pop)
-
-    static_assert(sizeof(s_palette_header) == 4, "s_palette_header size mismatch");
-    static_assert(sizeof(s_packed_frame_header) == 4, "s_packed_frame_header size mismatch");
-    static_assert(sizeof(s_packed_frame_run) == 4, "s_packed_frame_run size mismatch");
-    static_assert(sizeof(s_packed_screen_background_run32) == 8, "s_packed_screen_background_run32 size mismatch");
-    static_assert(sizeof(s_packed_screen_background_run8) == 2, "s_packed_screen_background_run8 size mismatch");
-
     extern s_palette_header* _palette_header;
 
     extern s_animation_header* _animation_header;

@@ -293,7 +293,7 @@ namespace replace {
         animate::_animation_header = anim;
 
         uint8_t* pal_header_ptr = reinterpret_cast<uint8_t*>(anim) + anim->frame_count * 4 + 0x10;
-        animate::_palette_header = reinterpret_cast<animate::s_palette_header*>(pal_header_ptr);
+        animate::_palette_header = reinterpret_cast<s_palette_header*>(pal_header_ptr);
 
         if (animate::_palette_header->count + shift > 256) {
             exitm::Exit_With_Message(s_Shift_Palette_Range_exceeds_25_0055b7c4);

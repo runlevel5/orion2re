@@ -7,7 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/clipped.{h,cpp}
 - [pending] src/game/cmbtai.{h,cpp}
 - [pending] src/game/cmbtdrw1.{h,cpp}
 - [pending] src/game/cmbtfir2.{h,cpp}
@@ -183,6 +182,7 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/clipped.{h,cpp} - applied concise clipped-sprite docstrings, renamed the generic header `data` parameters and the local screen-buffer cursor for clarity, removed the stale simplification/TODO comment, and aligned sprite-stream overlays with the existing packed-frame cast pattern from `animate.cpp`; unchecked screen-buffer offset math and manual sprite-command decoding remain UB-prone and still hint at a missing typed sprite-command stream abstraction.
 - [reviewed] src/game/chat.{h,cpp} - suggest adding concise chat helper docstrings, renaming the decompiler-style send parameter, replacing the remaining `static_cast` and plain `int` loop/length temporaries with explicit fixed-width `int32_t`, and removing the stale type-mismatch comment in the GNN send path; no pointer-math UB access stood out in this unit.
 - [reviewed] src/game/buffer.{h,cpp} - applied concise buffer-cache docstrings, renamed the unused flush parameter, replaced the remaining `static_cast`/`reinterpret_cast` uses with C-style casts, and inlined the local string-constant usages; raw header reads via `buffer_space_seg - 8` and `buffer_base - 0x0C` remain UB-prone pointer-math access patterns and likely want a better recovered allocation-header type boundary.
 - [reviewed] src/game/bomb.{h,cpp} - applied concise bomb helper docstrings, conservative bomb-result and loop-local renames, obvious `int32_t` cleanup for indices and bomb strength, raw-address/redundant comment cleanup, and typed pointer subtraction for colony indexing; the `colony->pop_roundoff[race_idx]` access remains a documented out-of-bounds risk and likely points to an incomplete recovered type or missing race-index normalization.

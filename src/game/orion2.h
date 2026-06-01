@@ -5237,27 +5237,33 @@ struct s_wormhole_data {
     int32_t count;
 };
 
+struct s_palette_header {
+    int16_t start_index;
+    int16_t count;
+};
 
-/* WARNING! conflicting data type names: /orion2.h/ulonglong - /ulonglong */
+struct s_packed_frame_header {
+    uint16_t unknown_0;
+    uint16_t start_y;
+};
 
+struct s_packed_frame_run {
+    int16_t pixel_count;
+    int16_t skip_count;
+};
 
-/* WARNING! conflicting data type names: /orion2.h/undefined2 - /undefined2 */
+struct s_packed_screen_background_run32 {
+    uint32_t skip_count;
+    uint32_t pixel_count;
+};
 
+struct s_packed_screen_background_run8 {
+    int8_t skip_count;
+    int8_t pixel_count;
+};
 
-/* WARNING! conflicting data type names: /orion2.h/undefined4 - /undefined4 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined5 - /undefined5 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined6 - /undefined6 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined7 - /undefined7 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined8 - /undefined8 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/word - /word */
-
+static_assert(sizeof(s_palette_header) == 4, "s_palette_header size mismatch");
+static_assert(sizeof(s_packed_frame_header) == 4, "s_packed_frame_header size mismatch");
+static_assert(sizeof(s_packed_frame_run) == 4, "s_packed_frame_run size mismatch");
+static_assert(sizeof(s_packed_screen_background_run32) == 8, "s_packed_screen_background_run32 size mismatch");
+static_assert(sizeof(s_packed_screen_background_run8) == 2, "s_packed_screen_background_run8 size mismatch");
