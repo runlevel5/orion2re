@@ -70,7 +70,7 @@ namespace bitio {
      * @param bit_buf Pointer to the BIT_BUF management structure.
      * @param bit The bit value to write (non-zero for 1, zero for 0).
      */
-    void __cdecl BufferOutputBit_(BIT_BUF* bit_buf, int bit) {
+    void __cdecl BufferOutputBit_(BIT_BUF* bit_buf, int32_t bit) {
         if (bit != 0) {
             bit_buf->rack |= (uint32_t)bit_buf->mask;
         }
@@ -113,7 +113,7 @@ namespace bitio {
             // If the byte mask reaches zero, we've filled the current rack byte.
             if (bit_buf->mask == 0) {
                 // Write the rack byte to the buffer and advance the byte index
-                bit_buf->buf[bit_buf->bit_index] = static_cast<uint8_t>(bit_buf->rack);
+                bit_buf->buf[bit_buf->bit_index] = (uint8_t)bit_buf->rack;
                 bit_buf->bit_index++;
 
                 // Reset the rack and bit mask for the next byte

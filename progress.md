@@ -1,15 +1,12 @@
 # Source Cleanup Progress
 
 ## Current focus
-- src/game/bill.{h,cpp}
+- none
 
 ## In progress
-- [in_progress] src/game/bill.{h,cpp}
+- none
 
 ## Pending
-- [pending] src/game/billhelp.{h,cpp}
-- [pending] src/game/bitio.{h,cpp}
-- [pending] src/game/bitmap.{h,cpp}
 - [pending] src/game/bolt.{h,cpp}
 - [pending] src/game/bomb.{h,cpp}
 - [pending] src/game/buffer.{h,cpp}
@@ -191,6 +188,10 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/bitmap.{h,cpp} - applied concise bitmap helper docstrings, inlined the CPP-local error strings and removed their header externs, renamed a few placeholder parameters, converted obvious bitmap/palette helper integers to fixed-width `int32_t`, and replaced the remaining `reinterpret_cast`/`static_cast` uses with C-style casts; widespread raw frame-buffer offset arithmetic and compressed-frame overlays remain UB-prone and likely indicate missing typed bitmap/span helpers.
+- [reviewed] src/game/bitio.{h,cpp} - applied concise header docstrings for the bit-buffer lifecycle and bit read/write helpers, replaced the plain `int` bit parameter with `int32_t`, and replaced the remaining `static_cast` with a C-style cast while retaining the existing source comments per user preference; no pointer-math UB access stood out in this unit.
+- [reviewed] src/game/bill.{h,cpp} - applied decompiler/raw-address comment cleanup, paragraph and active-player parameter renames, CPP-local file-mode/error string inlining, remaining C++-style cast cleanup, and `int32_t` wrapper parameters for centered bitmap printing; no pointer-math UB access stood out in this unit.
+- [reviewed] src/game/billhelp.{h,cpp} - applied concise header docstrings for the help-list setup helpers and screen-specific help installers; no comment cleanup, cast cleanup, fixed-width integer cleanup, or pointer-math UB access findings.
 - [reviewed] src/game/beams.{h,cpp} - suggest removing raw-address/decompiler comments, renaming several placeholder parameters, replacing remaining `reinterpret_cast`/`static_cast` uses with C-style casts, and fixing the negative-index rotation table lookups; raw animation-header overlays on allocated bitmap buffers still rely on layout/alignment assumptions.
 - [reviewed] src/game/assert.{h,cpp} - applied CPP-local prompt string inlining, removed the leaked decompiler-style extern names from the header, added a concise function docstring, and replaced the plain `int` key type with `int32_t`; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/advciv.{h,cpp} - applied conservative naming and docstring cleanup; no pointer-math UB access was found in this unit.
