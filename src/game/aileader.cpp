@@ -11,34 +11,34 @@ namespace aileader {
                 if (leader_idx != -1) {
                     bool hire_criteria_met = false;
                     s_leader_data* leader = &MOX::_leaders[leader_idx];
-                    uint32_t gen_skills = leader->general_skills;
+                    uint32_t general_skills = leader->general_skills;
 
-                    if ((gen_skills & 0x300) != 0) {
+                    if ((general_skills & 0x300) != 0) {
                         hire_criteria_met = true;
-                    } else if ((gen_skills & 0x2000) != 0 && player->do_not_research == 0) {
+                    } else if ((general_skills & 0x2000) != 0 && player->do_not_research == 0) {
                         hire_criteria_met = true;
-                    } else if ((gen_skills & 0x1000) != 0 && player->do_not_research == 0) {
+                    } else if ((general_skills & 0x1000) != 0 && player->do_not_research == 0) {
                         hire_criteria_met = true;
-                    } else if ((gen_skills & 0x3CCC3) != 0) {
+                    } else if ((general_skills & 0x3CCC3) != 0) {
                         hire_criteria_met = true;
-                    } else if ((gen_skills & 0x80000) != 0 && player->traits[19] == 0) {
+                    } else if ((general_skills & 0x80000) != 0 && player->traits[19] == 0) {
                         hire_criteria_met = true;
-                    } else if ((gen_skills & 0x40000) != 0 && player->traits[19] == 0) {
+                    } else if ((general_skills & 0x40000) != 0 && player->traits[19] == 0) {
                         hire_criteria_met = true;
                     } else if (leader->type == 0 && (leader->special_skills & 0xC0C0) != 0) {
                         hire_criteria_met = true;
                     }
 
-                    int16_t accept_final = 0;
+                    int16_t accept_offer = 0;
                     if (hire_criteria_met) {
                         int16_t cost = OFFICER::Calculate_Officer_Cost_(i, (int16_t)leader_idx);
                         if (cost + 50 < player->bc) {
-                            accept_final = 1;
+                            accept_offer = 1;
                             player->bc -= (int32_t)cost;
                         }
                     }
 
-                    OFFICER::Set_Officer_To_Player_((int16_t)leader_idx, i, (uint8_t)accept_final);
+                    OFFICER::Set_Officer_To_Player_((int16_t)leader_idx, i, (uint8_t)accept_offer);
                 }
 
                 player->officer_for_hire = -1;
@@ -47,10 +47,10 @@ namespace aileader {
 
         for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
             s_star_data* star = &MOX::_star[star_idx];
-            int8_t special = star->system_special;
+            int8_t system_special = star->system_special;
 
-            if (special >= 80 && special < 90) {
-                int16_t player_idx = (int16_t)(special - 80);
+            if (system_special >= 80 && system_special < 90) {
+                int16_t player_idx = (int16_t)(system_special - 80);
                 if (MOX::_player[player_idx].objectives != 100 /* HUMAN_PLAYER */) {
                     int16_t joined_result;
                     OFFICER::Marooned_Hero_At_Star_Can_Join_(star_idx, &joined_result, player_idx);
@@ -65,23 +65,17 @@ namespace aileader {
         }
     }
 
-    /**
-     * @address 0042a430
-     */
-    /**
-     * @address 0042a6b0
-     */
-    void __cdecl Assign_Star_Officer_(int player_index, int leader_index) {
-        int star_scores[72];
+    void __cdecl Assign_Star_Officer_(int32_t player_index, int32_t leader_index) {
+        int32_t star_scores[72];
         memset(star_scores, 0, sizeof(star_scores));
 
         uint32_t skills = MOX::_leaders[leader_index].special_skills;
 
-        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
 
             if (colony->owner == player_index && colony->outpost_flag == 0) {
-                int star_index = MOX::_planet[colony->planet].star_index;
+                int32_t star_index = MOX::_planet[colony->planet].star_index;
 
                 if (MOX::_star[star_index].officer_index[player_index] == -1) {
 
@@ -117,7 +111,7 @@ namespace aileader {
 
                     // Expansionist (Bits 10-11)
                     if (skills & 0x0C00) {
-                        int bonus = (uint8_t)(*AIDATA::_ai_colony_info)[i].pop_limit - (uint8_t)colony->n_pops;
+                        int32_t bonus = (uint8_t)(*AIDATA::_ai_colony_info)[i].pop_limit - (uint8_t)colony->n_pops;
                         if (bonus > 0) {
                             star_scores[star_index] += bonus;
                         }
@@ -132,8 +126,8 @@ namespace aileader {
             }
         }
 
-        int best_star_idx = MOX::_NUM_STARS - 1;
-        for (int i = MOX::_NUM_STARS - 2; i >= 0; --i) {
+        int32_t best_star_idx = MOX::_NUM_STARS - 1;
+        for (int32_t i = MOX::_NUM_STARS - 2; i >= 0; --i) {
             if (star_scores[i] > star_scores[best_star_idx]) {
                 best_star_idx = i;
             }
@@ -144,15 +138,12 @@ namespace aileader {
         }
     }
 
-    /**
-     * @address 0042a4a0
-     */
-    void __cdecl Assign_Fleet_Officer_(int player_index, int leader_index) {
+    void __cdecl Assign_Fleet_Officer_(int32_t player_index, int32_t leader_index) {
         s_ship_data* best_ship = nullptr;
         s_ship_data* ship_list = MOX::_ship;
-        int num_ships = (int)MOX::_NUM_SHIPS;
+        int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
 
-        for (int i = 0; i < num_ships; ++i) {
+        for (int32_t i = 0; i < num_ships; ++i) {
             s_ship_data* current_ship = &ship_list[i];
 
             if (current_ship->owner == (char)player_index &&
@@ -181,20 +172,17 @@ namespace aileader {
         }
     }
 
-    /**
-     * @address 0042a570
-     */
-    void __cdecl Reassign_Fleet_Officer_(int player_index, int leader_index) {
-        short orig_loc = MOX::_leaders[leader_index].location;
-        s_ship_data* original_ship = &MOX::_ship[orig_loc];
+    void __cdecl Reassign_Fleet_Officer_(int32_t player_index, int32_t leader_index) {
+        int16_t original_location = MOX::_leaders[leader_index].location;
+        s_ship_data* original_ship = &MOX::_ship[original_location];
         s_ship_data* best_ship = original_ship;
 
         s_ship_data* ships_end = &MOX::_ship[MOX::_NUM_SHIPS];
 
         for (s_ship_data* ship = MOX::_ship; ship < ships_end; ++ship) {
             if (ship->owner == player_index && ship->status <= 2 && ship->d.ship_type == 0 && ship->officer_index == -1) {
-                short ship_idx = static_cast<short>(ship - MOX::_ship);
-                if (OFFICER::Ships_In_Same_Place_(ship_idx, orig_loc)) {
+                int16_t ship_index = (int16_t)(ship - MOX::_ship);
+                if (OFFICER::Ships_In_Same_Place_(ship_index, original_location)) {
                     if (ship->d.size >= best_ship->d.size &&
                         ship->d.shield_type >= best_ship->d.shield_type &&
                         ship->d.armor_type >= best_ship->d.armor_type &&
@@ -213,21 +201,20 @@ namespace aileader {
     }
 
     void __cdecl Assign_Unassigned_Leaders_(int32_t player_idx) {
-        // There are 67 leaders in total (0xF71 / 0x3B)
-        for (int i = 0; i < 67; ++i) {
-            s_leader_data* leader = &MOX::_leaders[i]; // leader size is 0x3B
+        for (int32_t leader_index = 0; leader_index < 67; ++leader_index) {
+            s_leader_data* leader = &MOX::_leaders[leader_index];
 
             if (leader->player_index == (char)player_idx) {
                 if (leader->status == 0 /* Available/Unassigned */) {
                     if (leader->type == 0 /* Fleet Officer */) {
-                        Assign_Fleet_Officer_(player_idx, i);
+                        Assign_Fleet_Officer_(player_idx, leader_index);
                     } else /* Star Officer */ {
-                        Assign_Star_Officer_(player_idx, i);
+                        Assign_Star_Officer_(player_idx, leader_index);
                     }
                 } else if (leader->status == 1 /* Assigned */) {
                     // Only fleet officers seem to be reassigned in this manner
                     if (leader->type == 0 /* Fleet Officer */) {
-                        Reassign_Fleet_Officer_(player_idx, i);
+                        Reassign_Fleet_Officer_(player_idx, leader_index);
                     }
                 }
             }

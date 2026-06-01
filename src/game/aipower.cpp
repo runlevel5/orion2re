@@ -5,47 +5,47 @@ namespace AIPOWER {
         int16_t total_space = 100;
 
         if ((modification_flags & 0x0002) != 0) {
-            total_space = static_cast<int16_t>(TECHDATA::_weapon_modifications[1].space + 100);
+            total_space = (int16_t)(TECHDATA::_weapon_modifications[1].space + 100);
         }
         if ((modification_flags & 0x0004) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[2].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[2].space);
         }
         if ((modification_flags & 0x0020) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[5].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[5].space);
         }
         if ((modification_flags & 0x0080) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[7].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[7].space);
         }
         if ((modification_flags & 0x0100) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[8].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[8].space);
         }
         if ((modification_flags & 0x0200) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[9].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[9].space);
         }
         if ((modification_flags & 0x0400) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[10].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[10].space);
         }
         if ((modification_flags & 0x0800) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[11].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[11].space);
         }
         if ((modification_flags & 0x1000) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[12].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[12].space);
         }
         if ((modification_flags & 0x2000) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[13].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[13].space);
         }
         if ((modification_flags & 0x4000) != 0) {
-            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications[14].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[14].space);
         }
 
         int32_t result =
-            (static_cast<int32_t>(weapon_strength & 0xFFFFu) * static_cast<int32_t>(total_space)) / 100;
+            ((int32_t)(weapon_strength & 0xFFFFu) * (int32_t)total_space) / 100;
 
-        if (static_cast<uint32_t>(result) > 64000u) {
+        if ((uint32_t)result > 64000u) {
             result = 64000;
         }
 
-        return static_cast<uint32_t>(result);
+        return (uint32_t)result;
     }
 
     int16_t __cdecl Get_Best_Ship_Shield_Value_(int16_t player_idx) {
@@ -73,10 +73,6 @@ namespace AIPOWER {
         return TECHDATA::_shields[shield_idx].shield_class;
     }
 
-    /**
-     * Calculates ship strength vs a specific shield value.
-     * used for AI power estimation and strategic combat resolution.
-     */
     int16_t __cdecl Ship_Strength_Vs_Shield_(int16_t ship_idx, int16_t target_idx, int16_t shield_strength) {
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int32_t total_strength = 0;
@@ -94,7 +90,7 @@ namespace AIPOWER {
 
         defense_bonus = Base_Generic_Dcv_(target_idx);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int32_t i = 0; i < 8; ++i) {
             int16_t weapon_type = ship->d.ship_weapon[i].type;
             if (weapon_type <= 0) continue;
 
@@ -209,7 +205,7 @@ namespace AIPOWER {
         } else {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
-            int hull_type = (int)ship->d.size;
+            int32_t hull_type = (int32_t)ship->d.size;
             int16_t base_hits = TECHDATA::_hull_data[hull_type].strat_hits;
 
             int16_t best_armor_idx = INITSHIP::Best_Armor_((int16_t)ship->owner);
@@ -217,10 +213,10 @@ namespace AIPOWER {
                 // The original code performs a second call to Best_Armor_ if result is positive
                 best_armor_idx = INITSHIP::Best_Armor_((int16_t)ship->owner);
 
-                int absorption_pct = (int)TECHDATA::_armor[best_armor_idx].ships_bonus;
+                int32_t absorption_pct = (int32_t)TECHDATA::_armor[best_armor_idx].ships_bonus;
 
                 // bonus = (absorption_percent * base_hits) / 100
-                int16_t bonus_hits = (int16_t)((absorption_pct * (int)base_hits) / 100);
+                int16_t bonus_hits = (int16_t)((absorption_pct * (int32_t)base_hits) / 100);
                 return base_hits + bonus_hits;
             }
 
@@ -228,19 +224,11 @@ namespace AIPOWER {
         }
     }
 
-    /**
-     * Calculates the combat strength of an attacking ship against a target ship by first 
-     * determining the target's best shield value and then calculating strength vs that shield.
-     */
     uint16_t __cdecl Ship_Strength_Vs_Ships_(int16_t attacker_idx, int16_t target_idx) {
         int16_t shield_value = Get_Best_Ship_Shield_Value_(target_idx);
         return (uint16_t)Ship_Strength_Vs_Shield_(attacker_idx, target_idx, shield_value);
     }
 
-    /**
-     * Calculates the combat strength of an attacking ship against a target ship in a nebula.
-     * In a nebula, shields are disabled, so the shield value is set to 0.
-     */
     uint16_t __cdecl Ship_Strength_Vs_Ships_In_Nebula_(int16_t attacker_idx, int16_t target_idx) {
         return (uint16_t)AIPOWER::Ship_Strength_Vs_Shield_(attacker_idx, target_idx, 0);
     }
@@ -250,7 +238,7 @@ namespace AIPOWER {
 
         hits = AIPOWER::Max_Ship_Hits_(ship_idx);
 
-        // Substract structural damage
+        // Subtract structural damage.
         hits -= MOX::_ship[ship_idx].structural_damage;
 
         // In strategic combat armor damage is not counted
@@ -261,15 +249,11 @@ namespace AIPOWER {
         return hits;
     }
 
-    /**
-     * Calculates ship strength against 4 levels of planetary shields.
-     * results[0..3] corresponds to the 4 shield levels.
-     */
-    void __cdecl Ship_Strength_Vs_Planetary_Shield_(int16_t ship_idx, uint16_t* results) {
+    void __cdecl Ship_Strength_Vs_Planetary_Shield_(int16_t ship_idx, uint16_t* shield_strengths) {
         uint32_t strengths[4];
         uint16_t shield_reductions[4] = { 2, 7, 12, 22 };
 
-        for (int i = 0; i < 4; ++i) {
+        for (int32_t i = 0; i < 4; ++i) {
             strengths[i] = 0;
         }
 
@@ -278,11 +262,11 @@ namespace AIPOWER {
             uint32_t base_strength = (uint32_t)(size * size * 10);
             strengths[0] = base_strength;
 
-            for (int i = 1; i < 4; ++i) {
+            for (int32_t i = 1; i < 4; ++i) {
                 strengths[i] = (base_strength + (uint32_t)i - 1) / (uint32_t)i;
             }
         } else {
-            for (int i = 0; i < 8; ++i) {
+            for (int32_t i = 0; i < 8; ++i) {
                 int16_t weapon_type = MOX::_ship[ship_idx].d.ship_weapon[i].type;
                 if (weapon_type > 0) {
                     int16_t weapon_damage;
@@ -296,7 +280,7 @@ namespace AIPOWER {
 
                     int32_t count = MOX::_ship[ship_idx].d.ship_weapon[i].current_count;
 
-                    for (int j = 0; j < 4; ++j) {
+                    for (int32_t j = 0; j < 4; ++j) {
                         int32_t damage_vs_shield = (int32_t)weapon_damage - (int32_t)shield_reductions[j];
                         int32_t weapon_power = damage_vs_shield * count;
 
@@ -308,16 +292,16 @@ namespace AIPOWER {
             }
         }
 
-        for (int i = 0; i < 4; ++i) {
+        for (int32_t i = 0; i < 4; ++i) {
             int16_t current_hits = Current_Ship_Hits_(ship_idx);
             int16_t max_hits = Max_Ship_Hits_(ship_idx);
 
             // Scale strength by current ship health
             uint32_t final_power = (uint32_t)current_hits * strengths[i] / (uint32_t)max_hits;
 
-            results[i] = 0xfa00; /* 64000 */
+            shield_strengths[i] = 0xfa00; /* 64000 */
             if (final_power <= 0xfa00) {
-                results[i] = (uint16_t)final_power;
+                shield_strengths[i] = (uint16_t)final_power;
             }
         }
     }
@@ -336,16 +320,6 @@ namespace AIPOWER {
         return bonus;
     }
 
-    /**
-     * @brief Calculates the defensive space strength of a colony against a specific player.
-     * 
-     * Determines the building level of the colony's defensive satellites (Star Base, Battlestation, 
-     * or Star Fortress) and calculates the total strength based on that building and the colony's owner.
-     * 
-     * @param colony_idx The index of the colony in the global colony array.
-     * @param player_idx The index of the player attacking the colony.
-     * @return The calculated space strength as a 16-bit unsigned integer.
-     */
     uint16_t __cdecl Colony_Space_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
         s_colony* colony = &MOX::_colony[colony_idx];
         int16_t building_type = -1;
@@ -363,24 +337,17 @@ namespace AIPOWER {
         return AIPOWER::Satelite_Strength_Vs_Ships_(building_type, (int16_t)colony->owner, player_idx);
     }
 
-    /**
-     * @brief Calculates the defensive strength of a stationary defense (Star Base, Battlestation, Fortress) against ships.
-     * @param building_type Index offset for stationary defense (0=Star Base, 1=Battlestation, 2=Fortress).
-     * @param player_idx Index of the player owning the satellite.
-     * @param target_player_idx Index of the attacking player.
-     * @return Strength value clamped to 64000.
-     */
     int16_t __cdecl Base_Generic_Dcv_(int16_t player_idx) {
         const int16_t best_drive_idx = INITSHIP::Best_Warp_Drive_(player_idx);
 
         int16_t dcv =
-            static_cast<int16_t>(static_cast<int8_t>(TECHDATA::_drives[best_drive_idx].combat_speed_min[2]));
-        dcv = static_cast<int16_t>(dcv * 5);
+            (int16_t)(int8_t)(TECHDATA::_drives[best_drive_idx].combat_speed_min[2]);
+        dcv = (int16_t)(dcv * 5);
 
         if (player_idx < 8) {
-            dcv = static_cast<int16_t>(dcv + MOX::_player[player_idx].traits[6]);
+            dcv = (int16_t)(dcv + MOX::_player[player_idx].traits[6]);
             if (MOX::_player[player_idx].traits[0x1d] != 0) {
-                dcv = static_cast<int16_t>(dcv + 0x14);
+                dcv = (int16_t)(dcv + 0x14);
             }
         }
 
@@ -467,13 +434,6 @@ namespace AIPOWER {
         return (uint16_t)total_strength;
     }
 
-    /**
-     * Calculates the defensive strength of a colony's ground-based installations 
-     * against a specific player.
-     */
-    /**
-     * Calculates the defensive ground strength of a colony's missile base.
-     */
     uint32_t __cdecl Missile_Base_Strength_(int16_t player_idx, int16_t target_idx) {
         if (MOX::_settings.strategic_combat_flag == 1) {
             return 90 /* 0x5a */;
@@ -541,14 +501,13 @@ namespace AIPOWER {
         return strength;
     }
 
-    // Suggested name: AIPOWER::Phasor_Base_Strength_
-    uint32_t __cdecl Phasor_Base_Strength_(int16_t ship_idx, int16_t target_idx) {
+    uint32_t __cdecl Phasor_Base_Strength_(int16_t player_idx, int16_t target_idx) {
         if (MOX::_settings.strategic_combat_flag == 1) {
             return 120 /* 0x78 */;
         }
 
-        int16_t weapon_idx = INITSHIP::Best_Beam_Weapon_(ship_idx);
-        int32_t space = DESIGN::Weapon_Space_(ship_idx, weapon_idx, 1, 1, 1, 2);
+        int16_t weapon_idx = INITSHIP::Best_Beam_Weapon_(player_idx);
+        int32_t space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 1, 1, 2);
 
         // Number of weapon mounts that can fit in standard phasor space allocation
         int16_t weapon_count = (int16_t)(225 /* 0xE1 */ / space);
@@ -623,10 +582,10 @@ namespace AIPOWER {
 
     int16_t __cdecl Strength_Hits_Modifier_(int16_t strength) {
         if (strength <= 100) {
-            return static_cast<int16_t>(strength + (100 - strength) / 10);
+            return (int16_t)(strength + (100 - strength) / 10);
         }
 
-        return static_cast<int16_t>(100 + (strength - 100) / 4);
+        return (int16_t)(100 + (strength - 100) / 4);
     }
 
 }

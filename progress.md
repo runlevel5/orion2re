@@ -7,8 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/aipower.{h,cpp}
-- [pending] src/game/aistage.{h,cpp}
 - [pending] src/game/aitech.{h,cpp}
 - [pending] src/game/allocate.{h,cpp}
 - [pending] src/game/angle.{h,cpp}
@@ -209,7 +207,10 @@
 - [reviewed] src/game/aibomb.{h,cpp} - replace plain `int` counters and size parameters with `int32_t`, and replace the remaining `static_cast` with a C-style cast.
 - [reviewed] src/game/aibuild.{h,cpp} - applied conservative comment and fixed-width helper-type cleanup; pointer-subtraction index assumptions remain noted for later review.
 - [reviewed] src/game/aidudes.{h,cpp} - applied header docstrings, decompiler-name cleanup, and remaining `static_cast`/`reinterpret_cast` replacements; fixed-size colony scratch buffers still need a separate bounds review.
+- [reviewed] src/game/aileader.{h,cpp} - applied header docstrings, decompiler-comment cleanup, fixed-width loop/index cleanup, and the remaining `static_cast` replacement; the fleet-location pointer-subtraction index assumption remains noted for later review.
 - [reviewed] src/game/aimove.{h,cpp} - applied header docstrings, attack-helper parameter renames, remaining `static_cast`/`reinterpret_cast` replacements, and the typed pointer-subtraction cleanup for `Get_Enemy_Strength_On_Turn_`; the stage-point move-info aliasing overlay remains noted for later review.
+- [reviewed] src/game/aipower.{h,cpp} - applied header docstrings, removed duplicate/misplaced comments, replaced remaining `static_cast` uses with equivalent C-style casts, and converted obvious local `int` temporaries to fixed-width integers; no pointer-math UB access was found in this unit.
+- [reviewed] src/game/aistage.{h,cpp} - applied the missing header docstring and `<cstdint>` include, renamed decompiler-style locals, and converted obvious platform-dependent locals to fixed-width integers; no pointer-math UB access was found in this unit.
 
 ## Blocked
 - none
