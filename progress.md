@@ -7,10 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/aitech.{h,cpp}
-- [pending] src/game/allocate.{h,cpp}
-- [pending] src/game/angle.{h,cpp}
-- [pending] src/game/animate.{h,cpp}
 - [pending] src/game/antarans.{h,cpp}
 - [pending] src/game/antaroom.{h,cpp}
 - [pending] src/game/arith1e.{h,cpp}
@@ -211,6 +207,10 @@
 - [reviewed] src/game/aimove.{h,cpp} - applied header docstrings, attack-helper parameter renames, remaining `static_cast`/`reinterpret_cast` replacements, and the typed pointer-subtraction cleanup for `Get_Enemy_Strength_On_Turn_`; the stage-point move-info aliasing overlay remains noted for later review.
 - [reviewed] src/game/aipower.{h,cpp} - applied header docstrings, removed duplicate/misplaced comments, replaced remaining `static_cast` uses with equivalent C-style casts, and converted obvious local `int` temporaries to fixed-width integers; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/aistage.{h,cpp} - applied the missing header docstring and `<cstdint>` include, renamed decompiler-style locals, and converted obvious platform-dependent locals to fixed-width integers; no pointer-math UB access was found in this unit.
+- [reviewed] src/game/aitech.{h,cpp} - applied concise header docstrings, removed noisy tech-state and offset comments, replaced the remaining `static_cast` uses with C-style casts, and converted obvious best-tech index helpers from `int` to `int32_t`; no UB-prone pointer-math memory access stood out in this unit.
+- [reviewed] src/game/allocate.{h,cpp} - applied header docstrings, `sizeof(...)`-based typed allocations, parameter naming cleanup, removal of local-only stack-error string globals, and remaining C++-style cast cleanup; pointer-arithmetic-based pooled header overlays still rely on legacy layout assumptions and possible misalignment.
+- [reviewed] src/game/angle.{h,cpp} - applied concise trigonometry helper docstrings, local clarity renames in `Get_Angle_`, and replacement of the remaining `static_cast`-based sine scaling expressions with equivalent C-style casts; no pointer-math UB access was found in this unit.
+- [reviewed] src/game/animate.{h,cpp} - applied concise animation helper docstrings, conservative parameter/local clarity renames, and remaining C++-style cast cleanup; packed frame and palette overlays still rely on UB-prone pointer arithmetic and aliasing assumptions.
 
 ## Blocked
 - none

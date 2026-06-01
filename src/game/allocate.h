@@ -17,45 +17,90 @@ namespace allocate {
     };
 #pragma pack(pop)
 
+    /// Allocates header-backed storage for a payload buffer.
+    /// @param size Requested payload size in bytes.
+    /// @return Pointer to the payload bytes after the internal header.
     void* __cdecl Allocate_Space_(uint32_t size);
 
+    /// Allocates and clears the main global data buffers used during startup.
     void Allocate_Data_Space_();
 
+    /// Returns the unused payload space remaining in a block.
+    /// @param block Pointer previously returned by this allocator.
     int32_t __cdecl Get_Remaining_Block_Space_(void* block);
 
-    uint32_t __cdecl Get_Max_Block_Space_(void* ptr);
+    /// Returns the total payload capacity recorded for a block.
+    /// @param block Pointer previously returned by this allocator.
+    uint32_t __cdecl Get_Max_Block_Space_(void* block);
 
-    void __cdecl Allocation_Error_(int bytes_requested);
+    /// Exits with an allocation failure message.
+    /// @param requested_bytes Number of payload bytes that could not be allocated.
+    void __cdecl Allocation_Error_(int32_t requested_bytes);
 
     extern int32_t _mark_stack_pos[2];
 
     extern s_mark_stack_entry _mark_stack[39];
 
-    extern const char s_Mark_Block_Stack_Size_Exceeded_0055b6dc[];
-
-    extern const char s_Mark_Block_Stack_Empty_0055b6fc[];
-
+    /// Saves the current allocation offset for later restoration.
+    /// @param block Block whose current offset should be pushed.
     void __cdecl Push_Block_(void* block);
 
-    void __cdecl Pop_Block_(void* block);
+    /// Restores the most recently pushed allocation offset.
+    /// @param unused_block Unused legacy parameter kept for call compatibility.
+    void __cdecl Pop_Block_(void* unused_block);
 
+    /// Saves the current allocation offset in a block header.
+    /// @param block_ptr Block whose current offset should be marked.
+    /// @return Header address encoded as an integer for legacy callers.
     int32_t __cdecl Mark_Block_(void* block_ptr);
 
+    /// Restores a block to the offset previously saved by Mark_Block_.
+    /// @param block Block whose saved offset should be restored.
+    /// @return Pointer to the internal block header.
     void* __cdecl Release_Block_(void* block);
 
-    void __cdecl Reallocation_Error_(uint32_t size, int32_t arg2, int32_t arg3);
+    /// Exits with a detailed sub-allocation failure message.
+    /// @param requested_size Requested payload size in bytes.
+    /// @param bytes_short Number of bytes the pool was short.
+    /// @param block_capacity Total payload capacity of the pool.
+    void __cdecl Reallocation_Error_(uint32_t requested_size, int32_t bytes_short, int32_t block_capacity);
 
+    /// Allocates the next header-backed sub-block from a pool.
+    /// @param block Pool base pointer previously returned by this allocator.
+    /// @param size Requested payload size in bytes.
+    /// @return Pointer to the sub-block payload after its header.
     void* __cdecl Allocate_Next_Block_(void* block, uint32_t size);
 
+    /// Allocates header-backed storage through the DOS-space path.
+    /// @param size Requested payload size in bytes.
+    /// @return Pointer to the payload bytes after the internal header.
     void* __cdecl Allocate_Dos_Space_(uint32_t size);
 
+    /// Allocates raw heap storage and aborts on failure.
+    /// @param size Requested allocation size in bytes.
+    /// @return Pointer to the allocated storage.
     void* __cdecl Allocate_Far_Space_(uint32_t size);
 
+    /// Allocates raw storage without attaching an outer allocation header.
+    /// @param size Requested allocation size in bytes.
+    /// @return Pointer to the allocated storage.
     void* __cdecl Allocate_Space_No_Header_(uint32_t size);
 
+    /// Resets a block pool and allocates its first no-header sub-block.
+    /// @param block_ptr Pool base pointer previously returned by this allocator.
+    /// @param size Requested payload size in bytes.
+    /// @return Pointer to the start of the allocated sub-block.
     void* __cdecl Allocate_First_Block_No_Header_(void* block_ptr, uint32_t size);
 
+    /// Allocates the next no-header sub-block from a pool.
+    /// @param block_ptr Pool base pointer previously returned by this allocator.
+    /// @param size Requested payload size in bytes.
+    /// @return Pointer to the start of the allocated sub-block, or nullptr on overflow.
     void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size);
 
+    /// Resets a block pool and allocates its first header-backed sub-block.
+    /// @param block Pool base pointer previously returned by this allocator.
+    /// @param size Requested payload size in bytes.
+    /// @return Pointer to the first sub-block payload after its header.
     void* __cdecl Allocate_First_Block_(void* block, uint32_t size);
 }

@@ -5,10 +5,6 @@ namespace allocate {
 
     s_mark_stack_entry _mark_stack[39];
 
-    const char s_Mark_Block_Stack_Size_Exceeded_0055b6dc[] = "Mark Block Stack Size Exceeded";
-
-    const char s_Mark_Block_Stack_Empty_0055b6fc[] = "Mark Block Stack Empty";
-
     void* __cdecl Allocate_Space_(uint32_t size) {
         uint32_t padded_size = size;
 
@@ -20,9 +16,9 @@ namespace allocate {
 
         uint32_t total_alloc_size = padded_size + sizeof(s_alloc_header);
 
-        auto* header = static_cast<s_alloc_header*>(Allocate_Far_Space_(total_alloc_size));
+        auto* header = (s_alloc_header*)Allocate_Far_Space_(total_alloc_size);
         if (header == nullptr) {
-            header = static_cast<s_alloc_header*>(Allocate_Dos_Space_(total_alloc_size));
+            header = (s_alloc_header*)Allocate_Dos_Space_(total_alloc_size);
 
             if (header == nullptr) {
                 Allocation_Error_(size);
@@ -42,14 +38,14 @@ namespace allocate {
         MOX::_techname_seg = Allocate_Space_(30000);
         MOX::_special_names_seg = Allocate_Space_(1000);
 
-        MOX::_planet = reinterpret_cast<s_planet_data*>(Allocate_Space_(0x17E8));
-        struct_::Clear_Structure_(MOX::_planet, 0x17E8);
+        MOX::_planet = (s_planet_data*)Allocate_Space_(MAX_PLANETS * sizeof(s_planet_data));
+        struct_::Clear_Structure_(MOX::_planet, MAX_PLANETS * sizeof(s_planet_data));
 
-        MOX::_player = reinterpret_cast<s_player*>(Allocate_Space_(0x7548));
-        struct_::Clear_Structure_(MOX::_player, 0x7548);
+        MOX::_player = (s_player*)Allocate_Space_(MAX_PLAYERS * sizeof(s_player));
+        struct_::Clear_Structure_(MOX::_player, MAX_PLAYERS * sizeof(s_player));
 
-        MOX::_colony = reinterpret_cast<s_colony*>(Allocate_Space_(0x1608A));
-        struct_::Clear_Structure_(MOX::_colony, 0x1608A);
+        MOX::_colony = (s_colony*)Allocate_Space_(MAX_COLONIES * sizeof(s_colony));
+        struct_::Clear_Structure_(MOX::_colony, MAX_COLONIES * sizeof(s_colony));
 
         MOX::_nebula_screen_seg = Allocate_Space_(0x3E800);
 
@@ -60,41 +56,40 @@ namespace allocate {
         // DOS-space allocations for low-level segments
         MOX::_global_data_seg = Allocate_Dos_Space_(0x2800);
 
-        MOX::_nebula = reinterpret_cast<s_nebula*>(Allocate_Dos_Space_(0x14));
-        struct_::Clear_Structure_(MOX::_nebula, 0x14);
+        MOX::_nebula = (s_nebula*)Allocate_Dos_Space_(MAX_NEBULAS * sizeof(s_nebula));
+        struct_::Clear_Structure_(MOX::_nebula, MAX_NEBULAS * sizeof(s_nebula));
 
-        MOX::_star = reinterpret_cast<s_star_data*>(Allocate_Dos_Space_(0x1FC8));
-        struct_::Clear_Structure_(MOX::_star, 0x1FC8);
+        MOX::_star = (s_star_data*)Allocate_Dos_Space_(MAX_STARS * sizeof(s_star_data));
+        struct_::Clear_Structure_(MOX::_star, MAX_STARS * sizeof(s_star_data));
 
-        MOX::_ship = reinterpret_cast<s_ship_data*>(Allocate_Dos_Space_(0xFBF4));
-        struct_::Clear_Structure_(MOX::_ship, 0xFBF4);
+        MOX::_ship = (s_ship_data*)Allocate_Dos_Space_(MAX_SHIPS * sizeof(s_ship_data));
+        struct_::Clear_Structure_(MOX::_ship, MAX_SHIPS * sizeof(s_ship_data));
 
-        MOX::_leaders = reinterpret_cast<s_leader_data*>(Allocate_Dos_Space_(0xF71));
-        struct_::Clear_Structure_(MOX::_leaders, 0xF71);
+        MOX::_leaders = (s_leader_data*)Allocate_Dos_Space_(MAX_LEADERS * sizeof(s_leader_data));
+        struct_::Clear_Structure_(MOX::_leaders, MAX_LEADERS * sizeof(s_leader_data));
     }
 
-    void __cdecl Allocation_Error_(int bytes_requested) {
+    void __cdecl Allocation_Error_(int32_t requested_bytes) {
         char message_buffer[100];
 
-        sprintf(message_buffer, s_Couldn_t_Allocate_0055B668, bytes_requested);
+        sprintf(message_buffer, s_Couldn_t_Allocate_0055B668, requested_bytes);
 
         exitm::Exit_With_Message(message_buffer);
     }
 
     int32_t __cdecl Get_Remaining_Block_Space_(void* block) {
-        const auto* header = static_cast<s_alloc_header*>(block) - 1;
+        const auto* header = (s_alloc_header*)block - 1;
         return header->size - header->current;
     }
 
-    uint32_t __cdecl Get_Max_Block_Space_(void* ptr) {
-        return (static_cast<s_alloc_header*>(ptr) - 1)->size;
+    uint32_t __cdecl Get_Max_Block_Space_(void* block) {
+        return ((s_alloc_header*)block - 1)->size;
     }
 
-    void __cdecl Reallocation_Error_(uint32_t size, int32_t arg2, int32_t arg3) {
+    void __cdecl Reallocation_Error_(uint32_t requested_size, int32_t bytes_short, int32_t block_capacity) {
         char buffer[100];
 
-        // Format: "Unable to Allocate %d bytes (%d, %d)\n"
-        sprintf(buffer, s_Unable_to_Allocate_bytes, size, arg2, arg3);
+        sprintf(buffer, s_Unable_to_Allocate_bytes, requested_size, bytes_short, block_capacity);
 
         exitm::Exit_With_Message(buffer);
     }
@@ -111,7 +106,7 @@ namespace allocate {
         s_alloc_header* pool_header = (s_alloc_header*)block - 1;
 
         uint32_t current_offset = pool_header->current;
-        int32_t capacity = static_cast<int32_t>(pool_header->size);
+        int32_t capacity = (int32_t)pool_header->size;
 
         // Total required space for the new sub-block includes a 12-byte internal header.
         int32_t total_required =
@@ -141,7 +136,7 @@ namespace allocate {
     }
 
     void* __cdecl Allocate_First_Block_(void* block, uint32_t size) {
-        (static_cast<s_alloc_header*>(block) - 1)->current = 0;
+        ((s_alloc_header*)block - 1)->current = 0;
 
         return Allocate_Next_Block_(block, size);
     }
@@ -179,25 +174,22 @@ namespace allocate {
 
     void __cdecl Push_Block_(void* block) {
         if (_mark_stack_pos[0] >= 40) {
-            exitm::Exit_With_Message(s_Mark_Block_Stack_Size_Exceeded_0055b6dc);
+            exitm::Exit_With_Message("Mark Block Stack Size Exceeded");
         }
 
         int32_t pos = _mark_stack_pos[0];
         _mark_stack[pos].block = block;
 
-        _mark_stack[pos].current = (static_cast<s_alloc_header*>(block) - 1)->current;
+        _mark_stack[pos].current = ((s_alloc_header*)block - 1)->current;
 
         _mark_stack_pos[0]++;
     }
 
-    /**
-     * @brief Pops a block marker from the stack and restores the original value at the target address.
-     * The target address is stored at _mark_stack[idx].block, and the value to restore is at _mark_stack[idx].current.
-     * The restoration occurs at (target_address - 12).
-     */
-    void __cdecl Pop_Block_(void* block) {
+    void __cdecl Pop_Block_(void* unused_block) {
+        (void)unused_block;
+
         if (_mark_stack_pos[0] < 1) {
-            exitm::Exit_With_Message(s_Mark_Block_Stack_Empty_0055b6fc);
+            exitm::Exit_With_Message("Mark Block Stack Empty");
         }
 
         _mark_stack_pos[0]--;
@@ -206,8 +198,7 @@ namespace allocate {
         void* target_base = _mark_stack[index].block;
         uint32_t original_value = _mark_stack[index].current;
 
-        // Restore the value relative to the block address
-        (static_cast<s_alloc_header*>(target_base) - 1)->current = original_value;
+        ((s_alloc_header*)target_base - 1)->current = original_value;
     }
 
     void* __cdecl Allocate_Space_No_Header_(uint32_t size) {
@@ -225,24 +216,17 @@ namespace allocate {
     }
 
     void* __cdecl Allocate_First_Block_No_Header_(void* block_ptr, uint32_t size) {
-        (static_cast<s_alloc_header*>(block_ptr) - 1)->current = 0;
+        ((s_alloc_header*)block_ptr - 1)->current = 0;
 
         return Allocate_Next_Block_No_Header_(block_ptr, size);
     }
 
     int32_t __cdecl Mark_Block_(void* block_ptr) {
-        auto* header = static_cast<s_alloc_header*>(block_ptr) - 1;
+        auto* header = (s_alloc_header*)block_ptr - 1;
         header->reserved2 = header->current;
-        return reinterpret_cast<int32_t>(header);
+        return (int32_t)header;
     }
 
-    /**
-     * @brief Allocates a block of memory from a pool, aligning the size if it's odd.
-     * 
-     * @param block_ptr Start address of the memory pool. A header exists 12 bytes before this address.
-     * @param size The requested size of the block.
-     * @return void* Pointer to the start of the newly allocated region, or nullptr if capacity is exceeded.
-     */
     void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size) {
         auto* pool_header = (s_alloc_header*)block_ptr - 1;
 
@@ -265,16 +249,16 @@ namespace allocate {
 
         pool_header->current = next_offset;
 
-        uint32_t* new_block_words = (uint32_t*)new_block_ptr;
-        new_block_words[0] = 0;
-        new_block_words[1] = size;
-        new_block_words[2] = 0;
+        auto* sub_block_header = (s_alloc_header*)new_block_ptr;
+        sub_block_header->current = 0;
+        sub_block_header->size = size;
+        sub_block_header->reserved2 = 0;
 
         return new_block_ptr;
     }
 
-    void* __cdecl Release_Block_(void* ptr) {
-        auto* header = static_cast<s_alloc_header*>(ptr) - 1;
+    void* __cdecl Release_Block_(void* block) {
+        auto* header = (s_alloc_header*)block - 1;
         header->current = header->reserved2;
         return header;
     }

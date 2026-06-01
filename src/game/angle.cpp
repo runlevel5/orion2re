@@ -37,41 +37,42 @@ namespace angle {
             return 0;
         }
 
-        uint32_t u, v;
-        int16_t offset;
+        uint32_t normalized_x;
+        uint32_t normalized_y;
+        int16_t quadrant_offset;
 
         if (dx < 0) {
             if (dy < 0) {
-                u = 0u - (uint32_t)dx;
-                v = 0u - (uint32_t)dy;
-                offset = 180;
+                normalized_x = 0u - (uint32_t)dx;
+                normalized_y = 0u - (uint32_t)dy;
+                quadrant_offset = 180;
             } else {
-                u = dy;
-                v = 0u - (uint32_t)dx;
-                offset = 90;
+                normalized_x = dy;
+                normalized_y = 0u - (uint32_t)dx;
+                quadrant_offset = 90;
             }
         } else {
             if (dy > 0) {
-                u = dx;
-                v = dy;
-                offset = 0;
+                normalized_x = dx;
+                normalized_y = dy;
+                quadrant_offset = 0;
             } else {
-                u = 0u - (uint32_t)dy;
-                v = dx;
-                offset = 270;
+                normalized_x = 0u - (uint32_t)dy;
+                normalized_y = dx;
+                quadrant_offset = 270;
             }
         }
 
         int16_t angle;
-        if (v == u) {
+        if (normalized_y == normalized_x) {
             angle = 45;
-        } else if (v > u) {
-            angle = 90 - _atan_lookup_table[(u << 7) / v];
+        } else if (normalized_y > normalized_x) {
+            angle = 90 - _atan_lookup_table[(normalized_x << 7) / normalized_y];
         } else {
-            angle = _atan_lookup_table[(v << 7) / u];
+            angle = _atan_lookup_table[(normalized_y << 7) / normalized_x];
         }
 
-        angle += offset;
+        angle += quadrant_offset;
         if (angle == 360) {
             angle = 0;
         }
@@ -112,16 +113,16 @@ namespace angle {
 
         if (angle_deg < 180) {
             if (angle_deg < 90) {
-                return static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[angle_deg])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+                return (int32_t)(((uint32_t)(uint16_t)_sin_table[angle_deg] * (uint32_t)magnitude + 0x8000) >> 16);
             }
             if (angle_deg == 90) {
                 return magnitude;
             }
-            return static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[180 - angle_deg])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+            return (int32_t)(((uint32_t)(uint16_t)_sin_table[180 - angle_deg] * (uint32_t)magnitude + 0x8000) >> 16);
         }
 
         if (angle_deg < 270) {
-            return -static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[angle_deg - 180])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+            return -(int32_t)(((uint32_t)(uint16_t)_sin_table[angle_deg - 180] * (uint32_t)magnitude + 0x8000) >> 16);
         }
         if (angle_deg == 270) {
             if (magnitude == INT32_MIN) {
@@ -130,7 +131,7 @@ namespace angle {
             return -magnitude;
         }
 
-        return -static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[360 - angle_deg])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+        return -(int32_t)(((uint32_t)(uint16_t)_sin_table[360 - angle_deg] * (uint32_t)magnitude + 0x8000) >> 16);
     }
 
     void __cdecl Rotate_Coordinates_(int16_t angle_deg, int32_t* x_ptr, int32_t* y_ptr) {

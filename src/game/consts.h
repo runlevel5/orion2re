@@ -6,7 +6,7 @@
 #define MAX_PLANETS 360
 #define MAX_STARS 72
 #define MAX_LEADERS 67
-#define MAX_NEBULAS 5
+#define MAX_NEBULAS 4
 
 inline constexpr char GAME_VERSION[] = "1.31-re";
 inline constexpr char GAME_VERSION_LABEL[] = "Version 1.31-re";

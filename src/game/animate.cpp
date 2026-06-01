@@ -6,7 +6,6 @@ namespace animate {
     int16_t _clipping_flag;
     int16_t _dot_stencil_flag;
 
-    char s_Screen_Background_cant_be_clipp[35] = "Screen Background can't be clipped";
     char s_Refresh_Mask_cant_be_drawn[28] = "Refresh Mask can't be drawn";
 
     short __cdecl Get_Full_Store_Flag_(s_animation_header* header) {
@@ -33,8 +32,8 @@ namespace animate {
             int current_pixel_pos = chunk_base;
 
             while (true) {
-                int skip = static_cast<int>(sprite[sprite_idx]);
-                int count = static_cast<int>(sprite[sprite_idx + 1]);
+                int skip = (int)sprite[sprite_idx];
+                int count = (int)sprite[sprite_idx + 1];
                 sprite_idx += 2;
 
                 if (skip == 0 && count == 0) {
@@ -62,10 +61,10 @@ namespace animate {
         platform::Unlock_Primary_Surface();
     }
 
-    void __cdecl Draw_Screen_Background_Off_(uint8_t* data) {
-        uint32_t* sprite = reinterpret_cast<uint32_t*>(data);
+    void __cdecl Draw_Screen_Background_Off_(uint8_t* sprite_data) {
+        uint32_t* sprite = (uint32_t*)sprite_data;
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
-        uint32_t* vpage = reinterpret_cast<uint32_t*>(video::_current_video_page);
+        uint32_t* vpage = (uint32_t*)video::_current_video_page;
 
         int sprite_idx = 0;
         for (int row_base = 0; row_base < 0x14000; row_base += 0x4000) {
@@ -131,7 +130,7 @@ namespace animate {
             Set_Animation_Palette_();
         }
 
-        uint8_t* data = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
+        uint8_t* frame_data = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
 
         int16_t x_end = anim->width + x - 1;
         int16_t y_end = anim->height + y - 1;
@@ -157,15 +156,15 @@ namespace animate {
 
                 switch (anim->flags & 0x3) {
                 case 0:
-                    if (anim->flags & 0x8) clipped::Clipped_Draw_Glassed_Animated_Sprite_(x, y, data);
-                    else clipped::Clipped_Draw_Animated_Sprite_(x, y, data);
+                    if (anim->flags & 0x8) clipped::Clipped_Draw_Glassed_Animated_Sprite_(x, y, frame_data);
+                    else clipped::Clipped_Draw_Animated_Sprite_(x, y, frame_data);
                     break;
                 case 1:
-                    if (anim->flags & 0x8) clipped::Clipped_Draw_Glassed_Bitmap_Sprite_(x, y, data);
-                    else clipped::Clipped_Draw_Bitmap_Sprite_(x, y, data);
+                    if (anim->flags & 0x8) clipped::Clipped_Draw_Glassed_Bitmap_Sprite_(x, y, frame_data);
+                    else clipped::Clipped_Draw_Bitmap_Sprite_(x, y, frame_data);
                     break;
                 case 2:
-                    exitm::Exit_With_Message(s_Screen_Background_cant_be_clipp);
+                    exitm::Exit_With_Message("Screen Background can't be clipped");
                     break;
                 case 3:
                     exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
@@ -173,7 +172,7 @@ namespace animate {
                 }
             }
             else if ((anim->flags & 0x3) == 0) {
-                clipped::Clipped_Draw_Stenciled_Animated_Sprite_(x, y, data);
+                clipped::Clipped_Draw_Stenciled_Animated_Sprite_(x, y, frame_data);
             }
         }
         else {
@@ -192,17 +191,17 @@ namespace animate {
                 switch (type) {
                 case 0:
                     video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
-                    draw::Draw_Animated_Sprite_(x, y, data);
+                    draw::Draw_Animated_Sprite_(x, y, frame_data);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
                 case 1:
                     video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
-                    draw::Draw_Bitmap_Sprite_(x, y, data);
+                    draw::Draw_Bitmap_Sprite_(x, y, frame_data);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
                 case 2:
-                    if (video::_copy_to_on_page_flag == 1) Draw_Screen_Background_On_((uint32_t*)data);
-                    else Draw_Screen_Background_Off_(data);
+                    if (video::_copy_to_on_page_flag == 1) Draw_Screen_Background_On_((uint32_t*)frame_data);
+                    else Draw_Screen_Background_Off_(frame_data);
 
                     if (video::screen_refresh_flag > 1) {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
@@ -216,14 +215,14 @@ namespace animate {
             else {
                 switch (type) {
                 case 0:
-                    Draw_Glassed_Animated_Sprite_(x, y, data);
+                    Draw_Glassed_Animated_Sprite_(x, y, frame_data);
                     break;
                 case 1:
-                    Draw_Glassed_Bitmap_Sprite_(x, y, data);
+                    Draw_Glassed_Bitmap_Sprite_(x, y, frame_data);
                     break;
                 case 2:
-                    if (video::_copy_to_on_page_flag == 1) Draw_Glassed_Screen_Background_On_(data);
-                    else Draw_Glassed_Screen_Background_Off_(data);
+                    if (video::_copy_to_on_page_flag == 1) Draw_Glassed_Screen_Background_On_(frame_data);
+                    else Draw_Glassed_Screen_Background_Off_(frame_data);
 
                     if (video::screen_refresh_flag > 1) {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
@@ -252,15 +251,15 @@ namespace animate {
     }
 
     void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
-        int y_offset = *reinterpret_cast<uint16_t*>(frame_data + 2);
-        int dest_line_base = (y + y_offset) * static_cast<int>(video::g_screen_res_x) + x;
+        int y_offset = *(uint16_t*)(frame_data + 2);
+        int dest_line_base = (y + y_offset) * (int)video::g_screen_res_x + x;
         int dest_ptr = dest_line_base;
         int frame_idx = 2;
         int height = _animation_header->height;
 
         while (y_offset < height) {
-            int16_t run_len = *reinterpret_cast<int16_t*>(frame_data + frame_idx * 2);
-            int16_t skip_len = *reinterpret_cast<int16_t*>(frame_data + frame_idx * 2 + 2);
+            int16_t run_len = *(int16_t*)(frame_data + frame_idx * 2);
+            int16_t skip_len = *(int16_t*)(frame_data + frame_idx * 2 + 2);
             frame_idx += 2;
 
             if (run_len == 0) {
@@ -285,10 +284,10 @@ namespace animate {
         }
     }
 
-    void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
+    void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int32_t current_y_offset = *(uint16_t*)(sprite + 2);
+        int32_t current_y_offset = *(uint16_t*)(frame_data + 2);
         int32_t word_idx = 2;
 
         int32_t dest_idx = (int32_t)x + ((int32_t)y + current_y_offset) * video::g_screen_res_x;
@@ -298,8 +297,8 @@ namespace animate {
         uint8_t* video_ptr = video::_current_video_page;
 
         while (current_y_offset < total_height) {
-            int16_t pixel_count = *(int16_t*)(sprite + word_idx * 2);
-            int16_t skip_val = *(int16_t*)(sprite + word_idx * 2 + 2);
+            int16_t pixel_count = *(int16_t*)(frame_data + word_idx * 2);
+            int16_t skip_val = *(int16_t*)(frame_data + word_idx * 2 + 2);
             word_idx += 2;
 
             if (pixel_count == 0) {
@@ -309,7 +308,7 @@ namespace animate {
             }
             else {
                 dest_idx += skip_val;
-                uint8_t* pixel_data = &sprite[word_idx * 2];
+                uint8_t* pixel_data = &frame_data[word_idx * 2];
 
                 for (int32_t i = 0; i < (int32_t)pixel_count; ++i) {
                     uint8_t pixel = pixel_data[i];
@@ -380,8 +379,8 @@ namespace animate {
             int32_t current_out_pos = page_offset;
 
             while (true) {
-                int32_t skip_count = static_cast<int8_t>(sprite[sprite_idx]);
-                int32_t run_length = static_cast<int8_t>(sprite[sprite_idx + 1]);
+                int32_t skip_count = (int8_t)sprite[sprite_idx];
+                int32_t run_length = (int8_t)sprite[sprite_idx + 1];
                 sprite_idx += 2;
 
                 if (run_length == 0) {
@@ -401,15 +400,15 @@ namespace animate {
     }
 
     void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite) {
-        int32_t pitch = static_cast<int32_t>(platform::Lock_Primary_Surface());
+        int32_t pitch = (int32_t)platform::Lock_Primary_Surface();
         int32_t sprite_idx = 0;
 
         for (int32_t base_pixel_offset = 0; base_pixel_offset < 0x50000; base_pixel_offset += 0x10000) {
             int32_t current_pixel = base_pixel_offset;
 
             while (true) {
-                int8_t skip = static_cast<int8_t>(sprite[sprite_idx]);
-                int8_t count = static_cast<int8_t>(sprite[sprite_idx + 1]);
+                int8_t skip = (int8_t)sprite[sprite_idx];
+                int8_t count = (int8_t)sprite[sprite_idx + 1];
                 sprite_idx += 2;
 
                 if (count == 0) {
@@ -470,7 +469,7 @@ namespace animate {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         platform::Lock_Offscreen_Surface_();
 
-        int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
+        int32_t current_y = *(uint16_t*)(frame_data + 2);
         int32_t draw_y = y + current_y;
         int32_t data_offset_words = 2;
         int32_t draw_x = x;
@@ -479,8 +478,8 @@ namespace animate {
         int32_t height = _animation_header->height;
 
         while (current_y < height) {
-            int32_t count = *reinterpret_cast<int16_t*>(frame_data + data_offset_words * 2);
-            int32_t skip = *reinterpret_cast<int16_t*>(frame_data + data_offset_words * 2 + 2);
+            int32_t count = *(int16_t*)(frame_data + data_offset_words * 2);
+            int32_t skip = *(int16_t*)(frame_data + data_offset_words * 2 + 2);
             data_offset_words += 2;
 
             if (count == 0) {
@@ -542,7 +541,7 @@ namespace animate {
             }
         }
 
-        uint8_t* frame_ptr = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
+        uint8_t* frame_ptr = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
 
         if (clipped) {
             if (_dot_stencil_flag == 0) {
@@ -621,7 +620,7 @@ namespace animate {
             Set_Animation_Palette_();
         }
 
-        uint8_t* sprite = reinterpret_cast<uint8_t*>(header) + header->frame_offsets[header->current_frame];
+        uint8_t* sprite = (uint8_t*)header + header->frame_offsets[header->current_frame];
 
         bool is_clipped = false;
 
@@ -673,7 +672,7 @@ namespace animate {
                         break;
                     case 2:
                         if (video::_copy_to_on_page_flag == 1) {
-                            Draw_Screen_Background_On_(reinterpret_cast<uint32_t*>(sprite));
+                            Draw_Screen_Background_On_((uint32_t*)sprite);
                         } else {
                             Draw_Screen_Background_Off_(sprite);
                         }
@@ -712,7 +711,7 @@ namespace animate {
                         }
                         break;
                     case 2:
-                        exitm::Exit_With_Message(s_Screen_Background_cant_be_clipp);
+                        exitm::Exit_With_Message("Screen Background can't be clipped");
                         break;
                     case 3:
                         exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
@@ -747,20 +746,20 @@ namespace animate {
     {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int32_t cur_y_offset = *reinterpret_cast<uint16_t*>(sprite_data + 2);
-        int32_t line_start_offset = (y + cur_y_offset) * video::g_screen_res_x + x;
+        int32_t current_y_offset = *(uint16_t*)(sprite_data + 2);
+        int32_t line_start_offset = (y + current_y_offset) * video::g_screen_res_x + x;
         int32_t sprite_idx = 2;
         int32_t screen_offset = line_start_offset;
         int32_t header_height = _animation_header->height;
 
-        if (cur_y_offset < header_height) {
+        if (current_y_offset < header_height) {
             do {
-                int16_t run_len = *reinterpret_cast<int16_t*>(sprite_data + sprite_idx * 2);
-                int16_t skip_len = *reinterpret_cast<int16_t*>(sprite_data + sprite_idx * 2 + 2);
+                int16_t run_len = *(int16_t*)(sprite_data + sprite_idx * 2);
+                int16_t skip_len = *(int16_t*)(sprite_data + sprite_idx * 2 + 2);
                 sprite_idx += 2;
 
                 if (run_len == 0) {
-                    cur_y_offset += skip_len;
+                    current_y_offset += skip_len;
                     line_start_offset += skip_len * 640;
                     screen_offset = line_start_offset;
                 } else {
@@ -777,7 +776,7 @@ namespace animate {
 
                     sprite_idx += (run_len + 1) / 2;
                 }
-            } while (cur_y_offset < header_height);
+            } while (current_y_offset < header_height);
         }
 
         platform::Unlock_Appropriate_Render_Buffer();
@@ -849,11 +848,11 @@ namespace animate {
         int32_t idx = 2;
 
         while (current_y < start_y) {
-            int16_t cmd = *(int16_t*)(frame_data + idx * 2);
-            if (cmd == 0) {
+            int16_t run_length = *(int16_t*)(frame_data + idx * 2);
+            if (run_length == 0) {
                 current_y += *(uint16_t*)(frame_data + idx * 2 + 2);
             } else {
-                idx += (cmd + 1) / 2;
+                idx += (run_length + 1) / 2;
             }
             idx += 2;
         }
@@ -869,11 +868,11 @@ namespace animate {
         int32_t clip_right = line_start_offset + right_limit_offset;
 
         while (current_y < draw_height) {
-            int16_t cmd = *(int16_t*)(frame_data + idx * 2);
+            int16_t run_length = *(int16_t*)(frame_data + idx * 2);
             int16_t skip = *(int16_t*)(frame_data + idx * 2 + 2);
             idx += 2;
 
-            if (cmd == 0) {
+            if (run_length == 0) {
                 current_y += skip;
                 // Assembly explicitly uses constant 640 instead of g_screen_res_x inside this branch
                 line_start_offset += skip * 640;
@@ -883,23 +882,23 @@ namespace animate {
             } else {
                 screen_offset += skip;
                 int32_t data_idx = idx * 2;
-                int32_t end_x = cmd + screen_offset;
+                int32_t end_x = run_length + screen_offset;
 
                 if (screen_offset < clip_right) {
                     if (screen_offset < clip_left) {
-                        int16_t diff = clip_left - screen_offset;
-                        if (cmd <= diff) {
-                            diff = cmd;
+                        int16_t left_clip = clip_left - screen_offset;
+                        if (run_length <= left_clip) {
+                            left_clip = run_length;
                         }
-                        data_idx += diff;
-                        screen_offset += diff;
+                        data_idx += left_clip;
+                        screen_offset += left_clip;
                     }
 
-                    int16_t diff2 = clip_right - screen_offset;
-                    if (end_x <= diff2 + screen_offset) {
-                        diff2 = end_x - screen_offset;
+                    int16_t visible_run_length = clip_right - screen_offset;
+                    if (end_x <= visible_run_length + screen_offset) {
+                        visible_run_length = end_x - screen_offset;
                     }
-                    end_x = diff2 + screen_offset;
+                    end_x = visible_run_length + screen_offset;
 
                     while (screen_offset < end_x) {
                         video::_current_video_page[screen_offset] = remap::_picture_remap_color_list[frame_data[data_idx]];
@@ -907,7 +906,7 @@ namespace animate {
                         screen_offset++;
                     }
                 }
-                idx += (cmd + 1) / 2;
+                idx += (run_length + 1) / 2;
             }
         }
 

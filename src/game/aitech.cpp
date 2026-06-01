@@ -1,15 +1,11 @@
 #include "pch.h"
 
 namespace aitech {
-    int __cdecl Player_Best_Armor_(s_player* player) {
-        // The loop checks armors from index 6 down to 1.
-        // Index 0 is treated as the default return value if no other armor is researched.
-        for (int i = 6; i > 0; --i) {
-            // Check if the technology associated with this armor index is researched.
-            // Value 3 typically represents TECH_STATE_RESEARCHED.
+    int32_t __cdecl Player_Best_Armor_(s_player* player) {
+        for (int32_t i = 6; i > 0; --i) {
             int16_t tech_id = TECHDATA::_armor[i].tech_app_id;
 
-            if (player->tech_applications[tech_id] == 3 /* TECH_STATE_RESEARCHED */) {
+            if (player->tech_applications[tech_id] == 3) {
                 return i;
             }
         }
@@ -17,16 +13,11 @@ namespace aitech {
         return 0;
     }
 
-    int __cdecl Player_Best_Ship_Shield_(s_player* player) {
-        int shield_idx = 5;
-
-        // Loop iterates through shield indices 5 down to 1.
-        // Index 0 is the default return value if no other shields are researched.
+    int32_t __cdecl Player_Best_Ship_Shield_(s_player* player) {
+        int32_t shield_idx = 5;
         while (shield_idx > 0) {
-            // tech_app_id is at offset 0x06 in s_tech_shield_data
             int16_t tech_id = TECHDATA::_shields[shield_idx].tech_app_id;
 
-            // Status 3 typically represents a researched/known technology.
             if (player->tech_applications[tech_id] == 3) {
                 return shield_idx;
             }
@@ -34,11 +25,11 @@ namespace aitech {
             shield_idx--;
         }
 
-        return shield_idx; // Returns 0
+        return shield_idx;
     }
 
-    int __cdecl Player_Best_Rifle_(s_player* player) {
-        int i = 5;
+    int32_t __cdecl Player_Best_Rifle_(s_player* player) {
+        int32_t i = 5;
         while (i > 0) {
             if (player->tech_applications[TECHDATA::_rifles[i].tech_app_id] == 3) {
                 return i;
@@ -48,12 +39,12 @@ namespace aitech {
         return i;
     }
 
-    int __cdecl Player_Best_Personal_Shield_(s_player* player) {
-        int index = 1;
+    int32_t __cdecl Player_Best_Personal_Shield_(s_player* player) {
+        int32_t index = 1;
         s_tech_data_personal_shield* shield_data = &TECHDATA::_personal_shields[1];
 
         do {
-            if (player->tech_applications[shield_data->tech_app_id] == 3 /* RESEARCHED */) {
+            if (player->tech_applications[shield_data->tech_app_id] == 3) {
                 return index;
             }
 
@@ -64,8 +55,8 @@ namespace aitech {
         return index;
     }
 
-    int __cdecl Player_Best_Fuel_(s_player* player) {
-        int fuel_idx = 5;
+    int32_t __cdecl Player_Best_Fuel_(s_player* player) {
+        int32_t fuel_idx = 5;
 
         while (fuel_idx > 0) {
             int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app_id;
@@ -78,24 +69,23 @@ namespace aitech {
         return fuel_idx;
     }
 
-    int __cdecl Player_Best_Computer_(s_player* player) {
-        int computer_idx = 5;
+    int32_t __cdecl Player_Best_Computer_(s_player* player) {
+        int32_t computer_idx = 5;
 
         while (computer_idx > 0) {
             int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app_id;
 
-            // Check if the player has researched the technology application associated with this computer.
-            if (player->tech_applications[tech_app_idx] == 3 /* TECH_RESEARCHED */) {
+            if (player->tech_applications[tech_app_idx] == 3) {
                 return computer_idx;
             }
 
             computer_idx--;
         }
 
-        return computer_idx; // Returns 0
+        return computer_idx;
     }
 
-    int __cdecl Player_Best_Planetary_Shield_(s_player* player) {
+    int32_t __cdecl Player_Best_Planetary_Shield_(s_player* player) {
         if (player->tech_applications[TECH_APP_PLANETARY_BARRIER_SHIELD] == 3) {
             return 3;
         }
@@ -111,13 +101,9 @@ namespace aitech {
         return 0;
     }
 
-    int __cdecl Player_Best_Drive_(s_player* player) {
-        int drive_idx = 6;
-
-        // Loop from highest drive tier down to 1.
-        // Index 0 (Nuclear Engine) is the fallback value and is not explicitly checked.
+    int32_t __cdecl Player_Best_Drive_(s_player* player) {
+        int32_t drive_idx = 6;
         while (drive_idx > 0) {
-            // tech_app maps the drive to its corresponding entry in the tech_applications array.
             int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app_id;
 
             if (player->tech_applications[tech_app_idx] == 3) {
@@ -165,10 +151,10 @@ namespace aitech {
             // Calculate Best Weapon scores based on technology costs
             for (int w_idx = 1; w_idx <= 13; ++w_idx) {
                 uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
-                if (plr->tech_applications[app_id] == 3 /* LEARNED */) {
+                if (plr->tech_applications[app_id] == 3) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
-                    uint8_t cost_score = static_cast<uint8_t>(TECHDATA::_technology_fields[field_id].cost / 100);
-                    if (cost_score > static_cast<uint8_t>(plr_info->best_weapon1)) {
+                    uint8_t cost_score = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
+                    if (cost_score > (uint8_t)plr_info->best_weapon1) {
                         plr_info->best_weapon1 = cost_score;
                     }
                 }
@@ -176,10 +162,10 @@ namespace aitech {
 
             for (int w_idx = 14; w_idx <= 20; ++w_idx) {
                 uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
-                if (plr->tech_applications[app_id] == 3 /* LEARNED */) {
+                if (plr->tech_applications[app_id] == 3) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
-                    uint8_t cost_score = static_cast<uint8_t>(TECHDATA::_technology_fields[field_id].cost / 100);
-                    if (cost_score > static_cast<uint8_t>(plr_info->best_weapon2)) {
+                    uint8_t cost_score = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
+                    if (cost_score > (uint8_t)plr_info->best_weapon2) {
                         plr_info->best_weapon2 = cost_score;
                     }
                 }
@@ -188,7 +174,7 @@ namespace aitech {
             s_invasion_player_bonuses grnd_bonuses;
             invasion::Compute_Player_Ground_Combat_Bonuses_((int16_t)p_idx, &grnd_bonuses, 1);
 
-            int16_t bonus =
+            int16_t ground_bonus_total =
                 (uint8_t)grnd_bonuses.powered_armor_bonus +
                 (uint8_t)grnd_bonuses.troop_bonus +
                 (uint8_t)grnd_bonuses.personal_shield_bonus +
@@ -196,7 +182,7 @@ namespace aitech {
                 grnd_bonuses.ground_combat_bonus +
                 grnd_bonuses.low_g_penalty +
                 (uint8_t)grnd_bonuses.antigrav_bonus;
-            plr_info->ground_bonus = bonus;
+            plr_info->ground_bonus = ground_bonus_total;
             plr_info->ground_bonus += (uint8_t)grnd_bonuses.subterranean_bonus >> 1;
             plr_info->ground_bonus += (uint8_t)grnd_bonuses.battleoids_bonus >> 2;
 
@@ -340,11 +326,10 @@ namespace aitech {
         uint8_t other_player_bit = 1 << (other_player_id & 0x1F);
         int16_t score = 0;
 
-        int num_stars = static_cast<int>(MOX::_NUM_STARS);
-        for (int i = 0; i < num_stars; ++i) {
+        int32_t num_stars = (int32_t)MOX::_NUM_STARS;
+        for (int32_t i = 0; i < num_stars; ++i) {
             s_star_data* star = &MOX::_star[i];
 
-            // Offset 0x38: has_colony is a bitmask where bit N is set if player N has a colony
             if (star->has_colony & other_player_bit) {
                 if (star->has_colony & player_bit) {
                     score += 5;
@@ -362,7 +347,7 @@ namespace aitech {
 
         for (int i = 0; i < 83; ++i) {
             if (MOX::_player[player_idx].tech_fields[i] == 3) {
-                int32_t cost = static_cast<int32_t>(TECHDATA::_technology_fields[i].cost);
+                int32_t cost = (int32_t)TECHDATA::_technology_fields[i].cost;
                 if (max_cost < cost) {
                     max_cost = cost;
                 }
