@@ -7,11 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/bolt.{h,cpp}
-- [pending] src/game/bomb.{h,cpp}
-- [pending] src/game/buffer.{h,cpp}
-- [pending] src/game/capture.{h,cpp}
-- [pending] src/game/chat.{h,cpp}
 - [pending] src/game/clipped.{h,cpp}
 - [pending] src/game/cmbtai.{h,cpp}
 - [pending] src/game/cmbtdrw1.{h,cpp}
@@ -188,6 +183,10 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/chat.{h,cpp} - suggest adding concise chat helper docstrings, renaming the decompiler-style send parameter, replacing the remaining `static_cast` and plain `int` loop/length temporaries with explicit fixed-width `int32_t`, and removing the stale type-mismatch comment in the GNN send path; no pointer-math UB access stood out in this unit.
+- [reviewed] src/game/buffer.{h,cpp} - applied concise buffer-cache docstrings, renamed the unused flush parameter, replaced the remaining `static_cast`/`reinterpret_cast` uses with C-style casts, and inlined the local string-constant usages; raw header reads via `buffer_space_seg - 8` and `buffer_base - 0x0C` remain UB-prone pointer-math access patterns and likely want a better recovered allocation-header type boundary.
+- [reviewed] src/game/bomb.{h,cpp} - applied concise bomb helper docstrings, conservative bomb-result and loop-local renames, obvious `int32_t` cleanup for indices and bomb strength, raw-address/redundant comment cleanup, and typed pointer subtraction for colony indexing; the `colony->pop_roundoff[race_idx]` access remains a documented out-of-bounds risk and likely points to an incomplete recovered type or missing race-index normalization.
+- [reviewed] src/game/bolt.{h,cpp} - verified the cleanup remained behavior-equivalent, finished the remaining bolt parameter naming after checking the beam call sites, converted the remaining `static_cast<uint8_t>` uses to C-style casts, and used `int32_t` for loop counters; raw writes into `replace::_graphics_buffer` remain a UB-prone unchecked scratch-buffer access pattern.
 - [reviewed] src/game/bitmap.{h,cpp} - applied concise bitmap helper docstrings, inlined the CPP-local error strings and removed their header externs, renamed a few placeholder parameters, converted obvious bitmap/palette helper integers to fixed-width `int32_t`, and replaced the remaining `reinterpret_cast`/`static_cast` uses with C-style casts; widespread raw frame-buffer offset arithmetic and compressed-frame overlays remain UB-prone and likely indicate missing typed bitmap/span helpers.
 - [reviewed] src/game/bitio.{h,cpp} - applied concise header docstrings for the bit-buffer lifecycle and bit read/write helpers, replaced the plain `int` bit parameter with `int32_t`, and replaced the remaining `static_cast` with a C-style cast while retaining the existing source comments per user preference; no pointer-math UB access stood out in this unit.
 - [reviewed] src/game/bill.{h,cpp} - applied decompiler/raw-address comment cleanup, paragraph and active-player parameter renames, CPP-local file-mode/error string inlining, remaining C++-style cast cleanup, and `int32_t` wrapper parameters for centered bitmap printing; no pointer-math UB access stood out in this unit.
@@ -211,6 +210,7 @@
 - [reviewed] src/game/antarans.{h,cpp} - applied concise header docstrings, fixed-width signature cleanup, remaining `static_cast` replacement, local string literal inlining, and a conservative local rename; unchecked pointer-arithmetic appends into `MOX::_temp_string` remain noted for later review.
 - [reviewed] src/game/antaroom.{h,cpp} - applied concise header docstrings, a conservative screen-parameter and local rename, remaining `static_cast` cleanup, and CPP-local LBX string literal inlining; raw animation-header overlays on the mouse bitmap buffer remain noted for later review.
 - [reviewed] src/game/arith1e.{h,cpp} - suggest adding concise compression/decompression docstrings, replacing internal `int` count/context helpers with fixed-width `int32_t`, and inlining the CPP-local fatal-error string constants; no pointer-math UB access was found in this unit.
+- [reviewed] src/game/capture.{h,cpp} - applied concise header docstrings for the release-flag helpers and the no-op screen-capture entry point; no naming, comment, fixed-width type, cast, or pointer-math UB issues stood out in this unit.
 
 ## Blocked
 - none

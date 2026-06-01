@@ -4,9 +4,12 @@
 namespace capture {
     extern uint16_t _release_flag;
 
+    // Marks the build/runtime state as release mode.
     void Release_Version_();
 
+    // Handles the screen FLIC capture hook; currently performs no work.
     void __cdecl Screen_Flic_Capture_();
 
+    // Returns the current release-mode flag state.
     uint16_t __cdecl Check_Release_Version_();
 }

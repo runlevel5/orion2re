@@ -40,117 +40,123 @@ namespace bolt {
     };
 
     void __cdecl Wide_Bolt_Line_(
-        int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int16_t param_6,
-        int16_t param_7, int16_t param_8, uint16_t param_9, int16_t param_10, int16_t param_11, int16_t param_12,
-        int16_t param_13, int16_t param_14, int16_t param_15, int16_t param_16, int16_t param_17, int16_t param_18,
-        int16_t param_19, int16_t param_20, int16_t param_21)
+        int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t palette_base, int16_t palette_span,
+        int16_t color_jitter_chance, int16_t color_jitter_range, uint16_t sparkle_phase, int16_t legacy_core_flag,
+        int16_t point_source_end, int16_t tip_highlight, int16_t full_core_gradient_flag, int16_t apply_sparkles,
+        int16_t legacy_side_flag, int16_t core_max_offset, int16_t core_min_offset, int16_t mid_max_offset,
+        int16_t mid_min_offset, int16_t outer_max_offset, int16_t outer_min_offset)
     {
+        (void)legacy_core_flag;
+        (void)legacy_side_flag;
+
         int16_t angle = angle::Get_Angle_(x2 - x1, y2 - y1);
-        int16_t dir_idx = (((371 - angle) % 360) * 2) / 45;
+        int16_t direction_index = (((371 - angle) % 360) * 2) / 45;
 
         int16_t x1_1, y1_1, x2_1, y2_1;
         int16_t x1_2, y1_2, x2_2, y2_2;
 
-        if (param_11 == 1) {
+        if (point_source_end == 1) {
             x1_1 = x1;
             y1_1 = y1;
-            x2_1 = _head_wide_bolts[dir_idx * 12 + 8];
-            y2_1 = _head_wide_bolts[dir_idx * 12 + 9];
+            x2_1 = _head_wide_bolts[direction_index * 12 + 8];
+            y2_1 = _head_wide_bolts[direction_index * 12 + 9];
 
             x1_2 = x1;
             y1_2 = y1;
-            x2_2 = _head_wide_bolts[dir_idx * 12 + 10];
-            y2_2 = _head_wide_bolts[dir_idx * 12 + 11];
+            x2_2 = _head_wide_bolts[direction_index * 12 + 10];
+            y2_2 = _head_wide_bolts[direction_index * 12 + 11];
         } else {
-            x1_1 = _tail_wide_bolts[dir_idx * 12 + 8] + x1;
-            y1_1 = _tail_wide_bolts[dir_idx * 12 + 9] + y1;
-            x2_1 = _head_wide_bolts[dir_idx * 12 + 8];
-            y2_1 = _head_wide_bolts[dir_idx * 12 + 9];
+            x1_1 = _tail_wide_bolts[direction_index * 12 + 8] + x1;
+            y1_1 = _tail_wide_bolts[direction_index * 12 + 9] + y1;
+            x2_1 = _head_wide_bolts[direction_index * 12 + 8];
+            y2_1 = _head_wide_bolts[direction_index * 12 + 9];
 
-            x1_2 = _tail_wide_bolts[dir_idx * 12 + 10] + x1;
-            y1_2 = _tail_wide_bolts[dir_idx * 12 + 11] + y1;
-            x2_2 = _head_wide_bolts[dir_idx * 12 + 10];
-            y2_2 = _head_wide_bolts[dir_idx * 12 + 11];
+            x1_2 = _tail_wide_bolts[direction_index * 12 + 10] + x1;
+            y1_2 = _tail_wide_bolts[direction_index * 12 + 11] + y1;
+            x2_2 = _head_wide_bolts[direction_index * 12 + 10];
+            y2_2 = _head_wide_bolts[direction_index * 12 + 11];
         }
 
-        int16_t v6 = param_5 + param_6 - 1;
-        int16_t v4 = param_8 / 2;
+        int16_t max_color = palette_base + palette_span - 1;
+        int16_t side_rand_range = color_jitter_range / 2;
 
-        Bolt_Segment_(x1_1, y1_1, x2_1 + x2, y2_1 + y2, param_5 + param_21, param_20 - param_21, param_7, v4, param_5, v6, 0, param_14, param_9, 0);
-        Bolt_Segment_(x1_2, y1_2, x2_2 + x2, y2_2 + y2, param_5 + param_21, param_20 - param_21, param_7, v4, param_5, v6, 0, param_14, param_9, 0);
+        Bolt_Segment_(x1_1, y1_1, x2_1 + x2, y2_1 + y2, palette_base + outer_min_offset, outer_max_offset - outer_min_offset, color_jitter_chance, side_rand_range, palette_base, max_color, 0, apply_sparkles, sparkle_phase, 0);
+        Bolt_Segment_(x1_2, y1_2, x2_2 + x2, y2_2 + y2, palette_base + outer_min_offset, outer_max_offset - outer_min_offset, color_jitter_chance, side_rand_range, palette_base, max_color, 0, apply_sparkles, sparkle_phase, 0);
 
         int16_t x1_3, y1_3, x2_3, y2_3;
         int16_t x1_4, y1_4, x2_4, y2_4;
         int16_t x1_5, y1_5, x2_5, y2_5;
         int16_t x1_6, y1_6, x2_6, y2_6;
 
-        if (param_11 == 1) {
+        if (point_source_end == 1) {
             x1_3 = x1;
             y1_3 = y1;
-            x2_3 = _head_wide_bolts[dir_idx * 12 + 0];
-            y2_3 = _head_wide_bolts[dir_idx * 12 + 1];
+            x2_3 = _head_wide_bolts[direction_index * 12 + 0];
+            y2_3 = _head_wide_bolts[direction_index * 12 + 1];
 
             x1_4 = x1;
             y1_4 = y1;
-            x2_4 = _head_wide_bolts[dir_idx * 12 + 2];
-            y2_4 = _head_wide_bolts[dir_idx * 12 + 3];
+            x2_4 = _head_wide_bolts[direction_index * 12 + 2];
+            y2_4 = _head_wide_bolts[direction_index * 12 + 3];
 
             x1_5 = x1;
             y1_5 = y1;
-            x2_5 = _head_wide_bolts[dir_idx * 12 + 4];
-            y2_5 = _head_wide_bolts[dir_idx * 12 + 5];
+            x2_5 = _head_wide_bolts[direction_index * 12 + 4];
+            y2_5 = _head_wide_bolts[direction_index * 12 + 5];
 
             x1_6 = x1;
             y1_6 = y1;
-            x2_6 = _head_wide_bolts[dir_idx * 12 + 6];
-            y2_6 = _head_wide_bolts[dir_idx * 12 + 7];
+            x2_6 = _head_wide_bolts[direction_index * 12 + 6];
+            y2_6 = _head_wide_bolts[direction_index * 12 + 7];
         } else {
-            x1_3 = _tail_wide_bolts[dir_idx * 12 + 0] + x1;
-            y1_3 = _tail_wide_bolts[dir_idx * 12 + 1] + y1;
-            x2_3 = _head_wide_bolts[dir_idx * 12 + 0];
-            y2_3 = _head_wide_bolts[dir_idx * 12 + 1];
+            x1_3 = _tail_wide_bolts[direction_index * 12 + 0] + x1;
+            y1_3 = _tail_wide_bolts[direction_index * 12 + 1] + y1;
+            x2_3 = _head_wide_bolts[direction_index * 12 + 0];
+            y2_3 = _head_wide_bolts[direction_index * 12 + 1];
 
-            x1_4 = _tail_wide_bolts[dir_idx * 12 + 2] + x1;
-            y1_4 = _tail_wide_bolts[dir_idx * 12 + 3] + y1;
-            x2_4 = _head_wide_bolts[dir_idx * 12 + 2];
-            y2_4 = _head_wide_bolts[dir_idx * 12 + 3];
+            x1_4 = _tail_wide_bolts[direction_index * 12 + 2] + x1;
+            y1_4 = _tail_wide_bolts[direction_index * 12 + 3] + y1;
+            x2_4 = _head_wide_bolts[direction_index * 12 + 2];
+            y2_4 = _head_wide_bolts[direction_index * 12 + 3];
 
-            x1_5 = _tail_wide_bolts[dir_idx * 12 + 4] + x1;
-            y1_5 = _tail_wide_bolts[dir_idx * 12 + 5] + y1;
-            x2_5 = _head_wide_bolts[dir_idx * 12 + 4];
-            y2_5 = _head_wide_bolts[dir_idx * 12 + 5];
+            x1_5 = _tail_wide_bolts[direction_index * 12 + 4] + x1;
+            y1_5 = _tail_wide_bolts[direction_index * 12 + 5] + y1;
+            x2_5 = _head_wide_bolts[direction_index * 12 + 4];
+            y2_5 = _head_wide_bolts[direction_index * 12 + 5];
 
-            x1_6 = _tail_wide_bolts[dir_idx * 12 + 6] + x1;
-            y1_6 = _tail_wide_bolts[dir_idx * 12 + 7] + y1;
-            x2_6 = _head_wide_bolts[dir_idx * 12 + 6];
-            y2_6 = _head_wide_bolts[dir_idx * 12 + 7];
+            x1_6 = _tail_wide_bolts[direction_index * 12 + 6] + x1;
+            y1_6 = _tail_wide_bolts[direction_index * 12 + 7] + y1;
+            x2_6 = _head_wide_bolts[direction_index * 12 + 6];
+            y2_6 = _head_wide_bolts[direction_index * 12 + 7];
         }
 
-        int16_t v8 = param_19 + param_5;
-        int16_t v9 = param_18 - param_19;
+        int16_t mid_color_base = mid_min_offset + palette_base;
+        int16_t mid_color_range = mid_max_offset - mid_min_offset;
 
-        Bolt_Segment_(x1_3, y1_3, x2_3 + x2, y2_3 + y2, v8, v9, param_7, v4, param_5, v6, 0, param_14, param_9, param_12);
-        Bolt_Segment_(x1_4, y1_4, x2_4 + x2, y2_4 + y2, v8, v9, param_7, v4, param_5, v6, 0, param_14, param_9, param_12);
-        Bolt_Segment_(x1_5, y1_5, x2_5 + x2, y2_5 + y2, v8, v9, param_7, v4, param_5, v6, 0, param_14, param_9, param_12);
-        Bolt_Segment_(x1_6, y1_6, x2_6 + x2, y2_6 + y2, v8, v9, param_7, v4, param_5, v6, 0, param_14, param_9, param_12);
+        Bolt_Segment_(x1_3, y1_3, x2_3 + x2, y2_3 + y2, mid_color_base, mid_color_range, color_jitter_chance, side_rand_range, palette_base, max_color, 0, apply_sparkles, sparkle_phase, tip_highlight);
+        Bolt_Segment_(x1_4, y1_4, x2_4 + x2, y2_4 + y2, mid_color_base, mid_color_range, color_jitter_chance, side_rand_range, palette_base, max_color, 0, apply_sparkles, sparkle_phase, tip_highlight);
+        Bolt_Segment_(x1_5, y1_5, x2_5 + x2, y2_5 + y2, mid_color_base, mid_color_range, color_jitter_chance, side_rand_range, palette_base, max_color, 0, apply_sparkles, sparkle_phase, tip_highlight);
+        Bolt_Segment_(x1_6, y1_6, x2_6 + x2, y2_6 + y2, mid_color_base, mid_color_range, color_jitter_chance, side_rand_range, palette_base, max_color, 0, apply_sparkles, sparkle_phase, tip_highlight);
 
-        int16_t v3 = param_17 + param_5;
-        int16_t v7 = param_16 - param_17;
+        int16_t core_color_base = core_min_offset + palette_base;
+        int16_t core_color_range = core_max_offset - core_min_offset;
 
-        if (param_13 == 0) {
-            v3 += (v7 * 3) / 4;
-            v7 = 0;
+        if (full_core_gradient_flag == 0) {
+            core_color_base += (core_color_range * 3) / 4;
+            core_color_range = 0;
         }
 
-        Bolt_Segment_(x1, y1, x2, y2, v3, v7, param_7, param_8, param_5, v6, param_13, param_14, param_9, param_12);
+        Bolt_Segment_(x1, y1, x2, y2, core_color_base, core_color_range, color_jitter_chance, color_jitter_range, palette_base, max_color, full_core_gradient_flag, apply_sparkles, sparkle_phase, tip_highlight);
     }
 
 
     void __cdecl Bolt_Segment_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color_base,
-                               int16_t color_range, int16_t rand_chance, int16_t rand_range, int16_t min_color, int16_t max_color,
-                               int16_t unused_11, int16_t do_sparkles, uint16_t sparkle_offset, int16_t tip_fade)
+                               int16_t color_range, int16_t color_jitter_chance, int16_t color_jitter_range, int16_t min_color, int16_t max_color,
+                               int16_t legacy_segment_flag, int16_t apply_sparkles, uint16_t sparkle_phase, int16_t tip_highlight)
     {
-        int32_t rand_range2 = rand_range * 2 + 1;
+        (void)legacy_segment_flag;
+
+        int32_t rand_range2 = color_jitter_range * 2 + 1;
         int32_t dx = x2 - x1;
         int32_t dy = y2 - y1;
 
@@ -173,13 +179,13 @@ namespace bolt {
 
         if (y2 < y1) {
             if (len >= 0) {
-                for (int i = 0; i <= len; ++i) {
+                for (int32_t i = 0; i <= len; ++i) {
                     uint8_t c = (uint8_t)((color_accum >> 16) + rand_val + color_base);
                     replace::_graphics_buffer[len - i + 1] = c;
                     color_accum += step_val;
 
-                    if ((int16_t)random::Random_(100) < rand_chance) {
-                        rand_val = random::Random_(rand_range2) - rand_range;
+                    if ((int16_t)random::Random_(100) < color_jitter_chance) {
+                        rand_val = random::Random_(rand_range2) - color_jitter_range;
                     } else {
                         rand_val = 0;
                     }
@@ -189,13 +195,13 @@ namespace bolt {
             replace::_graphics_buffer[0] = (uint8_t)(color_base + color_range - 1);
         } else {
             if (len >= 0) {
-                for (int i = 0; i <= len; ++i) {
+                for (int32_t i = 0; i <= len; ++i) {
                     uint8_t c = (uint8_t)((color_accum >> 16) + rand_val + color_base);
                     replace::_graphics_buffer[i + 1] = c;
                     color_accum += step_val;
 
-                    if ((int16_t)random::Random_(100) < rand_chance) {
-                        rand_val = random::Random_(rand_range2) - rand_range;
+                    if ((int16_t)random::Random_(100) < color_jitter_chance) {
+                        rand_val = random::Random_(rand_range2) - color_jitter_range;
                     } else {
                         rand_val = 0;
                     }
@@ -205,8 +211,8 @@ namespace bolt {
             replace::_graphics_buffer[len] = (uint8_t)(color_base + color_range - 1);
         }
 
-        if (do_sparkles == 1) {
-            int32_t i = sparkle_offset % 8;
+        if (apply_sparkles == 1) {
+            int32_t i = sparkle_phase % 8;
             int32_t end_i = len + 2;
             if (i < end_i) {
                 do {
@@ -218,7 +224,7 @@ namespace bolt {
 
         int32_t buf_len = len + 2;
         if (buf_len > 0) {
-            for (int i = 0; i < buf_len; ++i) {
+            for (int32_t i = 0; i < buf_len; ++i) {
                 if (replace::_graphics_buffer[i] < min_color) {
                     replace::_graphics_buffer[i] = (uint8_t)min_color;
                 }
@@ -228,15 +234,15 @@ namespace bolt {
             }
         }
 
-        if (tip_fade != 0) {
-            int32_t fade_val = 3 / tip_fade;
+        if (tip_highlight != 0) {
+            int32_t fade_val = 3 / tip_highlight;
             if (y2 < y1) {
-                for (int i = 0; i <= 5; ++i) {
+                for (int32_t i = 0; i <= 5; ++i) {
                     replace::_graphics_buffer[i + 1] += fade_val;
                 }
             } else {
                 if (len > 5) {
-                    for (int i = 0; i <= 5; ++i) {
+                    for (int32_t i = 0; i <= 5; ++i) {
                         replace::_graphics_buffer[len - i - 1] += fade_val;
                     }
                 }
@@ -244,7 +250,7 @@ namespace bolt {
         }
 
         if (buf_len > 0) {
-            for (int i = 0; i < buf_len; ++i) {
+            for (int32_t i = 0; i < buf_len; ++i) {
                 if (replace::_graphics_buffer[i] > color_base + 15) {
                     replace::_graphics_buffer[i] = (uint8_t)(color_base + 15);
                 }
@@ -254,20 +260,23 @@ namespace bolt {
         line::Plasma_Line_(x1, y1, x2, y2, replace::_graphics_buffer, 0);
     }
 
-    void __cdecl Bolt_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t p5,
-        int16_t p6, int16_t p7, int16_t p8, uint16_t p9, int16_t draw_caps,
-        int16_t unused_11, int16_t p12, int16_t p13, int16_t p14, int16_t p15,
-        int16_t color_base, int16_t p17, int16_t p18, int16_t p19) {
+    void __cdecl Bolt_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t palette_base,
+        int16_t palette_span, int16_t color_jitter_chance, int16_t color_jitter_range, uint16_t sparkle_phase,
+        int16_t draw_caps, int16_t legacy_aux_flag, int16_t tip_highlight, int16_t full_core_gradient_flag,
+        int16_t apply_sparkles, int16_t suppress_side_strands, int16_t core_max_offset, int16_t core_min_offset,
+        int16_t side_max_offset, int16_t side_min_offset) {
+
+        (void)legacy_aux_flag;
 
         if (draw_caps == 1) {
-            uint8_t c_cross = static_cast<uint8_t>(p5 + 1);
-            uint8_t c_diag = static_cast<uint8_t>(p5);
-            if (p12 == 1) {
-                c_cross = static_cast<uint8_t>(p5 + 4);
-                c_diag = static_cast<uint8_t>(p5 + 1);
+            uint8_t c_cross = (uint8_t)(palette_base + 1);
+            uint8_t c_diag = (uint8_t)palette_base;
+            if (tip_highlight == 1) {
+                c_cross = (uint8_t)(palette_base + 4);
+                c_diag = (uint8_t)(palette_base + 1);
             }
 
-            uint8_t c_center = static_cast<uint8_t>(color_base + p5);
+            uint8_t c_center = (uint8_t)(core_max_offset + palette_base);
 
             graphics::Dot_(x2, y2, c_center);
             graphics::Dot_(x2, y2 - 1, c_cross);
@@ -280,7 +289,7 @@ namespace bolt {
             graphics::Dot_(x2 + 1, y2 - 1, c_diag);
             graphics::Dot_(x2 + 1, y2 + 1, c_diag);
 
-            if (p13 == 0) {
+            if (full_core_gradient_flag == 0) {
                 graphics::Dot_(x1, y1, c_center);
                 graphics::Dot_(x1, y1 - 1, c_cross);
                 graphics::Dot_(x1, y1 + 1, c_cross);
@@ -303,43 +312,43 @@ namespace bolt {
             y_off = 1;
         }
 
-        int16_t arg6_val = p18 - p19;
-        if (p12 == 1) {
-            arg6_val += 3;
+        int16_t flank_color_range = side_max_offset - side_min_offset;
+        if (tip_highlight == 1) {
+            flank_color_range += 3;
         }
 
-        if (p15 == 0) {
+        if (suppress_side_strands == 0) {
             bolt::Bolt_Segment_(
                 x1 - x_off, y1 - y_off,
                 x2 - x_off, y2 - y_off,
-                p19 + p5, arg6_val,
-                p7, p8 / 2, p5, p6 + p5 - 1,
-                0, p14, p9, 0
+                side_min_offset + palette_base, flank_color_range,
+                color_jitter_chance, color_jitter_range / 2, palette_base, palette_span + palette_base - 1,
+                0, apply_sparkles, sparkle_phase, 0
             );
 
             bolt::Bolt_Segment_(
                 x1 + x_off, y1 + y_off,
                 x2 + x_off, y2 + y_off,
-                p19 + p5, arg6_val,
-                p7, p8 / 2, p5, p6 + p5 - 1,
-                0, p14, p9, 0
+                side_min_offset + palette_base, flank_color_range,
+                color_jitter_chance, color_jitter_range / 2, palette_base, palette_span + palette_base - 1,
+                0, apply_sparkles, sparkle_phase, 0
             );
         }
 
-        int16_t arg6_main = color_base - p17;
-        int16_t arg5_main = p17 + p5;
+        int16_t core_color_range = core_max_offset - core_min_offset;
+        int16_t core_color_base = core_min_offset + palette_base;
 
-        if (p13 == 0) {
-            int32_t t = (int32_t)arg6_main * 3;
-            arg5_main += (int16_t)((t + ((t >> 31) & 3)) >> 2);
-            arg6_main = 0;
+        if (full_core_gradient_flag == 0) {
+            int32_t t = (int32_t)core_color_range * 3;
+            core_color_base += (int16_t)((t + ((t >> 31) & 3)) >> 2);
+            core_color_range = 0;
         }
 
         bolt::Bolt_Segment_(
             x1, y1, x2, y2,
-            arg5_main, arg6_main,
-            p7, p8, p5, p6 + p5 - 1,
-            p13, p14, p9, p12
+            core_color_base, core_color_range,
+            color_jitter_chance, color_jitter_range, palette_base, palette_span + palette_base - 1,
+            full_core_gradient_flag, apply_sparkles, sparkle_phase, tip_highlight
         );
     }
 }

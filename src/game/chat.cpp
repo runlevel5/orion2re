@@ -16,11 +16,11 @@ namespace CHAT {
         _chat_info->count++;
     }
 
-    void __cdecl Send_Chat_Msg_(char* param_1) {
+    void __cdecl Send_Chat_Msg_(char* msg) {
         for (int32_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
             if (MOX::_player[player_index].objectives == 0x64) {
-                int32_t message_len = static_cast<int32_t>(strlen(param_1) + 1);
-                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, 0x27, param_1, (uint16_t)message_len);
+                int32_t message_len = (int32_t)(strlen(msg) + 1);
+                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, 0x27, msg, (uint16_t)message_len);
                 RUSS::Mox_Update_();
             }
         }
@@ -31,17 +31,16 @@ namespace CHAT {
             return;
         }
 
-        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives == 100) {
-                int len = (int)strlen(msg);
+        for (int32_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
+            if (MOX::_player[player_index].objectives == 100) {
+                int32_t len = (int32_t)strlen(msg);
 
                 if (len > 80) {
                     msg[80] = '\0';
                     len = 80;
                 }
 
-                // TYPE MISMATCH: Mox_Send_Message_ returns int32_t and takes uint16_t for msg_type and len
-                NETMOX::Mox_Send_Message_(MOX::_player[i].network_player_id, (uint16_t)0x2D, msg, (uint16_t)(len + 1));
+                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, (uint16_t)0x2D, msg, (uint16_t)(len + 1));
                 RUSS::Mox_Update_();
             }
         }

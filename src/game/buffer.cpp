@@ -8,8 +8,8 @@ namespace buffer {
   int32_t _buffer_space_size;
   void* _buffer_space_ptr;
 
-  int8_t __cdecl Flush_Buffer_Space_(void* param_1) {
-    (void)param_1;
+  int8_t __cdecl Flush_Buffer_Space_(void* unused_context) {
+    (void)unused_context;
 
     for (int32_t file_index = 0; file_index < 50; ++file_index) {
       for (int32_t segment_index = 0; segment_index < 410; ++segment_index) {
@@ -33,11 +33,11 @@ namespace buffer {
     uint32_t allocation_error_size = requested_size;
     uint32_t space_size;
 
-    if (static_cast<int32_t>(requested_size - 0x374b8) > 0) {
+    if ((int32_t)(requested_size - 0x374b8) > 0) {
       allocation_error_size = requested_size - 0x374c4;
       space_size = allocation_error_size;
     } else {
-      exitm::Exit_With_Message(s_Not_Enough_Space_For_Buffer_Spac_0055b310);
+      exitm::Exit_With_Message("Not Enough Space For Buffer Space");
       space_size = requested_size;
     }
 
@@ -46,9 +46,9 @@ namespace buffer {
       allocation_size = (allocation_size & 0xFFFFFFFCu) + 4U;
     }
 
-    uint8_t* buffer_space = static_cast<uint8_t*>(allocate::Allocate_Far_Space_(allocation_size + 0xC));
+    uint8_t* buffer_space = (uint8_t*)allocate::Allocate_Far_Space_(allocation_size + 0xC);
     if (buffer_space == nullptr) {
-      allocate::Allocation_Error_((int)allocation_error_size);
+      allocate::Allocation_Error_((int32_t)allocation_error_size);
     }
 
     _buffer_space_ptr = buffer_space;
@@ -62,7 +62,7 @@ namespace buffer {
     _buffer_space_size = space_size;
     _buffer_space_seg = buffer_space_segment;
 
-    _file_buffer = reinterpret_cast<s_file_buffer_entry*>(allocate::Allocate_Far_Space_(0x374c4));
+    _file_buffer = (s_file_buffer_entry*)allocate::Allocate_Far_Space_(0x374c4);
     _file_buffer_count = 0;
 
     for (int32_t file_index = 0; file_index < 0x32; ++file_index) {
@@ -91,11 +91,11 @@ namespace buffer {
           for (int32_t segment_index = 0; segment_index < file_entry.segment_count; ++segment_index) {
             s_buffer_cached_segment& segment = file_entry.segments[segment_index];
 
-            if (static_cast<uint32_t>(segment.last_use_counter) <= lowest_priority) {
+            if ((uint32_t)segment.last_use_counter <= lowest_priority) {
               if (segment.is_loaded == 1) {
                 *out_file_index = file_index;
                 *out_segment_index = segment_index;
-                lowest_priority = static_cast<uint32_t>(segment.last_use_counter);
+                lowest_priority = (uint32_t)segment.last_use_counter;
               }
             }
           }
@@ -105,19 +105,22 @@ namespace buffer {
   }
 
   void* __cdecl Buffer_Reload_(const char* file_name, int32_t buffer_seg_id, void* buffer_space_seg) {
+    auto* pool_header =
+        (allocate::s_alloc_header*)((uint8_t*)buffer_space_seg - sizeof(allocate::s_alloc_header));
+
     if (buffer_space_seg != buffer::_buffer_space_seg) {
-      exitm::Exit_With_Message(s_Cache_Seg_Corrupted____0055b374);
+      exitm::Exit_With_Message("Cache Seg Corrupted...");
     }
 
-    if (*reinterpret_cast<int32_t*>(reinterpret_cast<uint8_t*>(buffer_space_seg) - 8) != buffer::_buffer_space_size) {
-      exitm::Exit_With_Message(s_Cache_Seg_Corrupted____0055b374);
+    if ((int32_t)pool_header->size != buffer::_buffer_space_size) {
+      exitm::Exit_With_Message("Cache Seg Corrupted...");
     }
 
     bool found_file = false;
     int32_t file_index = 0;
 
     if (buffer::_file_buffer_count > 0) {
-      for (int32_t i = 0; i < static_cast<int32_t>(buffer::_file_buffer_count); ++i) {
+      for (int32_t i = 0; i < (int32_t)buffer::_file_buffer_count; ++i) {
         if (_strcmpi(file_name, buffer::_file_buffer[i].file_name) == 0) {
           found_file = true;
           file_index = i;
@@ -141,30 +144,30 @@ namespace buffer {
 
           ++buffer::_global_load_count;
           segment.last_use_counter = buffer::_global_load_count;
-          segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, static_cast<uint8_t*>(buffer_space_seg));
+          segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, (uint8_t*)buffer_space_seg);
           segment.is_loaded = 1;
           return segment.data_ptr;
         }
       }
 
       if (file_entry.segment_count + 1 >= 0x19A) {
-        exitm::Exit_With_Message(s_max_buffer_segs_went_over___0055b358);
+        exitm::Exit_With_Message("max buffer segs went over..");
       }
 
       ++buffer::_global_load_count;
 
       s_buffer_cached_segment& segment = file_entry.segments[file_entry.segment_count];
-      segment.buffer_seg_id = static_cast<int16_t>(buffer_seg_id);
+      segment.buffer_seg_id = (int16_t)buffer_seg_id;
       segment.last_use_counter = buffer::_global_load_count;
-      segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, static_cast<uint8_t*>(buffer_space_seg));
+      segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, (uint8_t*)buffer_space_seg);
       segment.is_loaded = 1;
 
       ++file_entry.segment_count;
       return file_entry.segments[file_entry.segment_count - 1].data_ptr;
     }
 
-    if (static_cast<int32_t>(buffer::_file_buffer_count) + 1 >= 0x32) {
-      exitm::Exit_With_Message(s_max_file_buffer_count_went_over__0055b334);
+    if ((int32_t)buffer::_file_buffer_count + 1 >= 0x32) {
+      exitm::Exit_With_Message("max file buffer count went over..");
     }
 
     ++buffer::_global_load_count;
@@ -175,9 +178,9 @@ namespace buffer {
     file_entry.segment_count = 0;
 
     s_buffer_cached_segment& segment = file_entry.segments[file_entry.segment_count];
-    segment.buffer_seg_id = static_cast<int16_t>(buffer_seg_id);
+    segment.buffer_seg_id = (int16_t)buffer_seg_id;
     segment.last_use_counter = buffer::_global_load_count;
-    segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, static_cast<uint8_t*>(buffer_space_seg));
+    segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, (uint8_t*)buffer_space_seg);
     segment.is_loaded = 1;
 
     ++file_entry.segment_count;
@@ -189,7 +192,6 @@ namespace buffer {
   void* __cdecl Farload_Buffer_Library_(const char* file_name, int32_t entry_index, uint8_t* buffer_base) {
     char secondary_file_name[60]; // BUG: secondary_file_name is too small and can overflow
     int32_t entry_size;
-    int32_t* used_bytes_ptr;
     int32_t victim_file_buffer_index;
     int32_t victim_segment_index;
     int32_t next_file_buffer_index;
@@ -213,7 +215,7 @@ namespace buffer {
 
     if (!reuse_current_file) {
       strcpy(farload::_farload_file_name, file_name);
-      farload::_farload_fptr = fopen(file_name, s_rb_0055117c);
+      farload::_farload_fptr = fopen(file_name, "rb");
 
       if (farload::_farload_fptr == nullptr) {
         if (farload::_secondary_drive_path[0] == '\0') {
@@ -222,7 +224,7 @@ namespace buffer {
 
         strcpy(secondary_file_name, farload::_secondary_drive_path);
         strcat(secondary_file_name, farload::_farload_file_name);
-        farload::_farload_fptr = fopen(secondary_file_name, s_rb_0055117c);
+        farload::_farload_fptr = fopen(secondary_file_name, "rb");
 
         if (farload::_farload_fptr == nullptr) {
           farload::Error_Handler_(file_name, 1, entry_index);
@@ -238,7 +240,7 @@ namespace buffer {
       farload::_farload_file_flag = 1;
     }
 
-    if (static_cast<int16_t>(farload::_lbx_header.entry_count) <= entry_index) {
+    if ((int16_t)farload::_lbx_header.entry_count <= entry_index) {
       farload::Error_Handler_(file_name, 8, entry_index);
     }
 
@@ -248,13 +250,14 @@ namespace buffer {
 
     fseek(
         farload::_farload_fptr,
-        static_cast<long>(farload::_lbx_header.offsets[entry_index]),
+        (long)farload::_lbx_header.offsets[entry_index],
         0);
 
-    used_bytes_ptr = reinterpret_cast<int32_t*>(buffer_base - 0x0C);
+    auto* pool_header =
+        (allocate::s_alloc_header*)(buffer_base - sizeof(allocate::s_alloc_header));
     loaded_data = allocate::Allocate_Next_Block_No_Header_(buffer_base, entry_size);
 
-    while (loaded_data == nullptr && *used_bytes_ptr > 0) {
+    while (loaded_data == nullptr && (int32_t)pool_header->current > 0) {
       loaded_data = allocate::Allocate_Next_Block_No_Header_(buffer_base, entry_size);
 
       if (loaded_data == nullptr) {
@@ -266,17 +269,17 @@ namespace buffer {
             &next_segment_index,
             buffer_base);
 
-        uint8_t* used_end = buffer_base + *used_bytes_ptr;
+        uint8_t* used_end = buffer_base + pool_header->current;
         uint8_t* next_data_ptr = used_end;
 
         if (next_file_buffer_index != 1000) {
-          next_data_ptr = static_cast<uint8_t*>(
+          next_data_ptr = (uint8_t*)(
               buffer::_file_buffer[next_file_buffer_index]
               .segments[next_segment_index]
               .data_ptr);
         }
 
-        uint8_t* victim_data_ptr = static_cast<uint8_t*>(
+        uint8_t* victim_data_ptr = (uint8_t*)(
             buffer::_file_buffer[victim_file_buffer_index]
             .segments[victim_segment_index]
             .data_ptr);
@@ -285,13 +288,13 @@ namespace buffer {
 
         if (next_file_buffer_index != 1000) {
           const int32_t bytes_to_move =
-              static_cast<int32_t>(used_end - next_data_ptr);
+              (int32_t)(used_end - next_data_ptr);
 
           struct_::Copy_Structure_(victim_data_ptr, next_data_ptr, bytes_to_move);
 
           if (buffer::_file_buffer_count > 0) {
             for (int32_t file_buffer_index = 0;
-                file_buffer_index < static_cast<int16_t>(buffer::_file_buffer_count);
+                file_buffer_index < (int16_t)buffer::_file_buffer_count;
                 ++file_buffer_index) {
               if (buffer::_file_buffer[file_buffer_index].segment_count > 0) {
                 for (int32_t segment_index = 0;
@@ -301,8 +304,7 @@ namespace buffer {
                       buffer::_file_buffer[file_buffer_index].segments[segment_index];
 
                   if (segment.is_loaded == 1) {
-                    uint8_t* segment_data_ptr =
-                        static_cast<uint8_t*>(segment.data_ptr);
+                    uint8_t* segment_data_ptr = (uint8_t*)segment.data_ptr;
 
                     if (victim_data_ptr < segment_data_ptr) {
                       segment.data_ptr = segment_data_ptr - freed_size;
@@ -318,7 +320,7 @@ namespace buffer {
             .segments[victim_segment_index]
             .is_loaded = 0;
 
-        *used_bytes_ptr -= freed_size;
+        pool_header->current -= (uint32_t)freed_size;
       }
     }
 
@@ -335,10 +337,12 @@ namespace buffer {
                                         int32_t* next_buffer_index,
                                         int32_t* next_segment_index,
                                         uint8_t* buffer_data) {
+    auto* pool_header =
+            (allocate::s_alloc_header*)(buffer_data - sizeof(allocate::s_alloc_header));
     uint8_t* closest_address =
-            buffer_data + *reinterpret_cast<int32_t*>(buffer_data - 0x0C);
+            buffer_data + pool_header->current;
     const std::uintptr_t current_segment_address =
-            reinterpret_cast<std::uintptr_t>(
+            (std::uintptr_t)(
                     buffer::_file_buffer[current_buffer_index]
                             .segments[current_segment_index]
                             .data_ptr);
@@ -357,13 +361,13 @@ namespace buffer {
                segment_index < file_buffer_entry.segment_count;
                ++segment_index) {
             if (file_buffer_entry.segments[segment_index].is_loaded == 1) {
-              uint8_t* segment_data = reinterpret_cast<uint8_t*>(
+              uint8_t* segment_data = (uint8_t*)(
                       file_buffer_entry.segments[segment_index].data_ptr);
 
               if ((current_segment_address <
-                   reinterpret_cast<std::uintptr_t>(segment_data)) &&
-                  (reinterpret_cast<std::uintptr_t>(segment_data) <
-                   reinterpret_cast<std::uintptr_t>(closest_address))) {
+                   (std::uintptr_t)segment_data) &&
+                  ((std::uintptr_t)segment_data <
+                   (std::uintptr_t)closest_address)) {
                 *next_buffer_index = file_buffer_index;
                 *next_segment_index = segment_index;
                 closest_address = segment_data;
