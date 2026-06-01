@@ -853,7 +853,7 @@ namespace fonts {
         Print_To_Bitmap_(x - (width / 2), y, text, bitmap);
     }
 
-    void __cdecl PSTRS_(int16_t x, int16_t y, char* str) {
+    void __cdecl PSTRS_(int16_t x, int16_t y, const char* str) {
         Disp_PSTR_(x, y, str);
     }
 

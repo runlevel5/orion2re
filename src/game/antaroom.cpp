@@ -4,13 +4,8 @@ namespace ANTAROOM {
     s_colors _antaran_room_normal_colors = {{250, 254, 255, 251, 252, 253, 254, 255}};
     char* _antaran_room_message;
     uint8_t* _antaran_room_mouse_bitmap;
-    char const s_antaroom_LBX_00556098[13] = "antaroom.LBX";
-    char const s_antarmsg_LBX_005560a8[13] = "antarmsg.LBX";
     s_mouse_list _antaran_room_blank_mouse[1] = {{0, 0, 0, 0, 639, 479}};
 
-    /**
-     * @address 0042aa80
-     */
     void __cdecl Draw_Main_Antaran_Room_Screen_() {
         video::Set_Page_Off_();
         fonts::Set_Outline_Color_(0xFA, 0xFA);
@@ -28,7 +23,7 @@ namespace ANTAROOM {
         JIM::Play_Streaming_Music_(0x78, -1, 1);
     }
 
-    void __cdecl Main_Antaran_Room_Screen_(int16_t param_1) {
+    void __cdecl Main_Antaran_Room_Screen_(int16_t message_set_index) {
         fields::Clear_Fields_();
         fields::Deactivate_Help_List_();
         fields::Enable_Draw_All_Fields_();
@@ -47,7 +42,7 @@ namespace ANTAROOM {
         fields::Clear_Fields_();
 
         Reload_Main_Antaran_Room_Screen_();
-        Get_Antaran_Room_Message_(1 - param_1);
+        Get_Antaran_Room_Message_(1 - message_set_index);
 
         bool is_done = false;
         fields::Assign_Auto_Function_(Draw_Main_Antaran_Room_Screen_, 2);
@@ -85,7 +80,7 @@ namespace ANTAROOM {
 
     void __cdecl Reload_Main_Antaran_Room_Screen_() {
         _antaran_room_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x395);
-        s_animation_header* pic = (s_animation_header*)farload::Far_Reload_Next_(s_antaroom_LBX_00556098, 0, MOX::_screen_seg);
+        s_animation_header* pic = (s_animation_header*)farload::Far_Reload_Next_("antaroom.LBX", 0, MOX::_screen_seg);
         bitmap::Clear_Mouse_Image_(0);
         bitmap::Create_Blank_Bitmap_(30, 30, _antaran_room_mouse_bitmap);
         bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)_antaran_room_mouse_bitmap, pic);
@@ -95,12 +90,12 @@ namespace ANTAROOM {
         graphics::Fill_(0, 0, 639, 479, 0);
         _antaran_room_message = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 210);
 
-        int remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+        int32_t remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
         uint8_t* anim_buf = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining - 100);
         file_ani::Set_File_Animation_Buffer_(anim_buf);
 
         video::Set_Refresh_Stencil_();
-        file_ani::Open_File_Animation_(s_antaroom_LBX_00556098, 1);
+        file_ani::Open_File_Animation_("antaroom.LBX", 1);
         video::Set_Page_Off_();
         file_ani::Draw_File_Animation_();
         palette::Refresh_Palette_();
@@ -114,9 +109,9 @@ namespace ANTAROOM {
         char buffer[200];
 
         uint32_t random_val = random::Random_(4);
-        int16_t index = static_cast<int16_t>(random_val + (message_index + static_cast<uint8_t>(MOX::_settings.language) * 2) * 4 - 1);
+        int16_t message_lbx_index = (int16_t)(random_val + (message_index + (uint8_t)MOX::_settings.language * 2) * 4 - 1);
 
-        farload::Farload_Data_Static_(s_antarmsg_LBX_005560a8, index, buffer, 0, 1, sizeof(buffer));
+        farload::Farload_Data_Static_("antarmsg.LBX", message_lbx_index, buffer, 0, 1, sizeof(buffer));
 
         strcpy(_antaran_room_message, buffer);
     }

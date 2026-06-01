@@ -3,9 +3,6 @@
 namespace COMBINIT {
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
 
-    extern s_palette_entry _tractor_beam_remap_palette[8];
-    extern s_palette_entry _plasma_web_remap_palette[16];
-
     extern const char s_combat_lbx_00551244[11];
     extern const char s_monster_lbx_00551250[12];
     extern const char s_cmbtshp_lbx_0055125c[12];

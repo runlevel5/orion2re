@@ -20,16 +20,23 @@ namespace BEAMS {
 
     void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t weapon_id, uint16_t specials, s_weapon_visual_fx* out);
 
+    /**
+     * Draw a beam segment and related impact visuals for one animation frame.
+     * @param attacker_x Beam start x-position.
+     * @param attacker_y Beam start y-position.
+     * @param target_x Beam target x-position.
+     * @param target_y Beam target y-position.
+     */
     void __cdecl Draw_Generic_Beam_(
         int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
         int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
         int16_t beam_width, int16_t sprite_id, int16_t draw_core_flag, int16_t draw_glow_flag,
-        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t param_17,
-        int16_t param_18, int16_t param_19, int16_t param_20, int16_t mount_scale_mod, int16_t fx_param_1,
+        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t core_flicker_min,
+        int16_t core_flicker_max, int16_t reverse_draw_flag, int16_t draw_mauler_ball_flag, int16_t mount_scale_mod, int16_t fx_param_1,
         int16_t fx_param_2, int16_t fx_param_3, int16_t fx_param_4, int16_t frame_index,
         int16_t target_size_class, uint16_t hit_result_flags, uint16_t special_flag,
         int16_t is_non_ship_target, int16_t base_damage_class, int16_t reflection_state,
-        int16_t attacker_size_class, s_weapon_visual_fx* param_34
+        int16_t attacker_size_class, s_weapon_visual_fx* weapon_visual_fx
     );
 
     extern s_animation_header* _mauler_ball_seg;
@@ -116,9 +123,9 @@ namespace BEAMS {
 
     void __cdecl Adjust_Shield_Display_Status_(int16_t* shield_status);
 
-    void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7);
+    void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t is_special, int16_t is_heavy, int16_t hit_rotation, int16_t frame_index);
 
-    s_animation_header* __cdecl Reflection_Field_Anims_(int16_t p1, int16_t p2);
+    s_animation_header* __cdecl Reflection_Field_Anims_(int16_t rotation_idx, int16_t size_idx);
 
     void __cdecl Load_Reflection_Field_Hit_(int8_t should_load);
 
@@ -128,7 +135,7 @@ namespace BEAMS {
 
     void __cdecl Add_Damage_Indicator_For_Ship_(int16_t dx, int16_t dy, int16_t ship_idx, uint8_t side, int16_t total_damage, int16_t struct_damage);
 
-    void __cdecl Draw_Shield_Hit_Once_Through_(int16_t ship_idx, int16_t param_2, int16_t draw_x, int16_t draw_y);
+    void __cdecl Draw_Shield_Hit_Once_Through_(int16_t ship_idx, int16_t hit_rotation, int16_t draw_x, int16_t draw_y);
 
     void __cdecl Squish_Out_Msg_Queue_Slot_(int16_t index);
 
@@ -144,7 +151,7 @@ namespace BEAMS {
 
     int16_t __cdecl Get_Ship_Range_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
-    void __cdecl Adjust_Reflection_Field_Display_Status_(int16_t* param_1);
+    void __cdecl Adjust_Reflection_Field_Display_Status_(int16_t* frame_index);
 
     int16_t __cdecl Get_SFX_Draw_Shield_Facing2_(int16_t ship1_idx, int16_t ship2_idx);
 
@@ -167,7 +174,7 @@ namespace BEAMS {
 
     void __cdecl Add_Damage_Indicator_For_Biological_(int16_t x, int16_t y, uint8_t side_flag, int16_t damage);
 
-    void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* param_7, int16_t is_non_ship_target);
+    void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* fx_entries, int16_t is_non_ship_target);
 
     void __cdecl Rob_Interpolate_Line_(int16_t* p_x, int16_t* p_y, int16_t target_x, int16_t target_y, int16_t step);
 

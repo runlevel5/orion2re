@@ -7,9 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/arith1e.{h,cpp}
-- [pending] src/game/assert.h
-- [pending] src/game/beams.{h,cpp}
 - [pending] src/game/bill.{h,cpp}
 - [pending] src/game/billhelp.{h,cpp}
 - [pending] src/game/bitio.{h,cpp}
@@ -195,6 +192,8 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/beams.{h,cpp} - suggest removing raw-address/decompiler comments, renaming several placeholder parameters, replacing remaining `reinterpret_cast`/`static_cast` uses with C-style casts, and fixing the negative-index rotation table lookups; raw animation-header overlays on allocated bitmap buffers still rely on layout/alignment assumptions.
+- [reviewed] src/game/assert.{h,cpp} - applied CPP-local prompt string inlining, removed the leaked decompiler-style extern names from the header, added a concise function docstring, and replaced the plain `int` key type with `int32_t`; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/advciv.{h,cpp} - applied conservative naming and docstring cleanup; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/aidata.{h,cpp} - applied allocator `sizeof(...)` cleanup, renamed the out-parameter in the ship-turn helper, replaced remaining `static_cast` uses with C-style casts, and documented the raw `memcmp` layout assumption.
 - [reviewed] src/game/aidesign.{h,cpp} - suggest fixing the out-parameter indexing UB in missile weapon selection, replacing the remaining `static_cast` uses with C-style casts, and renaming low-value swap temporaries in the beam/missile helpers; no new header docstrings were needed.
@@ -210,7 +209,8 @@
 - [reviewed] src/game/angle.{h,cpp} - applied concise trigonometry helper docstrings, local clarity renames in `Get_Angle_`, and replacement of the remaining `static_cast`-based sine scaling expressions with equivalent C-style casts; no pointer-math UB access was found in this unit.
 - [reviewed] src/game/animate.{h,cpp} - applied concise animation helper docstrings, conservative parameter/local clarity renames, and remaining C++-style cast cleanup; packed frame and palette overlays still rely on UB-prone pointer arithmetic and aliasing assumptions.
 - [reviewed] src/game/antarans.{h,cpp} - applied concise header docstrings, fixed-width signature cleanup, remaining `static_cast` replacement, local string literal inlining, and a conservative local rename; unchecked pointer-arithmetic appends into `MOX::_temp_string` remain noted for later review.
-- [reviewed] src/game/antaroom.{h,cpp} - suggest adding concise header docstrings, renaming the decompiler-style screen parameter and message-index local, replacing remaining `static_cast` uses, inlining CPP-local LBX string constants, and noting the raw animation-header overlay on the mouse bitmap buffer.
+- [reviewed] src/game/antaroom.{h,cpp} - applied concise header docstrings, a conservative screen-parameter and local rename, remaining `static_cast` cleanup, and CPP-local LBX string literal inlining; raw animation-header overlays on the mouse bitmap buffer remain noted for later review.
+- [reviewed] src/game/arith1e.{h,cpp} - suggest adding concise compression/decompression docstrings, replacing internal `int` count/context helpers with fixed-width `int32_t`, and inlining the CPP-local fatal-error string constants; no pointer-math UB access was found in this unit.
 
 ## Blocked
 - none

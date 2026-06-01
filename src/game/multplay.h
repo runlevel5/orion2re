@@ -66,8 +66,6 @@ namespace MULTPLAY {
 
     extern s_palette_entry _green_pal_colors[16];
 
-    extern s_palette_entry _cur_pal_colors[16];
-
     extern char _baud_rate_strings[8][6];
 
     extern const char s_COM_PORT_FMT[7];

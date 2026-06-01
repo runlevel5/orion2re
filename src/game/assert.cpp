@@ -2,25 +2,22 @@
 
 namespace assert {
 
-    char s__00558488[8] = "    ";
-    char s__00558490[8] = "*";
+    int32_t __cdecl hgetch_() {
+        fonts::PSTRS_(0, 24, "*");
 
-    int __cdecl hgetch_() {
-        fonts::PSTRS_(0, 24, s__00558490);
+        int32_t pressed_key = _getch();
 
-        int key = _getch();
-
-        if ((key == 27 || key == 'Q' || key == 'q') && MOX::_global_var != 'u') {
+        if ((pressed_key == 27 || pressed_key == 'Q' || pressed_key == 'q') && MOX::_global_var != 'u') {
             fields::F11_Key_();
         }
 
-        if (key == 9) {
+        if (pressed_key == 9) {
             capture::Screen_Flic_Capture_();
         }
 
-        fonts::PSTRS_(0, 24, s__00558488);
+        fonts::PSTRS_(0, 24, "    ");
 
-        return key;
+        return pressed_key;
     }
 
 } // namespace assert

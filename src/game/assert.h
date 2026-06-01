@@ -1,8 +1,10 @@
 #pragma once
 
-namespace assert {
-    extern char s__00558488[8];
-    extern char s__00558490[8];
+#include <cstdint>
 
-    int __cdecl hgetch_();
+namespace assert {
+    /**
+     * Reads a keypress, handles the debug hotkeys, and returns the pressed key code.
+     */
+    int32_t __cdecl hgetch_();
 }

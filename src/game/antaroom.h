@@ -10,16 +10,19 @@ namespace ANTAROOM {
     extern char* _antaran_room_message;
     extern uint8_t* _antaran_room_mouse_bitmap;
 
-    // "antaroom.LBX"
-    extern char const s_antaroom_LBX_00556098[13];
-
-    extern char const s_antarmsg_LBX_005560a8[13]; // "antarmsg.LBX"
-
     extern s_mouse_list _antaran_room_blank_mouse[1];
 
+    /// Reloads the Antaran room background, animation, and mouse assets.
     void __cdecl Reload_Main_Antaran_Room_Screen_();
+
+    /// Loads one localized Antaran room message into the active text buffer.
+    /// @param message_index Selects which message set to load from the LBX file.
     void __cdecl Get_Antaran_Room_Message_(int16_t message_index);
+
+    /// Draws the Antaran room screen and its current message.
     void __cdecl Draw_Main_Antaran_Room_Screen_();
 
-    void __cdecl Main_Antaran_Room_Screen_(int16_t param_1);
+    /// Runs the Antaran room screen until dismissed by input.
+    /// @param message_set_index Selects which message variant group to display.
+    void __cdecl Main_Antaran_Room_Screen_(int16_t message_set_index);
 }

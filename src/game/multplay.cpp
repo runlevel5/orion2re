@@ -1,5 +1,9 @@
 #include "pch.h"
 
+namespace {
+    constexpr int kPlayerRemapPaletteStart = 144;
+}
+
 namespace MULTPLAY {
 
     char _global_chat_string[60];
@@ -30,8 +34,6 @@ namespace MULTPLAY {
         {1, 5, 48, 4},
         {1, 5, 50, 4},
     };
-
-    s_palette_entry _cur_pal_colors[16];
 
     char _baud_rate_strings[8][6] = {
         "1200",
@@ -78,7 +80,7 @@ namespace MULTPLAY {
         MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
         animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
 
-        memcpy(MULTPLAY::_cur_pal_colors, MULTPLAY::_green_pal_colors, 64);
+        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, 64);
         MOX::_mox_font_colors_offset = 0x96;
 
         s_colors* font_ptr = MISC::Font_Colors2_(4, 0x92, 0x98);
@@ -1297,7 +1299,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
         animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
 
-        memcpy(MULTPLAY::_cur_pal_colors, MULTPLAY::_green_pal_colors, 64);
+        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, 64);
 
         MOX::_mox_font_colors_offset = 150;
         style_colors = *MISC::Font_Colors2_(4, 146, 152);
@@ -1634,7 +1636,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
 
     animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
 
-    memcpy(MULTPLAY::_cur_pal_colors, MULTPLAY::_green_pal_colors, 0x40);
+    memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, 0x40);
 
     for (int i = 0; i < 10; ++i) {
         int16_t y_base = MOX::_mp_screen->screen_y + 0x42 + y_offset;
@@ -1993,7 +1995,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         // Update green palette range for the game selection list.
         // The original code copies a contiguous 64-byte palette block.
-        memcpy(&video::_current_palette[144], _green_pal_colors, 64);
+        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], _green_pal_colors, 64);
 
         for (int16_t i = 0, row_y_offset = 0; i < display_count; ++i) {
             char* name_ptr = netcode::Net_Get_Game_Name_(i);
