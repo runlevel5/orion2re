@@ -331,11 +331,10 @@ namespace SYS {
     }
 
     void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode) {
-        (void)content_h;
         (void)x_offset;
         (void)y_offset;
         MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
-        animate::Draw_(content_w + base_x, mode + base_y, MOX::_moveable_box_pict[0]);
+        animate::Draw_(content_w + base_x, (int16_t)(content_h + mode + base_y), MOX::_moveable_box_pict[0]);
     }
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner) {
