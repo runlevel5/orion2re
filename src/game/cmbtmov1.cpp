@@ -116,7 +116,7 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
     MOX::_dont_draw_ship = saved_dont_draw;
 }
 
-void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_message) {
+void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
     int16_t opponent_idx;
     char message_buffer[80];
 
@@ -125,17 +125,17 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_message) {
         opponent_idx = MOX::_combat_defender_player;
     }
 
-    NETMOX::Mox_Send_Message_(MOX::_player[opponent_idx].network_player_id, 1004 /* 0x3ec */, &opponent_idx, 2);
+    NETMOX::Mox_Send_Message_(MOX::_player[opponent_idx].network_player_id, 1004 /* 0x3ec */, &opponent_idx, sizeof(opponent_idx));
 
     while (MOX::_combat_done_waiting == 0) {
-        if (show_message == 0) {
+        if (show_wait_message == 0) {
             RUSS::Mox_Update_();
         } else {
             timer::Mark_Time_();
             video::Set_Page_Off_();
             CMBTDRW1::Draw_Main_Combat_Screen_();
             fonts::Set_Font_Style_(3, &MOX::_combat_green);
-            KEN::Ken_Get_Text_Message_(55 /* 0x37 */, message_buffer, 80 /* 0x50 */);
+            KEN::Ken_Get_Text_Message_(55 /* 0x37 */, message_buffer, sizeof(message_buffer));
             fonts::Print_(20 /* 0x14 */, 8, message_buffer);
             RUSS::Mox_Sync_Update_();
             timer::Release_Time_(1);
@@ -462,7 +462,7 @@ void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y)
     int32_t cost = diff * turn_cost;
 
     if (cost <= movement_left) {
-        MOX::_combat_data[ship_idx].movement_left -= static_cast<int16_t>(cost);
+        MOX::_combat_data[ship_idx].movement_left -= (int16_t)cost;
     } else {
         int16_t turns = (turn_cost + movement_left - 1) / turn_cost;
         int16_t new_facing = facing_dir + (turns * sign);
@@ -478,7 +478,7 @@ void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y)
     int32_t dx = (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20;
     int32_t dy = (MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y) * 20;
 
-    CMBTMOV1::Rotate_Ship_(ship_idx, target_facing, static_cast<int16_t>(dx), static_cast<int16_t>(dy));
+    CMBTMOV1::Rotate_Ship_(ship_idx, target_facing, (int16_t)dx, (int16_t)dy);
     COMBAT1::Assign_Combat_Grids_(ship_idx);
     CMBTDRW1::Refresh_Combat_Screen_Full_();
 }
@@ -538,7 +538,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
             while (impact_detected == 0) {
                 current_facing = (int8_t)((current_facing + rotation_step + 16) % 16);
 
-                for (int i = 0; i < 300; ++i) {
+                for (int32_t i = 0; i < 300; ++i) {
                     s_missile* missile = &MOX::_missile[i];
                     if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
                         int16_t move_speed = 5;
@@ -575,7 +575,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
             *target_facing = (int16_t)current_facing;
         }
 
-        for (int i = 0; i < 300; ++i) {
+        for (int32_t i = 0; i < 300; ++i) {
             if (missile_tracked[i] == 1) {
                 MOX::_missile[i].x = saved_missile_x[i];
                 MOX::_missile[i].y = saved_missile_y[i];
@@ -595,7 +595,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
     int16_t missile_y_saved[300];
     int16_t missile_travel_dist_saved[300];
 
-    struct_::Clear_Structure_(missile_checked, 300);
+    struct_::Clear_Structure_(missile_checked, sizeof(missile_checked));
 
     int16_t target_x_val = *dest_x;
     int16_t target_y_val = *dest_y;
@@ -791,7 +791,7 @@ void __cdecl Draw_Teleporting_Ship_(int16_t ship_idx, int16_t target_x, int16_t 
     sound::Fadeout_Sound_(sound_handle, 10);
 }
 
-int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_id, int16_t x, int16_t y, int16_t target_x, int16_t target_y) {
+int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_idx, int16_t x, int16_t y, int16_t target_x, int16_t target_y) {
     int16_t grid_x;
     int16_t grid_y;
 
@@ -812,40 +812,42 @@ int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_id, int16_t x, int16_t y, int
 
     int16_t cell_val = MOX::_combat_grid[cell_x][cell_y];
 
-    // 2000 likely represents an empty or traversable square
-    if (cell_val == 2000 /* 0x7d0 */ || cell_val == ship_id) {
+    if (cell_val == 2000 /* 0x7d0 */ || cell_val == ship_idx) {
         return 1;
     }
 
     return 0;
 }
 
-void __cdecl Tactical_Combat_Receive_Message_(int32_t param_1, uint16_t param_2, int32_t param_3, s_net_combat_message* param_4) {
-    if (param_2 >= 1000 && param_2 < 2000) {
-        switch (param_2) {
+void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t message_id, int32_t message_size, s_net_combat_message* message) {
+    (void)sender_net_id;
+    (void)message_size;
+
+    if (message_id >= 1000 && message_id < 2000) {
+        switch (message_id) {
             case 1000:
                 if (MOX::_new_message.f8 == 0) {
-                    struct_::Copy_Structure_(&MOX::_new_message, param_4, 16);
+                    struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
                     MOX::_tactical_net_choice = MOX::_new_message.f8;
                     return;
                 }
-                
-                // Original assembly contains duplicate block logic here
-                struct_::Copy_Structure_(&MOX::_new_message, param_4, 16);
+
+                struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
                 MOX::_tactical_net_choice = MOX::_new_message.f8;
                 return;
 
             case 1002: {
-                int16_t x = param_4->x;
-                MOX::_auto_combat_flag[x] = 0;
                 
+                int16_t player_idx = message->x;
+                MOX::_auto_combat_flag[player_idx] = 0;
+
                 if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_attacker_player) {
-                    if (x == 0) {
+                    if (player_idx == 0) {
                         MOX::_auto_combat = 0;
                         return;
                     }
                 } else {
-                    if (x == 1) {
+                    if (player_idx == 1) {
                         MOX::_auto_combat = 0;
                         return;
                     }
@@ -855,7 +857,7 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t param_1, uint16_t param_2,
 
             case 1003:
                 MOX::_saved_msl_warn = MOX::_msl_impact_warning_flag;
-                MOX::_msl_impact_warning_flag = param_4->x;
+                MOX::_msl_impact_warning_flag = message->x;
                 return;
 
             case 1004:
@@ -863,8 +865,8 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t param_1, uint16_t param_2,
                 return;
 
             case 1005:
-                if (param_4->x == 1) {
-                    MOX::_combat_init = param_4->x;
+                if (message->x == 1) {
+                    MOX::_combat_init = message->x;
                 }
                 break;
         }

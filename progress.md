@@ -7,11 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/cmbtmis.{h,cpp}
-- [pending] src/game/cmbtmov1.{h,cpp}
-- [pending] src/game/cmbtspec.{h,cpp}
-- [pending] src/game/colbcach.{h,cpp}
-- [pending] src/game/colbldg.{h,cpp}
 - [pending] src/game/colbomb.{h,cpp}
 - [pending] src/game/colcalc.{h,cpp}
 - [pending] src/game/colcalc_main.cpp
@@ -178,6 +173,11 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/colbldg.{h,cpp} - applied concise queue/build docstrings, clearer queue/input and weapon helper parameter names, raw-address/speculative comment cleanup, remaining C++-style cast cleanup, `sizeof(...)` replacements for ship-design copies, and direct `.name` returns instead of `char*` reinterpretation from ship/design objects; help-record text still relies on manual `+ 0x67` raw-buffer offsets that likely want a recovered typed record view later.
+- [reviewed] src/game/colbcach.{h,cpp} - applied a concise cache-loader docstring, clearer coordinate/building parameter and local variable names, and fixed-width `int32_t` cleanup for the frame/index temporaries; the returned `s_animation_header*` still overlays an untyped buffer-reload block and relies on recovered layout/alignment assumptions.
+- [reviewed] src/game/cmbtspec.{h,cpp} - applied concise combat-special-effect docstrings, renamed the remaining placeholder special-effect parameters and the transporter-beam scratch bitmap local, removed stale raw-address/suggested-name comments, replaced the remaining C++-style casts with equivalent C-style casts, and converted the last plain `int` sound handle to `int32_t`; repeated `s_animation_header*` overlays on pooled raw blocks and buffer reloads still rely on recovered layout/alignment assumptions and likely want a dedicated typed animation-buffer helper later.
+- [reviewed] src/game/cmbtmov1.{h,cpp} - applied concise movement/rotation/network docstrings, renamed the tactical-net message parameters and a couple of narrow locals for clarity, removed the speculative `2000` traversal comment plus the stale duplicate-assembly note, replaced the remaining `static_cast<int16_t>` uses with C-style casts, and switched the missile-tracking clear plus network message copies to `sizeof(...)`; no pointer-math direct-memory UB stood out, but the typed `s_animation_header*` overlay on the temporary teleport buffer still relies on recovered layout/alignment assumptions.
+- [reviewed] src/game/cmbtmis.{h,cpp} - applied concise missile-helper docstrings, removed stale decompiler/assembly comments and the exposed CPP-local string externs, inlined the local string literals, replaced the remaining `static_cast` uses with equivalent C-style casts, and converted the raw missile/torpedo coordinate buffer clears to `sizeof(...)`; raw `s_animation_header*` overlays on `Buffer_Reload_` and cached fighter/missile animation buffers still rely on recovered asset-layout/alignment assumptions and likely want a dedicated typed animation-buffer helper later.
 - [reviewed] src/game/cmbtfire.{h,cpp} - applied concise combat-fire header docstrings, renamed the remaining clear placeholder combat parameters and locals, removed stale suggested-name/redundant assembly comments, replaced the remaining `static_cast` uses with equivalent C-style casts, and inlined the redundant local LBX alias in `BHG_`; no direct pointer-arithmetic memory access stood out, but the repeated `s_animation_header*` overlays on reload/allocated buffers still rely on recovered layout/alignment assumptions and likely want a dedicated typed animation-buffer helper later.
 - [reviewed] src/game/cmbtfir2.{h,cpp} - applied concise combat-bonus/boarding docstrings, placeholder-parameter renames, fixed-width cleanup for the remaining `short` signatures, the last `static_cast<int32_t>` replacement, stale register/bit/assembly comment cleanup, inlining of the CPP-local boarding-format strings with fmtpara control-sequence notes, and `sizeof(...)` cleanup for fixed local buffers and the contiguous hit-layout copy; no pointer-arithmetic direct-memory UB stood out, but `Clear_Internal_Space_` still relies on a contiguous recovered-field layout that likely wants a dedicated typed sub-struct later.
 - [reviewed] src/game/cmbtdrw1.{h,cpp} - applied concise combat-drawing docstrings, conservative parameter renames, misplaced/stale comment cleanup, inlining of the CPP-local combat string constants, and obvious `static_cast`/`reinterpret_cast` cleanup to C-style casts; `Plasma_Darken_` still performs UB-prone frame-data access through pointer arithmetic on `s_animation_header*`, which likely wants a recovered typed frame-header/view helper before any deeper rewrite.

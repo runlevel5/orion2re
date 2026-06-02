@@ -52,6 +52,9 @@ namespace GENDRAW {
         HAROLD::Save_Mouse_List_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         ERIC::Fast_Fade_In_();
+        fonts::Load_Palette_(9, 0, 255);
+        palette::Set_Palette_Changes_(0, 255);
+        palette::Refresh_Palette_();
         allocate::Push_Block_(MOX::_screen_seg);
         MOX2::Get_Auto_Function_(&_gendraw_af);
         _old_help_list_active = fields::_help_list_active;

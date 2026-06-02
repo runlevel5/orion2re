@@ -1,21 +1,21 @@
 #include "pch.h"
 
 namespace COLBCACH {
-    s_animation_header* __cdecl Cache_Load_Bldg_(int16_t x, int16_t y, int16_t bldg_type) {
+    s_animation_header* __cdecl Cache_Load_Bldg_(int16_t building_x, int16_t building_y, int16_t building_type) {
         char filename[28];
-        int type_index = (int)bldg_type - 1;
-        int file_number = type_index / 10;
-        int frame_index = type_index % 10;
+        int32_t type_index = (int32_t)building_type - 1;
+        int32_t file_number = type_index / 10;
+        int32_t frame_index = type_index % 10;
 
-        char* format = ESTRINGS::E_Strings_(ESTR_BLDGDLBX1);
-        sprintf(filename, format, file_number);
+        char* filename_format = ESTRINGS::E_Strings_(ESTR_BLDGDLBX1);
+        sprintf(filename, filename_format, file_number);
 
-        void* cache_seg = MOX::_global_cache_seg;
+        void* global_cache_seg = MOX::_global_cache_seg;
         
-        int16_t base_frame = COLONY::Bldg_Coords_To_Effective_Frame_(x, y);
+        int16_t base_building_frame = COLONY::Bldg_Coords_To_Effective_Frame_(building_x, building_y);
 
-        int effective_frame = (int)base_frame + (frame_index * 36);
+        int32_t effective_frame = (int32_t)base_building_frame + (frame_index * 36);
 
-        return (s_animation_header*)buffer::Buffer_Reload_(filename, effective_frame, cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(filename, effective_frame, global_cache_seg);
     }
 }

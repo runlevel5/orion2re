@@ -93,7 +93,7 @@ namespace CMBTSPEC {
         int16_t x1, y1, x2, y2;
         int16_t target_idx;
 
-        target_idx = static_cast<int16_t>(MOX::_combat_data[ship_idx].special_cooldown);
+        target_idx = (int16_t)MOX::_combat_data[ship_idx].special_cooldown;
 
         COMBINIT::Ship_Center_Offsets_(ship_idx, &x1, &y1);
         x1 += (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20;
@@ -103,15 +103,15 @@ namespace CMBTSPEC {
         x2 += (MOX::_combat_data[target_idx].x - MOX::_cur_combat_x) * 20;
         y2 += (MOX::_combat_data[target_idx].y - MOX::_cur_combat_y) * 20;
 
-        animate::Set_Animation_Frame_(static_cast<s_animation_header*>(MOX::_small_tractor_seg), 6);
+        animate::Set_Animation_Frame_((s_animation_header*)MOX::_small_tractor_seg, 6);
         palette::Restore_Glass_Remap_Block_(MOX::_tractor_remap_colors);
         allocate::Push_Block_(MOX::_screen_seg);
 
         int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
         s_animation_header* temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining_space - 100);
 
-        bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), MOX::_small_tractor_seg);
-        bitmap::Set_Picture_Glassed_(static_cast<s_animation_header*>(temp_bitmap));
+        bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, MOX::_small_tractor_seg);
+        bitmap::Set_Picture_Glassed_((s_animation_header*)temp_bitmap);
 
         graphics::Set_Window_(0, 0, 639, 350);
         video::Clip_On_();
@@ -123,7 +123,7 @@ namespace CMBTSPEC {
     }
 
     void __cdecl Draw_Moving_Tractor_(int16_t ship_idx, int16_t center_x, int16_t center_y) {
-        int16_t target_ship_idx = static_cast<int16_t>(MOX::_combat_data[ship_idx].special_cooldown);
+        int16_t target_ship_idx = (int16_t)MOX::_combat_data[ship_idx].special_cooldown;
         int16_t x1, y1, x2, y2;
 
         COMBINIT::Ship_Center_Offsets_(ship_idx, &x1, &y1);
@@ -144,15 +144,15 @@ namespace CMBTSPEC {
             y2 += (MOX::_combat_data[target_ship_idx].y - MOX::_cur_combat_y) * 20;
         }
 
-        animate::Set_Animation_Frame_(static_cast<s_animation_header*>(MOX::_small_tractor_seg), (MOX::_ship_frame % 3) + 4);
+        animate::Set_Animation_Frame_((s_animation_header*)MOX::_small_tractor_seg, (MOX::_ship_frame % 3) + 4);
         palette::Restore_Glass_Remap_Block_(MOX::_tractor_remap_colors);
         allocate::Push_Block_(MOX::_screen_seg);
 
         int32_t remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
         s_animation_header* temp_bmp = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining - 100);
 
-        bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bmp), MOX::_small_tractor_seg);
-        bitmap::Set_Picture_Glassed_(static_cast<s_animation_header*>(temp_bmp));
+        bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bmp, MOX::_small_tractor_seg);
+        bitmap::Set_Picture_Glassed_((s_animation_header*)temp_bmp);
         bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, temp_bmp);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -366,30 +366,30 @@ namespace CMBTSPEC {
             goto finish_drawing;
         }
 
-        seg = static_cast<s_animation_header*>(buffer::Buffer_Reload_(ESTRINGS::E_Strings_(224), asset_id, MOX::_global_cache_seg));
+        seg = (s_animation_header*)buffer::Buffer_Reload_(ESTRINGS::E_Strings_(224), asset_id, MOX::_global_cache_seg);
         {
             int16_t frame_count = animate::Get_Animation_Frame_Count_(seg);
             animate::Set_Animation_Frame_(seg, MOX::_ship_frame % frame_count);
         }
-        bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), seg);
+        bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, seg);
 
     finish_drawing:
         int8_t flip_dir = facing / 4;
         if (flip_dir != 0) {
             if (flip_dir == 1) {
-                bitmap::Flip_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), static_cast<s_animation_header*>(temp_bitmap), 0);
+                bitmap::Flip_Bitmap_((s_animation_header*)temp_bitmap, (s_animation_header*)temp_bitmap, 0);
             } else if (flip_dir == 3) {
-                bitmap::Flip_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), static_cast<s_animation_header*>(temp_bitmap), 3);
+                bitmap::Flip_Bitmap_((s_animation_header*)temp_bitmap, (s_animation_header*)temp_bitmap, 3);
             }
         }
 
         palette::Restore_Glass_Remap_Block_(MOX::_plasma_web_remap_colors);
 
-        draw_x -= animate::Get_Width_(static_cast<s_animation_header*>(temp_bitmap)) / 2;
-        draw_y -= animate::Get_Height_(static_cast<s_animation_header*>(temp_bitmap)) / 2;
+        draw_x -= animate::Get_Width_((s_animation_header*)temp_bitmap) / 2;
+        draw_y -= animate::Get_Height_((s_animation_header*)temp_bitmap) / 2;
 
-        bitmap::Set_Picture_Glassed_(static_cast<s_animation_header*>(temp_bitmap));
-        animate::Draw_(draw_x, draw_y, static_cast<s_animation_header*>(temp_bitmap));
+        bitmap::Set_Picture_Glassed_((s_animation_header*)temp_bitmap);
+        animate::Draw_(draw_x, draw_y, (s_animation_header*)temp_bitmap);
 
         allocate::Pop_Block_(MOX::_screen_seg);
         palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
@@ -439,8 +439,8 @@ namespace CMBTSPEC {
                     
                     anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 1, MOX::_global_cache_seg);
                     animate::Set_Animation_Frame_(anim, frame_idx);
-                    bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), anim);
                     
+                    bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, anim);
                     graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);
                     video::Clip_On_();
                     bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, temp_bitmap);
@@ -585,7 +585,7 @@ namespace CMBTSPEC {
         }
     }
 
-    void __cdecl Tractor_Beam_(int16_t param_1, int16_t param_2) {
+    void __cdecl Tractor_Beam_(int16_t source_ship_idx, int16_t target_ship_idx) {
         int16_t src_x;
         int16_t src_y;
         int16_t dst_x;
@@ -595,18 +595,18 @@ namespace CMBTSPEC {
             allocate::Push_Block_(MOX::_screen_seg);
             s_animation_header* h1 = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000);
 
-            COMBINIT::Ship_Center_Offsets_(param_1, &src_x, &src_y);
-            src_x += (MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20;
-            src_y += (MOX::_combat_data[param_1].y - MOX::_cur_combat_y) * 20;
+            COMBINIT::Ship_Center_Offsets_(source_ship_idx, &src_x, &src_y);
+            src_x += (MOX::_combat_data[source_ship_idx].x - MOX::_cur_combat_x) * 20;
+            src_y += (MOX::_combat_data[source_ship_idx].y - MOX::_cur_combat_y) * 20;
 
-            COMBINIT::Ship_Center_Offsets_(param_2, &dst_x, &dst_y);
-            dst_x += (MOX::_combat_data[param_2].x - MOX::_cur_combat_x) * 20;
-            dst_y += (MOX::_combat_data[param_2].y - MOX::_cur_combat_y) * 20;
+            COMBINIT::Ship_Center_Offsets_(target_ship_idx, &dst_x, &dst_y);
+            dst_x += (MOX::_combat_data[target_ship_idx].x - MOX::_cur_combat_x) * 20;
+            dst_y += (MOX::_combat_data[target_ship_idx].y - MOX::_cur_combat_y) * 20;
 
             for (int16_t frame = 0; frame < 8; ++frame) {
                 timer::Mark_Time_();
                 video::Set_Page_Off_();
-                animate::Set_Animation_Frame_(static_cast<s_animation_header*>(MOX::_small_tractor_seg), frame);
+                animate::Set_Animation_Frame_((s_animation_header*)MOX::_small_tractor_seg, frame);
                 bitmap::Draw_Picture_To_Bitmap_(h1, MOX::_small_tractor_seg);
                 bitmap::Set_Picture_Glassed_(h1);
                 palette::Restore_Glass_Remap_Block_(MOX::_tractor_remap_colors);
@@ -624,9 +624,9 @@ namespace CMBTSPEC {
             allocate::Pop_Block_(MOX::_screen_seg);
         }
 
-        MOX::_combat_data[param_1].special_cooldown = (uint8_t)param_2;
-        int16_t current_speed = COMBAT1::Calc_Current_Speed_(param_2);
-        MOX::_combat_data[param_2].current_speed = current_speed;
+        MOX::_combat_data[source_ship_idx].special_cooldown = (uint8_t)target_ship_idx;
+        int16_t current_speed = COMBAT1::Calc_Current_Speed_(target_ship_idx);
+        MOX::_combat_data[target_ship_idx].current_speed = current_speed;
         CMBTDRW1::Refresh_Combat_Screen_Full_();
     }
 
@@ -744,11 +744,10 @@ namespace CMBTSPEC {
         }
     }
 
-    // Suggested name: Draw_Transporter_Bomb_Beam
     void __cdecl Draw_Transporter_Bomb_Beam_(int16_t ship_idx, int16_t target_x, int16_t target_y) {
         int16_t start_x, start_y;
         s_animation_header* anim;
-        s_animation_header* buffer;
+        s_animation_header* beam_bitmap;
         int16_t frame_idx = 0;
         int32_t sound_handle;
 
@@ -759,7 +758,7 @@ namespace CMBTSPEC {
         animate::Draw_Palette_(anim);
 
         allocate::Push_Block_(MOX::_screen_seg);
-        buffer = reinterpret_cast<s_animation_header*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */));
+        beam_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */);
 
         MOX::_dont_draw_ship = ship_idx;
         sound_handle = ERICNET::Mox_Play_Sound_(0x14);
@@ -775,9 +774,9 @@ namespace CMBTSPEC {
 
             anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 15, MOX::_global_cache_seg);
             animate::Set_Animation_Frame_(anim, frame_idx % 3);
-            bitmap::Draw_Picture_To_Bitmap_(buffer, anim);
-            bitmap::Set_Picture_Glassed_(buffer);
-            bitmap::Draw_Bitmap_Line_(start_x, start_y, target_x, target_y, buffer);
+            bitmap::Draw_Picture_To_Bitmap_(beam_bitmap, anim);
+            bitmap::Set_Picture_Glassed_(beam_bitmap);
+            bitmap::Draw_Bitmap_Line_(start_x, start_y, target_x, target_y, beam_bitmap);
 
             graphics::Set_Window_(0, 0, 639 /* 0x27f */, 350 /* 0x15e */);
             video::Clip_On_();
@@ -806,7 +805,7 @@ namespace CMBTSPEC {
         int16_t step;
         int16_t dist_acc;
         int16_t hit_flag;
-        int sound_handle;
+        int32_t sound_handle;
         s_missile* missile;
         int16_t target_unit_idx;
 
@@ -993,15 +992,15 @@ namespace CMBTSPEC {
         }
     }
 
-    void __cdecl Plasma_Web_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    void __cdecl Plasma_Web_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_slot_idx) {
         int16_t accumulated_damage = 0;
-        s_combat_data* source_ship = &MOX::_combat_data[param_1];
-        s_combat_data* target_ship = &MOX::_combat_data[param_2];
-        int16_t shots_left = source_ship->weapons[param_3].shots_left;
-        int16_t weapon_id = source_ship->weapons[param_3].weapon_id;
+        s_combat_data* source_ship = &MOX::_combat_data[attacker_idx];
+        s_combat_data* target_ship = &MOX::_combat_data[target_idx];
+        int16_t shots_left = source_ship->weapons[weapon_slot_idx].shots_left;
+        int16_t weapon_id = source_ship->weapons[weapon_slot_idx].weapon_id;
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
-            if (!CMBTDRW1::Ship_Completely_On_Screen_(param_2)) {
+            if (!CMBTDRW1::Ship_Completely_On_Screen_(target_idx)) {
                 COMBINIT::Snap_Center_Combat_Screen_(target_ship->x, target_ship->y);
             }
 
@@ -1009,12 +1008,12 @@ namespace CMBTSPEC {
             int16_t travel_frames = animate::Get_Animation_Frame_Count_(travel_seg);
 
             int16_t start_x, start_y;
-            COMBINIT::Ship_Center_Offsets_(param_1, &start_x, &start_y);
+            COMBINIT::Ship_Center_Offsets_(attacker_idx, &start_x, &start_y);
             start_x += (source_ship->x - MOX::_cur_combat_x) * 20 - 20;
             start_y += (source_ship->y - MOX::_cur_combat_y) * 20 - 20;
 
             int16_t dest_x, dest_y;
-            COMBINIT::Ship_Center_Offsets_(param_2, &dest_x, &dest_y);
+            COMBINIT::Ship_Center_Offsets_(target_idx, &dest_x, &dest_y);
             dest_x += (target_ship->x - MOX::_cur_combat_x) * 20 - 20;
             dest_y += (target_ship->y - MOX::_cur_combat_y) * 20 - 20;
 
@@ -1337,9 +1336,6 @@ namespace CMBTSPEC {
         }
     }
 
-    /**
-     * @address 004a59c0
-     */
     void __cdecl Draw_Anti_Missile_Rocket_Picture_(int16_t x, int16_t y) {
         int16_t x1 = x - 1;
         int16_t x2 = x + 1;
@@ -1356,9 +1352,9 @@ namespace CMBTSPEC {
         fields::Clipped_Dot_(x2, y2, 16);
     }
 
-    void __cdecl Play_Ship_Explosion_SFX_(int16_t param_1) {
+    void __cdecl Play_Ship_Explosion_SFX_(int16_t size_class) {
         int32_t random_val = random::Random_(3);
-        int16_t switch_idx = static_cast<int16_t>(random_val + param_1 - 1);
+        int16_t switch_idx = (int16_t)(random_val + size_class - 1);
 
         switch (switch_idx) {
         case 0:
@@ -1386,7 +1382,7 @@ namespace CMBTSPEC {
         }
     }
 
-    void __cdecl Draw_Gyro_Special_Effect_(int16_t param_1, int16_t param_2) {
+    void __cdecl Draw_Gyro_Special_Effect_(int16_t source_ship_idx, int16_t target_ship_idx) {
         int16_t x1, y1;
         int16_t x2, y2;
         int16_t step;
@@ -1400,13 +1396,13 @@ namespace CMBTSPEC {
         allocate::Push_Block_(MOX::_screen_seg);
         s_animation_header* block = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000);
 
-        COMBINIT::Ship_Center_Offsets_(param_1, &x1, &y1);
-        x1 += (MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20;
-        y1 += (MOX::_combat_data[param_1].y - MOX::_cur_combat_y) * 20;
+        COMBINIT::Ship_Center_Offsets_(source_ship_idx, &x1, &y1);
+        x1 += (MOX::_combat_data[source_ship_idx].x - MOX::_cur_combat_x) * 20;
+        y1 += (MOX::_combat_data[source_ship_idx].y - MOX::_cur_combat_y) * 20;
 
-        COMBINIT::Ship_Center_Offsets_(param_2, &x2, &y2);
-        x2 += (MOX::_combat_data[param_2].x - MOX::_cur_combat_x) * 20;
-        y2 += (MOX::_combat_data[param_2].y - MOX::_cur_combat_y) * 20;
+        COMBINIT::Ship_Center_Offsets_(target_ship_idx, &x2, &y2);
+        x2 += (MOX::_combat_data[target_ship_idx].x - MOX::_cur_combat_x) * 20;
+        y2 += (MOX::_combat_data[target_ship_idx].y - MOX::_cur_combat_y) * 20;
 
         if (MOX::_speedx2_flag == 1 || MOX::_net_flag != 0) {
             step = 2;
@@ -1433,15 +1429,15 @@ namespace CMBTSPEC {
                 bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, block);
 
                 CMBTDRW1::Draw_Ship_(
-                    param_1,
-                    (int16_t)((MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20),
-                    (int16_t)((MOX::_combat_data[param_1].y - MOX::_cur_combat_y) * 20)
+                    source_ship_idx,
+                    (int16_t)((MOX::_combat_data[source_ship_idx].x - MOX::_cur_combat_x) * 20),
+                    (int16_t)((MOX::_combat_data[source_ship_idx].y - MOX::_cur_combat_y) * 20)
                 );
 
                 CMBTDRW1::Draw_Ship_(
-                    param_2,
-                    (int16_t)((MOX::_combat_data[param_2].x - MOX::_cur_combat_x) * 20),
-                    (int16_t)((MOX::_combat_data[param_2].y - MOX::_cur_combat_y) * 20)
+                    target_ship_idx,
+                    (int16_t)((MOX::_combat_data[target_ship_idx].x - MOX::_cur_combat_x) * 20),
+                    (int16_t)((MOX::_combat_data[target_ship_idx].y - MOX::_cur_combat_y) * 20)
                 );
 
                 graphics::Reset_Window_();
@@ -1472,23 +1468,23 @@ namespace CMBTSPEC {
 
             bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, block);
 
-            int32_t next_dir = MOX::_combat_data[param_2].facing_dir + 1;
+            int32_t next_dir = MOX::_combat_data[target_ship_idx].facing_dir + 1;
             int32_t wrapped_dir = abs(next_dir) % 16;
             if (next_dir < 0) {
                 wrapped_dir = -wrapped_dir;
             }
-            MOX::_combat_data[param_2].facing_dir = (int8_t)wrapped_dir;
+            MOX::_combat_data[target_ship_idx].facing_dir = (int8_t)wrapped_dir;
 
             CMBTDRW1::Draw_Ship_(
-                param_2,
-                (int16_t)((MOX::_combat_data[param_2].x - MOX::_cur_combat_x) * 20),
-                (int16_t)((MOX::_combat_data[param_2].y - MOX::_cur_combat_y) * 20)
+                target_ship_idx,
+                (int16_t)((MOX::_combat_data[target_ship_idx].x - MOX::_cur_combat_x) * 20),
+                (int16_t)((MOX::_combat_data[target_ship_idx].y - MOX::_cur_combat_y) * 20)
             );
 
             CMBTDRW1::Draw_Ship_(
-                param_1,
-                (int16_t)((MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20),
-                (int16_t)((MOX::_combat_data[param_1].y - MOX::_cur_combat_y) * 20)
+                source_ship_idx,
+                (int16_t)((MOX::_combat_data[source_ship_idx].x - MOX::_cur_combat_x) * 20),
+                (int16_t)((MOX::_combat_data[source_ship_idx].y - MOX::_cur_combat_y) * 20)
             );
 
             video::Clip_Off_();
@@ -1534,7 +1530,7 @@ namespace CMBTSPEC {
         ERIC::Draw_Centered_(center_off_x + x, center_off_y + y, MOX::_combat_bitmap);
     }
 
-    void __cdecl Do_Spherical_SFX_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5) {
+    void __cdecl Do_Spherical_SFX_(int16_t source_ship_idx, int16_t effect_x, int16_t effect_y, int16_t effect_type, int16_t shot_count) {
         static const int16_t anim_frames[125] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1551,19 +1547,19 @@ namespace CMBTSPEC {
         int16_t center_dx_2;
         int16_t center_dy_2;
 
-        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0 && CMBTDRW1::Ship_Completely_On_Screen_(param_1) == 0) {
-            COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[param_1].x, MOX::_combat_data[param_1].y);
+        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0 && CMBTDRW1::Ship_Completely_On_Screen_(source_ship_idx) == 0) {
+            COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[source_ship_idx].x, MOX::_combat_data[source_ship_idx].y);
         }
 
         int16_t center_x, center_y;
-        COMBINIT::Ship_Center_Offsets_(param_1, &center_x, &center_y);
-        center_x = center_x + MOX::_cur_combat_x * -20 + param_2;
-        center_y = center_y + MOX::_cur_combat_y * -20 + param_3;
+        COMBINIT::Ship_Center_Offsets_(source_ship_idx, &center_x, &center_y);
+        center_x = center_x + MOX::_cur_combat_x * -20 + effect_x;
+        center_y = center_y + MOX::_cur_combat_y * -20 + effect_y;
 
         allocate::Push_Block_(MOX::_screen_seg);
         COLONY::Load_Ship_Bitm_();
 
-        int16_t sfx_type = param_4;
+        int16_t sfx_type = effect_type;
         bool draw_ships_collapsing_flag = true;
         void* remap_colors = nullptr;
 
@@ -1625,7 +1621,7 @@ namespace CMBTSPEC {
             for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].unit_status == 0 &&
                     CMBTMOV1::Ship_Is_In_Stasis_(i) == 0 &&
-                    i != param_1 &&
+                    i != source_ship_idx &&
                     MOX::_combat_data[i].unit_status != 5)
                 {
                     int16_t cx, cy;
@@ -1654,10 +1650,10 @@ namespace CMBTSPEC {
             }
         }
 
-        COMBINIT::Ship_Center_Offsets_(param_1, &center_dx_2, &center_dy_2);
+        COMBINIT::Ship_Center_Offsets_(source_ship_idx, &center_dx_2, &center_dy_2);
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
-            MOX::_dont_draw_ship = param_1;
+            MOX::_dont_draw_ship = source_ship_idx;
             video::Set_Page_Back_();
             CMBTDRW1::Draw_Main_Combat_Screen_();
             video::Copy_Back_To_Off_();
@@ -1678,15 +1674,15 @@ namespace CMBTSPEC {
                     graphics::Set_Window_(0, 0, 639, 350);
                     video::Clip_On_();
 
-                    if (!draw_ships_collapsing_flag && MOX::_combat_data[param_1].unit_status != 5) {
+                    if (!draw_ships_collapsing_flag && MOX::_combat_data[source_ship_idx].unit_status != 5) {
                         if (sfx_type == 1 || sfx_type == 0) {
-                            CMBTDRW1::Draw_Ship_(param_1, center_x - center_dx_2, center_y - center_dy_2);
+                            CMBTDRW1::Draw_Ship_(source_ship_idx, center_x - center_dx_2, center_y - center_dy_2);
                         }
                         else if (sfx_type == 3) {
-                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
+                            Draw_Ship_Collapsing_(source_ship_idx, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
                         }
                         else if (sfx_type == 4) {
-                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_4_val, (int8_t)frame);
+                            Draw_Ship_Collapsing_(source_ship_idx, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_4_val, (int8_t)frame);
                         }
                     }
 
@@ -1763,15 +1759,15 @@ namespace CMBTSPEC {
                         palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
                     }
 
-                    if (draw_ships_collapsing_flag && MOX::_combat_data[param_1].unit_status != 5) {
+                    if (draw_ships_collapsing_flag && MOX::_combat_data[source_ship_idx].unit_status != 5) {
                         if (sfx_type == 1 || sfx_type == 0 || sfx_type == 2) {
-                            CMBTDRW1::Draw_Ship_(param_1, center_x - center_dx_2, center_y - center_dy_2);
+                            CMBTDRW1::Draw_Ship_(source_ship_idx, center_x - center_dx_2, center_y - center_dy_2);
                         }
                         else if (sfx_type == 3) {
-                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
+                            Draw_Ship_Collapsing_(source_ship_idx, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
                         }
                         else if (sfx_type == 4) {
-                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val + 40, (int8_t)frame);
+                            Draw_Ship_Collapsing_(source_ship_idx, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val + 40, (int8_t)frame);
                         }
                     }
 
@@ -1807,29 +1803,29 @@ namespace CMBTSPEC {
                     int32_t kill_ratio = 0;
 
                     if (sfx_type == 0) {
-                        for (int16_t k = 0; k < param_5; ++k) {
+                        for (int16_t k = 0; k < shot_count; ++k) {
                             damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].max_damage -
                                 TECHDATA::_weapons[44].min_damage + 1) - 1;
                         }
-                        damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
+                        damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else if (sfx_type == 1) {
-                        for (int16_t k = 0; k < param_5; ++k) {
+                        for (int16_t k = 0; k < shot_count; ++k) {
                             damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].max_damage -
                                 TECHDATA::_weapons[36].min_damage + 1) - 1;
                         }
-                        damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
+                        damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else if (sfx_type == 2) {
-                        for (int16_t k = 0; k < param_5; ++k) {
+                        for (int16_t k = 0; k < shot_count; ++k) {
                             damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].max_damage -
                                 TECHDATA::_weapons[13].min_damage + 1) - 1;
                         }
-                        damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
+                        damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else {
                         kill_ratio = (dist_sq * 100) / radius_sq;
-                        damage = param_5;
+                        damage = shot_count;
                     }
 
                     int32_t chance = ((100 - kill_ratio) * (int32_t)damage) / 100;
@@ -1856,29 +1852,29 @@ namespace CMBTSPEC {
             int32_t kill_ratio = 0;
 
             if (sfx_type == 0) {
-                for (int16_t k = 0; k < param_5; ++k) {
+                for (int16_t k = 0; k < shot_count; ++k) {
                     damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].max_damage -
                         TECHDATA::_weapons[44].min_damage + 1) - 1;
                 }
-                damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
+                damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else if (sfx_type == 1) {
-                for (int16_t k = 0; k < param_5; ++k) {
+                for (int16_t k = 0; k < shot_count; ++k) {
                     damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].max_damage -
                         TECHDATA::_weapons[36].min_damage + 1) - 1;
                 }
-                damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
+                damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else if (sfx_type == 2) {
-                for (int16_t k = 0; k < param_5; ++k) {
+                for (int16_t k = 0; k < shot_count; ++k) {
                     damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].max_damage -
                         TECHDATA::_weapons[13].min_damage + 1) - 1;
                 }
-                damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
+                damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else {
                 kill_ratio = (ship_dist_sq[j] * 100) / radius_sq;
-                damage = param_5;
+                damage = shot_count;
             }
 
             int32_t chance = ((100 - kill_ratio) * (int32_t)damage) / 100;
@@ -1909,7 +1905,7 @@ namespace CMBTSPEC {
                 damage_out = (int16_t)chance;
             }
             else {
-                int16_t facing = CMBTDRW1::Relative_Bearing_(ship_idx, param_1);
+                int16_t facing = CMBTDRW1::Relative_Bearing_(ship_idx, source_ship_idx);
                 facing = CMBTFIRE::Facing_Shield_(facing);
                 CMBTFIRE::Apply_Ship_Damage_(ship_idx, &damage_out, &struct_damage, facing, 0, 0, 0, 0, 0);
             }

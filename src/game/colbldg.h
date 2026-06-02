@@ -42,8 +42,15 @@ namespace COLBLDG {
 
     void __cdecl Build_Arrays_();
 
+    /**
+     * Creates a queued ship instance from a player design at a colony.
+     * @param player_idx Owning player index.
+     * @param design_idx Ship design slot to copy.
+     * @param colony_idx Colony that supplies the ship location.
+     */
     int16_t __cdecl Create_Ship_(int16_t player_idx, int16_t design_idx, int16_t colony_idx);
 
+    /** Opens the colony build-queue popup and runs its input loop. */
     void __cdecl Build_Queue_Popup_();
 
     int16_t __cdecl Colbldg_Create_Ship_(int16_t design_slot);
@@ -100,17 +107,46 @@ namespace COLBLDG {
 
     void __cdecl Draw_Current_Selection_();
 
+    /**
+     * Prints cost and timing lines for the selected production item.
+     * @param colony_idx Colony supplying the production context.
+     * @param product_idx Building, ship, or special product identifier.
+     * @param line_count In/out line counter used for vertical placement.
+     */
     void __cdecl Draw_Cost_And_Time_Info_(int16_t colony_idx, int16_t product_idx, int16_t* line_count);
 
     void __cdecl Draw_Ship_Design_Info2_(s_ship_design* design);
 
+    /**
+     * Builds a formatted paragraph describing a ship design.
+     * @param design Ship design to describe.
+     * @param buffer Destination paragraph buffer.
+     */
     void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, char* buffer);
 
+    /**
+     * Builds a formatted paragraph describing a ship and its crew state.
+     * @param ship Ship instance to describe.
+     * @param buffer Destination paragraph buffer.
+     */
     void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer);
 
-    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, char* buffer, char show_crew);
+    /**
+     * Dispatches to the ship or design paragraph builder for binary-compatibility callers.
+     * @param ship_or_design Either a ship pointer or a design pointer.
+     * @param buffer Destination paragraph buffer.
+     * @param include_crew_details Nonzero when ship-specific crew details should be printed.
+     */
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, char* buffer, char include_crew_details);
 
-    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon_inst, char* dest, uint8_t param_3, uint8_t count);
+    /**
+     * Formats a weapon entry for ship-description output.
+     * @param weapon Weapon instance to describe.
+     * @param dest Destination string buffer.
+     * @param include_postfix_modifiers Nonzero to append trailing modifier text.
+     * @param weapon_count Number of copies mounted for pluralization and count output.
+     */
+    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon, char* dest, uint8_t include_postfix_modifiers, uint8_t weapon_count);
 
     int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t product_id);
 
@@ -158,10 +194,20 @@ namespace COLBLDG {
     int16_t __cdecl First_Prod_Queue_Slot_(int16_t prod_idx);
     void __cdecl Delete_From_Queue_(int16_t slot_idx);
     int8_t __cdecl Add_To_Queue_(int16_t prod_idx);
-    void __cdecl Insert_Before_Queue_Slot_(int16_t param_1, int16_t param_2);
+    /**
+     * Moves the selected queue entry before another queue slot.
+     * @param source_slot_idx Slot currently holding the item to move.
+     * @param target_slot_idx Slot that should receive the moved item.
+     */
+    void __cdecl Insert_Before_Queue_Slot_(int16_t source_slot_idx, int16_t target_slot_idx);
     void __cdecl Defragment_Queue_();
 
-    void __cdecl Evaluate_Input_(int16_t* param_1, int16_t* param_2);
+    /**
+     * Updates build-queue state from the latest field selection and scan result.
+     * @param selected_field_id In/out selected field identifier.
+     * @param scanned_field_id In/out scanned field identifier.
+     */
+    void __cdecl Evaluate_Input_(int16_t* selected_field_id, int16_t* scanned_field_id);
 
     void __cdecl Print_Selection_Centered_(const char* text);
 

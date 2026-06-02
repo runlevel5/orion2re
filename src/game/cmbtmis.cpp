@@ -37,9 +37,6 @@ namespace CMBTMIS {
         { 18, -1, -1, 18, -18, -1, 1, -18 },
         { 15, -8, 4, 16, -15, 8, -4, -16 },
     };
-    const char s__005510f0[2] = " ";
-    const char s_combat_lbx_00551244[11] = "combat.lbx";
-
     int8_t __cdecl Did_Missile_Hit_(int16_t missile_idx, int16_t x, int16_t y) {
         int32_t dx = (int32_t)x - (int32_t)MOX::_missile[missile_idx].x;
         int32_t dy = (int32_t)y - (int32_t)MOX::_missile[missile_idx].y;
@@ -220,8 +217,8 @@ namespace CMBTMIS {
     void __cdecl Coord_Movement_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t step, int16_t* out_x, int16_t* out_y) {
         int16_t dx = x2 - x1;
         int16_t dy = y2 - y1;
-        int abs_dx = (dx < 0) ? -dx : dx;
-        int abs_dy = (dy < 0) ? -dy : dy;
+        int32_t abs_dx = (dx < 0) ? -dx : dx;
+        int32_t abs_dy = (dy < 0) ? -dy : dy;
 
         if (abs_dx < abs_dy) {
             int16_t sy = (dy < 0) ? -1 : 1;
@@ -678,14 +675,11 @@ namespace CMBTMIS {
     }
 
     void __cdecl Get_Multiple_Torpedo_Coords_(int16_t missile_idx, int16_t group_size, int16_t* out_x, int16_t* out_y) {
-        // The assembly treats facing_dir as an unsigned index via mask and MOVSX
         uint8_t facing_dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
 
-        // Initialize output arrays (4 shorts each = 8 bytes total)
-        memset(out_x, 0, 8);
-        memset(out_y, 0, 8);
+        memset(out_x, 0, sizeof(*out_x) * 4);
+        memset(out_y, 0, sizeof(*out_y) * 4);
 
-        // This complex logic matches (int32_t)stardate % 2 == 1 in assembly
         int32_t stardate_mod = (int32_t)MOX::_stardate % 2;
 
         if (group_size == 2) {
@@ -723,11 +717,10 @@ namespace CMBTMIS {
     void __cdecl Get_Multiple_Missile_Coords_(int16_t missile_idx, int16_t quantity, int16_t* out_x, int16_t* out_y) {
         uint8_t dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
 
-        // Initialize output arrays with zeros (9 elements each)
-        memset(out_x, 0, 18);
-        memset(out_y, 0, 18);
+        memset(out_x, 0, sizeof(*out_x) * 9);
+        memset(out_y, 0, sizeof(*out_y) * 9);
 
-        if (static_cast<uint16_t>(quantity - 2) > 7) {
+        if ((uint16_t)(quantity - 2) > 7) {
             return;
         }
 
@@ -806,14 +799,14 @@ namespace CMBTMIS {
                 break;
 
             case 8:
-                for (int i = 0; i < 8; ++i) {
+                for (int32_t i = 0; i < 8; ++i) {
                     out_x[i] = CMBTMIS::_missile_group_offset[dir][i * 2];
                     out_y[i] = CMBTMIS::_missile_group_offset[dir][i * 2 + 1];
                 }
                 break;
 
             case 9:
-                for (int i = 0; i < 8; ++i) {
+                for (int32_t i = 0; i < 8; ++i) {
                     out_x[i + 1] = CMBTMIS::_missile_group_offset[dir][i * 2];
                     out_y[i + 1] = CMBTMIS::_missile_group_offset[dir][i * 2 + 1];
                 }
@@ -999,7 +992,7 @@ namespace CMBTMIS {
         }
     }
 
-    void __cdecl Draw_Fighter_(int16_t m_idx, int16_t base_x, int16_t base_y, int16_t combat_view_type) {
+    void __cdecl Draw_Fighter_(int16_t missile_idx, int16_t base_x, int16_t base_y, int16_t combat_view_type) {
         int16_t rand_x = 0;
         int16_t rand_y = 0;
         int16_t num_missiles;
@@ -1011,7 +1004,7 @@ namespace CMBTMIS {
         int16_t facing_dir;
         s_animation_header* fighter_anim;
 
-        num_missiles = MOX::_missile[m_idx].quantity / 4;
+        num_missiles = MOX::_missile[missile_idx].quantity / 4;
         if (num_missiles > 9) {
             num_missiles = 9;
         }
@@ -1019,7 +1012,7 @@ namespace CMBTMIS {
             num_missiles = 1;
         }
 
-        Get_Multiple_Missile_Coords_(m_idx, num_missiles, x_coords, y_coords);
+        Get_Multiple_Missile_Coords_(missile_idx, num_missiles, x_coords, y_coords);
 
         if (combat_view_type == 1) {
             window_height = 479;
@@ -1031,22 +1024,22 @@ namespace CMBTMIS {
         video::Clip_On_();
 
         for (int16_t i = 0; i < num_missiles; ++i) {
-            type = Missile_Type_(m_idx);
+            type = Missile_Type_(missile_idx);
 
             if (combat_view_type == 0 && (MOX::_ship_frame % 3 == 0)) {
                 uint32_t old_seed = random::Get_Random_Seed_();
-                random::Set_Random_Seed_(static_cast<uint32_t>(clock()) + i + m_idx);
-                rand_x = static_cast<int16_t>(random::Random_(3)) - 2;
-                rand_y = static_cast<int16_t>(random::Random_(3)) - 2;
+                random::Set_Random_Seed_((uint32_t)clock() + i + missile_idx);
+                rand_x = (int16_t)random::Random_(3) - 2;
+                rand_y = (int16_t)random::Random_(3) - 2;
                 random::Set_Random_Seed_(old_seed);
             }
 
-            owner = Missile_Owner_(m_idx);
-            facing_dir = static_cast<uint8_t>(MOX::_missile[m_idx].facing_dir);
+            owner = Missile_Owner_(missile_idx);
+            facing_dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
             fighter_anim = MOX::_fighter_seg[owner][type * 16 + facing_dir];
 
-            if (MOX::_missile[m_idx].target_unit_idx == MOX::_cur_ship) {
-                animate::Set_Animation_Frame_(fighter_anim, (MOX::_ship_frame + m_idx) % 3);
+            if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship) {
+                animate::Set_Animation_Frame_(fighter_anim, (MOX::_ship_frame + missile_idx) % 3);
             } else {
                 animate::Reset_Animation_Frame_(fighter_anim);
             }
@@ -1060,9 +1053,9 @@ namespace CMBTMIS {
         graphics::Reset_Window_();
     }
 
-    void __cdecl Draw_Missile_(int16_t missile_idx, int16_t screen_x, int16_t screen_y, int16_t flag) {
+    void __cdecl Draw_Missile_(int16_t missile_idx, int16_t screen_x, int16_t screen_y, int16_t draw_fullscreen_view) {
         if (MOX::_missile[missile_idx].type > 0) {
-            if (Missile_On_Combat_Screen_(missile_idx) != 0 || flag != 0) {
+            if (Missile_On_Combat_Screen_(missile_idx) != 0 || draw_fullscreen_view != 0) {
                 Missile_Owner_(missile_idx);
                 int16_t type_idx = Missile_Type_(missile_idx);
                 int16_t facing_idx = (int16_t)(uint8_t)MOX::_missile[missile_idx].facing_dir;
@@ -1078,7 +1071,7 @@ namespace CMBTMIS {
                 if (MOX::_missile[missile_idx].target_unit_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
                     int16_t weapon_type = MOX::_missile[missile_idx].type;
                     if (TECHDATA::_weapons[weapon_type].type == 4 /* RACK_FIGHTER */) {
-                        Draw_Fighter_(missile_idx, screen_x, screen_y, flag);
+                        Draw_Fighter_(missile_idx, screen_x, screen_y, draw_fullscreen_view);
                         return;
                     }
 
@@ -1088,18 +1081,18 @@ namespace CMBTMIS {
 
                     if (TECHDATA::_weapons[weapon_type].type != 1 /* RACK_MISSILE */ && weapon_type != 0x12 /* MSL_TYPE_MIRV */) {
                         Get_Multiple_Torpedo_Coords_(missile_idx, count, coords_y, coords_x);
-                        graphics::Set_Window_(0, 0, 0x27f, (flag == 1) ? 0x1df : 0x15e);
+                        graphics::Set_Window_(0, 0, 0x27f, (draw_fullscreen_view == 1) ? 0x1df : 0x15e);
                         video::Clip_On_();
-                        for (int i = 0; i < count; ++i) {
+                        for (int32_t i = 0; i < count; ++i) {
                             animate::Draw_(coords_x[i] + screen_x - 0x17, coords_y[i] + screen_y - 0x17, MOX::_msl_seg[type_idx * 16 + facing_idx]);
                         }
                         video::Clip_Off_();
                         graphics::Reset_Window_();
                     } else {
                         Get_Multiple_Missile_Coords_(missile_idx, count, coords_y, coords_x);
-                        graphics::Set_Window_(0, 0, 0x27f, (flag == 1) ? 0x1df : 0x15e);
+                        graphics::Set_Window_(0, 0, 0x27f, (draw_fullscreen_view == 1) ? 0x1df : 0x15e);
                         video::Clip_On_();
-                        for (int i = 0; i < count; ++i) {
+                        for (int32_t i = 0; i < count; ++i) {
                             animate::Draw_(coords_x[i] + screen_x - 0xc, coords_y[i] + screen_y - 0xc, MOX::_msl_seg[type_idx * 16 + facing_idx]);
                         }
                         video::Clip_Off_();
@@ -1304,14 +1297,8 @@ namespace CMBTMIS {
         return hits;
     }
 
-    /**
-     * @address 004fe760
-     */
     void __cdecl Draw_Missiles_(void) {
-        // Iterate through all missiles in the combat buffer (300 total)
         for (int16_t i = 299; i >= 0; --i) {
-            // Calculate screen coordinates based on combat camera position
-            // Combat tiles are 20 pixels wide/high
             int16_t screen_x = MOX::_missile[i].x - (MOX::_cur_combat_x * 20);
             int16_t screen_y = MOX::_missile[i].y - (MOX::_cur_combat_y * 20);
 
@@ -1327,7 +1314,7 @@ namespace CMBTMIS {
 
         graphics::Fill_(401, 379, 488, 467, 0);
 
-        anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 45, MOX::_global_cache_seg);
+        anim = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 45, MOX::_global_cache_seg);
         animate::Draw_(401, 379, anim);
 
         CMBTMIS::Draw_Missile_(missile_idx, x_off + 44, y_off + 44, 1);
@@ -1354,7 +1341,7 @@ namespace CMBTMIS {
             KEN::Ken_Get_Text_Message_(msg_id, msg_buf, 80);
             strcat(status_str, msg_buf);
         } else if (TECHDATA::_weapons[weapon_type].type == 4) {
-            strcat(status_str, s__005510f0);
+            strcat(status_str, " ");
             const char* weapon_name;
             if (weapon_type == 30) {
                 weapon_name = (MOX::_missile[missile_idx].quantity == 1) ? TECHDATA::_weapons[30].name : TECHDATA::_weapons[30].name_plural;
