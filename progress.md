@@ -1,18 +1,12 @@
 # Source Cleanup Progress
 
 ## Current focus
-- none
+- src/game/colland.{h,cpp}
 
 ## In progress
-- none
+- [in_progress] src/game/colland.{h,cpp}
 
 ## Pending
-- [pending] src/game/colbomb.{h,cpp}
-- [pending] src/game/colcalc.{h,cpp}
-- [pending] src/game/colcalc_main.cpp
-- [pending] src/game/coldraw.{h,cpp}
-- [pending] src/game/colgcbt.{h,cpp}
-- [pending] src/game/colland.{h,cpp}
 - [pending] src/game/colmove.{h,cpp}
 - [pending] src/game/colonize.{h,cpp}
 - [pending] src/game/colony.{h,cpp}
@@ -38,7 +32,6 @@
 - [pending] src/game/diplodef.h
 - [pending] src/game/diplomac.{h,cpp}
 - [pending] src/game/dos.{h,cpp}
-- [pending] src/game/dplay_dll.h
 - [pending] src/game/draw.{h,cpp}
 - [pending] src/game/eric.{h,cpp}
 - [pending] src/game/erichelp.{h,cpp}
@@ -173,6 +166,11 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/colgcbt.{h,cpp} - suggest concise colony-ground-combat helper docstrings, renaming placeholder summary/context parameters, removing the leaked unused fmtpara string plus decompiler/assembly comments, replacing the remaining `static_cast` uses with C-style casts, converting a few plain `int` loop temporaries plus the `Copy_Structure_` size literal to fixed-width/`sizeof(...)`, and fixing the UB-prone `_g_units[unit->side + 1]` end-pointer computation in `N_Left_Of_Me_To_Process_`; repeated `s_animation_header*` overlays on `Far_Reload_Next_` buffers still rely on recovered asset-layout/alignment assumptions, and `Get_CGCBT_Beam_Len_` still hints at a side-selection validation gap.
+- [reviewed] src/game/coldraw.{h,cpp} - suggest concise colony-road/veggie/pop-drawing docstrings, clearer parameter names for the drawing and pop helpers, replacing remaining `reinterpret_cast`/`static_cast` uses plus the plain `int` morale-width parameters with fixed-width/C-style equivalents, and removing redundant decompiler-style comments from the squish and production-bar helpers; repeated `s_animation_header*` overlays on `Buffer_Reload_` blocks still rely on recovered asset layout/alignment assumptions, and `Road_Back_To_Front_` trusts unchecked table indexing.
+- [reviewed] src/game/colcalc_main.cpp - suggest concise production/morale/player-maintenance docstrings, removing the stale speculative morale TODO and the redundant local format-string alias pointers, replacing the remaining obvious `static_cast` uses with equivalent C-style casts, switching cache clears to `sizeof(...)`, and fixing the UB-prone `p_pop - 1` write plus the raw `361` colony-size division with direct typed pointer subtraction; the packed-pop bitfield writes still hint at a missing typed population-record helper.
+- [reviewed] src/game/colcalc.{h,cpp} - suggest concise colony-calculation docstrings for the key public production/system helpers, removing stale suggested-name/raw-size/raw-address comments, replacing the remaining obvious `static_cast`/`reinterpret_cast` uses with equivalent C-style casts, and fixing the UB-prone colony-index math plus `0x169` structure-size division with direct typed pointer subtraction; `Colony_Food_Maintenance_` still decodes packed pop records manually, which is safe to simplify locally here but also hints at a missing typed population-record helper.
+- [reviewed] src/game/colbomb.{h,cpp} - applied concise bombing-popup docstrings, removed the leaked header externs for the Italian format strings by inlining those literals at their use sites, converted the remaining plain `int` message-length/line-count/index temporaries to `int32_t`, and replaced the raw `0x49` structure-copy size with `sizeof(backup_results)`; no pointer-math direct-memory UB stood out in this unit.
 - [reviewed] src/game/colbldg.{h,cpp} - applied concise queue/build docstrings, clearer queue/input and weapon helper parameter names, raw-address/speculative comment cleanup, remaining C++-style cast cleanup, `sizeof(...)` replacements for ship-design copies, and direct `.name` returns instead of `char*` reinterpretation from ship/design objects; help-record text still relies on manual `+ 0x67` raw-buffer offsets that likely want a recovered typed record view later.
 - [reviewed] src/game/colbcach.{h,cpp} - applied a concise cache-loader docstring, clearer coordinate/building parameter and local variable names, and fixed-width `int32_t` cleanup for the frame/index temporaries; the returned `s_animation_header*` still overlays an untyped buffer-reload block and relies on recovered layout/alignment assumptions.
 - [reviewed] src/game/cmbtspec.{h,cpp} - applied concise combat-special-effect docstrings, renamed the remaining placeholder special-effect parameters and the transporter-beam scratch bitmap local, removed stale raw-address/suggested-name comments, replaced the remaining C++-style casts with equivalent C-style casts, and converted the last plain `int` sound handle to `int32_t`; repeated `s_animation_header*` overlays on pooled raw blocks and buffer reloads still rely on recovered layout/alignment assumptions and likely want a dedicated typed animation-buffer helper later.
@@ -213,5 +211,3 @@
 - [reviewed] src/game/capture.{h,cpp} - applied concise header docstrings for the release-flag helpers and the no-op screen-capture entry point; no naming, comment, fixed-width type, cast, or pointer-math UB issues stood out in this unit.
 
 ## Blocked
-- [blocked] src/game/dplay_dll.h - file is not present under `src/game/` in the current tree.
-- [blocked] src/game/switchd_0045bee9.h - file is not present under `src/game/` in the current tree.

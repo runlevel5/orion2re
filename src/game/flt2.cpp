@@ -551,7 +551,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     if (is_ship_type_2 || is_ship_type_1 || is_ship_type_4) {
         allocate::Push_Block_(MOX::_screen_seg);
         void* block_10000 = allocate::Allocate_Next_Block_(MOX::_screen_seg, 10000);
-        allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57B);
+        allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
         
         int16_t help_idx = 0;
         if (ship_type == 1) {
@@ -565,14 +565,14 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         char lbx_name[20];
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
         
-        void* lbx_data = farload::Far_Reload_Next_Data_(lbx_name, 0, block_10000, help_idx, 1, 0x57B);
+        s_help_record* lbx_data = static_cast<s_help_record*>(farload::Far_Reload_Next_Data_(lbx_name, 0, block_10000, help_idx, 1, sizeof(s_help_record)));
         MOX::_mox_font_colors_offset = 0x72;
         
         s_colors temp_colors;
         MISC::Get_Mox_Font_Colors_(3, 111, 116, &temp_colors);
         
         fonts::Set_Font_Style_(3, &temp_colors);
-        ERIC::Print_Paragraph_Centered_Vertically_(0x12, 0x11A, 0x12B, 0xB7, (char*)lbx_data + 0x67, 0);
+        ERIC::Print_Paragraph_Centered_Vertically_(0x12, 0x11A, 0x12B, 0xB7, lbx_data->body, 0);
         
         allocate::Pop_Block_(MOX::_screen_seg);
         return;

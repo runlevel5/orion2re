@@ -359,11 +359,11 @@ namespace EVANHELP {
         allocate::Push_Block_(MOX::_screen_seg);
 
         void* buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 2000);
-        allocate::Allocate_Next_Block_(MOX::_screen_seg, 1403);
+        allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
 
-        uint8_t* data = (uint8_t*)farload::Far_Reload_Next_Data_(help_lbx_name, 0, buffer, item_index, 1, 1403);
+        s_help_record* data = static_cast<s_help_record*>(farload::Far_Reload_Next_Data_(help_lbx_name, 0, buffer, item_index, 1, sizeof(s_help_record)));
 
-        strcpy(dest, reinterpret_cast<char*>(data + 0x67));
+        strcpy(dest, data->body);
 
         allocate::Pop_Block_(MOX::_screen_seg);
     }

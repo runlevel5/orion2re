@@ -1,17 +1,6 @@
 #pragma once
 #include <cstdint>
 
-#pragma pack(push, 1)
-struct s_help_record {
-    char title[84];
-    char anim_lbx[10];
-    uint32_t anim_info;
-    uint8_t unknown_98;
-    uint32_t next_help_idx;
-    char body[1300];
-};
-#pragma pack(pop)
-
 namespace TEXTBOX {
     extern int16_t _bottom_y;
     extern uint8_t* _textbox_seg;

@@ -704,21 +704,20 @@ namespace COLBLDG {
 
     void __cdecl Get_App_Description_String_(char* dest_str, int16_t app_id) {
         char lbx_name[20];
-        void* record_ptr;
+        s_help_record* record_ptr;
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
 
         if (_last_app != app_id) {
             _last_app = app_id;
-            record_ptr = farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, 0x57B /* 1403 */);
+            record_ptr = static_cast<s_help_record*>(farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, sizeof(s_help_record)));
         } else {
-            record_ptr = _desc_record_ptr;
+            record_ptr = reinterpret_cast<s_help_record*>(_desc_record_ptr);
         }
 
         _desc_record_ptr = (uint8_t*)record_ptr;
 
-        // Copy description string starting at offset 0x67 of the record
-        strcpy(dest_str, (char*)record_ptr + 0x67);
+        strcpy(dest_str, record_ptr->body);
     }
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {
@@ -1013,10 +1012,10 @@ namespace COLBLDG {
 
         if (app_id != _last_app) {
             _last_app = app_id;
-            _desc_record_ptr = (uint8_t*)farload::Far_Reload_Data_(help_lbx_name, 0, _buffer, app_id, 1, 0x57b);
+            _desc_record_ptr = (uint8_t*)farload::Far_Reload_Data_(help_lbx_name, 0, _buffer, app_id, 1, sizeof(s_help_record));
         }
 
-        const char* record_text = (const char*)_desc_record_ptr + 0x67;
+        const char* record_text = reinterpret_cast<const s_help_record*>(_desc_record_ptr)->body;
         strcpy(description_buffer, record_text);
 
         BILL::_Print_Paragraph_(x, y, width, description_buffer, 3);

@@ -1948,21 +1948,21 @@ namespace DESBOX {
         allocate::Push_Block_(MOX::_screen_seg);
 
         void* block = allocate::Allocate_Next_Block_(MOX::_screen_seg, 5000);
-        allocate::Allocate_Next_Block_(MOX::_screen_seg, 1403);
+        allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
 
-        char* base_desc = reinterpret_cast<char*>(
-            farload::Far_Reload_Next_Data_(help_lbx_name, 0, block, 400, 1, 1403)
+        s_help_record* base_desc = static_cast<s_help_record*>(
+            farload::Far_Reload_Next_Data_(help_lbx_name, 0, block, 400, 1, sizeof(s_help_record))
         );
-        strcpy(desc_text, base_desc + 0x67);
+        strcpy(desc_text, base_desc->body);
         strcat(desc_text, "\n\n");
 
-        char* mod_desc = reinterpret_cast<char*>(
-            farload::Far_Reload_Next_Data_(help_lbx_name, 0, block, mod_id + 400, 1, 1403)
+        s_help_record* mod_desc = static_cast<s_help_record*>(
+            farload::Far_Reload_Next_Data_(help_lbx_name, 0, block, mod_id + 400, 1, sizeof(s_help_record))
         );
-        strcpy(mod_text, mod_desc + 0x67);
+        strcpy(mod_text, mod_desc->body);
         strcat(desc_text, mod_text);
 
-        TEXTBOX::Text_Box_(mod_desc, desc_text);
+        TEXTBOX::Text_Box_(mod_desc->title, desc_text);
 
         allocate::Pop_Block_(MOX::_screen_seg);
     }

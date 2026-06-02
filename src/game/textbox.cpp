@@ -341,9 +341,9 @@ namespace TEXTBOX {
 
         do {
             allocate::Push_Block_(_textbox_seg);
-            void* record_data = farload::Far_Reload_Next_Data_(help_lbx_name, 0, _textbox_seg, help_idx, 1, 0x57B);
+            void* record_data = farload::Far_Reload_Next_Data_(help_lbx_name, 0, _textbox_seg, help_idx, 1, sizeof(s_help_record));
             
-            memcpy(&records[count], record_data, 1403);
+            memcpy(&records[count], record_data, sizeof(s_help_record));
 
             FMTPARA::Get_Formatted_Paragraph_Max_Height_(0x153, records[count].body);
             allocate::Pop_Block_(_textbox_seg);

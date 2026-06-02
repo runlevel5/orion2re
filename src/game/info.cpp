@@ -907,10 +907,10 @@ namespace INFO {
                     uint8_t tech_app_id = _g_selected_list_p->tech_app_ids[_g_selected_list_p->current_app_index];
 
                     TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
-                    farload::Far_Reload_Data_(help_lbx_name, 0, text_buffer, tech_app_id, 1, 1403 /*0x57b*/);
+                    farload::Far_Reload_Data_(help_lbx_name, 0, text_buffer, tech_app_id, 1, sizeof(s_help_record));
 
                     fonts::Set_Font_Style_(2, &_info_normal_color);
-                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(2, 4, 173, static_cast<char*>(text_buffer) + 103, 0, _g_bitmap1_p);
+                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(2, 4, 173, static_cast<s_help_record*>(text_buffer)->body, 0, _g_bitmap1_p);
 
                     _g_selected_app_id = tech_app_id;
                     fonts::Set_Font_Style_(4, &_info_normal_color);
@@ -1109,13 +1109,13 @@ namespace INFO {
                 timer::Mark_Time_();
                 if (INFO::_g_list_update_needed != 0) {
                     bitmap::Create_Blank_Bitmap_(190, 314, INFO::_g_bitmap1_p);
-                    char* data = (char*)farload::Far_Reload_Data_(lbx_name, 0, out_buffer, record_offsets[INFO::_g_selected_list_p->group_id], 1, 1403 /* 0x57B */);
+                    s_help_record* data = static_cast<s_help_record*>(farload::Far_Reload_Data_(lbx_name, 0, out_buffer, record_offsets[INFO::_g_selected_list_p->group_id], 1, sizeof(s_help_record)));
 
                     fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
-                    BILL::Print_1_Or_More_Lines_Centered_To_Bitmap_(0, 24, 186, data, INFO::_g_bitmap1_p);
+                    BILL::Print_1_Or_More_Lines_Centered_To_Bitmap_(0, 24, 186, data->title, INFO::_g_bitmap1_p);
 
                     fonts::Set_Font_Style_(3, &INFO::_info_normal_color);
-                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 64, 186, data + 103 /* 0x67 */, 3, INFO::_g_bitmap1_p);
+                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 64, 186, data->body, 3, INFO::_g_bitmap1_p);
                 }
 
                 short input = fields::Get_Input_();
@@ -1913,18 +1913,18 @@ namespace INFO {
     int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** turn_summary_data_ptrs, int16_t param_2) {
         char help_lbx_name[20];
         char title_combined[80];
-        char* loaded_help_text;
+        s_help_record* loaded_help_text;
         int16_t input_code;
 
         TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
         INFO::Draw_Multiple_Drop_Areas_(INFO::_how_to_drops, 2);
 
-        loaded_help_text = (char*)farload::Far_Reload_Next_Data_(
-            help_lbx_name, 0, MOX::_screen_seg, (int32_t)INFO::_g_reference_ix, 1, 0x57B
-        );
+        loaded_help_text = static_cast<s_help_record*>(farload::Far_Reload_Next_Data_(
+            help_lbx_name, 0, MOX::_screen_seg, (int32_t)INFO::_g_reference_ix, 1, sizeof(s_help_record)
+        ));
 
         JIM::Get_Text_Message_(s_billtext_lbx, 13, title_combined, 80);
-        strcat(title_combined, loaded_help_text);
+        strcat(title_combined, loaded_help_text->title);
 
         fonts::Print_Centered_(414, 67, title_combined);
 
@@ -1932,7 +1932,7 @@ namespace INFO {
             fonts::Set_Font_Style_(3, &INFO::_info_normal_color);
         }
 
-        FMTPARA::Print_Formatted_Paragraph_(224, 99, 381, loaded_help_text + 0x67, 3);
+        FMTPARA::Print_Formatted_Paragraph_(224, 99, 381, loaded_help_text->body, 3);
 
         video::Copy_Off_To_Back_();
 

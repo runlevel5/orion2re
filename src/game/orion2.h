@@ -2227,6 +2227,21 @@ struct s_help_box {
     int16_t y2;
 };
 
+typedef struct s_help_record s_help_record, *Ps_help_record;
+
+#pragma pack(push, 1)
+struct s_help_record {
+    char title[84];
+    char anim_lbx[10];
+    uint32_t anim_info;
+    uint8_t unknown_0x62;
+    uint32_t next_help_idx;
+    char body[1300];
+};
+#pragma pack(pop)
+
+static_assert(sizeof(s_help_record) == 0x57b, "s_help_record size mismatch");
+
 typedef struct s_help_topic_record s_help_topic_record, *Ps_help_topic_record;
 
 struct s_help_topic_record {

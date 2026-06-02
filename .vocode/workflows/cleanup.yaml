@@ -55,6 +55,7 @@ workflows:
              - Treat most cleanup adjustments for paired `.h` and `.cpp` files as hand-in-hand changes.
              - Only analyze a single file by itself when no same-basename companion exists.
              - Do not re-process reviewed units unless the user explicitly requests it or new contradictory evidence appears.
+             - Immediately save the `progress.md` file to reserve file and prevent concurrent reviews.
 
           3. Suggest cleanup improvements for each reviewed unit
              - Focus only on the following improvement categories:

@@ -751,7 +751,7 @@ namespace TECH {
         void* out_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
-        char* loaded_data = (char*)farload::Far_Reload_Data_(lbx_name, 0, out_buffer, app_idx, 1, 0x57B);
+        s_help_record* loaded_data = static_cast<s_help_record*>(farload::Far_Reload_Data_(lbx_name, 0, out_buffer, app_idx, 1, sizeof(s_help_record)));
 
         int32_t cost = New_Get_Tech_Cost_(app_idx, 1, MOX::_PLAYER_NUM);
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3D, text_buffer, 0x50);
@@ -782,8 +782,8 @@ namespace TECH {
         }
         strcat(text_buffer, suffix);
 
-        sprintf(desc_buffer, _research_desc_fmt, loaded_data + 0x67, text_buffer);
-        TEXTBOX::Text_Box_(loaded_data, desc_buffer);
+        sprintf(desc_buffer, _research_desc_fmt, loaded_data->body, text_buffer);
+        TEXTBOX::Text_Box_(loaded_data->title, desc_buffer);
 
         allocate::Pop_Block_(MOX::_screen_seg);
         fields::Activate_Auto_Function_();
