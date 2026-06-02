@@ -9,30 +9,23 @@ s_coldraw_veggie_cell _veggie_list[6][6];
 uint8_t _DAT_5a7760;
 uint8_t _DAT_5a778a;
 
-void __cdecl Calculate_Squish_Step_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4) {
-    int16_t divisor = param_3;
-    int16_t base_val = param_4;
+void __cdecl Calculate_Squish_Step_(int16_t start_x, int16_t available_width, int16_t icon_count, int16_t icon_spacing) {
+    int16_t divisor = icon_count;
+    int16_t base_val = icon_spacing;
 
-    // Perform initial division of base value by -3
     int16_t intermediate = (int16_t)(base_val / -3);
+    intermediate = (intermediate - start_x) + available_width;
 
-    // Adjust intermediate value
-    intermediate = (intermediate - param_1) + param_2;
-
-    // Ensure divisor is at least 1
     if (divisor <= 1) {
         divisor = 1;
     }
 
-    // Calculate step adjustment
     int16_t step_calc = intermediate / divisor;
 
-    // Clamping calculation to minimum of 1
     if (step_calc <= 1) {
         step_calc = 1;
     }
 
-    // If calculated step is within the base value range, set squish step
     if (step_calc < base_val) {
         COLONY::_step_squish = base_val - step_calc;
     } else {
@@ -187,11 +180,11 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     video::Clip_Off_();
 }
 
-void __cdecl Draw_Colony_Prod_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6) {
-    Draw_Colony_Prod_Both_(param_1, param_2, param_3, param_4, param_5, param_6, 0);
+void __cdecl Draw_Colony_Prod_(int16_t colony_idx, int16_t prod_type, int16_t x, int16_t y, int16_t width, int16_t spacing) {
+    Draw_Colony_Prod_Both_(colony_idx, prod_type, x, y, width, spacing, 0);
 }
 
-void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, int width, char is_mini) {
+void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, int32_t width, uint8_t is_mini) {
     s_colony* colony = &MOX::_colony[colony_idx];
     int16_t morale_div2 = (int16_t)((int8_t)colony->morale / 2);
 
@@ -249,56 +242,46 @@ void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, in
     }
 }
 
-void __cdecl Draw_Info_Morale_(int16_t param_1, int16_t param_2, int16_t param_3, int32_t param_4) {
-    COLDRAW::Draw_Info_Morale_Both_(param_1, param_2, param_3, param_4, 0);
+void __cdecl Draw_Info_Morale_(int16_t colony_idx, int16_t x, int16_t y, int32_t width) {
+    COLDRAW::Draw_Info_Morale_Both_(colony_idx, x, y, width, 0);
 }
 
 void __cdecl Draw_Colony_PC_Bar_(int16_t x, int16_t y, int16_t total, int16_t current) {
     int32_t max_div = (total > 1000) ? (int32_t)total : 1000;
     int32_t capped_cur = (current < total) ? (int32_t)current : (int32_t)total;
 
-    // Calculate frame for the first animation (anim 35)
     int16_t frame1 = (int16_t)((capped_cur * 50) / max_div);
-
-    // Calculate frame for the second animation (anim 34)
-    // Note: Assembly uses ESI for this calculation and then refers to SI.
     int32_t frame2_full = ((capped_cur - (int32_t)total) * 50) / max_div + 50;
     int16_t frame2 = (int16_t)frame2_full;
 
-    // Calculate Y offset for the second animation drawing
-    // Assembly uses EDI for the first part, then modifies only DI (lower 16 bits).
-    int32_t edi_val = ((capped_cur - max_div) * 10) / max_div;
-    int16_t di_part = (int16_t)edi_val;
-    di_part += (int16_t)(((int32_t)total - capped_cur) * 64 / max_div);
-    di_part -= (int16_t)(((int32_t)total * 64) / max_div);
-
-    // Reconstruct EDI value to match register behavior
-    int32_t final_edi = (edi_val & 0xFFFF0000) | (uint16_t)di_part;
+    int32_t base_y_offset = ((capped_cur - max_div) * 10) / max_div;
+    int16_t adjusted_y_offset = (int16_t)base_y_offset;
+    adjusted_y_offset += (int16_t)(((int32_t)total - capped_cur) * 64 / max_div);
+    adjusted_y_offset -= (int16_t)(((int32_t)total * 64) / max_div);
+    int32_t combined_y_offset = (base_y_offset & 0xFFFF0000) | (uint16_t)adjusted_y_offset;
 
     graphics::Set_Window_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */);
     video::Clip_On_();
 
-    // Draw the first part of the bar
     s_animation_header* anim_35 = COLONY::C_Anims_(35 /* 0x23 */);
     animate::Set_Animation_Frame_(anim_35, (int32_t)frame1);
     anim_35 = COLONY::C_Anims_(35 /* 0x23 */);
     animate::Draw_(x, y, anim_35);
 
-    // Draw the second part of the bar at a calculated vertical offset
     s_animation_header* anim_34 = COLONY::C_Anims_(34 /* 0x22 */);
     animate::Set_Animation_Frame_(anim_34, (int32_t)frame2);
     anim_34 = COLONY::C_Anims_(34 /* 0x22 */);
 
-    // Final Y is y + offset + 10
-    int16_t y_final = (int16_t)(final_edi + (int32_t)y + 10);
+    int16_t y_final = (int16_t)(combined_y_offset + (int32_t)y + 10);
     animate::Draw_(x, y_final, anim_34);
 
     video::Clip_Off_();
 }
 
 int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
-    int16_t colony_idx, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5,
-    int16_t param_6, uint8_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10, int16_t* param_11)
+    int16_t colony_idx, int16_t job_filter, int16_t mode, int16_t left_x, int16_t top_y,
+    int16_t right_x, uint8_t show_farm_shadows, int16_t* pop_index_by_slot, int16_t* last_slot_idx_ptr,
+    int16_t* scroll_value_ptr, int16_t* scroll_field_id_ptr)
 {
     const uint8_t colony_n_pops = MOX::_colony[colony_idx].n_pops;
     int16_t pop_order[10];
@@ -315,26 +298,26 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
 
     int16_t pop_draw_index = 0;
 
-    if (param_3 != 2) {
-        Do_Colony_Info_Pop_Stuff_For_Pop_(colony_idx, param_2, 2, param_4, param_5, param_6, param_7, param_8, param_9, param_10, param_11);
+    if (mode != 2) {
+        Do_Colony_Info_Pop_Stuff_For_Pop_(colony_idx, job_filter, 2, left_x, top_y, right_x, show_farm_shadows, pop_index_by_slot, last_slot_idx_ptr, scroll_value_ptr, scroll_field_id_ptr);
     }
 
     int16_t start_idx;
     int16_t end_idx;
-    if (param_2 == -1) {
+    if (job_filter == -1) {
         start_idx = 0;
         end_idx = 3;
     } else {
-        start_idx = param_2;
-        end_idx = param_2 + 1;
+        start_idx = job_filter;
+        end_idx = job_filter + 1;
     }
 
-    if (param_3 == 0 && param_2 == 0 && MOX::_colony[colony_idx].max_farms == 0) {
+    if (mode == 0 && job_filter == 0 && MOX::_colony[colony_idx].max_farms == 0) {
         COLONY::Set_Colony_Font_To_(3);
         if (MOX::_settings.language == 1 && MOX::_current_screen == SCREEN_COLONY_SUMMARY) {
-            BILL::Squeeze_Print_Paragraph_(param_4, param_5 - 1, param_6 - param_4, 34, ESTRINGS::E_Strings_(387 /* ESTR_NO_FARMING */), 2);
+            BILL::Squeeze_Print_Paragraph_(left_x, top_y - 1, right_x - left_x, 34, ESTRINGS::E_Strings_(387 /* ESTR_NO_FARMING */), 2);
         } else {
-            BILL::Squeeze_Print_Paragraph_(param_4, param_5 + 5, param_6 - param_4, 28, ESTRINGS::E_Strings_(387 /* ESTR_NO_FARMING */), 2);
+            BILL::Squeeze_Print_Paragraph_(left_x, top_y + 5, right_x - left_x, 28, ESTRINGS::E_Strings_(387 /* ESTR_NO_FARMING */), 2);
         }
     }
 
@@ -352,36 +335,36 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
                                 if (((pop_val & 0x180) >> 7) == job_idx) {
                                     if ((pop_val & 0x200) != 0) {
                                         if (((pop_val & 0x400) >> 10) == race_idx) {
-                                            switch (param_3) {
+                                            switch (mode) {
                                                 case 0:
                                                     COLONY::Set_Colony_Font_To_(2);
                                                     if (pop_idx == COLONY::_scanned_pop && COLONY::_g_colony_n == colony_idx) {
                                                         if (ERIC::Global_Cycler_(30, 2) != 0) {
-                                                            COLONY::Draw_Pop_Dark_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, colony_idx, pop_idx);
+                                                            COLONY::Draw_Pop_Dark_((30 - COLONY::_step_squish) * pop_draw_index + left_x, top_y, colony_idx, pop_idx);
                                                             break;
                                                         }
                                                     }
                                                     {
                                                         s_animation_header *anim = COLONY::Colony_Pop_Anim_(colony_idx, pop_idx);
-                                                        animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, anim);
+                                                        animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + left_x, top_y, anim);
                                                     }
                                                     break;
 
                                                 case 1:
-                                                    param_8[pop_draw_index] = pop_idx;
+                                                    pop_index_by_slot[pop_draw_index] = pop_idx;
                                                     break;
 
                                                 case 2:
                                                     break;
 
                                                 case 3:
-                                                    if (*param_10 <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + param_4 || *param_9 == pop_draw_index) {
+                                                    if (*scroll_value_ptr <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + left_x || *last_slot_idx_ptr == pop_draw_index) {
                                                         found_match = true;
                                                     }
                                                     break;
 
                                                 case 4:
-                                                    if (mouse::Pointer_X_() <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + param_4 || *param_9 == pop_draw_index) {
+                                                    if (mouse::Pointer_X_() <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + left_x || *last_slot_idx_ptr == pop_draw_index) {
                                                         found_match = true;
                                                     }
                                                     break;
@@ -404,16 +387,16 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
     }
 
 post_loop_dispatch:
-    switch (param_3) {
+    switch (mode) {
         case 0:
-            if (param_7 != 0 && param_2 == 0) {
+            if (show_farm_shadows != 0 && job_filter == 0) {
                 const uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
                 if (max_farms != 0xff) {
                     if (pop_draw_index < (int16_t)max_farms) {
                         COLONY::Create_Shadow_Farmer_(MOX::_PLAYER_NUM);
                         while (pop_draw_index < (int16_t)max_farms) {
                             s_animation_header *anim = COLONY::Shadow_Farmer_Bitm_();
-                            animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, anim);
+                            animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + left_x, top_y, anim);
                             pop_draw_index++;
                         }
                     }
@@ -422,18 +405,18 @@ post_loop_dispatch:
             goto reset_step_squish_and_return;
 
         case 1:
-            *param_9 = pop_draw_index - 1;
-            *param_11 = fields::Add_Scroll_Field_(param_4, param_5, param_4, param_6 + 8, param_4, param_6, param_6 - param_4 + 8, 30, param_10, ESTRINGS::E_Strings_(12 /* ESTR_SCROLL_BAR_EMPTY */), 0);
+            *last_slot_idx_ptr = pop_draw_index - 1;
+            *scroll_field_id_ptr = fields::Add_Scroll_Field_(left_x, top_y, left_x, right_x + 8, left_x, right_x, right_x - left_x + 8, 30, scroll_value_ptr, ESTRINGS::E_Strings_(12 /* ESTR_SCROLL_BAR_EMPTY */), 0);
             goto reset_step_squish_and_return;
 
         case 2:
             {
                 int16_t squish_count = pop_draw_index;
                 const uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
-                if (param_7 != 0 && param_2 == 0 && max_farms != 0xff) {
+                if (show_farm_shadows != 0 && job_filter == 0 && max_farms != 0xff) {
                     squish_count = (int16_t)max_farms;
                 }
-                COLDRAW::Calculate_Squish_Step_(param_4, param_6, squish_count, 30);
+                COLDRAW::Calculate_Squish_Step_(left_x, right_x, squish_count, 30);
             }
             break;
 
@@ -442,13 +425,13 @@ post_loop_dispatch:
                 if (COLONY::_debug_flag != 0) {
                     assert::hgetch_();
                 }
-                return param_8[pop_draw_index];
+                return pop_index_by_slot[pop_draw_index];
             }
             goto reset_step_squish_and_return;
 
         case 4:
             if (found_match) {
-                return param_8[pop_draw_index];
+                return pop_index_by_slot[pop_draw_index];
             }
             goto reset_step_squish_and_return;
     }
@@ -460,10 +443,10 @@ reset_step_squish_and_return:
     return -1;
 }
 
-void __cdecl Draw_Simplest_Path_(int16_t prev_y, int16_t prev_x, int16_t local_y, int16_t local_x, uint8_t* p1, uint8_t* p2) {
+void __cdecl Draw_Simplest_Path_(int16_t previous_row, int16_t previous_col, int16_t row, int16_t col, uint8_t* first_segment_out, uint8_t* second_segment_out) {
 }
 
-void __cdecl Road_Back_To_Front_(int16_t index, int16_t* out_val1, int16_t* out_val2) {
+void __cdecl Road_Back_To_Front_(int16_t index, int16_t* row, int16_t* col) {
     uint8_t values[98] = {
         6, 6, 5, 6, 6, 5, 4, 6, 5, 5, 6, 4, 3, 6, 4, 3,
         5, 4, 6, 3, 2, 6, 3, 5, 4, 4, 5, 3, 6, 2, 1, 6,
@@ -474,8 +457,8 @@ void __cdecl Road_Back_To_Front_(int16_t index, int16_t* out_val1, int16_t* out_
         0, 0
     };
 
-    *out_val1 = values[index * 2];
-    *out_val2 = values[index * 2 + 1];
+    *row = values[index * 2];
+    *col = values[index * 2 + 1];
 }
 
 void __cdecl Draw_Road_List_() {
@@ -490,11 +473,11 @@ void __cdecl Draw_Road_List_() {
             uint8_t dir = draw_order[j];
 
             if (_road_list[y][x].connections[dir] != 0) {
-                s_animation_header* anim = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
+                s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(
                     COLONY::_COLROADS_LBX,
                     _road_list[y][x].anims[dir],
                     MOX::_global_cache_seg
-                ));
+                );
 
                 animate::Draw_(0, 0, anim);
             }
@@ -593,10 +576,10 @@ void __cdecl Build_Road_List_Based_On_Bldg_List_() {
     }
 }
 
-int16_t __cdecl Pick_Random_Road_At_And_Around_CR_(int16_t* x, int16_t* y, int16_t* conn_idx, int16_t search_count) {
-    int16_t best_x = *x;
-    int16_t best_y = *y;
-    int16_t best_conn = *conn_idx;
+int16_t __cdecl Pick_Random_Road_At_And_Around_CR_(int16_t* row, int16_t* col, int16_t* connection_idx, int16_t search_count) {
+    int16_t best_row = *row;
+    int16_t best_col = *col;
+    int16_t best_connection = *connection_idx;
     int16_t match_count = 0;
 
     const uint8_t offsets[12] = {
@@ -612,31 +595,31 @@ int16_t __cdecl Pick_Random_Road_At_And_Around_CR_(int16_t* x, int16_t* y, int16
         uint8_t dy = offsets[base_idx + 1];
         uint8_t dconn = offsets[base_idx + 2];
 
-        int16_t new_x = *x + dx;
-        int16_t new_y = *y + dy;
+        int16_t new_row = *row + dx;
+        int16_t new_col = *col + dy;
 
-        if (_road_list[new_x][new_y].connections[dconn] == *conn_idx) {
+        if (_road_list[new_row][new_col].connections[dconn] == *connection_idx) {
             match_count++;
             if (random::Random_(match_count) == 1) {
-                best_x = new_x;
-                best_y = new_y;
-                best_conn = dconn;
+                best_row = new_row;
+                best_col = new_col;
+                best_connection = dconn;
             }
         }
     }
 
-    *x = best_x;
-    *y = best_y;
-    *conn_idx = best_conn;
+    *row = best_row;
+    *col = best_col;
+    *connection_idx = best_connection;
 
     return match_count;
 }
 
-uint8_t __cdecl Do_Pick_Random_Road_At_And_Around_CR_(int16_t* c, int16_t* r, int16_t* param_3) {
-    return (uint8_t)Pick_Random_Road_At_And_Around_CR_(c, r, param_3, 4);
+uint8_t __cdecl Do_Pick_Random_Road_At_And_Around_CR_(int16_t* row, int16_t* col, int16_t* connection_idx) {
+    return (uint8_t)Pick_Random_Road_At_And_Around_CR_(row, col, connection_idx, 4);
 }
 
-int16_t __cdecl N_Roads_Around_CR_(int16_t x, int16_t y) {
+int16_t __cdecl N_Roads_Around_CR_(int16_t row, int16_t col) {
     uint8_t offsets[4][3] = {
         {0, 0, 0},
         {0, 0, 1},
@@ -646,11 +629,11 @@ int16_t __cdecl N_Roads_Around_CR_(int16_t x, int16_t y) {
 
     int16_t count = 0;
     for (int16_t i = 0; i < 4; i++) {
-        int16_t check_x = x + offsets[i][0];
-        int16_t check_y = y + offsets[i][1];
+        int16_t check_row = row + offsets[i][0];
+        int16_t check_col = col + offsets[i][1];
         uint8_t dir = offsets[i][2];
 
-        if (_road_list[check_x][check_y].connections[dir] != 0) {
+        if (_road_list[check_row][check_col].connections[dir] != 0) {
             count++;
         }
     }
@@ -701,7 +684,7 @@ void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
 
             for (int16_t sprite_index = 0; sprite_index < 2; ++sprite_index) {
                 COLDRAW::_veggie_list[row][col].sprites[sprite_index].draw_flag =
-                        static_cast<uint16_t>(random::Random_(3) == 1);
+                        (uint16_t)(random::Random_(3) == 1);
 
                 if (COLDRAW::_veggie_list[row][col].sprites[sprite_index].draw_flag == 0) {
                     continue;
@@ -722,13 +705,13 @@ void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
                 screen_x -= animate::Get_Width_(animation) / 2;
                 screen_x += COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 0);
                 COLDRAW::_veggie_list[row][col].sprites[sprite_index].screen_x =
-                        static_cast<int16_t>(screen_x);
+                        (int16_t)screen_x;
 
                 int32_t screen_y = random::Random_(animate::Get_Height_(animation));
                 screen_y -= animate::Get_Height_(animation) / 4;
                 screen_y += COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 1);
                 COLDRAW::_veggie_list[row][col].sprites[sprite_index].screen_y =
-                        static_cast<int16_t>(screen_y);
+                        (int16_t)screen_y;
             }
         }
     }
@@ -738,7 +721,7 @@ void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t
     Draw_Colony_Prod_Both_(colony_idx, prod_idx, x, y, width, height, 1);
 }
 
-void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int width) {
+void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int32_t width) {
     Draw_Info_Morale_Both_(colony_idx, x, y, width, 1);
 }
 
@@ -756,7 +739,7 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
     s_coldraw_veggie_cell& veggie_cell = COLDRAW::_veggie_list[row_idx][col_idx];
     const uint16_t initial_pass_count = draw_pass_count;
 
-    for (int16_t remaining_passes = static_cast<int16_t>(initial_pass_count);
+    for (int16_t remaining_passes = (int16_t)initial_pass_count;
          remaining_passes >= 0;
          --remaining_passes) {
         for (int16_t sprite_idx = 0; sprite_idx < 2; ++sprite_idx) {
@@ -765,7 +748,7 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
                 video::Clip_On_();
 
                 if (draw_pass_count != 0 &&
-                    initial_pass_count == static_cast<uint16_t>(remaining_passes)) {
+                    initial_pass_count == (uint16_t)remaining_passes) {
                     s_animation_header* animation =
                         (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
                                        veggie_cell.anim_entries[sprite_idx],
@@ -789,16 +772,16 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
     }
 }
 
-int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_index, int16_t row, int16_t col) {
-    int32_t random_entry = static_cast<int16_t>(random::Random_(8) - 1);
-    int32_t veggie_type = static_cast<int16_t>(COLDRAW::Veggie_Type_For_Colony_(colony_index));
+int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_idx, int16_t row, int16_t col) {
+    int32_t random_entry = (int16_t)(random::Random_(8) - 1);
+    int32_t veggie_type = (int16_t)COLDRAW::Veggie_Type_For_Colony_(colony_idx);
 
-    random_entry -= (static_cast<int32_t>(row) + static_cast<int32_t>(col)) / 2;
+    random_entry -= ((int32_t)row + (int32_t)col) / 2;
     if (random_entry <= 0) {
         random_entry = 0;
     }
 
-    return static_cast<int16_t>(random_entry + veggie_type * 8);
+    return (int16_t)(random_entry + veggie_type * 8);
 }
 
 int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {

@@ -7,11 +7,7 @@ namespace COLLAND {
     int32_t _pod2l_sfx;
     int32_t _pod1d_sfx;
     int16_t _fields;
-    const char s_format_comma_space[] = "%s, %s";
 
-    /**
-     * @address 00429f50
-     */
     void __cdecl Print_Planet_Data_(int16_t planet_idx) {
         char buffer[500];
         s_planet_data* planet = &MOX::_planet[planet_idx];
@@ -46,14 +42,14 @@ namespace COLLAND {
             climate_str = MOX::_planet_climate_string[(uint8_t)MOX::_colony[planet->colony_index].climate];
         }
 
-        const char* fmt_size_climate;
+        const char* size_climate_fmt;
         if (MOX::_settings.language == 4) {
-            fmt_size_climate = s_format_comma_space;
+            size_climate_fmt = "%s, %s";
         } else {
-            fmt_size_climate = ESTRINGS::E_Strings_(0x2d /* ESTR_S_S */);
+            size_climate_fmt = ESTRINGS::E_Strings_(0x2d /* ESTR_S_S */);
         }
 
-        sprintf(buffer, fmt_size_climate, size_str, climate_str);
+        sprintf(buffer, size_climate_fmt, size_str, climate_str);
         BILL::_Print_Paragraph_(0x14, 0x3c, 0x26b, buffer, 0);
 
         int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
@@ -76,9 +72,6 @@ namespace COLLAND {
         }
     }
 
-    /**
-     * @address 00429d40
-     */
     void __cdecl Load_Anims_() {
         COLLAND::_l_anims = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLONY_LBX, 6, MOX::_screen_seg);
     }
@@ -98,9 +91,6 @@ namespace COLLAND {
         );
     }
 
-    /**
-     * @address 00429da0
-     */
     void __cdecl Draw_Colony_Landing_Screen_() {
         char buffer[500];
 
@@ -118,8 +108,8 @@ namespace COLLAND {
             COLONY::Set_Colony_Font_To_(4);
 
             char* planet_name = HACCESS::Get_Planet_Name_((int16_t)COLONY::_planet_handle);
-            char* format = ESTRINGS::E_Strings_(0xE5 /* ESTR_COLONY_BUILT_ON_S */);
-            sprintf(buffer, format, planet_name);
+            char* title_fmt = ESTRINGS::E_Strings_(0xE5 /* ESTR_COLONY_BUILT_ON_S */);
+            sprintf(buffer, title_fmt, planet_name);
             fonts::Print_Centered_(0x13F, 10, buffer);
 
             if (COLONY::_full_draw != 0) {
@@ -160,9 +150,6 @@ namespace COLLAND {
         }
     }
 
-    /**
-     * @address 00429a90
-     */
     void __cdecl Colony_Landing_Screen_() {
         MOX2::action_func_t saved_auto_fn;
         int16_t input_result;

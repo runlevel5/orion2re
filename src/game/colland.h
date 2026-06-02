@@ -9,14 +9,17 @@ namespace COLLAND {
     extern int32_t _pod1d_sfx;
     extern int16_t _fields;
 
-    extern const char s_format_comma_space[];
-
+    /** Loads the landing-screen animation sequence from the colony LBX. */
     void __cdecl Load_Anims_();
+    /** Registers the hidden full-screen input field used by the landing screen. */
     void Add_Fields_();
 
+    /** Draws and updates the colony landing animation screen and related UI text. */
     void __cdecl Draw_Colony_Landing_Screen_();
 
+    /** Prints the selected planet's summary text for the landing screen. */
     void __cdecl Print_Planet_Data_(int16_t planet_idx);
 
+    /** Runs the colony landing screen loop, including palette setup, animation, and exit handling. */
     void __cdecl Colony_Landing_Screen_();
 }

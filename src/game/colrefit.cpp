@@ -10,29 +10,27 @@ namespace COLREFIT {
     s_animation_header* _anims[4];
     int16_t _scanned_ship_d_index = -1;
     int16_t _lscanned_field = -1000;
-    const char s_refitpup_LBX_00558394[13] = "refitpup.LBX";
     int16_t* _g_ship_field_list_ptr;
     MOX2::action_func_t _saved_autofunction;
     int16_t* _g_ship_list_ptr;
     int16_t _n_ships_in_list;
     int16_t _g_ship_n;
     s_scroll_state* _g_scroll_ptr;
-    char s_colon_005583a4[2] = ":";
 
-    void __cdecl Update_First_Ship_(int16_t* param_1, int16_t* param_2) {
-        int16_t sVar1 = ((_n_ships_in_list + 5) / 5) * 5;
+    void __cdecl Update_First_Ship_(int16_t* first_ship_ptr, int16_t* slider_pos_ptr) {
+        int16_t rounded_ship_count = ((_n_ships_in_list + 5) / 5) * 5;
 
-        if (sVar1 < 15) {
-            *param_2 = -1;
-            *param_1 = 0;
+        if (rounded_ship_count < 15) {
+            *slider_pos_ptr = -1;
+            *first_ship_ptr = 0;
             return;
         }
 
-        if ((sVar1 - *param_2) - *param_1 != 15) {
+        if ((rounded_ship_count - *slider_pos_ptr) - *first_ship_ptr != 15) {
             COLONY::_full_draw = 1;
-            sVar1 = (sVar1 - *param_2) - 15;
-            *param_1 = sVar1;
-            *param_1 = (sVar1 / 5) * 5;
+            rounded_ship_count = (rounded_ship_count - *slider_pos_ptr) - 15;
+            *first_ship_ptr = rounded_ship_count;
+            *first_ship_ptr = (rounded_ship_count / 5) * 5;
             _slider_bar_position = (((_n_ships_in_list + 5) / 5) - 3) * 5 - _first_ship;
         }
     }
@@ -61,14 +59,14 @@ namespace COLREFIT {
     }
 
     int16_t __cdecl Colony_Refit_Popup_() {
-        int16_t scan_code;
-        int16_t input_id;
+        int16_t hovered_field_id;
+        int16_t selected_field_id;
         s_scroll_state scroll_data = {0};
         int16_t ship_field_list[500];
         int16_t ship_list[500];
-        int16_t eval_result = 0;
+        int16_t popup_result = 0;
 
-        input_id = 0;
+        selected_field_id = 0;
 
         _g_scroll_ptr = &scroll_data;
         _g_ship_list_ptr = ship_list;
@@ -86,7 +84,7 @@ namespace COLREFIT {
         
         Load_Refit_Ship_Anims_();
         
-        MOX2::Get_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+        MOX2::Get_Auto_Function_(&_saved_autofunction);
         fields::Deactivate_Auto_Function_();
         fields::Assign_Auto_Function_(Draw_Refit_Popup_, 1);
         
@@ -101,12 +99,12 @@ namespace COLREFIT {
         COLONY::_full_draw = 1;
         
         do {
-            input_id = fields::Get_Input_();
-            scan_code = fields::Scan_Input_();
+            selected_field_id = fields::Get_Input_();
+            hovered_field_id = fields::Scan_Input_();
             
             Draw_Refit_Popup_();
             
-            eval_result = Evaluate_Input_(&input_id, &scan_code);
+            popup_result = Evaluate_Input_(&selected_field_id, &hovered_field_id);
             
             RUSS::Mox_Sync_Update_();
         } while (_esc == 0);
@@ -115,20 +113,20 @@ namespace COLREFIT {
         fields::Deactivate_Help_List_();
         fields::Deactivate_Auto_Function_();
         
-        MOX2::Put_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+        MOX2::Put_Auto_Function_(&_saved_autofunction);
         
         video::Copy_Back_To_Off_();
         
         allocate::Pop_Block_(MOX::_screen_seg);
         video::Clip_Off_();
         
-        return eval_result;
+        return popup_result;
     }
 
     int16_t __cdecl Colony_Refit2_Popup_(int16_t ship_idx) {
         int16_t match_count = 0;
-        int16_t get_input = 0;
-        int16_t scan_input;
+        int16_t selected_field_id = 0;
+        int16_t hovered_field_id;
         s_scroll_state scroll_data = {0};
         int16_t ship_field_list[500];
         int16_t ship_list[500];
@@ -138,8 +136,8 @@ namespace COLREFIT {
         _g_ship_list_ptr = ship_list;
         _g_ship_field_list_ptr = ship_field_list;
 
-        for (int i = 0; i < 5; ++i) {
-            if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[i].size == MOX::_ship[ship_idx].d.size) {
+        for (int16_t design_idx = 0; design_idx < 5; ++design_idx) {
+            if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size == MOX::_ship[ship_idx].d.size) {
                 match_count++;
             }
         }
@@ -154,7 +152,7 @@ namespace COLREFIT {
 
         Load_Refit2_Ship_Anims_();
 
-        MOX2::Get_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+        MOX2::Get_Auto_Function_(&_saved_autofunction);
         fields::Deactivate_Auto_Function_();
         fields::Assign_Auto_Function_(Draw_Refit2_Popup_, 1);
         Do_Add2_Fields_();
@@ -165,28 +163,28 @@ namespace COLREFIT {
         video::Set_Refresh_Stencil_();
         COLONY::_full_draw = 1;
 
-        int16_t result = 0;
+        int16_t popup_result = 0;
         do {
-            get_input = fields::Get_Input_();
-            scan_input = fields::Scan_Input_();
+            selected_field_id = fields::Get_Input_();
+            hovered_field_id = fields::Scan_Input_();
             Draw_Refit2_Popup_();
-            result = Evaluate2_Input_(&get_input, &scan_input);
+            popup_result = Evaluate2_Input_(&selected_field_id, &hovered_field_id);
             RUSS::Mox_Sync_Update_();
         } while (_esc == 0);
 
         fields::Clear_Fields_();
         fields::Deactivate_Help_List_();
         fields::Deactivate_Auto_Function_();
-        MOX2::Put_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+        MOX2::Put_Auto_Function_(&_saved_autofunction);
 
         video::Copy_Back_To_Off_();
         allocate::Pop_Block_(MOX::_screen_seg);
         video::Clip_Off_();
 
-        return result;
+        return popup_result;
     }
 
-    int16_t __cdecl Evaluate_Input_(int16_t* action_field, int16_t* hover_field) {
+    int16_t __cdecl Evaluate_Input_(int16_t* selected_field_id, int16_t* hovered_field_id) {
         char text[500];
 
         COLREFIT::_scanned_ship_index = -1;
@@ -194,7 +192,7 @@ namespace COLREFIT {
         for (int16_t i = 0; i < 15; i++) {
             int16_t ship_idx = COLREFIT::_g_ship_list_ptr[COLREFIT::_first_ship + i];
 
-            if (COLREFIT::_g_ship_field_list_ptr[i] == *action_field && ship_idx != -1) {
+            if (COLREFIT::_g_ship_field_list_ptr[i] == *selected_field_id && ship_idx != -1) {
                 if (MOX::_ship[ship_idx].d.picture_num == 44) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(0x23F));
                     COLONY::_full_draw = 1;
@@ -234,13 +232,14 @@ namespace COLREFIT {
 
         for (int16_t i = 0; i < 15; i++) {
             int16_t ship_idx = COLREFIT::_g_ship_list_ptr[COLREFIT::_first_ship + i];
-            if (COLREFIT::_g_ship_field_list_ptr[i] == *hover_field && ship_idx != -1) {
+            if (COLREFIT::_g_ship_field_list_ptr[i] == *hovered_field_id && ship_idx != -1) {
                 ERIC::Pulsing_Box_((i % 5) * 60 + 161, (i / 5) * 61 + 49, 55, 56, 1, 1, 2);
                 COLREFIT::_scanned_ship_index = COLREFIT::_first_ship + i;
             }
         }
 
-        if (*action_field == _fields[1] && COLREFIT::_g_ship_list_ptr[COLREFIT::_first_ship + 15] != -1) {
+        int32_t next_page_ship_index = COLREFIT::_first_ship + 15;
+        if (*selected_field_id == _fields[1] && next_page_ship_index < 500 && COLREFIT::_g_ship_list_ptr[next_page_ship_index] != -1) {
             int32_t next_first = COLREFIT::_first_ship + 5;
             if (next_first > 499) {
                 next_first = 500;
@@ -251,7 +250,7 @@ namespace COLREFIT {
             COLREFIT::Update_First_Ship_(&COLREFIT::_first_ship, &COLREFIT::_slider_bar_position);
         }
 
-        if (*action_field == _fields[2]) {
+        if (*selected_field_id == _fields[2]) {
             int32_t next_first = COLREFIT::_first_ship - 5;
             if (next_first <= 0) {
                 next_first = 0;
@@ -262,7 +261,7 @@ namespace COLREFIT {
             COLONY::_full_draw = 1;
         }
 
-        if (*action_field == _fields[3]) {
+        if (*selected_field_id == _fields[3]) {
             COLREFIT::_esc = 1;
         }
 
@@ -300,7 +299,6 @@ namespace COLREFIT {
     }
 
     void __cdecl Draw_Refit_Popup_() {
-        // TODO: This is a fix to correct locked up popup
         COLONY::_full_draw = 1;
         if (COLONY::_full_draw == 0) {
             Draw_Bar_Indicator_();
@@ -325,17 +323,17 @@ namespace COLREFIT {
     }
 
     void __cdecl Load_Refit_Ship_Anims_() {
-        _anims[0] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 0, MOX::_screen_seg));
-        _anims[2] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 1, MOX::_screen_seg));
-        _anims[1] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 2, MOX::_screen_seg));
-        _anims[3] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 3, MOX::_screen_seg));
+        _anims[0] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 0, MOX::_screen_seg);
+        _anims[2] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 1, MOX::_screen_seg);
+        _anims[1] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 2, MOX::_screen_seg);
+        _anims[3] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 3, MOX::_screen_seg);
     }
 
     void __cdecl Load_Refit2_Ship_Anims_() {
-        _anims[0] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 4, MOX::_screen_seg));
-        _anims[2] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 1, MOX::_screen_seg));
-        _anims[1] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 2, MOX::_screen_seg));
-        _anims[3] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 3, MOX::_screen_seg));
+        _anims[0] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 4, MOX::_screen_seg);
+        _anims[2] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 1, MOX::_screen_seg);
+        _anims[1] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 2, MOX::_screen_seg);
+        _anims[3] = (s_animation_header*)farload::Far_Reload_Next_("refitpup.LBX", 3, MOX::_screen_seg);
     }
 
     void __cdecl Show_Ship_Design_(s_ship_design* design) {
@@ -392,15 +390,15 @@ namespace COLREFIT {
     }
 
     void __cdecl Add_Ship_List_Fields_() {
-        for (int16_t i = 0; i < 15; ++i) {
-            if (_g_ship_list_ptr[i] == -1) {
-                _g_ship_field_list_ptr[i] = -1000;
+        for (int16_t slot_idx = 0; slot_idx < 15; ++slot_idx) {
+            if (_g_ship_list_ptr[slot_idx] == -1) {
+                _g_ship_field_list_ptr[slot_idx] = -1000;
             } else {
-                int y_offset = (i / 5) * 61;
-                int x_offset = (i % 5) * 60;
+                int32_t y_offset = (slot_idx / 5) * 61;
+                int32_t x_offset = (slot_idx % 5) * 60;
                 char* hotkey = ESTRINGS::E_Strings_(12);
 
-                _g_ship_field_list_ptr[i] = fields::Add_Hidden_Field_(
+                _g_ship_field_list_ptr[slot_idx] = fields::Add_Hidden_Field_(
                     x_offset + 161,
                     y_offset + 49,
                     x_offset + 216,
@@ -416,8 +414,8 @@ namespace COLREFIT {
         Update_First_Ship_(&_first_ship, &_slider_bar_position);
 
         if (_n_ships_in_list >= 15) {
-            int y1 = (_first_ship * 335) / _n_ships_in_list + 69;
-            int y2 = ((_first_ship + 15) * 335) / (((_n_ships_in_list + 5) / 5) * 5) + 69;
+            int32_t y1 = (_first_ship * 335) / _n_ships_in_list + 69;
+            int32_t y2 = ((_first_ship + 15) * 335) / (((_n_ships_in_list + 5) / 5) * 5) + 69;
 
             graphics::Fill_(0x1d4, y1, 0x1de, y2, 0xe5);
 
@@ -433,11 +431,11 @@ namespace COLREFIT {
         }
     }
 
-    void __cdecl Draw_Ship2_(int16_t ship_idx, int16_t position_idx) {
-        int16_t y = (position_idx / 5) * 61;
-        int16_t x = (position_idx % 5) * 60;
+    void __cdecl Draw_Ship2_(int16_t ship_idx, int16_t slot_idx) {
+        int16_t y_offset = (slot_idx / 5) * 61;
+        int16_t x_offset = (slot_idx % 5) * 60;
 
-        COLONY::Remap_Draw_Ship_Centered_(x + 188, y + 77, ship_idx);
+        COLONY::Remap_Draw_Ship_Centered_(x_offset + 188, y_offset + 77, ship_idx);
 
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
         int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
@@ -445,27 +443,24 @@ namespace COLREFIT {
         if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[colony_idx], -100 - ship_idx)) {
             COLONY::Set_Colony_Font_To_Red_(1, 1);
             char* text = ESTRINGS::E_Strings_(0x18B);
-            BILL::Squeeze_Paragraph_Centered_(x + 161, y + 49, 55, 56, text, 2);
+            BILL::Squeeze_Paragraph_Centered_(x_offset + 161, y_offset + 49, 55, 56, text, 2);
             return;
         }
 
         if (MOX::_ship[ship_idx].d.previous_owner != MOX::_PLAYER_NUM) {
             COLONY::Set_Colony_Font_To_Red_(1, 1);
             char* text = ESTRINGS::E_Strings_(0xD8);
-            BILL::Squeeze_Paragraph_Centered_(x + 161, y + 49, 55, 56, text, 2);
+            BILL::Squeeze_Paragraph_Centered_(x_offset + 161, y_offset + 49, 55, 56, text, 2);
             return;
         }
 
         if (MOX::_ship[ship_idx].d.picture_num == 44) {
             COLONY::Set_Colony_Font_To_Red_(1, 1);
             char* text = ESTRINGS::E_Strings_(0x16A);
-            BILL::Squeeze_Paragraph_Centered_(x + 161, y + 49, 55, 56, text, 2);
+            BILL::Squeeze_Paragraph_Centered_(x_offset + 161, y_offset + 49, 55, 56, text, 2);
         }
     }
 
-    /**
-     * @address 004a17e0
-     */
     void __cdecl Scan_Ship_Info_(int16_t ship_idx) {
         char buffer[10000];
 
@@ -489,11 +484,11 @@ namespace COLREFIT {
         char buffer[476];
         int16_t player_num = MOX::_PLAYER_NUM;
 
-        for (int16_t i = 0; i < 5; ++i) {
+        for (int16_t design_idx = 0; design_idx < 5; ++design_idx) {
             int32_t font_color = 0;
 
-            if (MOX::_player[player_num].ship_designs[i].size == MOX::_ship[_g_ship_n].d.size) {
-                if (_fields[5 + i] == _lscanned_field) {
+            if (MOX::_player[player_num].ship_designs[design_idx].size == MOX::_ship[_g_ship_n].d.size) {
+                if (_fields[5 + design_idx] == _lscanned_field) {
                     font_color = 1;
                 }
                 font_color++;
@@ -502,18 +497,18 @@ namespace COLREFIT {
             COLONY::Set_Colony_Font_To_Reg_Blue_(4, font_color);
 
             char* empty_str = ESTRINGS::E_Strings_(12);
-            char* selection_name = COLBLDG::Selection_Name_(-50 - i);
+            char* selection_name = COLBLDG::Selection_Name_(-50 - design_idx);
 
             if (strcmp(selection_name, empty_str) != 0) {
-                int32_t y = ((179 * (i + 1)) / 8) + 49;
+                int32_t y = ((179 * (design_idx + 1)) / 8) + 49;
 
-                char* name_to_print = COLBLDG::Selection_Name_(-50 - i);
+                char* name_to_print = COLBLDG::Selection_Name_(-50 - design_idx);
                 fonts::Print_(183, (int16_t)y, name_to_print);
 
-                char* hull_name = TECHDATA::_hull_data[MOX::_player[player_num].ship_designs[i].size].name;
+                char* hull_name = TECHDATA::_hull_data[MOX::_player[player_num].ship_designs[design_idx].size].name;
                 fonts::Print_Right_(457, (int16_t)y, hull_name);
 
-                fonts::Print_Centered_(320, (int16_t)y, s_colon_005583a4);
+                fonts::Print_Centered_(320, (int16_t)y, ":");
             }
         }
 
@@ -535,22 +530,22 @@ namespace COLREFIT {
         fonts::Print_Centered_(320, 20, buffer);
     }
 
-    int16_t __cdecl Evaluate2_Input_(int16_t* get_input, int16_t* scan_input) {
+    int16_t __cdecl Evaluate2_Input_(int16_t* selected_field_id, int16_t* hovered_field_id) {
         char buffer[500];
 
         _scanned_ship_d_index = -1;
         _lscanned_field = -1000;
 
-        for (int16_t i = 0; i < 5; i++) {
-            if (_fields[i + 5] == *scan_input) {
-                _lscanned_field = *scan_input;
-                _scanned_ship_d_index = i;
+        for (int16_t design_idx = 0; design_idx < 5; design_idx++) {
+            if (_fields[design_idx + 5] == *hovered_field_id) {
+                _lscanned_field = *hovered_field_id;
+                _scanned_ship_d_index = design_idx;
             }
-            if (*get_input == _fields[i + 5]) {
-                if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[i].size == MOX::_ship[_g_ship_n].d.size) {
+            if (*selected_field_id == _fields[design_idx + 5]) {
+                if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size == MOX::_ship[_g_ship_n].d.size) {
                     struct_::Copy_Structure_(
                         &MOX::_player[MOX::_PLAYER_NUM].ship_designs[5],
-                        &MOX::_player[MOX::_PLAYER_NUM].ship_designs[i],
+                        &MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx],
                         sizeof(s_ship_design)
                     );
                     MOX::_temp_star_handle = 5;
@@ -560,34 +555,34 @@ namespace COLREFIT {
                 GENDRAW::Help_(ESTRINGS::E_Strings_(0x323));
                 _esc = 0;
             }
-            if (*get_input + _fields[i + 5] == 0) {
+            if (*selected_field_id + _fields[design_idx + 5] == 0) {
                 sprintf(
                     buffer,
                     ESTRINGS::E_Strings_(0x324),
                     &MOX::_ship[_g_ship_n],
-                    &MOX::_player[MOX::_PLAYER_NUM].ship_designs[i]
+                    &MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx]
                 );
                 TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x325), buffer);
             }
         }
 
-        if (_fields[11] == *scan_input) {
-            _lscanned_field = *scan_input;
+        if (_fields[11] == *hovered_field_id) {
+            _lscanned_field = *hovered_field_id;
         }
-        if (*get_input == _fields[11]) {
+        if (*selected_field_id == _fields[11]) {
             _esc = 1;
             return -2;
         }
-        if (*get_input + _fields[11] == 0) {
+        if (*selected_field_id + _fields[11] == 0) {
             TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x326), ESTRINGS::E_Strings_(0x327));
         }
-        if (*get_input == _fields[3]) {
+        if (*selected_field_id == _fields[3]) {
             _esc = 1;
         }
-        if (*get_input + _fields[0] == 0) {
+        if (*selected_field_id + _fields[0] == 0) {
             TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x328), ESTRINGS::E_Strings_(0x329));
         }
-        if (*get_input + _fields[3] == 0) {
+        if (*selected_field_id + _fields[3] == 0) {
             TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x32a), ESTRINGS::E_Strings_(0x32b));
         }
         if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
@@ -607,15 +602,15 @@ namespace COLREFIT {
             0x28
         );
 
-        for (int i = 0; i < 5; ++i) {
-            if (strcmp(ESTRINGS::E_Strings_(0xC), COLBLDG::Selection_Name_(-50 - i)) == 0) {
-                _fields[5 + i] = -1000;
+        for (int16_t design_idx = 0; design_idx < 5; ++design_idx) {
+            if (strcmp(ESTRINGS::E_Strings_(0xC), COLBLDG::Selection_Name_(-50 - design_idx)) == 0) {
+                _fields[5 + design_idx] = -1000;
             } else {
-                _fields[5 + i] = fields::Add_Hidden_Field_(
+                _fields[5 + design_idx] = fields::Add_Hidden_Field_(
                     0xA1, 
-                    ((i + 1) * 179) / 8 + 49, 
+                    ((design_idx + 1) * 179) / 8 + 49, 
                     0x1DE, 
-                    ((i + 2) * 179) / 8 + 48, 
+                    ((design_idx + 2) * 179) / 8 + 48, 
                     ESTRINGS::E_Strings_(0xC), 
                     0x29
                 );

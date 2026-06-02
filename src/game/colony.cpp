@@ -680,15 +680,15 @@ namespace COLONY {
         timer::Release_Time_(2);
     }
 
-    int __cdecl Draw_Colony_Info_Military_For_(int param_1, int param_2, int param_3) {
-        return COLONY::Do_Colony_Info_Military_Stuff_For_(param_1, param_2, param_3, 0);
+    int32_t __cdecl Draw_Colony_Info_Military_For_(int32_t military_index, int32_t start_x, int32_t drawn_count) {
+        return COLONY::Do_Colony_Info_Military_Stuff_For_(military_index, start_x, drawn_count, 0);
     }
 
     void __cdecl Draw_Colony_Info_Military_() {
-        int last_result = 0;
-        int counter = 0;
-        int max_val = 0;
-        int i = 0;
+        int32_t last_result = 0;
+        int32_t counter = 0;
+        int32_t max_val = 0;
+        int32_t i = 0;
 
         do {
             last_result = Draw_Colony_Info_Military_For_(i, last_result, counter);
@@ -738,19 +738,18 @@ namespace COLONY {
     }
 
     void __cdecl Draw_Colony_Info_Production_For_(int32_t selection) {
-        int16_t v1;
-        int16_t v2;
+        int16_t row_index;
+        int16_t row_adjust;
 
         if (selection == 3) {
-            v1 = -1;
-            v2 = -3;
+            row_index = -1;
+            row_adjust = -3;
         } else {
-            v1 = (int16_t)selection;
-            v2 = -1;
+            row_index = (int16_t)selection;
+            row_adjust = -1;
         }
 
-        // Calculate y-coordinate: (v1 * 30) + v2 + 65
-        int16_t y_offset = (v1 * 0x1e) + v2 + 0x41;
+        int16_t y_offset = (row_index * 0x1e) + row_adjust + 0x41;
 
         COLDRAW::Draw_Colony_Prod_(
             (int16_t)_colony_handle,
@@ -786,7 +785,7 @@ namespace COLONY {
         } else if (_drawing_display == 1) {
             if (_g_scanned_star != -1) {
                 s_star_data* star = &MOX::_star[_g_scanned_star];
-                Print_Sys_Disp_Scanned_String_(reinterpret_cast<char*>(star));
+                Print_Sys_Disp_Scanned_String_(star->name);
 
                 Box_Galaxy_Map_Star_(_g_scanned_star, 1);
             }
@@ -1233,7 +1232,7 @@ namespace COLONY {
         ERIC::Draw_Centered_(param_1, param_2, COLONY::_ship_bitm);
     }
 
-    short __cdecl Pop_To_Pop_State_(short colony_idx, short pop_idx) {
+    int16_t __cdecl Pop_To_Pop_State_(int16_t colony_idx, int16_t pop_idx) {
         // Extract the lower nibble of the population data to determine status
         uint32_t pop_status = MOX::_colony[colony_idx].pop[pop_idx] & 0xf;
 
@@ -1623,9 +1622,9 @@ namespace COLONY {
         Col_Calc_Wrapper_(static_cast<int16_t>(_colony_handle));
     }
 
-    short __cdecl Get_Next_Colony_(short current_idx, short direction) {
+    int16_t __cdecl Get_Next_Colony_(int16_t current_idx, int16_t direction) {
         int8_t target_owner = MOX::_colony[current_idx].owner;
-        short search_idx = current_idx;
+        int16_t search_idx = current_idx;
 
         do {
             if (direction == 0) {
@@ -1656,18 +1655,11 @@ namespace COLONY {
     void __cdecl Remove_Satellite_From_Array_(int16_t satellite_id) {
         for (int16_t i = 0; i < 10; ++i) {
             if (_colony_satellites[i] == satellite_id) {
-                _colony_satellites[i] = 0;
-
-                // Note: The following check may perform an out-of-bounds access 
-                // on _colony_satellites[10] if i is 9. This behavior is 
-                // preserved from the binary.
-                if (_colony_satellites[i + 1] != 0) {
-                    // This loop effectively performs the same assignment 9 times.
-                    for (int count = 9; count != 0; --count) {
-                        _colony_satellites[i] = _colony_satellites[i + 1];
-                    }
-                    _colony_satellites[9] = -1;
+                for (int16_t shift_idx = i; shift_idx < 9; ++shift_idx) {
+                    _colony_satellites[shift_idx] = _colony_satellites[shift_idx + 1];
                 }
+                _colony_satellites[9] = -1;
+                break;
             }
         }
 
@@ -1695,8 +1687,8 @@ namespace COLONY {
         _job_fields[index] = field_id;
     }
 
-    int __cdecl Do_Colony_Info_Military_Stuff_For_Aux_(int index, int prev_ret, int count) {
-        return COLONY::Do_Colony_Info_Military_Stuff_For_(index, prev_ret, count, 1);
+    int32_t __cdecl Do_Colony_Info_Military_Stuff_For_Aux_(int32_t military_index, int32_t prev_ret, int32_t drawn_count) {
+        return COLONY::Do_Colony_Info_Military_Stuff_For_(military_index, prev_ret, drawn_count, 1);
     }
 
     void __cdecl Add_Bldg_Fields_() {
@@ -2144,28 +2136,19 @@ namespace COLONY {
         return (int16_t)_colonists_count;
     }
 
-    /**
-     * @address 004dc0c0
-     */
-    void __cdecl Set_Colony_Globals_(int16_t param_1) {
-        _colony_handle = param_1;
-        _planet_handle = MOX::_colony[param_1].planet;
+    void __cdecl Set_Colony_Globals_(int16_t colony_idx) {
+        _colony_handle = colony_idx;
+        _planet_handle = MOX::_colony[colony_idx].planet;
         _star_handle = MOX::_planet[_planet_handle].star_index;
         _orbit_n = MOX::_planet[_planet_handle].orbit;
     }
 
-    /**
-     * @address 004dcc90
-     */
-    s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1) {
-        return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, param_1 + 0x13, MOX::_global_cache_seg);
+    s_animation_header* __cdecl Load_Govt_Anim_(int16_t govt_anim_id) {
+        return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, govt_anim_id + 0x13, MOX::_global_cache_seg);
     }
 
-    /**
-     * @address 004dccb0
-     */
-    s_animation_header* __cdecl Govt_Anim_(int16_t param_1) {
-        return Load_Govt_Anim_(param_1);
+    s_animation_header* __cdecl Govt_Anim_(int16_t govt_anim_id) {
+        return Load_Govt_Anim_(govt_anim_id);
     }
 
     /**
@@ -2274,7 +2257,7 @@ namespace COLONY {
     /**
      * @address 004dd840
      */
-    int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int grid_y, int grid_x, int axis) {
+    int32_t __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int32_t grid_y, int32_t grid_x, int32_t axis) {
         // Calculate index based on 7-column stride and 2 components per cell
         int index = axis + (grid_y * 7 + grid_x) * 2;
 

@@ -40,8 +40,6 @@ namespace COLMOVE {
         int16_t unemployed_idx = Get_First_Unemployed_(_cluster_colony_n);
 
         while (unemployed_idx != -1) {
-            // Accessing population flags within the colony structure
-            // s_colony size is 361 bytes, pop array starts at offset 0xC
             uint32_t& pop_flags = MOX::_colony[_cluster_colony_n].pop[unemployed_idx];
 
             if ((pop_flags & 0x200) == 0) {
@@ -58,7 +56,6 @@ namespace COLMOVE {
     void __cdecl Get_Cluster_(int16_t colony_idx, int16_t start_pop_idx) {
         s_colony* colony = &MOX::_colony[colony_idx];
 
-        // Check if the starting population group is 'Natives' (type 9)
         if ((colony->pop[start_pop_idx] & 0x0F) == 9) {
             char* message = ESTRINGS::E_Strings_(0x17e /* ESTR_NATIVES_CANNOT_BE_MOVED_TO_ANOTHER_JOB_OR_PLANET */);
             GENDRAW::Help_(message);
@@ -68,10 +65,8 @@ namespace COLMOVE {
 
         _cluster_colony_n = colony_idx;
 
-        // Iterate through all populations in the colony starting from start_pop_idx
         for (int16_t i = start_pop_idx; i < (int16_t)(uint8_t)colony->n_pops; ++i) {
             if (Pops_Identical_(colony_idx, start_pop_idx, colony_idx, i)) {
-                // Clear specific flag bit (0x200) for identical populations
                 colony->pop[i] &= 0xFFFFFDFF;
             }
         }
@@ -100,7 +95,6 @@ namespace COLMOVE {
         int16_t n_pops = (uint8_t)MOX::_colony[colony_idx].n_pops;
 
         for (int16_t i = 0; i < n_pops; ++i) {
-            // TODO: Figure out bitmap
             if ((MOX::_colony[colony_idx].pop[i] & 0x200) == 0) {
                 unemployed_count++;
             }
@@ -109,24 +103,21 @@ namespace COLMOVE {
         return unemployed_count;
     }
 
-    bool __cdecl Pops_Identical_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4) {
-        uint32_t pop1 = MOX::_colony[param_1].pop[param_2];
-        uint32_t pop2 = MOX::_colony[param_3].pop[param_4];
+    bool __cdecl Pops_Identical_(int16_t source_colony_idx, int16_t source_pop_idx, int16_t dest_colony_idx, int16_t dest_pop_idx) {
+        uint32_t pop1 = MOX::_colony[source_colony_idx].pop[source_pop_idx];
+        uint32_t pop2 = MOX::_colony[dest_colony_idx].pop[dest_pop_idx];
 
-        // Check first set of flags (bits 7 and 8)
         if (((pop1 ^ pop2) & 0x180) != 0) {
             return false;
         }
 
-        int16_t state2 = COLONY::Pop_To_Pop_State_(param_3, param_4);
-        int16_t state1 = COLONY::Pop_To_Pop_State_(param_1, param_2);
+        int16_t state2 = COLONY::Pop_To_Pop_State_(dest_colony_idx, dest_pop_idx);
+        int16_t state1 = COLONY::Pop_To_Pop_State_(source_colony_idx, source_pop_idx);
 
-        // Compare derived population states
         if (state2 != state1) {
             return false;
         }
 
-        // Check second set of flags (bits 0, 1, 2, 3, and 10)
         if (((pop2 ^ pop1) & 0x40f) != 0) {
             return false;
         }
@@ -169,7 +160,7 @@ namespace COLMOVE {
         while (unemployed_pop_idx != -1) {
             if (colony_idx == COLMOVE::_cluster_colony_n) {
                 uint32_t& pop_flags = MOX::_colony[COLMOVE::_cluster_colony_n].pop[unemployed_pop_idx];
-                const int32_t current_job = static_cast<int32_t>((pop_flags & 0x180u) >> 7);
+                const int32_t current_job = (int32_t)((pop_flags & 0x180u) >> 7);
 
                 if (requested_job == -1 || current_job == requested_job) {
                     pop_flags |= 0x200u;
@@ -201,7 +192,7 @@ namespace COLMOVE {
                                     sprintf(
                                             message,
                                             ESTRINGS::E_Strings_(0x209),
-                                            static_cast<uint32_t>(settle_result.eta_turns));
+                                            (uint32_t)settle_result.eta_turns);
                                     warning_state = 1;
                                     COLONY::Reset_Mouse_Picture_();
                                     show_confirmation = true;
@@ -214,14 +205,14 @@ namespace COLMOVE {
                                     sprintf(
                                             message,
                                             ESTRINGS::E_Strings_(0x206),
-                                            static_cast<uint32_t>(settle_result.eta_turns));
+                                            (uint32_t)settle_result.eta_turns);
                                 } else {
                                     sprintf(
                                             message,
                                             ESTRINGS::E_Strings_(0x204),
-                                            static_cast<int32_t>(moved_count),
-                                            static_cast<int32_t>(unemployed_count),
-                                            static_cast<uint32_t>(settle_result.eta_turns));
+                                            (int32_t)moved_count,
+                                            (int32_t)unemployed_count,
+                                            (uint32_t)settle_result.eta_turns);
                                 }
 
                                 warning_state = 3;
@@ -238,8 +229,8 @@ namespace COLMOVE {
                                 sprintf(
                                         message,
                                         ESTRINGS::E_Strings_(0x203),
-                                        static_cast<int32_t>(moved_count),
-                                        static_cast<int32_t>(unemployed_count));
+                                        (int32_t)moved_count,
+                                        (int32_t)unemployed_count);
                             }
 
                             warning_state = 2;
@@ -260,7 +251,7 @@ namespace COLMOVE {
                         }
 
                         uint32_t& pop_flags = source_colony->pop[unemployed_pop_idx];
-                        const int32_t current_job = static_cast<int32_t>((pop_flags & 0x180u) >> 7);
+                        const int32_t current_job = (int32_t)((pop_flags & 0x180u) >> 7);
 
                         if (requested_job != -1 && current_job != requested_job) {
                             if (COLMOVE::Give_Colonist_New_Job_(
@@ -286,14 +277,14 @@ namespace COLMOVE {
                                         message,
                                         0,
                                         ESTRINGS::E_Strings_(0xFE),
-                                        static_cast<uint32_t>(settle_result.eta_turns));
+                                        (uint32_t)settle_result.eta_turns);
                                 line_count = 1;
                             } else {
                                 ERIC::String_Builder2_(
                                         message,
                                         0,
                                         ESTRINGS::E_Strings_(0xFC),
-                                        static_cast<uint32_t>(settle_result.eta_turns));
+                                        (uint32_t)settle_result.eta_turns);
                                 line_count = 1;
                             }
                         } else if (settle_result.no_room_at_destination != 0) {
@@ -347,7 +338,7 @@ namespace COLMOVE {
                                         message,
                                         line_count,
                                         ESTRINGS::E_Strings_(0x80),
-                                        static_cast<int32_t>(moved_count));
+                                        (int32_t)moved_count);
                             }
 
                             COLONY::Reset_Mouse_Picture_();
@@ -371,14 +362,14 @@ namespace COLMOVE {
                                     message,
                                     0,
                                     ESTRINGS::E_Strings_(0xFE),
-                                    static_cast<uint32_t>(settle_result.eta_turns));
+                                    (uint32_t)settle_result.eta_turns);
                             line_count = 1;
                         } else {
                             ERIC::String_Builder2_(
                                     message,
                                     0,
                                     ESTRINGS::E_Strings_(0xFC),
-                                    static_cast<uint32_t>(settle_result.eta_turns));
+                                    (uint32_t)settle_result.eta_turns);
                             line_count = 1;
                         }
                     } else if (settle_result.no_room_at_destination != 0) {
@@ -432,7 +423,7 @@ namespace COLMOVE {
                                     message,
                                     line_count,
                                     ESTRINGS::E_Strings_(0x80),
-                                    static_cast<int32_t>(moved_count));
+                                    (int32_t)moved_count);
                         }
 
                         COLONY::Reset_Mouse_Picture_();
@@ -472,11 +463,11 @@ namespace COLMOVE {
                     message,
                     0,
                     ESTRINGS::E_Strings_(0x1D1),
-                    static_cast<int32_t>(moved_count),
+                    (int32_t)moved_count,
                     pop_string,
                     source_planet_name,
                     destination_planet_name,
-                    static_cast<uint32_t>(settle_result.eta_turns));
+                    (uint32_t)settle_result.eta_turns);
 
             int16_t line_count = 1;
 
@@ -554,20 +545,20 @@ namespace COLMOVE {
         if (MOX::_settings.language == 4) {
             int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
             char* pop_state_string = COLONY::Pop_State_String_(pop_state);
-            char* conquered_string = COLONY::Conquered_String_(static_cast<bool>((pop_value >> 10) & 1U));
+            char* conquered_string = COLONY::Conquered_String_((bool)((pop_value >> 10) & 1U));
             char* pop_race_string = COLONY::Pop_Race_String_(colony_idx, pop_idx);
-            char* job_string = COLONY::Job_String_(static_cast<int16_t>((pop_value >> 7) & 3U));
+            char* job_string = COLONY::Job_String_((int16_t)((pop_value >> 7) & 3U));
             char* format = ESTRINGS::E_Strings_(0x4C);
 
             sprintf(output_buffer, format, job_string, pop_race_string, conquered_string, pop_state_string);
             return;
         }
 
-        char* job_string = COLONY::Job_String_(static_cast<int16_t>((pop_value >> 7) & 3U));
+        char* job_string = COLONY::Job_String_((int16_t)((pop_value >> 7) & 3U));
         int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
         char* pop_state_string = COLONY::Pop_State_String_(pop_state);
         char* pop_race_string = COLONY::Pop_Race_String_(colony_idx, pop_idx);
-        char* conquered_string = COLONY::Conquered_String_(static_cast<bool>((pop_value >> 10) & 1U));
+        char* conquered_string = COLONY::Conquered_String_((bool)((pop_value >> 10) & 1U));
         char* format = ESTRINGS::E_Strings_(0x4C);
 
         sprintf(output_buffer, format, conquered_string, pop_race_string, pop_state_string, job_string);

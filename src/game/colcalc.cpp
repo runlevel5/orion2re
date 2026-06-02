@@ -256,7 +256,7 @@ namespace COLCALC {
     }
 
     void __cdecl Compute_All_Star_Colony_Stuff_() {
-        int32_t num_stars = static_cast<int32_t>(MOX::_NUM_STARS);
+        int32_t num_stars = (int32_t)MOX::_NUM_STARS;
         s_star_data* star_ptr = MOX::_star;
         s_star_data* end_ptr = &MOX::_star[num_stars];
 
@@ -288,20 +288,20 @@ namespace COLCALC {
         Update_Player_Stats_(&MOX::_player[player_idx]);
     }
 
-    void __cdecl Compute_Star_Colony_Stuff_(s_star_data* col) {
-        uint8_t old_interdictor_state = col->has_warp_field_interdictor;
+    void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star) {
+        uint8_t old_interdictor_state = star->has_warp_field_interdictor;
 
-        col->has_colony = 0;
-        col->has_warp_field_interdictor = 0;
-        col->has_tachyon = 0;
-        col->has_subspace = 0;
-        col->has_stargate = 0;
-        col->has_jumpgate = 0;
-        col->has_artemis_net = 0;
-        col->has_dimensional_portal = 0;
+        star->has_colony = 0;
+        star->has_warp_field_interdictor = 0;
+        star->has_tachyon = 0;
+        star->has_subspace = 0;
+        star->has_stargate = 0;
+        star->has_jumpgate = 0;
+        star->has_artemis_net = 0;
+        star->has_dimensional_portal = 0;
 
         for (int16_t i = 0; i < 5; ++i) {
-            int16_t p_idx = col->planet_index[i];
+            int16_t p_idx = star->planet_index[i];
             if (p_idx == -1) continue;
 
             int16_t c_idx = MOX::_planet[p_idx].colony_index;
@@ -311,10 +311,10 @@ namespace COLCALC {
             int8_t owner = colony->owner;
             uint8_t owner_bit = (uint8_t)(1 << (owner & 0x1F));
 
-            col->has_colony |= owner_bit;
+            star->has_colony |= owner_bit;
 
             if (colony->buildings[BUILDING_WARP_INTERDICTOR] != 0) {
-                col->has_warp_field_interdictor |= owner_bit;
+                star->has_warp_field_interdictor |= owner_bit;
             }
 
             if (colony->buildings[BUILDING_STAR_BASE] != 0 ||
@@ -322,31 +322,31 @@ namespace COLCALC {
                 colony->buildings[BUILDING_STAR_FORTRESS] != 0) {
 
                 if (MOX::_player[owner].tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
-                    col->has_tachyon |= owner_bit;
+                    star->has_tachyon |= owner_bit;
                 }
                 if (MOX::_player[owner].tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
-                    col->has_subspace |= owner_bit;
+                    star->has_subspace |= owner_bit;
                 }
             }
 
             if (colony->buildings[BUILDING_ARTEMIS_SYSTEM_NET] != 0) {
-                col->has_artemis_net |= owner_bit;
+                star->has_artemis_net |= owner_bit;
             }
 
             if (colony->buildings[BUILDING_DIMENSIONAL_PORTAL] != 0) {
-                col->has_dimensional_portal |= owner_bit;
+                star->has_dimensional_portal |= owner_bit;
             }
 
             if (MOX::_player[owner].tech_applications[TECH_APP_JUMP_GATE] == 3) {
-                col->has_jumpgate |= owner_bit;
+                star->has_jumpgate |= owner_bit;
             }
 
             if (MOX::_player[owner].tech_applications[TECH_APP_STAR_GATE] == 3) {
-                col->has_stargate |= owner_bit;
+                star->has_stargate |= owner_bit;
             }
         }
 
-        if ((col->has_warp_field_interdictor != 0) != (old_interdictor_state != 0)) {
+        if ((star->has_warp_field_interdictor != 0) != (old_interdictor_state != 0)) {
             No_Op1_();
         }
     }
@@ -429,7 +429,7 @@ namespace COLCALC {
     }
 
     int16_t __cdecl Player_N_Turns_Until_Research_Complete_(s_player* plr) {
-        uint8_t field_idx = static_cast<uint8_t>(plr->current_research_field);
+        uint8_t field_idx = (uint8_t)plr->current_research_field;
 
         if (plr->tech_fields[field_idx] == 3) {
             return 0;
@@ -464,9 +464,9 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Chance_For_Research_Breakthrough_(s_player* plr) {
-        int32_t cost = Player_Research_Cost_(plr, static_cast<uint16_t>(static_cast<uint8_t>(plr->current_research_field)));
+        int32_t cost = Player_Research_Cost_(plr, (uint16_t)(uint8_t)plr->current_research_field);
 
-        int32_t produced = static_cast<int32_t>(plr->research_produced);
+        int32_t produced = (int32_t)plr->research_produced;
         int32_t accumulated_total = plr->research_accumulated + produced;
 
         return Chance_For_Research_Breakthrough_Aux_(accumulated_total, produced, cost);
@@ -499,8 +499,8 @@ namespace COLCALC {
 
         colony->food2_per_farmer = (int8_t)Colony_Food2_Per_Farmer_(colony, (int16_t)colony->owner, nullptr);
         Colony_Environmental_Stuff_(colony);
-        colony->industry_per_worker = (int8_t)Colony_Industry_Per_Worker_(colony, static_cast<int16_t>(static_cast<int8_t>(colony->owner)), nullptr);
-        colony->research_per_scientist = (int8_t)Colony_Research_Per_Scientist_(colony, static_cast<int16_t>(static_cast<int8_t>(colony->owner)), nullptr);
+        colony->industry_per_worker = (int8_t)Colony_Industry_Per_Worker_(colony, (int16_t)(int8_t)colony->owner, nullptr);
+        colony->research_per_scientist = (int8_t)Colony_Research_Per_Scientist_(colony, (int16_t)(int8_t)colony->owner, nullptr);
 
         Colony_Morale_(colony, nullptr);
         Colony_Industry_Maintenance_(colony);
@@ -510,7 +510,7 @@ namespace COLCALC {
         Colony_Replicators_(colony);
 
         // Calculate industry imports needed to cover maintenance, capped by production capacity
-        int16_t maintenance_val = static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[ECON_INDUSTRY]));
+        int16_t maintenance_val = (int16_t)(uint8_t)colony->maintenance[ECON_INDUSTRY];
         colony->imports[ECON_INDUSTRY] = maintenance_val;
         if (colony->production[ECON_INDUSTRY] <= maintenance_val) {
             colony->imports[ECON_INDUSTRY] = colony->production[ECON_INDUSTRY];
@@ -584,7 +584,6 @@ namespace COLCALC {
         return food_total;
     }
 
-    // Suggested name: Colony_Industry_Per_Worker
     int16_t __cdecl Colony_Industry_Per_Worker_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         int16_t industry;
 
@@ -633,7 +632,6 @@ namespace COLCALC {
         return (int16_t)industry;
     }
 
-    // Suggested name: Colony_Research_Per_Scientist
     int16_t __cdecl Colony_Research_Per_Scientist_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         int16_t research_per_scientist = 3;
 
@@ -997,7 +995,6 @@ namespace COLCALC {
     void __cdecl Show_Industry_Production_(short colony_idx) {
         char buffer[3000];
 
-        // MOX::_colony is a pointer to an array of s_colony structures (size 0x169 / 361)
         s_colony* colony = &MOX::_colony[colony_idx];
 
         Colony_Industry_Production_(colony, buffer);
@@ -1029,8 +1026,7 @@ namespace COLCALC {
         colony->food2_needed_for_natives = 0;
 
         for (int i = 0; i < (int)(uint8_t)colony->n_pops; ++i) {
-            // Read 4-byte pop structure to access bitfields efficiently
-            uint32_t pop_bits = *reinterpret_cast<uint32_t*>(&colony->pop[i]);
+            uint32_t pop_bits = colony->pop[i];
             uint32_t race = pop_bits & 0xF;
             uint32_t bit_10_flag = (pop_bits >> 10) & 1;
 
@@ -1112,7 +1108,7 @@ namespace COLCALC {
         if (colony->n_pops == 0) {
             colony->maintenance[ECON_BC] = 0;
         } else {
-            int16_t colony_idx = (int16_t)(((int32_t)colony - (int32_t)MOX::_colony) / 0x169);
+            int16_t colony_idx = (int16_t)(colony - MOX::_colony);
             if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
                 colony->maintenance[ECON_BC] = 0;
             } else {
@@ -2650,7 +2646,7 @@ namespace COLCALC {
             _tmp_quotient[0] = '+';
         }
 
-        int32_t n_chars = sprintf(&_tmp_quotient[1], DESIGN::s_pct_d, val / denominator);
+        int32_t n_chars = sprintf(&_tmp_quotient[1], "%d", val / denominator);
         char* fraction_ptr = &_tmp_quotient[1] + n_chars;
 
         int32_t remainder = val % denominator;
@@ -2670,7 +2666,7 @@ namespace COLCALC {
             }
 
             if (multiplier != 0) {
-                sprintf(fraction_ptr, s_dot_d_0055a528, scaled_remainder / denominator);
+                sprintf(fraction_ptr, ".%d", scaled_remainder / denominator);
             }
         }
 
@@ -3071,13 +3067,13 @@ namespace COLCALC {
         return result_count;
     }
 
-    short __cdecl Get_Surrender_System_(short player_idx, short param_2, short selection_mode) {
+    short __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode) {
         uint8_t possible_stars[72];
         s_star_weight star_weights[72];
         short result_star_idx = -1;
 
         // Populate potential stars to surrender
-        short num_stars = Get_Possible_Surrender_Systems_(player_idx, param_2, possible_stars);
+        short num_stars = Get_Possible_Surrender_Systems_(player_idx, target_player_idx, possible_stars);
 
         if (num_stars != 0) {
             for (int i = 0; i < (int)num_stars; ++i) {

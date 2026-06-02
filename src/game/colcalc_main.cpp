@@ -1,38 +1,7 @@
 #include "pch.h"
 
-namespace {
-    const char s_msg_bc_calc[] = "(%s %d * %d + %d * %d : %d BC)\n";
-    const char s_msg_bc_zero[] = "(%s 0 BC)\n";
-    const char s_separator[] = "-------------------\n";
-    const char s_fmt_val_name[] = "%d : %s\n";
-    const char s_fmt_val_msg[] = "%d %s\n";
-
-    const char s_T_15_65[] = "\x07" "T+15,+65.";
-    const char s_fmt_plus_d_pct_s_s[] = "\t%+d%%\t%s%s\r";
-    const char s_fmt_plus_d_pct_s[] = "\t%+d%%\t%s\r";
-    const char s_fmt_d_pct_s[] = "\t%d%%\t%s\r";
-    const char s_fmt_s_00551130[] = "%s";
-    const char s_0[] = "\x1A" "0";
-    const char s_fmt_plus_d_s[] = "\t%+d\t%s\r";
-    const char s_fmt_plus_d_s_2[] = "\t%+d\t %s\r";
-    const char s_fmt_plus_d_s_s[] = "\t%+d\t%s %s\r";
-    const char s_fmt_s_s_s[] = "\t%s\t%s %s\r";
-    const char s_fmt_s_s[] = "\t%s\t%s\r";
-    const char s_fmt_d_s[] = "\t%d\t%s\r";
-    const char s_fmt_minus_d_s[] = "\t-%d\t%s\r";
-    const char s_fmt_plus_d_s_3[] = "\t+%d\t%s\r";
-    const char s_newline_0055136c[] = "\r";
-
-    const char* const s_str = s_fmt_s_00551130;
-    const char* const s_newline = s_newline_0055136c;
-    const char* const s_tab_s_s_r = s_fmt_s_s;
-    const char* const s_tab_d_s_s_r = s_fmt_plus_d_s_s;
-    const char* const s_tab_d_s_r = s_fmt_plus_d_s;
-    const char* const s_tab_plus_d_s_r = s_fmt_plus_d_s_3;
-}
-
 namespace COLCALC {
-    void __cdecl Colony_Morale_(s_colony* colony, char* debug) {
+    void __cdecl Colony_Morale_(s_colony* colony, char* debug_out) {
         int8_t owner = colony->owner;
         s_player* player = &MOX::_player[owner];
         int8_t govt = player->traits[TRAIT_CURRENT_GOVERNMENT];
@@ -46,12 +15,11 @@ namespace COLCALC {
         int pleasure_dome_bonus = 0;
         int barracks_bonus = 0;
         int marine_barracks_bonus = 0;
-        const char* msg_barracks = s__00551100;
+        const char* msg_barracks = "";
 
         int mixed_race_penalty = Mixed_Race_Morale_Penalty_(colony);
         colony->morale = _morale_lookup_table[govt];
 
-        // TODO: Why do we divide by 2?
         if (gov_type != 3) { // 3 = Unification
             int officer_idx = Colony_Officer_(colony);
             if (officer_idx != -1) {
@@ -97,57 +65,59 @@ namespace COLCALC {
                 barracks_bonus + marine_barracks_bonus + no_capital_penalty;
         }
 
-        if (debug) {
+        if (debug_out) {
             if (gov_type == 3) {
                 const char* src = _unification_has_no_morale_msg;
-                while ((*debug++ = *src++) != '\0');
+                while ((*debug_out++ = *src++) != '\0');
                 return;
             }
 
-            debug += sprintf(debug, s_fmt_s_00551130, s_T_15_65);
-            debug += sprintf(debug, s_fmt_s_00551130, s_0);
+            // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
+            // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
+            debug_out += sprintf(debug_out, "%s", "\x07" "T+15,+65.");
+            debug_out += sprintf(debug_out, "%s", "\x1A" "0");
 
-            debug += sprintf(debug, s_fmt_plus_d_pct_s_s,
+            debug_out += sprintf(debug_out, "\t%+d%%\t%s%s\r",
                 _morale_lookup_table[govt] * 5, _government_morale_msg, msg_barracks);
 
             if (no_capital_penalty != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     no_capital_penalty * 5, _no_capital_msg);
 
             if (mixed_race_penalty != 0)
-                debug += sprintf(debug, s_fmt_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%d%%\t%s\r",
                     mixed_race_penalty * 5, _mixed_races_msg);
 
             if (barracks_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     barracks_bonus * 5, TECHDATA::_buildings[BUILDING_ARMOR_BARRACKS].name);
 
             if (marine_barracks_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     marine_barracks_bonus * 5, TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].name);
 
             if (psychophysics_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     psychophysics_bonus * 5, TECHDATA::_technology_applications[TECH_APP_PSIONICS].name);
 
             if (holo_simulator_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     holo_simulator_bonus * 5, TECHDATA::_buildings[BUILDING_HOLO_SIMULATOR].name);
 
             if (vr_network_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     vr_network_bonus * 5, TECHDATA::_technology_applications[TECH_APP_VIRTUAL_REALITY_NETWORK].name);
 
             if (pleasure_dome_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     pleasure_dome_bonus * 5, TECHDATA::_buildings[BUILDING_PLEASURE_DOME].name);
 
             if (leader_bonus != 0)
-                debug += sprintf(debug, s_fmt_plus_d_pct_s,
+                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
                     leader_bonus * 5, _leader_bonus_msg);
 
-            debug += sprintf(debug, s_newline_0055136c);
-            sprintf(debug, s_fmt_plus_d_pct_s,
+            debug_out += sprintf(debug_out, "\r");
+            sprintf(debug_out, "\t%+d%%\t%s\r",
                 colony->morale * 5, _total_morale_msg);
         }
     }
@@ -155,6 +125,7 @@ namespace COLCALC {
     void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
         uint32_t* p_pop = (uint32_t*)colony->pop;
         uint32_t* p_pop_end = &p_pop[colony->n_pops];
+        uint32_t* last_adjusted_pop = nullptr;
 
         RUSS::Mox_Update_();
 
@@ -172,6 +143,7 @@ namespace COLCALC {
         while (p_pop < p_pop_end && colony->production[ECON_INDUSTRY] < (int16_t)colony->maintenance[ECON_INDUSTRY]) {
             *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
             Recalculate_Colony_(colony);
+            last_adjusted_pop = p_pop;
             p_pop++;
         }
 
@@ -180,6 +152,7 @@ namespace COLCALC {
             while (p_pop < p_pop_end && (int16_t)colony->maintenance[ECON_FOOD] > colony->production[ECON_FOOD]) {
                 *p_pop = (*p_pop & 0xfffffe7f); // Clear Scientist and Worker flags -> Farmer
                 Recalculate_Colony_(colony);
+                last_adjusted_pop = p_pop;
                 p_pop++;
             }
         }
@@ -188,12 +161,14 @@ namespace COLCALC {
         while (p_pop < p_pop_end && colony->production[ECON_RESEARCH] > colony->production[ECON_INDUSTRY]) {
             *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
             Recalculate_Colony_(colony);
+            last_adjusted_pop = p_pop;
             p_pop++;
         }
 
         // If Industry is balanced or higher than Research, switch the last adjusted Pop back to Scientist
-        if (colony->production[ECON_INDUSTRY] >= colony->production[ECON_RESEARCH]) {
-            *(p_pop - 1) = (*(p_pop - 1) & 0xffffff7f) | 0x00000100;
+        if (last_adjusted_pop != nullptr &&
+            colony->production[ECON_INDUSTRY] >= colony->production[ECON_RESEARCH]) {
+            *last_adjusted_pop = (*last_adjusted_pop & 0xffffff7f) | 0x00000100;
             Recalculate_Colony_(colony);
         }
 
@@ -1018,7 +993,7 @@ namespace COLCALC {
 
         if (debug_out) {
             char* ptr = debug_out;
-            ptr += sprintf(ptr, s_fmt_val_msg, 5, _starting_command_points_msg);
+            ptr += sprintf(ptr, "%d %s\n", 5, _starting_command_points_msg);
 
             if (n_star_bases > 0) {
                 if (n_star_bases == 1) ptr += sprintf(ptr, _d_from_1_star_base_msg, 1);
@@ -1033,21 +1008,21 @@ namespace COLCALC {
                 else ptr += sprintf(ptr, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
             }
             if (comm_tech_total != 0) {
-                ptr += sprintf(ptr, s_fmt_val_name, comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
+                ptr += sprintf(ptr, "%d : %s\n", comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
             }
             if (leader_cp_bonus != 0) {
-                ptr += sprintf(ptr, s_fmt_val_name, leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
+                ptr += sprintf(ptr, "%d : %s\n", leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
             }
             if (warlord_bonus != 0) {
-                ptr += sprintf(ptr, s_fmt_val_msg, warlord_bonus, _from_warlord_msg);
+                ptr += sprintf(ptr, "%d %s\n", warlord_bonus, _from_warlord_msg);
             }
             if (imperium_bonus != 0) {
-                ptr += sprintf(ptr, s_fmt_val_msg, imperium_bonus, _from_imperium_msg);
+                ptr += sprintf(ptr, "%d %s\n", imperium_bonus, _from_imperium_msg);
             }
             if (plr->command_points > 5) {
-                ptr += sprintf(ptr, s_fmt_val_msg, (int)plr->command_points, _total_command_points_msg);
+                ptr += sprintf(ptr, "%d %s\n", (int)plr->command_points, _total_command_points_msg);
             }
-            ptr += sprintf(ptr, s_separator);
+            ptr += sprintf(ptr, "-------------------\n");
             debug_out = ptr;
         }
 
@@ -1090,8 +1065,8 @@ namespace COLCALC {
                 else ptr += sprintf(ptr, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
             }
             const char* used_msg = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
-            ptr += sprintf(ptr, s_fmt_val_msg, (int)plr->command_points_used, used_msg);
-            ptr += sprintf(ptr, s_separator);
+            ptr += sprintf(ptr, "%d %s\n", (int)plr->command_points_used, used_msg);
+            ptr += sprintf(ptr, "-------------------\n");
             debug_out = ptr;
         }
 
@@ -1101,13 +1076,13 @@ namespace COLCALC {
                 int32_t cost_mult = (plr->objectives == 'd') ? 10 : (12 - MOX::_settings.game_difficulty);
                 plr->maintenance[2] = (int16_t)(cost_mult * diff);
                 if (debug_out) {
-                    sprintf(debug_out, s_msg_bc_calc, _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
+                    sprintf(debug_out, "(%s %d * %d + %d * %d : %d BC)\n", _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
                 }
             }
             else {
                 plr->maintenance[2] = 0;
                 if (debug_out) {
-                    sprintf(debug_out, s_msg_bc_zero, _ship_maintenance_costs_msg);
+                    sprintf(debug_out, "(%s 0 BC)\n", _ship_maintenance_costs_msg);
                 }
             }
         }
@@ -1244,44 +1219,46 @@ namespace COLCALC {
 
         if (debug_buf) {
             char* ptr = debug_buf;
-            ptr += sprintf(ptr, s_fmt_s_00551130, s_T_15_65);
-            ptr += sprintf(ptr, s_fmt_s_00551130, s_0);
+            // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
+            // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
+            ptr += sprintf(ptr, "%s", "\x07" "T+15,+65.");
+            ptr += sprintf(ptr, "%s", "\x1A" "0");
 
             if (taxes_collected != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, taxes_collected, _taxes_collected_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", taxes_collected, _taxes_collected_msg);
             }
             if (morale_bonus > 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_bonus_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", morale_bonus, _morale_bonus_msg);
             }
             else if (morale_bonus < 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_penalty_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", morale_bonus, _morale_penalty_msg);
             }
             if (special_planet_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, special_planet_bc, _special_income_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", special_planet_bc, _special_income_msg);
             }
             if (leader_bonus_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, leader_bonus_bc, _leader_bonus_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", leader_bonus_bc, _leader_bonus_msg);
             }
             if (galactic_currency_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
             }
             if (stock_exchange_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
             }
             if (spaceport_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
             }
             if (gov_bonus_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, gov_bonus_bc, _government_bonus_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", gov_bonus_bc, _government_bonus_msg);
             }
             if (trade_goods_bc != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, trade_goods_bc, _trade_goods_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", trade_goods_bc, _trade_goods_msg);
             }
             if (colony->n_industry_taxed != 0) {
-                ptr += sprintf(ptr, s_fmt_plus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", (int)colony->n_industry_taxed, _taxed_from_industry_msg);
             }
-            ptr += sprintf(ptr, "%s", s_newline_0055136c);
-            sprintf(ptr, s_fmt_plus_d_s, (int)colony->production[ECON_BC], _total_income_msg);
+            ptr += sprintf(ptr, "%s", "\r");
+            sprintf(ptr, "\t%+d\t%s\r", (int)colony->production[ECON_BC], _total_income_msg);
         }
     }
 
@@ -1316,81 +1293,83 @@ namespace COLCALC {
 
         if (debug_out != nullptr) {
             char* ptr = debug_out;
-            ptr += sprintf(ptr, s_str, s_T_15_65);
-            ptr += sprintf(ptr, s_str, s_0);
+            // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
+            // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
+            ptr += sprintf(ptr, "%s", "\x07" "T+15,+65.");
+            ptr += sprintf(ptr, "%s", "\x1A" "0");
 
             if (breakdown.base_prod != 0) {
-                ptr += sprintf(ptr, s_tab_d_s_r, breakdown.base_prod, _produced_by_scientists_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_scientists_msg);
             }
             if (breakdown.artifacts_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_d_s_r, breakdown.artifacts_bonus, _artifacts_bonus_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.artifacts_bonus, _artifacts_bonus_msg);
             }
             if (breakdown.intelligence_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_d_s_r, breakdown.intelligence_bonus, _intelligence_bonus_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.intelligence_bonus, _intelligence_bonus_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
-                    ptr += sprintf(ptr, s_tab_d_s_s_r, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
+                    ptr += sprintf(ptr, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] != 0) {
-                ptr += sprintf(ptr, s_tab_d_s_r, (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
+                ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
             }
 
             for (int i = 0; i < 204; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    ptr += sprintf(ptr, s_tab_d_s_r, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
+                    ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < 49; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    ptr += sprintf(ptr, s_tab_d_s_r, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
+                    ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
             }
             if (breakdown.conquered_penalty != 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
             }
             if (breakdown.blockaded_penalty != 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
             }
             if (breakdown.morale_bonus > 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
             }
             if (breakdown.govt_bonus > 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
             }
             if (breakdown.officer_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
+                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
             }
 
             if (res_lab_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_plus_d_s_r, res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
+                ptr += sprintf(ptr, "\t+%d\t%s\r", res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
             }
             if (supercomp_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_plus_d_s_r, supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
+                ptr += sprintf(ptr, "\t+%d\t%s\r", supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
             }
             if (cybernet_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_plus_d_s_r, cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
+                ptr += sprintf(ptr, "\t+%d\t%s\r", cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
             }
             if (autolab_bonus != 0) {
-                ptr += sprintf(ptr, s_tab_plus_d_s_r, autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
+                ptr += sprintf(ptr, "\t+%d\t%s\r", autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
             }
 
-            ptr += sprintf(ptr, s_newline);
-            sprintf(ptr, s_tab_d_s_r, (int)total_research, _total_research_produced_msg);
+            ptr += sprintf(ptr, "\r");
+            sprintf(ptr, "\t%+d\t%s\r", (int)total_research, _total_research_produced_msg);
         }
     }
 
@@ -1401,7 +1380,7 @@ namespace COLCALC {
             return;
         }
 
-        int16_t colony_idx = (int16_t)(((uintptr_t)colony - (uintptr_t)MOX::_colony) / 361);
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             colony->production[ECON_FOOD] = 0;
             if (debug_out) {
@@ -1432,86 +1411,88 @@ namespace COLCALC {
         colony->production[ECON_FOOD] = static_cast<int16_t>(hydro_bonus + subterranean_bonus + base_job_prod);
 
         if (debug_out) {
-            int len = sprintf(debug_out, s_fmt_s_00551130, s_T_15_65);
-            len += sprintf(debug_out + len, s_fmt_s_00551130, s_0);
+            // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
+            // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
+            int len = sprintf(debug_out, "%s", "\x07" "T+15,+65.");
+            len += sprintf(debug_out + len, "%s", "\x1A" "0");
 
             if (breakdown.base_prod != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_farmers_msg);
+                len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.base_prod / 2, _produced_by_farmers_msg);
             }
             if (breakdown.food_bonus != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, _aquatic_bonus_msg);
+                len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.food_bonus / 2, _aquatic_bonus_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
                 int16_t val = breakdown.racial_bonuses[i];
                 if (val > 0) {
-                    len += sprintf(debug_out + len, s_fmt_plus_d_s_s, val / 2, MOX::_player[i].race_name, _bonus_msg);
+                    len += sprintf(debug_out + len, "\t%+d\t%s %s\r", val / 2, MOX::_player[i].race_name, _bonus_msg);
                 }
                 else if (val < 0) {
                     char* formatted = Format_Quotient_(val, 2);
-                    len += sprintf(debug_out + len, s_fmt_s_s_s, formatted, MOX::_player[i].race_name, _bonus_msg);
+                    len += sprintf(debug_out + len, "\t%s\t%s %s\r", formatted, MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_NATIVE] != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s_2, breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_NATIVE] / 2, _native_bonus_msg);
+                len += sprintf(debug_out + len, "\t%+d\t %s\r", breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_NATIVE] / 2, _native_bonus_msg);
             }
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] / 2, _android_bonus_msg);
+                len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] / 2, _android_bonus_msg);
             }
 
             for (int i = 0; i < 204; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
+                    len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < 49; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
+                    len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
             }
             if (breakdown.conquered_penalty != 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
             }
             if (breakdown.blockaded_penalty != 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
             }
             if (breakdown.morale_bonus > 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
             }
             if (breakdown.govt_bonus > 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
             }
             if (breakdown.officer_bonus != 0) {
-                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
+                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
             }
 
             if (hydro_bonus != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(hydro_bonus), TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
+                len += sprintf(debug_out + len, "\t%+d\t%s\r", (int32_t)hydro_bonus, TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
             }
             if (subterranean_bonus != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(subterranean_bonus), TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
+                len += sprintf(debug_out + len, "\t%+d\t%s\r", (int32_t)subterranean_bonus, TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
             }
 
             if (colony->n_food_replicated != 0) {
-                int replication_amount = static_cast<int>(static_cast<uint8_t>(colony->n_food_replicated));
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
-                colony->production[ECON_FOOD] += static_cast<int16_t>(replication_amount);
+                int replication_amount = (int)(uint8_t)colony->n_food_replicated;
+                len += sprintf(debug_out + len, "\t%+d\t%s\r", replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
+                colony->production[ECON_FOOD] += (int16_t)replication_amount;
             }
 
-            len += sprintf(debug_out + len, s_fmt_s_00551130, s_newline_0055136c);
-            sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_FOOD]), COLCALC::_total_food_produced_msg);
+            len += sprintf(debug_out + len, "%s", "\r");
+            sprintf(debug_out + len, "\t%+d\t%s\r", (int)colony->production[ECON_FOOD], COLCALC::_total_food_produced_msg);
         }
     }
 
@@ -1633,99 +1614,101 @@ namespace COLCALC {
 
         if (debug_out) {
             char* p = debug_out;
-            p += sprintf(p, s_fmt_s_00551130, s_T_15_65);
-            p += sprintf(p, s_fmt_s_00551130, s_0);
+            // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
+            // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
+            p += sprintf(p, "%s", "\x07" "T+15,+65.");
+            p += sprintf(p, "%s", "\x1A" "0");
 
             if (breakdown.base_prod != 0) {
-                p += sprintf(p, s_fmt_plus_d_s, breakdown.base_prod, _produced_by_workers_msg);
+                p += sprintf(p, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_workers_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
-                    p += sprintf(p, s_fmt_plus_d_s_s, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
+                    p += sprintf(p, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] != 0) {
-                p += sprintf(p, s_fmt_plus_d_s, (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
+                p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
             }
 
             for (int i = 0; i < 212; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    p += sprintf(p, s_fmt_plus_d_s, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
+                    p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < 49; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    p += sprintf(p, s_fmt_plus_d_s, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
+                    p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
             }
 
             if (breakdown.conquered_penalty != 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
             }
 
             if (breakdown.blockaded_penalty != 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
             }
 
             if (breakdown.morale_bonus > 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
             }
 
             if (breakdown.govt_bonus > 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
             }
 
             if (breakdown.officer_bonus != 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
             }
 
             if (bonus_recycling != 0) {
-                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
+                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
             }
             if (bonus_automated_factory != 0) {
-                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
+                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
             }
             if (bonus_robo_miner != 0) {
-                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
+                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
             }
             if (bonus_deep_core != 0) {
-                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
+                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
             }
             if (bonus_robotic_factory != 0) {
-                p += sprintf(p, s_fmt_plus_d_s_s, (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
+                p += sprintf(p, "\t%+d\t%s %s\r", (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
             }
 
             if (breakdown.pollution_penalty != 0) {
-                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
+                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
             }
 
             if (colony->n_food_replicated != 0) {
                 char temp[256];
                 sprintf(temp, _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
-                p += sprintf(p, s_fmt_d_s, (int32_t)(uint8_t)colony->n_food_replicated * -2, temp);
+                p += sprintf(p, "\t%d\t%s\r", (int32_t)(uint8_t)colony->n_food_replicated * -2, temp);
                 colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
             }
 
             if (colony->n_industry_taxed != 0) {
-                p += sprintf(p, s_fmt_minus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                p += sprintf(p, "\t-%d\t%s\r", (int)colony->n_industry_taxed, _taxed_from_industry_msg);
                 colony->production[ECON_INDUSTRY] -= colony->n_industry_taxed;
             }
 
-            p += sprintf(p, s_fmt_s_00551130, s_newline_0055136c);
-            sprintf(p, s_fmt_plus_d_s, (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
+            p += sprintf(p, "%s", "\r");
+            sprintf(p, "\t%+d\t%s\r", (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
         }
     }
 
@@ -1748,7 +1731,7 @@ namespace COLCALC {
         if (colony != _colony_calc_food_colony || (int16_t)_colony_calc_food_type != owner_idx || out != nullptr) {
             _colony_calc_food_colony = colony;
             _colony_calc_food_type = (uint8_t)owner_idx;
-            memset(_colony_calc_food_cache, 0x63, 10);
+            memset(_colony_calc_food_cache, 0x63, sizeof(_colony_calc_food_cache));
         }
 
         if (_colony_calc_food_cache[idx] == 0x63) {
@@ -1811,7 +1794,7 @@ namespace COLCALC {
         if (_colony_calc_industry_colony != colony || _colony_calc_industry_type != (uint8_t)type || out != nullptr) {
             _colony_calc_industry_colony = colony;
             _colony_calc_industry_type = (uint8_t)type;
-            memset(_colony_calc_industry_cache, 0x63, 10);
+            memset(_colony_calc_industry_cache, 0x63, sizeof(_colony_calc_industry_cache));
         }
 
         int32_t idx = (int32_t)player_idx;
@@ -1854,7 +1837,7 @@ namespace COLCALC {
 
             _colony_calc_research_colony = colony;
             _colony_calc_research_type = (uint8_t)research_type;
-            memset(_colony_calc_research_cache, 0x63, 10);
+            memset(_colony_calc_research_cache, 0x63, sizeof(_colony_calc_research_cache));
         }
 
         if (_colony_calc_research_cache[idx] == 0x63) {

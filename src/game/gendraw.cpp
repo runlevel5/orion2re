@@ -52,9 +52,6 @@ namespace GENDRAW {
         HAROLD::Save_Mouse_List_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         ERIC::Fast_Fade_In_();
-        fonts::Load_Palette_(9, 0, 255);
-        palette::Set_Palette_Changes_(0, 255);
-        palette::Refresh_Palette_();
         allocate::Push_Block_(MOX::_screen_seg);
         MOX2::Get_Auto_Function_(&_gendraw_af);
         _old_help_list_active = fields::_help_list_active;
@@ -121,7 +118,7 @@ namespace GENDRAW {
         uint8_t base_color1;
         uint8_t base_color2;
         TEXTBOX::Get_Mox_Text_Box_Base_Colors_(1, &base_color1, &base_color2);
-        s_colors* psVar2 = MISC::Font_Colors2_(mode, base_color2, base_color1);
+        s_colors* psVar2 = MISC::Font_Colors2_(mode, base_color1, base_color2);
         font_colors = *psVar2;
 
         fonts::Set_Remap_Font_Style_(mode, &font_colors);

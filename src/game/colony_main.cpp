@@ -231,11 +231,6 @@ namespace COLONY {
         ERICHELP::Set_Colony_Screen_Help_List_();
 
         int16_t saved_player_num = MOX::_PLAYER_NUM;
-        // UB: _colony_handle may be -1 here, matching binary behavior but not safe C++.
-        MOX::_PLAYER_NUM = static_cast<int16_t>(MOX::_colony[_colony_handle].owner);
-
-        Load_Colony_Screen_Seg_();
-        Load_Planet_Screen_();
 
         if (!_valid_colony) {
             MOX::_current_screen = MOX::_return_screen;
@@ -244,6 +239,11 @@ namespace COLONY {
             random::Set_Random_Seed_(saved_seed);
             return;
         }
+
+        MOX::_PLAYER_NUM = (int16_t)MOX::_colony[_colony_handle].owner;
+
+        Load_Colony_Screen_Seg_();
+        Load_Planet_Screen_();
 
         Make_Bldg_Array_For_Colony_(_colony_handle, 0);
 
@@ -400,23 +400,23 @@ namespace COLONY {
         animate::Draw_(draw_x, draw_y, (s_animation_header*)COLBLDG::_bldg_bitm);
     }
 
-    s_animation_header* __cdecl People_Anim_(int16_t param_1, int16_t param_2, int16_t param_3) {
-        if (param_2 == 2) {
-            int32_t entry_num = (static_cast<int32_t>(param_3) * 13) + (static_cast<int32_t>(param_1) * 2) + 1;
-            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg));
+    s_animation_header* __cdecl People_Anim_(int16_t job_type, int16_t pop_state, int16_t race_idx) {
+        if (pop_state == 2) {
+            int32_t entry_num = ((int32_t)race_idx * 13) + ((int32_t)job_type * 2) + 1;
+            return (s_animation_header*)buffer::Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg);
         }
 
-        if (param_2 == 0) {
-            int32_t entry_num = (static_cast<int32_t>(param_3) * 13) + (static_cast<int32_t>(param_1) * 2);
-            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg));
+        if (pop_state == 0) {
+            int32_t entry_num = ((int32_t)race_idx * 13) + ((int32_t)job_type * 2);
+            return (s_animation_header*)buffer::Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg);
         }
 
-        if (param_2 == 3) {
-            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, 0xAA, MOX::_global_cache_seg));
+        if (pop_state == 3) {
+            return (s_animation_header*)buffer::Buffer_Reload_(_RACEICON_LBX, 0xAA, MOX::_global_cache_seg);
         }
 
-        if (param_2 == 4) {
-            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, 0xA9, MOX::_global_cache_seg));
+        if (pop_state == 4) {
+            return (s_animation_header*)buffer::Buffer_Reload_(_RACEICON_LBX, 0xA9, MOX::_global_cache_seg);
         }
 
         return nullptr;
@@ -1128,7 +1128,7 @@ namespace COLONY {
         return 1;
     }
 
-    int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode) {
+    int32_t __cdecl Do_Colony_Info_Military_Stuff_For_(int32_t military_index, int32_t start_x, int32_t drawn_count, int32_t mode) {
         int military_count;
         int16_t owner;
         int16_t local_n;
@@ -1141,7 +1141,7 @@ namespace COLONY {
         _step_squish = 0;
 
         if (mode != 2) {
-            Do_Colony_Info_Military_Stuff_For_(military_index, start_n, param_3, 2);
+            Do_Colony_Info_Military_Stuff_For_(military_index, start_x, drawn_count, 2);
         }
 
         Set_Colony_Font_();
@@ -1157,7 +1157,7 @@ namespace COLONY {
                         anim = Military_Anim_((int16_t)military_index, (int16_t)race);
                         height_anim = Military_Anim_((int16_t)military_index, (int16_t)race);
                         height = animate::Get_Height_(height_anim);
-                        animate::Draw_((int16_t)(((int16_t)(local_n + start_n)) * (30 - _step_squish)), (int16_t)(0x1df - height), anim);
+                        animate::Draw_((int16_t)(((int16_t)(local_n + start_x)) * (30 - _step_squish)), (int16_t)(0x1df - height), anim);
                     }
                     local_n++;
                 } while (local_n < military_count);
@@ -1174,7 +1174,7 @@ namespace COLONY {
                 height_anim = Military_Anim_((int16_t)military_index, (int16_t)race);
                 height = animate::Get_Height_(height_anim);
 
-                animate::Draw_((int16_t)((int16_t)start_n * 30), (int16_t)(0x1df - height), anim);
+                animate::Draw_((int16_t)((int16_t)start_x * 30), (int16_t)(0x1df - height), anim);
 
                 sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
                 Set_Colony_Font_To_(3);
@@ -1183,7 +1183,7 @@ namespace COLONY {
                 height_anim = Military_Anim_((int16_t)military_index, (int16_t)race);
                 height = animate::Get_Height_(height_anim);
 
-                fonts::Print_((int16_t)(((int16_t)start_n + 1) * (30 - _step_squish)), (int16_t)(0x1df - height), buffer);
+                fonts::Print_((int16_t)(((int16_t)start_x + 1) * (30 - _step_squish)), (int16_t)(0x1df - height), buffer);
                 local_n = 3;
             }
         }
@@ -1195,9 +1195,9 @@ namespace COLONY {
                 anim = Military_Anim_((int16_t)military_index, (int16_t)race);
                 height = animate::Get_Height_(anim);
 
-                int16_t x1 = (int16_t)start_n * step;
+                int16_t x1 = (int16_t)start_x * step;
                 int16_t y1 = (int16_t)(0x1df - height);
-                int16_t x2 = (int16_t)(((int16_t)(local_n + start_n)) * step - 1);
+                int16_t x2 = (int16_t)(((int16_t)(local_n + start_x)) * step - 1);
                 int16_t y2 = 0x1df;
 
                 _military_fields[military_index] = fields::Add_Hidden_Field_(x1, y1, x2, y2, ESTRINGS::E_Strings_(0xc), 0);
@@ -1227,7 +1227,7 @@ namespace COLONY {
             }
         }
 
-        return start_n + local_n;
+        return start_x + local_n;
     }
 
 }

@@ -53,6 +53,9 @@ namespace COLONY {
 
     void __cdecl Init_Colonies_();
 
+    /**
+     * Shows the colony screen for the star/orbit currently stored in the screen globals.
+     */
     void __cdecl Colony_Screen_();
 
     bool __cdecl Colonize_Planet_(int16_t planet_idx);
@@ -87,7 +90,11 @@ namespace COLONY {
 
     extern s_animation_header* _c_anims[36];
 
-    void __cdecl Set_Colony_Globals_(int16_t param_1);
+    /**
+     * Caches the active colony, planet, star, and orbit handles for colony-screen helpers.
+     * @param colony_idx Index of the colony to expose through the colony globals.
+     */
+    void __cdecl Set_Colony_Globals_(int16_t colony_idx);
 
     extern uint8_t _debug_flag;
     extern uint8_t _using_colony_screen_palette;
@@ -118,14 +125,19 @@ namespace COLONY {
     extern int32_t _sys_disp_scanned_star_handle;
 
     void __cdecl Load_Colony_Anims_();
+    /** Loads the colony-screen animation and bitmap resources into the screen segment. */
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
     s_animation_header* __cdecl Cache_Load_Planet_(int16_t planet_id);
     s_animation_header* __cdecl C_Anims_(int16_t anim_id);
 
-    s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1);
+    /**
+     * Loads the requested government animation frame from COLONY2.LBX.
+     * @param govt_anim_id Government animation entry offset.
+     */
+    s_animation_header* __cdecl Load_Govt_Anim_(int16_t govt_anim_id);
 
-    s_animation_header* __cdecl Govt_Anim_(int16_t param_1);
+    s_animation_header* __cdecl Govt_Anim_(int16_t govt_anim_id);
 
     s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx);
 
@@ -136,7 +148,12 @@ namespace COLONY {
     s_animation_header* __cdecl Military_Anims_(int16_t param_1, int16_t param_2);
     s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t param_2);
 
-    short __cdecl Pop_To_Pop_State_(short colony_idx, short pop_idx);
+    /**
+     * Maps a colony pop record to the colony-screen portrait state.
+     * @param colony_idx Colony that owns the pop record.
+     * @param pop_idx Index of the pop entry within the colony.
+     */
+    int16_t __cdecl Pop_To_Pop_State_(int16_t colony_idx, int16_t pop_idx);
 
     char* __cdecl Pop_State_String_(int16_t state);
 
@@ -160,6 +177,7 @@ namespace COLONY {
 
     void __cdecl Load_Bldg_Bitm_();
 
+    /** Loads the stationed officer portrait for the active colony star, if any. */
     void __cdecl Load_Officer_Anim_();
 
     void __cdecl Load_Galaxy_Map_Anims_();
@@ -180,7 +198,13 @@ namespace COLONY {
 
     s_animation_header* __cdecl Spy_Anim_(int16_t race_index);
 
-    s_animation_header* __cdecl People_Anim_(int16_t param_1, int16_t param_2, int16_t param_3);
+    /**
+     * Returns the colony-screen population animation for a job/state/race combination.
+     * @param job_type Farmer/worker/scientist animation group.
+     * @param pop_state Colony-screen state variant for the pop.
+     * @param race_idx Race index whose portrait set should be used.
+     */
+    s_animation_header* __cdecl People_Anim_(int16_t job_type, int16_t pop_state, int16_t race_idx);
 
     s_animation_header* __cdecl Prod_Anims_(int16_t param_1, int16_t param_2, int8_t param_3);
 
@@ -254,11 +278,11 @@ namespace COLONY {
 
     void __cdecl Draw_Colony_Info_Military_();
 
-    int __cdecl Draw_Colony_Info_Military_For_(int param_1, int param_2, int param_3);
+    int32_t __cdecl Draw_Colony_Info_Military_For_(int32_t military_index, int32_t start_x, int32_t drawn_count);
 
     void __cdecl Draw_Colony_Info_Production_For_(int32_t selection);
 
-    int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode);
+    int32_t __cdecl Do_Colony_Info_Military_Stuff_For_(int32_t military_index, int32_t start_x, int32_t drawn_count, int32_t mode);
 
     void __cdecl Set_Colony_Font_To_(int32_t style);
 
@@ -296,7 +320,7 @@ namespace COLONY {
 
     void __cdecl Add_Move_Colonist_Job_Field_For_(int16_t index);
 
-    int __cdecl Do_Colony_Info_Military_Stuff_For_Aux_(int index, int prev_ret, int count);
+    int32_t __cdecl Do_Colony_Info_Military_Stuff_For_Aux_(int32_t military_index, int32_t prev_ret, int32_t drawn_count);
 
     void __cdecl Add_Job_Fields_();
 
@@ -310,7 +334,7 @@ namespace COLONY {
 
     void __cdecl Add_Bldg_Fields_();
 
-    int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int grid_y, int grid_x, int axis);
+    int32_t __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int32_t grid_y, int32_t grid_x, int32_t axis);
 
     void __cdecl Update_Fields_();
 
@@ -411,7 +435,12 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_To_Red_(uint8_t style, uint8_t color_idx);
 
-    short __cdecl Get_Next_Colony_(short current_idx, short direction);
+    /**
+     * Finds the next non-outpost colony owned by the same player.
+     * @param current_idx Current colony index.
+     * @param direction 0 searches forward, 1 searches backward.
+     */
+    int16_t __cdecl Get_Next_Colony_(int16_t current_idx, int16_t direction);
 
     void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_idx);
 

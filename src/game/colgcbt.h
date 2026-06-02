@@ -9,7 +9,6 @@ namespace COLGCBT {
     extern int16_t _old_ctr;
     extern int16_t _g_ctr;
     extern s_invasion_side_info* _g_attack_ptr;
-    extern const char s_t_T0_124_500_550_600_620__00558468[27];
     extern s_animation_header* _explosion_anim;
     extern uint16_t _display_fast;
     extern s_animation_header* _heart_anim;
@@ -25,8 +24,16 @@ namespace COLGCBT {
     extern uint8_t _player_color_array[64];
     extern uint8_t _short_player_color_array[64];
 
+    /**
+     * Recolors a ground-combat animation with the selected player's palette.
+     * @param anim Animation to recolor.
+     * @param player_idx Player whose color ramp should be applied.
+     */
     void __cdecl Replace_Colgcbt_Color_With_Player_Colors_(s_animation_header* anim, int16_t player_idx);
 
+    /**
+     * Loads the colony ground-combat animation set for both sides.
+     */
     void __cdecl Load_Combat_Anims_();
 
     extern s_ground_unit _g_units[2][40];
@@ -75,13 +82,23 @@ namespace COLGCBT {
 
     int16_t __cdecl N_Left_Active_To_Process_(s_ground_unit* start_unit);
 
+    /**
+     * Counts matching units from the current unit through the end of its side's unit block.
+     * @param unit Unit whose side, state, and troop type define the scan.
+     */
     int16_t __cdecl N_Left_Of_Me_To_Process_(s_ground_unit* unit);
 
     s_ground_unit* __cdecl Pick_Target_(uint8_t side);
 
     s_ground_unit* __cdecl Find_Unshot_Target_(uint8_t side);
 
-    s_ground_unit* __cdecl Find_Lowest_Framed_Unit_(uint8_t player_idx, int16_t state, uint8_t require_no_target);
+    /**
+     * Finds the lowest-animation-frame unit on one side that matches the requested state.
+     * @param side_idx Side row in `_g_units` to scan.
+     * @param state Required unit state.
+     * @param require_no_target Nonzero to skip units that already have a target.
+     */
+    s_ground_unit* __cdecl Find_Lowest_Framed_Unit_(uint8_t side_idx, int16_t state, uint8_t require_no_target);
 
     void __cdecl Draw_Unit_Beam_(s_ground_unit* unit);
 
@@ -109,15 +126,45 @@ namespace COLGCBT {
 
     void __cdecl Draw_Troops_();
 
-    void __cdecl Print_Data_(char* str, int16_t value, int16_t* line_idx, s_invasion_side_info* side);
+    /**
+     * Prints one summary modifier line for a combat side.
+     * @param label Text label to print.
+     * @param value Modifier value shown beside the label.
+     * @param row In/out summary row index.
+     * @param side_info Side whose summary box receives the line.
+     */
+    void __cdecl Print_Data_(char* label, int16_t value, int16_t* row, s_invasion_side_info* side_info);
 
-    void __cdecl Print_Best_Summary_(s_invasion_side_info* atk_ptr, int16_t* row);
+    /**
+     * Prints the best troop-equipment modifiers for one invasion side.
+     * @param side_info Side whose best equipment modifiers should be listed.
+     * @param row In/out summary row index.
+     */
+    void __cdecl Print_Best_Summary_(s_invasion_side_info* side_info, int16_t* row);
 
+    /**
+     * Prints racial and officer ground-combat modifiers for one invasion side.
+     * @param side_info Side whose racial modifiers should be listed.
+     * @param y_pos In/out summary row index.
+     */
     void __cdecl Print_Race_Summary_(s_invasion_side_info* side_info, int16_t* y_pos);
 
+    /**
+     * Draws the troop counts, hit points, and strength values for one invasion side.
+     * @param x Left edge of the summary block.
+     * @param y Top edge of the troop-total row.
+     * @param side_info Side whose troop totals should be drawn.
+     */
     void __cdecl Print_Troop_Totals_(int16_t x, int16_t y, s_invasion_side_info* side_info);
 
     void __cdecl Set_Help_List_();
 
-    void __cdecl Colony_Combat_Screen_(s_invasion_side_info* attacker, s_invasion_side_info* defender, uint32_t seed, int16_t param_4);
+    /**
+     * Runs the colony ground-combat presentation loop for one invasion result.
+     * @param attacker Attacking side summary and troop data.
+     * @param defender Defending side summary and troop data.
+     * @param seed Random seed used to replay the combat presentation.
+     * @param colony_idx Colony index whose background and state should be displayed.
+     */
+    void __cdecl Colony_Combat_Screen_(s_invasion_side_info* attacker, s_invasion_side_info* defender, uint32_t seed, int16_t colony_idx);
 }

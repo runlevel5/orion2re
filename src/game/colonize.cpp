@@ -17,10 +17,10 @@ namespace COLONIZE {
         return uncolonized_count;
     }
 
-    int16_t Star_N_Outpostable_Planets_For_Player_(s_star_data* star, int16_t player_id) {
+    int16_t Star_N_Outpostable_Planets_(s_star_data* star) {
         int16_t outpostable_count = 0;
 
-        for (int i = 0; i < 5; ++i) {
+        for (int32_t i = 0; i < 5; ++i) {
             int16_t planet_idx = star->planet_index[i];
             if (planet_idx != -1) {
                 if (MOX::_planet[planet_idx].colony_index == -1) {
@@ -32,10 +32,10 @@ namespace COLONIZE {
         return outpostable_count;
     }
 
-    int16_t Star_N_Colonizable_Planets_For_Player_(s_star_data* star, int16_t player_id) {
+    int16_t Star_N_Colonizable_Planets_For_Player_(s_star_data* star, int16_t player_idx) {
         int16_t colonizable_count = 0;
 
-        for (int i = 0; i < 5; ++i) {
+        for (int32_t i = 0; i < 5; ++i) {
             int16_t planet_idx = star->planet_index[i];
             if (planet_idx == -1) {
                 continue;
@@ -49,7 +49,7 @@ namespace COLONIZE {
                     colonizable_count++;
                 } else {
                     s_colony* colony = &MOX::_colony[colony_idx];
-                    if (colony->outpost_flag != 0 && (int16_t)colony->owner == player_id) {
+                    if (colony->outpost_flag != 0 && (int16_t)colony->owner == player_idx) {
                         colonizable_count++;
                     }
                 }
@@ -123,7 +123,7 @@ namespace COLONIZE {
                     }
                 }
                 if (!keep && ((outpost_bits[i] >> (priority_player & 0x1F)) & 1)) {
-                    if (Star_N_Outpostable_Planets_For_Player_(star, priority_player) > 0) {
+                    if (Star_N_Outpostable_Planets_(star) > 0) {
                         keep = true;
                     }
                 }
@@ -311,26 +311,32 @@ namespace COLONIZE {
         }
     }
 
-    void __cdecl Make_New_Colony_Or_Outpost_(short planet_idx, short player_idx, short is_outpost) {
+    void __cdecl Make_New_Colony_Or_Outpost_(int16_t planet_idx, int16_t player_idx, int16_t is_outpost) {
         bool is_reused = false;
         s_planet_data* planet = &MOX::_planet[planet_idx];
-        s_colony* colony;
+        s_colony* colony = nullptr;
 
         if (is_outpost == 0 && planet->colony_index != -1) {
             is_reused = true;
             colony = &MOX::_colony[planet->colony_index];
         } else {
-            colony = MOX::_colony;
-            while (colony->allocated_to != (int8_t)player_idx) {
-                colony++;
+            for (int16_t colony_idx = 0; colony_idx < MAX_COLONIES; ++colony_idx) {
+                if (MOX::_colony[colony_idx].allocated_to == (int8_t)player_idx) {
+                    colony = &MOX::_colony[colony_idx];
+                    break;
+                }
             }
         }
 
-        if (colony >= (MOX::_colony + MOX::_NUM_COLONIES)) {
-            MOX::_NUM_COLONIES = (short)(colony - MOX::_colony) + 1;
+        if (colony == nullptr) {
+            return;
         }
 
-        short colony_idx = (short)(colony - MOX::_colony);
+        if (colony >= (MOX::_colony + MOX::_NUM_COLONIES)) {
+            MOX::_NUM_COLONIES = (int16_t)(colony - MOX::_colony) + 1;
+        }
+
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)player_idx);
 
         colony->allocated_to = -1;
@@ -349,13 +355,13 @@ namespace COLONIZE {
             colony->pop[0] |= 0x200;
 
             if (planet->planet_special == 6 /* ORION */) {
-                for (int i = 1; i < 4; ++i) {
-                    uint32_t p = colony->pop[i];
-                    p = p & 0xFFFFFE7F;
-                    p = (p & 0xFFFFFFF9) | 9;
-                    p = (p & ~0x70) | ((player_idx << 4) & 0x70);
-                    p |= 0x200;
-                    colony->pop[i] = p;
+                for (int32_t i = 1; i < 4; ++i) {
+                    uint32_t pop_flags = colony->pop[i];
+                    pop_flags = pop_flags & 0xFFFFFE7F;
+                    pop_flags = (pop_flags & 0xFFFFFFF9) | 9;
+                    pop_flags = (pop_flags & ~0x70) | ((player_idx << 4) & 0x70);
+                    pop_flags |= 0x200;
+                    colony->pop[i] = pop_flags;
                 }
                 colony->n_pops = 4;
                 planet->planet_special = 0;
@@ -363,11 +369,11 @@ namespace COLONIZE {
             }
 
             if (is_reused) {
-                colony->buildings[22 /* Marine Barracks? */] = 1;
+                colony->buildings[22] = 1;
             }
 
             COLCALC::Colony_Calculation_(colony_idx);
-            colony->just_produced = -39; /* ECON_TRADE_GOODS? */
+            colony->just_produced = -39;
         } else {
             colony->outpost_flag = 1;
             colony->n_pops = 0;

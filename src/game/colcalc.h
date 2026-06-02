@@ -113,6 +113,10 @@ namespace COLCALC {
 
     bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index);
 
+    /**
+     * Sums building construction costs for each player's completed colonies.
+     * @param player_costs Output array indexed by player.
+     */
     void __cdecl Compute_Total_Building_Costs_(int32_t* player_costs);
 
     extern int8_t _difficulty_bc_lookup_table[8];
@@ -170,14 +174,26 @@ namespace COLCALC {
     void __cdecl Twiddle_Initial_Homeworlds_();
     void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony);
 
+    /**
+     * Recomputes a colony's local production and maintenance state before empire-wide import distribution.
+     * @param colony Colony to prepare.
+     */
     void __cdecl Pre_Import_Computing_(s_colony* colony);
 
-    void __cdecl Pass_Out_Imports_(int16_t owner, s_colony* colony);
+    /**
+     * Distributes empire food imports among a player's colonies and optionally finalizes one target colony.
+     * @param player_idx Player whose colonies are being balanced.
+     * @param colony Optional colony to ensure receives post-import recomputation.
+     */
+    void __cdecl Pass_Out_Imports_(int16_t player_idx, s_colony* colony);
 
     void __cdecl Recalculate_Colony_(s_colony* colony);
 
     bool __cdecl Colony_Can_Build_Large_Ships_(s_colony* colony);
 
+    /**
+     * Recomputes colony-derived control and infrastructure flags for every star system.
+     */
     void __cdecl Compute_All_Star_Colony_Stuff_();
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star);
 
@@ -205,7 +221,7 @@ namespace COLCALC {
 
     int32_t __cdecl Sort_star_weights_(const void* a, const void* b);
 
-    short __cdecl Get_Surrender_System_(short player_idx, short param_2, short selection_mode);
+    short __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode);
 
     void __cdecl No_Op1_();
 
@@ -241,10 +257,20 @@ namespace COLCALC {
 
     void __cdecl Colony_Environmental_Stuff_(s_colony* colony);
 
-    void __cdecl Colony_Morale_(s_colony* colony, char* debug);
+    /**
+     * Computes a colony's morale and optionally writes a short breakdown string.
+     * @param colony Colony to evaluate.
+     * @param debug_out Optional output buffer for the morale breakdown.
+     */
+    void __cdecl Colony_Morale_(s_colony* colony, char* debug_out);
 
     void __cdecl Colony_Industry_Maintenance_(s_colony* colony);
 
+    /**
+     * Computes colony industry output, pollution, and optional production breakdown text.
+     * @param colony Colony to evaluate.
+     * @param debug_out Optional output buffer for the industry summary.
+     */
     void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out);
 
     void __cdecl Show_Industry_Production_(short colony_idx);
@@ -260,7 +286,12 @@ namespace COLCALC {
     extern char _tmp_quotient[20];
     char* __cdecl Format_Quotient_(int32_t value, int32_t divisor);
 
-    void __cdecl Colony_Food_Production_(s_colony* colony, char* buffer);
+    /**
+     * Computes colony food output and optionally writes a production breakdown text.
+     * @param colony Colony to evaluate.
+     * @param debug_out Optional output buffer for the food summary.
+     */
+    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out);
 
     int16_t __cdecl Colony_Empire_Base_Food2_Produced_(const s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out);
 
@@ -308,6 +339,11 @@ namespace COLCALC {
 
     bool __cdecl Player_Owns_Officer_(s_player* plr, s_leader_data* leader);
 
+    /**
+     * Recalculates player maintenance totals, command points, and optional maintenance breakdown text.
+     * @param plr Player to update.
+     * @param debug_out Optional output buffer for the maintenance summary.
+     */
     void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);
 
     int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx);

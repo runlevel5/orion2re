@@ -16,7 +16,6 @@ namespace COLGCBT {
     int16_t _old_ctr = -1;
     int16_t _g_ctr;
     s_invasion_side_info* _g_attack_ptr;
-    const char s_t_T0_124_500_550_600_620__00558468[27] = "\x17t\aT0,124,500,550,600,620.";
     s_animation_header* _explosion_anim;
     uint16_t _display_fast;
     s_animation_header* _heart_anim;
@@ -79,7 +78,7 @@ namespace COLGCBT {
 
     void __cdecl Replace_Colgcbt_Color_With_Player_Colors_(s_animation_header* anim, int16_t player_idx)
     {
-        uint8_t color = static_cast<uint8_t>(MOX::_player[player_idx].color);
+        uint8_t color = (uint8_t)MOX::_player[player_idx].color;
 
         if (color != 2) {
             replace::Replace_Color_Range_(anim, _player_color_array + color * 8, 0xC0, 8);
@@ -163,7 +162,7 @@ namespace COLGCBT {
         _frame_anim = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 21, MOX::_screen_seg);
     }
 
-    void __cdecl Colony_Combat_Screen_(s_invasion_side_info* attacker, s_invasion_side_info* defender, uint32_t seed, int16_t param_4) {
+    void __cdecl Colony_Combat_Screen_(s_invasion_side_info* attacker, s_invasion_side_info* defender, uint32_t seed, int16_t colony_idx) {
         bool is_exit = false;
         MOX2::action_func_t auto_function_ptr;
 
@@ -183,7 +182,7 @@ namespace COLGCBT {
         Load_Combat_Anims_();
 
         COLONY::_using_colony_screen_palette = 1;
-        COLONY::Set_Colony_Globals_(param_4);
+        COLONY::Set_Colony_Globals_(colony_idx);
         COLONY::_sys_disp_star_handle = COLONY::_star_handle;
         COLONY::_drawing_display = 0;
         COLONY::_valid_colony = 1;
@@ -241,8 +240,8 @@ namespace COLGCBT {
 
             if (input != 0) {
                 if (_display_fast == 0 &&
-                    static_cast<uint8_t>(attacker->current_troop_type_idx) < 4 &&
-                    static_cast<uint8_t>(defender->current_troop_type_idx) < 4) {
+                    (uint8_t)attacker->current_troop_type_idx < 4 &&
+                    (uint8_t)defender->current_troop_type_idx < 4) {
                     _display_fast = 1;
                 }
                 else {
@@ -352,9 +351,9 @@ namespace COLGCBT {
                 int16_t height2 = animate::Get_Height_(anim2);
 
                 if (_g_units[side_idx][i + 1].y + height2 < _g_units[side_idx][i].y + height1) {
-                    struct_::Copy_Structure_(&temp, &_g_units[side_idx][i], 25);
-                    struct_::Copy_Structure_(&_g_units[side_idx][i], &_g_units[side_idx][i + 1], 25);
-                    struct_::Copy_Structure_(&_g_units[side_idx][i + 1], &temp, 25);
+                    struct_::Copy_Structure_(&temp, &_g_units[side_idx][i], sizeof(temp));
+                    struct_::Copy_Structure_(&_g_units[side_idx][i], &_g_units[side_idx][i + 1], sizeof(temp));
+                    struct_::Copy_Structure_(&_g_units[side_idx][i + 1], &temp, sizeof(temp));
                 }
             }
             --passes;
@@ -626,7 +625,7 @@ namespace COLGCBT {
     void __cdecl Draw_Summary_() {
         bool attackers_defeated = true;
 
-        for (int i = 0; i < 4; ++i) {
+        for (int32_t i = 0; i < 4; ++i) {
             if (_g_attack_ptr->unit_counts[i] > 0) {
                 attackers_defeated = false;
             }
@@ -682,21 +681,21 @@ namespace COLGCBT {
 
         s_ground_unit* unit = Get_First_Unit_(side);
         if (unit != nullptr) {
-            int8_t type = static_cast<int8_t>(Get_Next_Troop_Type_(side));
+            int8_t type = (int8_t)Get_Next_Troop_Type_(side);
             unit->type = type;
 
             if (type != -1) {
                 unit->state = 2;
-                unit->x = static_cast<int16_t>(base_x[side] + random::Random_(0x32) - 0x14);
+                unit->x = (int16_t)(base_x[side] + random::Random_(0x32) - 0x14);
 
                 if (random::Random_(0x55) + 0x168 >= 0x1ae) {
                     unit->y = 0x1ae;
                 } else {
-                    unit->y = static_cast<int16_t>(random::Random_(0x55) + 0x168);
+                    unit->y = (int16_t)(random::Random_(0x55) + 0x168);
                 }
 
                 unit->side = side;
-                unit->y_offset = static_cast<int16_t>(random::Random_(3)) - 2;
+                unit->y_offset = (int16_t)random::Random_(3) - 2;
                 unit->anim_frame = 0;
             } else {
                 unit->x = base_x[side];
@@ -709,7 +708,7 @@ namespace COLGCBT {
 
         s_ground_unit* unit = Get_First_Unit_(side);
         if (unit != nullptr) {
-            unit->type = static_cast<int8_t>(Get_Next_Troop_Type_(side));
+            unit->type = (int8_t)Get_Next_Troop_Type_(side);
 
             if (unit->type != -1) {
                 unit->state = 2;
@@ -718,16 +717,16 @@ namespace COLGCBT {
                 s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
                 int16_t height = animate::Get_Height_(anim);
 
-                if ((480 - height) > static_cast<int32_t>(random::Random_(85) + 360)) {
-                    unit->y = static_cast<int16_t>(random::Random_(85) + 360);
+                if ((480 - height) > (int32_t)(random::Random_(85) + 360)) {
+                    unit->y = (int16_t)(random::Random_(85) + 360);
                 } else {
                     anim = Action_Anim_(unit->side, unit->state, unit->type);
                     height = animate::Get_Height_(anim);
                     unit->y = 480 - height;
                 }
 
-                unit->side = static_cast<int8_t>(side);
-                unit->y_offset = static_cast<int16_t>(random::Random_(3)) - 2;
+                unit->side = (int8_t)side;
+                unit->y_offset = (int16_t)random::Random_(3) - 2;
                 unit->anim_frame = 0;
                 unit->target = nullptr;
             } else {
@@ -736,27 +735,23 @@ namespace COLGCBT {
         }
     }
 
-    void __cdecl Print_Data_(char* str, int16_t value, int16_t* line_idx, s_invasion_side_info* side) {
-        char unused_fmt[28];
+    void __cdecl Print_Data_(char* label, int16_t value, int16_t* row, s_invasion_side_info* side_info) {
         char text_buf[500];
 
-        // This string copy exists in the original assembly but is never used afterwards.
-        memcpy(unused_fmt, s_t_T0_124_500_550_600_620__00558468, 27);
-
         int16_t x_pos;
-        if (_g_attack_ptr == side) {
+        if (_g_attack_ptr == side_info) {
             x_pos = 1;
         } else {
-            x_pos = 0x17A; /* 378 */
+            x_pos = 0x17A;
         }
 
-        int16_t y_pos = (*line_idx * 11) + 0x32; /* 50 */
+        int16_t y_pos = (*row * 11) + 0x32;
 
-        sprintf(text_buf, ESTRINGS::E_Strings_(0x4B), s_0_0055110c, str, s_1_00551110, value);
+        sprintf(text_buf, ESTRINGS::E_Strings_(0x4B), s_0_0055110c, label, s_1_00551110, value);
 
-        FMTPARA::Print_Formatted_Paragraph_(x_pos + 9, y_pos, 0xF3 /* 243 */, text_buf, 0);
+        FMTPARA::Print_Formatted_Paragraph_(x_pos + 9, y_pos, 0xF3, text_buf, 0);
 
-        (*line_idx)++;
+        (*row)++;
     }
 
     void __cdecl Reinforce_Units_(uint8_t side) {
@@ -801,7 +796,7 @@ namespace COLGCBT {
         }
 
         if (side_info->combat_modifiers.subterranean_bonus != 0) {
-            Print_Data_(ESTRINGS::E_Strings_(0x1F1), static_cast<uint8_t>(side_info->combat_modifiers.subterranean_bonus), y_pos, side_info);
+            Print_Data_(ESTRINGS::E_Strings_(0x1F1), (uint8_t)side_info->combat_modifiers.subterranean_bonus, y_pos, side_info);
         }
 
         if (side_info->combat_modifiers.difficulty_bonus > 0 && capture::Check_Release_Version_() != 0) {
@@ -814,39 +809,39 @@ namespace COLGCBT {
         }
     }
 
-    void __cdecl Print_Best_Summary_(s_invasion_side_info* param_1, int16_t* param_2) {
-        if (param_1->combat_modifiers.antigrav_bonus != 0) {
+    void __cdecl Print_Best_Summary_(s_invasion_side_info* side_info, int16_t* row) {
+        if (side_info->combat_modifiers.antigrav_bonus != 0) {
             Print_Data_(TECHDATA::_technology_applications[9].name,
-                        (uint8_t)param_1->combat_modifiers.antigrav_bonus,
-                        param_2,
-                        param_1);
+                        (uint8_t)side_info->combat_modifiers.antigrav_bonus,
+                        row,
+                        side_info);
         }
 
-        if (param_1->combat_modifiers.best_armor_tech_app_id != 0) {
-            uint8_t tech_app_id = param_1->combat_modifiers.best_armor_tech_app_id;
+        if (side_info->combat_modifiers.best_armor_tech_app_id != 0) {
+            uint8_t tech_app_id = side_info->combat_modifiers.best_armor_tech_app_id;
 
             Print_Data_(TECHDATA::_technology_applications[tech_app_id].name,
-                        (uint8_t)param_1->combat_modifiers.troop_bonus,
-                        param_2,
-                        param_1);
+                        (uint8_t)side_info->combat_modifiers.troop_bonus,
+                        row,
+                        side_info);
         }
 
-        if (param_1->combat_modifiers.personal_shield_tech_app_id != 0) {
-            uint8_t tech_app_id = param_1->combat_modifiers.personal_shield_tech_app_id;
+        if (side_info->combat_modifiers.personal_shield_tech_app_id != 0) {
+            uint8_t tech_app_id = side_info->combat_modifiers.personal_shield_tech_app_id;
 
             Print_Data_(TECHDATA::_technology_applications[tech_app_id].name,
-                        (uint8_t)param_1->combat_modifiers.personal_shield_bonus,
-                        param_2,
-                        param_1);
+                        (uint8_t)side_info->combat_modifiers.personal_shield_bonus,
+                        row,
+                        side_info);
         }
 
-        if (param_1->combat_modifiers.rifle_tech_app_id != 0) {
-            uint8_t tech_app_id = param_1->combat_modifiers.rifle_tech_app_id;
+        if (side_info->combat_modifiers.rifle_tech_app_id != 0) {
+            uint8_t tech_app_id = side_info->combat_modifiers.rifle_tech_app_id;
 
             Print_Data_(TECHDATA::_technology_applications[tech_app_id].name,
-                        (uint8_t)param_1->combat_modifiers.rifle_bonus,
-                        param_2,
-                        param_1);
+                        (uint8_t)side_info->combat_modifiers.rifle_bonus,
+                        row,
+                        side_info);
         }
     }
 
@@ -873,8 +868,8 @@ namespace COLGCBT {
 
         COLONY::Set_Colony_Font_To_(3);
 
-        if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
-            static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+        if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
+            (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
 
             char buffer[500];
             char* race_name = MOX::_player[_g_attack_ptr->player_id].race_name;
@@ -935,7 +930,7 @@ namespace COLGCBT {
         int16_t valid_troop_idx = 0;
         char local_str[500];
 
-        for (int i = 0; i < 4; i++) {
+        for (int32_t i = 0; i < 4; i++) {
             if (side_info->unit_counts[i] != 0) {
                 active_unit_count++;
             }
@@ -944,18 +939,18 @@ namespace COLGCBT {
         int16_t spacing = 261 / (active_unit_count + 1);
         int16_t cur_x = x + spacing;
 
-        for (int j = 0; j < 4; j++) {
+        for (int32_t j = 0; j < 4; j++) {
             if (side_info->unit_counts[j] != 0) {
-                uint8_t race = static_cast<uint8_t>(MOX::_player[side_info->player_id].race);
+                uint8_t race = (uint8_t)MOX::_player[side_info->player_id].race;
                 s_animation_header* anim = COLONY::Player_Troop_Anim_(side_info->player_id, j, race);
 
-                COLONY::Set_Colony_Font_To_Player_(1, static_cast<int8_t>(_g_attack_ptr->player_id));
+                COLONY::Set_Colony_Font_To_Player_(1, (int8_t)_g_attack_ptr->player_id);
 
                 int32_t strength = side_info->unit_strengths[j] - side_info->combat_modifiers.difficulty_bonus;
                 sprintf(local_str, ESTRINGS::E_Strings_(13), strength);
                 fonts::Print_Centered_(cur_x, 176, local_str);
 
-                uint8_t hp = static_cast<uint8_t>(side_info->unit_hps[j]);
+                uint8_t hp = (uint8_t)side_info->unit_hps[j];
                 if (hp <= 1) {
                     sprintf(local_str, ESTRINGS::E_Strings_(22), hp);
                 } else {
@@ -1011,7 +1006,7 @@ namespace COLGCBT {
     int16_t __cdecl N_Left_Of_Me_To_Process_(s_ground_unit* unit)
     {
         int16_t count = 0;
-        s_ground_unit* end_ptr = _g_units[unit->side + 1];
+        s_ground_unit* end_ptr = &_g_units[unit->side][40];
 
         for (s_ground_unit* current = unit; current < end_ptr; ++current)
         {
@@ -1043,16 +1038,16 @@ namespace COLGCBT {
         return nullptr;
     }
 
-    s_ground_unit* __cdecl Find_Lowest_Framed_Unit_(uint8_t player_idx, int16_t state, uint8_t require_no_target) {
+    s_ground_unit* __cdecl Find_Lowest_Framed_Unit_(uint8_t side_idx, int16_t state, uint8_t require_no_target) {
         s_ground_unit* lowest_unit = nullptr;
         int16_t lowest_frame = 100;
 
         for (int16_t i = 0; i < 40; ++i) {
-            if (static_cast<int8_t>(_g_units[player_idx][i].state) == state) {
-                if (_g_units[player_idx][i].anim_frame <= lowest_frame) {
-                    if (require_no_target == 0 || _g_units[player_idx][i].target == nullptr) {
-                        lowest_frame = _g_units[player_idx][i].anim_frame;
-                        lowest_unit = &_g_units[player_idx][i];
+            if ((int8_t)_g_units[side_idx][i].state == state) {
+                if (_g_units[side_idx][i].anim_frame <= lowest_frame) {
+                    if (require_no_target == 0 || _g_units[side_idx][i].target == nullptr) {
+                        lowest_frame = _g_units[side_idx][i].anim_frame;
+                        lowest_unit = &_g_units[side_idx][i];
                     }
                 }
             }
@@ -1143,7 +1138,7 @@ namespace COLGCBT {
     }
 
     void __cdecl Play_Unit_Beam_Sound_(s_ground_unit* unit) {
-        uint32_t side_info_bits = 0;
+        int16_t default_sound_id = 0;
         s_invasion_side_info* side_info = nullptr;
         int16_t sound_id;
 
@@ -1171,11 +1166,11 @@ namespace COLGCBT {
                     sound_id = 12;
                     break;
                 default:
-                    sound_id = (int16_t)(uint16_t)side_info_bits;
+                    sound_id = default_sound_id;
                     break;
             }
         } else {
-            sound_id = (int16_t)(uint16_t)side_info_bits;
+            sound_id = default_sound_id;
         }
 
         unit->sound_id = ERICNET::Mox_Play_Sound_(sound_id);
@@ -1188,11 +1183,11 @@ namespace COLGCBT {
         animate::Get_Width_(seg);
         animate::Get_Animation_Frame_Count_(seg);
 
-        int16_t local_18[11] = { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
+        int16_t y_step_frames[11] = { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
 
         if (unit->state == 4) {
             if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[24] != 3 && unit->anim_frame % 3 == 2) ||
-                local_18[unit->anim_frame] == 1) {
+                y_step_frames[unit->anim_frame] == 1) {
                 unit->y += unit->y_offset;
             }
         }
@@ -1215,8 +1210,8 @@ namespace COLGCBT {
                 break;
 
             case 2:
-                if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
-                    static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
+                    (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
                     unit->state = 3;
                 } else {
                     unit->state = 4;
@@ -1224,18 +1219,18 @@ namespace COLGCBT {
                 break;
 
             case 3:
-                if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
-                    static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
+                    (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
                     uint32_t rnd = random::Random_(4);
                     if (rnd == 1) {
                         unit->state = 4;
                     } else if (rnd == 2) {
                         unit->state = 3;
-                        unit->x += static_cast<int16_t>(random::Random_(3) - 2);
+                        unit->x += (int16_t)(random::Random_(3) - 2);
                     } else {
                         unit->state = 4;
                         if (rnd != 3) {
-                            unit->y_offset = static_cast<int16_t>(random::Random_(3) - 2);
+                            unit->y_offset = (int16_t)(random::Random_(3) - 2);
                         }
                     }
                 } else {
@@ -1250,8 +1245,8 @@ namespace COLGCBT {
                 sound::Fadeout_Sound_(unit->sound_handle, 10);
                 unit->sound_handle = 0;
 
-                if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
-                    static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
+                    (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
                     if (random::Random_(2) == 1) {
                         unit->state = 3;
                         break;
