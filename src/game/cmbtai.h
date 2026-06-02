@@ -2,17 +2,23 @@
 #include <cstdint>
 
 namespace CMBTAI {
+    /** Returns the AI combat posture for the specified player. */
     int8_t __cdecl Get_Player_Mode_(int16_t player_idx);
 
+    /** Checks whether the specified player should retreat from tactical combat. */
     int16_t __cdecl Retreat_Check_(int16_t player_idx);
 
+    /** Returns the effective per-shot damage value used by AI weapon scoring. */
     int16_t __cdecl Get_Effective_Weapon_Damage_(int16_t ship_idx, int16_t slot_idx);
 
+    /** Returns the total remaining survivability score for a combat unit. */
     int16_t __cdecl Get_Total_Hits_(int16_t ship_idx);
 
+    /** Estimates total missile pressure for a player and reports leftover beam strength. */
     int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* beam_strength);
 
-    int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t param6);
+    /** Estimates how many missiles a point-defense weapon can remove from a volley. */
+    int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t missile_count, int16_t missile_type, int16_t* remaining_pd_count, int16_t missile_idx);
 
     int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx);
 
@@ -40,11 +46,13 @@ namespace CMBTAI {
 
     int8_t __cdecl Combat_Ship_Class_(int16_t ship_idx, int16_t target_idx);
 
-    int16_t __cdecl Auto_Move_Ship_(int16_t ship_param, int16_t target_idx);
+    int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx);
+
 
     bool __cdecl Does_Ship_Have_Missiles_Incoming_(int16_t ship_idx);
     
-    int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t param_2);
+    /** Selects the best current target, preferring either ships or missiles by score. */
+    int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t reference_target_idx);
 
     int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx);
 
@@ -66,21 +74,26 @@ namespace CMBTAI {
 
     bool __cdecl Safe_To_Fire_Sphere_Weapon_(int16_t source_ship_idx);
 
-    int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int16_t param_3);
+    /** Scores a missile target for interception priority. */
+    int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int16_t range_sensitive);
 
     extern int16_t _fleet_target;
 
+    /** Returns the best missile target and writes its priority score. */
     int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out);
 
+    /** Returns the best ship target and writes its priority score. */
     int16_t __cdecl Get_Current_Ship_Target_(int16_t current_ship_idx, int16_t reference_target_idx, int32_t* out_value);
 
     int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t attacker_idx, int16_t weapon_slot, int16_t target_idx, int16_t count, int16_t distance, int16_t target_type_flag);
 
+    /** Estimates the damage a missile volley is expected to inflict on a target ship. */
     int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon_id, int16_t weapon_count, uint16_t weapon_specials, int16_t attacker_player_idx);
 
     int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot, int16_t target_idx, int16_t target_type, int16_t range);
 
-    int16_t __cdecl Evaluate_Possible_Move_(int16_t score, int16_t val1, int16_t val2, int16_t move_type, int16_t* p_count, int16_t* best_moves_val1, int16_t* best_moves_val2, int16_t best_score);
+    /** Tracks the best-scoring move coordinates found for the current AI move search. */
+    int16_t __cdecl Evaluate_Possible_Move_(int16_t score, int16_t move_x, int16_t move_y, int16_t move_type, int16_t* best_move_count, int16_t* best_move_xs, int16_t* best_move_ys, int16_t best_score);
 
     int16_t __cdecl Convert_Ordinal_To_Msl_Type_(int16_t ordinal);
 }

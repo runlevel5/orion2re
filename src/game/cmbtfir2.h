@@ -5,22 +5,31 @@
 namespace CMBTFIR2 {
     extern int16_t _artemis_net_chance[6];
 
+    /** Returns the helmsman combat bonus granted by the specified leader. */
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx);
 
+    /** Returns the weaponry combat bonus granted by the specified leader. */
     int16_t __cdecl Weaponry_Bonus_(int16_t leader_idx);
 
+    /** Returns the engineer repair bonus granted by the specified leader. */
     int16_t __cdecl Engineer_Bonus_(int16_t leader_idx);
 
+    /** Returns the fighter-pilot combat bonus granted by the specified leader. */
     int16_t __cdecl Fighter_Pilot_Bonus_(int16_t leader_idx);
 
+    /** Returns the galactic-lore combat bonus granted by the specified leader. */
     int16_t __cdecl Galactic_Lore_Bonus_(int16_t leader_idx);
 
+    /** Recomputes ordnance bonuses for the current combat participants. */
     void __cdecl Set_Combat_Ordnance_Values_();
 
+    /** Returns the ordnance bonus granted by the specified leader. */
     int16_t __cdecl Leader_Ordnance_Bonus_(int16_t leader_idx);
 
+    /** Returns the highest ordnance bonus among active ships owned by a player. */
     int16_t __cdecl Get_Fleet_Ordnance_Bonus_(int16_t owner);
 
+    /** Applies the Artemis Net effect to eligible combat units. */
     bool __cdecl Apply_Combat_Artemis_Net_(char strategic);
 
     int16_t __cdecl Used_Teleporter_(int16_t ship_idx);
@@ -28,15 +37,6 @@ namespace CMBTFIR2 {
     void __cdecl Set_Teleporter_Used_(int16_t ship_idx);
 
     void __cdecl Set_Boarded_Flag_(int16_t ship_idx);
-
-    extern const char s__005510f0[2];
-    extern const char s__00557e5c[3];
-    extern const char s__00557e60[3];
-    extern const char s__0055a588[21];
-    extern const char s__0055a5a0[47];
-    extern const char s__0055a5d0[10];
-    extern const char s__0055a550[55];
-    extern const char s__0055a544[11];
 
     int16_t __cdecl Commando_Bonus_(int16_t leader_idx);
 
@@ -54,11 +54,12 @@ namespace CMBTFIR2 {
 
     void __cdecl Resolve_Raid_(int16_t attacker_idx, int16_t target_idx, int16_t* raiders);
 
-    void __cdecl Resolve_Capture_(int16_t attacker_idx, int16_t defender_idx, int16_t attacker_marines, int16_t param_4, int16_t param_5);
+    /** Resolves a boarding capture attempt between two combat ships. */
+    void __cdecl Resolve_Capture_(int16_t attacker_idx, int16_t defender_idx, int16_t attacker_marines, int16_t target_x, int16_t target_y);
 
-    void __cdecl Capture_Ship_(int16_t ship_idx, int16_t attacker_ship_idx, int16_t weapon_idx);
+    void __cdecl Capture_Ship_(int16_t ship_idx, int16_t x, int16_t y);
 
-    int16_t __cdecl Already_Boarded_(int16_t param_1);
+    int16_t __cdecl Already_Boarded_(int16_t ship_idx);
 
     void __cdecl Set_Combat_Ship_Done_(int16_t ship_idx);
 
@@ -66,15 +67,15 @@ namespace CMBTFIR2 {
 
     void __cdecl Init_Internal_Space_(s_combat_data* ship);
 
-    short __cdecl Max_Total_Internal_Space_(short ship_idx);
+    int16_t __cdecl Max_Total_Internal_Space_(int16_t ship_idx);
 
     int16_t __cdecl Total_Internal_Space_(int16_t ship_idx);
 
     int16_t __cdecl Crew_Defense_Bonus_(int16_t combat_idx);
 
-    short __cdecl Fleet_Defensive_Bonus_(short player_idx, short mode, short* bonus_val_ptr);
+    int16_t __cdecl Fleet_Defensive_Bonus_(int16_t player_idx, int16_t mode, int16_t* bonus_val_ptr);
 
-    short __cdecl Fleet_Offensive_Bonus_(short player_idx);
+    int16_t __cdecl Fleet_Offensive_Bonus_(int16_t player_idx);
 
     int16_t __cdecl Get_Fleet_Pilot_Bonus_(int16_t owner_idx);
 
@@ -102,7 +103,8 @@ namespace CMBTFIR2 {
 
     void __cdecl Set_Capturing_Flag_(int16_t unit_idx);
 
-    int16_t __cdecl Init_Boarding_Action_(int16_t unit_idx, int16_t* param_2);
+    /** Opens the boarding popup and returns the selected boarding action. */
+    int16_t __cdecl Init_Boarding_Action_(int16_t unit_idx, int16_t* boarding_choice_out);
 
     void __cdecl Defensive_Fire_Check_(int16_t target_idx, int16_t target_x, int16_t target_y, int16_t dest_x, int16_t dest_y);
 

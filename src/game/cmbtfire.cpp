@@ -92,14 +92,9 @@ namespace CMBTFIRE {
         }
     }
 
-    // Suggested name: Does_Combat_Planet_Have_Defenses
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_() {
         if (MOX::_cmbt_colony_id != -1) {
-            // Pack colony defense buildings into a bitfield:
-            // bit 3: Fighter Garrison
-            // bit 2: Stellar Converter
-            // bit 1: Ground Batteries
-            // bit 0: Missile Base
+            // Packs Fighter Garrison, Stellar Converter, Ground Batteries, and Missile Base into bits 3..0.
             return (((int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_FIGHTER_GARRISON] * 2 |
                      (int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_STELLAR_CONVERTER]) * 2 |
                     (int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_GROUND_BATTERIES]) * 2 |
@@ -179,7 +174,7 @@ namespace CMBTFIRE {
         MOX::_combat_data[ship_idx].stasis_source_idx = 0xFF;
     }
 
-    void __cdecl Destroy_Ship_(int16_t ship_idx, int16_t param_2, int16_t param_3, int16_t param_4) {
+    void __cdecl Destroy_Ship_(int16_t ship_idx, int16_t draw_x, int16_t draw_y, int16_t death_state) {
         s_combat_data& ship = MOX::_combat_data[ship_idx];
         int8_t new_owner;
 
@@ -195,7 +190,7 @@ namespace CMBTFIRE {
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             if (ship.unit_status == 0) {
-                CMBTSPEC::Destroy_Ship_FX_(ship_idx, param_2, param_3, param_4);
+                CMBTSPEC::Destroy_Ship_FX_(ship_idx, draw_x, draw_y, death_state);
             }
         } else {
             ship.unit_status = 5;
@@ -393,15 +388,13 @@ namespace CMBTFIRE {
 
         int8_t rack = TECHDATA::_weapons[weapon_idx].type;
 
-        // The assembly performs an unsigned bounds check on the sign-extended rack value
-        // before using the jump table.
-        if (static_cast<uint32_t>(static_cast<int32_t>(rack)) > 5) {
+        // Preserve the original unsigned bounds check before the rack jump table.
+        if ((uint32_t)(int32_t)rack > 5) {
             return 0;
         }
 
         switch (rack) {
             case 0:
-                // Check if specific flag bit is NOT set (0x2)
                 if ((flags & 0x0002) == 0) {
                     return 1;
                 }
@@ -429,7 +422,7 @@ namespace CMBTFIRE {
         return result;
     }
 
-    void __cdecl Fire_Fighter_Beam_(int16_t missile_idx, int16_t param_2, int16_t param_3, int16_t* total_damage, int16_t* total_struct_damage) {
+    void __cdecl Fire_Fighter_Beam_(int16_t missile_idx, int16_t shield_arc, int16_t target_is_missile, int16_t* total_damage, int16_t* total_struct_damage) {
         int16_t struct_damage = 0;
 
         int16_t target_idx = MOX::_missile[missile_idx].target_unit_idx;
@@ -450,7 +443,7 @@ namespace CMBTFIRE {
         int16_t weapon_min_damage = TECHDATA::_weapons[weapon_id].min_damage;
 
         int16_t chance_to_hit;
-        if (param_3 == 0) {
+        if (target_is_missile == 0) {
             int16_t ocv = CMBTMIS::Fighter_Ocv_(source_owner);
             chance_to_hit = ocv - MOX::_combat_data[target_idx].tac_val_defense;
         } else {
@@ -459,9 +452,7 @@ namespace CMBTFIRE {
             chance_to_hit = ocv - dcv;
         }
 
-        // Note: The original logic tests bit 2 of bStack_c here. Since bStack_c is only assigned 0 or 0x40, 
-        // this condition will never be true and appears to be a bug in the original code.
-        // It's intentionally preserved to stay strictly faithful to original semantics.
+        // Preserves the original unreachable bit test on specials, which appears to be a legacy bug.
         if (specials & 0x4) {
             chance_to_hit += 25;
             weapon_damage = (weapon_damage + 1) / 2;
@@ -491,13 +482,13 @@ namespace CMBTFIRE {
                     damage_done += ((rand_val - 40) * (damage_diff + 1)) / 60;
                 }
 
-                if (param_3 == 0) {
+                if (target_is_missile == 0) {
                     struct_damage = 0;
                     if (target_idx == 0) {
                         damage_done /= 2;
                     }
 
-                    CMBTFIRE::Apply_Ship_Damage_(target_idx, &damage_done, &struct_damage, param_2, specials, weapon_flags, 0, 0, 0);
+                    CMBTFIRE::Apply_Ship_Damage_(target_idx, &damage_done, &struct_damage, shield_arc, specials, weapon_flags, 0, 0, 0);
 
                     *total_damage += damage_done;
                     *total_struct_damage += struct_damage;
@@ -510,7 +501,7 @@ namespace CMBTFIRE {
         }
 
         if (CMBTMIS::Is_Missile_Target_Alive_(missile_idx) == 0) {
-            if (param_3 == 1) {
+            if (target_is_missile == 1) {
                 CMBTMIS::Retarget_Missile_(missile_idx);
                 CMBTMIS::Kill_Missile_(target_idx);
             }
@@ -524,7 +515,7 @@ namespace CMBTFIRE {
         // Calculate health for a single missile in the stack
         int16_t max_hits = CMBTMIS::Get_Missile_Hits_(
             missile->type,
-            static_cast<int16_t>(MOX::_combat_data[missile->source_unit_idx].owner),
+            (int16_t)MOX::_combat_data[missile->source_unit_idx].owner,
             missile->specials
         );
 
@@ -604,23 +595,23 @@ namespace CMBTFIRE {
         int16_t target_ship_idx,
         int16_t* dmg_out,
         int16_t* sys_dmg,
-        int16_t param_4,
+        int16_t shield_arc,
         uint16_t specials,
         uint16_t weapon_flags,
-        int16_t param_7,
-        int16_t param_8,
-        int16_t param_9
+        int16_t double_internal_damage,
+        int16_t force_armor_bypass,
+        int16_t internal_only
     ) {
-        int16_t local_8 = 0;
-        int16_t local_e = 0;
-        int16_t local_10 = 0;
+        int16_t internal_hit_type = 0;
+        int16_t internal_hit_count = 0;
+        int16_t structural_bonus_damage = 0;
         uint16_t retval = 0;
 
         *sys_dmg = 0;
 
         if (target_ship_idx == 0) {
             retval = Apply_Damage_To_Planet_(dmg_out, specials, weapon_flags);
-            *dmg_out += local_10;
+            *dmg_out += structural_bonus_damage;
             return retval;
         }
 
@@ -637,10 +628,10 @@ namespace CMBTFIRE {
             *dmg_out /= 4;
         }
 
-        int16_t local_a = MOX::_combat_data[target_ship_idx].shield_arc_current[param_4];
+        int16_t remaining_shield_hits = MOX::_combat_data[target_ship_idx].shield_arc_current[shield_arc];
         if ((specials & 0x40) != 0) {
             if (!COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13 /* Multi-Phased Shields */)) {
-                local_a = 0;
+                remaining_shield_hits = 0;
             }
         }
 
@@ -670,14 +661,14 @@ namespace CMBTFIRE {
                 }
             }
 
-            if (*dmg_out < local_a) {
-                MOX::_combat_data[target_ship_idx].shield_arc_current[param_4] -= *dmg_out;
+            if (*dmg_out < remaining_shield_hits) {
+                MOX::_combat_data[target_ship_idx].shield_arc_current[shield_arc] -= *dmg_out;
                 *sys_dmg = *dmg_out;
                 *dmg_out = 0;
             } else {
-                *dmg_out -= local_a;
-                *sys_dmg = local_a;
-                MOX::_combat_data[target_ship_idx].shield_arc_current[param_4] -= local_a;
+                *dmg_out -= remaining_shield_hits;
+                *sys_dmg = remaining_shield_hits;
+                MOX::_combat_data[target_ship_idx].shield_arc_current[shield_arc] -= remaining_shield_hits;
             }
         }
 
@@ -693,12 +684,12 @@ namespace CMBTFIRE {
             }
         }
 
-        if (param_7 != 0) {
+        if (double_internal_damage != 0) {
             *dmg_out *= 2;
         }
 
         int16_t ignore_armor;
-        if (param_8 == 0) {
+        if (force_armor_bypass == 0) {
             ignore_armor = (specials & 8) != 0;
             if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 14 /* Heavy Armor */) ||
                 MOX::_combat_data[target_ship_idx].armor_type == 6) {
@@ -725,7 +716,7 @@ namespace CMBTFIRE {
                     // Replicate original bug: damage fraction added again if it didn't hit maximum
                     MOX::_combat_data[target_ship_idx].structure_damage = cur_dmg + *dmg_out / 2;
                 }
-                local_10 = *dmg_out / 2;
+                structural_bonus_damage = *dmg_out / 2;
             }
 
             int16_t bypassed_damage;
@@ -734,11 +725,11 @@ namespace CMBTFIRE {
                 int16_t remaining_damage = *dmg_out;
 
                 while (remaining_damage > 0 && !CMBTFIRE::Is_Combat_Ship_Dead_(target_ship_idx)) {
-                    CMBTFIR2::Select_Internal_(target_ship_idx, &local_8, &local_e, param_8, weapon_flags & 8, 1, param_9);
-                    if (local_8 == -1) {
+                    CMBTFIR2::Select_Internal_(target_ship_idx, &internal_hit_type, &internal_hit_count, force_armor_bypass, weapon_flags & 8, 1, internal_only);
+                    if (internal_hit_type == -1) {
                         remaining_damage = 0;
                     }
-                    CMBTFIR2::Apply_Internal_Damage_(target_ship_idx, &remaining_damage, local_8, local_e, 1);
+                    CMBTFIR2::Apply_Internal_Damage_(target_ship_idx, &remaining_damage, internal_hit_type, internal_hit_count, 1);
                 }
             } else {
                 bypassed_damage = 0;
@@ -746,15 +737,15 @@ namespace CMBTFIRE {
 
             int16_t remaining_damage = *dmg_out - bypassed_damage;
             while (remaining_damage > 0 && !CMBTFIRE::Is_Combat_Ship_Dead_(target_ship_idx)) {
-                CMBTFIR2::Select_Internal_(target_ship_idx, &local_8, &local_e, param_8, weapon_flags & 8, 0, param_9);
-                if (local_8 == -1) {
+                CMBTFIR2::Select_Internal_(target_ship_idx, &internal_hit_type, &internal_hit_count, force_armor_bypass, weapon_flags & 8, 0, internal_only);
+                if (internal_hit_type == -1) {
                     remaining_damage = 0;
                 }
-                CMBTFIR2::Apply_Internal_Damage_(target_ship_idx, &remaining_damage, local_8, local_e, 1);
+                CMBTFIR2::Apply_Internal_Damage_(target_ship_idx, &remaining_damage, internal_hit_type, internal_hit_count, 1);
             }
         }
 
-        *dmg_out += local_10;
+        *dmg_out += structural_bonus_damage;
         return retval;
     }
 
@@ -839,8 +830,9 @@ namespace CMBTFIRE {
         palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
     }
 
-    int16_t __cdecl Fire_Bomb_(int16_t ship_idx, int16_t param_2, int16_t weapon_slot_idx) {
+    int16_t __cdecl Fire_Bomb_(int16_t ship_idx, int16_t unused_target_idx, int16_t weapon_slot_idx) {
         int16_t total_damage = 0;
+        (void)unused_target_idx;
         int32_t ordnance_bonus = MOX::_ordnance_bonus[MOX::_combat_data[ship_idx].owner];
         int16_t weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
 
@@ -1039,7 +1031,6 @@ namespace CMBTFIRE {
         Pre_Weapon_Specials_(source_ship_idx, target_ship_idx, flag);
 
         if (flag != 1 && CMBTMOV1::Ship_Is_In_Stasis_(target_ship_idx) != 0) {
-            // Target is in stasis, skip firing
         } else {
             bool target_dead = false;
             if (flag == 0) {
@@ -1219,7 +1210,7 @@ namespace CMBTFIRE {
                                     }
 
                                     if (flag == 0) {
-                                        target_death_status = static_cast<uint8_t>(Is_Combat_Ship_Dead_(target_ship_idx));
+                                        target_death_status = (uint8_t)Is_Combat_Ship_Dead_(target_ship_idx);
                                     } else {
                                         int16_t remaining_missiles = MOX::_missile[target_ship_idx].quantity - total_hits_on_target;
                                         if (remaining_missiles <= 0 || MOX::_missile[target_ship_idx].type == 0) {
@@ -1295,15 +1286,14 @@ namespace CMBTFIRE {
         return fire_result_flags;
     }
 
-    // Suggested name: CMBTFIRE::Pre_Weapon_Specials
-    void __cdecl Pre_Weapon_Specials_(int16_t unit_idx, int16_t target_idx, int16_t is_coord) {
+    void __cdecl Pre_Weapon_Specials_(int16_t unit_idx, int16_t target_idx, int16_t target_type) {
         int16_t range;
         int16_t special_idx;
         int16_t bit_idx;
 
-        if (is_coord != 0) {
+        if (target_type != 0) {
             CMBTMIS::Missile_Type_(target_idx);
-            if (is_coord != 0) {
+            if (target_type != 0) {
                 range = CMBTAI::Range_To_Missile_(unit_idx, target_idx);
             }
             else {
@@ -1317,7 +1307,7 @@ namespace CMBTFIRE {
         special_idx = 0;
         for (bit_idx = 0; bit_idx < 39; ++bit_idx) {
             // Check for Energy Absorber (Bit 10)
-            if (bit_idx == 10 && is_coord == 0 && range < 8) {
+            if (bit_idx == 10 && target_type == 0 && range < 8) {
                 if (MOX::_combat_data[unit_idx].reflected_damage_pool > 0) {
                     if (CMBTFIRE::Special_Is_On_(unit_idx, special_idx)) {
                         CMBTFIRE::Energy_Absorber_Attack_(unit_idx, target_idx);
@@ -1409,7 +1399,7 @@ namespace CMBTFIRE {
                         return;
                     }
                 } else {
-                    if (target_type == 0 && static_cast<uint16_t>(MOX::_combat_data[ship_idx].special_cooldown) != target_idx && MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
+                    if (target_type == 0 && (uint16_t)MOX::_combat_data[ship_idx].special_cooldown != target_idx && MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
                         CMBTSPEC::Tractor_Beam_(ship_idx, target_idx);
                         MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                     }
@@ -1591,27 +1581,27 @@ namespace CMBTFIRE {
         return (int16_t)return_flags;
     }
 
-    void __cdecl Energy_Absorber_Attack_(int16_t param_1, int16_t param_2) {
-        s_beam_fx_entry local_f0[16];
-        struct_::Clear_Structure_(local_f0, sizeof(local_f0));
+    void __cdecl Energy_Absorber_Attack_(int16_t source_ship_idx, int16_t target_ship_idx) {
+        s_beam_fx_entry beam_fx_entries[16];
+        struct_::Clear_Structure_(beam_fx_entries, sizeof(beam_fx_entries));
 
-        int16_t local_f8 = 0;
-        int16_t local_fc = Facing_Shield_(CMBTDRW1::Relative_Bearing_(param_2, param_1));
+        int16_t damage_bonus = 0;
+        int16_t target_shield_arc = Facing_Shield_(CMBTDRW1::Relative_Bearing_(target_ship_idx, source_ship_idx));
 
-        int16_t range = (int16_t)CMBTAI::Range_To_Ship_(param_1, param_2);
-        int16_t local_fe;
-        Get_Beam_Weapon_Modifiers_(param_1, range, 0, 3, &local_fe, &local_f8);
+        int16_t range = (int16_t)CMBTAI::Range_To_Ship_(source_ship_idx, target_ship_idx);
+        int16_t hit_bonus;
+        Get_Beam_Weapon_Modifiers_(source_ship_idx, range, 0, 3, &hit_bonus, &damage_bonus);
 
-        int32_t bonus = MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] + local_f8;
-        int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[param_1].reflected_damage_pool + 50) / 100);
+        int32_t bonus = MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] + damage_bonus;
+        int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[source_ship_idx].reflected_damage_pool + 50) / 100);
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(param_2, 8) != 0) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 8) != 0) {
             if (random::Random_(100) > 30) {
                 damage = 0;
             }
         }
 
-        if (param_2 == 0) {
+        if (target_ship_idx == 0) {
             damage /= 2;
         }
 
@@ -1619,44 +1609,44 @@ namespace CMBTFIRE {
         int16_t shield_hit_result = 0;
 
         if (damage > 0) {
-            int16_t sVar3 = COMBINIT::Does_Combat_Ship_Have_Special_(param_1, 1);
-            int16_t sVar2 = COMBINIT::Does_Combat_Ship_Have_Special_(param_1, 0x20);
-            uVar4 = Apply_Ship_Damage_(param_2, &damage, &shield_hit_result, local_fc, 0, 0, sVar2, sVar3, 0);
+            int16_t analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, 1);
+            int16_t structural_analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, 0x20);
+            uVar4 = Apply_Ship_Damage_(target_ship_idx, &damage, &shield_hit_result, target_shield_arc, 0, 0, structural_analyzer_bonus, analyzer_bonus, 0);
         }
 
-        int16_t is_dead = Is_Combat_Ship_Dead_(param_2);
+        int16_t is_dead = Is_Combat_Ship_Dead_(target_ship_idx);
 
         if (MOX::_apply_damage_to_planet != 0 && MOX::_super_fast_flag == 0) {
-            if (CMBTDRW1::Ship_Completely_On_Screen_(param_2) == 0) {
-                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[param_2].x, MOX::_combat_data[param_2].y);
+            if (CMBTDRW1::Ship_Completely_On_Screen_(target_ship_idx) == 0) {
+                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[target_ship_idx].x, MOX::_combat_data[target_ship_idx].y);
             }
 
-            local_f0[0].weapon_id = 0x2e;
-            local_f0[0].shot_count = 1;
-            local_f0[0].special_flag = uVar4 & 1;
-            local_f0[0].result_flags = (uVar4 & 2) != 0;
-            local_f0[0].accum_hit_x = damage;
-            local_f0[0].accum_hit_y = shield_hit_result;
-            local_f0[0].is_damage_entry = 0;
-            local_f0[0].specials = 0;
+            beam_fx_entries[0].weapon_id = 0x2e;
+            beam_fx_entries[0].shot_count = 1;
+            beam_fx_entries[0].special_flag = uVar4 & 1;
+            beam_fx_entries[0].result_flags = (uVar4 & 2) != 0;
+            beam_fx_entries[0].accum_hit_x = damage;
+            beam_fx_entries[0].accum_hit_y = shield_hit_result;
+            beam_fx_entries[0].is_damage_entry = 0;
+            beam_fx_entries[0].specials = 0;
 
             BEAMS::Beam_SFX_(
-                param_1,
-                (MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20,
-                (MOX::_combat_data[param_1].y - MOX::_cur_combat_y) * 20,
-                param_2,
-                (MOX::_combat_data[param_2].x - MOX::_cur_combat_x) * 20,
-                (MOX::_combat_data[param_2].y - MOX::_cur_combat_y) * 20,
-                local_f0,
+                source_ship_idx,
+                (MOX::_combat_data[source_ship_idx].x - MOX::_cur_combat_x) * 20,
+                (MOX::_combat_data[source_ship_idx].y - MOX::_cur_combat_y) * 20,
+                target_ship_idx,
+                (MOX::_combat_data[target_ship_idx].x - MOX::_cur_combat_x) * 20,
+                (MOX::_combat_data[target_ship_idx].y - MOX::_cur_combat_y) * 20,
+                beam_fx_entries,
                 0
             );
         }
 
         if (is_dead != 0) {
-            Destroy_Ship_(param_2, MOX::_combat_data[param_2].x * 20, MOX::_combat_data[param_2].y * 20, is_dead);
+            Destroy_Ship_(target_ship_idx, MOX::_combat_data[target_ship_idx].x * 20, MOX::_combat_data[target_ship_idx].y * 20, is_dead);
         }
 
-        MOX::_combat_data[param_1].reflected_damage_pool = 0;
+        MOX::_combat_data[source_ship_idx].reflected_damage_pool = 0;
     }
 
     void __cdecl Get_Beam_Weapon_Modifiers_(int16_t ship_idx, int16_t range, uint16_t wpn_modifier_flags, int16_t wpn_idx, int16_t *hit_bonus_out, int16_t *dmg_mod_out) {
@@ -1711,10 +1701,9 @@ namespace CMBTFIRE {
         int32_t sound_handle;
         int16_t speed_step;
         int16_t loop_counter;
-        const char* s_cmbtsfx_lbx_local = COMBINIT::s_cmbtsfx_lbx_00551228;
 
         if (MOX::_apply_damage_to_planet != 0 && MOX::_super_fast_flag == 0) {
-            anim_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F /* 47 */, MOX::_global_cache_seg);
+            anim_seg = (s_animation_header*)buffer::Buffer_Reload_(COMBINIT::s_cmbtsfx_lbx_00551228, 0x2F /* 47 */, MOX::_global_cache_seg);
             animate::Draw_Palette_(anim_seg);
             frame_count = animate::Get_Animation_Frame_Count_(anim_seg);
 
@@ -1748,7 +1737,7 @@ namespace CMBTFIRE {
                 loop_counter += speed_step;
 
                 animate::Set_Animation_Frame_(anim_seg, (int32_t)current_frame);
-                anim_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F, MOX::_global_cache_seg);
+                anim_seg = (s_animation_header*)buffer::Buffer_Reload_(COMBINIT::s_cmbtsfx_lbx_00551228, 0x2F, MOX::_global_cache_seg);
                 bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, anim_seg);
 
                 graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);

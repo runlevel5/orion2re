@@ -7,10 +7,6 @@
 - none
 
 ## Pending
-- [pending] src/game/cmbtai.{h,cpp}
-- [pending] src/game/cmbtdrw1.{h,cpp}
-- [pending] src/game/cmbtfir2.{h,cpp}
-- [pending] src/game/cmbtfire.{h,cpp}
 - [pending] src/game/cmbtmis.{h,cpp}
 - [pending] src/game/cmbtmov1.{h,cpp}
 - [pending] src/game/cmbtspec.{h,cpp}
@@ -182,6 +178,10 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/cmbtfire.{h,cpp} - applied concise combat-fire header docstrings, renamed the remaining clear placeholder combat parameters and locals, removed stale suggested-name/redundant assembly comments, replaced the remaining `static_cast` uses with equivalent C-style casts, and inlined the redundant local LBX alias in `BHG_`; no direct pointer-arithmetic memory access stood out, but the repeated `s_animation_header*` overlays on reload/allocated buffers still rely on recovered layout/alignment assumptions and likely want a dedicated typed animation-buffer helper later.
+- [reviewed] src/game/cmbtfir2.{h,cpp} - applied concise combat-bonus/boarding docstrings, placeholder-parameter renames, fixed-width cleanup for the remaining `short` signatures, the last `static_cast<int32_t>` replacement, stale register/bit/assembly comment cleanup, inlining of the CPP-local boarding-format strings with fmtpara control-sequence notes, and `sizeof(...)` cleanup for fixed local buffers and the contiguous hit-layout copy; no pointer-arithmetic direct-memory UB stood out, but `Clear_Internal_Space_` still relies on a contiguous recovered-field layout that likely wants a dedicated typed sub-struct later.
+- [reviewed] src/game/cmbtdrw1.{h,cpp} - applied concise combat-drawing docstrings, conservative parameter renames, misplaced/stale comment cleanup, inlining of the CPP-local combat string constants, and obvious `static_cast`/`reinterpret_cast` cleanup to C-style casts; `Plasma_Darken_` still performs UB-prone frame-data access through pointer arithmetic on `s_animation_header*`, which likely wants a recovered typed frame-header/view helper before any deeper rewrite.
+- [reviewed] src/game/cmbtai.{h,cpp} - re-reviewed header and implementation together; applied concise header docstrings for the targeting/move-evaluation helpers, clearer parameter names, removal of stale raw-address comments, replacement of the remaining `static_cast` uses with equivalent C-style casts, and fixed-width `int32_t` cleanup for the remaining score/average temporaries; `Evaluate_Possible_Move_` still relies on an uninitialized `base_val` path when `move_type` is unexpected, but the combat/missile scans otherwise did not reveal new pointer-arithmetic UB beyond that logic risk.
 - [reviewed] src/game/clipped.{h,cpp} - applied concise clipped-sprite docstrings, renamed the generic header `data` parameters and the local screen-buffer cursor for clarity, removed the stale simplification/TODO comment, and aligned sprite-stream overlays with the existing packed-frame cast pattern from `animate.cpp`; unchecked screen-buffer offset math and manual sprite-command decoding remain UB-prone and still hint at a missing typed sprite-command stream abstraction.
 - [reviewed] src/game/chat.{h,cpp} - suggest adding concise chat helper docstrings, renaming the decompiler-style send parameter, replacing the remaining `static_cast` and plain `int` loop/length temporaries with explicit fixed-width `int32_t`, and removing the stale type-mismatch comment in the GNN send path; no pointer-math UB access stood out in this unit.
 - [reviewed] src/game/buffer.{h,cpp} - applied concise buffer-cache docstrings, renamed the unused flush parameter, replaced the remaining `static_cast`/`reinterpret_cast` uses with C-style casts, and inlined the local string-constant usages; raw header reads via `buffer_space_seg - 8` and `buffer_base - 0x0C` remain UB-prone pointer-math access patterns and likely want a better recovered allocation-header type boundary.
@@ -213,4 +213,5 @@
 - [reviewed] src/game/capture.{h,cpp} - applied concise header docstrings for the release-flag helpers and the no-op screen-capture entry point; no naming, comment, fixed-width type, cast, or pointer-math UB issues stood out in this unit.
 
 ## Blocked
-- none
+- [blocked] src/game/dplay_dll.h - file is not present under `src/game/` in the current tree.
+- [blocked] src/game/switchd_0045bee9.h - file is not present under `src/game/` in the current tree.

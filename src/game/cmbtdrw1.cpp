@@ -2,7 +2,6 @@
 
 namespace CMBTDRW1 {
     const char s_combat_lbx[11] = "combat.lbx";
-    const char s__00559998[3] = "  ";
     uint8_t _green[16];
     MOX2::action_func_t _k_save;
 
@@ -16,15 +15,6 @@ namespace CMBTDRW1 {
     s_animation_header* _board_left_button_seg;
     s_animation_header* _board_right_button_seg;
 
-    const char s_B_005560e4[2] = "B";
-    const char s_L_005560e8[2] = "L";
-    const char s_S_005569cc[2] = "S";
-    const char s_D_005569dc[2] = "D";
-    const char s_A_00557ed4[2] = "A";
-    const char s_I_0055801c[2] = "I";
-    const char s_R_0055824c[2] = "R";
-    const char s_F_005598f4[2] = "F";
-
     void __cdecl Draw_Shield_Arcs_() {
         if (MOX::_cur_ship == 0) {
             return;
@@ -32,15 +22,15 @@ namespace CMBTDRW1 {
 
         char str[4][4] = {0};
         if (MOX::_settings.language == 4) {
-            strcpy(str[0], s_A_00557ed4);
-            strcpy(str[1], s_D_005569dc);
-            strcpy(str[2], s_I_0055801c);
-            strcpy(str[3], s_S_005569cc);
+            strcpy(str[0], "A");
+            strcpy(str[1], "D");
+            strcpy(str[2], "I");
+            strcpy(str[3], "S");
         } else {
-            strcpy(str[0], s_F_005598f4);
-            strcpy(str[1], s_R_0055824c);
-            strcpy(str[2], s_B_005560e4);
-            strcpy(str[3], s_L_005560e8);
+            strcpy(str[0], "F");
+            strcpy(str[1], "R");
+            strcpy(str[2], "B");
+            strcpy(str[3], "L");
         }
 
         int16_t local_3a[7];
@@ -250,10 +240,6 @@ namespace CMBTDRW1 {
         allocate::Pop_Block_(MOX::_screen_seg);
     }
 
-    /**
-     * Calculates the relative bearing from ship_a to ship_b, adjusted for ship_a's current facing direction.
-     * The result is in degrees [0, 359].
-     */
     void __cdecl Draw_Legal_Boxes_() {
         if (MOX::_cur_ship == 0) {
             return;
@@ -289,7 +275,6 @@ namespace CMBTDRW1 {
                 box_size = 60; /* 0x3C */
                 break;
             default:
-                // Note: Fallback to uninitialized stack variable DI in assembly
                 break;
             }
 
@@ -1343,8 +1328,8 @@ skip_cursor:
      * Draws a 3x3 blip on the screen using multiple dots with varying color offsets.
      * The color of each dot is relative to the sum of p3 and p4.
      */
-    void __cdecl Draw_Blip3_(int16_t x, int16_t y, int16_t p3, int16_t p4) {
-        int16_t color_base = p3 + p4;
+    void __cdecl Draw_Blip3_(int16_t x, int16_t y, int16_t base_color, int16_t color_offset) {
+        int16_t color_base = base_color + color_offset;
 
         // Row 0
         graphics::Dot_(x, y, (uint8_t)(color_base + 9));
@@ -1391,7 +1376,7 @@ skip_cursor:
      * The color of each pixel is determined by the sum of two color parameters and a local offset.
      */
     void __cdecl Draw_Blip5_(int16_t x, int16_t y, int16_t color_base_a, int16_t color_base_b) {
-        uint8_t base = static_cast<uint8_t>(color_base_a + color_base_b);
+        uint8_t base = (uint8_t)(color_base_a + color_base_b);
 
         // Row 0
         graphics::Dot_(x, y, base + 2);
@@ -2035,19 +2020,19 @@ skip_cursor:
      * It combines the world-to-screen coordinate transformation (multiplied by 20)
      * with local ship-specific centering offsets.
      */
-    void __cdecl Draw_Ship_Status_(int16_t param_1, int16_t param_2, int16_t param_3) {
-        if (param_1 < 0x14) {
+    void __cdecl Draw_Ship_Status_(int16_t x, int16_t y, int16_t ship_idx) {
+        if (x < 0x14) {
             graphics::Fill_(0xf, 0x17b, 0x66, 0x1c5, 0);
             s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, MOX::_global_cache_seg);
             animate::Draw_(0xf, 0x17b, anim);
-        } else if (param_1 > 0x17c) {
+        } else if (x > 0x17c) {
             graphics::Fill_(0x191, 0x17b, 0x1e8, 0x1d3, 0);
             s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, MOX::_global_cache_seg);
             animate::Draw_(0x191, 0x17b, anim);
         }
 
-        if (param_3 == 0) {
-            animate::Draw_(param_1 + 0x10, param_2 + 0xf, MOX::_combat_planet_seg2);
+        if (ship_idx == 0) {
+            animate::Draw_(x + 0x10, y + 0xf, MOX::_combat_planet_seg2);
             s_combat_data* planet_combat = &MOX::_combat_data[0];
 
             if (planet_combat->owner != 8) {
@@ -2065,53 +2050,54 @@ skip_cursor:
                     itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, local_b4, 10);
                 }
                 
-                strcpy(local_a0 + strlen(local_a0), local_b4);
-                strcpy(local_a0 + strlen(local_a0), s__00559998);
+
+                strcat(local_a0, local_b4);
+                strcat(local_a0, "  ");
 
                 if (MOX::_cmbt_colony_id != -1) {
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[1] > 0) {
                         KEN::Ken_Get_Text_Message_(1, local_50, 0x50);
-                        strcpy(local_a0 + strlen(local_a0), local_50);
+                        strcat(local_a0, local_50);
                         itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], local_b4, 10);
-                        strcpy(local_a0 + strlen(local_a0), local_b4);
-                        strcpy(local_a0 + strlen(local_a0), s__00559998);
+                        strcat(local_a0, local_b4);
+                        strcat(local_a0, "  ");
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[0] > 0) {
                         KEN::Ken_Get_Text_Message_(2, local_50, 0x50);
-                        strcpy(local_a0 + strlen(local_a0), local_50);
+                        strcat(local_a0, local_50);
                         itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], local_b4, 10);
-                        strcpy(local_a0 + strlen(local_a0), local_b4);
-                        strcpy(local_a0 + strlen(local_a0), s__00559998);
+                        strcat(local_a0, local_b4);
+                        strcat(local_a0, "  ");
                     }
                 }
 
-                fonts::Print_(param_1 + 2, param_2 + 0x48, local_a0);
+                fonts::Print_(x + 2, y + 0x48, local_a0);
                 local_a0[0] = '\0';
 
                 if (MOX::_cmbt_colony_id != -1) {
-                    int16_t y = param_2 + 4;
+                    int16_t current_y = y + 4;
                     if (MOX::_colony[MOX::_cmbt_colony_id].buildings[26] != 0) {
-                        fonts::Print_(param_1 + 2, y, TECHDATA::_buildings[26].name);
-                        y += 7;
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[26].name);
+                        current_y += 7;
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].buildings[27] != 0) {
-                        fonts::Print_(param_1 + 2, y, TECHDATA::_buildings[27].name);
-                        y += 7;
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[27].name);
+                        current_y += 7;
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].buildings[47] != 0) {
-                        fonts::Print_(param_1 + 2, y, TECHDATA::_buildings[47].name);
-                        y += 7;
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[47].name);
+                        current_y += 7;
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].buildings[42] != 0) {
-                        fonts::Print_(param_1 + 2, y, TECHDATA::_buildings[42].name);
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[42].name);
                     }
                 }
             }
         } else {
-            Draw_Ship_To_Bitmap_(param_3, 0, 0, 0);
+            Draw_Ship_To_Bitmap_(ship_idx, 0, 0, 0);
             bitmap::Create_Blank_Bitmap_(0x62, 0x62, MOX::_combat_bitmap);
             
-            int idx = (int)param_3;
+            int idx = (int)ship_idx;
             s_combat_data* ship = &MOX::_combat_data[idx];
             int8_t facing = MOX::_combat_data[idx].facing_dir;
             int8_t shield_type = MOX::_combat_data[idx].shield_type;
@@ -2267,9 +2253,9 @@ skip_cursor:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x51, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x52, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x53, 0);
-                            bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x53, 0); // Duplicate as in assembly
+                            bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x53, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x54, 0);
-                            bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x54, 0); // Duplicate as in assembly
+                            bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x54, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x55, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x56, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x57, 0);
@@ -2308,7 +2294,7 @@ skip_cursor:
                 }
 
                 bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_combat_bitmap, (s_animation_header*)MOX::_shield_div_bitmap[facing_mod], 0);
-                Draw_Ship_To_Bitmap_(param_3, 1, 0, 0);
+                Draw_Ship_To_Bitmap_(ship_idx, 1, 0, 0);
 
                 int32_t dir2 = ((int32_t)facing - 1) / 4;
                 if (dir2 < 0) {
@@ -2321,7 +2307,7 @@ skip_cursor:
 
             replace::Replace_Color_(MOX::_combat_bitmap, 1, 0);
             replace::Replace_Color_(MOX::_combat_bitmap, 2, 0);
-            animate::Draw_(param_1, param_2, MOX::_combat_bitmap);
+            animate::Draw_(x, y, MOX::_combat_bitmap);
 
             if (ship->current_speed <= 0) {
                 struct s_colors shadow_color;
@@ -2333,7 +2319,7 @@ skip_cursor:
                 
                 char local_50[80];
                 KEN::Ken_Get_Text_Message_(0x47, local_50, 0x50);
-                fonts::Print_Centered_(param_1 + 45, param_2 + 70, local_50);
+                fonts::Print_Centered_(x + 45, y + 70, local_50);
             }
         }
     }
@@ -2652,7 +2638,7 @@ skip_cursor:
     {
         for (int i = 0; i < 0x20; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - j * 2);
+                uint8_t val = (uint8_t)(i - j * 2);
                 MOX::_ship_darken_map[i][j] = val;
                 if (val > 0x20) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2662,7 +2648,7 @@ skip_cursor:
 
         for (int i = 0x20; i < 0x30; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - j);
+                uint8_t val = (uint8_t)(i - j);
                 MOX::_ship_darken_map[i][j] = val;
                 if (val < 0x20) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2672,7 +2658,7 @@ skip_cursor:
 
         for (int i = 0x30; i < 0x40; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - j);
+                uint8_t val = (uint8_t)(i - j);
                 MOX::_ship_darken_map[i][j] = val;
                 if (val < 0x30) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2682,7 +2668,7 @@ skip_cursor:
 
         for (int i = 0x40; i < 0x48; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - (j / 2));
+                uint8_t val = (uint8_t)(i - (j / 2));
                 MOX::_ship_darken_map[i][j] = val;
                 if (val < 0x40) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2692,7 +2678,7 @@ skip_cursor:
 
         for (int i = 0x48; i < 0x50; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - (j / 2));
+                uint8_t val = (uint8_t)(i - (j / 2));
                 MOX::_ship_darken_map[i][j] = val;
                 if (val < 0x48) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2702,7 +2688,7 @@ skip_cursor:
 
         for (int i = 0x60; i < 0x70; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - j);
+                uint8_t val = (uint8_t)(i - j);
                 MOX::_ship_darken_map[i][j] = val;
                 if (val < 0x60) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2712,7 +2698,7 @@ skip_cursor:
 
         for (int i = 0x70; i < 0x80; ++i) {
             for (int j = 0; j < 0x10; ++j) {
-                uint8_t val = static_cast<uint8_t>(i - j);
+                uint8_t val = (uint8_t)(i - j);
                 MOX::_ship_darken_map[i][j] = val;
                 if (val < 0x70) {
                     MOX::_ship_darken_map[i][j] = 0;
@@ -2742,7 +2728,7 @@ skip_cursor:
         line::Line_(offset, 253, offset, 263, 0);
     }
 
-    void __cdecl Draw_Weapon_Status_Display_(int16_t param_1, int16_t param_2) {
+    void __cdecl Draw_Weapon_Status_Display_(int16_t target_ship_idx, int16_t target_missile_idx) {
         s_colors color_b0 = {{ 0x53, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56, 0x56 }};
         s_colors color_b8 = {{ 0x50, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53 }};
         s_colors color_a8 = {{ 0xdf, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc }};
@@ -2767,17 +2753,17 @@ skip_cursor:
                 if (is_ai == 0) {
                     if (COMBAT1::Weapon_Is_On_(MOX::_cur_ship, weapon_slot_idx) == 0) {
                         display_color_mode = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].active == 1 ? 3 : 2;
-                    } else if (param_2 < 0) {
-                        if (param_1 != -1) {
-                            short rel_bearing = Relative_Bearing_(MOX::_cur_ship, param_1);
+                    } else if (target_missile_idx < 0) {
+                        if (target_ship_idx != -1) {
+                            short rel_bearing = Relative_Bearing_(MOX::_cur_ship, target_ship_idx);
                             uint8_t required_arc = Get_Weapon_Arc_(rel_bearing);
 
                             if ((arc & required_arc) != 0 &&
-                                CMBTFIRE::Weapon_In_Range_(weapon_slot_idx, MOX::_cur_ship, param_1, 0, 0) != 0 &&
+                                CMBTFIRE::Weapon_In_Range_(weapon_slot_idx, MOX::_cur_ship, target_ship_idx, 0, 0) != 0 &&
                                 CMBTFIRE::Target_Is_Legal_For_Weapon_(
                                     MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].weapon_id,
                                     MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].specials,
-                                    param_1, 0) != 0) {
+                                    target_ship_idx, 0) != 0) {
                                 display_color_mode = 1;
                             } else {
                                 display_color_mode = 0;
@@ -2786,15 +2772,15 @@ skip_cursor:
                             display_color_mode = 0;
                         }
                     } else {
-                        short rel_bearing = Relative_Bearing_XY_(MOX::_cur_ship, MOX::_missile[param_2].x, MOX::_missile[param_2].y);
+                        short rel_bearing = Relative_Bearing_XY_(MOX::_cur_ship, MOX::_missile[target_missile_idx].x, MOX::_missile[target_missile_idx].y);
                         uint8_t required_arc = Get_Weapon_Arc_(rel_bearing);
 
                         if ((arc & required_arc) == 0 ||
-                            CMBTFIRE::Weapon_In_Range_(weapon_slot_idx, MOX::_cur_ship, param_2, 1, 0) == 0 ||
+                            CMBTFIRE::Weapon_In_Range_(weapon_slot_idx, MOX::_cur_ship, target_missile_idx, 1, 0) == 0 ||
                             CMBTFIRE::Target_Is_Legal_For_Weapon_(
                                 MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].weapon_id,
                                 MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].specials,
-                                param_2, 1) == 0) {
+                                target_missile_idx, 1) == 0) {
                             display_color_mode = 0;
                         } else {
                             display_color_mode = 1;
@@ -2915,11 +2901,11 @@ skip_cursor:
         int frame = progress % 16;
         animate::Set_Animation_Frame_(MOX::_darken_plasma_map, frame);
 
-        int32_t* darken_frame_offsets = reinterpret_cast<int32_t*>(MOX::_darken_plasma_map + 1);
-        uint8_t* darken_data = reinterpret_cast<uint8_t*>(MOX::_darken_plasma_map) + darken_frame_offsets[MOX::_darken_plasma_map->current_frame];
+        int32_t* darken_frame_offsets = (int32_t*)(MOX::_darken_plasma_map + 1);
+        uint8_t* darken_data = (uint8_t*)MOX::_darken_plasma_map + darken_frame_offsets[MOX::_darken_plasma_map->current_frame];
 
-        int32_t* bitmap_frame_offsets = reinterpret_cast<int32_t*>(bitmap + 1);
-        uint8_t* bitmap_data = reinterpret_cast<uint8_t*>(bitmap) + bitmap_frame_offsets[bitmap->current_frame];
+        int32_t* bitmap_frame_offsets = (int32_t*)(bitmap + 1);
+        uint8_t* bitmap_data = (uint8_t*)bitmap + bitmap_frame_offsets[bitmap->current_frame];
 
         int16_t darkness = 0;
         switch (mode) {
@@ -2948,7 +2934,7 @@ skip_cursor:
             default:
                 // The original code has a bug where it reads an uninitialized variable for darkness.
                 // Due to compiler stack layout mapping, it accidentally reads the lower 16 bits of the bitmap_data pointer.
-                darkness = static_cast<int16_t>(reinterpret_cast<std::uintptr_t>(bitmap_data) & 0xFFFF);
+                darkness = (int16_t)((std::uintptr_t)bitmap_data & 0xFFFF);
                 break;
         }
 

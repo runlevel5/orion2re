@@ -64,6 +64,7 @@ workflows:
                d. Platform-dependent integer types that should be replaced with explicit fixed-width types.
                e. C++-style casts that should be replaced with equivalent C-style casts.
                f. UB-potential direct memory accesses performed via pointer arithmetic or pointer-based address math.
+               g. Hardcoded raw sizes for variables, arrays, or structures that should use `sizeof(...)` instead.
              - For every function that lacks a helpful description, suggest a short docstring only:
                - one sentence describing what the function does
                - parameter descriptions
@@ -126,14 +127,21 @@ workflows:
              - Add only concise, informational comments that clarify non-obvious formatting semantics for future readers.
              - Do not add comments for ordinary printable strings that do not use fmtpara-specific formatting constructs.
 
-          H. Scope discipline
+          H. Raw size cleanup
+             - Detect hardcoded byte counts that represent the size of a variable, pointee type, array element, structure, or structure field group when `sizeof(...)` would express the intent more safely.
+             - Prefer `sizeof(variable)`, `sizeof(*pointer)`, `sizeof(Type)`, or closely scoped equivalent expressions instead of magic numeric sizes when the replacement is clear.
+             - Flag suspicious constants in allocation, copy, clear, compare, serialization, and pointer-step code paths when they appear to encode object size manually.
+             - Do not replace protocol constants, file-format field widths, or other true semantic sizes unless the value is clearly standing in for an object-size expression.
+
+          I. Scope discipline
              - Stay focused on cleanup suggestions only.
              - Do not apply source-code changes unless the user explicitly asks for them.
              - You may update `progress.md` as part of normal workflow operation.
              - Even when not applying changes, always show the user concrete diff-style suggestions for the reviewed unit.
              - Avoid unrelated architectural commentary.
+             - After applying approved changes, re-read every changed file and verify that the edits were applied correctly and remain fully behavior-equivalent to the pre-change code aside from the intended cleanup.
 
-          I. Queue management requirements
+          J. Queue management requirements
              - `progress.md` is mandatory working memory.
              - Maintain compact sections such as current focus, pending units, reviewed units, blocked units, and per-unit notes.
              - Remove stale or duplicated entries once they are superseded.
@@ -156,6 +164,7 @@ workflows:
              - C++-style casts that should be converted to equivalent C-style casts
              - UB-potential direct memory accesses implemented through pointer arithmetic or pointer-based address math
              - suspicious type aliasing hints, including odd casts, raw pointer field accesses, or probable missing aliases/struct types
+             - hardcoded raw sizes that should be replaced with `sizeof(...)`
              - special fmtpara symbols in cleaned-up string literals that need an explanatory comment based on `docs/fmtpara.md`
           8. Update `progress.md` with:
              - unit status changes
@@ -163,8 +172,12 @@ workflows:
              - any blockers worth revisiting
           9. Present the suggested edits to the user as a diff-style patch covering the full review unit.
           10. Apply all approved code changes using the `apply_patch` tool before continuing.
-          11. Finish the current review batch at a clean review-unit boundary and return control to input.
-          12. Never stop with a unit left marked in_progress unless forced.
+          11. Re-read every changed file after applying edits and verify that:
+             - all requested changes were actually applied
+             - no unintended edits were introduced
+             - the resulting code is fully equivalent in behavior to the prior code except for the intended cleanup improvements
+          12. Finish the current review batch at a clean review-unit boundary and return control to input.
+          13. Never stop with a unit left marked in_progress unless forced.
 
           Output style:
 
@@ -179,6 +192,7 @@ workflows:
           - Function docstring suggestions
           - UB-risky pointer-math memory access findings
           - Type-aliasing or missing-type hints
+          - Hardcoded size to `sizeof(...)` fixes
           - Confidence
 
           Suggested diffs:

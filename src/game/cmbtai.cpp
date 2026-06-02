@@ -141,7 +141,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
 }
 
 int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot, int16_t target_idx, int16_t target_type, int16_t range) {
-    int expected_damage = 0;
+    int32_t expected_damage = 0;
 
     int16_t weapon_id = MOX::_combat_data[source_idx].weapons[weapon_slot].weapon_id;
     uint16_t specials = MOX::_combat_data[source_idx].weapons[weapon_slot].specials;
@@ -192,14 +192,14 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
             } else if (rack == 5) {
                 int16_t min_dam = TECHDATA::_weapons[weapon_id].min_damage;
                 int16_t max_dam = TECHDATA::_weapons[weapon_id].max_damage;
-                int avg_sum = (int)min_dam + (int)max_dam;
-                int avg_dam = (avg_sum - (avg_sum >> 31)) >> 1;
+                int32_t avg_damage_sum = ((int32_t)min_dam) + ((int32_t)max_dam);
+                int32_t avg_damage = (avg_damage_sum - (avg_damage_sum >> 31)) >> 1;
 
                 switch (weapon_id) {
                     case 0xD: // 13
                     case 0x22: { // 34
                         int size_mult = MOX::_combat_data[target_idx].size_class + 1;
-                        expected_damage = avg_dam * size_mult * count;
+                        expected_damage = avg_damage * size_mult * count;
                         break;
                     }
                     case 0x20: // 32
@@ -217,13 +217,13 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                     case 0x26: // 38
                     case 0x2D: { // 45
                         int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
-                        expected_damage = (avg_dam - blocked) * count * 4;
+                        expected_damage = (avg_damage - blocked) * count * 4;
                         break;
                     }
                     case 0x24: { // 36
                         int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
                         int size_mult = MOX::_combat_data[target_idx].size_class + 1;
-                        expected_damage = (avg_dam - blocked) * size_mult * count;
+                        expected_damage = (avg_damage - blocked) * size_mult * count;
                         break;
                     }
                     case 0x27: // 39
@@ -234,7 +234,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                     case 0x2C: { // 44
                         int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
                         int size_mult = MOX::_combat_data[target_idx].size_class + 1;
-                        expected_damage = (avg_dam - blocked) * size_mult * count * 4;
+                        expected_damage = (avg_damage - blocked) * size_mult * count * 4;
                         break;
                     }
                 }
@@ -873,9 +873,6 @@ int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx) {
     return total_strength;
 }
 
-/**
- * @address 0044f8d0
- */
 int16_t __cdecl Get_Effective_Beam_Strength_(int16_t player_idx) {
     int16_t total_strength = 0;
     int16_t ship_idx = 0;
@@ -1105,9 +1102,6 @@ int32_t __cdecl Target_Ship_Value_(int16_t attacker_idx, int16_t target_idx, int
     return value;
 }
 
-/**
- * @address 0044e3e0
- */
 int8_t __cdecl Combat_Ship_Class_(int16_t ship_idx, int16_t target_idx) {
     int16_t dmg_short_range = 0;
     int16_t dmg_med_range = 0;
@@ -1180,11 +1174,11 @@ int8_t __cdecl Combat_Ship_Class_(int16_t ship_idx, int16_t target_idx) {
         dmg_short_range *= 2;
     }
 
-    int32_t short_3_2 = (static_cast<int32_t>(dmg_short_range) * 3) / 2;
-    if (short_3_2 <= static_cast<int32_t>(dmg_long_range)) {
-        return (static_cast<int32_t>(dmg_med_range) * 3 / 2 <= static_cast<int32_t>(dmg_long_range)) + 1;
+    int32_t short_3_2 = (((int32_t)dmg_short_range) * 3) / 2;
+    if (short_3_2 <= (int32_t)dmg_long_range) {
+        return ((((int32_t)dmg_med_range) * 3) / 2 <= (int32_t)dmg_long_range) + 1;
     } else {
-        return static_cast<int32_t>(dmg_med_range) >= short_3_2;
+        return (int32_t)dmg_med_range >= short_3_2;
     }
 }
 
@@ -1207,7 +1201,7 @@ bool __cdecl Does_Ship_Have_Missiles_Incoming_(int16_t ship_idx) {
     return has_incoming;
 }
 
-int16_t __cdecl Auto_Move_Ship_(int16_t ship_param, int16_t target_idx) {
+int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
     int16_t moved = 0;
     int16_t num_possible_moves = 0;
     int16_t cur_ship_idx = MOX::_cur_ship;
@@ -1270,7 +1264,7 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_param, int16_t target_idx) {
                             dist_from_hex,
                             gx,
                             gy,
-                            (int16_t)MOX::_combat_data[ship_param].ai_range_tactic,
+                            (int16_t)MOX::_combat_data[ship_idx].ai_range_tactic,
                             &num_possible_moves,
                             move_x_coords,
                             move_y_coords,
@@ -1575,16 +1569,16 @@ void __cdecl Release_Smallest_Ship_From_Stasis_(int16_t owner_idx) {
  * @brief Evaluates a possible move score against the current best score and updates the best moves list.
  * 
  * @param score The raw score of the move being evaluated.
- * @param val1 First value associated with the move (e.g., coordinate or ID).
- * @param val2 Second value associated with the move.
+ * @param move_x First value associated with the move (for example, an X coordinate).
+ * @param move_y Second value associated with the move (for example, a Y coordinate).
  * @param move_type Determines the base offset to subtract from the score.
- * @param p_count Pointer to the current count of tied best moves.
- * @param best_moves_val1 Array storing the first values of the tied best moves.
- * @param best_moves_val2 Array storing the second values of the tied best moves.
+ * @param best_move_count Pointer to the current count of tied best moves.
+ * @param best_move_xs Array storing the first values of the tied best moves.
+ * @param best_move_ys Array storing the second values of the tied best moves.
  * @param best_score The current best score found so far.
  * @return The updated best score.
  */
-int16_t __cdecl Evaluate_Possible_Move_(int16_t score, int16_t val1, int16_t val2, int16_t move_type, int16_t* p_count, int16_t* best_moves_val1, int16_t* best_moves_val2, int16_t best_score) {
+int16_t __cdecl Evaluate_Possible_Move_(int16_t score, int16_t move_x, int16_t move_y, int16_t move_type, int16_t* best_move_count, int16_t* best_move_xs, int16_t* best_move_ys, int16_t best_score) {
     int16_t base_val;
 
     if (move_type == 0) {
@@ -1607,18 +1601,18 @@ int16_t __cdecl Evaluate_Possible_Move_(int16_t score, int16_t val1, int16_t val
     if (eval_score >= 0) {
         if (eval_score < best_score) {
             // Found a new strictly better score: reset the ties list.
-            *p_count = 0;
-            best_moves_val1[0] = val1;
-            best_moves_val2[0] = val2;
-            (*p_count)++;
+            *best_move_count = 0;
+            best_move_xs[0] = move_x;
+            best_move_ys[0] = move_y;
+            (*best_move_count)++;
             return eval_score;
         }
         else if (eval_score == best_score) {
             // Found a move with an equivalent score: add it to the ties list if space remains.
-            if (*p_count < 20 /* 0x14 */) {
-                best_moves_val1[*p_count] = val1;
-                best_moves_val2[*p_count] = val2;
-                (*p_count)++;
+            if (*best_move_count < 20 /* 0x14 */) {
+                best_move_xs[*best_move_count] = move_x;
+                best_move_ys[*best_move_count] = move_y;
+                (*best_move_count)++;
             }
             return best_score;
         }
@@ -1652,12 +1646,12 @@ void __cdecl Crystal_Control_(int16_t ship_idx) {
  * @brief Evaluates and selects the best target (ship or missile) for the current unit.
  *
  * @param ship_idx Index of the ship performing targeting.
- * @param param_2 Used as a target ship index filter/limit in human modes.
+ * @param reference_target_idx Used as a target ship index filter/limit in human modes.
  * @return int16_t The index of the selected target.
  */
-int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t param_2) {
-    int missile_score;
-    int ship_score;
+int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t reference_target_idx) {
+    int32_t missile_score;
+    int32_t ship_score;
     int16_t missile_target;
     int16_t ship_target;
     int8_t owner_idx;
@@ -1678,7 +1672,7 @@ int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t param_2) {
         }
     } else {
         // Human/Manual Logic
-        ship_target = Get_Current_Ship_Target_(ship_idx, param_2, &ship_score);
+        ship_target = Get_Current_Ship_Target_(ship_idx, reference_target_idx, &ship_score);
         missile_target = Get_Current_Missile_Target_(ship_idx, &missile_score);
 
         if (missile_score / 2 > ship_score) {
@@ -2005,11 +1999,11 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
     return result_damage;
 }
 
-int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int16_t param_3) {
+int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int16_t range_sensitive) {
     int16_t range;
     int16_t m_idx = (int16_t)missile_idx;
 
-    if (param_3 > 0) {
+    if (range_sensitive > 0) {
         range = Range_To_Missile_(unit_idx, m_idx);
         if (range < 1) {
             range = 1;
@@ -2258,14 +2252,14 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
     return total_effective_strength;
 }
 
-int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t param6) {
+int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t missile_idx) {
     int16_t kills = 0;
     int16_t slot_weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
     uint16_t specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
     int16_t range;
 
-    if (param6 > -1) {
-        range = Range_To_Missile_(ship_idx, param6);
+    if (missile_idx > -1) {
+        range = Range_To_Missile_(ship_idx, missile_idx);
     } else {
         range = 2;
     }
@@ -2463,7 +2457,7 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
         }
 
         if (ship_marines < marine_count_sum) {
-            int16_t diff = static_cast<int16_t>(marine_count_sum) - ship_marines;
+            int16_t diff = (int16_t)marine_count_sum - ship_marines;
             if (MOX::_player[player_id].traits[25] != 0) {
                 score += diff * 10;
             } else {
