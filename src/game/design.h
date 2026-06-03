@@ -10,33 +10,12 @@ namespace DESIGN {
     extern int32_t _printed_space_avail;
     extern int16_t _design_shield_replacement_field;
     extern int16_t _design_computer_replacement_field;
-    // 0x004321e0 stores EAX directly to 0x00565058, so this global is 32-bit here.
+    // Stored as a 32-bit value in the original binary.
     extern int32_t _printed_cost;
     extern uint8_t _changed_design_name;
     extern uint8_t _add_size_button_flag[6];
 
-    extern const char s_cstdes_log[13];
-    extern const char s_plus[2];
-    extern const char s_minus[2];
-    extern const char s_pct_d[3];
-    extern const char s_pct_s_pct_d[5];
-    extern const char s_pct_d_pct[5];
-    extern const char s_pct_s_bracket_pct_d[8];
-    extern const char s_special_tag[8];
-    extern const char s__00551100[1];
-    extern const char s__00551120[2];
-    extern const char s_B_005560e4[2];
-    extern const char s_L_005560e8[2];
-    extern const char s_360_00556164[4];
     extern const char s_comma_space[3];
-    extern const char s_ITATECD_LBX[12];
-    extern const char s_SPATECD_LBX[12];
-    extern const char s_FRETECD_LBX[12];
-    extern const char s_GERTECD_LBX[12];
-    extern const char s_TECHDESC_LBX[13];
-    extern const char* PTR_s_DESIGN_LBX_005560D8;
-    extern const char s_Bad_required_tech_in_Tech_Level[40];
-    extern const char s_SHIPNAME_LBX_0055610C[13];
     extern s_animation_header* _dull_plus_button_seg;
     extern s_animation_header* _dull_minus_button_seg;
     extern s_animation_header* _dark_build_design_button_seg;
@@ -115,9 +94,9 @@ namespace DESIGN {
 
     void __cdecl Update_Player_Design_(int16_t player_idx, int16_t design_idx);
 
-    void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag);
+    void __cdecl Check_Generic_Replacement_Fields_(int16_t clicked_field, int16_t* refresh_needed, int16_t* out_status);
 
-    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, /* unused */ int16_t* refresh, int16_t* out_flag);
+    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, /* unused */ int16_t* refresh, int16_t* out_status);
 
     void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t *unused, int16_t* out_status);
 
@@ -169,7 +148,7 @@ namespace DESIGN {
 
     int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_idx);
 
-    int32_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_id, int16_t ship_type, int16_t m_level);
+    int32_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_id, int16_t ship_type, int16_t player_idx);
 
     int16_t __cdecl Shield_Space_(int16_t shield_idx, int16_t ship_size);
 

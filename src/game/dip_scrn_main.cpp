@@ -1,36 +1,44 @@
 #include "pch.h"
 
 namespace DIP_SCRN {
+    /**
+     * @brief Resolves a treaty proposal and determines whether it succeeds.
+     *
+     * @param proposer_idx The player offering the treaty.
+     * @param target_idx The player receiving the treaty proposal.
+     * @param treaty_type The treaty type being proposed.
+     * @return 1 when the treaty is accepted, otherwise 0.
+     */
     int16_t __cdecl Diplomacy_Determine_Treaty_Proposal_(int16_t proposer_idx, int16_t target_idx, int16_t treaty_type) {
-        int16_t sVar1;
+        int16_t proposal_result;
         int16_t success;
-        int16_t local_c;
-        int16_t local_a;
-        int16_t local_8;
-        int16_t local_6;
-        int16_t local_4;
+        int16_t offered_tribute;
+        int16_t offered_star_idx;
+        int16_t offered_bc;
+        int16_t offered_tech_app;
+        int16_t offer_type;
 
         uint16_t initial_response = _response_message;
 
         if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
-            sVar1 = Check_Human_Treaty_Proposal_(proposer_idx, target_idx, treaty_type);
+            proposal_result = Check_Human_Treaty_Proposal_(proposer_idx, target_idx, treaty_type);
         }
         else {
-            sVar1 = diplomac::Check_Treaty_Proposal_(target_idx, proposer_idx, treaty_type, &_response_message, &local_4, &local_6, &local_8, &local_a, &local_c);
+            proposal_result = diplomac::Check_Treaty_Proposal_(target_idx, proposer_idx, treaty_type, &_response_message, &offer_type, &offered_tech_app, &offered_bc, &offered_star_idx, &offered_tribute);
         }
 
-        if ((sVar1 == 0) || (sVar1 == 3)) {
-            success = (sVar1 != 0) ? 1 : 0;
+        if ((proposal_result == 0) || (proposal_result == 3)) {
+            success = (proposal_result != 0) ? 1 : 0;
         }
         else {
             if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
-                sVar1 = Diplomacy_Human_Need_Better_Offer_(proposer_idx, target_idx);
+                proposal_result = Diplomacy_Human_Need_Better_Offer_(proposer_idx, target_idx);
             }
             else {
-                sVar1 = Diplomacy_Need_Better_Offer_(local_4, local_6, local_8, local_a, local_c);
+                proposal_result = Diplomacy_Need_Better_Offer_(offer_type, offered_tech_app, offered_bc, offered_star_idx, offered_tribute);
             }
 
-            if (sVar1 == 1) {
+            if (proposal_result == 1) {
                 success = 1;
                 switch (treaty_type) {
                 case 1:
@@ -77,22 +85,28 @@ namespace DIP_SCRN {
         return success;
     }
 
-    void __cdecl Diplomacy_Break_Treaty_(int16_t param_1, int16_t param_2) {
+    /**
+     * @brief Prompts the player to choose which active treaty to break.
+     *
+     * @param player_idx The player initiating the treaty break.
+     * @param target_idx The player whose treaty is being broken.
+     */
+    void __cdecl Diplomacy_Break_Treaty_(int16_t player_idx, int16_t target_idx) {
         uint8_t option_flags[7] = { 0 };
 
-        if (MOX::_player[param_1].trade_treaty[param_2] == 1) {
+        if (MOX::_player[player_idx].trade_treaty[target_idx] == 1) {
             option_flags[0] = 1;
         }
-        if (MOX::_player[param_1].research_treaty[param_2] == 1) {
+        if (MOX::_player[player_idx].research_treaty[target_idx] == 1) {
             option_flags[1] = 1;
         }
-        if (MOX::_player[param_1].tribute_treaty[param_2] > 0) {
+        if (MOX::_player[player_idx].tribute_treaty[target_idx] > 0) {
             option_flags[2] = 1;
         }
-        if (MOX::_player[param_1].treaty[param_2] == 1) {
+        if (MOX::_player[player_idx].treaty[target_idx] == 1) {
             option_flags[3] = 1;
         }
-        if (MOX::_player[param_1].treaty[param_2] == 2) {
+        if (MOX::_player[player_idx].treaty[target_idx] == 2) {
             option_flags[4] = 1;
         }
         option_flags[5] = 1;
@@ -133,28 +147,28 @@ namespace DIP_SCRN {
         switch (choice) {
         case 0:
             _old_response_message = -1;
-            Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 7);
+            Diplomacy_Break_Treaty_Resolution_(player_idx, target_idx, 7);
             break;
         case 1:
             _old_response_message = -1;
-            Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 8);
+            Diplomacy_Break_Treaty_Resolution_(player_idx, target_idx, 8);
             break;
         case 2:
             _old_response_message = -1;
-            if (MOX::_player[param_1].tribute_treaty[param_2] == 1) {
-                Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 9);
+            if (MOX::_player[player_idx].tribute_treaty[target_idx] == 1) {
+                Diplomacy_Break_Treaty_Resolution_(player_idx, target_idx, 9);
             }
             else {
-                Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 10);
+                Diplomacy_Break_Treaty_Resolution_(player_idx, target_idx, 10);
             }
             break;
         case 3:
             _old_response_message = -1;
-            Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 1);
+            Diplomacy_Break_Treaty_Resolution_(player_idx, target_idx, 1);
             break;
         case 4:
             _old_response_message = -1;
-            Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 2);
+            Diplomacy_Break_Treaty_Resolution_(player_idx, target_idx, 2);
             break;
         }
     }
@@ -778,7 +792,7 @@ namespace DIP_SCRN {
         fields::Set_Input_Delay_(1);
 
         for (int16_t i = 0; i < 3; ++i) {
-            char* src = reinterpret_cast<char**>(_agree_diplomacy_list)[i];
+            char* src = _agree_diplomacy_list[i];
             strcpy(_diplomacy_list_choice[i], src);
         }
 

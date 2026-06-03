@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace DESIGN {
+    /**
+     * Draws the currently edited ship design, including derived combat, cost, and space statistics.
+     */
     void __cdecl Print_Current_Design_() {
         s_ship_design local_design;
         int16_t bonus_mis_evade, bonus_beam_def, bonus_beam_atk;
@@ -84,7 +87,7 @@ namespace DESIGN {
         fonts::Set_Font_Style_(3, &style3_colors);
         fonts::Set_Font_Spacing_(1);
         fonts::Print_(0x1B5, 0x7D, HAROLD::H_Message_(HESTR_05C_BEAM_DEFENSE));
-        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? s_plus : s_minus), (int16_t)bonus_beam_def);
+        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? "+" : "-"), (int16_t)bonus_beam_def);
         fonts::Print_Right_(0x26A, 0x7D, buffer);
 
         fonts::Print_(0x1B5, 0x89, HAROLD::H_Message_(HESTR_05D_MISSILE_EVASION));
@@ -137,7 +140,7 @@ namespace DESIGN {
                 fonts::Print_Integer_Right_(0x31, y_pos, MOX::_design->weapon_count[slot]);
                 Design_Weapon_Damage_String_(slot, buffer, -1, -1);
 
-                if (strcmp(buffer, s_special_tag) == 0) {
+                if (strcmp(buffer, "special") == 0) {
                     MISC::Change_Font_Style_(1);
                     fonts::Print_Centered_(0x10B, y_pos, buffer);
                     MISC::Change_Font_Style_(2);
@@ -269,10 +272,13 @@ namespace DESIGN {
         fonts::Print_Integer_Right_(0x160, bottom_y, _printed_space_avail);
     }
 
+    /**
+     * Runs the design-screen event loop for the currently selected ship design slot.
+     */
     void __cdecl Design_Screen_() {
         video::Set_Refresh_Full_();
-        int16_t design = MOX::_temp_star_handle;
-        char log_buf[100];
+        int16_t design_idx = MOX::_temp_star_handle;
+        char log_path[100];
         MOX::_first_weapon_ctr = 0;
         MOX::_multi_colored_line_start = 0;
         MOX::_first_special_system_ctr = 0;
@@ -304,7 +310,7 @@ namespace DESIGN {
         else {
             MOX::_draw_design_screen_to_back = 1;
             Load_Design_Screen_Pictures_();
-            Build_Initial_Design_Template_(MOX::_PLAYER_NUM, design);
+            Build_Initial_Design_Template_(MOX::_PLAYER_NUM, design_idx);
             MOX::_original_cost = Total_Design_Cost_();
             if (MOX::_refit_ship != 0) {
                 MOX::_design->total_cost = 0;
@@ -345,7 +351,7 @@ namespace DESIGN {
             MOX::_scanned_field = fields::Scan_Input_();
 
             if (_changed_design_name == 0) {
-                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design);
+                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design_idx);
                 char* p1 = MOX::_design->name;
                 char* p2 = default_name;
                 while (*p1 && *p1 == *p2) { p1++; p2++; }
@@ -373,14 +379,14 @@ namespace DESIGN {
             }
 
             if (MOX::_design_build_button == input_field) {
-                Update_Player_Design_(MOX::_PLAYER_NUM, design);
+                Update_Player_Design_(MOX::_PLAYER_NUM, design_idx);
                 MOX::_current_screen = static_cast<SCREEN>(MOX::_return_screen);
                 screen_exit_flag = 1;
                 MOX::_temp_star_handle = 1;
             }
 
             if (MAINSCR::_debug_field == input_field) {
-                sprintf(log_buf, s_cstdes_log, (int)MOX::_design->ship_size);
+                sprintf(log_path, "cstdes%d.log", (int)MOX::_design->ship_size);
             }
 
             int16_t needs_refresh = 0;
@@ -474,7 +480,7 @@ namespace DESIGN {
 
             strings::Trim_(MOX::_design->name);
             if (MOX::_design->name[0] == '\0') {
-                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design);
+                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design_idx);
                 char* dst = MOX::_design->name;
                 while ((*dst++ = *default_name++));
             }
@@ -493,80 +499,83 @@ namespace DESIGN {
         } while (true);
     }
 
+    /**
+     * Loads the design-screen artwork and related tech-description text resources.
+     */
     void __cdecl Load_Design_Screen_Pictures_() {
         RUSS::Mox_Update_();
-        MOX::_design_screen_seg = (s_animation_header*)farload::Far_Reload_(PTR_s_DESIGN_LBX_005560D8, 0, MOX::_screen_seg);
-        MOX::_design_icon_lf_arrow_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 1, MOX::_screen_seg);
-        MOX::_design_icon_rt_arrow_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 2, MOX::_screen_seg);
-        MOX::_clear_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 3, MOX::_screen_seg);
-        MOX::_cancel_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 4, MOX::_screen_seg);
-        MOX::_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 5, MOX::_screen_seg);
+        MOX::_design_screen_seg = (s_animation_header*)farload::Far_Reload_("DESIGN.LBX", 0, MOX::_screen_seg);
+        MOX::_design_icon_lf_arrow_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 1, MOX::_screen_seg);
+        MOX::_design_icon_rt_arrow_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 2, MOX::_screen_seg);
+        MOX::_clear_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 3, MOX::_screen_seg);
+        MOX::_cancel_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 4, MOX::_screen_seg);
+        MOX::_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 5, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
         for (int i = 0; i < 6; ++i) {
-            MOX::_design_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 6 + i, MOX::_screen_seg);
+            MOX::_design_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 6 + i, MOX::_screen_seg);
         }
         for (int i = 0; i < 6; ++i) {
-            MOX::_darkened_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 6 + i, MOX::_screen_seg);
+            MOX::_darkened_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 6 + i, MOX::_screen_seg);
         }
 
         int idx = 12;
-        _dark_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        _dark_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        MOX::_plus_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_minus_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_d_scroll_up_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_d_scroll_dn_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        _dull_plus_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        _dull_minus_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_dull_d_scroll_up_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_dull_d_scroll_dn_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_plus_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_minus_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_d_scroll_up_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_d_scroll_dn_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        _dull_plus_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        _dull_minus_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_dull_d_scroll_up_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_dull_d_scroll_dn_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
 
-        MOX::_d_scroll_bar_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_d_scroll_bar_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
 
-        MOX::_beam_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_missile_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_bomb_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_special_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_weapons_cancel_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_weapons_accept_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_beam_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_missile_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_bomb_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_special_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_weapons_cancel_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_weapons_accept_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        MOX::_weapons_top_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_weapons_mid_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_weapons_bot_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_weapons_selected_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_top_box_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_weapons_mid_box_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_weapons_bot_box_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_weapons_selected_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        MOX::_weapons_rack_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_rack_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
 
         for (int i = 0; i < 5; ++i) {
-            MOX::_weapons_arc_pict_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+            MOX::_weapons_arc_pict_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         }
         for (int i = 0; i < 5; ++i) {
-            MOX::_weapons_arc_text_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+            MOX::_weapons_arc_text_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         }
         RUSS::Mox_Update_();
         for (int i = 0; i < 5; ++i) {
-            MOX::_weapons_rack_text_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+            MOX::_weapons_rack_text_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         }
 
-        MOX::_weapons_blank_mods_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_blank_mods_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         for (int i = 0; i < 18; ++i) {
-            MOX::_weapons_special_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+            MOX::_weapons_special_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
         }
         RUSS::Mox_Update_();
 
-        MOX::_system_repl_scroll_bar_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_system_repl_box_top_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_system_repl_box_mid_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_system_repl_box_btm_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::_system_repl_box_cancel_btn = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_system_repl_scroll_bar_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_top_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_mid_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_btm_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_cancel_btn = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", idx++, MOX::_screen_seg);
 
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
-        MOX::_design = (s_current_design*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x125);
-        MOX::_weapon_filter = (s_weapon_filter_item*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0xF0);
+        MOX::_design = (s_current_design*)allocate::Allocate_First_Block_(MOX::_global_data_seg, sizeof(*MOX::_design));
+        MOX::_weapon_filter = (s_weapon_filter_item*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, sizeof(*MOX::_weapon_filter) * 40);
 
         char tech_lbx[20];
         Get_Tech_Description_Lbx_Name_(tech_lbx);
@@ -581,19 +590,22 @@ namespace DESIGN {
         }
     }
 
+    /**
+     * Rebuilds the clickable controls for the current design-screen state.
+     */
     void __cdecl Add_Design_Buttons_() {
         for (int16_t i = 0; i < 6; ++i) {
             _add_size_button_flag[i] = Add_Size_Button_();
         }
 
-        int16_t x1, y1, x2, y2;
+        int16_t field_x1, field_y1, field_x2, field_y2;
         for (int16_t i = 0; i < 6; ++i) {
-            Get_Ship_Size_Button_Field_XY_(i, &x2, &y1, &x1, &y2);
+            Get_Ship_Size_Button_Field_XY_(i, &field_x1, &field_y1, &field_x2, &field_y2);
             if (_add_size_button_flag[i] == 1) {
-                MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(x2, y1, s__00551100, MOX::_design_size_button_seg[i], &MOX::_design_size, i, s__00551100, 0x29 /* ) */);
+                MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(field_x1, field_y1, "", MOX::_design_size_button_seg[i], &MOX::_design_size, i, "", 0x29 /* ) */);
             }
             else {
-                MOX::_design_ship_size_field[i] = fields::Add_Hidden_Field_(x2, y1, x1, y2, s__00551100, 0x29 /* ) */);
+                MOX::_design_ship_size_field[i] = fields::Add_Hidden_Field_(field_x1, field_y1, field_x2, field_y2, "", 0x29 /* ) */);
             }
         }
 
@@ -612,11 +624,11 @@ namespace DESIGN {
                 if (MOX::_design->weapon_type[weapon_idx] < 1 || MOX::_design->weapon_count[weapon_idx] < 2) {
                     MOX::_weapons_count_minus_button[i] = -1000;
                     if (MOX::_design->weapon_type[weapon_idx] > 0) {
-                        fields::Add_Hidden_Field_(0x37, weapon_y, 0x44, weapon_y + 12, s__00551100, 0);
+                        fields::Add_Hidden_Field_(0x37, weapon_y, 0x44, weapon_y + 12, "", 0);
                     }
                 }
                 else {
-                    MOX::_weapons_count_minus_button[i] = fields::Add_Button_Field_(0x37, weapon_y, s__00551100, MOX::_minus_button_seg, s__00551100, 0x28 /* ( */);
+                    MOX::_weapons_count_minus_button[i] = fields::Add_Button_Field_(0x37, weapon_y, "", MOX::_minus_button_seg, "", 0x28 /* ( */);
                 }
 
                 int32_t next_weapon_space = Weapon_Space_(MOX::_PLAYER_NUM, MOX::_design->weapon_type[weapon_idx],
@@ -629,11 +641,11 @@ namespace DESIGN {
                     ((MOX::_design->hull_space - MOX::_design->space_used) - (int32_t)next_weapon_space + (int32_t)MOX::_design->weapon_space[weapon_idx] < 0)) {
                     MOX::_weapons_count_plus_button[i] = -1000;
                     if (MOX::_design->weapon_type[weapon_idx] > 0) {
-                        fields::Add_Hidden_Field_(0x13, weapon_y, 0x20, weapon_y + 12, s__00551100, 0x29 /* ) */);
+                        fields::Add_Hidden_Field_(0x13, weapon_y, 0x20, weapon_y + 12, "", 0x29 /* ) */);
                     }
                 }
                 else {
-                    MOX::_weapons_count_plus_button[i] = fields::Add_Button_Field_(0x13, weapon_y, s__00551100, MOX::_plus_button_seg, s__00551100, 0x28 /* ( */);
+                    MOX::_weapons_count_plus_button[i] = fields::Add_Button_Field_(0x13, weapon_y, "", MOX::_plus_button_seg, "", 0x28 /* ( */);
                 }
 
                 int16_t h_x, h_w;
@@ -645,7 +657,7 @@ namespace DESIGN {
                     h_x = 0x4D;
                     h_w = 0x22C;
                 }
-                MOX::_weapons_field[i] = fields::Add_Hidden_Field_(h_x, weapon_y, h_w, weapon_y + 13, s__00551100, 0x29 /* ) */);
+                MOX::_weapons_field[i] = fields::Add_Hidden_Field_(h_x, weapon_y, h_w, weapon_y + 13, "", 0x29 /* ) */);
             }
             weapon_y += 13;
         }
@@ -655,7 +667,7 @@ namespace DESIGN {
         for (int16_t i = 0; i < 8; ++i) {
             MOX::_special_system_clear_button[i] = -1000;
             if (replacement_exists_9) {
-                MOX::_special_system_field[i] = fields::Add_Hidden_Field_(0x11, special_y, 0x26F, special_y + 13, s__00551100, 0x29 /* ) */);
+                MOX::_special_system_field[i] = fields::Add_Hidden_Field_(0x11, special_y, 0x26F, special_y + 13, "", 0x29 /* ) */);
             }
             else {
                 MOX::_special_system_field[i] = -1000;
@@ -663,8 +675,8 @@ namespace DESIGN {
             special_y += 13;
         }
 
-        MOX::_ship_icon_lf_button = fields::Add_Button_Field_(0x11, 0x52, s__00551100, MOX::_design_icon_lf_arrow_seg, s__00551100, 0x28 /* ( */);
-        MOX::_ship_icon_rt_button = fields::Add_Button_Field_(0x5E, 0x52, s__00551100, MOX::_design_icon_rt_arrow_seg, s__00551100, 0x28 /* ( */);
+        MOX::_ship_icon_lf_button = fields::Add_Button_Field_(0x11, 0x52, "", MOX::_design_icon_lf_arrow_seg, "", 0x28 /* ( */);
+        MOX::_ship_icon_rt_button = fields::Add_Button_Field_(0x5E, 0x52, "", MOX::_design_icon_rt_arrow_seg, "", 0x28 /* ( */);
 
         s_colors colors;
         MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &colors);
@@ -678,21 +690,21 @@ namespace DESIGN {
             MOX::_design->name, 15, 0, 0, 0x29 /* ) */, 0
         );
 
-        _design_shield_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x38, 0x273, 0x5F, s__00551100, 0x29 /* ) */);
-        _design_computer_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x61, 0x273, 0x7B, s__00551100, 0x29 /* ) */);
+        _design_shield_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x38, 0x273, 0x5F, "", 0x29 /* ) */);
+        _design_computer_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x61, 0x273, 0x7B, "", 0x29 /* ) */);
 
-        MOX::_design_cancel_button = fields::Add_Button_Field_(0x1CD, 0x1BB, s__00551100, MOX::_cancel_design_button_seg, s__00551120, 0x28 /* ( */);
-        MOX::_design_clear_button = fields::Add_Button_Field_(0x176, 0x1BB, s__00551100, MOX::_clear_design_button_seg, s_L_005560e8, 0x28 /* ( */);
+        MOX::_design_cancel_button = fields::Add_Button_Field_(0x1CD, 0x1BB, "", MOX::_cancel_design_button_seg, "\x1B", 0x28 /* ( */);
+        MOX::_design_clear_button = fields::Add_Button_Field_(0x176, 0x1BB, "", MOX::_clear_design_button_seg, "L", 0x28 /* ( */);
 
         if (MOX::_design->hull_space < MOX::_design->space_used) {
             MOX::_design_build_button = -1000;
         }
         else {
-            MOX::_design_build_button = fields::Add_Button_Field_(0x223, 0x1BB, s__00551100, MOX::_build_design_button_seg, s_B_005560e4, 0x28 /* ( */);
+            MOX::_design_build_button = fields::Add_Button_Field_(0x223, 0x1BB, "", MOX::_build_design_button_seg, "B", 0x28 /* ( */);
         }
 
-        MAINSCR::_debug_field = fields::Add_Hidden_Field_(0, 0x1D6, 10, 0x1DF, s__00551100, 0x29 /* ) */);
-        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
+        MAINSCR::_debug_field = fields::Add_Hidden_Field_(0, 0x1D6, 10, 0x1DF, "", 0x29 /* ) */);
+        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "", 0);
     }
 
 }

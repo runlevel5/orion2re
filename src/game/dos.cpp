@@ -5,25 +5,19 @@ namespace dos {
 
     struct _finddata32_t _fileinfo;
 
-    /**
-     * Finds files matching a pattern or continues a previous search.
-     * @param pattern The search pattern (e.g., "*.txt"). If empty, continues search with findnext.
-     * @param output_name Buffer to receive the filename of the found file.
-     * @return true if a file was found, false otherwise.
-     */
     bool __cdecl DIR_(const char* pattern, char* output_name) {
-        intptr_t result;
-        // Binary note: the empty-pattern path passes an uninitialized stack local to _findnext32.
-        // Keeping a safe default here avoids reintroducing that undefined behavior directly.
-        intptr_t search_handle = 0;
+        intptr_t find_result;
+        // Binary behavior appears to call _findnext32 without preserving a valid find handle.
+        // Keep a safe default here rather than reintroducing an uninitialized-handle use.
+        intptr_t find_handle = 0;
 
         if (pattern[0] == '\0') {
-            result = _findnext32(search_handle, &_fileinfo);
+            find_result = _findnext32(find_handle, &_fileinfo);
         } else {
-            result = _findfirst32(pattern, &_fileinfo);
+            find_result = _findfirst32(pattern, &_fileinfo);
         }
 
-        if (result == -1) {
+        if (find_result == -1) {
             output_name[0] = '\0';
             return false;
         }
@@ -50,10 +44,10 @@ namespace dos {
     }
 
     struct tm* __cdecl Time_Stamp_(LPCSTR pathname) {
-        intptr_t search_handle;
+        intptr_t find_handle;
 
-        search_handle = _findfirst32(pathname, &_fileinfo);
-        if (search_handle == -1) {
+        find_handle = _findfirst32(pathname, &_fileinfo);
+        if (find_handle == -1) {
             return nullptr;
         }
 

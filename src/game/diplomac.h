@@ -61,14 +61,34 @@ namespace diplomac {
 
     void __cdecl Limit_Treaty_Modifiers_();
 
-    void __cdecl Determine_Bad_Message_(int16_t current_player, int16_t target_player);
+    /**
+     * Chooses a hostile diplomacy message or escalation for the current incident.
+     * @param current_player_idx Player generating the response.
+     * @param target_player_idx Other player involved in the incident.
+     */
+    void __cdecl Determine_Bad_Message_(int16_t current_player_idx, int16_t target_player_idx);
 
+    /**
+     * Chooses a favorable diplomacy message and any follow-up demand for the current incident.
+     * @param player_idx Player generating the response.
+     * @param other_player_idx Other player involved in the incident.
+     */
     void __cdecl Determine_Good_Message_(int16_t player_idx, int16_t other_player_idx);
 
     void __cdecl Peace_Proposal_(int16_t player_idx, int16_t target_idx, int16_t unused = 0);
 
+    /**
+     * Tries to queue a diplomacy message asking another player to attack a third party.
+     * @param player_idx Requesting player index.
+     * @param other_player_idx Player receiving the request.
+     */
     void __cdecl Required_Alliances_(int16_t player_idx, int16_t other_player_idx);
 
+    /**
+     * Runs the NPC-only alliance-pressure path that can immediately redirect war state.
+     * @param p1_idx Requesting NPC player index.
+     * @param p2_idx Other player involved in the check.
+     */
     void __cdecl NPC_Required_Alliances_(int16_t p1_idx, int16_t p2_idx);
 
     void __cdecl Unprovoked_Good_Messages_(int16_t player_idx, int16_t target_idx);
@@ -79,7 +99,15 @@ namespace diplomac {
 
     void __cdecl NPC_Sneak_Attacks_();
 
-    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_eval_threshold, int16_t *out_msg_id, int16_t *out_unused);
+    /**
+     * Evaluates whether an AI player escalates toward threats, demands, or a sneak attack.
+     * @param player_idx Evaluating player index.
+     * @param target_idx Candidate target index.
+     * @param out_eval_threshold Receives the severity threshold used for the chosen action.
+     * @param out_message_id Receives the diplomacy message id for the chosen action.
+     * @param out_unused Preserved unused output slot from the original call signature.
+     */
+    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_idx, int16_t target_idx, int16_t* out_eval_threshold, int16_t* out_message_id, int16_t* out_unused);
 
     int16_t __cdecl Get_Player_Diplomacy_Personality_(int16_t player_idx, int16_t target_idx);
 
@@ -89,8 +117,25 @@ namespace diplomac {
 
     int16_t __cdecl Total_War_Loss_Comparison_(int16_t attacker_idx, int16_t target_idx);
 
-    int16_t __cdecl Diplomacy_Test_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
+    /**
+     * Scores a diplomacy proposal and returns the AI response band.
+     * @param evaluator_idx Player evaluating the proposal.
+     * @param proposer_idx Player making the proposal.
+     * @param difficulty_mod Baseline difficulty adjustment applied before treaty modifiers.
+     * @param treaty_type Treaty modifier bucket to include in the score.
+     */
+    int16_t __cdecl Diplomacy_Test_(int16_t evaluator_idx, int16_t proposer_idx, int16_t difficulty_mod, int16_t treaty_type);
 
+    /**
+     * Chooses a tribute, tech, gold, or system demand and stores it in the proposal globals.
+     * @param player_idx Demanding player index.
+     * @param target_idx Player being evaluated as the demand target.
+     * @param severity Demand strength from 1 to 10.
+     * @param demands_tribute Nonzero to allow tribute demands.
+     * @param demands_tech Nonzero to allow technology demands.
+     * @param demands_gold Nonzero to allow gold demands.
+     * @param demands_system Nonzero to allow system demands.
+     */
     int16_t __cdecl Get_Demands_(int16_t player_idx, int16_t target_idx, int16_t severity, int16_t demands_tribute, int16_t demands_tech, int16_t demands_gold, int16_t demands_system);
 
     void __cdecl Set_Demands_(int16_t current_player, int16_t target_player);
@@ -117,11 +162,32 @@ namespace diplomac {
 
     int16_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type);
 
+    /**
+     * Evaluates a treaty proposal and fills any resulting counter-demand details.
+     * @param player_idx Player evaluating the proposal.
+     * @param target_idx Proposing player.
+     * @param proposal_type Treaty or proposal type code.
+     * @param response Receives the response message code.
+     * @param demand_type Receives the counter-demand category when one is generated.
+     * @param demand_tech Receives the demanded tech id when applicable.
+     * @param demand_gold Receives the demanded gold amount when applicable.
+     * @param demand_system Receives the demanded system id when applicable.
+     * @param demand_tribute Receives the demanded tribute level when applicable.
+     */
     int16_t __cdecl Check_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t proposal_type, int16_t* response, int16_t* demand_type, int16_t* demand_tech, int16_t* demand_gold, int16_t* demand_system, int16_t* demand_tribute);
 
     void __cdecl Get_Gift_Response_(int16_t plr_a, int16_t plr_b, int16_t gift_type, int16_t gift_data, int16_t *response_code);
 
-    void __cdecl Get_Demand_Response_(int16_t player_a, int16_t player_b, int16_t demand_type, int16_t param_4, int16_t *accepted, int16_t *response_code);
+    /**
+     * Evaluates whether a player accepts a diplomacy demand and selects the reply message.
+     * @param player_a Demanding player index.
+     * @param player_b Responding player index.
+     * @param demand_type Demand category code.
+     * @param demand_value Demand payload such as a target player, tech id, or system id.
+     * @param accepted Receives 1 when the demand is accepted, otherwise 0.
+     * @param response_code Receives the response message code.
+     */
+    void __cdecl Get_Demand_Response_(int16_t player_a, int16_t player_b, int16_t demand_type, int16_t demand_value, int16_t *accepted, int16_t *response_code);
 
     int32_t __cdecl Tech_Comparison_(int16_t player_1, int16_t player_2);
 

@@ -139,12 +139,12 @@ namespace DIP_SCRN {
     void __cdecl Get_Human_Offer_Gift_Message_(int16_t player_idx, int16_t offer_type, int16_t value) {
         switch (offer_type) {
             case 1:
-                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 18 /* 0x12 */, _diplomacy_message, 250);
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 18 /* 0x12 */, _diplomacy_message, sizeof(_diplomacy_message));
                 JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, value, 250);
                 break;
 
             case 2:
-                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 15 /* 0x0F */, _diplomacy_message, 250);
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 15 /* 0x0F */, _diplomacy_message, sizeof(_diplomacy_message));
                 if (value == 1) {
                     JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, 5, 250);
                 } else {
@@ -153,12 +153,12 @@ namespace DIP_SCRN {
                 break;
 
             case 3:
-                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 16 /* 0x10 */, _diplomacy_message, 250);
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 16 /* 0x10 */, _diplomacy_message, sizeof(_diplomacy_message));
                 JIM::Decode_Text_Name_And_Tech_(_diplomacy_message, player_idx, value, 250);
                 break;
 
             case 4:
-                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 17 /* 0x11 */, _diplomacy_message, 250);
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 17 /* 0x11 */, _diplomacy_message, sizeof(_diplomacy_message));
                 JIM::Decode_Text_Name_And_System_(_diplomacy_message, player_idx, value, 250);
                 break;
 
@@ -365,7 +365,7 @@ namespace DIP_SCRN {
                     MOX::_player[player_idx].network_player_id,
                     0x834 /* MSG_NET_CHAT */,
                     DIP_SCRN::_net_diplomacy_chat_message,
-                    100
+                    sizeof(DIP_SCRN::_net_diplomacy_chat_message)
                 );
 
                 RUSS::Mox_Update_();
@@ -374,10 +374,16 @@ namespace DIP_SCRN {
         }
     }
 
-    void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2) {
+    /**
+     * @brief Runs the network diplomacy chat loop until the chat session closes.
+     *
+     * @param player_idx The local player participating in the chat session.
+     * @param target_player_idx The remote player associated with the session.
+     */
+    void __cdecl Diplomacy_Main_Net_Chat_(int16_t player_idx, int16_t target_player_idx) {
         do {
             timer::Mark_Time_();
-            DIP_SCRN::Diplomacy_Chat_(param_1, (uint8_t)param_2);
+            DIP_SCRN::Diplomacy_Chat_(player_idx, (uint8_t)target_player_idx);
 
             if (DIP_SCRN::_chat_mode_flag != 1) {
                 break;
@@ -399,7 +405,12 @@ namespace DIP_SCRN {
     }
 
     /**
-     * @address 00418170
+     * @brief Gets the human player's response to a treaty proposal.
+     *
+     * @param player_id The player proposing the treaty.
+     * @param target_player_id The player receiving the proposal.
+     * @param treaty_type The treaty type being proposed.
+     * @return The selected response code for the proposal.
      */
     int16_t __cdecl Check_Human_Treaty_Proposal_(int16_t player_id, int16_t target_player_id, int16_t treaty_type) {
         int16_t choice;
@@ -2069,8 +2080,13 @@ namespace DIP_SCRN {
     }
 
     /**
-     * Returns the appropriate English indefinite article ("a " or "an ") for the given string.
-     * If the current game language is not English, it returns an empty string.
+     * @brief Gets the human player's response to a diplomacy demand.
+     *
+     * @param player_id The player making the demand.
+     * @param target_player_id The player receiving the demand.
+     * @param demand_type The demand category being resolved.
+     * @param demand_arg Extra demand data such as a tech, treaty target, or system.
+     * @param out_choice Output for the selected human response.
      */
     void __cdecl Get_Human_Demand_Response_(int16_t player_id, int16_t target_player_id, int16_t demand_type, int16_t demand_arg, int16_t* out_choice) {
         int16_t choice_1_response = 0xA9;
@@ -2204,7 +2220,7 @@ namespace DIP_SCRN {
         fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
     }
 
-    void __cdecl Get_Human_Demand_Message_(int16_t player_idx, int16_t unused, int16_t demand_type, int16_t item_idx) {
+    void __cdecl Get_Human_Demand_Message_(int16_t player_idx, int16_t unused_target_idx, int16_t demand_type, int16_t item_idx) {
         switch (demand_type) {
         case 0:
             JIM::Get_Text_Message_(s_jimtext2_lbx, 0x13, _diplomacy_message, 0xfa);
@@ -2253,24 +2269,22 @@ namespace DIP_SCRN {
      * @param player_idx The index of the player making the demand.
      * @param other_player_idx The index of the player being demanded from.
      * @param demand_type The type of demand being made (e.g., 7 for a Star System).
-     * @param some_id An additional identifier used for system selection.
+     * @param demand_item_id An additional identifier used for system selection.
      * @return int16_t 1 if a choice was made (or for system demands), 0 if cancelled.
      */
-    int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t some_id) {
+    int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t demand_item_id) {
         char cancel_btn_text[40];
         char demand_text[80];
-        char separator;
         int16_t result = 0;
 
         if (demand_type == 7 /* ECON_STAR_SYSTEM */) {
-            if (DIP_SCRN::Diplomacy_Generic_System_List_(some_id, player_idx, other_player_idx, 1) != -1) {
+            if (DIP_SCRN::Diplomacy_Generic_System_List_(demand_item_id, player_idx, other_player_idx, 1) != -1) {
                 result = 1;
             }
         } else {
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 79 /* MSG_DEMAND_HEADER */, demand_text, 40);
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 80 /* MSG_DEMAND_SUBHEADER */, &demand_text[40], 40);
 
-            separator = DIP_SCRN::s__00551100[0];
             fields::Deactivate_Help_List_();
 
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext2_lbx, 0 /* MSG_CANCEL */, cancel_btn_text, 40);
@@ -2283,7 +2297,7 @@ namespace DIP_SCRN {
         return result;
     }
 
-    short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag)
+    int16_t __cdecl Diplomacy_Generic_System_List_(int16_t star_idx, int16_t giver_player_idx, int16_t receiver_player_idx, int16_t mode_flag)
     {
         s_animation_header* saved_bg_seg;
         int16_t result;
@@ -2347,7 +2361,12 @@ namespace DIP_SCRN {
         return result;
     }
 
-    // Suggested name: DIP_SCRN::Draw_Diplomacy_System_Text_
+    /**
+     * @brief Draws the selected system summary and colony list for the diplomacy UI.
+     *
+     * @param star_idx The scanned star-system index.
+     * @param selected_planet_idx The highlighted planet index, or -1 when none is highlighted.
+     */
     void __cdecl Draw_Diplomacy_System_Text_(int16_t star_idx, int16_t selected_planet_idx) {
         char text_buffer[80];
         bool use_special_colors = false;
@@ -2415,7 +2434,7 @@ namespace DIP_SCRN {
     }
 
     /**
-     * @address 00417150
+     * @brief Redraws the diplomacy system selection list and current system details.
      */
     void __cdecl Diplomacy_Generic_System_List_Draw_() {
         Draw_Diplomacy_Synch_Mode_();
@@ -2428,7 +2447,7 @@ namespace DIP_SCRN {
     }
 
     /**
-     * @address 0041c480
+     * @brief Swaps the active talker and listener roles during network diplomacy.
      */
     void __cdecl Diplomacy_Net_Switcheroo_() {
         uint8_t original_talker = (uint8_t)DIP_SCRN::_talker_ambassador;
@@ -2461,7 +2480,10 @@ namespace DIP_SCRN {
     }
 
     /**
-     * @address 0041ca80
+     * @brief Returns whether a diplomacy message ID expects player interaction.
+     *
+     * @param msg_id The diplomacy message identifier to test.
+     * @return 1 if the message is interactive, otherwise 0.
      */
     int8_t __cdecl Diplomacy_Message_Is_Interactive_(int16_t msg_id) {
         if (msg_id >= 0x53 && msg_id <= 0x55) {
@@ -2541,7 +2563,7 @@ namespace DIP_SCRN {
         }
 
         if (msg_code == 2100 /* 0x834 */) {
-            strcpy(_receive_chat_message, reinterpret_cast<char*>(net_msg));
+            strcpy(_receive_chat_message, (char*)net_msg);
         }
     }
 }

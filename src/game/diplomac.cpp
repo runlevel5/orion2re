@@ -42,11 +42,10 @@ namespace diplomac {
         -10, -5, -3, 0, 20, 20, -10, 0,
     };
 
-    // Suggested name: Sneak_Attack_Evaluations
-    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_eval_threshold, int16_t *out_msg_id, int16_t *out_unused) {
+    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_idx, int16_t target_idx, int16_t *out_eval_threshold, int16_t *out_message_id, int16_t *out_unused) {
         (void)out_unused;
 
-        int8_t rel = MOX::_player[player_id].relations[target_id];
+        int8_t rel = MOX::_player[player_idx].relations[target_idx];
         int8_t rel_divisor = (rel < 50) ? 10 : 5;
 
         int16_t msg_id = 67 /* 0x43 */;
@@ -54,27 +53,27 @@ namespace diplomac {
         int16_t score = rel / rel_divisor;
         int16_t min_mod = score;
 
-        int8_t threats = MOX::_player[player_id].threats[target_id];
-        if (threats > 0 && MOX::_player[player_id].last_bad_diplomatic_incident[target_id] != 0) {
-            int16_t personality = Get_Player_Diplomacy_Personality_(player_id, target_id);
+        int8_t threats = MOX::_player[player_idx].threats[target_idx];
+        if (threats > 0 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
+            int16_t personality = Get_Player_Diplomacy_Personality_(player_idx, target_idx);
             int16_t threat_mod = -(int16_t)((threats * 10) / diplodef::_personality_max_threats[personality]);
             if (threat_mod < min_mod) {
-                msg_id = (uint8_t)MOX::_player[player_id].last_bad_diplomatic_incident[target_id] + 70 /* 0x46 */;
+                msg_id = (uint8_t)MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] + 70 /* 0x46 */;
                 min_mod = threat_mod;
             }
             score += threat_mod;
         }
 
-        if (MOX::_player[player_id].failed_to_expand == 1) {
-            if (MOX::_player[player_id].objectives == 2 /* ECON_EXPANSION */ || 
-                MOX::_player[player_id].total_pop > COLCALC::Get_Player_Max_Population_(target_id) / 2) {
+        if (MOX::_player[player_idx].failed_to_expand == 1) {
+            if (MOX::_player[player_idx].objectives == 2 /* ECON_EXPANSION */ || 
+                MOX::_player[player_idx].total_pop > COLCALC::Get_Player_Max_Population_(target_idx) / 2) {
                 msg_id = 114 /* 0x72 */;
                 min_mod = -150;
                 score = -150;
             }
         }
 
-        if (MOX::_player[player_id].personality == 3 /* RUTHLESS */) {
+        if (MOX::_player[player_idx].personality == 3 /* RUTHLESS */) {
             if ((int16_t)random::Random_(200) <= MOX::_settings.game_difficulty + 1) {
                 msg_id = 109 /* 0x6D */;
                 severity = 100;
@@ -83,17 +82,17 @@ namespace diplomac {
             }
         }
 
-        if ((int16_t)random::Random_(100) < MOX::_player[player_id].food_shortage_duration) {
+        if ((int16_t)random::Random_(100) < MOX::_player[player_idx].food_shortage_duration) {
             msg_id = 119 /* 0x77 */;
             min_mod = -150;
             score = -150;
         }
 
-        if (MOX::_player[player_id].personality == 1 /* AGGRESSIVE */) {
-            if (Fleet_Strength_Comparison_(player_id, target_id) >= 100) {
-                if (MOX::_player[player_id].opportunity_actual_attacker_ratio[target_id] >= 200 && 
-                    MOX::_player[player_id].opportunity_planet_num[target_id] != -1) {
-                    int16_t opp_mod = (int16_t)(MOX::_player[player_id].opportunity_actual_attacker_ratio[target_id] / -20);
+        if (MOX::_player[player_idx].personality == 1 /* AGGRESSIVE */) {
+            if (Fleet_Strength_Comparison_(player_idx, target_idx) >= 100) {
+                if (MOX::_player[player_idx].opportunity_actual_attacker_ratio[target_idx] >= 200 && 
+                    MOX::_player[player_idx].opportunity_planet_num[target_idx] != -1) {
+                    int16_t opp_mod = (int16_t)(MOX::_player[player_idx].opportunity_actual_attacker_ratio[target_idx] / -20);
                     if (opp_mod < min_mod) {
                         msg_id = 115 /* 0x73 */;
                         min_mod = opp_mod;
@@ -103,24 +102,24 @@ namespace diplomac {
             }
         }
 
-        if (MOX::_player[player_id].personality == 0 /* XENOPHOBIC */) {
-            if (aitech::System_Proximity_Count_(player_id, (uint8_t)target_id) >= (int16_t)random::Random_(400)) {
+        if (MOX::_player[player_idx].personality == 0 /* XENOPHOBIC */) {
+            if (aitech::System_Proximity_Count_(player_idx, (uint8_t)target_idx) >= (int16_t)random::Random_(400)) {
                 msg_id = 121 /* 0x79 */;
                 min_mod = -150;
                 score = -150;
             }
         }
 
-        int16_t trust_mod = (MOX::_player[player_id].trust_worthiness[target_id] * 3) / 5;
-        if (trust_mod < min_mod && MOX::_player[player_id].trust_breaker_player[target_id] != -1) {
+        int16_t trust_mod = (MOX::_player[player_idx].trust_worthiness[target_idx] * 3) / 5;
+        if (trust_mod < min_mod && MOX::_player[player_idx].trust_breaker_player[target_idx] != -1) {
             min_mod = trust_mod;
-            msg_id = 176 /* 0xB0 */ + (MOX::_player[player_id].trust_breaker_player[target_id] == player_id);
+            msg_id = 176 /* 0xB0 */ + (MOX::_player[player_idx].trust_breaker_player[target_idx] == player_idx);
         }
         score += trust_mod;
 
-        if ((Fleet_Strength_Comparison_(player_id, target_id) >= 300 || MOX::_player[player_id].total_pop * 3 <= MOX::_player[player_id].total_pop * 2) && 
-            MOX::_player[player_id].personality != 5 /* PACIFIST */) {
-            int16_t str_mod = (int16_t)(Fleet_Strength_Comparison_(player_id, target_id) / -40);
+        if ((Fleet_Strength_Comparison_(player_idx, target_idx) >= 300 || MOX::_player[player_idx].total_pop * 3 <= MOX::_player[player_idx].total_pop * 2) && 
+            MOX::_player[player_idx].personality != 5 /* PACIFIST */) {
+            int16_t str_mod = (int16_t)(Fleet_Strength_Comparison_(player_idx, target_idx) / -40);
             if (str_mod < min_mod) {
                 msg_id = 112 /* 0x70 */;
                 min_mod = str_mod;
@@ -134,13 +133,13 @@ namespace diplomac {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives != 100 && !MOX::_player[i].eliminated) {
                 active_players++;
-                if (i != player_id && MOX::_player[i].total_pop > max_other_pop) {
+                if (i != player_idx && MOX::_player[i].total_pop > max_other_pop) {
                     max_other_pop = MOX::_player[i].total_pop;
                 }
             }
         }
 
-        if (((active_players < 3 && MOX::_player[player_id].total_pop > max_other_pop) || active_players == 1)) {
+        if (((active_players < 3 && MOX::_player[player_idx].total_pop > max_other_pop) || active_players == 1)) {
             if (min_mod > -10) {
                 msg_id = 178 /* 0xB2 */;
                 min_mod = -10;
@@ -152,8 +151,8 @@ namespace diplomac {
         int16_t turn = (int16_t)MOX::_stardate - 35001;
         if (turn > 99) {
             int16_t comparison_turn = (turn < 350) ? turn - 40 : 309;
-            int16_t source_growth = (uint8_t)MOX::_player[player_id].population_history[turn] - (uint8_t)MOX::_player[player_id].population_history[comparison_turn];
-            int16_t target_growth = (uint8_t)MOX::_player[target_id].population_history[turn] - (uint8_t)MOX::_player[target_id].population_history[comparison_turn];
+            int16_t source_growth = (uint8_t)MOX::_player[player_idx].population_history[turn] - (uint8_t)MOX::_player[player_idx].population_history[comparison_turn];
+            int16_t target_growth = (uint8_t)MOX::_player[target_idx].population_history[turn] - (uint8_t)MOX::_player[target_idx].population_history[comparison_turn];
             if (source_growth < target_growth) {
                 int16_t growth_mod = (source_growth - target_growth) / 2;
                 if (growth_mod < min_mod) {
@@ -164,19 +163,19 @@ namespace diplomac {
             }
         }
 
-        if (MOX::_player[player_id].treaty[target_id] == 1) score += 10;
-        if (MOX::_player[player_id].treaty[target_id] == 2) score += 20;
+        if (MOX::_player[player_idx].treaty[target_idx] == 1) score += 10;
+        if (MOX::_player[player_idx].treaty[target_idx] == 2) score += 20;
 
-        int16_t personality_idx = Get_Player_Diplomacy_Personality_(player_id, target_id);
+        int16_t personality_idx = Get_Player_Diplomacy_Personality_(player_idx, target_idx);
         score += diplomac::_personality_sneak_attack_modifiers[personality_idx];
 
-        if (MOX::_player[target_id].tech_applications[200] == 3) score += 5;
-        if (MOX::_player[target_id].traits[20] == 1 /* TRAIT_TELEPATHIC */) score += 10;
+        if (MOX::_player[target_idx].tech_applications[200] == 3) score += 5;
+        if (MOX::_player[target_idx].traits[20] == 1 /* TRAIT_TELEPATHIC */) score += 10;
 
-        score = (score + COLCALC::Best_Leader_Diplomat_Bonus_(target_id) - MOX::_settings.game_difficulty) + 15;
+        score = (score + COLCALC::Best_Leader_Diplomat_Bonus_(target_idx) - MOX::_settings.game_difficulty) + 15;
 
         int16_t final_prob;
-        uint8_t last_threat_turn = MOX::_player[player_id].last_diplomacy_threat_turn[target_id];
+        uint8_t last_threat_turn = MOX::_player[player_idx].last_diplomacy_threat_turn[target_idx];
 
         if (score < 0) {
             final_prob = -(int16_t)(last_threat_turn * score);
@@ -185,15 +184,15 @@ namespace diplomac {
             final_prob = (divisor != 0) ? (int16_t)(last_threat_turn / divisor) : 0;
         }
 
-        if ((MOX::_player[player_id].treaty[target_id] == 1 || MOX::_player[player_id].treaty[target_id] == 2) && 
-            Get_Player_Diplomacy_Personality_(player_id, target_id) == 4) {
+        if ((MOX::_player[player_idx].treaty[target_idx] == 1 || MOX::_player[player_idx].treaty[target_idx] == 2) && 
+            Get_Player_Diplomacy_Personality_(player_idx, target_idx) == 4) {
             final_prob = 0;
         }
 
-        int16_t demands_count = (int16_t)(Fleet_Strength_Comparison_(player_id, target_id) / 40) - 1 + random::Random_(3);
+        int16_t demands_count = (int16_t)(Fleet_Strength_Comparison_(player_idx, target_idx) / 40) - 1 + random::Random_(3);
         if (demands_count < 1) demands_count = 1;
 
-        if (Get_Demands_(player_id, target_id, demands_count, 1, 1, 1, 1) == 0) {
+        if (Get_Demands_(player_idx, target_idx, demands_count, 1, 1, 1, 1) == 0) {
             demands_count = 0;
         }
 
@@ -202,31 +201,31 @@ namespace diplomac {
                 if (demands_count > 0 && min_mod != -150) {
                     bool is_most_populous = true;
                     for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                        if (i != player_id && MOX::_player[player_id].total_pop < MOX::_player[i].total_pop) {
+                        if (i != player_idx && MOX::_player[player_idx].total_pop < MOX::_player[i].total_pop) {
                             is_most_populous = false;
                         }
                     }
 
                     if (random::Random_(4) < 4 && is_most_populous && diplodef::_COUNCIL_FLAG == 1 && demands_count > 3) {
                         *out_eval_threshold = severity;
-                        *out_msg_id = msg_id;
+                        *out_message_id = msg_id;
                         return 4; /* ULTIMATUM */
                     }
 
-                    if (MOX::_player[player_id].traits[19] == 0 && MOX::_player[target_id].traits[19] == 0) {
+                    if (MOX::_player[player_idx].traits[19] == 0 && MOX::_player[target_idx].traits[19] == 0) {
                         if (special::isqrt_(demands_count + 4) < (uint32_t)random::Random_(4)) {
                             *out_eval_threshold = severity;
-                            *out_msg_id = msg_id;
+                            *out_message_id = msg_id;
                             return 3; /* DEMAND */
                         }
                         *out_eval_threshold = severity;
-                        *out_msg_id = msg_id;
+                        *out_message_id = msg_id;
                         return 1; /* ATTACK */
                     }
                 }
             } else {
                 *out_eval_threshold = severity;
-                *out_msg_id = msg_id;
+                *out_message_id = msg_id;
                 return 2; /* THREAT */
             }
         }
@@ -373,11 +372,11 @@ namespace diplomac {
     void Init_Diplomatic_Relations_() {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
-                int32_t race_i = static_cast<uint8_t>(MOX::_player[i].race);
-                int32_t race_j = static_cast<uint8_t>(MOX::_player[j].race);
+                int32_t race_i = (uint8_t)MOX::_player[i].race;
+                int32_t race_j = (uint8_t)MOX::_player[j].race;
                 
                 int16_t relation_val = _starting_relations[race_i * 14 + race_j];
-                MOX::_player[i].relations[j] = static_cast<int8_t>(relation_val);
+                MOX::_player[i].relations[j] = (int8_t)relation_val;
                 MOX::_player[i].base_relations[j] = MOX::_player[i].relations[j];
                 
                 MOX::_player[i].treaty[j] = 0;
@@ -501,10 +500,10 @@ namespace diplomac {
             for (int16_t j = i + 1; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 // Treaty >= 4 usually represents a state of war
                 if (MOX::_player[i].treaty[j] >= 4 /* TREATY_WAR */) {
-                    if (static_cast<uint8_t>(MOX::_player[i].time_since_last_attack[j]) < 250) {
+                    if ((uint8_t)MOX::_player[i].time_since_last_attack[j] < 250) {
                         MOX::_player[i].time_since_last_attack[j]++;
                     }
-                    if (static_cast<uint8_t>(MOX::_player[j].time_since_last_attack[i]) < 250) {
+                    if ((uint8_t)MOX::_player[j].time_since_last_attack[i] < 250) {
                         MOX::_player[j].time_since_last_attack[i]++;
                     }
                 }
@@ -585,7 +584,8 @@ namespace diplomac {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 if (MOX::_player[i].treaty[j] == 3) {
-                    // Preserve original bogus pointer comparison as compiled.
+                    // REVIEW: This invalid pointer comparison appears to mirror decompiled binary behavior
+                    // and likely stands in for a missing recovered field or flag.
                     if ((MOX::_player + i) == (s_player*)0xFFFFF8D1) {
                         MOX::_player[i].treaty[j] = 0;
                         MOX::_player[j].treaty[i] = 0;
@@ -890,8 +890,8 @@ namespace diplomac {
             p1->base_relations[target_idx] -= 10;
             p2->base_relations[player_idx] -= 10;
 
-            int8_t rand_offset = static_cast<int8_t>(random::Random_(25));
-            int8_t initial_relations = static_cast<int8_t>(181) - rand_offset;
+            int8_t rand_offset = (int8_t)random::Random_(25);
+            int8_t initial_relations = (int8_t)181 - rand_offset;
 
             p1->relations[target_idx] = initial_relations;
             p2->relations[player_idx] = initial_relations;
@@ -937,10 +937,10 @@ namespace diplomac {
             result = 800;
         }
 
-        // Halve the result for each third-party player that player_idx_1 is allied with.
+        // Apply the original treaty-state reduction for each third-party player in state >= 4.
         for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
             if (i != player_idx_1 && i != player_idx_2) {
-                if (MOX::_player[player_idx_1].treaty[i] >= 4 /* TREATY_ALLIANCE */) {
+                if (MOX::_player[player_idx_1].treaty[i] >= 4) {
                     result >>= 1;
                 }
             }
@@ -956,11 +956,11 @@ namespace diplomac {
     int __cdecl Tech_Strength_Comparison_(int16_t player_idx1, int16_t player_idx2) {
         // Load research values and perform scaling.
         // The assembly uses MOVSX to sign-extend the 16-bit research value to 32-bit.
-        uint32_t scaled_research1 = static_cast<uint32_t>(static_cast<int32_t>(MOX::_player[player_idx1].total_research) * 100);
-        uint32_t divisor = static_cast<uint32_t>(static_cast<int32_t>(MOX::_player[player_idx2].total_research) + 1);
+        uint32_t scaled_research1 = (uint32_t)((int32_t)MOX::_player[player_idx1].total_research * 100);
+        uint32_t divisor = (uint32_t)((int32_t)MOX::_player[player_idx2].total_research + 1);
 
         // DIV instruction in assembly performs unsigned division.
-        return static_cast<int>(scaled_research1 / divisor) + 1;
+        return (int)(scaled_research1 / divisor) + 1;
     }
 
     /**
@@ -973,12 +973,12 @@ namespace diplomac {
      */
     int __cdecl Maintenance_Strength_Comparison_(int16_t player_idx_1, int16_t player_idx_2) {
         // total_maintenance is a signed int at offset 0xB4 of s_player
-        uint32_t maint_1 = static_cast<uint32_t>(MOX::_player[player_idx_1].total_maintenance);
-        uint32_t maint_2 = static_cast<uint32_t>(MOX::_player[player_idx_2].total_maintenance);
+        uint32_t maint_1 = (uint32_t)MOX::_player[player_idx_1].total_maintenance;
+        uint32_t maint_2 = (uint32_t)MOX::_player[player_idx_2].total_maintenance;
 
         // Division by zero is avoided by the +1 in the denominator.
         // The return value is the quotient + 1.
-        return static_cast<int>((maint_1 * 100) / (maint_2 + 1) + 1);
+        return (int)((maint_1 * 100) / (maint_2 + 1) + 1);
     }
 
     void __cdecl Reward_Check_(int16_t amount, int16_t p_a, int16_t p_b, int16_t system, int16_t value) {
@@ -1356,9 +1356,7 @@ namespace diplomac {
     }
 
     /**
-     * Establishes peace between two players, resets war-related stats, and adjusts relations.
-     * @param p1 First player index
-     * @param p2 Second player index
+     * Chooses a positive diplomacy message and any follow-up demand for the current incident.
      */
     void __cdecl Determine_Good_Message_(int16_t player_idx, int16_t other_player_idx) {
         uint8_t incident = (uint8_t)MOX::_player[player_idx].diplomacy_incident[other_player_idx];
@@ -1625,12 +1623,9 @@ namespace diplomac {
     }
 
     /**
-     * Checks if a player should propose an alliance-related war demand to another player.
-     * If player_idx has a peace treaty with other_player_idx, there's a 1 in 10 chance 
-     * they will demand other_player_idx go to war with one of player_idx's allies.
+     * Tries to queue a diplomacy message asking another player to attack a third party.
      */
     void __cdecl Required_Alliances_(int16_t player_idx, int16_t other_player_idx) {
-        // 0x02: Likely TREATY_PEACE or TREATY_CEASEFIRE
         if (MOX::_player[player_idx].treaty[other_player_idx] == 2) {
             if (random::Random_(10) == 1) {
                 int16_t target_ally_idx = -1;
@@ -1641,10 +1636,7 @@ namespace diplomac {
                         continue;
                     }
 
-                    // Check if player_idx is allied with i (0x04: TREATY_ALLIANCE)
                     if (MOX::_player[i].treaty[player_idx] >= 4) {
-                        // If other_player_idx is in contact and range of the ally, 
-                        // but is NOT allied with them.
                         if (MOX::_player[other_player_idx].contact[i] == 1 &&
                             MOX::_player[other_player_idx].within_range[i] == 1 &&
                             MOX::_player[other_player_idx].treaty[i] < 4) {
@@ -1783,15 +1775,15 @@ namespace diplomac {
         int active_plr = (int)p1_idx;
         int other_plr = (int)p2_idx;
 
-        // Check if there is a Non-Aggression Pact (treaty == 2)
+        // Only consider the treaty state that enables this NPC pressure path.
         if (MOX::_player[active_plr].treaty[other_plr] == 2) {
             if (random::Random_(10) == 1) {
                 int16_t target_idx = -1;
 
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
                     if (i != p1_idx && i != p2_idx) {
-                        // Check if potential target is allied (4 or 5) with other_plr,
-                        // and active_plr knows them, can reach them, and is not already allied.
+                        // Check whether the candidate is in the required treaty state with other_plr,
+                        // and whether active_plr knows them, can reach them, and is not already in state >= 4.
                         if ((MOX::_player[i].treaty[other_plr] == 4 || MOX::_player[i].treaty[other_plr] == 5) &&
                             (MOX::_player[active_plr].contact[i] == 1 &&
                              MOX::_player[active_plr].within_range[i] == 1 &&
@@ -2120,8 +2112,9 @@ namespace diplomac {
         s_player* p1 = &MOX::_player[p1_idx];
         s_player* p2 = &MOX::_player[p2_idx];
 
-        // Preserve the original bogus sentinel pointer check from the binary.
-        if (reinterpret_cast<std::intptr_t>(p1) == kInvalidTributePlayerMarker) {
+        // REVIEW: This sentinel pointer check likely stands in for a missing recovered field
+        // and depends on implementation-defined pointer-to-integer conversion.
+        if ((std::intptr_t)p1 == kInvalidTributePlayerMarker) {
             return;
         }
 
@@ -2470,7 +2463,6 @@ namespace diplomac {
         *msg_id = 0xa0; // Standard war declaration message
     }
 
-    // Suggested name: DIPLOMAC::Get_Gift_Response
     int __cdecl Fleet_Comparison_(int16_t player_idx, int16_t opponent_idx) {
         int32_t strength_a = MOX::_player[player_idx].total_ship_strength[opponent_idx];
         int32_t strength_b = MOX::_player[opponent_idx].total_ship_strength[player_idx];
@@ -2594,7 +2586,7 @@ namespace diplomac {
         MOX::_player[plr_b].relations[plr_a] = MOX::_player[plr_a].relations[plr_b];
     }
 
-    void __cdecl Get_Demand_Response_(int16_t player_a, int16_t player_b, int16_t demand_type, int16_t param_4, int16_t *accepted, int16_t *response_code) {
+    void __cdecl Get_Demand_Response_(int16_t player_a, int16_t player_b, int16_t demand_type, int16_t demand_value, int16_t *accepted, int16_t *response_code) {
         int32_t tech_comp = Tech_Comparison_(player_a, player_b);
         int32_t fleet_comp = Fleet_Comparison_(player_a, player_b);
         int32_t pop_comp = Population_Comparison_(player_a, player_b);
@@ -2608,38 +2600,38 @@ namespace diplomac {
             pers_mod = diplodef::_personality_relation_modifiers[6];
         }
 
-        int16_t modifier = static_cast<int16_t>(((tech_comp + fleet_comp + pop_comp) / 3) + worst_mod + rnd + (pers_mod * 2));
+        int16_t modifier = (int16_t)(((tech_comp + fleet_comp + pop_comp) / 3) + worst_mod + rnd + (pers_mod * 2));
 
         switch (demand_type) {
             case 0: {
-                if (MOX::_player[player_b].treaty[param_4] == 1) {
+                if (MOX::_player[player_b].treaty[demand_value] == 1) {
                     modifier -= 75;
-                } else if (MOX::_player[player_b].treaty[param_4] == 2) {
+                } else if (MOX::_player[player_b].treaty[demand_value] == 2) {
                     modifier -= 150;
                 } else {
                     modifier -= 25;
                 }
 
-                int8_t rel = MOX::_player[player_b].relations[param_4];
+                int8_t rel = MOX::_player[player_b].relations[demand_value];
                 modifier -= rel / 2;
 
-                int32_t tgt_fleet = Fleet_Comparison_(player_b, param_4);
+                int32_t tgt_fleet = Fleet_Comparison_(player_b, demand_value);
                 modifier -= tgt_fleet / 4;
 
-                if (MOX::_player[param_4].objectives != 100) {
+                if (MOX::_player[demand_value].objectives != 100) {
                     modifier -= 25;
                 }
                 break;
             }
             case 1: {
-                modifier -= (diplodef::_personality_relation_modifiers[MOX::_player[param_4].personality] + 80);
-                if (MOX::_player[param_4].objectives == 100) {
+                modifier -= (diplodef::_personality_relation_modifiers[MOX::_player[demand_value].personality] + 80);
+                if (MOX::_player[demand_value].objectives == 100) {
                     modifier = 0;
                 }
                 break;
             }
             case 2: {
-                modifier -= MOX::_player[player_b].relations[param_4] * 2;
+                modifier -= MOX::_player[player_b].relations[demand_value] * 2;
                 break;
             }
             case 3:
@@ -2653,18 +2645,18 @@ namespace diplomac {
                 break;
             }
             case 6: {
-                uint32_t tech_val = newtech::Calc_Tech_Value_(player_a, param_4);
+                uint32_t tech_val = newtech::Calc_Tech_Value_(player_a, demand_value);
                 int32_t max_tech_val = aitech::Get_Max_Technology_Value_(player_a);
-                modifier -= static_cast<int16_t>((tech_val * 100) / max_tech_val);
+                modifier -= (int16_t)((tech_val * 100) / max_tech_val);
                 break;
             }
             case 7: {
-                int16_t sys_pop = COLCALC::Get_System_Population_(player_b, param_4);
+                int16_t sys_pop = COLCALC::Get_System_Population_(player_b, demand_value);
                 int32_t val = (sys_pop * 1000) / MOX::_player[player_b].total_pop;
                 if (val > 300) {
                     val = 300;
                 }
-                modifier -= static_cast<int16_t>(val);
+                modifier -= (int16_t)val;
                 break;
             }
         }
@@ -2697,8 +2689,8 @@ namespace diplomac {
                 if (base_rel < -100) {
                     base_rel = -100;
                 }
-                MOX::_player[player_a].base_relations[player_b] = static_cast<int8_t>(base_rel);
-                MOX::_player[player_b].base_relations[player_a] = static_cast<int8_t>(base_rel);
+                MOX::_player[player_a].base_relations[player_b] = (int8_t)base_rel;
+                MOX::_player[player_b].base_relations[player_a] = (int8_t)base_rel;
                 
                 *response_code = 0xA7;
                 *accepted = 0;
@@ -2722,8 +2714,8 @@ namespace diplomac {
                 if (base_rel < -100) {
                     base_rel = -100;
                 }
-                MOX::_player[player_a].base_relations[player_b] = static_cast<int8_t>(base_rel);
-                MOX::_player[player_b].base_relations[player_a] = static_cast<int8_t>(base_rel);
+                MOX::_player[player_a].base_relations[player_b] = (int8_t)base_rel;
+                MOX::_player[player_b].base_relations[player_a] = (int8_t)base_rel;
                 
                 *response_code = 0xA7;
                 *accepted = 0;
@@ -2739,7 +2731,7 @@ namespace diplomac {
         if (*accepted == 1 && demand_type == 5) {
             int32_t rnd1 = random::Random_(50);
             int32_t rnd2 = random::Random_(50);
-            MOX::_player[player_b].stop_spying_duration[param_4] = static_cast<int8_t>(rnd1 + rnd2 + 10);
+            MOX::_player[player_b].stop_spying_duration[demand_value] = (int8_t)(rnd1 + rnd2 + 10);
         }
     }
 
@@ -2943,7 +2935,7 @@ namespace diplomac {
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
-                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                            *response = (uint8_t)MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] + 0x8D;
                         } else {
                             *response = 0x8A;
                         }
@@ -3009,7 +3001,7 @@ namespace diplomac {
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
-                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                            *response = (uint8_t)MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] + 0x8D;
                         } else {
                             *response = 0x8A;
                         }
@@ -3075,7 +3067,7 @@ namespace diplomac {
 
                 result = Diplomacy_Test_(player_idx, target_idx, test_val, 0);
 
-                if (static_cast<uint8_t>(MOX::_player[player_idx].time_since_last_attack[target_idx]) < 10) {
+                if ((uint8_t)MOX::_player[player_idx].time_since_last_attack[target_idx] < 10) {
                     result = 0;
                 }
 
@@ -3089,7 +3081,7 @@ namespace diplomac {
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
-                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                            *response = (uint8_t)MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] + 0x8D;
                         } else {
                             *response = 0x8A;
                         }
@@ -3149,7 +3141,7 @@ namespace diplomac {
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
-                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                            *response = (uint8_t)MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] + 0x8D;
                         } else {
                             *response = 0x8A;
                         }
@@ -3181,7 +3173,7 @@ namespace diplomac {
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
                         } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
-                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                            *response = (uint8_t)MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] + 0x8D;
                         } else {
                             *response = 0x8A;
                         }
@@ -3261,13 +3253,13 @@ namespace diplomac {
     }
 
     int16_t __cdecl Diplomacy_Test_(int16_t evaluator_idx, int16_t proposer_idx, int16_t difficulty_mod, int16_t treaty_type) {
-        int16_t score = static_cast<int16_t>(MOX::_player[evaluator_idx].broken_treaties_modifier[proposer_idx]) +
-            static_cast<int16_t>(MOX::_player[evaluator_idx].relations[proposer_idx]) +
-            static_cast<int16_t>(MOX::_player[evaluator_idx].trust_worthiness[proposer_idx]);
+        int16_t score = (int16_t)MOX::_player[evaluator_idx].broken_treaties_modifier[proposer_idx] +
+            (int16_t)MOX::_player[evaluator_idx].relations[proposer_idx] +
+            (int16_t)MOX::_player[evaluator_idx].trust_worthiness[proposer_idx];
 
         int16_t modifier;
         if (MOX::_player[evaluator_idx].personality == 4) {
-            score += static_cast<int16_t>(MOX::_player[evaluator_idx].trust_worthiness[proposer_idx]);
+            score += (int16_t)MOX::_player[evaluator_idx].trust_worthiness[proposer_idx];
             if (MOX::_player[evaluator_idx].dishonored_flag[proposer_idx] == 1) {
                 modifier = diplodef::_personality_relation_modifiers[6];
             }
@@ -3280,7 +3272,7 @@ namespace diplomac {
         }
 
         score -= (difficulty_mod - modifier);
-        score += static_cast<int16_t>(random::Random_(100));
+        score += (int16_t)random::Random_(100);
 
         switch (treaty_type) {
         case 0:
@@ -3303,16 +3295,16 @@ namespace diplomac {
 
         switch (treaty_type) {
         case 0:
-            MOX::_player[evaluator_idx].treaty_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(30) + 20);
+            MOX::_player[evaluator_idx].treaty_modifier[proposer_idx] -= (int16_t)(random::Random_(30) + 20);
             break;
         case 1:
-            MOX::_player[evaluator_idx].trade_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(30) + 20);
+            MOX::_player[evaluator_idx].trade_modifier[proposer_idx] -= (int16_t)(random::Random_(30) + 20);
             break;
         case 2:
-            MOX::_player[evaluator_idx].tech_exchange_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(50) + 20);
+            MOX::_player[evaluator_idx].tech_exchange_modifier[proposer_idx] -= (int16_t)(random::Random_(50) + 20);
             break;
         case 3:
-            MOX::_player[evaluator_idx].peace_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(50) + 50);
+            MOX::_player[evaluator_idx].peace_modifier[proposer_idx] -= (int16_t)(random::Random_(50) + 50);
             break;
         default:
             break;

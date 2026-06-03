@@ -13,29 +13,7 @@ namespace DESIGN {
     uint8_t _changed_design_name;
     uint8_t _add_size_button_flag[6];
 
-    const char s_cstdes_log[13] = "cstdes%d.log";
-    const char s_plus[2] = "+";
-    const char s_minus[2] = "-";
-    const char s_pct_d[3] = "%d";
-    const char s_pct_s_pct_d[5] = "%s%d";
-    const char s_pct_d_pct[5] = "%d%%";
-    const char s_pct_s_bracket_pct_d[8] = "%s (%d)";
-    const char s_special_tag[8] = "special";
-    const char s__00551100[1] = "";
-    const char s__00551120[2] = "\x1B";
-    const char s_B_005560e4[2] = "B";
-    const char s_L_005560e8[2] = "L";
-    const char s_360_00556164[4] = "360";
     const char s_comma_space[3] = ", ";
-    const char s_ITATECD_LBX[12] = "ITATECD.LBX";
-    const char s_SPATECD_LBX[12] = "SPATECD.LBX";
-    const char s_FRETECD_LBX[12] = "FRETECD.LBX";
-    const char s_GERTECD_LBX[12] = "GERTECD.LBX";
-    const char s_TECHDESC_LBX[13] = "TECHDESC.LBX";
-    const char s_DESIGN_LBX_005560cc[11] = "DESIGN.LBX";
-    const char* PTR_s_DESIGN_LBX_005560D8 = s_DESIGN_LBX_005560cc;
-    const char s_Bad_required_tech_in_Tech_Level[40] = "Bad required_tech in Tech_Level()... %d";
-    const char s_SHIPNAME_LBX_0055610C[13] = "shipname.lbx";
 
     s_animation_header* _dull_plus_button_seg;
     s_animation_header* _dull_minus_button_seg;
@@ -44,14 +22,12 @@ namespace DESIGN {
     void __cdecl Build_Initial_Design_Template_(int16_t player_idx, int16_t design_idx) {
         s_current_design* d = MOX::_design;
 
-        for (int i = 0; i < sizeof(s_current_design); ++i) {
-            ((uint8_t*)d)[i] = 0;
-        }
+        struct_::Clear_Structure_(d, sizeof(*d));
 
         char* name = HACCESS::Design_Name_(player_idx, design_idx);
-        int len = 0;
-        while (name[len] != '\0') len++;
-        for (int i = 0; i <= len && i < 16; ++i) {
+        int32_t name_length = 0;
+        while (name[name_length] != '\0') name_length++;
+        for (int32_t i = 0; i <= name_length && i < (int32_t)sizeof(d->name); ++i) {
             d->name[i] = name[i];
         }
 
@@ -364,7 +340,7 @@ namespace DESIGN {
             int16_t special_idx = design->special_devices[i];
             if (special_idx > 0) {
                 int16_t base_cost = TECHDATA::_specials[special_idx].cost_per_ship_type[design->ship_size];
-                if (special_idx == 4) { // Special logic for specific device ID 4 (Reinforced Hull?)
+                if (special_idx == 4) { // Device 4 keeps its base cost without miniaturization adjustment.
                     design->special_device_cost[i] = base_cost;
                 } else {
                     int16_t special_tech_level = Tech_Level_(player_idx, TECHDATA::_specials[special_idx].tech_app_id);
@@ -447,7 +423,7 @@ namespace DESIGN {
             int16_t device_id = design->special_devices[i];
             if (device_id > 0) {
                 if (device_id == 4) {
-                    // Device 4 has fixed space requirements (not miniaturized)
+                    // Device 4 keeps its base space without miniaturization adjustment.
                     design->special_device_space[i] = TECHDATA::_specials[4].space_per_ship_type[design->ship_size];
                 } else {
                     int16_t tech_app = TECHDATA::_specials[device_id].tech_app_id;
@@ -553,12 +529,19 @@ namespace DESIGN {
         return space;
     }
 
-    int32_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_id, int16_t ship_type, int16_t m_level) {
+    /**
+     * Returns the shield space after applying the owning player's miniaturization level.
+     *
+     * @param shield_id Shield entry to evaluate.
+     * @param ship_type Hull size index.
+     * @param player_idx Player whose tech level drives miniaturization.
+     */
+    int32_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_id, int16_t ship_type, int16_t player_idx) {
         // Calculate the base space requirement for this shield and ship type
         int16_t base_space = DESIGN::Shield_Space_(shield_id, ship_type);
 
-        // Determine the effective technology level based on mastery level and shield's tech app
-        int16_t tech_level = DESIGN::Tech_Level_(m_level, TECHDATA::_shields[shield_id].tech_app_id);
+        // Determine the effective technology level for the owning player and shield's tech app
+        int16_t tech_level = DESIGN::Tech_Level_(player_idx, TECHDATA::_shields[shield_id].tech_app_id);
 
         // Adjust the base space requirement according to the technology level
         return DESIGN::Space_Given_M_Level_(base_space, tech_level, 0);
@@ -730,7 +713,7 @@ namespace DESIGN {
         bool done = false;
 
         for (int16_t i = 0; i < 8 && !done; ++i) {
-            int16_t count_idx = (int16_t)MOX::_first_weapon_ctr + i;
+            int16_t weapon_slot = (int16_t)MOX::_first_weapon_ctr + i;
             if (MOX::_weapons_count_plus_button[i] != -1000 && input_id == MOX::_weapons_count_plus_button[i]) {
                 if (MOX::_design->weapon_type[i] > 0 && _repeat_count > 4) {
                     done = true;
@@ -745,10 +728,10 @@ namespace DESIGN {
                     );
 
                     if (MOX::_design->space_used + space <= MOX::_design->hull_space) {
-                        if (MOX::_design->weapon_count[count_idx] < 99) {
-                            MOX::_design->weapon_count[count_idx]++;
+                        if (MOX::_design->weapon_count[weapon_slot] < 99) {
+                            MOX::_design->weapon_count[weapon_slot]++;
                         } else {
-                            MOX::_design->weapon_count[count_idx] = 99;
+                            MOX::_design->weapon_count[weapon_slot] = 99;
                         }
                         updated = true;
                     }
@@ -757,10 +740,10 @@ namespace DESIGN {
                 if (MOX::_design->weapon_type[i] > 0 && _repeat_count > 5) {
                     done = true;
 
-                    if (MOX::_design->weapon_count[count_idx] > 1) {
-                        MOX::_design->weapon_count[count_idx]--;
+                    if (MOX::_design->weapon_count[weapon_slot] > 1) {
+                        MOX::_design->weapon_count[weapon_slot]--;
                     } else {
-                        MOX::_design->weapon_count[count_idx] = 1;
+                        MOX::_design->weapon_count[weapon_slot] = 1;
                     }
                     updated = true;
                 }
@@ -826,8 +809,15 @@ namespace DESIGN {
         target_design->speed = (int8_t)INITSHIP::Get_FTL_Speed_(player_idx, MOX::_design->ftl_type);
     }
 
-    void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
-        if (_design_computer_replacement_field == field) {
+    /**
+     * Opens the shield or computer replacement picker for the clicked field when upgrades are available.
+     *
+     * @param clicked_field Field identifier that was activated.
+     * @param refresh_needed Set when the design screen should recalculate and redraw.
+     * @param out_status Set to 99 when a replacement sub-screen takes over.
+     */
+    void __cdecl Check_Generic_Replacement_Fields_(int16_t clicked_field, int16_t* refresh_needed, int16_t* out_status) {
+        if (_design_computer_replacement_field == clicked_field) {
             if (N_Replacements_For_Generic_Item_(8) == 0) {
                 const char* msg = HAROLD::H_Message_(HESTR_050_YOU_MAY_NOT_UPGRADE_TH);
                 GENDRAW::Warning_Box_(msg);
@@ -838,12 +828,12 @@ namespace DESIGN {
                 DESBOX::Generic_Replacement_Box_();
                 MOX::_design->show_help = 1;
                 MOX::_current_screen = SCREEN_DESIGN;
-                *refresh = 1;
-                *flag = 99;
+                *refresh_needed = 1;
+                *out_status = 99;
             }
         }
 
-        if (_design_shield_replacement_field == field) {
+        if (_design_shield_replacement_field == clicked_field) {
             if (Has_Damper_Field_()) {
                 const char* msg = HAROLD::H_Message_(HESTR_051_YOU_MAY_NOT_PLACE_SHIE);
                 GENDRAW::Warning_Box_(msg);
@@ -858,8 +848,8 @@ namespace DESIGN {
                 DESBOX::Generic_Replacement_Box_();
                 MOX::_design->show_help = 1;
                 MOX::_current_screen = SCREEN_DESIGN;
-                *refresh = 1;
-                *flag = 99;
+                *refresh_needed = 1;
+                *out_status = 99;
             } else {
                 const char* msg = HAROLD::H_Message_(HESTR_052_YOU_MAY_NOT_UPGRADE_TH);
                 GENDRAW::Warning_Box_(msg);
@@ -867,7 +857,13 @@ namespace DESIGN {
         }
     }
 
-    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, int16_t* /* refresh */, int16_t* out_flag) {
+    /**
+     * Opens the weapon replacement picker or weapon help text for the clicked weapon row.
+     *
+     * @param clicked_field Field identifier that was activated.
+     * @param out_status Set to 99 when a replacement sub-screen takes over.
+     */
+    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, int16_t* /* refresh */, int16_t* out_status) {
         char description_buffer[1332];
 
         for (int16_t i = 0; i < 8; ++i) {
@@ -901,7 +897,7 @@ namespace DESIGN {
 
                 MOX::_design->show_help = 1;
                 MOX::_current_screen = SCREEN_DESIGN;
-                *out_flag = 99;
+                *out_status = 99;
                 continue;
             } else if (clicked_field + weapon_field_id == 0) {
                 int16_t weapon_type = MOX::_design->weapon_type[i];
@@ -913,6 +909,12 @@ namespace DESIGN {
         }
     }
 
+    /**
+     * Opens the special-system replacement picker or special-system help text for the clicked row.
+     *
+     * @param clicked_field_id Field identifier that was activated.
+     * @param out_status Set to 99 when a replacement sub-screen takes over.
+     */
     void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t* /* unused */, int16_t* out_status) {
         char description_buffer[1332];
 
@@ -950,7 +952,7 @@ namespace DESIGN {
                 if (special_id > 0) {
                     EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_app_id);
 
-                    const char* title = *reinterpret_cast<const char**>(&TECHDATA::_specials[special_id]);
+                    const char* title = TECHDATA::_specials[special_id].name;
                     TEXTBOX::Text_Box_(title, description_buffer);
                 }
             }
@@ -1025,19 +1027,19 @@ namespace DESIGN {
 
         switch (MOX::_settings.language) {
             case 1: // German
-                src = s_GERTECD_LBX;
+                src = "GERTECD.LBX";
                 break;
             case 2: // French
-                src = s_FRETECD_LBX;
+                src = "FRETECD.LBX";
                 break;
             case 3: // Spanish
-                src = s_SPATECD_LBX;
+                src = "SPATECD.LBX";
                 break;
             case 4: // Italian
-                src = s_ITATECD_LBX;
+                src = "ITATECD.LBX";
                 break;
             default: // English or other
-                src = s_TECHDESC_LBX;
+                src = "TECHDESC.LBX";
                 break;
         }
 
@@ -1146,12 +1148,12 @@ namespace DESIGN {
         int16_t entry_idx = (int16_t)(variant_idx + (int16_t)((int16_t)(race_idx * 6) + design_idx) * 8);
 
         char* loaded_name = (char*)farload::Far_Reload_Next_Data_(
-            s_SHIPNAME_LBX_0055610C,
+            "shipname.lbx",
             0,
             MOX::_global_data_seg,
             (int32_t)entry_idx,
             1,
-            0x10
+            sizeof(MOX::_design->name)
         );
 
         allocate::Pop_Block_(MOX::_global_data_seg);
@@ -1373,7 +1375,7 @@ namespace DESIGN {
     int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_idx) {
         if (player_idx > -1 && player_idx < MOX::_NUM_PLAYERS) {
             if (tech_idx < 0 || tech_idx >= 212 /* 0xd4 */) {
-                RUSS::PFMT_(0, 2, s_Bad_required_tech_in_Tech_Level, (int32_t)tech_idx);
+                RUSS::PFMT_(0, 2, "Bad required_tech in Tech_Level()... %d", (int32_t)tech_idx);
                 assert::hgetch_();
             }
 
@@ -1409,7 +1411,7 @@ namespace DESIGN {
 
     void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str) {
         char buffer[8];
-        dest_str[0] = s__00551100[0];
+        dest_str[0] = '\0';
 
         if (arc_flags & 0x01) {
             KEN::Ken_Get_Text_Message_(3, buffer, 6);
@@ -1436,7 +1438,7 @@ namespace DESIGN {
         }
 
         if (arc_flags & 0x10) {
-            strcpy(dest_str, s_360_00556164);
+            strcpy(dest_str, "360");
         }
     }
 

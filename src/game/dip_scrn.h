@@ -113,7 +113,7 @@ namespace DIP_SCRN {
 
     int16_t __cdecl Diplomacy_Determine_Treaty_Proposal_(int16_t proposer_idx, int16_t target_idx, int16_t treaty_type);
 
-    void __cdecl Diplomacy_Break_Treaty_(int16_t param_1, int16_t param_2);
+    void __cdecl Diplomacy_Break_Treaty_(int16_t player_idx, int16_t target_idx);
 
     void __cdecl Diplomacy_Break_Treaty_Resolution_(int16_t sender_id, int16_t target_id, int16_t treaty_type);
 
@@ -166,9 +166,9 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Net_Switcheroo_();
 
-    void __cdecl Get_Human_Demand_Message_(int16_t player_idx, int16_t unused, int16_t demand_type, int16_t item_idx);
+    void __cdecl Get_Human_Demand_Message_(int16_t player_idx, int16_t unused_target_idx, int16_t demand_type, int16_t item_idx);
 
-    int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t some_id);
+    int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t demand_item_id);
 
     void __cdecl Setup_Full_Screen_Diplomacy_Help_(int16_t help_id);
 
@@ -180,7 +180,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg);
 
-    void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2);
+    void __cdecl Diplomacy_Main_Net_Chat_(int16_t player_idx, int16_t target_player_idx);
 
     void __cdecl Start_Net_Treaty_();
 
@@ -210,7 +210,7 @@ namespace DIP_SCRN {
 
     int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, char* list_strings, int8_t add_cancel, char* title);
 
-    short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag);
+    int16_t __cdecl Diplomacy_Generic_System_List_(int16_t star_idx, int16_t giver_player_idx, int16_t receiver_player_idx, int16_t mode_flag);
 
     extern int16_t _offer_help_entry[7];
     extern char* _offer_diplomacy_list[7];
