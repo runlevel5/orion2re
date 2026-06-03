@@ -1,17 +1,5 @@
 # Source Cleanup Progress
 
-- [pending] src/game/eric.{h,cpp}
-- [pending] src/game/erichelp.{h,cpp}
-- [pending] src/game/ericnet.{h,cpp}
-- [pending] src/game/estrings.{h,cpp}
-- [pending] src/game/evanhelp.{h,cpp}
-- [pending] src/game/events.{h,cpp}
-- [pending] src/game/exitm.{h,cpp}
-- [pending] src/game/fade.{h,cpp}
-- [pending] src/game/fakebuts.{h,cpp}
-- [pending] src/game/farload.{h,cpp}
-- [pending] src/game/fields.{h,cpp}
-- [pending] src/game/fieldsav.{h,cpp}
 - [pending] src/game/file_ani.{h,cpp}
 - [pending] src/game/filedef.{h,cpp}
 - [pending] src/game/firepts.{h,cpp}

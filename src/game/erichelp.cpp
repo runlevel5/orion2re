@@ -125,9 +125,9 @@ namespace ERICHELP {
         {534, 1, 1, 638, 478},
     };
 
-    void __cdecl Eric_Set_Help_List_(s_help_box* help_list, int16_t count) {
+    void __cdecl Eric_Set_Help_List_(s_help_box* help_list, int16_t help_box_count) {
         fields::Deactivate_Help_List_();
-        fields::Set_Help_List_(help_list, count);
+        fields::Set_Help_List_(help_list, help_box_count);
     }
 
     void __cdecl Set_Transport_Popup_Help_List_() {
@@ -150,10 +150,10 @@ namespace ERICHELP {
         Eric_Set_Help_List_(_colony_screen_help_list, 17);
     }
 
-    void __cdecl Set_New_Game_Screen_Help_List_(int16_t mode) {
+    void __cdecl Set_New_Game_Screen_Help_List_(int16_t new_game_mode) {
         Eric_Set_Help_List_(_new_game_screen_help_list, 11);
 
-        switch (mode) {
+        switch (new_game_mode) {
             case 0:
                 _new_game_screen_help_list[0].help_id = 0x226;
                 break;

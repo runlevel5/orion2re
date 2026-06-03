@@ -9,7 +9,7 @@ namespace ERICNET {
         6, 5, 23, 36, 29, 30, 46, 14, 45, 3, 42, 38, 0, 0,
     };
 
-    void __cdecl Init_Homeworld_Colony2_(int16_t planet_idx, int16_t player_idx, uint8_t param_flag) {
+    void __cdecl Init_Homeworld_Colony2_(int16_t planet_idx, int16_t player_idx, uint8_t is_homeworld) {
         int16_t colony_idx = MOX::_NUM_COLONIES;
         MOX::_NUM_COLONIES++;
 
@@ -29,21 +29,21 @@ namespace ERICNET {
 
         colony.climate = MOX::_planet[planet_idx].climate;
 
-        int16_t limit = COLCALC::Colony_Race_Pop_Limit_(&colony, player_idx);
+        int16_t population_limit = COLCALC::Colony_Race_Pop_Limit_(&colony, player_idx);
 
         if (MOX::_settings.starting_civilization_level == 2 /* Post-War */) {
             int32_t growth_mod = MOX::_player[player_idx].traits[TRAIT_POP_GROWTH_BONUS];
-            colony.n_pops = (int8_t)(((growth_mod + 300) * (int32_t)limit * 6) / 3000);
+            colony.n_pops = (int8_t)(((growth_mod + 300) * (int32_t)population_limit * 6) / 3000);
 
-            if (limit < 9) {
-                colony.n_pops = (int8_t)(((int32_t)(uint8_t)colony.n_pops + (int32_t)limit) / 2);
+            if (population_limit < 9) {
+                colony.n_pops = (int8_t)(((int32_t)(uint8_t)colony.n_pops + (int32_t)population_limit) / 2);
             }
 
             if (colony.n_pops == 0) {
                 colony.n_pops = 1;
             }
 
-            if (param_flag != 0 && (uint8_t)colony.n_pops < 8) {
+            if (is_homeworld != 0 && (uint8_t)colony.n_pops < 8) {
                 colony.n_pops = 8;
             }
         } else {
@@ -67,9 +67,9 @@ namespace ERICNET {
             colony.pop[i] = pop_val;
         }
 
-        memset(colony.buildings, 0, 49);
+        memset(colony.buildings, 0, sizeof(colony.buildings));
 
-        if (MOX::_player[colony.owner].traits[TRAIT_CURRENT_GOVERNMENT] < 6 && param_flag != 0) {
+        if (MOX::_player[colony.owner].traits[TRAIT_CURRENT_GOVERNMENT] < 6 && is_homeworld != 0) {
             Add_Building_(colony_idx, BUILDING_CAPITOL);
         }
 
@@ -94,7 +94,7 @@ namespace ERICNET {
                         break;
                     case 10:
                     case 25:
-                        can_add = ((int32_t)(uint8_t)colony.n_pops < (int32_t)limit);
+                        can_add = ((int32_t)(uint8_t)colony.n_pops < (int32_t)population_limit);
                         break;
                     case 20:
                     case 31:
@@ -117,7 +117,7 @@ namespace ERICNET {
             }
         }
 
-        if (MOX::_settings.starting_civilization_level == 1 /* Average */ && param_flag != 0) {
+        if (MOX::_settings.starting_civilization_level == 1 /* Average */ && is_homeworld != 0) {
             MOX::_ship[MOX::_NUM_SHIPS].owner = (int8_t)player_idx;
             COLBLDG::Create_Ship_(player_idx, 0, colony_idx);
 
@@ -170,7 +170,7 @@ namespace ERICNET {
         for (int16_t ship_idx = 0; ship_idx < 500; ++ship_idx) {
             s_ship_data& ship = MOX::_ship[ship_idx];
 
-            if (ship.status < 5 && static_cast<uint8_t>(ship.owner) < 8) {
+            if (ship.status < 5 && (uint8_t)ship.owner < 8) {
                 int16_t owner_id = HACCESS::Ship_Owner_(ship_idx);
                 int16_t bonus = instructor_bonuses[owner_id];
                 Do_XP_For_Ship_(ship_idx, bonus);
@@ -182,20 +182,17 @@ namespace ERICNET {
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int16_t level = 0;
 
-        // Iterate through experience thresholds to determine ship level
         for (int i = 0; i < 4; ++i) {
             if (ship->crew_experience >= MOX::_crew_data[level + 1].experience) {
                 level++;
             }
         }
 
-        // Add level bonus for Warlord trait
         s_player* owner = &MOX::_player[(int16_t)ship->owner];
         if (owner->traits[TRAIT_WARLORD] != 0) {
             level++;
         }
 
-        // Final level is capped at 5
         if (level > 5) {
             level = 5;
         }
@@ -446,19 +443,19 @@ namespace ERICNET {
     void __cdecl Best_Instructor_Bonus_(int16_t* instructor_bonus_by_player) {
         for (int16_t leader_index = 0; leader_index < 0x43; ++leader_index) {
             const s_leader_data& leader = MOX::_leaders[leader_index];
-            const int16_t player_index = static_cast<int8_t>(leader.player_index);
+            const int16_t player_index = (int8_t)leader.player_index;
 
             if ((leader.type == 1) &&
-                (static_cast<int8_t>(leader.status) >= 0) &&
-                (static_cast<int8_t>(leader.eta) == 0) &&
+                ((int8_t)leader.status >= 0) &&
+                ((int8_t)leader.eta == 0) &&
                 (player_index > -1) &&
                 (player_index < 8)) {
                 int16_t bonus = 0;
 
                 if (OFFICER::Officer_Has_Special_Skill_(player_index, leader_index, 0x16)) {
-                    bonus = static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(player_index), leader_index, 0x16));
+                    bonus = (int16_t)OFFICER::Officer_Skill_Bonus_((uint32_t)player_index, leader_index, 0x16);
                 } else if (OFFICER::Officer_Has_Special_Skill_(player_index, leader_index, 0x17)) {
-                    bonus = static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(player_index), leader_index, 0x17));
+                    bonus = (int16_t)OFFICER::Officer_Skill_Bonus_((uint32_t)player_index, leader_index, 0x17);
                 }
 
                 if (instructor_bonus_by_player[player_index] < bonus) {
@@ -491,13 +488,13 @@ namespace ERICNET {
             case 45: /* BLDG_STAR_FORTRESS */
                 COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[MOX::_planet[MOX::_colony[colony_idx].planet].star_index]);
                 if (building_id == 45 /* BLDG_STAR_FORTRESS */) {
-                    SHIPMOVE::Update_Ship_ETAs_(static_cast<int32_t>(MOX::_colony[colony_idx].owner));
+                    SHIPMOVE::Update_Ship_ETAs_((int32_t)MOX::_colony[colony_idx].owner);
                     return;
                 }
                 break;
 
             case 9: /* BLDG_CAPITOL */
-                invasion::Assign_New_Home_Planet_(static_cast<int8_t>(MOX::_colony[colony_idx].owner), colony_idx);
+                invasion::Assign_New_Home_Planet_((int8_t)MOX::_colony[colony_idx].owner, colony_idx);
                 return;
 
             case 22: /* BLDG_ANDROIDS */

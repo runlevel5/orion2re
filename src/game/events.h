@@ -78,8 +78,6 @@ namespace EVENTS {
 
     extern char _event_message[300];
 
-    extern const char s__00551100[];
-
     int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx);
 
     void __cdecl Allocate_Comet_Hit_(int16_t colony_idx);
@@ -100,34 +98,33 @@ namespace EVENTS {
 
     bool __cdecl Check_For_Event_Message_();
 
+    /** Advances event processing and queues any reportable events for display. */
     void __cdecl Check_For_Event_();
 
+    /** Initializes the event-report screen state, music, and drawing hooks. */
     void __cdecl Start_Main_Event_();
 
     extern s_colors _event_normal_colors;
 
     extern s_mouse_list _event_blank_mouse;
 
+    /** Fades in the event screen and primes its animation and mouse buffers. */
     void __cdecl Event_Fade_In_();
 
+    /** Draws the current event illustration and formatted report text. */
     void __cdecl Draw_Event_Screen_();
-    extern const char s_s_005510f4[];
-    extern const char s_0_0055110c[];
-    extern const char s_jimtext2_lbx_00552340[];
-    extern const char s_X_d__d___s_00557548[];
-    extern const char s_EVENTMSP_LBX_00557554[];
-    extern const char s_EVENTMSI_LBX_00557564[];
-    extern const char s_EVENTMSS_LBX_00557574[];
-    extern const char s_EVENTMSF_LBX_00557584[];
-    extern const char s_EVENTMSG_LBX_00557594[];
-    extern const char s_EVENTMSE_LBX_005575a4[];
 
-    extern const char s_EVENTS_LBX_0055753c[];
-
+    /**
+     * Builds the localized message text for a specific event report variant.
+     * @param colony_idx Colony index used by planet-name substitution tokens.
+     * @param val1 First numeric or lookup substitution value.
+     * @param val2 Second numeric substitution value.
+     * @param out_str Destination buffer that receives the formatted message.
+     */
     void __cdecl Get_Event_Message_(
         int16_t event_type,
         int16_t event_subtype,
-        int16_t planet_idx,
+        int16_t colony_idx,
         int16_t val1,
         int16_t val2,
         int16_t player_idx1,
@@ -140,13 +137,23 @@ namespace EVENTS {
         int16_t tech_app_idx2,
         char* out_str);
 
+    /** Runs the event-report input loop until the player dismisses the screen. */
     void __cdecl Drive_Event_Screen_();
 
+    /** Loads the event illustration for the specified event. */
     void __cdecl Load_Event_Picture_(int16_t event_id);
 
+    /** Prepares and presents the next pending event report. */
     void __cdecl Setup_Next_Event_(int16_t event_id);
 
+    /** Reinitializes the event table after a full cleanup checkpoint. */
     void __cdecl Reset_Events_();
 
-    void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3);
+    /**
+     * Updates monster-event state after a monster move or resolution step.
+     * @param monster_type Nonplayer monster ship type used to select the event slot.
+     * @param target_id Target index for a location update, or -1 for a payload-only update.
+     * @param player_idx_or_amount Player index for target updates, or amount for payload updates.
+     */
+    void __cdecl Event_Monster_Update_(int16_t monster_type, int16_t target_id, int16_t player_idx_or_amount);
 }

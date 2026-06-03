@@ -16,24 +16,9 @@ namespace EVENTS {
     uint8_t _event_status_flag;
     uint8_t* _event_mouse_bitmap;
     char _event_message[300];
-    const char s__00551100[] = "";
     s_colors _event_normal_colors = {{248, 254, 253, 251, 252, 253, 254, 255}};
     s_mouse_list _event_blank_mouse = {0, 0, 0, 0, 639, 479};
-    const char s_s_005510f4[] = "s";
-    const char s_0_0055110c[] = "\x1A" "0";
-    const char s_jimtext2_lbx_00552340[] = "jimtext2.lbx";
-    const char s_X_d__d___s_00557548[] = "\x07" "X%d.%d. %s";
-    const char s_EVENTMSP_LBX_00557554[] = "EVENTMSP.LBX";
-    const char s_EVENTMSI_LBX_00557564[] = "EVENTMSI.LBX";
-    const char s_EVENTMSS_LBX_00557574[] = "EVENTMSS.LBX";
-    const char s_EVENTMSF_LBX_00557584[] = "EVENTMSF.LBX";
-    const char s_EVENTMSG_LBX_00557594[] = "EVENTMSG.LBX";
-    const char s_EVENTMSE_LBX_005575a4[] = "EVENTMSE.LBX";
-    const char s_EVENTS_LBX_0055753c[] = "EVENTS.LBX";
 
-    /**
-     * @address 00477440
-     */
     int16_t __cdecl Get_Event_Mineral_Depletion_Colony_(int16_t player_idx) {
         int16_t found_colony_idx = -1;
         int16_t attempts = 0;
@@ -201,12 +186,9 @@ namespace EVENTS {
         _event_data[32].player_idx = player_idx;
     }
 
-    /**
-     * @address 00477a50
-     */
     void __cdecl Allocate_Comet_Hit_(int16_t colony_idx) {
         s_combat_bomb_result result;
-        // Zero out the entire result structure (73 bytes)
+        // Zero out the full result structure.
         memset(&result, 0, sizeof(s_combat_bomb_result));
 
         result.attacker_idx = -1;
@@ -216,8 +198,8 @@ namespace EVENTS {
         int16_t building_count = 0;
         s_colony* colony = &MOX::_colony[colony_idx];
 
-        // Count existing buildings in the colony (up to 49)
-        for (int16_t i = 0; i < 49; ++i) {
+        const int16_t building_slot_count = (int16_t)(sizeof(colony->buildings) / sizeof(colony->buildings[0]));
+        for (int16_t i = 0; i < building_slot_count; ++i) {
             if (colony->buildings[i] != 0) {
                 building_count++;
             }
@@ -738,8 +720,8 @@ namespace EVENTS {
 
             int16_t target_id = -1;
             int16_t player_idx = -1;
-            int16_t local_1a = -1;
-            int16_t local_18 = -1;
+            int16_t contact_player_idx = -1;
+            int16_t ship_idx = -1;
 
             if (EVENTS::_event_data[event_type].status != 0) {
                 event_type = -1;
@@ -787,7 +769,7 @@ namespace EVENTS {
             }
 
             if (event_type == 0) {
-                KEN::Get_Derelict_Applications_(static_cast<int8_t>(player_idx), derelict_apps, &derelict_count);
+                KEN::Get_Derelict_Applications_((int8_t)player_idx, derelict_apps, &derelict_count);
                 if (derelict_count < 1) {
                     event_type = -1;
                 }
@@ -798,22 +780,22 @@ namespace EVENTS {
             }
 
             if (event_type == 1) {
-                target_id = EVENTS::Get_Event_Climate_Change_Colony_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Get_Event_Climate_Change_Colony_((int8_t)player_idx);
                 if (target_id == -1) {
                     event_type = -1;
                 }
             }
 
             if (event_type == 4 || event_type == 5) {
-                local_1a = EVENTS::Pick_Random_Player_In_Contact_(static_cast<int8_t>(player_idx));
-                if (local_1a == -1 || MOX::_player[player_idx].treaty[local_1a] >= 4) {
+                contact_player_idx = EVENTS::Pick_Random_Player_In_Contact_((int8_t)player_idx);
+                if (contact_player_idx == -1 || MOX::_player[player_idx].treaty[contact_player_idx] >= 4) {
                     event_type = -1;
                 }
             }
 
             if (event_type == 8) {
-                local_18 = EVENTS::Pick_Random_Ship_(static_cast<int8_t>(player_idx));
-                if (local_18 == -1) {
+                ship_idx = EVENTS::Pick_Random_Ship_((int8_t)player_idx);
+                if (ship_idx == -1) {
                     event_type = -1;
                 }
             }
@@ -823,7 +805,7 @@ namespace EVENTS {
                     event_type = -1;
                 }
                 else {
-                    target_id = EVENTS::Get_Event_Industrial_Accident_Colony_(static_cast<int8_t>(player_idx));
+                    target_id = EVENTS::Get_Event_Industrial_Accident_Colony_((int8_t)player_idx);
                     if (target_id == -1) {
                         event_type = -1;
                     }
@@ -831,14 +813,14 @@ namespace EVENTS {
             }
 
             if (event_type == 11) {
-                target_id = EVENTS::Get_Event_Mineral_Depletion_Colony_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Get_Event_Mineral_Depletion_Colony_((int8_t)player_idx);
                 if (target_id == -1) {
                     event_type = -1;
                 }
             }
 
             if (event_type == 12) {
-                target_id = EVENTS::Get_Event_Mineral_Deposit_Colony_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Get_Event_Mineral_Deposit_Colony_((int8_t)player_idx);
                 if (target_id == -1) {
                     event_type = -1;
                 }
@@ -870,7 +852,7 @@ namespace EVENTS {
             }
 
             if (event_type == 17) {
-                target_id = EVENTS::Pick_Random_Colony_No_Outpost_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Colony_No_Outpost_((int8_t)player_idx);
                 if (target_id != -1) {
                     if (EVENTS::_event_data[16].status == 2 && EVENTS::_event_data[16].target_id == target_id) {
                         event_type = -1;
@@ -878,7 +860,7 @@ namespace EVENTS {
                     if (EVENTS::Colony_Has_Event_(target_id) != -1) {
                         event_type = -1;
                     }
-                    if (COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[MOX::_colony[target_id].planet], static_cast<int8_t>(player_idx))
+                    if (COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[MOX::_colony[target_id].planet], (int8_t)player_idx)
                         == MOX::_colony[target_id].n_pops) {
                         event_type = -1;
                     }
@@ -889,15 +871,15 @@ namespace EVENTS {
             }
 
             if (event_type == 28) {
-                SHIPMOVE::Do_Wormhole_Event_(static_cast<int8_t>(player_idx), &wormhole_data);
+                SHIPMOVE::Do_Wormhole_Event_((int8_t)player_idx, &wormhole_data);
                 if (wormhole_data.success == 0) {
                     event_type = -1;
                 }
             }
 
             if (event_type == 26 || event_type == 27) {
-                local_18 = EVENTS::Pick_Random_Ship_(static_cast<int8_t>(player_idx));
-                if (local_18 == -1) {
+                ship_idx = EVENTS::Pick_Random_Ship_((int8_t)player_idx);
+                if (ship_idx == -1) {
                     event_type = -1;
                 }
             }
@@ -907,7 +889,7 @@ namespace EVENTS {
             EVENTS::_last_event_year = MOX::_stardate;
             EVENTS::_event_delay_count = 0;
 
-            EVENTS::_event_data[event_type].player_idx = static_cast<int8_t>(player_idx);
+            EVENTS::_event_data[event_type].player_idx = (int8_t)player_idx;
             EVENTS::_event_data[event_type].status = 1;
             EVENTS::_event_data[event_type].turn_count = -1;
             EVENTS::_event_data[event_type].target_id = -1;
@@ -947,7 +929,7 @@ namespace EVENTS {
                 break;
             case 4:
             case 5:
-                EVENTS::_event_data[event_type].target_id = local_1a;
+                EVENTS::_event_data[event_type].target_id = contact_player_idx;
                 break;
             case 6:
                 EVENTS::_event_data[event_type].target_id = (((MOX::_stardate - 35000) / 20) + 1) * 100;
@@ -961,7 +943,7 @@ namespace EVENTS {
                 }
                 break;
             case 8:
-                EVENTS::_event_data[event_type].target_id = local_18;
+                EVENTS::_event_data[event_type].target_id = ship_idx;
                 break;
             case 9:
                 EVENTS::_event_data[event_type].turn_count = 0;
@@ -972,11 +954,11 @@ namespace EVENTS {
                 EVENTS::_event_data[event_type].target_id = MOX::_colony[target_id].planet;
                 break;
             case 13:
-                EVENTS::_event_data[event_type].target_id = local_18;
-                EVENTS::_event_data[event_type].amount = local_1a;
+                EVENTS::_event_data[event_type].target_id = ship_idx;
+                EVENTS::_event_data[event_type].amount = contact_player_idx;
                 break;
             case 14:
-                target_id = EVENTS::Pick_Random_Star_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Star_((int8_t)player_idx);
                 EVENTS::_event_data[event_type].target_id = target_id;
                 if (target_id == -1 || EVENTS::Star_Has_Event_(target_id) != -1) {
                     EVENTS::_event_data[event_type].status = 0;
@@ -993,14 +975,14 @@ namespace EVENTS {
                 }
                 break;
             case 15:
-                target_id = EVENTS::Pick_Random_Star_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Star_((int8_t)player_idx);
                 EVENTS::_event_data[event_type].target_id = target_id;
                 if (target_id == -1) {
                     EVENTS::_event_data[event_type].status = 0;
                     EVENTS::_event_data[event_type].player_idx = -1;
                 }
                 else {
-                    EVENTS::_event_data[event_type].amount = static_cast<int16_t>((MOX::_player[player_idx].bc * (random::Random_(21) + 29)) /
+                    EVENTS::_event_data[event_type].amount = (int16_t)((MOX::_player[player_idx].bc * (random::Random_(21) + 29)) /
                         100);
                 }
                 break;
@@ -1026,7 +1008,7 @@ namespace EVENTS {
             case 21:
             case 22:
             case 23:
-                target_id = EVENTS::Pick_Random_Star_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Star_((int8_t)player_idx);
                 EVENTS::_event_data[event_type].target_id = target_id;
                 if (target_id == -1) {
                     EVENTS::_event_data[event_type].status = 0;
@@ -1060,7 +1042,7 @@ namespace EVENTS {
                 break;
             }
             case 25:
-                target_id = EVENTS::Pick_Random_Star_(static_cast<int8_t>(player_idx));
+                target_id = EVENTS::Pick_Random_Star_((int8_t)player_idx);
                 EVENTS::_event_data[event_type].target_id = target_id;
                 EVENTS::_event_data[event_type].turn_count = 0;
                 if (target_id == -1 || EVENTS::Star_Has_Event_(target_id) != -1) {
@@ -1073,12 +1055,12 @@ namespace EVENTS {
                 break;
             case 27:
                 EVENTS::_event_data[event_type].status = 3;
-                EVENTS::_event_data[event_type].target_id = local_18;
+                EVENTS::_event_data[event_type].target_id = ship_idx;
                 EVENTS::_event_data[event_type].turn_count = 0;
                 break;
             case 28:
-                EVENTS::_event_data[event_type].target_id = static_cast<int16_t>(wormhole_data.dest_star_idx);
-                EVENTS::_event_data[event_type].amount = static_cast<int16_t>(wormhole_data.count);
+                EVENTS::_event_data[event_type].target_id = (int16_t)wormhole_data.dest_star_idx;
+                EVENTS::_event_data[event_type].amount = (int16_t)wormhole_data.count;
                 break;
             }
 
@@ -1089,7 +1071,6 @@ namespace EVENTS {
         EVENTS::Event_Check_General_Status_();
     }
 
-    // Suggested name: EVENTS::Get_Antaran_Victim
     int16_t __cdecl Get_Antaran_Victim_() {
         uint16_t weights[8];
         int16_t candidates[8];
@@ -1302,13 +1283,11 @@ namespace EVENTS {
 
         return colony_idx;
     }
-    // Suggested name: Pick_Random_Player_In_Contact
     int16_t __cdecl Pick_Random_Player_In_Contact_(int16_t player_idx) {
         int16_t selected_player = -1;
         int16_t eligible_count = 0;
 
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            // Structure size: 0xEA9
             if (MOX::_player[i].eliminated == 0) {
                 if (struct_::Test_Bit_Field_(MOX::_player[player_idx].contact, i)) {
                     if (i != player_idx) {
@@ -1335,7 +1314,6 @@ namespace EVENTS {
         int16_t selected_ship_idx = -1;
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
-            // MOX::_ship is an array of s_ship_data (size 129 / 0x81)
             s_ship_data* ship = &MOX::_ship[i];
 
             if (ship->owner == owner_idx) {
@@ -1453,8 +1431,6 @@ namespace EVENTS {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
 
-            // 0x13F is buildings[9]. Index 9 is BUILDING_CAPITOL.
-            // 0x6 is outpost_flag.
             if (colony->owner == player_idx && 
                 colony->buildings[BUILDING_CAPITOL] == 0 && 
                 colony->outpost_flag == 0) {
@@ -1471,9 +1447,6 @@ namespace EVENTS {
         return selected_colony_idx;
     }
 
-    /**
-     * @address 00477eb0
-     */
     int16_t __cdecl Pick_Random_Star_(int16_t player_idx) {
         int16_t result_star_idx = -1;
         int16_t star_idx = 0;
@@ -1509,9 +1482,6 @@ namespace EVENTS {
         return result_star_idx;
     }
 
-    /**
-     * @address 004784e0
-     */
     int16_t __cdecl Star_Has_Event_(int16_t star_idx) {
         // Event 2 (Plague/Famine/etc - Colony context)
         if ((_event_data[2].status == 2 || _event_data[2].status == 4 || _event_data[2].status == 6)) {
@@ -1564,9 +1534,6 @@ namespace EVENTS {
         return -1;
     }
 
-    /**
-     * @address 00478640
-     */
     int16_t __cdecl Event_Pirate_Activity_Strength_(int16_t star_idx) {
         int16_t total_cp = 0;
 
@@ -1606,9 +1573,6 @@ namespace EVENTS {
         return (int16_t)scaled_cp;
     }
 
-    /**
-     * @address 00477ca0
-     */
     int16_t __cdecl Pick_Completely_Random_Star_() {
         int16_t found = 0;
         int16_t counter = 0;
@@ -1656,9 +1620,6 @@ namespace EVENTS {
         return star_idx;
     }
 
-    /**
-     * @address 00477a00
-     */
     void __cdecl Event_Check_General_Status_() {
         if (random::Random_(40 /* 0x28 */) == 1) {
             // Check if stardate is past 35050 and the Galactic Council hasn't been established.
@@ -1669,9 +1630,6 @@ namespace EVENTS {
         }
     }
 
-    /**
-     * @address 00477da0
-     */
     int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx) {
         int16_t total_size_points = 0;
 
@@ -1684,9 +1642,6 @@ namespace EVENTS {
         return total_size_points;
     }
 
-    /**
-     * @address 00477bb0
-     */
     void __cdecl Allocate_Earthquake_Hit_(int16_t colony_idx, int16_t* pop_killed, int16_t* buildings_destroyed_count) {
         s_combat_bomb_result result;
         memset(&result, 0, sizeof(s_combat_bomb_result));
@@ -1696,7 +1651,9 @@ namespace EVENTS {
         result.is_planetary_hit = 1;
 
         int16_t building_count = 0;
-        for (int i = 0; i < 49; ++i) {
+        const int16_t building_slot_count =
+            (int16_t)(sizeof(MOX::_colony[colony_idx].buildings) / sizeof(MOX::_colony[colony_idx].buildings[0]));
+        for (int16_t i = 0; i < building_slot_count; ++i) {
             if (MOX::_colony[colony_idx].buildings[i] != 0) {
                 building_count++;
             }
@@ -1722,7 +1679,7 @@ namespace EVENTS {
         *pop_killed = result.population_killed;
         *buildings_destroyed_count = 0;
 
-        for (int i = 0; i < 49; ++i) {
+        for (int16_t i = 0; i < building_slot_count; ++i) {
             if (result.buildings_destroyed[i] == 1) {
                 *buildings_destroyed_count += 1;
             }
@@ -1734,7 +1691,6 @@ namespace EVENTS {
     }
 
     /**
-     * @address 00477240
      * @brief Checks if the player has any "bad" events currently active.
      *
      * Iterates through the event data array to find an event that belongs to the
@@ -1765,9 +1721,6 @@ namespace EVENTS {
         return found;
     }
 
-    /**
-     * @address 00476DE0
-     */
     int16_t __cdecl Get_Event_Victim_(int8_t type) {
         uint16_t weights[8];
         int16_t candidates[8];
@@ -1857,9 +1810,6 @@ namespace EVENTS {
         return selected_player;
     }
 
-    /**
-     * @address 00477780
-     */
     void __cdecl Event_Check_Planet_Warning_() {
         if (_event_data[30].amount <= 2) {
             int16_t half_stars = MOX::_NUM_STARS / 2;
@@ -1922,7 +1872,7 @@ namespace EVENTS {
                 (current_amount == 2 && max_colonies >= (half_stars - 2) &&
                     max_colonies < half_stars && diplodef::_COUNCIL_FLAG == 0)) {
                 _event_data[30].target_id = max_colonies;
-                _event_data[30].player_idx = static_cast<int8_t>(top_player);
+                _event_data[30].player_idx = (int8_t)top_player;
                 _event_data[30].status = 6 /* EVENT_JUST_STARTED */;
                 _event_data[30].amount = next_amount;
             }
@@ -1958,13 +1908,10 @@ namespace EVENTS {
         return false;
     }
 
-    /**
-     * @address 00473ed0
-     */
-    void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    void __cdecl Event_Monster_Update_(int16_t monster_type, int16_t target_id, int16_t player_idx_or_amount) {
         int16_t event_index;
 
-        switch (param_1) {
+        switch (monster_type) {
         case 10:
             event_index = 0x13;
             break;
@@ -1984,26 +1931,23 @@ namespace EVENTS {
             return;
         }
 
-        _event_data[event_index].player_idx = static_cast<uint8_t>(param_3);
-        if (param_2 != -1) {
-            _event_data[event_index].target_id = param_2;
+        _event_data[event_index].player_idx = (uint8_t)player_idx_or_amount;
+        if (target_id != -1) {
+            _event_data[event_index].target_id = target_id;
             _event_data[event_index].status = 4;
             return;
         }
 
-        _event_data[event_index].amount = param_3;
-        if (param_3 == -1) {
+        _event_data[event_index].amount = player_idx_or_amount;
+        if (player_idx_or_amount == -1) {
             _event_data[event_index].turn_count = 0x14;
         }
         _event_data[event_index].status = 4;
     }
 
-    /**
-     * @address 00474030
-     */
     void __cdecl Load_Event_Picture_(int16_t event_id) {
         allocate::Mark_Block_(MOX::_screen_seg);
-        _event_display_seg = (s_animation_header*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, event_id + 2, MOX::_screen_seg);
+        _event_display_seg = (s_animation_header*)farload::Far_Reload_Next_("EVENTS.LBX", event_id + 2, MOX::_screen_seg);
         allocate::Release_Block_(MOX::_screen_seg);
     }
 
@@ -2038,11 +1982,8 @@ namespace EVENTS {
         EVENTS::Reset_Events_();
     }
 
-    /**
-     * @address 00473E50
-     */
     void __cdecl Reset_Events_() {
-        if (static_cast<int32_t>(MOX::_stardate) % 20 == 0) {
+        if ((int32_t)MOX::_stardate % 20 == 0) {
             for (int16_t i = 0; i < 36; ++i) {
                 if (EVENTS::_event_data[i].status == 0) {
                     return;
@@ -2057,7 +1998,7 @@ namespace EVENTS {
         int16_t p3 = 0;
         int16_t p4 = 0;
         int16_t p5 = 0;
-        int16_t player_idx = static_cast<int8_t>(_event_data[event_id].player_idx);
+        int16_t player_idx = (int16_t)(int8_t)_event_data[event_id].player_idx;
         int16_t p7 = 0;
         int16_t p8 = 0;
         int16_t p9 = 0;
@@ -2289,7 +2230,7 @@ namespace EVENTS {
                 p11 = _event_data[event_id].amount;
                 break;
             case 29:
-                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                event_subtype = (int16_t)(random::Random_(4) - 1);
                 break;
             case 30:
                 event_subtype = _event_data[event_id].amount;
@@ -2303,18 +2244,18 @@ namespace EVENTS {
                 event_subtype = _event_data[event_id].amount;
                 break;
             case 32:
-                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                event_subtype = (int16_t)(random::Random_(4) - 1);
                 p8 = player_idx;
                 break;
             case 33:
-                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                event_subtype = (int16_t)(random::Random_(4) - 1);
                 break;
             case 34:
                 p10 = _event_data[event_id].target_id;
-                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                event_subtype = (int16_t)(random::Random_(4) - 1);
                 break;
             case 35:
-                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                event_subtype = (int16_t)(random::Random_(4) - 1);
                 p8 = _event_data[event_id].target_id;
                 break;
             default:
@@ -2326,10 +2267,10 @@ namespace EVENTS {
                 if (_current_event == 0) {
                     Start_Main_Event_();
                     _event_display_seg = 0;
-                    Get_Event_Message_(0, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
+                    Get_Event_Message_(0, (int16_t)(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
                 } else {
                     _event_display_seg = 0;
-                    Get_Event_Message_(1, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
+                    Get_Event_Message_(1, (int16_t)(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
                     _event_status_flag = 0;
                 }
                 Drive_Event_Screen_();
@@ -2347,7 +2288,7 @@ namespace EVENTS {
             if (MOX::_settings.show_gnn_report == 1) {
                 Drive_Event_Screen_();
             } else {
-                JIM::Get_Text_Message_(JIM::jimtext_lbx, 29, text_buffer, 40);
+                JIM::Get_Text_Message_(JIM::jimtext_lbx, 29, text_buffer, sizeof(text_buffer));
                 MAINSCR::Mini_Main_Screen_Text_Box_(text_buffer, _event_message);
                 fields::Clear_Fields_();
             }
@@ -2357,7 +2298,7 @@ namespace EVENTS {
     void __cdecl Get_Event_Message_(
         int16_t event_type,
         int16_t event_subtype,
-        int16_t planet_idx,
+        int16_t colony_idx,
         int16_t val1,
         int16_t val2,
         int16_t player_idx1,
@@ -2374,13 +2315,13 @@ namespace EVENTS {
         const char* event_lbx;
 
         switch (MOX::_settings.language) {
-            case 0: event_lbx = s_EVENTMSE_LBX_005575a4; break;
-            case 1: event_lbx = s_EVENTMSG_LBX_00557594; break;
-            case 2: event_lbx = s_EVENTMSF_LBX_00557584; break;
-            case 3: event_lbx = s_EVENTMSS_LBX_00557574; break;
-            case 4: event_lbx = s_EVENTMSI_LBX_00557564; break;
-            case 5: event_lbx = s_EVENTMSP_LBX_00557554; break;
-            default: event_lbx = s_EVENTMSE_LBX_005575a4; break;
+            case 0: event_lbx = "EVENTMSE.LBX"; break;
+            case 1: event_lbx = "EVENTMSG.LBX"; break;
+            case 2: event_lbx = "EVENTMSF.LBX"; break;
+            case 3: event_lbx = "EVENTMSS.LBX"; break;
+            case 4: event_lbx = "EVENTMSI.LBX"; break;
+            case 5: event_lbx = "EVENTMSP.LBX"; break;
+            default: event_lbx = "EVENTMSE.LBX"; break;
         }
 
         char lbx_name[13];
@@ -2388,12 +2329,12 @@ namespace EVENTS {
 
         char buffer[300];
         int16_t index = event_subtype + (event_type * 4);
-        farload::Farload_Data_Static_(lbx_name, index, buffer, 0, 1, 300);
+        farload::Farload_Data_Static_(lbx_name, index, buffer, 0, 1, sizeof(buffer));
 
         int16_t out_len = 0;
         char temp_str[300];
 
-        for (int16_t i = 0; i < 300; ++i) {
+        for (int16_t i = 0; i < (int16_t)sizeof(buffer); ++i) {
             char c = buffer[i];
             if (c == '\0') {
                 break;
@@ -2403,7 +2344,7 @@ namespace EVENTS {
             int16_t fetch_player = -1;
 
             if (c == '\x80') {
-                append_str = HACCESS::Get_Planet_Name_(MOX::_colony[planet_idx].planet);
+                append_str = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
             } else if (c == '\x81') {
                 itoa(val1, temp_str, 10);
                 append_str = temp_str;
@@ -2412,13 +2353,13 @@ namespace EVENTS {
                 append_str = temp_str;
             } else if (c == '\x83') {
                 if ((val1 > 1 || val1 == 0) && MOX::_settings.language == 0) {
-                    append_str = s_s_005510f4;
+                    append_str = "s";
                 } else {
                     continue;
                 }
             } else if (c == '\x84') {
                 if ((val2 > 1 || val2 == 0) && MOX::_settings.language == 0) {
-                    append_str = s_s_005510f4;
+                    append_str = "s";
                 } else {
                     continue;
                 }
@@ -2444,14 +2385,14 @@ namespace EVENTS {
                 append_str = TECHDATA::_technology_applications[tech_app_idx2].name;
             } else if (c == '\x8F') {
                 if (MOX::_PLAYER_NUM != player_idx1) {
-                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3d, temp_str, 30);
+                    JIM::Get_Text_Message_("jimtext2.lbx", 0x3d, temp_str, 30);
                     append_str = temp_str;
                 } else {
                     continue;
                 }
             } else if (c == '\x90') {
                 if (MOX::_PLAYER_NUM == player_idx1) {
-                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3e, temp_str, 30);
+                    JIM::Get_Text_Message_("jimtext2.lbx", 0x3e, temp_str, 30);
                     append_str = temp_str;
                 } else if (player_idx1 >= 0) {
                     fetch_player = player_idx1;
@@ -2460,14 +2401,14 @@ namespace EVENTS {
                 }
             } else if (c == '\x91') {
                 if (MOX::_PLAYER_NUM != player_idx3) {
-                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3d, temp_str, 30);
+                    JIM::Get_Text_Message_("jimtext2.lbx", 0x3d, temp_str, 30);
                     append_str = temp_str;
                 } else {
                     continue;
                 }
             } else if (c == '\x92') {
                 if (MOX::_PLAYER_NUM == player_idx3) {
-                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3e, temp_str, 30);
+                    JIM::Get_Text_Message_("jimtext2.lbx", 0x3e, temp_str, 30);
                     append_str = temp_str;
                 } else if (player_idx3 >= 0) {
                     fetch_player = player_idx3;
@@ -2538,14 +2479,16 @@ namespace EVENTS {
                 } while (passes != 0);
             }
 
-            strcat(out_str, s_0_0055110c);
+            /* fmtpara: \x1A0 switches the appended ranking block to left alignment. */
+            strcat(out_str, "\x1A" "0");
 
             int16_t spacing = (MOX::_settings.show_gnn_report == 1) ? 0x78 : 0x0A;
             int16_t initial_spacing = spacing;
             int16_t count = (num_active > 6) ? 6 : num_active;
 
             for (int16_t k = 0; k < count; ++k) {
-                sprintf(temp_str, s_X_d__d___s_00557548, spacing, k + 1, MOX::_player[player_indices[k]].race_name);
+                /* fmtpara: \aX repositions the text cursor before each ranked entry. */
+                sprintf(temp_str, "\x07" "X%d.%d. %s", spacing, k + 1, MOX::_player[player_indices[k]].race_name);
                 strcat(out_str, temp_str);
 
                 if (((k + 1) % 3) == 0) {
@@ -2566,7 +2509,7 @@ namespace EVENTS {
             timer::Mark_Time_();
             fields::Clear_Fields_();
 
-            int16_t bg_field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+            int16_t bg_field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
             int16_t input_id = fields::Get_Input_();
 
             if (input_id == bg_field_id) {
@@ -2583,12 +2526,6 @@ namespace EVENTS {
         }
     }
 
-    /**
-     * @address 00473f80
-     */
-    /**
-     * @address 00476160
-     */
     int32_t __cdecl Event_Get_Fleet_Strength_(int16_t player_idx) {
         int32_t strength = 0;
 
@@ -2626,9 +2563,6 @@ namespace EVENTS {
         fonts::Set_Font_Style_Outline_(4, &_event_normal_colors);
     }
 
-    /**
-     * @address 004740D0
-     */
     void __cdecl Draw_Event_Screen_() {
         video::Set_Page_Off_();
 
@@ -2663,12 +2597,9 @@ namespace EVENTS {
         JIM::Play_Streaming_Music_(0x76, -1, 1);
     }
 
-    /**
-     * @address 004741A0
-     */
     void __cdecl Event_Fade_In_() {
         _event_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 917 /* 0x395 */);
-        s_animation_header* h2 = (s_animation_header*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, 0, MOX::_screen_seg);
+        s_animation_header* h2 = (s_animation_header*)farload::Far_Reload_Next_("EVENTS.LBX", 0, MOX::_screen_seg);
 
         bitmap::Clear_Mouse_Image_(0);
         bitmap::Create_Blank_Bitmap_(30, 30, _event_mouse_bitmap);
@@ -2684,7 +2615,7 @@ namespace EVENTS {
         palette::Set_Palette_Changes_(0, 255);
         graphics::Fill_(0, 0, 639, 479, 0);
 
-        file_ani::Open_File_Animation_(s_EVENTS_LBX_0055753c, 1);
+        file_ani::Open_File_Animation_("EVENTS.LBX", 1);
         video::Set_Page_Off_();
         file_ani::Draw_File_Animation_();
         video::Copy_Off_To_Back_();

@@ -2,7 +2,7 @@
 
 namespace fields {
     namespace {
-        s_field g_fields_storage[250];
+        s_field g_fields_storage[MAX_FIELDS_COUNT];
         constexpr std::uintptr_t kInvalidStringMarker = static_cast<std::uintptr_t>(-1);
     }
 
@@ -22,12 +22,9 @@ namespace fields {
     int16_t _help_list_count;
     int16_t _multi_hotkey_active_field;
     uint16_t _draw_fields_flag = 1;
-    const char s_You_exceeded_the_max_number_of_fields[44] = "You exceeded the max number of fields (150)";
-    const char s_Maximum_number_of_button_fields_e_0055b0b0[46] = "Maximum number of button fields exceeded (%d)";
-    const char s_Avail_Mem_0055b390[34] = "Avail Mem = %dk   Total Mem = %dk";
     char s__00551100[1] = "";
     char* DAT_0055afc0 = reinterpret_cast<char*>(kInvalidStringMarker);
-    int32_t _max_fields_count = 250;
+    int32_t _max_fields_count = MAX_FIELDS_COUNT;
     uint8_t _exit_the_list_field;
     s_field* _fields = g_fields_storage;
     s_field* _old_fields = g_fields_storage;
@@ -191,9 +188,9 @@ namespace fields {
         mouse::Mouse_Buffer2_();
     }
 
-    void __cdecl Clear_Fields_Above_(int16_t param_1) {
+    void __cdecl Clear_Fields_Above_(int16_t field_idx) {
         _down_mouse_button = -1;
-        _fields_count = param_1 + 1;
+        _fields_count = field_idx + 1;
         mouse::Mouse_Buffer_();
         mouse::Mouse_Buffer2_();
     }
@@ -213,14 +210,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str) {
-        char error_msg[44];
-        uint32_t local_24[9];
-
-        memcpy(error_msg, s_You_exceeded_the_max_number_of_fields, sizeof(error_msg));
-        memset(local_24, 0, sizeof(local_24));
-
         if ((int32_t)_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         s_field& field = _fields[_fields_count];
@@ -300,14 +291,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound) {
-        char error_message[44];
-        uint32_t local_24[9];
-
-        memcpy(error_message, s_You_exceeded_the_max_number_of_fields, sizeof(error_message));
-        memset(local_24, 0, sizeof(local_24));
-
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_message);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         const int16_t field_index = _fields_count;
@@ -330,13 +315,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t button_value, const char* hotkey, int8_t sound) {
-        char error_msg[80];
-
-        // A simple string copy is sufficient here because the buffer is only used as a C string.
-        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
-
         if ((int32_t)_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
@@ -354,19 +334,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
-        char error_msg[80];
-
-        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
-        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
-        for (int i = 0; i < 11; ++i) {
-            dest[i] = src[i];
-        }
-        for (int i = 11; i < 20; ++i) {
-            dest[i] = 0;
-        }
-
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
@@ -380,19 +349,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int8_t sound) {
-        char error_msg[80];
-
-        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
-        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
-        for (int i = 0; i < 11; ++i) {
-            dest[i] = src[i];
-        }
-        for (int i = 11; i < 20; ++i) {
-            dest[i] = 0;
-        }
-
         if ((int32_t)_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
@@ -407,9 +365,6 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
-        char error_msg[80];
-        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
-
         if (animate::_clipping_flag == 1) {
             int16_t width = animate::Get_Width_(pic);
             int16_t height = animate::Get_Height_(pic);
@@ -424,7 +379,7 @@ namespace fields {
         }
 
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
@@ -441,7 +396,7 @@ namespace fields {
         char buffer[80];
 
         if (_max_fields_count < _fields_count) {
-            sprintf(buffer, s_Maximum_number_of_button_fields_e_0055b0b0, (int32_t)_max_fields_count);
+            snprintf(buffer, sizeof(buffer), "Maximum number of button fields exceeded (%d)", (int32_t)_max_fields_count);
             exitm::Exit_With_Message(buffer);
         }
 
@@ -475,11 +430,9 @@ namespace fields {
         return current_index;
     }
 
-    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound) {
+    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, int16_t* grid_x, int16_t* grid_y, int8_t sound) {
         if (_fields_count >= _max_fields_count) {
-            char error_message[44];
-            memcpy(error_message, s_You_exceeded_the_max_number_of_fields, sizeof(error_message));
-            exitm::Exit_With_Message(error_message);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         s_field& field = _fields[_fields_count];
@@ -513,11 +466,8 @@ namespace fields {
         int16_t max_length, int16_t background_color, s_animation_header* pic,
         int8_t sound, int16_t font_shadow_style)
     {
-        char error_msg[80];
-        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
-
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         s_colors* norm_color = fonts::Get_Current_Font_Color_();
@@ -539,8 +489,8 @@ namespace fields {
         _fields[current].x_end = x + width;
         _fields[current].y_end = y + height;
 
-        if (max_length > 256) {
-            max_length = 256;
+        if (max_length > (int16_t)sizeof(_continuous_string)) {
+            max_length = (int16_t)sizeof(_continuous_string);
         }
 
         _fields[current].detail.cont_input.max_length = max_length;
@@ -560,14 +510,9 @@ namespace fields {
 
     int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max,
                                       int16_t return_value, int16_t set_value, int16_t width,
-                                      int16_t height, int16_t* value, const char* hotkey_str, char sound) {
-        char err_msg[80];
-
-        memcpy(err_msg, s_You_exceeded_the_max_number_of_f_0055b080, 44);
-        memset(err_msg + 44, 0, 36);
-
+                                      int16_t height, int16_t* value, const char* hotkey_str, int8_t sound) {
         if ((int32_t)_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(err_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         _fields[_fields_count].x = x;
@@ -587,7 +532,7 @@ namespace fields {
         }
 
         _fields[_fields_count].field_type = FIELD_TYPE_SCROLL;
-        _fields[_fields_count].detail.scroll.value = (short*)value;
+        _fields[_fields_count].detail.scroll.value = value;
         _fields[_fields_count].hotkey = hotkey_str[0];
 
         if (_fields[_fields_count].hotkey > '`' && _fields[_fields_count].hotkey < '{') {
@@ -602,7 +547,7 @@ namespace fields {
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text) {
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         int16_t current_idx = _fields_count;
@@ -682,14 +627,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int8_t sound) {
-        char error_msg[44];
-        uint32_t zero_pad[9];
-
-        strcpy(error_msg, s_You_exceeded_the_max_number_of_fields);
-        memset(zero_pad, 0, sizeof(zero_pad));
-
         if ((int32_t)_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
@@ -709,7 +648,7 @@ namespace fields {
         _input_delay = _old_input_delay;
         _down_mouse_button = _old_down_mouse_button;
 
-        _max_fields_count = 0xfa;
+        _max_fields_count = MAX_FIELDS_COUNT;
 
         _auto_input_variable = _old_auto_input_variable;
         _input_field_active = _old_input_field_active;
@@ -843,15 +782,13 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, char* hotkey, int8_t sound) {
-        char msg[80] = "You exceeded the max number of fields (150)";
-
         int32_t max_x = center_x + radius;
         int32_t min_x = center_x - radius;
         int32_t min_y = center_y - radius;
         int32_t max_y = center_y + radius;
 
         if (_max_fields_count <= _fields_count) {
-            exitm::Exit_With_Message(msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         if (max_x < video::_screen_window_x1 ||
@@ -1488,7 +1425,7 @@ namespace fields {
         }
     }
 
-    short __cdecl Get_List_Field_(
+    int16_t __cdecl Get_List_Field_(
         int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size,
         int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette,
         int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, char* unused_param_14)
@@ -1625,7 +1562,7 @@ namespace fields {
         memory_status.dwLength = sizeof(MEMORYSTATUS);
         ::GlobalMemoryStatus(&memory_status);
 
-        sprintf(buffer, s_Avail_Mem_0055b390, (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
+        snprintf(buffer, sizeof(buffer), "Avail Mem = %dk   Total Mem = %dk", (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
 
         platform::_need_quit = 1;
 
@@ -1668,7 +1605,6 @@ namespace fields {
             } else {
                 int delta = field->y_end - mouse_y;
                 int range = field->detail.scroll.range_max - field->detail.scroll.range_min;
-                // Note: Original code seems to omit adding range_min for vertical scroll calculation.
                 new_value = (int16_t)((delta * range) / height);
             }
         }
@@ -1685,14 +1621,8 @@ namespace fields {
     }
 
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound) {
-        char error_msg[44];
-        uint32_t local_24[9];
-
-        memcpy(error_msg, s_You_exceeded_the_max_number_of_fields, sizeof(error_msg));
-        memset(local_24, 0, sizeof(local_24));
-
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
         if (x_end < video::_screen_window_x1 || x > video::_screen_window_x2 ||
@@ -1997,15 +1927,13 @@ namespace fields {
 
         if (_help_box_mode != 0 && _help_list_count > 0) {
             for (int16_t i = 0; i < _help_list_count; ++i) {
-                s_help_box* help_box = reinterpret_cast<s_help_box*>(
-                    reinterpret_cast<uint8_t*>(_help_struct_pointer) + i * sizeof(s_help_box)
-                );
-                if (help_box->help_id != -1) {
+                const s_help_box& help_box = _help_struct_pointer[i];
+                if (help_box.help_id != -1) {
                     video::Clip_On_();
-                    line::Line_(help_box->x1, help_box->y1, help_box->x2, help_box->y1, static_cast<uint8_t>(_help_field_outline_color));
-                    line::Line_(help_box->x1, help_box->y1, help_box->x1, help_box->y2, static_cast<uint8_t>(_help_field_outline_color));
-                    line::Line_(help_box->x1, help_box->y2, help_box->x2, help_box->y2, static_cast<uint8_t>(_help_field_outline_color));
-                    line::Line_(help_box->x2, help_box->y1, help_box->x2, help_box->y2, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box.x1, help_box.y1, help_box.x2, help_box.y1, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box.x1, help_box.y1, help_box.x1, help_box.y2, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box.x1, help_box.y2, help_box.x2, help_box.y2, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box.x2, help_box.y1, help_box.x2, help_box.y2, static_cast<uint8_t>(_help_field_outline_color));
                     video::Clip_Off_();
                 }
             }
@@ -2331,15 +2259,14 @@ namespace fields {
         }
 
         if (_help_box_mode != 0 && _help_list_count > 0) {
-            int16_t* help_ptr = reinterpret_cast<int16_t*>(_help_struct_pointer);
-            for (int i = 0; i < _help_list_count; i++) {
-                int idx = i * 5;
-                if (help_ptr[idx] != -1) {
+            for (int16_t i = 0; i < _help_list_count; ++i) {
+                const s_help_box& help_box = _help_struct_pointer[i];
+                if (help_box.help_id != -1) {
                     video::Clip_On_();
-                    line::Line_(help_ptr[idx + 1], help_ptr[idx + 2], help_ptr[idx + 3], help_ptr[idx + 2], (uint8_t)_help_field_outline_color);
-                    line::Line_(help_ptr[idx + 1], help_ptr[idx + 2], help_ptr[idx + 1], help_ptr[idx + 4], (uint8_t)_help_field_outline_color);
-                    line::Line_(help_ptr[idx + 1], help_ptr[idx + 4], help_ptr[idx + 3], help_ptr[idx + 4], (uint8_t)_help_field_outline_color);
-                    line::Line_(help_ptr[idx + 3], help_ptr[idx + 2], help_ptr[idx + 3], help_ptr[idx + 4], (uint8_t)_help_field_outline_color);
+                    line::Line_(help_box.x1, help_box.y1, help_box.x2, help_box.y1, (uint8_t)_help_field_outline_color);
+                    line::Line_(help_box.x1, help_box.y1, help_box.x1, help_box.y2, (uint8_t)_help_field_outline_color);
+                    line::Line_(help_box.x1, help_box.y2, help_box.x2, help_box.y2, (uint8_t)_help_field_outline_color);
+                    line::Line_(help_box.x2, help_box.y1, help_box.x2, help_box.y2, (uint8_t)_help_field_outline_color);
                     video::Clip_Off_();
                 }
             }
@@ -2764,20 +2691,13 @@ namespace fields {
             return 1;
         }
 
-        int16_t* help_ptr = reinterpret_cast<int16_t*>(_help_struct_pointer);
         for (int16_t i = 0; i < _help_list_count; ++i) {
-            // _help_struct_pointer points to an array of 5-element int16_t records:
-            // [0] = help_id
-            // [1] = x_min
-            // [2] = y_min
-            // [3] = x_max
-            // [4] = y_max
-            int16_t* entry = &help_ptr[i * 5];
+            const s_help_box& entry = _help_struct_pointer[i];
 
-            if (entry[0] != -1 &&
-                entry[1] <= mouse_x && mouse_x <= entry[3] &&
-                entry[2] <= mouse_y && mouse_y <= entry[4]) {
-                TEXTBOX::Draw_Help_Entry_(entry[0]);
+            if (entry.help_id != -1 &&
+                entry.x1 <= mouse_x && mouse_x <= entry.x2 &&
+                entry.y1 <= mouse_y && mouse_y <= entry.y2) {
+                TEXTBOX::Draw_Help_Entry_(entry.help_id);
                 return 0;
             }
         }

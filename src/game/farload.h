@@ -7,21 +7,12 @@ struct s_lbx_header;
 struct s_animation_header;
 
 namespace farload {
-    // Suggested name: farload::Error_Handler
-    void __cdecl Error_Handler_(const char* lib_name, int code, int idx);
-
-    extern const char s_vga_frames_error[53];
-    extern const char s_error_defined_records[35];
-    extern const char s_error_record_size[30];
-    extern const char s_error_lbx_entries[31];
-    extern const char s_error_not_lbx[20];
-    extern const char s_error_reload_failed[40];
-    extern const char s_error_improper_entry[31];
-    extern const char s_error_insufficient_memory[74];
-    extern const char s_error_corrupted[21];
-    extern const char s_error_not_found[21];
-    extern const char s_entry_suffix[3];
-    extern const char s_entry_prefix[9];
+    /* Reports a farload error and terminates with a composed message.
+     * lib_name: Library or file name associated with the failure.
+     * error_code: Internal error selector used to choose the message text.
+     * entry_idx: Entry index associated with the failure.
+     */
+    void __cdecl Error_Handler_(const char* lib_name, int32_t error_code, int32_t entry_idx);
 
     extern uint32_t _farload_file_flag;
     extern char _farload_file_name[16];
@@ -29,23 +20,83 @@ namespace farload {
     extern s_lbx_header _lbx_header;
     extern char _secondary_drive_path[52];
 
-    void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3);
+    /* Reloads an LBX entry using the first-block allocator.
+     * path: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     * allocation_base: Allocation anchor passed to the allocator.
+     */
+    void* __cdecl Far_Reload_(const char* path, int32_t entry_idx, void* allocation_base);
 
-    void* __cdecl Farload_Data_Static_(const char* filename, int32_t resource_id, void* buffer, int32_t param_4, int32_t param_5, int32_t param_6);
+    /* Loads structured record data into a caller-supplied buffer.
+     * filename: Library path to load from.
+     * resource_id: Zero-based LBX entry index.
+     * buffer: Destination buffer for the loaded data.
+     * start_idx: First record to load.
+     * record_count: Number of records to load.
+     * expected_element_size: Expected size of each record in bytes.
+     */
+    void* __cdecl Farload_Data_Static_(const char* filename, int32_t resource_id, void* buffer, int32_t start_idx, int32_t record_count, int32_t expected_element_size);
 
-    void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* buffer);
+    /* Reloads an LBX entry using the next-block allocator.
+     * filename: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     * buffer: Allocation anchor passed to the allocator.
+     */
+    void* __cdecl Far_Reload_Next_(const char* filename, int32_t entry_idx, void* buffer);
 
-    void* __cdecl Farload_Library_Data_(const char* fname, int32_t idx, void* out, int16_t alloc_type, uint32_t start_idx, uint16_t count, uint16_t expected_element_size);
+    /* Loads record data from a structured LBX entry.
+     * library_name: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     * buffer: Destination buffer or allocation anchor, depending on allocation mode.
+     * allocation_mode: Selects which allocator path to use.
+     * start_idx: First record to load.
+     * record_count: Number of records to load, or 0xFFFF to load the remainder.
+     * expected_element_size: Expected size of each record in bytes.
+     */
+    void* __cdecl Farload_Library_Data_(const char* library_name, int32_t entry_idx, void* buffer, int16_t allocation_mode, uint32_t start_idx, uint16_t record_count, uint16_t expected_element_size);
 
-    void* __cdecl Far_Reload_Data_(const char* path, int32_t idx, void* out, uint32_t size, uint16_t param_5, uint16_t param_6);
+    /* Reloads structured record data using the first-block allocator.
+     * path: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     * buffer: Allocation anchor passed to the allocator.
+     * start_idx: First record to load.
+     * record_count: Number of records to load.
+     * expected_element_size: Expected size of each record in bytes.
+     */
+    void* __cdecl Far_Reload_Data_(const char* path, int32_t entry_idx, void* buffer, uint32_t start_idx, uint16_t record_count, uint16_t expected_element_size);
 
-    void* __cdecl Far_Reload_Next_Data_(const char* filename, int32_t idx, void* buffer, uint32_t entry_num, uint16_t type, uint16_t size);
+    /* Reloads structured record data using the next-block allocator.
+     * filename: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     * buffer: Allocation anchor passed to the allocator.
+     * start_idx: First record to load.
+     * record_count: Number of records to load.
+     * expected_element_size: Expected size of each record in bytes.
+     */
+    void* __cdecl Far_Reload_Next_Data_(const char* filename, int32_t entry_idx, void* buffer, uint32_t start_idx, uint16_t record_count, uint16_t expected_element_size);
 
-    void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type);
+    /* Loads one LBX entry and allocates storage for it.
+     * lib_name: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     * allocation_base: Allocation anchor used by chained allocator modes.
+     * allocation_mode: Selects which allocator path to use.
+     */
+    void* __cdecl Farload_Library_(const char* lib_name, int32_t entry_idx, void* allocation_base, int32_t allocation_mode);
 
-    int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int entry_idx);
+    /* Reads the record count stored at the start of a structured LBX entry.
+     * file_name: Library path to inspect.
+     * entry_idx: Zero-based LBX entry index.
+     */
+    int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int32_t entry_idx);
 
-    void* __cdecl Farload_(char* file_name, int param_2);
+    /* Loads one LBX entry into a newly allocated buffer.
+     * file_name: Library path to load from.
+     * entry_idx: Zero-based LBX entry index.
+     */
+    void* __cdecl Farload_(char* file_name, int32_t entry_idx);
 
-    void __cdecl Set_Alternate_Path_(char* path);
+    /* Stores a fallback directory used when the primary library path cannot be opened.
+     * input_path: Directory path to append file names to during fallback loads.
+     */
+    void __cdecl Set_Alternate_Path_(char* input_path);
 }

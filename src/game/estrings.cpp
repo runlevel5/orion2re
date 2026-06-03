@@ -2,91 +2,75 @@
 
 namespace ESTRINGS {
 
-char* _strings[812];
-char _string_data[21000];
+char* _strings[ESTRINGS_COUNT];
+char _string_data[ESTRINGS_DATA_SIZE];
 
 const char s_0_0055110c[4] = "\0320";
 const char s_1_00551110[4] = "\0321";
-
-const char s_estrings_lbx[16] = "estrings.lbx";
-const char s_estrGERM_lbx[16] = "estrGERM.lbx";
-const char s_estrFREN_lbx[16] = "estrFREN.lbx";
-const char s_estrSPAN_lbx[16] = "estrSPAN.lbx";
-const char s_estrITAL_lbx[16] = "estrITAL.lbx";
-const char s_estrPOLI_lbx[16] = "estrPOLI.lbx";
-
-const char s_maintext_lbx[16] = "maintext.lbx";
-const char s_maingerm_lbx[16] = "maingerm.lbx";
-const char s_mainfren_lbx[16] = "mainfren.lbx";
-const char s_mainspan_lbx[16] = "mainspan.lbx";
-const char s_mainital_lbx[16] = "mainital.lbx";
-const char s_mainpoli_lbx[16] = "mainpoli.lbx";
-
-const char s_you_blew_the_array_eric[24] = "you blew the array eric";
 
 void __cdecl Load_E_Strings_() {
     char* loaded_data;
 
     if (MOX::_settings.language == 0) {
-        loaded_data = (char*)farload::Farload_Data_Static_(s_estrings_lbx, 0, _string_data, 0, 1, 21000);
+        loaded_data = (char*)farload::Farload_Data_Static_("estrings.lbx", 0, _string_data, 0, 1, ESTRINGS_DATA_SIZE);
     }
     else if (MOX::_settings.language == 1) {
-        loaded_data = (char*)farload::Farload_Data_Static_(s_estrGERM_lbx, 0, _string_data, 0, 1, 21000);
+        loaded_data = (char*)farload::Farload_Data_Static_("estrGERM.lbx", 0, _string_data, 0, 1, ESTRINGS_DATA_SIZE);
     }
     else if (MOX::_settings.language == 2) {
-        loaded_data = (char*)farload::Farload_Data_Static_(s_estrFREN_lbx, 0, _string_data, 0, 1, 21000);
+        loaded_data = (char*)farload::Farload_Data_Static_("estrFREN.lbx", 0, _string_data, 0, 1, ESTRINGS_DATA_SIZE);
     }
     else if (MOX::_settings.language == 3) {
-        loaded_data = (char*)farload::Farload_Data_Static_(s_estrSPAN_lbx, 0, _string_data, 0, 1, 21000);
+        loaded_data = (char*)farload::Farload_Data_Static_("estrSPAN.lbx", 0, _string_data, 0, 1, ESTRINGS_DATA_SIZE);
     }
     else if (MOX::_settings.language == 4) {
-        loaded_data = (char*)farload::Farload_Data_Static_(s_estrITAL_lbx, 0, _string_data, 0, 1, 21000);
+        loaded_data = (char*)farload::Farload_Data_Static_("estrITAL.lbx", 0, _string_data, 0, 1, ESTRINGS_DATA_SIZE);
     }
     else if (MOX::_settings.language == 5) {
-        loaded_data = (char*)farload::Farload_Data_Static_(s_estrPOLI_lbx, 0, _string_data, 0, 1, 21000);
+        loaded_data = (char*)farload::Farload_Data_Static_("estrPOLI.lbx", 0, _string_data, 0, 1, ESTRINGS_DATA_SIZE);
     }
 
-    char* current_ptr = loaded_data;
-    for (int i = 0; i < 812; ++i) {
-        ESTRINGS::_strings[i] = current_ptr;
-        current_ptr += strlen(current_ptr) + 1;
+    char* current_string = loaded_data;
+    for (int string_index = 0; string_index < ESTRINGS_COUNT; ++string_index) {
+        ESTRINGS::_strings[string_index] = current_string;
+        current_string += strlen(current_string) + 1;
     }
 
-    if (current_ptr > ESTRINGS::_string_data + sizeof(ESTRINGS::_string_data)) {
-        exitm::Exit_With_Message(s_you_blew_the_array_eric);
+    if (current_string > ESTRINGS::_string_data + ESTRINGS_DATA_SIZE) {
+        exitm::Exit_With_Message("you blew the array eric");
     }
 
     Load_H_And_Pro_File_Strings_();
 
-    char* target_str = ESTRINGS::_strings[368];
+    char* maintext_lbx_name = ESTRINGS::_strings[368];
 
     if (MOX::_settings.language == 1) {
-        memcpy(target_str, s_maingerm_lbx, 13);
+        strcpy(maintext_lbx_name, "maingerm.lbx");
         return;
     }
 
     if (MOX::_settings.language == 0) {
-        memcpy(target_str, s_maintext_lbx, 13);
+        strcpy(maintext_lbx_name, "maintext.lbx");
         return;
     }
 
     if (MOX::_settings.language == 2) {
-        memcpy(target_str, s_mainfren_lbx, 13);
+        strcpy(maintext_lbx_name, "mainfren.lbx");
         return;
     }
 
     if (MOX::_settings.language == 3) {
-        memcpy(target_str, s_mainspan_lbx, 13);
+        strcpy(maintext_lbx_name, "mainspan.lbx");
         return;
     }
 
     if (MOX::_settings.language == 4) {
-        memcpy(target_str, s_mainital_lbx, 13);
+        strcpy(maintext_lbx_name, "mainital.lbx");
         return;
     }
 
     if (MOX::_settings.language == 5) {
-        memcpy(target_str, s_mainpoli_lbx, 13);
+        strcpy(maintext_lbx_name, "mainpoli.lbx");
     }
 }
 
@@ -312,8 +296,8 @@ void __cdecl Load_H_And_Pro_File_Strings_(void) {
     MOX::_hyper_field_title = ESTRINGS::E_Strings_(0x284);
 }
 
-char* __cdecl E_Strings_(int16_t index) {
-    return _strings[index];
+char* __cdecl E_Strings_(int16_t string_id) {
+    return _strings[string_id];
 }
 
 }

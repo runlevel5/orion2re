@@ -7,7 +7,6 @@ namespace ERIC {
     uint16_t _saved_sfx_l;
     uint16_t _saved_music_l;
     MOX2::action_func_t _cinematic_saved_autofunction;
-    const char s_2_00551108[3] = "\0332";
 
     uint16_t __cdecl Get_Fade_Percent_() {
         return _fade_percent;
@@ -22,7 +21,7 @@ namespace ERIC {
     }
 
     void __cdecl Set_Fade_Percent_(int16_t percent) {
-        _fade_percent = static_cast<uint8_t>(percent);
+        _fade_percent = (uint8_t)percent;
 
         if (percent == 0) {
             mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
@@ -40,7 +39,7 @@ namespace ERIC {
 
         for (uint16_t i = 0; i < count; ++i) {
             if (list[i] == value) {
-                return static_cast<int16_t>(i);
+                return (int16_t)i;
             }
         }
 
@@ -51,11 +50,11 @@ namespace ERIC {
         if (_fade_percent != 0) {
             video::Set_Refresh_Full_();
 
-            int16_t fade_level = static_cast<int16_t>(_fade_percent);
+            int16_t fade_level = (int16_t)_fade_percent;
 
             while (fade_level >= 0) {
-                palstore::Darken_Palette_(static_cast<int32_t>(fade_level));
-                _fade_percent = static_cast<uint8_t>(fade_level);
+                palstore::Darken_Palette_((int32_t)fade_level);
+                _fade_percent = (uint8_t)fade_level;
                 RUSS::Mox_Update_();
                 fade_level -= 10;
             }
@@ -76,7 +75,7 @@ namespace ERIC {
                 faded = true;
                 do {
                     palstore::Darken_Palette_(current_fade);
-                    _fade_percent = static_cast<uint8_t>(current_fade);
+                    _fade_percent = (uint8_t)current_fade;
                     RUSS::Mox_Update_();
                     current_fade += _fade_speed_in_percent;
                 } while (current_fade < 101);
@@ -96,8 +95,8 @@ namespace ERIC {
 
     int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus) {
         int32_t current_time = clock();
-        int32_t cycle_index = current_time / static_cast<int32_t>(divisor);
-        return static_cast<int16_t>(cycle_index % static_cast<int32_t>(modulus));
+        int32_t cycle_index = current_time / (int32_t)divisor;
+        return (int16_t)(cycle_index % (int32_t)modulus);
     }
 
     bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {
@@ -105,7 +104,7 @@ namespace ERIC {
             return true;
         }
 
-        uint8_t previous_screen = static_cast<uint8_t>(MOX::_previous_screen);
+        uint8_t previous_screen = (uint8_t)MOX::_previous_screen;
 
         switch (MOX::_current_screen) {
             case SCREEN_COLONY:
@@ -144,25 +143,25 @@ namespace ERIC {
         animate::Draw_(x_centered, y_centered, animation);
     }
 
-    void __cdecl Draw_Bottom_Centered_(int16_t x, int16_t y, s_animation_header* anim) {
-        int16_t width = animate::Get_Width_(anim);
-        int16_t height = animate::Get_Height_(anim);
-        animate::Draw_(x - (width / 2), y - height, anim);
+    void __cdecl Draw_Bottom_Centered_(int16_t x, int16_t y, s_animation_header* animation) {
+        int16_t width = animate::Get_Width_(animation);
+        int16_t height = animate::Get_Height_(animation);
+        animate::Draw_(x - (width / 2), y - height, animation);
     }
 
-    void __cdecl Draw_Bottom_Centered_No_Glass_(int16_t x, int16_t y, s_animation_header* anim) {
-        int16_t width = animate::Get_Width_(anim);
-        int16_t height = animate::Get_Height_(anim);
-        animate::Draw_No_Glass_(x - (width / 2), y - height, anim);
+    void __cdecl Draw_Bottom_Centered_No_Glass_(int16_t x, int16_t y, s_animation_header* animation) {
+        int16_t width = animate::Get_Width_(animation);
+        int16_t height = animate::Get_Height_(animation);
+        animate::Draw_No_Glass_(x - (width / 2), y - height, animation);
     }
 
     void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text) {
         int16_t text_height = BILL::_Get_Paragraph_Max_Height_(width, text);
 
-        int16_t y_centered = static_cast<int16_t>(
-            static_cast<int32_t>(y) +
-            (static_cast<uint16_t>(height) >> 1) -
-            (static_cast<int32_t>(text_height) / 2));
+        int16_t y_centered = (int16_t)(
+            (int32_t)y +
+            ((uint16_t)height >> 1) -
+            ((int32_t)text_height / 2));
 
         BILL::_Print_Paragraph_(x, y_centered, width, text, 2);
     }
@@ -176,7 +175,8 @@ namespace ERIC {
         if (value >= 0) {
             return ESTRINGS::E_Strings_(12);
         }
-        return s_2_00551108;
+        /* fmtpara: ESC + '2' emits a text-attribute control sequence for subsequent characters. */
+        return "\0332";
     }
 
     void __cdecl Play_Dimensional_Portal_Flic_() {
@@ -217,9 +217,9 @@ namespace ERIC {
         return false;
     }
 
-    void __cdecl Pulsing_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int32_t param_6, int16_t param_7) {
-        graphics::Box_(x1, y1, x2, y2, param_5, 0xff);
-        palette::Cycle_Palette_Color_(0xff, 0x13, 0x10, 0x09, 0x20, 0x28, 0x15, param_7);
+    void __cdecl Pulsing_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t box_color, int32_t reserved_arg, int16_t cycle_delay) {
+        graphics::Box_(x1, y1, x2, y2, box_color, 0xff);
+        palette::Cycle_Palette_Color_(0xff, 0x13, 0x10, 0x09, 0x20, 0x28, 0x15, cycle_delay);
     }
 
     void __cdecl Play_Loose_Flic_() {
@@ -302,12 +302,12 @@ namespace ERIC {
         Do_Cinematic_Popup_Cleanup_();
     }
 
-    int8_t __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t size, int16_t star_idx) {
+    int8_t __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t minimum_size, int16_t star_idx) {
         for (int16_t i = 0; i < 500; ++i) {
             if (MOX::_ship[i].location == star_idx &&
                 MOX::_ship[i].status == 0 &&
                 MOX::_ship[i].owner == player_idx &&
-                MOX::_ship[i].d.size >= size) {
+                MOX::_ship[i].d.size >= minimum_size) {
                 return 1;
             }
         }
@@ -379,12 +379,12 @@ namespace ERIC {
         return Pick_Random_Colony_(player_idx);
     }
 
-    int16_t __cdecl Pick_Random_Colony_(int16_t owner) {
+    int16_t __cdecl Pick_Random_Colony_(int16_t owner_idx) {
         int16_t count = 0;
         int16_t chosen_colony = -1;
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
-            if (MOX::_colony[i].owner == owner) {
+            if (MOX::_colony[i].owner == owner_idx) {
                 count++;
                 if (random::Random_(count) == 1) {
                     chosen_colony = i;
@@ -420,21 +420,21 @@ namespace ERIC {
         palette::Clear_Palette_Changes_(0, 255);
     }
 
-    void __cdecl String_Builder2_(char* dest, int16_t mode, const char* format, ...) {
+    void __cdecl String_Builder2_(char* dest, int16_t build_mode, const char* format, ...) {
         char local_buf[1000];
         va_list args;
 
-        if (mode >= 0) {
+        if (build_mode >= 0) {
             va_start(args, format);
-            uint32_t len = vsprintf(local_buf, format, args);
+            uint32_t formatted_length = vsprintf(local_buf, format, args);
             va_end(args);
 
-            if (len > 1000) {
+            if (formatted_length >= sizeof(local_buf)) {
                 exitm::Exit_With_Message(ESTRINGS::E_Strings_(408 /* ESTR_PFMT__STRING_BUILDER */));
                 return;
             }
 
-            if (mode == 0) {
+            if (build_mode == 0) {
                 strcpy(dest, local_buf);
             } else {
                 sprintf(dest, ESTRINGS::E_Strings_(71), dest, 13, local_buf);
@@ -442,8 +442,8 @@ namespace ERIC {
         }
     }
 
-    int8_t __cdecl Player_Has_Leader_With_General_Skill_At_Star_(short player_idx, short skill_idx, short star_idx) {
-        for (short i = 0; i < 0x43; ++i) {
+    int8_t __cdecl Player_Has_Leader_With_General_Skill_At_Star_(int16_t player_idx, int16_t skill_idx, int16_t star_idx) {
+        for (int16_t i = 0; i < 0x43; ++i) {
             if (MOX::_leaders[i].player_index == player_idx &&
                 MOX::_leaders[i].status == 1 &&
                 MOX::_leaders[i].eta == 0) {

@@ -1,6 +1,8 @@
 #pragma once
 
 namespace fields {
+    inline constexpr int32_t MAX_FIELDS_COUNT = 250;
+
     extern MOX2::action_func_t _update_function;
     extern uint16_t _auto_active_flag;
     extern uint16_t _list_field_on;
@@ -17,9 +19,6 @@ namespace fields {
     extern int16_t _help_list_count;
     extern int16_t _multi_hotkey_active_field;
     extern uint16_t _draw_fields_flag;
-    extern const char s_You_exceeded_the_max_number_of_fields[44];
-    extern const char s_Maximum_number_of_button_fields_e_0055b0b0[46];
-    extern const char s_Avail_Mem_0055b390[34];
     extern char s__00551100[1];
     extern char* DAT_0055afc0;
     extern int32_t _max_fields_count;
@@ -105,9 +104,17 @@ namespace fields {
 
     uint16_t __cdecl Pressed_Mouse_Y_();
 
-    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound);
+    /* Adds a grid field that converts mouse position into grid coordinates.
+     * grid_x: Receives the selected column.
+     * grid_y: Receives the selected row.
+     */
+    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, int16_t* grid_x, int16_t* grid_y, int8_t sound);
 
-    int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max, int16_t return_value, int16_t set_value, int16_t width, int16_t height, int16_t* value, const char* hotkey_str, char sound);
+    /* Adds a scroll field that updates a bound value within the supplied range.
+     * value: Pointer to the value controlled by the scroll field.
+     * hotkey_str: Optional hotkey string; only the first character is used.
+     */
+    int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max, int16_t return_value, int16_t set_value, int16_t width, int16_t height, int16_t* value, const char* hotkey_str, int8_t sound);
 
     // Type 11 is the newer continuous editor used by screen text boxes.
     // It uses detail.cont_input and is distinct from the older type 4 inline editor.
@@ -129,7 +136,10 @@ namespace fields {
 
     void __cdecl Disable_Cancel_();
 
-    void __cdecl Clear_Fields_Above_(int16_t f);
+    /* Truncates the field list above the supplied field and clears pending mouse input.
+     * field_idx: Highest field index to keep.
+     */
+    void __cdecl Clear_Fields_Above_(int16_t field_idx);
 
     int16_t __cdecl Get_Field_Counter_();
 
@@ -138,6 +148,10 @@ namespace fields {
 
     void __cdecl Deactivate_Help_List_();
 
+    /* Registers the active help-box array used for right-click help lookup.
+     * help_data: Pointer to the help-box records.
+     * count: Number of help-box records.
+     */
     void __cdecl Set_Help_List_(s_help_box* help_data, int16_t count);
 
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound);
@@ -164,6 +178,9 @@ namespace fields {
 
     void __cdecl Find_Bar_Position_(int16_t field_idx);
 
+    /* Checks whether the mouse is inside any registered help box and draws that help entry.
+     * Returns 0 when a help entry was shown, or 1 when no help box matched.
+     */
     int16_t __cdecl Check_Help_List_();
 
     void __cdecl Clear_Multi_Hot_Key_Offsets_();
@@ -203,5 +220,10 @@ namespace fields {
 
     void __cdecl Release_Fields_();
 
-    short __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size, int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, char* unused_param_14);
+    /* Builds a temporary selectable list from fixed-size records and returns the chosen row.
+     * list_ptr: Pointer to the first list record.
+     * item_size: Byte stride between records.
+     * selected_index: In/out selected row index.
+     */
+    int16_t __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size, int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, char* unused_param_14);
 }

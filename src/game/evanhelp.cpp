@@ -236,52 +236,52 @@ namespace EVANHELP {
     s_help_box _hotseat_setup_screen_help_list[4];
 
     void __cdecl Set_Main_Screen_Help_List_() {
-        int16_t local_2 = 15;
+        int16_t help_list_count = 15;
 
         if (MOX::_game_type == 2) {
-            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 303, 73, 0, 156, 19);
-            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 302, 418, 0, 519, 19);
+            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 303, 73, 0, 156, 19);
+            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 302, 418, 0, 519, 19);
         } else if (MOX::_game_type == 1) {
-            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 303, 73, 0, 156, 19);
+            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 303, 73, 0, 156, 19);
         }
 
         if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
-            int16_t height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
-            int16_t var_x = MOX::_fleet_box.x + 2;
-            int16_t var_y = MOX::_fleet_box.y - height + MOX::_fleet_box.field8_0xe;
-            int16_t var_w = MOX::_fleet_box.width + var_x;
+            int16_t button_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
+            int16_t button_left = MOX::_fleet_box.x + 2;
+            int16_t button_top = MOX::_fleet_box.y - button_height + MOX::_fleet_box.field8_0xe;
+            int16_t button_right = MOX::_fleet_box.width + button_left;
 
-            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 310, var_x, var_y - 35, var_w, var_y);
-            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 304, var_x, var_y, var_w, var_y + height);
+            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 310, button_left, button_top - 35, button_right, button_top);
+            EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 304, button_left, button_top, button_right, button_top + button_height);
 
-            int16_t offset = height;
+            int16_t stacked_height = button_height;
 
             if (MOX::_fleet_box.outpost_btn_active != 0) {
-                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 309, var_x, var_y, var_w, var_y + offset + height);
-                offset += height;
+                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 309, button_left, button_top, button_right, button_top + stacked_height + button_height);
+                stacked_height += button_height;
             }
 
             if (MOX::_fleet_box.colonize_btn_active != 0) {
-                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 306, var_x, var_y, var_w, var_y + offset + height);
-                offset += height;
+                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 306, button_left, button_top, button_right, button_top + stacked_height + button_height);
+                stacked_height += button_height;
             }
 
             if (MOX::_fleet_box.engage_btn_active != 0) {
-                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 307, var_x, var_y, var_w, var_y + offset + height);
-                offset += height;
+                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 307, button_left, button_top, button_right, button_top + stacked_height + button_height);
+                stacked_height += button_height;
             }
 
             if (MOX::_fleet_box.transport_btn_active != 0) {
-                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 308, var_x, var_y, var_w, var_y + offset + height);
-                offset += height;
+                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 308, button_left, button_top, button_right, button_top + stacked_height + button_height);
+                stacked_height += button_height;
             }
 
             if (MOX::_fleet_box.attack_btn_active != 0) {
-                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &local_2, 25, 305, var_x, var_y, var_w, var_y + offset + height);
+                EVANHELP::Append_Help_List_(EVANHELP::_main_screen_help_list, &help_list_count, 25, 305, button_left, button_top, button_right, button_top + stacked_height + button_height);
             }
         }
 
-        MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(EVANHELP::_main_screen_help_list, local_2);
+        MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(EVANHELP::_main_screen_help_list, help_list_count);
     }
 
     void __cdecl Set_Main_Game_Screen_Help_List_() {
@@ -309,16 +309,14 @@ namespace EVANHELP {
     }
 
     void __cdecl Set_Officer_Screen_Help_() {
-        int16_t skills[4] = { 0 };
+        int16_t displayed_skill_counts[4] = { 0 };
 
-        OFFICER::Get_N_Skills_Per_Officer_Displayed_(skills);
+        OFFICER::Get_N_Skills_Per_Officer_Displayed_(displayed_skill_counts);
 
         if (MOX::_officer_scrn_type == 1) {
-            // TYPE MISMATCH: skills is int32_t[2], but Set_ColOff_Screen_Help_List_ expects int16_t*
-            Set_ColOff_Screen_Help_List_(skills);
+            Set_ColOff_Screen_Help_List_(displayed_skill_counts);
         } else {
-            // TYPE MISMATCH: skills is int32_t[2], but Set_ShipOff_Screen_Help_List_ expects int16_t*
-            Set_ShipOff_Screen_Help_List_(skills, MOX::_n_fltscrn_big_icons_added);
+            Set_ShipOff_Screen_Help_List_(displayed_skill_counts, MOX::_n_fltscrn_big_icons_added);
         }
     }
 
@@ -330,7 +328,7 @@ namespace EVANHELP {
             if (new_y1 >= _design_screen_help_list[6].y2) {
                 new_y1 = _design_screen_help_list[6].y2;
             }
-            _design_screen_help_list[6].y1 = static_cast<int16_t>(new_y1);
+            _design_screen_help_list[6].y1 = (int16_t)new_y1;
         }
 
         if (lines_2 > 0) {
@@ -338,7 +336,7 @@ namespace EVANHELP {
             if (new_y1 >= _design_screen_help_list[7].y2) {
                 new_y1 = _design_screen_help_list[7].y2;
             }
-            _design_screen_help_list[7].y1 = static_cast<int16_t>(new_y1);
+            _design_screen_help_list[7].y1 = (int16_t)new_y1;
         }
 
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_design_screen_help_list, 13);
@@ -361,7 +359,7 @@ namespace EVANHELP {
         void* buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 2000);
         allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
 
-        s_help_record* data = static_cast<s_help_record*>(farload::Far_Reload_Next_Data_(help_lbx_name, 0, buffer, item_index, 1, sizeof(s_help_record)));
+        s_help_record* data = (s_help_record*)farload::Far_Reload_Next_Data_(help_lbx_name, 0, buffer, item_index, 1, sizeof(s_help_record));
 
         strcpy(dest, data->body);
 
@@ -390,30 +388,30 @@ namespace EVANHELP {
         }
     }
 
-    void __cdecl Set_Fleet_Screen_Help_List_(int16_t param_1) {
+    void __cdecl Set_Fleet_Screen_Help_List_(int16_t start_index) {
         int16_t help_list_count = 12;
 
-        memcpy(EVANHELP::_fleet_screen_help_list, EVANHELP::_static_fleet_screen_help_list, 0x50 * sizeof(uint32_t));
+        memcpy(EVANHELP::_fleet_screen_help_list, EVANHELP::_static_fleet_screen_help_list, sizeof(EVANHELP::_fleet_screen_help_list));
 
-        if (param_1 == 0) {
+        if (start_index == 0) {
             EVANHELP::Append_Help_List_(
                 EVANHELP::_fleet_screen_help_list,
                 &help_list_count,
                 0x20, 0x168, 0x158, 0x35, 0x24f, 0x161
             );
         } else {
-            for (int16_t i = param_1; i < 20; ++i) {
-                int32_t x = (i % 4) * 0x40;
-                int32_t y = (i / 4) * 0x40;
+            for (int16_t i = start_index; i < 20; ++i) {
+                int32_t slot_offset_x = (i % 4) * 0x40;
+                int32_t slot_offset_y = (i / 4) * 0x40;
 
                 EVANHELP::Append_Help_List_(
                     EVANHELP::_fleet_screen_help_list,
                     &help_list_count,
                     0x20, 0x168,
-                    x + 0x156,
-                    y + 0x34,
-                    x + 0x196,
-                    y + 0x72
+                    slot_offset_x + 0x156,
+                    slot_offset_y + 0x34,
+                    slot_offset_x + 0x196,
+                    slot_offset_y + 0x72
                 );
             }
         }
@@ -488,26 +486,26 @@ namespace EVANHELP {
         }
     }
 
-    void __cdecl Set_ColOff_Screen_Help_List_(int16_t* skills) {
+    void __cdecl Set_ColOff_Screen_Help_List_(int16_t* displayed_skill_counts) {
         memcpy(_coloff_screen_help_list, _static_coloff_screen_help_list, sizeof(_static_coloff_screen_help_list));
 
         for (int16_t i = 0; i < 4; ++i) {
-            if (skills[i] > 0) {
-                _coloff_screen_help_list[i + 3].y1 += skills[i] * 17 + 16;
+            if (displayed_skill_counts[i] > 0) {
+                _coloff_screen_help_list[i + 3].y1 += displayed_skill_counts[i] * 17 + 16;
             }
         }
 
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_coloff_screen_help_list, 16);
     }
 
-    void __cdecl Set_ShipOff_Screen_Help_List_(int16_t* help_y_offsets, int16_t start_index) {
+    void __cdecl Set_ShipOff_Screen_Help_List_(int16_t* displayed_skill_counts, int16_t start_index) {
         int16_t count = 18;
 
         memcpy(_shipoff_screen_help_list, _static_shipoff_screen_help_list, sizeof(_shipoff_screen_help_list));
 
         for (int16_t i = 0; i < 4; i++) {
-            if (help_y_offsets[i] > 0) {
-                _shipoff_screen_help_list[i + 2].y1 += help_y_offsets[i] * 17 + 16;
+            if (displayed_skill_counts[i] > 0) {
+                _shipoff_screen_help_list[i + 2].y1 += displayed_skill_counts[i] * 17 + 16;
             }
         }
 
