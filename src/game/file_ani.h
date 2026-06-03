@@ -29,45 +29,79 @@ namespace file_ani {
 
     extern uint8_t* _file_animation_header;
 
-    extern const char s_File_Animation_Frame_Too_Large[31];
-    extern const char s_Refresh_Mask_can_t_be_drawn[28];
-    extern const char (&s_Refresh_Mask_cant_be_drawn)[28];
-
-    extern const char s_Too_many_frames_for_multi_file_a[41];
-    extern const char s_Differentail_File_Animation_Can_n_masked[46];
-    extern const char s_Differentail_File_Animation_Can_n_bitmap[46];
-
-    extern const char (&s_Differential_Error_868)[46];
-    extern const char (&s_Differential_Error_898)[46];
-    extern const char s_Differential_Error_8C8[47];
-
+    /**
+     * Sets the buffer used to load animation frame data.
+     * @param buffer Destination buffer for loaded frame bytes.
+     */
     void __cdecl Set_File_Animation_Buffer_(void* buffer);
 
+    /** Resets the animation frame buffer to the default offscreen surface. */
     void __cdecl Reset_File_Animation_Buffer_();
 
+    /**
+     * Opens an animation file entry and loads its header into the shared I/O buffer.
+     * @param filename LBX file path.
+     * @param entry_index Zero-based animation entry index.
+     */
     void __cdecl Open_File_Animation_(const char* filename, int16_t entry_index);
 
-    void __cdecl Open_Multi_File_Animation_(const char* filename, int16_t file_index, int16_t animation_slot);
+    /**
+     * Opens an animation file entry into one of the multi-animation slots.
+     * @param filename LBX file path.
+     * @param entry_index Zero-based animation entry index.
+     * @param animation_slot Multi-animation slot index in the range [0, 2].
+     */
+    void __cdecl Open_Multi_File_Animation_(const char* filename, int16_t entry_index, int16_t animation_slot);
 
+    /**
+     * Clamps and sets the current frame for the active single-file animation.
+     * @param frame_index Requested frame index.
+     */
     void __cdecl Set_File_Animation_Frame_(int16_t frame_index);
 
+    /** Calls Draw_File_Animation_ through the original thunk entry point. */
     void __cdecl thunk_Draw_File_Animation_();
 
+    /** Draws the current single-file animation frame and advances the frame state. */
     void __cdecl Draw_File_Animation_();
 
+    /** Draws the current single-file differential frame and advances the frame state. */
     void __cdecl Draw_File_Animation_Stencil_();
 
+    /** Returns the current frame index for the active single-file animation. */
     int16_t __cdecl Get_File_Animation_Frame_();
 
+    /** Returns the highest valid frame index for the active single-file animation. */
     int16_t __cdecl Get_File_Animation_Total_Frames_();
 
+    /**
+     * Draws the current frame from a multi-animation slot and advances the frame state.
+     * @param anim_idx Multi-animation slot index.
+     */
     void __cdecl Draw_Multi_File_Animation_(int16_t anim_idx);
 
+    /**
+     * Draws the current differential frame from a multi-animation slot and advances the frame state.
+     * @param anim_idx Multi-animation slot index.
+     */
     void __cdecl Draw_Multi_File_Animation_Stencil_(int16_t anim_idx);
 
-    int16_t __cdecl Get_Multi_File_Animation_Frame_(int16_t index);
+    /**
+     * Returns the current frame index for a multi-animation slot.
+     * @param anim_idx Multi-animation slot index.
+     */
+    int16_t __cdecl Get_Multi_File_Animation_Frame_(int16_t anim_idx);
 
-    void __cdecl Set_Multi_File_Animation_Frame_(int16_t anim_idx, int16_t frame);
+    /**
+     * Clamps and sets the current frame for a multi-animation slot.
+     * @param anim_idx Multi-animation slot index.
+     * @param frame_index Requested frame index.
+     */
+    void __cdecl Set_Multi_File_Animation_Frame_(int16_t anim_idx, int16_t frame_index);
 
-    void __cdecl Draw_Multi_File_Animation_Palette_(int32_t index);
+    /**
+     * Applies palette data for a multi-animation slot when the animation requests it.
+     * @param anim_idx Multi-animation slot index.
+     */
+    void __cdecl Draw_Multi_File_Animation_Palette_(int32_t anim_idx);
 }

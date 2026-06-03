@@ -1,9 +1,5 @@
 # Source Cleanup Progress
 
-- [pending] src/game/file_ani.{h,cpp}
-- [pending] src/game/filedef.{h,cpp}
-- [pending] src/game/firepts.{h,cpp}
-- [pending] src/game/flcqueue.{h,cpp}
 - [pending] src/game/fleetpop.{h,cpp}
 - [pending] src/game/flt.{h,cpp}
 - [pending] src/game/flt1.{h,cpp}

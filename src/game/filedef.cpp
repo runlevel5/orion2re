@@ -1,26 +1,14 @@
 #include "pch.h"
 
 namespace FILEDEF {
-    const char s_SAVE_d_GAM_00556944[11] = "SAVE%d.GAM";
-    const char s_rb_0055117c[3] = "rb";
-    const char s_GAM_005568f4[5] = ".GAM";
-    const char s_SAVE_005568fc[5] = "SAVE";
-    const char s_Error_saving_game_00556904[20] = "Error saving game.\n";
-    const char s_no_description_00556920[21] = "<< no description >>";
     const char s_Auto_Save_00556938[12] = "(Auto Save)";
-    const char s_invalid_save_slot_english[65] = "SAVE%d.GAM is invalid! Try another save slot or start a NEW game";
-    const char s_invalid_save_slot_german[89] = "SAVE%d.GAM ist ung\x9Fltig! W\x8Ahlen Sie ein anderes Spiel, oder starten Sie ein NEUES Spiel.";
-    const char s_invalid_save_slot_french[112] = "SAUVEGARDER%d.GAM n'est pas valide! Essayez un autre emplacement de sauvegarde ou commencez une NOUVELLE partie";
-    const char s_invalid_save_slot_spanish[87] = "#SAVE%d.GAM no es v<lido! Prueba otro hueco para guardar or comienza una partida NUEVA";
-    const char s_invalid_save_slot_italian[91] = "Il file SAVE%d.GAM non > valido! Provate a caricarne un altro o iniziate una nuova partita";
 
     void __cdecl Load_Game_Settings_() {
         RUSS::Assert_Settings_();
 
         FILE* file = fopen("MOX.SET", "rb");
         if (file != nullptr) {
-            // Read 553 bytes (size of s_settings up to version/seed block)
-            fread(&MOX::_settings, 0x229, 1, file);
+            fread(&MOX::_settings, sizeof(MOX::_settings), 1, file);
             fclose(file);
             RUSS::Assert_Settings_();
         }
@@ -31,17 +19,14 @@ namespace FILEDEF {
     bool Save_Game_Settings_(void) {
         RUSS::Assert_Settings_();
 
-        // Open settings file in binary write mode
         FILE* file = fopen("MOX.SET", "wb");
         if (file == nullptr) {
             return false;
         }
 
-        // Write the settings structure (size 0x229 = 553 bytes)
-        fwrite(&MOX::_settings, 0x229, 1, file);
+        fwrite(&MOX::_settings, sizeof(MOX::_settings), 1, file);
         fclose(file);
 
-        // Re-assert state after saving
         RUSS::Assert_Settings_();
         fclose(file);
 
@@ -49,116 +34,115 @@ namespace FILEDEF {
     }
 
 
-    void __cdecl Save_Game_(short slot) {
+    void __cdecl Save_Game_(int16_t slot_index) {
         uint32_t random_seed = random::Get_Random_Seed_();
-        uint32_t padding[250];
+        uint32_t save_padding[250];
 
         for (int i = 0; i < 250; ++i) {
-            padding[i] = 0;
+            save_padding[i] = 0;
         }
 
         HAROLD::Save_Mouse_List_();
 
         char slot_str[20];
-        itoa(slot + 1, slot_str, 10);
+        itoa(slot_index + 1, slot_str, 10);
 
         char filename[260];
-        strcpy(filename, FILEDEF::s_SAVE_005568fc);
+        strcpy(filename, "SAVE");
         strcat(filename, slot_str);
-        strcat(filename, FILEDEF::s_GAM_005568f4);
+        strcat(filename, ".GAM");
 
         RUSS::Assert_Settings_();
 
-        FILE* fp = fopen(filename, s_wb_00551178); // "wb"
+        FILE* fp = fopen(filename, "wb");
 
         if (fp == nullptr) {
-            char error_msg[20];
-            memcpy(error_msg, FILEDEF::s_Error_saving_game_00556904, sizeof(error_msg));
-            GENDRAW::Message_Box_(error_msg);
+            char error_message[] = "Error saving game.\n";
+            GENDRAW::Message_Box_(error_message);
             return;
         }
 
         uint32_t save_header = 0xe0;
         MISC::Increment_Mouse_Clock_Image_();
-        fwrite(&save_header, 4, 1, fp);
+        fwrite(&save_header, sizeof(save_header), 1, fp);
 
-        int desc_slot = (slot > 8) ? 9 : (int)slot;
-        fwrite(&MOX::_save_game_description[desc_slot], 37, 1, fp);
-        fwrite(&MOX::_stardate, 4, 1, fp);
-        fwrite(&MOX::_game_type, 1, 1, fp);
-        fwrite(&MOX::_settings, 553, 1, fp); // 0x229 bytes
-
-        RUSS::Mox_Update_();
-        fwrite(&random_seed, 4, 1, fp);
-        fwrite(&MOX::_NUM_COLONIES, 2, 1, fp);
-        fwrite(MOX::_colony, sizeof(s_colony), MAX_COLONIES, fp); // 0x169 per item
+        int16_t description_slot_index = (slot_index > 8) ? 9 : slot_index;
+        fwrite(MOX::_save_game_description[description_slot_index].description, sizeof(MOX::_save_game_description[description_slot_index].description), 1, fp);
+        fwrite(&MOX::_stardate, sizeof(MOX::_stardate), 1, fp);
+        fwrite(&MOX::_game_type, sizeof(MOX::_game_type), 1, fp);
+        fwrite(&MOX::_settings, sizeof(MOX::_settings), 1, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_planet_count, 2, 1, fp);
-        fwrite(MOX::_planet, sizeof(s_planet_data), MAX_PLANETS, fp); // 0x11 per item
+        fwrite(&random_seed, sizeof(random_seed), 1, fp);
+        fwrite(&MOX::_NUM_COLONIES, sizeof(MOX::_NUM_COLONIES), 1, fp);
+        fwrite(MOX::_colony, sizeof(s_colony), MAX_COLONIES, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_NUM_STARS, 2, 1, fp);
-        fwrite(MOX::_star, sizeof(s_star_data), MAX_STARS, fp); // 0x71 per item
+        fwrite(&MOX::_planet_count, sizeof(MOX::_planet_count), 1, fp);
+        fwrite(MOX::_planet, sizeof(s_planet_data), MAX_PLANETS, fp);
 
         RUSS::Mox_Update_();
-        fwrite(MOX::_leaders, sizeof(s_leader_data), MAX_LEADERS, fp); // 0x3b per item
+        fwrite(&MOX::_NUM_STARS, sizeof(MOX::_NUM_STARS), 1, fp);
+        fwrite(MOX::_star, sizeof(s_star_data), MAX_STARS, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_NUM_PLAYERS, 2, 1, fp);
-        fwrite(MOX::_player, sizeof(s_player), MAX_PLAYERS, fp); // 0xea9 per item
+        fwrite(MOX::_leaders, sizeof(s_leader_data), MAX_LEADERS, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_NUM_SHIPS, 2, 1, fp);
-        fwrite(MOX::_ship, sizeof(s_ship_data), MAX_SHIPS, fp); // 0x81 per item
+        fwrite(&MOX::_NUM_PLAYERS, sizeof(MOX::_NUM_PLAYERS), 1, fp);
+        fwrite(MOX::_player, sizeof(s_player), MAX_PLAYERS, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_moveable_box, 28, 5, fp); // 0x1c per item
-        fwrite(&MOX::_moveable_box_order, 2, 5, fp);
-        fwrite(&MOX::_PLAYER_NUM, 2, 1, fp);
-        fwrite(&MOX::_max_map_scale, 2, 1, fp);
-        fwrite(&MOX::_max_zoom_count, 2, 1, fp);
+        fwrite(&MOX::_NUM_SHIPS, sizeof(MOX::_NUM_SHIPS), 1, fp);
+        fwrite(MOX::_ship, sizeof(s_ship_data), MAX_SHIPS, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_star_bg_index, 1, 1, fp);
-        fwrite(&MOX::_MAP_MAX_X, 2, 1, fp);
-        fwrite(&MOX::_MAP_MAX_Y, 2, 1, fp);
-        fwrite(&MOX::_fleet_icon_button_count, 2, 1, fp);
-        fwrite(MOX::_nebula, 20, 1, fp); // 0x14 size
-        fwrite(&MOX::_NUM_NEBULAS, 1, 1, fp);
-        fwrite(&MOX::_bill_savegame, 12, 1, fp); // 0xc size
+        fwrite(&MOX::_moveable_box, sizeof(MOX::_moveable_box[0]), 5, fp);
+        fwrite(&MOX::_moveable_box_order, sizeof(MOX::_moveable_box_order[0]), 5, fp);
+        fwrite(&MOX::_PLAYER_NUM, sizeof(MOX::_PLAYER_NUM), 1, fp);
+        fwrite(&MOX::_max_map_scale, sizeof(MOX::_max_map_scale), 1, fp);
+        fwrite(&MOX::_max_zoom_count, sizeof(MOX::_max_zoom_count), 1, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&REPORT::_n_reports, 2, 1, fp);
-        fwrite(&REPORT::_reports, 950, 1, fp); // 0x3b6 size
-        fwrite(&REPORT::_done_player_reports, 1, 1, fp);
-        fwrite(&REPORT::_something_interesting_happened, 8, 1, fp);
-        fwrite(&REPORT::_done_colonize_check, 9, 1, fp);
-        fwrite(&EVENTS::_event_data, 9, 36, fp);
+        fwrite(&MOX::_star_bg_index, sizeof(MOX::_star_bg_index), 1, fp);
+        fwrite(&MOX::_MAP_MAX_X, sizeof(MOX::_MAP_MAX_X), 1, fp);
+        fwrite(&MOX::_MAP_MAX_Y, sizeof(MOX::_MAP_MAX_Y), 1, fp);
+        fwrite(&MOX::_fleet_icon_button_count, sizeof(MOX::_fleet_icon_button_count), 1, fp);
+        fwrite(MOX::_nebula, sizeof(*MOX::_nebula), MAX_NEBULAS, fp);
+        fwrite(&MOX::_NUM_NEBULAS, sizeof(MOX::_NUM_NEBULAS), 1, fp);
+        fwrite(&MOX::_bill_savegame, sizeof(MOX::_bill_savegame), 1, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MSG_::_msgs, 18, 100, fp); // 0x12 per item
-        fwrite(&MSG_::_first_msg, 8, 1, fp);
-        fwrite(&MSG_::_max_msgs, 8, 1, fp);
-        fwrite(&MSG_::_n_msgs, 8, 1, fp);
-        fwrite(&REPORT::_displayed_msgs, 1, 1, fp);
-        fwrite(&REPORT::_displayed_gnn, 1, 1, fp);
+        fwrite(&REPORT::_n_reports, sizeof(REPORT::_n_reports), 1, fp);
+        fwrite(&REPORT::_reports, sizeof(REPORT::_reports), 1, fp);
+        fwrite(&REPORT::_done_player_reports, sizeof(REPORT::_done_player_reports), 1, fp);
+        fwrite(&REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened), 1, fp);
+        fwrite(&REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check), 1, fp);
+        fwrite(&EVENTS::_event_data, sizeof(EVENTS::_event_data[0]), 36, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&DIPLODEF::_COUNCIL_FLAG, 2, 1, fp);
-        fwrite(&DIPLODEF::_next_council_meeting_turn, 2, 1, fp);
-        fwrite(&MOX::_antaran_resource_level, 2, 1, fp);
-        fwrite(&MOX::_chance_for_antaran_invasion, 2, 1, fp);
-        fwrite(&MOX::_disallow_saves_code, 2, 1, fp);
-        fwrite(&EVENTS::_last_event_year, 4, 1, fp);
-        fwrite(&EVENTS::_event_delay_count, 2, 1, fp);
-        fwrite(&MOX::_antarans, 66, 1, fp);
+        fwrite(&MSG_::_msgs, sizeof(MSG_::_msgs[0]), 100, fp);
+        fwrite(&MSG_::_first_msg, sizeof(MSG_::_first_msg), 1, fp);
+        fwrite(&MSG_::_max_msgs, sizeof(MSG_::_max_msgs), 1, fp);
+        fwrite(&MSG_::_n_msgs, sizeof(MSG_::_n_msgs), 1, fp);
+        fwrite(&REPORT::_displayed_msgs, sizeof(REPORT::_displayed_msgs), 1, fp);
+        fwrite(&REPORT::_displayed_gnn, sizeof(REPORT::_displayed_gnn), 1, fp);
 
         RUSS::Mox_Update_();
-        fwrite(&MOX::_cur_map_scale, 2, 1, fp);
-        fwrite(&MOX::_cur_map_x, 2, 1, fp);
-        fwrite(&MOX::_cur_map_y, 2, 1, fp);
-        fwrite(&padding, 1000, 1, fp);
+        fwrite(&DIPLODEF::_COUNCIL_FLAG, sizeof(DIPLODEF::_COUNCIL_FLAG), 1, fp);
+        fwrite(&DIPLODEF::_next_council_meeting_turn, sizeof(DIPLODEF::_next_council_meeting_turn), 1, fp);
+        fwrite(&MOX::_antaran_resource_level, sizeof(MOX::_antaran_resource_level), 1, fp);
+        fwrite(&MOX::_chance_for_antaran_invasion, sizeof(MOX::_chance_for_antaran_invasion), 1, fp);
+        fwrite(&MOX::_disallow_saves_code, sizeof(MOX::_disallow_saves_code), 1, fp);
+        fwrite(&EVENTS::_last_event_year, sizeof(EVENTS::_last_event_year), 1, fp);
+        fwrite(&EVENTS::_event_delay_count, sizeof(EVENTS::_event_delay_count), 1, fp);
+        fwrite(&MOX::_antarans, sizeof(MOX::_antarans), 1, fp);
+
+        RUSS::Mox_Update_();
+        fwrite(&MOX::_cur_map_scale, sizeof(MOX::_cur_map_scale), 1, fp);
+        fwrite(&MOX::_cur_map_x, sizeof(MOX::_cur_map_x), 1, fp);
+        fwrite(&MOX::_cur_map_y, sizeof(MOX::_cur_map_y), 1, fp);
+        fwrite(&save_padding, sizeof(save_padding), 1, fp);
 
         fclose(fp);
 
@@ -167,17 +151,17 @@ namespace FILEDEF {
         FILEDEF::Save_Game_Settings_();
     }
 
-    uint32_t __cdecl Load_Game_(int16_t save_idx) {
+    uint32_t __cdecl Load_Game_(int16_t slot_index) {
         char filename[256];
-        char err_msg[128] = {};
+        char error_message[128] = {};
         uint32_t header_val;
         uint32_t random_seed;
         s_settings saved_settings;
-        uint8_t buffer_1000[1000];
+        uint8_t save_padding[1000];
 
         HAROLD::Save_Mouse_List_();
 
-        sprintf(filename, "SAVE%d.GAM", save_idx + 1);
+        sprintf(filename, "SAVE%d.GAM", slot_index + 1);
 
         RUSS::Mox_Update_();
         RUSS::Assert_Settings_();
@@ -189,20 +173,20 @@ namespace FILEDEF {
             return 0;
         }
 
-        fread(&header_val, 4, 1, file);
+        fread(&header_val, sizeof(header_val), 1, file);
         if (header_val != 0xe0) {
             const char* fmt = nullptr;
             switch (MOX::_settings.language) {
-            case 0: fmt = s_invalid_save_slot_english; break;
-            case 1: fmt = s_invalid_save_slot_german; break;
-            case 2: fmt = s_invalid_save_slot_french; break;
-            case 3: fmt = s_invalid_save_slot_spanish; break;
-            case 4: fmt = s_invalid_save_slot_italian; break;
+            case 0: fmt = "SAVE%d.GAM is invalid! Try another save slot or start a NEW game"; break;
+            case 1: fmt = "SAVE%d.GAM ist ung\x9Fltig! W\x8Ahlen Sie ein anderes Spiel, oder starten Sie ein NEUES Spiel."; break;
+            case 2: fmt = "SAUVEGARDER%d.GAM n'est pas valide! Essayez un autre emplacement de sauvegarde ou commencez une NOUVELLE partie"; break;
+            case 3: fmt = "#SAVE%d.GAM no es v<lido! Prueba otro hueco para guardar or comienza una partida NUEVA"; break;
+            case 4: fmt = "Il file SAVE%d.GAM non > valido! Provate a caricarne un altro o iniziate una nuova partita"; break;
             }
             if (fmt) {
-                sprintf(err_msg, fmt, save_idx + 1);
+                sprintf(error_message, fmt, slot_index + 1);
             }
-            GENDRAW::Warning_Box_(err_msg);
+            GENDRAW::Warning_Box_(error_message);
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 639, 479, 0);
             fclose(file);
@@ -211,27 +195,27 @@ namespace FILEDEF {
 
         MISC::Increment_Mouse_Clock_Image_();
 
-        int16_t desc_idx = (save_idx >= 9) ? 9 : save_idx;
-        fread(&MOX::_save_game_description[desc_idx], 37, 1, file);
-        fread(&MOX::_stardate, 4, 1, file);
-        fread(&MOX::_game_type, 1, 1, file);
-        fread(&saved_settings, 0x229, 1, file);
-        fread(&random_seed, 4, 1, file);
+        int16_t description_slot_index = (slot_index >= 9) ? 9 : slot_index;
+        fread(MOX::_save_game_description[description_slot_index].description, sizeof(MOX::_save_game_description[description_slot_index].description), 1, file);
+        fread(&MOX::_stardate, sizeof(MOX::_stardate), 1, file);
+        fread(&MOX::_game_type, sizeof(MOX::_game_type), 1, file);
+        fread(&saved_settings, sizeof(saved_settings), 1, file);
+        fread(&random_seed, sizeof(random_seed), 1, file);
 
         RUSS::Mox_Update_();
-        fread(&MOX::_NUM_COLONIES, 2, 1, file);
+        fread(&MOX::_NUM_COLONIES, sizeof(MOX::_NUM_COLONIES), 1, file);
         for (int i = 0; i < MAX_COLONIES; ++i) {
             fread(&MOX::_colony[i], sizeof(s_colony), 1, file);
         }
 
         RUSS::Mox_Update_();
-        fread(&MOX::_planet_count, 2, 1, file);
+        fread(&MOX::_planet_count, sizeof(MOX::_planet_count), 1, file);
         for (int i = 0; i < MAX_PLANETS; ++i) {
             fread(&MOX::_planet[i], sizeof(s_planet_data), 1, file);
         }
 
         RUSS::Mox_Update_();
-        fread(&MOX::_NUM_STARS, 2, 1, file);
+        fread(&MOX::_NUM_STARS, sizeof(MOX::_NUM_STARS), 1, file);
         for (int i = 0; i < MAX_STARS; ++i) {
             fread(&MOX::_star[i], sizeof(s_star_data), 1, file);
         }
@@ -242,68 +226,68 @@ namespace FILEDEF {
         }
 
         RUSS::Mox_Update_();
-        fread(&MOX::_NUM_PLAYERS, 2, 1, file);
+        fread(&MOX::_NUM_PLAYERS, sizeof(MOX::_NUM_PLAYERS), 1, file);
         for (int i = 0; i < MAX_PLAYERS; ++i) {
             fread(&MOX::_player[i], sizeof(s_player), 1, file);
         }
 
         RUSS::Mox_Update_();
-        fread(&MOX::_NUM_SHIPS, 2, 1, file);
+        fread(&MOX::_NUM_SHIPS, sizeof(MOX::_NUM_SHIPS), 1, file);
         for (int i = 0; i < MAX_SHIPS; ++i) {
             fread(&MOX::_ship[i], sizeof(s_ship_data), 1, file);
         }
 
-        fread(&MOX::_moveable_box, 0x1c, 5, file);
-        fread(&MOX::_moveable_box_order, 2, 5, file);
-        fread(&MOX::_PLAYER_NUM, 2, 1, file);
-        fread(&MOX::_max_map_scale, 2, 1, file);
-        fread(&MOX::_max_zoom_count, 2, 1, file);
-        fread(&MOX::_star_bg_index, 1, 1, file);
-        fread(&MOX::_MAP_MAX_X, 2, 1, file);
-        fread(&MOX::_MAP_MAX_Y, 2, 1, file);
+        fread(&MOX::_moveable_box, sizeof(MOX::_moveable_box[0]), 5, file);
+        fread(&MOX::_moveable_box_order, sizeof(MOX::_moveable_box_order[0]), 5, file);
+        fread(&MOX::_PLAYER_NUM, sizeof(MOX::_PLAYER_NUM), 1, file);
+        fread(&MOX::_max_map_scale, sizeof(MOX::_max_map_scale), 1, file);
+        fread(&MOX::_max_zoom_count, sizeof(MOX::_max_zoom_count), 1, file);
+        fread(&MOX::_star_bg_index, sizeof(MOX::_star_bg_index), 1, file);
+        fread(&MOX::_MAP_MAX_X, sizeof(MOX::_MAP_MAX_X), 1, file);
+        fread(&MOX::_MAP_MAX_Y, sizeof(MOX::_MAP_MAX_Y), 1, file);
 
         RUSS::Mox_Update_();
-        fread(&MOX::_fleet_icon_button_count, 2, 1, file);
-        fread(MOX::_nebula, 0x14, 1, file);
-        fread(&MOX::_NUM_NEBULAS, 1, 1, file);
+        fread(&MOX::_fleet_icon_button_count, sizeof(MOX::_fleet_icon_button_count), 1, file);
+        fread(MOX::_nebula, sizeof(*MOX::_nebula), MAX_NEBULAS, file);
+        fread(&MOX::_NUM_NEBULAS, sizeof(MOX::_NUM_NEBULAS), 1, file);
 
         if (MOX::_nebula_screen_seg == 0) {
             MOX::_NUM_NEBULAS = 0;
         }
 
-        fread(&MOX::_bill_savegame, 0xc, 1, file);
+        fread(&MOX::_bill_savegame, sizeof(MOX::_bill_savegame), 1, file);
         RUSS::Mox_Update_();
 
-        fread(&REPORT::_n_reports, 2, 1, file);
-        fread(&REPORT::_reports, 0x3b6, 1, file);
-        fread(&REPORT::_done_player_reports, 1, 1, file);
-        fread(&REPORT::_something_interesting_happened, 8, 1, file);
-        fread(&REPORT::_done_colonize_check, 9, 1, file);
-        fread(&EVENTS::_event_data, 9, 36, file);
+        fread(&REPORT::_n_reports, sizeof(REPORT::_n_reports), 1, file);
+        fread(&REPORT::_reports, sizeof(REPORT::_reports), 1, file);
+        fread(&REPORT::_done_player_reports, sizeof(REPORT::_done_player_reports), 1, file);
+        fread(&REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened), 1, file);
+        fread(&REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check), 1, file);
+        fread(&EVENTS::_event_data, sizeof(EVENTS::_event_data[0]), 36, file);
 
         RUSS::Mox_Update_();
-        fread(&MSG_::_msgs, 0x12, 100, file);
-        fread(&MSG_::_first_msg, 8, 1, file);
-        fread(&MSG_::_max_msgs, 8, 1, file);
-        fread(&MSG_::_n_msgs, 8, 1, file);
-        fread(&REPORT::_displayed_msgs, 1, 1, file);
-        fread(&REPORT::_displayed_gnn, 1, 1, file);
-        fread(&diplodef::_COUNCIL_FLAG, 2, 1, file);
-        fread(&diplodef::_next_council_meeting_turn, 2, 1, file);
+        fread(&MSG_::_msgs, sizeof(MSG_::_msgs[0]), 100, file);
+        fread(&MSG_::_first_msg, sizeof(MSG_::_first_msg), 1, file);
+        fread(&MSG_::_max_msgs, sizeof(MSG_::_max_msgs), 1, file);
+        fread(&MSG_::_n_msgs, sizeof(MSG_::_n_msgs), 1, file);
+        fread(&REPORT::_displayed_msgs, sizeof(REPORT::_displayed_msgs), 1, file);
+        fread(&REPORT::_displayed_gnn, sizeof(REPORT::_displayed_gnn), 1, file);
+        fread(&diplodef::_COUNCIL_FLAG, sizeof(diplodef::_COUNCIL_FLAG), 1, file);
+        fread(&diplodef::_next_council_meeting_turn, sizeof(diplodef::_next_council_meeting_turn), 1, file);
 
         RUSS::Mox_Update_();
-        fread(&MOX::_antaran_resource_level, 2, 1, file);
-        fread(&MOX::_chance_for_antaran_invasion, 2, 1, file);
-        fread(&MOX::_disallow_saves_code, 2, 1, file);
-        fread(&EVENTS::_last_event_year, 4, 1, file);
-        fread(&EVENTS::_event_delay_count, 2, 1, file);
-        fread(&MOX::_antarans, 66, 1, file);
+        fread(&MOX::_antaran_resource_level, sizeof(MOX::_antaran_resource_level), 1, file);
+        fread(&MOX::_chance_for_antaran_invasion, sizeof(MOX::_chance_for_antaran_invasion), 1, file);
+        fread(&MOX::_disallow_saves_code, sizeof(MOX::_disallow_saves_code), 1, file);
+        fread(&EVENTS::_last_event_year, sizeof(EVENTS::_last_event_year), 1, file);
+        fread(&EVENTS::_event_delay_count, sizeof(EVENTS::_event_delay_count), 1, file);
+        fread(&MOX::_antarans, sizeof(MOX::_antarans), 1, file);
 
         RUSS::Mox_Update_();
-        fread(&MOX::_cur_map_scale, 2, 1, file);
-        fread(&MOX::_cur_map_x, 2, 1, file);
-        fread(&MOX::_cur_map_y, 2, 1, file);
-        fread(&buffer_1000, 1000, 1, file);
+        fread(&MOX::_cur_map_scale, sizeof(MOX::_cur_map_scale), 1, file);
+        fread(&MOX::_cur_map_x, sizeof(MOX::_cur_map_x), 1, file);
+        fread(&MOX::_cur_map_y, sizeof(MOX::_cur_map_y), 1, file);
+        fread(&save_padding, sizeof(save_padding), 1, file);
         fclose(file);
 
         MOX2::Init_Map_Defaults_();
@@ -362,23 +346,23 @@ namespace FILEDEF {
 
             itoa(i + 1, num_str, 10);
 
-            strcpy(filename, s_SAVE_005568fc);
+            strcpy(filename, "SAVE");
             strcat(filename, num_str);
-            strcat(filename, s_GAM_005568f4);
+            strcat(filename, ".GAM");
 
             if (_access(filename, 0) == 0) {
-                FILE* fp = fopen(filename, s_rb_0055117c);
+                FILE* fp = fopen(filename, "rb");
                 if (fp != nullptr) {
                     int32_t type;
-                    fread(&type, 4, 1, fp);
-                    fread(MOX::_save_game_description[i].description, 37, 1, fp);
-                    fread(&save_times[i], 4, 1, fp);
+                    fread(&type, sizeof(type), 1, fp);
+                    fread(MOX::_save_game_description[i].description, sizeof(MOX::_save_game_description[i].description), 1, fp);
+                    fread(&save_times[i], sizeof(save_times[i]), 1, fp);
 
                     if (LOADSAVE::Is_Valid_Game_Type_(type)) {
                         if (i == 9) {
-                            strcpy(MOX::_save_game_description[i].description, s_Auto_Save_00556938);
+                            strcpy(MOX::_save_game_description[i].description, "(Auto Save)");
                         } else if (MOX::_save_game_description[i].description[0] == '\0') {
-                            strcpy(MOX::_save_game_description[i].description, s_no_description_00556920);
+                            strcpy(MOX::_save_game_description[i].description, "<< no description >>");
                         }
                     } else {
                         save_times[i] = -1;
@@ -397,11 +381,11 @@ namespace FILEDEF {
         int8_t game_type = -1;
         char filename[16];
 
-        sprintf(filename, s_SAVE_d_GAM_00556944, save_slot + 1);
-        FILE* file = fopen(filename, s_rb_0055117c);
+        sprintf(filename, "SAVE%d.GAM", save_slot + 1);
+        FILE* file = fopen(filename, "rb");
         if (file != nullptr) {
             if (fseek(file, 0x2D, SEEK_SET) == 0) {
-                fread(&game_type, 1, 1, file);
+                fread(&game_type, sizeof(game_type), 1, file);
             }
             fclose(file);
         }

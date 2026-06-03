@@ -19,13 +19,13 @@ namespace FLCQUEUE {
         }
     }
 
-    void __cdecl Squeze_Out_Queue_Entry_(int16_t index) {
-        strings::Delete_Structure_(index, _flic_queue, sizeof(s_flic_queue_entry), 100);
+    void __cdecl Squeze_Out_Queue_Entry_(int16_t entry_idx) {
+        strings::Delete_Structure_(entry_idx, _flic_queue, sizeof(s_flic_queue_entry), 100);
         _n_queue_entries--;
     }
 
-    void __cdecl Draw_Queue_Entry_(int16_t queue_idx) {
-        s_flic_queue_entry* entry = &_flic_queue[queue_idx];
+    void __cdecl Draw_Queue_Entry_(int16_t entry_idx) {
+        s_flic_queue_entry* entry = &_flic_queue[entry_idx];
 
         animate::Set_Animation_Frame_(entry->animation, entry->current_frame);
 
@@ -46,19 +46,19 @@ namespace FLCQUEUE {
             }
         } else if (entry->play_mode == 1) {
             if (animate::Get_Animation_Frame_Count_(entry->animation) <= entry->current_frame) {
-                Squeze_Out_Queue_Entry_(queue_idx);
+                Squeze_Out_Queue_Entry_(entry_idx);
             }
         }
     }
 
     void __cdecl Add_Flic_To_End_Of_Queue_(int16_t x, int16_t y, s_animation_header* animation, uint8_t play_mode, uint8_t use_clipping) {
         if (_n_queue_entries < 100) {
-            int16_t index = _n_queue_entries;
-            _flic_queue[index].x = x;
-            _flic_queue[index].y = y;
-            _flic_queue[index].animation = animation;
-            _flic_queue[index].play_mode = play_mode;
-            _flic_queue[index].use_clipping = use_clipping;
+            int16_t entry_idx = _n_queue_entries;
+            _flic_queue[entry_idx].x = x;
+            _flic_queue[entry_idx].y = y;
+            _flic_queue[entry_idx].animation = animation;
+            _flic_queue[entry_idx].play_mode = play_mode;
+            _flic_queue[entry_idx].use_clipping = use_clipping;
             _n_queue_entries++;
         }
     }

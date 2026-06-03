@@ -115,6 +115,8 @@ workflows:
           H. Raw size cleanup
              - Detect hardcoded byte counts that represent the size of a variable, pointee type, array element, structure, or structure field group when `sizeof(...)` would express the intent more safely.
              - Prefer `sizeof(variable)`, `sizeof(*pointer)`, `sizeof(Type)`, or closely scoped equivalent expressions instead of magic numeric sizes when the replacement is clear.
+             - Before replacing a raw size with `sizeof(...)`, explicitly verify whether the referenced identifier is an actual object, an array, or a pointer variable so you do not accidentally use the size of the pointer itself.
+             - When the data being read, written, copied, cleared, or compared is array-backed, prefer expressions that preserve the full array extent such as `sizeof(array)` or `sizeof(array[0]) * count`; do not use `sizeof(pointer)` unless the code truly intends the pointer-width value.
              - Flag suspicious constants in allocation, copy, clear, compare, serialization, and pointer-step code paths when they appear to encode object size manually.
              - Do not replace protocol constants, file-format field widths, or other true semantic sizes unless the value is clearly standing in for an object-size expression.
 
@@ -148,6 +150,7 @@ workflows:
              - all requested changes were actually applied
              - no unintended edits were introduced
              - the resulting code is fully equivalent in behavior to the prior code except for the intended cleanup improvements
+             - every `sizeof(...)` cleanup was checked against the underlying declaration so array extents were preserved and pointer-size substitutions were not introduced by mistake
           9. Finish the current review batch at a clean review-unit boundary and return control to input.
 
           Output style:

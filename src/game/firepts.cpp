@@ -18,24 +18,24 @@ namespace FIREPTS {
         }
     }
 
-    int16_t __cdecl N_Fire_Points_(int16_t param_1, int16_t param_2) {
+    int16_t __cdecl N_Fire_Points_(int16_t weapon_id, int16_t shot_count) {
         int16_t result = 0;
 
-        if (param_2 <= 10 || BEAMS::_g_firing_reflected_beam_flag != 0) {
+        if (shot_count <= 10 || BEAMS::_g_firing_reflected_beam_flag != 0) {
             result = 1;
-        } else if (param_2 < 30) {
+        } else if (shot_count < 30) {
             result = 2;
-        } else if (param_2 < 60) {
+        } else if (shot_count < 60) {
             result = 3;
-        } else if (param_2 <= 98) {
+        } else if (shot_count <= 98) {
             result = 4;
-        } else if (param_2 == 99) {
+        } else if (shot_count == 99) {
             result = 5;
         } else {
             result = 0;
         }
 
-        if (param_1 == 27 && result <= 2) {
+        if (weapon_id == 27 && result <= 2) {
             result = 2;
         }
 
@@ -47,14 +47,14 @@ namespace FIREPTS {
 
         int16_t n_points = N_Fire_Points_(weapon_id, shot_count);
 
-        if ((n_points % 2) == 1 && (n_points - static_cast<int16_t>(fp_idx)) == 1) {
+        if ((n_points % 2) == 1 && (n_points - fp_idx) == 1) {
             *fp_x = 0;
             *fp_y = 0;
             return;
         }
 
         int16_t color_idx = 0;
-        if (attacker_owner < 8) {
+        if (attacker_owner >= 0 && attacker_owner < 8) {
             color_idx = MOX::_player[attacker_owner].color;
         }
 
@@ -68,7 +68,7 @@ namespace FIREPTS {
         int32_t local_x = fp_data[point_idx * 2] - 0x1A;
         int32_t local_y = fp_data[point_idx * 2 + 1] - 0x18;
 
-        int rotation_angle = ((int)attacker_facing_dir * -360) / 16;
+        int32_t rotation_angle = ((int32_t)attacker_facing_dir * -360) / 16;
 
         angle::Rotate_Coordinates_(rotation_angle, &local_x, &local_y);
 
