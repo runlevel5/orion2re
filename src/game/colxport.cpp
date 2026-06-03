@@ -64,16 +64,15 @@ namespace COLXPORT {
  * If a "cheezy hack" state is active, it returns a cached value.
  * Otherwise, it iterates through the global colony list.
  */
-short __cdecl N_Colonies_(short player_idx) {
+int16_t __cdecl N_Colonies_(int16_t player_idx) {
     if (_cheezy_hack_col_count_state != 0) {
         return _cheezy_hack_col_count[(int16_t)player_idx];
     }
 
-    short colony_count = 0;
+    int16_t colony_count = 0;
     for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
         s_colony* colony = &MOX::_colony[i];
 
-        // Only count colonies owned by player_idx that are NOT outposts
         if ((int16_t)colony->owner == player_idx && colony->outpost_flag == 0) {
             colony_count++;
         }
@@ -93,7 +92,7 @@ void __cdecl Build_Global_Colony_List_() {
     int16_t count = 0;
 
     for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
-        if (MOX::_colony[i].owner == static_cast<char>(MOX::_PLAYER_NUM) && MOX::_colony[i].outpost_flag == 0) {
+        if (MOX::_colony[i].owner == (char)MOX::_PLAYER_NUM && MOX::_colony[i].outpost_flag == 0) {
             _g_colony_list_ptr[count] = i;
             count++;
         }
@@ -110,12 +109,12 @@ void __cdecl Load_Xport_Anims_() {
     _anims[2] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLPUPS_LBX, 0x14, MOX::_screen_seg);
 }
 
-short __cdecl Xport_Popup_() {
+int16_t __cdecl Xport_Popup_() {
     int16_t local_colony_list[250];
-    short input_id;
-    short selected_colony = -1;
+    int16_t input_id;
+    int16_t selected_colony = -1;
 
-    for (int i = 0; i < 15; ++i) {
+    for (int32_t i = 0; i < 15; ++i) {
         local_colony_list[i] = -1;
     }
 
@@ -145,7 +144,7 @@ short __cdecl Xport_Popup_() {
                 COLSUM::Increment_First_(6);
             }
         } else {
-            for (int i = 0; i < 6; ++i) {
+            for (int32_t i = 0; i < 6; ++i) {
                 if (_list_fields[i] == input_id) {
                     selected_colony = _list_col[i];
                 }
@@ -202,7 +201,6 @@ void __cdecl Add_Fields_()
         );
     }
 
-    // Add Transport Button
     COLXPORT::_x_fields_array[2] = fields::Add_Button_Field_(
         448, 
         52, 
@@ -212,7 +210,6 @@ void __cdecl Add_Fields_()
         40
     );
 
-    // Add System Button
     COLXPORT::_x_fields_array[3] = fields::Add_Button_Field_(
         447, 
         243, 
@@ -222,7 +219,6 @@ void __cdecl Add_Fields_()
         40
     );
 
-    // Add Build Button
     COLXPORT::_x_fields_array[1] = fields::Add_Button_Field_(
         352, 
         285, 
@@ -233,7 +229,7 @@ void __cdecl Add_Fields_()
     );
 
     y_offset = 83;
-    for (int i = 0; i < 6; ++i) {
+    for (int32_t i = 0; i < 6; ++i) {
         if (COLXPORT::_list_col[i] != -1) {
             char* scroll_str = ESTRINGS::E_Strings_(12);
             COLXPORT::_list_fields[i] = fields::Add_Hidden_Field_(
@@ -249,12 +245,6 @@ void __cdecl Add_Fields_()
     }
 }
 
-/**
- * @address 0042b1e0
- */
-/**
- * @address 0042b200
- */
 void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_idx) {
     COLXPORT::_list_col[entry_idx] = colony_idx;
 
@@ -275,8 +265,6 @@ void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_i
 }
 
 void __cdecl Clear_List_Col_Array_() {
-    // The assembly implements a loop setting each element of _list_col to -1 (0xFFFF).
-    // Using memset to represent the bulk memory initialization.
     memset(_list_col, 0xff, sizeof(_list_col));
 }
 
@@ -285,33 +273,29 @@ void __cdecl Draw_Bar_Indicator_() {
     COLSUM::Update_First_(6, &COLSUM::_first, &COLSUM::_slider_bar_position);
 
     if (n_colonies >= 6) {
-        // Slider track is 164 pixels high (from y=75 to y=239)
         int16_t y1 = (int16_t)((COLSUM::_first * 164) / n_colonies) + 75 /* 0x4b */;
         int16_t y2 = (int16_t)(((COLSUM::_first + 6) * 164) / n_colonies) + 75 /* 0x4b */;
 
         graphics::Fill_(449 /* 0x1c1 */, y1, 457 /* 0x1c9 */, y2, 229 /* 0xe5 */);
 
-        // Draw slider border
-        line::Line_(449 /* 0x1c1 */, y1, 457 /* 0x1c9 */, y1, 230 /* 0xe6 */); // Top
-        line::Line_(449 /* 0x1c1 */, y1, 449 /* 0x1c1 */, y2, 230 /* 0xe6 */); // Left
-        line::Line_(457 /* 0x1c9 */, y1, 457 /* 0x1c9 */, y2, 228 /* 0xe4 */); // Right
-        line::Line_(449 /* 0x1c1 */, y2, 457 /* 0x1c9 */, y2, 228 /* 0xe4 */); // Bottom
+        line::Line_(449 /* 0x1c1 */, y1, 457 /* 0x1c9 */, y1, 230 /* 0xe6 */);
+        line::Line_(449 /* 0x1c1 */, y1, 449 /* 0x1c1 */, y2, 230 /* 0xe6 */);
+        line::Line_(457 /* 0x1c9 */, y1, 457 /* 0x1c9 */, y2, 228 /* 0xe4 */);
+        line::Line_(449 /* 0x1c1 */, y2, 457 /* 0x1c9 */, y2, 228 /* 0xe4 */);
 
-        // Draw track corner marks
         graphics::Dot_(449 /* 0x1c1 */, 75 /* 0x4b */, 80 /* 0x50 / 'P' */);
         graphics::Dot_(457 /* 0x1c9 */, 75 /* 0x4b */, 80 /* 0x50 / 'P' */);
         graphics::Dot_(449 /* 0x1c1 */, 239 /* 0xef */, 80 /* 0x50 / 'P' */);
         graphics::Dot_(457 /* 0x1c9 */, 239 /* 0xef */, 80 /* 0x50 / 'P' */);
     } else {
-        // Full bar if 6 or fewer colonies
         graphics::Fill_(449 /* 0x1c1 */, 75 /* 0x4b */, 457 /* 0x1c9 */, 239 /* 0xef */, 80 /* 0x50 / 'P' */);
     }
 }
 
 void __cdecl Draw_Info_Pop_For_(int16_t entry_index) {
-    const int32_t index = static_cast<int32_t>(entry_index);
-    int16_t y = static_cast<int16_t>(entry_index * 0x26);
-    y = static_cast<int16_t>(y + 0x36);
+    const int32_t index = (int32_t)entry_index;
+    int16_t y = (int16_t)(entry_index * 0x26);
+    y = (int16_t)(y + 0x36);
 
     COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
         COLXPORT::_list_col[index],

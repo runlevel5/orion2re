@@ -232,7 +232,7 @@ namespace NETMOX {
         if (packet_id >= 2000) {
             DIP_SCRN::Diplomacy_Receive_Message_(net_id, packet_id, len, reinterpret_cast<s_dipscrn_net_message*>(packet));
         } else if (packet_id >= 1000) {
-            CMBTMOV1::Tactical_Combat_Receive_Message_(net_id, packet_id, len, reinterpret_cast<s_net_combat_message*>(packet));
+            CMBTMOV1::Tactical_Combat_Receive_Message_(net_id, packet_id, len, reinterpret_cast<s_net_tactical_combat_message*>(packet));
         } else {
             MAINSCR::Main_Receive_Message_(player_id, net_id, packet_id, len, packet);
         }

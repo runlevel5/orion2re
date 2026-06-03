@@ -3085,16 +3085,16 @@ struct s_net_chat {
     int32_t count;
 };
 
-typedef struct s_net_combat_message s_net_combat_message, *Ps_net_combat_message;
+typedef struct s_net_tactical_combat_message s_net_tactical_combat_message, *Ps_net_tactical_combat_message;
 
-struct s_net_combat_message {
-    int16_t x;
-    int16_t y;
-    int32_t f4;
-    int16_t f8;
-    int16_t f10;
-    int16_t f12;
-    int16_t f14;
+struct s_net_tactical_combat_message {
+    int16_t viewport_x;
+    int16_t viewport_y;
+    int32_t random_seed;
+    int16_t message_code;
+    int16_t arg1;
+    int16_t arg2;
+    int16_t arg3;
 };
 
 typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;

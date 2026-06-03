@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace COMBAT {
+    constexpr size_t kQCombatDataShipCount = 501;
+    constexpr size_t kQCombatDataSize = kQCombatDataShipCount * sizeof(s_qship);
+
     const char s_Crystal_00557e24[8] = "Crystal";
     const char s_Eel_00557e2c[4] = "Eel";
     const char s_Hydra_00557e30[8] = "Hydra";
@@ -22,8 +25,8 @@ namespace COMBAT {
 
         MOX::_cmbt_colony_id = colony_idx;
         MOX::_combat_turn = 0;
-        MOX::_qcombat_data = reinterpret_cast<s_qship*>(allocate::Allocate_First_Block_(MOX::_screen_seg, 0x4075));
-        struct_::Clear_Structure_(MOX::_qcombat_data, 0x4095);
+        MOX::_qcombat_data = (s_qship*)allocate::Allocate_First_Block_(MOX::_screen_seg, kQCombatDataSize);
+        struct_::Clear_Structure_(MOX::_qcombat_data, kQCombatDataSize);
 
         MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
 
@@ -335,7 +338,6 @@ namespace COMBAT {
                     *helmsman_max = bonus;
                 }
 
-                // Note: Structure field accessed again for each call as per disassembly
                 bonus = CMBTFIR2::Leader_Ordnance_Bonus_(MOX::_ship[ship_idx].officer_index);
                 if (*ordnance_max < bonus) {
                     *ordnance_max = bonus;
@@ -359,8 +361,7 @@ namespace COMBAT {
         }
     }
 
-    // Suggested name: COMBAT::Qload_Ships_
-    void __cdecl Qload_Ships_(int16_t* ship_indices, int16_t num_ships, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6) {
+    void __cdecl Qload_Ships_(int16_t* ship_indices, int16_t num_ships, int16_t beam_defense_bonus, int16_t damage_bonus, int16_t base_ocv_bonus, int16_t unused_lore_bonus) {
         int16_t player_idx;
         int16_t warp_bonus;
         int16_t best_armor_id;
@@ -412,7 +413,7 @@ namespace COMBAT {
                     q->special_weapon_id = best_strat_special;
                     q->shield_id = best_shield;
 
-                    if (static_cast<uint8_t>(q->player) < 10) {
+                    if ((uint8_t)q->player < 10) {
                         q->max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[ship_size].strat_hits * (armor_absorption + 100)) / 100);
                     } else {
                         q->max_hits = TECHDATA::_hull_data[ship_size].strat_hits;
@@ -457,11 +458,11 @@ namespace COMBAT {
                         }
                     }
 
-                    q->base_ocv += param_5 + special_ocv;
-                    q->beam_defense_bonus += param_3 + special_beam_def;
+                    q->base_ocv += base_ocv_bonus + special_ocv;
+                    q->beam_defense_bonus += beam_defense_bonus + special_beam_def;
                     q->missile_defense_bonus += special_missile_def;
-                    q->beam_damage_modifier += param_4 + special_beam_dmg;
-                    q->missile_damage_modifier += param_4 + special_missile_dmg;
+                    q->beam_damage_modifier += damage_bonus + special_beam_dmg;
+                    q->missile_damage_modifier += damage_bonus + special_missile_dmg;
                     q->officer_idx = MOX::_ship[ship_idx].officer_index;
                     q->structural_damage = MOX::_ship[ship_idx].structural_damage;
                     
@@ -711,16 +712,12 @@ namespace COMBAT {
         MOX::_combat_defender_count++;
     }
 
-    /**
-     * @address 0048cf80
-     */
     void __cdecl Stellar_Converter_Attack_(int16_t target_idx) {
         for (int i = 0; i < 4; ++i) {
             Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].max_damage);
         }
     }
 
-    // Suggested name: COMBAT::QGet_Target_SC
     int16_t __cdecl QGet_Target_SC_(int16_t attacker_idx) {
         int8_t attacker_player = MOX::_qcombat_data[attacker_idx].player;
         int16_t target_idx = -1;
@@ -791,9 +788,6 @@ namespace COMBAT {
         }
     }
 
-    /**
-     * @address 0048cd80
-     */
     void __cdecl Missile_Attack_(int16_t attacker_idx, int16_t target_idx) {
         s_qship* attacker = &MOX::_qcombat_data[attacker_idx];
         int16_t defense_bonus = MOX::_qcombat_data[target_idx].missile_defense_bonus;
@@ -847,7 +841,7 @@ namespace COMBAT {
     void __cdecl Strat_Special_Attack_(int16_t attacker_idx, int16_t target_idx) {
         s_qship* attacker = &MOX::_qcombat_data[attacker_idx];
         int16_t weapon_id = attacker->special_weapon_id;
-        int16_t count = INITSHIP::Strat_Special_Weapon_Count_(static_cast<uint32_t>(attacker->size));
+        int16_t count = INITSHIP::Strat_Special_Weapon_Count_((uint32_t)attacker->size);
 
         if (weapon_id == 0x25 /* PULSAR */) {
             count = (count + 1) / 2;
@@ -873,7 +867,6 @@ namespace COMBAT {
         }
     }
 
-    // Suggested name: COMBAT::Strategic_Bomb_Attack
     void __cdecl Strat_Bomb_Attack_(int16_t attacker_idx) {
         s_qship* attacker = &MOX::_qcombat_data[attacker_idx];
         int16_t weapon_id = attacker->bomb_weapon_id;
@@ -902,17 +895,13 @@ namespace COMBAT {
         }
     }
 
-    /**
-     * @address 00489a70
-     */
     void __cdecl Message_Box_Titled_(char* summary, char* details) {
         TEXTBOX::Do_Text_Box_(summary, details, 0);
     }
 
-    // Suggested name: Resolve_Strat_Colony_Damage
     void __cdecl Resolve_Strat_Colony_Damage_() {
         int8_t msg_buffer[73];
-        struct_::Clear_Structure_(msg_buffer, 73 /* 0x49 */);
+        struct_::Clear_Structure_(msg_buffer, sizeof(msg_buffer));
 
         if ((uint8_t)MOX::_qcombat_data->status <= 1) {
             if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_cmbt_colony_id != -1)) {
@@ -1020,10 +1009,10 @@ namespace COMBAT {
         return hits * 40;
     }
 
-    void __cdecl Get_Non_Player_Name_(int16_t param_1, char* param_2) {
+    void __cdecl Get_Non_Player_Name_(int16_t player_idx, char* out_name) {
         char name_buf[20];
 
-        switch (param_1) {
+        switch (player_idx) {
             case 8:
                 strcpy(name_buf, s_Antaran_00557e54);
                 break;
@@ -1049,7 +1038,7 @@ namespace COMBAT {
                 break;
         }
 
-        strcpy(param_2, name_buf);
+        strcpy(out_name, name_buf);
     }
 
     void __cdecl Build_End_Of_Combat_Message_(char* result_msg, char* stats_msg, int16_t star_idx, int16_t colony_damage_flags, int16_t outcome_type) {
@@ -1280,8 +1269,8 @@ namespace COMBAT {
      * @return 1 if ship2 is larger, -1 if ship1 is larger, 0 if equal.
      */
     int __cdecl qsort_ship_array_by_size_(const void* a, const void* b) {
-        const int16_t* p1 = static_cast<const int16_t*>(a);
-        const int16_t* p2 = static_cast<const int16_t*>(b);
+        const int16_t* p1 = (const int16_t*)a;
+        const int16_t* p2 = (const int16_t*)b;
         int8_t size2 = MOX::_ship[*p2].d.size;
         int8_t size1 = MOX::_ship[*p1].d.size;
 
@@ -1298,7 +1287,7 @@ namespace COMBAT {
 
     int16_t __cdecl Strategic_Bombardment_(int16_t* attacker_ship_indices, int16_t attacker_count, int16_t colony_id) {
         MOX::_cmbt_colony_id = colony_id;
-        MOX::_qcombat_data = (s_qship*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x4075);
+        MOX::_qcombat_data = (s_qship*)allocate::Allocate_First_Block_(MOX::_screen_seg, kQCombatDataSize);
         MOX::_combat_attacker_count = attacker_count;
         MOX::_combat_defender_count = 0;
 
@@ -1372,16 +1361,16 @@ namespace COMBAT {
 
         allocate::Push_Block_(MOX::_screen_seg);
 
-        MOX::_combat_data = static_cast<s_combat_data*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x100C2));
+        MOX::_combat_data = (s_combat_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x100C2);
         struct_::Clear_Structure_(MOX::_combat_data, 0x100C2);
 
-        MOX::_missile = static_cast<s_missile*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1E78));
+        MOX::_missile = (s_missile*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1E78);
         struct_::Clear_Structure_(MOX::_missile, 0x1E78);
 
         MOX::_combat_attacker_player = MOX::_ship[ship_array[0]].owner;
         MOX::_combat_defender_player = MOX::_colony[MOX::_cmbt_colony_id].owner;
 
-        qsort(ship_array, (size_t)ship_count, 2, qsort_ship_array_by_size_);
+        qsort(ship_array, (size_t)ship_count, sizeof(*ship_array), qsort_ship_array_by_size_);
 
         if (ship_count > 0) {
             for (int16_t i = 0; i < ship_count; ++i) {

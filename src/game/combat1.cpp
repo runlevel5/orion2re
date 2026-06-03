@@ -7,9 +7,9 @@ namespace COMBAT1 {
     uint16_t _start_of_turn;
 
     void __cdecl Add_Tactical_Combat_Fields_(void) {
-        short auto_combat_idx = 0;
+        int16_t auto_combat_idx = 0;
         const char* info_hotkey;
-        int info_y_coord;
+        int16_t info_y_coord;
 
         if (MOX::_cur_ship > -1) {
             if (MOX::_combat_data[MOX::_cur_ship].owner != MOX::_combat_attacker_player) {
@@ -86,8 +86,8 @@ namespace COMBAT1 {
             MOX::_grid_button = -100;
             MOX::_self_destruct_button = -100;
 
-            if (MOX::_combat_attacker_player < 8 && MOX::_player[MOX::_combat_attacker_player].objectives == 100 /* 'd' */ &&
-                MOX::_combat_defender_player < 8 && MOX::_player[MOX::_combat_defender_player].objectives == 100 /* 'd' */) {
+            if (MOX::_combat_attacker_player < 8 && MOX::_player[MOX::_combat_attacker_player].objectives == 100 &&
+                MOX::_combat_defender_player < 8 && MOX::_player[MOX::_combat_defender_player].objectives == 100) {
                 MOX::_super_fast_button = -1000;
             } else {
                 MOX::_super_fast_button = fields::Add_Hot_Key_("z");
@@ -125,7 +125,7 @@ namespace COMBAT1 {
 
         MOX::_cmbt_info_button = fields::Add_Button_Field_(298, info_y_coord, "", (s_animation_header*)MOX::_cmbt_info_button_seg, info_hotkey, 40);
 
-        short weapon_y = 389;
+        int16_t weapon_y = 389;
         for (int i = 0; i < 8; ++i) {
             MOX::_weapon_button[i] = fields::Add_Hidden_Field_(120, weapon_y - 10, 255, weapon_y, "", 41);
             weapon_y += 11;
@@ -134,16 +134,16 @@ namespace COMBAT1 {
         MOX::_center_button = fields::Add_Hidden_Field_(15, 379, 100, 460, "c", 41);
     }
 
-    int32_t __cdecl Send_Tactical_Combat_Message_(int16_t player_idx, int16_t p2, int16_t p3, int16_t p4, int16_t p5) {
-        s_net_combat_message combat_msg;
+    int32_t __cdecl Send_Tactical_Combat_Message_(int16_t player_idx, int16_t message_code, int16_t arg1, int16_t arg2, int16_t arg3) {
+        s_net_tactical_combat_message combat_msg;
 
-        combat_msg.x = MOX::_cur_combat_x;
-        combat_msg.y = MOX::_cur_combat_y;
-        combat_msg.f4 = random::Get_Random_Seed_();
-        combat_msg.f8 = p2;
-        combat_msg.f10 = p3;
-        combat_msg.f12 = p4;
-        combat_msg.f14 = p5;
+        combat_msg.viewport_x = MOX::_cur_combat_x;
+        combat_msg.viewport_y = MOX::_cur_combat_y;
+        combat_msg.random_seed = random::Get_Random_Seed_();
+        combat_msg.message_code = message_code;
+        combat_msg.arg1 = arg1;
+        combat_msg.arg2 = arg2;
+        combat_msg.arg3 = arg3;
 
         int16_t net_id = MOX::_player[player_idx].network_player_id;
 
@@ -223,7 +223,7 @@ namespace COMBAT1 {
 
         if (order_idx != num_captured) {
             if (MOX::_combat_init != 0) {
-                qsort(MOX::_ship_turn_order, order_idx, 2, qsort_ship_initiative_);
+                qsort(MOX::_ship_turn_order, order_idx, sizeof(MOX::_ship_turn_order[0]), qsort_ship_initiative_);
             }
             MOX::_ship_turn_order[order_idx++] = -10;
             while (order_idx < 210) {
@@ -316,7 +316,7 @@ namespace COMBAT1 {
                                         MOX::_msl_impact_warning_flag = 1 - MOX::_msl_impact_warning_flag;
                                         MOX::_saved_msl_warning = MOX::_msl_impact_warning_flag;
                                         if (MOX::_net_flag != 0) {
-                                            NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003, &MOX::_msl_impact_warning_flag, 2);
+                                            NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003, &MOX::_msl_impact_warning_flag, sizeof(MOX::_msl_impact_warning_flag));
                                         }
                                         input_val = 0;
                                     }
@@ -358,11 +358,11 @@ namespace COMBAT1 {
                                     if (input_val == MOX::_self_destruct_button) {
                                         char buf[80];
                                         if (MOX::_cur_ship == 0) {
-                                            KEN::Ken_Get_Text_Message_(56, buf, 80);
+                                            KEN::Ken_Get_Text_Message_(56, buf, sizeof(buf));
                                             palette::Refresh_Palette_();
                                             GENDRAW::Message_Box_(buf);
                                         } else {
-                                            KEN::Ken_Get_Text_Message_(57, buf, 80);
+                                            KEN::Ken_Get_Text_Message_(57, buf, sizeof(buf));
                                             palette::Refresh_Palette_();
                                             if (GENDRAW::Do_Confirmation_Box_(buf) != 0) {
                                                 MOX::_order_info_flag = 1 - MOX::_order_info_flag;
@@ -491,7 +491,7 @@ namespace COMBAT1 {
                                             }
                                             if (msg_id != 0) {
                                                 char buf[80];
-                                                KEN::Ken_Get_Text_Message_(msg_id, buf, 80);
+                                                KEN::Ken_Get_Text_Message_(msg_id, buf, sizeof(buf));
                                                 palette::Refresh_Palette_();
                                                 GENDRAW::Message_Box_(buf);
                                                 CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -514,7 +514,7 @@ namespace COMBAT1 {
                                         MOX::_skan_flag = 0;
                                         if (CMBTFIR2::Already_Boarded_(MOX::_cur_ship) != 0) {
                                             char buf[80];
-                                            KEN::Ken_Get_Text_Message_(60, buf, 80);
+                                            KEN::Ken_Get_Text_Message_(60, buf, sizeof(buf));
                                             palette::Refresh_Palette_();
                                             GENDRAW::Message_Box_(buf);
                                             CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -611,7 +611,7 @@ namespace COMBAT1 {
                                                 } else {
                                                     if (CMBTMOV1::Ship_Is_In_Stasis_(tgt_idx) != 0) {
                                                         char buf[80];
-                                                        KEN::Ken_Get_Text_Message_(61, buf, 80);
+                                                        KEN::Ken_Get_Text_Message_(61, buf, sizeof(buf));
                                                         palette::Set_Palette_Gradient_(144, 32, 0, 0, 0, 0, 0, 0);
                                                         palette::Refresh_Palette_();
                                                         if (GENDRAW::Do_Confirmation_Box_(buf) != 0) {
@@ -626,7 +626,7 @@ namespace COMBAT1 {
                                                         CMBTDRW1::Refresh_Combat_Screen_Full_();
                                                     } else if (MOX::_combat_data[tgt_idx].special_status_flag == 4) {
                                                         char buf[80];
-                                                        KEN::Ken_Get_Text_Message_(80, buf, 80);
+                                                        KEN::Ken_Get_Text_Message_(80, buf, sizeof(buf));
                                                         palette::Refresh_Palette_();
                                                         GENDRAW::Message_Box_(buf);
                                                         CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -714,13 +714,13 @@ namespace COMBAT1 {
                                             timer::Release_Time_(1);
                                         } else {
                                             net_processed = 1;
-                                            COMBINIT::Snap_Center_Combat_Screen_(MOX::_new_message.x + 16, MOX::_new_message.y + 9);
-                                            int16_t f10 = MOX::_new_message.f10;
-                                            int16_t f12 = MOX::_new_message.f12;
-                                            int16_t f14 = MOX::_new_message.f14;
-                                            int16_t f8 = MOX::_new_message.f8;
-                                            random::Set_Random_Seed_(MOX::_new_message.f4);
-                                            struct_::Clear_Structure_(&MOX::_new_message, 16);
+                                            COMBINIT::Snap_Center_Combat_Screen_(MOX::_new_message.viewport_x + 16, MOX::_new_message.viewport_y + 9);
+                                            int16_t f10 = MOX::_new_message.arg1;
+                                            int16_t f12 = MOX::_new_message.arg2;
+                                            int16_t f14 = MOX::_new_message.arg3;
+                                            int16_t f8 = MOX::_new_message.message_code;
+                                            random::Set_Random_Seed_(MOX::_new_message.random_seed);
+                                            struct_::Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
 
                                             switch (f8) {
                                                 case 10000:
@@ -938,7 +938,7 @@ namespace COMBAT1 {
                                 }
                             }
                         }
-                        MOX::_combat_data[i].ai_range_tactic = static_cast<int8_t>(CMBTFIR2::Max_Defensive_Fire_Range_(i));
+                        MOX::_combat_data[i].ai_range_tactic = (int8_t)CMBTFIR2::Max_Defensive_Fire_Range_(i);
                     }
                 }
             }
@@ -961,7 +961,7 @@ namespace COMBAT1 {
         if (MOX::_combat_data[ship_idx].ftl_type == 0 || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
             speed = 0;
         } else {
-            int combat_speed = static_cast<uint8_t>(MOX::_combat_data[ship_idx].combat_speed_base);
+            int combat_speed = (uint8_t)MOX::_combat_data[ship_idx].combat_speed_base;
             
             if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_flags, 2) == 1 &&
                 struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_damage_flags, 2) == 0) {
@@ -975,9 +975,9 @@ namespace COMBAT1 {
             if (owner <= 9) {
                 int half_max = max_hits / 2;
                 int range = max_hits - half_max;
-                speed = static_cast<int16_t>(((current_hits - half_max) * combat_speed) / range);
+                speed = (int16_t)(((current_hits - half_max) * combat_speed) / range);
             } else {
-                speed = static_cast<int16_t>((current_hits * combat_speed) / max_hits);
+                speed = (int16_t)((current_hits * combat_speed) / max_hits);
             }
             
             if (speed < 0) {
@@ -1004,7 +1004,7 @@ namespace COMBAT1 {
                 if (MOX::_combat_data[ship_idx].size_class + 1 <= tractor_beams) {
                     speed = 0;
                 } else {
-                    speed += static_cast<int16_t>((speed * tractor_beams) / (-1 - MOX::_combat_data[ship_idx].size_class));
+                    speed += (int16_t)((speed * tractor_beams) / (-1 - MOX::_combat_data[ship_idx].size_class));
                     if (speed < 1) {
                         speed = 1;
                     }
@@ -1160,8 +1160,8 @@ namespace COMBAT1 {
         return winner;
     }
 
-    int16_t __cdecl Next_Ship_(int16_t param_1) {
-        (void)param_1;
+    int16_t __cdecl Next_Ship_(int16_t unused_player_idx) {
+        (void)unused_player_idx;
         int16_t saved_cur_ship = MOX::_cur_ship;
         int16_t saved_cur_ptr = MOX::_cur_ptr;
         int16_t planet_has_defenses = 0;
@@ -1172,7 +1172,7 @@ namespace COMBAT1 {
 
         do {
             MOX::_cur_ptr++;
-            int32_t current_ptr = MOX::_cur_ptr;
+            int16_t current_ptr = MOX::_cur_ptr;
 
             if (MOX::_ship_turn_order[current_ptr] == -10) {
                 if (MOX::_cur_ptr != 0 && MOX::_cur_ptr != 1) {
@@ -1244,7 +1244,7 @@ namespace COMBAT1 {
 
                 if (owner == MOX::_PLAYER_NUM) {
                     MOX::_msl_impact_warning_flag = MOX::_saved_msl_warning;
-                    NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003 /* MSG_TYPE_MISSLE_WARNING */, &MOX::_msl_impact_warning_flag, 2);
+                    NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003 /* MSG_TYPE_MISSLE_WARNING */, &MOX::_msl_impact_warning_flag, sizeof(MOX::_msl_impact_warning_flag));
                 }
                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
             }
@@ -1586,7 +1586,7 @@ namespace COMBAT1 {
         return exists;
     }
 
-    void __cdecl Assign_Combat_Grids_(int16_t param_1) {
+    void __cdecl Assign_Combat_Grids_(int16_t active_ship_idx) {
         s_combat_data* ship;
         int16_t dim;
         int16_t i;
@@ -1605,7 +1605,7 @@ namespace COMBAT1 {
                 if (ship->unit_status == 0) {
                     MOX::_combat_grid[ship->x][ship->y] = ship_idx;
 
-                    if (ship_idx != param_1 || MOX::_skan_flag == 1 || MOX::_board_flag == 1) {
+                    if (ship_idx != active_ship_idx || MOX::_skan_flag == 1 || MOX::_board_flag == 1) {
                         if (ship_idx == 0) {
                             if (MOX::_cmbt_colony_id == -1) {
                                 dim = 6;
@@ -1647,8 +1647,8 @@ namespace COMBAT1 {
             }
         }
 
-        if (MOX::_cur_ship == param_1) {
-            COMBAT1::Set_Legal_Moves_(param_1, MOX::_combat_data[param_1].movement_left, 1);
+        if (MOX::_cur_ship == active_ship_idx) {
+            COMBAT1::Set_Legal_Moves_(active_ship_idx, MOX::_combat_data[active_ship_idx].movement_left, 1);
             COMBAT1::Assign_Mouse_Images_();
         }
     }
@@ -1658,7 +1658,7 @@ namespace COMBAT1 {
         int16_t range = CMBTAI::Range_To_Ship_(attacker_idx, defender_idx);
         int16_t has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* SPEC_TRANSPORTERS */);
         int16_t max_range = (has_transporters == 1) ? 4 : 1;
-        s_combat_data* target = MOX::_combat_data + defender_idx;
+        s_combat_data* target = &MOX::_combat_data[defender_idx];
         char msg_buffer[80];
         int msg_idx = 0;
 
@@ -1674,7 +1674,7 @@ namespace COMBAT1 {
         } else if (range > max_range) {
             can_board = false;
             msg_idx = 0x42; // Out of range
-        } else if (max_range != 4 && COMBAT1::Calc_Current_Speed_(static_cast<int16_t>(defender_idx)) > 0) {
+        } else if (max_range != 4 && COMBAT1::Calc_Current_Speed_((int16_t)defender_idx) > 0) {
             can_board = false;
             msg_idx = 0x43; // Ship moving too fast
         } else if (MOX::_combat_data[MOX::_cur_ship].marine_count == 0) {
@@ -1683,11 +1683,11 @@ namespace COMBAT1 {
         } else {
             if (max_range == 4) {
                 if (range > 1 || MOX::_combat_data[defender_idx].current_speed > 0) {
-                    uint32_t bearing = CMBTDRW1::Relative_Bearing_(static_cast<int16_t>(defender_idx), attacker_idx);
-                    int16_t shield_idx = CMBTFIRE::Facing_Shield_(static_cast<int16_t>(bearing));
+                    uint32_t bearing = CMBTDRW1::Relative_Bearing_((int16_t)defender_idx, attacker_idx);
+                    int16_t shield_idx = CMBTFIRE::Facing_Shield_((int16_t)bearing);
                     if (target->shield_arc_current[shield_idx] > 0) {
                         can_board = false;
-                        KEN::Ken_Get_Text_Message_(0x45, msg_buffer, 0x50);
+                        KEN::Ken_Get_Text_Message_(0x45, msg_buffer, sizeof(msg_buffer));
                         palette::Refresh_Palette_();
                         GENDRAW::Warning_Box_(msg_buffer);
                         CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -1702,7 +1702,7 @@ namespace COMBAT1 {
 
         if (!can_board) {
             if (msg_idx != 0) {
-                KEN::Ken_Get_Text_Message_(static_cast<int16_t>(msg_idx), msg_buffer, 0x50);
+                KEN::Ken_Get_Text_Message_((int16_t)msg_idx, msg_buffer, sizeof(msg_buffer));
                 palette::Refresh_Palette_();
                 GENDRAW::Warning_Box_(msg_buffer);
                 CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -1711,7 +1711,7 @@ namespace COMBAT1 {
             int16_t marines_sent;
             int16_t result = CMBTFIR2::Init_Boarding_Action_(MOX::_cur_ship, &marines_sent);
             if (result != 0) {
-                MOX::_combat_data[MOX::_cur_ship].marine_count -= static_cast<int8_t>(marines_sent);
+                MOX::_combat_data[MOX::_cur_ship].marine_count -= (int8_t)marines_sent;
 
                 if (max_range == 4 && (range != 1 || MOX::_combat_data[defender_idx].current_speed > 0)) {
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, 7 /* SPEC_DISPLACEMENT_DEVICE */) != 0) {
@@ -1746,7 +1746,7 @@ namespace COMBAT1 {
                     }
                     CMBTFIR2::Set_Boarded_Flag_(MOX::_cur_ship);
                     CMBTFIR2::Resolve_Raid_(MOX::_cur_ship, defender_idx, &marines_sent);
-                    MOX::_combat_data[MOX::_cur_ship].marine_count += static_cast<int8_t>(marines_sent);
+                    MOX::_combat_data[MOX::_cur_ship].marine_count += (int8_t)marines_sent;
                 } else if (result == 2) { // Capture
                     if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 1) {
                         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
@@ -2179,7 +2179,6 @@ namespace COMBAT1 {
 
         MOX::_help_entry_list[entry_idx].x1 = 0x72;
         MOX::_help_entry_list[entry_idx].y1 = 0x1c8;
-        // Code that apparently does nothing (flags ignored)
         (void)(MOX::_ship_status_display == 0);
         MOX::_help_entry_list[entry_idx].x2 = 0x108;
         MOX::_help_entry_list[entry_idx].y2 = 0x1d3;

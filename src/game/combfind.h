@@ -57,7 +57,14 @@ namespace COMBFIND {
         int16_t* best_colony_idx,
         int32_t preferred_owner);
 
-    void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *player_target_ptr, int16_t *colony_target_ptr);
+    /**
+     * Chooses a non-player combat target at a star.
+     * @param star_idx Star containing the pending combat.
+     * @param attacker_idx Non-player attacker identifier.
+     * @param target_player_idx_out Receives the chosen ship-only defender, or -1.
+     * @param target_colony_idx_out Receives the chosen colony target, or -1.
+     */
+    void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out);
 
     void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx);
 
@@ -73,7 +80,13 @@ namespace COMBFIND {
 
     void __cdecl Kill_Noncombat_Ships_(int16_t* ship_indices, int16_t count);
 
-    void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t retreat_type);
+    /**
+     * Marks a defeated fleet to retreat or be destroyed when no colony can shelter it.
+     * @param star_idx Star where combat ended.
+     * @param player_idx Owner of the retreating fleet.
+     * @param colony_idx Colony that can still anchor the fleet, or -1.
+     */
+    void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t colony_idx);
 
     void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx);
 
@@ -89,7 +102,16 @@ namespace COMBFIND {
 
     int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx);
 
-    short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short planet_idx, s_battle_results *result, int8_t is_sneak_attack);
+    /**
+     * Resolves one combat at a star and optionally fills a battle-results record.
+     * @param star_idx Star where combat occurs.
+     * @param attacker_idx Attacking player or monster.
+     * @param defender_idx Defending player or monster, or -1 to derive from the colony.
+     * @param planet_idx Defending planet, or -1 for ship-only combat.
+     * @param result Receives battle results when non-null.
+     * @param is_sneak_attack Nonzero when sneak-attack handling applies.
+     */
+    int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t attacker_idx, int16_t defender_idx, int16_t planet_idx, s_battle_results* result, int8_t is_sneak_attack);
 
     int8_t __cdecl AI_Can_Retreat_(int8_t player_idx, int16_t excluded_colony_idx);
 
@@ -119,7 +141,8 @@ namespace COMBFIND {
 
     void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx);
 
-    void __cdecl Do_Net_Combat_Update_(bool unused_message_sent);
+    /** Advances multiplayer combat synchronization state. */
+    void __cdecl Do_Net_Combat_Update_(bool unused);
 
     void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx);
 }

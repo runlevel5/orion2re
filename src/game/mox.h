@@ -552,7 +552,7 @@ namespace MOX {
     extern s_combat_data* _combat_data;
     extern s_missile* _missile;
     extern int16_t _missile_hit_radius[6];
-    extern s_net_combat_message _new_message;
+    extern s_net_tactical_combat_message _new_message;
     extern int16_t _gate_icon_field[4];
     extern int16_t _system_display_base_x;
     extern int16_t _system_display_base_y;

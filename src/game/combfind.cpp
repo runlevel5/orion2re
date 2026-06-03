@@ -422,7 +422,7 @@ void __cdecl Client_Combat_Loop_() {
             local_battle_results_1.planet_id = NETMOX::_net.combat_planet_id;
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_1, 0);
             local_battle_results_1.combat_result = (int8_t)result;
-            NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x18, &local_battle_results_1, 0x6CE);
+            NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x18, &local_battle_results_1, sizeof(local_battle_results_1));
             while (NETMOX::_net.sync_state != 14) {
                 RUSS::Mox_Update_();
             }
@@ -464,7 +464,7 @@ void __cdecl Client_Combat_Loop_() {
             local_battle_results_2.combat_result = (int8_t)result;
             MULTPLAY::Load_Net_Next_Turn_Screen_(1);
             if (NETMOX::_net.combat_target_player_id < 8 && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {
-                NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x16, &local_battle_results_2, 0x6CE);
+                NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x16, &local_battle_results_2, sizeof(local_battle_results_2));
             }
             NETMOX::_net.sync_state = 14;
             NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_2.combat_result);
@@ -569,14 +569,10 @@ int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx)
 }
 
 /**
- * @brief Selects a random attacker from the pool of players/entities that need to attack at a specific star.
- * 
- * The function checks bits 8-14 of the flags first (special attackers/factions). 
- * If any of those are set, it picks one randomly and ignores player bits (0-7).
- * Otherwise, it picks randomly from players 0 to _NUM_PLAYERS-1 whose bits are set.
- * 
- * @param star_idx The index of the star system.
- * @return The index of the selected attacker, or -1 if none found.
+ * Builds the current ship and colony target lists for one attacker at a star.
+ *
+ * @param star_idx Star containing potential combat targets.
+ * @param player_idx Attacker whose legal targets are being collected.
  */
 void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t player_idx) {
     _target.num_colony_targets = 0;
@@ -643,10 +639,10 @@ int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
                 }
             }
         }
-        return static_cast<int16_t>(attacker_idx);
+        return (int16_t)attacker_idx;
     } else {
         // Check for players (bits 0-7)
-        for (int32_t i = 0; i < static_cast<int32_t>(MOX::_NUM_PLAYERS); ++i) {
+        for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
             if ((needs_attack >> i) & 1) {
                 count++;
                 if (random::Random_(count) == 1) {
@@ -654,7 +650,7 @@ int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
                 }
             }
         }
-        return static_cast<int16_t>(attacker_idx);
+        return (int16_t)attacker_idx;
     }
 }
 
@@ -725,18 +721,16 @@ bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet) {
 }
 
 /**
- * @brief Translates a planet index to its corresponding colony index.
- * 
- * @param planet_idx The index of the planet in the global planet array.
- * @return The colony index associated with the planet, or -1 if the planet index is invalid or no colony exists.
+ * Returns the colony index occupying a planet, or -1 when none exists.
+ *
+ * @param planet_idx Planet index in the global planet array.
+ * @return Colony index for that planet, or -1.
  */
 int16_t __cdecl Target_Planet_To_Colony_(int32_t planet_idx) {
     if (planet_idx == -1) {
         return -1;
     }
 
-    // Each s_planet_data structure is 17 (0x11) bytes.
-    // The assembly calculates the offset as (planet_idx * 16) + planet_idx.
     return MOX::_planet[planet_idx].colony_index;
 }
 
@@ -767,7 +761,7 @@ s_colony* __cdecl Free_Colony_Slot_() {
 
 void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 {
-    int star_idx;
+    int16_t star_idx;
     int eligible_player_count;
     uint8_t player_present[8];
     int16_t player_idx;
@@ -778,12 +772,12 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
     int total_valid_techs;
     s_MSG msg;
 
-    star_idx = (int)(star - MOX::_star);
+    star_idx = (int16_t)(star - MOX::_star);
     Reset_One_Shot_System_Special_(star);
 
     if (star->system_special != 0 && (*_star_has_nonplayer)[star_idx] == 0) {
         eligible_player_count = 0;
-        memset(player_present, 0, 8);
+        memset(player_present, 0, sizeof(player_present));
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if ((*_star_has_player)[star_idx][i].has_player != 0) {
@@ -819,8 +813,8 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                     colony->n_pops = 3;
                 }
 
-                memset(colony->buildings, 0, 49);
-                memset(colony->pop, 0, 168 /* 42 * 4 */);
+                memset(colony->buildings, 0, sizeof(colony->buildings));
+                memset(colony->pop, 0, sizeof(colony->pop));
 
                 for (int i = 0; i < colony->n_pops; ++i) {
                     uint32_t pop_val = colony->pop[i];
@@ -916,7 +910,12 @@ void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
 }
 
 /**
- * @address 004bd640
+ * Prompts a local human player to choose a combat target at a star.
+ *
+ * @param star_idx Star containing the pending combat.
+ * @param player_idx Human attacker.
+ * @param target_player_idx_out Receives the chosen ship-only defender, or -1.
+ * @param target_colony_idx_out Receives the chosen colony target, or -1.
  */
 void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out) {
     *target_colony_idx_out = -1;
@@ -971,7 +970,13 @@ void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16
 }
 
 /**
- * @address 004bd580
+ * Selects the best AI combat target available at a star.
+ *
+ * @param star_idx Star containing the pending combat.
+ * @param player_idx AI attacker.
+ * @param target_player Receives the chosen ship-only defender, or -1.
+ * @param target_colony Receives the chosen colony target, or -1.
+ * @param is_sneak_attack Receives nonzero when the selected attack is a sneak attack.
  */
 void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player, int16_t* target_colony, int8_t* is_sneak_attack) {
     *is_sneak_attack = 0;
@@ -1112,22 +1117,30 @@ void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_a_idx, int 
     }
 }
 
-void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *player_target_ptr, int16_t *colony_target_ptr) {
+/**
+ * Chooses a non-player combat target at a star.
+ *
+ * @param star_idx Star containing the pending combat.
+ * @param attacker_idx Non-player attacker identifier.
+ * @param target_player_idx_out Receives the chosen ship-only defender, or -1.
+ * @param target_colony_idx_out Receives the chosen colony target, or -1.
+ */
+void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out) {
     int lucky_count;
     int non_lucky_count;
     int lucky_target;
     int non_lucky_target;
     int i;
 
-    *colony_target_ptr = -1;
-    *player_target_ptr = -1;
+    *target_colony_idx_out = -1;
+    *target_player_idx_out = -1;
 
-    if (event_type == 13 /* EVENT_TYPE_13 */) {
+    if (attacker_idx == 13 /* EVENT_TYPE_13 */) {
         return;
     }
 
     if (MOX::_NUM_STARS == star_idx) {
-        *player_target_ptr = 8;
+        *target_player_idx_out = 8;
         return;
     }
 
@@ -1156,10 +1169,10 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *play
         }
 
         if (non_lucky_target != -1) {
-            *colony_target_ptr = (int16_t)non_lucky_target;
+            *target_colony_idx_out = (int16_t)non_lucky_target;
         }
         else {
-            *colony_target_ptr = (int16_t)lucky_target;
+            *target_colony_idx_out = (int16_t)lucky_target;
         }
         return;
     }
@@ -1189,16 +1202,19 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *play
         }
 
         if (non_lucky_target != -1) {
-            *player_target_ptr = (int16_t)non_lucky_target;
+            *target_player_idx_out = (int16_t)non_lucky_target;
         }
         else {
-            *player_target_ptr = (int16_t)lucky_target;
+            *target_player_idx_out = (int16_t)lucky_target;
         }
     }
 }
 
 /**
- * @address 004bc0d0
+ * Assigns COMBFIND string pointers from a packed strings block.
+ *
+ * @param strings_block Start of the packed strings block.
+ * @return Pointer to the first byte after the strings consumed by this unit.
  */
 char* __cdecl Load_Combfind_Strings_(char* strings_block) {
     char* current = strings_block;
@@ -1237,7 +1253,11 @@ char* __cdecl Load_Combfind_Strings_(char* strings_block) {
 }
 
 /**
- * @address 004bd750
+ * Asks a human player to confirm an attack that may break diplomatic agreements.
+ *
+ * @param player_idx Attacking player.
+ * @param target_idx Proposed target player.
+ * @return Nonzero when the attack is confirmed.
  */
 int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
     char message_buffer[400];
@@ -1291,8 +1311,9 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
 }
 
 /**
- * Determines if a specific player is allowed to initiate an attack on another player 
- * based on their current relationship status, treaties, and personality.
+ * Copies the current target-selection state from another target record.
+ *
+ * @param src Source target-selection state.
  */
 void __cdecl Copy_Target_Info_(s_combfind_target* src) {
     _target = *src;
@@ -1388,8 +1409,8 @@ void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
         dest = (*_star_has_player)[star_idx];
     }
 
-    memcpy(dest, *buffer, 88);
-    *buffer += 88;
+    memcpy(dest, *buffer, 8 * sizeof(*dest));
+    *buffer += 8 * sizeof(*dest);
 
     if (star_idx == -1) {
         *_current_star_has_nonplayer = **buffer;
@@ -1422,7 +1443,7 @@ void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_id
     }
 }
 
-short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short planet_idx, s_battle_results *result, int8_t is_sneak_attack) {
+int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_idx, int16_t planet_idx, s_battle_results* result, int8_t is_sneak_attack) {
     short colony_idx;
     int16_t plr1_ship_offset;
     int16_t plr2_ship_offset;
@@ -1444,7 +1465,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
 
     if (result == nullptr) {
         result = &local_results;
-        memset(result, 0, 1742);
+        memset(result, 0, sizeof(*result));
     }
 
     if (MOX::_game_type < 2 || MOX::_game_type > 3) {
@@ -1537,7 +1558,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
 
         if (star_idx == MOX::_NUM_STARS) { // Antares victory
             MOX::_player[plr2_idx].captured_antares = 1;
-            memset(*_player_needs_to_attack, 0, 144);
+            memset(*_player_needs_to_attack, 0, sizeof(*_player_needs_to_attack));
         } else {
             Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
             if (plr2_ship_count == 0) {
@@ -1553,7 +1574,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
         }
     }
 
-    return (short)result->combat_result;
+    return (int16_t)result->combat_result;
 }
 
 int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* results)
@@ -1696,11 +1717,11 @@ void __cdecl Kill_Noncombat_Ships_(int16_t* ship_indices, int16_t count) {
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
-void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t retreat_type) {
+void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t colony_idx) {
     int32_t p_idx = (int32_t)player_idx;
     bool should_retreat_or_die = false;
 
-    if (retreat_type != -1 || COMBFIND::_current_star_has_player[p_idx].colony_count == 0) {
+    if (colony_idx != -1 || COMBFIND::_current_star_has_player[p_idx].colony_count == 0) {
         if (COMBFIND::_current_star_has_player[p_idx].colony_count < 2) {
             should_retreat_or_die = true;
         }
@@ -1904,7 +1925,7 @@ void __cdecl Get_Best_Colony_Target_(
             }
 
             if (is_valid) {
-                uint32_t worth = static_cast<uint32_t>(AIMOVE::Enemy_Colony_Worth_To_Player_(colony_idx, player_idx));
+                uint32_t worth = (uint32_t)AIMOVE::Enemy_Colony_Worth_To_Player_(colony_idx, player_idx);
 
                 if (enemy_space_str * 3 < our_space_str) {
                     our_space_str = 3;
@@ -1951,7 +1972,7 @@ void __cdecl Get_Best_Colony_Target_(
 
     if (preferred_owner != -1 && best_pref_colony != -1) {
         *best_score = best_pref_score;
-        *best_colony_idx = static_cast<int16_t>(best_pref_colony);
+        *best_colony_idx = (int16_t)best_pref_colony;
     }
 }
 
@@ -2236,7 +2257,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                     MOX::_planet[planet_idx].food_per_farmer = 0;
                     COLCALC::Colony_Environmental_Stuff_(colony);
                     invasion::Enforce_Population_Limits_At_Colony_(colony);
-                    COLCALC::Colony_Calculation_((int16_t)(((int)colony - (int)MOX::_colony) / sizeof(s_colony)));
+                    COLCALC::Colony_Calculation_((int16_t)(colony - MOX::_colony));
                 }
             }
             COLBOMB::Colony_Bombing_Screen_(&results->bomb);
@@ -2382,8 +2403,8 @@ int8_t __cdecl Player_Owns_Transports_(int player_idx) {
     return 0;
 }
 
-void __cdecl Do_Net_Combat_Update_(bool unused_message_sent) {
-    (void)unused_message_sent;
+void __cdecl Do_Net_Combat_Update_(bool unused) {
+    (void)unused;
     RUSS::Mox_Update_();
 
     if (_in_net_update != 0) {
@@ -2657,7 +2678,7 @@ void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
     memset(&local_6d0, 0, sizeof(s_battle_results));
 
     // The first 12 bytes of s_battle_results map exactly to the 12 bytes of s_net_player_info.
-    memcpy(&local_6d0, &NETMOX::_net.player_net_info[player_idx], 12);
+    memcpy(&local_6d0, &NETMOX::_net.player_net_info[player_idx], sizeof(NETMOX::_net.player_net_info[player_idx]));
 
     local_6d0.planet_id = local_6d0.combat_planet_id;
 
@@ -2692,8 +2713,8 @@ void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx) {
         src = (*_star_has_player)[star_idx];
     }
 
-    memcpy(*stream, src, 88); /* 8 * sizeof(s_combfind_star_has_player) */
-    uint8_t *ptr = *stream + 88;
+    memcpy(*stream, src, 8 * sizeof(*src));
+    uint8_t *ptr = *stream + 8 * sizeof(*src);
     *stream = ptr;
 
     if (star_idx != -1) {

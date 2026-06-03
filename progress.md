@@ -1,25 +1,14 @@
 # Source Cleanup Progress
 
-## Current focus
-- next: src/game/colsum.{h,cpp}
-
-## In progress
-
-
-## Pending
-- [pending] src/game/colsum.{h,cpp}
-- [pending] src/game/colsysdi.{h,cpp}
-- [pending] src/game/colxport.{h,cpp}
-- [pending] src/game/combat.{h,cpp}
-- [pending] src/game/combat1.{h,cpp}
-- [pending] src/game/combfind.{h,cpp}
-- [pending] src/game/combinit.{h,cpp}
-- [pending] src/game/comcore.{h,cpp}
-- [pending] src/game/consts.h
-- [pending] src/game/contact.{h,cpp}
-- [pending] src/game/council.{h,cpp}
-- [pending] src/game/deps.h
-- [pending] src/game/desbox.{h,cpp}
+- [X] src/game/combat.{h,cpp}
+- [X] src/game/combat1.{h,cpp}
+- [X] src/game/combfind.{h,cpp}
+- [X] src/game/combinit.{h,cpp}
+- [X] src/game/comcore.{h,cpp}
+- [X] src/game/consts.h
+- [X] src/game/contact.{h,cpp}
+- [X] src/game/council.{h,cpp}
+- [X] src/game/desbox.{h,cpp}
 - [pending] src/game/design.{h,cpp}
 - [pending] src/game/design_main.cpp
 - [pending] src/game/dip_scrn.{h,cpp}
@@ -160,6 +149,9 @@
 - [pending] src/game/winnet.{h,cpp}
 
 ## Reviewed
+- [reviewed] src/game/colsysdi.{h,cpp} - applied concise system-display docstrings, clearer parameter/local names for the summary and last-scanned helpers, and fixed-width cleanup for the remaining plain `int`/`short` locals plus the climate byte handling; `s_animation_header*` overlays on `Buffer_Reload_` blocks still rely on recovered asset-layout/alignment assumptions.
+- [reviewed] src/game/colsum.{h,cpp} - suggest concise header docstrings for the colony-summary screen helpers, conservative parameter renames for lingering `param_*`/`a1`-style signatures, removal of redundant raw-address/decompiler comments, replacement of the remaining `short`/plain `int` locals and C++-style casts with explicit-width integers and C-style casts, direct `star.name` access instead of `reinterpret_cast<const char*>(&star)`, and a bounds check around the `_first + 10` colony-list probe; repeated `s_animation_header*` overlays on `Far_Reload_Next_` buffers still rely on recovered asset-layout/alignment assumptions.
+- [reviewed] src/game/colxport.{h,cpp} - suggest concise header docstrings for the transport-popup helpers, replacing the remaining `short`/plain `int` signatures and temporaries with explicit-width integers, removing the raw-address and redundant assembly-explainer comments, and converting the remaining `static_cast` uses to equivalent C-style casts; the `s_animation_header*` overlays on `Buffer_Reload_`/`Far_Reload_Next_` buffers still rely on recovered asset-layout/alignment assumptions.
 - [reviewed] src/game/colony.{h,cpp} - applied concise header docstrings for the colony-screen state/navigation helpers, clearer parameter names for lingering `param_*`/`v1`/`v2` helpers, fixed-width cleanup for the remaining `short`/plain `int` public helper signatures and loop/return values, the safe `Remove_Satellite_From_Array_` shift fix, and the follow-up `Draw_Sys_Disp_Scanned_` cleanup to pass `star->name` directly instead of relying on the struct-base `reinterpret_cast<char*>(star)` shortcut; repeated `s_animation_header*` overlays on raw reload buffers still rely on recovered asset-layout/alignment assumptions.
 - [reviewed] src/game/colony_main.cpp - applied companion docstrings/parameter cleanup for the colony-screen draw/load helpers and guarded the current `MOX::_colony[_colony_handle]` owner read behind the existing validity check; the building/satellite animation cache still overlays typed animation headers onto raw farload/buffer blocks.
 - [reviewed] src/game/colonize.{h,cpp} - applied concise colonization helper docstrings, consistent `player_idx` naming plus a clearer Orion-pop scratch local, fixed-width cleanup for the colony-creation helper signature and nearby loop counters, removal of the speculative `Marine Barracks?` and `ECON_TRADE_GOODS?` comments, a bounded `MAX_COLONIES` slot scan instead of the prior unbounded `MOX::_colony` pointer walk, and removal of the unused player parameter from the outpostable-planet helper.

@@ -630,7 +630,7 @@ namespace MOX {
     s_combat_data* _combat_data;
     s_missile* _missile;
     int16_t _missile_hit_radius[6] = {12, 20, 26, 28, 30, 30};
-    s_net_combat_message _new_message;
+    s_net_tactical_combat_message _new_message;
 
     int16_t _gate_icon_field[4];
     int16_t _system_display_base_x;

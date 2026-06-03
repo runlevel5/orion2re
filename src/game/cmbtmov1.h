@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-struct s_net_combat_message;
+struct s_net_tactical_combat_message;
 
 namespace CMBTMOV1 {
     /**
@@ -112,5 +112,5 @@ namespace CMBTMOV1 {
      * @param message_size Size of the packet payload in bytes.
      * @param message Decoded tactical-combat packet payload.
      */
-    void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t message_id, int32_t message_size, s_net_combat_message* message);
+    void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t message_id, int32_t message_size, s_net_tactical_combat_message* message);
 }

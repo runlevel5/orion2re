@@ -4,6 +4,10 @@ namespace {
     constexpr int kPlayerRemapPaletteStart = 144;
     constexpr int kTractorBeamRemapPaletteStart = 80;
     constexpr int kPlasmaWebRemapPaletteStart = 176;
+    constexpr int kMaxCombatShips = 210;
+    constexpr int kMaxCombatMissiles = 300;
+    constexpr size_t kCombatDataBytes = sizeof(s_combat_data) * kMaxCombatShips;
+    constexpr size_t kCombatMissileBytes = sizeof(s_missile) * kMaxCombatMissiles;
 }
 
 namespace COMBINIT {
@@ -147,9 +151,10 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         }
     }
 
-    int32_t var_C = (2 * MOX::_global_combat_data.drive_hp_max) / -3;
+    int32_t drive_speed_adjustment = (2 * MOX::_global_combat_data.drive_hp_max) / -3;
     MOX::_global_combat_data.tactical_speed =
-        ((MOX::_global_combat_data.drive_effectiveness_pct + var_C) * MOX::_global_combat_data.tactical_speed) / (var_C + MOX::_global_combat_data.drive_hp_max);
+        ((MOX::_global_combat_data.drive_effectiveness_pct + drive_speed_adjustment) * MOX::_global_combat_data.tactical_speed) /
+        (drive_speed_adjustment + MOX::_global_combat_data.drive_hp_max);
 
     if (MOX::_global_combat_data.tactical_speed < 0) {
         MOX::_global_combat_data.tactical_speed = 0;
@@ -195,17 +200,17 @@ int8_t __cdecl Colony_Has_Defenses_(int16_t colony_idx) {
 }
 
 int __cdecl qsort_ship_array_by_size_(const void* p1, const void* p2) {
-    const int16_t* param_1 = (const int16_t*)p1;
-    const int16_t* param_2 = (const int16_t*)p2;
+    const int16_t* ship_idx_a = (const int16_t*)p1;
+    const int16_t* ship_idx_b = (const int16_t*)p2;
 
-    char size_2 = MOX::_ship[*param_2].d.size;
-    char size_1 = MOX::_ship[*param_1].d.size;
+    int8_t size_b = MOX::_ship[*ship_idx_b].d.size;
+    int8_t size_a = MOX::_ship[*ship_idx_a].d.size;
 
-    if (size_2 == size_1) {
+    if (size_b == size_a) {
         return 0;
     }
 
-    if (size_2 > size_1) {
+    if (size_b > size_a) {
         return 1;
     }
 
@@ -213,8 +218,8 @@ int __cdecl qsort_ship_array_by_size_(const void* p1, const void* p2) {
 }
 
 int __cdecl qsort_combat_data_by_size_(const void* a, const void* b) {
-    const s_combat_data* data_a = static_cast<const s_combat_data*>(a);
-    const s_combat_data* data_b = static_cast<const s_combat_data*>(b);
+    const s_combat_data* data_a = (const s_combat_data*)a;
+    const s_combat_data* data_b = (const s_combat_data*)b;
 
     if (data_b->size_class == data_a->size_class) {
         return 0;
@@ -508,8 +513,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_combat_total_ship_count = 1;
     MOX::_cmbt_colony_id = colony_idx;
 
-    MOX::_combat_data = reinterpret_cast<s_combat_data*>(allocate::Allocate_First_Block_(MOX::_screen_seg, 0x100C2));
-    struct_::Clear_Structure_(MOX::_combat_data, 0x100C2);
+    MOX::_combat_data = (s_combat_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, kCombatDataBytes);
+    struct_::Clear_Structure_(MOX::_combat_data, kCombatDataBytes);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
 
@@ -530,7 +535,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::_in_nebula_flag = GEO::Point_Is_In_Some_Nebula_(MOX::_star[star_idx].x, MOX::_star[star_idx].y) ? 1 : 0;
     }
 
-    qsort(plr1_ships, plr1_ship_count, 2, qsort_ship_array_by_size_);
+    qsort(plr1_ships, plr1_ship_count, sizeof(*plr1_ships), qsort_ship_array_by_size_);
 
     int16_t loaded_ships_1 = 0;
     for (int16_t i = 0; i < plr1_ship_count; ++i) {
@@ -623,48 +628,48 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         fonts::Load_Palette_(3, 0, 0xFF);
         ERIC::Set_Fade_Percent_(0);
 
-        MOX::_missile = reinterpret_cast<s_missile*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 7800));
-        struct_::Clear_Structure_(MOX::_missile, 7800);
+        MOX::_missile = (s_missile*)allocate::Allocate_Next_Block_(MOX::_screen_seg, kCombatMissileBytes);
+        struct_::Clear_Structure_(MOX::_missile, kCombatMissileBytes);
         RUSS::Mox_Update_();
 
-        MOX::_level_symbol_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x2A, MOX::_screen_seg);
+        MOX::_level_symbol_seg = farload::Far_Reload_Next_("combat.lbx", 0x2A, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_scan_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 1, MOX::_screen_seg);
+        MOX::_scan_button_seg = farload::Far_Reload_Next_("combat.lbx", 1, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_board_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x33, MOX::_screen_seg);
+        MOX::_board_button_seg = farload::Far_Reload_Next_("combat.lbx", 0x33, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_auto_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x32, MOX::_screen_seg);
+        MOX::_auto_button_seg = farload::Far_Reload_Next_("combat.lbx", 0x32, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_flee_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x35, MOX::_screen_seg);
+        MOX::_flee_button_seg = farload::Far_Reload_Next_("combat.lbx", 0x35, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_cmbt_done_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x36, MOX::_screen_seg);
+        MOX::_cmbt_done_button_seg = farload::Far_Reload_Next_("combat.lbx", 0x36, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_wait_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x34, MOX::_screen_seg);
+        MOX::_wait_button_seg = farload::Far_Reload_Next_("combat.lbx", 0x34, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_cmbt_info_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 10, MOX::_screen_seg);
+        MOX::_cmbt_info_button_seg = farload::Far_Reload_Next_("combat.lbx", 10, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_cmbt_option_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 2, MOX::_screen_seg);
+        MOX::_cmbt_option_seg = farload::Far_Reload_Next_("combat.lbx", 2, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_self_destruct_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 3, MOX::_screen_seg);
+        MOX::_self_destruct_seg = farload::Far_Reload_Next_("combat.lbx", 3, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_weapons_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 7, MOX::_screen_seg);
+        MOX::_weapons_button_seg = farload::Far_Reload_Next_("combat.lbx", 7, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
         for (int16_t i = 0; i < 0x70; ++i) {
-            MOX::_msl_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtmisl_lbx_00551234, i, MOX::_screen_seg);
+            MOX::_msl_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("cmbtmisl.lbx", i, MOX::_screen_seg);
             RUSS::Mox_Update_();
         }
 
-        MOX::_combat_mouse_grid = reinterpret_cast<s_mouse_list*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2928));
-        MOX::_specials_button_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 8, MOX::_screen_seg);
-        MOX::_msl_warning_on_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 4, MOX::_screen_seg);
+        MOX::_combat_mouse_grid = (s_mouse_list*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2928);
+        MOX::_specials_button_seg = farload::Far_Reload_Next_("combat.lbx", 8, MOX::_screen_seg);
+        MOX::_msl_warning_on_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 4, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_warning_missile_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x25, MOX::_screen_seg);
-        MOX::_warning_fighter_seg = farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x26, MOX::_screen_seg);
+        MOX::_warning_missile_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0x25, MOX::_screen_seg);
+        MOX::_warning_fighter_seg = farload::Far_Reload_Next_("combat.lbx", 0x26, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
         for (int16_t i = 0; i < 3; ++i) {
-            MOX::_ship_cursor[i] = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, i + 0x20, MOX::_screen_seg);
+            MOX::_ship_cursor[i] = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", i + 0x20, MOX::_screen_seg);
             RUSS::Mox_Update_();
         }
 
@@ -673,16 +678,16 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::_combat_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(0x62, 0x62));
         RUSS::Mox_Update_();
 
-        MOX::_shield_div_bitmap[0] = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xE, MOX::_screen_seg);
-        MOX::_shield_div_bitmap[1] = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xF, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[0] = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0xE, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[1] = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0xF, MOX::_screen_seg);
         RUSS::Mox_Update_();
-        MOX::_shield_div_bitmap[2] = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xC, MOX::_screen_seg);
-        MOX::_shield_div_bitmap[3] = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xD, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[2] = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0xC, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[3] = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0xD, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
         for (int16_t i = 0; i < 4; ++i) {
             for (int16_t j = 0; j < 4; ++j) {
-                MOX::_shield_mask_bitmap[j + i * 4] = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, j + i * 4 + 0x10, MOX::_screen_seg);
+                MOX::_shield_mask_bitmap[j + i * 4] = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", j + i * 4 + 0x10, MOX::_screen_seg);
             }
             RUSS::Mox_Update_();
         }
@@ -747,7 +752,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             Load_Antaran_Defense_Fleet_();
             Load_Antaran_Planet_();
         } else {
-            qsort(plr2_ships, plr2_ship_count, 2, qsort_ship_array_by_size_);
+            qsort(plr2_ships, plr2_ship_count, sizeof(*plr2_ships), qsort_ship_array_by_size_);
             int16_t loaded_ships_2 = 0;
             for (int16_t i = 0; i < plr2_ship_count; ++i) {
                 if (MOX::_ship[plr2_ships[i]].d.ship_type == 0 && loaded_ships_2 < 100) {
@@ -803,7 +808,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
 
         if (has_cloaking != 0) {
-            MOX::_darken_plasma_map = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x31, MOX::_screen_seg);
+            MOX::_darken_plasma_map = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0x31, MOX::_screen_seg);
             RUSS::Mox_Update_();
             CMBTDRW1::Create_Ship_Darken_Map_();
         }
@@ -826,7 +831,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
 
         MOX::_pulsar_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
-        s_animation_header* pulsar_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x34, MOX::_global_cache_seg));
+        s_animation_header* pulsar_pal = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 0x34, MOX::_global_cache_seg);
         animate::Draw_Palette_(pulsar_pal);
         RUSS::Mox_Update_();
         int16_t pulsar_c = 53;
@@ -845,7 +850,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         palette::Save_Glass_Remap_Block_(MOX::_pulsar_remap_colors);
 
         MOX::_warp_core_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
-        s_animation_header* warp_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_sphersfx_lbx_00551218, 0, MOX::_global_cache_seg));
+        s_animation_header* warp_pal = (s_animation_header*)buffer::Buffer_Reload_("sphersfx.lbx", 0, MOX::_global_cache_seg);
         RUSS::Mox_Update_();
         animate::Draw_Palette_(warp_pal);
         int16_t warp_c = 53;
@@ -865,7 +870,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
 
         if (has_tractor_beam != 0) {
-            MOX::_small_tractor_seg = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtsfx_lbx_00551228, 2, MOX::_screen_seg);
+            MOX::_small_tractor_seg = (s_animation_header*)farload::Far_Reload_Next_("cmbtsfx.lbx", 2, MOX::_screen_seg);
             RUSS::Mox_Update_();
             MOX::_tractor_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
             int16_t tractor_c = 23;
@@ -889,7 +894,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
         if (has_bhg != 0) {
             MOX::_bhg_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
-            s_animation_header* bhg_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x2E, MOX::_global_cache_seg));
+            s_animation_header* bhg_pal = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 0x2E, MOX::_global_cache_seg);
             animate::Draw_Palette_(bhg_pal);
             for (int16_t i = 1; i < 16; ++i) {
                 palette::Set_Glass_Remap_Color_(
@@ -929,7 +934,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         if (has_stellar_converter != 0) {
             MOX::_stellar_converter_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
             RUSS::Mox_Update_();
-            s_animation_header* stellar_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x28, MOX::_global_cache_seg));
+            s_animation_header* stellar_pal = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 0x28, MOX::_global_cache_seg);
             animate::Draw_Palette_(stellar_pal);
             int16_t stellar_c = 53;
             for (int16_t i = 1; i < 16; ++i) {
@@ -1102,11 +1107,11 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
     MAINSCR::Allocate_First_Screen_Seg_(5);
 
-    MOX::_settings.combat_shields_arc_flag = static_cast<char>(MOX::_shields_flag);
-    MOX::_settings.combat_speedx2_flag = static_cast<char>(MOX::_speedx2_flag);
-    MOX::_settings.combat_missile_impact_flag = static_cast<char>(MOX::_msl_impact_warning_flag);
-    MOX::_settings.combat_legal_moves_flag = static_cast<char>(MOX::_draw_legal_boxes_flag);
-    MOX::_settings.combat_grid_flag = static_cast<char>(MOX::_grid_flag);
+    MOX::_settings.combat_shields_arc_flag = (char)MOX::_shields_flag;
+    MOX::_settings.combat_speedx2_flag = (char)MOX::_speedx2_flag;
+    MOX::_settings.combat_missile_impact_flag = (char)MOX::_msl_impact_warning_flag;
+    MOX::_settings.combat_legal_moves_flag = (char)MOX::_draw_legal_boxes_flag;
+    MOX::_settings.combat_grid_flag = (char)MOX::_grid_flag;
 
     if (combat_winner == 0x29A) {
         combat_winner = 0;
@@ -1176,11 +1181,11 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 
     int32_t fortress_size_scaled = (int32_t)TECHDATA::_hull_data[8].size * 5;
     fortress_size_scaled = (fortress_size_scaled + ((fortress_size_scaled >> 31) & 3)) >> 2;
-    int16_t sVar2 = (int16_t)((fortress_size_scaled - (fortress_size_scaled >> 31)) >> 1);
+    int16_t fortress_weapon_space = (int16_t)((fortress_size_scaled - (fortress_size_scaled >> 31)) >> 1);
 
     ship->size_class = 4;
     ship->picture_num = 5;
-    ship->owner = static_cast<int8_t>(MOX::_combat_defender_player);
+    ship->owner = (int8_t)MOX::_combat_defender_player;
     ship->previous_owner = (uint8_t)MOX::_combat_defender_player;
     ship->ship_idx = -1;
     ship->ftl_type = 0;
@@ -1202,7 +1207,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     struct_::Set_Bit_Field_(ship->special_device_flags, 32);
 
     for (int i = 0; i < 8; ++i) {
-        struct_::Clear_Structure_(&ship->weapons[i], 11);
+        struct_::Clear_Structure_(&ship->weapons[i], sizeof(ship->weapons[i]));
     }
 
     int w_idx = 0;
@@ -1213,12 +1218,12 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].specials = 2;
 
     int space0 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
-    int count0 = (sVar2 / 2) / space0;
+    int count0 = (fortress_weapon_space / 2) / space0;
     if (count0 > 99) {
         count0 = 99;
     }
-    ship->weapons[w_idx].count = static_cast<uint8_t>(count0);
-    ship->weapons[w_idx].shots_left = static_cast<uint8_t>(count0);
+    ship->weapons[w_idx].count = (uint8_t)count0;
+    ship->weapons[w_idx].shots_left = (uint8_t)count0;
 
     w_idx++;
     ship->weapons[w_idx].weapon_id = 4;
@@ -1228,7 +1233,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].specials = 0;
 
     int space1 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
-    int count1 = (sVar2 / 4) / space1;
+    int count1 = (fortress_weapon_space / 4) / space1;
     if (count1 > 198) {
         count1 = 198;
     }
@@ -1247,8 +1252,8 @@ void __cdecl Load_Antaran_Star_Fortress_() {
             ship->weapons[w_idx].specials = 0;
         }
     }
-    ship->weapons[w_idx].count = static_cast<uint8_t>(count1);
-    ship->weapons[w_idx].shots_left = static_cast<uint8_t>(count1);
+    ship->weapons[w_idx].count = (uint8_t)count1;
+    ship->weapons[w_idx].shots_left = (uint8_t)count1;
 
     w_idx++;
     ship->weapons[w_idx].weapon_id = 4;
@@ -1258,7 +1263,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].specials = 4;
 
     int space2 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
-    int count2 = (sVar2 / 4) / space2;
+    int count2 = (fortress_weapon_space / 4) / space2;
     if (count2 > 198) {
         count2 = 198;
     }
@@ -1277,8 +1282,8 @@ void __cdecl Load_Antaran_Star_Fortress_() {
             ship->weapons[w_idx].specials = 4;
         }
     }
-    ship->weapons[w_idx].count = static_cast<uint8_t>(count2);
-    ship->weapons[w_idx].shots_left = static_cast<uint8_t>(count2);
+    ship->weapons[w_idx].count = (uint8_t)count2;
+    ship->weapons[w_idx].shots_left = (uint8_t)count2;
 
     w_idx++;
     ship->weapons[w_idx].weapon_id = 4;
@@ -1288,12 +1293,12 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].specials = 2;
 
     int space3 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
-    int count3 = (sVar2 / 2) / space3;
+    int count3 = (fortress_weapon_space / 2) / space3;
     if (count3 > 99) {
         count3 = 99;
     }
-    ship->weapons[w_idx].count = static_cast<uint8_t>(count3);
-    ship->weapons[w_idx].shots_left = static_cast<uint8_t>(count3);
+    ship->weapons[w_idx].count = (uint8_t)count3;
+    ship->weapons[w_idx].shots_left = (uint8_t)count3;
 
     for (int i = 0; i < 8; ++i) {
         ship->weapon_ready_flags[i] = 1;
@@ -1317,7 +1322,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 }
 
 void __cdecl Load_Antaran_Planet_() {
-    struct_::Clear_Structure_(MOX::_combat_data, 0x139 /* sizeof(s_combat_data) */);
+    struct_::Clear_Structure_(MOX::_combat_data, sizeof(*MOX::_combat_data));
 
     strcpy(MOX::_combat_data->name, s_Antares_00551288);
     MOX::_combat_data->ship_idx = -1;
@@ -1348,7 +1353,7 @@ void __cdecl Load_Antaran_Planet_() {
     MOX::_combat_data->shield_max_hits = 0;
     MOX::_combat_data->shield_current_hits = 0;
 
-    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx_00551278, 62 /* 0x3E */, MOX::_global_cache_seg);
+    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx_00551278, 62, MOX::_global_cache_seg);
     animate::Draw_Palette_(palette_anim);
     palette::Refresh_Palette_();
 
@@ -1373,10 +1378,10 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
     }
 
     if (player_idx < 8) {
-        memcpy(lbx_filename, s_cmbtshp_lbx_0055125c, 12);
+        strcpy(lbx_filename, "cmbtshp.lbx");
         lbx_index = (int)MOX::_player[player_idx].color * 45 + 44;
     } else {
-        memcpy(lbx_filename, s_monster_lbx_00551250, 12);
+        strcpy(lbx_filename, "monster.lbx");
         lbx_index = player_idx + 5;
     }
 
@@ -1392,7 +1397,7 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
         }
 
         if (planet_size > 0) {
-            MOX::_combat_map_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_00551244, (int)planet_size + (int)player_color * 4 + 0x36, MOX::_screen_seg);
+            MOX::_combat_map_planet_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", (int)planet_size + (int)player_color * 4 + 0x36, MOX::_screen_seg);
         }
 
         RUSS::Mox_Update_();
@@ -1848,7 +1853,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     }
 
     for (int i = 0; i < 8; ++i) {
-        struct_::Clear_Structure_(&MOX::_combat_data[MOX::_combat_total_ship_count].weapons[i], 11);
+        struct_::Clear_Structure_(&MOX::_combat_data[MOX::_combat_total_ship_count].weapons[i], sizeof(MOX::_combat_data[MOX::_combat_total_ship_count].weapons[i]));
     }
 
     int beam_idx = 0;
@@ -2030,11 +2035,11 @@ void __cdecl Deploy_Ships_() {
     for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
         if (MOX::_combat_data[i].ftl_type == 0) {
             saved_size = MOX::_combat_data[i].size_class;
-            MOX::_combat_data[i].size_class = 99; /* 'c' */
+            MOX::_combat_data[i].size_class = 99;
         }
     }
 
-    qsort(MOX::_combat_data, MOX::_combat_total_ship_count, 0x139, qsort_combat_data_by_size_);
+    qsort(MOX::_combat_data, MOX::_combat_total_ship_count, sizeof(*MOX::_combat_data), qsort_combat_data_by_size_);
 
     MOX::_combat_data[0].size_class = 3;
 
@@ -2533,7 +2538,7 @@ void __cdecl Repair_All_Combat_Ships_() {
     }
 }
 
-void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3) {
+void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t combat_winner) {
     int16_t leader_count = 0;
     int16_t defender_losses = 0;
     int16_t attacker_losses = 0;
@@ -2542,9 +2547,9 @@ void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3) {
     int16_t leaders[8];
 
     int16_t victor_player;
-    if (param_3 < 0) {
+    if (combat_winner < 0) {
         victor_player = MOX::_combat_defender_player;
-    } else if (param_3 == 666) {
+    } else if (combat_winner == 666) {
         victor_player = -1;
     } else {
         victor_player = MOX::_combat_attacker_player;
@@ -2555,7 +2560,7 @@ void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3) {
         s_combat_data* ship = &MOX::_combat_data[i];
 
         if (ship->ftl_type == 0 && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
-            if (param_1 != MOX::_NUM_STARS) {
+            if (star_idx != MOX::_NUM_STARS) {
                 s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
                 if (col->buildings[BUILDING_STAR_BASE] != 0) {
                     ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_BASE);
@@ -2617,21 +2622,21 @@ void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3) {
 
     if (MOX::_combat_attacker_player < 8) {
         if (MOX::_bio_weapon_flag != 0) {
-            COMBINIT::Apply_Bio_Weapon_Penalty_(MOX::_combat_attacker_player, param_1, param_2);
+            COMBINIT::Apply_Bio_Weapon_Penalty_(MOX::_combat_attacker_player, star_idx, colony_pop_lost);
         }
         if (MOX::_combat_defender_player < 8) {
-            MOX::_player[MOX::_combat_attacker_player].ship_war_losses[MOX::_combat_defender_player] += static_cast<int16_t>(attacker_power_lost);
-            MOX::_player[MOX::_combat_defender_player].ship_war_losses[MOX::_combat_attacker_player] += static_cast<int16_t>(defender_power_lost);
+            MOX::_player[MOX::_combat_attacker_player].ship_war_losses[MOX::_combat_defender_player] += (int16_t)attacker_power_lost;
+            MOX::_player[MOX::_combat_defender_player].ship_war_losses[MOX::_combat_attacker_player] += (int16_t)defender_power_lost;
             
             if (defender_losses <= 0) {
                 defender_losses = 1;
             }
             
             if (COMBINIT::_real_attack_flag != 0) {
-                if (param_2 > 0) {
-                    NETMOX::Russ_Change_Relations_(-10000, MOX::_combat_attacker_player, MOX::_combat_defender_player, 10, param_1, param_2);
+                if (colony_pop_lost > 0) {
+                    NETMOX::Russ_Change_Relations_(-10000, MOX::_combat_attacker_player, MOX::_combat_defender_player, 10, star_idx, colony_pop_lost);
                 }
-                NETMOX::Russ_Change_Relations_(-15 * defender_losses, MOX::_combat_attacker_player, MOX::_combat_defender_player, 11, param_1, 0);
+                NETMOX::Russ_Change_Relations_(-15 * defender_losses, MOX::_combat_attacker_player, MOX::_combat_defender_player, 11, star_idx, 0);
             }
         }
     }
@@ -2701,7 +2706,7 @@ void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3) {
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
         
-        if (param_1 == MOX::_NUM_STARS && ship->owner == 8 &&
+        if (star_idx == MOX::_NUM_STARS && ship->owner == 8 &&
             ship->unit_status == 5 && ship->ftl_type != 0) {
             antarans::Kill_Antaran_Defensive_Ship_(ship->size_class);
         } 
@@ -2857,12 +2862,12 @@ void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
     }
 }
 
-void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int16_t param_3) {
+void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t star_idx, int16_t colony_pop_lost) {
     if (player_idx < 8) {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives != 100 /* 'd' */ && i != player_idx) {
-                int16_t change = -static_cast<int16_t>(random::Random_(10));
-                NETMOX::Russ_Change_Relations_(change, player_idx, i, 6, param_2, param_3);
+                int16_t change = -(int16_t)random::Random_(10);
+                NETMOX::Russ_Change_Relations_(change, player_idx, i, 6, star_idx, colony_pop_lost);
             }
         }
     }

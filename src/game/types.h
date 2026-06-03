@@ -33,5 +33,5 @@ static_assert(sizeof(s_field) == 0x37, "s_field size mismatch");
 static_assert(sizeof(s_mp_screen) == 0x1eb, "s_mp_screen size mismatch");
 static_assert(sizeof(s_network) == 0x20a, "s_network size mismatch");
 static_assert(sizeof(s_net_player_info) == 0xc, "s_net_player_info size mismatch");
-static_assert(sizeof(s_net_combat_message) == 0x10, "s_net_combat_message size mismatch");
+static_assert(sizeof(s_net_tactical_combat_message) == 0x10, "s_net_tactical_combat_message size mismatch");
 static_assert(sizeof(s_battle_results) == 0x6ce, "s_battle_results size mismatch");

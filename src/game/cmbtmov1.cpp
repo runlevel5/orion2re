@@ -819,26 +819,26 @@ int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_idx, int16_t x, int16_t y, in
     return 0;
 }
 
-void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t message_id, int32_t message_size, s_net_combat_message* message) {
+void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t message_id, int32_t message_size, s_net_tactical_combat_message* message) {
     (void)sender_net_id;
     (void)message_size;
 
     if (message_id >= 1000 && message_id < 2000) {
         switch (message_id) {
             case 1000:
-                if (MOX::_new_message.f8 == 0) {
+                if (MOX::_new_message.message_code == 0) {
                     struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
-                    MOX::_tactical_net_choice = MOX::_new_message.f8;
+                    MOX::_tactical_net_choice = MOX::_new_message.message_code;
                     return;
                 }
 
                 struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
-                MOX::_tactical_net_choice = MOX::_new_message.f8;
+                MOX::_tactical_net_choice = MOX::_new_message.message_code;
                 return;
 
             case 1002: {
                 
-                int16_t player_idx = message->x;
+                int16_t player_idx = message->viewport_x;
                 MOX::_auto_combat_flag[player_idx] = 0;
 
                 if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_attacker_player) {
@@ -857,7 +857,7 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
 
             case 1003:
                 MOX::_saved_msl_warn = MOX::_msl_impact_warning_flag;
-                MOX::_msl_impact_warning_flag = message->x;
+                MOX::_msl_impact_warning_flag = message->viewport_x;
                 return;
 
             case 1004:
@@ -865,8 +865,8 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
                 return;
 
             case 1005:
-                if (message->x == 1) {
-                    MOX::_combat_init = message->x;
+                if (message->viewport_x == 1) {
+                    MOX::_combat_init = message->viewport_x;
                 }
                 break;
         }

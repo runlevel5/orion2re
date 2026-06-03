@@ -1,6 +1,8 @@
 #pragma once
 
 namespace COMBINIT {
+    // Loads the tactical planet graphics for the specified colony.
+    // colony_idx: Colony whose planet art should be loaded.
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
 
     extern const char s_combat_lbx_00551244[11];
@@ -10,60 +12,142 @@ namespace COMBINIT {
     extern const char s_cmbtsfx_lbx_00551228[12];
     extern const char s_sphersfx_lbx_00551218[13];
 
+    // Copies a strategic ship into the temporary display-combat record.
+    // ship_idx: Strategic ship index to copy.
     void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx);
 
+    // Copies a strategic ship into a combat-data slot.
+    // ship_idx: Strategic ship index to load.
+    // combat_idx: Combat-data slot to populate.
     void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx);
+
+    // Returns the maximum shield strength for a loaded combat ship.
+    // ship_idx: Combat-data ship index to inspect.
     int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx);
+
+    // Returns whether an undamaged special device is present on a combat ship.
+    // ship_idx: Combat-data ship index to inspect.
+    // special_id: Special-device bit index to test.
     int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id);
+
+    // Returns whether the colony has any tactical defensive installation.
+    // colony_idx: Colony index to inspect.
     int8_t __cdecl Colony_Has_Defenses_(int16_t colony_idx);
 
+    // Loads the scripted Antaran defensive fleet into combat data.
     void __cdecl Load_Antaran_Defense_Fleet_();
 
+    // Loads one Antaran ship template by hull size into a combat-data slot.
+    // ship_idx: Combat-data slot to populate.
+    // ship_size: Antaran hull-size template index.
     void __cdecl Load_Combat_Antaran_Ship_(int16_t ship_idx, int16_t ship_size);
 
+    // Loads the Antaran star fortress combat unit.
     void __cdecl Load_Antaran_Star_Fortress_();
+    // Loads the Antaran planet combat object and its graphics.
     void __cdecl Load_Antaran_Planet_();
+    // Loads the colony and any orbiting defense platform into combat data.
+    // colony_idx: Colony index whose defenses should be loaded.
     void __cdecl Load_Colony_Defense_(int16_t colony_idx);
 
+    // Loads the colony combat object and optionally its artwork.
+    // colony_idx: Colony index to load.
+    // load_picture: Nonzero to load the colony picture assets.
     void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture);
 
+    // Returns the combat station type present at the colony, or -1 if none.
+    // colony_idx: Colony index to inspect.
     int16_t __cdecl Type_Of_Space_Station_(int16_t colony_idx);
 
+    // Loads one orbital defense platform or station into combat data.
+    // station_type: Station hull/type selector.
     void __cdecl Load_Combat_Satelite_(int16_t station_type);
 
-    void __cdecl Load_Combat_Ship_Palette_(int16_t plr);
+    // Loads and applies the combat palette for one participant.
+    // player_idx: Player or monster owner index.
+    void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx);
 
+    // Loads per-ship art assets needed by one participant.
+    // player_idx: Player or monster owner index.
     void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx);
 
+    // Resets per-combat special-device state for one loaded ship.
+    // combat_ship_idx: Combat-data ship index to initialize.
     void __cdecl Init_Special_Devices_(int16_t combat_ship_idx);
 
+    // Places loaded combat units onto the tactical grid.
     void __cdecl Deploy_Ships_();
 
+    // Returns the deployment spacing offset for a hull size.
+    // size: Combat hull-size class.
     int16_t __cdecl Ship_Size_Offset_(int16_t size);
 
+    // Returns whether a ship can be deployed at a tactical grid cell.
+    // x: Candidate combat-grid X coordinate.
+    // y: Candidate combat-grid Y coordinate.
+    // ship_idx: Optional blocking ship index, or -1.
     int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx);
 
+    // Compares two combat-data entries by hull size for qsort, largest first.
+    // a: Pointer to the first combat-data entry.
+    // b: Pointer to the second combat-data entry.
     int __cdecl qsort_combat_data_by_size_(const void* a, const void* b);
 
+    // Centers the visible combat map near a target grid position.
+    // target_x: Combat-grid X coordinate to center on.
+    // target_y: Combat-grid Y coordinate to center on.
     void __cdecl Snap_Center_Combat_Screen_(int16_t target_x, int16_t target_y);
 
+    // Scrolls the combat camera while the pointer is at the screen edge.
     void __cdecl Scroll_Combat_Screen_();
 
+    // Applies end-of-phase plasma web damage to one side.
+    // owner_idx: Owner whose ships should take web damage.
     void __cdecl Plasma_Web_Damage_(int16_t owner_idx);
+    // Advances black-hole-generator countdown effects for one side.
+    // player_idx: Owner whose ships should be processed.
     void __cdecl Increment_Bhg_(int16_t player_idx);
+    // Recharges shields for all eligible combat ships.
     void __cdecl Recharge_Shields_();
+    // Applies end-of-turn repairs to all eligible combat ships.
     void __cdecl Repair_All_Combat_Ships_();
+    // Runs end-of-turn tactical combat maintenance.
     void __cdecl End_Of_Turn_Bookeeping_();
-    void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3);
+    // Resolves post-combat cleanup and strategic side effects.
+    // star_idx: Star index for the battle, or _NUM_STARS for Antares.
+    // colony_pop_lost: Population lost during the battle.
+    // combat_winner: Tactical combat result code.
+    void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t combat_winner);
 
+    // Runs a tactical combat encounter and returns the result code.
+    // plr1_ships: Attacker ship index array.
+    // plr1_ship_count: Number of attacker entries.
+    // plr2_ships: Defender ship index array.
+    // plr2_ship_count: Number of defender entries.
+    // star_idx: Star index for the battle, or _NUM_STARS for Antares.
+    // colony_idx: Defending colony index, or -1.
+    // retreat_flag: Initial retreat-control flag.
     int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag);
 
+    // Writes tactical combat damage state back to the strategic ship record.
+    // combat_ship_idx: Combat-data ship index to unload.
     void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx);
 
-    void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int16_t param_3);
+    // Applies diplomatic penalties for bio-weapon use.
+    // player_idx: Attacking player responsible for the penalty.
+    // star_idx: Star index where the combat occurred.
+    // colony_pop_lost: Population lost during the battle.
+    void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t star_idx, int16_t colony_pop_lost);
 
     extern uint8_t _real_attack_flag;
-    int __cdecl qsort_ship_array_by_size_(const void* param_1, const void* param_2);
+    // Compares two ship indices by hull size for qsort, largest first.
+    // a: Pointer to the first ship index.
+    // b: Pointer to the second ship index.
+    int __cdecl qsort_ship_array_by_size_(const void* a, const void* b);
 
+    // Returns the pixel-space center offset for a combat object.
+    // ship_idx: Combat-data ship index, or 0 for the colony/planet object.
+    // out_x: Receives the X offset.
+    // out_y: Receives the Y offset.
     void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y);
 }

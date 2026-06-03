@@ -8,9 +8,9 @@ void __cdecl Compute_Contacts_() {
     for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
         s_player* plr = &MOX::_player[i];
         
-        memcpy(old_contacts[i], plr->contact, 8);
-        memset(plr->contact, 0, 8);
-        memset(plr->within_range, 0, 8);
+        memcpy(old_contacts[i], plr->contact, sizeof(old_contacts[i]));
+        memset(plr->contact, 0, sizeof(plr->contact));
+        memset(plr->within_range, 0, sizeof(plr->within_range));
 
         plr->contact[i] = 1;
         plr->within_range[i] = 1;

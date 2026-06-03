@@ -1,12 +1,12 @@
 #include "pch.h"
 
 namespace COLSYSDI {
-    s_animation_header* __cdecl Planet_Anims_(int16_t planet_type, int16_t planet_size) {
-        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, planet_type * 5 + planet_size + 11, MOX::_global_cache_seg);
+    s_animation_header* __cdecl Planet_Anims_(int16_t climate, int16_t planet_size) {
+        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, climate * 5 + planet_size + 11, MOX::_global_cache_seg);
     }
 
-    void __cdecl Draw_Col_Sys_Disp_(int16_t param_1, int16_t param_2) {
-        int16_t text_y = param_2 + 7;
+    void __cdecl Draw_Col_Sys_Disp_(int16_t x, int16_t y) {
+        int16_t text_y = y + 7;
         int16_t star_idx = (int16_t)COLONY::_sys_disp_star_handle;
         
         for (int16_t i = 0; i < 5; i++) {
@@ -24,31 +24,31 @@ namespace COLSYSDI {
                 
                 if (planet->planet_type == 3) {
                     s_animation_header* anim = Planet_Anims_(climate, planet->size);
-                    ERIC::Draw_Centered_(param_1 + 15, param_2 + i * 24 + 14, anim);
+                    ERIC::Draw_Centered_(x + 15, y + i * 24 + 14, anim);
                 } else if (planet->planet_type == 2) {
                     s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3E, MOX::_global_cache_seg);
-                    ERIC::Draw_Centered_(param_1 + 15, param_2 + i * 24 + 14, anim);
+                    ERIC::Draw_Centered_(x + 15, y + i * 24 + 14, anim);
                 } else if (planet->planet_type == 1) {
                     s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3F, MOX::_global_cache_seg);
-                    ERIC::Draw_Centered_(param_1 + 15, param_2 + i * 24 + 14, anim);
+                    ERIC::Draw_Centered_(x + 15, y + i * 24 + 14, anim);
                 }
                 
                 COLONY::Set_Colony_Font_To_(1);
                 
-                char buffer[500];
-                Planet_Summary_String_(buffer, planet_idx, 1);
+                char summary_text[500];
+                Planet_Summary_String_(summary_text, planet_idx, 1);
                 
-                BILL::_Print_Paragraph_(param_1 + 28, text_y, 89 - param_1, buffer, 0);
+                BILL::_Print_Paragraph_(x + 28, text_y, 89 - x, summary_text, 0);
             }
             
             s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x41, MOX::_global_cache_seg);
-            ERIC::Draw_Centered_(param_1 + 2, param_2 + i * 24 + 12, anim);
+            ERIC::Draw_Centered_(x + 2, y + i * 24 + 12, anim);
             
             text_y += 24;
         }
     }
 
-    void __cdecl Draw_Col_Sys_Disp_Last_Scanned_(int16_t param_1, int16_t param_2) {
+    void __cdecl Draw_Col_Sys_Disp_Last_Scanned_(int16_t x, int16_t y) {
         s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
 
         if (colony->planet != -1) {
@@ -61,14 +61,13 @@ namespace COLSYSDI {
                 climate = MOX::_colony[planet->colony_index].climate;
             }
 
-            int sVar5 = 0;
+            int16_t display_row = 0;
             if (planet->orbit >= 0) {
                 do {
-                    // Unused read, matches assembly
-                    volatile short dummy = MOX::_star[planet->star_index].planet_index[sVar5];
-                    (void)dummy;
-                    sVar5++;
-                } while (sVar5 <= planet->orbit);
+                    volatile int16_t unused_planet_idx = MOX::_star[planet->star_index].planet_index[display_row];
+                    (void)unused_planet_idx;
+                    display_row++;
+                } while (display_row <= planet->orbit);
             }
 
             s_animation_header* anim = Planet_Anims_(climate, planet->size);
@@ -77,24 +76,23 @@ namespace COLSYSDI {
 
             int16_t frame = ERIC::Global_Cycler_(50, 6);
 
-            s_animation_header* anim_lbx = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
-            animate::Set_Animation_Frame_(anim_lbx, (int32_t)frame);
+            s_animation_header* marker_anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
+            animate::Set_Animation_Frame_(marker_anim, (int32_t)frame);
 
-            anim_lbx = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
-            ERIC::Draw_Centered_(param_1 + 2, (int16_t)(param_2 + sVar5 * 24 - 12), anim_lbx);
+            marker_anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
+            ERIC::Draw_Centered_(x + 2, (int16_t)(y + display_row * 24 - 12), marker_anim);
         }
     }
 
-    void __cdecl Planet_Summary_String_(char* param_1, int16_t param_2, int16_t param_3) {
+    void __cdecl Planet_Summary_String_(char* summary_text, int16_t planet_idx, int16_t font_player_idx) {
         char* gravity_and_mineral_str[8];
         char* size_str[5];
         char* gas_giant_str;
         char* asteroid_str;
         char pop_str[500];
 
-        int planet_idx = param_2;
         s_planet_data* planet = &MOX::_planet[planet_idx];
-        short colony_idx = planet->colony_index;
+        int16_t colony_idx = planet->colony_index;
 
         gravity_and_mineral_str[0] = ESTRINGS::E_Strings_(0x169);
         gravity_and_mineral_str[1] = ESTRINGS::E_Strings_(0xC);
@@ -127,7 +125,7 @@ namespace COLSYSDI {
         gas_giant_str = ESTRINGS::E_Strings_(0x132);
         asteroid_str = ESTRINGS::E_Strings_(0xBA);
 
-        char climate;
+        uint8_t climate;
         if (colony_idx == -1) {
             climate = planet->climate;
         } else {
@@ -136,10 +134,10 @@ namespace COLSYSDI {
 
         if (planet->planet_type != 3) {
             if (planet->planet_type == 2) {
-                sprintf(param_1, ESTRINGS::E_Strings_(0x46), gas_giant_str);
+                sprintf(summary_text, ESTRINGS::E_Strings_(0x46), gas_giant_str);
             }
             if (planet->planet_type == 1) {
-                sprintf(param_1, ESTRINGS::E_Strings_(0x46), asteroid_str);
+                sprintf(summary_text, ESTRINGS::E_Strings_(0x46), asteroid_str);
             }
             return;
         }
@@ -147,22 +145,22 @@ namespace COLSYSDI {
         if (colony_idx == -1) {
             strcpy(pop_str, ESTRINGS::E_Strings_(0xC));
         } else {
-            if (param_3 != -1) {
-                COLONY::Set_Colony_Font_To_Player_((uint8_t)param_3, MOX::_colony[colony_idx].owner);
+            if (font_player_idx != -1) {
+                COLONY::Set_Colony_Font_To_Player_((uint8_t)font_player_idx, MOX::_colony[colony_idx].owner);
             }
-            short max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_colony[colony_idx].owner);
+            int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_colony[colony_idx].owner);
             sprintf(pop_str, ESTRINGS::E_Strings_(0x8), (int)MOX::_colony[colony_idx].n_pops, (int)max_pop);
         }
 
         if (colony_idx == -1) {
-            sprintf(param_1, ESTRINGS::E_Strings_(0x2C),
+            sprintf(summary_text, ESTRINGS::E_Strings_(0x2C),
                     size_str[(int)planet->size],
                     MOX::_planet_climate_string[(int)climate],
                     gravity_and_mineral_str[(int)planet->gravity_class],
                     gravity_and_mineral_str[(int)planet->mineral_class + 3],
                     pop_str);
         } else {
-            sprintf(param_1, ESTRINGS::E_Strings_(0x29),
+            sprintf(summary_text, ESTRINGS::E_Strings_(0x29),
                     MOX::_player[(int)MOX::_colony[colony_idx].owner].race_name,
                     gravity_and_mineral_str[(int)planet->gravity_class],
                     gravity_and_mineral_str[(int)planet->mineral_class + 3],
