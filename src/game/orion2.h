@@ -345,6 +345,8 @@ typedef struct s_combat_bomb_result s_combat_bomb_result, *Ps_combat_bomb_result
 
 typedef struct s_battle_results_info s_battle_results_info, *Ps_battle_results_info;
 
+typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
+
 typedef struct s_invasion_side_info s_invasion_side_info, *Ps_invasion_side_info;
 
 typedef struct s_invasion_player_bonuses s_invasion_player_bonuses, *Ps_invasion_player_bonuses;
@@ -919,7 +921,7 @@ struct s_combat_bomb_result {
     int32_t total_hits_processed;
 };
 
-struct s_battle_results {
+struct s_net_player_info {
     int8_t packet_type;
     uint8_t combat_star_id;
     int16_t combat_defender_id;
@@ -929,6 +931,10 @@ struct s_battle_results {
     int8_t combat_attacker_id;
     int8_t combat_result;
     int8_t diplomacy_target_id;
+};
+
+struct s_battle_results {
+    struct s_net_player_info player_info;
     int8_t outpost_destroyed_flag;
     int16_t planet_id;
     struct s_combat_bomb_result bomb;
@@ -3428,20 +3434,6 @@ struct s_net_player {
     char event_string[52];
     char player_name[20];
     uint32_t join_time;
-};
-
-typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
-
-struct s_net_player_info {
-    uint8_t sync_state;
-    uint8_t combat_star_id;
-    int16_t sync_star_id;
-    int16_t sync_planet_id;
-    int16_t sync_colony_id;
-    undefined combat_type;
-    undefined sync_phase_ready_flag;
-    int8_t combat_status;
-    int8_t remote_player_id;
 };
 
 typedef struct s_network s_network, *Ps_network;

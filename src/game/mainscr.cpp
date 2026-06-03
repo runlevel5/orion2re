@@ -3741,8 +3741,8 @@ namespace MAINSCR {
         }
         case 0x05: {
             int8_t remote_id = *(int8_t*)data;
-            NETMOX::_net.player_net_info[from_player_id].remote_player_id = remote_id;
-            NETMOX::_net.player_net_info[from_player_id].sync_state = '&';
+            NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = remote_id;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = '&';
 
             int next_talker = NETMOX::Get_Next_AI_Talker_(remote_id);
             if (next_talker == -1) {
@@ -3750,8 +3750,8 @@ namespace MAINSCR {
             }
             else {
                 NETMOX::_net.ai_diplomacy_active_mask |= (1 << (from_player_id & 0x1F));
-                NETMOX::_net.player_net_info[from_player_id].remote_player_id = remote_id;
-                NETMOX::_net.player_net_info[from_player_id].sync_state = '(';
+                NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = remote_id;
+                NETMOX::_net.player_net_info[from_player_id].packet_type = '(';
             }
             break;
         }
@@ -3768,16 +3768,16 @@ namespace MAINSCR {
             break;
         }
         case 0x08: {
-            if (NETMOX::_net.player_net_info[from_player_id].sync_state != '&') {
+            if (NETMOX::_net.player_net_info[from_player_id].packet_type != '&') {
                 NETMOX::_net.ai_diplomacy_active_mask &= ~(1 << (from_player_id & 0x1F));
-                int next_talker = NETMOX::Get_Next_AI_Talker_(NETMOX::_net.player_net_info[from_player_id].remote_player_id);
+                int next_talker = NETMOX::Get_Next_AI_Talker_(NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id);
                 if (next_talker != -1) {
                     NETMOX::_net.ai_diplomacy_active_mask |= (1 << (next_talker & 0x1F));
-                    NETMOX::_net.player_net_info[next_talker].sync_state = '(';
+                    NETMOX::_net.player_net_info[next_talker].packet_type = '(';
                 }
             }
-            NETMOX::_net.player_net_info[from_player_id].remote_player_id = -1;
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x04;
+            NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = -1;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x04;
             NETMOX::_net.ai_diplomacy_cancel_mask |= (1 << (from_player_id & 0x1F));
             break;
         }
@@ -3788,7 +3788,7 @@ namespace MAINSCR {
         }
         case 0x0A: {
             s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)data;
-            int8_t remote_id = NETMOX::_net.player_net_info[from_player_id].remote_player_id;
+            int8_t remote_id = NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id;
 
             memcpy(&MOX::_player[remote_id], &pack->target_player, sizeof(s_player));
             memcpy(&MOX::_player[from_player_id], &pack->player, sizeof(s_player));
@@ -3797,15 +3797,15 @@ namespace MAINSCR {
                 MOX::_star[i].surrender_to[remote_id] = pack->surrender_to[i];
             }
 
-            NETMOX::_net.player_net_info[from_player_id].remote_player_id = -1;
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x04;
+            NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = -1;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x04;
             NETMOX::_net.players_sync_mask[remote_id] = 0xFF;
             NETMOX::_net.diplomacy_sync_mask[remote_id] = from_player_id;
 
             int next_talker = NETMOX::Get_Next_AI_Talker_(remote_id);
             if (next_talker != -1) {
                 NETMOX::_net.ai_diplomacy_active_mask |= (1 << (next_talker & 0x1F));
-                NETMOX::_net.player_net_info[next_talker].sync_state = '(';
+                NETMOX::_net.player_net_info[next_talker].packet_type = '(';
             }
             break;
         }
@@ -3829,9 +3829,9 @@ namespace MAINSCR {
         }
         case 0x11: {
             const s_case11_packet* packet = (const s_case11_packet*)data;
-            memcpy(&NETMOX::_net.player_net_info[from_player_id].sync_star_id, packet, 4);
-            NETMOX::_net.player_net_info[from_player_id].sync_colony_id = packet->sync_colony_id;
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x11;
+            memcpy(&NETMOX::_net.player_net_info[from_player_id].combat_defender_id, packet, 4);
+            NETMOX::_net.player_net_info[from_player_id].combat_target_player_id = packet->sync_colony_id;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x11;
             break;
         }
         case 0x12: {
@@ -3870,8 +3870,8 @@ namespace MAINSCR {
             break;
         }
         case 0x17: {
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x0E;
-            NETMOX::_net.player_net_info[from_player_id].sync_phase_ready_flag = 0xFF;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x0E;
+            NETMOX::_net.player_net_info[from_player_id].combat_attacker_id = 0xFF;
             NETMOX::_net.sync_phase_active_flag = 0;
             break;
         }
@@ -3988,12 +3988,12 @@ namespace MAINSCR {
             break;
         }
         case 0x24: {
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x1D;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x1D;
             break;
         }
         case 0x25: {
             NETMOX::_net.field168_0x209 = *(uint8_t*)data;
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x1E;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x1E;
             break;
         }
         case 0x26: {
@@ -4047,7 +4047,7 @@ namespace MAINSCR {
             break;
         }
         case 0x30: {
-            NETMOX::_net.player_net_info[from_player_id].sync_state = 0x1F;
+            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x1F;
             break;
         }
         case 0x31: {

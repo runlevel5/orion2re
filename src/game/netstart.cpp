@@ -600,8 +600,8 @@ namespace NETSTART {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                NETMOX::_net.player_net_info[i].sync_state = 4;
-                NETMOX::_net.player_net_info[i].remote_player_id = -1;
+                NETMOX::_net.player_net_info[i].packet_type = 4;
+                NETMOX::_net.player_net_info[i].diplomacy_target_id = -1;
             }
         }
 
@@ -848,8 +848,8 @@ namespace NETSTART {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int32_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                NETMOX::_net.player_net_info[i].sync_state = 4;
-                NETMOX::_net.player_net_info[i].remote_player_id = -1;
+                NETMOX::_net.player_net_info[i].packet_type = 4;
+                NETMOX::_net.player_net_info[i].diplomacy_target_id = -1;
             }
         }
 

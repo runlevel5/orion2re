@@ -169,12 +169,12 @@ namespace NETTURN {
         COLCALC::No_Op1_();
         NETMOX::_net.sync_phase_active_flag = 0;
 
-        memset(&NETMOX::_net.player_net_info[0].sync_state, 0, 180);
+        memset(&NETMOX::_net.player_net_info[0].packet_type, 0, 180);
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                NETMOX::_net.player_net_info[i].sync_phase_ready_flag = 0xFF;
-                NETMOX::_net.player_net_info[i].sync_state = 14 /* NEXT_TURN */;
+                NETMOX::_net.player_net_info[i].combat_attacker_id = 0xFF;
+                NETMOX::_net.player_net_info[i].packet_type = 14 /* NEXT_TURN */;
             }
         }
 
@@ -207,8 +207,8 @@ namespace NETTURN {
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                    NETMOX::_net.player_net_info[i].sync_state = 4 /* SYNC */;
-                    NETMOX::_net.player_net_info[i].remote_player_id = -1;
+                    NETMOX::_net.player_net_info[i].packet_type = 4 /* SYNC */;
+                    NETMOX::_net.player_net_info[i].diplomacy_target_id = -1;
                 }
             }
 

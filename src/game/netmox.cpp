@@ -818,7 +818,7 @@ namespace NETMOX {
         }
 
         if (!message_sent && (NETMOX::_net.ai_diplomacy_done_mask & (1 << current_player_idx))) {
-            int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].remote_player_id;
+            int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].diplomacy_target_id;
             NETMOX::_net.ai_diplomacy_done_mask &= ~(1 << current_player_idx);
             message_sent = true;
             NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 7, &remote_player_id, 1);
@@ -853,7 +853,7 @@ namespace NETMOX {
 
         if (!message_sent) {
             if (NETMOX::_net.ai_diplomacy_active_mask & (1 << current_player_idx)) {
-                int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].remote_player_id;
+                int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].diplomacy_target_id;
                 if (!(NETMOX::_net.players_sync_mask[remote_player_id] & (1 << current_player_idx))) {
                     message_sent = true;
                     NETMOX::_net.ai_diplomacy_active_mask &= ~(1 << current_player_idx);
@@ -864,7 +864,7 @@ namespace NETMOX {
 
         if (!message_sent) {
             if (NETMOX::_net.ai_diplomacy_cancel_mask & (1 << current_player_idx)) {
-                int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].remote_player_id;
+                int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].diplomacy_target_id;
                 NETMOX::_net.ai_diplomacy_cancel_mask &= ~(1 << current_player_idx);
                 message_sent = true;
                 NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 9, &remote_player_id, 1);
@@ -1635,8 +1635,8 @@ namespace NETMOX {
         }
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (NETMOX::_net.player_net_info[i].remote_player_id == target_player_id) {
-                if (NETMOX::_net.player_net_info[i].sync_state == '(') {
+            if (NETMOX::_net.player_net_info[i].diplomacy_target_id == target_player_id) {
+                if (NETMOX::_net.player_net_info[i].packet_type == '(') {
                     already_talking = true;
                 }
                 else {
@@ -1804,7 +1804,7 @@ namespace NETMOX {
         // 8. Finalize synchronization state
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
-        NETMOX::_net.player_net_info[MOX::_PLAYER_NUM].sync_state = 0x10;
+        NETMOX::_net.player_net_info[MOX::_PLAYER_NUM].packet_type = 0x10;
         NETMOX::_net.sync_state = 0x10;
     }
 
@@ -1953,8 +1953,8 @@ namespace NETMOX {
         int8_t combat_status = *reinterpret_cast<int8_t*>(ptr);
         ptr += sizeof(int16_t);
 
-        NETMOX::_net.player_net_info[attacker_id].combat_status = combat_status;
-        NETMOX::_net.player_net_info[defender_id].combat_status = combat_status;
+        NETMOX::_net.player_net_info[attacker_id].combat_result = combat_status;
+        NETMOX::_net.player_net_info[defender_id].combat_result = combat_status;
 
         RUSS::Mox_Update_();
 
@@ -2095,7 +2095,7 @@ namespace NETMOX {
         }
 
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
-        NETMOX::_net.player_net_info[reporting_player_id].sync_state = 0x1B;
+        NETMOX::_net.player_net_info[reporting_player_id].packet_type = 0x1B;
     }
 
     void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr, uint16_t len) {

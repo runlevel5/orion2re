@@ -421,12 +421,12 @@ void __cdecl Client_Combat_Loop_() {
             memcpy(&local_battle_results_1, &NETMOX::_net.sync_state, 12);
             local_battle_results_1.planet_id = NETMOX::_net.combat_planet_id;
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_1, 0);
-            local_battle_results_1.combat_result = (int8_t)result;
+            local_battle_results_1.player_info.combat_result = (int8_t)result;
             NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x18, &local_battle_results_1, sizeof(local_battle_results_1));
             while (NETMOX::_net.sync_state != 14) {
                 RUSS::Mox_Update_();
             }
-            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_1.combat_result);
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_1.player_info.combat_result);
             break;
 
         case 21:
@@ -461,13 +461,13 @@ void __cdecl Client_Combat_Loop_() {
             memcpy(&local_battle_results_2, &NETMOX::_net.sync_state, 12);
             local_battle_results_2.planet_id = NETMOX::_net.combat_planet_id;
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_2, 0);
-            local_battle_results_2.combat_result = (int8_t)result;
+            local_battle_results_2.player_info.combat_result = (int8_t)result;
             MULTPLAY::Load_Net_Next_Turn_Screen_(1);
             if (NETMOX::_net.combat_target_player_id < 8 && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {
                 NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x16, &local_battle_results_2, sizeof(local_battle_results_2));
             }
             NETMOX::_net.sync_state = 14;
-            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_2.combat_result);
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_2.player_info.combat_result);
             break;
 
         case 25:
@@ -1380,7 +1380,7 @@ int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
             s_combfind_star_has_player& star_info = (*COMBFIND::_star_has_player)[star_idx][i];
 
             if (star_info.colony_count != 0 || star_info.has_player != 0) {
-                if (NETMOX::_net.player_net_info[i].sync_phase_ready_flag != 0xFF) {
+                if (NETMOX::_net.player_net_info[i].combat_attacker_id != 0xFF) {
                     return 1;
                 }
 
@@ -1492,7 +1492,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
     Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
 
     short combat_status = Russ_Combat_(plr2_idx, &ships[plr2_ship_offset], plr2_ship_count, plr1_idx, &ships[plr1_ship_offset], plr1_ship_count, star_idx, colony_idx, is_sneak_attack, result);
-    result->combat_result = (int8_t)combat_status;
+    result->player_info.combat_result = (int8_t)combat_status;
 
     colony_idx = Target_Planet_To_Colony_(planet_idx);
 
@@ -1504,7 +1504,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         }
     }
 
-    if (result->combat_result >= 0) {
+    if (result->player_info.combat_result >= 0) {
         if (plr1_idx < 8) {
             if (_current_star_has_player[plr1_idx].ship_sizes[0] == 0 && colony_idx == -1) {
                 Kill_Noncombat_Ships_(&ships[plr1_ship_offset], plr1_ship_count);
@@ -1516,7 +1516,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         }
     }
 
-    if (result->combat_result <= 0) {
+    if (result->player_info.combat_result <= 0) {
         if (plr2_idx < 8) {
             Determine_Retreat_Ships_(star_idx, plr2_idx, -1);
         } else {
@@ -1534,7 +1534,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
             }
         }
 
-        if (result->combat_result < 0) {
+        if (result->player_info.combat_result < 0) {
             Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
             if (plr1_ship_count == 0) {
                 if (plr1_idx < 8) {
@@ -1574,7 +1574,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         }
     }
 
-    return (int16_t)result->combat_result;
+    return (int16_t)result->player_info.combat_result;
 }
 
 int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* results)
@@ -2327,7 +2327,7 @@ void __cdecl Bomb_Results_Popups_(s_battle_results* res) {
             &res->info.attacker_invasion,
             &res->info.defender_invasion,
             res->info.ground_defense_strength,
-            (int16_t)MOX::_planet[res->combat_planet_id].colony_index
+            (int16_t)MOX::_planet[res->player_info.combat_planet_id].colony_index
         );
 
         MULTPLAY::Load_Net_Next_Turn_Screen_(1);
@@ -2417,17 +2417,17 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     if (MOX::_NUM_PLAYERS > 0) {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             RUSS::Mox_Update_();
-            uint8_t state = NETMOX::_net.player_net_info[i].sync_state;
+            uint8_t state = NETMOX::_net.player_net_info[i].packet_type;
 
             switch (state) {
             case 0x11: {
-                int16_t sync_colony_id = NETMOX::_net.player_net_info[i].sync_colony_id;
+                int16_t sync_colony_id = NETMOX::_net.player_net_info[i].combat_target_player_id;
                 if (sync_colony_id == -1) {
-                    NETMOX::_net.player_net_info[i].sync_state = 0x0e;
+                    NETMOX::_net.player_net_info[i].packet_type = 0x0e;
                     for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-                        if ((uint8_t)NETMOX::_net.player_net_info[j].sync_phase_ready_flag == i) {
+                        if ((uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == i) {
                             RUSS::Mox_Update_();
-                            NETMOX::_net.player_net_info[j].sync_phase_ready_flag = (undefined)0xff;
+                            NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
                         }
                     }
                     NETMOX::_net.sync_phase_active_flag = 0;
@@ -2435,14 +2435,14 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                 } else {
                     MOX::_star[NETMOX::_net.player_net_info[i].combat_star_id].ignore_combat_ships = 0;
 
-                    NETMOX::_net.player_net_info[sync_colony_id].sync_star_id = NETMOX::_net.player_net_info[i].sync_star_id;
-                    NETMOX::_net.player_net_info[sync_colony_id].sync_planet_id = NETMOX::_net.player_net_info[i].sync_planet_id;
-                    NETMOX::_net.player_net_info[sync_colony_id].sync_colony_id = NETMOX::_net.player_net_info[i].sync_colony_id;
+                    NETMOX::_net.player_net_info[sync_colony_id].combat_defender_id = NETMOX::_net.player_net_info[i].combat_defender_id;
+                    NETMOX::_net.player_net_info[sync_colony_id].combat_planet_id = NETMOX::_net.player_net_info[i].combat_planet_id;
+                    NETMOX::_net.player_net_info[sync_colony_id].combat_target_player_id = NETMOX::_net.player_net_info[i].combat_target_player_id;
 
                     for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-                        if (j != i && j != sync_colony_id && (uint8_t)NETMOX::_net.player_net_info[j].sync_phase_ready_flag == i) {
+                        if (j != i && j != sync_colony_id && (uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == i) {
                             RUSS::Mox_Update_();
-                            NETMOX::_net.player_net_info[j].sync_phase_ready_flag = (undefined)0xff;
+                            NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
                         }
                     }
 
@@ -2451,19 +2451,19 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                     uint8_t msg_type = 0;
                     if (MOX::_settings.strategic_combat_flag == 0) {
                         if (sync_colony_id < 8 && MOX::_player[sync_colony_id].objectives == 100 /* 'd' */) {
-                            NETMOX::_net.player_net_info[i].sync_state = 0x14;
-                            NETMOX::_net.player_net_info[sync_colony_id].sync_state = 0x15;
-                            int16_t colony_id = Target_Planet_To_Colony_(NETMOX::_net.player_net_info[i].sync_planet_id);
+                            NETMOX::_net.player_net_info[i].packet_type = 0x14;
+                            NETMOX::_net.player_net_info[sync_colony_id].packet_type = 0x15;
+                            int16_t colony_id = Target_Planet_To_Colony_(NETMOX::_net.player_net_info[i].combat_planet_id);
                             NETMOX::Send_You_Are_Target_Info_(
-                                sync_colony_id, i, NETMOX::_net.player_net_info[i].sync_star_id, colony_id, NETMOX::_net.player_net_info[i].combat_star_id);
+                                sync_colony_id, i, NETMOX::_net.player_net_info[i].combat_defender_id, colony_id, NETMOX::_net.player_net_info[i].combat_star_id);
                             msg_type = 0x14;
                         } else {
-                            NETMOX::_net.player_net_info[i].sync_state = 0x16;
+                            NETMOX::_net.player_net_info[i].packet_type = 0x16;
                             msg_type = 0x14;
                         }
                     } else {
-                        NETMOX::_net.player_net_info[i].sync_state = 0x18;
-                        NETMOX::_net.player_net_info[sync_colony_id].sync_state = 0x19;
+                        NETMOX::_net.player_net_info[i].packet_type = 0x18;
+                        NETMOX::_net.player_net_info[sync_colony_id].packet_type = 0x19;
                         msg_type = 0x14;
                     }
                     NETMOX::Mox_Send_Message_((int16_t)MOX::_player[i].network_player_id, msg_type, nullptr, 0);
@@ -2471,12 +2471,12 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                 break;
             }
             case 0x1b: {
-                int16_t sync_phase_ready_flag = (int8_t)NETMOX::_net.player_net_info[i].sync_phase_ready_flag;
+                int16_t sync_phase_ready_flag = (int8_t)NETMOX::_net.player_net_info[i].combat_attacker_id;
                 if (sync_phase_ready_flag == i) {
                     Update_Player_Needs_To_Attack_(
                         NETMOX::_net.player_net_info[i].combat_star_id,
                         i,
-                        NETMOX::_net.player_net_info[i].sync_colony_id
+                        NETMOX::_net.player_net_info[i].combat_target_player_id
                     );
                 } else {
                     Update_Player_Needs_To_Attack_(
@@ -2485,15 +2485,15 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                         i
                     );
                 }
-                NETMOX::_net.player_net_info[i].sync_state = 0x0e;
-                NETMOX::_net.player_net_info[i].sync_phase_ready_flag = (undefined)0xff;
+                NETMOX::_net.player_net_info[i].packet_type = 0x0e;
+                NETMOX::_net.player_net_info[i].combat_attacker_id = (undefined)0xff;
                 NETMOX::_net.sync_phase_active_flag = 0;
                 break;
             }
             case 0x1d: {
                 Do_Nonhuman_Attack_Against_Human_(i);
                 (*_star_has_nonplayer)[NETMOX::_net.player_net_info[i].combat_star_id] &= 0xef;
-                NETMOX::_net.player_net_info[i].sync_state = 0x19;
+                NETMOX::_net.player_net_info[i].packet_type = 0x19;
                 NETMOX::_net.sync_phase_active_flag = 0;
                 NETMOX::_net.field82_0x160 = (undefined)0xff;
                 break;
@@ -2504,8 +2504,8 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                     NETMOX::_net.player_net_info[i].combat_star_id,
                     (int16_t)NETMOX::_net.field168_0x209
                 );
-                NETMOX::_net.player_net_info[i].sync_phase_ready_flag = (undefined)0xff;
-                NETMOX::_net.player_net_info[i].sync_state = 0x0e;
+                NETMOX::_net.player_net_info[i].combat_attacker_id = (undefined)0xff;
+                NETMOX::_net.player_net_info[i].packet_type = 0x0e;
                 NETMOX::_net.sync_phase_active_flag = 0;
                 NETMOX::_net.field82_0x160 = (undefined)0xff;
                 break;
@@ -2513,7 +2513,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
             case 0x1f: {
                 if (NETMOX::_net.sync_state == 0x0e) {
                     NETMOX::_net.sync_state = 0x21;
-                    NETMOX::_net.player_net_info[i].sync_state = 0x20;
+                    NETMOX::_net.player_net_info[i].packet_type = 0x20;
                     NETMOX::Mox_Send_Message_((int16_t)MOX::_player[i].network_player_id, 0x31, nullptr, 0);
                 }
                 break;
@@ -2525,7 +2525,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     if (_n_battle_stars == 0) {
         bool bVar3 = false;
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives == 100 /* 'd' */ && NETMOX::_net.player_net_info[i].sync_state != 0x0e) {
+            if (MOX::_player[i].objectives == 100 /* 'd' */ && NETMOX::_net.player_net_info[i].packet_type != 0x0e) {
                 RUSS::Mox_Update_();
                 bVar3 = true;
             }
@@ -2538,7 +2538,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
         return;
     }
 
-    uint8_t state = NETMOX::_net.player_net_info[MOX::_PLAYER_NUM].sync_state;
+    uint8_t state = NETMOX::_net.player_net_info[MOX::_PLAYER_NUM].packet_type;
     if (state == 0x10 || state == 0x0f || NETMOX::_net.sync_phase_active_flag != 0) {
         _in_net_update = 0;
         RUSS::Mox_Update_();
@@ -2563,23 +2563,23 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     for (int16_t j = 0; j < _target.num_player_targets; ++j) {
         int16_t target_player = _target.player_targets[j];
         NETMOX::_net.player_net_info[target_player].combat_star_id = (uint8_t)star_id;
-        NETMOX::_net.player_net_info[target_player].sync_phase_ready_flag = (undefined)attacker_id;
+        NETMOX::_net.player_net_info[target_player].combat_attacker_id = (undefined)attacker_id;
     }
 
     for (int16_t j = 0; j < _target.num_colony_targets; ++j) {
         int16_t target_colony = _target.colony_targets[j];
         int8_t owner = MOX::_colony[target_colony].owner;
         NETMOX::_net.player_net_info[owner].combat_star_id = (uint8_t)star_id;
-        NETMOX::_net.player_net_info[owner].sync_phase_ready_flag = (undefined)attacker_id;
+        NETMOX::_net.player_net_info[owner].combat_attacker_id = (undefined)attacker_id;
     }
 
     NETMOX::_net.player_net_info[attacker_id].combat_star_id = (uint8_t)star_id;
-    NETMOX::_net.player_net_info[attacker_id].sync_phase_ready_flag = (undefined)attacker_id;
+    NETMOX::_net.player_net_info[attacker_id].combat_attacker_id = (undefined)attacker_id;
 
     if (attacker_id < 8) {
         if (MOX::_player[attacker_id].objectives == 100 /* 'd' */) {
             if ((MOX::_star[star_id].ignore_combat_ships & (1 << attacker_id)) == 0) {
-                NETMOX::_net.player_net_info[attacker_id].sync_state = 0x10;
+                NETMOX::_net.player_net_info[attacker_id].packet_type = 0x10;
                 NETMOX::Send_Pick_Target_Info_(attacker_id, star_id, &_target);
                 _in_net_update = 0;
                 RUSS::Mox_Update_();
@@ -2605,35 +2605,35 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
         }
     }
 
-    NETMOX::_net.player_net_info[attacker_id].sync_star_id = target_defender_id;
+    NETMOX::_net.player_net_info[attacker_id].combat_defender_id = target_defender_id;
     int16_t target_planet_id = Target_Colony_To_Planet_(target_colony_idx);
-    NETMOX::_net.player_net_info[attacker_id].sync_planet_id = target_planet_id;
-    NETMOX::_net.player_net_info[attacker_id].sync_colony_id = target_sync_owner_id;
+    NETMOX::_net.player_net_info[attacker_id].combat_planet_id = target_planet_id;
+    NETMOX::_net.player_net_info[attacker_id].combat_target_player_id = target_sync_owner_id;
 
     if (target_sync_owner_id == -1) {
         NETMOX::_net.sync_phase_active_flag = 0;
         for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-            if ((uint8_t)NETMOX::_net.player_net_info[j].sync_phase_ready_flag == attacker_id) {
+            if ((uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id) {
                 RUSS::Mox_Update_();
-                NETMOX::_net.player_net_info[j].sync_phase_ready_flag = (undefined)0xff;
+                NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
             }
         }
     } else {
         MOX::_star[star_id].ignore_combat_ships = 0;
-        NETMOX::_net.player_net_info[target_sync_owner_id].sync_star_id = NETMOX::_net.player_net_info[attacker_id].sync_star_id;
-        NETMOX::_net.player_net_info[target_sync_owner_id].sync_planet_id = NETMOX::_net.player_net_info[attacker_id].sync_planet_id;
-        NETMOX::_net.player_net_info[target_sync_owner_id].sync_colony_id = NETMOX::_net.player_net_info[attacker_id].sync_colony_id;
+        NETMOX::_net.player_net_info[target_sync_owner_id].combat_defender_id = NETMOX::_net.player_net_info[attacker_id].combat_defender_id;
+        NETMOX::_net.player_net_info[target_sync_owner_id].combat_planet_id = NETMOX::_net.player_net_info[attacker_id].combat_planet_id;
+        NETMOX::_net.player_net_info[target_sync_owner_id].combat_target_player_id = NETMOX::_net.player_net_info[attacker_id].combat_target_player_id;
 
         for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-            if (j != attacker_id && j != target_sync_owner_id && (uint8_t)NETMOX::_net.player_net_info[j].sync_phase_ready_flag == attacker_id) {
+            if (j != attacker_id && j != target_sync_owner_id && (uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id) {
                 RUSS::Mox_Update_();
-                NETMOX::_net.player_net_info[j].sync_phase_ready_flag = (undefined)0xff;
+                NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
             }
         }
 
         if (target_sync_owner_id < 8 && MOX::_player[target_sync_owner_id].objectives == 100 /* 'd' */) {
             if (attacker_id == 12 && target_colony_idx != -1) {
-                NETMOX::_net.player_net_info[target_sync_owner_id].sync_state = 0x1c;
+                NETMOX::_net.player_net_info[target_sync_owner_id].packet_type = 0x1c;
                 NETMOX::Send_Dragon_Info_(target_colony_idx);
             } else {
                 Do_Nonhuman_Attack_Against_Human_(target_sync_owner_id);
@@ -2643,8 +2643,8 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
             Do_1_Combat_(star_id, attacker_id, target_defender_id, target_planet_id, nullptr, 0);
             Update_Player_Needs_To_Attack_(star_id, attacker_id, target_sync_owner_id);
             NETMOX::_net.sync_phase_active_flag = 0;
-            NETMOX::_net.player_net_info[attacker_id].sync_phase_ready_flag = (undefined)0xff;
-            NETMOX::_net.player_net_info[target_sync_owner_id].sync_phase_ready_flag = (undefined)0xff;
+            NETMOX::_net.player_net_info[attacker_id].combat_attacker_id = (undefined)0xff;
+            NETMOX::_net.player_net_info[target_sync_owner_id].combat_attacker_id = (undefined)0xff;
         }
     }
 
@@ -2655,23 +2655,23 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
 void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
     s_battle_results local_6d0;
 
-    int8_t attacker_id = (int8_t)NETMOX::_net.player_net_info[player_idx].sync_phase_ready_flag;
+    int8_t attacker_id = (int8_t)NETMOX::_net.player_net_info[player_idx].combat_attacker_id;
     int16_t combat_star_id = (int16_t)NETMOX::_net.player_net_info[player_idx].combat_star_id;
 
     GNN_Reports_Combat_(attacker_id, player_idx);
 
     if (MOX::_settings.strategic_combat_flag == 0) {
-        int16_t colony_id = Target_Planet_To_Colony_(NETMOX::_net.player_net_info[player_idx].sync_planet_id);
+        int16_t colony_id = Target_Planet_To_Colony_(NETMOX::_net.player_net_info[player_idx].combat_planet_id);
 
         NETMOX::Send_You_Are_Target_Info_(
             (int16_t)player_idx,
             (int16_t)attacker_id,
-            NETMOX::_net.player_net_info[player_idx].sync_star_id,
+            NETMOX::_net.player_net_info[player_idx].combat_defender_id,
             colony_id,
             (int16_t)combat_star_id
         );
 
-        NETMOX::_net.player_net_info[player_idx].sync_state = 0x17;
+        NETMOX::_net.player_net_info[player_idx].packet_type = 0x17;
         return;
     }
 
@@ -2680,13 +2680,13 @@ void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
     // The first 12 bytes of s_battle_results map exactly to the 12 bytes of s_net_player_info.
     memcpy(&local_6d0, &NETMOX::_net.player_net_info[player_idx], sizeof(NETMOX::_net.player_net_info[player_idx]));
 
-    local_6d0.planet_id = local_6d0.combat_planet_id;
+    local_6d0.planet_id = local_6d0.player_info.combat_planet_id;
 
-    local_6d0.combat_result = (int8_t)Do_1_Combat_(
+    local_6d0.player_info.combat_result = (int8_t)Do_1_Combat_(
         (int16_t)combat_star_id,
         (int16_t)attacker_id,
-        NETMOX::_net.player_net_info[player_idx].sync_star_id,
-        NETMOX::_net.player_net_info[player_idx].sync_planet_id,
+        NETMOX::_net.player_net_info[player_idx].combat_defender_id,
+        NETMOX::_net.player_net_info[player_idx].combat_planet_id,
         &local_6d0,
         0
     );
@@ -2694,8 +2694,8 @@ void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
     Update_Player_Needs_To_Attack_(combat_star_id, attacker_id, player_idx);
 
     NETMOX::_net.sync_phase_active_flag = 0;
-    NETMOX::_net.player_net_info[attacker_id].sync_phase_ready_flag = (undefined)0xFF; // -1
-    NETMOX::_net.player_net_info[player_idx].sync_state = 0x19;
+    NETMOX::_net.player_net_info[attacker_id].combat_attacker_id = (undefined)0xFF; // -1
+    NETMOX::_net.player_net_info[player_idx].packet_type = 0x19;
 
     NETMOX::Mox_Send_Message_(
         MOX::_player[player_idx].network_player_id,
