@@ -1,10 +1,6 @@
 #include "pch.h"
 
 namespace council {
-    const char s_format_votes[] = "%d %s";
-    const char s__00551100[] = "";
-    const char s_council_lbx[] = "council.LBX";
-    const char s_empty_string[] = "";
     const char lbx_00559a68[12] = "council.lbx";
     const char LBX_00559a74[12] = "council.LBX";
 
@@ -77,7 +73,6 @@ namespace council {
         int16_t field_id;
         int16_t input_id;
         int16_t done = 0;
-        int16_t unused_flag = 0;
 
         fields::Assign_Auto_Function_(Draw_Main_Council_Screen_, 2);
 
@@ -85,20 +80,18 @@ namespace council {
             timer::Mark_Time_();
             fields::Clear_Fields_();
 
-            field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+            field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
             input_id = fields::Get_Input_();
 
             if (field_id == input_id) {
                 done = 1;
             }
 
-            if (done == 0 && unused_flag == 0) {
+            if (done == 0) {
                 Draw_Main_Council_Screen_();
                 RUSS::Mox_Sync_Update_();
                 timer::Release_Time_(2);
             }
-
-            unused_flag = 0;
         }
 
         fields::Clear_Fields_();
@@ -153,8 +146,8 @@ namespace council {
     }
 
     void __cdecl Draw_Main_Council_Screen_() {
-        int16_t x_coords[6] = { 44, 520, 143, 444, 215, 377 }; // 0x2c, 0x208, 0x8f, 0x1bc, 0xd7, 0x179
-        int16_t y_coords[6] = { 96, 100, 148, 149, 169, 168 }; // 0x60, 0x64, 0x94, 0x95, 0xa9, 0xa8
+        int16_t x_coords[6] = { 44, 520, 143, 444, 215, 377 };
+        int16_t y_coords[6] = { 96, 100, 148, 149, 169, 168 };
         char buffer[40];
 
         video::Set_Page_Off_();
@@ -170,22 +163,22 @@ namespace council {
         fonts::Set_Outline_Color_(0, 0);
         fonts::Set_Font_Style_Outline_(2, &council::_council_normal_colors);
 
-        int16_t print_x = 30; // 0x1e
+        int16_t print_x = 30;
         for (int i = 0; i < 2; ++i) {
             if (council::_council_nominee_vote_total[i] < 1) {
                 strcpy(buffer, council::_council_no_votes_message);
-                JIM::Decode_Text_Race_(buffer, council::_council_nominee_[i], 40 /* 0x28 */);
+                JIM::Decode_Text_Race_(buffer, council::_council_nominee_[i], sizeof(buffer));
             } else {
                 char* msg = (council::_council_nominee_vote_total[i] < 2) ? council::_council_vote_message : council::_council_votes_message;
                 strcpy(buffer, msg);
-                JIM::Decode_Text_Name_And_Stat_(buffer, council::_council_nominee_[i], council::_council_nominee_vote_total[i], 40 /* 0x28 */);
+                JIM::Decode_Text_Name_And_Stat_(buffer, council::_council_nominee_[i], council::_council_nominee_vote_total[i], sizeof(buffer));
             }
-            fonts::Print_(print_x, 30 /* 0x1e */, buffer);
-            print_x += 421; // 0x1a5
+            fonts::Print_(print_x, 30, buffer);
+            print_x += 421;
         }
 
-        sprintf(buffer, council::s_format_votes, (int)council::_council_total_votes, council::_council_votes_total_message);
-        fonts::Print_Centered_(320 /* 0x140 */, 30 /* 0x1e */, buffer);
+        sprintf(buffer, "%d %s", (int)council::_council_total_votes, council::_council_votes_total_message);
+        fonts::Print_Centered_(320, 30, buffer);
 
         for (int i = 0; i < council::_council_total_members; ++i) {
             s_animation_header* anim;
@@ -197,21 +190,21 @@ namespace council {
             animate::Draw_(x_coords[i], y_coords[i], anim);
         }
 
-        int16_t nominee_x = 115; // 0x73
+        int16_t nominee_x = 115;
         for (int i = 0; i < 2; ++i) {
             int16_t frame = animate::Get_Current_Frame_(council::_council_nominees_seg[i]);
-            animate::Draw_(nominee_x, 225 /* 0xe1 */, council::_council_nominees_seg[i]);
+            animate::Draw_(nominee_x, 225, council::_council_nominees_seg[i]);
             if (council::_council_nominee_[i] != council::_council_voter) {
                 animate::Set_Animation_Frame_(council::_council_nominees_seg[i], frame);
             }
-            nominee_x += 205; // 0xcd
+            nominee_x += 205;
         }
 
         fonts::Set_Outline_Color_(0, 0);
         fonts::Set_Font_Style_Outline_(4, &council::_council_normal_colors);
         
-        int16_t msg_h = BILL::_Get_Paragraph_Max_Height_(550 /* 0x226 */, council::_council_message);
-        BILL::_Print_Paragraph_(55 /* 0x37 */, 470 /* 0x1d6 */ - msg_h, 550 /* 0x226 */, council::_council_message, 2);
+        int16_t msg_h = BILL::_Get_Paragraph_Max_Height_(550, council::_council_message);
+        BILL::_Print_Paragraph_(55, 470 - msg_h, 550, council::_council_message, 2);
 
         JIM::Play_Streaming_Music_(119 /* 0x77 */, -1, 1);
         RUSS::Mox_Update_();
@@ -220,36 +213,36 @@ namespace council {
     void Council_Player_Vote_() {
         char list_items[4][25];
         char title_msg[48];
-        int16_t result_code = 0;
+        int16_t vote_choice = 0;
 
         int8_t list_metadata;
         uint8_t active_mask[4];
 
         fields::Assign_Auto_Function_(council::Draw_Main_Council_Screen_, 2);
 
-        council::_council_vote_cast = council::Get_Num_Votes_(static_cast<uint8_t>(MOX::_PLAYER_NUM));
-        council::_council_voter = static_cast<uint8_t>(MOX::_PLAYER_NUM);
+        council::_council_vote_cast = council::Get_Num_Votes_((uint8_t)MOX::_PLAYER_NUM);
+        council::_council_voter = (uint8_t)MOX::_PLAYER_NUM;
 
         for (int i = 0; i < 4; ++i) {
             list_items[i][0] = '\0';
         }
 
-        JIM::Get_Text_Message_("jimtext.lbx", 23 /* COUNCIL_VOTE_CAST_INFO */, title_msg, 45);
-        JIM::Decode_Text_Stat_(title_msg, council::_council_vote_cast, 45);
+        JIM::Get_Text_Message_("jimtext.lbx", 23 /* COUNCIL_VOTE_CAST_INFO */, title_msg, sizeof(title_msg));
+        JIM::Decode_Text_Stat_(title_msg, council::_council_vote_cast, sizeof(title_msg));
 
         if (MOX::_PLAYER_NUM == council::_council_nominee_[0]) {
-            JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[0], 25);
+            JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[0], sizeof(list_items[0]));
         } else {
             sprintf(list_items[0], "  %s", MOX::_player[council::_council_nominee_[0]].name);
         }
 
         if (MOX::_PLAYER_NUM == council::_council_nominee_[1]) {
-            JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[1], 25);
+            JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[1], sizeof(list_items[1]));
         } else {
             sprintf(list_items[1], "  %s", MOX::_player[council::_council_nominee_[1]].name);
         }
 
-        JIM::Get_Text_Message_("jimtext.lbx", 25 /* ABSTAIN */, list_items[2], 25);
+        JIM::Get_Text_Message_("jimtext.lbx", 25 /* ABSTAIN */, list_items[2], sizeof(list_items[2]));
 
         active_mask[0] = 1;
         active_mask[1] = 1;
@@ -270,34 +263,34 @@ namespace council {
 
         if (selection == 0) {
             council::_winning_player = council::_council_nominee_[0];
-            result_code = 1;
+            vote_choice = 1;
             MOX::_player[council::_council_voter].council_voted_for = council::_council_nominee_[0];
         } else if (selection == 1) {
             council::_winning_player = council::_council_nominee_[1];
-            result_code = 2;
+            vote_choice = 2;
             MOX::_player[council::_council_voter].council_voted_for = council::_council_nominee_[1];
         } else if (selection == 2) {
-            result_code = 0;
+            vote_choice = 0;
             MOX::_player[council::_council_voter].council_voted_for = -1;
         } else {
-            result_code = 0;
+            vote_choice = 0;
         }
 
-        council::Council_Vote_Result_((int8_t)result_code, (uint8_t)MOX::_PLAYER_NUM);
+        council::Council_Vote_Result_((int8_t)vote_choice, (uint8_t)MOX::_PLAYER_NUM);
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
         council::_council_voter = -1;
     }
 
-    void __cdecl Council_Vote_Result_(int8_t vote_option, uint8_t player_idx) {
+    void __cdecl Council_Vote_Result_(int8_t vote_choice, uint8_t player_idx) {
         uint8_t nominee_id;
 
-        if (vote_option == 0) {
+        if (vote_choice == 0) {
             council::_council_state = 3;
             diplomac::Change_Relations_(-6, player_idx, council::_council_nominee_[1], 0, 0, 0);
             diplomac::Change_Relations_(-6, player_idx, council::_council_nominee_[0], 0, 0, 0);
             MOX::_player[player_idx].council_voted_for = -1;
-        } else if (vote_option == 1) {
+        } else if (vote_choice == 1) {
             council::_council_nominee_vote_total[0] += council::_council_vote_cast;
             council::_council_state = 2;
             council::_council_vote_for = 0;
@@ -305,7 +298,7 @@ namespace council {
             diplomac::Change_Relations_(-12, player_idx, council::_council_nominee_[1], 9, 0, 0);
             nominee_id = council::_council_nominee_[0];
             MOX::_player[player_idx].council_voted_for = nominee_id;
-        } else if (vote_option == 2) {
+        } else if (vote_choice == 2) {
             council::_council_nominee_vote_total[1] += council::_council_vote_cast;
             council::_council_state = 2;
             council::_council_vote_for = 1;
@@ -339,7 +332,7 @@ namespace council {
             break;
         case 2:
         case 3:
-            // No operation for these states
+            /* No operation for these states. */
             break;
         case 4:
         case 5:
@@ -370,38 +363,38 @@ namespace council {
                 int16_t vote0 = Vote_Check_(nominee0, member_id, nominee1);
                 int16_t vote1 = Vote_Check_(nominee1, member_id, nominee0);
 
-                int16_t vote_target;
+                int16_t vote_choice;
                 if (vote0 == 1) {
-                    // If member votes for both (ambiguous), they abstain (0)
-                    vote_target = (vote1 == 1) ? 0 : 1;
+                    /* If member votes for both nominees, they abstain. */
+                    vote_choice = (vote1 == 1) ? 0 : 1;
                 } else {
-                    // If member votes for nominee1 specifically, target is 2
-                    vote_target = (vote1 == 1) ? 2 : 0;
+                    /* If member supports only nominee 1, cast the vote for nominee 1. */
+                    vote_choice = (vote1 == 1) ? 2 : 0;
                 }
 
                 _council_vote_cast = _council_member_votes[i];
                 _council_voter = member_id;
-                Council_Vote_Result_((int8_t)vote_target, member_id);
+                Council_Vote_Result_((int8_t)vote_choice, member_id);
             }
         }
 
-        // Process automatic votes for nominees if they are not the player
+        /* Process automatic votes for nominees if they are not the player. */
         if ((int16_t)_council_nominee_[0] != MOX::_PLAYER_NUM) {
             int16_t votes = _council_nominee_votes[0];
-            int16_t vote_target = (votes >= 1) ? 1 : 0;
+            int16_t vote_choice = (votes >= 1) ? 1 : 0;
 
             _council_vote_cast = votes;
             _council_voter = _council_nominee_[0];
-            Council_Vote_Result_((int8_t)vote_target, _council_nominee_[0]);
+            Council_Vote_Result_((int8_t)vote_choice, _council_nominee_[0]);
         }
 
         if ((int16_t)_council_nominee_[1] != MOX::_PLAYER_NUM) {
             int16_t votes = _council_nominee_votes[1];
-            int16_t vote_target = (votes >= 1) ? 2 : 0;
+            int16_t vote_choice = (votes >= 1) ? 2 : 0;
 
             _council_vote_cast = votes;
             _council_voter = _council_nominee_[1];
-            Council_Vote_Result_((int8_t)vote_target, _council_nominee_[1]);
+            Council_Vote_Result_((int8_t)vote_choice, _council_nominee_[1]);
         }
 
         Council_Player_Vote_();
@@ -562,8 +555,8 @@ namespace council {
         case 6:
             JIM::Get_Text_Message_(JIM::jimtext_lbx, 21, _council_message, 200);
             if (diplodef::_COUNCIL_FLAG == 2) {
-                JIM::Get_Text_Message_(JIM::jimtext_lbx, 22, temp_buffer, 80);
-                JIM::Decode_Text_Race_(temp_buffer, _winning_player, 80);
+                JIM::Get_Text_Message_(JIM::jimtext_lbx, 22, temp_buffer, sizeof(temp_buffer));
+                JIM::Decode_Text_Race_(temp_buffer, _winning_player, sizeof(temp_buffer));
                 strcat(_council_message, temp_buffer);
             }
             break;
@@ -606,7 +599,7 @@ namespace council {
 
     void Council_Accept_Ruling_() {
         char choice_labels[2][25];
-        char list_items[40];
+        char prompt_text[40];
         int8_t list_metadata;
         uint8_t active_mask[4];
 
@@ -619,9 +612,9 @@ namespace council {
             fonts::Set_Font_Highlight_Colors_(&council::_council_highlight_colors);
             fonts::Set_Font_LF_(4);
 
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1A, choice_labels[0], 0x19);
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1B, choice_labels[1], 0x19);
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1C, list_items, 0x28);
+            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1A, choice_labels[0], sizeof(choice_labels[0]));
+            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1B, choice_labels[1], sizeof(choice_labels[1]));
+            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1C, prompt_text, sizeof(prompt_text));
 
             list_metadata = 0;
             active_mask[0] = 1;
@@ -631,7 +624,7 @@ namespace council {
 
             int16_t selection = fields::Get_List_Field_(
                 0xD6, 0x184, 0xB4, 
-                list_items, 
+                prompt_text, 
                 choice_labels[0], 
                 0x19, 
                 &list_metadata, 
@@ -696,19 +689,19 @@ namespace council {
     }
 
     void Council_Player_Voted_Winner_() {
-        memset(_player_voted_winner_message_id, 0xff, 20);
+        memset(_player_voted_winner_message_id, 0xff, sizeof(_player_voted_winner_message_id));
 
         fields::Assign_Auto_Function_(Draw_Council_Player_Voted_Winner_, 2);
 
-        // Select the nominee index opposite to the player's vote
-        int16_t nominee_idx = _council_nominee_[_council_vote_for == 0 ? 1 : 0];
-        Drive_Council_Player_Voted_Winner_(nominee_idx, 0);
+        /* Select the nominee index opposite to the player's vote. */
+        int16_t other_nominee_idx = _council_nominee_[_council_vote_for == 0 ? 1 : 0];
+        Drive_Council_Player_Voted_Winner_(other_nominee_idx, 0);
 
         if (_council_total_members != 0) {
             for (int i = 0; i < (int)_council_total_members; ++i) {
                 uint8_t member_idx = _council_members[i];
                 _council_members[i] = member_idx + 100;
-                Drive_Council_Player_Voted_Winner_(static_cast<int16_t>(member_idx), 0);
+                Drive_Council_Player_Voted_Winner_((int16_t)member_idx, 0);
             }
         }
     }
@@ -729,23 +722,23 @@ namespace council {
         } else if (treaty_type == 2 /* TREATY_PEACE */) {
             vote_score = 200;
         } else {
-            // Base score calculated from diplomatic standing and trust
+            /* Base score calculated from diplomatic standing and trust. */
             vote_score = MOX::_player[voter_idx].broken_treaties_modifier[candidate_idx] +
                          ((MOX::_player[voter_idx].trust_worthiness[candidate_idx] -
                            MOX::_player[voter_idx].diplomacy_proposal_rejection[candidate_idx] * 10) * 2) +
                          MOX::_player[voter_idx].relations[candidate_idx];
 
-            // If voter is allied with the other candidate, increase score requirement
+            /* If the voter is allied with the opposing candidate, increase the score requirement. */
             if (MOX::_player[voter_idx].treaty[opponent_idx] >= 4 /* TREATY_ALLIANCE */) {
                 vote_score += 100;
             }
 
-            // Current Orion owner check
+            /* Favor the current Orion owner. */
             if (HACCESS::Orion_Owner_() == candidate_idx) {
                 vote_score += 40;
             }
 
-            // Diplomatic traits
+            /* Apply diplomatic trait modifiers. */
             if (MOX::_player[candidate_idx].traits[20] == 1) {
                 vote_score += 40;
             }
@@ -753,17 +746,17 @@ namespace council {
                 vote_score -= 100;
             }
 
-            // Xeno Psychology or similar tech check
+            /* Apply the relevant diplomacy tech modifier. */
             if (MOX::_player[candidate_idx].tech_applications[200] == 3) {
                 vote_score += 30;
             }
 
-            // Previous voting record
+            /* Favor the same candidate as in the previous council vote. */
             if (MOX::_player[voter_idx].council_voted_for == (int8_t)candidate_idx) {
                 vote_score += 50;
             }
 
-            // Active treaties
+            /* Apply active treaty bonuses. */
             if (MOX::_player[voter_idx].treaty[candidate_idx] == 1 /* TREATY_NON_AGGRESSION */) {
                 vote_score += 50;
             }
@@ -774,34 +767,33 @@ namespace council {
                 vote_score += 25;
             }
 
-            // Diplomatic victory objective adjustment for higher difficulties
-            if (MOX::_player[candidate_idx].objectives == 100 /* 'd' - Diplomatic Victory? */) {
+            if (MOX::_player[candidate_idx].objectives == 100) {
                 if (MOX::_settings.game_difficulty > 2) {
                     vote_score = (int16_t)((vote_score * 6) / (MOX::_settings.game_difficulty + 6));
                 }
             }
         }
 
-        // Determine if the vote is cast based on the final score
+        /* Determine whether the vote is cast based on the final score. */
         return (int32_t)random::Random_(200) <= (int32_t)vote_score;
     }
 
-    void __cdecl Get_Player_Voted_Winner_Message_(int16_t unused) {
-        (void)unused;
+    void __cdecl Get_Player_Voted_Winner_Message_(int16_t unused_callback_arg) {
+        (void)unused_callback_arg;
         int16_t message_idx;
         do {
-            // BUG: message_idx can be -1 if Random_(14) returns 0
+            /* BUG: message_idx can be -1 if Random_(14) returns 0. */
             message_idx = (int16_t)random::Random_(14) - 1;
         } while (_player_voted_winner_message_id[message_idx] != 0xFF);
 
         _player_voted_winner_message_id[message_idx] = (uint8_t)message_idx;
 
-        // Calculate entry index: (language * 14 messages per language block) + random message index
-        int32_t entry = (int16_t)((int16_t)MOX::_settings.language * 14 + message_idx);
+        /* Calculate the entry index for the current language block. */
+        int32_t message_entry_idx = (int16_t)((int16_t)MOX::_settings.language * 14 + message_idx);
 
         farload::Farload_Data_Static_(
             s_councmsg_lbx,
-            entry,
+            message_entry_idx,
             _council_message,
             0,
             1,
@@ -809,18 +801,18 @@ namespace council {
         );
     }
 
-    void Drive_Council_Player_Voted_Winner_(int16_t player_idx, int16_t unused) {
-        Get_Player_Voted_Winner_Message_(unused);
+    void Drive_Council_Player_Voted_Winner_(int16_t player_idx, int16_t unused_callback_arg) {
+        Get_Player_Voted_Winner_Message_(unused_callback_arg);
 
         int16_t race_anim_id = (int16_t)((uint8_t)MOX::_player[player_idx].race + 0xB8);
-        file_ani::Open_Multi_File_Animation_(s_council_lbx, race_anim_id, 1);
+        file_ani::Open_Multi_File_Animation_("council.LBX", race_anim_id, 1);
 
         bool exit_loop = false;
         while (!exit_loop) {
             timer::Mark_Time_();
             fields::Clear_Fields_();
 
-            int16_t hidden_field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty_string, 0);
+            int16_t hidden_field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
             int16_t input_id = fields::Get_Input_();
 
             if (hidden_field_id == input_id) {
@@ -836,8 +828,8 @@ namespace council {
     }
 
     void __cdecl Draw_Council_Player_Voted_Winner_() {
-        int16_t x_coords[6] = { 44 /* 0x2c */, 520 /* 0x208 */, 143 /* 0x8f */, 444 /* 0x1bc */, 215 /* 0xd7 */, 377 /* 0x179 */ };
-        int16_t y_coords[6] = { 96 /* 0x60 */, 100 /* 0x64 */, 148 /* 0x94 */, 149 /* 0x95 */, 169 /* 0xa9 */, 168 /* 0xa8 */ };
+        int16_t x_coords[6] = { 44, 520, 143, 444, 215, 377 };
+        int16_t y_coords[6] = { 96, 100, 148, 149, 169, 168 };
 
         video::Set_Page_Off_();
         fonts::Set_Outline_Color_(0, 0);
@@ -851,7 +843,7 @@ namespace council {
         }
 
         for (int i = 0; i < (int)_council_total_members; ++i) {
-            if (_council_members[i] < 100 /* 0x64 */) {
+            if (_council_members[i] < 100) {
                 animate::Draw_(x_coords[i], y_coords[i], _council_dark_race_seg[i]);
             }
         }
@@ -859,8 +851,8 @@ namespace council {
         fonts::Set_Outline_Color_(0, 0);
         fonts::Set_Font_Style_Outline_(4, &_council_normal_colors);
 
-        int16_t msg_height = BILL::_Get_Paragraph_Max_Height_(550 /* 0x226 */, _council_message);
-        BILL::_Print_Paragraph_(55 /* 0x37 */, 470 /* 0x1d6 */ - msg_height, 550 /* 0x226 */, _council_message, 2);
+        int16_t msg_height = BILL::_Get_Paragraph_Max_Height_(550, _council_message);
+        BILL::_Print_Paragraph_(55, 470 - msg_height, 550, _council_message, 2);
 
         JIM::Play_Streaming_Music_(119 /* 0x77 */, -1, 1);
         RUSS::Mox_Update_();

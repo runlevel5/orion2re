@@ -2,10 +2,6 @@
 
 namespace comcore {
 
-const char s_Sending_Message_To_Individual[35] = "Sending Message To Individual....\n";
-
-const char s_Sending_Message_To_All[28] = "Sending Message To All....\n";
-
 void* _sendBuffer;
 
 void* _userReceiveBuffer;
@@ -34,43 +30,44 @@ int16_t __cdecl ComSendUserMessage_(
     DPID player_id,
     uint16_t msg_type,
     uint8_t flags,
-    uint32_t transprt_flag
+    uint32_t transport_flag
 ) {
     if (msg_type < 100) {
-        return static_cast<int16_t>(0xFF33);
+        return (int16_t)0xFF33;
     }
 
     if (msg_length > 350 || flags == 2) {
-        return transprt::SendLargeUserMessage_(transprt_flag, (uint8_t*)msg_data, msg_length, player_id);
+        return transprt::SendLargeUserMessage_(transport_flag, (uint8_t*)msg_data, msg_length, player_id);
     }
 
-    uint32_t header_val;
+    uint32_t packet_header;
     if (msg_type == 0x7B1) {
-        header_val = 0x71;
+        packet_header = 0x71;
     } else if (msg_type == 0x7BF) {
-        header_val = 0x61;
+        packet_header = 0x61;
     } else {
-        header_val = 0x51;
+        packet_header = 0x51;
     }
-    *static_cast<uint32_t*>(_sendBuffer) = header_val;
+    uint8_t* send_buffer = (uint8_t*)_sendBuffer;
+    memcpy(send_buffer, &packet_header, sizeof(packet_header));
 
-    memcpy(static_cast<uint8_t*>(_sendBuffer) + 4, msg_data, msg_length);
+    memcpy(send_buffer + sizeof(packet_header), msg_data, msg_length);
 
-    DPID idTo;
+    DPID target_player_id;
     if (player_id == 0x7FFF || player_id == 0x7FFE) {
-        ::OutputDebugStringA(s_Sending_Message_To_All);
-        idTo = 0;
+        ::OutputDebugStringA("Sending Message To All....\n");
+        target_player_id = 0;
     } else {
-        ::OutputDebugStringA(s_Sending_Message_To_Individual);
-        idTo = player_id;
+        ::OutputDebugStringA("Sending Message To Individual....\n");
+        target_player_id = player_id;
     }
 
     HRESULT hr = netcode::_dplay->Send(
         WINNET::_local_player_id,
-        idTo,
+        target_player_id,
         0,
         _sendBuffer,
-        msg_length + 4
+        msg_length + sizeof(packet_header)
     );
 
     if (hr != 0) {
@@ -80,15 +77,15 @@ int16_t __cdecl ComSendUserMessage_(
     return 1;
 }
 
-int32_t __cdecl ComInit_(uint16_t msg_size, char* name, recv_handler_fn rec_fn) {
+int32_t __cdecl ComInit_(uint16_t msg_size, char* player_name, recv_handler_fn receive_handler) {
     transprt::InitTransportLayer_(0x8000);
 
-    if (rec_fn == nullptr) {
+    if (receive_handler == nullptr) {
         return -203;
     }
 
-    transprt::_userRecFunc = rec_fn;
-    _recFunc = reinterpret_cast<comcore::rec_fn>(transprt::ReceiveLargeUserMessage_);
+    transprt::_userRecFunc = receive_handler;
+    _recFunc = (comcore::rec_fn)transprt::ReceiveLargeUserMessage_;
     _recBufferLength = msg_size + 10;
 
     _userReceiveBuffer = malloc(_recBufferLength);
@@ -102,9 +99,9 @@ int32_t __cdecl ComInit_(uint16_t msg_size, char* name, recv_handler_fn rec_fn) 
     }
 
     _sendReq.buf_size = 0;
-    _sendReq.send_buf = static_cast<uint8_t*>(_sendBuffer);
+    _sendReq.send_buf = (uint8_t*)_sendBuffer;
 
-    _pollBuffer = static_cast<uint8_t*>(malloc(_recBufferLength));
+    _pollBuffer = (uint8_t*)malloc(_recBufferLength);
     if (_pollBuffer == nullptr) {
         return -202;
     }
@@ -113,11 +110,11 @@ int32_t __cdecl ComInit_(uint16_t msg_size, char* name, recv_handler_fn rec_fn) 
 
     _commsInitTime = time_::_time();
 
-    if (strlen(name) > 10) {
-        name[10] = '\0';
+    if (strlen(player_name) > 10) {
+        player_name[10] = '\0';
     }
 
-    strncpy(_openReq.name, name, strlen(name));
+    strncpy(_openReq.name, player_name, strlen(player_name));
 
     _openReq.msg_size = msg_size;
     net::_thisHost = WINNET::_local_player_id;
@@ -144,16 +141,17 @@ void __cdecl GetMessages_() {
         }
 
         attempts--;
-        uint8_t* buf = _pollReq.send_buf;
+        uint8_t* poll_data = _pollReq.send_buf;
 
-        if (!HandleSessionMessage_(buf)) {
-            uint32_t msg_type = *reinterpret_cast<uint32_t*>(buf);
+        if (!HandleSessionMessage_(poll_data)) {
+            uint32_t packet_header;
+            memcpy(&packet_header, poll_data, sizeof(packet_header));
 
-            if (msg_type == 0x51 || msg_type == 0x61 || msg_type == 0x71) {
+            if (packet_header == 0x51 || packet_header == 0x61 || packet_header == 0x71) {
                 HandleControlMessage_(&_pollReq);
             }
 
-            if (*reinterpret_cast<uint32_t*>(buf) == 0x41) {
+            if (packet_header == 0x41) {
                 WINNET::SetPlayerLastKeepAlive_(&_pollReq);
             }
         }
@@ -165,15 +163,16 @@ void __cdecl GetMessages_() {
 }
 
 int32_t __cdecl HandleSessionMessage_(uint8_t* msg_data) {
-    uint32_t msg_type = *reinterpret_cast<uint32_t*>(msg_data);
+    uint32_t packet_header;
+    memcpy(&packet_header, msg_data, sizeof(packet_header));
 
-    if (msg_type == 3) {
-        WINNET::Handle_Create_Player_(reinterpret_cast<s_net_pack_create_player*>(msg_data));
+    if (packet_header == 3) {
+        WINNET::Handle_Create_Player_((s_net_pack_create_player*)msg_data);
         return 1;
     }
 
-    if (msg_type == 5) {
-        WINNET::Handle_Destroy_Player_(reinterpret_cast<s_net_pack_destroy_player*>(msg_data));
+    if (packet_header == 5) {
+        WINNET::Handle_Destroy_Player_((s_net_pack_destroy_player*)msg_data);
         return 1;
     }
 
@@ -186,16 +185,18 @@ int8_t __cdecl HandleControlMessage_(s_comcore_poll_buf* poll_buf) {
     }
 
     if (_recFunc != nullptr) {
-        uint32_t msg_type = *reinterpret_cast<uint32_t*>(poll_buf->send_buf);
+        uint32_t packet_header;
+        memcpy(&packet_header, poll_buf->send_buf, sizeof(packet_header));
+        uint8_t* payload = poll_buf->send_buf + sizeof(packet_header);
 
-        if (msg_type == 0x51) {
-            _recFunc(0x7B2, poll_buf->len - 4, poll_buf->send_buf + 4);
+        if (packet_header == 0x51) {
+            _recFunc(0x7B2, poll_buf->len - sizeof(packet_header), payload);
         }
-        if (msg_type == 0x71) {
-            _recFunc(0x7B1, poll_buf->len - 4, poll_buf->send_buf + 4);
+        if (packet_header == 0x71) {
+            _recFunc(0x7B1, poll_buf->len - sizeof(packet_header), payload);
         }
-        if (msg_type == 0x61) {
-            _recFunc(0x7BF, poll_buf->len - 4, poll_buf->send_buf + 4);
+        if (packet_header == 0x61) {
+            _recFunc(0x7BF, poll_buf->len - sizeof(packet_header), payload);
         }
     }
 
