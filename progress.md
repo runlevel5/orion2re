@@ -1,14 +1,7 @@
 # Source Cleanup Progress
 
-- [pending] src/game/fleetpop.{h,cpp}
-- [pending] src/game/flt.{h,cpp}
-- [pending] src/game/flt1.{h,cpp}
-- [pending] src/game/flt2.{h,cpp}
-- [pending] src/game/fmtpara.{h,cpp}
-- [pending] src/game/fontdraw.{h,cpp}
-- [pending] src/game/fonts.{h,cpp}
 - [pending] src/game/funcs.h
-- [pending] src/game/gendraw.{h,cpp}
+
 - [pending] src/game/geo.{h,cpp}
 - [pending] src/game/global.h
 - [pending] src/game/graphics.{h,cpp}

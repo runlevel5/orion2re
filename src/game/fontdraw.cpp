@@ -4,22 +4,22 @@ namespace fontdraw {
 
     void __cdecl Print_Character_No_Alias_ASM_(uint8_t* dest, const uint8_t* src, const uint8_t* palette, int32_t height)
     {
-        for (int y = 0; y < height; y++) {
+        for (int row = 0; row < height; row++) {
             uint8_t* line_start = dest;
             while (true) {
-                uint8_t val = *src++;
+                uint8_t glyph_byte = *src++;
                 
-                if (val == 0x80) {
+                if (glyph_byte == 0x80) {
                     break;
                 }
                 
-                if (val < 0x80) {
-                    if (val != 0) {
-                        *dest = palette[val - 1];
+                if (glyph_byte < 0x80) {
+                    if (glyph_byte != 0) {
+                        *dest = palette[glyph_byte - 1];
                     }
                     dest++;
                 } else {
-                    dest += (val & 0x7F);
+                    dest += (glyph_byte & 0x7F);
                 }
             }
             dest = line_start + video::g_screen_res_x;

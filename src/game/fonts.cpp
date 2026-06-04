@@ -25,8 +25,6 @@ namespace fonts {
     uint16_t _outline_color;
     uint16_t _alias_outline_color;
 
-    const char s_Print_only_works_on_bitmaps[] = "Print only works on bitmaps";
-
     void __cdecl Set_Normal_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
             _font_header.selected_colors.colors[i] = _font_header.normal_colors.colors[i];
@@ -72,18 +70,14 @@ namespace fonts {
     }
 
     void Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index) {
-        // Load the font palette resource block
-        void* loaded_palette = farload::Far_Reload_(_font_name, static_cast<int32_t>(palette_id) + 1, _palette_block);
-
-        // Calculate the range to copy. Colors are assumed to be 4-byte entries.
-        s_palette_entry* src = reinterpret_cast<s_palette_entry*>(loaded_palette) + start_index;
+        void* loaded_palette = farload::Far_Reload_(_font_name, (int32_t)palette_id + 1, _palette_block);
+        s_palette_entry* src = (s_palette_entry*)loaded_palette + start_index;
         s_palette_entry* dst = &video::_current_palette[start_index];
-        uint32_t byte_count = static_cast<uint32_t>(end_index - start_index + 1) * sizeof(uint32_t);
+        uint32_t byte_count = (uint32_t)(end_index - start_index + 1) * sizeof(*dst);
 
         struct_::Copy_Structure_(dst, src, byte_count);
 
-        // The mouse palette is offset by 1024 bytes (256 colors * 4 bytes) into the loaded buffer.
-        video::_mouse_palette = reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(loaded_palette) + 0x400);
+        video::_mouse_palette = (uint8_t*)loaded_palette + sizeof(video::_current_palette);
 
         // Signal that the specified color range has been modified.
         palette::Set_Palette_Changes_(start_index, end_index);
@@ -106,7 +100,7 @@ namespace fonts {
     }
 
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data) {
-        Set_Font_Style_(static_cast<int32_t>(font_index), style_data);
+        Set_Font_Style_((int32_t)font_index, style_data);
         _font_header.font_style = 5;
     }
 
@@ -115,8 +109,8 @@ namespace fonts {
         _alias_outline_color = alias_color;
     }
 
-    void __cdecl Set_Remap_Font_Style_(int font_idx, s_colors* colors) {
-        _current_font_style = static_cast<int16_t>(font_idx);
+    void __cdecl Set_Remap_Font_Style_(int32_t font_index, s_colors* colors) {
+        _current_font_style = (int16_t)font_index;
 
         for (int i = 0; i < 8; i++) {
             uint8_t color = remap::_picture_remap_color_list[colors->colors[i]];
@@ -125,22 +119,21 @@ namespace fonts {
             _current_font_color_array.colors[i] = color;
         }
 
-        _font_header.current_height = _font_header.font_heights[font_idx];
-        _font_header.font_style_height = _font_header.font_heights[font_idx];
+        _font_header.current_height = _font_header.font_heights[font_index];
+        _font_header.font_style_height = _font_header.font_heights[font_index];
         _font_header.font_style = 0;
-        _font_header.leading_offset = static_cast<uint16_t>(_font_header.leading_extra[font_idx]);
-        _font_header.font_style_spacing = _font_header.font_spacing[font_idx];
+        _font_header.leading_offset = (uint16_t)_font_header.leading_extra[font_index];
+        _font_header.font_style_spacing = _font_header.font_spacing[font_index];
         _font_header.line_height = _font_header.font_style_height + _font_header.leading_offset;
 
-        // Potential bug: The loop only copies 255 characters, skipping index 255.
         for (int i = 0; i < 255; i++) {
-            _font_header.font_style_widths[i] = static_cast<char>(_font_header.font_glyph_widths[font_idx][i]);
-            _font_header.font_style_offsets[i] = _font_header.font_glyph_offsets[font_idx][i];
+            _font_header.font_style_widths[i] = (char)_font_header.font_glyph_widths[font_index][i];
+            _font_header.font_style_offsets[i] = _font_header.font_glyph_offsets[font_index][i];
         }
     }
 
-    void __cdecl Set_Font_Style_(int font_style, const s_colors *new_colors) {
-        _current_font_style = static_cast<uint16_t>(font_style);
+    void __cdecl Set_Font_Style_(int32_t font_index, const s_colors* new_colors) {
+        _current_font_style = (uint16_t)font_index;
 
         for (int i = 0; i < 8; ++i) {
             uint8_t color = new_colors->colors[i];
@@ -149,16 +142,16 @@ namespace fonts {
             _current_font_color_array.colors[i] = color;
         }
 
-        _font_header.current_height = _font_header.font_heights[font_style];
-        _font_header.font_style_height = _font_header.font_heights[font_style];
+        _font_header.current_height = _font_header.font_heights[font_index];
+        _font_header.font_style_height = _font_header.font_heights[font_index];
         _font_header.font_style = 0;
-        _font_header.leading_offset = _font_header.leading_extra[font_style];
-        _font_header.font_style_spacing = _font_header.font_spacing[font_style];
+        _font_header.leading_offset = _font_header.leading_extra[font_index];
+        _font_header.font_style_spacing = _font_header.font_spacing[font_index];
         _font_header.line_height = _font_header.font_style_height + _font_header.leading_offset;
 
         for (int i = 0; i < 255; ++i) {
-            _font_header.font_style_widths[i] = _font_header.font_glyph_widths[font_style][i];
-            _font_header.font_style_offsets[i] = _font_header.font_glyph_offsets[font_style][i];
+            _font_header.font_style_widths[i] = _font_header.font_glyph_widths[font_index][i];
+            _font_header.font_style_offsets[i] = _font_header.font_glyph_offsets[font_index][i];
         }
     }
 
@@ -386,12 +379,12 @@ namespace fonts {
         uint32_t res_x = (uint32_t)platform::Lock_Appropriate_Render_Buffer();
         video::g_screen_res_x = (int32_t)res_x;
 
-        uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + (static_cast<int32_t>(y) * res_x) + x;
+        uint8_t* dest_ptr = (uint8_t*)video::_current_video_page + ((int32_t)y * res_x) + x;
 
         uint32_t offset = _font_header.font_style_offsets[(int16_t)c];
-        uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + offset;
+        uint8_t* glyph_ptr = (uint8_t*)_font_data + offset;
 
-        Print_Character_ASM_(dest_ptr, glyph_ptr, reinterpret_cast<uint8_t*>(&_font_header), (int16_t)_font_header.current_height);
+        Print_Character_ASM_(dest_ptr, glyph_ptr, _font_header.selected_colors.colors, (uint32_t)_font_header.current_height);
 
         int16_t char_width = (int16_t)_font_header.font_style_widths[(int16_t)c];
         int16_t total_width = char_width + _font_header.font_style_spacing;
@@ -408,15 +401,15 @@ namespace fonts {
         int32_t char_idx = (int32_t)character;
 
         int32_t pixel_offset = (int32_t)y * (int32_t)video::g_screen_res_x + (int32_t)x;
-        uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + pixel_offset;
+        uint8_t* dest_ptr = (uint8_t*)video::_current_video_page + pixel_offset;
 
-        uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + _font_header.font_style_offsets[char_idx];
+        uint8_t* glyph_ptr = (uint8_t*)_font_data + _font_header.font_style_offsets[char_idx];
 
         fontdraw::Print_Character_No_Alias_ASM_(
             dest_ptr, 
             glyph_ptr, 
             _font_header.selected_colors.colors, 
-            static_cast<int>(_font_header.current_height)
+            (int)_font_header.current_height
         );
 
         int16_t updated_x = x + (int16_t)_font_header.font_style_widths[char_idx] + _font_header.font_style_spacing;
@@ -523,11 +516,11 @@ namespace fonts {
         }
     }
 
-    void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t param_4, s_animation_header* bitmap) {
+    void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t max_width, s_animation_header* bitmap) {
         animate::_animation_header = bitmap;
 
         if ((bitmap->flags & 3) != 1) {
-            exitm::Exit_With_Message(s_Print_only_works_on_bitmaps);
+            exitm::Exit_With_Message("Print only works on bitmaps");
         }
 
         if (_font_header.font_style != 0) {
@@ -539,31 +532,31 @@ namespace fonts {
             }
 
             if (_font_header.font_style != 2) {
-                Print_String_To_Bitmap_(x + 1, y + 1, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x, y + 1, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x + 1, y, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 1, y + 1, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x, y + 1, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x + 1, y, str, 0, max_width, bitmap);
             }
 
             if (_font_header.font_style != 1 && _font_header.font_style != 3) {
-                Print_String_To_Bitmap_(x - 1, y, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x - 1, y - 1, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x, y - 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x - 1, y, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x - 1, y - 1, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x, y - 1, str, 0, max_width, bitmap);
             }
 
             if (_font_header.font_style == 3 || _font_header.font_style == 5) {
-                Print_String_To_Bitmap_(x + 2, y + 2, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x + 1, y + 2, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x + 2, y + 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 2, y + 2, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x + 1, y + 2, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x + 2, y + 1, str, 0, max_width, bitmap);
             }
 
             if (_font_header.font_style > 3) {
-                Print_String_To_Bitmap_(x + 1, y - 1, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x - 1, y + 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 1, y - 1, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x - 1, y + 1, str, 0, max_width, bitmap);
             }
 
             if (_font_header.font_style == 5) {
-                Print_String_To_Bitmap_(x + 2, y, str, 0, param_4, bitmap);
-                Print_String_To_Bitmap_(x, y + 2, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 2, y, str, 0, max_width, bitmap);
+                Print_String_To_Bitmap_(x, y + 2, str, 0, max_width, bitmap);
             }
 
             for (int i = 0; i < 8; ++i) {
@@ -572,26 +565,26 @@ namespace fonts {
         }
 
         _draw_alias_flag = 0;
-        Print_String_To_Bitmap_(x, y, str, 1, param_4, bitmap);
+        Print_String_To_Bitmap_(x, y, str, 1, max_width, bitmap);
     }
 
-    void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* seg) {
+    void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* bitmap) {
         if ((int16_t)(int8_t)ch > 0x80) {
             return;
         }
 
-        short font_h = _font_header.font_style_height;
-        short glyph_w = (short)_font_header.font_style_widths[(int16_t)(int8_t)ch];
+        int16_t font_h = _font_header.font_style_height;
+        int16_t glyph_w = (int16_t)_font_header.font_style_widths[(int16_t)(int8_t)ch];
 
-        short anim_w = animate::Get_Width_(seg);
-        short anim_h = animate::Get_Height_(seg);
+        int16_t anim_w = animate::Get_Width_(bitmap);
+        int16_t anim_h = animate::Get_Height_(bitmap);
 
-        short max_x_idx = anim_w - 1;
-        short max_y_idx = anim_h - 1;
+        int16_t max_x_idx = anim_w - 1;
+        int16_t max_y_idx = anim_h - 1;
 
-        short src_x = 0;
-        short draw_x = x;
-        short clipped_w = glyph_w;
+        int16_t src_x = 0;
+        int16_t draw_x = x;
+        int16_t clipped_w = glyph_w;
 
         if (draw_x < 0) {
             src_x = -draw_x;
@@ -609,20 +602,20 @@ namespace fonts {
             }
         }
 
-        short src_y = 0;
-        short draw_y = y;
+        int16_t src_y = 0;
+        int16_t draw_y = y;
 
         if (draw_y < 0) {
             src_y = -draw_y;
             draw_y = 0;
         }
 
-        short clipped_h = font_h;
+        int16_t clipped_h = font_h;
         if ((int)draw_y + (int)clipped_h > (int)max_y_idx) {
             clipped_h = max_y_idx - draw_y + 1;
         }
 
-        Print_Clipped_Letter_To_Bitmap_(draw_x, draw_y, ch, src_x, clipped_w, src_y, clipped_h, seg);
+        Print_Clipped_Letter_To_Bitmap_(draw_x, draw_y, ch, src_x, clipped_w, src_y, clipped_h, bitmap);
     }
 
     void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap) {
@@ -750,12 +743,12 @@ namespace fonts {
 
     void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str) {
         int16_t width = Get_String_Width_(str);
-        Print_(static_cast<int16_t>(x - (width / 2)), y, str);
+        Print_((int16_t)(x - (width / 2)), y, str);
     }
 
     void __cdecl Print_Right_(int16_t x, int16_t y, const char* text) {
         int16_t width = Get_String_Width_(text);
-        int16_t adjusted_x = static_cast<int16_t>(x - (width - 1));
+        int16_t adjusted_x = (int16_t)(x - (width - 1));
         Print_(adjusted_x, y, text);
     }
 
@@ -842,10 +835,10 @@ namespace fonts {
     }
 
     void __cdecl Set_Alias_Color_(uint8_t color) {
-        _font_header.normal_colors.colors[0] = static_cast<uint8_t>(color);
-        _font_header.highlight_colors.colors[0] = static_cast<uint8_t>(color);
-        _font_header.special_colors.colors[0] = static_cast<uint8_t>(color);
-        _font_header.selected_colors.colors[0] = static_cast<uint8_t>(color);
+        _font_header.normal_colors.colors[0] = (uint8_t)color;
+        _font_header.highlight_colors.colors[0] = (uint8_t)color;
+        _font_header.special_colors.colors[0] = (uint8_t)color;
+        _font_header.selected_colors.colors[0] = (uint8_t)color;
     }
 
     void __cdecl Print_Centered_To_Bitmap_(int16_t x, int16_t y, const char* text, s_animation_header* bitmap) {
@@ -858,31 +851,31 @@ namespace fonts {
     }
 
     void __cdecl Load_Font_File_(char* filename) {
-        uint8_t* blob;
+        uint8_t* font_blob;
 
         if (_current_font_blob == nullptr) {
-            blob = (uint8_t*)farload::Farload_(filename, 0);
+            font_blob = (uint8_t*)farload::Farload_(filename, 0);
             _palette_block = allocate::Allocate_Space_(0x3164);
         } else {
             free(_current_font_blob);
             _current_font_blob = nullptr;
-            blob = (uint8_t*)farload::Farload_(filename, 0);
+            font_blob = (uint8_t*)farload::Farload_(filename, 0);
         }
 
-        _current_font_blob = blob;
+        _current_font_blob = font_blob;
 
-        struct_::Copy_Structure_(video::_glass_colors, blob, 0x40);
-        blob += 0x40;
+        struct_::Copy_Structure_(video::_glass_colors, font_blob, sizeof(video::_glass_colors));
+        font_blob += sizeof(video::_glass_colors);
 
-        struct_::Copy_Structure_(&_font_header, blob, 0x235C);
-        blob += 0x235C;
+        struct_::Copy_Structure_(&_font_header, font_blob, sizeof(_font_header));
+        font_blob += sizeof(_font_header);
 
-        _font_data = blob;
+        _font_data = font_blob;
 
         strcpy(_font_name, filename);
     }
 
-    void __cdecl Disp_PSTR_(int x, int y, const char* format, ...) {
+    void __cdecl Disp_PSTR_(int32_t x, int32_t y, const char* format, ...) {
         HDC hdc;
         char buffer[100];
         tagSIZE size;
@@ -908,16 +901,16 @@ namespace fonts {
         }
     }
 
-    void __cdecl Print_Clipped_Letter_To_Bitmap_(int16_t x, int16_t y, char letter, int16_t clip_x, int16_t clip_width, int16_t clip_y, uint16_t clip_height, s_animation_header* anim) {
-        animate::_animation_header = anim;
+    void __cdecl Print_Clipped_Letter_To_Bitmap_(int16_t x, int16_t y, char letter, int16_t clip_x, int16_t clip_width, int16_t clip_y, uint16_t clip_height, s_animation_header* bitmap) {
+        animate::_animation_header = bitmap;
 
-        int16_t current_frame = anim->current_frame;
-        int16_t width = anim->width;
+        int16_t current_frame = bitmap->current_frame;
+        int16_t width = bitmap->width;
         int32_t dest_offset = x + y * width - clip_x;
 
-        int16_t font_offset = static_cast<int16_t>(_font_header.font_style_offsets[static_cast<int8_t>(letter)]);
+        int16_t font_offset = (int16_t)_font_header.font_style_offsets[(int8_t)letter];
 
-        if (static_cast<int16_t>(_font_header.current_height) < static_cast<int16_t>(clip_height)) {
+        if ((int16_t)_font_header.current_height < (int16_t)clip_height) {
             clip_height = _font_header.current_height;
         }
 
@@ -931,7 +924,7 @@ namespace fonts {
         int16_t rows = clip_height - clip_y;
 
         if (rows > 0) {
-            uint8_t* frame_ptr = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[current_frame];
+            uint8_t* frame_ptr = (uint8_t*)bitmap + bitmap->frame_offsets[current_frame];
             do {
                 int32_t dest_clip_start = clip_x + dest_offset;
                 int32_t dest_clip_end = dest_clip_start + clip_width;
@@ -964,11 +957,11 @@ namespace fonts {
 
         int screen_idx_start = y * video::g_screen_res_x - clip_left + x;
 
-        if (static_cast<int16_t>(_font_header.current_height) < end_y) {
-            end_y = static_cast<int16_t>(_font_header.current_height);
+        if ((int16_t)_font_header.current_height < end_y) {
+            end_y = (int16_t)_font_header.current_height;
         }
 
-        int16_t offset = static_cast<int16_t>(_font_header.font_style_offsets[(int16_t)letter]);
+        int16_t offset = (int16_t)_font_header.font_style_offsets[(int16_t)letter];
 
         for (int i = 0; i < start_y; ++i) {
             while (_font_data[offset] != 0x80) {

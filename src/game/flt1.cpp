@@ -2,19 +2,6 @@
 
 namespace FLT1 {
 
-    const char s_empty[] = "";
-    const char s_plus[] = "+";
-    const char s_minus[] = "-";
-    const char s_space[] = "\x1b";
-    const char s_C[] = "C";
-    const char s_L[] = "L";
-    const char s_dot[] = ".";
-    const char s_comma[] = ",";
-    const char s_S[] = "S";
-    const char s_A[] = "A";
-    const char s_R[] = "R";
-    const char s_U[] = "U";
-
     int16_t _fleet_screen_bad_ship_id;
     int16_t _combat_filter_button;
     uint8_t _relocate_button_mode;
@@ -41,21 +28,20 @@ namespace FLT1 {
         {1, 0, 447, 383, 517, 405},
         {1, 0, 345, 428, 625, 458},
     };
-    void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* sb) {
+    void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* scroll_bar) {
         int16_t scroll_height;
 
-        sb->visible_rows = 5;
-        sb->track_len_px = 0xea /* 234 */;
+        scroll_bar->visible_rows = 5;
+        scroll_bar->track_len_px = 0xea /* 234 */;
 
-        scroll_height = SCROLL::Get_Vertical_Scroll_Bar_Height_(sb);
-        sb->thumb_height_px = scroll_height;
+        scroll_height = SCROLL::Get_Vertical_Scroll_Bar_Height_(scroll_bar);
+        scroll_bar->thumb_height_px = scroll_height;
 
-        sb->last_thumb_center_y = -1;
-        sb->type = 0;
-        sb->row_step = 1;
+        scroll_bar->last_thumb_center_y = -1;
+        scroll_bar->type = 0;
+        scroll_bar->row_step = 1;
 
-        // Division by 2 logic (CDQ, SUB, SAR) matches signed integer division behavior
-        sb->thumb_center_y = sb->track_len_px - (scroll_height / 2);
+        scroll_bar->thumb_center_y = scroll_bar->track_len_px - (scroll_height / 2);
     }
 
     void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t param_1) {
@@ -133,7 +119,7 @@ namespace FLT1 {
         }
     }
 
-    void __cdecl Draw_Fltscrn_Ship_Destination_Lines_(int16_t param_1) {
+    void __cdecl Draw_Fltscrn_Ship_Destination_Lines_(int16_t screen_id) {
         bool draw_dest = false;
         int16_t icon_idx = -1;
         int16_t view_x1, view_y1, view_x2, view_y2;
@@ -143,7 +129,7 @@ namespace FLT1 {
         s_colors local_green = MAINSCR::_ship_direction_line_green_colors;
         s_colors local_red = MAINSCR::_ship_direction_line_red_colors;
 
-        if (param_1 == 4) {
+        if (screen_id == 4) {
             if (MOX::_small_ship_stack_ptr > -1) {
                 int16_t first_sel = First_Selected_Ship_();
                 if (first_sel != -1) {
@@ -374,14 +360,19 @@ namespace FLT1 {
     }
 
     void __cdecl Allocate_Fltscrn_Next_Screen_Seg_() {
-        MOX::_fltscrn_big_icon = (s_big_icon*)allocate::Allocate_Next_Block_((void*)(uintptr_t)MOX::_screen_seg, 0xcb2);
-        MOX::_fltscrn_icon_selection_status = (int8_t*)allocate::Allocate_Next_Block_((void*)(uintptr_t)MOX::_screen_seg, 0xfa);
-        MOX::_fltscrn_ship_icon_selection_list = (int16_t*)allocate::Allocate_Next_Block_((void*)(uintptr_t)MOX::_screen_seg, 0x1f4 /* 500 */);
-        MOX::_officer_id_list = (int16_t*)allocate::Allocate_Next_Block_((void*)(uintptr_t)MOX::_screen_seg, 0x86);
-        MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_((void*)(uintptr_t)MOX::_screen_seg, 0x1d);
+        MOX::_fltscrn_big_icon = (s_big_icon*)allocate::Allocate_Next_Block_(
+            (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_big_icon));
+        MOX::_fltscrn_icon_selection_status = (int8_t*)allocate::Allocate_Next_Block_(
+            (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_icon_selection_status));
+        MOX::_fltscrn_ship_icon_selection_list = (int16_t*)allocate::Allocate_Next_Block_(
+            (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
+        MOX::_officer_id_list = (int16_t*)allocate::Allocate_Next_Block_(
+            (void*)(uintptr_t)MOX::_screen_seg, 67 * sizeof(*MOX::_officer_id_list));
+        MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(
+            (void*)(uintptr_t)MOX::_screen_seg, sizeof(*MOX::_scroll_bar));
 
         if (MOX::_scroll_bar) {
-            memset(MOX::_scroll_bar, 0, 0x1d);
+            memset(MOX::_scroll_bar, 0, sizeof(*MOX::_scroll_bar));
         }
 
         allocate::Get_Remaining_Block_Space_((void*)(uintptr_t)MOX::_screen_seg);
@@ -501,7 +492,7 @@ namespace FLT1 {
         } scan_val;
 
         scan_val.words[1] = -1;
-        int16_t local_34 = -1;
+        int16_t relocate_target_star_idx = -1;
         int16_t exit_flag = 0;
         bool redraw_skip = false;
         bool reinit_scroll = false;
@@ -523,7 +514,7 @@ namespace FLT1 {
         MOX::_big_icon_y_offset = 0x35;
 
         Reload_Fleet_Screen_();
-        fields::Assign_Auto_Function_(reinterpret_cast<void(*)()>(Draw_Fleet_Screen_), 1);
+        fields::Assign_Auto_Function_((void(*)())Draw_Fleet_Screen_, 1);
         MOX::_icon_overlay_x = -1;
         MOX::_icon_overlay_y = -1;
         MOX::_drawing_officer_popup = 0;
@@ -574,10 +565,10 @@ namespace FLT1 {
         Draw_Fleet_Screen_();
 
         if (_n_player_ships > 0) {
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(_multi_button_support_seg), 1);
-            animate::Draw_(0x1A9, 0x1B3, reinterpret_cast<s_animation_header*>(_multi_button_support_seg));
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(_multi_button_combat_seg), 1);
-            animate::Draw_(0x1E7, 0x1B3, reinterpret_cast<s_animation_header*>(_multi_button_combat_seg));
+            animate::Set_Animation_Frame_((s_animation_header*)_multi_button_support_seg, 1);
+            animate::Draw_(0x1A9, 0x1B3, (s_animation_header*)_multi_button_support_seg);
+            animate::Set_Animation_Frame_((s_animation_header*)_multi_button_combat_seg, 1);
+            animate::Draw_(0x1E7, 0x1B3, (s_animation_header*)_multi_button_combat_seg);
         }
 
         palette::Clear_Palette_Changes_(0, 255);
@@ -600,7 +591,7 @@ namespace FLT1 {
 
             if (input < 0 && _relocate_button_mode == 1) {
                 scan_val.words[1] = -1;
-                local_34 = -1;
+                relocate_target_star_idx = -1;
                 _relocate_button_mode = 0;
                 mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
             } else if (input == (int16_t)0xFBAF) {
@@ -646,7 +637,7 @@ namespace FLT1 {
             } else if (ret_map == 0) {
                 if (_merging_relocations == 0) {
                     if (_relocate_button_mode == 1) {
-                        Star_Relocation_(&scan_val.words[1], &local_34, clicked_star_id);
+                        Star_Relocation_(&scan_val.words[1], &relocate_target_star_idx, clicked_star_id);
                     } else if (MOX::_star[clicked_star_id].spectral_class == 6) {
                         char msg_buf_78[80];
                         sprintf(msg_buf_78, HAROLD::H_Message_(0x78));
@@ -670,7 +661,7 @@ namespace FLT1 {
                     sprintf(msg_buf_77, HAROLD::H_Message_(0x77), MOX::_star[clicked_star_id].name);
                     HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_77, 0);
                     scan_val.words[1] = -1;
-                    local_34 = -1;
+                    relocate_target_star_idx = -1;
                 }
             }
 
@@ -751,7 +742,7 @@ namespace FLT1 {
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                     scan_val.words[1] = -1;
                     _relocate_button_mode = 0;
-                    local_34 = -1;
+                    relocate_target_star_idx = -1;
                 }
             }
 
@@ -845,21 +836,22 @@ namespace FLT1 {
         MOX::_reloaded_ship_palette = 0;
     }
 
-    int16_t __cdecl Scan_Small_Ship_Icons_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
+    int16_t __cdecl Scan_Small_Ship_Icons_(int16_t scanned_field_id, int16_t clicked_field_id,
+                                           int16_t* scanned_icon_idx, int16_t* clicked_icon_idx) {
         int16_t result = -1;
         bool found = false;
 
-        *param_3 = -1;
-        *param_4 = -1;
+        *scanned_icon_idx = -1;
+        *clicked_icon_idx = -1;
 
         for (int16_t i = 0; i < MOX::_ship_icon_count; ++i) {
             if (found) {
                 break;
             }
-            if (MOX::_ship_icon[i].stack_id == param_2) {
+            if (MOX::_ship_icon[i].stack_id == clicked_field_id) {
                 result = 0;
                 SHIPS::Overlapped_Ship_Icon_Button_(&i, 7, 4);
-                *param_4 = i;
+                *clicked_icon_idx = i;
                 MOX::_small_ship_stack_ptr = HACCESS::Ship_Stack_From_Ship_Icon_(i);
 
                 if (MOX::_old_small_ship_stack_ptr != MOX::_small_ship_stack_ptr) {
@@ -876,10 +868,10 @@ namespace FLT1 {
                 if (found) {
                     break;
                 }
-                if (MOX::_ship_icon[i].stack_id == param_1) {
+                if (MOX::_ship_icon[i].stack_id == scanned_field_id) {
                     result = 4;
                     found = true;
-                    *param_3 = i;
+                    *scanned_icon_idx = i;
                 }
             }
         }
@@ -889,14 +881,14 @@ namespace FLT1 {
 
     void __cdecl Cancel_Star_Relocation_(int16_t star_idx) {
         char message[100];
-        char* format;
+        const char* format;
         s_star_data* star;
 
         star = &MOX::_star[star_idx];
 
-        format = const_cast<char*>(HAROLD::H_Message_(137));
+        format = HAROLD::H_Message_(137);
 
-        sprintf(message, format, star);
+        sprintf(message, format, star->name);
 
         HACCESS::Clear_Star_Relocation_(star_idx, MOX::_PLAYER_NUM);
 
@@ -940,15 +932,12 @@ namespace FLT1 {
         _fleet_screen_bad_ship_id = -1;
     }
 
-    /**
-     * @address 004afd20
-     */
+    /** Collects the currently selected fleet-screen ships into the scrap list. */
     void __cdecl Build_Scrap_List_(int16_t* scrap_list, int16_t* list_count) {
         *list_count = 0;
 
         if (MOX::_n_fltscrn_big_icons > 0) {
             for (int16_t i = 0; i < (int16_t)MOX::_n_fltscrn_big_icons; ++i) {
-                // Size of s_big_icon is 13 (0xD) bytes
                 s_big_icon& icon = MOX::_fltscrn_big_icon[i];
 
                 if (icon.ship_idx > -1 && icon.ship_idx < 500 && icon.selected != 0) {
@@ -959,12 +948,9 @@ namespace FLT1 {
         }
     }
 
-    /**
-     * @address 004b2920
-     */
+    /** Awards any eligible reverse-engineered technology from the scrapped ships. */
     void __cdecl Plunder_Ships_For_Tech_(int16_t* ship_indices, int16_t count, int8_t flag) {
         for (int16_t i = 0; i < count; ++i) {
-            // Structure size is 129 bytes (0x81)
             s_ship_data* ship = &MOX::_ship[ship_indices[i]];
             if (ship->d.previous_owner != ship->owner) {
                 Get_Technology_From_Scrapped_Ship_(ship, MOX::_PLAYER_NUM, flag);
@@ -972,9 +958,7 @@ namespace FLT1 {
         }
     }
 
-    /**
-     * @address 004b28c0
-     */
+    /** Sums the BC value of all selected ships on the fleet screen. */
     int16_t __cdecl Get_Scrap_Ship_Value_() {
         int16_t total_value = 0;
 
@@ -989,9 +973,7 @@ namespace FLT1 {
         return total_value;
     }
 
-    /**
-     * @address 004b30f0
-     */
+    /** Counts selected fleet-screen ships from the current scroll position onward. */
     int16_t __cdecl N_Fltscrn_Ships_Selected_() {
         int16_t selected_count = 0;
         int16_t start_index = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
@@ -1182,6 +1164,7 @@ namespace FLT1 {
     }
 
     void* __cdecl Load_Fltscrn_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, uint8_t reload_flag) {
+        (void)player_num;
         int16_t entry_num = (int16_t)MOX::_leaders[leader_idx].pict_num + 0x2d;
 
         if (reload_flag != 0) {
@@ -1201,7 +1184,7 @@ namespace FLT1 {
 
         if (MOX::_n_big_icons_selected > 0 && MOX::_PLAYER_NUM == MOX::_fltscrn_stack_owner && FLT1::_relocate_button_mode != 1) {
             MOX::_add_scrap_button = 1;
-            *scrap_button_field_id = fields::Add_Button_Field_(549, 380, s_empty, MOX::_scrap_button_seg, s_S, 40);
+            *scrap_button_field_id = fields::Add_Button_Field_(549, 380, "", MOX::_scrap_button_seg, "S", 40);
         } else {
             MOX::_add_scrap_button = 0;
             *scrap_button_field_id = -1000;
@@ -1209,13 +1192,16 @@ namespace FLT1 {
 
         if (MOX::_n_fltscrn_big_icons > 0 && MOX::_PLAYER_NUM == MOX::_fltscrn_stack_owner && FLT1::_relocate_button_mode != 1) {
             MOX::_add_all_button = 1;
-            *all_button_field_id = fields::Add_Button_Field_(348, 380, s_empty, MOX::_fleet_all_button_seg, s_A, 40);
+            *all_button_field_id = fields::Add_Button_Field_(348, 380, "", MOX::_fleet_all_button_seg, "A", 40);
         } else {
             MOX::_add_all_button = 0;
             *all_button_field_id = -1000;
         }
 
-        *fleet_return_button_field_id = fields::Add_Button_Field_(556, 430, s_empty, MOX::_fleet_return_button_seg, s_space, 40);
+        *fleet_return_button_field_id = fields::Add_Button_Field_(
+            556, 430, "", MOX::_fleet_return_button_seg,
+            "\x1b", /* ESC control byte, not a printable space. */
+            40);
         
         *up_scroll_button_field_id = -1000;
         *down_scroll_button_field_id = -1000;
@@ -1224,11 +1210,11 @@ namespace FLT1 {
 
         if (FLT1::_n_player_ships > 0) {
             if (MOX::_n_fltscrn_big_icons > 20) {
-                *up_scroll_button_field_id = fields::Add_Button_Field_(606, 59, s_empty, MOX::_up_scroll_button_seg, s_minus, 40);
-                *down_scroll_button_field_id = fields::Add_Button_Field_(605, 325, s_empty, MOX::_down_scroll_button_seg, s_plus, 40);
+                *up_scroll_button_field_id = fields::Add_Button_Field_(606, 59, "", MOX::_up_scroll_button_seg, "-", 40);
+                *down_scroll_button_field_id = fields::Add_Button_Field_(605, 325, "", MOX::_down_scroll_button_seg, "+", 40);
             }
-            *prev_fleet_button_field_id = fields::Add_Button_Field_(19, 249, s_empty, MOX::_prev_fleet_button_seg, s_comma, 40);
-            *next_fleet_button_field_id = fields::Add_Button_Field_(283, 249, s_empty, MOX::_next_fleet_button_seg, s_dot, 40);
+            *prev_fleet_button_field_id = fields::Add_Button_Field_(19, 249, "", MOX::_prev_fleet_button_seg, ",", 40);
+            *next_fleet_button_field_id = fields::Add_Button_Field_(283, 249, "", MOX::_next_fleet_button_seg, ".", 40);
         }
 
         MOX::_scroll_bar->dn_btn = *down_scroll_button_field_id;
@@ -1240,17 +1226,17 @@ namespace FLT1 {
         } else {
             int h = animate::Get_Height_(MOX::_relocate_fleet_button_seg);
             int w = animate::Get_Width_(MOX::_relocate_fleet_button_seg);
-            *relocate_fleet_field_id = fields::Add_Hidden_Field_(441, 380, w + 441, h + 380, s_R, 41);
+            *relocate_fleet_field_id = fields::Add_Hidden_Field_(441, 380, w + 441, h + 380, "R", 41);
         }
 
         bool has_officer = FLT1::At_Least_One_Officer_(MOX::_PLAYER_NUM);
         if (has_officer) {
-            *officers_button_field_id = fields::Add_Button_Field_(342, 430, s_empty, MOX::_officers_button_seg, s_L, 40);
+            *officers_button_field_id = fields::Add_Button_Field_(342, 430, "", MOX::_officers_button_seg, "L", 40);
             MOX::_add_officers_button = 1;
         } else {
             int h = animate::Get_Height_(MOX::_officers_button_seg);
             int w = animate::Get_Width_(MOX::_officers_button_seg);
-            *officers_button_field_id = fields::Add_Hidden_Field_(342, 430, w + 342, h + 430, s_empty, 41);
+            *officers_button_field_id = fields::Add_Hidden_Field_(342, 430, w + 342, h + 430, "", 41);
             MOX::_add_officers_button = 0;
         }
 
@@ -1263,17 +1249,17 @@ namespace FLT1 {
 
         MOVEBOX::Add_Galaxy_Map_Fields_2_(15, 52, 305, 182, 0, 0, 0, 0, 1, &temp_field_id, MOX::_galaxy_map_star_field, &MOX::_galaxy_map_grid_field);
 
-        MAINSCR::_debug_field = fields::Add_Hidden_Field_(0, 470, 10, 479, s_empty, 41);
+        MAINSCR::_debug_field = fields::Add_Hidden_Field_(0, 470, 10, 479, "", 41);
 
         if (FLT1::_n_player_ships > 0) {
-            FLT1::_support_filter_button = fields::Add_Radio_Button_Field_(425, 435, s_empty, (s_animation_header*)FLT1::_multi_button_support_seg, &MOX::_fltscrn_support_button_status, s_U, 41);
-            FLT1::_combat_filter_button = fields::Add_Radio_Button_Field_(487, 435, s_empty, (s_animation_header*)FLT1::_multi_button_combat_seg, &MOX::_fltscrn_combat_button_status, s_C, 41);
+            FLT1::_support_filter_button = fields::Add_Radio_Button_Field_(425, 435, "", (s_animation_header*)FLT1::_multi_button_support_seg, &MOX::_fltscrn_support_button_status, "U", 41);
+            FLT1::_combat_filter_button = fields::Add_Radio_Button_Field_(487, 435, "", (s_animation_header*)FLT1::_multi_button_combat_seg, &MOX::_fltscrn_combat_button_status, "C", 41);
         } else {
             FLT1::_support_filter_button = -1000;
             FLT1::_combat_filter_button = -1000;
         }
 
-        fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty, 0);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
     }
 
     void __cdecl Reload_Small_Ship_Icons_() {
@@ -1335,7 +1321,7 @@ namespace FLT1 {
         return false;
     }
 
-    void __cdecl Get_Technology_From_Scrapped_Ship_(s_ship_data* ship, int16_t player_id, char show_msg) {
+    void __cdecl Get_Technology_From_Scrapped_Ship_(s_ship_data* ship, int16_t player_id, uint8_t show_msg) {
         uint16_t tech_apps[25];
         uint16_t got_tech_apps[25];
 
@@ -1427,9 +1413,7 @@ namespace FLT1 {
         }
     }
 
-    /**
-     * @address 004b2210
-     */
+    /** Loads the animated galaxy-star assets used by the fleet screen. */
     void __cdecl Load_Galaxy_Stars_(void) {
         int lbx_entry = 0x22 /* 34 */;
 
@@ -1442,7 +1426,7 @@ namespace FLT1 {
         }
     }
 
-    void __cdecl Draw_Fltscrn_Relocation_Lines_(int16_t param_1) {
+    void __cdecl Draw_Fltscrn_Relocation_Lines_(int16_t screen_id) {
         s_colors colors;
         int16_t local_a;
         int16_t view_y;
@@ -1460,7 +1444,7 @@ namespace FLT1 {
         colors.colors[6] = 9;
         colors.colors[7] = 10;
 
-        if (param_1 == 4) {
+        if (screen_id == 4) {
             local_a = 52 /* 0x34 */;
             view_y = 15 /* 0x0F */;
             view_x = 305 /* 0x131 */;
@@ -1472,11 +1456,11 @@ namespace FLT1 {
             zoom = 169 /* 0xA9 */;
         }
 
-        for (int16_t star_idx_00 = 0; star_idx_00 < (int16_t)MOX::_NUM_STARS; ++star_idx_00) {
-            if (HACCESS::Star_Has_Relocation_(star_idx_00, MOX::_PLAYER_NUM)) {
-                int16_t relocation_target_idx = HACCESS::Relocation_(star_idx_00, MOX::_PLAYER_NUM);
+        for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
+            if (HACCESS::Star_Has_Relocation_(star_idx, MOX::_PLAYER_NUM)) {
+                int16_t relocation_target_idx = HACCESS::Relocation_(star_idx, MOX::_PLAYER_NUM);
 
-                MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx_00, view_y, local_a, view_x, zoom, 0, 0, 1, &x1, &y1);
+                MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, view_y, local_a, view_x, zoom, 0, 0, 1, &x1, &y1);
                 MOVEBOX::Get_Galaxy_Map_Star_XY_(relocation_target_idx, view_y, local_a, view_x, zoom, 0, 0, 1, &x2, &y2);
 
                 SHIPS::Draw_Ship_Destination_Line_(x2 + 3, y2 + 3, x1, y1, &colors);
@@ -1484,9 +1468,7 @@ namespace FLT1 {
         }
     }
 
-    /**
-     * @address 004b2c20
-     */
+    /** Validates a relocation-source selection and restores the source cursor set. */
     uint8_t __cdecl Okay_To_Set_Relocate_Star2_(int16_t star_idx) {
         uint8_t result;
 
@@ -1496,10 +1478,7 @@ namespace FLT1 {
         return result;
     }
 
-    /**
-     * Checks if it is valid to relocate a fleet from one star to another,
-     * specifically checking for black hole blockades.
-     */
+    /** Scraps the selected ships and optionally awards BC and recovered technology. */
     int8_t __cdecl Scrap_Ships_(int16_t player_idx, int16_t* ship_indices, int16_t num_ships, int8_t interactive) {
         bool give_bc = true;
         bool has_officer = false;
@@ -1537,7 +1516,7 @@ namespace FLT1 {
                         strcpy(leader_name_buf, OFFICER::Leader_Name_(MOX::_ship[ship_idx].officer_index, 1));
 
                         char msg_buf[300];
-                        sprintf(msg_buf, HAROLD::H_Message_(126 /* 0x7e */), &MOX::_ship[ship_idx], leader_name_buf);
+                        sprintf(msg_buf, HAROLD::H_Message_(126 /* 0x7e */), MOX::_ship[ship_idx].d.name, leader_name_buf);
 
                         if (HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf, 1) == 0) {
                             char cancel_msg_buf[200];
@@ -1622,12 +1601,8 @@ namespace FLT1 {
         mouse::Set_Mouse_List_(FLT1::_mouse_list_to, 4);
 
         if (result != 0) {
-            // Check if the path from src_star to dst_star is blocked by a black hole
             if (struct_::Test_Bit_Field_(MOX::_star[src_star_idx].black_hole_blocks, dst_star_idx) != 0) {
                 fmt = HAROLD::H_Message_(0x82 /* 130 */);
-
-                // Note: passing pointer to s_star_data is equivalent to passing star.name
-                // because name is at offset 0 of s_star_data.
                 sprintf(message, fmt, MOX::_star[src_star_idx].name, MOX::_star[dst_star_idx].name);
 
                 result = 0;

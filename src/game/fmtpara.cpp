@@ -6,7 +6,7 @@ namespace FMTPARA {
     extern const uint8_t _legal_variable_types[6] = {1, 2, 3, 4, 5, 6};
     uint8_t _font_base_offsets[6] = {5, 7, 10, 11, 14, 19};
     int8_t _reset_parameters_lookup[16] = {1, 2, 4, 8, 12, 13, 16, 32, 29, 0, 0, 0, 0, 0, 0, 0};
-    short _tabs[11];
+    int16_t _tabs[11];
     s_fmtpara_style _saved_superscript;
     s_fmtpara_style* _style_p;
     s_fmtpara_char* _char_p;
@@ -28,8 +28,6 @@ namespace FMTPARA {
     uint32_t _variable[16];
     char _tmp_str[16];
     char _tmp_str2[32];
-    extern const char s_s_00556218[] = "s";
-    extern const char s_es_0055621c[] = "es";
     extern const char* const _ordinal_ending[10] = {
         "th",
         "st",
@@ -55,24 +53,17 @@ namespace FMTPARA {
         "ninth",
         "tenth",
     };
-    extern const char _ordinal_fmt[] = "%s\a^2.%s\a^0.";
     static const char k_insert_item_kind[] = "11110101121212120000";
     uint32_t _user_fn_arg;
 
-    /**
-     * @address 00432ef0
-     */
     void __cdecl Init_() {
         memset(_tabs, 0, sizeof(_tabs));
         memset(&_para_global, 0, sizeof(_para_global));
         Initialize_Formatted_Paragraph_System_();
     }
 
-    /**
-     * @address 00433de0
-     */
     void __cdecl Reset_A_Paragraph_Variable_(uint16_t index) {
-        if (index < 16) {
+        if (index < (sizeof(_variable) / sizeof(_variable[0]))) {
             uint32_t* var_ptr = &FMTPARA::_variable[index];
             _para_global.item_ptr[index] = var_ptr;
             _para_global.item_type[index] = 2;
@@ -80,11 +71,8 @@ namespace FMTPARA {
         }
     }
 
-    /**
-     * @address 00433dc0
-     */
     void __cdecl Initialize_Formatted_Paragraph_System_() {
-        for (uint16_t i = 0; i < 0x10; ++i) {
+        for (uint16_t i = 0; i < (sizeof(_variable) / sizeof(_variable[0])); ++i) {
             Reset_A_Paragraph_Variable_(i);
         }
     }
@@ -268,9 +256,6 @@ namespace FMTPARA {
         return false;
     }
 
-    /**
-     * @address 00433d30
-     */
     void __cdecl Reset_Parameters_() {
         uint8_t reset_flags;
         uint16_t argument;
@@ -306,13 +291,13 @@ namespace FMTPARA {
         }
     }
 
-    bool __cdecl Process_Command_(char param_1) {
-        if (param_1 < 0x17) {
-            if (param_1 > 0xd) {
+    bool __cdecl Process_Command_(char command_char) {
+        if (command_char < 0x17) {
+            if (command_char > 0xd) {
                 return false;
             }
 
-            switch (param_1) {
+            switch (command_char) {
                 case '\0':
                     _insert_case = 0;
                     if (!Previous_Nesting_Level_()) {
@@ -358,12 +343,12 @@ namespace FMTPARA {
                     break;
             }
         } else {
-            uint8_t cmd = param_1 - 0x17;
+            uint8_t cmd = (uint8_t)command_char - 0x17;
             if (cmd > 8) {
                 return false;
             }
 
-            switch (param_1) {
+            switch (command_char) {
                 case 0x17:
                     Set_Value_();
                     // fall through
@@ -641,15 +626,12 @@ namespace FMTPARA {
         return (int16_t)((_para_global.max_y - _para_global.min_y) + 1);
     }
 
-    /**
-     * @address 00432ea0
-     */
     int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify) {
         _Print_Formatted_Paragraph_(0, 0, width, text, justify, nullptr, false);
         return (int16_t)(_para_global.max_x - _para_global.min_x + 1);
     }
 
-    char* __cdecl _Print_Formatted_Paragraph_(short x, short y, short width, char* str, short justify, s_animation_header* seg, bool do_render) {
+    char* __cdecl _Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg, bool do_render) {
         s_fmtpara_para para;
         s_fmtpara_line linep;
         s_fmtpara_style stylep;
@@ -719,8 +701,8 @@ namespace FMTPARA {
         return str;
     }
 
-    char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t param_5) {
-        return _Print_Formatted_Paragraph_(x, y, width, str, param_5, nullptr, true);
+    char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify) {
+        return _Print_Formatted_Paragraph_(x, y, width, str, justify, nullptr, true);
     }
 
     void __cdecl Add_Character_To_Line_(char ch) {
@@ -871,7 +853,7 @@ namespace FMTPARA {
 
     void __cdecl Insert_Item_() {
         _para_p->str++;
-        uint8_t c = static_cast<uint8_t>(*_para_p->str);
+        uint8_t c = (uint8_t)*_para_p->str;
         uint16_t arg_idx;
         bool has_arg = true;
 
@@ -900,7 +882,8 @@ namespace FMTPARA {
             itoa(val, _tmp_str, 10);
             int len = (int)strlen(_tmp_str);
             int digit = _tmp_str[len - 1] - '0';
-            sprintf(_tmp_str2, _ordinal_fmt, _tmp_str, _ordinal_ending[digit]);
+            /* \a^2. renders the ordinal suffix in superscript and \a^0. restores the previous style. */
+            sprintf(_tmp_str2, "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);
             Insert_String_(_tmp_str2);
             break;
         }
@@ -913,7 +896,7 @@ namespace FMTPARA {
                 itoa(val, _tmp_str, 10);
                 int len = (int)strlen(_tmp_str);
                 int digit = _tmp_str[len - 1] - '0';
-                sprintf(_tmp_str2, _ordinal_fmt, _tmp_str, _ordinal_ending[digit]);
+                sprintf(_tmp_str2, "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);
                 Insert_String_(_tmp_str2);
             }
             break;
@@ -921,25 +904,25 @@ namespace FMTPARA {
 
         case 'E':
             if (_para_global.use_plural) {
-                Insert_String_(s_s_00556218);
+                Insert_String_("s");
             }
             break;
 
         case 'F':
             if (Get_Item_Value_(arg_idx) != 1) {
-                Insert_String_(s_s_00556218);
+                Insert_String_("s");
             }
             break;
 
         case 'G':
             if (_para_global.use_plural) {
-                Insert_String_(s_es_0055621c);
+                Insert_String_("es");
             }
             break;
 
         case 'H':
             if (Get_Item_Value_(arg_idx) != 1) {
-                Insert_String_(s_es_0055621c);
+                Insert_String_("es");
             }
             break;
 
@@ -1175,31 +1158,31 @@ namespace FMTPARA {
     }
 
     uint32_t __cdecl Get_Item_Value_(uint16_t index) {
-        if (index < 16) {
+        if (index < (sizeof(_para_global.item_ptr) / sizeof(_para_global.item_ptr[0]))) {
             int8_t type = FMTPARA::_para_global.item_type[index];
             void* ptr = FMTPARA::_para_global.item_ptr[index];
 
             switch (type) {
             case 2:
                 // Return as 32-bit dword
-                return *reinterpret_cast<uint32_t*>(ptr);
+                return *(uint32_t*)ptr;
 
             case 3:
                 // Return as unsigned 16-bit word
-                return static_cast<uint32_t>(*reinterpret_cast<uint16_t*>(ptr));
+                return (uint32_t)*(uint16_t*)ptr;
 
             case 4:
                 // Return as signed 16-bit short (sign-extended)
-                return static_cast<int32_t>(*reinterpret_cast<int16_t*>(ptr));
+                return (int32_t)*(int16_t*)ptr;
 
             case 6:
                 // Return as signed 8-bit char (sign-extended)
-                return static_cast<int32_t>(*reinterpret_cast<int8_t*>(ptr));
+                return (int32_t)*(int8_t*)ptr;
 
             case 5:
             default:
                 // Default case handles type 5 and any undefined types as unsigned 8-bit byte
-                return static_cast<uint32_t>(*reinterpret_cast<uint8_t*>(ptr));
+                return (uint32_t)*(uint8_t*)ptr;
             }
         }
 
@@ -1217,7 +1200,7 @@ namespace FMTPARA {
     }
 
     bool __cdecl Set_Item_Value_(uint16_t index, uint32_t value) {
-        if (index >= 16) {
+        if (index >= (sizeof(_para_global.item_ptr) / sizeof(_para_global.item_ptr[0]))) {
             return false;
         }
 
@@ -1226,23 +1209,23 @@ namespace FMTPARA {
 
         switch (type) {
             case 2:
-                *reinterpret_cast<uint32_t*>(ptr) = value;
+                *(uint32_t*)ptr = value;
                 return true;
 
             case 3:
-                *reinterpret_cast<uint16_t*>(ptr) = (uint16_t)value;
+                *(uint16_t*)ptr = (uint16_t)value;
                 return true;
 
             case 4:
-                *reinterpret_cast<int16_t*>(ptr) = (int16_t)value;
+                *(int16_t*)ptr = (int16_t)value;
                 return true;
 
             case 5:
-                *reinterpret_cast<uint8_t*>(ptr) = (uint8_t)value;
+                *(uint8_t*)ptr = (uint8_t)value;
                 return true;
 
             case 6:
-                *reinterpret_cast<int8_t*>(ptr) = (int8_t)value;
+                *(int8_t*)ptr = (int8_t)value;
                 return true;
 
             default:
@@ -1888,12 +1871,8 @@ namespace FMTPARA {
         return 0;
     }
 
-    /**
-     * @address 00435210
-     */
     int8_t __cdecl FN_User_Call_(int8_t func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
-        // user_fn is at offset 0x58 within s_fmtpara_global
-        void* user_fn_ptr = *reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(&_para_global) + 0x58);
+        void* user_fn_ptr = _para_global.user_fn;
 
         if (user_fn_ptr == nullptr) {
             return 0;
@@ -1903,7 +1882,7 @@ namespace FMTPARA {
             if (arg_ret) {
                 _user_fn_arg = 0;
             } else {
-                _user_fn_arg = static_cast<uint32_t>(val);
+                _user_fn_arg = (uint32_t)val;
             }
             return func_char;
         }
@@ -1912,7 +1891,7 @@ namespace FMTPARA {
         if (arg_index == 2 || arg_ret) {
             Update_Max_Min_Values_();
 
-            auto fn = reinterpret_cast<user_fn>(user_fn_ptr);
+            user_fn fn = (user_fn)user_fn_ptr;
             fn(_para_p, _user_fn_arg, val);
 
             return 0;
@@ -1922,7 +1901,7 @@ namespace FMTPARA {
     }
 
     int __cdecl _Comp_Tabs_(const void* a, const void* b) {
-        return (int)*(short*)a - (int)*(short*)b;
+        return (int)*(const int16_t*)a - (int)*(const int16_t*)b;
     }
 
     void __cdecl Pick_Font_Color_(uint8_t fg_and_attr) {
@@ -2006,8 +1985,8 @@ namespace FMTPARA {
         }
     }
 
-    uint32_t __cdecl Get_Item_Value_Set_Plural_(short item_idx) {
-        uint32_t value = FMTPARA::Get_Item_Value_(item_idx);
+    uint32_t __cdecl Get_Item_Value_Set_Plural_(int16_t item_index) {
+        uint32_t value = FMTPARA::Get_Item_Value_(item_index);
 
         if (value != 1) {
             FMTPARA::_para_global.use_plural = true;
@@ -2031,7 +2010,7 @@ namespace FMTPARA {
             _para_p->str++;
         } else {
             char* string_to_insert;
-            if (arg < 16) {
+            if (arg < (sizeof(_para_global.item_ptr) / sizeof(_para_global.item_ptr[0]))) {
                 string_to_insert = (char*)_para_global.item_ptr[arg];
             } else {
                 // If arg >= 16, string_to_insert is used uninitialized from the local stack slot
@@ -2040,9 +2019,6 @@ namespace FMTPARA {
         }
     }
 
-    /**
-     * @address 00434780
-     */
     void __cdecl Insert_A_String_(char* new_str) {
         if (_para_p->nest_depth < 10) {
             _para_p->nest_stack[_para_p->nest_depth] = _para_p->str;
@@ -2051,37 +2027,25 @@ namespace FMTPARA {
         }
     }
 
-    void __cdecl Insert_String_(const char* param_1) {
+    void __cdecl Insert_String_(const char* str) {
         FMTPARA::_para_p->str++;
-        FMTPARA::Insert_A_String_(const_cast<char*>(param_1));
+        FMTPARA::Insert_A_String_((char*)str);
     }
 
-    /**
-     * @address 00432e30
-     */
-    void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* ptr) {
-        Set_Paragraph_Variable_Pointer_(index, ptr, 2);
+    void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* value_ptr) {
+        Set_Paragraph_Variable_Pointer_(index, value_ptr, 2);
     }
 
-    /**
-     * @address 00432e50
-     */
-    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr) {
-        Set_Paragraph_Variable_Pointer_(id, ptr, 4);
+    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t index, void* value_ptr) {
+        Set_Paragraph_Variable_Pointer_(index, value_ptr, 4);
     }
 
-    /**
-     * @address 00432e00
-     */
-    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(short param_1, short param_2, short param_3, char* param_4, short param_5, s_animation_header* param_6) {
-        _Print_Formatted_Paragraph_(param_1, param_2, param_3, param_4, param_5, param_6, true);
+    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg) {
+        _Print_Formatted_Paragraph_(x, y, width, str, justify, seg, true);
     }
 
-    /**
-     * @address 00433e10
-     */
     void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t item_index, void *value_ptr, int8_t value_type) {
-        if (item_index < 0x10) {
+        if (item_index < (sizeof(_para_global.item_ptr) / sizeof(_para_global.item_ptr[0]))) {
             _para_global.item_ptr[item_index] = value_ptr;
             _para_global.item_type[item_index] = value_type;
         }

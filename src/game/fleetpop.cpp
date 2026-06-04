@@ -89,7 +89,7 @@ namespace FLEETPOP {
         return grid_height + close_btn_height + bottom_height + name_height;
     }
 
-void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
+void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t allow_input_fields) {
     int16_t local_a = -1;
     int16_t local_8 = -1;
     int16_t stack_node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
@@ -105,7 +105,7 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
 
         MOX::_moveable_box[2].window_field_id = -1000;
         MOX::_moveable_box[2].drag_field = fields::Add_Hidden_Field_(
-            box_x, box_y, box_width + box_x, box_y + 0x23, (char*)s__00551100, 0
+            box_x, box_y, box_width + box_x, box_y + 0x23, (char*)"", 0
         );
 
         int16_t end_idx = MOX::_fleet_icon_buttons_added + MOX::_first_fleet_movement_icon;
@@ -127,14 +127,14 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
             HACCESS::Fleet_Movement_Ship_Id_(i);
 
             MOX::_fleet_movement_icon[i].field = fields::Add_Hidden_Field_(
-                icon_x, icon_y, icon_x + 0x35, icon_y + 0x35, (char*)s__00551100, 0x29
+                icon_x, icon_y, icon_x + 0x35, icon_y + 0x35, (char*)"", 0x29
             );
         }
 
         node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
         int16_t ship_idx = MOX::_ship_node[node_ptr].ship_idx;
 
-        if (MOX::_moveable_box_order[0] == 2 && flag != 0 &&
+        if (MOX::_moveable_box_order[0] == 2 && allow_input_fields != 0 &&
             HACCESS::Ship_Owner_(ship_idx) == MOX::_PLAYER_NUM &&
             HACCESS::Player_Can_Order_Ship_(MOX::_PLAYER_NUM, &MOX::_ship[ship_idx])) {
 
@@ -144,8 +144,8 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
             }
 
             MOX::_fleet_movement_all_button = fields::Add_Clipped_Button_Field_(
-                btn_x, MOX::_fleet_box.field9_0x10 + box_y, (char*)s__00551100,
-                MOX::_fleet_box_all_button_seg, (char*)s__00551100, 0x28
+                btn_x, MOX::_fleet_box.field9_0x10 + box_y, (char*)"",
+                MOX::_fleet_box_all_button_seg, (char*)"", 0x28
             );
         } else {
             MOX::_fleet_movement_all_button = -1000;
@@ -158,16 +158,16 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
             MOX::_fleet_box_scroll_up_button = -1000;
             MOX::_fleet_box_scroll_dn_button = -1000;
 
-            if (flag != 0) {
+            if (allow_input_fields != 0) {
                 up_btn = fields::Add_Button_Field_(
-                    box_x + 0xbf, box_y + 0x2a, (char*)s__00551100,
-                    MOX::_fleet_box_scroll_up_button_seg, (char*)s_minus_0055111c, 0x28
+                    box_x + 0xbf, box_y + 0x2a, (char*)"",
+                    MOX::_fleet_box_scroll_up_button_seg, (char*)"-", 0x28
                 );
                 MOX::_fleet_box_scroll_up_button = up_btn;
 
                 dn_btn = fields::Add_Button_Field_(
-                    box_x + 0xbf, box_y + 0xae, (char*)s__00551100,
-                    MOX::_fleet_box_scroll_dn_button_seg, (char*)s_plus_00551118, 0x28
+                    box_x + 0xbf, box_y + 0xae, (char*)"",
+                    MOX::_fleet_box_scroll_dn_button_seg, (char*)"+", 0x28
                 );
             }
 
@@ -177,7 +177,7 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
 
             MOX::_fleet_movement_bar_field = fields::Add_Scroll_Field_(
                 box_x + 0xc0, box_y + 0x42, 0, 0x66, 0, 0x66, 10, 0x66,
-                &MOX::_fltpop_scroll_bar.thumb_center_y, (char*)s__00551100, 0
+                &MOX::_fltpop_scroll_bar.thumb_center_y, (char*)"", 0
             );
         }
 
@@ -219,13 +219,11 @@ void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count) {
     MOX::_moveable_box[2].height = Fleet_Box_Height_(count);
 }
 
-int16_t __cdecl Fleet_Box_Width_(int16_t count) {
+int16_t __cdecl Fleet_Box_Width_(int16_t unused_ship_count) {
+    (void)unused_ship_count;
     return animate::Get_Width_(MOX::_fleet_box.name_seg);
 }
 
-/**
- * @address 00405990
- */
 void __cdecl Reload_Fleet_Box_Data_(void) {
     if (HACCESS::Get_Stack_Start_From_Saved_Ship_Array_() == 0) {
         MOVEBOX::Vanish_Fleet_Movement_Box_();
@@ -263,29 +261,28 @@ void __cdecl Set_Fleet_Movement_Icon_Selections_(int16_t state, uint8_t auto_sel
     MOX::_fleet_movement_icons_on = static_cast<uint8_t>(state);
 }
 
-/**
- * @address 00406700
- */
 bool __cdecl Some_Icon_Selected_() {
     int16_t selected_ship_ids[500];
+    const int16_t selected_ship_capacity =
+        (int16_t)(sizeof(selected_ship_ids) / sizeof(selected_ship_ids[0]));
 
     if (MOVEBOX::Moveable_Box_Selected_(2)) {
-        int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, 500, 255);
+        int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(
+            selected_ship_ids, selected_ship_capacity, 255);
         return count > 0;
     }
 
     return false;
 }
 
-/**
- * @address 004059e0
- */
 void __cdecl Reload_Ship_Selection_Status_() {
     int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
     int16_t stack_owner = HACCESS::Ship_Stack_Owner_(node_ptr);
+    const int16_t ship_node_count =
+        (int16_t)(sizeof(MOX::_ship_node) / sizeof(MOX::_ship_node[0]));
 
     if (MOX::_PLAYER_NUM == stack_owner) {
-        for (int16_t i = 0; i < 500; ++i) {
+        for (int16_t i = 0; i < ship_node_count; ++i) {
             int16_t ship_idx = MOX::_ship_node[i].ship_idx;
             int16_t bit_set = struct_::Test_Bit_Field_(MOX::_fleet_icon_selection_status, ship_idx);
 
@@ -301,9 +298,6 @@ void __cdecl Reload_Ship_Selection_Status_() {
     }
 }
 
-/**
- * @address 00404cc0
- */
 int16_t __cdecl First_Unselected_Icon_() {
     int16_t first_unselected_index = 0;
     bool found = false;
@@ -324,9 +318,6 @@ int16_t __cdecl First_Unselected_Icon_() {
     return first_unselected_index;
 }
 
-/**
- * @address 00405a60
- */
 void __cdecl Save_Ship_Selection_Status_() {
     int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
     int16_t owner = HACCESS::Ship_Stack_Owner_(node_ptr);
@@ -348,9 +339,6 @@ void __cdecl Save_Ship_Selection_Status_() {
     }
 }
 
-/**
- * @address 00405070
- */
 int16_t __cdecl Fleet_Buttons_Chosen_() {
     int16_t selected_count = 0;
     int16_t i = 0;
@@ -370,19 +358,13 @@ int16_t __cdecl Fleet_Buttons_Chosen_() {
     return selected_count;
 }
 
-/**
- * @address 00406750
- */
-bool __cdecl Can_Select_Fleet_Box_Ship_(int16_t index) {
-    int16_t ship_node_idx = MOX::_fleet_movement_icon[index].ship_node_idx;
+bool __cdecl Can_Select_Fleet_Box_Ship_(int16_t icon_index) {
+    int16_t ship_node_idx = MOX::_fleet_movement_icon[icon_index].ship_node_idx;
     int16_t owner_id = HACCESS::Ship_Stack_Owner_(ship_node_idx);
 
     return owner_id == MOX::_PLAYER_NUM;
 }
 
-/**
- * @address 00406610
- */
 int16_t __cdecl Icon_Selection_Status_(int16_t icon_field_id) {
     int16_t first_icon_idx = static_cast<int16_t>(MOX::_first_fleet_movement_icon);
     int16_t limit_idx = MOX::_fleet_icon_buttons_added + first_icon_idx;
@@ -401,28 +383,22 @@ int16_t __cdecl Icon_Selection_Status_(int16_t icon_field_id) {
     return 0;
 }
 
-/**
- * @address 00403ec0
- */
 void __cdecl Clear_Ship_Node_Selection_Flags_() {
     MOX::_fleet_movement_icons_on = 0;
+    const int16_t ship_node_count =
+        (int16_t)(sizeof(MOX::_ship_node) / sizeof(MOX::_ship_node[0]));
 
-    for (int i = 0; i < 500; ++i) {
+    for (int16_t i = 0; i < ship_node_count; ++i) {
         MOX::_ship_node[i].selected = 0;
     }
 }
 
-/**
- * @address 004059c0
- */
-void __cdecl Reload_Fleet_Box_Palette_(int16_t player_idx, uint32_t is_not_player) {
+void __cdecl Reload_Fleet_Box_Palette_(int16_t player_idx, uint32_t unused_is_not_player) {
+    (void)unused_is_not_player;
     KEN::Load_Player_Ship_Palette_(player_idx);
     MOX::_mainscr_palette = 2;
 }
 
-/**
- * @address 00406590
- */
 bool __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx) {
     if (MAINSCR::Ship_Can_Be_Selected_(ship_idx) && MOX::_just_moved_stack == 0) {
         return true;
@@ -463,43 +439,47 @@ void __cdecl Add_Added_Buttons_(int16_t x_offset, int16_t y_offset) {
     x_pos = x_offset + 2;
     y_base = (MOX::_fleet_box.field8_0xe - btn_height) + y_offset;
 
-    MOX::_moveable_box[2].close_btn = fields::Add_Clipped_Button_Field_(x_pos, y_base, s__00551100, close_seg, s__00551120, 40 /* 0x28 */);
+    MOX::_moveable_box[2].close_btn = fields::Add_Clipped_Button_Field_(
+        x_pos,
+        y_base,
+        (char*)"",
+        close_seg,
+        (char*)"\x1b", /* fmtpara 0x1B starts a color-attribute control sequence; here it is reused as a non-printing field label. */
+        40 /* 0x28 */);
 
     stack_y_offset = btn_height;
 
     if (MOX::_fleet_box.outpost_btn_active != 0) {
-        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, s__00551100, outpost_seg, s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, (char*)"", outpost_seg, (char*)"", 40 /* 0x28 */);
         stack_y_offset = btn_height * 2;
     }
 
     if (MOX::_fleet_box.colonize_btn_active != 0) {
-        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, colonize_seg, s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", colonize_seg, (char*)"", 40 /* 0x28 */);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.engage_btn_active != 0) {
-        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, engage_seg, s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", engage_seg, (char*)"", 40 /* 0x28 */);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.transport_btn_active != 0) {
-        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, transport_seg, s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", transport_seg, (char*)"", 40 /* 0x28 */);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.attack_btn_active != 0) {
-        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, attack_seg, s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", attack_seg, (char*)"", 40 /* 0x28 */);
     }
 }
 
-/**
- * @address 004051e0
- */
 int16_t __cdecl N_Fleet_Icons_(int16_t node_idx) {
     int16_t count = 1;
+    const int16_t ship_node_count =
+        (int16_t)(sizeof(MOX::_ship_node) / sizeof(MOX::_ship_node[0]));
 
-    // Traverse the ship node chain starting from node_idx
-    while (MOX::_ship_node[node_idx].next_node != -1 && count < 500) {
+    while (MOX::_ship_node[node_idx].next_node != -1 && count < ship_node_count) {
         count++;
         HACCESS::Ship_Owner_(MOX::_ship_node[node_idx].ship_idx);
         node_idx = MOX::_ship_node[node_idx].next_node;
@@ -508,14 +488,13 @@ int16_t __cdecl N_Fleet_Icons_(int16_t node_idx) {
     return count;
 }
 
-/**
- * @address 00403e90
- */
 bool __cdecl At_Least_One_Ship_Of_Type_Selected_(int16_t ship_type) {
     int16_t selected_ship_ids[500];
+    const int16_t selected_ship_capacity =
+        (int16_t)(sizeof(selected_ship_ids) / sizeof(selected_ship_ids[0]));
 
-    // HACCESS::Get_Fleet_Box_Selected_Ship_Ids_ returns the number of ships found.
-    int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, 500, ship_type);
+    int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(
+        selected_ship_ids, selected_ship_capacity, ship_type);
 
     return count > 0;
 }
@@ -622,7 +601,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     }
 
     if ((head_node_ptr != MOX::_first_node_ptr_in_stack_) || (MOX::_first_node_ptr_in_stack_ == -1)) {
-        memset(&MOX::_fleet_movement_icon[0], 0, 500 * sizeof(s_fleet_movement_icon));
+        memset(MOX::_fleet_movement_icon, 0, sizeof(MOX::_fleet_movement_icon));
         MOX::_fleet_icon_buttons_added = 0;
     }
 
@@ -632,10 +611,12 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     bool stop_building_icons = false;
     int16_t icon_slot = 0;
     int16_t current_node_ptr = head_node_ptr;
+    const int16_t fleet_movement_icon_count =
+        (int16_t)(sizeof(MOX::_fleet_movement_icon) / sizeof(MOX::_fleet_movement_icon[0]));
 
     if (head_node_ptr != MOX::_first_node_ptr_in_stack_) {
         while (true) {
-            if ((current_node_ptr == -1) || (icon_slot >= 500)) {
+            if ((current_node_ptr == -1) || (icon_slot >= fleet_movement_icon_count)) {
                 stop_building_icons = true;
             }
 
@@ -643,7 +624,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
                 ++MOX::_fleet_icon_buttons_added;
             }
 
-            if (icon_slot >= 500) {
+            if (icon_slot >= fleet_movement_icon_count) {
                 break;
             }
 
@@ -1243,7 +1224,7 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
         int16_t y,
         int16_t x_offset,
         int16_t y_offset,
-        uint32_t unused_param_5,
+        uint32_t unused_fleet_count,
         int16_t* current_y) {
     uint16_t window_status;
     int16_t fleet_box_inner_height;
@@ -1302,7 +1283,7 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
     animate::Draw_(frame_left, *current_y, segment);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(segment));
 
-    (void)unused_param_5;
+    (void)unused_fleet_count;
 }
 
 void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* scroll_bar, int16_t total_rows) {
@@ -1363,7 +1344,7 @@ void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
 
     if (ship_owner <= 8) {
         if (HACCESS::Is_Combat_Ship_(ship_idx)) {
-            sprintf(out_text, s__s_00551130, TECHDATA::_hull_data[hull_size].name);
+            sprintf(out_text, "%s", TECHDATA::_hull_data[hull_size].name);
             return;
         }
     }

@@ -4,9 +4,6 @@ namespace FLT2 {
     s_colors _normal_colors = {{111, 116, 114, 116, 116, 116, 116, 116}};
     s_colors _neutral_colors = {{4, 16, 12, 16, 16, 16, 16, 16}};
     s_colors _red_colors = {{75, 129, 78, 129, 129, 129, 129, 129}};
-    const char s_fmt_to_00557e00[9] = "%s to %s";
-
-    const char s__00551100[] = "";
 
 void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out, int16_t* height_out)
 {
@@ -39,7 +36,7 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
                 MOX::_ship_icon[i].y,
                 MOX::_ship_icon[i].x + width,
                 MOX::_ship_icon[i].y + height,
-                const_cast<char*>(s__00551100),
+                "",
                 0x29
             );
         }
@@ -106,7 +103,7 @@ void Fleet_Screen_Big_Icon_Fields_(int16_t* button_id_ptr, int16_t x, int16_t y,
 
     *button_id_ptr = -1000;
     if (MOX::_big_icon_display_columns < MOX::_n_fltscrn_big_icons) {
-        *button_id_ptr = fields::Add_Scroll_Field_(x, y, 0, h, 0, h, w, h, &MOX::_scroll_bar->thumb_center_y, s__00551100, 0);
+        *button_id_ptr = fields::Add_Scroll_Field_(x, y, 0, h, 0, h, w, h, &MOX::_scroll_bar->thumb_center_y, "", 0);
     }
 }
 
@@ -117,12 +114,12 @@ void __cdecl Clear_All_Selection_Status_() {
 }
 
 void __cdecl Get_Fltscrn_Big_Icon_XY_(int16_t icon_idx, int16_t* out_x, int16_t* out_y) {
-    // This comparison is present in the original binary but its result is not used.
+    // Preserve the original unused screen check.
     (void)(MOX::_current_screen == 4);
 
     int16_t columns = MOX::_big_icon_display_columns;
 
-    // The original code performs division/modulo operations twice with 16-bit intermediates.
+    // Keep 16-bit intermediates in the coordinate math.
     int16_t remainder = (int16_t)(icon_idx % columns);
     *out_x = (int16_t)((int16_t)(remainder * 62) + MOX::_big_icon_x_offset);
 
@@ -232,7 +229,7 @@ void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx, int16_t first_vis
         }
     }
 
-    memset(MOX::_fltscrn_big_icon, 0, 250 * sizeof(s_big_icon));
+    memset(MOX::_fltscrn_big_icon, 0, 250 * sizeof(*MOX::_fltscrn_big_icon));
 
     for (int i = 0; i < 250; ++i) {
         MOX::_fltscrn_big_icon[i].button_id = -1000;
@@ -325,7 +322,7 @@ void __cdecl Add_Fltscrn_Big_Icon_Fields_(int16_t base_index) {
                     y,
                     x + width_offset,
                     y + height_offset,
-                    FLT2::s__00551100,
+                    "",
                     0x29
                 );
             } else {
@@ -479,7 +476,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
             local_58 = _neutral_colors;
         }
         {
-            int8_t leader_idx = static_cast<int8_t>(MOX::_star[val].officer_index[MOX::_PLAYER_NUM]);
+            int8_t leader_idx = (int8_t)MOX::_star[val].officer_index[MOX::_PLAYER_NUM];
             if (leader_idx == -1 || HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, val) == 0) {
                 strcpy(local_50, MOX::_star[val].name);
             } else {
@@ -509,7 +506,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
     MISC::Set_Fitted_Font_Style_(local_50, &local_58, 3, 2, 0, 0xBD, 1);
 
     if (owner != -1 && has_moving_ships == 0) {
-        uint8_t color_idx = MOX::_main_palette_player_colors[static_cast<uint8_t>(MOX::_player[owner].color)];
+        uint8_t color_idx = MOX::_main_palette_player_colors[(uint8_t)MOX::_player[owner].color];
         if (color_idx == 0x20) {
             color_idx = 0xF;
         }
@@ -540,7 +537,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     bool is_ship_type_1 = (ship_type == 1);
     bool is_ship_type_4 = (ship_type == 4);
 
-    // This code seems to be no-op but it is executed in the original assembly
+    // Preserve the original message loads even though the copied strings are not reused here.
     strcpy(unused_msg_95, HAROLD::H_Message_(0x95));
     strcpy(unused_msg_96, HAROLD::H_Message_(0x96));
     strcpy(unused_msg_97, HAROLD::H_Message_(0x97));
@@ -550,7 +547,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
 
     if (is_ship_type_2 || is_ship_type_1 || is_ship_type_4) {
         allocate::Push_Block_(MOX::_screen_seg);
-        void* block_10000 = allocate::Allocate_Next_Block_(MOX::_screen_seg, 10000);
+        void* help_data_block = allocate::Allocate_Next_Block_(MOX::_screen_seg, 10000);
         allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
         
         int16_t help_idx = 0;
@@ -565,7 +562,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         char lbx_name[20];
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
         
-        s_help_record* lbx_data = static_cast<s_help_record*>(farload::Far_Reload_Next_Data_(lbx_name, 0, block_10000, help_idx, 1, sizeof(s_help_record)));
+        s_help_record* lbx_data = (s_help_record*)farload::Far_Reload_Next_Data_(lbx_name, 0, help_data_block, help_idx, 1, sizeof(s_help_record));
         MOX::_mox_font_colors_offset = 0x72;
         
         s_colors temp_colors;
@@ -607,7 +604,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     
     fonts::Print_(0x12, EBP_y, HAROLD::H_Message_(0x99));
     
-    const char* sign1 = (attack_bonus >= 0) ? s_plus_00551118 : s__00551100;
+    const char* sign1 = (attack_bonus >= 0) ? s_plus_00551118 : "";
     sprintf(buffer, s__s_d_00556134, sign1, attack_bonus);
     fonts::Print_Right_(0x85, EBP_y, buffer);
     
@@ -621,7 +618,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         }
         fonts::Print_(0xAD, EBP_y, str_9a);
         
-        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : s__00551100;
+        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : "";
         sprintf(buffer, s__s_d_00556134, sign2, defense_bonus);
         fonts::Print_(w + 0xAD, EBP_y, buffer);
     } else {
@@ -633,7 +630,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         
         fonts::Print_(0x12, EBP_y, str_9a);
         
-        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : s__00551100;
+        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : "";
         sprintf(buffer, s__s_d_00556134, sign2, defense_bonus);
         
         if (w < 0x73) {
@@ -779,7 +776,7 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
     char msg_buf[200];
     char msg_buf2[88];
 
-    memset(MOX::_fltscrn_ship_icon_selection_list, 0xFF, 0x7D * 4);
+    memset(MOX::_fltscrn_ship_icon_selection_list, 0xFF, 250 * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
 
     if (Build_Fltscrn_Ship_List_(MOX::_fltscrn_ship_icon_selection_list) != 0) {
         SHIPMOVE::Ships_Try_To_Move_To_(MOX::_fltscrn_ship_icon_selection_list, target_star, &MOX::_g_ship_move_info);
@@ -796,7 +793,7 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
 
         if (MOX::_g_ship_move_info.blackhole_blocks != 0) {
             strcpy(msg_buf2, HAROLD::H_Message_(0x21));
-            sprintf(msg_buf, s_fmt_to_00557e00, msg_buf2, MOX::_star[target_star].name);
+            sprintf(msg_buf, "%s to %s", msg_buf2, MOX::_star[target_star].name);
             HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf, 3);
             return;
         }
@@ -819,62 +816,53 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
     }
 }
 
-uint8_t __cdecl Draw_Captains_Picture_(int16_t param_1) {
+uint8_t __cdecl Draw_Captains_Picture_(int16_t ship_idx) {
     int16_t leader_idx = 0;
-    s_colors auStack_58;
-    char local_50[80];
+    s_colors highlight_colors = {{0x4C, 0x4D, 0x4E, 0x4F, 0x3F, 0x40, 0x41, 0x42}};
+    char captain_label[80];
 
-    auStack_58.colors[0] = 0x4C; /* 'L' */
-    auStack_58.colors[1] = 0x4D; /* 'M' */
-    auStack_58.colors[2] = 0x4E; /* 'N' */
-    auStack_58.colors[3] = 0x4F; /* 'O' */
-    auStack_58.colors[4] = 0x3F; /* '?' */
-    auStack_58.colors[5] = 0x40; /* '@' */
-    auStack_58.colors[6] = 0x41; /* 'A' */
-    auStack_58.colors[7] = 0x42; /* 'B' */
-
-    int16_t valid_captain_idx = 0;
-    uint8_t found = 0;
+    int16_t portrait_idx = 0;
+    uint8_t found_captain = 0;
 
     for (int16_t i = 0; i < 67; i++) {
         if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM &&
             MOX::_leaders[i].status == 1 &&
             MOX::_leaders[i].type == 0) {
 
-            if (MOX::_leaders[i].location == param_1) {
+            if (MOX::_leaders[i].location == ship_idx) {
                 leader_idx = i;
-                found = 1;
+                found_captain = 1;
                 break;
             }
-            valid_captain_idx++;
+            portrait_idx++;
         }
     }
 
-    if (found) {
-        s_animation_header* pict = MOX::_temp_officers_pict[valid_captain_idx];
+    if (found_captain) {
+        s_animation_header* pict = MOX::_temp_officers_pict[portrait_idx];
         int16_t width = animate::Get_Width_(pict);
         int16_t height = animate::Get_Height_(pict);
 
         char* leader_name = OFFICER::Leader_Name_(leader_idx, 1);
-        sprintf(local_50, s__s_00551130, leader_name);
+        sprintf(captain_label, s__s_00551130, leader_name);
 
         fonts::Set_Font_Style_(0, &_normal_colors);
-        ERIC::Print_Paragraph_Centered_Vertically_(0xAD, 0x11F, 0x42, height, local_50, 2);
+        ERIC::Print_Paragraph_Centered_Vertically_(0xAD, 0x11F, 0x42, height, captain_label, 2);
         animate::Draw_(0xF2, 0x11C, pict);
 
         if (MOX::_leaders[leader_idx].eta > 0) {
             OFFICER::Print_ETA_On_Officer_Picture_(leader_idx, 0xF2, 0x11C, width);
             width += 2;
             height += 2;
-            MISC::Draw_Highlight_Box_(0xF0, 0x11A, width, height, &auStack_58.colors[0]);
+            MISC::Draw_Highlight_Box_(0xF0, 0x11A, width, height, &highlight_colors.colors[0]);
         } else {
             width += 2;
             height += 2;
-            MISC::Draw_Highlight_Box_(0xF0, 0x11A, width, height, &auStack_58.colors[4]);
+            MISC::Draw_Highlight_Box_(0xF0, 0x11A, width, height, &highlight_colors.colors[4]);
         }
     }
 
-    return found;
+    return found_captain;
 }
 
 int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list) {

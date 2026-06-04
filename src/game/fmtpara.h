@@ -10,7 +10,7 @@ namespace FMTPARA {
     extern const uint8_t _legal_variable_types[6];
     extern uint8_t _font_base_offsets[6];
     extern int8_t _reset_parameters_lookup[16];
-    extern short _tabs[11];
+    extern int16_t _tabs[11];
     extern s_fmtpara_style _saved_superscript;
     extern s_fmtpara_style* _style_p;
     extern s_fmtpara_char* _char_p;
@@ -30,9 +30,6 @@ namespace FMTPARA {
     extern char _tmp_str2[32];
     extern const char* const _ordinal_ending[10];
     extern const char* const _ordinal_word[11];
-    extern const char _ordinal_fmt[];
-    extern const char s_s_00556218[];
-    extern const char s_es_0055621c[];
     extern uint32_t _user_fn_arg;
 
     void __cdecl Init_();
@@ -46,8 +43,12 @@ namespace FMTPARA {
 
     void __cdecl Reset_Font_Spacing_();
 
+    /** Initializes the paragraph variable table to its default internal storage. */
     void __cdecl Initialize_Formatted_Paragraph_System_();
 
+    /** Resets one paragraph variable slot to the internal backing array.
+     * @param index Variable slot to reset.
+     */
     void __cdecl Reset_A_Paragraph_Variable_(uint16_t index);
 
     void __cdecl Pick_Font_Color_(uint8_t fg_and_attr);
@@ -60,13 +61,29 @@ namespace FMTPARA {
 
     void __cdecl Set_Max_Min_Y_(s_fmtpara_char* char_p);
 
+    /** Measures the rendered height of a formatted paragraph without drawing it.
+     * @param width Paragraph width in pixels.
+     * @param text Source formatted string.
+     */
     int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text);
 
+    /** Measures the rendered width of a formatted paragraph without drawing it.
+     * @param width Paragraph width in pixels.
+     * @param text Source formatted string.
+     * @param justify Justification mode.
+     */
     int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify);
 
     int16_t __cdecl Get_Last_Formatted_Paragraph_Max_Width_();
 
-    char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t param_5);
+    /** Renders a formatted paragraph and returns the next unread source position.
+     * @param x Left edge in pixels.
+     * @param y Top edge in pixels.
+     * @param width Paragraph width in pixels.
+     * @param str Source formatted string.
+     * @param justify Justification mode.
+     */
+    char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify);
 
     void __cdecl Initialize_Line_Start_();
 
@@ -114,7 +131,7 @@ namespace FMTPARA {
 
     void __cdecl Insert_A_String_(char* new_str);
 
-    uint32_t __cdecl Get_Item_Value_Set_Plural_(short item_idx);
+    uint32_t __cdecl Get_Item_Value_Set_Plural_(int16_t item_index);
 
     void __cdecl Insert_String_(const char* str);
 
@@ -174,17 +191,47 @@ namespace FMTPARA {
 
     void __cdecl Sort_Tabs_();
 
-    bool __cdecl Process_Command_(char param_1);
+    bool __cdecl Process_Command_(char command_char);
 
     void __cdecl Process_Paragraph_Text_();
 
-    char* __cdecl _Print_Formatted_Paragraph_(short x, short y, short width, char* str, short justify, s_animation_header* seg, bool do_render);
+    /** Lays out or renders a formatted paragraph and returns the next unread source position.
+     * @param x Left edge in pixels.
+     * @param y Top edge in pixels.
+     * @param width Paragraph width in pixels.
+     * @param str Source formatted string.
+     * @param justify Justification mode.
+     * @param seg Destination bitmap, or nullptr to draw to the active screen.
+     * @param do_render False to measure only, true to render glyphs.
+     */
+    char* __cdecl _Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg, bool do_render);
 
-    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr);
+    /** Binds a signed 16-bit paragraph variable slot to external storage.
+     * @param index Variable slot index.
+     * @param value_ptr Pointer to the bound value.
+     */
+    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t index, void* value_ptr);
 
-    void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* ptr);
+    /** Binds a 32-bit paragraph variable slot to external storage.
+     * @param index Variable slot index.
+     * @param value_ptr Pointer to the bound value.
+     */
+    void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* value_ptr);
 
+    /** Binds a paragraph variable slot to caller-provided storage and a tagged value type.
+     * @param item_index Variable slot index.
+     * @param value_ptr Pointer to the bound value.
+     * @param value_type Tagged storage type used by Get_Item_Value_ and Set_Item_Value_.
+     */
     void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t item_index, void *value_ptr, int8_t value_type);
 
-    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(short param_1, short param_2, short param_3, char* param_4, short param_5, s_animation_header* param_6);
+    /** Renders a formatted paragraph into a destination bitmap.
+     * @param x Left edge in pixels.
+     * @param y Top edge in pixels.
+     * @param width Paragraph width in pixels.
+     * @param str Source formatted string.
+     * @param justify Justification mode.
+     * @param seg Destination bitmap.
+     */
+    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg);
 }
