@@ -2,23 +2,21 @@
 
 namespace LIST {
 
-    void __cdecl Set_List_Page_Pointer_(s_list_state* list) {
-        uint8_t target_page = list->cur_page;
-        list->cur_page = 1;
+    void __cdecl Set_List_Page_Pointer_(s_list_state* state) {
+        uint8_t target_page = state->cur_page;
+        state->cur_page = 1;
 
         if (target_page == 0) {
             target_page = 1;
         }
 
-        s_list_item* items_start = list->items;
+        s_list_item* items_start = state->items;
         s_list_item* current = items_start;
-        // The list item count is treated as an unsigned 8-bit value (0-255).
-        // Each list item occupies 158 (0x9E) bytes.
-        s_list_item* items_end = &items_start[list->num_items];
+        s_list_item* items_end = &items_start[state->num_items];
 
         while (current < items_end) {
             if (target_page <= 1) {
-                list->selected_item = current;
+                state->selected_item = current;
                 return;
             }
 
@@ -28,14 +26,13 @@ namespace LIST {
                 break;
             }
 
-            // Check if we hit a boundary that signifies the start of a new page/group.
             if (current->stop_flag != 0) {
                 --target_page;
-                ++list->cur_page;
+                ++state->cur_page;
             }
         }
 
-        list->selected_item = items_start;
+        state->selected_item = items_start;
     }
 
     void __cdecl Display_List_Text_(s_list_state* state, s_list_item* item) {
@@ -69,7 +66,7 @@ namespace LIST {
                     }
 
                     if (state->draw_app_cb != nullptr) {
-                        auto draw_fn = reinterpret_cast<draw_app_fn>(state->draw_app_cb);
+                        draw_app_fn draw_fn = (draw_app_fn)state->draw_app_cb;
                         draw_fn(item->app_base_x, item->app_y_offsets[i] + item->y, item->tech_app_ids[i]);
                     }
                 }
@@ -86,9 +83,9 @@ namespace LIST {
         while (item != end) {
             Display_List_Text_(state, item);
 
-            item++;
+            ++item;
 
-            if (item->stop_flag != 0) {
+            if (item >= end || item->stop_flag != 0) {
                 break;
             }
         }
@@ -114,10 +111,10 @@ namespace LIST {
                 }
             }
 
-            if (item[1].stop_flag != 0) {
+            if (item + 1 >= end_item || item[1].stop_flag != 0) {
                 break;
             }
-            item++;
+            ++item;
         }
 
         return fields::Get_Field_Counter_() - 1;
@@ -157,7 +154,7 @@ namespace LIST {
         return 0;
     }
 
-    s_list_item* __cdecl Set_Selected_List_Entry_(s_list_state* state, int16_t target_app_id) {
+    s_list_item* __cdecl Set_Selected_List_Entry_(s_list_state* state, int16_t target_field_id) {
         s_list_item* item = state->selected_item;
         s_list_item* end_item = &state->items[state->num_items];
         s_list_item* found_item = nullptr;
@@ -167,8 +164,7 @@ namespace LIST {
 
             if (found_item == nullptr) {
                 for (uint8_t i = 0; i < item->app_count; ++i) {
-                    // Sign-extend app_id byte to match int16 target_app_id (MOVSX in assembly)
-                    if ((int16_t)(int8_t)item->app_ids[i] == target_app_id) {
+                    if ((int16_t)(int8_t)item->app_ids[i] == target_field_id) {
                         item->is_selectable = 1;
                         item->current_app_index = i;
                         found_item = item;
@@ -176,11 +172,10 @@ namespace LIST {
                 }
             }
 
-            // Check if next item in memory has stop_flag set to terminate traversal
-            if (item[1].stop_flag != 0) {
+            if (item + 1 >= end_item || item[1].stop_flag != 0) {
                 break;
             }
-            item++;
+            ++item;
         }
 
         return found_item;
@@ -195,14 +190,11 @@ namespace LIST {
                 return item;
             }
 
-            // If the current item is not selectable, we check the next item's stop_flag.
-            // If the stop_flag is set, the selectable range has ended.
-            // Note: (item + 1) points to the next s_list_item record.
-            if ((item + 1)->stop_flag != 0) {
+            if (item + 1 >= end || (item + 1)->stop_flag != 0) {
                 break;
             }
 
-            item++;
+            ++item;
         }
 
         return nullptr;
@@ -217,7 +209,6 @@ namespace LIST {
         state->max_page = 1;
         state->cur_page = 1;
 
-        // Size of s_list_item is 0x9E (158 bytes)
         s_list_item* end_item = &state->items[state->num_items];
 
         do {
@@ -235,7 +226,6 @@ namespace LIST {
                 } while (i < item->app_count);
             }
 
-            // i is now equal to item->app_count
             int16_t next_y_step = state->app_y_table[i] + (int16_t)state->item_spacing;
             current_y += next_y_step;
 
@@ -267,7 +257,7 @@ namespace LIST {
         if (state->draw_app_cb != nullptr) {
             fonts::Set_Font_Style_(state->item_font, state->active_color);
 
-            auto draw_cb = reinterpret_cast<draw_app_fn>(state->draw_app_cb);
+            draw_app_fn draw_cb = (draw_app_fn)state->draw_app_cb;
 
             int16_t current_app_y = item->app_y_offsets[item->current_app_index] + item->y;
             draw_cb(item->app_base_x, current_app_y, item->tech_app_ids[item->current_app_index]);
@@ -342,7 +332,7 @@ namespace LIST {
             if (list_state->draw_app_cb != nullptr) {
                 fonts::Set_Font_Style_(list_state->item_font, list_state->active_color);
 
-                auto draw_cb = reinterpret_cast<draw_app_fn>(list_state->draw_app_cb);
+                draw_app_fn draw_cb = (draw_app_fn)list_state->draw_app_cb;
 
                 uint8_t app_idx = item->current_app_index;
                 draw_cb(item->app_base_x,

@@ -2,8 +2,6 @@
 #include <cstdint>
 
 namespace LOADSAVE {
-    extern const char s_INVALID_STR[12];
-
     extern char _months[12][6];
 
     void __cdecl Load_Month_Names_();
@@ -40,7 +38,8 @@ namespace LOADSAVE {
 
     bool __cdecl Is_Valid_Game_Type_(uint32_t game_type);
 
-    void __cdecl Check_For_Saved_Games_(int8_t* list);
+    /** Populates each save-slot status entry by probing the on-disk save files. */
+    void __cdecl Check_For_Saved_Games_(int8_t* slot_status);
 
     void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary);
 
@@ -80,39 +79,23 @@ namespace LOADSAVE {
 
     void __cdecl _Game_Popup_();
 
-    void __cdecl Get_Star_Date_Strings_(int32_t* fields, char* output_buf);
-
-    extern const char s_dot_GAM_005568f4[5];
-    extern const char s_SAVE_005568fc[5];
-    extern const char s_format_0055ad30[14];
+    /** Formats the per-slot stardate strings into 25-byte popup records. */
+    void __cdecl Get_Star_Date_Strings_(int32_t* star_dates, char* output_buf);
 
     void __cdecl Auto_Save_Last_Saved_Game_(int16_t* flag);
 
     void __cdecl Auto_Load_Last_Saved_Game_(int16_t* flag);
 
-    extern const char s__ALT_F1__0055ad24[9];
-    extern const char s__ALT_F2__0055ad18[9];
-    extern const char s__ALT_F3__0055ad0c[9];
-    extern const char s__ALT_F5__0055ad00[9];
-    extern const char s__ALT_F6__0055acf4[9];
-    extern const char s__ALT_F7__0055ace8[9];
-    extern const char s__ALT_F8__0055acdc[9];
-
-    extern const char s__ALT_F1__0055acd0[9];
-    extern const char s__ALT_F2__0055acc4[9];
-    extern const char s__ALT_F3__0055acb8[9];
-    extern const char s__ALT_F4__0055acac[9];
-    extern const char s__ALT_F5__0055aca0[9];
-    extern const char s__ALT_F6__0055ac94[9];
-    extern const char s__ALT_F7__0055ac88[9];
-    extern const char s__ALT_F8__0055ac7c[9];
-
+    /** Populates each 25-byte save-slot date record from the save-file timestamps. */
     void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer);
 
+    /** Formats a single save file's timestamp into the popup date buffer. */
     void __cdecl Get_File_Date_String_(const char* file_path, char* out_string);
 
-    void __cdecl Embed_Special_Color_Codes_(char* str, int16_t max_len);
+    /** Wraps a save-slot label in the popup's inline highlight control bytes. */
+    void __cdecl Embed_Special_Color_Codes_(char* text, int16_t max_len);
 
+    /** Strips the popup's inline highlight control bytes from a save-slot label. */
     void __cdecl Remove_Embedded_Special_Codes_(char* text);
 
     void __cdecl Draw_Popup_Pic1_();

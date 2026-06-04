@@ -194,15 +194,6 @@ namespace line {
         }
     }
 
-    /**
-     * @brief Clips a line segment to the screen boundaries defined in video namespace.
-     *
-     * @param x1 Pointer to start X coordinate
-     * @param y1 Pointer to start Y coordinate
-     * @param x2 Pointer to end X coordinate
-     * @param y2 Pointer to end Y coordinate
-     * @return 0 if the line (or part of it) is visible, 1 if the line is completely clipped.
-     */
     int16_t __cdecl Clip_Line_(int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2) {
         int16_t is_clipped = 0;
 
@@ -330,7 +321,6 @@ namespace line {
 
         int16_t dy = y2 - y1;
 
-        // Vertical line case
         if (dx == 0) {
             int16_t count = dy + 1;
             do {
@@ -348,7 +338,6 @@ namespace line {
             return;
         }
 
-        // Horizontal line case
         if (dy == 0) {
             int16_t count = dx + 1;
             do {
@@ -366,7 +355,6 @@ namespace line {
             return;
         }
 
-        // Diagonal line case (slope 1 or -1)
         if (dy == dx) {
             int16_t count = dx + 1;
             do {
@@ -390,7 +378,6 @@ namespace line {
             return;
         }
 
-        // Bresenham-based line drawing
         if (dy < dx) {
             int16_t run_len = dx / dy;
             int16_t rem = (dx % dy) * 2;
@@ -496,11 +483,11 @@ namespace line {
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
-    void __cdecl Draw_Vertical_Run_(uint8_t** buf, int16_t param_2, int16_t count, uint8_t color) {
+    void __cdecl Draw_Vertical_Run_(uint8_t** buf, int16_t post_offset, int16_t count, uint8_t color) {
         uint8_t* current_ptr = *buf;
 
         if (count > 0) {
-            int32_t remaining = static_cast<int32_t>(count);
+            int32_t remaining = (int32_t)count;
             do {
                 *current_ptr = color;
                 current_ptr += video::g_screen_res_x;
@@ -508,14 +495,13 @@ namespace line {
             } while (remaining != 0);
         }
 
-        // Update the caller's buffer pointer, applying the post-draw offset
-        *buf = current_ptr + param_2;
+        *buf = current_ptr + post_offset;
     }
 
     void __cdecl Draw_Horizontal_Run_(uint8_t** buf, int16_t step_x, int16_t count, uint8_t color) {
         uint8_t* current_pos = *buf;
         if (count > 0) {
-            int32_t remaining = static_cast<int32_t>(count);
+            int32_t remaining = (int32_t)count;
             do {
                 *current_pos = color;
                 current_pos += step_x;
@@ -523,7 +509,6 @@ namespace line {
             } while (remaining != 0);
         }
 
-        // Advance buffer pointer to the next line based on screen resolution
         *buf = current_pos + video::g_screen_res_x;
     }
 
@@ -542,10 +527,10 @@ namespace line {
                 int16_t y2 = y - i + height - 1;
                 Plasma_Line_(x2, y1, x2, y2, replace::_graphics_buffer, width);
 
-                for (int j = 0; j < 511; ++j) {
-                    uint8_t tmp = replace::_graphics_buffer[j];
-                    replace::_graphics_buffer[j] = replace::_graphics_buffer[1022 - j];
-                    replace::_graphics_buffer[1022 - j] = tmp;
+                for (int16_t mirror_index = 0; mirror_index < 511; ++mirror_index) {
+                    uint8_t tmp = replace::_graphics_buffer[mirror_index];
+                    replace::_graphics_buffer[mirror_index] = replace::_graphics_buffer[1022 - mirror_index];
+                    replace::_graphics_buffer[1022 - mirror_index] = tmp;
                 }
 
                 Plasma_Line_(x1, y1, x1, y2, replace::_graphics_buffer, height + width);
@@ -568,16 +553,16 @@ namespace line {
         *dest_ptr = ptr + video::g_screen_res_x;
     }
 
-    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, uint16_t* color_idx) {
+    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t post_offset, int16_t height, s_colors* colors, uint16_t* color_index) {
         uint8_t* dest = *screen_ptr;
 
         for (int16_t i = 0; i < height; ++i) {
-            *dest = colors->colors[*color_idx & 7];
-            (*color_idx)++;
+            *dest = colors->colors[*color_index & 7];
+            (*color_index)++;
             dest += video::g_screen_res_x;
         }
 
-        *screen_ptr = dest + offset;
+        *screen_ptr = dest + post_offset;
     }
 
     void __cdecl Plasma_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_map, uint16_t color_index) {
@@ -820,15 +805,6 @@ namespace line {
         }
     }
 
-    /**
-     * @brief Draws a vertical line segment using cyclic plasma data and updates the pixel pointer.
-     * 
-     * @param pixel_ptr_ref Pointer to the current pixel location, updated after the run.
-     * @param post_offset Offset added to the pixel pointer after the drawing loop.
-     * @param length Number of pixels to draw vertically.
-     * @param plasma_table 1024-byte table containing color/plasma values.
-     * @param plasma_index_ptr Pointer to the current index in the plasma table (cyclic).
-     */
     void __cdecl Draw_Vertical_Run_Plasma_(uint8_t** pixel_ptr_ref, int16_t post_offset, int16_t length, uint8_t* plasma_table, uint16_t* plasma_index_ptr) {
         uint8_t* current_pixels = *pixel_ptr_ref;
 
@@ -851,15 +827,15 @@ namespace line {
         *pixel_ptr_ref = current_pixels + post_offset;
     }
 
-    void __cdecl Draw_Horizontal_Run_Plasma_(uint8_t** dest_ptr, int16_t step, int16_t length, uint8_t* plasma_table, uint16_t* angle_ptr) {
+    void __cdecl Draw_Horizontal_Run_Plasma_(uint8_t** dest_ptr, int16_t step, int16_t length, uint8_t* plasma_table, uint16_t* plasma_index_ptr) {
         uint8_t* dest = *dest_ptr;
 
         if (length > 0) {
             int32_t count = (int32_t)length;
             do {
-                *dest = plasma_table[*angle_ptr & 0x3FF];
+                *dest = plasma_table[*plasma_index_ptr & 0x3FF];
                 dest += step;
-                (*angle_ptr)++;
+                (*plasma_index_ptr)++;
                 count--;
             } while (count != 0);
         }
@@ -871,13 +847,13 @@ namespace line {
         random::Save_Random_Seed_();
         random::Set_Random_Seed_(seed);
 
-        replace::_graphics_buffer[0] = static_cast<uint8_t>(start_value & 0x7);
+        replace::_graphics_buffer[0] = (uint8_t)(start_value & 0x7);
 
-        int8_t direction_state = static_cast<int8_t>(random::Random_(4)) - 1;
+        int8_t direction_state = (int8_t)random::Random_(4) - 1;
         int8_t step_dir = (direction_state == 0) ? -1 : 1;
 
-        for (int i = 1; i < 1023; ++i) {
-            int8_t val = replace::_graphics_buffer[i - 1];
+        for (int16_t sample_index = 1; sample_index < 1023; ++sample_index) {
+            int8_t val = replace::_graphics_buffer[sample_index - 1];
 
             if (random::Random_(4) == 1) {
                 direction_state = 1 - direction_state;
@@ -900,11 +876,11 @@ namespace line {
                 val = 7;
             }
 
-            replace::_graphics_buffer[i] = static_cast<uint8_t>(val);
+            replace::_graphics_buffer[sample_index] = (uint8_t)val;
         }
 
-        for (int i = 1; i < 1023; ++i) {
-            replace::_graphics_buffer[i] = color_map[replace::_graphics_buffer[i]];
+        for (int16_t sample_index = 1; sample_index < 1023; ++sample_index) {
+            replace::_graphics_buffer[sample_index] = color_map[replace::_graphics_buffer[sample_index]];
         }
 
         random::Restore_Random_Seed_();

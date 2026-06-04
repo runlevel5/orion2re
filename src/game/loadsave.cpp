@@ -1,8 +1,6 @@
 #include "pch.h"
 
 namespace LOADSAVE {
-    const char s_INVALID_STR[12] = "* INVALID *";
-
     char _months[12][6];
 
     uint8_t _draw_game_popup_to_back;
@@ -21,45 +19,20 @@ namespace LOADSAVE {
     uint8_t _loaded_new_game;
     uint8_t _loaded_debug_save;
 
-    const char s_dot_GAM_005568f4[5] = ".GAM";
-    const char s_SAVE_005568fc[5] = "SAVE";
-    const char s_format_0055ad30[14] = "%s, %s, %d %s";
-
-    const char s__ALT_F1__0055ad24[9] = "(ALT_F1)";
-    const char s__ALT_F2__0055ad18[9] = "(ALT_F2)";
-    const char s__ALT_F3__0055ad0c[9] = "(ALT_F3)";
-    const char s__ALT_F5__0055ad00[9] = "(ALT_F5)";
-    const char s__ALT_F6__0055acf4[9] = "(ALT_F6)";
-    const char s__ALT_F7__0055ace8[9] = "(ALT_F7)";
-    const char s__ALT_F8__0055acdc[9] = "(ALT_F8)";
-
-    const char s__ALT_F1__0055acd0[9] = "(ALT-F1)";
-    const char s__ALT_F2__0055acc4[9] = "(ALT-F2)";
-    const char s__ALT_F3__0055acb8[9] = "(ALT-F3)";
-    const char s__ALT_F4__0055acac[9] = "(ALT-F4)";
-    const char s__ALT_F5__0055aca0[9] = "(ALT-F5)";
-    const char s__ALT_F6__0055ac94[9] = "(ALT-F6)";
-    const char s__ALT_F7__0055ac88[9] = "(ALT-F7)";
-    const char s__ALT_F8__0055ac7c[9] = "(ALT-F8)";
-
     /**
      * @address 00511020
      */
     void __cdecl Allocate_Data_Space_For_Game_Popup_() {
         // Allocate space for game animations and clear the block
-        _game_anims = (s_game_anims*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x65);
-
-        uint8_t* anim_ptr = reinterpret_cast<uint8_t*>(_game_anims);
-        for (int i = 0; i < 0x65; ++i) {
-            anim_ptr[i] = 0;
-        }
+        _game_anims = (s_game_anims*)allocate::Allocate_First_Block_(MOX::_screen_seg, sizeof(*_game_anims));
+        memset(_game_anims, 0, sizeof(*_game_anims));
 
         // Allocate buffers for game dates and stardates (1000 bytes each)
         MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 1000);
         MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 1000);
 
-        // Allocate space for the popup fields structure (0x278 = 632 bytes)
-        _game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
+        // Allocate space for the popup fields structure.
+        _game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_game_popup_fields));
     }
 
     /**
@@ -284,7 +257,7 @@ namespace LOADSAVE {
             if (MOX::_screen_data == 2) {
                 for (int16_t i = 0; i < 10; ++i) {
                     if (_game_popup_fields->slot_status[i] == 2) {
-                        memcpy(MOX::_save_game_description[i].description, s_INVALID_STR, 12);
+                        memcpy(MOX::_save_game_description[i].description, "* INVALID *", sizeof("* INVALID *"));
                     }
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
                     _game_popup_fields->saved_game_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, MOX::_popup_base_y + 0x18 + i * 0x1f, MOX::_popup_base_x + 0xe2, MOX::_popup_base_y + 0x18 + i * 0x1f + 0x18, s__00551100, ')');
@@ -295,7 +268,7 @@ namespace LOADSAVE {
                 for (int16_t i = 0; i < 10; ++i) {
                     fonts::Set_Font_Style_(2, &colors_style);
                     if (_game_popup_fields->slot_status[i] == 2) {
-                        memcpy(MOX::_save_game_description[i].description, s_INVALID_STR, 12);
+                        memcpy(MOX::_save_game_description[i].description, "* INVALID *", sizeof("* INVALID *"));
                     }
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
                     _game_popup_fields->saved_game_fields[i] = fields::Add_Continuous_String_Input_Field_(MOX::_popup_base_x + 0x1a, MOX::_popup_base_y + 0x18 + i * 0x1f, 200, fonts::Get_Font_Height_(), MOX::_save_game_description[i].description, 0x1e, 0, 0, ')', 0);
@@ -566,7 +539,7 @@ namespace LOADSAVE {
                     s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
                     const char* colony_str = HAROLD::H_Message_(colonies == 1 ? 0xbc : 0xbd);
 
-                    sprintf(temp_buffer, s_format_0055ad30, plr->name, plr->race_name, (int)colonies, colony_str);
+                    sprintf(temp_buffer, "%s, %s, %d %s", plr->name, plr->race_name, (int)colonies, colony_str);
                     if (strlen(temp_buffer) >= 0x25) {
                         temp_buffer[0x24] = '\0';
                     }
@@ -617,7 +590,7 @@ namespace LOADSAVE {
         }
     }
 
-    void __cdecl Check_For_Saved_Games_(int8_t* games) {
+    void __cdecl Check_For_Saved_Games_(int8_t* slot_status) {
         char filename_buffer[20];
         char itoa_buffer[12];
         int16_t game_index = 0;
@@ -626,7 +599,7 @@ namespace LOADSAVE {
             itoa(game_index + 1, itoa_buffer, 10);
 
             char* dest = filename_buffer;
-            const char* src = s_SAVE_005568fc;
+            const char* src = "SAVE";
             while ((*dest++ = *src++) != '\0');
             dest--;
 
@@ -634,24 +607,24 @@ namespace LOADSAVE {
             while ((*dest++ = *src++) != '\0');
             dest--;
 
-            src = s_dot_GAM_005568f4;
+            src = ".GAM";
             while ((*dest++ = *src++) != '\0');
 
-            games[game_index] = 0;
+            slot_status[game_index] = 0;
 
             if (!dos::DIR_(filename_buffer, filename_buffer)) {
-                games[game_index] = 1;
+                slot_status[game_index] = 1;
             } else {
                 if (LOADSAVE::Check_Magic_Number_(filename_buffer) < 1) {
-                    games[game_index] = 2;
+                    slot_status[game_index] = 2;
                 } else {
                     if (LOADSAVE::Get_Game_Type_From_Saved_Game_(filename_buffer)) {
                         int8_t game_type = (int8_t)FILEDEF::Get_Game_Type_From_Saved_Game_(game_index);
                         if (game_type == 3 || game_type == 2) {
-                            games[game_index] = 3;
+                            slot_status[game_index] = 3;
                         }
                     } else {
-                        games[game_index] = 2;
+                        slot_status[game_index] = 2;
                     }
                 }
             }
@@ -663,12 +636,12 @@ namespace LOADSAVE {
     /**
      * @address 0050f8d0
      */
-    void __cdecl Get_Star_Date_Strings_(int32_t* dates, char* output_buf) {
+    void __cdecl Get_Star_Date_Strings_(int32_t* star_dates, char* output_buf) {
         for (int16_t i = 0; i < 10; ++i) {
             char local_str_buf[25];
-            memset(local_str_buf, 0, 25);
+            memset(local_str_buf, 0, sizeof(local_str_buf));
 
-            int32_t star_date_value = dates[i];
+            int32_t star_date_value = star_dates[i];
 
             if (star_date_value > 0) {
                 // Fetch the prefix (e.g., "Stardate " or "D ")
@@ -692,11 +665,11 @@ namespace LOADSAVE {
 
             } else if (star_date_value < 0) {
                 // If the value is negative, mark it as invalid
-                memcpy(local_str_buf, s_INVALID_STR, 12);
+                memcpy(local_str_buf, "* INVALID *", sizeof("* INVALID *"));
             }
 
             // Copy the resulting string (25 bytes) to the correct slot in the output buffer
-            memcpy(output_buf + (i * 25), local_str_buf, 25);
+            memcpy(output_buf + (i * 25), local_str_buf, sizeof(local_str_buf));
         }
     }
 
@@ -712,7 +685,7 @@ namespace LOADSAVE {
             itoa(i + 1, slot_num_str, 10);
 
             char* dest = filename;
-            const char* src = s_SAVE_005568fc;
+            const char* src = "SAVE";
             while ((*dest++ = *src++) != '\0');
             dest--;
 
@@ -720,7 +693,7 @@ namespace LOADSAVE {
             while ((*dest++ = *src++) != '\0');
             dest--;
 
-            src = s_dot_GAM_005568f4;
+            src = ".GAM";
             while ((*dest++ = *src++) != '\0');
 
             for (int j = 0; j < 25; ++j) {
@@ -874,7 +847,7 @@ namespace LOADSAVE {
                     Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
                     s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_active : &_game_popup_fields->color_normal;
                     fonts::Set_Font_Style_(2, color);
-                    const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : s_INVALID_STR;
+                    const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : "* INVALID *";
                     fonts::Print_(text_x, text_y, desc);
                 }
             } else {
@@ -890,7 +863,7 @@ namespace LOADSAVE {
                         fonts::Print_To_Bitmap_(print_x, text_y, MOX::_save_game_description[i].description, _bitmap);
                     }
                 } else if (MOX::_save_game_description[i].description[0] != '\0') {
-                    fonts::Print_To_Bitmap_(print_x, text_y, s_INVALID_STR, _bitmap);
+                    fonts::Print_To_Bitmap_(print_x, text_y, "* INVALID *", _bitmap);
                 }
             }
 
@@ -1063,19 +1036,19 @@ namespace LOADSAVE {
      * @address 0043d1d0
      */
     void __cdecl Save_Session_Related_Settings_() {
-        uint8_t file_buffer[553]; // 0x229 bytes
+        uint8_t file_buffer[sizeof(MOX::_settings)];
         bool success = false;
 
         FILE* file = fopen(s_MOX_SET_00556918, s_rb_0055117c);
         if (file != nullptr) {
-            fread(file_buffer, 0x229, 1, file);
+            fread(file_buffer, sizeof(file_buffer), 1, file);
             fclose(file);
 
             RUSS::Assert_Settings_();
 
             // Update the session-related portion of the settings (211 bytes)
             for (int i = 0; i < 211; ++i) {
-                file_buffer[i] = reinterpret_cast<uint8_t*>(&MOX::_settings)[i];
+                file_buffer[i] = ((uint8_t*)&MOX::_settings)[i];
             }
 
             success = true;
@@ -1083,7 +1056,7 @@ namespace LOADSAVE {
 
             file = fopen(s_MOX_SET_00556918, s_wb_00551178);
             if (file != nullptr) {
-                fwrite(file_buffer, 0x229, 1, file);
+                fwrite(file_buffer, sizeof(file_buffer), 1, file);
                 fclose(file);
             } else {
                 success = false;
@@ -1446,8 +1419,7 @@ namespace LOADSAVE {
         s_colors* palette = MISC::Font_Colors2_(2, 0x55, 0x7E); // 'U', '~'
 
         // Copy the palette colors locally
-        *reinterpret_cast<uint32_t*>(&local_8.colors[0]) = *reinterpret_cast<uint32_t*>(&palette->colors[0]);
-        *reinterpret_cast<uint32_t*>(&local_8.colors[4]) = *reinterpret_cast<uint32_t*>(&palette->colors[4]);
+        memcpy(local_8.colors, palette->colors, sizeof(local_8.colors));
 
         if (_print_data_to_bitmap == 0) {
             if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
@@ -1491,20 +1463,20 @@ namespace LOADSAVE {
             int16_t text_x2 = text_x1 + 0x96;
 
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x02, HAROLD::H_Message_(0xA6), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x02, s__ALT_F1__0055ad24, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x02, "(ALT_F1)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x13, HAROLD::H_Message_(0xA7), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x13, s__ALT_F2__0055ad18, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x13, "(ALT_F2)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x24, HAROLD::H_Message_(0xA8), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x24, s__ALT_F3__0055ad0c, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x24, "(ALT_F3)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x35, HAROLD::H_Message_(0xA9), _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x46, HAROLD::H_Message_(0xAA), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x46, s__ALT_F5__0055ad00, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x46, "(ALT_F5)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x57, HAROLD::H_Message_(0xAB), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x57, s__ALT_F6__0055acf4, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x57, "(ALT_F6)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x68, s__ALT_F7__0055ace8, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x68, "(ALT_F7)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD), _bitmap);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, s__ALT_F8__0055acdc, _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, "(ALT_F8)", _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE), _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF), _bitmap);
             fonts::Print_To_Bitmap_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0), _bitmap);
@@ -1521,22 +1493,22 @@ namespace LOADSAVE {
             int16_t text_x2 = text_x1 + 0x96;
 
             fonts::Print_(text_x1, draw_y + 0x02, HAROLD::H_Message_(0xA6));
-            fonts::Print_(text_x2, draw_y + 0x02, s__ALT_F1__0055acd0);
+            fonts::Print_(text_x2, draw_y + 0x02, "(ALT-F1)");
             fonts::Print_(text_x1, draw_y + 0x13, HAROLD::H_Message_(0xA7));
-            fonts::Print_(text_x2, draw_y + 0x13, s__ALT_F2__0055acc4);
+            fonts::Print_(text_x2, draw_y + 0x13, "(ALT-F2)");
             fonts::Print_(text_x1, draw_y + 0x24, HAROLD::H_Message_(0xA8));
-            fonts::Print_(text_x2, draw_y + 0x24, s__ALT_F3__0055acb8);
+            fonts::Print_(text_x2, draw_y + 0x24, "(ALT-F3)");
             fonts::Print_(text_x1, draw_y + 0x35, HAROLD::H_Message_(0xA9));
             fonts::Print_(text_x1, draw_y + 0x46, HAROLD::H_Message_(0xAA));
-            fonts::Print_(text_x2, draw_y + 0x46, s__ALT_F4__0055acac);
+            fonts::Print_(text_x2, draw_y + 0x46, "(ALT-F4)");
             fonts::Print_(text_x1, draw_y + 0x57, HAROLD::H_Message_(0xAB));
-            fonts::Print_(text_x2, draw_y + 0x57, s__ALT_F5__0055aca0);
+            fonts::Print_(text_x2, draw_y + 0x57, "(ALT-F5)");
             fonts::Print_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC));
-            fonts::Print_(text_x2, draw_y + 0x68, s__ALT_F6__0055ac94);
+            fonts::Print_(text_x2, draw_y + 0x68, "(ALT-F6)");
             fonts::Print_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD));
-            fonts::Print_(text_x2, draw_y + 0x79, s__ALT_F7__0055ac88);
+            fonts::Print_(text_x2, draw_y + 0x79, "(ALT-F7)");
             fonts::Print_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE));
-            fonts::Print_(text_x2, draw_y + 0x8A, s__ALT_F8__0055ac7c);
+            fonts::Print_(text_x2, draw_y + 0x8A, "(ALT-F8)");
             fonts::Print_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF));
             fonts::Print_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0));
             fonts::Print_(text_x1, draw_y + 0xBD, HAROLD::H_Message_(0xB1));
@@ -1549,14 +1521,14 @@ namespace LOADSAVE {
         bool first_loop_drawn = true;
         int16_t dummy_p1;
         int16_t dummy_p2;
-        uint8_t settings_copy[0x229];
+        uint8_t settings_copy[sizeof(MOX::_settings)];
 
         MOX::_first_time_drawn = 1;
         _loaded_new_game = 0;
         fields::Clear_Fields_();
         MOX::_global_var = 0;
 
-        memcpy(settings_copy, &MOX::_settings, 0x229);
+        memcpy(settings_copy, &MOX::_settings, sizeof(settings_copy));
 
         if (MOX::_screen_data < 0 || MOX::_screen_data > 3) {
             MOX::_screen_data = 0;
@@ -1567,7 +1539,7 @@ namespace LOADSAVE {
         Load_Game_Popup_Pictures_();
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
 
-        memset(_game_popup_fields, 0xFF, 0x278);
+        memset(_game_popup_fields, 0xFF, sizeof(*_game_popup_fields));
 
         Set_Current_Game_Option_Flags_();
 
@@ -1672,17 +1644,17 @@ namespace LOADSAVE {
     /**
      * @address 00512290
      */
-    void __cdecl Embed_Special_Color_Codes_(char* param_1, int16_t param_2) {
-        int16_t length = static_cast<int16_t>(strlen(param_1));
+    void __cdecl Embed_Special_Color_Codes_(char* text, int16_t max_len) {
+        int16_t length = static_cast<int16_t>(strlen(text));
         char encoded[202];
 
-        memset(encoded, 0, sizeof(encoded) - 1);
+        memset(encoded, 0, sizeof(encoded));
 
-        if (length <= 0xC8 && length < param_2 - 2 && *param_1 != '\x03') {
+        if (length <= 0xC8 && length < max_len - 2 && *text != '\x03') {
             encoded[0] = '\x03';
-            memcpy(encoded + 1, param_1, length);
+            memcpy(encoded + 1, text, length);
             encoded[length + 1] = '\x01';
-            memcpy(param_1, encoded, length + 2);
+            memcpy(text, encoded, length + 2);
         }
     }
 

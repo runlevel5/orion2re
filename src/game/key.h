@@ -15,9 +15,12 @@ namespace key {
     // Signed read index for the keyboard ring buffer.
     extern int8_t _key_read;
 
+    // Returns non-zero when the keyboard ring buffer currently contains unread input.
     uint8_t Keyboard_Status_();
 
+    // Returns the next key code from the ring buffer and advances the read position.
     int32_t Read_Key_();
 
+    // Returns the next buffered key code as a 16-bit value, or 0 when no key is available.
     int16_t Scan_Key_();
 }

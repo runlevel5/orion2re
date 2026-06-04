@@ -9,6 +9,8 @@ namespace key {
 
     int8_t _key_read;
 
+    constexpr int32_t kLastKeyPressedCount = sizeof(_last_key_pressed) / sizeof(_last_key_pressed[0]);
+
     uint8_t Keyboard_Status_() {
         if (_key_pressed == 1) {
             _key_pressed = 0;
@@ -19,16 +21,9 @@ namespace key {
 
     int32_t Read_Key_() {
         int8_t current_index = _key_read;
-
-        // Retrieve the key code at the current read position.
-        // Note: There is no explicit bounds check on 'current_index' before access.
         int32_t key_code = _last_key_pressed[current_index];
+        _key_read = (current_index + 1) % kLastKeyPressedCount;
 
-        // Increment the read pointer with wrap-around (ring buffer size is 10).
-        _key_read = (current_index + 1) % 10;
-
-        // Update the key_pressed status based on whether more keys are available.
-        // If the read pointer has caught up to the write pointer, the buffer is empty.
         if (_key_read == _key_write) {
             _key_pressed = 0;
         } else {

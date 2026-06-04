@@ -1,19 +1,17 @@
 #include "pch.h"
 
 namespace lbx {
-    const char s_r_b_0055bf20[4] = "r+b";
-
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename) {
         memset(header, 0, sizeof(s_lbx_stream_header));
 
-        header->file = fopen(filename, s_r_b_0055bf20);
+        header->file = fopen(filename, "r+b");
         
         if (header->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
-                char full_path[80];
+                char full_path[sizeof(header->filename)];
                 strcpy(full_path, farload::_secondary_drive_path);
                 strcat(full_path, filename);
-                header->file = fopen(full_path, s_r_b_0055bf20);
+                header->file = fopen(full_path, "r+b");
             }
             
             if (header->file == nullptr) {
@@ -21,7 +19,7 @@ namespace lbx {
             }
         }
 
-        fread(header, 8, 1, header->file);
+        fread(header, sizeof(header->entry_count) + sizeof(header->magic) + sizeof(header->header_data), 1, header->file);
 
         if (header->magic != 0xFEAD) {
             fclose(header->file);
@@ -29,22 +27,23 @@ namespace lbx {
             return;
         }
 
-        uint32_t* temp_offsets = &header->entries[254].offset;
-        fread(temp_offsets, 4, 510, header->file);
+        uint32_t* raw_offsets = &header->entries[254].offset;
+        fread(raw_offsets, sizeof(*raw_offsets), 510, header->file);
 
-        header->first_offset = temp_offsets[0];
+        header->first_offset = raw_offsets[0];
 
-        for (int i = 0; i < (int16_t)header->entry_count; ++i) {
-            header->entries[i].offset = temp_offsets[i + 1];
-            uint32_t prev_offset = (i == 0) ? header->first_offset : header->entries[i - 1].offset;
-            header->entries[i].size = header->entries[i].offset - prev_offset;
+        int32_t entry_count = (int16_t)header->entry_count;
+        for (int32_t entry_idx = 0; entry_idx < entry_count; ++entry_idx) {
+            header->entries[entry_idx].offset = raw_offsets[entry_idx + 1];
+            uint32_t prev_offset = (entry_idx == 0) ? header->first_offset : header->entries[entry_idx - 1].offset;
+            header->entries[entry_idx].size = header->entries[entry_idx].offset - prev_offset;
         }
 
         strcpy(header->filename, filename);
     }
 
-    uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx) {
-        return header->entries[rec_idx].size;
+    uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t record_idx) {
+        return header->entries[record_idx].size;
     }
 
     void __cdecl LBX_uninit_(s_lbx_stream_header* header) {
@@ -55,7 +54,7 @@ namespace lbx {
     }
 
     void __cdecl LBX_init_stream_(s_wave_stream_header* stream, const char* filename) {
-        uint8_t music_active = sound::_musicActive;
+        uint8_t was_music_active = sound::_musicActive;
 
         if (stream->file != nullptr && sound::_close_stream == 0) {
             mmioClose(stream->file, 0);
@@ -63,15 +62,15 @@ namespace lbx {
 
         memset(stream, 0, sizeof(s_wave_stream_header));
 
-        LPSTR mmio_filename = const_cast<LPSTR>(filename);
+        LPSTR mmio_filename = (LPSTR)filename;
         stream->file = mmioOpenA(mmio_filename, nullptr, MMIO_READ | MMIO_ALLOCBUF);
 
         if (stream->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
-                char local_50[80];
-                strcpy(local_50, farload::_secondary_drive_path);
-                strcat(local_50, filename);
-                stream->file = mmioOpenA(local_50, nullptr, MMIO_READ | MMIO_ALLOCBUF);
+                char full_path[sizeof(stream->filename)];
+                strcpy(full_path, farload::_secondary_drive_path);
+                strcat(full_path, filename);
+                stream->file = mmioOpenA(full_path, nullptr, MMIO_READ | MMIO_ALLOCBUF);
             }
             if (stream->file == nullptr) {
                 sound::_musicActive = 0;
@@ -79,7 +78,7 @@ namespace lbx {
             }
         }
 
-        mmioRead(stream->file, reinterpret_cast<char*>(stream), 8);
+        mmioRead(stream->file, (char*)stream, sizeof(stream->entry_count) + sizeof(stream->magic) + sizeof(stream->header_data));
 
         if (stream->magic != 0xFEAD) {
             mmioClose(stream->file, 0);
@@ -89,20 +88,20 @@ namespace lbx {
         }
 
         uint32_t* raw_offsets = &stream->entries[254].offset;
-        mmioRead(stream->file, reinterpret_cast<char*>(raw_offsets), 0x7F8);
+        mmioRead(stream->file, (char*)raw_offsets, sizeof(*raw_offsets) * 510);
 
         stream->first_offset = raw_offsets[0];
 
-        int count = static_cast<int16_t>(stream->entry_count);
-        for (int i = 0; i < count; ++i) {
-            stream->entries[i].offset = raw_offsets[i + 1];
-            uint32_t prev_offset = (i == 0) ? stream->first_offset : stream->entries[i - 1].offset;
-            stream->entries[i].size = raw_offsets[i + 1] - prev_offset;
+        int32_t entry_count = (int16_t)stream->entry_count;
+        for (int32_t entry_idx = 0; entry_idx < entry_count; ++entry_idx) {
+            stream->entries[entry_idx].offset = raw_offsets[entry_idx + 1];
+            uint32_t prev_offset = (entry_idx == 0) ? stream->first_offset : stream->entries[entry_idx - 1].offset;
+            stream->entries[entry_idx].size = raw_offsets[entry_idx + 1] - prev_offset;
         }
 
         strcpy(stream->filename, filename);
 
-        if (music_active == 1) {
+        if (was_music_active == 1) {
             sound::_musicActive = 1;
         }
 

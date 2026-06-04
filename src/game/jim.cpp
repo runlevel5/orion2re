@@ -51,7 +51,7 @@ namespace JIM {
         void* ani_buffer = allocate::Allocate_Next_Block_(MOX::_global_screen_seg, remaining_space - 100);
         file_ani::Set_File_Animation_Buffer_(ani_buffer);
 
-        int16_t skip_flag = 0;
+        int16_t skip_requested = 0;
         bool user_interrupted = false;
 
         if (Check_For_Simtex_Logo_() == 0) {
@@ -69,24 +69,23 @@ namespace JIM {
             platform::Toggle_Pages_Stub_();
             _darken_palette_value = 0;
 
-            // Slow fade in for the first logo
-            skip_flag = palstore::Slow_Fade_In_();
+            skip_requested = palstore::Slow_Fade_In_();
 
-            int16_t end_delay_counter = 15; // 0xF
+            int16_t end_delay_counter = 15;
             mouse::Set_Mouse_List_(&_logo_mouse_list, 1);
 
             while (!user_interrupted) {
-                if (skip_flag != 0) break;
+                if (skip_requested != 0) break;
 
                 timer::Mark_Time_();
                 if (key::Keyboard_Status_() == 1) {
                     key::Read_Key_();
-                    skip_flag = 1;
+                    skip_requested = 1;
                     user_interrupted = true;
                 }
 
                 if (mouse::Mouse_Button_() != 0) {
-                    skip_flag = 1;
+                    skip_requested = 1;
                     user_interrupted = true;
                 }
 
@@ -113,7 +112,7 @@ namespace JIM {
         }
 
         // Second Logo (Master of Orion / Microprose)
-        if (skip_flag == 0) {
+        if (skip_requested == 0) {
             Logo_Fadeout_();
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
@@ -135,12 +134,12 @@ namespace JIM {
                 timer::Mark_Time_();
                 if (key::Keyboard_Status_() == 1) {
                     key::Read_Key_();
-                    skip_flag = 1;
+                    skip_requested = 1;
                     user_interrupted = true;
                 }
 
                 if (mouse::Mouse_Button_() != 0) {
-                    skip_flag = 1;
+                    skip_requested = 1;
                     user_interrupted = true;
                 }
 
@@ -170,8 +169,7 @@ namespace JIM {
         graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
         video::Copy_Off_To_Back_();
 
-        // Finally play the intro cinematic unless the user requested a skip early on
-        if (skip_flag == 0) {
+        if (skip_requested == 0) {
             SMACK::Play_Cinematic_(s_intro_lbx, 0, 1);
         }
     }
@@ -180,7 +178,7 @@ namespace JIM {
         video::Set_Refresh_Full_();
 
         for (int16_t current_fade = _darken_palette_value; current_fade <= 100; current_fade += 10) {
-            palstore::Darken_Palette_(static_cast<int32_t>(current_fade));
+            palstore::Darken_Palette_((int32_t)current_fade);
             RUSS::Mox_Update_();
         }
 
@@ -193,22 +191,18 @@ namespace JIM {
     }
 
     void Play_Background_Music_() {
-        // Only proceed if music is enabled in settings
         if (MOX::_settings.music_on != 1) {
             return;
         }
 
         _jim_old_music_id = -1;
 
-        // If one of the background tracks (1, 2, or 3) is already playing, do nothing
         if (_jim_current_stream == 1 || _jim_current_stream == 2 || _jim_current_stream == 3) {
             return;
         }
 
-        // Fade out existing audio
         sound::Fade_Stream_Down_(25);
 
-        // Wait for volume to reach zero while updating engine state
         if (sound::Get_Stream_Volume_() > 0) {
             int16_t current_volume;
             do {
@@ -219,7 +213,6 @@ namespace JIM {
 
         sound::Stop_Stream_();
 
-        // Randomly select next track from "STREAM.LBX" (indices 1, 2, or 3)
         _jim_current_stream = (int16_t)((clock() % 3) + 1);
 
         sound::Set_Stream_Filename_(s_STREAM_LBX);
@@ -231,74 +224,74 @@ namespace JIM {
         sound::Fade_Stream_Up_(30);
     }
 
-    void __cdecl Decode_Text_Stat_(char* buffer, int16_t stat_a, int16_t stat_b) {
-        Decode_Text_Message_(buffer, -1, -1, -1, stat_a, -1, -1, -1, stat_b);
+    void __cdecl Decode_Text_Stat_(char* buffer, int16_t numeric_value, int16_t max_len) {
+        Decode_Text_Message_(buffer, -1, -1, -1, numeric_value, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Year_(char* buffer, int16_t year) {
-        JIM::Decode_Text_Message_(buffer, -1, -1, -1, -1, -1, -1, -1, year);
+    void __cdecl Decode_Text_Year_(char* buffer, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, -1, -1, -1, -1, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx1, int16_t race_idx2) {
-        JIM::Decode_Text_Message_(buffer, race_idx1, -1, -1, -1, -1, -1, -1, race_idx2);
+    void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, race_idx, -1, -1, -1, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Race_(char* out_buffer, int16_t msg_idx, int16_t race_idx) {
-        JIM::Decode_Text_Message_(out_buffer, msg_idx, -1, -1, -1, -1, -1, -1, race_idx);
+    void __cdecl Decode_Text_Race_(char* buffer, int16_t race_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, race_idx, -1, -1, -1, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Name_And_Stat_(char* text, int16_t val1, int16_t val2, int16_t val3) {
-        JIM::Decode_Text_Message_(text, val1, -1, -1, val2, -1, -1, -1, val3);
+    void __cdecl Decode_Text_Name_And_Stat_(char* buffer, int16_t name_idx, int16_t numeric_value, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, -1, numeric_value, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* text, int16_t val1, int16_t val2, int16_t val3, int16_t val4, int16_t val5) {
-        JIM::Decode_Text_Message_(text, val1, -1, val3, -1, val2, val4, -1, val5);
+    void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* buffer, int16_t name_idx, int16_t other_name_idx, int16_t first_tech_idx, int16_t second_tech_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, first_tech_idx, -1, other_name_idx, second_tech_idx, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t name_idx, int16_t system_idx, int16_t unknown_idx) {
-        JIM::Decode_Text_Message_(buffer, name_idx, system_idx, -1, -1, -1, -1, -1, unknown_idx);
+    void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t name_idx, int16_t system_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, name_idx, system_idx, -1, -1, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_System_(char* buffer, int16_t message_id, int16_t system_id) {
-        JIM::Decode_Text_Message_(buffer, -1, message_id, -1, -1, -1, -1, -1, system_id);
+    void __cdecl Decode_Text_System_(char* buffer, int16_t system_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, -1, system_idx, -1, -1, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t id1, int16_t id2, int16_t id3, int16_t id4) {
-        JIM::Decode_Text_Message_(buffer, id1, -1, -1, -1, id2, id3, -1, id4);
+    void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t name_idx, int16_t other_name_idx, int16_t tech_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, -1, -1, other_name_idx, tech_idx, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Name_And_Tech_(char* text, int16_t id1, int16_t id2, int16_t id3) {
-        JIM::Decode_Text_Message_(text, id1, -1, id2, -1, -1, -1, -1, id3);
+    void __cdecl Decode_Text_Name_And_Tech_(char* buffer, int16_t name_idx, int16_t tech_idx, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, tech_idx, -1, -1, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t id1, int16_t id2, int16_t id3) {
-        Decode_Text_Message_(buffer, id1, -1, -1, -1, id2, -1, -1, id3);
+    void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t name_idx1, int16_t name_idx2, int16_t max_len) {
+        Decode_Text_Message_(buffer, name_idx1, -1, -1, -1, name_idx2, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Tech_And_Other_Name_(char* text, int16_t tech_id, int16_t other_name_1, int16_t other_name_2, int16_t other_name_3) {
-        JIM::Decode_Text_Message_(text, tech_id, -1, other_name_1, -1, other_name_2, -1, -1, other_name_3);
+    void __cdecl Decode_Text_Tech_And_Other_Name_(char* buffer, int16_t tech_id, int16_t other_name_1, int16_t other_name_2, int16_t max_len) {
+        JIM::Decode_Text_Message_(buffer, tech_id, -1, other_name_1, -1, other_name_2, -1, -1, max_len);
     }
 
-    void __cdecl Decode_Text_Field_(char* text, int16_t field_id, int16_t max_len) {
-        Decode_Text_Message_(text, -1, -1, -1, -1, -1, -1, field_id, max_len);
+    void __cdecl Decode_Text_Field_(char* buffer, int16_t field_id, int16_t max_len) {
+        Decode_Text_Message_(buffer, -1, -1, -1, -1, -1, -1, field_id, max_len);
     }
 
-    void __cdecl Decode_Text_Message_(char* text, int16_t player1_id, int16_t star_id, int16_t tech_app1_id, int16_t number, int16_t player2_id, int16_t tech_app2_id, int16_t tech_field_id, int16_t max_len) {
-        int16_t len = 0;
+    void __cdecl Decode_Text_Message_(char* message_buffer, int16_t player1_id, int16_t star_id, int16_t tech_app1_id, int16_t number, int16_t player2_id, int16_t tech_app2_id, int16_t tech_field_id, int16_t max_len) {
+        int16_t dest_len = 0;
         char temp_buf[40];
         char dest_buf[200];
 
-        for (int i = 0; i < 200; ++i) {
-            char c = text[i];
-            if (c == '\0') {
+        for (int32_t i = 0; i < (int32_t)sizeof(dest_buf); ++i) {
+            char current_char = message_buffer[i];
+            if (current_char == '\0') {
                 break;
             }
 
             char* src_ptr = nullptr;
-            if (static_cast<uint8_t>(c) >= 0x80 && static_cast<uint8_t>(c) <= 0x8A) {
-                dest_buf[len] = '\0';
+            if ((uint8_t)current_char >= 0x80 && (uint8_t)current_char <= 0x8A) {
+                dest_buf[dest_len] = '\0';
 
-                switch (static_cast<uint8_t>(c)) {
+                switch ((uint8_t)current_char) {
                     case 0x80:
                         src_ptr = MOX::_player[player1_id].name;
                         break;
@@ -344,41 +337,41 @@ namespace JIM {
                         break;
                 }
 
-                strcpy(&dest_buf[len], src_ptr);
-                len = static_cast<int16_t>(strlen(dest_buf));
+                strcpy(&dest_buf[dest_len], src_ptr);
+                dest_len = (int16_t)strlen(dest_buf);
             } else {
-                dest_buf[len++] = c;
+                dest_buf[dest_len++] = current_char;
             }
         }
 
-        dest_buf[len] = '\0';
+        dest_buf[dest_len] = '\0';
 
-        if (strlen(dest_buf) >= static_cast<uint32_t>(max_len - 1)) {
-            sprintf(dest_buf, s_Decode_message_too_long_0055593c, max_len, text);
+        if (strlen(dest_buf) >= (uint32_t)(max_len - 1)) {
+            sprintf(dest_buf, s_Decode_message_too_long_0055593c, max_len, message_buffer);
             exitm::Exit_With_Message(dest_buf);
         } else {
-            strcpy(text, dest_buf);
+            strcpy(message_buffer, dest_buf);
         }
     }
 
-    void __cdecl Get_Text_Message_(const char* filename, int16_t msg_idx, char* dest, int16_t max_len) {
+    void __cdecl Get_Text_Message_(const char* filename, int16_t message_index, char* dest, int16_t max_len) {
         char buffer[100];
 
-        uint16_t lang = static_cast<uint8_t>(MOX::_settings.language);
+        uint16_t lang = (uint8_t)MOX::_settings.language;
         if (lang > 5) {
             lang = 0;
         }
 
         RUSS::Mox_Update_();
 
-        farload::Farload_Data_Static_(filename, static_cast<int16_t>(msg_idx * 6 + lang), buffer, 0, 1, 100);
+        farload::Farload_Data_Static_(filename, (int16_t)(message_index * 6 + lang), buffer, 0, 1, (int16_t)sizeof(buffer));
 
         RUSS::Mox_Update_();
 
-        int16_t len = static_cast<int16_t>(strlen(buffer));
+        int16_t message_len = (int16_t)strlen(buffer);
 
-        if (max_len - 1 <= len || len >= 99) {
-            sprintf(buffer, s_Message_too_long, msg_idx, filename, len);
+        if (max_len - 1 <= message_len || message_len >= (int16_t)(sizeof(buffer) - 1)) {
+            sprintf(buffer, s_Message_too_long, message_index, filename, message_len);
             exitm::Exit_With_Message(buffer);
             return;
         }
@@ -405,7 +398,7 @@ namespace JIM {
             if (sound::Get_Stream_Volume_() > 0) {
                 int16_t current_volume;
                 do {
-                    current_volume = static_cast<int16_t>(sound::Get_Stream_Volume_());
+                    current_volume = (int16_t)sound::Get_Stream_Volume_();
                     RUSS::Mox_Update_();
                 } while (current_volume > 0);
             }
@@ -413,7 +406,7 @@ namespace JIM {
             sound::Stop_Stream_();
 
             int32_t ticks = clock();
-            _jim_current_stream = static_cast<uint16_t>((ticks % 3) + 4);
+            _jim_current_stream = (int16_t)((ticks % 3) + 4);
 
             sound::Set_Stream_Filename_(s_STREAM_LBX);
             sound::Play_Stream_(_jim_current_stream);
@@ -484,8 +477,8 @@ namespace JIM {
             sound::Stop_Stream_();
 
             if (_jim_old_transition_id == -2) {
-                int32_t ticks = static_cast<int32_t>(clock());
-                _jim_current_stream = static_cast<int16_t>((ticks % 3) + 1);
+                int32_t ticks = (int32_t)clock();
+                _jim_current_stream = (int16_t)((ticks % 3) + 1);
                 sound::Set_Stream_Filename_(s_STREAM_LBX);
                 sound::Play_Stream_(_jim_current_stream);
             } else {

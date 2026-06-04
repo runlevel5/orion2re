@@ -1,9 +1,6 @@
 #include "pch.h"
 
 namespace KEN {
-    const char s_KENTEXT_LBX_005597c0[12] = "KENTEXT.LBX";
-    const char s_KENTEXT1_LBX_005597cc[13] = "KENTEXT1.LBX";
-
     uint8_t _personalities[140] = {
         3, 4, 4, 4, 4, 4, 4, 4, 5, 5,
         1, 2, 2, 2, 2, 2, 2, 2, 3, 3,
@@ -77,7 +74,7 @@ namespace KEN {
         if (player_idx < 8) {
             palette_anim = (s_animation_header*)buffer::Buffer_Reload_(
                 s_ships_lbx_005597b4,
-                static_cast<uint8_t>(MOX::_player[player_idx].color) * 50 + 49,
+                (uint8_t)MOX::_player[player_idx].color * 50 + 49,
                 MOX::_global_cache_seg
             );
         } else {
@@ -114,11 +111,11 @@ namespace KEN {
     void __cdecl Ken_Init2_() {
     }
 
-    void __cdecl Ken_Get_Text_Message_(int32_t msg_index, char* buffer, int16_t param_3) {
+    void __cdecl Ken_Get_Text_Message_(int32_t msg_index, char* buffer, int16_t message_arg) {
         if (msg_index >= 0x50) {
-            JIM::Get_Text_Message_(s_KENTEXT1_LBX_005597cc, static_cast<int16_t>(msg_index - 0x50), buffer, param_3);
+            JIM::Get_Text_Message_("KENTEXT1.LBX", (int16_t)(msg_index - 0x50), buffer, message_arg);
         } else {
-            JIM::Get_Text_Message_(s_KENTEXT_LBX_005597c0, static_cast<int16_t>(msg_index), buffer, param_3);
+            JIM::Get_Text_Message_("KENTEXT.LBX", (int16_t)msg_index, buffer, message_arg);
         }
     }
 
@@ -140,6 +137,9 @@ namespace KEN {
             int obj_w[6];
             int des_w[4];
             int spec_w[7];
+            const int32_t objective_weight_count = (int32_t)(sizeof(obj_w) / sizeof(obj_w[0]));
+            const int32_t design_weight_count = (int32_t)(sizeof(des_w) / sizeof(des_w[0]));
+            const int32_t special_weight_count = (int32_t)(sizeof(spec_w) / sizeof(spec_w[0]));
 
             obj_w[0] = 1;
             obj_w[2] = 1;
@@ -309,12 +309,12 @@ namespace KEN {
 
             // Calculate objectives
             int total_obj = 0;
-            for (int j = 0; j < 6; j++) {
+            for (int32_t j = 0; j < objective_weight_count; ++j) {
                 total_obj += obj_w[j];
             }
             while (total_obj > 1000) {
                 total_obj = 0;
-                for (int j = 0; j < 6; j++) {
+                for (int32_t j = 0; j < objective_weight_count; ++j) {
                     obj_w[j] /= 2;
                     total_obj += obj_w[j];
                 }
@@ -323,7 +323,7 @@ namespace KEN {
             int selected_obj = 0;
             rand_obj -= obj_w[0];
             if (rand_obj > 0) {
-                for (int j = 1; j < 6; j++) {
+                for (int32_t j = 1; j < objective_weight_count; ++j) {
                     selected_obj++;
                     rand_obj -= obj_w[j];
                     if (rand_obj <= 0) break;
@@ -338,12 +338,12 @@ namespace KEN {
 
             // Calculate ship design theme
             int total_des = 0;
-            for (int j = 0; j < 4; j++) {
+            for (int32_t j = 0; j < design_weight_count; ++j) {
                 total_des += des_w[j];
             }
             while (total_des > 1000) {
                 total_des = 0;
-                for (int j = 0; j < 4; j++) {
+                for (int32_t j = 0; j < design_weight_count; ++j) {
                     des_w[j] /= 2;
                     total_des += des_w[j];
                 }
@@ -352,7 +352,7 @@ namespace KEN {
             int selected_des = 0;
             rand_des -= des_w[0];
             if (rand_des > 0) {
-                for (int j = 1; j < 4; j++) {
+                for (int32_t j = 1; j < design_weight_count; ++j) {
                     selected_des++;
                     rand_des -= des_w[j];
                     if (rand_des <= 0) break;
@@ -362,12 +362,12 @@ namespace KEN {
 
             // Calculate ship special theme
             int total_spec = 0;
-            for (int j = 0; j < 7; j++) {
+            for (int32_t j = 0; j < special_weight_count; ++j) {
                 total_spec += spec_w[j];
             }
             while (total_spec > 1000) {
                 total_spec = 0;
-                for (int j = 0; j < 7; j++) {
+                for (int32_t j = 0; j < special_weight_count; ++j) {
                     spec_w[j] /= 2;
                     total_spec += spec_w[j];
                 }
@@ -376,7 +376,7 @@ namespace KEN {
             int selected_spec = 0;
             rand_spec -= spec_w[0];
             if (rand_spec > 0) {
-                for (int j = 1; j < 7; j++) {
+                for (int32_t j = 1; j < special_weight_count; ++j) {
                     selected_spec++;
                     rand_spec -= spec_w[j];
                     if (rand_spec <= 0) break;
@@ -386,8 +386,8 @@ namespace KEN {
         }
     }
 
-    s_animation_header* __cdecl Get_Ship_Picture_Seg_(int16_t param_1, int16_t param_2) {
-        return Do_Get_Ship_Picture_Seg(param_1, param_2);
+    s_animation_header* __cdecl Get_Ship_Picture_Seg_(int16_t player_idx, int16_t ship_type) {
+        return Do_Get_Ship_Picture_Seg(player_idx, ship_type);
     }
 
     void __cdecl Get_Derelict_Applications_(int16_t player_idx, uint16_t* app_array, int16_t* app_count) {

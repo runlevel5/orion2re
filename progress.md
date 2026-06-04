@@ -3,14 +3,6 @@
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
 
-- [pending] src/game/jim.{h,cpp}
-- [pending] src/game/ken.{h,cpp}
-- [pending] src/game/key.{h,cpp}
-- [pending] src/game/lbx.{h,cpp}
-- [pending] src/game/line.{h,cpp}
-- [pending] src/game/list.{h,cpp}
-- [pending] src/game/loader.{h,cpp}
-- [pending] src/game/loadsave.{h,cpp}
 - [pending] src/game/lostship.{h,cpp}
 - [pending] src/game/mainmenu.{h,cpp}
 - [pending] src/game/mainpups.{h,cpp}
