@@ -8,7 +8,7 @@ namespace init {
         memset(_io_buffer, 0, 0x2000);
     }
 
-    int8_t __cdecl Init_Drivers_(uint32_t param_1, char* font_name) {
+    int8_t __cdecl Init_Drivers_(uint32_t unused, char* font_name) {
         init::Create_IO_Buffer_();
         video::Init_Video_Drivers_();
         remap::Sort_Palette_List_();

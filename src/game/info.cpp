@@ -1,8 +1,6 @@
 #include "pch.h"
 
 namespace {
-    const char s_caret_00556074[2] = "^";
-
     int16_t _turn_summary_list_y[16] = {
         0, 10, 20, 30, 40, 50, 60, 70,
         80, 90, 100, 110, 120, 130, 140, 0,
@@ -27,7 +25,7 @@ namespace {
 
             fonts::Set_Font_LF_(10);
             MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
-            fonts::Print_(x, y, s_caret_00556074);
+            fonts::Print_(x, y, "^");
             FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 345, buffer, 0);
         }
     }
@@ -110,17 +108,11 @@ namespace INFO {
         _review_equipment,
     };
 
-    const char s_billtex2_lbx[13] = "billtex2.lbx";
-    const char s_app_pics_lbx_00556028[13] = "app_pics.lbx";
-    const char s_APP_PICS_LBX_00556018[13] = "APP_PICS.LBX";
-
     s_colors _info_normal_color = {{178, 185, 183, 182, 184, 185, 185, 186}};
 
     s_colors _info_high_color = {{178, 191, 183, 185, 187, 188, 191, 191}};
 
     int16_t _tech_rev_field[8] = {216, 427, 318, 427, 373, 427, 438, 427};
-
-    const char s_bullet_fmt_00556078[5] = "^ %s";
 
     s_drop_area _tech_review_drops[4] = {
         {218, 60, 425, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
@@ -322,10 +314,6 @@ namespace INFO {
 
     s_colors* _hist_graph_palettes[8];
 
-    const char s_billtext_lbx[13] = "billtext.lbx";
-    const char lbx_billtext[13] = "billtext.lbx";
-    const char empty_string[1] = "";
-
     s_drop_area _history_graph_drops[2] = {
         {220, 60, 609, 122, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
         {220, 132, 609, 413, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
@@ -333,21 +321,7 @@ namespace INFO {
 
     int16_t _graph_button_x[4] = {233, 323, 404, 457};
 
-    const char s_pct_fmt[6] = "%3i%%";
-    const char s_int_fmt[3] = "%i";
-
     uint8_t _graph_offsets[10] = {7, 3, 3, 3, 3, 5, 3, 3, 3, 3};
-    const char s_fmt_comma[6] = "%i,%i";
-    const char s_fmt_dot[6] = "%i.%i";
-
-    const char s_plus_00551118[2] = "+";
-    const char s_minus_0055111C[2] = "-";
-    const char s_fmt_00556048[6] = "%s%+i";
-    const char s_plus_2_00556050[3] = "+2";
-    const char s_plus_1_00556054[3] = "+1";
-    const char s_minus_0_5_00556058[5] = "-0.5";
-    const char s_0_5_BC_00556060[7] = "0.5 BC";
-    const char s_1_BC_00556068[5] = "1 BC";
 
     static int Compare_Unsigned_Strings_(const char* lhs, const char* rhs) {
         while ((uint8_t)*lhs == (uint8_t)*rhs) {
@@ -396,29 +370,29 @@ namespace INFO {
                     if (trait_idx == 2) {
                         strcpy(local_80, local_40);
                         if (trait_val < 0) {
-                            strcat(local_80, s_minus_0_5_00556058);
+                            strcat(local_80, "-0.5");
                         } else if (trait_val == 2) {
-                            strcat(local_80, s_plus_1_00556054);
+                            strcat(local_80, "+1");
                         } else {
-                            strcat(local_80, s_plus_2_00556050);
+                            strcat(local_80, "+2");
                         }
                         print_str = local_80;
                     } else if (trait_idx == 5) {
                         strcpy(local_80, local_40);
                         if (trait_val < 0) {
-                            strcat(local_80, s_minus_0055111C);
+                            strcat(local_80, "-");
                         } else {
-                            strcat(local_80, s_plus_00551118);
+                            strcat(local_80, "+");
                         }
 
                         if (trait_val == 2) {
-                            strcat(local_80, s_1_BC_00556068);
+                            strcat(local_80, "1 BC");
                         } else {
-                            strcat(local_80, s_0_5_BC_00556060);
+                            strcat(local_80, "0.5 BC");
                         }
                         print_str = local_80;
                     } else {
-                        sprintf(local_80, s_fmt_00556048, local_40, (int)trait_val);
+                        sprintf(local_80, "%s%+i", local_40, (int)trait_val);
                         print_str = local_80;
                     }
                 }
@@ -605,7 +579,7 @@ namespace INFO {
         sprintf(stardate_str, format, (int)(MOX::_stardate / 10), (int)(MOX::_stardate % 10));
 
         _race_statistics_page = 1;
-        int16_t input_field = static_cast<int16_t>(reinterpret_cast<std::uintptr_t>(info_lbx[0]));
+        int16_t input_field = 0;
 
         do {
             *MOX::_active_player = static_cast<uint8_t>(MOX::_PLAYER_NUM);
@@ -721,8 +695,8 @@ namespace INFO {
             fonts::Set_Font_Style_(2, INFO::PTR__orange_text_colors[i]);
 
             if (i == 0) {
-                sprintf(buffer, s_int_fmt, (int)MOX::_cur_plyr_ptr->bc_produced);
-                JIM::Get_Text_Message_(s_billtext_lbx, 19, lbx_msg, 40);
+                sprintf(buffer, "%i", (int)MOX::_cur_plyr_ptr->bc_produced);
+                JIM::Get_Text_Message_("billtext.lbx", 19, lbx_msg, 40);
                 strcat(buffer, lbx_msg);
 
                 if (fonts::Get_String_Width_(buffer) > 126) {
@@ -732,7 +706,7 @@ namespace INFO {
                 fonts::Print_Centered_To_Bitmap_(92, 3, buffer, label);
                 fonts::_font_header.font_style_spacing = fonts::_font_header.font_spacing[2];
             } else {
-                sprintf(buffer, s_pct_fmt, (int)values[i]);
+                sprintf(buffer, "%3i%%", (int)values[i]);
                 fonts::Print_To_Bitmap_(27, 3, buffer, label);
 
                 s_colors text_colors;
@@ -752,7 +726,7 @@ namespace INFO {
 
                 text_colors.colors[0] = base_color;
                 fonts::Set_Font_Style_(2, &text_colors);
-                JIM::Get_Text_Message_(s_billtext_lbx, (int16_t)(i + 19), lbx_msg, 40);
+                JIM::Get_Text_Message_("billtext.lbx", (int16_t)(i + 19), lbx_msg, 40);
                 fonts::Print_Centered_To_Bitmap_(108, 3, lbx_msg, label);
             }
         }
@@ -761,18 +735,18 @@ namespace INFO {
         INFO::_info_dark_color.colors[0] = 0xB0;
     }
 
-    void __cdecl Draw_Maint_Income_Chart_(s_animation_header** headers_a, s_animation_header** headers_b, int16_t param_3) {
+    void __cdecl Draw_Maint_Income_Chart_(s_animation_header** chart_bars, s_animation_header** chart_labels, int16_t visible_bar_count) {
         char msg_top[40];
         char msg_bottom[40];
         char msg_stat[64];
 
-        animate::Draw_(30, 212, headers_a[0]);
+        animate::Draw_(30, 212, chart_bars[0]);
 
-        if (param_3 > 0) {
-            int16_t draw_x = (int16_t)(((param_3 * 18) - 42) / 2 + 120);
+        if (visible_bar_count > 0) {
+            int16_t draw_x = (int16_t)(((visible_bar_count * 18) - 42) / 2 + 120);
             for (int i = 6; i >= 1; --i) {
-                if (headers_a[i] != nullptr) {
-                    animate::Draw_(draw_x, 212, headers_a[i]);
+                if (chart_bars[i] != nullptr) {
+                    animate::Draw_(draw_x, 212, chart_bars[i]);
                     draw_x -= 18;
                 }
             }
@@ -780,16 +754,16 @@ namespace INFO {
 
         int16_t draw_y = 344;
         for (int i = 0; i < 7; ++i) {
-            animate::Draw_(25, draw_y, headers_b[i]);
+            animate::Draw_(25, draw_y, chart_labels[i]);
             draw_y += 16;
         }
 
         fonts::Set_Font_Style_(1, &INFO::_info_normal_color);
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 17, msg_top, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 17, msg_top, 40);
         fonts::Print_Centered_(42, 324, msg_top);
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 18, msg_bottom, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 18, msg_bottom, 40);
         fonts::Print_Centered_(120, 324, msg_bottom);
 
         int32_t net_income = (int32_t)MOX::_cur_plyr_ptr->bc_produced - MOX::_cur_plyr_ptr->total_maintenance;
@@ -803,12 +777,12 @@ namespace INFO {
 
         fonts::Set_Font_Style_(2, stat_color);
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 27, msg_stat, 64);
+        JIM::Get_Text_Message_("billtext.lbx", 27, msg_stat, 64);
         JIM::Decode_Text_Stat_(msg_stat, net_income, 64);
         fonts::Print_Centered_(105, 196, msg_stat);
     }
 
-    int16_t __cdecl _Tech_Review_Subscreen_(s_animation_header** param_1, int16_t param_2, int16_t param_3) {
+    int16_t __cdecl _Tech_Review_Subscreen_(s_animation_header** anims, int16_t exit_threshold, int16_t player_idx) {
         s_list_state list_headers[4];
         char billtext[40];
         char help_lbx_name[20];
@@ -819,10 +793,7 @@ namespace INFO {
 
         for (int i = 0; i < 4; ++i) {
             _g_header_p = &list_headers[i];
-            // TODO: This is just memset
-            for (int j = 0; j < 16; ++j) {
-                reinterpret_cast<uint32_t*>(_g_header_p)[j] = reinterpret_cast<uint32_t*>(&_tech_review_list_header)[j];
-            }
+            memcpy(_g_header_p, &_tech_review_list_header, sizeof(*_g_header_p));
             _g_header_p->items = reinterpret_cast<s_list_item*>(
                 allocate::Allocate_Next_Block_(MOX::_screen_seg, _list_sizes[i])
             );
@@ -831,12 +802,12 @@ namespace INFO {
             _g_header_p->items[0].current_app_index = 0;
         }
 
-        text_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
+        text_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
         _g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 150));
         _g_bitmap2_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 48));
 
-        s_animation_header* app_pics = reinterpret_cast<s_animation_header*>(
-            farload::Far_Reload_Next_(s_app_pics_lbx_00556028, 0, MOX::_screen_seg)
+        s_animation_header* app_pics = (s_animation_header*)(
+            farload::Far_Reload_Next_("app_pics.lbx", 0, MOX::_screen_seg)
         );
 
         is_tech_image_loaded = false;
@@ -848,7 +819,7 @@ namespace INFO {
                 _tech_rev_field[i * 2],
                 _tech_rev_field[i * 2 + 1],
                 s__00551100,
-                param_1[i + 4],
+                anims[i + 4],
                 &_tech_review_tab_index,
                 i,
                 s__00551100,
@@ -856,10 +827,10 @@ namespace INFO {
             );
         }
 
-        field_up = fields::Add_Button_Field_(410, 65, s__00551100, param_1[2], s__00551120, 40);
-        field_down = fields::Add_Button_Field_(410, 395, s__00551100, param_1[3], s__00551120, 40);
+        field_up = fields::Add_Button_Field_(410, 65, s__00551100, anims[2], s__00551120, 40);
+        field_down = fields::Add_Button_Field_(410, 395, s__00551100, anims[3], s__00551120, 40);
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 6, billtext, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 6, billtext, 40);
         fonts::Print_Centered_(416, 31, billtext);
 
         Draw_Multiple_Drop_Areas_(_tech_review_drops, 4);
@@ -876,8 +847,8 @@ namespace INFO {
 
             RUSS::Mox_Update_();
             Draw_Drop_Area_(_tech_review_drops);
-            animate::Draw_(410, 65, param_1[0]);
-            animate::Draw_(410, 395, param_1[1]);
+            animate::Draw_(410, 65, anims[0]);
+            animate::Draw_(410, 395, anims[1]);
             LIST::Display_List_Page_(_g_header_p);
             video::Copy_Off_To_Back_();
 
@@ -910,12 +881,12 @@ namespace INFO {
                     farload::Far_Reload_Data_(help_lbx_name, 0, text_buffer, tech_app_id, 1, sizeof(s_help_record));
 
                     fonts::Set_Font_Style_(2, &_info_normal_color);
-                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(2, 4, 173, static_cast<s_help_record*>(text_buffer)->body, 0, _g_bitmap1_p);
+                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(2, 4, 173, ((s_help_record*)text_buffer)->body, 0, _g_bitmap1_p);
 
                     _g_selected_app_id = tech_app_id;
                     fonts::Set_Font_Style_(4, &_info_normal_color);
 
-                    char* name_str = TECH::Technology_Applications_Name_(_g_selected_app_id, param_3);
+                    char* name_str = TECH::Technology_Applications_Name_(_g_selected_app_id, player_idx);
                     FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 12, 176 /*0xb0*/, name_str, 2, _g_bitmap2_p);
 
                     RUSS::Mox_Update_();
@@ -925,7 +896,7 @@ namespace INFO {
                     }
 
                     allocate::Push_Block_(MOX::_screen_seg);
-                    _g_tech_image_seg = farload::Far_Reload_Next_(s_APP_PICS_LBX_00556018, tech_app_id, MOX::_screen_seg);
+                    _g_tech_image_seg = farload::Far_Reload_Next_("APP_PICS.LBX", tech_app_id, MOX::_screen_seg);
                     is_tech_image_loaded = true;
 
                     animate::Draw_Palette_(reinterpret_cast<s_animation_header*>(_g_tech_image_seg));
@@ -967,7 +938,7 @@ namespace INFO {
                     continue;
                 }
 
-                if (input >= param_2) {
+                if (input >= exit_threshold) {
                     list_changed = false;
                     refresh_list_content = true;
                     inner_break = true;
@@ -1023,32 +994,36 @@ namespace INFO {
         palette::Cycle_Palette_Color_(0xbf, 8, 0x20, 0, 0x28, 0x3f, 8, 8);
     }
 
-    int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** anims, int16_t unused) {
+    int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** anims, int16_t unused_exit_code) {
         char header_text[80];
         char lbx_name[20];
         uint32_t record_offsets[60];
         s_list_item items[60];
-        void* out_buffer;
-        int i, j;
+        void* record_buffer;
+        int16_t i, j;
+
+        (void)unused_exit_code;
 
         Draw_Drop_Area_(INFO::_category_drops);
-        JIM::Get_Text_Message_(s_billtext_lbx, 12 /* BILL_MSG_CATEGORY_HEADER */, header_text, 80);
+        JIM::Get_Text_Message_("billtext.lbx", 12 /* BILL_MSG_CATEGORY_HEADER */, header_text, 80);
         strcat(header_text, MOX::_help_category_labels[INFO::_g_reference_ix]);
         fonts::Print_Centered_(416, 67, header_text);
 
         INFO::_g_category_header.items = items;
         uint32_t bmp_size = bitmap::Get_Bitmap_Size_(190, 314);
         INFO::_g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
-        out_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 1404 /* 0x57C */);
+        record_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
         int count = farload::Get_Farload_Data_Record_Count_(lbx_name, INFO::_g_reference_ix);
         INFO::_g_category_header.num_items = (uint8_t)count;
 
         for (i = 0; i < count; i++) {
-            char* data = (char*)farload::Far_Reload_Data_(lbx_name, INFO::_g_reference_ix, out_buffer, i, 1, 84 /* 0x54 */);
-            strcpy(items[i].group_name, data);
-            memcpy(&record_offsets[i], data + 80, sizeof(record_offsets[i]));
+            s_help_topic_record* topic = (s_help_topic_record*)
+                farload::Far_Reload_Data_(lbx_name, INFO::_g_reference_ix, record_buffer, i, 1, sizeof(s_help_topic_record))
+            ;
+            strcpy(items[i].group_name, topic->text);
+            record_offsets[i] = topic->id;
             items[i].group_id = (uint8_t)i;
             items[i].group_color_index = 0;
             items[i].app_count = 1;
@@ -1075,9 +1050,9 @@ namespace INFO {
         }
 
         LIST::Init_List_Data_(&INFO::_g_category_header);
-        short close_btn_id = fields::Add_Button_Field_(386, 427, s__00551100, anims[21], s__00551100, '(');
-        short up_btn_id = fields::Add_Button_Field_(398, 96, s__00551100, anims[14], s__00551120, '(');
-        short down_btn_id = fields::Add_Button_Field_(398, 396, s__00551100, anims[15], s__00551120, '(');
+        int16_t close_btn_id = fields::Add_Button_Field_(386, 427, s__00551100, anims[21], s__00551100, '(');
+        int16_t up_btn_id = fields::Add_Button_Field_(398, 96, s__00551100, anims[14], s__00551120, '(');
+        int16_t down_btn_id = fields::Add_Button_Field_(398, 396, s__00551100, anims[15], s__00551120, '(');
 
         fields::Assign_Auto_Function_(INFO::Draw_Reference_Category_Subscreen_, 2);
         INFO::_g_reference_screen_type = 0;
@@ -1109,7 +1084,7 @@ namespace INFO {
                 timer::Mark_Time_();
                 if (INFO::_g_list_update_needed != 0) {
                     bitmap::Create_Blank_Bitmap_(190, 314, INFO::_g_bitmap1_p);
-                    s_help_record* data = static_cast<s_help_record*>(farload::Far_Reload_Data_(lbx_name, 0, out_buffer, record_offsets[INFO::_g_selected_list_p->group_id], 1, sizeof(s_help_record)));
+                    s_help_record* data = (s_help_record*)farload::Far_Reload_Data_(lbx_name, 0, record_buffer, record_offsets[INFO::_g_selected_list_p->group_id], 1, sizeof(s_help_record));
 
                     fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
                     BILL::Print_1_Or_More_Lines_Centered_To_Bitmap_(0, 24, 186, data->title, INFO::_g_bitmap1_p);
@@ -1118,7 +1093,7 @@ namespace INFO {
                     FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 64, 186, data->body, 3, INFO::_g_bitmap1_p);
                 }
 
-                short input = fields::Get_Input_();
+                int16_t input = fields::Get_Input_();
                 if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
                     return 0;
                 }
@@ -1164,7 +1139,7 @@ namespace INFO {
         int16_t player_hist_buttons[4];
         int16_t input;
 
-        JIM::Get_Text_Message_(lbx_billtext, 5, msg_buffer, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 5, msg_buffer, 40);
         fonts::Print_Centered_(416 /* 0x1a0 */, 31 /* 0x1f */, msg_buffer);
 
         INFO::Set_Up_Player_Colors_(lbx_images);
@@ -1186,10 +1161,10 @@ namespace INFO {
             fields::Add_Radio_Button_Field_(
                 INFO::_graph_button_x[i],
                 427 /* 0x1ab */,
-                empty_string,
+                "",
                 lbx_images[i + 8],
                 &player_hist_buttons[i],
-                empty_string,
+                "",
                 40 /* 0x28 */
             );
         }
@@ -1410,12 +1385,8 @@ namespace INFO {
         }
     }
 
-    void __cdecl Draw_Multiple_Drop_Areas_(s_drop_area* areas, uint32_t count) {
-        // The count is treated as a 16-bit unsigned integer.
-        uint16_t num_areas = static_cast<uint16_t>(count);
-        s_drop_area* end = areas + num_areas;
-
-        // Iterate through the array of drop areas and draw each one.
+    void __cdecl Draw_Multiple_Drop_Areas_(s_drop_area* areas, uint16_t count) {
+        s_drop_area* end = areas + count;
         while (areas < end) {
             Draw_Drop_Area_(areas);
             areas++;
@@ -1513,9 +1484,9 @@ namespace INFO {
         }
     }
 
-    int16_t __cdecl Tech_Review_Subscreen_(s_animation_header** headers, int16_t param_2) {
+    int16_t __cdecl Tech_Review_Subscreen_(s_animation_header** headers, int16_t exit_threshold) {
         RACERPRT::_race_report_jim_hack = 1;
-        return _Tech_Review_Subscreen_(&headers[12], param_2, MOX::_PLAYER_NUM);
+        return _Tech_Review_Subscreen_(&headers[12], exit_threshold, MOX::_PLAYER_NUM);
     }
 
     /**
@@ -1542,7 +1513,7 @@ namespace INFO {
                 }
                 
                 // Fetch group name from LBX and initialize item header fields
-                JIM::Get_Text_Message_(INFO::s_billtex2_lbx, static_cast<int16_t>(ach->id), item->group_name, 0x40);
+                JIM::Get_Text_Message_("billtex2.lbx", static_cast<int16_t>(ach->id), item->group_name, 0x40);
                 item->group_id = ach->id;
                 item->group_color_index = 0;
                 item->app_count = 0;
@@ -1658,9 +1629,9 @@ namespace INFO {
 
             if ((current_val % 5 == 0) && (fraction != 0)) {
                 if (MOX::_settings.language == 0) {
-                    sprintf(buffer, INFO::s_fmt_dot, whole, fraction);
+                    sprintf(buffer, "%i.%i", whole, fraction);
                 } else {
-                    sprintf(buffer, INFO::s_fmt_comma, whole, fraction);
+                    sprintf(buffer, "%i,%i", whole, fraction);
                 }
             } else {
                 itoa(whole, buffer, 10);
@@ -1674,38 +1645,38 @@ namespace INFO {
         return return_val;
     }
 
-    int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** param_1, int16_t param_2) {
+    int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** anims, int16_t exit_threshold) {
         char race_name[32];
         char title_msg[40];
         char dead_msg[40];
         char none_msg[40];
         char unused_msg[40];
 
-        s_animation_header* acStack_e0[8];
-        s_animation_header* sprite;
+        s_animation_header* player_panels[8];
+        s_animation_header* eliminated_banner;
 
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 14, dead_msg, 40);
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 15, none_msg, 40);
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 16, unused_msg, 40);
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 7, title_msg, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 14, dead_msg, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 15, none_msg, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 16, unused_msg, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 7, title_msg, 40);
 
         fonts::Print_Centered_(416, 31, title_msg);
-        INFO::Set_Up_Player_Colors_(param_1);
+        INFO::Set_Up_Player_Colors_(anims);
 
         MOX::_active_player[0] = static_cast<char>(MOX::_PLAYER_NUM);
         BILL::Get_Players_Dead_Or_Alive_Or_Omniscient_(1, 1);
 
         uint32_t size = bitmap::Get_Bitmap_Size_(183, 20);
-        sprite = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
-        bitmap::Create_Blank_Bitmap_(183, 20, sprite);
+        eliminated_banner = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+        bitmap::Create_Blank_Bitmap_(183, 20, eliminated_banner);
 
         fonts::Set_Font_Style_Outline_(2, &INFO::_info_red_color);
-        fonts::Print_Centered_To_Bitmap_(91, 2, dead_msg, sprite);
+        fonts::Print_Centered_To_Bitmap_(91, 2, dead_msg, eliminated_banner);
 
         for (int i = 0; i < 8; ++i) {
             size = bitmap::Get_Bitmap_Size_(183, 164);
-            acStack_e0[i] = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
-            bitmap::Create_Blank_Bitmap_(183, 164, acStack_e0[i]);
+            player_panels[i] = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+            bitmap::Create_Blank_Bitmap_(183, 164, player_panels[i]);
 
             if (i < MOX::_active_count) {
                 uint8_t active_idx = MOX::_active_player[i];
@@ -1714,18 +1685,18 @@ namespace INFO {
                 strcpy(race_name, MOX::_player[active_idx].race_name);
                 _strupr(race_name);
 
-                fonts::Print_Centered_To_Bitmap_(91, 0, race_name, acStack_e0[i]);
+                fonts::Print_Centered_To_Bitmap_(91, 0, race_name, player_panels[i]);
 
                 fonts::Set_Font_Style_(2, INFO::_hist_graph_palettes[active_idx]);
-                INFO::Print_Player_Specials_To_Bitmap_(0, 22, active_idx, acStack_e0[i]);
+                INFO::Print_Player_Specials_To_Bitmap_(0, 22, active_idx, player_panels[i]);
             } else {
                 fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
-                fonts::Print_Centered_To_Bitmap_(91, 0, none_msg, acStack_e0[i]);
+                fonts::Print_Centered_To_Bitmap_(91, 0, none_msg, player_panels[i]);
             }
         }
 
         if (MOX::_active_count > 4) {
-            fields::Add_Button_Field_(385, 427, MOX::s__00551100, param_1[20], MOX::s__00551100, 40); // 40 = '('
+            fields::Add_Button_Field_(385, 427, MOX::s__00551100, anims[20], MOX::s__00551100, 40);
         }
 
         fields::Assign_Auto_Function_(INFO::Draw_Race_Stats_Subscreen_, 2);
@@ -1743,11 +1714,11 @@ namespace INFO {
 
                 line::Line_(x + 10, y + 17, x + 173, y + 17, INFO::_info_normal_color.colors[6]);
 
-                animate::Draw_(x, y, acStack_e0[offset]);
+                animate::Draw_(x, y, player_panels[offset]);
 
                 uint8_t active_idx = MOX::_active_player[offset];
                 if (MOX::_player[active_idx].eliminated != 0) {
-                    animate::Draw_(x, y + 11, sprite);
+                    animate::Draw_(x, y + 11, eliminated_banner);
                 } else if (offset < MOX::_active_count) {
                     INFO::Race_Statistics_Specials_Help_(x, y + 22, active_idx);
                 }
@@ -1789,7 +1760,7 @@ namespace INFO {
                     return 0;
                 }
 
-                if (input >= param_2) {
+                if (input >= exit_threshold) {
                     INFO::_race_statistics_page = (INFO::_race_statistics_page == 0) ? 1 : 0;
                     break;
                 } else if (input == 0) {
@@ -1799,14 +1770,13 @@ namespace INFO {
                 }
             } while (input == 0);
 
-            if (input < param_2) {
+            if (input < exit_threshold) {
                 return input;
             }
         }
     }
 
-    // Suggested name: INFO::Reference_Main_Subscreen_
-    int16_t __cdecl Reference_Main_Subscreen_(uint32_t param_1, int16_t exit_code) {
+    int16_t __cdecl Reference_Main_Subscreen_(s_animation_header** unused_anims, int16_t exit_code) {
         char header_text[40];
         char lbx_name[20];
         char category_strs[16][48];
@@ -1819,18 +1789,17 @@ namespace INFO {
         s_help_topic_record* record;
         int16_t category_count;
 
-        const char* s_bullet_fmt = INFO::s_bullet_fmt_00556078;
-        const char* s_empty = INFO::empty_string;
+        (void)unused_anims;
 
         INFO::_g_category_str_p = category_strs;
         INFO::_g_how_to_str_ = how_to_strs;
 
         INFO::Draw_Multiple_Drop_Areas_(INFO::_reference_drops, 4);
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 10, header_text, 0x28);
+        JIM::Get_Text_Message_("billtext.lbx", 10, header_text, 0x28);
         fonts::Print_(0xe0, 0x43, header_text);
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 11, header_text, 0x28);
+        JIM::Get_Text_Message_("billtext.lbx", 11, header_text, 0x28);
         fonts::Print_(0x1a8, 0x43, header_text);
 
         if (MOX::_settings.language == 1 || MOX::_settings.language == 2) {
@@ -1845,27 +1814,27 @@ namespace INFO {
 
         for (int i = 1; i < 17; ++i) {
             if ((uint8_t)MOX::_help_category_labels[i][0] > 0x39 /* '9' */) {
-                sprintf(category_strs[category_count], s_bullet_fmt, MOX::_help_category_labels[i]);
+                sprintf(category_strs[category_count], "^ %s", MOX::_help_category_labels[i]);
                 fonts::Print_(0xdd, y_pos, category_strs[category_count]);
-                fields::Add_Hidden_Field_(0xdd, y_pos - 2, 0x19b, y_pos + 18, s_empty, 0);
+                fields::Add_Hidden_Field_(0xdd, y_pos - 2, 0x19b, y_pos + 18, "", 0);
                 category_indices[category_count] = (int16_t)i;
                 category_count++;
                 y_pos += 20;
             }
         }
 
-        void* reload_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x54 /* sizeof(s_help_topic_record) */);
+        void* reload_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_topic_record));
         INFO::_g_first_how_to_field = fields::Get_Field_Counter_();
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
         record_count = farload::Get_Farload_Data_Record_Count_(lbx_name, 0xf);
 
         y_pos = 100;
         for (int i = 0; i < (int)record_count; ++i) {
-            record = (s_help_topic_record*)farload::Far_Reload_Data_(lbx_name, 0xf, reload_buffer, i, 1, 0x54);
+            record = (s_help_topic_record*)farload::Far_Reload_Data_(lbx_name, 0xf, reload_buffer, i, 1, sizeof(s_help_topic_record));
             topic_ids[i] = record->id;
-            sprintf(how_to_strs[i], s_bullet_fmt, record->text);
+            sprintf(how_to_strs[i], "^ %s", record->text);
             fonts::Print_(0x1a5, y_pos, how_to_strs[i]);
-            fields::Add_Hidden_Field_(0x1a5, y_pos - 2, 0x263, y_pos + 18, s_empty, 0);
+            fields::Add_Hidden_Field_(0x1a5, y_pos - 2, 0x263, y_pos + 18, "", 0);
             y_pos += 20;
         }
 
@@ -1910,11 +1879,13 @@ namespace INFO {
         return 0;
     }
 
-    int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** turn_summary_data_ptrs, int16_t param_2) {
+    int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** anims, int16_t exit_code) {
         char help_lbx_name[20];
         char title_combined[80];
         s_help_record* loaded_help_text;
         int16_t input_code;
+
+        (void)exit_code;
 
         TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
         INFO::Draw_Multiple_Drop_Areas_(INFO::_how_to_drops, 2);
@@ -1923,7 +1894,7 @@ namespace INFO {
             help_lbx_name, 0, MOX::_screen_seg, (int32_t)INFO::_g_reference_ix, 1, sizeof(s_help_record)
         ));
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 13, title_combined, 80);
+        JIM::Get_Text_Message_("billtext.lbx", 13, title_combined, 80);
         strcat(title_combined, loaded_help_text->title);
 
         fonts::Print_Centered_(414, 67, title_combined);
@@ -1936,7 +1907,7 @@ namespace INFO {
 
         video::Copy_Off_To_Back_();
 
-        fields::Add_Button_Field_(386, 427, "", turn_summary_data_ptrs[21], "", 40);
+        fields::Add_Button_Field_(386, 427, "", anims[21], "", 40);
 
         fields::Assign_Auto_Function_(INFO::Draw_Dummy_Turn_Summary_Subscreen_, 2);
         
@@ -1954,32 +1925,31 @@ namespace INFO {
         return input_code;
     }
 
-    int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2) {
+    int16_t __cdecl Reference_Subscreen_(s_animation_header** anims, int16_t exit_threshold) {
         char text_buffer[40];
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 9, text_buffer, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 9, text_buffer, 40);
         fonts::Print_Centered_(416, 31, text_buffer);
         fonts::Set_Font_Style_(4, &_info_normal_color);
 
         if (_g_reference_screen_type == 0) {
             BILLHELP::Reference_Help_();
-            return Reference_Main_Subscreen_(reinterpret_cast<std::uintptr_t>(param_1), param_2);
+            return Reference_Main_Subscreen_(anims, exit_threshold);
         }
 
         if (_g_reference_screen_type == 1) {
             BILLHELP::Ref_How_To_Help_();
-            return Reference_Category_Subscreen_(param_1, param_2);
+            return Reference_Category_Subscreen_(anims, exit_threshold);
         }
 
         if (_g_reference_screen_type == 2) {
             BILLHELP::Ref_Category_Help_();
-            return Reference_How_To_Subscreen_(param_1, param_2);
+            return Reference_How_To_Subscreen_(anims, exit_threshold);
         }
 
         return 0;
     }
 
-    // Suggested name: INFO::Init_Turn_Summary_List
     void __cdecl _Init_Turn_Summary_List_(s_list_state* state, int16_t num_items, int16_t font_style, int16_t font_lf) {
         if (num_items != 0) {
             state->num_items = (uint8_t)num_items;
@@ -2044,10 +2014,10 @@ namespace INFO {
         char str_date[64];
         s_list_item list_items[100];
 
-        JIM::Get_Text_Message_(s_billtext_lbx, 0x10, str_turn_summary, 40);
-        JIM::Get_Text_Message_(s_billtext_lbx, 8, str_year, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 0x10, str_turn_summary, 40);
+        JIM::Get_Text_Message_("billtext.lbx", 8, str_year, 40);
         fonts::Print_Centered_(0x1a0, 0x1f, str_year);
-        JIM::Get_Text_Message_(s_billtext_lbx, 0x1a, str_date, 60);
+        JIM::Get_Text_Message_("billtext.lbx", 0x1a, str_date, 60);
         JIM::Decode_Text_Year_(str_date, 60);
 
         int16_t msg_count = MSG_::N_Msgs_For_Player_(MOX::_PLAYER_NUM);

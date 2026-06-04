@@ -13,17 +13,11 @@ struct s_tech_review_achievement;
 namespace INFO {
     extern s_tech_review_achievement* _review_list[4];
 
-    extern const char s_billtex2_lbx[13];
-    extern const char s_app_pics_lbx_00556028[13];
-    extern const char s_APP_PICS_LBX_00556018[13];
-
     extern s_colors _info_normal_color;
 
     extern s_colors _info_high_color;
 
     extern int16_t _tech_rev_field[8];
-
-    extern const char s_bullet_fmt_00556078[5];
 
     extern s_drop_area _tech_review_drops[4];
 
@@ -93,10 +87,13 @@ namespace INFO {
     extern int16_t _race_statistics_specials_help_count;
     extern s_help_box _race_statistics_specials_help[50];
 
+    /** Returns the currently selected player-info tab index. */
     int16_t __cdecl Get_Plyr_Info_Btns_();
 
+    /** Fills the output array with normalized maintenance percentages for the active player. */
     int16_t __cdecl Initialize_Maintenance_Values_(int32_t* values);
 
+    /** Builds the maintenance chart bar and label bitmaps from the supplied values. */
     void __cdecl Build_Maint_Chart_Bitmaps_(s_animation_header** sprites, s_animation_header** bars, s_animation_header** labels, int32_t* values);
 
     extern s_colors _info_dark_color;
@@ -109,23 +106,18 @@ namespace INFO {
 
     extern s_colors* _hist_graph_palettes[8];
 
+    /** Recolors bitmap pixels whose indices fall within the supplied palette range. */
     void __cdecl Colorize_Bitmap_(s_animation_header* anim, s_colors* color_table, uint8_t range_start, uint8_t range_end);
 
-    extern const char s_billtext_lbx[13];
-    extern const char lbx_billtext[13];
-    extern const char empty_string[1];
     extern s_drop_area _history_graph_drops[2];
     extern int16_t _graph_button_x[4];
 
-    extern const char s_pct_fmt[6];
-    extern const char s_int_fmt[3];
-
     extern uint8_t _graph_offsets[10];
-    extern const char s_fmt_comma[6];
-    extern const char s_fmt_dot[6];
 
-    void __cdecl Draw_Maint_Income_Chart_(s_animation_header** chart_bars, s_animation_header** chart_labels, int16_t val);
+    /** Draws the maintenance income chart and summary text for the active player. */
+    void __cdecl Draw_Maint_Income_Chart_(s_animation_header** chart_bars, s_animation_header** chart_labels, int16_t visible_bar_count);
 
+    /** Runs the history-graph tab until the caller's exit threshold is reached. */
     int16_t __cdecl History_Subscreen_(s_animation_header** lbx_images, int16_t exit_threshold);
 
     void __cdecl Set_Up_Player_Colors_(s_animation_header** anim_ptrs);
@@ -140,7 +132,7 @@ namespace INFO {
 
     void __cdecl Draw_Drop_Area_(s_drop_area* area);
 
-    void __cdecl Draw_Multiple_Drop_Areas_(s_drop_area* areas, uint32_t count);
+    void __cdecl Draw_Multiple_Drop_Areas_(s_drop_area* areas, uint16_t count);
 
     void __cdecl Display_Graphed_Players_Names_();
 
@@ -154,20 +146,13 @@ namespace INFO {
 
     void __cdecl Init_Tech_Review_List_(s_list_state* state, int16_t review_idx);
 
-    int16_t __cdecl _Tech_Review_Subscreen_(s_animation_header** param_1, int16_t param_2, int16_t param_3);
+    /** Runs the tech-review tab for the supplied player until the exit threshold is reached. */
+    int16_t __cdecl _Tech_Review_Subscreen_(s_animation_header** anims, int16_t exit_threshold, int16_t player_idx);
 
-    int16_t __cdecl Tech_Review_Subscreen_(s_animation_header** headers, int16_t param_2);
+    int16_t __cdecl Tech_Review_Subscreen_(s_animation_header** headers, int16_t exit_threshold);
 
-    int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** param_1, int16_t param_2);
-
-    extern const char s_plus_00551118[2];
-    extern const char s_minus_0055111C[2];
-    extern const char s_fmt_00556048[6];
-    extern const char s_plus_2_00556050[3];
-    extern const char s_plus_1_00556054[3];
-    extern const char s_minus_0_5_00556058[5];
-    extern const char s_0_5_BC_00556060[7];
-    extern const char s_1_BC_00556068[5];
+    /** Runs the race-statistics tab until the caller's exit threshold is reached. */
+    int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** anims, int16_t exit_threshold);
 
     void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap);
 
@@ -185,17 +170,19 @@ namespace INFO {
 
     int16_t __cdecl Turn_Summary_Subscreen_(s_animation_header** anim_data, int16_t min_field);
 
-    int16_t __cdecl Reference_Main_Subscreen_(uint32_t param_1, int16_t exit_code);
+    /** Displays the reference index view and records which sub-view should open next. */
+    int16_t __cdecl Reference_Main_Subscreen_(s_animation_header** unused_anims, int16_t exit_code);
 
     void __cdecl Draw_Reference_Main_Subscreen_();
 
-    int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** turn_summary_data_ptrs, int16_t param_2);
+    int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** anims, int16_t exit_code);
 
     void __cdecl Draw_Reference_Category_Subscreen_();
 
-    int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** anims, int16_t unused);
+    int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** anims, int16_t unused_exit_code);
 
-    int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2);
+    /** Dispatches to the active reference sub-view. */
+    int16_t __cdecl Reference_Subscreen_(s_animation_header** anims, int16_t exit_threshold);
 
     void __cdecl Info_Screen_();
 }

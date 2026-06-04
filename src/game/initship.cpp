@@ -1,8 +1,6 @@
 #include "pch.h"
 
 namespace INITSHIP {
-    const char s_Avenger_005576c4[8] = "Avenger";
-
     void __cdecl Init_Ship_Designs_(int16_t player_idx) {
         s_player* plr = &MOX::_player[player_idx];
         int16_t design_flag = 0;
@@ -13,7 +11,7 @@ namespace INITSHIP {
 
         if (MOX::_settings.strategic_combat_flag == 1) {
             for (int16_t i = 0; i < 6; ++i) {
-                struct_::Clear_Structure_(&plr->ship_designs[i], 99);
+                struct_::Clear_Structure_(&plr->ship_designs[i], sizeof(plr->ship_designs[i]));
                 Auto_Strategic_Design_Ship_(player_idx, i, &plr->ship_designs[i]);
             }
             return;
@@ -28,7 +26,7 @@ namespace INITSHIP {
         }
 
         if (plr->objectives == 0x64 /* 'd' */) {
-            struct_::Clear_Structure_(&plr->ship_designs[5], 99);
+            struct_::Clear_Structure_(&plr->ship_designs[5], sizeof(plr->ship_designs[5]));
         } else {
             aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[5], 5);
 
@@ -313,7 +311,6 @@ namespace INITSHIP {
         return 0;
     }
 
-    // Suggested name: INITSHIP::Best_Shield_Special_
     int16_t __cdecl Best_Shield_Special_(int16_t player_idx) {
         if (player_idx < 8) {
             // Check if player has Hard Shields tech application researched (level 3)
@@ -324,15 +321,15 @@ namespace INITSHIP {
         return 0;
     }
 
-    int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech) {
-        int16_t armor_idx = Best_Armor_(armor_tech);
+    int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t player_idx) {
+        int16_t armor_idx = Best_Armor_(player_idx);
 
         int16_t base_structure = TECHDATA::_hull_data[hull_index].structure_hp;
         int16_t absorption_pct = TECHDATA::_armor[armor_idx].ships_bonus;
 
         // Formula: base_structure + (absorption_pct * base_structure) / 100
-        int32_t bonus = (static_cast<int32_t>(absorption_pct) * static_cast<int32_t>(base_structure)) / 100;
-        int16_t total_structure = base_structure + static_cast<int16_t>(bonus);
+        int32_t bonus = ((int32_t)absorption_pct * (int32_t)base_structure) / 100;
+        int16_t total_structure = base_structure + (int16_t)bonus;
 
         if (is_fort) {
             total_structure *= 3;
@@ -370,7 +367,7 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Small_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
 
         strcpy(design->name, s_Raider_0055768c);
 
@@ -412,7 +409,7 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
 
         strcpy(design->name, s_Marauder_00557694);
 
@@ -465,7 +462,7 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
 
         strcpy(design->name, s_Interdictor_005576ac);
 
@@ -546,10 +543,9 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
         memcpy(design->name, global::s_Intruder_005576a0, 9);
 
-        // Indices into the s_ship_design structure based on disassembly offsets
         design->ship_type = 0;
         design->shield_type = 0;
         design->computer_type = 5;
@@ -558,7 +554,6 @@ namespace INITSHIP {
         design->ftl_type = 5;
         design->armor_type = 6;
 
-        // Weaponry setup - following offsets mapped in disassembly
         design->ship_weapon[0].type = 4;
         design->ship_weapon[0].count = 4;
         design->ship_weapon[0].current_count = 4;
@@ -612,7 +607,7 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
 
         strcpy(design->name, s_Harbinger_005576b8);
 
@@ -723,7 +718,7 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
 
         const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_COLONY][(uint8_t)MOX::_settings.language];
         strcpy(design->name, localized_name);
@@ -751,7 +746,7 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Outpost_Ship_Design_(int16_t player_idx, s_ship_design* design) {
-        struct_::Clear_Structure_(design, 99);
+        struct_::Clear_Structure_(design, sizeof(*design));
 
         strcpy(design->name, MOX::_ship_type_names[SHIP_TYPE_OUTPOST][(uint8_t)MOX::_settings.language]);
 
@@ -887,7 +882,6 @@ namespace INITSHIP {
         return result;
     }
 
-    // Suggested name: Get_Ship_Combat_Bonuses
     void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* ship_defense, int16_t* ship_missile_defense, int16_t* ship_attack) {
         int16_t local_defense = 0;
         int16_t local_missile_defense = 0;
@@ -940,7 +934,6 @@ namespace INITSHIP {
         return (int16_t)reduced_cost;
     }
 
-    // Suggested name: Best_Beam_Weapon_
     int16_t __cdecl Best_Beam_Weapon_(int16_t player_idx) {
         int16_t best_weapon_idx = 3;
 
@@ -987,7 +980,6 @@ namespace INITSHIP {
         return best_weapon_idx;
     }
 
-    // Suggested name: INITSHIP::Best_Missile_Weapon_
     int16_t __cdecl Best_Missile_Weapon_(int16_t player_idx) {
         int16_t best_idx = 14; /* 0xE */
         int16_t max_damage = 0;
@@ -1029,7 +1021,6 @@ namespace INITSHIP {
         }
     }
 
-    // Suggested name: INITSHIP::Best_Point_Defense_Weapon_By_Size_
     int16_t __cdecl Best_Point_Defense_Weapon_By_Size_(int16_t player_idx) {
         int16_t best_dmg_per_space = 0;
         int16_t best_weapon_idx = 3;
@@ -1118,7 +1109,6 @@ namespace INITSHIP {
         }
     }
 
-    // Suggested name: Best_Strat_Special_Weapon_
     int16_t __cdecl Best_Strat_Special_Weapon_(int16_t player_idx, int16_t size) {
         if (player_idx >= 8) {
             switch (player_idx) {
@@ -1283,38 +1273,29 @@ namespace INITSHIP {
 
         return weapon_count;
     }
-/**
- * Finds the best point defense weapon available to a player.
- * A weapon is considered if it is learned (tech_level 3), has the PD special bit (0x4),
- * and has no rack count (0).
- *
- * @param player_idx The index of the player.
- * @return The index of the best PD weapon found, or default/fallback values (3 or 4).
- */
-// Suggested name: INITSHIP::Best_Bomb_Weapon_
-int16_t __cdecl Best_Bomb_Weapon_(int16_t player_idx) {
-    if (player_idx >= 8) {
-        return 24 /* 0x18 */;
-    }
-
-    int16_t best_weapon_idx = 21 /* 0x15 */;
-    int16_t max_damage = 0;
-
-    for (int16_t i = 0; i < 40 /* 0x28 */; ++i) {
-        const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
-
-        // Check if player has the tech, if it is a bomb (rack == 3), and if it deals more damage
-        if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
-            weapon.type == 3 &&
-            weapon.max_damage > max_damage)
-        {
-            best_weapon_idx = i;
-            max_damage = weapon.max_damage;
+    int16_t __cdecl Best_Bomb_Weapon_(int16_t player_idx) {
+        if (player_idx >= 8) {
+            return 24 /* 0x18 */;
         }
-    }
 
-    return best_weapon_idx;
-}
+        int16_t best_weapon_idx = 21 /* 0x15 */;
+        int16_t max_damage = 0;
+
+        for (int16_t i = 0; i < 40 /* 0x28 */; ++i) {
+            const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
+
+            // Check if player has the tech, if it is a bomb (rack == 3), and if it deals more damage
+            if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+                weapon.type == 3 &&
+                weapon.max_damage > max_damage)
+            {
+                best_weapon_idx = i;
+                max_damage = weapon.max_damage;
+            }
+        }
+
+        return best_weapon_idx;
+    }
 
 int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
     int16_t best_weapon_idx = 3;
@@ -1702,7 +1683,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     ship->weapons[4].status = 0;
 
     for (int i = 4; i < 8; ++i) {
-        struct_::Clear_Structure_(&ship->weapons[i], 11);
+        struct_::Clear_Structure_(&ship->weapons[i], sizeof(ship->weapons[i]));
     }
 
     struct_::Set_Bit_Field_(ship->special_device_flags, 7 /* SDEVICE_QUANTUM_DETONATOR */);
@@ -1807,7 +1788,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->weapons[5].status = 0;
 
     for (int i = 6; i < 8; ++i) {
-        struct_::Clear_Structure_(&ship->weapons[i], 11 /* sizeof(s_combat_weapon_slot) */);
+        struct_::Clear_Structure_(&ship->weapons[i], sizeof(ship->weapons[i]));
     }
 
     // Special devices
@@ -1946,8 +1927,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     ship->weapons[7].shots_left = 6;
     ship->weapons[7].status = 0;
 
-    // Assembly at 0x480b0a calls Clear_Structure_ on weapon slot 7 specifically
-    struct_::Clear_Structure_(&ship->weapons[7], 11 /* sizeof(s_combat_weapon_slot) */);
+    struct_::Clear_Structure_(&ship->weapons[7], sizeof(ship->weapons[7]));
 
     struct_::Set_Bit_Field_(ship->special_device_flags, 7);
     struct_::Set_Bit_Field_(ship->special_device_flags, 24);
@@ -1992,7 +1972,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 }
 
 void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
-    struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
+    struct_::Clear_Structure_(design, sizeof(*design));
 
     strcpy(design->name, MOX::_race_names[14]);
 
@@ -2106,9 +2086,8 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
     design->cost = 0;
 }
 
-// Suggested name: INITSHIP::Load_Crystal_Ship_Design_
 void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
-    struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
+    struct_::Clear_Structure_(design, sizeof(*design));
     
     // Copy "Crystal" or specific race name from the race names array
     strcpy(design->name, MOX::_race_names[16]);
@@ -2234,7 +2213,6 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
 void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
 
-    // MOX::_race_names[18] is the design name for Eels
     strcpy(design->name, MOX::_race_names[18]);
 
     design->ship_type = 0;
@@ -2328,7 +2306,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) 
 }
 
 void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design) {
-    struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
+    struct_::Clear_Structure_(design, sizeof(*design));
 
     // Copy localized "Transport" name
     const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_TRANSPORT][(uint8_t)MOX::_settings.language];
@@ -2371,9 +2349,9 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
 }
 
 void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
-    struct_::Clear_Structure_(design, 99);
+    struct_::Clear_Structure_(design, sizeof(*design));
 
-    strcpy(design->name, s_Avenger_005576c4);
+    strcpy(design->name, "Avenger");
 
     design->computer_type = 5;
     design->ship_type = 0;

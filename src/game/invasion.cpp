@@ -2,7 +2,7 @@
 
 namespace invasion {
 
-void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_player_bonuses* bonuses, char is_defender) {
+void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_player_bonuses* bonuses, int8_t is_defender) {
     memset(bonuses, 0, sizeof(s_invasion_player_bonuses));
 
     if (player_idx >= 8) {
@@ -81,7 +81,6 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
         }
 
         if (bonuses->officer_bonus > 0) {
-            // Accessing the low byte of the officer short field
             bonuses->officer_idx = (int8_t)colony->officer;
         }
     }
@@ -110,7 +109,7 @@ void __cdecl Compute_Attacker_Officer_Bonus_(int16_t* ship_indexes, int16_t coun
 
                 if (bonuses->officer_bonus < bonus) {
                     bonuses->officer_bonus = bonus;
-                    bonuses->officer_idx = static_cast<int8_t>(officer_idx);
+                    bonuses->officer_idx = (int8_t)officer_idx;
                 }
             }
         }
@@ -257,8 +256,8 @@ void __cdecl Ground_Combat_Round_(s_invasion_side_info* side1, s_invasion_side_i
 }
 
 void __cdecl Resolve_Ground_Combat_(s_invasion_side_info* side_a, s_invasion_side_info* side_b) {
-    while (static_cast<uint8_t>(side_a->current_troop_type_idx) < 4 &&
-           static_cast<uint8_t>(side_b->current_troop_type_idx) < 4) {
+    while ((uint8_t)side_a->current_troop_type_idx < 4 &&
+           (uint8_t)side_b->current_troop_type_idx < 4) {
         Ground_Combat_Round_(side_a, side_b);
     }
 }
@@ -292,13 +291,9 @@ void __cdecl Assign_New_Home_Planet_(int8_t player_idx, int16_t excluded_colony_
     int best_colony_idx = -1;
 
     for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
-        // Check if the current colony is not the excluded one and belongs to the player
         if (i != (int)excluded_colony_idx && MOX::_colony[i].owner == (int8_t)player_idx) {
-            // Population is handled as unsigned byte in comparison logic
             int current_pops = (uint8_t)MOX::_colony[i].n_pops;
 
-            // Select the colony with the largest population. 
-            // Ties result in selecting the colony with the higher index.
             if (current_pops >= max_pops) {
                 max_pops = current_pops;
                 best_colony_idx = i;
@@ -307,19 +302,16 @@ void __cdecl Assign_New_Home_Planet_(int8_t player_idx, int16_t excluded_colony_
     }
 
     if (best_colony_idx == -1) {
-        // No suitable colony found for a new home
         MOX::_player[player_idx].home_planet_id = -1;
-    }
-    else {
-        // Assign the planet index of the best colony found
+    } else {
         MOX::_player[player_idx].home_planet_id = MOX::_colony[best_colony_idx].planet;
     }
 }
 
-int32_t __cdecl Colony_Infantry_Limit_(s_colony* param_1) {
-    int32_t limit = MOX::_planet_max_population[MOX::_planet[param_1->planet].size];
+int32_t __cdecl Colony_Infantry_Limit_(s_colony* colony) {
+    int32_t limit = MOX::_planet_max_population[MOX::_planet[colony->planet].size];
     
-    if (MOX::_player[param_1->owner].traits[TRAIT_WARLORD] == 0) {
+    if (MOX::_player[colony->owner].traits[TRAIT_WARLORD] == 0) {
         limit /= 2;
     }
     
@@ -383,12 +375,12 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
 
     int chance = total_rebel_pop * 10;
 
-    if (MOX::_player[colony->owner].objectives == 100 /* 'd' */ &&
-        MOX::_player[rebel_player].objectives != 100 /* 'd' */) {
+    if (MOX::_player[colony->owner].objectives == 100 &&
+        MOX::_player[rebel_player].objectives != 100) {
         chance += MOX::_settings.game_difficulty * 4 - 8;
     }
 
-    if (colony->buildings[1 /* BUILDING_ALIEN_CONTROL_CENTER */] != 0) {
+    if (colony->buildings[1] != 0) {
         chance /= 2;
     }
 
@@ -398,26 +390,26 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
 
     if ((int32_t)random::Random_(1000) <= chance) {
         int rebel_count = random::Random_(total_rebel_pop);
-        s_invasion_side_info local_70;
-        s_invasion_side_info local_38;
+        s_invasion_side_info rebel_side;
+        s_invasion_side_info defender_side;
 
-        Get_Rebellion_Info_(rebel_player, rebel_count, colony, &local_70, &local_38);
-        Resolve_Ground_Combat_(&local_70, &local_38);
+        Get_Rebellion_Info_(rebel_player, rebel_count, colony, &rebel_side, &defender_side);
+        Resolve_Ground_Combat_(&rebel_side, &defender_side);
 
         s_MSG msg = {};
         msg.msg_type = 0 /* MSG_TYPE_COLONY */;
-        msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+        msg.u.colony.planet_idx = (uint8_t)colony->planet;
         msg.u.colony.subtype = 9 /* s_MSG_colony_rebellion */;
-        msg.u.colony.c.rebels.owner_player = static_cast<int8_t>(rebel_player);
-        msg.u.colony.c.rebels.rebels = static_cast<int8_t>(rebel_count);
-        msg.u.colony.c.rebels.lost = static_cast<int8_t>(rebel_count - local_70.unit_counts[3]);
+        msg.u.colony.c.rebels.owner_player = (int8_t)rebel_player;
+        msg.u.colony.c.rebels.rebels = (int8_t)rebel_count;
+        msg.u.colony.c.rebels.lost = (int8_t)(rebel_count - rebel_side.unit_counts[3]);
 
         MSG_::Add_Msg_(msg, colony->owner);
         MSG_::Add_Msg_(msg, rebel_player);
 
-        if (local_70.current_troop_type_idx < 4) {
-            Change_Colony_Ownership_(colony, local_70.player_id, 0);
-            Resolve_Rebellion_Troops_(local_70);
+        if (rebel_side.current_troop_type_idx < 4) {
+            Change_Colony_Ownership_(colony, rebel_side.player_id, 0);
+            Resolve_Rebellion_Troops_(rebel_side);
             colony->just_produced = -41;
         }
     }
@@ -539,14 +531,12 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
         int32_t captured_count = 0;
         int32_t chance_base;
 
-        // Determine base chance to capture tech from buildings
-        if (MOX::_player[new_owner_idx].objectives == 100 /* 'd' - likely human or specific AI type */) {
+        if (MOX::_player[new_owner_idx].objectives == 100) {
             chance_base = 125;
         } else {
             chance_base = MOX::_settings.game_difficulty * 5 + 115;
         }
 
-        // Stage 1: Attempt to capture tech from existing buildings
         for (int32_t i = 0; i < 49; ++i) {
             if (colony->buildings[i] != 0) {
                 int16_t tech_app = TECHDATA::_buildings[i].tech_app;
@@ -564,7 +554,6 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
             }
         }
 
-        // Stage 2: Attempt to capture remaining techs from the owner's knowledge
         if (captured_count < 4) {
             int32_t chance_random;
             if (MOX::_player[new_owner_idx].objectives == 100) {
@@ -574,8 +563,8 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
             }
 
             memset(weights, 0, sizeof(weights));
-            for (int32_t i = 0; i < 204 /* TECH_APP_COUNT_EXCLUDING_HIDDEN */; ++i) {
-                if (MOX::_player[old_owner_idx].tech_applications[i] == 3 /* Fully Known */) {
+            for (int32_t i = 0; i < 204; ++i) {
+                if (MOX::_player[old_owner_idx].tech_applications[i] == 3) {
                     if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[new_owner_idx], i)) {
                         weights[i] = 1;
                     }
@@ -599,7 +588,6 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
             }
         }
 
-        // Write captured tech info to battle results
         memcpy(results->captured_techs_data, captured_techs, captured_count * sizeof(int16_t));
         results->captured_tech_id = (int16_t)captured_count;
         results->captured_tech_planet_id = colony->planet;
@@ -608,12 +596,12 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
 int __cdecl Colony_N_Militia_(s_colony* colony) {
     int count = 0;
-    uint8_t n_pops = static_cast<uint8_t>(colony->n_pops);
+    uint8_t n_pops = (uint8_t)colony->n_pops;
 
     for (uint8_t i = 0; i < n_pops; ++i) {
-        uint32_t p = colony->pop[i];
+        uint32_t pop_flags = colony->pop[i];
 
-        if (((p & 0x0F) < 8) && ((p & 0x0400) == 0)) {
+        if (((pop_flags & 0x0F) < 8) && ((pop_flags & 0x0400) == 0)) {
             count++;
         }
     }
@@ -621,13 +609,13 @@ int __cdecl Colony_N_Militia_(s_colony* colony) {
     return count / 5;
 }
 
-void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner) {
+void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     s_colony* colony = &MOX::_colony[colony_idx];
     int8_t old_owner = colony->owner;
 
     BOMB::Handle_Leader_At_Lost_Colony_(colony);
 
-    MOX::_player[old_owner].colony_war_losses[new_owner] += (uint8_t)colony->n_pops;
+    MOX::_player[old_owner].colony_war_losses[new_owner_idx] += (uint8_t)colony->n_pops;
 
     if (colony->buildings[9 /* BUILDING_CAPITOL */] != 0) {
         ERICNET::Remove_Building_(colony_idx, 9 /* BUILDING_CAPITOL */);
@@ -637,24 +625,23 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner) {
         invasion::Assign_New_Home_Planet_(old_owner, colony_idx);
     }
 
-    colony->owner = (int8_t)new_owner;
+    colony->owner = (int8_t)new_owner_idx;
     COLCALC::Do_Colony_Owner_Change_Star_Colony_Stuff_(colony);
 
-    if (MOX::_player[new_owner].home_planet_id == -1) {
-        MOX::_player[new_owner].home_planet_id = colony->planet;
+    if (MOX::_player[new_owner_idx].home_planet_id == -1) {
+        MOX::_player[new_owner_idx].home_planet_id = colony->planet;
     }
 
     colony->auto_building = 0;
 
-    // Check for specific traits (e.g., Unification/Federation) that scrap morale buildings
-    if (MOX::_player[new_owner].traits[0] / 2 == 3) {
+    if (MOX::_player[new_owner_idx].traits[0] / 2 == 3) {
         if (colony->buildings[20] != 0) {
             ERICNET::Remove_Building_(colony_idx, 20);
-            MOX::_player[new_owner].bc += TECHDATA::_buildings[20].cost / 2;
+            MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[20].cost / 2;
         }
         if (colony->buildings[31 /* BUILDING_PLEASURE_DOME */] != 0) {
             ERICNET::Remove_Building_(colony_idx, 31 /* BUILDING_PLEASURE_DOME */);
-            MOX::_player[new_owner].bc += TECHDATA::_buildings[31].cost / 2;
+            MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[31].cost / 2;
         }
     }
 
@@ -662,23 +649,21 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner) {
     for (int i = 0; i < n_pops; ++i) {
         uint32_t pop_val = colony->pop[i];
         uint32_t race = pop_val & 0xF;
-        uint32_t owner = (pop_val & 0x70) >> 4;
+        uint32_t original_owner_idx = (pop_val & 0x70) >> 4;
 
-        if (race == new_owner) {
-            pop_val &= ~0x400; // Clear conquered bit
-            pop_val = (pop_val & ~0x70) | ((new_owner << 4) & 0x70);
+        if (race == new_owner_idx) {
+            pop_val &= ~0x400;
+            pop_val = (pop_val & ~0x70) | ((new_owner_idx << 4) & 0x70);
         } else if (race == 8 || race == 9) {
-            // Special races (likely Androids) just update owner
-            pop_val = (pop_val & ~0x70) | ((new_owner << 4) & 0x70);
+            pop_val = (pop_val & ~0x70) | ((new_owner_idx << 4) & 0x70);
         } else {
-            if (owner == new_owner) {
-                pop_val &= ~0x400; // Clear conquered bit
-            } else if (MOX::_player[new_owner].traits[25] != 0) {
-                // Assimilation trait (e.g. Telepathic)
+            if (original_owner_idx == new_owner_idx) {
                 pop_val &= ~0x400;
-                pop_val = (pop_val & ~0x70) | ((new_owner << 4) & 0x70);
+            } else if (MOX::_player[new_owner_idx].traits[25] != 0) {
+                pop_val &= ~0x400;
+                pop_val = (pop_val & ~0x70) | ((new_owner_idx << 4) & 0x70);
             } else {
-                pop_val |= 0x400; // Set conquered bit
+                pop_val |= 0x400;
             }
         }
         colony->pop[i] = pop_val;
@@ -692,7 +677,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner) {
     colony->just_produced = -40;
     colony->occupation_points = 0;
     colony->occupation_policy = 4;
-    colony->buildings[11] = 0; // Likely clearing Outpost/Colony Base status
+    colony->buildings[11] = 0;
 
     int star_idx = (uint8_t)MOX::_planet[colony->planet].star_index;
     COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);
@@ -721,7 +706,7 @@ void __cdecl Enforce_Population_Limits_At_Colony_(s_colony* colony) {
         }
     }
 
-    RUSS::Shuffle_(colony->pop, 4, (int16_t)colony->n_pops);
+    RUSS::Shuffle_(colony->pop, sizeof(colony->pop[0]), (int16_t)colony->n_pops);
 
     for (int current_limit = 1; current_limit < 42; ++current_limit) {
         if (limit_has_pops[current_limit] == 0) {
@@ -791,7 +776,7 @@ void __cdecl Enforce_Population_Limits_At_Colony_(s_colony* colony) {
 }
 
 int16_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony) {
-    int32_t limit = static_cast<uint8_t>(colony->n_pops);
+    int32_t limit = (uint8_t)colony->n_pops;
 
     if (MOX::_player[colony->owner].traits[TRAIT_WARLORD] == 0) {
         limit /= 2;
@@ -806,7 +791,7 @@ int16_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony) {
 
 int __cdecl Colony_Tank_Barracks_Limit_(s_colony* colony) {
     int limit;
-    int pops = static_cast<uint8_t>(colony->n_pops);
+    int pops = (uint8_t)colony->n_pops;
 
     if (MOX::_player[colony->owner].traits[30 /* TRAIT_WARLORD */] == 0) {
         limit = pops / 4;
@@ -875,7 +860,7 @@ void __cdecl Invade_(int16_t* ship_list, int16_t n_ships, int16_t colony_id, s_b
 
     invasion::Resolve_Ground_Combat_(&local_attacker, &local_defender);
 
-    if (static_cast<uint8_t>(local_attacker.current_troop_type_idx) < 4) {
+    if ((uint8_t)local_attacker.current_troop_type_idx < 4) {
         invasion::Change_Colony_Ownership_(colony, (uint32_t)local_attacker.player_id, battle_results);
         invasion::Resolve_Invasion_Troops_(local_attacker);
     } else {
@@ -893,10 +878,11 @@ void __cdecl Invade_(int16_t* ship_list, int16_t n_ships, int16_t colony_id, s_b
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
-bool __cdecl Has_Defending_Troops_(int8_t attacker_id, int16_t* ship_list, int n_ships, int16_t colony_idx) {
+bool __cdecl Has_Defending_Troops_(int8_t unused_attacker_id, int16_t* ship_list, int n_ships, int16_t colony_idx) {
     s_invasion_side_info side1;
     s_invasion_side_info side2;
 
+    (void)unused_attacker_id;
     Get_Invasion_Info_(ship_list, (int16_t)n_ships, &MOX::_colony[colony_idx], &side1, &side2);
 
     return side1.unit_counts[1] != 0;
@@ -910,11 +896,11 @@ void __cdecl Compute_Colony_Ground_Combat_Info_(s_colony* colony, s_invasion_sid
     side_info->ship_list = nullptr;
     side_info->n_ships = 0;
 
-    side_info->colony_id = static_cast<int16_t>(colony - MOX::_colony);
+    side_info->colony_id = (int16_t)(colony - MOX::_colony);
 
     side_info->unit_counts[0] = colony->military[1];
     side_info->unit_counts[1] = colony->military[0];
-    side_info->unit_counts[2] = static_cast<int16_t>(Colony_N_Militia_(colony));
+    side_info->unit_counts[2] = (int16_t)Colony_N_Militia_(colony);
 
     Compute_Colony_Officer_Bonus_(colony, &side_info->combat_modifiers);
     Compute_Player_Ground_Combat_Bonuses_(colony->owner, &side_info->combat_modifiers, 1);
@@ -923,7 +909,7 @@ void __cdecl Compute_Colony_Ground_Combat_Info_(s_colony* colony, s_invasion_sid
 
 int32_t __cdecl Colony_Tank_Limit_(s_colony* colony) {
     int32_t tank_limit =
-        static_cast<int32_t>(MOX::_planet_max_population[MOX::_planet[colony->planet].size]);
+        (int32_t)MOX::_planet_max_population[MOX::_planet[colony->planet].size];
 
     if (MOX::_player[colony->owner].traits[TRAIT_WARLORD] == 0) {
         tank_limit /= 4;

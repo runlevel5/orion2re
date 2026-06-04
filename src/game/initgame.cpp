@@ -8,13 +8,8 @@ namespace INITGAME {
      * location, and officer values for each.
      */
     void Init_Ships_Array_() {
-        // Clear 500 packed 0x81-byte ship slots.
         memset(MOX::_ship, 0, 500 * sizeof(s_ship_data));
 
-        // After the clear, initialize:
-        //   status        @ +0x64 = 5
-        //   location      @ +0x65 = -1
-        //   officer_index @ +0x74 = -1
         for (MOX::_NUM_SHIPS = 0; MOX::_NUM_SHIPS < 500; ++MOX::_NUM_SHIPS) {
             s_ship_data& ship = MOX::_ship[MOX::_NUM_SHIPS];
             ship.status = 5;
@@ -50,12 +45,7 @@ namespace INITGAME {
      * generates a default network game name using the current clock, and persists the settings.
      */
     void Set_Default_Game_Settings_() {
-        // Zero out the first 553 bytes of the settings structure (0x8A * 4 + 1)
-        uint8_t* settings_raw = reinterpret_cast<uint8_t*>(&MOX::_settings);
-        for (int i = 0; i < 553; ++i) {
-            settings_raw[i] = 0;
-        }
-
+        memset(&MOX::_settings, 0, sizeof(MOX::_settings));
         // Initialize general game settings
         MOX::_settings.end_of_turn_summary = 1;
         MOX::_settings.end_of_turn_wait = 1;
@@ -109,31 +99,28 @@ namespace INITGAME {
         }
 
         // Generate default network name: MOX-<clock % 10>
-        int clock_val = clock();
-        sprintf(MOX::_settings.net_game_name, "MOX-%d", clock_val % 10);
+        const int32_t clock_value = (int32_t)clock();
+        sprintf(MOX::_settings.net_game_name, "MOX-%d", clock_value % 10);
 
         // Finalize default settings
         MULTPLAY::Set_Default_Modem_Settings_();
         INITGAME::Write_Game_Settings_();
     }
 
-    /**
-     * @address 00478fb0
-     */
     void Write_Game_Settings_() {
-        FILE* file = fopen(s_mox_set_0055760c, s_wb_00551178);
+        FILE* settings_file = fopen("mox.set", "wb");
 
-        if (file == nullptr) {
-            exitm::Exit_With_Message(s_Unable_to_open_mox_set_005575f4);
+        if (settings_file == nullptr) {
+            exitm::Exit_With_Message("Unable to open mox.set");
         }
 
-        fwrite(&MOX::_settings, sizeof(MOX::_settings), 1, file);
-        fflush(file);
-        fclose(file);
+        fwrite(&MOX::_settings, sizeof(MOX::_settings), 1, settings_file);
+        fflush(settings_file);
+        fclose(settings_file);
     }
 
     void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int16_t galaxy_age, int16_t num_players,
-                                int16_t strategic_combat_flag, int16_t starting_civ_level) {
+                                int16_t strategic_combat_flag, int16_t starting_civilization_level) {
         bool extra_maps_generated = false;
         int16_t map_index = 0;
         int16_t generation_success;
@@ -282,7 +269,7 @@ namespace INITGAME {
 
     void __cdecl Init_Players_(void) {
       RACESEL::_race_specials[0] = (uint8_t*)farload::Far_Reload_Data_(
-          s_RACESTUF_LBX,
+          "RACESTUF.LBX",
           7,
           MOX::_global_data_seg,
           0,
@@ -293,7 +280,7 @@ namespace INITGAME {
       for (int16_t race_special_idx = 1; race_special_idx < 13; ++race_special_idx) {
         RACESEL::_race_specials[race_special_idx] =
             (uint8_t*)farload::Far_Reload_Next_Data_(
-                s_RACESTUF_LBX,
+                "RACESTUF.LBX",
                 7,
                 MOX::_global_data_seg,
                 race_special_idx,
@@ -311,22 +298,22 @@ namespace INITGAME {
           struct_::Copy_Structure_(
               player.evolutionary_upgrade_traits,
               player.traits,
-              31);
+              sizeof(player.traits));
           continue;
         }
 
         int16_t race_idx = 0;
         while (true) {
           bool unique_race = true;
-          race_idx = static_cast<int16_t>(random::Random_(13) - 1);
+          race_idx = (int16_t)(random::Random_(13) - 1);
 
           for (int16_t prev_player_idx = 0; prev_player_idx < player_idx; ++prev_player_idx) {
             if (!unique_race) {
               break;
             }
 
-            if (static_cast<uint8_t>(MOX::_player[prev_player_idx].race) ==
-                static_cast<uint8_t>(race_idx)) {
+            if ((uint8_t)MOX::_player[prev_player_idx].race ==
+                (uint8_t)race_idx) {
               unique_race = false;
             }
           }
@@ -336,24 +323,25 @@ namespace INITGAME {
           }
         }
 
-        player.race = static_cast<uint8_t>(race_idx);
+        player.race = (uint8_t)race_idx;
         strcpy(player.race_name, MOX::_race_names[race_idx]);
 
-        struct_::Copy_Structure_(player.traits, RACESEL::_race_specials[race_idx], 31);
-        struct_::Copy_Structure_(player.evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx], 31);
+        struct_::Copy_Structure_(player.traits, RACESEL::_race_specials[race_idx], sizeof(player.traits));
+        struct_::Copy_Structure_(player.evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx],
+                                 sizeof(player.evolutionary_upgrade_traits));
         RUSS::Mox_Update_();
 
         RACECUST::Race_Customization_(player_idx);
         RUSS::Mox_Update_();
 
         for (int16_t trait_idx = 1; trait_idx < 10; ++trait_idx) {
-          uint8_t v = (uint8_t)player.traits[trait_idx];
+          uint8_t trait_value = (uint8_t)player.traits[trait_idx];
           player.traits[trait_idx] =
-              v ? MOX::_special_bonus[trait_idx - 1][v - 1] : 0;
+              trait_value ? MOX::_special_bonus[trait_idx - 1][trait_value - 1] : 0;
 
-          v = (uint8_t)player.evolutionary_upgrade_traits[trait_idx];
+          trait_value = (uint8_t)player.evolutionary_upgrade_traits[trait_idx];
           player.evolutionary_upgrade_traits[trait_idx] =
-              v ? MOX::_special_bonus[trait_idx - 1][v - 1] : 0;
+              trait_value ? MOX::_special_bonus[trait_idx - 1][trait_value - 1] : 0;
         }
 
         RUSS::Mox_Update_();
@@ -372,9 +360,9 @@ namespace INITGAME {
             break;
           }
 
-          int32_t t = (int16_t)color_idx + 1;
-          int32_t s = t >> 31;
-          color_idx = (int16_t)((((t ^ s) - s) & 7 ^ s) - s);
+          int32_t next_color_idx = (int16_t)color_idx + 1;
+          int32_t sign_bits = next_color_idx >> 31;
+          color_idx = (int16_t)((((next_color_idx ^ sign_bits) - sign_bits) & 7 ^ sign_bits) - sign_bits);
         }
 
         player.color = (uint8_t)color_idx;
@@ -382,13 +370,13 @@ namespace INITGAME {
 
         allocate::Push_Block_(MOX::_screen_seg);
 
-        char* player_name = static_cast<char*>(farload::Far_Reload_Next_Data_(
-            s_RACENAME_LBX,
+        char* player_name = (char*)farload::Far_Reload_Next_Data_(
+            "RACENAME.LBX",
             0,
             MOX::_screen_seg,
             race_idx * 8 + random::Random_(8) - 1,
             1,
-            20));
+            20);
         RUSS::Mox_Update_();
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -404,7 +392,7 @@ namespace INITGAME {
         s_player& player = MOX::_player[player_idx];
 
         player.officer_for_hire = -1;
-        player.offensive_stagepoint = static_cast<char>(0xFF);
+        player.offensive_stagepoint = (char)0xFF;
         player.contact[player_idx] = 1;
         player.player_done_flags = 0;
         player.bc = 50;
@@ -436,13 +424,6 @@ namespace INITGAME {
       RUSS::Mox_Update_();
     }
 
-    /**
-     * Initializes leader data from LBX, sets random skills for specific officers,
-     * and calculates initial officer skill values.
-     */
-    /**
-     * @address 004794b0
-     */
     void __cdecl Init_Colony_(int16_t colony_idx, int16_t planet_idx, uint8_t player_num) {
         s_colony* colony = &MOX::_colony[colony_idx];
 
@@ -458,11 +439,11 @@ namespace INITGAME {
 
         int8_t star_idx = planet->star_index;
         // Mark the star system as visited/seen by the player
-        uint8_t player_bit = (uint8_t)(1u << (player_num & 0x1f));
-        MOX::_star[star_idx].visited |= player_bit;
+        uint8_t visited_player_mask = (uint8_t)(1u << (player_num & 0x1f));
+        MOX::_star[star_idx].visited |= visited_player_mask;
 
-        for (int i = 0; i < 7; ++i) {
-            colony->producing[i] = -1;
+        for (int32_t producing_idx = 0; producing_idx < (int32_t)(sizeof(colony->producing) / sizeof(colony->producing[0])); ++producing_idx) {
+            colony->producing[producing_idx] = -1;
         }
 
         colony->occupation_policy = 4;
@@ -473,15 +454,9 @@ namespace INITGAME {
         char lbx_filename[20];
         HAROLD::Get_Officer_Data_LBX_Name_(lbx_filename);
 
-        // Loads 67 leader records (59 bytes each) into a temporary buffer.
-        void* loaded_data = farload::Far_Reload_Data_(lbx_filename, 0, MOX::_screen_seg, 0, 67, 59);
+        void* leader_records = farload::Far_Reload_Data_(lbx_filename, 0, MOX::_screen_seg, 0, 67, sizeof(s_leader_data));
 
-        // Bulk copy loaded data into the global leaders array.
-        uint8_t* src = reinterpret_cast<uint8_t*>(loaded_data);
-        uint8_t* dst = reinterpret_cast<uint8_t*>(MOX::_leaders);
-        for (int32_t i = 0; i < (67 * 59); ++i) {
-            dst[i] = src[i];
-        }
+        memcpy(MOX::_leaders, leader_records, 67 * sizeof(s_leader_data));
 
         for (int16_t i = 0; i < 67; ++i) {
             if (i == 41) {
@@ -494,8 +469,8 @@ namespace INITGAME {
             }
             else if (i == 65) {
                 // Special randomized tech application for leader at index 65
-                MOX::_leaders[i].tech_application[0] = static_cast<uint8_t>(random::Random_(102)) - 1;
-                MOX::_leaders[i].tech_application[1] = static_cast<uint8_t>(random::Random_(102)) + 101;
+                MOX::_leaders[i].tech_application[0] = (uint8_t)random::Random_(102) - 1;
+                MOX::_leaders[i].tech_application[1] = (uint8_t)random::Random_(102) + 101;
             }
 
             // Calculate and set the skill value for this leader.
@@ -506,9 +481,6 @@ namespace INITGAME {
         }
     }
 
-    /**
-     * @address 00478d10
-     */
     void Set_Initial_Colony_Auto_Selects_() {
         if (MOX::_NUM_STARS <= 0) {
             return;
@@ -521,8 +493,8 @@ namespace INITGAME {
             }
 
             // Determine and set the default auto-selection logic for this star
-            int16_t temp_auto_select;
-            HACCESS::Set_Colony_Auto_Select_For_Star_(star_idx, MOX::_PLAYER_NUM, &temp_auto_select);
+            int16_t selected_planet_idx;
+            HACCESS::Set_Colony_Auto_Select_For_Star_(star_idx, MOX::_PLAYER_NUM, &selected_planet_idx);
         }
     }
 
@@ -535,7 +507,7 @@ namespace INITGAME {
         while (star_ptr < end_ptr) {
             if (star_ptr->system_special == SYSTEM_SPECIAL_SPACE_MONSTER) {
                 int32_t ship_type = random::Random_(5) + 9;
-                int16_t star_idx = static_cast<int16_t>(star_ptr - MOX::_star);
+                int16_t star_idx = (int16_t)(star_ptr - MOX::_star);
                 int16_t planet_idx = HOMEGEN::Random_Planet_(star_idx);
 
                 // Initialize monster ship owner to Neutral/Orion
@@ -546,7 +518,7 @@ namespace INITGAME {
                 star_ptr->system_special = star_ptr->twinkling1;
                 star_ptr->twinkling1 = 0;
 
-                HOMEGEN::Upgrade_Planet_Guarded_By_Monster_(&MOX::_planet[planet_idx], static_cast<int16_t>(ship_type));
+                HOMEGEN::Upgrade_Planet_Guarded_By_Monster_(&MOX::_planet[planet_idx], (int16_t)ship_type);
             }
             star_ptr++;
         }

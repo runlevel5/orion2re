@@ -3,11 +3,6 @@
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
 
-- [pending] src/game/info.{h,cpp}
-- [pending] src/game/init.{h,cpp}
-- [pending] src/game/initgame.{h,cpp}
-- [pending] src/game/initship.{h,cpp}
-- [pending] src/game/invasion.{h,cpp}
 - [pending] src/game/jim.{h,cpp}
 - [pending] src/game/ken.{h,cpp}
 - [pending] src/game/key.{h,cpp}

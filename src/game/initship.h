@@ -7,10 +7,19 @@ struct s_ship_design;
 namespace INITSHIP {
     void __cdecl Repair_Ships_At_Colonies_();
 
+    /** Fully repairs a ship and restores its weapon and special-device state.
+     * @param ship_idx Index of the ship to repair.
+     */
     void __cdecl Repair_Ship_Full_(int16_t ship_idx);
 
     void __cdecl Init_Ship_Designs_(int16_t player_idx);
     
+    /** Calculates combat attack and defense bonuses for a ship.
+     * @param ship_idx Index of the ship to inspect.
+     * @param ship_defense Receives the defense rating.
+     * @param ship_missile_defense Receives the missile defense rating.
+     * @param ship_attack Receives the attack bonus.
+     */
     void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* ship_defense, int16_t* ship_missile_defense, int16_t* ship_attack);
 
     int16_t __cdecl Best_Ship_Fuel_(int16_t player_idx);
@@ -51,7 +60,12 @@ namespace INITSHIP {
 
     int16_t __cdecl Get_Design_Structure_(s_ship_design design);
 
-    int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech);
+    /** Returns the total structure for a hull after armor and fortification modifiers.
+     * @param hull_index Hull data index to inspect.
+     * @param is_fort Non-zero to apply the fortification multiplier.
+     * @param player_idx Player index used to resolve the best available armor.
+     */
+    int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t player_idx);
 
     int16_t __cdecl Get_Ship_Structure_(int16_t ship_idx);
 
@@ -69,6 +83,10 @@ namespace INITSHIP {
 
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design);
 
+    /** Loads one of the predefined Antaran ship designs for a hull size.
+     * @param design Design record to populate.
+     * @param hull_size Hull size selector from small through titan.
+     */
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size);
 
     void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx);
@@ -94,8 +112,6 @@ namespace INITSHIP {
     void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster);
 
     void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design);
-
-    extern const char s_Avenger_005576c4[8];
 
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design);
 
@@ -131,11 +147,20 @@ namespace INITSHIP {
 
     void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bonus_out, int16_t* defense_rating_out, int16_t* missile_defense_out);
 
+    /** Loads the standard transport ship design for a player.
+     * @param player_idx Player index whose current tech determines the loadout.
+     * @param design Design record to populate.
+     */
     void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design);
 
+    /** Updates localized non-combat ship names after a language change. */
     void __cdecl Update_Ship_Names_To_New_Language_();
 
     int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx);
 
+    /** Checks whether a ship carries a weapon type in any slot.
+     * @param ship_index Index of the ship to inspect.
+     * @param weapon_type Weapon type id to search for.
+     */
     int16_t __cdecl Ship_Has_Weapon_(int16_t ship_index, int16_t weapon_type);
 }
