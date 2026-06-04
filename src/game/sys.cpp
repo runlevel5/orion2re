@@ -1560,7 +1560,7 @@ namespace SYS {
         int16_t left_padding;
         int16_t origin_x;
         int16_t origin_y;
-        uint16_t saved_window_status;
+        int16_t saved_window_status;
 
         if (MOX::_current_screen == 0) {
             left_padding = 0x0D;

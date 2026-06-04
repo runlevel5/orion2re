@@ -1,14 +1,16 @@
 #include "pch.h"
 
 namespace MOVEBOX {
-    void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* anim2,
+    void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* unused_anim2,
                                     int16_t x_base, int16_t y_base,
                                     int16_t width, int16_t height,
                                     int16_t map_x_off, int16_t map_y_off,
                                     int16_t x_adj, int16_t y_adj,
                                     int16_t view_mode, int16_t exit_flag) {
+        (void)unused_anim2;
+
         s_colors font_colors;
-        for (int i = 2; i < 8; ++i) {
+        for (int32_t i = 2; i < 8; ++i) {
             font_colors.colors[i] = (uint8_t)(i + 100);
         }
 
@@ -38,7 +40,7 @@ namespace MOVEBOX {
                     video::Clip_Off_();
                     graphics::Reset_Window_();
                 } else {
-                    for (int i = 0; i < 8; ++i) {
+                    for (int32_t i = 0; i < 8; ++i) {
                         font_colors.colors[i] = (i == 0) ? 0x62 : (uint8_t)(i + 100);
                     }
                     if (MOX::_current_screen == SCREEN_MAIN) {
@@ -90,7 +92,7 @@ namespace MOVEBOX {
                     s_animation_header* summ_anim = MOX::_planet_summary_galaxy_star_seg[color_idx];
                     if (i == scanned) {
                         animate::Set_Animation_Frame_(summ_anim, (int)MOX::_galaxy_star_anim_count);
-                        int count = animate::Get_Animation_Frame_Count_(summ_anim);
+                        int32_t count = animate::Get_Animation_Frame_Count_(summ_anim);
                         MOX::_galaxy_star_anim_count = (uint8_t)((MOX::_galaxy_star_anim_count + 1) % count);
                     } else {
                         animate::Reset_Animation_Frame_(summ_anim);
@@ -121,7 +123,7 @@ namespace MOVEBOX {
     }
 
     int16_t __cdecl Moveable_Box_Selected_(int16_t box_index) {
-        return static_cast<int16_t>(
+        return (int16_t)(
             MOX::_box_off_flag[box_index] < MOX::_moveable_box[box_index].id
         );
     }
@@ -188,15 +190,15 @@ namespace MOVEBOX {
     }
 
     void __cdecl Box_Fleet_Screen_Scanned_Star_() {
-        s_star_data* star = &MOX::_star[MOX::_galaxy_map_scanned_star]; // star_data size 0x71
+        s_star_data* star = &MOX::_star[MOX::_galaxy_map_scanned_star];
 
         int32_t x_scaled = (star->x * 1000) / (int32_t)MOX::_max_map_scale;
-        int16_t x = (int16_t)((x_scaled * 10) / 1659 /* 0x67b */ + 15) - 5;
+        int16_t x = (int16_t)(((x_scaled * 10) / 1659) + 15) - 5;
 
         int32_t y_scaled = (star->y * 1000) / (int32_t)MOX::_max_map_scale;
-        int16_t y = (int16_t)((y_scaled * 10) / 2197 /* 0x895 */) + 47 /* 0x2f */;
+        int16_t y = (int16_t)((y_scaled * 10) / 2197) + 47;
 
-        graphics::Box_(x, y, 11 /* 0xb */, 12 /* 0xc */, 1 /* 0x1 */, 113 /* 0x71, 'q' */);
+        graphics::Box_(x, y, 11, 12, 1, 113);
     }
 
     void __cdecl Box_Fleet_Screen_Scanned_Ship_() {
@@ -226,7 +228,7 @@ namespace MOVEBOX {
         }
     }
 
-    void __cdecl Do_Officer_Screen_Stuff_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4) {
+    void __cdecl Do_Officer_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int16_t scale_x, int16_t scale_y) {
         bool is_fleet_officer = OFFICER::Is_Fleet_Officer_Screen_();
         int16_t scanned_star_idx = MOX::_galaxy_map_scanned_star;
 
@@ -236,8 +238,8 @@ namespace MOVEBOX {
 
             uint8_t color1, color2;
             if (owner < 0 || owner >= 8) {
-                color1 = 33 /* 0x21 */;
-                color2 = 38 /* 0x26 */;
+                color1 = 33;
+                color2 = 38;
             } else {
                 uint8_t player_color_idx = MOX::_player[owner].color;
                 uint8_t palette_color = MOX::_main_palette_player_colors[player_color_idx];
@@ -275,39 +277,39 @@ namespace MOVEBOX {
                     } else {
                         const char* fmt;
                         if (eta == 1) {
-                            fmt = HAROLD::H_Message_(146 /* 0x92 */);
+                            fmt = HAROLD::H_Message_(146);
                         } else {
-                            fmt = HAROLD::H_Message_(147 /* 0x93 */);
+                            fmt = HAROLD::H_Message_(147);
                         }
                         sprintf(buffer, fmt, star.name, leader.name, eta);
                     }
                 }
             } else {
-                strcpy(buffer, HAROLD::H_Message_(148 /* 0x94 */));
+                strcpy(buffer, HAROLD::H_Message_(148));
             }
 
-            MISC::Set_Fitted_Font_Style_(buffer, &font_colors, 3, 2, 0, 203 /* 0xCB */, 1);
-            fonts::Print_Centered_(466 /* 0x1D2 */, 418 /* 0x1A2 */, buffer);
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors, 3, 2, 0, 203, 1);
+            fonts::Print_Centered_(466, 418, buffer);
         }
 
         if (!is_fleet_officer && OFFICER::_officer_star_displayed >= 0) {
-            MOVEBOX::Box_Officer_Screen_Chosen_Star_(param_1, param_2, (int16_t)param_3, (int16_t)param_4);
+            MOVEBOX::Box_Officer_Screen_Chosen_Star_(map_x_off, map_y_off, scale_x, scale_y);
         }
     }
 
     void __cdecl Move_Box_To_Top_(int16_t box_id) {
-        int16_t local_order[5] = {0, 0, 0, 0, 0};
+        int16_t reordered_box_ids[5] = {0, 0, 0, 0, 0};
+        const int16_t reordered_box_count =
+            (int16_t)(sizeof(reordered_box_ids) / sizeof(reordered_box_ids[0]));
         int16_t found_idx = -1;
 
-        // Find the index of the box in the current order
-        for (int16_t i = 0; i < 5; ++i) {
+        for (int16_t i = 0; i < reordered_box_count; ++i) {
             if (MOX::_moveable_box_order[i] == box_id) {
                 found_idx = i;
                 break;
             }
         }
 
-        // If not found, original code accesses MOX::DAT_0059bd1e at 0x0059BD1E.
         int16_t target_box_id;
         if (found_idx >= 0) {
             target_box_id = MOX::_moveable_box_order[found_idx];
@@ -317,23 +319,20 @@ namespace MOVEBOX {
             MOX::DAT_0059bd1e = -1;
         }
 
-        // The specified box is now at the top (index 0) of our local sorted list
-        local_order[0] = target_box_id;
+        reordered_box_ids[0] = target_box_id;
 
-        // Fill slots 1 through 4 with the remaining boxes in their existing relative order
-        for (int16_t i = 1; i < 5; ++i) {
-            for (int16_t j = 0; j < 5; ++j) {
+        for (int16_t i = 1; i < reordered_box_count; ++i) {
+            for (int16_t j = 0; j < reordered_box_count; ++j) {
                 if (MOX::_moveable_box_order[j] != -1) {
-                    local_order[i] = MOX::_moveable_box_order[j];
+                    reordered_box_ids[i] = MOX::_moveable_box_order[j];
                     MOX::_moveable_box_order[j] = -1;
                     break;
                 }
             }
         }
 
-        // Copy the reorganized local list back to the global order array
-        for (int16_t i = 0; i < 5; ++i) {
-            MOX::_moveable_box_order[i] = local_order[i];
+        for (int16_t i = 0; i < reordered_box_count; ++i) {
+            MOX::_moveable_box_order[i] = reordered_box_ids[i];
         }
     }
 
@@ -444,13 +443,10 @@ namespace MOVEBOX {
         const int32_t scaled_x = ((((int32_t)scanned_star->x * 1000) / map_scale) * 10) / 0x637;
         const int32_t scaled_y = ((((int32_t)scanned_star->y * 1000) / map_scale) * 10) / 0x93e;
 
-        uint32_t box_x = static_cast<uint32_t>(scaled_x + 0x132);
-        box_x = (box_x & 0xffff0000u) | static_cast<uint16_t>(static_cast<uint16_t>(box_x) - 5);
+        const int16_t box_x = (int16_t)((uint16_t)(scaled_x + 0x132) - 5);
+        const int16_t box_y = (int16_t)((uint16_t)scaled_y + 0xE6);
 
-        uint32_t box_y = static_cast<uint32_t>(scaled_y);
-        box_y = (box_y & 0xffff0000u) | static_cast<uint16_t>(static_cast<uint16_t>(box_y) + 0xe6);
-
-        graphics::Box_(static_cast<int16_t>(box_x), static_cast<int16_t>(box_y), 0xb, 0xc, 1, 0x71);
+        graphics::Box_(box_x, box_y, 0x0B, 0x0C, 1, 0x71);
     }
 
     void __cdecl Add_Galaxy_Map_Fields_2_(
@@ -460,12 +456,15 @@ namespace MOVEBOX {
             int16_t map_height,
             int16_t offset_x,
             int16_t offset_y,
-            uint32_t unused_7,
-            uint32_t unused_8,
+            uint32_t unused_arg7,
+            uint32_t unused_arg8,
             int16_t field_style,
             int16_t* out_special_field_id,
             int16_t* star_field_ids,
             int16_t* out_grid_field_id) {
+        (void)unused_arg7;
+        (void)unused_arg8;
+
         const int16_t window_top = static_cast<int16_t>(map_y + offset_y);
         const int16_t window_left = static_cast<int16_t>(map_x + offset_x);
 
@@ -579,8 +578,8 @@ namespace MOVEBOX {
         FLEETPOP::Draw_Fleet_Movement_Box_();
     }
 
-    int8_t __cdecl Box_Was_Open_(int16_t box_idx) {
-        return MOX::_saved_boxes[box_idx].is_open;
+    int8_t __cdecl Box_Was_Open_(int16_t box_index) {
+        return MOX::_saved_boxes[box_index].is_open;
     }
 
     void __cdecl Restore_Boxes_() {

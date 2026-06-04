@@ -17,13 +17,13 @@ namespace MISC {
 
     extern s_colors _mox_font_colors;
 
-    s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3);
+    s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t primary_color, uint8_t secondary_color);
 
     void __cdecl Set_Fitted_Font_Style_(char* text, s_colors* colors, int16_t initial_style, int16_t initial_spacing, int16_t variant, int16_t max_width, int16_t min_style);
 
     int16_t __cdecl Get_Font_Style_();
 
-    void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors);
+    void __cdecl Get_Mox_Font_Colors_(int16_t mode, uint8_t primary_color, uint8_t secondary_color, s_colors* out_colors);
 
     void __cdecl Set_Font_Default_Spacing_();
 
@@ -44,13 +44,13 @@ namespace MISC {
                                        uint8_t full_bitmap, uint8_t* old_colors, uint8_t* new_colors,
                                        int8_t color_count, s_animation_header* anim);
 
-    void __cdecl Save_Window_Status_(void* status);
+    void __cdecl Save_Window_Status_(int16_t* status);
 
     void __cdecl Restore_Window_Status_(int16_t status);
 
     void __cdecl Get_LBX_Message_(int16_t message_id, char* buffer);
 
-    void __cdecl Get_Bitmap_String_Range_(int16_t segment_idx, int16_t divisor, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, char* str);
+    void __cdecl Get_Bitmap_String_Range_(int16_t segment_idx, int16_t divisor, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, char* text);
 
     void __cdecl Swap_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end, void* old_colors, void* new_colors, int16_t num_colors, s_animation_header* bitmap);
 

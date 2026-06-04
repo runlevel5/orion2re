@@ -1,6 +1,14 @@
 #include "pch.h"
 
 namespace MSG_ {
+    namespace {
+        constexpr int16_t DIPLOMACY_MSG_WAR = 0;
+        constexpr int16_t DIPLOMACY_MSG_PEACE = 1;
+        constexpr int16_t DIPLOMACY_MSG_ALLIANCE = 2;
+        constexpr int16_t DIPLOMACY_MSG_NONAGGRESSION = 3;
+        constexpr int16_t DIPLOMACY_MSG_PEACE_ENDED = 4;
+    }
+
     uint8_t _first_msg[8];
     uint8_t _n_msgs[8];
     s_MSG _msgs[100];
@@ -493,7 +501,7 @@ namespace MSG_ {
 
         if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
             memset(&msg, 0, sizeof(msg));
-            msg.msg_type = 8 /* MSG_TYPE_HYPERSPACE_FLUX */;
+            msg.msg_type = MSG_TYPE_HYPERSPACE_FLUX;
             msg.priority = 0;
 
             for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
@@ -506,7 +514,7 @@ namespace MSG_ {
             if (owner >= 0) {
                 if (EVENTS::Event_Check_Plague_(colony_idx) != 0) {
                     memset(&msg, 0, sizeof(msg));
-                    msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                    msg.msg_type = MSG_TYPE_COLONY;
                     msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet;
                     msg.u.colony.subtype = 6;
                     Add_Msg_(msg, owner);
@@ -514,7 +522,7 @@ namespace MSG_ {
 
                 if (EVENTS::Event_Check_Population_Boom_(colony_idx) != 0) {
                     memset(&msg, 0, sizeof(msg));
-                    msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                    msg.msg_type = MSG_TYPE_COLONY;
                     msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet;
                     msg.u.colony.subtype = 7;
                     Add_Msg_(msg, owner);
@@ -522,7 +530,7 @@ namespace MSG_ {
 
                 if (EVENTS::Event_Check_Comet_(colony_idx) != 0) {
                     memset(&msg, 0, sizeof(msg));
-                    msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                    msg.msg_type = MSG_TYPE_COLONY;
                     msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet;
                     msg.u.colony.subtype = 8;
                     Add_Msg_(msg, owner);
@@ -533,7 +541,7 @@ namespace MSG_ {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (EVENTS::Event_Check_Space_Anomaly_At_Star_(star_idx) != 0) {
                 memset(&msg, 0, sizeof(msg));
-                msg.msg_type = 0x10 /* MSG_TYPE_ANOMALY */;
+                msg.msg_type = MSG_TYPE_ANOMALY;
                 msg.u.anomaly.star_idx = (uint8_t)star_idx;
 
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
@@ -547,33 +555,33 @@ namespace MSG_ {
             tm* time_info = localtime(&current_time);
 
             if (time_info->tm_mon == 3 /* April */ && time_info->tm_mday == 1) {
-                msg.msg_type = 0x15 /* MSG_TYPE_APRIL1 */;
+                msg.msg_type = MSG_TYPE_APRIL1;
                 Add_Msg_All_(msg);
             }
         }
     }
 
     void __cdecl Add_Peace_Ended_Msg_(int player_a_idx, int player_b_idx) {
-        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 4);
+        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, DIPLOMACY_MSG_PEACE_ENDED);
     }
 
     /**
      * Adds a diplomacy message indicating peace has been declared between two players.
      */
     void __cdecl Add_Peace_Msg_(int32_t player_a_idx, int32_t player_b_idx) {
-        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 1 /* DIPLOMACY_PEACE */);
+        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, DIPLOMACY_MSG_PEACE);
     }
 
     void __cdecl Add_Diplomacy_Msg_(int16_t plr_a, int16_t plr_b, int16_t diplomacy_idx) {
         s_MSG msg = {};
-        msg.msg_type = 17; /* MSG_TYPE_DIPLOMACY */
+        msg.msg_type = MSG_TYPE_DIPLOMACY;
         msg.u.diplomacy.diplomacy_idx = static_cast<int8_t>(diplomacy_idx);
         msg.u.diplomacy.plr_a = static_cast<int8_t>(plr_a);
         msg.u.diplomacy.plr_b = static_cast<int8_t>(plr_b);
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                if (diplomacy_idx == 4) {
+                if (diplomacy_idx == DIPLOMACY_MSG_PEACE_ENDED) {
                     if (i == plr_a || i == plr_b) {
                         Add_Msg_(msg, i);
                     }
@@ -587,7 +595,7 @@ namespace MSG_ {
     }
 
     void __cdecl Add_Nonaggression_Msg_(int16_t plr_a, int16_t plr_b) {
-        Add_Diplomacy_Msg_(plr_a, plr_b, 3);
+        Add_Diplomacy_Msg_(plr_a, plr_b, DIPLOMACY_MSG_NONAGGRESSION);
     }
 
     void __cdecl Add_Msg_All_(s_MSG msg) {
@@ -597,13 +605,11 @@ namespace MSG_ {
     }
 
     void __cdecl Add_Alliance_Msg_(uint32_t player_a_idx, uint32_t player_b_idx) {
-        // Note: The constant 2 maps to MSG_TYPE_DECLARE_WAR in the message table, 
-        // which might indicate a logic quirk or internal enumeration mismatch.
-        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 2 /* MSG_TYPE_DECLARE_WAR */);
+        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, DIPLOMACY_MSG_ALLIANCE);
     }
 
     void __cdecl Add_War_Msg_(int32_t player_a, int32_t player_b) {
-        Add_Diplomacy_Msg_(player_a, player_b, 0);
+        Add_Diplomacy_Msg_(player_a, player_b, DIPLOMACY_MSG_WAR);
     }
 
     /**

@@ -78,7 +78,7 @@ namespace TEXTBOX {
         int16_t y_bot = height;
         y_bot += y_mid;
 
-        uint32_t window_status;
+        int16_t window_status;
         MISC::Save_Window_Status_(&window_status);
 
         graphics::Set_Window_(*x_ptr, y_mid, *x_ptr + 380, y_bot);
@@ -244,7 +244,7 @@ namespace TEXTBOX {
 
         FMTPARA::Print_Formatted_Paragraph_(print_x, print_y, width, const_cast<char*>(text), 0);
 
-        MISC::Restore_Window_Status_((uint32_t)window_status);
+        MISC::Restore_Window_Status_(window_status);
 
         video::Copy_Off_To_Back_();
 

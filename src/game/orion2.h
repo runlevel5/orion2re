@@ -4557,8 +4557,8 @@ struct s_skill_data {
     int16_t strength;
     int8_t level_up;
     int8_t cost;
-    char *name;
-    char *format_str;
+    const char *name;
+    const char *format_str;
 };
 
 typedef struct s_smack_video s_smack_video, *Ps_smack_video;

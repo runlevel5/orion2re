@@ -52,8 +52,8 @@ namespace MOX {
     extern s_animation_header* _relocate_fleet_button_seg;
     extern s_animation_header* _officers_button_seg;
     extern uint8_t _add_officers_button;
-    extern short _fltscrn_support_button_status;
-    extern short _fltscrn_combat_button_status;
+    extern int16_t _fltscrn_support_button_status;
+    extern int16_t _fltscrn_combat_button_status;
     extern s_mp_screen* _mp_screen;
     extern int8_t _player_mode[15];
     extern int16_t _cur_ship;
@@ -154,7 +154,7 @@ namespace MOX {
     extern int16_t _cur_map_x;
     extern int16_t _cur_map_y;
     extern uint16_t _global_esc;
-    extern short _return_screen;
+    extern int16_t _return_screen;
     extern char* _save_game_dates;
     extern char* _save_game_stardates;
     extern char* _star_name_loaded_string;
@@ -166,7 +166,7 @@ namespace MOX {
     extern uint8_t _turns_between_debug_saves;
     extern void* _sound_buffer;
     extern int16_t _hot_seat_flag;
-    extern short _current_screen;
+    extern int16_t _current_screen;
     extern int16_t _design_screen_replacement_type;
     extern int16_t _design_screen_replacement_slot;
     extern int16_t _weapons_field[8];
@@ -229,7 +229,7 @@ namespace MOX {
     extern int16_t _skan_flag;
     extern uint8_t _draw_design_screen_to_back;
     extern uint8_t _refit_ship;
-    extern int _original_cost;
+    extern int32_t _original_cost;
     extern int16_t _design_name_field;
     extern int16_t _design_cancel_button;
     extern int16_t _design_clear_button;
@@ -374,7 +374,7 @@ namespace MOX {
 
     extern s_planet_data* _planet;
 
-    extern char* _roman_literals[21];
+    extern const char* _roman_literals[21];
 
     extern char* _planet_special_string[12];
     extern char* _planet_climate_string[10];
@@ -685,7 +685,7 @@ namespace MOX {
     // Suggested name: MOX::old_galaxy_climate_roll_table
     extern uint8_t _old_gal_climate_roll_table[10][4];
 
-    // Array of movable box structures (size 0x1C each, total 0x8C/140 bytes)
+    // Array of movable box structures.
     extern s_movable_box _moveable_box[5];
 
     extern uint8_t _fleet_movement_icons_on;
@@ -773,5 +773,9 @@ namespace MOX {
 
     extern s_animation_header* _fltscrn_flashing_monster_ship_icon[7];
 
-    void __cdecl Apply_Save_Settings(s_settings* s);
+    /**
+     * Copies persisted game-setup values into the active global settings.
+     * @param settings Source settings record loaded from save data.
+     */
+    void __cdecl Apply_Save_Settings(s_settings* settings);
 }

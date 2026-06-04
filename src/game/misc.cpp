@@ -37,7 +37,7 @@ namespace MISC {
         }
     }
 
-    s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3) {
+    s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t primary_color, uint8_t secondary_color) {
         for (int i = 0; i < 8; ++i) {
             _mox_font_colors.colors[i] = 0;
         }
@@ -45,49 +45,49 @@ namespace MISC {
         switch (mode) {
         case 0:
         case 1:
-            _mox_font_colors.colors[0] = param_2;
+            _mox_font_colors.colors[0] = primary_color;
             for (int i = 1; i < 8; ++i) {
-                _mox_font_colors.colors[i] = param_3;
+                _mox_font_colors.colors[i] = secondary_color;
             }
             break;
 
         case 2:
         case 3:
-            _mox_font_colors.colors[0] = param_2;
+            _mox_font_colors.colors[0] = primary_color;
             for (int i = 1; i < 8; ++i) {
-                _mox_font_colors.colors[i] = param_3;
+                _mox_font_colors.colors[i] = secondary_color;
             }
             if (MOX::_mox_font_colors_offset != 0) {
                 _mox_font_colors.colors[2] = MOX::_mox_font_colors_offset;
             } else {
-                int val = (int)param_2 + 1;
-                if (val > (int)param_3) {
-                    val = (int)param_3;
+                int32_t next_color = (int32_t)primary_color + 1;
+                if (next_color > (int32_t)secondary_color) {
+                    next_color = (int32_t)secondary_color;
                 }
-                _mox_font_colors.colors[2] = static_cast<uint8_t>(val);
+                _mox_font_colors.colors[2] = (uint8_t)next_color;
             }
             break;
 
         case 4:
-            _mox_font_colors.colors[0] = param_2;
+            _mox_font_colors.colors[0] = primary_color;
             for (int i = 1; i < 8; ++i) {
-                _mox_font_colors.colors[i] = param_3;
+                _mox_font_colors.colors[i] = secondary_color;
             }
             if (MOX::_mox_font_colors_offset != 0) {
                 _mox_font_colors.colors[2] = MOX::_mox_font_colors_offset;
             } else {
-                _mox_font_colors.colors[2] = param_3 - 1;
+                _mox_font_colors.colors[2] = secondary_color - 1;
             }
             break;
 
         case 5:
-            _mox_font_colors.colors[1] = param_2;
-            _mox_font_colors.colors[2] = param_3 - 1;
-            _mox_font_colors.colors[3] = param_3 - 1;
-            _mox_font_colors.colors[4] = param_3 - 1;
-            _mox_font_colors.colors[5] = param_3;
-            _mox_font_colors.colors[6] = param_3;
-            _mox_font_colors.colors[7] = param_3;
+            _mox_font_colors.colors[1] = primary_color;
+            _mox_font_colors.colors[2] = secondary_color - 1;
+            _mox_font_colors.colors[3] = secondary_color - 1;
+            _mox_font_colors.colors[4] = secondary_color - 1;
+            _mox_font_colors.colors[5] = secondary_color;
+            _mox_font_colors.colors[6] = secondary_color;
+            _mox_font_colors.colors[7] = secondary_color;
             break;
 
         default:
@@ -98,9 +98,9 @@ namespace MISC {
         return &_mox_font_colors;
     }
 
-    void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors) {
-        s_colors* colors_ptr = MISC::Font_Colors2_(font_idx, color_idx_1, color_idx_2);
-        memcpy(out_colors->colors, colors_ptr->colors, 8);
+    void __cdecl Get_Mox_Font_Colors_(int16_t mode, uint8_t primary_color, uint8_t secondary_color, s_colors* out_colors) {
+        s_colors* colors_ptr = MISC::Font_Colors2_(mode, primary_color, secondary_color);
+        memcpy(out_colors->colors, colors_ptr->colors, sizeof(out_colors->colors));
     }
 
     int16_t __cdecl Get_Font_Spacing_() {
@@ -112,11 +112,11 @@ namespace MISC {
         fonts::Get_Colors_(&colors);
 
         for (int i = 1; i < 8; ++i) {
-            int32_t val = static_cast<int32_t>(colors.colors[i]) + increment;
+            int32_t val = (int32_t)colors.colors[i] + increment;
             if (val > 255) {
                 val = 255;
             }
-            colors.colors[i] = static_cast<uint8_t>(val);
+            colors.colors[i] = (uint8_t)val;
         }
 
         MISC::Set_Font_Colors_(&colors);
@@ -127,21 +127,21 @@ namespace MISC {
         fonts::Get_Colors_(&colors);
 
         for (int32_t i = 1; i < 8; ++i) {
-            int32_t new_val = static_cast<int32_t>(colors.colors[i]) - static_cast<int32_t>(amount);
+            int32_t new_val = (int32_t)colors.colors[i] - (int32_t)amount;
 
             if (new_val <= 0) {
                 new_val = 0;
             }
 
-            colors.colors[i] = static_cast<uint8_t>(new_val);
+            colors.colors[i] = (uint8_t)new_val;
         }
 
         MISC::Set_Font_Colors_(&colors);
     }
 
-    void __cdecl Save_Window_Status_(void* status) {
+    void __cdecl Save_Window_Status_(int16_t* status) {
         graphics::Save_Window_();
-        *(int16_t*)status = animate::_clipping_flag;
+        *status = animate::_clipping_flag;
     }
 
     void __cdecl Restore_Window_Status_(int16_t status) {
@@ -177,7 +177,7 @@ namespace MISC {
             y_end = height;
         }
 
-        uint8_t* pixel_data = reinterpret_cast<uint8_t*>(anim) + 16;
+        uint8_t* pixel_data = (uint8_t*)anim + sizeof(*anim) + sizeof(uint32_t);
 
         for (int16_t y = y_start; y < y_end; ++y) {
             int32_t y_offset = (int32_t)y * width;
@@ -255,7 +255,7 @@ namespace MISC {
         int16_t saved_style = fonts::_font_header.font_style;
 
         fonts::Get_Colors_(&colors);
-        fonts::Set_Font_Style_(static_cast<int32_t>(font_id), &colors);
+        fonts::Set_Font_Style_((int32_t)font_id, &colors);
 
         fonts::_font_header.font_style = saved_style;
     }
@@ -320,7 +320,7 @@ namespace MISC {
     }
 
     void __cdecl Replace_Char_(char* str, char target, char replacement) {
-        int16_t length = static_cast<int16_t>(strlen(str));
+        int16_t length = (int16_t)strlen(str);
 
         if (length <= 0) {
             return;
@@ -449,16 +449,15 @@ namespace MISC {
 
         Get_Bitmap_Dimensions_(bitmap, &width, &height);
 
-        uint8_t* old_colors = static_cast<uint8_t*>(old_colors_ptr);
-        uint8_t* new_colors = static_cast<uint8_t*>(new_colors_ptr);
+        uint8_t* old_colors = (uint8_t*)old_colors_ptr;
+        uint8_t* new_colors = (uint8_t*)new_colors_ptr;
 
-        // Pixel data starts 16 bytes after the start of the header.
-        uint8_t* pixel_data = reinterpret_cast<uint8_t*>(bitmap) + 16;
+        uint8_t* pixel_data = (uint8_t*)bitmap + sizeof(*bitmap) + sizeof(uint32_t);
 
         for (int16_t y = y_start; y < y_end; ++y) {
-            int y_offset = (int)y * (int)width;
+            int32_t y_offset = (int32_t)y * (int32_t)width;
             for (int16_t x = x_start; x < x_end; ++x) {
-                int pixel_idx = (int)x + y_offset;
+                int32_t pixel_idx = (int32_t)x + y_offset;
                 uint8_t current_color = pixel_data[pixel_idx];
 
                 if (num_colors > 0) {
@@ -486,13 +485,11 @@ namespace MISC {
             x2 = width;
         }
 
-        // Bitmap pixels start after the header (12 bytes) and the first frame offset (4 bytes)
-        uint8_t* pixels = reinterpret_cast<uint8_t*>(anim) + 16;
+        uint8_t* pixels = (uint8_t*)anim + sizeof(*anim) + sizeof(uint32_t);
 
         for (int16_t y = y1; y < y2; ++y) {
             for (int16_t x = x1; x < x2; ++x) {
-                // Calculation: x + width * y
-                uint8_t& pixel = pixels[x + static_cast<int32_t>(width) * y];
+                uint8_t& pixel = pixels[x + (int32_t)width * y];
                 if (pixel != 0) {
                     pixel += tint_value;
                 }
@@ -500,26 +497,18 @@ namespace MISC {
         }
     }
 
-    void __cdecl Get_Bitmap_String_Range_(int16_t segment_idx, int16_t divisor, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, char* str) {
-        int16_t string_width = fonts::Get_String_Width_(str);
+    void __cdecl Get_Bitmap_String_Range_(int16_t segment_idx, int16_t divisor, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, char* text) {
+        int16_t string_width = fonts::Get_String_Width_(text);
 
-        // This loop represents the REPNE SCASB instruction (0049e89a).
-        // It advances the pointer to the end of the string, but the result is not used.
-        char* scan_ptr = str;
-        while (*scan_ptr++) {}
-
-        // Calculate scaled width of a single segment
         int32_t scaled_width = (((int32_t)string_width * 10) / (int32_t)divisor + 9) / 10;
         int16_t font_height = fonts::Get_Font_Height_();
 
-        // Calculate starting X coordinate and clamp to string width
         int16_t start_x = segment_idx * (int16_t)scaled_width;
         *out_start_x = start_x;
         if (string_width < start_x) {
             *out_start_x = string_width;
         }
 
-        // Calculate ending X coordinate and clamp to string width
         int16_t end_x = *out_start_x + (int16_t)scaled_width;
         *out_end_x = end_x;
         if (string_width < end_x) {
@@ -538,7 +527,7 @@ namespace MISC {
             *out_start_x = 0;
             *out_end_x = 0;
 
-            int divisor = ((max_width * 10 / (int)string_width) + 9) / 10;
+            int32_t divisor = ((max_width * 10 / (int32_t)string_width) + 9) / 10;
             if ((tick % divisor == 0) || (is_full_range != 0)) {
                 int32_t start_x_calc = (tick * (int32_t)string_width * 10) / max_width;
                 int16_t start_x = (int16_t)(start_x_calc / 10);
@@ -566,7 +555,7 @@ namespace MISC {
                 current_tick = tick;
             }
 
-            int step = ((string_width * 10 / (int)max_width) + 9) / 10;
+            int32_t step = ((string_width * 10 / (int32_t)max_width) + 9) / 10;
 
             int16_t start_x = (int16_t)(current_tick * step);
             if (start_x > string_width) {
@@ -593,7 +582,7 @@ namespace MISC {
         int16_t rect_x2;
         int16_t rect_y2;
 
-        fonts::Set_Font_Style_(static_cast<uint16_t>(font_style), p_colors);
+        fonts::Set_Font_Style_((uint16_t)font_style, p_colors);
 
         MISC::Get_Advancing_Bitmap_String_Range_(*p_frame_index, total_frames,
                                                  &rect_x1, &rect_y1, &rect_x2, &rect_y2,
@@ -610,21 +599,17 @@ namespace MISC {
         *p_frame_index += 1;
     }
 
-    /**
-     * @address 0049df10
-     */
-    char* __cdecl Get_Comma_String_(int32_t val) {
+    char* __cdecl Get_Comma_String_(int32_t value) {
         char separator = ',';
-        if (MOX::_settings.language == 1 /* French/German separator variant */) {
+        if (MOX::_settings.language == 1) {
             separator = ' ';
         }
 
-        // Calculate absolute value with the same bit pattern behavior as the binary.
-        int32_t sign = val >> 31;
-        int32_t abs_val = (val ^ sign) - sign;
+        int32_t sign = value >> 31;
+        int32_t abs_val = (value ^ sign) - sign;
 
         char raw_buf[32];
-        sprintf(raw_buf, strings::s_ld_00558280, abs_val);
+        sprintf(raw_buf, "%ld", abs_val);
 
         int16_t len = (int16_t)strlen(raw_buf);
         int16_t num_separators = (len - 1) / 3;
@@ -641,12 +626,10 @@ namespace MISC {
             int16_t sep_count = num_separators;
             int16_t total_len = len + num_separators;
 
-            // Build the string with separators backwards
             for (int16_t dst_idx = total_len; dst_idx >= 0; --dst_idx) {
                 if (dst_idx == total_len) {
                     grouped_buf[dst_idx] = '\0';
                 } else {
-                    // Check if current position is a grouping boundary (every 4th char from end)
                     if ((group_counter % 4 == 0) && (group_counter > 1) && (sep_count > 0)) {
                         grouped_buf[dst_idx] = separator;
                         sep_count--;
@@ -658,14 +641,11 @@ namespace MISC {
                 group_counter++;
             }
 
-            // Binary uses hand-rolled MOVSD/MOVSB rep sequence to copy result
             strcpy(MOX::_temp_string, grouped_buf);
         }
 
-        // Apply negative sign and shift string if necessary
-        if (val < 0) {
+        if (value < 0) {
             size_t current_len = strlen(MOX::_temp_string);
-            // Shift string to the right by 1 to make room for '-'
             memmove(&MOX::_temp_string[1], MOX::_temp_string, current_len);
             MOX::_temp_string[0] = '-';
             MOX::_temp_string[current_len + 1] = '\0';
@@ -684,9 +664,6 @@ namespace MISC {
         RUSS::Mox_Sync_Update_();
     }
 
-    /**
-     * @address 0049f120
-     */
     void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t shadow_color, const char* text) {
         s_colors orig_colors;
         s_colors shadow_colors;
@@ -694,7 +671,7 @@ namespace MISC {
         fonts::Get_Colors_(&orig_colors);
 
         shadow_colors.colors[0] = orig_colors.colors[0];
-        memset(&shadow_colors.colors[1], shadow_color, 7);
+        memset(&shadow_colors.colors[1], shadow_color, sizeof(shadow_colors.colors) - 1);
 
         Set_Font_Colors_(&shadow_colors);
         fonts::Print_(x + 1, y + 1, text);
@@ -703,15 +680,9 @@ namespace MISC {
         fonts::Print_(x, y, text);
     }
 
-    /**
-     * @address 0049f0e0
-     */
     void __cdecl _Print_Centered_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text) {
         int16_t width = fonts::Get_String_Width_(text);
-
-        // Calculate horizontal center
         int16_t centered_x = x - (width / 2);
-
         MISC::_Print_Shadow_Down_(centered_x, y, color, text);
     }
 
@@ -723,15 +694,14 @@ namespace MISC {
         int16_t* out_hour,
         int16_t* out_minute,
         int16_t* out_second) {
-        // TYPE MISMATCH: decompilation used uint16_t*
         struct tm* time_info = dos::Time_Stamp_(input);
 
-        *out_year = static_cast<int16_t>(time_info->tm_year);
-        *out_month = static_cast<int16_t>(time_info->tm_mon);
-        *out_day = static_cast<int16_t>(time_info->tm_mday);
-        *out_hour = static_cast<int16_t>(time_info->tm_hour);
-        *out_minute = static_cast<int16_t>(time_info->tm_min);
-        *out_second = static_cast<int16_t>(time_info->tm_sec);
+        *out_year = (int16_t)time_info->tm_year;
+        *out_month = (int16_t)time_info->tm_mon;
+        *out_day = (int16_t)time_info->tm_mday;
+        *out_hour = (int16_t)time_info->tm_hour;
+        *out_minute = (int16_t)time_info->tm_min;
+        *out_second = (int16_t)time_info->tm_sec;
     }
 
     int32_t __cdecl Substring_(char* haystack, char* needle) {
@@ -745,7 +715,7 @@ namespace MISC {
     }
 
     void __cdecl Diagonal_Line_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t spacing, uint8_t color1, uint8_t color2) {
-        uint16_t window_status;
+        int16_t window_status;
         Save_Window_Status_(&window_status);
 
         if (spacing == 0) {

@@ -1,28 +1,5 @@
 #include "pch.h"
 
-namespace {
-    char s_roman_literal_I[] = "I";
-    char s_roman_literal_II[] = "II";
-    char s_roman_literal_III[] = "III";
-    char s_roman_literal_IV[] = "IV";
-    char s_roman_literal_V[] = "V";
-    char s_roman_literal_VI[] = "VI";
-    char s_roman_literal_VII[] = "VII";
-    char s_roman_literal_VIII[] = "VIII";
-    char s_roman_literal_IX[] = "IX";
-    char s_roman_literal_X[] = "X";
-    char s_roman_literal_XI[] = "XI";
-    char s_roman_literal_XII[] = "XII";
-    char s_roman_literal_XIII[] = "XIII";
-    char s_roman_literal_XIV[] = "XIV";
-    char s_roman_literal_XV[] = "XV";
-    char s_roman_literal_XVI[] = "XVI";
-    char s_roman_literal_XVII[] = "XVII";
-    char s_roman_literal_XVIII[] = "XVIII";
-    char s_roman_literal_XIX[] = "XIX";
-    char s_roman_literal_XX[] = "XX";
-}
-
 namespace MOX {
     const char _ship_type_names[5][6][16] = {
         {
@@ -172,8 +149,8 @@ namespace MOX {
     s_animation_header* _relocate_fleet_button_seg;
     s_animation_header* _officers_button_seg;
     uint8_t _add_officers_button;
-    short _fltscrn_support_button_status;
-    short _fltscrn_combat_button_status;
+    int16_t _fltscrn_support_button_status;
+    int16_t _fltscrn_combat_button_status;
     s_mp_screen* _mp_screen;
     int8_t _player_mode[15];
     int16_t _cur_ship;
@@ -278,7 +255,7 @@ namespace MOX {
     int16_t _cur_map_x;
     int16_t _cur_map_y;
     uint16_t _global_esc;
-    short _return_screen;
+    int16_t _return_screen;
     char* _save_game_dates;
     char* _save_game_stardates;
     char* _star_name_loaded_string;
@@ -290,7 +267,7 @@ namespace MOX {
     uint8_t _turns_between_debug_saves;
     void* _sound_buffer;
     int16_t _hot_seat_flag;
-    short _current_screen;
+    int16_t _current_screen;
     int16_t _design_screen_replacement_type;
     int16_t _design_screen_replacement_slot;
     int16_t _weapons_field[8];
@@ -353,7 +330,7 @@ namespace MOX {
     int16_t _skan_flag;
     uint8_t _draw_design_screen_to_back;
     uint8_t _refit_ship;
-    int _original_cost;
+    int32_t _original_cost;
     int16_t _design_name_field;
     int16_t _design_cancel_button;
     int16_t _design_clear_button;
@@ -446,28 +423,28 @@ namespace MOX {
     int16_t _planet_count;
     int8_t _climate_modifier_table[5] = {0, 0, 0, -10, -20};
     s_planet_data* _planet;
-    char* _roman_literals[21] = {
+    const char* _roman_literals[21] = {
         nullptr,
-        s_roman_literal_I,
-        s_roman_literal_II,
-        s_roman_literal_III,
-        s_roman_literal_IV,
-        s_roman_literal_V,
-        s_roman_literal_VI,
-        s_roman_literal_VII,
-        s_roman_literal_VIII,
-        s_roman_literal_IX,
-        s_roman_literal_X,
-        s_roman_literal_XI,
-        s_roman_literal_XII,
-        s_roman_literal_XIII,
-        s_roman_literal_XIV,
-        s_roman_literal_XV,
-        s_roman_literal_XVI,
-        s_roman_literal_XVII,
-        s_roman_literal_XVIII,
-        s_roman_literal_XIX,
-        s_roman_literal_XX,
+        "I",
+        "II",
+        "III",
+        "IV",
+        "V",
+        "VI",
+        "VII",
+        "VIII",
+        "IX",
+        "X",
+        "XI",
+        "XII",
+        "XIII",
+        "XIV",
+        "XV",
+        "XVI",
+        "XVII",
+        "XVIII",
+        "XIX",
+        "XX",
     };
     char* _planet_special_string[12];
     char* _planet_climate_string[10];
@@ -688,60 +665,60 @@ namespace MOX {
     char* _star_officer_level_names[6];
 
     s_skill_data _skill_data[54] = {
-        {0, 0x1, 0, 20, 1, 2, nullptr, const_cast<char*>(s__d___0055612c)},
-        {1, 0x2, 0, 30, 1, 4, nullptr, const_cast<char*>(s__d___0055612c)},
-        {2, 0x4, 0, 20, 1, 0, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {3, 0x8, 0, 30, 1, 0, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {4, 0x10, 0, 100, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_short_00558cfc)},
-        {5, 0x20, 0, 150, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_short_00558cfc)},
-        {6, 0x1, 1, 20, 1, 3, nullptr, const_cast<char*>(s__d___0055612c)},
-        {7, 0x2, 1, 30, 1, 6, nullptr, const_cast<char*>(s__d___0055612c)},
-        {8, 0x1, 2, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_minus_d_percent_00558cf4)},
-        {9, 0x2, 2, 150, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_minus_d_percent_00558cf4)},
-        {10, 0x40, 0, 600, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_minus_d_bc_00558cec)},
-        {11, 0x80, 0, 900, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_minus_d_bc_00558cec)},
-        {12, 0x4, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {13, 0x8, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {14, 0x4, 1, 50, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {15, 0x8, 1, 75, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {16, 0x10, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {17, 0x20, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {18, 0x10, 1, 50, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {19, 0x20, 1, 75, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {20, 0x40, 1, 50, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {21, 0x80, 1, 75, 1, 8, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {22, 0x40, 2, 10, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {23, 0x80, 2, 15, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {24, 0x100, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {25, 0x200, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {26, 0x400, 2, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {27, 0x800, 2, 150, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {28, 0x100, 0, 100, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_10bc_00558cdc)},
-        {29, 0x200, 0, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_15bc_00558cd4)},
-        {30, 0x100, 1, 10, 2, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {31, 0x200, 1, 15, 2, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {32, 0x400, 0, 20, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {33, 0x800, 0, 30, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {34, 0x400, 1, 50, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {35, 0x800, 1, 75, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {36, 0x1000, 0, 50, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {37, 0x2000, 0, 75, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {38, 0x1000, 2, 100, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {39, 0x2000, 2, 150, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {40, 0x1000, 1, 20, 1, 1, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {41, 0x2000, 1, 30, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {42, 0x4000, 2, 50, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {43, 0x8000, 2, 75, 1, 8, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {44, 0x4000, 0, 20, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {45, 0x8000, 0, 30, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {46, 0x10000, 2, 20, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {47, 0x20000, 2, 30, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {48, 0x10000, 0, 20, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {49, 0x20000, 0, 30, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {50, 0x40000, 0, 100, 1, 2, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {51, 0x80000, 0, 150, 1, 4, nullptr, const_cast<char*>(strings::s_fmt_plus_d_percent_00558ce4)},
-        {52, 0x4000, 1, 50, 1, 3, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
-        {53, 0x8000, 1, 75, 1, 6, nullptr, const_cast<char*>(strings::s_fmt_plus_d_00557ed0)},
+        {0, 0x1, 0, 20, 1, 2, nullptr, "%d%%"},
+        {1, 0x2, 0, 30, 1, 4, nullptr, "%d%%"},
+        {2, 0x4, 0, 20, 1, 0, nullptr, "+%d"},
+        {3, 0x8, 0, 30, 1, 0, nullptr, "+%d"},
+        {4, 0x10, 0, 100, 1, 1, nullptr, "+%d%"},
+        {5, 0x20, 0, 150, 1, 2, nullptr, "+%d%"},
+        {6, 0x1, 1, 20, 1, 3, nullptr, "%d%%"},
+        {7, 0x2, 1, 30, 1, 6, nullptr, "%d%%"},
+        {8, 0x1, 2, 100, 1, 2, nullptr, "-%d%%"},
+        {9, 0x2, 2, 150, 1, 4, nullptr, "-%d%%"},
+        {10, 0x40, 0, 600, 1, 2, nullptr, "-%dBC"},
+        {11, 0x80, 0, 900, 1, 4, nullptr, "-%dBC"},
+        {12, 0x4, 2, 100, 1, 3, nullptr, "+%d%%"},
+        {13, 0x8, 2, 150, 1, 6, nullptr, "+%d%%"},
+        {14, 0x4, 1, 50, 1, 3, nullptr, "+%d"},
+        {15, 0x8, 1, 75, 1, 6, nullptr, "+%d"},
+        {16, 0x10, 2, 100, 1, 3, nullptr, "+%d%%"},
+        {17, 0x20, 2, 150, 1, 6, nullptr, "+%d%%"},
+        {18, 0x10, 1, 50, 1, 2, nullptr, "+%d"},
+        {19, 0x20, 1, 75, 1, 4, nullptr, "+%d"},
+        {20, 0x40, 1, 50, 1, 4, nullptr, "+%d"},
+        {21, 0x80, 1, 75, 1, 8, nullptr, "+%d"},
+        {22, 0x40, 2, 10, 1, 1, nullptr, "+%d"},
+        {23, 0x80, 2, 15, 1, 2, nullptr, "+%d"},
+        {24, 0x100, 2, 100, 1, 3, nullptr, "+%d%%"},
+        {25, 0x200, 2, 150, 1, 6, nullptr, "+%d%%"},
+        {26, 0x400, 2, 100, 1, 2, nullptr, "+%d%%"},
+        {27, 0x800, 2, 150, 1, 4, nullptr, "+%d%%"},
+        {28, 0x100, 0, 100, 1, 1, nullptr, "+10BC"},
+        {29, 0x200, 0, 100, 1, 2, nullptr, "+15BC"},
+        {30, 0x100, 1, 10, 2, 1, nullptr, "+%d"},
+        {31, 0x200, 1, 15, 2, 2, nullptr, "+%d"},
+        {32, 0x400, 0, 20, 1, 2, nullptr, "+%d"},
+        {33, 0x800, 0, 30, 1, 4, nullptr, "+%d"},
+        {34, 0x400, 1, 50, 1, 3, nullptr, "+%d"},
+        {35, 0x800, 1, 75, 1, 6, nullptr, "+%d"},
+        {36, 0x1000, 0, 50, 1, 2, nullptr, "+%d"},
+        {37, 0x2000, 0, 75, 1, 4, nullptr, "+%d"},
+        {38, 0x1000, 2, 100, 1, 3, nullptr, "+%d%%"},
+        {39, 0x2000, 2, 150, 1, 6, nullptr, "+%d%%"},
+        {40, 0x1000, 1, 20, 1, 1, nullptr, "+%d"},
+        {41, 0x2000, 1, 30, 1, 2, nullptr, "+%d"},
+        {42, 0x4000, 2, 50, 1, 4, nullptr, "+%d%%"},
+        {43, 0x8000, 2, 75, 1, 8, nullptr, "+%d%%"},
+        {44, 0x4000, 0, 20, 1, 3, nullptr, "+%d%%"},
+        {45, 0x8000, 0, 30, 1, 6, nullptr, "+%d%%"},
+        {46, 0x10000, 2, 20, 1, 2, nullptr, "+%d"},
+        {47, 0x20000, 2, 30, 1, 4, nullptr, "+%d"},
+        {48, 0x10000, 0, 20, 1, 2, nullptr, "+%d%%"},
+        {49, 0x20000, 0, 30, 1, 4, nullptr, "+%d%%"},
+        {50, 0x40000, 0, 100, 1, 2, nullptr, "+%d%%"},
+        {51, 0x80000, 0, 150, 1, 4, nullptr, "+%d%%"},
+        {52, 0x4000, 1, 50, 1, 3, nullptr, "+%d"},
+        {53, 0x8000, 1, 75, 1, 6, nullptr, "+%d"},
     };
 
     s_colony* _colony;
@@ -966,15 +943,15 @@ namespace MOX {
 
     s_fleet_movement_icon _fleet_movement_icon[500];
 
-    void __cdecl Apply_Save_Settings(s_settings* s) {
-        MOX::_settings.xenons_exist = s->xenons_exist;
-        MOX::_settings.game_difficulty = s->game_difficulty;
-        MOX::_settings.number_of_players = s->number_of_players;
-        MOX::_settings.galaxy_size = s->galaxy_size;
-        MOX::_settings.galaxy_age = s->galaxy_age;
-        MOX::_settings.strategic_combat_flag = s->strategic_combat_flag;
-        MOX::_settings.starting_civilization_level = s->starting_civilization_level;
-        MOX::_settings.start_of_game_seed = s->start_of_game_seed;
-        MOX::_settings.random_events = s->random_events;
+    void __cdecl Apply_Save_Settings(s_settings* settings) {
+        MOX::_settings.xenons_exist = settings->xenons_exist;
+        MOX::_settings.game_difficulty = settings->game_difficulty;
+        MOX::_settings.number_of_players = settings->number_of_players;
+        MOX::_settings.galaxy_size = settings->galaxy_size;
+        MOX::_settings.galaxy_age = settings->galaxy_age;
+        MOX::_settings.strategic_combat_flag = settings->strategic_combat_flag;
+        MOX::_settings.starting_civilization_level = settings->starting_civilization_level;
+        MOX::_settings.start_of_game_seed = settings->start_of_game_seed;
+        MOX::_settings.random_events = settings->random_events;
     }
 }

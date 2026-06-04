@@ -37,9 +37,9 @@ namespace mouse {
         return _mouse_overide_right_button + _mouse_overide_left_button;
     }
 
-    void __cdecl Set_Mouse_List_(s_mouse_list* list, int16_t count) {
-        _current_mouse_list_count = count;
-        _current_mouse_list = list;
+    void __cdecl Set_Mouse_List_(s_mouse_list* mouse_list, int16_t list_count) {
+        _current_mouse_list_count = list_count;
+        _current_mouse_list = mouse_list;
 
         Check_Mouse_Shape_();
 
@@ -56,13 +56,13 @@ namespace mouse {
     }
 
     void __cdecl Check_Mouse_Buffer_() {
-        uint16_t pressed_buttons = static_cast<uint16_t>(_mouse_buttons & 0x0003);
+        uint16_t pressed_buttons = (uint16_t)(_mouse_buttons & 0x0003);
 
         if (pressed_buttons != 0) {
             _mouse_buffer_button = (int16_t)pressed_buttons;
 
             if (_mouse_overide_flag == 1) {
-                _mouse_buffer_button = static_cast<int16_t>(_mouse_overide_right_button + _mouse_overide_left_button);
+                _mouse_buffer_button = (int16_t)(_mouse_overide_right_button + _mouse_overide_left_button);
             }
 
             _mouse_buffer_flag = 1;
@@ -106,21 +106,16 @@ namespace mouse {
     }
 
     /**
-     * @brief Retrieves the frame offset for the current mouse cursor from the active mouse list.
-     * @return The frame index of the current mouse pointer.
+     * Returns the frame offset from the active mouse-list entry.
+     * Caller must ensure a valid mouse-list entry is currently selected.
      */
     int __cdecl Get_Pointer_Offset_() {
-        // The instruction sequence:
-        // MOVSX EAX, word ptr [video::_current_mouse_list_ptr]
-        // MOV ECX, [mouse::_current_mouse_list]
-        // MOVSX EAX, word ptr [ECX + EAX*12 + 2]
-        // maps to indexing into the array of s_mouse_list (size 0xC) and returning the 'frame' field (offset 0x2).
         return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].frame;
     }
 
     /**
-     * @brief Retrieves the icon index for the currently active mouse pointer from the current mouse list.
-     * @return The icon index of the current mouse pointer.
+     * Returns the icon index from the active mouse-list entry.
+     * Caller must ensure a valid mouse-list entry is currently selected.
      */
     int __cdecl Get_Pointer_Image_Number_() {
         return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
@@ -184,7 +179,7 @@ namespace mouse {
             mouse::_mouse_buttons = (int16_t)mouse_buttons;
         } else {
             mouse::_mouse_buttons =
-                static_cast<int16_t>(mouse::_mouse_overide_right_button + mouse::_mouse_overide_left_button);
+                (int16_t)(mouse::_mouse_overide_right_button + mouse::_mouse_overide_left_button);
         }
 
         mouse::Check_Mouse_Buffer_();

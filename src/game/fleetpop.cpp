@@ -840,7 +840,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     const int16_t left_x = static_cast<int16_t>(x + x_offset);
     const int16_t right_x = static_cast<int16_t>(left_x + MOX::_fleet_box.width);
     const int16_t start_y = static_cast<int16_t>(y + y_offset);
-    uint32_t saved_window_status = 0;
+    int16_t saved_window_status = 0;
 
     *current_y = start_y;
 
@@ -1226,7 +1226,7 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
         int16_t y_offset,
         uint32_t unused_fleet_count,
         int16_t* current_y) {
-    uint16_t window_status;
+    int16_t window_status;
     int16_t fleet_box_inner_height;
     s_animation_header* segment;
     int16_t frame_left;

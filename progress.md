@@ -3,13 +3,6 @@
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
 
-- [pending] src/game/misc.{h,cpp}
-- [pending] src/game/motrans.{h,cpp}
-- [pending] src/game/mouse.{h,cpp}
-- [pending] src/game/movebox.{h,cpp}
-- [pending] src/game/mox.{h,cpp}
-- [pending] src/game/mox2.{h,cpp}
-- [pending] src/game/msg.{h,cpp}
 - [pending] src/game/multplay.{h,cpp}
 - [pending] src/game/namestar.{h,cpp}
 - [pending] src/game/net.{h,cpp}

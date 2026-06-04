@@ -9,36 +9,8 @@ namespace MOX2 {
     uint8_t _quick_start;
     char _leave_game_message[100];
 
-    const char s_MOX_SET[8] = "MOX.SET";
     const char s_language_ini[13] = "language.ini";
     const char s_language_ini_write_mode[3] = "wt";
-    const char s_rt[3] = "rt";
-    const char s_Thanks_English[38] = "Thanks for playing Master of Orion ][";
-    const char s_Thanks_German[49] = "Danke, da\xDF Sie Master of Orion II gew\xE4hlt haben.";
-    const char s_Thanks_French[36] = "Merci de jouer \xE0 Master of Orion II";
-    const char s_Thanks_Spanish[41] = "Gracias por jugar con Master of Orion II";
-    const char s_Thanks_Italian[47] = "Grazie per aver giocato a Master of Orion II !";
-
-    const char s_Loading_English[44] = "Loading Master of Orion II, please wait....";
-    const char s_Loading_German[50] = "Master of Orion II wird geladen, bitte warten....";
-    const char s_Loading_French[66] = "Chargement de Master of Orion II en cours, veuillez patienter....";
-    const char s_Loading_Spanish[50] = "Cargando Master of Orion II, espera, por favor...";
-    const char s_Loading_Italian[55] = "Caricamento di Master of Orion II. Attendere, prego...";
-
-    const char s_Non_trovo_il_file_ORIONCD_INI_005578ec[62] = "Non trovo il file ORIONCD.INI. Bisogna reinstallare Orion II.";
-    const char s_ORIONCD_INI_no_se_ha_encontrado_0055792c[61] = "ORIONCD.INI no se ha encontrado. Vuelve a instalar Orion ][.";
-    const char s_ORIONCD_INI_introuvable_0055796c[56] = "ORIONCD.INI introuvable. Veuillez r\x82installer Orion II.";
-    const char s_ORIONCD_INI_nicht_gefunden_005579a4[61] = "ORIONCD.INI nicht gefunden. Bitte Orion II neu installieren.";
-    const char s_ORIONCD_INI_not_found_005579e4[51] = "ORIONCD.INI not found. Please Re-Install Orion ][.";
-    const char s_Non_riesco_a_trovare_qualche_fil_00557a18[85] = "Non riesco a trovare qualche file. Bisogna reinserire il CD o reinstallare il gioco.";
-    const char s_No_se_puede_localizar_todos_los_f_00557a70[99] = "No se puede localizar todos los ficheros del juego.  Por favor mete el CD-ROM o vuelve a instalar.";
-    const char s_Echec_de_la_localisation_de_tous_00557ad4[93] = "Echec de la localisation de tous les fichiers de jeu. Veuillez ins\x82rer le CD ou r\x82installer.";
-    const char s_Nicht_alle_Spieldateien_auffindb_00557b34[77] = "Nicht alle Spieldateien auffindbar. Bitte CD einlegen oder neu installieren.";
-    const char s_Cannot_locate_all_game_files_00557b84[63] = "Cannot locate all game files.  Please insert CD or re-install.";
-    const char s_diplomat_lbx_00557bc4[13] = "diplomat.lbx";
-    const char s__sdiplomat_lbx_00557bd4[15] = "%sdiplomat.lbx";
-    const char s_backslash_00557be4[2] = "\\";
-    const char s_orioncd_ini_00557bec[12] = "orioncd.ini";
 
     void __cdecl Init_Map_Pictures_Default__() {
         MAPGEN::Load_Nebula_Pictures_();
@@ -58,9 +30,9 @@ namespace MOX2 {
     void __cdecl Screen_Control_() {
         while (true) {
             MOX::_global_esc = 0;
-            short current = MOX::_current_screen;
+            int16_t current_screen = MOX::_current_screen;
 
-            switch (current) {
+            switch (current_screen) {
                 case SCREEN_MAIN:
                     MAINSCR::Main_Screen_();
                     MOX::_previous_screen = SCREEN_MAIN;
@@ -146,13 +118,13 @@ namespace MOX2 {
                     break;
                 case SCREEN_START_NET:
                     if (NETSTART::Start_Net_Screen_()) {
-                        MOX::_current_screen = SCREEN_REPORTS; // 0x27
+                        MOX::_current_screen = SCREEN_REPORTS;
                     }
                     MOX::_previous_screen = SCREEN_START_NET;
                     break;
                 case SCREEN_JOIN_NET:
                     if (NETSTART::Join_Net_Screen_()) {
-                        MOX::_current_screen = SCREEN_REPORTS; // 0x27
+                        MOX::_current_screen = SCREEN_REPORTS;
                     }
                     MOX::_previous_screen = SCREEN_JOIN_NET;
                     break;
@@ -210,9 +182,9 @@ namespace MOX2 {
                     break;
                 case SCREEN_LOAD_NET:
                     if (NETSTART::Load_Net_Screen_()) {
-                        MOX::_current_screen = SCREEN_REPORTS; // 0x27
+                        MOX::_current_screen = SCREEN_REPORTS;
                     }
-                    MOX::_previous_screen = SCREEN_JOIN_NET; // Note: Original code set it to 0x16
+                    MOX::_previous_screen = SCREEN_JOIN_NET;
                     break;
                 case SCREEN_SHOW_COMMAND_POINTS:
                     MAINSCR2::Show_Command_Points_Screen_();
@@ -242,8 +214,8 @@ namespace MOX2 {
         char dir_buffer[80];
         char line_buffer[80];
 
-        if (dos::DIR_(s_language_ini, dir_buffer) != 0) {
-            FILE* file = fopen(s_language_ini, s_rt);
+        if (dos::DIR_("language.ini", dir_buffer) != 0) {
+            FILE* file = fopen("language.ini", "rt");
             fgets(line_buffer, 0x3C, file);
             fclose(file);
             atoi(line_buffer + 4);
@@ -273,7 +245,7 @@ namespace MOX2 {
 
         MOX::_sound_buffer = allocate::Allocate_Space_(0x64000);
 
-        if (dos::DIR_(MOX2::s_MOX_SET, mox_set_dir) != 0) {
+        if (dos::DIR_("MOX.SET", mox_set_dir) != 0) {
             FILEDEF::Load_Game_Settings_();
             if (MOX::_settings.version != 0x82) {
                 FILEDEF::Update_Game_Settings_Version_Number_();
@@ -323,16 +295,31 @@ namespace MOX2 {
 
         // Prepare loading message
         const char* loading_src = nullptr;
-        int copy_len = 0;
+        size_t loading_size = 0;
         switch (MOX::_settings.language) {
-        case 1: loading_src = MOX2::s_Loading_German; copy_len = 48 + 2; break; // 0xc * 4 + 2
-        case 2: loading_src = MOX2::s_Loading_French; copy_len = 64 + 2; break; // 0x10 * 4 + 2
-        case 3: loading_src = MOX2::s_Loading_Spanish; copy_len = 48 + 2; break; // 0xc * 4 + 2
-        case 4: loading_src = MOX2::s_Loading_Italian; copy_len = 52 + 3; break; // 0xd * 4 + 3
-        default: loading_src = MOX2::s_Loading_English; copy_len = 44; break;   // 0xb * 4
+        case 1:
+            loading_src = "Master of Orion II wird geladen, bitte warten....";
+            loading_size = sizeof("Master of Orion II wird geladen, bitte warten....");
+            break;
+        case 2:
+            loading_src = "Chargement de Master of Orion II en cours, veuillez patienter....";
+            loading_size = sizeof("Chargement de Master of Orion II en cours, veuillez patienter....");
+            break;
+        case 3:
+            loading_src = "Cargando Master of Orion II, espera, por favor...";
+            loading_size = sizeof("Cargando Master of Orion II, espera, por favor...");
+            break;
+        case 4:
+            loading_src = "Caricamento di Master of Orion II. Attendere, prego...";
+            loading_size = sizeof("Caricamento di Master of Orion II. Attendere, prego...");
+            break;
+        default:
+            loading_src = "Loading Master of Orion II, please wait....";
+            loading_size = sizeof("Loading Master of Orion II, please wait....");
+            break;
         }
 
-        memcpy(loading_buffer, loading_src, copy_len);
+        memcpy(loading_buffer, loading_src, loading_size);
 
         fonts::Print_(5, 10, loading_buffer);
         RUSS::Mox_Sync_Update_();
@@ -352,7 +339,7 @@ namespace MOX2 {
                     MOX::_settings.strategic_combat_flag,
                     MOX::_settings.starting_civilization_level
                 );
-                MOX::_current_screen = SCREEN_REPORTS; // 0x27
+                MOX::_current_screen = SCREEN_REPORTS;
             }
             else {
                 MOX::_current_screen = SCREEN_MAIN_MENU;
@@ -369,36 +356,51 @@ namespace MOX2 {
 
         // Copy leave message
         const char* thanks_src = nullptr;
-        int thanks_len = 0;
+        size_t thanks_size = 0;
         switch (MOX::_settings.language) {
-        case 1: thanks_src = MOX2::s_Thanks_German; thanks_len = 49; break; // 0xc * 4 + 1
-        case 2: thanks_src = MOX2::s_Thanks_French; thanks_len = 36; break; // 0x9 * 4
-        case 3: thanks_src = MOX2::s_Thanks_Spanish; thanks_len = 41; break; // 0xa * 4 + 1
-        case 4: thanks_src = MOX2::s_Thanks_Italian; thanks_len = 44 + 3; break; // 0xb * 4 + 3
-        default: thanks_src = MOX2::s_Thanks_English; thanks_len = 36 + 2; break; // 0x9 * 4 + 2
+        case 1:
+            thanks_src = "Danke, da\xDF Sie Master of Orion II gew\xE4hlt haben.";
+            thanks_size = sizeof("Danke, da\xDF Sie Master of Orion II gew\xE4hlt haben.");
+            break;
+        case 2:
+            thanks_src = "Merci de jouer \xE0 Master of Orion II";
+            thanks_size = sizeof("Merci de jouer \xE0 Master of Orion II");
+            break;
+        case 3:
+            thanks_src = "Gracias por jugar con Master of Orion II";
+            thanks_size = sizeof("Gracias por jugar con Master of Orion II");
+            break;
+        case 4:
+            thanks_src = "Grazie per aver giocato a Master of Orion II !";
+            thanks_size = sizeof("Grazie per aver giocato a Master of Orion II !");
+            break;
+        default:
+            thanks_src = "Thanks for playing Master of Orion ][";
+            thanks_size = sizeof("Thanks for playing Master of Orion ][");
+            break;
         }
 
-        memcpy(MOX2::_leave_game_message, thanks_src, thanks_len);
+        memcpy(MOX2::_leave_game_message, thanks_src, thanks_size);
 
         exitm::Exit_With_Message(MOX2::_leave_game_message);
     }
 
-    void __cdecl thunk_main2_(void*) {
+    void __cdecl thunk_main2_(void* unused) {
         main2_();
     }
 
-    void __cdecl Get_Auto_Function_(MOX2::action_func_t* param_1) {
-        *param_1 = fields::_function;
+    void __cdecl Get_Auto_Function_(MOX2::action_func_t* function_slot) {
+        *function_slot = fields::_function;
     }
 
-    void __cdecl Put_Auto_Function_(MOX2::action_func_t* param_1) {
-        fields::_function = *param_1;
+    void __cdecl Put_Auto_Function_(MOX2::action_func_t* function_slot) {
+        fields::_function = *function_slot;
     }
 
-    void __cdecl Execute_Auto_Function_(MOX2::action_func_t* fn)
+    void __cdecl Execute_Auto_Function_(MOX2::action_func_t* function_entry)
     {
-        if (*fn != nullptr) {
-            (*fn)();
+        if (*function_entry != nullptr) {
+            (*function_entry)();
         }
     }
 
@@ -410,21 +412,21 @@ namespace MOX2 {
         int16_t path_length;
         const char* error_text = nullptr;
 
-        if (!dos::DIR_(s_orioncd_ini_00557bec, alternate_path)) {
+        if (!dos::DIR_("orioncd.ini", alternate_path)) {
             if (MOX::_settings.language == 0) {
-                error_text = s_ORIONCD_INI_not_found_005579e4;
+                error_text = "ORIONCD.INI not found. Please Re-Install Orion ][.";
             }
             else if (MOX::_settings.language == 1) {
-                error_text = s_ORIONCD_INI_nicht_gefunden_005579a4;
+                error_text = "ORIONCD.INI nicht gefunden. Bitte Orion II neu installieren.";
             }
             else if (MOX::_settings.language == 2) {
-                error_text = s_ORIONCD_INI_introuvable_0055796c;
+                error_text = "ORIONCD.INI introuvable. Veuillez r\x82installer Orion II.";
             }
             else if (MOX::_settings.language == 3) {
-                error_text = s_ORIONCD_INI_no_se_ha_encontrado_0055792c;
+                error_text = "ORIONCD.INI no se ha encontrado. Vuelve a instalar Orion ][.";
             }
             else if (MOX::_settings.language == 4) {
-                error_text = s_Non_trovo_il_file_ORIONCD_INI_005578ec;
+                error_text = "Non trovo il file ORIONCD.INI. Bisogna reinstallare Orion II.";
             }
 
             if (error_text != nullptr) {
@@ -435,12 +437,12 @@ namespace MOX2 {
             return;
         }
 
-        config_file = fopen(s_orioncd_ini_00557bec, s_rt);
+        config_file = fopen("orioncd.ini", "rt");
         fgets(alternate_path, 0x3c, config_file);
         fclose(config_file);
 
         alternate_path[60] = '\0';
-        path_length = static_cast<int16_t>(strlen(alternate_path));
+        path_length = (int16_t)strlen(alternate_path);
 
         if (alternate_path[path_length - 1] == '\r') {
             --path_length;
@@ -455,12 +457,12 @@ namespace MOX2 {
         farload::Set_Alternate_Path_(alternate_path);
 
         if (alternate_path[path_length - 1] != '\\') {
-            strcat(alternate_path, s_backslash_00557be4);
+            strcat(alternate_path, "\\");
         }
 
-        sprintf(diplomat_path, s__sdiplomat_lbx_00557bd4, alternate_path);
+        sprintf(diplomat_path, "%sdiplomat.lbx", alternate_path);
 
-        if (dos::DIR_(s_diplomat_lbx_00557bc4, alternate_path)) {
+        if (dos::DIR_("diplomat.lbx", alternate_path)) {
             return;
         }
 
@@ -471,19 +473,19 @@ namespace MOX2 {
         error_text = nullptr;
 
         if (MOX::_settings.language == 0) {
-            error_text = s_Cannot_locate_all_game_files_00557b84;
+            error_text = "Cannot locate all game files.  Please insert CD or re-install.";
         }
         else if (MOX::_settings.language == 1) {
-            error_text = s_Nicht_alle_Spieldateien_auffindb_00557b34;
+            error_text = "Nicht alle Spieldateien auffindbar. Bitte CD einlegen oder neu installieren.";
         }
         else if (MOX::_settings.language == 2) {
-            error_text = s_Echec_de_la_localisation_de_tous_00557ad4;
+            error_text = "Echec de la localisation de tous les fichiers de jeu. Veuillez ins\x82rer le CD ou r\x82installer.";
         }
         else if (MOX::_settings.language == 3) {
-            error_text = s_No_se_puede_localizar_todos_los_f_00557a70;
+            error_text = "No se puede localizar todos los ficheros del juego.  Por favor mete el CD-ROM o vuelve a instalar.";
         }
         else if (MOX::_settings.language == 4) {
-            error_text = s_Non_riesco_a_trovare_qualche_fil_00557a18;
+            error_text = "Non riesco a trovare qualche file. Bisogna reinserire il CD o reinstallare il gioco.";
         }
 
         if (error_text != nullptr) {
