@@ -60,7 +60,7 @@ namespace NETSTART {
 
         MULTPLAY::Reload_Getting_Data_Info_();
 
-        strcpy(MOX::_temp_string, NETTURN::_waiting_fmt);
+        strcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt);
         video::Set_Page_Off_();
         MULTPLAY::Draw_SendGet_Net_Info_Screen_();
         fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
@@ -122,7 +122,7 @@ namespace NETSTART {
         fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
         MULTPLAY::Reload_Getting_Data_Info_();
 
-        strcpy(MOX::_temp_string, NETTURN::_waiting_fmt);
+        strcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt);
 
         while (NETMOX::_net.total_chunk_count == 0) {
             fields::Get_Input_();

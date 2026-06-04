@@ -17,13 +17,13 @@ namespace net {
             (LPDWORD)&buffer_length);
 
         if (receive_result != 0) {
-            if (receive_result != static_cast<HRESULT>(0x887700BEu)) {
+            if (receive_result != (HRESULT)0x887700BEu) {
                 WINNET::Exit_With_DPlay_Error_(receive_result);
             }
             return 0;
         }
 
-        OutputDebugStringA(s_Receiving_Message_005609F0);
+        OutputDebugStringA("Receiving Message....\n");
 
         receive_result = netcode::_dplay->Receive(
             (LPDPID)&id_from,

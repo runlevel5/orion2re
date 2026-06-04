@@ -2,11 +2,9 @@
 
 namespace NETTURN {
 
-    const char s_craziness_00557680[10] = "craziness";
+    char* _waiting_message_fmt;
 
-    char* _waiting_fmt;
-
-    char* _have_d_of_d_chunks_fmt;
+    char* _chunk_progress_fmt;
 
     void __cdecl Net_Next_Turn_() {
         s_net_chat chat_buffer;
@@ -17,7 +15,7 @@ namespace NETTURN {
             NETSTART::Mox_Net_Uninit_();
             MOX::_current_screen = 10;
             MOX::_return_screen = 10;
-            *reinterpret_cast<int8_t*>(&MOX::_previous_screen) = 10;
+            MOX::_previous_screen = 10;
             return;
         }
 
@@ -37,20 +35,20 @@ namespace NETTURN {
             NETMOX::_net.host_election_player_rank[MOX::_PLAYER_NUM] = (int8_t)MOX::_PLAYER_NUM;
         }
 
-        election_msg.flag = 1;
+        election_msg.hit_next_turn = 1;
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives == 100 /* 'd' */) {
                 if (MOX::_PLAYER_NUM != i) {
                     election_msg.rank = (int32_t)NETMOX::_net.host_election_player_rank[MOX::_PLAYER_NUM];
-                    NETMOX::Mox_Send_Message_(MOX::_player[i].network_player_id, 4, &election_msg, 5);
+                    NETMOX::Mox_Send_Message_(MOX::_player[i].network_player_id, 4, &election_msg, sizeof(election_msg));
                 }
             }
             MULTPLAY::Chat_Box_Input_Loop_();
         }
 
         while (true) {
-            int host_rank = -1;
+            int elected_host_player_idx = -1;
             bool consensus = true;
 
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -60,17 +58,17 @@ namespace NETTURN {
                         consensus = false;
                         break;
                     }
-                    if (host_rank == -1) {
-                        host_rank = rank;
-                    } else if (rank != host_rank) {
+                    if (elected_host_player_idx == -1) {
+                        elected_host_player_idx = rank;
+                    } else if (rank != elected_host_player_idx) {
                         consensus = false;
                         break;
                     }
                 }
             }
 
-            if (consensus && host_rank != -1) {
-                NETMOX::_net.local_net_id = MOX::_player[host_rank].network_player_id;
+            if (consensus && elected_host_player_idx != -1) {
+                NETMOX::_net.local_net_id = MOX::_player[elected_host_player_idx].network_player_id;
             }
 
             MULTPLAY::Chat_Box_Input_Loop_();
@@ -88,7 +86,7 @@ namespace NETTURN {
 
                 if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
                     ERICNET::Mox_Play_Sound_(0x33);
-                    *reinterpret_cast<int8_t*>(&MOX::_previous_screen) = 0x25;
+                    MOX::_previous_screen = 0x25;
                     MOX::_current_screen = 0x27;
                     return;
                 }
@@ -100,21 +98,21 @@ namespace NETTURN {
 
                 NETSTART::Mox_Net_Uninit_();
                 MOX::_game_type = 0;
-                *reinterpret_cast<int8_t*>(&MOX::_previous_screen) = 0x25;
+                MOX::_previous_screen = 0x25;
                 MOX::_current_screen = 10;
                 return;
             }
         }
     }
 
-    char* __cdecl Load_Netturn_Strings_(char* input_strings) {
-        _waiting_fmt = input_strings;
+    char* __cdecl Load_Netturn_Strings_(char* string_block) {
+        _waiting_message_fmt = string_block;
 
-        char* next_ptr = _waiting_fmt + strlen(_waiting_fmt) + 1;
+        char* next_ptr = _waiting_message_fmt + strlen(_waiting_message_fmt) + 1;
 
-        _have_d_of_d_chunks_fmt = next_ptr;
+        _chunk_progress_fmt = next_ptr;
 
-        return _have_d_of_d_chunks_fmt + strlen(_have_d_of_d_chunks_fmt) + 1;
+        return _chunk_progress_fmt + strlen(_chunk_progress_fmt) + 1;
     }
 
     void __cdecl Host_Next_Turn_() {
@@ -140,7 +138,7 @@ namespace NETTURN {
 
                 if (NETMOX::_net.players_hit_next_turn[i] != 0 && NETMOX::_net.player_is_active_flags[i] != 0) {
                     NETMOX::_net.player_is_active_flags[i] = 0;
-                    NETMOX::_net.host_active_player_id = static_cast<int8_t>(i);
+                    NETMOX::_net.host_active_player_id = (int8_t)i;
                 }
 
                 if (NETMOX::_net.host_active_player_id != -1) {
@@ -239,21 +237,41 @@ namespace NETTURN {
     }
 
     void __cdecl Net_Init_Host_Election_() {
-        memset(NETMOX::_net.host_election_player_rank, -1, 8);
+        memset(
+            NETMOX::_net.host_election_player_rank,
+            -1,
+            sizeof(NETMOX::_net.host_election_player_rank)
+        );
         NETMOX::_net.field134_0x1b6 = -1;
         NETMOX::_net.field135_0x1ba = -1;
-        memset(NETMOX::_net.players_hit_next_turn, 0, 8);
+        memset(
+            NETMOX::_net.players_hit_next_turn,
+            0,
+            sizeof(NETMOX::_net.players_hit_next_turn)
+        );
 
         NETMOX::_net.local_net_id = -1;
         NETMOX::_net.host_active_player_id = -1;
         NETMOX::_net.field23_0xc6 = 0;
         NETMOX::_net.diplomacy_initiator_id = -1;
 
-        memset(&NETMOX::_net.players_ready_mask[1], 0, 7);
+        memset(
+            &NETMOX::_net.players_ready_mask[1],
+            0,
+            sizeof(NETMOX::_net.players_ready_mask) - sizeof(NETMOX::_net.players_ready_mask[0])
+        );
         NETMOX::_net.field132_0x1ad = 0;
 
-        memset(NETMOX::_net.player_is_active_flags, 0, 8);
-        memset(NETMOX::_net.player_race_selected_flags, 0, 8);
+        memset(
+            NETMOX::_net.player_is_active_flags,
+            0,
+            sizeof(NETMOX::_net.player_is_active_flags)
+        );
+        memset(
+            NETMOX::_net.player_race_selected_flags,
+            0,
+            sizeof(NETMOX::_net.player_race_selected_flags)
+        );
     }
 
     void __cdecl Client_Next_Turn_() {
@@ -279,7 +297,7 @@ namespace NETTURN {
         COMBFIND::_current_star_has_player = nullptr;
         COMBFIND::_current_star_has_nonplayer = nullptr;
 
-        strcpy(MOX::_temp_string, NETTURN::_waiting_fmt);
+        strcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt);
 
         while (NETMOX::_net.total_chunk_count == 0 && MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             MULTPLAY::Chat_Box_Input_Loop_();
@@ -287,12 +305,12 @@ namespace NETTURN {
 
         if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                sprintf(MOX::_temp_string, NETTURN::_have_d_of_d_chunks_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
+                sprintf(MOX::_temp_string, NETTURN::_chunk_progress_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
                 MULTPLAY::Chat_Box_Input_Loop_();
             }
 
             while (!NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 0)) {
-                exitm::Exit_With_Message(s_craziness_00557680);
+                exitm::Exit_With_Message("craziness");
             }
 
             NETMOX::_net.field_1db = 0;

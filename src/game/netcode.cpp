@@ -1,9 +1,6 @@
 #include "pch.h"
 
 namespace netcode {
-    const char s_Lost_Player_Connection_0055bf3c[26] = "Lost Player Connection...";
-    const char s_REENTERING_Net_Send_Message_0055bf58[34] = "REENTERING (Net_Send_Message)!!!!";
-
     uint32_t _netInitialized;
     int8_t _tpSending;
     uint8_t _inComms;
@@ -169,7 +166,7 @@ namespace netcode {
 
         if (_connection_type == 1 || _connection_type == 2) {
             if (users != nullptr) {
-                users[0] = static_cast<uint8_t>(net::_thisHost);
+                users[0] = (uint8_t)net::_thisHost;
                 users[1] = simmodem::_connected_to_id;
             }
             return 2;
@@ -225,7 +222,7 @@ namespace netcode {
         if (_in_send_message == 0) {
             _in_send_message = 1;
         } else {
-            ::OutputDebugStringA(s_REENTERING_Net_Send_Message_0055bf58);
+            ::OutputDebugStringA("REENTERING (Net_Send_Message)!!!!");
         }
 
         if (_connection_type == 3) {
@@ -242,7 +239,7 @@ namespace netcode {
             clock_t start_time = clock();
             while (transprt::_tpSending != 0) {
                 if ((uint32_t)(clock() - start_time) >= 120000) {
-                    exitm::Exit_With_Message(s_Lost_Player_Connection_0055bf3c);
+                    exitm::Exit_With_Message("Lost Player Connection...");
                 }
                 Net_Update_();
             }
@@ -283,37 +280,37 @@ namespace netcode {
     }
 
     int32_t __cdecl Net_Create_Game_(GUID guid, char* name, int32_t max_players, char* password, char* player_name) {
-        DPSESSIONDESC local_7c;
-        DPID dpid;
+        DPSESSIONDESC session_desc;
+        DPID player_id;
 
-        memset(&local_7c, 0, sizeof(DPSESSIONDESC));
-        local_7c.dwSize = sizeof(DPSESSIONDESC);
-        local_7c.guidSession = guid;
-        local_7c.dwFlags = 2;
-        local_7c.dwMaxPlayers = max_players;
+        memset(&session_desc, 0, sizeof(DPSESSIONDESC));
+        session_desc.dwSize = sizeof(DPSESSIONDESC);
+        session_desc.guidSession = guid;
+        session_desc.dwFlags = 2;
+        session_desc.dwMaxPlayers = max_players;
 
-        strcpy(local_7c.szSessionName, name);
+        strcpy(session_desc.szSessionName, name);
 
         if (password != nullptr) {
-            strcpy(local_7c.szPassword, password);
+            strcpy(session_desc.szPassword, password);
         }
 
-        HRESULT hr = _dplay->Open(&local_7c);
+        HRESULT hr = _dplay->Open(&session_desc);
         if (hr != 0) {
             _dplay->Release();
             _dplay = nullptr;
             return 0;
         }
 
-        DPSESSIONDESC* new_session = reinterpret_cast<DPSESSIONDESC*>(::malloc(sizeof(DPSESSIONDESC)));
+        DPSESSIONDESC* new_session = (DPSESSIONDESC*)::malloc(sizeof(DPSESSIONDESC));
         WINNET::_sessions[WINNET::_session_count] = new_session;
-        memcpy(new_session, &local_7c, sizeof(DPSESSIONDESC));
+        memcpy(new_session, &session_desc, sizeof(DPSESSIONDESC));
         WINNET::_session_count++;
 
         WINNET::Net_Enable_New_Players();
 
-        WINNET::Create_Player_(&dpid, player_name, s__00551100);
-        WINNET::_local_player_id = dpid;
+        WINNET::Create_Player_(&player_id, player_name, s__00551100);
+        WINNET::_local_player_id = player_id;
 
         comcore::ComInit_(0x1c2, name, _recv_fn);
 

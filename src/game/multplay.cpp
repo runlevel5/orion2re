@@ -10,11 +10,7 @@ namespace MULTPLAY {
 
     s_mp_screen _g_mp_screen;
 
-    const char s_Evan_Axelrad_0055aa48[16] = "Evan Axelrad";
-
     const char s_MULTIGM_LBX_00558d04[12] = "MULTIGM.LBX";
-
-    const char s_Moo_II_0055aa88[8] = "Moo II ";
 
     s_palette_entry _green_pal_colors[16] = {
         {1, 4, 8, 1},
@@ -46,18 +42,6 @@ namespace MULTPLAY {
         "38400",
     };
 
-    const char s_COM_PORT_FMT[7] = "COM:%d";
-
-    const char s_COM_PORT_FMT_v2[6] = "COM%d";
-
-    const char s_BAUD_RATE_FMT[4] = "%ld";
-
-    const char s_name_fmt[7] = "(%s)  ";
-
-    const char s_gnn_fmt[12] = "( GNN )  %s";
-
-    const char s_chat_msg_fmt[9] = "(%s)  %s";
-
     uint8_t _allow_chat_mode;
 
     const char s__00551100[1] = "";
@@ -80,18 +64,18 @@ namespace MULTPLAY {
         MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
         animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
 
-        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, 64);
+        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, sizeof(MULTPLAY::_green_pal_colors));
         MOX::_mox_font_colors_offset = 0x96;
 
         s_colors* font_ptr = MISC::Font_Colors2_(4, 0x92, 0x98);
         local_colors = *font_ptr;
         fonts::Set_Font_Style_(4, &local_colors);
 
-        sprintf(buffer, s_COM_PORT_FMT_v2, NETMOX::_net.modem_settings.com_port_index + 1);
+        sprintf(buffer, "COM%d", NETMOX::_net.modem_settings.com_port_index + 1);
         fonts::Print_(x + 130, y + 63, buffer);
 
         fonts::Set_Font_Style_(4, &local_colors);
-        sprintf(buffer, s_BAUD_RATE_FMT, NETMOX::_net.modem_settings.baud_rate);
+        sprintf(buffer, "%ld", NETMOX::_net.modem_settings.baud_rate);
         fonts::Print_(x + 300, y + 63, buffer);
 
         int16_t msg_id = (NETMOX::_net.modem_initialized != 0) ? 0xf7 /* HESTR_0F7_TONE */ : 0xf8 /* HESTR_0F8_PULSE */;
@@ -130,7 +114,7 @@ namespace MULTPLAY {
                     fonts::Set_Font_Style_(3, &local_colors);
                 }
 
-                sprintf(buffer, s_COM_PORT_FMT_v2, i + 1);
+                sprintf(buffer, "COM%d", i + 1);
                 fonts::Print_(x + 170, current_y + 3, buffer);
                 current_y += 15;
             }
@@ -167,7 +151,7 @@ namespace MULTPLAY {
         }
     }
 
-    void __cdecl Load_Net_Next_Turn_Screen_(char fade_in) {
+    void __cdecl Load_Net_Next_Turn_Screen_(int8_t fade_in) {
         int16_t top_h;
         int16_t mid_h;
         int16_t chat_bg_h;
@@ -180,8 +164,7 @@ namespace MULTPLAY {
 
         memset(MOX::_mp_screen, 0, sizeof(s_mp_screen));
 
-        // Signature copy: Evan Axelrad (12 bytes + null terminator)
-        memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
+        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
 
         MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2A /* 42 */, MOX::_global_cache_seg);
         top_w = animate::Get_Width_(MOX::_mp_screen->anim_turn_screen_top);
@@ -215,7 +198,7 @@ namespace MULTPLAY {
 
         fields::Clear_Fields_();
 
-        if (fade_in != '\0') {
+        if (fade_in != 0) {
             MISC::Fade_Into_Screen_(MULTPLAY::Draw_Net_Next_Turn_Screen_, fade_palette, 0);
         }
 
@@ -316,7 +299,7 @@ namespace MULTPLAY {
         memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
         MOX::_mp_screen->needs_full_redraw = 1;
-        strcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48);
+        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
 
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
         MOX::_mp_screen->res_setup_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 1, MOX::_global_cache_seg);
@@ -339,8 +322,6 @@ namespace MULTPLAY {
     }
 
     void __cdecl Set_Default_Modem_Settings_(void) {
-        // Note: com_port_index is set to 1 initially but overwritten to 0 at the end of the function.
-        // Both assignments are kept per restoration rules.
         MOX::_settings.modem_settings.com_port_index = 1;
         MOX::_settings.modem_settings.serial_cfg_ext = 0;
         MOX::_settings.modem_settings.baud_rate = 19200 /* 0x4B00 */;
@@ -494,7 +475,7 @@ namespace MULTPLAY {
                 }
                 else {
                     if (MOX::_settings.net_game_name[0] == '\0') {
-                        memcpy(MOX::_settings.net_game_name, s_Moo_II_0055aa88, 8);
+                        memcpy(MOX::_settings.net_game_name, "Moo II ", 8);
                         int32_t v = (int32_t)clock();
                         int32_t s = v >> 31;
                         v = ((v ^ s) - s) & 0x1F;
@@ -690,13 +671,7 @@ namespace MULTPLAY {
 
         } while (exit_screen == 0);
 
-        memcpy(MOX::_settings.modem_settings.cmd_reset, NETMOX::_net.modem_settings.cmd_reset, 131);
-
-        MOX::_settings.modem_settings.com_port_index = NETMOX::_net.modem_settings.com_port_index;
-        MOX::_settings.modem_settings.baud_rate = NETMOX::_net.modem_settings.baud_rate;
-        memcpy(&MOX::_settings.modem_settings.parity,
-            &NETMOX::_net.modem_settings.parity,
-            9);
+        MOX::_settings.modem_settings = NETMOX::_net.modem_settings;
 
         FILEDEF::Save_Game_Settings_();
     }
@@ -733,14 +708,7 @@ namespace MULTPLAY {
     }
 
     void __cdecl Copy_Modem_Defaults_To_Net_Struct_() {
-        memcpy(NETMOX::_net.modem_settings.cmd_reset, MOX::_settings.modem_settings.cmd_reset, 131);
-
-        NETMOX::_net.modem_settings.com_port_index = MOX::_settings.modem_settings.com_port_index;
-        NETMOX::_net.modem_settings.baud_rate = MOX::_settings.modem_settings.baud_rate;
-
-        memcpy(&NETMOX::_net.modem_settings.parity,
-            &MOX::_settings.modem_settings.parity,
-            9);
+        NETMOX::_net.modem_settings = MOX::_settings.modem_settings;
 
         if ((int32_t)NETMOX::_net.modem_settings.com_port_index < 0 || (int32_t)NETMOX::_net.modem_settings.com_port_index > 7) {
             NETMOX::_net.modem_settings.com_port_index = 1;
@@ -912,15 +880,15 @@ namespace MULTPLAY {
     }
 
     void __cdecl Add_Modem_Setup_Fields2_(void) {
-        short screen_x = MOX::_mp_screen->screen_x;
-        short screen_y = MOX::_mp_screen->screen_y;
+        int16_t screen_x = MOX::_mp_screen->screen_x;
+        int16_t screen_y = MOX::_mp_screen->screen_y;
 
         MOX::_mp_screen->field_id_cancel = -1000;
 
         if (MOX::_mp_screen->flag_modem_disabled == 1) {
-            short start_x = screen_x + 0x94;
-            short current_y = screen_y + 0x56;
-            short end_x = start_x + 0x55;
+            int16_t start_x = screen_x + 0x94;
+            int16_t current_y = screen_y + 0x56;
+            int16_t end_x = start_x + 0x55;
 
             for (int i = 0; i < 8; ++i) {
                 MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(start_x, current_y, end_x, current_y + 0xF, s__00551100, 0x28);
@@ -928,9 +896,9 @@ namespace MULTPLAY {
             }
         }
         else if (MOX::_mp_screen->flag_modem_disabled == 2) {
-            short start_x = screen_x + 0x12F;
-            short current_y = screen_y + 0x60;
-            short end_x = start_x + 0x50;
+            int16_t start_x = screen_x + 0x12F;
+            int16_t current_y = screen_y + 0x60;
+            int16_t end_x = start_x + 0x50;
 
             for (int i = 0; i < 8; ++i) {
                 MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(start_x, current_y, end_x, current_y + 0xF, s__00551100, 0x28);
@@ -938,7 +906,7 @@ namespace MULTPLAY {
             }
         }
         else {
-            short btn_y = screen_y + 0xC7;
+            int16_t btn_y = screen_y + 0xC7;
 
             MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(
                 screen_x + 0x3D, btn_y, s__00551100, MOX::_mp_screen->anim_btn_cancel, s__00551120, 0x28
@@ -948,8 +916,8 @@ namespace MULTPLAY {
                 screen_x + 0xFF, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 0x28
             );
 
-            short hidden_y1 = screen_y + 0x3E;
-            short hidden_y2 = screen_y + 0x4D;
+            int16_t hidden_y1 = screen_y + 0x3E;
+            int16_t hidden_y2 = screen_y + 0x4D;
 
             MOX::_mp_screen->game_list_field_ids[0] = fields::Add_Hidden_Field_(
                 screen_x + 0x7A, hidden_y1, screen_x + 0xCA, hidden_y2, s__00551100, 0x28
@@ -974,7 +942,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-    memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
+    strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
 
     MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
     MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 32, MOX::_global_cache_seg);
@@ -1029,39 +997,25 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
         MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
 
-        // Reset the screen data structure
         memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-        // Set the hardcoded signature for the screen
-        memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
+        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
 
-        // Load visual assets from MULTIGM.LBX
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
         MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x23, MOX::_global_cache_seg);
         MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x26, MOX::_global_cache_seg);
         MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x27, MOX::_global_cache_seg);
 
-        // Load button animations (note: indices might be specific to serial/modem setup)
         MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x24, MOX::_screen_seg);
         MOX::_mp_screen->anim_btn_unk_3 = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x25, MOX::_screen_seg);
 
-        // Center the background on the 640x480 screen
         width = animate::Get_Width_(MOX::_mp_screen->bg_seg);
         MOX::_mp_screen->screen_x = (640 - width) / 2;
 
         height = animate::Get_Height_(MOX::_mp_screen->bg_seg);
         MOX::_mp_screen->screen_y = (480 - height) / 2;
 
-        // Sync modem settings from global configuration to the active network state.
-        // The original code copies the modem string tail starting at cmd_reset,
-        // then writes the leading modem settings fields separately.
-        memcpy(NETMOX::_net.modem_settings.cmd_reset, MOX::_settings.modem_settings.cmd_reset, 131);
-
-        NETMOX::_net.modem_settings.com_port_index = MOX::_settings.modem_settings.com_port_index;
-        NETMOX::_net.modem_settings.baud_rate = MOX::_settings.modem_settings.baud_rate;
-        memcpy(&NETMOX::_net.modem_settings.parity,
-            &MOX::_settings.modem_settings.parity,
-            9);
+        NETMOX::_net.modem_settings = MOX::_settings.modem_settings;
     }
 
     void __cdecl Modem_Setup_Screen_() {
@@ -1081,10 +1035,8 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         HAROLD::Load_Language_Fonts_();
         fields::Disable_Cancel_();
 
-        // Backup current network configuration
         memcpy(&net_backup, &NETMOX::_net, sizeof(s_network));
 
-        // Ghidra decompiler shows manual string copies, likely diagnostic/unused in this function scope
         strcpy(cmd_reset_buf, NETMOX::_net.modem_settings.cmd_reset);
         strcpy(cmd_init_buf, NETMOX::_net.modem_settings.cmd_init);
         strcpy(cmd_hangup_buf, NETMOX::_net.modem_settings.cmd_hangup);
@@ -1160,7 +1112,6 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
             } else if (MOX::_mp_screen->field_id_cancel == input_id) {
                 save_on_exit = false;
                 exit_loop = true;
-                // Restore backed up network settings
                 memcpy(&NETMOX::_net, &net_backup, sizeof(s_network));
             } else if (MOX::_mp_screen->field_id_ok == input_id) {
                 save_on_exit = true;
@@ -1183,14 +1134,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         }
 
         if (save_on_exit) {
-            // Sync working network settings to global game settings
-            memcpy(MOX::_settings.modem_settings.cmd_reset, NETMOX::_net.modem_settings.cmd_reset, 131);
-
-            MOX::_settings.modem_settings.com_port_index = NETMOX::_net.modem_settings.com_port_index;
-            MOX::_settings.modem_settings.baud_rate = NETMOX::_net.modem_settings.baud_rate;
-            MOX::_settings.modem_settings.parity = NETMOX::_net.modem_settings.parity;
-            MOX::_settings.modem_settings.data_bits = NETMOX::_net.modem_settings.data_bits;
-            MOX::_settings.modem_settings.serial_cfg_ext = NETMOX::_net.modem_settings.serial_cfg_ext;
+            MOX::_settings.modem_settings = NETMOX::_net.modem_settings;
 
             FILEDEF::Save_Game_Settings_();
         }
@@ -1233,7 +1177,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
             return -1;
         }
 
-        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Load_MP_Game_Screen_, reinterpret_cast<uint8_t*>(&MOX::_mp_screen->needs_full_redraw), 11);
+        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Load_MP_Game_Screen_, (uint8_t*)&MOX::_mp_screen->needs_full_redraw, 11);
 
         while (!exit_loop) {
             timer::Mark_Time_();
@@ -1286,8 +1230,8 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
     }
 
     void __cdecl Draw_NullModem_Setup_Screen_(void) {
-        short x = MOX::_mp_screen->screen_x;
-        short y = MOX::_mp_screen->screen_y;
+        int16_t x = MOX::_mp_screen->screen_x;
+        int16_t y = MOX::_mp_screen->screen_y;
         char buffer[32];
         s_colors style_colors;
 
@@ -1299,7 +1243,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
         animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
 
-        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, 64);
+        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, sizeof(MULTPLAY::_green_pal_colors));
 
         MOX::_mox_font_colors_offset = 150;
         style_colors = *MISC::Font_Colors2_(4, 146, 152);
@@ -1307,17 +1251,17 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
         s_modem_settings* settings = &NETMOX::_net.modem_settings;
 
-        sprintf(buffer, s_COM_PORT_FMT, settings->com_port_index + 1);
+        sprintf(buffer, "COM:%d", settings->com_port_index + 1);
         fonts::Print_(x + 119, y + 83, buffer);
 
-        sprintf(buffer, s_BAUD_RATE_FMT, settings->baud_rate);
+        sprintf(buffer, "%ld", settings->baud_rate);
         fonts::Print_(x + 293, y + 83, buffer);
 
         if (MOX::_mp_screen->flag_serial_type == 1) {
             MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
             animate::Draw_(x + 129, y + 101, MOX::_mp_screen->btn_accept_off);
 
-            short cur_y = y + 101;
+            int16_t cur_y = y + 101;
             for (int i = 0; i < 8; ++i) {
                 cur_y += 15;
                 if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
@@ -1329,7 +1273,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                     style_colors = *MISC::Font_Colors2_(3, 146, 151);
                     fonts::Set_Font_Style_(3, &style_colors);
                 }
-                sprintf(buffer, s_COM_PORT_FMT, i + 1);
+                sprintf(buffer, "COM:%d", i + 1);
                 fonts::Print_(x + 156, cur_y + 3, buffer);
             }
             return;
@@ -1339,7 +1283,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
             MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
             animate::Draw_(x + 295, y + 100, MOX::_mp_screen->btn_accept_off);
 
-            short cur_y = y + 100;
+            int16_t cur_y = y + 100;
             for (int i = 0; i < 8; ++i) {
                 cur_y += 15;
                 if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
@@ -1437,7 +1381,7 @@ void __cdecl Load_Load_MP_Game_Screen_(void) {
     MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-    memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
+    strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
 
     MOX::_save_game_dates = (char*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 1000);
     MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
@@ -1534,8 +1478,6 @@ void __cdecl Change_MP_Game_Name_() {
         
         fields::Assign_Auto_Function_(SCORE::nullsub, 1);
         
-        // The binary uses an explicit strlen/memcpy sequence here, but this remains a plain
-        // null-terminated copy into a local stack buffer, so strcpy preserves the behavior.
         strcpy(prompt, HAROLD::H_Message_(0xFE /* HESTR_0FE_ENTER_NET_GAME_NAME */));
         
         y = namestar::Star_Name_Popup_Screen_Center_Y_();
@@ -1636,7 +1578,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
 
     animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
 
-    memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, 0x40);
+    memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, sizeof(MULTPLAY::_green_pal_colors));
 
     for (int i = 0; i < 10; ++i) {
         int16_t y_base = MOX::_mp_screen->screen_y + 0x42 + y_offset;
@@ -1644,8 +1586,8 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
 
         LOADSAVE::Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
 
-        memcpy(stardate_buf, MOX::_save_game_stardates + string_buffer_offset, 25);
-        memcpy(date_buf, MOX::_save_game_dates + string_buffer_offset, 25);
+        memcpy(stardate_buf, MOX::_save_game_stardates + string_buffer_offset, sizeof(stardate_buf));
+        memcpy(date_buf, MOX::_save_game_dates + string_buffer_offset, sizeof(date_buf));
 
         s_colors* palette_colors = MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, 0x90, 0x93);
         memcpy(&text_colors, palette_colors, sizeof(s_colors));
@@ -1772,7 +1714,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
     fonts::Set_Font_Special_Colors_(&local_colors2);
     
     char name_buffer[80];
-    sprintf(name_buffer, s_name_fmt, MOX::_player[MOX::_PLAYER_NUM].name);
+    sprintf(name_buffer, "(%s)  ", MOX::_player[MOX::_PLAYER_NUM].name);
     
     int16_t name_width = fonts::Get_String_Width_(name_buffer);
     MULTPLAY::_global_chat_string[0] = '\0';
@@ -1937,7 +1879,7 @@ void __cdecl Draw_SendGet_Net_Info_Screen_(void) {
         MOX::_mox_font_colors_offset = 0xF2;
         s_colors* palette_colors = MISC::Font_Colors2_(4, 0x9C, 0xF8);
 
-        memcpy(&font_colors, palette_colors, 8);
+        memcpy(&font_colors, palette_colors, sizeof(font_colors));
 
         fonts::Set_Font_Style_(4, &font_colors);
 
@@ -1959,7 +1901,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-    memcpy(MOX::_mp_screen->signature, MULTPLAY::s_Evan_Axelrad_0055aa48, 13);
+    strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
     MOX::_mp_screen->lbx_entry_num = lbx_entry_num;
 
     MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
@@ -1993,9 +1935,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
         animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
 
-        // Update green palette range for the game selection list.
-        // The original code copies a contiguous 64-byte palette block.
-        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], _green_pal_colors, 64);
+        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], _green_pal_colors, sizeof(_green_pal_colors));
 
         for (int16_t i = 0, row_y_offset = 0; i < display_count; ++i) {
             char* name_ptr = netcode::Net_Get_Game_Name_(i);
@@ -2095,8 +2035,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-        // Note: Manual 13-byte copy of the signature string "Evan Axelrad"
-        memcpy(MOX::_mp_screen->signature, MULTPLAY::s_signature_axelrad, 13);
+        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
 
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
 
@@ -2324,12 +2263,12 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                     MOX::_mox_font_colors_offset = (uint8_t)(c2 + 1);
                     s_colors chat_colors = *MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, (uint8_t)(c1 + 1), (uint8_t)(c3 + 2));
                     fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &chat_colors);
-                    sprintf(chat_buffer, s_chat_msg_fmt, MOX::_player[sender_id].name, CHAT::_chat_info->messages[i].text);
+                    sprintf(chat_buffer, "(%s)  %s", MOX::_player[sender_id].name, CHAT::_chat_info->messages[i].text);
                 } else {
                     MOX::_mox_font_colors_offset = 16;
                     s_colors gnn_colors = *MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, 12, 23);
                     fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &gnn_colors);
-                    sprintf(chat_buffer, s_gnn_fmt, CHAT::_chat_info->messages[i].text);
+                    sprintf(chat_buffer, "( GNN )  %s", CHAT::_chat_info->messages[i].text);
                 }
 
                 if (i == 0) {
@@ -2347,11 +2286,10 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
 
         char final_name_buffer[100];
-        sprintf(final_name_buffer, s_name_fmt, MOX::_player[MOX::_PLAYER_NUM].name);
+        sprintf(final_name_buffer, "(%s)  ", MOX::_player[MOX::_PLAYER_NUM].name);
 
         uint8_t pc1, pc2, pc3;
         MULTPLAY::Get_Main_Palette_Base_Colors_(MOX::_PLAYER_NUM, &pc1, &pc2, &pc3);
-        // Using pc3 + 2 as suggested by the decompiler comment
         s_colors player_name_colors = *MISC::Font_Colors2_(4, (uint8_t)(pc1 + 1), (uint8_t)(pc3 + 2));
         MOX::_mox_font_colors_offset = pc2;
         fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &player_name_colors);
@@ -2365,11 +2303,11 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen->needs_full_redraw = 0;
     }
 
-    void __cdecl Draw_Fill_Seg_(int16_t player_idx, int16_t row_idx) {
+    void __cdecl Draw_Fill_Seg_(int16_t player_idx, int16_t unused_row_idx) {
         int16_t x;
         int16_t y;
 
-        (void)row_idx;
+        (void)unused_row_idx;
 
         x = (player_idx % 2) * 294 + MOX::_mp_screen->screen_x + 40;
         y = (player_idx / 2) * 36 + MOX::_mp_screen->screen_y + 65;
@@ -2411,7 +2349,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
         memset(MOX::_mp_screen, 0, sizeof(s_mp_screen));
 
-        memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
+        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
         MOX::_mp_screen->needs_full_redraw = 1;
 
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
@@ -2675,8 +2613,8 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MULTPLAY::Reload_Generic_Net_Info_(0x18);
     }
 
-    void __cdecl Get_Player_Colors_(int16_t player_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary) {
-        uint16_t base_color_idx = (uint16_t)((uint16_t)player_idx * 6u + 0x70u);
+    void __cdecl Get_Player_Colors_(int16_t color_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary) {
+        uint16_t base_color_idx = (uint16_t)((uint16_t)color_idx * 6u + 0x70u);
         uint16_t mode = (uint8_t)MOX::_mp_screen->subscreen_mode;
 
         s_colors* colors1 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 4));

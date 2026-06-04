@@ -2,19 +2,8 @@
 
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
-
-- [pending] src/game/multplay.{h,cpp}
-- [pending] src/game/namestar.{h,cpp}
-- [pending] src/game/net.{h,cpp}
-- [pending] src/game/netcode.{h,cpp}
-- [pending] src/game/netmox.{h,cpp}
-- [pending] src/game/netstart.{h,cpp}
 - [pending] src/game/netstrat.h
-- [pending] src/game/netturn.{h,cpp}
-- [pending] src/game/newgame.{h,cpp}
-- [pending] src/game/newpup.{h,cpp}
-- [pending] src/game/newtech.{h,cpp}
-- [pending] src/game/nextturn.{h,cpp}
+
 - [pending] src/game/npcdiplo.{h,cpp}
 - [pending] src/game/ocpolpup.{h,cpp}
 - [pending] src/game/officer.{h,cpp}

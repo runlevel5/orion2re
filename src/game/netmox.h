@@ -15,8 +15,6 @@ namespace NETMOX {
 
     extern s_net_modem_file _secret_modem_file;
 
-    extern const char s_modem_tmp_0055ad4c[10]; // "modem.tmp"
-
     extern char* _sending_chunk_d_of_d_fmt;
 
     extern char* _incompatible_versions_error;
@@ -68,21 +66,13 @@ namespace NETMOX {
 
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
-    int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len);
+    int32_t __cdecl Mox_Send_Message_(int16_t recipient_net_id, uint16_t msg_type, void* packet, uint16_t packet_len);
 
     void __cdecl Decode_Game_Orders_(void* data, uint32_t len);
 
     void __cdecl Broadcast_Game_Data_Differential_(uint8_t unknown);
 
     int8_t __cdecl Decode_Broadcast_Game_Data_Differential_(void* buffer, size_t size, uint8_t flag);
-
-    extern const char s_wb_00551178[3];
-    extern const char s_rb_0055117c[3];
-    extern const char s_error_decoding_broadcast_0055ad58[25];
-    extern const char s_p_limit_p_diff_0055ad74[17]; /* "p_limit < p_diff" */
-    extern const char s_fseek_ahead_modem_file_0055ad88[23]; /* "fseek ahead modem_file" */
-    extern const char s_fread_modem_file_0055ada0[17]; /* "fread modem_file" */
-    extern const char s_fseek_modem_file_0055adb4[17]; /* "fseek modem_file" */
 
     s_net_modem_file* __cdecl Open_Modem_File_(const char* mode, uint32_t size);
 
@@ -148,7 +138,7 @@ namespace NETMOX {
 
     void __cdecl Decode_Battle_Results_(void* packet_data, uint16_t len);
 
-    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1, uint16_t len);
+    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* packet, uint16_t len);
 
     void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr, uint16_t len);
 

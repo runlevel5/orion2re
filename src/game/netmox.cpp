@@ -15,8 +15,6 @@ namespace NETMOX {
 
     s_net_modem_file _secret_modem_file;
 
-    const char s_modem_tmp_0055ad4c[10] = "modem.tmp";
-
     char* _sending_chunk_d_of_d_fmt;
 
     char* _incompatible_versions_error;
@@ -30,14 +28,6 @@ namespace NETMOX {
     uint8_t _is_updating;
 
     uint8_t _next_update_player_counter;
-
-    const char s_wb_00551178[3] = "wb";
-    const char s_rb_0055117c[3] = "rb";
-    const char s_error_decoding_broadcast_0055ad58[25] = "error decoding broadcast";
-    const char s_p_limit_p_diff_0055ad74[17] = "p_limit < p_diff";
-    const char s_fseek_ahead_modem_file_0055ad88[23] = "fseek ahead modem_file";
-    const char s_fread_modem_file_0055ada0[17] = "fread modem_file";
-    const char s_fseek_modem_file_0055adb4[17] = "fseek modem_file";
 
     int32_t __cdecl Net_Id_To_Player_Id_(int32_t player_idx) {
         for (int32_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -252,7 +242,7 @@ namespace NETMOX {
             msg_data.star_idx = star_idx;
             msg_data.param6 = param6;
 
-            Mox_Send_Message_(_net.local_net_id, 0x43, &msg_data, 12);
+            Mox_Send_Message_(_net.local_net_id, 0x43, &msg_data, sizeof(msg_data));
         }
     }
 
@@ -282,29 +272,29 @@ namespace NETMOX {
         return target_player_idx;
     }
 
-    int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len) {
+    int32_t __cdecl Mox_Send_Message_(int16_t recipient_net_id, uint16_t msg_type, void* packet, uint16_t packet_len) {
         uint8_t dummy_packet;
         uint8_t skip_send;
         int32_t result = 1;
 
         _sending_msg = 1;
 
-        if (len == 0) {
-            len = 1;
+        if (packet_len == 0) {
+            packet_len = 1;
             packet = &dummy_packet;
         }
 
         Update_();
 
-        if (_net.net_host_id == param_1) {
-            Receive_Message_(param_1, param_2, len, static_cast<uint8_t*>(packet));
+        if (_net.net_host_id == recipient_net_id) {
+            Receive_Message_(recipient_net_id, msg_type, packet_len, (uint8_t*)packet);
         } else {
             skip_send = 0;
             do {
                 Update_();
             } while (netcode::Net_Is_Sending_() != 0);
 
-            if (param_1 == 0x7FFE) {
+            if (recipient_net_id == 0x7FFE) {
                 int32_t last_valid_id = -1;
                 int32_t count = 0;
 
@@ -319,12 +309,12 @@ namespace NETMOX {
                 if (count == 0) {
                     skip_send = 1;
                 } else if (count == 1) {
-                    param_1 = static_cast<int16_t>(last_valid_id);
+                    recipient_net_id = (int16_t)last_valid_id;
                 }
             }
 
             if (skip_send == 0) {
-                result = netcode::Net_Send_Message_(param_1, param_2, packet, len);
+                result = netcode::Net_Send_Message_(recipient_net_id, msg_type, packet, packet_len);
             }
 
             if (result == 0) {
@@ -381,7 +371,7 @@ namespace NETMOX {
             MOX::_player[player_idx].network_player_id,
             0x1c,
             &MOX::_player[MOX::_PLAYER_NUM],
-            0xea9 /* sizeof(s_player) */
+            sizeof(MOX::_player[MOX::_PLAYER_NUM])
         );
 
         while (_net.sync_state == 0x29 /* 41, ')' */ || _net.sync_state == 0x2e /* 46, '.' */) {
@@ -406,17 +396,17 @@ namespace NETMOX {
         }
     }
 
-    void __cdecl Russ_Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    void __cdecl Russ_Event_Monster_Update_(int16_t owner, int16_t param2, int16_t param3) {
         if (MOX::_game_type != 2 /* GAME_TYPE_NETWORK_HOST */ &&
             MOX::_game_type != 3 /* GAME_TYPE_NETWORK_CLIENT */) {
-            EVENTS::Event_Monster_Update_(param_1, param_2, param_3);
+            EVENTS::Event_Monster_Update_(owner, param2, param3);
             return;
         }
 
         s_net_pack_monster_update msg;
-        msg.param_1 = static_cast<int32_t>(param_1);
-        msg.param_2 = static_cast<int32_t>(param_2);
-        msg.param_3 = static_cast<int32_t>(param_3);
+        msg.param_1 = (int32_t)owner;
+        msg.param_2 = (int32_t)param2;
+        msg.param_3 = (int32_t)param3;
 
         NETMOX::Mox_Send_Message_(_net.local_net_id, 0x3c /* MSG_TYPE_MONSTER_UPDATE */, &msg, sizeof(msg));
     }
@@ -424,8 +414,8 @@ namespace NETMOX {
     void __cdecl Send_Pick_Your_Position_(int16_t network_player_id) {
         allocate::Push_Block_(MOX::_screen_seg);
 
-        // Allocation size 0x754a = 30026 bytes, enough for 8 players: 2 + (8 * 3753)
-        s_net_pack_pick_your_position* packet = (s_net_pack_pick_your_position*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x754a);
+        s_net_pack_pick_your_position* packet =
+            (s_net_pack_pick_your_position*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_net_pack_pick_your_position));
 
         packet->num_players = MOX::_NUM_PLAYERS;
 
@@ -434,7 +424,7 @@ namespace NETMOX {
         // Copy the current player list into the network packet
         memcpy(packet->players, MOX::_player, num_players * (int32_t)sizeof(s_player));
 
-        uint16_t msg_size = (uint16_t)(2 + num_players * (int32_t)sizeof(s_player));
+        uint16_t msg_size = (uint16_t)(sizeof(packet->num_players) + num_players * (int32_t)sizeof(packet->players[0]));
         NETMOX::Mox_Send_Message_(network_player_id, 32 /* MSG_TYPE_PICK_YOUR_POSITION */, packet, (uint16_t)msg_size);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -553,8 +543,8 @@ namespace NETMOX {
         * (uint16_t*)ptr = EVENTS::_event_delay_count;
         ptr += sizeof(uint16_t);
 
-        memcpy(ptr, MOX::_bill_savegame, 12);
-        ptr += 12;
+        memcpy(ptr, MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
+        ptr += sizeof(MOX::_bill_savegame);
 
         RUSS::Mox_Update_();
 
@@ -564,18 +554,18 @@ namespace NETMOX {
         s_net_modem_file* file;
 
         if (use_diff != 0) {
-            file = Open_Modem_File_(s_wb_00551178, block_size);
+            file = Open_Modem_File_("wb", block_size);
             Write_Modem_File_(file, block, block_size);
             send_ptr = block;
             send_size = block_size;
         }
         else {
-            file = Open_Modem_File_(s_rb_0055117c, 0);
+            file = Open_Modem_File_("rb", 0);
             send_ptr = block + block_size;
             send_size = Make_Difference_Buffer_(file, block, block_size, send_ptr, 0xe1000 - block_size);
             Close_Modem_File_(file);
 
-            file = Open_Modem_File_(s_wb_00551178, block_size);
+            file = Open_Modem_File_("wb", block_size);
             Write_Modem_File_(file, block, block_size);
         }
 
@@ -617,17 +607,17 @@ namespace NETMOX {
 
         if (flag == 0) {
             ptr = buffer + size;
-            s_net_modem_file* file_handle = NETMOX::Open_Modem_File_(NETMOX::s_rb_0055117c, 0);
+            s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("rb", 0);
             size = NETMOX::Decode_Difference_Buffer_(file_handle, ptr, 0xE1000 - size, buffer, size);
             NETMOX::Close_Modem_File_(file_handle);
 
             if (size == 0) {
-                exitm::Exit_With_message2_(NETMOX::s_error_decoding_broadcast_0055ad58);
+                exitm::Exit_With_message2_("error decoding broadcast");
                 return 0;
             }
         }
 
-        s_net_modem_file* file_handle = NETMOX::Open_Modem_File_(NETMOX::s_wb_00551178, size);
+        s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("wb", size);
         NETMOX::Write_Modem_File_(file_handle, ptr, size);
         NETMOX::Close_Modem_File_(file_handle);
 
@@ -762,7 +752,7 @@ namespace NETMOX {
         EVENTS::_event_delay_count = *(int16_t*)ptr;
         ptr += sizeof(int16_t);
 
-        memcpy(MOX::_bill_savegame, ptr, 12);
+        memcpy(MOX::_bill_savegame, ptr, sizeof(MOX::_bill_savegame));
 
         RUSS::Mox_Update_();
 
@@ -844,7 +834,7 @@ namespace NETMOX {
                         !message_sent && NETMOX::_net.player_race_selected_flags[current_player_idx]) {
                         
                         message_sent = true;
-                        NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x22, &sync_pkt, 0x1DA2);
+                        NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x22, &sync_pkt, sizeof(sync_pkt));
                     }
                 }
                 NETMOX::_net.players_sync_mask[i] &= ~(1 << current_player_idx);
@@ -891,7 +881,7 @@ namespace NETMOX {
                     rank_msg.rank = (int32_t)local_rank;
                     rank_msg.hit_next_turn = NETMOX::_net.players_hit_next_turn[player_num];
                     player_rank_sync_flags[current_player_idx] = local_rank;
-                    NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 4, &rank_msg, 5);
+                    NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 4, &rank_msg, sizeof(rank_msg));
                 }
             }
         }
@@ -1139,7 +1129,7 @@ namespace NETMOX {
         uint8_t* diff_end = diff_buffer + diff_len;
 
         if (fseek_modem_file_(modem_file, 0, 0) != 0) {
-            exitm::Exit_With_message2_(s_fseek_modem_file_0055adb4);
+            exitm::Exit_With_message2_("fseek modem_file");
             return 0;
         }
 
@@ -1152,7 +1142,7 @@ namespace NETMOX {
             if (b <= 0xF4) {
                 uint32_t size = b;
                 if (fread_modem_file_(out_ptr, size, 1, modem_file) != 1) {
-                    exitm::Exit_With_message2_(s_fread_modem_file_0055ada0);
+                    exitm::Exit_With_message2_("fread modem_file");
                     return 0;
                 }
                 diff_buffer++;
@@ -1161,13 +1151,13 @@ namespace NETMOX {
             } else if (b == 0xFF) {
                 diff_buffer++;
                 if (diff_buffer > diff_end || out_buffer + max_out_len < out_ptr) {
-                    exitm::Exit_With_message2_(s_p_limit_p_diff_0055ad74);
+                    exitm::Exit_With_message2_("p_limit < p_diff");
                     return 0;
                 }
             } else {
                 uint32_t skip = b - 0xF5;
                 if (fseek_modem_file_(modem_file, skip, 1) != 0) {
-                    exitm::Exit_With_message2_(s_fseek_ahead_modem_file_0055ad88);
+                    exitm::Exit_With_message2_("fseek ahead modem_file");
                     return 0;
                 }
                 memcpy(out_ptr, diff_buffer + 1, skip);
@@ -1380,7 +1370,7 @@ namespace NETMOX {
                 MOX::_player[target_player_id].network_player_id,
                 0x1C,
                 MOX::_player + MOX::_PLAYER_NUM,
-                0xEA9 /* sizeof(s_player) */
+                sizeof(MOX::_player[MOX::_PLAYER_NUM])
             );
         } else {
             _net.sync_state = 0x29; /* ')' */
@@ -1399,7 +1389,7 @@ namespace NETMOX {
                     MOX::_player[target_player_id].network_player_id,
                     0x1B,
                     &packet,
-                    0xEF1 /* sizeof(s_packet_1B) */
+                    sizeof(packet)
                 );
             }
         }
@@ -1447,12 +1437,12 @@ namespace NETMOX {
         RUSS::Mox_Update_();
 
         uint8_t star_updates[72 * sizeof(s_net_pack_star_order)];
-        memcpy(star_updates, ptr, MOX::_NUM_STARS * 24);
-        ptr += MOX::_NUM_STARS * 24;
+        memcpy(star_updates, ptr, MOX::_NUM_STARS * sizeof(s_net_pack_star_order));
+        ptr += MOX::_NUM_STARS * sizeof(s_net_pack_star_order);
 
         if (MOX::_NUM_STARS > 0) {
             for (int i = 0; i < MOX::_NUM_STARS; ++i) {
-                uint8_t* update = star_updates + i * 24;
+                uint8_t* update = star_updates + i * sizeof(s_net_pack_star_order);
                 uint32_t flags;
                 memcpy(&flags, update, sizeof(flags));
                 s_star_data* star = &MOX::_star[i];
@@ -1613,7 +1603,7 @@ namespace NETMOX {
                 return &_secret_modem_file;
             }
 
-            _secret_modem_file.file = fopen(s_modem_tmp_0055ad4c, mode_str);
+            _secret_modem_file.file = fopen("modem.tmp", mode_str);
             if (_secret_modem_file.file == nullptr) {
                 exitm::Exit_With_message2_(_modem_disk_error);
                 return &_secret_modem_file;
@@ -1792,9 +1782,7 @@ namespace NETMOX {
                     break;
                 }
 
-                memcpy(&MOX::_ship[ship_id], ptr, sizeof(s_ship_design) + 30 /* Size of s_ship_data is 129 */);
-                // NOTE: the code uses `sizeof(s_ship_data)` directly
-                // memcpy(&MOX::_ship[ship_id], ptr, sizeof(s_ship_data));
+                memcpy(&MOX::_ship[ship_id], ptr, sizeof(s_ship_data));
                 ptr += sizeof(s_ship_data);
 
                 RUSS::Mox_Update_();
@@ -1930,10 +1918,10 @@ namespace NETMOX {
         NETMOX::_net.sync_state = 0x13;
     }
 
-    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1, uint16_t len) {
+    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* packet, uint16_t len) {
         (void)len;
-        MOX::_NUM_PLAYERS = param_1->num_players;
-        memcpy(MOX::_player, param_1->players, param_1->num_players * sizeof(s_player));
+        MOX::_NUM_PLAYERS = packet->num_players;
+        memcpy(MOX::_player, packet->players, packet->num_players * sizeof(s_player));
     }
 
     void __cdecl Decode_Battle_Results_(void* packet_data, uint16_t len) {
@@ -2310,13 +2298,13 @@ namespace NETMOX {
             RUSS::Mox_Update_();
 
             if (other_player_idx < 8) {
-                memcpy(ptr, MOX::_player[other_player_idx].tech_applications, 212);
-                ptr += 212;
+                memcpy(ptr, MOX::_player[other_player_idx].tech_applications, sizeof(MOX::_player[other_player_idx].tech_applications));
+                ptr += sizeof(MOX::_player[other_player_idx].tech_applications);
             }
 
             if (target_player_idx < 8) {
-                memcpy(ptr, MOX::_player[target_player_idx].tech_applications, 212);
-                ptr += 212;
+                memcpy(ptr, MOX::_player[target_player_idx].tech_applications, sizeof(MOX::_player[target_player_idx].tech_applications));
+                ptr += sizeof(MOX::_player[target_player_idx].tech_applications);
             }
 
             RUSS::Mox_Update_();
