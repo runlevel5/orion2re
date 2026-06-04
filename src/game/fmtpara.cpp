@@ -751,7 +751,7 @@ namespace FMTPARA {
 
             // The original stack frame copies the 13 bytes immediately following s_fmtpara_line.
             // In this function those bytes are occupied by the adjacent s_fmtpara_style local.
-            memcpy(&_break_p->x, _style_p, sizeof(s_fmtpara_style));
+            memcpy(&_break_p->style, _style_p, sizeof(s_fmtpara_style));
 
             _break_p->break_is_backspace = false;
             if (char_code == '\b') {
@@ -1721,7 +1721,7 @@ namespace FMTPARA {
         _line_p->char_count = _break_p->char_count;
         _line_p->space_count = _break_p->space_count;
 
-        memcpy(_style_p, &_break_p->x, sizeof(s_fmtpara_style));
+        memcpy(_style_p, &_break_p->style, sizeof(s_fmtpara_style));
 
         if (_break_p->break_is_backspace && &_first_char_p[_line_p->char_count - 1] == _char_p) {
             Add_Character_To_Line_('-');

@@ -15,10 +15,12 @@ namespace GEO {
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance) {
         int16_t black_hole_indices[72];
         int16_t num_black_holes = Collect_Black_Holes_(black_hole_indices);
+        const int32_t black_hole_block_count =
+            (int32_t)(sizeof(MOX::_star[0].black_hole_blocks) / sizeof(MOX::_star[0].black_hole_blocks[0]));
 
         // Clear black_hole_blocks bitfield for all stars
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
-            for (int k = 0; k < 9; ++k) {
+            for (int32_t k = 0; k < black_hole_block_count; ++k) {
                 MOX::_star[i].black_hole_blocks[k] = 0;
             }
         }
@@ -56,13 +58,10 @@ namespace GEO {
 
     /**
      * @brief Iterates through all stars and updates their nebula status.
-     * 
-     * Semantically equivalent to GEO::Initialize_Star_In_Nebula_Info_ at 0x00412ba0.
      */
     void __cdecl Initialize_Star_In_Nebula_Info_() {
         if (MOX::_NUM_STARS > 0) {
-            for (int32_t i = 0; i < static_cast<int32_t>(MOX::_NUM_STARS); ++i) {
-                // The status is stored in the 'in_nebula' field (offset 0x6F)
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_STARS; ++i) {
                 MOX::_star[i].in_nebula = Star_Is_In_Some_Nebula_(i);
             }
         }
@@ -108,8 +107,6 @@ namespace GEO {
      * @param star_index The index into the global star array.
      */
     uint8_t __cdecl Star_Is_In_Some_Nebula_(int32_t star_index) {
-        // Star data structures are 113 (0x71) bytes in size.
-        // x is at offset 0xF (15), y is at offset 0x11 (17).
         const auto& star = MOX::_star[star_index];
         return Point_Is_In_Some_Nebula_(star.x, star.y);
     }
@@ -123,12 +120,12 @@ namespace GEO {
         s_nebula* nebula = &MOX::_nebula[nebula_idx];
 
         // Calculate relative coordinates and scale down by 3
-        int32_t rel_x = (static_cast<int32_t>(x) - nebula->x) / 3;
+        int32_t rel_x = ((int32_t)x - nebula->x) / 3;
         if (rel_x < 0) {
             return false;
         }
 
-        int32_t rel_y = (static_cast<int32_t>(y) - nebula->y) / 3;
+        int32_t rel_y = ((int32_t)y - nebula->y) / 3;
         if (rel_y < 0) {
             return false;
         }
@@ -137,9 +134,8 @@ namespace GEO {
         s_animation_header* anim = MOX::_nebula_pict_seg[nebula_idx][3];
 
         // Check if the relative coordinates are within the animation frame dimensions
-        if (rel_x < static_cast<int32_t>(anim->width) && rel_y < static_cast<int32_t>(anim->height)) {
-            // Frame pixel data is stored immediately after the 16-byte animation header
-            uint8_t* pixel_data = reinterpret_cast<uint8_t*>(anim) + 16;
+        if (rel_x < (int32_t)anim->width && rel_y < (int32_t)anim->height) {
+            uint8_t* pixel_data = (uint8_t*)anim + sizeof(s_animation_header) + sizeof(uint32_t);
             uint8_t pixel_value = pixel_data[rel_y * anim->width + rel_x];
 
             // The nebula is considered present if the pixel value exceeds a transparency threshold
@@ -157,7 +153,7 @@ namespace GEO {
 
         while (true) {
             // Check if current index is within the number of active nebulas
-            if (static_cast<int16_t>(MOX::_NUM_NEBULAS) <= i) {
+            if ((int16_t)MOX::_NUM_NEBULAS <= i) {
                 return in_any_nebula;
             }
 
@@ -260,22 +256,22 @@ namespace GEO {
 #include <time.h>
 
     void __cdecl Get_Orbit_Display_X_Y_(int32_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos) {
-        int base_time = (star_idx * 7) + (int)MOX::_stardate;
+        int32_t base_time = (star_idx * 7) + (int32_t)MOX::_stardate;
         
         // Complex multiplier calculation for 5311 * base_time
-        int scaled_time = base_time;
-        int t5 = scaled_time * 5;
-        int t41 = scaled_time + (t5 * 8);
-        int t83 = scaled_time + (t41 * 2);
-        int dividend = (t83 << 6) - scaled_time; // (83 * 64 - 1) * base_time = 5311 * base_time
+        int32_t scaled_time = base_time;
+        int32_t t5 = scaled_time * 5;
+        int32_t t41 = scaled_time + (t5 * 8);
+        int32_t t83 = scaled_time + (t41 * 2);
+        int32_t dividend = (t83 << 6) - scaled_time; // (83 * 64 - 1) * base_time = 5311 * base_time
 
-        int denominator = (orbit_idx * 100) + star_idx + 150;
-        int angle = (dividend / denominator) % 360;
+        int32_t denominator = (orbit_idx * 100) + star_idx + 150;
+        int32_t angle = (dividend / denominator) % 360;
         int16_t angle16 = (int16_t)angle;
 
         // The binary reads radii from the second pair in the orbit constants table.
-        int cos_res = angle::Cos_(angle16, GEO::_orbit_consts[orbit_idx + 1][0]);
-        int x_val = cos_res + 5;
+        int32_t cos_res = angle::Cos_(angle16, GEO::_orbit_consts[orbit_idx + 1][0]);
+        int32_t x_val = cos_res + 5;
         if (x_val >= 0) {
             x_val += 5; // Result: (cos + 10) / 10
         } else {
@@ -284,8 +280,8 @@ namespace GEO {
         *out_x = x_val / 10;
 
         // Y coordinate calculation with rounding and inversion
-        int sin_res = angle::Sin_(angle16, GEO::_orbit_consts[orbit_idx + 1][1]);
-        int y_val = sin_res - 5;
+        int32_t sin_res = angle::Sin_(angle16, GEO::_orbit_consts[orbit_idx + 1][1]);
+        int32_t y_val = sin_res - 5;
         if (y_val >= 0) {
             y_val += 5; // Result: sin / 10
         } else {
@@ -294,7 +290,7 @@ namespace GEO {
         *out_y = -(y_val / 10);
 
         // Calculate rotation frame (32 frames total)
-        int rotation_frame = ((angle + 6) * 32) / 360;
+        int32_t rotation_frame = ((angle + 6) * 32) / 360;
         if (rotation_frame == 32) {
             rotation_frame = 0;
         }
@@ -332,13 +328,13 @@ namespace GEO {
             uint32_t min_dist_sq = 0xFFFFFFFF;
             int32_t best_index = -1;
 
-            for (int i = 0; i < 7; ++i) {
+            for (int32_t i = 0; i < 7; ++i) {
                 // Get_Angle_ arguments: (short[1]*x, short[0]*-y)
                 int16_t angle_val = angle::Get_Angle_(GEO::_orbit_consts[i][1] * x, GEO::_orbit_consts[i][0] * -y);
 
                 // Rounding for Cosine result
-                int cos_raw = angle::Cos_(angle_val, GEO::_orbit_consts[i][0]);
-                int scaled_cos;
+                int32_t cos_raw = angle::Cos_(angle_val, GEO::_orbit_consts[i][0]);
+                int32_t scaled_cos;
                 if (cos_raw + 5 >= 0) {
                     scaled_cos = (cos_raw + 10) / 10;
                 } else {
@@ -346,8 +342,8 @@ namespace GEO {
                 }
 
                 // Rounding for Sine result
-                int sin_raw = angle::Sin_(angle_val, GEO::_orbit_consts[i][1]);
-                int scaled_sin;
+                int32_t sin_raw = angle::Sin_(angle_val, GEO::_orbit_consts[i][1]);
+                int32_t scaled_sin;
                 if (sin_raw - 5 >= 0) {
                     scaled_sin = sin_raw / 10;
                 } else {
@@ -355,8 +351,8 @@ namespace GEO {
                 }
 
                 // Distance squared calculation: (cos_res - x)^2 + (sin_res + y)^2
-                int dx = scaled_cos - x;
-                int dy = scaled_sin + y;
+                int32_t dx = scaled_cos - x;
+                int32_t dy = scaled_sin + y;
                 uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
 
                 if (dist_sq < min_dist_sq) {
@@ -457,30 +453,30 @@ namespace GEO {
     }
 
     bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-        bool bVar1 = false;
-        int32_t iVar15 = (int32_t)y1 - (int32_t)y2;
-        int32_t iVar17 = (int32_t)x2 - (int32_t)x1;
+        bool is_within_distance = false;
+        int32_t line_dy = (int32_t)y1 - (int32_t)y2;
+        int32_t line_dx = (int32_t)x2 - (int32_t)x1;
 
-        int32_t dot_product = (px - x2) * iVar15 + (py - y2) * iVar17;
+        int32_t dot_product = (px - x2) * line_dy + (py - y2) * line_dx;
         int32_t abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
 
-        int32_t uVar8 = iVar17 * iVar17 + iVar15 * iVar15;
-        int32_t uVar13 = d * d;
+        int32_t line_len_sq = line_dx * line_dx + line_dy * line_dy;
+        int32_t distance_sq = d * d;
 
-        if ((uint32_t)(0xFFFFFFFFu / (uint32_t)uVar13) < (uint32_t)uVar8) {
+        if ((uint32_t)(0xFFFFFFFFu / (uint32_t)distance_sq) < (uint32_t)line_len_sq) {
             do {
                 if (abs_dot <= 0xFFFF) {
-                    bVar1 = true;
+                    is_within_distance = true;
                     break;
                 }
 
-                int32_t sqrt_uVar8 = special::isqrt_(uVar8);
-                if (abs_dot <= sqrt_uVar8 * d) {
-                    bVar1 = true;
+                int32_t sqrt_line_len = special::isqrt_(line_len_sq);
+                if (abs_dot <= sqrt_line_len * d) {
+                    is_within_distance = true;
                     break;
                 }
 
-                if ((sqrt_uVar8 + 1) * d < abs_dot) {
+                if ((sqrt_line_len + 1) * d < abs_dot) {
                     return false;
                 }
 
@@ -492,19 +488,19 @@ namespace GEO {
                 py /= 2;
                 px /= 2;
 
-                iVar15 = (int32_t)y1 - (int32_t)y2;
-                iVar17 = (int32_t)x2 - (int32_t)x1;
-                dot_product = (px - x2) * iVar15 + (py - y2) * iVar17;
+                line_dy = (int32_t)y1 - (int32_t)y2;
+                line_dx = (int32_t)x2 - (int32_t)x1;
+                dot_product = (px - x2) * line_dy + (py - y2) * line_dx;
                 abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
 
-                uVar8 = iVar17 * iVar17 + iVar15 * iVar15;
-                uVar13 = d * d;
+                line_len_sq = line_dx * line_dx + line_dy * line_dy;
+                distance_sq = d * d;
 
-            } while ((uint32_t)(0xFFFFFFFFu / (uint32_t)uVar13) < (uint32_t)uVar8);
+            } while ((uint32_t)(0xFFFFFFFFu / (uint32_t)distance_sq) < (uint32_t)line_len_sq);
         }
 
-        if (!bVar1) {
-            if (abs_dot > 0xFFFF || uVar13 * uVar8 < abs_dot * abs_dot) {
+        if (!is_within_distance) {
+            if (abs_dot > 0xFFFF || distance_sq * line_len_sq < abs_dot * abs_dot) {
                 return false;
             }
         }
@@ -531,28 +527,28 @@ namespace GEO {
             }
             return true;
         } else {
-            int32_t sum_sq = iVar15 * iVar15 + iVar17 * iVar17;
-            int32_t iVar12 = iVar15;
-            int32_t local_10 = iVar17;
+            int32_t step_len_sq = line_dy * line_dy + line_dx * line_dx;
+            int32_t scaled_dy = line_dy;
+            int32_t scaled_dx = line_dx;
 
-            if (sum_sq <= uVar13) {
+            if (step_len_sq <= distance_sq) {
                 do {
-                    iVar12 += iVar15;
-                    local_10 += iVar17;
-                    sum_sq = iVar12 * iVar12 + local_10 * local_10;
-                } while (sum_sq <= uVar13);
+                    scaled_dy += line_dy;
+                    scaled_dx += line_dx;
+                    step_len_sq = scaled_dy * scaled_dy + scaled_dx * scaled_dx;
+                } while (step_len_sq <= distance_sq);
             }
 
-            int32_t ppx1 = iVar12 + px;
-            int32_t ppy1 = local_10 + py;
+            int32_t candidate_x = scaled_dy + px;
+            int32_t candidate_y = scaled_dx + py;
 
-            if (Points_On_Same_Side_Of_Line_(ppx1, ppy1, px, py, x1, y1, x2, y2) > 0) {
-                ppx1 = px - iVar12;
-                ppy1 = py - local_10;
-                Points_On_Same_Side_Of_Line_(ppx1, ppy1, px, py, x1, y1, x2, y2);
+            if (Points_On_Same_Side_Of_Line_(candidate_x, candidate_y, px, py, x1, y1, x2, y2) > 0) {
+                candidate_x = px - scaled_dy;
+                candidate_y = py - scaled_dx;
+                Points_On_Same_Side_Of_Line_(candidate_x, candidate_y, px, py, x1, y1, x2, y2);
             }
 
-            if (Points_On_Same_Side_Of_Line_(x1, y1, x2, y2, ppx1, ppy1, px, py) > 0) {
+            if (Points_On_Same_Side_Of_Line_(x1, y1, x2, y2, candidate_x, candidate_y, px, py) > 0) {
                 return false;
             }
 
@@ -560,12 +556,12 @@ namespace GEO {
         }
     }
 
-    int __cdecl Actual_Expected_Damage_(int min_damage, int max_damage, int min_chance, int base_chance, int reduction) {
-        int expected_total = 0;
+    int32_t __cdecl Actual_Expected_Damage_(int32_t min_damage, int32_t max_damage, int32_t min_chance, int32_t base_chance, int32_t reduction) {
+        int32_t expected_total = 0;
 
         if (reduction < max_damage) {
-            for (int i = 1; i <= 100; ++i) {
-                int chance;
+            for (int32_t i = 1; i <= 100; ++i) {
+                int32_t chance;
 
                 if (i >= 96) {
                     chance = 100;
@@ -577,7 +573,7 @@ namespace GEO {
                 }
 
                 if (min_chance <= chance) {
-                    int expected;
+                    int32_t expected;
 
                     if (chance == 100) {
                         expected = max_damage;
@@ -587,7 +583,7 @@ namespace GEO {
                         expected = ((max_damage - min_damage + 1) * (chance - min_chance)) / (100 - min_chance) + min_damage;
                     }
 
-                    int net_damage = expected - reduction;
+                    int32_t net_damage = expected - reduction;
                     if (net_damage > 0) {
                         expected_total += net_damage;
                     }

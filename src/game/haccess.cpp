@@ -1,25 +1,16 @@
 #include "pch.h"
 
 namespace HACCESS {
-    const char s_format_star_roman[6] = "%s %s";
-    const char s_I[2] = "I";
-
-    /**
-     * @address 0049b210
-     */
     int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx) {
         int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
 
-        if (node_idx >= 0 && node_idx < 500) {
+        if (node_idx >= 0 && node_idx < (int16_t)(sizeof(MOX::_ship_node) / sizeof(MOX::_ship_node[0]))) {
             return MOX::_ship_node[node_idx].ship_idx;
         }
 
         return 0;
     }
 
-    /**
-     * @address 0049b240
-     */
     int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx) {
         int16_t node_idx = MOX::_ship_icon[ship_icon_idx].node_idx;
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
@@ -27,9 +18,6 @@ namespace HACCESS {
         return MOX::_ship[ship_idx].location;
     }
 
-    /**
-     * @address 0049b270
-     */
     int16_t __cdecl Ship_Owner_(int16_t ship_idx) {
         int16_t error_code = 0;
 
@@ -51,8 +39,10 @@ namespace HACCESS {
         }
 
         char message[200];
-        // Note: The original code accesses the array even if the index is invalid in error paths.
-        int32_t current_owner = (int32_t)MOX::_ship[ship_idx].owner;
+        int32_t current_owner = -1;
+        if (ship_idx >= 0 && ship_idx < 500) {
+            current_owner = (int32_t)MOX::_ship[ship_idx].owner;
+        }
 
         sprintf(message, s_Memory_Corruption_val_00558028, (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
 
@@ -161,9 +151,9 @@ namespace HACCESS {
         }
     }
 
-    // BUG: The original implementation contains a potential bug where it skips every 
+    // BUG: The original implementation contains a potential bug where it skips every
     // second node in the linked list chain during traversal.
-    int16_t __cdecl Ship_Icon_Id_From_Node_Ptr_(int16_t node_ptr) {
+    int16_t __cdecl Ship_Icon_Id_From_Node_Ptr_(int16_t ship_node_idx) {
         int16_t found_icon_idx = 0;
         bool found = false;
         int16_t i = 0;
@@ -176,7 +166,7 @@ namespace HACCESS {
 
                 int16_t current_node_idx = MOX::_ship_icon[i].node_idx;
 
-                if (current_node_idx == node_ptr) {
+                if (current_node_idx == ship_node_idx) {
                     found = true;
                     found_icon_idx = i;
                 } else {
@@ -188,7 +178,7 @@ namespace HACCESS {
 
                         // Advance to next node and compare
                         current_node_idx = MOX::_ship_node[current_node_idx].next_node;
-                        if (current_node_idx == node_ptr) {
+                        if (current_node_idx == ship_node_idx) {
                             found = true;
                             found_icon_idx = i;
                         } else if (current_node_idx != -1) {
@@ -204,8 +194,8 @@ namespace HACCESS {
         return found_icon_idx;
     }
 
-    int16_t __cdecl Ship_Icon_Owner_(int16_t icon_id) {
-        int16_t node_idx = MOX::_ship_icon[icon_id].node_idx;
+    int16_t __cdecl Ship_Icon_Owner_(int16_t icon_idx) {
+        int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
 
         return Ship_Owner_(MOX::_ship_node[node_idx].ship_idx);
     }
@@ -218,9 +208,6 @@ namespace HACCESS {
     void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
-        buffer[0] = s_space_005510f0[0];
-        buffer[1] = s_space_005510f0[1];
-
         int8_t star_idx = MOX::_planet[planet_idx].star_index;
         int8_t planet_num = HAROLD::Planet_Number_(planet_idx);
 
@@ -229,14 +216,14 @@ namespace HACCESS {
             numeral_str = MOX::_roman_literals[planet_num + 1];
         } else {
             numeral_str = MOX::_roman_literals[planet_num + 1];
-            if (numeral_str[0] == s_I[0] && numeral_str[1] == s_I[1]) {
+            if (strcmp(numeral_str, "I") == 0) {
                 numeral_str = HAROLD::H_Message_(0xa0);
             }
         }
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        sprintf(buffer, s_format_star_roman, star->name, numeral_str);
+        sprintf(buffer, "%s %s", star->name, numeral_str);
 
         if (strlen(buffer) > 30) {
             buffer[30] = '\0';
@@ -313,11 +300,8 @@ namespace HACCESS {
         }
     }
 
-    char* __cdecl Design_Name_(int16_t player_idx, int16_t design) {
-        // Redundant operation from original code
-        *(uint16_t*)MOX::_temp_string = *reinterpret_cast<const uint16_t*>(s_space_005510f0);
-
-        strcpy(MOX::_temp_string, MOX::_player[player_idx].ship_designs[design].name);
+    char* __cdecl Design_Name_(int16_t player_idx, int16_t design_idx) {
+        strcpy(MOX::_temp_string, MOX::_player[player_idx].ship_designs[design_idx].name);
 
         return MOX::_temp_string;
     }
@@ -403,7 +387,7 @@ namespace HACCESS {
         int16_t result_index = 0;
         bool found = false;
 
-        for (int16_t i = 0; i < 40 /* 0x28 */; ++i) {
+        for (int16_t i = 0; i < (int16_t)(sizeof(TECHDATA::_weapons) / sizeof(TECHDATA::_weapons[0])); ++i) {
             // Check if we have already found the weapon to early exit
             if (found) {
                 break;
@@ -521,54 +505,25 @@ namespace HACCESS {
         return 0;
     }
 
-    /**
-     * @brief Scans the ship node list and collects indices of selected ships belonging to the player,
-     * optionally filtered by ship type.
-     * 
-     * @param selected_ids_out Buffer to store the resulting ship indices.
-     * @param max The number of int16_t elements in the output buffer to initialize with -1.
-     * @param filter The ship type to filter for (0xFF for no filter).
-     * @return The number of selected ships found.
-     */
-    /**
-     * @brief Retrieves the X coordinate of a ship at a specific index in the ship node stack.
-     *
-     * @param stack_idx Index in the ship node list.
-     * @return The X coordinate of the ship referenced by the node.
-     */
     int16_t __cdecl Ship_Stack_X_(int16_t stack_idx) {
-        // Fetch the ship index from the node list at the given stack index
         int16_t ship_idx = MOX::_ship_node[stack_idx].ship_idx;
-
-        // Access the ship data array and return the x coordinate
-        // ship_idx is used as an index into the s_ship_data array (size 0x81)
         return MOX::_ship[ship_idx].x;
     }
 
-    /**
-     * @brief Returns the Y coordinate of a ship in a stack node.
-     * @param node_idx The index into the ship node array.
-     * @return The Y coordinate of the ship.
-     */
     int16_t __cdecl Ship_Stack_Y_(int16_t node_idx) {
-        // Fetch ship_idx from _ship_node[node_idx]
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
-        // Fetch _ship[ship_idx].y
         return MOX::_ship[ship_idx].y;
     }
 
-    /**
-     * @address 0049ac20
-     */
     bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship) {
-        if (static_cast<int16_t>(ship->owner) == player_idx) {
+        if ((int16_t)ship->owner == player_idx) {
             return SHIPMOVE::Can_Order_Ship_(ship);
         }
 
         return false;
     }
 
-    int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords) {
+    int16_t __cdecl Nearest_Star_To_XY_(int16_t* ship_coords) {
         int16_t best_star_idx = -1;
         uint8_t min_turns = 0xff;
         s_ship_move_info move_info;
@@ -578,7 +533,7 @@ namespace HACCESS {
             if (HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, i)) {
                 // Check if the system is blockaded for the current player
                 if (((MOX::_star[i].blockaded >> (uint8_t)MOX::_PLAYER_NUM) & 1) == 0) {
-                    SHIPMOVE::Ships_Try_To_Move_To_(coords, i, &move_info);
+                    SHIPMOVE::Ships_Try_To_Move_To_(ship_coords, i, &move_info);
 
                     // If ships can actually move to this star
                     if (move_info.moving != 0) {
@@ -595,9 +550,12 @@ namespace HACCESS {
         return best_star_idx;
     }
 
-    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* selected_ids_out, int16_t max, int16_t filter) {
+    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(
+        int16_t* selected_ids_out,
+        int16_t selected_ids_capacity,
+        int16_t ship_type_filter) {
         // Initialize output buffer with 0xFFFF (-1)
-        memset(selected_ids_out, 0xff, max * sizeof(int16_t));
+        memset(selected_ids_out, 0xff, selected_ids_capacity * sizeof(selected_ids_out[0]));
 
         int16_t selected_count = 0;
         bool stop_flag = false;
@@ -614,7 +572,7 @@ namespace HACCESS {
             bool is_match = false;
             // Verify ownership and optional ship type filter
             if ((int16_t)(int8_t)ship.owner == MOX::_PLAYER_NUM) {
-                if (filter == 0x00FF || (int16_t)(int8_t)ship.d.ship_type == filter) {
+                if (ship_type_filter == 0x00FF || (int16_t)(int8_t)ship.d.ship_type == ship_type_filter) {
                     is_match = true;
                 }
             }
@@ -633,27 +591,15 @@ namespace HACCESS {
         return selected_count;
     }
 
-    /**
-     * @address 0049AC40
-     */
     bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx) {
         return MOX::_player[player_idx].tech_applications[tech_idx] == 3;
     }
 
-    /**
-     * @address 0049ab90
-     */
-    /**
-     * @address 0049b510
-     */
     int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_idx) {
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
         return MOX::_ship[ship_idx].location;
     }
 
-    /**
-     * @address 0049AB10
-     */
     int8_t __cdecl N_Star_Relocations_(int16_t player_idx) {
         int16_t relocation_count = 0;
 
@@ -690,9 +636,6 @@ namespace HACCESS {
         return -1;
     }
 
-    /**
-     * @address 0049b5b0
-     */
     int8_t __cdecl Special_Is_Planet_Special_(int16_t special_type) {
         if (special_type == 4 || special_type == 5 || special_type == 6 ||
             special_type == 7 || special_type == 10) {
@@ -702,9 +645,6 @@ namespace HACCESS {
         return 0;
     }
 
-    /**
-     * @address 0049ac00
-     */
     int16_t __cdecl Planet_Orbit_(int16_t planet_idx) {
         return (int16_t)MOX::_planet[planet_idx].orbit;
     }
@@ -737,28 +677,18 @@ namespace HACCESS {
         return enemy_approaching;
     }
 
-    /**
-     * @address 0049acd0
-     */
-    void __cdecl Race_Name_(int16_t id, char* race_name_out) {
-        // Initial setup with default race name "Human"
-        strcpy(race_name_out, s_Human_00558020);
+    void __cdecl Race_Name_(int16_t race_id, char* race_name_out) {
+        strcpy(race_name_out, "Human");
 
-        if (id < 8) {
-            // For valid player indices, use their customized race name
-            strcpy(race_name_out, MOX::_player[id].race_name);
-        } else if (id == 8) {
-            // Special index 8 maps to a specific internal race string
+        if (race_id < 8) {
+            strcpy(race_name_out, MOX::_player[race_id].race_name);
+        } else if (race_id == 8) {
             strcpy(race_name_out, MOX::_race_names[13]);
         } else {
-            // For other indices, use a fixed offset into the race names list
-            strcpy(race_name_out, MOX::_race_names[id + 5]);
+            strcpy(race_name_out, MOX::_race_names[race_id + 5]);
         }
     }
 
-    /**
-     * @address 0049add0
-     */
     void __cdecl Set_All_Colony_Auto_Select_Flags_() {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             bool found_valid = false;
@@ -793,29 +723,18 @@ namespace HACCESS {
         }
     }
 
-    /**
-     * @address 0049b610
-     */
     int16_t __cdecl System_Planet_Scanned_To_Planet_Id_(int16_t star_idx, int16_t planet_idx) {
         return MOX::_star[star_idx].planet_index[planet_idx];
     }
 
-    /**
-     * @address 0049b640
-     */
     int16_t __cdecl System_Ship_Scanned_To_Ship_Id_(int16_t ship_node_idx) {
-        // Each s_ship_node is 5 bytes. The disassembly calculates the offset as: ship_node_idx * 5
-        // which corresponds to indexing the array of s_ship_node structures.
         return MOX::_ship_node[ship_node_idx].ship_idx;
     }
 
     void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {
-        memset(MOX::_fleet_icon_selection_status, 0, 63);
+        memset(MOX::_fleet_icon_selection_status, 0, sizeof(MOX::_fleet_icon_selection_status));
     }
 
-    /**
-     * @address 0049b090
-     */
     void __cdecl Set_Hotseat_Fleet_Box_To_Last_Stack_(int16_t player_idx) {
         const int16_t ship_id = MAINSCR::_hotseat_fleet_box[player_idx].stack_ship_id;
 
@@ -823,7 +742,7 @@ namespace HACCESS {
 
         if (ship_id > -1 &&
             HACCESS::Ship_Owner_(ship_id) == player_idx &&
-            static_cast<int8_t>(MOX::_ship[ship_id].status) < 3) {
+            (int8_t)MOX::_ship[ship_id].status < 3) {
             MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Ship_Id_(ship_id);
         } else {
             MOX::_fleet_box_ship_stack = -1;
@@ -832,13 +751,10 @@ namespace HACCESS {
         if (MOX::_fleet_box_ship_stack == -1) {
             MOVEBOX::Vanish_Fleet_Movement_Box_();
             MOX::_saved_boxes[2].is_open = 0;
-            MOX::_saved_boxes[2].field_id = static_cast<int16_t>(MOX::_box_off_flag[2]);
+            MOX::_saved_boxes[2].field_id = (int16_t)MOX::_box_off_flag[2];
         }
     }
 
-    /**
-     * @address 0049A360
-     */
     void __cdecl Build_Saved_Ship_Array_() {
         memset(MOX::_fleet_box_ship_ids, 0, sizeof(MOX::_fleet_box_ship_ids));
 
@@ -847,14 +763,11 @@ namespace HACCESS {
                 const int32_t ship_node_idx = MOX::_fleet_movement_icon[saved_ship_idx].ship_node_idx;
                 struct_::Set_Bit_Field_(
                     MOX::_fleet_box_ship_ids,
-                    static_cast<uint16_t>(MOX::_ship_node[ship_node_idx].ship_idx));
+                    (uint16_t)MOX::_ship_node[ship_node_idx].ship_idx);
             }
         }
     }
 
-    /**
-     * @address 0049B050
-     */
     void __cdecl Save_Hotseat_Fleet_Box_Ship_(int16_t fleet_box_idx) {
         if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
             const int32_t ship_node_idx = MOX::_fleet_movement_icon[0].ship_node_idx;

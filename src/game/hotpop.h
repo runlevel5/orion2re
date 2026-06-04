@@ -8,13 +8,23 @@ namespace HOTPOP {
     extern s_animation_header* _hot_pop_background_seg;
     extern s_animation_header* _grid_background[4];
 
+    /* Reloads the hotseat setup screen art assets into the screen segment. */
     void __cdecl Reload_Hotseat_Screen_();
 
+    /* Fades in after drawing the hotseat setup screen background. */
     void __cdecl Fade_Into_Hotseat_Screen_();
 
-    void __cdecl Init_Hotseat_Screen_(int16_t* btn_field_1, int16_t* btn_field_2, int16_t* btn_field_3);
+    /*
+     * Initializes the hotseat setup fields and returns their field ids.
+     * out_join_button_field: Receives the Join button field id, or -1000 when joining is unavailable.
+     * out_accept_button_field: Receives the Accept button field id.
+     * out_cancel_button_field: Receives the Cancel button field id.
+     */
+    void __cdecl Init_Hotseat_Screen_(int16_t* out_join_button_field, int16_t* out_accept_button_field, int16_t* out_cancel_button_field);
 
+    /* Draws the hotseat setup background and player-number list. */
     void __cdecl Draw_Hotseat_Screen_(void);
 
+    /* Runs the hotseat setup loop until the player cancels or starts a new game. */
     void __cdecl Hotseat_Screen_(void);
 }

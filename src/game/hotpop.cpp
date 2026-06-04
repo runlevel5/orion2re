@@ -37,7 +37,7 @@ namespace HOTPOP {
         _grid_background[3] = (s_animation_header*)farload::Far_Reload_Next_(MULTPLAY::s_MULTIGM_LBX, 0x0E, MOX::_screen_seg);
     }
 
-    void __cdecl Init_Hotseat_Screen_(int16_t* btn_field_1, int16_t* btn_field_2, int16_t* btn_field_3) {
+    void __cdecl Init_Hotseat_Screen_(int16_t* out_join_button_field, int16_t* out_accept_button_field, int16_t* out_cancel_button_field) {
         int16_t base_x;
         int16_t base_y;
         int16_t anim_w;
@@ -58,14 +58,15 @@ namespace HOTPOP {
         base_y = (480 - anim_h) / 2;
 
         if (HOTPOP::_hotseat_human_players < 8) {
-            *btn_field_1 = fields::Add_Button_Field_(base_x + 125, base_y + 99, s__00551100, _grid_background[1], s__00551100, 40 /* '(' */);
+            *out_join_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 99, "", _grid_background[1], "", 40);
         } else {
-            *btn_field_1 = -1000;
+            *out_join_button_field = -1000;
         }
 
-        *btn_field_2 = fields::Add_Button_Field_(base_x + 125, base_y + 136, s__00551100, _grid_background[2], s__00551100, 40 /* '(' */);
+        *out_accept_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 136, "", _grid_background[2], "", 40);
 
-        *btn_field_3 = fields::Add_Button_Field_(base_x + 140, base_y + 200, s__00551100, _grid_background[3], s__00551120, 40 /* '(' */);
+        /* "\x1b" is a non-printing fmtpara ESC control byte reused here as a field-label sentinel. */
+        *out_cancel_button_field = fields::Add_Button_Field_(base_x + 140, base_y + 200, "", _grid_background[3], "\x1b", 40);
 
         fields::Assign_Auto_Function_(HOTPOP::Draw_Hotseat_Screen_, 2);
     }
@@ -81,7 +82,7 @@ namespace HOTPOP {
         int16_t center_x;
         int16_t center_y;
         char msg_players_plural[20];
-        char msg_player_singular[20];
+        char remaining_player_label[20];
         char warning_buf[200];
 
         MOX::_hot_seat_flag = 3;
@@ -124,15 +125,15 @@ namespace HOTPOP {
                     strcpy(msg_players_plural, HAROLD::H_Message_(165));
                     
                     if ((MOX::_settings.number_of_players - HOTPOP::_hotseat_human_players) == 1) {
-                        strcpy(msg_player_singular, HAROLD::H_Message_(164));
+                        strcpy(remaining_player_label, HAROLD::H_Message_(164));
                     } else {
-                        strcpy(msg_player_singular, HAROLD::H_Message_(165));
+                        strcpy(remaining_player_label, HAROLD::H_Message_(165));
                     }
 
                     sprintf(warning_buf, HAROLD::H_Message_(163), 
                             HOTPOP::_hotseat_human_players, msg_players_plural, 
                             (MOX::_settings.number_of_players - HOTPOP::_hotseat_human_players), 
-                            msg_player_singular);
+                            remaining_player_label);
 
                     if (GENDRAW::Confirmation_Box_(warning_buf) == 0) {
                         video::Set_Page_Back_();

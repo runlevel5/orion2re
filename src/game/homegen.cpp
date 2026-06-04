@@ -1,7 +1,6 @@
 #include "pch.h"
 
 namespace HOMEGEN {
-    const char s_Found_no_satellites_after_3_MIN_e_0055adc8[54] = "Found no satellites after 3_MIN enforcement: Star: %d";
     const char s_Orion[8] = "Orion";
 
     int32_t _HOME_WORLD_GEN_MAX_CTR;
@@ -9,9 +8,17 @@ namespace HOMEGEN {
     int16_t _nearest_food_worlds[8];
     s_star_dist* _star_list;
 
-    int __cdecl qsort_1_(const void* a, const void* b) {
-        const s_orion_candidate* candidate_a = (const s_orion_candidate*)a; 
-        const s_orion_candidate* candidate_b = (const s_orion_candidate*)b;
+    static int32_t __cdecl Compare_Star_Dist_(const s_star_dist* candidate_a, const s_star_dist* candidate_b) {
+        if (candidate_a->dist == candidate_b->dist) {
+            return 0;
+        }
+
+        return (candidate_a->dist > candidate_b->dist) ? 1 : -1;
+    }
+
+    int __cdecl qsort_1_(const void* candidate_a_ptr, const void* candidate_b_ptr) {
+        const s_orion_candidate* candidate_a = (const s_orion_candidate*)candidate_a_ptr;
+        const s_orion_candidate* candidate_b = (const s_orion_candidate*)candidate_b_ptr;
         return candidate_a->dist - candidate_b->dist;
     }
 
@@ -38,7 +45,8 @@ namespace HOMEGEN {
     }
 
     void __cdecl Guarantee_A_Planet_At_Min_Dist_(int16_t origin_star_idx, int16_t min_dist, int16_t* player_home_stars) {
-        _star_list = (s_star_dist*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x120);
+        _star_list = (s_star_dist*)allocate::Allocate_First_Block_(
+            MOX::_global_data_seg, sizeof(*_star_list) * MAX_STARS);
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             _star_list[i].dist = 999;
@@ -60,7 +68,7 @@ namespace HOMEGEN {
         }
 
         if (!planet_found) {
-            qsort(_star_list, MOX::_NUM_STARS, sizeof(s_star_dist), qsort_star_dist_list_);
+            qsort(_star_list, MOX::_NUM_STARS, sizeof(*_star_list), qsort_star_dist_list_);
 
             int16_t list_idx = 0;
             int16_t target_star_idx;
@@ -83,27 +91,27 @@ namespace HOMEGEN {
             }
 
             if (!Star_Has_Planet_(target_star_idx)) {
-                s_star_data* s = &MOX::_star[target_star_idx];
-                s->spectral_class = 4; // M-class (Red)
+                s_star_data* target_star = &MOX::_star[target_star_idx];
+                target_star->spectral_class = 4; // M-class (Red)
 
                 int32_t r_size = random::Random_(10) - 1;
-                if (r_size < 3) s->size = 0;
-                else if (r_size < 7) s->size = 1;
-                else s->size = 2;
+                if (r_size < 3) target_star->size = 0;
+                else if (r_size < 7) target_star->size = 1;
+                else target_star->size = 2;
 
-                s->pict_type = (char)(random::Random_(3) - 1);
+                target_star->pict_type = (char)(random::Random_(3) - 1);
 
                 for (int j = 0; j < 5; ++j) {
-                    s->planet_index[j] = -1;
+                    target_star->planet_index[j] = -1;
                 }
 
                 for (int j = 0; j < 2; ++j) {
                     char orbit = MAPGEN::Generate_Orbit_(target_star_idx);
-                    s->planet_index[(uint8_t)orbit] = MOX::_planet_count;
+                    target_star->planet_index[(uint8_t)orbit] = MOX::_planet_count;
 
-                    s_planet_data* p = &MOX::_planet[MOX::_planet_count];
-                    p->orbit = orbit;
-                    p->planet_type = 3; // Terran
+                    s_planet_data* new_planet = &MOX::_planet[MOX::_planet_count];
+                    new_planet->orbit = orbit;
+                    new_planet->planet_type = 3; // Terran
 
                     MAPGEN::Generate_Satellite_(target_star_idx, orbit, 3);
                     MOX::_planet_count++;
@@ -138,18 +146,18 @@ namespace HOMEGEN {
         return (dx * dx) + (dy * dy);
     }
 
-    int32_t __cdecl qsort_star_dist_list_(const void* param_1, const void* param_2) {
-        const int16_t val1 = *reinterpret_cast<const int16_t*>(param_1);
-        const int16_t val2 = *reinterpret_cast<const int16_t*>(param_2);
+    int32_t __cdecl qsort_star_dist_list_(const void* star_dist_a, const void* star_dist_b) {
+        const s_star_dist* left = (const s_star_dist*)star_dist_a;
+        const s_star_dist* right = (const s_star_dist*)star_dist_b;
 
-        if (val1 == val2) {
+        if (left->dist == right->dist) {
             return 0;
         }
 
-        return (val1 > val2) ? 1 : -1;
+        return (left->dist > right->dist) ? 1 : -1;
     }
 
-    void __cdecl Build_Min_Star_Distances_(int32_t min_distance) {
+    void __cdecl Build_Min_Star_Distances_(int32_t min_dist_sq) {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
             RUSS::Mox_Update_();
 
@@ -161,7 +169,7 @@ namespace HOMEGEN {
 
                 int32_t dist = Dist_Between_Stars_(i, j);
 
-                if (dist >= min_distance) {
+                if (dist >= min_dist_sq) {
                     struct_::Set_Bit_Field_(current_star, j);
 
                     // Note: Potential out-of-bounds access if MOX::_NUM_STARS > 72
@@ -172,12 +180,12 @@ namespace HOMEGEN {
         }
     }
 
-    uint8_t __cdecl Build_Home_Star_List_(int16_t* home_stars_out, int32_t min_dist) {
+    uint8_t __cdecl Build_Home_Star_List_(int16_t* home_stars_out, int32_t min_distance_sq) {
         s_colors colors1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
         s_colors colors2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
-        CandidateList candidates[72];
-        for (int i = 0; i < 72; ++i) {
+        CandidateList candidates[MAX_STARS];
+        for (int i = 0; i < MAX_STARS; ++i) {
             candidates[i].count = 0;
             for (int j = 0; j < 20; ++j) candidates[i].stars[j] = 0;
         }
@@ -215,7 +223,7 @@ namespace HOMEGEN {
                             int16_t bit = struct_::Test_Bit_Field_(field_k, star_j);
 
                             RUSS::Mox_Update_();
-                            if (existing_star != star_j && (bit == 0 || dist < min_dist)) {
+                            if (existing_star != star_j && (bit == 0 || dist < min_distance_sq)) {
                                 valid = false;
                                 break;
                             }
@@ -236,7 +244,7 @@ namespace HOMEGEN {
 
         int16_t selected_index = -1;
         int32_t pick_count = 1;
-        for (uint16_t si = 0; si < 72; ++si) {
+        for (uint16_t si = 0; si < MAX_STARS; ++si) {
             RUSS::Mox_Update_();
             if (candidates[si].count >= MOX::_NUM_PLAYERS) {
                 if (random::Random_(pick_count) == 1) {
@@ -256,7 +264,7 @@ namespace HOMEGEN {
                 sel_list->stars[idx2] = tmp;
             }
 
-            // Initialize output buffer (8 uint16_t slots as per 0xFFFFFFFF x 4)
+            // Clear the 8-slot output list.
             for (int i = 0; i < 8; ++i) home_stars_out[i] = -1;
 
             for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
@@ -268,19 +276,7 @@ namespace HOMEGEN {
         return 1; // Failure
     }
 
-    /**
-     * @brief Randomizes elements in the home world array by performing 100 swaps.
-     *
-     * @param arr Pointer to an array of world identifiers (shorts).
-     */
-    /**
-     * @brief Checks if a given food world index is already in the list of nearest food worlds.
-     * @param food_world_idx The world index to search for.
-     * @return true if the world is already added, false otherwise.
-     */
     bool __cdecl Is_Added_Food_World_(int16_t food_world_idx) {
-        // The function iterates through the nearest food worlds and returns true if a match is found.
-        // It uses _NUM_PLAYERS as the loop limit.
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (_nearest_food_worlds[i] == food_world_idx) {
                 return true;
@@ -289,16 +285,15 @@ namespace HOMEGEN {
         return false;
     }
 
-    void __cdecl Randomize_Home_Worlds_(int16_t* arr) {
+    void __cdecl Randomize_Home_Worlds_(int16_t* home_star_ids) {
         for (int32_t i = 0; i < 100; ++i) {
-            // Random_ likely returns a value from 1 to N, so we subtract 1 for 0-based indexing.
-            int16_t idx1 = static_cast<uint16_t>(random::Random_(static_cast<int32_t>(MOX::_NUM_PLAYERS))) - 1;
-            int16_t idx2 = static_cast<uint16_t>(random::Random_(static_cast<int32_t>(MOX::_NUM_PLAYERS))) - 1;
+            int16_t idx1 = (uint16_t)random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
+            int16_t idx2 = (uint16_t)random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
 
             if (idx1 != idx2) {
-                int16_t temp = arr[idx1];
-                arr[idx1] = arr[idx2];
-                arr[idx2] = temp;
+                int16_t temp = home_star_ids[idx1];
+                home_star_ids[idx1] = home_star_ids[idx2];
+                home_star_ids[idx2] = temp;
             }
         }
     }
@@ -400,7 +395,7 @@ namespace HOMEGEN {
         (void)colors2;
 
         // Determine home world generation counter limits
-        _HOME_WORLD_GEN_MAX_CTR = (static_cast<int32_t>(MOX::_NUM_STARS) * 25) / 20;
+        _HOME_WORLD_GEN_MAX_CTR = ((int32_t)MOX::_NUM_STARS * 25) / 20;
         if (MOX::_NUM_STARS > 54) {
             _HOME_WORLD_GEN_MAX_CTR = 372;
         }
@@ -413,7 +408,7 @@ namespace HOMEGEN {
         }
 
         video::Set_Page_Back_();
-        s_animation_header* lbx_buf = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(MAPGEN::s_raceopt_lbx, 0, MOX::_global_cache_seg));
+        s_animation_header* lbx_buf = (s_animation_header*)buffer::Buffer_Reload_(MAPGEN::s_raceopt_lbx, 0, MOX::_global_cache_seg);
         animate::Draw_(0, 0, lbx_buf);
         video::Copy_Back_To_Off_();
 
@@ -432,11 +427,6 @@ namespace HOMEGEN {
         fonts::Print_To_Bitmap_(0, 0, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap);
     }
 
-    /**
-     * Ensures that a star system has at least 3 planetary bodies (planets, asteroid belts, or gas giants).
-     * If the spectral class is not conducive to life/planets, it rerolls the star's class.
-     * Then it populates empty orbits until the minimum count is met.
-     */
     void __cdecl Assign_Home_Star_Names_() {
         uint8_t is_race_assigned[14];
         for (int i = 0; i < 14; ++i) {
@@ -470,7 +460,7 @@ namespace HOMEGEN {
     void __cdecl Make_System_Monsters_() {
         int16_t scaled_x = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
         int16_t scaled_y = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
-        uint32_t dist_limit_sq = static_cast<uint32_t>(scaled_x * scaled_x + scaled_y * scaled_y);
+        uint32_t dist_limit_sq = (uint32_t)(scaled_x * scaled_x + scaled_y * scaled_y);
 
         if (MOX2::_user_wants_n_space_monsters == -1) {
             if (MAPGEN::_n_space_monsters > 20) {
@@ -498,7 +488,7 @@ namespace HOMEGEN {
                 desired_monsters = valid_stars_count;
             }
 
-            MAPGEN::_n_space_monsters = static_cast<uint8_t>(desired_monsters);
+            MAPGEN::_n_space_monsters = (uint8_t)desired_monsters;
             MOX2::_user_wants_n_space_monsters = MAPGEN::_n_space_monsters;
             // Disable distance constraints for custom monster counts
             dist_limit_sq = 0;
@@ -508,9 +498,9 @@ namespace HOMEGEN {
             return;
         }
 
-        uint16_t weights[72];
-        uint8_t flags[72];
-        int16_t placed_monster_stars[72];
+        uint16_t weights[MAX_STARS];
+        uint8_t flags[MAX_STARS];
+        int16_t placed_monster_stars[MAX_STARS];
 
         memset(weights, 0, sizeof(weights));
         memset(flags, 0, sizeof(flags));
@@ -528,7 +518,7 @@ namespace HOMEGEN {
             }
         }
 
-        for (int m = 0; m < static_cast<int>(MAPGEN::_n_space_monsters); ++m) {
+        for (int m = 0; m < (int)MAPGEN::_n_space_monsters; ++m) {
             int divisor = (m * 2 > 1) ? (m * 2) : 1;
             int32_t current_min_dist = dist_limit_sq / divisor;
 
@@ -628,7 +618,7 @@ namespace HOMEGEN {
             if (found) break;
 
             int r = random::Random_(5);
-            int16_t orbit_candidate = static_cast<int16_t>(r - 1);
+            int16_t orbit_candidate = (int16_t)(r - 1);
 
             if (orbit_candidate < 0 || orbit_candidate > 4) continue;
 
@@ -659,7 +649,7 @@ namespace HOMEGEN {
 
         // Final fallback: just pick a random orbit if search failed
         if (result_orbit == -1) {
-            result_orbit = static_cast<int16_t>(random::Random_(5) - 1);
+            result_orbit = (int16_t)(random::Random_(5) - 1);
         }
 
         return result_orbit;
@@ -685,7 +675,7 @@ namespace HOMEGEN {
 
     void __cdecl Set_Special_For_Star_Guarded_By_Monster_(s_star_data* star, int16_t monster_type) {
         char race_name[200];
-        int16_t star_idx = static_cast<int16_t>(star - MOX::_star);
+        int16_t star_idx = (int16_t)(star - MOX::_star);
         int16_t need_new_special = 0;
 
         HACCESS::Race_Name_(monster_type, race_name);
@@ -707,7 +697,7 @@ namespace HOMEGEN {
         }
 
         if (has_planet_special) {
-            if ((monster_mask >> (static_cast<uint8_t>(star->system_special) & 0x1F)) & 1) {
+            if ((monster_mask >> ((uint8_t)star->system_special & 0x1F)) & 1) {
                 for (int i = 0; i < 5; ++i) {
                     int16_t p_idx = star->planet_index[i];
                     if (p_idx > -1) {
@@ -798,7 +788,7 @@ namespace HOMEGEN {
             }
         }
 
-        int16_t planet_index = static_cast<int16_t>(planet - MOX::_planet);
+        int16_t planet_index = (int16_t)(planet - MOX::_planet);
         int16_t star_idx = (int16_t)planet->star_index;
         MAPGEN::Set_Secondary_Planet_Data_(star_idx, planet_index);
 
@@ -954,7 +944,7 @@ namespace HOMEGEN {
 
         if (candidate_count == 0) {
             char error_msg[128];
-            sprintf(error_msg, s_Found_no_satellites_after_3_MIN_e_0055adc8, (int)star_idx);
+            sprintf(error_msg, "Found no satellites after 3_MIN enforcement: Star: %d", (int)star_idx);
             exitm::Exit_With_Message(error_msg);
             return;
         }
@@ -1025,7 +1015,6 @@ namespace HOMEGEN {
     }
 
     void __cdecl Set_Planet_Size(int16_t planet_index, int8_t size) {
-        // s_planet_data structure size is 17 (0x11) bytes
         MOX::_planet[planet_index].size = size;
     }
 
@@ -1056,7 +1045,6 @@ namespace HOMEGEN {
     }
 
     void __cdecl Enforce_Planet_Abundant_Mineral_Class(int16_t planet_idx) {
-        // Accessing planet data array (struct size 0x11/17 bytes)
         if (MOX::_planet[planet_idx].mineral_class != MINERAL_RESOURCE_ABUNDANT) {
             MOX::_planet[planet_idx].mineral_class = MINERAL_RESOURCE_ABUNDANT;
         }
@@ -1176,15 +1164,15 @@ namespace HOMEGEN {
         return overall_success;
     }
 
-    void __cdecl Add_Non_Food_Planets_To_List_(int16_t star_idx, int16_t* planet_list, int16_t* count) {
+    void __cdecl Add_Non_Food_Planets_To_List_(int16_t star_idx, int16_t* planet_list, int16_t* count_in_out) {
         s_star_data* star = &MOX::_star[star_idx];
 
         for (int i = 0; i < 5; ++i) {
             int16_t planet_id = star->planet_index[i];
 
             if (planet_id > -1) {
-                planet_list[*count] = planet_id;
-                *count += 1;
+                planet_list[*count_in_out] = planet_id;
+                *count_in_out += 1;
             }
         }
     }
@@ -1198,10 +1186,10 @@ namespace HOMEGEN {
         int16_t out_x, out_y;
         MAINSCR::Get_PointXY_Draw_Coords_(x_center, y_center, &out_x, &out_y);
 
-        uint8_t visited[72];
+        uint8_t visited[MAX_STARS];
         memset(visited, 0, sizeof(visited));
 
-        s_orion_candidate candidates[72];
+        s_orion_candidate candidates[MAX_STARS];
         memset(candidates, 0xFF, sizeof(candidates));
 
         int candidate_count = 0;
@@ -1325,7 +1313,7 @@ namespace HOMEGEN {
         }
 
         MOX::_star[0].system_special = SYSTEM_SPECIAL_ORION_STAR;
-        memcpy(MOX::_star[0].name, s_Orion, 6);
+        memcpy(MOX::_star[0].name, "Orion", sizeof("Orion"));
 
         if (MOX::_star[0].spectral_class == STAR_CLASS_BLACK_HOLE) {
             MOX::_star[0].spectral_class = (int8_t)random::Random_(6) - 1;

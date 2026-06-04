@@ -1800,6 +1800,19 @@ struct s_flic_queue_entry {
 
 typedef struct s_fmtpara_break s_fmtpara_break, *Ps_fmtpara_break;
 
+typedef struct s_fmtpara_style s_fmtpara_style, *Ps_fmtpara_style;
+
+struct s_fmtpara_style {
+    int8_t font_id;
+    undefined1 highlight;
+    uint8_t fg_color;
+    uint8_t bg_color;
+    uint8_t color_attr;
+    int16_t font_height_px;
+    int8_t *char_widths;
+    int16_t space_width;
+};
+
 struct s_fmtpara_break {
     char *break_str_next;
     int16_t break_x;
@@ -1812,13 +1825,7 @@ struct s_fmtpara_break {
     int16_t space_count;
     bool break_is_backspace;
     bool break_valid;
-    int16_t x;
-    int16_t left_limit_x;
-    int16_t right_limit_x;
-    int16_t exclusion_left_x;
-    int16_t exclusion_right_x;
-    int16_t x_candidate;
-    int8_t line_char_count;
+    s_fmtpara_style style;
 };
 
 typedef struct s_fmtpara_char s_fmtpara_char, *Ps_fmtpara_char;
@@ -1892,19 +1899,6 @@ struct s_fmtpara_para {
     int16_t nest_depth;
     char *nest_stack[9];
     struct s_fmtpara_line *line;
-};
-
-typedef struct s_fmtpara_style s_fmtpara_style, *Ps_fmtpara_style;
-
-struct s_fmtpara_style {
-    int8_t font_id;
-    undefined1 highlight;
-    uint8_t fg_color;
-    uint8_t bg_color;
-    uint8_t color_attr;
-    int16_t font_height_px;
-    int8_t *char_widths;
-    int16_t space_width;
 };
 
 typedef struct s_font s_font, *Ps_font;

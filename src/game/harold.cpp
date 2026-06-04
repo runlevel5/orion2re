@@ -9,17 +9,6 @@ namespace HAROLD {
     const char s_after_home_world_gen[] = "after home world gen";
 
     const char s___s__00556ae4[] = "(%s)";
-    const char s_relate_game_conditions_EXACTLY_a_0055a6cc[] = "relate game conditions EXACTLY as they just happened";
-    const char s_orbit__d_of_star__d_has_more_tha_0055a704[] = "orbit %d of star %d has more than 1 planet in it";
-
-    const char s_HERODATI_LBX[16] = "HERODATI.LBX";
-    const char s_HERODATS_LBX[16] = "HERODATS.LBX";
-    const char s_HERODATF_LBX[16] = "HERODATF.LBX";
-    const char s_HERODATG_LBX[16] = "HERODATG.LBX";
-    const char s_HERODATA_LBX[16] = "HERODATA.LBX";
-
-    const char s_MC_0055823c[] = "MC";
-    const char s_BC_00558244[] = "BC";
     const char s_in_next_turn[] = "in next-turn";
 
     uint32_t __cdecl Is_Colony_Star_(int16_t star_idx) {
@@ -44,9 +33,7 @@ namespace HAROLD {
         for (int16_t i = 0; i < 5; ++i) {
             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
 
-            // Check if slot contains a valid planet (-1 is empty/gas giant in some contexts)
             if (planet_idx != -1) {
-                // The assembly specifically checks if planet_type is 0x03
                 if (MOX::_planet[planet_idx].planet_type == 3) {
                     count++;
                 }
@@ -56,36 +43,31 @@ namespace HAROLD {
         return count;
     }
 
-    void __cdecl Get_Officer_Data_LBX_Name_(char* out) {
-        const char* filename;
+    void __cdecl Get_Officer_Data_LBX_Name_(char* out_name) {
+        const char* lbx_name;
 
         switch (MOX::_settings.language) {
         case 1:  // German
-            filename = s_HERODATG_LBX;
+            lbx_name = "HERODATG.LBX";
             break;
         case 2:  // French
-            filename = s_HERODATF_LBX;
+            lbx_name = "HERODATF.LBX";
             break;
         case 3:  // Spanish
-            filename = s_HERODATS_LBX;
+            lbx_name = "HERODATS.LBX";
             break;
         case 4:  // Italian
-            filename = s_HERODATI_LBX;
+            lbx_name = "HERODATI.LBX";
             break;
         default: // English / Standard
-            filename = s_HERODATA_LBX;
+            lbx_name = "HERODATA.LBX";
             break;
         }
 
-        for (int32_t i = 0; i < 13; ++i) {
-            out[i] = filename[i];
-        }
+        memcpy(out_name, lbx_name, sizeof("HERODATA.LBX"));
     }
 
-    /**
-     * Checks if a star system is Orion.
-     * Uses assembly REPE CMPSB with ECX=6 comparison.
-     */
+    /** Returns whether the star's name matches Orion. */
     bool __cdecl Star_Is_Orion_(int16_t star_idx) {
         const char* orion_str = HOMEGEN::s_Orion;
         const char* star_name = MOX::_star[star_idx].name;
@@ -98,34 +80,23 @@ namespace HAROLD {
         return true;
     }
 
-    /**
-     * Checks if a star system has a habitable spectral class (O, B, A, F, G, or K).
-     * Spectral classes are indexed such that habitable ones are < 6.
-     */
+    /** Returns whether the star's spectral class falls in the habitable range. */
     bool __cdecl Habitable_Spectral_Class_(int16_t star_idx) {
-        // Star data structure size is 113 bytes.
         return MOX::_star[star_idx].spectral_class < 6;
     }
 
-    /**
-     * Determines if a star system contains only outposts (no full colonies).
-     * Returns true if there is at least one outpost and zero established colonies.
-     * @address 004f1a20
-     */
+    /** Returns whether the system contains outposts but no full colonies. */
     bool __cdecl Star_Is_Outpost_Star_(int16_t star_idx) {
         int8_t outpost_count = 0;
         int8_t colony_count = 0;
 
         for (int32_t i = 0; i < 5; ++i) {
-            // Planet index at offset 0x4a in s_star_data
             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
 
             if (planet_idx != -1) {
-                // Colony index at offset 0x0 in s_planet_data
                 int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
                 if (colony_idx != -1) {
-                    // outpost_flag at offset 0x6 in s_colony
                     if (MOX::_colony[colony_idx].outpost_flag == 0) {
                         colony_count++;
                     } else {
@@ -171,19 +142,19 @@ namespace HAROLD {
     void __cdecl Get_Font_File_(char* buffer) {
         switch (MOX::_settings.language) {
         case 1: // German
-            memcpy(buffer, "fontsg.lbx", 11);
+            memcpy(buffer, "fontsg.lbx", sizeof("fontsg.lbx"));
             return;
         case 2: // French
-            memcpy(buffer, "fontsf.lbx", 11);
+            memcpy(buffer, "fontsf.lbx", sizeof("fontsf.lbx"));
             return;
         case 3: // Spanish
-            memcpy(buffer, "fontss.lbx", 11);
+            memcpy(buffer, "fontss.lbx", sizeof("fontss.lbx"));
             return;
         case 4: // Italian
-            memcpy(buffer, "fontsi.lbx", 11);
+            memcpy(buffer, "fontsi.lbx", sizeof("fontsi.lbx"));
             return;
         default: // English or Other
-            memcpy(buffer, "fonts.lbx", 10);
+            memcpy(buffer, "fonts.lbx", sizeof("fonts.lbx"));
             return;
         }
     }
@@ -196,11 +167,11 @@ namespace HAROLD {
     }
 
     int16_t __cdecl Get_Scaled_Value_(int16_t value) {
-        return static_cast<int16_t>(static_cast<int32_t>(value * 10) / static_cast<int32_t>(MOX::_cur_map_scale));
+        return (int16_t)(((int32_t)value * 10) / (int32_t)MOX::_cur_map_scale);
     }
 
     int32_t __cdecl Get_Up_Scaled_Value_(int16_t value) {
-        return (static_cast<int32_t>(value) * static_cast<int32_t>(MOX::_cur_map_scale)) / 10;
+        return ((int32_t)value * (int32_t)MOX::_cur_map_scale) / 10;
     }
 
     uint8_t __cdecl N_Satellites(int16_t star_index) {
@@ -351,12 +322,12 @@ namespace HAROLD {
     /**
      * @address 004f1930
      */
-    void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2) {
+    void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool apply_selected_color_offset) {
         s_colors style;
 
         int16_t style_idx = Zoom_Level_Font_Style_();
 
-        Get_Player_Font_Colors_(player_idx, style_idx, &style, param_2);
+        Get_Player_Font_Colors_(player_idx, style_idx, &style, apply_selected_color_offset);
 
         fonts::Set_Font_Style_(style_idx, &style);
     }
@@ -408,7 +379,7 @@ namespace HAROLD {
      * @address 004f0f60
      */
     void __cdecl Init_System_Display_Box_() {
-        MOX::_moveable_box_pict[0] = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+        MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg);
 
         MOX::_moveable_box[0].width = animate::Get_Width_(MOX::_moveable_box_pict[0]);
         MOX::_moveable_box[0].height = animate::Get_Height_(MOX::_moveable_box_pict[0]);
@@ -429,10 +400,10 @@ namespace HAROLD {
         memset(MOX::_moveable_box, 0, sizeof(MOX::_moveable_box));
 
         for (int i = 0; i < 5; ++i) {
-            MOX::_moveable_box[i].index = static_cast<uint16_t>(i);
-            MOX::_moveable_box_order[i] = static_cast<uint16_t>(i);
+            MOX::_moveable_box[i].index = (uint16_t)i;
+            MOX::_moveable_box_order[i] = (uint16_t)i;
 
-            MOX::_moveable_box[i].id = static_cast<int16_t>(MOX::_box_off_flag[i]);
+            MOX::_moveable_box[i].id = (int16_t)MOX::_box_off_flag[i];
 
             MOX::_moveable_box[i].x = -1;
             MOX::_moveable_box[i].y = -1;
@@ -659,8 +630,11 @@ namespace HAROLD {
         }
     }
 
-    const char* __cdecl H_Message_(int16_t id, int save_slot, const s_save_game_description* save_description) {
+    const char* __cdecl H_Message_(int16_t id, int unused_save_slot, const s_save_game_description* unused_save_description) {
         uint16_t buffer_offset = 0;
+
+        (void)unused_save_slot;
+        (void)unused_save_description;
 
         if (id >= 0 && id < 397) {
             buffer_offset = MOX::_h_string_ix[id];
@@ -679,9 +653,7 @@ namespace HAROLD {
 
         HAROLD::_saved_mouse_list_count = count;
 
-        // Each entry in the mouse list is 12 bytes (6 shorts)
-        // Total bytes to copy = count * 12
-        memcpy(HAROLD::_saved_mouse_list, mouse::_current_mouse_list, (size_t)count * 12);
+        memcpy(HAROLD::_saved_mouse_list, mouse::_current_mouse_list, (size_t)count * sizeof(HAROLD::_saved_mouse_list[0]));
     }
 
     void __cdecl Restore_Mouse_List_() {
@@ -689,7 +661,9 @@ namespace HAROLD {
         _saved_mouse_list_count = 0;
     }
 
-    void Confirm_Planet_And_Star_Index_Link_(const char* msg) {
+    void Confirm_Planet_And_Star_Index_Link_(const char* unused_context) {
+        (void)unused_context;
+
         for (int16_t i = 0; i < MOX::_planet_count; ++i) {
             Planet_Number_(i);
         }
@@ -705,8 +679,8 @@ namespace HAROLD {
                     int8_t planet_orbit = planet->orbit;
 
                     if (orbit_taken[planet_orbit] != 0) {
-                        RUSS::PFMT_(0, 1, s_orbit__d_of_star__d_has_more_tha_0055a704, (int32_t)planet_orbit, (int32_t)star_idx);
-                        RUSS::PFMT_(0, 2, s_relate_game_conditions_EXACTLY_a_0055a6cc);
+                        RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, (int32_t)star_idx);
+                        RUSS::PFMT_(0, 2, "relate game conditions EXACTLY as they just happened");
                         RUSS::PFMT_(0, 3, s___s__00556ae4, star->name);
                         assert::hgetch_();
                     }
@@ -734,7 +708,7 @@ namespace HAROLD {
                 );
 
                 if (record_ptr != nullptr) {
-                    char* src_title = reinterpret_cast<char*>(record_ptr) + 15;
+                    char* src_title = (char*)record_ptr + 15;
                     char* dest_title = MOX::_leaders[i].title;
 
                     while ((*dest_title++ = *src_title++) != '\0');
@@ -910,13 +884,13 @@ namespace HAROLD {
         return found;
     }
 
-    int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx) {
+    int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t viewer_player_idx) {
         int16_t player_counts[MAX_PLAYERS];
-        int16_t unk_val;
+        int16_t visible_owner_count;
 
-        bool hide_unexplored = !HAROLD::Player_Is_Omniscient_(player_idx);
+        bool hide_unexplored = !HAROLD::Player_Is_Omniscient_(viewer_player_idx);
 
-        Colony_Owners_(star_idx, player_counts, &unk_val, hide_unexplored);
+        Colony_Owners_(star_idx, player_counts, &visible_owner_count, hide_unexplored);
 
         if (player_counts[MOX::_PLAYER_NUM] > 0) {
             return MOX::_PLAYER_NUM;
@@ -1021,8 +995,10 @@ namespace HAROLD {
      * @param star_idx Index of the star system to check.
      * @return true if an outpost is found on any planet in the system, false otherwise.
      */
-    bool __cdecl Player_Has_Outpost_(int16_t player_num, int16_t star_idx) {
+    bool __cdecl Player_Has_Outpost_(int16_t unused_player_num, int16_t star_idx) {
         bool has_outpost = false;
+
+        (void)unused_player_num;
 
         for (int16_t i = 0; i < 5; ++i) {
             // The binary checks result flag at the start of the loop block
@@ -1197,25 +1173,22 @@ namespace HAROLD {
      * Copies the currency unit string (e.g., "MC" or "BC") into the provided buffer.
      * The currency unit depends on the current game language setting.
      */
-    void __cdecl Get_Monetary_Unit_String_(char* out) {
-        const char* src;
+    void __cdecl Get_Monetary_Unit_String_(char* buffer) {
+        const char* unit_text;
 
         switch (MOX::_settings.language) {
         case 1:
-            src = s_MC_0055823c;
+            unit_text = "MC";
             break;
         case 2:
         case 3:
         case 4:
         default:
-            src = s_BC_00558244;
+            unit_text = "BC";
             break;
         }
 
-        // Binary-faithful copy of 3 bytes (including null terminator)
-        out[0] = src[0];
-        out[1] = src[1];
-        out[2] = src[2];
+        memcpy(buffer, unit_text, sizeof("MC"));
     }
 
     void __cdecl Planet_Data_Screen_() {
@@ -1239,11 +1212,11 @@ namespace HAROLD {
         return ship_count;
     }
 
-    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool param_2) {
+    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool apply_selected_color_offset) {
         uint8_t base_color_idx = 1;
         uint8_t mode = 0;
         int16_t limit_color = 14;
-        int16_t offset = param_2 ? static_cast<int16_t>(static_cast<int8_t>(MOX::_selected_star_color_offset)) : 0;
+        int16_t offset = apply_selected_color_offset ? (int16_t)(int8_t)MOX::_selected_star_color_offset : 0;
 
         if (player_idx >= 8 && player_idx < 15) {
             base_color_idx = 4;
@@ -1525,7 +1498,7 @@ namespace HAROLD {
             MOX::_black_hole_anim_count[i] = (int8_t)(i * 2);
         }
         MAINSCR::Clear_Twinkling_Star_Data_();
-        memset(MOX::_fleet_icon_selection_status, 0, 63);
+        memset(MOX::_fleet_icon_selection_status, 0, sizeof(MOX::_fleet_icon_selection_status));
     }
 
     void __cdecl Load_H_Strings_() {

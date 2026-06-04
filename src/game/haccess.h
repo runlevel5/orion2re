@@ -2,10 +2,11 @@
 #include "deps.h"
 
 namespace HACCESS {
-    extern const char s_format_star_roman[6];
-    extern const char s_I[2];
-
-    void __cdecl Race_Name_(int16_t id, char* race_name_out);
+    /** Copies the resolved race name into the caller-provided buffer.
+     * @param race_id Player or race identifier to resolve.
+     * @param race_name_out Destination buffer for the copied name.
+     */
+    void __cdecl Race_Name_(int16_t race_id, char* race_name_out);
 
     void __cdecl Set_Colony_Auto_Select_For_Star_(int16_t star_idx, int16_t player_idx, int16_t* out_planet_idx);
 
@@ -17,11 +18,21 @@ namespace HACCESS {
     int16_t __cdecl Ship_Stack_From_Saved_Array_();
     int16_t __cdecl Node_Ptr_From_Ship_Stack_(int16_t index);
 
-    int16_t __cdecl Ship_Icon_Id_From_Node_Ptr_(int16_t node_ptr);
+    /** Returns the ship icon index that contains the given ship-node index.
+     * @param ship_node_idx Ship-node index to search for.
+     */
+    int16_t __cdecl Ship_Icon_Id_From_Node_Ptr_(int16_t ship_node_idx);
 
-    int16_t __cdecl Ship_Icon_Owner_(int16_t icon_id);
+    /** Returns the owning player index for a ship icon.
+     * @param icon_idx Ship icon index.
+     */
+    int16_t __cdecl Ship_Icon_Owner_(int16_t icon_idx);
 
-    char* __cdecl Design_Name_(int16_t player_idx, int16_t design);
+    /** Returns the selected design name in the shared temporary buffer.
+     * @param player_idx Owning player index.
+     * @param design_idx Ship design index.
+     */
+    char* __cdecl Design_Name_(int16_t player_idx, int16_t design_idx);
 
     int16_t __cdecl Design_Weapon_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx);
 
@@ -54,7 +65,15 @@ namespace HACCESS {
 
     int8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_();
 
-    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* out, int16_t max, int16_t filter);
+    /** Collects selected ship IDs into the caller-provided buffer.
+     * @param selected_ids_out Output buffer for ship IDs.
+     * @param selected_ids_capacity Number of int16_t entries available in the output buffer.
+     * @param ship_type_filter Ship type to keep, or 0x00FF for no type filter.
+     */
+    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(
+        int16_t* selected_ids_out,
+        int16_t selected_ids_capacity,
+        int16_t ship_type_filter);
 
     void __cdecl Clear_Fleet_Box_Selected_Ship_Status_();
 
@@ -91,7 +110,10 @@ namespace HACCESS {
 
     bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship = nullptr);
 
-    int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords);
+    /** Finds the nearest reachable player-owned star to the given coordinates.
+     * @param ship_coords Pointer to the source XY coordinate pair.
+     */
+    int16_t __cdecl Nearest_Star_To_XY_(int16_t* ship_coords);
 
     void __cdecl Clear_Star_Relocation_(int16_t star_idx, int16_t player_idx);
 

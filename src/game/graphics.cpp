@@ -34,16 +34,16 @@ namespace graphics {
             setvesa::Add_Square_To_Scan_List_(x1, y1, x2, y2);
         }
 
-        int left_block = x1 / 4;
-        int right_block = x2 / 4;
+        int32_t left_block = x1 / 4;
+        int32_t right_block = x2 / 4;
 
         if (right_block == left_block) {
-            uint8_t* surface = reinterpret_cast<uint8_t*>(video::_current_video_page + (y1 * video::g_screen_res_x) + x1);
+            uint8_t* surface = (uint8_t*)(video::_current_video_page + (y1 * video::g_screen_res_x) + x1);
             regions::Fill_Column_(color, surface, (x2 - x1) + 1, (y2 - y1) + 1);
         } else {
             uint32_t left_partial_width = 4 - (x1 & 3);
             uint32_t right_partial_width = (x2 & 3) + 1;
-            int mid_blocks = (right_block - left_block) - 1;
+            int32_t mid_blocks = (right_block - left_block) - 1;
 
             if (left_partial_width == 4) {
                 left_partial_width = 0;
@@ -54,24 +54,24 @@ namespace graphics {
                 mid_blocks++;
             }
 
-            int y_offset = y1 * video::g_screen_res_x;
+            int32_t y_offset = y1 * video::g_screen_res_x;
             uint32_t height = (y2 - y1) + 1;
 
             if (left_partial_width == 0) {
                 if (mid_blocks != 0) {
-                    uint8_t* surface = reinterpret_cast<uint8_t*>(video::_current_video_page + (left_block * 4) + y_offset);
-                    regions::Fill_Region_(color, surface, static_cast<uint8_t>(mid_blocks), height);
+                    uint8_t* surface = (uint8_t*)(video::_current_video_page + (left_block * 4) + y_offset);
+                    regions::Fill_Region_(color, surface, (uint8_t)mid_blocks, height);
                 }
             } else {
-                uint8_t* col_surface = reinterpret_cast<uint8_t*>(video::_current_video_page + y_offset + x1);
+                uint8_t* col_surface = (uint8_t*)(video::_current_video_page + y_offset + x1);
                 regions::Fill_Column_(color, col_surface, left_partial_width, height);
 
-                uint8_t* reg_surface = reinterpret_cast<uint8_t*>(video::_current_video_page + (left_block * 4) + y_offset + 4);
-                regions::Fill_Region_(color, reg_surface, static_cast<uint8_t>(mid_blocks), height);
+                uint8_t* reg_surface = (uint8_t*)(video::_current_video_page + (left_block * 4) + y_offset + 4);
+                regions::Fill_Region_(color, reg_surface, (uint8_t)mid_blocks, height);
             }
 
             if (right_partial_width != 0) {
-                uint8_t* surface = reinterpret_cast<uint8_t*>(video::_current_video_page + (right_block * 4) + y_offset);
+                uint8_t* surface = (uint8_t*)(video::_current_video_page + (right_block * 4) + y_offset);
                 regions::Fill_Column_(color, surface, right_partial_width, height);
             }
         }
@@ -97,12 +97,12 @@ namespace graphics {
             y1 = 0;
         }
 
-        if (static_cast<int32_t>(x2) >= video::g_screen_res_x) {
-            x2 = static_cast<int16_t>(video::g_screen_res_x - 1);
+        if ((int32_t)x2 >= video::g_screen_res_x) {
+            x2 = (int16_t)(video::g_screen_res_x - 1);
         }
 
-        if (static_cast<int32_t>(y2) >= video::g_screen_res_y) {
-            y2 = static_cast<int16_t>(video::g_screen_res_y - 1);
+        if ((int32_t)y2 >= video::g_screen_res_y) {
+            y2 = (int16_t)(video::g_screen_res_y - 1);
         }
 
         video::_screen_window_x1 = x1;
@@ -134,18 +134,17 @@ namespace graphics {
             return;
         }
 
-        for (int i = 0; i < (int)thickness; ++i) {
+        for (int32_t i = 0; i < (int32_t)thickness; ++i) {
             int16_t offset = (int16_t)i;
             int16_t x1 = x + offset;
             int16_t y1 = y + offset;
             int16_t x2 = x + width - offset - 1;
             int16_t y2 = y + height - offset - 1;
 
-            // Draw the four sides of the rectangle for the current thickness layer
-            line::Line_(x1, y1, x2, y1, color); // Top edge
-            line::Line_(x1, y1, x1, y2, color); // Left edge
-            line::Line_(x2, y1, x2, y2, color); // Right edge
-            line::Line_(x1, y2, x2, y2, color); // Bottom edge
+            line::Line_(x1, y1, x2, y1, color);
+            line::Line_(x1, y1, x1, y2, color);
+            line::Line_(x2, y1, x2, y2, color);
+            line::Line_(x1, y2, x2, y2, color);
         }
     }
 
@@ -160,7 +159,7 @@ namespace graphics {
         video::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
 
         if (video::screen_refresh_flag >= 2) {
-            video::Add_Dot_To_Scan_List_(static_cast<int32_t>(x), static_cast<int32_t>(y));
+            video::Add_Dot_To_Scan_List_((int32_t)x, (int32_t)y);
         }
 
         uint8_t* framebuffer = video::_current_video_page;
@@ -199,22 +198,22 @@ namespace graphics {
             setvesa::Add_Square_To_Scan_List_(x1, y1, x2, y2);
         }
 
-        int start_col = x1 / 4;
-        int end_col = x2 / 4;
+        int32_t start_col = x1 / 4;
+        int32_t end_col = x2 / 4;
 
         if (start_col == end_col) {
             uint8_t* dest = video::_current_video_page + (y1 * video::g_screen_res_x) + x1;
-            int height = y2 - y1 + 1;
-            int width = x2 - x1 + 1;
+            int32_t height = y2 - y1 + 1;
+            int32_t width = x2 - x1 + 1;
             uint8_t* color_map = (uint8_t*)&video::_glass_remap_colors + (tint_color * 256);
             regions::Tint_Fill_Column_(color_map, dest, width, height);
         } else {
             // Exact binary behavior: split-path uses base glass remap table; tint_color offset is only used in the single-block path.
-            int start_pixels = 4 - (x1 & 3);
-            int middle_blocks = end_col - start_col - 1;
-            int height = y2 - y1 + 1;
-            int end_pixels = x2 & 3;
-            int offset_y = y1 * video::g_screen_res_x;
+            int32_t start_pixels = 4 - (x1 & 3);
+            int32_t middle_blocks = end_col - start_col - 1;
+            int32_t height = y2 - y1 + 1;
+            int32_t end_pixels = x2 & 3;
+            int32_t offset_y = y1 * video::g_screen_res_x;
 
             if (start_pixels == 4) {
                 // Exact binary behavior: if x1 is 4-byte aligned and there are no middle dword blocks, no region call is made.
@@ -365,7 +364,7 @@ namespace graphics {
     void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2, int16_t color3) {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        uint32_t color = (static_cast<uint32_t>(color3) << 16) + (static_cast<uint32_t>(color2) << 8) + static_cast<uint32_t>(color1);
+        uint32_t color = ((uint32_t)color3 << 16) + ((uint32_t)color2 << 8) + (uint32_t)color1;
 
         if (x1 > x2) {
             strings::Swap_Short_(&x1, &x2);
@@ -443,7 +442,7 @@ namespace graphics {
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
-    void __cdecl Gray_Scale_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_ptr, int32_t extra, int32_t param_7) {
+    void __cdecl Gray_Scale_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* palette_map, int32_t gradient_scale, int32_t invert_flag) {
         video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         if (x2 < x1) {
@@ -473,37 +472,37 @@ namespace graphics {
         }
 
         replace::_palette_color_list = replace::_graphics_buffer;
-        replace::Establish_Color_Gradient_(static_cast<int16_t>(extra), static_cast<int16_t>(param_7));
+        replace::Establish_Color_Gradient_((int16_t)gradient_scale, (int16_t)invert_flag);
 
-        int32_t gap = video::g_screen_res_x - (x2 - x1) - 1;
+        int32_t row_advance = video::g_screen_res_x - (x2 - x1) - 1;
 
-        for (int i = 0; i < 256; ++i) {
+        for (int32_t i = 0; i < 256; ++i) {
             uint8_t color_idx = replace::_palette_color_list[i];
-            replace::_palette_color_list[i] = color_ptr[color_idx];
+            replace::_palette_color_list[i] = palette_map[color_idx];
         }
 
         uint8_t* dest_ptr = video::_current_video_page + (y1 * video::g_screen_res_x) + x1;
         int32_t width = (x2 - x1) + 1;
         int32_t height = (y2 - y1) + 1;
 
-        shear::Gray_Scale_Fill_Pixels_(dest_ptr, replace::_palette_color_list, gap, width, height);
+        shear::Gray_Scale_Fill_Pixels_(dest_ptr, replace::_palette_color_list, row_advance, width, height);
 
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
-    void __cdecl Gradient_Fill_(int x1, int y1, int x2, int y2, int mode, uint8_t* palette, int extra, s_animation_header* pic, s_colors* colors) {
+    void __cdecl Gradient_Fill_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t mode, uint8_t* palette, int32_t gradient_scale, s_animation_header* pic, s_colors* colors) {
         switch (mode) {
         case 1:
-            Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), (int8_t)*palette);
+            Fill_((int16_t)x1, (int16_t)y1, (int16_t)x2, (int16_t)y2, (int8_t)*palette);
             break;
         case 3:
-            Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), 0);
+            Tint_Fill_((int16_t)x1, (int16_t)y1, (int16_t)x2, (int16_t)y2, 0);
             break;
         case 15:
-            Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), (int8_t)*palette);
+            Tint_Fill_((int16_t)x1, (int16_t)y1, (int16_t)x2, (int16_t)y2, (int8_t)*palette);
             break;
         case 16:
-            Gray_Scale_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), palette, extra, 0);
+            Gray_Scale_Fill_((int16_t)x1, (int16_t)y1, (int16_t)x2, (int16_t)y2, palette, gradient_scale, 0);
             break;
         }
     }

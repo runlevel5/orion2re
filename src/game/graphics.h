@@ -7,26 +7,117 @@ namespace graphics {
     extern int16_t _old_screen_window_x2;
     extern int16_t _old_screen_window_x1;
 
+    /** Resets the active clipping window to cover the full screen. */
     void Reset_Window_();
+
+    /**
+     * Fills a rectangle with a solid color.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     * @param color Palette index to write.
+     */
     void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color);
+
+    /**
+     * Darkens a rectangle using the default tint table.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     */
     void __cdecl Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
+    /**
+     * Sets the active clipping window, clamped to screen bounds.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     */
     void __cdecl Set_Window_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
+    /** Saves the current clipping window bounds. */
     void __cdecl Save_Window_();
+    /** Restores the previously saved clipping window bounds. */
     void __cdecl Restore_Window_();
 
+    /**
+     * Applies a tint remap to a rectangle.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     * @param tint_color Tint-table selector.
+     */
     void __cdecl Tint_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t tint_color);
 
-    void __cdecl Gray_Scale_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_ptr, int32_t extra, int32_t param_7);
+    /**
+     * Applies a grayscale palette remap to a rectangle.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     * @param palette_map Lookup table used to remap palette entries.
+     * @param gradient_scale Gradient scale passed to the grayscale builder.
+     * @param invert_flag Nonzero to invert the generated gradient.
+     */
+    void __cdecl Gray_Scale_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* palette_map, int32_t gradient_scale, int32_t invert_flag);
 
-    void __cdecl Gradient_Fill_(int x1, int y1, int x2, int y2, int mode, uint8_t* palette, int extra, s_animation_header* pic, s_colors* colors);
+    /**
+     * Dispatches one of the supported rectangle fill modes.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     * @param mode Fill mode selector.
+     * @param palette Mode-specific palette or color data.
+     * @param gradient_scale Grayscale gradient scale used by mode 16.
+     * @param pic Unused by the current implementation.
+     * @param colors Unused by the current implementation.
+     */
+    void __cdecl Gradient_Fill_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t mode, uint8_t* palette, int32_t gradient_scale, s_animation_header* pic, s_colors* colors);
 
+    /**
+     * Fills a rectangle with a two-color interlaced pattern.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     * @param color1 First palette index.
+     * @param color2 Second palette index.
+     */
     void __cdecl Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2);
 
+    /**
+     * Fills a rectangle with a repeating three-color interlaced pattern.
+     * @param x1 Left coordinate.
+     * @param y1 Top coordinate.
+     * @param x2 Right coordinate.
+     * @param y2 Bottom coordinate.
+     * @param color1 First palette index.
+     * @param color2 Second palette index.
+     * @param color3 Third palette index.
+     */
     void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2, int16_t color3);
 
+    /**
+     * Draws a rectangular border.
+     * @param x Left coordinate.
+     * @param y Top coordinate.
+     * @param width Border width in pixels.
+     * @param height Border height in pixels.
+     * @param thickness Border thickness in pixels.
+     * @param color Palette index to draw.
+     */
     void __cdecl Box_(int16_t x, int16_t y, int16_t width, int16_t height, int16_t thickness, uint8_t color);
 
+    /**
+     * Draws a single pixel.
+     * @param x Pixel x coordinate.
+     * @param y Pixel y coordinate.
+     * @param color Palette index to write.
+     */
     void __cdecl Dot_(int16_t x, int16_t y, uint8_t color);
 }

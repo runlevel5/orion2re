@@ -1,14 +1,8 @@
 # Source Cleanup Progress
 
 - [pending] src/game/funcs.h
-
-- [pending] src/game/geo.{h,cpp}
 - [pending] src/game/global.h
-- [pending] src/game/graphics.{h,cpp}
-- [pending] src/game/haccess.{h,cpp}
-- [pending] src/game/harold.{h,cpp}
-- [pending] src/game/homegen.{h,cpp}
-- [pending] src/game/hotpop.{h,cpp}
+
 - [pending] src/game/info.{h,cpp}
 - [pending] src/game/init.{h,cpp}
 - [pending] src/game/initgame.{h,cpp}
