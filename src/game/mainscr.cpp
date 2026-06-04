@@ -75,7 +75,7 @@ namespace MAINSCR {
     int16_t _last_field;
 
     bool __cdecl Is_Main_Screen_Palette_() {
-        uint8_t screen = static_cast<uint8_t>(MOX::_previous_screen);
+        uint8_t screen = (uint8_t)MOX::_previous_screen;
 
         if (screen == SCREEN_MAIN ||
             screen == 0xBU /* SCREEN_UNK2 */ ||
@@ -108,7 +108,7 @@ namespace MAINSCR {
     void __cdecl Update_Star_Owners_() {
         for (int16_t i = 0; i < MOX::_NUM_STARS; i++) {
             int16_t owner_id = HAROLD::Star_Owner_(i, MOX::_PLAYER_NUM);
-            MOX::_star[i].owner = static_cast<int8_t>(owner_id);
+            MOX::_star[i].owner = (int8_t)owner_id;
         }
     }
 
@@ -368,9 +368,6 @@ namespace MAINSCR {
         }
     }
 
-    /**
-     * @address 004cd550
-     */
     void __cdecl Update_Ship_Icons_In_Between_Turns_() {
         Update_Star_Owners_();
         SHIPS::Build_Ship_Icons_();
@@ -633,7 +630,7 @@ namespace MAINSCR {
      * 
      * @param out Buffer of at least 3 bytes to store the result (including null terminator).
      */
-    void __cdecl Get_Research_Unit_String_(char *out) {
+    void __cdecl Get_Research_Unit_String_(char* out_buffer) {
         const char *src;
 
         switch (MOX::_settings.language) {
@@ -654,9 +651,9 @@ namespace MAINSCR {
                 break;
         }
 
-        out[0] = src[0];
-        out[1] = src[1];
-        out[2] = src[2];
+        out_buffer[0] = src[0];
+        out_buffer[1] = src[1];
+        out_buffer[2] = src[2];
     }
 
     void __cdecl Draw_Diplomacy_Request_Lights_() {
@@ -840,7 +837,7 @@ namespace MAINSCR {
         }
     }
 
-    void __cdecl Print_Star_Name(int16_t star_id, int8_t simple_draw, char* star_name, void* buffer) {
+    void __cdecl Print_Star_Name(int16_t star_id, int8_t use_bitmap, char* star_name, void* buffer) {
         HAROLD::Map_Scale_To_Zoom_Level_();
         int16_t zoom_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_id);
 
@@ -851,7 +848,7 @@ namespace MAINSCR {
         int16_t half_zoom_size = zoom_size / 2;
         int16_t text_y = half_zoom_size + (draw_y - (int16_t)MOX::_star[star_id].size);
 
-        if (simple_draw != 0) {
+        if (use_bitmap != 0) {
             int16_t width = fonts::Get_String_Width_(star_name);
             animate::Draw_(text_center_x - (width / 2), text_y, (s_animation_header*)buffer);
             return;
@@ -1083,7 +1080,7 @@ namespace MAINSCR {
         }
     }
 
-    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, s_animation_header** out_bitmap_ptr) {
+    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* star_name, s_animation_header** out_bitmap_ptr) {
         int16_t owner_counts[8];
         int16_t num_owners;
         s_colors standard_colors;
@@ -1110,13 +1107,13 @@ namespace MAINSCR {
         *out_bitmap_ptr = bitmap;
 
         bitmap::Create_Blank_Bitmap_(200, 20, bitmap);
-        fonts::Print_To_Bitmap_(0, 0, str, bitmap);
+        fonts::Print_To_Bitmap_(0, 0, star_name, bitmap);
 
         int16_t current_x = 0;
         for (int16_t i = 0; i < 8; ++i) {
             if (owner_counts[i] > 0) {
                 int16_t width, height, d1, d2;
-                MISC::Get_Bitmap_String_Range_(owner_counts[i], total_colony_count, &width, &d1, &d2, &height, str);
+                MISC::Get_Bitmap_String_Range_(owner_counts[i], total_colony_count, &width, &d1, &d2, &height, star_name);
                 HAROLD::Get_Player_Font_Colors_(i, fonts::_current_font_style, &player_colors, false);
                 MISC::Swap_Bitmap_Colors_(current_x, 0, current_x + width, height, &standard_colors, &player_colors, 8, bitmap);
                 current_x += width;
@@ -1218,8 +1215,8 @@ namespace MAINSCR {
      */
     void __cdecl Check_Hot_Keys_(int16_t key, int32_t unused_param) {
         (void)unused_param;
-        char local_118[80];
-        char local_c8[200];
+        char message_buffer[80];
+        char dialog_text[200];
 
         if ((key == _omniscient_hot_key && capture::Check_Release_Version_() == 0) ||
             key == _omniscience_cheat) {
@@ -1235,8 +1232,8 @@ namespace MAINSCR {
                 Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 1);
             }
 
-            strcpy(local_c8, msg_src);
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
+            strcpy(dialog_text, msg_src);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, dialog_text, 0);
             MOX::_draw_main_screen_to_back = 1;
             Update_Star_Owners_();
         }
@@ -1251,8 +1248,8 @@ namespace MAINSCR {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             player->bc += 1000;
             const char* msg_fmt = HAROLD::H_Message_(215); // HESTR_0D7_S_HAS_BEEN_GIVEN_A_GIF
-            sprintf(local_118, msg_fmt, player->race_name, 1000);
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_118, 0);
+            sprintf(message_buffer, msg_fmt, player->race_name, 1000);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 0);
             Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 3);
             return;
         }
@@ -1261,9 +1258,9 @@ namespace MAINSCR {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             const char* tech_name = TECHDATA::_technology_applications[(uint8_t)player->current_research_application].name;
             const char* msg_fmt = HAROLD::H_Message_(216); // HESTR_0D8_S_WILL_BE_KNOWN
-            sprintf(local_118, msg_fmt, tech_name);
+            sprintf(message_buffer, msg_fmt, tech_name);
             player->research_accumulated = 9999;
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_118, 0);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 0);
             Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 4);
             return;
         }
@@ -1276,8 +1273,8 @@ namespace MAINSCR {
         if (key == _hi_score_cheat) {
             int16_t score = SCORE::Do_Calculate_Hi_Score_(MOX::_PLAYER_NUM);
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            sprintf(local_c8, "Current score for %s is %d", player->name, (int)score);
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
+            sprintf(dialog_text, "Current score for %s is %d", player->name, (int)score);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, dialog_text, 0);
         }
     }
 
@@ -1601,9 +1598,6 @@ namespace MAINSCR {
         }
     }
 
-    /**
-     * @address 004c6da0
-     */
     void __cdecl Draw_Scanned_Ship_Seg_() {
         int16_t icon_idx = _main_screen_ship_icon_scanned;
         int16_t owner_idx = HACCESS::Ship_Icon_Owner_(icon_idx);
@@ -2001,7 +1995,7 @@ namespace MAINSCR {
         fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
     }
 
-    int16_t __cdecl Do_Reply_To_Diplomacy_Request_(int16_t screen_data) {
+    int16_t __cdecl Do_Reply_To_Diplomacy_Request_(int16_t requester_id) {
         int16_t unused_field;
         int16_t first_reply_field;
         int16_t second_reply_field;
@@ -2018,7 +2012,7 @@ namespace MAINSCR {
         RUSS::Mox_Sync_Update_();
 
         MOX::_temp_string[0] = '\0';
-        MOX::_screen_data = screen_data;
+        MOX::_screen_data = requester_id;
 
         fields::Clear_Fields_();
         MAINSCR::Clear_Main_Screen_Fields_();
@@ -2111,13 +2105,9 @@ namespace MAINSCR {
     int16_t __cdecl Get_Ship_Stack_For_Officers_Screen_() {
         int16_t first_stack_idx = MOX::_ship_stack_start[0];
 
-        // 0xFFFF is -1, indicating an empty/invalid stack entry
         if (first_stack_idx > -1) {
-            // Note: _ship_node[first_stack_idx].ship_idx maps stack index to global ship array index
-            // owner is at offset 0x63 in s_ship_data
             int16_t ship_idx = MOX::_ship_node[first_stack_idx].ship_idx;
 
-            // If the first ship in stack is not owned by the current player, search the rest
             if (MOX::_ship[ship_idx].owner != MOX::_PLAYER_NUM) {
                 for (int16_t i = 0; i < MOX::_ship_stack_count; ++i) {
                     int16_t current_stack_idx = MOX::_ship_stack_start[i];
@@ -2134,9 +2124,6 @@ namespace MAINSCR {
         return first_stack_idx;
     }
 
-    /**
-     * @address 0045f3f0
-     */
     void __cdecl Tax_Rate_Popup_() {
         int16_t scan_val;
         int16_t input_val;
@@ -2408,10 +2395,8 @@ namespace MAINSCR {
         }
     }
 
-    /**
-     * @address 004c4980
-     */
-    void* __cdecl Allocate_First_Screen_Seg_(int32_t param) {
+    void* __cdecl Allocate_First_Screen_Seg_(int32_t unused_param) {
+        (void)unused_param;
         // Allocate 76,000 bytes (0x128E0) for other ships
         MOX::_other_ships_screen_seg = allocate::Allocate_First_Block_(MOX::_screen_seg, 76000 /* 0x128E0 */);
 
@@ -2425,9 +2410,6 @@ namespace MAINSCR {
         return MOX::_global_bitmap_seg;
     }
 
-    /**
-     * @address 004c4e90
-     */
     bool __cdecl Ship_Can_Be_Selected_(int16_t ship_idx) {
         return HACCESS::Player_Can_Order_Ship_(MOX::_PLAYER_NUM, &MOX::_ship[ship_idx]);
     }
@@ -2554,9 +2536,6 @@ namespace MAINSCR {
         animate::Draw_(249, 5, MOX::_main_game_button_seg);
     }
 
-    /**
-     * @address 004c64b0
-     */
     void __cdecl Draw_Main_Screen_Before_Stencil_() {
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
@@ -3065,9 +3044,6 @@ namespace MAINSCR {
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
     }
 
-    /**
-     * @address 004cc480
-     */
     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx) {
         int16_t result = -1;
         bool found = false;
@@ -3955,7 +3931,8 @@ namespace MAINSCR {
             break;
         }
         case 0x21: {
-            int target_id = *(int32_t*)data;
+            int32_t target_id;
+            memcpy(&target_id, data, sizeof(target_id));
             MOX::_player[target_id].network_player_id = param_2;
             NETMOX::_net.joining_net_id = -1;
             break;
@@ -4077,10 +4054,10 @@ namespace MAINSCR {
             break;
         }
         case 0x3C: {
-            int32_t p1 = *(int32_t*)data;
-            int32_t p2 = *(int32_t*)((uint8_t*)data + 4);
-            int32_t p3 = *(int32_t*)((uint8_t*)data + 8);
-            EVENTS::Event_Monster_Update_((int16_t)p1, (int16_t)p2, (int16_t)p3);
+            s_net_pack_monster_update monster_update;
+            memcpy(&monster_update, data, sizeof(monster_update));
+            EVENTS::Event_Monster_Update_((int16_t)monster_update.param_1, (int16_t)monster_update.param_2,
+                                          (int16_t)monster_update.param_3);
             break;
         }
         case 0x3D: {
@@ -4113,13 +4090,10 @@ namespace MAINSCR {
             break;
         }
         case 0x43: {
-            int16_t p1 = *(int16_t*)data;
-            int16_t p2 = *(int16_t*)((uint8_t*)data + 2);
-            int16_t p3 = *(int16_t*)((uint8_t*)data + 4);
-            int16_t p4 = *(int16_t*)((uint8_t*)data + 6);
-            int16_t p5 = *(int16_t*)((uint8_t*)data + 8);
-            int16_t p6 = *(int16_t*)((uint8_t*)data + 10);
-            diplomac::Change_Relations_(p1, p2, p3, p4, p5, p6);
+            int16_t relation_params[6];
+            memcpy(relation_params, data, sizeof(relation_params));
+            diplomac::Change_Relations_(relation_params[0], relation_params[1], relation_params[2],
+                                        relation_params[3], relation_params[4], relation_params[5]);
             break;
         }
         case 0x44: {
@@ -4133,8 +4107,9 @@ namespace MAINSCR {
             break;
         }
         case 100: { // 0x64
-            int32_t val = *(int32_t*)data;
-            diplomac::Declare_War_((int16_t)from_player_id, (int16_t)val);
+            int32_t target_player_id;
+            memcpy(&target_player_id, data, sizeof(target_player_id));
+            diplomac::Declare_War_((int16_t)from_player_id, (int16_t)target_player_id);
             break;
         }
         }

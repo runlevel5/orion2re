@@ -57,14 +57,24 @@ namespace MAINSCR {
 
     extern uint8_t _star_name_highlight_value;
 
-    void* __cdecl Allocate_First_Screen_Seg_(int32_t p);
+    /**
+     * Allocates the scratch screen buffers used by main-screen UI rendering.
+     * @param unused_param Unused legacy parameter kept for compatibility.
+     */
+    void* __cdecl Allocate_First_Screen_Seg_(int32_t unused_param);
 
     bool __cdecl Is_Main_Screen_Palette_();
 
     bool __cdecl Ship_Can_Be_Selected_(int16_t ship_idx);
 
+    /**
+     * Draws the current main-screen frame, including overlays and movable boxes.
+     */
     void __cdecl Draw_Main_Screen_();
 
+    /**
+     * Enters the main-screen event loop and dispatches its UI interactions.
+     */
     void __cdecl Main_Screen_();
 
     extern uint8_t _check_next_turn_exit_field;
@@ -94,6 +104,9 @@ namespace MAINSCR {
 
     void __cdecl Draw_Mini_Main_Offscreen_();
 
+    /**
+     * Rebuilds star ownership and ship-icon positions after turn processing changes fleet state.
+     */
     void __cdecl Update_Ship_Icons_In_Between_Turns_();
 
     void __cdecl Draw_Wormhole_Links_();
@@ -115,7 +128,7 @@ namespace MAINSCR {
      */
     void __cdecl Print_Star_Name(int16_t star_id, int8_t use_bitmap, char* star_name, void* buffer);
 
-    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, s_animation_header** out_bitmap_ptr);
+    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* star_name, s_animation_header** out_bitmap_ptr);
 
     /**
      * Builds the current display label for a star and optional multi-owner bitmap.
@@ -168,10 +181,20 @@ namespace MAINSCR {
 
     void __cdecl Set_Post_Fitted_Font_Style_(uint8_t c1, uint8_t c2);
 
-    void __cdecl Get_Research_Unit_String_(char* buffer);
+    /**
+     * Builds the localized research-point unit abbreviation for the HUD.
+     * @param out_buffer Destination buffer for the 3-character unit text.
+     */
+    void __cdecl Get_Research_Unit_String_(char* out_buffer);
 
+    /**
+     * Draws the resource, stardate, and research summary widgets on the main-screen HUD.
+     */
     void __cdecl Print_Main_Screen_Data_();
 
+    /**
+     * Draws the map layers that sit below movable-box stenciling.
+     */
     void __cdecl Draw_Main_Screen_Before_Stencil_();
 
     void __cdecl Popup_XY_(int16_t index, int16_t x, int16_t y, int16_t* out_w, int16_t* out_h);
@@ -219,6 +242,9 @@ namespace MAINSCR {
 
     void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_();
 
+    /**
+     * Draws the highlighted ship icon under the current main-screen hover target.
+     */
     void __cdecl Draw_Scanned_Ship_Seg_();
 
     void __cdecl Print_Galaxy_Map_Scanned_Star_();
@@ -241,6 +267,10 @@ namespace MAINSCR {
 
     void __cdecl Warn_About_Cheating_Players_();
 
+    /**
+     * Shows the diplomacy-request popup and returns the selected response.
+     * @param requester_id Player index requesting diplomacy.
+     */
     int16_t __cdecl Do_Reply_To_Diplomacy_Request_(int16_t requester_id);
 
     int16_t __cdecl Check_For_Diplomacy_Request_();
@@ -255,6 +285,9 @@ namespace MAINSCR {
 
     int16_t __cdecl Get_Star_Id_For_Officers_Screen_();
 
+    /**
+     * Opens and runs the tax-rate popup until the user dismisses it.
+     */
     void __cdecl Tax_Rate_Popup_();
 
     void __cdecl Scroll_Map_(int16_t x, int16_t y);
@@ -300,6 +333,13 @@ namespace MAINSCR {
 
     void __cdecl Center_Map_(int16_t x, int16_t y);
 
+    /**
+     * Scans fleet-box ship fields for click and hover interactions.
+     * @param field_id_a Hovered field id.
+     * @param field_id_b Activated field id.
+     * @param out_chosen_offset Receives the selected fleet-entry offset.
+     * @param out_scanned_icon_idx Receives the hovered fleet icon index.
+     */
     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx);
 
     /**

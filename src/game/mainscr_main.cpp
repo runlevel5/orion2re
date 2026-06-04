@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace MAINSCR {
+    /**
+     * Draws the main-screen HUD summaries for stardate, economy, command points, food, freighters, and research.
+     */
     void __cdecl Print_Main_Screen_Data_() {
         char sep = (MOX::_settings.language == 1 || MOX::_settings.language == 2) ? ',' : '.';
         s_colors colors1, colors2;
@@ -17,7 +20,7 @@ namespace MAINSCR {
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, -1, 0x43, 1);
         int16_t stardate_font_style = MISC::Get_Font_Style_();
         s_colors* p_stardate_colors = MISC::Font_Colors2_(stardate_font_style, 14, 23);
-        memcpy(&colors2, p_stardate_colors, 8);
+        memcpy(&colors2, p_stardate_colors, sizeof(colors2));
         fonts::Set_Outline_Color_(2, 1);
         fonts::Set_Font_Style_Outline_(stardate_font_style, &colors2);
         fonts::Print_Centered_(580, 29, buffer); // 0x244, 0x1d
@@ -244,14 +247,17 @@ namespace MAINSCR {
         }
     }
 
+    /**
+     * Runs the main-screen event loop, including map interaction, popups, and screen transitions.
+     */
     void __cdecl Main_Screen_() {
         int16_t exit_flag = 0;
-        int16_t mouse_field_1 = 0;
+        int16_t hovered_target_id = 0;
         int16_t boxes_saved_flag = 0;
         uint8_t icon_selected_flag = 0;
         int16_t planet_idx = 0;
-        int16_t mouse_field_2 = 0;
-        int16_t sel = 0;
+        int16_t selected_target_id = 0;
+        int16_t system_hover_selection_id = 0;
         int16_t m_planet_idx = 0;
         int16_t m_ship_idx = 0;
         int16_t ship_idx = 0;
@@ -437,31 +443,31 @@ namespace MAINSCR {
             if (MOX::_skip_fields == 0) {
                 icon_selected_flag = 0;
 
-                int16_t mouse_status = MAINSCR::Get_Mouse_Field_(0, &mouse_field_1, &mouse_field_2);
-                _main_screen_scanned_star = mouse_field_1;
+                int16_t mouse_status = MAINSCR::Get_Mouse_Field_(0, &hovered_target_id, &selected_target_id);
+                _main_screen_scanned_star = hovered_target_id;
 
                 if ((mouse_status == 0 || mouse_status == 4) && MOVEBOX::Moveable_Box_Selected_(2)) {
                     icon_selected_flag = FLEETPOP::Some_Icon_Selected_();
                 }
 
-                if (mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE && _merging_relocations != 0) {
+                if (mouse_status == 0 && MOX::_star[selected_target_id].spectral_class != STAR_CLASS_BLACK_HOLE && _merging_relocations != 0) {
                     _merging_relocations = 0;
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
-                    HACCESS::Set_All_Star_Relocations_(mouse_field_2, MOX::_PLAYER_NUM);
+                    HACCESS::Set_All_Star_Relocations_(selected_target_id, MOX::_PLAYER_NUM);
 
                     const char* msg = HAROLD::H_Message_(HESTR_0DD_ALL_NEW_SHIPS_BUILT_WI);
-                    sprintf(text_buffer, msg, &MOX::_star[mouse_field_2]);
+                    sprintf(text_buffer, msg, &MOX::_star[selected_target_id]);
                     HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, text_buffer, 0);
                 }
                 else {
-                    if (mouse_status == 0 && mouse_field_2 >= 0) {
+                    if (mouse_status == 0 && selected_target_id >= 0) {
                         if (!icon_selected_flag) {
                             int16_t colony_idx = -1;
-                            if (MOX::_settings.auto_select_colony && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
-                                colony_idx = HACCESS::Last_Colony_Selected_(mouse_field_2, MOX::_PLAYER_NUM);
+                            if (MOX::_settings.auto_select_colony && MOX::_star[selected_target_id].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                                colony_idx = HACCESS::Last_Colony_Selected_(selected_target_id, MOX::_PLAYER_NUM);
                             }
                             if (colony_idx == -1) {
-                                MAINSCR::Do_System_Popup_(mouse_field_2);
+                                MAINSCR::Do_System_Popup_(selected_target_id);
                             }
                             else {
                                 MAINSCR::Do_Colony_Screen_(colony_idx, &exit_flag);
@@ -470,9 +476,9 @@ namespace MAINSCR {
                     }
 
                     if (icon_selected_flag) {
-                        if (mouse_field_2 > -1 && mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                        if (selected_target_id > -1 && mouse_status == 0 && MOX::_star[selected_target_id].spectral_class != STAR_CLASS_BLACK_HOLE) {
                         HACCESS::Get_Fleet_Box_Selected_Ship_Ids_((int16_t*)ship_ids, 500, 0xff);
-                        SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, mouse_field_2, &MOX::_g_ship_move_info);
+                        SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, selected_target_id, &MOX::_g_ship_move_info);
 
                         if (MOX::_g_ship_move_info.moving == 0) {
                             int msg_id = 0;
@@ -489,7 +495,7 @@ namespace MAINSCR {
                         }
                         else {
                             int ships_count = FLEETPOP::Fleet_Buttons_Chosen_();
-                            SHIPMOVE::Make_Ships_Move_To_(ship_ids, mouse_field_2, &MOX::_g_ship_move_info);
+                            SHIPMOVE::Make_Ships_Move_To_(ship_ids, selected_target_id, &MOX::_g_ship_move_info);
                             MOX::_eta_star_id = -1;
 
                             int16_t next_icon = 0;
@@ -524,11 +530,11 @@ namespace MAINSCR {
                         }
                         else if (mouse_status == 4 && MOVEBOX::Moveable_Box_Selected_(2)) {
                             MOX::_fleet_ship_scanned = -1;
-                            if (MOX::_star[mouse_field_1].spectral_class == STAR_CLASS_BLACK_HOLE) {
+                            if (MOX::_star[hovered_target_id].spectral_class == STAR_CLASS_BLACK_HOLE) {
                                 MOX::_eta_star_id = -1;
                             }
                             else {
-                                MOX::_eta_star_id = mouse_field_1;
+                                MOX::_eta_star_id = hovered_target_id;
                             }
                         }
                     }
@@ -540,14 +546,14 @@ namespace MAINSCR {
                     int mx = mouse::Pointer_X_();
                     int my = mouse::Pointer_Y_();
 
-                    int res = MAINSCR::Scan_System_Display_Fields_(mouse_input, input, (int16_t*)MOX::_planet_buttons, &m_planet_idx, &planet_idx, &m_ship_idx, &ship_idx, &sel);
+                    int res = MAINSCR::Scan_System_Display_Fields_(mouse_input, input, (int16_t*)MOX::_planet_buttons, &m_planet_idx, &planet_idx, &m_ship_idx, &ship_idx, &system_hover_selection_id);
 
                     MOX::_system_display_ship_scanned = m_ship_idx;
-                    if (sel == -1 && MOX::_system_icon_scanned > 2000 && MOX::_system_icon_scanned < 2004) {
+                    if (system_hover_selection_id == -1 && MOX::_system_icon_scanned > 2000 && MOX::_system_icon_scanned < 2004) {
                         MOX::_system_icon_scanned = -1;
                     }
-                    else if (sel > -1) {
-                        MOX::_system_icon_scanned = sel;
+                    else if (system_hover_selection_id > -1) {
+                        MOX::_system_icon_scanned = system_hover_selection_id;
                     }
 
                     // Boundary check against moveable box
@@ -576,17 +582,17 @@ namespace MAINSCR {
             MAINSCR::Scan_Moveable_Box_Fields(MOX::_skip_fields, input, mouse_input, &exit_flag);
 
             if (MOX::_skip_fields == 0) {
-                int field_res = MAINSCR::Get_Mouse_Field_(1, &mouse_field_1, &mouse_field_2);
-                _main_screen_ship_icon_scanned = mouse_field_1;
-                if (mouse_field_1 != -1) {
+                int field_res = MAINSCR::Get_Mouse_Field_(1, &hovered_target_id, &selected_target_id);
+                _main_screen_ship_icon_scanned = hovered_target_id;
+                if (hovered_target_id != -1) {
                     MOX::_eta_star_id = -1;
                 }
                 if (field_res == 0) {
-                    MAINSCR::Do_Fleet_Popup_(mouse_field_2, 1);
+                    MAINSCR::Do_Fleet_Popup_(selected_target_id, 1);
                 }
 
                 MAINSCR::Check_Function_Keys_(input, &exit_flag);
-                MAINSCR::Check_Hot_Keys_(input, (int)&exit_flag);
+                MAINSCR::Check_Hot_Keys_(input, 0);
             }
 
             if (input == _exit_game_hot_key && MOX::_skip_fields == 0) {
@@ -845,7 +851,6 @@ namespace MAINSCR {
                         }
 
             // Scroll map logic
-            // TODO: Why this is -main_screen_grid_field?
             if (-MOX::_main_screen_grid_field == input && MOX::_skip_fields == 0 && MOX::_max_map_scale != MOX::_cur_map_scale) {
                 int target_y = HAROLD::Get_Up_Scaled_Value_(MOX::_main_screen_grid_y) + MOX::_cur_map_y;
                 int target_x = HAROLD::Get_Up_Scaled_Value_(MOX::_main_screen_grid_x) + MOX::_cur_map_x;
@@ -916,6 +921,9 @@ namespace MAINSCR {
     }
 
 
+    /**
+     * Draws one main-screen frame, including map contents, overlays, and movable boxes.
+     */
     void __cdecl Draw_Main_Screen_() {
         if (MOX::_stencil_box_id >= 0 && MOX::_stencil_box_id <= 4) {
             Draw_Main_Screen_While_Moving_Boxes_();

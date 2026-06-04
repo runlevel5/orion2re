@@ -8,30 +8,27 @@ namespace maintain {
      * Determines if a building is processed in the first maintenance phase.
      * Buildings with no maintenance, specific AI groups, or the Star Base (index 9) are excluded.
      */
-    bool __cdecl Phase1_Building_(int16_t b) {
-        if (TECHDATA::_buildings[b].maintenance <= 0) {
+    bool __cdecl Phase1_Building_(int16_t building_idx) {
+        if (TECHDATA::_buildings[building_idx].maintenance <= 0) {
             return false;
         }
 
-        int16_t tech_app_idx = TECHDATA::_buildings[b].tech_app;
+        int16_t tech_app_idx = TECHDATA::_buildings[building_idx].tech_app;
         uint8_t ai_group = TECHDATA::_technology_applications[tech_app_idx].ai_group;
 
-        // Exclude specific AI groups (likely Orion-related or unique structures)
         if (ai_group == 3 || ai_group == 1) {
             return false;
         }
 
-        // Special case: building 9 (Star Base) is handled elsewhere
-        return b != 9;
+        return building_idx != 9;
     }
 
-    // Suggested name: Player_Maintenance_
-    void __cdecl Player_Maintenance_(s_player* param_1) {
-        if (param_1->do_not_research) {
-            Kill_Research_Buildings_(param_1);
+    void __cdecl Player_Maintenance_(s_player* player) {
+        if (player->do_not_research) {
+            Kill_Research_Buildings_(player);
         }
 
-        if ((int)param_1->surplus_bc + param_1->bc >= 0) {
+        if ((int32_t)player->surplus_bc + player->bc >= 0) {
             return;
         }
 
@@ -42,19 +39,19 @@ namespace maintain {
         uint8_t eligible_players[8];
         memset(eligible_players, 0, sizeof(eligible_players));
 
-        int player_idx = (int)(param_1 - MOX::_player);
-        int eligible_count = 0;
+        int32_t player_idx = (int32_t)(player - MOX::_player);
+        int32_t eligible_count = 0;
 
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-            if (i != player_idx && param_1->contact[i]) {
+        for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
+            if (i != player_idx && player->contact[i]) {
                 eligible_players[i] = 1;
                 eligible_count++;
             }
         }
 
         if (eligible_count == 0) {
-            for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-                if (i != player_idx && !MOX::_player[i].eliminated && MOX::_player[i].objectives == 100 /* 0x64 */) {
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
+                if (i != player_idx && !MOX::_player[i].eliminated && MOX::_player[i].objectives == 100) {
                     eligible_players[i] = 1;
                     eligible_count++;
                 }
@@ -62,7 +59,7 @@ namespace maintain {
         }
 
         if (eligible_count == 0) {
-            for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
                 if (i != player_idx && !MOX::_player[i].eliminated) {
                     eligible_players[i] = 1;
                     eligible_count++;
@@ -84,55 +81,48 @@ namespace maintain {
             }
         }
 
-        if (((int)param_1->command_points * 4) / 3 < (int)param_1->command_points_used) {
-            Kill_Ships_(param_1, 1, 1, 4);
-            Kill_Ships_(param_1, 1, 0, 4);
-            Kill_Ships_(param_1, 1, 1, 2);
-            Kill_Ships_(param_1, 1, 1, 0);
-            Kill_Ships_(param_1, 0, 1, 4);
-            Kill_Ships_(param_1, 0, 0, 4);
-            Kill_Ships_(param_1, 0, 1, 2);
-            Kill_Ships_(param_1, 0, 1, 0);
+        if (((int32_t)player->command_points * 4) / 3 < (int32_t)player->command_points_used) {
+            Kill_Ships_(player, 1, 1, 4);
+            Kill_Ships_(player, 1, 0, 4);
+            Kill_Ships_(player, 1, 1, 2);
+            Kill_Ships_(player, 1, 1, 0);
+            Kill_Ships_(player, 0, 1, 4);
+            Kill_Ships_(player, 0, 0, 4);
+            Kill_Ships_(player, 0, 1, 2);
+            Kill_Ships_(player, 0, 1, 0);
         }
 
-        Kill_Buildings_(param_1, Phase1_Building_);
-        Kill_Ships_(param_1, 1, 1, 4);
-        Kill_Ships_(param_1, 1, 0, 4);
-        Kill_Ships_(param_1, 0, 1, 4);
-        Kill_Ships_(param_1, 0, 0, 4);
-        Kill_Ships_(param_1, 1, 1, 2);
-        Kill_Ships_(param_1, 1, 1, 0);
-        Kill_Ships_(param_1, 0, 1, 2);
-        Kill_Ships_(param_1, 0, 1, 0);
-        Kill_Buildings_(param_1, Phase2_Building_);
-        Kill_Ships_(param_1, 1, 0, 2);
-        Kill_Ships_(param_1, 0, 0, 2);
-        Kill_Ships_(param_1, 1, 1, 1);
-        Kill_Ships_(param_1, 0, 1, 1);
-        Kill_Ships_(param_1, 1, 0, 1);
-        Kill_Ships_(param_1, 0, 0, 1);
-        Kill_Spy_(param_1);
-        Kill_Ships_(param_1, 1, 0, 0);
-        Kill_Ships_(param_1, 0, 0, 0);
-        Kill_Leaders_(param_1);
-        Kill_Buildings_(param_1, All_But_Capitol_);
+        Kill_Buildings_(player, Phase1_Building_);
+        Kill_Ships_(player, 1, 1, 4);
+        Kill_Ships_(player, 1, 0, 4);
+        Kill_Ships_(player, 0, 1, 4);
+        Kill_Ships_(player, 0, 0, 4);
+        Kill_Ships_(player, 1, 1, 2);
+        Kill_Ships_(player, 1, 1, 0);
+        Kill_Ships_(player, 0, 1, 2);
+        Kill_Ships_(player, 0, 1, 0);
+        Kill_Buildings_(player, Phase2_Building_);
+        Kill_Ships_(player, 1, 0, 2);
+        Kill_Ships_(player, 0, 0, 2);
+        Kill_Ships_(player, 1, 1, 1);
+        Kill_Ships_(player, 0, 1, 1);
+        Kill_Ships_(player, 1, 0, 1);
+        Kill_Ships_(player, 0, 0, 1);
+        Kill_Spy_(player);
+        Kill_Ships_(player, 1, 0, 0);
+        Kill_Ships_(player, 0, 0, 0);
+        Kill_Leaders_(player);
+        Kill_Buildings_(player, All_But_Capitol_);
 
         _ship_worths = nullptr;
     }
 
-    /**
-     * @brief Checks if a building has a maintenance cost greater than zero.
-     * @param p Pointer to the player.
-     * @param a Colony index.
-     * @param b Building index.
-     * @return True if maintenance > 0, false otherwise.
-     */
-    bool __cdecl Phase2_Building_(int16_t b) {
-        return TECHDATA::_buildings[b].maintenance > 0;
+    bool __cdecl Phase2_Building_(int16_t building_idx) {
+        return TECHDATA::_buildings[building_idx].maintenance > 0;
     }
 
-    bool __cdecl All_But_Capitol_(int16_t b) {
-        return b != BUILDING_CAPITOL;
+    bool __cdecl All_But_Capitol_(int16_t building_idx) {
+        return building_idx != BUILDING_CAPITOL;
     }
 
     /**
@@ -144,23 +134,23 @@ namespace maintain {
      * If the colony was currently producing the removed building, its production is reset.
      */
     void __cdecl Kill_Research_Buildings_(s_player* player) {
-        int player_idx = (int)(player - MOX::_player);
+        int32_t player_idx = (int32_t)(player - MOX::_player);
         bool any_removed = false;
 
         for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
 
             if (colony->owner == player_idx) {
-                for (int j = 0; j < 4; ++j) {
+                for (int32_t j = 0; j < (int32_t)(sizeof(_research_building_table) / sizeof(_research_building_table[0])); ++j) {
                     uint8_t building_id = maintain::_research_building_table[j];
 
                     if (colony->buildings[building_id] != 0) {
-                        int cost = TECHDATA::_buildings[building_id].cost;
+                        int32_t cost = TECHDATA::_buildings[building_id].cost;
 
                         ERICNET::Remove_Building_((int16_t)i, (int16_t)building_id);
                         any_removed = true;
 
-                        int compensation = cost / 2;
+                        int32_t compensation = cost / 2;
                         player->bc += compensation;
 
                         if (player->objectives != 100) {
@@ -169,7 +159,7 @@ namespace maintain {
                     }
 
                     if (colony->producing[0] == building_id) {
-                        colony->producing[0] = -2; /* Set to default housing/trade */
+                        colony->producing[0] = -2;
                     }
                 }
             }
@@ -216,14 +206,13 @@ namespace maintain {
         return 0;
     }
 
-    // Suggested name: MAINTAIN::Make_Scrap_Ships_Dead_
     void __cdecl Make_Scrap_Ships_Dead_() {
-        int num_ships = (int)MOX::_NUM_SHIPS;
+        int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
 
-        for (int i = 0; i < num_ships; ++i) {
+        for (int32_t i = 0; i < num_ships; ++i) {
             if (ships[i].status == 7 || ships[i].status == 8) {
-                SHIPS::Kill_Ship_(static_cast<int16_t>(i));
+                SHIPS::Kill_Ship_((int16_t)i);
             }
         }
     }
@@ -251,7 +240,6 @@ namespace maintain {
                     }
 
                     if (restricted_mission) {
-                        // Restricted missions: None (0), Orbiting (3), or Scrapped? (7)
                         if (!(ship->mission == 0 || ship->mission == 3 || ship->mission == 7)) {
                             continue;
                         }
@@ -336,10 +324,10 @@ namespace maintain {
         }
     }
 
-    void __cdecl Kill_Leaders_(s_player* p) {
-        int player_idx = (int)(p - MOX::_player);
+    void __cdecl Kill_Leaders_(s_player* player) {
+        int32_t player_idx = (int32_t)(player - MOX::_player);
         bool searched_without_removal = false;
-        int balance = (int)p->surplus_bc + p->bc;
+        int32_t balance = (int32_t)player->surplus_bc + player->bc;
 
         do {
             if (balance >= 0 || searched_without_removal) {
@@ -365,27 +353,26 @@ namespace maintain {
                 }
             }
 
-            balance = (int)p->surplus_bc + p->bc;
+            balance = (int32_t)player->surplus_bc + player->bc;
         } while (true);
     }
 
     int32_t __cdecl Building_Worth_(s_colony* colony, int16_t building_idx) {
-        const uint8_t* colony_bytes = reinterpret_cast<const uint8_t*>(colony);
         int32_t worth = TECHDATA::_buildings[building_idx].cost;
 
         switch (building_idx) {
         case 2:
         case 0x16: {
-            const int32_t owner_player_idx = static_cast<int8_t>(colony_bytes[0]);
+            const int32_t owner_player_idx = colony->owner;
             const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
 
             if (owner_trait_group >= 0 && owner_trait_group <= 1) {
                 if (building_idx == 0x16) {
-                    if (colony_bytes[0x138] == 0) {
+                    if (colony->buildings[0] == 0) {
                         return worth * 8;
                     }
                 } else {
-                    if (colony_bytes[0x14c] == 0) {
+                    if (colony->buildings[20] == 0) {
                         return worth * 8;
                     }
                 }
@@ -404,7 +391,7 @@ namespace maintain {
 
         case 0x14:
         case 0x1f: {
-            const int32_t owner_player_idx = static_cast<int8_t>(colony_bytes[0]);
+            const int32_t owner_player_idx = colony->owner;
             const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
 
             if (owner_trait_group != 3) {
@@ -427,7 +414,7 @@ namespace maintain {
     }
 
     void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(int16_t)) {
-        int16_t plr_idx = (int16_t)(player - MOX::_player);
+        int16_t player_idx = (int16_t)(player - MOX::_player);
         bool no_more_buildings = false;
 
         while ((player->bc + player->surplus_bc < 0) && !no_more_buildings) {
@@ -438,20 +425,20 @@ namespace maintain {
 
             for (int i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
                 s_colony* col = &MOX::_colony[i];
-                if (col->owner == (char)plr_idx) {
-                    for (int j = 0; j < 49; ++j) {
-                        if (col->buildings[j] != 0 && can_scrap((int16_t)j)) {
-                            int32_t worth = Building_Worth_(col, (int16_t)j);
+                if (col->owner == (int8_t)player_idx) {
+                    for (int32_t building_idx = 0; building_idx < (int32_t)(sizeof(col->buildings) / sizeof(col->buildings[0])); ++building_idx) {
+                        if (col->buildings[building_idx] != 0 && can_scrap((int16_t)building_idx)) {
+                            int32_t worth = Building_Worth_(col, (int16_t)building_idx);
                             if (worth < min_worth) {
                                 min_worth = worth;
                                 candidates_count = 1;
                                 best_colony = col;
-                                best_building = j;
+                                best_building = building_idx;
                             } else if (worth == min_worth) {
                                 candidates_count++;
                                 if (random::Random_((uint32_t)candidates_count) == 1) {
                                     best_colony = col;
-                                    best_building = j;
+                                    best_building = building_idx;
                                 }
                             }
                         }
@@ -468,21 +455,21 @@ namespace maintain {
                 ERICNET::Remove_Building_(colony_idx, (int16_t)best_building);
                 
                 player->bc += scrap_value;
-                if (player->objectives != 100 /* 'd' */) {
+                if (player->objectives != 100) {
                     player->bc += MOX::_settings.game_difficulty;
                 }
 
                 COLCALC::Colony_Calculation_(colony_idx);
 
                 s_MSG msg;
-                memset(&msg, 0, sizeof(s_MSG));
+                memset(&msg, 0, sizeof(msg));
                 msg.msg_type = MSG_TYPE_COLONY;
                 msg.u.colony.planet_idx = (uint8_t)best_colony->planet;
                 msg.u.colony.subtype = 0 /* s_MSG_colony_scrap_building */;
                 msg.u.colony.c.scrap.building_id = (int16_t)best_building;
                 msg.u.colony.c.scrap.bc = scrap_value;
 
-                MSG_::Add_Msg_(msg, plr_idx);
+                MSG_::Add_Msg_(msg, player_idx);
             }
         }
     }

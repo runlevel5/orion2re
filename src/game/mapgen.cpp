@@ -26,15 +26,9 @@ namespace MAPGEN {
     s_planet_data* _pl;
     const char s_raceopt_lbx[12] = "raceopt.lbx";
     const char s_starname_lbx[13] = "starname.lbx";
-    const char s_starbg_lbx[11] = "starbg.lbx";
-    const char s_Stat_d__start_d__diff_d__total_d_d[48] = "Stat %d  (start: %d)  (diff %d)  (total: %d.%d)";
-    const char s_Blank_Stat_Line[71] = "                                                                      ";
-    const char s_Moving_planet_d_to_planet_d[30] = "Moving planet %d to planet %d";
-    const char s_Colony_Planets_d_Max_d[67] = "Colony Planets: %d  Max: %d  Planet Count: %d  Removing %d planets";
-    const char s_Star_d_orbit_d_has_a_0_sat_t_00558a1c[58] = "Star %d, orbit %d, has a 0 sat type.  Roll: %d  Table: %d";
     uint8_t _MAPGEN_TRACE = 1;
 
-bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, int8_t generate_spectral, int8_t use_names) {
+bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age, int8_t generate_spectral, int8_t use_names) {
     int16_t x_cell_size = MOX::_MAP_MAX_X / x_cells;
     int16_t y_cell_size = MOX::_MAP_MAX_Y / y_cells;
     int16_t scaled_max_x = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
@@ -42,12 +36,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     int8_t y_collision_padding = 0;
 
     s_colors font_colors_main;
-    s_colors* puVar = MISC::Font_Colors2_(4, 'w', 'y');
-    font_colors_main = *puVar;
+    s_colors* font_colors_ptr = MISC::Font_Colors2_(4, 'w', 'y');
+    font_colors_main = *font_colors_ptr;
 
     s_colors font_colors_alt;
-    puVar = MISC::Font_Colors2_(4, 'w', '|');
-    font_colors_alt = *puVar;
+    font_colors_ptr = MISC::Font_Colors2_(4, 'w', '|');
+    font_colors_alt = *font_colors_ptr;
 
     HAROLD::Set_Player_Font_Style_(0, 0);
     HAROLD::Map_Scale_To_Zoom_Level_();
@@ -85,7 +79,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
 
         if (generate_spectral) {
-            MOX::_star[i].spectral_class = MAPGEN::Generate_Spectral_Class_(param_3);
+            MOX::_star[i].spectral_class = MAPGEN::Generate_Spectral_Class_(galaxy_age);
         }
 
         int16_t collision_w;
@@ -250,14 +244,13 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         return 0xFF;
     }
 
-    int8_t __cdecl Generate_Mineral_Class_(int16_t star_idx, int16_t param_2) {
+    int8_t __cdecl Generate_Mineral_Class_(int16_t star_idx, int16_t unused_planet_idx) {
+        (void)unused_planet_idx;
         int32_t random_roll = random::Random_(10);
         int8_t spectral_class = MOX::_star[star_idx].spectral_class;
 
         if (spectral_class >= 0 && spectral_class < 6) {
-            // Access mineral class table: (random_roll - 1) * 6 + spectral_class
-            // The table is an array of mineral types mapped by (Roll-1, SpectralClass)
-            int32_t table_index = (random_roll - 1) * 6 + static_cast<int32_t>(spectral_class);
+            int32_t table_index = (random_roll - 1) * 6 + (int32_t)spectral_class;
             return (int8_t)MOX::_class_to_mineral[table_index];
         }
 
@@ -277,7 +270,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         do {
             // Randomly roll for a satellite type based on weightings in the data table
-            roll = static_cast<int16_t>(random::Random_(10) - 1);
+            roll = (int16_t)(random::Random_(10) - 1);
             MAPGEN::_t_roll = roll;
 
             satellite_type = MOX::_orbit_to_satellite_type[roll][orbit];
@@ -293,7 +286,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     if (spectral == 0) {
                         satellite_type = 5;
                     } else {
-                        satellite_type = static_cast<uint8_t>(spectral + 4);
+                        satellite_type = (uint8_t)(spectral + 4);
                     }
                 } else {
                     // Fallback to type 1 if companion conditions aren't met
@@ -307,10 +300,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         // Debug assertion: Check for invalid satellite type 0
         if (satellite_type == 0) {
             int table_value = (int)(int8_t)MOX::_orbit_to_satellite_type[MAPGEN::_t_roll][orbit];
-            RUSS::PFMT_(0, 0x0F, s_Star_d_orbit_d_has_a_0_sat_t_00558a1c,
-                        static_cast<int>(star_idx),
-                        static_cast<int>(orbit),
-                        static_cast<int>(MAPGEN::_t_roll),
+            RUSS::PFMT_(0, 0x0F, "Star %d, orbit %d, has a 0 sat type.  Roll: %d  Table: %d",
+                        (int)star_idx,
+                        (int)orbit,
+                        (int)MAPGEN::_t_roll,
                         table_value);
             assert::hgetch_();
         }
@@ -415,17 +408,17 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      * If the galaxy is young or normal, it uses one weight table; if old, another.
      * If forced to be a food planet, it ensures the chosen climate supports agriculture.
      */
-    int8_t __cdecl Generate_Climate_(int16_t star_type) {
+    int8_t __cdecl Generate_Climate_(int16_t planet_group) {
         uint8_t weights[10];
         memset(&weights, 0, sizeof(weights));
 
-        // 1. Determine weights based on star type and galaxy age
+        // 1. Determine weights based on planet group and galaxy age
         for (int i = 0; i < 10; ++i) {
             if (MOX::_g_galaxy_age <= 1) { // 0: Young, 1: Normal
-                weights[i] = MOX::_normal_gal_climate_roll_table[i][star_type];
+                weights[i] = MOX::_normal_gal_climate_roll_table[i][planet_group];
             }
             else if (MOX::_g_galaxy_age == 2) { // 2: Old
-                weights[i] = MOX::_old_gal_climate_roll_table[i][star_type];
+                weights[i] = MOX::_old_gal_climate_roll_table[i][planet_group];
             }
         }
 
@@ -437,9 +430,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             uint8_t match_index = 0;
             for (int i = 0; i < 10; ++i) {
                 // Check if climate has a non-zero weight and supports food production
-                if (weights[i] != 0 && static_cast<int8_t>(MOX::_food_per_farmer_table[i]) > 0) {
+                if (weights[i] != 0 && (int8_t)MOX::_food_per_farmer_table[i] > 0) {
                     match_count++;
-                    match_index = static_cast<uint8_t>(i);
+                    match_index = (uint8_t)i;
                 }
             }
 
@@ -481,7 +474,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
 
             if (capture::Check_Release_Version_() == 0) {
-                RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
+                RUSS::PFMT_(0, 1, "Colony Planets: %d  Max: %d  Planet Count: %d  Removing %d planets",
                     (int32_t)(original_planet_count - gas_giant_count),
                     (int32_t)max_planets,
                     (int32_t)original_planet_count,
@@ -500,7 +493,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 s_planet_data* backup_p = &_pl[random_idx];
 
                 if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
-                    int16_t mapped_idx = ((int16_t*)MOX::_star[(int8_t)backup_p->star_index].planet_index)[random_idx];
+                    int16_t mapped_idx = MOX::_star[(int8_t)backup_p->star_index].planet_index[random_idx];
                     if (mapped_idx > -1 && _pl[mapped_idx].planet_type != 2 /* PLANET_TYPE_GAS_GIANT */) {
                         backup_p->colony_index = -2;
                         MOX::_planet_count--;
@@ -518,7 +511,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                         MOX::_player[player_home_idx].home_planet_id = new_idx;
                     }
 
-                    RUSS::PFMT_(0, 10, s_Moving_planet_d_to_planet_d, (int32_t)old_idx, (int32_t)new_idx);
+                    RUSS::PFMT_(0, 10, "Moving planet %d to planet %d", (int32_t)old_idx, (int32_t)new_idx);
 
                     MOX::_planet[new_idx] = _pl[old_idx];
                     MOX::_star[(uint8_t)MOX::_planet[new_idx].star_index].planet_index[(uint8_t)MOX::_planet[new_idx].orbit] = new_idx;
@@ -777,7 +770,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
     }
 
-    void __cdecl Generate_Number_Of_Nebulas_(int16_t galaxy_size, int16_t nebula_freq) {
+    void __cdecl Generate_Number_Of_Nebulas_(int16_t galaxy_size, int16_t unused_nebula_freq) {
+        (void)unused_nebula_freq;
         MOX::_NUM_NEBULAS = 0;
 
         if (MOX::_nebula_screen_seg == nullptr) {
@@ -786,16 +780,16 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         switch (galaxy_size) {
         case 0:
-            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(2) - 1);
+            MOX::_NUM_NEBULAS = (uint8_t)(random::Random_(2) - 1);
             break;
         case 1:
-            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(2));
+            MOX::_NUM_NEBULAS = (uint8_t)random::Random_(2);
             break;
         case 2:
-            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(3));
+            MOX::_NUM_NEBULAS = (uint8_t)random::Random_(3);
             break;
         case 3:
-            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(3) + 1);
+            MOX::_NUM_NEBULAS = (uint8_t)(random::Random_(3) + 1);
             break;
         default:
             break;
@@ -808,16 +802,19 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         uint8_t nebula_types[4];
         int16_t min_dist_param = 0x14;
         int16_t attempts = 0;
+        const int32_t point_buffer_value_count = 30000 * 2;
+        const int32_t coord_buffer_value_count = 10000 * 2;
+        const int32_t weight_buffer_value_count = 10000;
 
         allocate::Push_Block_(MOX::_screen_seg);
-        int16_t* point_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 120000);
-        int16_t* coord_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40000);
-        uint16_t* weight_buffer = (uint16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20000);
+        int16_t* point_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, (int32_t)(sizeof(*point_buffer) * point_buffer_value_count));
+        int16_t* coord_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, (int32_t)(sizeof(*coord_buffer) * coord_buffer_value_count));
+        uint16_t* weight_buffer = (uint16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, (int32_t)(sizeof(*weight_buffer) * weight_buffer_value_count));
 
         RUSS::Mox_Update_();
 
         for (int i = 0; i < 12; ++i) {
-            s_animation_header* anim = (s_animation_header*)farload::Far_Reload_(s_starbg_lbx, i * 4 + 6, MOX::_nebula_screen_seg);
+            s_animation_header* anim = (s_animation_header*)farload::Far_Reload_("starbg.lbx", i * 4 + 6, MOX::_nebula_screen_seg);
             widths[i] = animate::Get_Width_(anim);
             heights[i] = animate::Get_Height_(anim);
         }
@@ -845,9 +842,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 break;
             }
 
-            memset(point_buffer, 0, 120000);
-            memset(coord_buffer, 0, 40000);
-            memset(weight_buffer, 0, 20000);
+            memset(point_buffer, 0, sizeof(*point_buffer) * point_buffer_value_count);
+            memset(coord_buffer, 0, sizeof(*coord_buffer) * coord_buffer_value_count);
+            memset(weight_buffer, 0, sizeof(*weight_buffer) * weight_buffer_value_count);
             RUSS::Mox_Update_();
 
             int16_t start_x = (int16_t)random::Random_(0x1FA - widths[0]);
@@ -1000,11 +997,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                         int entry_num = entry_counter + 6;
 
                         if (first_load) {
-                            loaded_segment = reinterpret_cast<s_animation_header*>(farload::Far_Reload_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg));
+                            loaded_segment = (s_animation_header*)farload::Far_Reload_("starbg.lbx", entry_num, MOX::_nebula_screen_seg);
                             first_load = false;
                         }
                         else {
-                            loaded_segment = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg));
+                            loaded_segment = (s_animation_header*)farload::Far_Reload_Next_("starbg.lbx", entry_num, MOX::_nebula_screen_seg);
                         }
 
                         // Store the segment for the specific frame of this nebula
@@ -1033,9 +1030,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     /**
-     * Finds the index of the player whose home planet matches the given planet ID.
-     * @param planet_id The ID of the planet to search for.
-     * @return The player index if found, otherwise -1.
+     * Rolls the number of planetary orbits to populate for a star system.
+     * @param star_idx The star whose spectral class is used for the roll.
+     * @return The generated satellite count.
      */
     int16_t __cdecl Generate_Number_Of_Satellites_(int16_t star_idx) {
         int32_t random_val = random::Random_(10);
@@ -1059,7 +1056,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         if (type == 1 || type == 2 || type == 3) {
             MOX::_star[star_idx].planet_index[orbit] = (int16_t)MOX::_planet_count;
 
-            s_planet_data& planet = MOX::_planet[MOX::_planet_count]; // size: 17
+            s_planet_data& planet = MOX::_planet[MOX::_planet_count];
             planet.orbit = orbit;
             planet.planet_type = (int8_t)type;
 
@@ -1159,7 +1156,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     /**
      * Corrects black holes that overlap nebulae by converting them to habitable stars.
      */
-    void __cdecl Black_Hole_Fix_(int16_t param_1) {
+    void __cdecl Black_Hole_Fix_(int16_t galaxy_age) {
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data& star = MOX::_star[i];
 
@@ -1180,7 +1177,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     in_nebula_5 || in_nebula_6 || in_nebula_7 || in_nebula_8) {
                     int16_t attempts = 0;
                     do {
-                        star.spectral_class = MAPGEN::Generate_Spectral_Class_(param_1);
+                        star.spectral_class = MAPGEN::Generate_Spectral_Class_(galaxy_age);
 
                         // Failsafe: if we can't find a habitable class after 200 attempts, force class M
                         if (attempts > 200) {
@@ -1242,8 +1239,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     void __cdecl Get_Star_Name_(int16_t star_idx) {
-        int32_t name_id = static_cast<int16_t>(_name_index[star_idx]);
-        const char* src_name = reinterpret_cast<const char*>(reinterpret_cast<std::uintptr_t>(_name_seg) + (name_id * 15));
+        int32_t name_id = (int16_t)_name_index[star_idx];
+        const char (*name_table)[15] = (const char (*)[15])_name_seg;
+        const char* src_name = name_table[name_id];
         char* dest_name = MOX::_star[star_idx].name;
 
         while ((*dest_name++ = *src_name++) != '\0');
@@ -1257,14 +1255,14 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         char planets_per_star[72];
         char error_buf[80];
         int16_t grid_x, grid_y;
-        int16_t local_bc;
+        int16_t unused_wormhole_flag;
         int32_t galaxy_size = (int32_t)gal_size;
 
-        s_colors* p = MISC::Font_Colors2_(4, 'w', 'y');
-        local_colors1 = *p;
+        s_colors* font_colors_ptr = MISC::Font_Colors2_(4, 'w', 'y');
+        local_colors1 = *font_colors_ptr;
 
-        p = MISC::Font_Colors2_(4, 'w', '|');
-        local_colors2 = *p;
+        font_colors_ptr = MISC::Font_Colors2_(4, 'w', '|');
+        local_colors2 = *font_colors_ptr;
         RUSS::Mox_Update_();
 
         last_stat_clock = clock();
@@ -1289,9 +1287,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             memset(MOX::_planet, 0, 0x17E8);
             RUSS::Mox_Update_();
 
-            _name_seg = farload::Far_Reload_Data_(s_starname_lbx, 1, MOX::_screen_seg, 0, 0x33D, 0xF);
+            _name_seg = farload::Far_Reload_Data_("starname.lbx", 1, MOX::_screen_seg, 0, 0x33D, 0xF);
             RUSS::Mox_Update_();
-            _name_index = reinterpret_cast<uint16_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xCF4));
+            _name_index = (uint16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xCF4);
             RUSS::Mox_Update_();
             RUSS::Mox_Update_();
 
@@ -1309,7 +1307,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 }
                 video::Set_Page_Back_();
                 RUSS::Mox_Update_();
-                s_animation_header* raceopt_ptr = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_raceopt_lbx, 0, MOX::_global_cache_seg));
+                s_animation_header* raceopt_ptr = (s_animation_header*)buffer::Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg);
                 animate::Draw_(0, 0, raceopt_ptr);
                 RUSS::Mox_Update_();
                 video::Copy_Back_To_Off_();
@@ -1454,7 +1452,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     }
 
                     if (MOX::_star[_star_count].spectral_class != 6 && planets_per_star[_star_count] > 0 && _star_count > 0) {
-                        Generate_Star_Special_(_star_count, &local_bc, _special_count);
+                        Generate_Star_Special_(_star_count, &unused_wormhole_flag, _special_count);
                     }
 
                     MOX::_star[_star_count].wormhole_star_id = -1;
@@ -1482,10 +1480,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                         (map_idx % (MOX::_n_stats_to_generate / 100)) == 0) {
                         uint32_t prev_stat_clock = last_stat_clock;
                         last_stat_clock = clock();
-                        RUSS::PFMT_(0, 0, s_Blank_Stat_Line);
+                        RUSS::PFMT_(0, 0, "                                                                      ");
 
                         uint32_t total_time = last_stat_clock - stats_start_clock;
-                        RUSS::PFMT_(0, 0, s_Stat_d__start_d__diff_d__total_d_d,
+                        RUSS::PFMT_(0, 0, "Stat %d  (start: %d)  (diff %d)  (total: %d.%d)",
                             (int32_t)map_idx,
                             (int32_t)stats_start_clock,
                             (int32_t)(last_stat_clock - prev_stat_clock),

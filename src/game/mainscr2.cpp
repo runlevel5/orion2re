@@ -25,32 +25,32 @@ namespace MAINSCR2 {
         fields::Clear_Fields_();
 
         // Screen bounds are 640x480 (0..639, 0..479)
-        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, s__00551120, 41 /* 0x29 */);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
 
         fields::Disable_Draw_All_Fields_();
         video::Set_Page_Off_();
-        graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
+        graphics::Fill_(0, 0, 639, 479, 0);
 
         MAINSCR::Draw_Mini_Main_Screen_();
         RUSS::Mox_Sync_Update_();
         fields::Enable_Draw_All_Fields_();
 
-        COLCALC::Show_Command_Points_(static_cast<int>(MOX::_PLAYER_NUM));
+        COLCALC::Show_Command_Points_((int)MOX::_PLAYER_NUM);
 
         MOX::_current_screen = MOX::_return_screen;
     }
 
     void __cdecl Draw_Main_Screen_For_Star_Distan() {
         int16_t star_idx = MOX::_screen_mouse_list_type;
-        s_colors local_58 = {{0x70, 0x72, 0x71, 0x72, 0x72, 0x72, 0x72, 0x72}};
-        s_colors local_60 = {{0x4C, 0x50, 0x4E, 0x50, 0x50, 0x50, 0x50, 0x50}};
+        s_colors distance_outline_colors = {{0x70, 0x72, 0x71, 0x72, 0x72, 0x72, 0x72, 0x72}};
+        s_colors blocked_path_outline_colors = {{0x4C, 0x50, 0x4E, 0x50, 0x50, 0x50, 0x50, 0x50}};
 
         MAINSCR::Draw_Mini_Main_Screen_();
         MAINSCR::Draw_Main_Main_Screen_();
         graphics::Set_Window_(22, 22, 527, 421);
         video::Clip_On_();
 
-        MOX::_global_var = static_cast<int8_t>(MOX::_temp_star_handle);
+        MOX::_global_var = (int8_t)MOX::_temp_star_handle;
 
         if (star_idx > -1) {
             MAINSCR::Highlight_Star_(star_idx);
@@ -68,7 +68,7 @@ namespace MAINSCR2 {
                     }
 
                     if (MOX::_temp_star_handle > -1 && MOX::_temp_star_handle != star_idx) {
-                        if (static_cast<int16_t>(MOX::_global_var) == MOX::_temp_star_handle) {
+                        if ((int16_t)MOX::_global_var == MOX::_temp_star_handle) {
                             int16_t x1, y1;
                             int16_t x2, y2;
 
@@ -77,23 +77,23 @@ namespace MAINSCR2 {
 
                             int32_t distance = GEO::Parsecs_Between_Stars_(star_idx, MOX::_temp_star_handle);
 
-                            char local_50[80];
+                            char distance_text[80];
                             if (struct_::Test_Bit_Field_(MOX::_star[star_idx].black_hole_blocks, MOX::_temp_star_handle) != 0) {
                                 fonts::Set_Outline_Color_(0, 0);
-                                fonts::Set_Font_Style_Outline_(2, &local_60);
-                                strcpy(local_50, HAROLD::H_Message_(234));
+                                fonts::Set_Font_Style_Outline_(2, &blocked_path_outline_colors);
+                                strcpy(distance_text, HAROLD::H_Message_(234));
                                 MISC::Change_Font_Style_(1);
                             } else {
                                 fonts::Set_Outline_Color_(0, 0);
-                                fonts::Set_Font_Style_Outline_(2, &local_58);
-                                sprintf(local_50, HAROLD::H_Message_(235), distance);
+                                fonts::Set_Font_Style_Outline_(2, &distance_outline_colors);
+                                sprintf(distance_text, HAROLD::H_Message_(235), distance);
                             }
 
-                            int16_t width = fonts::Get_String_Width_(local_50);
+                            int16_t width = fonts::Get_String_Width_(distance_text);
                             if (x2 + width + 10 <= 522) {
-                                fonts::Print_(x2 + 10, y2, local_50);
+                                fonts::Print_(x2 + 10, y2, distance_text);
                             } else {
-                                fonts::Print_Right_(522, y2, local_50);
+                                fonts::Print_Right_(522, y2, distance_text);
                             }
 
                             SHIPS::Draw_Directional_Multi_Colored_Line_(
@@ -113,7 +113,6 @@ namespace MAINSCR2 {
         graphics::Reset_Window_();
     }
 
-    // Suggested name: MAINSCR2::Reports_Screen_
     void __cdecl Reports_Screen_() {
         int8_t report_mode;
         bool should_fade = false;
@@ -230,9 +229,9 @@ namespace MAINSCR2 {
             MOX::_scanned_field = fields::Scan_Input_();
 
             if (MOX::_screen_mouse_list_type == -1) {
-                mouse::Set_Mouse_List_(_mouse_list_from, 5);
+                mouse::Set_Mouse_List_(_mouse_list_from, sizeof(_mouse_list_from) / sizeof(_mouse_list_from[0]));
             } else {
-                mouse::Set_Mouse_List_(_mouse_list_to, 5);
+                mouse::Set_Mouse_List_(_mouse_list_to, sizeof(_mouse_list_to) / sizeof(_mouse_list_to[0]));
             }
 
             for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
@@ -247,7 +246,7 @@ namespace MAINSCR2 {
             if (input == full_screen_field ||
                 input + full_screen_field == 0 ||
                 input + starmap_field == 0 ||
-                input == -1009 /* 0xfc0f */ ||
+                input == -1009 ||
                 input == hotkey) {
                 done = true;
             }
@@ -266,14 +265,14 @@ namespace MAINSCR2 {
     }
 
     void __cdecl Scrap_Freighters_() {
-        char local_c8[200];
+        char message_text[200];
 
         int16_t selected_box = MOVEBOX::Moveable_Box_Selected_(2);
         int16_t scrap_amount = settler::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
 
         if (scrap_amount <= 0) {
-            strcpy(local_c8, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 3);
+            strcpy(message_text, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 3);
         } else {
             fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
             EVANHELP::Set_Scrap_Freighters_Help_List_();
@@ -294,14 +293,14 @@ namespace MAINSCR2 {
                 if (plr->n_freighters <= count || plr->surplus_freighters <= count) {
                     const char* str1 = HAROLD::H_Message_((count == 1) ? 0xf0 /* HESTR_0F0_FREIGHTER */ : 0xf1 /* HESTR_0F1_FREIGHTERS */);
                     const char* str2 = HAROLD::H_Message_((plr->surplus_freighters == 1) ? 0xf0 : 0xf1);
-                    sprintf(local_c8, HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
-                    box_result = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 1);
+                    sprintf(message_text, HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
+                    box_result = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 1);
                 }
 
                 if (box_result != 0 && count > 0) {
                     const char* str3 = HAROLD::H_Message_((count == 1) ? 0xf0 : 0xf1);
-                    sprintf(local_c8, HAROLD::H_Message_(0xef), count, str3);
-                    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
+                    sprintf(message_text, HAROLD::H_Message_(0xef), count, str3);
+                    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 0);
 
                     int16_t new_freighters = plr->n_freighters - count;
                     if (new_freighters <= 0) {
@@ -485,11 +484,11 @@ namespace MAINSCR2 {
         SYS::Clear_System_Display_Loaded_Flag_();
     }
 
-    void __cdecl Begin_Of_Turn_(int8_t* p_report_flag) {
+    void __cdecl Begin_Of_Turn_(int8_t* reports_available) {
         bool is_main_palette = true;
 
-        *p_report_flag = 0;
-        MAINSCR2::Main_Screen_Report_Handler_(p_report_flag);
+        *reports_available = 0;
+        MAINSCR2::Main_Screen_Report_Handler_(reports_available);
 
         if (MOX::_global_esc == 1) {
             return;
@@ -515,7 +514,7 @@ namespace MAINSCR2 {
         fields::Disable_Draw_All_Fields_();
         fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 2);
 
-        if (p_report_flag == nullptr) {
+        if (reports_available == nullptr) {
             is_main_palette = MAINSCR::Is_Main_Screen_Palette_();
         }
 
@@ -527,7 +526,7 @@ namespace MAINSCR2 {
             FLEETPOP::Reload_Ship_Selection_Status_();
         }
 
-        if (p_report_flag != nullptr) {
+        if (reports_available != nullptr) {
             if (box_2_was_open) {
                 MAINSCR2::Restore_Fleet_Box_Palette_();
                 fields::Enable_Draw_All_Fields_();
@@ -585,7 +584,7 @@ namespace MAINSCR2 {
             int32_t stardate_mod = MOX::_stardate % 10;
             int32_t stardate_div = MOX::_stardate / 10;
             char* race_name = MOX::_player[MOX::_PLAYER_NUM].race_name;
-            char* format = const_cast<char*>(HAROLD::H_Message_(0xE9));
+            char* format = (char*)HAROLD::H_Message_(0xE9);
 
             sprintf(msg_buffer, format, race_name, stardate_div, stardate_mod);
 
@@ -641,7 +640,7 @@ namespace MAINSCR2 {
             if (colony_index >= 0) {
                 if (MOX::_colony[colony_index].owner == MOX::_PLAYER_NUM) {
                     int16_t ship_ids[500];
-                    int32_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(ship_ids, 500, 2);
+                    int32_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(ship_ids, sizeof(ship_ids) / sizeof(ship_ids[0]), 2);
                     int16_t unloaded = invasion::Unload_Transports_(&MOX::_colony[colony_index], ship_ids, count);
 
                     if (MOX::_fleet_box.count == unloaded) {
@@ -682,7 +681,7 @@ namespace MAINSCR2 {
         }
     }
 
-    void __cdecl Main_Screen_Report_Handler_(int8_t *reports_available) {
+    void __cdecl Main_Screen_Report_Handler_(int8_t* reports_available) {
         uint8_t pending_reports;
         bool is_popup_report;
 
@@ -726,10 +725,10 @@ namespace MAINSCR2 {
 
             MOX::_previous_report = REPORT::Display_Report_(MOX::_PLAYER_NUM);
 
-            if (MOX::_previous_report == 2 /* MSG_TYPE_DECLARE_WAR? */ || 
-                MOX::_previous_report == 5 /* MSG_TYPE_LOST_SHIP */ || 
-                MOX::_previous_report == 6 /* MSG_TYPE_SCRAP_SHIP */ || 
-                (MOX::_previous_report == 7 /* MSG_TYPE_LOST_COLONY */ && MOX::_settings.show_gnn_report != 0)) {
+            if (MOX::_previous_report == 2 ||
+                MOX::_previous_report == 5 ||
+                MOX::_previous_report == 6 ||
+                (MOX::_previous_report == 7 && MOX::_settings.show_gnn_report != 0)) {
                 is_popup_report = true;
             } else {
                 is_popup_report = false;

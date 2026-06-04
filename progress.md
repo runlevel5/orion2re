@@ -3,10 +3,6 @@
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
 
-- [pending] src/game/mainscr2.{h,cpp}
-- [pending] src/game/mainscr_main.cpp
-- [pending] src/game/maintain.{h,cpp}
-- [pending] src/game/mapgen.{h,cpp}
 - [pending] src/game/misc.{h,cpp}
 - [pending] src/game/motrans.{h,cpp}
 - [pending] src/game/mouse.{h,cpp}
