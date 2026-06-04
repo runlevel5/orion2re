@@ -74,15 +74,6 @@ namespace MAINSCR {
     int16_t _hi_score_cheat = -1000;
     int16_t _last_field;
 
-    const char _ALL_TECH_CHEAT[] = "EINSTEIN";
-    const char _MORE_MONEY_CHEAT[] = "MOOLA";
-    const char _GET_TECH_CHEAT[] = "MENLO";
-    const char _OMNISCIENCE_CHEAT[] = "ISEEALL";
-    const char _SCORE_CHEAT[] = "SCORE";
-    const char s_Current_score_for_s_is_d[] = "Current score for %s is %d";
-    const char s_fmt_star_len_00559984[] = "%s, len = %d";
-    const char s_ship_icon_idx_fmt[] = "ship icon %d";
-
     bool __cdecl Is_Main_Screen_Palette_() {
         uint8_t screen = static_cast<uint8_t>(MOX::_previous_screen);
 
@@ -646,24 +637,23 @@ namespace MAINSCR {
         const char *src;
 
         switch (MOX::_settings.language) {
-            case 1: // French?
+            case 1:
                 src = s_FP_00558240;
                 break;
-            case 2: // German?
+            case 2:
                 src = s_PR_00558238;
                 break;
-            case 3: // Italian?
+            case 3:
                 src = s_PI_00559994;
                 break;
-            case 4: // Spanish?
+            case 4:
                 src = s_PR_00558238;
                 break;
-            default: // English (0) or others
+            default:
                 src = s_RP_00558248;
                 break;
         }
 
-        // Copies 3 bytes, typically 2 letters and the null terminator
         out[0] = src[0];
         out[1] = src[1];
         out[2] = src[2];
@@ -1019,10 +1009,10 @@ namespace MAINSCR {
         fields::Enable_Draw_All_Fields_();
     }
 
-    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, s_animation_header** param_5) {
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* out_uses_bitmap, char* out_name, s_animation_header** out_bitmap_ptr) {
         bool galactic_lore = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
-        *str = '\0';
-        *param_3 = 0;
+        *out_name = '\0';
+        *out_uses_bitmap = 0;
         HAROLD::Map_Scale_To_Zoom_Level_();
 
         int16_t color_offset = (is_selected != 0) ? (int16_t)MOX::_selected_star_color_offset : 0;
@@ -1053,7 +1043,7 @@ namespace MAINSCR {
                 if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) return;
 
                 char* src = star_ptr->name;
-                char* dst = str;
+                char* dst = out_name;
                 while ((*dst++ = *src++));
 
                 int16_t font_style = HAROLD::Zoom_Level_Font_Style_();
@@ -1061,7 +1051,7 @@ namespace MAINSCR {
 
                 if (is_outpost) {
                     MISC::Decrease_Font_Color_Range_(2);
-                    strings::String_To_Lower_(str);
+                    strings::String_To_Lower_(out_name);
                 }
                 return;
             }
@@ -1069,10 +1059,10 @@ namespace MAINSCR {
 
         // Logic for Lore or Contacted
         if (galactic_lore && MOX::_PLAYER_NUM != owner && !HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
-            sprintf(str, HAROLD::s___s__00556ae4, star_ptr->name);
+            sprintf(out_name, HAROLD::s___s__00556ae4, star_ptr->name);
         } else {
             char* src = star_ptr->name;
-            char* dst = str;
+            char* dst = out_name;
             while ((*dst++ = *src++));
         }
 
@@ -1085,11 +1075,11 @@ namespace MAINSCR {
 
         if (is_outpost) {
             MISC::Decrease_Font_Color_Range_(1);
-            strings::String_To_Lower_(str);
+            strings::String_To_Lower_(out_name);
         }
 
         if (HAROLD::N_Colony_Owners_(star_idx) > 1) {
-            *param_3 = Print_Star_Name_To_Bitmap_(star_idx, str, param_5);
+            *out_uses_bitmap = Print_Star_Name_To_Bitmap_(star_idx, out_name, out_bitmap_ptr);
         }
     }
 
@@ -1220,7 +1210,14 @@ namespace MAINSCR {
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
     }
 
-    void __cdecl Check_Hot_Keys_(int16_t key, int param_2) {
+    /**
+     * Handles main-screen cheat and debug hotkeys.
+     *
+     * @param key Activated hotkey field id.
+     * @param unused_param Unused legacy parameter kept for compatibility.
+     */
+    void __cdecl Check_Hot_Keys_(int16_t key, int32_t unused_param) {
+        (void)unused_param;
         char local_118[80];
         char local_c8[200];
 
@@ -1279,7 +1276,7 @@ namespace MAINSCR {
         if (key == _hi_score_cheat) {
             int16_t score = SCORE::Do_Calculate_Hi_Score_(MOX::_PLAYER_NUM);
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            sprintf(local_c8, s_Current_score_for_s_is_d, player->name, (int)score);
+            sprintf(local_c8, "Current score for %s is %d", player->name, (int)score);
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
         }
     }
@@ -1345,15 +1342,15 @@ namespace MAINSCR {
     }
 
     void __cdecl Add_Cheats_() {
-        _all_tech_cheat = fields::Add_Multi_Hot_Key_Field_(_ALL_TECH_CHEAT);
-        _more_money_cheat = fields::Add_Multi_Hot_Key_Field_(_MORE_MONEY_CHEAT);
-        _get_tech_cheat = fields::Add_Multi_Hot_Key_Field_(_GET_TECH_CHEAT);
-        _omniscience_cheat = fields::Add_Multi_Hot_Key_Field_(_OMNISCIENCE_CHEAT);
-        _hi_score_cheat = fields::Add_Multi_Hot_Key_Field_(_SCORE_CHEAT);
+        _all_tech_cheat = fields::Add_Multi_Hot_Key_Field_("EINSTEIN");
+        _more_money_cheat = fields::Add_Multi_Hot_Key_Field_("MOOLA");
+        _get_tech_cheat = fields::Add_Multi_Hot_Key_Field_("MENLO");
+        _omniscience_cheat = fields::Add_Multi_Hot_Key_Field_("ISEEALL");
+        _hi_score_cheat = fields::Add_Multi_Hot_Key_Field_("SCORE");
         _last_field = fields::_fields_count - 1;
     }
 
-    void __cdecl Highlight_Star_(short star_idx) {
+    void __cdecl Highlight_Star_(int16_t star_idx) {
         if (MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE) {
             Print_Highlighted_Star_Name_(star_idx);
 
@@ -1987,7 +1984,7 @@ namespace MAINSCR {
     void __cdecl Change_Home_Star_Name_() {
         int16_t player_idx = MOX::_PLAYER_NUM;
         s_player* player = &MOX::_player[player_idx];
-        int16_t star_idx = static_cast<int16_t>(MOX::_planet[player->home_planet_id].star_index);
+        int16_t star_idx = (int16_t)MOX::_planet[player->home_planet_id].star_index;
 
         int16_t center_y = namestar::Star_Name_Popup_Map_Center_Y_();
         int16_t center_x = namestar::Star_Name_Popup_Map_Center_X_();
@@ -2001,7 +1998,6 @@ namespace MAINSCR {
         video::Set_Page_Off_();
         MAINSCR::Draw_Mini_Main_Screen_();
         RUSS::Mox_Sync_Update_();
-        // TYPE MISMATCH: Assign_Auto_Function_ takes int16_t delay as second argument in codebase, but decompilation has int32_t active.
         fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
     }
 
@@ -2220,15 +2216,9 @@ namespace MAINSCR {
     }
 
     /**
-     * @brief Redraws the main game screen, handling full redraws with fades or mini updates.
+     * Mirrors the fleet-box field selection state into the underlying ship-node selection flags.
      *
-     * @param redraw_full If true, performs a full screen clear, fade out, and fade in.
-     */
-    /**
-     * @brief Centers the map view on a specific point.
-     * 
-     * @param target_x Desired center X coordinate.
-     * @param target_y Desired center Y coordinate.
+     * @param field_to_select Fleet movement field id to apply.
      */
     void __cdecl Set_Painted_Fleet_Fields_(int16_t field_to_select) {
         int16_t box_ptr_idx = 0;
@@ -2618,7 +2608,7 @@ namespace MAINSCR {
                 if (!MAINSCR::_moving_a_stack || MOX::_mouse_XY.hovering_star_idx == -1) {
                     MOX::_mouse_XY.hovering_ship_icon_idx = i;
                     MOX::_mouse_XY.selected = 0;
-                    sprintf(icon_label, MAINSCR::s_ship_icon_idx_fmt, (int)i);
+                    sprintf(icon_label, "ship icon %d", (int)i);
                     MOX::_mouse_XY.hovering_star_idx = -1;
                 }
                 found = true;
@@ -2777,7 +2767,7 @@ namespace MAINSCR {
                 int16_t text_width = fonts::Get_String_Width_(star_ptr->name);
                 
                 char buffer[80];
-                sprintf(buffer, s_fmt_star_len_00559984, star_ptr->name, (int32_t)text_width);
+                sprintf(buffer, "%s, len = %d", star_ptr->name, (int32_t)text_width);
                 
                 star_processed = true;
             }
@@ -2927,7 +2917,7 @@ namespace MAINSCR {
         }
     }
 
-    int __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor) {
+    int32_t __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor) {
         return (width * 506 /* 0x1fa */) / zoom_factor;
     }
 

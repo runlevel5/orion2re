@@ -3,10 +3,6 @@
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
 
-- [pending] src/game/lostship.{h,cpp}
-- [pending] src/game/mainmenu.{h,cpp}
-- [pending] src/game/mainpups.{h,cpp}
-- [pending] src/game/mainscr.{h,cpp}
 - [pending] src/game/mainscr2.{h,cpp}
 - [pending] src/game/mainscr_main.cpp
 - [pending] src/game/maintain.{h,cpp}

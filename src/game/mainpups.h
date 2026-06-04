@@ -53,11 +53,6 @@ namespace MAINPUPS {
 
     extern s_colony_combat_popup_data* _g_data_ptr;
 
-    extern const char s_str_fmt_00556d98[7];
-
-    extern const char s_format_string[3];
-    extern const char s_SI_COMBATTE_NEL_SISTEMA[61];
-
     void __cdecl Load_Tax_Rate_Popup_();
     void __cdecl Get_Picture_Draw_XY_(s_animation_header* anim);
 
@@ -71,7 +66,13 @@ namespace MAINPUPS {
 
     int16_t __cdecl Evaluate_Selection_Input_(int16_t* selected_field, int16_t* field_data, int16_t* refresh_flag);
 
-    int16_t __cdecl Check_System_Display_Fields_Selection_(int16_t* x, int16_t* y, int16_t* selection_confirmed);
+    /**
+     * Evaluates a system-display click for colony, outpost, troop-drop, or dragon selection popups.
+     * @param mouse_x Current X-side field scan input.
+     * @param mouse_y Current Y-side field scan input.
+     * @param selection_confirmed Set to 1 when a valid target is chosen.
+     */
+    int16_t __cdecl Check_System_Display_Fields_Selection_(int16_t* mouse_x, int16_t* mouse_y, int16_t* selection_confirmed);
 
     int8_t __cdecl New_Colony_Confirmation_Box_(int16_t planet_idx);
 
@@ -79,7 +80,12 @@ namespace MAINPUPS {
     void __cdecl Load_Slider_Fields_();
     void __cdecl Add_Slider_Fields_(int16_t min_val, int16_t max_val, int16_t* value_ptr);
 
-    void __cdecl Do_Popup_Setup_(int16_t param_1, s_animation_header* param_2);
+    /**
+     * Sets up popup rendering state and centers the popup art over the selected star.
+     * @param star_idx Star to focus in the system display, or -1 to use the current player's home star.
+     * @param popup_anim Popup art used to compute the centered draw position.
+     */
+    void __cdecl Do_Popup_Setup_(int16_t star_idx, s_animation_header* popup_anim);
 
     void __cdecl Add_Tax_Rate_Fields_();
     void __cdecl Eric_Pop_Fields_();
@@ -117,15 +123,25 @@ namespace MAINPUPS {
 
     void __cdecl Draw_Colony_Combat_Popup_();
 
-    void __cdecl Update_Colony_Combat_Fields_(int16_t planet_idx, int16_t* fields_ptr);
+    /**
+     * Rebuilds the colony-combat popup fields for the current mode and transient combat state.
+     * @param popup_mode Popup mode selector used by the combat popup loop.
+     * @param combat_state_ptr Current bombing/invasion substate used to choose available actions.
+     */
+    void __cdecl Update_Colony_Combat_Fields_(int16_t popup_mode, int16_t* combat_state_ptr);
 
-    void __cdecl Add_Colony_Combat_Fields_(int16_t param_1, int16_t* param_2);
+    /**
+     * Adds the actionable colony-combat buttons for the current popup mode and combat state.
+     * @param popup_mode Popup mode selector used by the combat popup loop.
+     * @param combat_state_ptr Current bombing/invasion substate used to choose available actions.
+     */
+    void __cdecl Add_Colony_Combat_Fields_(int16_t popup_mode, int16_t* combat_state_ptr);
 
     void __cdecl Setup_To_Apply_Bomb_Hits_(s_combat_bomb_result* result, int16_t* p_bomb_hits_remaining, int16_t* p_bio_hits_remaining);
 
     void __cdecl Apply_Next_Bomb_Hit_(s_combat_bomb_result *bomb, int16_t *state, int16_t *bomb_hits, int16_t *bio_hits);
 
-    int16_t __cdecl Evaluate_Colony_Combat_Input_(int16_t* field_id_ptr, int16_t* unused, int16_t* close_popup_flag, int16_t* selection_idx_ptr);
+    int16_t __cdecl Evaluate_Colony_Combat_Input_(int16_t* field_id_ptr, int16_t* unused_input, int16_t* close_popup_flag, int16_t* selection_idx_ptr);
 
     void __cdecl Load_Combat_Colony_Picture_To_Screen_Seg_(int16_t colony_idx);
 
@@ -167,7 +183,13 @@ namespace MAINPUPS {
 
     int16_t __cdecl Evaluate_Defense_Selection_Input_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made);
 
-    int16_t __cdecl Check_System_Display_Fields_Defense_Selection_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made);
+    /**
+     * Evaluates defense-selection clicks on the system display and returns the chosen colony or hostile owner.
+     * @param mouse_x Current X-side field scan input.
+     * @param mouse_y Current Y-side field scan input.
+     * @param selection_made Set to 1 when a valid defense target is chosen.
+     */
+    int16_t __cdecl Check_System_Display_Fields_Defense_Selection_(int16_t* mouse_x, int16_t* mouse_y, int16_t* selection_made);
 
     void __cdecl Player_Attacked_Popup_(int16_t attacker_idx, int16_t defender_idx, int16_t star_idx, int16_t colony_idx);
 
@@ -198,7 +220,15 @@ namespace MAINPUPS {
 
     s_animation_header* __cdecl System_Special_Anim_(int16_t star_idx, int16_t anim_type);
 
-    void __cdecl Draw_Special_Info_Popup_(int16_t x, int16_t y, s_animation_header* anim, const char* name, const char* desc);
+    /**
+     * Draws a titled system-special popup with the supplied animation and descriptive text.
+     * @param x Left screen coordinate for the popup.
+     * @param y Top screen coordinate for the popup.
+     * @param anim Special-case illustration to draw inside the popup.
+     * @param title Title text shown at the top of the popup.
+     * @param text Body text shown beside the illustration.
+     */
+    void __cdecl Draw_Special_Info_Popup_(int16_t x, int16_t y, s_animation_header* anim, const char* title, const char* text);
 
     int16_t __cdecl Get_Colony_Best_Shield_Bldg_(int16_t colony_idx);
 
@@ -232,7 +262,12 @@ namespace MAINPUPS {
         int8_t has_stellar_converter
     );
 
-    int16_t __cdecl Colony_Combat_Popup_(s_colony_combat_popup_data* data, int16_t flag);
+    /**
+     * Runs the colony-combat popup loop until the user closes it or selects an action.
+     * @param popup_data Display state used by the popup while it is active.
+     * @param popup_mode Combat mode selector used to choose invasion or bombing behavior.
+     */
+    int16_t __cdecl Colony_Combat_Popup_(s_colony_combat_popup_data* popup_data, int16_t popup_mode);
 
     int16_t __cdecl Colony_Bombing_Popup_(
         s_combat_bomb_result* bomb,

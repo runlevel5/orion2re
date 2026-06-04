@@ -106,11 +106,26 @@ namespace MAINSCR {
 
     void __cdecl Draw_Main_Main_Screen_();
 
-    void __cdecl Print_Star_Name(int16_t star_id, int8_t simple_draw, char* star_name, void* buffer);
+    /**
+     * Draws a star label near the specified star or blits a pre-rendered bitmap label.
+     * @param star_id Star to label.
+     * @param use_bitmap Nonzero when buffer points to a pre-rendered label bitmap.
+     * @param star_name Null-terminated text for the label.
+     * @param buffer Optional bitmap used when use_bitmap is nonzero.
+     */
+    void __cdecl Print_Star_Name(int16_t star_id, int8_t use_bitmap, char* star_name, void* buffer);
 
     bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, s_animation_header** out_bitmap_ptr);
 
-    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, s_animation_header** param_5);
+    /**
+     * Builds the current display label for a star and optional multi-owner bitmap.
+     * @param star_idx Star to describe.
+     * @param is_selected Nonzero when generating the highlighted variant.
+     * @param out_uses_bitmap Set when the caller should draw the returned bitmap instead of plain text.
+     * @param out_name Destination buffer for the generated label text.
+     * @param out_bitmap_ptr Optional bitmap for contested or multi-owner labels.
+     */
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* out_uses_bitmap, char* out_name, s_animation_header** out_bitmap_ptr);
 
     extern uint8_t _already_faded_into_main_screen;
     extern uint8_t _in_auto_next_turn_mode;
@@ -175,16 +190,12 @@ namespace MAINSCR {
     extern int16_t _hi_score_cheat;
     extern int16_t _last_field;
 
-    extern const char _ALL_TECH_CHEAT[];
-    extern const char _MORE_MONEY_CHEAT[];
-    extern const char _GET_TECH_CHEAT[];
-    extern const char _OMNISCIENCE_CHEAT[];
-    extern const char _SCORE_CHEAT[];
-    extern const char s_Current_score_for_s_is_d[];
-    extern const char s_fmt_star_len_00559984[];
-    extern const char s_ship_icon_idx_fmt[];
-
-    void __cdecl Check_Hot_Keys_(int16_t key, int param_2);
+    /**
+     * Handles main-screen cheat and debug hotkeys.
+     * @param key Activated hotkey field id.
+     * @param unused_param Unused legacy parameter kept for compatibility.
+     */
+    void __cdecl Check_Hot_Keys_(int16_t key, int32_t unused_param);
 
     void __cdecl Add_Cheats_();
 
@@ -252,7 +263,11 @@ namespace MAINSCR {
 
     void __cdecl Print_Highlighted_Star_Name_(int16_t star_idx);
 
-    void __cdecl Highlight_Star_(short star_idx);
+    /**
+     * Pulses the selected star label highlight state.
+     * @param star_idx Star to highlight.
+     */
+    void __cdecl Highlight_Star_(int16_t star_idx);
 
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 
@@ -267,10 +282,18 @@ namespace MAINSCR {
 
     void __cdecl Draw_Reply_To_Diplomacy_Request_();
 
+    /**
+     * Dispatches a network payload received while the main screen is active.
+     * @param from_player_id Sending network player index.
+     * @param param_2 Message-specific secondary value.
+     * @param msg_type Network message type.
+     * @param len Payload size in bytes.
+     * @param data Raw payload buffer.
+     */
     void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t param_2, uint16_t msg_type, uint32_t len, void* data);
 
     int16_t __cdecl Scan_Galaxy_Map_Fields_(int16_t field_id_1, int16_t field_id_2, int16_t* star_idx_ptr_1, int16_t* star_idx_ptr_2);
-    int __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor);
+    int32_t __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor);
     int32_t __cdecl Zoom_Box_Height_(int16_t height, int16_t divisor);
     void __cdecl Cycle_Ship_Icons_(int16_t* ptr, int16_t* out_val, int16_t dir);
     void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction);
@@ -279,7 +302,14 @@ namespace MAINSCR {
 
     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx);
 
-    void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4);
+    /**
+     * Routes hover and click input to the active movable-box widgets on the main screen.
+     * @param mouse_input Current hover field id.
+     * @param input Activated field id.
+     * @param scan_input Current scanned field id.
+     * @param out_exit_flag Set when the handler changes screens.
+     */
+    void __cdecl Scan_Moveable_Box_Fields(int16_t mouse_input, int16_t input, int32_t scan_input, int16_t* out_exit_flag);
 
     void __cdecl Get_Star_Name_Info_(int16_t star_idx, int16_t* out_x, int16_t* out_y, int16_t* out_width);
 

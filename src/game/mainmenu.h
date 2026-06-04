@@ -33,49 +33,103 @@ namespace MAINMENU {
     extern int16_t _fade_out_count;
     extern char (*_credits)[2][127];
 
-    extern const char s_MAINMENU_LBX_0055a630[13]; // "MAINMENU.LBX"
-    extern const char s_C_00552420[2]; // "C"
-    extern const char s_S_005569CC[2]; // "S"
-    extern const char s_L_005560E8[2]; // "L"
-    extern const char s_M_00557ED8[2]; // "M"
-    extern const char s_H_005569D4[2]; // "H"
-    extern const char s_Q_005598F0[2]; // "Q"
-    extern const char s_empty_00551120[2]; // "\x1b"
-    extern const char s_N_0055765C[2]; // "N"
-    extern const char s_save_question_gam[10]; // "save?.gam"
-    extern const char s_save_percent_d_gam[11]; // "save%d.gam"
-
+    /**
+     * Draws the main menu background during fade-in.
+     */
     void __cdecl Main_Menu_Fade_Function_();
+
+    /**
+     * Draws the opening main menu segment during fade-in.
+     */
     void __cdecl Main_Menu_Fade_Function2_();
+
+    /**
+     * Creates the active main-menu button fields for the current save-state.
+     */
     void __cdecl Add_Main_Menu_Fields_();
+
+    /**
+     * Reloads the main menu background and button animations from LBX data.
+     */
     void __cdecl Reload_Main_Menu_Screen_();
 
+    /**
+     * Plays the opening file animation and returns the selected menu hotkey code.
+     */
     int16_t __cdecl Do_Main_Menu_File_Animation_();
 
+    /**
+     * Applies a fade step to the scrolling credit palette entries.
+     * @param amount Additive fade amount.
+     * @param colors Palette buffer to adjust.
+     */
     void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors);
 
     extern uint8_t _credits_column_one;
 
+    /**
+     * Renders one credit entry into the scratch bitmap.
+     * @param index Credit row index.
+     * @param bitmap Destination bitmap.
+     */
     void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, s_animation_header* bitmap);
 
+    /**
+     * Draws the scrolling credits overlay.
+     */
     void __cdecl Draw_Credits_();
 
+    /**
+     * Draws the current main menu screen state.
+     */
     void __cdecl Draw_Main_Menu_Screen_();
 
+    /**
+     * Replaces the active help list for the main menu.
+     * @param help_data Help entry array.
+     * @param count Number of help entries.
+     */
     void __cdecl Set_Main_Menu_Screen_Help_List_Aux_(s_help_box* help_data, int16_t count);
+
+    /**
+     * Installs the standard main menu help list.
+     */
     void __cdecl Set_Main_Menu_Screen_Help_List_();
 
+    /**
+     * Runs the load-game screen until the popup finishes.
+     */
     int8_t __cdecl Do_Mainmenu_Load_Screen_();
 
+    /**
+     * Loads the artwork used by the main menu load-game popup.
+     */
     void __cdecl Load_Mainmenu_Load_Game_Popup_();
 
+    /**
+     * Displays the main menu load-game popup and returns its result.
+     * @param save_game_list Storage used by the popup load/save code.
+     */
     int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* save_game_list);
 
+    /**
+     * Runs the main menu screen loop until the user leaves it.
+     */
     void __cdecl Main_Menu_Screen_();
 
+    /**
+     * Returns the scratch-buffer size required for the current file-animation block.
+     */
     int32_t __cdecl Get_File_Animation_Block_Space_();
 
+    /**
+     * Selects the localized credits resource and font settings.
+     * @param filename Output buffer for the chosen credits LBX filename.
+     */
     void __cdecl Init_Credits_(char* filename);
 
+    /**
+     * Loads the scrolling credits text and scratch bitmap.
+     */
     void __cdecl Load_Credits_();
 }

@@ -1,18 +1,6 @@
 #include "pch.h"
 
 namespace MAINMENU {
-    const char s_MAINMENU_LBX_0055a630[13] = "MAINMENU.LBX";
-    const char s_C_00552420[2] = "C";
-    const char s_S_005569CC[2] = "S";
-    const char s_L_005560E8[2] = "L";
-    const char s_M_00557ED8[2] = "M";
-    const char s_H_005569D4[2] = "H";
-    const char s_Q_005598F0[2] = "Q";
-    const char s_empty_00551120[2] = "\x1b";
-    const char s_N_0055765C[2] = "N";
-    const char s_save_question_gam[10] = "save?.gam";
-    const char s_save_percent_d_gam[11] = "save%d.gam";
-
     s_main_menu* _mainmenu;
     s_animation_header* _main_menu_background;
     s_animation_header* _mainmenu_first_seg;
@@ -37,7 +25,7 @@ namespace MAINMENU {
     }
 
     void __cdecl Main_Menu_Fade_Function2_() {
-        animate::Draw_(0, 0, reinterpret_cast<s_animation_header*>(_mainmenu_first_seg));
+        animate::Draw_(0, 0, _mainmenu_first_seg);
     }
 
     int16_t __cdecl Do_Main_Menu_File_Animation_() {
@@ -46,7 +34,7 @@ namespace MAINMENU {
         int16_t result_code = -1;
         int32_t current_sound_handle = 0;
 
-        file_ani::Open_File_Animation_(s_MAINMENU_LBX_0055a630, 0);
+        file_ani::Open_File_Animation_("MAINMENU.LBX", 0);
         uint32_t buffer_size = MAINMENU::Get_File_Animation_Block_Space_();
         int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
 
@@ -59,15 +47,16 @@ namespace MAINMENU {
         fields::Clear_Fields_();
 
         int16_t button_fields[6];
-        button_fields[0] = fields::Add_Hidden_Field_(10, 20, 25, 35, s_C_00552420, ')');
-        button_fields[1] = fields::Add_Hidden_Field_(20, 30, 35, 45, s_S_005569CC, ')');
-        button_fields[2] = fields::Add_Hidden_Field_(30, 40, 45, 55, s_L_005560E8, ')');
-        button_fields[3] = fields::Add_Hidden_Field_(40, 50, 55, 65, s_M_00557ED8, ')');
-        button_fields[4] = fields::Add_Hidden_Field_(50, 60, 65, 75, s_H_005569D4, ')');
-        button_fields[5] = fields::Add_Hidden_Field_(60, 70, 75, 85, s_Q_005598F0, ')');
+        button_fields[0] = fields::Add_Hidden_Field_(10, 20, 25, 35, "C", ')');
+        button_fields[1] = fields::Add_Hidden_Field_(20, 30, 35, 45, "S", ')');
+        button_fields[2] = fields::Add_Hidden_Field_(30, 40, 45, 55, "L", ')');
+        button_fields[3] = fields::Add_Hidden_Field_(40, 50, 55, 65, "M", ')');
+        button_fields[4] = fields::Add_Hidden_Field_(50, 60, 65, 75, "H", ')');
+        button_fields[5] = fields::Add_Hidden_Field_(60, 70, 75, 85, "Q", ')');
 
-        int16_t hotkey_field = fields::Add_Hot_Key_(s_empty_00551120);
-        int16_t fullscreen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty_00551120, ')');
+        /* fmtpara: "\x1b" begins an inline color-attribute command; it is preserved here as the original non-printing field token. */
+        int16_t hotkey_field = fields::Add_Hot_Key_("\x1b");
+        int16_t fullscreen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1b", ')');
 
         fields::Assign_Auto_Function_(file_ani::thunk_Draw_File_Animation_, 1);
 
@@ -78,10 +67,10 @@ namespace MAINMENU {
             int16_t current_frame = file_ani::Get_File_Animation_Frame_();
 
             if (current_frame == 5) {
-                current_sound_handle = ERICNET::Mox_Play_Sound_(0x35); // 53
+                current_sound_handle = ERICNET::Mox_Play_Sound_(0x35);
             } else if (current_frame == 46) {
                 sound::Stop_Sound_(current_sound_handle);
-                current_sound_handle = ERICNET::Mox_Play_Sound_(0x36); // 54
+                current_sound_handle = ERICNET::Mox_Play_Sound_(0x36);
             }
 
             if (input == fullscreen_field || input == hotkey_field) {
@@ -90,7 +79,7 @@ namespace MAINMENU {
             } else if (current_frame == total_frames) {
                 finished = true;
             } else {
-                for (int i = 0; i < 6; ++i) {
+                for (int32_t i = 0; i < 6; ++i) {
                     if (input == button_fields[i]) {
                         static const uint16_t mapping[] = { 0x43, 0x53, 0x4C, 0x4D, 0x48, 0x51 }; // C, S, L, M, H, Q
                         result_code = mapping[i];
@@ -123,7 +112,7 @@ namespace MAINMENU {
         char find_data[16];
 
         uint8_t game_type = FILEDEF::Get_Game_Type_From_Saved_Game_(9);
-        sprintf(save_filename, s_save_percent_d_gam, 10);
+        sprintf(save_filename, "save%d.gam", 10);
         fields::Clear_Fields_();
 
         bool can_continue = false;
@@ -134,21 +123,21 @@ namespace MAINMENU {
         }
 
         if (can_continue) {
-            _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field = fields::Add_Hidden_Field_(0x19F, 0xAC, 0x237, 0xC1, s_C_00552420, 0x29);
+            _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field = fields::Add_Hidden_Field_(0x19F, 0xAC, 0x237, 0xC1, "C", 0x29);
         } else {
             _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field = -1000;
         }
 
-        if (MOX::_disallow_saves_code == 0 && dos::DIR_(s_save_question_gam, find_data) == 1) {
-            _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = fields::Add_Hidden_Field_(0x19F, 0xC3, 0x237, 0xD7, s_L_005560E8, 0x29);
+        if (MOX::_disallow_saves_code == 0 && dos::DIR_("save?.gam", find_data) == 1) {
+            _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = fields::Add_Hidden_Field_(0x19F, 0xC3, 0x237, 0xD7, "L", 0x29);
         } else {
-            _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = -1000; // -1000
+            _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = -1000;
         }
 
-        _mainmenu->fields[MAIN_MENU_BTN_NEW].field = fields::Add_Hidden_Field_(0x19F, 0xD9, 0x237, 0xEE, s_N_0055765C, 0x29);
-        _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field = fields::Add_Hidden_Field_(0x19F, 0xF0, 0x237, 0x104, s_M_00557ED8, 0x29);
-        _mainmenu->fields[MAIN_MENU_BTN_HELP].field = fields::Add_Hidden_Field_(0x19F, 0x106, 0x237, 0x11B, s_H_005569D4, 0x29);
-        _mainmenu->fields[MAIN_MENU_BTN_QUIT].field = fields::Add_Hidden_Field_(0x19F, 0x11D, 0x237, 0x132, s_Q_005598F0, 0x29);
+        _mainmenu->fields[MAIN_MENU_BTN_NEW].field = fields::Add_Hidden_Field_(0x19F, 0xD9, 0x237, 0xEE, "N", 0x29);
+        _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field = fields::Add_Hidden_Field_(0x19F, 0xF0, 0x237, 0x104, "M", 0x29);
+        _mainmenu->fields[MAIN_MENU_BTN_HELP].field = fields::Add_Hidden_Field_(0x19F, 0x106, 0x237, 0x11B, "H", 0x29);
+        _mainmenu->fields[MAIN_MENU_BTN_QUIT].field = fields::Add_Hidden_Field_(0x19F, 0x11D, 0x237, 0x132, "Q", 0x29);
     }
 
     void __cdecl Reload_Main_Menu_Screen_() {
@@ -156,14 +145,14 @@ namespace MAINMENU {
 
         RUSS::Mox_Update_();
 
-        _main_menu_background = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, 2, MOX::_screen_seg);
+        _main_menu_background = (s_animation_header*)farload::Far_Reload_Next_("MAINMENU.LBX", 2, MOX::_screen_seg);
 
         RUSS::Mox_Update_();
 
-        for (int i = 0; i < 6; ++i) {
-            _mainmenu->fields[i].field0_0x0 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index, MOX::_screen_seg);
-            _mainmenu->fields[i].field1_0x4 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 1, MOX::_screen_seg);
-            _mainmenu->fields[i].field2_0x8 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 2, MOX::_screen_seg);
+        for (int32_t i = 0; i < 6; ++i) {
+            _mainmenu->fields[i].field0_0x0 = (s_animation_header*)farload::Far_Reload_Next_("MAINMENU.LBX", entry_index, MOX::_screen_seg);
+            _mainmenu->fields[i].field1_0x4 = (s_animation_header*)farload::Far_Reload_Next_("MAINMENU.LBX", entry_index + 1, MOX::_screen_seg);
+            _mainmenu->fields[i].field2_0x8 = (s_animation_header*)farload::Far_Reload_Next_("MAINMENU.LBX", entry_index + 2, MOX::_screen_seg);
 
             _mainmenu->fields[i].field = -1000;
 
@@ -195,20 +184,17 @@ namespace MAINMENU {
         anims->pictures[19] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x1a, seg);
     }
 
-    /**
-     * @address 00511f40
-     */
     int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* save_game_list) {
         LOADSAVE::_draw_game_popup_to_back = 1;
         MOX::_screen_data = 2;
 
-        _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 0x15, MOX::_screen_seg);
+        _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_("MAINMENU.LBX", 0x15, MOX::_screen_seg);
 
-        LOADSAVE::_game_anims = (s_game_anims*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x65);
-        memset(LOADSAVE::_game_anims, 0, 0x65);
+        LOADSAVE::_game_anims = (s_game_anims*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*LOADSAVE::_game_anims));
+        memset(LOADSAVE::_game_anims, 0, sizeof(*LOADSAVE::_game_anims));
 
-        LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
-        memset(LOADSAVE::_game_popup_fields, 0xFF, 0x278);
+        LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*LOADSAVE::_game_popup_fields));
+        memset(LOADSAVE::_game_popup_fields, 0xFF, sizeof(*LOADSAVE::_game_popup_fields));
 
         LOADSAVE::Load_Month_Names_();
         Load_Mainmenu_Load_Game_Popup_();
@@ -221,15 +207,11 @@ namespace MAINMENU {
         return result;
     }
 
-    /**
-     * Loads and displays the main menu load game screen popup until a selection is confirmed.
-     * @address 004e94d0
-     */
     int8_t __cdecl Do_Mainmenu_Load_Screen_() {
         int8_t result;
-        int16_t status = 0;
+        int16_t popup_status = 0;
 
-        _mainmenu_last_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 21, MOX::_screen_seg);
+        _mainmenu_last_seg = (s_animation_header*)farload::Far_Reload_("MAINMENU.LBX", 21, MOX::_screen_seg);
 
         video::Set_Refresh_Stencil_();
         video::Set_Page_Back_();
@@ -244,10 +226,9 @@ namespace MAINMENU {
 
         MOX::_previous_screen = SCREEN_MAIN_MENU;
 
-        // Loop until the popup returns 1 (selection made or closed)
         do {
-            result = Mainmenu_Load_Game_Popup_(&status);
-        } while (status != 1);
+            result = Mainmenu_Load_Game_Popup_(&popup_status);
+        } while (popup_status != 1);
 
         return result;
     }
@@ -374,7 +355,6 @@ namespace MAINMENU {
                 } else if (i == fade_out_line_idx) {
                     active_palette = fade_out_palette;
                     int32_t remainder = MAINMENU::_credit_count % 14;
-                    // Standard C signed division adjustment for SAR implementation
                     int8_t step = (int8_t)(((remainder + (remainder < 0 ? 3 : 0)) >> 2) * 2);
                     MAINMENU::Fade_Credit_Colors_(step, &active_palette);
                 } else {
@@ -415,20 +395,20 @@ namespace MAINMENU {
         fields::Clear_Fields_();
         RUSS::Mox_Update_();
 
-        _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 1, MOX::_screen_seg);
+        _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_("MAINMENU.LBX", 1, MOX::_screen_seg);
         RUSS::Mox_Update_();
         MAINMENU::Load_Credits_();
         RUSS::Mox_Update_();
 
         MOX::_game_type = 0;
-        _mainmenu = (s_main_menu*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 210); // 0xd2
-        __gametype = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 40); // 0x28
+        _mainmenu = (s_main_menu*)allocate::Allocate_First_Block_(MOX::_global_data_seg, sizeof(s_main_menu));
+        __gametype = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 40);
         RUSS::Mox_Update_();
 
         // Initialize main menu structure fields to -1
         memset(_mainmenu, 0xFF, sizeof(s_main_menu));
 
-        LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
+        LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, sizeof(*LOADSAVE::_game_popup_fields));
         MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         RUSS::Mox_Update_();
@@ -472,7 +452,7 @@ namespace MAINMENU {
         video::Copy_Back_To_Off_();
         RUSS::Mox_Sync_Update_();
 
-        int16_t hotkey_n = fields::Add_Hot_Key_(s_N_0055765C);
+        int16_t hotkey_n = fields::Add_Hot_Key_("N");
         bool screen_exit = false;
 
         fields::Assign_Auto_Function_(Draw_Main_Menu_Screen_, 2);
@@ -493,7 +473,7 @@ namespace MAINMENU {
                     if (MOX::_game_type != 2 && MOX::_game_type != 3) {
                         MOX::_current_screen = (MOX::_game_type == 1) ? SCREEN_HOTSEAT_SELECT_PLAYER : SCREEN_REPORTS;
                     } else {
-                        GENDRAW::Warning_Box_(HAROLD::H_Message_(207)); // 0xcf
+                        GENDRAW::Warning_Box_(HAROLD::H_Message_(207));
                         MOX::_current_screen = SCREEN_MAIN_MENU;
                     }
                 } else {
@@ -511,7 +491,7 @@ namespace MAINMENU {
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_LOAD].field || last_input_scan == 0x4c) {
                 if (Do_Mainmenu_Load_Screen_() != 0) {
                     if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-                        GENDRAW::Warning_Box_(HAROLD::H_Message_(208)); // 0xd0
+                        GENDRAW::Warning_Box_(HAROLD::H_Message_(208));
                         MOX::_current_screen = SCREEN_MAIN_MENU;
                     } else {
                         MOX::_current_screen = (MOX::_game_type == 1) ? SCREEN_HOTSEAT_SELECT_PLAYER : SCREEN_REPORTS;
@@ -575,7 +555,7 @@ namespace MAINMENU {
         RUSS::Mox_Update_();
 
         _max_credits = (int16_t)atoi(data);
-        _credits = (char (*)[2][127])allocate::Allocate_Next_Block_(MOX::_screen_seg, _max_credits * 254);
+        _credits = (char (*)[2][127])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_credits) * (uint32_t)_max_credits);
 
         for (credit_idx = 0; credit_idx < _max_credits; ++credit_idx) {
             RUSS::Mox_Update_();
@@ -620,35 +600,35 @@ namespace MAINMENU {
                 _credits_font_style = 2;
                 _credits_font_spacing = 2;
                 _credits_column_one = 0x9a;
-                memcpy(filename, "GERCRDTS.LBX", 13);
+                strcpy(filename, "GERCRDTS.LBX");
                 return;
 
             case 2: /* French */
                 _credits_column_one = 0xa4;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                memcpy(filename, "FRECRDTS.LBX", 13);
+                strcpy(filename, "FRECRDTS.LBX");
                 return;
 
             case 3: /* Spanish */
                 _credits_column_one = 0x92;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                memcpy(filename, "SPACRDTS.LBX", 13);
+                strcpy(filename, "SPACRDTS.LBX");
                 return;
 
             case 4:
                 _credits_column_one = 0x92;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                memcpy(filename, "ITACRDTS.LBX", 13);
+                strcpy(filename, "ITACRDTS.LBX");
                 return;
 
             default: /* English */
                 _credits_column_one = 0x7c;
                 _credits_font_spacing = 1;
                 _credits_font_style = 3;
-                memcpy(filename, "CREDITS.LBX", 12);
+                strcpy(filename, "CREDITS.LBX");
                 return;
         }
     }
