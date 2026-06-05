@@ -44,7 +44,7 @@ namespace transprt {
 
     int32_t _tpBurstNum;
 
-    DWORD _tpLastBurstTickCount;
+    uint32_t _tpLastBurstTickCount;
 
     int32_t _tpLastBurstStartPacket;
 
@@ -75,11 +75,11 @@ namespace transprt {
             return 0;
         }
 
-        uint32_t size = buffer_size;
+        uint32_t buffer_size_bytes = buffer_size;
 
-        _tpRecUserBuffer = static_cast<uint8_t*>(malloc(size));
-        _tpRecPacketBuffer = static_cast<uint8_t*>(malloc(size));
-        _tpFullSendBuffer = static_cast<uint8_t*>(malloc(size));
+        _tpRecUserBuffer = (uint8_t*)malloc(buffer_size_bytes);
+        _tpRecPacketBuffer = (uint8_t*)malloc(buffer_size_bytes);
+        _tpFullSendBuffer = (uint8_t*)malloc(buffer_size_bytes);
 
         if (_tpRecUserBuffer != nullptr && 
             _tpRecPacketBuffer != nullptr && 
@@ -101,12 +101,12 @@ namespace transprt {
         return 0;
     }
 
-    int32_t __cdecl SendLargeUserMessage_(uint16_t type, uint8_t* data, uint16_t len, uint32_t dest) {
+    int32_t __cdecl SendLargeUserMessage_(uint16_t user_type, uint8_t* data, uint16_t data_len, uint32_t dest_id) {
         if (_tpInitialized == 0) {
             return -0xCC;
         }
 
-        if (len > _tpBufferSize) {
+        if (data_len > _tpBufferSize) {
             return -0xCC;
         }
 
@@ -114,7 +114,7 @@ namespace transprt {
             return -0xCC;
         }
 
-        if (dest == net::_thisHost) {
+        if (dest_id == net::_thisHost) {
             _tpLastSendSuccessful = 1;
             return 1;
         }
@@ -126,25 +126,27 @@ namespace transprt {
 
         _tpMessageStamp++;
 
-        if (len < 0x100) {
-            memcpy(_tpFullSendBuffer, data, len);
+        if (data_len < 0x100) {
+            memcpy(_tpFullSendBuffer, data, data_len);
             _tpMessageIsProcessed = 0;
             _tpMessageData = _tpFullSendBuffer;
         } else {
             uint32_t comp_len = 0;
-            arith1e::Compress_Data_(data, len, _tpFullSendBuffer, &comp_len);
-            len = static_cast<uint16_t>(comp_len);
+            arith1e::Compress_Data_(data, data_len, _tpFullSendBuffer, &comp_len);
+            data_len = (uint16_t)comp_len;
             _tpMessageIsProcessed = 1;
             _tpMessageData = _tpFullSendBuffer;
         }
 
-        _tpSendDataLength = len;
+        _tpSendDataLength = data_len;
         _tpSendImmediateBurst = 0;
-        _tpDestID = dest;
+        _tpDestID = dest_id;
         _tpBurstNum = 0;
         _tpSending = 1;
-        _tpCurrentUserType = type;
-        _tpTotalPackets = (len / 0x14B) + (len % 0x14B != 0 ? 1 : 0);
+        _tpCurrentUserType = user_type;
+        _tpTotalPackets =
+            (data_len / sizeof(_tpSendBuffer.payload)) +
+            ((data_len % sizeof(_tpSendBuffer.payload)) != 0 ? 1 : 0);
 
         UpdateTransportLayer_();
 
@@ -178,7 +180,7 @@ namespace transprt {
         if (_tpLastBurstStartPacket < _tpBurstNum || 
             _tpForceBurstSend == 1 || 
             _tpSendImmediateBurstFlag == 1 || 
-            static_cast<uint32_t>(clock() - _tpLastBurstClock) >= 2000) {
+            (uint32_t)(clock() - _tpLastBurstClock) >= 2000) {
 
             if (_tpSending != 0 && _tpBurstNum + 4 > _tpBurstNum) {
                 for (int32_t packet_idx = _tpBurstNum; packet_idx < _tpBurstNum + 4; ++packet_idx) {
@@ -198,31 +200,32 @@ namespace transprt {
     }
 
     void __cdecl SendPacket_(int32_t packet_index, uint32_t dest_id, uint16_t user_type) {
+        const uint32_t payload_size_max = sizeof(_tpSendBuffer.payload);
         uint16_t data_len = _tpSendDataLength;
-        int32_t total_packets = (data_len / 331) + ((data_len % 331) != 0 ? 1 : 0);
+        int32_t total_packets = (data_len / payload_size_max) + ((data_len % payload_size_max) != 0 ? 1 : 0);
 
         if (packet_index < total_packets && _tpSending != 0) {
             _tpSendBuffer.message_stamp = _tpMessageStamp;
             _tpSendBuffer.send_data_length = _tpSendDataLength;
-            _tpSendBuffer.packet_index = static_cast<uint8_t>(packet_index);
-            _tpSendBuffer.total_packets = static_cast<uint8_t>(total_packets);
-            _tpSendBuffer.sender_host_id = static_cast<uint8_t>(net::_thisHost);
+            _tpSendBuffer.packet_index = (uint8_t)packet_index;
+            _tpSendBuffer.total_packets = (uint8_t)total_packets;
+            _tpSendBuffer.sender_host_id = (uint8_t)net::_thisHost;
             _tpSendBuffer.current_user_type = user_type;
-            _tpSendBuffer.burst_index = static_cast<uint8_t>(packet_index / 4);
+            _tpSendBuffer.burst_index = (uint8_t)(packet_index / 4);
             _tpSendBuffer.message_is_processed = _tpMessageIsProcessed;
             _tpSendBuffer.send_immediate_burst = _tpSendImmediateBurst;
 
-            uint32_t payload_size = 331;
+            uint32_t payload_size = payload_size_max;
             if (total_packets - packet_index == 1) {
                 // BUG: if data_len is a multiple of 331, payload_size becomes 0 due to modulo calculation
-                payload_size = _tpSendDataLength % 331;
+                payload_size = _tpSendDataLength % payload_size_max;
             }
 
-            memcpy(_tpSendBuffer.payload, _tpMessageData + (packet_index * 331), payload_size);
+            memcpy(_tpSendBuffer.payload, _tpMessageData + (packet_index * payload_size_max), payload_size);
 
             comcore::ComSendUserMessage_(
                 &_tpSendBuffer,
-                static_cast<uint16_t>(payload_size + 0x13),
+                (uint16_t)(payload_size + (sizeof(_tpSendBuffer) - sizeof(_tpSendBuffer.payload))),
                 dest_id,
                 0x7B2,
                 1,
@@ -231,7 +234,7 @@ namespace transprt {
         }
     }
 
-    void __cdecl ReceiveLargeUserMessage_(uint16_t packet_type, uint32_t packet_size, s_transport_packet* packet) {
+    void __cdecl ReceiveLargeUserMessage_(uint16_t packet_type, uint32_t packet_size_bytes, s_transport_packet* packet) {
         if (_tpInitialized == 0) {
             return;
         }
@@ -255,7 +258,7 @@ namespace transprt {
                 return;
             }
 
-            if (packet->burst_index != static_cast<uint32_t>(_tpBurstNum / 4)) {
+            if (packet->burst_index != (uint32_t)(_tpBurstNum / 4)) {
                 return;
             }
 
@@ -314,11 +317,11 @@ namespace transprt {
             _tpRecNum = packet->message_stamp;
         }
 
-        uint8_t pkt_idx = packet->packet_index;
-        if (_tpReceiveState.packets_received[pkt_idx] == 1) {
+        uint8_t packet_index = packet->packet_index;
+        if (_tpReceiveState.packets_received[packet_index] == 1) {
             bool burst_complete = true;
-            uint32_t burst_start = pkt_idx & ~3u;
-            for (uint32_t i = burst_start; i < burst_start + 4 && i < static_cast<uint32_t>(packet->total_packets); ++i) {
+            uint32_t burst_start = packet_index & ~3u;
+            for (uint32_t i = burst_start; i < burst_start + 4 && i < (uint32_t)packet->total_packets; ++i) {
                 if (_tpReceiveState.packets_received[i] == 0) {
                     burst_complete = false;
                 }
@@ -328,10 +331,10 @@ namespace transprt {
                 return;
             }
         } else {
-            _tpReceiveState.packets_received[pkt_idx] = 1;
+            _tpReceiveState.packets_received[packet_index] = 1;
             bool burst_complete = true;
-            uint32_t burst_start = pkt_idx & ~3u;
-            for (uint32_t i = burst_start; i < burst_start + 4 && i < static_cast<uint32_t>(packet->total_packets); ++i) {
+            uint32_t burst_start = packet_index & ~3u;
+            for (uint32_t i = burst_start; i < burst_start + 4 && i < (uint32_t)packet->total_packets; ++i) {
                 if (_tpReceiveState.packets_received[i] == 0) {
                     burst_complete = false;
                 }
@@ -340,12 +343,13 @@ namespace transprt {
                 SendAck_(sender, packet->message_stamp, packet->burst_index);
             }
 
-            uint32_t payload_len = (packet_size & 0xFFFF) - 0x13;
-            uint8_t* dest = _tpRecPacketBuffer + 331 * pkt_idx;
-            memcpy(dest, packet->payload, payload_len);
+            uint32_t payload_len =
+                (packet_size_bytes & 0xFFFF) - (uint32_t)(sizeof(*packet) - sizeof(packet->payload));
+            uint8_t* packet_dest = _tpRecPacketBuffer + (sizeof(packet->payload) * packet_index);
+            memcpy(packet_dest, packet->payload, payload_len);
 
             bool all_complete = true;
-            for (uint32_t i = 0; i < static_cast<uint32_t>(packet->total_packets); ++i) {
+            for (uint32_t i = 0; i < (uint32_t)packet->total_packets; ++i) {
                 if (_tpReceiveState.packets_received[i] == 0) {
                     all_complete = false;
                 }
@@ -357,7 +361,7 @@ namespace transprt {
                 if (packet->message_is_processed == 1) {
                     uint32_t uncompressed_len;
                     arith1e::Uncompress_Data_(_tpRecPacketBuffer, len, _tpRecUserBuffer, &uncompressed_len);
-                    packet->send_data_length = static_cast<uint16_t>(uncompressed_len);
+                    packet->send_data_length = (uint16_t)uncompressed_len;
                 } else {
                     memcpy(_tpRecUserBuffer, _tpRecPacketBuffer, len);
                 }
@@ -377,10 +381,10 @@ namespace transprt {
     int32_t __cdecl SendAck_(uint8_t dest_player, uint32_t message_stamp, uint8_t burst_index) {
         s_transport_pack_ack packet;
         packet.message_stamp = message_stamp;
-        packet.host = static_cast<uint8_t>(net::_thisHost);
+        packet.host = (uint8_t)net::_thisHost;
         packet.burst_index = burst_index;
 
-        return static_cast<int32_t>(comcore::ComSendUserMessage_(&packet, sizeof(packet), dest_player, 0x7bf, 1, 0));
+        return (int32_t)comcore::ComSendUserMessage_(&packet, sizeof(packet), dest_player, 0x7bf, 1, 0);
     }
 
     bool __cdecl AllAcknowledged_() {
@@ -390,7 +394,7 @@ namespace transprt {
 
         bool all_acknowledged = true;
         for (uint32_t i = 0; i < WINNET::_player_count; ++i) {
-            uint32_t player_id = WINNET::Get_Player_Network_Id_(static_cast<int32_t>(i));
+            uint32_t player_id = WINNET::Get_Player_Network_Id_((int32_t)i);
             if (player_id != net::_thisHost) {
                 if (all_acknowledged) {
                     all_acknowledged = true;
@@ -408,14 +412,14 @@ namespace transprt {
     void __cdecl NotifyNextQueuedSender_() {
         if (_queuedSenderCount != 0) {
             uint8_t msg[0x13] = {};
-            msg[8] = static_cast<uint8_t>(net::_thisHost);
+            msg[8] = (uint8_t)net::_thisHost;
             msg[11] = 0;
 
-            // Message is sent twice deliberately, likely a naive form of redundancy over UDP
-            comcore::ComSendUserMessage_(msg, 0x13, _queuedSenders[0], 0x7B1, 1, 0);
-            comcore::ComSendUserMessage_(msg, 0x13, _queuedSenders[0], 0x7B1, 1, 0);
+            // Send the wake-up message twice.
+            comcore::ComSendUserMessage_(msg, sizeof(msg), _queuedSenders[0], 0x7B1, 1, 0);
+            comcore::ComSendUserMessage_(msg, sizeof(msg), _queuedSenders[0], 0x7B1, 1, 0);
 
-            memmove(&_queuedSenders[0], &_queuedSenders[1], 0x13 * sizeof(uint32_t));
+            memmove(&_queuedSenders[0], &_queuedSenders[1], sizeof(_queuedSenders) - sizeof(_queuedSenders[0]));
 
             _queuedSenderCount--;
         }

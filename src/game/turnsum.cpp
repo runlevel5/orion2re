@@ -1,8 +1,6 @@
 #include "pch.h"
 
 namespace {
-    const char s_caret_00556074[2] = "^";
-
     int16_t _turn_sum_list_y[16] = {
         0, 10, 20, 30, 40, 50, 60, 70,
         80, 90, 100, 110, 120, 130, 140, 0,
@@ -13,6 +11,12 @@ namespace {
         89, 99, 109, 119, 129, 139, 149, 0,
     };
 
+    /**
+     * Draws the caret marker and formatted text for one turn summary message entry.
+     * @param x Left edge of the entry.
+     * @param y Top edge of the entry.
+     * @param msg_idx Message table index to render.
+     */
     void __cdecl Draw_Turn_Summary_Popup_App_(int16_t x, int16_t y, uint8_t msg_idx)
     {
         if (msg_idx <= 0xFA)
@@ -21,14 +25,10 @@ namespace {
 
             fonts::Set_Font_LF_(10);
             MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
-            fonts::Print_(x, y, s_caret_00556074);
+            fonts::Print_(x, y, "^");
             FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 320, buffer, 0);
         }
     }
-}
-
-namespace s_turnsum {
-    const char lbx_00558c70[12] = "turnsum.lbx";
 }
 
 namespace TURNSUM {
@@ -52,7 +52,7 @@ namespace TURNSUM {
         0,
         4,
         4,
-        reinterpret_cast<void*>(Draw_Turn_Summary_Popup_App_),
+        (void*)Draw_Turn_Summary_Popup_App_,
         13,
         0,
         &_turn_sum_high_color,
@@ -68,11 +68,11 @@ namespace TURNSUM {
     {
         _g_turn_sum_header.group_colors[0] = &_turn_sum_high_color;
 
-        int16_t input = fields::Scan_Input_();
+        int16_t input_field = fields::Scan_Input_();
 
-        if (input >= INFO::_g_first_list_field && input <= INFO::_g_last_list_field)
+        if (input_field >= INFO::_g_first_list_field && input_field <= INFO::_g_last_list_field)
         {
-            LIST::Set_Selected_List_Entry_(&_g_turn_sum_header, input);
+            LIST::Set_Selected_List_Entry_(&_g_turn_sum_header, input_field);
         }
 
         _g_selected_msg_p = LIST::Get_Selected_List_Entry_(&_g_turn_sum_header);
@@ -94,12 +94,12 @@ namespace TURNSUM {
         {
             if (MOX::_current_screen == 0)
             {
-                MOX::_current_screen = 0x27; // 39
+                MOX::_current_screen = 0x27;
             }
             return;
         }
 
-        if (MOX::_return_screen == 0x27) // 39
+        if (MOX::_return_screen == 0x27)
         {
             _g_turn_message_ix = 0;
         }
@@ -116,14 +116,14 @@ namespace TURNSUM {
         fields::Clear_Fields_();
         video::Set_Refresh_Stencil_();
 
-        s_animation_header* anim = reinterpret_cast<s_animation_header*>(
-            farload::Far_Reload_(s_turnsum::lbx_00558c70, 0, MOX::_screen_seg));
-        s_animation_header* pic = reinterpret_cast<s_animation_header*>(
-            farload::Far_Reload_Next_(s_turnsum::lbx_00558c70, 1, MOX::_screen_seg));
-        s_animation_header* pic_00 = reinterpret_cast<s_animation_header*>(
-            farload::Far_Reload_Next_(s_turnsum::lbx_00558c70, 2, MOX::_screen_seg));
-        s_animation_header* pic_01 = reinterpret_cast<s_animation_header*>(
-            farload::Far_Reload_Next_(s_turnsum::lbx_00558c70, 3, MOX::_screen_seg));
+        s_animation_header* popup_background_anim = (s_animation_header*)(
+            farload::Far_Reload_("turnsum.lbx", 0, MOX::_screen_seg));
+        s_animation_header* scroll_up_button_image = (s_animation_header*)(
+            farload::Far_Reload_Next_("turnsum.lbx", 1, MOX::_screen_seg));
+        s_animation_header* scroll_down_button_image = (s_animation_header*)(
+            farload::Far_Reload_Next_("turnsum.lbx", 2, MOX::_screen_seg));
+        s_animation_header* ok_button_image = (s_animation_header*)(
+            farload::Far_Reload_Next_("turnsum.lbx", 3, MOX::_screen_seg));
 
         while (true)
         {
@@ -131,8 +131,8 @@ namespace TURNSUM {
             fields::Clear_Fields_();
             fields::Assign_Auto_Function_(TURNSUM::Draw_Turn_Summary_Popup_, 2);
 
-            int16_t field_btn_up = fields::Add_Button_Field_(0x1B9, 0x5F, s__00551100, pic, s__00551100, 0);
-            int16_t field_btn_down = fields::Add_Button_Field_(0x1B9, 0x161, s__00551100, pic_00, s__00551100, 0);
+            int16_t field_btn_up = fields::Add_Button_Field_(0x1B9, 0x5F, s__00551100, scroll_up_button_image, s__00551100, 0);
+            int16_t field_btn_down = fields::Add_Button_Field_(0x1B9, 0x161, s__00551100, scroll_down_button_image, s__00551100, 0);
 
             _g_turn_sum_header.items = list_items;
             INFO::Init_Turn_Summary_List_(&_g_turn_sum_header, num_msgs);
@@ -148,11 +148,11 @@ namespace TURNSUM {
                 INFO::_g_first_list_field = fields::Get_Field_Counter_();
                 INFO::_g_last_list_field = LIST::Add_Fields_To_List_Page_(&_g_turn_sum_header);
 
-                int16_t field_btn_ok = fields::Add_Button_Field_(0xF2, 0x176, s__00551100, pic_01, s__00551120, 0);
+                int16_t field_btn_ok = fields::Add_Button_Field_(0xF2, 0x176, s__00551100, ok_button_image, s__00551120, 0);
                 fields::Add_Hidden_Field_(0x54, 0x33, 0x1D0, 0x189, s__00551120, 0);
                 int16_t field_hidden_bg = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0);
 
-                animate::Draw_(0x54, 0x33, anim);
+                animate::Draw_(0x54, 0x33, popup_background_anim);
                 LIST::Display_List_Page_(&_g_turn_sum_header);
                 LIST::Set_List_Up_Down_Field_Drawing_(&_g_turn_sum_header, field_btn_up, field_btn_down);
 
@@ -180,7 +180,7 @@ namespace TURNSUM {
                         {
                             input_field = field_hidden_bg;
                             MOX::_current_screen = 1;
-                            MOX::_return_screen = 0x28; // 40
+                            MOX::_return_screen = 0x28;
                             _g_turn_message_ix = msg_idx;
                         }
                     }
@@ -190,7 +190,6 @@ namespace TURNSUM {
                         {
                             if (input_field >= field_hidden_bg || input_field == field_btn_ok)
                             {
-                                // Handle loop exit later
                             }
                             else if (input_field == field_btn_down)
                             {
@@ -222,7 +221,7 @@ namespace TURNSUM {
                         fields::Clear_Fields_();
                         if (MOX::_current_screen == 0)
                         {
-                            MOX::_current_screen = 0x27; // 39
+                            MOX::_current_screen = 0x27;
                         }
                         return;
                     }

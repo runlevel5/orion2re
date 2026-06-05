@@ -55,7 +55,6 @@ namespace video {
 
 	extern tagPALETTEENTRY g_palette_entries[256];
 
-	// Address 0x579350 is the base of the current palette status array
 	extern s_palette_entry _current_palette[256];
 
 	extern uint8_t* _palette_list[65];
@@ -74,48 +73,78 @@ namespace video {
 	extern int16_t _screen_window_x2;
 
 	// Functions
+	// Switches refresh handling to stencil mode for the next page update.
 	void __cdecl Set_Refresh_Stencil_();
+	// Switches refresh handling to a full-screen redraw mode.
 	void __cdecl Set_Refresh_Full_();
+	// Selects the off-screen render page and clears the copy-to-on-page flag.
 	void __cdecl Set_Page_Off_();
+	// Disables clipping in the animation subsystem.
 	void __cdecl Clip_Off_();
+	// Enables clipping in the animation subsystem.
 	void __cdecl Clip_On_();
 
+	// Blits the primary off-screen surface into the back surface.
 	void __cdecl Copy_Off_To_Back_();
 
+    // Selects the back render page and clears the copy-to-on-page flag.
     void __cdecl Set_Page_Back_();
 
+    // Blits the back surface into the primary off-screen surface.
     void __cdecl Copy_Back_To_Off_();
 
+    // Adds a horizontal pixel span to the refresh scan list for one scanline.
+    // x1: Left pixel coordinate. y: Scanline index. x2: Right pixel coordinate.
     void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2);
 
-	void __cdecl Add_Dot_To_Scan_List_(int32_t x_scaled, int32_t y);
+	// Adds a single pixel position to the refresh scan list.
+	// x: Pixel x coordinate. y: Scanline index.
+	void __cdecl Add_Dot_To_Scan_List_(int32_t x, int32_t y);
 
+	// Switches refresh handling to differential mode.
 	void __cdecl Set_Refresh_Differential_();
+	// Returns the currently selected video page flag.
 	uint8_t __cdecl Get_Current_Video_Page_Flag_();
+	// Returns the current refresh mode as a 16-bit value.
 	int16_t __cdecl Get_Refresh_Mode_();
 
+	// Initializes video-driver state, cursor surfaces, and default mouse bounds.
 	void __cdecl Init_Video_Drivers_();
 
+    // Performs the masked screen-dump path used when screen_dump_flag is 1.
     void __cdecl _Masked_Screen_Dump();
 
+    // Copies only the scan-listed regions from the alternate off-screen surface.
     void __cdecl _Partial_Screen_Dump();
 
+    // Copies scan-listed background regions into the alternate off-screen surface.
     void __cdecl Stencil_Out_Background_();
 
+    // Marks every stencil scan-list entry as empty.
     void __cdecl Clear_Stencil_List_();
+    // Marks every refresh scan-list entry as empty.
     void __cdecl Clear_Scan_List_();
 
+    // Presents the pending frame and updates refresh bookkeeping.
     void __cdecl Toggle_Pages_();
 
+    // Saves the current refresh and dump flags into the legacy backup globals.
     void __cdecl Save_Refresh_();
 
+    // Enables differential refresh while forcing the partial dump path.
     void __cdecl Set_Refresh_Differential_No_Full_();
 
+	// Restores the previously saved refresh and dump flags.
 	void __cdecl Restore_Refresh_();
 
+    // Clears the display state and releases the active DirectDraw palette.
     void __cdecl Clear_Display_And_Release_Palette_();
 
+    // Performs a page toggle when the current frame count is odd.
     void __cdecl Toggle_Pages_On_Odd_Frame_();
 
-    void __cdecl Allocate_Refresh_Lists_(uint32_t, int32_t entry_count);
+    // Allocates the refresh and stencil scan lists.
+    // unused: Unused legacy argument preserved for call compatibility.
+    // entry_count: Number of scan-list entries to allocate.
+    void __cdecl Allocate_Refresh_Lists_(uint32_t unused, int32_t entry_count);
 }

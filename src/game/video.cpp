@@ -70,7 +70,7 @@ namespace video {
 	}
 
 	int16_t __cdecl Get_Refresh_Mode_() {
-		return static_cast<int16_t>(screen_refresh_flag);
+		return (int16_t)screen_refresh_flag;
 	}
 
 	void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2) {
@@ -141,51 +141,51 @@ namespace video {
 		}
 	}
 
-	void __cdecl Add_Dot_To_Scan_List_(int32_t x_scaled, int32_t y) {
-		int32_t x32 = x_scaled >> 2;
-		int16_t x = (int16_t)x32;
+	void __cdecl Add_Dot_To_Scan_List_(int32_t x, int32_t y) {
+		int32_t scaled_x32 = x >> 2;
+		int16_t scaled_x = (int16_t)scaled_x32;
 		s_scan_list_entry* scan_entry = &_refresh_scan_list[y];
 
 		if (screen_refresh_flag == 2) {
 			if (scan_entry->min_x == -1) {
-				scan_entry->min_x = x;
-				scan_entry->max_x = x;
+				scan_entry->min_x = scaled_x;
+				scan_entry->max_x = scaled_x;
 				return;
 			}
-			if (scan_entry->min_x > x32) {
-				scan_entry->min_x = x;
+			if (scan_entry->min_x > scaled_x32) {
+				scan_entry->min_x = scaled_x;
 				return;
 			}
-			if (scan_entry->max_x < x32) {
-				scan_entry->max_x = x;
+			if (scan_entry->max_x < scaled_x32) {
+				scan_entry->max_x = scaled_x;
 			}
 			return;
 		}
 
 		if (scan_entry->min_x == -1) {
-			scan_entry->min_x = x;
-			scan_entry->max_x = x;
+			scan_entry->min_x = scaled_x;
+			scan_entry->max_x = scaled_x;
 		}
-		else if (scan_entry->min_x > x32) {
-			scan_entry->min_x = x;
+		else if (scan_entry->min_x > scaled_x32) {
+			scan_entry->min_x = scaled_x;
 		}
-		else if (scan_entry->max_x < x32) {
-			scan_entry->max_x = x;
+		else if (scan_entry->max_x < scaled_x32) {
+			scan_entry->max_x = scaled_x;
 		}
 
 		s_scan_list_entry* stencil_entry = &_refresh_stencil_list[y];
 
 		if (stencil_entry->min_x == -1) {
-			stencil_entry->min_x = x;
-			stencil_entry->max_x = x;
+			stencil_entry->min_x = scaled_x;
+			stencil_entry->max_x = scaled_x;
 			return;
 		}
-		if (stencil_entry->min_x > x32) {
-			stencil_entry->min_x = x;
+		if (stencil_entry->min_x > scaled_x32) {
+			stencil_entry->min_x = scaled_x;
 			return;
 		}
-		if (stencil_entry->max_x < x32) {
-			stencil_entry->max_x = x;
+		if (stencil_entry->max_x < scaled_x32) {
+			stencil_entry->max_x = scaled_x;
 		}
 	}
 
@@ -211,16 +211,16 @@ namespace video {
                 }
 
                 platform::Save_Mouse_(platform::g_mouse_x, platform::g_mouse_y);
-                platform::Draw_Cursor_XY(static_cast<int>(platform::g_mouse_x), static_cast<int>(platform::g_mouse_y));
+                platform::Draw_Cursor_XY((int)platform::g_mouse_x, (int)platform::g_mouse_y);
             } else {
                 platform::Save_Mouse_Offscreen_(platform::g_mouse_x, platform::g_mouse_y);
                 platform::Draw_Cursor_XY_Offscreen_(platform::g_mouse_x, platform::g_mouse_y);
                 
                 setvesa::Add_Square_To_Scan_List_(
-                    static_cast<int>(platform::g_mouse_x),
-                    static_cast<int>(platform::g_mouse_y),
-                    static_cast<int>(platform::g_mouse_x) + 24,
-                    static_cast<int>(platform::g_mouse_y) + 24
+                    (int)platform::g_mouse_x,
+                    (int)platform::g_mouse_y,
+                    (int)platform::g_mouse_x + 24,
+                    (int)platform::g_mouse_y + 24
                 );
 
                 if (video::screen_dump_flag == 1) {
@@ -256,12 +256,18 @@ namespace video {
 
 	void __cdecl Clear_Stencil_List_() {
 		const uint32_t scanline_count = g_screen_res_y & 0x3FFFFFFFu;
-		memset(video::_refresh_stencil_list, 0xFF, static_cast<size_t>(scanline_count) * 4u);
+		memset(
+			video::_refresh_stencil_list,
+			0xFF,
+			(size_t)scanline_count * sizeof(video::_refresh_stencil_list[0]));
 	}
 
 	void __cdecl Clear_Scan_List_() {
 		const uint32_t scan_line_count = g_screen_res_y & 0x3FFFFFFFu;
-		memset(video::_refresh_scan_list, 0xFF, static_cast<size_t>(scan_line_count) * 4u);
+		memset(
+			video::_refresh_scan_list,
+			0xFF,
+			(size_t)scan_line_count * sizeof(video::_refresh_scan_list[0]));
 	}
 
 	void __cdecl Save_Refresh_() {
@@ -323,12 +329,12 @@ namespace video {
                 const s_scan_list_entry& scan = video::_refresh_scan_list[y];
                 if (scan.min_x != -1) {
                     const int32_t min_x = scan.min_x;
-                    const int32_t count = static_cast<int32_t>(scan.max_x) - min_x + 1;
+                    const int32_t count = (int32_t)scan.max_x - min_x + 1;
 
                     platform::Copy_Dwords_(
                         video_memory + (dst_row_offset + min_x),
                         alt_surface + (src_row_offset + min_x),
-                        static_cast<uint32_t>(count));
+                        (uint32_t)count);
                 }
 
                 dst_row_offset += primary_pitch_dwords;
@@ -355,12 +361,12 @@ namespace video {
             const int32_t min_x = scan.min_x;
 
             if (min_x != -1) {
-                const int32_t count = static_cast<int32_t>(scan.max_x) - min_x + 1;
+                const int32_t count = (int32_t)scan.max_x - min_x + 1;
                 const int32_t dword_offset = row_dword_offset + min_x;
                 platform::Copy_Dwords_(
                     alt_offscreen_surface + dword_offset,
-                    (uint32_t*)(offscreen_surface + dword_offset * 4),
-                    static_cast<uint32_t>(count)
+                    (uint32_t*)(offscreen_surface + dword_offset * (int32_t)sizeof(*alt_offscreen_surface)),
+                    (uint32_t)count
                 );
             }
 
@@ -395,9 +401,9 @@ namespace video {
         platform::Create_Cursor_Surface();
 
         video::_default_mouse_list.x2 =
-            static_cast<int16_t>(static_cast<uint16_t>(g_screen_res_x) - 1);
+            (int16_t)((uint16_t)g_screen_res_x - 1);
         video::_default_mouse_list.y2 =
-            static_cast<int16_t>(static_cast<uint16_t>(g_screen_res_y) - 1);
+            (int16_t)((uint16_t)g_screen_res_y - 1);
 
         mouse::Set_Mouse_List_(&video::_default_mouse_list, 1);
 
@@ -417,8 +423,8 @@ namespace video {
 
         source_rect.left = 0;
         source_rect.top = 0;
-        source_rect.right = static_cast<LONG>(video::g_screen_res_x);
-        source_rect.bottom = static_cast<LONG>(video::g_screen_res_y);
+        source_rect.right = (LONG)video::g_screen_res_x;
+        source_rect.bottom = (LONG)video::g_screen_res_y;
 
         video::g_offscreen_surface_1->BltFast(
             0,
@@ -433,8 +439,8 @@ namespace video {
 
         copy_rect.left = 0;
         copy_rect.top = 0;
-        copy_rect.right = static_cast<LONG>(video::g_screen_res_x);
-        copy_rect.bottom = static_cast<LONG>(video::g_screen_res_y);
+        copy_rect.right = (LONG)video::g_screen_res_x;
+        copy_rect.bottom = (LONG)video::g_screen_res_y;
 
         video::g_offscreen_surface_2->BltFast(
             0,
@@ -444,20 +450,21 @@ namespace video {
             DDBLTFAST_WAIT);
     }
 
-    void __cdecl Allocate_Refresh_Lists_(uint32_t, int32_t entry_count) {
+    void __cdecl Allocate_Refresh_Lists_(uint32_t unused, int32_t entry_count) {
+        (void)unused;
         const uint32_t allocation_size =
-            static_cast<uint32_t>(entry_count) *
-            static_cast<uint32_t>(sizeof(s_scan_list_entry));
+            (uint32_t)entry_count *
+            (uint32_t)sizeof(s_scan_list_entry);
 
         _refresh_scan_list =
-            reinterpret_cast<s_scan_list_entry*>(allocate::Allocate_Space_(allocation_size));
+            (s_scan_list_entry*)allocate::Allocate_Space_(allocation_size);
         _refresh_stencil_list =
-            reinterpret_cast<s_scan_list_entry*>(allocate::Allocate_Space_(allocation_size));
+            (s_scan_list_entry*)allocate::Allocate_Space_(allocation_size);
 
         if (entry_count > 0) {
             for (int32_t i = 0; i < entry_count; ++i) {
-                _refresh_scan_list[i].min_x = static_cast<int16_t>(-1);
-                _refresh_stencil_list[i].max_x = static_cast<int16_t>(-1);
+                _refresh_scan_list[i].min_x = (int16_t)-1;
+                _refresh_stencil_list[i].max_x = (int16_t)-1;
             }
         }
     }

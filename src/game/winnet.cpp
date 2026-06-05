@@ -1,9 +1,6 @@
 #include "pch.h"
 
 namespace WINNET {
-    const char s_modem_005607dc[6] = "modem";
-    const char s_ipx_005607e4[4] = "ipx";
-    const char s_tcp_005607e8[4] = "tcp";
     int32_t _provider_count;
     s_winnet_provider* _providers[9];
     clock_t _net_refresh_timer;
@@ -16,27 +13,13 @@ namespace WINNET {
     s_net_player* _player_list[20];
     DPID _local_player_id;
     int32_t _provider_mode;
-    char s_Error_Unknown_0055bf7c[16] = "Error Unknown";
-    char s_Invalid_Object_0055bf8c[16] = "Invalid Object";
-    char s_Invalid_Player_0055bf9c[16] = "Invalid Player";
-    char DAT_0055bfac[8] = "Busy";
-    char s_Active_Players_0055bfb4[16] = "Active Players";
-    char s_User_Cancel_0055bfc4[12] = "User Cancel";
-    char s_Unsupported_0055bfd0[12] = "Unsupported";
-    char s_Unavailable_0055bfdc[12] = "Unavailable";
-    char s_Generic_0055bfe8[8] = "Generic";
-    char s_Invalid_Params_0055bff0[16] = "Invalid Params";
-    char s_Unknown_Err_00560a08[12] = "Unknown Err";
-    char s_Buffer_To_Small_00560a14[16] = "Buffer To Small";
-    char s_No_Messages_00560a24[12] = "No Messages";
-    char s_DirectPlay_ERR_00560a30[20] = "DirectPlay ERR: ";
 
     int8_t __cdecl Find_Provider_(const char* name) {
         int8_t found_index = -1;
 
         for (int32_t i = 0; i < _provider_count; ++i) {
             if (strstr(_providers[i]->name, name) != nullptr) {
-                found_index = static_cast<int8_t>(i);
+                found_index = (int8_t)i;
             }
         }
 
@@ -48,11 +31,11 @@ namespace WINNET {
         const char* provider_name = nullptr;
 
         if (mode == 0) {
-            provider_name = s_modem_005607dc;
+            provider_name = "modem";
         } else if (mode == 1) {
-            provider_name = s_ipx_005607e4;
+            provider_name = "ipx";
         } else if (mode == 2) {
-            provider_name = s_tcp_005607e8;
+            provider_name = "tcp";
         }
 
         if (provider_name != nullptr) {
@@ -101,16 +84,16 @@ namespace WINNET {
             HRESULT hr = netcode::_dplay->EnumSessions(
                 &session_desc,
                 1000,
-                reinterpret_cast<LPDPENUMSESSIONSCALLBACK>(Refresh_Game_List_Callback_),
+                (LPDPENUMSESSIONSCALLBACK)Refresh_Game_List_Callback_,
                 platform::g_main_window,
                 1 /* DPENUMSESSIONS_AVAILABLE */
             );
 
             if (hr != 0) {
-                if (hr == static_cast<HRESULT>(0x88770082)) { // DPERR_INVALIDOBJECT
+                if (hr == (HRESULT)0x88770082) { // DPERR_INVALIDOBJECT
                     exitm::Exit_With_Message(s_Error_Enum_Current_Games_Invalid_0055c028);
                 }
-                if (hr == static_cast<HRESULT>(0x80070057)) { // E_INVALIDARG / DPERR_INVALIDPARAMS
+                if (hr == (HRESULT)0x80070057) { // E_INVALIDARG / DPERR_INVALIDPARAMS
                     exitm::Exit_With_Message(s_Error_Enum_Current_Games_Invalid_0055c000);
                 }
             }
@@ -130,20 +113,20 @@ namespace WINNET {
         for (uint32_t i = 0; i < _session_count; ++i) {
             if (_strcmpi(session_desc->szSessionName, _sessions[i]->szSessionName) < 0) {
                 insert_idx = i;
-                _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(malloc(sizeof(DPSESSIONDESC)));
+                _sessions[_session_count] = (LPDPSESSIONDESC)malloc(sizeof(*_sessions[_session_count]));
 
                 for (uint32_t j = _session_count; j > i; --j) {
-                    memcpy(_sessions[j], _sessions[j - 1], sizeof(DPSESSIONDESC));
+                    memcpy(_sessions[j], _sessions[j - 1], sizeof(*_sessions[j]));
                 }
 
-                memcpy(_sessions[i], session_desc, sizeof(DPSESSIONDESC));
+                memcpy(_sessions[i], session_desc, sizeof(*_sessions[i]));
                 break;
             }
         }
 
         if (insert_idx == _session_count) {
-            _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(malloc(sizeof(DPSESSIONDESC)));
-            memcpy(_sessions[_session_count], session_desc, sizeof(DPSESSIONDESC));
+            _sessions[_session_count] = (LPDPSESSIONDESC)malloc(sizeof(*_sessions[_session_count]));
+            memcpy(_sessions[_session_count], session_desc, sizeof(*_sessions[_session_count]));
         }
 
         _session_count++;
@@ -151,13 +134,13 @@ namespace WINNET {
     }
 
     int32_t __cdecl Init_Providers_() {
-        DirectPlayEnumerateA(Enumerate_Providers_, reinterpret_cast<LPVOID>(platform::g_main_window));
+        DirectPlayEnumerateA(Enumerate_Providers_, (LPVOID)platform::g_main_window);
         return 0;
     }
 
     BOOL __stdcall Enumerate_Providers_(GUID* guid, char* name, DWORD major_version, DWORD minor_version, void* context) {
         if (_provider_count < 9) {
-            s_winnet_provider* provider = static_cast<s_winnet_provider*>(malloc(sizeof(s_winnet_provider)));
+            s_winnet_provider* provider = (s_winnet_provider*)malloc(sizeof(*provider));
             _providers[_provider_count] = provider;
 
             provider->guid = *guid;
@@ -197,7 +180,7 @@ namespace WINNET {
         netcode::_dplay->EnumPlayers(
             session_id,
             Player_Enumerate_Callback_,
-            reinterpret_cast<LPVOID>(platform::g_main_window),
+            (LPVOID)platform::g_main_window,
             0x80 /* DPENUMPLAYERS_SESSION */
         );
 
@@ -215,7 +198,7 @@ namespace WINNET {
     }
 
     void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str) {
-        s_net_player* player = reinterpret_cast<s_net_player*>(malloc(sizeof(s_net_player)));
+        s_net_player* player = (s_net_player*)malloc(sizeof(*player));
 
         _player_list[_player_count] = player;
         player->player_id = player_id;
@@ -229,34 +212,34 @@ namespace WINNET {
     }
 
     void __cdecl Exit_With_DPlay_Error_(int32_t error_code) {
-        char buffer[200];
-        char* err_str;
+        char message[200];
+        const char* error_string;
 
-        strcpy(buffer, s_DirectPlay_ERR_00560a30);
+        strcpy(message, "DirectPlay ERR: ");
 
         switch (error_code) {
         case 0x80070057:
-            err_str = s_Invalid_Params_0055bff0;
+            error_string = "Invalid Params";
             break;
         case 0x80004005:
-            err_str = s_Generic_0055bfe8;
+            error_string = "Generic";
             break;
         case 0x8877001E:
-            err_str = s_Buffer_To_Small_00560a14;
+            error_string = "Buffer To Small";
             break;
         case 0x88770082:
-            err_str = s_Invalid_Object_0055bf8c;
+            error_string = "Invalid Object";
             break;
         case 0x887700BE:
-            err_str = s_No_Messages_00560a24;
+            error_string = "No Messages";
             break;
         default:
-            err_str = s_Unknown_Err_00560a08;
+            error_string = "Unknown Err";
             break;
         }
 
-        strcat(buffer, err_str);
-        exitm::Exit_With_Message(buffer);
+        strcat(message, error_string);
+        exitm::Exit_With_Message(message);
     }
 
     void __cdecl Net_Enable_New_Players() {
@@ -319,38 +302,38 @@ namespace WINNET {
 
     void __cdecl Exit_With_Error_(HRESULT hr) {
         char message[100];
-        char* error_string;
+        const char* error_string;
 
         switch (hr) {
-        case static_cast<int32_t>(0x80004005): /* E_FAIL */
-            error_string = s_Generic_0055bfe8;
+        case (int32_t)0x80004005: /* E_FAIL */
+            error_string = "Generic";
             break;
-        case static_cast<int32_t>(0x80004001): /* E_NOTIMPL */
-            error_string = s_Unsupported_0055bfd0;
+        case (int32_t)0x80004001: /* E_NOTIMPL */
+            error_string = "Unsupported";
             break;
-        case static_cast<int32_t>(0x88770014): /* DPNERR_ACTIVEPLAYERS */
-            error_string = s_Active_Players_0055bfb4;
+        case (int32_t)0x88770014: /* DPNERR_ACTIVEPLAYERS */
+            error_string = "Active Players";
             break;
-        case static_cast<int32_t>(0x80070057): /* E_INVALIDARG */
-            error_string = s_Invalid_Params_0055bff0;
+        case (int32_t)0x80070057: /* E_INVALIDARG */
+            error_string = "Invalid Params";
             break;
-        case static_cast<int32_t>(0x88770082): /* DPNERR_INVALIDOBJECT */
-            error_string = s_Invalid_Object_0055bf8c;
+        case (int32_t)0x88770082: /* DPNERR_INVALIDOBJECT */
+            error_string = "Invalid Object";
             break;
-        case static_cast<int32_t>(0x88770096): /* DPNERR_INVALIDPLAYER */
-            error_string = s_Invalid_Player_0055bf9c;
+        case (int32_t)0x88770096: /* DPNERR_INVALIDPLAYER */
+            error_string = "Invalid Player";
             break;
-        case static_cast<int32_t>(0x887700FA): /* DPNERR_UNAVAILABLE */
-            error_string = s_Unavailable_0055bfdc;
+        case (int32_t)0x887700FA: /* DPNERR_UNAVAILABLE */
+            error_string = "Unavailable";
             break;
-        case static_cast<int32_t>(0x8877010E): /* DPNERR_UNINITIALIZED */
-            error_string = DAT_0055bfac;
+        case (int32_t)0x8877010E: /* DPNERR_UNINITIALIZED */
+            error_string = "Busy";
             break;
-        case static_cast<int32_t>(0x88770118): /* DPNERR_USERCANCEL */
-            error_string = s_User_Cancel_0055bfc4;
+        case (int32_t)0x88770118: /* DPNERR_USERCANCEL */
+            error_string = "User Cancel";
             break;
         default:
-            error_string = s_Error_Unknown_0055bf7c;
+            error_string = "Error Unknown";
             break;
         }
 

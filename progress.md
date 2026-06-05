@@ -10,9 +10,4 @@
 - [pending] src/game/settings.h
 - [pending] src/game/simmodem.h
 - [pending] src/game/string.h
-
-- [pending] src/game/transprt.{h,cpp}
-- [pending] src/game/turnsum.{h,cpp}
 - [pending] src/game/types.h
-- [pending] src/game/video.{h,cpp}
-- [pending] src/game/winnet.{h,cpp}
