@@ -1684,7 +1684,7 @@ namespace OFFICER {
         int16_t result = -1;
 
         if (type == 1) {
-            result = GENDRAW::Confirmation_Box_(const_cast<char*>(message));
+            result = GENDRAW::Confirmation_Box_(message);
         } else if (type == 3) {
             GENDRAW::Warning_Box_(message);
         } else if (type == 5) {
@@ -1697,7 +1697,7 @@ namespace OFFICER {
             TEXTBOX::Timed_Text_Box_(nullptr, message, static_cast<int16_t>(duration));
             MOX::_global_var = 0;
         } else {
-            GENDRAW::Message_Box_(const_cast<char*>(message));
+            GENDRAW::Message_Box_(message);
         }
 
         video::Set_Page_Off_();

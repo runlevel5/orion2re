@@ -65,14 +65,14 @@ namespace FMTPARA {
      * @param width Paragraph width in pixels.
      * @param text Source formatted string.
      */
-    int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text);
+    int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, const char* text);
 
     /** Measures the rendered width of a formatted paragraph without drawing it.
      * @param width Paragraph width in pixels.
      * @param text Source formatted string.
      * @param justify Justification mode.
      */
-    int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify);
+    int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, const char* text, int16_t justify);
 
     int16_t __cdecl Get_Last_Formatted_Paragraph_Max_Width_();
 
@@ -83,7 +83,7 @@ namespace FMTPARA {
      * @param str Source formatted string.
      * @param justify Justification mode.
      */
-    char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify);
+    const char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, const char* str, int16_t justify);
 
     void __cdecl Initialize_Line_Start_();
 
@@ -129,7 +129,7 @@ namespace FMTPARA {
 
     void __cdecl Skip_Arg_Insert_A_String_(uint16_t arg, bool flag);
 
-    void __cdecl Insert_A_String_(char* new_str);
+    void __cdecl Insert_A_String_(const char* new_str);
 
     uint32_t __cdecl Get_Item_Value_Set_Plural_(int16_t item_index);
 
@@ -185,7 +185,7 @@ namespace FMTPARA {
 
     char __cdecl FN_Superscript_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 
-    char* __cdecl Skip_Spaces_(char* str);
+    const char* __cdecl Skip_Spaces_(const char* str);
 
     int __cdecl _Comp_Tabs_(const void* a, const void* b);
 
@@ -204,7 +204,7 @@ namespace FMTPARA {
      * @param seg Destination bitmap, or nullptr to draw to the active screen.
      * @param do_render False to measure only, true to render glyphs.
      */
-    char* __cdecl _Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg, bool do_render);
+    const char* __cdecl _Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, const char* str, int16_t justify, s_animation_header* seg, bool do_render);
 
     /** Binds a signed 16-bit paragraph variable slot to external storage.
      * @param index Variable slot index.
@@ -233,5 +233,5 @@ namespace FMTPARA {
      * @param justify Justification mode.
      * @param seg Destination bitmap.
      */
-    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg);
+    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int16_t x, int16_t y, int16_t width, const char* str, int16_t justify, s_animation_header* seg);
 }

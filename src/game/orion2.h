@@ -1814,7 +1814,7 @@ struct s_fmtpara_style {
 };
 
 struct s_fmtpara_break {
-    char *break_str_next;
+    const char *break_str_next;
     int16_t break_x;
     int16_t break_x_candidate;
     int16_t insert_case;
@@ -1876,7 +1876,7 @@ typedef struct s_fmtpara_para s_fmtpara_para, *Ps_fmtpara_para;
 
 struct s_fmtpara_para {
     int16_t para_y;
-    char *str;
+    const char *str;
     int16_t x1;
     int16_t x2;
     int16_t y;
@@ -1897,7 +1897,7 @@ struct s_fmtpara_para {
     int8_t justify_mode;
     int8_t paragraph_break;
     int16_t nest_depth;
-    char *nest_stack[9];
+    const char *nest_stack[9];
     struct s_fmtpara_line *line;
 };
 

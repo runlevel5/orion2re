@@ -102,7 +102,7 @@ namespace HAROLD {
 
     void __cdecl Load_H_Strings_();
 
-    int16_t __cdecl User_Box_(uint8_t* refresh_flag, char* message, int16_t type);
+    int16_t __cdecl User_Box_(uint8_t* refresh_flag, const char* message, int16_t type);
 
     int16_t __cdecl Get_N_Remaining_Humans_();
 

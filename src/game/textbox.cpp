@@ -190,7 +190,7 @@ namespace TEXTBOX {
 
         fonts::Set_Font_Style_(3, &primary_colors);
 
-        uint16_t max_height = (uint16_t)FMTPARA::Get_Formatted_Paragraph_Max_Height_(339, (char*)text);
+        uint16_t max_height = (uint16_t)FMTPARA::Get_Formatted_Paragraph_Max_Height_(339, text);
 
         if (FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_() < 339) {
             width = (uint16_t)FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_();
@@ -232,7 +232,7 @@ namespace TEXTBOX {
 
         video::Clip_On_();
 
-        FMTPARA::Print_Formatted_Paragraph_(print_x, print_y, width, (char*)text, 0);
+        FMTPARA::Print_Formatted_Paragraph_(print_x, print_y, width, text, 0);
 
         MISC::Restore_Window_Status_(window_status);
 

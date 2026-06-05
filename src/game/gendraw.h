@@ -5,9 +5,9 @@ namespace GENDRAW {
 
     void __cdecl Help_(const char* message);
 
-    int16_t __cdecl Confirmation_Box_(char* text);
+    int16_t __cdecl Confirmation_Box_(const char* text);
 
-    int16_t __cdecl Do_Confirmation_Box_(char* msg);
+    int16_t __cdecl Do_Confirmation_Box_(const char* msg);
 
     void __cdecl Warning_Box_(const char* message);
 
@@ -34,15 +34,15 @@ namespace GENDRAW {
 
     void __cdecl Message_Box_Startup_();
 
-    void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, s_animation_header* bitmap);
+    void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text, s_animation_header* bitmap);
 
-    void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text);
+    void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text);
 
     void __cdecl Draw_Animating_Message_Box_();
 
     void __cdecl Message_Box_Cleanup_();
 
-    void __cdecl Message_Box_Exploding_(char* text);
+    void __cdecl Message_Box_Exploding_(const char* text);
 
     void __cdecl Message_Box_Exploding_Star_(const char* text, int16_t star_idx);
 }

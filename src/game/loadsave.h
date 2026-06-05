@@ -12,7 +12,7 @@ namespace LOADSAVE {
 
     void __cdecl Restore_Game_Popup_();
 
-    int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type);
+    int16_t __cdecl Game_Popup_User_Box_(const char* message, int16_t type);
 
     void __cdecl Reload_Language_Strings_();
 

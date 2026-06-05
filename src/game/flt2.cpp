@@ -879,7 +879,7 @@ int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list) {
                 ship_list[count] = MOX::_fltscrn_big_icon[i].ship_idx;
                 count++;
                 if (count >= 250) {
-                    HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, (char*)"Too many ships in list", 0);
+                    HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, "Too many ships in list", 0);
                     error_flag = 1;
                     retval = 0;
                 }

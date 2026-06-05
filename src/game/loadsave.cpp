@@ -90,7 +90,7 @@ namespace LOADSAVE {
         RUSS::Mox_Sync_Update_();
     }
 
-    int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type) {
+    int16_t __cdecl Game_Popup_User_Box_(const char* message, int16_t type) {
         int16_t result = 0;
 
         if (type == 0) {

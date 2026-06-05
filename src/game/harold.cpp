@@ -1259,7 +1259,7 @@ namespace HAROLD {
         }
     }
 
-    int16_t __cdecl User_Box_(uint8_t* refresh_flag, char* message, int16_t type) {
+    int16_t __cdecl User_Box_(uint8_t* refresh_flag, const char* message, int16_t type) {
         char buffer[100];
         int16_t result = -1;
 

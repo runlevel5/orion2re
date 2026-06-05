@@ -16,7 +16,7 @@ namespace GENDRAW {
     int16_t _old_help_list_active;
 
     void __cdecl Message_Box_(const char* text) {
-        TEXTBOX::Do_Text_Box_(nullptr, (char*)text, 0);
+        TEXTBOX::Do_Text_Box_(nullptr, text, 0);
     }
 
     void __cdecl Help_(const char* message) {
@@ -25,11 +25,11 @@ namespace GENDRAW {
 
     void __cdecl Warning_Box_(const char* message) {
         _warning_box = 1;
-        Message_Box_Exploding_((char*)message);
+        Message_Box_Exploding_(message);
     }
 
     void __cdecl Message_Box_Exploding_Star_(const char* text, int16_t star_idx) {
-        Message_Box_Exploding_((char*)text);
+        Message_Box_Exploding_(text);
     }
 
     void __cdecl Draw_Confirm_Box_() {
@@ -87,7 +87,7 @@ namespace GENDRAW {
         animate::Draw_(0xD0, box_y, _box_bitmap);
     }
 
-    void __cdecl Message_Box_Exploding_(char* str) {
+    void __cdecl Message_Box_Exploding_(const char* str) {
         Message_Box_Startup_();
 
         fonts::Set_Font_Style_(4, &_message_text_colors);
@@ -150,7 +150,7 @@ namespace GENDRAW {
         Message_Box_Cleanup_();
     }
 
-    int16_t __cdecl Confirmation_Box_(char* text) {
+    int16_t __cdecl Confirmation_Box_(const char* text) {
         uint8_t color_1;
         uint8_t color_2;
         s_colors font_colors;
@@ -217,11 +217,11 @@ namespace GENDRAW {
         return (input == _first_field) ? 1 : 0;
     }
 
-    int16_t __cdecl Do_Confirmation_Box_(char* msg) {
+    int16_t __cdecl Do_Confirmation_Box_(const char* msg) {
         return Confirmation_Box_(msg);
     }
 
-    void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, s_animation_header* bitmap) {
+    void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text, s_animation_header* bitmap) {
         int16_t max_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(width, text);
         int16_t centered_y = y + (static_cast<int16_t>(fonts::_font_header.current_height) - max_height) / 2;
 
@@ -232,7 +232,7 @@ namespace GENDRAW {
         }
     }
 
-    void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text) {
+    void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, const char* text) {
         _Print_1_Or_More_Formatted_Lines_Centered_(x, y, width, text, nullptr);
     }
 

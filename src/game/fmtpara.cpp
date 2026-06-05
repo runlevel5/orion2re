@@ -621,17 +621,17 @@ namespace FMTPARA {
         return (int16_t)(_para_global.max_x - _para_global.min_x + 1);
     }
 
-    int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text) {
+    int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, const char* text) {
         _Print_Formatted_Paragraph_(0, 0, width, text, 0, nullptr, false);
         return (int16_t)((_para_global.max_y - _para_global.min_y) + 1);
     }
 
-    int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify) {
+    int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, const char* text, int16_t justify) {
         _Print_Formatted_Paragraph_(0, 0, width, text, justify, nullptr, false);
         return (int16_t)(_para_global.max_x - _para_global.min_x + 1);
     }
 
-    char* __cdecl _Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg, bool do_render) {
+    const char* __cdecl _Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, const char* str, int16_t justify, s_animation_header* seg, bool do_render) {
         s_fmtpara_para para;
         s_fmtpara_line linep;
         s_fmtpara_style stylep;
@@ -701,7 +701,7 @@ namespace FMTPARA {
         return str;
     }
 
-    char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify) {
+    const char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, const char* str, int16_t justify) {
         return _Print_Formatted_Paragraph_(x, y, width, str, justify, nullptr, true);
     }
 
@@ -1073,7 +1073,7 @@ namespace FMTPARA {
     void __cdecl Test_Item_() {
         _para_global.cond_flag = false;
         _para_p->str++;
-        char* current_str = _para_p->str;
+        const char* current_str = _para_p->str;
         char c = *current_str;
         uint32_t val1 = Get_Next_Item_Value_();
 
@@ -1589,8 +1589,8 @@ namespace FMTPARA {
         return 0;
     }
 
-    char* __cdecl Skip_Spaces_(char* str) {
-        char* current = str;
+    const char* __cdecl Skip_Spaces_(const char* str) {
+        const char* current = str;
         char c = *str;
 
         while (true) {
@@ -2019,7 +2019,7 @@ namespace FMTPARA {
         }
     }
 
-    void __cdecl Insert_A_String_(char* new_str) {
+    void __cdecl Insert_A_String_(const char* new_str) {
         if (_para_p->nest_depth < 10) {
             _para_p->nest_stack[_para_p->nest_depth] = _para_p->str;
             _para_p->nest_depth++;
@@ -2029,7 +2029,7 @@ namespace FMTPARA {
 
     void __cdecl Insert_String_(const char* str) {
         FMTPARA::_para_p->str++;
-        FMTPARA::Insert_A_String_((char*)str);
+        FMTPARA::Insert_A_String_(str);
     }
 
     void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* value_ptr) {
@@ -2040,7 +2040,7 @@ namespace FMTPARA {
         Set_Paragraph_Variable_Pointer_(index, value_ptr, 4);
     }
 
-    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int16_t x, int16_t y, int16_t width, char* str, int16_t justify, s_animation_header* seg) {
+    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int16_t x, int16_t y, int16_t width, const char* str, int16_t justify, s_animation_header* seg) {
         _Print_Formatted_Paragraph_(x, y, width, str, justify, seg, true);
     }
 
