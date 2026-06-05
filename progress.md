@@ -6,16 +6,8 @@
 - [pending] src/game/orion2.h
 - [pending] src/game/orion2_consts.h
 - [pending] src/game/orion2_str.h
-
-- [pending] src/game/palstore.{h,cpp}
 - [pending] src/game/paragrph.h
-- [pending] src/game/platform.{h,cpp}
-- [pending] src/game/plntsum.{h,cpp}
-- [pending] src/game/racecust.{h,cpp}
-- [pending] src/game/raceopt.{h,cpp}
-- [pending] src/game/racerprt.{h,cpp}
-- [pending] src/game/racescrn.{h,cpp}
-- [pending] src/game/racesel.{h,cpp}
+
 - [pending] src/game/random.{h,cpp}
 - [pending] src/game/reduce.{h,cpp}
 - [pending] src/game/regions.{h,cpp}

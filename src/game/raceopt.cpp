@@ -18,52 +18,52 @@ namespace raceopt {
     int16_t _option_toggle[24];
     int16_t _button_variable[10];
     s_animation_header* _special_button_seg;
-    const char s__00551100[1] = "";
-    const char s_racestuf_lbx_00556310[13] = "racestuf.lbx";
     int16_t _name_button;
     char _cur_race_name[16];
 
-    void __cdecl Setup_Evolutionary_Upgrade_(short player_idx) {
+    void __cdecl Setup_Evolutionary_Upgrade_(int16_t player_idx) {
         s_player& plr = MOX::_player[player_idx];
         int8_t original_traits0 = plr.traits[0];
 
         if (plr.objectives == 100) {
-            // Copy 30 bytes (traits index 1 to 30)
-            struct_::Copy_Structure_(&plr.evolutionary_upgrade_traits[1], &plr.traits[1], 30);
+            struct_::Copy_Structure_(
+                &plr.evolutionary_upgrade_traits[1],
+                &plr.traits[1],
+                sizeof(plr.traits) - sizeof(plr.traits[0]));
 
-            // Apply mask to trait 0 for the evolutionary upgrade
             plr.evolutionary_upgrade_traits[0] = original_traits0 & 0x0E;
 
             Evolutionary_Mutation_Screen_(plr.evolutionary_upgrade_traits);
 
-            // Explicitly restore original traits[0]
             plr.traits[0] = original_traits0;
         }
         else {
-            // Revert traits from evolutionary buffer if objectives condition not met
-            struct_::Copy_Structure_(&plr.traits[1], &plr.evolutionary_upgrade_traits[1], 30);
+            struct_::Copy_Structure_(
+                &plr.traits[1],
+                &plr.evolutionary_upgrade_traits[1],
+                sizeof(plr.traits) - sizeof(plr.traits[0]));
         }
 
         plr.picked_evolutionary_upgrade = 1;
     }
 
     void __cdecl Evolutionary_Mutation_Screen_(int8_t *traits) {
-        MOX2::action_func_t local_164;
-        int16_t asStack_160[10];
-        int8_t local_14c[31];
-        char acStack_12c[200];
-        char acStack_64[100];
+        MOX2::action_func_t previous_auto_function;
+        int16_t previous_button_values[10];
+        int8_t baseline_flags[31];
+        char message_text[200];
+        char message_line[100];
         
-        MOX2::Get_Auto_Function_(&local_164);
+        MOX2::Get_Auto_Function_(&previous_auto_function);
         ERIC::Fast_Fade_Out_();
         fonts::Load_Palette_(9, 0, 255);
         Convert_Player_To_Flags_EM_(traits);
-        struct_::Copy_Structure_(local_14c, traits, 31);
+        struct_::Copy_Structure_(baseline_flags, traits, sizeof(baseline_flags));
         
         for (int16_t i = 1; i < 10; ++i) {
             for (int16_t j = 2; j >= 0; --j) {
-                if (MOX::_special_bonus[i - 1][j] == local_14c[i]) {
-                    local_14c[i] = j + 1;
+                if (MOX::_special_bonus[i - 1][j] == baseline_flags[i]) {
+                    baseline_flags[i] = j + 1;
                 }
             }
         }
@@ -87,10 +87,10 @@ namespace raceopt {
         _color_opt.colors[7] = 0x9D;
         fonts::Set_Font_Style_(4, &_color_opt);
         
-        Add_Race_Options_Fields_EM_(local_14c, orig_picks);
+        Add_Race_Options_Fields_EM_(baseline_flags, orig_picks);
         
         for (int i = 0; i < 10; ++i) {
-            asStack_160[i] = _button_variable[i];
+            previous_button_values[i] = _button_variable[i];
         }
         
         video::Set_Page_Back_();
@@ -103,11 +103,11 @@ namespace raceopt {
         RUSS::Mox_Sync_Update_();
         ERIC::Fast_Fade_In_();
         
-        KEN::Ken_Get_Text_Message_(77, acStack_64, 100);
-        strcpy(acStack_12c, acStack_64);
-        KEN::Ken_Get_Text_Message_(78, acStack_64, 100);
-        strcat(acStack_12c, acStack_64);
-        GENDRAW::Message_Box_(acStack_12c);
+        KEN::Ken_Get_Text_Message_(77, message_line, sizeof(message_line));
+        strcpy(message_text, message_line);
+        KEN::Ken_Get_Text_Message_(78, message_line, sizeof(message_line));
+        strcat(message_text, message_line);
+        GENDRAW::Message_Box_(message_text);
         
         video::Set_Page_Back_();
         Draw_Race_Option_Background_();
@@ -127,8 +127,8 @@ namespace raceopt {
                     int choice = i % 4;
                     
                     if (group == 1 && _option_toggle[9] == 1) {
-                        KEN::Ken_Get_Text_Message_(73, acStack_12c, 120);
-                        GENDRAW::Warning_Box_(acStack_12c);
+                        KEN::Ken_Get_Text_Message_(73, message_text, 120);
+                        GENDRAW::Warning_Box_(message_text);
                         video::Set_Page_Back_();
                         Draw_Race_Option_Background_();
                         video::Copy_Back_To_Off_();
@@ -137,21 +137,21 @@ namespace raceopt {
                         RUSS::Mox_Sync_Update_();
                         _button_variable[1] = 0;
                     } else {
-                        if (asStack_160[group] == choice) {
+                        if (previous_button_values[group] == choice) {
                             _button_variable[group] = 0;
                             Calculate_EM_Picks_();
                         } else {
                             int cost_idx = i + (-3 - i) / 4;
                             if (_ability_costs[cost_idx] + _negative_picks < -10) {
-                                KEN::Ken_Get_Text_Message_(74, acStack_12c, 80);
-                                GENDRAW::Warning_Box_(acStack_12c);
+                                KEN::Ken_Get_Text_Message_(74, message_text, 80);
+                                GENDRAW::Warning_Box_(message_text);
                                 video::Set_Page_Back_();
                                 Draw_Race_Option_Background_();
                                 video::Copy_Back_To_Off_();
                                 video::Set_Page_Off_();
                                 Draw_Racial_Option_Screen_();
                                 RUSS::Mox_Sync_Update_();
-                                _button_variable[group] = asStack_160[group];
+                                _button_variable[group] = previous_button_values[group];
                             } else {
                                 _button_variable[group] = choice;
                             }
@@ -159,8 +159,8 @@ namespace raceopt {
                     }
                     
                     int cost_idx2 = i + (-3 - i) / 4;
-                    if (_button_variable[group] < local_14c[group + 1] && _ability_costs[cost_idx2] >= 0) {
-                        _button_variable[group] = local_14c[group + 1];
+                    if (_button_variable[group] < baseline_flags[group + 1] && _ability_costs[cost_idx2] >= 0) {
+                        _button_variable[group] = baseline_flags[group + 1];
                     }
                 }
             }
@@ -177,8 +177,8 @@ namespace raceopt {
                     } else {
                         Calculate_EM_Picks_();
                         if (_negative_picks < -10) {
-                            KEN::Ken_Get_Text_Message_(74, acStack_12c, 80);
-                            GENDRAW::Warning_Box_(acStack_12c);
+                            KEN::Ken_Get_Text_Message_(74, message_text, 80);
+                            GENDRAW::Warning_Box_(message_text);
                             video::Set_Page_Back_();
                             Draw_Race_Option_Background_();
                             video::Copy_Back_To_Off_();
@@ -205,8 +205,8 @@ namespace raceopt {
             
             if (_accept == input) {
                 if (_picks < 0) {
-                    KEN::Ken_Get_Text_Message_(75, acStack_12c, 80);
-                    GENDRAW::Warning_Box_(acStack_12c);
+                    KEN::Ken_Get_Text_Message_(75, message_text, 80);
+                    GENDRAW::Warning_Box_(message_text);
                     video::Set_Page_Back_();
                     Draw_Race_Option_Background_();
                     video::Copy_Back_To_Off_();
@@ -227,13 +227,13 @@ namespace raceopt {
             }
             
             if (!done) {
-                Add_Race_Options_Fields_EM_(local_14c, orig_picks);
+                Add_Race_Options_Fields_EM_(baseline_flags, orig_picks);
                 video::Set_Page_Off_();
                 Draw_Racial_Option_Screen_();
                 RUSS::Mox_Sync_Update_();
                 
                 for (int i = 0; i < 10; ++i) {
-                    asStack_160[i] = _button_variable[i];
+                    previous_button_values[i] = _button_variable[i];
                 }
             }
         }
@@ -241,7 +241,7 @@ namespace raceopt {
         Convert_Flags_To_Player_EM_(traits);
         fields::Deactivate_Help_List_();
         fields::Deactivate_Auto_Function_();
-        MOX2::Put_Auto_Function_(&local_164);
+        MOX2::Put_Auto_Function_(&previous_auto_function);
         fields::Clear_Fields_();
         allocate::Pop_Block_(MOX::_screen_seg);
         MISC::Fade_Into_Screen_(MAINSCR::Draw_Mini_Main_Screen_, &MOX::_draw_main_screen_to_back, 0);
@@ -250,11 +250,11 @@ namespace raceopt {
     int16_t __cdecl Player_Score_Modifier_(int16_t player_idx) {
         int16_t score_modifier = 100;
 
-        _ability_costs = reinterpret_cast<int8_t*>(farload::Far_Reload_Next_(
-            s_racestuf_lbx_00556310,
+        _ability_costs = (int8_t*)farload::Far_Reload_Next_(
+            "racestuf.lbx",
             6,
             MOX::_screen_seg
-        ));
+        );
 
         Convert_Player_To_Flags_EM_(MOX::_player[player_idx].traits);
         Calculate_Picks_();
@@ -271,15 +271,15 @@ namespace raceopt {
     }
 
     void __cdecl Reload_Option_Strings_() {
-        char* strings_data = static_cast<char*>(farload::Far_Reload_Next_(
-            s_racestuf_lbx_00556310,
-            static_cast<uint32_t>(static_cast<uint8_t>(MOX::_settings.language)),
-            MOX::_screen_seg));
+        char* strings_data = (char*)farload::Far_Reload_Next_(
+            "racestuf.lbx",
+            (uint32_t)(uint8_t)(MOX::_settings.language),
+            MOX::_screen_seg);
 
-        _ability_costs = static_cast<int8_t*>(farload::Far_Reload_Next_(
-            s_racestuf_lbx_00556310,
+        _ability_costs = (int8_t*)farload::Far_Reload_Next_(
+            "racestuf.lbx",
             6,
-            MOX::_screen_seg));
+            MOX::_screen_seg);
 
         int16_t offset = 0;
         int16_t index = 1;
@@ -343,7 +343,7 @@ namespace raceopt {
                 char num_buf[12];
                 char str_buf[12];
                 
-                str_buf[0] = s__00551100[0];
+                str_buf[0] = '\0';
                 str_buf[1] = '\0';
 
                 int cost_idx = opt_string_idx + (-3 - opt_string_idx) / 4;
@@ -497,20 +497,20 @@ namespace raceopt {
     void __cdecl Reload_Racial_Option_Screen_() {
         allocate::Push_Block_(MOX::_screen_seg);
 
-        _special_button_seg = reinterpret_cast<s_animation_header*>(
+        _special_button_seg = (s_animation_header*)
             farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 1, MOX::_screen_seg)
-        );
+        ;
         RUSS::Mox_Update_();
 
-        _default_button_seg = static_cast<uint8_t*>(farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 2, MOX::_screen_seg));
+        _default_button_seg = (uint8_t*)farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 2, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        _accept_button_seg = static_cast<uint8_t*>(farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 3, MOX::_screen_seg));
+        _accept_button_seg = (uint8_t*)farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 3, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        _off_button_seg = reinterpret_cast<s_animation_header*>(
+        _off_button_seg = (s_animation_header*)
             farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 5, MOX::_screen_seg)
-        );
+        ;
         RUSS::Mox_Update_();
 
         Reload_Option_Strings_();
@@ -607,7 +607,7 @@ namespace raceopt {
 
                 if (draw_text) {
                     char local_5c[12];
-                    local_50[0] = s__00551100[0];
+                    local_50[0] = '\0';
                     local_50[1] = '\0';
                     itoa(_ability_costs[neg_idx], local_5c, 10);
                     strcpy(local_50 + 1, local_5c);
@@ -943,8 +943,8 @@ namespace raceopt {
             }
         }
 
-        int offset = 0;
-        for (int i = 10; i < 32; ++i) {
+        int16_t offset = 0;
+        for (int16_t i = 10; i < 32; ++i) {
             if (i == 15) {
                 if (_option_toggle[5] == 1) {
                     flags_out[15] = 1;
@@ -1008,14 +1008,14 @@ namespace raceopt {
         return cost;
     }
 
-    void __cdecl Add_Race_Options_Fields_EM_(int8_t *param_1, int16_t param_2) {
+    void __cdecl Add_Race_Options_Fields_EM_(int8_t *baseline_flags, int16_t available_picks) {
         int16_t x_coords[4] = { 80, 254, 442, 643 };
         int16_t y_coords[5] = { 72, 147, 222, 297, 372 };
-        int16_t count_arr[7] = { 22 };
+        int16_t block_sizes[7] = { 22 };
 
         fields::Clear_Fields_();
         _exit_ken = -1000;
-        _accept = fields::Add_Button_Field_(506, 448, s__00551100, reinterpret_cast<s_animation_header*>(_accept_button_seg), s__00551100, 40);
+        _accept = fields::Add_Button_Field_(506, 448, "", (s_animation_header*)_accept_button_seg, "", 40);
         _defalt = -1000;
 
         int16_t col_idx = 0;
@@ -1032,31 +1032,31 @@ namespace raceopt {
             int16_t y = y_coords[row_idx] + 9;
 
             do {
-                int16_t param1_idx = group_btn_idx / 4;
+                int16_t group_idx = group_btn_idx / 4;
                 int16_t cost = 0;
 
-                if (param_1[param1_idx + 1] != 0) {
-                    cost = _ability_costs[param_1[param1_idx] + param1_idx * 3 - 1];
+                if (baseline_flags[group_idx + 1] != 0) {
+                    cost = _ability_costs[baseline_flags[group_idx] + group_idx * 3 - 1];
                 }
 
-                int8_t ability_cost = _ability_costs[param1_idx * 3 + sub_idx];
+                int8_t ability_cost = _ability_costs[group_idx * 3 + sub_idx];
 
                 bool is_valid = false;
                 if (ability_cost < 0) {
-                    if (param_1[param1_idx + 1] == 1) {
+                    if (baseline_flags[group_idx + 1] == 1) {
                         is_valid = true;
                     }
                 } else if (ability_cost > 0) {
-                    if (param_1[param1_idx + 1] <= sub_idx + 1 || param_1[param1_idx + 1] < _button_variable[param1_idx]) {
+                    if (baseline_flags[group_idx + 1] <= sub_idx + 1 || baseline_flags[group_idx + 1] < _button_variable[group_idx]) {
                         is_valid = true;
                     }
                 }
 
-                if (is_valid && (ability_cost - cost <= param_2)) {
+                if (is_valid && (ability_cost - cost <= available_picks)) {
                     _group_button[group_btn_idx] = fields::Add_Hidden_Field_(
                         x_coords[col_idx] - 20, y - 9,
                         x_coords[col_idx + 1] - 50, y,
-                        s__00551100, 41
+                        "", 41
                     );
                 } else {
                     _group_button[group_btn_idx] = -1000;
@@ -1090,7 +1090,7 @@ namespace raceopt {
         while (group_btn_idx < 64) {
             int16_t sub2_idx = 0;
             int16_t inner_cnt = 0;
-            int16_t count = count_arr[arr_idx];
+            int16_t count = block_sizes[arr_idx];
 
             if (count > 0) {
                 group_btn_idx += count;
@@ -1102,20 +1102,20 @@ namespace raceopt {
                         bool valid2 = true;
                         
                         if (cost2 < 0) {
-                            if (param_1[sub2_idx + opt_btn_idx + 10] == 0) {
+                            if (baseline_flags[sub2_idx + opt_btn_idx + 10] == 0) {
                                 valid2 = false;
                             }
                         } else if (cost2 > 0) {
-                            if (param_1[sub2_idx + opt_btn_idx + 10] == 1) {
+                            if (baseline_flags[sub2_idx + opt_btn_idx + 10] == 1) {
                                 valid2 = false;
                             }
                         }
 
-                        if (valid2 && cost2 <= param_2) {
+                        if (valid2 && cost2 <= available_picks) {
                             _option_button[opt_btn_idx] = fields::Add_Hidden_Field_(
                                 x_coords[col_idx] - 20, y2,
                                 x_coords[col_idx] + 152, y2 + 9,
-                                s__00551100, 41
+                                "", 41
                             );
                         } else {
                             _option_button[opt_btn_idx] = -1000;
@@ -1173,14 +1173,14 @@ namespace raceopt {
         raceopt::_accept = fields::Add_Button_Field_(
             0x01FA,
             0x01C0,
-            s__00551100,
+            "",
             (s_animation_header*)raceopt::_accept_button_seg,
             s_a,
             0x0028);
         raceopt::_defalt = fields::Add_Button_Field_(
             0x004C,
             0x01C0,
-            s__00551100,
+            "",
             (s_animation_header*)raceopt::_default_button_seg,
             s_c_00556350,
             0x0028);
@@ -1205,7 +1205,7 @@ namespace raceopt {
                     static_cast<int16_t>(bottom - 9),
                     right,
                     bottom,
-                    s__00551100,
+                    "",
                     0x0029);
                 ++group_button_index;
                 bottom = static_cast<int16_t>(bottom + 0x0D);
@@ -1231,7 +1231,7 @@ namespace raceopt {
                 static_cast<int16_t>(bottom - 9),
                 right,
                 bottom,
-                s__00551100,
+                "",
                 0x0029);
             ++group_button_index;
             bottom = static_cast<int16_t>(bottom + 0x0D);
@@ -1257,7 +1257,7 @@ namespace raceopt {
                         top,
                         right,
                         static_cast<int16_t>(top + 9),
-                        s__00551100,
+                        "",
                         0x0029);
                     ++option_button_index;
                     --remaining;

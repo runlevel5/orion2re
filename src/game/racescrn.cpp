@@ -2,14 +2,11 @@
 
 namespace RACESCRN {
 
-    static void __cdecl FUN_0049DAC0(s_racescrn_mouse_group* group) {
+    static void __cdecl Clear_Mouse_Group_Bitmap_(s_racescrn_mouse_group* group) {
         bitmap::Create_Blank_Bitmap_(187, 25, group->sprite2);
     }
 
-    const char s_billtext_lbx_0055135c[13] = "billtext.lbx";
-    const char s_billtex2_lbx_00556038[13] = "billtex2.lbx";
-    const char s_races_lbx[10] = "races.lbx";
-    s_racescrn_icon_layout _mouse_group_data = {0, 0, 186, 24, 25, FUN_0049DAC0};
+    s_racescrn_icon_layout _mouse_group_data = {0, 0, 186, 24, 25, Clear_Mouse_Group_Bitmap_};
     int16_t _g_spy_xfer_count;
     s_racescrn_mouse_group* _g_agent_group_p;
     s_racescrn_mouse_group* _g_mouse_group_p;
@@ -54,25 +51,8 @@ namespace RACESCRN {
     s_colors _banner_color_low = {{70, 138, 149, 35, 59, 96, 110, 49}};
     s_colors _banner_color_edge = {{72, 97, 150, 26, 57, 116, 158, 73}};
     char _receiving_treaty_buffer[80];
-    const char s_empty_string[1] = "";
-    const char s_carriage_return[2] = "\r";
-    const char s_spy_bonus_fmt[8] = "%s%hi%%";
-    const char s_agent_bonus_fmt[8] = "%s%hi%%";
-    const char s_trade_bc_fmt[8] = "\r%s%iBC";
-    const char s_trade_mc_fmt[8] = "\r%s%iMC";
-    const char s_research_fmt[8] = "\r%s%i%s";
-    const char s_pr_str[3] = "PR";
-    const char s_mc_str[3] = "MC";
-    const char s_fp_str[4] = "FP";
-    const char s_bc_str[3] = "BC";
-    const char s_rp_str[3] = "RP";
-    const char s_space[2] = "\x1b";
-    const char s_I[2] = "I";
-    const char s_R[2] = "R";
-    const char s_A[2] = "A";
-    const char s_D[2] = "D";
     char _diplomacy_net_wait_buffer[100];
-    char _diplomacy_net_requeting_buffer[100];
+    char _diplomacy_net_requesting_buffer[100];
 
     void __cdecl Calculate_Icon_Group_Data_(s_racescrn_mouse_group* group) {
         int16_t width = (group->x2 - group->x1) + 1;
@@ -129,8 +109,8 @@ namespace RACESCRN {
     }
 
     void __cdecl Draw_Race_Text_(s_racescrn_race_display* display) {
-        char buffer[200];
-        char string2[64];
+        char treaty_text_buffer[200];
+        char treaty_segment_buffer[64];
         int16_t spy_bonus;
         int16_t agent_bonus;
 
@@ -166,15 +146,15 @@ namespace RACESCRN {
                 );
 
                 if (display->is_eliminated == 0) {
-                    buffer[0] = s_empty_string[0];
+                    treaty_text_buffer[0] = '\0';
 
                     int16_t treaty = MOX::_cur_plyr_ptr->treaty[display->player_idx];
                     if (treaty > 0) {
                         if (treaty > 5) {
                             treaty = 5;
                         }
-                        strcpy(buffer, MOX::_treaty_labels[treaty]);
-                        _strupr(buffer);
+                        strcpy(treaty_text_buffer, MOX::_treaty_labels[treaty]);
+                        _strupr(treaty_text_buffer);
                     }
 
                     if (MOX::_cur_plyr_ptr->research_treaty[display->player_idx] != 0) {
@@ -183,56 +163,57 @@ namespace RACESCRN {
 
                         switch (MOX::_settings.language) {
                             case 0:
-                                type_str = research_level >= 0 ? s_rp_str : s_bc_str;
+                                type_str = research_level >= 0 ? "RP" : "BC";
                                 break;
                             case 1:
-                                type_str = research_level >= 0 ? s_fp_str : s_mc_str;
+                                type_str = research_level >= 0 ? "FP" : "MC";
                                 break;
                             case 2:
-                                type_str = research_level >= 0 ? s_rp_str : s_bc_str;
+                                type_str = research_level >= 0 ? "RP" : "BC";
                                 break;
                             case 3:
-                                type_str = research_level >= 0 ? s_rp_str : s_bc_str;
+                                type_str = research_level >= 0 ? "RP" : "BC";
                                 break;
                             case 4:
-                                type_str = research_level >= 0 ? s_pr_str : s_bc_str;
+                                type_str = research_level >= 0 ? "PR" : "BC";
                                 break;
                             default:
-                                type_str = research_level >= 0 ? s_rp_str : s_bc_str;
+                                type_str = research_level >= 0 ? "RP" : "BC";
                                 break;
                         }
 
-                        sprintf(string2, s_research_fmt, _research_treaty_buffer, research_level, type_str);
-                        strcat(buffer, string2);
+                        /* fmtpara '\r' starts a new paragraph line inside the treaty summary. */
+                        sprintf(treaty_segment_buffer, "\r%s%i%s", _research_treaty_buffer, research_level, type_str);
+                        strcat(treaty_text_buffer, treaty_segment_buffer);
                     }
 
                     if (MOX::_cur_plyr_ptr->trade_treaty[display->player_idx] != 0) {
                         int16_t trade_level = MOX::_cur_plyr_ptr->current_trade_agreement_level[display->player_idx];
-                        const char* format = (MOX::_settings.language == 1) ? s_trade_mc_fmt : s_trade_bc_fmt;
-                        sprintf(string2, format, _trade_treaty_buffer, trade_level);
-                        strcat(buffer, string2);
+                        const char* format = (MOX::_settings.language == 1) ? "\r%s%iMC" : "\r%s%iBC";
+                        sprintf(treaty_segment_buffer, format, _trade_treaty_buffer, trade_level);
+                        strcat(treaty_text_buffer, treaty_segment_buffer);
                     }
 
                     if (MOX::_cur_plyr_ptr->tribute_treaty[display->player_idx] != 0) {
-                        strcat(buffer, s_carriage_return);
-                        strcpy(string2, _giving_treaty_buffer);
+                        strcat(treaty_text_buffer, "\r");
+                        strcpy(treaty_segment_buffer, _giving_treaty_buffer);
                         int stat_num = (MOX::_cur_plyr_ptr->tribute_treaty[display->player_idx] == 1) ? 5 : 10;
-                        JIM::Decode_Text_Stat_(string2, stat_num, 0x40);
-                        strcat(buffer, string2);
+                        JIM::Decode_Text_Stat_(treaty_segment_buffer, stat_num, sizeof(treaty_segment_buffer));
+                        strcat(treaty_text_buffer, treaty_segment_buffer);
                     } else if (MOX::_player[display->player_idx].tribute_treaty[MOX::_PLAYER_NUM] != 0) {
-                        strcat(buffer, s_carriage_return);
-                        strcpy(string2, _receiving_treaty_buffer);
+                        strcat(treaty_text_buffer, "\r");
+                        strcpy(treaty_segment_buffer, _receiving_treaty_buffer);
                         int stat_num = (MOX::_player[display->player_idx].tribute_treaty[MOX::_PLAYER_NUM] == 1) ? 5 : 10;
-                        JIM::Decode_Text_Stat_(string2, stat_num, 0x40);
-                        strcat(buffer, string2);
+                        JIM::Decode_Text_Stat_(treaty_segment_buffer, stat_num, sizeof(treaty_segment_buffer));
+                        strcat(treaty_text_buffer, treaty_segment_buffer);
                     }
 
-                    if (strlen(buffer) < 1) {
-                        strcpy(buffer, MOX::_treaty_labels[0]);
+                    if (strlen(treaty_text_buffer) < 1) {
+                        strcpy(treaty_text_buffer, MOX::_treaty_labels[0]);
                     }
 
                     fonts::Set_Font_Style_(2, &_race_normal_color);
-                    BILL::Squeeze_Paragraph_Centered_(race_text_x, race_text_y, 0xB6, 0x2B, buffer, 2);
+                    BILL::Squeeze_Paragraph_Centered_(race_text_x, race_text_y, 0xB6, 0x2B, treaty_text_buffer, 2);
                 }
             }
             display++;
@@ -241,16 +222,16 @@ namespace RACESCRN {
         fonts::Set_Font_Style_(3, &_race_normal_color);
         spy::Compute_Spy_Bonuses_(MOX::_cur_plyr_ptr, &spy_bonus, &agent_bonus);
 
-        sprintf(string2, s_spy_bonus_fmt, _spy_bonus_str, spy_bonus);
-        BILL::Squeeze_Centered_Print_(0x1A1, 0x174, string2, 0x62);
+        sprintf(treaty_segment_buffer, "%s%hi%%", _spy_bonus_str, spy_bonus);
+        BILL::Squeeze_Centered_Print_(0x1A1, 0x174, treaty_segment_buffer, 0x62);
 
-        sprintf(string2, s_agent_bonus_fmt, _agent_bonus_str, agent_bonus);
-        BILL::Squeeze_Centered_Print_(0x207, 0x174, string2, 0x61);
+        sprintf(treaty_segment_buffer, "%s%hi%%", _agent_bonus_str, agent_bonus);
+        BILL::Squeeze_Centered_Print_(0x207, 0x174, treaty_segment_buffer, 0x61);
     }
 
     void __cdecl Draw_Relations_Sliders_(s_racescrn_race_display* displays) {
         allocate::Push_Block_(MOX::_screen_seg);
-        s_animation_header* bar_anim = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 3, MOX::_screen_seg);
+        s_animation_header* bar_anim = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 3, MOX::_screen_seg);
 
         for (int16_t i = 0; i < 7; ++i) {
             int16_t x;
@@ -299,15 +280,15 @@ namespace RACESCRN {
         }
     }
 
-    void __cdecl Init_Race_Display_Data_(s_racescrn_race_display* race_display, s_racescrn_mouse_group* agent_group) {
-        memset(race_display, 0, sizeof(s_racescrn_race_display) * 7);
+    void __cdecl Init_Race_Display_Data_(s_racescrn_race_display* race_displays, s_racescrn_mouse_group* agent_group) {
+        memset(race_displays, 0, sizeof(*race_displays) * 7);
 
-        s_animation_header* spy_agent_icon_sprite = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, MOX::_player[MOX::_PLAYER_NUM].race + 0x2E, MOX::_screen_seg);
-        s_animation_header* slider_sprite = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 2, MOX::_screen_seg);
-        s_animation_header* eliminated_overlay_sprite = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 0x1F, MOX::_screen_seg);
+        s_animation_header* spy_agent_icon_sprite = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", MOX::_player[MOX::_PLAYER_NUM].race + 0x2E, MOX::_screen_seg);
+        s_animation_header* slider_sprite = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 2, MOX::_screen_seg);
+        s_animation_header* eliminated_overlay_sprite = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 0x1F, MOX::_screen_seg);
 
         for (int16_t i = 0; i < 7; ++i) {
-            race_display[i].relationship_slider_img = slider_sprite;
+            race_displays[i].relationship_slider_img = slider_sprite;
 
             if (i < MOX::_active_count) {
                 int16_t active_player_idx = (uint8_t)MOX::_active_player[i];
@@ -319,34 +300,34 @@ namespace RACESCRN {
                     relation_idx++;
                 }
 
-                race_display[i].relationship_text = RACESCRN::_relation_text[relation_idx];
+                race_displays[i].relationship_text = RACESCRN::_relation_text[relation_idx];
                 int16_t remap_index = relations_val / 8;
                 uint8_t slider_remap_idx = RACESCRN::_slider_remap_list[remap_index];
 
-                race_display[i].list_idx = i;
-                race_display[i].player_idx = active_player_idx;
-                race_display[i].player = player;
-                race_display[i].player_name = player->name;
-                race_display[i].race = (int16_t)(uint8_t)player->race;
-                race_display[i].relationship_slider_y = RACESCRN::_race_bar[i * 2 + 1] + (int16_t)slider_remap_idx - 6;
-                race_display[i].eliminated_overlay_img = eliminated_overlay_sprite;
+                race_displays[i].list_idx = i;
+                race_displays[i].player_idx = active_player_idx;
+                race_displays[i].player = player;
+                race_displays[i].player_name = player->name;
+                race_displays[i].race = (int16_t)(uint8_t)player->race;
+                race_displays[i].relationship_slider_y = RACESCRN::_race_bar[i * 2 + 1] + (int16_t)slider_remap_idx - 6;
+                race_displays[i].eliminated_overlay_img = eliminated_overlay_sprite;
 
                 if (!player->eliminated) {
                     int16_t spy_count = BILL::Get_My_Spy_Number_(active_player_idx);
-                    race_display[i].agent_mission_idx = (int16_t)BILL::Get_My_Spy_Mission_(active_player_idx) + 1;
+                    race_displays[i].agent_mission_idx = (int16_t)BILL::Get_My_Spy_Mission_(active_player_idx) + 1;
 
-                    RACESCRN::Setup_Icon_Group_Data_(&race_display[i].spy_icons_group, &RACESCRN::_spy_group_data[i], spy_count, spy_agent_icon_sprite, nullptr);
+                    RACESCRN::Setup_Icon_Group_Data_(&race_displays[i].spy_icons_group, &RACESCRN::_spy_group_data[i], spy_count, spy_agent_icon_sprite, nullptr);
 
-                    race_display[i].spy_icon_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, i + 10, MOX::_screen_seg);
-                    race_display[i].sabotage_icon_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, i + 17, MOX::_screen_seg);
-                    race_display[i].assassination_icon_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, i + 24, MOX::_screen_seg);
+                    race_displays[i].spy_icon_img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", i + 10, MOX::_screen_seg);
+                    race_displays[i].sabotage_icon_img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", i + 17, MOX::_screen_seg);
+                    race_displays[i].assassination_icon_img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", i + 24, MOX::_screen_seg);
                 } else {
-                    race_display[i].is_eliminated = 1;
+                    race_displays[i].is_eliminated = 1;
                 }
 
-                race_display[i].race_portrait_img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, race_display[i].race + 32, MOX::_screen_seg);
+                race_displays[i].race_portrait_img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", race_displays[i].race + 32, MOX::_screen_seg);
             } else {
-                race_display[i].is_empty_slot = 1;
+                race_displays[i].is_empty_slot = 1;
             }
         }
 
@@ -360,8 +341,9 @@ namespace RACESCRN {
     {
         fields::Clear_Fields_();
 
-        s_animation_header* img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 9, MOX::_screen_seg);
-        *ok_btn_id = fields::Add_Button_Field_(535, 433, s_empty_string, img, s_space, 40 /* '(' */);
+        s_animation_header* img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 9, MOX::_screen_seg);
+        /* fmtpara 0x1B is a color-attribute control byte, not a printable space. */
+        *ok_btn_id = fields::Add_Button_Field_(535, 433, "", img, "\x1b", 40 /* '(' */);
 
         *agriculture_field_id = 0;
         *research_field_id = 0;
@@ -374,17 +356,17 @@ namespace RACESCRN {
             *agriculture_btn_id = 0;
             *diplomacy_btn_id = 0;
         } else {
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 6, MOX::_screen_seg);
-            *industry_btn_id = fields::Add_Radio_Button_Field_(429, 444, s_empty_string, img, industry_field_id, s_I, 40 /* '(' */);
+            img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 6, MOX::_screen_seg);
+            *industry_btn_id = fields::Add_Radio_Button_Field_(429, 444, "", img, industry_field_id, "I", 40 /* '(' */);
 
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 7, MOX::_screen_seg);
-            *research_btn_id = fields::Add_Radio_Button_Field_(429, 423, s_empty_string, img, research_field_id, s_R, 40 /* '(' */);
+            img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 7, MOX::_screen_seg);
+            *research_btn_id = fields::Add_Radio_Button_Field_(429, 423, "", img, research_field_id, "R", 40 /* '(' */);
 
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 8, MOX::_screen_seg);
-            *agriculture_btn_id = fields::Add_Radio_Button_Field_(334, 423, s_empty_string, img, agriculture_field_id, s_A, 40 /* '(' */);
+            img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 8, MOX::_screen_seg);
+            *agriculture_btn_id = fields::Add_Radio_Button_Field_(334, 423, "", img, agriculture_field_id, "A", 40 /* '(' */);
 
-            img = (s_animation_header*)farload::Far_Reload_Next_(s_races_lbx, 60, MOX::_screen_seg);
-            *diplomacy_btn_id = fields::Add_Radio_Button_Field_(334, 444, s_empty_string, img, diplomacy_field_id, s_D, 40 /* '(' */);
+            img = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 60, MOX::_screen_seg);
+            *diplomacy_btn_id = fields::Add_Radio_Button_Field_(334, 444, "", img, diplomacy_field_id, "D", 40 /* '(' */);
         }
 
         return (int16_t)(fields::Get_Field_Counter_() - 1);
@@ -426,23 +408,15 @@ namespace RACESCRN {
         }
     }
 
-    /**
-     * @address 0049da90
-     */
     void __cdecl Move_Spies_Group_(s_racescrn_mouse_group* mouse_group, s_animation_header* mouse_sprite) {
         Move_Icon_Group_Icons_(mouse_group, RACESCRN::_g_mouse_group_p, RACESCRN::_g_spy_xfer_count);
         Redraw_Spy_Mouse_(mouse_sprite);
     }
 
-    /**
-     * @address 0049d960
-     */
     void __cdecl Adjust_Spy_Mission_Data_() {
         int16_t active_count = MOX::_active_count;
 
-        // Iterate through all active race display slots
         for (int i = 0; i < (int)active_count; ++i) {
-            // Default mission index 0 (likely 'None') is updated to 3 (likely 'Passive/Hide')
             if (_g_display_p[i].agent_mission_idx == 0) {
                 _g_display_p[i].agent_mission_idx = 3;
             }
@@ -456,7 +430,7 @@ namespace RACESCRN {
 
         fields::Clear_Fields_Above_(base_field_id);
 
-        RACESCRN::_g_agent_field = fields::Add_Hidden_Field_(328, 386, 613, 415, RACESCRN::s_empty_string, 0);
+        RACESCRN::_g_agent_field = fields::Add_Hidden_Field_(328, 386, 613, 415, "", 0);
 
         for (int i = 0; i < (int)MOX::_active_count; ++i) {
             s_racescrn_race_display* display = &race_displays[i];
@@ -464,19 +438,19 @@ namespace RACESCRN {
             int16_t btn_y = RACESCRN::_race_spy_btns[i * 2 + 1];
 
             // Add mission toggle buttons (Spy, Sabotage, Assassination)
-            fields::Add_Multi_Button_Field_(btn_x, btn_y, RACESCRN::s_empty_string, display->spy_icon_img, &display->agent_mission_idx, 1, RACESCRN::s_empty_string, 41);
-            fields::Add_Multi_Button_Field_(btn_x + 76, btn_y, RACESCRN::s_empty_string, display->sabotage_icon_img, &display->agent_mission_idx, 2, RACESCRN::s_empty_string, 41);
-            fields::Add_Multi_Button_Field_(btn_x + 149, btn_y, RACESCRN::s_empty_string, display->assassination_icon_img, &display->agent_mission_idx, 3, RACESCRN::s_empty_string, 41);
+            fields::Add_Multi_Button_Field_(btn_x, btn_y, "", display->spy_icon_img, &display->agent_mission_idx, 1, "", 41);
+            fields::Add_Multi_Button_Field_(btn_x + 76, btn_y, "", display->sabotage_icon_img, &display->agent_mission_idx, 2, "", 41);
+            fields::Add_Multi_Button_Field_(btn_x + 149, btn_y, "", display->assassination_icon_img, &display->agent_mission_idx, 3, "", 41);
 
             // Add interaction field for spy/agent area
             int16_t spy_x = RACESCRN::_race_spies[i * 2];
             int16_t spy_y = RACESCRN::_race_spies[i * 2 + 1];
-            display->main_interaction_field_id = fields::Add_Hidden_Field_(spy_x, spy_y - 6, spy_x + 187, spy_y + 25, RACESCRN::s_empty_string, 0);
+            display->main_interaction_field_id = fields::Add_Hidden_Field_(spy_x, spy_y - 6, spy_x + 187, spy_y + 25, "", 0);
 
             // Add interaction field for relationship bar area
             int16_t bar_x = RACESCRN::_race_bar[i * 2];
             int16_t bar_y = RACESCRN::_race_bar[i * 2 + 1];
-            display->relationshiop_field_id = fields::Add_Hidden_Field_(bar_x - 6, bar_y - 6, bar_x + 8, bar_y + 88, RACESCRN::s_empty_string, 0);
+            display->relationshiop_field_id = fields::Add_Hidden_Field_(bar_x - 6, bar_y - 6, bar_x + 8, bar_y + 88, "", 0);
         }
 
         return 1;
@@ -504,7 +478,7 @@ namespace RACESCRN {
                 y_base,
                 x_offset + 319,
                 y_base + 88,
-                s_empty_string,
+                "",
                 0
             );
         }
@@ -618,15 +592,15 @@ namespace RACESCRN {
 
         if (RACESCRN::_net_state == 1) {
             animate::Draw_(0x85, 0xBF, (s_animation_header*)RACESCRN::_netbox_seg);
-            strcpy(text_buffer, RACESCRN::_diplomacy_net_requeting_buffer);
+            strcpy(text_buffer, RACESCRN::_diplomacy_net_requesting_buffer);
             race_idx = NETMOX::Net_Diplomacy_With_();
-            JIM::Decode_Text_Race_(text_buffer, (int16_t)race_idx, 100);
+            JIM::Decode_Text_Race_(text_buffer, (int16_t)race_idx, sizeof(text_buffer));
             FMTPARA::Print_Formatted_Paragraph_(0x8F, 0xDA, 0x15E, text_buffer, 2);
         } else if (RACESCRN::_net_state == 2) {
             animate::Draw_(0x85, 0xBF, (s_animation_header*)RACESCRN::_netbox_seg);
             strcpy(text_buffer, RACESCRN::_diplomacy_net_wait_buffer);
             race_idx = NETMOX::Net_Diplomacy_With_();
-            JIM::Decode_Text_Race2_(text_buffer, (int16_t)race_idx, 100);
+            JIM::Decode_Text_Race2_(text_buffer, (int16_t)race_idx, sizeof(text_buffer));
             FMTPARA::Print_Formatted_Paragraph_(0x8F, 0xD1, 0x15E, text_buffer, 2);
         }
     }
@@ -639,7 +613,7 @@ namespace RACESCRN {
 
         if (_g_spy_xfer_count > 1) {
             fonts::Set_Font_Style_Outline_(2, &_race_high_color);
-            itoa(static_cast<int32_t>(_g_spy_xfer_count), num_str, 10);
+            itoa((int32_t)_g_spy_xfer_count, num_str, 10);
             fonts::Print_To_Bitmap_(8, 4, num_str, _g_mouse_group_p->sprite2);
         }
 
@@ -711,30 +685,30 @@ namespace RACESCRN {
         RUSS::Mox_Update_();
 
         for (int i = 0; i < 17; ++i) {
-            JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x21 + i, _relation_text[i], 15);
+            JIM::Get_Text_Message_("billtext.lbx", 0x21 + i, _relation_text[i], sizeof(_relation_text[i]));
             RUSS::Mox_Update_();
         }
 
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x32, _ignoring_str, 20);
+        JIM::Get_Text_Message_("billtext.lbx", 0x32, _ignoring_str, sizeof(_ignoring_str));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x33, _no_contact_str, 20);
+        JIM::Get_Text_Message_("billtext.lbx", 0x33, _no_contact_str, sizeof(_no_contact_str));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x34, _spy_bonus_str, 20);
+        JIM::Get_Text_Message_("billtext.lbx", 0x34, _spy_bonus_str, sizeof(_spy_bonus_str));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x35, _agent_bonus_str, 20);
+        JIM::Get_Text_Message_("billtext.lbx", 0x35, _agent_bonus_str, sizeof(_agent_bonus_str));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x39, _research_treaty_buffer, 30);
+        JIM::Get_Text_Message_("billtext.lbx", 0x39, _research_treaty_buffer, sizeof(_research_treaty_buffer));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3A, _trade_treaty_buffer, 30);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3B, _giving_treaty_buffer, 80);
+        JIM::Get_Text_Message_("billtext.lbx", 0x3A, _trade_treaty_buffer, sizeof(_trade_treaty_buffer));
+        JIM::Get_Text_Message_("billtext.lbx", 0x3B, _giving_treaty_buffer, sizeof(_giving_treaty_buffer));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3C, _receiving_treaty_buffer, 80);
+        JIM::Get_Text_Message_("billtext.lbx", 0x3C, _receiving_treaty_buffer, sizeof(_receiving_treaty_buffer));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x4C, _diplomacy_net_requeting_buffer, 100);
+        JIM::Get_Text_Message_("billtext.lbx", 0x4C, _diplomacy_net_requesting_buffer, sizeof(_diplomacy_net_requesting_buffer));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x4D, _diplomacy_net_wait_buffer, 100);
+        JIM::Get_Text_Message_("billtext.lbx", 0x4D, _diplomacy_net_wait_buffer, sizeof(_diplomacy_net_wait_buffer));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtex2_lbx_00556038, 0x1A, _declare_war_buffer, 120);
+        JIM::Get_Text_Message_("billtex2.lbx", 0x1A, _declare_war_buffer, sizeof(_declare_war_buffer));
         RUSS::Mox_Update_();
         
         ERIC::Fast_Fade_Out_();
@@ -761,20 +735,17 @@ namespace RACESCRN {
             RUSS::Mox_Update_();
 
             uint32_t bmp_size = bitmap::Get_Bitmap_Size_(187, 25);
-            s_animation_header* sprite = static_cast<s_animation_header*>(allocate::Allocate_First_Block_(MOX::_screen_seg, bmp_size));
+            s_animation_header* sprite = (s_animation_header*)allocate::Allocate_First_Block_(MOX::_screen_seg, bmp_size);
             bitmap::Create_Blank_Bitmap_(187, 25, sprite);
             RUSS::Mox_Update_();
 
-            s_animation_header* anim = reinterpret_cast<s_animation_header*>(
-                farload::Far_Reload_Next_(s_races_lbx, 0, MOX::_screen_seg));
+            s_animation_header* anim = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 0, MOX::_screen_seg);
             RUSS::Mox_Update_();
 
-            _arrow_seg = reinterpret_cast<s_animation_header*>(
-                farload::Far_Reload_Next_(s_races_lbx, 1, MOX::_screen_seg));
+            _arrow_seg = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 1, MOX::_screen_seg);
             RUSS::Mox_Update_();
 
-            _g_mouse_seg = reinterpret_cast<s_animation_header*>(
-                farload::Far_Reload_Next_(s_races_lbx, 4, MOX::_screen_seg));
+            _g_mouse_seg = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 4, MOX::_screen_seg);
             RUSS::Mox_Update_();
 
             int16_t sprite_idx = 5;
@@ -785,12 +756,10 @@ namespace RACESCRN {
                 case 3: sprite_idx = 5; break;
                 case 4: sprite_idx = 63; break;
             }
-            s_animation_header* mouse_pic = reinterpret_cast<s_animation_header*>(
-                farload::Far_Reload_Next_(s_races_lbx, sprite_idx, MOX::_screen_seg));
+            s_animation_header* mouse_pic = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", sprite_idx, MOX::_screen_seg);
             RUSS::Mox_Update_();
 
-            _netbox_seg = reinterpret_cast<s_animation_header*>(
-                farload::Far_Reload_Next_(s_races_lbx, 59, MOX::_screen_seg));
+            _netbox_seg = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 59, MOX::_screen_seg);
             RUSS::Mox_Update_();
 
             JIM::Bill_Picture_To_Mouse_(_g_mouse_seg);
@@ -931,7 +900,7 @@ namespace RACESCRN {
                                 break;
                             }
                             strcpy(message_buffer, _declare_war_buffer);
-                            JIM::Decode_Text_Race_(message_buffer, target_player_idx, 120);
+                            JIM::Decode_Text_Race_(message_buffer, target_player_idx, sizeof(message_buffer));
                             if (GENDRAW::Do_Confirmation_Box_(message_buffer) == 1) {
                                 MOX::_player[MOX::_PLAYER_NUM].delayed_diplomacy_orders[target_player_idx] = 0;
                             }
@@ -973,7 +942,7 @@ namespace RACESCRN {
                                 _net_state = 0;
                                 if (net_cancel_requested == 0) {
                                     if (NETMOX::No_AI_Diplomacy_Allowed_() != 0) {
-                                        JIM::Get_Text_Message_(s_billtex2_lbx_00556038, 27, message_buffer, 80);
+                                        JIM::Get_Text_Message_("billtex2.lbx", 27, message_buffer, 80);
                                         GENDRAW::Message_Box_(message_buffer);
                                     } else {
                                         DIP_SCRN::Diplomacy_Screen_(target_player_idx);
@@ -1023,12 +992,12 @@ namespace RACESCRN {
                                 }
                                 _net_state = 0;
                                 if (NETMOX::Human_Hit_Next_Turn_(target_player_idx) != 0) {
-                                    JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 55, message_buffer, 80);
+                                    JIM::Get_Text_Message_("billtext.lbx", 55, message_buffer, 80);
                                     GENDRAW::Message_Box_(message_buffer);
                                     NETMOX::Net_End_Human_Diplomacy_();
                                 } else {
                                     if (human_rejected != 0) {
-                                        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 56, message_buffer, 80);
+                                        JIM::Get_Text_Message_("billtext.lbx", 56, message_buffer, 80);
                                         GENDRAW::Message_Box_(message_buffer);
                                         NETMOX::Net_End_Human_Diplomacy_();
                                     } else {

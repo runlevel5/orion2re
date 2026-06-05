@@ -3,10 +3,6 @@
 namespace RACESCRN {
     using render_fn = void(*)(s_racescrn_mouse_group*);
 
-    extern const char s_billtext_lbx_0055135c[13];
-    extern const char s_billtex2_lbx_00556038[13];
-    extern const char s_races_lbx[10];
-
     extern s_racescrn_icon_layout _mouse_group_data;
     extern int16_t _g_spy_xfer_count;
     extern s_racescrn_mouse_group* _g_agent_group_p;
@@ -46,52 +42,110 @@ namespace RACESCRN {
     extern s_colors _banner_color_edge;
     extern char _receiving_treaty_buffer[80];
 
-    extern const char s_empty_string[1];
-    extern const char s_carriage_return[2];
-    extern const char s_spy_bonus_fmt[8];
-    extern const char s_agent_bonus_fmt[8];
-    extern const char s_trade_bc_fmt[8];
-    extern const char s_trade_mc_fmt[8];
-    extern const char s_research_fmt[8];
-    extern const char s_pr_str[3];
-    extern const char s_mc_str[3];
-    extern const char s_fp_str[4];
-    extern const char s_bc_str[3];
-    extern const char s_rp_str[3];
-
-    extern const char s_space[2];
-    extern const char s_I[2];
-    extern const char s_R[2];
-    extern const char s_A[2];
-    extern const char s_D[2];
-
     extern char _diplomacy_net_wait_buffer[100];
-    extern char _diplomacy_net_requeting_buffer[100];
+    extern char _diplomacy_net_requesting_buffer[100];
 
-    void __cdecl Init_Race_Display_Data_(s_racescrn_race_display* race_display, s_racescrn_mouse_group* agent_group);
+    /** Initializes the seven race display slots and the shared agent icon group.
+     *  @param race_displays Output display array.
+     *  @param agent_group Output icon group for unassigned agents.
+     */
+    void __cdecl Init_Race_Display_Data_(s_racescrn_race_display* race_displays, s_racescrn_mouse_group* agent_group);
+
+    /** Recomputes spacing and extents for an icon group.
+     *  @param group Group to update.
+     */
     void __cdecl Calculate_Icon_Group_Data_(s_racescrn_mouse_group* group);
+    /** Copies layout and sprite data into an icon group, then recalculates its derived fields.
+     *  @param group Group to initialize.
+     *  @param layout Source layout rectangle.
+     *  @param count Initial icon count.
+     *  @param sprite1 Foreground icon sprite.
+     *  @param sprite2 Optional destination bitmap.
+     */
     void __cdecl Setup_Icon_Group_Data_(s_racescrn_mouse_group* group, s_racescrn_icon_layout* layout, int16_t count, s_animation_header* sprite1, s_animation_header* sprite2);
+    /** Draws the race portraits and banner frames for each active display slot.
+     *  @param race_displays Display array to render.
+     */
     void __cdecl Draw_Race_Photos_(s_racescrn_race_display* race_displays);
+    /** Draws player names, treaty text, and spy/agent bonus text for each display slot.
+     *  @param display Display array to render.
+     */
     void __cdecl Draw_Race_Text_(s_racescrn_race_display* display);
+    /** Draws the relationship bars and slider markers for each display slot.
+     *  @param displays Display array to render.
+     */
     void __cdecl Draw_Relations_Sliders_(s_racescrn_race_display* displays);
+    /** Creates the bottom-row action buttons and returns the highest field ID.
+     *  @param ok_btn_id Output OK button field ID.
+     *  @param agriculture_btn_id Output action button field ID.
+     *  @param agriculture_field_id Output radio state field ID.
+     *  @param research_btn_id Output action button field ID.
+     *  @param research_field_id Output radio state field ID.
+     *  @param industry_btn_id Output action button field ID.
+     *  @param industry_field_id Output radio state field ID.
+     *  @param diplomacy_btn_id Output action button field ID.
+     *  @param diplomacy_field_id Output radio state field ID.
+     */
     int16_t __cdecl Setup_Main_Fields_(int16_t* ok_btn_id, int16_t* agriculture_btn_id, int16_t* agriculture_field_id,
                                int16_t* research_btn_id, int16_t* research_field_id, int16_t* industry_btn_id,
                                int16_t* industry_field_id, int16_t* diplomacy_btn_id, int16_t* diplomacy_field_id);
+    /** Adds per-race spy and relationship interaction fields for the main screen mode.
+     *  @param race_displays Display array to update.
+     *  @param base_field_id Lowest field ID to preserve.
+     */
     int8_t __cdecl Setup_Race_Display_Fields_(s_racescrn_race_display* race_displays, int16_t base_field_id);
+    /** Draws the full race screen for the current input and mode state. */
     void __cdecl Draw_Race_Screen_();
 
+    /** Draws an icon group either directly to the screen or into its destination bitmap.
+     *  @param group Group to draw.
+     */
     void __cdecl Draw_Icon_Group_(s_racescrn_mouse_group* group);
 
+    /** Highlights the icons under the cursor and returns how many would be moved.
+     *  @param group Group being inspected.
+     *  @param x_pos Cursor X coordinate.
+     *  @param color Highlight color index.
+     *  @param show_count Whether to print the moved-icon count.
+     */
     int16_t __cdecl Draw_Icon_Group_Cursor_(s_racescrn_mouse_group* group, int16_t x_pos, uint8_t color, bool show_count);
 
+    /** Moves the currently carried spies into the target group, respecting capacity.
+     *  @param target_group Destination icon group.
+     */
     void __cdecl Move_Spy_Group_From_Mouse_(s_racescrn_mouse_group* target_group);
+    /** Transfers up to count icons from one group to another and refreshes both layouts.
+     *  @param src Source icon group.
+     *  @param dst Destination icon group.
+     *  @param count Maximum number of icons to move.
+     */
     void __cdecl Move_Icon_Group_Icons_(s_racescrn_mouse_group* src, s_racescrn_mouse_group* dst, uint16_t count);
+    /** Rebuilds the mouse-carried spy bitmap, including the transfer-count overlay.
+     *  @param spy_icon Icon sprite drawn into the mouse bitmap.
+     */
     void __cdecl Redraw_Spy_Mouse_(s_animation_header* spy_icon);
+    /** Adds full-slot selection fields for the target-selection mode.
+     *  @param race_displays Display array to update.
+     *  @param field_id_base Lowest field ID to preserve.
+     */
     int8_t __cdecl Setup_Race_Who_Fields_(s_racescrn_race_display* race_displays, int16_t field_id_base);
+    /** Returns the spy group associated with a field ID.
+     *  @param field_id Field ID to resolve.
+     *  @param out_index Output display index when a race slot is matched.
+     */
     s_racescrn_mouse_group* __cdecl Get_Spy_Group_For_Field_(int16_t field_id, int16_t* out_index);
+    /** Moves the currently selected spy icons into the mouse group and redraws the cursor bitmap.
+     *  @param mouse_group Source group to pull from.
+     *  @param mouse_sprite Icon sprite drawn into the mouse bitmap.
+     */
     void __cdecl Move_Spies_Group_(s_racescrn_mouse_group* mouse_group, s_animation_header* mouse_sprite);
+    /** Normalizes mission indices after spy transfers. */
     void __cdecl Adjust_Spy_Mission_Data_();
+    /** Writes the current spy counts and mission selections back to player state.
+     *  @param race_displays Display array to commit.
+     */
     void __cdecl Update_Spy_Stuff_(s_racescrn_race_display* race_displays);
 
+    /** Runs the race screen until the player exits. */
     void __cdecl Race_Screen_();
 }

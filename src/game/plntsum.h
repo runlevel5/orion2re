@@ -46,7 +46,7 @@ namespace PLNTSUM {
 
     void __cdecl Add_Colony_Ship_Icon_Field_(int16_t* field_id, int16_t row_index);
 
-    void __cdecl Add_Outpost_Ship_Icon_Field_(int16_t* field_id, int16_t row);
+    void __cdecl Add_Outpost_Ship_Icon_Field_(int16_t* field_id, int16_t row_index);
 
     void __cdecl Add_PlntSum_Galaxy_Map_Fields_(int16_t* fields_array);
 
@@ -56,12 +56,12 @@ namespace PLNTSUM {
 
     bool __cdecl Send_Colony_Button_Selectable_();
     bool __cdecl Send_Outpost_Button_Selectable_();
-    bool __cdecl Summary_Found_Colony_Ship_(short ship_index);
-    bool __cdecl Summary_Found_Outpost_Ship_(short index);
-    bool __cdecl Planet_Is_Outpost_Planet_(short planet_idx);
+    bool __cdecl Summary_Found_Colony_Ship_(int16_t ship_summary_idx);
+    bool __cdecl Summary_Found_Outpost_Ship_(int16_t ship_summary_idx);
+    bool __cdecl Planet_Is_Outpost_Planet_(int16_t planet_idx);
     bool __cdecl Planet_Has_Players_Colony_(int16_t planet_idx);
     bool __cdecl Planet_Has_Been_Visited_(int16_t planet_index);
-    bool __cdecl Planet_In_Range_Of_A_Colony_(short planet_index);
+    bool __cdecl Planet_In_Range_Of_A_Colony_(int16_t planet_idx);
 
     int16_t __cdecl Productivity_Penalty_(int16_t player_idx, int16_t planet_gravity);
 
@@ -75,9 +75,9 @@ namespace PLNTSUM {
 
     bool __cdecl Planet_Has_Adverse_Gravity_(int16_t planet_idx, int16_t player_idx);
     bool __cdecl Planet_Is_Enemy_Controlled_(int16_t planet_idx, int16_t player_idx);
-    bool __cdecl Planet_Has_Hostile_Environment_(short planet_idx);
+    bool __cdecl Planet_Has_Hostile_Environment_(int16_t planet_idx);
 
-    bool __cdecl Planet_Is_Mineral_Scarce_(short planet_idx);
+    bool __cdecl Planet_Is_Mineral_Scarce_(int16_t planet_idx);
     int16_t __cdecl Colony_Ship_Auto_Colonization_(s_ship_data* ship);
     void __cdecl Set_Auto_Colonize_Flag_(s_ship_data* ship, int16_t flag);
     bool __cdecl Ship_Is_Not_Colonizing_(s_ship_data* ship);
@@ -140,7 +140,7 @@ namespace PLNTSUM {
 
     void __cdecl Get_Colony_Outpost_Marker_XY_(int16_t summary_idx, int16_t* out_x, int16_t* out_y);
 
-    void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t colony, int8_t outpost);
+    void __cdecl Print_Colony_Outpost_Marker_(int16_t x, int16_t y, int16_t ship_summary_idx, int8_t colony, int8_t outpost);
 
     extern bool _recalc_first_planet;
 
@@ -156,7 +156,7 @@ namespace PLNTSUM {
 
     void __cdecl Draw_Rotating_Planets_();
 
-    s_animation_header* __cdecl Load_Planet_Segment_(int16_t param_1);
+    s_animation_header* __cdecl Load_Planet_Segment_(int16_t planet_anim_idx);
 
     void __cdecl Summary_Screen_Print_Data_();
 
@@ -165,7 +165,7 @@ namespace PLNTSUM {
 
     void __cdecl Player_Colors_(int16_t player_idx, s_colors* colors_out, int8_t type, uint8_t* base_color_out);
 
-    void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char param_3);
+    void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, int8_t highlight_type);
 
     void __cdecl Summary_Screen_Print_Scanned_();
 

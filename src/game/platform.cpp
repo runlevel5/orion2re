@@ -5,7 +5,7 @@
 uint8_t g_ten_game_number;
 int16_t g_cached_mouse_x;
 int16_t g_cached_mouse_y;
-int g_window_focus_state;
+int32_t g_window_focus_state;
 uint32_t g_last_scan_code;
 
 namespace platform {
@@ -13,7 +13,6 @@ namespace platform {
 	uint32_t g_win_minor;
 	uint32_t g_win_major;
 	uint32_t g_win_ver;
-	const char s_slash_ten[6] = "/ten=";
 	char* g_command_line;
 	void* g_env_strings;
 	MSG g_main_msg;
@@ -30,7 +29,7 @@ namespace platform {
 	LPDIRECTDRAWSURFACE g_cursor_surface_1;
 	int32_t _offscreen_mouse_shape;
 	LPDIRECTDRAWSURFACE g_cursor_surface_2;
-	LPVOID _cursor_surface;
+	uint8_t* _cursor_surface;
 	uint32_t DAT_00578e20;
 	uint32_t g_frame_count;
 	int8_t g_render_buffer;
@@ -48,33 +47,34 @@ namespace platform {
     LPDIRECTDRAWSURFACE	l_temp_surface = NULL;
 
     // Color shifts
-    int		rshift;
-    int		gshift;
-    int		bshift;
+    int32_t	rshift;
+    int32_t	gshift;
+    int32_t	bshift;
     // Scaled window
-    int scaleX = 640;
-    int scaleY = 480;
+    int32_t scaleX = 640;
+    int32_t scaleY = 480;
 
-    int _Get_Mask_Info(DWORD Bitmask, int* lpShift)
+    int32_t _Get_Mask_Info(DWORD bitmask, int32_t* shift_out)
     {
-        int Precision, Shift;
+        int32_t precision;
+        int32_t shift;
 
-        Precision = Shift = 0;
+        precision = shift = 0;
         //count the zeros on right hand side
-        while (!(Bitmask & 0x01L))
+        while (!(bitmask & 0x01L))
         {
-            Bitmask >>= 1;
-            Shift++;
+            bitmask >>= 1;
+            shift++;
         }
 
         //count the ones on right hand side
-        while (Bitmask & 0x01L)
+        while (bitmask & 0x01L)
         {
-            Bitmask >>= 1;
-            Precision++;
+            bitmask >>= 1;
+            precision++;
         }
-        *lpShift = Shift;
-        return Precision;
+        *shift_out = shift;
+        return precision;
     }
 
     void Blit_Surface_To_Screen(LPDIRECTDRAWSURFACE lpSurface)
@@ -161,7 +161,6 @@ namespace platform {
         }
     }
 
-    // Hooks
     void __cdecl Parse_Ten_Cmd_Parameter(const char* input_str) {
         if (input_str == nullptr) {
             return;
@@ -176,7 +175,7 @@ namespace platform {
             return;
         }
 
-        char* copy_buffer = static_cast<char*>(malloc(input_len + 4));
+        char* copy_buffer = (char*)malloc(input_len + 4);
         if (copy_buffer == nullptr) {
             return;
         }
@@ -187,15 +186,10 @@ namespace platform {
 
         _strlwr(copy_buffer);
 
-        // Search for the tag "/ten" in the lowercased buffer
-        char* match_ptr = strstr(copy_buffer, s_slash_ten);
+        // Search for "/ten=" in the lowercased command line.
+        char* match_ptr = strstr(copy_buffer, "/ten=");
         if (match_ptr != nullptr) {
-            uint32_t needle_len = 0;
-            while (s_slash_ten[needle_len] != '\0') {
-                needle_len++;
-            }
-
-            char* target = match_ptr + needle_len;
+            char* target = match_ptr + (sizeof("/ten=") - 1);
             target[1] = '\0';
 
             int parsed_val = atoi(target);
@@ -575,7 +569,7 @@ namespace platform {
             nullptr);
 
         if (lock_result == DD_OK) {
-            platform::_cursor_surface = platform::_cursor_surface_desc.lpSurface;
+            platform::_cursor_surface = (uint8_t*)platform::_cursor_surface_desc.lpSurface;
         }
     }
 
@@ -612,8 +606,8 @@ namespace platform {
         }
         if (hr == DD_OK)
         {
-            video::_current_video_page = static_cast<uint8_t*>(desc.lpSurface);
-            return static_cast<uint32_t>(desc.lPitch);
+            video::_current_video_page = (uint8_t*)desc.lpSurface;
+            return (uint32_t)desc.lPitch;
         }
 
         switch (hr)
@@ -643,7 +637,7 @@ namespace platform {
             break;
         }
 
-        return static_cast<uint32_t>(hr);
+        return (uint32_t)hr;
     }
 
 
@@ -791,8 +785,8 @@ namespace platform {
         const LONG max_x = video::g_screen_res_x - 1;
         const LONG max_y = video::g_screen_res_y - 1;
 
-        save_rect.left = static_cast<LONG>(mouse_x);
-        save_rect.top = static_cast<LONG>(mouse_y);
+        save_rect.left = (LONG)mouse_x;
+        save_rect.top = (LONG)mouse_y;
 
         save_rect.right = max_x;
         if (save_rect.left + 0x18 < max_x) {
@@ -819,8 +813,8 @@ namespace platform {
     void __cdecl Save_Mouse_Offscreen_(int16_t mouse_x, int16_t mouse_y) {
         RECT saved_rect;
 
-        saved_rect.left = static_cast<LONG>(mouse_x);
-        saved_rect.top = static_cast<LONG>(mouse_y);
+        saved_rect.left = (LONG)mouse_x;
+        saved_rect.top = (LONG)mouse_y;
 
         saved_rect.right = video::g_screen_res_x - 1;
         if (saved_rect.left + 0x18 < video::g_screen_res_x - 1) {
@@ -854,22 +848,22 @@ namespace platform {
             return;
         }
 
-        if (static_cast<int32_t>(video::_current_mouse_shape) != platform::_offscreen_mouse_shape) {
+        if ((int32_t)video::_current_mouse_shape != platform::_offscreen_mouse_shape) {
             platform::Update_Cursor_Image_();
-            platform::_offscreen_mouse_shape = static_cast<int32_t>(video::_current_mouse_shape);
+            platform::_offscreen_mouse_shape = (int32_t)video::_current_mouse_shape;
         }
 
         source_rect.left = 0;
         source_rect.top = 0;
 
-        x = static_cast<int32_t>(mouse_x);
+        x = (int32_t)mouse_x;
         if (x + 0x18 < video::g_screen_res_x - 1) {
             source_rect.right = 0x18;
         } else {
             source_rect.right = video::g_screen_res_x - x - 1;
         }
 
-        y = static_cast<int32_t>(mouse_y);
+        y = (int32_t)mouse_y;
         if (y + 0x18 < video::g_screen_res_y - 1) {
             source_rect.bottom = 0x18;
         } else {
@@ -881,8 +875,8 @@ namespace platform {
 
         platform::g_cursor_surface_1->SetColorKey(8, &color_key);
         video::g_offscreen_surface_1->BltFast(
-            static_cast<DWORD>(x),
-            static_cast<DWORD>(y),
+            (DWORD)x,
+            (DWORD)y,
             platform::g_cursor_surface_1,
             &source_rect,
             DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
@@ -890,8 +884,8 @@ namespace platform {
 
     void __cdecl Restore_Mouse_Off_Page_() {
         RECT src_rect;
-        const int32_t mouse_x = static_cast<int32_t>(g_cached_mouse_x);
-        const int32_t mouse_y = static_cast<int32_t>(g_cached_mouse_y);
+        const int32_t mouse_x = (int32_t)g_cached_mouse_x;
+        const int32_t mouse_y = (int32_t)g_cached_mouse_y;
 
         src_rect.left = 0;
         src_rect.top = 0;
@@ -909,8 +903,8 @@ namespace platform {
         }
 
         video::g_offscreen_surface_1->BltFast(
-            static_cast<DWORD>(mouse_x),
-            static_cast<DWORD>(mouse_y),
+            (DWORD)mouse_x,
+            (DWORD)mouse_y,
             platform::g_cursor_surface_2,
             &src_rect,
             DDBLTFAST_WAIT
@@ -923,7 +917,7 @@ namespace platform {
         g_mouse_y = y;
 
 #ifndef FULSCREEN
-        // Quick hack to ignore window size
+        // Offset the game-space position into window coordinates in windowed mode.
         POINT p = { 0, 0 };
         ClientToScreen(g_main_window, &p);
 
@@ -999,39 +993,39 @@ namespace platform {
             }
 
             if (key_char == 0) {
-                uint32_t iVar7 = 0;
+                uint32_t key_code = 0;
                 switch (wParam) {
-                case 0x08: iVar7 = 0x0E08; break;
-                case 0x09: iVar7 = 0x0F09; break;
-                case 0x0D: iVar7 = 0x1C0D; break;
-                case 0x21: iVar7 = 0x49E0; break;
-                case 0x22: iVar7 = 0x51E0; break;
-                case 0x23: iVar7 = 0x4FE0; break;
-                case 0x24: iVar7 = 0x47E0; break;
-                case 0x25: iVar7 = 0x4BE0; break;
-                case 0x26: iVar7 = 0x48E0; break;
-                case 0x27: iVar7 = 0x4DE0; break;
-                case 0x28: iVar7 = 0x50E0; break;
-                case 0x2D: iVar7 = 0x52E0; break;
-                case 0x2E: iVar7 = 0x10000; break;
-                case 0x6B: iVar7 = 0x0D2B; break;
-                case 0x6D: iVar7 = 0x0C2D; break;
-                case 0x70: iVar7 = 0x3B00; break;
-                case 0x71: iVar7 = 0x3C00; break;
-                case 0x72: iVar7 = 0x3D00; break;
-                case 0x73: iVar7 = 0x3E00; break;
-                case 0x74: iVar7 = 0x3F00; break;
-                case 0x75: iVar7 = 0x4000; break;
-                case 0x76: iVar7 = 0x4100; break;
-                case 0x77: iVar7 = 0x4200; break;
-                case 0x78: iVar7 = 0x4300; break;
-                case 0x79: iVar7 = 0x4400; break;
-                case 0x7A: iVar7 = 0xFFFF8500; break;
-                case 0x7B: iVar7 = 0xFFFF8600; break;
+                case 0x08: key_code = 0x0E08; break;
+                case 0x09: key_code = 0x0F09; break;
+                case 0x0D: key_code = 0x1C0D; break;
+                case 0x21: key_code = 0x49E0; break;
+                case 0x22: key_code = 0x51E0; break;
+                case 0x23: key_code = 0x4FE0; break;
+                case 0x24: key_code = 0x47E0; break;
+                case 0x25: key_code = 0x4BE0; break;
+                case 0x26: key_code = 0x48E0; break;
+                case 0x27: key_code = 0x4DE0; break;
+                case 0x28: key_code = 0x50E0; break;
+                case 0x2D: key_code = 0x52E0; break;
+                case 0x2E: key_code = 0x10000; break;
+                case 0x6B: key_code = 0x0D2B; break;
+                case 0x6D: key_code = 0x0C2D; break;
+                case 0x70: key_code = 0x3B00; break;
+                case 0x71: key_code = 0x3C00; break;
+                case 0x72: key_code = 0x3D00; break;
+                case 0x73: key_code = 0x3E00; break;
+                case 0x74: key_code = 0x3F00; break;
+                case 0x75: key_code = 0x4000; break;
+                case 0x76: key_code = 0x4100; break;
+                case 0x77: key_code = 0x4200; break;
+                case 0x78: key_code = 0x4300; break;
+                case 0x79: key_code = 0x4400; break;
+                case 0x7A: key_code = 0xFFFF8500; break;
+                case 0x7B: key_code = 0xFFFF8600; break;
                 }
-                if (iVar7 != 0) {
+                if (key_code != 0) {
                     key::_key_pressed = true;
-                    key::_last_key_pressed[key::_key_write] = (int32_t)iVar7;
+                    key::_last_key_pressed[key::_key_write] = (int32_t)key_code;
                     key::_key_write = (key::_key_write + 1) % 10;
                     g_last_scan_code = (lParam & 0xFF0000) >> 16;
                 }
@@ -1145,10 +1139,7 @@ namespace platform {
         // Send custom toggle message (0x401 = WM_USER + 1)
         SendMessageA(g_main_window, 0x401, 0, 0);
 
-        // Busy wait until the message handler resets the pending flag.
-        // Note: The original assembly (0x00527ebc - 0x00527ec3) contains a bug where
-        // the variable is not reloaded from memory inside the loop, effectively
-        // creating an infinite spin if the flag remains true after SendMessageA returns.
+        // Wait for the message handler to clear the pending flag.
         while (g_pending_toggle_pages) {
             // Spin
         }
@@ -1162,7 +1153,6 @@ namespace platform {
         window_class.cbWndExtra = 0;
         window_class.hInstance = hInstance;
         window_class.style = CS_HREDRAW | CS_VREDRAW; // 3
-        // Suggested name: main_window_proc
         window_class.lpfnWndProc = &WndProc;
         window_class.hIcon = LoadIconA(hInstance, MAKEINTRESOURCEA(101)); // 0x65
         window_class.hCursor = LoadCursorA(NULL, IDC_ARROW);              // 0x7F00
@@ -1209,11 +1199,11 @@ namespace platform {
         Create_Direct_Draw(4);
 
         bool has_lost_focus = false;
-        g_worker_thread_handle = reinterpret_cast<HANDLE>(_beginthread(MOX2::thunk_main2_, 0xFFFF, nullptr));
+        g_worker_thread_handle = (HANDLE)_beginthread(MOX2::thunk_main2_, 0xFFFF, nullptr);
 
         do {
             if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {
-                return static_cast<int>(g_main_msg.wParam);
+                return (int)g_main_msg.wParam;
             }
 
             TranslateMessage(&g_main_msg);
@@ -1242,10 +1232,10 @@ namespace platform {
             platform::Lock_Cursor_Surface_();
 
             uint8_t* const src =
-                &video::_mouse_palette[(static_cast<int32_t>(video::_current_mouse_shape) - 1) * 0x240];
+                &video::_mouse_palette[((int32_t)video::_current_mouse_shape - 1) * 0x240];
 
             for (int32_t row = 0; row < 0x18; ++row) {
-                memcpy(&((uint8_t*)platform::_cursor_surface)[row * 0x18], &src[row * 0x18], 0x18);
+                memcpy(&platform::_cursor_surface[row * 0x18], &src[row * 0x18], 0x18);
             }
 
             platform::Unlock_Cursor_Surface_();

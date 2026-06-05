@@ -3,8 +3,8 @@
 namespace palstore {
     void __cdecl Store_Palette_Block_(int32_t first_entry, int32_t entry_count) {
         if (first_entry < first_entry + entry_count) {
-            int palette_index = first_entry;
-            int remaining = entry_count;
+            int32_t palette_index = first_entry;
+            int32_t remaining = entry_count;
 
             do {
                 video::g_palette_entries[palette_index].peRed = video::_current_palette[palette_index].r << 2;
@@ -21,10 +21,10 @@ namespace palstore {
         tagPALETTEENTRY entries[256];
         int32_t multiplier = 100 - darken_percent;
 
-        for (int i = 1; i < 256; ++i) {
-            entries[i].peRed   = static_cast<uint8_t>(((video::_current_palette[i].r * multiplier) / 100) << 2);
-            entries[i].peGreen = static_cast<uint8_t>(((video::_current_palette[i].g * multiplier) / 100) << 2);
-            entries[i].peBlue  = static_cast<uint8_t>(((video::_current_palette[i].b * multiplier) / 100) << 2);
+        for (int32_t i = 1; i < 256; ++i) {
+            entries[i].peRed   = (uint8_t)(((video::_current_palette[i].r * multiplier) / 100) << 2);
+            entries[i].peGreen = (uint8_t)(((video::_current_palette[i].g * multiplier) / 100) << 2);
+            entries[i].peBlue  = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
         }
 
         video::g_palette->SetEntries(0, 1, 255, &entries[1]);
@@ -59,7 +59,7 @@ namespace palstore {
                 input_occurred = 1;
             }
 
-            Darken_Palette_(static_cast<int32_t>(intensity));
+            Darken_Palette_((int32_t)intensity);
             RUSS::Mox_Update_();
 
             if (intensity-- == 0) {

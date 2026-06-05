@@ -13,12 +13,6 @@ char _last_race_name[15];
 s_animation_header* _last_race_seg;
 uint8_t _color_flag[8];
 uint8_t _race_flag[14];
-const char s_patch13_lbx[12] = "patch13.lbx";
-const char s_lastrace_rac[13] = "lastrace.rac";
-const char s_RACESEL_LBX[12] = "RACESEL.LBX";
-const char s_rb_0055117C[3] = "rb";
-const char s_empty_00551100[1] = "";
-const char s_space_00551120[2] = "\x1b";
 char* _temp_ruler_name;
 
 void __cdecl Convert_Custom_Race_Flags_(uint8_t* custom_race_flags) {
@@ -132,7 +126,7 @@ void __cdecl Set_Race_Select_Help_() {
 }
 
 void __cdecl Reload_Race_Selection_Screen_() {
-    uint8_t dummy_byte;
+    uint8_t saved_race_index;
 
     allocate::Push_Block_(MOX::_screen_seg);
 
@@ -141,7 +135,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
         RUSS::Mox_Update_();
     }
 
-    FILE* file = fopen(s_lastrace_rac, s_rb_0055117C);
+    FILE* file = fopen("lastrace.rac", "rb");
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
         _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, 12, 1, 0x1F);
@@ -151,22 +145,23 @@ void __cdecl Reload_Race_Selection_Screen_() {
         Convert_Custom_Race_Flags_(_race_specials[13]);
         RUSS::Mox_Update_();
 
-        fread(&dummy_byte, 1, 1, file);
-        fread(_last_race_name, 15, 1, file);
+        fread(&saved_race_index, sizeof(saved_race_index), 1, file);
+        fread(_last_race_name, sizeof(_last_race_name), 1, file);
+        (void)saved_race_index;
 
         RUSS::Mox_Update_();
         fclose(file);
     }
 
     for (int i = 0; i < 14; ++i) {
-        _race_button[i] = (s_animation_header*)farload::Far_Reload_Next_(s_RACESEL_LBX, i + 1, MOX::_screen_seg);
+        _race_button[i] = (s_animation_header*)farload::Far_Reload_Next_("RACESEL.LBX", i + 1, MOX::_screen_seg);
         RUSS::Mox_Update_();
     }
 
-    _last_race_seg = (s_animation_header*)farload::Far_Reload_Next_(s_patch13_lbx, 1, MOX::_screen_seg);
+    _last_race_seg = (s_animation_header*)farload::Far_Reload_Next_("patch13.lbx", 1, MOX::_screen_seg);
 }
 
-short Race_Selection_Screen_(s_player* plr) {
+int16_t Race_Selection_Screen_(s_player* plr) {
     int16_t field_ids[14];
     int16_t hotkey_field;
     char msg_buffer[100];
@@ -194,7 +189,7 @@ short Race_Selection_Screen_(s_player* plr) {
     video::Copy_Back_To_Off_();
     
     if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-        hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+        hotkey_field = fields::Add_Hot_Key_("\x1B");
     } else {
         hotkey_field = -1000;
     }
@@ -202,8 +197,8 @@ short Race_Selection_Screen_(s_player* plr) {
     RUSS::Mox_Update_();
     for (int i = 0; i < 14; ++i) {
         field_ids[i] = fields::Add_Radio_Button_Field_(
-            (i / 7) * 126 + 351, (i % 7) * 48 + 90, s_empty_00551100,
-            _race_button[i], &_race_button_status[i], s_empty_00551100, 40
+            (i / 7) * 126 + 351, (i % 7) * 48 + 90, "",
+            _race_button[i], &_race_button_status[i], "", 40
         );
     }
     
@@ -230,7 +225,7 @@ short Race_Selection_Screen_(s_player* plr) {
                     (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_((uint8_t)i);
                 
                 if (!can_request) {
-                    KEN::Ken_Get_Text_Message_(72 /* 0x48 */, msg_buffer, 100);
+                    KEN::Ken_Get_Text_Message_(72 /* 0x48 */, msg_buffer, sizeof(msg_buffer));
                     GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
                     auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
@@ -241,7 +236,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         timer::Mark_Time_();
                         timer::Release_Time_(5);
                         fields::Clear_Fields_();
-                        struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                        struct_::Copy_Structure_(plr->traits, _race_specials[i], sizeof(plr->traits));
                         plr->race = (uint8_t)i;
                         strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Help_List_();
@@ -287,9 +282,9 @@ short Race_Selection_Screen_(s_player* plr) {
                             _old_race = 0;
                             for (int j = 0; j < 14; ++j) _race_button_status[j] = 0;
                             _race_button_status[_displayed_race] = 1;
-                            if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+                            if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_("\x1B");
                             for (int j = 0; j < 14; ++j) {
-                                field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, s_empty_00551100, _race_button[j], &_race_button_status[j], s_empty_00551100, 40);
+                                field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", _race_button[j], &_race_button_status[j], "", 40);
                             }
                             video::Set_Page_Off_();
                             Draw_Race_Selection_Screen_();
@@ -297,7 +292,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                         }
                     } else {
-                        struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                        struct_::Copy_Structure_(plr->traits, _race_specials[i], sizeof(plr->traits));
                         plr->race = (uint8_t)i;
                         strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Auto_Function_();
@@ -317,11 +312,11 @@ short Race_Selection_Screen_(s_player* plr) {
                             auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                             animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
-                            if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+                            if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_("\x1B");
                             for (int j = 0; j < 13; ++j) {
-                                field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, s_empty_00551100, _race_button[j], &_race_button_status[j], s_empty_00551100, 40);
+                                field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", _race_button[j], &_race_button_status[j], "", 40);
                             }
-                            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s_empty_00551100, 40);
+                            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", (s_animation_header*)_last_race_seg, &_race_button_status[13], "", 40);
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                             RACESEL::Set_Race_Select_Help_();
                             _custom_flag = 0;
@@ -340,44 +335,44 @@ short Race_Selection_Screen_(s_player* plr) {
             }
             _custom_flag = 0;
             fields::Clear_Fields_Above_(field_ids[12]);
-            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, _race_button[13], &_race_button_status[13], s_empty_00551100, 40);
+            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", _race_button[13], &_race_button_status[13], "", 40);
         }
         
         if (input_field == field_ids[13]) {
-            FILE* f = fopen(s_lastrace_rac, s_rb_0055117C);
+            FILE* race_file = fopen("lastrace.rac", "rb");
             if (_custom_flag == 0) {
                 _custom_flag = 1;
                 fields::Clear_Fields_Above_(field_ids[12]);
-                if (!f) {
+                if (!race_file) {
                     field_ids[13] = -1000;
                 } else {
-                    field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s_empty_00551100, 40);
-                    fclose(f);
+                    field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", (s_animation_header*)_last_race_seg, &_race_button_status[13], "", 40);
+                    fclose(race_file);
                 }
-            } else if (f) {
+            } else if (race_file) {
                 uint8_t loaded_race;
-                uint8_t temp_traits[31];
-                fread(temp_traits, 31, 1, f);
-                struct_::Copy_Structure_(plr->traits, _race_specials[13], 31);
-                fread(&loaded_race, 1, 1, f);
+                uint8_t discarded_traits[31];
+                fread(discarded_traits, sizeof(discarded_traits), 1, race_file);
+                struct_::Copy_Structure_(plr->traits, _race_specials[13], sizeof(plr->traits));
+                fread(&loaded_race, sizeof(loaded_race), 1, race_file);
                 plr->race = loaded_race;
                 uint8_t can_request =
                     (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_(13);
                 
                 if (!can_request) {
-                    fclose(f);
-                    KEN::Ken_Get_Text_Message_(72, msg_buffer, 100);
+                    fclose(race_file);
+                    KEN::Ken_Get_Text_Message_(72, msg_buffer, sizeof(msg_buffer));
                     GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
                     auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                     animate::Draw_(0, 0, anim);
                     video::Copy_Back_To_Off_();
                 } else {
-                    fread(plr->race_name, 15, 1, f);
+                    fread(plr->race_name, sizeof(plr->race_name), 1, race_file);
                     fields::Deactivate_Auto_Function_();
                     fields::Clear_Fields_();
                     _old_race = loaded_race;
-                    fclose(f);
+                    fclose(race_file);
                     if (Racial_Option_Screen_(plr) == 1) {
                         done_flag = 1;
                         _race_flag[loaded_race] = 1;
@@ -393,11 +388,11 @@ short Race_Selection_Screen_(s_player* plr) {
                         auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                         animate::Draw_(0, 0, anim);
                         video::Copy_Back_To_Off_();
-                        if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+                        if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_("\x1B");
                         for (int j = 0; j < 13; ++j) {
-                            field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, s_empty_00551100, _race_button[j], &_race_button_status[j], s_empty_00551100, 40);
+                            field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", _race_button[j], &_race_button_status[j], "", 40);
                         }
-                        field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, _race_button[13], &_race_button_status[13], s_empty_00551100, 40);
+                        field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", _race_button[13], &_race_button_status[13], "", 40);
                         fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                         RACESEL::Set_Race_Select_Help_();
                         _custom_flag = 0;
@@ -481,7 +476,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                     int16_t selected_group = static_cast<int16_t>(group_button_index / 4);
 
                     if (selected_group == 1 && raceopt::_option_toggle[9] == 1) {
-                        KEN::Ken_Get_Text_Message_(0x49, warning_text, 0x78);
+                        KEN::Ken_Get_Text_Message_(0x49, warning_text, sizeof(warning_text));
                         GENDRAW::Warning_Box_(warning_text);
                         video::Set_Page_Back_();
                         raceopt::Draw_Race_Option_Background_();
@@ -503,7 +498,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                                     static_cast<int32_t>(raceopt::_negative_picks);
 
                             if (pick_total < -10) {
-                                KEN::Ken_Get_Text_Message_(0x4A, warning_text, 0x50);
+                                KEN::Ken_Get_Text_Message_(0x4A, warning_text, sizeof(warning_text));
                                 GENDRAW::Warning_Box_(warning_text);
                                 video::Set_Page_Back_();
                                 raceopt::Draw_Race_Option_Background_();
@@ -533,7 +528,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                                 static_cast<int32_t>(raceopt::_negative_picks);
 
                         if (pick_total < -10) {
-                            KEN::Ken_Get_Text_Message_(0x4A, warning_text, 0x50);
+                            KEN::Ken_Get_Text_Message_(0x4A, warning_text, sizeof(warning_text));
                             GENDRAW::Warning_Box_(warning_text);
                             video::Set_Page_Back_();
                             raceopt::Draw_Race_Option_Background_();
@@ -561,7 +556,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                         raceopt::Calculate_Picks_();
 
                         if (raceopt::_negative_picks < -10) {
-                            KEN::Ken_Get_Text_Message_(0x4A, warning_text, 0x50);
+                            KEN::Ken_Get_Text_Message_(0x4A, warning_text, sizeof(warning_text));
                             GENDRAW::Warning_Box_(warning_text);
                             video::Set_Page_Back_();
                             raceopt::Draw_Race_Option_Background_();
@@ -619,7 +614,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
 
             if (input_id == raceopt::_accept) {
                 if (raceopt::_picks < 0) {
-                    KEN::Ken_Get_Text_Message_(0x4B, warning_text, 0x50);
+                    KEN::Ken_Get_Text_Message_(0x4B, warning_text, sizeof(warning_text));
                     GENDRAW::Warning_Box_(warning_text);
                     video::Set_Page_Back_();
                     raceopt::Draw_Race_Option_Background_();
@@ -652,7 +647,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                         }
 
                         popup_result = static_cast<int16_t>(
-                                popup_result + RACESEL::Flag_Screen_(reinterpret_cast<uint8_t*>(&player->color)));
+                                popup_result + RACESEL::Flag_Screen_((uint8_t*)&player->color));
 
                         if (popup_result != 1) {
                             break;
@@ -660,12 +655,12 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                     }
 
                     if (popup_result == 2) {
-                        FILE* race_file = fopen(s_lastrace_rac, s_wb_00551178);
+                        FILE* race_file = fopen("lastrace.rac", "wb");
                         if (race_file != nullptr) {
-                            fwrite(player->traits, 0x1F, 1, race_file);
-                            fwrite(&player->race, 1, 1, race_file);
+                            fwrite(player->traits, sizeof(player->traits), 1, race_file);
+                            fwrite(&player->race, sizeof(player->race), 1, race_file);
                             memcpy(player_race_name, raceopt::_cur_race_name, strlen(raceopt::_cur_race_name) + 1);
-                            fwrite(player_race_name, 0x0F, 1, race_file);
+                            fwrite(player_race_name, sizeof(player->race_name), 1, race_file);
                             fclose(race_file);
                         }
 
@@ -727,20 +722,19 @@ void __cdecl Draw_Naming_Popup_() {
   }
 }
 
-void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output) {
+void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output_text) {
     int16_t next_count = static_cast<int16_t>(*message_count + 1);
     *message_count = next_count;
 
     if (split_at_count == next_count) {
         if (next_count > 1) {
-            char local_50[80];
+            char separator_text[80];
 
-            // Potential bug: a 100-byte limit is passed for an 80-byte stack buffer.
-            KEN::Ken_Get_Text_Message_(0x68, local_50, 100);
-            strcat(output, local_50);
+            KEN::Ken_Get_Text_Message_(0x68, separator_text, sizeof(separator_text));
+            strcat(output_text, separator_text);
         }
     } else if (next_count > 1) {
-        strcat(output, DESIGN::s_comma_space);
+        strcat(output_text, DESIGN::s_comma_space);
     }
 }
 
@@ -757,21 +751,21 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
         s_RACENAME_LBX,
         0,
         MOX::_screen_seg,
-        static_cast<int32_t>(random::Random_(8)) + static_cast<int32_t>(race_idx) * 8 - 1,
+        (int32_t)random::Random_(8) + (int32_t)race_idx * 8 - 1,
         1,
-        0x14
+        sizeof(original_name)
     );
 
     strcpy(original_name, RACESEL::_temp_ruler_name);
 
-    KEN::Ken_Get_Text_Message_(0x6A, popup_text, 0x50);
+    KEN::Ken_Get_Text_Message_(0x6A, popup_text, sizeof(popup_text));
 
     const int16_t center_y = namestar::Star_Name_Popup_Screen_Center_Y_();
     const int16_t center_x = namestar::Star_Name_Popup_Screen_Center_X_();
 
     const int8_t popup_result = namestar::Input_Box_Popup_Animated_(
         RACESEL::_temp_ruler_name,
-        0x14,
+        sizeof(original_name),
         0x66,
         popup_text,
         center_x,
@@ -790,11 +784,8 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
 }
 
 void __cdecl Draw_Flag_Screen_() {
-    const int32_t unused_ebx = 0;
-    (void)unused_ebx;
-
     s_animation_header* animation =
-        (s_animation_header*)buffer::Buffer_Reload_(s_racesel_lbx_00557ff4, 0x20, MOX::_global_cache_seg); // TYPE MISMATCH: Buffer_Reload_ returns void*
+        (s_animation_header*)buffer::Buffer_Reload_(s_racesel_lbx_00557ff4, 0x20, MOX::_global_cache_seg);
 
     animate::Draw_(0x37, 0x43, animation);
 
@@ -807,7 +798,7 @@ void __cdecl Draw_Flag_Screen_() {
                 x_adjust = -1;
             }
 
-            animation = (s_animation_header*)buffer::Buffer_Reload_( // TYPE MISMATCH: Buffer_Reload_ returns void*
+            animation = (s_animation_header*)buffer::Buffer_Reload_(
                 s_racesel_lbx_00557ff4,
                 static_cast<int32_t>(race_index) + static_cast<int32_t>(RACESEL::_old_race) * 8 + 0x22,
                 cache_seg);
@@ -862,7 +853,7 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
                     static_cast<int16_t>(row_offset + 0x90),
                     static_cast<int16_t>(column_offset + 0xB3),
                     static_cast<int16_t>(row_offset + 0xF2),
-                    s__00551100,
+                    "",
                     0x29
                 );
             } else {
@@ -870,7 +861,7 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
             }
         }
 
-        cancel_field_id = fields::Add_Hot_Key_(s__00551120);
+        cancel_field_id = fields::Add_Hot_Key_("\x1B");
         const int16_t input_field_id = fields::Get_Input_();
 
         for (int16_t flag_index = 0; flag_index < 8; ++flag_index) {
@@ -888,7 +879,7 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
                     *selected_color = static_cast<uint8_t>(flag_index);
                     RACESEL::_color_flag[flag_index] = 1;
                 } else {
-                    KEN::Ken_Get_Text_Message_(0x69, message_text, 0x50);
+                    KEN::Ken_Get_Text_Message_(0x69, message_text, sizeof(message_text));
                     GENDRAW::Message_Box_(message_text);
                 }
             }
@@ -939,10 +930,10 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
     paragraph[0] = '\0';
 
     if (RACESEL::_custom_flag == 0) {
-        animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0x21, MOX::_global_cache_seg);
+        animation = (s_animation_header*)buffer::Buffer_Reload_("RACESEL.LBX", 0x21, MOX::_global_cache_seg);
         animate::Draw_(0x16e, 0x34, animation);
     } else {
-        animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0x1d, MOX::_global_cache_seg);
+        animation = (s_animation_header*)buffer::Buffer_Reload_("RACESEL.LBX", 0x1d, MOX::_global_cache_seg);
         animate::Draw_(0x16f, 0x30, animation);
     }
 
@@ -952,7 +943,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
         if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
             animation = (s_animation_header*)buffer::Buffer_Reload_(
-                    s_RACESEL_LBX,
+                    "RACESEL.LBX",
                     static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
                     MOX::_global_cache_seg);
             animate::Draw_Palette_(animation);
@@ -960,13 +951,13 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
     } else {
         if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
             animation = (s_animation_header*)buffer::Buffer_Reload_(
-                    s_RACESEL_LBX,
+                    "RACESEL.LBX",
                     static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
                     MOX::_global_cache_seg);
             animate::Draw_(0x36, 0x3f, animation);
         } else {
             fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
-            KEN::Ken_Get_Text_Message_(0x48, text_message, 100);
+            KEN::Ken_Get_Text_Message_(0x48, text_message, sizeof(text_message));
             BILL::_Print_Paragraph_(0x3c, 0xaf, 0x118, text_message, 2);
         }
     }
@@ -1051,7 +1042,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
         }
     }
 
-    animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0, MOX::_global_cache_seg);
+    animation = (s_animation_header*)buffer::Buffer_Reload_("RACESEL.LBX", 0, MOX::_global_cache_seg);
     animate::Draw_(0x30, 0x3a, animation);
 }
 

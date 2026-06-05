@@ -4,23 +4,6 @@
 
 namespace PLNTSUM {
 
-static const char s__00551100[1] = "";
-static const char s_plus[2] = "+";
-static const char s_minus[2] = "-";
-static const char s_space[2] = "\x1B";
-static const char s_C[2] = "C";
-static const char s_O[2] = "O";
-static const char s_1[2] = "1";
-static const char s_2[2] = "2";
-static const char s_3[2] = "3";
-static const char s_4[2] = "4";
-static const char s_5[2] = "5";
-
-static const char s_PLNTSUM_LBX_00556a54[12] = "PLNTSUM.LBX";
-static const char s_o_00556af4[2] = "o";
-static const char s_oc_00556af8[3] = "oc";
-static const char s_c_00556350[2] = "c";
-
 s_colors _hi_neutral_colors = {{0x40, 0xFF, 0x43, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 s_colors _red_colors = {{0xCF, 0xD3, 0xD2, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3}};
 s_colors _green_colors = {{0xDB, 0xDE, 0xDD, 0xDE, 0xDE, 0xDE, 0xDE, 0xDE}};
@@ -50,7 +33,7 @@ uint32_t DAT_0056583c;
 uint8_t DAT_00565840;
 
 int16_t _last_ship_moved;
-const char* PTR_s_PLNTSUM_LBX_00556AC0 = s_PLNTSUM_LBX_00556a54;
+const char* PTR_s_PLNTSUM_LBX_00556AC0 = "PLNTSUM.LBX";
 s_animation_header* _send_colony_ship_button_seg;
 s_animation_header* _send_outpost_ship_button_seg;
 
@@ -333,21 +316,21 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             0x197, // 407
             0xf,   // 15
             0x197, // 407
-            reinterpret_cast<short*>(MOX::_scroll_bar),
-            s__00551100,
+            (short*)MOX::_scroll_bar,
+            "",
             0
         );
     }
 
-    bool __cdecl Summary_Found_Colony_Ship_(short ship_index) {
-        if (_ship_summary[ship_index].colony_ship_idx != -1 && _ship_summary[ship_index].colony_available) {
+    bool __cdecl Summary_Found_Colony_Ship_(int16_t ship_summary_idx) {
+        if (_ship_summary[ship_summary_idx].colony_ship_idx != -1 && _ship_summary[ship_summary_idx].colony_available) {
             return true;
         }
         return false;
     }
 
-    bool __cdecl Summary_Found_Outpost_Ship_(short index) {
-        if (_ship_summary[index].outpost_ship_idx != -1 && _ship_summary[index].output_available) {
+    bool __cdecl Summary_Found_Outpost_Ship_(int16_t ship_summary_idx) {
+        if (_ship_summary[ship_summary_idx].outpost_ship_idx != -1 && _ship_summary[ship_summary_idx].output_available) {
             return true;
         }
         return false;
@@ -361,8 +344,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         return _found_outpost_ship != 0;
     }
 
-    bool __cdecl Planet_Is_Outpost_Planet_(short planet_idx) {
-        short colony_idx = MOX::_planet[planet_idx].colony_index;
+    bool __cdecl Planet_Is_Outpost_Planet_(int16_t planet_idx) {
+        int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
         if (colony_idx > -1) {
             return MOX::_colony[colony_idx].outpost_flag != 0;
@@ -376,7 +359,6 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         int16_t colony_index = MOX::_planet[planet_idx].colony_index;
 
         if (colony_index != -1) {
-            // colony_index of -1 (0xFFFF) indicates no colony or just an outpost
             owner_id = (int16_t)MOX::_colony[colony_index].owner;
         }
 
@@ -394,8 +376,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         return false;
     }
 
-    bool __cdecl Planet_In_Range_Of_A_Colony_(short planet_index) {
-        int8_t star_idx = MOX::_planet[planet_index].star_index;
+    bool __cdecl Planet_In_Range_Of_A_Colony_(int16_t planet_idx) {
+        int8_t star_idx = MOX::_planet[planet_idx].star_index;
         s_star_data* star = &MOX::_star[star_idx];
 
         return SHIPMOVE::Star_In_Extended_Range_Of_Player_(star, MOX::_PLAYER_NUM);
@@ -410,7 +392,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         return penalty > 0;
     }
 
-    bool __cdecl Planet_Is_Mineral_Scarce_(short planet_idx) {
+    bool __cdecl Planet_Is_Mineral_Scarce_(int16_t planet_idx) {
         if (MOX::_planet[planet_idx].mineral_class == MINERAL_RESOURCE_POOR || 
             MOX::_planet[planet_idx].mineral_class == MINERAL_RESOURCE_ULTRA_POOR) {
             return true;
@@ -418,7 +400,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         return false;
     }
 
-    bool __cdecl Planet_Has_Hostile_Environment_(short planet_idx) {
+    bool __cdecl Planet_Has_Hostile_Environment_(int16_t planet_idx) {
         return MOX::_planet[planet_idx].food_per_farmer <= 0;
     }
 
@@ -587,23 +569,23 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         int16_t y2 = y1 + icon_h;
 
         // Register the field and store its handle
-        *field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, s__00551100, 0);
+        *field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, "", 0);
     }
 
-    void __cdecl Add_Outpost_Ship_Icon_Field_(int16_t* field_id, int16_t row) {
+    void __cdecl Add_Outpost_Ship_Icon_Field_(int16_t* field_id, int16_t row_index) {
         s_animation_header* pic = _screen->pics[13];
         int16_t width = animate::Get_Width_(pic);
         int16_t height = animate::Get_Height_(pic);
 
         // Calculate top-left Y based on row index and animation height
-        int16_t y = (row * 55 - height) + 84;
+        int16_t y = (row_index * 55 - height) + 84;
 
         *field_id = fields::Add_Hidden_Field_(
             102,
             y,
             width + 102,
             y + height,
-            s__00551100,
+            "",
             0
         );
     }
@@ -687,24 +669,24 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     void __cdecl Add_Plntsum_Fields_() {
-        _screen->buttons[0] = fields::Add_Multi_Button_Field_(441, 200, s__00551100, _screen->pics[1], &_sort_choice, 0, s__00551100, 41);
-        _screen->buttons[1] = fields::Add_Multi_Button_Field_(501, 200, s__00551100, _screen->pics[2], &_sort_choice, 1, s__00551100, 41);
-        _screen->buttons[2] = fields::Add_Multi_Button_Field_(567, 200, s__00551100, _screen->pics[3], &_sort_choice, 2, s__00551100, 41);
+        _screen->buttons[0] = fields::Add_Multi_Button_Field_(441, 200, "", _screen->pics[1], &_sort_choice, 0, "", 41);
+        _screen->buttons[1] = fields::Add_Multi_Button_Field_(501, 200, "", _screen->pics[2], &_sort_choice, 1, "", 41);
+        _screen->buttons[2] = fields::Add_Multi_Button_Field_(567, 200, "", _screen->pics[3], &_sort_choice, 2, "", 41);
 
-        _screen->buttons[3] = fields::Add_Radio_Button_Field_(441, 266, s__00551100, _screen->pics[4], &_filter_out_enemy_controlled_planets, s_1, 41);
-        _screen->buttons[4] = fields::Add_Radio_Button_Field_(441, 289, s__00551100, _screen->pics[5], &_filter_out_adverse_gravity_planets, s_2, 41);
-        _screen->buttons[5] = fields::Add_Radio_Button_Field_(441, 312, s__00551100, _screen->pics[6], &_filter_out_hostile_environment_planets, s_3, 41);
-        _screen->buttons[6] = fields::Add_Radio_Button_Field_(441, 335, s__00551100, _screen->pics[7], &_filter_out_mineral_scarcity_planets, s_4, 41);
-        _screen->buttons[7] = fields::Add_Radio_Button_Field_(441, 358, s__00551100, _screen->pics[8], &_filter_out_planets_out_of_range, s_5, 41);
+        _screen->buttons[3] = fields::Add_Radio_Button_Field_(441, 266, "", _screen->pics[4], &_filter_out_enemy_controlled_planets, "1", 41);
+        _screen->buttons[4] = fields::Add_Radio_Button_Field_(441, 289, "", _screen->pics[5], &_filter_out_adverse_gravity_planets, "2", 41);
+        _screen->buttons[5] = fields::Add_Radio_Button_Field_(441, 312, "", _screen->pics[6], &_filter_out_hostile_environment_planets, "3", 41);
+        _screen->buttons[6] = fields::Add_Radio_Button_Field_(441, 335, "", _screen->pics[7], &_filter_out_mineral_scarcity_planets, "4", 41);
+        _screen->buttons[7] = fields::Add_Radio_Button_Field_(441, 358, "", _screen->pics[8], &_filter_out_planets_out_of_range, "5", 41);
 
         if (Send_Colony_Button_Selectable_()) {
-            _screen->buttons[8] = fields::Add_Hidden_Field_(386, 408, 609, 413, s_C, 41);
+            _screen->buttons[8] = fields::Add_Hidden_Field_(386, 408, 609, 413, "C", 41);
         } else {
             _screen->buttons[8] = -1000;
         }
 
         if (Send_Outpost_Button_Selectable_()) {
-            _screen->buttons[9] = fields::Add_Hidden_Field_(413, 437, 610, 442, s_O, 41);
+            _screen->buttons[9] = fields::Add_Hidden_Field_(413, 437, 610, 442, "O", 41);
         } else {
             _screen->buttons[9] = -1000;
         }
@@ -728,33 +710,41 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         for (int i = 0; i < 8; ++i) {
             int16_t y1 = _plntscrn_delta_y[i] + 36;
-            _screen->fields[i] = fields::Add_Hidden_Field_(18, y1, 414, y1 + 50, s__00551100, 41);
+            _screen->fields[i] = fields::Add_Hidden_Field_(18, y1, 414, y1 + 50, "", 41);
         }
 
-        _screen->up_button = fields::Add_Button_Field_(422, 16, s__00551100, _screen->pics[9], s_minus, 40);
-        _screen->dn_button = fields::Add_Button_Field_(421, 448, s__00551100, _screen->pics[10], s_plus, 40);
+        _screen->up_button = fields::Add_Button_Field_(422, 16, "", _screen->pics[9], "-", 40);
+        _screen->dn_button = fields::Add_Button_Field_(421, 448, "", _screen->pics[10], "+", 40);
 
         Add_PlntSum_Galaxy_Map_Fields_(_screen->planet_icons);
         Add_Planet_Summary_Bar_Field_();
 
-        _screen->esc_button = fields::Add_Button_Field_(454, 440, s__00551100, _screen->pics[11], s_space, 40);
+        _screen->esc_button = fields::Add_Button_Field_(
+            454,
+            440,
+            "",
+            _screen->pics[11],
+            /* Preserves the raw 0x1B control byte token used by the original field wiring. */
+            "\x1B",
+            40
+        );
 
         MOX::_scroll_bar->up_btn = _screen->up_button;
         MOX::_scroll_bar->dn_btn = _screen->dn_button;
     }
 
     void __cdecl Allocate_Space_For_Summary_Screen_() {
-        _planet_summary = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2760);
-        memset(_planet_summary, 0xFF, 0x2760);
+        _planet_summary = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_planet_summary) * 360);
+        memset(_planet_summary, 0xFF, sizeof(*_planet_summary) * 360);
 
-        _screen = (s_plntsum_screen*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x115);
-        memset(_screen, 0, 0x115);
+        _screen = (s_plntsum_screen*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_screen));
+        memset(_screen, 0, sizeof(*_screen));
 
-        _ship_summary = (s_plntsum_ship*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xFA0);
-        memset(_ship_summary, 0xFF, 0xFA0);
+        _ship_summary = (s_plntsum_ship*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_summary) * 500);
+        memset(_ship_summary, 0xFF, sizeof(*_ship_summary) * 500);
 
-        MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1D);
-        memset(MOX::_scroll_bar, 0, 0x1D);
+        MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*MOX::_scroll_bar));
+        memset(MOX::_scroll_bar, 0, sizeof(*MOX::_scroll_bar));
     }
 
     void __cdecl Load_Planet_Summary_Pictures_(void) {
@@ -901,9 +891,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
     void Build_Ship_Summary_() {
         _n_ships_in_summary = 0;
-        // Clears the whole summary buffer (500 entries of 8 bytes = 4000 bytes)
-        memset(_ship_summary, 0xFF, 4000);
-        // Clears star reachability flags (18 entries of 4 bytes = 72 bytes)
+        memset(_ship_summary, 0xFF, sizeof(*_ship_summary) * 500);
         memset(_can_reach_star, 0, sizeof(_can_reach_star));
 
         _found_colony_ship = 0;
@@ -968,11 +956,10 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         int16_t original_count = *summary_count;
         allocate::Push_Block_(MOX::_screen_seg);
 
-        // Allocate buffer for 360 planets (0x2760 / 28 bytes)
-        s_plntsum_planet* temp_buffer = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2760);
+        s_plntsum_planet* temp_buffer =
+            (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*temp_buffer) * 360);
 
-        // Initialize temp buffer with 0xFF (sets all shorts to -1)
-        memset(temp_buffer, 0xFF, 0x2760);
+        memset(temp_buffer, 0xFF, sizeof(*temp_buffer) * 360);
 
         *summary_count = 0;
 
@@ -1034,7 +1021,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         // If the count of visible planets changed, update the global summary
         if (*summary_count != original_count) {
-            memcpy(PLNTSUM::_planet_summary, temp_buffer, 0x2760);
+            memcpy(PLNTSUM::_planet_summary, temp_buffer, sizeof(*temp_buffer) * 360);
             PLNTSUM::Sort_Planet_Summary_();
             MOX::_scanned_field = -1;
         }
@@ -1042,7 +1029,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         allocate::Pop_Block_(MOX::_screen_seg);
     }
 
-    int16_t __cdecl Planet_Summary_List_Id_(int16_t param_1) {
+    int16_t __cdecl Planet_Summary_List_Id_(int16_t planet_idx) {
         int16_t result = -1;
         int16_t total_rows = MOX::_scroll_bar->total_rows;
 
@@ -1052,7 +1039,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     break;
                 }
 
-                if (PLNTSUM::_planet_summary[i].explored == param_1) {
+                if (PLNTSUM::_planet_summary[i].explored == planet_idx) {
                     result = i;
                 }
             }
@@ -1205,34 +1192,33 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     int __cdecl qsort_by_climate_(const void* a, const void* b) {
-        auto param_1 = static_cast<const s_plntsum_planet*>(a);
-        auto param_2 = static_cast<const s_plntsum_planet*>(b);
-        return (int)param_2->climate - (int)param_1->climate;
+        const s_plntsum_planet* lhs = (const s_plntsum_planet*)a;
+        const s_plntsum_planet* rhs = (const s_plntsum_planet*)b;
+        return (int)rhs->climate - (int)lhs->climate;
     }
 
     int __cdecl qsort_by_minerals_(const void* a, const void* b) {
-        auto param_1 = static_cast<const s_plntsum_planet*>(a);
-        auto param_2 = static_cast<const s_plntsum_planet*>(b);
-        // Sorts in descending order based on minerals
-        return (int)param_2->minerals - (int)param_1->minerals;
+        const s_plntsum_planet* lhs = (const s_plntsum_planet*)a;
+        const s_plntsum_planet* rhs = (const s_plntsum_planet*)b;
+        return (int)rhs->minerals - (int)lhs->minerals;
     }
 
     int __cdecl qsort_by_max_population_(const void* a, const void* b) {
-        auto planet1 = static_cast<const s_plntsum_planet*>(a);
-        auto planet2 = static_cast<const s_plntsum_planet*>(b);
-        return (int)planet2->max_pop - (int)planet1->max_pop;
+        const s_plntsum_planet* lhs = (const s_plntsum_planet*)a;
+        const s_plntsum_planet* rhs = (const s_plntsum_planet*)b;
+        return (int)rhs->max_pop - (int)lhs->max_pop;
     }
 
     void __cdecl Sort_Planet_Summary_() {
         switch (_sort_choice) {
             case 0:
-                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_climate_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, sizeof(*_planet_summary), qsort_by_climate_);
                 break;
             case 1:
-                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_minerals_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, sizeof(*_planet_summary), qsort_by_minerals_);
                 break;
             case 2:
-                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_max_population_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, sizeof(*_planet_summary), qsort_by_max_population_);
                 break;
             default:
                 break;
@@ -1248,7 +1234,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             for (short j = 0; j < (short)MOX::_NUM_STARS; ++j) {
                 short x, y;
                 MOVEBOX::Get_Galaxy_Map_Star_XY_(j, 443, 17, 180, 116, 0, 0, 0, &x, &y);
-                fields_array[j] = fields::Add_Hidden_Field_(x, y, x + 5, y + 5, s__00551100, 41);
+                fields_array[j] = fields::Add_Hidden_Field_(x, y, x + 5, y + 5, "", 41);
             }
         }
     }
@@ -1306,9 +1292,9 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                             MOX::_scanned_field = star_idx + 1000 /* 0x3E8 */;
                             int16_t target_id = -1;
                             if (PLNTSUM::_send_choice == 0) {
-                                target_id = *reinterpret_cast<int16_t*>(&PLNTSUM::_planet_summary[current_row].best_colony_ship_idx);
+                                target_id = PLNTSUM::_planet_summary[current_row].best_colony_ship_idx;
                             } else if (PLNTSUM::_send_choice == 1) {
-                                target_id = *reinterpret_cast<int16_t*>(&PLNTSUM::_planet_summary[current_row].best_outpost_ship_idx);
+                                target_id = PLNTSUM::_planet_summary[current_row].best_outpost_ship_idx;
                             }
 
                             if (target_id != -1) {
@@ -1556,7 +1542,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
         const char* heading_raw = HAROLD::H_Message_(heading_msg_id);
         strcpy(buffer1, heading_raw);
 
-        const char* eta_param = (MOX::_g_ship_move_info.turns_left == 0) ? s__00551100 : eta_str;
+        const char* eta_param = (MOX::_g_ship_move_info.turns_left == 0) ? "" : eta_str;
         char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
 
         sprintf(buffer2, buffer1, planet_name, &MOX::_star[star_id], eta_param);
@@ -1570,7 +1556,8 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
     }
 }
 
-void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t colony, int8_t outpost) {
+void __cdecl Print_Colony_Outpost_Marker_(int16_t x, int16_t y, int16_t ship_summary_idx, int8_t colony, int8_t outpost) {
+    (void)ship_summary_idx;
     s_colors inactive_colors;
     s_colors active_colors;
 
@@ -1603,30 +1590,30 @@ void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t 
             if (PLNTSUM::_send_choice == 1) {
                 fonts::Set_Font_Style_(0, &active_colors);
                 int16_t bottom = fonts::Get_Font_Height_() + cur_y;
-                int16_t right = fonts::Get_String_Width_(s_oc_00556af8) + cur_x;
+                int16_t right = fonts::Get_String_Width_("oc") + cur_x;
                 graphics::Fill_(cur_x, cur_y, right, bottom, 1);
-                fonts::Print_(cur_x, cur_y, s_o_00556af4);
+                fonts::Print_(cur_x, cur_y, "o");
                 fonts::Set_Font_Style_(0, &inactive_colors);
-                int16_t text_x = fonts::Get_String_Width_(s_o_00556af4) + cur_x;
-                fonts::Print_(text_x, cur_y, s_c_00556350);
+                int16_t text_x = fonts::Get_String_Width_("o") + cur_x;
+                fonts::Print_(text_x, cur_y, "c");
                 return;
             }
 
             if (PLNTSUM::_send_choice == 0) {
                 fonts::Set_Font_Style_(0, &inactive_colors);
                 int16_t bottom = fonts::Get_Font_Height_() + cur_y;
-                int16_t right = fonts::Get_String_Width_(s_oc_00556af8) + cur_x;
+                int16_t right = fonts::Get_String_Width_("oc") + cur_x;
                 graphics::Fill_(cur_x, cur_y, right, bottom, 1);
-                fonts::Print_(cur_x, cur_y, s_o_00556af4);
+                fonts::Print_(cur_x, cur_y, "o");
                 fonts::Set_Font_Style_(0, &active_colors);
-                int16_t text_x = fonts::Get_String_Width_(s_o_00556af4) + cur_x;
-                fonts::Print_(text_x, cur_y, s_c_00556350);
+                int16_t text_x = fonts::Get_String_Width_("o") + cur_x;
+                fonts::Print_(text_x, cur_y, "c");
                 return;
             }
         }
 
         fonts::Set_Font_Style_(0, &inactive_colors);
-        fonts::Print_(cur_x, cur_y, s_oc_00556af8);
+        fonts::Print_(cur_x, cur_y, "oc");
     } else if (outpost != 0) {
         int16_t cur_x = x + 6;
         int16_t cur_y = y - 1;
@@ -1634,13 +1621,13 @@ void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
             fonts::Set_Font_Style_(0, &active_colors);
             int16_t bottom = fonts::Get_Font_Height_() + cur_y;
-            int16_t right = fonts::Get_String_Width_(s_o_00556af4) + cur_x;
+            int16_t right = fonts::Get_String_Width_("o") + cur_x;
             graphics::Fill_(cur_x, cur_y, right, bottom, 1);
         } else {
             fonts::Set_Font_Style_(0, &inactive_colors);
         }
 
-        fonts::Print_(cur_x, cur_y, s_o_00556af4);
+        fonts::Print_(cur_x, cur_y, "o");
     } else if (colony != 0) {
         int16_t cur_x = x + 6;
         int16_t cur_y = y - 1;
@@ -1648,13 +1635,13 @@ void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
             fonts::Set_Font_Style_(0, &active_colors);
             int16_t bottom = fonts::Get_Font_Height_() + cur_y;
-            int16_t right = fonts::Get_String_Width_(s_c_00556350) + cur_x;
+            int16_t right = fonts::Get_String_Width_("c") + cur_x;
             graphics::Fill_(cur_x, cur_y, right, bottom, 1);
         } else {
             fonts::Set_Font_Style_(0, &inactive_colors);
         }
 
-        fonts::Print_(cur_x, cur_y, s_c_00556350);
+        fonts::Print_(cur_x, cur_y, "c");
     }
 }
 
@@ -1982,7 +1969,10 @@ void Planet_Summary_Screen_() {
     MOX::_scroll_bar->type = 2;
     MOX::_scroll_bar->row_step = 1;
 
-    _p_rotating_planet = reinterpret_cast<s_animation_header**>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 200 /* 0xc8 */));
+    _p_rotating_planet = (s_animation_header**)allocate::Allocate_Next_Block_(
+        MOX::_screen_seg,
+        sizeof(*_p_rotating_planet) * 50
+    );
     Load_Planet_Pictures_();
     Determine_Button_Status_();
 
@@ -2131,12 +2121,12 @@ void Planet_Summary_Screen_() {
     fields::Set_Field_Outline_Color_(10);
 }
 
-s_animation_header* __cdecl Load_Planet_Segment_(int16_t param_1) {
+s_animation_header* __cdecl Load_Planet_Segment_(int16_t planet_anim_idx) {
     allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
 
     s_animation_header* segment = (s_animation_header*)farload::Far_Reload_Next_(
         PTR_s_PLNTSUM_LBX_00556AC0,
-        static_cast<int32_t>(static_cast<int16_t>(param_1 + 0x1A)),
+        (int32_t)(int16_t)(planet_anim_idx + 0x1A),
         MOX::_screen_seg
     );
 
@@ -2145,7 +2135,8 @@ s_animation_header* __cdecl Load_Planet_Segment_(int16_t param_1) {
     return segment;
 }
 
-void __cdecl Draw_Colony_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {
+void __cdecl Draw_Colony_ETA_(int16_t unused_planet_sum_idx, int16_t scroll_idx) {
+    (void)unused_planet_sum_idx;
     int16_t width = animate::Get_Width_(_screen->pics[13]);
     int16_t height = animate::Get_Height_(_screen->pics[13]);
 
@@ -2181,19 +2172,20 @@ int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx) {
     return 0;
 }
 
-void __cdecl Draw_Outpost_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {
+void __cdecl Draw_Outpost_ETA_(int16_t unused_planet_sum_idx, int16_t scroll_idx) {
+    (void)unused_planet_sum_idx;
     int16_t height = animate::Get_Height_(_screen->pics[13]);
     int16_t y = _plntscrn_delta_y[scroll_idx] - height + 0x54;
     animate::Draw_(0x12, y, _screen->pics[13]);
 }
 
-void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char param_3) {
+void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, int8_t highlight_type) {
     uint8_t local_1;
 
     if (colony_idx != -1) {
-        Player_Colors_(MOX::_colony[colony_idx].owner, colors, param_3, &local_1);
+        Player_Colors_(MOX::_colony[colony_idx].owner, colors, highlight_type, &local_1);
     } else {
-        Player_Colors_(-1, colors, param_3, &local_1);
+        Player_Colors_(-1, colors, highlight_type, &local_1);
     }
 }
 

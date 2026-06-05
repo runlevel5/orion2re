@@ -3,7 +3,7 @@
 extern uint8_t g_ten_game_number;
 extern int16_t g_cached_mouse_x;
 extern int16_t g_cached_mouse_y;
-extern int g_window_focus_state;
+extern int32_t g_window_focus_state;
 extern uint32_t g_last_scan_code;
 
 namespace platform {
@@ -18,9 +18,6 @@ namespace platform {
 	extern HANDLE g_worker_thread_handle;
 	extern uint32_t _updating_cursor_img;
 	extern uint8_t g_should_exit;
-
-	// Fixed string literal "/ten=" used for pattern matching.
-	extern const char s_slash_ten[6];
 
 	extern LPDIRECTDRAW g_direct_draw;
 
@@ -42,7 +39,7 @@ namespace platform {
 
 	extern LPDIRECTDRAWSURFACE g_cursor_surface_2;
 
-	extern LPVOID _cursor_surface;
+	extern uint8_t* _cursor_surface;
 
 	extern uint32_t DAT_00578e20;
 
