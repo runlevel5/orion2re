@@ -6,12 +6,12 @@ namespace SMACK {
     int16_t _smack_x;
     int16_t _smack_y;
 
-    void __cdecl Smack_Fade_(int16_t mode) {
+    void __cdecl Smack_Fade_(int16_t fade_mode) {
         int16_t fade_step;
         int16_t palette_level;
         int16_t fade_percent;
 
-        if (mode == 3) {
+        if (fade_mode == 3) {
             fade_step = -10;
             fade_percent = ERIC::Get_Fade_Percent_();
             palette_level = 100;
@@ -29,9 +29,9 @@ namespace SMACK {
 
         do {
             if (palette_level >= 0 && palette_level < 100) {
-                palstore::Darken_Palette_(static_cast<int>(palette_level));
+                palstore::Darken_Palette_((int)palette_level);
             }
-            palette_level = static_cast<int16_t>(palette_level + fade_step);
+            palette_level = (int16_t)(palette_level + fade_step);
         } while (palette_level != 110 && palette_level != -10);
 
         palette::Clear_Palette_Changes_(0, 0xff);
@@ -73,14 +73,14 @@ namespace SMACK {
         smckplay::Open_Smacker_Animation_(smacker_name, MOX::_settings.music_on, play_flags);
 
         animation_width = smckplay::Get_Smacker_Animation_Width_();
-        SMACK::_smack_x = static_cast<int16_t>((0x280 - animation_width) / 2);
+        SMACK::_smack_x = (int16_t)((0x280 - animation_width) / 2);
 
         animation_height = smckplay::Get_Smacker_Animation_Height_();
         if ((play_flags & 0x100000U) == 0) {
-            SMACK::_smack_y = static_cast<int16_t>((0x1e0 - animation_height) / 2);
+            SMACK::_smack_y = (int16_t)((0x1e0 - animation_height) / 2);
         }
         else {
-            SMACK::_smack_y = static_cast<int16_t>((0x1e0 - animation_height) / 4);
+            SMACK::_smack_y = (int16_t)((0x1e0 - animation_height) / 4);
         }
 
         if (use_fade == 1) {
@@ -132,9 +132,9 @@ namespace SMACK {
         }
 
         smckplay::Close_Smacker_Animation_();
-        MOX::_global_cache_seg = reinterpret_cast<void*>(buffer::Allocate_Buffer_Space_(MOX::_global_cache_size));
+        MOX::_global_cache_seg = (void*)buffer::Allocate_Buffer_Space_(MOX::_global_cache_size);
         RUSS::Mox_Update_();
-        JIM::_jim_current_stream = static_cast<uint16_t>(-1);
+        JIM::_jim_current_stream = (uint16_t)-1;
         JIM::Play_Background_Music_();
 
         if (use_fade == 0) {

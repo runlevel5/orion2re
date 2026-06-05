@@ -2,6 +2,9 @@
 #include <cstring>
 
 namespace SHIPMOVE {
+    /**
+     * Reserves available ship slots for Antarans and players based on current production demand.
+     */
     void __cdecl Allocate_New_Ship_Slots_() {
         int antaran_max_slots = 0;
         for (int i = 0; i < 9; ++i) {
@@ -139,11 +142,11 @@ namespace SHIPMOVE {
         }
 
         // Calculate the index of the input star in the star array
-        int16_t star_idx = static_cast<int16_t>(star - MOX::_star);
+        int16_t star_idx = (int16_t)(star - MOX::_star);
         // dist is scaled by 30 pixels per unit (30^2 = 900)
-        int32_t dist_sq_limit = static_cast<int32_t>(dist) * dist * 900;
+        int32_t dist_sq_limit = (int32_t)dist * dist * 900;
 
-        for (int i = 0; i < static_cast<int>(MOX::_NUM_STARS); ++i) {
+        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
             s_star_data* current_star = &MOX::_star[i];
 
             // Check if player_idx bit is set in has_colony bitmask
@@ -172,7 +175,7 @@ namespace SHIPMOVE {
      */
     bool __cdecl Star_In_Range_Of_Player_Aux2_(s_star_data* star, int16_t player_idx, int16_t dist) {
         // Check if player has a colony in this star system
-        if ((star->has_colony >> (static_cast<uint8_t>(player_idx) & 0x1F)) & 1) {
+        if ((star->has_colony >> ((uint8_t)player_idx & 0x1F)) & 1) {
             return true;
         }
 
@@ -185,7 +188,7 @@ namespace SHIPMOVE {
         if (star->wormhole_star_id != -1) {
             s_star_data* wormhole_star = &MOX::_star[star->wormhole_star_id];
 
-            if ((wormhole_star->visited >> (static_cast<uint8_t>(player_idx) & 0x1F)) & 1) {
+            if ((wormhole_star->visited >> ((uint8_t)player_idx & 0x1F)) & 1) {
                 if (Star_In_Range_Of_Player_Aux1_(wormhole_star, player_idx, dist)) {
                     return true;
                 }
@@ -211,9 +214,7 @@ namespace SHIPMOVE {
      * The extended range is calculated as 150% of the player's standard ship range.
      */
     bool __cdecl Star_In_Extended_Range_Of_Player_(s_star_data* star, int16_t player_idx) {
-        // The standard ship range is multiplied by 3 and divided by 2.
-        // The assembly uses a standard signed division sequence (CDQ, SUB, SAR) to truncate towards zero.
-        int16_t extended_range = static_cast<int16_t>((MOX::_player[player_idx].ship_range * 3) / 2);
+        int16_t extended_range = (int16_t)((MOX::_player[player_idx].ship_range * 3) / 2);
 
         return Star_In_Range_Of_Player_(star, player_idx, extended_range);
     }
@@ -243,12 +244,8 @@ namespace SHIPMOVE {
     }
 
     /**
-     * Determines if a ship can receive orders, based on its status and player's communications technology.
-     * @param ship The ship to check.
-     * @return True if the ship can be ordered.
-     */
-    /**
-     * @address 00436b40
+     * Returns whether the ship is currently travelling between stars.
+     * @param ship Ship record to inspect.
      */
     bool __cdecl Ship_Is_Moving_(s_ship_data* ship) {
         if (ship->status >= 1 && ship->status <= 2) {
@@ -311,7 +308,8 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 00435fc0
+     * Returns the ship's travel range, including the extended-range special when present.
+     * @param ship Ship record to inspect.
      */
     int16_t __cdecl Ship_Range_(s_ship_data* ship) {
         if (ship->owner >= 8) {
@@ -328,7 +326,8 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 00437260
+     * Returns the destination star index encoded in the ship's current location field.
+     * @param ship Ship record to inspect.
      */
     int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship) {
         int16_t location = ship->location;
@@ -345,7 +344,11 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 00436e30
+     * Creates a non-player ship in the first available slot and returns its index.
+     * @param owner Owner slot to assign.
+     * @param design Optional design to copy into the new ship.
+     * @param x Initial x-coordinate.
+     * @param y Initial y-coordinate.
      */
     int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y) {
         int16_t i;
@@ -391,11 +394,11 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 00436b60
+     * Advances each moving ship by one turn and finalizes any arrivals.
      */
     void __cdecl Move_All_Ships_Toward_Stars_() {
-        int8_t local_8;
-        int8_t local_7;
+        int8_t unused_navigator_flag;
+        int8_t unused_direction;
 
         if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
             for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
@@ -427,8 +430,8 @@ namespace SHIPMOVE {
                         (uint16_t)(uint8_t)ship->travelling_speed,
                         &ship->x,
                         &ship->y,
-                        (ship->group_has_navigator == 0) ? &local_8 : nullptr,
-                        &local_7
+                        (ship->group_has_navigator == 0) ? &unused_navigator_flag : nullptr,
+                        &unused_direction
                     );
                 }
 
@@ -447,23 +450,30 @@ namespace SHIPMOVE {
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
     }
 
-    void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_id, s_ship_move_info* move_info) {
-        int8_t status;
+    /**
+     * Applies a prepared movement plan to each ship in the list.
+     * @param ship_list Sentinel-terminated ship index list.
+     * @param destination_star_idx Destination star index before location encoding.
+     * @param move_info Precomputed movement result to apply.
+     */
+    void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_star_idx, s_ship_move_info* move_info) {
+        int8_t move_status;
         bool colony_flag_needed = false;
         int i = 0;
+        int16_t destination_location = destination_star_idx;
 
         if (move_info->turns_left == 0) {
-            status = 0;
+            move_status = 0;
         } else {
             int16_t first_ship_idx = ship_list[0];
             int16_t first_loc = MOX::_ship[first_ship_idx].location;
 
             if (first_loc < 72 || first_loc >= 1000) {
-                status = 2;
-                destination_id += 1000;
+                move_status = 2;
+                destination_location += 1000;
             } else {
-                status = 1;
-                destination_id += 500;
+                move_status = 1;
+                destination_location += 500;
             }
         }
 
@@ -477,11 +487,11 @@ namespace SHIPMOVE {
                 }
             }
 
-            ship->location = destination_id;
+            ship->location = destination_location;
             ship->turns_left = move_info->turns_left;
             ship->group_has_navigator = move_info->has_navigator;
             ship->travelling_speed = move_info->traveling_speed;
-            ship->status = status;
+            ship->status = move_status;
 
             i++;
         }
@@ -492,10 +502,10 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 00437750
+     * Clears the just_built flag on AI-controlled ships.
      */
     void __cdecl Unmark_Just_Built_AI_Ships_() {
-        int32_t num_ships = static_cast<int32_t>(MOX::_NUM_SHIPS);
+        int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
         s_ship_data* ship_array = MOX::_ship;
 
         for (int32_t i = 0; i < num_ships; ++i) {
@@ -503,14 +513,16 @@ namespace SHIPMOVE {
 
             // AI players (owner 0-7) who aren't the primary human player (objectives != 100)
             // have their just_built flag cleared.
-            if (ship.owner < 8 && MOX::_player[static_cast<int32_t>(ship.owner)].objectives != 100) {
+            if (ship.owner < 8 && MOX::_player[(int32_t)ship.owner].objectives != 100) {
                 ship.just_built = 0;
             }
         }
     }
 
     /**
-     * @address 00436cd0
+     * Finalizes a ship's arrival at a star and updates related visibility state.
+     * @param ship Ship record to update.
+     * @param star_idx Destination star index.
      */
     void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx) {
         ship->location = (short)star_idx;
@@ -546,22 +558,24 @@ namespace SHIPMOVE {
         if (owner < 8) {
             REPORT::_something_interesting_happened[owner] = 1;
 
-            // Check if player's objective is to defend Orion
-            if (MOX::_player[owner].objectives == 100 /* 'd' */) {
+            if (MOX::_player[owner].objectives == 100) {
                 MOX::_star[star_idx].not_used3 = 0;
             }
         }
     }
 
     /**
-     * @address 004363e0
+     * Evaluates whether the listed ships can move to the target star and fills out move_info.
+     * @param ship_list Sentinel-terminated ship index list.
+     * @param target_star_idx Destination star index.
+     * @param move_info Output movement analysis record.
      */
     void __cdecl Ships_Try_To_Move_To_(int16_t* ship_list, int16_t target_star_idx, s_ship_move_info* move_info) {
         int16_t start_x = 0;
         int16_t start_y = 0;
         int32_t navigator_bonus = 0;
         int32_t min_range = 30000;
-        int8_t first_ship_flag = 0;
+        int8_t have_start_position = 0;
         int8_t player_idx;
         int32_t ship_speed;
 
@@ -604,8 +618,8 @@ namespace SHIPMOVE {
                 }
             }
 
-            if (first_ship_flag == 0) {
-                first_ship_flag = 1;
+            if (have_start_position == 0) {
+                have_start_position = 1;
                 start_x = ship->x;
                 start_y = ship->y;
             }
@@ -678,8 +692,8 @@ namespace SHIPMOVE {
                 }
 
                 while (cur_x != target_star->x || cur_y != target_star->y) {
-                    int8_t dummy_dir;
-                    int8_t dummy_nav_flag;
+                    int8_t unused_direction;
+                    int8_t unused_navigator_flag;
                     turn_count++;
                     GEO::Move_Player_1_Turn_To_Star_(
                         (uint8_t)player_idx, 
@@ -689,8 +703,8 @@ namespace SHIPMOVE {
                         (int16_t)base_speed, 
                         &cur_x, 
                         &cur_y, 
-                        (navigator_bonus == 0) ? &dummy_nav_flag : nullptr,
-                        &dummy_dir
+                        (navigator_bonus == 0) ? &unused_navigator_flag : nullptr,
+                        &unused_direction
                     );
                 }
                 move_info->turns_left = turn_count;
@@ -729,6 +743,10 @@ namespace SHIPMOVE {
         }
     }
 
+    /**
+     * Recomputes ETAs for moving ships that do not belong to the specified player.
+     * @param player_id Player index to exclude from the update.
+     */
     void __cdecl Update_Ship_ETAs_(int16_t player_id) {
         int num_ships = (int)MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
@@ -748,8 +766,8 @@ namespace SHIPMOVE {
                 int16_t current_y = ship->y;
                 uint8_t turn_count = 0;
 
-                int8_t local_a;
-                int8_t local_9;
+                int8_t unused_navigator_flag;
+                int8_t unused_direction;
 
                 // Simulate movement turn by turn until destination is reached
                 while (current_x != target_x || current_y != target_y) {
@@ -757,7 +775,7 @@ namespace SHIPMOVE {
 
                     int8_t* navigator_ptr = nullptr;
                     if (ship->group_has_navigator == 0) {
-                        navigator_ptr = &local_a;
+                        navigator_ptr = &unused_navigator_flag;
                     }
 
                     GEO::Move_Player_1_Turn_To_Star_(
@@ -769,7 +787,7 @@ namespace SHIPMOVE {
                         &current_x,
                         &current_y,
                         navigator_ptr,
-                        &local_9
+                        &unused_direction
                     );
                 }
 
@@ -779,7 +797,7 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 004377d0
+     * Clears ignore-combat flags from stars where no opposing force remains.
      */
     void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
         uint16_t presence_mask[72]; // Tracks which players have assets at each star
@@ -828,18 +846,17 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 004368e0
-     */
-    /**
-     * @address 00437910
+     * Returns whether the player has an orbiting ship at a star colonized only by another player.
+     * @param player_idx Player whose ships are checked.
+     * @param colony_bit_idx Colony-owner bit to test for.
      */
     bool __cdecl Player_Has_Ships_Pestering_Other_Player_(int player_idx, uint8_t colony_bit_idx) {
         s_ship_data* ship = MOX::_ship;
-        s_ship_data* ship_end = MOX::_ship + static_cast<int16_t>(MOX::_NUM_SHIPS);
+        s_ship_data* ship_end = MOX::_ship + (int16_t)MOX::_NUM_SHIPS;
 
         for (; ship < ship_end; ++ship) {
-            if (static_cast<int8_t>(ship->owner) == player_idx && ship->status == 0) {
-                int32_t star_idx = static_cast<int16_t>(ship->location);
+            if ((int8_t)ship->owner == player_idx && ship->status == 0) {
+                int32_t star_idx = (int16_t)ship->location;
                 uint8_t colony_mask = MOX::_star[star_idx].has_colony;
 
                 if (((colony_mask >> (colony_bit_idx & 0x1f)) & 1) != 0 &&
@@ -852,6 +869,12 @@ namespace SHIPMOVE {
         return false;
     }
 
+    /**
+     * Returns the number of turns the player needs to travel between two stars.
+     * @param player_idx Player whose travel rules are used.
+     * @param start_star_idx Starting star index.
+     * @param end_star_idx Destination star index.
+     */
     int16_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star_idx, int16_t end_star_idx) {
         if (start_star_idx == end_star_idx) {
             return 0;
@@ -872,7 +895,7 @@ namespace SHIPMOVE {
             return 1;
         }
 
-        short speed = MOX::_player[player_idx].ship_speed;
+        int16_t speed = MOX::_player[player_idx].ship_speed;
         bool is_jumpgate_used = false;
 
         // Check jumpgate connectivity (player bitmask)
@@ -899,8 +922,8 @@ namespace SHIPMOVE {
         int16_t target_y = target_star->y;
         int16_t n_turns = 0;
 
-        int8_t status1;
-        int8_t status2;
+        int8_t unused_navigator_flag;
+        int8_t unused_direction;
 
         while (current_x != target_x || current_y != target_y) {
             n_turns++;
@@ -912,8 +935,8 @@ namespace SHIPMOVE {
                 (int16_t)speed,
                 &current_x,
                 &current_y,
-                &status1,
-                &status2
+                &unused_navigator_flag,
+                &unused_direction
             );
         }
 
@@ -921,7 +944,8 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 004374e0
+     * Resolves the Hyperspace Beast event for one player's moving ships.
+     * @param player_idx Owning player to search, or -1 for no eligible ship.
      */
     void __cdecl Do_Hyperspace_Beast_(int32_t player_idx) {
         s_MSG msg;
@@ -930,12 +954,12 @@ namespace SHIPMOVE {
         s_ship_data* selected_ship = nullptr;
 
         if (player_idx != -1) {
-            int32_t count = 0;
+            int32_t candidate_count = 0;
             for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
                 s_ship_data* ship = &MOX::_ship[i];
                 if (ship->owner == player_idx && ship->status == 1) {
-                    count++;
-                    if (random::Random_(count) == 1) {
+                    candidate_count++;
+                    if (random::Random_(candidate_count) == 1) {
                         selected_ship = ship;
                     }
                 }
@@ -945,12 +969,12 @@ namespace SHIPMOVE {
         if (selected_ship == nullptr) {
             msg.u.hyperspace_beast.ship_idx = -1;
         } else {
-            int16_t ship_index = static_cast<int16_t>(selected_ship - MOX::_ship);
+            int16_t ship_index = (int16_t)(selected_ship - MOX::_ship);
             int16_t officer_index = selected_ship->officer_index;
 
             msg.u.hyperspace_beast.ship_idx = ship_index;
-            msg.u.hyperspace_beast.officer_idx = static_cast<int8_t>(officer_index);
-            msg.u.hyperspace_beast.star_idx = static_cast<int8_t>(selected_ship->location + 12);
+            msg.u.hyperspace_beast.officer_idx = (int8_t)officer_index;
+            msg.u.hyperspace_beast.star_idx = (int8_t)(selected_ship->location + 12);
 
             if (officer_index != -1) {
                 OFFICER::Move_Officer_To_Pool_(officer_index);
@@ -988,7 +1012,7 @@ namespace SHIPMOVE {
 
                         if (replacement_ship != nullptr) {
                             replacement_ship->officer_index = officer_index;
-                            leader->location = static_cast<int16_t>(replacement_ship - MOX::_ship);
+                            leader->location = (int16_t)(replacement_ship - MOX::_ship);
                             msg.u.hyperspace_beast.leader_status = 2;
                             leader->status = 1;
                         } else {
@@ -1018,21 +1042,23 @@ namespace SHIPMOVE {
     }
 
     /**
-     * @address 004373a0
+     * Resolves the wormhole event by selecting one moving fleet and snapping matching ships to arrival.
+     * @param player_idx Player whose ships are eligible.
+     * @param wormhole Output event result record.
      */
     void __cdecl Do_Wormhole_Event_(int32_t player_idx, s_wormhole_data* wormhole) {
         wormhole->success = 0;
         wormhole->dest_star_idx = 0;
         wormhole->count = 0;
 
-        int32_t random_counter = 0;
+        int32_t candidate_count = 0;
         s_ship_data* selected_ship = nullptr;
 
         for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == player_idx && ship->status == 1 && ship->turns_left != 1) {
-                random_counter++;
-                if (random::Random_(random_counter) == 1) {
+                candidate_count++;
+                if (random::Random_(candidate_count) == 1) {
                     selected_ship = ship;
                 }
             }

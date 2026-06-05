@@ -22,9 +22,6 @@ namespace sound {
     uint8_t _soundTimerActive;
     uint32_t _soundTimerRunning = 1;
     uint32_t _soundTimerStopFlag;
-    const char _default_sound_file_name[10] = "sound.lbx";
-    const char _default_music_file_name[10] = "music.lbx";
-    const char _stream_file_name[11] = "stream.lbx";
     void* _soundBuffer;
     uint32_t _soundBufferSize;
     uint32_t _soundTimerLock;
@@ -36,15 +33,6 @@ namespace sound {
     int32_t _doubleBufferLoops;
     uint8_t _command;
     uint8_t _streamIncVal;
-    const char s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910[68] = "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. ";
-    const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954[65] = "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. ";
-    const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998[64] = "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. ";
-    const char s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer[52] = "STREAM ERROR: (Play_Stream) Unable to lock buffer.";
-    const char s_Cant_Read[18] = "Cant Read........";
-    const char s_data_0055c20c[5] = "data";
-    const char s_fmt_0055c214[5] = "fmt ";
-    const char s_WAVE_0055c21c[5] = "WAVE";
-    const char s_RIFF_0055c224[5] = "RIFF";
     uint32_t _streamAvailable2;
     s_lbx_stream_header _musicLbxHandle;
     IDirectSound* _dsound;
@@ -56,11 +44,6 @@ namespace sound {
     LPDIRECTSOUNDBUFFER _dsound_buffer;
     DSBUFFERDESC1 _dsound_buffer_desc;
     s_sound_channel _soundChannels[16];
-    const char s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538[67] = "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. ";
-    const char s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c[64] = "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. ";
-    const char s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc[63] = "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. ";
-    const char s_SOUND_ERROR___Play_Sound_File__U_0055b5fc[56] = "SOUND ERROR: (Play_Sound_File) Unable to lock buffer.";
-    const char s_SOUND_ERROR__Reading_Wave_0055b634[26] = "SOUND ERROR: Reading Wave";
     s_lbx_stream_header _soundLbxHandle;
     s_wave_stream_header _streamLbxHandle;
     uint8_t _close_stream = 1;
@@ -93,13 +76,13 @@ namespace sound {
 
             // Check if bit 0 is set (active flag) and volume is non-zero
             if ((channel.flags & 1) && channel.volume_index != 0) {
-                int vol_level = Get_Channel_Volume_Level_(i);
-                int diff = vol_level - static_cast<int>(channel.volume_index);
+                int32_t vol_level = Get_Channel_Volume_Level_(i);
+                int32_t diff = vol_level - (int32_t)channel.volume_index;
 
                 // Valid delta range is [1, 100]
                 if (diff >= 1 && diff <= 100) {
                     int16_t ds_vol = _ds_volume_table[diff];
-                    channel.buffer->SetVolume(static_cast<int32_t>(ds_vol));
+                    channel.buffer->SetVolume((int32_t)ds_vol);
                 } else {
                     // Out of range: stop and cleanup
                     channel.flags ^= 1;
@@ -213,26 +196,26 @@ namespace sound {
         header->data_ptr = (uint8_t*)src_data + 0x2c;
 
         sound::Copy_FourCC_(tag_buf, header->riff_tag);
-        if (_strcmpi(tag_buf, s_RIFF_0055c224) != 0) {
+        if (_strcmpi(tag_buf, "RIFF") != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->wave_tag);
-        if (_strcmpi(tag_buf, s_WAVE_0055c21c) != 0) {
+        if (_strcmpi(tag_buf, "WAVE") != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->fmt_tag);
-        if (_strcmpi(tag_buf, s_fmt_0055c214) != 0) {
+        if (_strcmpi(tag_buf, "fmt ") != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->data_tag);
-        return _strcmpi(tag_buf, s_data_0055c20c) == 0;
+        return _strcmpi(tag_buf, "data") == 0;
     }
 
     /**
-     * @address 0052DC80
+     * Releases DirectSound resources and stops the periodic sound timer.
      */
     void __cdecl Destroy_Sound_() {
         Stop_Sound_Timer_And_Wait2_();
@@ -254,9 +237,9 @@ namespace sound {
             memset(&_soundLbxHandle, 0, sizeof(s_lbx_stream_header));
             memset(&_musicLbxHandle, 0, sizeof(s_lbx_stream_header));
 
-            lbx::LBX_init_(&_soundLbxHandle, _default_sound_file_name);
-            lbx::LBX_init_(&_musicLbxHandle, _default_music_file_name);
-            lbx::LBX_init_stream_(&_streamLbxHandle, _stream_file_name);
+            lbx::LBX_init_(&_soundLbxHandle, "sound.lbx");
+            lbx::LBX_init_(&_musicLbxHandle, "music.lbx");
+            lbx::LBX_init_stream_(&_streamLbxHandle, "stream.lbx");
 
             if (_soundBuffer != nullptr) {
                 _soundBufferSize = allocate::Get_Remaining_Block_Space_(_soundBuffer);
@@ -338,7 +321,7 @@ namespace sound {
         }
     }
 
-    void __stdcall Sound_Timer_Callback_(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4, uint32_t p5) {
+    void __stdcall Sound_Timer_Callback_(uint32_t timer_id, uint32_t message, uint32_t user_data, uint32_t param1, uint32_t param2) {
         if (sound::_soundTimerLock == 1) {
             return;
         }
@@ -369,7 +352,7 @@ namespace sound {
     }
 
     /**
-     * @address 00532440
+     * Requests the periodic sound timer to stop and drains in-flight work.
      */
     void __cdecl Stop_Sound_Timer_() {
         sound::_soundTimerStopFlag = 1;
@@ -441,7 +424,7 @@ namespace sound {
     }
 
     /**
-     * @address 0052e7a0
+     * Sets one channel volume, or updates the master volume when channel_idx is -1.
      */
     void __cdecl Set_Channel_Volume_(int32_t channel_idx, int32_t volume) {
         if (sound::_soundOn == 0) {
@@ -495,7 +478,12 @@ namespace sound {
         }
     }
 
-    void __cdecl Resume_Sound_(int sound) {
+    /**
+     * Placeholder stub for resuming sound playback on a channel.
+     * @param channel_idx Channel index to resume.
+     */
+    void __cdecl Resume_Sound_(int32_t channel_idx) {
+        (void)channel_idx;
         return;
     }
 
@@ -506,13 +494,13 @@ namespace sound {
 
             int32_t index = 0;
             for (int16_t* entry = sound::_ds_volume_table; entry < sound::_ds_volume_table + 101; ++entry) {
-                if (static_cast<int32_t>(*entry) == current_volume) {
+                if ((int32_t)*entry == current_volume) {
                     return index;
                 }
                 index++;
             }
 
-            return static_cast<int32_t>(current_volume);
+            return (int32_t)current_volume;
         }
 
         return 0;
@@ -560,29 +548,29 @@ namespace sound {
         char tag_buffer[5];
         tag_buffer[4] = '\0';
 
-        mmioRead(_streamLbxHandle.file, reinterpret_cast<HPSTR>(stream->riff_tag), 0x30);
+        mmioRead(_streamLbxHandle.file, (HPSTR)stream->riff_tag, 0x30);
         stream->data_start_offset = entry_offset + 0x2c;
 
         sound::Copy_FourCC_(tag_buffer, stream->riff_tag);
-        if (_strcmpi(tag_buffer, sound::s_RIFF_0055c224) != 0) {
+        if (_strcmpi(tag_buffer, "RIFF") != 0) {
             Debug_Log_Stream_Message_("stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->wave_tag);
-        if (_strcmpi(tag_buffer, sound::s_WAVE_0055c21c) != 0) {
+        if (_strcmpi(tag_buffer, "WAVE") != 0) {
             Debug_Log_Stream_Message_("stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->fmt_tag);
-        if (_strcmpi(tag_buffer, sound::s_fmt_0055c214) != 0) {
+        if (_strcmpi(tag_buffer, "fmt ") != 0) {
             Debug_Log_Stream_Message_("stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->data_tag);
-        if (_strcmpi(tag_buffer, sound::s_data_0055c20c) != 0) {
+        if (_strcmpi(tag_buffer, "data") != 0) {
             Debug_Log_Stream_Message_("stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
@@ -664,7 +652,7 @@ namespace sound {
         );
 
         if (_dsound_hr != 0) {
-            strcpy(&msg_buf[0], s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer);
+            strcpy(&msg_buf[0], "STREAM ERROR: (Play_Stream) Unable to lock buffer.");
             exitm::Exit_With_Message(&msg_buf[0]);
         }
 
@@ -687,11 +675,11 @@ namespace sound {
 
         if (_dsound_hr != 0) {
             if (_dsound_hr == DSERR_INVALIDPARAM) {
-                sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954, _dsound_hr);
+                sprintf(msg_buf, "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. ", _dsound_hr);
             } else if (_dsound_hr == DSERR_INVALIDCALL) {
-                sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998, _dsound_hr);
+                sprintf(msg_buf, "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. ", _dsound_hr);
             } else if (_dsound_hr == DSERR_PRIOLEVELNEEDED) {
-                sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910, _dsound_hr);
+                sprintf(msg_buf, "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. ", _dsound_hr);
             }
             exitm::Exit_With_Message(msg_buf);
         }
@@ -735,7 +723,7 @@ namespace sound {
                     uint32_t remaining = bytes_to_read - total_copied;
                     uint32_t chunk_size = (available < remaining) ? available : remaining;
 
-                    memcpy(static_cast<uint8_t*>(buffer) + total_copied, mmio_info.pchNext, chunk_size);
+                    memcpy((uint8_t*)buffer + total_copied, mmio_info.pchNext, chunk_size);
 
                     mmio_info.pchNext += chunk_size;
                     total_copied += chunk_size;
@@ -767,13 +755,13 @@ namespace sound {
             );
         }
 
-        fonts::Disp_PSTR_(320 /* 0x140 */, 0, sound::s_Cant_Read);
+        fonts::Disp_PSTR_(320 /* 0x140 */, 0, "Cant Read........");
         *bytes_read_ptr = 0;
-        return static_cast<uint8_t>(status);
+        return (uint8_t)status;
     }
 
     /**
-     * @address 0052e850
+     * Stores the fade target volume index for a channel.
      */
     void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx) {
         if (channel_idx >= 0 && channel_idx < 16) {
@@ -781,14 +769,14 @@ namespace sound {
         }
     }
 
-    void __cdecl Loop_Sound_(int channel_idx, int8_t loop_count) {
+    void __cdecl Loop_Sound_(int32_t channel_idx, int8_t loop_count) {
         if (channel_idx >= 1) {
             _soundChannels[channel_idx].flags |= 0x08;
             _soundChannels[channel_idx].loop_count = loop_count;
         }
     }
 
-    int __cdecl Get_Channel_Volume_Level_(int channel_idx) {
+    int32_t __cdecl Get_Channel_Volume_Level_(int32_t channel_idx) {
         LONG volume = 0;
 
         if (sound::_soundOn == 0) {
@@ -805,14 +793,14 @@ namespace sound {
             }
         }
 
-        return (int)volume;
+        return (int32_t)volume;
     }
 
     void __cdecl Copy_FourCC_(char* dest, const char* src) {
         memcpy(dest, src, 4);
     }
 
-    void __cdecl Refill_Sound_Channel_Buffer_(int channel_idx) {
+    void __cdecl Refill_Sound_Channel_Buffer_(int32_t channel_idx) {
         DWORD play_cursor;
         DWORD write_cursor;
         DWORD status;
@@ -937,7 +925,7 @@ namespace sound {
     }
 
     /**
-     * @address 0052e800
+     * Sets the master playback volume for all active sound channels.
      */
     void __cdecl Set_Master_Volume_(int32_t volume) {
         if (sound::_soundOn != 0 && volume >= 0 && volume <= 100) {
@@ -1149,15 +1137,17 @@ namespace sound {
         }
     }
 
-    int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size) {
+    int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t wave_data_size) {
         s_sound_wav_header info;
         WAVEFORMATEX wfx;
         char error_msg[256];
         uint32_t dwBytes;
         Stop_Sound_Timer_And_Wait2_();
 
+        (void)wave_data_size;
+
         if (!Init_Wave_Header_From_Memory_(wave_data, &info)) {
-            exitm::Exit_With_Message(s_SOUND_ERROR__Reading_Wave_0055b634);
+            exitm::Exit_With_Message("SOUND ERROR: Reading Wave");
         }
 
         _soundChannels[channel_idx].buffer->Stop();
@@ -1165,7 +1155,7 @@ namespace sound {
         _dsound_hr = _soundChannels[channel_idx].buffer->Release();
 
         memset(&_dsound_buffer_desc, 0, sizeof(DSBUFFERDESC1));
-        _dsound_buffer_desc.dwSize = 0x14;
+        _dsound_buffer_desc.dwSize = sizeof(_DSBUFFERDESC1);
         _dsound_buffer_desc.dwFlags = 0xe0;
 
         uint32_t desc_bytes = 0x4000;
@@ -1200,7 +1190,7 @@ namespace sound {
         _dsound_hr = _soundChannels[channel_idx].buffer->Lock(0, dwBytes, &_streamBuffer1, (LPDWORD)&_streamAvailable1, &_streamBuffer2, (LPDWORD)&_streamAvailable2, 0);
 
         if (_dsound_hr != 0) {
-            strcpy(error_msg, s_SOUND_ERROR___Play_Sound_File__U_0055b5fc);
+            strcpy(error_msg, "SOUND ERROR: (Play_Sound_File) Unable to lock buffer.");
             exitm::Exit_With_Message(error_msg);
         }
 
@@ -1219,11 +1209,11 @@ namespace sound {
         if (_dsound_hr != 0) {
             const char* fmt = nullptr;
             if (_dsound_hr == 0x80070057 /* DSERR_INVALIDPARAM */) {
-                fmt = s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c;
+                fmt = "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. ";
             } else if (_dsound_hr == 0x88780032 /* DSERR_INVALIDCALL */) {
-                fmt = s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc;
+                fmt = "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. ";
             } else if (_dsound_hr == 0x88780046 /* DSERR_PRIOLEVELNEEDED */) {
-                fmt = s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538;
+                fmt = "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. ";
             }
 
             if (fmt) {
@@ -1306,7 +1296,7 @@ namespace sound {
                     continue;
                 }
 
-                void* buffer = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_soundBuffer) + index.buffer_offset);
+                void* buffer = (uint8_t*)_soundBuffer + index.buffer_offset;
                 return Play_Sound_File_(channel_id, buffer, index.buffer_size);
             }
         }
@@ -1330,7 +1320,7 @@ namespace sound {
      * @brief Checks the status of a sound channel and performs updates based on its current position.
      * Handles both looping and one-shot sounds, as well as cleanup when playback is finished.
      */
-    void __cdecl Update_Sound_Channel_Status_(int channel_idx) {
+    void __cdecl Update_Sound_Channel_Status_(int32_t channel_idx) {
         DWORD play_cursor;
         DWORD ds_write_cursor;
         DWORD status;
@@ -1376,7 +1366,7 @@ namespace sound {
     }
 
     /**
-     * @address 0052e5a0
+     * Finds an unused sound-cache index entry.
      */
     int32_t __cdecl Get_Free_Sound_Index_() {
         for (int32_t i = 1; i < 33; ++i) {
@@ -1388,12 +1378,9 @@ namespace sound {
     }
 
     /**
-     * @brief Traverses the sound buffer index list and merges adjacent free blocks.
+     * Allocates a cached sound-data block from the shared sound buffer.
      */
-    /**
-     * @address 0052e2b0
-     */
-    void* __cdecl Allocate_Sound_Block_(int8_t channel, int32_t resource_id, int32_t size) {
+    void* __cdecl Allocate_Sound_Block_(int8_t channel_idx, int32_t resource_id, int32_t size) {
         if (size > (int32_t)_soundBufferSize) {
             return nullptr;
         }
@@ -1426,12 +1413,12 @@ namespace sound {
                         new_block->resource_id = 0;
 
                         current->next_id = free_idx;
-                        current->active_channel_ids[0] = (uint8_t)channel;
+                        current->active_channel_ids[0] = (uint8_t)channel_idx;
                         current->resource_id = resource_id;
                         current->buffer_size = size;
                         current->num_active_channels = 1;
 
-                        return reinterpret_cast<uint8_t*>(_soundBuffer) + current->buffer_offset;
+                        return (uint8_t*)_soundBuffer + current->buffer_offset;
                     }
                     return nullptr;
                 }

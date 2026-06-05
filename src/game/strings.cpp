@@ -18,9 +18,12 @@ namespace strings {
     const char s_fmt_minus_d_percent_00558cf4[6] = "-%d%%";
     const char s_fmt_plus_d_percent_short_00558cfc[5] = "+%d%";
     const char s_ld_00558280[4] = "%ld";
+    /* fmtpara: switches paragraph justification to left alignment. */
     const char s_0_0055110c[3] = "\x1A" "0";
+    /* fmtpara: switches paragraph justification to right alignment. */
     const char s_1_00551110[3] = "\x1A" "1";
     const char s__0055ac34[2] = "\t";
+    /* fmtpara: clears tab stops, then defines tabs at X=0, 5, and 124. */
     const char s_t_T0_5_124__0055ac38[13] = "\x17" "t" "\a" "T0,5,124.";
 
     void Load_Strings() {
@@ -35,9 +38,8 @@ namespace strings {
         }
 
         for (int32_t i = 0; str[i] != '\0'; ++i) {
-            // Check if character is between 'A' (0x41) and 'Z' (0x5A)
             if (str[i] >= 0x41 && str[i] <= 0x5A) {
-                str[i] += 0x20; // Convert to lowercase by adding 32
+                str[i] += 0x20;
             }
         }
     }
@@ -56,54 +58,51 @@ namespace strings {
         } while (str[i] != '\0');
     }
 
-    void __cdecl Swap_Short_(int16_t* a, int16_t* b) {
-        int16_t temp = *a;
-        *a = *b;
-        *b = temp;
+    void __cdecl Swap_Short_(int16_t* lhs, int16_t* rhs) {
+        int16_t temp = *lhs;
+        *lhs = *rhs;
+        *rhs = temp;
     }
 
-    void __cdecl Swap_Char_(uint8_t* a, uint8_t* b) {
-        uint8_t temp = *a;
-        *a = *b;
-        *b = temp;
+    void __cdecl Swap_Char_(uint8_t* lhs, uint8_t* rhs) {
+        uint8_t temp = *lhs;
+        *lhs = *rhs;
+        *rhs = temp;
     }
 
-    void __cdecl Swap_(int32_t* ptr1, int32_t* ptr2) {
-        int32_t temp = *ptr1;
-        *ptr1 = *ptr2;
-        *ptr2 = temp;
+    void __cdecl Swap_(int32_t* lhs, int32_t* rhs) {
+        int32_t temp = *lhs;
+        *lhs = *rhs;
+        *rhs = temp;
     }
 
-    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, uint32_t element_size, uint32_t count) {
-        if (index < (int32_t)(count - 1)) {
+    void __cdecl Delete_Structure_(int32_t index, void* array, uint32_t element_size_bytes, uint32_t element_count) {
+        if (index < (int32_t)(element_count - 1)) {
+            uint8_t* array_bytes = (uint8_t*)array;
             struct_::Copy_Structure_(
-                (uint8_t*)array_ptr + (uint32_t)index * element_size,
-                (uint8_t*)array_ptr + ((uint32_t)index + 1) * element_size,
-                (count - (uint32_t)index - 1) * element_size
+                array_bytes + (uint32_t)index * element_size_bytes,
+                array_bytes + ((uint32_t)index + 1) * element_size_bytes,
+                (element_count - (uint32_t)index - 1) * element_size_bytes
             );
         }
     }
 
     void __cdecl Trim_(char* str) {
-        // Skip leading spaces
-        int first_non_space = 0;
+        int32_t first_non_space = 0;
         while (str[first_non_space] == ' ') {
             first_non_space++;
         }
 
-        // If there are leading spaces, shift the string to the left (including null terminator)
         if (first_non_space > 0) {
             memmove(str, str + first_non_space, strlen(str + first_non_space) + 1);
         }
 
-        // Find the new end of the string
-        int length = 0;
+        int32_t length = 0;
         while (str[length] != '\0') {
             length++;
         }
 
-        // Iterate backwards from the end, replacing trailing spaces with null terminators
-        for (int i = length - 1; i >= 0; --i) {
+        for (int32_t i = length - 1; i >= 0; --i) {
             if (str[i] == ' ') {
                 str[i] = '\0';
             } else {

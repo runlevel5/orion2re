@@ -24,14 +24,14 @@ namespace smckplay {
             _smk = _SmackOpen(path_buffer, open_flags, -1);
         }
 
-        return static_cast<int8_t>(_smk != nullptr);
+        return (int8_t)(_smk != nullptr);
     }
 
     int32_t __cdecl Get_Smacker_Animation_Width_() {
         if (_smk == nullptr) {
             return 0;
         }
-        return static_cast<int32_t>(_smk->width);
+        return (int32_t)_smk->width;
     }
 
     int32_t __cdecl Get_Smacker_Animation_Height_() {
@@ -59,7 +59,7 @@ namespace smckplay {
             DDSURFACEDESC surface_desc;
             LPDDSURFACEDESC surface_desc_ptr = &surface_desc;
 
-            surface_desc.dwSize = 0x6c;
+            surface_desc.dwSize = sizeof(surface_desc);
             surface_desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
             video::g_offscreen_surface_1->GetSurfaceDesc(surface_desc_ptr);
             video::g_offscreen_surface_1->Lock(nullptr, surface_desc_ptr, DDLOCK_WAIT, nullptr);

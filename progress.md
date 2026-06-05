@@ -8,18 +8,9 @@
 - [pending] src/game/orion2_str.h
 - [pending] src/game/paragrph.h
 - [pending] src/game/settings.h
-
-- [pending] src/game/shipmove.{h,cpp}
-- [pending] src/game/ships.{h,cpp}
-- [pending] src/game/shipstak.{h,cpp}
 - [pending] src/game/simmodem.h
-- [pending] src/game/smack.{h,cpp}
-- [pending] src/game/smckplay.{h,cpp}
-- [pending] src/game/sound.{h,cpp}
-- [pending] src/game/special.{h,cpp}
-- [pending] src/game/spy.{h,cpp}
 - [pending] src/game/string.h
-- [pending] src/game/strings.{h,cpp}
+
 - [pending] src/game/struct.{h,cpp}
 - [pending] src/game/swap.{h,cpp}
 - [pending] src/game/sys.{h,cpp}

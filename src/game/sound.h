@@ -19,12 +19,6 @@ namespace sound {
 
     extern uint32_t _soundTimerStopFlag;
 
-    extern const char _default_sound_file_name[10]; // "sound.lbx"
-
-    extern const char _default_music_file_name[10]; // "music.lbx"
-
-    extern const char _stream_file_name[11]; // "stream.lbx"
-
     extern void* _soundBuffer;
 
     extern uint32_t _soundBufferSize;
@@ -46,21 +40,6 @@ namespace sound {
     extern uint8_t _command;
 
     extern uint8_t _streamIncVal;
-
-    extern const char s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910[68]; // "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
-
-    extern const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954[65]; // "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
-
-    extern const char s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998[64]; // "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
-
-    extern const char s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer[52]; // "STREAM ERROR: (Play_Stream) Unable to lock buffer."
-
-    extern const char s_Cant_Read[18];
-
-    extern const char s_data_0055c20c[5]; // "data"
-    extern const char s_fmt_0055c214[5];  // "fmt "
-    extern const char s_WAVE_0055c21c[5]; // "WAVE"
-    extern const char s_RIFF_0055c224[5]; // "RIFF"
 
     void __cdecl Copy_FourCC_(char* dest, const char* src);
 
@@ -88,12 +67,6 @@ namespace sound {
     // functions still treat 0..15 as the valid channel index range.
     extern s_sound_channel _soundChannels[16];
 
-    extern const char s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538[67]; // "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
-    extern const char s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c[64]; // "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
-    extern const char s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc[63]; // "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
-    extern const char s_SOUND_ERROR___Play_Sound_File__U_0055b5fc[56]; // "SOUND ERROR: (Play_Sound_File) Unable to lock buffer."
-    extern const char s_SOUND_ERROR__Reading_Wave_0055b634[26]; // "SOUND ERROR: Reading Wave"
-
     void __cdecl Stop_Sound_Timer_And_Wait2_();
 
     void __cdecl Merge_Free_Blocks_();
@@ -116,13 +89,21 @@ namespace sound {
 
     extern s_sound_stream _stream_data;
 
-    void __stdcall Sound_Timer_Callback_(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4, uint32_t p5);
+    /**
+     * Drives periodic sound and stream maintenance from the multimedia timer.
+     * @param timer_id Multimedia timer identifier.
+     * @param message Timer callback message code.
+     * @param user_data Caller-supplied timer user data.
+     * @param param1 Reserved timer callback parameter.
+     * @param param2 Reserved timer callback parameter.
+     */
+    void __stdcall Sound_Timer_Callback_(uint32_t timer_id, uint32_t message, uint32_t user_data, uint32_t param1, uint32_t param2);
 
     void __cdecl Update_Sound_Channels_();
 
-    void __cdecl Refill_Sound_Channel_Buffer_(int channel_idx);
+    void __cdecl Refill_Sound_Channel_Buffer_(int32_t channel_idx);
 
-    void __cdecl Update_Sound_Channel_Status_(int channel_idx);
+    void __cdecl Update_Sound_Channel_Status_(int32_t channel_idx);
 
     void __cdecl Update_Stream_Status_();
 
@@ -168,7 +149,7 @@ namespace sound {
 
     void __cdecl Stop_All_Sounds_();
 
-    void __cdecl Resume_Sound_(int32_t channel);
+    void __cdecl Resume_Sound_(int32_t channel_idx);
 
     void __cdecl Set_Sound_Max_Volume_(int32_t volume);
 
@@ -182,15 +163,15 @@ namespace sound {
 
     void __cdecl Sound_Update_();
 
-    int __cdecl Get_Channel_Volume_Level_(int channel_idx);
+    int32_t __cdecl Get_Channel_Volume_Level_(int32_t channel_idx);
 
     int8_t __cdecl Find_Free_Channel_();
 
     void __cdecl Merge_Free_Sound_Blocks_();
 
-    int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size);
+    int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t wave_data_size);
 
-    void* __cdecl Allocate_Sound_Block_(int8_t channel, int32_t resource_id, int32_t size);
+    void* __cdecl Allocate_Sound_Block_(int8_t channel_idx, int32_t resource_id, int32_t size);
 
     int32_t __cdecl Play_Sound_(int32_t resource_id);
 
@@ -198,7 +179,7 @@ namespace sound {
 
     void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch);
 
-    void __cdecl Loop_Sound_(int channel_idx, int8_t loop_count);
+    void __cdecl Loop_Sound_(int32_t channel_idx, int8_t loop_count);
 
     void __cdecl Destroy_Sound_();
 

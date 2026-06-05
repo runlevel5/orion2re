@@ -2,9 +2,6 @@
 
 namespace SHIPS {
 
-    /**
-     * @address 0041ff40
-     */
     void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship) {
         uint8_t ship_type = ship->d.ship_type;
 
@@ -14,9 +11,6 @@ namespace SHIPS {
         }
     }
 
-    /**
-     * @address 0041ff60
-     */
     void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
         if (*ship_list == -1) {
             return;
@@ -116,7 +110,7 @@ namespace SHIPS {
             SHIPMOVE::Ships_Try_To_Move_To_(ship_list, star_idx, &move_info);
 
             if (move_info.moving == 0) {
-                RUSS::PFMT_(0, 1, s_Monster_ship_id_cannot_mov_00552cd8, (int)ship_idx, MOX::_star[star_idx].name, (int)star_idx);
+                RUSS::PFMT_(0, 1, "Monster (ship id: %d) cannot move to %s (%d)!", (int)ship_idx, MOX::_star[star_idx].name, (int)star_idx);
                 assert::hgetch_();
             } else {
                 SHIPMOVE::Make_Ships_Move_To_(ship_list, star_idx, &move_info);
@@ -214,17 +208,17 @@ namespace SHIPS {
         return (int16_t)SHIPMOVE::Create_Nonplayer_Ship_((int8_t)type, design, final_x_upscaled, final_y_upscaled);
     }
 
-    void __cdecl Get_Ship_Icon_Coords_(int16_t ship_idx, int16_t* x, int16_t* y) {
-        int16_t star_id_check = HACCESS::Ship_Icon_Star_Id_(ship_idx);
+    void __cdecl Get_Ship_Icon_Coords_(int16_t ship_icon_idx, int16_t* x, int16_t* y) {
+        HACCESS::Ship_Icon_Star_Id_(ship_icon_idx);
 
-        int16_t node_idx = MOX::_ship_icon[ship_idx].node_idx;
+        int16_t node_idx = MOX::_ship_icon[ship_icon_idx].node_idx;
         int16_t actual_ship_idx = MOX::_ship_node[node_idx].ship_idx;
         s_ship_data* ship = &MOX::_ship[actual_ship_idx];
 
         int16_t star_id = HAROLD::XY_To_Star_Id_(ship->x, ship->y);
 
         if (ship->status == 1 /* STATUS_IN_TRANSIT */) {
-            Get_Ship_Icon_Coords_In_Space_(ship_idx, x, y);
+            Get_Ship_Icon_Coords_In_Space_(ship_icon_idx, x, y);
             return;
         }
 
@@ -232,9 +226,7 @@ namespace SHIPS {
         int16_t ox_arr[4], oy_arr[4];
 
         Get_XYs_For_Orbiting_Ships_(star_id, (int16_t)ship->owner, &ox1, &oy1, &ox2, &oy2, ox_arr, oy_arr);
-
-        // stack_slot is at offset 6 in s_ship_icon
-        int16_t slot = *reinterpret_cast<int16_t*>(&MOX::_ship_icon[ship_idx].stack_slot);
+        int16_t slot = MOX::_ship_icon[ship_icon_idx].stack_slot;
 
         switch (slot) {
         case 0:
@@ -303,11 +295,8 @@ namespace SHIPS {
         line::Multi_Colored_Line_(x1, y1, x2, y2, &reversed_colors, phase);
     }
 
-    /**
-     * @address 0041f030
-     */
-    void __cdecl Get_XYs_For_Orbiting_Ships_(int16_t star_idx, int16_t ship_icon_idx, int16_t* out_x1, int16_t* out_y1, int16_t* out_x2, int16_t* out_y2, int16_t* out_arr_x, int16_t* out_arr_y) {
-        s_animation_header* anim = SHIPS::Get_Ship_Icon_Pict_Seg_(ship_icon_idx, 0);
+    void __cdecl Get_XYs_For_Orbiting_Ships_(int16_t star_idx, int16_t ship_icon_type_idx, int16_t* out_x1, int16_t* out_y1, int16_t* out_x2, int16_t* out_y2, int16_t* out_arr_x, int16_t* out_arr_y) {
+        s_animation_header* anim = SHIPS::Get_Ship_Icon_Pict_Seg_(ship_icon_type_idx, 0);
         int16_t width = animate::Get_Width_(anim);
         animate::Get_Height_(anim); // Result ignored by original code
 
@@ -345,9 +334,6 @@ namespace SHIPS {
         out_arr_y[2] = y_ref + 3 * diff_11_minus_zoom;
     }
 
-    /**
-     * @address 0041fef0
-     */
     void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, uint8_t* width, uint8_t* height) {
         s_animation_header* anim;
 
@@ -357,9 +343,6 @@ namespace SHIPS {
         *height = (uint8_t)animate::Get_Height_(anim);
     }
 
-    /**
-     * @address 0041f200
-     */
     s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t ship_type_idx, uint8_t is_highlighted) {
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
         int16_t inverted_zoom = 1;
@@ -425,12 +408,6 @@ namespace SHIPS {
         return nullptr;
     }
 
-    /**
-     * @address 0041f150
-     */
-    /**
-     * @address 0041f730
-     */
     bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(int16_t node_idx) {
         bool result = false;
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
@@ -543,16 +520,14 @@ namespace SHIPS {
         fonts::Print_Right_(width + x_offset, height + y_offset, buffer);
     }
 
-    void __cdecl Get_Ship_Icon_Coords_In_Space_(int16_t icon_id, int16_t* x, int16_t* y) {
-        int16_t ship_id = HACCESS::Ship_Icon_Ship_Id_(icon_id);
+    void __cdecl Get_Ship_Icon_Coords_In_Space_(int16_t ship_icon_idx, int16_t* x, int16_t* y) {
+        int16_t ship_id = HACCESS::Ship_Icon_Ship_Id_(ship_icon_idx);
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
 
         uint8_t* width_ptr = &MOX::_ship_icon_width[zoom_level];
         uint8_t* height_ptr = &MOX::_ship_icon_height[zoom_level];
 
         SHIPS::Get_Ship_Icon_Dimensions_(zoom_level, width_ptr, height_ptr);
-
-        // s_ship_data size is 129 (0x81)
         s_ship_data* ship = &MOX::_ship[ship_id];
 
         int16_t base_x = ship->x - MOX::_cur_map_x;
@@ -566,12 +541,6 @@ namespace SHIPS {
         *y = (scaled_y - (int16_t)(*height_ptr >> 1)) + 21 /* 0x15 */;
     }
 
-    /**
-     * @address 0041f370
-     */
-    /**
-     * @address 0041f680
-     */
     void __cdecl Draw_Ship_Destination_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors) {
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
         int zoom_index = 3 - (int)zoom_level;
@@ -605,8 +574,8 @@ namespace SHIPS {
         );
     }
 
-    int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* p_icon_idx, int16_t threshold_x, int16_t threshold_y) {
-        int16_t current_idx = *p_icon_idx;
+    int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* in_out_ship_icon_idx, int16_t threshold_x, int16_t threshold_y) {
+        int16_t current_idx = *in_out_ship_icon_idx;
         int16_t result = 0;
 
         int diff_x = abs((int)MOX::_icon_overlay_x - (int)MOX::_ship_icon[current_idx].x);
@@ -621,7 +590,7 @@ namespace SHIPS {
             int16_t num_overlaps = 0;
             int16_t stop_searching = 0;
 
-            struct_::Set_Memory_(overlap_indices, 100 /* 50 * sizeof(short) */, 0);
+            struct_::Set_Memory_(overlap_indices, sizeof(overlap_indices), 0);
 
             HACCESS::Ship_Icon_Star_Id_(current_idx);
 
@@ -656,7 +625,7 @@ namespace SHIPS {
                 }
 
                 result = 1;
-                *p_icon_idx = overlap_indices[0];
+                *in_out_ship_icon_idx = overlap_indices[0];
             }
         }
 
@@ -664,9 +633,8 @@ namespace SHIPS {
     }
 
     int __cdecl qsort_ship_icon_(const void* a, const void* b) {
-        // TYPE MISMATCH: decompiled as (s_ship_icon* a, s_ship_icon* b)
-        auto p1 = static_cast<const s_ship_icon*>(a);
-        auto p2 = static_cast<const s_ship_icon*>(b);
+        const s_ship_icon* p1 = (const s_ship_icon*)a;
+        const s_ship_icon* p2 = (const s_ship_icon*)b;
         return p2->stack_slot - p1->stack_slot;
     }
 
@@ -674,16 +642,16 @@ namespace SHIPS {
         SHIPSTAK::Find_Ship_Stacks_();
 
         allocate::Mark_Block_(MOX::_global_data_seg);
-        s_build_ship_icon_item* build_items = reinterpret_cast<s_build_ship_icon_item*>(
+        s_build_ship_icon_item* build_items = (s_build_ship_icon_item*)(
             allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x168)
         );
-        uint8_t* slot_counts = reinterpret_cast<uint8_t*>(
+        uint8_t* slot_counts = (uint8_t*)(
             allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x120)
         );
         allocate::Release_Block_(MOX::_global_data_seg);
 
         memset(slot_counts, 0x02, 0x120);
-        memset(MOX::_ship_icon, 0xFF, sizeof(s_ship_icon) * 572);
+        memset(MOX::_ship_icon, 0xFF, sizeof(MOX::_ship_icon));
         memset(build_items, 0xFF, 0x168);
 
         MOX::_ship_icon_count = 0;
@@ -694,7 +662,7 @@ namespace SHIPS {
                 int16_t stack_id = MOX::_ship_stack_start[stack_iter];
                 int16_t x = HACCESS::Ship_Stack_X_(stack_id);
                 int16_t y = HACCESS::Ship_Stack_Y_(stack_id);
-                int8_t owner = static_cast<int8_t>(HACCESS::Ship_Stack_Owner_(stack_id));
+                int8_t owner = (int8_t)HACCESS::Ship_Stack_Owner_(stack_id);
 
                 int16_t ship_idx = MOX::_ship_node[stack_id].ship_idx;
                 int16_t dest_star_id = HAROLD::XY_To_Star_Id_(x, y);
@@ -722,11 +690,11 @@ namespace SHIPS {
                             MOX::_ship_icon_count++;
                         } else if (item_player_idx != MOX::_PLAYER_NUM && owner == MOX::_PLAYER_NUM) {
                             MOX::_ship_icon[item->icon_idx].stack_slot = slot_counts[star_id];
-                            uint8_t slot = static_cast<uint8_t>(slot_counts[star_id] + 1);
+                            uint8_t slot = (uint8_t)(slot_counts[star_id] + 1);
                             if (slot > 3) slot = 3;
                             slot_counts[star_id] = slot;
 
-                            item->player_idx = static_cast<int8_t>(MOX::_PLAYER_NUM);
+                            item->player_idx = (int8_t)MOX::_PLAYER_NUM;
                             item->ship_idx = stack_id;
                             item->icon_idx = MOX::_ship_icon_count;
 
@@ -739,7 +707,7 @@ namespace SHIPS {
                             MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
                             MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = slot_counts[star_id];
 
-                            uint8_t slot = static_cast<uint8_t>(slot_counts[star_id] + 1);
+                            uint8_t slot = (uint8_t)(slot_counts[star_id] + 1);
                             if (slot > 3) slot = 3;
                             slot_counts[star_id] = slot;
 
@@ -777,7 +745,7 @@ namespace SHIPS {
                             MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
                             MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = slot_counts[star_id];
 
-                            uint8_t slot = static_cast<uint8_t>(slot_counts[star_id] + 1);
+                            uint8_t slot = (uint8_t)(slot_counts[star_id] + 1);
                             if (slot > 3) slot = 3;
                             slot_counts[star_id] = slot;
 
@@ -789,7 +757,7 @@ namespace SHIPS {
         }
 
         if (MOX::_ship_icon_count > 0 && need_sort) {
-            qsort(MOX::_ship_icon, MOX::_ship_icon_count, 12, SHIPS::qsort_ship_icon_);
+            qsort(MOX::_ship_icon, MOX::_ship_icon_count, sizeof(MOX::_ship_icon[0]), SHIPS::qsort_ship_icon_);
         }
     }
 

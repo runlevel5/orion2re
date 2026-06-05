@@ -2,14 +2,6 @@
 
 namespace special {
 
-    /**
-     * Calculates an approximation of the distance (range) between two points.
-     * Uses the formula: max(abs(dx), abs(dy)) + min(abs(dx), abs(dy)) / 2.
-     * @param x1 x1
-     * @param y1 y1
-     * @param x2 x2
-     * @param y2 y2
-     */
     int16_t __cdecl Range_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
         int16_t dx = x2 - x1;
         int16_t dy = y2 - y1;
@@ -62,13 +54,13 @@ namespace special {
         int16_t angle = angle::Get_Angle_(angle_dx, angle_dy);
 
         // Update X coordinate
-        int16_t live_x = *x_ptr;
+        int16_t previous_x = *x_ptr;
         int16_t move_x = (int16_t)angle::Cos_(angle, step);
-        int16_t new_x = (int16_t)(live_x + move_x);
+        int16_t new_x = (int16_t)(previous_x + move_x);
         *x_ptr = new_x;
 
         // Clamp to target X
-        if (live_x < target_x) {
+        if (previous_x < target_x) {
             if (new_x > target_x) {
                 *x_ptr = target_x;
             }
@@ -79,13 +71,13 @@ namespace special {
         }
 
         // Update Y coordinate
-        int16_t live_y = *y_ptr;
+        int16_t previous_y = *y_ptr;
         int16_t move_y = (int16_t)angle::Sin_(angle, step);
-        int16_t new_y = (int16_t)(live_y + move_y);
+        int16_t new_y = (int16_t)(previous_y + move_y);
         *y_ptr = new_y;
 
         // Clamp to target Y
-        if (live_y < target_y) {
+        if (previous_y < target_y) {
             if (new_y > target_y) {
                 *y_ptr = target_y;
             }
@@ -101,8 +93,8 @@ namespace special {
             return;
         }
 
-        int16_t curr_x = *x_ptr;
-        if (curr_x == x2 && *y_ptr == y2) {
+        int16_t current_x = *x_ptr;
+        if (current_x == x2 && *y_ptr == y2) {
             return;
         }
 
@@ -118,13 +110,13 @@ namespace special {
 
         if (abs_dy < abs_dx) {
             if (x1 < x2) {
-                int16_t new_x = curr_x + step;
+                int16_t new_x = current_x + step;
                 *x_ptr = new_x;
                 if (new_x > x2) {
                     *x_ptr = x2;
                 }
             } else {
-                int16_t new_x = curr_x - step;
+                int16_t new_x = current_x - step;
                 *x_ptr = new_x;
                 if (new_x < x2) {
                     *x_ptr = x2;

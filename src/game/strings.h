@@ -1,11 +1,23 @@
 #pragma once
 
 namespace strings {
-    void __cdecl Swap_Short_(int16_t* a, int16_t* b);
+    /** Swaps the two 16-bit values in place.
+     * @param lhs First value to swap.
+     * @param rhs Second value to swap.
+     */
+    void __cdecl Swap_Short_(int16_t* lhs, int16_t* rhs);
 
-    void __cdecl Swap_(int32_t* ptr1, int32_t* ptr2);
+    /** Swaps the two 32-bit values in place.
+     * @param lhs First value to swap.
+     * @param rhs Second value to swap.
+     */
+    void __cdecl Swap_(int32_t* lhs, int32_t* rhs);
 
-    void __cdecl Swap_Char_(uint8_t* a, uint8_t* b);
+    /** Swaps the two 8-bit values in place.
+     * @param lhs First value to swap.
+     * @param rhs Second value to swap.
+     */
+    void __cdecl Swap_Char_(uint8_t* lhs, uint8_t* rhs);
 
     extern const char s__00551100[1];
     extern const char s_plus_00551118[2];
@@ -23,19 +35,35 @@ namespace strings {
     extern const char s_fmt_minus_d_bc_00558cec[6];
     extern const char s_fmt_minus_d_percent_00558cf4[6];
     extern const char s_fmt_plus_d_percent_short_00558cfc[5];
-    extern const char s_ld_00558280[4]; // "%ld"
+    extern const char s_ld_00558280[4];
     extern const char s_0_0055110c[3];
     extern const char s_1_00551110[3];
-    extern const char s__0055ac34[2]; /* "\t" */
+    extern const char s__0055ac34[2];
     extern const char s_t_T0_5_124__0055ac38[13];
 
+    /** Loads the shared game string tables. */
     void Load_Strings();
 
+    /** Converts uppercase ASCII letters in the string buffer to lowercase in place.
+     * @param str NUL-terminated string buffer to modify.
+     */
     void __cdecl String_To_Lower_(char* str);
 
+    /** Subtracts 0x20 from each byte in the 0x61-0x7F range of the string buffer.
+     * @param str NUL-terminated string buffer to modify.
+     */
     void __cdecl String_To_Upper_(char* str);
 
+    /** Removes leading and trailing space characters from the string buffer in place.
+     * @param str NUL-terminated string buffer to trim.
+     */
     void __cdecl Trim_(char* str);
 
-    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, uint32_t element_size, uint32_t count);
+    /** Removes one element from a packed array by shifting later elements down over it.
+     * @param index Zero-based element index to remove.
+     * @param array Array storage to compact in place.
+     * @param element_size_bytes Size of each element in bytes.
+     * @param element_count Number of valid elements in the array.
+     */
+    void __cdecl Delete_Structure_(int32_t index, void* array, uint32_t element_size_bytes, uint32_t element_count);
 }

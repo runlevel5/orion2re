@@ -13,7 +13,17 @@ namespace SMACK {
 
     extern int16_t _smack_y;
 
-    void __cdecl Smack_Fade_(int16_t mode);
+    /**
+     * Applies the palette fade used around Smacker cinematic playback.
+     * @param fade_mode Observed fade selector used by the cinematic wrapper.
+     */
+    void __cdecl Smack_Fade_(int16_t fade_mode);
 
+    /**
+     * Plays a Smacker cinematic and restores video/audio state afterward.
+     * @param smacker_name Resource name passed to the Smacker loader.
+     * @param play_flags Playback flags forwarded to the animation backend.
+     * @param use_fade Nonzero to wrap playback in the cinematic fade effect.
+     */
     void __cdecl Play_Cinematic_(const char* smacker_name, uint32_t play_flags, char use_fade);
 }
