@@ -107,7 +107,7 @@ namespace SCIENCE {
         remaining_discoveries = discovery_count;
         if (discovery_count != 0) {
             for (uint16_t i = 0; i < discovery_count; ++i) {
-                sprintf(animation_lbx_names[i], s_TANM__03hi_LBX_005512a0, discovery_data[i] & 0x01FF);
+                sprintf(animation_lbx_names[i], "TANM_%03hi.LBX", discovery_data[i] & 0x01FF);
             }
         }
 

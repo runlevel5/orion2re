@@ -330,7 +330,7 @@ namespace COLONY {
         void* screen_seg = MOX::_screen_seg;
 
         for (int i = 0; i < 10; ++i) {
-            MOX::_colony_galaxy_star_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(s_gstar_lbx_00558544, entry_num, screen_seg);
+            MOX::_colony_galaxy_star_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("gstar.lbx", entry_num, screen_seg);
             entry_num++;
 
             screen_seg = MOX::_screen_seg;

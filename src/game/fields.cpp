@@ -1568,7 +1568,7 @@ namespace fields {
 
         video::Clear_Display_And_Release_Palette_();
 
-        ::MessageBoxA(platform::g_main_window, buffer, s_Microprose, 0x10);
+        ::MessageBoxA(platform::g_main_window, buffer, "Microprose", 0x10);
 
         platform::Prepare_Exit_();
 

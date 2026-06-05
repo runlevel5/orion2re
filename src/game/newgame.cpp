@@ -145,7 +145,7 @@ void __cdecl Globals_To_Temps_() {
 }
 
 void __cdecl Reload_Newgame_Screen_() {
-    _background_seg = (s_animation_header*)farload::Far_Reload_(s_RACEOPT_LBX, 0, MOX::_screen_seg);
+    _background_seg = (s_animation_header*)farload::Far_Reload_("RACEOPT.LBX", 0, MOX::_screen_seg);
     RUSS::Mox_Update_();
 
     int16_t index = 0;

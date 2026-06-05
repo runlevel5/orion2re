@@ -39,7 +39,7 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     RUSS::Mox_Update_();
 
     for (uint16_t i = 0; i < 10; ++i) {
-        screen_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(s_racerprt_lbx_005574d8, i, (void*)MOX::_screen_seg);
+        screen_anims[i] = (s_animation_header*)farload::Far_Reload_Next_("racerprt.lbx", i, (void*)MOX::_screen_seg);
         RUSS::Mox_Update_();
     }
 

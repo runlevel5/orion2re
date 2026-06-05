@@ -198,7 +198,7 @@ namespace replace {
     }
 
     void __cdecl Exit_With_Message_() {
-        exitm::Exit_With_Message(s_Cannot_color_replace_refresh_mas_0055b7a0);
+        exitm::Exit_With_Message("Cannot color replace refresh mask.");
     }
 
     void __cdecl Replace_Color_Range_(s_animation_header* anim, uint8_t* palette_map, int16_t start_color, int16_t num_colors) {

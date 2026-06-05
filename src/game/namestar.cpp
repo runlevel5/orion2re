@@ -240,7 +240,7 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
     fonts::Set_Font_Style_(3, &colors);
 
     int16_t current_name_width = fonts::Get_String_Width_(MOX::_star[star_idx].name);
-    int16_t max_placeholder_width = fonts::Get_String_Width_(s_WWWWWWW_0055137c);
+    int16_t max_placeholder_width = fonts::Get_String_Width_("WWWWWWW");
     int16_t max_name_width = Max_Pixel_Width_Star_Name_Can_Be_(star_idx);
 
     if (current_name_width > max_name_width) {

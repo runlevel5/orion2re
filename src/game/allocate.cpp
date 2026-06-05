@@ -89,7 +89,7 @@ namespace allocate {
     void __cdecl Reallocation_Error_(uint32_t requested_size, int32_t bytes_short, int32_t block_capacity) {
         char buffer[100];
 
-        sprintf(buffer, s_Unable_to_Allocate_bytes, requested_size, bytes_short, block_capacity);
+        sprintf(buffer, "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n", requested_size, bytes_short, block_capacity);
 
         exitm::Exit_With_Message(buffer);
     }
@@ -166,7 +166,7 @@ namespace allocate {
         void* ptr = ::malloc(size);
 
         if (ptr == nullptr) {
-            exitm::Exit_With_Message(s_Null_Pointer_0055b658);
+            exitm::Exit_With_Message("Null Pointer");
         }
 
         return ptr;

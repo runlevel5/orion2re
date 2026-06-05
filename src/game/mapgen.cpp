@@ -352,7 +352,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             modifier = MOX::_climate_modifier_table[climate_index];
 
             if (modifier > 0) {
-                RUSS::PFMT_(0, 0, s_______CLIMATE_modifier_is__d_Pla_00558a58,
+                RUSS::PFMT_(0, 0, "------CLIMATE modifier is %d  Planet: %d  Mineral: %d",
                     modifier,
                     MOX::_planet_count,
                     climate_index);

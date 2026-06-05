@@ -1248,7 +1248,7 @@ namespace SYS {
                             ? TECHDATA::_hull_data[hull_idx].name
                             : TECHDATA::_hull_data[hull_idx].size_name;
 
-                    sprintf(line_buffer, s__2d__s_00557f10, static_cast<int32_t>(hull_count), hull_name);
+                    sprintf(line_buffer, "%2d %s", static_cast<int32_t>(hull_count), hull_name);
                     print_y = static_cast<int16_t>(print_y + static_cast<int16_t>(line_step));
 
                     if (draw_text) {
@@ -1405,10 +1405,10 @@ namespace SYS {
             const uint8_t climate_idx =
                     static_cast<uint8_t>(colony != nullptr ? colony->climate : planet->climate);
 
-            sprintf(title_buffer, s__s_005569e8, HACCESS::Get_Planet_Name_No_Prime_(planet_idx));
+            sprintf(title_buffer, "%s ", HACCESS::Get_Planet_Name_No_Prime_(planet_idx));
 
             if (colony != nullptr) {
-                sprintf(detail_buffer, s___s_00557f0c, MOX::_player[colony_owner].race_name);
+                sprintf(detail_buffer, "(%s", MOX::_player[colony_owner].race_name);
                 strcat(title_buffer, detail_buffer);
 
                 if (colony->outpost_flag != 0) {
@@ -1431,7 +1431,7 @@ namespace SYS {
 
             sprintf(
                     detail_buffer,
-                    s__s___s_0055238c,
+                    "%s, %s",
                     MOX::_planet_size_string[static_cast<int8_t>(planet->size)],
                     MOX::_planet_climate_string[climate_idx]);
 
@@ -1479,12 +1479,12 @@ namespace SYS {
             if (static_cast<int8_t>(planet->gravity_class) == 1) {
                 sprintf(
                         detail_buffer,
-                        s__s_00551130,
+                        "%s",
                         MOX::_mineral_class_string[static_cast<int8_t>(planet->mineral_class)]);
             } else {
                 sprintf(
                         detail_buffer,
-                        s__s___s_0055238c,
+                        "%s, %s",
                         MOX::_mineral_class_string[static_cast<int8_t>(planet->mineral_class)],
                         MOX::_planet_gravity_string[static_cast<int8_t>(planet->gravity_class)]);
             }

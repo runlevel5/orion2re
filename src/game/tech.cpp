@@ -245,7 +245,7 @@ namespace TECH {
         _g_entries_p = entries;
 
         player_race = MOX::_player[MOX::_PLAYER_NUM].race;
-        sprintf(science_race_lbx_name, s_SR_R_x_SC_LBX_00557d74, player_race);
+        sprintf(science_race_lbx_name, "SR_R%x_SC.LBX", player_race);
 
         RUSS::Mox_Update_();
 
@@ -761,22 +761,22 @@ namespace TECH {
         const char* suffix;
         switch (MOX::_settings.language) {
         case 0:
-            suffix = s_RP_00557da4;
+            suffix = " RP";
             break;
         case 1:
-            suffix = s_FP_00557da0;
+            suffix = " FP";
             break;
         case 2:
-            suffix = s_RP_00557da4;
+            suffix = " RP";
             break;
         case 3:
-            suffix = s_RP_00557da4;
+            suffix = " RP";
             break;
         case 4:
-            suffix = s_PR_00557d9c;
+            suffix = " PR";
             break;
         default:
-            suffix = s_RP_00557da4;
+            suffix = " RP";
             break;
         }
         strcat(text_buffer, suffix);
@@ -1003,7 +1003,7 @@ namespace TECH {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        sprintf(buffer, s__s__s_00558014, star->name, numeral_str);
+        sprintf(buffer, "%s %s", star->name, numeral_str);
 
         if (strlen(buffer) > 30) {
             buffer[30] = '\0';

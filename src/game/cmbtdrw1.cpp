@@ -2883,7 +2883,7 @@ skip_cursor:
                             strcat(local_a0, local_50);
                             break;
                         case 15:
-                            strcat(local_a0, s_360_00556164);
+                            strcat(local_a0, "360");
                             break;
                     }
                     strcat(local_a0, ")");
@@ -3638,7 +3638,7 @@ skip_cursor:
                         strcat(arc_text, message_text);
                         break;
                     case 15:
-                        strcat(arc_text, s_360_00556164);
+                        strcat(arc_text, "360");
                         break;
                     default:
                         break;

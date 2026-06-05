@@ -588,7 +588,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     
     char* crew_desc = FLT2::Crew_Description_String_(ship_idx);
     int16_t exp = MOX::_ship[ship_idx].crew_experience;
-    sprintf(buffer, s_fmt_s_d_EP_00557e18, crew_desc, exp);
+    sprintf(buffer, "%s (%d EP)", crew_desc, exp);
     
     fonts::Get_String_Width_(buffer);
     fonts::Print_(0x12, y_cursor + 0x11F, buffer);
@@ -605,7 +605,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     fonts::Print_(0x12, EBP_y, HAROLD::H_Message_(0x99));
     
     const char* sign1 = (attack_bonus >= 0) ? s_plus_00551118 : "";
-    sprintf(buffer, s__s_d_00556134, sign1, attack_bonus);
+    sprintf(buffer, "%s%d", sign1, attack_bonus);
     fonts::Print_Right_(0x85, EBP_y, buffer);
     
     strcpy(str_9a, HAROLD::H_Message_(0x9A));
@@ -619,7 +619,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         fonts::Print_(0xAD, EBP_y, str_9a);
         
         const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : "";
-        sprintf(buffer, s__s_d_00556134, sign2, defense_bonus);
+        sprintf(buffer, "%s%d", sign2, defense_bonus);
         fonts::Print_(w + 0xAD, EBP_y, buffer);
     } else {
         w = fonts::Get_String_Width_(str_9a);
@@ -631,7 +631,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         fonts::Print_(0x12, EBP_y, str_9a);
         
         const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : "";
-        sprintf(buffer, s__s_d_00556134, sign2, defense_bonus);
+        sprintf(buffer, "%s%d", sign2, defense_bonus);
         
         if (w < 0x73) {
             w = 0x73;
@@ -712,7 +712,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
                 wep_name = TECHDATA::_weapons[wep_type].name_plural;
             }
             
-            sprintf(buffer, s_fmt_d_s_s_00557e0c, count, wep_name, arc_str);
+            sprintf(buffer, "%d %s (%s)", count, wep_name, arc_str);
             fonts::Print_(0x17, wep_y + 0x11F, buffer);
             wep_y += fonts::Get_Font_Height_() + 1;
             weapons_printed++;
@@ -844,7 +844,7 @@ uint8_t __cdecl Draw_Captains_Picture_(int16_t ship_idx) {
         int16_t height = animate::Get_Height_(pict);
 
         char* leader_name = OFFICER::Leader_Name_(leader_idx, 1);
-        sprintf(captain_label, s__s_00551130, leader_name);
+        sprintf(captain_label, "%s", leader_name);
 
         fonts::Set_Font_Style_(0, &_normal_colors);
         ERIC::Print_Paragraph_Centered_Vertically_(0xAD, 0x11F, 0x42, height, captain_label, 2);
@@ -879,7 +879,7 @@ int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list) {
                 ship_list[count] = MOX::_fltscrn_big_icon[i].ship_idx;
                 count++;
                 if (count >= 250) {
-                    HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, s_Too_many_ships_in_list_00557de8, 0);
+                    HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, (char*)"Too many ships in list", 0);
                     error_flag = 1;
                     retval = 0;
                 }

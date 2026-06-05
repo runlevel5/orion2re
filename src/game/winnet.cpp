@@ -91,10 +91,10 @@ namespace WINNET {
 
             if (hr != 0) {
                 if (hr == (HRESULT)0x88770082) { // DPERR_INVALIDOBJECT
-                    exitm::Exit_With_Message(s_Error_Enum_Current_Games_Invalid_0055c028);
+                    exitm::Exit_With_Message("Error Enum Current Games Invalid Object");
                 }
                 if (hr == (HRESULT)0x80070057) { // E_INVALIDARG / DPERR_INVALIDPARAMS
-                    exitm::Exit_With_Message(s_Error_Enum_Current_Games_Invalid_0055c000);
+                    exitm::Exit_With_Message("Error Enum Current Games Invalid Params");
                 }
             }
         }

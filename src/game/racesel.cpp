@@ -131,14 +131,14 @@ void __cdecl Reload_Race_Selection_Screen_() {
     allocate::Push_Block_(MOX::_screen_seg);
 
     for (int i = 0; i < 13; ++i) {
-        _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, i, 1, 0x1F);
+        _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, i, 1, 0x1F);
         RUSS::Mox_Update_();
     }
 
     FILE* file = fopen("lastrace.rac", "rb");
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
-        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, 12, 1, 0x1F);
+        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, 12, 1, 0x1F);
 
         // Overwrite template with saved race data
         fread(_race_specials[13], 31, 1, file);
@@ -748,7 +748,7 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
     allocate::Push_Block_(MOX::_screen_seg);
 
     RACESEL::_temp_ruler_name = (char*)farload::Far_Reload_Next_Data_(
-        s_RACENAME_LBX,
+        "RACENAME.LBX",
         0,
         MOX::_screen_seg,
         (int32_t)random::Random_(8) + (int32_t)race_idx * 8 - 1,
@@ -999,13 +999,13 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
                 if (ability_id == 5) {
                     if (bonus == 1) {
-                        strcpy(bonus_text, s_1_2_00557ff0);
+                        strcpy(bonus_text, "1/2");
                     } else {
-                        strcpy(bonus_text, s_1_00556B10);
+                        strcpy(bonus_text, "1");
                     }
                 } else if (ability_id == 2) {
                     if (bonus == 1) {
-                        strcpy(bonus_text, s_1_2_00557ff0);
+                        strcpy(bonus_text, "1/2");
                     } else {
                         itoa(static_cast<int32_t>(bonus / 2), bonus_text, 10);
                     }

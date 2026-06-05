@@ -575,7 +575,7 @@ namespace INFO {
 
         int16_t field_counter = fields::Get_Field_Counter_();
 
-        const char* format = (MOX::_settings.language == 0) ? s_fmt_dot_00555ff8 : s_fmt_comma_00555ff0;
+        const char* format = (MOX::_settings.language == 0) ? "%i.%i" : "%i,%i";
         sprintf(stardate_str, format, (int)(MOX::_stardate / 10), (int)(MOX::_stardate % 10));
 
         _race_statistics_page = 1;

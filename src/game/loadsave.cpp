@@ -1064,7 +1064,7 @@ namespace LOADSAVE {
         }
 
         if (!success) {
-            exitm::Exit_With_Message(s_Settings_file_error_00556950);
+            exitm::Exit_With_Message("Settings file (MOX.SET) is missing or invalid");
         }
     }
 
@@ -1760,7 +1760,7 @@ namespace LOADSAVE {
 
         sprintf(
                 out_string,
-                s__3s__2d____4d__2d__2d_0055ac64,
+                "%3s %2d, %-4d  %2d:%2d",
                 LOADSAVE::_months[month],
                 static_cast<int>(day),
                 static_cast<int>(year),

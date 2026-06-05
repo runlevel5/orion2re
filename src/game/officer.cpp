@@ -3565,7 +3565,7 @@ void __cdecl Print_Officer_Data_(
     }
 
     if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
-        sprintf(text_buffer, s__s_00551130, OFFICER::Leader_Name_(officer_id, false));
+        sprintf(text_buffer, "%s", OFFICER::Leader_Name_(officer_id, false));
         fonts::Set_Font_Style_Outline_(3, &text_colors);
         fonts::Set_Font_Spacing_(1);
 
@@ -3585,7 +3585,7 @@ void __cdecl Print_Officer_Data_(
             const int16_t label_width = fonts::Get_String_Width_(label);
 
             HAROLD::Get_Monetary_Unit_String_(money_unit);
-            sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(status4_cost), money_unit);
+            sprintf(text_buffer, "%d %s", static_cast<int32_t>(status4_cost), money_unit);
 
             fonts::Print_Right_(
                 static_cast<int16_t>(text_x + right_column_offset_x - 2),
@@ -3604,7 +3604,7 @@ void __cdecl Print_Officer_Data_(
                 strcpy(text_buffer, HAROLD::H_Message_(0x10a));
             } else {
                 HAROLD::Get_Monetary_Unit_String_(money_unit);
-                sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(other_cost), money_unit);
+                sprintf(text_buffer, "%d %s", static_cast<int32_t>(other_cost), money_unit);
             }
 
             const int16_t label_x =
@@ -3718,7 +3718,7 @@ void __cdecl Print_Officer_Data_(
             OFFICER::Draw_Officer_Skill_Icon_(skill_column_x, current_y, skill_idx / 2);
 
             const int16_t name_x = static_cast<int16_t>(skill_column_x + 0x16);
-            sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
+            sprintf(text_buffer, "%s ", MOX::_skill_data[skill_idx].name);
             fonts::Print_(name_x, current_y, text_buffer);
             fonts::Get_String_Width_(text_buffer);
 
@@ -3753,7 +3753,7 @@ void __cdecl Print_Officer_Data_(
             OFFICER::Draw_Officer_Skill_Icon_(skill_column_x, current_y, skill_idx / 2);
 
             const int16_t name_x = static_cast<int16_t>(skill_column_x + 0x16);
-            sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
+            sprintf(text_buffer, "%s ", MOX::_skill_data[skill_idx].name);
             fonts::Print_(name_x, current_y, text_buffer);
             fonts::Get_String_Width_(text_buffer);
 

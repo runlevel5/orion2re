@@ -1324,7 +1324,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 void __cdecl Load_Antaran_Planet_() {
     struct_::Clear_Structure_(MOX::_combat_data, sizeof(*MOX::_combat_data));
 
-    strcpy(MOX::_combat_data->name, s_Antares_00551288);
+    strcpy(MOX::_combat_data->name, "Antares");
     MOX::_combat_data->ship_idx = -1;
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->size_class = 5;

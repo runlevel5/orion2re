@@ -214,7 +214,7 @@ namespace remap {
 
         animate::_animation_header = animation;
         if ((animation->flags & 0x10) == 0) {
-            exitm::Exit_With_Message(s_Get_Picture_Color_Picture_Must_H_0055b2dc);
+            exitm::Exit_With_Message("Get_Picture_Color  Picture Must Have Palette");
         }
 
         animate::_palette_header =
@@ -236,7 +236,7 @@ namespace remap {
             return;
         }
 
-        sprintf(error_text, s__d___d___d_0055b2d0, palette_index, palette_start, palette_end);
+        sprintf(error_text, "%d, %d, %d", palette_index, palette_start, palette_end);
         exitm::Exit_With_Message(error_text);
     }
 }

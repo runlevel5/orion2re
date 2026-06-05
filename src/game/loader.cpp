@@ -66,7 +66,7 @@ namespace LOADER {
         int32_t star_picture_idx = 1;
         for (int32_t i = 0; i < 11; ++i) {
             RUSS::Mox_Update_();
-            MOX::_star_colors_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(s_gstar_lbx_00558544, star_picture_idx, MOX::_global_screen_seg);
+            MOX::_star_colors_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("gstar.lbx", star_picture_idx, MOX::_global_screen_seg);
             star_picture_idx++;
         }
 
@@ -104,7 +104,7 @@ namespace LOADER {
 
     void __cdecl Load_Player_Special_Names_() {
         char* const loaded_names = (char*)farload::Far_Reload_(
-            s_RACESTUF_lbx_00558550,
+            "RACESTUF.lbx",
             (int32_t)(uint8_t)MOX::_settings.language + 8,
             MOX::_special_names_seg);
 

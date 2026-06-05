@@ -480,10 +480,10 @@ namespace DIP_SCRN {
         graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
         bitmap::Draw_Bitmap_To_Mouse_(0, 0, (s_animation_header*)_diplomacy_mouse_bitmap, 0);
 
-        _diplomacy_system_star_background_seg = (s_animation_header*)farload::Far_Reload_Next_(s_dipstars_lbx_00552374, 0, MOX::_screen_seg);
+        _diplomacy_system_star_background_seg = (s_animation_header*)farload::Far_Reload_Next_("dipstars.lbx", 0, MOX::_screen_seg);
         for (int i = 0; i < 11; ++i) {
             MOX::_fleet_galaxy_star_seg[i] = (s_animation_header*)
-                farload::Far_Reload_Next_(s_dipstars_lbx_00552374, i + 1, MOX::_screen_seg);
+                farload::Far_Reload_Next_("dipstars.lbx", i + 1, MOX::_screen_seg);
         }
 
         _main_diplomacy_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
@@ -1619,7 +1619,7 @@ namespace DIP_SCRN {
                     fonts::Set_Outline_Color_(0xF8, 0xF8);
                     fonts::Set_Font_Style_Shadow_Down_(4, &_diplomacy_normal_colors);
 
-                    sprintf(local_str, s_s_sez__s_00552334, MOX::_player[_current_ambassador].name, _receive_chat_message);
+                    sprintf(local_str, "%s sez: %s", MOX::_player[_current_ambassador].name, _receive_chat_message);
                     fonts::Print_Centered_(0x140, 0x1D, local_str);
                 }
             }

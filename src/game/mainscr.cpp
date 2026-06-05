@@ -410,21 +410,21 @@ namespace MAINSCR {
         video::Clip_On_();
 
         // Far Stars - Layer 0
-        MOX::_far_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_STARBG_LBX, 0, MOX::_global_cache_seg));
+        MOX::_far_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("STARBG.LBX", 0, MOX::_global_cache_seg));
         animate::Draw_(MOX::_far_star_x, MOX::_far_star_y, MOX::_far_star_seg);
         animate::Draw_(MOX::_far_star_x - 640, MOX::_far_star_y, MOX::_far_star_seg);
         animate::Draw_(MOX::_far_star_x - 640, MOX::_far_star_y - 480, MOX::_far_star_seg);
         animate::Draw_(MOX::_far_star_x, MOX::_far_star_y - 480, MOX::_far_star_seg);
 
         // Mid Stars - Layer 1
-        MOX::_mid_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_STARBG_LBX, 1, MOX::_global_cache_seg));
+        MOX::_mid_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("STARBG.LBX", 1, MOX::_global_cache_seg));
         animate::Draw_(MOX::_mid_star_x, MOX::_mid_star_y, MOX::_mid_star_seg);
         animate::Draw_(MOX::_mid_star_x - 640, MOX::_mid_star_y, MOX::_mid_star_seg);
         animate::Draw_(MOX::_mid_star_x - 640, MOX::_mid_star_y - 480, MOX::_mid_star_seg);
         animate::Draw_(MOX::_mid_star_x, MOX::_mid_star_y - 480, MOX::_mid_star_seg);
 
         // Near Stars - Layer 2
-        MOX::_near_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_STARBG_LBX, 2, MOX::_global_cache_seg));
+        MOX::_near_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("STARBG.LBX", 2, MOX::_global_cache_seg));
         animate::Draw_(MOX::_near_star_x, MOX::_near_star_y, MOX::_near_star_seg);
         animate::Draw_(MOX::_near_star_x - 640, MOX::_near_star_y, MOX::_near_star_seg);
         animate::Draw_(MOX::_near_star_x - 640, MOX::_near_star_y - 480, MOX::_near_star_seg);

@@ -843,8 +843,7 @@ namespace SCORE {
         char scor_buf[16];
 
         // This local string copy appears in the original binary but is not explicitly used.
-        memcpy(scor_buf, s_scor_0055a510, 4);
-        scor_buf[4] = s_scor_0055a510[4];
+        memcpy(scor_buf, "scor", 5);
 
         SCORE::_hi->score_elimination = SCORE::Get_Elimination_Score_(player_idx);
         SCORE::_hi->score_technology = SCORE::Get_Technology_Score_(player_idx);
@@ -890,11 +889,11 @@ namespace SCORE {
             char modifier_str[16];
             int16_t modifier = _hi->score_modifier_pct;
             if (modifier < 100) {
-                sprintf(modifier_str, s_dot_d_0055a528, (int)modifier);
+                sprintf(modifier_str, ".%d", (int)modifier);
             } else {
-                sprintf(modifier_str, s_fmt_modifier_full_005523a4, (int)(modifier / 100), (int)(modifier % 100));
+                sprintf(modifier_str, "%d.%d", (int)(modifier / 100), (int)(modifier % 100));
             }
-            sprintf(score_buffer, s_fmt_score_complex_0055a518, (int)_hi->score_raw_subtotal, modifier_str, (int)_hi->score_final);
+            sprintf(score_buffer, "(%d x %s) %d", (int)_hi->score_raw_subtotal, modifier_str, (int)_hi->score_final);
         }
 
         int16_t score_width = fonts::Get_String_Width_(score_buffer);

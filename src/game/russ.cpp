@@ -175,7 +175,7 @@ namespace RUSS {
         if (star_index < MOX::_NUM_STARS) {
             return MOX::_star[star_index].name;
         }
-        return (char*)s_Antares_00551288;
+        return (char*)"Antares";
     }
 
     void __cdecl Shuffle_(void* buffer, int16_t element_size, int16_t num_elements) {

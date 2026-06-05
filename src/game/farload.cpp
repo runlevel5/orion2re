@@ -332,7 +332,7 @@ void __cdecl Set_Alternate_Path_(char* input_path) {
     }
 
     if (path_length == 0 || _secondary_drive_path[path_length - 1] != '\\') {
-        strcat(_secondary_drive_path, k_backslash);
+        strcat(_secondary_drive_path, "\\");
     }
 }
 

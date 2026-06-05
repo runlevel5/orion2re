@@ -1265,35 +1265,35 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
 
     if (target_idx < 8 && (*_attack_confirmed)[player_idx][target_idx] == 0) {
         int treaty_count = 0;
-        int offset = sprintf(message_buffer, s_format_string, _you_have_following_treaties_msg);
+        int offset = sprintf(message_buffer, "%s\n", _you_have_following_treaties_msg);
         char* dest_ptr = message_buffer + offset;
 
         // Check standard treaties (e.g., Non-Aggression, Alliance)
         int8_t treaty_type = MOX::_player[player_idx].treaty[target_idx];
         if (treaty_type > 0 && treaty_type < 4) {
             treaty_count = 1;
-            offset = sprintf(dest_ptr, s_format_string, MOX::_treaty_labels[treaty_type]);
+            offset = sprintf(dest_ptr, "%s\n", MOX::_treaty_labels[treaty_type]);
             dest_ptr += offset;
         }
 
         // Check trade treaty
         if (MOX::_player[player_idx].trade_treaty[target_idx] != 0) {
             treaty_count++;
-            offset = sprintf(dest_ptr, s_format_string, _trade_treaty_msg);
+            offset = sprintf(dest_ptr, "%s\n", _trade_treaty_msg);
             dest_ptr += offset;
         }
 
         // Check research treaty
         if (MOX::_player[player_idx].research_treaty[target_idx] != 0) {
             treaty_count++;
-            offset = sprintf(dest_ptr, s_format_string, _research_treaty_msg);
+            offset = sprintf(dest_ptr, "%s\n", _research_treaty_msg);
             dest_ptr += offset;
         }
 
         // Check if player is receiving tribute from the target
         if (MOX::_player[target_idx].tribute_treaty[player_idx] != 0) {
             treaty_count++;
-            offset = sprintf(dest_ptr, s_format_string, _receiving_tribute_msg);
+            offset = sprintf(dest_ptr, "%s\n", _receiving_tribute_msg);
             dest_ptr += offset;
         }
 

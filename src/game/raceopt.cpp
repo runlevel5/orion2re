@@ -311,7 +311,7 @@ namespace raceopt {
         s_animation_header* bg1 = (s_animation_header*)buffer::Buffer_Reload_("RACEOPT.LBX", 4, MOX::_global_cache_seg);
         animate::Draw_(0, 0, bg1);
         
-        s_animation_header* bg2 = (s_animation_header*)buffer::Buffer_Reload_(s_patch13_lbx_00556330, 0, MOX::_global_cache_seg);
+        s_animation_header* bg2 = (s_animation_header*)buffer::Buffer_Reload_("patch13.lbx", 0, MOX::_global_cache_seg);
         animate::Draw_(131 /* 0x83 */, 0, bg2);
 
         int16_t col_idx = 0;

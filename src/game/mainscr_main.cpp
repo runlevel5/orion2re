@@ -16,7 +16,7 @@ namespace MAINSCR {
 
         fonts::Set_Font_Style_(0, &colors1);
         fonts::Get_Font_Height_();
-        sprintf(buffer, s__d_c_d_0055996c, (int)(MOX::_stardate / 10), (int)sep, (int)(MOX::_stardate % 10));
+        sprintf(buffer, "%d%c%d", (int)(MOX::_stardate / 10), (int)sep, (int)(MOX::_stardate % 10));
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, -1, 0x43, 1);
         int16_t stardate_font_style = MISC::Get_Font_Style_();
         s_colors* p_stardate_colors = MISC::Font_Colors2_(stardate_font_style, 14, 23);
@@ -50,7 +50,7 @@ namespace MAINSCR {
 
         char* surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
         const char* bc_sign = (plr->surplus_bc < 0) ? s__00551100 : s_plus_00551118;
-        sprintf(buffer, s__s_s__s_00559964, bc_sign, surplus_bc_comma, monetary_unit);
+        sprintf(buffer, "%s%s %s", bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
         int16_t bc_style = MISC::Get_Font_Style_();
         MISC::Get_Font_Spacing_();
@@ -58,7 +58,7 @@ namespace MAINSCR {
         MISC::Get_Mox_Font_Colors_(bc_style, 14, 23, &colors2);
 
         char* bc_comma = MISC::Get_Comma_String_(plr->bc);
-        sprintf(buffer, s__s__s_00558014, bc_comma, monetary_unit);
+        sprintf(buffer, "%s %s", bc_comma, monetary_unit);
 
         if (plr->bc < 0) {
             MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
@@ -74,7 +74,7 @@ namespace MAINSCR {
 
         surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
         bc_sign = (plr->surplus_bc < 0) ? s__00551100 : s_plus_00551118;
-        sprintf(buffer, s__s_s__s_00559964, bc_sign, surplus_bc_comma, monetary_unit);
+        sprintf(buffer, "%s%s %s", bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
         bc_style = MISC::Get_Font_Style_();
         int16_t bc_spacing = MISC::Get_Font_Spacing_();
@@ -96,7 +96,7 @@ namespace MAINSCR {
 
         int16_t cp_surplus = plr->command_points - plr->command_points_used;
         const char* cp_sign = (cp_surplus < 0) ? s__00551100 : s_plus_00551118;
-        sprintf(buffer, s__s_d___d__00559958, cp_sign, (int)cp_surplus, (int)plr->command_points);
+        sprintf(buffer, "%s%d (%d)", cp_sign, (int)cp_surplus, (int)plr->command_points);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 0);
         int16_t current_style = (int16_t)fonts::_current_font_style;
         int16_t current_spacing = MISC::Get_Font_Spacing_();
@@ -104,10 +104,10 @@ namespace MAINSCR {
         MISC::Get_Mox_Font_Colors_(current_style, 14, 23, &colors2);
 
         char cp_left[64];
-        sprintf(cp_left, s__s_d_00556134, cp_sign, (int)cp_surplus);
+        sprintf(cp_left, "%s%d", cp_sign, (int)cp_surplus);
         int16_t cp_left_w = fonts::Get_String_Width_(cp_left);
         char cp_right[64];
-        sprintf(cp_right, s___d__00559950, (int)plr->command_points);
+        sprintf(cp_right, "(%d)", (int)plr->command_points);
         int16_t cp_total_w = (int16_t)(fonts::Get_String_Width_(cp_right) + cp_left_w + 4);
 
         if (cp_surplus < 0) {
@@ -130,7 +130,7 @@ namespace MAINSCR {
         fonts::Get_Font_Height_();
         char* food_comma = MISC::Get_Comma_String_(plr->surplus_food);
         const char* food_sign = (plr->surplus_food < 0) ? s__00551100 : s_plus_00551118;
-        sprintf(buffer, s__s_s_00556aec, food_sign, food_comma);
+        sprintf(buffer, "%s%s", food_sign, food_comma);
         if (plr->surplus_food < 0) {
             MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
             Set_Post_Fitted_Font_Style_('K', 'M');
@@ -145,7 +145,7 @@ namespace MAINSCR {
         fonts::Print_Centered_(579, 255, buffer);
 
         const char* fr_sign = (plr->surplus_freighters < 0) ? s__00551100 : s_plus_00551118;
-        sprintf(buffer, s__s_d___d__00559958, fr_sign, (int)plr->surplus_freighters, (int)plr->n_freighters);
+        sprintf(buffer, "%s%d (%d)", fr_sign, (int)plr->surplus_freighters, (int)plr->n_freighters);
         MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
         int16_t fr_style = MISC::Get_Font_Style_();
         MISC::Get_Mox_Font_Colors_(fr_style, 'K', 'M', &colors1);
@@ -153,7 +153,7 @@ namespace MAINSCR {
         int16_t fr_spacing = MISC::Get_Font_Spacing_();
         int16_t fr_total_w = fonts::Get_String_Width_(buffer);
 
-        sprintf(buffer, s__s_d_00556134, fr_sign, (int)plr->surplus_freighters);
+        sprintf(buffer, "%s%d", fr_sign, (int)plr->surplus_freighters);
         if (plr->surplus_freighters < 0) {
             fonts::Set_Font_Style_Outline_(fr_style, &colors1);
             fonts::Set_Font_Spacing_(fr_spacing);
@@ -170,7 +170,7 @@ namespace MAINSCR {
 
         fonts::Set_Outline_Color_(2, 1);
         int16_t fr_left_w = fonts::Get_String_Width_(buffer);
-        sprintf(buffer, s___d__00559950, (int)plr->n_freighters);
+        sprintf(buffer, "(%d)", (int)plr->n_freighters);
         fonts::Set_Font_Style_Outline_(fr_style, &colors2);
         fonts::Set_Font_Spacing_(fr_spacing);
         fonts::Print_(fr_left_w - fr_half_w + 583, 330, buffer);
@@ -194,7 +194,7 @@ namespace MAINSCR {
         if (turns > 0) {
             int32_t chance = COLCALC::Chance_For_Research_Breakthrough_(plr);
             if (chance > 0) {
-                sprintf(buffer, s__d___0055612c, (int)chance);
+                sprintf(buffer, "%d%%", (int)chance);
                 MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
                 Set_Post_Fitted_Font_Style_(14, 23);
                 fonts::Set_Outline_Color_(2, 1);
@@ -203,7 +203,7 @@ namespace MAINSCR {
             const char* turns_msg = HAROLD::H_Message_(turns == 1 ? 0xe1 : 0xe2);
             sprintf(buffer, turns_msg, (int)turns);
             char at_buffer[64];
-            sprintf(at_buffer, s___s_0055994c, buffer);
+            sprintf(at_buffer, "@%s", buffer);
             MISC::Set_Fitted_Font_Style_(at_buffer, &colors2, 2, 2, 4, 0x43, 1);
             Set_Post_Fitted_Font_Style_(14, 23);
             int16_t fh = fonts::Get_Font_Height_();
@@ -211,21 +211,21 @@ namespace MAINSCR {
             fonts::Set_Outline_Color_(2, 1);
             int16_t msg_w = fonts::Get_String_Width_(buffer);
             int16_t start_x = (int16_t)((62 - msg_w) / 2 + 548);
-            fonts::Print_(start_x, turns_y + 3, s___00559948);
+            fonts::Print_(start_x, turns_y + 3, "@");
 
             const char* turns_msg2 = HAROLD::H_Message_(turns == 1 ? 0xe1 : 0xe2);
             sprintf(buffer, turns_msg2, (int)turns);
-            fonts::Print_((int16_t)(fonts::Get_String_Width_(s___00559948) + start_x), turns_y, buffer);
+            fonts::Print_((int16_t)(fonts::Get_String_Width_("@") + start_x), turns_y, buffer);
 
             char* res_comma = MISC::Get_Comma_String_(plr->research_produced);
-            sprintf(buffer, s__s__s_00558014, res_comma, research_unit);
+            sprintf(buffer, "%s %s", res_comma, research_unit);
             MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
             Set_Post_Fitted_Font_Style_(14, 23);
             fonts::Set_Outline_Color_(2, 1);
             fonts::Print_Centered_(579, turns_y + fonts::Get_Font_Height_(), buffer);
         }
         else if (turns < 0) {
-            sprintf(buffer, s_0__s_00559940, research_unit);
+            sprintf(buffer, "0 %s", research_unit);
             MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
             Set_Post_Fitted_Font_Style_(14, 23);
             fonts::Set_Outline_Color_(2, 1);
@@ -233,13 +233,13 @@ namespace MAINSCR {
         }
         else {
             int32_t chance = COLCALC::Chance_For_Research_Breakthrough_(plr);
-            sprintf(buffer, s__d___0055612c, (int)chance);
+            sprintf(buffer, "%d%%", (int)chance);
             MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
             Set_Post_Fitted_Font_Style_(14, 23);
             fonts::Set_Outline_Color_(2, 1);
             fonts::Print_Centered_(579, 391, buffer);
 
-            sprintf(buffer, s__d__s_005569f0, (int)plr->research_produced, research_unit);
+            sprintf(buffer, "%d %s", (int)plr->research_produced, research_unit);
             MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
             Set_Post_Fitted_Font_Style_(14, 23);
             fonts::Set_Outline_Color_(2, 1);
