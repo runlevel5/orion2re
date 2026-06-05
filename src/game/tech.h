@@ -9,18 +9,25 @@ struct s_animation_header;
 struct s_fieldsav_data;
 
 namespace TECH {
+    /** Opens the technology selection screen for the current player. */
     void __cdecl Tech_Select_();
-    extern char s__00559488[64];
 
-    void __cdecl _Tech_Select_(uint8_t arg0);
+    /** Displays the technology screen in select or change mode.
+     * @param changing_tech Nonzero to open the change-research variant.
+     */
+    void __cdecl _Tech_Select_(uint8_t changing_tech);
 
+    /** Restores palette, help, and audio state after leaving the technology screen. */
     void __cdecl Reset_Screen_();
 
-    extern const char _research_desc_fmt[19];
+    /** Returns the research cost for a field or application.
+     * @param id Technology field or application identifier.
+     * @param is_tech_app Nonzero when @p id names an application instead of a field.
+     * @param player_idx Player whose cost modifiers should be used.
+     */
     int32_t __cdecl New_Get_Tech_Cost_(int16_t id, uint8_t is_tech_app, int16_t player_idx);
 
     extern uint8_t _saved_hyper_advanced_tech[8];
-    extern const char _tech_select_lbx[12];
     extern int32_t _tech_select_pos[8];
     extern int32_t _tech_change_pos[8];
     extern int16_t _app_name_y[8];
@@ -43,32 +50,65 @@ namespace TECH {
     extern s_list_item* _g_selected_list_entry_p;
     extern char _tech_group_names[10][20];
 
+    /** Restores the saved hyper-advanced-tech levels for a player. */
     void __cdecl Restore_Hyper_Tech_Values_(int16_t player_idx);
+    /** Initializes the fixed on-screen positions for the eight research entries. */
     void __cdecl Init_Entry_Positions_(s_list_item_research* entries);
-    int16_t __cdecl Init_Entry_Data_(s_list_item_research* param_1, int param_2);
+    /** Builds the visible research-entry data for the current player.
+     * @param entries Destination array of eight research entries.
+     * @param research_cost_offset Research already accumulated toward the displayed field.
+     */
+    int16_t __cdecl Init_Entry_Data_(s_list_item_research* entries, int32_t research_cost_offset);
+    /** Creates the per-entry radio-button fields for selectable research entries. */
     void __cdecl Setup_Entry_Buttons_(s_list_item_research* entries, s_animation_header** images);
+    /** Draws the main technology selection screen state. */
     void __cdecl Draw_Tech_Select_();
+    /** Draws one research entry's field, cost, and visible applications. */
     void __cdecl Display_Entry_Text_(s_list_item_research* item);
+    /** Draws all eight research entries. */
     void __cdecl Display_All_Entry_Text_(s_list_item_research* entries);
+    /** Marks the entry matching a clicked field id as selected. */
     s_list_item_research* __cdecl Set_Selected_Entry_(s_list_item_research* research_list, int16_t field_id);
+    /** Returns the currently selected research entry, if any. */
     s_list_item_research* __cdecl Get_Selected_Entry_(s_list_item_research* entries);
+    /** Redraws the selected research entry highlight state. */
     void __cdecl Display_Selected_Entry_Text_(s_list_item_research* entry);
+    /** Draws the selection arrow next to the active application line. */
     void __cdecl Draw_Little_Arrow_(s_list_item_research* entry);
-    void __cdecl Draw_Application_Description_(int32_t param1, uint16_t app_id);
-    int16_t __cdecl _Tech_List_(s_list_item_research* tech_research, uint8_t mode);
+    /** Shows the help text and displayed cost for a technology application.
+     * @param unused_x Retained legacy x-coordinate parameter; currently unused.
+     * @param app_id Technology application to describe.
+     */
+    void __cdecl Draw_Application_Description_(int32_t unused_x, uint16_t app_id);
+    /** Opens the grouped technology list popup for a selected entry.
+     * @param entry Entry whose group should be listed.
+     * @param is_change_mode Nonzero when opened from the change-research screen.
+     */
+    int16_t __cdecl _Tech_List_(s_list_item_research* entry, uint8_t is_change_mode);
 
+    /** Populates the list popup with all visible technologies in a group. */
     void __cdecl Get_Group_List_(s_list_state* list, int16_t group_id);
 
+    /** Draws the grouped technology list popup state. */
     void __cdecl Draw_Tech_List_();
 
+    /** Opens the change-research flow from the current screen. */
     void __cdecl Tech_Change_();
 
+    /** Saves the current hyper-advanced-tech levels for a player. */
     void __cdecl Save_Hyper_Tech_Values_(int16_t player_idx);
 
+    /** Temporarily increments hyper-advanced-tech levels for display calculations. */
     void __cdecl Promote_Hyper_Field_Values_(int16_t player_idx);
 
-    char* __cdecl Technology_Applications_Name_(int16_t param_1, int16_t param_2);
+    /** Returns the display name for a technology application.
+     * @param tech_app_id Technology application identifier.
+     * @param player_idx Player whose hyper-tech suffix should be reflected in the name.
+     */
+    char* __cdecl Technology_Applications_Name_(int16_t tech_app_id, int16_t player_idx);
+    /** Maps a hyper-tech field id to its synthetic application id. */
     int16_t __cdecl Get_Hyper_Tech_App_ID_(int16_t tech_field_id);
+    /** Returns the display name for a technology field. */
     char* __cdecl Technology_Fields_Name_(int16_t tech_field_id);
     extern int16_t _tech_field_y1[4];
     extern int16_t _tech_field_y2[4];

@@ -11,7 +11,6 @@
 - [pending] src/game/simmodem.h
 - [pending] src/game/string.h
 
-- [pending] src/game/trade.{h,cpp}
 - [pending] src/game/transprt.{h,cpp}
 - [pending] src/game/turnsum.{h,cpp}
 - [pending] src/game/types.h

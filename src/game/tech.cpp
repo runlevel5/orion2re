@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace {
+    /** Draws one application name inside the grouped technology list popup. */
     void __cdecl Draw_Tech_List_App_(int16_t x, int16_t y, uint8_t tech_app_id) {
         char buffer[80];
 
@@ -11,17 +12,9 @@ namespace {
 }
 
 namespace TECH {
-    const char _research_desc_fmt[19] = {
-        '\x07', 'F', '3', '.', '\x1A', '3', '%', 's',
-        '\r', '\x07', 'Y', '+', '3', '.', '\x1A', '2',
-        '%', 's', '\0',
-    };
-
-    char s__00559488[64];
+    char _hyper_field_name_buffer[64];
 
     uint8_t _saved_hyper_advanced_tech[8];
-
-    const char _tech_select_lbx[12] = "TECHSEL.LBX";
 
     int32_t _tech_select_pos[8] = {
         0x001E00B0, 0x001F0193, 0x008700B0, 0x00870193,
@@ -95,7 +88,7 @@ namespace TECH {
         0,
         4,
         3,
-        reinterpret_cast<void*>(Draw_Tech_List_App_),
+        (void*)Draw_Tech_List_App_,
         10,
         0xFF,
         &_tech_color[1],
@@ -115,14 +108,14 @@ namespace TECH {
         TECH::Reset_Screen_();
     }
 
-    void __cdecl _Tech_Select_(uint8_t param_1) {
+    void __cdecl _Tech_Select_(uint8_t changing_tech) {
         int16_t extra_fields_cnt;
         int16_t first_btn_field;
         int16_t last_btn_field;
         int16_t accept_btn_id;
         int i;
         int16_t player_race;
-        char sr_r_x_sc_lbx[64];
+        char science_race_lbx_name[64];
         MOX2::action_func_t auto_func;
         s_animation_header* tech_select_lbx_images[9];
         s_animation_header* entry_buttons[8];
@@ -140,18 +133,18 @@ namespace TECH {
         fields::Disable_Cancel_();
 
         MOX::_cur_plyr_ptr = &MOX::_player[MOX::_PLAYER_NUM];
-        _g_changing_tech = param_1;
+        _g_changing_tech = changing_tech;
 
         saved_current_field = MOX::_cur_plyr_ptr->current_research_field;
 
-        s_list_item_research* entries = reinterpret_cast<s_list_item_research*>(
-            allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xC40)
+        s_list_item_research* entries = (s_list_item_research*)(
+            allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_list_item_research) * 8)
             );
         MOX::_tech_desc_seg = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
 
         RUSS::Mox_Update_();
 
-        if (param_1 == 1) {
+        if (changing_tech == 1) {
             _g_scrn_x = 0x50;
             _g_scrn_y = 0;
             for (i = 0; i < 5; ++i) {
@@ -159,21 +152,21 @@ namespace TECH {
             }
             _g_cursor_box_color = 0xEF;
 
-            tech_select_lbx_images[0] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0xE, MOX::_screen_seg));
+            tech_select_lbx_images[0] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0xE, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            entry_buttons[0] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0xF, MOX::_screen_seg));
-            entry_buttons[1] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x10, MOX::_screen_seg));
-            entry_buttons[2] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x11, MOX::_screen_seg));
-            entry_buttons[3] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x12, MOX::_screen_seg));
+            entry_buttons[0] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0xF, MOX::_screen_seg);
+            entry_buttons[1] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x10, MOX::_screen_seg);
+            entry_buttons[2] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x11, MOX::_screen_seg);
+            entry_buttons[3] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x12, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            entry_buttons[4] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x13, MOX::_screen_seg));
-            entry_buttons[5] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x14, MOX::_screen_seg));
-            entry_buttons[6] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x15, MOX::_screen_seg));
+            entry_buttons[4] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x13, MOX::_screen_seg);
+            entry_buttons[5] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x14, MOX::_screen_seg);
+            entry_buttons[6] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x15, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            entry_buttons[7] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x16, MOX::_screen_seg));
+            entry_buttons[7] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x16, MOX::_screen_seg);
 
-            tech_select_lbx_images[8] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x1B,
-                MOX::_screen_seg));
+            tech_select_lbx_images[8] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x1B,
+                MOX::_screen_seg);
         }
         else {
             _g_scrn_x = 0xA1;
@@ -183,27 +176,27 @@ namespace TECH {
             }
             _g_cursor_box_color = 0xFF;
 
-            tech_select_lbx_images[0] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0, MOX::_screen_seg));
+            tech_select_lbx_images[0] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            entry_buttons[0] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 1, MOX::_screen_seg));
-            entry_buttons[1] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 2, MOX::_screen_seg));
-            entry_buttons[2] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 3, MOX::_screen_seg));
+            entry_buttons[0] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 1, MOX::_screen_seg);
+            entry_buttons[1] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 2, MOX::_screen_seg);
+            entry_buttons[2] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 3, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            entry_buttons[3] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 4, MOX::_screen_seg));
-            entry_buttons[4] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 5, MOX::_screen_seg));
-            entry_buttons[5] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 6, MOX::_screen_seg));
+            entry_buttons[3] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 4, MOX::_screen_seg);
+            entry_buttons[4] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 5, MOX::_screen_seg);
+            entry_buttons[5] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 6, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            entry_buttons[6] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 7, MOX::_screen_seg));
-            entry_buttons[7] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 8, MOX::_screen_seg));
+            entry_buttons[6] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 7, MOX::_screen_seg);
+            entry_buttons[7] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 8, MOX::_screen_seg);
 
-            tech_select_lbx_images[8] = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0xD, MOX::_screen_seg));
+            tech_select_lbx_images[8] = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0xD, MOX::_screen_seg);
         }
 
         RUSS::Mox_Update_();
 
         _g_tech_list_header.marker_color = _g_cursor_box_color;
 
-        if (param_1 == 1) {
+        if (changing_tech == 1) {
             accept_btn_id = fields::Add_Button_Field_(
                 _g_scrn_x + 0xBD, _g_scrn_y + 0x1C4, s__00551100, tech_select_lbx_images[8], s__00551120, '('
             );
@@ -252,19 +245,19 @@ namespace TECH {
         _g_entries_p = entries;
 
         player_race = MOX::_player[MOX::_PLAYER_NUM].race;
-        sprintf(sr_r_x_sc_lbx, s_SR_R_x_SC_LBX_00557d74, player_race);
+        sprintf(science_race_lbx_name, s_SR_R_x_SC_LBX_00557d74, player_race);
 
         RUSS::Mox_Update_();
 
-        if (param_1 == 0) {
-            file_ani::Open_File_Animation_(sr_r_x_sc_lbx, 0);
-            science_lbx = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(s_SCIENCE_LBX_00557d68, 0, MOX::_screen_seg));
+        if (changing_tech == 0) {
+            file_ani::Open_File_Animation_(science_race_lbx_name, 0);
+            science_lbx = (s_animation_header*)farload::Far_Reload_Next_(s_SCIENCE_LBX_00557d68, 0, MOX::_screen_seg);
         }
 
         while (true) {
             RUSS::Mox_Update_();
 
-            if (param_1 == 0) {
+            if (changing_tech == 0) {
                 video::Set_Page_Off_();
                 graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
 
@@ -285,7 +278,7 @@ namespace TECH {
 
             fields::Set_Input_Delay_(5);
 
-            if (param_1 == 1) {
+            if (changing_tech == 1) {
                 BILLHELP::Technology_Change_Help_();
             }
             else {
@@ -305,7 +298,7 @@ namespace TECH {
             video::Copy_Off_To_Back_();
             Draw_Tech_Select_();
 
-            if (param_1 == 0) {
+            if (changing_tech == 0) {
                 JIM::Bill_Picture_To_Mouse_(tech_select_lbx_images[8]);
             }
 
@@ -318,7 +311,7 @@ namespace TECH {
             bool redraw = false;
 
             while (!redraw) {
-                if (param_1 == 0) {
+                if (changing_tech == 0) {
                     JIM::Play_Streaming_Music_(0x75, -2, 1);
                 }
 
@@ -396,7 +389,7 @@ namespace TECH {
                         );
                         video::Copy_Off_To_Back_();
                         clicked_entry->button_value = 0;
-                        _Tech_List_(clicked_entry, param_1);
+                        _Tech_List_(clicked_entry, changing_tech);
                         redraw = true;
                         break;
                     }
@@ -406,14 +399,19 @@ namespace TECH {
     }
 
     void __cdecl Restore_Hyper_Tech_Values_(int16_t player_idx) {
-        // The function iterates 8 times copying bytes from a global buffer to the player's tech structure.
-        // This is semantically equivalent to a memcpy of size 8.
-        memcpy(MOX::_player[player_idx].hyper_advanced_tech, TECH::_saved_hyper_advanced_tech, 8);
+        memcpy(
+            MOX::_player[player_idx].hyper_advanced_tech,
+            TECH::_saved_hyper_advanced_tech,
+            sizeof(MOX::_player[player_idx].hyper_advanced_tech)
+        );
     }
 
     void __cdecl Save_Hyper_Tech_Values_(int16_t player_idx) {
-        // Copy 8 bytes of hyper advanced tech values for the specified player
-        memcpy(TECH::_saved_hyper_advanced_tech, MOX::_player[player_idx].hyper_advanced_tech, 8);
+        memcpy(
+            TECH::_saved_hyper_advanced_tech,
+            MOX::_player[player_idx].hyper_advanced_tech,
+            sizeof(TECH::_saved_hyper_advanced_tech)
+        );
     }
 
     void __cdecl Init_Entry_Positions_(s_list_item_research* research_list) {
@@ -443,7 +441,7 @@ namespace TECH {
             entry.list_win_x = TECH::_list_window_x_offsets[i] + TECH::_g_scrn_x;
 
             for (int j = 0; j < 4; ++j) {
-                entry.app_label_y[j] = TECH::_app_name_y[j] + entry.y + 21 /* 0x15 */;
+                entry.app_label_y[j] = TECH::_app_name_y[j] + entry.y + 21;
                 entry.app_names[j][0] = '\0';
             }
         }
@@ -460,7 +458,7 @@ namespace TECH {
                     images[i],
                     &items[i].button_value,
                     s__00551100,
-                    40 /* 0x28 */
+                    40
                 );
                 items[i].button_image = images[i];
             }
@@ -472,7 +470,6 @@ namespace TECH {
 
         if (input_field >= _g_first_tech_field && input_field <= _g_last_tech_field) {
             int32_t index = input_field - _g_first_tech_field;
-            // s_list_item_research size is 0x188 (392)
             _g_selected_entry_p = &_g_entries_p[index];
             input_field = _g_selected_entry_p->app_click_field_ids[_g_selected_entry_p->visible_app_count - 1];
         }
@@ -485,7 +482,7 @@ namespace TECH {
         Display_Selected_Entry_Text_(_g_selected_entry_p);
         Draw_Little_Arrow_(_g_selected_entry_p);
 
-        palette::Cycle_Palette_Color_(_g_cursor_box_color, 8, 32 /* 0x20 */, 0, 40 /* 0x28 */, 63 /* 0x3f */, 8, 8);
+        palette::Cycle_Palette_Color_(_g_cursor_box_color, 8, 32, 0, 40, 63, 8, 8);
     }
 
     void __cdecl Display_All_Entry_Text_(s_list_item_research* items) {
@@ -533,12 +530,12 @@ namespace TECH {
         return nullptr;
     }
 
-    int16_t __cdecl Init_Entry_Data_(s_list_item_research* param_1, int param_2) {
+    int16_t __cdecl Init_Entry_Data_(s_list_item_research* entries, int32_t research_cost_offset) {
         char local_50[80];
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 62, local_50, 80);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 62, local_50, sizeof(local_50));
         int16_t valid_count = 0;
 
-        s_list_item_research* item = param_1;
+        s_list_item_research* item = entries;
         for (int i = 0; i < 8; ++i, ++item) {
             int16_t tech_field_id = MOX::_first_field_in_group[item->id];
 
@@ -557,7 +554,7 @@ namespace TECH {
 
             if (tech_field_id == 0) continue;
 
-            if (tech_field_id < 75 /* 0x4B */) {
+            if (tech_field_id < 75) {
                 int visible_app_count = 0;
                 int16_t* techs = TECHDATA::_technology_fields[tech_field_id].tech;
                 for (int app_index = 0; app_index < 4; ++app_index) {
@@ -610,7 +607,7 @@ namespace TECH {
 
             item->tech_field_id = tech_field_id;
 
-            int32_t cost = COLCALC::Player_Research_Cost_(MOX::_cur_plyr_ptr, tech_field_id) - param_2;
+            int32_t cost = COLCALC::Player_Research_Cost_(MOX::_cur_plyr_ptr, tech_field_id) - research_cost_offset;
             if (cost < 0) {
                 cost = 0;
             }
@@ -693,21 +690,21 @@ namespace TECH {
         } while (i < item->visible_app_count);
     }
 
-    void __cdecl Draw_Little_Arrow_(s_list_item_research* param_1) {
-        if (param_1 == nullptr) {
+    void __cdecl Draw_Little_Arrow_(s_list_item_research* entry) {
+        if (entry == nullptr) {
             return;
         }
 
-        if (param_1->current_app_index == 0) {
+        if (entry->current_app_index == 0) {
             return;
         }
 
-        int16_t tech_id = param_1->tech_field_id;
+        int16_t tech_id = entry->tech_field_id;
         if (tech_id == 0) {
             return;
         }
 
-        int16_t i = param_1->selected_app_index;
+        int16_t i = entry->selected_app_index;
         int16_t upper_bound = i + 1;
 
         if (MOX::_player[MOX::_PLAYER_NUM].traits[22] == 1 ||
@@ -719,17 +716,17 @@ namespace TECH {
             tech_id == 0x17)
         {
             i = 0;
-            upper_bound = param_1->visible_app_count;
+            upper_bound = entry->visible_app_count;
         }
 
         for (; i < upper_bound; i++) {
             uint8_t color = _g_cursor_box_color;
-            int16_t label_x = param_1->label_x;
-            int16_t y = param_1->app_label_y[i] + 5;
+            int16_t label_x = entry->label_x;
+            int16_t y = entry->app_label_y[i] + 5;
             int16_t x1 = label_x - 9;
             int16_t x2 = label_x - 2;
             int16_t x3 = label_x - 5;
-            int16_t y0 = param_1->app_label_y[0] - 3;
+            int16_t y0 = entry->app_label_y[0] - 3;
 
             line::Line_(x1, y0, x1, y, color);
             line::Line_(x1, y, x2, y, color);
@@ -738,11 +735,13 @@ namespace TECH {
         }
     }
 
-    void __cdecl Draw_Application_Description_(int32_t param_1, uint16_t app_idx) {
+    void __cdecl Draw_Application_Description_(int32_t unused_x, uint16_t app_idx) {
         char text_buffer[80];
         char lbx_name[20];
         char cost_str[20];
         char desc_buffer[1420];
+
+        (void)unused_x;
 
         fields::Deactivate_Auto_Function_();
         allocate::Push_Block_(MOX::_screen_seg);
@@ -751,10 +750,10 @@ namespace TECH {
         void* out_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
-        s_help_record* loaded_data = static_cast<s_help_record*>(farload::Far_Reload_Data_(lbx_name, 0, out_buffer, app_idx, 1, sizeof(s_help_record)));
+        s_help_record* loaded_data = (s_help_record*)farload::Far_Reload_Data_(lbx_name, 0, out_buffer, app_idx, 1, sizeof(s_help_record));
 
         int32_t cost = New_Get_Tech_Cost_(app_idx, 1, MOX::_PLAYER_NUM);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3D, text_buffer, 0x50);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3D, text_buffer, sizeof(text_buffer));
 
         itoa(cost, cost_str, 10);
         strcat(text_buffer, cost_str);
@@ -782,7 +781,14 @@ namespace TECH {
         }
         strcat(text_buffer, suffix);
 
-        sprintf(desc_buffer, _research_desc_fmt, loaded_data->body, text_buffer);
+        /* fmtpara: \aF3. selects font 3, \x1A3 fully justifies the body text,
+           then \r starts a new paragraph and \aY+3.\x1A2 centers the cost line. */
+        sprintf(
+            desc_buffer,
+            "\aF3.\x1A" "3%s\r\aY+3.\x1A" "2%s",
+            loaded_data->body,
+            text_buffer
+        );
         TEXTBOX::Text_Box_(loaded_data->title, desc_buffer);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -791,7 +797,7 @@ namespace TECH {
         fields::Enable_Draw_All_Fields_();
     }
 
-    int16_t __cdecl _Tech_List_(s_list_item_research* param_1, uint8_t is_select) {
+    int16_t __cdecl _Tech_List_(s_list_item_research* entry, uint8_t is_change_mode) {
         char msg_buf[80];
         char title_buf[32];
         s_animation_header* win_bg_1;
@@ -812,21 +818,21 @@ namespace TECH {
         int16_t input;
 
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3F, msg_buf, 0x50);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x40, _tech_group_names[0], 0x14);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x41, _tech_group_names[1], 0x14);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3F, msg_buf, sizeof(msg_buf));
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x40, _tech_group_names[0], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x41, _tech_group_names[1], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x42, _tech_group_names[2], 0x14);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x43, _tech_group_names[3], 0x14);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x42, _tech_group_names[2], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x43, _tech_group_names[3], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x44, _tech_group_names[4], 0x14);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x45, _tech_group_names[5], 0x14);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x44, _tech_group_names[4], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x45, _tech_group_names[5], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x46, _tech_group_names[6], 0x14);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x47, _tech_group_names[7], 0x14);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x46, _tech_group_names[6], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x47, _tech_group_names[7], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x48, _tech_group_names[8], 0x14);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x49, _tech_group_names[9], 0x14);
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x48, _tech_group_names[8], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x49, _tech_group_names[9], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
 
         MOX2::Get_Auto_Function_(auto_funcs);
@@ -834,24 +840,24 @@ namespace TECH {
         FIELDSAV::Save_Field_Stats_(&_tech_field_save);
         fields::Disable_Cancel_();
 
-        if (is_select == 1) {
-            win_bg_1 = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x17, MOX::_screen_seg));
-            win_bg_2 = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x18, MOX::_screen_seg));
+        if (is_change_mode == 1) {
+            win_bg_1 = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x17, MOX::_screen_seg);
+            win_bg_2 = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x18, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            pic = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x19, MOX::_screen_seg));
-            pic_00 = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x1A, MOX::_screen_seg));
+            pic = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x19, MOX::_screen_seg);
+            pic_00 = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x1A, MOX::_screen_seg);
         }
         else {
-            win_bg_1 = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x09, MOX::_screen_seg));
-            win_bg_2 = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x0A, MOX::_screen_seg));
+            win_bg_1 = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x09, MOX::_screen_seg);
+            win_bg_2 = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x0A, MOX::_screen_seg);
             RUSS::Mox_Update_();
-            pic = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x0B, MOX::_screen_seg));
-            pic_00 = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(_tech_select_lbx, 0x0C, MOX::_screen_seg));
+            pic = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x0B, MOX::_screen_seg);
+            pic_00 = (s_animation_header*)farload::Far_Reload_Next_("TECHSEL.LBX", 0x0C, MOX::_screen_seg);
         }
         RUSS::Mox_Update_();
 
-        _g_tech_list_header.items = reinterpret_cast<s_list_item*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x33E0));
-        win_x = param_1->list_win_x;
+        _g_tech_list_header.items = (s_list_item*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x33E0);
+        win_x = entry->list_win_x;
         _g_tech_list_header.x = win_x + 0x10;
 
         uint32_t bg_size = bitmap::Get_Bitmap_Size_(0x1B5, 0x190);
@@ -860,7 +866,7 @@ namespace TECH {
         bitmap::Screen_Bitmap_Capture_(0x54, 0x28, 0x207, 0x1B7, bg_capture);
 
         if ((win_x - _g_scrn_x) <= 6) {
-            if (is_select != 0) {
+            if (is_change_mode != 0) {
                 BILLHELP::Tech_Change_List_Left_Help_();
             }
             else {
@@ -868,7 +874,7 @@ namespace TECH {
             }
         }
         else {
-            if (is_select != 0) {
+            if (is_change_mode != 0) {
                 BILLHELP::Tech_Change_List_Right_Help_();
             }
             else {
@@ -876,7 +882,7 @@ namespace TECH {
             }
         }
 
-        Get_Group_List_(&_g_tech_list_header, param_1->id);
+        Get_Group_List_(&_g_tech_list_header, entry->id);
         LIST::Init_List_Data_(&_g_tech_list_header);
 
         button_1_id = fields::Add_Button_Field_(win_x + 0xF7, 0x4D, s__00551100, pic, s__00551100, 0);
@@ -895,7 +901,7 @@ namespace TECH {
             graphics::Fill_(win_x, 0x1F, fill_x2, 0x1C1, 0);
             animate::Draw_(win_x, 0x1F, win_bg_1);
 
-            strcpy(title_buf, _tech_group_names[param_1->id]);
+            strcpy(title_buf, _tech_group_names[entry->id]);
             strcat(title_buf, msg_buf);
 
             fonts::Set_Font_Style_(4, _tech_color);
@@ -975,7 +981,8 @@ namespace TECH {
         }
     }
 
-    void __cdecl Do_Get_Planet_Name_(short planet_idx, char* out_str, char param_3) {
+    /** Builds a star-and-roman-numeral planet name for technology text. */
+    void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
         strcpy(buffer, s_space_005510f0);
@@ -984,7 +991,7 @@ namespace TECH {
         char planet_num = HAROLD::Planet_Number_(planet_idx);
 
         const char* numeral_str;
-        if (param_3 == 0) {
+        if (localized_flag == 0) {
             numeral_str = MOX::_roman_literals[planet_num + 1];
         }
         else {
@@ -1012,13 +1019,13 @@ namespace TECH {
         return tech_id;
     }
 
-    char* __cdecl Technology_Fields_Name_(short tech_field_id) {
-        if (tech_field_id < 75) { /* 0x4B */
+    char* __cdecl Technology_Fields_Name_(int16_t tech_field_id) {
+        if (tech_field_id < 75) {
             return TECHDATA::_technology_fields[tech_field_id].name;
         }
 
-        strcpy(s__00559488, MOX::_hyper_field_title);
-        return s__00559488;
+        strcpy(_hyper_field_name_buffer, MOX::_hyper_field_title);
+        return _hyper_field_name_buffer;
     }
 
     int32_t __cdecl New_Get_Tech_Cost_(int16_t id, uint8_t is_tech_app, int16_t player_idx) {
@@ -1106,20 +1113,20 @@ namespace TECH {
 
         LIST::Display_Selected_List_Text_For_Tech_List_(&_g_tech_list_header, _g_selected_list_entry_p);
 
-        palette::Cycle_Palette_Color_(_g_cursor_box_color, 8, 0x20, 0, 0x28, 0x3F, 8, 8);
+        palette::Cycle_Palette_Color_(_g_cursor_box_color, 8, 32, 0, 40, 63, 8, 8);
     }
 
-    char* __cdecl Technology_Applications_Name_(int16_t param_1, int16_t param_2) {
-        if (param_1 < 204 /* 0xCC */) {
-            return TECHDATA::_technology_applications[param_1].name;
+    char* __cdecl Technology_Applications_Name_(int16_t tech_app_id, int16_t player_idx) {
+        if (tech_app_id < 204) {
+            return TECHDATA::_technology_applications[tech_app_id].name;
         }
 
-        uint8_t hyper_tech = MOX::_player[param_2].hyper_advanced_tech[param_1 - 204];
+        uint8_t hyper_tech = MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - 204];
 
-        strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[param_1].name);
+        strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[tech_app_id].name);
         strcat(MOX::_temp_string_buf + 1, s_space_005510f0);
 
-        if (hyper_tech > 0 && hyper_tech <= 20 /* 0x14 */) {
+        if (hyper_tech > 0 && hyper_tech <= 20) {
             strcat(MOX::_temp_string_buf + 1, MOX::_roman_literals[hyper_tech]);
         } else {
             char* end_ptr = (MOX::_temp_string_buf + 1) + strlen(MOX::_temp_string_buf + 1);
