@@ -9,7 +9,6 @@ extern const char s_tech_has_too_many_apps_0055a97c[24]; /* " tech has too many 
 struct s_animation_header;
 struct s_lbx_stream_header;
 
-extern const char s_space_005510f0[2]; // " "
 extern char s_cmbtsfx_lbx_00551228[12]; // "cmbtsfx.lbx"
 extern const char s_fmt_comma_00555ff0[6]; // "%i,%i"
 extern const char s_fmt_dot_00555ff8[6]; // "%i.%i"
@@ -20,15 +19,11 @@ extern const char s_Human_00558020[8]; // "Human"
 extern const char s_Error_Enum_Current_Games_Invalid_0055c000[40]; // "Error Enum Current Games Invalid Params"
 extern const char s_Error_Enum_Current_Games_Invalid_0055c028[40]; // "Error Enum Current Games Invalid Object"
 
-extern const char s_techname_lbx_0055a96c[13]; // "techname.lbx"
-extern const char s_INFO_LBX_00556000[9]; // "INFO.LBX"
 extern const char s_Remap_draw_not_support_map_00557f88[27]; // "Remap draw not support map"
 extern const char s_Remap_draw_not_support_screen_00557fa4[30]; // "Remap draw not support screen"
 extern const char s_Remap_draw_not_support_bitmaps_00557fc4[31]; // "Remap draw not support bitmaps"
-extern const char s_racesel_lbx_00557ff4[12]; // "racesel.lbx"
 extern const char s_1_2_00557ff0[4]; // "1/2"
 
-extern const char s_SCIENCE_LBX_00557d68[12]; // "SCIENCE.LBX"
 void __cdecl Fleet_Movement_Scroll_Callback();
 extern const char s_TANM__03hi_LBX_005512a0[15]; /* "TANM_%03hi.LBX" */
 extern const char s_SR_R_x_SC_LBX_00557d74[14]; // "SR_R%x_SC.LBX"
@@ -47,18 +42,10 @@ extern const char s_Add_Square_to_scan_list_failed__0055b270[33]; /* "Add Square
 extern const char s__d___d___d_0055b2d0[11]; // "%d, %d, %d"
 extern const char s_Get_Picture_Color_Picture_Must_H_0055b2dc[45]; // "Get_Picture_Color  Picture Must Have Palette"
 
-extern const char s_percent_0055633c[2]; // "%"
-extern const char s_slash_005599a4[2]; // "/"
-extern const char s_lparen_005599a8[2]; // "("
-
 extern const char s_fmt_modifier_full_005523a4[6]; // "%d.%d"
-extern const char s_fmt_score_simple_00556104[3]; // "%d"
-extern const char s_dot_0055632c[2]; // "."
 extern const char s_scor_0055a510[5]; // "scor"
-extern const char s_RACEOPT_LBX_00556320[12]; // "RACEOPT.LBX"
 extern char s_patch13_lbx_00556330[12]; // "patch13.lbx"
 extern const char s_fmt_score_complex_0055a518[13]; // "(%d x %s) %d"
-extern const char s_percent_s_percent_d_00556d98[7]; /* "%s: %d" */
 extern const char s_RACESTUF_lbx_00558550[13]; // "RACESTUF.lbx"
 
 extern const char s_STREAM_LBX_005558fc[11]; /* "STREAM.LBX" */
@@ -69,15 +56,6 @@ namespace GLOBALS {
 }
 
 extern char s_360_00556164[4]; // "360"
-extern const char s_comma_space_00556168[3]; // ", "
-
-extern const char s_Raider_0055768c[7]; // "Raider"
-extern char s_rparen_00557f08[2]; // ")"
-extern const char s_Marauder_00557694[9]; // "Marauder"
-extern char s_space_lparen_0055999c[3]; // " ("
-extern char s_space_x_005599a0[3]; // " x"
-extern const char s_Interdictor_005576ac[12]; // "Interdictor"
-extern const char s_Harbinger_005576b8[10]; // "Harbinger"
 extern const char s_RACENAME_LBX[13];
 extern const char s_RACESTUF_LBX[13];
 extern const char s_WWWWWWW_0055137c[8]; // "WWWWWWW"
@@ -103,19 +81,12 @@ extern const char s__d_BC_00552384[8];
 extern const char s_plus_00551118[2]; // "+"
 extern const char s_minus_0055111c[2]; // "-"
 extern const char s__00551120[2]; // "\x1b"
-extern const char s_c_00556350[2]; // "c"
 extern const char s_o_00556af4[2]; // "o"
 extern const char s_oc_00556af8[3]; // "oc"
-extern const char s_C_00552420[2]; // "C"
-extern const char s_H_005569d4[2]; // "H"
 extern const char s_S_005569cc[2]; // "S"
-extern const char s_D_005569dc[2]; // "D"
-extern const char s_L_005560e8[2]; // "L"
 extern const char s_O_00556afc[2]; // "O"
 extern const char s_A_00557ed4[2]; // "A"
 extern const char s_M_00557ed8[2]; // "M"
-extern const char s_I_0055801c[2]; // "I"
-extern const char s_R_0055824c[2]; // "R"
 extern const char DAT_00558540[2];
 extern const char DAT_0055aa90[2];
 
@@ -128,15 +99,11 @@ extern const char s_2_00551108[4];
 extern const char s_1_00551114[4];
 extern const char s_1_00556B10[2]; // "1"
 
-extern const char s_e_0055ac48[2]; // "e"
-
 extern const char s_Null_Pointer_0055b658[13]; // "Null Pointer"
 
 extern char s_Not_Enough_Space_For_Buffer_Spac_0055b310[34]; // "Not Enough Space For Buffer Space"
 
 // Suggested name: s_allocation_error_fmt
-extern const char s_Couldn_t_Allocate_0055B668[38]; // "Couldn't Allocate %d Increase Virtual"
-
 extern const char s_Unable_to_Allocate_bytes[73]; // "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n"
 
 extern const char s_fmt_00557F18[7]; // "%d> %s"
@@ -150,30 +117,20 @@ extern const char* PTR_s_FLEET_LBX_005584a8;
 extern const char s_RACEOPT_LBX[12]; // "RACEOPT.LBX"
 extern const char s_SAVE_005568fc[5]; // "SAVE"
 extern const char s__GAM_005568f4[5]; // ".GAM"
-extern const char s_rb_0055117c[3]; // "rb"
-extern const char s_wb_00551178[3]; // "wb"
-extern const char s_Error_in_swap_file_0055beb8[19]; // "Error in swap file"
 extern const char s_TEMP_TMP_0055becc[9]; // "TEMP.TMP"
-extern const char s_Insufficient_disk_space_for_swap_0055bed8[33]; // "Insufficient disk space for swap"
-extern const char s_Drive_swap_reqd_too_large_for_bl_0055befc[36]; // "Drive swap reqd too large for block"
 extern const char s_mox_set_0055760c[8]; // "mox.set"
 extern const char s_Unable_to_open_mox_set_005575f4[23]; // "Unable to open mox.set"
-extern const char s_MOX_SET_00556918[8]; // "MOX.SET"
 extern const char s_Settings_file_error_00556950[46]; // "Settings file (MOX.SET) is missing or invalid"
 
 extern const char s_Antares_00551288[8];
 extern const char s_cmbtplnt_lbx_00551278[13]; // "cmbtplnt.lbx"
 extern const char s_0_0055110c[3];
 extern const char s_1_00551110[3];
-extern const char s_caret_space_00556070[3]; /* "^ " */
 extern const char s_BUFFER0_LBX[12]; // "BUFFER0.LBX"
 extern const char s__s___s_0055238c[7]; // "%s, %s"
 extern const char s__s_005569e8[4]; // "%s "
 extern const char s___s_00557f0c[4]; // "(%s"
-extern const char s_rstring_d_lbx[14]; // "rstring%d.lbx"
 extern const char s_STARBG_LBX[11]; // "STARBG.LBX"
-extern const char s_councmsg_lbx[13]; // "councmsg.lbx"
-extern const char s_ships_lbx_005597b4[10]; // "ships.lbx"
 extern const char s_billtext_lbx_0055135c[13]; // "billtext.lbx"
 extern char s_racerprt_lbx_005574d8[13];
 extern const char s_gstar_lbx_00558544[10]; // "gstar.lbx"
@@ -182,7 +139,6 @@ extern char s_ITA_HELP_LBX_00557460[16]; // "ITA_HELP.LBX"
 extern char s_FRE_HELP_LBX_00557470[16]; // "FRE_HELP.LBX"
 extern char s_GER_HELP_LBX_00557480[16]; // "GER_HELP.LBX"
 extern char s_HELP_LBX_00557490[9]; // "HELP.LBX"
-extern const char s_DIPLOMAT_LBX[13]; /* "DIPLOMAT.LBX" */
 extern const char s_dipstars_lbx_00552374[13]; // "dipstars.lbx"
 
 extern const char s_______CLIMATE_modifier_is__d_Pla_00558a58[54]; // "------CLIMATE modifier is %d  Planet: %d  Mineral: %d"
@@ -208,25 +164,11 @@ extern const char s_Refresh_Mask_can_t_be_drawn_0055b10c[28]; // "Refresh Mask c
 
 extern char s_Cannot_color_replace_refresh_mas_0055b7a0[35]; // "Cannot color replace refresh mask."
 
-extern char s_PR_00558238[3]; // "PR"
-extern char s_FP_00558240[4]; // "FP"
-extern char s_RP_00558248[3]; // "RP"
-extern char s_PI_00559994[3]; // "PI"
-extern char s_G_0055241c[2]; // "G"
-extern char s_P_005569d8[2]; // "P"
-extern char s_W_0055992c[2]; // "W"
-extern char s_r_00556db0[2]; // "r"
-extern char s_Q_005598f0[2]; // "Q"
-extern const char s_F_005598f4[2]; // "F"
-extern char s_T_005598f8[2]; // "T"
-extern const char s_combat_lbx_005599c8[11]; // "combat.LBX"
 extern const char s_warning_lbx_00557650[12]; // "warning.lbx"
 
 extern char s_You_exceeded_the_max_number_of_f_0055b080[44];
 
 extern char s_X_005569d0[2]; // "X"
-extern char s_comma_005569c8[2]; // ","
-extern char s_N_0055765c[2]; // "N"
 extern char s_Y_00557660[2]; // "Y"
 extern char s_confirm_lbx_00557664[12]; // "confirm.lbx"
 extern char s_dot_d_0055a528[4]; // ".%d"
@@ -240,9 +182,6 @@ extern char s_fmt_s_d_EP_00557e18[11]; /* "%s (%d EP)" */
 
 extern char s_Too_many_ships_in_list_00557de8[23]; /* "Too many ships in list" */
 
-extern char s_i_PR_00557d84[6]; // "%i PR"
-extern char s_i_FP_00557d8c[6]; // "%i FP"
-extern char s_i_RP_00557d94[6]; // "%i RP"
 extern const char s_s_sez__s_00552334[11]; // "%s sez: %s"
 extern const char s_PR_00557d9c[4];
 extern const char s_FP_00557da0[4];
@@ -252,12 +191,5 @@ struct s_fleet_movement_icon;
 
 struct IDirectSound;
 struct s_smack_video;
-
-extern const char s___s__String___d_Too_Long__check_t_0055A740[56]; // "(%s) String #%d Too Long, check terminator (strlen: %i)"
-extern const char s_HISTRNGS_LBX_0055A778[16]; // "HISTRNGS.LBX"
-extern const char s_HSSTRNGS_LBX_0055A788[16]; // "HSSTRNGS.LBX"
-extern const char s_HFSTRNGS_LBX_0055A798[16]; // "HFSTRNGS.LBX"
-extern const char s_HGSTRNGS_LBX_0055A7A8[16]; // "HGSTRNGS.LBX"
-extern const char s_HESTRNGS_LBX_0055A7B8[16]; // "HESTRNGS.LBX"
 
 extern const char k_backslash[2]; // "\\"

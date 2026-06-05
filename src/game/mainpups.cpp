@@ -2272,7 +2272,7 @@ namespace MAINPUPS {
                 if (i == 0) {
                     prefix = ESTRINGS::E_Strings_(208 /* 0xD0 */);
                 } else {
-                    prefix = s_comma_space_00556168;
+                    prefix = ", ";
                 }
 
                 current_dest += sprintf(current_dest, prefix);

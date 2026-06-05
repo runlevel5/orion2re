@@ -1,6 +1,5 @@
 # Source Cleanup Progress
 
-- [pending] src/game/funcs.h
 - [pending] src/game/global.h
 - [pending] src/game/netstrat.h
 - [pending] src/game/orion2.h

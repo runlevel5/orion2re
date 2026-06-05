@@ -72,7 +72,7 @@ namespace allocate {
     void __cdecl Allocation_Error_(int32_t requested_bytes) {
         char message_buffer[100];
 
-        sprintf(message_buffer, s_Couldn_t_Allocate_0055B668, requested_bytes);
+        sprintf(message_buffer, "Couldn't Allocate %d Increase Virtual", requested_bytes);
 
         exitm::Exit_With_Message(message_buffer);
     }

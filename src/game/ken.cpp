@@ -73,32 +73,32 @@ namespace KEN {
 
         if (player_idx < 8) {
             palette_anim = (s_animation_header*)buffer::Buffer_Reload_(
-                s_ships_lbx_005597b4,
+                "ships.lbx",
                 (uint8_t)MOX::_player[player_idx].color * 50 + 49,
                 MOX::_global_cache_seg
             );
         } else {
             switch (player_idx) {
                 case 8:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 413, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 413, MOX::_global_cache_seg);
                     break;
                 case 9:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 419, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 419, MOX::_global_cache_seg);
                     break;
                 case 10:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 417, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 417, MOX::_global_cache_seg);
                     break;
                 case 11:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 416, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 416, MOX::_global_cache_seg);
                     break;
                 case 12:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 414, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 414, MOX::_global_cache_seg);
                     break;
                 case 13:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 415, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 415, MOX::_global_cache_seg);
                     break;
                 case 14:
-                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_ships_lbx_005597b4, 418, MOX::_global_cache_seg);
+                    palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 418, MOX::_global_cache_seg);
                     break;
             }
         }
@@ -462,7 +462,7 @@ namespace KEN {
         }
 
         return (s_animation_header*)buffer::Buffer_Reload_(
-            s_ships_lbx_005597b4,
+            "ships.lbx",
             (int16_t)(ship_type + color * 50),
             MOX::_global_cache_seg
         );

@@ -313,8 +313,8 @@ namespace MAINMENU {
 
         if (credits[index][0][0] != '\0' && credits[index][1][0] != '\0') {
             while (x_pos < (int16_t)MAINMENU::_credits_column_one) {
-                fonts::Print_To_Bitmap_(x_pos, 0, s_dot_0055632c, bitmap);
-                x_pos += fonts::Get_String_Width_(s_dot_0055632c);
+                fonts::Print_To_Bitmap_(x_pos, 0, ".", bitmap);
+                x_pos += fonts::Get_String_Width_(".");
             }
         }
 

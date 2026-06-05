@@ -1399,7 +1399,7 @@ namespace FLT1 {
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_id], tech_id);
 
                     strcat(message, s_0_0055110c);
-                    strcat(message, s_caret_space_00556070);
+                    strcat(message, "^ ");
                     strcat(message, TECHDATA::_technology_applications[tech_id].name);
                     strcat(message, string::s_Newline);
                 }

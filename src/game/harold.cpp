@@ -1516,31 +1516,31 @@ namespace HAROLD {
 
         switch (MOX::_settings.language) {
         case 1:
-            memcpy(strings_file, s_HGSTRNGS_LBX_0055A7A8, sizeof(strings_file));
+            memcpy(strings_file, "HGSTRNGS.LBX", sizeof(strings_file));
             max_length = 0x1A0;
             resource_id = 0x3D01;
             break;
 
         case 2:
-            memcpy(strings_file, s_HFSTRNGS_LBX_0055A798, sizeof(strings_file));
+            memcpy(strings_file, "HFSTRNGS.LBX", sizeof(strings_file));
             max_length = 0x118;
             resource_id = 0x408D;
             break;
 
         case 3:
-            memcpy(strings_file, s_HSSTRNGS_LBX_0055A788, sizeof(strings_file));
+            memcpy(strings_file, "HSSTRNGS.LBX", sizeof(strings_file));
             max_length = 0x1A1;
             resource_id = 0x3CE8;
             break;
 
         case 4:
-            memcpy(strings_file, s_HISTRNGS_LBX_0055A778, sizeof(strings_file));
+            memcpy(strings_file, "HISTRNGS.LBX", sizeof(strings_file));
             max_length = 0x172;
             resource_id = 0x36CF;
             break;
 
         default:
-            memcpy(strings_file, s_HESTRNGS_LBX_0055A7B8, sizeof(strings_file));
+            memcpy(strings_file, "HESTRNGS.LBX", sizeof(strings_file));
             max_length = 0x181;
             resource_id = 0x34D1;
             break;
@@ -1568,7 +1568,7 @@ namespace HAROLD {
             if (string_length > max_length) {
                 sprintf(
                     error_message,
-                    s___s__String___d_Too_Long__check_t_0055A740,
+                    "(%s) String #%d Too Long, check terminator (strlen: %i)",
                     strings_file,
                     static_cast<int32_t>(string_index),
                     string_length

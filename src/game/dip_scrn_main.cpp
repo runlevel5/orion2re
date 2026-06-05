@@ -464,7 +464,7 @@ namespace DIP_SCRN {
     void __cdecl Diplomacy_Mouse_Init_(int16_t param_1) {
         _diplomacy_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x395);
         s_animation_header* diplomat_anim = (s_animation_header*)
-            farload::Far_Reload_Next_(s_DIPLOMAT_LBX, (int)MOX::_player[param_1].race, MOX::_screen_seg);
+            farload::Far_Reload_Next_("DIPLOMAT.LBX", (int)MOX::_player[param_1].race, MOX::_screen_seg);
 
         bitmap::Clear_Mouse_Image_(0);
         bitmap::Create_Blank_Bitmap_(30, 30, _diplomacy_mouse_bitmap);
@@ -1642,7 +1642,7 @@ namespace DIP_SCRN {
         MOX::_FULL_DRAW_SCREEN_FLAG = 0;
 
         int anim_index = (static_cast<uint8_t>(MOX::_player[_current_ambassador].race) * 2) + 13;
-        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX, anim_index);
+        file_ani::Open_File_Animation_("DIPLOMAT.LBX", anim_index);
 
         video::Set_Page_Off_();
 
@@ -1662,7 +1662,7 @@ namespace DIP_SCRN {
         uint8_t race = static_cast<uint8_t>(MOX::_player[_current_ambassador].race);
 
         file_ani::Open_File_Animation_(
-            s_DIPLOMAT_LBX,
+            "DIPLOMAT.LBX",
             race * 2 + 14
         );
 

@@ -753,7 +753,7 @@ namespace MULTPLAY {
             y + 0x5B,
             x + 0x3B + animate::Get_Width_(anim),
             y + 0x5B + animate::Get_Height_(anim),
-            s_N_0055765c,
+            "N",
             0x28 /* 40 */
         );
 
@@ -786,7 +786,7 @@ namespace MULTPLAY {
             y + 0xBB,
             x + 0x3B + animate::Get_Width_(anim),
             y + 0xBB + animate::Get_Height_(anim),
-            s_H_005569d4,
+            "H",
             0x28 /* 40 */
         );
 
@@ -796,7 +796,7 @@ namespace MULTPLAY {
             y + 0xDC,
             s__00551100,
             MOX::_mp_screen->anim_btn_help,
-            s_T_005598f8,
+            "T",
             0x28 /* 40 */
         );
 
@@ -842,7 +842,7 @@ namespace MULTPLAY {
             y + 0x7A,
             s__00551100,
             MOX::_mp_screen->anim_btn_accept,
-            s_L_005560e8,
+            "L",
             0x28 /* 40 */
         );
 
@@ -871,7 +871,7 @@ namespace MULTPLAY {
                 y + 0xBB,
                 s__00551100,
                 MOX::_mp_screen->anim_btn_setup,
-                s_C_00552420,
+                "C",
                 0x28 /* 40 */
             );
         }
@@ -1733,7 +1733,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
     );
     MOX::_mp_screen->player_field_ids[0] = chat_field_id;
     
-    int16_t hidden_field_id = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */, s_C_00552420, 41 /* 0x29 */);
+    int16_t hidden_field_id = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */, "C", 41 /* 0x29 */);
     MOX::_mp_screen->player_field_ids[1] = hidden_field_id;
 }
 

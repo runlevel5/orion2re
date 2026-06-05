@@ -1754,7 +1754,7 @@ namespace OFFICER {
         sprintf(leader_name_buf, MOX::s_fmt_s, leader_raw_name);
 
         if (MOX::_settings.language != 4 && MOX::_leaders[leader_idx].title[0] != '\0') {
-            strcat(leader_name_buf, s_comma_005569c8);
+            strcat(leader_name_buf, ",");
         }
 
         int16_t skill_value;
@@ -2803,7 +2803,7 @@ namespace OFFICER {
                 0x1b9, 
                 animate::Get_Width_(MOX::_officer_dismiss_button_seg) + 0x1cf, 
                 animate::Get_Height_(MOX::_officer_dismiss_button_seg) + 0x1b9, 
-                s_D_005569dc, 
+                "D",
                 0x29
             );
         } else {
@@ -2816,7 +2816,7 @@ namespace OFFICER {
                 0x1b9, 
                 animate::Get_Width_(MOX::_officer_pool_button_seg) + 0x184, 
                 animate::Get_Height_(MOX::_officer_pool_button_seg) + 0x1b9, 
-                s_P_005569d8, 
+                "P",
                 0x29
             );
         } else {
@@ -2829,7 +2829,7 @@ namespace OFFICER {
                 0x1b9, 
                 s__00551100,
                 MOX::_officer_hire_button_seg, 
-                s_H_005569d4, 
+                "H",
                 0x28
             );
         } else {
@@ -2863,7 +2863,7 @@ namespace OFFICER {
             0xb, 
             animate::Get_Width_((s_animation_header*)MOX::_officer_colony_ldrs_button_seg) + 0x9, 
             animate::Get_Height_((s_animation_header*)MOX::_officer_colony_ldrs_button_seg) + 0xb, 
-            s_C_00552420, 
+            "C",
             0x29
         );
 
@@ -2939,7 +2939,7 @@ namespace OFFICER {
             0xcd, 
             s__00551100,
             MOX::_officer_next_button_seg, 
-            s_dot_0055632c, 
+            ".",
             0x28
         );
 
@@ -2948,7 +2948,7 @@ namespace OFFICER {
             0xcd, 
             s__00551100,
             MOX::_officer_prev_button_seg, 
-            s_comma_005569c8, 
+            ",",
             0x28
         );
 
@@ -3084,7 +3084,7 @@ namespace OFFICER {
             strcpy(MOX::_temp_string, MOX::_star_officer_level_names[level]);
         }
 
-        strcat(MOX::_temp_string, s_space_005510f0);
+        strcat(MOX::_temp_string, " ");
         strcat(MOX::_temp_string, MOX::_leaders[leader_idx].name);
 
         if (include_title == '\0') {
@@ -3282,7 +3282,7 @@ void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int
   if (tech_app_count > 0) {
     for (int16_t tech_index = 0; tech_index < tech_app_count; ++tech_index) {
       strcat(output, s_0_0055110c);
-      strcat(output, s_caret_space_00556070);
+      strcat(output, "^ ");
       strcat(output, TECHDATA::_technology_applications[tech_app_ids[tech_index]].name);
       strcat(output, string::s_Newline);
     }

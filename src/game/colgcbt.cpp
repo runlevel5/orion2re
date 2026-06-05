@@ -959,7 +959,7 @@ namespace COLGCBT {
                 fonts::Print_Centered_(cur_x, 167, local_str);
 
                 if (MOX::_settings.language == 4) {
-                    sprintf(local_str, s_percent_s_percent_d_00556d98,
+                    sprintf(local_str, "%s: %d",
                             COLONY::Player_Troop_Name_(side_info->player_id, j, race),
                             side_info->unit_counts[j]);
                 } else {

@@ -350,7 +350,7 @@ namespace INFO {
                 char local_40[64];
                 char local_80[64];
 
-                strcpy(local_40, s_caret_space_00556070);
+                strcpy(local_40, "^ ");
 
                 if (trait_idx == 0) {
                     strcat(local_40, MOX::_government_labels[trait_val]);
@@ -533,9 +533,9 @@ namespace INFO {
         *MOX::_active_player = static_cast<uint8_t>(MOX::_PLAYER_NUM);
         BILL::Get_Active_Players_(1, 0);
 
-        info_lbx[0] = static_cast<s_animation_header*>(farload::Far_Reload_(s_INFO_LBX_00556000, 0, MOX::_screen_seg));
+        info_lbx[0] = static_cast<s_animation_header*>(farload::Far_Reload_("INFO.LBX", 0, MOX::_screen_seg));
         for (int i = 1; i < 26; ++i) {
-            info_lbx[i] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_INFO_LBX_00556000, i, MOX::_screen_seg));
+            info_lbx[i] = static_cast<s_animation_header*>(farload::Far_Reload_Next_("INFO.LBX", i, MOX::_screen_seg));
         }
 
         for (int i = 0; i < 7; ++i) {

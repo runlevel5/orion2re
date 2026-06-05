@@ -14,16 +14,16 @@ void __cdecl Save_Block_To_Drive_(uint8_t* block_address, int32_t block_size) {
     swap::_swap_block_size = saved_block_size + (int32_t)sizeof(*block_header);
 
     if ((int32_t)block_header->size < swap::_swap_block_size) {
-        exitm::Exit_With_Message(s_Drive_swap_reqd_too_large_for_bl_0055befc);
+        exitm::Exit_With_Message("Drive swap reqd too large for block");
     }
 
     if (dos::Disk_Free_() < swap::_swap_block_size) {
-        exitm::Exit_With_Message(s_Insufficient_disk_space_for_swap_0055bed8);
+        exitm::Exit_With_Message("Insufficient disk space for swap");
     }
 
     swap_file = fopen("TEMP.TMP", "wb");
     if (swap_file == nullptr) {
-        exitm::Exit_With_Message(s_Error_in_swap_file_0055beb8);
+        exitm::Exit_With_Message("Error in swap file");
     }
 
     fwrite(block_header, swap::_swap_block_size, 1, swap_file);
@@ -38,7 +38,7 @@ void __cdecl Restore_Block_From_Drive_() {
     FILE* swap_file = fopen("TEMP.TMP", "rb");
 
     if (swap_file == nullptr) {
-        exitm::Exit_With_Message(s_Error_in_swap_file_0055beb8);
+        exitm::Exit_With_Message("Error in swap file");
     }
 
     fread(block_header, (uint32_t)swap::_swap_block_size, 1, swap_file);

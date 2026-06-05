@@ -1414,7 +1414,7 @@ namespace SYS {
                 if (colony->outpost_flag != 0) {
                     strcat(title_buffer, HAROLD::H_Message_(0x161));
                 } else {
-                    strcat(title_buffer, s_rparen_00557f08);
+                    strcat(title_buffer, ")");
                 }
             }
 
@@ -1636,13 +1636,13 @@ namespace SYS {
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                     if (HAROLD::Player_Has_Dimensional_Portal_(&MOX::_player[player_idx], &MOX::_star[star_idx])) {
                         strcat(info_text, MOX::_player[player_idx].name);
-                        strcat(info_text, s_comma_space_00556168);
+                        strcat(info_text, ", ");
                     }
                 }
             }
 
             info_text[static_cast<int32_t>(strlen(info_text)) - 2] = '\0';
-            strcat(info_text, s_rparen_00557f08);
+            strcat(info_text, ")");
             break;
 
         case 1:
@@ -1663,13 +1663,13 @@ namespace SYS {
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                     if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[player_idx], &MOX::_star[star_idx])) {
                         strcat(info_text, MOX::_player[player_idx].race_name);
-                        strcat(info_text, s_comma_space_00556168);
+                        strcat(info_text, ", ");
                     }
                 }
             }
 
             info_text[static_cast<int32_t>(strlen(info_text)) - 2] = '\0';
-            strcat(info_text, s_rparen_00557f08);
+            strcat(info_text, ")");
             break;
 
         default:

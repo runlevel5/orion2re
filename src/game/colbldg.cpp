@@ -342,7 +342,7 @@ namespace COLBLDG {
             _fields[5] = fields::Add_Button_Field_(561, 379, ESTRINGS::E_Strings_(12), _anims[5], ESTRINGS::E_Strings_(251 /* ESTR_D3 */), 40);
         }
 
-        _fields[6] = fields::Add_Button_Field_(503, 411, ESTRINGS::E_Strings_(12), _anims[6], (char*)s_e_0055ac48, 40);
+        _fields[6] = fields::Add_Button_Field_(503, 411, ESTRINGS::E_Strings_(12), _anims[6], (char*)"e", 40);
         _fields[7] = -1000;
 
         Add_Build_Queue_Fields_();
@@ -2204,7 +2204,7 @@ namespace COLBLDG {
             if (struct_::Test_Bit_Field_(mods_ptr, bit)) {
                 if (bit == 1 || bit == 2) {
                     strcat(buf1, TECHDATA::_weapon_modifications[bit].name_plural);
-                    strcat(buf1, s_space_005510f0);
+                    strcat(buf1, " ");
                 } else {
                     strcat(buf3, TECHDATA::_weapon_modifications[bit].name_plural);
                 }

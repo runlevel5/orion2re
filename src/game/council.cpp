@@ -792,7 +792,7 @@ namespace council {
         int32_t message_entry_idx = (int16_t)((int16_t)MOX::_settings.language * 14 + message_idx);
 
         farload::Farload_Data_Static_(
-            s_councmsg_lbx,
+            "councmsg.lbx",
             message_entry_idx,
             _council_message,
             0,

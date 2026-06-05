@@ -251,7 +251,7 @@ namespace TECH {
 
         if (changing_tech == 0) {
             file_ani::Open_File_Animation_(science_race_lbx_name, 0);
-            science_lbx = (s_animation_header*)farload::Far_Reload_Next_(s_SCIENCE_LBX_00557d68, 0, MOX::_screen_seg);
+            science_lbx = (s_animation_header*)farload::Far_Reload_Next_("SCIENCE.LBX", 0, MOX::_screen_seg);
         }
 
         while (true) {
@@ -616,12 +616,12 @@ namespace TECH {
             char fmt[8];
             const char* fmt_ptr;
             switch (MOX::_settings.language) {
-            case 0: fmt_ptr = s_i_RP_00557d94; break;
-            case 1: fmt_ptr = s_i_FP_00557d8c; break;
-            case 3: fmt_ptr = s_i_RP_00557d94; break;
-            case 4: fmt_ptr = s_i_PR_00557d84; break;
+            case 0: fmt_ptr = "%i RP"; break;
+            case 1: fmt_ptr = "%i FP"; break;
+            case 3: fmt_ptr = "%i RP"; break;
+            case 4: fmt_ptr = "%i PR"; break;
             case 2:
-            default: fmt_ptr = s_i_RP_00557d94; break;
+            default: fmt_ptr = "%i RP"; break;
             }
             strcpy(fmt, fmt_ptr);
             sprintf(item->buf, fmt, item->research_cost_remaining);
@@ -985,7 +985,7 @@ namespace TECH {
     void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
-        strcpy(buffer, s_space_005510f0);
+        strcpy(buffer, " ");
 
         char star_idx = MOX::_planet[planet_idx].star_index;
         char planet_num = HAROLD::Planet_Number_(planet_idx);
@@ -996,7 +996,7 @@ namespace TECH {
         }
         else {
             numeral_str = MOX::_roman_literals[planet_num + 1];
-            if (strcmp(numeral_str, s_I_0055801c) == 0) {
+            if (strcmp(numeral_str, "I") == 0) {
                 numeral_str = HAROLD::H_Message_(0xa0);
             }
         }
@@ -1124,7 +1124,7 @@ namespace TECH {
         uint8_t hyper_tech = MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - 204];
 
         strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[tech_app_id].name);
-        strcat(MOX::_temp_string_buf + 1, s_space_005510f0);
+        strcat(MOX::_temp_string_buf + 1, " ");
 
         if (hyper_tech > 0 && hyper_tech <= 20) {
             strcat(MOX::_temp_string_buf + 1, MOX::_roman_literals[hyper_tech]);

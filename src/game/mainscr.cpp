@@ -635,19 +635,19 @@ namespace MAINSCR {
 
         switch (MOX::_settings.language) {
             case 1:
-                src = s_FP_00558240;
+                src = "FP";
                 break;
             case 2:
-                src = s_PR_00558238;
+                src = "PR";
                 break;
             case 3:
-                src = s_PI_00559994;
+                src = "PI";
                 break;
             case 4:
-                src = s_PR_00558238;
+                src = "PR";
                 break;
             default:
-                src = s_RP_00558248;
+                src = "RP";
                 break;
         }
 
@@ -1141,17 +1141,17 @@ namespace MAINSCR {
         MOVEBOX::Moveable_Box_Selected_(2);
         _whole_screen_field = (int16_t)0xfc18;
 
-        _game_button = fields::Add_Button_Field_(249, 5, s__00551100, MOX::_main_game_button_seg, s_G_0055241c, 0x29);
-        _next_button = fields::Add_Button_Field_(544, 441, s__00551100, MOX::_main_next_button_seg, s_T_005598f8, 0x28);
+        _game_button = fields::Add_Button_Field_(249, 5, s__00551100, MOX::_main_game_button_seg, "G", 0x29);
+        _next_button = fields::Add_Button_Field_(544, 441, s__00551100, MOX::_main_next_button_seg, "T", 0x28);
         _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, "+", 0x28);
         _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, "-", 0x28);
 
-        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, s__00551100, MOX::_main_colonies_button_seg, 0, 425, s_C_00552420, 0x28);
-        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, s__00551100, MOX::_main_planets_button_seg, 0, 425, s_P_005569d8, 0x28);
-        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, s__00551100, MOX::_main_fleets_button_seg, 0, 425, s_F_005598f4, 0x28);
-        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, s__00551100, MOX::_main_leaders_button_seg, 306, 425, s_L_005560e8, 0x28);
-        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, s__00551100, MOX::_main_races_button_seg, 306, 425, s_R_0055824c, 0x28);
-        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, s__00551100, MOX::_main_info_button_seg, 306, 425, s_I_0055801c, 0x28);
+        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, s__00551100, MOX::_main_colonies_button_seg, 0, 425, "C", 0x28);
+        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, s__00551100, MOX::_main_planets_button_seg, 0, 425, "P", 0x28);
+        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, s__00551100, MOX::_main_fleets_button_seg, 0, 425, "F", 0x28);
+        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, s__00551100, MOX::_main_leaders_button_seg, 306, 425, "L", 0x28);
+        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, s__00551100, MOX::_main_races_button_seg, 306, 425, "R", 0x28);
+        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, s__00551100, MOX::_main_info_button_seg, 306, 425, "I", 0x28);
 
         _treasury_window_field = fields::Add_Hidden_Field_(545, 49, 613, 119, s__00551100, 0x29);
         _command_points_window_field = fields::Add_Hidden_Field_(545, 122, 613, 192, s__00551100, 0x29);
@@ -1176,7 +1176,7 @@ namespace MAINSCR {
         }
 
         graphics::Reset_Window_();
-        _exit_game_hot_key = fields::Add_Multi_Hot_Key_Field_(s_Q_005598f0);
+        _exit_game_hot_key = fields::Add_Multi_Hot_Key_Field_("Q");
 
         MOX::_main_screen_grid_field = fields::Add_Grid_Field_(22, 22, 1, 1, 506, 400, &MOX::_main_screen_grid_x, &MOX::_main_screen_grid_y, 0);
     }
@@ -4183,7 +4183,7 @@ namespace MAINSCR {
             button_top,
             s__00551100,
             MOX::_diplomacy_request_invoke_seg,
-            s_I_0055801c,
+            "I",
             0x28
         );
 
@@ -4192,7 +4192,7 @@ namespace MAINSCR {
             button_top,
             s__00551100,
             MOX::_diplomacy_request_wait_seg,
-            s_W_0055992c,
+            "W",
             0x28
         );
 

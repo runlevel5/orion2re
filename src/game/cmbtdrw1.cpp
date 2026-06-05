@@ -1568,10 +1568,10 @@ skip_cursor:
 
         allocate::Push_Block_(MOX::_screen_seg);
 
-        _board_left_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 6, MOX::_screen_seg);
-        _board_right_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 40, MOX::_screen_seg);
-        _board_raid_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 39, MOX::_screen_seg);
-        _board_capture_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 41, MOX::_screen_seg);
+        _board_left_button_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.LBX", 6, MOX::_screen_seg);
+        _board_right_button_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.LBX", 40, MOX::_screen_seg);
+        _board_raid_button_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.LBX", 39, MOX::_screen_seg);
+        _board_capture_button_seg = (s_animation_header*)farload::Far_Reload_Next_("combat.LBX", 41, MOX::_screen_seg);
 
         video::Set_Page_Back_();
         Full_Draw_Combat_Screen_();
@@ -2710,7 +2710,7 @@ skip_cursor:
     void __cdecl Draw_Board_Popup_() {
         fonts::Set_Font_Style_(2, &MOX::_combat_green);
 
-        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_005599c8, 36, MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("combat.LBX", 36, MOX::_global_cache_seg);
         animate::Draw_(150, 100, anim);
 
         BILL::_Print_Paragraph_(165, 153, 261, _g_msg, 2);
@@ -2830,11 +2830,11 @@ skip_cursor:
                         local_a0[0] = '\0';
                     } else {
                         strcpy(local_a0, TECHDATA::_weapon_modifications[2].name_plural);
-                        strcat(local_a0, s_space_005510f0);
+                        strcat(local_a0, " ");
                     }
                 } else {
                     strcpy(local_a0, TECHDATA::_weapon_modifications[1].name_plural);
-                    strcat(local_a0, s_space_005510f0);
+                    strcat(local_a0, " ");
                 }
 
                 if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left == 1) {
@@ -2852,19 +2852,19 @@ skip_cursor:
                 }
 
                 if (rack == 1 || rack == 3 || rack == 4 || w_id == 0x21) {
-                    strcat(local_a0, s_space_x_005599a0);
+                    strcat(local_a0, " x");
                     _itoa(ammo, local_64, 10);
                     strcat(local_a0, local_64);
                 } else if (rack == 2) {
                     if (ammo > 0) {
-                        strcat(local_a0, s_space_005510f0);
+                        strcat(local_a0, " ");
                         _itoa(ammo, local_64, 10);
                         strcat(local_a0, local_64);
                         KEN::Ken_Get_Text_Message_(85, local_50, 80);
                         strcat(local_a0, local_50);
                     }
                 } else if (rack == 0) {
-                    strcat(local_a0, s_space_lparen_0055999c);
+                    strcat(local_a0, " (");
                     switch (arc) {
                         case 1:
                             KEN::Ken_Get_Text_Message_(3, local_50, 80);
@@ -2886,7 +2886,7 @@ skip_cursor:
                             strcat(local_a0, s_360_00556164);
                             break;
                     }
-                    strcat(local_a0, s_rparen_00557f08);
+                    strcat(local_a0, ")");
                 }
 
                 fonts::Set_Outline_Color_(0, 0);
@@ -3295,7 +3295,7 @@ skip_cursor:
 
         sprintf(line_text, "%d%s",
                 static_cast<int32_t>(MOX::_global_combat_data.ship_missle_defense),
-                s_percent_0055633c);
+                "%");
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
 
         if (MOX::_global_combat_data.player_idx <= 9) {
@@ -3355,11 +3355,11 @@ skip_cursor:
             sprintf(
                 line_text,
                 "%s%d%s%d%s",
-                s_lparen_005599a8,
+                "(",
                 static_cast<int32_t>(MOX::_global_combat_data.drive_effectiveness_pct),
-                s_slash_005599a4,
+                "/",
                 static_cast<int32_t>(MOX::_global_combat_data.drive_hp_max),
-                s_rparen_00557f08);
+                ")");
             fonts::Print_Right_(left_panel_right_x, row_y + 0x03, line_text);
         }
 
@@ -3397,7 +3397,7 @@ skip_cursor:
             sprintf(
                 line_text,
                 "%s%d%s",
-                s_caret_space_00556070,
+                "^ ",
                 static_cast<int32_t>(TECHDATA::_drives[MOX::_global_combat_data.ftl_type].warp_speed),
                 message_text);
             fonts::Print_(left_value_x, row_y, line_text);
@@ -3416,9 +3416,9 @@ skip_cursor:
             sprintf(
                 line_text,
                 "%s%d%s%s",
-                s_caret_space_00556070,
+                "^ ",
                 static_cast<int32_t>(TECHDATA::_armor[best_armor].ships_bonus) + 100,
-                s_space_005510f0,
+                " ",
                 [&]() -> const char* {
                     KEN::Ken_Get_Text_Message_(16, message_text, 0x50);
                     return message_text;
@@ -3435,7 +3435,7 @@ skip_cursor:
         sprintf(
             line_text,
             "%s%d%s",
-            s_caret_space_00556070,
+            "^ ",
             static_cast<int32_t>(MOX::_global_combat_data.tactical_speed),
             message_text);
         fonts::Print_(left_value_x, row_y, line_text);
@@ -3473,7 +3473,7 @@ skip_cursor:
             } else {
                 KEN::Ken_Get_Text_Message_(0x14, message_text, 0x50);
                 fonts::Print_(
-                    right_panel_x + fonts::Get_String_Width_(s_caret_space_00556070) + 0x03,
+                    right_panel_x + fonts::Get_String_Width_("^ ") + 0x03,
                     row_y,
                     message_text);
             }
@@ -3492,11 +3492,11 @@ skip_cursor:
             sprintf(
                 line_text,
                 "%s%d%s%d%s",
-                s_lparen_005599a8,
+                "(",
                 static_cast<int32_t>(MOX::_global_combat_data.computer_effectiveness_pct),
-                s_slash_005599a4,
+                "/",
                 static_cast<int32_t>(MOX::_global_combat_data.computer_hp_max),
-                s_rparen_00557f08);
+                ")");
             fonts::Print_Right_(left_panel_right_x, row_y + 0x03, line_text);
 
             fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
@@ -3516,11 +3516,11 @@ skip_cursor:
                     sprintf(
                         line_text,
                         "%s%d%s%d%s",
-                        s_lparen_005599a8,
+                        "(",
                         static_cast<int32_t>(MOX::_global_combat_data.shield_hp_current),
-                        s_slash_005599a4,
+                        "/",
                         static_cast<int32_t>(MOX::_global_combat_data.shield_hp_max),
-                        s_rparen_00557f08);
+                        ")");
                     fonts::Print_Right_(right_panel_right_x, row_y + 0x03, line_text);
                 }
             }
@@ -3617,9 +3617,9 @@ skip_cursor:
                         ? TECHDATA::_weapons[weapon_id].name
                         : TECHDATA::_weapons[weapon_id].name_plural;
 
-                sprintf(quantity_text, "%d%s%s", static_cast<int32_t>(slot.count), s_space_005510f0, weapon_name);
+                sprintf(quantity_text, "%d%s%s", static_cast<int32_t>(slot.count), " ", weapon_name);
 
-                strcpy(arc_text, s_space_lparen_0055999c);
+                strcpy(arc_text, " (");
                 switch (weapon_arc) {
                     case 1:
                         KEN::Ken_Get_Text_Message_(3, message_text, 0x50);
@@ -3643,7 +3643,7 @@ skip_cursor:
                     default:
                         break;
                 }
-                strcat(arc_text, s_rparen_00557f08);
+                strcat(arc_text, ")");
 
                 if (weapon_arc != 1) {
                     strcat(quantity_text, arc_text);
@@ -3704,7 +3704,7 @@ skip_cursor:
                     for (int32_t mod_index = 0; mod_index < 15; ++mod_index) {
                         if ((mod_bits & 1) != 0) {
                             if (line_text[0] != '\0') {
-                                strcat(line_text, s_comma_space_00556168);
+                                strcat(line_text, ", ");
                             }
                             strcat(line_text, TECHDATA::_weapon_modifications[mod_index].name_plural);
                         }

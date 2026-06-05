@@ -117,14 +117,14 @@ namespace DIP_SCRN {
 
         uint8_t race = (uint8_t)MOX::_player[player_idx].race;
 
-        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX, (uint16_t)race * 2 + 13);
+        file_ani::Open_File_Animation_("DIPLOMAT.LBX", (uint16_t)race * 2 + 13);
         video::Set_Page_Off_();
         file_ani::Draw_File_Animation_();
         video::Copy_Off_To_Back_();
 
         DIP_SCRN::_current_ambassador = (uint8_t)player_idx;
 
-        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX, (uint16_t)race * 2 + 14);
+        file_ani::Open_File_Animation_("DIPLOMAT.LBX", (uint16_t)race * 2 + 14);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         file_ani::Draw_File_Animation_Stencil_();
     }
@@ -575,8 +575,8 @@ namespace DIP_SCRN {
             fields::Clear_Fields_();
             Setup_Full_Screen_Diplomacy_Help_(0x2b6);
 
-            field_cancel = fields::Add_Hidden_Field_(15, 139, 157, 162, s_C_00552420, 0);
-            field_goodbye = fields::Add_Hidden_Field_(15, 165, 157, 188, s_G_0055241c, 0);
+            field_cancel = fields::Add_Hidden_Field_(15, 139, 157, 162, "C", 0);
+            field_goodbye = fields::Add_Hidden_Field_(15, 165, 157, 188, "G", 0);
             hotkey_space = fields::Add_Hot_Key_(s__00551120);
 
             input_field = fields::Get_Input_();

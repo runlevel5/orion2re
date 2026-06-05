@@ -30,7 +30,7 @@ void* __cdecl Farload_Library_(const char* lib_name, int32_t entry_idx, void* al
         char* dst = farload::_farload_file_name;
         while ((*dst++ = *src++) != '\0');
 
-        farload::_farload_fptr = fopen(lib_name, s_rb_0055117c);
+        farload::_farload_fptr = fopen(lib_name, "rb");
         if (farload::_farload_fptr == nullptr) {
             if (farload::_secondary_drive_path[0] == '\0') {
                 farload::Error_Handler_(lib_name, 1, entry_idx);
@@ -43,7 +43,7 @@ void* __cdecl Farload_Library_(const char* lib_name, int32_t entry_idx, void* al
             s = farload::_farload_file_name;
             while ((*p++ = *s++) != '\0');
 
-            farload::_farload_fptr = fopen(fallback_path, s_rb_0055117c);
+            farload::_farload_fptr = fopen(fallback_path, "rb");
             if (farload::_farload_fptr == nullptr) {
                 farload::Error_Handler_(lib_name, 1, entry_idx);
             }
@@ -119,7 +119,7 @@ void* __cdecl Farload_(char* file_name, int32_t entry_idx) {
 
         if (load_header) {
             strcpy(_farload_file_name, library_name);
-            _farload_fptr = fopen(library_name, s_rb_0055117c);
+            _farload_fptr = fopen(library_name, "rb");
             
             if (_farload_fptr == nullptr) {
                 if (_secondary_drive_path[0] == '\0') {
@@ -129,7 +129,7 @@ void* __cdecl Farload_(char* file_name, int32_t entry_idx) {
                 strcpy(fallback_path, _secondary_drive_path);
                 strcat(fallback_path, _farload_file_name);
 
-                _farload_fptr = fopen(fallback_path, s_rb_0055117c);
+                _farload_fptr = fopen(fallback_path, "rb");
                 if (_farload_fptr == nullptr) {
                     Error_Handler_(library_name, 1, entry_idx);
                 }
@@ -281,7 +281,7 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int32_t en
 
     if (need_to_open) {
         strcpy(_farload_file_name, file_name);
-        _farload_fptr = fopen(file_name, s_rb_0055117c);
+        _farload_fptr = fopen(file_name, "rb");
 
         if (_farload_fptr == nullptr) {
             if (_secondary_drive_path[0] == '\0') {
@@ -292,7 +292,7 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int32_t en
             strcpy(full_path, _secondary_drive_path);
             strcat(full_path, _farload_file_name);
 
-            _farload_fptr = fopen(full_path, s_rb_0055117c);
+            _farload_fptr = fopen(full_path, "rb");
             if (_farload_fptr == nullptr) {
                 Error_Handler_(file_name, 1, entry_idx);
             }

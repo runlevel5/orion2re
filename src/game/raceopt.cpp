@@ -308,7 +308,7 @@ namespace raceopt {
         int16_t y_coords[5] = { 72, 147, 222, 297, 372 };
         s_colors color1 = {{ 0x91, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95 }};
         
-        s_animation_header* bg1 = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 4, MOX::_global_cache_seg);
+        s_animation_header* bg1 = (s_animation_header*)buffer::Buffer_Reload_("RACEOPT.LBX", 4, MOX::_global_cache_seg);
         animate::Draw_(0, 0, bg1);
         
         s_animation_header* bg2 = (s_animation_header*)buffer::Buffer_Reload_(s_patch13_lbx_00556330, 0, MOX::_global_cache_seg);
@@ -356,7 +356,7 @@ namespace raceopt {
                 int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
                 while (dots_start < dots_end - 4) {
-                    fonts::Print_(dots_start, current_y, s_dot_0055632c);
+                    fonts::Print_(dots_start, current_y, ".");
                     dots_start += 4;
                 }
 
@@ -402,7 +402,7 @@ namespace raceopt {
             int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
             while (dots_start < dots_end - 4) {
-                fonts::Print_(dots_start, current_y, s_dot_0055632c);
+                fonts::Print_(dots_start, current_y, ".");
                 dots_start += 4;
             }
 
@@ -446,7 +446,7 @@ namespace raceopt {
                     int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
 
                     while (dots_start < dots_end - 4) {
-                        fonts::Print_(dots_start, current_y, s_dot_0055632c);
+                        fonts::Print_(dots_start, current_y, ".");
                         dots_start += 4;
                     }
 
@@ -498,18 +498,18 @@ namespace raceopt {
         allocate::Push_Block_(MOX::_screen_seg);
 
         _special_button_seg = (s_animation_header*)
-            farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 1, MOX::_screen_seg)
+            farload::Far_Reload_Next_("RACEOPT.LBX", 1, MOX::_screen_seg)
         ;
         RUSS::Mox_Update_();
 
-        _default_button_seg = (uint8_t*)farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 2, MOX::_screen_seg);
+        _default_button_seg = (uint8_t*)farload::Far_Reload_Next_("RACEOPT.LBX", 2, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        _accept_button_seg = (uint8_t*)farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 3, MOX::_screen_seg);
+        _accept_button_seg = (uint8_t*)farload::Far_Reload_Next_("RACEOPT.LBX", 3, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
         _off_button_seg = (s_animation_header*)
-            farload::Far_Reload_Next_(s_RACEOPT_LBX_00556320, 5, MOX::_screen_seg)
+            farload::Far_Reload_Next_("RACEOPT.LBX", 5, MOX::_screen_seg)
         ;
         RUSS::Mox_Update_();
 
@@ -549,7 +549,7 @@ namespace raceopt {
         }
         
         fonts::Print_Integer_Right_(0x1B7, 0x1C1, modified_picks);
-        fonts::Print_Right_(0x1C5, 0x1C1, s_percent_0055633c);
+        fonts::Print_Right_(0x1C5, 0x1C1, "%");
 
         int16_t col_idx = 0;
         int16_t item_idx = 0;
@@ -619,7 +619,7 @@ namespace raceopt {
                     int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(local_50) - 0x32;
                     
                     for (int x = dots_start; x < target_x - 4; x += 4) {
-                        fonts::Print_(x, y, s_dot_0055632c);
+                        fonts::Print_(x, y, ".");
                     }
                     
                     fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y, local_50);
@@ -680,7 +680,7 @@ namespace raceopt {
                 int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(local_50) - 0x32;
 
                 for (int x = dots_start; x < target_x - 4; x += 4) {
-                    fonts::Print_(x, y2, s_dot_0055632c);
+                    fonts::Print_(x, y2, ".");
                 }
 
                 fonts::Print_(x_coords[col_idx], y2, _opt_string[item_idx]);
@@ -737,7 +737,7 @@ namespace raceopt {
                             int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(local_50) - 0x32;
 
                             for (int x = dots_start; x < target_x - 4; x += 4) {
-                                fonts::Print_(x, y3, s_dot_0055632c);
+                                fonts::Print_(x, y3, ".");
                             }
 
                             fonts::Print_(x_coords[col_idx], y3, _opt_string[item_idx]);
@@ -1182,7 +1182,7 @@ namespace raceopt {
             0x01C0,
             "",
             (s_animation_header*)raceopt::_default_button_seg,
-            s_c_00556350,
+            "c",
             0x0028);
 
         row_index = 0;

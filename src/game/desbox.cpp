@@ -2866,12 +2866,12 @@ namespace DESBOX {
                         fonts::Print_(base_x + 0x20, local_y, HAROLD::H_Message_(0x39));
                         fonts::Print_Right_(base_x + 0xe3, local_y, "0");
                         fonts::Print_Right_(base_x + 0x124, local_y, "0");
-                        fonts::Print_(base_x + 0x13e, local_y, s_space_005510f0);
+                        fonts::Print_(base_x + 0x13e, local_y, " ");
                     }
                     else {
                         MISC::Get_Font_Style_();
-                        sprintf(cost_str, s_fmt_score_simple_00556104, cost);
-                        sprintf(space_str, s_fmt_score_simple_00556104, space);
+                        sprintf(cost_str, "%d", cost);
+                        sprintf(space_str, "%d", space);
 
                         fonts::Set_Font_Spacing_(1);
                         fonts::Print_(base_x + 0x20, local_y, special_name);

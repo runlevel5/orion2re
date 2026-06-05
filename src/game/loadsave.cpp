@@ -185,15 +185,15 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(_game_anims->pictures[0]);
 
             if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                _game_popup_fields->btn_main_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[2], s_L_005560e8, '(');
-                _game_popup_fields->btn_main_new_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[3], s_N_0055765c, '(');
+                _game_popup_fields->btn_main_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[2], "L", '(');
+                _game_popup_fields->btn_main_new_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[3], "N", '(');
             } else {
                 _game_popup_fields->btn_main_load_id = -1000;
                 _game_popup_fields->btn_main_new_id = -1000;
             }
 
             _game_popup_fields->btn_main_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[1], s_S_005569cc, '(');
-            _game_popup_fields->btn_main_quit_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[4], s_Q_005598f0, '(');
+            _game_popup_fields->btn_main_quit_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[4], "Q", '(');
             _game_popup_fields->btn_main_options_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], s_O_00556afc, '(');
             _game_popup_fields->btn_main_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[6], s__00551120, '(');
 
@@ -262,8 +262,8 @@ namespace LOADSAVE {
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
                     _game_popup_fields->saved_game_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, MOX::_popup_base_y + 0x18 + i * 0x1f, MOX::_popup_base_x + 0xe2, MOX::_popup_base_y + 0x18 + i * 0x1f + 0x18, s__00551100, ')');
                 }
-                _game_popup_fields->debug_hotspot_id = fields::Add_Hidden_Field_(0x275, 0x1d5, 0x27f, 0x1df, s_D_005569dc, '3');
-                _game_popup_fields->btn_popup_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, s__00551100, _game_anims->pictures[0xc], s_L_005560e8, '(');
+                _game_popup_fields->debug_hotspot_id = fields::Add_Hidden_Field_(0x275, 0x1d5, 0x27f, 0x1df, "D", '3');
+                _game_popup_fields->btn_popup_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, s__00551100, _game_anims->pictures[0xc], "L", '(');
             } else {
                 for (int16_t i = 0; i < 10; ++i) {
                     fonts::Set_Font_Style_(2, &colors_style);
@@ -281,7 +281,7 @@ namespace LOADSAVE {
                 _game_popup_fields->debug_hotspot_id = -1000;
                 _game_popup_fields->btn_popup_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], s_S_005569cc, '(');
             }
-            _game_popup_fields->btn_popup_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xd], s_C_00552420, '(');
+            _game_popup_fields->btn_popup_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xd], "C", '(');
             break;
         }
         default:
@@ -713,7 +713,7 @@ namespace LOADSAVE {
 
     int32_t __cdecl Check_Magic_Number_(const char* filename) {
         int32_t magic_number = 0;
-        FILE* file_ptr = fopen(filename, s_rb_0055117c);
+        FILE* file_ptr = fopen(filename, "rb");
 
         if (file_ptr != nullptr) {
             if (fseek(file_ptr, 0x29, SEEK_SET) == 0) {
@@ -769,7 +769,7 @@ namespace LOADSAVE {
      */
     bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
         bool is_valid = false;
-        FILE* file = fopen(filename, s_rb_0055117c);
+        FILE* file = fopen(filename, "rb");
 
         if (file != nullptr) {
             uint32_t game_type_header;
@@ -1039,7 +1039,7 @@ namespace LOADSAVE {
         uint8_t file_buffer[sizeof(MOX::_settings)];
         bool success = false;
 
-        FILE* file = fopen(s_MOX_SET_00556918, s_rb_0055117c);
+        FILE* file = fopen("MOX.SET", "rb");
         if (file != nullptr) {
             fread(file_buffer, sizeof(file_buffer), 1, file);
             fclose(file);
@@ -1054,7 +1054,7 @@ namespace LOADSAVE {
             success = true;
             RUSS::Assert_Settings_();
 
-            file = fopen(s_MOX_SET_00556918, s_wb_00551178);
+            file = fopen("MOX.SET", "wb");
             if (file != nullptr) {
                 fwrite(file_buffer, sizeof(file_buffer), 1, file);
                 fclose(file);
@@ -1737,7 +1737,7 @@ namespace LOADSAVE {
      * @address 0050f650
      */
     void __cdecl Get_File_Date_String_(const char* file_path, char* out_string) {
-        FILE* file = fopen(file_path, s_r_00556db0);
+        FILE* file = fopen(file_path, "r");
         if (file == nullptr) {
             return;
         }

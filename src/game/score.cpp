@@ -264,7 +264,7 @@ namespace SCORE {
         FILE* file;
         int16_t sort_buffer[10][2];
 
-        file = fopen("HOF.M2", s_rb_0055117c);
+        file = fopen("HOF.M2", "rb");
         if (file == nullptr) {
             return 0;
         }
@@ -548,7 +548,7 @@ namespace SCORE {
 
         Get_Hall_Of_Fame_Colors_();
 
-        _hi->exit_hotkey_handle = fields::Add_Multi_Hot_Key_Field_(s_C_00552420);
+        _hi->exit_hotkey_handle = fields::Add_Multi_Hot_Key_Field_("C");
 
         fields::Disable_Draw_All_Fields_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
@@ -885,7 +885,7 @@ namespace SCORE {
 
         char score_buffer[80];
         if (_hi->score_raw_subtotal == _hi->score_final) {
-            sprintf(score_buffer, s_fmt_score_simple_00556104, (int)_hi->score_final);
+            sprintf(score_buffer, "%d", (int)_hi->score_final);
         } else {
             char modifier_str[16];
             int16_t modifier = _hi->score_modifier_pct;
@@ -909,7 +909,7 @@ namespace SCORE {
         s_colors dot_colors = *dot_colors_ptr;
 
         char dot_str[4];
-        strcpy(dot_str, s_dot_0055632c);
+        strcpy(dot_str, ".");
         int16_t dot_width = fonts::Get_String_Width_(dot_str);
 
         int16_t y = next_draw_y + 10;
@@ -948,7 +948,7 @@ namespace SCORE {
         dot_colors = *palette_colors;
 
         // Copy dot string "."
-        strcpy(dot_str, s_dot_0055632c);
+        strcpy(dot_str, ".");
         dot_width = fonts::Get_String_Width_(dot_str);
 
         // Copy label string
@@ -956,7 +956,7 @@ namespace SCORE {
         label_width = fonts::Get_String_Width_(label_buf);
 
         // Format score string
-        sprintf(score_buf, s_fmt_score_simple_00556104, (int)score);
+        sprintf(score_buf, "%d", (int)score);
         score_width = fonts::Get_String_Width_(score_buf) + 3;
 
         // Print label

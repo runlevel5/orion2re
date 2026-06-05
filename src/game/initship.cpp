@@ -369,7 +369,7 @@ namespace INITSHIP {
     void __cdecl Load_Small_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, s_Raider_0055768c);
+        strcpy(design->name, "Raider");
 
         design->ship_type = 0;
         design->shield_type = 0;
@@ -411,7 +411,7 @@ namespace INITSHIP {
     void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, s_Marauder_00557694);
+        strcpy(design->name, "Marauder");
 
         design->ship_type = 0;
         design->shield_type = 0;
@@ -464,7 +464,7 @@ namespace INITSHIP {
     void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, s_Interdictor_005576ac);
+        strcpy(design->name, "Interdictor");
 
         design->ship_type = 0;
         design->shield_type = 0;
@@ -609,7 +609,7 @@ namespace INITSHIP {
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, s_Harbinger_005576b8);
+        strcpy(design->name, "Harbinger");
 
         design->size = 4;
         design->ship_type = 0;
@@ -1446,7 +1446,7 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
 void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    strcpy(ship->name, s_Raider_0055768c);
+    strcpy(ship->name, "Raider");
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1500,7 +1500,7 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
 void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    strcpy(ship->name, s_Marauder_00557694);
+    strcpy(ship->name, "Marauder");
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1717,7 +1717,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    strcpy(ship->name, s_Interdictor_005576ac);
+    strcpy(ship->name, "Interdictor");
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
