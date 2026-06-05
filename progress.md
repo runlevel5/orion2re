@@ -8,11 +8,6 @@
 - [pending] src/game/orion2_str.h
 - [pending] src/game/paragrph.h
 
-- [pending] src/game/random.{h,cpp}
-- [pending] src/game/reduce.{h,cpp}
-- [pending] src/game/regions.{h,cpp}
-- [pending] src/game/remap.{h,cpp}
-- [pending] src/game/replace.{h,cpp}
 - [pending] src/game/report.{h,cpp}
 - [pending] src/game/russ.{h,cpp}
 - [pending] src/game/science.{h,cpp}

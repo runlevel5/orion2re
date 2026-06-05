@@ -5,8 +5,8 @@ namespace regions {
     uint32_t _saved_width;
     uint32_t _interlaced_fill_next_pattern;
 
-    void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height) {
-        const uint32_t width_bytes = width_blocks << 2;
+    void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_dwords, uint32_t height) {
+        const uint32_t width_bytes = width_dwords * (uint32_t)sizeof(uint32_t);
         const int32_t stride_skip = video::g_screen_res_x - (int32_t)width_bytes;
         uint32_t remaining = height;
 
@@ -36,10 +36,10 @@ namespace regions {
 
         _rows_remaining = row_count;
 
-        uint32_t width_bytes = width_dwords << 2;
+        uint32_t width_bytes = width_dwords * (uint32_t)sizeof(uint32_t);
         int32_t row_skip = video::g_screen_res_x - (int32_t)width_bytes;
 
-        _saved_width = width_bytes >> 2;
+        _saved_width = width_dwords;
 
         do {
             uint32_t remaining_dwords = _saved_width;
@@ -59,7 +59,7 @@ namespace regions {
     void __cdecl Tint_Fill_Column_(uint8_t* tint_table, uint8_t* pixels, uint32_t width, uint32_t height) {
         uint8_t* dst = pixels;
         uint8_t* src = pixels;
-        const int32_t row_skip = video::g_screen_res_x - static_cast<int32_t>(width);
+        const int32_t row_skip = video::g_screen_res_x - (int32_t)width;
 
         _rows_remaining = height;
         _saved_width = width;
@@ -79,10 +79,10 @@ namespace regions {
     }
 
     void __cdecl Interlaced_Fill_Column_(uint32_t interlace_pattern, uint8_t* dst, int32_t span, int32_t row_count) {
-        const uint32_t row_padding = static_cast<uint32_t>(video::g_screen_res_x) - static_cast<uint32_t>(span);
+        const uint32_t row_padding = (uint32_t)video::g_screen_res_x - (uint32_t)span;
 
         do {
-            memset(dst, static_cast<int>(static_cast<uint8_t>(interlace_pattern)), static_cast<size_t>(span));
+            memset(dst, (int)(uint8_t)interlace_pattern, (size_t)span);
             dst += span;
             dst += row_padding;
 
@@ -97,12 +97,12 @@ namespace regions {
 
     void __cdecl Interlaced_Fill_Region_(uint16_t pattern, uint8_t* dst, int32_t width_dwords, int32_t height)
     {
-        uint32_t current_pattern = static_cast<uint32_t>(pattern);
+        uint32_t current_pattern = (uint32_t)pattern;
         _interlaced_fill_next_pattern = current_pattern;
 
         {
-            uint8_t fill_byte = static_cast<uint8_t>(current_pattern);
-            uint32_t replicated_pattern = static_cast<uint32_t>(fill_byte);
+            uint8_t fill_byte = (uint8_t)current_pattern;
+            uint32_t replicated_pattern = (uint32_t)fill_byte;
             replicated_pattern |= replicated_pattern << 8;
             replicated_pattern |= replicated_pattern << 16;
 
@@ -112,8 +112,8 @@ namespace regions {
         }
 
         {
-            uint8_t fill_byte = static_cast<uint8_t>(current_pattern >> 8);
-            uint32_t replicated_pattern = static_cast<uint32_t>(fill_byte);
+            uint8_t fill_byte = (uint8_t)(current_pattern >> 8);
+            uint32_t replicated_pattern = (uint32_t)fill_byte;
             replicated_pattern |= replicated_pattern << 8;
             replicated_pattern |= replicated_pattern << 16;
 
@@ -122,17 +122,16 @@ namespace regions {
             current_pattern = previous_pattern;
         }
 
-        int32_t shifted_width_bytes = width_dwords;
-        shifted_width_bytes <<= 2;
-        int32_t row_advance = video::g_screen_res_x - shifted_width_bytes;
-        int32_t fill_count = shifted_width_bytes >> 2;
+        const int32_t width_bytes = width_dwords * (int32_t)sizeof(current_pattern);
+        const int32_t row_advance = video::g_screen_res_x - width_bytes;
+        const int32_t fill_count = width_dwords;
         int32_t remaining_rows = height;
 
         do {
             int32_t remaining = fill_count;
             do {
-                *(uint32_t*)dst = current_pattern;
-                dst += 4;
+                memcpy(dst, &current_pattern, sizeof(current_pattern));
+                dst += sizeof(current_pattern);
             } while (--remaining != 0);
 
             dst += row_advance;
@@ -174,18 +173,18 @@ namespace regions {
     void __cdecl Tri_Interlaced_Fill_Region_(
         uint32_t next_pattern,
         uint8_t* dst,
-        uint32_t width,
+        uint32_t width_dwords,
         uint32_t height)
     {
         _interlaced_fill_next_pattern = next_pattern;
 
-        const uint32_t fill_width = width & 0x3FFFFFFFu;
-        const uint32_t fill_width_bytes = fill_width * 4;
+        const uint32_t fill_width = width_dwords & 0x3FFFFFFFu;
+        const uint32_t fill_width_bytes = fill_width * (uint32_t)sizeof(uint32_t);
         const uint32_t row_advance = video::g_screen_res_x - fill_width_bytes;
 
         while (true) {
-            memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),
-                   static_cast<size_t>(fill_width_bytes));
+            memset(dst, (int)(uint8_t)_interlaced_fill_next_pattern,
+                   (size_t)fill_width_bytes);
             dst += fill_width_bytes;
             dst += row_advance;
             _interlaced_fill_next_pattern =
@@ -196,8 +195,8 @@ namespace regions {
                 break;
             }
 
-            memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),
-                   static_cast<size_t>(fill_width_bytes));
+            memset(dst, (int)(uint8_t)_interlaced_fill_next_pattern,
+                   (size_t)fill_width_bytes);
             dst += fill_width_bytes;
             dst += row_advance;
             _interlaced_fill_next_pattern =
@@ -208,8 +207,8 @@ namespace regions {
                 break;
             }
 
-            memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),
-                   static_cast<size_t>(fill_width_bytes));
+            memset(dst, (int)(uint8_t)_interlaced_fill_next_pattern,
+                   (size_t)fill_width_bytes);
             dst += fill_width_bytes;
             dst += row_advance;
             _interlaced_fill_next_pattern =

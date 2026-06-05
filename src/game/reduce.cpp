@@ -8,12 +8,19 @@ namespace reduce {
     s_palette_cube _cube_list[256];
     uint8_t _color_weight[512];
 
+    namespace {
+        constexpr int16_t kReducedPaletteCapacity =
+            (int16_t)(sizeof(_reduced_palette_list) / sizeof(_reduced_palette_list[0]));
+        constexpr int16_t kReducedCubeCapacity =
+            (int16_t)(sizeof(_cube_list) / sizeof(_cube_list[0]));
+    }
+
     void __cdecl Reduce_Palette_(s_palette_entry* palette, int16_t start_index, int16_t num_colors_src, int16_t num_colors_dst) {
-        if (num_colors_src > 512) {
-            exitm::Exit_With_Message(s_Too_many_colors_to_reduce_from_);
+        if (num_colors_src > kReducedPaletteCapacity) {
+            exitm::Exit_With_Message("Too many colors to reduce from (Max 512)");
         }
-        if (num_colors_dst > 256) {
-            exitm::Exit_With_Message(s_Too_many_colors_to_reduce_to_);
+        if (num_colors_dst > kReducedCubeCapacity) {
+            exitm::Exit_With_Message("Too many colors to reduce to (Max 256)");
         }
 
         Initial_Cube_(palette, num_colors_src);
@@ -61,43 +68,43 @@ namespace reduce {
         _ncubes = 0;
     }
 
-    void __cdecl Add_Reduced_Palette_Group_(s_animation_header* param_1) {
-        animate::_animation_header = param_1;
+    void __cdecl Add_Reduced_Palette_Group_(s_animation_header* anim) {
+        animate::_animation_header = anim;
 
-        if ((param_1->flags & 0x10) == 0) {
+        if ((anim->flags & 0x10) == 0) {
             exitm::Exit_With_Message("Palette Reduction Pictures Must Have Palette");
         }
 
-        animate::_palette_header = reinterpret_cast<s_palette_header*>(reinterpret_cast<uint8_t*>(animate::_animation_header) +
-                                   (animate::_animation_header->frame_count * 4) + 0x10);
+        animate::_palette_header = (s_palette_header*)((uint8_t*)anim +
+                                   (anim->frame_count * sizeof(anim->frame_offsets[0])) + 0x10);
 
-        int16_t count = animate::_palette_header->count;
+        int16_t palette_count = animate::_palette_header->count;
 
-        if (count > 0) {
-            s_palette_entry* src_pal = reinterpret_cast<s_palette_entry*>(animate::_palette_header + 1);
+        if (palette_count > 0) {
+            s_palette_entry* src_palette = (s_palette_entry*)(animate::_palette_header + 1);
 
-            for (int16_t i = 0; i < count; ++i) {
+            for (int16_t i = 0; i < palette_count; ++i) {
                 int16_t cube_idx = reduce::_ncubes;
-                reduce::_reduced_palette_list[cube_idx].r = src_pal[i].r;
-                reduce::_reduced_palette_list[cube_idx].g = src_pal[i].g;
-                reduce::_reduced_palette_list[cube_idx].b = src_pal[i].b;
+                reduce::_reduced_palette_list[cube_idx].r = src_palette[i].r;
+                reduce::_reduced_palette_list[cube_idx].g = src_palette[i].g;
+                reduce::_reduced_palette_list[cube_idx].b = src_palette[i].b;
 
                 reduce::_ncubes++;
 
-                if (reduce::_ncubes >= 512) {
+                if (reduce::_ncubes >= kReducedPaletteCapacity) {
                     exitm::Exit_With_Message("Too many colors to reduce from (Max 512)");
                 }
             }
         }
     }
 
-    void __cdecl Compress_Reduced_Palette_Groups_(int16_t start_index, int16_t count) {
-        if (count < _ncubes) {
-            Reduce_Palette_(_reduced_palette_list, 0, _ncubes, count);
+    void __cdecl Compress_Reduced_Palette_Groups_(int16_t start_index, int16_t color_count) {
+        if (color_count < _ncubes) {
+            Reduce_Palette_(_reduced_palette_list, 0, _ncubes, color_count);
         }
 
-        if (count > 0) {
-            for (int16_t i = 0; i < count; ++i) {
+        if (color_count > 0) {
+            for (int16_t i = 0; i < color_count; ++i) {
                 int32_t dest_idx = start_index + i;
                 video::_current_palette[dest_idx].changed = 1;
                 video::_current_palette[dest_idx].r = _reduced_palette_list[i].r;
@@ -107,7 +114,7 @@ namespace reduce {
         }
     }
 
-    void __cdecl Shrink_Cube_(s_palette_cube* cube, s_palette_entry* hist) {
+    void __cdecl Shrink_Cube_(s_palette_cube* cube, s_palette_entry* palette_entries) {
         cube->r_min = 0xFF;
         cube->r_max = 0x00;
         cube->g_min = 0xFF;
@@ -115,10 +122,10 @@ namespace reduce {
         cube->b_min = 0xFF;
         cube->b_max = 0x00;
 
-        for (int16_t i = cube->first_hist_index; i <= static_cast<int16_t>(cube->last_hist_index); ++i) {
+        for (int16_t i = cube->first_hist_index; i <= (int16_t)cube->last_hist_index; ++i) {
             int16_t hist_idx = _HistPtr[i];
 
-            uint8_t r = hist[hist_idx].r;
+            uint8_t r = palette_entries[hist_idx].r;
             if (r < cube->r_min) {
                 cube->r_min = r;
             }
@@ -126,7 +133,7 @@ namespace reduce {
                 cube->r_max = r;
             }
 
-            uint8_t g = hist[hist_idx].g;
+            uint8_t g = palette_entries[hist_idx].g;
             if (g < cube->g_min) {
                 cube->g_min = g;
             }
@@ -134,7 +141,7 @@ namespace reduce {
                 cube->g_max = g;
             }
 
-            uint8_t b = hist[hist_idx].b;
+            uint8_t b = palette_entries[hist_idx].b;
             if (b < cube->b_min) {
                 cube->b_min = b;
             }
@@ -148,9 +155,9 @@ namespace reduce {
         int16_t best_idx = -1;
         int16_t max_diff = 0;
 
-        for (int16_t i = 0; i < static_cast<int32_t>(_active_cube_count); ++i) {
+        for (int16_t i = 0; i < (int32_t)_active_cube_count; ++i) {
             if (_cube_list[i].first_hist_index != _cube_list[i].last_hist_index &&
-                static_cast<int16_t>(_cube_list[i].level) < 30000) {
+                (int16_t)_cube_list[i].level < 30000) {
 
                 int16_t r_diff = _cube_list[i].r_max - _cube_list[i].r_min;
                 int16_t g_diff = _cube_list[i].g_max - _cube_list[i].g_min;
@@ -173,7 +180,7 @@ namespace reduce {
         return best_idx;
     }
 
-    void __cdecl Initial_Cube_(s_palette_entry* pal, int16_t num_colors) {
+    void __cdecl Initial_Cube_(s_palette_entry* palette, int16_t num_colors) {
         if (num_colors > 0) {
             for (int16_t i = 0; i < num_colors; ++i) {
                 _HistPtr[i] = i;
@@ -184,7 +191,7 @@ namespace reduce {
         _cube_list[0].last_hist_index = num_colors - 1;
         _cube_list[0].level = 0;
 
-        Shrink_Cube_(&_cube_list[0], pal);
+        Shrink_Cube_(&_cube_list[0], palette);
 
         _active_cube_count = 1;
     }
@@ -203,12 +210,12 @@ namespace reduce {
         return 2;
     }
 
-    void __cdecl Sort_Cube_Points_(s_palette_entry* palette, int16_t* indices, int16_t num_indices, int16_t component) {
+    void __cdecl Sort_Cube_Points_(s_palette_entry* palette, int16_t* indices, int16_t num_indices, int16_t color_channel) {
         int16_t pass;
         bool swapped;
         int16_t i;
 
-        if (component == 0) {
+        if (color_channel == 0) {
             pass = 0;
             swapped = true;
             if (num_indices > 0) {
@@ -228,7 +235,7 @@ namespace reduce {
                     }
                 }
             }
-        } else if (component == 1) {
+        } else if (color_channel == 1) {
             pass = 0;
             swapped = true;
             if (num_indices > 0) {
@@ -248,7 +255,7 @@ namespace reduce {
                     }
                 }
             }
-        } else if (component == 2) {
+        } else if (color_channel == 2) {
             swapped = true;
             pass = 0;
             if (num_indices > 0) {
@@ -271,7 +278,7 @@ namespace reduce {
         }
     }
 
-    void __cdecl Split_Cube_(s_palette_entry* entries, int16_t cube_index, int16_t color_channel) {
+    void __cdecl Split_Cube_(s_palette_entry* palette_entries, int16_t cube_index, int16_t color_channel) {
         uint16_t first = _cube_list[cube_index].first_hist_index;
         uint16_t last = _cube_list[cube_index].last_hist_index;
 
@@ -279,12 +286,12 @@ namespace reduce {
             if (first <= last) {
                 for (uint16_t i = first; i <= last; ++i) {
                     if (i == first) {
-                        _color_weight[i] = entries[_HistPtr[i + 1]].r - entries[_HistPtr[i]].r;
+                        _color_weight[i] = palette_entries[_HistPtr[i + 1]].r - palette_entries[_HistPtr[i]].r;
                     } else if (i == last) {
-                        _color_weight[i] = entries[_HistPtr[i]].r - entries[_HistPtr[i - 1]].r;
+                        _color_weight[i] = palette_entries[_HistPtr[i]].r - palette_entries[_HistPtr[i - 1]].r;
                     } else {
-                        uint8_t diff1 = entries[_HistPtr[i]].r - entries[_HistPtr[i - 1]].r;
-                        uint8_t diff2 = entries[_HistPtr[i + 1]].r - entries[_HistPtr[i]].r;
+                        uint8_t diff1 = palette_entries[_HistPtr[i]].r - palette_entries[_HistPtr[i - 1]].r;
+                        uint8_t diff2 = palette_entries[_HistPtr[i + 1]].r - palette_entries[_HistPtr[i]].r;
                         _color_weight[i] = (diff2 > diff1) ? diff2 : diff1;
                     }
 
@@ -297,12 +304,12 @@ namespace reduce {
             if (first <= last) {
                 for (uint16_t i = first; i <= last; ++i) {
                     if (i == first) {
-                        _color_weight[i] = entries[_HistPtr[i + 1]].g - entries[_HistPtr[i]].g;
+                        _color_weight[i] = palette_entries[_HistPtr[i + 1]].g - palette_entries[_HistPtr[i]].g;
                     } else if (i == last) {
-                        _color_weight[i] = entries[_HistPtr[i]].g - entries[_HistPtr[i - 1]].g;
+                        _color_weight[i] = palette_entries[_HistPtr[i]].g - palette_entries[_HistPtr[i - 1]].g;
                     } else {
-                        uint8_t diff1 = entries[_HistPtr[i]].g - entries[_HistPtr[i - 1]].g;
-                        uint8_t diff2 = entries[_HistPtr[i + 1]].g - entries[_HistPtr[i]].g;
+                        uint8_t diff1 = palette_entries[_HistPtr[i]].g - palette_entries[_HistPtr[i - 1]].g;
+                        uint8_t diff2 = palette_entries[_HistPtr[i + 1]].g - palette_entries[_HistPtr[i]].g;
                         _color_weight[i] = (diff2 > diff1) ? diff2 : diff1;
                     }
 
@@ -315,12 +322,12 @@ namespace reduce {
             if (first <= last) {
                 for (uint16_t i = first; i <= last; ++i) {
                     if (i == first) {
-                        _color_weight[i] = entries[_HistPtr[i + 1]].b - entries[_HistPtr[i]].b;
+                        _color_weight[i] = palette_entries[_HistPtr[i + 1]].b - palette_entries[_HistPtr[i]].b;
                     } else if (i == last) {
-                        _color_weight[i] = entries[_HistPtr[i]].b - entries[_HistPtr[i - 1]].b;
+                        _color_weight[i] = palette_entries[_HistPtr[i]].b - palette_entries[_HistPtr[i - 1]].b;
                     } else {
-                        uint8_t diff1 = entries[_HistPtr[i]].b - entries[_HistPtr[i - 1]].b;
-                        uint8_t diff2 = entries[_HistPtr[i + 1]].b - entries[_HistPtr[i]].b;
+                        uint8_t diff1 = palette_entries[_HistPtr[i]].b - palette_entries[_HistPtr[i - 1]].b;
+                        uint8_t diff2 = palette_entries[_HistPtr[i + 1]].b - palette_entries[_HistPtr[i]].b;
                         _color_weight[i] = (diff2 > diff1) ? diff2 : diff1;
                     }
 
@@ -344,16 +351,16 @@ namespace reduce {
             sum -= _color_weight[split_index];
         }
 
-        uint16_t active = _active_cube_count;
-        _cube_list[active].first_hist_index = split_index + 1;
-        _cube_list[active].last_hist_index = _cube_list[cube_index].last_hist_index;
-        _cube_list[active].level = _cube_list[cube_index].level + 1;
+        uint16_t new_cube_index = _active_cube_count;
+        _cube_list[new_cube_index].first_hist_index = split_index + 1;
+        _cube_list[new_cube_index].last_hist_index = _cube_list[cube_index].last_hist_index;
+        _cube_list[new_cube_index].level = _cube_list[cube_index].level + 1;
 
         _cube_list[cube_index].last_hist_index = split_index;
         _cube_list[cube_index].level++;
 
-        Shrink_Cube_(&_cube_list[cube_index], entries);
-        Shrink_Cube_(&_cube_list[active], entries);
+        Shrink_Cube_(&_cube_list[cube_index], palette_entries);
+        Shrink_Cube_(&_cube_list[new_cube_index], palette_entries);
 
         _active_cube_count++;
     }
