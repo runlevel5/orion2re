@@ -3,14 +3,10 @@
 - [pending] src/game/funcs.h
 - [pending] src/game/global.h
 - [pending] src/game/netstrat.h
-
-- [pending] src/game/npcdiplo.{h,cpp}
-- [pending] src/game/ocpolpup.{h,cpp}
-- [pending] src/game/officer.{h,cpp}
 - [pending] src/game/orion2.h
 - [pending] src/game/orion2_consts.h
 - [pending] src/game/orion2_str.h
-- [pending] src/game/palette.{h,cpp}
+
 - [pending] src/game/palstore.{h,cpp}
 - [pending] src/game/paragrph.h
 - [pending] src/game/platform.{h,cpp}

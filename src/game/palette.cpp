@@ -7,7 +7,7 @@ namespace palette {
     int32_t _cycle_color_value;
 
     void __cdecl Save_Palette_() {
-        struct_::Copy_Structure_Aligned_(_saved_palette, video::_current_palette, 0x400);
+        struct_::Copy_Structure_Aligned_(_saved_palette, video::_current_palette, sizeof(_saved_palette));
     }
 
     void __cdecl Set_Palette_Changes_(int16_t start_index, int16_t end_index) {
@@ -15,31 +15,24 @@ namespace palette {
         int32_t end = end_index;
 
         if (start <= end) {
-            // Pointer to the first palette status entry to modify
             s_palette_entry* entry = &video::_current_palette[start];
-            
-            // Calculate number of entries to mark (inclusive)
             int32_t count = (end - start) + 1;
-            
+
             do {
-                // Set the changed flag (first byte of the 4-byte Palette_Entry)
                 entry->changed = 1;
-                
-                // Move to the next 4-byte entry
+
                 entry++;
                 count--;
             } while (count != 0);
         }
     }
 
-    void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end) {
-        if (start <= end) {
-            // Calculate how many entries to clear
-            int32_t count = end - start + 1;
-            s_palette_entry* entry = &video::_current_palette[start];
+    void __cdecl Clear_Palette_Changes_(int16_t start_index, int16_t end_index) {
+        if (start_index <= end_index) {
+            int32_t count = end_index - start_index + 1;
+            s_palette_entry* entry = &video::_current_palette[start_index];
 
             do {
-                // Clear only the 'changed' status byte (offset 0 in the 4-byte record)
                 entry->changed = 0;
                 entry++;
                 count--;
@@ -52,8 +45,11 @@ namespace palette {
     }
 
     void __cdecl Restore_Palette_() {
-        struct_::Copy_Structure_Aligned_(video::_current_palette, _saved_palette, 0x400);
-        Set_Palette_Changes_(0, 0xFF);
+        const int16_t last_palette_index =
+            (int16_t)((sizeof(video::_current_palette) / sizeof(video::_current_palette[0])) - 1);
+
+        struct_::Copy_Structure_Aligned_(video::_current_palette, _saved_palette, sizeof(_saved_palette));
+        Set_Palette_Changes_(0, last_palette_index);
     }
 
     void __cdecl Set_Palette_Gradient_(int32_t start_index, int32_t count, int32_t start_r, int32_t start_g, int32_t start_b, int32_t end_r, int32_t end_g, int32_t end_b) {
@@ -117,45 +113,45 @@ namespace palette {
             i += count;
         }
         
-        Clear_Palette_Changes_(0, 255);
+        Clear_Palette_Changes_(0, (int16_t)(palette_entry_count - 1));
     }
 
-    void __cdecl Update_Cycle_(int16_t* bound1, int16_t* bound2) {
+    void __cdecl Update_Cycle_(int16_t* start_value, int16_t* end_value) {
         if (_cycle_direction_flag == 0) {
-            if (*bound1 < *bound2) {
+            if (*start_value < *end_value) {
                 _cycle_color_value += _cycle_step_value;
-                if (*bound2 < _cycle_color_value) {
+                if (*end_value < _cycle_color_value) {
                     _cycle_direction_flag = 1;
-                    _cycle_color_value = *bound2 - 1;
+                    _cycle_color_value = *end_value - 1;
                 }
             } else {
                 _cycle_color_value -= _cycle_step_value;
-                if (_cycle_color_value < *bound1) {
+                if (_cycle_color_value < *start_value) {
                     _cycle_direction_flag = 1;
-                    _cycle_color_value = *bound1 + 1;
+                    _cycle_color_value = *start_value + 1;
                 }
             }
         } else {
-            if (*bound1 < *bound2) {
+            if (*start_value < *end_value) {
                 _cycle_color_value -= _cycle_step_value;
-                if (_cycle_color_value < *bound1) {
+                if (_cycle_color_value < *start_value) {
                     _cycle_direction_flag = 0;
-                    _cycle_color_value = *bound1 + 1;
+                    _cycle_color_value = *start_value + 1;
                 }
             } else {
                 _cycle_color_value += _cycle_step_value;
-                if (*bound2 < _cycle_color_value) {
+                if (*end_value < _cycle_color_value) {
                     _cycle_direction_flag = 0;
-                    _cycle_color_value = *bound2 - 1;
+                    _cycle_color_value = *end_value - 1;
                 }
             }
         }
     }
 
-    void __cdecl Cycle_Palette_Color_(int16_t pal_idx, int16_t r1, int16_t g1, int16_t b1, int16_t r2, int16_t g2, int16_t b2, int16_t step_val) {
-        int32_t delta_r = r2 - r1;
-        int32_t delta_g = g2 - g1;
-        int32_t delta_b = b2 - b1;
+    void __cdecl Cycle_Palette_Color_(int16_t palette_index, int16_t start_r, int16_t start_g, int16_t start_b, int16_t end_r, int16_t end_g, int16_t end_b, int16_t step_value) {
+        int32_t delta_r = end_r - start_r;
+        int32_t delta_g = end_g - start_g;
+        int32_t delta_b = end_b - start_b;
 
         int32_t abs_r = delta_r;
         if (abs_r < 0) {
@@ -172,7 +168,7 @@ namespace palette {
             abs_b = -abs_b;
         }
 
-        _cycle_step_value = step_val;
+        _cycle_step_value = step_value;
 
         int32_t max_idx = 2;
         if ((abs_r < abs_g) || (abs_r < abs_b)) {
@@ -186,11 +182,11 @@ namespace palette {
         if (_cycle_direction_flag == -1) {
             _cycle_direction_flag = 0;
             if (max_idx == 0) {
-                _cycle_color_value = r1;
+                _cycle_color_value = start_r;
             } else if (max_idx == 1) {
-                _cycle_color_value = g1;
+                _cycle_color_value = start_g;
             } else if (max_idx == 2) {
-                _cycle_color_value = b1;
+                _cycle_color_value = start_b;
             }
         }
 
@@ -200,54 +196,66 @@ namespace palette {
 
         if (max_idx == 0) {
             out_r = _cycle_color_value;
-            out_g = (delta_g * (_cycle_color_value - r1)) / delta_r + g1;
-            out_b = (delta_b * (_cycle_color_value - r1)) / delta_r + b1;
+            out_g = (delta_g * (_cycle_color_value - start_r)) / delta_r + start_g;
+            out_b = (delta_b * (_cycle_color_value - start_r)) / delta_r + start_b;
         } else if (max_idx == 1) {
             out_g = _cycle_color_value;
-            out_r = (delta_r * (_cycle_color_value - g1)) / delta_g + r1;
-            out_b = (delta_b * (_cycle_color_value - g1)) / delta_g + b1;
+            out_r = (delta_r * (_cycle_color_value - start_g)) / delta_g + start_r;
+            out_b = (delta_b * (_cycle_color_value - start_g)) / delta_g + start_b;
         } else if (max_idx == 2) {
             out_b = _cycle_color_value;
-            out_g = (delta_g * (_cycle_color_value - b1)) / delta_b + g1;
-            out_r = (delta_r * (_cycle_color_value - b1)) / delta_b + r1;
+            out_g = (delta_g * (_cycle_color_value - start_b)) / delta_b + start_g;
+            out_r = (delta_r * (_cycle_color_value - start_b)) / delta_b + start_r;
         }
 
         if (max_idx == 0) {
-            Update_Cycle_(&r1, &r2);
+            Update_Cycle_(&start_r, &end_r);
         } else if (max_idx == 1) {
-            Update_Cycle_(&g1, &g2);
+            Update_Cycle_(&start_g, &end_g);
         } else if (max_idx == 2) {
-            Update_Cycle_(&b1, &b2);
+            Update_Cycle_(&start_b, &end_b);
         }
 
-        palstore::Store_Single_Palette_Color_(pal_idx, static_cast<uint8_t>(out_r), static_cast<uint8_t>(out_g), static_cast<uint8_t>(out_b));
+        palstore::Store_Single_Palette_Color_(palette_index, (uint8_t)out_r, (uint8_t)out_g, (uint8_t)out_b);
     }
 
-    void __cdecl Save_Glass_Remap_Block_(void* buffer) {
-        struct_::Copy_Structure_(buffer, video::_glass_remap_colors, 0x1000);
-        struct_::Copy_Structure_(static_cast<uint8_t*>(buffer) + 0x1000, video::_glass_colors, 0x40);
+    void __cdecl Save_Glass_Remap_Block_(void* remap_buffer) {
+        uint8_t* remap_buffer_bytes = (uint8_t*)remap_buffer;
+
+        struct_::Copy_Structure_(remap_buffer_bytes, video::_glass_remap_colors, sizeof(video::_glass_remap_colors));
+        struct_::Copy_Structure_(
+            remap_buffer_bytes + sizeof(video::_glass_remap_colors),
+            video::_glass_colors,
+            sizeof(video::_glass_colors));
     }
 
-    void* __cdecl Allocate_Glass_Remap_Next_Block_(void* block) {
-        return allocate::Allocate_Next_Block_(block, 0x1040);
+    void* __cdecl Allocate_Glass_Remap_Next_Block_(void* current_block) {
+        return allocate::Allocate_Next_Block_(
+            current_block,
+            sizeof(video::_glass_remap_colors) + sizeof(video::_glass_colors));
     }
 
-    void __cdecl Set_Glass_Remap_Color_(int16_t idx, uint8_t r, uint8_t g, uint8_t b, uint8_t c) {
-        video::_glass_colors[idx].intensity = c;
-        video::_glass_colors[idx].r = r;
-        video::_glass_colors[idx].g = g;
-        video::_glass_colors[idx].b = b;
+    void __cdecl Set_Glass_Remap_Color_(int16_t color_index, uint8_t red, uint8_t green, uint8_t blue, uint8_t intensity) {
+        video::_glass_colors[color_index].intensity = intensity;
+        video::_glass_colors[color_index].r = red;
+        video::_glass_colors[color_index].g = green;
+        video::_glass_colors[color_index].b = blue;
     }
 
-    void __cdecl Restore_Glass_Remap_Block_(void* buffer) {
-        struct_::Copy_Structure_(video::_glass_remap_colors, buffer, 0x1000);
-        struct_::Copy_Structure_(video::_glass_colors, static_cast<uint8_t*>(buffer) + 0x1000, 0x40);
+    void __cdecl Restore_Glass_Remap_Block_(void* remap_buffer) {
+        uint8_t* remap_buffer_bytes = (uint8_t*)remap_buffer;
+
+        struct_::Copy_Structure_(video::_glass_remap_colors, remap_buffer_bytes, sizeof(video::_glass_remap_colors));
+        struct_::Copy_Structure_(
+            video::_glass_colors,
+            remap_buffer_bytes + sizeof(video::_glass_remap_colors),
+            sizeof(video::_glass_colors));
     }
 
-    void __cdecl RGB_To_HLS_(int8_t r, int8_t g, int8_t b, int32_t* h, int32_t* l, int32_t* s) {
-        int32_t r_scaled = (r * 1000) / 63;
-        int32_t g_scaled = (g * 1000) / 63;
-        int32_t b_scaled = (b * 1000) / 63;
+    void __cdecl RGB_To_HLS_(int8_t red, int8_t green, int8_t blue, int32_t* hue, int32_t* lightness, int32_t* saturation) {
+        int32_t r_scaled = (red * 1000) / 63;
+        int32_t g_scaled = (green * 1000) / 63;
+        int32_t b_scaled = (blue * 1000) / 63;
 
         int32_t max_val = g_scaled;
         if (g_scaled <= r_scaled) {
@@ -265,86 +273,86 @@ namespace palette {
             min_val = b_scaled;
         }
 
-        int32_t lightness = (max_val + min_val) / 2;
-        *l = lightness;
+        int32_t lightness_value = (max_val + min_val) / 2;
+        *lightness = lightness_value;
 
         if (min_val != max_val) {
             int32_t delta = max_val - min_val;
 
-            if (lightness <= 500) {
-                *s = (delta * 1000) / (max_val + min_val);
+            if (lightness_value <= 500) {
+                *saturation = (delta * 1000) / (max_val + min_val);
             } else {
-                *s = (delta * 1000) / ((2000 - min_val) - max_val);
+                *saturation = (delta * 1000) / ((2000 - min_val) - max_val);
             }
 
             if (r_scaled == max_val) {
-                *h = ((g_scaled - b_scaled) * 1000) / delta;
+                *hue = ((g_scaled - b_scaled) * 1000) / delta;
             } else if (g_scaled == max_val) {
-                *h = ((b_scaled - r_scaled) * 1000) / delta + 2000;
+                *hue = ((b_scaled - r_scaled) * 1000) / delta + 2000;
             } else if (b_scaled == max_val) {
-                *h = ((r_scaled - g_scaled) * 1000) / delta + 4000;
+                *hue = ((r_scaled - g_scaled) * 1000) / delta + 4000;
             }
 
-            int32_t hue = *h * 60;
-            *h = hue;
-            if (hue < 0) {
-                *h = hue + 360;
+            int32_t hue_degrees = *hue * 60;
+            *hue = hue_degrees;
+            if (hue_degrees < 0) {
+                *hue = hue_degrees + 360;
             }
-            *h = *h / 1000;
+            *hue = *hue / 1000;
         } else {
-            *s = 0;
-            *h = -1;
+            *saturation = 0;
+            *hue = -1;
         }
     }
 
-    int32_t __cdecl Value_(int32_t p, int32_t q, int32_t t) {
-        if (t > 360) {
-            t -= 360;
-        } else if (t < 0) {
-            t += 360;
+    int32_t __cdecl Value_(int32_t m1, int32_t m2, int32_t hue) {
+        if (hue > 360) {
+            hue -= 360;
+        } else if (hue < 0) {
+            hue += 360;
         }
 
-        if (t < 60) {
-            return (((q - p) * (t * 1000 / 60)) / 1000 + p) * 63 / 1000;
+        if (hue < 60) {
+            return (((m2 - m1) * (hue * 1000 / 60)) / 1000 + m1) * 63 / 1000;
         }
-        if (t < 180) {
-            return q * 63 / 1000;
+        if (hue < 180) {
+            return m2 * 63 / 1000;
         }
-        if (t < 240) {
-            return ((((240 - t) * 1000 / 60) * (q - p)) / 1000 + p) * 63 / 1000;
+        if (hue < 240) {
+            return ((((240 - hue) * 1000 / 60) * (m2 - m1)) / 1000 + m1) * 63 / 1000;
         }
         
-        return p * 63 / 1000;
+        return m1 * 63 / 1000;
     }
 
-    void __cdecl HLS_To_RGB_(int32_t h, int32_t l, int32_t s, uint8_t* r, uint8_t* g, uint8_t* b) {
+    void __cdecl HLS_To_RGB_(int32_t hue, int32_t lightness, int32_t saturation, uint8_t* red, uint8_t* green, uint8_t* blue) {
         int32_t m2;
 
-        if (l <= 500) {
-            m2 = ((s + 1000) * l) / 1000;
+        if (lightness <= 500) {
+            m2 = ((saturation + 1000) * lightness) / 1000;
         } else {
-            m2 = (s * l) / -1000 + s + l;
+            m2 = (saturation * lightness) / -1000 + saturation + lightness;
         }
 
-        int32_t m1 = l * 2 - m2;
+        int32_t m1 = lightness * 2 - m2;
 
-        if (s == 0) {
-            if (h == -1) {
-                uint8_t val = (l * 63) / 1000;
-                *b = val;
-                *g = val;
-                *r = val;
+        if (saturation == 0) {
+            if (hue == -1) {
+                uint8_t value = (lightness * 63) / 1000;
+                *blue = value;
+                *green = value;
+                *red = value;
             } else {
-                *b = 0;
-                *g = 0;
-                *r = 0;
+                *blue = 0;
+                *green = 0;
+                *red = 0;
             }
             return;
         }
 
-        *r = Value_(m1, m2, h + 120);
-        *g = Value_(m1, m2, h);
-        *b = Value_(m1, m2, h - 120);
+        *red = Value_(m1, m2, hue + 120);
+        *green = Value_(m1, m2, hue);
+        *blue = Value_(m1, m2, hue - 120);
     }
 }
 

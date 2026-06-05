@@ -11,7 +11,7 @@ namespace npcdiplo {
 
     void __cdecl NPC_Diplomacy_Buildup_Penalties_() {
         // Only run every 2 stardates after date 35000
-        int32_t date_diff = static_cast<int32_t>(MOX::_stardate) - 35000;
+        int32_t date_diff = (int32_t)MOX::_stardate - 35000;
         if (date_diff % 2 != 0) {
             return;
         }
@@ -46,21 +46,19 @@ namespace npcdiplo {
                     continue;
                 }
 
-                int32_t threshold = static_cast<int32_t>(MOX::_settings.galaxy_size) * 3 + 3;
+                int32_t threshold = (int32_t)MOX::_settings.galaxy_size * 3 + 3;
                 if (threshold >= MOX::_player[i].total_colonies) {
                     continue;
                 }
 
                 // 25% chance per eligible pair per turn to apply penalty
                 if (random::Random_(4) == 1) {
-                    int32_t difficulty_mod = (static_cast<int32_t>(MOX::_settings.galaxy_size) - MOX::_settings.game_difficulty) + 6;
+                    int32_t difficulty_mod = ((int32_t)MOX::_settings.galaxy_size - MOX::_settings.game_difficulty) + 6;
                     int32_t expansion_excess = threshold - MOX::_player[i].total_colonies;
 
                     // Note: expansion_excess is negative here
                     int32_t base_penalty = (expansion_excess / difficulty_mod) * random::Random_(4);
-                    int16_t relations_change = static_cast<int16_t>((base_penalty / 3) * 4);
-
-                    // Redundant check against assembly: always true given previous JZ skip
+                    int16_t relations_change = (int16_t)((base_penalty / 3) * 4);
                     if (MOX::_player[i].objectives != 100) {
                         relations_change /= 2;
                     }
@@ -95,7 +93,7 @@ namespace npcdiplo {
                     continue;
                 }
 
-                short severity = p1.diplomacy_severity[p2_idx];
+                int16_t severity = p1.diplomacy_severity[p2_idx];
                 if (severity == 0) {
                     continue;
                 }
@@ -126,7 +124,7 @@ namespace npcdiplo {
                         }
                     } else {
                         // Negative severity (diplomatic insult/attack) increases threats
-                        short threat_threshold;
+                        int16_t threat_threshold;
                         if (p1.personality == 4 /* Aggressive/Ruthless */ && p1.dishonored_flag[p2_idx] == 1) {
                             threat_threshold = diplodef::_personality_threat_modifiers[6];
                         } else {
@@ -733,14 +731,12 @@ namespace npcdiplo {
                 for (int16_t j = k; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                     if (MOX::_player[j].objectives != 100) {
                         /*
-                         * Check for diplomatic conflict:
-                         * If player j and player k (i+1) are allied, but player i
-                         * only has a peace treaty with both of them.
-                         * 4 = ALLIANCE, 2 = PEACE
+                         * Break player i's treaties with both empires when their
+                         * existing treaty state conflicts with player i's pair of treaties.
                          */
-                        if (MOX::_player[j].treaty[k] >= 4 /* ALLIANCE */ &&
-                            MOX::_player[i].treaty[j] == 2 /* PEACE */ &&
-                            MOX::_player[i].treaty[k] == 2 /* PEACE */)
+                        if (MOX::_player[j].treaty[k] >= 4 &&
+                            MOX::_player[i].treaty[j] == 2 &&
+                            MOX::_player[i].treaty[k] == 2)
                         {
                             diplomac::Break_Treaties_(i, j);
                             diplomac::Break_Treaties_(i, k);
@@ -965,7 +961,7 @@ namespace npcdiplo {
         s_player* npc = &MOX::_player[npc_idx];
         s_player* other = &MOX::_player[player_idx];
 
-        // Check if player has at least non-aggression or better
+        // Skip proposal generation while already in a high-conflict treaty state.
         if (npc->treaty[player_idx] >= 4) {
             return false;
         }
@@ -986,7 +982,7 @@ namespace npcdiplo {
             score -= 8;
         }
 
-        // Technology check (offset 200 within tech applications)
+        // Xeno Psychology makes diplomatic proposals slightly more likely.
         if (other->tech_applications[200] == 3) {
             score -= 5;
         }
@@ -1050,8 +1046,8 @@ namespace npcdiplo {
                 }
 
                 if (tech_value != 0 && tech_value >= min_tech_value && tech_value <= max_tech_value) {
-                    _human_tech[*tech_count].index = static_cast<uint8_t>(tech_idx);
-                    _human_tech[*tech_count].value = static_cast<int32_t>(tech_value);
+                    _human_tech[*tech_count].index = (uint8_t)tech_idx;
+                    _human_tech[*tech_count].value = (int32_t)tech_value;
                     *tech_count += 1;
                 }
             }
@@ -1069,43 +1065,43 @@ namespace npcdiplo {
         }
     }
 
-    int16_t __cdecl Get_Tech_Exchange_Reaction_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    int16_t __cdecl Get_Tech_Exchange_Reaction_(int16_t player_idx, int16_t target_idx, int16_t reaction_bonus_flag) {
         int32_t rand_val = random::Random_(150);
 
-        int32_t reaction = MOX::_player[param_1].diplomacy_proposal_rejection[param_2] * 20
-                         + COLCALC::Best_Leader_Diplomat_Bonus_(param_1)
+        int32_t reaction = MOX::_player[player_idx].diplomacy_proposal_rejection[target_idx] * 20
+                         + COLCALC::Best_Leader_Diplomat_Bonus_(player_idx)
                          + (3 - MOX::_settings.game_difficulty) * 50
-                         + MOX::_player[param_1].broken_treaties_modifier[param_2]
-                         + MOX::_player[param_1].relations[param_2];
+                         + MOX::_player[player_idx].broken_treaties_modifier[target_idx]
+                         + MOX::_player[player_idx].relations[target_idx];
 
-        if (MOX::_player[param_1].traits[20] != 0) {
+        if (MOX::_player[player_idx].traits[20] != 0) {
             reaction += 50;
         }
 
-        if (MOX::_player[param_1].tech_applications[200] == 3) {
+        if (MOX::_player[player_idx].tech_applications[200] == 3) {
             reaction += 50;
         }
 
         int32_t personality_modifier;
-        if (MOX::_player[param_2].personality == 4 && MOX::_player[param_2].dishonored_flag[param_1] == 1) {
+        if (MOX::_player[target_idx].personality == 4 && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
             personality_modifier = diplodef::_personality_relation_modifiers[6];
         } else {
-            personality_modifier = diplodef::_personality_relation_modifiers[MOX::_player[param_2].personality];
+            personality_modifier = diplodef::_personality_relation_modifiers[MOX::_player[target_idx].personality];
         }
 
         reaction += personality_modifier;
 
-        if (param_3 == 1) {
+        if (reaction_bonus_flag == 1) {
             reaction += 150;
         } else {
-            reaction += rand_val + MOX::_player[param_1].tech_exchange_modifier[param_2] - 1;
+            reaction += rand_val + MOX::_player[player_idx].tech_exchange_modifier[target_idx] - 1;
         }
 
         if (reaction < 0) {
-            return static_cast<int16_t>(10000 / (100 - reaction));
+            return (int16_t)(10000 / (100 - reaction));
         }
 
-        return static_cast<int16_t>(reaction + 100);
+        return (int16_t)(reaction + 100);
     }
 
     void __cdecl NPC_Message_Rejection_Check_(int16_t player_idx, int16_t target_idx, int16_t* msg_type) {
@@ -1127,24 +1123,24 @@ namespace npcdiplo {
 
         switch (MOX::_player[player_idx].personality) {
             case 0:
-                rejection_val = static_cast<int16_t>(random::Random_(4) - 6);
+                rejection_val = (int16_t)(random::Random_(4) - 6);
                 break;
             case 1:
             case 2:
-                rejection_val = static_cast<int16_t>(-1 - (int32_t)random::Random_(3));
+                rejection_val = (int16_t)(-1 - (int32_t)random::Random_(3));
                 break;
             case 3:
-                rejection_val = static_cast<int16_t>(-(int32_t)random::Random_(4));
+                rejection_val = (int16_t)(-(int32_t)random::Random_(4));
                 break;
             case 4:
                 if (MOX::_player[player_idx].dishonored_flag[target_idx] == 1) {
-                    rejection_val = static_cast<int16_t>(random::Random_(4) - 6);
+                    rejection_val = (int16_t)(random::Random_(4) - 6);
                 } else {
-                    rejection_val = static_cast<int16_t>(-(int32_t)random::Random_(3));
+                    rejection_val = (int16_t)(-(int32_t)random::Random_(3));
                 }
                 break;
             case 5:
-                rejection_val = static_cast<int16_t>(-(int32_t)random::Random_(3));
+                rejection_val = (int16_t)(-(int32_t)random::Random_(3));
                 break;
             default:
                 break;
@@ -1171,7 +1167,7 @@ namespace npcdiplo {
         if (MOX::_player[target_idx].personality == 4 && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
             expectation += diplodef::_personality_relation_modifiers[6];
         } else {
-            expectation += diplodef::_personality_relation_modifiers[static_cast<uint8_t>(MOX::_player[target_idx].personality)];
+            expectation += diplodef::_personality_relation_modifiers[(uint8_t)MOX::_player[target_idx].personality];
         }
 
         if (expectation < 0) {
@@ -1241,7 +1237,7 @@ namespace npcdiplo {
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_b], i)) {
                     int32_t val = newtech::Calc_Tech_Value_(player_b, i);
                     if (val != 0) {
-                        _human_tech[human_count].index = static_cast<uint8_t>(i);
+                        _human_tech[human_count].index = (uint8_t)i;
                         _human_tech[human_count].value = val;
                         human_count++;
                     }
@@ -1270,7 +1266,7 @@ namespace npcdiplo {
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_a], i)) {
                     int32_t val = newtech::Calc_Tech_Value_(player_a, i);
                     if (val != 0 && val <= max_target_val) {
-                        _target_tech[target_count].index = static_cast<uint8_t>(i);
+                        _target_tech[target_count].index = (uint8_t)i;
                         _target_tech[target_count].value = val;
                         target_count++;
                     }
@@ -1283,8 +1279,8 @@ namespace npcdiplo {
             return;
         }
 
-        qsort(_human_tech, human_count, 5, compare_tech_);
-        qsort(_target_tech, target_count, 5, reverse_compare_tech_);
+        qsort(_human_tech, human_count, sizeof(_human_tech[0]), compare_tech_);
+        qsort(_target_tech, target_count, sizeof(_target_tech[0]), reverse_compare_tech_);
 
         int median_human_tech = _human_tech[human_count / 2].value;
         *out_count = 0;

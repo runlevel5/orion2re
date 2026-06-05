@@ -26,26 +26,46 @@ namespace NEWGAME {
     extern char* _diff_button_strings[5];
     extern char* _gal_age_button_strings[3];
     extern char* _combat_button_strings[2];
-    extern char _hack_msg[20];
+    extern char _localized_gal_size_label[20];
     extern char* _opp_button_strings[7];
 
-    extern const char s_Media_00557db4[6]; // "Media"
-    extern const char s_sen_00557dbc[5]; // "%sen"
-    extern const char s_Piccola_00557dc4[8]; // "Piccola"
-
+    /**
+     * Loads the localized labels used by the new game option controls.
+     */
     void __cdecl Load_New_Game_Strings_();
 
+    /**
+     * Reloads the new game background and option animations from LBX resources.
+     */
     void __cdecl Reload_Newgame_Screen_();
 
+    /**
+     * Copies persisted game settings into the screen-local selection variables.
+     */
     void __cdecl Globals_To_Temps_();
 
+    /**
+     * Rebuilds the interactive fields for the current new game options.
+     */
     void __cdecl Update_Fields_();
 
+    /**
+     * Draws the preview pictures for the currently selected options.
+     */
     void __cdecl Draw_Pictures_();
 
+    /**
+     * Draws the full new game screen for the current selection state.
+     */
     void __cdecl Draw_Newgame_Screen_();
 
+    /**
+     * Copies the screen-local selections back into the persisted game settings.
+     */
     void __cdecl Temps_To_Globals_();
 
+    /**
+     * Runs the new game setup screen and returns whether setup was accepted.
+     */
     int16_t __cdecl Newgame_Screen_();
 }

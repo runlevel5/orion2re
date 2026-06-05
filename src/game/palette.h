@@ -1,15 +1,19 @@
 #pragma once
 
 namespace palette {
+    // Fills `count` entries starting at `start_index` with a gradient from the start RGB color to the end RGB color.
     void __cdecl Set_Palette_Gradient_(int32_t start_index, int32_t count, int32_t start_r, int32_t start_g, int32_t start_b, int32_t end_r, int32_t end_g, int32_t end_b);
 
     extern s_palette_entry _saved_palette[256];
 
+    // Saves the current palette so it can be restored later.
     void __cdecl Save_Palette_();
 
-    void __cdecl Set_Palette_Changes_(int16_t start, int16_t end);
+    // Marks palette entries in the inclusive [`start_index`, `end_index`] range as changed.
+    void __cdecl Set_Palette_Changes_(int16_t start_index, int16_t end_index);
 
-    void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end);
+    // Clears the changed flag for palette entries in the inclusive [`start_index`, `end_index`] range.
+    void __cdecl Clear_Palette_Changes_(int16_t start_index, int16_t end_index);
 
     extern int32_t _cycle_direction_flag;
 
@@ -17,27 +21,39 @@ namespace palette {
 
     extern int32_t _cycle_color_value;
 
+    // Resets palette cycling so the next cycle starts from its initial endpoint.
     void __cdecl Reset_Cycle_Palette_Color_();
 
+    // Restores the saved palette and marks every palette entry as changed.
     void __cdecl Restore_Palette_();
 
+    // Uploads contiguous runs of changed palette entries to the platform palette.
     void __cdecl Refresh_Palette_();
 
-    void __cdecl Cycle_Palette_Color_(int16_t pal_idx, int16_t r1, int16_t g1, int16_t b1, int16_t r2, int16_t g2, int16_t b2, int16_t step_val);
+    // Advances one palette entry along the RGB line from the start color to the end color using `step_value`.
+    void __cdecl Cycle_Palette_Color_(int16_t palette_index, int16_t start_r, int16_t start_g, int16_t start_b, int16_t end_r, int16_t end_g, int16_t end_b, int16_t step_value);
 
-    void __cdecl Update_Cycle_(int16_t* bound1, int16_t* bound2);
+    // Updates the active cycle component between `start_value` and `end_value`.
+    void __cdecl Update_Cycle_(int16_t* start_value, int16_t* end_value);
 
-    void __cdecl Save_Glass_Remap_Block_(void* buffer);
+    // Saves the glass remap tables into `remap_buffer`.
+    void __cdecl Save_Glass_Remap_Block_(void* remap_buffer);
 
-    void* __cdecl Allocate_Glass_Remap_Next_Block_(void* block);
+    // Allocates the next block sized for one saved glass remap payload after `current_block`.
+    void* __cdecl Allocate_Glass_Remap_Next_Block_(void* current_block);
 
-    void __cdecl Set_Glass_Remap_Color_(int16_t idx, uint8_t r, uint8_t g, uint8_t b, uint8_t c);
+    // Sets one glass remap base color and its `intensity` value.
+    void __cdecl Set_Glass_Remap_Color_(int16_t color_index, uint8_t red, uint8_t green, uint8_t blue, uint8_t intensity);
 
-    void __cdecl Restore_Glass_Remap_Block_(void* buffer);
+    // Restores the glass remap tables from `remap_buffer`.
+    void __cdecl Restore_Glass_Remap_Block_(void* remap_buffer);
 
-    void __cdecl RGB_To_HLS_(int8_t r, int8_t g, int8_t b, int32_t* h, int32_t* l, int32_t* s);
+    // Converts an RGB palette color to HLS and stores the results in `hue`, `lightness`, and `saturation`.
+    void __cdecl RGB_To_HLS_(int8_t red, int8_t green, int8_t blue, int32_t* hue, int32_t* lightness, int32_t* saturation);
 
-    void __cdecl HLS_To_RGB_(int32_t h, int32_t l, int32_t s, uint8_t* r, uint8_t* g, uint8_t* b);
+    // Converts an HLS color to RGB and stores the channel values in `red`, `green`, and `blue`.
+    void __cdecl HLS_To_RGB_(int32_t hue, int32_t lightness, int32_t saturation, uint8_t* red, uint8_t* green, uint8_t* blue);
 
-    int32_t __cdecl Value_(int32_t p, int32_t q, int32_t t);
+    // Evaluates one RGB channel from HLS interpolation for the supplied `hue`.
+    int32_t __cdecl Value_(int32_t m1, int32_t m2, int32_t hue);
 }

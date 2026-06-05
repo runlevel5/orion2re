@@ -13,19 +13,16 @@ namespace newtech {
         int16_t max_ai_group = 0;
 
         if (MOX::_NUM_PLAYERS > 0) {
-            for (int p_idx = 0; p_idx < (int)MOX::_NUM_PLAYERS; ++p_idx) {
-                // Skip the player specified in exclude_player_idx (likely the current player)
-                if (p_idx == (int)exclude_player_idx) {
+            for (int player_idx = 0; player_idx < (int)MOX::_NUM_PLAYERS; ++player_idx) {
+                if (player_idx == (int)exclude_player_idx) {
                     continue;
                 }
 
-                s_player* plr = &MOX::_player[p_idx];
+                s_player* player = &MOX::_player[player_idx];
 
-                // Iterate through first 75 technology applications
                 for (int app_idx = 0; app_idx < 75; ++app_idx) {
                     if (TECHDATA::_technology_applications[app_idx].ai_group == target_ai_group) {
-                        // Check if the player knows the application (3 usually represents fully researched)
-                        if (plr->tech_applications[app_idx] == 3) {
+                        if (player->tech_applications[app_idx] == 3) {
                             int16_t field_id = TECHDATA::_technology_applications[app_idx].tech_field_id;
                             uint8_t field_ai_group = TECHDATA::_technology_fields[field_id].ai_group;
 
@@ -57,7 +54,7 @@ namespace newtech {
     }
 
     int32_t __cdecl Get_Competition_Player_Tech_Value_(int16_t player_idx, uint16_t target_ai_group) {
-        int32_t max_tech_value = 0;
+        int32_t max_field_ai_group = 0;
 
         for (int i = 0; i < 75; ++i) {
             if (TECHDATA::_technology_applications[i].ai_group == target_ai_group) {
@@ -65,14 +62,14 @@ namespace newtech {
                     int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
                     uint8_t field_ai_group = TECHDATA::_technology_fields[tech_field_id].ai_group;
 
-                    if (field_ai_group > max_tech_value) {
-                        max_tech_value = (int16_t)field_ai_group;
+                    if (field_ai_group > max_field_ai_group) {
+                        max_field_ai_group = (int16_t)field_ai_group;
                     }
                 }
             }
         }
 
-        return max_tech_value;
+        return max_field_ai_group;
     }
 
     int32_t __cdecl Calc_Tech_Value_(int16_t player_idx, int16_t tech_app_idx) {
@@ -203,32 +200,32 @@ namespace newtech {
                 if (MOX::_player[player_idx].traits[9] < 0 || MOX::_player[player_idx].traits[9] > 0) modifier = 50;
                 if (MOX::_player[player_idx].traits[0] / 2 == 2) modifier = 50;
                 break;
-            case 16: // 0x10
+            case 16:
                 if (MOX::_player[player_idx].traits[8] < 0) modifier = 20;
                 break;
-            case 18: // 0x12
+            case 18:
                 if (MOX::_player[player_idx].traits[6] < 0) modifier = 50;
                 break;
-            case 25: // 0x19
+            case 25:
                 if (MOX::_player[player_idx].traits[7] < 0) modifier = 100;
                 break;
-            case 27: // 0x1B
+            case 27:
                 if (MOX::_player[player_idx].traits[7] > 0) modifier = 100;
                 break;
-            case 28: // 0x1C
+            case 28:
                 if (MOX::_player[player_idx].traits[6] > 0) modifier = 100;
                 break;
-            case 37: // 0x25
+            case 37:
                 if (MOX::_player[player_idx].traits[28] != 0) modifier = 1;
                 break;
-            case 40: // 0x28
+            case 40:
                 if (MOX::_player[player_idx].traits[0] / 2 == 3) modifier = 1;
                 break;
         }
 
         if (tech_app_idx == 5) {
             if (MOX::_player[player_idx].traits[25] != 0) modifier = 1;
-        } else if (tech_app_idx == 0x83) { // 131
+        } else if (tech_app_idx == 0x83) {
             if (MOX::_player[player_idx].traits[11] != 0) modifier = 1;
             else if (MOX::_player[player_idx].traits[10] != 0) modifier = 50;
         }
@@ -329,7 +326,7 @@ namespace newtech {
             }
         }
 
-        return static_cast<int32_t>(val);
+        return (int32_t)val;
     }
 
     int8_t __cdecl All_Gray_Boxes_Researched_(s_player* player) {
@@ -384,14 +381,15 @@ namespace newtech {
     int16_t __cdecl Choose_Tech_Application_(int16_t player_idx) {
         uint32_t tech_values[212] = { 0 };
         uint32_t weighted_choices[212] = { 0 };
+        const int32_t tech_choice_count = (int32_t)(sizeof(tech_values) / sizeof(tech_values[0]));
         uint32_t max_weighted_choice = 0;
-        bool found_some = false;
+        bool has_candidate_tech = false;
 
         s_player* player = &MOX::_player[player_idx];
         bool all_gray_boxes = All_Gray_Boxes_Researched_(player) != 0;
         Set_Competition_Tech_Values_(player_idx);
 
-        for (int i = 1; i < 212; i++) {
+        for (int32_t i = 1; i < tech_choice_count; ++i) {
             if (player->tech_applications[i] == 1 &&
                 (MOX::_settings.strategic_combat_flag == 0 || TECHDATA::_technology_applications[i].in_strategic != 0)) {
 
@@ -422,13 +420,13 @@ namespace newtech {
                         if (value == 0) value = 1;
                     }
 
-                    found_some = true;
+                    has_candidate_tech = true;
                     tech_values[i] = value;
                 }
             }
         }
 
-        if (found_some) {
+        if (has_candidate_tech) {
             int32_t research_threshold = 15;
             // BUG: Original assembly unconditionally reads from Player 0 instead of the current player.
             int32_t research_produced = MOX::_player[0].research_produced;
@@ -440,7 +438,7 @@ namespace newtech {
             while (!has_choices) {
                 max_weighted_choice = 0;
 
-                for (int i = 1; i < 212; i++) {
+                for (int32_t i = 1; i < tech_choice_count; ++i) {
                     if (tech_values[i] == 0) {
                         weighted_choices[i] = 0;
                     } else {
@@ -473,7 +471,7 @@ namespace newtech {
                 return Choose_Hyper_Advanced_Tech_();
             }
 
-            for (int i = 1; i < 212; i++) {
+            for (int32_t i = 1; i < tech_choice_count; ++i) {
                 uint32_t val = weighted_choices[i];
                 if (val != 0) {
                     bool keep = true;
@@ -502,7 +500,7 @@ namespace newtech {
         }
 
         if (max_weighted_choice != 0) {
-            return RUSS::Get_Weighted_Choice_Int_(weighted_choices, 212);
+            return RUSS::Get_Weighted_Choice_Int_(weighted_choices, tech_choice_count);
         }
 
         return Choose_Hyper_Advanced_Tech_();

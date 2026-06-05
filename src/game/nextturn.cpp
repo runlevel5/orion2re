@@ -4,11 +4,11 @@ namespace NEXTTURN {
 
 int16_t Get_Winner_() {
     if (diplodef::_council_winner != -1) {
-        return static_cast<int16_t>(diplodef::_council_winner);
+        return (int16_t)diplodef::_council_winner;
     }
 
     int16_t winner_idx = -1;
-    int16_t num_players = static_cast<int16_t>(MOX::_NUM_PLAYERS);
+    int16_t num_players = (int16_t)MOX::_NUM_PLAYERS;
 
     for (int16_t i = 0; i < num_players; ++i) {
         if (MOX::_player[i].captured_antares != 0 || MOX::_player[i].eliminated == 0) {
@@ -20,15 +20,15 @@ int16_t Get_Winner_() {
 }
 
 void Do_Autosave_() {
-    int32_t interval = 4;
+    int32_t autosave_interval = 4;
 
     if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-        interval = 1;
+        autosave_interval = 1;
     }
 
     if (MOX::_settings.auto_saves != 0) {
-        if ((static_cast<int32_t>(MOX::_stardate) % interval) == 0) {
-            strcpy(MOX::_save_game_description[9].description, FILEDEF::s_Auto_Save_00556938);
+        if (((int32_t)MOX::_stardate % autosave_interval) == 0) {
+            strcpy(MOX::_save_game_description[9].description, "(Auto Save)");
             FILEDEF::Save_Game_(9);
         }
     }
@@ -73,7 +73,7 @@ void Next_Turn_() {
                     if (MOX::_player[i].captured_antares != 0) {
                         fields::Deactivate_Auto_Function_();
                         ERIC::Play_All_Flics_();
-                        SCORE::End_Of_Game_Hi_Score_(static_cast<int16_t>(i));
+                        SCORE::End_Of_Game_Hi_Score_((int16_t)i);
                         MOX::_current_screen = SCREEN_MAIN_MENU;
                     }
                 }

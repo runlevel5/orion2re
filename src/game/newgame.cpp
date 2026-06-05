@@ -26,22 +26,18 @@ char* _civ_button_strings[3];
 char* _diff_button_strings[5];
 char* _gal_age_button_strings[3];
 char* _combat_button_strings[2];
-char _hack_msg[20];
+char _localized_gal_size_label[20];
 char* _opp_button_strings[7];
 
-const char s_Media_00557db4[6] = "Media";
-const char s_sen_00557dbc[5] = "%sen";
-const char s_Piccola_00557dc4[8] = "Piccola";
+int16_t __cdecl Newgame_Screen_(void) {
+    memcpy(NEWGAME::_color_ken.colors, "y{z|||||", sizeof(NEWGAME::_color_ken.colors));
 
-short __cdecl Newgame_Screen_(void) {
-    memcpy(NEWGAME::_color_ken.colors, "y{z|||||", 8);
-
-    struct_::Clear_Structure_(MOX::_star, 0x1fc8);
-    struct_::Clear_Structure_(MOX::_planet, 0x17e8);
-    struct_::Clear_Structure_(MOX::_colony, 0x1608a);
-    struct_::Clear_Structure_(MOX::_ship, 0xfbf4);
-    struct_::Clear_Structure_(MOX::_player, 0x7548);
-    struct_::Clear_Structure_(MOX::_leaders, 0xf71);
+    struct_::Clear_Structure_(MOX::_star, MAX_STARS * sizeof(*MOX::_star));
+    struct_::Clear_Structure_(MOX::_planet, MAX_PLANETS * sizeof(*MOX::_planet));
+    struct_::Clear_Structure_(MOX::_colony, MAX_COLONIES * sizeof(*MOX::_colony));
+    struct_::Clear_Structure_(MOX::_ship, MAX_SHIPS * sizeof(*MOX::_ship));
+    struct_::Clear_Structure_(MOX::_player, MAX_PLAYERS * sizeof(*MOX::_player));
+    struct_::Clear_Structure_(MOX::_leaders, MAX_LEADERS * sizeof(*MOX::_leaders));
 
     int16_t result = 0;
     int16_t current_civ_btn = NEWGAME::_civ_button_variable;
@@ -51,8 +47,8 @@ short __cdecl Newgame_Screen_(void) {
     fonts::Load_Palette_(9, 0, 0xff);
 
     if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-        memset(RACESEL::_color_flag, 0, 8);
-        memset(RACESEL::_race_flag, 0, 14);
+        memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
+        memset(RACESEL::_race_flag, 0, sizeof(RACESEL::_race_flag));
     }
 
     NEWGAME::Reload_Newgame_Screen_();
@@ -239,29 +235,29 @@ void __cdecl Update_Fields_() {
     fields::Clear_Fields_();
     fonts::Set_Font_Style_(3, &_color_ken);
 
-    const char* common_str = ESTRINGS::E_Strings_(0x0C);
+    const char* common_help_text = ESTRINGS::E_Strings_(0x0C);
     int16_t gx = _g_x;
     int16_t gy = _g_y;
 
     // Difficulty
-    int16_t h0 = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, common_str, 0);
-    _fields[0] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0xCC, gx + 0xCD, gy + 0xE0, _diff_button_strings, 5, &_diff_button_variable, 0, common_str, 0, h0);
+    int16_t difficulty_hidden_field = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, common_help_text, 0);
+    _fields[0] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0xCC, gx + 0xCD, gy + 0xE0, _diff_button_strings, 5, &_diff_button_variable, 0, common_help_text, 0, difficulty_hidden_field);
 
     // Galaxy Size
-    int16_t h1 = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_str, 0);
-    _fields[1] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0xCC, gx + 0x169, gy + 0xE0, _gal_size_button_strings, 4, &_gal_size_button_variable, 0, common_str, 0, h1);
+    int16_t galaxy_size_hidden_field = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_help_text, 0);
+    _fields[1] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0xCC, gx + 0x169, gy + 0xE0, _gal_size_button_strings, 4, &_gal_size_button_variable, 0, common_help_text, 0, galaxy_size_hidden_field);
 
     // Galaxy Age
-    int16_t h2 = fields::Add_Hidden_Field_(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_str, 0);
-    _fields[2] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x1A1, gy + 0xCC, gx + 0x205, gy + 0xE0, _gal_age_button_strings, 3, &_gal_age_button_variable, 0, common_str, 0, h2);
+    int16_t galaxy_age_hidden_field = fields::Add_Hidden_Field_(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_help_text, 0);
+    _fields[2] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x1A1, gy + 0xCC, gx + 0x205, gy + 0xE0, _gal_age_button_strings, 3, &_gal_age_button_variable, 0, common_help_text, 0, galaxy_age_hidden_field);
 
     // Opponents
-    int16_t h3 = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_str, 0);
-    _fields[3] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0x15D, gx + 0xCD, gy + 0x171, _opp_button_strings, 7, &_opp_button_variable, 0, common_str, 0, h3);
+    int16_t opponents_hidden_field = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_help_text, 0);
+    _fields[3] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0x15D, gx + 0xCD, gy + 0x171, _opp_button_strings, 7, &_opp_button_variable, 0, common_help_text, 0, opponents_hidden_field);
 
     // Starting Civilization Level
-    int16_t h4 = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, common_str, 0);
-    _fields[5] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0x15D, gx + 0x169, gy + 0x171, _civ_button_strings, 3, &_civ_button_variable, 0, common_str, 0, h4);
+    int16_t civilization_hidden_field = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, common_help_text, 0);
+    _fields[5] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0x15D, gx + 0x169, gy + 0x171, _civ_button_strings, 3, &_civ_button_variable, 0, common_help_text, 0, civilization_hidden_field);
 
     // Radio Buttons: Random Events, Xenon Attacks, Strategic Combat
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x127, ESTRINGS::E_Strings_(0x0C), _anims[0], &_random_events_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
@@ -297,7 +293,7 @@ void __cdecl Draw_Newgame_Screen_() {
     FAKEBUTS::Draw_Click_Thru_Fields_();
     Draw_Pictures_();
 
-    if (MOX::_game_type == 2 /* ECON_INDUSTRY */) {
+    if (MOX::_game_type == 2 /* NET_GAME */) {
         animate::Draw_(_g_x + 0xD9, _g_y + 0x179, _anims[5]);
     }
 
@@ -315,22 +311,21 @@ void Load_New_Game_Strings_() {
     _gal_size_button_strings[0] = ESTRINGS::E_Strings_(0x1e0 /* ESTR_SMALL */);
     // Special case for Italian language
     if (MOX::_settings.language == 4) {
-        sprintf(_hack_msg, s_Piccola_00557dc4);
-        _gal_size_button_strings[0] = _hack_msg;
+        sprintf(_localized_gal_size_label, "Piccola");
+        _gal_size_button_strings[0] = _localized_gal_size_label;
     }
 
     _gal_size_button_strings[1] = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
 
     if (MOX::_settings.language == 2) {
         char* medium_str = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
-        sprintf(_hack_msg, s_sen_00557dbc, medium_str);
-        _gal_size_button_strings[2] = _hack_msg;
+        sprintf(_localized_gal_size_label, "%sen", medium_str);
+        _gal_size_button_strings[2] = _localized_gal_size_label;
     } else if (MOX::_settings.language == 4) {
-        sprintf(_hack_msg, s_Media_00557db4);
-        _gal_size_button_strings[2] = _hack_msg;
+        sprintf(_localized_gal_size_label, "Media");
+        _gal_size_button_strings[2] = _localized_gal_size_label;
     }
 
-    // Original behavior: this unconditional assignment overwrites any temporary localized hack string.
     _gal_size_button_strings[2] = ESTRINGS::E_Strings_(0x168);
     _gal_size_button_strings[3] = ESTRINGS::E_Strings_(0x143);
 

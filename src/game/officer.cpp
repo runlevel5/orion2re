@@ -19,13 +19,6 @@ namespace OFFICER {
     s_prev_leader_data* _prev_leaders;
     s_officer_picture_slot* _ldrpict;
     const char* PTR_s_OFFICER_LBX = s_OFFICER_LBX_00556980;
-    const char s_ITASKLLS_LBX_005569fc[16] = "ITASKLLS.LBX";
-    const char s_SPASKLLS_LBX_00556a0c[16] = "SPASKLLS.LBX";
-    const char s_FRESKLLS_LBX_00556a1c[16] = "FRESKLLS.LBX";
-    const char s_GERSKLLS_LBX_00556a2c[16] = "GERSKLLS.LBX";
-    const char s_SKILDESC_LBX_00556a3c[16] = "SKILDESC.LBX";
-    const char s_comma_lo_00556a4c[6] = ", lo ";
-    const char s___005569ec[3] = " .";
     char* _officer_skill_description_string[27];
     char* _officer_skill_name_string[27];
     s_officer_skill_help _officer_skill_help[4];
@@ -62,13 +55,14 @@ namespace OFFICER {
         return (warlord != 0) ? 5 : 4;
     }
 
-    int32_t __cdecl Officer_Skill_Bonus_(uint32_t param_1, int16_t leader_idx, int16_t skill_idx) {
+    int32_t __cdecl Officer_Skill_Bonus_(uint32_t unused, int16_t leader_idx, int16_t skill_idx) {
         int16_t level;
+        (void)unused;
 
         if (MOX::_leaders[leader_idx].player_index == -1) {
             level = Get_Officer_Level_(leader_idx);
         } else {
-            level = Owned_Officer_Level_(static_cast<int32_t>(leader_idx));
+            level = Owned_Officer_Level_(leader_idx);
         }
 
         int32_t current_level_val = static_cast<int32_t>(level) + 1;
@@ -80,7 +74,7 @@ namespace OFFICER {
         return (intermediate * bonus_base) / 10;
     }
 
-    int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
+    int16_t __cdecl Owned_Officer_Level_(int16_t leader_idx) {
         int8_t warlord;
         s_leader_data* leader = &MOX::_leaders[leader_idx];
         int16_t xp = leader->xp;
@@ -1337,7 +1331,7 @@ namespace OFFICER {
         return match_type;
     }
 
-    uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
+    uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t current_field_id, int16_t scanned_field_id, int16_t* out_current_icon_idx, int16_t* out_scanned_icon_idx) {
         int16_t start_idx = MOX::_scroll_bar->first_visible_row * MOX::_big_icon_display_columns;
         int16_t end_idx = start_idx + 0x14;
 
@@ -1347,8 +1341,8 @@ namespace OFFICER {
 
         uint16_t result = 0xFFFF;
         bool stop = false;
-        *param_3 = -1;
-        *param_4 = -1;
+        *out_current_icon_idx = -1;
+        *out_scanned_icon_idx = -1;
 
         if (start_idx < 0 || end_idx < 0) {
             stop = true;
@@ -1360,15 +1354,15 @@ namespace OFFICER {
 
                 auto& icon = MOX::_fltscrn_big_icon[i];
                 if (icon.ship_idx > -1) {
-                    if (icon.button_id == param_2) {
+                    if (icon.button_id == scanned_field_id) {
                         result = 0;
                         stop = true;
-                        *param_4 = i;
+                        *out_scanned_icon_idx = i;
                     }
-                    else if ((int32_t)icon.button_id + (int32_t)param_2 == 0) {
+                    else if ((int32_t)icon.button_id + (int32_t)scanned_field_id == 0) {
                         result = 1;
                         stop = true;
-                        *param_4 = i;
+                        *out_scanned_icon_idx = i;
                     }
                 }
             }
@@ -1378,9 +1372,9 @@ namespace OFFICER {
             if (start_idx < end_idx && !stop) {
                 for (int16_t i = start_idx; i < end_idx; ++i) {
                     auto& icon = MOX::_fltscrn_big_icon[i];
-                    if (icon.button_id == param_1 && icon.ship_idx > -1) {
+                    if (icon.button_id == current_field_id && icon.ship_idx > -1) {
                         result = 4;
-                        *param_3 = i;
+                        *out_current_icon_idx = i;
                         break;
                     }
                 }
@@ -1390,10 +1384,10 @@ namespace OFFICER {
         return result;
     }
 
-    void __cdecl Check_Officer_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
+    void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, int16_t* officer_fields, int16_t* portrait_fields) {
         bool is_fleet_screen = Is_Fleet_Officer_Screen_();
         int16_t field1, field2;
-        int16_t scan_result = Scan_Officer_Fields_(param_3, param_4, param_2, param_1, &MOX::_officer_scanned, &field2, &field1);
+        int16_t scan_result = Scan_Officer_Fields_(officer_fields, portrait_fields, scanned, input, &MOX::_officer_scanned, &field2, &field1);
 
         if (scan_result == 0) {
             if (static_cast<int16_t>(MOX::_officer_selected) == field2) {
@@ -1518,7 +1512,6 @@ namespace OFFICER {
         return false;
     }
 
-    // Suggested name: Hire_Officer
     void __cdecl Hire_Officer_(int16_t player_idx, int16_t leader_idx) {
         int16_t maintenance_cost;
         int16_t hire_cost;
@@ -1743,14 +1736,12 @@ namespace OFFICER {
     }
 
     void __cdecl Deselect_Offpop_Icons_() {
-        // Reset the currently selected officer index
         MOX::_officer_selected = -1;
 
-        // BUG: Accessing array with index -1 if no icon was selected
-        // Reset the selection state of the big icon if one was selected.
-        MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].selected = 0;
+        if (MOX::_offpop_big_icon_selected > -1) {
+            MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].selected = 0;
+        }
 
-        // Reset the icon selection index
         MOX::_offpop_big_icon_selected = -1;
     }
 
@@ -1906,7 +1897,7 @@ namespace OFFICER {
                     y,
                     (uint32_t)MOX::_PLAYER_NUM,
                     officer_id,
-                    reinterpret_cast<int16_t*>(&OFFICER::_officer_skill_help[officer_slot])
+                    (int16_t*)&OFFICER::_officer_skill_help[officer_slot]
                 );
             }
 
@@ -1962,13 +1953,13 @@ namespace OFFICER {
         return found;
     }
 
-    void __cdecl Wrapper_For_Offscrn_Data_(int16_t param_1, int16_t param_2) {
+    void __cdecl Wrapper_For_Offscrn_Data_(int16_t officer_list_index, int16_t officer_id) {
         // Calculations use 16-bit intermediate as per IMUL CX, ADD CX sequence
-        int16_t scaled = param_1 * 0x6D;
+        int16_t scaled = officer_list_index * 0x6D;
 
         Print_Officer_Data_(
-            param_1,
-            param_2,
+            officer_list_index,
+            officer_id,
             0x5C,
             (int32_t)(scaled + 0x26),
             8,
@@ -2197,13 +2188,13 @@ namespace OFFICER {
      * Loads 27 skill icons from the OFFICER.LBX starting at entry 0x58 (88).
      * These icons are stored in the global _officer_skill_icon_seg array.
      */
-    void __cdecl Load_Officer_Skill_Icons_(void* param_1) {
+    void __cdecl Load_Officer_Skill_Icons_(void* buffer) {
         for (int i = 0; i < 27; ++i) {
-            MOX::_officer_skill_icon_seg[i] = reinterpret_cast<s_animation_header*>(
+            MOX::_officer_skill_icon_seg[i] = (s_animation_header*)(
                 farload::Far_Reload_Next_(
-                    reinterpret_cast<const char*>(PTR_s_OFFICER_LBX),
+                    (const char*)PTR_s_OFFICER_LBX,
                     0x58 + i,
-                    param_1
+                    buffer
                 )
             );
         }
@@ -2221,8 +2212,8 @@ namespace OFFICER {
 
         MOX::_officer_pictures_screen_seg = allocate::Allocate_Next_Block_(MOX::_screen_seg, 85000);
         
-        _ldrpict = (s_officer_picture_slot*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
-        memset(_ldrpict, 0, 0x30);
+        _ldrpict = (s_officer_picture_slot*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ldrpict) * 8);
+        memset(_ldrpict, 0, sizeof(*_ldrpict) * 8);
 
         _prev_leaders = static_cast<s_prev_leader_data*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
 
@@ -2569,7 +2560,7 @@ namespace OFFICER {
             if (MOX::_leaders[leader_idx].player_index == -1) {
                 level_plus_1 = Get_Officer_Level_(leader_idx) + 1;
             } else {
-                level_plus_1 = Owned_Officer_Level_((int32_t)leader_idx) + 1;
+                level_plus_1 = Owned_Officer_Level_(leader_idx) + 1;
             }
 
             if (MOX::_leaders[leader_idx].player_index == player_idx) {
@@ -3041,11 +3032,11 @@ namespace OFFICER {
         return false;
     }
 
-    void __cdecl Add_Display_Popup_Fields_(int16_t param_1) {
+    void __cdecl Add_Display_Popup_Fields_(int16_t system_id) {
         int16_t local_4;
         int16_t local_2;
 
-        SYS::Add_System_Display_Popup_Fields_(param_1, 0x132, 0x11, 0, 0, 0, 0, &local_4, nullptr, &local_2);
+        SYS::Add_System_Display_Popup_Fields_(system_id, 0x132, 0x11, 0, 0, 0, 0, &local_4, nullptr, &local_2);
     }
 
     void __cdecl Print_ETA_On_Officer_Picture_(int16_t leader_idx, int16_t x, int16_t y, int16_t w) {
@@ -3259,9 +3250,9 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int
         MOX::_leaders[0x41].location = -1;
         MOX::_leaders[0x41].player_index = -1;
         MOX::_leaders[0x41].status = 6;
-        // BUG: Original code blindly assigns this even if ship_idx is -1, 
-        // potentially writing out of bounds. Keeping exact behavior.
-        MOX::_ship[ship_idx].officer_index = -1;
+        if (ship_idx != -1) {
+            MOX::_ship[ship_idx].officer_index = -1;
+        }
     } else {
         if (ship_idx != -1) {
             MOX::_leaders[0x41].location = ship_idx;
@@ -3298,11 +3289,12 @@ void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int
   }
 }
 
-void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int16_t* param_2, int16_t param_3) {
+void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_t tech_app_count) {
     char buffer[500];
+    (void)unused;
 
-    if (param_3 > 0) {
-        Make_Loknar_Message_(buffer, param_2, param_3);
+    if (tech_app_count > 0) {
+        Make_Loknar_Message_(buffer, tech_app_ids, tech_app_count);
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
     }
@@ -3417,27 +3409,31 @@ void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, 
     Assign_Leader_To_Star_(player, leader, star, eta);
 }
 
-void __cdecl Get_Skill_Description_LBX_Name_(char* param_1) {
-    const char* skill_description_lbx_name = OFFICER::s_SKILDESC_LBX_00556a3c;
+/**
+ * Select the localized LBX file name for officer skill text.
+ * @param lbx_name Receives the selected 8.3 LBX file name.
+ */
+void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name) {
+    const char* skill_description_lbx_name = "SKILDESC.LBX";
 
     switch (MOX::_settings.language) {
     case 1:
-        skill_description_lbx_name = OFFICER::s_GERSKLLS_LBX_00556a2c;
+        skill_description_lbx_name = "GERSKLLS.LBX";
         break;
     case 2:
-        skill_description_lbx_name = OFFICER::s_FRESKLLS_LBX_00556a1c;
+        skill_description_lbx_name = "FRESKLLS.LBX";
         break;
     case 3:
-        skill_description_lbx_name = OFFICER::s_SPASKLLS_LBX_00556a0c;
+        skill_description_lbx_name = "SPASKLLS.LBX";
         break;
     case 4:
-        skill_description_lbx_name = OFFICER::s_ITASKLLS_LBX_005569fc;
+        skill_description_lbx_name = "ITASKLLS.LBX";
         break;
     default:
         break;
     }
 
-    memcpy(param_1, skill_description_lbx_name, 13);
+    memcpy(lbx_name, skill_description_lbx_name, 13);
 }
 
 void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx,
@@ -3464,7 +3460,7 @@ void __cdecl Get_Italian_The_(int16_t leader_idx, char* output) {
     }
 
     if (leader_idx == 0x1a || leader_idx == 0x2b || leader_idx == 0x34) {
-        strcpy(output, s_comma_lo_00556a4c);
+        strcpy(output, ", lo ");
         return;
     }
 
@@ -3697,7 +3693,7 @@ void __cdecl Print_Officer_Data_(
         current_y = static_cast<int16_t>(current_y + 0x10);
     }
 
-    memcpy(dot_text, s___005569ec, 3);
+    memcpy(dot_text, " .", 3);
     fonts::Get_String_Width_(dot_text);
     OFFICER::Get_Skill_Data_Max_Pixel_Width_(officer_id);
 
@@ -3830,6 +3826,10 @@ void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(
         (int16_t*)OFFICER::_officer_skill_help);
 }
 
+/**
+ * Add hidden help fields for each visible officer skill row.
+ * @param help_fields Receives five field IDs followed by five skill IDs.
+ */
 void __cdecl Add_Skill_Description_Help_Fields_(
     int16_t left,
     int16_t top,

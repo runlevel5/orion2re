@@ -27,13 +27,6 @@ namespace OFFICER {
     extern s_prev_leader_data* _prev_leaders;
     extern s_officer_picture_slot* _ldrpict;
     extern const char* PTR_s_OFFICER_LBX;
-    extern const char s_ITASKLLS_LBX_005569fc[16]; // "ITASKLLS.LBX"
-    extern const char s_SPASKLLS_LBX_00556a0c[16]; // "SPASKLLS.LBX"
-    extern const char s_FRESKLLS_LBX_00556a1c[16]; // "FRESKLLS.LBX"
-    extern const char s_GERSKLLS_LBX_00556a2c[16]; // "GERSKLLS.LBX"
-    extern const char s_SKILDESC_LBX_00556a3c[16]; // "SKILDESC.LBX"
-    extern const char s_comma_lo_00556a4c[6];
-    extern const char s___005569ec[3];
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
@@ -41,9 +34,9 @@ namespace OFFICER {
 
     int16_t __cdecl Bonus_For_Famous_Heroes_(int16_t player_idx);
 
-    int16_t __cdecl Owned_Officer_Level_(int leader_idx);
+    int16_t __cdecl Owned_Officer_Level_(int16_t leader_idx);
 
-    int32_t __cdecl Officer_Skill_Bonus_(uint32_t param_1, int16_t leader_idx, int16_t skill_idx);
+    int32_t __cdecl Officer_Skill_Bonus_(uint32_t unused, int16_t leader_idx, int16_t skill_idx);
 
     int16_t __cdecl Officer_Skill_Value_(int16_t leader_index);
 
@@ -129,7 +122,7 @@ namespace OFFICER {
 
     void __cdecl Give_Officer_XP_(int16_t player_idx, int16_t leader_idx, int16_t xp_amount);
 
-    void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
+    void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, int16_t* officer_fields, int16_t* portrait_fields);
 
     int16_t __cdecl Scan_Officer_Fields_(
         int16_t* field_x_a,
@@ -141,7 +134,14 @@ namespace OFFICER {
         int16_t* out_skill_id
     );
 
-    uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4);
+    /**
+     * Scan the visible fleet big-icon fields for hover and click matches.
+     * @param current_field_id Current field ID under the cursor.
+     * @param scanned_field_id Newly scanned field ID from input processing.
+     * @param out_current_icon_idx Receives the currently hovered icon index.
+     * @param out_scanned_icon_idx Receives the clicked or activated icon index.
+     */
+    uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t current_field_id, int16_t scanned_field_id, int16_t* out_current_icon_idx, int16_t* out_scanned_icon_idx);
 
     int16_t __cdecl Officer_Screen_User_Box_(const char* message, int16_t type);
 
@@ -169,7 +169,11 @@ namespace OFFICER {
 
     void __cdecl Text_Box_With_Refresh_(const char* title, const char* body);
 
-    void __cdecl Get_Skill_Description_LBX_Name_(char* name);
+    /**
+     * Select the localized LBX file name for officer skill text.
+     * @param lbx_name Receives the selected 8.3 LBX file name.
+     */
+    void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name);
 
     void __cdecl Print_Officer_Skill_Help_(int16_t skill_id, int16_t bonus, int16_t leader_idx);
 
@@ -181,7 +185,7 @@ namespace OFFICER {
 
     void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t* tech_list, int16_t* num_techs);
 
-    void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int16_t* param_2, int16_t param_3);
+    void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_t tech_app_count);
 
     void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int16_t tech_app_count);
 
@@ -216,7 +220,7 @@ namespace OFFICER {
         int16_t unk_10
     );
 
-    void __cdecl Wrapper_For_Offscrn_Data_(int16_t param_1, int16_t param_2);
+    void __cdecl Wrapper_For_Offscrn_Data_(int16_t officer_list_index, int16_t officer_id);
 
     bool __cdecl Leaders_In_Hiring_Pool_();
 
@@ -246,7 +250,7 @@ namespace OFFICER {
 
     void __cdecl Load_Fleet_Galaxy_Stars_();
 
-    void __cdecl Load_Officer_Skill_Icons_(void* param_1);
+    void __cdecl Load_Officer_Skill_Icons_(void* buffer);
 
     uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message);
 
@@ -266,7 +270,7 @@ namespace OFFICER {
 
     void __cdecl Wrapper_For_Offscrn_Help_Fields_();
 
-    void __cdecl Add_Display_Popup_Fields_(int16_t star_displayed);
+    void __cdecl Add_Display_Popup_Fields_(int16_t system_id);
 
     bool __cdecl Officer_Is_Female_(int16_t officer_idx);
 
@@ -287,6 +291,10 @@ namespace OFFICER {
 
     extern const char s__00551100[1];
 
+    /**
+     * Add hidden help fields for each visible officer skill row.
+     * @param help_fields Receives five field IDs followed by five skill IDs.
+     */
     void __cdecl Add_Skill_Description_Help_Fields_(
         int16_t left,
         int16_t top,
