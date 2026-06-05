@@ -5,87 +5,85 @@ namespace struct_ {
         memset(dest, fill, size);
     }
 
-    void __cdecl Clear_Structure_(void* s, uint32_t len) {
-        memset(s, 0, len);
+    void __cdecl Clear_Structure_(void* dest, uint32_t size) {
+        memset(dest, 0, size);
     }
 
     void __cdecl Copy_Structure_Aligned_(void* dest, void* src, uint32_t size) {
-        memcpy(dest, src, (size >> 2) * 4);
+        memcpy(dest, src, (size >> 2) * sizeof(uint32_t));
     }
 
     void __cdecl Copy_Structure_(void* dest, void* src, uint32_t size) {
-        // TODO: Just use memcpy
-        uint8_t* d_ptr = static_cast<uint8_t*>(dest);
-        uint8_t* s_ptr = static_cast<uint8_t*>(src);
+        uint8_t* dest_bytes = (uint8_t*)dest;
+        uint8_t* src_bytes = (uint8_t*)src;
 
-        std::uintptr_t u_src = reinterpret_cast<std::uintptr_t>(s_ptr);
-        std::uintptr_t u_dest = reinterpret_cast<std::uintptr_t>(d_ptr);
+        std::uintptr_t src_addr = (std::uintptr_t)src_bytes;
+        std::uintptr_t dest_addr = (std::uintptr_t)dest_bytes;
 
-        if ((u_src & 1) == (u_dest & 1)) {
-            if ((u_src & 1) != 0) {
-                *d_ptr++ = *s_ptr++;
+        if ((src_addr & 1) == (dest_addr & 1)) {
+            if ((src_addr & 1) != 0) {
+                *dest_bytes++ = *src_bytes++;
                 size--;
             }
 
             uint32_t dword_count = size >> 2;
-            memcpy(d_ptr, s_ptr, dword_count * 4);
-            d_ptr += dword_count * 4;
-            s_ptr += dword_count * 4;
+            memcpy(dest_bytes, src_bytes, dword_count * sizeof(uint32_t));
+            dest_bytes += dword_count * sizeof(uint32_t);
+            src_bytes += dword_count * sizeof(uint32_t);
 
             uint32_t remaining_bytes = size & 3;
             for (uint32_t i = 0; i < remaining_bytes; ++i) {
-                *d_ptr++ = *s_ptr++;
+                *dest_bytes++ = *src_bytes++;
             }
         }
         else {
             for (uint32_t i = 0; i < size; ++i) {
-                *d_ptr++ = *s_ptr++;
+                *dest_bytes++ = *src_bytes++;
             }
         }
     }
 
-    int16_t __cdecl Test_Bit_Field_(void* field, uint16_t bit_index) {
-        const uint8_t* data = reinterpret_cast<const uint8_t*>(field);
+    int16_t __cdecl Test_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        const uint8_t* bit_field_bytes = (const uint8_t*)bit_field;
         uint32_t byte_offset = bit_index >> 3;
         uint32_t bit_in_byte = bit_index & 7;
 
-        return (data[byte_offset] >> bit_in_byte) & 1;
+        return (bit_field_bytes[byte_offset] >> bit_in_byte) & 1;
     }
 
-    void __cdecl Set_Bit_Field_(void* field, uint16_t bit) {
-        uint8_t* data = reinterpret_cast<uint8_t*>(field);
-        // Calculate byte index and bit position within that byte
-        data[bit >> 3] |= static_cast<uint8_t>(1 << (bit & 0x7));
+    void __cdecl Set_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        uint8_t* bit_field_bytes = (uint8_t*)bit_field;
+        bit_field_bytes[bit_index >> 3] |= (uint8_t)(1 << (bit_index & 0x7));
     }
 
     void __cdecl Clear_Bit_Field_(void* bit_field, uint16_t bit_index) {
-        uint8_t* field_ptr = reinterpret_cast<uint8_t*>(bit_field);
+        uint8_t* bit_field_bytes = (uint8_t*)bit_field;
 
         uint32_t byte_offset = bit_index >> 3;
         uint32_t bit_in_byte = bit_index & 7;
 
-        field_ptr[byte_offset] &= ~(static_cast<uint8_t>(1 << bit_in_byte));
+        bit_field_bytes[byte_offset] &= ~((uint8_t)(1 << bit_in_byte));
     }
 
     void __cdecl Swap_Structure_(void* left_ptr, void* right_ptr, uint32_t byte_count) {
-        uint8_t* left = static_cast<uint8_t*>(left_ptr);
-        uint8_t* right = static_cast<uint8_t*>(right_ptr);
+        uint8_t* left_bytes = (uint8_t*)left_ptr;
+        uint8_t* right_bytes = (uint8_t*)right_ptr;
 
-        if ((reinterpret_cast<std::uintptr_t>(right_ptr) & 1U) != 0) {
-            if ((reinterpret_cast<std::uintptr_t>(left_ptr) & 1U) == 0) {
+        if (((std::uintptr_t)right_ptr & 1U) != 0) {
+            if (((std::uintptr_t)left_ptr & 1U) == 0) {
                 uint32_t count = byte_count;
                 do {
-                    uint8_t temp = *right;
-                    *right++ = *left;
-                    *left++ = temp;
+                    uint8_t temp = *right_bytes;
+                    *right_bytes++ = *left_bytes;
+                    *left_bytes++ = temp;
                 } while (--count != 0);
                 return;
             }
 
             {
-                uint8_t temp = *right;
-                *right++ = *left;
-                *left++ = temp;
+                uint8_t temp = *right_bytes;
+                *right_bytes++ = *left_bytes;
+                *left_bytes++ = temp;
             }
 
             byte_count -= 1;
@@ -94,32 +92,32 @@ namespace struct_ {
             if (dword_count != 0) {
                 do {
                     uint32_t temp;
-                    memcpy(&temp, right, sizeof(temp));
-                    memcpy(right, left, sizeof(temp));
-                    memcpy(left, &temp, sizeof(temp));
-                    right += 4;
-                    left += 4;
+                    memcpy(&temp, right_bytes, sizeof(temp));
+                    memcpy(right_bytes, left_bytes, sizeof(temp));
+                    memcpy(left_bytes, &temp, sizeof(temp));
+                    right_bytes += sizeof(temp);
+                    left_bytes += sizeof(temp);
                 } while (--dword_count != 0);
             }
 
             uint32_t tail_count = byte_count & 3;
             if (tail_count != 0) {
                 do {
-                    uint8_t temp = *right;
-                    *right++ = *left;
-                    *left++ = temp;
+                    uint8_t temp = *right_bytes;
+                    *right_bytes++ = *left_bytes;
+                    *left_bytes++ = temp;
                 } while (--tail_count != 0);
             }
 
             return;
         }
 
-        if ((reinterpret_cast<std::uintptr_t>(left_ptr) & 1U) != 0) {
+        if (((std::uintptr_t)left_ptr & 1U) != 0) {
             uint32_t count = byte_count;
             do {
-                uint8_t temp = *right;
-                *right++ = *left;
-                *left++ = temp;
+                uint8_t temp = *right_bytes;
+                *right_bytes++ = *left_bytes;
+                *left_bytes++ = temp;
             } while (--count != 0);
             return;
         }
@@ -128,20 +126,20 @@ namespace struct_ {
         if (dword_count != 0) {
             do {
                 uint32_t temp;
-                memcpy(&temp, right, sizeof(temp));
-                memcpy(right, left, sizeof(temp));
-                memcpy(left, &temp, sizeof(temp));
-                right += 4;
-                left += 4;
+                memcpy(&temp, right_bytes, sizeof(temp));
+                memcpy(right_bytes, left_bytes, sizeof(temp));
+                memcpy(left_bytes, &temp, sizeof(temp));
+                right_bytes += sizeof(temp);
+                left_bytes += sizeof(temp);
             } while (--dword_count != 0);
         }
 
         uint32_t tail_count = byte_count & 3;
         if (tail_count != 0) {
             do {
-                uint8_t temp = *right;
-                *right++ = *left;
-                *left++ = temp;
+                uint8_t temp = *right_bytes;
+                *right_bytes++ = *left_bytes;
+                *left_bytes++ = temp;
             } while (--tail_count != 0);
         }
     }

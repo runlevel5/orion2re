@@ -84,7 +84,7 @@ namespace fields {
 
     int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* text, int8_t key);
 
-    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int8_t sound);
+    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound);
 

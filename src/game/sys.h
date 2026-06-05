@@ -2,22 +2,9 @@
 
 namespace SYS {
     extern void* _sys_data_buffer;
-    extern const char s_fmt_star_display[7]; // "%d> %s"
-    extern const char s_1[3];
-    extern const char s_percent_d_nl[6]; // "%d%%\n"
-    extern const char s_0s_1[7];
-    extern const char s_0s[5];
-    extern const char s_m25_17[9];
-    extern const char s_0s_1_dash[10];
-    extern const char s_m25_27[9];
-    extern const char s_0s_1d_nl[10];
-    extern const char s_0s_10_nl[9];
-    extern const char s_d_nl[4]; // "%d\n"
-    extern const char s_m25_30_0s[13];
 
     extern uint8_t _draw_sun_before_planet;
     extern int8_t _skip_draw_system_planets;
-    extern const char s__00551120[2];
     extern uint8_t _skip_draw_system_display;
     extern s_animation_header* _system_display_sun_seg;
     extern void* _sys_disp_bitmap;
@@ -26,7 +13,11 @@ namespace SYS {
 
     void __cdecl Clear_System_Display_Ship_Fields_();
 
-    bool __cdecl Need_To_Reload_System_Display_(int16_t star_id);
+    /**
+     * Returns whether the cached system-display title differs from the requested star.
+     * @param star_idx Star index to compare against the cached title string.
+     */
+    bool __cdecl Need_To_Reload_System_Display_(int16_t star_idx);
 
     void __cdecl Set_System_Display_Loaded_Flag_(int16_t star_idx);
 
@@ -34,9 +25,20 @@ namespace SYS {
 
     void __cdecl Init_System_Display_(int16_t star_id);
 
+    /**
+     * Builds and shows the colony-potential summary popup for a planet.
+     * @param planet_idx Planet index to summarize.
+     */
     void __cdecl Potential_Colony_Info_Popup_(int16_t planet_idx);
 
-    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t arg3, int32_t arg4);
+    /**
+     * Loads the rotating animation segment for the given planet.
+     * @param out_ptr Receives the buffered animation header.
+     * @param planet_idx Planet index whose display art is requested.
+     * @param unused_star_idx Unused legacy argument kept for call compatibility.
+     * @param unused_arg Unused legacy argument kept for call compatibility.
+     */
+    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t unused_star_idx, int32_t unused_arg);
 
     extern int8_t _remap_gray_percentages[10];
 
@@ -50,7 +52,11 @@ namespace SYS {
 
     void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes);
 
-    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, char mode);
+    /**
+     * Fills the system-display area when the current system should be hidden.
+     * @param fill_mode Nonzero to draw the diagonal fill overlay.
+     */
+    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int8_t fill_mode);
 
     void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
 
@@ -103,11 +109,25 @@ namespace SYS {
             int16_t* total_height,
             bool draw);
 
-    void __cdecl Print_Planet_Info_(int16_t p1, int16_t p2, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7);
+    /**
+     * Draws the expanded planet-information popup inside the current system display.
+     * @param base_x Popup base X position.
+     * @param base_y Popup base Y position.
+     * @param content_w Popup content X offset.
+     * @param content_h Popup content Y offset.
+     * @param planet_idx Planet index to describe.
+     * @param x_offset Additional popup X offset.
+     * @param y_offset Additional popup Y offset.
+     */
+    void __cdecl Print_Planet_Info_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t planet_idx, int16_t x_offset, int16_t y_offset);
 
     void __cdecl Draw_System_Ship_Icons_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset);
 
-    void __cdecl Measure_System_Ship_Data_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t p5, int16_t* out_w, int16_t* out_h);
+    /**
+     * Measures the ship-details popup without drawing it.
+     * @param ship_node_num Ship-node index whose stack details are measured.
+     */
+    void __cdecl Measure_System_Ship_Data_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t ship_node_num, int16_t* out_w, int16_t* out_h);
 
     void __cdecl Do_Print_System_Ship_Data_(
         int16_t base_x,
@@ -125,7 +145,7 @@ namespace SYS {
     void __cdecl Build_System_Popup_Ships_(int16_t star_idx);
 
     void __cdecl Get_System_Display_Ship_Icon_XY_(
-            int32_t unused,
+            int32_t unused_arg,
             int16_t display_slot,
             int16_t* x,
             int16_t* y,
@@ -133,9 +153,17 @@ namespace SYS {
 
     s_animation_header* __cdecl Buffer_Reload_System_Ships_(int16_t display_idx);
 
-    void __cdecl Get_Gate_Icon_XY_(int16_t x, int16_t y, int16_t off_x, int16_t off_y, int16_t unused, int16_t* out_x, int16_t* out_y);
+    /**
+     * Computes the top-left position of the system gate icons.
+     * @param unused_arg Unused legacy argument kept for call compatibility.
+     */
+    void __cdecl Get_Gate_Icon_XY_(int16_t x, int16_t y, int16_t off_x, int16_t off_y, int16_t unused_arg, int16_t* out_x, int16_t* out_y);
 
-    void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t x, int16_t y, int16_t width, int16_t height, int32_t unknown);
+    /**
+     * Draws any dimensional-portal or Artemis Net icons for the system.
+     * @param unused_arg Unused legacy argument kept for call compatibility.
+     */
+    void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t x, int16_t y, int16_t width, int16_t height, int32_t unused_arg);
 
     void __cdecl Print_Gate_Info_(
             int16_t star_idx,
@@ -169,5 +197,14 @@ namespace SYS {
         int16_t* out_popup_title_button,
         int16_t* out_system_field);
 
-    void __cdecl Wrapper_For_Informational_System_Fields_(int16_t star_idx, int16_t x, int16_t y, int16_t arg4, int16_t arg5, int16_t* arg6);
+    /**
+     * Initializes the system display and adds its informational popup fields.
+     * @param star_idx Star index to prepare.
+     * @param base_x Popup base X position.
+     * @param base_y Popup base Y position.
+     * @param orbit_offset_x Additional orbit-layout X offset.
+     * @param orbit_offset_y Additional orbit-layout Y offset.
+     * @param out_popup_title_button Receives the popup title button field id.
+     */
+    void __cdecl Wrapper_For_Informational_System_Fields_(int16_t star_idx, int16_t base_x, int16_t base_y, int16_t orbit_offset_x, int16_t orbit_offset_y, int16_t* out_popup_title_button);
 }

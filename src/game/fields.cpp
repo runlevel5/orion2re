@@ -364,7 +364,7 @@ namespace fields {
         return current_field;
     }
 
-    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
+    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
         if (animate::_clipping_flag == 1) {
             int16_t width = animate::Get_Width_(pic);
             int16_t height = animate::Get_Height_(pic);

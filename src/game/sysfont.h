@@ -14,6 +14,8 @@ namespace sysfont {
     extern uint16_t _default_mouse_image[576];
     extern uint8_t _default_palette_colors[48];
 
+    /* Initializes the built-in cursor palette, image, and default mouse list. */
     void __cdecl Load_System_Mouse_();
+    /* Installs the built-in mouse assets and builds the encoded default font glyph stream. */
     void __cdecl Load_System_Font_();
 }

@@ -75,26 +75,26 @@ uint8_t _default_palette_colors[48] = {
 };
 
 void __cdecl Load_System_Mouse_() {
-    for (int pal_idx = 0; pal_idx < 16; ++pal_idx) {
-        video::_current_palette[pal_idx].r = sysfont::_default_palette_colors[pal_idx * 3 + 0];
-        video::_current_palette[pal_idx].g = sysfont::_default_palette_colors[pal_idx * 3 + 1];
-        video::_current_palette[pal_idx].b = sysfont::_default_palette_colors[pal_idx * 3 + 2];
+    for (int32_t palette_index = 0; palette_index < 16; ++palette_index) {
+        video::_current_palette[palette_index].r = sysfont::_default_palette_colors[palette_index * 3 + 0];
+        video::_current_palette[palette_index].g = sysfont::_default_palette_colors[palette_index * 3 + 1];
+        video::_current_palette[palette_index].b = sysfont::_default_palette_colors[palette_index * 3 + 2];
 
-        video::_current_palette[240 + pal_idx].r = sysfont::_default_palette_colors[pal_idx * 3 + 0];
-        video::_current_palette[240 + pal_idx].g = sysfont::_default_palette_colors[pal_idx * 3 + 1];
-        video::_current_palette[240 + pal_idx].b = sysfont::_default_palette_colors[pal_idx * 3 + 2];
+        video::_current_palette[240 + palette_index].r = sysfont::_default_palette_colors[palette_index * 3 + 0];
+        video::_current_palette[240 + palette_index].g = sysfont::_default_palette_colors[palette_index * 3 + 1];
+        video::_current_palette[240 + palette_index].b = sysfont::_default_palette_colors[palette_index * 3 + 2];
     }
 
-    for (int y = 0; y < 576; y += 24) {
-        for (int x = 0; x < 24; ++x) {
-            uint16_t pixel = sysfont::_default_mouse_image[y + x];
-            if (pixel == 0xFF) {
-                video::_mouse_palette[y + x] = 0x00;
-            } else if (pixel != 0) {
-                if (pixel == 2) {
-                    video::_mouse_palette[y + x] = static_cast<uint8_t>(sysfont::_mouse_cursor_color);
+    for (int32_t row_offset = 0; row_offset < (int32_t)(sizeof(sysfont::_default_mouse_image) / sizeof(sysfont::_default_mouse_image[0])); row_offset += 24) {
+        for (int32_t column_index = 0; column_index < 24; ++column_index) {
+            uint16_t cursor_pixel = sysfont::_default_mouse_image[row_offset + column_index];
+            if (cursor_pixel == 0xFF) {
+                video::_mouse_palette[row_offset + column_index] = 0x00;
+            } else if (cursor_pixel != 0) {
+                if (cursor_pixel == 2) {
+                    video::_mouse_palette[row_offset + column_index] = (uint8_t)sysfont::_mouse_cursor_color;
                 } else {
-                    video::_mouse_palette[y + x] = static_cast<uint8_t>(sysfont::_mouse_cursor_color);
+                    video::_mouse_palette[row_offset + column_index] = (uint8_t)sysfont::_mouse_cursor_color;
                 }
             }
         }
@@ -109,24 +109,28 @@ void __cdecl Load_System_Font_() {
     video::_mouse_palette = sysfont::_default_mouse_palette;
     sysfont::Load_System_Mouse_();
 
-    fonts::_font_data = static_cast<uint8_t*>(allocate::Allocate_Space_(20000));
+    fonts::_font_data = (uint8_t*)allocate::Allocate_Space_(20000);
 
     fonts::_font_header.font_spacing[0] = 0;
     fonts::_font_header.leading_extra[0] = 0;
 
-    memset(fonts::_font_header.font_glyph_widths[0], 4, 255);
+    memset(
+        fonts::_font_header.font_glyph_widths[0],
+        4,
+        sizeof(fonts::_font_header.font_glyph_widths[0]) -
+            sizeof(fonts::_font_header.font_glyph_widths[0][255]));
 
     fonts::_font_header.font_heights[0] = 8;
 
-    uint32_t current_offset = 0;
-    uint32_t char_data_offset = 0;
+    uint32_t glyph_write_offset = 0;
+    uint32_t glyph_data_offset = 0;
 
-    for (int char_idx = 0; char_idx < 256; char_idx++) {
-        fonts::_font_header.font_glyph_offsets[0][char_idx] = current_offset;
+    for (int32_t glyph_index = 0; glyph_index < (int32_t)(sizeof(fonts::_font_header.font_glyph_offsets[0]) / sizeof(fonts::_font_header.font_glyph_offsets[0][0])); ++glyph_index) {
+        fonts::_font_header.font_glyph_offsets[0][glyph_index] = glyph_write_offset;
 
-        for (int col = 0; col < 8; col++) {
-            uint32_t col_idx = sysfont::_thin_column_lookup[col];
-            uint32_t pixel_data = sysfont::_font_pixel_data[col_idx + char_data_offset];
+        for (int32_t column_index = 0; column_index < (int32_t)(sizeof(sysfont::_thin_column_lookup) / sizeof(sysfont::_thin_column_lookup[0])); ++column_index) {
+            uint32_t pixel_column_index = sysfont::_thin_column_lookup[column_index];
+            uint32_t pixel_data = sysfont::_font_pixel_data[pixel_column_index + glyph_data_offset];
 
             uint32_t pixels[8];
             memset(pixels, 0, sizeof(pixels));
@@ -137,25 +141,25 @@ void __cdecl Load_System_Font_() {
             if (pixel_data & 0x1)       pixels[3] = 1;
 
             uint32_t transparent_count = 0;
-            for (int p = 0; p < 4; p++) {
-                if (pixels[p] == 0) {
+            for (int32_t pixel_index = 0; pixel_index < 4; ++pixel_index) {
+                if (pixels[pixel_index] == 0) {
                     transparent_count++;
                 } else {
                     if (transparent_count > 0) {
-                        fonts::_font_data[current_offset++] = (uint8_t)(transparent_count + 0x80);
+                        fonts::_font_data[glyph_write_offset++] = (uint8_t)(transparent_count + 0x80);
                     }
-                    fonts::_font_data[current_offset++] = 1;
+                    fonts::_font_data[glyph_write_offset++] = 1;
                     transparent_count = 0;
                 }
             }
-            fonts::_font_data[current_offset++] = 0x80;
+            fonts::_font_data[glyph_write_offset++] = 0x80;
         }
 
-        while ((current_offset & 3) != 0) {
-            current_offset++;
+        while ((glyph_write_offset & 3) != 0) {
+            glyph_write_offset++;
         }
 
-        char_data_offset += 16;
+        glyph_data_offset += 16;
     }
 }
 

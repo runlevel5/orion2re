@@ -4,7 +4,6 @@
 struct s_unit_data;
 
 namespace TECHDATA {
-    // Correct addresses for various TECHDATA structures. If address does not match, then it points inside of structure.
     extern s_techdata_planetary_shield _planetary_shields[4];
     extern s_tech_armor_data _armor[7];
     extern s_tech_building_data _buildings[49];
@@ -27,7 +26,11 @@ namespace TECHDATA {
 
     extern s_tech_data_personal_shield _personal_shields[2];
 
-    inline uint16_t& _fuel_ship_range(int32_t fuel_idx) {
-      return _fuel[fuel_idx].ship_range;
+    /**
+     * Returns a reference to the ship-range value for a fuel technology entry.
+     * @param fuel_index Index into the TECHDATA fuel table.
+     */
+    inline uint16_t& _fuel_ship_range(int32_t fuel_index) {
+      return _fuel[fuel_index].ship_range;
     }
 }

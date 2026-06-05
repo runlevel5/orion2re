@@ -11,17 +11,6 @@
 - [pending] src/game/simmodem.h
 - [pending] src/game/string.h
 
-- [pending] src/game/struct.{h,cpp}
-- [pending] src/game/swap.{h,cpp}
-- [pending] src/game/sys.{h,cpp}
-- [pending] src/game/sysfont.{h,cpp}
-- [pending] src/game/tech.{h,cpp}
-- [pending] src/game/techdata.h
-- [pending] src/game/techinit.{h,cpp}
-- [pending] src/game/ten.{h,cpp}
-- [pending] src/game/textbox.{h,cpp}
-- [pending] src/game/time.{h,cpp}
-- [pending] src/game/timer.{h,cpp}
 - [pending] src/game/trade.{h,cpp}
 - [pending] src/game/transprt.{h,cpp}
 - [pending] src/game/turnsum.{h,cpp}

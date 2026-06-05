@@ -1,24 +1,10 @@
 #include "pch.h"
 
 namespace SYS {
-    char s__00551100[1] = "";
     void* _sys_data_buffer;
-    const char s_fmt_star_display[7] = "%d> %s";
-    const char s_1[3] = "\x1A" "1";
-    const char s_percent_d_nl[6] = "%d%%\n";
-    const char s_0s_1[7] = "\x1A" "0%s" "\x1A" "1";
-    const char s_0s[5] = "\x1A" "0%s";
-    const char s_m25_17[9] = "\a" "M25,17.";
-    const char s_0s_1_dash[10] = "\x1A" "0%s" "\x1A" "1--\n";
-    const char s_m25_27[9] = "\a" "M25,27.";
-    const char s_0s_1d_nl[10] = "\x1A" "0%s" "\x1A" "1%d\n";
-    const char s_0s_10_nl[9] = "\x1A" "0%s" "\x1A" "10\n";
-    const char s_d_nl[4] = "%d\n";
-    const char s_m25_30_0s[13] = "\a" "M25,30." "\x1A" "0%s";
 
     uint8_t _draw_sun_before_planet;
     int8_t _skip_draw_system_planets;
-    const char s__00551120[2] = { '\x1B', '\0' };
     uint8_t _skip_draw_system_display;
     s_animation_header* _system_display_sun_seg;
     void* _sys_disp_bitmap;
@@ -36,11 +22,10 @@ namespace SYS {
         }
     }
 
-    // Suggested name: Need_To_Reload_System_Display
-    bool __cdecl Need_To_Reload_System_Display_(int16_t star_index) {
+    bool __cdecl Need_To_Reload_System_Display_(int16_t star_idx) {
         char buffer[120];
 
-        sprintf(buffer, SYS::s_fmt_star_display, (int)star_index, &MOX::_star[star_index]);
+        sprintf(buffer, "%d> %s", (int)star_idx, MOX::_star[star_idx].name);
 
         size_t len = strlen(buffer);
         if (len >= 20) {
@@ -74,7 +59,7 @@ namespace SYS {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        sprintf(temp_buffer, SYS::s_fmt_star_display, (int)star_idx, star->name);
+        sprintf(temp_buffer, "%d> %s", (int)star_idx, star->name);
 
         if (strlen(temp_buffer) >= 20) {
             temp_buffer[20] = '\0';
@@ -184,7 +169,7 @@ namespace SYS {
         MOX::_mainscr_palette = 0;
         RUSS::Mox_Update_();
 
-        qsort(MOX::_sys_disp, 5, 0xe, qsort_sys_disp_);
+        qsort(MOX::_sys_disp, 5, sizeof(MOX::_sys_disp[0]), qsort_sys_disp_);
 
         if (MOX::_look_at_colonies == 0) {
             if (!Ok_To_View_System_(star_idx, MOX::_PLAYER_NUM)) {
@@ -212,9 +197,9 @@ namespace SYS {
         }
     }
 
-    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t arg3, int32_t arg4) {
-        (void)arg3;
-        (void)arg4;
+    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t unused_star_idx, int32_t unused_arg) {
+        (void)unused_star_idx;
+        (void)unused_arg;
 
         s_planet_data* planet = &MOX::_planet[planet_idx];
         int16_t colony_idx = planet->colony_index;
@@ -241,7 +226,7 @@ namespace SYS {
         *out_ptr = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int)entry_idx + 0x5c, MOX::_global_cache_seg);
     }
 
-    void __cdecl Potential_Colony_Info_Popup_(int16_t planet_id) {
+    void __cdecl Potential_Colony_Info_Popup_(int16_t planet_idx) {
         char bonus_msg_buf[32];
         char penalty_msg_buf[32];
         char fmt_text[200];
@@ -256,77 +241,81 @@ namespace SYS {
 
         COLCALC::Compute_Potential_Colony_Info_(
             &MOX::_player[MOX::_PLAYER_NUM],
-            &MOX::_planet[planet_id],
+            &MOX::_planet[planet_idx],
             &info
         );
 
-        sprintf(fmt_text, s_m25_30_0s, HAROLD::H_Message_(HESTR_170_MAX_POPULATION));
-        strcat(fmt_text, s_1);
-        strcat(fmt_text, s_d_nl);
+        /* fmtpara: \aM25,30. adjusts paragraph margins, \x1A left-align/right-align control code prefixes the following digit. */
+        sprintf(fmt_text, "\aM25,30." "\x1A" "0%s", HAROLD::H_Message_(HESTR_170_MAX_POPULATION));
+        strcat(fmt_text, "\x1A" "1");
+        strcat(fmt_text, "%d\n");
 
-        int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_id], MOX::_PLAYER_NUM);
+        int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
         sprintf(main_text, fmt_text, (int)max_pop);
 
+        /* fmtpara: \x1A control code prefixes the following alignment digit. */
         if (info.food == 0) {
-            sprintf(line_text, s_0s_10_nl, HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
+            sprintf(line_text, "\x1A" "0%s" "\x1A" "10\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
         } else {
             int food_val = (int)info.food / 2;
-            sprintf(line_text, s_0s_1d_nl, HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_val);
+            sprintf(line_text, "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_val);
         }
         strcat(main_text, line_text);
 
-        sprintf(line_text, s_0s_1d_nl, HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
+        sprintf(line_text, "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
         strcat(main_text, line_text);
 
-        sprintf(line_text, s_0s_1d_nl, HAROLD::H_Message_(HESTR_173_RESEARCH_PER_SCIENTIST), (int)info.research);
+        sprintf(line_text, "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_173_RESEARCH_PER_SCIENTIST), (int)info.research);
         strcat(main_text, line_text);
 
         if (info.maintenance == 0) {
-            strcat(main_text, s_m25_27);
-            sprintf(line_text, s_0s_1_dash, HAROLD::H_Message_(HESTR_174_NO_MAINTENANCE_BONUS));
+            /* fmtpara: \aM25,27. changes the paragraph margin before the following status line. */
+            strcat(main_text, "\aM25,27.");
+            sprintf(line_text, "\x1A" "0%s" "\x1A" "1--\n", HAROLD::H_Message_(HESTR_174_NO_MAINTENANCE_BONUS));
             strcat(main_text, line_text);
         } else {
-            strcat(main_text, s_m25_17);
-            sprintf(line_text, s_0s, HAROLD::H_Message_(HESTR_175_MAINTENANCE));
+            /* fmtpara: \aM25,17. changes the paragraph margin before the following status line. */
+            strcat(main_text, "\aM25,17.");
+            sprintf(line_text, "\x1A" "0%s", HAROLD::H_Message_(HESTR_175_MAINTENANCE));
 
             int16_t msg_id = (info.maintenance <= 0) ? HESTR_189_MAINTENANCE_BONUS : HESTR_18A_MAINTENANCE_PENALTY;
-            sprintf(line_text, s_0s_1, HAROLD::H_Message_(msg_id));
+            sprintf(line_text, "\x1A" "0%s" "\x1A" "1", HAROLD::H_Message_(msg_id));
 
             int abs_maint = abs((int)info.maintenance);
-            sprintf(val_text, s_percent_d_nl, abs_maint);
+            sprintf(val_text, "%d%%\n", abs_maint);
 
             strcat(line_text, val_text);
             strcat(main_text, line_text);
         }
 
         if (info.worker_bonus == 0) {
-            strcat(main_text, s_m25_27);
-            sprintf(line_text, s_0s_1_dash, HAROLD::H_Message_(HESTR_176_NO_WORKER_BONUS));
+            strcat(main_text, "\aM25,27.");
+            sprintf(line_text, "\x1A" "0%s" "\x1A" "1--\n", HAROLD::H_Message_(HESTR_176_NO_WORKER_BONUS));
             strcat(main_text, line_text);
         } else {
-            strcat(main_text, s_m25_17);
-            sprintf(line_text, s_0s, HAROLD::H_Message_(HESTR_177_WORKER));
+            strcat(main_text, "\aM25,17.");
+            sprintf(line_text, "\x1A" "0%s", HAROLD::H_Message_(HESTR_177_WORKER));
 
             int16_t msg_id = (info.worker_bonus > 0) ? HESTR_18B_WORKER_BONUS : HESTR_18C_WORKER_PENALTY;
-            sprintf(line_text, s_0s_1, HAROLD::H_Message_(msg_id));
+            sprintf(line_text, "\x1A" "0%s" "\x1A" "1", HAROLD::H_Message_(msg_id));
 
             int abs_bonus = abs((int)info.worker_bonus);
-            sprintf(val_text, s_percent_d_nl, abs_bonus);
+            sprintf(val_text, "%d%%\n", abs_bonus);
 
             strcat(line_text, val_text);
             strcat(main_text, line_text);
         }
 
         strcpy(fmt_text, HAROLD::H_Message_(HESTR_178_COLONY_INFO_FOR_S));
-        char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_id);
+        char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
         sprintf(title_text, fmt_text, planet_name);
 
         TEXTBOX::Text_Box_(title_text, main_text);
     }
 
     int __cdecl qsort_sys_disp_(const void* a, const void* b) {
-        auto p1 = static_cast<const s_sys_disp*>(a);
-        auto p2 = static_cast<const s_sys_disp*>(b);
+        const s_sys_disp* p1 = (const s_sys_disp*)a;
+        const s_sys_disp* p2 = (const s_sys_disp*)b;
         return (int)p1->y - (int)p2->y;
     }
 
@@ -379,8 +368,8 @@ namespace SYS {
         animate::_animation_header = anim_hdr;
         SYS::_mask_header = mask_hdr;
 
-        uint8_t* anim_frame = reinterpret_cast<uint8_t*>(anim_hdr) + anim_hdr->frame_offsets[anim_hdr->current_frame];
-        int8_t* mask_frame = reinterpret_cast<int8_t*>(mask_hdr) + mask_hdr->frame_offsets[mask_hdr->current_frame];
+        uint8_t* anim_frame = (uint8_t*)anim_hdr + anim_hdr->frame_offsets[anim_hdr->current_frame];
+        int8_t* mask_frame = (int8_t*)mask_hdr + mask_hdr->frame_offsets[mask_hdr->current_frame];
 
         if (!is_clipped) {
             if (video::screen_refresh_flag >= 2) {
@@ -600,14 +589,14 @@ namespace SYS {
         Do_Print_Planet_Info_(0, 0, 0, 0, planet_idx, 0, 0, box_width, box_height, 0);
     }
 
-    void __cdecl Print_Planet_Info_(int16_t p1, int16_t p2, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
+    void __cdecl Print_Planet_Info_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t planet_idx, int16_t x_offset, int16_t y_offset) {
         int16_t out_width;
         int16_t out_height;
 
-        Do_Print_Planet_Info_(p1, p2, p3, p4, p5, p6, p7, &out_width, &out_height, 1);
+        Do_Print_Planet_Info_(base_x, base_y, content_w, content_h, planet_idx, x_offset, y_offset, &out_width, &out_height, 1);
     }
 
-    void __cdecl Draw_System_Highlight_(short planet_idx, short rect_w, short rect_h, short x_offset, short y_offset) {
+    void __cdecl Draw_System_Highlight_(int16_t planet_idx, int16_t rect_w, int16_t rect_h, int16_t x_offset, int16_t y_offset) {
         int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
         MOX::_o_highlight_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x4b, (void*)MOX::_global_cache_seg);
         int16_t w = animate::Get_Width_(MOX::_o_highlight_seg);
@@ -643,7 +632,7 @@ namespace SYS {
         }
     }
 
-    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, char mode)
+    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int8_t fill_mode)
     {
         int16_t x1, y1, x2, y2;
 
@@ -662,7 +651,7 @@ namespace SYS {
         s_colors font_colors;
         memcpy(&font_colors, MISC::Font_Colors2_(4, 'n', 's'), sizeof(font_colors));
 
-        if (mode != 0) {
+        if (fill_mode != 0) {
             int16_t clipped_y2 = video::_screen_window_y2;
             if (y2 <= clipped_y2) {
                 clipped_y2 = y2;
@@ -919,7 +908,8 @@ namespace SYS {
         }
     }
 
-    void __cdecl Get_Gate_Icon_XY_(int16_t x, int16_t y, int16_t off_x, int16_t off_y, int16_t unused, int16_t* out_x, int16_t* out_y) {
+    void __cdecl Get_Gate_Icon_XY_(int16_t x, int16_t y, int16_t off_x, int16_t off_y, int16_t unused_arg, int16_t* out_x, int16_t* out_y) {
+        (void)unused_arg;
         *out_x = x + off_x + 0xE9;
         *out_y = y + off_y + 0xF3;
 
@@ -929,11 +919,11 @@ namespace SYS {
         }
     }
 
-    void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t x, int16_t y, int16_t width, int16_t height, int32_t unknown) {
+    void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t x, int16_t y, int16_t width, int16_t height, int32_t unused_arg) {
         int16_t out_x;
         int16_t out_y;
 
-        SYS::Get_Gate_Icon_XY_(x, y, width, height, (int16_t)unknown, &out_x, &out_y);
+        SYS::Get_Gate_Icon_XY_(x, y, width, height, (int16_t)unused_arg, &out_x, &out_y);
 
         if (MOX::_current_screen == 29 /* SCREEN_GALAXY */) {
             out_y -= 6;
@@ -1009,9 +999,6 @@ namespace SYS {
         MISC::_Print_Centered_Shadow_Down_(print_x, print_y, 0x3d /* '=' */, text);
     }
 
-    /**
-     * @address 00497f80
-     */
     s_animation_header* __cdecl Buffer_Reload_System_Ships_(int16_t display_idx) {
         int16_t node_ship_idx = MOX::_ship_node[MOX::_system_display_ships[display_idx].ship_idx].ship_idx;
         int16_t owner_idx = HACCESS::Ship_Owner_(node_ship_idx);
@@ -1075,12 +1062,9 @@ namespace SYS {
         }
     }
 
-    /**
-     * @address 00495bf0
-     */
-    void __cdecl Measure_System_Ship_Data_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t p5, int16_t* out_w, int16_t* out_h) {
+    void __cdecl Measure_System_Ship_Data_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t ship_node_num, int16_t* out_w, int16_t* out_h) {
         // Mode 0 is used for measurement calculation instead of actual drawing.
-        SYS::Do_Print_System_Ship_Data_(x, y, w, h, p5, out_w, out_h, 0);
+        SYS::Do_Print_System_Ship_Data_(x, y, w, h, ship_node_num, out_w, out_h, 0);
     }
 
     int16_t __cdecl Print_Special_Building_Data_(
@@ -1737,27 +1721,27 @@ namespace SYS {
     }
 
     void __cdecl Wrapper_For_Informational_System_Fields_(
-        int16_t param_1,
-        int16_t param_2,
-        int16_t param_3,
-        int16_t param_4,
-        int16_t param_5,
-        int16_t* param_6) {
-        int16_t local_4;
-        int16_t local_2;
+        int16_t star_idx,
+        int16_t base_x,
+        int16_t base_y,
+        int16_t orbit_offset_x,
+        int16_t orbit_offset_y,
+        int16_t* out_popup_title_button) {
+        int16_t popup_hidden_field;
+        int16_t system_field;
 
-        SYS::Init_System_Display_(param_1);
+        SYS::Init_System_Display_(star_idx);
         SYS::Add_System_Display_Popup_Fields_(
-            param_1,
-            param_2,
-            param_3,
+            star_idx,
+            base_x,
+            base_y,
             0,
             0,
-            param_4,
-            param_5,
-            &local_4,
-            param_6,
-            &local_2);
+            orbit_offset_x,
+            orbit_offset_y,
+            &popup_hidden_field,
+            out_popup_title_button,
+            &system_field);
     }
 
     void __cdecl Add_System_Display_Popup_Fields_(
@@ -1798,9 +1782,9 @@ namespace SYS {
             *out_popup_title_button = fields::Add_Clipped_Button_Field_(
                 static_cast<int16_t>(popup_left + 0x107),
                 static_cast<int16_t>(popup_top + 0xEC),
-                s__00551100,
+                "",
                 MOX::_moveable_box_pict[4],
-                SYS::s__00551120,
+                "\x1B",
                 0x28);
 
             *out_popup_hidden_field = fields::Add_Hidden_Field_(
@@ -1808,7 +1792,7 @@ namespace SYS {
                 popup_top,
                 static_cast<int16_t>(popup_left + MOX::_moveable_box[0].width),
                 static_cast<int16_t>(popup_top + 0x2F),
-                s__00551100,
+                "",
                 0);
         } else {
             *out_popup_hidden_field = -1000;
@@ -1855,7 +1839,7 @@ namespace SYS {
                 top,
                 static_cast<int16_t>(left + planet_diameter),
                 static_cast<int16_t>(top + planet_diameter),
-                s__00551100,
+                "",
                 0x29);
         }
 
@@ -1882,7 +1866,7 @@ namespace SYS {
                 ship_top,
                 ship_right,
                 ship_bottom,
-                s__00551100,
+                "",
                 0x29);
         }
 
@@ -1910,7 +1894,7 @@ namespace SYS {
                 gate_icon_y,
                 static_cast<int16_t>(gate_icon_x + 0x0F),
                 static_cast<int16_t>(gate_icon_y + 0x0F),
-                s__00551100,
+                "",
                 0);
         }
 
@@ -1921,7 +1905,7 @@ namespace SYS {
                 gate_icon_y,
                 static_cast<int16_t>(gate_icon_x + 0x0F),
                 static_cast<int16_t>(gate_icon_y + 0x0F),
-                s__00551100,
+                "",
                 0);
         }
 
@@ -1931,7 +1915,7 @@ namespace SYS {
                 static_cast<int16_t>(base_y + popup_offset_y),
                 static_cast<int16_t>(base_x + popup_offset_x + 0x13E),
                 static_cast<int16_t>(base_y + popup_offset_y + 0xB4),
-                s__00551100,
+                "",
                 0);
             return;
         }
@@ -1952,7 +1936,7 @@ namespace SYS {
             static_cast<int16_t>(base_y + popup_offset_y),
             static_cast<int16_t>(base_x + popup_offset_x + MOX::_moveable_box[0].width),
             static_cast<int16_t>(base_y + popup_offset_y + MOX::_moveable_box[0].height),
-            s__00551100,
+            "",
             0);
     }
 
@@ -1961,63 +1945,52 @@ namespace SYS {
         int16_t y,
         const uint8_t* sprite_data,
         const int8_t* mask_data) {
-      const int16_t* const sprite_words =
-          reinterpret_cast<const int16_t*>(sprite_data);
+        const int16_t sprite_width = animate::_animation_header->width;
+        int32_t current_y_offset = ((const s_packed_frame_header*)sprite_data)->start_y;
+        int32_t line_start_offset =
+            ((int32_t)y + current_y_offset) * (int32_t)video::g_screen_res_x + (int32_t)x;
+        int32_t sprite_idx = 2;
+        int32_t screen_offset = line_start_offset;
+        const int32_t header_height = animate::_animation_header->height;
 
-      const int16_t sprite_width = animate::_animation_header->width;
-      const int32_t sprite_height = animate::_animation_header->height;
-
-      int32_t current_row = static_cast<uint16_t>(sprite_words[1]);
-      int32_t word_index = 2;
-      int32_t dest_offset =
-          (static_cast<int32_t>(y) + current_row) * static_cast<int32_t>(video::g_screen_res_x) +
-          static_cast<int32_t>(x);
-      int32_t row_start_dest_offset = dest_offset;
-
-      while (current_row < sprite_height) {
-        const int16_t run_length = sprite_words[word_index];
-        const int16_t delta = sprite_words[word_index + 1];
-        word_index += 2;
-
-        if (run_length == 0) {
-          current_row += static_cast<int32_t>(delta);
-          row_start_dest_offset += static_cast<int32_t>(delta) * 640;
-          dest_offset = row_start_dest_offset;
-        } else {
-          dest_offset += static_cast<int32_t>(delta);
-
-          int32_t sprite_byte_index = word_index * 2;
-          int32_t pixel_index = 0;
-          const int32_t run_end = dest_offset + static_cast<int32_t>(run_length);
-
-          if (run_end > dest_offset) {
-            const int32_t mask_offset =
-                static_cast<int32_t>(sprite_width) * current_row + static_cast<int32_t>(delta);
-
+        if (current_y_offset < header_height) {
             do {
-              const int8_t mask_value = mask_data[mask_offset + pixel_index];
+                const s_packed_frame_run* run =
+                    (const s_packed_frame_run*)(sprite_data + sprite_idx * 2);
+                const int16_t run_len = run->pixel_count;
+                const int16_t skip_len = run->skip_count;
+                sprite_idx += 2;
 
-              uint8_t color;
-              if (mask_value != 0) {
-                const uint8_t remapped_color =
-                    remap::_picture_remap_color_list[sprite_data[sprite_byte_index]];
-                color =
-                    SYS::_remap_gray_mask_palette[mask_value][remapped_color];
-              } else {
-                color = remap::_picture_remap_color_list[sprite_data[sprite_byte_index]];
-              }
+                if (run_len == 0) {
+                    current_y_offset += skip_len;
+                    line_start_offset += skip_len * 640;
+                    screen_offset = line_start_offset;
+                } else {
+                    screen_offset += skip_len;
+                    const int32_t end_offset = screen_offset + run_len;
+                    int32_t data_offset = sprite_idx * 2;
+                    int32_t pixel_index =
+                        sprite_width * current_y_offset + (int32_t)skip_len;
 
-              video::_current_video_page[dest_offset] = color;
+                    if (screen_offset < end_offset) {
+                        do {
+                            const int8_t mask_value = mask_data[pixel_index++];
+                            const uint8_t remapped_color =
+                                remap::_picture_remap_color_list[sprite_data[data_offset++]];
 
-              ++sprite_byte_index;
-              ++dest_offset;
-              ++pixel_index;
-            } while (run_end > dest_offset);
-          }
+                            uint8_t color = remapped_color;
+                            if (mask_value != 0) {
+                                color = SYS::_remap_gray_mask_palette[mask_value][remapped_color];
+                            }
 
-          word_index += (run_length + 1) / 2;
+                            video::_current_video_page[screen_offset++] = color;
+                        } while (screen_offset < end_offset);
+                    }
+
+                    sprite_idx += (run_len + 1) / 2;
+                }
+            } while (current_y_offset < header_height);
         }
-      }
     }
 
     void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(
@@ -2025,8 +1998,6 @@ namespace SYS {
         int16_t y,
         const uint8_t* encoded_sprite,
         const int8_t* mask_bitmap) {
-        const uint16_t* const sprite_words =
-            reinterpret_cast<const uint16_t*>(encoded_sprite);
         const int32_t sprite_width = animate::_animation_header->width;
         const int32_t sprite_height = animate::_animation_header->height;
 
@@ -2061,7 +2032,7 @@ namespace SYS {
         }
 
         int32_t word_index = 2;
-        int32_t current_row = static_cast<uint16_t>(sprite_words[1]);
+        int32_t current_row = ((const s_packed_frame_header*)encoded_sprite)->start_y;
 
         int32_t current_dest_row =
             static_cast<int32_t>(draw_y) * static_cast<int32_t>(video::g_screen_res_x) +
@@ -2069,9 +2040,11 @@ namespace SYS {
 
         if (current_row < top_clip) {
             do {
-                const int16_t run_length = static_cast<int16_t>(sprite_words[word_index]);
+                const s_packed_frame_run* run =
+                    (const s_packed_frame_run*)(encoded_sprite + word_index * 2);
+                const int16_t run_length = run->pixel_count;
                 if (run_length == 0) {
-                    current_row += static_cast<uint16_t>(sprite_words[word_index + 1]);
+                    current_row += static_cast<uint16_t>(run->skip_count);
                 } else {
                     word_index += (static_cast<int32_t>(run_length) + 1) / 2;
                 }
@@ -2093,8 +2066,10 @@ namespace SYS {
             static_cast<int32_t>(bottom) - static_cast<int32_t>(draw_y) + 1;
 
         while (row_index < visible_height) {
-            const int16_t run_length = static_cast<int16_t>(sprite_words[word_index]);
-            const int16_t run_x = static_cast<int16_t>(sprite_words[word_index + 1]);
+            const s_packed_frame_run* run =
+                (const s_packed_frame_run*)(encoded_sprite + word_index * 2);
+            const int16_t run_length = run->pixel_count;
+            const int16_t run_x = run->skip_count;
             word_index += 2;
 
             if (run_length == 0) {
@@ -2154,13 +2129,13 @@ namespace SYS {
     }
 
     void __cdecl Get_System_Display_Ship_Icon_XY_(
-        int32_t unused,
+        int32_t unused_arg,
         int16_t display_slot,
         int16_t* x,
         int16_t* y,
         int16_t* layout_state
     ) {
-        (void)unused;
+        (void)unused_arg;
 
         MOX::_moveable_box_pict[0] =
             (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);

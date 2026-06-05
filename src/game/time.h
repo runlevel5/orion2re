@@ -6,5 +6,6 @@ namespace time_ {
 
     extern Fn _time2;
 
+    /** Returns the current `clock()` tick value using the existing millisecond scaling sequence. */
     int32_t __cdecl time_();
 }
