@@ -7,16 +7,8 @@
 - [pending] src/game/orion2_consts.h
 - [pending] src/game/orion2_str.h
 - [pending] src/game/paragrph.h
-
-- [pending] src/game/report.{h,cpp}
-- [pending] src/game/russ.{h,cpp}
-- [pending] src/game/science.{h,cpp}
-- [pending] src/game/score.{h,cpp}
-- [pending] src/game/scroll.{h,cpp}
 - [pending] src/game/settings.h
-- [pending] src/game/settler.{h,cpp}
-- [pending] src/game/setvesa.{h,cpp}
-- [pending] src/game/shear.{h,cpp}
+
 - [pending] src/game/shipmove.{h,cpp}
 - [pending] src/game/ships.{h,cpp}
 - [pending] src/game/shipstak.{h,cpp}

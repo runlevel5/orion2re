@@ -1,15 +1,10 @@
 #include "pch.h"
 
 namespace SCIENCE {
-    const char s_SR_R_x_SC_LBX_005512b0[14] = "SR_R%x_SC.LBX";
     const char _spy_anim_fmt[14] = "SR_R%x_SP.LBX";
     const char _trooper_anim_fmt[14] = "SR_R%x_TR.LBX";
     const char _spy_anim_find_pat[13] = "SR_R?_SP.LBX";
     const char _trooper_anim_find_pat[13] = "SR_R?_TR.LBX";
-    const char s_billtext_lbx_0055135c[13] = "billtext.lbx";
-    const char s__00551100[1] = "";
-    const char s__00551120[2] = { 0x1B, '\0' };
-    const char s__0055136c[2] = "\r";
 
     s_colors _science_high_color = {{240, 246, 243, 244, 244, 245, 246, 247}};
     s_colors _science_normal_color = {{242, 245, 244, 244, 244, 244, 245, 246}};
@@ -21,8 +16,6 @@ namespace SCIENCE {
 
     void* _science_mouse_bitmap;
 
-    const char s_SCIENCE_LBX_00551290[12] = "SCIENCE.LBX";
-
     void __cdecl Show_Off_Captured_Tech_(int16_t* captured_tech_ids, uint16_t tech_count, int16_t message_arg) {
         char text_buffer[0x100];
 
@@ -31,8 +24,8 @@ namespace SCIENCE {
         void* animation_buffer = allocate::Allocate_First_Block_(MOX::_screen_seg, 0x7C830);
         file_ani::Set_File_Animation_Buffer_(animation_buffer);
 
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 3, text_buffer, 0x100);
-        JIM::Decode_Text_System_(text_buffer, message_arg, 0x100);
+        JIM::Get_Text_Message_("billtext.lbx", 3, text_buffer, sizeof(text_buffer));
+        JIM::Decode_Text_System_(text_buffer, message_arg, sizeof(text_buffer));
 
         char* trooper_anim = BILL::Cache_Player_Trooper_Anim_();
         SCIENCE::Science_Room_(trooper_anim, tech_count, captured_tech_ids, text_buffer);
@@ -43,7 +36,9 @@ namespace SCIENCE {
         JIM::Play_Background_Music_();
     }
 
-    void __cdecl Update_Science_Anims_(int unused, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1) {
+    void __cdecl Update_Science_Anims_(int32_t unused_arg, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1) {
+        (void)unused_arg;
+
         if (MOX::_settings.animations_on != 0) {
             file_ani::Draw_Multi_File_Animation_Stencil_(1);
         } else {
@@ -51,7 +46,7 @@ namespace SCIENCE {
         }
 
         if (draw_anim_2 == 1) {
-            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 2, MOX::_global_cache_seg);
             animate::Draw_(0, 0, anim);
         }
 
@@ -60,12 +55,12 @@ namespace SCIENCE {
         }
 
         if (draw_anim_1 == 1) {
-            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 1, MOX::_global_cache_seg);
             animate::Draw_(0, 0, anim);
         }
     }
 
-    void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_idx) {
+    void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_player_idx) {
         char message_text[0x100];
         int16_t discovered_tech = (int16_t)tech_idx;
         void* animation_block;
@@ -74,8 +69,8 @@ namespace SCIENCE {
         allocate::Push_Block_(MOX::_screen_seg);
         animation_block = allocate::Allocate_First_Block_(MOX::_screen_seg, 0x7C830);
         file_ani::Set_File_Animation_Buffer_(animation_block);
-        JIM::Get_Text_Message_(SCIENCE::s_billtext_lbx_0055135c, 2, message_text, 0x100);
-        JIM::Decode_Text_Tech_And_Other_Name_(message_text, MOX::_PLAYER_NUM, tech_idx, other_idx, 0x100);
+        JIM::Get_Text_Message_("billtext.lbx", 2, message_text, sizeof(message_text));
+        JIM::Decode_Text_Tech_And_Other_Name_(message_text, MOX::_PLAYER_NUM, tech_idx, other_player_idx, sizeof(message_text));
         spy_anim = BILL::Cache_Player_Spy_Anim_();
         SCIENCE::Science_Room_(spy_anim, 1, &discovered_tech, message_text);
         file_ani::Reset_File_Animation_Buffer_();
@@ -118,8 +113,8 @@ namespace SCIENCE {
 
         RUSS::Mox_Update_();
 
-        science_room_picture = (s_animation_header*)farload::Far_Reload_Next_(s_SCIENCE_LBX_00551290, 0, MOX::_screen_seg);
-        SCIENCE::_science_mouse_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x395);
+        science_room_picture = (s_animation_header*)farload::Far_Reload_Next_("SCIENCE.LBX", 0, MOX::_screen_seg);
+        SCIENCE::_science_mouse_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(0x1E, 0x1E));
         text_data_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
         current_text_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(0xAF, 0xC3));
         previous_text_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(0xAF, 0xC3));
@@ -128,7 +123,7 @@ namespace SCIENCE {
         buffer::Flush_Buffer_Space_(MOX::_global_cache_seg);
 
         if (MOX::_settings.animations_on == 0) {
-            animate::Set_Animation_Frame_((s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg), 5);
+            animate::Set_Animation_Frame_((s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 1, MOX::_global_cache_seg), 5);
         }
 
         bitmap::Create_Blank_Bitmap_(0xAF, 0xC3, current_text_bitmap);
@@ -141,8 +136,9 @@ namespace SCIENCE {
         ERIC::Fast_Fade_Out_();
 
         file_ani::Open_Multi_File_Animation_(intro_animation_name, 0, 1);
-        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
-        science_hot_key = fields::Add_Hot_Key_(s__00551120);
+        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "", 0);
+        /* fmtpara \x1B color-attribute control byte reused as a non-printing hotkey label. */
+        science_hot_key = fields::Add_Hot_Key_("\x1B");
 
         video::Set_Page_Off_();
         fields::Assign_Auto_Function_(&SCIENCE::Draw_Science_Room_, 2);
@@ -154,9 +150,9 @@ namespace SCIENCE {
         bitmap::Draw_Bitmap_To_Mouse_(0, 0, (s_animation_header*)SCIENCE::_science_mouse_bitmap, 0);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 4, bill_text, 0x50);
+        JIM::Get_Text_Message_("billtext.lbx", 4, bill_text, sizeof(bill_text));
 
-        buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
+        buffer::Buffer_Reload_("SCIENCE.LBX", 1, MOX::_global_cache_seg);
         palette::Set_Palette_Changes_(0, 0xFF);
         animate::Draw_Palette_(science_room_picture);
         BILL::Turn_Off_Palettes_(0, 0xFF);
@@ -185,7 +181,7 @@ namespace SCIENCE {
                 palstore::Darken_Palette_(fade_amount);
                 palette::Clear_Palette_Changes_(0, 0xFF);
 
-                animate::Draw_(0, 0, (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg));
+                animate::Draw_(0, 0, (s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 2, MOX::_global_cache_seg));
                 RUSS::Mox_Sync_Update_();
                 timer::Release_Time_(1);
             } while (fade_amount > 0);
@@ -257,7 +253,8 @@ namespace SCIENCE {
                         while (weapon_mask != 0) {
                             if ((weapon_mask & 1) != 0) {
                                 strcpy(&weapon_mod_text[strlen(weapon_mod_text)], TECHDATA::_weapon_modifications[weapon_mod_index].name);
-                                strcpy(&weapon_mod_text[strlen(weapon_mod_text)], s__0055136c);
+                                /* fmtpara \r starts a new paragraph between modification names. */
+                                strcpy(&weapon_mod_text[strlen(weapon_mod_text)], "\r");
                             }
 
                             weapon_mask >>= 1;
@@ -300,7 +297,7 @@ namespace SCIENCE {
                     }
                 } else {
                     room_animation_ready = animate::Get_Current_Frame_(
-                            (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg)) >= 5;
+                            (s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 1, MOX::_global_cache_seg)) >= 5;
                 }
 
                 fonts::Set_Outline_Color_(0, 0xF2);
@@ -313,7 +310,7 @@ namespace SCIENCE {
 
             if (should_close) {
                 int16_t frame = animate::Get_Current_Frame_(
-                        (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg));
+                        (s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 1, MOX::_global_cache_seg));
                 --frame;
 
                 if (frame >= 0 && MOX::_settings.animations_on != 0) {
@@ -323,7 +320,7 @@ namespace SCIENCE {
                         timer::Mark_Time_();
 
                         animate::Set_Animation_Frame_(
-                                (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg),
+                                (s_animation_header*)buffer::Buffer_Reload_("SCIENCE.LBX", 1, MOX::_global_cache_seg),
                                 frame_index);
 
                         SCIENCE::Update_Science_Anims_(false, false, true, true);
@@ -371,33 +368,33 @@ namespace SCIENCE {
         int16_t researched_tech_ids[4];
         char science_room_lbx[64];
         char decoded_text[256];
-        short found_count = 0;
+        uint16_t researched_tech_count = 0;
 
         MOX::_cur_plyr_ptr = &MOX::_player[player_idx];
 
         if (MOX::_cur_plyr_ptr->current_research_field != 0) {
-            const uint8_t research_field = static_cast<uint8_t>(MOX::_cur_plyr_ptr->current_research_field);
+            const uint8_t research_field = (uint8_t)MOX::_cur_plyr_ptr->current_research_field;
 
             TECH::Technology_Fields_Name_(research_field);
 
             const int16_t* field_tech_ids = TECHDATA::_technology_fields[research_field].tech;
-            for (int tech_slot = 0; tech_slot < 4; ++tech_slot) {
+            for (uint16_t tech_slot = 0; tech_slot < 4; ++tech_slot) {
                 const int16_t tech_id = field_tech_ids[tech_slot];
                 if (tech_id > 0 && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
-                    researched_tech_ids[found_count++] = (int16_t)tech_id;
+                    researched_tech_ids[researched_tech_count++] = tech_id;
                 }
             }
 
-            if (found_count != 0) {
-                JIM::Get_Text_Message_(SCIENCE::s_billtext_lbx_0055135c, 1, decoded_text, 0xFA);
+            if (researched_tech_count != 0) {
+                JIM::Get_Text_Message_("billtext.lbx", 1, decoded_text, 0xFA);
                 JIM::Decode_Text_Field_(decoded_text, research_field, 0xFA);
 
                 sprintf(
                     science_room_lbx,
-                    SCIENCE::s_SR_R_x_SC_LBX_005512b0,
-                    static_cast<unsigned int>(static_cast<uint8_t>(MOX::_player[player_idx].race)));
+                    "SR_R%x_SC.LBX",
+                    (unsigned int)(uint8_t)MOX::_player[player_idx].race);
 
-                SCIENCE::Science_Room_(science_room_lbx, found_count, researched_tech_ids, decoded_text);
+                SCIENCE::Science_Room_(science_room_lbx, researched_tech_count, researched_tech_ids, decoded_text);
                 return;
             }
         }

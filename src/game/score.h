@@ -6,130 +6,185 @@ struct s_hof;
 namespace SCORE {
     extern s_hof _hof;
     extern char _default_names[10][20];
-    extern const char LBX_0055a430[10];
-
-    extern const char s_wb[3]; // "wb"
-    extern const char s_HOF_M2[7]; // "HOF.M2"
 
     extern s_hiscore* _hi;
-
-    extern const char s__d__d_005523a4[6]; // "%d.%d"
-
-    extern const char* PTR_s_SCORE_LBX_0055a440;
 
     extern int16_t _entry_to_flash;
 
     extern char _difficulty_string[5][15];
 
+    /** Returns the hall-of-fame file version, or 0 if the file cannot be read. */
     int16_t __cdecl HOF_Version_Number_();
 
+    /** Creates a default hall-of-fame file with shuffled placeholder entries. */
     void __cdecl Create_Default_HOF_File_();
 
+    /** Reads and normalizes the hall-of-fame file into SCORE::_hof. */
     int8_t __cdecl Read_HOF_File_();
 
+    /** Loads hall-of-fame screen assets and allocates the shared screen state. */
     void __cdecl Load_Hall_Of_Fame_Screen_();
 
+    /** Initializes hall-of-fame fields, colors, and sorted entry state. */
     void __cdecl Init_Hall_Of_Fame_Screen_();
 
+    /** Compares two {score,index} pairs in descending order for qsort. */
     int __cdecl qsort_hof_scores_descending_(const void* a, const void* b);
 
-    int __cdecl qsort_hof_scores_ascending_(const void* param_1, const void* param_2);
+    /** Compares two {score,index} pairs in ascending order for qsort. */
+    int __cdecl qsort_hof_scores_ascending_(const void* a, const void* b);
 
+    /** Loads the hall-of-fame font colors and flash state. */
     void __cdecl Get_Hall_Of_Fame_Colors_();
 
+    /** Draws the hall-of-fame screen and any flashing entry highlight. */
     void __cdecl Draw_Hall_Of_Fame_Screen_();
 
+    /** Runs the end-of-game high-score screen and returns the final score. */
     int16_t __cdecl Hi_Score_Screen_(int16_t player_idx);
 
+    /** Builds a sortable {score,index} list from the current hall-of-fame data. */
     void __cdecl Sort_HOF_Scores_(int16_t sort_list[10][2]);
 
+    /** Reorders hall-of-fame records according to a sorted {score,index} list. */
     void __cdecl Move_Sorted_HOF_Data_(int16_t sort_list[10][2]);
 
+    /** Writes the current hall-of-fame data to disk. */
     void __cdecl Write_HOF_File_();
 
+    /** Draws the time-score row. */
     void __cdecl Draw_Time_Score_();
 
+    /** Draws one labeled score row with dotted fill and a right-aligned value. */
     void __cdecl Print_Score_String_(int16_t x, int16_t y, int16_t score, const char* label);
 
+    /** Draws the population-score row. */
     void __cdecl Draw_Population_Score_();
 
+    /** Draws a generic score row and then invokes an optional detail callback. */
     void __cdecl Draw_Generic_Score_(int16_t value, const char* label, void (__cdecl *callback)(), int width);
 
+    /** Draws defeated-race portraits for the elimination score section. */
     void __cdecl Draw_Eliminated_Race_Pictures_();
 
+    /** Draws the elimination-score row. */
     void __cdecl Draw_Elimination_Score_();
 
+    /** Draws the captured-colonies score row. */
     void __cdecl Draw_Captured_Colonies_Score_();
 
+    /** Draws captured population icons for the captured-colonies section. */
     void __cdecl Draw_Cap_Pop_();
 
+    /** Draws the technology-score row. */
     void __cdecl Draw_Technology_Score_();
 
+    /** Draws the Orion-score row. */
     void __cdecl Draw_Orion_Score_();
 
+    /** Draws the Antares-score row. */
     void __cdecl Draw_Antares_Score_();
 
+    /** Draws the council-victory score row when applicable. */
     void __cdecl Draw_Council_Score_(void);
 
+    /** Draws the total-score summary row. */
     void __cdecl Draw_Total_Score_();
 
+    /** Draws population icons for either regular or captured population. */
     void __cdecl Draw_Pop_(uint8_t is_captured, int16_t max_pop, int16_t current_pop);
 
+    /** Draws the regular-population icon section. */
     void __cdecl Draw_Reg_Pop_();
 
+    /** Draws the full high-score report screen. */
     void __cdecl Draw_Hi_Score_Screen_();
 
+    /** Loads the high-score report screen assets and buffers. */
     void __cdecl Load_Hi_Score_Screen_();
 
+    /** Initializes the high-score report color sets. */
     void __cdecl Get_Hi_Score_Colors_();
 
+    /** Adds the hidden input fields used by the high-score screen. */
     void __cdecl Add_Hi_Score_Screen_Fields_();
 
+    /** Initializes population/icon state for a player's high-score report. */
     void __cdecl Init_Hi_Score_(int16_t player_idx);
 
+    /** Returns the total colony population owned by the specified player. */
     int16_t __cdecl Get_Total_Population_(int16_t player_idx);
 
+    /** Chooses population icon race/icon pairs for the player's score report. */
     void __cdecl Set_Hi_Score_Pop_Icon_Ids_(int16_t player_idx);
 
-    void __cdecl Get_From_Tmp_Pop_(s_hiscore_tmp_pop* tmp_pop_list, uint16_t race_idx, int16_t count, int16_t* out_colony_idx, int16_t* out_pop_idx);
+    /**
+     * Selects one matching temporary population entry for a race and returns its colony/pop indices.
+     * @param tmp_pop_list Temporary population entries to search.
+     * @param race_idx Race to match.
+     * @param entry_count Number of entries in tmp_pop_list.
+     * @param out_colony_idx Receives the selected colony index.
+     * @param out_pop_idx Receives the selected population index.
+     */
+    void __cdecl Get_From_Tmp_Pop_(s_hiscore_tmp_pop* tmp_pop_list, uint16_t race_idx, int16_t entry_count, int16_t* out_colony_idx, int16_t* out_pop_idx);
 
+    /** Compares two uint8_t values in ascending order for qsort. */
     int __cdecl ascending_qsort_uchar_(const void* a, const void* b);
 
+    /** Builds the captured-colonist race list shown in the score report. */
     void __cdecl Build_Captured_Colonists_Array_(int16_t player_idx);
 
+    /** Updates the hall of fame after the end-of-game score screen completes. */
     void __cdecl End_Of_Game_Hi_Score_(int16_t player_idx);
 
-    void __cdecl Hall_Of_Fame_Screen_(int16_t param_1);
+    /** Runs the hall-of-fame screen, optionally flashing the specified entry. */
+    void __cdecl Hall_Of_Fame_Screen_(int16_t entry_to_flash_idx);
 
+    /** Calculates a player's final score without opening the score UI. */
     int16_t __cdecl Do_Calculate_Hi_Score_(int16_t player_idx);
 
+    /** Calculates and stores all high-score components for the specified player. */
     void __cdecl Calculate_Hi_Scores_(int16_t player_idx);
 
+    /** Returns the elimination score for the specified player. */
     int16_t __cdecl Get_Elimination_Score_(int16_t player_idx);
 
+    /** Returns the technology score for the specified player. */
     int16_t __cdecl Get_Technology_Score_(int16_t player_idx);
 
+    /** Counts researched technologies and hyper technologies for a player. */
     void __cdecl Get_Technology_(int16_t player_idx, int16_t* tech_count, int16_t* hyper_tech_count);
 
+    /** Returns non-zero if the player captured Antares. */
     int8_t __cdecl Captured_Antares_(int16_t player_idx);
 
+    /** Returns the Antares bonus score for the specified player. */
     int16_t __cdecl Get_Antares_Score_(int16_t player_idx);
 
+    /** Returns non-zero if the player captured Orion. */
     int8_t __cdecl Captured_Orion_(int16_t player_idx);
 
+    /** Returns the Orion bonus score for the specified player. */
     int16_t __cdecl Get_Orion_Score_(int16_t player_idx);
 
+    /** Returns the captured-colonist score for the specified player. */
     int32_t __cdecl Get_Captured_Colonist_Score_(int16_t player_idx);
 
+    /** Returns and stores the total population score for the specified player. */
     int16_t __cdecl Get_Population_Score_(int16_t player_idx);
 
+    /** Returns the time-based score component for the current game state. */
     int16_t __cdecl Get_Time_Score_();
 
+    /** No-op callback used by field automation. */
     void __cdecl nullsub();
 
+    /** Returns non-zero if the player won the council vote. */
     int8_t __cdecl Won_Council_Vote_(int16_t player_idx);
 
+    /** Returns the council-victory bonus score for the specified player. */
     int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx);
 
+    /** Returns the fully calculated score for the specified player. */
     int16_t __cdecl Player_Score_(int16_t player_idx);
 }

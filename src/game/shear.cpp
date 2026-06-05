@@ -129,10 +129,9 @@ void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, uint32_t width, uint32_t he
     } while (height != 0);
 }
 
-void __cdecl Outline_Bitmap_Pixels_(uint8_t* src, uint32_t outline_color, uint32_t unused, uint8_t* dest, uint32_t width, uint32_t height) {
+void __cdecl Outline_Bitmap_Pixels_(uint8_t* src, uint32_t outline_color, uint32_t unused_param, uint8_t* dest, uint32_t width, uint32_t height) {
     _outline_color = outline_color;
 
-    // BUG: width * height?
     uint32_t pixel_count = width * width;
     bitmap::_pixel_count = pixel_count;
     _temp = 0;
@@ -173,7 +172,6 @@ void __cdecl Outline_Bitmap_Pixels_(uint8_t* src, uint32_t outline_color, uint32
         }
     }
 
-    // BUG: width * height?
     pixel_count = width * width;
     bitmap::_pixel_count = pixel_count;
     _src_bitmap_end = src + pixel_count;
@@ -215,14 +213,13 @@ void __cdecl Outline_Bitmap_Pixels_(uint8_t* src, uint32_t outline_color, uint32
     }
 }
 
-void __cdecl Outline_Bitmap_Pixels_No_Glass_(uint8_t* src, uint32_t outline_color, uint32_t unused, uint8_t* dest, uint32_t width, uint32_t height) {
+void __cdecl Outline_Bitmap_Pixels_No_Glass_(uint8_t* src, uint32_t outline_color, uint32_t unused_param, uint8_t* dest, uint32_t width, uint32_t height) {
     _outline_color = outline_color;
-    // BUG: width * height?
     uint32_t pixel_count = width * width;
     bitmap::_pixel_count = pixel_count;
     _temp = 0;
 
-    uint8_t color = static_cast<uint8_t>(outline_color);
+    uint8_t color = (uint8_t)outline_color;
     uint32_t x_count = width;
     bool was_glass = false;
     bool was_solid = false;
@@ -261,7 +258,6 @@ void __cdecl Outline_Bitmap_Pixels_No_Glass_(uint8_t* src, uint32_t outline_colo
     }
 
     // Pass 2: Vertical outline (column-major traversal)
-    // BUG: width * height?
     pixel_count = width * width;
     bitmap::_pixel_count = pixel_count;
     _src_bitmap_end = src + pixel_count;
@@ -310,8 +306,8 @@ void __cdecl Interlace_Scale_Off_Page_ASM_(uint8_t* page, uint8_t* lut) {
     uint8_t* ptr = page;
 
     do {
-        for (int i = 0; i < 640; i++) {
-            ptr[i] = lut[ptr[i]];
+        for (uint32_t column = 0; column < 640; ++column) {
+            ptr[column] = lut[ptr[column]];
         }
 
         ptr += 1280;
@@ -323,10 +319,10 @@ void __cdecl Mask_Bitmap_Pixels_(uint8_t* src, int32_t src_row_skip, int32_t dst
     _src_row_skip = src_row_skip;
     _dst_row_skip = dst_row_skip;
 
-    uint32_t row_count = static_cast<uint32_t>(height);
+    uint32_t row_count = (uint32_t)height;
 
     do {
-        uint32_t col_count = static_cast<uint32_t>(width);
+        uint32_t col_count = (uint32_t)width;
 
         do {
             if (*src != 0) {
@@ -367,16 +363,16 @@ void __cdecl Mask_Brighten_Bitmap_Pixels_(uint8_t* src, int32_t src_row_skip, in
     _src_row_skip = src_row_skip;
     _dst_row_skip = dst_row_skip;
 
-    uint32_t row_count = static_cast<uint32_t>(height);
+    uint32_t row_count = (uint32_t)height;
 
     do {
-        uint32_t col_count = static_cast<uint32_t>(width);
+        uint32_t col_count = (uint32_t)width;
 
         do {
             uint8_t src_pixel = *src++;
             if (src_pixel != 0 && *dst != 0) {
                 uint32_t color_offset =
-                    (static_cast<uint32_t>(static_cast<uint8_t>(src_pixel - bitmap::_brighten_start_color)) << 8) + *dst;
+                    (((uint32_t)(uint8_t)(src_pixel - bitmap::_brighten_start_color)) << 8) + *dst;
                 *dst = bitmap::_brighten_palette_seg[color_offset];
             }
             ++dst;
@@ -486,7 +482,7 @@ void __cdecl Reduce_Bitmap_(
 
     // The original inline assembly leaves the upper 16 bits of EAX intact,
     // which contains the src_ptr from its initialization block.
-    uint32_t eax_reg = reinterpret_cast<uint32_t>(src_ptr);
+    uint32_t eax_reg = (uint32_t)(uintptr_t)src_ptr;
 
     uint16_t x_step = 0x6400 / (src_width & 0xFFFF);
     _x_step_8_8 = x_step;
@@ -562,13 +558,13 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
     for (uint32_t ecx = dword_count; ecx > 0; ecx--) {
         uint32_t pixels;
         struct_::Copy_Structure_(&pixels, src, sizeof(pixels));
-        src += 4;
+        src += sizeof(pixels);
 
         uint32_t noise;
         struct_::Copy_Structure_(&noise, _noise_table + noise_idx, sizeof(noise));
-        noise_idx = (noise_idx + 4) & 0xFF;
+        noise_idx = (noise_idx + sizeof(noise)) & 0xFF;
 
-        for (int i = 0; i < 4; ++i) {
+        for (uint32_t byte_index = 0; byte_index < sizeof(pixels); ++byte_index) {
             if ((uint8_t)noise < threshold) {
                 pixels &= 0xFFFFFF00;
             }
@@ -577,7 +573,7 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
         }
 
         struct_::Copy_Structure_(dst, &pixels, sizeof(pixels));
-        dst += 4;
+        dst += sizeof(pixels);
 
         _row_dword_counter--;
         const bool carry_from_final_ror = (pixels & 0x80000000u) != 0;
@@ -610,7 +606,7 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
             noise_val &= shear::_jumble_mask;
             noise_val = noise_val + 1;
 
-            int32_t offset = static_cast<int32_t>(noise_val);
+            int32_t offset = (int32_t)noise_val;
             if (shear::_jumble_direction_toggle != 0) {
                 offset = -offset;
             }

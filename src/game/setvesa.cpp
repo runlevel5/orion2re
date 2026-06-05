@@ -1,71 +1,74 @@
 #include "pch.h"
 
 namespace setvesa {
-    void __cdecl Add_Square_To_Scan_List_(int x1, int y1, int x2, int y2) {
-        if (video::g_screen_res_x <= x1 || video::g_screen_res_y <= y1 || x2 <= 0 || y2 <= 0) {
+    void __cdecl Add_Square_To_Scan_List_(int32_t left, int32_t top, int32_t right, int32_t bottom) {
+        if (video::g_screen_res_x <= left || video::g_screen_res_y <= top || right <= 0 || bottom <= 0) {
             return;
         }
 
-        if (x1 < 0) {
-            x1 = 0;
+        if (left < 0) {
+            left = 0;
         }
 
-        if (y1 < 0) {
-            y1 = 0;
+        if (top < 0) {
+            top = 0;
         }
 
-        if (video::g_screen_res_x <= x2) {
-            x2 = video::g_screen_res_x - 1;
+        if (video::g_screen_res_x <= right) {
+            right = video::g_screen_res_x - 1;
         }
 
-        if (video::g_screen_res_y <= y2) {
-            y2 = video::g_screen_res_y - 1;
+        if (video::g_screen_res_y <= bottom) {
+            bottom = video::g_screen_res_y - 1;
         }
 
-        x1 >>= 2;
-        x2 >>= 2;
+        left >>= 2;
+        right >>= 2;
 
-        if (x2 < x1) {
-            exitm::Exit_With_Message(s_Add_Square_to_scan_list_failed__0055b270);
+        if (right < left) {
+            exitm::Exit_With_Message("Add Square to scan list failed..");
         }
+
+        const int16_t min_scan_x = (int16_t)left;
+        const int16_t max_scan_x = (int16_t)right;
 
         if (video::screen_refresh_flag == 2) {
-            for (int16_t y = (int16_t)y1; y <= y2; ++y) {
-                if (video::_refresh_scan_list[y].min_x == -1) {
-                    video::_refresh_scan_list[y].min_x = (int16_t)x1;
-                    video::_refresh_scan_list[y].max_x = (int16_t)x2;
+            for (int32_t row = top; row <= bottom; ++row) {
+                if (video::_refresh_scan_list[row].min_x == -1) {
+                    video::_refresh_scan_list[row].min_x = min_scan_x;
+                    video::_refresh_scan_list[row].max_x = max_scan_x;
                 } else {
-                    if (x1 < video::_refresh_scan_list[y].min_x) {
-                        video::_refresh_scan_list[y].min_x = (int16_t)x1;
+                    if (min_scan_x < video::_refresh_scan_list[row].min_x) {
+                        video::_refresh_scan_list[row].min_x = min_scan_x;
                     }
-                    if (video::_refresh_scan_list[y].max_x < x2) {
-                        video::_refresh_scan_list[y].max_x = (int16_t)x2;
+                    if (video::_refresh_scan_list[row].max_x < max_scan_x) {
+                        video::_refresh_scan_list[row].max_x = max_scan_x;
                     }
                 }
             }
         } else {
-            for (int16_t y = (int16_t)y1; y <= y2; ++y) {
-                if (video::_refresh_scan_list[y].min_x == -1) {
-                    video::_refresh_scan_list[y].min_x = (int16_t)x1;
-                    video::_refresh_scan_list[y].max_x = (int16_t)x2;
+            for (int32_t row = top; row <= bottom; ++row) {
+                if (video::_refresh_scan_list[row].min_x == -1) {
+                    video::_refresh_scan_list[row].min_x = min_scan_x;
+                    video::_refresh_scan_list[row].max_x = max_scan_x;
                 } else {
-                    if (x1 < video::_refresh_scan_list[y].min_x) {
-                        video::_refresh_scan_list[y].min_x = (int16_t)x1;
+                    if (min_scan_x < video::_refresh_scan_list[row].min_x) {
+                        video::_refresh_scan_list[row].min_x = min_scan_x;
                     }
-                    if (video::_refresh_scan_list[y].max_x < x2) {
-                        video::_refresh_scan_list[y].max_x = (int16_t)x2;
+                    if (video::_refresh_scan_list[row].max_x < max_scan_x) {
+                        video::_refresh_scan_list[row].max_x = max_scan_x;
                     }
                 }
 
-                if (video::_refresh_stencil_list[y].min_x == -1) {
-                    video::_refresh_stencil_list[y].min_x = (int16_t)x1;
-                    video::_refresh_stencil_list[y].max_x = (int16_t)x2;
+                if (video::_refresh_stencil_list[row].min_x == -1) {
+                    video::_refresh_stencil_list[row].min_x = min_scan_x;
+                    video::_refresh_stencil_list[row].max_x = max_scan_x;
                 } else {
-                    if (x1 < video::_refresh_stencil_list[y].min_x) {
-                        video::_refresh_stencil_list[y].min_x = (int16_t)x1;
+                    if (min_scan_x < video::_refresh_stencil_list[row].min_x) {
+                        video::_refresh_stencil_list[row].min_x = min_scan_x;
                     }
-                    if (video::_refresh_stencil_list[y].max_x < x2) {
-                        video::_refresh_stencil_list[y].max_x = (int16_t)x2;
+                    if (video::_refresh_stencil_list[row].max_x < max_scan_x) {
+                        video::_refresh_stencil_list[row].max_x = max_scan_x;
                     }
                 }
             }

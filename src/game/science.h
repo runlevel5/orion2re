@@ -1,20 +1,10 @@
 #pragma once
 
 namespace SCIENCE {
-    extern const char s_SR_R_x_SC_LBX_005512b0[14]; // "SR_R%x_SC.LBX"
-
     extern const char _spy_anim_fmt[14];
     extern const char _trooper_anim_fmt[14];
     extern const char _spy_anim_find_pat[13];
     extern const char _trooper_anim_find_pat[13];
-
-    extern const char s_billtext_lbx_0055135c[13]; // "billtext.lbx"
-
-    void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_idx);
-
-    extern const char s__00551100[1];
-    extern const char s__00551120[2];
-    extern const char s__0055136c[2]; /* "\r" */
 
     extern s_colors _science_high_color;
 
@@ -30,14 +20,40 @@ namespace SCIENCE {
 
     extern void* _science_mouse_bitmap;
 
-    extern const char s_SCIENCE_LBX_00551290[12];
-    void __cdecl Update_Science_Anims_(int unused, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1);
+    /* Displays the science-room sequence for a stolen technology.
+     * tech_idx: Technology id to present.
+     * other_player_idx: Other player referenced by the decoded message.
+     */
+    void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_player_idx);
 
+    /* Draws the current science-room animation layers for the active frame.
+     * unused_arg: Unused legacy callback-style argument.
+     * draw_multi_anim: Non-zero to draw the intro/discovery multi-file animation.
+     * draw_anim_2: Non-zero to draw SCIENCE.LBX animation 2.
+     * draw_anim_1: Non-zero to draw SCIENCE.LBX animation 1.
+     */
+    void __cdecl Update_Science_Anims_(int32_t unused_arg, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1);
+
+    /* Auto-function hook used while the science room screen is active. */
     void __cdecl Draw_Science_Room_();
 
+    /* Runs the science-room presentation loop for one or more discoveries.
+     * intro_animation_name: Intro animation LBX name.
+     * discovery_count: Number of discovery entries to process.
+     * discovery_data: Packed discovery entry data for the presentation.
+     * footer_text: Footer paragraph shown under the discovery text.
+     */
     void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, int16_t* discovery_data, char* footer_text);
 
+    /* Shows the science-room sequence for the active player's completed research.
+     * player_idx: Player whose newly completed research should be presented.
+     */
     void __cdecl Show_Off_Researched_Tech_(int16_t player_idx);
 
+    /* Shows the science-room sequence for captured technologies.
+     * captured_tech_ids: Packed captured technology entry data.
+     * tech_count: Number of entries in captured_tech_ids.
+     * message_arg: Text decoding argument for the footer message.
+     */
     void __cdecl Show_Off_Captured_Tech_(int16_t* captured_tech_ids, uint16_t tech_count, int16_t message_arg);
 }

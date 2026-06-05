@@ -18,7 +18,7 @@ namespace REPORT {
     char* _enemy_spy_steals_fmt;
     char* _outpost_preselected_planet_fmt;
 
-    s_colony* __cdecl Player_Colony_Base_At_Star_(short player_idx, short star_idx) {
+    s_colony* __cdecl Player_Colony_Base_At_Star_(int16_t player_idx, int16_t star_idx) {
         for (int i = 0; i < 5; ++i) {
             short planet_idx = MOX::_star[star_idx].planet_index[i];
             
@@ -38,7 +38,7 @@ namespace REPORT {
         return nullptr;
     }
 
-    s_ship_data* __cdecl Player_Ship_Type_At_Star_(short owner, short ship_type, short location, char include_just_built) {
+    s_ship_data* __cdecl Player_Ship_Type_At_Star_(int16_t owner, int16_t ship_type, int16_t location, int8_t include_just_built) {
         s_ship_data* ship = MOX::_ship;
         int num_ships = (int)MOX::_NUM_SHIPS;
         s_ship_data* end = &ship[num_ships];
@@ -87,7 +87,6 @@ namespace REPORT {
                             should_show = false;
                             break;
                         default:
-                            // Serious reports check (caseD_1)
                             should_show = (MOX::_settings.only_show_serious_turn_summary_reports == 0);
                             break;
                         }
@@ -105,9 +104,8 @@ namespace REPORT {
                         break;
 
                     case 9:
-                        // Use raw offsets here to match the original message
-                        // payload access rather than relying on an uncertain
-                        // union member interpretation for this message type.
+                        // TODO: msg_type 9 still depends on byte-offset reads from s_MSG.
+                        // This likely wants a dedicated payload type to avoid aliasing/provenance UB.
                         if (*(int16_t*)((uint8_t*)msg + 2) != -1 &&
                             *(uint8_t*)((uint8_t*)msg + 7) != 0) {
                             should_show = true;
@@ -118,17 +116,16 @@ namespace REPORT {
                         break;
 
                     case 17:
+                        // TODO: msg_type 17 also relies on a raw byte-offset payload read.
                         if (*(uint8_t*)((uint8_t*)msg + 3) == (uint8_t)MOX::_PLAYER_NUM) {
                             should_show = false;
                         }
                         else {
-                            // Serious reports check (caseD_1)
                             should_show = (MOX::_settings.only_show_serious_turn_summary_reports == 0);
                         }
                         break;
 
                     default:
-                        // Serious reports check (caseD_1)
                         should_show = (MOX::_settings.only_show_serious_turn_summary_reports == 0);
                         break;
                     }
@@ -155,7 +152,7 @@ namespace REPORT {
         return result;
     }
 
-    int8_t __cdecl Colonization_(int16_t player_idx, char show_dialog) {
+    int8_t __cdecl Colonization_(int16_t player_idx, int8_t show_dialog) {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (MOX::_star[star_idx].colonize_player == player_idx) {
                 if (struct_::Test_Bit_Field_(_done_colonize_check, star_idx) == 0) {
@@ -251,11 +248,11 @@ namespace REPORT {
                                     if (is_colony) {
                                         COLONIZE::Make_New_Colony_(planet_idx, player_idx);
                                         if (colony_base == nullptr) {
-                                            SHIPS::Kill_Ship_(static_cast<int16_t>(colony_ship - MOX::_ship));
+                                            SHIPS::Kill_Ship_((int16_t)(colony_ship - MOX::_ship));
                                             MAINSCR::Update_Ship_Icons_In_Between_Turns_();
                                             colony_base = nullptr;
                                         } else {
-                                            ERICNET::Remove_Building_(static_cast<int16_t>(colony_base - MOX::_colony), 11);
+                                            ERICNET::Remove_Building_((int16_t)(colony_base - MOX::_colony), 11);
                                             colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
                                         }
 
@@ -281,7 +278,7 @@ namespace REPORT {
                                         return 1;
                                     } else {
                                         COLONIZE::Make_New_Outpost_(planet_idx, player_idx);
-                                        SHIPS::Kill_Ship_(static_cast<int16_t>(outpost_ship - MOX::_ship));
+                                        SHIPS::Kill_Ship_((int16_t)(outpost_ship - MOX::_ship));
                                         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
                                     }
                                 }
@@ -297,7 +294,7 @@ namespace REPORT {
         return 0;
     }
 
-    int8_t __cdecl Display_Report_Aux_(int16_t player_idx, uint8_t param2) {
+    int8_t __cdecl Display_Report_Aux_(int16_t player_idx, uint8_t show_ui) {
         int8_t status;
 
         if (((_done_player_reports >> (uint8_t)player_idx) & 1) != 0) {
@@ -308,33 +305,30 @@ namespace REPORT {
             return 0;
         }
 
-        if ((status = Antarans_(player_idx, param2)) != 0) return status;
-        if ((status = Has_GNN_((uint8_t)player_idx, (bool)param2)) != 0) return status;
-        if ((status = Set_Initial_Tech_(player_idx, (char)param2)) != 0) return status;
-        if ((status = Has_Research_Breakthrough_(player_idx, (int8_t)param2)) != 0) return status;
-        if ((status = Has_Evolutionary_Upgrade_(player_idx, (int8_t)param2)) != 0) return status;
-        if ((status = Has_Officer_For_Hire_(player_idx, (int8_t)param2)) != 0) return status;
-        if ((status = Colonization_(player_idx, param2)) != 0) return status;
-        if ((status = Explored_New_Star_(player_idx, (char)param2)) != 0) return status;
-        if ((status = OFFICER::Officer_Made_Level_Report_(player_idx, (int8_t)param2)) != 0) return status;
-        if ((status = Has_Report_(player_idx, param2)) != 0) return status;
-        if ((status = Has_Diplomacy_Messages_(player_idx, (bool)param2)) != 0) return status;
-        if ((status = Has_Msg_(player_idx, (int8_t)param2)) != 0) return status;
-        if ((status = Empty_Colony_Queue_(player_idx, (int8_t)param2)) != 0) return status;
-        if ((status = Need_To_Set_Occupation_Policy_(player_idx, (int8_t)param2)) != 0) return status;
+        if ((status = Antarans_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Has_GNN_((uint8_t)player_idx, show_ui != 0)) != 0) return status;
+        if ((status = Set_Initial_Tech_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Has_Research_Breakthrough_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Has_Evolutionary_Upgrade_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Has_Officer_For_Hire_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Colonization_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Explored_New_Star_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = OFFICER::Officer_Made_Level_Report_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Has_Report_(player_idx, show_ui != 0)) != 0) return status;
+        if ((status = Has_Diplomacy_Messages_(player_idx, show_ui != 0)) != 0) return status;
+        if ((status = Has_Msg_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Empty_Colony_Queue_(player_idx, (int8_t)show_ui)) != 0) return status;
+        if ((status = Need_To_Set_Occupation_Policy_(player_idx, (int8_t)show_ui)) != 0) return status;
 
         _done_player_reports |= (1 << (uint8_t)player_idx);
 
         return 0;
     }
 
-    uint8_t __cdecl Display_Report_(int16_t report_idx) {
-        return (uint8_t)REPORT::Display_Report_Aux_(report_idx, 1);
+    uint8_t __cdecl Display_Report_(int16_t player_idx) {
+        return (uint8_t)REPORT::Display_Report_Aux_(player_idx, 1);
     }
 
-    /**
-     * @address 004a9e40
-     */
     void __cdecl sprintf_report_(char* buffer, s_report* report) {
         if (report->type == 1 /* MSG_TYPE_REPORT_YOUR_SPY */) {
             if (report->action == 0 /* SPY_ACTION_STEAL */) {
@@ -396,27 +390,21 @@ namespace REPORT {
         return data;
     }
 
-    /**
-     * @address 004aa020
-     */
     void __cdecl Client_Initialize_Reports_() {
         _done_player_reports = 0;
         _displayed_msgs = 0;
         _displayed_gnn = 0;
 
-        // Clearing _done_colonize_check array (9 bytes)
+        // Reset colonization checks for all tracked stars.
         memset(_done_colonize_check, 0, sizeof(_done_colonize_check));
 
         MOX::_antarans.attack_notified_mask = 0;
     }
 
-    /**
-     * @address 004aa050
-     */
     void __cdecl Initialize_Reports_() {
         _n_reports = 0;
 
-        // Zeroing _something_interesting_happened (8 bytes)
+        // Clear per-player "something interesting happened" flags.
         memset(_something_interesting_happened, 0, sizeof(_something_interesting_happened));
 
         Client_Initialize_Reports_();
@@ -425,21 +413,20 @@ namespace REPORT {
     /**
      * @brief Checks if a GNN (Galactic News Network) event is available.
      * 
-     * @param index The bit index in the displayed GNN mask to check.
+     * @param player_idx The bit index in the displayed GNN mask to check.
      * @param mark_as_displayed If true, marks the event as displayed and triggers event processing.
      * @return int8_t Returns 7 if a GNN event message is available, 0 otherwise.
      */
-    int8_t __cdecl Has_GNN_(uint8_t index, bool mark_as_displayed) {
+    int8_t __cdecl Has_GNN_(uint8_t player_idx, bool mark_as_displayed) {
         int8_t status = 0;
         uint8_t displayed_mask = REPORT::_displayed_gnn;
 
-        // Check if the GNN event at the specified index has already been displayed
-        if ((((uint8_t)(displayed_mask >> index)) & 1u) == 0) {
+        if ((((uint8_t)(displayed_mask >> player_idx)) & 1u) == 0) {
             if (EVENTS::Check_For_Event_Message_() != 0) {
                 status = 7;
                 if (mark_as_displayed) {
                     EVENTS::Check_For_Event_();
-                    REPORT::_displayed_gnn = (uint8_t)(REPORT::_displayed_gnn | (uint8_t)(1u << index));
+                    REPORT::_displayed_gnn = (uint8_t)(REPORT::_displayed_gnn | (uint8_t)(1u << player_idx));
                 }
             }
         }
@@ -447,20 +434,17 @@ namespace REPORT {
         return status;
     }
 
-    uint8_t __cdecl Must_Display_Reports_(int16_t player_num) {
+    uint8_t __cdecl Must_Display_Reports_(int16_t player_idx) {
         int8_t displayed = 0;
 
-        // Check if player objectives are complete (flag 100)
-        if (MOX::_player[player_num].objectives == 100) {
-            displayed = REPORT::Display_Report_Aux_(player_num, 0);
+        if (MOX::_player[player_idx].objectives == 100) {
+            displayed = REPORT::Display_Report_Aux_(player_idx, 0);
         }
 
         if (displayed == 0) {
-            REPORT::Redirect_Newly_Built_Ships_(player_num);
+            REPORT::Redirect_Newly_Built_Ships_(player_idx);
 
-            // Re-checking displayed (BL) as per disassembly 0x004ab2c6
             if (displayed == 0) {
-                // If game type is 2 (Hotseat) or 3 (Network), perform autosave
                 if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
                     NEXTTURN::Do_Autosave_();
                 }
@@ -470,7 +454,7 @@ namespace REPORT {
         return displayed;
     }
 
-    int8_t __cdecl Set_Initial_Tech_(short player_idx, char select_tech) {
+    int8_t __cdecl Set_Initial_Tech_(int16_t player_idx, int8_t select_tech) {
         if (MOX::_stardate > 35000) {
             uint8_t field_idx = (uint8_t)MOX::_player[player_idx].current_research_field;
 
@@ -510,9 +494,6 @@ namespace REPORT {
         return has_officer;
     }
 
-    /**
-     * @address 004aae90
-     */
     int8_t __cdecl Has_Research_Breakthrough_(int16_t player_idx, int8_t do_select) {
         int8_t status = 0;
 
@@ -547,13 +528,7 @@ namespace REPORT {
         return result;
     }
 
-    /**
-     * @address 004aa550
-     */
-    /**
-     * @address 004aa0d0
-     */
-    int8_t __cdecl Draw_Special_(s_star_data* star, int16_t param_2) {
+    int8_t __cdecl Draw_Special_(s_star_data* star, int16_t player_idx) {
         int8_t special = star->system_special;
 
         if (special < 50) {
@@ -581,7 +556,7 @@ namespace REPORT {
             }
 
             int16_t remainder = special % 10;
-            if (remainder == param_2 || result == 10) {
+            if (remainder == player_idx || result == 10) {
                 return result;
             }
 
@@ -601,7 +576,7 @@ namespace REPORT {
         return has_special;
     }
 
-    int8_t __cdecl Explored_New_Star_(short player_idx, char show_popup) {
+    int8_t __cdecl Explored_New_Star_(int16_t player_idx, int8_t show_popup) {
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             int8_t has_special = REPORT::Star_Has_Special_For_Player_(star, (int)player_idx);
@@ -617,7 +592,7 @@ namespace REPORT {
                 if (show_popup != 0) {
                     MOVEBOX::Remove_Box_Check_();
                     char special_type = REPORT::Draw_Special_(star, player_idx);
-                    short star_idx = (short)(star - MOX::_star);
+                    int16_t star_idx = (int16_t)(star - MOX::_star);
                     MAINPUPS::New_System_Discovery_Popup_(star_idx, (int16_t)special_type);
 
                     // Mark as no longer "just visited" after reporting
@@ -633,9 +608,6 @@ namespace REPORT {
         return 0;
     }
 
-    /**
-     * @address 004ab010
-     */
     int8_t __cdecl Has_Diplomacy_Messages_(int16_t receiver_idx, bool show_messages) {
         int8_t has_messages = 0;
 
@@ -680,24 +652,22 @@ namespace REPORT {
     }
 
     /**
-     * @address 004aab80
-     */
-    /**
      * @brief Evaluates and triggers Antaran attack notifications.
      * 
-     * @param param_1 Unused.
-     * @param param_2 Flag indicating if notification logic should proceed beyond basic state check.
+     * @param unused_player_idx Unused caller-supplied player index.
+     * @param show_notification Flag indicating if notification logic should proceed beyond basic state check.
      * @return int8_t 0 if no notification, 6 if stardate matches but logic skipped, 1 if attack movie played.
      */
-    int8_t __cdecl Antarans_(int16_t param_1, int8_t param_2) {
+    int8_t __cdecl Antarans_(int16_t unused_player_idx, int8_t show_notification) {
         int8_t result = 0;
+        (void)unused_player_idx;
 
         // Check if stardate is exactly one day past invasion date
         if (((int32_t)MOX::_antarans.invasion_stardate - (int32_t)MOX::_stardate) == -1) {
             // Check if current player was already notified
             if (!((MOX::_antarans.attack_notified_mask >> (uint8_t)MOX::_PLAYER_NUM) & 1)) {
                 result = 6;
-                if (param_2 != 0) {
+                if (show_notification != 0) {
                     int32_t target_star_idx = -1;
                     uint8_t max_turns_left = 0;
 
@@ -770,9 +740,6 @@ namespace REPORT {
         return 0;
     }
 
-    /**
-     * @address 004aaac0
-     */
     void __cdecl Redirect_Newly_Built_Ships_(int16_t player_idx) {
         bool any_ships_redirected = false;
         s_ship_data* ship = MOX::_ship;
@@ -812,9 +779,6 @@ namespace REPORT {
         }
     }
 
-    /**
-     * @address 004aa070
-     */
     void __cdecl Add_Report_(s_report* report) {
         if (_n_reports < 50) {
             _reports[_n_reports] = *report;

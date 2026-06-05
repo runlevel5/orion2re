@@ -1,12 +1,7 @@
 #include "pch.h"
 
 namespace SCORE {
-    namespace {
-        constexpr std::uintptr_t kInvalidOutColonyIdxMarker = static_cast<std::uintptr_t>(-1);
-    }
-
     s_hof _hof;
-    const char LBX_0055a430[10] = "SCORE.LBX";
 
     char _default_names[10][20] = {
         "Moise",
@@ -21,14 +16,7 @@ namespace SCORE {
         "Chewy",
     };
 
-    const char s_wb[3] = "wb";
-    const char s_HOF_M2[7] = "HOF.M2";
-
     s_hiscore* _hi;
-
-    const char s__d__d_005523a4[6] = "%d.%d";
-
-    const char* PTR_s_SCORE_LBX_0055a440 = SCORE::LBX_0055a430;
 
     int16_t _entry_to_flash;
 
@@ -56,12 +44,9 @@ namespace SCORE {
         return 0;
     }
 
-    /**
-     * @address 0x004e4980
-     */
-    int32_t __cdecl qsort_hof_scores_ascending_(const void* param_1, const void* param_2) {
-        const int16_t* p1 = (const int16_t*)param_1;
-        const int16_t* p2 = (const int16_t*)param_2;
+    int32_t __cdecl qsort_hof_scores_ascending_(const void* a, const void* b) {
+        const int16_t* p1 = (const int16_t*)a;
+        const int16_t* p2 = (const int16_t*)b;
 
         if (p2[0] < p1[0]) {
             return 1;
@@ -80,26 +65,18 @@ namespace SCORE {
         return 0;
     }
 
-    /**
-     * @address 004e3ad0
-     */
     void __cdecl Load_Hall_Of_Fame_Screen_() {
-        // Allocate space for the high score screen state and zero it out.
-        // Size 0x125 (293 bytes) corresponds to sizeof(s_hiscore).
-        _hi = (s_hiscore*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x125);
-        memset(_hi, 0, 0x125);
+        _hi = (s_hiscore*)allocate::Allocate_First_Block_(MOX::_screen_seg, sizeof(s_hiscore));
+        memset(_hi, 0, sizeof(s_hiscore));
 
-        // Load specific background and cursor animations from SCORE.LBX.
-        // Entry 15 (0xF) is the hall of fame background.
         _hi->background_anim = (s_animation_header*)farload::Far_Reload_Next_(
-            SCORE::LBX_0055a430,
+            "SCORE.LBX",
             0xF, 
             MOX::_screen_seg
         );
 
-        // Entry 16 (0x10) is the custom mouse cursor for this screen.
         _hi->mouse_cursor_anim = (s_animation_header*)farload::Far_Reload_Next_(
-            SCORE::LBX_0055a430,
+            "SCORE.LBX",
             0x10, 
             MOX::_screen_seg
         );
@@ -146,7 +123,7 @@ namespace SCORE {
 
         allocate::Push_Block_(MOX::_global_data_seg);
 
-        SCORE::_hi = reinterpret_cast<s_hiscore*>(allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x125));
+        SCORE::_hi = (s_hiscore*)allocate::Allocate_First_Block_(MOX::_global_data_seg, sizeof(s_hiscore));
 
         SCORE::Calculate_Hi_Scores_(player_idx);
 
@@ -166,7 +143,7 @@ namespace SCORE {
 
         current_score = Hi_Score_Screen_(player_idx);
         fields::Assign_Auto_Function_(SCORE::nullsub, 1);
-        SCORE::_hi = (s_hiscore*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x125 /* 293 */);
+        SCORE::_hi = (s_hiscore*)allocate::Allocate_First_Block_(MOX::_screen_seg, sizeof(s_hiscore));
 
         for (int i = 0; i < 10; ++i) {
             if (_hof.scores[i] > max_hof_score) {
@@ -225,11 +202,11 @@ namespace SCORE {
     }
 
     void __cdecl Create_Default_HOF_File_() {
-        FILE* file = fopen(s_HOF_M2, s_wb);
+        FILE* file = fopen("HOF.M2", "wb");
 
         memset(&_hof, 0, sizeof(s_hof));
 
-        *reinterpret_cast<uint16_t*>(&_hof) = 0x82;
+        _hof.version = 0x82;
 
         int16_t indices[13];
         for (int16_t i = 0; i < 13; ++i) {
@@ -287,7 +264,7 @@ namespace SCORE {
         FILE* file;
         int16_t sort_buffer[10][2];
 
-        file = fopen(s_HOF_M2, s_rb_0055117c);
+        file = fopen("HOF.M2", s_rb_0055117c);
         if (file == nullptr) {
             return 0;
         }
@@ -309,12 +286,12 @@ namespace SCORE {
         return SCORE::_hof.version;
     }
 
-    void __cdecl Hall_Of_Fame_Screen_(int16_t param_1) {
+    void __cdecl Hall_Of_Fame_Screen_(int16_t entry_to_flash_idx) {
         int16_t input_val;
         int16_t scan_val;
         bool exit_screen = false;
 
-        SCORE::_entry_to_flash = param_1;
+        SCORE::_entry_to_flash = entry_to_flash_idx;
 
         strcpy(SCORE::_difficulty_string[0], ESTRINGS::E_Strings_(0x221));
         strcpy(SCORE::_difficulty_string[1], ESTRINGS::E_Strings_(0x118));
@@ -558,7 +535,7 @@ namespace SCORE {
             _hi->sort_list[i][1] = (int16_t)i;
         }
 
-        qsort(_hi->sort_list, 10, 4, qsort_hof_scores_descending_);
+        qsort(_hi->sort_list, 10, sizeof(_hi->sort_list[0]), qsort_hof_scores_descending_);
 
         int16_t y = 131;
         for (int i = 0; i < 10; ++i) {
@@ -608,7 +585,7 @@ namespace SCORE {
             sort_list[i][0] = _hof.scores[i];
             sort_list[i][1] = i;
         }
-        qsort(sort_list, 10, 4, qsort_hof_scores_ascending_);
+        qsort(sort_list, 10, sizeof(sort_list[0]), qsort_hof_scores_ascending_);
     }
 
     void __cdecl Move_Sorted_HOF_Data_(int16_t sort_list[10][2]) {
@@ -629,13 +606,10 @@ namespace SCORE {
         _hof = local_hof;
     }
 
-    /**
-     * @address 0x004e45a0
-     */
     void __cdecl Write_HOF_File_() {
         FILE* file;
 
-        file = fopen(s_HOF_M2, s_wb);
+        file = fopen("HOF.M2", "wb");
         if (file != nullptr) {
             fwrite(&_hof, sizeof(s_hof), 1, file);
             fclose(file);
@@ -788,7 +762,7 @@ namespace SCORE {
                     fonts::Set_Outline_Color_(2, 1);
                     fonts::Set_Font_Spacing_(1);
 
-                    sprintf(buffer, SCORE::s__d__d_005523a4, defeated_score / 10, defeated_score % 10);
+                    sprintf(buffer, "%d.%d", defeated_score / 10, defeated_score % 10);
 
                     int16_t centerX = current_x + (icon_width / 2);
                     fonts::Print_Centered_(centerX, base_y + 3, buffer);
@@ -1187,8 +1161,7 @@ namespace SCORE {
 
         allocate::Push_Block_(MOX::_screen_seg);
 
-        // s_hiscore_tmp_pop size is 5
-        uint32_t alloc_size = total_pop_limit * 5;
+        uint32_t alloc_size = total_pop_limit * sizeof(s_hiscore_tmp_pop);
         s_hiscore_tmp_pop* temp_buffer = (s_hiscore_tmp_pop*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
         memset(temp_buffer, 0, alloc_size);
 
@@ -1218,13 +1191,12 @@ namespace SCORE {
             }
         }
 
-        // Use the actual collected count for the shuffle and distribution phases
-        int16_t final_count = total_pop_limit;
+        int16_t population_limit = total_pop_limit;
 
-        if (final_count > 0) {
-            for (int16_t i = final_count; i > 0; --i) {
-                int16_t idx1 = (int16_t)random::Random_(final_count) - 1;
-                int16_t idx2 = (int16_t)random::Random_(final_count) - 1;
+        if (population_limit > 0) {
+            for (int16_t i = population_limit; i > 0; --i) {
+                int16_t idx1 = (int16_t)random::Random_(population_limit) - 1;
+                int16_t idx2 = (int16_t)random::Random_(population_limit) - 1;
 
                 s_hiscore_tmp_pop swap_tmp = temp_buffer[idx1];
                 temp_buffer[idx1] = temp_buffer[idx2];
@@ -1235,7 +1207,7 @@ namespace SCORE {
         for (int16_t race_id = 0; race_id < 14; ++race_id) {
             if (race_counts[race_id] > 0) {
                 // Calculation: round( (race_counts / final_count) * 16 )
-                int32_t num_to_draw = ((race_counts[race_id] * 160) / final_count + 5) / 10;
+                int32_t num_to_draw = ((race_counts[race_id] * 160) / population_limit + 5) / 10;
 
                 // Enforce maximum of 16 icons total in high score report
                 if (SCORE::_hi->reg_pop + num_to_draw > 16 && num_to_draw > 1) {
@@ -1248,7 +1220,7 @@ namespace SCORE {
                     SCORE::Get_From_Tmp_Pop_(
                         temp_buffer, 
                         race_id, 
-                        final_count, 
+                        population_limit, 
                         &SCORE::_hi->pop_units[SCORE::_hi->reg_pop].race_id, 
                         &SCORE::_hi->pop_units[SCORE::_hi->reg_pop].icon_id
                     );
@@ -1262,7 +1234,7 @@ namespace SCORE {
     }
 
     int __cdecl ascending_qsort_uchar_(const void* a, const void* b) {
-        return static_cast<int>(*static_cast<const uint8_t*>(a)) - static_cast<int>(*static_cast<const uint8_t*>(b));
+        return (int)(*(const uint8_t*)a) - (int)(*(const uint8_t*)b);
     }
 
     void __cdecl Build_Captured_Colonists_Array_(int16_t player_idx) {
@@ -1302,14 +1274,14 @@ namespace SCORE {
             }
         }
 
-        qsort(SCORE::_hi->captured_pop_race_ids, 16, 1, SCORE::ascending_qsort_uchar_);
+        qsort(SCORE::_hi->captured_pop_race_ids, 16, sizeof(SCORE::_hi->captured_pop_race_ids[0]), SCORE::ascending_qsort_uchar_);
 
         SCORE::_hi->raw_captured_population = captured_count;
         random::Set_Random_Seed_(original_seed);
     }
 
     int8_t __cdecl Won_Council_Vote_(int16_t player_idx) {
-        return static_cast<int8_t>(MOX::_player[player_idx].won_council_vote);
+        return (int8_t)MOX::_player[player_idx].won_council_vote;
     }
 
     int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
@@ -1318,9 +1290,9 @@ namespace SCORE {
 
     int16_t __cdecl Player_Score_(int16_t player_idx) {
         allocate::Push_Block_(MOX::_screen_seg);
-        _hi = reinterpret_cast<s_hiscore*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x125));
-        memset(_hi, 0, 0x125);
-        _hi->player_idx = static_cast<int8_t>(player_idx);
+        _hi = (s_hiscore*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_hiscore));
+        memset(_hi, 0, sizeof(s_hiscore));
+        _hi->player_idx = (int8_t)player_idx;
         Calculate_Hi_Scores_(player_idx);
         allocate::Pop_Block_(MOX::_screen_seg);
         return _hi->score_final;
@@ -1333,22 +1305,22 @@ namespace SCORE {
         uint32_t bitmap_size;
         int16_t lbx_index;
 
-        _hi = static_cast<s_hiscore*>(allocate::Allocate_First_Block_(MOX::_screen_seg, sizeof(s_hiscore)));
+        _hi = (s_hiscore*)allocate::Allocate_First_Block_(MOX::_screen_seg, sizeof(s_hiscore));
         memset(_hi, 0, sizeof(s_hiscore));
 
         bitmap_size = bitmap::Get_Bitmap_Size_(600, 300);
-        _hi->report_bitmap = static_cast<s_animation_header*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size));
+        _hi->report_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
         bitmap::Create_Blank_Bitmap_(600, 300, _hi->report_bitmap);
 
         bitmap_size = bitmap::Get_Bitmap_Size_(50, 50);
         MAINSCR::_temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
 
-        _hi->main_background_anim = static_cast<s_animation_header*>(farload::Far_Reload_Next_(static_cast<const char*>(PTR_s_SCORE_LBX_0055a440), 0, MOX::_screen_seg));
-        _hi->race_icon_frame_anim = static_cast<s_animation_header*>(farload::Far_Reload_Next_(static_cast<const char*>(PTR_s_SCORE_LBX_0055a440), 1, MOX::_screen_seg));
+        _hi->main_background_anim = (s_animation_header*)farload::Far_Reload_Next_("SCORE.LBX", 0, MOX::_screen_seg);
+        _hi->race_icon_frame_anim = (s_animation_header*)farload::Far_Reload_Next_("SCORE.LBX", 1, MOX::_screen_seg);
 
         lbx_index = 2;
         for (int i = 0; i < 13; ++i) {
-            _hi->race_icon_anims[i] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(static_cast<const char*>(PTR_s_SCORE_LBX_0055a440), lbx_index, MOX::_screen_seg));
+            _hi->race_icon_anims[i] = (s_animation_header*)farload::Far_Reload_Next_("SCORE.LBX", lbx_index, MOX::_screen_seg);
             lbx_index++;
         }
     }
@@ -1404,7 +1376,7 @@ namespace SCORE {
                         );
                     } else {
                         anim = COLONY::Colony_Pop_Icon_(
-                            static_cast<uint16_t>(static_cast<uint8_t>(SCORE::_hi->captured_pop_race_ids[i]))
+                            (uint16_t)(uint8_t)SCORE::_hi->captured_pop_race_ids[i]
                         );
                     }
 
@@ -1447,19 +1419,18 @@ namespace SCORE {
     /**
      * @address 004e4d70
      */
-    void __cdecl Get_From_Tmp_Pop_(s_hiscore_tmp_pop* tmp_pop_list, uint16_t race_idx, int16_t count, int16_t* out_colony_idx, int16_t* out_pop_idx) {
+    void __cdecl Get_From_Tmp_Pop_(s_hiscore_tmp_pop* tmp_pop_list, uint16_t race_idx, int16_t entry_count, int16_t* out_colony_idx, int16_t* out_pop_idx) {
         int16_t first_match_colony = -1;
         int16_t first_match_pop = -1;
         bool found_unused = false;
         int16_t unused_index = 0;
 
-        for (int16_t i = 0; i < count; ++i) {
+        for (int16_t i = 0; i < entry_count; ++i) {
             s_hiscore_tmp_pop* entry = &tmp_pop_list[i];
 
             if (entry->race_idx == (uint8_t)race_idx) {
                 if (first_match_colony == -1) {
                     first_match_colony = entry->colony_idx;
-                    // Note: Compiler cleverness with register reuse results in this pattern
                     first_match_pop = (int16_t)entry->pop_idx;
                 }
 
@@ -1474,13 +1445,9 @@ namespace SCORE {
 
         if (found_unused) {
             tmp_pop_list[unused_index].is_used = 1;
-        } else {
-            // Potential bug: This branch performs a comparison and dereference of an 
-            // address (0xFFFFFFFF) that is typically invalid in Win32.
-            if (reinterpret_cast<std::uintptr_t>(out_colony_idx) == kInvalidOutColonyIdxMarker) {
+        } else if ((std::uintptr_t)out_colony_idx == (std::uintptr_t)-1) {
                 *out_colony_idx = first_match_colony;
                 *out_pop_idx = first_match_pop;
-            }
         }
     }
 }

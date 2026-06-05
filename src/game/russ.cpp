@@ -5,7 +5,6 @@ namespace RUSS {
     char _russ_strings[0x1964];
     const char s_Seed_ld[] = "Seed: %ld";
     const char s_Map_d[] = "Map:  %d";
-    const char s_This_isnt_a_single_player_game[] = "This isn't a single player game, cheeky monkey!";
 
     void __cdecl Assert_Settings_() {
     }
@@ -20,13 +19,12 @@ namespace RUSS {
             return -1;
         }
 
-        uint16_t r = static_cast<uint16_t>(random::Random_(total_weight));
+        uint16_t r = (uint16_t)random::Random_(total_weight);
         int16_t index = 0;
 
-        // Cumulative sum check to determine which index the random value falls into.
         if (weights[index] < r) {
             do {
-                r -= static_cast<uint16_t>(weights[index]);
+                r -= (uint16_t)weights[index];
                 index++;
             } while (weights[index] < r);
         }
@@ -37,10 +35,9 @@ namespace RUSS {
     int16_t __cdecl Get_Weighted_Choice_Short_(const uint16_t* weights, int16_t count) {
         uint32_t total_weight = 0;
 
-        // Calculate the sum of all weights
         if (count > 0) {
             for (int16_t i = 0; i < count; ++i) {
-                total_weight += static_cast<uint16_t>(weights[i]);
+                total_weight += (uint16_t)weights[i];
             }
         }
 
@@ -48,20 +45,15 @@ namespace RUSS {
             return -1;
         }
 
-        // Obtain a random target value from [0, total_weight - 1] 
-        // (Assuming Random_ behaves as such, or [1, total_weight])
-        uint32_t random_val = static_cast<uint32_t>(random::Random_(static_cast<int32_t>(total_weight)));
+        uint32_t random_val = (uint32_t)random::Random_((int32_t)total_weight);
         int16_t index = 0;
 
-        // Perform weighted selection
-        // Logic: Return the first index such that the sum of weights up to that index 
-        // satisfies the random_val threshold.
-        if (static_cast<uint16_t>(weights[index]) < random_val) {
+        if ((uint16_t)weights[index] < random_val) {
             do {
-                uint32_t current_weight = static_cast<uint16_t>(weights[index]);
+                uint32_t current_weight = (uint16_t)weights[index];
                 index++;
                 random_val -= current_weight;
-            } while (static_cast<uint16_t>(weights[index]) < random_val);
+            } while ((uint16_t)weights[index] < random_val);
         }
 
         return index;
@@ -77,30 +69,21 @@ namespace RUSS {
             return -1;
         }
 
-        uint32_t roll = static_cast<uint32_t>(random::Random_(static_cast<int32_t>(total_weight)));
-        int16_t choice = 0;
+        uint32_t roll = (uint32_t)random::Random_((int32_t)total_weight);
+        int16_t selected_index = 0;
 
         if (weights[0] < roll) {
             do {
-                roll -= weights[choice];
-                ++choice;
-            } while (weights[choice] < roll);
+                roll -= weights[selected_index];
+                ++selected_index;
+            } while (weights[selected_index] < roll);
         }
 
-        return choice;
+        return selected_index;
     }
 
-    /**
-     * @brief Releases all allocated blocks within a memory segment by resetting it.
-     * 
-     * This function effectively resets the memory segment provided, allowing it 
-     * to be reused from the beginning. It calls the underlying allocation system 
-     * to reset the segment.
-     * 
-     * @param seg Pointer to the memory segment to be released/reset.
-     */
-    void __cdecl Release_All_Blocks_(void* seg) {
-        allocate::Allocate_First_Block_(seg, 1);
+    void __cdecl Release_All_Blocks_(void* segment) {
+        allocate::Allocate_First_Block_(segment, 1);
     }
 
     void __cdecl Load_Russ_Strings_() {
@@ -110,7 +93,7 @@ namespace RUSS {
 
         sprintf(filename_buffer, s_rstring_d_lbx, (uint32_t)language);
 
-        farload::Farload_Data_Static_(filename_buffer, 0, &RUSS::_russ_strings, 0, 1, 0x1964);
+        farload::Farload_Data_Static_(filename_buffer, 0, &RUSS::_russ_strings, 0, 1, (int32_t)sizeof(RUSS::_russ_strings));
 
         char* string_ptr;
         string_ptr = COLCALC::Load_Colcalc_Strings_(RUSS::_russ_strings);
@@ -126,13 +109,13 @@ namespace RUSS {
         if (MOX::_game_type == 0) {
             RUSS::_all_ai_game = 1;
 
-            if (MOX::_player[MOX::_PLAYER_NUM].objectives == 0x64 /* 'd' */) {
-                Make_Player_Into_AI_(static_cast<int32_t>(MOX::_PLAYER_NUM));
+            if (MOX::_player[MOX::_PLAYER_NUM].objectives == 0x64) {
+                Make_Player_Into_AI_((int32_t)MOX::_PLAYER_NUM);
             }
 
             NETMOX::_net.all_ai_game_sync_flag = 1;
         } else {
-            GENDRAW::Message_Box_(const_cast<char*>(s_This_isnt_a_single_player_game));
+            GENDRAW::Message_Box_((char*)"This isn't a single player game, cheeky monkey!");
         }
     }
 
@@ -141,13 +124,13 @@ namespace RUSS {
 
         if (length > 0) {
             do {
-                int current = index;
-                int random_value = random::Random_(length - current);
-                int16_t swap_index = static_cast<int16_t>(index + random_value - 1);
+                int16_t current_index = index;
+                int32_t random_offset = random::Random_(length - current_index);
+                int16_t swap_index = (int16_t)(index + random_offset - 1);
                 ++index;
 
-                int8_t temp = buffer[current];
-                buffer[current] = buffer[swap_index];
+                int8_t temp = buffer[current_index];
+                buffer[current_index] = buffer[swap_index];
                 buffer[swap_index] = temp;
             } while (index < length);
         }
@@ -158,11 +141,9 @@ namespace RUSS {
             return;
         }
 
-        // Standard Fisher-Yates shuffle implementation.
-        // Note: random::Random_(n) in this context is assumed to return a value in the range [1, n].
         for (int16_t i = 0; i < count; ++i) {
-            int32_t r = random::Random_(static_cast<int32_t>(count) - i);
-            int16_t target_idx = static_cast<int16_t>(i + r - 1);
+            int32_t random_offset = random::Random_((int32_t)count - i);
+            int16_t target_idx = (int16_t)(i + random_offset - 1);
 
             int32_t temp = array[i];
             array[i] = array[target_idx];
@@ -176,14 +157,10 @@ namespace RUSS {
         }
 
         for (int16_t i = 0; i < count; ++i) {
-            // Note: The logic suggests random::Random_(n) returns a value in range [1, n].
-            int r = random::Random_(static_cast<int>(count) - i);
+            int32_t random_offset = random::Random_((int32_t)count - i);
 
             int16_t temp = data[i];
-
-            // target_idx = i + r - 1
-            // If Random_(n) is 1-based, this maps [1, count-i] to [i, count-1].
-            int16_t target_idx = static_cast<int16_t>(i + r - 1);
+            int16_t target_idx = (int16_t)(i + random_offset - 1);
 
             data[i] = data[target_idx];
             data[target_idx] = temp;
@@ -191,46 +168,45 @@ namespace RUSS {
     }
 
     int16_t __cdecl Star_To_Monster_(int16_t star_index) {
-        return static_cast<int16_t>(star_index % 5 + 1);
+        return (int16_t)(star_index % 5 + 1);
     }
 
-    char* __cdecl Star_Name_(int32_t star_idx) {
-        if (star_idx < MOX::_NUM_STARS) {
-            return MOX::_star[star_idx].name;
+    char* __cdecl Star_Name_(int32_t star_index) {
+        if (star_index < MOX::_NUM_STARS) {
+            return MOX::_star[star_index].name;
         }
-        return const_cast<char*>(s_Antares_00551288);
+        return (char*)s_Antares_00551288;
     }
 
     void __cdecl Shuffle_(void* buffer, int16_t element_size, int16_t num_elements) {
         if (element_size == 1) {
-            RUSS::Shuffle_Char_(static_cast<int8_t*>(buffer), num_elements);
+            RUSS::Shuffle_Char_((int8_t*)buffer, num_elements);
             return;
         }
 
         if (element_size == 2) {
-            RUSS::Shuffle_Sint_(static_cast<int16_t*>(buffer), num_elements);
+            RUSS::Shuffle_Sint_((int16_t*)buffer, num_elements);
             return;
         }
 
         if (element_size == 4) {
-            RUSS::Shuffle_Int_(static_cast<int32_t*>(buffer), num_elements);
+            RUSS::Shuffle_Int_((int32_t*)buffer, num_elements);
             return;
         }
 
         if (num_elements > 0) {
-            uint8_t temp[128]; // Scratch buffer for element swapping
+            uint8_t temp[128];
             for (int16_t i = 0; i < num_elements; ++i) {
-                // Random_ returns a value in range [1, range]
-                int r = random::Random_(static_cast<int>(num_elements) - static_cast<int>(i));
-                int16_t j = i + static_cast<int16_t>(r) - 1;
+                int32_t random_offset = random::Random_((int32_t)num_elements - i);
+                int16_t j = i + (int16_t)random_offset - 1;
 
                 if (j != i) {
-                    uint8_t* p_i = static_cast<uint8_t*>(buffer) + static_cast<int>(i) * static_cast<int>(element_size);
-                    uint8_t* p_j = static_cast<uint8_t*>(buffer) + static_cast<int>(j) * static_cast<int>(element_size);
+                    uint8_t* element_i = (uint8_t*)buffer + (int32_t)i * (int32_t)element_size;
+                    uint8_t* element_j = (uint8_t*)buffer + (int32_t)j * (int32_t)element_size;
 
-                    memcpy(temp, p_i, element_size);
-                    memcpy(p_i, p_j, element_size);
-                    memcpy(p_j, temp, element_size);
+                    memcpy(temp, element_i, element_size);
+                    memcpy(element_i, element_j, element_size);
+                    memcpy(element_j, temp, element_size);
                 }
             }
         }
@@ -247,9 +223,9 @@ namespace RUSS {
     }
 
     void __cdecl Make_Player_Into_AI_(int32_t player_idx) {
-        MOX::_player[player_idx].objectives = static_cast<uint8_t>(random::Random_(5));
+        MOX::_player[player_idx].objectives = (uint8_t)random::Random_(5);
 
-        INITSHIP::Update_Player_Ship_Designs_(static_cast<int16_t>(player_idx));
+        INITSHIP::Update_Player_Ship_Designs_((int16_t)player_idx);
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
             if (MOX::_colony[i].owner == player_idx) {
@@ -257,11 +233,11 @@ namespace RUSS {
             }
         }
 
-        COLCALC::Do_Player_Colony_Calculations_(static_cast<int16_t>(player_idx));
+        COLCALC::Do_Player_Colony_Calculations_((int16_t)player_idx);
     }
 
-    int __cdecl Compare_Ratios_(uint32_t first_numerator, uint32_t first_denominator, uint32_t second_numerator, uint32_t second_denominator) {
-        int comparison = 2;
+    int32_t __cdecl Compare_Ratios_(uint32_t first_numerator, uint32_t first_denominator, uint32_t second_numerator, uint32_t second_denominator) {
+        int32_t comparison = 2;
 
         do {
             uint32_t saved_first_numerator = first_numerator;
