@@ -570,13 +570,13 @@ namespace animate {
                     Remap_Clipped_Draw_Animated_Sprite_(x, y, frame_ptr);
                     return;
                 case ANIMATION_DRAW_MODE_BITMAP:
-                    exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
+                    exitm::Exit_With_Message("Remap draw not support bitmaps");
                     break;
                 case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
-                    exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
+                    exitm::Exit_With_Message("Remap draw not support screen");
                     break;
                 case ANIMATION_DRAW_MODE_REFRESH_MASK:
-                    exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
+                    exitm::Exit_With_Message("Remap draw not support map");
                     break;
                 }
             }
@@ -591,13 +591,13 @@ namespace animate {
                 Remap_Draw_Animated_Sprite_(x, y, frame_ptr);
                 break;
             case ANIMATION_DRAW_MODE_BITMAP:
-                exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
+                exitm::Exit_With_Message("Remap draw not support bitmaps");
                 break;
             case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
-                exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
+                exitm::Exit_With_Message("Remap draw not support screen");
                 break;
             case ANIMATION_DRAW_MODE_REFRESH_MASK:
-                exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
+                exitm::Exit_With_Message("Remap draw not support map");
                 break;
             }
         }

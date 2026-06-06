@@ -5,11 +5,7 @@ namespace COMBINIT {
     // colony_idx: Colony whose planet art should be loaded.
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
 
-    extern const char s_combat_lbx_00551244[11];
-    extern const char s_monster_lbx_00551250[12];
-    extern const char s_cmbtshp_lbx_0055125c[12];
     extern const char s_cmbtmisl_lbx_00551234[13];
-    extern const char s_cmbtsfx_lbx_00551228[12];
     extern const char s_sphersfx_lbx_00551218[13];
 
     // Copies a strategic ship into the temporary display-combat record.

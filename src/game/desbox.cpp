@@ -201,8 +201,8 @@ namespace DESBOX {
                                         MISC::Get_LBX_Message_(0x43, msg43_base);
                                         char* name_item = TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name;
                                         char* name_excl = TECHDATA::_specials[exclude_special].name;
-                                        const char* article_item = MISC::Is_Vowel_(name_item[0]) ? s_an : s_a;
-                                        const char* article_excl = MISC::Is_Vowel_(name_excl[0]) ? s_an : s_a;
+                                        const char* article_item = MISC::Is_Vowel_(name_item[0]) ? "an" : "a";
+                                        const char* article_excl = MISC::Is_Vowel_(name_excl[0]) ? "an" : "a";
                                         sprintf(msg42, msg43_base, article_excl, name_excl, article_item, name_item);
                                     }
                                     GENDRAW::Warning_Box_(msg42);

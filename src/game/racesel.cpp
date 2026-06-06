@@ -1014,7 +1014,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
                 }
 
                 if (bonus > 0) {
-                    strcat(paragraph, s_plus_00551118);
+                    strcat(paragraph, "+");
                 }
 
                 strcat(paragraph, bonus_text);

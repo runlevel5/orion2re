@@ -12,11 +12,7 @@ namespace {
 
 namespace COMBINIT {
 
-const char s_combat_lbx_00551244[11] = "combat.lbx";
-const char s_monster_lbx_00551250[12] = "monster.lbx";
-const char s_cmbtshp_lbx_0055125c[12] = "cmbtshp.lbx";
 const char s_cmbtmisl_lbx_00551234[13] = "cmbtmisl.lbx";
-const char s_cmbtsfx_lbx_00551228[12] = "cmbtsfx.lbx";
 const char s_sphersfx_lbx_00551218[13] = "sphersfx.lbx";
 
 uint8_t _real_attack_flag;
@@ -1353,14 +1349,14 @@ void __cdecl Load_Antaran_Planet_() {
     MOX::_combat_data->shield_max_hits = 0;
     MOX::_combat_data->shield_current_hits = 0;
 
-    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx_00551278, 62, MOX::_global_cache_seg);
+    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_("cmbtplnt.lbx", 62, MOX::_global_cache_seg);
     animate::Draw_Palette_(palette_anim);
     palette::Refresh_Palette_();
 
-    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx_00551278, 60 /* 0x3C */, MOX::_screen_seg);
+    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_("cmbtplnt.lbx", 60 /* 0x3C */, MOX::_screen_seg);
     RUSS::Mox_Update_();
 
-    MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx_00551278, 61 /* 0x3D */, MOX::_screen_seg);
+    MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_("cmbtplnt.lbx", 61 /* 0x3D */, MOX::_screen_seg);
     RUSS::Mox_Update_();
 }
 
@@ -1475,15 +1471,15 @@ void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
     int8_t climate = planet->climate;
     int8_t size = planet->size;
 
-    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx_00551278, climate * 6 + 5, MOX::_global_cache_seg);
+    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_("cmbtplnt.lbx", climate * 6 + 5, MOX::_global_cache_seg);
     animate::Draw_Palette_(palette_anim);
     RUSS::Mox_Update_();
 
-    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx_00551278, size + (climate * 6), MOX::_screen_seg);
+    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_("cmbtplnt.lbx", size + (climate * 6), MOX::_screen_seg);
     RUSS::Mox_Update_();
 
     if (planet->size != 0) {
-        MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx_00551278, climate * 6, MOX::_screen_seg);
+        MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_("cmbtplnt.lbx", climate * 6, MOX::_screen_seg);
         RUSS::Mox_Update_();
     } else {
         MOX::_combat_planet_seg2 = MOX::_combat_planet_seg;

@@ -425,7 +425,7 @@ namespace MSG_ {
                     pcVar6 = _msg_1_ship_killed_retreating_fmt;
                 }
                 int iVar9 = sprintf(param_1, pcVar6, (uint32_t)uVar5, &MOX::_star[(uint8_t)(param_2->u).retreat.star_idx]);
-                int iVar10 = sprintf(param_1 + iVar9, GLOBALS::s_spaces_percent_s_0055236c,
+                int iVar10 = sprintf(param_1 + iVar9, "  %s",
                                           _failed_retreat_reason_strings[(uint8_t)(param_2->u).retreat.reason]);
                 uint8_t bVar3 = (param_2->u).retreat.leader_count;
                 if (bVar3 != 0) {
@@ -477,7 +477,7 @@ namespace MSG_ {
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name);
                 } else {
                     KEN::Ken_Get_Text_Message_(0x68, local_dc, 0x13);
-                    sprintf(local_c8, GLOBALS::s_percent_s_percent_s_percent_s_005574f4,
+                    sprintf(local_c8, "%s %s %s",
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name, local_dc,
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech2].name);
                 }

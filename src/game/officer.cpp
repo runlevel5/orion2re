@@ -4,6 +4,7 @@ namespace OFFICER {
     char s_OFFICER_LBX_00556980[16] = "OFFICER.LBX";
     s_colors _normal_text_colors = {{61, 68, 67, 68, 68, 68, 68, 68}};
     s_colors _red_colors = {{75, 129, 77, 129, 129, 129, 129, 129}};
+    s_colors _selected_text_colors = {{0x3E, 0x47, 0x45, 0x47, 0x47, 0x47, 0x47, 0x47}};
     int16_t _officer_dismiss_btn;
     uint8_t _offscrn_skip_draw_ships;
     uint8_t _full_draw;
@@ -2842,7 +2843,7 @@ namespace OFFICER {
                 0x1b7, 
                 s__00551100,
                 MOX::_officer_cancel_hire_button_seg, 
-                s_X_005569d0, 
+                "X", 
                 0x28
             );
         } else {
@@ -2854,7 +2855,7 @@ namespace OFFICER {
             0xb, 
             animate::Get_Width_((s_animation_header*)MOX::_officer_ship_ldrs_button_seg) + 0x9c, 
             animate::Get_Height_((s_animation_header*)MOX::_officer_ship_ldrs_button_seg) + 0xb, 
-            s_S_005569cc, 
+            "S", 
             0x29
         );
 
@@ -2914,7 +2915,7 @@ namespace OFFICER {
                 0x16, 
                 s__00551100,
                 MOX::_officer_up_button_seg, 
-                s_minus_0055111c, 
+                "-", 
                 0x28
             );
             *dn_btn = fields::Add_Button_Field_(
@@ -2922,7 +2923,7 @@ namespace OFFICER {
                 0xaa, 
                 s__00551100,
                 MOX::_officer_dn_button_seg, 
-                s_plus_00551118, 
+                "+", 
                 0x28
             );
             FLT2::Fleet_Screen_Big_Icon_Fields_(big_icon_fields, 0x264, 0x2d, 0xa, 0x79);
@@ -3552,11 +3553,11 @@ void __cdecl Print_Officer_Data_(
         if (officer_list_index > -1 &&
             MOX::_officer_id_list[officer_list_index] ==
                 static_cast<int16_t>(MOX::_officer_scanned)) {
-            text_colors = ::s__GEGGGGG_s___s__005569b8;
+            text_colors = OFFICER::_selected_text_colors;
         } else if (officer_list_index > -1 &&
                    MOX::_officer_id_list[officer_list_index] ==
                        static_cast<int16_t>(MOX::_officer_selected)) {
-            text_colors = ::s__GEGGGGG_s___s__005569b8;
+            text_colors = OFFICER::_selected_text_colors;
         } else {
             text_colors = OFFICER::_normal_text_colors;
         }

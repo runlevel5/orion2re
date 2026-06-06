@@ -552,14 +552,16 @@ namespace COLSUM {
                 sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x0C));
                 sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x0C));
             } else {
-                sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), s_2_00551108);
+                /* Fmtpara: "\x1B2" switches the following text to an alternate inline color attribute. */
+                sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), "\x1B" "2");
                 sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x86));
             }
 
             sprintf(buffer, ESTRINGS::E_Strings_(0x51), sub_buffer1, HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer2);
             paragraph_type = 0x59;
         } else {
-            const char* event_prefix = Event_Good_(event_id) ? s_1_00551114 : s_2_00551108;
+            /* Fmtpara: "\x1B1" and "\x1B2" switch the event label to specific inline color attributes. */
+            const char* event_prefix = Event_Good_(event_id) ? "\x1B" "1" : "\x1B" "2";
             sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), event_prefix);
             sprintf(buffer, ESTRINGS::E_Strings_(0x55), HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer1, _wee_event_strings[event_id]);
             paragraph_type = 0x57;
@@ -577,17 +579,18 @@ namespace COLSUM {
 
             int16_t item_producing = colony->producing[0];
             if (item_producing != -1) {
+                /* Fmtpara: these inline "\x1B?" sequences apply specific color attributes to the auto-build text. */
                 if (turn_count < 1 || turn_count > 9999) {
                     if (colony->auto_building == 0) {
                         sprintf(buffer, ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
                     } else {
-                        sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing));
+                        sprintf(buffer, ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing));
                     }
                 } else {
                     if (colony->auto_building == 0) {
                         sprintf(buffer, ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     } else {
-                        sprintf(buffer, ESTRINGS::E_Strings_(0x5C), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                        sprintf(buffer, ESTRINGS::E_Strings_(0x5C), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     }
                 }
 
@@ -598,7 +601,7 @@ namespace COLSUM {
             }
 
             if (colony->auto_building != 0) {
-                sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(-1));
+                sprintf(buffer, ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(-1));
                 BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
                 fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
             }
@@ -1145,7 +1148,8 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
 
             const char* sign_str = s__00551100;
             if (total_growth < 0) {
-                sign_str = s_2_00551108;
+                /* Fmtpara: "\x1B2" colors negative growth before the numeric value is rendered. */
+                sign_str = "\x1B" "2";
             }
 
             s_planet_data* planet = &MOX::_planet[planet_idx];
@@ -1162,7 +1166,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                     (int32_t)max_pop,
                     sign_str,
                     (int32_t)total_growth,
-                    s_0_00551104);
+                    "\x1B" "0");
 
             BILL::Squeeze_Print_Formatted_Paragraph_(13, 354, 80, 88, buffer, 0);
         }

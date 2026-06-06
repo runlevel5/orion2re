@@ -1859,7 +1859,7 @@ namespace DIP_SCRN {
                         case 1008: {
                             _response_message = _old_response_message;
                             char* tech_name = TECH::Technology_Applications_Name_(_net_diplomacy_message.arg1, _talker_ambassador);
-                            sprintf(msg_buf, GLOBALS::s_spaces_percent_s_0055236c, tech_name);
+                            sprintf(msg_buf, "  %s", tech_name);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
                             int16_t list_choice = Diplomacy_Generic_List_(1, msg_buf, 1, title_buf);
                             if (list_choice == -1) {
@@ -2140,9 +2140,9 @@ namespace DIP_SCRN {
         }
     }
 
-    char* __cdecl An_(char* text) {
+    const char* __cdecl An_(char* text) {
         if (MOX::_settings.language != 0) {
-            return const_cast<char*>(s__00551100);
+            return s__00551100;
         }
 
         char first_char = *text;
@@ -2153,10 +2153,10 @@ namespace DIP_SCRN {
             first_char == 'I' || first_char == 'i' ||
             first_char == 'O' || first_char == 'o' ||
             first_char == 'U' || first_char == 'u') {
-            return s_an;
+            return "an";
         }
 
-        return s_a;
+        return "a";
     }
 
     void __cdecl Diplomacy_Give_In_To_Demand_(int16_t asking_player_idx, int16_t giving_player_idx, int16_t demand_type, int16_t demand_data) {

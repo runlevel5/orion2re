@@ -609,7 +609,7 @@ namespace DIP_SCRN {
             }
 
             param_4[out_idx] = '\0';
-            char* replacement = nullptr;
+            const char* replacement = nullptr;
             char temp_buf[64];
 
             switch (c) {
@@ -664,7 +664,7 @@ namespace DIP_SCRN {
                     replacement = temp_buf;
                 }
                 else {
-                    replacement = const_cast<char*>(s_FWEE);
+                    replacement = s_FWEE;
                 }
                 break;
             }
@@ -1776,7 +1776,7 @@ namespace DIP_SCRN {
                 for (int16_t i = 0; i < items_to_process; i++) {
                     int16_t target_idx = i + has_prev;
                     char* tech_name = TECH::Technology_Applications_Name_((uint8_t)tech_ids[start_idx + i], tech_app_player);
-                    sprintf(_diplomacy_list_choice[target_idx], GLOBALS::s_spaces_percent_s_0055236c, tech_name);
+                    sprintf(_diplomacy_list_choice[target_idx], "  %s", tech_name);
                     item_values[target_idx] = (uint8_t)tech_ids[start_idx + i];
                 }
             }

@@ -704,7 +704,7 @@ namespace COLONY {
         int8_t officer_idx = MOX::_star[COLONY::_star_handle].officer_index[MOX::_PLAYER_NUM];
 
         if (officer_idx != -1) {
-            MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+            MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("BUFFER0.LBX", 0, MOX::_global_cache_seg));
             remap::Calculate_Picture_Remap_Colors_(MOX::_main_screen_seg);
 
             s_animation_header* anim1 = C_Anims_(33);

@@ -556,7 +556,7 @@ namespace MAINPUPS {
         fonts::Set_Font_Style_Shadow_Down_(1, &colors);
         Load_Colony_Defense_Selection_Popup_();
 
-        popup_buffer = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+        popup_buffer = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x49, MOX::_global_cache_seg);
         Do_Popup_Setup_(star_idx, popup_buffer);
 
         fields::Deactivate_Auto_Function_();
@@ -721,7 +721,7 @@ namespace MAINPUPS {
         Set_G_Special_Value_(star_idx);
         Clear_System_Special_Slots_();
 
-        s_animation_header* popup_bg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+        s_animation_header* popup_bg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x49, MOX::_global_cache_seg);
         Do_Popup_Setup_(star_idx, popup_bg);
 
         fields::Deactivate_Help_List_();
@@ -943,7 +943,7 @@ namespace MAINPUPS {
         _g_special = special_flag;
         Clear_System_Special_Slots_();
 
-        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x49, MOX::_global_cache_seg);
         Do_Popup_Setup_(star_idx, anim);
 
         video::Copy_Off_To_Back_();
@@ -1540,7 +1540,7 @@ namespace MAINPUPS {
         format = ESTRINGS::E_Strings_(456 /* 0x1c8 */);
         sprintf(msg_buffer, format, star_ptr->name);
 
-        anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 73 /* 0x49 */, MOX::_global_cache_seg);
+        anim = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 73 /* 0x49 */, MOX::_global_cache_seg);
         MAINPUPS::Get_Picture_Draw_XY_(anim);
 
         SYS::Draw_System_Display_Popup_(

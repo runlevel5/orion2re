@@ -12,6 +12,7 @@ namespace OFFICER {
     );
     extern s_colors _normal_text_colors;
     extern s_colors _red_colors;
+    extern s_colors _selected_text_colors;
     extern int16_t _officer_dismiss_btn;
     extern uint8_t _offscrn_skip_draw_ships;
     extern uint8_t _full_draw;

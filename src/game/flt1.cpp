@@ -1168,9 +1168,9 @@ namespace FLT1 {
         int16_t entry_num = (int16_t)MOX::_leaders[leader_idx].pict_num + 0x2d;
 
         if (reload_flag != 0) {
-            return farload::Far_Reload_(PTR_s_FLEET_LBX_005584a8, entry_num, buffer);
+            return farload::Far_Reload_("FLEET.LBX", entry_num, buffer);
         } else {
-            return farload::Far_Reload_Next_(PTR_s_FLEET_LBX_005584a8, entry_num, buffer);
+            return farload::Far_Reload_Next_("FLEET.LBX", entry_num, buffer);
         }
     }
 
@@ -1271,13 +1271,13 @@ namespace FLT1 {
             int16_t current_entry = entry_idx++;
 
             MOX::_fltscrn_small_ship_icon_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_FLEET_LBX_005584a8,
+                "FLEET.LBX",
                 (int)current_entry,
                 MOX::_screen_seg
             );
 
             MOX::_fltscrn_flashing_ship_pict_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_FLEET_LBX_005584a8,
+                "FLEET.LBX",
                 (int)current_entry,
                 MOX::_screen_seg
             );
@@ -1287,13 +1287,13 @@ namespace FLT1 {
             int16_t current_entry = entry_idx++;
 
             MOX::_fltscrn_monster_ship_icon[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_FLEET_LBX_005584a8,
+                "FLEET.LBX",
                 (int)current_entry,
                 MOX::_screen_seg
             );
 
             MOX::_fltscrn_flashing_monster_ship_icon[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_FLEET_LBX_005584a8,
+                "FLEET.LBX",
                 (int)current_entry,
                 MOX::_screen_seg
             );
@@ -1419,7 +1419,7 @@ namespace FLT1 {
 
         for (int i = 0; i < 11; ++i) {
             MOX::_fleet_galaxy_star_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(
-                PTR_s_FLEET_LBX_005584a8,
+                "FLEET.LBX",
                 lbx_entry++,
                 MOX::_screen_seg
             );

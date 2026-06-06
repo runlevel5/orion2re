@@ -532,7 +532,7 @@ namespace TECH {
 
     int16_t __cdecl Init_Entry_Data_(s_list_item_research* entries, int32_t research_cost_offset) {
         char local_50[80];
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 62, local_50, sizeof(local_50));
+        JIM::Get_Text_Message_("billtext.lbx", 62, local_50, sizeof(local_50));
         int16_t valid_count = 0;
 
         s_list_item_research* item = entries;
@@ -753,7 +753,7 @@ namespace TECH {
         s_help_record* loaded_data = (s_help_record*)farload::Far_Reload_Data_(lbx_name, 0, out_buffer, app_idx, 1, sizeof(s_help_record));
 
         int32_t cost = New_Get_Tech_Cost_(app_idx, 1, MOX::_PLAYER_NUM);
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3D, text_buffer, sizeof(text_buffer));
+        JIM::Get_Text_Message_("billtext.lbx", 0x3D, text_buffer, sizeof(text_buffer));
 
         itoa(cost, cost_str, 10);
         strcat(text_buffer, cost_str);
@@ -818,21 +818,21 @@ namespace TECH {
         int16_t input;
 
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3F, msg_buf, sizeof(msg_buf));
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x40, _tech_group_names[0], sizeof(_tech_group_names[0]));
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x41, _tech_group_names[1], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x3F, msg_buf, sizeof(msg_buf));
+        JIM::Get_Text_Message_("billtext.lbx", 0x40, _tech_group_names[0], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x41, _tech_group_names[1], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x42, _tech_group_names[2], sizeof(_tech_group_names[0]));
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x43, _tech_group_names[3], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x42, _tech_group_names[2], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x43, _tech_group_names[3], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x44, _tech_group_names[4], sizeof(_tech_group_names[0]));
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x45, _tech_group_names[5], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x44, _tech_group_names[4], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x45, _tech_group_names[5], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x46, _tech_group_names[6], sizeof(_tech_group_names[0]));
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x47, _tech_group_names[7], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x46, _tech_group_names[6], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x47, _tech_group_names[7], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x48, _tech_group_names[8], sizeof(_tech_group_names[0]));
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x49, _tech_group_names[9], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x48, _tech_group_names[8], sizeof(_tech_group_names[0]));
+        JIM::Get_Text_Message_("billtext.lbx", 0x49, _tech_group_names[9], sizeof(_tech_group_names[0]));
         RUSS::Mox_Update_();
 
         MOX2::Get_Auto_Function_(auto_funcs);

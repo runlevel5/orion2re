@@ -922,22 +922,22 @@ skip_cursor:
     {
         s_animation_header* seg;
 
-        seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2B, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x2B, MOX::_global_cache_seg);
         animate::Draw_(x - 1, y - 1, seg);
 
-        seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2C, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x2C, MOX::_global_cache_seg);
         animate::Draw_(x, y + 0x4E, seg);
 
         if (ship_idx == 0)
         {
-            seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+            seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
             animate::Draw_(x + 1, y + 0x4F, seg);
 
             if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() != 0)
             {
                 int16_t struct_dmg = MOX::_combat_data[ship_idx].structure_damage;
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x58, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x58, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 int16_t armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
@@ -948,12 +948,12 @@ skip_cursor:
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -961,7 +961,7 @@ skip_cursor:
             }
             else
             {
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
             }
             return;
@@ -1009,12 +1009,12 @@ skip_cursor:
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 video::Clip_Off_();
@@ -1034,7 +1034,7 @@ skip_cursor:
                 graphics::Set_Window_(x + 1, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -1056,7 +1056,7 @@ skip_cursor:
                 graphics::Set_Window_(x - bar_len + 0x58, 0, x + 0x58, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -1065,10 +1065,10 @@ skip_cursor:
         }
         else
         {
-            seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x59, MOX::_global_cache_seg);
+            seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x59, MOX::_global_cache_seg);
             animate::Draw_(x + 1, y + 0x4F, seg);
 
-            seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x58, MOX::_global_cache_seg);
+            seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x58, MOX::_global_cache_seg);
             animate::Draw_(x + 1, y + 0x55, seg);
 
             int16_t struct_dmg = MOX::_combat_data[ship_idx].structure_damage;
@@ -1080,12 +1080,12 @@ skip_cursor:
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -1103,12 +1103,12 @@ skip_cursor:
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 video::Clip_Off_();
@@ -1959,11 +1959,11 @@ skip_cursor:
             int32_t picture_num;
 
             if (previous_owner < 8 && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
-                memcpy(lbx_name, s_cmbtshp_lbx_0055125c, 12);
+                memcpy(lbx_name, "cmbtshp.lbx", 12);
                 uint8_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
             } else {
-                memcpy(lbx_name, s_monster_lbx_00551250, 12);
+                memcpy(lbx_name, "monster.lbx", 12);
                 if (MOX::_combat_data[ship_idx].picture_num == 0x2C) {
                     picture_num = 25;
                 } else {
@@ -2023,11 +2023,11 @@ skip_cursor:
     void __cdecl Draw_Ship_Status_(int16_t x, int16_t y, int16_t ship_idx) {
         if (x < 0x14) {
             graphics::Fill_(0xf, 0x17b, 0x66, 0x1c5, 0);
-            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x2d, MOX::_global_cache_seg);
             animate::Draw_(0xf, 0x17b, anim);
         } else if (x > 0x17c) {
             graphics::Fill_(0x191, 0x17b, 0x1e8, 0x1d3, 0);
-            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 0x2d, MOX::_global_cache_seg);
             animate::Draw_(0x191, 0x17b, anim);
         }
 
@@ -2368,7 +2368,7 @@ skip_cursor:
             return;
         }
 
-        s_animation_header* effect_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 42, MOX::_global_cache_seg);
+        s_animation_header* effect_seg = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 42, MOX::_global_cache_seg);
         int16_t effect_width = animate::Get_Width_(effect_seg);
         int16_t effect_height = animate::Get_Height_(effect_seg);
         int16_t frame_count = animate::Get_Animation_Frame_Count_(effect_seg);
@@ -2439,7 +2439,7 @@ skip_cursor:
                 video::Clip_On_();
                 graphics::Set_Window_(0, 0, 0x27F, 0x15E);
 
-                effect_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 42, MOX::_global_cache_seg);
+                effect_seg = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 42, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(effect_seg, frame);
                 animate::Draw_(draw_x, draw_y, effect_seg);
 
@@ -2499,11 +2499,11 @@ skip_cursor:
             char lbx_name[12];
             int16_t picture_num;
             if (previous_owner < 8 && MOX::_combat_data[param_1].picture_num != 44 /* 0x2c */) {
-                strcpy(lbx_name, s_cmbtshp_lbx_0055125c);
+                strcpy(lbx_name, "cmbtshp.lbx");
                 int16_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[param_1].picture_num;
             } else {
-                strcpy(lbx_name, s_monster_lbx_00551250);
+                strcpy(lbx_name, "monster.lbx");
                 if (MOX::_combat_data[param_1].picture_num == 44 /* 0x2c */) {
                     picture_num = 25; /* 0x19 */
                 } else {
@@ -3064,7 +3064,7 @@ skip_cursor:
 
     static void Build_Signed_Bonus_String(char* out_text, int32_t value) {
         if (value > 0) {
-            sprintf(out_text, "%s%d", s_plus_00551118, value);
+            sprintf(out_text, "%s%d", "+", value);
         } else {
             sprintf(out_text, "%d", value);
         }
@@ -3103,7 +3103,7 @@ skip_cursor:
         bool is_special_target;
 
         MOX::_scan_ship_seg =
-            buffer::Buffer_Reload_(s_combat_lbx_00551244, 5, MOX::_global_cache_seg);
+            buffer::Buffer_Reload_("combat.lbx", 5, MOX::_global_cache_seg);
 
         view_x = static_cast<int16_t>(0x149 - animate::Get_Width_((s_animation_header*)MOX::_scan_ship_seg) / 2);
         view_y = static_cast<int16_t>(0x0F9 - animate::Get_Height_((s_animation_header*)MOX::_scan_ship_seg) / 2);
@@ -3653,7 +3653,7 @@ skip_cursor:
 
                 switch (TECHDATA::_weapons[weapon_id].type) {
                     case 0:
-                        fonts::Print_(left_panel_x + 0x99, row_y, s_minus_0055111c);
+                        fonts::Print_(left_panel_x + 0x99, row_y, "-");
                         break;
 
                     case 1:
@@ -3762,7 +3762,7 @@ skip_cursor:
         }
 
         MOX::_scan_ship_seg =
-            buffer::Buffer_Reload_(s_combat_lbx_00551244, 5, MOX::_global_cache_seg);
+            buffer::Buffer_Reload_("combat.lbx", 5, MOX::_global_cache_seg);
 
         animate::Draw_(view_x - 0x09, view_y - 0x09, (s_animation_header*)MOX::_scan_ship_seg);
     }

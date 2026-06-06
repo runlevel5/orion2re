@@ -192,9 +192,9 @@ namespace LOADSAVE {
                 _game_popup_fields->btn_main_new_id = -1000;
             }
 
-            _game_popup_fields->btn_main_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[1], s_S_005569cc, '(');
+            _game_popup_fields->btn_main_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[1], "S", '(');
             _game_popup_fields->btn_main_quit_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[4], "Q", '(');
-            _game_popup_fields->btn_main_options_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], s_O_00556afc, '(');
+            _game_popup_fields->btn_main_options_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], "O", '(');
             _game_popup_fields->btn_main_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[6], s__00551120, '(');
 
             _music_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xc2, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->music_level, s__00551100, '\0');
@@ -217,7 +217,7 @@ namespace LOADSAVE {
                 _game_popup_fields->option_toggles[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
                 offset_y += 0x11;
             }
-            _game_popup_fields->btn_settings_accept_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], s_A_00557ed4, '(');
+            _game_popup_fields->btn_settings_accept_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], "A", '(');
             break;
         }
         case 2:
@@ -279,7 +279,7 @@ namespace LOADSAVE {
                     _game_popup_fields->save_slot_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, y_start + font_h + 1, MOX::_popup_base_x + 0xf4, y_start + font_h * 2, s__00551100, ')');
                 }
                 _game_popup_fields->debug_hotspot_id = -1000;
-                _game_popup_fields->btn_popup_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], s_S_005569cc, '(');
+                _game_popup_fields->btn_popup_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], "S", '(');
             }
             _game_popup_fields->btn_popup_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xd], "C", '(');
             break;
@@ -1168,37 +1168,37 @@ namespace LOADSAVE {
     void __cdecl Load_Game_Popup_Pictures_() {
         RUSS::Mox_Update_();
 
-        _game_anims->pictures[0] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 0, MOX::_screen_seg);
-        _game_anims->pictures[1] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 1, MOX::_screen_seg);
-        _game_anims->pictures[2] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 2, MOX::_screen_seg);
-        _game_anims->pictures[3] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 3, MOX::_screen_seg);
-        _game_anims->pictures[4] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 4, MOX::_screen_seg);
-        _game_anims->pictures[5] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 5, MOX::_screen_seg);
+        _game_anims->pictures[0] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 0, MOX::_screen_seg);
+        _game_anims->pictures[1] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 1, MOX::_screen_seg);
+        _game_anims->pictures[2] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 2, MOX::_screen_seg);
+        _game_anims->pictures[3] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 3, MOX::_screen_seg);
+        _game_anims->pictures[4] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 4, MOX::_screen_seg);
+        _game_anims->pictures[5] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 5, MOX::_screen_seg);
 
         RUSS::Mox_Update_();
 
-        _game_anims->pictures[6] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 6, MOX::_screen_seg);
-        _game_anims->pictures[7] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 7, MOX::_screen_seg);
-        _game_anims->pictures[8] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 29, MOX::_screen_seg);
-        _game_anims->pictures[9] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 9, MOX::_screen_seg);
-        _game_anims->pictures[10] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 10, MOX::_screen_seg);
+        _game_anims->pictures[6] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 6, MOX::_screen_seg);
+        _game_anims->pictures[7] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 7, MOX::_screen_seg);
+        _game_anims->pictures[8] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 29, MOX::_screen_seg);
+        _game_anims->pictures[9] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 9, MOX::_screen_seg);
+        _game_anims->pictures[10] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 10, MOX::_screen_seg);
 
         RUSS::Mox_Update_();
 
-        _game_anims->pictures[11] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 11, MOX::_screen_seg);
-        _game_anims->pictures[12] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 12, MOX::_screen_seg);
-        _game_anims->pictures[13] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 13, MOX::_screen_seg);
-        _game_anims->pictures[14] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 14, MOX::_screen_seg);
-        _game_anims->pictures[15] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 15, MOX::_screen_seg);
-        _game_anims->pictures[16] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 16, MOX::_screen_seg);
+        _game_anims->pictures[11] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 11, MOX::_screen_seg);
+        _game_anims->pictures[12] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 12, MOX::_screen_seg);
+        _game_anims->pictures[13] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 13, MOX::_screen_seg);
+        _game_anims->pictures[14] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 14, MOX::_screen_seg);
+        _game_anims->pictures[15] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 15, MOX::_screen_seg);
+        _game_anims->pictures[16] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 16, MOX::_screen_seg);
 
         RUSS::Mox_Update_();
 
-        _game_anims->pictures[17] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 17, MOX::_screen_seg);
-        _game_anims->pictures[18] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 18, MOX::_screen_seg);
-        _game_anims->pictures[19] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 19, MOX::_screen_seg);
-        _game_anims->pictures[23] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 27, MOX::_screen_seg);
-        _game_anims->pictures[24] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 28, MOX::_screen_seg);
+        _game_anims->pictures[17] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 17, MOX::_screen_seg);
+        _game_anims->pictures[18] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 18, MOX::_screen_seg);
+        _game_anims->pictures[19] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 19, MOX::_screen_seg);
+        _game_anims->pictures[23] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 27, MOX::_screen_seg);
+        _game_anims->pictures[24] = (s_animation_header*)farload::Far_Reload_Next_("GAME.LBX", 28, MOX::_screen_seg);
 
         RUSS::Mox_Update_();
 

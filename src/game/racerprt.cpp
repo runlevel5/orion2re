@@ -68,17 +68,17 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     }
 
     if (num_alliances == 0) {
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x1D, acStack_200, 0x28);
+        JIM::Get_Text_Message_("billtext.lbx", 0x1D, acStack_200, 0x28);
         strcat(acStack_200, string::s_Newline);
     }
     if (num_wars == 0) {
-        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x1E, acStack_280, 0x28);
+        JIM::Get_Text_Message_("billtext.lbx", 0x1E, acStack_280, 0x28);
         strcat(acStack_280, string::s_Newline);
     }
 
     RUSS::Mox_Update_();
-    JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x1F, acStack_318, 0x28);
-    JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x20, acStack_2a8, 0x28);
+    JIM::Get_Text_Message_("billtext.lbx", 0x1F, acStack_318, 0x28);
+    JIM::Get_Text_Message_("billtext.lbx", 0x20, acStack_2a8, 0x28);
     RUSS::Mox_Update_();
 
     /* fmtpara: '\n' inserts paragraph breaks between the treaty headings and their race-name lists. */
@@ -116,14 +116,14 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
 
         if (spy_count == 0) {
             fonts::Set_Font_Style_(3, &RACERPRT::_report_normal_color);
-            JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x1C, acStack_318, 0x28);
+            JIM::Get_Text_Message_("billtext.lbx", 0x1C, acStack_318, 0x28);
         } else {
             RACESCRN::Draw_Icon_Group_(&spy_icon_group);
             fonts::Set_Font_Style_(2, &RACERPRT::_report_normal_color);
             if (spy_count <= 1) {
-                JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x4B, acStack_318, 0x28);
+                JIM::Get_Text_Message_("billtext.lbx", 0x4B, acStack_318, 0x28);
             } else {
-                JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x4A, acStack_318, 0x28);
+                JIM::Get_Text_Message_("billtext.lbx", 0x4A, acStack_318, 0x28);
                 JIM::Decode_Text_Stat_(acStack_318, spy_count, 0x28);
             }
         }

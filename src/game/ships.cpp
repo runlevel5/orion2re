@@ -337,7 +337,7 @@ namespace SHIPS {
     void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, uint8_t* width, uint8_t* height) {
         s_animation_header* anim;
 
-        anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int)zoom_level + 0xCD, MOX::_global_cache_seg);
+        anim = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", (int)zoom_level + 0xCD, MOX::_global_cache_seg);
 
         *width = (uint8_t)animate::Get_Width_(anim);
         *height = (uint8_t)animate::Get_Height_(anim);
@@ -366,11 +366,11 @@ namespace SHIPS {
             int index = (int)inverted_zoom + (int)color * 4;
 
             if (is_highlighted != 0) {
-                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, index + 205 /* 0xcd */, MOX::_global_cache_seg);
+                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", index + 205 /* 0xcd */, MOX::_global_cache_seg);
                 MOX::_hl_ship_icon_seg[index] = seg;
                 return seg;
             } else {
-                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, index + 205 /* 0xcd */, MOX::_global_cache_seg);
+                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", index + 205 /* 0xcd */, MOX::_global_cache_seg);
                 MOX::_ship_icon_seg[index] = seg;
                 return seg;
             }
@@ -379,11 +379,11 @@ namespace SHIPS {
         if (ship_type_idx == 8) {
             // Monster ship uses the inverted zoom index directly
             if (is_highlighted != 0) {
-                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int)inverted_zoom + 237 /* 0xed */, MOX::_global_cache_seg);
+                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", (int)inverted_zoom + 237 /* 0xed */, MOX::_global_cache_seg);
                 MOX::_hl_monster_ship_icon_seg[inverted_zoom] = seg;
                 return seg;
             } else {
-                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int)inverted_zoom + 237 /* 0xed */, MOX::_global_cache_seg);
+                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", (int)inverted_zoom + 237 /* 0xed */, MOX::_global_cache_seg);
                 MOX::_monster_ship_seg[inverted_zoom] = seg;
                 return seg;
             }
@@ -395,11 +395,11 @@ namespace SHIPS {
             int index = (int)zoom_level + antaran_idx * 4;
 
             if (is_highlighted != 0) {
-                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, index + 241 /* 0xf1 */, MOX::_global_cache_seg);
+                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", index + 241 /* 0xf1 */, MOX::_global_cache_seg);
                 MOX::_hl_antaran_ship_icon_seg[index] = seg;
                 return seg;
             } else {
-                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, index + 241 /* 0xf1 */, MOX::_global_cache_seg);
+                s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", index + 241 /* 0xf1 */, MOX::_global_cache_seg);
                 MOX::_antaran_ship_icons[index] = seg;
                 return seg;
             }

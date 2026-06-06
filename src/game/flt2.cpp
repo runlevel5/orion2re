@@ -604,7 +604,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     
     fonts::Print_(0x12, EBP_y, HAROLD::H_Message_(0x99));
     
-    const char* sign1 = (attack_bonus >= 0) ? s_plus_00551118 : "";
+    const char* sign1 = (attack_bonus >= 0) ? "+" : "";
     sprintf(buffer, "%s%d", sign1, attack_bonus);
     fonts::Print_Right_(0x85, EBP_y, buffer);
     
@@ -618,7 +618,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         }
         fonts::Print_(0xAD, EBP_y, str_9a);
         
-        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : "";
+        const char* sign2 = (defense_bonus >= 0) ? "+" : "";
         sprintf(buffer, "%s%d", sign2, defense_bonus);
         fonts::Print_(w + 0xAD, EBP_y, buffer);
     } else {
@@ -630,7 +630,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         
         fonts::Print_(0x12, EBP_y, str_9a);
         
-        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : "";
+        const char* sign2 = (defense_bonus >= 0) ? "+" : "";
         sprintf(buffer, "%s%d", sign2, defense_bonus);
         
         if (w < 0x73) {

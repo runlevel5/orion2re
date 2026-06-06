@@ -133,7 +133,7 @@ namespace MAINSCR {
         int32_t final_index = (int32_t)result_ax;
 
         MOX::_star_seg[final_index] = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
-            s_BUFFER0_LBX,
+            "BUFFER0.LBX",
             final_index + 148,
             MOX::_global_cache_seg
         ));
@@ -533,7 +533,7 @@ namespace MAINSCR {
         int16_t max_icon_height = 0;
 
         if (has_portal) {
-            s_animation_header* portal_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
+            s_animation_header* portal_pic = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", zoom_offset + 19, MOX::_global_cache_seg);
             MOX::_gate_icon_seg[zoom_offset] = portal_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[0], portal_pic);
             int16_t h = animate::Get_Height_(portal_pic);
@@ -544,7 +544,7 @@ namespace MAINSCR {
         }
 
         if (has_artemis) {
-            s_animation_header* artemis_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
+            s_animation_header* artemis_pic = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", zoom_offset + 31, MOX::_global_cache_seg);
             MOX::_gate_icon_seg[12 + zoom_offset] = artemis_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[icon_count], artemis_pic);
             int16_t h = animate::Get_Height_(artemis_pic);
@@ -753,19 +753,19 @@ namespace MAINSCR {
 
         Draw_Paralax_();
 
-        MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+        MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("BUFFER0.LBX", 0, MOX::_global_cache_seg));
         animate::Draw_(0, 0, MOX::_main_screen_seg);
 
         Draw_Wormhole_Links_();
         Draw_Relocation_Links_();
 
         if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-            MOX::_mainscrn_diplo_lights_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
+            MOX::_mainscrn_diplo_lights_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("BUFFER0.LBX", 0xD, MOX::_global_cache_seg));
             animate::Draw_(415, 0, MOX::_mainscrn_diplo_lights_seg);
         }
 
         if (MOX::_game_type == 2 || MOX::_game_type == 3 || MOX::_game_type == 1) {
-            MOX::_mainscrn_plyr_done_lights_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
+            MOX::_mainscrn_plyr_done_lights_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("BUFFER0.LBX", 0xD, MOX::_global_cache_seg));
             animate::Draw_(74, 0, MOX::_mainscrn_plyr_done_lights_seg);
         }
 
@@ -1132,8 +1132,8 @@ namespace MAINSCR {
                 MOX::_moveable_box[i].close_btn = -1000;
             }
 
-            _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, s_plus_00551118, 0x28);
-            _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, s_minus_0055111c, 0x28);
+            _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, "+", 0x28);
+            _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, "-", 0x28);
             _whole_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0x29);
             return;
         }
@@ -4146,13 +4146,13 @@ namespace MAINSCR {
     void __cdecl Load_Reply_To_Diplomacy_Request_Popup_() {
         allocate::Push_Block_(MOX::_screen_seg);
 
-        MOX::_diplomacy_request_popup_seg = (s_animation_header*)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x0f, MOX::_screen_seg);
+        MOX::_diplomacy_request_popup_seg = (s_animation_header*)farload::Far_Reload_Next_("BUFFER0.LBX", 0x0f, MOX::_screen_seg);
 
-        MOX::_diplomacy_request_accept_seg = (s_animation_header*)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x10, MOX::_screen_seg);
+        MOX::_diplomacy_request_accept_seg = (s_animation_header*)farload::Far_Reload_Next_("BUFFER0.LBX", 0x10, MOX::_screen_seg);
 
-        MOX::_diplomacy_request_invoke_seg = (s_animation_header*)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x11, MOX::_screen_seg);
+        MOX::_diplomacy_request_invoke_seg = (s_animation_header*)farload::Far_Reload_Next_("BUFFER0.LBX", 0x11, MOX::_screen_seg);
 
-        MOX::_diplomacy_request_wait_seg = (s_animation_header*)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x12, MOX::_screen_seg);
+        MOX::_diplomacy_request_wait_seg = (s_animation_header*)farload::Far_Reload_Next_("BUFFER0.LBX", 0x12, MOX::_screen_seg);
     }
 
     void __cdecl Add_Reply_To_Diplomacy_Request_Fields_(
@@ -4174,7 +4174,7 @@ namespace MAINSCR {
             button_top,
             s__00551100,
             MOX::_diplomacy_request_accept_seg,
-            s_A_00557ed4,
+            "A",
             0x28
         );
 

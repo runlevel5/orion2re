@@ -58,7 +58,7 @@ namespace DIP_SCRN {
     extern const char s_DIPLOMSG_LBX[];
     extern const char s_DIPLOMSE_LBX[];
 
-    char* __cdecl An_(char* text);
+    const char* __cdecl An_(char* text);
 
     int8_t __cdecl Diplomacy_Message_Is_Interactive_(int16_t msg_id);
 

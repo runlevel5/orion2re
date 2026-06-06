@@ -172,7 +172,7 @@ namespace MAINMENU {
 
     void __cdecl Load_Mainmenu_Load_Game_Popup_() {
         s_game_anims* anims = LOADSAVE::_game_anims;
-        const char* lbx = PTR_s_GAME_LBX_0055ac4c;
+        const char* lbx = "GAME.LBX";
         void* seg = MOX::_screen_seg;
 
         anims->pictures[11] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x14, seg);

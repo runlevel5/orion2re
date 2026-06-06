@@ -1175,7 +1175,7 @@ namespace raceopt {
             0x01C0,
             "",
             (s_animation_header*)raceopt::_accept_button_seg,
-            s_a,
+            "a",
             0x0028);
         raceopt::_defalt = fields::Add_Button_Field_(
             0x004C,

@@ -55,19 +55,19 @@ namespace FLEETPOP {
         int16_t bottom_height;
 
         if (MOX::_fleet_box.is_small_frame == 0) {
-            MOX::_fleet_box_name_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
+            MOX::_fleet_box_name_lg_seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x33, MOX::_global_cache_seg);
             MOX::_fleet_box.name_seg = MOX::_fleet_box_name_lg_seg;
             name_height = animate::Get_Height_(MOX::_fleet_box.name_seg);
 
-            MOX::_fleet_box.bottom_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
+            MOX::_fleet_box.bottom_seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x37, MOX::_global_cache_seg);
             MOX::_fleet_box_bottom_lg_seg = MOX::_fleet_box.bottom_seg;
         }
         else {
-            MOX::_fleet_box_name_sm_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+            MOX::_fleet_box_name_sm_seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x34, MOX::_global_cache_seg);
             MOX::_fleet_box.name_seg = MOX::_fleet_box_name_sm_seg;
             name_height = animate::Get_Height_(MOX::_fleet_box.name_seg);
 
-            MOX::_fleet_box.bottom_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+            MOX::_fleet_box.bottom_seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x38, MOX::_global_cache_seg);
             MOX::_fleet_box_bottom_sm_seg = MOX::_fleet_box.bottom_seg;
         }
 
@@ -75,7 +75,7 @@ namespace FLEETPOP {
 
         int16_t grid_height;
         if (fleet_count > 9) {
-            MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
+            MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x35, MOX::_global_cache_seg);
             grid_height = animate::Get_Height_(MOX::_fleet_box_grid_lg_seg);
         }
         else {
@@ -202,7 +202,7 @@ int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type) {
     }
 
     if (grid_type == 3) {
-        MOX::_fleet_box_grid_sm_seg4 = buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x36, MOX::_global_cache_seg);
+        MOX::_fleet_box_grid_sm_seg4 = buffer::Buffer_Reload_("BUFFER0.LBX", 0x36, MOX::_global_cache_seg);
         return animate::Get_Height_((s_animation_header*)MOX::_fleet_box_grid_sm_seg4);
     }
 
@@ -864,7 +864,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     *current_y = start_y;
 
     s_animation_header* top_frame =
-            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x34, MOX::_global_cache_seg);
     animate::Draw_(left_x, *current_y, top_frame);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(top_frame));
 
@@ -883,7 +883,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     video::Clip_On_();
 
     MOX::_fleet_box_grid_sm_seg4 =
-            buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x36, MOX::_global_cache_seg);
+            buffer::Buffer_Reload_("BUFFER0.LBX", 0x36, MOX::_global_cache_seg);
     animate::Draw_(left_x, *current_y, (s_animation_header*)MOX::_fleet_box_grid_sm_seg4);
 
     MISC::Restore_Window_Status_(saved_window_status);
@@ -891,7 +891,7 @@ void __cdecl Draw_Small_Fleet_Box_Frame_(
     *current_y = static_cast<int16_t>(*current_y + grid_height);
 
     s_animation_header* bottom_frame =
-            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x38, MOX::_global_cache_seg);
     animate::Draw_(left_x, *current_y, bottom_frame);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(bottom_frame));
 }
@@ -906,11 +906,11 @@ void __cdecl Fleet_Box_Data_(int16_t ship_count) {
         MOX::_fleet_box.is_small_frame = 0;
 
         MOX::_fleet_box_bottom_lg_seg =
-            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x37, MOX::_global_cache_seg);
         MOX::_fleet_box.bottom_seg = MOX::_fleet_box_bottom_lg_seg;
 
         MOX::_fleet_box_name_lg_seg =
-            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x33, MOX::_global_cache_seg);
         MOX::_fleet_box.x = MOX::_moveable_box[2].x;
         MOX::_fleet_box.y = MOX::_moveable_box[2].y;
         MOX::_fleet_box.name_seg = MOX::_fleet_box_name_lg_seg;
@@ -919,7 +919,7 @@ void __cdecl Fleet_Box_Data_(int16_t ship_count) {
         MOX::_fleet_box.height = Fleet_Box_Height_(ship_count);
 
         MOX::_fleet_box_grid_lg_seg =
-            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x35, MOX::_global_cache_seg);
         MOX::_fleet_box.map_height = animate::Get_Height_(MOX::_fleet_box_grid_lg_seg);
 
         MOX::_fleet_box.field9_0x10 = static_cast<int16_t>(
@@ -928,11 +928,11 @@ void __cdecl Fleet_Box_Data_(int16_t ship_count) {
         MOX::_fleet_box.is_small_frame = 1;
 
         MOX::_fleet_box_bottom_sm_seg =
-            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x38, MOX::_global_cache_seg);
         MOX::_fleet_box.bottom_seg = MOX::_fleet_box_bottom_sm_seg;
 
         MOX::_fleet_box_name_sm_seg =
-            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x34, MOX::_global_cache_seg);
         MOX::_fleet_box.name_seg = MOX::_fleet_box_name_sm_seg;
 
         Set_Fleet_Movement_Box_Dimensions_(ship_count);
@@ -1263,21 +1263,21 @@ void __cdecl Draw_Large_Fleet_Box_Frame_(
     MISC::Restore_Window_Status_(window_status);
 
     segment = (s_animation_header*)buffer::Buffer_Reload_(
-            ::s_BUFFER0_LBX,
+            "BUFFER0.LBX",
             0x33,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, segment);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(segment));
 
     MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(
-            ::s_BUFFER0_LBX,
+            "BUFFER0.LBX",
             0x35,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, MOX::_fleet_box_grid_lg_seg);
     *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(MOX::_fleet_box_grid_lg_seg));
 
     segment = (s_animation_header*)buffer::Buffer_Reload_(
-            ::s_BUFFER0_LBX,
+            "BUFFER0.LBX",
             0x37,
             MOX::_global_cache_seg);
     animate::Draw_(frame_left, *current_y, segment);
@@ -1306,21 +1306,21 @@ void __cdecl Buffer_Reload_Fleetpop_Frame_() {
     s_animation_header* seg;
 
     if (MOX::_fleet_box.is_small_frame == 0) {
-        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x37, MOX::_global_cache_seg);
         MOX::_fleet_box_bottom_lg_seg = seg;
         MOX::_fleet_box.bottom_seg = seg;
 
-        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x33, MOX::_global_cache_seg);
         MOX::_fleet_box_name_lg_seg = seg;
         MOX::_fleet_box.name_seg = seg;
         return;
     }
 
-    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+    seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x38, MOX::_global_cache_seg);
     MOX::_fleet_box_bottom_sm_seg = seg;
     MOX::_fleet_box.bottom_seg = seg;
 
-    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+    seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x34, MOX::_global_cache_seg);
     MOX::_fleet_box_name_sm_seg = seg;
     MOX::_fleet_box.name_seg = seg;
 }

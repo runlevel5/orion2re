@@ -764,7 +764,7 @@ namespace MULTPLAY {
             y + 0x7A,
             x + 0x3B + animate::Get_Width_(anim),
             y + 0x7A + animate::Get_Height_(anim),
-            s_M_00557ed8,
+            "M",
             0x28 /* 40 */
         );
 
@@ -775,7 +775,7 @@ namespace MULTPLAY {
             y + 0x9B,
             x + 0x3B + animate::Get_Width_(anim),
             y + 0x9B + animate::Get_Height_(anim),
-            DAT_00558540,
+            "U",
             0x28 /* 40 */
         );
 
@@ -832,7 +832,7 @@ namespace MULTPLAY {
             y + 0x5B,
             s__00551100,
             MOX::_mp_screen->anim_btn_next,
-            s_S_005569cc,
+            "S",
             0x28 /* 40 */
         );
 
@@ -855,7 +855,7 @@ namespace MULTPLAY {
                 y + 0x9B,
                 s__00551100,
                 MOX::_mp_screen->anim_btn_back,
-                DAT_0055aa90,
+                "J",
                 0x28 /* 40 */
             );
         }
@@ -2480,7 +2480,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             MOX::_mp_screen->screen_y + 106,
             s__00551100,
             MOX::_mp_screen->anim_btn_begin,
-            s_S_005569cc,
+            "S",
             40
         );
     }
@@ -2530,7 +2530,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 MOX::_mp_screen->screen_y + combined_h + 1,
                 s__00551100,
                 MOX::_mp_screen->anim_btn_begin,
-                s_S_005569cc,
+                "S",
                 40
             );
             MOX::_mp_screen->field_id_begin = field_id;
