@@ -23,7 +23,7 @@ namespace platform {
 
 	extern HWND g_main_window;
 
-	extern bool g_pending_toggle_pages;
+	extern volatile bool g_pending_toggle_pages;
 
 	extern int16_t g_video_mode;
 
