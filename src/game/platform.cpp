@@ -21,7 +21,7 @@ namespace platform {
 	uint8_t g_should_exit;
 	LPDIRECTDRAW g_direct_draw;
 	HWND g_main_window;
-	bool g_pending_toggle_pages;
+	volatile bool g_pending_toggle_pages;
 	int16_t g_video_mode;
 	uint32_t g_available_mem;
 	LPDIRECTDRAWSURFACE g_primary_surface;
