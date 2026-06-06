@@ -1,0 +1,48 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "win32-debug",
+      "displayName": "Win32 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "win32-release",
+      "displayName": "Win32 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "win32-debug",
+      "configurePreset": "win32-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win32-release",
+      "configurePreset": "win32-release",
+      "configuration": "Release"
+    }
+  ]
+}

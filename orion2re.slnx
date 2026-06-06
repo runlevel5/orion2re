@@ -1,9 +1,0 @@
-<Solution>
-  <Configurations>
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Project Path="orion2re.vcxproj" Id="1c5e872e-3a4c-4482-b618-2390f707502f">
-    <Platform Solution="Debug|x64" Project="Win32" />
-  </Project>
-</Solution>

@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(MSVC AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(FATAL_ERROR "This project only supports 32-bit MSVC Windows builds. Reconfigure with -A Win32.")
+endif()
+
 project(orion2re LANGUAGES CXX)
 
 file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
@@ -22,17 +26,11 @@ if(MSVC)
     target_compile_options(orion2re PRIVATE /W3 /permissive-)
     target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
 
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        target_precompile_headers(orion2re PRIVATE
-            "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<CONFIG:Debug>>>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
-        )
-    else()
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         target_precompile_headers(orion2re PRIVATE
             "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
         )
-    endif()
 
-    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set_property(TARGET orion2re PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
         target_compile_definitions(orion2re PRIVATE
@@ -65,8 +63,16 @@ if(MSVC)
                 "${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
                 "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
             COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
-            COMMAND "${ORION2RE_LIB_TOOL}" /def:"${CMAKE_CURRENT_SOURCE_DIR}/smackw32.def" /machine:x86 /name:SMACKW32.DLL /out:"${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
-            COMMAND "${ORION2RE_LIB_TOOL}" /def:"${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def" /machine:x86 /name:DPLAYX.DLL /out:"${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+            COMMAND "${ORION2RE_LIB_TOOL}"
+                "/def:${CMAKE_CURRENT_SOURCE_DIR}/smackw32.def"
+                /machine:x86
+                /name:SMACKW32.DLL
+                "/out:${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
+            COMMAND "${ORION2RE_LIB_TOOL}"
+                "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
+                /machine:x86
+                /name:DPLAYX.DLL
+                "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
             DEPENDS
                 "${CMAKE_CURRENT_SOURCE_DIR}/smackw32.def"
                 "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
@@ -94,8 +100,6 @@ if(MSVC)
             $<$<CONFIG:Debug>:/NXCOMPAT:NO>
             $<$<CONFIG:Release>:/DEBUG>
         )
-    elseif(WIN32)
-        target_link_options(orion2re PRIVATE $<$<CONFIG:Release>:/DEBUG>)
     endif()
 elseif(WIN32)
     message(WARNING "The CMake conversion preserves the original Visual Studio/MSVC-specific Windows build behavior; non-MSVC Windows builds may need additional link setup.")
