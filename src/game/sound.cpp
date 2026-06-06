@@ -20,11 +20,11 @@ namespace sound {
     uint8_t _soundErrorOccurred;
     MMRESULT _soundTimerId;
     uint8_t _soundTimerActive;
-    uint32_t _soundTimerRunning = 1;
-    uint32_t _soundTimerStopFlag;
+    volatile uint32_t _soundTimerRunning = 1;
+    volatile uint32_t _soundTimerStopFlag;
     void* _soundBuffer;
     uint32_t _soundBufferSize;
-    uint32_t _soundTimerLock;
+    volatile uint32_t _soundTimerLock;
     void* _streamBuffer1;
     void* _streamBuffer2;
     uint8_t _soundFxActive;

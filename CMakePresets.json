@@ -31,6 +31,34 @@
         "value": "x86",
         "strategy": "external"
       }
+    },
+    {
+      "name": "win32-release-pdb",
+      "displayName": "Win32 Release + PDB",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_RELEASE_DEBUG_INFO": "ON"
+      },
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "win32-debug-asan",
+      "displayName": "Win32 Debug (ASan)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      },
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      }
     }
   ],
   "buildPresets": [
@@ -43,6 +71,16 @@
       "name": "win32-release",
       "configurePreset": "win32-release",
       "configuration": "Release"
+    },
+    {
+      "name": "win32-release-pdb",
+      "configurePreset": "win32-release-pdb",
+      "configuration": "Release"
+    },
+    {
+      "name": "win32-debug-asan",
+      "configurePreset": "win32-debug-asan",
+      "configuration": "Debug"
     }
   ]
 }

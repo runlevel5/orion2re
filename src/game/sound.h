@@ -15,15 +15,15 @@ namespace sound {
 
     extern uint8_t _soundTimerActive;
 
-    extern uint32_t _soundTimerRunning;
+    extern volatile uint32_t _soundTimerRunning;
 
-    extern uint32_t _soundTimerStopFlag;
+    extern volatile uint32_t _soundTimerStopFlag;
 
     extern void* _soundBuffer;
 
     extern uint32_t _soundBufferSize;
 
-    extern uint32_t _soundTimerLock;
+    extern volatile uint32_t _soundTimerLock;
 
     extern void* _streamBuffer1;
 

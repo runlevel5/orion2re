@@ -17,6 +17,19 @@ namespace graphics {
             strings::Swap_Short_(&y1, &y2);
         }
 
+        const int16_t max_x = (int16_t)(video::g_screen_res_x - 1);
+        const int16_t max_y = (int16_t)(video::g_screen_res_y - 1);
+
+        if (x1 > max_x || x2 < 0 || y1 > max_y || y2 < 0) {
+            platform::Unlock_Appropriate_Render_Buffer();
+            return;
+        }
+
+        if (x1 < 0) x1 = 0;
+        if (y1 < 0) y1 = 0;
+        if (x2 > max_x) x2 = max_x;
+        if (y2 > max_y) y2 = max_y;
+
         if (animate::_clipping_flag == 1) {
             if (x1 >= video::_screen_window_x2 || x2 <= video::_screen_window_x1 ||
                 y1 >= video::_screen_window_y2 || y2 <= video::_screen_window_y1) {

@@ -6,6 +6,24 @@ endif()
 
 project(orion2re LANGUAGES CXX)
 
+set(ORION2RE_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../moo2")
+
+option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported MSVC debug builds" OFF)
+option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
+
+if(ORION2RE_ENABLE_ASAN AND NOT MSVC)
+    message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is only supported with MSVC builds.")
+endif()
+
+if(MSVC AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_OUTPUT_DIR}")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_OUTPUT_DIR}")
+    set(CMAKE_PDB_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_OUTPUT_DIR}")
+    set(CMAKE_PDB_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_OUTPUT_DIR}")
+    set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_OUTPUT_DIR}")
+    set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_OUTPUT_DIR}")
+endif()
+
 file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
@@ -44,13 +62,19 @@ if(MSVC)
             $<$<CONFIG:Debug>:/GS>
             $<$<CONFIG:Release>:/Gy>
             $<$<CONFIG:Release>:/Oi>
-            $<$<CONFIG:Release>:/GS->
+            $<$<CONFIG:Release>:/GS>
+            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zi>
+            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
         )
 
-        set_target_properties(orion2re PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../../moo2"
-            RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/../../moo2"
-        )
+        if(ORION2RE_ENABLE_ASAN)
+            if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+                message(FATAL_ERROR "ORION2RE_ENABLE_ASAN requires a Debug build.")
+            endif()
+
+            target_compile_options(orion2re PRIVATE /fsanitize=address)
+            target_link_options(orion2re PRIVATE /INFERASANLIBS /fsanitize=address)
+        endif()
 
         set(ORION2RE_IMPORT_LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/import-libs")
         set(ORION2RE_LIB_TOOL "${CMAKE_LIB}")
@@ -96,8 +120,8 @@ if(MSVC)
         )
 
         target_link_options(orion2re PRIVATE
-            $<$<CONFIG:Debug>:/DYNAMICBASE:NO>
-            $<$<CONFIG:Debug>:/NXCOMPAT:NO>
+            /DYNAMICBASE
+            /NXCOMPAT
             $<$<CONFIG:Release>:/DEBUG>
         )
     endif()

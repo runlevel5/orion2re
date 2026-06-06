@@ -32,7 +32,7 @@ namespace COLBLDG {
     int16_t _refitting_ship_n;
     int16_t _building_fields[54];
     uint8_t* _desc_record_ptr;
-    uint8_t _colony_auto_building;
+    int16_t _colony_auto_building;
     int16_t _fields[11];
     char _g_msg[800];
     s_animation_header* _colsum_pal_anim;

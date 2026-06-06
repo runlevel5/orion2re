@@ -376,8 +376,28 @@ namespace fonts {
     }
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, int8_t c) {
+        const int16_t advance = x + (int16_t)_font_header.font_style_widths[(int16_t)c] + _font_header.font_style_spacing;
         uint32_t res_x = (uint32_t)platform::Lock_Appropriate_Render_Buffer();
         video::g_screen_res_x = (int32_t)res_x;
+
+        if (x < 0 ||
+            y < 0 ||
+            x + _font_header.font_style_widths[(int16_t)c] > video::g_screen_res_x ||
+            y + _font_header.font_style_height > video::g_screen_res_y)
+        {
+            platform::Unlock_Appropriate_Render_Buffer();
+
+            if (x >= video::g_screen_res_x ||
+                y >= video::g_screen_res_y ||
+                x + _font_header.font_style_widths[(int16_t)c] <= 0 ||
+                y + _font_header.font_style_height <= 0)
+            {
+                return advance;
+            }
+
+            Print_Character_Clipped_(x, y, c);
+            return advance;
+        }
 
         uint8_t* dest_ptr = (uint8_t*)video::_current_video_page + ((int32_t)y * res_x) + x;
 
@@ -386,19 +406,35 @@ namespace fonts {
 
         Print_Character_ASM_(dest_ptr, glyph_ptr, _font_header.selected_colors.colors, (uint32_t)_font_header.current_height);
 
-        int16_t char_width = (int16_t)_font_header.font_style_widths[(int16_t)c];
-        int16_t total_width = char_width + _font_header.font_style_spacing;
-        int16_t next_x = x + total_width;
-
         platform::Unlock_Appropriate_Render_Buffer();
 
-        return next_x;
+        return advance;
     }
 
     int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character) {
+        const int16_t advance = x + (int16_t)_font_header.font_style_widths[(int32_t)character] + _font_header.font_style_spacing;
         video::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
 
         int32_t char_idx = (int32_t)character;
+
+        if (x < 0 ||
+            y < 0 ||
+            x + _font_header.font_style_widths[char_idx] > video::g_screen_res_x ||
+            y + _font_header.font_style_height > video::g_screen_res_y)
+        {
+            platform::Unlock_Appropriate_Render_Buffer();
+
+            if (x >= video::g_screen_res_x ||
+                y >= video::g_screen_res_y ||
+                x + _font_header.font_style_widths[char_idx] <= 0 ||
+                y + _font_header.font_style_height <= 0)
+            {
+                return advance;
+            }
+
+            Print_Character_Clipped_(x, y, (int8_t)character);
+            return advance;
+        }
 
         int32_t pixel_offset = (int32_t)y * (int32_t)video::g_screen_res_x + (int32_t)x;
         uint8_t* dest_ptr = (uint8_t*)video::_current_video_page + pixel_offset;
@@ -412,11 +448,9 @@ namespace fonts {
             (int)_font_header.current_height
         );
 
-        int16_t updated_x = x + (int16_t)_font_header.font_style_widths[char_idx] + _font_header.font_style_spacing;
-
         platform::Unlock_Appropriate_Render_Buffer();
 
-        return updated_x;
+        return advance;
     }
 
     void __cdecl Print_String_To_Bitmap_(int16_t x, int16_t y, const char* string, int16_t color_flags, int16_t max_width, s_animation_header* bitmap) {

@@ -66,7 +66,7 @@ namespace COLBLDG {
     extern int16_t _colony_bldg_saved_screen;
     extern int16_t _scanned_prod;
     extern int16_t _refitting_ship_n;
-    extern uint8_t _colony_auto_building;
+    extern int16_t _colony_auto_building;
     extern int16_t _fields[11];
     extern s_colors _l_font_color_array;
     extern s_colors _l_font_dim_color_array;
