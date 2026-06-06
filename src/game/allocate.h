@@ -101,4 +101,20 @@ namespace allocate {
     /// @param size Requested payload size in bytes.
     /// @return Pointer to the first sub-block payload after its header.
     void* __cdecl Allocate_First_Block_(void* block, uint32_t size);
+
+    /// Returns the payload size needed when a header-backed sub-block will later be reused
+    /// as a no-header pool for allocation mode 1 reloads.
+    /// @param size Requested no-header payload size in bytes.
+    /// @return Padded payload size that can satisfy one Allocate_First_Block_No_Header_ request.
+    constexpr uint32_t Nested_No_Header_Pool_Size_(uint32_t size) {
+        return (size & 1u) != 0 ? ((size & 0xFFFFFFFCu) + 4u) : size;
+    }
+
+    /// Allocates a header-backed sub-block sized for later reuse as a no-header pool.
+    /// @param block Pool base pointer previously returned by this allocator.
+    /// @param size Requested no-header payload size in bytes.
+    /// @return Pointer to the first sub-block payload after its header.
+    inline void* Allocate_Next_Block_For_No_Header_Pool_(void* block, uint32_t size) {
+        return Allocate_Next_Block_(block, Nested_No_Header_Pool_Size_(size));
+    }
 }

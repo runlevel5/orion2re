@@ -802,7 +802,7 @@ namespace INFO {
             _g_header_p->items[0].current_app_index = 0;
         }
 
-        text_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
+        text_buffer = allocate::Allocate_Next_Block_For_No_Header_Pool_(MOX::_screen_seg, sizeof(s_help_record));
         _g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 150));
         _g_bitmap2_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 48));
 
@@ -1012,7 +1012,7 @@ namespace INFO {
         INFO::_g_category_header.items = items;
         uint32_t bmp_size = bitmap::Get_Bitmap_Size_(190, 314);
         INFO::_g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
-        record_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
+        record_buffer = allocate::Allocate_Next_Block_For_No_Header_Pool_(MOX::_screen_seg, sizeof(s_help_record));
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
         int count = farload::Get_Farload_Data_Record_Count_(lbx_name, INFO::_g_reference_ix);
