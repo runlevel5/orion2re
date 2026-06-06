@@ -17,7 +17,7 @@ namespace NETSTART {
 
     extern char s_myname_005597dc[7];
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, char* str1, char* str2);
+    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, const char* game_name, int32_t max_players, const char* str1, const char* str2);
 
     bool __cdecl Do_Dial_(char* phone_number);
 

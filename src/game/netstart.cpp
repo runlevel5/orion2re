@@ -265,8 +265,8 @@ namespace NETSTART {
     uint8_t __cdecl Join_Net_Screen_() {
         uint8_t result = 0;
         uint8_t fade_status;
-        char* empty_str = const_cast<char*>("");
-        char* myname_str = s_myname_005597dc;
+        const char* empty_str = "";
+        const char* myname_str = s_myname_005597dc;
 
         NETMOX::_net.sync_state = 5;
 
@@ -376,7 +376,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, const_cast<char*>(""), s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -681,7 +681,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, const_cast<char*>(""), s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -883,7 +883,7 @@ namespace NETSTART {
         return 1;
     }
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, char* str1, char* str2) {
+    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, const char* game_name, int32_t max_players, const char* str1, const char* str2) {
         RUSS::Mox_Update_();
         int32_t result = netcode::Net_Create_Game_(guid, game_name, max_players, str1, str2);
         RUSS::Mox_Update_();

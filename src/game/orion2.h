@@ -1575,7 +1575,7 @@ struct s_field_button {
     int16_t field0_0x0;
     int16_t field2_0x2;
     struct s_colors *highlight_color;
-    char *help;
+    const char *help;
     int16_t help_start;
     undefined field6_0xe;
     undefined field7_0xf;
@@ -1619,7 +1619,7 @@ struct s_field_string_list {
     int16_t gradient_mode;
     int16_t is_selectable;
     struct s_colors *highlight_color;
-    char *help;
+    const char *help;
     int16_t help_start;
     undefined2 field5_0xe;
     int8_t *value;
@@ -1634,7 +1634,7 @@ struct s_field_radio {
     undefined field1_0x1;
     int16_t is_active;
     struct s_colors *highlight_color;
-    char *help;
+    const char *help;
     int16_t value;
     undefined field6_0xe;
     undefined field7_0xf;
@@ -1675,7 +1675,7 @@ struct s_field_multi_hotkey {
     int16_t field0_0x0;
     int16_t field2_0x2;
     struct s_colors *highlight_color;
-    char *help;
+    const char *help;
     int16_t help_start;
     undefined field6_0xe;
     undefined field7_0xf;

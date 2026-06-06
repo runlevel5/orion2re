@@ -1201,7 +1201,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                             exit_loop = true;
                         }
                     } else {
-                        char* fmt = const_cast<char*>(HAROLD::H_Message_(0xFD /* HESTR_0FD_SAVE_D_IS_NOT_A_VALID_ */));
+                        const char* fmt = HAROLD::H_Message_(0xFD /* HESTR_0FD_SAVE_D_IS_NOT_A_VALID_ */);
                         sprintf(warning_msg, fmt, i);
                         GENDRAW::Warning_Box_(warning_msg);
                         result = -1;
@@ -2110,7 +2110,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             }
 
             if (is_host != 0 && MOX::_mp_screen->field_id_begin == input_field_id) {
-                char* msg = const_cast<char*>(HAROLD::H_Message_(0xF5 /* HESTR_0F5_READY_TO_START_A_NETWO */));
+                const char* msg = HAROLD::H_Message_(0xF5 /* HESTR_0F5_READY_TO_START_A_NETWO */);
                 if (GENDRAW::Do_Confirmation_Box_(msg) != 0) {
                     result = 1;
                     exit_loop = true;

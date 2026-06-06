@@ -272,7 +272,7 @@ namespace fields {
 
         field->x = x;
         field->y = y;
-        field->detail.button.help = const_cast<char*>(help);
+        field->detail.button.help = help;
 
         field->x_end = field->x + animate::Get_Width_(pic) - 1;
         field->y_end = field->y + animate::Get_Height_(pic) - 1;
@@ -392,7 +392,7 @@ namespace fields {
         return current_index;
     }
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound) {
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound) {
         char buffer[80];
 
         if (_max_fields_count < _fields_count) {
@@ -560,7 +560,7 @@ namespace fields {
         field->hotkey = '\0';
         field->field_type = FIELD_TYPE_MULTI_HOTKEY;
 
-        field->detail.multi_hotkey.help = const_cast<char*>(help_text);
+        field->detail.multi_hotkey.help = help_text;
         field->detail.multi_hotkey.help_start = 0;
         field->detail.multi_hotkey.help_len = (short)strlen(help_text);
 
@@ -660,7 +660,7 @@ namespace fields {
         int16_t x,
         int16_t y,
         int16_t width,
-        char* help,
+        const char* help,
         int16_t is_selectable,
         int8_t* value,
         int16_t help_start,
@@ -669,8 +669,8 @@ namespace fields {
         int32_t gradient_extra,
         s_animation_header* gradient_pic,
         int32_t unused_param_12,
-        char* hotkey_str,
-        char* unused_param_14
+        const char* hotkey_str,
+        const char* unused_param_14
     ) {
         int16_t index = _fields_count;
 
@@ -781,7 +781,7 @@ namespace fields {
         _exit_the_list_field = 1;
     }
 
-    int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, char* hotkey, int8_t sound) {
+    int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, const char* hotkey, int8_t sound) {
         int32_t max_x = center_x + radius;
         int32_t min_x = center_x - radius;
         int32_t min_y = center_y - radius;
@@ -1426,9 +1426,9 @@ namespace fields {
     }
 
     int16_t __cdecl Get_List_Field_(
-        int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size,
+        int16_t x, int16_t y, int16_t width, const char* help, const char* list_ptr, int32_t item_size,
         int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette,
-        int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, char* unused_param_14)
+        int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, const char* unused_param_14)
     {
         _list_field_on = 1;
         Set_Input_Delay_(1);

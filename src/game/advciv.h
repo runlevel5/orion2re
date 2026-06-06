@@ -3,6 +3,10 @@
 
 namespace ADVCIV {
     extern int8_t* _star_colony_owner;
+    extern int8_t* _planet_selected_flag;
+    extern s_adv_civ_player* _adv_civ_player;
+    extern s_parsec* _parsec;
+    extern s_adv_planet_worth* _planet_worth_to_player;
 
     /** Returns whether another player owns a colony at the specified star.
      * @param player_idx Player to exclude from the ownership check.
@@ -20,13 +24,6 @@ namespace ADVCIV {
 
     /** Invokes the advanced-civilization fleet setup placeholder for each player. */
     void __cdecl Assign_Advanced_Civilization_Starting_Ships_();
-
-    extern int8_t* _planet_selected_flag;
-    extern s_adv_civ_player* _adv_civ_player;
-
-    extern s_parsec* _parsec;
-
-    extern s_adv_planet_worth* _planet_worth_to_player;
 
     /** Fills the inter-star distance table used during colony selection.
      * @param parsec_distances Output buffer of per-star parsec distances.

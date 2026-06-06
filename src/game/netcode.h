@@ -49,7 +49,7 @@ namespace netcode {
      * @param password Optional session password.
      * @param player_name Local player display name.
      */
-    int32_t __cdecl Net_Join_Game_(char* game_name, char* password, char* player_name);
+    int32_t __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name);
 
     /** Shuts down the active networking backend and releases session state. */
     void __cdecl Net_Uninit_();
@@ -95,5 +95,5 @@ namespace netcode {
      * @param password Optional session password.
      * @param player_name Local player display name.
      */
-    int32_t __cdecl Net_Create_Game_(GUID guid, char* name, int32_t max_players, char* password, char* player_name);
+    int32_t __cdecl Net_Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name);
 }

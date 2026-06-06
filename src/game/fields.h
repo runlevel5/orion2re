@@ -93,7 +93,7 @@ namespace fields {
     // Type 13 irregular buttons reuse the button payload, but the two legacy short
     // fields at detail+0x1c/+0x20 are alternate sprite draw coordinates rather than
     // help metadata.
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound);
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
     int16_t __cdecl Check_Multi_Hot_Key_Fields_(int16_t hotkey);
@@ -124,7 +124,7 @@ namespace fields {
     // The payload stores the shared selection pointer plus this field's selected value.
     int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t button_value, const char* hotkey, int8_t sound);
 
-    int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, char* hotkey, int8_t sound);
+    int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int8_t sound);
 
@@ -210,7 +210,7 @@ namespace fields {
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int8_t sound);
 
     // Type 10 list rows store a per-row selectability flag at detail+0x2.
-    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t is_selectable, int8_t* value, int16_t help_start, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_12, char* hotkey_str, char* unused_param_14);
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, const char* help, int16_t is_selectable, int8_t* value, int16_t help_start, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_12, const char* hotkey_str, const char* unused_param_14);
 
     void __cdecl Mark_Fields_();
 
@@ -225,5 +225,5 @@ namespace fields {
      * item_size: Byte stride between records.
      * selected_index: In/out selected row index.
      */
-    int16_t __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size, int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, char* unused_param_14);
+    int16_t __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, const char* help, const char* list_ptr, int32_t item_size, int8_t* selected_index, uint8_t* item_flags, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_13, const char* unused_param_14);
 }

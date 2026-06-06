@@ -1146,12 +1146,12 @@ namespace MAINSCR {
         _zoom_in_button = fields::Add_Button_Field_(244, 428, "", MOX::_main_zoom_in_button_seg, "+", 0x28);
         _zoom_out_button = fields::Add_Button_Field_(244, 455, "", MOX::_main_zoom_out_button_seg, "-", 0x28);
 
-        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, const_cast<char*>(""), MOX::_main_colonies_button_seg, 0, 425, "C", 0x28);
-        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, const_cast<char*>(""), MOX::_main_planets_button_seg, 0, 425, "P", 0x28);
-        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, const_cast<char*>(""), MOX::_main_fleets_button_seg, 0, 425, "F", 0x28);
-        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, const_cast<char*>(""), MOX::_main_leaders_button_seg, 306, 425, "L", 0x28);
-        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, const_cast<char*>(""), MOX::_main_races_button_seg, 306, 425, "R", 0x28);
-        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, const_cast<char*>(""), MOX::_main_info_button_seg, 306, 425, "I", 0x28);
+        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, "", MOX::_main_colonies_button_seg, 0, 425, "C", 0x28);
+        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, "", MOX::_main_planets_button_seg, 0, 425, "P", 0x28);
+        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, "", MOX::_main_fleets_button_seg, 0, 425, "F", 0x28);
+        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, "", MOX::_main_leaders_button_seg, 306, 425, "L", 0x28);
+        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, "", MOX::_main_races_button_seg, 306, 425, "R", 0x28);
+        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, "", MOX::_main_info_button_seg, 306, 425, "I", 0x28);
 
         _treasury_window_field = fields::Add_Hidden_Field_(545, 49, 613, 119, "", 0x29);
         _command_points_window_field = fields::Add_Hidden_Field_(545, 122, 613, 192, "", 0x29);
@@ -2287,7 +2287,7 @@ namespace MAINSCR {
             int16_t adjusted_radius = (radius / 2) - 2;
 
             MOX::_star_button[star_idx] = fields::Add_Clipped_Circle_Field_(
-                x_coord, y_coord, adjusted_radius, const_cast<char*>(""), '\0'
+                x_coord, y_coord, adjusted_radius, "", '\0'
             );
         }
     }
@@ -2808,10 +2808,10 @@ namespace MAINSCR {
         case 0: /* DI = -1010 */
             if (MOX::_disallow_saves_code == 0) {
                 FILEDEF::Save_Game_(9);
-                strcpy(msg_buffer, const_cast<char*>(HAROLD::H_Message_(211 /* HESTR_0D3_GAME_SAVED */)));
+                strcpy(msg_buffer, HAROLD::H_Message_(211 /* HESTR_0D3_GAME_SAVED */));
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
             } else {
-                strcpy(msg_buffer, const_cast<char*>(HAROLD::H_Message_(212 /* HESTR_0D4_SAVE_GAME_FUNCTION_DIS */)));
+                strcpy(msg_buffer, HAROLD::H_Message_(212 /* HESTR_0D4_SAVE_GAME_FUNCTION_DIS */));
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
             }
             break;
@@ -2865,7 +2865,7 @@ namespace MAINSCR {
                 }
             } else {
                 int16_t msg_id = (reloc_count == 1) ? 209 /* 0xD1 */ : 210 /* 0xD2 */;
-                strcpy(msg_buffer, const_cast<char*>(HAROLD::H_Message_(msg_id)));
+                strcpy(msg_buffer, HAROLD::H_Message_(msg_id));
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
             }
             break;

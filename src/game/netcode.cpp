@@ -96,12 +96,12 @@ namespace netcode {
         return (int32_t)netcode::_tpSending;
     }
 
-    int32_t __cdecl Net_Join_Game_(char* game_name, char* password, char* player_name) {
+    int32_t __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name) {
         uint32_t found_idx = 0xffffffff;
 
         if (WINNET::_session_count != 0) {
             for (uint32_t i = 0; i < WINNET::_session_count; ++i) {
-                char* name = Net_Get_Game_Name_(i);
+                const char* name = Net_Get_Game_Name_(i);
                 if (strcmp(game_name, name) == 0) {
                     found_idx = i;
                     break;
@@ -279,7 +279,7 @@ namespace netcode {
         return status;
     }
 
-    int32_t __cdecl Net_Create_Game_(GUID guid, char* name, int32_t max_players, char* password, char* player_name) {
+    int32_t __cdecl Net_Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name) {
         DPSESSIONDESC session_desc;
         DPID player_id;
 
@@ -312,7 +312,7 @@ namespace netcode {
         WINNET::Create_Player_(&player_id, player_name, "");
         WINNET::_local_player_id = player_id;
 
-        comcore::ComInit_(0x1c2, name, _recv_fn);
+        comcore::ComInit_(0x1c2, const_cast<char*>(name), _recv_fn);
 
         _netInitialized = 1;
         return 1;

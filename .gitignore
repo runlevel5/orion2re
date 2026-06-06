@@ -3,4 +3,5 @@ orion2re/
 .vocode/data/
 .vocode/sessions/
 Release
+build/
 /headers.md

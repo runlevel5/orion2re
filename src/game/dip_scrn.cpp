@@ -2349,7 +2349,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_LF_(4);
 
         current_selection = 0;
-        result = fields::Get_List_Field_(10, 102, 245, list_title, (char*)_diplomacy_list_choice, 50, &current_selection, enabled_flags, 17, 0, 0, nullptr, 0, 0);
+        result = fields::Get_List_Field_(10, 102, 245, list_title, (const char*)_diplomacy_list_choice, 50, &current_selection, enabled_flags, 17, 0, 0, nullptr, 0, 0);
 
         MOX::_star_bg_seg = saved_bg_seg;
         COLONY::_using_colony_screen_palette = 0;
