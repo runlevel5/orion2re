@@ -577,7 +577,7 @@ namespace DIP_SCRN {
 
             field_cancel = fields::Add_Hidden_Field_(15, 139, 157, 162, "C", 0);
             field_goodbye = fields::Add_Hidden_Field_(15, 165, 157, 188, "G", 0);
-            hotkey_space = fields::Add_Hot_Key_(s__00551120);
+            hotkey_space = fields::Add_Hot_Key_("\x1B");
 
             input_field = fields::Get_Input_();
 

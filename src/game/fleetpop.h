@@ -4,6 +4,8 @@
 struct s_fleet_box;
 
 namespace FLEETPOP {
+    void __cdecl Fleet_Movement_Scroll_Callback();
+
     bool __cdecl Set_Attack_Antares_Button_Flag_(void);
 
     int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count);

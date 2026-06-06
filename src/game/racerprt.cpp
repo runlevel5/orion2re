@@ -84,7 +84,7 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     /* fmtpara: '\n' inserts paragraph breaks between the treaty headings and their race-name lists. */
     sprintf(acStack_100, "%s\n%s\n%s\n%s", acStack_318, acStack_200, acStack_2a8, acStack_280);
 
-    INFO::_g_exit_field = fields::Add_Button_Field_(0x216, 0x1B1, s__00551100, screen_anims[1], s__00551120, '(');
+    INFO::_g_exit_field = fields::Add_Button_Field_(0x216, 0x1B1, "", screen_anims[1], "\x1B", '(');
 
     MOX::_first_time = 1;
 

@@ -119,7 +119,7 @@ namespace COMBAT1 {
             MOX::_flee_button = -100;
             MOX::_wait_button = -100;
             MOX::_done_button = -100;
-            info_hotkey = s__00551120;
+            info_hotkey = "\x1B";
             info_y_coord = 301;
         }
 
@@ -414,7 +414,7 @@ namespace COMBAT1 {
                                             MOX::_super_fast_flag = 0;
                                         }
                                         fields::Clear_Fields_();
-                                        MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+                                        MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
                                         if (MOX::_net_flag != 0) {
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
@@ -785,7 +785,7 @@ namespace COMBAT1 {
                                                     break;
                                                 case 10008:
                                                     fields::Clear_Fields_();
-                                                    MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+                                                    MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
                                                     if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_attacker_player) {
                                                         MOX::_auto_combat_flag[0] = 1 - MOX::_auto_combat_flag[0];
                                                         MOX::_auto_combat = MOX::_auto_combat_flag[0];
@@ -1322,7 +1322,7 @@ namespace COMBAT1 {
                     local_y - 16,
                     local_x - 8,
                     local_y - 8,
-                    s__00551100,
+                    "",
                     0
                 );
 

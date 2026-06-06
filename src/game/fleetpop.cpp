@@ -3,6 +3,41 @@
 namespace FLEETPOP {
     uint8_t _n_added_buttons;
 
+    void __cdecl Fleet_Movement_Scroll_Callback() {
+        int16_t thumb_height = MOX::_fltpop_scroll_bar.thumb_height_px;
+        int16_t track_len = MOX::_fltpop_scroll_bar.track_len_px;
+        int16_t thumb_y = MOX::_fltpop_scroll_bar.thumb_center_y;
+
+        int16_t start_y = static_cast<int16_t>(
+            MOX::_fleet_box.y +
+            MOX::_moveable_box[2].content_offset_y +
+            track_len -
+            (thumb_height / 2) -
+            thumb_y +
+            0x43);
+
+        int16_t end_y = static_cast<int16_t>(start_y + track_len);
+        int16_t x = static_cast<int16_t>(MOX::_fleet_box.x + MOX::_moveable_box[2].content_offset_x + 0xC0);
+        uint8_t color = 0x74;
+
+        for (int16_t i = 0; i < 9; ++i) {
+            line::Line_(x, start_y, x, end_y, color);
+
+            if ((i % 2) == 0) {
+                --color;
+            }
+
+            ++x;
+        }
+
+        s_animation_header* scroll_anim =
+            static_cast<s_animation_header*>(buffer::Buffer_Reload_("BUFFER0.LBX", 0x39, MOX::_global_cache_seg));
+        animate::Draw_(
+            static_cast<int16_t>(MOX::_fleet_box.x + MOX::_moveable_box[2].content_offset_x + 0xBD),
+            static_cast<int16_t>(MOX::_fleet_box.y + MOX::_moveable_box[2].content_offset_y + 0x42),
+            scroll_anim);
+    }
+
     void __cdecl Draw_Damage_Bars_(int16_t x, int16_t y, int16_t width, int16_t y_offset, int16_t x_offset, int16_t ship_idx) {
         int16_t effective_width = width - 4;
         int16_t draw_x = x_offset + x;

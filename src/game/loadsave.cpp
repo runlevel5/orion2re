@@ -185,20 +185,20 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(_game_anims->pictures[0]);
 
             if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                _game_popup_fields->btn_main_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[2], "L", '(');
-                _game_popup_fields->btn_main_new_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[3], "N", '(');
+                _game_popup_fields->btn_main_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x2b, "", _game_anims->pictures[2], "L", '(');
+                _game_popup_fields->btn_main_new_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x58, "", _game_anims->pictures[3], "N", '(');
             } else {
                 _game_popup_fields->btn_main_load_id = -1000;
                 _game_popup_fields->btn_main_new_id = -1000;
             }
 
-            _game_popup_fields->btn_main_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[1], "S", '(');
-            _game_popup_fields->btn_main_quit_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[4], "Q", '(');
-            _game_popup_fields->btn_main_options_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], "O", '(');
-            _game_popup_fields->btn_main_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[6], s__00551120, '(');
+            _game_popup_fields->btn_main_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, "", _game_anims->pictures[1], "S", '(');
+            _game_popup_fields->btn_main_quit_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, "", _game_anims->pictures[4], "Q", '(');
+            _game_popup_fields->btn_main_options_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, "", _game_anims->pictures[5], "O", '(');
+            _game_popup_fields->btn_main_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, "", _game_anims->pictures[6], "\x1B", '(');
 
-            _music_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xc2, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->music_level, s__00551100, '\0');
-            _sfx_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xd8, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->sound_fx_level, s__00551100, '\0');
+            _music_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xc2, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->music_level, "", '\0');
+            _sfx_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xd8, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->sound_fx_level, "", '\0');
             break;
         }
         case 1: {
@@ -212,12 +212,12 @@ namespace LOADSAVE {
                 int16_t bx = MOX::_popup_base_x + 0x1a;
                 int16_t by = MOX::_popup_base_y + 0x29 + offset_y;
                 s_animation_header* pic = _game_anims->pictures[9];
-                _game_popup_fields->option_names[i] = fields::Add_Hidden_Field_(bx, by, animate::Get_Width_(pic) + bx, animate::Get_Height_(pic) + by, s__00551100, '(');
+                _game_popup_fields->option_names[i] = fields::Add_Hidden_Field_(bx, by, animate::Get_Width_(pic) + bx, animate::Get_Height_(pic) + by, "", '(');
 
-                _game_popup_fields->option_toggles[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
+                _game_popup_fields->option_toggles[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, "", ')');
                 offset_y += 0x11;
             }
-            _game_popup_fields->btn_settings_accept_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], "A", '(');
+            _game_popup_fields->btn_settings_accept_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, "", _game_anims->pictures[10], "A", '(');
             break;
         }
         case 2:
@@ -260,10 +260,10 @@ namespace LOADSAVE {
                         memcpy(MOX::_save_game_description[i].description, "* INVALID *", sizeof("* INVALID *"));
                     }
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
-                    _game_popup_fields->saved_game_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, MOX::_popup_base_y + 0x18 + i * 0x1f, MOX::_popup_base_x + 0xe2, MOX::_popup_base_y + 0x18 + i * 0x1f + 0x18, s__00551100, ')');
+                    _game_popup_fields->saved_game_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, MOX::_popup_base_y + 0x18 + i * 0x1f, MOX::_popup_base_x + 0xe2, MOX::_popup_base_y + 0x18 + i * 0x1f + 0x18, "", ')');
                 }
                 _game_popup_fields->debug_hotspot_id = fields::Add_Hidden_Field_(0x275, 0x1d5, 0x27f, 0x1df, "D", '3');
-                _game_popup_fields->btn_popup_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, s__00551100, _game_anims->pictures[0xc], "L", '(');
+                _game_popup_fields->btn_popup_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, "", _game_anims->pictures[0xc], "L", '(');
             } else {
                 for (int16_t i = 0; i < 10; ++i) {
                     fonts::Set_Font_Style_(2, &colors_style);
@@ -276,20 +276,20 @@ namespace LOADSAVE {
                 for (int16_t i = 0; i < 10; ++i) {
                     int16_t y_start = MOX::_popup_base_y + 0x18 + i * 0x1f;
                     int16_t font_h = fonts::Get_Font_Height_();
-                    _game_popup_fields->save_slot_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, y_start + font_h + 1, MOX::_popup_base_x + 0xf4, y_start + font_h * 2, s__00551100, ')');
+                    _game_popup_fields->save_slot_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, y_start + font_h + 1, MOX::_popup_base_x + 0xf4, y_start + font_h * 2, "", ')');
                 }
                 _game_popup_fields->debug_hotspot_id = -1000;
-                _game_popup_fields->btn_popup_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], "S", '(');
+                _game_popup_fields->btn_popup_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, "", _game_anims->pictures[0xf], "S", '(');
             }
-            _game_popup_fields->btn_popup_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xd], "C", '(');
+            _game_popup_fields->btn_popup_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, "", _game_anims->pictures[0xd], "C", '(');
             break;
         }
         default:
             break;
         }
 
-        _game_popup_fields->field_space = fields::Add_Hidden_Field_(MOX::_popup_base_x, MOX::_popup_base_y, *out_x + MOX::_popup_base_x, *out_y + MOX::_popup_base_y, s__00551100, '\0');
-        _game_popup_fields->screen_cancel_field_id = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, ')');
+        _game_popup_fields->field_space = fields::Add_Hidden_Field_(MOX::_popup_base_x, MOX::_popup_base_y, *out_x + MOX::_popup_base_x, *out_y + MOX::_popup_base_y, "", '\0');
+        _game_popup_fields->screen_cancel_field_id = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, "\x1B", ')');
     }
 
     /**
@@ -316,7 +316,7 @@ namespace LOADSAVE {
         if (!from_menu) {
             EVANHELP::Set_Load_Game_Screen_Help_List_();
             fields::Clear_Fields_();
-            MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41));
+            MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41));
         }
 
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
@@ -415,7 +415,7 @@ namespace LOADSAVE {
 
         EVANHELP::Set_Options_Game_Screen_Help_List_();
         fields::Clear_Fields_();
-        int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29);
+        int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "\x1B", 0x29);
         MOX::_global_var = (int8_t)hidden_field;
 
         fields::Clear_Fields_();
@@ -476,7 +476,7 @@ namespace LOADSAVE {
         EVANHELP::Set_Save_Game_Screen_Help_List_();
         fields::Clear_Fields_();
 
-        MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, 0x29);
+        MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, "\x1B", 0x29);
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
         Add_Game_Popup_Fields_(&sStack_6c, &sStack_6a);

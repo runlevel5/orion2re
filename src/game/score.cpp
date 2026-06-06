@@ -539,12 +539,12 @@ namespace SCORE {
 
         int16_t y = 131;
         for (int i = 0; i < 10; ++i) {
-            int16_t handle = fields::Add_Hidden_Field_(139, y, 155, y + 22, s__00551100, 0);
+            int16_t handle = fields::Add_Hidden_Field_(139, y, 155, y + 22, "", 0);
             _hi->entry_field_handles[i] = handle;
             y += 29;
         }
 
-        _hi->screen_field_handle = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+        _hi->screen_field_handle = fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41);
 
         Get_Hall_Of_Fame_Colors_();
 
@@ -1021,7 +1021,7 @@ namespace SCORE {
      * @address 0x004e2750
      */
     void __cdecl Add_Hi_Score_Screen_Fields_() {
-        _hi->screen_field_handle = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+        _hi->screen_field_handle = fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41);
     }
 
     /**

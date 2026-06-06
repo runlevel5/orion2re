@@ -558,17 +558,17 @@ namespace INFO {
 
         current_tab = Get_Plyr_Info_Btns_();
 
-        _g_exit_field = fields::Add_Button_Field_(0x217, 0x1B2, s__00551100, info_lbx[2], s__00551120, '(');
+        _g_exit_field = fields::Add_Button_Field_(0x217, 0x1B2, "", info_lbx[2], "\x1B", '(');
 
         for (int i = 0; i < 5; ++i) {
             fields::Add_Multi_Button_Field_(
                 _sub_scr_field[i * 2],
                 _sub_scr_field[i * 2 + 1],
-                s__00551100,
+                "",
                 info_lbx[3 + i],
                 &current_tab,
                 i,
-                s__00551100,
+                "",
                 0x29
             );
         }
@@ -818,17 +818,17 @@ namespace INFO {
             field_multi_last = fields::Add_Multi_Button_Field_(
                 _tech_rev_field[i * 2],
                 _tech_rev_field[i * 2 + 1],
-                s__00551100,
+                "",
                 anims[i + 4],
                 &_tech_review_tab_index,
                 i,
-                s__00551100,
+                "",
                 40
             );
         }
 
-        field_up = fields::Add_Button_Field_(410, 65, s__00551100, anims[2], s__00551120, 40);
-        field_down = fields::Add_Button_Field_(410, 395, s__00551100, anims[3], s__00551120, 40);
+        field_up = fields::Add_Button_Field_(410, 65, "", anims[2], "\x1B", 40);
+        field_down = fields::Add_Button_Field_(410, 395, "", anims[3], "\x1B", 40);
 
         JIM::Get_Text_Message_("billtext.lbx", 6, billtext, 40);
         fonts::Print_Centered_(416, 31, billtext);
@@ -1050,9 +1050,9 @@ namespace INFO {
         }
 
         LIST::Init_List_Data_(&INFO::_g_category_header);
-        int16_t close_btn_id = fields::Add_Button_Field_(386, 427, s__00551100, anims[21], s__00551100, '(');
-        int16_t up_btn_id = fields::Add_Button_Field_(398, 96, s__00551100, anims[14], s__00551120, '(');
-        int16_t down_btn_id = fields::Add_Button_Field_(398, 396, s__00551100, anims[15], s__00551120, '(');
+        int16_t close_btn_id = fields::Add_Button_Field_(386, 427, "", anims[21], "", '(');
+        int16_t up_btn_id = fields::Add_Button_Field_(398, 96, "", anims[14], "\x1B", '(');
+        int16_t down_btn_id = fields::Add_Button_Field_(398, 396, "", anims[15], "\x1B", '(');
 
         fields::Assign_Auto_Function_(INFO::Draw_Reference_Category_Subscreen_, 2);
         INFO::_g_reference_screen_type = 0;
@@ -2025,8 +2025,8 @@ namespace INFO {
         int16_t down_button = 0;
 
         if (msg_count > 0) {
-            up_button = fields::Add_Button_Field_(0x250, 0x54, s__00551100, anim_data[0xe], s__00551120, '(');
-            down_button = fields::Add_Button_Field_(0x250, 0x18b, s__00551100, anim_data[0xf], s__00551120, '(');
+            up_button = fields::Add_Button_Field_(0x250, 0x54, "", anim_data[0xe], "\x1B", '(');
+            down_button = fields::Add_Button_Field_(0x250, 0x18b, "", anim_data[0xf], "\x1B", '(');
 
             _g_turn_header.items = list_items;
             Init_Turn_Summary_List_(&_g_turn_header, msg_count);

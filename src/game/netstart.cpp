@@ -113,7 +113,7 @@ namespace NETSTART {
         }
 
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, const_cast<char*>(s__00551100), 0);
+        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, "", 0);
 
         NETMOX::_net.sync_state = 7;
         message_buffer = (int32_t)selection;
@@ -265,7 +265,7 @@ namespace NETSTART {
     uint8_t __cdecl Join_Net_Screen_() {
         uint8_t result = 0;
         uint8_t fade_status;
-        char* empty_str = s__00551100;
+        char* empty_str = const_cast<char*>("");
         char* myname_str = s_myname_005597dc;
 
         NETMOX::_net.sync_state = 5;
@@ -376,7 +376,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, s__00551100, s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, const_cast<char*>(""), s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -681,7 +681,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, s__00551100, s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, const_cast<char*>(""), s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -702,7 +702,7 @@ namespace NETSTART {
         }
 
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
 
         fields::Assign_Auto_Function_(SCORE::nullsub, 2);
 
@@ -719,7 +719,7 @@ namespace NETSTART {
         int16_t choose_result = MULTPLAY::Choose_Network_Plyrs_Screen_(&payload.begin_state, status, 0, 1);
         
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
 
         if (choose_result == -1) {
             NETMOX::_net.sync_state = 0;

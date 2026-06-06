@@ -49,7 +49,7 @@ namespace MAINSCR {
         s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
 
         char* surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
-        const char* bc_sign = (plr->surplus_bc < 0) ? s__00551100 : "+";
+        const char* bc_sign = (plr->surplus_bc < 0) ? "" : "+";
         sprintf(buffer, "%s%s %s", bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
         int16_t bc_style = MISC::Get_Font_Style_();
@@ -73,7 +73,7 @@ namespace MAINSCR {
         fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
 
         surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
-        bc_sign = (plr->surplus_bc < 0) ? s__00551100 : "+";
+        bc_sign = (plr->surplus_bc < 0) ? "" : "+";
         sprintf(buffer, "%s%s %s", bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
         bc_style = MISC::Get_Font_Style_();
@@ -95,7 +95,7 @@ namespace MAINSCR {
         fonts::Print_Centered_(579, fonts::Get_Font_Height_() + 96, buffer);
 
         int16_t cp_surplus = plr->command_points - plr->command_points_used;
-        const char* cp_sign = (cp_surplus < 0) ? s__00551100 : "+";
+        const char* cp_sign = (cp_surplus < 0) ? "" : "+";
         sprintf(buffer, "%s%d (%d)", cp_sign, (int)cp_surplus, (int)plr->command_points);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 0);
         int16_t current_style = (int16_t)fonts::_current_font_style;
@@ -129,7 +129,7 @@ namespace MAINSCR {
 
         fonts::Get_Font_Height_();
         char* food_comma = MISC::Get_Comma_String_(plr->surplus_food);
-        const char* food_sign = (plr->surplus_food < 0) ? s__00551100 : "+";
+        const char* food_sign = (plr->surplus_food < 0) ? "" : "+";
         sprintf(buffer, "%s%s", food_sign, food_comma);
         if (plr->surplus_food < 0) {
             MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
@@ -144,7 +144,7 @@ namespace MAINSCR {
         }
         fonts::Print_Centered_(579, 255, buffer);
 
-        const char* fr_sign = (plr->surplus_freighters < 0) ? s__00551100 : "+";
+        const char* fr_sign = (plr->surplus_freighters < 0) ? "" : "+";
         sprintf(buffer, "%s%d (%d)", fr_sign, (int)plr->surplus_freighters, (int)plr->n_freighters);
         MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
         int16_t fr_style = MISC::Get_Font_Style_();

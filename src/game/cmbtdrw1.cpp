@@ -1583,13 +1583,13 @@ skip_cursor:
         fields::Assign_Auto_Function_(Draw_Board_Popup_, 1);
         fields::Clear_Fields_();
 
-        fields::Add_Scroll_Field_(0xbb, 0xf9, min_val, max_val + 1, min_val, max_val, 0xcf, 0xd, (short*)&_g_var, s__00551100, 0);
+        fields::Add_Scroll_Field_(0xbb, 0xf9, min_val, max_val + 1, min_val, max_val, 0xcf, 0xd, (short*)&_g_var, "", 0);
 
-        int16_t btn_left = fields::Add_Button_Field_(0xa4, 0xfd, s__00551100, _board_left_button_seg, s__00551100, 0);
-        int16_t btn_right = fields::Add_Button_Field_(0x196, 0xfd, s__00551100, _board_right_button_seg, s__00551100, 0);
-        int16_t btn_raid = fields::Add_Button_Field_(0xa3, 0x111, s__00551100, _board_raid_button_seg, s__00551100, 0);
-        int16_t btn_capture = fields::Add_Button_Field_(0x159, 0x111, s__00551100, _board_capture_button_seg, s__00551100, 0);
-        int16_t btn_cancel = fields::Add_Hot_Key_(s__00551120);
+        int16_t btn_left = fields::Add_Button_Field_(0xa4, 0xfd, "", _board_left_button_seg, "", 0);
+        int16_t btn_right = fields::Add_Button_Field_(0x196, 0xfd, "", _board_right_button_seg, "", 0);
+        int16_t btn_raid = fields::Add_Button_Field_(0xa3, 0x111, "", _board_raid_button_seg, "", 0);
+        int16_t btn_capture = fields::Add_Button_Field_(0x159, 0x111, "", _board_capture_button_seg, "", 0);
+        int16_t btn_cancel = fields::Add_Hot_Key_("\x1B");
 
         video::Set_Page_Off_();
         Draw_Board_Popup_();

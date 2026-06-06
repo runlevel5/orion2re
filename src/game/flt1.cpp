@@ -1393,12 +1393,13 @@ namespace FLT1 {
                 }
             }
 
+            /* fmtpara \x1A0 restores left alignment before each recovered-technology line. */
             for (int i = 0; i < num_acquired; i++) {
                 uint16_t tech_id = got_tech_apps[i];
                 if (tech_id != 0) {
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_id], tech_id);
 
-                    strcat(message, s_0_0055110c);
+                    strcat(message, "\x1A" "0");
                     strcat(message, "^ ");
                     strcat(message, TECHDATA::_technology_applications[tech_id].name);
                     strcat(message, string::s_Newline);

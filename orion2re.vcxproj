@@ -110,7 +110,6 @@
     <ClCompile Include="src\game\fmtpara.cpp" />
     <ClCompile Include="src\game\fontdraw.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
-    <ClCompile Include="src\game\funcs.cpp" />
     <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\global.cpp" />
@@ -218,6 +217,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\dplay.h" />
     <ClInclude Include="src\game\advciv.h" />
     <ClInclude Include="src\game\aibomb.h" />
     <ClInclude Include="src\game\aibuild.h" />
@@ -364,7 +364,6 @@
     <ClInclude Include="src\game\palstore.h" />
     <ClInclude Include="src\game\paragrph.h" />
     <ClInclude Include="src\game\platform.h" />
-    <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\plntsum.h" />
     <ClInclude Include="src\game\racecust.h" />
     <ClInclude Include="src\game\raceopt.h" />

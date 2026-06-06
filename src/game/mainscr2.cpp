@@ -25,7 +25,7 @@ namespace MAINSCR2 {
         fields::Clear_Fields_();
 
         // Screen bounds are 640x480 (0..639, 0..479)
-        fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41);
 
         fields::Disable_Draw_All_Fields_();
         video::Set_Page_Off_();
@@ -197,11 +197,11 @@ namespace MAINSCR2 {
         video::Clip_Off_();
         graphics::Reset_Window_();
 
-        int16_t hotkey = fields::Add_Hot_Key_(s__00551120);
-        int16_t starmap_field = fields::Add_Hidden_Field_(22, 22, 506, 400, s__00551100, 41);
+        int16_t hotkey = fields::Add_Hot_Key_("\x1B");
+        int16_t starmap_field = fields::Add_Hidden_Field_(22, 22, 506, 400, "", 41);
 
         bool done = false;
-        int16_t full_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+        int16_t full_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
 
         fields::Assign_Auto_Function_(Draw_Main_Screen_For_Star_Distan, 2);
 

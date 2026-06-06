@@ -747,7 +747,8 @@ namespace COLGCBT {
 
         int16_t y_pos = (*row * 11) + 0x32;
 
-        sprintf(text_buf, ESTRINGS::E_Strings_(0x4B), s_0_0055110c, label, s_1_00551110, value);
+        /* fmtpara \x1A0/\x1A1 switch the inserted label/value runs to left and right justification. */
+        sprintf(text_buf, ESTRINGS::E_Strings_(0x4B), "\x1A" "0", label, "\x1A" "1", value);
 
         FMTPARA::Print_Formatted_Paragraph_(x_pos + 9, y_pos, 0xF3, text_buf, 0);
 

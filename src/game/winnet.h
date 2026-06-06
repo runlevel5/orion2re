@@ -72,7 +72,7 @@ namespace WINNET {
      * @param player_name Display name stored for the player.
      * @param event_str Event string stored for the player.
      */
-    void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str);
+    void __cdecl Register_Player_(uint32_t player_id, const char* player_name, const char* event_str);
 
     /**
      * Creates the local DirectPlay player and caches it locally.
@@ -80,7 +80,7 @@ namespace WINNET {
      * @param friendly_name Friendly player name passed to DirectPlay.
      * @param formal_name Formal player name passed to DirectPlay.
      */
-    void __cdecl Create_Player_(DPID* pid, char* friendly_name, char* formal_name);
+    void __cdecl Create_Player_(DPID* pid, const char* friendly_name, const char* formal_name);
 
     /**
      * Processes an incoming create-player packet.

@@ -131,8 +131,8 @@ namespace TURNSUM {
             fields::Clear_Fields_();
             fields::Assign_Auto_Function_(TURNSUM::Draw_Turn_Summary_Popup_, 2);
 
-            int16_t field_btn_up = fields::Add_Button_Field_(0x1B9, 0x5F, s__00551100, scroll_up_button_image, s__00551100, 0);
-            int16_t field_btn_down = fields::Add_Button_Field_(0x1B9, 0x161, s__00551100, scroll_down_button_image, s__00551100, 0);
+            int16_t field_btn_up = fields::Add_Button_Field_(0x1B9, 0x5F, "", scroll_up_button_image, "", 0);
+            int16_t field_btn_down = fields::Add_Button_Field_(0x1B9, 0x161, "", scroll_down_button_image, "", 0);
 
             _g_turn_sum_header.items = list_items;
             INFO::Init_Turn_Summary_List_(&_g_turn_sum_header, num_msgs);
@@ -148,9 +148,9 @@ namespace TURNSUM {
                 INFO::_g_first_list_field = fields::Get_Field_Counter_();
                 INFO::_g_last_list_field = LIST::Add_Fields_To_List_Page_(&_g_turn_sum_header);
 
-                int16_t field_btn_ok = fields::Add_Button_Field_(0xF2, 0x176, s__00551100, ok_button_image, s__00551120, 0);
-                fields::Add_Hidden_Field_(0x54, 0x33, 0x1D0, 0x189, s__00551120, 0);
-                int16_t field_hidden_bg = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0);
+                int16_t field_btn_ok = fields::Add_Button_Field_(0xF2, 0x176, "", ok_button_image, "\x1B", 0);
+                fields::Add_Hidden_Field_(0x54, 0x33, 0x1D0, 0x189, "\x1B", 0);
+                int16_t field_hidden_bg = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "\x1B", 0);
 
                 animate::Draw_(0x54, 0x33, popup_background_anim);
                 LIST::Display_List_Page_(&_g_turn_sum_header);

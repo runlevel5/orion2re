@@ -198,7 +198,7 @@ namespace TECH {
 
         if (changing_tech == 1) {
             accept_btn_id = fields::Add_Button_Field_(
-                _g_scrn_x + 0xBD, _g_scrn_y + 0x1C4, s__00551100, tech_select_lbx_images[8], s__00551120, '('
+                _g_scrn_x + 0xBD, _g_scrn_y + 0x1C4, "", tech_select_lbx_images[8], "\x1B", '('
             );
             MOX::_cur_plyr_ptr->current_research_field = 0;
             Init_Entry_Positions_(entries);
@@ -220,7 +220,7 @@ namespace TECH {
             _g_last_tech_field = fields::Add_Hidden_Field_(
                 entries[i].x - 2, entries[i].y + 18,
                 entries[i].x + 215, entries[i].y + 99,
-                s__00551100, 0
+                "", 0
             );
         }
 
@@ -240,7 +240,7 @@ namespace TECH {
 
         last_btn_field = fields::Get_Field_Counter_() - 1;
 
-        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
+        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "", 0);
 
         _g_entries_p = entries;
 
@@ -454,10 +454,10 @@ namespace TECH {
                 items[i].button_field_id = fields::Add_Radio_Button_Field_(
                     TECH::_tech_button_pos[i * 2] + TECH::_g_scrn_x,
                     TECH::_tech_button_pos[i * 2 + 1] + TECH::_g_scrn_y,
-                    s__00551100,
+                    "",
                     images[i],
                     &items[i].button_value,
-                    s__00551100,
+                    "",
                     40
                 );
                 items[i].button_image = images[i];
@@ -567,7 +567,7 @@ namespace TECH {
                             _tech_field_y1[visible_app_count] + item->y + 0x15,
                             item->x + 0xDA,
                             _tech_field_y2[visible_app_count] + item->y + 0x15,
-                            s__00551100,
+                            "",
                             0
                         );
                         ++visible_app_count;
@@ -582,7 +582,7 @@ namespace TECH {
                         _tech_field_y1[0] + item->y + 0x15,
                         item->x + 0xDA,
                         _tech_field_y2[0] + item->y + 0x15,
-                        s__00551100,
+                        "",
                         0
                     );
                     ++visible_app_count;
@@ -599,7 +599,7 @@ namespace TECH {
                     _tech_field_y1[0] + item->y + 0x15,
                     item->x + 0xDA,
                     _tech_field_y2[0] + item->y + 0x15,
-                    s__00551100,
+                    "",
                     0
                 );
                 item->visible_app_count = 1;
@@ -885,8 +885,8 @@ namespace TECH {
         Get_Group_List_(&_g_tech_list_header, entry->id);
         LIST::Init_List_Data_(&_g_tech_list_header);
 
-        button_1_id = fields::Add_Button_Field_(win_x + 0xF7, 0x4D, s__00551100, pic, s__00551100, 0);
-        button_2_id = fields::Add_Button_Field_(win_x + 0xF8, 0x18E, s__00551100, pic_00, s__00551100, 0);
+        button_1_id = fields::Add_Button_Field_(win_x + 0xF7, 0x4D, "", pic, "", 0);
+        button_2_id = fields::Add_Button_Field_(win_x + 0xF8, 0x18E, "", pic_00, "", 0);
         start_field = fields::Get_Field_Counter_();
         fields::Assign_Auto_Function_(Draw_Tech_List_, 4);
 
@@ -917,8 +917,8 @@ namespace TECH {
             fields::Clear_Fields_Above_(clear_field);
             list_bottom_field = LIST::Add_Fields_To_List_Page_(&_g_tech_list_header);
 
-            hidden_field_1 = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0);
-            fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
+            hidden_field_1 = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "\x1B", 0);
+            fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "", 0);
 
             timer::Release_Time_(4);
 

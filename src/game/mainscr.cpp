@@ -1132,32 +1132,32 @@ namespace MAINSCR {
                 MOX::_moveable_box[i].close_btn = -1000;
             }
 
-            _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, "+", 0x28);
-            _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, "-", 0x28);
-            _whole_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0x29);
+            _zoom_in_button = fields::Add_Button_Field_(244, 428, "", MOX::_main_zoom_in_button_seg, "+", 0x28);
+            _zoom_out_button = fields::Add_Button_Field_(244, 455, "", MOX::_main_zoom_out_button_seg, "-", 0x28);
+            _whole_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0x29);
             return;
         }
 
         MOVEBOX::Moveable_Box_Selected_(2);
         _whole_screen_field = (int16_t)0xfc18;
 
-        _game_button = fields::Add_Button_Field_(249, 5, s__00551100, MOX::_main_game_button_seg, "G", 0x29);
-        _next_button = fields::Add_Button_Field_(544, 441, s__00551100, MOX::_main_next_button_seg, "T", 0x28);
-        _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, "+", 0x28);
-        _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, "-", 0x28);
+        _game_button = fields::Add_Button_Field_(249, 5, "", MOX::_main_game_button_seg, "G", 0x29);
+        _next_button = fields::Add_Button_Field_(544, 441, "", MOX::_main_next_button_seg, "T", 0x28);
+        _zoom_in_button = fields::Add_Button_Field_(244, 428, "", MOX::_main_zoom_in_button_seg, "+", 0x28);
+        _zoom_out_button = fields::Add_Button_Field_(244, 455, "", MOX::_main_zoom_out_button_seg, "-", 0x28);
 
-        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, s__00551100, MOX::_main_colonies_button_seg, 0, 425, "C", 0x28);
-        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, s__00551100, MOX::_main_planets_button_seg, 0, 425, "P", 0x28);
-        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, s__00551100, MOX::_main_fleets_button_seg, 0, 425, "F", 0x28);
-        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, s__00551100, MOX::_main_leaders_button_seg, 306, 425, "L", 0x28);
-        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, s__00551100, MOX::_main_races_button_seg, 306, 425, "R", 0x28);
-        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, s__00551100, MOX::_main_info_button_seg, 306, 425, "I", 0x28);
+        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, const_cast<char*>(""), MOX::_main_colonies_button_seg, 0, 425, "C", 0x28);
+        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, const_cast<char*>(""), MOX::_main_planets_button_seg, 0, 425, "P", 0x28);
+        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, const_cast<char*>(""), MOX::_main_fleets_button_seg, 0, 425, "F", 0x28);
+        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, const_cast<char*>(""), MOX::_main_leaders_button_seg, 306, 425, "L", 0x28);
+        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, const_cast<char*>(""), MOX::_main_races_button_seg, 306, 425, "R", 0x28);
+        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, const_cast<char*>(""), MOX::_main_info_button_seg, 306, 425, "I", 0x28);
 
-        _treasury_window_field = fields::Add_Hidden_Field_(545, 49, 613, 119, s__00551100, 0x29);
-        _command_points_window_field = fields::Add_Hidden_Field_(545, 122, 613, 192, s__00551100, 0x29);
-        _food_window_field = fields::Add_Hidden_Field_(545, 197, 613, 267, s__00551100, 0x29);
-        _freighters_window_field = fields::Add_Hidden_Field_(545, 270, 613, 340, s__00551100, 0x29);
-        _research_window_field = fields::Add_Hidden_Field_(545, 344, 613, 415, s__00551100, 0x29);
+        _treasury_window_field = fields::Add_Hidden_Field_(545, 49, 613, 119, "", 0x29);
+        _command_points_window_field = fields::Add_Hidden_Field_(545, 122, 613, 192, "", 0x29);
+        _food_window_field = fields::Add_Hidden_Field_(545, 197, 613, 267, "", 0x29);
+        _freighters_window_field = fields::Add_Hidden_Field_(545, 270, 613, 340, "", 0x29);
+        _research_window_field = fields::Add_Hidden_Field_(545, 344, 613, 415, "", 0x29);
 
         Add_Moveable_Box_Fields_();
 
@@ -1170,7 +1170,7 @@ namespace MAINSCR {
         _first_field = MOX::_star_button[0];
 
         if (_debug_enabled) {
-            _debug_field = fields::Add_Hidden_Field_(630, 470, 639, 479, s__00551100, 0);
+            _debug_field = fields::Add_Hidden_Field_(630, 470, 639, 479, "", 0);
         } else {
             _debug_field = (int16_t)0xfc18;
         }
@@ -2287,7 +2287,7 @@ namespace MAINSCR {
             int16_t adjusted_radius = (radius / 2) - 2;
 
             MOX::_star_button[star_idx] = fields::Add_Clipped_Circle_Field_(
-                x_coord, y_coord, adjusted_radius, const_cast<char*>(s__00551100), '\0'
+                x_coord, y_coord, adjusted_radius, const_cast<char*>(""), '\0'
             );
         }
     }
@@ -2453,7 +2453,7 @@ namespace MAINSCR {
             Clear_Main_Screen_Fields_();
 
             if (MOX::_settings.end_of_turn_wait == 0) {
-                MOX::_global_exit_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+                MOX::_global_exit_field = fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41);
                 *exit_flag = 1;
                 return;
             }
@@ -4172,7 +4172,7 @@ namespace MAINSCR {
         *accept_field = fields::Add_Button_Field_(
             static_cast<int16_t>(popup_left + 0x40),
             button_top,
-            s__00551100,
+            "",
             MOX::_diplomacy_request_accept_seg,
             "A",
             0x28
@@ -4181,7 +4181,7 @@ namespace MAINSCR {
         *invoke_field = fields::Add_Button_Field_(
             static_cast<int16_t>(popup_left + 0xBC),
             button_top,
-            s__00551100,
+            "",
             MOX::_diplomacy_request_invoke_seg,
             "I",
             0x28
@@ -4190,7 +4190,7 @@ namespace MAINSCR {
         *wait_field = fields::Add_Button_Field_(
             static_cast<int16_t>(popup_left + 0x13B),
             button_top,
-            s__00551100,
+            "",
             MOX::_diplomacy_request_wait_seg,
             "W",
             0x28
@@ -4208,7 +4208,7 @@ namespace MAINSCR {
             popup_top,
             popup_right,
             popup_bottom,
-            s__00551100,
+            "",
             0
         );
 
@@ -4217,7 +4217,7 @@ namespace MAINSCR {
             0,
             0x27F,
             0x1DF,
-            s__00551120,
+            "\x1B",
             0x29
         );
     }

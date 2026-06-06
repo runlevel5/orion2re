@@ -2873,7 +2873,7 @@ namespace OFFICER {
             0x1b9, 
             s__00551100,
             MOX::_officer_return_button_seg, 
-            s__00551120, 
+            "\x1B", 
             0x28
         );
 
@@ -3281,8 +3281,9 @@ void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int
   strcpy(output, HAROLD::H_Message_(message_id));
 
   if (tech_app_count > 0) {
+    /* fmtpara \x1A0 restores left alignment before each bullet line in the reward list. */
     for (int16_t tech_index = 0; tech_index < tech_app_count; ++tech_index) {
-      strcat(output, s_0_0055110c);
+      strcat(output, "\x1A" "0");
       strcat(output, "^ ");
       strcat(output, TECHDATA::_technology_applications[tech_app_ids[tech_index]].name);
       strcat(output, string::s_Newline);

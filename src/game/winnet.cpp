@@ -156,8 +156,13 @@ namespace WINNET {
         return 0;
     }
 
-    void __cdecl Create_Player_(DPID* pid, char* friendly_name, char* formal_name) {
-        HRESULT hr = netcode::_dplay->CreatePlayer(pid, friendly_name, formal_name, nullptr);
+    void __cdecl Create_Player_(DPID* pid, const char* friendly_name, const char* formal_name) {
+        HRESULT hr = netcode::_dplay->CreatePlayer(
+            pid,
+            const_cast<char*>(friendly_name),
+            const_cast<char*>(formal_name),
+            nullptr
+        );
 
         if (hr != 0) {
             *pid = 0;
@@ -197,7 +202,7 @@ namespace WINNET {
         return 1;
     }
 
-    void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str) {
+    void __cdecl Register_Player_(uint32_t player_id, const char* player_name, const char* event_str) {
         s_net_player* player = (s_net_player*)malloc(sizeof(*player));
 
         _player_list[_player_count] = player;

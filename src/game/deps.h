@@ -18,8 +18,6 @@
 
 #include "../dplay.h"
 
-#include "funcs.h"
-
 #include "consts.h"
 
 #pragma pack(push, 1)

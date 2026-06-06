@@ -925,7 +925,7 @@ namespace DIP_SCRN {
         memset(selection_flags, 1, 15);
 
         for (int i = 0; i < 15; ++i) {
-            _diplomacy_list_choice[i][0] = s__00551100[0];
+            _diplomacy_list_choice[i][0] = '\0';
         }
 
         int current_bc = MOX::_player[player_idx].bc;

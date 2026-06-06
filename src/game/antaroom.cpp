@@ -51,7 +51,7 @@ namespace ANTAROOM {
             timer::Mark_Time_();
             fields::Clear_Fields_();
 
-            int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+            int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
 
             if (fields::Get_Input_() == hidden_field || key::Keyboard_Status_()) {
                 is_done = true;

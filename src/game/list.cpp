@@ -103,7 +103,7 @@ namespace LIST {
                         state->app_ymin_offsets[i] + item->y,
                         item->app_x_max,
                         state->app_ymax_offsets[i] + item->y,
-                        s__00551100,
+                        "",
                         0
                     );
 

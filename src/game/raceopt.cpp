@@ -1169,7 +1169,7 @@ namespace raceopt {
                 0);
         }
 
-        raceopt::_exit_ken = fields::Add_Hot_Key_(s__00551120);
+        raceopt::_exit_ken = fields::Add_Hot_Key_("\x1B");
         raceopt::_accept = fields::Add_Button_Field_(
             0x01FA,
             0x01C0,

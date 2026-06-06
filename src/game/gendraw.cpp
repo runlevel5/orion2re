@@ -102,7 +102,7 @@ namespace GENDRAW {
 
         _message_box_y = 0x90;
         int mode = 4;
-        _first_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29);
+        _first_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, "\x1B", 0x29);
 
         s_colors font_colors;
         fonts::Set_Remap_Font_Style_(4, &font_colors);

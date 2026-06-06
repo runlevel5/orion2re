@@ -140,7 +140,7 @@ namespace netcode {
         }
 
         DPID player_id;
-        WINNET::Create_Player_(&player_id, player_name, s__00551100);
+        WINNET::Create_Player_(&player_id, player_name, "");
         WINNET::_local_player_id = player_id;
 
         comcore::ComInit_(0x1c2, session->szSessionName, _recv_fn);
@@ -309,7 +309,7 @@ namespace netcode {
 
         WINNET::Net_Enable_New_Players();
 
-        WINNET::Create_Player_(&player_id, player_name, s__00551100);
+        WINNET::Create_Player_(&player_id, player_name, "");
         WINNET::_local_player_id = player_id;
 
         comcore::ComInit_(0x1c2, name, _recv_fn);

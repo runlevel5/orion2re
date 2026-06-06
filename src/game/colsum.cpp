@@ -1146,7 +1146,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
 
             COLONY::Sum_Colonists_(COLONY::_g_colony_n, -1, -1, -1, -1, -1);
 
-            const char* sign_str = s__00551100;
+            const char* sign_str = "";
             if (total_growth < 0) {
                 /* Fmtpara: "\x1B2" colors negative growth before the numeric value is rendered. */
                 sign_str = "\x1B" "2";
