@@ -9,8 +9,8 @@ uint16_t (*_player_needs_to_attack)[73];
 int8_t* _battle_stars;
 uint8_t (*_star_has_nonplayer)[73];
 int16_t _n_battle_stars;
-int8_t (*_attack_confirmed)[8][8];
-s_combfind_star_has_player (*_star_has_player)[73][8];
+int8_t (*_attack_confirmed)[MAX_PLAYERS][MAX_PLAYERS];
+s_combfind_star_has_player (*_star_has_player)[73][MAX_PLAYERS];
 uint8_t* _current_star_has_nonplayer;
 s_combfind_star_has_player* _current_star_has_player;
 char* _research_treaty_msg;
@@ -34,11 +34,11 @@ void __cdecl Search_For_Battles_() {
 
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
-    s_combfind_star_has_player star_has_player_stack[73][8];
+    s_combfind_star_has_player star_has_player_stack[73][MAX_PLAYERS];
     uint8_t star_has_nonplayer_stack[73];
     uint16_t player_needs_to_attack_stack[73];
     int8_t battle_stars_stack[76];
-    int8_t attack_confirmed_buf[8][8];
+    int8_t attack_confirmed_buf[MAX_PLAYERS][MAX_PLAYERS];
 
     _star_has_player = &star_has_player_stack;
     memset(&star_has_player_stack, 0, sizeof(star_has_player_stack));
@@ -68,7 +68,7 @@ void __cdecl Search_For_Battles_() {
         if (loc < 72) {
             if (ship->status == 0) {
                 int8_t owner = ship->owner;
-                if (owner < 8) {
+                if (owner < MAX_PLAYERS) {
                     uint8_t ship_type = ship->d.ship_type;
                     (*_star_has_player)[loc][owner].has_player = 1;
                     (*_star_has_player)[loc][owner].ship_sizes[ship_type] = 1;
@@ -78,7 +78,7 @@ void __cdecl Search_For_Battles_() {
                         (*_player_needs_to_attack)[loc] |= (1 << (owner & 0x1F));
                     }
                 } else {
-                    (*_star_has_nonplayer)[loc] |= (1 << ((owner - 8) & 0x1F));
+                    (*_star_has_nonplayer)[loc] |= (1 << ((owner - MAX_PLAYERS) & 0x1F));
                     (*_player_needs_to_attack)[loc] |= (1 << (owner & 0x1F));
                 }
             }
@@ -115,7 +115,7 @@ void __cdecl Search_For_Battles_() {
                 int16_t colony_idx = -1;
                 int8_t unk_flag = 0;
 
-                if (attacker_idx < 8) {
+                if (attacker_idx < MAX_PLAYERS) {
                     if (MOX::_player[attacker_idx].objectives != 100) {
                         Get_AI_Target_(star_idx, attacker_idx, &defender_idx, &colony_idx, &unk_flag);
                     } else {
@@ -200,8 +200,8 @@ void __cdecl Process_Retreating_Ships_(void) {
         char pad2[13];
     };
 
-    s_retreat_report report[8][73];
-    int8_t player_retreat_target[8];
+    s_retreat_report report[MAX_PLAYERS][73];
+    int8_t player_retreat_target[MAX_PLAYERS];
     int16_t ship_indices[500];
     s_ship_move_info move_info;
     
@@ -304,11 +304,11 @@ void __cdecl Process_Retreating_Ships_(void) {
                     MOX::_ship[idx].status = 1;
                 }
             }
-        } else if (ship->owner >= 8) {
+        } else if (ship->owner >= MAX_PLAYERS) {
             if (ship->owner == 8 && ship->status == 0) {
                 antarans::Restock_Antaran_Ship_((int16_t)ship->d.size);
                 SHIPS::Kill_Ship_((int16_t)i);
-            } else if (ship->owner > 7 && ship->status == 0 && ship->d.speed != 0) {
+            } else if (ship->owner >= MAX_PLAYERS && ship->status == 0 && ship->d.speed != 0) {
                 bool destroy_monster = false;
                 if (ship->owner == 10) {
                     destroy_monster = true;
@@ -344,7 +344,7 @@ void __cdecl Process_Retreating_Ships_(void) {
 }
 
 void __cdecl Client_Combat_Loop_() {
-    int8_t local_attack_confirmed[8][8];
+    int8_t local_attack_confirmed[MAX_PLAYERS][MAX_PLAYERS];
     s_battle_results local_battle_results_1;
     s_battle_results local_battle_results_2;
     s_battle_results local_battle_results_main;
@@ -354,7 +354,7 @@ void __cdecl Client_Combat_Loop_() {
 
     NETMOX::_net.combat_results_data = &local_battle_results_main;
     memset(local_attack_confirmed, 0, sizeof(local_attack_confirmed));
-    COMBFIND::_attack_confirmed = (int8_t (*)[8][8])local_attack_confirmed;
+    COMBFIND::_attack_confirmed = (int8_t (*)[MAX_PLAYERS][MAX_PLAYERS])local_attack_confirmed;
 
     while (NETMOX::_net.sync_state >= 14 && NETMOX::_net.sync_state < 35 /* 0x23 */) {
         RUSS::Mox_Update_();
@@ -408,7 +408,7 @@ void __cdecl Client_Combat_Loop_() {
             break;
 
         case 19:
-            if (NETMOX::_net.combat_attacker_id < 8 && MOX::_player[(int)NETMOX::_net.combat_attacker_id].objectives == 100) {
+            if (NETMOX::_net.combat_attacker_id < MAX_PLAYERS && MOX::_player[(int)NETMOX::_net.combat_attacker_id].objectives == 100) {
                 NETMOX::_net.sync_state = 21;
             } else {
                 NETMOX::_net.sync_state = 23;
@@ -463,7 +463,7 @@ void __cdecl Client_Combat_Loop_() {
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_2, 0);
             local_battle_results_2.player_info.combat_result = (int8_t)result;
             MULTPLAY::Load_Net_Next_Turn_Screen_(1);
-            if (NETMOX::_net.combat_target_player_id < 8 && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {
+            if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {
                 NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 0x16, &local_battle_results_2, sizeof(local_battle_results_2));
             }
             NETMOX::_net.sync_state = 14;
@@ -609,9 +609,9 @@ void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t player_idx) {
     if (mask != 0) {
         for (int i = 0; i < 7; ++i) {
             // Indices 8-14 represent non-player factions/monsters
-            if (player_idx != (i + 8)) {
+            if (player_idx != (i + MAX_PLAYERS)) {
                 if ((mask >> i) & 1) {
-                    _target.player_targets[_target.num_player_targets] = (int16_t)i + 8;
+                    _target.player_targets[_target.num_player_targets] = (int16_t)i + MAX_PLAYERS;
                     _target.num_player_targets++;
                 }
             }
@@ -629,8 +629,8 @@ int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
     }
 
     // Check for special entities (bits 8-14)
-    if (needs_attack >= 0x100 /* bit 8 set */) {
-        for (int32_t i = 8; i < 15; ++i) {
+    if (needs_attack >= (1u << MAX_PLAYERS) /* bit 8 set */) {
+        for (int32_t i = MAX_PLAYERS; i < 15; ++i) {
             if ((needs_attack >> i) & 1) {
                 count++;
                 // Reservoir sampling for equal probability distribution
@@ -763,7 +763,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 {
     int16_t star_idx;
     int eligible_player_count;
-    uint8_t player_present[8];
+    uint8_t player_present[MAX_PLAYERS];
     int16_t player_idx;
     s_colony *colony;
     int16_t planet_idx;
@@ -1091,7 +1091,7 @@ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* targe
 
 void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_a_idx, int player_b_idx) {
     // Handle first player
-    if (player_a_idx < 8) {
+    if (player_a_idx < MAX_PLAYERS) {
         // Regular player: check presence via star-player status struct
         if ((*_star_has_player)[star_idx][player_a_idx].has_player == 0) {
             (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_a_idx & 0x1f));
@@ -1104,7 +1104,7 @@ void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_a_idx, int 
     }
 
     // Handle second player
-    if (player_b_idx < 8) {
+    if (player_b_idx < MAX_PLAYERS) {
         // Regular player: check presence via star-player status struct
         if ((*_star_has_player)[star_idx][player_b_idx].has_player == 0) {
             (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_b_idx & 0x1f));
@@ -1187,7 +1187,7 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* ta
             int16_t player_idx = COMBFIND::_target.player_targets[i];
 
             // If player is valid index and not lucky, prioritize them
-            if (player_idx < 8 && MOX::_player[player_idx].traits[26 /* TRAIT_LUCKY */] == 0) {
+            if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[26 /* TRAIT_LUCKY */] == 0) {
                 non_lucky_count++;
                 if (random::Random_(non_lucky_count) == 1) {
                     non_lucky_target = player_idx;
@@ -1263,7 +1263,7 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
     char message_buffer[400];
     int8_t confirmed = 1;
 
-    if (target_idx < 8 && (*_attack_confirmed)[player_idx][target_idx] == 0) {
+    if (target_idx < MAX_PLAYERS && (*_attack_confirmed)[player_idx][target_idx] == 0) {
         int treaty_count = 0;
         int offset = sprintf(message_buffer, "%s\n", _you_have_following_treaties_msg);
         char* dest_ptr = message_buffer + offset;
@@ -1325,7 +1325,7 @@ int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx) {
     }
 
     // Indices >= 8 usually represent Antarans, Guardians, or space monsters
-    if (attacker_idx > 7) {
+    if (attacker_idx >= MAX_PLAYERS) {
         return 1;
     }
 
@@ -1409,8 +1409,8 @@ void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
         dest = (*_star_has_player)[star_idx];
     }
 
-    memcpy(dest, *buffer, 8 * sizeof(*dest));
-    *buffer += 8 * sizeof(*dest);
+    memcpy(dest, *buffer, MAX_PLAYERS * sizeof(*dest));
+    *buffer += MAX_PLAYERS * sizeof(*dest);
 
     if (star_idx == -1) {
         *_current_star_has_nonplayer = **buffer;
@@ -1459,7 +1459,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         plr1_idx = (short)MOX::_colony[colony_idx].owner;
     }
 
-    if (plr2_idx < 8 && plr1_idx < 8) {
+    if (plr2_idx < MAX_PLAYERS && plr1_idx < MAX_PLAYERS) {
         MOX::_player[plr2_idx].time_since_last_attack[plr1_idx] = 0;
     }
 
@@ -1505,22 +1505,22 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
     }
 
     if (result->player_info.combat_result >= 0) {
-        if (plr1_idx < 8) {
+        if (plr1_idx < MAX_PLAYERS) {
             if (_current_star_has_player[plr1_idx].ship_sizes[0] == 0 && colony_idx == -1) {
                 Kill_Noncombat_Ships_(&ships[plr1_ship_offset], plr1_ship_count);
             } else {
                 Determine_Retreat_Ships_(star_idx, plr1_idx, colony_idx);
             }
         } else {
-            *_current_star_has_nonplayer &= ~(1 << (plr1_idx - 8));
+            *_current_star_has_nonplayer &= ~(1 << (plr1_idx - MAX_PLAYERS));
         }
     }
 
     if (result->player_info.combat_result <= 0) {
-        if (plr2_idx < 8) {
+        if (plr2_idx < MAX_PLAYERS) {
             Determine_Retreat_Ships_(star_idx, plr2_idx, -1);
         } else {
-            *_current_star_has_nonplayer &= ~(1 << (plr2_idx - 8));
+            *_current_star_has_nonplayer &= ~(1 << (plr2_idx - MAX_PLAYERS));
         }
 
         if (plr2_idx == 9) { // Guardian defeated
@@ -1537,10 +1537,10 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         if (result->player_info.combat_result < 0) {
             Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
             if (plr1_ship_count == 0) {
-                if (plr1_idx < 8) {
+                if (plr1_idx < MAX_PLAYERS) {
                     Reset_Combat_Ships_At_Current_Star_Has_Player_(plr1_idx);
                 } else {
-                    *_current_star_has_nonplayer &= ~(1 << (plr1_idx - 8));
+                    *_current_star_has_nonplayer &= ~(1 << (plr1_idx - MAX_PLAYERS));
                 }
             }
         }
@@ -1562,10 +1562,10 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         } else {
             Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
             if (plr2_ship_count == 0) {
-                if (plr2_idx < 8) {
+                if (plr2_idx < MAX_PLAYERS) {
                     Reset_Combat_Ships_At_Current_Star_Has_Player_(plr2_idx);
                 } else {
-                    *_current_star_has_nonplayer &= ~(1 << (plr2_idx - 8));
+                    *_current_star_has_nonplayer &= ~(1 << (plr2_idx - MAX_PLAYERS));
                 }
             }
             if (colony_idx != -1 && MOX::_colony[colony_idx].owner != -1) {
@@ -1593,13 +1593,13 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
 
     strategic_combat_flag = MOX::_settings.strategic_combat_flag;
 
-    if (attacker_idx < 8 && MOX::_player[attacker_idx].objectives == 100 /* HUMAN */) {
+    if (attacker_idx < MAX_PLAYERS && MOX::_player[attacker_idx].objectives == 100 /* HUMAN */) {
         plr1_is_human = true;
     } else {
         plr1_is_human = false;
     }
 
-    if (defender_idx < 8 && MOX::_player[defender_idx].objectives == 100 /* HUMAN */) {
+    if (defender_idx < MAX_PLAYERS && MOX::_player[defender_idx].objectives == 100 /* HUMAN */) {
         plr2_is_human = true;
     } else {
         plr2_is_human = false;
@@ -1610,10 +1610,10 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
         return 0;
     }
 
-    if (attacker_idx < 8) {
+    if (attacker_idx < MAX_PLAYERS) {
         REPORT::_something_interesting_happened[attacker_idx] = 1;
     }
-    if (defender_idx < 8) {
+    if (defender_idx < MAX_PLAYERS) {
         REPORT::_something_interesting_happened[defender_idx] = 1;
     }
 
@@ -1649,7 +1649,7 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
     } else {
         int8_t retreat_flag = 1;
 
-        if (attacker_idx < 8 && defender_idx < 8) {
+        if (attacker_idx < MAX_PLAYERS && defender_idx < MAX_PLAYERS) {
             if (plr1_is_human) {
                 if (!plr2_is_human) {
                     retreat_flag = AI_Can_Retreat_((int8_t)defender_idx, colony_idx);
@@ -1729,7 +1729,7 @@ void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int1
 
     if (should_retreat_or_die) {
         bool destroy_ships_in_flux = false;
-        if (player_idx < 8 && MOX::_player[p_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
+        if (player_idx < MAX_PLAYERS && MOX::_player[p_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
             if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
                 destroy_ships_in_flux = true;
             }
@@ -1831,8 +1831,8 @@ void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_
                     }
                 }
 
-                for (int16_t np = 8; np < 15; ++np) {
-                    if ((((*_star_has_nonplayer)[star_idx] >> (np - 8)) & 1) != 0 &&
+                for (int16_t np = MAX_PLAYERS; np < 15; ++np) {
+                    if ((((*_star_has_nonplayer)[star_idx] >> (np - MAX_PLAYERS)) & 1) != 0 &&
                         (((*_player_needs_to_attack)[star_idx] >> np) & 1) == 0) {
                         player_strength[np] += AIPOWER::Ship_Strength_Vs_Ships_(i, np);
                     }
@@ -1989,7 +1989,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
         results->outpost_destroyed_flag = 1;
         BOMB::Destroy_Colony_(colony, 1);
         COMBFIND::_current_star_has_player[colony_owner].colony_count--;
-    } else if (attacker_id < 8) {
+    } else if (attacker_id < MAX_PLAYERS) {
         if (MOX::_player[attacker_id].objectives == 'd' /* ECON_INDUSTRY */) {
             bool is_active_player = false;
             if ((MOX::_game_type != 2 && MOX::_game_type != 3) || (MOX::_PLAYER_NUM == attacker_id)) {
@@ -2450,7 +2450,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
 
                     uint8_t msg_type = 0;
                     if (MOX::_settings.strategic_combat_flag == 0) {
-                        if (sync_colony_id < 8 && MOX::_player[sync_colony_id].objectives == 100 /* 'd' */) {
+                        if (sync_colony_id < MAX_PLAYERS && MOX::_player[sync_colony_id].objectives == 100 /* 'd' */) {
                             NETMOX::_net.player_net_info[i].packet_type = 0x14;
                             NETMOX::_net.player_net_info[sync_colony_id].packet_type = 0x15;
                             int16_t colony_id = Target_Planet_To_Colony_(NETMOX::_net.player_net_info[i].combat_planet_id);
@@ -2576,7 +2576,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     NETMOX::_net.player_net_info[attacker_id].combat_star_id = (uint8_t)star_id;
     NETMOX::_net.player_net_info[attacker_id].combat_attacker_id = (undefined)attacker_id;
 
-    if (attacker_id < 8) {
+    if (attacker_id < MAX_PLAYERS) {
         if (MOX::_player[attacker_id].objectives == 100 /* 'd' */) {
             if ((MOX::_star[star_id].ignore_combat_ships & (1 << attacker_id)) == 0) {
                 NETMOX::_net.player_net_info[attacker_id].packet_type = 0x10;
@@ -2589,10 +2589,10 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     }
 
     int16_t target_sync_owner_id;
-    if (attacker_id < 8 && MOX::_player[attacker_id].objectives == 100 /* 'd' */) {
+    if (attacker_id < MAX_PLAYERS && MOX::_player[attacker_id].objectives == 100 /* 'd' */) {
         target_sync_owner_id = -1;
     } else {
-        if (attacker_id < 8) {
+        if (attacker_id < MAX_PLAYERS) {
             Get_AI_Target_(star_id, attacker_id, &target_defender_id, &target_colony_idx, &is_sneak_attack);
         } else {
             Get_NPC_Target_(star_id, attacker_id, &target_defender_id, &target_colony_idx);
@@ -2631,7 +2631,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
             }
         }
 
-        if (target_sync_owner_id < 8 && MOX::_player[target_sync_owner_id].objectives == 100 /* 'd' */) {
+        if (target_sync_owner_id < MAX_PLAYERS && MOX::_player[target_sync_owner_id].objectives == 100 /* 'd' */) {
             if (attacker_id == 12 && target_colony_idx != -1) {
                 NETMOX::_net.player_net_info[target_sync_owner_id].packet_type = 0x1c;
                 NETMOX::Send_Dragon_Info_(target_colony_idx);
@@ -2713,8 +2713,8 @@ void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx) {
         src = (*_star_has_player)[star_idx];
     }
 
-    memcpy(*stream, src, 8 * sizeof(*src));
-    uint8_t *ptr = *stream + 8 * sizeof(*src);
+    memcpy(*stream, src, MAX_PLAYERS * sizeof(*src));
+    uint8_t *ptr = *stream + MAX_PLAYERS * sizeof(*src);
     *stream = ptr;
 
     if (star_idx != -1) {

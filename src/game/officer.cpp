@@ -2108,7 +2108,7 @@ namespace OFFICER {
             SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &n_unknown, &n_colony_ships, &n_outposts, &n_transports, hull_counts);
 
             uint8_t player_palette_color = 0x49; // 'I'
-            if (owner < 8) {
+            if (owner < MAX_PLAYERS) {
                 uint8_t player_color = MOX::_player[owner].color;
                 player_palette_color = MOX::_main_palette_player_colors[player_color];
             }
@@ -2591,7 +2591,7 @@ namespace OFFICER {
         if (loc > -1) {
             if (leader->type == 1) {
                 int16_t player_idx = (int16_t)leader->player_index;
-                if (player_idx > -1 && player_idx < 8) {
+                if (player_idx > -1 && player_idx < MAX_PLAYERS) {
                     MOX::_star[loc].officer_index[player_idx] = -1;
                 }
             } else {

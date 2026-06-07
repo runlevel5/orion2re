@@ -71,7 +71,7 @@ namespace BILLHELP {
 
     extern s_help_box _technology_list4_help_list[2];
 
-    extern s_help_box _races_help_list[8];
+    extern s_help_box _races_help_list[MAX_PLAYERS];
 
     extern s_help_box _report_help_list[1];
 

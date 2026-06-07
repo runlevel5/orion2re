@@ -1360,7 +1360,7 @@ namespace BEAMS {
                         target_bearing = CMBTFIRE::Facing_Shield_(target_bearing);
 
                         int16_t fp_count;
-                        if (attacker_ship_id <= 0 || attacker_owner >= 8 || _g_reflection_state_flag == 2) {
+                        if (attacker_ship_id <= 0 || attacker_owner >= MAX_PLAYERS || _g_reflection_state_flag == 2) {
                             fp_count = 1;
                         }
                         else {

@@ -190,10 +190,10 @@ namespace HAROLD {
      * @address 004f10f0
      */
     int16_t __cdecl N_Colony_Owners_(int16_t star_idx) {
-        uint8_t owners_seen[8];
+        uint8_t owners_seen[MAX_PLAYERS];
         int16_t unique_count = 0;
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             owners_seen[i] = 0;
         }
 
@@ -505,13 +505,13 @@ namespace HAROLD {
      * Calculates how many colonies each player owns in a specific star system.
      *
      * @param star_idx Index of the star system to check.
-     * @param player_counts Array of size 8 that receives colony count per player index.
+     * @param player_counts Array of size MAX_PLAYERS that receives colony count per player index.
      * @param total_count Pointer to variable that receives the number of unique players owning colonies in this system.
      * @param have_contact If true, only counts owners that the current player has diplomatic contact with.
      */
     void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool have_contact) {
         *total_count = 0;
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             player_counts[i] = 0;
         }
 
@@ -980,8 +980,8 @@ namespace HAROLD {
 
         Init_Moving_Boxes_();
 
-        // Zero out the 8-byte array tracking home star rename status
-        for (int i = 0; i < 8; ++i) {
+        // Zero out the MAX_PLAYERS-sized array tracking home star rename status
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             MOX::_given_chance_to_rename_home_star[i] = 0x00;
         }
 
@@ -1218,7 +1218,7 @@ namespace HAROLD {
         int16_t limit_color = 14;
         int16_t offset = apply_selected_color_offset ? (int16_t)(int8_t)MOX::_selected_star_color_offset : 0;
 
-        if (player_idx >= 8 && player_idx < 15) {
+        if (player_idx >= MAX_PLAYERS && player_idx < 15) {
             base_color_idx = 4;
             mode = 1;
             limit_color = 11;
@@ -1228,7 +1228,7 @@ namespace HAROLD {
                 base_color_idx = 12;
                 mode = 2;
                 limit_color = 22;
-            } else if (player_idx < 8) {
+            } else if (player_idx < MAX_PLAYERS) {
                 uint8_t palette_val = MOX::_main_palette_player_colors[p_color];
                 base_color_idx = palette_val + 1;
                 limit_color = palette_val + 6;
@@ -1428,7 +1428,7 @@ namespace HAROLD {
         MOX::_selected_star_color_mod = 1;
         MOX::_selected_star_color_offset = 0;
 
-        for (int16_t i = 0; i < 8; ++i) {
+        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             MAINSCR::_hotseat_system_box[i].system_id = -1;
         }
 

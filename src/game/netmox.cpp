@@ -1086,7 +1086,7 @@ namespace NETMOX {
 
     void __cdecl Send_Drop_Out_Info_(int player_idx, uint16_t msg_type) {
         uint8_t any_processed;
-        uint8_t player_process_flags[8];
+        uint8_t player_process_flags[MAX_PLAYERS];
         s_net_pack_drop_out_info packet;
 
         MOX::_player[player_idx].network_player_id = -1;
@@ -1616,7 +1616,7 @@ namespace NETMOX {
     }
 
     int16_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id) {
-        uint8_t weights[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        uint8_t weights[MAX_PLAYERS] = { 0 };
         uint8_t max_weight = 0;
         bool already_talking = false;
 
@@ -1824,12 +1824,12 @@ namespace NETMOX {
             COMBFIND::Decode_Star_Player_Presence_(&ptr, -1);
 
             // 2. Read Player Tech Applications
-            if (attacker_id < 8) {
+            if (attacker_id < MAX_PLAYERS) {
                 memcpy(MOX::_player[attacker_id].tech_applications, ptr, sizeof(MOX::_player[attacker_id].tech_applications)); // 212 bytes
                 ptr += sizeof(MOX::_player[attacker_id].tech_applications);
             }
 
-            if (MOX::_PLAYER_NUM < 8) {
+            if (MOX::_PLAYER_NUM < MAX_PLAYERS) {
                 memcpy(MOX::_player[MOX::_PLAYER_NUM].tech_applications, ptr, sizeof(MOX::_player[MOX::_PLAYER_NUM].tech_applications)); // 212 bytes
                 ptr += sizeof(MOX::_player[MOX::_PLAYER_NUM].tech_applications);
             }
@@ -1855,12 +1855,12 @@ namespace NETMOX {
             }
 
             // 4. Read Star Officer Indexes
-            if (attacker_id < 8) {
+            if (attacker_id < MAX_PLAYERS) {
                 MOX::_star[star_id].officer_index[attacker_id] = static_cast<char>(*ptr);
                 ptr += 1;
             }
 
-            if (MOX::_PLAYER_NUM < 8) {
+            if (MOX::_PLAYER_NUM < MAX_PLAYERS) {
                 MOX::_star[star_id].officer_index[MOX::_PLAYER_NUM] = static_cast<char>(*ptr);
                 ptr += 1;
             }
@@ -1952,7 +1952,7 @@ namespace NETMOX {
             bool skip_unpack = false;
             // Do not unpack if the reporter is the defender, the attacker is a valid player,
             // and the attacker is a human player (objective == 100 / 'd')
-            if (defender_id == reporting_player_id && attacker_id < 8) {
+            if (defender_id == reporting_player_id && attacker_id < MAX_PLAYERS) {
                 if (MOX::_player[attacker_id].objectives == 100) {
                     skip_unpack = true;
                 }
@@ -1972,7 +1972,7 @@ namespace NETMOX {
                 RUSS::Mox_Update_();
 
                 // 3. Unpack Tech Applications and Officer Indexes
-                if (attacker_id < 8) {
+                if (attacker_id < MAX_PLAYERS) {
                     memcpy(MOX::_player[attacker_id].tech_applications, ptr, sizeof(MOX::_player[attacker_id].tech_applications)); // 212 bytes
                     ptr += sizeof(MOX::_player[attacker_id].tech_applications);
 
@@ -1980,7 +1980,7 @@ namespace NETMOX {
                     ptr += 1;
                 }
 
-                if (defender_id < 8) {
+                if (defender_id < MAX_PLAYERS) {
                     memcpy(MOX::_player[defender_id].tech_applications, ptr, sizeof(MOX::_player[defender_id].tech_applications)); // 212 bytes
                     ptr += sizeof(MOX::_player[defender_id].tech_applications);
 
@@ -2151,7 +2151,7 @@ namespace NETMOX {
         local_4 += 2;
 
         if (_net.local_net_id != _net.net_host_id &&
-            (player_num != target_player_id || player_id >= 8 || MOX::_player[player_id].objectives != 100 /* 'd' */)) {
+            (player_num != target_player_id || player_id >= MAX_PLAYERS || MOX::_player[player_id].objectives != 100 /* 'd' */)) {
 
             *reinterpret_cast<int16_t*>(local_4) = star_id;
             local_4 += 2;
@@ -2165,14 +2165,14 @@ namespace NETMOX {
 
             RUSS::Mox_Update_();
 
-            if (player_id < 8) {
+            if (player_id < MAX_PLAYERS) {
                 memcpy(local_4, MOX::_player[player_id].tech_applications, sizeof(MOX::_player[player_id].tech_applications));
                 local_4 += sizeof(MOX::_player[player_id].tech_applications);
                 *local_4 = MOX::_star[star_id].officer_index[player_id];
                 local_4++;
             }
 
-            if (target_player_id < 8) {
+            if (target_player_id < MAX_PLAYERS) {
                 memcpy(local_4, MOX::_player[target_player_id].tech_applications, sizeof(MOX::_player[target_player_id].tech_applications));
                 local_4 += sizeof(MOX::_player[target_player_id].tech_applications);
                 *local_4 = MOX::_star[star_id].officer_index[target_player_id];
@@ -2297,12 +2297,12 @@ namespace NETMOX {
             COMBFIND::Send_Star_Player_Presence_(&ptr, star_idx);
             RUSS::Mox_Update_();
 
-            if (other_player_idx < 8) {
+            if (other_player_idx < MAX_PLAYERS) {
                 memcpy(ptr, MOX::_player[other_player_idx].tech_applications, sizeof(MOX::_player[other_player_idx].tech_applications));
                 ptr += sizeof(MOX::_player[other_player_idx].tech_applications);
             }
 
-            if (target_player_idx < 8) {
+            if (target_player_idx < MAX_PLAYERS) {
                 memcpy(ptr, MOX::_player[target_player_idx].tech_applications, sizeof(MOX::_player[target_player_idx].tech_applications));
                 ptr += sizeof(MOX::_player[target_player_idx].tech_applications);
             }
@@ -2322,12 +2322,12 @@ namespace NETMOX {
             *reinterpret_cast<int16_t*>(ptr) = -1;
             ptr += sizeof(int16_t);
 
-            if (other_player_idx < 8) {
+            if (other_player_idx < MAX_PLAYERS) {
                 *ptr = MOX::_star[star_idx].officer_index[other_player_idx];
                 ptr++;
             }
 
-            if (target_player_idx < 8) {
+            if (target_player_idx < MAX_PLAYERS) {
                 *ptr = MOX::_star[star_idx].officer_index[target_player_idx];
                 ptr++;
             }

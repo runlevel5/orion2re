@@ -17,7 +17,7 @@ namespace SHIPMOVE {
             antaran_max_slots += 2;
         }
 
-        int colony_production_slots[8] = {0};
+        int colony_production_slots[MAX_PLAYERS] = {0};
         for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
             s_colony* col = &MOX::_colony[i];
             if (col->owner != -1 && col->outpost_flag == 0) {
@@ -54,7 +54,7 @@ namespace SHIPMOVE {
             }
         }
 
-        int ships_assigned_per_player[8] = {0};
+        int ships_assigned_per_player[MAX_PLAYERS] = {0};
         ships_assigned_per_player[MOX::_PLAYER_NUM] = player_assigned;
 
         int current_player = (int)MOX::_stardate % (int)MOX::_NUM_PLAYERS;
@@ -312,7 +312,7 @@ namespace SHIPMOVE {
      * @param ship Ship record to inspect.
      */
     int16_t __cdecl Ship_Range_(s_ship_data* ship) {
-        if (ship->owner >= 8) {
+        if (ship->owner >= MAX_PLAYERS) {
             return 0xFF;
         }
 
@@ -513,7 +513,7 @@ namespace SHIPMOVE {
 
             // AI players (owner 0-7) who aren't the primary human player (objectives != 100)
             // have their just_built flag cleared.
-            if (ship.owner < 8 && MOX::_player[(int32_t)ship.owner].objectives != 100) {
+            if (ship.owner < MAX_PLAYERS && MOX::_player[(int32_t)ship.owner].objectives != 100) {
                 ship.just_built = 0;
             }
         }
@@ -535,7 +535,7 @@ namespace SHIPMOVE {
 
         int8_t owner = ship->owner;
 
-        if (owner < 8) {
+        if (owner < MAX_PLAYERS) {
             // Check for Orion discovery
             if (MOX::_star[star_idx].system_special == 11 /* Orion */ && MOX::_star[star_idx].visited == 0) {
                 EVENTS::Event_Orion_Discovered_((int16_t)owner);
@@ -555,7 +555,7 @@ namespace SHIPMOVE {
             ship->d.date_of_design = 0;
         }
 
-        if (owner < 8) {
+        if (owner < MAX_PLAYERS) {
             REPORT::_something_interesting_happened[owner] = 1;
 
             if (MOX::_player[owner].objectives == 100) {
@@ -582,7 +582,7 @@ namespace SHIPMOVE {
         s_star_data* target_star = &MOX::_star[target_star_idx];
         player_idx = MOX::_ship[*ship_list].owner;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             ship_speed = (uint8_t)MOX::_player[player_idx].ship_speed;
         } else {
             ship_speed = 1;
@@ -590,7 +590,7 @@ namespace SHIPMOVE {
 
         std::memset(move_info, 0, sizeof(*move_info));
 
-        if (MOX::_NUM_STARS != target_star_idx && player_idx < 8) {
+        if (MOX::_NUM_STARS != target_star_idx && player_idx < MAX_PLAYERS) {
             if (MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
                 if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
                     move_info->hyperspace_flux = 1;
@@ -641,7 +641,7 @@ namespace SHIPMOVE {
             }
         }
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             if (!SHIPMOVE::Star_In_Range_Of_Player_(target_star, (int16_t)player_idx, (int16_t)min_range)) {
                 int16_t closest_star = COMBFIND::Closest_Other_Colony_Star_((int16_t)player_idx, target_star_idx);
                 if (closest_star != -1) {

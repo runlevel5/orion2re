@@ -71,7 +71,7 @@ namespace KEN {
     void __cdecl Load_Player_Ship_Palette_(int16_t player_idx) {
         s_animation_header* palette_anim; // BUG: uninitialized pointer used for player_idx > 14
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             palette_anim = (s_animation_header*)buffer::Buffer_Reload_(
                 "ships.lbx",
                 (uint8_t)MOX::_player[player_idx].color * 50 + 49,
@@ -79,7 +79,7 @@ namespace KEN {
             );
         } else {
             switch (player_idx) {
-                case 8:
+                case MAX_PLAYERS:
                     palette_anim = (s_animation_header*)buffer::Buffer_Reload_("ships.lbx", 413, MOX::_global_cache_seg);
                     break;
                 case 9:
@@ -457,7 +457,7 @@ namespace KEN {
 
     s_animation_header* __cdecl Do_Get_Ship_Picture_Seg(int16_t player_idx, int16_t ship_type) {
         int8_t color = 8;
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             color = (int8_t)MOX::_player[player_idx].color;
         }
 

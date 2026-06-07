@@ -68,7 +68,7 @@ namespace COLONIZE {
 
         // Reset priority for all stars
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
-            MOX::_star[i].colonize_player = 8;
+            MOX::_star[i].colonize_player = MAX_PLAYERS;
         }
 
         // Phase 1: Check ships (Colony and Outpost ships)
@@ -79,7 +79,7 @@ namespace COLONIZE {
                     int16_t star_idx = ship->location;
                     if (star_idx >= 0 && star_idx < 72) {
                         s_star_data* star = &MOX::_star[star_idx];
-                        if (star->colonize_player == 8) {
+                        if (star->colonize_player == MAX_PLAYERS) {
                             star->colonize_player = ship->owner;
                             if (ship->d.ship_type == SHIP_TYPE_OUTPOST) {
                                 colony_bits[star_idx] |= (1 << (ship->owner & 0x1F));
@@ -100,7 +100,7 @@ namespace COLONIZE {
             if (colony->owner != -1 && colony->buildings[BUILDING_COLONY_BASE] != 0) {
                 int star_idx = MOX::_planet[colony->planet].star_index;
                 s_star_data* star = &MOX::_star[star_idx];
-                if (star->colonize_player == 8) {
+                if (star->colonize_player == MAX_PLAYERS) {
                     star->colonize_player = colony->owner;
                     colony_bits[star_idx] |= (1 << (colony->owner & 0x1F));
                 } else if (star->colonize_player != colony->owner) {
@@ -113,7 +113,7 @@ namespace COLONIZE {
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             int8_t priority_player = star->colonize_player;
-            if (priority_player == 8) {
+            if (priority_player == MAX_PLAYERS) {
                 star->colonize_player = -1;
             } else {
                 bool keep = false;
@@ -142,8 +142,8 @@ namespace COLONIZE {
                 if (star_idx >= 0 && star_idx < 72) {
                     s_star_data* star = &MOX::_star[star_idx];
                     int8_t colonizer = star->colonize_player;
-                    if (colonizer >= 0 && colonizer < 8 && ship->owner != colonizer) {
-                        if (ship->owner >= 8) {
+                    if (colonizer >= 0 && colonizer < MAX_PLAYERS && ship->owner != colonizer) {
+                        if (ship->owner >= MAX_PLAYERS) {
                             star->colonize_player = -1;
                         } else {
                             // Check treaty status: if we have peace/alliance (4, 5, 6), priority is contested
@@ -191,8 +191,8 @@ namespace COLONIZE {
     }
 
     void Allocate_New_Colony_Slots_() {
-        int16_t uncolonized_counts[8] = { 0 };
-        int16_t allocated_counts[8] = { 0 };
+        int16_t uncolonized_counts[MAX_PLAYERS] = { 0 };
+        int16_t allocated_counts[MAX_PLAYERS] = { 0 };
         uint8_t free_slots_indices[250];
 
         int16_t free_slots_count = 0;

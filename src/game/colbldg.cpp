@@ -1400,7 +1400,7 @@ namespace COLBLDG {
         if (_fields[3] == input_field) {
             _field_mode = 0;
             COLONY::Reset_Mouse_Picture_();
-            MOX::_colony[COLONY::_colony_handle].auto_building = _colony_auto_building;
+            MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
 
             if (Something_Behind_Settting_() == 0) {
                 Do_Exit_Screen_Cleanup_();
@@ -1530,7 +1530,7 @@ namespace COLBLDG {
                 int16_t next_colony = COLONY::Get_Next_Colony_(COLONY::_colony_handle, 0);
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = _colony_auto_building;
+                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
                 Do_Exit_Screen_Cleanup_();
                 if (next_colony != COLONY::_colony_handle) {
                     COLONY::Set_Colony_Screen_To_New_Colony_(next_colony);
@@ -1543,7 +1543,7 @@ namespace COLBLDG {
                 }
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = _colony_auto_building;
+                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
                 Do_Exit_Screen_Cleanup_();
                 COLONY::_full_draw = 1;
             } else if (_fields[7] == input_field) {
@@ -1970,7 +1970,7 @@ namespace COLBLDG {
                 } else {
                     MOX::_temp_star_handle = 4;
                     COLBLDG::_return_to_build_popup_from_custom_design = 1;
-                    MOX::_colony[COLONY::_colony_handle].auto_building = COLBLDG::_colony_auto_building;
+                    MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)COLBLDG::_colony_auto_building;
                     return 1;
                 }
             }

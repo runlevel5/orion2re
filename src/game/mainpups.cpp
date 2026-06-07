@@ -486,7 +486,7 @@ namespace MAINPUPS {
             strcpy(location_name, HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet));
         }
 
-        if (attacker_idx >= 0 && attacker_idx < 8) {
+        if (attacker_idx >= 0 && attacker_idx < MAX_PLAYERS) {
             if (MOX::_settings.language == 4) {
                 sprintf(attacker_name, "%s", MOX::_player[attacker_idx].race_name);
             } else {
@@ -507,7 +507,7 @@ namespace MAINPUPS {
             sprintf(attacker_name, ESTRINGS::E_Strings_(str_id));
         }
 
-        if (defender_idx >= 0 && defender_idx < 8) {
+        if (defender_idx >= 0 && defender_idx < MAX_PLAYERS) {
             sprintf(defender_name, ESTRINGS::E_Strings_(0x46), MOX::_player[defender_idx].race_name);
         } else {
             sprintf(defender_name, ESTRINGS::E_Strings_(0xA5));

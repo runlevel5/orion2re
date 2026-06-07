@@ -500,7 +500,7 @@ namespace BILL {
 
     void __cdecl Record_History_()
     {
-        uint32_t building_costs[8];
+        uint32_t building_costs[MAX_PLAYERS];
         uint32_t fleet_history_tmp[350];
         uint32_t pop_history_tmp[350];
         uint32_t prod_history_tmp[350];

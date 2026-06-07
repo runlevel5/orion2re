@@ -96,7 +96,7 @@ namespace AIMOVE {
         s_ship_data* ship = MOX::_ship;
         if (ship < MOX::_ship + MOX::_NUM_SHIPS) {
             do {
-                if (ship->owner >= 8 && ship->status == 0) {
+                if (ship->owner >= MAX_PLAYERS && ship->status == 0) {
                     (*_nonplayer_here)[ship->location] = ship->owner;
                 }
                 ship++;
@@ -452,13 +452,13 @@ namespace AIMOVE {
 
             if (ship->owner != _i_ai && ship->status < 3) {
                 if (ship->location == star_idx) {
-                    uint16_t(*strength_table)[500][8] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
+                    uint16_t(*strength_table)[500][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
                     turn_strengths[0] += (*strength_table)[ship_idx][_i_ai];
                 } else {
                     int location_diff = (int)(int16_t)ship->location - star_idx;
                     // Location diffs of 500 and 1000 relate to travel/wormhole logic
                     if ((location_diff == 500 || location_diff == 1000) && ship->turns_left < 10) {
-                        uint16_t(*strength_table)[500][8] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
+                        uint16_t(*strength_table)[500][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
                         turn_strengths[ship->turns_left] += (*strength_table)[ship_idx][_i_ai];
                     }
                 }
@@ -900,7 +900,7 @@ namespace AIMOVE {
         for (int16_t ship_idx = 0; ship_idx < MOX::_NUM_SHIPS; ++ship_idx) {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
-            if (ship->owner < 8) {
+            if (ship->owner < MAX_PLAYERS) {
                 continue;
             }
 
@@ -1042,7 +1042,7 @@ namespace AIMOVE {
         for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
 
-            if (ship->owner >= 8 && (int)ship->location == star_idx && ship->status == 0) {
+            if (ship->owner >= MAX_PLAYERS && (int)ship->location == star_idx && ship->status == 0) {
                 return true;
             }
         }
@@ -1796,12 +1796,12 @@ namespace AIMOVE {
                     if ((MOX::_star[star_idx].has_colony >> _i_ai) & 1)
                     {
                         uint32_t strength = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_(s, _i_ai);
-                        alien_str[star_idx][ship->owner - 8].strength += strength;
-                        if (alien_str[star_idx][ship->owner - 8].strength == 0)
+                        alien_str[star_idx][ship->owner - MAX_PLAYERS].strength += strength;
+                        if (alien_str[star_idx][ship->owner - MAX_PLAYERS].strength == 0)
                         {
-                            alien_str[star_idx][ship->owner - 8].strength = 1;
+                            alien_str[star_idx][ship->owner - MAX_PLAYERS].strength = 1;
                         }
-                        alien_str[star_idx][ship->owner - 8].eta = 0;
+                        alien_str[star_idx][ship->owner - MAX_PLAYERS].eta = 0;
                         aliens_present = true;
                     }
                 }
@@ -1811,16 +1811,16 @@ namespace AIMOVE {
                     if ((MOX::_star[star_idx].has_colony >> _i_ai) & 1)
                     {
                         uint32_t strength = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_(s, _i_ai);
-                        alien_str[star_idx][ship->owner - 8].strength += strength;
-                        if (alien_str[star_idx][ship->owner - 8].strength == 0)
+                        alien_str[star_idx][ship->owner - MAX_PLAYERS].strength += strength;
+                        if (alien_str[star_idx][ship->owner - MAX_PLAYERS].strength == 0)
                         {
-                            alien_str[star_idx][ship->owner - 8].strength = 1;
+                            alien_str[star_idx][ship->owner - MAX_PLAYERS].strength = 1;
                         }
 
                         // Original bug: alien_str.eta is initialized to 0, so turns_left is never < eta
-                        if (ship->turns_left < alien_str[star_idx][ship->owner - 8].eta)
+                        if (ship->turns_left < alien_str[star_idx][ship->owner - MAX_PLAYERS].eta)
                         {
-                            alien_str[star_idx][ship->owner - 8].eta = ship->turns_left;
+                            alien_str[star_idx][ship->owner - MAX_PLAYERS].eta = ship->turns_left;
                         }
                         aliens_present = true;
                     }
@@ -1846,7 +1846,7 @@ namespace AIMOVE {
                             i++;
                         }
 
-                        intercepts[idx].player_mask |= (1 << (o + 8));
+                        intercepts[idx].player_mask |= (1 << (o + MAX_PLAYERS));
 
                         if (alien_str[star_idx][o].eta < intercepts[idx].min_eta)
                         {
@@ -2089,7 +2089,7 @@ namespace AIMOVE {
     int16_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags) {
         int32_t dest_star_idx = -1;
         int32_t ship_location = MOX::_ship[ship_idx].location;
-        uint32_t player_str[8] = { 0 };
+        uint32_t player_str[MAX_PLAYERS] = { 0 };
         s_aimove_npc_dest npc_dest[72];
 
         memset(npc_dest, 0, sizeof(npc_dest));
@@ -2424,7 +2424,7 @@ namespace AIMOVE {
         if ((uint8_t)player_mask != 0) {
             for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
                 if ((player_mask >> i) & 1) {
-                    uint16_t(*strengths)[500][8];
+                    uint16_t(*strengths)[500][MAX_PLAYERS];
                     if (in_nebula) {
                         strengths = AIDATA::_ship_strengths_in_nebula;
                     }
@@ -2441,8 +2441,8 @@ namespace AIMOVE {
         }
 
         // Check special entities or high-index players (indices 8 to 14)
-        if ((uint8_t)(player_mask >> 8) != 0) {
-            for (int32_t i = 8; i < 15; ++i) {
+        if ((uint8_t)(player_mask >> MAX_PLAYERS) != 0) {
+            for (int32_t i = MAX_PLAYERS; i < 15; ++i) {
                 if ((player_mask >> i) & 1) {
                     uint16_t strength;
                     if (in_nebula) {

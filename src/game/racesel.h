@@ -14,7 +14,7 @@ namespace RACESEL {
 
     extern s_animation_header* _last_race_seg;
 
-    extern uint8_t _color_flag[8];
+    extern uint8_t _color_flag[MAX_PLAYERS];
     extern uint8_t _race_flag[14];
 
     /**

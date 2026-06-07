@@ -3,7 +3,7 @@
 namespace COLXPORT {
     uint8_t _cheezy_hack_col_count_state;
 
-    int16_t _cheezy_hack_col_count[8];
+    int16_t _cheezy_hack_col_count[MAX_PLAYERS];
 
     int16_t* _g_colony_list_ptr;
 

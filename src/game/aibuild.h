@@ -1,17 +1,16 @@
 #pragma once
-#include <cstdint>
 
 namespace AIBUILD {
     extern uint8_t _difficulty_ship_design[12];
     extern int8_t _difficulty_intel_bias[8];
     extern uint8_t _player_ship_size_table[9];
-    extern s_player_ship_sizes _player_ship_sizes[8];
-    extern int32_t _player_total_strength_vs_colonies[8];
-    extern uint8_t _player_n_transports[8][2];
-    extern int8_t _player_n_freighter_groups_wanted[8];
-    extern uint8_t _player_n_spies[8][2];
-    extern uint8_t _player_n_colony_ships[8][3];
-    extern int32_t _player_total_strength_vs_ships[8][3];
+    extern s_player_ship_sizes _player_ship_sizes[MAX_PLAYERS];
+    extern int32_t _player_total_strength_vs_colonies[MAX_PLAYERS];
+    extern uint8_t _player_n_transports[MAX_PLAYERS][2];
+    extern int8_t _player_n_freighter_groups_wanted[MAX_PLAYERS];
+    extern uint8_t _player_n_spies[MAX_PLAYERS][2];
+    extern uint8_t _player_n_colony_ships[MAX_PLAYERS][3];
+    extern int32_t _player_total_strength_vs_ships[MAX_PLAYERS][3];
 
     /** Returns the refit cost for replacing one ship design with another.
      * @param player_idx Player paying for the refit.

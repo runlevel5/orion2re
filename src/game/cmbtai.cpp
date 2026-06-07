@@ -559,7 +559,7 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
     }
 
     if ((Is_Ship_Out_Of_Ammo_(MOX::_cur_ship) || MOX::_player_mode[ship->owner] == -1) && ship->ftl_type != 0) {
-        if (COMBAT1::Enemy_Dissipator_Exists_(ship->owner) == 0 && ship->owner < 8 && MOX::_ai_retreat_flag == 1) {
+        if (COMBAT1::Enemy_Dissipator_Exists_(ship->owner) == 0 && ship->owner < MAX_PLAYERS && MOX::_ai_retreat_flag == 1) {
             ship->is_retreating = 1;
             ship->field40_0x47 = -1;
         }
@@ -738,7 +738,7 @@ int16_t __cdecl Retreat_Check_(int16_t player_idx) {
     int32_t player_total_hits = 0;
     int16_t ship_remaining_hits[210] = {};
 
-    if (player_idx < 8 && MOX::_player[player_idx].objectives != 100 /* 'd' */ && MOX::_ai_retreat_flag == 1) {
+    if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].objectives != 100 /* 'd' */ && MOX::_ai_retreat_flag == 1) {
         if (COMBAT1::Enemy_Dissipator_Exists_(player_idx) == 0) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (i == 0) {
@@ -1957,7 +1957,7 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         damage = (int16_t)((MOX::_ordnance_bonus[attacker_player_idx] * base_damage) / 100);
 
         int16_t evade = MOX::_combat_data[target_ship_idx].tac_val_evade;
-        if (attacker_player_idx < 8) {
+        if (attacker_player_idx < MAX_PLAYERS) {
             s_player* attacker = &MOX::_player[attacker_player_idx];
             if (attacker->tech_applications[TECH_APP_SENSORS] == 3) {
                 evade -= 70;

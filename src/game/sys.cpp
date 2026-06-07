@@ -1003,18 +1003,18 @@ namespace SYS {
         int16_t node_ship_idx = MOX::_ship_node[MOX::_system_display_ships[display_idx].ship_idx].ship_idx;
         int16_t owner_idx = HACCESS::Ship_Owner_(node_ship_idx);
 
-        if (owner_idx < 8) {
+        if (owner_idx < MAX_PLAYERS) {
             // Reload buffer based on player color
             uint8_t player_color = static_cast<uint8_t>(MOX::_player[owner_idx].color);
             return (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", player_color + 273 /* 0x111 */, MOX::_global_cache_seg);
         }
 
-        if (owner_idx == 8) {
+        if (owner_idx == MAX_PLAYERS) {
             // Neutral or special owner case
             return (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 281 /* 0x119 */, MOX::_global_cache_seg);
         }
 
-        if (owner_idx > 8 && owner_idx < 15) {
+        if (owner_idx > MAX_PLAYERS && owner_idx < 15) {
             // Other special owner ranges
             return (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", (owner_idx - 9) + 282 /* 0x11a */, MOX::_global_cache_seg);
         }
@@ -1152,7 +1152,7 @@ namespace SYS {
         } else {
             ship_idx = MOX::_ship_node[ship_node_num].ship_idx;
             owner = HACCESS::Ship_Owner_(ship_idx);
-            if (owner >= 8) {
+            if (owner >= MAX_PLAYERS) {
                 sprintf(ship_name, MOX::_ship[ship_idx].d.name);
             }
         }

@@ -1137,7 +1137,7 @@ namespace COLCALC {
 
         for (int i = 0; i < (uint8_t)colony->n_pops; ++i) {
             int32_t race_idx = colony->pop[i] & 0x0F;
-            if (race_idx < 8) {
+            if (race_idx < MAX_PLAYERS) {
                 if (MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
                     total_normal_pops++;
                 }
@@ -1308,7 +1308,7 @@ namespace COLCALC {
                 ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.intelligence_bonus, _intelligence_bonus_msg);
             }
 
-            for (int i = 0; i < 8; ++i) {
+            for (int i = 0; i < MAX_PLAYERS; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
                     ptr += sprintf(ptr, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
@@ -1423,7 +1423,7 @@ namespace COLCALC {
                 len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.food_bonus / 2, _aquatic_bonus_msg);
             }
 
-            for (int i = 0; i < 8; ++i) {
+            for (int i = 0; i < MAX_PLAYERS; ++i) {
                 int16_t val = breakdown.racial_bonuses[i];
                 if (val > 0) {
                     len += sprintf(debug_out + len, "\t%+d\t%s %s\r", val / 2, MOX::_player[i].race_name, _bonus_msg);
@@ -1585,7 +1585,7 @@ namespace COLCALC {
                 int immune_pops = 0;
                 for (int i = 0; i < n_pops; ++i) {
                     uint32_t race = colony->pop[i] & 0xF;
-                    if ((race < 8 && MOX::_player[race].traits[TRAIT_ENVIRONMENT_IMMUNE]) || race == 8 /* ANDROID */) {
+                    if ((race < MAX_PLAYERS && MOX::_player[race].traits[TRAIT_ENVIRONMENT_IMMUNE]) || race == 8 /* ANDROID */) {
                         immune_pops++;
                     }
                 }
@@ -1623,7 +1623,7 @@ namespace COLCALC {
                 p += sprintf(p, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_workers_msg);
             }
 
-            for (int i = 0; i < 8; ++i) {
+            for (int i = 0; i < MAX_PLAYERS; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
                     p += sprintf(p, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
@@ -1738,7 +1738,7 @@ namespace COLCALC {
             int16_t trait_bonus = 0;
             int32_t extra_food = 0;
 
-            if (player_idx < 8) {
+            if (player_idx < MAX_PLAYERS) {
                 s_player* player = &MOX::_player[player_idx];
 
                 trait_bonus = (int16_t)player->traits[TRAIT_FOOD_BONUS];
@@ -1800,7 +1800,7 @@ namespace COLCALC {
         int32_t idx = (int32_t)player_idx;
         if (_colony_calc_industry_cache[idx] == 0x63) {
             int16_t bonus = 0;
-            if (player_idx < 8) {
+            if (player_idx < MAX_PLAYERS) {
                 bonus = MOX::_player[idx].traits[TRAIT_PRODUCTION_BONUS];
             }
             else if (player_idx == 8) {
@@ -1844,7 +1844,7 @@ namespace COLCALC {
             int16_t trait_bonus = 0;
             int32_t intelligence_bonus = 0;
 
-            if (player_idx < 8) {
+            if (player_idx < MAX_PLAYERS) {
                 trait_bonus = (int16_t)MOX::_player[idx].traits[TRAIT_RESEARCH_BONUS];
 
                 if (colony->owner == (int8_t)player_idx && MOX::_player[idx].tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == 3) {

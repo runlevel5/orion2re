@@ -1072,11 +1072,11 @@ namespace EVENTS {
     }
 
     int16_t __cdecl Get_Antaran_Victim_() {
-        uint16_t weights[8];
-        int16_t candidates[8];
+        uint16_t weights[MAX_PLAYERS];
+        int16_t candidates[MAX_PLAYERS];
         int16_t count = 0;
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             weights[i] = 0;
             candidates[i] = -1;
         }
@@ -1722,11 +1722,11 @@ namespace EVENTS {
     }
 
     int16_t __cdecl Get_Event_Victim_(int8_t type) {
-        uint16_t weights[8];
-        int16_t candidates[8];
+        uint16_t weights[MAX_PLAYERS];
+        int16_t candidates[MAX_PLAYERS];
         int16_t num_candidates = 0;
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             weights[i] = 0;
             candidates[i] = -1;
         }
@@ -1813,9 +1813,9 @@ namespace EVENTS {
     void __cdecl Event_Check_Planet_Warning_() {
         if (_event_data[30].amount <= 2) {
             int16_t half_stars = MOX::_NUM_STARS / 2;
-            int16_t colony_counts[8];
+            int16_t colony_counts[MAX_PLAYERS];
 
-            for (int i = 0; i < 8; ++i) {
+            for (int i = 0; i < MAX_PLAYERS; ++i) {
                 colony_counts[i] = 0;
             }
 
@@ -2441,13 +2441,13 @@ namespace EVENTS {
         if (event_type == 0x21) {
             strcat(out_str, string::s_Newline);
 
-            int32_t bldg_costs[8];
+            int32_t bldg_costs[MAX_PLAYERS];
             if (event_subtype == 0) {
                 COLCALC::Compute_Total_Building_Costs_(bldg_costs);
             }
 
-            int16_t player_indices[8];
-            int32_t player_values[8];
+            int16_t player_indices[MAX_PLAYERS];
+            int32_t player_values[MAX_PLAYERS];
             int16_t num_active = 0;
 
             for (int16_t p = 0; p < MOX::_NUM_PLAYERS; ++p) {

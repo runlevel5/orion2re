@@ -219,15 +219,15 @@ namespace FLT1 {
             int16_t node_idx = MOX::_ship_icon[i].node_idx;
             int16_t owner = HACCESS::Ship_Stack_Owner_(node_idx);
 
-            if (owner < 8) {
+            if (owner < MAX_PLAYERS) {
                 uint8_t color = MOX::_player[owner].color;
                 animate::Reset_Animation_Frame_(MOX::_fltscrn_small_ship_icon_seg[color]);
                 anim = MOX::_fltscrn_small_ship_icon_seg[color];
             } else {
                 int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
                 int8_t ship_owner = MOX::_ship[ship_idx].owner;
-                animate::Reset_Animation_Frame_(MOX::_fltscrn_monster_ship_icon[ship_owner - 8]);
-                anim = MOX::_fltscrn_monster_ship_icon[ship_owner - 8];
+                animate::Reset_Animation_Frame_(MOX::_fltscrn_monster_ship_icon[ship_owner - MAX_PLAYERS]);
+                anim = MOX::_fltscrn_monster_ship_icon[ship_owner - MAX_PLAYERS];
             }
 
             animate::Draw_(MOX::_ship_icon[i].x, MOX::_ship_icon[i].y, anim);
@@ -243,11 +243,11 @@ namespace FLT1 {
         node_idx = MOX::_ship_stack_start[MOX::_small_ship_stack_ptr];
         owner_idx = HACCESS::Ship_Owner_(MOX::_ship_node[node_idx].ship_idx);
 
-        if (owner_idx < 8) {
+        if (owner_idx < MAX_PLAYERS) {
             uint8_t color_idx = (uint8_t)MOX::_player[owner_idx].color;
             flashing_anim = MOX::_fltscrn_flashing_ship_pict_seg[color_idx];
         } else {
-            flashing_anim = MOX::_fltscrn_flashing_monster_ship_icon[owner_idx - 8];
+            flashing_anim = MOX::_fltscrn_flashing_monster_ship_icon[owner_idx - MAX_PLAYERS];
         }
 
         icon_idx = FLT1::F_Ship_Icon_From_Node_Ptr_(node_idx);
@@ -1267,7 +1267,7 @@ namespace FLT1 {
 
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             int16_t current_entry = entry_idx++;
 
             MOX::_fltscrn_small_ship_icon_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(

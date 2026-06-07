@@ -1,10 +1,10 @@
 #pragma once
 
 namespace MSG_ {
-    extern uint8_t _first_msg[8];
-    extern uint8_t _n_msgs[8];
+    extern uint8_t _first_msg[MAX_PLAYERS];
+    extern uint8_t _n_msgs[MAX_PLAYERS];
     extern s_MSG _msgs[100];
-    extern uint8_t _max_msgs[8];
+    extern uint8_t _max_msgs[MAX_PLAYERS];
 
     void __cdecl Allocate_Msg_Slots_();
     int16_t __cdecl N_Msgs_For_Player_(int16_t player_idx);

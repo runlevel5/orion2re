@@ -3,7 +3,7 @@
 namespace CONTACT {
 
 void __cdecl Compute_Contacts_() {
-    uint8_t old_contacts[8][8];
+    uint8_t old_contacts[MAX_PLAYERS][MAX_PLAYERS];
 
     for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
         s_player* plr = &MOX::_player[i];

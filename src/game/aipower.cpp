@@ -49,9 +49,9 @@ namespace AIPOWER {
     }
 
     int16_t __cdecl Get_Best_Ship_Shield_Value_(int16_t player_idx) {
-        if (player_idx >= 8) {
+        if (player_idx >= MAX_PLAYERS) {
             switch (player_idx) {
-                case 8:
+                case MAX_PLAYERS:
                     return 6;
                 case 9:
                     return 8;
@@ -313,7 +313,7 @@ namespace AIPOWER {
         computer_idx = INITSHIP::Best_Computer_(player_idx);
         bonus = TECHDATA::_computers[computer_idx].bonus;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             bonus += MOX::_player[player_idx].traits[7 /* TRAIT_SHIP_ATTACK */];
         }
 
@@ -344,7 +344,7 @@ namespace AIPOWER {
             (int16_t)(int8_t)(TECHDATA::_drives[best_drive_idx].combat_speed_min[2]);
         dcv = (int16_t)(dcv * 5);
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             dcv = (int16_t)(dcv + MOX::_player[player_idx].traits[6]);
             if (MOX::_player[player_idx].traits[0x1d] != 0) {
                 dcv = (int16_t)(dcv + 0x14);

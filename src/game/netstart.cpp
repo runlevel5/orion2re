@@ -7,7 +7,7 @@ struct s_load_net_screen_packet {
     uint8_t field3_0x3;
     uint8_t field4_0x4;
     uint8_t field5_0x5;
-    int32_t network_ids[8];
+    int32_t network_ids[MAX_PLAYERS];
     uint8_t field38_0x26;
     uint8_t field39_0x27;
     int8_t number_of_players;
@@ -98,7 +98,7 @@ namespace NETSTART {
     }
 
     int8_t __cdecl Net_Pick_Position_() {
-        uint8_t connected_players[8];
+        uint8_t connected_players[MAX_PLAYERS];
         int16_t selection;
         int32_t message_buffer;
 
@@ -376,7 +376,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, "", s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -631,7 +631,7 @@ namespace NETSTART {
     void __cdecl Mox_Net_Uninit_() {
         netcode::Net_Uninit_();
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             MOX::_player[i].network_player_id = -1;
         }
 
@@ -660,7 +660,7 @@ namespace NETSTART {
 
     uint8_t __cdecl Load_Net_Screen_() {
         uint8_t fade_flag = 0;
-        uint8_t status[8] = { 0 };
+        uint8_t status[MAX_PLAYERS] = { 0 };
         s_load_net_screen_packet payload = {};
         uint8_t user_list[256];
 
@@ -681,7 +681,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, 8, "", s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;

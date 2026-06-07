@@ -234,10 +234,10 @@ namespace diplomac {
     }
 
     void __cdecl NPC_Sneak_Attacks_() {
-        int16_t eval_results[8];
-        int16_t eval_messages[8];
-        int16_t eval_ratios[8];
-        int16_t eval_unused[8];
+        int16_t eval_results[MAX_PLAYERS];
+        int16_t eval_messages[MAX_PLAYERS];
+        int16_t eval_ratios[MAX_PLAYERS];
+        int16_t eval_unused[MAX_PLAYERS];
 
         for (int16_t p1 = 0; p1 < (int16_t)MOX::_NUM_PLAYERS; ++p1) {
             s_player* plr1 = &MOX::_player[p1];
@@ -1014,7 +1014,7 @@ namespace diplomac {
     }
 
     void __cdecl Change_Relations_(int16_t amount, int16_t p_a, int16_t p_b, int16_t incident, int16_t system, int16_t value) {
-        if (p_a > 7 || p_b > 7 || p_a > (int16_t)MOX::_NUM_PLAYERS || p_b > (int16_t)MOX::_NUM_PLAYERS || p_a == p_b || amount == 0) {
+        if (p_a >= MAX_PLAYERS || p_b >= MAX_PLAYERS || p_a > (int16_t)MOX::_NUM_PLAYERS || p_b > (int16_t)MOX::_NUM_PLAYERS || p_a == p_b || amount == 0) {
             return;
         }
 

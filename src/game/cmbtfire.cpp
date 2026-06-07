@@ -232,7 +232,7 @@ namespace CMBTFIRE {
         } else {
             if ((TECHDATA::_weapons[weapon_id].natural_mods & 0x8) != 0) {
                 uint8_t prev_owner = MOX::_combat_data[target_idx].previous_owner;
-                if (prev_owner >= 8 && prev_owner != 9) {
+                if (prev_owner >= MAX_PLAYERS && prev_owner != 9) {
                     is_legal = 0;
                 }
             }
@@ -265,7 +265,7 @@ namespace CMBTFIRE {
                         }
                     }
                 } else if (weapon_id == 28 /* Stellar Converter */) {
-                    if (MOX::_combat_data[target_idx].owner > 8) {
+                    if (MOX::_combat_data[target_idx].owner > MAX_PLAYERS) {
                         is_legal = 0;
                     }
                 }

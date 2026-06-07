@@ -36,7 +36,7 @@ namespace maintain {
         memset(worths, 0, sizeof(worths));
         _ship_worths = &worths;
 
-        uint8_t eligible_players[8];
+        uint8_t eligible_players[MAX_PLAYERS];
         memset(eligible_players, 0, sizeof(eligible_players));
 
         int32_t player_idx = (int32_t)(player - MOX::_player);

@@ -466,7 +466,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             uint8_t is_home_system[72];
             memset(is_home_system, 0, sizeof(is_home_system));
 
-            for (int32_t i = 0; i < 8; ++i) {
+            for (int32_t i = 0; i < MAX_PLAYERS; ++i) {
                 if (i < MOX::_NUM_PLAYERS) {
                     int16_t home_pid = MOX::_player[i].home_planet_id;
                     is_home_system[(uint8_t)MOX::_planet[home_pid].star_index] = 1;

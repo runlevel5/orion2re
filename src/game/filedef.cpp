@@ -313,7 +313,7 @@ namespace FILEDEF {
         RUSS::Assert_Settings_();
         HAROLD::Load_Leader_Titles_();
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             if (MOX::_player[i].dead_field != 0) {
                 MOX::_player[i].research_accumulated = (uint16_t)MOX::_player[i].dead_field;
                 MOX::_player[i].dead_field = 0;

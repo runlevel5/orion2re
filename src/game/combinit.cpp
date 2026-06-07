@@ -156,7 +156,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         MOX::_global_combat_data.tactical_speed = 0;
     }
 
-    if (MOX::_global_combat_data.player_idx < 8) {
+    if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
         if (MOX::_player[MOX::_global_combat_data.player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
             MOX::_global_combat_data.tactical_speed += 4;
         }
@@ -239,7 +239,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
     combat->shield_type = ship->d.shield_type;
     combat->computer_type = ship->d.computer_type;
 
-    if (combat->owner < 8) {
+    if (combat->owner < MAX_PLAYERS) {
         combat->ftl_type = ship->d.ftl_type;
     } else {
         combat->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(combat->owner);
@@ -314,7 +314,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->structure_damage = combat->structure_max - 1;
     }
 
-    if (combat->size_class == 5 && combat->owner < 8) {
+    if (combat->size_class == 5 && combat->owner < MAX_PLAYERS) {
         combat->picture_num = 43 /* 0x2b */;
     } else {
         combat->picture_num = ship->d.picture_num;
@@ -577,7 +577,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
     }
 
-    if (MOX::_combat_defender_player < 8 && star_idx < MOX::_NUM_STARS) {
+    if (MOX::_combat_defender_player < MAX_PLAYERS && star_idx < MOX::_NUM_STARS) {
         if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[MOX::_combat_defender_player], &MOX::_star[star_idx])) {
             abort_tactical = CMBTFIR2::Apply_Combat_Artemis_Net_(0);
             if (abort_tactical == 0) {
@@ -1075,13 +1075,13 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     End_Of_Combat_(star_idx, colony_pop, combat_winner);
 
     if (combat_winner == 1 || combat_winner == 0x29A) {
-        if (MOX::_combat_attacker_player < 8 && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.ftl_type > 0) {
+        if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.ftl_type > 0) {
             NETMOX::Russ_Event_Monster_Update_(MOX::_combat_defender_player, -1, MOX::_combat_attacker_player);
         }
     }
 
     if (combat_winner == -1 || combat_winner == 0x29A) {
-        if (MOX::_combat_defender_player < 8 && MOX::_combat_attacker_player >= 10 && MOX::_ship[plr1_ships[0]].d.ftl_type > 0) {
+        if (MOX::_combat_defender_player < MAX_PLAYERS && MOX::_combat_attacker_player >= 10 && MOX::_ship[plr1_ships[0]].d.ftl_type > 0) {
             NETMOX::Russ_Event_Monster_Update_(MOX::_combat_attacker_player, -1, MOX::_combat_defender_player);
         }
     }
@@ -1373,7 +1373,7 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
         color_table[i] = (uint8_t)i + 0x60;
     }
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         strcpy(lbx_filename, "cmbtshp.lbx");
         lbx_index = (int)MOX::_player[player_idx].color * 45 + 44;
     } else {
@@ -2413,7 +2413,7 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
         ship_cache[i] = nullptr;
     }
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int i = 0; i < 64; ++i) {
             MOX::_fighter_seg[player_idx][i] = (s_animation_header*)farload::Far_Reload_Next_("cmbtfgtr.lbx", i, MOX::_screen_seg);
             RUSS::Mox_Update_();
@@ -2458,7 +2458,7 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
             char lbx_filename[16];
             int16_t lbx_index;
 
-            if ((uint8_t)ship->previous_owner < 8 && ship->picture_num != 44) {
+            if ((uint8_t)ship->previous_owner < MAX_PLAYERS && ship->picture_num != 44) {
                 strcpy(lbx_filename, "cmbtshp.lbx");
                 lbx_index = (int16_t)MOX::_player[player_idx].color * 45 + ship->picture_num;
             }
@@ -2498,13 +2498,13 @@ void __cdecl Repair_All_Combat_Ships_() {
     attacker_bonus = CMBTFIR2::Get_Fleet_Engineer_Bonus_(MOX::_combat_attacker_player);
     defender_bonus = CMBTFIR2::Get_Fleet_Engineer_Bonus_(MOX::_combat_defender_player);
 
-    if (MOX::_combat_attacker_player < 8) {
+    if (MOX::_combat_attacker_player < MAX_PLAYERS) {
         if (MOX::_player[MOX::_combat_attacker_player].traits[TRAIT_CYBERNETIC] != 0) {
             attacker_bonus += 10;
         }
     }
 
-    if (MOX::_combat_defender_player < 8) {
+    if (MOX::_combat_defender_player < MAX_PLAYERS) {
         if (MOX::_player[MOX::_combat_defender_player].traits[TRAIT_CYBERNETIC] != 0) {
             defender_bonus += 10;
         }
@@ -2571,7 +2571,7 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
 
         if ((ship->unit_status == 5 && ship->is_retreating != 2) ||
             (ship->is_captured != 0 && ship->owner != victor_player) ||
-            (ship->owner >= 8 && ship->previous_owner != ship->owner)) {
+            (ship->owner >= MAX_PLAYERS && ship->previous_owner != ship->owner)) {
             
             ship->unit_status = 5;
 
@@ -2600,7 +2600,7 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         } else {
             if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_AUTOMATED_REPAIR_UNIT) == 1 ||
                 CMBTFIR2::Get_Fleet_Engineer_Bonus_(ship->owner) > 0 ||
-                (ship->owner < 8 && (MOX::_player[ship->owner].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] == 3 ||
+                (ship->owner < MAX_PLAYERS && (MOX::_player[ship->owner].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] == 3 ||
                                      MOX::_player[ship->owner].traits[TRAIT_CYBERNETIC] != 0))) {
                 
                 CMBTFIR2::Clear_Internal_Space_(ship);
@@ -2616,11 +2616,11 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         }
     }
 
-    if (MOX::_combat_attacker_player < 8) {
+    if (MOX::_combat_attacker_player < MAX_PLAYERS) {
         if (MOX::_bio_weapon_flag != 0) {
             COMBINIT::Apply_Bio_Weapon_Penalty_(MOX::_combat_attacker_player, star_idx, colony_pop_lost);
         }
-        if (MOX::_combat_defender_player < 8) {
+        if (MOX::_combat_defender_player < MAX_PLAYERS) {
             MOX::_player[MOX::_combat_attacker_player].ship_war_losses[MOX::_combat_defender_player] += (int16_t)attacker_power_lost;
             MOX::_player[MOX::_combat_defender_player].ship_war_losses[MOX::_combat_attacker_player] += (int16_t)defender_power_lost;
             
@@ -2859,7 +2859,7 @@ void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
 }
 
 void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t star_idx, int16_t colony_pop_lost) {
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives != 100 /* 'd' */ && i != player_idx) {
                 int16_t change = -(int16_t)random::Random_(10);

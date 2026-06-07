@@ -1,13 +1,13 @@
 #include "pch.h"
 
 namespace FIREPTS {
-    uint8_t* _fp_data_ptr[8];
+    uint8_t* _fp_data_ptr[MAX_PLAYERS];
     uint8_t* _fp_seg;
 
     void __cdecl Load_FP_Data_From_LBX_() {
         _fp_seg = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1B90);
 
-        for (int16_t i = 0; i < 8; ++i) {
+        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             if (i == 0) {
                 _fp_data_ptr[i] = (uint8_t*)farload::Far_Reload_Data_(
                     COLONY::_FIREPTS_LBX, 0, _fp_seg, i, 1, 0x310);
@@ -54,7 +54,7 @@ namespace FIREPTS {
         }
 
         int16_t color_idx = 0;
-        if (attacker_owner >= 0 && attacker_owner < 8) {
+        if (attacker_owner >= 0 && attacker_owner < MAX_PLAYERS) {
             color_idx = MOX::_player[attacker_owner].color;
         }
 

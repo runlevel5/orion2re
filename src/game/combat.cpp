@@ -40,7 +40,7 @@ namespace COMBAT {
             }
         }
 
-        if (MOX::_combat_attacker_player == 9 && MOX::_combat_defender_player > 7) {
+        if (MOX::_combat_attacker_player == 9 && MOX::_combat_defender_player >= MAX_PLAYERS) {
             MOX::_combat_attacker_player = 9;
             for (int i = 0; i < plr2_ship_count; i++) {
                 SHIPS::Kill_Ship_(plr2_ships[i]);
@@ -49,7 +49,7 @@ namespace COMBAT {
             return 1;
         }
 
-        if (MOX::_combat_defender_player == 9 && MOX::_combat_attacker_player > 7) {
+        if (MOX::_combat_defender_player == 9 && MOX::_combat_attacker_player >= MAX_PLAYERS) {
             for (int i = 0; i < plr1_ship_count; i++) {
                 SHIPS::Kill_Ship_(plr1_ships[i]);
             }
@@ -77,7 +77,7 @@ namespace COMBAT {
         int16_t survived_officer_ids[8] = {};
         bool skip_combat = false;
 
-        if (MOX::_combat_defender_player < 8 && star_idx < MOX::_NUM_STARS) {
+        if (MOX::_combat_defender_player < MAX_PLAYERS && star_idx < MOX::_NUM_STARS) {
             if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[MOX::_combat_defender_player], &MOX::_star[star_idx])) {
                 if (CMBTFIR2::Apply_Combat_Artemis_Net_(1)) {
                     result = -1;
@@ -192,7 +192,7 @@ namespace COMBAT {
             if (ship_design_idx != -1) {
                 uint8_t player = (uint8_t)MOX::_qcombat_data[i].player;
                 if (leader_combat_bonuses[player] <= 0 && 
-                   (player >= 8 || (MOX::_player[player].tech_applications[4] != 3 && MOX::_player[player].traits[17] == 0))) {
+                   (player >= MAX_PLAYERS || (MOX::_player[player].tech_applications[4] != 3 && MOX::_player[player].traits[17] == 0))) {
                     if (MOX::_settings.strategic_combat_flag == 1) {
                         MOX::_ship[ship_design_idx].structural_damage = MOX::_qcombat_data[i].structural_damage;
                     } else {
@@ -230,7 +230,7 @@ namespace COMBAT {
             }
         }
 
-        if (MOX::_combat_attacker_player < 8 && MOX::_combat_defender_player < 8) {
+        if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player < MAX_PLAYERS) {
             if (MOX::_cmbt_colony_id != -1) {
                 NETMOX::Russ_Change_Relations_(-10000, MOX::_combat_attacker_player, MOX::_combat_defender_player, 10, star_idx, 1);
             }
@@ -286,14 +286,14 @@ namespace COMBAT {
             }
         }
 
-        if (result >= 1 && MOX::_combat_attacker_player < 8 && MOX::_combat_defender_player >= 10) {
+        if (result >= 1 && MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player >= 10) {
             if (MOX::_ship[plr2_ships[0]].d.ftl_type > 0) {
                 NETMOX::Russ_Event_Monster_Update_(MOX::_combat_defender_player, -1, MOX::_combat_attacker_player);
                 result = 1;
             }
         }
 
-        if (result <= -1 && MOX::_combat_defender_player < 8 && MOX::_combat_attacker_player >= 10) {
+        if (result <= -1 && MOX::_combat_defender_player < MAX_PLAYERS && MOX::_combat_attacker_player >= 10) {
             if (MOX::_ship[plr1_ships[0]].d.ftl_type > 0) {
                 NETMOX::Russ_Event_Monster_Update_(MOX::_combat_attacker_player, -1, MOX::_combat_defender_player);
                 result = -1;
@@ -386,7 +386,7 @@ namespace COMBAT {
         int16_t best_warp = INITSHIP::Best_Warp_Drive_(player_idx);
 
         warp_bonus = (best_warp - 1) * 10;
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             warp_bonus += MOX::_player[player_idx].traits[6];
         }
 
@@ -805,7 +805,7 @@ namespace COMBAT {
             int8_t attacker_player_idx = attacker->player;
 
             // Apply sensor bonus to hit chance by reducing target defense
-            if (attacker_player_idx < 8) {
+            if (attacker_player_idx < MAX_PLAYERS) {
                 s_player* player = &MOX::_player[attacker_player_idx];
                 if (player->tech_applications[160 /* TECH_APP_SENSORS */] == 3) {
                     defense_bonus -= 70;
@@ -1102,13 +1102,13 @@ namespace COMBAT {
         }
         strcat(result_msg, location_name);
 
-        if (MOX::_combat_attacker_player < 8) {
+        if (MOX::_combat_attacker_player < MAX_PLAYERS) {
             strcpy(attacker_race_name, MOX::_player[MOX::_combat_attacker_player].race_name);
         } else {
             Get_Non_Player_Name_(MOX::_combat_attacker_player, attacker_race_name);
         }
 
-        if (MOX::_combat_defender_player < 8) {
+        if (MOX::_combat_defender_player < MAX_PLAYERS) {
             strcpy(defender_race_name, MOX::_player[MOX::_combat_defender_player].race_name);
         } else {
             Get_Non_Player_Name_(MOX::_combat_defender_player, defender_race_name);

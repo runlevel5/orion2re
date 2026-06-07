@@ -135,8 +135,8 @@ namespace MOX {
     uint8_t _skip_draw_ships;
     uint8_t _fix_palette;
     s_animation_header* _scrap_button_seg;
-    s_animation_header* _colony_marker_seg[8];
-    s_animation_header* _outpost_marker_seg[8];
+    s_animation_header* _colony_marker_seg[MAX_PLAYERS];
+    s_animation_header* _outpost_marker_seg[MAX_PLAYERS];
     s_animation_header* _o_highlight_seg;
     uint8_t _add_all_button;
     s_animation_header* _fleet_all_button_seg;
@@ -279,7 +279,7 @@ namespace MOX {
     s_animation_header* _combat_planet_seg;
     s_animation_header* _combat_planet_seg2;
     uint8_t _ship_darken_map[128][16];
-    uint8_t _given_chance_to_rename_home_star[8];
+    uint8_t _given_chance_to_rename_home_star[MAX_PLAYERS];
     uint8_t _player_has_ship_in_system;
     s_animation_header* _moveable_box_pict[25];
     int8_t _game_type;
@@ -900,7 +900,7 @@ namespace MOX {
         {1, 0, 527, 0, 639, 479},
         {1, 0, 0, 421, 639, 479},
     };
-    uint8_t _main_palette_player_colors[8] = {73, 98, 110, 32, 62, 148, 45, 85};
+    uint8_t _main_palette_player_colors[MAX_PLAYERS] = {73, 98, 110, 32, 62, 148, 45, 85};
     int16_t _h_string_ix[397];
     char _h_strings[0x4074];
     s_help_box _help_entry_list[50];

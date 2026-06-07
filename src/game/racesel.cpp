@@ -11,7 +11,7 @@ uint8_t* _race_specials[14];
 s_animation_header* _race_button[14];
 char _last_race_name[15];
 s_animation_header* _last_race_seg;
-uint8_t _color_flag[8];
+uint8_t _color_flag[MAX_PLAYERS];
 uint8_t _race_flag[14];
 char* _temp_ruler_name;
 
@@ -791,7 +791,7 @@ void __cdecl Draw_Flag_Screen_() {
 
     void* cache_seg = MOX::_global_cache_seg;
 
-    for (int16_t race_index = 0; race_index < 8; ++race_index) {
+    for (int16_t race_index = 0; race_index < MAX_PLAYERS; ++race_index) {
         if (RACESEL::_color_flag[race_index] == 0) {
             int16_t x_adjust = 0;
             if (race_index == 3 || race_index == 7) {
@@ -800,7 +800,7 @@ void __cdecl Draw_Flag_Screen_() {
 
             animation = (s_animation_header*)buffer::Buffer_Reload_(
                 "racesel.lbx",
-                static_cast<int32_t>(race_index) + static_cast<int32_t>(RACESEL::_old_race) * 8 + 0x22,
+                static_cast<int32_t>(race_index) + static_cast<int32_t>(RACESEL::_old_race) * MAX_PLAYERS + 0x22,
                 cache_seg);
 
             const int16_t y =
@@ -817,7 +817,7 @@ void __cdecl Draw_Flag_Screen_() {
 int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
     int16_t cancel_field_id;
     int16_t selection_made;
-    int16_t field_ids[8];
+    int16_t field_ids[MAX_PLAYERS];
     char message_text[0x50];
 
     RUSS::Mox_Sync_Update_();
@@ -838,7 +838,7 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
     while (true) {
         fields::Clear_Fields_();
 
-        for (int16_t flag_index = 0; flag_index < 8; ++flag_index) {
+        for (int16_t flag_index = 0; flag_index < MAX_PLAYERS; ++flag_index) {
             int16_t column_adjust = 0;
             if (flag_index == 3 || flag_index == 7) {
                 column_adjust = -1;
@@ -864,7 +864,7 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
         cancel_field_id = fields::Add_Hot_Key_("\x1B");
         const int16_t input_field_id = fields::Get_Input_();
 
-        for (int16_t flag_index = 0; flag_index < 8; ++flag_index) {
+        for (int16_t flag_index = 0; flag_index < MAX_PLAYERS; ++flag_index) {
             if (field_ids[flag_index] == input_field_id) {
                 uint8_t accepted;
 

@@ -9,10 +9,10 @@ namespace MSG_ {
         constexpr int16_t DIPLOMACY_MSG_PEACE_ENDED = 4;
     }
 
-    uint8_t _first_msg[8];
-    uint8_t _n_msgs[8];
+    uint8_t _first_msg[MAX_PLAYERS];
+    uint8_t _n_msgs[MAX_PLAYERS];
     s_MSG _msgs[100];
-    uint8_t _max_msgs[8];
+    uint8_t _max_msgs[MAX_PLAYERS];
 
     char* _msg_artifacts_fmt;
     char* _msg_colony_your_rebellion_lost_fmt;
@@ -136,8 +136,8 @@ namespace MSG_ {
             }
         }
 
-        // Reset message tracking arrays for all potential 8 players
-        for (int i = 0; i < 8; ++i) {
+        // Reset message tracking arrays for all potential players
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             _first_msg[i] = 0;
             _n_msgs[i] = 0;
             _max_msgs[i] = 0;
@@ -310,7 +310,7 @@ namespace MSG_ {
                     case 11: {
                         uint8_t bVar3 = (param_2->u).colony.c.android_killed.race_idx;
                         char* pcVar8 = _native_msg;
-                        if (bVar3 < 8) {
+                        if (bVar3 < MAX_PLAYERS) {
                             pcVar8 = MOX::_player[bVar3].race_name;
                         }
                         sprintf(param_1, _msg_colony_android_killed_organic_fmt, pcVar6, pcVar8);

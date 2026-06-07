@@ -57,7 +57,7 @@ namespace HOTPOP {
         anim_h = animate::Get_Height_(HOTPOP::_hot_pop_background_seg);
         base_y = (480 - anim_h) / 2;
 
-        if (HOTPOP::_hotseat_human_players < 8) {
+        if (HOTPOP::_hotseat_human_players < MAX_PLAYERS) {
             *out_join_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 99, "", _grid_background[1], "", 40);
         } else {
             *out_join_button_field = -1000;

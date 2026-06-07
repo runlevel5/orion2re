@@ -456,5 +456,5 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_To_Player_(uint8_t font_style, uint8_t player_idx);
 
-    extern s_colors _player_font_color_array[8];
+    extern s_colors _player_font_color_array[MAX_PLAYERS];
 }

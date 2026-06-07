@@ -146,8 +146,8 @@ namespace npcdiplo {
     }
 
     void __cdecl NPC_Declarations_Of_War_() {
-        int16_t decision[8];
-        int16_t reason[8];
+        int16_t decision[MAX_PLAYERS];
+        int16_t reason[MAX_PLAYERS];
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             auto& p_source = MOX::_player[i];

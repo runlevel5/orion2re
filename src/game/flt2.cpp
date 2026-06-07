@@ -11,13 +11,13 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
     int16_t owner = HACCESS::Ship_Stack_Owner_(node_idx);
 
     s_animation_header* anim;
-    if (owner < 8) {
+    if (owner < MAX_PLAYERS) {
         anim = MOX::_fltscrn_small_ship_icon_seg[MOX::_player[owner].color];
     }
     else {
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
         int8_t ship_owner = MOX::_ship[ship_idx].owner;
-        anim = MOX::_fltscrn_monster_ship_icon[ship_owner - 8];
+        anim = MOX::_fltscrn_monster_ship_icon[ship_owner - MAX_PLAYERS];
     }
 
     *width_out = animate::Get_Width_(anim);
@@ -471,7 +471,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
         break;
     case 7:
         owner = MOX::_star[MOX::_galaxy_map_scanned_star].owner;
-        if (owner < 0 || owner >= 8) {
+        if (owner < 0 || owner >= MAX_PLAYERS) {
             owner = -1;
             local_58 = _neutral_colors;
         }

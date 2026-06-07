@@ -102,7 +102,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Ship_Fuel_(int16_t player_idx) {
-        if (player_idx >= 8) {
+        if (player_idx >= MAX_PLAYERS) {
             return 5;
         }
 
@@ -124,7 +124,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Warp_Drive_(int16_t player_idx) {
-        if (player_idx > 7) {
+        if (player_idx >= MAX_PLAYERS) {
             // Handle special players (Guardians, Antarans, etc.)
             switch (player_idx) {
                 case 8:  // Antarans
@@ -158,7 +158,7 @@ namespace INITSHIP {
     int16_t __cdecl Calc_Player_FTL_Speed_(int16_t player_idx) {
         int16_t speed = 1;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             int16_t drive_idx = Best_Warp_Drive_(player_idx);
             speed = TECHDATA::_drives[drive_idx].warp_speed;
 
@@ -173,7 +173,7 @@ namespace INITSHIP {
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t drive_idx) {
         int16_t speed = 0;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
@@ -246,7 +246,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Armor_(int16_t player_idx) {
-        if (player_idx > 7) {
+        if (player_idx >= MAX_PLAYERS) {
             // Antarans or Space Monsters
             if (player_idx == 8 || player_idx == 9) {
                 return 6; // Xentronium
@@ -273,7 +273,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Computer_(int16_t player_idx) {
-        if (player_idx >= 8) {
+        if (player_idx >= MAX_PLAYERS) {
             return 5;
         }
 
@@ -291,7 +291,7 @@ namespace INITSHIP {
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
         int16_t best_shield_idx = 0;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             for (int16_t i = 1; i < 6; ++i) {
                 if (MOX::_player[player_idx].tech_applications[TECHDATA::_shields[i].tech_app_id] == 3) {
                     best_shield_idx = i;
@@ -312,7 +312,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Shield_Special_(int16_t player_idx) {
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             // Check if player has Hard Shields tech application researched (level 3)
             if (MOX::_player[player_idx].tech_applications[TECH_APP_HARD_SHIELDS] == 3) {
                 return 13; /* HARD_SHIELDS_SPECIAL */
@@ -778,9 +778,9 @@ namespace INITSHIP {
     }
 
     void __cdecl Repair_Ships_At_Colonies_() {
-        int16_t best_warp_drives[8];
+        int16_t best_warp_drives[MAX_PLAYERS];
 
-        for (int16_t i = 0; i < 8; ++i) {
+        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             best_warp_drives[i] = Best_Warp_Drive_(i);
         }
 
@@ -788,7 +788,7 @@ namespace INITSHIP {
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
                 s_ship_data& ship = MOX::_ship[i];
 
-                if (ship.owner < 8 && ship.status == 0) {
+                if (ship.owner < MAX_PLAYERS && ship.status == 0) {
                     int16_t best_ftl = best_warp_drives[(uint8_t)ship.owner];
                     if (best_ftl != (int16_t)ship.d.ftl_type) {
                         int8_t old_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_min[(uint8_t)ship.d.size];
@@ -906,7 +906,7 @@ namespace INITSHIP {
         local_missile_defense += (int16_t)(crew_def_bonus / 2);
         local_attack += MOX::_crew_data[(int)ship->crew_quality].attack;
 
-        if (ship->owner < 8) {
+        if (ship->owner < MAX_PLAYERS) {
             s_player* owner_player = &MOX::_player[(int)ship->owner];
 
             int16_t trait_def_bonus = (int16_t)owner_player->traits[TRAIT_SHIP_DEFENSE];
@@ -938,7 +938,7 @@ namespace INITSHIP {
         int16_t best_weapon_idx = 3;
 
         // Special handling for non-standard players (monsters, Antarans, etc.)
-        if (player_idx >= 8) {
+        if (player_idx >= MAX_PLAYERS) {
             switch (player_idx) {
             case 8:
                 return 11;
@@ -984,7 +984,7 @@ namespace INITSHIP {
         int16_t best_idx = 14; /* 0xE */
         int16_t max_damage = 0;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             for (int16_t i = 0; i < 40; ++i) {
                 // check if player has researched the weapon (value 3 usually means fully researched/available)
                 if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
@@ -1025,7 +1025,7 @@ namespace INITSHIP {
         int16_t best_dmg_per_space = 0;
         int16_t best_weapon_idx = 3;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             for (int16_t i = 0; i < 40; ++i) {
                 const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
@@ -1084,7 +1084,7 @@ namespace INITSHIP {
         int16_t best_weapon_idx = 14;
         int16_t max_damage = 0;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             for (int i = 0; i < 40; ++i) {
                 const auto& weapon = TECHDATA::_weapons[i];
                 if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
@@ -1110,7 +1110,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Strat_Special_Weapon_(int16_t player_idx, int16_t size) {
-        if (player_idx >= 8) {
+        if (player_idx >= MAX_PLAYERS) {
             switch (player_idx) {
                 case 8:
                     return 37 /* 0x25 */;
@@ -1242,7 +1242,7 @@ namespace INITSHIP {
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int16_t owner = (int16_t)ship->owner;
 
-        if (owner < 8 && MOX::_settings.strategic_combat_flag != 0) {
+        if (owner < MAX_PLAYERS && MOX::_settings.strategic_combat_flag != 0) {
             ship->d.ftl_type = static_cast<int8_t>(Best_Warp_Drive_(owner));
             ship->d.speed = static_cast<int8_t>(Get_FTL_Speed_(owner, static_cast<int16_t>(ship->d.ftl_type)));
             ship->d.shield_type = static_cast<int8_t>(Best_Ship_Shield_(owner));
@@ -1264,7 +1264,7 @@ namespace INITSHIP {
     int16_t __cdecl Strat_Beam_Weapon_Count_(int16_t player_idx, int16_t hull_idx) {
         int16_t weapon_count = TECHDATA::_hull_data[hull_idx].strat_beam;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             // Check for Megafluxers tech application
             if (MOX::_player[player_idx].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
                 weapon_count = (int16_t)((weapon_count * 3) / 2);
@@ -1274,7 +1274,7 @@ namespace INITSHIP {
         return weapon_count;
     }
     int16_t __cdecl Best_Bomb_Weapon_(int16_t player_idx) {
-        if (player_idx >= 8) {
+        if (player_idx >= MAX_PLAYERS) {
             return 24 /* 0x18 */;
         }
 
@@ -1301,7 +1301,7 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
     int16_t best_weapon_idx = 3;
     int16_t max_damage = 0;
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t i = 0; i < 40; ++i) {
             int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
 
@@ -1343,7 +1343,7 @@ int16_t __cdecl Best_Beam_To_Hit_Special_(int16_t player_idx) {
     int16_t max_bonus = 0;
 
     // Ensure player_idx is within valid bounds
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t special_idx = 0; special_idx < 39 /* 0x27 */; ++special_idx) {
             const s_tech_specials_data& spec = TECHDATA::_specials[special_idx];
 
@@ -1368,7 +1368,7 @@ int16_t __cdecl Best_Beam_Damage_Special_(int16_t player_idx) {
     int16_t best_idx = 0;
     int16_t max_bonus = 0;
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t i = 0; i < 39; ++i) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
@@ -1392,7 +1392,7 @@ int16_t __cdecl Best_Beam_Defense_Special_(int16_t player_idx) {
     int16_t best_special_idx = 0;
     int16_t max_bonus = 0;
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t i = 0; i < 39; ++i) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
@@ -1422,7 +1422,7 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
     int16_t best_special_idx = 0;
     int16_t best_bonus = 0;
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t special_idx = 0; special_idx < 39 /* 0x27 */; ++special_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[special_idx];
 
@@ -2431,7 +2431,7 @@ int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
     int16_t best_special_idx = 0;
     int16_t best_strategic_value = 0;
 
-    if (player_idx < 8) {
+    if (player_idx < MAX_PLAYERS) {
         for (int16_t special_idx = 0; special_idx < 39; ++special_idx) {
             const int16_t tech_app_id =
                 static_cast<int16_t>(TECHDATA::_specials[special_idx].tech_app_id);

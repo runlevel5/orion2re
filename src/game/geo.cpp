@@ -305,7 +305,7 @@ namespace GEO {
         bool result = false;
 
         // Mask out the bit corresponding to player_idx to check for interdictors from other players
-        uint8_t shift = player_idx & 7;
+        uint8_t shift = player_idx & (MAX_PLAYERS - 1);
         uint8_t other_players_mask = (uint8_t)~((uint8_t)1 << shift);
 
         if ((star->has_warp_field_interdictor & other_players_mask) != 0) {

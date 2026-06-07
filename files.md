@@ -1,4 +1,4 @@
-[X] src/game/advciv.cpp
+[ ] src/game/advciv.cpp
 [ ] src/game/advciv.h
 [ ] src/game/aibomb.cpp
 [ ] src/game/aibomb.h
@@ -110,7 +110,6 @@
 [ ] src/game/combinit.h
 [ ] src/game/comcore.cpp
 [ ] src/game/comcore.h
-[ ] src/game/consts.h
 [ ] src/game/contact.cpp
 [ ] src/game/contact.h
 [ ] src/game/council.cpp
@@ -162,7 +161,7 @@
 [ ] src/game/filedef.h
 [ ] src/game/firepts.cpp
 [ ] src/game/firepts.h
-[ ] src/game/flcqueue.cpp
+[ ] src/game/firepts.h
 [ ] src/game/flcqueue.h
 [ ] src/game/fleetpop.cpp
 [ ] src/game/fleetpop.h

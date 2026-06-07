@@ -162,7 +162,7 @@ namespace ERICNET {
     }
 
     void __cdecl Do_All_Ships_XP_Check_() {
-        int16_t instructor_bonuses[8];
+        int16_t instructor_bonuses[MAX_PLAYERS];
         memset(instructor_bonuses, 0, sizeof(instructor_bonuses));
 
         Best_Instructor_Bonus_(instructor_bonuses);
@@ -170,7 +170,7 @@ namespace ERICNET {
         for (int16_t ship_idx = 0; ship_idx < 500; ++ship_idx) {
             s_ship_data& ship = MOX::_ship[ship_idx];
 
-            if (ship.status < 5 && (uint8_t)ship.owner < 8) {
+            if (ship.status < 5 && (uint8_t)ship.owner < MAX_PLAYERS) {
                 int16_t owner_id = HACCESS::Ship_Owner_(ship_idx);
                 int16_t bonus = instructor_bonuses[owner_id];
                 Do_XP_For_Ship_(ship_idx, bonus);
@@ -449,7 +449,7 @@ namespace ERICNET {
                 ((int8_t)leader.status >= 0) &&
                 ((int8_t)leader.eta == 0) &&
                 (player_index > -1) &&
-                (player_index < 8)) {
+                (player_index < MAX_PLAYERS)) {
                 int16_t bonus = 0;
 
                 if (OFFICER::Officer_Has_Special_Skill_(player_index, leader_index, 0x16)) {

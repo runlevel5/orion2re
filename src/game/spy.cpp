@@ -84,7 +84,7 @@ namespace spy {
 
     void __cdecl Resolve_Spies_() {
         uint8_t num_active_players = 0;
-        int8_t active_player_indices[8];
+        int8_t active_player_indices[MAX_PLAYERS];
 
         Resolve_Assassins_();
 
@@ -280,7 +280,7 @@ namespace spy {
         }
 
         int32_t remaining_spies = total_spies - allocated_home;
-        uint32_t target_weights[8] = { 0 };
+        uint32_t target_weights[MAX_PLAYERS] = { 0 };
         uint32_t max_weight = 0;
 
         if (MOX::_NUM_PLAYERS > 0) {

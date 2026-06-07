@@ -276,7 +276,7 @@ namespace NETTURN {
 
     void __cdecl Client_Next_Turn_() {
         uint8_t star_has_nonplayer;
-        s_combfind_star_has_player star_has_player[8];
+        s_combfind_star_has_player star_has_player[MAX_PLAYERS];
 
         NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, 11 /* NET_MSG_TURN_END_REQUEST */, nullptr, 0);
 

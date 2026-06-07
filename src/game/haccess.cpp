@@ -680,9 +680,9 @@ namespace HACCESS {
     void __cdecl Race_Name_(int16_t race_id, char* race_name_out) {
         strcpy(race_name_out, "Human");
 
-        if (race_id < 8) {
+        if (race_id < MAX_PLAYERS) {
             strcpy(race_name_out, MOX::_player[race_id].race_name);
-        } else if (race_id == 8) {
+        } else if (race_id == MAX_PLAYERS) {
             strcpy(race_name_out, MOX::_race_names[13]);
         } else {
             strcpy(race_name_out, MOX::_race_names[race_id + 5]);

@@ -5,7 +5,7 @@ namespace HOMEGEN {
 
     int32_t _HOME_WORLD_GEN_MAX_CTR;
     s_good_star* _good_stars;
-    int16_t _nearest_food_worlds[8];
+    int16_t _nearest_food_worlds[MAX_PLAYERS];
     s_star_dist* _star_list;
 
     static int32_t __cdecl Compare_Star_Dist_(const s_star_dist* candidate_a, const s_star_dist* candidate_b) {
@@ -264,8 +264,8 @@ namespace HOMEGEN {
                 sel_list->stars[idx2] = tmp;
             }
 
-            // Clear the 8-slot output list.
-            for (int i = 0; i < 8; ++i) home_stars_out[i] = -1;
+            // Clear the player-slot output list.
+            for (int i = 0; i < MAX_PLAYERS; ++i) home_stars_out[i] = -1;
 
             for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
                 home_stars_out[i] = sel_list->stars[i];
@@ -299,7 +299,7 @@ namespace HOMEGEN {
     }
 
     uint16_t __cdecl Generate_Home_Worlds_() {
-        int16_t home_star_ids[8];
+        int16_t home_star_ids[MAX_PLAYERS];
 
         s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
         s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
@@ -307,7 +307,7 @@ namespace HOMEGEN {
         _good_stars = (s_good_star*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x5418);
         memset(_good_stars, 0, 0x120);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             _nearest_food_worlds[i] = -1;
         }
 
@@ -833,7 +833,7 @@ namespace HOMEGEN {
     }
 
     void __cdecl Modify_Home_Worlds_() {
-        int16_t home_star_ids[9];
+        int16_t home_star_ids[MAX_PLAYERS + 1];
         int16_t home_planet_id;
         int16_t home_star_count = 0;
 
@@ -845,12 +845,12 @@ namespace HOMEGEN {
         home_star_ids[5] = -1;
         home_star_ids[6] = -1;
         home_star_ids[7] = -1;
-        home_star_ids[8] = -1;
+        home_star_ids[MAX_PLAYERS] = -1;
 
         // Pass 1: Collect star IDs of all home worlds
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
             int8_t owner = MOX::_star[i].owner;
-            if (owner >= 0 && owner < 8) {
+            if (owner >= 0 && owner < MAX_PLAYERS) {
                 home_star_ids[home_star_count + 1] = i;
                 home_star_count++;
             }
@@ -859,7 +859,7 @@ namespace HOMEGEN {
         // Pass 2: Process and enforce traits on each home world
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
             int16_t owner_idx = (int16_t)MOX::_star[i].owner;
-            if (owner_idx >= 0 && owner_idx < 8) {
+            if (owner_idx >= 0 && owner_idx < MAX_PLAYERS) {
                 s_player* player = &MOX::_player[owner_idx];
 
                 Enforce_3_Planet_Minimum_(i);

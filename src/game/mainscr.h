@@ -43,11 +43,11 @@ namespace MAINSCR {
     extern int8_t _fleet_ship_selection_status;
     extern int16_t _fleet_icon_chosen;
 
-    extern s_hotseat_system_box_state _hotseat_system_box[8];
+    extern s_hotseat_system_box_state _hotseat_system_box[MAX_PLAYERS];
 
-    extern uint8_t _hotseat_map_scale[8];
+    extern uint8_t _hotseat_map_scale[MAX_PLAYERS];
 
-    extern s_hotseat_fleet_box_state _hotseat_fleet_box[8];
+    extern s_hotseat_fleet_box_state _hotseat_fleet_box[MAX_PLAYERS];
 
     inline int16_t& _hotseat_fleet_box_stack_ship_id(int32_t index) {
         return _hotseat_fleet_box[index].stack_ship_id;
@@ -83,8 +83,8 @@ namespace MAINSCR {
     extern s_colors _ship_direction_line_green_colors;
     extern s_colors _ship_direction_line_red_colors;
     extern uint8_t _fltpop_field_selection_status;
-    extern int8_t _diplo_lights_anim_frame[8];
-    extern s_animation_header* _player_lights_seg[8];
+    extern int8_t _diplo_lights_anim_frame[MAX_PLAYERS];
+    extern s_animation_header* _player_lights_seg[MAX_PLAYERS];
 
     void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* out_x, int16_t* out_y);
 

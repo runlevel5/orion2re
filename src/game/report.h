@@ -4,7 +4,7 @@ namespace REPORT {
     extern int16_t _n_reports;
     extern s_report _reports[50];
     extern uint8_t _done_player_reports;
-    extern uint8_t _something_interesting_happened[8];
+    extern uint8_t _something_interesting_happened[MAX_PLAYERS];
     extern uint8_t _done_colonize_check[9];
     extern uint8_t _displayed_msgs;
     extern uint8_t _displayed_gnn;

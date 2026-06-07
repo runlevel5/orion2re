@@ -2092,7 +2092,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MISC::Fade_Into_Screen_(Draw_Choose_Net_Plyrs_Screen_, &fade_flag, 11);
 
         MOX::_mp_screen->is_host_flag = is_host;
-        memcpy(MOX::_mp_screen->player_connected_flags, connected_flags, 8);
+        memcpy(MOX::_mp_screen->player_connected_flags, connected_flags, MAX_PLAYERS);
 
         do {
             timer::Mark_Time_();
@@ -2257,7 +2257,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 uint8_t sender_id = CHAT::_chat_info->messages[i].player_id;
                 char chat_buffer[100];
 
-                if (sender_id < 8) {
+                if (sender_id < MAX_PLAYERS) {
                     uint8_t c1, c2, c3;
                     MULTPLAY::Get_Main_Palette_Base_Colors_(sender_id, &c1, &c2, &c3);
                     MOX::_mox_font_colors_offset = (uint8_t)(c2 + 1);
@@ -2491,7 +2491,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         fields::Clear_Fields_();
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             MOX::_mp_screen->player_field_ids[i] = -1000;
         }
 
@@ -2865,7 +2865,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         int16_t visible_row = 0;
         MOX::_mp_screen->subscreen_mode = 4;
 
-        for (int16_t player_idx = 0; player_idx < 8; ++player_idx) {
+        for (int16_t player_idx = 0; player_idx < MAX_PLAYERS; ++player_idx) {
             s_colors primary_colors;
             s_colors secondary_colors;
             s_colors tertiary_colors;
@@ -2998,7 +2998,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     int16_t __cdecl Hotseat_Get_N_Valid_Players_() {
         int16_t valid_player_count = 0;
 
-        for (int16_t player_index = 0; player_index < 8; ++player_index) {
+        for (int16_t player_index = 0; player_index < MAX_PLAYERS; ++player_index) {
             const int8_t button_status = MOX::_mp_screen->player_button_status[player_index];
             if (button_status == 2 || button_status == 1) {
                 ++valid_player_count;
@@ -3011,7 +3011,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     void __cdecl Hotseat_Set_Next_Player_Status_(void) {
         int16_t ready_player_count = 0;
 
-        for (int16_t player_idx = 0; player_idx < 8; ++player_idx) {
+        for (int16_t player_idx = 0; player_idx < MAX_PLAYERS; ++player_idx) {
             if (player_idx < MOX::_NUM_PLAYERS) {
                 const int8_t player_status = MULTPLAY::Hotseat_Player_Status_(player_idx);
                 MOX::_mp_screen->player_button_status[player_idx] = player_status;

@@ -8,8 +8,8 @@ namespace COMBFIND {
     extern int8_t* _battle_stars;
     extern uint8_t (*_star_has_nonplayer)[73];
     extern int16_t _n_battle_stars;
-    extern int8_t (*_attack_confirmed)[8][8];
-    extern s_combfind_star_has_player (*_star_has_player)[73][8];
+    extern int8_t (*_attack_confirmed)[MAX_PLAYERS][MAX_PLAYERS];
+    extern s_combfind_star_has_player (*_star_has_player)[73][MAX_PLAYERS];
     extern uint8_t* _current_star_has_nonplayer;
     extern s_combfind_star_has_player* _current_star_has_player;
     extern char* _research_treaty_msg;

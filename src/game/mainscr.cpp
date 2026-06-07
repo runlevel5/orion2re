@@ -42,11 +42,11 @@ namespace MAINSCR {
     int8_t _fleet_ship_selection_status;
     int16_t _fleet_icon_chosen;
 
-    s_hotseat_system_box_state _hotseat_system_box[8];
+    s_hotseat_system_box_state _hotseat_system_box[MAX_PLAYERS];
 
-    uint8_t _hotseat_map_scale[8];
+    uint8_t _hotseat_map_scale[MAX_PLAYERS];
 
-    s_hotseat_fleet_box_state _hotseat_fleet_box[8];
+    s_hotseat_fleet_box_state _hotseat_fleet_box[MAX_PLAYERS];
 
     int8_t _star_name_highlight_direction = 1;
 
@@ -877,7 +877,7 @@ namespace MAINSCR {
         }
 
         int8_t surrender_to = MOX::_star[star_id].surrender_to[MOX::_PLAYER_NUM];
-        if (static_cast<uint8_t>(surrender_to) < 8) {
+        if (static_cast<uint8_t>(surrender_to) < MAX_PLAYERS) {
             // Player colors derived from stack-initialized byte array
             static const uint8_t surrender_colors[8] = { 0x80, 0x7b, 0x78, 0x2c, 0x86, 0x9f, 0x83, 0x7e };
 
@@ -1035,7 +1035,7 @@ namespace MAINSCR {
         };
 
         if (!galactic_lore) {
-            bool has_contact = (owner >= 0 && owner <= 7) && HAROLD::Contact_With_One_Colony_(star_idx);
+            bool has_contact = (owner >= 0 && owner < MAX_PLAYERS) && HAROLD::Contact_With_One_Colony_(star_idx);
             if (!has_contact) {
                 if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) return;
 
@@ -1063,7 +1063,7 @@ namespace MAINSCR {
             while ((*dst++ = *src++));
         }
 
-        if (owner >= 0 && owner <= 7) {
+        if (owner >= 0 && owner < MAX_PLAYERS) {
             HAROLD::Set_Player_Font_Style_(owner, (bool)is_selected);
         } else {
             int16_t font_style = HAROLD::Zoom_Level_Font_Style_();
@@ -1081,7 +1081,7 @@ namespace MAINSCR {
     }
 
     bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* star_name, s_animation_header** out_bitmap_ptr) {
-        int16_t owner_counts[8];
+        int16_t owner_counts[MAX_PLAYERS];
         int16_t num_owners;
         s_colors standard_colors;
         s_colors player_colors;
@@ -1094,7 +1094,7 @@ namespace MAINSCR {
         }
 
         int16_t total_colony_count = 0;
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             total_colony_count += owner_counts[i];
         }
 
@@ -1110,7 +1110,7 @@ namespace MAINSCR {
         fonts::Print_To_Bitmap_(0, 0, star_name, bitmap);
 
         int16_t current_x = 0;
-        for (int16_t i = 0; i < 8; ++i) {
+        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             if (owner_counts[i] > 0) {
                 int16_t width, height, d1, d2;
                 MISC::Get_Bitmap_String_Range_(owner_counts[i], total_colony_count, &width, &d1, &d2, &height, star_name);
@@ -1635,7 +1635,7 @@ namespace MAINSCR {
         s_star_data* star = &MOX::_star[star_idx];
         int16_t owner = (int16_t)star->owner;
 
-        if (owner >= 0 && owner < 8) {
+        if (owner >= 0 && owner < MAX_PLAYERS) {
             HAROLD::Set_Player_Font_Style_(owner, 0);
             char* race_name = HACCESS::Race_Name_String_(owner);
 
@@ -3812,7 +3812,7 @@ namespace MAINSCR {
             if (MOX::_settings.strategic_combat_flag != 0) {
                 NETMOX::_net.sync_state = 0x18;
             }
-            else if (NETMOX::_net.combat_target_player_id < 8 && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 'd') {
+            else if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 'd') {
                 NETMOX::_net.sync_state = 0x14;
             }
             else {

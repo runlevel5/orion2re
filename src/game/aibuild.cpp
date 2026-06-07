@@ -4,13 +4,13 @@ namespace AIBUILD {
     uint8_t _difficulty_ship_design[12] = {2, 10, 35, 50, 115, 0, 0, 0, 45, 0, 0, 0};
     int8_t _difficulty_intel_bias[8] = {1, 1, 2, 3, 4, 0, 0, 0};
     uint8_t _player_ship_size_table[9] = {1, 2, 3, 5, 8, 13, 0, 0, 0};
-    s_player_ship_sizes _player_ship_sizes[8];
-    int32_t _player_total_strength_vs_colonies[8];
-    uint8_t _player_n_transports[8][2];
-    int8_t _player_n_freighter_groups_wanted[8];
-    uint8_t _player_n_spies[8][2];
-    uint8_t _player_n_colony_ships[8][3];
-    int32_t _player_total_strength_vs_ships[8][3];
+    s_player_ship_sizes _player_ship_sizes[MAX_PLAYERS];
+    int32_t _player_total_strength_vs_colonies[MAX_PLAYERS];
+    uint8_t _player_n_transports[MAX_PLAYERS][2];
+    int8_t _player_n_freighter_groups_wanted[MAX_PLAYERS];
+    uint8_t _player_n_spies[MAX_PLAYERS][2];
+    uint8_t _player_n_colony_ships[MAX_PLAYERS][3];
+    int32_t _player_total_strength_vs_ships[MAX_PLAYERS][3];
 
     int16_t __cdecl Mean_Ship_Strength_(s_ship_data* ship) {
         int32_t ship_idx = (int32_t)(ship - MOX::_ship);
@@ -133,7 +133,7 @@ namespace AIBUILD {
         for (int32_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
 
-            if ((ship->status < 5 || ship->status == 6) && ship->owner < 8) {
+            if ((ship->status < 5 || ship->status == 6) && ship->owner < MAX_PLAYERS) {
                 int8_t owner = (int8_t)ship->owner;
 
                 if (ship->d.ship_type == SHIP_TYPE_COMBAT) {
@@ -912,7 +912,7 @@ namespace AIBUILD {
             uint32_t pop_data = colony->pop[i];
             uint32_t pop_owner = pop_data & 0x0F;
 
-            if (pop_owner < 8 && (int8_t)pop_owner != colony->owner) {
+            if (pop_owner < MAX_PLAYERS && (int8_t)pop_owner != colony->owner) {
                 if (MOX::_player[pop_owner].eliminated == 0) {
                     int8_t treaty_status = MOX::_player[pop_owner].treaty[(int32_t)colony->owner];
 

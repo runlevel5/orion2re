@@ -3,7 +3,7 @@
 namespace COLXPORT {
     extern uint8_t _cheezy_hack_col_count_state;
 
-    extern int16_t _cheezy_hack_col_count[8];
+    extern int16_t _cheezy_hack_col_count[MAX_PLAYERS];
 
     /**
      * @brief Returns the number of non-outpost colonies owned by a player.

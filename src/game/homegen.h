@@ -17,7 +17,7 @@ namespace HOMEGEN {
     extern const char s_Orion[8];
     extern int32_t _HOME_WORLD_GEN_MAX_CTR;
     extern s_good_star* _good_stars;
-    extern int16_t _nearest_food_worlds[8];
+    extern int16_t _nearest_food_worlds[MAX_PLAYERS];
     extern s_star_dist* _star_list;
 
     /** Returns whether world_id is already tracked in the nearest food-world list. */

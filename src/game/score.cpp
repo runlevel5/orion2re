@@ -1238,7 +1238,7 @@ namespace SCORE {
 
     void __cdecl Build_Captured_Colonists_Array_(int16_t player_idx) {
         uint32_t original_seed;
-        uint16_t weights[8];
+        uint16_t weights[MAX_PLAYERS];
         int16_t captured_count;
         int16_t colonies;
 
@@ -1246,7 +1246,7 @@ namespace SCORE {
         original_seed = random::Get_Random_Seed_();
         memset(weights, 0, sizeof(weights));
 
-        for (int16_t i = 0; i < 8; ++i) {
+        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             if (i != player_idx && MOX::_player[player_idx].first_contact[i] == 1) {
                 weights[i] = 2;
             }
@@ -1265,7 +1265,7 @@ namespace SCORE {
 
         if (SCORE::_hi->raw_captured_population > 0) {
             for (int16_t i = 0; i < SCORE::_hi->raw_captured_population; ++i) {
-                int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, 8);
+                int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, MAX_PLAYERS);
                 if (choice >= 0 && choice < MOX::_NUM_PLAYERS && choice != player_idx) {
                     captured_count++;
                     SCORE::_hi->captured_pop_race_ids[i] = MOX::_player[choice].race;

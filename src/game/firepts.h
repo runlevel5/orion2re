@@ -1,7 +1,7 @@
 #pragma once
 
 namespace FIREPTS {
-    extern uint8_t* _fp_data_ptr[8];
+    extern uint8_t* _fp_data_ptr[MAX_PLAYERS];
     extern uint8_t* _fp_seg;
 
     /* Loads the FIREPTS.LBX fire-point tables into the shared buffer. */

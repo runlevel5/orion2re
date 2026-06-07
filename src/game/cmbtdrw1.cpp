@@ -198,7 +198,7 @@ namespace CMBTDRW1 {
 
         if (MOX::_global_combat_data.officer_idx == -1) {
             int16_t p_idx = (int16_t)MOX::_global_combat_data.player_idx;
-            if (p_idx > 7) p_idx = 0;
+            if (p_idx >= MAX_PLAYERS) p_idx = 0;
             
             uint8_t race = (uint8_t)MOX::_player[p_idx].race;
             MOX::_detail_fleet_icon_seg = (s_animation_header*)farload::Far_Reload_Next_("flticons.lbx", race, MOX::_screen_seg);
@@ -470,7 +470,7 @@ namespace CMBTDRW1 {
 
             if (MOX::_draw_legal_boxes_flag == 1 && MOX::_cur_ship > -1) {
                 int8_t owner = MOX::_combat_data[MOX::_cur_ship].owner;
-                if (owner < 8 && MOX::_player[owner].objectives == 100) {
+                if (owner < MAX_PLAYERS && MOX::_player[owner].objectives == 100) {
                     Draw_Legal_Boxes_();
                 }
             }
@@ -835,7 +835,7 @@ skip_cursor:
         fonts::Set_Outline_Color_(0, 0);
 
         if (MOX::_missile_warning > 0 && 
-            MOX::_combat_data[MOX::_cur_ship].owner < 8 && 
+            MOX::_combat_data[MOX::_cur_ship].owner < MAX_PLAYERS && 
             MOX::_player[MOX::_combat_data[MOX::_cur_ship].owner].objectives == 100 /* 'd' */) {
             
             if (MOX::_missile_warning == 1) {
@@ -1958,7 +1958,7 @@ skip_cursor:
             char lbx_name[12];
             int32_t picture_num;
 
-            if (previous_owner < 8 && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
+            if (previous_owner < MAX_PLAYERS && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
                 memcpy(lbx_name, "cmbtshp.lbx", 12);
                 uint8_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
@@ -2498,7 +2498,7 @@ skip_cursor:
 
             char lbx_name[12];
             int16_t picture_num;
-            if (previous_owner < 8 && MOX::_combat_data[param_1].picture_num != 44 /* 0x2c */) {
+            if (previous_owner < MAX_PLAYERS && MOX::_combat_data[param_1].picture_num != 44 /* 0x2c */) {
                 strcpy(lbx_name, "cmbtshp.lbx");
                 int16_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[param_1].picture_num;
@@ -3143,7 +3143,7 @@ skip_cursor:
                 0,
                 panel_color);
 
-            if (MOX::_global_combat_data.player_idx < 8) {
+            if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
                 graphics::Interlaced_Fill_(
                     view_x + 0xEC,
                     view_y + 0x1A,
@@ -3218,7 +3218,7 @@ skip_cursor:
                 0,
                 panel_color);
 
-            if (MOX::_global_combat_data.player_idx < 8) {
+            if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
                 graphics::Interlaced_Fill_(
                     view_x + 0xEC,
                     view_y + 0x1A,
@@ -3248,7 +3248,7 @@ skip_cursor:
 
             CMBTDRW1::Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18), MOX::_ship_data_id);
 
-            if (MOX::_global_combat_data.player_idx < 8) {
+            if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
                 if (MOX::_global_combat_data.officer_idx == -1) {
                     animate::Remap_Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
                 } else {

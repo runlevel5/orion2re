@@ -86,8 +86,8 @@ namespace COMBAT1 {
             MOX::_grid_button = -100;
             MOX::_self_destruct_button = -100;
 
-            if (MOX::_combat_attacker_player < 8 && MOX::_player[MOX::_combat_attacker_player].objectives == 100 &&
-                MOX::_combat_defender_player < 8 && MOX::_player[MOX::_combat_defender_player].objectives == 100) {
+            if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_player[MOX::_combat_attacker_player].objectives == 100 &&
+                MOX::_combat_defender_player < MAX_PLAYERS && MOX::_player[MOX::_combat_defender_player].objectives == 100) {
                 MOX::_super_fast_button = -1000;
             } else {
                 MOX::_super_fast_button = fields::Add_Hot_Key_("z");
@@ -154,7 +154,7 @@ namespace COMBAT1 {
         int16_t is_computer = 0;
         int8_t owner = MOX::_combat_data[ship_idx].owner;
 
-        if (((owner >= 8) || (MOX::_player[owner].objectives != 100) || (MOX::_auto_combat == 1)) &&
+        if (((owner >= MAX_PLAYERS) || (MOX::_player[owner].objectives != 100) || (MOX::_auto_combat == 1)) &&
             (MOX::_take_control_flag == 0)) {
             is_computer = 1;
         }
@@ -984,7 +984,7 @@ namespace COMBAT1 {
                 speed = 0;
             }
             
-            if (owner < 8 && MOX::_player[owner].traits[29] != 0) {
+            if (owner < MAX_PLAYERS && MOX::_player[owner].traits[29] != 0) {
                 speed += 4;
             }
             

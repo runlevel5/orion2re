@@ -5,7 +5,7 @@ namespace invasion {
 void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_player_bonuses* bonuses, int8_t is_defender) {
     memset(bonuses, 0, sizeof(s_invasion_player_bonuses));
 
-    if (player_idx >= 8) {
+    if (player_idx >= MAX_PLAYERS) {
         bonuses->antigrav_bonus = 10;
         bonuses->battleoids_bonus = 10;
         bonuses->has_battleoids = 1;
@@ -351,7 +351,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         return;
     }
 
-    uint8_t rebel_weights[8] = {0};
+    uint8_t rebel_weights[MAX_PLAYERS] = {0};
     int total_rebel_pop = 0;
 
     if (colony->n_pops != 0) {
@@ -601,7 +601,7 @@ int __cdecl Colony_N_Militia_(s_colony* colony) {
     for (uint8_t i = 0; i < n_pops; ++i) {
         uint32_t pop_flags = colony->pop[i];
 
-        if (((pop_flags & 0x0F) < 8) && ((pop_flags & 0x0400) == 0)) {
+        if (((pop_flags & 0x0F) < MAX_PLAYERS) && ((pop_flags & 0x0400) == 0)) {
             count++;
         }
     }

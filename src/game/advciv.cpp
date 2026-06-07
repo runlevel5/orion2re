@@ -235,9 +235,9 @@ namespace ADVCIV {
         int16_t target_planet_count = Num_Adv_Civ_Planets_();
         int16_t active_players_count = (int16_t)MOX::_NUM_PLAYERS;
 
-        int16_t player_round_state[16];
+        int16_t player_round_state[MAX_PLAYERS * 2];
 
-        for (int16_t i = 0; i < 8; ++i) {
+        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             player_round_state[i] = -1;
         }
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
@@ -245,14 +245,14 @@ namespace ADVCIV {
         }
 
         while (active_players_count > 0) {
-            for (int16_t i = 8; i < 16; ++i) {
+            for (int16_t i = MAX_PLAYERS; i < MAX_PLAYERS * 2; ++i) {
                 player_round_state[i] = -1;
             }
 
             Build_Adv_Civ_Star_List_();
-            HAROLD::Randomize_List_(player_round_state, 8, 0);
+            HAROLD::Randomize_List_(player_round_state, MAX_PLAYERS, 0);
 
-            for (int16_t i = 0; i < 8; ++i) {
+            for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
                 int16_t player_idx = player_round_state[i];
                 if (player_idx == -1) continue;
 
@@ -263,7 +263,7 @@ namespace ADVCIV {
                 } else {
                     int16_t global_planet_idx = _adv_civ_player[player_idx].planets[candidate_planet_idx].planet_idx;
                     int8_t star_idx = MOX::_planet[global_planet_idx].star_index;
-                    player_round_state[player_idx + 8] = candidate_planet_idx;
+                    player_round_state[player_idx + MAX_PLAYERS] = candidate_planet_idx;
                     _planet_selected_flag[global_planet_idx] = (int8_t)player_idx;
                     _star_colony_owner[star_idx] = (int8_t)player_idx;
                 }
@@ -271,14 +271,14 @@ namespace ADVCIV {
 
             int16_t round_pick_count = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-                if (player_round_state[i + 8] != -1) {
+                if (player_round_state[i + MAX_PLAYERS] != -1) {
                     round_pick_count++;
                 }
             }
 
             if (round_pick_count == (int16_t)MOX::_NUM_PLAYERS) {
                 for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
-                    int16_t candidate_planet_idx = player_round_state[p + 8];
+                    int16_t candidate_planet_idx = player_round_state[p + MAX_PLAYERS];
                     if (candidate_planet_idx == -1) continue;
 
                     s_adv_civ_player& plr = _adv_civ_player[p];
@@ -316,7 +316,7 @@ namespace ADVCIV {
                 }
             } else {
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-                    int16_t candidate_planet_idx = player_round_state[i + 8];
+                    int16_t candidate_planet_idx = player_round_state[i + MAX_PLAYERS];
                     if (candidate_planet_idx >= 0 && candidate_planet_idx < 360) {
                         _planet_selected_flag[candidate_planet_idx] = -1;
                     }
@@ -410,7 +410,7 @@ namespace ADVCIV {
      */
     void __cdecl Twiddle_Selected_Adv_Civ_Planets_() {
         MAPGEN::_MAPGEN_TRACE = 0;
-        int16_t player_special_count[8] = { 0 };
+        int16_t player_special_count[MAX_PLAYERS] = { 0 };
         int32_t max_worthiness = 0;
         int16_t best_player_idx = 0;
 

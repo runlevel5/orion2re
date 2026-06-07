@@ -301,7 +301,7 @@ namespace INFO {
         nullptr,
     };
 
-    s_colors _hist_palettes[8] = {
+    s_colors _hist_palettes[MAX_PLAYERS] = {
         {{178, 198, 167, 195, 196, 197, 198, 199}},
         {{178, 206, 203, 203, 204, 205, 206, 207}},
         {{178, 214, 211, 211, 212, 213, 214, 215}},
@@ -312,7 +312,7 @@ namespace INFO {
         {{178, 254, 251, 251, 252, 253, 254, 255}},
     };
 
-    s_colors* _hist_graph_palettes[8];
+    s_colors* _hist_graph_palettes[MAX_PLAYERS];
 
     s_drop_area _history_graph_drops[2] = {
         {220, 60, 609, 122, {179, 177, 177}, {180, 178, 178}, {178, 176, 176}},
@@ -1221,7 +1221,7 @@ namespace INFO {
 
     void __cdecl Draw_Histories_(int16_t offset_x) {
         int16_t btns[4];
-        int32_t history_data[8][350];
+        int32_t history_data[MAX_PLAYERS][350];
         int16_t n_points;
         char buffer[32];
 
@@ -1652,7 +1652,7 @@ namespace INFO {
         char none_msg[40];
         char unused_msg[40];
 
-        s_animation_header* player_panels[8];
+        s_animation_header* player_panels[MAX_PLAYERS];
         s_animation_header* eliminated_banner;
 
         JIM::Get_Text_Message_("billtext.lbx", 14, dead_msg, 40);
@@ -1673,7 +1673,7 @@ namespace INFO {
         fonts::Set_Font_Style_Outline_(2, &INFO::_info_red_color);
         fonts::Print_Centered_To_Bitmap_(91, 2, dead_msg, eliminated_banner);
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             size = bitmap::Get_Bitmap_Size_(183, 164);
             player_panels[i] = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
             bitmap::Create_Blank_Bitmap_(183, 164, player_panels[i]);

@@ -203,12 +203,12 @@ namespace SHIPSTAK {
                     s_ship_data& ship = MOX::_ship[node_ship_idx];
                     int16_t owner = (int16_t)(int8_t)ship.owner;
 
-                    if (owner < 9 || ship.d.speed != 0) {
+                    if (owner <= MAX_PLAYERS || ship.d.speed != 0) {
                         int16_t detection = 0;
 
-                        if (owner == 8) {
+                        if (owner == MAX_PLAYERS) {
                             detection = -5;
-                        } else if (owner < 8 && MOX::_player[owner].traits[28] == 1) {
+                        } else if (owner < MAX_PLAYERS && MOX::_player[owner].traits[28] == 1) {
                             detection = 500;
                         } else {
                             if ((int8_t)ship.status == 1) {

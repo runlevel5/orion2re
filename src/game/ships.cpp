@@ -358,7 +358,7 @@ namespace SHIPS {
             inverted_zoom = 3;
         }
 
-        if (ship_type_idx < 8) {
+        if (ship_type_idx < MAX_PLAYERS) {
             uint8_t color = MOX::_player[ship_type_idx].color;
             // Assembly contains a redundant call here
             HAROLD::Map_Scale_To_Zoom_Level_();

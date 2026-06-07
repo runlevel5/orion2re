@@ -79,7 +79,7 @@ namespace CMBTMIS {
 
         // Retargeting requires rack type 4 (Fighters) or Emissions Guidance tech (tech app 46)
         if (TECHDATA::_weapons[missile.type].type == 4 || 
-            (owner_player < 8 && MOX::_player[owner_player].tech_applications[46] == 3)) {
+            (owner_player < MAX_PLAYERS && MOX::_player[owner_player].tech_applications[46] == 3)) {
             
             int16_t min_range = 30000;
             int16_t target_player = MOX::_combat_attacker_player;
@@ -326,7 +326,7 @@ namespace CMBTMIS {
                 evade = MOX::_combat_data[target_unit_idx].tac_val_evade;
             }
 
-            if (owner < 8) {
+            if (owner < MAX_PLAYERS) {
                 if (MOX::_player[owner].tech_applications[160] == 3) {
                     evade -= 70;
                 } else if (MOX::_player[owner].tech_applications[116] == 3) {
@@ -571,28 +571,28 @@ namespace CMBTMIS {
 
             case 28: /* 0x1C */
                 missile_speed = 6;
-                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
                     missile_speed = 10;
                 }
                 break;
 
             case 29: /* 0x1D */
                 missile_speed = 8;
-                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
                     missile_speed = 12;
                 }
                 break;
 
             case 30: /* 0x1E */
                 missile_speed = 8;
-                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
                     missile_speed = 12;
                 }
                 break;
 
             case 31: /* 0x1F */
                 missile_speed = 10;
-                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
                     missile_speed = 14;
                 }
                 break;
@@ -1115,7 +1115,7 @@ namespace CMBTMIS {
         ocv += TECHDATA::_computers[best_computer_idx].bonus;
 
         // Players 0-7 get their racial/trained ship attack trait bonus
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             ocv += MOX::_player[player_idx].traits[TRAIT_SHIP_ATTACK];
         }
 
@@ -1372,7 +1372,7 @@ namespace CMBTMIS {
             bonus = CMBTFIR2::Get_Fleet_Pilot_Bonus_(player_idx);
 
             // Add defense trait bonus if player is valid
-            if (player_idx < 8 && player_idx != -1) {
+            if (player_idx < MAX_PLAYERS && player_idx != -1) {
                 bonus += MOX::_player[player_idx].traits[TRAIT_SHIP_DEFENSE];
             }
         }

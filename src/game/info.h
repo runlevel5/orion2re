@@ -102,9 +102,9 @@ namespace INFO {
 
     extern s_colors* PTR__orange_text_colors[8];
 
-    extern s_colors _hist_palettes[8];
+    extern s_colors _hist_palettes[MAX_PLAYERS];
 
-    extern s_colors* _hist_graph_palettes[8];
+    extern s_colors* _hist_graph_palettes[MAX_PLAYERS];
 
     /** Recolors bitmap pixels whose indices fall within the supplied palette range. */
     void __cdecl Colorize_Bitmap_(s_animation_header* anim, s_colors* color_table, uint8_t range_start, uint8_t range_end);

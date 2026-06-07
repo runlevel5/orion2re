@@ -73,7 +73,7 @@ namespace LOADER {
         SYS::_sys_data_buffer = allocate::Allocate_Next_Block_(MOX::_global_screen_seg, 0xDC);
 
         int32_t player_light_idx = 0x109;
-        for (int32_t i = 0; i < 8; ++i) {
+        for (int32_t i = 0; i < MAX_PLAYERS; ++i) {
             MAINSCR::_player_lights_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("BUFFER0.LBX", player_light_idx, MOX::_global_screen_seg);
             player_light_idx++;
         }

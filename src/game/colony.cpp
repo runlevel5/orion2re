@@ -150,7 +150,7 @@ namespace COLONY {
 
     int16_t _g_count;
 
-    s_colors _player_font_color_array[8] = {
+    s_colors _player_font_color_array[MAX_PLAYERS] = {
         {{183, 187, 185, 0, 0, 0, 0, 0}},
         {{232, 234, 233, 0, 0, 0, 0, 0}},
         {{83, 102, 100, 0, 0, 0, 0, 0}},

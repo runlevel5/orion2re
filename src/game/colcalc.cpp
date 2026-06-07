@@ -129,7 +129,7 @@ namespace COLCALC {
     }
 
     int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
-        if (player_idx < 8 && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
+        if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
             switch (climate) {
                 case PLANET_CLIMATE_TUNDRA: // 4
                 case PLANET_CLIMATE_SWAMP: // 6
@@ -807,11 +807,11 @@ namespace COLCALC {
     int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, int climate, int16_t player_idx) {
         bool is_immune = false;
 
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             if (MOX::_player[player_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] != 0) {
                 is_immune = true;
             }
-        } else if (player_idx == 8) {
+        } else if (player_idx == MAX_PLAYERS) {
             // Player index 8 is considered immune (e.g., Neutral/Orion)
             is_immune = true;
         }
@@ -819,7 +819,7 @@ namespace COLCALC {
         int adjusted_climate = COLCALC::Calc_Player_Climate_(player_idx, climate);
         int max_pop = COLCALC::Size_And_Climate_Max_Population_(size, adjusted_climate, is_immune);
 
-        if (player_idx < 8 && MOX::_player[player_idx].traits[TRAIT_SUBTERRANEAN] != 0) {
+        if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_SUBTERRANEAN] != 0) {
             max_pop += COLCALC::Double_Add_Two_(size);
         }
 
@@ -872,7 +872,7 @@ namespace COLCALC {
 
         for (int32_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
-            if (ship->owner < 8 && ship->status < 5 && ship->d.ship_type == 0) {
+            if (ship->owner < MAX_PLAYERS && ship->status < 5 && ship->d.ship_type == 0) {
                 MOX::_player[ship->owner].total_ships += (1 << (ship->d.size & 0x1F));
             }
         }
@@ -920,7 +920,7 @@ namespace COLCALC {
         colony->industry2_needed_for_androids = 0;
         colony->industry2_needed_for_assimilated = 0;
         colony->industry2_needed_for_conquered = 0;
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             colony->industry2_needed_for_empire[i] = 0;
         }
 
@@ -984,7 +984,7 @@ namespace COLCALC {
             s_ship_data* current_ship = &ship_list[i];
 
             // In MoO2, owner indices 8 and above typically represent monsters or guardians
-            if (current_ship->owner >= 8 && current_ship->location == star_idx) {
+            if (current_ship->owner >= MAX_PLAYERS && current_ship->location == star_idx) {
                 return true;
             }
         }
@@ -1017,7 +1017,7 @@ namespace COLCALC {
         }
 
         // Initialize food requirement trackers
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
             colony->food2_needed_for_empire[i] = 0;
         }
         colony->food2_needed_for_our_empire = 0;
@@ -1248,7 +1248,7 @@ namespace COLCALC {
     }
 
     int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx) {
-        if (colony->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
+        if (colony->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= MAX_PLAYERS) {
             return 4;
         }
 
@@ -1762,7 +1762,7 @@ namespace COLCALC {
         // Step 1: Initialize blockade statuses for all systems
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
             MOX::_star[i].blockaded = 0;
-            memset(MOX::_star[i].blockaded_by, 0, 8);
+            memset(MOX::_star[i].blockaded_by, 0, MAX_PLAYERS);
         }
 
         // Step 2: Calculate blockades based on ship positions
@@ -1775,7 +1775,7 @@ namespace COLCALC {
                 int8_t ship_owner = ship->owner;
                 s_star_data* star = &MOX::_star[star_id];
 
-                if (ship_owner < 8) {
+                if (ship_owner < MAX_PLAYERS) {
                     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                         // A blockade occurs if the ship owner is at war with the colony owner
                         if (p != ship_owner && (star->has_colony & (1 << p))) {
@@ -2594,13 +2594,13 @@ namespace COLCALC {
      * @address 004fb870
      */
     void __cdecl Check_For_Eliminated_Players_() {
-        uint8_t has_colonies[8];
+        uint8_t has_colonies[MAX_PLAYERS];
         memset(has_colonies, 0, sizeof(has_colonies));
 
         // Mark players that currently own at least one colony (excluding outposts)
         for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
-            if ((uint8_t)colony->owner < 8 && colony->outpost_flag == 0) {
+            if ((uint8_t)colony->owner < MAX_PLAYERS && colony->outpost_flag == 0) {
                 has_colonies[(uint8_t)colony->owner] = 1;
             }
         }
@@ -2770,13 +2770,13 @@ namespace COLCALC {
         player->settlers_freighted = 0;
 
         // Record the date of defeat for the attacker
-        if (player->last_attacker >= 0 && player->last_attacker < 8) {
+        if (player->last_attacker >= 0 && player->last_attacker < MAX_PLAYERS) {
             MOX::_player[player->last_attacker].player_defeated[player_idx] = static_cast<uint16_t>(MOX::_stardate);
         }
     }
 
     char* __cdecl Player_Name_(int32_t player_idx) {
-        if (player_idx < 8) {
+        if (player_idx < MAX_PLAYERS) {
             return MOX::_player[player_idx].race_name;
         }
 
@@ -3174,7 +3174,7 @@ namespace COLCALC {
     }
 
     void __cdecl Compute_Total_Building_Costs_(int32_t* player_costs) {
-        memset(player_costs, 0, 8 * sizeof(int32_t));
+        memset(player_costs, 0, MAX_PLAYERS * sizeof(int32_t));
 
         for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
