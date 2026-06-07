@@ -1,0 +1,113 @@
+workflows:
+  mass-consts:
+    description: "Claim files from files.md and replace hard-coded uses of a target constant with the symbolic constant in a simple infinite loop."
+    need_input: False
+    nodes:
+      - name: init
+        type: result
+        message: "go ahead"
+        outcomes:
+          - name: done
+      - name: claim
+        type: llm
+        model: ${LLM_WEAK_MODEL}
+        confirmation: auto
+        max_rounds: 20
+        tools:
+          - read_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a queue locking assistant.
+
+          Your only job is to claim exactly one file from `files.md` before the edit step starts.
+
+          REQUIRED STEPS
+          * Read `files.md`.
+          * Find the first unprocessed line in file order.
+          * An unprocessed line starts with the literal text `[ ]`.
+          * Lock exactly that one line by changing only its leading marker from `[ ]` to `[X]`.
+          * Do not reorder lines.
+          * Do not change any other checklist entries.
+          * After applying the patch, output only the claimed file path, for example:
+            `src/game/advciv.cpp`
+          * If no unprocessed lines remain, output exactly:
+            `DONE`
+
+          RULES
+          * Use `rg`, never `grep`.
+          * Use `apply_patch`, never shell-based file edits.
+          * If duplicate paths exist, claim only the first unprocessed matching line in file order.
+        outcomes:
+          - name: claimed
+            description: Select when a file path was returned or no work remains.
+      - name: apply_const
+        type: llm
+        model: ${LLM_STRONG_MODEL}
+        temperature: 1
+        reasoning_effort: high
+        start_timeout: 600
+        max_rounds: 100
+        max_retries: 10
+        hard_error_retries: 3
+        confirmation: auto
+        tools:
+          - read_files
+          - list_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a focused C/C++ maintenance assistant making small, reliable symbolic-constant cleanups.
+
+          To retarget this workflow, change only this line:
+          TARGET_CONSTANT_NAME: MAX_PLAYERS
+
+          CONSTANT SOURCE
+          * The target constant is declared in `src/game/consts.h`.
+
+          INPUT
+          * You will receive either a claimed file path from `files.md`, such as `src/game/advciv.cpp`, or the literal text `DONE`.
+
+          REQUIRED WORKFLOW
+          * If the input is `DONE`, make no file changes and finish immediately.
+          * Read `src/game/consts.h` and resolve the meaning and numeric value of `TARGET_CONSTANT_NAME`.
+          * Read the claimed file.
+          * If needed to keep matching declarations and definitions consistent, you may also read and patch the sibling file with the same basename and the opposite extension (`.h` or `.cpp`).
+          * Replace hard-coded uses of the resolved value with `TARGET_CONSTANT_NAME` only when the code is clearly expressing that constant semantically.
+
+          GOOD REPLACEMENT CANDIDATES
+          * Array sizes and array dimensions tied to per-player storage.
+          * Loop bounds iterating over players.
+          * Comparisons, guards, and range checks for player indexes or player counts.
+          * Copy counts, helper sizes, and related fixed limits that clearly represent the same per-player constant.
+
+          DO NOT CHANGE
+          * Unrelated uses of the same numeric literal when the code is not clearly about the target constant.
+          * Values whose meaning is ambiguous.
+          * Broader refactors unrelated to the claimed file and directly required sibling declaration or definition updates.
+
+          RULES
+          * Prefer the smallest safe edit.
+          * Preserve existing code style.
+          * Use `rg`, never `grep`.
+          * Use `apply_patch`, never shell-based file edits.
+          * If no reliable replacements are needed, leave the file unchanged.
+
+          OUTPUT
+          * Print the claimed file path first.
+          * Briefly summarize any replacements made, or say that no safe change was needed.
+        outcomes:
+          - name: done
+            description: Select after the claimed file was processed or skipped.
+    edges:
+      - init.done -> claim
+      - claim.claimed -> apply_const
+      - apply_const.done -> claim

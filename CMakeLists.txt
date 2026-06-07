@@ -28,8 +28,18 @@ file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
+file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+)
+
 add_executable(orion2re
     ${ORION2RE_SOURCES}
+    ${ORION2RE_HEADERS}
+)
+
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
+    ${ORION2RE_SOURCES}
+    ${ORION2RE_HEADERS}
 )
 
 target_compile_features(orion2re PRIVATE cxx_std_20)
