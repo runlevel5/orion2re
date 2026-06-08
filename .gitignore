@@ -7,3 +7,5 @@ build/
 out/
 /headers.md
 /test-releases/
+/CMakeUserPresets.json
+/cmake/local-user.cmake
