@@ -110,6 +110,12 @@ namespace mouse {
      * Caller must ensure a valid mouse-list entry is currently selected.
      */
     int __cdecl Get_Pointer_Offset_() {
+        if (_current_mouse_list == nullptr ||
+            video::_current_mouse_list_ptr < 0 ||
+            video::_current_mouse_list_ptr >= _current_mouse_list_count) {
+            return 0;
+        }
+
         return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].frame;
     }
 
@@ -118,6 +124,12 @@ namespace mouse {
      * Caller must ensure a valid mouse-list entry is currently selected.
      */
     int __cdecl Get_Pointer_Image_Number_() {
+        if (_current_mouse_list == nullptr ||
+            video::_current_mouse_list_ptr < 0 ||
+            video::_current_mouse_list_ptr >= _current_mouse_list_count) {
+            return 0;
+        }
+
         return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
     }
 
@@ -153,6 +165,18 @@ namespace mouse {
     void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons) {
         if (mouse::_in_mouse_handler == 1) {
             return;
+        }
+
+        if (mouse_x < 0) {
+            mouse_x = 0;
+        } else if (mouse_x >= video::g_screen_res_x) {
+            mouse_x = (int16_t)(video::g_screen_res_x - 1);
+        }
+
+        if (mouse_y < 0) {
+            mouse_y = 0;
+        } else if (mouse_y >= video::g_screen_res_y) {
+            mouse_y = (int16_t)(video::g_screen_res_y - 1);
         }
 
         mouse::_in_mouse_handler = 1;
