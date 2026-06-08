@@ -443,7 +443,7 @@ namespace ERIC {
     }
 
     int8_t __cdecl Player_Has_Leader_With_General_Skill_At_Star_(int16_t player_idx, int16_t skill_idx, int16_t star_idx) {
-        for (int16_t i = 0; i < 0x43; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             if (MOX::_leaders[i].player_index == player_idx &&
                 MOX::_leaders[i].status == 1 &&
                 MOX::_leaders[i].eta == 0) {

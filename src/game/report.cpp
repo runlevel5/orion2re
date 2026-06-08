@@ -5,7 +5,7 @@ namespace REPORT {
     s_report _reports[50];
     uint8_t _done_player_reports;
     uint8_t _something_interesting_happened[MAX_PLAYERS];
-    uint8_t _done_colonize_check[9];
+    uint8_t _done_colonize_check[(MAX_STARS + 7) / 8];
     uint8_t _displayed_msgs;
     uint8_t _displayed_gnn;
 

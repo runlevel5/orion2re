@@ -524,7 +524,7 @@ namespace COLONY {
         _galaxy_map_name_field = -1000;
         MOX::_galaxy_map_grid_field = -1000;
 
-        for (int i = 0; i < 72; ++i) {
+        for (int i = 0; i < MAX_STARS; ++i) {
             MOX::_galaxy_map_star_field[i] = -1000;
         }
     }

@@ -18,7 +18,7 @@ namespace aidudes {
 
     extern int16_t _i_ai;
 
-    extern s_aidudes_colony_info (*_our_colonies)[250];
+    extern s_aidudes_colony_info (*_our_colonies)[MAX_COLONIES];
 
     /**
      * Sorts colony-info entries so blockaded colonies are processed first.

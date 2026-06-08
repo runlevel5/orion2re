@@ -425,7 +425,7 @@ namespace AIBUILD {
             bool has_threatened = false;
             uint16_t max_weight_threatened = 0;
             uint16_t max_weight_safe = 0;
-            uint16_t weights[250];
+            uint16_t weights[MAX_COLONIES];
             memset(weights, 0, sizeof(weights));
 
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {

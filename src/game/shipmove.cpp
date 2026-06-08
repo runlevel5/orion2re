@@ -43,7 +43,7 @@ namespace SHIPMOVE {
         for (int i = 0; i < MAX_SHIPS; ++i) {
             if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status == 5) {
                 if (antaran_assigned < antaran_max_slots) {
-                    MOX::_ship[i].owner = (int8_t)8;
+                    MOX::_ship[i].owner = (int8_t)MAX_PLAYERS;
                     antaran_assigned++;
                 } else if (player_assigned < player_max_slots) {
                     MOX::_ship[i].owner = (int8_t)MOX::_PLAYER_NUM;
@@ -355,7 +355,7 @@ namespace SHIPMOVE {
 
         // Search for an available ship slot
         for (i = 0; i < MAX_SHIPS; ++i) {
-            if (MOX::_ship[i].owner == 8) {
+            if (MOX::_ship[i].owner == MAX_PLAYERS) {
                 // Slot is free if status is 5 or it's beyond the current total count
                 if (MOX::_ship[i].status == 5 || i >= (int16_t)MOX::_NUM_SHIPS) {
                     break;
@@ -468,7 +468,7 @@ namespace SHIPMOVE {
             int16_t first_ship_idx = ship_list[0];
             int16_t first_loc = MOX::_ship[first_ship_idx].location;
 
-            if (first_loc < 72 || first_loc >= 1000) {
+            if (first_loc < MAX_STARS || first_loc >= 1000) {
                 move_status = 2;
                 destination_location += 1000;
             } else {
@@ -800,7 +800,7 @@ namespace SHIPMOVE {
      * Clears ignore-combat flags from stars where no opposing force remains.
      */
     void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
-        uint16_t presence_mask[72]; // Tracks which players have assets at each star
+        uint16_t presence_mask[MAX_STARS]; // Tracks which players have assets at each star
         memset(presence_mask, 0, sizeof(presence_mask));
 
         // Mark player presence via ships

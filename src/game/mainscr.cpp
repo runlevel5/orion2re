@@ -58,8 +58,8 @@ namespace MAINSCR {
     s_colors _ship_direction_line_green_colors = {{0x6E, 0x6F, 0x72, 0x74, 0x74, 0x72, 0x6F, 0x6E}};
     s_colors _ship_direction_line_red_colors = {{0x49, 0x4A, 0x4D, 0x4F, 0x4F, 0x4D, 0x4A, 0x49}};
     uint8_t _fltpop_field_selection_status;
-    int8_t _diplo_lights_anim_frame[8];
-    s_animation_header* _player_lights_seg[8];
+    int8_t _diplo_lights_anim_frame[MAX_PLAYERS];
+    s_animation_header* _player_lights_seg[MAX_PLAYERS];
 
     uint8_t _already_faded_into_main_screen;
     uint8_t _in_auto_next_turn_mode;
@@ -879,7 +879,7 @@ namespace MAINSCR {
         int8_t surrender_to = MOX::_star[star_id].surrender_to[MOX::_PLAYER_NUM];
         if (static_cast<uint8_t>(surrender_to) < MAX_PLAYERS) {
             // Player colors derived from stack-initialized byte array
-            static const uint8_t surrender_colors[8] = { 0x80, 0x7b, 0x78, 0x2c, 0x86, 0x9f, 0x83, 0x7e };
+            static const uint8_t surrender_colors[MAX_PLAYERS] = { 0x80, 0x7b, 0x78, 0x2c, 0x86, 0x9f, 0x83, 0x7e };
 
             HAROLD::Set_Player_Font_Style_(0, false);
             fonts::Set_Font_Spacing_(1);
@@ -1926,7 +1926,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Clear_Twinkling_Star_Data_() {
-        for (int32_t i = 0; i < 72; ++i) {
+        for (int32_t i = 0; i < MAX_STARS; ++i) {
             MOX::_star[i].twinkling1 = -1;
             MOX::_star[i].twinkling2 = -1;
         }
@@ -3298,7 +3298,7 @@ namespace MAINSCR {
         bool found_stack = false;
         bool found_icon = false;
 
-        if (MOX::_fleet_box_ship_stack > 0 && MOX::_fleet_box_ship_stack < 500 && MOVEBOX::Moveable_Box_Selected_(2)) {
+        if (MOX::_fleet_box_ship_stack > 0 && MOX::_fleet_box_ship_stack < MAX_SHIPS && MOVEBOX::Moveable_Box_Selected_(2)) {
             target_player_num = HACCESS::Ship_Stack_Owner_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
         }
         else {

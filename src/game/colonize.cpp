@@ -60,8 +60,8 @@ namespace COLONIZE {
     }
 
     void Find_Colonize_Players_() {
-        uint8_t colony_bits[72];
-        uint8_t outpost_bits[72];
+        uint8_t colony_bits[MAX_STARS];
+        uint8_t outpost_bits[MAX_STARS];
 
         memset(colony_bits, 0, sizeof(colony_bits));
         memset(outpost_bits, 0, sizeof(outpost_bits));
@@ -77,7 +77,7 @@ namespace COLONIZE {
             if (ship->status == 0) { // Active
                 if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
                     int16_t star_idx = ship->location;
-                    if (star_idx >= 0 && star_idx < 72) {
+                    if (star_idx >= 0 && star_idx < MAX_STARS) {
                         s_star_data* star = &MOX::_star[star_idx];
                         if (star->colonize_player == MAX_PLAYERS) {
                             star->colonize_player = ship->owner;
@@ -139,7 +139,7 @@ namespace COLONIZE {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->status == 0 && ship->d.ship_type == SHIP_TYPE_COMBAT) {
                 int16_t star_idx = ship->location;
-                if (star_idx >= 0 && star_idx < 72) {
+                if (star_idx >= 0 && star_idx < MAX_STARS) {
                     s_star_data* star = &MOX::_star[star_idx];
                     int8_t colonizer = star->colonize_player;
                     if (colonizer >= 0 && colonizer < MAX_PLAYERS && ship->owner != colonizer) {
@@ -193,7 +193,7 @@ namespace COLONIZE {
     void Allocate_New_Colony_Slots_() {
         int16_t uncolonized_counts[MAX_PLAYERS] = { 0 };
         int16_t allocated_counts[MAX_PLAYERS] = { 0 };
-        uint8_t free_slots_indices[250];
+        uint8_t free_slots_indices[MAX_COLONIES];
 
         int16_t free_slots_count = 0;
 
@@ -207,7 +207,7 @@ namespace COLONIZE {
             }
         }
 
-        for (int16_t i = 0; i < 250; ++i) {
+        for (int16_t i = 0; i < MAX_COLONIES; ++i) {
             MOX::_colony[i].allocated_to = (char)0xFF;
             if (i >= MOX::_NUM_COLONIES || MOX::_colony[i].planet == -1) {
                 free_slots_indices[free_slots_count++] = (uint8_t)i;

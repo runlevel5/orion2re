@@ -714,7 +714,7 @@ namespace COLCALC {
             for (uint32_t i = 0; i < static_cast<uint32_t>(n_pops); ++i) {
                 uint32_t race_id = colony->pop[i] & 0x0F;
 
-                if (race_id < 8) {
+                if (race_id < MAX_PLAYERS) {
                     if (first_biological_race == 0xFFFFFFFF) {
                         first_biological_race = race_id;
                     } else if (race_id != first_biological_race) {
@@ -932,7 +932,7 @@ namespace COLCALC {
                 uint32_t pop_data = colony->pop[i];
                 int16_t race = (int16_t)(pop_data & 0xF);
 
-                if (race < 8) {
+                if (race < MAX_PLAYERS) {
                     int8_t cost = (MOX::_player[race].traits[TRAIT_CYBERNETIC] != 0) ? 1 : 0;
 
                     if (race == owner_race_idx) {
@@ -1030,7 +1030,7 @@ namespace COLCALC {
             uint32_t race = pop_bits & 0xF;
             uint32_t bit_10_flag = (pop_bits >> 10) & 1;
 
-            if (race < 8) {
+            if (race < MAX_PLAYERS) {
                 s_player* player_ptr = &MOX::_player[race];
                 uint8_t food_rate_half;
 
@@ -1770,7 +1770,7 @@ namespace COLCALC {
             s_ship_data* ship = &MOX::_ship[i];
 
             // Only active combat ships inside known star systems can blockade
-            if (ship->status == 0 && ship->location < 0x48 && ship->d.ship_type == 0) {
+            if (ship->status == 0 && ship->location < MAX_STARS && ship->d.ship_type == 0) {
                 int16_t star_id = (int16_t)ship->location;
                 int8_t ship_owner = ship->owner;
                 s_star_data* star = &MOX::_star[star_id];
@@ -1823,7 +1823,7 @@ namespace COLCALC {
         int max_bonus = 0;
         s_player* plr = &MOX::_player[player_idx];
 
-        for (int i = 0; i < 67; ++i) {
+        for (int i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
 
             if (Player_Owns_Officer_(plr, leader)) {
@@ -1988,7 +1988,7 @@ namespace COLCALC {
                 const uint32_t race_idx = *pop & 0x0f;
 
                 if (race_idx == 9 ||
-                    (race_idx < 8 &&
+                    (race_idx < MAX_PLAYERS &&
                      static_cast<int32_t>(static_cast<int8_t>(colony->owner)) != static_cast<int32_t>(race_idx) &&
                      ((*pop & 0x400) != 0))) {
                     ++removable_count;
@@ -2718,7 +2718,7 @@ namespace COLCALC {
         }
 
         // Release all leaders hired by the eliminated player
-        for (int i = 0; i < 67; ++i) {
+        for (int i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
             if (leader->player_index == player_idx) {
                 leader->status = -2 /* STATUS_RELEASED? */;
@@ -2815,7 +2815,7 @@ namespace COLCALC {
                                     return 1;
                                 }
                                 uint32_t race = colony->pop[i] & 0xF;
-                                if (race < 8) {
+                                if (race < MAX_PLAYERS) {
                                     if (first_race == -1) {
                                         first_race = race;
                                     } else if (first_race != race) {
@@ -2893,7 +2893,7 @@ namespace COLCALC {
                             int8_t gravity = MOX::_planet[colony->planet].gravity_class;
                             for (int i = 0; i < colony->n_pops; ++i) {
                                 uint32_t race = colony->pop[i] & 0xF;
-                                if (race < 8) {
+                                if (race < MAX_PLAYERS) {
                                     if (gravity == 0) {
                                         if (MOX::_player[race].traits[10] == 0) return 1;
                                     } else if (gravity == 1) {
@@ -3068,8 +3068,8 @@ namespace COLCALC {
     }
 
     short __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode) {
-        uint8_t possible_stars[72];
-        s_star_weight star_weights[72];
+        uint8_t possible_stars[MAX_STARS];
+        s_star_weight star_weights[MAX_STARS];
         short result_star_idx = -1;
 
         // Populate potential stars to surrender
@@ -3432,7 +3432,7 @@ namespace COLCALC {
 
                 for (int16_t pop_idx = 0; pop_idx < pop_count; ++pop_idx) {
                     const uint32_t pop_record = colony->pop[pop_idx];
-                    if ((pop_record & 0x400u) != 0 && (pop_record & 0x0Fu) < 8) {
+                    if ((pop_record & 0x400u) != 0 && (pop_record & 0x0Fu) < MAX_PLAYERS) {
                         ++candidate_count;
                         if (random::Random_(candidate_count) == 1) {
                             chosen_pop_idx = pop_idx;

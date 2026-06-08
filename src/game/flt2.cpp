@@ -643,7 +643,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     y_cursor = fonts::Get_Font_Height_() + y_cursor + 2;
     
     int16_t loc = MOX::_ship[ship_idx].location;
-    if (loc >= 500 && loc <= MOX::_NUM_STARS + 1000) {
+    if (loc >= MAX_SHIPS && loc <= MOX::_NUM_STARS + 1000) {
         int16_t star_idx = HAROLD::Absolute_Location_(loc);
         bool visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx);
         
@@ -824,7 +824,7 @@ uint8_t __cdecl Draw_Captains_Picture_(int16_t ship_idx) {
     int16_t portrait_idx = 0;
     uint8_t found_captain = 0;
 
-    for (int16_t i = 0; i < 67; i++) {
+    for (int16_t i = 0; i < MAX_LEADERS; i++) {
         if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM &&
             MOX::_leaders[i].status == 1 &&
             MOX::_leaders[i].type == 0) {

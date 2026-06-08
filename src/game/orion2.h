@@ -74,9 +74,9 @@ struct s_adv_civ_player {
     int16_t candidate_planet_count;
     int16_t settled_planet_count;
     int16_t furthest_star_dist_from_home;
-    int8_t has_planet[360];
-    struct s_adv_civ_player_star stars[72];
-    struct s_adv_civ_player_planet planets[360];
+    int8_t has_planet[MAX_PLANETS];
+    struct s_adv_civ_player_star stars[MAX_STARS];
+    struct s_adv_civ_player_planet planets[MAX_PLANETS];
 };
 
 typedef struct s_adv_planet_worth s_adv_planet_worth, *Ps_adv_planet_worth;
@@ -2195,7 +2195,7 @@ struct s_good_star {
     undefined field6_0x6;
     undefined field7_0x7;
     undefined field8_0x8;
-    uint32_t star_distances[72];
+    uint32_t star_distances[MAX_STARS];
     uint16_t star_count;
 };
 
@@ -3347,7 +3347,7 @@ struct s_player {
 
 struct s_net_pack_drop_out_info {
     struct s_player player_data;
-    int8_t star_surrender_to[72];
+    int8_t star_surrender_to[MAX_STARS];
 };
 
 typedef struct s_net_pack_end_ai_diplomacy s_net_pack_end_ai_diplomacy, *Ps_net_pack_end_ai_diplomacy;
@@ -3358,7 +3358,7 @@ typedef struct s_net_pack_end_ai_diplomacy s_net_pack_end_ai_diplomacy, *Ps_net_
 struct s_net_pack_end_ai_diplomacy {
     int32_t target_player_id;
     struct s_player target_player;
-    uint8_t surrender_to[72];
+    uint8_t surrender_to[MAX_STARS];
     int32_t player_num;
     struct s_player player;
 };
@@ -3392,7 +3392,7 @@ typedef struct s_net_pack_req_human_diplomacy s_net_pack_req_human_diplomacy, *P
 
 struct s_net_pack_req_human_diplomacy {
     struct s_player player;
-    int8_t surrender_to[72];
+    int8_t surrender_to[MAX_STARS];
 };
 
 typedef struct s_net_pack_star_order s_net_pack_star_order, *Ps_net_pack_star_order;
@@ -3658,7 +3658,7 @@ struct s_palette_entry {
 typedef struct s_parsec s_parsec, *Ps_parsec;
 
 struct s_parsec {
-    int32_t dist[72];
+    int32_t dist[MAX_STARS];
 };
 
 typedef struct s_planet_data s_planet_data, *Ps_planet_data;
@@ -3773,7 +3773,7 @@ struct s_plntsum_screen {
     int16_t up_button;
     int16_t dn_button;
     int16_t esc_button;
-    int16_t planet_icons[72];
+    int16_t planet_icons[MAX_STARS];
     bool refresh_fields;
     int16_t scanned_input;
 };

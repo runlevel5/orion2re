@@ -88,7 +88,7 @@ namespace COLSUM {
         MOX2::action_func_t saved_auto_fn = nullptr;
         int16_t input_val = 0;
         int16_t scan_val = 0;
-        short colony_list_buffer[250];
+        short colony_list_buffer[MAX_COLONIES];
 
         COLSUM::_draw_planet_sum = 0;
         COLXPORT::_g_colony_list_ptr = colony_list_buffer;
@@ -351,9 +351,9 @@ namespace COLSUM {
     }
 
     void __cdecl Sort_Col_List_() {
-        int16_t outer_count = 250;
+        int16_t outer_count = MAX_COLONIES;
         do {
-            for (int16_t i = 0; i < 249; ++i) {
+            for (int16_t i = 0; i < MAX_COLONIES - 1; ++i) {
                 int16_t val1 = COLXPORT::_g_colony_list_ptr[i];
                 int16_t val2 = COLXPORT::_g_colony_list_ptr[i + 1];
 

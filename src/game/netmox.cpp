@@ -480,7 +480,7 @@ namespace NETMOX {
         * (uint16_t*)ptr = MOX::_NUM_COLONIES;
         ptr += sizeof(uint16_t);
 
-        size = 250 * sizeof(s_colony);
+        size = MAX_COLONIES * sizeof(s_colony);
         memcpy(ptr, MOX::_colony, size);
         ptr += size;
 
@@ -694,8 +694,8 @@ namespace NETMOX {
         MOX::_NUM_COLONIES = *(int16_t*)ptr;
         ptr += sizeof(int16_t);
 
-        memcpy(MOX::_colony, ptr, 250 * sizeof(s_colony));
-        ptr += 250 * sizeof(s_colony);
+        memcpy(MOX::_colony, ptr, MAX_COLONIES * sizeof(s_colony));
+        ptr += MAX_COLONIES * sizeof(s_colony);
 
         MOX::_NUM_SHIPS = *(int16_t*)ptr;
         ptr += sizeof(int16_t);
@@ -961,7 +961,7 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        s_net_pack_star_order star_orders[72];
+        s_net_pack_star_order star_orders[MAX_STARS];
         memset(star_orders, 0, sizeof(star_orders));
 
         if (MOX::_NUM_STARS > 0) {
@@ -1035,7 +1035,7 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM) {
                 *reinterpret_cast<int16_t*>(out) = i;
                 out += sizeof(int16_t);
@@ -1436,7 +1436,7 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        uint8_t star_updates[72 * sizeof(s_net_pack_star_order)];
+        uint8_t star_updates[MAX_STARS * sizeof(s_net_pack_star_order)];
         memcpy(star_updates, ptr, MOX::_NUM_STARS * sizeof(s_net_pack_star_order));
         ptr += MOX::_NUM_STARS * sizeof(s_net_pack_star_order);
 
@@ -1577,7 +1577,7 @@ namespace NETMOX {
             leader_idx_prev = leader_idx + 1;
         }
 
-        for (int i = leader_idx_prev; i < 67; ++i) {
+        for (int i = leader_idx_prev; i < MAX_LEADERS; ++i) {
             if (MOX::_leaders[i].player_index == player_idx) {
                 NETMOX::Ditch_Leader_(i);
             }
@@ -1696,7 +1696,7 @@ namespace NETMOX {
             }
 
             // 4. Read Leaders
-            for (int i = 0; i < 67 /* 0x43 */; ++i) {
+            for (int i = 0; i < MAX_LEADERS; ++i) {
                 MOX::_leaders[i].player_index = -1;
             }
 
@@ -1835,7 +1835,7 @@ namespace NETMOX {
             }
 
             // 3. Read Leaders
-            for (int i = 0; i < 67 /* 0x43 */; ++i) {
+            for (int i = 0; i < MAX_LEADERS; ++i) {
                 int16_t owner = MOX::_leaders[i].player_index;
                 if (owner == attacker_id || owner == MOX::_PLAYER_NUM) {
                     MOX::_leaders[i].player_index = -1;
@@ -2181,7 +2181,7 @@ namespace NETMOX {
 
             RUSS::Mox_Update_();
 
-            for (int16_t i = 0; i < 67; i++) {
+            for (int16_t i = 0; i < MAX_LEADERS; i++) {
                 if (MOX::_leaders[i].player_index == player_id || MOX::_leaders[i].player_index == target_player_id) {
                     *reinterpret_cast<int16_t*>(local_4) = i;
                     local_4 += 2;
@@ -2309,7 +2309,7 @@ namespace NETMOX {
 
             RUSS::Mox_Update_();
 
-            for (int16_t i = 0; i < 67; ++i) {
+            for (int16_t i = 0; i < MAX_LEADERS; ++i) {
                 if (MOX::_leaders[i].player_index == other_player_idx || MOX::_leaders[i].player_index == target_player_idx) {
                     *reinterpret_cast<int16_t*>(ptr) = i;
                     ptr += sizeof(int16_t);
@@ -2434,7 +2434,7 @@ namespace NETMOX {
 
             RUSS::Mox_Update_();
 
-            for (int16_t i = 0; i < 67; i++) {
+            for (int16_t i = 0; i < MAX_LEADERS; i++) {
                 *reinterpret_cast<int16_t*>(local_8) = i;
                 local_8 += 2;
                 memcpy(local_8, &MOX::_leaders[i], sizeof(s_leader_data));

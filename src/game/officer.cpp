@@ -1013,7 +1013,7 @@ namespace OFFICER {
                             MOX::_offpop_big_icon_selected = (int16_t)b_idx;
                             FLT2::Clear_All_Selection_Status_();
                             MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].selected = 1;
-                            if (MOX::_officer_selected > -1 && MOX::_officer_selected < 'C') {
+                            if (MOX::_officer_selected > -1 && MOX::_officer_selected < MAX_LEADERS) {
                                 if (Leader_Can_Be_Assigned_((int16_t)MOX::_officer_selected) == 0) {
                                     char buffer[200];
                                     const char* fmt = HAROLD::H_Message_(0x12D /* HESTR_12D_S_CANNOT_BE_PUT_INTO_S */);
@@ -1228,7 +1228,7 @@ namespace OFFICER {
 
         // Check if there's already an officer assigned to this star for the player
         int8_t current_leader_idx = star->officer_index[player_index];
-        if (current_leader_idx > -1 && current_leader_idx < 67 /* 0x43 */) {
+        if (current_leader_idx > -1 && current_leader_idx < MAX_LEADERS) {
             s_leader_data* prev_leader = &MOX::_leaders[current_leader_idx];
             prev_leader->eta = 0;
             prev_leader->status = 0;
@@ -1255,7 +1255,7 @@ namespace OFFICER {
 
         // If the ship already has an officer, clear that officer's assignment data.
         short current_officer_idx = ship->officer_index;
-        if (current_officer_idx > -1 && current_officer_idx < 67 /* 0x43 */) {
+        if (current_officer_idx > -1 && current_officer_idx < MAX_LEADERS) {
             s_leader_data* old_officer = &MOX::_leaders[current_officer_idx];
             old_officer->status = 0;
             old_officer->location = -1;
@@ -1714,7 +1714,7 @@ namespace OFFICER {
      * Decrements ETA for traveling officers and increments it for those in a pending/cooldown state.
      */
     void __cdecl Decrement_Officer_ETA_() {
-        for (int16_t leader_idx = 0; leader_idx < 67 /* 0x43 */; ++leader_idx) {
+        for (int16_t leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
             s_leader_data& leader = MOX::_leaders[leader_idx];
 
             if (leader.status == 4) {
@@ -2218,7 +2218,7 @@ namespace OFFICER {
 
         _prev_leaders = static_cast<s_prev_leader_data*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
 
-        for (int16_t i = 0; i < 0x43; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             _prev_leaders[i].status = MOX::_leaders[i].status;
             _prev_leaders[i].location = MOX::_leaders[i].location;
             _prev_leaders[i].eta = static_cast<short>(MOX::_leaders[i].eta);
@@ -2373,7 +2373,7 @@ namespace OFFICER {
     int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_index) {
         int16_t count = 0;
 
-        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             // Check if leader belongs to the player and is of type fleet (0)
             if ((int16_t)MOX::_leaders[i].player_index == player_index && MOX::_leaders[i].type == 0) {
                 if (Officer_Status_Ok_(i)) {
@@ -2393,7 +2393,7 @@ namespace OFFICER {
     int16_t __cdecl N_Star_Officers_Owned_By_Player_(int16_t player_index) {
         int16_t count = 0;
 
-        for (int16_t i = 0; i < 0x43; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             // Check if the leader belongs to the specified player and is of type 1 (Star Officer)
             if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == 1) {
                 if (Officer_Status_Ok_(i)) {
@@ -2411,7 +2411,7 @@ namespace OFFICER {
     int8_t __cdecl Officer_Made_Level_Report_(int16_t player_idx, int8_t process_popups) {
         int8_t found = 0;
 
-        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             // Check if a report was found in previous iteration
             if (found != 0) {
                 return 1;
@@ -2485,8 +2485,8 @@ namespace OFFICER {
         }
 
         // Limit is capped at 67 (typically the total number of hireable leaders)
-        if (limit > 67) {
-            limit = 67;
+        if (limit > MAX_LEADERS) {
+            limit = MAX_LEADERS;
         }
 
         do {
@@ -3363,7 +3363,7 @@ bool __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* hero_idx
 
     *hero_idx = -1;
 
-    for (int16_t i = 0; i < 67; i++) {
+    for (int16_t i = 0; i < MAX_LEADERS; i++) {
         if (found) {
             break;
         }

@@ -91,7 +91,7 @@ namespace DIP_SCRN {
     char* _system_cancel_buffer;
     int16_t _diplomacy_system_homeworld_flag;
     s_animation_header* _diplomacy_system_star_background_seg;
-    int16_t _diplomacy_system_fields[72];
+    int16_t _diplomacy_system_fields[MAX_STARS];
     uint8_t* _diplomacy_mouse_bitmap;
     char* _system_homeworld_buffer;
     int16_t _diplomacy_good_music;

@@ -3,7 +3,7 @@
 namespace spy {
     int8_t _lookup_table[8] = {0, 0, 10, 15, -10, -10, 15, 15};
 
-    int16_t _spy_bonuses[16];
+    int16_t _spy_bonuses[MAX_PLAYERS * 2];
 
     int16_t __cdecl Tech_Spy_Bonus_(s_player* player) {
         int16_t bonus = 0;
@@ -41,7 +41,7 @@ namespace spy {
 
         int32_t player_idx = player - MOX::_player;
 
-        for (int32_t i = 0; i < 67; ++i) {
+        for (int32_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
 
             if (leader->player_index == player_idx) {
@@ -141,7 +141,7 @@ namespace spy {
 
     void __cdecl Resolve_Assassins_() {
         s_leader_data* leader = MOX::_leaders;
-        s_leader_data* end = &MOX::_leaders[67];
+        s_leader_data* end = &MOX::_leaders[MAX_LEADERS];
 
         if (leader < end) {
             do {

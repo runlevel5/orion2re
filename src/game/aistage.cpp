@@ -3,7 +3,7 @@
 namespace AISTAGE {
 
 void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
-    uint8_t processed_stars[72];
+    uint8_t processed_stars[MAX_STARS];
     int16_t selected_stagepoint_count = 0;
     bool finished;
     uint32_t best_weight;

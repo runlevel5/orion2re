@@ -15,8 +15,8 @@ namespace lostship {
     }
 
     void __cdecl Lose_Out_Of_Range_Ships_() {
-        int8_t basic_range_array[72];
-        int8_t extended_range_array[72];
+        int8_t basic_range_array[MAX_STARS];
+        int8_t extended_range_array[MAX_STARS];
 
         if (0 < MOX::_NUM_PLAYERS) {
             for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {

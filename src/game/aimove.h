@@ -18,7 +18,7 @@ namespace AIMOVE {
 
     extern s_player* _p_ai;
     extern s_ai_colonizable_planet* _colonizable;
-    extern int8_t (*_nonplayer_here)[72];
+    extern int8_t (*_nonplayer_here)[MAX_STARS];
     extern int8_t* _flee_stars;
     extern int16_t _i_ai;
     extern int16_t _n_colonizable;

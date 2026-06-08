@@ -172,7 +172,7 @@ namespace HOMEGEN {
                 if (dist >= min_dist_sq) {
                     struct_::Set_Bit_Field_(current_star, j);
 
-                    // Note: Potential out-of-bounds access if MOX::_NUM_STARS > 72
+                    // Note: Potential out-of-bounds access if MOX::_NUM_STARS > MAX_STARS
                     current_star->star_distances[j] = dist;
                     current_star->star_count++;
                 }
@@ -1071,11 +1071,11 @@ namespace HOMEGEN {
     }
 
     uint8_t __cdecl Ensure_At_Least_1_Food_Planet_() {
-        int16_t planet_buffer[360];
+        int16_t planet_buffer[MAX_PLANETS];
         int16_t buffer_count = 0;
         uint8_t overall_success = 1;
 
-        for (int i = 0; i < 360; ++i) {
+        for (int i = 0; i < MAX_PLANETS; ++i) {
             planet_buffer[i] = -1;
         }
 
@@ -1197,7 +1197,7 @@ namespace HOMEGEN {
             if (dist_limit >= 8) break;
 
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
-                // Potential buffer overflow if _NUM_STARS > 72
+                // Potential buffer overflow if _NUM_STARS > MAX_STARS
                 if (visited[i] == 0) {
                     if (HAROLD::Is_Home_Star_(i) == 0 && Is_Added_Food_World_(i) == 0) {
                         int16_t d = GEO::Parsecs_Between_Points_(MOX::_star[i].x, MOX::_star[i].y, x_center, y_center);
@@ -1213,7 +1213,7 @@ namespace HOMEGEN {
             dist_limit++;
         } while (candidate_count < 4);
 
-        // Potential buffer overflow if _NUM_STARS > 72
+        // Potential buffer overflow if _NUM_STARS > MAX_STARS
         qsort(candidates, (uint32_t)MOX::_NUM_STARS, sizeof(s_orion_candidate), qsort_1_);
 
         int valid_count = 0;

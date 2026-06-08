@@ -27,11 +27,11 @@ namespace RACESCRN {
     extern char _relation_text[17][15];
     extern uint8_t _slider_remap_list[26];
     extern uint8_t _relation_name_table[17];
-    extern s_racescrn_icon_layout _spy_group_data[7];
+    extern s_racescrn_icon_layout _spy_group_data[MAX_PLAYERS - 1];
     extern int16_t _race_bar[14];
     extern int16_t _race_spies[14];
     extern int16_t _race_spy_btns[14];
-    extern int16_t _race_slider_x[7];
+    extern int16_t _race_slider_x[MAX_PLAYERS - 1];
     extern s_racescrn_icon_layout _agent_group_data;
     extern int16_t _race_picture[14];
     extern int16_t _race_text[14];
@@ -45,7 +45,7 @@ namespace RACESCRN {
     extern char _diplomacy_net_wait_buffer[100];
     extern char _diplomacy_net_requesting_buffer[100];
 
-    /** Initializes the seven race display slots and the shared agent icon group.
+    /** Initializes the race display slots for the other players and the shared agent icon group.
      *  @param race_displays Output display array.
      *  @param agent_group Output icon group for unassigned agents.
      */

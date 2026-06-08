@@ -78,7 +78,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     MOX::_global_combat_data.crew_quality = MOX::_ship[ship_idx].crew_quality;
     MOX::_global_combat_data.officer_idx = MOX::_ship[ship_idx].officer_index;
 
-    if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner < 9) {
+    if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner <= MAX_PLAYERS) {
         MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.hull_size].marines;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 36)) {
@@ -295,7 +295,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->officer_idx = officer_idx;
     }
 
-    if (ship->d.ship_type == 0 && ship->owner < 9) {
+    if (ship->d.ship_type == 0 && ship->owner <= MAX_PLAYERS) {
         combat->marine_count = (uint8_t)TECHDATA::_hull_data[combat->size_class].marines;
         if (struct_::Test_Bit_Field_(combat->special_device_flags, 0x24 /* 36 */) == 1 &&
             struct_::Test_Bit_Field_(combat->special_device_damage_flags, 0x24 /* 36 */) == 0) {
@@ -332,7 +332,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->shield_arc_current[i] = combat->shield_arc_max;
     }
 
-    if (combat->owner > 8 && combat->ftl_type == 0) {
+    if (combat->owner > MAX_PLAYERS && combat->ftl_type == 0) {
         switch (combat->owner) {
             case 9:
             case 11:
@@ -515,7 +515,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
 
     if (star_idx == MOX::_NUM_STARS) {
-        MOX::_combat_defender_player = 8;
+        MOX::_combat_defender_player = MAX_PLAYERS;
         colony_pop = 0;
     } else if (MOX::_cmbt_colony_id == -1) {
         MOX::_combat_defender_player = MOX::_ship[plr2_ships[0]].owner;
@@ -727,12 +727,12 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             }
         }
 
-        if (MOX::_combat_attacker_player <= 8) {
+        if (MOX::_combat_attacker_player <= MAX_PLAYERS) {
             MOX::_fighter_beam_type[MOX::_combat_attacker_player] = INITSHIP::Best_Point_Defense_Weapon_(MOX::_combat_attacker_player);
             MOX::_fighter_bomb_type[MOX::_combat_attacker_player] = INITSHIP::Best_Bomb_Weapon_(MOX::_combat_attacker_player);
         }
 
-        if (MOX::_combat_defender_player <= 8) {
+        if (MOX::_combat_defender_player <= MAX_PLAYERS) {
             MOX::_fighter_beam_type[MOX::_combat_defender_player] = INITSHIP::Best_Point_Defense_Weapon_(MOX::_combat_defender_player);
             MOX::_fighter_bomb_type[MOX::_combat_defender_player] = INITSHIP::Best_Bomb_Weapon_(MOX::_combat_defender_player);
         }
@@ -978,8 +978,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
         int16_t turn_plr1 = MOX::_combat_attacker_player;
         int16_t turn_plr2 = MOX::_combat_defender_player;
-        if (MOX::_combat_defender_player == 8) {
-            turn_plr1 = 8;
+        if (MOX::_combat_defender_player == MAX_PLAYERS) {
+            turn_plr1 = MAX_PLAYERS;
             turn_plr2 = MOX::_combat_attacker_player;
         }
 
@@ -1325,8 +1325,8 @@ void __cdecl Load_Antaran_Planet_() {
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->size_class = 5;
     MOX::_combat_data->unit_status = 0;
-    MOX::_combat_data->owner = 8;
-    MOX::_combat_data->previous_owner = 8;
+    MOX::_combat_data->owner = MAX_PLAYERS;
+    MOX::_combat_data->previous_owner = MAX_PLAYERS;
     MOX::_combat_data->ftl_type = 0;
     MOX::_combat_data->is_retreating = 0;
     MOX::_combat_data->shield_type = 0;
@@ -1383,8 +1383,8 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
 
     ship_anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_filename, lbx_index, MOX::_global_cache_seg);
 
-    if (player_idx == MOX::_combat_defender_player && player_idx < 9 && (MOX::_cmbt_colony_id > -1 || player_idx == 8)) {
-        if (player_idx == 8) {
+    if (player_idx == MOX::_combat_defender_player && player_idx <= MAX_PLAYERS && (MOX::_cmbt_colony_id > -1 || player_idx == MAX_PLAYERS)) {
+        if (player_idx == MAX_PLAYERS) {
             planet_size = 2;
             player_color = 2;
         } else {
@@ -1488,8 +1488,8 @@ void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
 
 void __cdecl Load_Colony_Defense_(int16_t colony_idx) {
     if (colony_idx < 0) {
-        MOX::_combat_data->owner = 8;
-        MOX::_combat_data->previous_owner = 8;
+        MOX::_combat_data->owner = MAX_PLAYERS;
+        MOX::_combat_data->previous_owner = MAX_PLAYERS;
         MOX::_combat_data->ship_idx = -1;
         MOX::_combat_data->unit_status = 5;
     } else {
@@ -2432,21 +2432,21 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
             }
         }
     }
-    else if (player_idx == 8) {
+    else if (player_idx == MAX_PLAYERS) {
         for (int i = 0; i < 16; ++i) {
-            MOX::_fighter_seg[8][i] = (s_animation_header*)farload::Far_Reload_Next_("cmbtfgtr.lbx", i + 0x40, MOX::_screen_seg);
+            MOX::_fighter_seg[MAX_PLAYERS][i] = (s_animation_header*)farload::Far_Reload_Next_("cmbtfgtr.lbx", i + 0x40, MOX::_screen_seg);
             RUSS::Mox_Update_();
         }
 
-        if (MOX::_combat_attacker_player == 8) {
+        if (MOX::_combat_attacker_player == MAX_PLAYERS) {
             for (int i = 0; i < 16; ++i) {
-                replace::Replace_Color_Range_(MOX::_fighter_seg[8][i], attacker_palette, 0x50, 0x10);
+                replace::Replace_Color_Range_(MOX::_fighter_seg[MAX_PLAYERS][i], attacker_palette, 0x50, 0x10);
                 RUSS::Mox_Update_();
             }
         }
         else {
             for (int i = 0; i < 16; ++i) {
-                replace::Replace_Color_Range_(MOX::_fighter_seg[8][i], defender_palette, 0x50, 0x10);
+                replace::Replace_Color_Range_(MOX::_fighter_seg[MAX_PLAYERS][i], defender_palette, 0x50, 0x10);
                 RUSS::Mox_Update_();
             }
         }
@@ -2702,12 +2702,12 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
         
-        if (star_idx == MOX::_NUM_STARS && ship->owner == 8 &&
+        if (star_idx == MOX::_NUM_STARS && ship->owner == MAX_PLAYERS &&
             ship->unit_status == 5 && ship->ftl_type != 0) {
             antarans::Kill_Antaran_Defensive_Ship_(ship->size_class);
         } 
         else if (ship->unit_status == 5 && ship->ship_idx != -1 && ship->is_retreating != 2) {
-            if (ship->owner == 8) {
+            if (ship->owner == MAX_PLAYERS) {
                 antarans::Kill_Antaran_Offensive_Ship_(ship->size_class);
             }
             if (MOX::_ship[ship->ship_idx].officer_index > -1) {

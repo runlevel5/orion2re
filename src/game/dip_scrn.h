@@ -232,7 +232,7 @@ namespace DIP_SCRN {
     extern char* _system_cancel_buffer;
     extern int16_t _diplomacy_system_homeworld_flag;
     extern s_animation_header* _diplomacy_system_star_background_seg;
-    extern int16_t _diplomacy_system_fields[72];
+    extern int16_t _diplomacy_system_fields[MAX_STARS];
     extern uint8_t* _diplomacy_mouse_bitmap;
     extern char* _system_homeworld_buffer;
     extern int16_t _diplomacy_good_music;

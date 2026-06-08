@@ -3,7 +3,7 @@
 struct s_leader_data;
 
 namespace spy {
-    extern int8_t _lookup_table[8];
+    extern int8_t _lookup_table[MAX_PLAYERS];
 
     /* Returns the spy bonus granted by the player's completed spy-related technologies.
      * @param player Player whose technology bonuses are evaluated.

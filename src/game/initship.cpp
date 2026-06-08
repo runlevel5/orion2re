@@ -802,7 +802,7 @@ namespace INITSHIP {
                 if (ship.owner > 8) {
                     Repair_Ship_Full_(i);
                 } else {
-                    if (ship.location >= 0 && ship.location < 72 && 
+                    if (ship.location >= 0 && ship.location < MAX_STARS && 
                         ship.status == 0 && ship.d.ship_type == 0) {
                         
                         if (struct_::Test_Bit_Field_(&MOX::_star[ship.location].has_colony, (int16_t)ship.owner)) {

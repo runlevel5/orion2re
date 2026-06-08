@@ -97,8 +97,8 @@ namespace settler {
         do {
             bool has_arrivals = false;
             int32_t settler_idx = 0;
-            int8_t arrivals_per_planet[360];
-            int8_t over_limit_per_planet[360];
+            int8_t arrivals_per_planet[MAX_PLANETS];
+            int8_t over_limit_per_planet[MAX_PLANETS];
             const int32_t planet_count = (int32_t)(sizeof(arrivals_per_planet) / sizeof(arrivals_per_planet[0]));
 
             memset(arrivals_per_planet, 0, sizeof(arrivals_per_planet));

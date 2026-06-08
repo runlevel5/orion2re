@@ -27,9 +27,9 @@ namespace INITGAME {
      * Clears the entire array and sets initial sentinel values for owner, planet, and officer.
      */
     void Init_Colonies_Array_() {
-        memset(MOX::_colony, 0, 250 * sizeof(s_colony));
+        memset(MOX::_colony, 0, MAX_COLONIES * sizeof(s_colony));
 
-        for (MOX::_NUM_COLONIES = 0; MOX::_NUM_COLONIES < 250; ++MOX::_NUM_COLONIES) {
+        for (MOX::_NUM_COLONIES = 0; MOX::_NUM_COLONIES < MAX_COLONIES; ++MOX::_NUM_COLONIES) {
             s_colony& colony = MOX::_colony[MOX::_NUM_COLONIES];
 
             colony.planet = -1;
@@ -454,11 +454,11 @@ namespace INITGAME {
         char lbx_filename[20];
         HAROLD::Get_Officer_Data_LBX_Name_(lbx_filename);
 
-        void* leader_records = farload::Far_Reload_Data_(lbx_filename, 0, MOX::_screen_seg, 0, 67, sizeof(s_leader_data));
+        void* leader_records = farload::Far_Reload_Data_(lbx_filename, 0, MOX::_screen_seg, 0, MAX_LEADERS, sizeof(s_leader_data));
 
-        memcpy(MOX::_leaders, leader_records, 67 * sizeof(s_leader_data));
+        memcpy(MOX::_leaders, leader_records, MAX_LEADERS * sizeof(s_leader_data));
 
-        for (int16_t i = 0; i < 67; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             if (i == 41) {
                 // Special handling for leader at index 41
                 OFFICER::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 2, 5, 1);

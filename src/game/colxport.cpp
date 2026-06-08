@@ -98,7 +98,7 @@ void __cdecl Build_Global_Colony_List_() {
         }
     }
 
-    for (; count < 250; ++count) {
+    for (; count < MAX_COLONIES; ++count) {
         _g_colony_list_ptr[count] = -1;
     }
 }
@@ -110,7 +110,7 @@ void __cdecl Load_Xport_Anims_() {
 }
 
 int16_t __cdecl Xport_Popup_() {
-    int16_t local_colony_list[250];
+    int16_t local_colony_list[MAX_COLONIES];
     int16_t input_id;
     int16_t selected_colony = -1;
 
@@ -118,7 +118,7 @@ int16_t __cdecl Xport_Popup_() {
         local_colony_list[i] = -1;
     }
 
-    memset(&local_colony_list[15], 0, (250 - 15) * sizeof(local_colony_list[0]));
+    memset(&local_colony_list[15], 0, (MAX_COLONIES - 15) * sizeof(local_colony_list[0]));
 
     _g_colony_list_ptr = local_colony_list;
     COLONY::_full_draw = 1;

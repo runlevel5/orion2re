@@ -595,7 +595,7 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     src_buf += shear::_jumble_mask;
     dst_buf += shear::_jumble_mask;
 
-    uint32_t noise_idx = shear::_noise_start_index;
+    uint32_t noise_idx = shear::_noise_start_index & 0xFF;
     uint8_t threshold = shear::_noise_threshold;
 
     for (uint32_t i = 0; i < pixel_count; ++i) {

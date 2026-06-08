@@ -463,7 +463,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         int16_t gas_giant_count = Gas_Giants_();
 
         if (max_planets <= original_planet_count - gas_giant_count) {
-            uint8_t is_home_system[72];
+            uint8_t is_home_system[MAX_STARS];
             memset(is_home_system, 0, sizeof(is_home_system));
 
             for (int32_t i = 0; i < MAX_PLAYERS; ++i) {
@@ -531,7 +531,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     }
 
     void __cdecl Generate_Wormhole_Links_() {
-        uint8_t star_used[72];
+        uint8_t star_used[MAX_STARS];
         memset(star_used, 0, sizeof(star_used));
 
         if (MOX::_NUM_PLAYERS > 0) {
@@ -1252,7 +1252,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         s_colors local_colors2;
         uint32_t last_stat_clock;
         uint32_t stats_start_clock = 0;
-        char planets_per_star[72];
+        char planets_per_star[MAX_STARS];
         char error_buf[80];
         int16_t grid_x, grid_y;
         int16_t unused_wormhole_flag;

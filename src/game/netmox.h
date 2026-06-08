@@ -163,7 +163,7 @@ namespace NETMOX {
     struct s_NET_MSG_SYNC_PLAYER {
         int32_t player1_idx;
         s_player player1;
-        int8_t surrender_to[72];
+        int8_t surrender_to[MAX_STARS];
         int32_t player2_idx;
         s_player player2;
     };

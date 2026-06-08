@@ -20,8 +20,8 @@ s_plntsum_screen* _screen;
 s_plntsum_planet* _planet_summary;
 s_plntsum_ship* _ship_summary;
 int16_t _n_ships_in_summary;
-int8_t _can_reach_star[72];
-uint8_t _explored_bitmap[45];
+int8_t _can_reach_star[MAX_STARS];
+uint8_t _explored_bitmap[MAX_PLANETS / 8];
 
 uint8_t _found_outpost_ship;
 uint8_t _draw_colony_button_status;
@@ -734,8 +734,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     void __cdecl Allocate_Space_For_Summary_Screen_() {
-        _planet_summary = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_planet_summary) * 360);
-        memset(_planet_summary, 0xFF, sizeof(*_planet_summary) * 360);
+        _planet_summary = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_planet_summary) * MAX_PLANETS);
+        memset(_planet_summary, 0xFF, sizeof(*_planet_summary) * MAX_PLANETS);
 
         _screen = (s_plntsum_screen*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_screen));
         memset(_screen, 0, sizeof(*_screen));
@@ -957,9 +957,9 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         allocate::Push_Block_(MOX::_screen_seg);
 
         s_plntsum_planet* temp_buffer =
-            (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*temp_buffer) * 360);
+            (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*temp_buffer) * MAX_PLANETS);
 
-        memset(temp_buffer, 0xFF, sizeof(*temp_buffer) * 360);
+        memset(temp_buffer, 0xFF, sizeof(*temp_buffer) * MAX_PLANETS);
 
         *summary_count = 0;
 
@@ -1021,7 +1021,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         // If the count of visible planets changed, update the global summary
         if (*summary_count != original_count) {
-            memcpy(PLNTSUM::_planet_summary, temp_buffer, sizeof(*temp_buffer) * 360);
+            memcpy(PLNTSUM::_planet_summary, temp_buffer, sizeof(*temp_buffer) * MAX_PLANETS);
             PLNTSUM::Sort_Planet_Summary_();
             MOX::_scanned_field = -1;
         }
@@ -1071,7 +1071,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         moving_ships[0] = _ship_summary[ship_summary_idx].colony_ship_idx;
         moving_ships[1] = -1;
 
-        for (int16_t star_idx = 0; star_idx < 72; ++star_idx) {
+        for (int16_t star_idx = 0; star_idx < MAX_STARS; ++star_idx) {
             int16_t summary_planet_idx = Summary_Planet_Index_(star_idx);
 
             if (summary_planet_idx != -1) {
@@ -1131,7 +1131,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         moving_ships[0] = _ship_summary[ship_summary_idx].outpost_ship_idx;
         moving_ships[1] = -1;
 
-        for (int16_t star_idx = 0; star_idx < 72; ++star_idx) {
+        for (int16_t star_idx = 0; star_idx < MAX_STARS; ++star_idx) {
             int16_t summary_planet_idx = Summary_Planet_Index_(star_idx);
 
             if (summary_planet_idx != -1) {
@@ -1226,7 +1226,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     void __cdecl Add_PlntSum_Galaxy_Map_Fields_(int16_t* fields_array) {
-        for (short i = 0; i < 72; ++i) {
+        for (short i = 0; i < MAX_STARS; ++i) {
             fields_array[i] = -1000;
         }
 

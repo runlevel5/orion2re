@@ -5,12 +5,12 @@ namespace COMBFIND {
 uint8_t _messed_up_fleet_palette;
 uint8_t _in_net_update;
 s_combfind_target _target;
-uint16_t (*_player_needs_to_attack)[73];
+uint16_t (*_player_needs_to_attack)[MAX_STARS + 1];
 int8_t* _battle_stars;
-uint8_t (*_star_has_nonplayer)[73];
+uint8_t (*_star_has_nonplayer)[MAX_STARS + 1];
 int16_t _n_battle_stars;
 int8_t (*_attack_confirmed)[MAX_PLAYERS][MAX_PLAYERS];
-s_combfind_star_has_player (*_star_has_player)[73][MAX_PLAYERS];
+s_combfind_star_has_player (*_star_has_player)[MAX_STARS + 1][MAX_PLAYERS];
 uint8_t* _current_star_has_nonplayer;
 s_combfind_star_has_player* _current_star_has_player;
 char* _research_treaty_msg;
@@ -34,9 +34,9 @@ void __cdecl Search_For_Battles_() {
 
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
-    s_combfind_star_has_player star_has_player_stack[73][MAX_PLAYERS];
-    uint8_t star_has_nonplayer_stack[73];
-    uint16_t player_needs_to_attack_stack[73];
+    s_combfind_star_has_player star_has_player_stack[MAX_STARS + 1][MAX_PLAYERS];
+    uint8_t star_has_nonplayer_stack[MAX_STARS + 1];
+    uint16_t player_needs_to_attack_stack[MAX_STARS + 1];
     int8_t battle_stars_stack[76];
     int8_t attack_confirmed_buf[MAX_PLAYERS][MAX_PLAYERS];
 
@@ -65,7 +65,7 @@ void __cdecl Search_For_Battles_() {
     for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
         s_ship_data* ship = &MOX::_ship[i];
         int16_t loc = ship->location;
-        if (loc < 72) {
+        if (loc < MAX_STARS) {
             if (ship->status == 0) {
                 int8_t owner = ship->owner;
                 if (owner < MAX_PLAYERS) {
@@ -200,7 +200,7 @@ void __cdecl Process_Retreating_Ships_(void) {
         char pad2[13];
     };
 
-    s_retreat_report report[MAX_PLAYERS][73];
+    s_retreat_report report[MAX_PLAYERS][MAX_STARS + 1];
     int8_t player_retreat_target[MAX_PLAYERS];
     int16_t ship_indices[MAX_SHIPS];
     s_ship_move_info move_info;

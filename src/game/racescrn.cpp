@@ -29,7 +29,7 @@ namespace RACESCRN {
     char _relation_text[17][15];
     uint8_t _slider_remap_list[26] = {74, 72, 68, 66, 62, 60, 56, 54, 50, 48, 44, 42, 38, 36, 32, 30, 26, 24, 20, 18, 14, 12, 8, 6, 2, 0};
     uint8_t _relation_name_table[17] = {9, 21, 33, 45, 57, 69, 81, 93, 107, 119, 131, 143, 155, 167, 179, 191, 255};
-    s_racescrn_icon_layout _spy_group_data[7] = {
+    s_racescrn_icon_layout _spy_group_data[MAX_PLAYERS - 1] = {
         {121, 98, 307, 122, 25, nullptr},
         {121, 205, 307, 229, 25, nullptr},
         {121, 311, 307, 335, 25, nullptr},
@@ -38,13 +38,13 @@ namespace RACESCRN {
         {333, 206, 519, 230, 25, nullptr},
         {333, 311, 519, 335, 25, nullptr},
     };
-    int16_t _race_bar[14] = {105, 49, 105, 155, 105, 262, 105, 370, 528, 49, 528, 156, 528, 261};
-    int16_t _race_spies[14] = {121, 98, 121, 205, 121, 311, 121, 417, 333, 98, 333, 206, 333, 311};
-    int16_t _race_spy_btns[14] = {120, 126, 120, 233, 120, 338, 120, 445, 332, 126, 332, 233, 332, 338};
-    int16_t _race_slider_x[7] = {96, 96, 96, 96, 520, 520, 520};
+    int16_t _race_bar[(MAX_PLAYERS - 1) * 2] = {105, 49, 105, 155, 105, 262, 105, 370, 528, 49, 528, 156, 528, 261};
+    int16_t _race_spies[(MAX_PLAYERS - 1) * 2] = {121, 98, 121, 205, 121, 311, 121, 417, 333, 98, 333, 206, 333, 311};
+    int16_t _race_spy_btns[(MAX_PLAYERS - 1) * 2] = {120, 126, 120, 233, 120, 338, 120, 445, 332, 126, 332, 233, 332, 338};
+    int16_t _race_slider_x[MAX_PLAYERS - 1] = {96, 96, 96, 96, 520, 520, 520};
     s_racescrn_icon_layout _agent_group_data = {332, 392, 613, 415, 24, nullptr};
-    int16_t _race_picture[14] = {21, 49, 21, 156, 21, 262, 21, 369, 544, 50, 544, 157, 544, 262};
-    int16_t _race_text[14] = {125, 50, 125, 157, 125, 262, 125, 366, 333, 50, 333, 157, 333, 262};
+    int16_t _race_picture[(MAX_PLAYERS - 1) * 2] = {21, 49, 21, 156, 21, 262, 21, 369, 544, 50, 544, 157, 544, 262};
+    int16_t _race_text[(MAX_PLAYERS - 1) * 2] = {125, 50, 125, 157, 125, 262, 125, 366, 333, 50, 333, 157, 333, 262};
     s_colors _race_normal_color = {{176, 185, 181, 182, 184, 185, 185, 186}};
     s_colors _race_high_color = {{176, 191, 183, 185, 187, 188, 191, 191}};
     s_colors _banner_color_high = {{67, 139, 147, 38, 61, 95, 106, 47}};
@@ -114,7 +114,7 @@ namespace RACESCRN {
         int16_t spy_bonus;
         int16_t agent_bonus;
 
-        for (int i = 0; i < 7; ++i) {
+        for (int i = 0; i < (MAX_PLAYERS - 1); ++i) {
             int16_t race_text_x = _race_text[i * 2];
             int16_t race_text_y = _race_text[i * 2 + 1];
 
@@ -233,7 +233,7 @@ namespace RACESCRN {
         allocate::Push_Block_(MOX::_screen_seg);
         s_animation_header* bar_anim = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 3, MOX::_screen_seg);
 
-        for (int16_t i = 0; i < 7; ++i) {
+        for (int16_t i = 0; i < (MAX_PLAYERS - 1); ++i) {
             int16_t x;
             int16_t y;
             s_animation_header* slider_img;
@@ -281,13 +281,13 @@ namespace RACESCRN {
     }
 
     void __cdecl Init_Race_Display_Data_(s_racescrn_race_display* race_displays, s_racescrn_mouse_group* agent_group) {
-        memset(race_displays, 0, sizeof(*race_displays) * 7);
+        memset(race_displays, 0, sizeof(*race_displays) * (MAX_PLAYERS - 1));
 
         s_animation_header* spy_agent_icon_sprite = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", MOX::_player[MOX::_PLAYER_NUM].race + 0x2E, MOX::_screen_seg);
         s_animation_header* slider_sprite = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 2, MOX::_screen_seg);
         s_animation_header* eliminated_overlay_sprite = (s_animation_header*)farload::Far_Reload_Next_("races.lbx", 0x1F, MOX::_screen_seg);
 
-        for (int16_t i = 0; i < 7; ++i) {
+        for (int16_t i = 0; i < (MAX_PLAYERS - 1); ++i) {
             race_displays[i].relationship_slider_img = slider_sprite;
 
             if (i < MOX::_active_count) {
@@ -717,7 +717,7 @@ namespace RACESCRN {
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
             RUSS::Mox_Update_();
 
-            s_racescrn_race_display race_display_data[7];
+            s_racescrn_race_display race_display_data[MAX_PLAYERS - 1];
             s_racescrn_mouse_group agent_group;
             char message_buffer[120];
             s_racescrn_mouse_group mouse_group;

@@ -28,7 +28,7 @@ namespace SHIPS {
         HACCESS::Ship_Owner_(ship_idx);
 
         bool officer_relocated = false;
-        for (int16_t leader_idx = 0; leader_idx < 67; ++leader_idx) {
+        for (int16_t leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
             if (officer_relocated) {
                 break;
             }
@@ -376,7 +376,7 @@ namespace SHIPS {
             }
         }
 
-        if (ship_type_idx == 8) {
+        if (ship_type_idx == MAX_PLAYERS) {
             // Monster ship uses the inverted zoom index directly
             if (is_highlighted != 0) {
                 s_animation_header* seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", (int)inverted_zoom + 237 /* 0xed */, MOX::_global_cache_seg);

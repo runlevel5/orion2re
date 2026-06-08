@@ -367,7 +367,7 @@ namespace FLT1 {
         MOX::_fltscrn_ship_icon_selection_list = (int16_t*)allocate::Allocate_Next_Block_(
             (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
         MOX::_officer_id_list = (int16_t*)allocate::Allocate_Next_Block_(
-            (void*)(uintptr_t)MOX::_screen_seg, 67 * sizeof(*MOX::_officer_id_list));
+            (void*)(uintptr_t)MOX::_screen_seg, MAX_LEADERS * sizeof(*MOX::_officer_id_list));
         MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(
             (void*)(uintptr_t)MOX::_screen_seg, sizeof(*MOX::_scroll_bar));
 
@@ -1147,10 +1147,10 @@ namespace FLT1 {
         MOX::_selected_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 17, MOX::_screen_seg);
         MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 18, MOX::_screen_seg);
 
-        MOX::_temp_officers_pict = (s_animation_header**)allocate::Allocate_Next_Block_(MOX::_screen_seg, 67 * sizeof(s_animation_header*));
+        MOX::_temp_officers_pict = (s_animation_header**)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_LEADERS * sizeof(s_animation_header*));
         FLT1::Allocate_Fltscrn_Next_Screen_Seg_();
 
-        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
             if (leader->player_index == MOX::_PLAYER_NUM && leader->status == 1 /* Status: Active? */ && leader->type == 0 /* Type: Ship Officer? */) {
                 MOX::_temp_officers_pict[matching_officer_count] = (s_animation_header*)FLT1::Load_Fltscrn_Officer_Picture_(MOX::_PLAYER_NUM, i, MOX::_screen_seg, 0);
@@ -1313,7 +1313,7 @@ namespace FLT1 {
     bool __cdecl At_Least_One_Officer_(int16_t player_num) {
         (void)player_num;
 
-        for (int16_t i = 0; i < 67; ++i) {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM && MOX::_leaders[i].status >= 0) {
                 return true;
             }

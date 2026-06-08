@@ -17,7 +17,7 @@ int16_t _fields[10];
 s_animation_header* _anims[7];
 s_animation_header* _tech_level_anims[3];
 s_animation_header* _difficulty_anims[5];
-s_animation_header* _num_players_anims[7];
+s_animation_header* _num_players_anims[MAX_PLAYERS - 1];
 s_animation_header* _gal_age_anims[3];
 s_animation_header* _gal_size_anims[4];
 s_animation_header* _background_seg;
@@ -27,7 +27,7 @@ char* _diff_button_strings[5];
 char* _gal_age_button_strings[3];
 char* _combat_button_strings[2];
 char _localized_gal_size_label[20];
-char* _opp_button_strings[7];
+char* _opp_button_strings[MAX_PLAYERS - 1];
 
 int16_t __cdecl Newgame_Screen_(void) {
     memcpy(NEWGAME::_color_ken.colors, "y{z|||||", sizeof(NEWGAME::_color_ken.colors));
@@ -169,10 +169,10 @@ void __cdecl Reload_Newgame_Screen_() {
     index += 4;
     RUSS::Mox_Update_();
 
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < MAX_PLAYERS - 1; ++i) {
         _num_players_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
-    index += 7;
+    index += MAX_PLAYERS - 1;
     RUSS::Mox_Update_();
 
     for (int i = 0; i < 3; ++i) {
@@ -253,7 +253,7 @@ void __cdecl Update_Fields_() {
 
     // Opponents
     int16_t opponents_hidden_field = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_help_text, 0);
-    _fields[3] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0x15D, gx + 0xCD, gy + 0x171, _opp_button_strings, 7, &_opp_button_variable, 0, common_help_text, 0, opponents_hidden_field);
+    _fields[3] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0x15D, gx + 0xCD, gy + 0x171, _opp_button_strings, MAX_PLAYERS - 1, &_opp_button_variable, 0, common_help_text, 0, opponents_hidden_field);
 
     // Starting Civilization Level
     int16_t civilization_hidden_field = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, common_help_text, 0);

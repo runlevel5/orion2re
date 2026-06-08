@@ -26,7 +26,7 @@ namespace COLGCBT {
     int16_t _top_line;
     s_animation_header* _anims[40];
 
-    uint8_t _player_color_array[64] = {
+    uint8_t _player_color_array[MAX_PLAYERS * 8] = {
         146, 236, 237, 238, 239, 150, 151, 152,
         218, 219, 220, 212, 222, 223, 224, 225,
         192, 193, 194, 195, 196, 197, 198, 199,
@@ -37,7 +37,7 @@ namespace COLGCBT {
         183, 184, 185, 186, 187, 188, 189, 189,
     };
 
-    uint8_t _short_player_color_array[64] = {
+    uint8_t _short_player_color_array[MAX_PLAYERS * 8] = {
         236, 237, 238, 239, 0, 0, 0, 0,
         219, 221, 223, 225, 0, 0, 0, 0,
         232, 232, 234, 235, 0, 0, 0, 0,

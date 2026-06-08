@@ -441,7 +441,7 @@ namespace ERICNET {
     }
 
     void __cdecl Best_Instructor_Bonus_(int16_t* instructor_bonus_by_player) {
-        for (int16_t leader_index = 0; leader_index < 0x43; ++leader_index) {
+        for (int16_t leader_index = 0; leader_index < MAX_LEADERS; ++leader_index) {
             const s_leader_data& leader = MOX::_leaders[leader_index];
             const int16_t player_index = (int8_t)leader.player_index;
 

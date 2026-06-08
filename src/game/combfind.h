@@ -4,12 +4,12 @@ namespace COMBFIND {
     extern uint8_t _messed_up_fleet_palette;
     extern uint8_t _in_net_update;
     extern s_combfind_target _target;
-    extern uint16_t (*_player_needs_to_attack)[73];
+    extern uint16_t (*_player_needs_to_attack)[MAX_STARS + 1];
     extern int8_t* _battle_stars;
-    extern uint8_t (*_star_has_nonplayer)[73];
+    extern uint8_t (*_star_has_nonplayer)[MAX_STARS + 1];
     extern int16_t _n_battle_stars;
     extern int8_t (*_attack_confirmed)[MAX_PLAYERS][MAX_PLAYERS];
-    extern s_combfind_star_has_player (*_star_has_player)[73][MAX_PLAYERS];
+    extern s_combfind_star_has_player (*_star_has_player)[MAX_STARS + 1][MAX_PLAYERS];
     extern uint8_t* _current_star_has_nonplayer;
     extern s_combfind_star_has_player* _current_star_has_player;
     extern char* _research_treaty_msg;

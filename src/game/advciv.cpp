@@ -84,7 +84,7 @@ namespace ADVCIV {
                 planet.proximity_bonus = proximity_bonus;
             }
 
-            qsort(player.planets, 360, sizeof(s_adv_civ_player_planet), qsort_planet_worth_);
+            qsort(player.planets, MAX_PLANETS, sizeof(s_adv_civ_player_planet), qsort_planet_worth_);
         }
     }
 
@@ -95,7 +95,7 @@ namespace ADVCIV {
             _adv_civ_player[player_idx].candidate_star_count = 0;
 
             int16_t home_star_idx = (int16_t)MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index;
-            for (int16_t star_idx = 1; star_idx < 72; ++star_idx) {
+            for (int16_t star_idx = 1; star_idx < MAX_STARS; ++star_idx) {
                 int16_t distance = (int16_t)_parsec[home_star_idx].dist[star_idx];
                 if (max_dist_so_far < distance) {
                     max_dist_so_far = distance;
@@ -104,7 +104,7 @@ namespace ADVCIV {
 
             _adv_civ_player[player_idx].furthest_star_dist_from_home = max_dist_so_far;
 
-            for (int16_t colonized_star = 1; colonized_star < 72; ++colonized_star) {
+            for (int16_t colonized_star = 1; colonized_star < MAX_STARS; ++colonized_star) {
                 if (colonized_star < MOX::_NUM_STARS &&
                     MOX::_star[colonized_star].system_special != SYSTEM_SPECIAL_SPACE_MONSTER &&
                     Player_Has_Colony_At_Star_(player_idx, colonized_star)) {
@@ -135,7 +135,7 @@ namespace ADVCIV {
         for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
             s_adv_civ_player* player = &ADVCIV::_adv_civ_player[player_idx];
 
-            for (int16_t star_list_idx = 0; star_list_idx < 72; ++star_list_idx) {
+            for (int16_t star_list_idx = 0; star_list_idx < MAX_STARS; ++star_list_idx) {
                 s_adv_civ_player_star* adv_star = &player->stars[star_list_idx];
 
                 if (adv_star->min_dist_to_colony < 10 && adv_star->star_idx > 0) {
@@ -216,7 +216,7 @@ namespace ADVCIV {
     }
 
     void __cdecl Build_Parsec_Star_Distances_(s_parsec* parsec_distances) {
-        for (int16_t i = 0; i < 72; ++i) {
+        for (int16_t i = 0; i < MAX_STARS; ++i) {
             memset(parsec_distances[i].dist, 0xFF, sizeof(parsec_distances[i].dist));
 
             if (i < MOX::_NUM_STARS) {
@@ -317,7 +317,7 @@ namespace ADVCIV {
             } else {
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
                     int16_t candidate_planet_idx = player_round_state[i + MAX_PLAYERS];
-                    if (candidate_planet_idx >= 0 && candidate_planet_idx < 360) {
+                    if (candidate_planet_idx >= 0 && candidate_planet_idx < MAX_PLANETS) {
                         _planet_selected_flag[candidate_planet_idx] = -1;
                     }
                 }
@@ -358,25 +358,25 @@ namespace ADVCIV {
 
         _adv_civ_player = (s_adv_civ_player*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x8500);
         _parsec = (s_parsec*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x5100);
-        _planet_selected_flag = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x168);
-        _star_colony_owner = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x48);
+        _planet_selected_flag = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_PLANETS);
+        _star_colony_owner = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_STARS);
         _planet_worth_to_player = (s_adv_planet_worth*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x3c8);
 
         memset(_adv_civ_player, 0, 0x8500);
         memset(_parsec, 0, 0x5100);
-        memset(_planet_selected_flag, 0xFF, 0x168);
-        memset(_star_colony_owner, 0xFF, 0x48);
+        memset(_planet_selected_flag, 0xFF, MAX_PLANETS);
+        memset(_star_colony_owner, 0xFF, MAX_STARS);
         memset(_planet_worth_to_player, 0xFF, 0x3c8);
 
         for (int16_t p_idx = 0; p_idx < (int16_t)MOX::_NUM_PLAYERS; ++p_idx) {
             int16_t hw_idx = MOX::_player[p_idx].home_planet_id;
             int16_t star_idx = (int16_t)MOX::_planet[hw_idx].star_index;
 
-            for (int16_t i = 0; i < 360; ++i) {
+            for (int16_t i = 0; i < MAX_PLANETS; ++i) {
                 _adv_civ_player[p_idx].planets[i].planet_idx = -1;
             }
 
-            for (int16_t i = 0; i < 72; ++i) {
+            for (int16_t i = 0; i < MAX_STARS; ++i) {
                 _adv_civ_player[p_idx].stars[i].star_idx = -1;
                 _adv_civ_player[p_idx].stars[i].min_dist_to_colony = 9999;
             }

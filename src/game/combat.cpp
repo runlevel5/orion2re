@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace COMBAT {
-    constexpr size_t kQCombatDataShipCount = 501;
+    constexpr size_t kQCombatDataShipCount = MAX_SHIPS + 1;
     constexpr size_t kQCombatDataSize = kQCombatDataShipCount * sizeof(s_qship);
 
     const char s_Crystal_00557e24[8] = "Crystal";

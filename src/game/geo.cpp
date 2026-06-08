@@ -13,7 +13,7 @@ namespace GEO {
     };
 
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance) {
-        int16_t black_hole_indices[72];
+        int16_t black_hole_indices[MAX_STARS];
         int16_t num_black_holes = Collect_Black_Holes_(black_hole_indices);
         const int32_t black_hole_block_count =
             (int32_t)(sizeof(MOX::_star[0].black_hole_blocks) / sizeof(MOX::_star[0].black_hole_blocks[0]));
@@ -173,7 +173,7 @@ namespace GEO {
     }
 
     bool __cdecl Map_Is_Connected_() {
-        int16_t local_dads_buffer[72]; // Stack space allocated for union-find dads
+        int16_t local_dads_buffer[MAX_STARS]; // Stack space allocated for union-find dads
         GEO::_dads = local_dads_buffer;
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
@@ -213,7 +213,7 @@ namespace GEO {
      * A path is considered blocked if any black hole is within 45 coordinate units of the segment.
      */
     bool __cdecl Black_Hole_Blocks_Points_(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
-        int16_t black_holes[72];
+        int16_t black_holes[MAX_STARS];
         bool is_blocked = false;
 
         int16_t num_black_holes = Collect_Black_Holes_(black_holes);

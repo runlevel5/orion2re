@@ -818,12 +818,12 @@ namespace HAROLD {
      * @address 004f05c0
      */
     int16_t __cdecl Absolute_Location_(int16_t location) {
-        if (location >= 500 && location < 1000) {
-            return location - 500;
+        if (location >= MAX_SHIPS && location < (MAX_SHIPS * 2)) {
+            return location - MAX_SHIPS;
         }
 
-        if (location >= 1000 && location < 1072 /* 0x430 */) {
-            return location - 1000;
+        if (location >= (MAX_SHIPS * 2) && location < (MAX_SHIPS * 2) + MAX_STARS /* 0x430 */) {
+            return location - (MAX_SHIPS * 2);
         }
 
         return location;
@@ -835,15 +835,15 @@ namespace HAROLD {
     int16_t __cdecl Actual_Star_Id_(int16_t star_id, int16_t* out_actual_id) {
         int16_t type = 0;
 
-        // Range [500, 999]
-        if (star_id >= 500 && star_id < 1000) {
-            *out_actual_id = star_id - 500;
+        // Range [MAX_SHIPS, (MAX_SHIPS * 2) - 1]
+        if (star_id >= MAX_SHIPS && star_id < (MAX_SHIPS * 2)) {
+            *out_actual_id = star_id - MAX_SHIPS;
             return 1;
         }
 
-        // Range [1000, 1499]
-        if (star_id >= 1000 && star_id < 1500) {
-            star_id -= 1000;
+        // Range [(MAX_SHIPS * 2), (MAX_SHIPS * 3) - 1]
+        if (star_id >= (MAX_SHIPS * 2) && star_id < (MAX_SHIPS * 3)) {
+            star_id -= (MAX_SHIPS * 2);
             type = 2;
         }
 
@@ -870,8 +870,8 @@ namespace HAROLD {
                 s_ship_data* ship = &MOX::_ship[ship_idx];
 
                 // Status 0 indicates the ship is active/available.
-                // Owners >= 8 (specifically owner 8) are typically neutral monsters (Orion Guardians, etc).
-                if (ship->status == 0 && ship->owner >= 8 && ship->location == location_idx) {
+                // Owners >= MAX_PLAYERS (specifically owner 8) are typically neutral monsters (Orion Guardians, etc).
+                if (ship->status == 0 && ship->owner >= MAX_PLAYERS && ship->location == location_idx) {
                     found = true;
                     *monster_owner = (int16_t)ship->owner;
                     break;
@@ -1051,7 +1051,7 @@ namespace HAROLD {
         if (MOX::_NUM_STARS <= 54) {
             return 2;
         }
-        if (MOX::_NUM_STARS <= 72) {
+        if (MOX::_NUM_STARS <= MAX_STARS) {
             return 3;
         }
 

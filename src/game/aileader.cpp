@@ -66,7 +66,7 @@ namespace aileader {
     }
 
     void __cdecl Assign_Star_Officer_(int32_t player_index, int32_t leader_index) {
-        int32_t star_scores[72];
+        int32_t star_scores[MAX_STARS];
         memset(star_scores, 0, sizeof(star_scores));
 
         uint32_t skills = MOX::_leaders[leader_index].special_skills;
@@ -201,7 +201,7 @@ namespace aileader {
     }
 
     void __cdecl Assign_Unassigned_Leaders_(int32_t player_idx) {
-        for (int32_t leader_index = 0; leader_index < 67; ++leader_index) {
+        for (int32_t leader_index = 0; leader_index < MAX_LEADERS; ++leader_index) {
             s_leader_data* leader = &MOX::_leaders[leader_index];
 
             if (leader->player_index == (char)player_idx) {

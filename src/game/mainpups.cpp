@@ -495,7 +495,7 @@ namespace MAINPUPS {
         } else {
             int16_t str_id;
             switch (attacker_idx) {
-                case 8:  str_id = 0x1FF; break;
+                case MAX_PLAYERS:  str_id = 0x1FF; break;
                 case 9:  str_id = 0x202; break;
                 case 10: str_id = 0x9F;  break;
                 case 11: str_id = 0xA0;  break;

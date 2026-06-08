@@ -456,7 +456,7 @@ namespace KEN {
     }
 
     s_animation_header* __cdecl Do_Get_Ship_Picture_Seg(int16_t player_idx, int16_t ship_type) {
-        int8_t color = 8;
+        int8_t color = MAX_PLAYERS;
         if (player_idx < MAX_PLAYERS) {
             color = (int8_t)MOX::_player[player_idx].color;
         }

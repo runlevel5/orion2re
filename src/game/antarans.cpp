@@ -285,7 +285,7 @@ namespace antarans {
 
     int16_t __cdecl Get_Antaran_Target_Star_(int16_t player_idx) {
         int16_t star_count;
-        int16_t star_indices[72];
+        int16_t star_indices[MAX_STARS];
         int16_t target_star_idx = -1;
 
         Build_List_Of_Stars_By_Player_(player_idx, star_indices, &star_count);

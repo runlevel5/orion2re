@@ -11,7 +11,7 @@ namespace aidudes {
     s_aidudes_colony_info* _Sort_Pops_colony_info;
     s_colony* _Sort_Pops_colony_data;
     int16_t _i_ai;
-    s_aidudes_colony_info (*_our_colonies)[250];
+    s_aidudes_colony_info (*_our_colonies)[MAX_COLONIES];
 
     void __cdecl All_Colony_AI_() {
         int16_t num_players = (int16_t)MOX::_NUM_PLAYERS;
@@ -87,7 +87,7 @@ namespace aidudes {
     }
 
     void __cdecl Colony_AI_(int16_t i_ai) {
-        s_aidudes_colony_info our_colonies_local[250];
+        s_aidudes_colony_info our_colonies_local[MAX_COLONIES];
 
         aidudes::_i_ai = i_ai;
         aidudes::_our_colonies = &our_colonies_local;
@@ -943,7 +943,7 @@ namespace aidudes {
                 isqrt_val > 1) {
 
                 if (p->tech_applications[41] == 3 && !no_range_or_speed) {
-                    int val = (*AIDATA::_contextual_planet_values)[player_idx * 360 + best_planet];
+                    int val = (*AIDATA::_contextual_planet_values)[player_idx * MAX_PLANETS + best_planet];
                     if (war_level > 0) {
                         val /= 4;
                     }
@@ -1412,7 +1412,7 @@ namespace aidudes {
     }
 
     void __cdecl Assign_Additional_Unblockaded_Farmers_() {
-        s_aidudes_colony_info* candidates[250];
+        s_aidudes_colony_info* candidates[MAX_COLONIES];
         int num_candidates = 0;
         bool freighter_shortage_flag = false;
         bool allocation_failed = false;

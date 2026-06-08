@@ -190,7 +190,7 @@ namespace COLCALC {
             break;
         case 8:
             // Deassign officers if the system special is removed (e.g., Orion conquered)
-            for (int16_t i = 0; i < 67; ++i) {
+            for (int16_t i = 0; i < MAX_LEADERS; ++i) {
                 if (MOX::_leaders[i].status == 5 && MOX::_leaders[i].location == star_idx) {
                     OFFICER::Deassign_Officer_(i);
                 }
@@ -206,7 +206,7 @@ namespace COLCALC {
 
     void __cdecl Pass_Out_Imports_(int16_t player_idx, s_colony* colony) {
         s_player* player = &MOX::_player[player_idx];
-        int16_t needy_colony_indices[250];
+        int16_t needy_colony_indices[MAX_COLONIES];
         int16_t num_needy = 0;
         int16_t total_surplus = 0;
         int16_t total_deficit = 0;
@@ -609,7 +609,7 @@ namespace COLCALC {
         }
 
         // Process Leaders
-        for (int i = 0; i < 67; ++i) {
+        for (int i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
             if (Player_Owns_Officer_(plr, leader) && Leader_At_Anomaly_(leader) == 0) {
                 uint32_t skills = leader->general_skills;

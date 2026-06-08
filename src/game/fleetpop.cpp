@@ -1489,7 +1489,7 @@ uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
     }
 
     bool valid_offset_location = false;
-    if (location > 1000 && location < 1072) {
+    if (location > 1000 && location < 1000 + MAX_STARS) {
         valid_offset_location = true;
     }
 
@@ -1558,7 +1558,7 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
 
     bool needs_xy_to_star = false;
     if (star_idx > 1000) {
-        needs_xy_to_star = (star_idx < 0x430);
+        needs_xy_to_star = (star_idx < 1000 + MAX_STARS);
     }
 
     if (needs_xy_to_star) {
@@ -1659,7 +1659,7 @@ int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
 
     int16_t star_index = MOX::_ship[ship_idx].location;
     const bool is_at_star = (star_index > -1) && (star_index < 500);
-    const bool is_in_transit_to_star = (star_index > 1000) && (star_index < 1072);
+    const bool is_in_transit_to_star = (star_index > 1000) && (star_index < 1000 + MAX_STARS);
 
     if (is_in_transit_to_star) {
         star_index -= 1000;
@@ -1756,7 +1756,7 @@ int8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t ship_count) {
   int16_t star_idx = MOX::_ship[primary_ship_idx].location;
 
   const bool is_at_star = (star_idx > -1) && (star_idx < 500);
-  const bool is_at_xy_star = (star_idx > 1000) && (star_idx < 1072);
+  const bool is_at_xy_star = (star_idx > 1000) && (star_idx < 1000 + MAX_STARS);
 
   if (is_at_xy_star) {
     star_idx = HAROLD::XY_To_Star_Id_(MOX::_ship[primary_ship_idx].x, MOX::_ship[primary_ship_idx].y);

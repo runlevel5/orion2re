@@ -543,7 +543,7 @@ namespace MOX {
     s_animation_header* _main_leaders_button_seg;
     s_animation_header* _main_races_button_seg;
     s_animation_header* _main_info_button_seg;
-    int16_t _star_button[72];
+    int16_t _star_button[MAX_STARS];
     int16_t _main_screen_grid_field;
     int16_t _main_screen_grid_x;
     int16_t _main_screen_grid_y;
@@ -889,7 +889,7 @@ namespace MOX {
     int16_t _galaxy_map_grid_y;
     int16_t _galaxy_map_width;
     int16_t _galaxy_map_grid_x;
-    int16_t _galaxy_map_star_field[72];
+    int16_t _galaxy_map_star_field[MAX_STARS];
     s_animation_header* _fltscrn_flashing_ship_pict_seg[8];
     s_animation_header* _fltscrn_flashing_monster_ship_icon[7];
 

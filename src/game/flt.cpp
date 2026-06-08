@@ -4,8 +4,8 @@ namespace FLT {
 
 void __cdecl Set_Fltscrn_Small_Ship_Icon_XYs_(int16_t map_x, int16_t map_y, int16_t map_width, int16_t map_height) {
     int16_t zoom_level;
-    int16_t star_x[72];
-    int16_t star_y[72];
+    int16_t star_x[MAX_STARS];
+    int16_t star_y[MAX_STARS];
     int16_t icon_w, icon_h;
     int16_t actual_star_idx;
     int16_t icon_x, icon_y;

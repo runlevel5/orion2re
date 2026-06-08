@@ -487,7 +487,7 @@ namespace MOX {
     extern s_animation_header* _main_leaders_button_seg;
     extern s_animation_header* _main_races_button_seg;
     extern s_animation_header* _main_info_button_seg;
-    extern int16_t _star_button[72];
+    extern int16_t _star_button[MAX_STARS];
     extern int16_t _main_screen_grid_field;
     extern int16_t _main_screen_grid_x;
     extern int16_t _main_screen_grid_y;
@@ -767,7 +767,7 @@ namespace MOX {
     extern int16_t _galaxy_map_width;
     extern int16_t _galaxy_map_grid_x;
 
-    extern int16_t _galaxy_map_star_field[72];
+    extern int16_t _galaxy_map_star_field[MAX_STARS];
 
     extern s_animation_header* _fltscrn_flashing_ship_pict_seg[8];
 
