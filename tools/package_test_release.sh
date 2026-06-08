@@ -53,10 +53,8 @@ zip_path="$release_dir/${release_name}.zip"
 
 mkdir -p "$release_dir" "$tester_dir"
 
-cp "$exe_path" "$release_dir/"
-cp "$pdb_path" "$release_dir/"
-
 cp "$exe_path" "$tester_dir/"
+cp "$pdb_path" "$tester_dir/"
 cp "$asan_dll_path" "$tester_dir/"
 cp "$LAUNCHER_PATH" "$tester_dir/"
 
@@ -82,11 +80,9 @@ with zipfile.ZipFile(zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
 PY
 
 echo "Created test release: $release_dir"
-echo "Archive files:"
-echo "  $(basename "$exe_path")"
-echo "  $(basename "$pdb_path")"
 echo "Tester package contents:"
 echo "  tester-package/$(basename "$exe_path")"
+echo "  tester-package/$(basename "$pdb_path")"
 echo "  tester-package/$(basename "$asan_dll_path")"
 echo "  tester-package/$(basename "$LAUNCHER_PATH")"
 echo "  tester-package/README.txt"

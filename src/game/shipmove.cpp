@@ -719,15 +719,11 @@ namespace SHIPMOVE {
         move_info->has_navigator = (navigator_bonus > 0);
         
         // Final validation
-        if (((move_info->blackhole_blocks != 0 && move_info->has_jumpgate_route == 0 && 
-              move_info->has_stargate_route == 0 && navigator_bonus <= 0) && 
-             move_info->out_of_range == 0 &&
-             move_info->uses_wormhole == 0) ||
-            (move_info->out_of_range != 0 &&
-             (move_info->blackhole_blocks != 0 ||
-              move_info->has_jumpgate_route != 0 ||
-              move_info->has_stargate_route != 0 ||
-              navigator_bonus > 0)) ||
+        if ((move_info->blackhole_blocks != 0 &&
+             move_info->has_jumpgate_route == 0 &&
+             move_info->has_stargate_route == 0 &&
+             navigator_bonus <= 0) ||
+            move_info->out_of_range != 0 ||
             (ship_speed == 0 && (target_star->x != start_x || target_star->y != start_y))) {
             move_info->turns_left = -1;
             move_info->moving = 0;
