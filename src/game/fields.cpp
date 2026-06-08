@@ -1712,10 +1712,10 @@ namespace fields {
                                 );
                             }
                         } else {
-                            if (f->detail.radio.field9_0x14 == 0) {
-                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
-                            } else {
+                            if (f->detail.radio.draw_style != 0) {
                                 animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
+                            } else {
+                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
                             }
                             animate::Draw_(f->x, f->y, f->detail.radio.pic);
                             if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
@@ -1731,10 +1731,10 @@ namespace fields {
                         break;
                     case 3:
                         if (*f->detail.multibtn.selection == f->detail.multibtn.button_value) {
-                            if (f->detail.radio.field9_0x14 == 0) {
-                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
-                            } else {
+                            if (f->detail.multibtn.draw_style != 0) {
                                 animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
+                            } else {
+                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
                             }
                             animate::Draw_(f->x, f->y, f->detail.radio.pic);
                             if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
@@ -2057,10 +2057,10 @@ namespace fields {
                                 fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
                             }
                         } else {
-                            if (_fields[i].detail.radio.field9_0x14 == 0) {
-                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
-                            } else {
+                            if (_fields[i].detail.radio.draw_style != 0) {
                                 animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
+                            } else {
+                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
                             }
                             animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
                             if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
@@ -2075,10 +2075,10 @@ namespace fields {
                     }
                     case 3: {
                         if (*_fields[i].detail.multibtn.selection == _fields[i].detail.multibtn.button_value) {
-                            if (_fields[i].detail.radio.field9_0x14 == 0) {
-                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
-                            } else {
+                            if (_fields[i].detail.multibtn.draw_style != 0) {
                                 animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
+                            } else {
+                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
                             }
                             animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
                             if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {

@@ -292,6 +292,7 @@ namespace TECH {
 
             graphics::Fill_(_g_scrn_x + 4, _g_scrn_y + 4, _g_scrn_x + 0x1D7, _g_scrn_y + 0x1D8, 0);
             animate::Draw_(_g_scrn_x, _g_scrn_y, tech_select_lbx_images[0]);
+            palette::Refresh_Palette_();
             Display_All_Entry_Text_(_g_entries_p);
 
             RUSS::Mox_Update_();

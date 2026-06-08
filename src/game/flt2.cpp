@@ -214,11 +214,15 @@ void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx, int16_t first_vis
     int16_t ship_idx_list[250];
     int16_t selected_count = 0;
     int16_t target_icon_idx = -1;
-    int16_t next_node_idx = MOX::_ship_stack_start[stack_idx];
+    int16_t next_node_idx = -1;
 
     MOX::_n_fltscrn_big_icons_added = 0;
 
     memset(ship_idx_list, 0xff, sizeof(ship_idx_list));
+
+    if (stack_idx >= 0 && stack_idx < MOX::_ship_stack_count) {
+        next_node_idx = MOX::_ship_stack_start[stack_idx];
+    }
 
     if (MOX::_n_fltscrn_big_icons > 0) {
         for (int16_t i = 0; i < MOX::_n_fltscrn_big_icons; ++i) {

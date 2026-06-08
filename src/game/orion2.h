@@ -1557,7 +1557,7 @@ struct s_field_multi_button {
     undefined field8_0xe;
     undefined field9_0xf;
     int16_t *selection;
-    int16_t field11_0x14;
+    int16_t draw_style;
     undefined field12_0x16;
     undefined field13_0x17;
     int16_t field14_0x18;
@@ -1639,7 +1639,7 @@ struct s_field_radio {
     undefined field6_0xe;
     undefined field7_0xf;
     int16_t *selection;
-    int16_t field9_0x14;
+    int16_t draw_style;
     undefined field10_0x16;
     undefined field11_0x17;
     int32_t field12_0x18;
