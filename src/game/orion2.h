@@ -2231,8 +2231,8 @@ typedef struct s_help_record s_help_record, *Ps_help_record;
 
 #pragma pack(push, 1)
 struct s_help_record {
-    char title[84];
-    char anim_lbx[10];
+    char title[80];
+    char anim_lbx[14];
     uint32_t anim_info;
     uint8_t unknown_0x62;
     uint32_t next_help_idx;
