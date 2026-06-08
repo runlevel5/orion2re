@@ -3246,7 +3246,7 @@ skip_cursor:
             text_colors.colors[6] = CMBTDRW1::_green[4];
             text_colors.colors[7] = CMBTDRW1::_green[4];
 
-            CMBTDRW1::Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18), MOX::_ship_data_id);
+            CMBTDRW1::Remap_Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18));
 
             if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
                 if (MOX::_global_combat_data.officer_idx == -1) {
