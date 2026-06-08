@@ -35,12 +35,12 @@ namespace SHIPMOVE {
             player_max_slots = 20;
         }
 
-        int unassigned_indices[500];
+        int unassigned_indices[MAX_SHIPS];
         int unassigned_count = 0;
         int antaran_assigned = 0;
         int player_assigned = 0;
 
-        for (int i = 0; i < 500; ++i) {
+        for (int i = 0; i < MAX_SHIPS; ++i) {
             if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status == 5) {
                 if (antaran_assigned < antaran_max_slots) {
                     MOX::_ship[i].owner = (int8_t)8;
@@ -354,7 +354,7 @@ namespace SHIPMOVE {
         int16_t i;
 
         // Search for an available ship slot
-        for (i = 0; i < 500; ++i) {
+        for (i = 0; i < MAX_SHIPS; ++i) {
             if (MOX::_ship[i].owner == 8) {
                 // Slot is free if status is 5 or it's beyond the current total count
                 if (MOX::_ship[i].status == 5 || i >= (int16_t)MOX::_NUM_SHIPS) {
@@ -363,7 +363,7 @@ namespace SHIPMOVE {
             }
         }
 
-        if (i == 500) {
+        if (i == MAX_SHIPS) {
             return -1;
         }
 

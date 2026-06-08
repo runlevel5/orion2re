@@ -303,7 +303,7 @@ namespace ERIC {
     }
 
     int8_t __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t minimum_size, int16_t star_idx) {
-        for (int16_t i = 0; i < 500; ++i) {
+        for (int16_t i = 0; i < MAX_SHIPS; ++i) {
             if (MOX::_ship[i].location == star_idx &&
                 MOX::_ship[i].status == 0 &&
                 MOX::_ship[i].owner == player_idx &&

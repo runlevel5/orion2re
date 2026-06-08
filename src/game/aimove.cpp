@@ -213,7 +213,7 @@ namespace AIMOVE {
         int8_t star_flags_0[72];
         int32_t enemy_strength_1[10];
         int32_t enemy_strength_2[10];
-        int16_t ship_indices[500];
+        int16_t ship_indices[MAX_SHIPS];
         s_ship_move_info move_info;
         int16_t local_4a0[2];
 
@@ -452,13 +452,13 @@ namespace AIMOVE {
 
             if (ship->owner != _i_ai && ship->status < 3) {
                 if (ship->location == star_idx) {
-                    uint16_t(*strength_table)[500][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
+                    uint16_t(*strength_table)[MAX_SHIPS][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
                     turn_strengths[0] += (*strength_table)[ship_idx][_i_ai];
                 } else {
                     int location_diff = (int)(int16_t)ship->location - star_idx;
                     // Location diffs of 500 and 1000 relate to travel/wormhole logic
                     if ((location_diff == 500 || location_diff == 1000) && ship->turns_left < 10) {
-                        uint16_t(*strength_table)[500][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
+                        uint16_t(*strength_table)[MAX_SHIPS][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
                         turn_strengths[ship->turns_left] += (*strength_table)[ship_idx][_i_ai];
                     }
                 }
@@ -711,7 +711,7 @@ namespace AIMOVE {
         int16_t num_ships = 0;
         int8_t stage_point_map[72];
         s_ai_stage_point stage_points[72];
-        int16_t ship_indices[500];
+        int16_t ship_indices[MAX_SHIPS];
 
         for (int i = 0; i < 72; ++i) {
             stage_point_map[i] = -1;
@@ -1136,7 +1136,7 @@ namespace AIMOVE {
             dest_star_arr[i] = -1;
         }
 
-        int16_t transport_ships[500];
+        int16_t transport_ships[MAX_SHIPS];
         int16_t num_transports = 0;
 
         for (int16_t i = 0; i < MOX::_NUM_SHIPS; i++) {
@@ -1385,10 +1385,10 @@ namespace AIMOVE {
 
     void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count) {
         int16_t num_my_colony_ships = 0;
-        int16_t my_colony_ships[500];
+        int16_t my_colony_ships[MAX_SHIPS];
 
-        int16_t enemy_colony_ships_buf[500];
-        int16_t* enemy_colony_ships_ptr = &enemy_colony_ships_buf[500];
+        int16_t enemy_colony_ships_buf[MAX_SHIPS];
+        int16_t* enemy_colony_ships_ptr = &enemy_colony_ships_buf[MAX_SHIPS];
 
         for (int i = 0; i < MOX::_NUM_SHIPS; i++) {
             s_ship_data* ship = &MOX::_ship[i];
@@ -1405,7 +1405,7 @@ namespace AIMOVE {
             }
         }
 
-        int16_t num_enemy_colony_ships = (int16_t)(&enemy_colony_ships_buf[500] - enemy_colony_ships_ptr);
+        int16_t num_enemy_colony_ships = (int16_t)(&enemy_colony_ships_buf[MAX_SHIPS] - enemy_colony_ships_ptr);
 
         while (*count > 0) {
             if (num_my_colony_ships <= 0) return;
@@ -1489,7 +1489,7 @@ namespace AIMOVE {
 
     void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate) {
         int num_intercepting_ships;
-        int16_t intercepting_ships[500];
+        int16_t intercepting_ships[MAX_SHIPS];
         int8_t star_valid_target[72];
         int local_1670;
 
@@ -1503,13 +1503,13 @@ namespace AIMOVE {
 
             RUSS::Mox_Update_();
 
-            int8_t ship_target_star[500];
-            for (int i = 0; i < 500; ++i) {
+            int8_t ship_target_star[MAX_SHIPS];
+            for (int i = 0; i < MAX_SHIPS; ++i) {
                 ship_target_star[i] = -1;
             }
 
-            int8_t ship_intermediate_star[500];
-            for (int i = 0; i < 500; ++i) {
+            int8_t ship_intermediate_star[MAX_SHIPS];
+            for (int i = 0; i < MAX_SHIPS; ++i) {
                 ship_intermediate_star[i] = -1;
             }
 
@@ -1522,7 +1522,7 @@ namespace AIMOVE {
             int8_t target_best_eta[72];
 
             if (num_intercepting_ships > 0) {
-                uint8_t ship_min_eta[500];
+                uint8_t ship_min_eta[MAX_SHIPS];
                 int16_t star_min_strength[72];
 
                 for (int ship_list_index = 0; ship_list_index < num_intercepting_ships; ++ship_list_index) {
@@ -2424,7 +2424,7 @@ namespace AIMOVE {
         if ((uint8_t)player_mask != 0) {
             for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
                 if ((player_mask >> i) & 1) {
-                    uint16_t(*strengths)[500][MAX_PLAYERS];
+                    uint16_t(*strengths)[MAX_SHIPS][MAX_PLAYERS];
                     if (in_nebula) {
                         strengths = AIDATA::_ship_strengths_in_nebula;
                     }

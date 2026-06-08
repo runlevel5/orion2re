@@ -1327,9 +1327,9 @@ namespace COMBAT {
 
         int16_t num_ships = 0;
         uint8_t colony_idx = result->colony_idx;
-        int16_t ships[500];
+        int16_t ships[MAX_SHIPS];
 
-        for (int16_t i = 0; i < 500; ++i) {
+        for (int16_t i = 0; i < MAX_SHIPS; ++i) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
             if (MOX::_planet[planet_idx].star_index == MOX::_ship[i].location &&

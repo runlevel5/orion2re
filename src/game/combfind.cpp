@@ -202,7 +202,7 @@ void __cdecl Process_Retreating_Ships_(void) {
 
     s_retreat_report report[MAX_PLAYERS][73];
     int8_t player_retreat_target[MAX_PLAYERS];
-    int16_t ship_indices[500];
+    int16_t ship_indices[MAX_SHIPS];
     s_ship_move_info move_info;
     
     memset(report, 0, sizeof(report));
@@ -1424,7 +1424,7 @@ void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
 void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count) {
     *plr1_offset = 0;
     *plr1_count = 0;
-    *plr2_offset = 500;
+    *plr2_offset = MAX_SHIPS;
     *plr2_count = 0;
 
     for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
@@ -1450,7 +1450,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
     int16_t plr1_ship_count;
     int16_t plr2_ship_count;
     char msg_buf[200];
-    int16_t ships[500];
+    int16_t ships[MAX_SHIPS];
     s_battle_results local_results;
 
     colony_idx = Target_Planet_To_Colony_(planet_idx);

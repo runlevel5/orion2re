@@ -360,7 +360,7 @@ namespace COLBLDG {
         int16_t planet_idx = MOX::_colony[colony_idx].planet;
         int16_t star_idx = (int16_t)MOX::_planet[planet_idx].star_index;
 
-        while (ship_idx < 500) {
+        while (ship_idx < MAX_SHIPS) {
             auto& ship = MOX::_ship[ship_idx];
             if (ship.owner == (int8_t)player_idx) {
                 if (ship.status == 5 || ship_idx >= (int16_t)MOX::_NUM_SHIPS) {
@@ -370,7 +370,7 @@ namespace COLBLDG {
             ship_idx++;
         }
 
-        if (ship_idx >= 500) {
+        if (ship_idx >= MAX_SHIPS) {
             return -1;
         }
 

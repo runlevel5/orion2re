@@ -43,7 +43,7 @@ namespace SHIPSTAK {
     }
 
     void __cdecl Find_Ship_Stacks_() {
-        uint8_t* ship_skip_flags = (uint8_t*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 500);
+        uint8_t* ship_skip_flags = (uint8_t*)allocate::Allocate_First_Block_(MOX::_global_data_seg, MAX_SHIPS);
 
         if (MOX::_NUM_SHIPS > 0) {
             memset(ship_skip_flags, 0, MOX::_NUM_SHIPS);
@@ -250,7 +250,7 @@ namespace SHIPSTAK {
 
     void __cdecl Sort_Ships_In_Stack_(int16_t start_node) {
         int16_t ship_count;
-        int16_t ship_entries[1000];
+        int16_t ship_entries[MAX_SHIPS * 2];
         int16_t current_node = start_node;
 
         Build_Ship_Type_Array_(start_node, ship_entries, &ship_count);
@@ -302,7 +302,7 @@ namespace SHIPSTAK {
             }
 
             current_node_idx = node.next_node;
-        } while (current_node_idx > 0 && current_node_idx < 500);
+        } while (current_node_idx > 0 && current_node_idx < MAX_SHIPS);
     }
 
     int __cdecl qsort_ships_by_type_(const void* left_entry, const void* right_entry) {

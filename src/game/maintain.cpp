@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace maintain {
-    int32_t (*_ship_worths)[500];
+    int32_t (*_ship_worths)[MAX_SHIPS];
     uint8_t _research_building_table[4] = {6, 30, 19, 35};
 
     /**
@@ -32,7 +32,7 @@ namespace maintain {
             return;
         }
 
-        int32_t worths[500];
+        int32_t worths[MAX_SHIPS];
         memset(worths, 0, sizeof(worths));
         _ship_worths = &worths;
 

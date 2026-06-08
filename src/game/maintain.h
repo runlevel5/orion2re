@@ -14,7 +14,7 @@ namespace maintain {
     /// @param player Player whose upkeep is being processed.
     void __cdecl Player_Maintenance_(s_player* player);
 
-    extern int32_t (*_ship_worths)[500];
+    extern int32_t (*_ship_worths)[MAX_SHIPS];
 
     /// Returns the BC refund for scrapping a ship at an owned colony.
     /// @param ship Ship being evaluated for scrapping.

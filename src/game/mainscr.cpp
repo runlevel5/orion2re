@@ -2729,8 +2729,8 @@ namespace MAINSCR {
                 font_colors.colors[7] = 22;
 
                 if (FLEETPOP::Some_Icon_Selected_()) {
-                    int16_t selected_ship_ids[500];
-                    HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, 500, 0xFF);
+                    int16_t selected_ship_ids[MAX_SHIPS];
+                    HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, MAX_SHIPS, 0xFF);
                     SHIPMOVE::Ships_Try_To_Move_To_(selected_ship_ids, star_idx, &MOX::_g_ship_move_info);
                     _moving_a_stack = 1;
                 }
@@ -3220,8 +3220,8 @@ namespace MAINSCR {
                         strcpy(local_4b0, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
                         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_4b0, 3);
                     } else {
-                        int16_t local_3e8[500];
-                        int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(local_3e8, 500, 255);
+                        int16_t local_3e8[MAX_SHIPS];
+                        int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(local_3e8, MAX_SHIPS, 255);
                         int16_t ship_id = HACCESS::Fleet_Movement_Ship_Id_(0);
                         
                         int16_t msg_idx = (count == 1) ? 0xE4 : 0xE5;

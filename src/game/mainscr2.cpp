@@ -639,7 +639,7 @@ namespace MAINSCR2 {
             int16_t colony_index = MOX::_planet[star_id].colony_index;
             if (colony_index >= 0) {
                 if (MOX::_colony[colony_index].owner == MOX::_PLAYER_NUM) {
-                    int16_t ship_ids[500];
+                    int16_t ship_ids[MAX_SHIPS];
                     int32_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(ship_ids, sizeof(ship_ids) / sizeof(ship_ids[0]), 2);
                     int16_t unloaded = invasion::Unload_Transports_(&MOX::_colony[colony_index], ship_ids, count);
 

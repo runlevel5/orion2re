@@ -297,7 +297,7 @@ void __cdecl Set_Fleet_Movement_Icon_Selections_(int16_t state, uint8_t auto_sel
 }
 
 bool __cdecl Some_Icon_Selected_() {
-    int16_t selected_ship_ids[500];
+    int16_t selected_ship_ids[MAX_SHIPS];
     const int16_t selected_ship_capacity =
         (int16_t)(sizeof(selected_ship_ids) / sizeof(selected_ship_ids[0]));
 
@@ -524,7 +524,7 @@ int16_t __cdecl N_Fleet_Icons_(int16_t node_idx) {
 }
 
 bool __cdecl At_Least_One_Ship_Of_Type_Selected_(int16_t ship_type) {
-    int16_t selected_ship_ids[500];
+    int16_t selected_ship_ids[MAX_SHIPS];
     const int16_t selected_ship_capacity =
         (int16_t)(sizeof(selected_ship_ids) / sizeof(selected_ship_ids[0]));
 

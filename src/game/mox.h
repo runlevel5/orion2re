@@ -619,11 +619,11 @@ namespace MOX {
     extern uint8_t _orbit_to_satellite_type[10][5];
 
     // Suggested name: MOX::_ship_node
-    extern s_ship_node _ship_node[500];
+    extern s_ship_node _ship_node[MAX_SHIPS];
 
     extern int16_t _ship_stack_count;
 
-    extern int16_t _ship_stack_start[500];
+    extern int16_t _ship_stack_start[MAX_SHIPS];
 
     extern uint8_t _fleet_box_ship_ids[63];
 
@@ -732,7 +732,7 @@ namespace MOX {
 
     extern int8_t _mouse_button_pressed;
 
-    extern s_fleet_movement_icon _fleet_movement_icon[500];
+    extern s_fleet_movement_icon _fleet_movement_icon[MAX_SHIPS];
 
     extern s_save_game_description _save_game_description[10];
 

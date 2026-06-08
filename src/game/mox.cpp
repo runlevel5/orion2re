@@ -748,11 +748,11 @@ namespace MOX {
         {3, 3, 3, 3, 3},
     };
 
-    s_ship_node _ship_node[500];
+    s_ship_node _ship_node[MAX_SHIPS];
 
     int16_t _ship_stack_count;
 
-    int16_t _ship_stack_start[500];
+    int16_t _ship_stack_start[MAX_SHIPS];
 
     uint8_t _fleet_box_ship_ids[63];
 
@@ -941,7 +941,7 @@ namespace MOX {
 
     s_ship_move_info _g_ship_move_info;
 
-    s_fleet_movement_icon _fleet_movement_icon[500];
+    s_fleet_movement_icon _fleet_movement_icon[MAX_SHIPS];
 
     void __cdecl Apply_Save_Settings(s_settings* settings) {
         MOX::_settings.xenons_exist = settings->xenons_exist;

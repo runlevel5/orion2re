@@ -2434,7 +2434,7 @@ namespace OFFICER {
                         loc = MOX::_ship[loc].location;
 
                         // Resolve ship location to an absolute map index
-                        if (loc < 500 || loc >= 1000) {
+                        if (loc < MAX_SHIPS || loc >= 1000) {
                             loc = HAROLD::Absolute_Location_(loc);
                         } else {
                             // Location is in-transit or invalid for report

@@ -23,7 +23,7 @@ namespace HACCESS {
 
         if (ship_idx < 0) {
             error_code = 1;
-        } else if (ship_idx >= 500) {
+        } else if (ship_idx >= MAX_SHIPS) {
             error_code = 2;
         } else {
             int8_t owner = MOX::_ship[ship_idx].owner;
@@ -40,7 +40,7 @@ namespace HACCESS {
 
         char message[200];
         int32_t current_owner = -1;
-        if (ship_idx >= 0 && ship_idx < 500) {
+        if (ship_idx >= 0 && ship_idx < MAX_SHIPS) {
             current_owner = (int32_t)MOX::_ship[ship_idx].owner;
         }
 
@@ -60,7 +60,7 @@ namespace HACCESS {
             return -1;
         }
 
-        for (int16_t i = 0; i < 500; ++i) {
+        for (int16_t i = 0; i < MAX_SHIPS; ++i) {
             // Status >= 3 typically indicates the ship is inactive/destroyed
             if (MOX::_ship[i].status < 3 && struct_::Test_Bit_Field_(&MOX::_fleet_box_ship_ids, i)) {
                 int16_t target_owner = Ship_Owner_(i);
@@ -560,7 +560,7 @@ namespace HACCESS {
         int16_t selected_count = 0;
         bool stop_flag = false;
 
-        for (int16_t i = 0; i < 500; ++i) {
+        for (int16_t i = 0; i < MAX_SHIPS; ++i) {
             // Check stop flag at the top of the loop as per assembly
             if (stop_flag) {
                 break;
@@ -582,7 +582,7 @@ namespace HACCESS {
                 selected_ids_out[selected_count] = ship_idx;
                 selected_count++;
 
-                if (selected_count > 500) {
+                if (selected_count > MAX_SHIPS) {
                     stop_flag = true;
                 }
             }

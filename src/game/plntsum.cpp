@@ -740,8 +740,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         _screen = (s_plntsum_screen*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_screen));
         memset(_screen, 0, sizeof(*_screen));
 
-        _ship_summary = (s_plntsum_ship*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_summary) * 500);
-        memset(_ship_summary, 0xFF, sizeof(*_ship_summary) * 500);
+        _ship_summary = (s_plntsum_ship*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_summary) * MAX_SHIPS);
+        memset(_ship_summary, 0xFF, sizeof(*_ship_summary) * MAX_SHIPS);
 
         MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*MOX::_scroll_bar));
         memset(MOX::_scroll_bar, 0, sizeof(*MOX::_scroll_bar));
@@ -891,7 +891,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
     void Build_Ship_Summary_() {
         _n_ships_in_summary = 0;
-        memset(_ship_summary, 0xFF, sizeof(*_ship_summary) * 500);
+        memset(_ship_summary, 0xFF, sizeof(*_ship_summary) * MAX_SHIPS);
         memset(_can_reach_star, 0, sizeof(_can_reach_star));
 
         _found_colony_ship = 0;

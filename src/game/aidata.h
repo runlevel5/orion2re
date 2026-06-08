@@ -16,16 +16,16 @@ namespace AIDATA {
     static_assert(sizeof(s_ship_n_turns_to_intermediate_cache_entry) == 2);
 
     extern uint16_t _g_base_planet_values[MAX_PLAYERS][360];
-    extern uint16_t (*_ship_strengths)[500][MAX_PLAYERS];
-    extern uint16_t (*_ship_strengths_in_nebula)[500][MAX_PLAYERS];
-    extern uint16_t (*_ship_bomb_strengths)[500][4];
+    extern uint16_t (*_ship_strengths)[MAX_SHIPS][MAX_PLAYERS];
+    extern uint16_t (*_ship_strengths_in_nebula)[MAX_SHIPS][MAX_PLAYERS];
+    extern uint16_t (*_ship_bomb_strengths)[MAX_SHIPS][4];
     extern int16_t (*_planet_stage_weights)[360][MAX_PLAYERS];
     extern uint32_t (*_base_star_stage_weights)[72][MAX_PLAYERS];
     extern uint32_t (*_star_stage_weights)[72][MAX_PLAYERS];
     extern uint8_t (*_n_turns_from_to)[72][72][MAX_PLAYERS];
     extern s_turns_from_to_intermediate_cache_entry (*_n_turns_from_to_intermediate)[72][72][MAX_PLAYERS];
-    extern int8_t (*_ship_n_turns_to)[500][72];
-    extern s_ship_n_turns_to_intermediate_cache_entry (*_ship_n_turns_to_intermediate)[500][72];
+    extern int8_t (*_ship_n_turns_to)[MAX_SHIPS][72];
+    extern s_ship_n_turns_to_intermediate_cache_entry (*_ship_n_turns_to_intermediate)[MAX_SHIPS][72];
     extern int32_t (*_possible_ship_strengths)[72][MAX_PLAYERS][MAX_PLAYERS][10];
     extern s_ai_colony_info (*_ai_colony_info)[250];
     extern s_ai_player_info (*_ai_player_info)[MAX_PLAYERS];
@@ -36,11 +36,11 @@ namespace AIDATA {
     extern int8_t (*_enroute_ships)[72][MAX_PLAYERS][10];
     extern int8_t (*_enroute_human_ships)[72][10];
     extern int8_t (*_enroute_nonstealthy_ships)[72][MAX_PLAYERS];
-    extern int16_t (*_all_ships)[500];
+    extern int16_t (*_all_ships)[MAX_SHIPS];
     extern int16_t (*_i_all_combat_ships)[MAX_PLAYERS][73];
     extern s_ai_tech_info* _aitech;
     extern s_ai_refit_player (*_airefit)[MAX_PLAYERS];
-    extern int32_t (*_ship_refit_desirabilities)[500];
+    extern int32_t (*_ship_refit_desirabilities)[MAX_SHIPS];
     extern uint16_t (*_base_planet_values)[MAX_PLAYERS][360];
     extern uint16_t _g_contextual_planet_values[2880];
     extern uint16_t (*_contextual_planet_values)[2880];

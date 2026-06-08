@@ -501,7 +501,7 @@ namespace FLT1 {
         int16_t clicked_icon_idx;
         int16_t scanned_star_id;
         int16_t clicked_star_id;
-        int16_t scrap_list[500];
+        int16_t scrap_list[MAX_SHIPS];
         int16_t scrap_count;
 
         SYS::Clear_System_Display_Loaded_Flag_();
@@ -940,7 +940,7 @@ namespace FLT1 {
             for (int16_t i = 0; i < (int16_t)MOX::_n_fltscrn_big_icons; ++i) {
                 s_big_icon& icon = MOX::_fltscrn_big_icon[i];
 
-                if (icon.ship_idx > -1 && icon.ship_idx < 500 && icon.selected != 0) {
+                if (icon.ship_idx > -1 && icon.ship_idx < MAX_SHIPS && icon.selected != 0) {
                     scrap_list[*list_count] = icon.ship_idx;
                     *list_count += 1;
                 }

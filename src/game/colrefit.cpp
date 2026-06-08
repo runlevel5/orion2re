@@ -38,12 +38,12 @@ namespace COLREFIT {
     void __cdecl Build_Ship_List_() {
         int16_t n_ships = 0;
 
-        for (int16_t ship_idx = 0; ship_idx < 500; ++ship_idx) {
+        for (int16_t ship_idx = 0; ship_idx < MAX_SHIPS; ++ship_idx) {
             if (MOX::_ship[ship_idx].owner == MOX::_PLAYER_NUM &&
                 MOX::_ship[ship_idx].status < 3 &&
                 MOX::_ship[ship_idx].location == MOX::_screen_data &&
                 MOX::_ship[ship_idx].d.ship_type == 0 &&
-                n_ships < 500) {
+                n_ships < MAX_SHIPS) {
 
                 _g_ship_list_ptr[n_ships] = ship_idx;
                 n_ships++;
@@ -52,7 +52,7 @@ namespace COLREFIT {
 
         _n_ships_in_list = n_ships;
 
-        while (n_ships < 500) {
+        while (n_ships < MAX_SHIPS) {
             _g_ship_list_ptr[n_ships] = -1;
             n_ships++;
         }
@@ -62,8 +62,8 @@ namespace COLREFIT {
         int16_t hovered_field_id;
         int16_t selected_field_id;
         s_scroll_state scroll_data = {0};
-        int16_t ship_field_list[500];
-        int16_t ship_list[500];
+        int16_t ship_field_list[MAX_SHIPS];
+        int16_t ship_list[MAX_SHIPS];
         int16_t popup_result = 0;
 
         selected_field_id = 0;
@@ -128,8 +128,8 @@ namespace COLREFIT {
         int16_t selected_field_id = 0;
         int16_t hovered_field_id;
         s_scroll_state scroll_data = {0};
-        int16_t ship_field_list[500];
-        int16_t ship_list[500];
+        int16_t ship_field_list[MAX_SHIPS];
+        int16_t ship_list[MAX_SHIPS];
 
         _g_ship_n = ship_idx;
         _g_scroll_ptr = &scroll_data;
@@ -239,10 +239,10 @@ namespace COLREFIT {
         }
 
         int32_t next_page_ship_index = COLREFIT::_first_ship + 15;
-        if (*selected_field_id == _fields[1] && next_page_ship_index < 500 && COLREFIT::_g_ship_list_ptr[next_page_ship_index] != -1) {
+        if (*selected_field_id == _fields[1] && next_page_ship_index < MAX_SHIPS && COLREFIT::_g_ship_list_ptr[next_page_ship_index] != -1) {
             int32_t next_first = COLREFIT::_first_ship + 5;
-            if (next_first > 499) {
-                next_first = 500;
+            if (next_first >= MAX_SHIPS) {
+                next_first = MAX_SHIPS;
             }
             COLREFIT::_first_ship = (int16_t)next_first;
             COLONY::_full_draw = 1;

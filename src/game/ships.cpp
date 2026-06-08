@@ -762,7 +762,7 @@ namespace SHIPS {
     }
 
     int16_t __cdecl Deploy_Ships_To_Attack_Antares_(void) {
-        int16_t selected_ship_indices[500];
+        int16_t selected_ship_indices[MAX_SHIPS];
         s_ship_move_info move_info;
         int16_t selected_ship_count = 0;
 

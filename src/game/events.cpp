@@ -1633,7 +1633,7 @@ namespace EVENTS {
     int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx) {
         int16_t total_size_points = 0;
 
-        for (int16_t i = 0; i < 500; ++i) {
+        for (int16_t i = 0; i < MAX_SHIPS; ++i) {
             if (MOX::_ship[i].location == star_idx && MOX::_ship[i].status == 0) {
                 total_size_points += (int16_t)MOX::_ship[i].d.size + 1;
             }

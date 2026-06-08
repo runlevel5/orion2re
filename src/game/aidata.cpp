@@ -3,16 +3,16 @@
 namespace AIDATA {
 
     uint16_t _g_base_planet_values[MAX_PLAYERS][360];
-    uint16_t (*_ship_strengths)[500][MAX_PLAYERS];
-    uint16_t (*_ship_strengths_in_nebula)[500][MAX_PLAYERS];
-    uint16_t (*_ship_bomb_strengths)[500][4];
+    uint16_t (*_ship_strengths)[MAX_SHIPS][MAX_PLAYERS];
+    uint16_t (*_ship_strengths_in_nebula)[MAX_SHIPS][MAX_PLAYERS];
+    uint16_t (*_ship_bomb_strengths)[MAX_SHIPS][4];
     int16_t (*_planet_stage_weights)[360][MAX_PLAYERS];
     uint32_t (*_base_star_stage_weights)[72][MAX_PLAYERS];
     uint32_t (*_star_stage_weights)[72][MAX_PLAYERS];
     uint8_t (*_n_turns_from_to)[72][72][MAX_PLAYERS];
     s_turns_from_to_intermediate_cache_entry (*_n_turns_from_to_intermediate)[72][72][MAX_PLAYERS];
-    int8_t (*_ship_n_turns_to)[500][72];
-    s_ship_n_turns_to_intermediate_cache_entry (*_ship_n_turns_to_intermediate)[500][72];
+    int8_t (*_ship_n_turns_to)[MAX_SHIPS][72];
+    s_ship_n_turns_to_intermediate_cache_entry (*_ship_n_turns_to_intermediate)[MAX_SHIPS][72];
     int32_t (*_possible_ship_strengths)[72][MAX_PLAYERS][MAX_PLAYERS][10];
     s_ai_colony_info (*_ai_colony_info)[250];
     s_ai_player_info (*_ai_player_info)[MAX_PLAYERS];
@@ -23,11 +23,11 @@ namespace AIDATA {
     int8_t (*_enroute_ships)[72][MAX_PLAYERS][10];
     int8_t (*_enroute_human_ships)[72][10];
     int8_t (*_enroute_nonstealthy_ships)[72][MAX_PLAYERS];
-    int16_t (*_all_ships)[500];
+    int16_t (*_all_ships)[MAX_SHIPS];
     int16_t (*_i_all_combat_ships)[MAX_PLAYERS][73];
     s_ai_tech_info* _aitech;
     s_ai_refit_player (*_airefit)[MAX_PLAYERS];
-    int32_t (*_ship_refit_desirabilities)[500];
+    int32_t (*_ship_refit_desirabilities)[MAX_SHIPS];
     uint16_t (*_base_planet_values)[MAX_PLAYERS][360] = &_g_base_planet_values;
     uint16_t _g_contextual_planet_values[MAX_PLAYERS * 360];
     uint16_t (*_contextual_planet_values)[MAX_PLAYERS * 360] = &_g_contextual_planet_values;
@@ -161,16 +161,16 @@ namespace AIDATA {
     void Compute_AI_Data_() {
         RUSS::Assert_Settings_();
         allocate::Push_Block_(MOX::_screen_seg);
-        _ship_strengths = (uint16_t(*)[500][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_strengths));
-        _ship_strengths_in_nebula = (uint16_t(*)[500][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_strengths_in_nebula));
-        _ship_bomb_strengths = (uint16_t(*)[500][4])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_bomb_strengths));
+        _ship_strengths = (uint16_t(*)[MAX_SHIPS][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_strengths));
+        _ship_strengths_in_nebula = (uint16_t(*)[MAX_SHIPS][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_strengths_in_nebula));
+        _ship_bomb_strengths = (uint16_t(*)[MAX_SHIPS][4])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_bomb_strengths));
         _planet_stage_weights = (int16_t(*)[360][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_planet_stage_weights));
         _base_star_stage_weights = (uint32_t(*)[72][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_base_star_stage_weights));
         _star_stage_weights = (uint32_t(*)[72][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_star_stage_weights));
         _n_turns_from_to = (uint8_t(*)[72][72][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_n_turns_from_to));
         _n_turns_from_to_intermediate = (s_turns_from_to_intermediate_cache_entry(*)[72][72][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_n_turns_from_to_intermediate));
-        _ship_n_turns_to = (int8_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_n_turns_to));
-        _ship_n_turns_to_intermediate = (s_ship_n_turns_to_intermediate_cache_entry(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_n_turns_to_intermediate));
+        _ship_n_turns_to = (int8_t(*)[MAX_SHIPS][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_n_turns_to));
+        _ship_n_turns_to_intermediate = (s_ship_n_turns_to_intermediate_cache_entry(*)[MAX_SHIPS][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_n_turns_to_intermediate));
         _possible_ship_strengths = (int32_t(*)[72][MAX_PLAYERS][MAX_PLAYERS][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_possible_ship_strengths));
         _ai_colony_info = (s_ai_colony_info(*)[250])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ai_colony_info));
         _ai_player_info = (s_ai_player_info(*)[MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ai_player_info));
@@ -181,12 +181,12 @@ namespace AIDATA {
         _enroute_ships = (int8_t(*)[72][MAX_PLAYERS][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_ships));
         _enroute_human_ships = (int8_t(*)[72][10])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_human_ships));
         _enroute_nonstealthy_ships = (int8_t(*)[72][MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_enroute_nonstealthy_ships));
-        _all_ships = (int16_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_all_ships));
+        _all_ships = (int16_t(*)[MAX_SHIPS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_all_ships));
         _base_planet_values = &_g_base_planet_values;
         _i_all_combat_ships = (int16_t(*)[MAX_PLAYERS][73])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_i_all_combat_ships));
         _aitech = (s_ai_tech_info*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_aitech));
         _airefit = (s_ai_refit_player(*)[MAX_PLAYERS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_airefit));
-        _ship_refit_desirabilities = (int32_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_refit_desirabilities));
+        _ship_refit_desirabilities = (int32_t(*)[MAX_SHIPS])allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(*_ship_refit_desirabilities));
 
         memset(_ai_player_info, 0, sizeof(*_ai_player_info));
         RUSS::Mox_Update_();

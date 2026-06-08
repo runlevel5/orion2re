@@ -487,7 +487,7 @@ namespace NETMOX {
         * (int16_t*)ptr = MOX::_NUM_SHIPS;
         ptr += sizeof(uint16_t);
 
-        size = 500 * sizeof(s_ship_data);
+        size = MAX_SHIPS * sizeof(s_ship_data);
         memcpy(ptr, MOX::_ship, size);
         ptr += size;
 
@@ -700,8 +700,8 @@ namespace NETMOX {
         MOX::_NUM_SHIPS = *(int16_t*)ptr;
         ptr += sizeof(int16_t);
 
-        memcpy(MOX::_ship, ptr, 500 * sizeof(s_ship_data));
-        ptr += 500 * sizeof(s_ship_data);
+        memcpy(MOX::_ship, ptr, MAX_SHIPS * sizeof(s_ship_data));
+        ptr += MAX_SHIPS * sizeof(s_ship_data);
 
         memcpy(MOX::_leaders, ptr, 71 * sizeof(s_leader_data));
         ptr += 71 * sizeof(s_leader_data);

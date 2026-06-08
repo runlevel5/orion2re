@@ -167,7 +167,7 @@ namespace ERICNET {
 
         Best_Instructor_Bonus_(instructor_bonuses);
 
-        for (int16_t ship_idx = 0; ship_idx < 500; ++ship_idx) {
+        for (int16_t ship_idx = 0; ship_idx < MAX_SHIPS; ++ship_idx) {
             s_ship_data& ship = MOX::_ship[ship_idx];
 
             if (ship.status < 5 && (uint8_t)ship.owner < MAX_PLAYERS) {

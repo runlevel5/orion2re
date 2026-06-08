@@ -2415,7 +2415,7 @@ void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
 }
 
 void __cdecl Update_Ship_Names_To_New_Language_(void) {
-    for (int32_t ship_index = 0; ship_index < 500; ++ship_index) {
+    for (int32_t ship_index = 0; ship_index < MAX_SHIPS; ++ship_index) {
         s_ship_data* ship = &MOX::_ship[ship_index];
         const int32_t ship_type = (int32_t)ship->d.ship_type;
 

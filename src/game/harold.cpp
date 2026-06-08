@@ -1207,7 +1207,7 @@ namespace HAROLD {
                 ship_count = ship_count + 1;
             }
             ship_idx = ship_idx + 1;
-        } while (ship_idx < 500);
+        } while (ship_idx < MAX_SHIPS);
 
         return ship_count;
     }

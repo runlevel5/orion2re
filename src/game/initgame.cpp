@@ -8,9 +8,9 @@ namespace INITGAME {
      * location, and officer values for each.
      */
     void Init_Ships_Array_() {
-        memset(MOX::_ship, 0, 500 * sizeof(s_ship_data));
+        memset(MOX::_ship, 0, MAX_SHIPS * sizeof(s_ship_data));
 
-        for (MOX::_NUM_SHIPS = 0; MOX::_NUM_SHIPS < 500; ++MOX::_NUM_SHIPS) {
+        for (MOX::_NUM_SHIPS = 0; MOX::_NUM_SHIPS < MAX_SHIPS; ++MOX::_NUM_SHIPS) {
             s_ship_data& ship = MOX::_ship[MOX::_NUM_SHIPS];
             ship.status = 5;
             ship.location = -1;

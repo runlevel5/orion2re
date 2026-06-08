@@ -160,7 +160,7 @@ typedef struct s_ai_refit_player s_ai_refit_player, *Ps_ai_refit_player;
 
 struct s_ai_refit_player {
     int16_t n_entries;
-    struct s_ai_refit_entry entry[500];
+    struct s_ai_refit_entry entry[MAX_SHIPS];
 };
 
 static_assert(sizeof(s_ai_refit_player) == 3002, "s_ai_refit_player size mismatch");
