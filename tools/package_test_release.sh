@@ -48,7 +48,8 @@ stamp=$(date +%Y%m%d_%H%M%S)
 rand_id=$(printf '%06x' "$((RANDOM << 16 | RANDOM))")
 release_dir="$RELEASES_DIR/${stamp}_${rand_id}"
 tester_dir="$release_dir/tester-package"
-zip_path="$release_dir/tester-package.zip"
+release_name=$(basename "$release_dir")
+zip_path="$release_dir/${release_name}.zip"
 
 mkdir -p "$release_dir" "$tester_dir"
 
@@ -90,4 +91,4 @@ echo "  tester-package/$(basename "$asan_dll_path")"
 echo "  tester-package/$(basename "$LAUNCHER_PATH")"
 echo "  tester-package/README.txt"
 echo "Zip archive:"
-echo "  tester-package.zip"
+echo "  ${release_name}.zip"
