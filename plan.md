@@ -357,6 +357,7 @@ These should not be copied as-is:
 - First audit which parts are still real refresh bookkeeping helpers and which parts only exist to serve old VESA or DirectDraw presentation assumptions.
 - Functions that only add dirty rectangles or scan-list coverage may still be useful.
 - Functions that only exist for hardware mode switches, vertical blank, or page-flip timing are likely removable in the SDL path.
+- Current finding: the active `setvesa` usage is refresh scan-list bookkeeping only. It should be retained until a later cleanup folds that bookkeeping into a better-named helper.
 
 ### 2. `Flip_Surface()` and vertical blank waits
 
@@ -563,6 +564,7 @@ Status: `in_progress`
 - Identify which helpers are still required for refresh bookkeeping.
 - Remove or stub out hardware-flip and vertical-blank specific behavior that no longer applies.
 - Keep behavior only where the game logic truly depends on it.
+- Remove dead synchronization leftovers from the active path once publication no longer borrows live `Off`.
 
 Acceptance criteria:
 

@@ -94,7 +94,6 @@ namespace video {
 	uint8_t* __cdecl Get_Selected_Page_Pixels_();
 	void __cdecl Init_Off_Page_Ownership_();
 	void __cdecl Shutdown_Off_Page_Ownership_();
-	void __cdecl Wait_For_Off_Page_Writable_();
 	void __cdecl Publish_Off_Page_();
 	bool __cdecl Try_Begin_Off_Page_Present_();
 	void __cdecl End_Off_Page_Present_();

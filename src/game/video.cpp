@@ -137,11 +137,6 @@ namespace video {
 		g_last_presented_generation = 0;
 	}
 
-	void __cdecl Wait_For_Off_Page_Writable_() {
-		// Off is now always game-thread-owned. Publication snapshots Off into a
-		// separate buffer, so render writes no longer need to wait for the presenter.
-	}
-
 	void __cdecl Publish_Off_Page_() {
 		if (g_off_page_mutex == nullptr || g_off_page_condition == nullptr) {
 			return;

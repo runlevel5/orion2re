@@ -31,6 +31,36 @@ namespace platform {
 			return (int16_t)rounded_value;
 		}
 
+		int16_t Map_Window_Coord_To_Game_Coord_(float coord, int32_t window_extent, int32_t game_extent) {
+			if (window_extent <= 1 || game_extent <= 1) {
+				return 0;
+			}
+
+			float scaled = (coord * (float)(game_extent - 1)) / (float)(window_extent - 1);
+			long rounded_value = lroundf(scaled);
+			if (rounded_value < 0) {
+				return 0;
+			}
+			if (rounded_value > game_extent - 1) {
+				return (int16_t)(game_extent - 1);
+			}
+
+			return (int16_t)rounded_value;
+		}
+
+		float Map_Game_Coord_To_Window_Coord_(int16_t coord, int32_t game_extent, int32_t window_extent) {
+			if (window_extent <= 1 || game_extent <= 1) {
+				return 0.0f;
+			}
+
+			return ((float)coord * (float)(window_extent - 1)) / (float)(game_extent - 1);
+		}
+
+		[[noreturn]] void Force_Immediate_Process_Exit_() {
+			ExitProcess(0);
+			abort();
+		}
+
 		void Fill_Rect_32_(int32_t x, int32_t y, int32_t width, int32_t height, uint32_t color) {
 			if (g_sdl_present_pixels == nullptr) {
 				return;
@@ -636,8 +666,7 @@ namespace platform {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT ||
                 event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
-                Prepare_Exit_();
-                continue;
+                Force_Immediate_Process_Exit_();
             }
 
             if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
@@ -657,15 +686,21 @@ namespace platform {
             }
 
             if (event.type == SDL_EVENT_MOUSE_MOTION) {
+                int32_t window_width = 0;
+                int32_t window_height = 0;
+                SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
                 mouse::User_Mouse_Handler_(
-                    Round_Float_To_Int16_(event.motion.x),
-                    Round_Float_To_Int16_(event.motion.y),
+                    Map_Window_Coord_To_Game_Coord_(event.motion.x, window_width, video::g_screen_res_x),
+                    Map_Window_Coord_To_Game_Coord_(event.motion.y, window_height, video::g_screen_res_y),
                     (uint16_t)mouse::_mouse_buttons);
                 continue;
             }
 
             if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
                 uint16_t mouse_buttons = 0;
+                int32_t window_width = 0;
+                int32_t window_height = 0;
+                SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
 
                 if ((event.button.button == SDL_BUTTON_LEFT && event.button.down) ||
                     (event.button.button != SDL_BUTTON_LEFT && (mouse::_mouse_buttons & 1) != 0)) {
@@ -678,8 +713,8 @@ namespace platform {
                 }
 
                 mouse::User_Mouse_Handler_(
-                    Round_Float_To_Int16_(event.button.x),
-                    Round_Float_To_Int16_(event.button.y),
+                    Map_Window_Coord_To_Game_Coord_(event.button.x, window_width, video::g_screen_res_x),
+                    Map_Window_Coord_To_Game_Coord_(event.button.y, window_height, video::g_screen_res_y),
                     mouse_buttons);
                 continue;
             }
@@ -938,7 +973,13 @@ namespace platform {
         g_mouse_y = y;
 
         if (g_sdl_window != nullptr) {
-            SDL_WarpMouseInWindow(g_sdl_window, (float)x, (float)y);
+            int32_t window_width = 0;
+            int32_t window_height = 0;
+            SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
+            SDL_WarpMouseInWindow(
+                g_sdl_window,
+                Map_Game_Coord_To_Window_Coord_(x, video::g_screen_res_x, window_width),
+                Map_Game_Coord_To_Window_Coord_(y, video::g_screen_res_y, window_height));
             return;
         }
 
@@ -1106,8 +1147,6 @@ namespace platform {
                 memcpy(&platform::_cursor_surface[row * 0x18], &src[row * 0x18], 0x18);
             }
         }
-
-        platform::Force_Cursor_Pos(platform::g_mouse_x, platform::g_mouse_y);
     }
 
     void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count) {
