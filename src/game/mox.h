@@ -465,7 +465,7 @@ namespace MOX {
 
     // Suggested name: MOX::_star_seg
     extern s_animation_header* _star_seg[40];
-    extern s_animation_header* _sun_seg[6];
+    extern s_animation_header* _sun_seg[7];
 
     extern uint16_t _n_stats_to_generate;
 

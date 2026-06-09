@@ -526,7 +526,7 @@ namespace MOX {
     s_animation_header* _far_star_seg;
     uint8_t _fleet_icon_selection_status[64];
     s_animation_header* _star_seg[40];
-    s_animation_header* _sun_seg[6];
+    s_animation_header* _sun_seg[7];
     uint16_t _n_stats_to_generate;
     uint32_t _global_cache_size;
     uint32_t _cmd_line_seed;
