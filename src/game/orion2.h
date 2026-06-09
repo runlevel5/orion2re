@@ -1550,25 +1550,19 @@ struct s_field_multi_button {
     undefined field1_0x1;
     int16_t field2_0x2;
     struct s_colors *highlight_color;
-    int16_t field4_0x8;
-    undefined field5_0xa;
-    undefined field6_0xb;
+    const char *help;
     int16_t button_value;
     undefined field8_0xe;
     undefined field9_0xf;
     int16_t *selection;
     int16_t draw_style;
-    undefined field12_0x16;
-    undefined field13_0x17;
-    int16_t field14_0x18;
-    undefined field15_0x1a;
-    undefined field16_0x1b;
-    int16_t field17_0x1c;
-    undefined field18_0x1e;
-    undefined field19_0x1f;
-    int16_t field20_0x20;
-    undefined field21_0x22;
-    undefined field22_0x23;
+    undefined field10_0x16;
+    undefined field11_0x17;
+    int32_t field12_0x18;
+    struct s_animation_header *pic;
+    int16_t field14_0x20;
+    undefined field15_0x22;
+    undefined field16_0x23;
 };
 
 struct s_field_button {

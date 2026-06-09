@@ -1716,6 +1716,7 @@ namespace fields {
                                 animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
                             } else {
                                 animate::Reset_Animation_Frame_(f->detail.radio.pic);
+                                animate::Draw_(f->x, f->y, f->detail.radio.pic);
                             }
                             animate::Draw_(f->x, f->y, f->detail.radio.pic);
                             if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
@@ -1732,30 +1733,31 @@ namespace fields {
                     case 3:
                         if (*f->detail.multibtn.selection == f->detail.multibtn.button_value) {
                             if (f->detail.multibtn.draw_style != 0) {
-                                animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
+                                animate::Set_Animation_Frame_(f->detail.multibtn.pic, 1);
                             } else {
-                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
+                                animate::Reset_Animation_Frame_(f->detail.multibtn.pic);
+                                animate::Draw_(f->x, f->y, f->detail.multibtn.pic);
                             }
-                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
-                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                            animate::Draw_(f->x, f->y, f->detail.multibtn.pic);
+                            if (f->detail.multibtn.help != nullptr && *f->detail.multibtn.help != '\0') {
                                 fonts::Set_Font_Style_(f->font_style, f->font_color);
                                 int16_t h = fonts::Get_Font_Height_() - 1;
                                 fonts::Print_Centered_(
                                     f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
                                     f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
-                                    f->detail.radio.help
+                                    f->detail.multibtn.help
                                 );
                             }
                         } else {
-                            animate::Reset_Animation_Frame_(f->detail.radio.pic);
-                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
-                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                            animate::Reset_Animation_Frame_(f->detail.multibtn.pic);
+                            animate::Draw_(f->x, f->y, f->detail.multibtn.pic);
+                            if (f->detail.multibtn.help != nullptr && *f->detail.multibtn.help != '\0') {
                                 fonts::Set_Font_Style_(f->font_style, f->font_color);
                                 int16_t h = fonts::Get_Font_Height_() - 1;
                                 fonts::Print_Centered_(
                                     f->x + (f->x_end - f->x) / 2,
                                     f->y + (f->y_end - f->y) / 2 - h / 2,
-                                    f->detail.radio.help
+                                    f->detail.multibtn.help
                                 );
                             }
                         }
@@ -2061,6 +2063,7 @@ namespace fields {
                                 animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
                             } else {
                                 animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
+                                animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
                             }
                             animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
                             if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
@@ -2076,27 +2079,28 @@ namespace fields {
                     case 3: {
                         if (*_fields[i].detail.multibtn.selection == _fields[i].detail.multibtn.button_value) {
                             if (_fields[i].detail.multibtn.draw_style != 0) {
-                                animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
+                                animate::Set_Animation_Frame_(_fields[i].detail.multibtn.pic, 1);
                             } else {
-                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
+                                animate::Reset_Animation_Frame_(_fields[i].detail.multibtn.pic);
+                                animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.multibtn.pic);
                             }
-                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
-                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.multibtn.pic);
+                            if (_fields[i].detail.multibtn.help != nullptr && _fields[i].detail.multibtn.help[0] != '\0') {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                                 int font_height = fonts::Get_Font_Height_();
                                 int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2 + _selected_button_text_x_offset;
                                 int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2) + _selected_button_text_y_offset;
-                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                                fonts::Print_Centered_(cx, cy, _fields[i].detail.multibtn.help);
                             }
                         } else {
-                            animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
-                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
-                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                            animate::Reset_Animation_Frame_(_fields[i].detail.multibtn.pic);
+                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.multibtn.pic);
+                            if (_fields[i].detail.multibtn.help != nullptr && _fields[i].detail.multibtn.help[0] != '\0') {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                                 int font_height = fonts::Get_Font_Height_();
                                 int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
                                 int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
-                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                                fonts::Print_Centered_(cx, cy, _fields[i].detail.multibtn.help);
                             }
                         }
                         break;
@@ -2502,62 +2506,62 @@ namespace fields {
             }
             case 1: {
                 if (action != 0 && *field->detail.radio.selection != 1) {
-                    if (field->detail.button.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.button.pic);
-                        animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    if (field->detail.radio.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.radio.pic);
+                        animate::Draw_(field->x, field->y, field->detail.radio.pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                        animate::Set_Animation_Frame_(field->detail.radio.pic, 1);
                     }
-                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.button.help
+                        field->detail.radio.help
                     );
                 } else {
-                    animate::Reset_Animation_Frame_(field->detail.button.pic);
-                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    animate::Reset_Animation_Frame_(field->detail.radio.pic);
+                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.button.help
+                        field->detail.radio.help
                     );
                 }
                 break;
             }
             case 2: {
                 if (*field->detail.radio.selection == 0 && action != 1) {
-                    animate::Reset_Animation_Frame_(field->detail.button.pic);
-                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    animate::Reset_Animation_Frame_(field->detail.radio.pic);
+                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.button.help
+                        field->detail.radio.help
                     );
                 } else {
-                    if (field->detail.button.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.button.pic);
-                        animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    if (field->detail.radio.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.radio.pic);
+                        animate::Draw_(field->x, field->y, field->detail.radio.pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                        animate::Set_Animation_Frame_(field->detail.radio.pic, 1);
                     }
-                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.button.help
+                        field->detail.radio.help
                     );
                 }
                 break;
@@ -2570,31 +2574,31 @@ namespace fields {
                 }
 
                 if (*field->detail.multibtn.selection != field->detail.multibtn.button_value) {
-                    animate::Reset_Animation_Frame_(field->detail.button.pic);
-                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    animate::Reset_Animation_Frame_(field->detail.multibtn.pic);
+                    animate::Draw_(field->x, field->y, field->detail.multibtn.pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.button.help
+                        field->detail.multibtn.help
                     );
                 } else {
-                    if (field->detail.button.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.button.pic);
-                        animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    if (field->detail.multibtn.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.multibtn.pic);
+                        animate::Draw_(field->x, field->y, field->detail.multibtn.pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                        animate::Set_Animation_Frame_(field->detail.multibtn.pic, 1);
                     }
-                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    animate::Draw_(field->x, field->y, field->detail.multibtn.pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.button.help
+                        field->detail.multibtn.help
                     );
                 }
                 break;
