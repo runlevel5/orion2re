@@ -70,7 +70,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
 
 target_compile_features(orion2re PRIVATE cxx_std_20)
 target_include_directories(orion2re PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_compile_definitions(orion2re PRIVATE _WINDOWS SDL_MAIN_HANDLED)
+target_compile_definitions(orion2re PRIVATE _WINDOWS)
 
 if(WIN32)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
@@ -156,7 +156,6 @@ if(MSVC)
             "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
             winmm
             dsound
-            ddraw
             SDL3::SDL3-static
         )
 

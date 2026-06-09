@@ -462,21 +462,15 @@ namespace platform {
 	volatile bool g_pending_toggle_pages;
 	int16_t g_video_mode;
 	uint32_t g_available_mem;
-	uint8_t* g_primary_surface;
 	uint8_t* g_present_surface;
 	uint8_t* g_cursor_surface_1;
 	uint8_t* _cursor_surface;
-	uint32_t DAT_00578e20;
 	uint32_t g_frame_count;
 	int8_t g_render_buffer;
 	uint8_t* _offscreen_surface;
 	int32_t DAT_578B3C;
 	int16_t g_mouse_x;
 	int16_t g_mouse_y;
-
-    // Scaled window
-    int32_t scaleX = 640;
-    int32_t scaleY = 480;
 
     constexpr int32_t k_windowed_logical_width = 640;
     constexpr int32_t k_windowed_logical_height = 480;
@@ -519,20 +513,19 @@ namespace platform {
         free(copy_buffer);
     }
 
-    HWND cleanup() {
+    bool cleanup() {
         Prepare_Exit_();
         Destroy_Main_Window_();
-        return nullptr;
+        return false;
     }
 
-    HWND __cdecl Create_Direct_Draw(int16_t video_mode) {
+    bool Create_Video_Buffers_(int16_t video_mode) {
         MEMORYSTATUS mem_status;
         mem_status.dwLength = sizeof(MEMORYSTATUS);
         GlobalMemoryStatus(&mem_status);
 
         g_video_mode = video_mode;
         g_available_mem = mem_status.dwAvailPhys;
-        DAT_00578e20 = (uint32_t)&video::_current_palette[0];
 
         switch (video_mode) {
         case 0:
@@ -548,8 +541,8 @@ namespace platform {
             video::g_screen_res_y = 480;
             break;
         case 5:
-            video::g_screen_res_x = scaleX;
-            video::g_screen_res_y = scaleY;
+            video::g_screen_res_x = k_windowed_logical_width;
+            video::g_screen_res_y = k_windowed_logical_height;
         default:
             break;
         }
@@ -559,13 +552,11 @@ namespace platform {
         video::Allocate_Page_Buffers_(video::g_screen_res_x, video::g_screen_res_y);
         video::Init_Off_Page_Ownership_();
 
-        g_primary_surface = (uint8_t*)malloc((size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y);
         g_present_surface = (uint8_t*)malloc((size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y);
-        if (g_primary_surface == nullptr || g_present_surface == nullptr) {
+        if (g_present_surface == nullptr) {
             return cleanup();
         }
 
-        memset(g_primary_surface, 0, (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y);
         memset(g_present_surface, 0, (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y);
 
         video::Set_Page_Off_();
@@ -576,18 +567,16 @@ namespace platform {
         video::Clear_Stencil_List_();
         video::screen_refresh_flag = 0;
         graphics::Reset_Window_();
-        return g_main_window;
+        return true;
     }
 
-    HRESULT	Restore_Surfaces()
+    void Restore_Surfaces()
     {
         g_frame_count = 0;
         if (video::screen_refresh_flag == 3)
         {
             video::Set_Refresh_Stencil_();
         }
-
-        return S_OK;
     }
 
     void __cdecl Prepare_Exit_() {
@@ -598,11 +587,6 @@ namespace platform {
 
     void Cleanup_Surfaces()
     {
-        if (g_primary_surface != nullptr) {
-            free(g_primary_surface);
-            g_primary_surface = nullptr;
-        }
-
         if (g_present_surface != nullptr) {
             free(g_present_surface);
             g_present_surface = nullptr;
@@ -622,12 +606,6 @@ namespace platform {
             Destroy_Present_Backend_();
             SDL_DestroyWindow(g_sdl_window);
             g_sdl_window = nullptr;
-            g_main_window = nullptr;
-            return;
-        }
-
-        if (g_main_window != nullptr) {
-            DestroyWindow(g_main_window);
             g_main_window = nullptr;
         }
     }
@@ -719,9 +697,9 @@ namespace platform {
         }
     }
 
-    LONG __cdecl Lock_Offscreen_Surface_() {
+    int32_t __cdecl Lock_Offscreen_Surface_() {
         platform::_offscreen_surface = video::g_page_back.pixels;
-        return (LONG)video::g_screen_res_x;
+        return video::g_screen_res_x;
     }
 
     void __cdecl Unlock_Offscreen_Surface_() {
@@ -729,36 +707,13 @@ namespace platform {
 
     uint32_t Lock_Appropriate_Render_Buffer()
     {
-        if (g_render_buffer == 0) {
-            video::_current_video_page = g_primary_surface;
-            return (uint32_t)video::g_screen_res_x;
-        }
-
         video::_current_video_page = video::Get_Selected_Page_Pixels_();
         return (uint32_t)video::g_screen_res_x;
     }
 
 
-    HRESULT __cdecl	Unlock_Appropriate_Render_Buffer()
+    void Unlock_Appropriate_Render_Buffer()
     {
-        if (g_render_buffer == 0)
-        {
-            Present_Primary_Buffer_();
-            return DD_OK;
-        }
-
-        return DD_OK;
-    }
-
-    int32_t Lock_Primary_Surface()
-    {
-        video::_video_memory = g_primary_surface;
-        return video::g_screen_res_x;
-    }
-
-    void Unlock_Primary_Surface()
-    {
-        Present_Primary_Buffer_();
     }
 
     void	Copy_Off_Page_To_Present_Surface_()
@@ -783,19 +738,7 @@ namespace platform {
                 g_sdl_window,
                 Map_Game_Coord_To_Window_Coord_(x, video::g_screen_res_x, window_width),
                 Map_Game_Coord_To_Window_Coord_(y, video::g_screen_res_y, window_height));
-            return;
         }
-
-#ifndef FULLSCREEN
-        // Offset the game-space position into window coordinates in windowed mode.
-        POINT p = { 0, 0 };
-        ClientToScreen(g_main_window, &p);
-
-        x += (int16_t)p.x;
-        y += (int16_t)p.y;
-#endif
-
-        SetCursorPos(x, y);
     }
 
     void __cdecl Create_Cursor_Surface() {
@@ -815,15 +758,8 @@ namespace platform {
         video::Toggle_Pages_();
     }
 
-    void __cdecl Present_Primary_Buffer_() {
-        Present_Indexed_Buffer_(g_primary_surface);
-    }
-
-    int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd) {
-        (void)hPrevInstance;
-        (void)nShowCmd;
-
-        Parse_Ten_Cmd_Parameter(lpCmdLine);
+    int Run_Main_Loop(const char* command_line) {
+        Parse_Ten_Cmd_Parameter(command_line);
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             return 0;
@@ -837,8 +773,8 @@ namespace platform {
 		g_fps_frame_count = 0;
 
 #ifdef FULLSCREEN
-        int nWidth = GetSystemMetrics(SM_CXSCREEN);
-        int nHeight = GetSystemMetrics(SM_CYSCREEN);
+        int nWidth = k_windowed_logical_width;
+        int nHeight = k_windowed_logical_height;
         SDL_WindowFlags window_flags = SDL_WINDOW_FULLSCREEN;
 #else
         int nWidth = k_windowed_logical_width;
@@ -857,17 +793,10 @@ namespace platform {
             window_props,
             SDL_PROP_WINDOW_WIN32_HWND_POINTER,
             nullptr);
-        if (g_main_window == nullptr) {
-            Destroy_Main_Window_();
-            SDL_Quit();
-            return 0;
-        }
 
         SDL_HideCursor();
 
-        Create_Direct_Draw(4);
-
-        if (g_main_window == nullptr) {
+        if (!Create_Video_Buffers_(4)) {
             Destroy_Main_Window_();
             SDL_Quit();
             return 0;

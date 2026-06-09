@@ -30,15 +30,11 @@ namespace platform {
 
 	extern uint32_t g_available_mem;
 
-	extern uint8_t* g_primary_surface;
-
 	extern uint8_t* g_present_surface;
 
 	extern uint8_t* g_cursor_surface_1;
 
 	extern uint8_t* _cursor_surface;
-
-	extern uint32_t DAT_00578e20;
 
 	extern uint32_t g_frame_count;
 
@@ -54,27 +50,24 @@ namespace platform {
 
 	// Functions
 	void Parse_Ten_Cmd_Parameter(const char* input_str);
-	HWND Create_Direct_Draw(int16_t video_mode);
+	bool Create_Video_Buffers_(int16_t video_mode);
 	void __cdecl Flip_Surface();
 	void __cdecl Service_Pending_Window_Events_();
 	bool __cdecl Update_Active_World_Frame_();
 	uint32_t Lock_Appropriate_Render_Buffer();
-	HRESULT	Unlock_Appropriate_Render_Buffer();
-	int32_t Lock_Primary_Surface();
-	void Unlock_Primary_Surface();
+	void Unlock_Appropriate_Render_Buffer();
 	void Copy_Off_Page_To_Present_Surface_();
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void __cdecl Create_Cursor_Surface();
-	HRESULT Restore_Surfaces();
+	void Restore_Surfaces();
 
-	LONG __cdecl Lock_Offscreen_Surface_();
+	int32_t __cdecl Lock_Offscreen_Surface_();
 	void __cdecl Unlock_Offscreen_Surface_();
 	void Cleanup_Surfaces();
 	void Destroy_Main_Window_();
 	void __cdecl Prepare_Exit_();
 	void __cdecl Update_Cursor_Image_();
 	void __cdecl Toggle_Pages_Stub_();
-	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
+	int Run_Main_Loop(const char* command_line);
 	void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count);
-	void __cdecl Present_Primary_Buffer_();
 }

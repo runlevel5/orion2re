@@ -419,8 +419,7 @@ These should not be copied as-is:
 - The active software-render model should therefore be understood as:
   - two persistent gameplay pages: `Off` and `Back`
   - one separate main-thread/platform presentation target or upload path
-- Some primary-surface compatibility helpers still remain because legacy callers such as background-draw and partial-refresh code still use them.
-- Those helpers should now be treated as compatibility scaffolding, not as part of the main SDL world-present path.
+- The old direct-primary compatibility layer has now been removed from the active SDL migration path.
 
 ### 4. `_copy_to_on_page_flag` appears inactive in the current branch
 
@@ -583,9 +582,8 @@ Status: `in_progress`
 - Remove or stub out hardware-flip and vertical-blank specific behavior that no longer applies.
 - Keep behavior only where the game logic truly depends on it.
 - Remove dead synchronization leftovers from the active path once publication no longer borrows live `Off`.
-- Current finding: primary-surface compatibility functions and `_Partial_Screen_Dump()` are still referenced by legacy callers, so they cannot be removed yet without rewriting those call sites.
 - Update: the unreferenced `_Partial_Screen_Dump()` and alt-offscreen compatibility chain have now been removed.
-- Remaining primary-surface compatibility is limited to direct-primary callers that still use `Lock_Primary_Surface()` / `Present_Primary_Buffer_()` semantics.
+- Update: the remaining direct-primary compatibility layer has also been removed because it was no longer referenced by live callers.
 
 Acceptance criteria:
 
@@ -601,6 +599,10 @@ Status: `pending`
 - Minimize remaining fake-surface API surface area.
 - Keep compatibility wrappers only where they still reduce risk.
 - Revisit the temporary fast-exit-on-window-close behavior once the engine shutdown path is known not to hang.
+- Write-only compatibility state such as `DAT_00578e20` has been pruned where it no longer participates in live logic.
+- Fixed-size compatibility globals such as `scaleX` / `scaleY` have been collapsed into constants where they were no longer mutable in practice.
+- Active SDL cursor positioning and fullscreen sizing no longer rely on Win32 screen or cursor APIs.
+- Remaining Win32 usage in `platform.cpp` is now limited primarily to handle/signature compatibility, with the SDL video path no longer depending on Win32 destruction fallbacks.
 
 Acceptance criteria:
 
