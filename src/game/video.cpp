@@ -14,10 +14,8 @@ namespace video {
 	int16_t _current_mouse_list_ptr;
 	int16_t _current_mouse_shape;
 	uint8_t* _current_video_page;
-	uint32_t screen_dump_flag;
 	int32_t screen_refresh_flag;
 	int16_t _old_screen_dump_flag;
-	int16_t _old_screen_refresh_flag;
 	s_scan_list_entry* _refresh_scan_list;
 	s_scan_list_entry* _refresh_stencil_list;
 	uint8_t* _mouse_palette;
@@ -191,12 +189,10 @@ namespace video {
 
 	void Set_Refresh_Stencil_() {
 		screen_refresh_flag = 3;
-		screen_dump_flag = 0;
 	}
 
 	void Set_Refresh_Full_() {
 		screen_refresh_flag = 0;
-		screen_dump_flag = 0;
 	}
 
 	void Clip_Off_() {
@@ -213,7 +209,6 @@ namespace video {
 
 	void __cdecl Set_Refresh_Differential_() {
 		screen_refresh_flag = 2;
-		screen_dump_flag = 0;
 	}
 
 	int16_t __cdecl Get_Refresh_Mode_() {
@@ -345,14 +340,6 @@ namespace video {
         g_cached_mouse_y = platform::g_mouse_y;
 
         if (g_window_focus_state != 0) {
-            if (video::screen_refresh_flag == 3 || video::screen_refresh_flag == 2) {
-                video::screen_dump_flag = 2;
-            }
-
-            if (video::screen_refresh_flag == 1) {
-                video::screen_dump_flag = 1;
-            }
-
             palette::Refresh_Palette_();
             mouse::Enable_Mouse_();
 
@@ -376,8 +363,6 @@ namespace video {
         video::Set_Page_Off_();
         platform::g_pending_toggle_pages = false;
     }
-	void __cdecl _Masked_Screen_Dump() {
-	}
 
 	void __cdecl Clear_Stencil_List_() {
 		const uint32_t scanline_count = g_screen_res_y & 0x3FFFFFFFu;
@@ -397,17 +382,14 @@ namespace video {
 
 	void __cdecl Save_Refresh_() {
 		video::_old_screen_dump_flag = video::screen_refresh_flag;
-		video::_old_screen_refresh_flag = video::screen_dump_flag;
 	}
 
 	void __cdecl Restore_Refresh_() {
 		video::screen_refresh_flag = video::_old_screen_dump_flag;
-		video::screen_dump_flag = video::_old_screen_refresh_flag;
 	}
 
 	void __cdecl Set_Refresh_Differential_No_Full_() {
 		video::screen_refresh_flag = 2;
-		video::screen_dump_flag = 2;
 	}
 
     void __cdecl Clear_Display_And_Release_Palette_() {

@@ -1564,8 +1564,6 @@ namespace fields {
 
         snprintf(buffer, sizeof(buffer), "Avail Mem = %dk   Total Mem = %dk", (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
 
-        platform::_need_quit = 1;
-
         video::Clear_Display_And_Release_Palette_();
 
         ::MessageBoxA(platform::g_main_window, buffer, "Microprose", 0x10);

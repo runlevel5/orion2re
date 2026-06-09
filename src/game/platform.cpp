@@ -465,8 +465,6 @@ namespace platform {
 	uint8_t* g_primary_surface;
 	uint8_t* g_present_surface;
 	uint8_t* g_cursor_surface_1;
-	int32_t _offscreen_mouse_shape;
-	uint8_t* g_cursor_surface_2;
 	uint8_t* _cursor_surface;
 	uint32_t DAT_00578e20;
 	uint32_t g_frame_count;
@@ -476,8 +474,6 @@ namespace platform {
 	int16_t g_mouse_x;
 	int16_t g_mouse_y;
 	uint32_t* _alt_offscreen_surface;
-
-    uint8_t _need_quit;
 
     // Scaled window
     int32_t scaleX = 640;
@@ -573,7 +569,6 @@ namespace platform {
         memset(g_primary_surface, 0, (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y);
         memset(g_present_surface, 0, (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y);
 
-        _need_quit = 0;
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 639, 479, 0);
         video::Set_Page_Back_();
@@ -617,11 +612,6 @@ namespace platform {
         if (g_cursor_surface_1 != nullptr) {
             free(g_cursor_surface_1);
             g_cursor_surface_1 = nullptr;
-        }
-
-        if (g_cursor_surface_2 != nullptr) {
-            free(g_cursor_surface_2);
-            g_cursor_surface_2 = nullptr;
         }
 
         video::Free_Page_Buffers_();
@@ -781,192 +771,6 @@ namespace platform {
         }
     }
 
-    void	Draw_Cursor_XY(int32_t x, int32_t y)
-    {
-        if (video::_current_mouse_shape > 0)
-        {
-            if ((int32_t)video::_current_mouse_shape != DAT_578B3C)
-            {
-                Update_Cursor_Image_();
-                DAT_578B3C = (int32_t)video::_current_mouse_shape;
-            }
-
-            RECT rect;
-            rect.left = 0;
-            rect.top = 0;
-
-            if (x + 24 >= video::g_screen_res_x - 1)
-                rect.right = video::g_screen_res_x - x - 1;
-            else
-                rect.right = 24;
-
-            if (y + 24 >= video::g_screen_res_y - 1)
-                rect.bottom = video::g_screen_res_y - y - 1;
-            else
-                rect.bottom = 24;
-
-            DDCOLORKEY	key;
-            key.dwColorSpaceHighValue = 0;
-            key.dwColorSpaceLowValue = 0;
-
-            (void)key;
-
-            for (int32_t row = 0; row < rect.bottom; ++row) {
-                for (int32_t col = 0; col < rect.right; ++col) {
-                    const uint8_t pixel = platform::g_cursor_surface_1[row * 24 + col];
-                    if (pixel != 0) {
-                        video::_video_memory[(y + row) * video::g_screen_res_x + (x + col)] = pixel;
-                    }
-                }
-            }
-
-#ifndef FULLSCREEN
-            Present_Primary_Buffer_();
-#endif
-        }
-    }
-
-    void __cdecl Save_Mouse_(int16_t mouse_x, int16_t mouse_y) {
-        RECT save_rect;
-        const LONG max_x = video::g_screen_res_x - 1;
-        const LONG max_y = video::g_screen_res_y - 1;
-
-        save_rect.left = (LONG)mouse_x;
-        save_rect.top = (LONG)mouse_y;
-
-        save_rect.right = max_x;
-        if (save_rect.left + 0x18 < max_x) {
-            save_rect.right = save_rect.left + 0x18;
-        }
-
-        save_rect.bottom = max_y;
-        if (save_rect.top + 0x18 < max_y) {
-            save_rect.bottom = save_rect.top + 0x18;
-        }
-
-        const int32_t width = save_rect.right - save_rect.left;
-        const int32_t height = save_rect.bottom - save_rect.top;
-
-        for (int32_t y = 0; y < height; ++y) {
-            memcpy(
-                g_cursor_surface_2 + y * 24,
-                video::_video_memory + (save_rect.top + y) * video::g_screen_res_x + save_rect.left,
-                (size_t)width);
-        }
-
-        g_cached_mouse_x = mouse_x;
-        g_cached_mouse_y = mouse_y;
-    }
-
-    void __cdecl Save_Mouse_Offscreen_(int16_t mouse_x, int16_t mouse_y) {
-        RECT saved_rect;
-
-        saved_rect.left = (LONG)mouse_x;
-        saved_rect.top = (LONG)mouse_y;
-
-        saved_rect.right = video::g_screen_res_x - 1;
-        if (saved_rect.left + 0x18 < video::g_screen_res_x - 1) {
-            saved_rect.right = saved_rect.left + 0x18;
-        }
-
-        saved_rect.bottom = video::g_screen_res_y - 1;
-        if (saved_rect.top + 0x18 < video::g_screen_res_y - 1) {
-            saved_rect.bottom = saved_rect.top + 0x18;
-        }
-
-        uint8_t* dst = g_cursor_surface_2;
-        const uint8_t* src = video::g_page_off.pixels;
-        const int32_t width = saved_rect.right - saved_rect.left;
-        const int32_t height = saved_rect.bottom - saved_rect.top;
-
-        for (int32_t y = 0; y < height; ++y) {
-            memcpy(
-                dst + y * 24,
-                src + (saved_rect.top + y) * video::g_screen_res_x + saved_rect.left,
-                (size_t)width);
-        }
-
-        g_cached_mouse_x = mouse_x;
-        g_cached_mouse_y = mouse_y;
-    }
-
-    void __cdecl Draw_Cursor_XY_Offscreen_(int16_t mouse_x, int16_t mouse_y) {
-        RECT source_rect;
-        DDCOLORKEY color_key;
-        int32_t x;
-        int32_t y;
-
-        if (video::_current_mouse_shape <= 0) {
-            return;
-        }
-
-        if ((int32_t)video::_current_mouse_shape != platform::_offscreen_mouse_shape) {
-            platform::Update_Cursor_Image_();
-            platform::_offscreen_mouse_shape = (int32_t)video::_current_mouse_shape;
-        }
-
-        source_rect.left = 0;
-        source_rect.top = 0;
-
-        x = (int32_t)mouse_x;
-        if (x + 0x18 < video::g_screen_res_x - 1) {
-            source_rect.right = 0x18;
-        } else {
-            source_rect.right = video::g_screen_res_x - x - 1;
-        }
-
-        y = (int32_t)mouse_y;
-        if (y + 0x18 < video::g_screen_res_y - 1) {
-            source_rect.bottom = 0x18;
-        } else {
-            source_rect.bottom = video::g_screen_res_y - y - 1;
-        }
-
-        color_key.dwColorSpaceLowValue = 0;
-        color_key.dwColorSpaceHighValue = 0;
-
-        (void)color_key;
-
-        uint8_t* dst = video::g_page_off.pixels;
-        for (int32_t row = 0; row < source_rect.bottom; ++row) {
-            for (int32_t col = 0; col < source_rect.right; ++col) {
-                const uint8_t pixel = platform::g_cursor_surface_1[row * 24 + col];
-                if (pixel != 0) {
-                    dst[(y + row) * video::g_screen_res_x + (x + col)] = pixel;
-                }
-            }
-        }
-    }
-
-    void __cdecl Restore_Mouse_Off_Page_() {
-        RECT src_rect;
-        const int32_t mouse_x = (int32_t)g_cached_mouse_x;
-        const int32_t mouse_y = (int32_t)g_cached_mouse_y;
-
-        src_rect.left = 0;
-        src_rect.top = 0;
-
-        if (mouse_x + 0x18 < video::g_screen_res_x - 1) {
-            src_rect.right = 0x18;
-        } else {
-            src_rect.right = video::g_screen_res_x - mouse_x - 1;
-        }
-
-        if (mouse_y + 0x18 < video::g_screen_res_y - 1) {
-            src_rect.bottom = 0x18;
-        } else {
-            src_rect.bottom = video::g_screen_res_y - mouse_y - 1;
-        }
-
-        uint8_t* dst = video::g_page_off.pixels;
-        for (int32_t row = 0; row < src_rect.bottom; ++row) {
-            memcpy(
-                dst + (mouse_y + row) * video::g_screen_res_x + mouse_x,
-                platform::g_cursor_surface_2 + row * 24,
-                (size_t)src_rect.right);
-        }
-    }
-
     void Force_Cursor_Pos(int16_t x, int16_t y)
     {
         g_mouse_x = x;
@@ -1000,53 +804,12 @@ namespace platform {
             platform::g_cursor_surface_1 = (uint8_t*)malloc(24 * 24);
         }
 
-        if (platform::g_cursor_surface_2 == nullptr) {
-            platform::g_cursor_surface_2 = (uint8_t*)malloc(24 * 24);
-        }
-
-        if (platform::g_cursor_surface_1 == nullptr || platform::g_cursor_surface_2 == nullptr) {
+        if (platform::g_cursor_surface_1 == nullptr) {
             exitm::Exit_With_Message("Create_Cursor_Surface failed");
         }
 
         memset(platform::g_cursor_surface_1, 0, 24 * 24);
-        memset(platform::g_cursor_surface_2, 0, 24 * 24);
         platform::_cursor_surface = platform::g_cursor_surface_1;
-    }
-
-    void Draw_Auto_Cursor()
-    {
-        RECT rect;
-        const int32_t mouse_x = g_cached_mouse_x;
-        const int32_t mouse_y = g_cached_mouse_y;
-        rect.left = 0;
-        rect.top = 0;
-
-        if (mouse_x + 24 >= video::g_screen_res_x - 1)
-            rect.right = video::g_screen_res_x - mouse_x - 1;
-        else
-            rect.right = 24;
-
-        if (mouse_y + 24 >= video::g_screen_res_y - 1)
-            rect.bottom = video::g_screen_res_y - mouse_y - 1;
-        else
-            rect.bottom = 24;
-
-        if (Lock_Primary_Surface() < 0 || video::_video_memory == nullptr) {
-            return;
-        }
-
-        for (int32_t row = 0; row < rect.bottom; ++row) {
-            memcpy(
-                video::_video_memory + (mouse_y + row) * video::g_screen_res_x + mouse_x,
-                g_cursor_surface_2 + row * 24,
-                (size_t)rect.right);
-        }
-
-        Unlock_Primary_Surface();
-
-#ifndef FULLSCREEN
-        return;
-#endif
     }
 
     void __cdecl Toggle_Pages_Stub_() {
@@ -1068,7 +831,6 @@ namespace platform {
         }
 
         g_should_exit = 0;
-        _need_quit = 0;
         g_pending_toggle_pages = false;
         g_window_focus_state = 1;
         g_has_lost_focus = false;

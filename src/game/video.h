@@ -32,8 +32,6 @@ namespace video {
 
 	extern uint8_t* _current_video_page;
 
-	extern uint32_t screen_dump_flag;
-
 	struct s_scan_list_entry {
 		int16_t min_x;
 		int16_t max_x;
@@ -42,8 +40,6 @@ namespace video {
 	extern int32_t screen_refresh_flag;
 
 	extern int16_t _old_screen_dump_flag;
-
-	extern int16_t _old_screen_refresh_flag;
 
 	extern s_scan_list_entry* _refresh_scan_list;
 
@@ -137,9 +133,6 @@ namespace video {
 	// Initializes video-driver state, cursor surfaces, and default mouse bounds.
 	void __cdecl Init_Video_Drivers_();
 
-    // Performs the masked screen-dump path used when screen_dump_flag is 1.
-    void __cdecl _Masked_Screen_Dump();
-
     // Copies only the scan-listed regions from the alternate off-screen surface.
     void __cdecl _Partial_Screen_Dump();
 
@@ -154,13 +147,13 @@ namespace video {
     // Presents the pending frame and updates refresh bookkeeping.
     void __cdecl Toggle_Pages_();
 
-    // Saves the current refresh and dump flags into the legacy backup globals.
+    // Saves the current refresh flag into the legacy backup global.
     void __cdecl Save_Refresh_();
 
-    // Enables differential refresh while forcing the partial dump path.
+    // Enables differential refresh mode for legacy partial-update flows.
     void __cdecl Set_Refresh_Differential_No_Full_();
 
-	// Restores the previously saved refresh and dump flags.
+	// Restores the previously saved refresh flag.
 	void __cdecl Restore_Refresh_();
 
     // Clears the display state and releases the active DirectDraw palette.

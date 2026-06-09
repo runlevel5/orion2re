@@ -36,15 +36,9 @@ namespace platform {
 
 	extern uint8_t* g_cursor_surface_1;
 
-	extern int32_t _offscreen_mouse_shape;
-
-	extern uint8_t* g_cursor_surface_2;
-
 	extern uint8_t* _cursor_surface;
 
 	extern uint32_t DAT_00578e20;
-
-	extern uint8_t _need_quit;
 
 	extern uint32_t g_frame_count;
 
@@ -69,18 +63,12 @@ namespace platform {
 	int32_t Lock_Primary_Surface();
 	void Unlock_Primary_Surface();
 	void Copy_Off_Page_To_Present_Surface_();
-	void Draw_Cursor_XY(int32_t x, int32_t y);
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void __cdecl Create_Cursor_Surface();
 	HRESULT Restore_Surfaces();
 
 	LONG __cdecl Lock_Offscreen_Surface_();
 	void __cdecl Unlock_Offscreen_Surface_();
-	void __cdecl Save_Mouse_(int16_t mouse_x, int16_t mouse_y);
-	void __cdecl Save_Mouse_Offscreen_(int16_t mouse_x, int16_t mouse_y);
-	void __cdecl Draw_Cursor_XY_Offscreen_(int16_t mouse_x, int16_t mouse_y);
-	void __cdecl Restore_Mouse_Off_Page_();
-	void Draw_Auto_Cursor();
 	void Cleanup_Surfaces();
 	void Destroy_Main_Window_();
 	void __cdecl Prepare_Exit_();

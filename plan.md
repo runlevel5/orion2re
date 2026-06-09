@@ -368,9 +368,9 @@ These should not be copied as-is:
 
 ### 3. `screen_dump_flag == 1` masked path
 
-- `_Masked_Screen_Dump()` is still a stub in the current branch.
-- Before deleting related logic, audit whether that path is truly dead or merely not implemented yet.
-- The initial migration should preserve behavior flags and route them to in-memory operations, even if later simplification removes unused branches.
+- The old `screen_dump_flag`-driven present split is no longer part of the active SDL present model.
+- The masked dump path was stubbed and has been removed from the active refresh-state model.
+- Remaining refresh compatibility helpers now preserve only `screen_refresh_flag`, which is the only refresh-mode state still used operationally.
 
 ## Additional findings from rendering-flow analysis
 
@@ -396,6 +396,21 @@ These should not be copied as-is:
 - `Back` is populated afterward via `Copy_Off_To_Back_()` as a preserved baseline for later restore/stencil work.
 - The main-screen present path therefore expects stars, fleets, links, labels, overlays, and UI data to already be present on `Off` before `Toggle_Pages_()` publishes.
 - If SDL shows only background, nebulae, and UI, the likely fault is not the `Off`/`Back` page roles themselves but a mismatch in the `Draw_Main_Main_Screen_()` subtree or a page-target mismatch inside its draw primitives.
+
+### 6. Windowed SDL mouse coordinates must be mapped from current window size into game space
+
+- SDL mouse events are delivered in current window coordinates, not fixed 640x480 game coordinates.
+- The active game input path still expects logical game-space coordinates.
+- At a 640x480 window size, raw SDL coordinates happen to match the game space directly.
+- At any other window size, raw SDL coordinates must be scaled into 640x480 game space or the in-game cursor will move too fast or too slow and fail to line up with the window edges.
+- The correct mapping is edge-inclusive: the full current window width maps to `0..639` and the full current window height maps to `0..479`.
+- Cursor warps issued by game code must apply the reverse mapping back into the current SDL window size.
+
+### 7. Window-close behavior currently needs a platform-level fast exit
+
+- The current in-game shutdown path can hang when triggered from an SDL window close request.
+- Until the engine shutdown path is audited and fixed, the SDL close event should bypass normal game cleanup and exit the process directly with a status code.
+- This is a temporary platform safeguard rather than a final engine-lifecycle design.
 
 ### 3. `Primary` is distinct from the two gameplay pages
 
@@ -429,6 +444,7 @@ Acceptance criteria:
 - Main thread does not require a per-frame wakeup event from the game thread.
 - Game thread still runs legacy gameplay entry point.
 - Basic keyboard/mouse input reaches the game.
+- Windowed mouse input is scaled from current SDL window size into game-space coordinates correctly.
 
 ### Step 2. Add the in-memory surface compat layer
 
@@ -485,7 +501,7 @@ Acceptance criteria:
 
 ### Step 5. Remove cursor rendering from the game render surface
 
-Status: `in_progress`
+Status: `completed`
 
 - Keep cursor image generation from `video::_mouse_palette`.
 - Stop using save-under cursor blits into primary/offscreen pages for final presentation.
@@ -494,7 +510,7 @@ Status: `in_progress`
   - current cursor shape,
   - current cursor image buffer.
 - Main-thread presentation now composites the active cursor directly over the presented world frame.
-- Remaining legacy save/restore helpers may still exist temporarily for compatibility, but they should no longer be part of the active final-present path.
+- The old game-surface cursor save/restore presentation path has been removed from the active platform layer.
 
 Acceptance criteria:
 
@@ -579,6 +595,7 @@ Status: `pending`
 - Remove no-longer-needed Win32 video code.
 - Minimize remaining fake-surface API surface area.
 - Keep compatibility wrappers only where they still reduce risk.
+- Revisit the temporary fast-exit-on-window-close behavior once the engine shutdown path is known not to hang.
 
 Acceptance criteria:
 
