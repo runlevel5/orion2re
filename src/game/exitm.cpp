@@ -9,9 +9,6 @@ namespace exitm {
         MessageBoxA(platform::g_main_window, message, "Microprose", MB_OK);
 
         platform::Prepare_Exit_();
-
-        platform::Destroy_Main_Window_();
-        exit(1);
     }
 
     void __cdecl Exit_With_message2_(const char* message) {

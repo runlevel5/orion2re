@@ -455,7 +455,7 @@ namespace platform {
 	uint32_t g_win_ver;
 	char* g_command_line;
 	void* g_env_strings;
-	HANDLE g_worker_thread_handle;
+	SDL_Thread* g_worker_thread_handle;
 	uint32_t _updating_cursor_img;
 	uint8_t g_should_exit;
 	HWND g_main_window;
@@ -874,7 +874,13 @@ namespace platform {
             return 0;
         }
 
-        g_worker_thread_handle = (HANDLE)_beginthread(MOX2::thunk_main2_, 0xFFFF, nullptr);
+        g_worker_thread_handle = SDL_CreateThread(MOX2::thunk_main2_, "MOX2::main2_", nullptr);
+        if (g_worker_thread_handle == nullptr) {
+            Cleanup_Surfaces();
+            Destroy_Main_Window_();
+            SDL_Quit();
+            return 0;
+        }
 
         while (g_should_exit != 1) {
             Service_Pending_Window_Events_();
@@ -889,7 +895,7 @@ namespace platform {
         }
 
         if (g_worker_thread_handle != nullptr) {
-            WaitForSingleObject(g_worker_thread_handle, INFINITE);
+            SDL_WaitThread(g_worker_thread_handle, nullptr);
             g_worker_thread_handle = nullptr;
         }
 

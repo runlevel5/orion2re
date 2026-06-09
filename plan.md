@@ -419,6 +419,8 @@ These should not be copied as-is:
 - The active software-render model should therefore be understood as:
   - two persistent gameplay pages: `Off` and `Back`
   - one separate main-thread/platform presentation target or upload path
+- Some primary-surface compatibility helpers still remain because legacy callers such as background-draw and partial-refresh code still use them.
+- Those helpers should now be treated as compatibility scaffolding, not as part of the main SDL world-present path.
 
 ### 4. `_copy_to_on_page_flag` appears inactive in the current branch
 
@@ -581,6 +583,7 @@ Status: `in_progress`
 - Remove or stub out hardware-flip and vertical-blank specific behavior that no longer applies.
 - Keep behavior only where the game logic truly depends on it.
 - Remove dead synchronization leftovers from the active path once publication no longer borrows live `Off`.
+- Current finding: primary-surface compatibility functions and `_Partial_Screen_Dump()` are still referenced by legacy callers, so they cannot be removed yet without rewriting those call sites.
 
 Acceptance criteria:
 

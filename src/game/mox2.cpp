@@ -385,8 +385,10 @@ namespace MOX2 {
         exitm::Exit_With_Message(MOX2::_leave_game_message);
     }
 
-    void __cdecl thunk_main2_(void* unused) {
+    int SDLCALL thunk_main2_(void* unused) {
+        (void)unused;
         main2_();
+        return 0;
     }
 
     void __cdecl Get_Auto_Function_(MOX2::action_func_t* function_slot) {

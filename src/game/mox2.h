@@ -36,7 +36,7 @@ namespace MOX2 {
      * Adapts main2_ to a callback-style entry point.
      * @param unused Unused callback context.
      */
-    void __cdecl thunk_main2_(void* unused);
+    int SDLCALL thunk_main2_(void* unused);
 }
 
 namespace MOX2 {

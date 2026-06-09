@@ -18,7 +18,7 @@ namespace platform {
 	extern uint32_t g_win_ver;
 	extern char* g_command_line;
 	extern void* g_env_strings;
-	extern HANDLE g_worker_thread_handle;
+	extern SDL_Thread* g_worker_thread_handle;
 	extern uint32_t _updating_cursor_img;
 	extern uint8_t g_should_exit;
 

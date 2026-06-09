@@ -1569,10 +1569,6 @@ namespace fields {
         ::MessageBoxA(platform::g_main_window, buffer, "Microprose", 0x10);
 
         platform::Prepare_Exit_();
-
-        platform::Destroy_Main_Window_();
-
-        exit(1);
     }
 
     void __cdecl Find_Bar_Position_(int16_t field_idx) {
