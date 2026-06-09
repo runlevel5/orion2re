@@ -1572,7 +1572,7 @@ namespace fields {
 
         platform::Prepare_Exit_();
 
-        ::DestroyWindow(platform::g_main_window);
+        platform::Destroy_Main_Window_();
 
         exit(1);
     }

@@ -7,8 +7,9 @@ uint32_t DAT_00578dcc;
 namespace video {
 	int32_t g_screen_res_x;
 	int32_t g_screen_res_y;
-	IDirectDrawSurface* g_offscreen_surface_1;
-	IDirectDrawSurface* g_offscreen_surface_2;
+	s_page_buffer g_page_off = {};
+	s_page_buffer g_page_back = {};
+	s_page_buffer g_page_published = {};
 	uint8_t* _video_memory;
 	int16_t _current_mouse_list_ptr;
 	int16_t _current_mouse_shape;
@@ -23,7 +24,6 @@ namespace video {
 	uint32_t _screen_pixel_size = 0x4B000;
 	uint8_t _glass_remap_colors[16][256];
 	s_glass_color _glass_colors[16];
-	IDirectDrawPalette* g_palette;
 	tagPALETTEENTRY g_palette_entries[256];
 	s_palette_entry _current_palette[256];
 	uint8_t* _palette_list[65];
@@ -36,10 +36,162 @@ namespace video {
 	int16_t _screen_window_y2;
 	int16_t _screen_window_x1;
 	int16_t _screen_window_x2;
+	SDL_Mutex* g_off_page_mutex;
+	SDL_Condition* g_off_page_condition;
+	uint8_t g_off_page_state;
+	uint32_t g_off_page_generation;
+	uint32_t g_last_presented_generation;
+
+	void __cdecl Allocate_Page_Buffers_(int32_t width, int32_t height) {
+		const size_t page_size = (size_t)width * (size_t)height;
+
+		Free_Page_Buffers_();
+
+		g_page_off.pixels = (uint8_t*)malloc(page_size);
+		g_page_back.pixels = (uint8_t*)malloc(page_size);
+		g_page_published.pixels = (uint8_t*)malloc(page_size);
+
+		if (g_page_off.pixels == nullptr || g_page_back.pixels == nullptr || g_page_published.pixels == nullptr) {
+			exitm::Exit_With_Message("Allocate_Page_Buffers_ failed");
+		}
+
+		memset(g_page_off.pixels, 0, page_size);
+		memset(g_page_back.pixels, 0, page_size);
+		memset(g_page_published.pixels, 0, page_size);
+
+		g_page_off.width = width;
+		g_page_off.height = height;
+		g_page_back.width = width;
+		g_page_back.height = height;
+		g_page_published.width = width;
+		g_page_published.height = height;
+	}
+
+	void __cdecl Free_Page_Buffers_() {
+		if (g_page_off.pixels != nullptr) {
+			free(g_page_off.pixels);
+			g_page_off.pixels = nullptr;
+		}
+
+		if (g_page_back.pixels != nullptr) {
+			free(g_page_back.pixels);
+			g_page_back.pixels = nullptr;
+		}
+
+		if (g_page_published.pixels != nullptr) {
+			free(g_page_published.pixels);
+			g_page_published.pixels = nullptr;
+		}
+
+		g_page_off.width = 0;
+		g_page_off.height = 0;
+		g_page_back.width = 0;
+		g_page_back.height = 0;
+		g_page_published.width = 0;
+		g_page_published.height = 0;
+	}
+
+	uint8_t* __cdecl Get_Page_Pixels_(int32_t page_index) {
+		if (page_index == 1) {
+			return g_page_off.pixels;
+		}
+
+		if (page_index == 2) {
+			return g_page_back.pixels;
+		}
+
+		return nullptr;
+	}
+
+	uint8_t* __cdecl Get_Selected_Page_Pixels_() {
+		return Get_Page_Pixels_(platform::g_render_buffer);
+	}
+
+	void __cdecl Init_Off_Page_Ownership_() {
+		if (g_off_page_mutex == nullptr) {
+			g_off_page_mutex = SDL_CreateMutex();
+		}
+
+		if (g_off_page_condition == nullptr) {
+			g_off_page_condition = SDL_CreateCondition();
+		}
+
+		g_off_page_state = OFF_PAGE_WRITABLE;
+		g_off_page_generation = 0;
+		g_last_presented_generation = 0;
+	}
+
+	void __cdecl Shutdown_Off_Page_Ownership_() {
+		if (g_off_page_condition != nullptr) {
+			SDL_DestroyCondition(g_off_page_condition);
+			g_off_page_condition = nullptr;
+		}
+
+		if (g_off_page_mutex != nullptr) {
+			SDL_DestroyMutex(g_off_page_mutex);
+			g_off_page_mutex = nullptr;
+		}
+
+		g_off_page_state = OFF_PAGE_WRITABLE;
+		g_off_page_generation = 0;
+		g_last_presented_generation = 0;
+	}
+
+	void __cdecl Wait_For_Off_Page_Writable_() {
+		// Off is now always game-thread-owned. Publication snapshots Off into a
+		// separate buffer, so render writes no longer need to wait for the presenter.
+	}
+
+	void __cdecl Publish_Off_Page_() {
+		if (g_off_page_mutex == nullptr || g_off_page_condition == nullptr) {
+			return;
+		}
+
+		SDL_LockMutex(g_off_page_mutex);
+		while (g_off_page_state != OFF_PAGE_WRITABLE) {
+			SDL_WaitCondition(g_off_page_condition, g_off_page_mutex);
+		}
+
+		const size_t page_size = (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y;
+		memcpy(g_page_published.pixels, g_page_off.pixels, page_size);
+		g_off_page_state = OFF_PAGE_PUBLISHED;
+		++g_off_page_generation;
+		SDL_UnlockMutex(g_off_page_mutex);
+	}
+
+	bool __cdecl Try_Begin_Off_Page_Present_() {
+		if (g_off_page_mutex == nullptr) {
+			return false;
+		}
+
+		bool should_present = false;
+		SDL_LockMutex(g_off_page_mutex);
+		if (g_off_page_state == OFF_PAGE_PUBLISHED &&
+			g_off_page_generation != g_last_presented_generation) {
+			g_off_page_state = OFF_PAGE_PRESENTING;
+			g_last_presented_generation = g_off_page_generation;
+			should_present = true;
+		}
+		SDL_UnlockMutex(g_off_page_mutex);
+
+		return should_present;
+	}
+
+	void __cdecl End_Off_Page_Present_() {
+		if (g_off_page_mutex == nullptr || g_off_page_condition == nullptr) {
+			return;
+		}
+
+		SDL_LockMutex(g_off_page_mutex);
+		g_off_page_state = OFF_PAGE_WRITABLE;
+		SDL_SignalCondition(g_off_page_condition);
+		SDL_UnlockMutex(g_off_page_mutex);
+	}
 
 	void Set_Page_Off_() {
 		platform::g_render_buffer = 1;
 		_copy_to_on_page_flag = 0;
+		_current_video_page = g_page_off.pixels;
 	}
 
 	void Set_Refresh_Stencil_() {
@@ -198,42 +350,20 @@ namespace video {
         g_cached_mouse_y = platform::g_mouse_y;
 
         if (g_window_focus_state != 0) {
-            if (video::screen_dump_flag == 0) {
-                platform::Blit_To_Back_Buffer();
-                platform::Flip_Surface();
+            if (video::screen_refresh_flag == 3 || video::screen_refresh_flag == 2) {
+                video::screen_dump_flag = 2;
+            }
 
-                if (video::screen_refresh_flag == 3 || video::screen_refresh_flag == 2) {
-                    video::screen_dump_flag = 2;
-                }
-
-                if (video::screen_refresh_flag == 1) {
-                    video::screen_dump_flag = 1;
-                }
-
-                platform::Save_Mouse_(platform::g_mouse_x, platform::g_mouse_y);
-                platform::Draw_Cursor_XY((int)platform::g_mouse_x, (int)platform::g_mouse_y);
-            } else {
-                platform::Save_Mouse_Offscreen_(platform::g_mouse_x, platform::g_mouse_y);
-                platform::Draw_Cursor_XY_Offscreen_(platform::g_mouse_x, platform::g_mouse_y);
-                
-                setvesa::Add_Square_To_Scan_List_(
-                    (int)platform::g_mouse_x,
-                    (int)platform::g_mouse_y,
-                    (int)platform::g_mouse_x + 24,
-                    (int)platform::g_mouse_y + 24
-                );
-
-                if (video::screen_dump_flag == 1) {
-                    video::_Masked_Screen_Dump();
-                } else {
-                    video::_Partial_Screen_Dump();
-                }
-
-                platform::Restore_Mouse_Off_Page_();
+            if (video::screen_refresh_flag == 1) {
+                video::screen_dump_flag = 1;
             }
 
             palette::Refresh_Palette_();
             mouse::Enable_Mouse_();
+
+            // Snapshot the completed Off page before any legacy stencil restore
+            // mutates it to prepare the next incremental frame.
+            video::Publish_Off_Page_();
 
             if (video::screen_refresh_flag == 3) {
                 video::Stencil_Out_Background_();
@@ -295,11 +425,6 @@ namespace video {
         graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
         platform::Toggle_Pages_Stub_();
         video::Toggle_Pages_On_Odd_Frame_();
-
-        if (video::g_palette != nullptr) {
-            video::g_palette->Release();
-            video::g_palette = nullptr;
-        }
     }
 
     void __cdecl _Partial_Screen_Dump() {
@@ -416,38 +541,17 @@ namespace video {
     void __cdecl Set_Page_Back_() {
         platform::g_render_buffer = 2;
         _copy_to_on_page_flag = 0;
+        _current_video_page = g_page_back.pixels;
     }
 
     void __cdecl Copy_Back_To_Off_() {
-        RECT source_rect;
-
-        source_rect.left = 0;
-        source_rect.top = 0;
-        source_rect.right = (LONG)video::g_screen_res_x;
-        source_rect.bottom = (LONG)video::g_screen_res_y;
-
-        video::g_offscreen_surface_1->BltFast(
-            0,
-            0,
-            video::g_offscreen_surface_2,
-            &source_rect,
-            DDBLTFAST_WAIT);
+        const size_t page_size = (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y;
+        memcpy(video::g_page_off.pixels, video::g_page_back.pixels, page_size);
     }
 
     void __cdecl Copy_Off_To_Back_() {
-        RECT copy_rect;
-
-        copy_rect.left = 0;
-        copy_rect.top = 0;
-        copy_rect.right = (LONG)video::g_screen_res_x;
-        copy_rect.bottom = (LONG)video::g_screen_res_y;
-
-        video::g_offscreen_surface_2->BltFast(
-            0,
-            0,
-            video::g_offscreen_surface_1,
-            &copy_rect,
-            DDBLTFAST_WAIT);
+        const size_t page_size = (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y;
+        memcpy(video::g_page_back.pixels, video::g_page_off.pixels, page_size);
     }
 
     void __cdecl Allocate_Refresh_Lists_(uint32_t unused, int32_t entry_count) {

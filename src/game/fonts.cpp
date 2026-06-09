@@ -910,29 +910,14 @@ namespace fonts {
     }
 
     void __cdecl Disp_PSTR_(int32_t x, int32_t y, const char* format, ...) {
-        HDC hdc;
         char buffer[100];
-        tagSIZE size;
 
-        if (platform::g_primary_surface->GetDC(&hdc) == DD_OK) {
-            va_list args;
-            va_start(args, format);
-            vsprintf(buffer, format, args);
-            va_end(args);
+        va_list args;
+        va_start(args, format);
+        vsprintf(buffer, format, args);
+        va_end(args);
 
-            SetBkMode(hdc, 1);
-            SetTextColor(hdc, 0xFFFFFF);
-
-            int len = lstrlenA(buffer);
-            GetTextExtentPoint32A(hdc, buffer, len, &size);
-
-            len = lstrlenA(buffer);
-            TextOutA(hdc, x, y, buffer, len);
-
-            platform::g_primary_surface->ReleaseDC(hdc);
-
-            setvesa::Add_Square_To_Scan_List_(x, y, x + size.cx, y + size.cy);
-        }
+        Print_Display_((int16_t)x, (int16_t)y, buffer, 0);
     }
 
     void __cdecl Print_Clipped_Letter_To_Bitmap_(int16_t x, int16_t y, char letter, int16_t clip_x, int16_t clip_width, int16_t clip_y, uint16_t clip_height, s_animation_header* bitmap) {

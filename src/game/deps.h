@@ -16,6 +16,8 @@
 #include <math.h>
 #include <direct.h>
 
+#include <SDL3/SDL.h>
+
 #include "../dplay.h"
 
 #include "consts.h"

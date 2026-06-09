@@ -42,9 +42,7 @@ namespace mouse {
         _current_mouse_list = mouse_list;
 
         Check_Mouse_Shape_();
-
-        // Send a custom message (WM_USER + 2) to the main window
-        SendMessageA(platform::g_main_window, 0x402, 0, 0);
+        platform::_updating_cursor_img = 1;
     }
 
     int16_t Pointer_X_() {
@@ -217,11 +215,6 @@ namespace mouse {
 
         if ((mouse::_mouse_enabled == 1) && !platform::g_pending_toggle_pages) {
             mouse::Check_Mouse_Shape_();
-            platform::Draw_Auto_Cursor();
-            platform::Save_Mouse_(platform::g_mouse_x, platform::g_mouse_y);
-            platform::Draw_Cursor_XY(
-                (int16_t)platform::g_mouse_x,
-                (int16_t)platform::g_mouse_y);
         }
 
         mouse::_in_mouse_handler = 0;

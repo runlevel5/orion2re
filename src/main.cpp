@@ -1,5 +1,37 @@
 #include "pch.h"
 
+#include <SDL3/SDL_main.h>
+
+static int SDLCALL Orion2re_SDL_Main(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
+
+    char* command_line = GetCommandLineA();
+    char* lp_cmd_line = command_line;
+
+    if (lp_cmd_line != nullptr && *lp_cmd_line != '\0') {
+        if (*lp_cmd_line == '"') {
+            ++lp_cmd_line;
+            while (*lp_cmd_line != '\0' && *lp_cmd_line != '"') {
+                ++lp_cmd_line;
+            }
+            if (*lp_cmd_line == '"') {
+                ++lp_cmd_line;
+            }
+        } else {
+            while (*lp_cmd_line != '\0' && *lp_cmd_line > ' ') {
+                ++lp_cmd_line;
+            }
+        }
+
+        while (*lp_cmd_line != '\0' && *lp_cmd_line <= ' ') {
+            ++lp_cmd_line;
+        }
+    }
+
+    return platform::WinMain_Proxy(GetModuleHandleA(nullptr), nullptr, lp_cmd_line, SW_SHOWDEFAULT);
+}
+
 namespace {
     void Initialize_Process_State() {
 #ifdef _MSC_VER
@@ -23,11 +55,16 @@ namespace {
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)lpCmdLine;
+    (void)nShowCmd;
+
     Initialize_Process_State();
 
     if (platform::g_command_line == nullptr) {
         return -1;
     }
 
-    return platform::WinMain_Proxy(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+    return SDL_RunApp(0, nullptr, Orion2re_SDL_Main, nullptr);
 }

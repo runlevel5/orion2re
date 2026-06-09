@@ -13,8 +13,6 @@ namespace palstore {
                 ++palette_index;
             } while (--remaining != 0);
         }
-
-        video::g_palette->SetEntries(0, first_entry, entry_count, &video::g_palette_entries[first_entry]);
     }
 
     void __cdecl Darken_Palette_(int32_t darken_percent) {
@@ -27,14 +25,15 @@ namespace palstore {
             entries[i].peBlue  = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
         }
 
-        video::g_palette->SetEntries(0, 1, 255, &entries[1]);
+        for (int32_t i = 1; i < 256; ++i) {
+            video::g_palette_entries[i] = entries[i];
+        }
     }
 
     void __cdecl Store_Single_Palette_Color_(int32_t palette_index, uint8_t red, uint8_t green, uint8_t blue) {
         video::g_palette_entries[palette_index].peRed = red << 2;
         video::g_palette_entries[palette_index].peGreen = green << 2;
         video::g_palette_entries[palette_index].peBlue = blue * 4;
-        video::g_palette->SetEntries(0, palette_index, 1, &video::g_palette_entries[palette_index]);
         video::_current_palette[palette_index].r = red;
         video::_current_palette[palette_index].g = green;
         video::_current_palette[palette_index].b = blue;

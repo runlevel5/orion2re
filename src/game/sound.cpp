@@ -222,8 +222,9 @@ namespace sound {
         timeKillEvent(_soundTimerId);
         timeEndPeriod(0xA0);
 
-        if (_soundOn == 1) {
+        if (_soundOn == 1 && _dsound != NULL) {
             _dsound->Release();
+            _dsound = NULL;
         }
 
         _audioInitialized = 0;

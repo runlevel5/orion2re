@@ -56,24 +56,15 @@ namespace smckplay {
                 smckplay::Set_Smacker_Palette_();
             }
 
-            DDSURFACEDESC surface_desc;
-            LPDDSURFACEDESC surface_desc_ptr = &surface_desc;
-
-            surface_desc.dwSize = sizeof(surface_desc);
-            surface_desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
-            video::g_offscreen_surface_1->GetSurfaceDesc(surface_desc_ptr);
-            video::g_offscreen_surface_1->Lock(nullptr, surface_desc_ptr, DDLOCK_WAIT, nullptr);
-
             smckplay::_SmackToBuffer_28(smckplay::_smk,
                 left,
                 top,
-                surface_desc.lPitch,
+                video::g_screen_res_x,
                 smckplay::_smk->height,
-                surface_desc.lpSurface,
+                video::g_page_off.pixels,
                 0);
 
             smckplay::_SmackDoFrame_4(smckplay::_smk);
-            video::g_offscreen_surface_1->Unlock(nullptr);
 
             int32_t rect_result = smckplay::_SmackToBufferRect_8(smckplay::_smk, 0);
             while (rect_result != 0) {

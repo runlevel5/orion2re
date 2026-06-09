@@ -4,19 +4,25 @@ extern uint8_t DAT_00578820;
 extern uint32_t DAT_00578dc8;
 extern uint32_t DAT_00578dcc;
 
-struct IDirectDrawPalette;
 struct tagPALETTEENTRY;
-struct IDirectDrawSurface;
 
 namespace video {
+	struct s_page_buffer {
+		uint8_t* pixels;
+		int32_t width;
+		int32_t height;
+	};
+
 	// Variables
 	extern int32_t g_screen_res_x;
 
 	extern int32_t g_screen_res_y;
 
-	extern IDirectDrawSurface* g_offscreen_surface_1;
+	extern s_page_buffer g_page_off;
 
-	extern IDirectDrawSurface* g_offscreen_surface_2;
+	extern s_page_buffer g_page_back;
+
+	extern s_page_buffer g_page_published;
 
 	extern uint8_t* _video_memory;
 
@@ -51,8 +57,6 @@ namespace video {
 
 	extern s_glass_color _glass_colors[16];
 
-	extern IDirectDrawPalette* g_palette;
-
 	extern tagPALETTEENTRY g_palette_entries[256];
 
 	extern s_palette_entry _current_palette[256];
@@ -71,6 +75,29 @@ namespace video {
 	extern int16_t _screen_window_y2;
 	extern int16_t _screen_window_x1;
 	extern int16_t _screen_window_x2;
+
+	extern SDL_Mutex* g_off_page_mutex;
+	extern SDL_Condition* g_off_page_condition;
+	extern uint8_t g_off_page_state;
+	extern uint32_t g_off_page_generation;
+	extern uint32_t g_last_presented_generation;
+
+	enum {
+		OFF_PAGE_WRITABLE = 0,
+		OFF_PAGE_PUBLISHED = 1,
+		OFF_PAGE_PRESENTING = 2,
+	};
+
+	void __cdecl Allocate_Page_Buffers_(int32_t width, int32_t height);
+	void __cdecl Free_Page_Buffers_();
+	uint8_t* __cdecl Get_Page_Pixels_(int32_t page_index);
+	uint8_t* __cdecl Get_Selected_Page_Pixels_();
+	void __cdecl Init_Off_Page_Ownership_();
+	void __cdecl Shutdown_Off_Page_Ownership_();
+	void __cdecl Wait_For_Off_Page_Writable_();
+	void __cdecl Publish_Off_Page_();
+	bool __cdecl Try_Begin_Off_Page_Present_();
+	void __cdecl End_Off_Page_Present_();
 
 	// Functions
 	// Switches refresh handling to stencil mode for the next page update.

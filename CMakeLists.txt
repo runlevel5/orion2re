@@ -6,6 +6,13 @@ endif()
 
 project(orion2re LANGUAGES CXX)
 
+set(ORION2RE_VENDORED_SDL3_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/SDL")
+set(ORION2RE_VENDORED_SDL3_COMMIT "8e37db5e797b6167f3a00d697d816a684bd259c7")
+
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+endif()
+
 set(ORION2RE_GAME_DIR "" CACHE PATH "Optional game directory used for runtime output and debugger working directory")
 
 set(ORION2RE_LOCAL_CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/cmake/local-user.cmake")
@@ -15,6 +22,20 @@ endif()
 
 option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported MSVC debug builds" OFF)
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
+
+if(NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR
+        "This project requires the SDL3 submodule at vendors/SDL. "
+        "Run 'git submodule update --init --recursive vendors/SDL' and ensure it is pinned to ${ORION2RE_VENDORED_SDL3_COMMIT}."
+    )
+endif()
+
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory("${ORION2RE_VENDORED_SDL3_DIR}" EXCLUDE_FROM_ALL)
 
 if(ORION2RE_ENABLE_ASAN AND NOT MSVC)
     message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is only supported with MSVC builds.")
@@ -49,7 +70,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
 
 target_compile_features(orion2re PRIVATE cxx_std_20)
 target_include_directories(orion2re PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_compile_definitions(orion2re PRIVATE _WINDOWS)
+target_compile_definitions(orion2re PRIVATE _WINDOWS SDL_MAIN_HANDLED)
 
 if(WIN32)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
@@ -69,8 +90,6 @@ if(MSVC)
         target_precompile_headers(orion2re PRIVATE
             "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
         )
-
-        set_property(TARGET orion2re PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
         target_compile_definitions(orion2re PRIVATE
             WIN32
@@ -138,6 +157,7 @@ if(MSVC)
             winmm
             dsound
             ddraw
+            SDL3::SDL3-static
         )
 
         target_link_options(orion2re PRIVATE
