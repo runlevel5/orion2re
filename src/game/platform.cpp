@@ -17,6 +17,7 @@ namespace platform {
 		uint32_t g_fps_frame_count;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
+		void Composite_Cursor_On_Present_Pixels_();
 
 		int16_t Round_Float_To_Int16_(float value) {
 			long rounded_value = lroundf(value);
@@ -337,6 +338,8 @@ namespace platform {
 					(uint32_t)pal.peBlue;
 			}
 
+			Composite_Cursor_On_Present_Pixels_();
+
 #if ORION2RE_ENABLE_FPS_COUNTER
 			if (g_sdl_window != nullptr) {
 				const uint32_t now_ms = (uint32_t)SDL_GetTicks();
@@ -370,6 +373,49 @@ namespace platform {
 			SDL_RenderClear(g_sdl_renderer);
 			SDL_RenderTexture(g_sdl_renderer, g_sdl_present_texture, nullptr, nullptr);
 			SDL_RenderPresent(g_sdl_renderer);
+		}
+
+		void Composite_Cursor_On_Present_Pixels_() {
+			if (g_sdl_present_pixels == nullptr ||
+				mouse::_mouse_enabled == 0 ||
+				video::_current_mouse_shape <= 0) {
+				return;
+			}
+
+			if ((int32_t)video::_current_mouse_shape != DAT_578B3C) {
+				Update_Cursor_Image_();
+				DAT_578B3C = (int32_t)video::_current_mouse_shape;
+			}
+
+			const int32_t offset = mouse::Get_Pointer_Offset_();
+			const int32_t dst_x0 = (int32_t)g_mouse_x + offset;
+			const int32_t dst_y0 = (int32_t)g_mouse_y + offset;
+
+			for (int32_t row = 0; row < 24; ++row) {
+				const int32_t dst_y = dst_y0 + row;
+				if (dst_y < 0 || dst_y >= video::g_screen_res_y) {
+					continue;
+				}
+
+				for (int32_t col = 0; col < 24; ++col) {
+					const int32_t dst_x = dst_x0 + col;
+					if (dst_x < 0 || dst_x >= video::g_screen_res_x) {
+						continue;
+					}
+
+					const uint8_t pixel = g_cursor_surface_1[row * 24 + col];
+					if (pixel == 0) {
+						continue;
+					}
+
+					const tagPALETTEENTRY& pal = video::g_palette_entries[pixel];
+					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] =
+						0xFF000000u |
+						((uint32_t)pal.peRed << 16) |
+						((uint32_t)pal.peGreen << 8) |
+						(uint32_t)pal.peBlue;
+				}
+			}
 		}
 	}
 

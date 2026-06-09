@@ -484,7 +484,7 @@ Acceptance criteria:
 
 ### Step 5. Remove cursor rendering from the game render surface
 
-Status: `pending`
+Status: `in_progress`
 
 - Keep cursor image generation from `video::_mouse_palette`.
 - Stop using save-under cursor blits into primary/offscreen pages for final presentation.
@@ -492,6 +492,8 @@ Status: `pending`
   - current logical mouse position,
   - current cursor shape,
   - current cursor image buffer.
+- Main-thread presentation now composites the active cursor directly over the presented world frame.
+- Remaining legacy save/restore helpers may still exist temporarily for compatibility, but they should no longer be part of the active final-present path.
 
 Acceptance criteria:
 
