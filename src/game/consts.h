@@ -11,3 +11,5 @@
 inline constexpr char GAME_VERSION[] = "1.31-re";
 inline constexpr char GAME_VERSION_LABEL[] = "Version 1.31-re";
 inline constexpr char GAME_BUILD_DATE[] = "May 31 2026";
+
+//#define FULLSCREEN

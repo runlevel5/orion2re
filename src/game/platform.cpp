@@ -1,7 +1,5 @@
 #include "pch.h"
 
-//#define FULLSCREEN
-
 uint8_t g_ten_game_number;
 int16_t g_cached_mouse_x;
 int16_t g_cached_mouse_y;
@@ -261,7 +259,6 @@ namespace platform {
 
 #ifdef FULLSCREEN
         if (g_direct_draw->SetDisplayMode(video::g_screen_res_x, video::g_screen_res_y, 8) != DD_OK) {
-            cleanup();
             return cleanup();
         }
 
@@ -916,7 +913,7 @@ namespace platform {
         g_mouse_x = x;
         g_mouse_y = y;
 
-#ifndef FULSCREEN
+#ifndef FULLSCREEN
         // Offset the game-space position into window coordinates in windowed mode.
         POINT p = { 0, 0 };
         ClientToScreen(g_main_window, &p);
@@ -1168,7 +1165,7 @@ namespace platform {
             exit(1);
         }
 
-#ifdef FULSCREEN
+#ifdef FULLSCREEN
         int nWidth = GetSystemMetrics(SM_CXSCREEN);
         int nHeight = GetSystemMetrics(SM_CYSCREEN);
         DWORD flags = flags = WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_EX_TOPMOST;

@@ -192,8 +192,15 @@ namespace mouse {
             mouse::Check_Mouse_Buffer_();
 
             mouse::_in_mouse_handler = 0;
-            platform::g_mouse_x = previous_mouse_x;
-            platform::g_mouse_y = previous_mouse_y;
+
+            // In the original fullscreen flow, pending-toggle mouse moves are typically
+            // synthetic SetCursorPos echoes to the same logical position. In windowed mode,
+            // real user movement can also arrive here, so only discard same-coordinate echoes.
+            if (mouse_x == previous_mouse_x && mouse_y == previous_mouse_y) {
+                platform::g_mouse_x = previous_mouse_x;
+                platform::g_mouse_y = previous_mouse_y;
+            }
+
             return;
         }
 
