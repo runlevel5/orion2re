@@ -473,7 +473,6 @@ namespace platform {
 	int32_t DAT_578B3C;
 	int16_t g_mouse_x;
 	int16_t g_mouse_y;
-	uint32_t* _alt_offscreen_surface;
 
     // Scaled window
     int32_t scaleX = 640;
@@ -921,11 +920,4 @@ namespace platform {
         memcpy(destination, source, dword_count * sizeof(uint32_t));
     }
 
-    int32_t __cdecl Lock_Alt_Offscreen_Surface_() {
-        platform::_alt_offscreen_surface = (uint32_t*)video::g_page_off.pixels;
-        return video::g_screen_res_x;
-    }
-
-    void __cdecl Unlock_Alt_Offscreen_Surface_() {
-    }
 }

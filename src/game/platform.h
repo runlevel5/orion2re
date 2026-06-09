@@ -77,9 +77,4 @@ namespace platform {
 	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
 	void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count);
 	void __cdecl Present_Primary_Buffer_();
-
-	extern uint32_t* _alt_offscreen_surface;
-
-	int32_t __cdecl Lock_Alt_Offscreen_Surface_();
-	void __cdecl Unlock_Alt_Offscreen_Surface_();
 }

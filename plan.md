@@ -584,6 +584,8 @@ Status: `in_progress`
 - Keep behavior only where the game logic truly depends on it.
 - Remove dead synchronization leftovers from the active path once publication no longer borrows live `Off`.
 - Current finding: primary-surface compatibility functions and `_Partial_Screen_Dump()` are still referenced by legacy callers, so they cannot be removed yet without rewriting those call sites.
+- Update: the unreferenced `_Partial_Screen_Dump()` and alt-offscreen compatibility chain have now been removed.
+- Remaining primary-surface compatibility is limited to direct-primary callers that still use `Lock_Primary_Surface()` / `Present_Primary_Buffer_()` semantics.
 
 Acceptance criteria:
 

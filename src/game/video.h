@@ -131,9 +131,6 @@ namespace video {
 	// Initializes video-driver state, cursor surfaces, and default mouse bounds.
 	void __cdecl Init_Video_Drivers_();
 
-    // Copies only the scan-listed regions from the alternate off-screen surface.
-    void __cdecl _Partial_Screen_Dump();
-
     // Copies scan-listed background regions into the alternate off-screen surface.
     void __cdecl Stencil_Out_Background_();
 

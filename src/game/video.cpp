@@ -401,57 +401,11 @@ namespace video {
         platform::Toggle_Pages_Stub_();
         video::Toggle_Pages_On_Odd_Frame_();
     }
-
-    void __cdecl _Partial_Screen_Dump() {
-        const int32_t primary_pitch_bytes = platform::Lock_Primary_Surface();
-        if (primary_pitch_bytes < 0) {
-            return;
-        }
-
-        const int32_t primary_pitch_dwords =
-            (primary_pitch_bytes + ((primary_pitch_bytes >> 31) & 3)) >> 2;
-        const int32_t alt_pitch_bytes = platform::Lock_Alt_Offscreen_Surface_();
-        if (alt_pitch_bytes < 0) {
-            platform::Unlock_Primary_Surface();
-            return;
-        }
-
-        const int32_t alt_pitch_dwords =
-            (alt_pitch_bytes + ((alt_pitch_bytes >> 31) & 3)) >> 2;
-        uint32_t* const alt_surface = platform::_alt_offscreen_surface;
-        uint32_t* const video_memory = (uint32_t*)video::_video_memory;
-
-        if (g_screen_res_y > 0) {
-            int32_t dst_row_offset = 0;
-            int32_t src_row_offset = 0;
-
-            for (int32_t y = 0; y < g_screen_res_y; ++y) {
-                const s_scan_list_entry& scan = video::_refresh_scan_list[y];
-                if (scan.min_x != -1) {
-                    const int32_t min_x = scan.min_x;
-                    const int32_t count = (int32_t)scan.max_x - min_x + 1;
-
-                    platform::Copy_Dwords_(
-                        video_memory + (dst_row_offset + min_x),
-                        alt_surface + (src_row_offset + min_x),
-                        (uint32_t)count);
-                }
-
-                dst_row_offset += primary_pitch_dwords;
-                src_row_offset += alt_pitch_dwords;
-            }
-        }
-
-        platform::Unlock_Primary_Surface();
-        platform::Unlock_Alt_Offscreen_Surface_();
-    }
-
     void __cdecl Stencil_Out_Background_() {
         platform::Lock_Offscreen_Surface_();
-        platform::Lock_Alt_Offscreen_Surface_();
 
         uint8_t* offscreen_surface = platform::_offscreen_surface;
-        uint32_t* alt_offscreen_surface = platform::_alt_offscreen_surface;
+        uint32_t* alt_offscreen_surface = (uint32_t*)video::g_page_off.pixels;
         const int32_t dwords_per_row =
             (g_screen_res_x + ((g_screen_res_x >> 31) & 3)) >> 2;
 
@@ -473,7 +427,6 @@ namespace video {
             row_dword_offset += dwords_per_row;
         }
 
-        platform::Unlock_Alt_Offscreen_Surface_();
         platform::Unlock_Offscreen_Surface_();
     }
 
