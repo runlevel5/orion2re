@@ -29,7 +29,6 @@ namespace video {
 	uint16_t _is_initializing;
 	s_mouse_list _default_mouse_list;
 	uint8_t DAT_00578b58;
-	int16_t _copy_to_on_page_flag;
 	int16_t _screen_window_y1;
 	int16_t _screen_window_y2;
 	int16_t _screen_window_x1;
@@ -183,7 +182,6 @@ namespace video {
 
 	void Set_Page_Off_() {
 		platform::g_render_buffer = 1;
-		_copy_to_on_page_flag = 0;
 		_current_video_page = g_page_off.pixels;
 	}
 
@@ -517,7 +515,6 @@ namespace video {
 
     void __cdecl Set_Page_Back_() {
         platform::g_render_buffer = 2;
-        _copy_to_on_page_flag = 0;
         _current_video_page = g_page_back.pixels;
     }
 

@@ -424,9 +424,9 @@ These should not be copied as-is:
 
 ### 4. `_copy_to_on_page_flag` appears inactive in the current branch
 
-- The code still checks `_copy_to_on_page_flag` in some animation paths.
-- The active branch does not appear to set it to `1` in meaningful render flow.
-- The dominant active behavior is the offscreen/incremental software-page path.
+- The old `_copy_to_on_page_flag` branch was inactive in the SDL migration path and has been removed.
+- Main animation and file-animation screen-background draws now always use the off-page path.
+- The old on-page screen-background helper functions have been removed with the flag.
 
 ## Step-by-step implementation plan
 

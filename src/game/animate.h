@@ -121,16 +121,6 @@ namespace animate {
      */
     void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite);
 
-    /** Draws a packed screen-background sprite to the primary surface.
-     *  @param sprite Packed background data.
-     */
-    void __cdecl Draw_Screen_Background_On_(uint32_t* sprite);
-
-    /** Draws a glass-remapped packed background sprite to the primary surface.
-     *  @param sprite Packed background data.
-     */
-    void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite);
-
     /** Draws a glass-remapped packed background sprite to the render buffer.
      *  @param sprite Packed background data.
      */

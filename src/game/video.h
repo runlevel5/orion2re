@@ -65,8 +65,6 @@ namespace video {
 	extern s_mouse_list _default_mouse_list;
 	extern uint8_t DAT_00578b58;
 
-	extern int16_t _copy_to_on_page_flag;
-
 	extern int16_t _screen_window_y1;
 	extern int16_t _screen_window_y2;
 	extern int16_t _screen_window_x1;
@@ -99,7 +97,7 @@ namespace video {
 	void __cdecl Set_Refresh_Stencil_();
 	// Switches refresh handling to a full-screen redraw mode.
 	void __cdecl Set_Refresh_Full_();
-	// Selects the off-screen render page and clears the copy-to-on-page flag.
+	// Selects the off-screen render page.
 	void __cdecl Set_Page_Off_();
 	// Disables clipping in the animation subsystem.
 	void __cdecl Clip_Off_();
@@ -109,7 +107,7 @@ namespace video {
 	// Blits the primary off-screen surface into the back surface.
 	void __cdecl Copy_Off_To_Back_();
 
-    // Selects the back render page and clears the copy-to-on-page flag.
+    // Selects the back render page.
     void __cdecl Set_Page_Back_();
 
     // Blits the back surface into the primary off-screen surface.
