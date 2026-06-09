@@ -603,6 +603,8 @@ Status: `pending`
 - Fixed-size compatibility globals such as `scaleX` / `scaleY` have been collapsed into constants where they were no longer mutable in practice.
 - Active SDL cursor positioning and fullscreen sizing no longer rely on Win32 screen or cursor APIs.
 - Remaining Win32 usage in `platform.cpp` is now limited primarily to handle/signature compatibility, with the SDL video path no longer depending on Win32 destruction fallbacks.
+- Unreferenced legacy-named exports such as `Flip_Surface` have been removed from the active platform surface.
+- Platform helpers that are only used internally, such as `Restore_Surfaces()`, are being removed from the public platform header surface.
 
 Acceptance criteria:
 

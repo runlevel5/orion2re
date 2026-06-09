@@ -475,7 +475,7 @@ namespace platform {
     constexpr int32_t k_windowed_logical_width = 640;
     constexpr int32_t k_windowed_logical_height = 480;
 
-    void __cdecl Parse_Ten_Cmd_Parameter(const char* input_str) {
+    void Parse_Ten_Cmd_Parameter_(const char* input_str) {
         if (input_str == nullptr) {
             return;
         }
@@ -608,11 +608,6 @@ namespace platform {
             g_sdl_window = nullptr;
             g_main_window = nullptr;
         }
-    }
-
-    void __cdecl Flip_Surface()
-    {
-        Present_Indexed_Buffer_(g_present_surface);
     }
 
 	bool __cdecl Update_Active_World_Frame_() {
@@ -759,7 +754,7 @@ namespace platform {
     }
 
     int Run_Main_Loop(const char* command_line) {
-        Parse_Ten_Cmd_Parameter(command_line);
+        Parse_Ten_Cmd_Parameter_(command_line);
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             return 0;

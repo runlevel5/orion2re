@@ -49,9 +49,7 @@ namespace platform {
 	extern int16_t g_mouse_y;
 
 	// Functions
-	void Parse_Ten_Cmd_Parameter(const char* input_str);
 	bool Create_Video_Buffers_(int16_t video_mode);
-	void __cdecl Flip_Surface();
 	void __cdecl Service_Pending_Window_Events_();
 	bool __cdecl Update_Active_World_Frame_();
 	uint32_t Lock_Appropriate_Render_Buffer();
@@ -59,7 +57,6 @@ namespace platform {
 	void Copy_Off_Page_To_Present_Surface_();
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void __cdecl Create_Cursor_Surface();
-	void Restore_Surfaces();
 
 	int32_t __cdecl Lock_Offscreen_Surface_();
 	void __cdecl Unlock_Offscreen_Surface_();
