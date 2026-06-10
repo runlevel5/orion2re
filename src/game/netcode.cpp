@@ -151,7 +151,7 @@ namespace netcode {
         if (_in_send_message == 0) {
             _in_send_message = 1;
         } else {
-            ::OutputDebugStringA("REENTERING (Net_Send_Message)!!!!");
+            SDL_Log("REENTERING (Net_Send_Message)!!!!");
         }
 
         if (_connection_type == 3) {

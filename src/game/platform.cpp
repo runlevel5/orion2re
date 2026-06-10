@@ -57,8 +57,8 @@ namespace platform {
 		}
 
 		[[noreturn]] void Force_Immediate_Process_Exit_() {
-			ExitProcess(0);
-			abort();
+			SDL_Quit();
+			exit(0);
 		}
 
 		void Fill_Rect_32_(int32_t x, int32_t y, int32_t width, int32_t height, uint32_t color) {
@@ -502,7 +502,7 @@ namespace platform {
             copy_buffer[i] = input_str[i];
         }
 
-        _strlwr(copy_buffer);
+        strlwr(copy_buffer);
 
         // Search for "/ten=" in the lowercased command line.
         char* match_ptr = strstr(copy_buffer, "/ten=");

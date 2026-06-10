@@ -93,7 +93,7 @@ namespace transprt {
             ResetSending_();
             ResetReceiving_();
 
-            _tpLastBurstTickCount = GetTickCount();
+            _tpLastBurstTickCount = (uint32_t)SDL_GetTicks();
 
             return 1;
         }
@@ -191,7 +191,7 @@ namespace transprt {
                 }
             }
 
-            _tpLastBurstTickCount = GetTickCount();
+            _tpLastBurstTickCount = (uint32_t)SDL_GetTicks();
             _tpLastBurstClock = clock();
             _tpLastBurstStartPacket = _tpBurstNum;
             _tpSendImmediateBurstFlag = 0;

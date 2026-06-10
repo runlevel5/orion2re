@@ -43,7 +43,7 @@ namespace WINNET {
             uint32_t insert_idx = _session_count;
 
             for (uint32_t i = 0; i < _session_count; ++i) {
-                if (_strcmpi(session_desc->szSessionName, _sessions[i]->szSessionName) < 0) {
+                if (strcasecmp(session_desc->szSessionName, _sessions[i]->szSessionName) < 0) {
                     insert_idx = i;
                     _sessions[_session_count] = (LPDPSESSIONDESC)malloc(sizeof(*_sessions[_session_count]));
 
@@ -75,7 +75,7 @@ namespace WINNET {
                 provider->major_version = major_version;
                 provider->minor_version = minor_version;
 
-                _strlwr(provider->name);
+                strlwr(provider->name);
 
                 _provider_count++;
                 return 1;
@@ -555,7 +555,7 @@ namespace WINNET {
             return 0;
         }
 
-        OutputDebugStringA("Receiving Message....\n");
+        SDL_Log("Receiving Message....");
 
         receive_result = _dplay->Receive(
             (LPDPID)&id_from,

@@ -463,22 +463,22 @@ namespace sound {
         header->data_ptr = (uint8_t*)src_data + 0x2c;
 
         Copy_FourCC_Tag_(tag_buf, header->riff_tag);
-        if (cstrcmpi(tag_buf, "RIFF") != 0) {
+        if (strcasecmp(tag_buf, "RIFF") != 0) {
             return false;
         }
 
         Copy_FourCC_Tag_(tag_buf, header->wave_tag);
-        if (cstrcmpi(tag_buf, "WAVE") != 0) {
+        if (strcasecmp(tag_buf, "WAVE") != 0) {
             return false;
         }
 
         Copy_FourCC_Tag_(tag_buf, header->fmt_tag);
-        if (cstrcmpi(tag_buf, "fmt ") != 0) {
+        if (strcasecmp(tag_buf, "fmt ") != 0) {
             return false;
         }
 
         Copy_FourCC_Tag_(tag_buf, header->data_tag);
-        return cstrcmpi(tag_buf, "data") == 0;
+        return strcasecmp(tag_buf, "data") == 0;
     }
 
     /**
@@ -753,25 +753,25 @@ namespace sound {
         stream->data_start_offset = entry_offset + 0x2c;
 
         Copy_FourCC_Tag_(tag_buffer, stream->riff_tag);
-        if (cstrcmpi(tag_buffer, "RIFF") != 0) {
+        if (strcasecmp(tag_buffer, "RIFF") != 0) {
             Debug_Log_Stream_Message_("stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->wave_tag);
-        if (cstrcmpi(tag_buffer, "WAVE") != 0) {
+        if (strcasecmp(tag_buffer, "WAVE") != 0) {
             Debug_Log_Stream_Message_("stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->fmt_tag);
-        if (cstrcmpi(tag_buffer, "fmt ") != 0) {
+        if (strcasecmp(tag_buffer, "fmt ") != 0) {
             Debug_Log_Stream_Message_("stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->data_tag);
-        if (cstrcmpi(tag_buffer, "data") != 0) {
+        if (strcasecmp(tag_buffer, "data") != 0) {
             Debug_Log_Stream_Message_("stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }

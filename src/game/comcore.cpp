@@ -55,10 +55,10 @@ int16_t __cdecl ComSendUserMessage_(
 
     uint32_t target_player_id;
     if (player_id == 0x7FFF || player_id == 0x7FFE) {
-        ::OutputDebugStringA("Sending Message To All....\n");
+        SDL_Log("Sending Message To All....");
         target_player_id = 0;
     } else {
-        ::OutputDebugStringA("Sending Message To Individual....\n");
+        SDL_Log("Sending Message To Individual....");
         target_player_id = player_id;
     }
 

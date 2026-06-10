@@ -171,7 +171,7 @@ namespace NETTURN {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                NETMOX::_net.player_net_info[i].combat_attacker_id = 0xFF;
+                NETMOX::_net.player_net_info[i].combat_attacker_id = -1;
                 NETMOX::_net.player_net_info[i].packet_type = 14 /* NEXT_TURN */;
             }
         }
