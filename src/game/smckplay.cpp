@@ -254,8 +254,6 @@ namespace smckplay {
             current_entry->g = (uint8_t)(palette[1] >> 2);
             current_entry->b = (uint8_t)(palette[2] >> 2);
         }
-
-        palette::Refresh_Palette_();
     }
 
     uint32_t __cdecl Get_Smacker_Animation_Total_Frames_() {
