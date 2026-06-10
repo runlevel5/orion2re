@@ -47,6 +47,25 @@ namespace smckplay {
             return SDL_AUDIO_UNKNOWN;
         }
 
+        void Queue_Smacker_Audio_Frame_() {
+            for (int track = 0; track < 7; ++track) {
+                SDL_AudioStream* stream = _smacker_state.audio_streams[track];
+                if (stream == nullptr) {
+                    continue;
+                }
+
+                const unsigned char* audio_data = smk_get_audio(_smk, (unsigned char)track);
+                unsigned long audio_size = smk_get_audio_size(_smk, (unsigned char)track);
+                if (audio_data == nullptr || audio_size == 0) {
+                    continue;
+                }
+
+                if (!SDL_PutAudioStreamData(stream, audio_data, (int)audio_size)) {
+                    SDL_Log("smacker: SDL_PutAudioStreamData failed for track %d: %s", track, SDL_GetError());
+                }
+            }
+        }
+
         bool Init_Smacker_Audio_Streams_() {
             if ((MOX::_settings.music_on == 0) || (_smacker_state.audio_track_mask == 0)) {
                 return true;
@@ -63,10 +82,6 @@ namespace smckplay {
                     continue;
                 }
 
-                if (smk_enable_audio(_smk, (unsigned char)track, 1) < 0) {
-                    continue;
-                }
-
                 SDL_AudioStream* stream = (SDL_AudioStream*)sound::Open_Playback_Stream_(
                     _smacker_state.audio_bitdepth[track],
                     (uint16_t)_smacker_state.audio_channels[track],
@@ -80,30 +95,6 @@ namespace smckplay {
             }
 
             return true;
-        }
-
-        void Queue_Smacker_Audio_Frame_() {
-            for (int track = 0; track < 7; ++track) {
-                SDL_AudioStream* stream = _smacker_state.audio_streams[track];
-                if (stream == nullptr) {
-                    continue;
-                }
-
-                const unsigned char* audio_data = smk_get_audio(_smk, (unsigned char)track);
-                unsigned long audio_size = smk_get_audio_size(_smk, (unsigned char)track);
-                if (audio_data == nullptr || audio_size == 0) {
-                    continue;
-                }
-
-                if (!SDL_PutAudioStreamData(stream, audio_data, (int)audio_size)) {
-                    SDL_Log("smacker: SDL_PutAudioStreamData failed for track %d: %s", track, SDL_GetError());
-                    continue;
-                }
-
-                if (!SDL_FlushAudioStream(stream)) {
-                    SDL_Log("smacker: SDL_FlushAudioStream failed for track %d: %s", track, SDL_GetError());
-                }
-            }
         }
 
         void Blit_Smacker_Frame_(int32_t left, int32_t top) {
@@ -186,6 +177,7 @@ namespace smckplay {
 
         Update_Smacker_Frame_Metadata_();
         Queue_Smacker_Audio_Frame_();
+
         _smacker_state.next_frame_tick_ns = SDL_GetTicksNS();
 
         return (int8_t)(_smk != nullptr);

@@ -23,6 +23,7 @@ endif()
 
 option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported MSVC debug builds" OFF)
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
+option(ORION2RE_ENABLE_NETWORKING "Enable legacy DirectPlay networking" OFF)
 
 if(NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
     message(FATAL_ERROR
@@ -83,7 +84,10 @@ target_include_directories(orion2re PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
 )
-target_compile_definitions(orion2re PRIVATE _WINDOWS)
+target_compile_definitions(orion2re PRIVATE
+    _WINDOWS
+    ORION2RE_ENABLE_NETWORKING=$<BOOL:${ORION2RE_ENABLE_NETWORKING}>
+)
 
 if(WIN32)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
@@ -135,31 +139,37 @@ if(MSVC)
             set(ORION2RE_LIB_TOOL lib)
         endif()
 
-        add_custom_command(
-            OUTPUT
+        if(ORION2RE_ENABLE_NETWORKING)
+            add_custom_command(
+                OUTPUT
+                    "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+                COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
+                COMMAND "${ORION2RE_LIB_TOOL}"
+                    "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
+                    /machine:x86
+                    /name:DPLAYX.DLL
+                    "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+                DEPENDS
+                    "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
+                VERBATIM
+            )
+
+            add_custom_target(orion2re_win32_importlibs
+                DEPENDS
+                    "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+            )
+
+            add_dependencies(orion2re orion2re_win32_importlibs)
+
+            target_link_libraries(orion2re PRIVATE
                 "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
-            COMMAND "${ORION2RE_LIB_TOOL}"
-                "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-                /machine:x86
-                /name:DPLAYX.DLL
-                "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            DEPENDS
-                "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-            VERBATIM
-        )
-
-        add_custom_target(orion2re_win32_importlibs
-            DEPENDS
-                "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-        )
-
-        add_dependencies(orion2re orion2re_win32_importlibs)
-
-        target_link_libraries(orion2re PRIVATE
-            "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            SDL3::SDL3-static
-        )
+                SDL3::SDL3-static
+            )
+        else()
+            target_link_libraries(orion2re PRIVATE
+                SDL3::SDL3-static
+            )
+        endif()
 
         target_link_options(orion2re PRIVATE
             /DYNAMICBASE

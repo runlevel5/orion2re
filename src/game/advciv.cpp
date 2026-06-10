@@ -237,6 +237,7 @@ namespace ADVCIV {
 
         int16_t active_player_order[MAX_PLAYERS];
         int16_t picked_planet_idx[MAX_PLAYERS];
+        int16_t round_active_players_count;
 
         for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
             active_player_order[i] = -1;
@@ -250,6 +251,8 @@ namespace ADVCIV {
             for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
                 picked_planet_idx[i] = -1;
             }
+
+            round_active_players_count = active_players_count;
 
             Build_Adv_Civ_Star_List_();
             HAROLD::Randomize_List_(active_player_order, MAX_PLAYERS, 0);
@@ -278,7 +281,7 @@ namespace ADVCIV {
                 }
             }
 
-            if (round_pick_count == active_players_count) {
+            if (round_pick_count == round_active_players_count) {
                 for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
                     int16_t candidate_planet_idx = picked_planet_idx[p];
                     if (candidate_planet_idx == -1) continue;
@@ -327,9 +330,7 @@ namespace ADVCIV {
                     if (candidate_planet_idx >= 0 && candidate_planet_idx < MAX_PLANETS) {
                         int16_t global_planet_idx = _adv_civ_player[i].planets[candidate_planet_idx].planet_idx;
                         if (global_planet_idx >= 0) {
-                            int8_t star_idx = MOX::_planet[global_planet_idx].star_index;
                             _planet_selected_flag[global_planet_idx] = -1;
-                            _star_colony_owner[star_idx] = -1;
                         }
                     }
                 }

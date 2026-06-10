@@ -9,8 +9,6 @@ namespace netcode {
 
     extern uint8_t _inComms;
 
-    extern IDirectPlay* _dplay;
-
     extern recv_fn _recv_fn;
 
     extern int32_t _connection_type;

@@ -62,7 +62,7 @@ namespace comcore {
     int16_t __cdecl ComSendUserMessage_(
         void* msg_data,
         uint16_t msg_length,
-        DPID player_id,
+        uint32_t player_id,
         uint16_t msg_type,
         uint8_t flags,
         uint32_t transport_flag
