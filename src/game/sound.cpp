@@ -321,6 +321,40 @@ namespace sound {
     }
 
     /**
+     * Opens a basic PCM playback stream using the already-initialized SDL audio backend.
+     */
+    void* __cdecl Open_Playback_Stream_(uint16_t bits_per_sample, uint16_t channels, uint32_t sample_rate, int32_t volume_percent) {
+        if (_audioInitialized == 0 || channels == 0 || sample_rate == 0) {
+            return nullptr;
+        }
+
+        SDL_AudioSpec spec = {};
+        spec.format = Get_SDL_Audio_Format_(1, bits_per_sample);
+        spec.channels = channels;
+        spec.freq = (int)sample_rate;
+
+        if (spec.format == SDL_AUDIO_UNKNOWN) {
+            return nullptr;
+        }
+
+        void* stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, nullptr, nullptr);
+        if (stream == nullptr) {
+            return nullptr;
+        }
+
+        if (volume_percent < 0) {
+            volume_percent = 0;
+        }
+        else if (volume_percent > 100) {
+            volume_percent = 100;
+        }
+
+        SDL_SetAudioStreamGain(As_SDL_Audio_Stream_(stream), (float)volume_percent / 100.0f);
+        SDL_ResumeAudioStreamDevice(As_SDL_Audio_Stream_(stream));
+        return stream;
+    }
+
+    /**
      * @brief Sets the internal audio buffer and updates its available size.
      *
      * @param buffer Pointer to the memory block to be used as the audio buffer.

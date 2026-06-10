@@ -4,10 +4,11 @@ if(MSVC AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "This project only supports 32-bit MSVC Windows builds. Reconfigure with -A Win32.")
 endif()
 
-project(orion2re LANGUAGES CXX)
+project(orion2re LANGUAGES C CXX)
 
 set(ORION2RE_VENDORED_SDL3_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/SDL")
 set(ORION2RE_VENDORED_SDL3_COMMIT "8e37db5e797b6167f3a00d697d816a684bd259c7")
+set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
 
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
@@ -27,6 +28,12 @@ if(NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
     message(FATAL_ERROR
         "This project requires the SDL3 submodule at vendors/SDL. "
         "Run 'git submodule update --init --recursive vendors/SDL' and ensure it is pinned to ${ORION2RE_VENDORED_SDL3_COMMIT}."
+    )
+endif()
+
+if(NOT EXISTS "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c")
+    message(FATAL_ERROR
+        "This project requires libsmacker sources at vendors/libsmacker."
     )
 endif()
 
@@ -61,6 +68,9 @@ file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
 add_executable(orion2re
     ${ORION2RE_SOURCES}
     ${ORION2RE_HEADERS}
+    "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c"
+    "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_bitstream.c"
+    "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_hufftree.c"
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
@@ -69,7 +79,10 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
 )
 
 target_compile_features(orion2re PRIVATE cxx_std_20)
-target_include_directories(orion2re PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(orion2re PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
+)
 target_compile_definitions(orion2re PRIVATE _WINDOWS)
 
 if(WIN32)
@@ -124,35 +137,26 @@ if(MSVC)
 
         add_custom_command(
             OUTPUT
-                "${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
                 "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
             COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
-            COMMAND "${ORION2RE_LIB_TOOL}"
-                "/def:${CMAKE_CURRENT_SOURCE_DIR}/smackw32.def"
-                /machine:x86
-                /name:SMACKW32.DLL
-                "/out:${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
             COMMAND "${ORION2RE_LIB_TOOL}"
                 "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
                 /machine:x86
                 /name:DPLAYX.DLL
                 "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
             DEPENDS
-                "${CMAKE_CURRENT_SOURCE_DIR}/smackw32.def"
                 "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
             VERBATIM
         )
 
         add_custom_target(orion2re_win32_importlibs
             DEPENDS
-                "${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
                 "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
         )
 
         add_dependencies(orion2re orion2re_win32_importlibs)
 
         target_link_libraries(orion2re PRIVATE
-            "${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
             "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
             SDL3::SDL3-static
         )
