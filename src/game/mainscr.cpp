@@ -3837,7 +3837,7 @@ namespace MAINSCR {
         }
         case 0x17: {
             NETMOX::_net.player_net_info[from_player_id].packet_type = 0x0E;
-            NETMOX::_net.player_net_info[from_player_id].combat_attacker_id = 0xFF;
+            NETMOX::_net.player_net_info[from_player_id].combat_attacker_id = -1;
             NETMOX::_net.sync_phase_active_flag = 0;
             break;
         }

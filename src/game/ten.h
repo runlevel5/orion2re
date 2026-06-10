@@ -28,7 +28,7 @@ namespace ten {
     }
 
     /* Initializes the TEN networking layer; current stub performs no work. */
-    inline void __cdecl Init_TEN_(uint32_t, GUID*, recv_fn, s_network*) {
+    inline void __cdecl Init_TEN_(uint32_t, recv_fn, s_network*) {
     }
 
     /* Stops the TEN subsystem; current stub performs no work. */

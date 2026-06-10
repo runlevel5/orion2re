@@ -8,14 +8,14 @@ namespace netcode {
     int32_t _connection_type;
     int32_t _in_send_message;
 
-    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
+    int32_t __cdecl Do_Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network) {
         RUSS::Mox_Update_();
-        int32_t result = Net_Init_(mode, guid, recv_fn_ptr, network);
+        int32_t result = Net_Init_(mode, recv_fn_ptr, network);
         RUSS::Mox_Update_();
         return result;
     }
 
-    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
+    int32_t __cdecl Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network) {
         int32_t result = 0;
         _connection_type = mode;
 
@@ -25,7 +25,7 @@ namespace netcode {
 
             // TCP - original wants IPX
             result = WINNET::Init_Connection_(2);
-            WINNET::Refresh_Game_List_(guid);
+            WINNET::Refresh_Game_List_();
 
             _recv_fn = recv_fn_ptr;
         }
@@ -208,8 +208,8 @@ namespace netcode {
         return status;
     }
 
-    int32_t __cdecl Net_Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name) {
-        if (!WINNET::Create_Game_(guid, name, max_players, password, player_name)) {
+    int32_t __cdecl Net_Create_Game_(const char* name, int32_t max_players, const char* password, const char* player_name) {
+        if (!WINNET::Create_Game_(name, max_players, password, player_name)) {
             return 0;
         }
 

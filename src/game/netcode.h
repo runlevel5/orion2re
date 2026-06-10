@@ -17,19 +17,17 @@ namespace netcode {
 
     /** Initializes networking while pumping MOX before and after backend setup.
      * @param mode Connection backend selector.
-     * @param guid Session GUID used by the backend.
      * @param recv_fn_ptr Callback invoked for received packets.
      * @param network Modem/network configuration for modem modes.
      */
-    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network);
+    int32_t __cdecl Do_Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network);
 
     /** Initializes the requested networking backend.
      * @param mode Connection backend selector.
-     * @param guid Session GUID used by the backend.
      * @param recv_fn_ptr Callback invoked for received packets.
      * @param network Modem/network configuration for modem modes.
      */
-    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network);
+    int32_t __cdecl Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network);
 
     /** Returns the number of discovered game sessions. */
     int32_t __cdecl Net_Get_Game_Count_();
@@ -87,11 +85,10 @@ namespace netcode {
     uint32_t __cdecl Net_Status_();
 
     /** Creates a new game session and local player.
-     * @param guid Session GUID for the new game.
      * @param name Session display name.
      * @param max_players Maximum player count.
      * @param password Optional session password.
      * @param player_name Local player display name.
      */
-    int32_t __cdecl Net_Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name);
+    int32_t __cdecl Net_Create_Game_(const char* name, int32_t max_players, const char* password, const char* player_name);
 }

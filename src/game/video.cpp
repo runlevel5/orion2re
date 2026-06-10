@@ -22,7 +22,7 @@ namespace video {
 	uint32_t _screen_pixel_size = 0x4B000;
 	uint8_t _glass_remap_colors[16][256];
 	s_glass_color _glass_colors[16];
-	tagPALETTEENTRY g_palette_entries[256];
+	s_palette_color g_palette_entries[256];
 	s_palette_entry _current_palette[256];
 	uint8_t* _palette_list[65];
 	uint8_t _palette_reds[256];

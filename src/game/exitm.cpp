@@ -6,7 +6,7 @@ namespace exitm {
 
         video::Clear_Display_And_Release_Palette_();
 
-        MessageBoxA(platform::g_main_window, message, "Microprose", MB_OK);
+        Show_Message_Box_(platform::g_main_window, message, "Microprose");
 
         platform::Prepare_Exit_();
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctype.h>
+#include <stdint.h>
 
 #include <SDL3/SDL.h>
 
@@ -12,33 +13,45 @@
 #define __stdcall
 #endif
 
+#if !defined(GUID_DEFINED)
+#define GUID_DEFINED
+typedef struct _GUID {
+    uint32_t Data1;
+    uint16_t Data2;
+    uint16_t Data3;
+    uint8_t Data4[8];
+} GUID;
+#endif
+
+#if !defined(ORION2RE_MEMORYSTATUS_DEFINED)
+#define ORION2RE_MEMORYSTATUS_DEFINED
+struct MEMORYSTATUS {
+    uint32_t dwLength;
+    uint32_t dwMemoryLoad;
+    uint32_t dwTotalPhys;
+    uint32_t dwAvailPhys;
+    uint32_t dwTotalPageFile;
+    uint32_t dwAvailPageFile;
+    uint32_t dwTotalVirtual;
+    uint32_t dwAvailVirtual;
+};
+#endif
+
+bool File_Exists_(const char* path);
+void Query_Memory_Status_(MEMORYSTATUS* memory_status);
+int Show_Message_Box_(void* window_handle, const char* text, const char* caption, bool is_error = false);
+
 #if defined(_WIN32)
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #endif
 
 inline char* strlwr(char* text) {
-    if (text == nullptr) {
-        return nullptr;
-    }
-
-    for (char* cursor = text; *cursor != '\0'; ++cursor) {
-        *cursor = (char)tolower((unsigned char)*cursor);
-    }
-
-    return text;
+    return SDL_strlwr(text);
 }
 
 inline char* strupr(char* text) {
-    if (text == nullptr) {
-        return nullptr;
-    }
-
-    for (char* cursor = text; *cursor != '\0'; ++cursor) {
-        *cursor = (char)toupper((unsigned char)*cursor);
-    }
-
-    return text;
+    return SDL_strupr(text);
 }
 
 #if defined(_WIN32)

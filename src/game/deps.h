@@ -1,17 +1,14 @@
 #pragma once
 
-#include <Windows.h>
+#include "types.h"
+
 #include <time.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
-#include <io.h>
-#include <process.h>
 #include <math.h>
-#include <direct.h>
 
 #include <SDL3/SDL.h>
 
@@ -54,7 +51,6 @@
 #include "initgame.h"
 #include "officer.h"
 #include "shipmove.h"
-#include "types.h"
 #include "harold.h"
 #include "sound.h"
 #include "ten.h"
@@ -221,3 +217,5 @@
 #include "colbomb.h"
 #include "aibomb.h"
 #include "flcqueue.h"
+
+#include "sizes.h"

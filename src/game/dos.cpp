@@ -1,58 +1,137 @@
 #include "pch.h"
 
 namespace dos {
-    struct tm* _tmbuf;
+    namespace {
+        enum {
+            MAX_DOS_PATH = 512,
+            NANOSECONDS_PER_SECOND = 1000000000,
+        };
 
-    struct _finddata32_t _fileinfo;
+        const char* Get_File_Name_(const char* path) {
+            const char* slash;
+            const char* backslash;
 
-    bool __cdecl DIR_(const char* pattern, char* output_name) {
-        intptr_t find_result;
-        // Binary behavior appears to call _findnext32 without preserving a valid find handle.
-        // Keep a safe default here rather than reintroducing an uninitialized-handle use.
-        intptr_t find_handle = 0;
+            slash = strrchr(path, '/');
+            backslash = strrchr(path, '\\');
 
-        if (pattern[0] == '\0') {
-            find_result = _findnext32(find_handle, &_fileinfo);
-        } else {
-            find_result = _findfirst32(pattern, &_fileinfo);
+            if (slash == nullptr) {
+                slash = path;
+            } else {
+                ++slash;
+            }
+
+            if (backslash == nullptr) {
+                return slash;
+            }
+
+            ++backslash;
+            if (backslash > slash) {
+                return backslash;
+            }
+
+            return slash;
         }
 
-        if (find_result == -1) {
+        void Split_Search_Pattern_(const char* pattern, char* directory, char* filename_pattern) {
+            const char* file_name;
+            size_t directory_length;
+
+            file_name = Get_File_Name_(pattern);
+            if (file_name == pattern) {
+                strcpy(directory, ".");
+                strcpy(filename_pattern, pattern);
+                return;
+            }
+
+            directory_length = (size_t)(file_name - pattern);
+            if (directory_length >= MAX_DOS_PATH) {
+                directory_length = MAX_DOS_PATH - 1;
+            }
+
+            memcpy(directory, pattern, directory_length);
+            directory[directory_length] = '\0';
+
+            if (directory_length > 0 &&
+                (directory[directory_length - 1] == '/' || directory[directory_length - 1] == '\\')) {
+                directory[directory_length - 1] = '\0';
+            }
+
+            if (directory[0] == '\0') {
+                strcpy(directory, ".");
+            }
+
+            strcpy(filename_pattern, file_name);
+        }
+    }
+
+    bool __cdecl DIR_(const char* pattern, char* output_name) {
+        char directory[MAX_DOS_PATH];
+        char filename_pattern[MAX_DOS_PATH];
+        char** matches;
+        int count;
+
+        if (pattern == nullptr || output_name == nullptr || pattern[0] == '\0') {
             output_name[0] = '\0';
             return false;
         }
 
-        strcpy(output_name, _fileinfo.name);
+        Split_Search_Pattern_(pattern, directory, filename_pattern);
 
+        matches = SDL_GlobDirectory(directory, filename_pattern, SDL_GLOB_CASEINSENSITIVE, &count);
+        if (matches == nullptr || count <= 0) {
+            if (matches != nullptr) {
+                SDL_free(matches);
+            }
+            output_name[0] = '\0';
+            return false;
+        }
+
+        strcpy(output_name, Get_File_Name_(matches[0]));
+        SDL_free(matches);
         return true;
     }
 
-    void __cdecl Delete_File_(LPCSTR path) {
+    void __cdecl Delete_File_(const char* path) {
         remove(path);
     }
 
     int32_t __cdecl Disk_Free_(void) {
-        _diskfree_t disk_free_info;
+        uint64_t available_bytes;
+        SDL_Storage* storage;
 
-        if (_getdiskfree(0, &disk_free_info) != 0) {
+        storage = SDL_OpenFileStorage(nullptr);
+        if (storage == nullptr) {
             return 0;
         }
 
-        return disk_free_info.avail_clusters *
-               disk_free_info.sectors_per_cluster *
-               disk_free_info.bytes_per_sector;
+        if (!SDL_StorageReady(storage)) {
+            SDL_CloseStorage(storage);
+            return 0;
+        }
+
+        available_bytes = (uint64_t)SDL_GetStorageSpaceRemaining(storage);
+        SDL_CloseStorage(storage);
+
+        if (available_bytes > INT32_MAX) {
+            return INT32_MAX;
+        }
+
+        return (int32_t)available_bytes;
     }
 
-    struct tm* __cdecl Time_Stamp_(LPCSTR pathname) {
-        intptr_t find_handle;
+    struct tm* __cdecl Time_Stamp_(const char* pathname) {
+        SDL_PathInfo path_info;
+        time_t modified_time;
 
-        find_handle = _findfirst32(pathname, &_fileinfo);
-        if (find_handle == -1) {
+        if (pathname == nullptr) {
             return nullptr;
         }
 
-        _ctime32(&_fileinfo.time_write);
-        _tmbuf = _localtime32(&_fileinfo.time_write);
-        return _tmbuf;
+        if (!SDL_GetPathInfo(pathname, &path_info) || path_info.type != SDL_PATHTYPE_FILE) {
+            return nullptr;
+        }
+
+        modified_time = (time_t)(path_info.modify_time / NANOSECONDS_PER_SECOND);
+        return localtime(&modified_time);
     }
 }

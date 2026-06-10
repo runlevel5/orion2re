@@ -5,7 +5,11 @@ namespace assert {
     int32_t __cdecl hgetch_() {
         fonts::PSTRS_(0, 24, "*");
 
-        int32_t pressed_key = _getch();
+        int32_t pressed_key;
+
+        do {
+            pressed_key = key::Read_Key_();
+        } while (pressed_key == 0);
 
         if ((pressed_key == 27 || pressed_key == 'Q' || pressed_key == 'q') && MOX::_global_var != 'u') {
             fields::F11_Key_();

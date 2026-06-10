@@ -4,9 +4,14 @@ extern uint8_t DAT_00578820;
 extern uint32_t DAT_00578dc8;
 extern uint32_t DAT_00578dcc;
 
-struct tagPALETTEENTRY;
-
 namespace video {
+	struct s_palette_color {
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+		uint8_t flags;
+	};
+
 	struct s_page_buffer {
 		uint8_t* pixels;
 		int32_t width;
@@ -53,7 +58,7 @@ namespace video {
 
 	extern s_glass_color _glass_colors[16];
 
-	extern tagPALETTEENTRY g_palette_entries[256];
+	extern s_palette_color g_palette_entries[256];
 
 	extern s_palette_entry _current_palette[256];
 

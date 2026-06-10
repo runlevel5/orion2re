@@ -1559,14 +1559,13 @@ namespace fields {
 
         Clear_Fields_();
 
-        memory_status.dwLength = sizeof(MEMORYSTATUS);
-        ::GlobalMemoryStatus(&memory_status);
+        Query_Memory_Status_(&memory_status);
 
         snprintf(buffer, sizeof(buffer), "Avail Mem = %dk   Total Mem = %dk", (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
 
         video::Clear_Display_And_Release_Palette_();
 
-        ::MessageBoxA(platform::g_main_window, buffer, "Microprose", 0x10);
+        Show_Message_Box_(platform::g_main_window, buffer, "Microprose", true);
 
         platform::Prepare_Exit_();
     }

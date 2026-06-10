@@ -7,15 +7,14 @@ namespace WINNET {
     int32_t _provider_count;
     s_winnet_provider* _providers[9];
     clock_t _net_refresh_timer;
-    GUID _game_guid = {0xEBD6DA60, 0x7CCD, 0x11CF, {0xB4, 0xC3, 0x00, 0xAA, 0x00, 0x3F, 0xCD, 0x2E}};
     uint32_t _session_count;
-    GUID _app_guid;
     uint32_t _player_count;
     uint32_t _local_player_id;
     int32_t _provider_mode;
 
     namespace {
         s_net_player* _player_list[20];
+        const GUID k_game_guid = {0xEBD6DA60, 0x7CCD, 0x11CF, {0xB4, 0xC3, 0x00, 0xAA, 0x00, 0x3F, 0xCD, 0x2E}};
 
 #if ORION2RE_ENABLE_NETWORKING
         IDirectPlay* _dplay;
@@ -219,9 +218,7 @@ namespace WINNET {
 #endif
     }
 
-    uint32_t __cdecl Refresh_Game_List_(GUID guid) {
-        _app_guid = guid;
-
+    uint32_t __cdecl Refresh_Game_List_() {
 #if !ORION2RE_ENABLE_NETWORKING
         _session_count = 0;
         return 0;
@@ -240,7 +237,7 @@ namespace WINNET {
         DPSESSIONDESC session_desc;
         memset(&session_desc, 0, sizeof(session_desc));
         session_desc.dwSize = sizeof(DPSESSIONDESC);
-        session_desc.guidSession = guid;
+        session_desc.guidSession = k_game_guid;
 
         if (netcode::_connection_type == 0) {
             _is_searching_games = 1;
@@ -448,9 +445,8 @@ namespace WINNET {
 #endif
     }
 
-    int32_t __cdecl Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name) {
+    int32_t __cdecl Create_Game_(const char* name, int32_t max_players, const char* password, const char* player_name) {
 #if !ORION2RE_ENABLE_NETWORKING
-        (void)guid;
         (void)name;
         (void)max_players;
         (void)password;
@@ -462,7 +458,7 @@ namespace WINNET {
 
         memset(&session_desc, 0, sizeof(DPSESSIONDESC));
         session_desc.dwSize = sizeof(DPSESSIONDESC);
-        session_desc.guidSession = guid;
+        session_desc.guidSession = k_game_guid;
         session_desc.dwFlags = 2;
         session_desc.dwMaxPlayers = max_players;
 

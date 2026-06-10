@@ -51,9 +51,6 @@ namespace BOMB {
         int16_t leader_idx;
         s_MSG msg;
 
-        static_assert(sizeof(s_MSG) == 0x12, "s_MSG size mismatch");
-        static_assert(sizeof(s_colony) == 0x169, "s_colony size mismatch");
-
         star = &MOX::_star[MOX::_planet[colony->planet].star_index];
         colony_idx = (int16_t)(colony - MOX::_colony);
 

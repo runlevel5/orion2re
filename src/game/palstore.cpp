@@ -7,22 +7,22 @@ namespace palstore {
             int32_t remaining = entry_count;
 
             do {
-                video::g_palette_entries[palette_index].peRed = video::_current_palette[palette_index].r << 2;
-                video::g_palette_entries[palette_index].peGreen = video::_current_palette[palette_index].g << 2;
-                video::g_palette_entries[palette_index].peBlue = video::_current_palette[palette_index].b << 2;
+                video::g_palette_entries[palette_index].r = video::_current_palette[palette_index].r << 2;
+                video::g_palette_entries[palette_index].g = video::_current_palette[palette_index].g << 2;
+                video::g_palette_entries[palette_index].b = video::_current_palette[palette_index].b << 2;
                 ++palette_index;
             } while (--remaining != 0);
         }
     }
 
     void __cdecl Darken_Palette_(int32_t darken_percent) {
-        tagPALETTEENTRY entries[256];
+        video::s_palette_color entries[256];
         int32_t multiplier = 100 - darken_percent;
 
         for (int32_t i = 1; i < 256; ++i) {
-            entries[i].peRed   = (uint8_t)(((video::_current_palette[i].r * multiplier) / 100) << 2);
-            entries[i].peGreen = (uint8_t)(((video::_current_palette[i].g * multiplier) / 100) << 2);
-            entries[i].peBlue  = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
+            entries[i].r = (uint8_t)(((video::_current_palette[i].r * multiplier) / 100) << 2);
+            entries[i].g = (uint8_t)(((video::_current_palette[i].g * multiplier) / 100) << 2);
+            entries[i].b = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
         }
 
         for (int32_t i = 1; i < 256; ++i) {
@@ -31,9 +31,9 @@ namespace palstore {
     }
 
     void __cdecl Store_Single_Palette_Color_(int32_t palette_index, uint8_t red, uint8_t green, uint8_t blue) {
-        video::g_palette_entries[palette_index].peRed = red << 2;
-        video::g_palette_entries[palette_index].peGreen = green << 2;
-        video::g_palette_entries[palette_index].peBlue = blue * 4;
+        video::g_palette_entries[palette_index].r = red << 2;
+        video::g_palette_entries[palette_index].g = green << 2;
+        video::g_palette_entries[palette_index].b = blue * 4;
         video::_current_palette[palette_index].r = red;
         video::_current_palette[palette_index].g = green;
         video::_current_palette[palette_index].b = blue;

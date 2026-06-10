@@ -700,7 +700,7 @@ namespace LOADSAVE {
                 date_str[j] = 0;
             }
 
-            if (_access(filename, 0) == 0) {
+            if (File_Exists_(filename)) {
                 Get_File_Date_String_(filename, date_str);
             }
 

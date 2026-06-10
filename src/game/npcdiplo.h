@@ -3,8 +3,6 @@
 #include <cstdint>
 
 namespace npcdiplo {
-    static_assert(sizeof(s_npcdiplo_tech) == 5, "s_npcdiplo_tech size mismatch");
-
     extern s_npcdiplo_tech _human_tech[212];
 
     extern s_npcdiplo_tech _target_tech[212];

@@ -1,5 +1,25 @@
 #pragma once
-#include <cstdint>
+#include <stdint.h>
+
+#pragma pack(push, 1)
+struct s_load_net_screen_packet {
+    int16_t begin_state;
+    uint8_t field2_0x2;
+    uint8_t field3_0x3;
+    uint8_t field4_0x4;
+    uint8_t field5_0x5;
+    int32_t network_ids[MAX_PLAYERS];
+    uint8_t field38_0x26;
+    uint8_t field39_0x27;
+    int8_t number_of_players;
+    uint8_t field41_0x29;
+    uint8_t field42_0x2a;
+    uint8_t field43_0x2b;
+    uint8_t field44_0x2c;
+    uint8_t field45_0x2d;
+    char version_string[50];
+};
+#pragma pack(pop)
 
 namespace NETSTART {
     uint8_t __cdecl Start_Net_Screen_();
@@ -17,7 +37,7 @@ namespace NETSTART {
 
     extern char s_myname_005597dc[7];
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, const char* game_name, int32_t max_players, const char* str1, const char* str2);
+    int32_t __cdecl Russ_Net_Create_Game_(const char* game_name, int32_t max_players, const char* str1, const char* str2);
 
     bool __cdecl Do_Dial_(char* phone_number);
 

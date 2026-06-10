@@ -1,27 +1,5 @@
 #include "pch.h"
 
-#pragma pack(push, 1)
-struct s_load_net_screen_packet {
-    int16_t begin_state;
-    uint8_t field2_0x2;
-    uint8_t field3_0x3;
-    uint8_t field4_0x4;
-    uint8_t field5_0x5;
-    int32_t network_ids[MAX_PLAYERS];
-    uint8_t field38_0x26;
-    uint8_t field39_0x27;
-    int8_t number_of_players;
-    uint8_t field41_0x29;
-    uint8_t field42_0x2a;
-    uint8_t field43_0x2b;
-    uint8_t field44_0x2c;
-    uint8_t field45_0x2d;
-    char version_string[50];
-};
-#pragma pack(pop)
-
-static_assert(sizeof(s_load_net_screen_packet) == 0x60, "s_load_net_screen_packet size mismatch");
-
 namespace NETSTART {
     char* _dialing_failed_error;
     char* _receiving_chunk_d_of_d;
@@ -278,7 +256,7 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
         RUSS::Mox_Update_();
 
-        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, NETMOX::Receive_Message_, &NETMOX::_net)) {
+        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net)) {
             RUSS::Mox_Update_();
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
@@ -368,7 +346,7 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             NETMOX::_net.sync_state = 0;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
@@ -376,7 +354,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -673,7 +651,7 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, WINNET::_game_guid, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
             NETMOX::_net.sync_state = 0;
@@ -681,7 +659,7 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 0) {
-            if (Russ_Net_Create_Game_(WINNET::_game_guid, NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
+            if (Russ_Net_Create_Game_(NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
                 MOX::_current_screen = 15;
@@ -883,9 +861,9 @@ namespace NETSTART {
         return 1;
     }
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, const char* game_name, int32_t max_players, const char* str1, const char* str2) {
+    int32_t __cdecl Russ_Net_Create_Game_(const char* game_name, int32_t max_players, const char* str1, const char* str2) {
         RUSS::Mox_Update_();
-        int32_t result = netcode::Net_Create_Game_(guid, game_name, max_players, str1, str2);
+        int32_t result = netcode::Net_Create_Game_(game_name, max_players, str1, str2);
         RUSS::Mox_Update_();
         return result;
     }

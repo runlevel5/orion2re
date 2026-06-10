@@ -1,36 +1,4 @@
-﻿typedef unsigned char undefined;
-typedef unsigned char   undefined;
-
-typedef unsigned char    byte;
-typedef unsigned int    dword;
-
-typedef long long    int16;
-typedef long long    longlong;
-typedef unsigned char    uchar;
-typedef unsigned int    uint;
-typedef unsigned long    ulong;
-typedef unsigned long long    ulonglong;
-typedef unsigned char    undefined1;
-typedef unsigned short    undefined2;
-typedef unsigned int    undefined4;
-typedef unsigned long long    undefined5;
-typedef unsigned long long    undefined6;
-typedef unsigned long long    undefined7;
-typedef unsigned long long    undefined8;
-typedef unsigned short    uint16_t;
-typedef unsigned short    word;
 typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
-
-
-/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
-
-typedef uchar uint8_t;
-
-
-/* WARNING! conflicting data type names: /types.h/uint - /uint */
-
-typedef uint uint32_t;
-
 struct BIT_BUF {
     uint8_t *buf;
     uint8_t mask;
@@ -53,8 +21,6 @@ typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
 typedef struct s_adv_civ_player_star s_adv_civ_player_star, *Ps_adv_civ_player_star;
 
 typedef struct s_adv_civ_player_planet s_adv_civ_player_planet, *Ps_adv_civ_player_planet;
-
-typedef int int32_t;
 
 struct s_adv_civ_player_planet {
     int8_t is_homeworld;
@@ -143,8 +109,6 @@ struct s_player_ship_sizes {
     int32_t weighted_ship_size;
 };
 
-static_assert(sizeof(s_player_ship_sizes) == 0x38, "s_player_ship_sizes size mismatch");
-
 typedef struct s_ai_refit_entry s_ai_refit_entry, *Ps_ai_refit_entry;
 
 #pragma pack(push, 1)
@@ -154,16 +118,12 @@ struct s_ai_refit_entry {
 };
 #pragma pack(pop)
 
-static_assert(sizeof(s_ai_refit_entry) == 6, "s_ai_refit_entry size mismatch");
-
 typedef struct s_ai_refit_player s_ai_refit_player, *Ps_ai_refit_player;
 
 struct s_ai_refit_player {
     int16_t n_entries;
     struct s_ai_refit_entry entry[MAX_SHIPS];
 };
-
-static_assert(sizeof(s_ai_refit_player) == 3002, "s_ai_refit_player size mismatch");
 
 typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
 
@@ -258,12 +218,6 @@ struct s_aimove_alien_strength {
 };
 
 typedef struct s_aimove_intercept_entry s_aimove_intercept_entry, *Ps_aimove_intercept_entry;
-
-
-/* WARNING! conflicting data type names: /types.h/uint16_t - /uint16_t */
-
-typedef uint16_t uint16_t;
-
 typedef struct s_aimove_intercept_player s_aimove_intercept_player, *Ps_aimove_intercept_player;
 
 struct s_aimove_intercept_player {
@@ -300,8 +254,6 @@ struct s_alloc_header {
 
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
-typedef int16_t int16_t;
-
 #pragma pack(push, 1)
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -322,8 +274,6 @@ struct s_animation_header {
 #pragma warning(pop)
 #endif
 #pragma pack(pop)
-
-static_assert(sizeof(s_animation_header) == 0x0c, "s_animation_header size mismatch");
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
 
@@ -980,8 +930,6 @@ struct s_big_icon {
 
 typedef struct s_bomb s_bomb, *Ps_bomb;
 
-typedef char sbyte;
-
 struct s_bomb {
     undefined field0_0x0;
     undefined field1_0x1;
@@ -1197,8 +1145,6 @@ struct s_colony_job_production {
     int32_t difficulty_bonus;
     int32_t final_prod;
 };
-
-static_assert(sizeof(s_colony_job_production) == 0x256, "s_colony_job_production size mismatch");
 
 typedef struct s_colors s_colors, *Ps_colors;
 
@@ -2233,8 +2179,6 @@ struct s_help_record {
     char body[1300];
 };
 #pragma pack(pop)
-
-static_assert(sizeof(s_help_record) == 0x57b, "s_help_record size mismatch");
 
 typedef struct s_help_topic_record s_help_topic_record, *Ps_help_topic_record;
 
@@ -3654,8 +3598,6 @@ struct s_planet_data {
     int8_t environmental_alterations;
 };
 
-static_assert(sizeof(s_planet_data) == 0x11, "s_planet_data size mismatch");
-
 typedef struct s_planet_max_farms s_planet_max_farms, *Ps_planet_max_farms;
 
 struct s_planet_max_farms {
@@ -4625,8 +4567,6 @@ struct s_star_data {
     byte artifacts_gave_app;
 };
 
-static_assert(sizeof(s_star_data) == 0x71, "s_star_data size mismatch");
-
 typedef struct s_star_weight s_star_weight, *Ps_star_weight;
 
 struct s_star_weight {
@@ -4981,9 +4921,3 @@ struct s_packed_screen_background_run8 {
     int8_t skip_count;
     int8_t pixel_count;
 };
-
-static_assert(sizeof(s_palette_header) == 4, "s_palette_header size mismatch");
-static_assert(sizeof(s_packed_frame_header) == 4, "s_packed_frame_header size mismatch");
-static_assert(sizeof(s_packed_frame_run) == 4, "s_packed_frame_run size mismatch");
-static_assert(sizeof(s_packed_screen_background_run32) == 8, "s_packed_screen_background_run32 size mismatch");
-static_assert(sizeof(s_packed_screen_background_run8) == 2, "s_packed_screen_background_run8 size mismatch");

@@ -350,7 +350,7 @@ namespace FILEDEF {
             strcat(filename, num_str);
             strcat(filename, ".GAM");
 
-            if (_access(filename, 0) == 0) {
+            if (File_Exists_(filename)) {
                 FILE* fp = fopen(filename, "rb");
                 if (fp != nullptr) {
                     int32_t type;

@@ -22,7 +22,7 @@ namespace platform {
 	extern uint32_t _updating_cursor_img;
 	extern uint8_t g_should_exit;
 
-	extern HWND g_main_window;
+	extern void* g_main_window;
 
 	extern volatile bool g_pending_toggle_pages;
 

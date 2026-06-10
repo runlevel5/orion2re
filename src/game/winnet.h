@@ -1,7 +1,5 @@
 #pragma once
 
-#include <guiddef.h>
-
 namespace WINNET {
     extern int32_t _provider_count;
 
@@ -9,10 +7,7 @@ namespace WINNET {
 
     extern clock_t _net_refresh_timer;
 
-    extern GUID _game_guid;
-
     extern uint32_t _session_count;
-    extern GUID _app_guid;
 
     extern uint32_t _player_count;
 
@@ -26,7 +21,7 @@ namespace WINNET {
 
     void __cdecl Handle_Destroy_Player_(s_net_pack_destroy_player* pack);
 
-    uint32_t __cdecl Refresh_Game_List_(GUID guid);
+    uint32_t __cdecl Refresh_Game_List_();
 
     int32_t __cdecl Init_Connection_(int32_t mode);
 
@@ -40,7 +35,7 @@ namespace WINNET {
 
     int32_t __cdecl Join_Game_(const char* game_name, const char* password, const char* player_name);
 
-    int32_t __cdecl Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name);
+    int32_t __cdecl Create_Game_(const char* name, int32_t max_players, const char* password, const char* player_name);
 
     void __cdecl Shutdown_();
 

@@ -364,12 +364,12 @@ namespace platform {
 
 			const int32_t pixel_count = video::g_screen_res_x * video::g_screen_res_y;
 			for (int32_t i = 0; i < pixel_count; ++i) {
-				const tagPALETTEENTRY& pal = video::g_palette_entries[src_pixels[i]];
+				const video::s_palette_color& pal = video::g_palette_entries[src_pixels[i]];
 				g_sdl_present_pixels[i] =
 					0xFF000000u |
-					((uint32_t)pal.peRed << 16) |
-					((uint32_t)pal.peGreen << 8) |
-					(uint32_t)pal.peBlue;
+					((uint32_t)pal.r << 16) |
+					((uint32_t)pal.g << 8) |
+					(uint32_t)pal.b;
 			}
 
 			Composite_Cursor_On_Present_Pixels_();
@@ -442,12 +442,12 @@ namespace platform {
 						continue;
 					}
 
-					const tagPALETTEENTRY& pal = video::g_palette_entries[pixel];
+					const video::s_palette_color& pal = video::g_palette_entries[pixel];
 					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] =
 						0xFF000000u |
-						((uint32_t)pal.peRed << 16) |
-						((uint32_t)pal.peGreen << 8) |
-						(uint32_t)pal.peBlue;
+						((uint32_t)pal.r << 16) |
+						((uint32_t)pal.g << 8) |
+						(uint32_t)pal.b;
 				}
 			}
 		}
@@ -462,7 +462,7 @@ namespace platform {
 	SDL_Thread* g_worker_thread_handle;
 	uint32_t _updating_cursor_img;
 	uint8_t g_should_exit;
-	HWND g_main_window;
+	void* g_main_window;
 	volatile bool g_pending_toggle_pages;
 	int16_t g_video_mode;
 	uint32_t g_available_mem;
@@ -525,8 +525,7 @@ namespace platform {
 
     bool Create_Video_Buffers_(int16_t video_mode) {
         MEMORYSTATUS mem_status;
-        mem_status.dwLength = sizeof(MEMORYSTATUS);
-        GlobalMemoryStatus(&mem_status);
+        Query_Memory_Status_(&mem_status);
 
         g_video_mode = video_mode;
         g_available_mem = mem_status.dwAvailPhys;
@@ -611,6 +610,8 @@ namespace platform {
             SDL_DestroyWindow(g_sdl_window);
             g_sdl_window = nullptr;
         }
+
+		g_main_window = nullptr;
     }
 
 	bool __cdecl Update_Active_World_Frame_() {
@@ -785,6 +786,8 @@ namespace platform {
             SDL_Quit();
             return 0;
         }
+
+		g_main_window = g_sdl_window;
 
         SDL_HideCursor();
 
