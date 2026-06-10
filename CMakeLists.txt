@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 
-if(MSVC AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "This project only supports 32-bit MSVC Windows builds. Reconfigure with -A Win32.")
-endif()
-
 project(orion2re LANGUAGES C CXX)
+
+if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if(MSVC AND WIN32)
+        message(FATAL_ERROR "This project requires a 32-bit build. Reconfigure with -A Win32.")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        message(FATAL_ERROR "This project requires a 32-bit build. Reconfigure with the Linux x86 presets or pass -m32 compiler and linker flags.")
+    else()
+        message(FATAL_ERROR "This project requires a 32-bit build.")
+    endif()
+endif()
 
 set(ORION2RE_VENDORED_SDL3_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/SDL")
 set(ORION2RE_VENDORED_SDL3_COMMIT "8e37db5e797b6167f3a00d697d816a684bd259c7")
@@ -21,7 +27,7 @@ if(EXISTS "${ORION2RE_LOCAL_CONFIG}")
     include("${ORION2RE_LOCAL_CONFIG}")
 endif()
 
-option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported MSVC debug builds" OFF)
+option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds" OFF)
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
 option(ORION2RE_ENABLE_NETWORKING "Enable legacy DirectPlay networking" OFF)
 
@@ -44,10 +50,6 @@ set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("${ORION2RE_VENDORED_SDL3_DIR}" EXCLUDE_FROM_ALL)
-
-if(ORION2RE_ENABLE_ASAN AND NOT MSVC)
-    message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is only supported with MSVC builds.")
-endif()
 
 if(MSVC AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4 AND ORION2RE_GAME_DIR)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
@@ -85,7 +87,6 @@ target_include_directories(orion2re PRIVATE
     "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
 )
 target_compile_definitions(orion2re PRIVATE
-    _WINDOWS
     ORION2RE_ENABLE_NETWORKING=$<BOOL:${ORION2RE_ENABLE_NETWORKING}>
 )
 
@@ -123,15 +124,6 @@ if(MSVC)
             $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zi>
             $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
         )
-
-        if(ORION2RE_ENABLE_ASAN)
-            if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-                message(FATAL_ERROR "ORION2RE_ENABLE_ASAN requires a Debug build.")
-            endif()
-
-            target_compile_options(orion2re PRIVATE /fsanitize=address)
-            target_link_options(orion2re PRIVATE /INFERASANLIBS /fsanitize=address)
-        endif()
 
         set(ORION2RE_IMPORT_LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/import-libs")
         set(ORION2RE_LIB_TOOL "${CMAKE_LIB}")
@@ -179,4 +171,20 @@ if(MSVC)
     endif()
 elseif(WIN32)
     message(WARNING "The CMake conversion preserves the original Visual Studio/MSVC-specific Windows build behavior; non-MSVC Windows builds may need additional link setup.")
+endif()
+
+if(ORION2RE_ENABLE_ASAN)
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(FATAL_ERROR "ORION2RE_ENABLE_ASAN requires a Debug build.")
+    endif()
+
+    if(MSVC)
+        target_compile_options(orion2re PRIVATE /fsanitize=address)
+        target_link_options(orion2re PRIVATE /INFERASANLIBS /fsanitize=address)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(orion2re PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+        target_link_options(orion2re PRIVATE -fsanitize=address)
+    else()
+        message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is unsupported for the current compiler.")
+    endif()
 endif()

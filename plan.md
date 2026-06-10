@@ -60,9 +60,11 @@
    - Relax the hard Windows-only checks in `CMakeLists.txt` so non-Windows configure passes can begin.
    - Keep networking and any remaining unsupported pieces behind feature flags rather than global platform rejection.
    - Add non-Windows presets once the codebase can configure and compile far enough to validate incremental fixes.
+   - Progress update: shared target setup no longer defines `_WINDOWS` unconditionally; that Win32 define now stays limited to the MSVC/Win32-specific branch instead of leaking into non-Windows builds.
 
 11. Validate incrementally after each stage
    - After each step, run the narrowest possible configure or build command to catch portability regressions early.
    - Re-run repository scans for Win32 headers, APIs, and types in active code after each completed stage.
    - Only move on once the previous stage compiles cleanly or all remaining failures are understood and isolated.
    - Latest validation: repository scans are clean for the recently removed global Windows headers, active palette Win32 type usage, and recent compat-layer C++ stdlib usage; current configure still advances until the broader build-system portability limits take over.
+   - Follow-up validation: non-networking configure still advances on Linux after the `_WINDOWS` define cleanup, but the configure run remains slow in vendored SDL detection and timed out before reaching the first project compile failure.
