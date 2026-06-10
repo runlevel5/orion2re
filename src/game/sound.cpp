@@ -43,8 +43,6 @@ namespace sound {
     void* _soundBuffer;
     uint32_t _soundBufferSize;
     volatile uint32_t _soundTimerLock;
-    void* _streamBuffer1;
-    void* _streamBuffer2;
     uint8_t _audioPlaybackActive;
     int32_t _global_stream_volume = 100;
     uint8_t _loopStream;
@@ -136,6 +134,30 @@ namespace sound {
             }
 
             return SDL_SetAudioStreamGain(stream, (float)volume_percent / 100.0f);
+        }
+
+        void Flush_SDL_Stream_(SDL_AudioStream* stream) {
+            if (stream != nullptr) {
+                SDL_FlushAudioStream(stream);
+            }
+        }
+
+        void Clear_SDL_Stream_(SDL_AudioStream* stream) {
+            if (stream != nullptr) {
+                SDL_ClearAudioStream(stream);
+            }
+        }
+
+        void Pause_SDL_Stream_(SDL_AudioStream* stream) {
+            if (stream != nullptr) {
+                SDL_PauseAudioStreamDevice(stream);
+            }
+        }
+
+        void Resume_SDL_Stream_(SDL_AudioStream* stream) {
+            if (stream != nullptr) {
+                SDL_ResumeAudioStreamDevice(stream);
+            }
         }
 
         bool Queue_Channel_Data_(s_sound_channel& channel, uint32_t bytes_to_queue) {
@@ -235,7 +257,7 @@ namespace sound {
                 if (bytes_remaining == 0) {
                     if (_loopStream == 0) {
                         _stream_data.status &= ~0x02;
-                        SDL_FlushAudioStream(_stream_data.ds_buffer);
+                        Flush_SDL_Stream_(_stream_data.ds_buffer);
                         return true;
                     }
 
@@ -252,7 +274,7 @@ namespace sound {
                     bytes_remaining = _stream_data.data_remaining;
                     if (bytes_remaining == 0) {
                         _stream_data.status &= ~0x02;
-                        SDL_FlushAudioStream(_stream_data.ds_buffer);
+                        Flush_SDL_Stream_(_stream_data.ds_buffer);
                         return true;
                     }
                 }
@@ -345,8 +367,8 @@ namespace sound {
             volume_percent = 100;
         }
 
-        SDL_SetAudioStreamGain(stream, (float)volume_percent / 100.0f);
-        SDL_ResumeAudioStreamDevice(stream);
+        Set_SDL_Stream_Gain_(stream, volume_percent);
+        Resume_SDL_Stream_(stream);
         return stream;
     }
 
@@ -597,7 +619,7 @@ namespace sound {
                 }
 
                 _currentStreamVolume = volume_percent;
-                SDL_SetAudioStreamGain(_stream_data.ds_buffer, (float)volume_percent / 100.0f);
+                Set_SDL_Stream_Gain_(_stream_data.ds_buffer, volume_percent);
             }
         }
     }
@@ -682,9 +704,7 @@ namespace sound {
         if (_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
             Stop_Sound_Timer_();
 
-            SDL_DestroyAudioStream(_stream_data.ds_buffer);
-
-            _stream_data.ds_buffer = nullptr;
+            Destroy_SDL_Stream_(_stream_data.ds_buffer);
             _loopStream = 0;
             _audioPlaybackActive = 0;
 
@@ -774,10 +794,7 @@ namespace sound {
         int32_t volume_idx = Get_Stream_Volume_();
         Stop_Stream_Loop_();
 
-        if (_stream_data.ds_buffer != nullptr) {
-            SDL_DestroyAudioStream(_stream_data.ds_buffer);
-            _stream_data.ds_buffer = nullptr;
-        }
+        Destroy_SDL_Stream_(_stream_data.ds_buffer);
 
         if (Load_Stream_Wave_Header_(stream_id, &_stream_data) == 0) {
             Enable_Sound_Timer_();
@@ -816,15 +833,14 @@ namespace sound {
         }
 
         if (!Queue_Stream_Until_Target_(_stream_data.block_size * k_stream_prefill_blocks)) {
-            SDL_DestroyAudioStream(_stream_data.ds_buffer);
-            _stream_data.ds_buffer = nullptr;
+            Destroy_SDL_Stream_(_stream_data.ds_buffer);
             Enable_Sound_Timer_();
             return;
         }
 
         _currentStreamVolume = volume_idx;
-        SDL_SetAudioStreamGain(_stream_data.ds_buffer, (float)volume_idx / 100.0f);
-        SDL_ResumeAudioStreamDevice(_stream_data.ds_buffer);
+        Set_SDL_Stream_Gain_(_stream_data.ds_buffer, volume_idx);
+        Resume_SDL_Stream_(_stream_data.ds_buffer);
 
         _audioPlaybackActive = 1;
         Enable_Sound_Timer_();
@@ -893,7 +909,7 @@ namespace sound {
             if (remaining == 0) {
                 if (!Restart_Channel_Loop_(*channel)) {
                     channel->flags &= ~0x02;
-                    SDL_FlushAudioStream(channel->buffer);
+                    Flush_SDL_Stream_(channel->buffer);
                     break;
                 }
                 remaining = channel->sample_size;
@@ -910,7 +926,7 @@ namespace sound {
 
             if (channel->sample_offset >= channel->sample_size && !Channel_Loop_Enabled_(*channel)) {
                 channel->flags &= ~0x02;
-                SDL_FlushAudioStream(channel->buffer);
+                Flush_SDL_Stream_(channel->buffer);
             }
 
             queued = SDL_GetAudioStreamQueued(channel->buffer);
@@ -1063,11 +1079,11 @@ namespace sound {
         _soundChannels[channel_idx].flags |= 0x1;
 
         if (_soundChannels[channel_idx].sample_offset >= _soundChannels[channel_idx].sample_size && !Channel_Loop_Enabled_(_soundChannels[channel_idx])) {
-            SDL_FlushAudioStream(_soundChannels[channel_idx].buffer);
+            Flush_SDL_Stream_(_soundChannels[channel_idx].buffer);
         }
 
         SDL_SetAudioStreamFrequencyRatio(_soundChannels[channel_idx].buffer, 1.0f);
-        SDL_ResumeAudioStreamDevice(_soundChannels[channel_idx].buffer);
+        Resume_SDL_Stream_(_soundChannels[channel_idx].buffer);
 
         Resume_Timer2_();
 
@@ -1176,10 +1192,10 @@ namespace sound {
             }
         } else {
             if (Restart_Channel_Loop_(channel)) {
-                SDL_ClearAudioStream(channel.buffer);
+                Clear_SDL_Stream_(channel.buffer);
                 if (Queue_Channel_Data_(channel, channel.sample_size)) {
-                    SDL_FlushAudioStream(channel.buffer);
-                    SDL_ResumeAudioStreamDevice(channel.buffer);
+                    Flush_SDL_Stream_(channel.buffer);
+                    Resume_SDL_Stream_(channel.buffer);
                 }
             } else {
                 channel.flags ^= 0x1; // Deactivate active flag
@@ -1353,15 +1369,15 @@ namespace sound {
 
         if (SDL_GetAudioStreamQueued(_stream_data.ds_buffer) == 0) {
             _stream_data.status ^= 1;
-            SDL_PauseAudioStreamDevice(_stream_data.ds_buffer);
+            Pause_SDL_Stream_(_stream_data.ds_buffer);
             _audioPlaybackActive = 0;
         }
     }
 
     void __cdecl Stop_Stream_Loop_() {
         if (_stream_data.ds_buffer != nullptr) {
-            SDL_ClearAudioStream(_stream_data.ds_buffer);
-            SDL_PauseAudioStreamDevice(_stream_data.ds_buffer);
+            Clear_SDL_Stream_(_stream_data.ds_buffer);
+            Pause_SDL_Stream_(_stream_data.ds_buffer);
         }
 
         _loopStream = 0;
