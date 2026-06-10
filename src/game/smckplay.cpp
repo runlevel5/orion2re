@@ -82,7 +82,7 @@ namespace smckplay {
                     continue;
                 }
 
-                SDL_AudioStream* stream = (SDL_AudioStream*)sound::Open_Playback_Stream_(
+                SDL_AudioStream* stream = sound::Open_Playback_Stream_(
                     _smacker_state.audio_bitdepth[track],
                     (uint16_t)_smacker_state.audio_channels[track],
                     (uint32_t)_smacker_state.audio_rate[track],

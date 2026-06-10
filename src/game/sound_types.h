@@ -13,7 +13,7 @@ struct s_sound_channel {
     uint32_t field7_0x13;
     uint32_t write_cursor;
     uint8_t flags;
-    void* buffer;
+    SDL_AudioStream* buffer;
 };
 
 struct s_sound_index {
@@ -50,7 +50,7 @@ struct s_sound_stream {
     uint32_t field20_0x3f;
     uint32_t write_cursor;
     uint8_t status;
-    void* ds_buffer;
+    SDL_AudioStream* ds_buffer;
     uint32_t ds_buffer_size;
     uint32_t block_size;
 };

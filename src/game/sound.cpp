@@ -76,10 +76,6 @@ namespace sound {
         constexpr uint32_t k_initial_channel_queue_size = 0x4000;
         constexpr int32_t k_infinite_loop_count = 0xFFFF;
 
-        SDL_AudioStream* As_SDL_Audio_Stream_(void* stream) {
-            return (SDL_AudioStream*)stream;
-        }
-
         void Copy_FourCC_Tag_(char* dest, const char* src) {
             memcpy(dest, src, 4);
         }
@@ -127,19 +123,19 @@ namespace sound {
             return (channel.flags & 0x0C) != 0;
         }
 
-        void Destroy_SDL_Stream_(void*& stream) {
+        void Destroy_SDL_Stream_(SDL_AudioStream*& stream) {
             if (stream != nullptr) {
-                SDL_DestroyAudioStream(As_SDL_Audio_Stream_(stream));
+                SDL_DestroyAudioStream(stream);
                 stream = nullptr;
             }
         }
 
-        bool Set_SDL_Stream_Gain_(void* stream, int32_t volume_percent) {
+        bool Set_SDL_Stream_Gain_(SDL_AudioStream* stream, int32_t volume_percent) {
             if (stream == nullptr) {
                 return false;
             }
 
-            return SDL_SetAudioStreamGain(As_SDL_Audio_Stream_(stream), (float)volume_percent / 100.0f);
+            return SDL_SetAudioStreamGain(stream, (float)volume_percent / 100.0f);
         }
 
         bool Queue_Channel_Data_(s_sound_channel& channel, uint32_t bytes_to_queue) {
@@ -147,7 +143,7 @@ namespace sound {
                 return false;
             }
 
-            if (!SDL_PutAudioStreamData(As_SDL_Audio_Stream_(channel.buffer), &channel.sample_data[channel.sample_offset], (int)bytes_to_queue)) {
+            if (!SDL_PutAudioStreamData(channel.buffer, &channel.sample_data[channel.sample_offset], (int)bytes_to_queue)) {
                 return false;
             }
 
@@ -213,7 +209,7 @@ namespace sound {
             bool queued = false;
 
             if (bytes_read != 0) {
-                queued = SDL_PutAudioStreamData(As_SDL_Audio_Stream_(_stream_data.ds_buffer), block, (int)bytes_read);
+                queued = SDL_PutAudioStreamData(_stream_data.ds_buffer, block, (int)bytes_read);
                 if (queued) {
                     _stream_data.bytes_written += bytes_read;
                 }
@@ -233,13 +229,13 @@ namespace sound {
                 return false;
             }
 
-            while (SDL_GetAudioStreamQueued(As_SDL_Audio_Stream_(_stream_data.ds_buffer)) < (int)target_queued_bytes) {
+            while (SDL_GetAudioStreamQueued(_stream_data.ds_buffer) < (int)target_queued_bytes) {
                 uint32_t bytes_remaining = _stream_data.data_remaining - _stream_data.bytes_written;
 
                 if (bytes_remaining == 0) {
                     if (_loopStream == 0) {
                         _stream_data.status &= ~0x02;
-                        SDL_FlushAudioStream(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+                        SDL_FlushAudioStream(_stream_data.ds_buffer);
                         return true;
                     }
 
@@ -256,7 +252,7 @@ namespace sound {
                     bytes_remaining = _stream_data.data_remaining;
                     if (bytes_remaining == 0) {
                         _stream_data.status &= ~0x02;
-                        SDL_FlushAudioStream(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+                        SDL_FlushAudioStream(_stream_data.ds_buffer);
                         return true;
                     }
                 }
@@ -323,7 +319,7 @@ namespace sound {
     /**
      * Opens a basic PCM playback stream using the already-initialized SDL audio backend.
      */
-    void* __cdecl Open_Playback_Stream_(uint16_t bits_per_sample, uint16_t channels, uint32_t sample_rate, int32_t volume_percent) {
+    SDL_AudioStream* __cdecl Open_Playback_Stream_(uint16_t bits_per_sample, uint16_t channels, uint32_t sample_rate, int32_t volume_percent) {
         if (_audioInitialized == 0 || channels == 0 || sample_rate == 0) {
             return nullptr;
         }
@@ -337,7 +333,7 @@ namespace sound {
             return nullptr;
         }
 
-        void* stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, nullptr, nullptr);
+        SDL_AudioStream* stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, nullptr, nullptr);
         if (stream == nullptr) {
             return nullptr;
         }
@@ -349,8 +345,8 @@ namespace sound {
             volume_percent = 100;
         }
 
-        SDL_SetAudioStreamGain(As_SDL_Audio_Stream_(stream), (float)volume_percent / 100.0f);
-        SDL_ResumeAudioStreamDevice(As_SDL_Audio_Stream_(stream));
+        SDL_SetAudioStreamGain(stream, (float)volume_percent / 100.0f);
+        SDL_ResumeAudioStreamDevice(stream);
         return stream;
     }
 
@@ -601,7 +597,7 @@ namespace sound {
                 }
 
                 _currentStreamVolume = volume_percent;
-                SDL_SetAudioStreamGain(As_SDL_Audio_Stream_(_stream_data.ds_buffer), (float)volume_percent / 100.0f);
+                SDL_SetAudioStreamGain(_stream_data.ds_buffer, (float)volume_percent / 100.0f);
             }
         }
     }
@@ -686,7 +682,7 @@ namespace sound {
         if (_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
             Stop_Sound_Timer_();
 
-            SDL_DestroyAudioStream(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+            SDL_DestroyAudioStream(_stream_data.ds_buffer);
 
             _stream_data.ds_buffer = nullptr;
             _loopStream = 0;
@@ -704,7 +700,7 @@ namespace sound {
                 return;
             }
 
-            SDL_AudioStream* stream = As_SDL_Audio_Stream_(channel.buffer);
+            SDL_AudioStream* stream = channel.buffer;
             float ratio = SDL_GetAudioStreamFrequencyRatio(stream);
             if (ratio <= 0.0f) {
                 ratio = 1.0f;
@@ -779,7 +775,7 @@ namespace sound {
         Stop_Stream_Loop_();
 
         if (_stream_data.ds_buffer != nullptr) {
-            SDL_DestroyAudioStream(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+            SDL_DestroyAudioStream(_stream_data.ds_buffer);
             _stream_data.ds_buffer = nullptr;
         }
 
@@ -820,15 +816,15 @@ namespace sound {
         }
 
         if (!Queue_Stream_Until_Target_(_stream_data.block_size * k_stream_prefill_blocks)) {
-            SDL_DestroyAudioStream(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+            SDL_DestroyAudioStream(_stream_data.ds_buffer);
             _stream_data.ds_buffer = nullptr;
             Enable_Sound_Timer_();
             return;
         }
 
         _currentStreamVolume = volume_idx;
-        SDL_SetAudioStreamGain(As_SDL_Audio_Stream_(_stream_data.ds_buffer), (float)volume_idx / 100.0f);
-        SDL_ResumeAudioStreamDevice(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+        SDL_SetAudioStreamGain(_stream_data.ds_buffer, (float)volume_idx / 100.0f);
+        SDL_ResumeAudioStreamDevice(_stream_data.ds_buffer);
 
         _audioPlaybackActive = 1;
         Enable_Sound_Timer_();
@@ -887,7 +883,7 @@ namespace sound {
             return;
         }
 
-        int queued = SDL_GetAudioStreamQueued(As_SDL_Audio_Stream_(channel->buffer));
+        int queued = SDL_GetAudioStreamQueued(channel->buffer);
         if (queued < 0 || queued >= (int)k_channel_stream_chunk_size) {
             return;
         }
@@ -897,7 +893,7 @@ namespace sound {
             if (remaining == 0) {
                 if (!Restart_Channel_Loop_(*channel)) {
                     channel->flags &= ~0x02;
-                    SDL_FlushAudioStream(As_SDL_Audio_Stream_(channel->buffer));
+                    SDL_FlushAudioStream(channel->buffer);
                     break;
                 }
                 remaining = channel->sample_size;
@@ -914,10 +910,10 @@ namespace sound {
 
             if (channel->sample_offset >= channel->sample_size && !Channel_Loop_Enabled_(*channel)) {
                 channel->flags &= ~0x02;
-                SDL_FlushAudioStream(As_SDL_Audio_Stream_(channel->buffer));
+                SDL_FlushAudioStream(channel->buffer);
             }
 
-            queued = SDL_GetAudioStreamQueued(As_SDL_Audio_Stream_(channel->buffer));
+            queued = SDL_GetAudioStreamQueued(channel->buffer);
         }
 
         if (channel->sample_size <= channel->sample_offset) {
@@ -1067,11 +1063,11 @@ namespace sound {
         _soundChannels[channel_idx].flags |= 0x1;
 
         if (_soundChannels[channel_idx].sample_offset >= _soundChannels[channel_idx].sample_size && !Channel_Loop_Enabled_(_soundChannels[channel_idx])) {
-            SDL_FlushAudioStream(As_SDL_Audio_Stream_(_soundChannels[channel_idx].buffer));
+            SDL_FlushAudioStream(_soundChannels[channel_idx].buffer);
         }
 
-        SDL_SetAudioStreamFrequencyRatio(As_SDL_Audio_Stream_(_soundChannels[channel_idx].buffer), 1.0f);
-        SDL_ResumeAudioStreamDevice(As_SDL_Audio_Stream_(_soundChannels[channel_idx].buffer));
+        SDL_SetAudioStreamFrequencyRatio(_soundChannels[channel_idx].buffer, 1.0f);
+        SDL_ResumeAudioStreamDevice(_soundChannels[channel_idx].buffer);
 
         Resume_Timer2_();
 
@@ -1096,7 +1092,7 @@ namespace sound {
                 return i;
             }
 
-            if (SDL_GetAudioStreamQueued(As_SDL_Audio_Stream_(channel.buffer)) == 0) {
+            if (SDL_GetAudioStreamQueued(channel.buffer) == 0) {
                 if (!(channel.flags & 1)) {
                     return i;
                 }
@@ -1166,7 +1162,7 @@ namespace sound {
             return;
         }
 
-        int queued = SDL_GetAudioStreamQueued(As_SDL_Audio_Stream_(channel.buffer));
+        int queued = SDL_GetAudioStreamQueued(channel.buffer);
         if (queued > 0) {
             return;
         }
@@ -1180,10 +1176,10 @@ namespace sound {
             }
         } else {
             if (Restart_Channel_Loop_(channel)) {
-                SDL_ClearAudioStream(As_SDL_Audio_Stream_(channel.buffer));
+                SDL_ClearAudioStream(channel.buffer);
                 if (Queue_Channel_Data_(channel, channel.sample_size)) {
-                    SDL_FlushAudioStream(As_SDL_Audio_Stream_(channel.buffer));
-                    SDL_ResumeAudioStreamDevice(As_SDL_Audio_Stream_(channel.buffer));
+                    SDL_FlushAudioStream(channel.buffer);
+                    SDL_ResumeAudioStreamDevice(channel.buffer);
                 }
             } else {
                 channel.flags ^= 0x1; // Deactivate active flag
@@ -1355,17 +1351,17 @@ namespace sound {
             return;
         }
 
-        if (SDL_GetAudioStreamQueued(As_SDL_Audio_Stream_(_stream_data.ds_buffer)) == 0) {
+        if (SDL_GetAudioStreamQueued(_stream_data.ds_buffer) == 0) {
             _stream_data.status ^= 1;
-            SDL_PauseAudioStreamDevice(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+            SDL_PauseAudioStreamDevice(_stream_data.ds_buffer);
             _audioPlaybackActive = 0;
         }
     }
 
     void __cdecl Stop_Stream_Loop_() {
         if (_stream_data.ds_buffer != nullptr) {
-            SDL_ClearAudioStream(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
-            SDL_PauseAudioStreamDevice(As_SDL_Audio_Stream_(_stream_data.ds_buffer));
+            SDL_ClearAudioStream(_stream_data.ds_buffer);
+            SDL_PauseAudioStreamDevice(_stream_data.ds_buffer);
         }
 
         _loopStream = 0;
