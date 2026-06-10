@@ -1,8 +1,6 @@
 #pragma once
 
 namespace sound {
-    void* __cdecl Get_Native_Sound_Device_();
-
     /**
      * Drives periodic sound and stream maintenance from the multimedia timer.
      * @param timer_id Multimedia timer identifier.

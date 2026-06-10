@@ -4,8 +4,6 @@ namespace smckplay {
     extern s_smack_video* _smk;
     extern uint32_t _lastkey;
 
-    extern "C" __declspec(dllimport) void __stdcall _SmackSoundUseDirectSound(void* native_sound_device);
-
     extern "C" __declspec(dllimport) s_smack_video* __stdcall _SmackOpen(char* path, uint32_t flags, int32_t priority);
 
     extern "C" __declspec(dllimport) int32_t __stdcall _SmackWait(s_smack_video* smk);

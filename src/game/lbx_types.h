@@ -20,7 +20,7 @@ struct s_wave_stream_header {
     uint16_t entry_count;
     uint16_t magic;
     uint32_t header_data;
-    void* file;
+    FILE* file;
     uint32_t first_offset;
     s_lbx_stream_entry entries[509];
     uint32_t padding;

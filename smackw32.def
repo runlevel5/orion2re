@@ -1,7 +1,6 @@
 LIBRARY SMACKW32.DLL
 
 EXPORTS
-    _SmackSoundUseDirectSound@4
     _SmackNextFrame@4
     _SmackToBufferRect@8
     _SmackDoFrame@4

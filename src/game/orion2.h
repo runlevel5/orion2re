@@ -4552,10 +4552,6 @@ struct s_smack_video {
     uint32_t rect_height;
 };
 
-typedef struct IDirectSoundBuffer IDirectSoundBuffer, *PIDirectSoundBuffer;
-
-typedef struct IDirectSoundBuffer *LPDIRECTSOUNDBUFFER;
-
 typedef long HRESULT;
 
 
@@ -4569,37 +4565,12 @@ typedef ulong DWORD;
 
 typedef DWORD ULONG;
 
-typedef struct _DSBCAPS _DSBCAPS, *P_DSBCAPS;
-
-typedef struct _DSBCAPS *LPDSBCAPS;
-
 typedef DWORD *LPDWORD;
-
-typedef struct tWAVEFORMATEX tWAVEFORMATEX, *PtWAVEFORMATEX;
-
-typedef struct tWAVEFORMATEX *LPWAVEFORMATEX;
-
-typedef long *LPLONG;
-
-typedef struct IDirectSound IDirectSound, *PIDirectSound;
-
-typedef struct IDirectSound *LPDIRECTSOUND;
-
-typedef struct _DSBUFFERDESC _DSBUFFERDESC, *P_DSBUFFERDESC;
-
-typedef struct _DSBUFFERDESC DSBUFFERDESC;
-
-
-typedef struct tWAVEFORMATEX WAVEFORMATEX;
 
 
 typedef long LONG;
 
 typedef uint16_t WORD;
-
-typedef struct IUnknown IUnknown, *PIUnknown;
-
-typedef struct IUnknown *LPUNKNOWN;
 
 typedef struct HWND__ HWND__, *PHWND__;
 
@@ -4945,10 +4916,6 @@ struct s_unit_data {
     undefined field7_0xa;
     undefined field8_0xb;
 };
-
-typedef struct HMMIO__ HMMIO__, *PHMMIO__;
-
-typedef struct HMMIO__ *HMMIO;
 
 typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;
 

@@ -6,7 +6,9 @@ namespace smckplay {
 
     int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char mode, uint32_t options) {
         char path_buffer[100];
-        _SmackSoundUseDirectSound(sound::Get_Native_Sound_Device_());
+
+        // The SDL audio migration no longer routes Smacker playback through DirectSound.
+        // Cinematics continue to open and render even if Smacker-managed audio is absent.
 
         ::strcpy(path_buffer, file_name);
 

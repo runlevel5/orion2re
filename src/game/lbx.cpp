@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include <mmsystem.h>
-
 namespace sound {
     extern uint8_t _close_stream;
     extern uint8_t _musicActive;
@@ -64,20 +62,19 @@ namespace lbx {
         uint8_t was_music_active = sound::_musicActive;
 
         if (stream->file != nullptr && sound::_close_stream == 0) {
-            mmioClose((HMMIO)stream->file, 0);
+            fclose(stream->file);
         }
 
         memset(stream, 0, sizeof(s_wave_stream_header));
 
-        LPSTR mmio_filename = (LPSTR)filename;
-        stream->file = mmioOpenA(mmio_filename, nullptr, MMIO_READ | MMIO_ALLOCBUF);
+        stream->file = fopen(filename, "rb");
 
         if (stream->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char full_path[sizeof(stream->filename)];
                 strcpy(full_path, farload::_secondary_drive_path);
                 strcat(full_path, filename);
-                stream->file = mmioOpenA(full_path, nullptr, MMIO_READ | MMIO_ALLOCBUF);
+                stream->file = fopen(full_path, "rb");
             }
             if (stream->file == nullptr) {
                 sound::_musicActive = 0;
@@ -85,17 +82,17 @@ namespace lbx {
             }
         }
 
-        mmioRead((HMMIO)stream->file, (char*)stream, sizeof(stream->entry_count) + sizeof(stream->magic) + sizeof(stream->header_data));
+        fread(stream, sizeof(stream->entry_count) + sizeof(stream->magic) + sizeof(stream->header_data), 1, stream->file);
 
         if (stream->magic != 0xFEAD) {
-            mmioClose((HMMIO)stream->file, 0);
+            fclose(stream->file);
             stream->file = nullptr;
             sound::_musicActive = 0;
             return;
         }
 
         uint32_t* raw_offsets = &stream->entries[254].offset;
-        mmioRead((HMMIO)stream->file, (char*)raw_offsets, sizeof(*raw_offsets) * 510);
+        fread(raw_offsets, sizeof(*raw_offsets), 510, stream->file);
 
         stream->first_offset = raw_offsets[0];
 

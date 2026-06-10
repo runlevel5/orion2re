@@ -5,13 +5,15 @@ struct s_sound_channel {
     int8_t loop_count;
     undefined field2_0x5;
     int8_t volume_index;
+    int32_t current_volume;
     uint32_t sample_size;
+    uint32_t sample_rate;
     uint32_t sample_offset;
     uint32_t ds_buffer_size;
     uint32_t field7_0x13;
     uint32_t write_cursor;
     uint8_t flags;
-    LPDIRECTSOUNDBUFFER buffer;
+    void* buffer;
 };
 
 struct s_sound_index {
@@ -48,7 +50,7 @@ struct s_sound_stream {
     uint32_t field20_0x3f;
     uint32_t write_cursor;
     uint8_t status;
-    LPDIRECTSOUNDBUFFER ds_buffer;
+    void* ds_buffer;
     uint32_t ds_buffer_size;
     uint32_t block_size;
 };

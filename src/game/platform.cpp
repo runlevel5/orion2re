@@ -610,7 +610,6 @@ namespace platform {
             Destroy_Present_Backend_();
             SDL_DestroyWindow(g_sdl_window);
             g_sdl_window = nullptr;
-            g_main_window = nullptr;
         }
     }
 
@@ -786,12 +785,6 @@ namespace platform {
             SDL_Quit();
             return 0;
         }
-
-        SDL_PropertiesID window_props = SDL_GetWindowProperties(g_sdl_window);
-        g_main_window = (HWND)SDL_GetPointerProperty(
-            window_props,
-            SDL_PROP_WINDOW_WIN32_HWND_POINTER,
-            nullptr);
 
         SDL_HideCursor();
 

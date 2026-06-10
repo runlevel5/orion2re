@@ -154,8 +154,6 @@ if(MSVC)
         target_link_libraries(orion2re PRIVATE
             "${ORION2RE_IMPORT_LIB_DIR}/smackw32.lib"
             "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            winmm
-            dsound
             SDL3::SDL3-static
         )
 
