@@ -319,6 +319,10 @@ namespace platform {
 				return false;
 			}
 
+			// Match the original frame-present cadence more closely by blocking on
+			// display refresh when the active renderer backend supports it.
+			(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+
 			g_sdl_present_texture = SDL_CreateTexture(
 				g_sdl_renderer,
 				SDL_PIXELFORMAT_ARGB8888,

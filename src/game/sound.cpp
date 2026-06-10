@@ -1,6 +1,40 @@
 #include "pch.h"
 
+#include <dsound.h>
+#include <mmsystem.h>
+
 namespace sound {
+    extern "C" HRESULT WINAPI DirectSoundCreate(LPCGUID pcGuidDevice, struct IDirectSound** ppDS, IUnknown* pUnkOuter);
+
+    constexpr size_t k_stream_filename_capacity = 260;
+
+    void __cdecl Copy_FourCC_(char* dest, const char* src);
+    void __cdecl Stop_Sound_Timer_And_Wait2_();
+    void __cdecl Merge_Free_Blocks_();
+    int32_t __cdecl Get_Free_Sound_Index_();
+    bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header);
+    void __cdecl Reset_Sound_Channel_(int8_t channel_idx);
+    void __cdecl Resume_Timer2_();
+    void __cdecl Update_Sound_Channels_();
+    void __cdecl Refill_Sound_Channel_Buffer_(int32_t channel_idx);
+    void __cdecl Update_Sound_Channel_Status_(int32_t channel_idx);
+    void __cdecl Update_Stream_Status_();
+    void __cdecl Adjust_Settings_();
+    void __cdecl Audio_Clear_Cache_();
+    void __cdecl Stop_Sound_Timer_();
+    void __cdecl Enable_Sound_Timer_();
+    int8_t __cdecl Load_Stream_Wave_Header_(int32_t entry_index, s_sound_stream* stream);
+    uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr);
+    void __cdecl Set_Channel_Volume_(int32_t channel, int32_t volume);
+    void __cdecl Set_Master_Volume_(int32_t volume);
+    void __cdecl Remove_Sound_Instance_(int32_t instance_id);
+    int32_t __cdecl Get_Channel_Volume_Level_(int32_t channel_idx);
+    int8_t __cdecl Find_Free_Channel_();
+    void __cdecl Merge_Free_Sound_Blocks_();
+    int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t wave_data_size);
+    void* __cdecl Allocate_Sound_Block_(int8_t channel_idx, int32_t resource_id, int32_t size);
+    void __cdecl Stop_Stream_Loop_();
+
     int16_t _ds_volume_table[101] = {
         -10000, -10000, -10000, -10000, -9287, -8643, -8117, -7673, -7287, -6947,
         -6643, -6368, -6117, -5886, -5673, -5473, -5287, -5112, -4947, -4791,
@@ -49,7 +83,7 @@ namespace sound {
     uint8_t _close_stream = 1;
     uint8_t _musicActive;
     s_sound_stream _stream_data;
-    char _currentStreamFilename[MAX_PATH] = "stream.lbx";
+    char _currentStreamFilename[k_stream_filename_capacity] = "stream.lbx";
     int32_t _currentStreamId;
     uint8_t _streamReadErrorLogged;
 
@@ -61,9 +95,12 @@ namespace sound {
             vsnprintf(message, sizeof(message), format, args);
             va_end(args);
 
-            OutputDebugStringA(message);
-            OutputDebugStringA("\n");
+            SDL_Log("%s", message);
         }
+    }
+
+    void* __cdecl Get_Native_Sound_Device_() {
+        return _dsound;
     }
 
     /**
@@ -196,22 +233,22 @@ namespace sound {
         header->data_ptr = (uint8_t*)src_data + 0x2c;
 
         sound::Copy_FourCC_(tag_buf, header->riff_tag);
-        if (_strcmpi(tag_buf, "RIFF") != 0) {
+        if (cstrcmpi(tag_buf, "RIFF") != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->wave_tag);
-        if (_strcmpi(tag_buf, "WAVE") != 0) {
+        if (cstrcmpi(tag_buf, "WAVE") != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->fmt_tag);
-        if (_strcmpi(tag_buf, "fmt ") != 0) {
+        if (cstrcmpi(tag_buf, "fmt ") != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->data_tag);
-        return _strcmpi(tag_buf, "data") == 0;
+        return cstrcmpi(tag_buf, "data") == 0;
     }
 
     /**
@@ -544,39 +581,39 @@ namespace sound {
 
         uint32_t entry_offset = _streamLbxHandle.entries[entry_index - 1].offset;
 
-        mmioSeek(_streamLbxHandle.file, entry_offset, 0);
+        mmioSeek((HMMIO)_streamLbxHandle.file, entry_offset, 0);
 
         char tag_buffer[5];
         tag_buffer[4] = '\0';
 
-        mmioRead(_streamLbxHandle.file, (HPSTR)stream->riff_tag, 0x30);
+        mmioRead((HMMIO)_streamLbxHandle.file, (HPSTR)stream->riff_tag, 0x30);
         stream->data_start_offset = entry_offset + 0x2c;
 
         sound::Copy_FourCC_(tag_buffer, stream->riff_tag);
-        if (_strcmpi(tag_buffer, "RIFF") != 0) {
+        if (cstrcmpi(tag_buffer, "RIFF") != 0) {
             Debug_Log_Stream_Message_("stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->wave_tag);
-        if (_strcmpi(tag_buffer, "WAVE") != 0) {
+        if (cstrcmpi(tag_buffer, "WAVE") != 0) {
             Debug_Log_Stream_Message_("stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->fmt_tag);
-        if (_strcmpi(tag_buffer, "fmt ") != 0) {
+        if (cstrcmpi(tag_buffer, "fmt ") != 0) {
             Debug_Log_Stream_Message_("stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->data_tag);
-        if (_strcmpi(tag_buffer, "data") != 0) {
+        if (cstrcmpi(tag_buffer, "data") != 0) {
             Debug_Log_Stream_Message_("stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
-        mmioSeek(_streamLbxHandle.file, stream->data_start_offset, 0);
+        mmioSeek((HMMIO)_streamLbxHandle.file, stream->data_start_offset, 0);
 
         return 1;
     }
@@ -697,7 +734,7 @@ namespace sound {
 
     uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr) {
         MMIOINFO mmio_info;
-        MMRESULT res = mmioGetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
+        MMRESULT res = mmioGetInfo((HMMIO)sound::_streamLbxHandle.file, &mmio_info, 0);
 
         uint32_t status = (res == 0) ? 0 : 1;
         uint32_t total_copied = 0;
@@ -708,7 +745,7 @@ namespace sound {
             if (bytes_to_read != 0) {
                 while (total_copied < bytes_to_read) {
                     if (mmio_info.pchNext == mmio_info.pchEndRead) {
-                        status = mmioAdvance(sound::_streamLbxHandle.file, &mmio_info, 0);
+                        status = mmioAdvance((HMMIO)sound::_streamLbxHandle.file, &mmio_info, 0);
                         if (status != 0) {
                             error_occurred = true;
                             break;
@@ -732,7 +769,7 @@ namespace sound {
             }
 
             if (!error_occurred) {
-                status = mmioSetInfo(sound::_streamLbxHandle.file, &mmio_info, 0);
+                status = mmioSetInfo((HMMIO)sound::_streamLbxHandle.file, &mmio_info, 0);
                 if (status == 0) {
                     *bytes_read_ptr = bytes_to_read;
                     return 0;

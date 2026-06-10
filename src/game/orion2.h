@@ -2372,28 +2372,6 @@ struct s_lbx_header {
     uint32_t offsets[510];
 };
 
-typedef struct s_lbx_stream_entry s_lbx_stream_entry, *Ps_lbx_stream_entry;
-
-struct s_lbx_stream_entry {
-    uint32_t size;
-    uint32_t offset;
-};
-
-typedef struct s_lbx_stream_header s_lbx_stream_header, *Ps_lbx_stream_header;
-
-
-
-struct s_lbx_stream_header {
-    uint16_t entry_count;
-    uint16_t magic;
-    uint32_t header_data;
-    FILE *file;
-    uint32_t first_offset;
-    struct s_lbx_stream_entry entries[509];
-    uint32_t padding;
-    char filename[80];
-};
-
 struct _iobuf_copy {
     char *_ptr;
     int32_t _cnt;
@@ -4574,13 +4552,9 @@ struct s_smack_video {
     uint32_t rect_height;
 };
 
-typedef struct s_sound_channel s_sound_channel, *Ps_sound_channel;
-
 typedef struct IDirectSoundBuffer IDirectSoundBuffer, *PIDirectSoundBuffer;
 
 typedef struct IDirectSoundBuffer *LPDIRECTSOUNDBUFFER;
-
-typedef struct IDirectSoundBufferVtbl IDirectSoundBufferVtbl, *PIDirectSoundBufferVtbl;
 
 typedef long HRESULT;
 
@@ -4623,212 +4597,13 @@ typedef long LONG;
 
 typedef uint16_t WORD;
 
-typedef struct IDirectSoundVtbl IDirectSoundVtbl, *PIDirectSoundVtbl;
-
 typedef struct IUnknown IUnknown, *PIUnknown;
 
 typedef struct IUnknown *LPUNKNOWN;
 
-typedef struct _DSCAPS _DSCAPS, *P_DSCAPS;
-
-typedef struct _DSCAPS *LPDSCAPS;
-
 typedef struct HWND__ HWND__, *PHWND__;
 
 typedef struct HWND__ *HWND;
-
-
-typedef struct IUnknownVtbl IUnknownVtbl, *PIUnknownVtbl;
-
-struct tWAVEFORMATEX_copy {
-    WORD wFormatTag;
-    WORD nChannels;
-    DWORD nSamplesPerSec;
-    DWORD nAvgBytesPerSec;
-    WORD nBlockAlign;
-    WORD wBitsPerSample;
-    WORD cbSize;
-};
-
-struct IDirectSound_copy {
-    struct IDirectSoundVtbl *lpVtbl;
-};
-
-struct IDirectSoundBufferVtbl {
-    HRESULT (*QueryInterface)(struct IDirectSoundBuffer *, IID *, LPVOID *);
-    ULONG (*AddRef)(struct IDirectSoundBuffer *);
-    ULONG (*Release)(struct IDirectSoundBuffer *);
-    HRESULT (*GetCaps)(struct IDirectSoundBuffer *, LPDSBCAPS);
-    HRESULT (*GetCurrentPosition)(struct IDirectSoundBuffer *, LPDWORD, LPDWORD);
-    HRESULT (*GetFormat)(struct IDirectSoundBuffer *, LPWAVEFORMATEX, DWORD, LPDWORD);
-    HRESULT (*GetVolume)(struct IDirectSoundBuffer *, LPLONG);
-    HRESULT (*GetPan)(struct IDirectSoundBuffer *, LPLONG);
-    HRESULT (*GetFrequency)(struct IDirectSoundBuffer *, LPDWORD);
-    HRESULT (*GetStatus)(struct IDirectSoundBuffer *, LPDWORD);
-    HRESULT (*Initialize)(struct IDirectSoundBuffer *, LPDIRECTSOUND, LPCDSBUFFERDESC);
-    HRESULT (*Lock)(struct IDirectSoundBuffer *, DWORD, DWORD, LPVOID *, LPDWORD, LPVOID *, LPDWORD, DWORD);
-    HRESULT (*Play)(struct IDirectSoundBuffer *, DWORD, DWORD, DWORD);
-    HRESULT (*SetCurrentPosition)(struct IDirectSoundBuffer *, DWORD);
-    HRESULT (*SetFormat)(struct IDirectSoundBuffer *, LPCWAVEFORMATEX);
-    HRESULT (*SetVolume)(struct IDirectSoundBuffer *, LONG);
-    HRESULT (*SetPan)(struct IDirectSoundBuffer *, LONG);
-    HRESULT (*SetFrequency)(struct IDirectSoundBuffer *, DWORD);
-    HRESULT (*Stop)(struct IDirectSoundBuffer *);
-    HRESULT (*Unlock)(struct IDirectSoundBuffer *, LPVOID, DWORD, LPVOID, DWORD);
-    HRESULT (*Restore)(struct IDirectSoundBuffer *);
-};
-
-struct IDirectSoundBuffer_copy {
-    struct IDirectSoundBufferVtbl *lpVtbl;
-};
-
-struct _DSCAPS_copy {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwMinSecondarySampleRate;
-    DWORD dwMaxSecondarySampleRate;
-    DWORD dwPrimaryBuffers;
-    DWORD dwMaxHwMixingAllBuffers;
-    DWORD dwMaxHwMixingStaticBuffers;
-    DWORD dwMaxHwMixingStreamingBuffers;
-    DWORD dwFreeHwMixingAllBuffers;
-    DWORD dwFreeHwMixingStaticBuffers;
-    DWORD dwFreeHwMixingStreamingBuffers;
-    DWORD dwMaxHw3DAllBuffers;
-    DWORD dwMaxHw3DStaticBuffers;
-    DWORD dwMaxHw3DStreamingBuffers;
-    DWORD dwFreeHw3DAllBuffers;
-    DWORD dwFreeHw3DStaticBuffers;
-    DWORD dwFreeHw3DStreamingBuffers;
-    DWORD dwTotalHwMemBytes;
-    DWORD dwFreeHwMemBytes;
-    DWORD dwMaxContigFreeHwMemBytes;
-    DWORD dwUnlockTransferRateHwBuffers;
-    DWORD dwPlayCpuOverheadSwBuffers;
-    DWORD dwReserved1;
-    DWORD dwReserved2;
-};
-
-struct s_sound_channel {
-    uint8_t *sample_data;
-    int8_t loop_count;
-    undefined field2_0x5;
-    int8_t volume_index;
-    uint32_t sample_size;
-    uint32_t sample_offset;
-    uint32_t ds_buffer_size;
-    uint32_t field7_0x13;
-    uint32_t write_cursor;
-    uint8_t flags;
-    LPDIRECTSOUNDBUFFER buffer;
-};
-
-struct _DSBCAPS_copy {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwBufferBytes;
-    DWORD dwUnlockTransferRate;
-    DWORD dwPlayCpuOverhead;
-};
-
-struct HWND__copy {
-    int32_t unused;
-};
-
-struct IDirectSoundVtbl {
-    HRESULT (*QueryInterface)(struct IDirectSound *, IID *, LPVOID *);
-    ULONG (*AddRef)(struct IDirectSound *);
-    ULONG (*Release)(struct IDirectSound *);
-    HRESULT (*CreateSoundBuffer)(struct IDirectSound *, LPCDSBUFFERDESC, LPDIRECTSOUNDBUFFER *, LPUNKNOWN);
-    HRESULT (*GetCaps)(struct IDirectSound *, LPDSCAPS);
-    HRESULT (*DuplicateSoundBuffer)(struct IDirectSound *, LPDIRECTSOUNDBUFFER, LPDIRECTSOUNDBUFFER *);
-    HRESULT (*SetCooperativeLevel)(struct IDirectSound *, HWND, DWORD);
-    HRESULT (*Compact)(struct IDirectSound *);
-    HRESULT (*GetSpeakerConfig)(struct IDirectSound *, LPDWORD);
-    HRESULT (*SetSpeakerConfig)(struct IDirectSound *, DWORD);
-    HRESULT (*Initialize)(struct IDirectSound *, LPCGUID);
-};
-
-struct IUnknownVtbl {
-    HRESULT (*QueryInterface)(struct IUnknown *, IID *, void **);
-    ULONG (*AddRef)(struct IUnknown *);
-    ULONG (*Release)(struct IUnknown *);
-};
-
-struct IUnknown_copy {
-    struct IUnknownVtbl *lpVtbl;
-};
-
-struct _DSBUFFERDESC_copy {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwBufferBytes;
-    DWORD dwReserved;
-    LPWAVEFORMATEX lpwfxFormat;
-    GUID guid3DAlgorithm;
-};
-
-typedef struct s_sound_index s_sound_index, *Ps_sound_index;
-
-struct s_sound_index {
-    uint32_t buffer_offset;
-    uint32_t buffer_size;
-    int32_t num_active_channels;
-    uint8_t active_channel_ids[16];
-    int32_t resource_id;
-    int32_t next_id;
-    int32_t prev_id;
-};
-
-typedef struct s_sound_stream s_sound_stream, *Ps_sound_stream;
-
-struct s_sound_stream {
-    char riff_tag[4];
-    uint32_t riff_size;
-    char wave_tag[4];
-    char fmt_tag[4];
-    uint32_t fmt_size;
-    uint16_t format_tag;
-    uint16_t channels;
-    uint32_t samples_per_sec;
-    uint32_t avg_bytes_per_sec;
-    uint16_t block_align;
-    uint16_t bits_per_sample;
-    char data_tag[4];
-    uint32_t total_data_size;
-    uint32_t data_start_offset;
-    undefined field14_0x30;
-    undefined field15_0x31;
-    undefined field16_0x32;
-    uint32_t data_remaining;
-    uint32_t bytes_written;
-    uint32_t last_lock_size;
-    uint32_t field20_0x3f;
-    uint32_t write_cursor;
-    uint8_t status;
-    LPDIRECTSOUNDBUFFER ds_buffer;
-    uint32_t ds_buffer_size;
-    uint32_t block_size;
-};
-
-typedef struct s_sound_wav_header s_sound_wav_header, *Ps_sound_wav_header;
-
-struct s_sound_wav_header {
-    char riff_tag[4];
-    uint32_t chunk_size;
-    char wave_tag[4];
-    char fmt_tag[4];
-    uint32_t fmt_size;
-    uint16_t audio_format;
-    uint16_t num_channels;
-    uint32_t sample_rate;
-    uint32_t byte_rate;
-    uint16_t block_align;
-    uint16_t bits_per_sample;
-    char data_tag[4];
-    uint32_t data_size;
-    void *data_ptr;
-};
 
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
@@ -5171,26 +4946,9 @@ struct s_unit_data {
     undefined field8_0xb;
 };
 
-typedef struct s_wave_stream_header s_wave_stream_header, *Ps_wave_stream_header;
-
 typedef struct HMMIO__ HMMIO__, *PHMMIO__;
 
 typedef struct HMMIO__ *HMMIO;
-
-struct s_wave_stream_header {
-    uint16_t entry_count;
-    uint16_t magic;
-    uint32_t header_data;
-    HMMIO file;
-    uint32_t first_offset;
-    struct s_lbx_stream_entry entries[509];
-    uint32_t padding;
-    char filename[80];
-};
-
-struct HMMIO__copy {
-    int32_t unused;
-};
 
 typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;
 

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Windows.h>
-#include <dsound.h>
-#include <mmsystem.h>
 #include <time.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -17,6 +15,8 @@
 
 #include <SDL3/SDL.h>
 
+#include "compat.h"
+
 #include "../dplay.h"
 
 #include "consts.h"
@@ -26,6 +26,9 @@
 #include "orion2_consts.h"
 #include "orion2_str.h"
 #pragma pack(pop)
+
+#include "lbx_types.h"
+#include "sound_types.h"
 
 #include "random.h"
 #include "platform.h"

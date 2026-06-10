@@ -6,9 +6,7 @@ namespace smckplay {
 
     int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char mode, uint32_t options) {
         char path_buffer[100];
-        IDirectSound* direct_sound = sound::_dsound;
-
-        _SmackSoundUseDirectSound(direct_sound);
+        _SmackSoundUseDirectSound(sound::Get_Native_Sound_Device_());
 
         ::strcpy(path_buffer, file_name);
 

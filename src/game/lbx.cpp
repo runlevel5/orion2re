@@ -1,5 +1,12 @@
 #include "pch.h"
 
+#include <mmsystem.h>
+
+namespace sound {
+    extern uint8_t _close_stream;
+    extern uint8_t _musicActive;
+}
+
 namespace lbx {
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename) {
         memset(header, 0, sizeof(s_lbx_stream_header));
@@ -57,7 +64,7 @@ namespace lbx {
         uint8_t was_music_active = sound::_musicActive;
 
         if (stream->file != nullptr && sound::_close_stream == 0) {
-            mmioClose(stream->file, 0);
+            mmioClose((HMMIO)stream->file, 0);
         }
 
         memset(stream, 0, sizeof(s_wave_stream_header));
@@ -78,17 +85,17 @@ namespace lbx {
             }
         }
 
-        mmioRead(stream->file, (char*)stream, sizeof(stream->entry_count) + sizeof(stream->magic) + sizeof(stream->header_data));
+        mmioRead((HMMIO)stream->file, (char*)stream, sizeof(stream->entry_count) + sizeof(stream->magic) + sizeof(stream->header_data));
 
         if (stream->magic != 0xFEAD) {
-            mmioClose(stream->file, 0);
+            mmioClose((HMMIO)stream->file, 0);
             stream->file = nullptr;
             sound::_musicActive = 0;
             return;
         }
 
         uint32_t* raw_offsets = &stream->entries[254].offset;
-        mmioRead(stream->file, (char*)raw_offsets, sizeof(*raw_offsets) * 510);
+        mmioRead((HMMIO)stream->file, (char*)raw_offsets, sizeof(*raw_offsets) * 510);
 
         stream->first_offset = raw_offsets[0];
 
