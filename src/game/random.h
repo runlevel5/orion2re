@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace random {
+namespace game_random {
     extern uint32_t _random_seed;
     extern uint32_t _saved_random_seed;
 

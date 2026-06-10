@@ -436,7 +436,7 @@ namespace maintain {
                                 best_building = building_idx;
                             } else if (worth == min_worth) {
                                 candidates_count++;
-                                if (random::Random_((uint32_t)candidates_count) == 1) {
+                                if (game_random::Random_((uint32_t)candidates_count) == 1) {
                                     best_colony = col;
                                     best_building = building_idx;
                                 }

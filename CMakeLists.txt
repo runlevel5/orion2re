@@ -90,6 +90,10 @@ target_compile_definitions(orion2re PRIVATE
     ORION2RE_ENABLE_NETWORKING=$<BOOL:${ORION2RE_ENABLE_NETWORKING}>
 )
 
+target_link_libraries(orion2re PRIVATE
+    SDL3::SDL3-static
+)
+
 if(WIN32)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
 endif()
@@ -155,11 +159,6 @@ if(MSVC)
 
             target_link_libraries(orion2re PRIVATE
                 "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-                SDL3::SDL3-static
-            )
-        else()
-            target_link_libraries(orion2re PRIVATE
-                SDL3::SDL3-static
             )
         endif()
 

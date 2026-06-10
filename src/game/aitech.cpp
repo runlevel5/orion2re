@@ -208,7 +208,7 @@ namespace aitech {
                         int value = has_contact ? best_shield_delta * 3 : best_shield_delta;
                         plr_info->best_shield_delta += (int8_t)value;
                     } else if (best_shield_delta == 0) {
-                        int value = random::Random_(2) - 1;
+                        int value = game_random::Random_(2) - 1;
                         plr_info->best_shield_delta += (int8_t)value;
                     }
 
@@ -217,7 +217,7 @@ namespace aitech {
                         int value = has_contact ? best_armor_delta * 3 : best_armor_delta;
                         plr_info->armor_delta += (int8_t)value;
                     } else if (best_armor_delta == 0) {
-                        int value = random::Random_(2) - 1;
+                        int value = game_random::Random_(2) - 1;
                         plr_info->armor_delta += (int8_t)value;
                     }
 
@@ -226,7 +226,7 @@ namespace aitech {
                         int value = has_contact ? best_computer_delta * 3 : best_computer_delta;
                         plr_info->best_computer_delta += (int8_t)value;
                     } else if (best_computer_delta == 0) {
-                        int value = random::Random_(2) - 1;
+                        int value = game_random::Random_(2) - 1;
                         plr_info->best_computer_delta += (int8_t)value;
                     }
 
@@ -240,7 +240,7 @@ namespace aitech {
                         int value = has_contact ? best_weapon1_delta * 3 : best_weapon1_delta;
                         plr_info->best_weapon1_delta += (int8_t)value;
                     } else if (best_weapon1_delta == 0) {
-                        int value = random::Random_(2) - 1;
+                        int value = game_random::Random_(2) - 1;
                         plr_info->best_weapon1_delta += (int8_t)value;
                     }
 
@@ -249,7 +249,7 @@ namespace aitech {
                         int value = has_contact ? best_weapon2_delta * 3 : best_weapon2_delta;
                         plr_info->best_weapon2_delta += (int8_t)value;
                     } else if (best_weapon2_delta == 0) {
-                        int value = random::Random_(2) - 1;
+                        int value = game_random::Random_(2) - 1;
                         plr_info->best_weapon2_delta += (int8_t)value;
                     }
 

@@ -162,7 +162,7 @@ namespace spy {
                     }
 
                     if (chance != 0) {
-                        if ((int16_t)random::Random_(100) <= chance) {
+                        if ((int16_t)game_random::Random_(100) <= chance) {
                             spy::Leader_Assassinates_(leader);
                         }
                     }
@@ -224,24 +224,24 @@ namespace spy {
             if ((*AIDATA::_ai_player_info)[player_idx].n_contacts > 0 && MOX::_stardate > 35030) {
                 if (MOX::_settings.game_difficulty == 4) {
                     if (player->objectives != 0) {
-                        random::Random_(8);
+                        game_random::Random_(8);
                     }
                     if (player->traits[9] > 0) {
-                        random::Random_(5);
+                        game_random::Random_(5);
                     }
                     total_spies = 1;
                 } else if (MOX::_settings.game_difficulty == 3) {
-                    if (player->objectives == 0 && random::Random_(7) == 1) {
+                    if (player->objectives == 0 && game_random::Random_(7) == 1) {
                         total_spies = 1;
-                    } else if (random::Random_(25) == 1) {
+                    } else if (game_random::Random_(25) == 1) {
                         total_spies = 1;
-                    } else if (player->traits[9] > 0 && random::Random_(6) == 1) {
+                    } else if (player->traits[9] > 0 && game_random::Random_(6) == 1) {
                         total_spies = 1;
                     }
                 } else if (MOX::_settings.game_difficulty == 2) {
-                    if (player->objectives == 0 && random::Random_(13) == 1) {
+                    if (player->objectives == 0 && game_random::Random_(13) == 1) {
                         total_spies = 1;
-                    } else if (player->traits[9] > 0 && random::Random_(13) == 1) {
+                    } else if (player->traits[9] > 0 && game_random::Random_(13) == 1) {
                         total_spies = 1;
                     }
                 }
@@ -368,7 +368,7 @@ namespace spy {
 
                 int16_t mission = 0;
                 if (MOX::_player[player_idx].personality == 3) {
-                    if (random::Random_(8) == 1) {
+                    if (game_random::Random_(8) == 1) {
                         mission = 1;
                     }
                 }
@@ -396,8 +396,8 @@ namespace spy {
                 continue;
             }
 
-            int32_t rand1 = random::Random_(100);
-            int32_t rand2 = random::Random_(100);
+            int32_t rand1 = game_random::Random_(100);
+            int32_t rand2 = game_random::Random_(100);
 
             int32_t other_off = _spy_bonuses[other_plr_idx * 2];
             int32_t my_def = _spy_bonuses[player_idx * 2 + 1];
@@ -428,8 +428,8 @@ namespace spy {
                 }
             }
 
-            int32_t rand3 = random::Random_(100);
-            int32_t rand4 = random::Random_(100);
+            int32_t rand3 = game_random::Random_(100);
+            int32_t rand4 = game_random::Random_(100);
 
             int32_t catch_roll = other_off - my_def - def_spies_bonus - rand4 + rand3 + other_spies_bonus - 20;
 
@@ -486,7 +486,7 @@ namespace spy {
                 int16_t spies_attacking = BILL::Get_Their_Spy_Number_(i, victim_player_idx);
                 if (spies_attacking > 0) {
                     total_assassins += spies_attacking;
-                    if ((int32_t)random::Random_(total_assassins) <= spies_attacking) {
+                    if ((int32_t)game_random::Random_(total_assassins) <= spies_attacking) {
                         assassin_plr_a = i;
                         assassin_plr_b = victim_player_idx;
                     }
@@ -498,7 +498,7 @@ namespace spy {
                         int16_t spies_defending = BILL::Get_Their_Spy_Number_(i, i);
                         if (spies_defending > 0) {
                             total_defenders += spies_defending;
-                            if ((int32_t)random::Random_(total_defenders) <= spies_defending) {
+                            if ((int32_t)game_random::Random_(total_defenders) <= spies_defending) {
                                 assassin_plr_a = i;
                                 assassin_plr_b = i;
                             }
@@ -540,7 +540,7 @@ namespace spy {
                         uint32_t field_cost = TECHDATA::_technology_fields[field_id].cost;
                         if ((int32_t)field_cost > 0) {
                             total_cost += field_cost;
-                            if ((uint32_t)random::Random_(total_cost) <= field_cost) {
+                            if ((uint32_t)game_random::Random_(total_cost) <= field_cost) {
                                 chosen_app_id = i;
                             }
                         }
@@ -557,7 +557,7 @@ namespace spy {
                 spy::Frame_Another_((int16_t)attacker_idx, (int16_t)victim_idx, &framed_player_idx, chosen_app_id);
             }
 
-            int32_t penalty = -((int32_t)random::Random_(5) + (int32_t)random::Random_(15));
+            int32_t penalty = -((int32_t)game_random::Random_(5) + (int32_t)game_random::Random_(15));
             int32_t mode = (framed_player_idx == (int16_t)attacker_idx) ? 1 : 2;
             diplomac::Change_Relations_(penalty, framed_player_idx, victim_idx, mode, 0, chosen_app_id);
 
@@ -641,7 +641,7 @@ namespace spy {
 
             // Reservoir sampling: select one candidate per treaty category at random
             treaty_counts[treaty_type]++;
-            if (random::Random_((int32_t)treaty_counts[treaty_type]) == 1) {
+            if (game_random::Random_((int32_t)treaty_counts[treaty_type]) == 1) {
                 framed_candidates[treaty_type] = (int8_t)i;
             }
         }
@@ -691,7 +691,7 @@ namespace spy {
                         int32_t cost = building_data->cost;
                         total_weight += cost;
 
-                        if ((int32_t)random::Random_(total_weight) <= cost) {
+                        if ((int32_t)game_random::Random_(total_weight) <= cost) {
                             target_colony = i;
                             target_building = b_idx;
                         }
@@ -706,7 +706,7 @@ namespace spy {
             int16_t planet_idx = MOX::_colony[target_colony].planet;
             int32_t diplomacy_mode = (framed_player_idx == (int16_t)acting_player_idx) ? 3 : 4;
 
-            int32_t penalty = -((int32_t)random::Random_(5) + (int32_t)random::Random_(15));
+            int32_t penalty = -((int32_t)game_random::Random_(5) + (int32_t)game_random::Random_(15));
             diplomac::Change_Relations_((int16_t)penalty, (int16_t)acting_player_idx, victim_player_idx, diplomacy_mode, planet_idx, (int16_t)target_building);
 
             s_report report;

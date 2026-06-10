@@ -2862,7 +2862,7 @@ void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t star_idx, int
     if (player_idx < MAX_PLAYERS) {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives != 100 /* 'd' */ && i != player_idx) {
-                int16_t change = -(int16_t)random::Random_(10);
+                int16_t change = -(int16_t)game_random::Random_(10);
                 NETMOX::Russ_Change_Relations_(change, player_idx, i, 6, star_idx, colony_pop_lost);
             }
         }

@@ -259,7 +259,7 @@ namespace NETMOX {
                 uint8_t ready_mask = _net.players_ready_mask[0];
                 if (((uint8_t)(ready_mask >> ((uint8_t)i & 0x1F)) & 1) != 0) {
                     ++ready_count;
-                    if (random::Random_(ready_count) == 1) {
+                    if (game_random::Random_(ready_count) == 1) {
                         target_player_idx = i;
                     }
                 }
@@ -453,7 +453,7 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        * (int32_t*)ptr = random::Get_Random_Seed_();
+        * (int32_t*)ptr = game_random::Get_Random_Seed_();
         ptr += sizeof(int32_t);
 
         * (uint16_t*)ptr = MOX::_NUM_PLAYERS;
@@ -654,7 +654,7 @@ namespace NETMOX {
         MOX::_settings.xenons_exist = *ptr;
         ptr += sizeof(uint8_t);
 
-        random::Set_Random_Seed_(*(uint32_t*)ptr);
+        game_random::Set_Random_Seed_(*(uint32_t*)ptr);
         ptr += sizeof(uint32_t);
 
         RUSS::Mox_Update_();

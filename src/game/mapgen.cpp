@@ -101,10 +101,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             if (MAPGEN::_n_maps_generated <= 2) goto START_POS_GEN;
         }
 
-        collision_w = (int16_t)((int16_t)random::Random_(8) +
-                                (int16_t)random::Random_(8) +
+        collision_w = (int16_t)((int16_t)game_random::Random_(8) +
+                                (int16_t)game_random::Random_(8) +
                                 0x20 +
-                                (int16_t)random::Random_(8));
+                                (int16_t)game_random::Random_(8));
 
     START_POS_GEN:
         int16_t retry_count = 0;
@@ -115,14 +115,14 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         do {
             int16_t rx, scaled_x;
             do {
-                rx = (int16_t)(random::Random_(x_cell_size * 2) + (i % x_cells) * x_cell_size) % MOX::_MAP_MAX_X;
+                rx = (int16_t)(game_random::Random_(x_cell_size * 2) + (i % x_cells) * x_cell_size) % MOX::_MAP_MAX_X;
                 scaled_x = HAROLD::Get_Scaled_Value_(rx);
             } while (scaled_x < 0x18 || (scaled_max_x - (MOX::_star_width / 2)) < scaled_x);
             MOX::_star[i].x = rx;
 
             int16_t ry, scaled_y;
             do {
-                ry = (int16_t)(random::Random_(y_cell_size * 2) + (y_cell_size * i) / x_cells) % MOX::_MAP_MAX_Y;
+                ry = (int16_t)(game_random::Random_(y_cell_size * 2) + (y_cell_size * i) / x_cells) % MOX::_MAP_MAX_Y;
                 scaled_y = HAROLD::Get_Scaled_Value_(ry);
             } while (scaled_y < 0x16 || ((scaled_max_y - (MOX::_star_height / 2)) - y_collision_padding) < scaled_y);
             MOX::_star[i].y = ry;
@@ -135,8 +135,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 bool fallback_found = false;
                 do {
                     RUSS::Mox_Update_();
-                    int32_t fx = (int16_t)random::Random_(0x189) + 0x14;
-                    int32_t fy = (int16_t)random::Random_(0x155) + 0x14;
+                    int32_t fx = (int16_t)game_random::Random_(0x189) + 0x14;
+                    int32_t fy = (int16_t)game_random::Random_(0x155) + 0x14;
                     MOX::_star[i].x = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fx);
                     MOX::_star[i].y = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fy);
 
@@ -231,7 +231,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     }
 
     uint8_t __cdecl Generate_Size_() {
-        int32_t rand_val = random::Random_(10);
+        int32_t rand_val = game_random::Random_(10);
 
         for (int16_t i = 0; i < 5; ++i) {
             int16_t threshold = (int16_t)(int8_t)MOX::_planet_size_table[i];
@@ -246,7 +246,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
     int8_t __cdecl Generate_Mineral_Class_(int16_t star_idx, int16_t unused_planet_idx) {
         (void)unused_planet_idx;
-        int32_t random_roll = random::Random_(10);
+        int32_t random_roll = game_random::Random_(10);
         int8_t spectral_class = MOX::_star[star_idx].spectral_class;
 
         if (spectral_class >= 0 && spectral_class < 6) {
@@ -270,13 +270,13 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
         do {
             // Randomly roll for a satellite type based on weightings in the data table
-            roll = (int16_t)(random::Random_(10) - 1);
+            roll = (int16_t)(game_random::Random_(10) - 1);
             MAPGEN::_t_roll = roll;
 
             satellite_type = MOX::_orbit_to_satellite_type[roll][orbit];
 
             if (satellite_type == 4) { // Special logic for type 4 (potential companion star)
-                int chance = random::Random_(100);
+                int chance = game_random::Random_(100);
 
                 // If the roll is specific and it's the inner-most orbit, try to spawn a binary companion
                 if (roll == 1 && chance < 11 && orbit == 0) {
@@ -331,7 +331,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
         planet->climate = Generate_Climate_((int16_t)planet->group);
 
-        planet->climate_bg_type = (int8_t)(random::Random_(3) - 1);
+        planet->climate_bg_type = (int8_t)(game_random::Random_(3) - 1);
 
         Set_Secondary_Planet_Data_(star_idx, MOX::_planet_count);
     }
@@ -489,7 +489,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             memcpy(star_backup, MOX::_star, 0x1FC8);
 
             while (max_planets <= MOX::_planet_count - gas_giant_count) {
-                int32_t random_idx = random::Random_(static_cast<int32_t>(MOX::_planet_count)) - 1;
+                int32_t random_idx = game_random::Random_(static_cast<int32_t>(MOX::_planet_count)) - 1;
                 s_planet_data* backup_p = &_pl[random_idx];
 
                 if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
@@ -546,7 +546,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             for (int16_t wormhole_idx = 0; wormhole_idx < (int16_t)_n_wormholes; ++wormhole_idx) {
                 int16_t found_star_idx = -1;
                 for (int attempt = 0; attempt <= 200; ++attempt) {
-                    int16_t star_idx = (int16_t)random::Random_((int16_t)MOX::_NUM_STARS - 1);
+                    int16_t star_idx = (int16_t)game_random::Random_((int16_t)MOX::_NUM_STARS - 1);
                     if (star_idx != 0 &&
                         star_used[star_idx] == 0 &&
                         MOX::_star[star_idx].system_special == SYSTEM_SPECIAL_NO_SPECIAL &&
@@ -714,7 +714,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     void __cdecl Generate_Star_Special_(int16_t star_idx, int16_t* wormhole_out, uint8_t* special_counts) {
         int8_t special_type = 0;
 
-        if ((int16_t)MOX::_planet_special < (int16_t)random::Random_(100)) {
+        if ((int16_t)MOX::_planet_special < (int16_t)game_random::Random_(100)) {
             Get_A_Planet_Or_Star_Special_(star_idx, wormhole_out, &special_type, 1, 0);
         } else {
             special_type = 0;
@@ -729,7 +729,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             monster_chance = 5;
         }
 
-        if ((int32_t)random::Random_(100) - 1 < (int32_t)monster_chance) {
+        if ((int32_t)game_random::Random_(100) - 1 < (int32_t)monster_chance) {
             _n_space_monsters++;
         }
 
@@ -744,7 +744,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 int16_t selected_hero_idx = -1;
 
                 do {
-                    int16_t hero_candidate = (int16_t)random::Random_(38) - 1;
+                    int16_t hero_candidate = (int16_t)game_random::Random_(38) - 1;
 
                     if (hero_candidate == 0x41 || MOX::_leaders[hero_candidate].status != -1) {
                         attempts++;
@@ -780,16 +780,16 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
         switch (galaxy_size) {
         case 0:
-            MOX::_NUM_NEBULAS = (uint8_t)(random::Random_(2) - 1);
+            MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(2) - 1);
             break;
         case 1:
-            MOX::_NUM_NEBULAS = (uint8_t)random::Random_(2);
+            MOX::_NUM_NEBULAS = (uint8_t)game_random::Random_(2);
             break;
         case 2:
-            MOX::_NUM_NEBULAS = (uint8_t)random::Random_(3);
+            MOX::_NUM_NEBULAS = (uint8_t)game_random::Random_(3);
             break;
         case 3:
-            MOX::_NUM_NEBULAS = (uint8_t)(random::Random_(3) + 1);
+            MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(3) + 1);
             break;
         default:
             break;
@@ -824,7 +824,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 RUSS::Mox_Update_();
                 // The original reads an uninitialized stack byte array before accepting
                 // a type. Use a direct random choice here instead of encoding UB.
-                nebula_types[i] = (uint8_t)((int16_t)random::Random_(12) - 1);
+                nebula_types[i] = (uint8_t)((int16_t)game_random::Random_(12) - 1);
                 RUSS::Mox_Update_();
             }
         }
@@ -847,8 +847,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             memset(weight_buffer, 0, sizeof(*weight_buffer) * weight_buffer_value_count);
             RUSS::Mox_Update_();
 
-            int16_t start_x = (int16_t)random::Random_(0x1FA - widths[0]);
-            int16_t start_y = (int16_t)random::Random_(0x190 - heights[0]);
+            int16_t start_x = (int16_t)game_random::Random_(0x1FA - widths[0]);
+            int16_t start_y = (int16_t)game_random::Random_(0x190 - heights[0]);
 
             MOX::_nebula[0].type = (int8_t)nebula_types[0];
             MOX::_nebula[0].x = HAROLD::Get_Up_Scaled_Value_(start_x);
@@ -1035,7 +1035,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
      * @return The generated satellite count.
      */
     int16_t __cdecl Generate_Number_Of_Satellites_(int16_t star_idx) {
-        int32_t random_val = random::Random_(10);
+        int32_t random_val = game_random::Random_(10);
         int16_t result = 0;
 
         if (MOX::_star[star_idx].spectral_class < STAR_CLASS_BLACK_HOLE) {
@@ -1142,8 +1142,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         }
 
         for (int i = 0; i < 829; ++i) {
-            int32_t idx1 = random::Random_(829) - 1;
-            int32_t idx2 = random::Random_(829) - 1;
+            int32_t idx1 = game_random::Random_(829) - 1;
+            int32_t idx2 = game_random::Random_(829) - 1;
 
             if (idx1 != idx2) {
                 uint16_t temp = star_name_indices[idx1];
@@ -1327,7 +1327,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             }
 
             if (_first_time_map_is_generated != 0) {
-                random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
+                game_random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
                 _first_time_map_is_generated = 0;
             }
 
@@ -1376,7 +1376,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
             while ((int32_t)map_idx < (int32_t)_num_maps_to_generate) {
                 if (_num_maps_to_generate != 1) {
-                    MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
+                    MOX::_settings.start_of_game_seed = game_random::Get_Random_Seed_();
                 }
 
                 _n_space_monsters = 0;
@@ -1420,7 +1420,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     }
 
                     MOX::_star[_star_count].owner = -1;
-                    int16_t r_size = (int16_t)(random::Random_(10) - 1);
+                    int16_t r_size = (int16_t)(game_random::Random_(10) - 1);
                     if (r_size < 3) {
                         MOX::_star[_star_count].size = 0;
                     }
@@ -1431,7 +1431,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                         MOX::_star[_star_count].size = 2;
                     }
 
-                    MOX::_star[_star_count].pict_type = (int8_t)(random::Random_(3) - 1);
+                    MOX::_star[_star_count].pict_type = (int8_t)(game_random::Random_(3) - 1);
                     memset(MOX::_star[_star_count].planet_index, 0xFF, sizeof(MOX::_star[_star_count].planet_index));
 
                     _companion_star = 0;

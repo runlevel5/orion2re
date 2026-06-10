@@ -1381,13 +1381,13 @@ namespace FLT1 {
             MISC::Get_LBX_Message_(116, lbx_message);
             sprintf(message, lbx_message, ship->d.name);
 
-            int32_t first_idx = random::Random_(num_new_techs) - 1;
+            int32_t first_idx = game_random::Random_(num_new_techs) - 1;
             int16_t num_acquired = 1;
             got_tech_apps[0] = tech_apps[first_idx];
 
             for (int i = 0; i < num_new_techs; i++) {
                 if (i != first_idx) {
-                    if (((int32_t)random::Random_(100) - 1) < ((6 - num_acquired) * 5)) {
+                    if (((int32_t)game_random::Random_(100) - 1) < ((6 - num_acquired) * 5)) {
                         got_tech_apps[num_acquired++] = tech_apps[i];
                     }
                 }

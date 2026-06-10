@@ -686,7 +686,7 @@ namespace REPORT {
                     if (target_star_idx != -1) {
                         // Check if player has a colony at the target system
                         if ((MOX::_star[target_star_idx].has_colony >> (uint8_t)MOX::_PLAYER_NUM) & 1) {
-                            if (random::Random_(10) <= 4) {
+                            if (game_random::Random_(10) <= 4) {
                                 ANTAROOM::Main_Antaran_Room_Screen_(MOX::_antarans.invasion_stardate < 35000 /* 0x88B8 */);
                                 room_screen_shown = true;
                             }

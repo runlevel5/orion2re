@@ -2139,7 +2139,7 @@ namespace AIMOVE {
             }
             if (npc_dest[i].dist != 0 && npc_dest[i].dist < 15) {
                 valid_count++;
-                if (random::Random_(valid_count) == 1) {
+                if (game_random::Random_(valid_count) == 1) {
                     dest_star_idx = npc_dest[i].star_idx;
                 }
             }

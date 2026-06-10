@@ -52,12 +52,12 @@ namespace npcdiplo {
                 }
 
                 // 25% chance per eligible pair per turn to apply penalty
-                if (random::Random_(4) == 1) {
+                if (game_random::Random_(4) == 1) {
                     int32_t difficulty_mod = ((int32_t)MOX::_settings.galaxy_size - MOX::_settings.game_difficulty) + 6;
                     int32_t expansion_excess = threshold - MOX::_player[i].total_colonies;
 
                     // Note: expansion_excess is negative here
-                    int32_t base_penalty = (expansion_excess / difficulty_mod) * random::Random_(4);
+                    int32_t base_penalty = (expansion_excess / difficulty_mod) * game_random::Random_(4);
                     int16_t relations_change = (int16_t)((base_penalty / 3) * 4);
                     if (MOX::_player[i].objectives != 100) {
                         relations_change /= 2;
@@ -112,7 +112,7 @@ namespace npcdiplo {
 
                     if (severity > 0) {
                         // Positive severity reduces threats over time
-                        if ((int16_t)random::Random_(100) < (severity * 2)) {
+                        if ((int16_t)game_random::Random_(100) < (severity * 2)) {
                             p1.threats[p2_idx]--;
                             if (p1.threats[p2_idx] < 0) {
                                 p1.threats[p2_idx] = 0;
@@ -132,7 +132,7 @@ namespace npcdiplo {
                         }
 
                         // Severity is negative, so subtracting it increases the random threshold
-                        if ((int16_t)random::Random_(100) < (threat_threshold - severity * 2) || increment == 2) {
+                        if ((int16_t)game_random::Random_(100) < (threat_threshold - severity * 2) || increment == 2) {
                             p1.threats[p2_idx] += increment;
                             p2.threats[p1_idx] = p1.threats[p2_idx];
                         } else {
@@ -183,7 +183,7 @@ namespace npcdiplo {
                         if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && p_target.objectives != 100) {
                             int diff = MOX::_settings.game_difficulty;
                             int roll_limit = (diff * diff * 2 + 2) * 15;
-                            if (random::Random_(roll_limit) == 1) {
+                            if (game_random::Random_(roll_limit) == 1) {
                                 decision[j] = 1;
                                 reason[j] = 20 /* PERSONALITY_AGGRESSION */;
                             }
@@ -203,7 +203,7 @@ namespace npcdiplo {
                         if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
                             int diff = MOX::_settings.game_difficulty;
                             int threshold = (-5 - p_source.relations[j]) / (diff * 2 + 1);
-                            if ((int16_t)random::Random_(100) <= threshold) {
+                            if ((int16_t)game_random::Random_(100) <= threshold) {
                                 decision[j] = 1;
                                 reason[j] = 68 /* OPPORTUNISTIC_ATTACK */;
                             }
@@ -230,7 +230,7 @@ namespace npcdiplo {
             }
 
             // Case 4: Food Shortage desperation
-            if ((int16_t)random::Random_(100) < p_source.food_shortage_duration) {
+            if ((int16_t)game_random::Random_(100) < p_source.food_shortage_duration) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     auto& p_target = MOX::_player[j];
                     if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
@@ -286,7 +286,7 @@ namespace npcdiplo {
                         
                         int personality_idx = diplomac::Get_Player_Diplomacy_Personality_(i, j);
                         int threshold = diplodef::_personality_relation_modifiers[personality_idx] * 3 +
-                                        random::Random_(200) + (MOX::_settings.game_difficulty + 5) * 25;
+                                        game_random::Random_(200) + (MOX::_settings.game_difficulty + 5) * 25;
                         
                         int8_t t = p_source.treaty[j];
                         if (t == 1) threshold += 50;
@@ -357,7 +357,7 @@ namespace npcdiplo {
             }
 
             if (protective_treaties == 0 && potential_targets_count > 0) {
-                int target_idx = random::Random_(potential_targets_count);
+                int target_idx = game_random::Random_(potential_targets_count);
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     if (j != i && decision[j] == 1) {
                         if (--target_idx == 0) {
@@ -388,8 +388,8 @@ namespace npcdiplo {
 
                         s_player* p2 = &MOX::_player[p2_idx];
                         if (p2->objectives != 100 && p2->traits[TRAIT_REPULSIVE] == 0 && p1->contact[p2_idx] != 0) {
-                            if ((int16_t)random::Random_(100) < (int)p1->relations[p2_idx] + 50) {
-                                if ((int16_t)random::Random_(4) <= (int)MOX::_settings.game_difficulty) {
+                            if ((int16_t)game_random::Random_(100) < (int)p1->relations[p2_idx] + 50) {
+                                if ((int16_t)game_random::Random_(4) <= (int)MOX::_settings.game_difficulty) {
                                     int16_t best_tech_for_p1 = -1;
                                     uint32_t max_val_for_p1 = 0;
                                     int16_t best_tech_for_p2 = -1;
@@ -542,7 +542,7 @@ namespace npcdiplo {
                             p_i.relations[k] -= (int8_t)(hatred_score / 100);
 
                             // Probabilistic reduction for the remainder
-                            if ((int32_t)random::Random_(100) <= (hatred_score % 100)) {
+                            if ((int32_t)game_random::Random_(100) <= (hatred_score % 100)) {
                                 p_i.relations[k] -= 1;
                             }
 
@@ -647,7 +647,7 @@ namespace npcdiplo {
             surrender_prob = loss_factor;
         }
 
-        if ((int32_t)random::Random_(100) > surrender_prob) {
+        if ((int32_t)game_random::Random_(100) > surrender_prob) {
             return -1;
         }
 
@@ -788,7 +788,7 @@ namespace npcdiplo {
                 if (plr_j.traits[TRAIT_REPULSIVE] != 0) continue;
                 if (i == j) continue;
 
-                if (random::Random_(250 - (40 * (int32_t)MOX::_settings.game_difficulty)) != 1) continue;
+                if (game_random::Random_(250 - (40 * (int32_t)MOX::_settings.game_difficulty)) != 1) continue;
                 if (plr_i.contact[j] != 1) continue;
 
                 if (plr_i.treaty[j] < 4 && plr_i.treaty_modifier[j] > -30) {
@@ -832,7 +832,7 @@ namespace npcdiplo {
                     int32_t alliance_score = common_score + 
                                              diplodef::_personality_relation_modifiers[(uint8_t)plr_j.personality] +
                                              diplodef::_personality_relation_modifiers[(uint8_t)plr_i.personality] +
-                                             plr_i.treaty_modifier[j] + random::Random_(100) + (num_nonplayer_allies * 50);
+                                             plr_i.treaty_modifier[j] + game_random::Random_(100) + (num_nonplayer_allies * 50);
 
                     if (alliance_score >= 200 && plr_i.treaty[j] == 1 /* TREATY_PEACE */ && num_nonplayer_allies == 0) {
                         diplomac::Start_Treaty_(i, j, 2 /* ALLIANCE_TYPE */);
@@ -842,7 +842,7 @@ namespace npcdiplo {
 
                     int32_t trade_score = common_score + 
                                           diplodef::_personality_relation_modifiers[(uint8_t)plr_j.personality] +
-                                          plr_i.trade_modifier[j] + random::Random_(100);
+                                          plr_i.trade_modifier[j] + game_random::Random_(100);
 
                     if (trade_score >= 111) {
                         if (plr_i.research_treaty[j] == 0) {
@@ -859,7 +859,7 @@ namespace npcdiplo {
                     int32_t tribute_score_val = common_score + 
                                                 diplodef::_personality_relation_modifiers[(uint8_t)plr_j.personality] +
                                                 diplodef::_personality_relation_modifiers[(uint8_t)plr_i.personality] +
-                                                plr_i.treaty_modifier[j] + random::Random_(100);
+                                                plr_i.treaty_modifier[j] + game_random::Random_(100);
 
                     bool is_paying_tribute = false;
                     if (MOX::_NUM_PLAYERS > 0) {
@@ -874,12 +874,12 @@ namespace npcdiplo {
                     if (tribute_score_val > 150 && !is_paying_tribute) {
                         if (diplomac::Fleet_Strength_Comparison_(i, j) < 100) {
                             if (plr_i.bc_produced < plr_j.bc_produced && 
-                                (int32_t)random::Random_(20) <= (int32_t)MOX::_settings.game_difficulty + 1) {
+                                (int32_t)game_random::Random_(20) <= (int32_t)MOX::_settings.game_difficulty + 1) {
                                 
-                                random::Random_(4);
+                                game_random::Random_(4);
                                 diplomac::Start_Tribute_Treaty_(i, j, 2);
                                 
-                                int32_t rel_change = random::Random_(3) + 3;
+                                int32_t rel_change = game_random::Random_(3) + 3;
                                 diplomac::Change_Relations_((int16_t)rel_change, i, j, 14 /* TRIBUTE_START */, 0, 0);
                             }
                         }
@@ -997,7 +997,7 @@ namespace npcdiplo {
         int divisor = (score * score) / 50 + 1;
         int threshold = (int)npc->last_diplomacy_proposal_turn[player_idx] / divisor;
 
-        int random_val = random::Random_(100);
+        int random_val = game_random::Random_(100);
 
         return random_val <= threshold;
     }
@@ -1066,7 +1066,7 @@ namespace npcdiplo {
     }
 
     int16_t __cdecl Get_Tech_Exchange_Reaction_(int16_t player_idx, int16_t target_idx, int16_t reaction_bonus_flag) {
-        int32_t rand_val = random::Random_(150);
+        int32_t rand_val = game_random::Random_(150);
 
         int32_t reaction = MOX::_player[player_idx].diplomacy_proposal_rejection[target_idx] * 20
                          + COLCALC::Best_Leader_Diplomat_Bonus_(player_idx)
@@ -1123,24 +1123,24 @@ namespace npcdiplo {
 
         switch (MOX::_player[player_idx].personality) {
             case 0:
-                rejection_val = (int16_t)(random::Random_(4) - 6);
+                rejection_val = (int16_t)(game_random::Random_(4) - 6);
                 break;
             case 1:
             case 2:
-                rejection_val = (int16_t)(-1 - (int32_t)random::Random_(3));
+                rejection_val = (int16_t)(-1 - (int32_t)game_random::Random_(3));
                 break;
             case 3:
-                rejection_val = (int16_t)(-(int32_t)random::Random_(4));
+                rejection_val = (int16_t)(-(int32_t)game_random::Random_(4));
                 break;
             case 4:
                 if (MOX::_player[player_idx].dishonored_flag[target_idx] == 1) {
-                    rejection_val = (int16_t)(random::Random_(4) - 6);
+                    rejection_val = (int16_t)(game_random::Random_(4) - 6);
                 } else {
-                    rejection_val = (int16_t)(-(int32_t)random::Random_(3));
+                    rejection_val = (int16_t)(-(int32_t)game_random::Random_(3));
                 }
                 break;
             case 5:
-                rejection_val = (int16_t)(-(int32_t)random::Random_(3));
+                rejection_val = (int16_t)(-(int32_t)game_random::Random_(3));
                 break;
             default:
                 break;
@@ -1151,7 +1151,7 @@ namespace npcdiplo {
     }
 
     int32_t __cdecl Get_Tech_Exchange_Expectation_(int16_t player_idx, int16_t target_idx) {
-        int32_t expectation = random::Random_(150 /* 0x96 */);
+        int32_t expectation = game_random::Random_(150 /* 0x96 */);
 
         expectation -= MOX::_settings.game_difficulty * 25;
         expectation += MOX::_player[player_idx].broken_treaties_modifier[target_idx];
@@ -1206,7 +1206,7 @@ namespace npcdiplo {
             
             if (num_elements > 0) {
                 qsort(_human_tech, num_elements, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
-                int32_t random_pick = random::Random_((num_elements + 1) / 2);
+                int32_t random_pick = game_random::Random_((num_elements + 1) / 2);
                 uint8_t selected_tech_index = _human_tech[random_pick - 1].index;
                 int32_t exchange_val = (_human_tech[random_pick - 1].value * expectation) / 100;
                 

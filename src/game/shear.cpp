@@ -541,7 +541,7 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
     _noise_threshold = noise_threshold;
     uint8_t threshold = _noise_threshold;
 
-    uint32_t rand_val = random::Random_(1000);
+    uint32_t rand_val = game_random::Random_(1000);
     _noise_start_index = (rand_val - 1) & 0xFFFE;
 
     uint32_t total_pixels = width * height;
@@ -588,7 +588,7 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     shear::_noise_threshold = noise_threshold;
     shear::_jumble_mask = jumble_mask;
 
-    shear::_noise_start_index = (random::Random_(1000) - 1) & 0xFFFF;
+    shear::_noise_start_index = (game_random::Random_(1000) - 1) & 0xFFFF;
 
     uint32_t pixel_count = (width * height) - shear::_jumble_mask - shear::_jumble_mask;
 

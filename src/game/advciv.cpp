@@ -365,8 +365,8 @@ namespace ADVCIV {
     }
 
     void __cdecl Advanced_Civilization_Colonies_() {
-        random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
-        random::Get_Random_Seed_();
+        game_random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
+        game_random::Get_Random_Seed_();
         allocate::Push_Block_(MOX::_screen_seg);
 
         _adv_civ_player = (s_adv_civ_player*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x8500);

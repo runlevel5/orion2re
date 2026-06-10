@@ -19,7 +19,7 @@ namespace RUSS {
             return -1;
         }
 
-        uint16_t r = (uint16_t)random::Random_(total_weight);
+        uint16_t r = (uint16_t)game_random::Random_(total_weight);
         int16_t index = 0;
 
         if (weights[index] < r) {
@@ -45,7 +45,7 @@ namespace RUSS {
             return -1;
         }
 
-        uint32_t random_val = (uint32_t)random::Random_((int32_t)total_weight);
+        uint32_t random_val = (uint32_t)game_random::Random_((int32_t)total_weight);
         int16_t index = 0;
 
         if ((uint16_t)weights[index] < random_val) {
@@ -69,7 +69,7 @@ namespace RUSS {
             return -1;
         }
 
-        uint32_t roll = (uint32_t)random::Random_((int32_t)total_weight);
+        uint32_t roll = (uint32_t)game_random::Random_((int32_t)total_weight);
         int16_t selected_index = 0;
 
         if (weights[0] < roll) {
@@ -125,7 +125,7 @@ namespace RUSS {
         if (length > 0) {
             do {
                 int16_t current_index = index;
-                int32_t random_offset = random::Random_(length - current_index);
+                int32_t random_offset = game_random::Random_(length - current_index);
                 int16_t swap_index = (int16_t)(index + random_offset - 1);
                 ++index;
 
@@ -142,7 +142,7 @@ namespace RUSS {
         }
 
         for (int16_t i = 0; i < count; ++i) {
-            int32_t random_offset = random::Random_((int32_t)count - i);
+            int32_t random_offset = game_random::Random_((int32_t)count - i);
             int16_t target_idx = (int16_t)(i + random_offset - 1);
 
             int32_t temp = array[i];
@@ -157,7 +157,7 @@ namespace RUSS {
         }
 
         for (int16_t i = 0; i < count; ++i) {
-            int32_t random_offset = random::Random_((int32_t)count - i);
+            int32_t random_offset = game_random::Random_((int32_t)count - i);
 
             int16_t temp = data[i];
             int16_t target_idx = (int16_t)(i + random_offset - 1);
@@ -197,7 +197,7 @@ namespace RUSS {
         if (num_elements > 0) {
             uint8_t temp[128];
             for (int16_t i = 0; i < num_elements; ++i) {
-                int32_t random_offset = random::Random_((int32_t)num_elements - i);
+                int32_t random_offset = game_random::Random_((int32_t)num_elements - i);
                 int16_t j = i + (int16_t)random_offset - 1;
 
                 if (j != i) {
@@ -223,7 +223,7 @@ namespace RUSS {
     }
 
     void __cdecl Make_Player_Into_AI_(int32_t player_idx) {
-        MOX::_player[player_idx].objectives = (uint8_t)random::Random_(5);
+        MOX::_player[player_idx].objectives = (uint8_t)game_random::Random_(5);
 
         INITSHIP::Update_Player_Ship_Designs_((int16_t)player_idx);
 

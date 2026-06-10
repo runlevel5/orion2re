@@ -141,7 +141,7 @@ namespace BOMB {
                 return 0;
             }
 
-            int32_t hit_val = random::Random_(total_targets);
+            int32_t hit_val = game_random::Random_(total_targets);
             int32_t hit_idx = hit_val - 1;
 
             if (hit_idx < target_building_count) {
@@ -218,7 +218,7 @@ namespace BOMB {
             // Check race index; 8 is RACE_ANDROID
             if ((colony->pop[pop_slot_idx] & 0xf) != 8) {
                 non_android_count++;
-                if (random::Random_(non_android_count) == 1) {
+                if (game_random::Random_(non_android_count) == 1) {
                     target_pop_idx = pop_slot_idx;
                 }
             }
@@ -232,7 +232,7 @@ namespace BOMB {
 
         if ((uint8_t)colony->n_pops >= 2) {
             int32_t chance_sum = (int32_t)colony->military[0] + (int32_t)colony->military[1] + (int32_t)(uint8_t)colony->n_pops;
-            if (random::Random_(chance_sum) <= (int32_t)(uint8_t)colony->n_pops) {
+            if (game_random::Random_(chance_sum) <= (int32_t)(uint8_t)colony->n_pops) {
                 bomb_result->population_killed++;
                 bomb_result->bio_pop_killed++;
 
@@ -244,7 +244,7 @@ namespace BOMB {
             }
 
             if (colony->military[0] != 0) {
-                if ((int32_t)random::Random_((int32_t)colony->military[1] + (int32_t)colony->military[0]) <= (int32_t)colony->military[0]) {
+                if ((int32_t)game_random::Random_((int32_t)colony->military[1] + (int32_t)colony->military[0]) <= (int32_t)colony->military[0]) {
                     colony->military[0]--;
                     bomb_result->infantry_killed++;
                     return;
@@ -257,7 +257,7 @@ namespace BOMB {
         }
 
         if (colony->military[0] != 0) {
-            if ((int32_t)random::Random_((int32_t)colony->military[1] + (int32_t)colony->military[0]) <= (int32_t)colony->military[0]) {
+            if ((int32_t)game_random::Random_((int32_t)colony->military[1] + (int32_t)colony->military[0]) <= (int32_t)colony->military[0]) {
                 colony->military[0]--;
                 bomb_result->infantry_killed++;
                 return;

@@ -135,7 +135,7 @@ namespace SHIPS {
             final_y_upscaled = MOX::_star[system_idx].y;
         } else {
             int16_t scaled_offset = HAROLD::Get_Scaled_Value_(30);
-            int16_t random_iters = (int16_t)random::Random_(5);
+            int16_t random_iters = (int16_t)game_random::Random_(5);
             int16_t star_x_scaled = HAROLD::Get_Scaled_Value_(MOX::_star[system_idx].x);
             int16_t star_y_scaled = HAROLD::Get_Scaled_Value_(MOX::_star[system_idx].y);
 
@@ -150,7 +150,7 @@ namespace SHIPS {
 
             if (x_less_than_max) {
                 if (x_greater_than_min) {
-                    dir_x = (random::Random_(2) == 1) ? -1 : 1;
+                    dir_x = (game_random::Random_(2) == 1) ? -1 : 1;
                 } else {
                     dir_x = 1;
                 }
@@ -160,7 +160,7 @@ namespace SHIPS {
 
             if (y_less_than_max) {
                 if (y_greater_than_min) {
-                    dir_y = (random::Random_(2) == 1) ? -1 : 1;
+                    dir_y = (game_random::Random_(2) == 1) ? -1 : 1;
                 } else {
                     dir_y = 1;
                 }
@@ -173,8 +173,8 @@ namespace SHIPS {
 
             if (random_iters > 0) {
                 for (int i = 0; i < random_iters; ++i) {
-                    dx += (int16_t)random::Random_(scaled_offset) * dir_x;
-                    dy += (int16_t)random::Random_(scaled_offset) * dir_y;
+                    dx += (int16_t)game_random::Random_(scaled_offset) * dir_x;
+                    dy += (int16_t)game_random::Random_(scaled_offset) * dir_y;
                 }
             }
 

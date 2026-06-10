@@ -35,7 +35,7 @@ namespace FILEDEF {
 
 
     void __cdecl Save_Game_(int16_t slot_index) {
-        uint32_t random_seed = random::Get_Random_Seed_();
+        uint32_t random_seed = game_random::Get_Random_Seed_();
         uint32_t save_padding[250];
 
         for (int i = 0; i < 250; ++i) {
@@ -291,7 +291,7 @@ namespace FILEDEF {
         fclose(file);
 
         MOX2::Init_Map_Defaults_();
-        random::Set_Random_Seed_(random_seed);
+        game_random::Set_Random_Seed_(random_seed);
         RUSS::Mox_Update_();
         BILL::Cache_Player_Scientist_Anim_();
         RUSS::Mox_Update_();

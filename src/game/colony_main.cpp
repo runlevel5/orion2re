@@ -200,8 +200,8 @@ namespace COLONY {
         bool input_received = false;
         bool quit_flag = false;
 
-        uint32_t saved_seed = random::Get_Random_Seed_();
-        random::Set_Random_Seed_(static_cast<uint32_t>(_colony_handle));
+        uint32_t saved_seed = game_random::Get_Random_Seed_();
+        game_random::Set_Random_Seed_(static_cast<uint32_t>(_colony_handle));
         video::Clip_Off_();
         _using_colony_screen_palette = 1;
 
@@ -236,7 +236,7 @@ namespace COLONY {
             MOX::_current_screen = MOX::_return_screen;
             MOX::_PLAYER_NUM = saved_player_num;
             _using_colony_screen_palette = 0;
-            random::Set_Random_Seed_(saved_seed);
+            game_random::Set_Random_Seed_(saved_seed);
             return;
         }
 
@@ -333,7 +333,7 @@ namespace COLONY {
         }
 
         fields::Deactivate_Help_List_();
-        random::Set_Random_Seed_(saved_seed);
+        game_random::Set_Random_Seed_(saved_seed);
     }
 
     void __cdecl Load_Colony_Screen_Seg_() {
@@ -493,8 +493,8 @@ namespace COLONY {
 
 
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_idx, uint8_t is_ui_view) {
-        uint32_t previous_seed = random::Get_Random_Seed_();
-        random::Set_Random_Seed_(static_cast<uint32_t>(colony_idx));
+        uint32_t previous_seed = game_random::Get_Random_Seed_();
+        game_random::Set_Random_Seed_(static_cast<uint32_t>(colony_idx));
 
         int16_t satellite_count = 0;
         Clear_Colony_Buidlings_();
@@ -547,13 +547,13 @@ namespace COLONY {
                             int tc = tr;
                             bool should_swap = false;
                             if (COLONY::_colony_bldgs[tr].buildings[tc] == 0) {
-                                if (random::Random_(3) == 1) should_swap = true;
+                                if (game_random::Random_(3) == 1) should_swap = true;
                             }
                             else {
-                                if (random::Random_(3) == 1) {
+                                if (game_random::Random_(3) == 1) {
                                     should_swap = true;
                                 }
-                                else if (random::Random_(3) == 1) {
+                                else if (game_random::Random_(3) == 1) {
                                     should_swap = true;
                                 }
                             }
@@ -586,7 +586,7 @@ namespace COLONY {
             COLDRAW::Clear_Veggie_Draw_Flags_();
         }
 
-        random::Set_Random_Seed_(previous_seed);
+        game_random::Set_Random_Seed_(previous_seed);
     }
 
 
@@ -608,7 +608,7 @@ namespace COLONY {
                     for (int16_t j = 0; j < 6; ++j) {
                         if (COLONY::_colony_bldgs[i].buildings[j] == 0) {
                             empty_count++;
-                            if (random::Random_((int)empty_count) == 1) {
+                            if (game_random::Random_((int)empty_count) == 1) {
                                 row = i;
                                 col = j;
                             }

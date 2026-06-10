@@ -844,27 +844,27 @@ namespace line {
     }
 
     void __cdecl Create_Plasma_Line_(int16_t seed, uint16_t start_value, const uint8_t* color_map) {
-        random::Save_Random_Seed_();
-        random::Set_Random_Seed_(seed);
+        game_random::Save_Random_Seed_();
+        game_random::Set_Random_Seed_(seed);
 
         replace::_graphics_buffer[0] = (uint8_t)(start_value & 0x7);
 
-        int8_t direction_state = (int8_t)random::Random_(4) - 1;
+        int8_t direction_state = (int8_t)game_random::Random_(4) - 1;
         int8_t step_dir = (direction_state == 0) ? -1 : 1;
 
         for (int16_t sample_index = 1; sample_index < 1023; ++sample_index) {
             int8_t val = replace::_graphics_buffer[sample_index - 1];
 
-            if (random::Random_(4) == 1) {
+            if (game_random::Random_(4) == 1) {
                 direction_state = 1 - direction_state;
                 step_dir = (direction_state == 0) ? -1 : 1;
             }
 
-            if (random::Random_(4) == 1) {
+            if (game_random::Random_(4) == 1) {
                 val += step_dir;
-                if (random::Random_(4) == 1) {
+                if (game_random::Random_(4) == 1) {
                     val += step_dir;
-                    if (random::Random_(4) == 1) {
+                    if (game_random::Random_(4) == 1) {
                         val += step_dir;
                     }
                 }
@@ -883,7 +883,7 @@ namespace line {
             replace::_graphics_buffer[sample_index] = color_map[replace::_graphics_buffer[sample_index]];
         }
 
-        random::Restore_Random_Seed_();
+        game_random::Restore_Random_Seed_();
     }
 
 } // namespace line

@@ -531,17 +531,17 @@ void __cdecl Build_Road_List_Based_On_Bldg_List_() {
     for (int16_t x = 0; x < 6; ++x) {
         for (int16_t y = 0; y < 6; ++y) {
             if (COLONY::_colony_bldgs[x].buildings[y] != 0) {
-                if (random::Random_(2) == 1) {
+                if (game_random::Random_(2) == 1) {
                     _road_list[x][y].connections[0] = 1;
                 } else {
                     _road_list[x][y].connections[1] = 1;
                 }
 
-                if (random::Random_(2) != 1) {
+                if (game_random::Random_(2) != 1) {
                     _road_list[x + 1][y].connections[0] = 1;
                 }
 
-                if (random::Random_(2) != 1) {
+                if (game_random::Random_(2) != 1) {
                     _road_list[x][y + 1].connections[1] = 1;
                 }
 
@@ -551,7 +551,7 @@ void __cdecl Build_Road_List_Based_On_Bldg_List_() {
                 if (_road_list[x][y + 1].connections[2] != 0 &&
                     _road_list[x][y + 1].connections[3] != 0) {
                     
-                    if (random::Random_(2) == 1) {
+                    if (game_random::Random_(2) == 1) {
                         _road_list[x][y + 1].connections[3] = 0;
                     } else {
                         _road_list[x][y + 1].connections[2] = 0;
@@ -600,7 +600,7 @@ int16_t __cdecl Pick_Random_Road_At_And_Around_CR_(int16_t* row, int16_t* col, i
 
         if (_road_list[new_row][new_col].connections[dconn] == *connection_idx) {
             match_count++;
-            if (random::Random_(match_count) == 1) {
+            if (game_random::Random_(match_count) == 1) {
                 best_row = new_row;
                 best_col = new_col;
                 best_connection = dconn;
@@ -662,10 +662,10 @@ void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
                     COLONY::N_Bldgs_(MOX::_planet[planet_index].colony_index);
 
             bool should_process_cell = false;
-            if ((int32_t)random::Random_(7) - 2 < (int32_t)road_count) {
+            if ((int32_t)game_random::Random_(7) - 2 < (int32_t)road_count) {
                 should_process_cell = true;
             } else if (road_count == 0) {
-                if (random::Random_(building_count + 2) != 0) {
+                if (game_random::Random_(building_count + 2) != 0) {
                     should_process_cell = true;
                 }
             }
@@ -684,7 +684,7 @@ void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
 
             for (int16_t sprite_index = 0; sprite_index < 2; ++sprite_index) {
                 COLDRAW::_veggie_list[row][col].sprites[sprite_index].draw_flag =
-                        (uint16_t)(random::Random_(3) == 1);
+                        (uint16_t)(game_random::Random_(3) == 1);
 
                 if (COLDRAW::_veggie_list[row][col].sprites[sprite_index].draw_flag == 0) {
                     continue;
@@ -701,13 +701,13 @@ void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
                 s_animation_header* const animation =
                         (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLVEGGIE_LBX, anim_entry, MOX::_global_cache_seg);
 
-                int32_t screen_x = random::Random_(animate::Get_Width_(animation));
+                int32_t screen_x = game_random::Random_(animate::Get_Width_(animation));
                 screen_x -= animate::Get_Width_(animation) / 2;
                 screen_x += COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 0);
                 COLDRAW::_veggie_list[row][col].sprites[sprite_index].screen_x =
                         (int16_t)screen_x;
 
-                int32_t screen_y = random::Random_(animate::Get_Height_(animation));
+                int32_t screen_y = game_random::Random_(animate::Get_Height_(animation));
                 screen_y -= animate::Get_Height_(animation) / 4;
                 screen_y += COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 1);
                 COLDRAW::_veggie_list[row][col].sprites[sprite_index].screen_y =
@@ -773,7 +773,7 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
 }
 
 int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_idx, int16_t row, int16_t col) {
-    int32_t random_entry = (int16_t)(random::Random_(8) - 1);
+    int32_t random_entry = (int16_t)(game_random::Random_(8) - 1);
     int32_t veggie_type = (int16_t)COLDRAW::Veggie_Type_For_Colony_(colony_idx);
 
     random_entry -= ((int32_t)row + (int32_t)col) / 2;
@@ -791,11 +791,11 @@ int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {
 
     switch (climate) {
     case 0:
-        return (random::Random_(2) == 1) ? 5 : 9;
+        return (game_random::Random_(2) == 1) ? 5 : 9;
 
     case 1:
     case 2:
-        return (random::Random_(2) == 1) ? 6 : 4;
+        return (game_random::Random_(2) == 1) ? 6 : 4;
 
     case 3:
         return 8;
@@ -804,7 +804,7 @@ int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {
         return 4;
 
     case 5:
-        switch (random::Random_(4)) {
+        switch (game_random::Random_(4)) {
         case 1:
             return 7;
         case 2:
@@ -825,7 +825,7 @@ int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {
 
     case 8:
     case 9:
-        switch (random::Random_(4)) {
+        switch (game_random::Random_(4)) {
         case 1:
             return 12;
         case 2:

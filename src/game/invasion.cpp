@@ -211,8 +211,8 @@ void __cdecl Check_All_Rebellions_() {
 }
 
 void __cdecl Ground_Combat_Round_(s_invasion_side_info* side1, s_invasion_side_info* side2) {
-    int16_t roll1 = side1->unit_strengths[(uint8_t)side1->current_troop_type_idx] + (int16_t)random::Random_(100);
-    int16_t roll2 = side2->unit_strengths[(uint8_t)side2->current_troop_type_idx] + (int16_t)random::Random_(100);
+    int16_t roll1 = side1->unit_strengths[(uint8_t)side1->current_troop_type_idx] + (int16_t)game_random::Random_(100);
+    int16_t roll2 = side2->unit_strengths[(uint8_t)side2->current_troop_type_idx] + (int16_t)game_random::Random_(100);
 
     side1->round_hit_unit_type = -1;
     side1->round_killed_unit_type = -1;
@@ -388,8 +388,8 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         chance *= 2;
     }
 
-    if ((int32_t)random::Random_(1000) <= chance) {
-        int rebel_count = random::Random_(total_rebel_pop);
+    if ((int32_t)game_random::Random_(1000) <= chance) {
+        int rebel_count = game_random::Random_(total_rebel_pop);
         s_invasion_side_info rebel_side;
         s_invasion_side_info defender_side;
 
@@ -541,7 +541,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
             if (colony->buildings[i] != 0) {
                 int16_t tech_app = TECHDATA::_buildings[i].tech_app;
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[new_owner_idx], tech_app)) {
-                    if ((int32_t)random::Random_(1000) <= (chance_base / (captured_count + 1))) {
+                    if ((int32_t)game_random::Random_(1000) <= (chance_base / (captured_count + 1))) {
                         captured_techs[captured_count] = tech_app;
                         captured_count++;
                         COLCALC::Player_Gets_Tech_App_(&MOX::_player[new_owner_idx], tech_app);
@@ -573,7 +573,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
             int32_t n_tries = (uint8_t)colony->n_pops;
             while (n_tries > 0 && captured_count < 4) {
-                if ((int32_t)random::Random_(1000) <= (chance_random / (captured_count + 1))) {
+                if ((int32_t)game_random::Random_(1000) <= (chance_random / (captured_count + 1))) {
                     int16_t tech_id = RUSS::Get_Weighted_Choice_Short_(weights, 204);
                     if (tech_id == -1) {
                         n_tries = 0; // No more techs to capture
@@ -854,7 +854,7 @@ void __cdecl Invade_(int16_t* ship_list, int16_t n_ships, int16_t colony_id, s_b
     battle_results->attacker_invasion = local_attacker;
     battle_results->defender_invasion = local_defender;
 
-    uint32_t random_seed = random::Get_Random_Seed_();
+    uint32_t random_seed = game_random::Get_Random_Seed_();
     battle_results->captured_tech_id = 0;
     battle_results->ground_defense_strength = (int32_t)random_seed;
 

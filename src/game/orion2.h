@@ -51,7 +51,7 @@ typedef struct s_adv_planet_worth_s1 s_adv_planet_worth_s1, *Ps_adv_planet_worth
 
 struct s_adv_planet_worth_s1 {
     int16_t planet_idx;
-    int worth;
+    int32_t worth;
 };
 
 struct s_adv_planet_worth {
@@ -63,7 +63,7 @@ typedef struct s_ai_colonizable_planet s_ai_colonizable_planet, *Ps_ai_colonizab
 
 struct s_ai_colonizable_planet {
     int16_t planet_idx;
-    int contextual_value;
+    int32_t contextual_value;
 };
 
 typedef struct s_ai_colony_info s_ai_colony_info, *Ps_ai_colony_info;
@@ -4494,7 +4494,7 @@ struct s_smack_video {
     uint32_t rect_height;
 };
 
-typedef long HRESULT;
+typedef int32_t HRESULT;
 
 
 /* WARNING! conflicting data type names: /guiddef.h/GUID - /GUID */
@@ -4503,14 +4503,14 @@ typedef GUID IID;
 
 typedef void *LPVOID;
 
-typedef ulong DWORD;
+typedef uint32_t DWORD;
 
 typedef DWORD ULONG;
 
 typedef DWORD *LPDWORD;
 
 
-typedef long LONG;
+typedef int32_t LONG;
 
 typedef uint16_t WORD;
 

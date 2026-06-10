@@ -219,7 +219,7 @@ void __cdecl Process_Retreating_Ships_(void) {
                 for (int j = 0; j < MOX::_NUM_STARS; ++j) {
                     if ((MOX::_star[j].has_dimensional_portal >> owner) & 1) {
                         valid_star_count++;
-                        if (random::Random_(valid_star_count) == 1) {
+                        if (game_random::Random_(valid_star_count) == 1) {
                             player_retreat_target[owner] = (int8_t)j;
                         }
                     }
@@ -313,7 +313,7 @@ void __cdecl Process_Retreating_Ships_(void) {
                 if (ship->owner == 10) {
                     destroy_monster = true;
                 } else if (ship->owner == 11 || ship->owner == 12 || ship->owner == 14) {
-                    if (random::Random_(2) == 1) {
+                    if (game_random::Random_(2) == 1) {
                         destroy_monster = true;
                     }
                 }
@@ -634,7 +634,7 @@ int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
             if ((needs_attack >> i) & 1) {
                 count++;
                 // Reservoir sampling for equal probability distribution
-                if (random::Random_(count) == 1) {
+                if (game_random::Random_(count) == 1) {
                     attacker_idx = i;
                 }
             }
@@ -645,7 +645,7 @@ int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
         for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
             if ((needs_attack >> i) & 1) {
                 count++;
-                if (random::Random_(count) == 1) {
+                if (game_random::Random_(count) == 1) {
                     attacker_idx = i;
                 }
             }
@@ -824,7 +824,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                     pop_val = (pop_val & ~0x70) | ((player_idx << 4) & 0x70);
 
                     if (MOX::_planet[planet_idx].food_per_farmer == 0 || MOX::_player[player_idx].traits[18] != 0) {
-                        int r = random::Random_(2);
+                        int r = game_random::Random_(2);
                         pop_val = (((r << 7) ^ pop_val) & 0x180) ^ pop_val;
                     } else if (MOX::_player[player_idx].traits[17] == 0) {
                         pop_val &= ~0x180;
@@ -861,7 +861,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                     picked_tech_ids[0] = 0;
                     picked_tech_ids[1] = 0;
 
-                    r = random::Random_(4);
+                    r = game_random::Random_(4);
                     n_techs = ((r + ((r >> 31) & 3)) >> 2) + 1;
 
                     for (int remaining = n_techs; remaining != 0; --remaining) {
@@ -871,7 +871,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                                 COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_id)) {
 
                                 total_valid_techs++;
-                                if (random::Random_(total_valid_techs) == 1) {
+                                if (game_random::Random_(total_valid_techs) == 1) {
                                     picked_tech_ids[remaining - 1] = (uint8_t)tech_id;
                                 }
                             }
@@ -1044,7 +1044,7 @@ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* targe
                                     break;
                                 case 2:
                                 case 3:
-                                    is_valid = (random::Random_(2) - 1) != 0;
+                                    is_valid = (game_random::Random_(2) - 1) != 0;
                                     break;
                             }
                         }
@@ -1156,13 +1156,13 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* ta
 
             if (MOX::_player[owner].traits[26 /* TRAIT_LUCKY */] != 0) {
                 lucky_count++;
-                if (random::Random_(lucky_count) == 1) {
+                if (game_random::Random_(lucky_count) == 1) {
                     lucky_target = colony_idx;
                 }
             }
             else {
                 non_lucky_count++;
-                if (random::Random_(non_lucky_count) == 1) {
+                if (game_random::Random_(non_lucky_count) == 1) {
                     non_lucky_target = colony_idx;
                 }
             }
@@ -1189,13 +1189,13 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* ta
             // If player is valid index and not lucky, prioritize them
             if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[26 /* TRAIT_LUCKY */] == 0) {
                 non_lucky_count++;
-                if (random::Random_(non_lucky_count) == 1) {
+                if (game_random::Random_(non_lucky_count) == 1) {
                     non_lucky_target = player_idx;
                 }
             }
             else {
                 lucky_count++;
-                if (random::Random_(lucky_count) == 1) {
+                if (game_random::Random_(lucky_count) == 1) {
                     lucky_target = player_idx;
                 }
             }
@@ -1357,7 +1357,7 @@ int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx) {
 
         // Personality 3 is likely erratic or opportunistic, having a small chance to attack
         if (attacker->personality == 3) {
-            if (random::Random_(10) == 1) {
+            if (game_random::Random_(10) == 1) {
                 return 1;
             }
         }
@@ -2001,7 +2001,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                 bool has_stellar = Has_Stellar_Converter_(ship_list, n_ships);
 
                 invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &results->info.attacker_invasion, &results->info.defender_invasion);
-                int seed = random::Get_Random_Seed_();
+                int seed = game_random::Get_Random_Seed_();
                 int16_t selection = MAINPUPS::Colony_Selection_Popup_(&results->info.attacker_invasion, &results->info.defender_invasion, seed, (int16_t)colony_idx, bombardment_res, has_stellar);
 
                 bool loop_done = false;
@@ -2023,7 +2023,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             break;
                         }
                         case 2: { // Bombing
-                            int bomb_seed = random::Get_Random_Seed_();
+                            int bomb_seed = game_random::Get_Random_Seed_();
                             memset(&results->bomb, 0, sizeof(s_combat_bomb_result));
                             results->bomb.attacker_idx = attacker_id;
                             results->bomb.colony_idx = (uint8_t)colony_idx;
@@ -2047,11 +2047,11 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                         }
                         case 3: { // Invasion
                             invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, &results->info);
-                            int combat_seed = random::Get_Random_Seed_();
+                            int combat_seed = game_random::Get_Random_Seed_();
                             ERIC::Force_Fade_To_Colony_Palette_(1);
                             COLGCBT::Colony_Combat_Screen_(&results->info.attacker_invasion, &results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
                             ERIC::Force_Fade_To_Colony_Palette_(0);
-                            random::Set_Random_Seed_(combat_seed);
+                            game_random::Set_Random_Seed_(combat_seed);
 
                             if (results->info.captured_tech_id != 0) {
                                 SCIENCE::Show_Off_Captured_Tech_(results->info.captured_techs_data, results->info.captured_tech_id, results->info.captured_tech_planet_id);
@@ -2209,11 +2209,11 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                     if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
                         (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
                         MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id)) {
-                        int invade_seed = random::Get_Random_Seed_();
+                        int invade_seed = game_random::Get_Random_Seed_();
                         ERIC::Force_Fade_To_Colony_Palette_(1);
                         COLGCBT::Colony_Combat_Screen_(&results->info.attacker_invasion, &results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
                         ERIC::Force_Fade_To_Colony_Palette_(0);
-                        random::Set_Random_Seed_(invade_seed);
+                        game_random::Set_Random_Seed_(invade_seed);
                     }
 
                     NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, 0);
@@ -2321,7 +2321,7 @@ void __cdecl Bomb_Results_Popups_(s_battle_results* res) {
     }
 
     if (res->info.attacker_invasion.unit_counts[1] != 0) {
-        uint32_t seed = random::Get_Random_Seed_();
+        uint32_t seed = game_random::Get_Random_Seed_();
 
         COLGCBT::Colony_Combat_Screen_(
             &res->info.attacker_invasion,
@@ -2331,7 +2331,7 @@ void __cdecl Bomb_Results_Popups_(s_battle_results* res) {
         );
 
         MULTPLAY::Load_Net_Next_Turn_Screen_(1);
-        random::Set_Random_Seed_(seed);
+        game_random::Set_Random_Seed_(seed);
     }
 
     if (res->info.is_mind_controlled != 0) {
@@ -2730,7 +2730,7 @@ void __cdecl GNN_Reports_Combat_(int player1_idx, int player2_idx) {
     int p1;
     int p2;
 
-    if (random::Random_(2) == 1) {
+    if (game_random::Random_(2) == 1) {
         p1 = player1_idx;
         p2 = player2_idx;
     } else {

@@ -391,7 +391,7 @@ namespace COLONY {
 
                 if (current_id == 0) {
                     empty_count++;
-                    if (random::Random_((int32_t)empty_count) == 1) {
+                    if (game_random::Random_((int32_t)empty_count) == 1) {
                         *row_out = i;
                         *col_out = j;
                     }

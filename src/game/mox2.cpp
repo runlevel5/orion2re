@@ -21,9 +21,9 @@ namespace MOX2 {
         capture::Check_Release_Version_();
 
         if (MOX::_cmd_line_seed != 0) {
-            random::Set_Random_Seed_(MOX::_cmd_line_seed);
+            game_random::Set_Random_Seed_(MOX::_cmd_line_seed);
         } else {
-            random::Randomize_();
+            game_random::Randomize_();
         }
     }
 

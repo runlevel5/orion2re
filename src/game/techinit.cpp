@@ -279,7 +279,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     if (!has_app) {
       int16_t tech_app_id;
       do {
-        int16_t random_slot_idx = random::Random_(missing_count) - 1;
+        int16_t random_slot_idx = game_random::Random_(missing_count) - 1;
         tech_app_id = field_tech_ids[random_slot_idx];
       } while (!TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id));
 

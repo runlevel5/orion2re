@@ -139,7 +139,7 @@ namespace COMBAT1 {
 
         combat_msg.viewport_x = MOX::_cur_combat_x;
         combat_msg.viewport_y = MOX::_cur_combat_y;
-        combat_msg.random_seed = random::Get_Random_Seed_();
+        combat_msg.random_seed = game_random::Get_Random_Seed_();
         combat_msg.message_code = message_code;
         combat_msg.arg1 = arg1;
         combat_msg.arg2 = arg2;
@@ -719,7 +719,7 @@ namespace COMBAT1 {
                                             int16_t f12 = MOX::_new_message.arg2;
                                             int16_t f14 = MOX::_new_message.arg3;
                                             int16_t f8 = MOX::_new_message.message_code;
-                                            random::Set_Random_Seed_(MOX::_new_message.random_seed);
+                                            game_random::Set_Random_Seed_(MOX::_new_message.random_seed);
                                             struct_::Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
 
                                             switch (f8) {

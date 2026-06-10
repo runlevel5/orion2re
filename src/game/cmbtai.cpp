@@ -1276,7 +1276,7 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
         }
 
         if (num_possible_moves > 0) {
-            int rnd_idx = random::Random_((int)num_possible_moves) - 1;
+            int rnd_idx = game_random::Random_((int)num_possible_moves) - 1;
             int16_t mx = move_x_coords[rnd_idx];
             int16_t my = move_y_coords[rnd_idx];
             int16_t move_cost = CMBTMOV1::Move_Cost_(cur_ship_idx, mx, my);
@@ -2467,7 +2467,7 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
     }
 
     if (score > 0) {
-        if ((int)random::Random_(100) < score) {
+        if ((int)game_random::Random_(100) < score) {
             if (ship->current_speed == 0) {
                 ret_val = 1;
             }

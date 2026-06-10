@@ -273,7 +273,7 @@ namespace AIBUILD {
         AIBUILD::_player_ship_sizes[player_idx].target_ship_size = highest_ship_size_idx + 1;
         if (max_strength_vs_ships < AIBUILD::_player_total_strength_vs_ships[player_idx][0] || 
             (*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0) {
-            int32_t rand_val = random::Random_(2);
+            int32_t rand_val = game_random::Random_(2);
             AIBUILD::_player_ship_sizes[player_idx].target_ship_size = highest_ship_size_idx + 1 + rand_val + (is_objective_1 ? 1 : 0) - 1;
         }
 
@@ -334,7 +334,7 @@ namespace AIBUILD {
         int32_t current_need = AIBUILD::_player_total_strength_vs_ships[player_idx][2];
         if (current_need == 0 || MOX::_player[player_idx].command_points_used < MOX::_player[player_idx].command_points) {
             if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players > 0) {
-                if (random::Random_(10 - (is_objective_1 ? 1 : 0)) == 1) {
+                if (game_random::Random_(10 - (is_objective_1 ? 1 : 0)) == 1) {
                     AIBUILD::_player_total_strength_vs_ships[player_idx][2] += (is_objective_1 ? 4 : 0) + 1;
                 }
             }
@@ -374,12 +374,12 @@ namespace AIBUILD {
                 }
 
                 int32_t spy_trait = MOX::_player[player_idx].traits[9];
-                int32_t spy_roll = (int32_t)random::Random_(100);
+                int32_t spy_roll = (int32_t)game_random::Random_(100);
                 if (current_spies < max_spies + 2 && spy_roll <= spy_trait) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
-                if (MOX::_player[player_idx].objectives == 0 && random::Random_(2) == 1) {
+                if (MOX::_player[player_idx].objectives == 0 && game_random::Random_(2) == 1) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
@@ -388,7 +388,7 @@ namespace AIBUILD {
                     int32_t cap = (*AIDATA::_ai_player_info)[player_idx].n_contacts * ((MOX::_player[player_idx].traits[9] > 0 ? 1 : 0) + 1) * 2;
                     if (cap < current_spies) {
                         if (spy_need < 2) {
-                            if (MOX::_player[player_idx].traits[9] < 1 && random::Random_(4) != 1) {
+                            if (MOX::_player[player_idx].traits[9] < 1 && game_random::Random_(4) != 1) {
                                 AIBUILD::_player_n_spies[player_idx][1] = 0;
                             } else {
                                 AIBUILD::_player_n_spies[player_idx][1] = 1;

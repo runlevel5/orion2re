@@ -522,9 +522,9 @@ namespace aidesign {
         }
 
         int32_t arc0_threshold = (int32_t)r_base + (int32_t)spec0_mod_count * 20;
-        if ((int32_t)random::Random_(100) < arc0_threshold) {
+        if ((int32_t)game_random::Random_(100) < arc0_threshold) {
             int32_t arc0_inner_threshold = (int32_t)(r_base / 2) + (int32_t)spec0_mod_count * 20;
-            if ((int32_t)random::Random_(100) < arc0_inner_threshold) {
+            if ((int32_t)game_random::Random_(100) < arc0_inner_threshold) {
                 *arc0 = 16;
             } else {
                 *arc0 = 2;
@@ -532,12 +532,12 @@ namespace aidesign {
         }
 
         int32_t arc1_threshold = (int32_t)spec1_mod_count * 20 + (int32_t)(r_base / 2);
-        if ((int32_t)random::Random_(100) < arc1_threshold) {
+        if ((int32_t)game_random::Random_(100) < arc1_threshold) {
             *arc1 = 2;
         }
 
         int32_t arc2_threshold = (int32_t)spec2_mod_count * 20 + (int32_t)(r_base / 4);
-        if ((int32_t)random::Random_(100) < arc2_threshold) {
+        if ((int32_t)game_random::Random_(100) < arc2_threshold) {
             *arc2 = 2;
         }
     }
@@ -730,7 +730,7 @@ namespace aidesign {
         switch ((uint8_t)player->ship_design_theme) {
             case 0:
             case 100: {
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                     case 2:
                     case 3:
@@ -764,7 +764,7 @@ namespace aidesign {
             }
 
             case 1: {
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         return get_default_class();
                     case 2:
@@ -797,7 +797,7 @@ namespace aidesign {
             }
 
             case 2:
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         result = get_default_class();
                         break;
@@ -836,7 +836,7 @@ namespace aidesign {
                 [[fallthrough]];
 
             case 3:
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         return get_default_class();
                     case 2:
@@ -1421,13 +1421,13 @@ namespace aidesign {
         ship_class = Get_Ship_Class_(player_idx);
 
         if (hull_idx == 5 && (player->tech_applications[TECH_APP_STELLAR_CONVERTER] == 3)) {
-            if (random::Random_(4) < 4) {
+            if (game_random::Random_(4) < 4) {
                 ship_class = 6;
             }
         }
 
         if (player->tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == 3 && hull_idx > 3) {
-            if (random::Random_(4) < 4) {
+            if (game_random::Random_(4) < 4) {
                 ship_class = 6;
             }
         }
@@ -1438,7 +1438,7 @@ namespace aidesign {
             design->picture_num = 0x2b; /* '+' */
             strcpy(design->name, TECHDATA::_hull_data[5].name);
         } else {
-            design->picture_num = (int8_t)random::Random_(8) + (int8_t)hull_idx * 8 - 1;
+            design->picture_num = (int8_t)game_random::Random_(8) + (int8_t)hull_idx * 8 - 1;
             uint8_t player_race = player->race;
             DESIGN::Get_Ship_Design_Name_(player_race, hull_idx, (int16_t)(design->picture_num % 8), design->name);
         }

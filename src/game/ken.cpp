@@ -52,7 +52,7 @@ namespace KEN {
             return 0;
         }
 
-        int32_t rem = random::Random_(sum) - weights[0];
+        int32_t rem = game_random::Random_(sum) - weights[0];
         uint16_t idx = 0;
 
         if (rem > 0) {
@@ -125,7 +125,7 @@ namespace KEN {
         }
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
-            int difficulty_val = random::Random_(10) - MOX::_settings.game_difficulty + 1;
+            int difficulty_val = game_random::Random_(10) - MOX::_settings.game_difficulty + 1;
             if (difficulty_val < 0) {
                 difficulty_val = 0;
             } else if (difficulty_val > 9) {
@@ -319,7 +319,7 @@ namespace KEN {
                     total_obj += obj_w[j];
                 }
             }
-            int rand_obj = random::Random_(total_obj);
+            int rand_obj = game_random::Random_(total_obj);
             int selected_obj = 0;
             rand_obj -= obj_w[0];
             if (rand_obj > 0) {
@@ -348,7 +348,7 @@ namespace KEN {
                     total_des += des_w[j];
                 }
             }
-            int rand_des = random::Random_(total_des);
+            int rand_des = game_random::Random_(total_des);
             int selected_des = 0;
             rand_des -= des_w[0];
             if (rand_des > 0) {
@@ -372,7 +372,7 @@ namespace KEN {
                     total_spec += spec_w[j];
                 }
             }
-            int rand_spec = random::Random_(total_spec);
+            int rand_spec = game_random::Random_(total_spec);
             int selected_spec = 0;
             rand_spec -= spec_w[0];
             if (rand_spec > 0) {

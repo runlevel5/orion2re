@@ -108,7 +108,7 @@ namespace ANTAROOM {
     void __cdecl Get_Antaran_Room_Message_(int16_t message_index) {
         char buffer[200];
 
-        uint32_t random_val = random::Random_(4);
+        uint32_t random_val = game_random::Random_(4);
         int16_t message_lbx_index = (int16_t)(random_val + (message_index + (uint8_t)MOX::_settings.language * 2) * 4 - 1);
 
         farload::Farload_Data_Static_("antarmsg.LBX", message_lbx_index, buffer, 0, 1, sizeof(buffer));

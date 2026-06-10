@@ -548,7 +548,7 @@ namespace DIP_SCRN {
 
         _diplomacy_current_music = -1;
         _diplomacy_good_music = (int16_t)MOX::_player[param_1].race + 1;
-        _diplomacy_bad_music = (int16_t)random::Random_(3) + 13;
+        _diplomacy_bad_music = (int16_t)game_random::Random_(3) + 13;
     }
 
     void __cdecl Start_Diplomacy_Music_(int16_t music_type) {
@@ -597,7 +597,7 @@ namespace DIP_SCRN {
         farload::Farload_Data_Static_(filename, file_msg_id, buf, 0, 1, 5202);
 
         int count = buf[1];
-        int rnd_idx = random::Random_(count) - 1;
+        int rnd_idx = game_random::Random_(count) - 1;
         char* record = reinterpret_cast<char*>(buf) + 2 + rnd_idx * 200;
 
         int out_idx = 0;
@@ -783,7 +783,7 @@ namespace DIP_SCRN {
         selectable[1] = 1;
         selectable[2] = 1;
 
-        int16_t msg_idx = (random::Random_(2) == 1) ? 0x4A : 0x4B;
+        int16_t msg_idx = (game_random::Random_(2) == 1) ? 0x4A : 0x4B;
         JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx_00552360, msg_idx, text_buffer, 40);
 
         fields::Clear_Fields_();
@@ -1941,7 +1941,7 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Accepted_Npc_Demand_Resolution_(int16_t player_id, int16_t ambassador_id) {
-        int16_t relation_change = random::Random_(13) + 11;
+        int16_t relation_change = game_random::Random_(13) + 11;
         diplomac::Change_Relations_(relation_change, player_id, ambassador_id, 0, 0, 0);
 
         MOX::_player[player_id].threats[ambassador_id] = '\0';

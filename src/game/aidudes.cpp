@@ -375,7 +375,7 @@ namespace aidudes {
 
         if (plr->surplus_freighters < 0 || plr->surplus_food < 0) {
             int32_t threshold = 1 - (int32_t)MOX::_settings.game_difficulty * (int32_t)plr->surplus_freighters;
-            int32_t roll = (int32_t)random::Random_(50);
+            int32_t roll = (int32_t)game_random::Random_(50);
 
             if (threshold >= roll) {
                 plr->n_freighters += 5;
@@ -404,7 +404,7 @@ namespace aidudes {
         int32_t upgrade_threshold = (difficulty_bonus + desirability) * 2;
         int upgrade_count = 0;
 
-        if ((int32_t)random::Random_(900) <= upgrade_threshold) {
+        if ((int32_t)game_random::Random_(900) <= upgrade_threshold) {
             upgrade_count = 1;
         }
 
@@ -413,7 +413,7 @@ namespace aidudes {
             upgrade_count = 0;
         } else {
             int32_t total_pop = MOX::_player[aidudes::_i_ai].total_pop;
-            if ((int32_t)random::Random_((uint32_t)total_pop) <= 8) {
+            if ((int32_t)game_random::Random_((uint32_t)total_pop) <= 8) {
                 upgrade_count = 0;
             }
         }
@@ -955,7 +955,7 @@ namespace aidudes {
                     }
                     val += bonus;
 
-                    int rand_val = random::Random_(700);
+                    int rand_val = game_random::Random_(700);
                     int adjusted_rand = rand_val + 100 + (is_objective_2 ? 0 : 100);
 
                     if (adjusted_rand < (isqrt_val + 64) * val) {
@@ -988,7 +988,7 @@ namespace aidudes {
         if (want_colony_base && p->tech_applications[41] == 3) {
             int r = 0;
             if (is_objective_2 != 0) {
-                if (random::Random_(5) == 1) {
+                if (game_random::Random_(5) == 1) {
                     r = 1;
                 }
             }
@@ -999,7 +999,7 @@ namespace aidudes {
                     i--;
                     s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
-                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < (int32_t)random::Random_(100)) {
+                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < (int32_t)game_random::Random_(100)) {
                             INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
                             int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)colony_queue[i]);
                             if (ship_idx == -1) {
@@ -1196,7 +1196,7 @@ namespace aidudes {
                             }
                         }
 
-                        if (AIBUILD::_player_total_strength_vs_ships[player_idx][0] > 0 && random::Random_(5) == 1) {
+                        if (AIBUILD::_player_total_strength_vs_ships[player_idx][0] > 0 && game_random::Random_(5) == 1) {
                             ship_weights[0] = 0;
                         }
 
@@ -1500,7 +1500,7 @@ namespace aidudes {
         }
 
         if (freighter_shortage_flag) {
-            if ((int)random::Random_(10) <= (int)MOX::_settings.game_difficulty) {
+            if ((int)game_random::Random_(10) <= (int)MOX::_settings.game_difficulty) {
                 aidudes::_p_ai->n_freighters += 5;
             }
         }

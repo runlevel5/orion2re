@@ -751,7 +751,7 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
         "RACENAME.LBX",
         0,
         MOX::_screen_seg,
-        (int32_t)random::Random_(8) + (int32_t)race_idx * 8 - 1,
+        (int32_t)game_random::Random_(8) + (int32_t)race_idx * 8 - 1,
         1,
         sizeof(original_name)
     );

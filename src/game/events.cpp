@@ -207,8 +207,8 @@ namespace EVENTS {
 
         // Potential hits based on sum of buildings and population
         uint8_t population = (uint8_t)colony->n_pops;
-        int32_t random_val1 = random::Random_(3);
-        int32_t random_val2 = random::Random_(3);
+        int32_t random_val1 = game_random::Random_(3);
+        int32_t random_val2 = game_random::Random_(3);
 
         int16_t hits = (int16_t)((random_val1 + random_val2) * (building_count + population) / 10);
         if (hits == 0) {
@@ -249,7 +249,7 @@ namespace EVENTS {
             if (player.eliminated == 0 && player.traits[26 /* TRAIT_LUCKY */] == 1) {
                 int16_t chance = player.time_since_last_lucky_event / lucky_divisor;
 
-                if (chance >= (int16_t)random::Random_(1000)) {
+                if (chance >= (int16_t)game_random::Random_(1000)) {
                     lucky_player_idx = i;
                     player.time_since_last_lucky_event = 0;
                 }
@@ -316,7 +316,7 @@ namespace EVENTS {
                                 _event_data[i].status = 5;
                             }
                         }
-                        if (random::Random_(20) == 1 && _event_data[i].amount != _event_data[i].max_amount) {
+                        if (game_random::Random_(20) == 1 && _event_data[i].amount != _event_data[i].max_amount) {
                             _event_data[i].status = 4;
                         }
                     }
@@ -324,7 +324,7 @@ namespace EVENTS {
 
                 case 3:
                 {
-                    int val = random::Random_(50) + 50;
+                    int val = game_random::Random_(50) + 50;
                     if (MOX::_player[_event_data[i].player_idx].research_accumulated < val) {
                         val = MOX::_player[_event_data[i].player_idx].research_accumulated;
                     }
@@ -371,7 +371,7 @@ namespace EVENTS {
 
                 case 9:
                     if (_event_data[i].status == 2) {
-                        if (_event_data[i].turn_count > 4 && random::Random_(20) == 1) {
+                        if (_event_data[i].turn_count > 4 && game_random::Random_(20) == 1) {
                             _event_data[i].status = 5;
                         }
                         if (_event_data[i].turn_count > 20) {
@@ -420,7 +420,7 @@ namespace EVENTS {
 
                 case 14:
                     if (_event_data[i].status != 6) {
-                        if ((int32_t)random::Random_(100) <= (int)_event_data[i].amount * 100 / (int)_event_data[i].max_amount) {
+                        if ((int32_t)game_random::Random_(100) <= (int)_event_data[i].amount * 100 / (int)_event_data[i].max_amount) {
                             for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                                 if ((MOX::_star[_event_data[i].target_id].has_colony >> j) & 1) {
                                     if (MOX::_player[j].n_freighters > 0) {
@@ -451,7 +451,7 @@ namespace EVENTS {
                         if (_event_data[i].amount <= 0) {
                             _event_data[i].status = 5;
                         }
-                        if (_event_data[i].turn_count > 4 && random::Random_(20) == 1) {
+                        if (_event_data[i].turn_count > 4 && game_random::Random_(20) == 1) {
                             _event_data[i].status = 4;
                         }
                         _event_data[i].turn_count++;
@@ -461,7 +461,7 @@ namespace EVENTS {
                 case 17:
                     if (_event_data[i].status == 2) {
                         COLCALC::Colony_Calculation_(_event_data[i].target_id);
-                        if (_event_data[i].turn_count > 4 && random::Random_(20) == 1) {
+                        if (_event_data[i].turn_count > 4 && game_random::Random_(20) == 1) {
                             _event_data[i].status = 5;
                         }
                         if (_event_data[i].turn_count > 20) {
@@ -557,7 +557,7 @@ namespace EVENTS {
                                 _event_data[i].status = 5;
                             }
                         }
-                        if (random::Random_(20) == 1 && _event_data[i].status != 5) {
+                        if (game_random::Random_(20) == 1 && _event_data[i].status != 5) {
                             _event_data[i].status = 4;
                         }
                     }
@@ -574,7 +574,7 @@ namespace EVENTS {
                                 }
                             }
                         }
-                        if (_event_data[i].turn_count > 4 && random::Random_(20) == 1) {
+                        if (_event_data[i].turn_count > 4 && game_random::Random_(20) == 1) {
                             _event_data[i].status = 5;
                         }
                         if (_event_data[i].turn_count > 20) {
@@ -586,7 +586,7 @@ namespace EVENTS {
 
                 case 26:
                     if (_event_data[i].status == 2) {
-                        if (_event_data[i].turn_count > 4 && random::Random_(20) == 1) {
+                        if (_event_data[i].turn_count > 4 && game_random::Random_(20) == 1) {
                             _event_data[i].status = 5;
                         }
                         if (_event_data[i].turn_count > 20) {
@@ -602,7 +602,7 @@ namespace EVENTS {
 
                 case 27:
                     if (_event_data[i].status == 2) {
-                        if (_event_data[i].turn_count > 4 && random::Random_(20) == 1) {
+                        if (_event_data[i].turn_count > 4 && game_random::Random_(20) == 1) {
                             _event_data[i].status = 5;
                         }
                         if (_event_data[i].turn_count > 20) {
@@ -698,7 +698,7 @@ namespace EVENTS {
             case 4: probability = (delay * 5) / 6; break;
             }
 
-            if ((int32_t)random::Random_(512) <= probability) {
+            if ((int32_t)game_random::Random_(512) <= probability) {
                 is_random_event_due = true;
             }
         }
@@ -712,7 +712,7 @@ namespace EVENTS {
         s_wormhole_data wormhole_data;
 
         for (int16_t loop_idx = 0; loop_idx < 5; ++loop_idx) {
-            int16_t event_type = random::Random_(29) - 1;
+            int16_t event_type = game_random::Random_(29) - 1;
 
             if (MOX::_settings.game_difficulty == 0 && EVENTS::_event_good_array[event_type] == 0) {
                 continue;
@@ -915,10 +915,10 @@ namespace EVENTS {
                     EVENTS::_event_data[event_type].player_idx = -1;
                 }
                 else {
-                    int16_t amount = (random::Random_(5) + MOX::_settings.game_difficulty + 10) * 10;
+                    int16_t amount = (game_random::Random_(5) + MOX::_settings.game_difficulty + 10) * 10;
                     EVENTS::_event_data[event_type].amount = amount;
                     EVENTS::_event_data[event_type].max_amount = amount;
-                    EVENTS::_event_data[event_type].turn_count = random::Random_(5) - MOX::_settings.game_difficulty + 10;
+                    EVENTS::_event_data[event_type].turn_count = game_random::Random_(5) - MOX::_settings.game_difficulty + 10;
                 }
                 break;
             case 3:
@@ -982,14 +982,14 @@ namespace EVENTS {
                     EVENTS::_event_data[event_type].player_idx = -1;
                 }
                 else {
-                    EVENTS::_event_data[event_type].amount = (int16_t)((MOX::_player[player_idx].bc * (random::Random_(21) + 29)) /
+                    EVENTS::_event_data[event_type].amount = (int16_t)((MOX::_player[player_idx].bc * (game_random::Random_(21) + 29)) /
                         100);
                 }
                 break;
             case 16:
             {
                 EVENTS::_event_data[event_type].target_id = target_id;
-                int16_t multiplier = random::Random_(8) + MOX::_settings.game_difficulty * 2;
+                int16_t multiplier = game_random::Random_(8) + MOX::_settings.game_difficulty * 2;
                 int16_t pts = multiplier * EVENTS::Colony_Research_Points_(target_id);
                 EVENTS::_event_data[event_type].amount = pts;
                 EVENTS::_event_data[event_type].max_amount = pts;
@@ -1024,7 +1024,7 @@ namespace EVENTS {
                     EVENTS::_event_data[event_type].player_idx = -1;
                 }
                 else {
-                    EVENTS::_event_data[event_type].turn_count = random::Random_(5) - MOX::_settings.game_difficulty + 10;
+                    EVENTS::_event_data[event_type].turn_count = game_random::Random_(5) - MOX::_settings.game_difficulty + 10;
                     EVENTS::_event_data[event_type].amount = 0;
                     for (int16_t i = 0; i < 5; ++i) {
                         int16_t pl_id = MOX::_star[target_id].planet_index[i];
@@ -1294,7 +1294,7 @@ namespace EVENTS {
                         eligible_count++;
 
                         // Reservoir sampling: pick one of N elements with 1/N probability
-                        if (random::Random_(eligible_count) == 1) {
+                        if (game_random::Random_(eligible_count) == 1) {
                             selected_player = i;
                         }
                     }
@@ -1322,7 +1322,7 @@ namespace EVENTS {
                     match_count++;
 
                     // Reservoir sampling: pick the nth item with probability 1/n
-                    if (random::Random_((int32_t)match_count) == 1) {
+                    if (game_random::Random_((int32_t)match_count) == 1) {
                         selected_ship_idx = i;
                     }
                 }
@@ -1415,7 +1415,7 @@ namespace EVENTS {
                 match_count++;
 
                 // Using reservoir sampling: for the n-th match found, the probability of selecting it is 1/n.
-                if (random::Random_((int32_t)match_count) == 1) {
+                if (game_random::Random_((int32_t)match_count) == 1) {
                     selected_colony_idx = i;
                 }
             }
@@ -1438,7 +1438,7 @@ namespace EVENTS {
                 match_count++;
 
                 // Reservoir sampling: replace the current selection with 1/match_count probability
-                if (random::Random_((int32_t)match_count) == 1) {
+                if (game_random::Random_((int32_t)match_count) == 1) {
                     selected_colony_idx = i;
                 }
             }
@@ -1467,7 +1467,7 @@ namespace EVENTS {
                                     count++;
                                     // Reservoir sampling: pick the current star with 1/count probability.
                                     // The check 'count == 0' handles the unlikely case of a 16-bit counter overflow.
-                                    if (count == 0 || random::Random_((int32_t)count) == 1) {
+                                    if (count == 0 || game_random::Random_((int32_t)count) == 1) {
                                         result_star_idx = star_idx;
                                     }
                                 }
@@ -1579,7 +1579,7 @@ namespace EVENTS {
         int16_t star_idx;
 
         // Pick initial star
-        star_idx = (int16_t)random::Random_(MOX::_NUM_STARS) - 1;
+        star_idx = (int16_t)game_random::Random_(MOX::_NUM_STARS) - 1;
 
         while (counter < 1000) {
             if (MOX::_star[star_idx].has_colony != 0) {
@@ -1598,7 +1598,7 @@ namespace EVENTS {
                 }
             } else {
                 // If no colony on star, pick a new random star
-                star_idx = (int16_t)random::Random_(MOX::_NUM_STARS) - 1;
+                star_idx = (int16_t)game_random::Random_(MOX::_NUM_STARS) - 1;
             }
 
             counter++;
@@ -1621,11 +1621,11 @@ namespace EVENTS {
     }
 
     void __cdecl Event_Check_General_Status_() {
-        if (random::Random_(40 /* 0x28 */) == 1) {
+        if (game_random::Random_(40 /* 0x28 */) == 1) {
             // Check if stardate is past 35050 and the Galactic Council hasn't been established.
             if (MOX::_stardate > 35050 /* 35000 + 50 */ && diplodef::_COUNCIL_FLAG == 0) {
                 _event_data[31].status = 6; /* Just Started */
-                _event_data[31].amount = (int16_t)(random::Random_(4) - 1);
+                _event_data[31].amount = (int16_t)(game_random::Random_(4) - 1);
             }
         }
     }
@@ -1662,8 +1662,8 @@ namespace EVENTS {
         uint8_t population = MOX::_colony[colony_idx].n_pops;
         int16_t total_targets = building_count + population;
 
-        int32_t random1 = random::Random_(2);
-        int32_t random2 = random::Random_(3);
+        int32_t random1 = game_random::Random_(2);
+        int32_t random2 = game_random::Random_(3);
         int16_t final_hits = (int16_t)(((random1 + random2) * total_targets) / 10);
 
         if (final_hits == 0) {
@@ -1889,8 +1889,8 @@ namespace EVENTS {
         bomb_result.bomb_hits_remaining = 1;
         bomb_result.is_bio_weapon = 1;
 
-        int rand_val1 = random::Random_(3);
-        int rand_val2 = random::Random_(3);
+        int rand_val1 = game_random::Random_(3);
+        int rand_val2 = game_random::Random_(3);
         int rand_sum = rand_val1 + rand_val2;
 
         bomb_result.bio_hits_remaining = (int16_t)((rand_sum * (uint8_t)MOX::_colony[colony_idx].n_pops) / 10);
@@ -2230,7 +2230,7 @@ namespace EVENTS {
                 p11 = _event_data[event_id].amount;
                 break;
             case 29:
-                event_subtype = (int16_t)(random::Random_(4) - 1);
+                event_subtype = (int16_t)(game_random::Random_(4) - 1);
                 break;
             case 30:
                 event_subtype = _event_data[event_id].amount;
@@ -2244,18 +2244,18 @@ namespace EVENTS {
                 event_subtype = _event_data[event_id].amount;
                 break;
             case 32:
-                event_subtype = (int16_t)(random::Random_(4) - 1);
+                event_subtype = (int16_t)(game_random::Random_(4) - 1);
                 p8 = player_idx;
                 break;
             case 33:
-                event_subtype = (int16_t)(random::Random_(4) - 1);
+                event_subtype = (int16_t)(game_random::Random_(4) - 1);
                 break;
             case 34:
                 p10 = _event_data[event_id].target_id;
-                event_subtype = (int16_t)(random::Random_(4) - 1);
+                event_subtype = (int16_t)(game_random::Random_(4) - 1);
                 break;
             case 35:
-                event_subtype = (int16_t)(random::Random_(4) - 1);
+                event_subtype = (int16_t)(game_random::Random_(4) - 1);
                 p8 = _event_data[event_id].target_id;
                 break;
             default:
@@ -2267,10 +2267,10 @@ namespace EVENTS {
                 if (_current_event == 0) {
                     Start_Main_Event_();
                     _event_display_seg = 0;
-                    Get_Event_Message_(0, (int16_t)(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
+                    Get_Event_Message_(0, (int16_t)(game_random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
                 } else {
                     _event_display_seg = 0;
-                    Get_Event_Message_(1, (int16_t)(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
+                    Get_Event_Message_(1, (int16_t)(game_random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
                     _event_status_flag = 0;
                 }
                 Drive_Event_Screen_();

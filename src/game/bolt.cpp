@@ -184,8 +184,8 @@ namespace bolt {
                     replace::_graphics_buffer[len - i + 1] = c;
                     color_accum += step_val;
 
-                    if ((int16_t)random::Random_(100) < color_jitter_chance) {
-                        rand_val = random::Random_(rand_range2) - color_jitter_range;
+                    if ((int16_t)game_random::Random_(100) < color_jitter_chance) {
+                        rand_val = game_random::Random_(rand_range2) - color_jitter_range;
                     } else {
                         rand_val = 0;
                     }
@@ -200,8 +200,8 @@ namespace bolt {
                     replace::_graphics_buffer[i + 1] = c;
                     color_accum += step_val;
 
-                    if ((int16_t)random::Random_(100) < color_jitter_chance) {
-                        rand_val = random::Random_(rand_range2) - color_jitter_range;
+                    if ((int16_t)game_random::Random_(100) < color_jitter_chance) {
+                        rand_val = game_random::Random_(rand_range2) - color_jitter_range;
                     } else {
                         rand_val = 0;
                     }

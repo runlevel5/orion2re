@@ -411,8 +411,8 @@ namespace COLBLDG {
     }
 
     void __cdecl Build_Queue_Popup_() {
-        uint32_t original_seed = random::Get_Random_Seed_();
-        random::Set_Random_Seed_((uint32_t)COLONY::_colony_handle);
+        uint32_t original_seed = game_random::Get_Random_Seed_();
+        game_random::Set_Random_Seed_((uint32_t)COLONY::_colony_handle);
 
         COLONY::_star_handle = MOX::_screen_data;
         COLONY::_orbit_n = COLONY::_orbit_temp;
@@ -521,7 +521,7 @@ namespace COLBLDG {
             }
         }
 
-        random::Set_Random_Seed_(original_seed);
+        game_random::Set_Random_Seed_(original_seed);
     }
 
     int16_t __cdecl Star_N_Uncolonized_Worlds_(int16_t star_index) {

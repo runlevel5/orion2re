@@ -272,8 +272,8 @@ namespace antarans {
 
         int16_t shuffle_limit = *star_count / 2;
         for (int16_t i = 0; i < shuffle_limit; ++i) {
-            int16_t idx1 = (int16_t)random::Random_(*star_count) - 1;
-            int16_t idx2 = (int16_t)random::Random_(*star_count) - 1;
+            int16_t idx1 = (int16_t)game_random::Random_(*star_count) - 1;
+            int16_t idx2 = (int16_t)game_random::Random_(*star_count) - 1;
 
             if (idx1 != idx2) {
                 int16_t temp = star_list[idx1];
@@ -293,7 +293,7 @@ namespace antarans {
         if (star_count > 0) {
             for (int16_t i = 0; i < star_count; ++i) {
                 // Reservoir sampling: pick the i-th star with 1/(i+1) probability
-                if (random::Random_((int32_t)i + 1) == 1) {
+                if (game_random::Random_((int32_t)i + 1) == 1) {
                     target_star_idx = star_indices[i];
                 }
             }
@@ -500,7 +500,7 @@ namespace antarans {
 
         // If there's built-up pressure, perform a random check to decide on the attack
         if (MOX::_antarans.attack_pressure > 0) {
-            int16_t random_val = (int16_t)random::Random_(200) - 1;
+            int16_t random_val = (int16_t)game_random::Random_(200) - 1;
             if ((int32_t)MOX::_antarans.attack_pressure + 1 > (int32_t)random_val) {
                 should_attack = true;
             }

@@ -1,6 +1,6 @@
 #include "pch.h"
 
-namespace random {
+namespace game_random {
     uint32_t _random_seed;
     uint32_t _saved_random_seed;
 

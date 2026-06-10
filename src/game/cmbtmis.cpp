@@ -298,7 +298,7 @@ namespace CMBTMIS {
                 int16_t loop_count = 0;
                 if (missile->quantity > 0) {
                     do {
-                        if (random::Random_(100) < 50) {
+                        if (game_random::Random_(100) < 50) {
                             missile->quantity--;
                         }
                         loop_count++;
@@ -426,16 +426,16 @@ namespace CMBTMIS {
             int16_t loop_count = 0;
             if (missile->quantity > 0) {
                 do {
-                    int16_t roll = random::Random_(100);
+                    int16_t roll = game_random::Random_(100);
 
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_unit_idx, 8)) {
-                        if (random::Random_(100) < 30) {
+                        if (game_random::Random_(100) < 30) {
                             roll = -1000;
                         }
                     }
 
                     if (MOX::_combat_data[target_unit_idx].special_status_flag == 1) {
-                        if (random::Random_(100) < 50) {
+                        if (game_random::Random_(100) < 50) {
                             roll = -1000;
                         }
                     }
@@ -1027,11 +1027,11 @@ namespace CMBTMIS {
             type = Missile_Type_(missile_idx);
 
             if (combat_view_type == 0 && (MOX::_ship_frame % 3 == 0)) {
-                uint32_t old_seed = random::Get_Random_Seed_();
-                random::Set_Random_Seed_((uint32_t)clock() + i + missile_idx);
-                rand_x = (int16_t)random::Random_(3) - 2;
-                rand_y = (int16_t)random::Random_(3) - 2;
-                random::Set_Random_Seed_(old_seed);
+                uint32_t old_seed = game_random::Get_Random_Seed_();
+                game_random::Set_Random_Seed_((uint32_t)clock() + i + missile_idx);
+                rand_x = (int16_t)game_random::Random_(3) - 2;
+                rand_y = (int16_t)game_random::Random_(3) - 2;
+                game_random::Set_Random_Seed_(old_seed);
             }
 
             owner = Missile_Owner_(missile_idx);

@@ -554,7 +554,7 @@ namespace NETSTART {
                     for (int j = 0; j < 8; j++) {
                         if (color_used[j] == 0) {
                             num_available++;
-                            if (random::Random_(num_available) == 1) {
+                            if (game_random::Random_(num_available) == 1) {
                                 selected_color = static_cast<int8_t>(j);
                             }
                         }
