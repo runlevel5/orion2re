@@ -51,7 +51,6 @@ namespace sound {
     uint32_t _soundBufferSize;
     SDL_AtomicInt _soundTimerLock;
     SDL_AtomicInt _soundTimerCallbackCount;
-    SDL_Mutex* _musicStreamLock;
     uint8_t _audioPlaybackActive;
     int32_t _global_stream_volume = 100;
     uint8_t _loopStream;
@@ -77,18 +76,6 @@ namespace sound {
     namespace {
         void Copy_FourCC_Tag_(char* dest, const char* src) {
             memcpy(dest, src, 4);
-        }
-
-        void Lock_Music_Stream_State_() {
-            if (_musicStreamLock != nullptr) {
-                SDL_LockMutex(_musicStreamLock);
-            }
-        }
-
-        void Unlock_Music_Stream_State_() {
-            if (_musicStreamLock != nullptr) {
-                SDL_UnlockMutex(_musicStreamLock);
-            }
         }
 
         void Initialize_Sound_Indices_(uint32_t buffer_size) {
@@ -137,37 +124,11 @@ namespace sound {
             return (channel.flags & 0x0C) != 0;
         }
 
-        void Log_Music_Stream_State_(const char* event, SDL_AudioStream* stream) {
-            SDL_LogInfo(
-                SDL_LOG_CATEGORY_APPLICATION,
-                "sound: %s stream=%p current=%p id=%d status=0x%02x active=%u loop=%u bytes_written=%u data_remaining=%u block=%u stop=%d running=%d lock=%d callbacks=%d",
-                event,
-                (void*)stream,
-                (void*)_stream_data.ds_buffer,
-                _currentStreamId,
-                (unsigned int)_stream_data.status,
-                (unsigned int)_audioPlaybackActive,
-                (unsigned int)_loopStream,
-                _stream_data.bytes_written,
-                _stream_data.data_remaining,
-                _stream_data.block_size,
-                SDL_GetAtomicInt(&_soundTimerStopFlag),
-                SDL_GetAtomicInt(&_soundTimerRunning),
-                SDL_GetAtomicInt(&_soundTimerLock),
-                SDL_GetAtomicInt(&_soundTimerCallbackCount));
-        }
-
         void Destroy_SDL_Stream_(SDL_AudioStream*& stream) {
             if (stream != nullptr) {
-                if (stream == _stream_data.ds_buffer) {
-                    Log_Music_Stream_State_("Destroy_SDL_Stream begin", stream);
-                }
                 SDL_AudioStream* destroyed_stream = stream;
                 stream = nullptr;
                 SDL_DestroyAudioStream(destroyed_stream);
-                if (stream == _stream_data.ds_buffer) {
-                    Log_Music_Stream_State_("Destroy_SDL_Stream end", stream);
-                }
             }
         }
 
@@ -261,9 +222,6 @@ namespace sound {
 
         bool Queue_Stream_Block_(uint32_t bytes_to_queue) {
             if (_stream_data.ds_buffer == nullptr || bytes_to_queue == 0) {
-                if (bytes_to_queue != 0) {
-                    Log_Music_Stream_State_("Queue_Stream_Block skipped null stream", _stream_data.ds_buffer);
-                }
                 return false;
             }
 
@@ -294,11 +252,8 @@ namespace sound {
 
         bool Queue_Stream_Until_Target_(uint32_t target_queued_bytes) {
             if (_stream_data.ds_buffer == nullptr) {
-                Log_Music_Stream_State_("Queue_Stream_Until_Target null stream", _stream_data.ds_buffer);
                 return false;
             }
-
-            Log_Music_Stream_State_("Queue_Stream_Until_Target enter", _stream_data.ds_buffer);
 
             while (SDL_GetAudioStreamQueued(_stream_data.ds_buffer) < (int)target_queued_bytes) {
                 uint32_t bytes_remaining = _stream_data.data_remaining - _stream_data.bytes_written;
@@ -572,7 +527,6 @@ namespace sound {
      * Releases SDL audio stream resources and stops the periodic sound timer.
      */
     void __cdecl Destroy_Sound_() {
-        Log_Music_Stream_State_("Destroy_Sound enter", _stream_data.ds_buffer);
         Stop_Sound_Timer_And_Drain_();
 
         if (_soundTimerId != 0) {
@@ -589,19 +543,13 @@ namespace sound {
             Destroy_SDL_Stream_(_soundChannels[i].buffer);
         }
 
-        Lock_Music_Stream_State_();
-        Destroy_SDL_Stream_(_stream_data.ds_buffer);
+        SDL_AudioStream* destroyed_stream = _stream_data.ds_buffer;
+        _stream_data.ds_buffer = nullptr;
         _audioPlaybackActive = 0;
         _stream_data.status = 0;
-        Unlock_Music_Stream_State_();
+        Destroy_SDL_Stream_(destroyed_stream);
 
         _audioInitialized = 0;
-        Log_Music_Stream_State_("Destroy_Sound exit", _stream_data.ds_buffer);
-
-        if (_musicStreamLock != nullptr) {
-            SDL_DestroyMutex(_musicStreamLock);
-            _musicStreamLock = nullptr;
-        }
     }
 
     void __cdecl Init_Sound_() {
@@ -642,15 +590,6 @@ namespace sound {
             Reset_Sound_Channel_(i);
         }
 
-        if (_musicStreamLock == nullptr) {
-            _musicStreamLock = SDL_CreateMutex();
-            if (_musicStreamLock == nullptr) {
-                _soundErrorOccurred = 1;
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL_CreateMutex for music stream failed: %s", SDL_GetError());
-                return;
-            }
-        }
-
         SDL_SetAtomicInt(&_soundTimerRunning, 0);
         SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
         SDL_SetAtomicInt(&_soundTimerLock, 0);
@@ -689,7 +628,6 @@ namespace sound {
         }
 
         if (sound::_audioPlaybackActive == 1 && sound::_musicActive == 1) {
-            Log_Music_Stream_State_("Sound_Timer_Callback before Adjust_Settings", _stream_data.ds_buffer);
             sound::Adjust_Settings_();
         }
 
@@ -741,7 +679,6 @@ namespace sound {
      * @param volume_percent The desired volume as a percentage (0-100).
      */
     void __cdecl Set_Stream_Volume_(int32_t volume_percent) {
-        Lock_Music_Stream_State_();
         if (sound::_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
             // Validate that the volume percentage is within the expected range
             if (volume_percent >= 0 && volume_percent <= 100) {
@@ -754,7 +691,6 @@ namespace sound {
                 Set_SDL_Stream_Gain_(_stream_data.ds_buffer, volume_percent);
             }
         }
-        Unlock_Music_Stream_State_();
     }
 
     void __cdecl Sound_On_() {
@@ -826,32 +762,26 @@ namespace sound {
     }
 
     int32_t __cdecl Get_Stream_Volume_() {
-        Lock_Music_Stream_State_();
         if (sound::_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
-            const int32_t current_volume = _currentStreamVolume;
-            Unlock_Music_Stream_State_();
-            return current_volume;
+            return _currentStreamVolume;
         }
-
-        Unlock_Music_Stream_State_();
 
         return 0;
     }
 
     void __cdecl Stop_Stream_() {
         if (_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
-            Log_Music_Stream_State_("Stop_Stream enter", _stream_data.ds_buffer);
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: stopped file=%s entry=%d", _currentStreamFilename, _currentStreamId);
             Stop_Sound_Timer_();
 
-            Lock_Music_Stream_State_();
-            Destroy_SDL_Stream_(_stream_data.ds_buffer);
+            SDL_AudioStream* destroyed_stream = _stream_data.ds_buffer;
+            _stream_data.ds_buffer = nullptr;
             _loopStream = 0;
             _audioPlaybackActive = 0;
 
             Stop_Stream_Loop_();
-            Unlock_Music_Stream_State_();
+            Destroy_SDL_Stream_(destroyed_stream);
             Enable_Sound_Timer_();
-            Log_Music_Stream_State_("Stop_Stream exit", _stream_data.ds_buffer);
         }
     }
 
@@ -986,8 +916,6 @@ namespace sound {
         _currentStreamId = stream_id;
         _streamReadErrorLogged = 0;
 
-        Log_Music_Stream_State_("Play_Stream begin", _stream_data.ds_buffer);
-
         if (_streamLbxHandle.file == nullptr) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: requested play with unopened stream file=%s entry=%d", _currentStreamFilename, _currentStreamId);
             return;
@@ -995,11 +923,11 @@ namespace sound {
 
         Stop_Sound_Timer_();
         int32_t volume_idx = Get_Stream_Volume_();
-
-        Lock_Music_Stream_State_();
         Stop_Stream_Loop_();
 
-        Destroy_SDL_Stream_(_stream_data.ds_buffer);
+        SDL_AudioStream* destroyed_stream = _stream_data.ds_buffer;
+        _stream_data.ds_buffer = nullptr;
+        Destroy_SDL_Stream_(destroyed_stream);
 
         if (Load_Stream_Wave_Header_(stream_id, &_stream_data) == 0) {
             Enable_Sound_Timer_();
@@ -1028,12 +956,9 @@ namespace sound {
         _stream_data.ds_buffer = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &stream_spec, nullptr, nullptr);
         if (_stream_data.ds_buffer == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "stream: SDL_OpenAudioDeviceStream failed file=%s entry=%d error=%s", _currentStreamFilename, _currentStreamId, SDL_GetError());
-            Unlock_Music_Stream_State_();
             Enable_Sound_Timer_();
             return;
         }
-
-        Log_Music_Stream_State_("Play_Stream opened stream", _stream_data.ds_buffer);
 
         _stream_data.status |= 0x01;
         if (_stream_data.data_remaining > 0) {
@@ -1041,8 +966,9 @@ namespace sound {
         }
 
         if (!Queue_Stream_Until_Target_(_stream_data.block_size * STREAM_PREFILL_BLOCKS)) {
-            Destroy_SDL_Stream_(_stream_data.ds_buffer);
-            Unlock_Music_Stream_State_();
+            SDL_AudioStream* failed_stream = _stream_data.ds_buffer;
+            _stream_data.ds_buffer = nullptr;
+            Destroy_SDL_Stream_(failed_stream);
             Enable_Sound_Timer_();
             return;
         }
@@ -1052,9 +978,8 @@ namespace sound {
         Resume_SDL_Stream_(_stream_data.ds_buffer);
 
         _audioPlaybackActive = 1;
-        Unlock_Music_Stream_State_();
         Enable_Sound_Timer_();
-        Log_Music_Stream_State_("Play_Stream ready", _stream_data.ds_buffer);
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: started file=%s entry=%d", _currentStreamFilename, _currentStreamId);
     }
 
     uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr) {
@@ -1210,13 +1135,9 @@ namespace sound {
     }
 
     void __cdecl Adjust_Settings_() {
-        Lock_Music_Stream_State_();
         if (sound::_audioPlaybackActive != 1 || !(sound::_stream_data.status & 0x01)) {
-            Unlock_Music_Stream_State_();
             return;
         }
-
-        Log_Music_Stream_State_("Adjust_Settings enter", _stream_data.ds_buffer);
 
         if (sound::_command == 1 /* Fade In */) {
             int32_t current_vol = sound::Get_Stream_Volume_();
@@ -1248,21 +1169,15 @@ namespace sound {
 
         if (sound::_stream_data.status & 0x02) {
             if (sound::_stream_data.ds_buffer == nullptr) {
-                Log_Music_Stream_State_("Adjust_Settings null stream while queued", _stream_data.ds_buffer);
-                Unlock_Music_Stream_State_();
                 return;
             }
 
             if (!Queue_Stream_Until_Target_(sound::_stream_data.block_size * STREAM_PREFILL_BLOCKS)) {
-                Log_Music_Stream_State_("Adjust_Settings queue failed", _stream_data.ds_buffer);
-                Unlock_Music_Stream_State_();
                 return;
             }
         } else if (!(sound::_stream_data.status & 0x08)) {
             sound::Update_Stream_Status_();
         }
-
-        Unlock_Music_Stream_State_();
     }
 
     int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t wave_data_size) {
@@ -1586,23 +1501,19 @@ namespace sound {
     }
 
     void __cdecl Update_Stream_Status_() {
-        Lock_Music_Stream_State_();
         if (_stream_data.ds_buffer == nullptr) {
-            Unlock_Music_Stream_State_();
             return;
         }
 
         if (SDL_GetAudioStreamQueued(_stream_data.ds_buffer) == 0) {
-            Log_Music_Stream_State_("Update_Stream_Status drained", _stream_data.ds_buffer);
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: ended file=%s entry=%d", _currentStreamFilename, _currentStreamId);
             _stream_data.status ^= 1;
             Pause_SDL_Stream_(_stream_data.ds_buffer);
             _audioPlaybackActive = 0;
         }
-        Unlock_Music_Stream_State_();
     }
 
     void __cdecl Stop_Stream_Loop_() {
-        Log_Music_Stream_State_("Stop_Stream_Loop begin", _stream_data.ds_buffer);
         if (_stream_data.ds_buffer != nullptr) {
             Clear_SDL_Stream_(_stream_data.ds_buffer);
             Pause_SDL_Stream_(_stream_data.ds_buffer);
@@ -1615,13 +1526,9 @@ namespace sound {
         _stream_data.field20_0x3f = 0;
         _stream_data.write_cursor = 0;
         _stream_data.status = 0;
-        Log_Music_Stream_State_("Stop_Stream_Loop end", _stream_data.ds_buffer);
     }
 
     uint8_t __cdecl Is_Stream_Playing_() {
-        Lock_Music_Stream_State_();
-        const uint8_t is_playing = _audioPlaybackActive;
-        Unlock_Music_Stream_State_();
-        return is_playing;
+        return _audioPlaybackActive;
     }
 }
