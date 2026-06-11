@@ -57,6 +57,7 @@ namespace platform {
 		}
 
 		[[noreturn]] void Force_Immediate_Process_Exit_() {
+			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "platform: Force_Immediate_Process_Exit");
 			SDL_Quit();
 			exit(0);
 		}
@@ -583,6 +584,7 @@ namespace platform {
     }
 
     void __cdecl Prepare_Exit_() {
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Prepare_Exit");
         sound::Destroy_Sound_();
         netcode::Net_Uninit_();
         g_should_exit = 1;
@@ -758,11 +760,14 @@ namespace platform {
     }
 
     int Run_Main_Loop(const char* command_line) {
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop start cmd='%s'", command_line != nullptr ? command_line : "");
         Parse_Ten_Cmd_Parameter_(command_line);
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError());
             return 0;
         }
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL video initialized");
 
         g_should_exit = 0;
         g_pending_toggle_pages = false;
@@ -783,27 +788,33 @@ namespace platform {
 
         g_sdl_window = SDL_CreateWindow("Microprose", nWidth, nHeight, window_flags);
         if (g_sdl_window == nullptr) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateWindow failed: %s", SDL_GetError());
             SDL_Quit();
             return 0;
         }
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: window created");
 
 		g_main_window = g_sdl_window;
 
         SDL_HideCursor();
 
         if (!Create_Video_Buffers_(4)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: Create_Video_Buffers failed");
             Destroy_Main_Window_();
             SDL_Quit();
             return 0;
         }
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: video buffers created");
 
         g_worker_thread_handle = SDL_CreateThread(MOX2::thunk_main2_, "MOX2::main2_", nullptr);
         if (g_worker_thread_handle == nullptr) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateThread failed: %s", SDL_GetError());
             Cleanup_Surfaces();
             Destroy_Main_Window_();
             SDL_Quit();
             return 0;
         }
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: worker thread created");
 
         while (g_should_exit != 1) {
             Service_Pending_Window_Events_();
@@ -818,10 +829,12 @@ namespace platform {
         }
 
         if (g_worker_thread_handle != nullptr) {
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: waiting for worker thread");
             SDL_WaitThread(g_worker_thread_handle, nullptr);
             g_worker_thread_handle = nullptr;
         }
 
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop shutdown");
         Cleanup_Surfaces();
         Destroy_Main_Window_();
         SDL_Quit();

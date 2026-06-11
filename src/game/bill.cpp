@@ -23,8 +23,8 @@ namespace BILL {
         char msg_buf[128];
         char read_buffer[4096];
 
-        FILE* src_fp = fopen(src_path, "rb");
-        FILE* dst_fp = fopen(dst_path, "wb");
+        FILE* src_fp = fopen_case(src_path, "rb");
+        FILE* dst_fp = fopen_case(dst_path, "wb");
 
         if (src_fp == nullptr) {
             sprintf(msg_buf, "Could not open %s", src_path);

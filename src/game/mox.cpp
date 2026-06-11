@@ -162,7 +162,7 @@ namespace MOX {
     int16_t _wait_button;
     int16_t _scan_button;
     int16_t _missile_field[300];
-    int16_t _combat_grid[81][68];
+    int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
     int16_t _weapon_mod_field_status[15];
     int16_t _weapon_button[8];
     int16_t _ship_turn_order[210];

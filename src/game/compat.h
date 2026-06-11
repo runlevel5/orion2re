@@ -1,6 +1,8 @@
 #pragma once
 
 #include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdint.h>
 
 #include <SDL3/SDL.h>
@@ -11,6 +13,10 @@
 
 #if !defined(_MSC_VER) && !defined(__stdcall)
 #define __stdcall
+#endif
+
+#if !defined(_MSC_VER) && !defined(__thiscall)
+#define __thiscall
 #endif
 
 #if !defined(GUID_DEFINED)
@@ -38,12 +44,16 @@ struct MEMORYSTATUS {
 #endif
 
 bool File_Exists_(const char* path);
+FILE* fopen_case(const char* path, const char* mode);
 void Query_Memory_Status_(MEMORYSTATUS* memory_status);
 int Show_Message_Box_(void* window_handle, const char* text, const char* caption, bool is_error = false);
 
 #if defined(_WIN32)
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
+#else
+#define itoa SDL_itoa
+#define _itoa SDL_itoa
 #endif
 
 inline char* strlwr(char* text) {

@@ -1691,7 +1691,7 @@ namespace AIMOVE {
         }
     }
 
-    void AIMOVE::Intercept_Invaders_()
+    void Intercept_Invaders_()
     {
         int i = 0;
         s_aimove_intercept_entry intercepts[MAX_STARS];

@@ -571,7 +571,10 @@ namespace COMBAT1 {
                                             }
                                         }
                                         
-                                        int16_t tgt_idx = MOX::_combat_grid[tx][ty];
+                                        int16_t tgt_idx = -1;
+                                        if (tx >= 0 && tx < 81 && ty >= 0 && ty < 68) {
+                                            tgt_idx = MOX::_combat_grid[tx][ty];
+                                        }
                                         if (MOX::_board_flag + MOX::_skan_flag <= 0) {
                                             if (tgt_idx == 2000) {
                                                 int8_t orig_owner = MOX::_combat_data[MOX::_cur_ship].owner;
@@ -1416,9 +1419,15 @@ namespace COMBAT1 {
         for (int grid_x = 31; grid_x >= 0; --grid_x) {
             for (int grid_y = 17; grid_y >= 0; --grid_y) {
                 int idx = grid_x * 18 + grid_y + 1;
+                int16_t target_ship = -1;
+                int16_t world_x = grid_x + MOX::_cur_combat_x;
+                int16_t world_y = grid_y + MOX::_cur_combat_y;
+
+                if (world_x >= 0 && world_x < 81 && world_y >= 0 && world_y < 68) {
+                    target_ship = MOX::_combat_grid[world_x][world_y];
+                }
 
                 if (MOX::_skan_flag == 1) {
-                    int16_t target_ship = MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y];
                     if (target_ship < 0 || target_ship >= MOX::_combat_total_ship_count) {
                         MOX::_combat_mouse_grid[idx].icon = 14;
                         MOX::_combat_mouse_grid[idx].frame = 12;
@@ -1427,7 +1436,6 @@ namespace COMBAT1 {
                         MOX::_combat_mouse_grid[idx].frame = 12;
                     }
                 } else if (MOX::_board_flag == 1) {
-                    int16_t target_ship = MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y];
                     if (target_ship < 0 || target_ship >= MOX::_combat_total_ship_count ||
                         MOX::_combat_data[target_ship].owner == MOX::_combat_data[MOX::_cur_ship].owner) {
                         MOX::_combat_mouse_grid[idx].icon = 2;
@@ -1437,7 +1445,6 @@ namespace COMBAT1 {
                         MOX::_combat_mouse_grid[idx].frame = 12;
                     }
                 } else {
-                    int16_t target_ship = MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y];
                     if (target_ship < 0) {
                         MOX::_combat_mouse_grid[idx].icon = 2;
                         MOX::_combat_mouse_grid[idx].frame = 12;

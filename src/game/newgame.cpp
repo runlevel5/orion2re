@@ -357,7 +357,7 @@ void Temps_To_Globals_() {
     MOX::_settings.starting_civilization_level = (uint8_t)_civ_button_variable;
     MOX::_settings.strategic_combat_flag = (_combat_button_variable == 0);
     MOX::_settings.random_events = (int8_t)_random_events_button_variable;
-    MOX::_settings.xenons_exist = (byte)_xenon_attacks_button_variable;
+    MOX::_settings.xenons_exist = (uint8_t)_xenon_attacks_button_variable;
 }
 
 } // namespace NEWGAME

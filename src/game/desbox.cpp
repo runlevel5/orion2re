@@ -1392,7 +1392,7 @@ namespace DESBOX {
         fields::Assign_Auto_Function_(Draw_Weapons_Replacement_Box_, 1);
         Get_Weapons_Box_Base_Dimensions_();
         Set_Up_Weapon_Display_(replacement_slot);
-        Weapon_Replacement_Help_(MOX::_design_screen_replacement_slot);
+        Weapon_Replacement_Help_(_field_item_chosen);
 
         int16_t redraw_flag = 1;
 
@@ -1958,9 +1958,9 @@ namespace DESBOX {
     void __cdecl Weapon_Replacement_Help_(int16_t weapon_idx) {
         uint8_t needs_racks = 0;
 
-        if (weapon_idx >= 0) {
+        if (weapon_idx >= 0 && weapon_idx < MOX::_scroll_bar->total_rows) {
             int16_t actual_weapon_idx = Weapon_Index_(weapon_idx);
-            if (DESIGN::Weapon_Needs_Racks_(actual_weapon_idx) != 0) {
+            if (actual_weapon_idx > 0 && DESIGN::Weapon_Needs_Racks_(actual_weapon_idx) != 0) {
                 needs_racks = 1;
             }
         }

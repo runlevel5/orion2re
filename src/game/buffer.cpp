@@ -121,7 +121,7 @@ namespace buffer {
 
     if (buffer::_file_buffer_count > 0) {
       for (int32_t i = 0; i < (int32_t)buffer::_file_buffer_count; ++i) {
-        if (_strcmpi(file_name, buffer::_file_buffer[i].file_name) == 0) {
+        if (strcasecmp(file_name, buffer::_file_buffer[i].file_name) == 0) {
           found_file = true;
           file_index = i;
           break;
@@ -206,7 +206,7 @@ namespace buffer {
 
     reuse_current_file = false;
     if (farload::_farload_file_flag != 0) {
-      if (_strcmpi(file_name, farload::_farload_file_name) == 0) {
+      if (strcasecmp(file_name, farload::_farload_file_name) == 0) {
         reuse_current_file = true;
       } else if (farload::_farload_file_flag != 0) {
         fclose(farload::_farload_fptr);
@@ -215,7 +215,7 @@ namespace buffer {
 
     if (!reuse_current_file) {
       strcpy(farload::_farload_file_name, file_name);
-      farload::_farload_fptr = fopen(file_name, "rb");
+      farload::_farload_fptr = fopen_case(file_name, "rb");
 
       if (farload::_farload_fptr == nullptr) {
         if (farload::_secondary_drive_path[0] == '\0') {
@@ -224,7 +224,7 @@ namespace buffer {
 
         strcpy(secondary_file_name, farload::_secondary_drive_path);
         strcat(secondary_file_name, farload::_farload_file_name);
-        farload::_farload_fptr = fopen(secondary_file_name, "rb");
+        farload::_farload_fptr = fopen_case(secondary_file_name, "rb");
 
         if (farload::_farload_fptr == nullptr) {
           farload::Error_Handler_(file_name, 1, entry_index);

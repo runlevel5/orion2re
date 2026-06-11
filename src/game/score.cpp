@@ -202,7 +202,7 @@ namespace SCORE {
     }
 
     void __cdecl Create_Default_HOF_File_() {
-        FILE* file = fopen("HOF.M2", "wb");
+        FILE* file = fopen_case("HOF.M2", "wb");
 
         memset(&_hof, 0, sizeof(s_hof));
 
@@ -264,7 +264,7 @@ namespace SCORE {
         FILE* file;
         int16_t sort_buffer[10][2];
 
-        file = fopen("HOF.M2", "rb");
+        file = fopen_case("HOF.M2", "rb");
         if (file == nullptr) {
             return 0;
         }
@@ -609,7 +609,7 @@ namespace SCORE {
     void __cdecl Write_HOF_File_() {
         FILE* file;
 
-        file = fopen("HOF.M2", "wb");
+        file = fopen_case("HOF.M2", "wb");
         if (file != nullptr) {
             fwrite(&_hof, sizeof(s_hof), 1, file);
             fclose(file);

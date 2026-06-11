@@ -1384,7 +1384,7 @@ namespace HAROLD {
 
     void __cdecl Write_Language_Setting_File_() {
         char language_text[80];
-        FILE* file = fopen(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
+        FILE* file = fopen_case(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
 
         if (file != nullptr) {
             itoa((uint32_t)(uint8_t)MOX::_settings.language, language_text, 10);

@@ -6,7 +6,7 @@ namespace FILEDEF {
     void __cdecl Load_Game_Settings_() {
         RUSS::Assert_Settings_();
 
-        FILE* file = fopen("MOX.SET", "rb");
+        FILE* file = fopen_case("MOX.SET", "rb");
         if (file != nullptr) {
             fread(&MOX::_settings, sizeof(MOX::_settings), 1, file);
             fclose(file);
@@ -19,7 +19,7 @@ namespace FILEDEF {
     bool Save_Game_Settings_(void) {
         RUSS::Assert_Settings_();
 
-        FILE* file = fopen("MOX.SET", "wb");
+        FILE* file = fopen_case("MOX.SET", "wb");
         if (file == nullptr) {
             return false;
         }
@@ -54,7 +54,7 @@ namespace FILEDEF {
 
         RUSS::Assert_Settings_();
 
-        FILE* fp = fopen(filename, "wb");
+        FILE* fp = fopen_case(filename, "wb");
 
         if (fp == nullptr) {
             char error_message[] = "Error saving game.\n";
@@ -166,7 +166,7 @@ namespace FILEDEF {
         RUSS::Mox_Update_();
         RUSS::Assert_Settings_();
 
-        FILE* file = fopen(filename, "rb");
+        FILE* file = fopen_case(filename, "rb");
         if (file == nullptr) {
             RUSS::PFMT_(0, 0, "File read error");
             assert::hgetch_();
@@ -351,7 +351,7 @@ namespace FILEDEF {
             strcat(filename, ".GAM");
 
             if (File_Exists_(filename)) {
-                FILE* fp = fopen(filename, "rb");
+                FILE* fp = fopen_case(filename, "rb");
                 if (fp != nullptr) {
                     int32_t type;
                     fread(&type, sizeof(type), 1, fp);
@@ -382,7 +382,7 @@ namespace FILEDEF {
         char filename[16];
 
         sprintf(filename, "SAVE%d.GAM", save_slot + 1);
-        FILE* file = fopen(filename, "rb");
+        FILE* file = fopen_case(filename, "rb");
         if (file != nullptr) {
             if (fseek(file, 0x2D, SEEK_SET) == 0) {
                 fread(&game_type, sizeof(game_type), 1, file);
@@ -394,7 +394,7 @@ namespace FILEDEF {
 
     void Update_Game_Settings_Version_Number_() {
         bool needs_reset = false;
-        FILE* file = fopen("MOX.SET", "rb");
+        FILE* file = fopen_case("MOX.SET", "rb");
 
         if (file != nullptr) {
             fclose(file);

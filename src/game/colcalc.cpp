@@ -1123,7 +1123,7 @@ namespace COLCALC {
                 int32_t base_cost = (uint8_t)colony->n_food_replicated + total_building_maintenance;
 
                 int32_t calculated_bc = (((climate_modifier * base_cost) * 4 + 200) * 25) / 10000;
-                colony->maintenance[ECON_BC] = (byte)calculated_bc;
+                colony->maintenance[ECON_BC] = (uint8_t)calculated_bc;
             }
         }
 

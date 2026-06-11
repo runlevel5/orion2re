@@ -108,7 +108,7 @@ namespace INITGAME {
     }
 
     void Write_Game_Settings_() {
-        FILE* settings_file = fopen("mox.set", "wb");
+        FILE* settings_file = fopen_case("mox.set", "wb");
 
         if (settings_file == nullptr) {
             exitm::Exit_With_Message("Unable to open mox.set");

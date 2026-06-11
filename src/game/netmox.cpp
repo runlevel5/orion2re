@@ -1603,7 +1603,7 @@ namespace NETMOX {
                 return &_secret_modem_file;
             }
 
-            _secret_modem_file.file = fopen("modem.tmp", mode_str);
+            _secret_modem_file.file = fopen_case("modem.tmp", mode_str);
             if (_secret_modem_file.file == nullptr) {
                 exitm::Exit_With_message2_(_modem_disk_error);
                 return &_secret_modem_file;

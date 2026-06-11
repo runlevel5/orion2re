@@ -1042,7 +1042,7 @@ struct s_colony {
     int8_t allocated_to;
     int16_t planet;
     int16_t officer;
-    byte outpost_flag;
+    uint8_t outpost_flag;
     int8_t morale;
     int16_t pollution;
     uint8_t n_pops;
@@ -1086,7 +1086,7 @@ struct s_colony {
     int16_t military[2];
     int8_t tank_roundoff;
     int8_t infantry_roundoff;
-    byte buildings[49];
+    uint8_t buildings[49];
     uint16_t last_turn_building_destroyed;
 };
 
@@ -2336,7 +2336,7 @@ struct s_leader_data {
     int16_t xp;
     uint32_t general_skills;
     uint32_t special_skills;
-    byte tech_application[3];
+    uint8_t tech_application[3];
     uint8_t pict_num;
     int16_t skill_value;
     uint8_t level;
@@ -3084,7 +3084,7 @@ struct s_ship_design {
     sbyte picture_num;
     uint8_t previous_owner;
     int16_t cost;
-    byte combat_speed;
+    uint8_t combat_speed;
     uint16_t date_of_design;
 };
 
@@ -3098,11 +3098,11 @@ struct s_player {
     int8_t picture;
     char name[20];
     char race_name[15];
-    byte eliminated;
+    uint8_t eliminated;
     uint8_t race;
     uint8_t color;
     uint8_t personality;
-    byte objectives;
+    uint8_t objectives;
     int16_t home_planet_id;
     int16_t network_player_id;
     int8_t player_done_flags;
@@ -3126,8 +3126,8 @@ struct s_player {
     int16_t surplus_bc;
     int32_t total_maintenance;
     int16_t maintenance[6];
-    byte tech_fields[83];
-    byte tech_applications[212];
+    uint8_t tech_fields[83];
+    uint8_t tech_applications[212];
     int32_t research_accumulated;
     int8_t captured_orion;
     int8_t captured_antares;
@@ -3739,7 +3739,7 @@ typedef struct s_qship s_qship, *Ps_qship;
 
 struct s_qship {
     int8_t player;
-    byte size;
+    uint8_t size;
     int16_t ship_design_idx;
     int16_t field3_0x4;
     int8_t status;
@@ -3962,10 +3962,10 @@ struct s_settings {
     uint8_t music_on;
     int8_t music_level;
     int8_t active_save_slot;
-    byte multi_player_game_type;
+    uint8_t multi_player_game_type;
     char net_game_name[9];
     struct s_modem_settings modem_settings;
-    byte modem_init_string[11];
+    uint8_t modem_init_string[11];
     undefined field26_0xae;
     undefined field27_0xaf;
     undefined field28_0xb0;
@@ -4003,12 +4003,12 @@ struct s_settings {
     undefined field60_0xd0;
     undefined field61_0xd1;
     uint8_t language;
-    byte xenons_exist;
+    uint8_t xenons_exist;
     int8_t game_difficulty;
     int8_t number_of_players;
     int8_t galaxy_size;
     int8_t galaxy_age;
-    byte strategic_combat_flag;
+    uint8_t strategic_combat_flag;
     int8_t starting_civilization_level;
     uint32_t start_of_game_seed;
     int16_t sound_driver_id;
@@ -4379,7 +4379,7 @@ struct s_ship_data {
     int8_t crew_quality;
     int16_t crew_experience;
     int16_t officer_index;
-    byte special_device_damage_flags[5];
+    uint8_t special_device_damage_flags[5];
     int16_t armor_damage;
     int16_t structural_damage;
     int8_t mission;
@@ -4539,32 +4539,32 @@ struct s_star_data {
     int8_t black_hole_blocks[9];
     int8_t system_special;
     int8_t wormhole_star_id;
-    byte blockaded;
+    uint8_t blockaded;
     uint8_t blockaded_by[MAX_PLAYERS];
     uint8_t visited;
-    byte just_visited;
-    byte ignore_colony_ships;
-    byte ignore_combat_ships;
+    uint8_t just_visited;
+    uint8_t ignore_colony_ships;
+    uint8_t ignore_combat_ships;
     int8_t colonize_player;
-    byte has_colony;
-    byte has_warp_field_interdictor;
-    byte next_wfi_in_list;
-    byte has_tachyon;
-    byte has_subspace;
-    byte has_stargate;
-    byte has_jumpgate;
-    byte has_artemis_net;
-    byte has_dimensional_portal;
-    byte is_stagepoint;
+    uint8_t has_colony;
+    uint8_t has_warp_field_interdictor;
+    uint8_t next_wfi_in_list;
+    uint8_t has_tachyon;
+    uint8_t has_subspace;
+    uint8_t has_stargate;
+    uint8_t has_jumpgate;
+    uint8_t has_artemis_net;
+    uint8_t has_dimensional_portal;
+    uint8_t is_stagepoint;
     int8_t officer_index[MAX_PLAYERS];
     int16_t planet_index[5];
     int16_t relocate_ship_to[MAX_PLAYERS];
     int8_t twinkling1;
     int8_t twinkling2;
-    byte not_used3;
+    uint8_t not_used3;
     int8_t surrender_to[MAX_PLAYERS];
-    byte in_nebula;
-    byte artifacts_gave_app;
+    uint8_t in_nebula;
+    uint8_t artifacts_gave_app;
 };
 
 typedef struct s_star_weight s_star_weight, *Ps_star_weight;
@@ -4604,7 +4604,7 @@ struct s_tech_app_data {
     int16_t tech_field_id;
     uint8_t unk_class;
     uint8_t ai_group;
-    byte unknown1;
+    uint8_t unknown1;
     uint8_t in_strategic;
     uint8_t type;
 };
@@ -4684,7 +4684,7 @@ struct s_tech_field_data {
     int16_t next_field_id;
     int16_t tech[4];
     uint32_t cost;
-    byte ai_group;
+    uint8_t ai_group;
 };
 
 typedef struct s_tech_fuel_data s_tech_fuel_data, *Ps_tech_fuel_data;
@@ -4885,8 +4885,8 @@ typedef struct s_winnet_provider s_winnet_provider, *Ps_winnet_provider;
 struct s_winnet_provider {
     GUID guid;
     char name[100];
-    dword major_version;
-    dword minor_version;
+    uint32_t major_version;
+    uint32_t minor_version;
 };
 
 typedef struct s_wormhole_data s_wormhole_data, *Ps_wormhole_data;

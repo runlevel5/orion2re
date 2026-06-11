@@ -298,15 +298,6 @@ namespace sound {
             return interval;
         }
 
-        void Debug_Log_Stream_Message_(const char* format, ...) {
-            char message[512];
-            va_list args;
-            va_start(args, format);
-            vsnprintf(message, sizeof(message), format, args);
-            va_end(args);
-
-            SDL_Log("%s", message);
-        }
     }
 
     /**
@@ -501,11 +492,15 @@ namespace sound {
     }
 
     void __cdecl Init_Sound_() {
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "sound: Init_Sound start");
+
         if ((SDL_WasInit(SDL_INIT_AUDIO) & SDL_INIT_AUDIO) == 0) {
             if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
                 _soundErrorOccurred = 1;
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL_InitSubSystem(SDL_INIT_AUDIO) failed: %s", SDL_GetError());
                 return;
             }
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL audio subsystem initialized");
         }
 
         memset(&_soundLbxHandle, 0, sizeof(s_lbx_stream_header));
@@ -514,10 +509,17 @@ namespace sound {
         lbx::LBX_init_(&_soundLbxHandle, "sound.lbx");
         lbx::LBX_init_(&_musicLbxHandle, "music.lbx");
         lbx::LBX_init_stream_(&_streamLbxHandle, "stream.lbx");
+        SDL_LogInfo(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "sound: lbx open sound=%d music=%d stream=%d",
+            _soundLbxHandle.file != nullptr ? 1 : 0,
+            _musicLbxHandle.file != nullptr ? 1 : 0,
+            _streamLbxHandle.file != nullptr ? 1 : 0);
 
         if (_soundBuffer != nullptr) {
             _soundBufferSize = allocate::Get_Remaining_Block_Space_(_soundBuffer);
             memset(_soundBuffer, 0, _soundBufferSize);
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "sound: sound buffer ready size=%u", _soundBufferSize);
         }
 
         Initialize_Sound_Indices_(_soundBufferSize);
@@ -536,6 +538,9 @@ namespace sound {
             _audioInitialized = 1;
             _musicActive = 1;
             _soundErrorOccurred = 0;
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "sound: Init_Sound complete timer=%u", (unsigned int)_soundTimerId);
+        } else {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL_AddTimer failed: %s", SDL_GetError());
         }
     }
 
@@ -738,7 +743,7 @@ namespace sound {
 
     int8_t __cdecl Load_Stream_Wave_Header_(int32_t entry_index, s_sound_stream* stream) {
         if (entry_index == 0) {
-            Debug_Log_Stream_Message_("stream: rejected empty entry file=%s entry=%d", _currentStreamFilename, entry_index);
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: rejected empty entry file=%s entry=%d", _currentStreamFilename, entry_index);
             return 0;
         }
 
@@ -754,25 +759,25 @@ namespace sound {
 
         Copy_FourCC_Tag_(tag_buffer, stream->riff_tag);
         if (strcasecmp(tag_buffer, "RIFF") != 0) {
-            Debug_Log_Stream_Message_("stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->wave_tag);
         if (strcasecmp(tag_buffer, "WAVE") != 0) {
-            Debug_Log_Stream_Message_("stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->fmt_tag);
         if (strcasecmp(tag_buffer, "fmt ") != 0) {
-            Debug_Log_Stream_Message_("stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->data_tag);
         if (strcasecmp(tag_buffer, "data") != 0) {
-            Debug_Log_Stream_Message_("stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
             return 0;
         }
 
@@ -788,7 +793,7 @@ namespace sound {
 
         _currentStreamId = stream_id;
         _streamReadErrorLogged = 0;
-        Debug_Log_Stream_Message_("stream: play file=%s entry=%d", _currentStreamFilename, _currentStreamId);
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: play file=%s entry=%d", _currentStreamFilename, _currentStreamId);
 
         Stop_Sound_Timer_();
         int32_t volume_idx = Get_Stream_Volume_();
@@ -815,14 +820,14 @@ namespace sound {
         stream_spec.freq = (int)_stream_data.samples_per_sec;
 
         if (stream_spec.format == SDL_AUDIO_UNKNOWN) {
-            Debug_Log_Stream_Message_("stream: unsupported audio format file=%s entry=%d format=%u bits=%u", _currentStreamFilename, _currentStreamId, _stream_data.format_tag, _stream_data.bits_per_sample);
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: unsupported audio format file=%s entry=%d format=%u bits=%u", _currentStreamFilename, _currentStreamId, _stream_data.format_tag, _stream_data.bits_per_sample);
             Enable_Sound_Timer_();
             return;
         }
 
         _stream_data.ds_buffer = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &stream_spec, nullptr, nullptr);
         if (_stream_data.ds_buffer == nullptr) {
-            Debug_Log_Stream_Message_("stream: SDL_OpenAudioDeviceStream failed file=%s entry=%d error=%s", _currentStreamFilename, _currentStreamId, SDL_GetError());
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "stream: SDL_OpenAudioDeviceStream failed file=%s entry=%d error=%s", _currentStreamFilename, _currentStreamId, SDL_GetError());
             Enable_Sound_Timer_();
             return;
         }
@@ -857,7 +862,8 @@ namespace sound {
 
         if (_streamReadErrorLogged == 0) {
             _streamReadErrorLogged = 1;
-            Debug_Log_Stream_Message_(
+            SDL_LogWarn(
+                SDL_LOG_CATEGORY_APPLICATION,
                 "stream: read failed file=%s entry=%d status=%u requested=%u copied=%u bytes_written=%u total_data=%u data_offset=%u loop=%u",
                 _currentStreamFilename,
                 _currentStreamId,

@@ -280,8 +280,8 @@ namespace CMBTDRW1 {
 
             uint8_t color = (MOX::_in_nebula_flag == 1) ? 0 : 0x81 /* 129 */;
 
-            for (int16_t x = MOX::_cur_combat_x; x < MOX::_cur_combat_x + 32; ++x) {
-                for (int16_t y = MOX::_cur_combat_y; y < MOX::_cur_combat_y + 18; ++y) {
+            for (int16_t x = MOX::_cur_combat_x; x < MOX::_cur_combat_x + COMBAT_GRID_VIEW_WIDTH; ++x) {
+                for (int16_t y = MOX::_cur_combat_y; y < MOX::_cur_combat_y + COMBAT_GRID_VIEW_HEIGHT; ++y) {
                     if (MOX::_combat_grid[x][y] == 2000 /* 0x7D0 */) {
                         int16_t x1 = (x - MOX::_cur_combat_x) * 20;
                         int16_t y1 = (y - MOX::_cur_combat_y) * 20;
@@ -625,7 +625,7 @@ namespace CMBTDRW1 {
         if (MOX::_cur_ship >= 0) {
             int16_t new_last_ship_status = MOX::_last_ship_status;
 
-            if (ptr_x / 20 < 32 && ptr_y / 20 < 18) {
+            if (ptr_x / 20 < COMBAT_GRID_VIEW_WIDTH && ptr_y / 20 < COMBAT_GRID_VIEW_HEIGHT) {
                 graphics::Set_Window_(0, 0, 639, 350);
                 video::Clip_On_();
 
@@ -641,6 +641,17 @@ namespace CMBTDRW1 {
 
                 int16_t grid_x = (ptr_x - ship_draw_size + 12) / 20;
                 int16_t grid_y = (ptr_y - ship_draw_size + 12) / 20;
+                if (grid_x < 0) {
+                    grid_x = 0;
+                } else if (grid_x > COMBAT_GRID_VIEW_MAX_X) {
+                    grid_x = COMBAT_GRID_VIEW_MAX_X;
+                }
+
+                if (grid_y < 0) {
+                    grid_y = 0;
+                } else if (grid_y > COMBAT_GRID_VIEW_MAX_Y) {
+                    grid_y = COMBAT_GRID_VIEW_MAX_Y;
+                }
 
                 if (MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y] == 2000 &&
                     MOX::_skan_flag == 0 &&
@@ -674,9 +685,21 @@ skip_box:
 
                 int16_t ptr_offset = mouse::Get_Pointer_Offset_();
                 int16_t ptr_offset_y = mouse::Get_Pointer_Offset_();
-                int16_t hov_grid_x = (ptr_x + ptr_offset) / 20 + MOX::_cur_combat_x;
-                int16_t hov_grid_y = (ptr_y + ptr_offset_y) / 20 + MOX::_cur_combat_y;
-                int16_t hov_ship = MOX::_combat_grid[hov_grid_x][hov_grid_y];
+                int16_t hov_grid_x = (ptr_x + ptr_offset) / 20;
+                int16_t hov_grid_y = (ptr_y + ptr_offset_y) / 20;
+                if (hov_grid_x < 0) {
+                    hov_grid_x = 0;
+                } else if (hov_grid_x > COMBAT_GRID_VIEW_MAX_X) {
+                    hov_grid_x = COMBAT_GRID_VIEW_MAX_X;
+                }
+
+                if (hov_grid_y < 0) {
+                    hov_grid_y = 0;
+                } else if (hov_grid_y > COMBAT_GRID_VIEW_MAX_Y) {
+                    hov_grid_y = COMBAT_GRID_VIEW_MAX_Y;
+                }
+
+                int16_t hov_ship = MOX::_combat_grid[hov_grid_x + MOX::_cur_combat_x][hov_grid_y + MOX::_cur_combat_y];
 
                 if (MOX::_ship_status_display != 0) {
                     Draw_Special_Status_Display_();

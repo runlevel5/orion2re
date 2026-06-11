@@ -9,14 +9,14 @@ namespace lbx {
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename) {
         memset(header, 0, sizeof(s_lbx_stream_header));
 
-        header->file = fopen(filename, "r+b");
+        header->file = fopen_case(filename, "r+b");
         
         if (header->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char full_path[sizeof(header->filename)];
                 strcpy(full_path, farload::_secondary_drive_path);
                 strcat(full_path, filename);
-                header->file = fopen(full_path, "r+b");
+                header->file = fopen_case(full_path, "r+b");
             }
             
             if (header->file == nullptr) {
@@ -67,14 +67,14 @@ namespace lbx {
 
         memset(stream, 0, sizeof(s_wave_stream_header));
 
-        stream->file = fopen(filename, "rb");
+        stream->file = fopen_case(filename, "rb");
 
         if (stream->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char full_path[sizeof(stream->filename)];
                 strcpy(full_path, farload::_secondary_drive_path);
                 strcat(full_path, filename);
-                stream->file = fopen(full_path, "rb");
+                stream->file = fopen_case(full_path, "rb");
             }
             if (stream->file == nullptr) {
                 sound::_musicActive = 0;

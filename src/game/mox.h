@@ -65,7 +65,7 @@ namespace MOX {
     extern int16_t _wait_button;
     extern int16_t _scan_button;
     extern int16_t _missile_field[300];
-    extern int16_t _combat_grid[81][68];
+    extern int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
     extern int16_t _weapon_mod_field_status[15];
     extern int16_t _weapon_button[8];
     extern int16_t _ship_turn_order[210];

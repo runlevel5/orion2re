@@ -135,7 +135,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
         RUSS::Mox_Update_();
     }
 
-    FILE* file = fopen("lastrace.rac", "rb");
+    FILE* file = fopen_case("lastrace.rac", "rb");
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
         _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, 12, 1, 0x1F);
@@ -339,7 +339,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
         }
         
         if (input_field == field_ids[13]) {
-            FILE* race_file = fopen("lastrace.rac", "rb");
+            FILE* race_file = fopen_case("lastrace.rac", "rb");
             if (_custom_flag == 0) {
                 _custom_flag = 1;
                 fields::Clear_Fields_Above_(field_ids[12]);
@@ -655,7 +655,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                     }
 
                     if (popup_result == 2) {
-                        FILE* race_file = fopen("lastrace.rac", "wb");
+                        FILE* race_file = fopen_case("lastrace.rac", "wb");
                         if (race_file != nullptr) {
                             fwrite(player->traits, sizeof(player->traits), 1, race_file);
                             fwrite(&player->race, sizeof(player->race), 1, race_file);
