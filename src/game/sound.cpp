@@ -38,11 +38,12 @@ namespace sound {
     uint8_t _soundErrorOccurred;
     SDL_TimerID _soundTimerId;
     uint8_t _soundTimerActive;
-    volatile uint32_t _soundTimerRunning = 1;
-    volatile uint32_t _soundTimerStopFlag;
+    SDL_AtomicInt _soundTimerRunning;
+    SDL_AtomicInt _soundTimerStopFlag;
     void* _soundBuffer;
     uint32_t _soundBufferSize;
-    volatile uint32_t _soundTimerLock;
+    SDL_AtomicInt _soundTimerLock;
+    SDL_AtomicInt _soundTimerCallbackCount;
     uint8_t _audioPlaybackActive;
     int32_t _global_stream_volume = 100;
     uint8_t _loopStream;
@@ -94,11 +95,14 @@ namespace sound {
         }
 
         void Stop_Sound_Timer_And_Drain_() {
-            _soundTimerStopFlag = 1;
+            SDL_SetAtomicInt(&_soundTimerStopFlag, 1);
 
-            while (_soundTimerRunning != 0) {
-                sound::Sound_Timer_Callback_(0, 0, 0, 0, 0);
+            while (SDL_GetAtomicInt(&_soundTimerCallbackCount) != 0 ||
+                   SDL_GetAtomicInt(&_soundTimerLock) != 0) {
+                SDL_Delay(1);
             }
+
+            SDL_SetAtomicInt(&_soundTimerRunning, 0);
         }
 
         SDL_AudioFormat Get_SDL_Audio_Format_(uint16_t format_tag, uint16_t bits_per_sample) {
@@ -294,7 +298,21 @@ namespace sound {
 
         Uint32 SDLCALL Sound_Timer_Thunk_(void* userdata, SDL_TimerID timer_id, Uint32 interval) {
             (void)userdata;
+
+            if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
+                SDL_SetAtomicInt(&_soundTimerRunning, 0);
+                return 0;
+            }
+
+            SDL_AddAtomicInt(&_soundTimerCallbackCount, 1);
             sound::Sound_Timer_Callback_(timer_id, 0, 0, 0, 0);
+            SDL_AddAtomicInt(&_soundTimerCallbackCount, -1);
+
+            if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
+                SDL_SetAtomicInt(&_soundTimerRunning, 0);
+                return 0;
+            }
+
             return interval;
         }
 
@@ -477,9 +495,15 @@ namespace sound {
      */
     void __cdecl Destroy_Sound_() {
         Stop_Sound_Timer_And_Drain_();
+
         if (_soundTimerId != 0) {
             SDL_RemoveTimer(_soundTimerId);
             _soundTimerId = 0;
+        }
+
+        while (SDL_GetAtomicInt(&_soundTimerCallbackCount) != 0 ||
+               SDL_GetAtomicInt(&_soundTimerLock) != 0) {
+            SDL_Delay(1);
         }
 
         for (int i = 0; i < k_sound_channel_count; ++i) {
@@ -529,6 +553,11 @@ namespace sound {
             Reset_Sound_Channel_(i);
         }
 
+        SDL_SetAtomicInt(&_soundTimerRunning, 0);
+        SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
+        SDL_SetAtomicInt(&_soundTimerLock, 0);
+        SDL_SetAtomicInt(&_soundTimerCallbackCount, 0);
+
         _soundTimerId = SDL_AddTimer(k_sound_timer_interval_ms, Sound_Timer_Thunk_, nullptr);
         if (_soundTimerId != 0) {
             _soundTimerActive = 1;
@@ -545,19 +574,17 @@ namespace sound {
     }
 
     void __stdcall Sound_Timer_Callback_(uint32_t timer_id, uint32_t message, uint32_t user_data, uint32_t param1, uint32_t param2) {
-        if (sound::_soundTimerLock == 1) {
+        if (!SDL_CompareAndSwapAtomicInt(&_soundTimerLock, 0, 1)) {
             return;
         }
 
-        sound::_soundTimerLock = 1;
-
-        if (sound::_soundTimerRunning == 0) {
-            if (sound::_soundTimerStopFlag != 0) {
-                sound::_soundTimerLock = 0;
-                return;
-            }
-            sound::_soundTimerRunning = 1;
+        if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
+            SDL_SetAtomicInt(&_soundTimerRunning, 0);
+            SDL_SetAtomicInt(&_soundTimerLock, 0);
+            return;
         }
+
+        SDL_SetAtomicInt(&_soundTimerRunning, 1);
 
         if (sound::_soundOn == 1 && sound::_audioInitialized == 1) {
             sound::Update_Sound_Channels_();
@@ -567,11 +594,11 @@ namespace sound {
             sound::Adjust_Settings_();
         }
 
-        if (sound::_soundTimerStopFlag != 0) {
-            sound::_soundTimerRunning = 0;
+        if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
+            SDL_SetAtomicInt(&_soundTimerRunning, 0);
         }
 
-        sound::_soundTimerLock = 0;
+        SDL_SetAtomicInt(&_soundTimerLock, 0);
     }
 
     /**
@@ -589,11 +616,11 @@ namespace sound {
      * Enables the sound timer by clearing the stop flag.
      */
     void __cdecl Enable_Sound_Timer_() {
-        _soundTimerStopFlag = 0;
+        SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
     }
 
     void __cdecl Resume_Timer2_() {
-        _soundTimerStopFlag = 0;
+        SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
     }
 
     void __cdecl Loop_Stream_(int32_t count) {
