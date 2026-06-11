@@ -324,15 +324,8 @@ void* __cdecl Farload_Data_Static_(const char* filename, int32_t resource_id, vo
 }
 
 void __cdecl Set_Alternate_Path_(char* input_path) {
-    strcpy(_secondary_drive_path, input_path);
-
-    int32_t path_length = 0;
-    while (path_length < (int32_t)sizeof(_secondary_drive_path) && _secondary_drive_path[path_length] != '\0') {
-        ++path_length;
-    }
-
-    if (path_length == 0 || _secondary_drive_path[path_length - 1] != '\\') {
-        strcat(_secondary_drive_path, "\\");
+    if (!Cleanup_Path_(input_path, _secondary_drive_path, sizeof(_secondary_drive_path), true)) {
+        _secondary_drive_path[0] = '\0';
     }
 }
 

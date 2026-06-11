@@ -44,6 +44,7 @@ struct MEMORYSTATUS {
 #endif
 
 bool File_Exists_(const char* path);
+bool Cleanup_Path_(const char* input_path, char* output_path, size_t output_path_size, bool ensure_trailing_separator = false);
 FILE* fopen_case(const char* path, const char* mode);
 void Query_Memory_Status_(MEMORYSTATUS* memory_status);
 int Show_Message_Box_(void* window_handle, const char* text, const char* caption, bool is_error = false);

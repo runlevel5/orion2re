@@ -1059,6 +1059,7 @@ namespace sound {
             exitm::Exit_With_Message("SOUND ERROR: Reading Wave");
         }
 
+        Remove_Sound_Instance_(channel_idx);
         Destroy_SDL_Stream_(_soundChannels[channel_idx].buffer);
         Reset_Sound_Channel_(channel_idx);
 
@@ -1146,7 +1147,7 @@ namespace sound {
                 if (index.num_active_channels == -1) {
                     index.num_active_channels = 1;
                     index.active_channel_ids[0] = (uint8_t)channel_id;
-                } else if (index.num_active_channels > 0) {
+                } else if (index.num_active_channels > 0 && index.num_active_channels < k_sound_channel_count) {
                     index.active_channel_ids[index.num_active_channels] = (uint8_t)channel_id;
                     index.num_active_channels++;
                 } else {

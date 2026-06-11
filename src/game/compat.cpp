@@ -1,6 +1,13 @@
 #include "pch.h"
 
 namespace {
+    constexpr char k_native_path_separator =
+#if defined(_WIN32)
+        '\\';
+#else
+        '/';
+#endif
+
     const char* Get_File_Name_(const char* path) {
         const char* slash = strrchr(path, '/');
         const char* backslash = strrchr(path, '\\');
@@ -46,10 +53,79 @@ bool File_Exists_(const char* path) {
     return SDL_GetPathInfo(path, &path_info) && path_info.type == SDL_PATHTYPE_FILE;
 }
 
+bool Cleanup_Path_(const char* input_path, char* output_path, size_t output_path_size, bool ensure_trailing_separator) {
+    if (input_path == nullptr || output_path == nullptr || output_path_size == 0) {
+        return false;
+    }
+
+    size_t write_pos = 0;
+    bool last_was_separator = false;
+
+    for (size_t read_pos = 0; input_path[read_pos] != '\0'; ++read_pos) {
+        char ch = input_path[read_pos];
+        if (ch == '/' || ch == '\\') {
+            ch = k_native_path_separator;
+            if (last_was_separator) {
+                continue;
+            }
+            last_was_separator = true;
+        } else {
+            last_was_separator = false;
+        }
+
+        if (write_pos + 1 >= output_path_size) {
+            return false;
+        }
+
+        output_path[write_pos++] = ch;
+    }
+
+    output_path[write_pos] = '\0';
+
+    while (write_pos >= 2 &&
+        output_path[write_pos - 2] == '.' &&
+        output_path[write_pos - 1] == k_native_path_separator) {
+        output_path[write_pos - 2] = '\0';
+        write_pos -= 2;
+    }
+
+    if (strcmp(output_path, ".") == 0 ||
+        (output_path[0] == '.' && output_path[1] == k_native_path_separator && output_path[2] == '\0')) {
+        output_path[0] = '\0';
+        write_pos = 0;
+    }
+
+    while (write_pos >= 3 &&
+        output_path[0] == '.' &&
+        output_path[1] == k_native_path_separator &&
+        output_path[2] == '.') {
+        memmove(output_path, output_path + 2, write_pos - 1);
+        write_pos -= 2;
+    }
+
+    if (ensure_trailing_separator) {
+        if (write_pos > 0 && output_path[write_pos - 1] != k_native_path_separator) {
+            if (write_pos + 1 >= output_path_size) {
+                return false;
+            }
+            output_path[write_pos++] = k_native_path_separator;
+            output_path[write_pos] = '\0';
+        }
+    } else {
+        while (write_pos > 1 && output_path[write_pos - 1] == k_native_path_separator) {
+            output_path[--write_pos] = '\0';
+        }
+    }
+
+    return true;
+}
+
 FILE* fopen_case(const char* path, const char* mode) {
+    char clean_path[512];
     char upper_path[512];
     char cwd[512];
     char* cwd_alloc;
+    const char* open_path;
     bool has_upper_path;
     int original_errno;
 
@@ -59,8 +135,16 @@ FILE* fopen_case(const char* path, const char* mode) {
         return nullptr;
     }
 
-    has_upper_path = Build_Uppercase_File_Name_(path, upper_path, sizeof(upper_path)) &&
-        strcmp(path, upper_path) != 0;
+    if (!Cleanup_Path_(path, clean_path, sizeof(clean_path), false)) {
+        errno = ENAMETOOLONG;
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "fopen_case path cleanup failed: requested='%s' mode='%s'", path, mode);
+        return nullptr;
+    }
+
+    open_path = clean_path[0] != '\0' ? clean_path : path;
+
+    has_upper_path = Build_Uppercase_File_Name_(open_path, upper_path, sizeof(upper_path)) &&
+        strcmp(open_path, upper_path) != 0;
 
     cwd_alloc = SDL_GetCurrentDirectory();
     if (cwd_alloc != nullptr) {
@@ -71,18 +155,18 @@ FILE* fopen_case(const char* path, const char* mode) {
     }
 
     if (Mode_Creates_File_(mode)) {
-        if (File_Exists_(path)) {
-            return fopen(path, mode);
+        if (File_Exists_(open_path)) {
+            return fopen(open_path, mode);
         }
 
         if (has_upper_path && File_Exists_(upper_path)) {
             return fopen(upper_path, mode);
         }
 
-        return fopen(path, mode);
+        return fopen(open_path, mode);
     }
 
-    FILE* file = fopen(path, mode);
+    FILE* file = fopen(open_path, mode);
     if (file != nullptr) {
         return file;
     }
@@ -105,12 +189,13 @@ FILE* fopen_case(const char* path, const char* mode) {
 
     SDL_LogWarn(
         SDL_LOG_CATEGORY_APPLICATION,
-        "fopen_case failed: requested='%s' uppercase='%s' mode='%s' cwd='%s' exists=%d upper_exists=%d errno=%d (%s)",
+        "fopen_case failed: requested='%s' cleaned='%s' uppercase='%s' mode='%s' cwd='%s' exists=%d upper_exists=%d errno=%d (%s)",
         path,
+        open_path,
         has_upper_path ? upper_path : "<none>",
         mode,
         cwd,
-        File_Exists_(path) ? 1 : 0,
+        File_Exists_(open_path) ? 1 : 0,
         (has_upper_path && File_Exists_(upper_path)) ? 1 : 0,
         original_errno,
         strerror(original_errno));
