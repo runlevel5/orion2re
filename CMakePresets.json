@@ -17,7 +17,8 @@
         "rhs": "Windows"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_WINDOWS_ARCH": "x86"
       },
       "architecture": {
         "value": "x86",
@@ -35,7 +36,8 @@
         "rhs": "Windows"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_WINDOWS_ARCH": "x86"
       },
       "architecture": {
         "value": "x86",
@@ -54,6 +56,7 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_WINDOWS_ARCH": "x86",
         "ORION2RE_RELEASE_DEBUG_INFO": "ON"
       },
       "architecture": {
@@ -73,6 +76,7 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_WINDOWS_ARCH": "x86",
         "ORION2RE_ENABLE_ASAN": "ON"
       },
       "architecture": {
@@ -81,7 +85,131 @@
       }
     },
     {
+      "name": "win64-debug",
+      "displayName": "Win64 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_WINDOWS_ARCH": "x64"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "win64-release",
+      "displayName": "Win64 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_WINDOWS_ARCH": "x64"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "win64-release-pdb",
+      "displayName": "Win64 Release + PDB",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_WINDOWS_ARCH": "x64",
+        "ORION2RE_RELEASE_DEBUG_INFO": "ON"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "win64-debug-asan",
+      "displayName": "Win64 Debug (ASan)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_WINDOWS_ARCH": "x64",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
       "name": "linux-debug",
+      "displayName": "Linux Native Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_ENABLE_NETWORKING": "OFF"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Native Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_ENABLE_NETWORKING": "OFF"
+      }
+    },
+    {
+      "name": "linux-debug-asan",
+      "displayName": "Linux Native Debug (ASan)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_ENABLE_NETWORKING": "OFF",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      }
+    },
+    {
+      "name": "linux-x86-debug",
       "displayName": "Linux x86 Debug",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
@@ -101,7 +229,7 @@
       }
     },
     {
-      "name": "linux-release",
+      "name": "linux-x86-release",
       "displayName": "Linux x86 Release",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
@@ -121,7 +249,7 @@
       }
     },
     {
-      "name": "linux-debug-asan",
+      "name": "linux-x86-debug-asan",
       "displayName": "Linux x86 Debug (ASan)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
@@ -164,6 +292,26 @@
       "configuration": "Debug"
     },
     {
+      "name": "win64-debug",
+      "configurePreset": "win64-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win64-release",
+      "configurePreset": "win64-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "win64-release-pdb",
+      "configurePreset": "win64-release-pdb",
+      "configuration": "Release"
+    },
+    {
+      "name": "win64-debug-asan",
+      "configurePreset": "win64-debug-asan",
+      "configuration": "Debug"
+    },
+    {
       "name": "linux-debug",
       "configurePreset": "linux-debug",
       "configuration": "Debug"
@@ -176,6 +324,21 @@
     {
       "name": "linux-debug-asan",
       "configurePreset": "linux-debug-asan",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-x86-debug",
+      "configurePreset": "linux-x86-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-x86-release",
+      "configurePreset": "linux-x86-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "linux-x86-debug-asan",
+      "configurePreset": "linux-x86-debug-asan",
       "configuration": "Debug"
     }
   ]

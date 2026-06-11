@@ -480,9 +480,9 @@ void __cdecl Reduce_Bitmap_(
     _src_width = src_width;
     _src_height = src_height;
 
-    // The original inline assembly leaves the upper 16 bits of EAX intact,
-    // which contains the src_ptr from its initialization block.
-    uint32_t eax_reg = (uint32_t)(uintptr_t)src_ptr;
+    // The original inline assembly carries unspecified upper register bits here,
+    // but only the low 16 bits participate in the stepping logic we use below.
+    uint32_t eax_reg = 0;
 
     uint16_t x_step = 0x6400 / (src_width & 0xFFFF);
     _x_step_8_8 = x_step;

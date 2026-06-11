@@ -2,13 +2,71 @@ cmake_minimum_required(VERSION 3.20)
 
 project(orion2re LANGUAGES C CXX)
 
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
-    if(MSVC AND WIN32)
-        message(FATAL_ERROR "This project requires a 32-bit build. Reconfigure with -A Win32.")
-    elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        message(FATAL_ERROR "This project requires a 32-bit build. Reconfigure with the Linux x86 presets or pass -m32 compiler and linker flags.")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(ORION2RE_TARGET_ARCH x86)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(ORION2RE_TARGET_ARCH x64)
     else()
-        message(FATAL_ERROR "This project requires a 32-bit build.")
+        message(FATAL_ERROR "Linux builds are only supported for x86 and x64 targets.")
+    endif()
+elseif(WIN32)
+    set(ORION2RE_WINDOWS_ARCH "" CACHE STRING "Target Windows architecture (x86 or x64)")
+    set_property(CACHE ORION2RE_WINDOWS_ARCH PROPERTY STRINGS x86 x64)
+
+    string(TOLOWER "${ORION2RE_WINDOWS_ARCH}" ORION2RE_WINDOWS_ARCH_NORMALIZED)
+
+    if(NOT ORION2RE_WINDOWS_ARCH_NORMALIZED)
+        set(ORION2RE_WINDOWS_ARCH_HINT "")
+
+        if(CMAKE_VS_PLATFORM_NAME)
+            set(ORION2RE_WINDOWS_ARCH_HINT "${CMAKE_VS_PLATFORM_NAME}")
+        elseif(CMAKE_GENERATOR_PLATFORM)
+            set(ORION2RE_WINDOWS_ARCH_HINT "${CMAKE_GENERATOR_PLATFORM}")
+        elseif(DEFINED ENV{VSCMD_ARG_TGT_ARCH})
+            set(ORION2RE_WINDOWS_ARCH_HINT "$ENV{VSCMD_ARG_TGT_ARCH}")
+        endif()
+
+        string(TOLOWER "${ORION2RE_WINDOWS_ARCH_HINT}" ORION2RE_WINDOWS_ARCH_HINT)
+
+        if(ORION2RE_WINDOWS_ARCH_HINT STREQUAL "win32" OR ORION2RE_WINDOWS_ARCH_HINT STREQUAL "x86")
+            set(ORION2RE_WINDOWS_ARCH_NORMALIZED x86)
+        elseif(ORION2RE_WINDOWS_ARCH_HINT STREQUAL "x64" OR ORION2RE_WINDOWS_ARCH_HINT STREQUAL "amd64")
+            set(ORION2RE_WINDOWS_ARCH_NORMALIZED x64)
+        endif()
+
+        if(ORION2RE_WINDOWS_ARCH_NORMALIZED)
+            set(ORION2RE_WINDOWS_ARCH "${ORION2RE_WINDOWS_ARCH_NORMALIZED}" CACHE STRING "Target Windows architecture (x86 or x64)" FORCE)
+            set_property(CACHE ORION2RE_WINDOWS_ARCH PROPERTY STRINGS x86 x64)
+        endif()
+    endif()
+
+    if(NOT ORION2RE_WINDOWS_ARCH_NORMALIZED)
+        message(FATAL_ERROR
+            "Select a Windows target architecture with -DORION2RE_WINDOWS_ARCH=x86 or x64 "
+            "and configure the generator or toolchain for the same target."
+        )
+    elseif(ORION2RE_WINDOWS_ARCH_NORMALIZED STREQUAL "x86")
+        set(ORION2RE_TARGET_ARCH x86)
+        set(ORION2RE_WINDOWS_POINTER_SIZE 4)
+    elseif(ORION2RE_WINDOWS_ARCH_NORMALIZED STREQUAL "x64")
+        set(ORION2RE_TARGET_ARCH x64)
+        set(ORION2RE_WINDOWS_POINTER_SIZE 8)
+    else()
+        message(FATAL_ERROR "Unsupported ORION2RE_WINDOWS_ARCH value '${ORION2RE_WINDOWS_ARCH}'. Use x86 or x64.")
+    endif()
+
+    if(CMAKE_SIZEOF_VOID_P AND NOT CMAKE_SIZEOF_VOID_P EQUAL ORION2RE_WINDOWS_POINTER_SIZE)
+        if(MSVC)
+            message(FATAL_ERROR
+                "ORION2RE_WINDOWS_ARCH=${ORION2RE_WINDOWS_ARCH_NORMALIZED} does not match the configured MSVC generator platform. "
+                "Use -A Win32 for x86 or -A x64 for x64."
+            )
+        else()
+            message(FATAL_ERROR
+                "ORION2RE_WINDOWS_ARCH=${ORION2RE_WINDOWS_ARCH_NORMALIZED} does not match the configured Windows toolchain target."
+            )
+        endif()
     endif()
 endif()
 
@@ -51,7 +109,7 @@ set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("${ORION2RE_VENDORED_SDL3_DIR}" EXCLUDE_FROM_ALL)
 
-if(MSVC AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4 AND ORION2RE_GAME_DIR)
+if(MSVC AND WIN32 AND ORION2RE_GAME_DIR)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_GAME_DIR}")
     set(CMAKE_PDB_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
@@ -108,66 +166,64 @@ if(MSVC)
     target_compile_options(orion2re PRIVATE /W3 /permissive-)
     target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
 
-    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        target_precompile_headers(orion2re PRIVATE
-            "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
-        )
+    target_precompile_headers(orion2re PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
+    )
 
-        target_compile_definitions(orion2re PRIVATE
-            WIN32
-            $<$<CONFIG:Debug>:_CRT_SECURE_NO_DEPRECATE>
-            $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_DEPRECATE>
-        )
+    target_compile_definitions(orion2re PRIVATE
+        WIN32
+        $<$<CONFIG:Debug>:_CRT_SECURE_NO_DEPRECATE>
+        $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_DEPRECATE>
+    )
 
-        target_compile_options(orion2re PRIVATE
-            $<$<CONFIG:Debug>:/RTC1>
-            $<$<CONFIG:Debug>:/GS>
-            $<$<CONFIG:Release>:/Gy>
-            $<$<CONFIG:Release>:/Oi>
-            $<$<CONFIG:Release>:/GS>
-            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zi>
-            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
-        )
+    target_compile_options(orion2re PRIVATE
+        $<$<CONFIG:Debug>:/RTC1>
+        $<$<CONFIG:Debug>:/GS>
+        $<$<CONFIG:Release>:/Gy>
+        $<$<CONFIG:Release>:/Oi>
+        $<$<CONFIG:Release>:/GS>
+        $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zi>
+        $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
+    )
 
-        set(ORION2RE_IMPORT_LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/import-libs")
-        set(ORION2RE_LIB_TOOL "${CMAKE_LIB}")
-        if(NOT ORION2RE_LIB_TOOL)
-            set(ORION2RE_LIB_TOOL lib)
-        endif()
+    set(ORION2RE_IMPORT_LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/import-libs")
+    set(ORION2RE_LIB_TOOL "${CMAKE_LIB}")
+    if(NOT ORION2RE_LIB_TOOL)
+        set(ORION2RE_LIB_TOOL lib)
+    endif()
 
-        if(ORION2RE_ENABLE_NETWORKING)
-            add_custom_command(
-                OUTPUT
-                    "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-                COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
-                COMMAND "${ORION2RE_LIB_TOOL}"
-                    "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-                    /machine:x86
-                    /name:DPLAYX.DLL
-                    "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-                DEPENDS
-                    "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-                VERBATIM
-            )
-
-            add_custom_target(orion2re_win32_importlibs
-                DEPENDS
-                    "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            )
-
-            add_dependencies(orion2re orion2re_win32_importlibs)
-
-            target_link_libraries(orion2re PRIVATE
+    if(ORION2RE_ENABLE_NETWORKING)
+        add_custom_command(
+            OUTPUT
                 "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            )
-        endif()
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
+            COMMAND "${ORION2RE_LIB_TOOL}"
+                "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
+                "/machine:${ORION2RE_TARGET_ARCH}"
+                /name:DPLAYX.DLL
+                "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+            DEPENDS
+                "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
+            VERBATIM
+        )
 
-        target_link_options(orion2re PRIVATE
-            /DYNAMICBASE
-            /NXCOMPAT
-            $<$<CONFIG:Release>:/DEBUG>
+        add_custom_target(orion2re_windows_importlibs
+            DEPENDS
+                "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+        )
+
+        add_dependencies(orion2re orion2re_windows_importlibs)
+
+        target_link_libraries(orion2re PRIVATE
+            "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
         )
     endif()
+
+    target_link_options(orion2re PRIVATE
+        /DYNAMICBASE
+        /NXCOMPAT
+        $<$<CONFIG:Release>:/DEBUG>
+    )
 elseif(WIN32)
     message(WARNING "The CMake conversion preserves the original Visual Studio/MSVC-specific Windows build behavior; non-MSVC Windows builds may need additional link setup.")
 endif()

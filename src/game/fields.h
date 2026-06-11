@@ -154,8 +154,6 @@ namespace fields {
      */
     void __cdecl Set_Help_List_(s_help_box* help_data, int16_t count);
 
-    void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound);
-
     void __cdecl Invoke_Auto_Function_();
     void __cdecl Invoke_Saved_Auto_Function_();
 

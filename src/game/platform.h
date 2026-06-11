@@ -1,5 +1,11 @@
 #pragma once
 
+#if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__LP64__)
+#define ORION2RE_64BIT_BUILD 1
+#else
+#define ORION2RE_64BIT_BUILD 0
+#endif
+
 #ifndef ORION2RE_ENABLE_FPS_COUNTER
 #define ORION2RE_ENABLE_FPS_COUNTER 1
 #endif

@@ -54,5 +54,5 @@ namespace settler {
      * @param pop_index Pop index to move from the source colony.
      * @param dest_colony Destination colony receiving the pop.
      */
-    int32_t __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
+    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
 }

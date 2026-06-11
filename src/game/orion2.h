@@ -4829,6 +4829,8 @@ struct s_transport_pack_ack {
 
 typedef struct s_transport_packet s_transport_packet, *Ps_transport_packet;
 
+#define TRANSPORT_PAYLOAD_SIZE 331
+
 struct s_transport_packet {
     uint32_t message_stamp;
     uint16_t send_data_length;
@@ -4840,7 +4842,7 @@ struct s_transport_packet {
     uint8_t message_is_processed;
     uint32_t send_immediate_burst;
     uint16_t pad;
-    uint8_t payload[331];
+    uint8_t payload[TRANSPORT_PAYLOAD_SIZE];
 };
 
 typedef struct s_unit_data s_unit_data, *Ps_unit_data;

@@ -267,29 +267,6 @@ namespace fields {
         }
     }
 
-    void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound) {
-        s_field* field = &_fields[_fields_count];
-
-        field->x = x;
-        field->y = y;
-        field->detail.button.help = help;
-
-        field->x_end = field->x + animate::Get_Width_(pic) - 1;
-        field->y_end = field->y + animate::Get_Height_(pic) - 1;
-
-        field->font_style = fonts::Get_Current_Font_Style_();
-        field->font_color = fonts::Get_Current_Font_Color_();
-
-        field->sound = sound;
-        field->detail.button.pic = pic;
-        field->detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
-
-        field->hotkey = *hotkey;
-        if (field->hotkey > '`' && field->hotkey < '{') {
-            field->hotkey -= 0x20;
-        }
-    }
-
     int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound) {
         if (_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message("You exceeded the max number of fields (150)");
@@ -319,11 +296,26 @@ namespace fields {
             exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
-        Add_Button_Info_(x, y, help, pic, hotkey, sound);
-
         s_field* field = &_fields[_fields_count];
 
+        struct_::Clear_Structure_(field, sizeof(*field));
+
+        field->x = x;
+        field->y = y;
+        field->x_end = field->x + animate::Get_Width_(pic) - 1;
+        field->y_end = field->y + animate::Get_Height_(pic) - 1;
+        field->font_style = fonts::Get_Current_Font_Style_();
+        field->font_color = fonts::Get_Current_Font_Color_();
+        field->sound = sound;
+        field->hotkey = *hotkey;
+        if (field->hotkey > '`' && field->hotkey < '{') {
+            field->hotkey -= 0x20;
+        }
+
         field->field_type = FIELD_TYPE_MULTI_BUTTON;
+        field->detail.multibtn.help = help;
+        field->detail.multibtn.pic = pic;
+        field->detail.multibtn.draw_style = animate::Get_Full_Store_Flag_(pic);
         field->detail.multibtn.selection = value;
         field->detail.multibtn.button_value = button_value;
 
@@ -338,9 +330,25 @@ namespace fields {
             exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
-        Add_Button_Info_(x, y, help, pic, hotkey, sound);
+        s_field* field = &_fields[_fields_count];
 
-        _fields[_fields_count].field_type = FIELD_TYPE_BUTTON;
+        struct_::Clear_Structure_(field, sizeof(*field));
+
+        field->x = x;
+        field->y = y;
+        field->x_end = field->x + animate::Get_Width_(pic) - 1;
+        field->y_end = field->y + animate::Get_Height_(pic) - 1;
+        field->field_type = FIELD_TYPE_BUTTON;
+        field->font_style = fonts::Get_Current_Font_Style_();
+        field->font_color = fonts::Get_Current_Font_Color_();
+        field->sound = sound;
+        field->hotkey = *hotkey;
+        if (field->hotkey > '`' && field->hotkey < '{') {
+            field->hotkey -= 0x20;
+        }
+        field->detail.button.help = help;
+        field->detail.button.pic = pic;
+        field->detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
 
         int16_t current_id = _fields_count;
         _fields_count++;
@@ -353,10 +361,27 @@ namespace fields {
             exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
-        Add_Button_Info_(x, y, help, pic, hotkey, sound);
-
         int16_t current_field = _fields_count;
+        s_field* field = &_fields[current_field];
+
+        struct_::Clear_Structure_(field, sizeof(*field));
+
+        field->x = x;
+        field->y = y;
+        field->x_end = field->x + animate::Get_Width_(pic) - 1;
+        field->y_end = field->y + animate::Get_Height_(pic) - 1;
+        field->font_style = fonts::Get_Current_Font_Style_();
+        field->font_color = fonts::Get_Current_Font_Color_();
+        field->sound = sound;
+        field->hotkey = *hotkey;
+        if (field->hotkey > '`' && field->hotkey < '{') {
+            field->hotkey -= 0x20;
+        }
+
         _fields[current_field].field_type = FIELD_TYPE_RADIO;
+        _fields[current_field].detail.radio.help = help;
+        _fields[current_field].detail.radio.pic = pic;
+        _fields[current_field].detail.radio.draw_style = animate::Get_Full_Store_Flag_(pic);
         _fields[current_field].detail.radio.selection = variable;
 
         _fields_count++;
@@ -382,9 +407,25 @@ namespace fields {
             exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
-        Add_Button_Info_(x, y, help, pic, hotkey, sound);
+        s_field* field = &_fields[_fields_count];
 
-        _fields[_fields_count].field_type = FIELD_TYPE_BUTTON;
+        struct_::Clear_Structure_(field, sizeof(*field));
+
+        field->x = x;
+        field->y = y;
+        field->x_end = field->x + animate::Get_Width_(pic) - 1;
+        field->y_end = field->y + animate::Get_Height_(pic) - 1;
+        field->field_type = FIELD_TYPE_BUTTON;
+        field->font_style = fonts::Get_Current_Font_Style_();
+        field->font_color = fonts::Get_Current_Font_Color_();
+        field->sound = sound;
+        field->hotkey = *hotkey;
+        if (field->hotkey > '`' && field->hotkey < '{') {
+            field->hotkey -= 0x20;
+        }
+        field->detail.button.help = help;
+        field->detail.button.pic = pic;
+        field->detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
         
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -401,6 +442,8 @@ namespace fields {
         }
 
         s_field& field = _fields[_fields_count];
+
+        struct_::Clear_Structure_(&field, sizeof(field));
 
         field.x = x;
         field.y = y;
@@ -631,10 +674,25 @@ namespace fields {
             exitm::Exit_With_Message("You exceeded the max number of fields (150)");
         }
 
-        Add_Button_Info_(x, y, help, pic, hotkey, sound);
-
         s_field& current_field = _fields[_fields_count];
+
+        struct_::Clear_Structure_(&current_field, sizeof(current_field));
+
+        current_field.x = x;
+        current_field.y = y;
+        current_field.x_end = current_field.x + animate::Get_Width_(pic) - 1;
+        current_field.y_end = current_field.y + animate::Get_Height_(pic) - 1;
         current_field.field_type = FIELD_TYPE_LOCKED;
+        current_field.font_style = fonts::Get_Current_Font_Style_();
+        current_field.font_color = fonts::Get_Current_Font_Color_();
+        current_field.sound = sound;
+        current_field.hotkey = *hotkey;
+        if (current_field.hotkey > '`' && current_field.hotkey < '{') {
+            current_field.hotkey -= 0x20;
+        }
+        current_field.detail.radio.help = help;
+        current_field.detail.radio.pic = pic;
+        current_field.detail.radio.draw_style = animate::Get_Full_Store_Flag_(pic);
         current_field.detail.radio.selection = selection;
 
         int16_t current_index = _fields_count;

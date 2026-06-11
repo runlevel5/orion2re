@@ -200,7 +200,7 @@ namespace transprt {
     }
 
     void __cdecl SendPacket_(int32_t packet_index, uint32_t dest_id, uint16_t user_type) {
-        const uint32_t payload_size_max = sizeof(_tpSendBuffer.payload);
+        const uint32_t payload_size_max = TRANSPORT_PAYLOAD_SIZE;
         uint16_t data_len = _tpSendDataLength;
         int32_t total_packets = (data_len / payload_size_max) + ((data_len % payload_size_max) != 0 ? 1 : 0);
 
@@ -217,8 +217,10 @@ namespace transprt {
 
             uint32_t payload_size = payload_size_max;
             if (total_packets - packet_index == 1) {
-                // BUG: if data_len is a multiple of 331, payload_size becomes 0 due to modulo calculation
                 payload_size = _tpSendDataLength % payload_size_max;
+                if (payload_size == 0) {
+                    payload_size = payload_size_max;
+                }
             }
 
             memcpy(_tpSendBuffer.payload, _tpMessageData + (packet_index * payload_size_max), payload_size);
@@ -345,7 +347,7 @@ namespace transprt {
 
             uint32_t payload_len =
                 (packet_size_bytes & 0xFFFF) - (uint32_t)(sizeof(*packet) - sizeof(packet->payload));
-            uint8_t* packet_dest = _tpRecPacketBuffer + (sizeof(packet->payload) * packet_index);
+            uint8_t* packet_dest = _tpRecPacketBuffer + (TRANSPORT_PAYLOAD_SIZE * packet_index);
             memcpy(packet_dest, packet->payload, payload_len);
 
             bool all_complete = true;
