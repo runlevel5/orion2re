@@ -111,8 +111,11 @@ namespace smckplay {
                 const unsigned char* src_row = frame + (y * _smacker_state.width);
 
                 for (unsigned long x = 0; x < _smacker_state.width; ++x) {
-                    const uint8_t index = src_row[x];
-                    dst_row[x] = (index < 236) ? (uint8_t)(index + 10) : index;
+                    // libsmacker's decoded frame indices are already aligned to the
+                    // game's active Smacker palette window. The old smackw32.dll path
+                    // effectively used palette entries 10..245 directly, so applying
+                    // an extra +10 index remap here corrupts the popup background.
+                    dst_row[x] = src_row[x];
                 }
             }
         }
@@ -237,6 +240,11 @@ namespace smckplay {
         if (palette == nullptr) {
             return;
         }
+
+        // The cinematic palette lives in the game's 10..245 window. The legacy
+        // smackw32.dll interface exposed a 236-color view that corresponds to
+        // libsmacker palette entries 10..245, not 0..235.
+        palette += 10 * 3;
 
         for (s_palette_entry* current_entry = video::_current_palette + 10;
             current_entry < video::_current_palette + 246;
