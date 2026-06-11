@@ -58,6 +58,7 @@ namespace platform {
 
 		[[noreturn]] void Force_Immediate_Process_Exit_() {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "platform: Force_Immediate_Process_Exit");
+			sound::Destroy_Sound_();
 			SDL_Quit();
 			exit(0);
 		}
