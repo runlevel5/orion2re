@@ -91,6 +91,8 @@ namespace smckplay {
                     continue;
                 }
 
+                smk_enable_audio(_smk, (unsigned char)track, 1);
+
                 _smacker_state.audio_streams[track] = stream;
             }
 

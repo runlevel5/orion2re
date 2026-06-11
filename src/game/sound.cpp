@@ -300,7 +300,7 @@ namespace sound {
 
             if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
                 SDL_SetAtomicInt(&_soundTimerRunning, 0);
-                return 0;
+                return interval;
             }
 
             SDL_AddAtomicInt(&_soundTimerCallbackCount, 1);
@@ -309,7 +309,7 @@ namespace sound {
 
             if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
                 SDL_SetAtomicInt(&_soundTimerRunning, 0);
-                return 0;
+                return interval;
             }
 
             return interval;
@@ -907,7 +907,6 @@ namespace sound {
 
         _currentStreamId = stream_id;
         _streamReadErrorLogged = 0;
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: play file=%s entry=%d", _currentStreamFilename, _currentStreamId);
 
         if (_streamLbxHandle.file == nullptr) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: requested play with unopened stream file=%s entry=%d", _currentStreamFilename, _currentStreamId);
