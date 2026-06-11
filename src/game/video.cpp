@@ -1,9 +1,5 @@
 #include "pch.h"
 
-uint8_t DAT_00578820;
-uint32_t DAT_00578dc8;
-uint32_t DAT_00578dcc;
-
 namespace video {
 	int32_t g_screen_res_x;
 	int32_t g_screen_res_y;
@@ -439,8 +435,6 @@ namespace video {
 
     void __cdecl Init_Video_Drivers_() {
         video::_is_initializing = 1;
-        ::DAT_00578dcc = static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(&video::DAT_00578b58));
-        ::DAT_00578dc8 = static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(&::DAT_00578820));
 
         platform::g_mouse_x = 0;
         ::g_cached_mouse_x = 0;

@@ -2955,9 +2955,7 @@ skip_cursor:
                 if (darkness < 0) darkness = 0;
                 break;
             default:
-                // The original code has a bug where it reads an uninitialized variable for darkness.
-                // Due to compiler stack layout mapping, it accidentally reads the lower 16 bits of the bitmap_data pointer.
-                darkness = (int16_t)((std::uintptr_t)bitmap_data & 0xFFFF);
+                darkness = 0;
                 break;
         }
 

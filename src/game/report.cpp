@@ -104,10 +104,8 @@ namespace REPORT {
                         break;
 
                     case 9:
-                        // TODO: msg_type 9 still depends on byte-offset reads from s_MSG.
-                        // This likely wants a dedicated payload type to avoid aliasing/provenance UB.
-                        if (*(int16_t*)((uint8_t*)msg + 2) != -1 &&
-                            *(uint8_t*)((uint8_t*)msg + 7) != 0) {
+                        if (msg->u.hyperspace_beast.ship_idx != -1 &&
+                            msg->u.hyperspace_beast.fate != 0) {
                             should_show = true;
                         }
                         else {
@@ -116,8 +114,7 @@ namespace REPORT {
                         break;
 
                     case 17:
-                        // TODO: msg_type 17 also relies on a raw byte-offset payload read.
-                        if (*(uint8_t*)((uint8_t*)msg + 3) == (uint8_t)MOX::_PLAYER_NUM) {
+                        if ((uint8_t)msg->u.diplomacy.plr_a == (uint8_t)MOX::_PLAYER_NUM) {
                             should_show = false;
                         }
                         else {

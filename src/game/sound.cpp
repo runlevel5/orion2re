@@ -1,8 +1,6 @@
 #include "pch.h"
 
 namespace sound {
-    constexpr size_t k_stream_filename_capacity = 260;
-
     void __cdecl Merge_Free_Blocks_();
     int32_t __cdecl Get_Free_Sound_Index_();
     void __cdecl Set_Master_Volume_(int32_t volume);
@@ -18,6 +16,15 @@ namespace sound {
     int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t wave_data_size);
     void* __cdecl Allocate_Sound_Block_(int8_t channel_idx, int32_t resource_id, int32_t size);
     void __cdecl Stop_Stream_Loop_();
+
+#define STREAM_FILENAME_CAPACITY 260
+#define SOUND_TIMER_INTERVAL_MS 160
+#define SOUND_CHANNEL_COUNT 16
+#define SOUND_INDEX_COUNT 33
+#define STREAM_PREFILL_BLOCKS 20
+#define CHANNEL_STREAM_CHUNK_SIZE 0x1555
+#define INITIAL_CHANNEL_QUEUE_SIZE 0x4000
+#define INFINITE_LOOP_COUNT 0xFFFF
 
     int16_t _volume_table[101] = {
         -10000, -10000, -10000, -10000, -9287, -8643, -8117, -7673, -7287, -6947,
@@ -61,20 +68,12 @@ namespace sound {
     uint8_t _close_stream = 1;
     uint8_t _musicActive;
     s_sound_stream _stream_data;
-    char _currentStreamFilename[k_stream_filename_capacity] = "stream.lbx";
+    char _currentStreamFilename[STREAM_FILENAME_CAPACITY] = "stream.lbx";
     int32_t _currentStreamId;
     int32_t _currentStreamVolume = 100;
     uint8_t _streamReadErrorLogged;
 
     namespace {
-        constexpr Uint32 k_sound_timer_interval_ms = 160;
-        constexpr int32_t k_sound_channel_count = 16;
-        constexpr int32_t k_sound_index_count = 33;
-        constexpr int32_t k_stream_prefill_blocks = 20;
-        constexpr uint32_t k_channel_stream_chunk_size = 0x1555;
-        constexpr uint32_t k_initial_channel_queue_size = 0x4000;
-        constexpr int32_t k_infinite_loop_count = 0xFFFF;
-
         void Copy_FourCC_Tag_(char* dest, const char* src) {
             memcpy(dest, src, 4);
         }
@@ -82,7 +81,7 @@ namespace sound {
         void Initialize_Sound_Indices_(uint32_t buffer_size) {
             memset(_soundIndices, 0, sizeof(_soundIndices));
 
-            for (int i = 0; i < k_sound_index_count; ++i) {
+            for (int i = 0; i < SOUND_INDEX_COUNT; ++i) {
                 _soundIndices[i].next_id = -1;
                 _soundIndices[i].prev_id = -1;
             }
@@ -323,7 +322,7 @@ namespace sound {
      * Stops and removes channels if the volume delta is out of bounds.
      */
     void __cdecl Sound_Update_() {
-        for (int i = 0; i < k_sound_channel_count; ++i) {
+        for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
             s_sound_channel& channel = _soundChannels[i];
 
             // Check if bit 0 is set (active flag) and volume is non-zero
@@ -461,33 +460,66 @@ namespace sound {
         }
     }
 
-    bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header) {
+    bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, uint32_t src_data_size, s_sound_wav_header* header) {
         char tag_buf[5];
         tag_buf[4] = '\0';
 
-        // Copy standard RIFF/WAVE header fields from source buffer
-        memcpy(header, src_data, sizeof(s_sound_wav_header));
+        if (src_data == nullptr || header == nullptr) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "sound: invalid wave header parse request");
+            return false;
+        }
+
+        if (src_data_size < sizeof(s_sound_wav_header_disk)) {
+            SDL_LogWarn(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "sound: wave header too small size=%u expected=%u",
+                src_data_size,
+                (unsigned int)sizeof(s_sound_wav_header_disk)
+            );
+            return false;
+        }
+
+        memset(header, 0, sizeof(s_sound_wav_header));
+        memcpy(header, src_data, sizeof(s_sound_wav_header_disk));
 
         // Set data pointer to the start of raw audio data in the source buffer
-        header->data_ptr = (uint8_t*)src_data + 0x2c;
+        header->data_ptr = (uint8_t*)src_data + sizeof(s_sound_wav_header_disk);
 
         Copy_FourCC_Tag_(tag_buf, header->riff_tag);
         if (strcasecmp(tag_buf, "RIFF") != 0) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "sound: invalid in-memory RIFF tag %.4s", tag_buf);
             return false;
         }
 
         Copy_FourCC_Tag_(tag_buf, header->wave_tag);
         if (strcasecmp(tag_buf, "WAVE") != 0) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "sound: invalid in-memory WAVE tag %.4s", tag_buf);
             return false;
         }
 
         Copy_FourCC_Tag_(tag_buf, header->fmt_tag);
         if (strcasecmp(tag_buf, "fmt ") != 0) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "sound: invalid in-memory fmt tag %.4s", tag_buf);
             return false;
         }
 
         Copy_FourCC_Tag_(tag_buf, header->data_tag);
-        return strcasecmp(tag_buf, "data") == 0;
+        if (strcasecmp(tag_buf, "data") != 0) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "sound: invalid in-memory data tag %.4s", tag_buf);
+            return false;
+        }
+
+        if (header->data_size > src_data_size - sizeof(s_sound_wav_header_disk)) {
+            SDL_LogWarn(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "sound: wave data truncated declared=%u available=%u",
+                header->data_size,
+                src_data_size - (uint32_t)sizeof(s_sound_wav_header_disk)
+            );
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -506,7 +538,7 @@ namespace sound {
             SDL_Delay(1);
         }
 
-        for (int i = 0; i < k_sound_channel_count; ++i) {
+        for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
             Destroy_SDL_Stream_(_soundChannels[i].buffer);
         }
 
@@ -548,7 +580,7 @@ namespace sound {
 
         Initialize_Sound_Indices_(_soundBufferSize);
 
-        for (int i = 0; i < k_sound_channel_count; ++i) {
+        for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
             _soundChannels[i].buffer = nullptr;
             Reset_Sound_Channel_(i);
         }
@@ -558,7 +590,7 @@ namespace sound {
         SDL_SetAtomicInt(&_soundTimerLock, 0);
         SDL_SetAtomicInt(&_soundTimerCallbackCount, 0);
 
-        _soundTimerId = SDL_AddTimer(k_sound_timer_interval_ms, Sound_Timer_Thunk_, nullptr);
+        _soundTimerId = SDL_AddTimer(SOUND_TIMER_INTERVAL_MS, Sound_Timer_Thunk_, nullptr);
         if (_soundTimerId != 0) {
             _soundTimerActive = 1;
             _masterVolume = 100;
@@ -625,7 +657,7 @@ namespace sound {
 
     void __cdecl Loop_Stream_(int32_t count) {
         if (count == -1) {
-            count = k_infinite_loop_count;
+            count = INFINITE_LOOP_COUNT;
         }
 
         _loopStream = 1;
@@ -680,7 +712,7 @@ namespace sound {
                 volume = sound::_masterVolume;
             }
 
-            if (channel_idx >= 0 && channel_idx < k_sound_channel_count) {
+            if (channel_idx >= 0 && channel_idx < SOUND_CHANNEL_COUNT) {
                 _soundChannels[channel_idx].current_volume = volume;
                 Set_SDL_Stream_Gain_(_soundChannels[channel_idx].buffer, volume);
             }
@@ -697,7 +729,7 @@ namespace sound {
             return;
         }
 
-        if (channel_idx >= 0 && channel_idx < k_sound_channel_count) {
+        if (channel_idx >= 0 && channel_idx < SOUND_CHANNEL_COUNT) {
             s_sound_channel* channel = &sound::_soundChannels[channel_idx];
             if ((channel->flags & 1) != 0) {
                 channel->flags ^= 1;
@@ -709,7 +741,7 @@ namespace sound {
 
     void __cdecl Stop_All_Sounds_() {
         if (sound::_soundOn != 0) {
-            for (int32_t i = 0; i < k_sound_channel_count; ++i) {
+            for (int32_t i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
                 sound::Stop_Sound_(i);
             }
         }
@@ -746,7 +778,7 @@ namespace sound {
     }
 
     void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch) {
-        if (handle >= 1 && handle < k_sound_channel_count) {
+        if (handle >= 1 && handle < SOUND_CHANNEL_COUNT) {
             s_sound_channel& channel = _soundChannels[handle];
             if (channel.buffer == nullptr || channel.sample_rate == 0) {
                 return;
@@ -774,15 +806,48 @@ namespace sound {
             return 0;
         }
 
+        if (stream == nullptr) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: null header target file=%s entry=%d", _currentStreamFilename, entry_index);
+            return 0;
+        }
+
+        if (_streamLbxHandle.file == nullptr) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: no stream file open for %s entry=%d", _currentStreamFilename, entry_index);
+            return 0;
+        }
+
+        if (entry_index < 1 || entry_index > (int32_t)_streamLbxHandle.entry_count) {
+            SDL_LogWarn(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "stream: invalid entry file=%s entry=%d entry_count=%u",
+                _currentStreamFilename,
+                entry_index,
+                (unsigned int)_streamLbxHandle.entry_count
+            );
+            return 0;
+        }
+
+        memset(stream, 0, sizeof(s_sound_stream));
+
         uint32_t entry_offset = _streamLbxHandle.entries[entry_index - 1].offset;
 
-        fseek(_streamLbxHandle.file, entry_offset, SEEK_SET);
+        if (fseek(_streamLbxHandle.file, entry_offset, SEEK_SET) != 0) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: seek failed file=%s entry=%d offset=%u", _currentStreamFilename, entry_index, entry_offset);
+            return 0;
+        }
 
         char tag_buffer[5];
         tag_buffer[4] = '\0';
 
-        fread(stream->riff_tag, 0x30, 1, _streamLbxHandle.file);
-        stream->data_start_offset = entry_offset + 0x2c;
+        s_sound_wav_header_disk disk_header = {};
+
+        if (fread(&disk_header, sizeof(disk_header), 1, _streamLbxHandle.file) != 1) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: header read failed file=%s entry=%d", _currentStreamFilename, entry_index);
+            return 0;
+        }
+
+        memcpy(stream, &disk_header, sizeof(disk_header));
+        stream->data_start_offset = entry_offset + (uint32_t)sizeof(s_sound_wav_header_disk);
 
         Copy_FourCC_Tag_(tag_buffer, stream->riff_tag);
         if (strcasecmp(tag_buffer, "RIFF") != 0) {
@@ -808,7 +873,29 @@ namespace sound {
             return 0;
         }
 
-        fseek(_streamLbxHandle.file, stream->data_start_offset, SEEK_SET);
+        if (stream->channels == 0 || stream->samples_per_sec == 0 || stream->total_data_size == 0) {
+            SDL_LogWarn(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "stream: invalid audio params file=%s entry=%d channels=%u rate=%u bytes=%u",
+                _currentStreamFilename,
+                entry_index,
+                (unsigned int)stream->channels,
+                (unsigned int)stream->samples_per_sec,
+                (unsigned int)stream->total_data_size
+            );
+            return 0;
+        }
+
+        if (fseek(_streamLbxHandle.file, stream->data_start_offset, SEEK_SET) != 0) {
+            SDL_LogWarn(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "stream: seek to data failed file=%s entry=%d data_offset=%u",
+                _currentStreamFilename,
+                entry_index,
+                stream->data_start_offset
+            );
+            return 0;
+        }
 
         return 1;
     }
@@ -821,6 +908,11 @@ namespace sound {
         _currentStreamId = stream_id;
         _streamReadErrorLogged = 0;
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: play file=%s entry=%d", _currentStreamFilename, _currentStreamId);
+
+        if (_streamLbxHandle.file == nullptr) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: requested play with unopened stream file=%s entry=%d", _currentStreamFilename, _currentStreamId);
+            return;
+        }
 
         Stop_Sound_Timer_();
         int32_t volume_idx = Get_Stream_Volume_();
@@ -864,7 +956,7 @@ namespace sound {
             _stream_data.status |= 0x02;
         }
 
-        if (!Queue_Stream_Until_Target_(_stream_data.block_size * k_stream_prefill_blocks)) {
+        if (!Queue_Stream_Until_Target_(_stream_data.block_size * STREAM_PREFILL_BLOCKS)) {
             Destroy_SDL_Stream_(_stream_data.ds_buffer);
             Enable_Sound_Timer_();
             return;
@@ -913,7 +1005,7 @@ namespace sound {
      * Stores the fade target volume index for a channel.
      */
     void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx) {
-        if (channel_idx >= 0 && channel_idx < k_sound_channel_count) {
+        if (channel_idx >= 0 && channel_idx < SOUND_CHANNEL_COUNT) {
             _soundChannels[channel_idx].volume_index = volume_idx;
         }
     }
@@ -933,11 +1025,11 @@ namespace sound {
         }
 
         int queued = SDL_GetAudioStreamQueued(channel->buffer);
-        if (queued < 0 || queued >= (int)k_channel_stream_chunk_size) {
+        if (queued < 0 || queued >= (int)CHANNEL_STREAM_CHUNK_SIZE) {
             return;
         }
 
-        while (queued >= 0 && queued < (int)k_channel_stream_chunk_size) {
+        while (queued >= 0 && queued < (int)CHANNEL_STREAM_CHUNK_SIZE) {
             uint32_t remaining = channel->sample_size - channel->sample_offset;
             if (remaining == 0) {
                 if (!Restart_Channel_Loop_(*channel)) {
@@ -949,8 +1041,8 @@ namespace sound {
             }
 
             uint32_t bytes_to_queue = remaining;
-            if (bytes_to_queue > k_channel_stream_chunk_size) {
-                bytes_to_queue = k_channel_stream_chunk_size;
+            if (bytes_to_queue > CHANNEL_STREAM_CHUNK_SIZE) {
+                bytes_to_queue = CHANNEL_STREAM_CHUNK_SIZE;
             }
 
             if (!Queue_Channel_Data_(*channel, bytes_to_queue)) {
@@ -972,7 +1064,7 @@ namespace sound {
 
     void __cdecl Update_Sound_Channels_() {
         if (sound::_soundOn == 1) {
-            for (int i = 0; i < k_sound_channel_count; ++i) {
+            for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
                 if (sound::_soundChannels[i].flags & 1) {
                     if (sound::_soundChannels[i].flags & 2) {
                         sound::Refill_Sound_Channel_Buffer_(i);
@@ -994,7 +1086,7 @@ namespace sound {
                 volume = sound::_masterVolume;
             }
 
-            for (int i = 0; i < k_sound_channel_count; ++i) {
+            for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
                 sound::_soundChannels[i].current_volume = volume;
                 Set_SDL_Stream_Gain_(sound::_soundChannels[i].buffer, volume);
             }
@@ -1009,7 +1101,7 @@ namespace sound {
      * in that sound's channel list.
      */
     void __cdecl Remove_Sound_Instance_(int32_t instance_id) {
-        for (int i = 1; i < k_sound_index_count; ++i) {
+        for (int i = 1; i < SOUND_INDEX_COUNT; ++i) {
             s_sound_index& sound_idx = _soundIndices[i];
 
             for (int j = 0; j < sound_idx.num_active_channels; ++j) {
@@ -1068,7 +1160,7 @@ namespace sound {
                 return;
             }
 
-            if (!Queue_Stream_Until_Target_(sound::_stream_data.block_size * k_stream_prefill_blocks)) {
+            if (!Queue_Stream_Until_Target_(sound::_stream_data.block_size * STREAM_PREFILL_BLOCKS)) {
                 return;
             }
         } else if (!(sound::_stream_data.status & 0x08)) {
@@ -1082,7 +1174,7 @@ namespace sound {
 
         (void)wave_data_size;
 
-        if (!Init_Wave_Header_From_Memory_(wave_data, &info)) {
+        if (!Init_Wave_Header_From_Memory_(wave_data, wave_data_size, &info)) {
             exitm::Exit_With_Message("SOUND ERROR: Reading Wave");
         }
 
@@ -1101,9 +1193,9 @@ namespace sound {
         _soundChannels[channel_idx].current_volume = _masterVolume;
 
         uint32_t dwBytes = _soundChannels[channel_idx].sample_size;
-        if (dwBytes > k_initial_channel_queue_size) {
+        if (dwBytes > INITIAL_CHANNEL_QUEUE_SIZE) {
             _soundChannels[channel_idx].flags |= 0x2;
-            dwBytes = k_initial_channel_queue_size;
+            dwBytes = INITIAL_CHANNEL_QUEUE_SIZE;
         }
 
         if (!Queue_Channel_Data_(_soundChannels[channel_idx], dwBytes)) {
@@ -1135,7 +1227,7 @@ namespace sound {
      * @address 0052ddc0
      */
     int8_t __cdecl Find_Free_Channel_() {
-        for (int8_t i = 0; i < k_sound_channel_count; ++i) {
+        for (int8_t i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
             s_sound_channel& channel = _soundChannels[i];
 
             if (channel.buffer == nullptr) {
@@ -1168,13 +1260,13 @@ namespace sound {
         }
 
         // Search cache for existing sound data
-        for (int i = 0; i < k_sound_index_count; ++i) {
+        for (int i = 0; i < SOUND_INDEX_COUNT; ++i) {
             s_sound_index& index = _soundIndices[i];
             if (index.resource_id == resource_id && index.num_active_channels != 0) {
                 if (index.num_active_channels == -1) {
                     index.num_active_channels = 1;
                     index.active_channel_ids[0] = (uint8_t)channel_id;
-                } else if (index.num_active_channels > 0 && index.num_active_channels < k_sound_channel_count) {
+                } else if (index.num_active_channels > 0 && index.num_active_channels < SOUND_CHANNEL_COUNT) {
                     index.active_channel_ids[index.num_active_channels] = (uint8_t)channel_id;
                     index.num_active_channels++;
                 } else {
@@ -1217,7 +1309,7 @@ namespace sound {
             return;
         }
 
-        if (channel.sample_size > k_initial_channel_queue_size) {
+        if (channel.sample_size > INITIAL_CHANNEL_QUEUE_SIZE) {
             if (channel.sample_offset >= channel.sample_size) {
                 channel.flags ^= 0x1; // Deactivate active flag
                 Remove_Sound_Instance_(channel_idx);
@@ -1243,7 +1335,7 @@ namespace sound {
      * Finds an unused sound-cache index entry.
      */
     int32_t __cdecl Get_Free_Sound_Index_() {
-        for (int32_t i = 1; i < k_sound_index_count; ++i) {
+        for (int32_t i = 1; i < SOUND_INDEX_COUNT; ++i) {
             if (_soundIndices[i].next_id == -1 && _soundIndices[i].prev_id == -1) {
                 return i;
             }

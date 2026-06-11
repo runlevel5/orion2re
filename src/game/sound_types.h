@@ -1,5 +1,25 @@
 #pragma once
 
+#pragma pack(push, 1)
+
+struct s_sound_wav_header_disk {
+    char riff_tag[4];
+    uint32_t chunk_size;
+    char wave_tag[4];
+    char fmt_tag[4];
+    uint32_t fmt_size;
+    uint16_t audio_format;
+    uint16_t num_channels;
+    uint32_t sample_rate;
+    uint32_t byte_rate;
+    uint16_t block_align;
+    uint16_t bits_per_sample;
+    char data_tag[4];
+    uint32_t data_size;
+};
+
+#pragma pack(pop)
+
 struct s_sound_channel {
     uint8_t* sample_data;
     int8_t loop_count;

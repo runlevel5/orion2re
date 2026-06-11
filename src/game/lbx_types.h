@@ -5,6 +5,16 @@ struct s_lbx_stream_entry {
     uint32_t offset;
 };
 
+#pragma pack(push, 1)
+
+struct s_lbx_disk_header {
+    uint16_t entry_count;
+    uint16_t magic;
+    uint32_t header_data;
+};
+
+#pragma pack(pop)
+
 struct s_lbx_stream_header {
     uint16_t entry_count;
     uint16_t magic;

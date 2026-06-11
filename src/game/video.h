@@ -1,9 +1,5 @@
 #pragma once
 
-extern uint8_t DAT_00578820;
-extern uint32_t DAT_00578dc8;
-extern uint32_t DAT_00578dcc;
-
 namespace video {
 	struct s_palette_color {
 		uint8_t r;
