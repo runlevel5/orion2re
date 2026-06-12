@@ -903,7 +903,7 @@ namespace COLONY {
             else {
                 char* err_msg = ESTRINGS::E_Strings_(0xf7);
                 RUSS::PFMT_(0, 0, err_msg, producing_id);
-                assert::hgetch_();
+                key::Wait_For_Key_();
             }
             break;
         }

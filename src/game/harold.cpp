@@ -682,7 +682,7 @@ namespace HAROLD {
                         RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, (int32_t)star_idx);
                         RUSS::PFMT_(0, 2, "relate game conditions EXACTLY as they just happened");
                         RUSS::PFMT_(0, 3, s___s__00556ae4, star->name);
-                        assert::hgetch_();
+                        key::Wait_For_Key_();
                     }
                     orbit_taken[planet_orbit] = 1;
                 }

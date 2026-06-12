@@ -31,12 +31,12 @@ namespace aidesign {
     s_spcl _missile_defense_spcl[8] = {
         {SPECIAL_WIDE_AREA_JAMMER, 0},
         {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
-        {SPECIAL_HARD_SHIELDS, 1},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
         {SPECIAL_ECM_JAMMER, 0},
-        {SPECIAL_TROOP_PODS, 1},
+        {WEAPON_PULSAR, 1},
         {SPECIAL_DISPLACEMENT_DEVICE, 0},
         {SPECIAL_LIGHTNING_FIELD, 0},
-        {SPECIAL_SUB_SPACE_TELEPORTER, 1},
+        {WEAPON_ANTI_MISSILE_ROCKET, 1},
     };
     s_spcl _armor_spcl[3] = {
         {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
@@ -129,9 +129,9 @@ namespace aidesign {
     };
     s_spcl _special_device_spcl[12] = {
         {SPECIAL_QUANTUM_DETONATOR, 0},
-        {SPECIAL_HARD_SHIELDS, 1},
-        {SPECIAL_TROOP_PODS, 1},
-        {SPECIAL_STRUCTURAL_ANALYZER, 1},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {WEAPON_PULSAR, 1},
+        {WEAPON_STASIS_FIELD, 1},
         {SPECIAL_PHASING_CLOAK, 0},
         {SPECIAL_CLOAKING_DEVICE, 0},
         {SPECIAL_STEALTH_FIELD, 0},
@@ -156,10 +156,10 @@ namespace aidesign {
         {SPECIAL_AUGMENTED_ENGINES, 0},
         {SPECIAL_SHIELD_CAPACITOR, 0},
         {SPECIAL_MULTI_PHASED_SHIELDS, 0},
-        {SPECIAL_SUB_SPACE_TELEPORTER, 1},
+        {WEAPON_ANTI_MISSILE_ROCKET, 1},
         {SPECIAL_REFLECTION_FIELD, 0},
-        {SPECIAL_HARD_SHIELDS, 1},
-        {SPECIAL_TROOP_PODS, 1},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {WEAPON_PULSAR, 1},
         {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
         {SPECIAL_NO_SPECIAL, 0},
     };
@@ -178,10 +178,10 @@ namespace aidesign {
         {SPECIAL_AUGMENTED_ENGINES, 0},
         {SPECIAL_SHIELD_CAPACITOR, 0},
         {SPECIAL_MULTI_PHASED_SHIELDS, 0},
-        {SPECIAL_SUB_SPACE_TELEPORTER, 1},
+        {WEAPON_ANTI_MISSILE_ROCKET, 1},
         {SPECIAL_REFLECTION_FIELD, 0},
-        {SPECIAL_HARD_SHIELDS, 1},
-        {SPECIAL_TROOP_PODS, 1},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {WEAPON_PULSAR, 1},
         {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
         {SPECIAL_NO_SPECIAL, 0},
     };

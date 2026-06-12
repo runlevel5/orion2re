@@ -2,6 +2,8 @@
 
 namespace aidudes {
 
+    constexpr int16_t TEMP_SHIP_DESIGN_SLOT = SHIP_SIZE_DOOM_STAR;
+
     int16_t _n_our_blockaded;
     int16_t _n_our_unblockaded;
     s_aidudes_colony_info* _our_blockaded;
@@ -1000,8 +1002,8 @@ namespace aidudes {
                     s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
                         if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < (int32_t)game_random::Random_(100)) {
-                            INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[SHIP_SIZE_DOOM_STAR]);
-                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, (int16_t)colony_queue[i]);
+                            INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[TEMP_SHIP_DESIGN_SLOT]);
+                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, TEMP_SHIP_DESIGN_SLOT, (int16_t)colony_queue[i]);
                             if (ship_idx == -1) {
                                 no_range_or_speed = true;
                             } else {
@@ -1317,8 +1319,8 @@ namespace aidudes {
                                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_MARINE_BARRACKS);
                                 AIBUILD::_player_n_transports[player_idx][1]--;
                             } else {
-                                INITSHIP::Load_Transport_Ship_Design_(player_idx, &p->ship_designs[SHIP_SIZE_DOOM_STAR]);
-                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, (int16_t)current_colony_idx);
+                                INITSHIP::Load_Transport_Ship_Design_(player_idx, &p->ship_designs[TEMP_SHIP_DESIGN_SLOT]);
+                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, TEMP_SHIP_DESIGN_SLOT, (int16_t)current_colony_idx);
                                 if (tr_idx == -1) {
                                     no_range_or_speed = true;
                                 } else {

@@ -927,7 +927,7 @@ namespace COLBLDG {
                     return;
                 }
                 RUSS::PFMT_(0, 0, ESTRINGS::E_Strings_(248 /* 0xF8 */), item_id);
-                assert::hgetch_();
+                key::Wait_For_Key_();
                 break;
             }
         }
@@ -2263,7 +2263,7 @@ namespace COLBLDG {
         }
 
         RUSS::PFMT_(0, 0, ESTRINGS::E_Strings_(248 /* 0xF8 */), option_id);
-        assert::hgetch_();
+        key::Wait_For_Key_();
         return ESTRINGS::E_Strings_(0x00C);
     }
 

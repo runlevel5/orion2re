@@ -423,7 +423,7 @@ post_loop_dispatch:
         case 3:
             if (found_match) {
                 if (COLONY::_debug_flag != 0) {
-                    assert::hgetch_();
+                    key::Wait_For_Key_();
                 }
                 return pop_index_by_slot[pop_draw_index];
             }

@@ -169,7 +169,7 @@ namespace FILEDEF {
         FILE* file = fopen_case(filename, "rb");
         if (file == nullptr) {
             RUSS::PFMT_(0, 0, "File read error");
-            assert::hgetch_();
+            key::Wait_For_Key_();
             return 0;
         }
 

@@ -96,7 +96,10 @@ workflows:
           * Read only the claimed file.
           * Focus only on that single provided file.
           * Do not read, patch, or coordinate changes with any sibling file or any other project file.
-          * Replace hard-coded uses with the matching symbolic constant from `src/game/orion2_consts.h` only when the code in that file is clearly expressing that constant semantically.
+          * Replace hard-coded uses with the matching symbolic constant from `src/game/orion2_consts.h` only when the code in that file is clearly expressing that exact constant semantically.
+          * Treat semantic meaning as the primary requirement. A numeric value match alone is never sufficient.
+          * If multiple constants share the same numeric value, use the one that matches the surrounding domain meaning, not merely the value.
+          * Verify the intended meaning from nearby identifiers, data structures, loop purpose, comments, index usage, and related operations before replacing a literal.
           * Convert all clearly relevant hard-coded uses in the claimed file, not just the first one you find.
           * If the claimed file does not contain any clearly relevant hard-coded uses of constants from `src/game/orion2_consts.h`, leave it unchanged and skip it.
 
@@ -108,7 +111,9 @@ workflows:
 
           DO NOT CHANGE
           * Unrelated uses of the same numeric literal when the code is not clearly about the target constant.
+          * A literal just because it has the same numeric value as a constant with different semantic meaning.
           * Values whose meaning is ambiguous.
+          * Any site where you cannot confidently explain why this exact constant, and not another equal-valued constant, is intended.
           * Anything outside the single claimed file.
           * Broader refactors unrelated to the claimed file.
 

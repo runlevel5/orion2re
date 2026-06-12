@@ -36,7 +36,6 @@
 #include "clipped.h"
 #include "bitmap.h"
 #include "struct.h"
-#include "assert.h"
 #include "dos.h"
 #include "init.h"
 #include "mouse.h"

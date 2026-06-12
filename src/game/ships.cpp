@@ -111,7 +111,7 @@ namespace SHIPS {
 
             if (move_info.moving == 0) {
                 RUSS::PFMT_(0, 1, "Monster (ship id: %d) cannot move to %s (%d)!", (int)ship_idx, MOX::_star[star_idx].name, (int)star_idx);
-                assert::hgetch_();
+                key::Wait_For_Key_();
             } else {
                 SHIPMOVE::Make_Ships_Move_To_(ship_list, star_idx, &move_info);
             }

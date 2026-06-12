@@ -1881,9 +1881,7 @@ namespace COLONY {
 
         int key;
 
-        do {
-            key = key::Read_Key_();
-        } while (key == 0);
+        key = key::Wait_For_Key_();
 
         input_buf[0] = (char)key;
         input_buf[1] = '\0';
@@ -2246,7 +2244,7 @@ namespace COLONY {
             if (_debug_flag != 0) {
                 fonts::PSTRS_(0, 1, ESTRINGS::E_Strings_(0x122));
             }
-            assert::hgetch_();
+            key::Wait_For_Key_();
         }
 
         bitmap::Draw_Picture_To_Bitmap_(_mouse_bitm, anim_header);

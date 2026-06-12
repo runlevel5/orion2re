@@ -18,7 +18,7 @@ namespace ERICNET {
 
         if (COLONY::_debug_flag) {
             RUSS::PFMT_(0, 0, "INITING HOMEWORLD ph:%d pl:%d num:%d", (int)planet_idx, (int)player_idx, (int)MOX::_NUM_COLONIES);
-            assert::hgetch_();
+            key::Wait_For_Key_();
         }
 
         INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)player_idx);

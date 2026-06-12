@@ -305,7 +305,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                         (int)orbit,
                         (int)MAPGEN::_t_roll,
                         table_value);
-            assert::hgetch_();
+            key::Wait_For_Key_();
         }
 
         return satellite_type;
@@ -479,7 +479,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     (int32_t)max_planets,
                     (int32_t)original_planet_count,
                     (int32_t)((original_planet_count - gas_giant_count) - max_planets));
-                assert::hgetch_();
+                key::Wait_For_Key_();
             }
 
             _pl = (s_planet_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x17E8);
