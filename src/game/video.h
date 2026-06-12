@@ -73,6 +73,7 @@ namespace video {
 
 	extern SDL_Mutex* g_off_page_mutex;
 	extern SDL_Condition* g_off_page_condition;
+	extern SDL_Mutex* g_palette_mutex;
 	extern uint8_t g_off_page_state;
 	extern uint32_t g_off_page_generation;
 	extern uint32_t g_last_presented_generation;

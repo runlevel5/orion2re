@@ -3,6 +3,10 @@
 namespace palstore {
     void __cdecl Store_Palette_Block_(int32_t first_entry, int32_t entry_count) {
         if (first_entry < first_entry + entry_count) {
+            if (video::g_palette_mutex != nullptr) {
+                SDL_LockMutex(video::g_palette_mutex);
+            }
+
             int32_t palette_index = first_entry;
             int32_t remaining = entry_count;
 
@@ -12,6 +16,10 @@ namespace palstore {
                 video::g_palette_entries[palette_index].b = video::_current_palette[palette_index].b << 2;
                 ++palette_index;
             } while (--remaining != 0);
+
+            if (video::g_palette_mutex != nullptr) {
+                SDL_UnlockMutex(video::g_palette_mutex);
+            }
         }
     }
 
@@ -25,15 +33,32 @@ namespace palstore {
             entries[i].b = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
         }
 
+        if (video::g_palette_mutex != nullptr) {
+            SDL_LockMutex(video::g_palette_mutex);
+        }
+
         for (int32_t i = 1; i < 256; ++i) {
             video::g_palette_entries[i] = entries[i];
+        }
+
+        if (video::g_palette_mutex != nullptr) {
+            SDL_UnlockMutex(video::g_palette_mutex);
         }
     }
 
     void __cdecl Store_Single_Palette_Color_(int32_t palette_index, uint8_t red, uint8_t green, uint8_t blue) {
+        if (video::g_palette_mutex != nullptr) {
+            SDL_LockMutex(video::g_palette_mutex);
+        }
+
         video::g_palette_entries[palette_index].r = red << 2;
         video::g_palette_entries[palette_index].g = green << 2;
         video::g_palette_entries[palette_index].b = blue * 4;
+
+        if (video::g_palette_mutex != nullptr) {
+            SDL_UnlockMutex(video::g_palette_mutex);
+        }
+
         video::_current_palette[palette_index].r = red;
         video::_current_palette[palette_index].g = green;
         video::_current_palette[palette_index].b = blue;

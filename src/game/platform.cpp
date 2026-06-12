@@ -17,7 +17,7 @@ namespace platform {
 		uint32_t g_fps_frame_count;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
-		void Composite_Cursor_On_Present_Pixels_();
+		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries);
 
 		int16_t Round_Float_To_Int16_(float value) {
 			long rounded_value = lroundf(value);
@@ -364,9 +364,18 @@ namespace platform {
 				return;
 			}
 
+			video::s_palette_color palette_entries[256];
+			if (video::g_palette_mutex != nullptr) {
+				SDL_LockMutex(video::g_palette_mutex);
+			}
+			memcpy(palette_entries, video::g_palette_entries, sizeof(palette_entries));
+			if (video::g_palette_mutex != nullptr) {
+				SDL_UnlockMutex(video::g_palette_mutex);
+			}
+
 			const int32_t pixel_count = video::g_screen_res_x * video::g_screen_res_y;
 			for (int32_t i = 0; i < pixel_count; ++i) {
-				const video::s_palette_color& pal = video::g_palette_entries[src_pixels[i]];
+				const video::s_palette_color& pal = palette_entries[src_pixels[i]];
 				g_sdl_present_pixels[i] =
 					0xFF000000u |
 					((uint32_t)pal.r << 16) |
@@ -374,7 +383,7 @@ namespace platform {
 					(uint32_t)pal.b;
 			}
 
-			Composite_Cursor_On_Present_Pixels_();
+			Composite_Cursor_On_Present_Pixels_(palette_entries);
 
 #if ORION2RE_ENABLE_FPS_COUNTER
 			if (g_sdl_window != nullptr) {
@@ -411,8 +420,9 @@ namespace platform {
 			SDL_RenderPresent(g_sdl_renderer);
 		}
 
-		void Composite_Cursor_On_Present_Pixels_() {
+		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries) {
 			if (g_sdl_present_pixels == nullptr ||
+				palette_entries == nullptr ||
 				mouse::_mouse_enabled == 0 ||
 				video::_current_mouse_shape <= 0) {
 				return;
@@ -444,7 +454,7 @@ namespace platform {
 						continue;
 					}
 
-					const video::s_palette_color& pal = video::g_palette_entries[pixel];
+					const video::s_palette_color& pal = palette_entries[pixel];
 					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] =
 						0xFF000000u |
 						((uint32_t)pal.r << 16) |

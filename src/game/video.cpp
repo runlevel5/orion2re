@@ -31,6 +31,7 @@ namespace video {
 	int16_t _screen_window_x2;
 	SDL_Mutex* g_off_page_mutex;
 	SDL_Condition* g_off_page_condition;
+	SDL_Mutex* g_palette_mutex;
 	uint8_t g_off_page_state;
 	uint32_t g_off_page_generation;
 	uint32_t g_last_presented_generation;
@@ -109,6 +110,10 @@ namespace video {
 			g_off_page_condition = SDL_CreateCondition();
 		}
 
+		if (g_palette_mutex == nullptr) {
+			g_palette_mutex = SDL_CreateMutex();
+		}
+
 		g_off_page_state = OFF_PAGE_WRITABLE;
 		g_off_page_generation = 0;
 		g_last_presented_generation = 0;
@@ -123,6 +128,11 @@ namespace video {
 		if (g_off_page_mutex != nullptr) {
 			SDL_DestroyMutex(g_off_page_mutex);
 			g_off_page_mutex = nullptr;
+		}
+
+		if (g_palette_mutex != nullptr) {
+			SDL_DestroyMutex(g_palette_mutex);
+			g_palette_mutex = nullptr;
 		}
 
 		g_off_page_state = OFF_PAGE_WRITABLE;

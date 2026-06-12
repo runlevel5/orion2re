@@ -940,26 +940,18 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
     if (RACESEL::_old_race != RACESEL::_displayed_race) {
         RACESEL::_race_button_status[static_cast<int32_t>(RACESEL::_old_race)] = 0;
         RACESEL::_race_button_status[static_cast<int32_t>(RACESEL::_displayed_race)] = 1;
+    }
 
-        if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
-            animation = (s_animation_header*)buffer::Buffer_Reload_(
-                    "RACESEL.LBX",
-                    static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
-                    MOX::_global_cache_seg);
-            animate::Draw_Palette_(animation);
-        }
+    if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
+        animation = (s_animation_header*)buffer::Buffer_Reload_(
+                "RACESEL.LBX",
+                static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
+                MOX::_global_cache_seg);
+        animate::Draw_(0x36, 0x3f, animation);
     } else {
-        if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
-            animation = (s_animation_header*)buffer::Buffer_Reload_(
-                    "RACESEL.LBX",
-                    static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
-                    MOX::_global_cache_seg);
-            animate::Draw_(0x36, 0x3f, animation);
-        } else {
-            fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
-            KEN::Ken_Get_Text_Message_(0x48, text_message, sizeof(text_message));
-            BILL::_Print_Paragraph_(0x3c, 0xaf, 0x118, text_message, 2);
-        }
+        fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
+        KEN::Ken_Get_Text_Message_(0x48, text_message, sizeof(text_message));
+        BILL::_Print_Paragraph_(0x3c, 0xaf, 0x118, text_message, 2);
     }
 
     RACESEL::_old_race = RACESEL::_displayed_race;

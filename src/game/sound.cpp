@@ -543,6 +543,7 @@ namespace sound {
             Destroy_SDL_Stream_(_soundChannels[i].buffer);
         }
 
+        Stop_Stream_Loop_();
         SDL_AudioStream* destroyed_stream = _stream_data.ds_buffer;
         _stream_data.ds_buffer = nullptr;
         _audioPlaybackActive = 0;
@@ -774,12 +775,11 @@ namespace sound {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: stopped file=%s entry=%d", _currentStreamFilename, _currentStreamId);
             Stop_Sound_Timer_();
 
+            Stop_Stream_Loop_();
             SDL_AudioStream* destroyed_stream = _stream_data.ds_buffer;
             _stream_data.ds_buffer = nullptr;
             _loopStream = 0;
             _audioPlaybackActive = 0;
-
-            Stop_Stream_Loop_();
             Destroy_SDL_Stream_(destroyed_stream);
             Enable_Sound_Timer_();
         }
