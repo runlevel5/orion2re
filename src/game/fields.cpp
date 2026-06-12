@@ -625,19 +625,19 @@ namespace fields {
 
         int16_t type = field->field_type;
 
-        if (type == 9) {
+        if (type == FIELD_TYPE_SCROLL_RETURN) {
             *field->detail.scroll.value = field->detail.scroll.set_value;
             return field->detail.scroll.return_value;
         }
 
-        if (type == 10) {
+        if (type == FIELD_TYPE_STRING_LIST) {
             if (field->detail.strings.is_selectable == 0) {
                 return 0;
             }
         }
 
-        if (type == 12) {
-            if (_down_mouse_button == -1 || _fields[_down_mouse_button].field_type != 12) {
+        if (type == FIELD_TYPE_GRID) {
+            if (_down_mouse_button == -1 || _fields[_down_mouse_button].field_type != FIELD_TYPE_GRID) {
                 *field->detail.grid.grid_x_ptr = (int16_t)((mouse::Pointer_X_() - field->x) / field->detail.grid.step_x);
                 *field->detail.grid.grid_y_ptr = (int16_t)((mouse::Pointer_Y_() - field->y) / field->detail.grid.step_y);
             }
@@ -760,7 +760,7 @@ namespace fields {
         _fields[index].detail.strings.gradient_pic = gradient_pic;
         (void)unused_param_12;
         (void)unused_param_14;
-        _fields[index].field_type = FIELD_TYPE_10;
+        _fields[index].field_type = FIELD_TYPE_STRING_LIST;
 
         _fields_count++;
         return _fields_count - 1;
@@ -883,7 +883,7 @@ namespace fields {
         _fields[_fields_count].detail.circle.center_x = center_x;
         _fields[_fields_count].detail.circle.center_y = center_y;
         _fields[_fields_count].detail.circle.radius_squared = radius * radius;
-        _fields[_fields_count].field_type = 14;
+        _fields[_fields_count].field_type = FIELD_TYPE_CIRCLE;
         _fields[_fields_count].sound = sound;
         _fields[_fields_count].hotkey = *hotkey;
 
@@ -956,7 +956,7 @@ namespace fields {
             }
 
             if (field_idx != 0 && (int16_t)_fields[field_idx].hotkey == (int16_t)key_code) {
-                if (_fields[field_idx].field_type == 6) {
+                if (_fields[field_idx].field_type == FIELD_TYPE_SCROLL) {
                     return 0;
                 }
                 
@@ -973,12 +973,12 @@ namespace fields {
                     if (*_fields[field_idx].detail.radio.selection == 0) {
                         *_fields[field_idx].detail.radio.selection = 1;
                     }
-                } else if (field_type == 9) {
+                } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
                     _down_mouse_button = -1;
                     return _fields[field_idx].detail.scroll.return_value;
                 }
                 
-                if (field_type != 7 && field_type != 8) {
+                if (field_type != FIELD_TYPE_HIDDEN && field_type != FIELD_TYPE_MULTI_HOTKEY) {
                     Quick_Call_Auto_Function_();
                 }
                 _down_mouse_button = -1;
@@ -1004,7 +1004,7 @@ namespace fields {
                 }
                 
                 if (scanned_field > 0) {
-                    if (_fields[scanned_field].field_type == 11) {
+                    if (_fields[scanned_field].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
                         if (_input_field_active == 0) {
                             if (_active_input_field_number == scanned_field) {
                                 int16_t len = 0;
@@ -1052,7 +1052,7 @@ namespace fields {
                 }
                 
                 if (scanned_field != 0) {
-                    if (_fields[scanned_field].field_type != 6 && _fields[scanned_field].field_type != 11) {
+                    if (_fields[scanned_field].field_type != FIELD_TYPE_SCROLL && _fields[scanned_field].field_type != FIELD_TYPE_CONTINUOUS_INPUT) {
                         Push_Field_Down_(scanned_field, ptr_x, ptr_y);
                     }
                     
@@ -1067,7 +1067,7 @@ namespace fields {
                         if (*_fields[scanned_field].detail.radio.selection == 0) {
                             *_fields[scanned_field].detail.radio.selection = 1;
                         }
-                    } else if (field_type == 9) {
+                    } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
                         _down_mouse_button = -1;
                         return _fields[scanned_field].detail.scroll.return_value;
                     }
@@ -1081,7 +1081,7 @@ namespace fields {
                 
                 if (_list_field_on != 0) {
                     for (int16_t i = 1; i < _fields_count; ++i) {
-                        if (_fields[i].field_type == 10 && *_fields[i].detail.strings.value == _fields[i].detail.strings.help_start && _fields[i].detail.strings.is_selectable != 0) {
+                        if (_fields[i].field_type == FIELD_TYPE_STRING_LIST && *_fields[i].detail.strings.value == _fields[i].detail.strings.help_start && _fields[i].detail.strings.is_selectable != 0) {
                             _down_mouse_button = -1;
                             return i;
                         }
@@ -1089,7 +1089,7 @@ namespace fields {
                 }
             } else if (key_code == 0x0D2B || key_code == 0x0C2D) {
                 int16_t scanned_field = Scan_Field_();
-                if (scanned_field != 0 && _fields[scanned_field].field_type == 6) {
+                if (scanned_field != 0 && _fields[scanned_field].field_type == FIELD_TYPE_SCROLL) {
                     if (key_code == 0x0D2B) {
                         Increment_Scroll_Bar_(scanned_field);
                     }
@@ -1204,7 +1204,7 @@ namespace fields {
                 int32_t y = (int32_t)buf_y + _pointer_offset;
                 
                 if (_fields[i].x <= x && x <= _fields[i].x_end && _fields[i].y <= y && y <= _fields[i].y_end) {
-                    if (_fields[i].field_type != 14) {
+                    if (_fields[i].field_type != FIELD_TYPE_CIRCLE) {
                         field_idx = i;
                         break;
                     }
@@ -1219,7 +1219,7 @@ namespace fields {
             }
             
             if (field_idx != 0) {
-                if (_fields[field_idx].field_type != 11) {
+                if (_fields[field_idx].field_type != FIELD_TYPE_CONTINUOUS_INPUT) {
                     _auto_input_variable = field_idx;
                     Push_Field_Down_(field_idx, buf_x, buf_y);
                     Quick_Call_Auto_Function_();
@@ -1238,13 +1238,13 @@ namespace fields {
                             *_fields[field_idx].detail.radio.selection = 1;
                         }
                         break;
-                    case 4:
+                    case FIELD_TYPE_LEGACY_INPUT:
                         Push_Field_Down_(field_idx, buf_x, buf_y);
                         break;
-                    case 9:
+                    case FIELD_TYPE_SCROLL_RETURN:
                         _down_mouse_button = -1;
                         return _fields[field_idx].detail.scroll.return_value;
-                    case 11:
+                    case FIELD_TYPE_CONTINUOUS_INPUT:
                         if (_input_field_active == 0) {
                             strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
                             _input_field_active = 1;
@@ -1330,11 +1330,11 @@ namespace fields {
                 
                 if (field_idx == 0) {
                     if (_down_mouse_button != -1) {
-                        if (_fields[_down_mouse_button].field_type == 6) {
+                        if (_fields[_down_mouse_button].field_type == FIELD_TYPE_SCROLL) {
                             Invoke_Auto_Function_();
                         }
                         int16_t down_type = _fields[_down_mouse_button].field_type;
-                        if (down_type != 3 && down_type != 10 && down_type != 11) {
+                        if (down_type != FIELD_TYPE_MULTI_BUTTON && down_type != FIELD_TYPE_STRING_LIST && down_type != FIELD_TYPE_CONTINUOUS_INPUT) {
                             mouse::Save_Mouse_State_();
                             Draw_Field_(_down_mouse_button, 0);
                             platform::Force_Cursor_Pos(ptr_x, ptr_y);
@@ -1345,12 +1345,12 @@ namespace fields {
                     break;
                 }
                 
-                if (_down_mouse_button != field_idx && _fields[field_idx].field_type != 4 && _fields[field_idx].field_type != 11) {
+                if (_down_mouse_button != field_idx && _fields[field_idx].field_type != FIELD_TYPE_LEGACY_INPUT && _fields[field_idx].field_type != FIELD_TYPE_CONTINUOUS_INPUT) {
                     bool skip_push = false;
                     if (_down_mouse_button != -1) {
-                        if (_fields[field_idx].field_type == 12 && _fields[_down_mouse_button].field_type == 12) {
+                        if (_fields[field_idx].field_type == FIELD_TYPE_GRID && _fields[_down_mouse_button].field_type == FIELD_TYPE_GRID) {
                             skip_push = true;
-                        } else if (_fields[_down_mouse_button].field_type == 6) {
+                        } else if (_fields[_down_mouse_button].field_type == FIELD_TYPE_SCROLL) {
                             Invoke_Auto_Function_();
                         }
                     }
@@ -1359,7 +1359,7 @@ namespace fields {
                     }
                 }
                 
-                if (_fields[field_idx].field_type == 11) {
+                if (_fields[field_idx].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
                     if (_input_field_active == 0 || field_idx != _active_input_field_number) {
                         strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
                         _input_field_active = 1;
@@ -1394,7 +1394,7 @@ namespace fields {
                 mouse::Mouse_Buffer2_();
             }
             
-            if (_fields[_auto_input_variable].field_type == 6) {
+            if (_fields[_auto_input_variable].field_type == FIELD_TYPE_SCROLL) {
                 Invoke_Auto_Function_();
             }
             _auto_input_variable = 0;
@@ -1419,10 +1419,10 @@ namespace fields {
                             *_fields[field_idx].detail.radio.selection = 1;
                         }
                         break;
-                    case 4:
+                    case FIELD_TYPE_LEGACY_INPUT:
                         Push_Field_Down_(field_idx, ptr_x, ptr_y);
                         break;
-                    case 9:
+                    case FIELD_TYPE_SCROLL_RETURN:
                         _down_mouse_button = -1;
                         if (mouse_btn != 2) {
                             return _fields[field_idx].detail.scroll.return_value;
@@ -1729,7 +1729,7 @@ namespace fields {
             for (int16_t i = 1; i < _fields_count; ++i) {
                 s_field* f = &_fields[i];
 
-                if (i == _down_mouse_button && f->field_type != 4 && f->field_type != 12 && f->field_type != 10) {
+                if (i == _down_mouse_button && f->field_type != FIELD_TYPE_LEGACY_INPUT && f->field_type != FIELD_TYPE_GRID && f->field_type != FIELD_TYPE_STRING_LIST) {
                     Draw_Field_(i, 1);
                     continue;
                 }
@@ -1813,7 +1813,7 @@ namespace fields {
                             }
                         }
                         break;
-                    case 4:
+                    case FIELD_TYPE_LEGACY_INPUT:
                         if (_down_mouse_button != i) {
                             fonts::Set_Font_Style_(f->font_style, f->font_color);
                             fonts::Set_Font_Highlight_Colors_(f->detail.input.highlight_color);
@@ -1827,7 +1827,7 @@ namespace fields {
                             }
                         }
                         break;
-                    case 6: {
+                    case FIELD_TYPE_SCROLL: {
                         int16_t return_val = f->detail.scroll.return_value;
                         int16_t set_val = f->detail.scroll.set_value;
                         int16_t val = *f->detail.scroll.value;
@@ -1841,7 +1841,7 @@ namespace fields {
                         *f->detail.scroll.value = val;
                         break;
                     }
-                    case 10: {
+                    case FIELD_TYPE_STRING_LIST: {
                         fonts::Set_Font_Style_(f->font_style, f->font_color);
                         int16_t spacing = fonts::Get_Font_Vertical_Spacing_() / 2;
                         if (spacing == 0) {
@@ -1873,7 +1873,7 @@ namespace fields {
                         }
                         break;
                     }
-                    case 11: {
+                    case FIELD_TYPE_CONTINUOUS_INPUT: {
                         int16_t shadow_style = f->detail.cont_input.font_shadow_style;
                         if (_active_input_field_number == i) {
                             if (shadow_style == -1) {
@@ -1967,7 +1967,7 @@ namespace fields {
                         break;
                 }
 
-                if (_field_box_mode != 0 && f->field_type != 8) {
+                if (_field_box_mode != 0 && f->field_type != FIELD_TYPE_MULTI_HOTKEY) {
                     video::Clip_On_();
                     line::Line_(f->x, f->y, f->x_end, f->y, static_cast<uint8_t>(_field_outline_color));
                     line::Line_(f->x, f->y, f->x, f->y_end, static_cast<uint8_t>(_field_outline_color));
@@ -2004,7 +2004,7 @@ namespace fields {
                     _down_mouse_button = field_idx;
                     Draw_Field_(field_idx, 1);
 
-                    if (_fields[field_idx].field_type == 4) {
+                    if (_fields[field_idx].field_type == FIELD_TYPE_LEGACY_INPUT) {
                         x = mouse::Pointer_X_();
                         y = mouse::Pointer_Y_();
                     }
@@ -2017,8 +2017,8 @@ namespace fields {
                 int16_t down_idx = _down_mouse_button;
                 int16_t type_down = _fields[down_idx].field_type;
 
-                if ((type_down != 3 || _fields[field_idx].field_type == 3) &&
-                    (type_down != 10 || (_fields[field_idx].field_type == 10 &&
+                if ((type_down != FIELD_TYPE_MULTI_BUTTON || _fields[field_idx].field_type == FIELD_TYPE_MULTI_BUTTON) &&
+                    (type_down != FIELD_TYPE_STRING_LIST || (_fields[field_idx].field_type == FIELD_TYPE_STRING_LIST &&
                                          _fields[field_idx].detail.strings.is_selectable != 0))) {
                     Draw_Field_(down_idx, 0);
                 }
@@ -2026,7 +2026,7 @@ namespace fields {
                 _down_mouse_button = field_idx;
                 Draw_Field_(field_idx, 1);
 
-                if (_fields[field_idx].field_type == 4) {
+                if (_fields[field_idx].field_type == FIELD_TYPE_LEGACY_INPUT) {
                     x = mouse::Pointer_X_();
                     y = mouse::Pointer_Y_();
                 }
@@ -2079,7 +2079,7 @@ namespace fields {
 
         if (_draw_fields_flag != 0 && _fields_count > 1) {
             for (int i = 1; i < _fields_count; i++) {
-                if (_down_mouse_button == i && _fields[i].field_type != 4 && _fields[i].field_type != 12 && _fields[i].field_type != 10) {
+                if (_down_mouse_button == i && _fields[i].field_type != FIELD_TYPE_LEGACY_INPUT && _fields[i].field_type != FIELD_TYPE_GRID && _fields[i].field_type != FIELD_TYPE_STRING_LIST) {
                     Draw_Field_(i, 1);
                     continue;
                 }
@@ -2156,7 +2156,7 @@ namespace fields {
                         }
                         break;
                     }
-                    case 4: {
+                    case FIELD_TYPE_LEGACY_INPUT: {
                         if (_down_mouse_button != i) {
                             fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                             fonts::Set_Font_Highlight_Colors_(_fields[i].detail.input.highlight_color);
@@ -2171,7 +2171,7 @@ namespace fields {
                         }
                         break;
                     }
-                    case 6: {
+                    case FIELD_TYPE_SCROLL: {
                         int16_t ret_val = _fields[i].detail.scroll.return_value;
                         int16_t max_val = _fields[i].detail.scroll.set_value;
                         int16_t cur_val = *_fields[i].detail.scroll.value;
@@ -2184,7 +2184,7 @@ namespace fields {
                         *_fields[i].detail.scroll.value = cur_val;
                         break;
                     }
-                    case 10: {
+                    case FIELD_TYPE_STRING_LIST: {
                         fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                         int spacing = fonts::Get_Font_Vertical_Spacing_() / 2;
                         if (spacing == 0) {
@@ -2215,7 +2215,7 @@ namespace fields {
                         }
                         break;
                     }
-                    case 11: {
+                    case FIELD_TYPE_CONTINUOUS_INPUT: {
                         int shadow_style = _fields[i].detail.cont_input.font_shadow_style;
                         if (i != _active_input_field_number) {
                             if (shadow_style == -1) {
@@ -2302,7 +2302,7 @@ namespace fields {
                         break;
                 }
 
-                if (_field_box_mode != 0 && _fields[i].field_type != 8) {
+                if (_field_box_mode != 0 && _fields[i].field_type != FIELD_TYPE_MULTI_HOTKEY) {
                     video::Clip_On_();
                     line::Line_(_fields[i].x, _fields[i].y, _fields[i].x_end, _fields[i].y, (uint8_t)_field_outline_color);
                     line::Line_(_fields[i].x, _fields[i].y, _fields[i].x, _fields[i].y_end, (uint8_t)_field_outline_color);
@@ -2513,11 +2513,11 @@ namespace fields {
 
         switch (field->field_type) {
             case 0:
-            case 13: {
+            case FIELD_TYPE_IRREGULAR_BUTTON: {
                 int16_t x_pos;
                 int16_t y_pos;
 
-                if (field->field_type == 13) {
+                if (field->field_type == FIELD_TYPE_IRREGULAR_BUTTON) {
                     x_pos = field->detail.button.help_start;
                     y_pos = field->detail.button.background_color;
                 } else {
@@ -2654,19 +2654,19 @@ namespace fields {
                 }
                 break;
             }
-            case 4: {
+            case FIELD_TYPE_LEGACY_INPUT: {
                 if (action == 1) {
                     Input_String_(field_idx);
                 }
                 break;
             }
-            case 6: {
+            case FIELD_TYPE_SCROLL: {
                 if (action == 1) {
                     Find_Bar_Position_(field_idx);
                 }
                 break;
             }
-            case 12: {
+            case FIELD_TYPE_GRID: {
                 _pointer_offset = mouse::Get_Pointer_Offset_();
                 if (action == 1) {
                     *field->detail.grid.grid_x_ptr = (mouse::Pointer_X_() - field->x + _pointer_offset) / field->detail.grid.step_x;

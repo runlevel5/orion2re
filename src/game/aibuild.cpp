@@ -3,7 +3,7 @@
 namespace AIBUILD {
     uint8_t _difficulty_ship_design[12] = {2, 10, 35, 50, 115, 0, 0, 0, 45, 0, 0, 0};
     int8_t _difficulty_intel_bias[8] = {1, 1, 2, 3, 4, 0, 0, 0};
-    uint8_t _player_ship_size_table[9] = {1, 2, 3, 5, 8, 13, 0, 0, 0};
+    uint8_t _player_ship_size_table[HULL_CLASS_COUNT] = {1, 2, 3, 5, 8, 13, 0, 0, 0};
     s_player_ship_sizes _player_ship_sizes[MAX_PLAYERS];
     int32_t _player_total_strength_vs_colonies[MAX_PLAYERS];
     uint8_t _player_n_transports[MAX_PLAYERS][2];
@@ -261,7 +261,7 @@ namespace AIBUILD {
                         max_ship_size_13 = AIBUILD::_player_ship_sizes[i].weighted_ship_size;
                     }
 
-                    for (int16_t j = 0; j < 9; ++j) {
+                    for (int16_t j = 0; j < HULL_CLASS_COUNT; ++j) {
                         if (AIBUILD::_player_ship_sizes[i].ship_counts[j] != 0 && highest_ship_size_idx < j) {
                             highest_ship_size_idx = j;
                         }
@@ -282,7 +282,7 @@ namespace AIBUILD {
         }
 
         AIBUILD::_player_n_transports[player_idx][1] = 0;
-        if (MOX::_player[player_idx].tech_applications[189] == 3 && AIBUILD::_player_ship_sizes[player_idx].weighted_ship_size > 1) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_TRANSPORT] == 3 && AIBUILD::_player_ship_sizes[player_idx].weighted_ship_size > 1) {
             int32_t colony_limit = ((*AIDATA::_ai_player_info)[player_idx].colony_count + 2) / 3;
             int32_t transport_avg = (max_transports + 1 + total_transports / total_contacts) / 2;
             
@@ -373,7 +373,7 @@ namespace AIBUILD {
                     AIBUILD::_player_n_spies[player_idx][1] = (uint8_t)(max_spies - current_spies);
                 }
 
-                int32_t spy_trait = MOX::_player[player_idx].traits[9];
+                int32_t spy_trait = MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS];
                 int32_t spy_roll = (int32_t)game_random::Random_(100);
                 if (current_spies < max_spies + 2 && spy_roll <= spy_trait) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
@@ -385,10 +385,10 @@ namespace AIBUILD {
 
                 uint8_t spy_need = AIBUILD::_player_n_spies[player_idx][1];
                 if (spy_need != 0) {
-                    int32_t cap = (*AIDATA::_ai_player_info)[player_idx].n_contacts * ((MOX::_player[player_idx].traits[9] > 0 ? 1 : 0) + 1) * 2;
+                    int32_t cap = (*AIDATA::_ai_player_info)[player_idx].n_contacts * ((MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS] > 0 ? 1 : 0) + 1) * 2;
                     if (cap < current_spies) {
                         if (spy_need < 2) {
-                            if (MOX::_player[player_idx].traits[9] < 1 && game_random::Random_(4) != 1) {
+                            if (MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS] < 1 && game_random::Random_(4) != 1) {
                                 AIBUILD::_player_n_spies[player_idx][1] = 0;
                             } else {
                                 AIBUILD::_player_n_spies[player_idx][1] = 1;
@@ -512,7 +512,7 @@ namespace AIBUILD {
     }
 
     void __cdecl Find_Buildable_Buildings_(s_colony* colony, uint16_t* buildable_flags) {
-        for (int16_t product_id = 1; product_id < 0x31; ++product_id) {
+        for (int16_t product_id = 1; product_id < BUILDING_COUNT; ++product_id) {
             if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
                 buildable_flags[product_id] = 1;
             }
@@ -554,15 +554,15 @@ namespace AIBUILD {
         int8_t gravity = planet->gravity_class;
         
         bool is_industrial_focus = false;
-        if (colony->buildings[7 /* BUILDING_AUTOMATED_FACTORY */] == 0 && player->tech_applications[22 /* TECH_APP_AUTOMATED_FACTORIES */] == 3 && planet->mineral_class <= 2) {
+        if (colony->buildings[BUILDING_AUTOMATED_FACTORY] == 0 && player->tech_applications[TECH_APP_AUTOMATED_FACTORIES] == 3 && planet->mineral_class <= 2) {
             is_industrial_focus = true;
         }
 
         bool is_military_focus = false;
         int8_t ground_trait = player->traits[0 /* TRAIT_GROUND_COMBAT */] / 2;
         if (ground_trait >= 0 && ground_trait <= 1) {
-            if ((colony->buildings[22 /* BUILDING_MARINE_BARRACKS */] == 0 && player->tech_applications[103 /* TECH_APP_MARINE_BARRACKS */] == 3) ||
-                (colony->buildings[2 /* BUILDING_ARMOR_BARRACKS */] == 0 && player->tech_applications[14 /* TECH_APP_ARMOR_BARRACKS */] == 3)) {
+            if ((colony->buildings[BUILDING_MARINE_BARRACKS] == 0 && player->tech_applications[TECH_APP_MARINE_BARRACKS] == 3) ||
+                (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0 && player->tech_applications[TECH_APP_ARMOR_BARRACKS] == 3)) {
                 is_military_focus = true;
             }
         }
@@ -571,13 +571,13 @@ namespace AIBUILD {
         int32_t score = 0;
 
         switch (building_id) {
-        case 2: {
+        case BUILDING_ARMOR_BARRACKS: {
             int32_t threatened_score = alliance_count * 3 + threatened * 2 +
                                        out_of_range_count + neutral_count + enemy_count;
             if (colony->n_pops > 2 || bc_score != 0) {
                 if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             }
-            if (ground_trait >= 0 && ground_trait <= 1 && colony->buildings[22 /* BUILDING_MARINE_BARRACKS */] == 0) {
+            if (ground_trait >= 0 && ground_trait <= 1 && colony->buildings[BUILDING_MARINE_BARRACKS] == 0) {
                 score += 6;
             }
             if (Colony_Is_Conquered_(colony)) score += 1;
@@ -585,7 +585,7 @@ namespace AIBUILD {
             score += bc_score;
         } break;
 
-        case 3:
+        case BUILDING_ARTEMIS_SYSTEM_NET:
             if (building_focus && threatened == 0) break;
             if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner_u8 & 0x1F)) & 1) == 0) {
                 int threatened_score = alliance_count * 3 + threatened * 10 +
@@ -596,11 +596,11 @@ namespace AIBUILD {
             score += bc_score;
             break;
 
-        case 4:
+        case BUILDING_ASTRO_UNIVERSITY:
             score = 5;
             break;
 
-        case 5:
+        case BUILDING_ATMOSPHERE_RENEWER:
             if (trait_score != 0 && colony->pollution > 5) {
                 score = objective_5_bonus;
                 if (colony->pollution >= 11) {
@@ -609,17 +609,17 @@ namespace AIBUILD {
             }
             break;
 
-        case 6:
+        case BUILDING_AUTOLAB:
             if (!building_focus && player->do_not_research == 0) {
                 score = objective_3_bonus * 4 + 11;
             }
             break;
 
-        case 7:
+        case BUILDING_AUTOMATED_FACTORY:
             score = (uint8_t)colony->n_pops + 13 + objective_4_bonus * 2;
             break;
 
-        case 8: {
+        case BUILDING_BATTLESTATION: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 3 + threatened * 10;
             if (player->command_points <= player->command_points_used) {
@@ -628,25 +628,25 @@ namespace AIBUILD {
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
-        case 9:
+        case BUILDING_CAPITOL:
             if (ground_trait != 3 && player->home_planet_id == colony->planet) {
                 score = 100;
             }
             break;
 
-        case 10:
+        case BUILDING_CLONING_CENTER:
             if (!building_focus) {
-                if (player->traits[1 /* TRAIT_POP_GROWTH_BONUS */] < 0) score = objective_5_bonus;
+                if (player->traits[TRAIT_POP_GROWTH_BONUS] < 0) score = objective_5_bonus;
                 bc_score /= 2;
                 score += bc_score;
             }
             break;
 
-        case 12:
+        case BUILDING_DEEP_CORE_MINE:
             score = (uint8_t)colony->n_pops + 12 + objective_4_bonus * 4;
             break;
 
-        case 13:
+        case BUILDING_CORE_WASTE_DUMP:
             if (!building_focus && trait_score != 0 && colony->pollution > 5) {
                 score = objective_5_bonus;
                 if (colony->pollution >= 11) {
@@ -655,11 +655,11 @@ namespace AIBUILD {
             }
             break;
 
-        case 15:
+        case BUILDING_BIOSPHERES:
             if (!building_focus) score = objective_5_bonus + 18;
             break;
 
-        case 16:
+        case BUILDING_FOOD_REPLICATORS:
             if (trait_eats_minerals != 0) {
                 int32_t base_score = 8;
                 if (player->surplus_food >= 0) {
@@ -669,21 +669,21 @@ namespace AIBUILD {
             }
             break;
 
-        case 17:
+        case BUILDING_GAIA_TRANSFORMATION:
             score = bc_score + objective_5_bonus;
             break;
 
-        case 19:
+        case BUILDING_GALACTIC_CYBERNET:
             if (!building_focus && player->do_not_research == 0) score = 11;
             break;
 
-        case 20:
+        case BUILDING_HOLO_SIMULATOR:
             if (ground_trait != 3 && (colony->n_pops > 2 || (bc_score != 0 && colony->n_pops > 1))) {
                 score = 10;
             }
             break;
 
-        case 21:
+        case BUILDING_HYDROPONIC_FARM:
             if (trait_eats_minerals != 0) {
                 int32_t base_val = 6;
                 if (colony->food2_per_farmer == 0) base_val = 12;
@@ -695,78 +695,78 @@ namespace AIBUILD {
             }
             break;
 
-        case 22: {
+        case BUILDING_MARINE_BARRACKS: {
             int32_t threatened_score = threatened * 5 + (alliance_count * 3 + out_of_range_count) * 2 + neutral_count * 3 + enemy_count;
             if (colony->n_pops > 1 || bc_score != 0) {
                 if (threatened_score != 0) score = threatened_score + objective_1_bonus;
             }
-            if (colony->buildings[2 /* BUILDING_ARMOR_BARRACKS */] == 0 && ground_trait >= 0 && ground_trait <= 1) {
+            if (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0 && ground_trait >= 0 && ground_trait <= 1) {
                 score += 12;
             }
             if (Colony_Is_Conquered_(colony)) score += 3;
             score += bc_score;
         } break;
 
-        case 23:
-        case 24: {
+        case BUILDING_BARRIER_SHIELD:
+        case BUILDING_FLUX_SHIELD: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = enemy_count + (threatened * 5 + (alliance_count * 3 + neutral_count) * 2 + out_of_range_count) * 2;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus;
-            if (climate == 1) score += objective_5_bonus * 2;
+            if (climate == PLANET_CLIMATE_RADIATED) score += objective_5_bonus * 2;
             score += bc_score;
         } break;
 
-        case 25: {
-            if (player->traits[11 /* TRAIT_HEAVY_G_WORLD */] != 0) {
-                if (gravity == 0) score = objective_5_bonus + 3;
-            } else if (player->traits[10 /* TRAIT_LOW_G_WORLD */] != 0) {
-                if (gravity == 1) score = objective_5_bonus + 3;
-                else if (gravity == 2) score = objective_5_bonus + 6;
+        case BUILDING_GRAVITY_GENERATOR: {
+            if (player->traits[TRAIT_HEAVY_G_WORLD] != 0) {
+                if (gravity == PLANET_GRAVITY_LOW_G) score = objective_5_bonus + 3;
+            } else if (player->traits[TRAIT_LOW_G_WORLD] != 0) {
+                if (gravity == PLANET_GRAVITY_NORMAL_G) score = objective_5_bonus + 3;
+                else if (gravity == PLANET_GRAVITY_HEAVY_G) score = objective_5_bonus + 6;
             } else {
-                if (gravity == 0) score = objective_5_bonus + 3;
-                else if (gravity == 2) score = objective_5_bonus + 6;
+                if (gravity == PLANET_GRAVITY_LOW_G) score = objective_5_bonus + 3;
+                else if (gravity == PLANET_GRAVITY_HEAVY_G) score = objective_5_bonus + 6;
             }
         } break;
 
-        case 26: {
+        case BUILDING_MISSILE_BASE: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
-        case 27: {
+        case BUILDING_GROUND_BATTERIES: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
-        case 28: {
+        case BUILDING_RADIATION_SHIELD: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (alliance_count * 3 + neutral_count * 2 + out_of_range_count + enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus;
-            if (climate == 1) score += objective_5_bonus * 2;
+            if (climate == PLANET_CLIMATE_RADIATED) score += objective_5_bonus * 2;
             score += bc_score;
         } break;
 
-        case 29:
+        case BUILDING_STOCK_EXCHANGE:
             if (!building_focus && colony->n_pops > 4) {
                 score = (ai_colony->pop_limit + (uint8_t)colony->n_pops + objective_4_bonus) / 3;
             }
             break;
 
-        case 30:
+        case BUILDING_SUPERCOMPUTER:
             if (!building_focus && player->do_not_research == 0) {
                 score = objective_3_bonus * 3 + 8;
             }
             break;
 
-        case 31:
+        case BUILDING_PLEASURE_DOME:
             if (ground_trait != 3 && (colony->n_pops > 2 || (bc_score != 0 && colony->n_pops > 1))) {
                 score = 16;
             }
             break;
 
-        case 32:
+        case BUILDING_POLLUTION_PROCESSOR:
             if (trait_score != 0 && colony->pollution > 5) {
                 score = objective_5_bonus;
                 if (colony->pollution >= 11) {
@@ -775,44 +775,44 @@ namespace AIBUILD {
             }
             break;
 
-        case 33:
+        case BUILDING_RECYCLOTRON:
             score = (ai_colony->pop_limit + (uint8_t)colony->n_pops * 2) / 3 + (trait_score + objective_4_bonus + objective_5_bonus) * 2;
             break;
 
-        case 34:
+        case BUILDING_ROBOTIC_FACTORY:
             score = objective_4_bonus * 2 + 12;
             break;
 
-        case 35:
+        case BUILDING_RESEARCH_LAB:
             if (!building_focus && player->do_not_research == 0) {
                 score = objective_3_bonus * 2 + 5;
             }
             break;
 
-        case 36:
+        case BUILDING_ROBO_MINER_PLANT:
             score = (uint8_t)colony->n_pops + 5 + objective_4_bonus * 2;
             break;
 
-        case 37:
+        case BUILDING_SOIL_ENRICHMENT:
             if (!building_focus && trait_eats_minerals != 0 && colony->food2_per_farmer != 0) {
                 int32_t base_val = (player->surplus_food >= 0) ? 3 : 5;
                 score = base_val + objective_5_bonus * 2;
             }
             break;
 
-        case 38:
+        case BUILDING_SPACE_ACADEMY:
             if (!building_focus && (colony->production[1] > 16 || colony->n_pops > 4 || bc_score != 0)) {
                 score = (int32_t)special::isqrt_((int32_t)colony->production[1] - 15);
             }
             break;
 
-        case 39:
+        case BUILDING_SPACEPORT:
             if (!building_focus && colony->n_pops > 2) {
                 score = (ai_colony->pop_limit + (uint8_t)colony->n_pops + objective_4_bonus) / 3;
             }
             break;
 
-        case 40: {
+        case BUILDING_STAR_BASE: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = out_of_range_count * 3 + (enemy_count + (neutral_count + alliance_count * 2) * 2) * 4 + threatened * 10;
             if (player->command_points <= player->command_points_used) {
@@ -821,7 +821,7 @@ namespace AIBUILD {
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
-        case 41: {
+        case BUILDING_STAR_FORTRESS: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 3 + threatened * 10;
             if (player->command_points <= player->command_points_used) {
@@ -830,13 +830,13 @@ namespace AIBUILD {
             if (base_threat != 0) score = base_threat + objective_1_bonus + bc_score;
         } break;
 
-        case 42: {
+        case BUILDING_STELLAR_CONVERTER: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus + bc_score;
         } break;
 
-        case 43:
+        case BUILDING_SUBTERRANEAN_FARMS:
             if (!building_focus && trait_eats_minerals != 0) {
                 int32_t base_val = 7;
                 if (colony->food2_per_farmer == 0) base_val = 13;
@@ -848,37 +848,37 @@ namespace AIBUILD {
             }
             break;
 
-        case 44:
+        case BUILDING_TERRAFORMING:
             if (!building_focus) {
                 int32_t base_climate_score = 0;
                 bool valid_climate = true;
-                bool is_aquatic = (player->traits[12 /* TRAIT_AQUATIC */] != 0);
+                bool is_aquatic = (player->traits[TRAIT_AQUATIC] != 0);
                 switch (climate) {
-                case 2: base_climate_score = 2; break;
-                case 3: base_climate_score = 1; break;
-                case 4:
+                case PLANET_CLIMATE_BARREN: base_climate_score = 2; break;
+                case PLANET_CLIMATE_DESERT: base_climate_score = 1; break;
+                case PLANET_CLIMATE_TUNDRA:
                     if (is_aquatic) {
                         base_climate_score = 1;
                     }
                     break;
-                case 5:
+                case PLANET_CLIMATE_OCEAN:
                     if (!is_aquatic) {
                         base_climate_score = 4;
                     }
                     break;
-                case 6:
+                case PLANET_CLIMATE_SWAMP:
                     if (!is_aquatic) {
                         base_climate_score = 6;
                     }
                     break;
-                case 7: base_climate_score = 1; break;
+                case PLANET_CLIMATE_ARID: base_climate_score = 1; break;
                 default: valid_climate = false; break;
                 }
                 if (valid_climate) score = base_climate_score + objective_5_bonus * 3 + bc_score;
             }
             break;
 
-        case 45: {
+        case BUILDING_WARP_INTERDICTOR: {
             if (building_focus && threatened == 0) break;
             if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner_u8 & 0x1F)) & 1) == 0) {
                 int32_t threatened_score = threatened * 5 + (enemy_count + alliance_count * 2) * 2 + neutral_count * 3 + out_of_range_count;
@@ -888,14 +888,14 @@ namespace AIBUILD {
             score += bc_score;
         } break;
 
-        case 46:
+        case BUILDING_WEATHER_CONTROLLER:
             if (!building_focus && trait_eats_minerals != 0 && colony->food2_per_farmer != 0) {
                 int base_val = (player->surplus_food >= 0) ? 5 : 10;
                 score = base_val + objective_5_bonus * 2;
             }
             break;
 
-        case 47: {
+        case BUILDING_FIGHTER_GARRISON: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + objective_1_bonus + bc_score;
@@ -933,7 +933,7 @@ namespace AIBUILD {
 
         Find_Buildable_Buildings_(colony, weights);
 
-        for (int16_t i = 4; i <= 48; ++i) {
+        for (int16_t i = BUILDING_ASTRO_UNIVERSITY; i < BUILDING_COUNT; ++i) {
             if (weights[i] > 0) {
                 int16_t score = Colony_Building_Score_(colony, i);
                 weights[i] = score;
@@ -943,7 +943,7 @@ namespace AIBUILD {
             }
         }
 
-        weights[50] = 1;
+        weights[BUILDING_COUNT + 1] = 1;
 
         if (max_score < 1) {
             max_score = 1;
@@ -956,7 +956,7 @@ namespace AIBUILD {
 
         int32_t threshold_multiplier = 6 - difficulty;
 
-        for (int16_t i = 0; i <= 50; ++i) {
+        for (int16_t i = 0; i <= BUILDING_COUNT + 1; ++i) {
             if (threshold_multiplier * weights[i] < max_score) {
                 weights[i] = 0;
             }
@@ -967,17 +967,17 @@ namespace AIBUILD {
 
         if (colony->n_pops * 3 <= pop_limit) {
             int32_t housing_weight_base = (pop_limit - colony->n_pops) * 3;
-            weights[49] = (int16_t)special::isqrt_(housing_weight_base);
+            weights[BUILDING_COUNT] = (int16_t)special::isqrt_(housing_weight_base);
         }
 
-        int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, 51);
+        int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, BUILDING_COUNT + 2);
 
-        if (choice < 49) {
+        if (choice < BUILDING_COUNT) {
             COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, choice);
             colony->producing[0] = choice;
-        } else if (choice == 49) {
+        } else if (choice == BUILDING_COUNT) {
             colony->producing[0] = -3;
-        } else if (choice == 50) {
+        } else if (choice == BUILDING_COUNT + 1) {
             colony->producing[0] = -2;
         }
     }

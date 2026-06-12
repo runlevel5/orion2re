@@ -26,16 +26,16 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     MOX::_global_combat_data.player_idx = MOX::_ship[ship_idx].owner;
     MOX::_global_combat_data.previous_owner = MOX::_ship[ship_idx].d.previous_owner;
-    MOX::_global_combat_data.design_idx = ship_idx;
+    MOX::_global_combat_data.ship_idx = ship_idx;
     MOX::_global_combat_data.shield_type = MOX::_ship[ship_idx].d.shield_type;
     MOX::_global_combat_data.computer_type = MOX::_ship[ship_idx].d.computer_type;
     MOX::_global_combat_data.ftl_type = MOX::_ship[ship_idx].d.ftl_type;
     MOX::_global_combat_data.hull_size = MOX::_ship[ship_idx].d.size;
-    MOX::_global_combat_data.field6_0x24 = 0;
+    MOX::_global_combat_data.unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
         MOX::_global_combat_data.special_device_flags[i] = MOX::_ship[ship_idx].d.special_device_flags[i];
-        MOX::_global_combat_data.special_device_damage[i] = MOX::_ship[ship_idx].special_device_damage_flags[i];
+        MOX::_global_combat_data.special_device_damage_flags[i] = MOX::_ship[ship_idx].special_device_damage_flags[i];
     }
 
     for (int i = 0; i < 8; ++i) {
@@ -72,7 +72,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     }
 
     for (int i = 0; i < 8; ++i) {
-        MOX::_global_combat_data.weapon_slot_active[i] = 1;
+        MOX::_global_combat_data.weapon_ready_flags[i] = 1;
     }
 
     MOX::_global_combat_data.crew_quality = MOX::_ship[ship_idx].crew_quality;
@@ -82,7 +82,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.hull_size].marines;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 36)) {
-            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage, 36)) {
+            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, 36)) {
                 MOX::_global_combat_data.marine_count *= 2;
             }
         }
@@ -102,7 +102,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         MOX::_global_combat_data.picture_num = MOX::_ship[ship_idx].d.picture_num;
     }
 
-    MOX::_global_combat_data.field33_0x4b = 0;
+    MOX::_global_combat_data.is_retreating = 0;
 
     CMBTFIR2::Init_Internal_Space_((s_combat_data*)&MOX::_global_combat_data);
 
@@ -126,7 +126,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
             TECHDATA::_shields[MOX::_global_combat_data.shield_type].shield_class * shield_hull_mult * 5;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 20)) {
-            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage, 20)) {
+            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, 20)) {
                 MOX::_global_combat_data.shield_points_base += MOX::_global_combat_data.shield_points_base / 2;
             }
         }

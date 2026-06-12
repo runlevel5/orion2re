@@ -120,7 +120,7 @@ namespace AIDATA {
 
         for (int i = 0; i < 8; ++i) {
             int weapon_type = (int)ship->d.ship_weapon[i].type;
-            if (weapon_type != 0) {
+            if (weapon_type != WEAPON_NO_WEAPONS) {
                 uint16_t app_id = TECHDATA::_weapons[weapon_type].tech_app_id;
                 uint16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                 uint8_t normalized_cost = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
@@ -147,7 +147,7 @@ namespace AIDATA {
         }
 
         int size = (int)(int8_t)ship->d.size;
-        if (desirability != 0 && size < 5) {
+        if (desirability != 0 && size < SHIP_SIZE_DOOM_STAR) {
             s_ship_design* standard_design = &MOX::_player[owner].ship_designs[size];
             // NOTE: This raw compare assumes s_ship_design has a stable packed byte layout.
             if (memcmp(&ship->d, standard_design, 99 /* sizeof(s_ship_design) */) == 0) {
@@ -222,7 +222,7 @@ namespace AIDATA {
                     }
                     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                         if (owner != p && MOX::_player[p].eliminated == 0) {
-                            if (ship.d.ship_type == 0) {
+                            if (ship.d.ship_type == SHIP_TYPE_COMBAT) {
                                 uint16_t str = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_(i, p);
                                 (*_ship_strengths)[i][p] = str;
                                 (*_ai_player_info)[owner].total_ship_strength[p] += str;
@@ -484,7 +484,7 @@ namespace AIDATA {
 
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
-            if (ship->d.ship_type == 0 && ship->owner < MOX::_NUM_PLAYERS && ship->status < 3 && ship->mission != 4 /* SHIP_MISSION_SCRAP */) {
+            if (ship->d.ship_type == SHIP_TYPE_COMBAT && ship->owner < MOX::_NUM_PLAYERS && ship->status < 3 && ship->mission != 4 /* SHIP_MISSION_SCRAP */) {
                 (*_all_ships)[_n_all_ships++] = (int16_t)i;
                 if (ship->status == 0) {
                     RUSS::Mox_Update_();
@@ -1130,7 +1130,7 @@ namespace AIDATA {
 
                         if (in_range || (in_ext_range && has_stargate)) {
                             if (i == dest_star_idx || i == ship_dest_star ||
-                                (MOX::_star[i].spectral_class != 6 &&
+                                (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE &&
                                     MOX::_star[i].system_special != 9 &&
                                     (((MOX::_star[i].has_colony >> owner) & 1) != 0 || MOX::_star[i].has_colony == 0))) {
 

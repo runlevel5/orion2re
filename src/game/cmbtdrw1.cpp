@@ -3346,7 +3346,7 @@ skip_cursor:
 
         row_y = static_cast<int16_t>(view_y + 0x76);
 
-        if (MOX::_global_combat_data.field41_0xb0 == 1) {
+        if (MOX::_global_combat_data.is_captured == 1) {
             fonts::Set_Font_Style_Shadow_Down_(4, &damaged_colors);
             fonts::Set_Outline_Color_(0, 1);
 
@@ -3761,7 +3761,7 @@ skip_cursor:
         for (int32_t special_index = 0; special_index < 0x27; ++special_index) {
             if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, special_index) != 0) {
                 const s_colors* active_colors =
-                    (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage, special_index) == 0)
+                    (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, special_index) == 0)
                         ? &text_colors
                         : &damaged_colors;
 
@@ -3827,7 +3827,7 @@ skip_cursor:
     }
 
     void __cdecl Remap_Draw_Ship_Status_(int16_t x, int16_t y) {
-        s_animation_header* ship_picture = KEN::Get_Ship_Id_Picture_Seg_(MOX::_global_combat_data.design_idx);
+        s_animation_header* ship_picture = KEN::Get_Ship_Id_Picture_Seg_(MOX::_global_combat_data.ship_idx);
 
         bitmap::Draw_Picture_To_Bitmap_(MOX::_draw_ship_bitmap, ship_picture);
         bitmap::Create_Blank_Bitmap_(0x62, 0x62, MOX::_combat_bitmap);

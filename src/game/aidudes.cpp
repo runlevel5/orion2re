@@ -139,129 +139,129 @@ namespace aidudes {
                     }
                 }
 
-                uint8_t weights[50];
+                uint8_t weights[BUILDING_COUNT + 1];
                 memset(weights, 0, sizeof(weights));
-                weights[49] = 55; // Default/Keep Current weight
+                weights[BUILDING_COUNT] = 55; // Default/Keep Current weight
 
                 if (colony->n_pops >= 5) {
                     // TECH_APP_SPACEPORT (164), BUILDING_SPACEPORT (39)
-                    if (_p_ai->tech_applications[164] == 3 && colony->buildings[39] == 0) {
-                        weights[39] = colony->n_pops + 25;
+                    if (_p_ai->tech_applications[TECH_APP_SPACEPORT] == 3 && colony->buildings[BUILDING_SPACEPORT] == 0) {
+                        weights[BUILDING_SPACEPORT] = colony->n_pops + 25;
                     }
                     // TECH_APP_PLANETARY_STOCK_EXCHANGE (135), BUILDING_STOCK_EXCHANGE (29)
-                    if (_p_ai->tech_applications[135] == 3 && colony->buildings[29] == 0) {
-                        weights[29] = colony->n_pops + 20;
+                    if (_p_ai->tech_applications[TECH_APP_PLANETARY_STOCK_EXCHANGE] == 3 && colony->buildings[BUILDING_STOCK_EXCHANGE] == 0) {
+                        weights[BUILDING_STOCK_EXCHANGE] = colony->n_pops + 20;
                     }
                 }
 
                 // TECH_APP_SUBTERRANEAN_FARMS (178), BUILDING_SUBTERRANEAN_FARMS (43)
-                if (_p_ai->tech_applications[178] == 3 && colony->buildings[43] == 0) {
-                    weights[43] = 20;
+                if (_p_ai->tech_applications[TECH_APP_SUBTERRANEAN_FARMS] == 3 && colony->buildings[BUILDING_SUBTERRANEAN_FARMS] == 0) {
+                    weights[BUILDING_SUBTERRANEAN_FARMS] = 20;
                 }
                 // TECH_APP_HYDROPONIC_FARM (87), BUILDING_HYDROPONIC_FARM (21)
-                if (_p_ai->tech_applications[87] == 3 && colony->buildings[21] == 0) {
-                    weights[21] = 20;
+                if (_p_ai->tech_applications[TECH_APP_HYDROPONIC_FARM] == 3 && colony->buildings[BUILDING_HYDROPONIC_FARM] == 0) {
+                    weights[BUILDING_HYDROPONIC_FARM] = 20;
                 }
                 // TECH_APP_AUTOMATED_FACTORIES (22), BUILDING_AUTOMATED_FACTORY (7)
-                if (_p_ai->tech_applications[22] == 3 && colony->buildings[7] == 0) {
-                    weights[7] = 35;
+                if (_p_ai->tech_applications[TECH_APP_AUTOMATED_FACTORIES] == 3 && colony->buildings[BUILDING_AUTOMATED_FACTORY] == 0) {
+                    weights[BUILDING_AUTOMATED_FACTORY] = 35;
                 }
                 // TECH_APP_ROBO_MINERS (156), BUILDING_ROBO_MINER_PLANT (36)
-                if (_p_ai->tech_applications[156] == 3 && colony->buildings[36] == 0) {
-                    weights[36] = 20;
+                if (_p_ai->tech_applications[TECH_APP_ROBO_MINERS] == 3 && colony->buildings[BUILDING_ROBO_MINER_PLANT] == 0) {
+                    weights[BUILDING_ROBO_MINER_PLANT] = 20;
                 }
                 // TECH_APP_DEEP_CORE_MINING (49), BUILDING_DEEP_CORE_MINE (12)
-                if (_p_ai->tech_applications[49] == 3 && colony->buildings[12] == 0) {
-                    weights[12] = 10;
+                if (_p_ai->tech_applications[TECH_APP_DEEP_CORE_MINING] == 3 && colony->buildings[BUILDING_DEEP_CORE_MINE] == 0) {
+                    weights[BUILDING_DEEP_CORE_MINE] = 10;
                 }
                 // TECH_APP_ROBOTIC_FACTORY (154), BUILDING_ROBOTIC_FACTORY (34)
-                if (_p_ai->tech_applications[154] == 3 && colony->buildings[34] == 0) {
-                    weights[34] = 7;
+                if (_p_ai->tech_applications[TECH_APP_ROBOTIC_FACTORY] == 3 && colony->buildings[BUILDING_ROBOTIC_FACTORY] == 0) {
+                    weights[BUILDING_ROBOTIC_FACTORY] = 7;
                 }
 
                 if (colony->n_pops >= 5) {
                     // TECH_APP_RECYCLOTRON (152), BUILDING_RECYCLOTRON (33)
-                    if (_p_ai->tech_applications[152] == 3 && colony->buildings[33] == 0) {
-                        weights[33] = colony->n_pops + 15;
+                    if (_p_ai->tech_applications[TECH_APP_RECYCLOTRON] == 3 && colony->buildings[BUILDING_RECYCLOTRON] == 0) {
+                        weights[BUILDING_RECYCLOTRON] = colony->n_pops + 15;
                     }
                     if (_p_ai->do_not_research == 0) {
                         // TECH_APP_RESEARCH_LABORATORY (155), BUILDING_RESEARCH_LAB (35)
-                        if (_p_ai->tech_applications[155] == 3 && colony->buildings[35] == 0) {
-                            weights[35] = 20;
+                        if (_p_ai->tech_applications[TECH_APP_RESEARCH_LABORATORY] == 3 && colony->buildings[BUILDING_RESEARCH_LAB] == 0) {
+                            weights[BUILDING_RESEARCH_LAB] = 20;
                         }
                         // TECH_APP_PLANETARY_SUPERCOMPUTER (136), BUILDING_SUPERCOMPUTER (30)
-                        if (_p_ai->tech_applications[136] == 3 && colony->buildings[30] == 0) {
-                            weights[30] = 10;
+                        if (_p_ai->tech_applications[TECH_APP_PLANETARY_SUPERCOMPUTER] == 3 && colony->buildings[BUILDING_SUPERCOMPUTER] == 0) {
+                            weights[BUILDING_SUPERCOMPUTER] = 10;
                         }
                     }
                 }
 
                 int player_idx = (int)(_p_ai - MOX::_player);
-                int trait_check = MOX::_player[player_idx].traits[0] / 2;
+                int trait_check = MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2;
 
                 if (trait_check != 3) {
                     if (trait_check == 1 || trait_check == 0) {
                         // TECH_APP_MARINE_BARRACKS (103), BUILDING_MARINE_BARRACKS (22), BUILDING_ARMOR_BARRACKS (2)
-                        if (_p_ai->tech_applications[103] == 3 && colony->buildings[22] == 0 && colony->buildings[2] == 0) {
-                            weights[22] = 37;
+                        if (_p_ai->tech_applications[TECH_APP_MARINE_BARRACKS] == 3 && colony->buildings[BUILDING_MARINE_BARRACKS] == 0 && colony->buildings[BUILDING_ARMOR_BARRACKS] == 0) {
+                            weights[BUILDING_MARINE_BARRACKS] = 37;
                         }
                         // TECH_APP_ARMOR_BARRACKS (14), BUILDING_ARMOR_BARRACKS (2), BUILDING_MARINE_BARRACKS (22)
-                        if (_p_ai->tech_applications[14] == 3 && colony->buildings[2] == 0 && colony->buildings[22] == 0) {
-                            weights[2] = 10;
+                        if (_p_ai->tech_applications[TECH_APP_ARMOR_BARRACKS] == 3 && colony->buildings[BUILDING_ARMOR_BARRACKS] == 0 && colony->buildings[BUILDING_MARINE_BARRACKS] == 0) {
+                            weights[BUILDING_ARMOR_BARRACKS] = 10;
                         }
                     }
                     if (colony->n_pops >= 3) {
                         // TECH_APP_HOLO_SIMULATOR (86), BUILDING_HOLO_SIMULATOR (20)
-                        if (_p_ai->tech_applications[86] == 3 && colony->buildings[20] == 0) {
-                            weights[20] = colony->n_pops + 25;
+                        if (_p_ai->tech_applications[TECH_APP_HOLO_SIMULATOR] == 3 && colony->buildings[BUILDING_HOLO_SIMULATOR] == 0) {
+                            weights[BUILDING_HOLO_SIMULATOR] = colony->n_pops + 25;
                         }
                         // TECH_APP_PLEASURE_DOME (141), BUILDING_PLEASURE_DOME (31)
-                        if (_p_ai->tech_applications[141] == 3 && colony->buildings[31] == 0) {
-                            weights[31] = colony->n_pops + 10;
+                        if (_p_ai->tech_applications[TECH_APP_PLEASURE_DOME] == 3 && colony->buildings[BUILDING_PLEASURE_DOME] == 0) {
+                            weights[BUILDING_PLEASURE_DOME] = colony->n_pops + 10;
                         }
                     }
                 }
 
                 // TECH_APP_BIOSPHERES (61), BUILDING_BIOSPHERES (15)
-                if (_p_ai->tech_applications[61] == 3 && colony->buildings[15] == 0) {
-                    weights[15] = 30;
+                if (_p_ai->tech_applications[TECH_APP_BIOSPHERES] == 3 && colony->buildings[BUILDING_BIOSPHERES] == 0) {
+                    weights[BUILDING_BIOSPHERES] = 30;
                 }
 
                 if (colony->pollution >= 5 && current_info->eats_minerals == 0) {
                     // TECH_APP_CORE_WASTE_DUMPS (50), BUILDING_CORE_WASTE_DUMP (13)
-                    if (_p_ai->tech_applications[50] == 3 && colony->buildings[13] == 0) {
-                        weights[13] = (uint8_t)special::isqrt_(colony->pollution) + 8;
+                    if (_p_ai->tech_applications[TECH_APP_CORE_WASTE_DUMPS] == 3 && colony->buildings[BUILDING_CORE_WASTE_DUMP] == 0) {
+                        weights[BUILDING_CORE_WASTE_DUMP] = (uint8_t)special::isqrt_(colony->pollution) + 8;
                     }
                     // TECH_APP_ATMOSPHERIC_RENEWER (19), BUILDING_ATMOSPHERE_RENEWER (5)
-                    if (_p_ai->tech_applications[19] == 3 && colony->buildings[5] == 0) {
-                        weights[5] = (uint8_t)special::isqrt_(colony->pollution) + 8;
+                    if (_p_ai->tech_applications[TECH_APP_ATMOSPHERIC_RENEWER] == 3 && colony->buildings[BUILDING_ATMOSPHERE_RENEWER] == 0) {
+                        weights[BUILDING_ATMOSPHERE_RENEWER] = (uint8_t)special::isqrt_(colony->pollution) + 8;
                     }
                     // TECH_APP_POLLUTION_PROCESSOR (142), BUILDING_POLLUTION_PROCESSOR (32)
-                    if (_p_ai->tech_applications[142] == 3 && colony->buildings[32] == 0) {
-                        weights[32] = 10;
+                    if (_p_ai->tech_applications[TECH_APP_POLLUTION_PROCESSOR] == 3 && colony->buildings[BUILDING_POLLUTION_PROCESSOR] == 0) {
+                        weights[BUILDING_POLLUTION_PROCESSOR] = 10;
                     }
                 }
 
                 // TECH_APP_PLANETARY_GRAVITY_GENERATOR (131), BUILDING_GRAVITY_GENERATOR (25)
-                if (_p_ai->tech_applications[131] == 3 && colony->buildings[25] == 0) {
+                if (_p_ai->tech_applications[TECH_APP_PLANETARY_GRAVITY_GENERATOR] == 3 && colony->buildings[BUILDING_GRAVITY_GENERATOR] == 0) {
                     int8_t gravity = MOX::_planet[colony->planet].gravity_class;
-                    if (gravity == 0) {
-                        if (_p_ai->traits[10 /* TRAIT_LOW_G_WORLD */] == 0) {
-                            weights[25] = 10;
+                    if (gravity == PLANET_GRAVITY_LOW_G) {
+                        if (_p_ai->traits[TRAIT_LOW_G_WORLD] == 0) {
+                            weights[BUILDING_GRAVITY_GENERATOR] = 10;
                         }
-                    } else if (gravity == 1) {
-                        if (_p_ai->traits[10 /* TRAIT_LOW_G_WORLD */] != 0) {
-                            weights[25] = 10;
+                    } else if (gravity == PLANET_GRAVITY_NORMAL_G) {
+                        if (_p_ai->traits[TRAIT_LOW_G_WORLD] != 0) {
+                            weights[BUILDING_GRAVITY_GENERATOR] = 10;
                         }
-                    } else if (gravity == 2) {
-                        if (_p_ai->traits[11 /* TRAIT_HEAVY_G_WORLD */] == 0) {
-                            weights[25] = 20;
+                    } else if (gravity == PLANET_GRAVITY_HEAVY_G) {
+                        if (_p_ai->traits[TRAIT_HEAVY_G_WORLD] == 0) {
+                            weights[BUILDING_GRAVITY_GENERATOR] = 20;
                         }
                     }
                 }
 
-                int16_t choice = RUSS::Get_Weighted_Choice_Char_(weights, 50);
-                if (choice < 49) {
+                int16_t choice = RUSS::Get_Weighted_Choice_Char_(weights, BUILDING_COUNT + 1);
+                if (choice < BUILDING_COUNT) {
                     COLBLDG::Clear_Colony_Queue_(colony_idx);
                     colony->producing[0] = choice;
                 }
@@ -294,9 +294,9 @@ namespace aidudes {
                 int ship_idx = -producing_id - 100;
                 s_ship_data& ship = MOX::_ship[ship_idx];
 
-                if (ship.d.ship_type == 0) {
+                if (ship.d.ship_type == SHIP_TYPE_COMBAT) {
                     s_ship_design* source_design;
-                    if (ship.d.size < 5 /* SIZE_DOOMSTAR */) {
+                    if (ship.d.size < SHIP_SIZE_DOOM_STAR) {
                         source_design = &aidudes::_p_ai->ship_designs[(int)ship.d.size];
                     } else {
                         if (doom_star_design.cost == 0) {
@@ -441,7 +441,7 @@ namespace aidudes {
             }
 
             // Apply design upgrade
-            if (ship->d.size < 5 /* SIZE_DOOMSTAR */) {
+            if (ship->d.size < SHIP_SIZE_DOOM_STAR) {
                 ship->d = aidudes::_p_ai->ship_designs[(int)ship->d.size];
             } else {
                 INITSHIP::Load_Doom_Star_Ship_Design_(aidudes::_i_ai, &ship->d);
@@ -835,7 +835,7 @@ namespace aidudes {
                             bool delete_from_queue = false;
                             int16_t prod = temp_colony->producing[0];
                             if (prod <= -100) {
-                                if (MOX::_ship[-prod - 100].d.ship_type != 0) {
+                                if (MOX::_ship[-prod - 100].d.ship_type != SHIP_TYPE_COMBAT) {
                                     delete_from_queue = true;
                                 }
                             } else if (prod > -8) {
@@ -903,29 +903,29 @@ namespace aidudes {
             if ((war_level != 0 && (*AIDATA::_enroute_human_ships)[MOX::_planet[temp_colony->planet].star_index][9] != 0) ||
                 AIBUILD::Colony_Is_Conquered_(temp_colony)) {
 
-                if (COLCALC::Colony_Can_Build_Product_(temp_colony, 26)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 26);
+                if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_MISSILE_BASE)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_MISSILE_BASE);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 27)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 27);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_GROUND_BATTERIES)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_GROUND_BATTERIES);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 40)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 40);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_STAR_BASE)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_STAR_BASE);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 8)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 8);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_BATTLESTATION)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_BATTLESTATION);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 41)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 41);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_STAR_FORTRESS)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_STAR_FORTRESS);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 28)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 28);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_RADIATION_SHIELD)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_RADIATION_SHIELD);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 24)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 24);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_FLUX_SHIELD)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_FLUX_SHIELD);
                     changed = true;
-                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 23)) {
-                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 23);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, BUILDING_BARRIER_SHIELD)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_BARRIER_SHIELD);
                     changed = true;
                 }
             }
@@ -942,7 +942,7 @@ namespace aidudes {
                 AIBUILD::_player_total_strength_vs_ships[player_idx][2] < 10 ||
                 isqrt_val > 1) {
 
-                if (p->tech_applications[41] == 3 && !no_range_or_speed) {
+                if (p->tech_applications[TECH_APP_COLONY_SHIP] == 3 && !no_range_or_speed) {
                     int val = (*AIDATA::_contextual_planet_values)[player_idx * MAX_PLANETS + best_planet];
                     if (war_level > 0) {
                         val /= 4;
@@ -968,15 +968,15 @@ namespace aidudes {
         RUSS::Mox_Update_();
         qsort(colony_queue, (uint32_t)colony_queue_count, 1, aidudes::colony_less_industry_cmp_);
 
-        if (p->tech_applications[40] == 3) {
+        if (p->tech_applications[TECH_APP_COLONY_BASE] == 3) {
             int i = colony_queue_count;
             while (want_colony_base && i > 0) {
                 i--;
                 s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                 if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 13) {
                     if (MOX::_planet[temp_colony->planet].star_index == MOX::_planet[best_planet].star_index) {
-                        if (temp_colony->buildings[11] != 1) {
-                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 11);
+                        if (temp_colony->buildings[BUILDING_COLONY_BASE] != 1) {
+                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_COLONY_BASE);
                         }
                         want_colony_base = false;
                     }
@@ -985,7 +985,7 @@ namespace aidudes {
         }
 
         RUSS::Mox_Update_();
-        if (want_colony_base && p->tech_applications[41] == 3) {
+        if (want_colony_base && p->tech_applications[TECH_APP_COLONY_SHIP] == 3) {
             int r = 0;
             if (is_objective_2 != 0) {
                 if (game_random::Random_(5) == 1) {
@@ -1000,8 +1000,8 @@ namespace aidudes {
                     s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
                         if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < (int32_t)game_random::Random_(100)) {
-                            INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
-                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)colony_queue[i]);
+                            INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[SHIP_SIZE_DOOM_STAR]);
+                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, (int16_t)colony_queue[i]);
                             if (ship_idx == -1) {
                                 no_range_or_speed = true;
                             } else {
@@ -1054,7 +1054,7 @@ namespace aidudes {
             if (threatened == 0) {
                 if (AIBUILD::_player_n_freighter_groups_wanted[player_idx] != 0 &&
                     freighter_groups_assigned <= 1 &&
-                    p->tech_applications[69] == 3) {
+                    p->tech_applications[TECH_APP_FREIGHTERS] == 3) {
 
                     freighter_weight = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - freighter_groups_assigned * 2) * 20 + 100;
                     if (war_level > 0) {
@@ -1070,7 +1070,7 @@ namespace aidudes {
                 }
 
                 if (AIBUILD::_player_n_transports[player_idx][1] != 0 &&
-                    p->tech_applications[189] == 3 &&
+                    p->tech_applications[TECH_APP_TRANSPORT] == 3 &&
                     !no_range_or_speed) {
                     transport_weight = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
                     if (war_level > 0) {
@@ -1115,16 +1115,16 @@ namespace aidudes {
 
                         uint16_t ship_weights[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-                        if (p->ship_designs[0].cost <= (war_level + 15) * ind_worth * 2) {
-                            ship_weights[0] = 2;
+                        if (p->ship_designs[SHIP_SIZE_SMALL].cost <= (war_level + 15) * ind_worth * 2) {
+                            ship_weights[SHIP_SIZE_SMALL] = 2;
                             int cost_threshold_1 = (war_level * 2 + 33) * ind_worth;
-                            if (p->ship_designs[1].cost <= cost_threshold_1) {
-                                ship_weights[1] = 16;
-                                ship_weights[0] = 1;
+                            if (p->ship_designs[SHIP_SIZE_MEDIUM].cost <= cost_threshold_1) {
+                                ship_weights[SHIP_SIZE_MEDIUM] = 16;
+                                ship_weights[SHIP_SIZE_SMALL] = 1;
 
-                                if (temp_colony->buildings[41] == 0) {
-                                    if (p->tech_applications[169] == 3 &&
-                                        COLCALC::Colony_Product_Cost_(MOX::_colony, 41) <= (war_level * 2 + 31) * ind_worth) {
+                                if (temp_colony->buildings[BUILDING_STAR_FORTRESS] == 0) {
+                                    if (p->tech_applications[TECH_APP_STAR_FORTRESS] == 3 &&
+                                        COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_STAR_FORTRESS) <= (war_level * 2 + 31) * ind_worth) {
                                         flag_38 = true;
                                         ship_weights[8] = (uint16_t)(((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2 +
                                                            ((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2) * 2 +
@@ -1135,9 +1135,9 @@ namespace aidudes {
                                     }
                                 }
 
-                                if (temp_colony->buildings[8] == 0) {
-                                    if (p->tech_applications[27] == 3 &&
-                                        COLCALC::Colony_Product_Cost_(MOX::_colony, 8) <= cost_threshold_1) {
+                                if (temp_colony->buildings[BUILDING_BATTLESTATION] == 0) {
+                                    if (p->tech_applications[TECH_APP_BATTLESTATION] == 3 &&
+                                        COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_BATTLESTATION) <= cost_threshold_1) {
                                         flag_34 = true;
                                         ship_weights[7] = (uint16_t)(((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2 +
                                                            (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2) * 5 +
@@ -1148,9 +1148,9 @@ namespace aidudes {
                                     }
                                 }
 
-                                if (temp_colony->buildings[40] == 0) {
-                                    if (p->tech_applications[168] == 3 &&
-                                        COLCALC::Colony_Product_Cost_(MOX::_colony, 40) <= (war_level * 2 + 35) * ind_worth) {
+                                if (temp_colony->buildings[BUILDING_STAR_BASE] == 0) {
+                                    if (p->tech_applications[TECH_APP_STAR_BASE] == 3 &&
+                                        COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_STAR_BASE) <= (war_level * 2 + 35) * ind_worth) {
                                         flag_2c = true;
                                         ship_weights[6] = (uint16_t)((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 10 +
                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count * 4 + 12 +
@@ -1165,21 +1165,21 @@ namespace aidudes {
 
                         if (COLCALC::Colony_Can_Build_Large_Ships_(temp_colony)) {
                             int size_9 = AIBUILD::_player_ship_sizes[player_idx].target_ship_size;
-                            if (size_9 >= 2 && p->ship_designs[2].cost <= (war_level * 2 + 45) * ind_worth) {
-                                ship_weights[2] = 32;
-                                ship_weights[1] /= 5;
-                                if (size_9 >= 3 && p->ship_designs[3].cost <= (war_level * 2 + 55) * ind_worth) {
-                                    ship_weights[3] = 64;
-                                    ship_weights[2] = 5;
-                                    if (p->tech_applications[186] == 3 && size_9 >= 4 && p->ship_designs[4].cost <= (war_level * 2 + 48) * ind_worth) {
-                                        ship_weights[4] = 100;
+                            if (size_9 >= SHIP_SIZE_LARGE && p->ship_designs[SHIP_SIZE_LARGE].cost <= (war_level * 2 + 45) * ind_worth) {
+                                ship_weights[SHIP_SIZE_LARGE] = 32;
+                                ship_weights[SHIP_SIZE_MEDIUM] /= 5;
+                                if (size_9 >= SHIP_SIZE_HUGE && p->ship_designs[SHIP_SIZE_HUGE].cost <= (war_level * 2 + 55) * ind_worth) {
+                                    ship_weights[SHIP_SIZE_HUGE] = 64;
+                                    ship_weights[SHIP_SIZE_LARGE] = 5;
+                                    if (p->tech_applications[TECH_APP_TITAN_CONSTRUCTION] == 3 && size_9 >= SHIP_SIZE_TITAN && p->ship_designs[SHIP_SIZE_TITAN].cost <= (war_level * 2 + 48) * ind_worth) {
+                                        ship_weights[SHIP_SIZE_TITAN] = 100;
                                     }
-                                    if (p->tech_applications[55] == 3 && size_9 >= 5) {
+                                    if (p->tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] == 3 && size_9 >= SHIP_SIZE_DOOM_STAR) {
                                         if (ship_design.cost == 0) {
                                             INITSHIP::Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
                                         }
                                         if (ship_design.cost <= (war_level * 2 + 48) * ind_worth) {
-                                            ship_weights[5] = 150;
+                                            ship_weights[SHIP_SIZE_DOOM_STAR] = 150;
                                         }
                                     }
                                 }
@@ -1197,7 +1197,7 @@ namespace aidudes {
                         }
 
                         if (AIBUILD::_player_total_strength_vs_ships[player_idx][0] > 0 && game_random::Random_(5) == 1) {
-                            ship_weights[0] = 0;
+                            ship_weights[SHIP_SIZE_SMALL] = 0;
                         }
 
                         int ship_choice = RUSS::Get_Weighted_Choice_Short_(ship_weights, 9);
@@ -1222,8 +1222,8 @@ namespace aidudes {
                             }
                             case 6:
                             {
-                                memcpy(&p->ship_designs[5], &ship_design, sizeof(s_ship_design));
-                                int16_t ds_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)current_colony_idx);
+                                memcpy(&p->ship_designs[SHIP_SIZE_DOOM_STAR], &ship_design, sizeof(s_ship_design));
+                                int16_t ds_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, (int16_t)current_colony_idx);
                                 if (ds_idx == -1) {
                                     no_range_or_speed = true;
                                 } else {
@@ -1234,15 +1234,15 @@ namespace aidudes {
                                 break;
                             }
                             case 7:
-                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 40);
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_STAR_BASE);
                                 AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count);
                                 break;
                             case 8:
-                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 8);
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_BATTLESTATION);
                                 AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 3 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count);
                                 break;
                             case 9:
-                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 41);
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_STAR_FORTRESS);
                                 AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 6 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 4 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count);
                                 break;
                         }
@@ -1266,10 +1266,10 @@ namespace aidudes {
                             int16_t ship_idx = p_refit->entry[j].ship_idx;
                             s_ship_data* s = &MOX::_ship[ship_idx];
                             if (s->location == refit_planet_idx &&
-                                (s->d.size < 2 || COLCALC::Colony_Can_Build_Large_Ships_(temp_colony))) {
+                                (s->d.size < SHIP_SIZE_LARGE || COLCALC::Colony_Can_Build_Large_Ships_(temp_colony))) {
 
                                 s_ship_design* refit_design;
-                                if (s->d.size == 5) {
+                                if (s->d.size == SHIP_SIZE_DOOM_STAR) {
                                     if (ship_design.cost == 0) {
                                         INITSHIP::Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
                                     }
@@ -1313,12 +1313,12 @@ namespace aidudes {
                         break;
                     case 4:
                         if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 14) {
-                            if (temp_colony->buildings[22] == 0) {
-                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 22);
+                            if (temp_colony->buildings[BUILDING_MARINE_BARRACKS] == 0) {
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, BUILDING_MARINE_BARRACKS);
                                 AIBUILD::_player_n_transports[player_idx][1]--;
                             } else {
-                                INITSHIP::Load_Transport_Ship_Design_(player_idx, &p->ship_designs[5]);
-                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)current_colony_idx);
+                                INITSHIP::Load_Transport_Ship_Design_(player_idx, &p->ship_designs[SHIP_SIZE_DOOM_STAR]);
+                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, (int16_t)current_colony_idx);
                                 if (tr_idx == -1) {
                                     no_range_or_speed = true;
                                 } else {

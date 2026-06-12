@@ -2,7 +2,7 @@
 
 namespace aitech {
     int32_t __cdecl Player_Best_Armor_(s_player* player) {
-        for (int32_t i = 6; i > 0; --i) {
+        for (int32_t i = ARMOR_COUNT - 1; i > ARMOR_NO_ARMOR; --i) {
             int16_t tech_id = TECHDATA::_armor[i].tech_app_id;
 
             if (player->tech_applications[tech_id] == 3) {
@@ -14,8 +14,8 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Ship_Shield_(s_player* player) {
-        int32_t shield_idx = 5;
-        while (shield_idx > 0) {
+        int32_t shield_idx = SHIELD_COUNT - 1;
+        while (shield_idx > SHIELD_NO_SHIELD) {
             int16_t tech_id = TECHDATA::_shields[shield_idx].tech_app_id;
 
             if (player->tech_applications[tech_id] == 3) {
@@ -56,9 +56,9 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Fuel_(s_player* player) {
-        int32_t fuel_idx = 5;
+        int32_t fuel_idx = FUEL_COUNT - 1;
 
-        while (fuel_idx > 0) {
+        while (fuel_idx > FUEL_NO_FUEL_CELLS) {
             int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app_id;
             if (player->tech_applications[tech_idx] == 3) {
                 return fuel_idx;
@@ -70,9 +70,9 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Computer_(s_player* player) {
-        int32_t computer_idx = 5;
+        int32_t computer_idx = COMPUTER_COUNT - 1;
 
-        while (computer_idx > 0) {
+        while (computer_idx > COMPUTER_NO_COMPUTER) {
             int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app_id;
 
             if (player->tech_applications[tech_app_idx] == 3) {
@@ -102,8 +102,8 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Drive_(s_player* player) {
-        int32_t drive_idx = 6;
-        while (drive_idx > 0) {
+        int32_t drive_idx = DRIVE_COUNT - 1;
+        while (drive_idx > DRIVE_NO_DRIVE) {
             int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app_id;
 
             if (player->tech_applications[tech_app_idx] == 3) {
@@ -149,7 +149,7 @@ namespace aitech {
             plr_info->best_drive = aitech::Player_Best_Drive_(plr);
 
             // Calculate Best Weapon scores based on technology costs
-            for (int w_idx = 1; w_idx <= 13; ++w_idx) {
+            for (int w_idx = WEAPON_MASS_DRIVER; w_idx <= WEAPON_SPATIAL_COMPRESSOR; ++w_idx) {
                 uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
                 if (plr->tech_applications[app_id] == 3) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
@@ -160,7 +160,7 @@ namespace aitech {
                 }
             }
 
-            for (int w_idx = 14; w_idx <= 20; ++w_idx) {
+            for (int w_idx = WEAPON_NUCLEAR_MISSILE; w_idx <= WEAPON_PLASMA_TORPEDO; ++w_idx) {
                 uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
                 if (plr->tech_applications[app_id] == 3) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
@@ -345,7 +345,7 @@ namespace aitech {
     int32_t __cdecl Get_Max_Technology_Value_(int16_t player_idx) {
         int32_t max_cost = 0;
 
-        for (int i = 0; i < 83; ++i) {
+        for (int i = 0; i < TECH_FIELD_COUNT; ++i) {
             if (MOX::_player[player_idx].tech_fields[i] == 3) {
                 int32_t cost = (int32_t)TECHDATA::_technology_fields[i].cost;
                 if (max_cost < cost) {

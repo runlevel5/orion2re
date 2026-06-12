@@ -95,7 +95,7 @@ namespace DESIGN {
         d->num_special_slots = special_idx;
 
         d->base_combat_speed = Current_Design_Combat_Speed_(d);
-        d->date_of_design = 140;
+        d->special_system_scroll_thumb_y = 140;
 
         Update_Calculated_Design_Data_(player_idx);
     }
