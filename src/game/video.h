@@ -65,7 +65,7 @@ namespace video {
 
 	extern uint16_t _is_initializing;
 	extern s_mouse_list _default_mouse_list;
-	extern uint8_t DAT_00578b58;
+	extern uint8_t _video_driver_state_marker;
 
 	extern int16_t _screen_window_y1;
 	extern int16_t _screen_window_y2;

@@ -36,7 +36,7 @@ namespace transprt {
 
     uint32_t _tpMessageStamp = 1;
 
-    uint32_t DAT_00560a70;
+    uint32_t _tpCurrentSendOffset;
 
     uint16_t _tpCurrentUserType;
 
@@ -50,7 +50,7 @@ namespace transprt {
 
     clock_t _tpLastBurstClock;
 
-    uint32_t DAT_00560a94;
+    uint32_t _tpLastAckedBurstStartPacket;
 
     uint8_t _tpSendImmediateBurstFlag = 1;
 
@@ -157,9 +157,9 @@ namespace transprt {
         _tpSendDataLength = 0;
         _tpMessageData = nullptr;
         _tpDestID = 0;
-        DAT_00560a70 = 0;
+        _tpCurrentSendOffset = 0;
         _tpSending = 0;
-        DAT_00560a94 = 0;
+        _tpLastAckedBurstStartPacket = 0;
         _tpTotalPackets = 0;
         _tpBurstNum = 0;
         memset(_tpAckFlags, 0, sizeof(_tpAckFlags));

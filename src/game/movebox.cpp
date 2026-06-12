@@ -315,8 +315,8 @@ namespace MOVEBOX {
             target_box_id = MOX::_moveable_box_order[found_idx];
             MOX::_moveable_box_order[found_idx] = -1;
         } else {
-            target_box_id = MOX::DAT_0059bd1e;
-            MOX::DAT_0059bd1e = -1;
+            target_box_id = MOX::_moveable_box_reorder_fallback;
+            MOX::_moveable_box_reorder_fallback = -1;
         }
 
         reordered_box_ids[0] = target_box_id;

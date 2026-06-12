@@ -1,4 +1,5 @@
 typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
+
 struct BIT_BUF {
     uint8_t *buf;
     uint8_t mask;
@@ -6,17 +7,7 @@ struct BIT_BUF {
     uint32_t bit_index;
 };
 
-
-/* WARNING! conflicting data type names: /orion2.h/dword - /dword */
-
-
-/* WARNING! conflicting data type names: /orion2.h/int16 - /int16 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/longlong - /longlong */
-
 typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
-
 
 typedef struct s_adv_civ_player_star s_adv_civ_player_star, *Ps_adv_civ_player_star;
 
@@ -82,9 +73,6 @@ typedef struct s_ai_player_info s_ai_player_info, *Ps_ai_player_info;
 
 typedef struct s_player_ship_sizes s_player_ship_sizes, *Ps_player_ship_sizes;
 
-
-/* WARNING! conflicting data type names: /orion2.h/undefined - /undefined */
-
 struct s_ai_player_info {
     int16_t colony_count;
     int16_t colony_deficit;
@@ -128,9 +116,6 @@ struct s_ai_refit_player {
 typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
 
 typedef struct s_ai_star_player_block s_ai_star_player_block, *Ps_ai_star_player_block;
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined1 - /undefined1 */
 
 struct s_ai_star_player_block {
     int8_t enemy_count;
@@ -254,7 +239,6 @@ struct s_alloc_header {
 
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
-#pragma pack(push, 1)
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4200)
@@ -273,7 +257,6 @@ struct s_animation_header {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#pragma pack(pop)
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
 

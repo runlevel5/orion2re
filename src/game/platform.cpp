@@ -419,9 +419,9 @@ namespace platform {
 				return;
 			}
 
-			if ((int32_t)video::_current_mouse_shape != DAT_578B3C) {
+			if ((int32_t)video::_current_mouse_shape != g_last_cursor_shape) {
 				Update_Cursor_Image_();
-				DAT_578B3C = (int32_t)video::_current_mouse_shape;
+				g_last_cursor_shape = (int32_t)video::_current_mouse_shape;
 			}
 
 			const int32_t offset = mouse::Get_Pointer_Offset_();
@@ -475,7 +475,7 @@ namespace platform {
 	uint32_t g_frame_count;
 	int8_t g_render_buffer;
 	uint8_t* _offscreen_surface;
-	int32_t DAT_578B3C;
+	int32_t g_last_cursor_shape;
 	int16_t g_mouse_x;
 	int16_t g_mouse_y;
 

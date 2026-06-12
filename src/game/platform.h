@@ -48,7 +48,7 @@ namespace platform {
 
 	extern uint8_t* _offscreen_surface;
 
-	extern int32_t DAT_578B3C;
+	extern int32_t g_last_cursor_shape;
 
 	extern int16_t g_mouse_x;
 

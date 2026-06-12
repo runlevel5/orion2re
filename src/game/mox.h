@@ -71,7 +71,7 @@ namespace MOX {
     extern int16_t _ship_turn_order[210];
     extern int16_t _repl_fields[10];
     extern int16_t _side_end_of_turn[15];
-    extern int16_t DAT_0059730e;
+    extern int16_t _unused_ship_turn_order_marker;
     extern int16_t _design_choice_items[40];
     extern int16_t _weapon_mod_fields[15];
     extern int16_t _weapon_arc_field[5];
@@ -745,8 +745,8 @@ namespace MOX {
     // Suggested name: MOX::_gate_icon_seg
     extern s_animation_header* _gate_icon_seg[16];
 
-    // Suggested name: MOX::DAT_0059bd1e
-    extern int16_t DAT_0059bd1e;
+    // Cached movable-box id preserved while reordering the z-order list.
+    extern int16_t _moveable_box_reorder_fallback;
 
     // Suggested name: MOX::moveable_box_display_order
     extern int16_t _moveable_box_order[5];

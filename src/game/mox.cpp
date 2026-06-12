@@ -168,7 +168,7 @@ namespace MOX {
     int16_t _ship_turn_order[210];
     int16_t _repl_fields[10];
     int16_t _side_end_of_turn[15];
-    int16_t DAT_0059730e;
+    int16_t _unused_ship_turn_order_marker;
     int16_t _design_choice_items[40];
     int16_t _weapon_mod_fields[15];
     int16_t _weapon_arc_field[5];
@@ -879,7 +879,7 @@ namespace MOX {
     int16_t _screen_mouse_list_type;
     int16_t _temp_star_handle;
     s_animation_header* _gate_icon_seg[16];
-    int16_t DAT_0059bd1e;
+    int16_t _moveable_box_reorder_fallback;
     int16_t _moveable_box_order[5];
     int16_t _box_off_flag[5];
     s_saved_box _saved_boxes[5];

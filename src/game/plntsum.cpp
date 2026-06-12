@@ -29,8 +29,8 @@ int16_t _send_choice;
 uint8_t _found_colony_ship;
 uint8_t _draw_outpost_button_status;
 int16_t _plntsum_scroll_bar;
-uint32_t DAT_0056583c;
-uint8_t DAT_00565840;
+uint32_t _planet_summary_reserved_counter;
+uint8_t _planet_summary_refresh_marker;
 
 int16_t _last_ship_moved;
 const char* PTR_s_PLNTSUM_LBX_00556AC0 = "PLNTSUM.LBX";
@@ -41,7 +41,7 @@ bool _can_reach_scanned_planet;
 int8_t _box_field_scanned;
 bool _recalc_first_planet;
 uint8_t _fade_flag;
-uint8_t DAT_005658a4;
+uint8_t _planet_summary_state_marker;
 uint8_t _skip_draw_planets;
 
 s_animation_header** _p_rotating_planet;
@@ -1921,14 +1921,14 @@ void Planet_Summary_Screen_() {
     _send_choice = -1;
     COLONY::_using_colony_screen_palette = 0;
     MOX::_scanned_field = -1;
-    DAT_00565840 = 0;
+    _planet_summary_refresh_marker = 0;
     last_scanned_status = -1;
     _recalc_first_planet = false;
     MOX::_multi_colored_line_start = 0;
     MOX::_galaxy_star_anim_count = 0;
     _last_ship_moved = -1;
-    DAT_0056583c = 0;
-    DAT_005658a4 = 0;
+    _planet_summary_reserved_counter = 0;
+    _planet_summary_state_marker = 0;
     _skip_draw_planets = 0;
     _can_reach_scanned_planet = false;
     _draw_colony_button_status = 0;

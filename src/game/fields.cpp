@@ -23,7 +23,7 @@ namespace fields {
     int16_t _multi_hotkey_active_field;
     uint16_t _draw_fields_flag = 1;
     char s__00551100[1] = "";
-    char* DAT_0055afc0 = reinterpret_cast<char*>(kInvalidStringMarker);
+    char* _invalid_field_string_ptr = reinterpret_cast<char*>(kInvalidStringMarker);
     int32_t _max_fields_count = MAX_FIELDS_COUNT;
     uint8_t _exit_the_list_field;
     s_field* _fields = g_fields_storage;

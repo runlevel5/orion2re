@@ -38,9 +38,9 @@ namespace PLNTSUM {
 
     extern int16_t _plntsum_scroll_bar;
 
-    extern uint32_t DAT_0056583c;
+    extern uint32_t _planet_summary_reserved_counter;
 
-    extern uint8_t DAT_00565840;
+    extern uint8_t _planet_summary_refresh_marker;
 
     void __cdecl Add_Planet_Summary_Bar_Field_();
 
@@ -146,7 +146,7 @@ namespace PLNTSUM {
 
     extern uint8_t _fade_flag;
 
-    extern uint8_t DAT_005658a4;
+    extern uint8_t _planet_summary_state_marker;
 
     extern uint8_t _skip_draw_planets;
 

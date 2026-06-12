@@ -20,7 +20,7 @@ namespace fields {
     extern int16_t _multi_hotkey_active_field;
     extern uint16_t _draw_fields_flag;
     extern char s__00551100[1];
-    extern char* DAT_0055afc0;
+    extern char* _invalid_field_string_ptr;
     extern int32_t _max_fields_count;
     extern uint8_t _exit_the_list_field;
     extern s_field* _fields;

@@ -25,7 +25,7 @@ namespace video {
 	uint8_t _palette_reds[256];
 	uint16_t _is_initializing;
 	s_mouse_list _default_mouse_list;
-	uint8_t DAT_00578b58;
+	uint8_t _video_driver_state_marker;
 	int16_t _screen_window_y1;
 	int16_t _screen_window_y2;
 	int16_t _screen_window_x1;
