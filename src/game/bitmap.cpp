@@ -84,7 +84,7 @@ namespace bitmap {
         header->frame_count = 1;
         header->loop_frame = 0;
         header->keyframe_interval = 0;
-        header->flags = 1;
+        header->flags = ANIMATION_DRAW_MODE_BITMAP;
         header->frame_offsets[0] = kBitmapFrameDataOffset;
     }
 
@@ -119,7 +119,7 @@ namespace bitmap {
 
     void __cdecl Set_Picture_Glassed_(s_animation_header* anim) {
         animate::_animation_header = anim;
-        anim->flags |= 8;
+        anim->flags |= ANIMATION_FLAG_GLASSED;
     }
 
     void __cdecl Flip_Bitmap_(s_animation_header* dst_hdr, s_animation_header* src_hdr, int16_t flip_mode) {

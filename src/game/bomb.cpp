@@ -62,7 +62,7 @@ namespace BOMB {
             const int16_t capture_reason = (int16_t)capturing_player;
 
             memset(&msg, 0, sizeof(s_MSG));
-            msg.msg_type = 7 /* MSG_TYPE_LOST_COLONY */;
+            msg.msg_type = MSG_TYPE_LOST_COLONY;
             msg.u.lost_colony.planet_idx = colony->planet;
             msg.u.lost_colony.reason = capture_reason;
             msg.u.lost_colony.leader_idx = leader_idx;
@@ -280,7 +280,7 @@ namespace BOMB {
             colony->n_pops = 0;
 
             bool has_buildings = false;
-            for (int32_t building_idx = 0; building_idx < 49; ++building_idx) {
+            for (int32_t building_idx = 0; building_idx < BUILDING_COUNT; ++building_idx) {
                 if (colony->buildings[building_idx] != 0) {
                     has_buildings = true;
                     break;

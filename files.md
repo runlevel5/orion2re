@@ -34,40 +34,40 @@
 [X] src/game/arith1e.h
 [X] src/game/assert.cpp
 [X] src/game/assert.h
-[ ] src/game/beams.cpp
-[ ] src/game/beams.h
-[ ] src/game/bill.cpp
-[ ] src/game/bill.h
-[ ] src/game/billhelp.cpp
-[ ] src/game/billhelp.h
-[ ] src/game/bitio.cpp
-[ ] src/game/bitio.h
-[ ] src/game/bitmap.cpp
-[ ] src/game/bitmap.h
-[ ] src/game/bolt.cpp
-[ ] src/game/bolt.h
-[ ] src/game/bomb.cpp
-[ ] src/game/bomb.h
-[ ] src/game/buffer.cpp
-[ ] src/game/buffer.h
-[ ] src/game/capture.cpp
-[ ] src/game/capture.h
-[ ] src/game/chat.cpp
-[ ] src/game/chat.h
-[ ] src/game/clipped.cpp
-[ ] src/game/clipped.h
-[ ] src/game/cmbtai.cpp
-[ ] src/game/cmbtai.h
-[ ] src/game/cmbtdrw1.cpp
-[ ] src/game/cmbtdrw1.h
-[ ] src/game/cmbtfir2.cpp
-[ ] src/game/cmbtfir2.h
-[ ] src/game/cmbtfire.cpp
-[ ] src/game/cmbtfire.h
-[ ] src/game/cmbtmis.cpp
-[ ] src/game/cmbtmis.h
-[ ] src/game/cmbtmov1.cpp
-[ ] src/game/cmbtmov1.h
+[X] src/game/beams.cpp
+[X] src/game/beams.h
+[X] src/game/bill.cpp
+[X] src/game/bill.h
+[X] src/game/billhelp.cpp
+[X] src/game/billhelp.h
+[X] src/game/bitio.cpp
+[X] src/game/bitio.h
+[X] src/game/bitmap.cpp
+[X] src/game/bitmap.h
+[X] src/game/bolt.cpp
+[X] src/game/bolt.h
+[X] src/game/bomb.cpp
+[X] src/game/bomb.h
+[X] src/game/buffer.cpp
+[X] src/game/buffer.h
+[X] src/game/capture.cpp
+[X] src/game/capture.h
+[X] src/game/chat.cpp
+[X] src/game/chat.h
+[X] src/game/clipped.cpp
+[X] src/game/clipped.h
+[X] src/game/cmbtai.cpp
+[X] src/game/cmbtai.h
+[X] src/game/cmbtdrw1.cpp
+[X] src/game/cmbtdrw1.h
+[X] src/game/cmbtfir2.cpp
+[X] src/game/cmbtfir2.h
+[X] src/game/cmbtfire.cpp
+[X] src/game/cmbtfire.h
+[X] src/game/cmbtmis.cpp
+[X] src/game/cmbtmis.h
+[X] src/game/cmbtmov1.cpp
+[X] src/game/cmbtmov1.h
 [ ] src/game/cmbtspec.cpp
 [ ] src/game/cmbtspec.h
 [ ] src/game/colbcach.cpp

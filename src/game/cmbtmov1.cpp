@@ -5,11 +5,11 @@ namespace CMBTMOV1 {
         int16_t cost = 2;
 
         // Check for specific ship special systems that affect turning cost
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 18)) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_INERTIAL_STABILIZER)) {
             return 1;
         }
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 17)) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_INERTIAL_NULLIFIER)) {
             cost = 0;
         }
 
@@ -199,7 +199,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
         int16_t dest_x_px = dest_x * 20;
         int16_t dest_y_px = dest_y * 20;
 
-        bool has_teleporter = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x21 /* SPEC_SUB_SPACE_TELEPORTER */) != 0 ||
+        bool has_teleporter = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) != 0 ||
                               COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x16 /* SPEC_TRANSPORTER */) != 0;
 
         bool skip_normal_move = false;

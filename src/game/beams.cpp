@@ -851,7 +851,7 @@ namespace BEAMS {
         int16_t v_is_multi_beam = 0;
 
         switch (weapon_id) {
-        case 1:
+        case WEAPON_MASS_DRIVER:
             v_color = 7;
             v_duration = 1;
             v_local_58 = 1;
@@ -875,7 +875,7 @@ namespace BEAMS {
             v_local_4c = 0;
             v_is_multi_beam = 1;
             break;
-        case 2:
+        case WEAPON_GAUSS_CANNON:
             v_color = 2;
             v_mount_scale_mod = 1;
             v_local_3e = 0x28;
@@ -899,7 +899,7 @@ namespace BEAMS {
             v_local_4c = v_ebx;
             v_is_multi_beam = v_mount_scale_mod;
             break;
-        case 3:
+        case WEAPON_LASER_CANNON:
             v_color = 0;
             v_local_3e = 10;
             v_duration = 0x5A;
@@ -921,7 +921,7 @@ namespace BEAMS {
             v_local_4c = v_color;
             v_sfx_n = v_local_42_2;
             break;
-        case 4:
+        case WEAPON_PARTICLE_BEAM:
             v_duration = 0x3C;
             v_color = 1;
             v_local_42 = v_color;
@@ -943,7 +943,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 5:
+        case WEAPON_FUSION_BEAM:
             v_color = 8;
             v_local_3e = 0x28;
             v_duration = 0x280;
@@ -965,7 +965,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = 1;
             break;
-        case 6:
+        case WEAPON_ION_PULSE_CANNON:
             v_duration = 0x28;
             v_color = 3;
             v_local_42_2 = v_color;
@@ -987,7 +987,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 7:
+        case WEAPON_GRAVITON_BEAM:
             v_color = 6;
             v_local_42 = 1;
             v_local_3e = 0x1E;
@@ -1009,7 +1009,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 8:
+        case WEAPON_NEUTRON_BLASTER:
             v_color = 2;
             v_local_42_2 = 3;
             v_duration = 0x5A;
@@ -1031,8 +1031,8 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 9:
-        case 41:
+        case WEAPON_PHASOR:
+        case WEAPON_PHASOR_EYE:
             v_color = 0;
             v_ebx = 0;
             v_duration = 0x5A;
@@ -1054,7 +1054,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 10:
+        case WEAPON_DISRUPTER:
             v_color = 0;
             v_ebx = 0;
             v_duration = 0x28;
@@ -1076,8 +1076,8 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 11:
-        case 42:
+        case WEAPON_DEATH_RAY:
+        case WEAPON_CRYSTAL_RAY:
             v_color = 6;
             v_local_42_2 = 3;
             v_duration = 0x5A;
@@ -1099,7 +1099,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 12:
+        case WEAPON_PLASMA_CANNON:
             v_color = 0;
             v_ebx = 0;
             v_duration = 0x3C;
@@ -1121,7 +1121,7 @@ namespace BEAMS {
             v_local_4a = v_ebx;
             v_local_4c = v_ebx;
             break;
-        case 13:
+        case WEAPON_SPATIAL_COMPRESSOR:
             v_mount_scale_mod = 2;
             v_local_42 = 1;
             v_local_3e = 0x1E;
@@ -1143,9 +1143,9 @@ namespace BEAMS {
             v_local_4c = v_ebx;
             v_sfx_n = v_local_42;
             break;
-        case 27:
-        case 40:
-        case 43:
+        case WEAPON_MAULER_DEVICE:
+        case WEAPON_DRAGON_BREATH:
+        case WEAPON_PLASMA_BREATH:
             v_duration = 0x14;
             v_color = 5;
             v_local_42_2 = v_color;
@@ -1466,7 +1466,7 @@ namespace BEAMS {
                             int16_t other_i = (i == 0) ? 1 : 0;
                             int16_t other_fx = current_fx_idx[other_i];
                             if (other_fx != -1 && other_fx < 16) {
-                                if (fx_entries[other_fx].weapon_id <= 0 || frame_idx[other_i] >= 9) {
+                                if (fx_entries[other_fx].weapon_id <= WEAPON_NO_WEAPONS || frame_idx[other_i] >= 9) {
                                     skip_frame_increment = true;
                                 }
                             }
@@ -1484,7 +1484,7 @@ namespace BEAMS {
                             if (special_timer[i] <= 0) {
                                 special_timer[i] = 0;
                                 s_beam_fx_entry* next_fx = &fx_entries[fx_idx + 1];
-                                if (next_fx->weapon_id <= 0 || fx_idx + 1 >= 16) {
+                                if (next_fx->weapon_id <= WEAPON_NO_WEAPONS || fx_idx + 1 >= 16) {
                                     current_fx_idx[i] = (int16_t)0xffff;
                                 }
                                 else {
@@ -1517,7 +1517,7 @@ namespace BEAMS {
                                             reflected_fx[0].accum_hit_y = next_fx->accum_hit_y;
                                             reflected_fx[0].specials = next_fx->specials;
                                             reflected_fx[0].is_damage_entry = next_fx->is_damage_entry;
-                                            reflected_fx[1].weapon_id = 0;
+                                            reflected_fx[1].weapon_id = WEAPON_NO_WEAPONS;
                                             reflected_fx[1].is_damage_entry = 0;
 
                                             _g_firing_reflected_beam_flag = 1;
@@ -1838,7 +1838,7 @@ namespace BEAMS {
     }
 
     void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t weapon_id, uint16_t weapon_specials, s_weapon_visual_fx* out_fx) {
-        if (weapon_id <= 0 || weapon_id > 46) {
+        if (weapon_id <= WEAPON_NO_WEAPONS || weapon_id > 46) {
             memset(out_fx, 0, sizeof(*out_fx));
             return;
         }
@@ -1846,7 +1846,7 @@ namespace BEAMS {
         s_weapon_visual_fx local_2c;
 
         switch (weapon_id) {
-            case 1:
+            case WEAPON_MASS_DRIVER:
                 Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x6b, 0xc3, 0xda, 0xfc, 0xff);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 1;
@@ -1856,7 +1856,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 2:
+            case WEAPON_GAUSS_CANNON:
                 Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x67, 0x6c, 0xb2, 0xc8, 0xc8);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 1;
@@ -1866,7 +1866,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 3:
+            case WEAPON_LASER_CANNON:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
                     local_2c.thickness = 1;
@@ -1885,7 +1885,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 4:
+            case WEAPON_PARTICLE_BEAM:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
                     local_2c.thickness = 0;
@@ -1904,7 +1904,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 5:
+            case WEAPON_FUSION_BEAM:
                 if (((weapon_specials & 0x10) != 0) && ((weapon_specials & 0x100) != 0)) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
                     local_2c.thickness = 1;
@@ -1937,7 +1937,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 6:
+            case WEAPON_ION_PULSE_CANNON:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
                     local_2c.thickness = 2;
@@ -1956,7 +1956,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 7:
+            case WEAPON_GRAVITON_BEAM:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
                     local_2c.thickness = 2;
@@ -1975,7 +1975,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 8:
+            case WEAPON_NEUTRON_BLASTER:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
                     local_2c.thickness = 1;
@@ -1994,8 +1994,8 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 9:
-            case 41:
+            case WEAPON_PHASOR:
+            case WEAPON_PHASOR_EYE:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
                     local_2c.thickness = 1;
@@ -2014,7 +2014,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 10:
+            case WEAPON_DISRUPTER:
                 Set_Weapon_Visual_FX_Colors_(&local_2c, 0x6b, 0xa2, 0x16, 0xf2, 0xff, 0x35);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 1;
@@ -2024,8 +2024,8 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 11:
-            case 42:
+            case WEAPON_DEATH_RAY:
+            case WEAPON_CRYSTAL_RAY:
                 Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc9, 0x53, 0xc4, 0xff, 0xb8, 0xff);
                 local_2c.thickness = 1;
                 local_2c.anim_style = 3;
@@ -2035,7 +2035,7 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 12:
+            case WEAPON_PLASMA_CANNON:
                 if ((weapon_specials & 0x10) == 0) {
                     Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
                     local_2c.thickness = 2;
@@ -2054,9 +2054,9 @@ namespace BEAMS {
                 memcpy(out_fx, &local_2c, sizeof(local_2c));
                 break;
 
-            case 27:
-            case 40:
-            case 43:
+            case WEAPON_MAULER_DEVICE:
+            case WEAPON_DRAGON_BREATH:
+            case WEAPON_PLASMA_BREATH:
             case 46:
                 memset(out_fx, 0, sizeof(*out_fx));
                 break;
@@ -2069,25 +2069,25 @@ namespace BEAMS {
 
     int8_t __cdecl Is_Steve_Stuff_Weapon_(int16_t weapon_id) {
         switch (weapon_id) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 41:
-            case 42:
+            case WEAPON_MASS_DRIVER:
+            case WEAPON_GAUSS_CANNON:
+            case WEAPON_LASER_CANNON:
+            case WEAPON_PARTICLE_BEAM:
+            case WEAPON_FUSION_BEAM:
+            case WEAPON_ION_PULSE_CANNON:
+            case WEAPON_GRAVITON_BEAM:
+            case WEAPON_NEUTRON_BLASTER:
+            case WEAPON_PHASOR:
+            case WEAPON_DISRUPTER:
+            case WEAPON_DEATH_RAY:
+            case WEAPON_PLASMA_CANNON:
+            case WEAPON_PHASOR_EYE:
+            case WEAPON_CRYSTAL_RAY:
                 return 1;
-            case 13:
-            case 27:
-            case 40:
-            case 43:
+            case WEAPON_SPATIAL_COMPRESSOR:
+            case WEAPON_MAULER_DEVICE:
+            case WEAPON_DRAGON_BREATH:
+            case WEAPON_PLASMA_BREATH:
             case 46:
                 return 0;
             default:

@@ -11,23 +11,23 @@ namespace CMBTFIRE {
 
         s_colony* colony = &MOX::_colony[MOX::_cmbt_colony_id];
 
-        if (colony->buildings[26 /* BUILDING_MISSILE_BASE */] != 0) {
-            defense_list[found_count] = 26 /* BUILDING_MISSILE_BASE */;
+        if (colony->buildings[BUILDING_MISSILE_BASE] != 0) {
+            defense_list[found_count] = BUILDING_MISSILE_BASE;
             found_count++;
         }
 
-        if (colony->buildings[27 /* BUILDING_GROUND_BATTERIES */] != 0) {
-            defense_list[found_count] = 27 /* BUILDING_GROUND_BATTERIES */;
+        if (colony->buildings[BUILDING_GROUND_BATTERIES] != 0) {
+            defense_list[found_count] = BUILDING_GROUND_BATTERIES;
             found_count++;
         }
 
-        if (colony->buildings[42 /* BUILDING_STELLAR_CONVERTER */] != 0) {
-            defense_list[found_count] = 42 /* BUILDING_STELLAR_CONVERTER */;
+        if (colony->buildings[BUILDING_STELLAR_CONVERTER] != 0) {
+            defense_list[found_count] = BUILDING_STELLAR_CONVERTER;
             found_count++;
         }
 
-        if (colony->buildings[47 /* BUILDING_FIGHTER_GARRISON */] != 0) {
-            defense_list[found_count] = 47 /* BUILDING_FIGHTER_GARRISON */;
+        if (colony->buildings[BUILDING_FIGHTER_GARRISON] != 0) {
+            defense_list[found_count] = BUILDING_FIGHTER_GARRISON;
             found_count++;
         }
 
@@ -44,7 +44,7 @@ namespace CMBTFIRE {
                 ERICNET::Remove_Building_(MOX::_cmbt_colony_id, building_id);
 
                 switch (building_id) {
-                    case 26 /* BUILDING_MISSILE_BASE */:
+                    case BUILDING_MISSILE_BASE:
                         for (int i = 0; i < 8; ++i) {
                             int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 1 || rack == 2) {
@@ -54,7 +54,7 @@ namespace CMBTFIRE {
                         }
                         break;
 
-                    case 27 /* BUILDING_GROUND_BATTERIES */:
+                    case BUILDING_GROUND_BATTERIES:
                         for (int i = 0; i < 8; ++i) {
                             int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 0) {
@@ -64,7 +64,7 @@ namespace CMBTFIRE {
                         }
                         break;
 
-                    case 42 /* BUILDING_STELLAR_CONVERTER */:
+                    case BUILDING_STELLAR_CONVERTER:
                         for (int i = 0; i < 8; ++i) {
                             int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 5) {
@@ -74,7 +74,7 @@ namespace CMBTFIRE {
                         }
                         break;
 
-                    case 47 /* BUILDING_FIGHTER_GARRISON */:
+                    case BUILDING_FIGHTER_GARRISON:
                         for (int i = 0; i < 8; ++i) {
                             int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 4) {
@@ -215,7 +215,7 @@ namespace CMBTFIRE {
             int8_t rack = TECHDATA::_weapons[missile_type].type;
 
             if (rack == 4 /* Torpedo */) {
-                if (weapon_id == 33 /* Transporter */) {
+                if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     is_legal = 0;
                 }
             }
@@ -241,30 +241,30 @@ namespace CMBTFIRE {
                 int8_t rack = TECHDATA::_weapons[weapon_id].type;
                 if (rack == 3 /* Fighter */ && target_idx != 0) {
                     is_legal = 0;
-                } else if (weapon_id == 33 /* Transporter */) {
+                } else if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     is_legal = 0;
                 } else if (target_idx == 0) {
-                    if (weapon_id == 28 /* Stellar Converter */) {
+                    if (weapon_id == WEAPON_ASSAULT_SHUTTLE) {
                         is_legal = 0;
                     }
                     if (rack == 5 /* Special/Bomb */) {
                         switch (weapon_id) {
-                            case 13:
-                            case 32:
-                            case 34:
-                            case 35:
-                            case 36:
-                            case 37:
-                            case 39:
-                            case 44:
-                            case 45:
+                            case WEAPON_SPATIAL_COMPRESSOR:
+                            case WEAPON_STASIS_FIELD:
+                            case WEAPON_GYRO_DESTABILIZER:
+                            case WEAPON_PLASMA_WEB:
+                            case WEAPON_PULSAR:
+                            case WEAPON_BLACK_HOLE_GENERATOR:
+                            case WEAPON_TRACTOR_BEAM:
+                            case WEAPON_PLASMA_FLUX:
+                            case WEAPON_CAUSTIC_SLIME:
                                 is_legal = 0;
                                 break;
                             default:
                                 break;
                         }
                     }
-                } else if (weapon_id == 28 /* Stellar Converter */) {
+                } else if (weapon_id == WEAPON_ASSAULT_SHUTTLE) {
                     if (MOX::_combat_data[target_idx].owner > MAX_PLAYERS) {
                         is_legal = 0;
                     }
@@ -272,7 +272,7 @@ namespace CMBTFIRE {
             }
         }
 
-        if (MOX::_combat_data[target_idx].black_hole_flag != 0 && weapon_id == 37 /* Black Hole Generator */) {
+        if (MOX::_combat_data[target_idx].black_hole_flag != 0 && weapon_id == WEAPON_BLACK_HOLE_GENERATOR) {
             is_legal = 0;
         }
 
@@ -359,17 +359,17 @@ namespace CMBTFIRE {
             break;
 
         case 5: // Specials and Bombs
-            if (weapon_id == 0x27 && range <= 4) return 1;
-            if (weapon_id == 0x20 && range <= 1) return 1;
-            if (weapon_id == 0x21 && range <= 5) return 1;
-            if (weapon_id == 0x22 && range <= 5) return 1;
-            if (weapon_id == 0x23 && range <= 5) return 1;
-            if (weapon_id == 0x24 && range <= 1) return 1;
-            if (weapon_id == 0x25 && range <= 5) return 1;
-            if (weapon_id == 0x26) return 1;
-            if (weapon_id == 0x0D && range <= 1) return 1;
-            if (weapon_id == 0x2C && range <= 1) return 1;
-            if (weapon_id == 0x2D && range <= 5) return 1;
+            if (weapon_id == WEAPON_TRACTOR_BEAM && range <= 4) return 1;
+            if (weapon_id == WEAPON_STASIS_FIELD && range <= 1) return 1;
+            if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET && range <= 5) return 1;
+            if (weapon_id == WEAPON_GYRO_DESTABILIZER && range <= 5) return 1;
+            if (weapon_id == WEAPON_PLASMA_WEB && range <= 5) return 1;
+            if (weapon_id == WEAPON_PULSAR && range <= 1) return 1;
+            if (weapon_id == WEAPON_BLACK_HOLE_GENERATOR && range <= 5) return 1;
+            if (weapon_id == WEAPON_STELLAR_CONVERTER) return 1;
+            if (weapon_id == WEAPON_SPATIAL_COMPRESSOR && range <= 1) return 1;
+            if (weapon_id == WEAPON_PLASMA_FLUX && range <= 1) return 1;
+            if (weapon_id == WEAPON_CAUSTIC_SLIME && range <= 5) return 1;
             break;
 
         default:
@@ -401,13 +401,13 @@ namespace CMBTFIRE {
                 break;
 
             case 4:
-                if (weapon_idx == 0x1f /* 31 */) {
+                if (weapon_idx == WEAPON_INTERCEPTOR) {
                     result = 1;
                 }
                 // fallthrough
 
             case 5:
-                if (weapon_idx == 0x24 /* 36 */ || weapon_idx == 0x0d /* 13 */ || weapon_idx == 0x21 /* 33 */) {
+                if (weapon_idx == WEAPON_PULSAR || weapon_idx == WEAPON_SPATIAL_COMPRESSOR || weapon_idx == WEAPON_ANTI_MISSILE_ROCKET) {
                     result = 1;
                 }
                 break;
@@ -615,7 +615,7 @@ namespace CMBTFIRE {
             return retval;
         }
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 10 /* Reflection Field */)) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_ENERGY_ABSORBER)) {
             int16_t reflected = *dmg_out / 4;
             if (reflected < 2) {
                 reflected = 1;
@@ -691,8 +691,8 @@ namespace CMBTFIRE {
         int16_t ignore_armor;
         if (force_armor_bypass == 0) {
             ignore_armor = (specials & 8) != 0;
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 14 /* Heavy Armor */) ||
-                MOX::_combat_data[target_ship_idx].armor_type == 6) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_HEAVY_ARMOR) ||
+                MOX::_combat_data[target_ship_idx].armor_type == ARMOR_XENTRONIUM_ARMOR) {
                 ignore_armor = 0;
             }
         } else {
@@ -782,7 +782,7 @@ namespace CMBTFIRE {
     }
 
     int16_t __cdecl Get_Beam_Range_To_Hit_Bonus_(int16_t ship_idx, int16_t range) {
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 25) == 1) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_RANGEMASTER_UNIT) == 1) {
             return MOX::_ranged_to_hit_penalty[range / 3];
         }
 
@@ -1195,7 +1195,7 @@ namespace CMBTFIRE {
                                         }
                                         case 5: {
                                             Fire_Special_Weapon_(source_ship_idx, sx, sy, target_ship_idx, weapon_slot_idx, flag);
-                                            if (weapon->weapon_id == 32) {
+                                            if (weapon->weapon_id == WEAPON_STASIS_FIELD) {
                                                 continue_firing = 0;
                                             }
                                             break;
@@ -1307,7 +1307,7 @@ namespace CMBTFIRE {
         special_idx = 0;
         for (bit_idx = 0; bit_idx < 39; ++bit_idx) {
             // Check for Energy Absorber (Bit 10)
-            if (bit_idx == 10 && target_type == 0 && range < 8) {
+            if (bit_idx == SPECIAL_ENERGY_ABSORBER && target_type == 0 && range < 8) {
                 if (MOX::_combat_data[unit_idx].reflected_damage_pool > 0) {
                     if (CMBTFIRE::Special_Is_On_(unit_idx, special_idx)) {
                         CMBTFIRE::Energy_Absorber_Attack_(unit_idx, target_idx);
@@ -1336,20 +1336,20 @@ namespace CMBTFIRE {
         }
 
         switch (MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id) {
-            case 13:
+            case WEAPON_SPATIAL_COMPRESSOR:
                 if (MOX::_apply_damage_to_planet == 1) {
                     CMBTSPEC::Do_Spherical_SFX_(ship_idx, x, y, 2, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
                 }
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 break;
-            case 32:
+            case WEAPON_STASIS_FIELD:
                 if (target_idx != 0 && target_type == 0) {
                     CMBTSPEC::Draw_Stasis_Beam_(ship_idx, target_idx);
                     Place_Ship_In_Stasis_(target_idx, (uint8_t)ship_idx);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 }
                 break;
-            case 33:
+            case WEAPON_ANTI_MISSILE_ROCKET:
                 if (target_type != 0) {
                     int16_t type = MOX::_missile[target_idx].type;
                     if (TECHDATA::_weapons[type].type == 1 || TECHDATA::_weapons[type].type == 4) {
@@ -1359,14 +1359,14 @@ namespace CMBTFIRE {
                     }
                 }
                 break;
-            case 34:
+            case WEAPON_GYRO_DESTABILIZER:
                 if (target_idx != 0 && target_type == 0) {
                     CMBTSPEC::Gyro_Destablizer_(ship_idx, target_idx, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
-            case 35:
-            case 45:
+            case WEAPON_PLASMA_WEB:
+            case WEAPON_CAUSTIC_SLIME:
                 if (target_idx != 0) {
                     CMBTSPEC::Plasma_Web_(ship_idx, target_idx, weapon_slot_idx);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
@@ -1374,25 +1374,25 @@ namespace CMBTFIRE {
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
-            case 36:
+            case WEAPON_PULSAR:
                 if (MOX::_apply_damage_to_planet == 1) {
                     CMBTSPEC::Do_Spherical_SFX_(ship_idx, x, y, 1, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
                 }
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 break;
-            case 37:
+            case WEAPON_BLACK_HOLE_GENERATOR:
                 if (target_idx != 0 && target_type == 0) {
                     BHG_(ship_idx, target_idx);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
-            case 38:
+            case WEAPON_STELLAR_CONVERTER:
                 if (target_type == 0) {
                     CMBTSPEC::Stellar_Converter_(ship_idx, target_idx, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
-            case 39:
+            case WEAPON_TRACTOR_BEAM:
                 if (target_idx == 0) {
                     if (MOX::_apply_damage_to_planet == 0) {
                         MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
@@ -1409,7 +1409,7 @@ namespace CMBTFIRE {
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
-            case 44:
+            case WEAPON_PLASMA_FLUX:
                 if (MOX::_apply_damage_to_planet == 1) {
                     CMBTSPEC::Do_Spherical_SFX_(ship_idx, x, y, 0, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
                 }
@@ -1535,7 +1535,7 @@ namespace CMBTFIRE {
                     current_damage /= 2;
                 }
 
-                if (COMBINIT::Does_Combat_Ship_Have_Special_(target, 0x1A)) {
+                if (COMBINIT::Does_Combat_Ship_Have_Special_(target, SPECIAL_REFLECTION_FIELD)) {
                     if ((int)game_random::Random_(current_damage + 15) > current_damage) {
                         *damage += current_damage;
                         current_damage = 0;
@@ -1546,15 +1546,15 @@ namespace CMBTFIRE {
                     if ((specials & 0x100) != 0) {
                         for (int16_t shield_idx = 0; shield_idx < 4; ++shield_idx) {
                             int16_t dmg_val = current_damage;
-                            int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 1);
-                            int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 32);
+                            int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_ACHILLES_TARGETING_UNIT);
+                            int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_STRUCTURAL_ANALYZER);
                             return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &dmg_val, &local_e, shield_idx, specials, weapon_flags_00, special20, special1, 0);
                             *hit_x += dmg_val;
                             *hit_y += local_e;
                         }
                     } else {
-                        int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 1);
-                        int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, 32);
+                        int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_ACHILLES_TARGETING_UNIT);
+                        int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_STRUCTURAL_ANALYZER);
                         return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &current_damage, &local_e, shield_arc, specials, weapon_flags_00, special20, special1, 0);
                         *hit_x += current_damage;
                         *hit_y += local_e;
@@ -1595,7 +1595,7 @@ namespace CMBTFIRE {
         int32_t bonus = MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] + damage_bonus;
         int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[source_ship_idx].reflected_damage_pool + 50) / 100);
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 8) != 0) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_DISPLACEMENT_DEVICE) != 0) {
             if (game_random::Random_(100) > 30) {
                 damage = 0;
             }
@@ -1609,8 +1609,8 @@ namespace CMBTFIRE {
         int16_t shield_hit_result = 0;
 
         if (damage > 0) {
-            int16_t analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, 1);
-            int16_t structural_analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, 0x20);
+            int16_t analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, SPECIAL_ACHILLES_TARGETING_UNIT);
+            int16_t structural_analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, SPECIAL_STRUCTURAL_ANALYZER);
             uVar4 = Apply_Ship_Damage_(target_ship_idx, &damage, &shield_hit_result, target_shield_arc, 0, 0, structural_analyzer_bonus, analyzer_bonus, 0);
         }
 
@@ -1672,7 +1672,7 @@ namespace CMBTFIRE {
             *hit_bonus_out *= 2;
         }
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 15 /* HIGH_ENERGY_FOCUS */)) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HIGH_ENERGY_FOCUS)) {
             *dmg_mod_out += 50;
         }
 

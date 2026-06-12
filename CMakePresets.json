@@ -163,6 +163,74 @@
       }
     },
     {
+      "name": "mingw-win32-debug",
+      "displayName": "MinGW Win32 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x86.cmake",
+        "ORION2RE_WINDOWS_ARCH": "x86",
+        "ORION2RE_ENABLE_NETWORKING": "OFF"
+      }
+    },
+    {
+      "name": "mingw-win32-release",
+      "displayName": "MinGW Win32 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x86.cmake",
+        "ORION2RE_WINDOWS_ARCH": "x86",
+        "ORION2RE_ENABLE_NETWORKING": "OFF"
+      }
+    },
+    {
+      "name": "mingw-win64-debug",
+      "displayName": "MinGW Win64 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x64.cmake",
+        "ORION2RE_WINDOWS_ARCH": "x64",
+        "ORION2RE_ENABLE_NETWORKING": "OFF"
+      }
+    },
+    {
+      "name": "mingw-win64-release",
+      "displayName": "MinGW Win64 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x64.cmake",
+        "ORION2RE_WINDOWS_ARCH": "x64",
+        "ORION2RE_ENABLE_NETWORKING": "OFF"
+      }
+    },
+    {
       "name": "linux-debug",
       "displayName": "Linux Native Debug",
       "generator": "Ninja",
@@ -310,6 +378,26 @@
       "name": "win64-debug-asan",
       "configurePreset": "win64-debug-asan",
       "configuration": "Debug"
+    },
+    {
+      "name": "mingw-win32-debug",
+      "configurePreset": "mingw-win32-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "mingw-win32-release",
+      "configurePreset": "mingw-win32-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "mingw-win64-debug",
+      "configurePreset": "mingw-win64-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "mingw-win64-release",
+      "configurePreset": "mingw-win64-release",
+      "configuration": "Release"
     },
     {
       "name": "linux-debug",

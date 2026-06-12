@@ -114,7 +114,7 @@ namespace CMBTFIR2 {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 s_combat_data* ship = &MOX::_combat_data[i];
                 if ((int16_t)ship->owner == player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(i, 38 /* 0x26 */)) {
+                    if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WIDE_AREA_JAMMER)) {
                         *bonus_val_ptr = 70 /* 0x46 */;
                     }
                     if (ship->officer_idx > -1) {
@@ -176,8 +176,7 @@ namespace CMBTFIR2 {
         }
 
         if (MOX::_combat_data[combat_unit_idx].ftl_type > 0 && owner < MAX_PLAYERS) {
-            // Index 6 corresponds to TRAIT_SHIP_DEFENSE
-            trait_bonus = (int16_t)MOX::_player[owner].traits[6 /* TRAIT_SHIP_DEFENSE */];
+            trait_bonus = (int16_t)MOX::_player[owner].traits[TRAIT_SHIP_DEFENSE];
         }
 
         return fleet_bonus + trait_bonus + speed_bonus + specials_bonus + crew_bonus;
@@ -199,7 +198,7 @@ namespace CMBTFIR2 {
     int16_t __cdecl Ship_Specials_Offensive_Bonus_(int16_t ship_idx) {
         int16_t bonus = 0;
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 5 /* SPEC_STRUCTURAL_ANALYZER */) != 0) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_BATTLE_SCANNER) != 0) {
             bonus = 50;
         }
 
@@ -274,7 +273,7 @@ namespace CMBTFIR2 {
 
         trait_bonus = 0;
         if (owner < MAX_PLAYERS) {
-            trait_bonus = (int16_t)MOX::_player[owner].traits[7 /* TRAIT_SHIP_ATTACK */];
+            trait_bonus = (int16_t)MOX::_player[owner].traits[TRAIT_SHIP_ATTACK];
         }
 
         return computer_bonus + crew_bonus + trait_bonus + fleet_bonus + specials_bonus;
@@ -467,7 +466,7 @@ namespace CMBTFIR2 {
                     int16_t shield_id = MOX::_qcombat_data[ship_idx].shield_id;
                     int16_t damage = (int16_t)(game_random::Random_(0xC9) + 0x4A); // Random(201) + 74
                     
-                    MOX::_qcombat_data[ship_idx].shield_id = 0;
+                    MOX::_qcombat_data[ship_idx].shield_id = SHIELD_NO_SHIELD;
                     COMBAT::Apply_Damage_To_Qship_(ship_idx, damage);
                     MOX::_qcombat_data[ship_idx].shield_id = shield_id;
 
@@ -617,7 +616,7 @@ namespace CMBTFIR2 {
                                        TECHDATA::_hull_data[size].armor_hp / 100);
             }
             
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 14 /* SPECIAL_REINFORCED_HULL */)) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HEAVY_ARMOR)) {
                 armor_hits *= 3;
             }
         }
@@ -1264,7 +1263,7 @@ namespace CMBTFIR2 {
         int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_(attacker_owner);
         int16_t attacker_boarding_bonus = Crew_Boarding_Combat_Bonus_(attacker_idx);
         int16_t target_boarding_bonus = Crew_Boarding_Combat_Bonus_(target_idx);
-        int16_t has_special_1d = COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, 0x1d);
+        int16_t has_special_1d = COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_SECURITY_STATIONS);
         int16_t target_commando_bonus = Get_Fleet_Commando_Bonus_(target_owner);
         int16_t target_security_bonus = Get_Fleet_Security_Bonus_(target_owner);
 
@@ -1498,7 +1497,7 @@ namespace CMBTFIR2 {
         int16_t defender_marines_orig = defender_marines_start;
 
         int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_((int16_t)attacker->owner);
-        int16_t has_dashboards = COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, 0x1D);
+        int16_t has_dashboards = COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_SECURITY_STATIONS);
         int16_t defender_commando_bonus = Get_Fleet_Commando_Bonus_((int16_t)defender->owner);
         int16_t defender_security_bonus = Get_Fleet_Security_Bonus_((int16_t)defender->owner);
         int16_t defender_total_bonus = has_dashboards * 20 + defender_commando_bonus + defender_security_bonus;
@@ -1722,7 +1721,7 @@ namespace CMBTFIR2 {
 
         CMBTFIR2::Clear_Capturing_Flag_(ship_idx);
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* SPEC_HIGH_ENERGY_FOCUS */)) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_QUANTUM_DETONATOR)) {
             if (game_random::Random_(10) < 6) {
                 CMBTFIRE::Destroy_Ship_(ship_idx, x, y, 4);
                 return;
@@ -1740,7 +1739,7 @@ namespace CMBTFIR2 {
         CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
         COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
 
-        if (new_owner >= MAX_PLAYERS || !MOX::_player[new_owner].traits[25 /* TRAIT_TELEPATHIC */]) {
+        if (new_owner >= MAX_PLAYERS || !MOX::_player[new_owner].traits[TRAIT_TELEPATHIC]) {
             combat_ship->is_captured = 1;
         }
 
@@ -1766,7 +1765,7 @@ namespace CMBTFIR2 {
         int16_t has_special;
         int8_t size_class;
 
-        has_special = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* 24 */);
+        has_special = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_QUANTUM_DETONATOR);
 
         size_class = MOX::_combat_data[ship_idx].size_class;
         damage = TECHDATA::_hull_data[size_class].drive_hp * 5;

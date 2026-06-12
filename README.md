@@ -8,13 +8,18 @@ This repository does not include the original game data. To play, you must own a
 
 ## Requirements
 
-- Windows build environment
 - CMake 3.20 or newer
-- MSVC toolchain with 32-bit/x86 support
 - Ninja
+- Either:
+  - Windows build environment with an MSVC toolchain
+  - Linux build environment with MinGW-w64 cross-compilers
 - Original Master of Orion II game files from GOG or Steam
 
-The current CMake setup only supports 32-bit MSVC Windows builds.
+Supported build paths:
+
+- Native Linux builds
+- Native Windows builds with MSVC for x86 and x64
+- Linux-hosted MinGW-w64 cross-builds for Win32 and Win64 with networking disabled
 
 ## SDL3 submodule
 
@@ -70,6 +75,20 @@ Available presets:
 - `win32-release`
 - `win32-release-pdb`
 - `win32-debug-asan`
+- `win64-debug`
+- `win64-release`
+- `win64-release-pdb`
+- `win64-debug-asan`
+- `mingw-win32-debug`
+- `mingw-win32-release`
+- `mingw-win64-debug`
+- `mingw-win64-release`
+- `linux-debug`
+- `linux-release`
+- `linux-debug-asan`
+- `linux-x86-debug`
+- `linux-x86-release`
+- `linux-x86-debug-asan`
 
 Example release build:
 
@@ -77,6 +96,32 @@ Example release build:
 cmake --preset win32-release
 cmake --build --preset win32-release
 ```
+
+## Cross-compiling Windows builds from Linux
+
+Install MinGW-w64 cross-compilers and Ninja first. On Debian or Ubuntu, the required packages are typically:
+
+```sh
+sudo apt install gcc-mingw-w64 g++-mingw-w64 binutils-mingw-w64 ninja-build
+```
+
+Then configure and build one of the MinGW presets:
+
+```sh
+cmake --preset mingw-win32-debug
+cmake --build --preset mingw-win32-debug
+```
+
+or:
+
+```sh
+cmake --preset mingw-win64-release
+cmake --build --preset mingw-win64-release
+```
+
+The MinGW presets target Windows with vendored SDL and keep legacy DirectPlay networking disabled.
+
+The MinGW toolchain files also request static GCC and C++ runtime linkage so the generated Windows executables do not depend on the MinGW runtime DLLs.
 
 ## Customization script
 

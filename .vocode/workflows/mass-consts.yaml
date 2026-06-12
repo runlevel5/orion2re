@@ -101,6 +101,8 @@ workflows:
           * If multiple constants share the same numeric value, use the one that matches the surrounding domain meaning, not merely the value.
           * Verify the intended meaning from nearby identifiers, data structures, loop purpose, comments, index usage, and related operations before replacing a literal.
           * Convert all clearly relevant hard-coded uses in the claimed file, not just the first one you find.
+          * Before finishing the file or continuing to the next claim, verify every replacement you made still preserves the exact same numeric value and the same semantic meaning in context.
+          * Confirm each inserted symbolic constant resolves to exactly the literal value it replaced, and revert any candidate edit where either the numeric value or the intended meaning does not match exactly.
           * If the claimed file does not contain any clearly relevant hard-coded uses of constants from `src/game/orion2_consts.h`, leave it unchanged and skip it.
 
           GOOD REPLACEMENT CANDIDATES

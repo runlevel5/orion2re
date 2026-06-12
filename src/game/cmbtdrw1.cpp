@@ -251,8 +251,8 @@ namespace CMBTDRW1 {
         if (ship->movement_left > 0) {
             can_move = true;
         } else {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(MOX::_cur_ship, 0x21 /* 33 */) ||
-                COMBINIT::Does_Combat_Ship_Have_Special_(MOX::_cur_ship, 0x16 /* 22 */)) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(MOX::_cur_ship, SPECIAL_SUB_SPACE_TELEPORTER) ||
+                COMBINIT::Does_Combat_Ship_Have_Special_(MOX::_cur_ship, SPECIAL_PHASE_SHIFTER)) {
                 if (CMBTFIR2::Used_Teleporter_(MOX::_cur_ship) == 0) {
                     can_move = true;
                 }
@@ -1017,7 +1017,7 @@ skip_cursor:
             
             int32_t armor_total = hull_armor + (armor_percent * hull_armor) / 100;
             
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0xE) != 0)
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HEAVY_ARMOR) != 0)
             {
                 armor_total *= 3;
             }
@@ -2099,20 +2099,20 @@ skip_cursor:
 
                 if (MOX::_cmbt_colony_id != -1) {
                     int16_t current_y = y + 4;
-                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[26] != 0) {
-                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[26].name);
+                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_MISSILE_BASE] != 0) {
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[BUILDING_MISSILE_BASE].name);
                         current_y += 7;
                     }
-                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[27] != 0) {
-                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[27].name);
+                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_GROUND_BATTERIES] != 0) {
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[BUILDING_GROUND_BATTERIES].name);
                         current_y += 7;
                     }
-                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[47] != 0) {
-                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[47].name);
+                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_FIGHTER_GARRISON] != 0) {
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[BUILDING_FIGHTER_GARRISON].name);
                         current_y += 7;
                     }
-                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[42] != 0) {
-                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[42].name);
+                    if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_STELLAR_CONVERTER] != 0) {
+                        fonts::Print_(x + 2, current_y, TECHDATA::_buildings[BUILDING_STELLAR_CONVERTER].name);
                     }
                 }
             }
@@ -2874,7 +2874,7 @@ skip_cursor:
                     fonts::Set_Font_Style_Shadow_Down_(1, &color_a8);
                 }
 
-                if (rack == 1 || rack == 3 || rack == 4 || w_id == 0x21) {
+                if (rack == 1 || rack == 3 || rack == 4 || w_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     strcat(local_a0, " x");
                     _itoa(ammo, local_64, 10);
                     strcat(local_a0, local_64);
@@ -2999,7 +2999,7 @@ skip_cursor:
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage) {
         bool is_bio = (TECHDATA::_weapons[weapon_id].natural_mods & 0x80) != 0;
-        bool has_transporter = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* Transporter */) != 0;
+        bool has_transporter = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS) != 0;
         int16_t speed = (MOX::_speedx2_flag != 0 || MOX::_net_flag != 0) ? 12 : 6;
 
         if (Ship_Completely_On_Screen_(attacker_idx) == 0) {
@@ -3480,7 +3480,7 @@ skip_cursor:
                      armor_total) /
                     100;
 
-                if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 14) != 0) {
+                if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_HEAVY_ARMOR) != 0) {
                     armor_total *= 3;
                 }
 
@@ -3722,7 +3722,7 @@ skip_cursor:
                     uint16_t mod_bits = slot.specials;
                     line_text[0] = '\0';
 
-                    for (int32_t mod_index = 0; mod_index < 15; ++mod_index) {
+                    for (int32_t mod_index = 0; mod_index < WEAPON_MOD_COUNT; ++mod_index) {
                         if ((mod_bits & 1) != 0) {
                             if (line_text[0] != '\0') {
                                 strcat(line_text, ", ");

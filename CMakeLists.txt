@@ -227,7 +227,9 @@ if(MSVC)
         $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/DEBUG>
     )
 elseif(WIN32)
-    message(WARNING "The CMake conversion preserves the original Visual Studio/MSVC-specific Windows build behavior; non-MSVC Windows builds may need additional link setup.")
+    if(ORION2RE_ENABLE_NETWORKING)
+        message(WARNING "Legacy DirectPlay networking import library setup remains MSVC-specific; non-MSVC Windows networking builds may need additional link setup.")
+    endif()
 endif()
 
 if(ORION2RE_ENABLE_ASAN)
