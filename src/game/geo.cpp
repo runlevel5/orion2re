@@ -649,7 +649,7 @@ namespace GEO {
         }
 
         if (do_union && root2 != root1) {
-            if (random::Random_(2) == 1) {
+            if (game_random::Random_(2) == 1) {
                 _dads[root1] = root2;
             } else {
                 _dads[root2] = root1;

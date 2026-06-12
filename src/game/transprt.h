@@ -37,7 +37,7 @@ namespace transprt {
 
     extern uint32_t _tpMessageStamp;
 
-    extern uint32_t DAT_00560a70;
+    extern uint32_t _tpCurrentSendOffset;
 
     extern uint16_t _tpCurrentUserType;
 
@@ -51,7 +51,7 @@ namespace transprt {
 
     extern clock_t _tpLastBurstClock;
 
-    extern uint32_t DAT_00560a94;
+    extern uint32_t _tpLastAckedBurstStartPacket;
 
     extern uint8_t _tpSendImmediateBurstFlag;
 

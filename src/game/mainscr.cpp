@@ -2910,7 +2910,7 @@ namespace MAINSCR {
         int16_t width;
         int16_t height;
 
-        saved_seed = random::Get_Random_Seed_();
+        saved_seed = game_random::Get_Random_Seed_();
 
         for (int16_t i = 0; i < 8; ++i) {
             if (i < 2 || i > 5) {
@@ -2974,7 +2974,7 @@ namespace MAINSCR {
 
         video::Clip_Off_();
         graphics::Reset_Window_();
-        random::Set_Random_Seed_(saved_seed);
+        game_random::Set_Random_Seed_(saved_seed);
     }
 
     void __cdecl Toggle_Game_Option_(int16_t option_idx) {
@@ -3389,7 +3389,7 @@ namespace MAINSCR {
 
     void __cdecl Draw_Exploding_Plasma_Box_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7)
     {
-        uint32_t random_seed = random::Get_Random_Seed_();
+        uint32_t random_seed = game_random::Get_Random_Seed_();
         MOX::_animated_star = 0xFFFF;
 
         if (param_7 == 2) {
@@ -3439,7 +3439,7 @@ namespace MAINSCR {
             plasma_color_map[i] = static_cast<uint8_t>((i * 2) + 14);
         }
 
-        int16_t unk_color = (int16_t)random::Random_(8) - 1;
+        int16_t unk_color = (int16_t)game_random::Random_(8) - 1;
         int16_t color_anim = 0;
 
         int16_t dest_x = original_x2;
@@ -3526,7 +3526,7 @@ namespace MAINSCR {
 
             line::Plasma_Box_(draw_x, draw_y, (uint16_t)w_offset, h_offset, 3, color_anim, (uint8_t)unk_color, plasma_color_map);
 
-            color_anim = (random::Random_(10) + color_anim) & 0xFF;
+            color_anim = (game_random::Random_(10) + color_anim) & 0xFF;
             RUSS::Mox_Sync_Update_();
 
             accum_y += step_y;
@@ -3552,7 +3552,7 @@ namespace MAINSCR {
         RUSS::Mox_Sync_Update_();
         fields::Enable_Draw_All_Fields_();
         MOX::_draw_main_screen_to_back = 1;
-        random::Set_Random_Seed_(random_seed);
+        game_random::Set_Random_Seed_(random_seed);
         MISC::Restore_Window_Status_(saved_window);
     }
 
@@ -3837,7 +3837,7 @@ namespace MAINSCR {
         }
         case 0x17: {
             NETMOX::_net.player_net_info[from_player_id].packet_type = 0x0E;
-            NETMOX::_net.player_net_info[from_player_id].combat_attacker_id = 0xFF;
+            NETMOX::_net.player_net_info[from_player_id].combat_attacker_id = -1;
             NETMOX::_net.sync_phase_active_flag = 0;
             break;
         }

@@ -2193,8 +2193,8 @@ namespace DIP_SCRN {
 
         case 8:
             {
-                int32_t r1 = random::Random_(50);
-                int32_t r2 = random::Random_(50);
+                int32_t r1 = game_random::Random_(50);
+                int32_t r2 = game_random::Random_(50);
                 MOX::_player[giving_player_idx].stop_blockading_duration[asking_player_idx] = (int8_t)r1 + (int8_t)r2 + 10;
             }
             break;

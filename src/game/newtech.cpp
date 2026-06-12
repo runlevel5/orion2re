@@ -342,7 +342,7 @@ namespace newtech {
     }
 
     int32_t __cdecl Choose_Hyper_Advanced_Tech_() {
-        int32_t rand_val = random::Random_(0x14);
+        int32_t rand_val = game_random::Random_(0x14);
 
         switch (rand_val) {
             case 1:

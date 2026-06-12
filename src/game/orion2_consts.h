@@ -1,23 +1,3 @@
-﻿typedef unsigned char undefined;
-typedef unsigned char   undefined;
-
-typedef unsigned char    byte;
-typedef unsigned int    dword;
-
-typedef long long    longlong;
-typedef unsigned char    uchar;
-typedef unsigned int    uint;
-typedef unsigned long    ulong;
-typedef unsigned long long    ulonglong;
-typedef unsigned char    undefined1;
-typedef unsigned short    undefined2;
-typedef unsigned int    undefined4;
-typedef unsigned long long    undefined5;
-typedef unsigned long long    undefined6;
-typedef unsigned long long    undefined7;
-typedef unsigned long long    undefined8;
-typedef unsigned short    ushort;
-typedef unsigned short    word;
 typedef enum ARMOR {
     ARMOR_NO_ARMOR=0,
     ARMOR_TITANIUM_ARMOR=1,
@@ -115,16 +95,21 @@ typedef enum FIELD_TYPE {
     FIELD_TYPE_RADIO=1,
     FIELD_TYPE_LOCKED=2,
     FIELD_TYPE_MULTI_BUTTON=3,
+    FIELD_TYPE_LEGACY_INPUT=4,
     FIELD_TYPE_4=4,
     FIELD_TYPE_5=5,
     FIELD_TYPE_SCROLL=6,
     FIELD_TYPE_HIDDEN=7,
     FIELD_TYPE_MULTI_HOTKEY=8,
+    FIELD_TYPE_SCROLL_RETURN=9,
     FIELD_TYPE_9=9,
+    FIELD_TYPE_STRING_LIST=10,
     FIELD_TYPE_10=10,
     FIELD_TYPE_CONTINUOUS_INPUT=11,
     FIELD_TYPE_GRID=12,
-    FIELD_TYPE_IRREGULAR_INPUT=13
+    FIELD_TYPE_IRREGULAR_BUTTON=13,
+    FIELD_TYPE_IRREGULAR_INPUT=13,
+    FIELD_TYPE_CIRCLE=14
 } FIELD_TYPE;
 
 typedef enum FUEL {

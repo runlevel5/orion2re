@@ -1123,7 +1123,7 @@ namespace COLCALC {
                 int32_t base_cost = (uint8_t)colony->n_food_replicated + total_building_maintenance;
 
                 int32_t calculated_bc = (((climate_modifier * base_cost) * 4 + 200) * 25) / 10000;
-                colony->maintenance[ECON_BC] = (byte)calculated_bc;
+                colony->maintenance[ECON_BC] = (uint8_t)calculated_bc;
             }
         }
 
@@ -1529,7 +1529,7 @@ namespace COLCALC {
                     if (is_valid) {
                         candidates_count++;
                         // Reservoir sampling: pick new candidate with 1/N probability
-                        if (random::Random_(candidates_count) == 1) {
+                        if (game_random::Random_(candidates_count) == 1) {
                             selected_tech_id = tech_id;
                         }
                     }
@@ -1805,7 +1805,7 @@ namespace COLCALC {
                             if (((star->blockaded_by[p_target] >> p_attacker) & 1) &&
                                 !((star->has_colony >> p_attacker) & 1)) {
 
-                                int16_t penalty = -static_cast<int16_t>(random::Random_(5));
+                                int16_t penalty = -static_cast<int16_t>(game_random::Random_(5));
                                 diplomac::Change_Relations_(penalty, p_attacker, p_target, 7 /* RELATION_BLOCKADE */, i, 0);
                             }
                         }
@@ -1992,7 +1992,7 @@ namespace COLCALC {
                      static_cast<int32_t>(static_cast<int8_t>(colony->owner)) != static_cast<int32_t>(race_idx) &&
                      ((*pop & 0x400) != 0))) {
                     ++removable_count;
-                    if (random::Random_(removable_count) == 1) {
+                    if (game_random::Random_(removable_count) == 1) {
                         selected_pop = pop;
                     }
                 }
@@ -2088,12 +2088,12 @@ namespace COLCALC {
 
                         if ((pop & 0x180) == 0) {
                             ++normal_count;
-                            if (random::Random_(normal_count) == 1) {
+                            if (game_random::Random_(normal_count) == 1) {
                                 selected_normal = pop_idx;
                             }
                         } else {
                             ++special_count;
-                            if (random::Random_(special_count) == 1) {
+                            if (game_random::Random_(special_count) == 1) {
                                 selected_special = pop_idx;
                             }
                         }
@@ -2301,7 +2301,7 @@ namespace COLCALC {
         player->research_breakthrough = 0;
         player->research_accumulated += (int32_t)player->research_produced;
 
-        if ((int32_t)random::Random_(100) <= breakthrough_chance) {
+        if ((int32_t)game_random::Random_(100) <= breakthrough_chance) {
             player->research_breakthrough = 1;
             player->research_accumulated = 0;
             Give_Player_Field_(player, field, 0);
@@ -3101,10 +3101,10 @@ namespace COLCALC {
 
             if (selection_mode == 0) {
                 // Pick from the "bottom" (lower weight) half
-                chosen_idx = random::Random_(half_count) - 1;
+                chosen_idx = game_random::Random_(half_count) - 1;
             } else {
                 // Pick from the "top" (higher weight) half
-                chosen_idx = num_stars - random::Random_(half_count);
+                chosen_idx = num_stars - game_random::Random_(half_count);
             }
 
             result_star_idx = (short)star_weights[chosen_idx].star_idx;
@@ -3434,7 +3434,7 @@ namespace COLCALC {
                     const uint32_t pop_record = colony->pop[pop_idx];
                     if ((pop_record & 0x400u) != 0 && (pop_record & 0x0Fu) < MAX_PLAYERS) {
                         ++candidate_count;
-                        if (random::Random_(candidate_count) == 1) {
+                        if (game_random::Random_(candidate_count) == 1) {
                             chosen_pop_idx = pop_idx;
                         }
                     }
@@ -3743,7 +3743,7 @@ namespace COLCALC {
 
         for (building_idx = 0; building_idx < 49; ++building_idx) {
             if (colony->buildings[building_idx] != 0) {
-                if (random::Random_(10) == 1) {
+                if (game_random::Random_(10) == 1) {
                     const int32_t colony_idx = static_cast<int32_t>(colony - MOX::_colony);
                     ERICNET::Remove_Building_(static_cast<int16_t>(colony_idx), static_cast<int16_t>(building_idx));
                 } else {

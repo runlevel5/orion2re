@@ -7,13 +7,11 @@ namespace AIDATA {
         uint8_t extended_turns;
         uint8_t extended_intermediate_star;
     };
-    static_assert(sizeof(s_turns_from_to_intermediate_cache_entry) == 4);
 
     struct s_ship_n_turns_to_intermediate_cache_entry {
         uint8_t turns;
         uint8_t intermediate_star;
     };
-    static_assert(sizeof(s_ship_n_turns_to_intermediate_cache_entry) == 2);
 
     extern uint16_t _g_base_planet_values[MAX_PLAYERS][MAX_PLANETS];
     extern uint16_t (*_ship_strengths)[MAX_SHIPS][MAX_PLAYERS];

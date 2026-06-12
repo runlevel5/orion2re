@@ -48,8 +48,8 @@ namespace antarans {
     /// Returns the last turn on which medium Antaran ships may still be built.
     int16_t __cdecl No_Medium_Ships_After_N_Turns_();
 
-    extern uint8_t _antaran_ship_cost[9];
-    extern uint8_t _n_max_antaran_off_ships[9];
+    extern uint8_t _antaran_ship_cost[HULL_CLASS_COUNT];
+    extern uint8_t _n_max_antaran_off_ships[HULL_CLASS_COUNT];
     extern uint8_t _offensive_titan_ship_built;
 
     /// Spends an Antaran resource pool to build ships up to the configured caps.
@@ -72,7 +72,7 @@ namespace antarans {
     /// @param player_idx Player index whose colonies are eligible targets.
     int16_t __cdecl Get_Antaran_Target_Star_(int16_t player_idx);
 
-    extern uint8_t _n_max_antaran_def_ships[9];
+    extern uint8_t _n_max_antaran_def_ships[HULL_CLASS_COUNT];
 
     /// Builds as many defensive ships as the current defensive resource pool allows.
     void __cdecl Build_Antaran_Defensive_Ships_();

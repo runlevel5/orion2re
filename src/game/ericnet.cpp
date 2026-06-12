@@ -18,7 +18,7 @@ namespace ERICNET {
 
         if (COLONY::_debug_flag) {
             RUSS::PFMT_(0, 0, "INITING HOMEWORLD ph:%d pl:%d num:%d", (int)planet_idx, (int)player_idx, (int)MOX::_NUM_COLONIES);
-            assert::hgetch_();
+            key::Wait_For_Key_();
         }
 
         INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)player_idx);
@@ -357,7 +357,7 @@ namespace ERICNET {
                         } else if (star->planet_index[3] == p_idx || star->planet_index[4] == p_idx) {
                             MOX::_planet[p_idx].climate = 4; /* Tundra */
                         } else {
-                            MOX::_planet[p_idx].climate = (random::Random_(2) != 1) ? 4 : 3;
+                            MOX::_planet[p_idx].climate = (game_random::Random_(2) != 1) ? 4 : 3;
                         }
                         break;
                     case 3: /* Desert */
@@ -411,7 +411,7 @@ namespace ERICNET {
                     tp->gravity_class = 1; /* Normal Gravity */
                     tp->group = 0;
                     tp->climate = 2; /* Barren */
-                    tp->climate_bg_type = (int8_t)random::Random_(3) - 1;
+                    tp->climate_bg_type = (int8_t)game_random::Random_(3) - 1;
                     tp->mineral_class = 2; /* Abundant */
                     tp->food_per_farmer = 0;
                     tp->n_terraforms = 0;

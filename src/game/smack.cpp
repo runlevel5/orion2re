@@ -30,6 +30,8 @@ namespace SMACK {
         do {
             if (palette_level >= 0 && palette_level < 100) {
                 palstore::Darken_Palette_((int)palette_level);
+                video::Submit_Palette_();
+                RUSS::Mox_Update_();
             }
             palette_level = (int16_t)(palette_level + fade_step);
         } while (palette_level != 110 && palette_level != -10);

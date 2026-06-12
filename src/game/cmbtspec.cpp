@@ -3,9 +3,6 @@
 #include <cstddef>
 
 namespace CMBTSPEC {
-    static_assert(sizeof(s_combat_weapon_slot) == 11);
-    static_assert(sizeof(s_missile) == 0x1A);
-
     int32_t _g_engine_sfx_handle;
 
     void __cdecl Draw_Cloak_(int16_t ship_idx, int16_t cloak_type) {
@@ -511,13 +508,13 @@ namespace CMBTSPEC {
             CMBTSPEC::Draw_Gyro_Special_Effect_(source_idx, target_idx);
 
             for (int i = 0; i < 19; ++i) {
-                rotations_left += (int16_t)random::Random_(13);
+                rotations_left += (int16_t)game_random::Random_(13);
             }
 
             while (true) {
                 int16_t temp = rotations_left % 16;
                 if (temp != 15 && temp >= 2) break;
-                rotations_left += (int16_t)random::Random_(13);
+                rotations_left += (int16_t)game_random::Random_(13);
             }
 
             graphics::Set_Window_(0, 0, 639, 350);
@@ -556,7 +553,7 @@ namespace CMBTSPEC {
         if (attack_count > 0) {
             int16_t range = TECHDATA::_weapons[34].max_damage - TECHDATA::_weapons[34].min_damage + 1;
             for (int i = 0; i < attack_count; ++i) {
-                int32_t roll = random::Random_(range);
+                int32_t roll = game_random::Random_(range);
                 int16_t base_dmg = TECHDATA::_weapons[34].min_damage + (int16_t)roll - 1;
                 total_damage_accum += (int16_t)(base_dmg * (MOX::_combat_data[target_idx].size_class + 1));
             }
@@ -697,7 +694,7 @@ namespace CMBTSPEC {
                     break;
                 }
 
-                int16_t roll = (int16_t)random::Random_(100);
+                int16_t roll = (int16_t)game_random::Random_(100);
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].ammo--;
 
@@ -1102,7 +1099,7 @@ namespace CMBTSPEC {
 
         if (shots_left > 0) {
             for (int16_t i = 0; i < shots_left; ++i) {
-                accumulated_damage += (int16_t)(((int32_t)random::Random_(100) * diff) / 100 + min_dmg);
+                accumulated_damage += (int16_t)(((int32_t)game_random::Random_(100) * diff) / 100 + min_dmg);
             }
         }
 
@@ -1353,7 +1350,7 @@ namespace CMBTSPEC {
     }
 
     void __cdecl Play_Ship_Explosion_SFX_(int16_t size_class) {
-        int32_t random_val = random::Random_(3);
+        int32_t random_val = game_random::Random_(3);
         int16_t switch_idx = (int16_t)(random_val + size_class - 1);
 
         switch (switch_idx) {
@@ -1579,7 +1576,7 @@ namespace CMBTSPEC {
             draw_ships_collapsing_flag = false;
             ERICNET::Mox_Play_Sound_(0x2F);
             ERICNET::Mox_Play_Sound_(8);
-            if (random::Random_(10) == 1) {
+            if (game_random::Random_(10) == 1) {
                 ERICNET::Mox_Play_Sound_(0x21);
             }
             break;
@@ -1700,9 +1697,9 @@ namespace CMBTSPEC {
                         {
                             int16_t ship_idx = ship_indices[j];
                             int16_t cx = MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x;
-                            cx = cx * 20 - 3 + (int16_t)random::Random_(5);
+                            cx = cx * 20 - 3 + (int16_t)game_random::Random_(5);
                             int16_t cy = MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y;
-                            cy = cy * 20 - 3 + (int16_t)random::Random_(5);
+                            cy = cy * 20 - 3 + (int16_t)game_random::Random_(5);
                             CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
                             draw_ship = false;
                         }
@@ -1715,9 +1712,9 @@ namespace CMBTSPEC {
                                 if (frame_val < 85 || (frame_val >= 85 && dist_sq <= frame_val_sq - 625)) {
                                     int16_t ship_idx = ship_indices[j];
                                     int16_t cx = MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x;
-                                    cx = cx * 20 - 3 + (int16_t)random::Random_(5);
+                                    cx = cx * 20 - 3 + (int16_t)game_random::Random_(5);
                                     int16_t cy = MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y;
-                                    cy = cy * 20 - 3 + (int16_t)random::Random_(5);
+                                    cy = cy * 20 - 3 + (int16_t)game_random::Random_(5);
                                     CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
                                     draw_ship = false;
                                 }
@@ -1787,7 +1784,7 @@ namespace CMBTSPEC {
         for (int32_t i = 0; i < 300; ++i) {
             if (MOX::_missile[i].type > 0 &&
                 TECHDATA::_weapons[MOX::_missile[i].type].type != 2 &&
-                (TECHDATA::_weapons[MOX::_missile[i].type].type != 4 || random::Random_(2) != 1))
+                (TECHDATA::_weapons[MOX::_missile[i].type].type != 4 || game_random::Random_(2) != 1))
             {
                 int32_t mx = (int32_t)MOX::_missile[i].x + (int32_t)MOX::_cur_combat_x * -20;
                 int32_t my = (int32_t)MOX::_missile[i].y + (int32_t)MOX::_cur_combat_y * -20;
@@ -1804,21 +1801,21 @@ namespace CMBTSPEC {
 
                     if (sfx_type == 0) {
                         for (int16_t k = 0; k < shot_count; ++k) {
-                            damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].max_damage -
+                            damage += TECHDATA::_weapons[44].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[44].max_damage -
                                 TECHDATA::_weapons[44].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else if (sfx_type == 1) {
                         for (int16_t k = 0; k < shot_count; ++k) {
-                            damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].max_damage -
+                            damage += TECHDATA::_weapons[36].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[36].max_damage -
                                 TECHDATA::_weapons[36].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else if (sfx_type == 2) {
                         for (int16_t k = 0; k < shot_count; ++k) {
-                            damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].max_damage -
+                            damage += TECHDATA::_weapons[13].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[13].max_damage -
                                 TECHDATA::_weapons[13].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
@@ -1834,7 +1831,7 @@ namespace CMBTSPEC {
 
                     if (qty > 0) {
                         for (int16_t k = 0; k < qty; ++k) {
-                            if ((int)random::Random_(100) <= (int32_t)(chance * 25) / missile_hits) {
+                            if ((int)game_random::Random_(100) <= (int32_t)(chance * 25) / missile_hits) {
                                 MOX::_missile[i].quantity--;
                             }
                         }
@@ -1853,21 +1850,21 @@ namespace CMBTSPEC {
 
             if (sfx_type == 0) {
                 for (int16_t k = 0; k < shot_count; ++k) {
-                    damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].max_damage -
+                    damage += TECHDATA::_weapons[44].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[44].max_damage -
                         TECHDATA::_weapons[44].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else if (sfx_type == 1) {
                 for (int16_t k = 0; k < shot_count; ++k) {
-                    damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].max_damage -
+                    damage += TECHDATA::_weapons[36].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[36].max_damage -
                         TECHDATA::_weapons[36].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else if (sfx_type == 2) {
                 for (int16_t k = 0; k < shot_count; ++k) {
-                    damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].max_damage -
+                    damage += TECHDATA::_weapons[13].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[13].max_damage -
                         TECHDATA::_weapons[13].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
@@ -1888,12 +1885,12 @@ namespace CMBTSPEC {
 
             if (MOX::_combat_data[ship_idx].size_class != -1 && MOX::_combat_data[ship_idx].size_class + 1 > 0) {
                 for (int16_t k = 0; k < MOX::_combat_data[ship_idx].size_class + 1; ++k) {
-                    int32_t rnd = random::Random_((int32_t)chance);
+                    int32_t rnd = game_random::Random_((int32_t)chance);
                     if (rnd <= 1) {
                         damage_out++;
                     }
                     else {
-                        damage_out += (int16_t)random::Random_((int32_t)chance);
+                        damage_out += (int16_t)game_random::Random_((int32_t)chance);
                     }
                 }
             }

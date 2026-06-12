@@ -1,33 +1,40 @@
 #include "pch.h"
 
-namespace {
-    void Initialize_Process_State() {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#endif
-        uint32_t version_info = GetVersion();
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <SDL3/SDL_main.h>
 
-        platform::g_os_ver = version_info;
-        platform::g_win_minor = (version_info >> 8) & 0xFF;
-        platform::g_win_major = version_info & 0xFF;
-        platform::g_win_ver = (platform::g_win_major << 8) | platform::g_win_minor;
-        platform::g_os_ver >>= 16;
-
-        platform::g_command_line = GetCommandLineA();
-        platform::g_env_strings = nullptr;
-    }
-}
-
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-    Initialize_Process_State();
-
-    if (platform::g_command_line == nullptr) {
-        return -1;
+int main(int argc, char** argv) {
+    size_t command_line_length = 0;
+    for (int i = 1; i < argc; ++i) {
+        command_line_length += strlen(argv[i]);
+        if (i + 1 < argc) {
+            ++command_line_length;
+        }
     }
 
-    return platform::WinMain_Proxy(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+    char* command_line = nullptr;
+    if (command_line_length != 0) {
+        command_line = (char*)malloc(command_line_length + 1);
+        if (command_line == nullptr) {
+            return -1;
+        }
+
+        size_t write_offset = 0;
+        for (int i = 1; i < argc; ++i) {
+            const size_t arg_length = strlen(argv[i]);
+            memcpy(command_line + write_offset, argv[i], arg_length);
+            write_offset += arg_length;
+
+            if (i + 1 < argc) {
+                command_line[write_offset++] = ' ';
+            }
+        }
+        command_line[write_offset] = '\0';
+    }
+
+    const int result = platform::Run_Main_Loop(command_line);
+    if (command_line != nullptr) {
+        free(command_line);
+    }
+
+    return result;
 }

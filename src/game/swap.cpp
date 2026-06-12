@@ -21,7 +21,7 @@ void __cdecl Save_Block_To_Drive_(uint8_t* block_address, int32_t block_size) {
         exitm::Exit_With_Message("Insufficient disk space for swap");
     }
 
-    swap_file = fopen("TEMP.TMP", "wb");
+    swap_file = fopen_case("TEMP.TMP", "wb");
     if (swap_file == nullptr) {
         exitm::Exit_With_Message("Error in swap file");
     }
@@ -35,7 +35,7 @@ void __cdecl Save_Block_To_Drive_(uint8_t* block_address, int32_t block_size) {
 void __cdecl Restore_Block_From_Drive_() {
     uint8_t* swap_block_address = swap::_swap_block_address;
     auto* block_header = (allocate::s_alloc_header*)swap_block_address - 1;
-    FILE* swap_file = fopen("TEMP.TMP", "rb");
+    FILE* swap_file = fopen_case("TEMP.TMP", "rb");
 
     if (swap_file == nullptr) {
         exitm::Exit_With_Message("Error in swap file");

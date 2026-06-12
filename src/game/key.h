@@ -21,6 +21,9 @@ namespace key {
     // Returns the next key code from the ring buffer and advances the read position.
     int32_t Read_Key_();
 
+    // Blocks until a key code is available, yielding briefly between polls.
+    int32_t Wait_For_Key_();
+
     // Returns the next buffered key code as a 16-bit value, or 0 when no key is available.
     int16_t Scan_Key_();
 }

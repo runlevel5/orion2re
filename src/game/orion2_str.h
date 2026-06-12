@@ -1,23 +1,3 @@
-﻿typedef unsigned char undefined;
-typedef unsigned char   undefined;
-
-typedef unsigned char    byte;
-typedef unsigned int    dword;
-
-typedef long long    longlong;
-typedef unsigned char    uchar;
-typedef unsigned int    uint;
-typedef unsigned long    ulong;
-typedef unsigned long long    ulonglong;
-typedef unsigned char    undefined1;
-typedef unsigned short    undefined2;
-typedef unsigned int    undefined4;
-typedef unsigned long long    undefined5;
-typedef unsigned long long    undefined6;
-typedef unsigned long long    undefined7;
-typedef unsigned long long    undefined8;
-typedef unsigned short    ushort;
-typedef unsigned short    word;
 typedef enum ESTRNGS {
     ESTR_S_GAINS_A_LEVEL=1,
     ESTR_S_OFFERS_TO_JOIN_YOU_FOR_D_BC_NOW_AND_DBC_A_TURNS_DO_YOU_ACCEPT=2,

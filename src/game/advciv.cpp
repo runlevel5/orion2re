@@ -235,35 +235,40 @@ namespace ADVCIV {
         int16_t target_planet_count = Num_Adv_Civ_Planets_();
         int16_t active_players_count = (int16_t)MOX::_NUM_PLAYERS;
 
-        int16_t player_round_state[MAX_PLAYERS * 2];
+        int16_t active_player_order[MAX_PLAYERS];
+        int16_t picked_planet_idx[MAX_PLAYERS];
+        int16_t round_active_players_count;
 
         for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
-            player_round_state[i] = -1;
+            active_player_order[i] = -1;
+            picked_planet_idx[i] = -1;
         }
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-            player_round_state[i] = i;
+            active_player_order[i] = i;
         }
 
         while (active_players_count > 0) {
-            for (int16_t i = MAX_PLAYERS; i < MAX_PLAYERS * 2; ++i) {
-                player_round_state[i] = -1;
+            for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
+                picked_planet_idx[i] = -1;
             }
 
+            round_active_players_count = active_players_count;
+
             Build_Adv_Civ_Star_List_();
-            HAROLD::Randomize_List_(player_round_state, MAX_PLAYERS, 0);
+            HAROLD::Randomize_List_(active_player_order, MAX_PLAYERS, 0);
 
             for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
-                int16_t player_idx = player_round_state[i];
+                int16_t player_idx = active_player_order[i];
                 if (player_idx == -1) continue;
 
                 int16_t candidate_planet_idx = Get_Next_Adv_Civ_Planet_(player_idx, _planet_selected_flag);
                 if (candidate_planet_idx == -1) {
                     active_players_count--;
-                    player_round_state[player_idx] = -1;
+                    active_player_order[i] = -1;
                 } else {
                     int16_t global_planet_idx = _adv_civ_player[player_idx].planets[candidate_planet_idx].planet_idx;
                     int8_t star_idx = MOX::_planet[global_planet_idx].star_index;
-                    player_round_state[player_idx + MAX_PLAYERS] = candidate_planet_idx;
+                    picked_planet_idx[player_idx] = candidate_planet_idx;
                     _planet_selected_flag[global_planet_idx] = (int8_t)player_idx;
                     _star_colony_owner[star_idx] = (int8_t)player_idx;
                 }
@@ -271,14 +276,14 @@ namespace ADVCIV {
 
             int16_t round_pick_count = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-                if (player_round_state[i + MAX_PLAYERS] != -1) {
+                if (picked_planet_idx[i] != -1) {
                     round_pick_count++;
                 }
             }
 
-            if (round_pick_count == (int16_t)MOX::_NUM_PLAYERS) {
+            if (round_pick_count == round_active_players_count) {
                 for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
-                    int16_t candidate_planet_idx = player_round_state[p + MAX_PLAYERS];
+                    int16_t candidate_planet_idx = picked_planet_idx[p];
                     if (candidate_planet_idx == -1) continue;
 
                     s_adv_civ_player& plr = _adv_civ_player[p];
@@ -310,15 +315,23 @@ namespace ADVCIV {
                     plr.candidate_planet_count--;
 
                     if (plr.settled_planet_count >= target_planet_count) {
-                        player_round_state[p] = -1;
+                        for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
+                            if (active_player_order[i] == p) {
+                                active_player_order[i] = -1;
+                                break;
+                            }
+                        }
                         active_players_count--;
                     }
                 }
             } else {
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-                    int16_t candidate_planet_idx = player_round_state[i + MAX_PLAYERS];
+                    int16_t candidate_planet_idx = picked_planet_idx[i];
                     if (candidate_planet_idx >= 0 && candidate_planet_idx < MAX_PLANETS) {
-                        _planet_selected_flag[candidate_planet_idx] = -1;
+                        int16_t global_planet_idx = _adv_civ_player[i].planets[candidate_planet_idx].planet_idx;
+                        if (global_planet_idx >= 0) {
+                            _planet_selected_flag[global_planet_idx] = -1;
+                        }
                     }
                 }
                 active_players_count = 0;
@@ -352,8 +365,8 @@ namespace ADVCIV {
     }
 
     void __cdecl Advanced_Civilization_Colonies_() {
-        random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
-        random::Get_Random_Seed_();
+        game_random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
+        game_random::Get_Random_Seed_();
         allocate::Push_Block_(MOX::_screen_seg);
 
         _adv_civ_player = (s_adv_civ_player*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x8500);

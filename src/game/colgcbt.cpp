@@ -226,7 +226,7 @@ namespace COLGCBT {
         timer::Mark_Time_();
         timer::Release_Time_(16);
 
-        random::Set_Random_Seed_(seed);
+        game_random::Set_Random_Seed_(seed);
 
         do {
             timer::Mark_Time_();
@@ -476,7 +476,7 @@ namespace COLGCBT {
                 _g_attack_ptr->round_hit_unit_type = -1;
                 COLONY::_full_draw = 1;
             } else if (_g_attack_ptr->round_hit_unit_type == unit->type && unit->state != 1 && unit->state != 5) {
-                if (random::Random_(N_Left_Active_To_Process_(unit)) <= 1) {
+                if (game_random::Random_(N_Left_Active_To_Process_(unit)) <= 1) {
                     unit->state = 5;
                     unit->is_hit = 0;
                     unit->anim_frame = 0;
@@ -492,7 +492,7 @@ namespace COLGCBT {
                 _g_defend_ptr->round_hit_unit_type = -1;
                 COLONY::_full_draw = 1;
             } else if (_g_defend_ptr->round_hit_unit_type == unit->type && unit->state != 1 && unit->state != 5) {
-                if (random::Random_(N_Left_Active_To_Process_(unit)) <= 1) {
+                if (game_random::Random_(N_Left_Active_To_Process_(unit)) <= 1) {
                     unit->state = 5;
                     unit->is_hit = 0;
                     unit->anim_frame = 0;
@@ -515,9 +515,9 @@ namespace COLGCBT {
             if (unit->target == nullptr) {
                 unit->target = Pick_Target_(unit->side == 0);
 
-                if (unit->target == nullptr || random::Random_(N_Left_Of_Me_To_Process_(unit)) <= 2) {
+                if (unit->target == nullptr || game_random::Random_(N_Left_Of_Me_To_Process_(unit)) <= 2) {
                     unit->target = nullptr;
-                    if (random::Random_(2) == 1) {
+                    if (game_random::Random_(2) == 1) {
                         unit->state = 4;
                     } else {
                         unit->state = 2;
@@ -686,16 +686,16 @@ namespace COLGCBT {
 
             if (type != -1) {
                 unit->state = 2;
-                unit->x = (int16_t)(base_x[side] + random::Random_(0x32) - 0x14);
+                unit->x = (int16_t)(base_x[side] + game_random::Random_(0x32) - 0x14);
 
-                if (random::Random_(0x55) + 0x168 >= 0x1ae) {
+                if (game_random::Random_(0x55) + 0x168 >= 0x1ae) {
                     unit->y = 0x1ae;
                 } else {
-                    unit->y = (int16_t)(random::Random_(0x55) + 0x168);
+                    unit->y = (int16_t)(game_random::Random_(0x55) + 0x168);
                 }
 
                 unit->side = side;
-                unit->y_offset = (int16_t)random::Random_(3) - 2;
+                unit->y_offset = (int16_t)game_random::Random_(3) - 2;
                 unit->anim_frame = 0;
             } else {
                 unit->x = base_x[side];
@@ -717,8 +717,8 @@ namespace COLGCBT {
                 s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
                 int16_t height = animate::Get_Height_(anim);
 
-                if ((480 - height) > (int32_t)(random::Random_(85) + 360)) {
-                    unit->y = (int16_t)(random::Random_(85) + 360);
+                if ((480 - height) > (int32_t)(game_random::Random_(85) + 360)) {
+                    unit->y = (int16_t)(game_random::Random_(85) + 360);
                 } else {
                     anim = Action_Anim_(unit->side, unit->state, unit->type);
                     height = animate::Get_Height_(anim);
@@ -726,7 +726,7 @@ namespace COLGCBT {
                 }
 
                 unit->side = (int8_t)side;
-                unit->y_offset = (int16_t)random::Random_(3) - 2;
+                unit->y_offset = (int16_t)game_random::Random_(3) - 2;
                 unit->anim_frame = 0;
                 unit->target = nullptr;
             } else {
@@ -847,7 +847,7 @@ namespace COLGCBT {
     }
 
     void __cdecl Draw_Colony_Combat_Screen_() {
-        uint32_t random_seed = random::Get_Random_Seed_();
+        uint32_t random_seed = game_random::Get_Random_Seed_();
         video::Set_Page_Off_();
 
         if (COLONY::_full_draw != 0) {
@@ -892,7 +892,7 @@ namespace COLGCBT {
         FLCQUEUE::Draw_Flic_Queue_();
         video::Clip_Off_();
 
-        random::Set_Random_Seed_(random_seed);
+        game_random::Set_Random_Seed_(random_seed);
 
         for (;;) {
             _g_ctr++;
@@ -1222,16 +1222,16 @@ namespace COLGCBT {
             case 3:
                 if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
                     (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
-                    uint32_t rnd = random::Random_(4);
+                    uint32_t rnd = game_random::Random_(4);
                     if (rnd == 1) {
                         unit->state = 4;
                     } else if (rnd == 2) {
                         unit->state = 3;
-                        unit->x += (int16_t)(random::Random_(3) - 2);
+                        unit->x += (int16_t)(game_random::Random_(3) - 2);
                     } else {
                         unit->state = 4;
                         if (rnd != 3) {
-                            unit->y_offset = (int16_t)(random::Random_(3) - 2);
+                            unit->y_offset = (int16_t)(game_random::Random_(3) - 2);
                         }
                     }
                 } else {
@@ -1248,13 +1248,13 @@ namespace COLGCBT {
 
                 if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
                     (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
-                    if (random::Random_(2) == 1) {
+                    if (game_random::Random_(2) == 1) {
                         unit->state = 3;
                         break;
                     }
                 }
 
-                if (random::Random_(2) == 1) {
+                if (game_random::Random_(2) == 1) {
                     unit->state = 2;
                 } else {
                     unit->state = 4;
@@ -1513,7 +1513,7 @@ namespace COLGCBT {
                         sound::Fadeout_Sound_(unit->sound_handle, 10);
                         unit->sound_handle = 0;
                     }
-                    unit->y_offset = random::Random_(3) - 2;
+                    unit->y_offset = game_random::Random_(3) - 2;
                     return 1;
                 }
 
@@ -1544,7 +1544,7 @@ namespace COLGCBT {
         int16_t bottom = height + unit->y + (unit->y_offset * frame_count) / 5;
 
         while (!Move_Is_Legal_(unit)) {
-            switch (random::Random_(4)) {
+            switch (game_random::Random_(4)) {
                 case 1:
                     unit->y_offset = 0;
                     break;

@@ -1,5 +1,25 @@
 #pragma once
-#include <cstdint>
+#include <stdint.h>
+
+#pragma pack(push, 1)
+// Message 0x2A shares the tail layout of s_net_pack_start_game; the first 6 bytes
+// are repurposed locally while waiting for the host to begin the loaded game.
+struct s_load_net_screen_packet {
+    int16_t begin_state;
+    uint16_t ignored_net_host_id_upper16;
+    int16_t ignored_num_connected_players;
+    int32_t network_ids[MAX_PLAYERS];
+    uint8_t random_events;
+    uint8_t game_difficulty;
+    int8_t number_of_players;
+    uint8_t galaxy_size;
+    uint8_t galaxy_age;
+    uint8_t strategic_combat_flag;
+    uint8_t starting_civilization_level;
+    uint8_t xenons_exist;
+    char version_string[50];
+};
+#pragma pack(pop)
 
 namespace NETSTART {
     uint8_t __cdecl Start_Net_Screen_();
@@ -17,7 +37,7 @@ namespace NETSTART {
 
     extern char s_myname_005597dc[7];
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, const char* game_name, int32_t max_players, const char* str1, const char* str2);
+    int32_t __cdecl Russ_Net_Create_Game_(const char* game_name, int32_t max_players, const char* str1, const char* str2);
 
     bool __cdecl Do_Dial_(char* phone_number);
 

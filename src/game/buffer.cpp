@@ -1,5 +1,9 @@
 #include "pch.h"
 
+#define ORION2RE_BUFFER_FILE_COUNT 50u
+#define ORION2RE_BUFFER_SEGMENT_COUNT 410u
+#define ORION2RE_BUFFER_METADATA_SIZE (sizeof(s_file_buffer_entry) * ORION2RE_BUFFER_FILE_COUNT)
+
 namespace buffer {
   int32_t _global_load_count;
   int16_t _file_buffer_count;
@@ -11,8 +15,8 @@ namespace buffer {
   int8_t __cdecl Flush_Buffer_Space_(void* unused_context) {
     (void)unused_context;
 
-    for (int32_t file_index = 0; file_index < 50; ++file_index) {
-      for (int32_t segment_index = 0; segment_index < 410; ++segment_index) {
+    for (int32_t file_index = 0; file_index < (int32_t)ORION2RE_BUFFER_FILE_COUNT; ++file_index) {
+      for (int32_t segment_index = 0; segment_index < (int32_t)ORION2RE_BUFFER_SEGMENT_COUNT; ++segment_index) {
         _file_buffer[file_index].segments[segment_index].last_use_counter = 0;
       }
     }
@@ -33,8 +37,8 @@ namespace buffer {
     uint32_t allocation_error_size = requested_size;
     uint32_t space_size;
 
-    if ((int32_t)(requested_size - 0x374b8) > 0) {
-      allocation_error_size = requested_size - 0x374c4;
+    if (requested_size > ORION2RE_BUFFER_METADATA_SIZE) {
+      allocation_error_size = requested_size - ORION2RE_BUFFER_METADATA_SIZE;
       space_size = allocation_error_size;
     } else {
       exitm::Exit_With_Message("Not Enough Space For Buffer Space");
@@ -62,14 +66,14 @@ namespace buffer {
     _buffer_space_size = space_size;
     _buffer_space_seg = buffer_space_segment;
 
-    _file_buffer = (s_file_buffer_entry*)allocate::Allocate_Far_Space_(0x374c4);
+    _file_buffer = (s_file_buffer_entry*)allocate::Allocate_Far_Space_(ORION2RE_BUFFER_METADATA_SIZE);
     _file_buffer_count = 0;
 
-    for (int32_t file_index = 0; file_index < 0x32; ++file_index) {
+    for (int32_t file_index = 0; file_index < (int32_t)ORION2RE_BUFFER_FILE_COUNT; ++file_index) {
       s_file_buffer_entry& file_entry = _file_buffer[file_index];
       file_entry.segment_count = 0;
 
-      for (int32_t segment_index = 0; segment_index < 0x19A; ++segment_index) {
+      for (int32_t segment_index = 0; segment_index < (int32_t)ORION2RE_BUFFER_SEGMENT_COUNT; ++segment_index) {
         s_buffer_cached_segment& segment = file_entry.segments[segment_index];
         segment.is_loaded = 0;
         segment.buffer_seg_id = 0;
@@ -121,7 +125,7 @@ namespace buffer {
 
     if (buffer::_file_buffer_count > 0) {
       for (int32_t i = 0; i < (int32_t)buffer::_file_buffer_count; ++i) {
-        if (_strcmpi(file_name, buffer::_file_buffer[i].file_name) == 0) {
+        if (strcasecmp(file_name, buffer::_file_buffer[i].file_name) == 0) {
           found_file = true;
           file_index = i;
           break;
@@ -150,7 +154,7 @@ namespace buffer {
         }
       }
 
-      if (file_entry.segment_count + 1 >= 0x19A) {
+      if (file_entry.segment_count + 1 >= (int32_t)ORION2RE_BUFFER_SEGMENT_COUNT) {
         exitm::Exit_With_Message("max buffer segs went over..");
       }
 
@@ -166,7 +170,7 @@ namespace buffer {
       return file_entry.segments[file_entry.segment_count - 1].data_ptr;
     }
 
-    if ((int32_t)buffer::_file_buffer_count + 1 >= 0x32) {
+    if ((int32_t)buffer::_file_buffer_count + 1 >= (int32_t)ORION2RE_BUFFER_FILE_COUNT) {
       exitm::Exit_With_Message("max file buffer count went over..");
     }
 
@@ -206,7 +210,7 @@ namespace buffer {
 
     reuse_current_file = false;
     if (farload::_farload_file_flag != 0) {
-      if (_strcmpi(file_name, farload::_farload_file_name) == 0) {
+      if (strcasecmp(file_name, farload::_farload_file_name) == 0) {
         reuse_current_file = true;
       } else if (farload::_farload_file_flag != 0) {
         fclose(farload::_farload_fptr);
@@ -215,7 +219,7 @@ namespace buffer {
 
     if (!reuse_current_file) {
       strcpy(farload::_farload_file_name, file_name);
-      farload::_farload_fptr = fopen(file_name, "rb");
+      farload::_farload_fptr = fopen_case(file_name, "rb");
 
       if (farload::_farload_fptr == nullptr) {
         if (farload::_secondary_drive_path[0] == '\0') {
@@ -224,7 +228,7 @@ namespace buffer {
 
         strcpy(secondary_file_name, farload::_secondary_drive_path);
         strcat(secondary_file_name, farload::_farload_file_name);
-        farload::_farload_fptr = fopen(secondary_file_name, "rb");
+        farload::_farload_fptr = fopen_case(secondary_file_name, "rb");
 
         if (farload::_farload_fptr == nullptr) {
           farload::Error_Handler_(file_name, 1, entry_index);

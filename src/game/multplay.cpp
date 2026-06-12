@@ -1921,7 +1921,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
         if (WINNET::_net_refresh_timer < clock() + 5000) {
-            WINNET::Refresh_Game_List_(WINNET::_game_guid);
+            WINNET::Refresh_Game_List_();
             WINNET::_net_refresh_timer = clock();
         }
 
@@ -1985,7 +1985,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
         clock_t now = clock();
         if (now + 5000 /* 5 seconds */ > WINNET::_net_refresh_timer) {
-            WINNET::Refresh_Game_List_(WINNET::_game_guid);
+            WINNET::Refresh_Game_List_();
             WINNET::_net_refresh_timer = clock();
         }
 

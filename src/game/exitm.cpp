@@ -2,18 +2,15 @@
 
 namespace exitm {
     void Exit_With_Message(const char* message) {
-        fields::Clear_Fields_();
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "fatal exit: %s", message != nullptr ? message : "<null>");
 
-        platform::_need_quit = 1;
+        fields::Clear_Fields_();
 
         video::Clear_Display_And_Release_Palette_();
 
-        MessageBoxA(platform::g_main_window, message, "Microprose", MB_OK);
+        Show_Message_Box_(platform::g_main_window, message, "Microprose");
 
         platform::Prepare_Exit_();
-
-        DestroyWindow(platform::g_main_window);
-        exit(1);
     }
 
     void __cdecl Exit_With_message2_(const char* message) {

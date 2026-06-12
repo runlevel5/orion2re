@@ -281,9 +281,7 @@ namespace settler {
         result->can_settle = 1;
     }
 
-    int32_t __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
-        int32_t ret_value = (int32_t)(uintptr_t)dest_colony;
-
+    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
         if (dest_colony != source_colony) {
             s_player* owner_player = &MOX::_player[(int32_t)source_colony->owner];
             const int32_t source_planet_index = (int32_t)source_colony->planet;
@@ -324,10 +322,7 @@ namespace settler {
             const uint32_t last_pop_value = source_colony->pop[last_pop_index];
 
             source_colony->n_pops = last_pop_index;
-            ret_value = (int32_t)last_pop_value;
             *pop_slot = last_pop_value;
         }
-
-        return ret_value;
     }
 }

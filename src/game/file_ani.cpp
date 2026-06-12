@@ -36,7 +36,7 @@ namespace file_ani {
             fclose(_file_animation_fptr);
         }
 
-        _file_animation_fptr = fopen(filename, "rb");
+        _file_animation_fptr = fopen_case(filename, "rb");
         _file_animation_open = 1;
 
         if (_file_animation_fptr == nullptr) {
@@ -53,7 +53,7 @@ namespace file_ani {
             src = filename;
             while ((*dst++ = *src++) != '\0');
 
-            _file_animation_fptr = fopen(full_path, "rb");
+            _file_animation_fptr = fopen_case(full_path, "rb");
             if (_file_animation_fptr == nullptr) {
                 farload::Error_Handler_(full_path, 1, entry_index);
             }
@@ -123,9 +123,7 @@ namespace file_ani {
                     animate::Draw_Glassed_Bitmap_Sprite_(0, 0, _file_animation_buffer);
                     break;
                 case 2:
-                    if (video::_copy_to_on_page_flag != 1) {
-                        animate::Draw_Glassed_Screen_Background_Off_(_file_animation_buffer);
-                    }
+                    animate::Draw_Glassed_Screen_Background_Off_(_file_animation_buffer);
                     if (video::screen_refresh_flag >= 2) {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                     }
@@ -148,9 +146,7 @@ namespace file_ani {
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
                 case 2:
-                    if (video::_copy_to_on_page_flag != 1) {
-                        animate::Draw_Screen_Background_Off_(_file_animation_buffer);
-                    }
+                    animate::Draw_Screen_Background_Off_(_file_animation_buffer);
                     if (video::screen_refresh_flag >= 2) {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                     }
@@ -278,7 +274,7 @@ namespace file_ani {
             fclose(_file_animation[slot]);
         }
 
-        _file_animation[slot] = fopen(filename, "rb");
+        _file_animation[slot] = fopen_case(filename, "rb");
 
         if (_file_animation[slot] == nullptr) {
             if (farload::_secondary_drive_path[0] == '\0') {
@@ -288,7 +284,7 @@ namespace file_ani {
             char full_path[60];
             sprintf(full_path, "%s%s", farload::_secondary_drive_path, filename);
 
-            _file_animation[slot] = fopen(full_path, "rb");
+            _file_animation[slot] = fopen_case(full_path, "rb");
 
             if (_file_animation[slot] == nullptr) {
                 farload::Error_Handler_(full_path, 1, entry_index);
@@ -438,9 +434,7 @@ namespace file_ani {
             draw::Draw_Bitmap_Sprite_(0, 0, sprite);
             break;
         case 2:
-            if (video::_copy_to_on_page_flag != 1) {
-                animate::Draw_Screen_Background_Off_(sprite);
-            }
+            animate::Draw_Screen_Background_Off_(sprite);
             if (video::screen_refresh_flag >= 2) {
                 setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
             }

@@ -202,7 +202,7 @@ namespace SCORE {
     }
 
     void __cdecl Create_Default_HOF_File_() {
-        FILE* file = fopen("HOF.M2", "wb");
+        FILE* file = fopen_case("HOF.M2", "wb");
 
         memset(&_hof, 0, sizeof(s_hof));
 
@@ -214,8 +214,8 @@ namespace SCORE {
         }
 
         for (int i = 0; i < 10; ++i) {
-            int16_t idx1 = (int16_t)random::Random_(11) + 1;
-            int16_t idx2 = (int16_t)random::Random_(11) + 1;
+            int16_t idx1 = (int16_t)game_random::Random_(11) + 1;
+            int16_t idx2 = (int16_t)game_random::Random_(11) + 1;
             if (idx2 != idx1) {
                 int16_t temp = indices[idx1];
                 indices[idx1] = indices[idx2];
@@ -224,8 +224,8 @@ namespace SCORE {
         }
 
         for (int i = 0; i < 8; ++i) {
-            int16_t idx1 = (int16_t)random::Random_(8) + 1;
-            int16_t idx2 = (int16_t)random::Random_(8) + 1;
+            int16_t idx1 = (int16_t)game_random::Random_(8) + 1;
+            int16_t idx2 = (int16_t)game_random::Random_(8) + 1;
             char temp_name[20];
             strcpy(temp_name, _default_names[idx1]);
             strcpy(_default_names[idx1], _default_names[idx2]);
@@ -236,8 +236,8 @@ namespace SCORE {
         int16_t rand_range = 10;
 
         for (int i = 0; i < 10; ++i) {
-            int16_t r1 = (int16_t)random::Random_(rand_range + 1);
-            int16_t r2 = (int16_t)random::Random_(5);
+            int16_t r1 = (int16_t)game_random::Random_(rand_range + 1);
+            int16_t r2 = (int16_t)game_random::Random_(5);
 
             _hof.scores[i] = score_base + (r2 * 10) + ((r1 - 1) * 15);
             _hof.difficulties[i] = (int8_t)(i % 5);
@@ -264,7 +264,7 @@ namespace SCORE {
         FILE* file;
         int16_t sort_buffer[10][2];
 
-        file = fopen("HOF.M2", "rb");
+        file = fopen_case("HOF.M2", "rb");
         if (file == nullptr) {
             return 0;
         }
@@ -609,7 +609,7 @@ namespace SCORE {
     void __cdecl Write_HOF_File_() {
         FILE* file;
 
-        file = fopen("HOF.M2", "wb");
+        file = fopen_case("HOF.M2", "wb");
         if (file != nullptr) {
             fwrite(&_hof, sizeof(s_hof), 1, file);
             fclose(file);
@@ -1029,9 +1029,9 @@ namespace SCORE {
      */
     void __cdecl Init_Hi_Score_(int16_t player_idx) {
         Get_Total_Population_(player_idx);
-        uint32_t saved_seed = random::Get_Random_Seed_();
+        uint32_t saved_seed = game_random::Get_Random_Seed_();
         Set_Hi_Score_Pop_Icon_Ids_(player_idx);
-        random::Set_Random_Seed_(saved_seed);
+        game_random::Set_Random_Seed_(saved_seed);
     }
 
     /**
@@ -1194,8 +1194,8 @@ namespace SCORE {
 
         if (population_limit > 0) {
             for (int16_t i = population_limit; i > 0; --i) {
-                int16_t idx1 = (int16_t)random::Random_(population_limit) - 1;
-                int16_t idx2 = (int16_t)random::Random_(population_limit) - 1;
+                int16_t idx1 = (int16_t)game_random::Random_(population_limit) - 1;
+                int16_t idx2 = (int16_t)game_random::Random_(population_limit) - 1;
 
                 s_hiscore_tmp_pop swap_tmp = temp_buffer[idx1];
                 temp_buffer[idx1] = temp_buffer[idx2];
@@ -1243,7 +1243,7 @@ namespace SCORE {
         int16_t colonies;
 
         captured_count = 0;
-        original_seed = random::Get_Random_Seed_();
+        original_seed = game_random::Get_Random_Seed_();
         memset(weights, 0, sizeof(weights));
 
         for (int16_t i = 0; i < MAX_PLAYERS; ++i) {
@@ -1276,7 +1276,7 @@ namespace SCORE {
         qsort(SCORE::_hi->captured_pop_race_ids, 16, sizeof(SCORE::_hi->captured_pop_race_ids[0]), SCORE::ascending_qsort_uchar_);
 
         SCORE::_hi->raw_captured_population = captured_count;
-        random::Set_Random_Seed_(original_seed);
+        game_random::Set_Random_Seed_(original_seed);
     }
 
     int8_t __cdecl Won_Council_Vote_(int16_t player_idx) {

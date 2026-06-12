@@ -3,38 +3,62 @@
 namespace palstore {
     void __cdecl Store_Palette_Block_(int32_t first_entry, int32_t entry_count) {
         if (first_entry < first_entry + entry_count) {
+            if (video::g_palette_mutex != nullptr) {
+                SDL_LockMutex(video::g_palette_mutex);
+            }
+
             int32_t palette_index = first_entry;
             int32_t remaining = entry_count;
 
             do {
-                video::g_palette_entries[palette_index].peRed = video::_current_palette[palette_index].r << 2;
-                video::g_palette_entries[palette_index].peGreen = video::_current_palette[palette_index].g << 2;
-                video::g_palette_entries[palette_index].peBlue = video::_current_palette[palette_index].b << 2;
+                video::g_palette_entries[palette_index].r = video::_current_palette[palette_index].r << 2;
+                video::g_palette_entries[palette_index].g = video::_current_palette[palette_index].g << 2;
+                video::g_palette_entries[palette_index].b = video::_current_palette[palette_index].b << 2;
                 ++palette_index;
             } while (--remaining != 0);
-        }
 
-        video::g_palette->SetEntries(0, first_entry, entry_count, &video::g_palette_entries[first_entry]);
+            if (video::g_palette_mutex != nullptr) {
+                SDL_UnlockMutex(video::g_palette_mutex);
+            }
+        }
     }
 
     void __cdecl Darken_Palette_(int32_t darken_percent) {
-        tagPALETTEENTRY entries[256];
+        video::s_palette_color entries[256];
         int32_t multiplier = 100 - darken_percent;
 
         for (int32_t i = 1; i < 256; ++i) {
-            entries[i].peRed   = (uint8_t)(((video::_current_palette[i].r * multiplier) / 100) << 2);
-            entries[i].peGreen = (uint8_t)(((video::_current_palette[i].g * multiplier) / 100) << 2);
-            entries[i].peBlue  = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
+            entries[i].r = (uint8_t)(((video::_current_palette[i].r * multiplier) / 100) << 2);
+            entries[i].g = (uint8_t)(((video::_current_palette[i].g * multiplier) / 100) << 2);
+            entries[i].b = (uint8_t)(((video::_current_palette[i].b * multiplier) / 100) << 2);
         }
 
-        video::g_palette->SetEntries(0, 1, 255, &entries[1]);
+        if (video::g_palette_mutex != nullptr) {
+            SDL_LockMutex(video::g_palette_mutex);
+        }
+
+        for (int32_t i = 1; i < 256; ++i) {
+            video::g_palette_entries[i] = entries[i];
+        }
+
+        if (video::g_palette_mutex != nullptr) {
+            SDL_UnlockMutex(video::g_palette_mutex);
+        }
     }
 
     void __cdecl Store_Single_Palette_Color_(int32_t palette_index, uint8_t red, uint8_t green, uint8_t blue) {
-        video::g_palette_entries[palette_index].peRed = red << 2;
-        video::g_palette_entries[palette_index].peGreen = green << 2;
-        video::g_palette_entries[palette_index].peBlue = blue * 4;
-        video::g_palette->SetEntries(0, palette_index, 1, &video::g_palette_entries[palette_index]);
+        if (video::g_palette_mutex != nullptr) {
+            SDL_LockMutex(video::g_palette_mutex);
+        }
+
+        video::g_palette_entries[palette_index].r = red << 2;
+        video::g_palette_entries[palette_index].g = green << 2;
+        video::g_palette_entries[palette_index].b = blue * 4;
+
+        if (video::g_palette_mutex != nullptr) {
+            SDL_UnlockMutex(video::g_palette_mutex);
+        }
+
         video::_current_palette[palette_index].r = red;
         video::_current_palette[palette_index].g = green;
         video::_current_palette[palette_index].b = blue;
@@ -60,6 +84,7 @@ namespace palstore {
             }
 
             Darken_Palette_((int32_t)intensity);
+            video::Submit_Palette_();
             RUSS::Mox_Update_();
 
             if (intensity-- == 0) {

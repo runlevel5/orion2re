@@ -10,7 +10,7 @@ namespace TRADE {
             int16_t remainder = goal % 5;
 
             if (remainder != 0) {
-                if ((int16_t)random::Random_(5) <= remainder) {
+                if ((int16_t)game_random::Random_(5) <= remainder) {
                     increment = 1;
                 }
             }
@@ -39,7 +39,7 @@ namespace TRADE {
             int16_t remainder = goal % 5;
 
             if (remainder != 0) {
-                if ((int16_t)random::Random_(5) <= remainder) {
+                if ((int16_t)game_random::Random_(5) <= remainder) {
                     increment = 1;
                 }
             }

@@ -94,12 +94,12 @@ namespace HOMEGEN {
                 s_star_data* target_star = &MOX::_star[target_star_idx];
                 target_star->spectral_class = 4; // M-class (Red)
 
-                int32_t r_size = random::Random_(10) - 1;
+                int32_t r_size = game_random::Random_(10) - 1;
                 if (r_size < 3) target_star->size = 0;
                 else if (r_size < 7) target_star->size = 1;
                 else target_star->size = 2;
 
-                target_star->pict_type = (char)(random::Random_(3) - 1);
+                target_star->pict_type = (char)(game_random::Random_(3) - 1);
 
                 for (int j = 0; j < 5; ++j) {
                     target_star->planet_index[j] = -1;
@@ -247,7 +247,7 @@ namespace HOMEGEN {
         for (uint16_t si = 0; si < MAX_STARS; ++si) {
             RUSS::Mox_Update_();
             if (candidates[si].count >= MOX::_NUM_PLAYERS) {
-                if (random::Random_(pick_count) == 1) {
+                if (game_random::Random_(pick_count) == 1) {
                     selected_index = (int16_t)si;
                     pick_count++;
                 }
@@ -257,8 +257,8 @@ namespace HOMEGEN {
         if (selected_index >= 0) {
             CandidateList* sel_list = &candidates[selected_index];
             for (int i = 0; i < 4; ++i) {
-                int idx1 = random::Random_(sel_list->count) - 1;
-                int idx2 = random::Random_(sel_list->count) - 1;
+                int idx1 = game_random::Random_(sel_list->count) - 1;
+                int idx2 = game_random::Random_(sel_list->count) - 1;
                 int16_t tmp = sel_list->stars[idx1];
                 sel_list->stars[idx1] = sel_list->stars[idx2];
                 sel_list->stars[idx2] = tmp;
@@ -287,8 +287,8 @@ namespace HOMEGEN {
 
     void __cdecl Randomize_Home_Worlds_(int16_t* home_star_ids) {
         for (int32_t i = 0; i < 100; ++i) {
-            int16_t idx1 = (uint16_t)random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
-            int16_t idx2 = (uint16_t)random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
+            int16_t idx1 = (uint16_t)game_random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
+            int16_t idx2 = (uint16_t)game_random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
 
             if (idx1 != idx2) {
                 int16_t temp = home_star_ids[idx1];
@@ -567,7 +567,7 @@ namespace HOMEGEN {
         s_star_data& star = MOX::_star[star_idx];
 
         if (is_food_planet != 0 && star.spectral_class >= 5) {
-            star.spectral_class = (int8_t)(random::Random_(5) - 1);
+            star.spectral_class = (int8_t)(game_random::Random_(5) - 1);
         }
 
         MAPGEN::_make_food_planet = (uint8_t)is_food_planet;
@@ -617,7 +617,7 @@ namespace HOMEGEN {
         for (int i = 0; i <= 100; ++i) {
             if (found) break;
 
-            int r = random::Random_(5);
+            int r = game_random::Random_(5);
             int16_t orbit_candidate = (int16_t)(r - 1);
 
             if (orbit_candidate < 0 || orbit_candidate > 4) continue;
@@ -649,7 +649,7 @@ namespace HOMEGEN {
 
         // Final fallback: just pick a random orbit if search failed
         if (result_orbit == -1) {
-            result_orbit = (int16_t)(random::Random_(5) - 1);
+            result_orbit = (int16_t)(game_random::Random_(5) - 1);
         }
 
         return result_orbit;
@@ -982,13 +982,13 @@ namespace HOMEGEN {
 
             if (possible_with_spectral) {
                 // Pick a random planet from the candidates and force the climate/group
-                int16_t chosen_candidate = random::Random_(candidate_count) - 1;
+                int16_t chosen_candidate = game_random::Random_(candidate_count) - 1;
                 int16_t p_idx = candidates[chosen_candidate].planet_idx;
                 *out_planet_idx = p_idx;
 
                 MOX::_planet[p_idx].climate = (int8_t)climate_id;
 
-                int16_t chosen_group_idx = random::Random_(valid_group_count) - 1;
+                int16_t chosen_group_idx = game_random::Random_(valid_group_count) - 1;
                 MOX::_planet[p_idx].group = (int8_t)valid_groups[chosen_group_idx];
 
                 MOX::_planet[p_idx].food_per_farmer = MAPGEN::Generate_Food_Per_Farmer_(star_idx, p_idx);
@@ -1132,7 +1132,7 @@ namespace HOMEGEN {
                         food_star = nearest_empty_star;
                         MOX::_planet_count++;
                     } else if (nearest_star_in_range != -1) {
-                        int32_t rnd = random::Random_(buffer_count);
+                        int32_t rnd = game_random::Random_(buffer_count);
                         int16_t target_p_idx = planet_buffer[rnd - 1];
                         int8_t original_special = MOX::_planet[target_p_idx].planet_special;
                         int16_t star_of_planet = MOX::_planet[target_p_idx].star_index;
@@ -1229,14 +1229,14 @@ namespace HOMEGEN {
         if (valid_count < 2) {
             bool found = false;
             do {
-                int r = random::Random_((int)MOX::_NUM_STARS);
+                int r = game_random::Random_((int)MOX::_NUM_STARS);
                 selected_star = (int16_t)(r - 1);
                 if (HAROLD::Is_Home_Star_(selected_star) == 0 && Is_Added_Food_World_(selected_star) == 0) {
                     found = true;
                 }
             } while (!found);
         } else {
-            int r = random::Random_(valid_count);
+            int r = game_random::Random_(valid_count);
             selected_star = candidates[r - 1].star_idx;
         }
 
@@ -1289,14 +1289,14 @@ namespace HOMEGEN {
             int16_t p_idx = MOX::_star[0].planet_index[i];
             planet_indices_backup[i] = p_idx;
             if (p_idx > -1 && i > 2) {
-                if (random::Random_(i - 1) == 1) {
+                if (game_random::Random_(i - 1) == 1) {
                     selected_orbit = i;
                 }
             }
         }
 
         if (selected_orbit < 2) {
-            selected_orbit = (int16_t)random::Random_(3) + 1;
+            selected_orbit = (int16_t)game_random::Random_(3) + 1;
         }
 
         int16_t target_planet_idx = MOX::_star[0].planet_index[selected_orbit];
@@ -1316,7 +1316,7 @@ namespace HOMEGEN {
         memcpy(MOX::_star[0].name, "Orion", sizeof("Orion"));
 
         if (MOX::_star[0].spectral_class == STAR_CLASS_BLACK_HOLE) {
-            MOX::_star[0].spectral_class = (int8_t)random::Random_(6) - 1;
+            MOX::_star[0].spectral_class = (int8_t)game_random::Random_(6) - 1;
         }
 
         s_star_data star_temp;

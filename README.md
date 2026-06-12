@@ -16,6 +16,40 @@ This repository does not include the original game data. To play, you must own a
 
 The current CMake setup only supports 32-bit MSVC Windows builds.
 
+## SDL3 submodule
+
+The project requires the SDL3 submodule at `vendors/SDL`.
+
+Clone the repository with submodules:
+
+```sh
+git clone --recurse-submodules <repo-url>
+```
+
+If you already cloned the repository without submodules, initialize it with:
+
+```sh
+git submodule update --init --recursive vendors/SDL
+```
+
+Bootstrap dependencies and verify required tools first:
+
+Unix-like shells:
+
+```sh
+tools/bootstrap_deps.sh
+```
+
+Windows `cmd.exe`:
+
+```bat
+tools\bootstrap_deps.bat
+```
+
+The bootstrap scripts verify that `git`, `cmake`, and `ninja` are available, then initialize the SDL3 submodule and verify that it is pinned correctly.
+
+The repository is expected to be pinned to SDL commit `8e37db5e797b6167f3a00d697d816a684bd259c7` (`release-3.4.10`).
+
 ## Build
 
 Configure a preset:

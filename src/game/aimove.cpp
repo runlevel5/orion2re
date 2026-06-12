@@ -228,7 +228,7 @@ namespace AIMOVE {
 
                     if (status == 0) {
                         if ((MOX::_ship[i].mission == 0 || MOX::_ship[i].mission == 3) &&
-                            MOX::_ship[i].d.ship_type == 0) {
+                            MOX::_ship[i].d.ship_type == SHIP_TYPE_COMBAT) {
                             ship_indices[num_ships_selected] = (int16_t)i;
                             num_ships_selected++;
                         }
@@ -362,8 +362,8 @@ namespace AIMOVE {
         while (planet < end) {
 
             // Only consider uncolonized planets. 
-            // planet_type == 3 is a standard colonizable planet (excluding gas giants, asteroids).
-            if (planet->colony_index == -1 && planet->planet_type == 3) {
+            // PLANET_TYPE_PLANET is a standard colonizable planet (excluding gas giants, asteroids).
+            if (planet->colony_index == -1 && planet->planet_type == PLANET_TYPE_PLANET) {
                 // Each byte in the array represents a star, with bits corresponding to players
                 // who have that star within their extended travel range.
                 int32_t star_idx = (int32_t)planet->star_index;
@@ -660,7 +660,7 @@ namespace AIMOVE {
 
         while (ship < ship_end) {
             // Only consider ships owned by the player that are combat ships (type 0)
-            if ((int16_t)ship->owner == player_idx && ship->d.ship_type == 0) {
+            if ((int16_t)ship->owner == player_idx && ship->d.ship_type == SHIP_TYPE_COMBAT) {
                 int star_idx = -1;
 
                 // Determine the current or destination star index based on ship status.
@@ -700,7 +700,7 @@ namespace AIMOVE {
 
     void __cdecl Move_To_Stage_Points_() {
         uint8_t local_5d7;
-        if (EVENTS::Event_Check_Warp_Beast_() != 0 && _p_ai->traits[26] == 0) {
+        if (EVENTS::Event_Check_Warp_Beast_() != 0 && _p_ai->traits[TRAIT_LUCKY] == 0) {
             local_5d7 = 1;
         } else {
             local_5d7 = 0;
@@ -737,7 +737,7 @@ namespace AIMOVE {
             s_ship_data* ship = &MOX::_ship[ship_idx];
             if (ship->owner == _i_ai &&
                 ship->status <= 2 &&
-                ship->d.ship_type == 0) {
+                ship->d.ship_type == SHIP_TYPE_COMBAT) {
 
                 if (ship->mission != 1 && ship->mission != 2 &&
                     ship->mission != 4 && ship->mission != 5 &&
@@ -959,7 +959,7 @@ namespace AIMOVE {
 
                         if (new_ship_idx != -1) {
                             s_MSG msg = {};
-                            msg.msg_type = 18; // MSG_TYPE_EEL_SPAWNED
+                            msg.msg_type = MSG_TYPE_EEL_SPAWNED;
                             msg.u.eel.star_idx = (uint8_t)ship->location;
                             MSG_::Add_Msg_All_(msg);
 
@@ -976,7 +976,7 @@ namespace AIMOVE {
 
                 if (dest == -1) {
                     s_MSG msg = {};
-                    msg.msg_type = 19; // MSG_TYPE_EEL_VANISHED
+                    msg.msg_type = MSG_TYPE_EEL_VANISHED;
                     msg.u.eel.star_idx = (uint8_t)ship->location;
                     MSG_::Add_Msg_All_(msg);
 
@@ -1145,7 +1145,7 @@ namespace AIMOVE {
             if (ship->owner == ai_idx && ship->status < 3) {
                 uint8_t ship_type = ship->d.ship_type;
 
-                if (ship_type == 0) {
+                if (ship_type == SHIP_TYPE_COMBAT) {
                     if (ship->mission == 1) {
                         if (ship->location < MAX_STARS) {
                             dest_turns_colony[ship->location] = 1;
@@ -1173,7 +1173,7 @@ namespace AIMOVE {
                             }
                         }
                     }
-                } else if (ship_type == 2) {
+                } else if (ship_type == SHIP_TYPE_TRANSPORT) {
                     int16_t loc = ship->location;
                     if (loc < MAX_STARS) {
                         RUSS::Mox_Update_();
@@ -1392,7 +1392,7 @@ namespace AIMOVE {
 
         for (int i = 0; i < MOX::_NUM_SHIPS; i++) {
             s_ship_data* ship = &MOX::_ship[i];
-            if (ship->d.ship_type == 1 /* SHIP_TYPE_COLONY */) {
+            if (ship->d.ship_type == SHIP_TYPE_COLONY) {
                 if (ship->owner == AIMOVE::_i_ai) {
                     if (SHIPMOVE::Can_Order_Ship_(ship)) {
                         my_colony_ships[num_my_colony_ships++] = i;
@@ -1691,7 +1691,7 @@ namespace AIMOVE {
         }
     }
 
-    void AIMOVE::Intercept_Invaders_()
+    void Intercept_Invaders_()
     {
         int i = 0;
         s_aimove_intercept_entry intercepts[MAX_STARS];
@@ -2139,7 +2139,7 @@ namespace AIMOVE {
             }
             if (npc_dest[i].dist != 0 && npc_dest[i].dist < 15) {
                 valid_count++;
-                if (random::Random_(valid_count) == 1) {
+                if (game_random::Random_(valid_count) == 1) {
                     dest_star_idx = npc_dest[i].star_idx;
                 }
             }
@@ -2285,7 +2285,7 @@ namespace AIMOVE {
             int16_t prod_id = colony->producing[i];
             if (prod_id < -99) {
                 int16_t ship_design_idx = -100 - prod_id;
-                if (MOX::_ship[ship_design_idx].d.ship_type == 0) {
+                if (MOX::_ship[ship_design_idx].d.ship_type == SHIP_TYPE_COMBAT) {
                     int32_t cost = MOX::_ship[ship_design_idx].d.cost;
                     if (cost > spent) {
                         int32_t buy_cost = COLCALC::Colony_Cost_To_Buy_Given_Product_(colony, prod_id, spent);

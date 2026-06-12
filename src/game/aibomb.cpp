@@ -9,11 +9,11 @@ bool __cdecl AI_Invasion_Will_Succeed_(int8_t attacker_id, int16_t* ship_list, i
     invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &invader, &defender);
 
     if (COMBFIND::_current_star_has_player[attacker_id].transport_count > 0) {
-        invader.current_troop_type_idx = 1;
-        invader.unit_counts[1] += COMBFIND::_current_star_has_player[attacker_id].transport_count * 4 - 2;
+        invader.current_troop_type_idx = UNIT_MARINES;
+        invader.unit_counts[UNIT_MARINES] += COMBFIND::_current_star_has_player[attacker_id].transport_count * 4 - 2;
     }
 
-    if (invader.unit_counts[1] > 0) {
+    if (invader.unit_counts[UNIT_MARINES] > 0) {
         s_invasion_side_info backup_invader = invader;
         s_invasion_side_info backup_defender = defender;
 
@@ -29,7 +29,7 @@ bool __cdecl AI_Invasion_Will_Succeed_(int8_t attacker_id, int16_t* ship_list, i
 
             invasion::Resolve_Ground_Combat_(&invader, &defender);
 
-            if ((uint8_t)invader.current_troop_type_idx < 4) {
+            if ((uint8_t)invader.current_troop_type_idx < UNIT_COUNT) {
                 invader_wins++;
             }
 

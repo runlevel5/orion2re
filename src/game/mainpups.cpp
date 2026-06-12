@@ -1218,7 +1218,7 @@ namespace MAINPUPS {
             MAINPUPS::Setup_To_Apply_Bomb_Hits_(MAINPUPS::_g_data_ptr->bomb, &bomb_hit_val1, &bomb_hit_val2);
         }
 
-        random::Set_Random_Seed_(MAINPUPS::_g_data_ptr->random_seed);
+        game_random::Set_Random_Seed_(MAINPUPS::_g_data_ptr->random_seed);
         MAINPUPS::_g_state = popup_mode;
 
         while (true) {
@@ -1246,7 +1246,7 @@ namespace MAINPUPS {
                             MAINPUPS::_g_data_ptr,
                             MAINPUPS::_g_data_ptr->attacker,
                             MAINPUPS::_g_data_ptr->defender,
-                            random::Get_Random_Seed_(),
+                            game_random::Get_Random_Seed_(),
                             MAINPUPS::_g_data_ptr->colony_idx,
                             MAINPUPS::_g_data_ptr->bombardment_result,
                             MAINPUPS::_g_data_ptr->has_stellar_converter
@@ -1447,11 +1447,11 @@ namespace MAINPUPS {
 
                             int anim3_h = animate::Get_Height_(_anims[3]);
                             int base_y = (anim3_h + _g_y * 2 - 30) / 2;
-                            int rand_y = base_y + random::Random_(abs_diff * 2) - abs_diff;
+                            int rand_y = base_y + game_random::Random_(abs_diff * 2) - abs_diff;
 
                             int anim3_w = animate::Get_Width_(_anims[3]);
                             int base_x = (anim3_w + _g_x * 2 - 30) / 2;
-                            int rand_x = base_x + random::Random_(abs_diff * 2) - abs_diff;
+                            int rand_x = base_x + game_random::Random_(abs_diff * 2) - abs_diff;
 
                             FLCQUEUE::Add_Flic_To_End_Of_Queue_(rand_x, rand_y, _anims[25], 1, 0);
                             ERICNET::Mox_Play_Sound_(24 /* 0x18 */);
@@ -1464,11 +1464,11 @@ namespace MAINPUPS {
 
                     int anim3_h = animate::Get_Height_(_anims[3]);
                     int base_y = (anim3_h + _g_y * 2 - 30) / 2;
-                    int rand_y = base_y + random::Random_(40) - 20;
+                    int rand_y = base_y + game_random::Random_(40) - 20;
 
                     int anim3_w = animate::Get_Width_(_anims[3]);
                     int base_x = (anim3_w + _g_x * 2 - 30) / 2;
-                    int rand_x = base_x + random::Random_(40) - 20;
+                    int rand_x = base_x + game_random::Random_(40) - 20;
 
                     FLCQUEUE::Add_Flic_To_End_Of_Queue_(rand_x, rand_y, _anims[26], 1, 0);
                     ERICNET::Mox_Play_Sound_(32 /* 0x20 */);

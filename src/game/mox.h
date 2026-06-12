@@ -65,13 +65,13 @@ namespace MOX {
     extern int16_t _wait_button;
     extern int16_t _scan_button;
     extern int16_t _missile_field[300];
-    extern int16_t _combat_grid[81][68];
+    extern int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
     extern int16_t _weapon_mod_field_status[15];
     extern int16_t _weapon_button[8];
     extern int16_t _ship_turn_order[210];
     extern int16_t _repl_fields[10];
     extern int16_t _side_end_of_turn[15];
-    extern int16_t DAT_0059730e;
+    extern int16_t _unused_ship_turn_order_marker;
     extern int16_t _design_choice_items[40];
     extern int16_t _weapon_mod_fields[15];
     extern int16_t _weapon_arc_field[5];
@@ -465,7 +465,7 @@ namespace MOX {
 
     // Suggested name: MOX::_star_seg
     extern s_animation_header* _star_seg[40];
-    extern s_animation_header* _sun_seg[6];
+    extern s_animation_header* _sun_seg[7];
 
     extern uint16_t _n_stats_to_generate;
 
@@ -581,7 +581,7 @@ namespace MOX {
     extern int16_t _combat_defender_player;
     extern s_combat_bomb_result _combat_bomb_result;
 
-    extern s_global_combat_data _global_combat_data;
+    extern s_combat_data _global_combat_data;
 
     extern int16_t* _officers_original_star_id;
 
@@ -745,8 +745,8 @@ namespace MOX {
     // Suggested name: MOX::_gate_icon_seg
     extern s_animation_header* _gate_icon_seg[16];
 
-    // Suggested name: MOX::DAT_0059bd1e
-    extern int16_t DAT_0059bd1e;
+    // Cached movable-box id preserved while reordering the z-order list.
+    extern int16_t _moveable_box_reorder_fallback;
 
     // Suggested name: MOX::moveable_box_display_order
     extern int16_t _moveable_box_order[5];

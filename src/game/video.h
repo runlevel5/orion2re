@@ -1,22 +1,29 @@
 #pragma once
 
-extern uint8_t DAT_00578820;
-extern uint32_t DAT_00578dc8;
-extern uint32_t DAT_00578dcc;
-
-struct IDirectDrawPalette;
-struct tagPALETTEENTRY;
-struct IDirectDrawSurface;
-
 namespace video {
+	struct s_palette_color {
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+		uint8_t flags;
+	};
+
+	struct s_page_buffer {
+		uint8_t* pixels;
+		int32_t width;
+		int32_t height;
+	};
+
 	// Variables
 	extern int32_t g_screen_res_x;
 
 	extern int32_t g_screen_res_y;
 
-	extern IDirectDrawSurface* g_offscreen_surface_1;
+	extern s_page_buffer g_page_off;
 
-	extern IDirectDrawSurface* g_offscreen_surface_2;
+	extern s_page_buffer g_page_back;
+
+	extern s_page_buffer g_page_published;
 
 	extern uint8_t* _video_memory;
 
@@ -26,8 +33,6 @@ namespace video {
 
 	extern uint8_t* _current_video_page;
 
-	extern uint32_t screen_dump_flag;
-
 	struct s_scan_list_entry {
 		int16_t min_x;
 		int16_t max_x;
@@ -36,8 +41,6 @@ namespace video {
 	extern int32_t screen_refresh_flag;
 
 	extern int16_t _old_screen_dump_flag;
-
-	extern int16_t _old_screen_refresh_flag;
 
 	extern s_scan_list_entry* _refresh_scan_list;
 
@@ -51,9 +54,8 @@ namespace video {
 
 	extern s_glass_color _glass_colors[16];
 
-	extern IDirectDrawPalette* g_palette;
-
-	extern tagPALETTEENTRY g_palette_entries[256];
+	extern s_palette_color g_palette_entries[256];
+	extern s_palette_color g_submitted_palette_entries[256];
 
 	extern s_palette_entry _current_palette[256];
 
@@ -63,21 +65,43 @@ namespace video {
 
 	extern uint16_t _is_initializing;
 	extern s_mouse_list _default_mouse_list;
-	extern uint8_t DAT_00578b58;
-
-	extern int16_t _copy_to_on_page_flag;
+	extern uint8_t _video_driver_state_marker;
 
 	extern int16_t _screen_window_y1;
 	extern int16_t _screen_window_y2;
 	extern int16_t _screen_window_x1;
 	extern int16_t _screen_window_x2;
 
+	extern SDL_Mutex* g_off_page_mutex;
+	extern SDL_Condition* g_off_page_condition;
+	extern SDL_Mutex* g_palette_mutex;
+	extern uint8_t g_off_page_state;
+	extern uint32_t g_off_page_generation;
+	extern uint32_t g_last_presented_generation;
+
+	enum {
+		OFF_PAGE_WRITABLE = 0,
+		OFF_PAGE_PUBLISHED = 1,
+		OFF_PAGE_PRESENTING = 2,
+	};
+
+	void __cdecl Allocate_Page_Buffers_(int32_t width, int32_t height);
+	void __cdecl Free_Page_Buffers_();
+	uint8_t* __cdecl Get_Page_Pixels_(int32_t page_index);
+	uint8_t* __cdecl Get_Selected_Page_Pixels_();
+	void __cdecl Init_Off_Page_Ownership_();
+	void __cdecl Shutdown_Off_Page_Ownership_();
+	void __cdecl Publish_Off_Page_();
+	void __cdecl Submit_Palette_();
+	bool __cdecl Try_Begin_Off_Page_Present_();
+	void __cdecl End_Off_Page_Present_();
+
 	// Functions
 	// Switches refresh handling to stencil mode for the next page update.
 	void __cdecl Set_Refresh_Stencil_();
 	// Switches refresh handling to a full-screen redraw mode.
 	void __cdecl Set_Refresh_Full_();
-	// Selects the off-screen render page and clears the copy-to-on-page flag.
+	// Selects the off-screen render page.
 	void __cdecl Set_Page_Off_();
 	// Disables clipping in the animation subsystem.
 	void __cdecl Clip_Off_();
@@ -87,7 +111,7 @@ namespace video {
 	// Blits the primary off-screen surface into the back surface.
 	void __cdecl Copy_Off_To_Back_();
 
-    // Selects the back render page and clears the copy-to-on-page flag.
+    // Selects the back render page.
     void __cdecl Set_Page_Back_();
 
     // Blits the back surface into the primary off-screen surface.
@@ -111,12 +135,6 @@ namespace video {
 	// Initializes video-driver state, cursor surfaces, and default mouse bounds.
 	void __cdecl Init_Video_Drivers_();
 
-    // Performs the masked screen-dump path used when screen_dump_flag is 1.
-    void __cdecl _Masked_Screen_Dump();
-
-    // Copies only the scan-listed regions from the alternate off-screen surface.
-    void __cdecl _Partial_Screen_Dump();
-
     // Copies scan-listed background regions into the alternate off-screen surface.
     void __cdecl Stencil_Out_Background_();
 
@@ -128,13 +146,13 @@ namespace video {
     // Presents the pending frame and updates refresh bookkeeping.
     void __cdecl Toggle_Pages_();
 
-    // Saves the current refresh and dump flags into the legacy backup globals.
+    // Saves the current refresh flag into the legacy backup global.
     void __cdecl Save_Refresh_();
 
-    // Enables differential refresh while forcing the partial dump path.
+    // Enables differential refresh mode for legacy partial-update flows.
     void __cdecl Set_Refresh_Differential_No_Full_();
 
-	// Restores the previously saved refresh and dump flags.
+	// Restores the previously saved refresh flag.
 	void __cdecl Restore_Refresh_();
 
     // Clears the display state and releases the active DirectDraw palette.

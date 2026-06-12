@@ -106,8 +106,6 @@ namespace palette {
                 ++run;
             }
 
-            platform::g_direct_draw->WaitForVerticalBlank(1, nullptr);
-            
             palstore::Store_Palette_Block_(i, count);
             
             i += count;

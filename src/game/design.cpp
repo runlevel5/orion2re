@@ -95,7 +95,7 @@ namespace DESIGN {
         d->num_special_slots = special_idx;
 
         d->base_combat_speed = Current_Design_Combat_Speed_(d);
-        d->date_of_design = 140;
+        d->special_system_scroll_thumb_y = 140;
 
         Update_Calculated_Design_Data_(player_idx);
     }
@@ -1376,7 +1376,7 @@ namespace DESIGN {
         if (player_idx > -1 && player_idx < MOX::_NUM_PLAYERS) {
             if (tech_idx < 0 || tech_idx >= 212 /* 0xd4 */) {
                 RUSS::PFMT_(0, 2, "Bad required_tech in Tech_Level()... %d", (int32_t)tech_idx);
-                assert::hgetch_();
+                key::Wait_For_Key_();
             }
 
             if (tech_idx != 0 && MOX::_player[player_idx].tech_applications[tech_idx] != 1) {

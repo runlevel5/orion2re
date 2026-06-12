@@ -700,7 +700,7 @@ namespace LOADSAVE {
                 date_str[j] = 0;
             }
 
-            if (_access(filename, 0) == 0) {
+            if (File_Exists_(filename)) {
                 Get_File_Date_String_(filename, date_str);
             }
 
@@ -713,7 +713,7 @@ namespace LOADSAVE {
 
     int32_t __cdecl Check_Magic_Number_(const char* filename) {
         int32_t magic_number = 0;
-        FILE* file_ptr = fopen(filename, "rb");
+        FILE* file_ptr = fopen_case(filename, "rb");
 
         if (file_ptr != nullptr) {
             if (fseek(file_ptr, 0x29, SEEK_SET) == 0) {
@@ -769,7 +769,7 @@ namespace LOADSAVE {
      */
     bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
         bool is_valid = false;
-        FILE* file = fopen(filename, "rb");
+        FILE* file = fopen_case(filename, "rb");
 
         if (file != nullptr) {
             uint32_t game_type_header;
@@ -1039,7 +1039,7 @@ namespace LOADSAVE {
         uint8_t file_buffer[sizeof(MOX::_settings)];
         bool success = false;
 
-        FILE* file = fopen("MOX.SET", "rb");
+        FILE* file = fopen_case("MOX.SET", "rb");
         if (file != nullptr) {
             fread(file_buffer, sizeof(file_buffer), 1, file);
             fclose(file);
@@ -1054,7 +1054,7 @@ namespace LOADSAVE {
             success = true;
             RUSS::Assert_Settings_();
 
-            file = fopen("MOX.SET", "wb");
+            file = fopen_case("MOX.SET", "wb");
             if (file != nullptr) {
                 fwrite(file_buffer, sizeof(file_buffer), 1, file);
                 fclose(file);
@@ -1737,7 +1737,7 @@ namespace LOADSAVE {
      * @address 0050f650
      */
     void __cdecl Get_File_Date_String_(const char* file_path, char* out_string) {
-        FILE* file = fopen(file_path, "r");
+        FILE* file = fopen_case(file_path, "r");
         if (file == nullptr) {
             return;
         }

@@ -4,38 +4,38 @@ namespace AIPOWER {
     uint32_t __cdecl Modified_Weapon_Strength_(uint32_t weapon_strength, uint16_t modification_flags) {
         int16_t total_space = 100;
 
-        if ((modification_flags & 0x0002) != 0) {
-            total_space = (int16_t)(TECHDATA::_weapon_modifications[1].space + 100);
+        if ((modification_flags & WEAPON_MOD_FLAG_HEAVY_MOUNT) != 0) {
+            total_space = (int16_t)(TECHDATA::_weapon_modifications[WEAPON_MOD_HEAVY_MOUNT].space + 100);
         }
-        if ((modification_flags & 0x0004) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[2].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_POINT_DEFENCE) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_POINT_DEFENSE].space);
         }
-        if ((modification_flags & 0x0020) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[5].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_NO_RANGE_DISSIPATION].space);
         }
-        if ((modification_flags & 0x0080) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[7].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_AUTO_FIRE) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_AUTO_FIRE].space);
         }
-        if ((modification_flags & 0x0100) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[8].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_ENVELOPING) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_ENVELOPING].space);
         }
-        if ((modification_flags & 0x0200) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[9].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_MIRV) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_MIRV].space);
         }
-        if ((modification_flags & 0x0400) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[10].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_ECCM) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_ECCM].space);
         }
-        if ((modification_flags & 0x0800) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[11].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_HEAVILY_ARMORED) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_HEAVILY_ARMORED].space);
         }
-        if ((modification_flags & 0x1000) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[12].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_FAST) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_FAST].space);
         }
-        if ((modification_flags & 0x2000) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[13].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_EMISSION_GUIDANCE) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_EMMISIONS_GUIDANCE].space);
         }
-        if ((modification_flags & 0x4000) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[14].space);
+        if ((modification_flags & WEAPON_MOD_FLAG_OVERLOADED) != 0) {
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_OVERLOADED].space);
         }
 
         int32_t result =
@@ -98,7 +98,7 @@ namespace AIPOWER {
             uint16_t slot_specials = ship->d.ship_weapon[i].specials;
             uint32_t slot_strength;
 
-            if (!(slot_specials & 0x40) && weapon_type != 0x22 && weapon_type != 0x0D) {
+            if (!(slot_specials & WEAPON_MOD_FLAG_SHIELD_PIERCING) && weapon_type != 0x22 && weapon_type != 0x0D) {
                 if (weapon_type == 0x1F /* Point Defense */) {
                     weapon_type = INITSHIP::Best_Point_Defense_Weapon_(ship->owner);
                     count *= 3;
@@ -113,9 +113,9 @@ namespace AIPOWER {
                 }
 
                 int16_t damage = TECHDATA::_weapons[weapon_type].max_damage;
-                if (slot_specials & 0x02) {
+                if (slot_specials & WEAPON_MOD_FLAG_HEAVY_MOUNT) {
                     damage += (int16_t)(((damage * 5 + 5) * 10) / 100);
-                } else if (slot_specials & 0x04) {
+                } else if (slot_specials & WEAPON_MOD_FLAG_POINT_DEFENCE) {
                     damage = (int16_t)(((damage * 5 + 5) * 10) / 100);
                 }
 
@@ -314,7 +314,7 @@ namespace AIPOWER {
         bonus = TECHDATA::_computers[computer_idx].bonus;
 
         if (player_idx < MAX_PLAYERS) {
-            bonus += MOX::_player[player_idx].traits[7 /* TRAIT_SHIP_ATTACK */];
+            bonus += MOX::_player[player_idx].traits[TRAIT_SHIP_ATTACK];
         }
 
         return bonus;
@@ -345,8 +345,8 @@ namespace AIPOWER {
         dcv = (int16_t)(dcv * 5);
 
         if (player_idx < MAX_PLAYERS) {
-            dcv = (int16_t)(dcv + MOX::_player[player_idx].traits[6]);
-            if (MOX::_player[player_idx].traits[0x1d] != 0) {
+            dcv = (int16_t)(dcv + MOX::_player[player_idx].traits[TRAIT_SHIP_DEFENSE]);
+            if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 dcv = (int16_t)(dcv + 0x14);
             }
         }

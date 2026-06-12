@@ -27,7 +27,7 @@ uint8_t* _pollBuffer;
 int16_t __cdecl ComSendUserMessage_(
     void* msg_data,
     uint16_t msg_length,
-    DPID player_id,
+    uint32_t player_id,
     uint16_t msg_type,
     uint8_t flags,
     uint32_t transport_flag
@@ -53,25 +53,22 @@ int16_t __cdecl ComSendUserMessage_(
 
     memcpy(send_buffer + sizeof(packet_header), msg_data, msg_length);
 
-    DPID target_player_id;
+    uint32_t target_player_id;
     if (player_id == 0x7FFF || player_id == 0x7FFE) {
-        ::OutputDebugStringA("Sending Message To All....\n");
+        SDL_Log("Sending Message To All....");
         target_player_id = 0;
     } else {
-        ::OutputDebugStringA("Sending Message To Individual....\n");
+        SDL_Log("Sending Message To Individual....");
         target_player_id = player_id;
     }
 
-    HRESULT hr = netcode::_dplay->Send(
+    if (!WINNET::Send_Message_(
         WINNET::_local_player_id,
         target_player_id,
-        0,
         _sendBuffer,
         msg_length + sizeof(packet_header)
-    );
-
-    if (hr != 0) {
-        WINNET::Exit_With_Error_(hr);
+    )) {
+        return 0;
     }
 
     return 1;

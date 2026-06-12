@@ -955,7 +955,7 @@ namespace SHIPMOVE {
                 s_ship_data* ship = &MOX::_ship[i];
                 if (ship->owner == player_idx && ship->status == 1) {
                     candidate_count++;
-                    if (random::Random_(candidate_count) == 1) {
+                    if (game_random::Random_(candidate_count) == 1) {
                         selected_ship = ship;
                     }
                 }
@@ -1054,7 +1054,7 @@ namespace SHIPMOVE {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == player_idx && ship->status == 1 && ship->turns_left != 1) {
                 candidate_count++;
-                if (random::Random_(candidate_count) == 1) {
+                if (game_random::Random_(candidate_count) == 1) {
                     selected_ship = ship;
                 }
             }

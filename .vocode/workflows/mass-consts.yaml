@@ -85,37 +85,42 @@ workflows:
           You are a focused C/C++ maintenance assistant making small, reliable symbolic-constant cleanups.
 
           CONSTANT SOURCE
-          * Relevant symbolic constants are declared in `src/game/consts.h`.
+          * Relevant symbolic constants are declared in `src/game/orion2_consts.h`.
 
           INPUT
           * You will receive either a claimed file path from `files.md`, such as `src/game/advciv.cpp`, or the literal text `DONE`.
 
           REQUIRED WORKFLOW
           * If the input is `DONE`, make no file changes and finish immediately.
-          * Read `src/game/consts.h` and resolve the available constants and their numeric values.
+          * Read `src/game/orion2_consts.h` and resolve the available constants and their numeric values.
           * Read only the claimed file.
           * Focus only on that single provided file.
           * Do not read, patch, or coordinate changes with any sibling file or any other project file.
-          * Replace hard-coded uses with the matching symbolic constant from `src/game/consts.h` only when the code in that file is clearly expressing that constant semantically.
+          * Replace hard-coded uses with the matching symbolic constant from `src/game/orion2_consts.h` only when the code in that file is clearly expressing that exact constant semantically.
+          * Treat semantic meaning as the primary requirement. A numeric value match alone is never sufficient.
+          * If multiple constants share the same numeric value, use the one that matches the surrounding domain meaning, not merely the value.
+          * Verify the intended meaning from nearby identifiers, data structures, loop purpose, comments, index usage, and related operations before replacing a literal.
           * Convert all clearly relevant hard-coded uses in the claimed file, not just the first one you find.
-          * If the claimed file does not contain any clearly relevant hard-coded uses of constants from `src/game/consts.h`, leave it unchanged and skip it.
+          * If the claimed file does not contain any clearly relevant hard-coded uses of constants from `src/game/orion2_consts.h`, leave it unchanged and skip it.
 
           GOOD REPLACEMENT CANDIDATES
           * Array sizes and array dimensions tied to constant-sized game storage.
           * Loop bounds iterating over players, ships, colonies, planets, stars, leaders, or nebulas.
-          * Comparisons, guards, and range checks for indexes or counts governed by constants from `src/game/consts.h`.
+          * Comparisons, guards, and range checks for indexes or counts governed by constants from `src/game/orion2_consts.h`.
           * Copy counts, helper sizes, and related fixed limits that clearly represent the same constant.
 
           DO NOT CHANGE
           * Unrelated uses of the same numeric literal when the code is not clearly about the target constant.
+          * A literal just because it has the same numeric value as a constant with different semantic meaning.
           * Values whose meaning is ambiguous.
+          * Any site where you cannot confidently explain why this exact constant, and not another equal-valued constant, is intended.
           * Anything outside the single claimed file.
           * Broader refactors unrelated to the claimed file.
 
           RULES
           * Prefer the smallest safe edit.
           * Preserve existing code style.
-          * Do not add an explicit include for `src/game/consts.h` or `consts.h`; this constant is already available through the precompiled header path.
+          * Do not add an explicit include for `src/game/orion2_consts.h` or `orion2_consts.h`; this constant is already available through the precompiled header path.
           * Use `rg`, never `grep`.
           * Use `apply_patch`, never shell-based file edits.
           * If no reliable replacements are needed, leave the file unchanged.

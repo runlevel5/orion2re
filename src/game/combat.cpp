@@ -607,7 +607,7 @@ namespace COMBAT {
 
         if (target_count != 0) {
             // Random_ returns 1..N based on assembly array access pattern [rand*2 + 0x12]
-            int random_val = random::Random_(target_count);
+            int random_val = game_random::Random_(target_count);
             return targets[random_val - 1];
         }
 
@@ -767,11 +767,11 @@ namespace COMBAT {
             }
 
             for (int i = 0; i < (int)beam_weapon_count; ++i) {
-                int roll = random::Random_(100);
+                int roll = game_random::Random_(100);
                 
                 // If miss_threshold <= roll, the attack hits
                 if (miss_threshold <= (int16_t)roll) {
-                    int damage_roll = random::Random_((max_damage - min_damage) + 1);
+                    int damage_roll = game_random::Random_((max_damage - min_damage) + 1);
                     int final_damage = min_damage + damage_roll - 1;
                     
                     COMBAT::Apply_Damage_To_Qship_(target_idx, (int16_t)final_damage);
@@ -819,7 +819,7 @@ namespace COMBAT {
             }
 
             do {
-                int16_t roll = (int16_t)random::Random_(100);
+                int16_t roll = (int16_t)game_random::Random_(100);
                 if (roll > 95) {
                     roll = 1000;
                 }
@@ -854,7 +854,7 @@ namespace COMBAT {
                 int16_t min_dmg = TECHDATA::_weapons[weapon_id].min_damage;
                 int16_t max_dmg = TECHDATA::_weapons[weapon_id].max_damage;
 
-                int damage_roll = min_dmg + random::Random_(max_dmg - min_dmg + 1) - 1;
+                int damage_roll = min_dmg + game_random::Random_(max_dmg - min_dmg + 1) - 1;
                 
                 COMBAT::Apply_Damage_To_Qship_(target_idx, (int16_t)damage_roll);
 
@@ -879,7 +879,7 @@ namespace COMBAT {
             // The loop processes damage for each bomb weapon on the ship
             for (int16_t i = weapon_count; i > 0; --i) {
                 int range = (int)max_dmg - (int)min_dmg + 1;
-                int random_val = random::Random_(range);
+                int random_val = game_random::Random_(range);
                 
                 // Damage calculation includes an off-by-one adjustment as per original logic
                 int applied_damage = (int)min_dmg + random_val - 1;

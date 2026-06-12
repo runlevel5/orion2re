@@ -258,8 +258,8 @@ namespace HAROLD {
             if (invalidated_count < count) {
                 int32_t iters = ((int32_t)count * 5) / 3;
                 for (int32_t i = 0; i < iters; ++i) {
-                    int16_t idx1 = (int16_t)random::Random_(count);
-                    int16_t idx2 = (int16_t)random::Random_(count);
+                    int16_t idx1 = (int16_t)game_random::Random_(count);
+                    int16_t idx2 = (int16_t)game_random::Random_(count);
                     if (idx1 != idx2 && candidates[idx1] != -1 && candidates[idx2] != -1) {
                         int16_t temp = candidates[idx1];
                         candidates[idx1] = candidates[idx2];
@@ -271,7 +271,7 @@ namespace HAROLD {
                 int16_t pick_counter = 1;
                 for (int i = 0; i < count; ++i) {
                     if (candidates[i] != -1) {
-                        if (random::Random_(pick_counter) == 1) {
+                        if (game_random::Random_(pick_counter) == 1) {
                             wormhole_exit_id = candidates[i];
                             pick_counter++;
                         }
@@ -595,8 +595,8 @@ namespace HAROLD {
 
             if (use_clock == 0) {
                 // Binary returns a 1-based random index here; convert to 0-based with -1
-                idx1 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
-                idx2 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
+                idx1 = static_cast<int16_t>(game_random::Random_(static_cast<int32_t>(size))) - 1;
+                idx2 = static_cast<int16_t>(game_random::Random_(static_cast<int32_t>(size))) - 1;
             } else {
                 idx1 = (int16_t)(clock() % (int32_t)size);
                 idx2 = (int16_t)(clock() % (int32_t)size);
@@ -682,7 +682,7 @@ namespace HAROLD {
                         RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, (int32_t)star_idx);
                         RUSS::PFMT_(0, 2, "relate game conditions EXACTLY as they just happened");
                         RUSS::PFMT_(0, 3, s___s__00556ae4, star->name);
-                        assert::hgetch_();
+                        key::Wait_For_Key_();
                     }
                     orbit_taken[planet_orbit] = 1;
                 }
@@ -1384,7 +1384,7 @@ namespace HAROLD {
 
     void __cdecl Write_Language_Setting_File_() {
         char language_text[80];
-        FILE* file = fopen(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
+        FILE* file = fopen_case(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
 
         if (file != nullptr) {
             itoa((uint32_t)(uint8_t)MOX::_settings.language, language_text, 10);

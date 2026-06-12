@@ -1,22 +1,22 @@
 #pragma once
 
-#include <Windows.h>
-#include <ddraw.h>
-#include <dsound.h>
-#include <mmsystem.h>
+#include "types.h"
+
 #include <time.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
-#include <io.h>
-#include <process.h>
 #include <math.h>
-#include <direct.h>
 
+#include <SDL3/SDL.h>
+
+#include "compat.h"
+
+#if ORION2RE_ENABLE_NETWORKING
 #include "../dplay.h"
+#endif
 
 #include "consts.h"
 
@@ -26,6 +26,9 @@
 #include "orion2_str.h"
 #pragma pack(pop)
 
+#include "lbx_types.h"
+#include "sound_types.h"
+
 #include "random.h"
 #include "platform.h"
 #include "allocate.h"
@@ -33,7 +36,6 @@
 #include "clipped.h"
 #include "bitmap.h"
 #include "struct.h"
-#include "assert.h"
 #include "dos.h"
 #include "init.h"
 #include "mouse.h"
@@ -48,7 +50,6 @@
 #include "initgame.h"
 #include "officer.h"
 #include "shipmove.h"
-#include "types.h"
 #include "harold.h"
 #include "sound.h"
 #include "ten.h"
@@ -215,3 +216,5 @@
 #include "colbomb.h"
 #include "aibomb.h"
 #include "flcqueue.h"
+
+#include "sizes.h"

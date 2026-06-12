@@ -165,7 +165,7 @@ namespace OFFICER {
             int16_t current_class = skill_class;
 
             if (randomize_class != 0) {
-                if (random::Random_(7) < 3) {
+                if (game_random::Random_(7) < 3) {
                     current_class = 0;
                 }
             }
@@ -178,8 +178,8 @@ namespace OFFICER {
                         ((*secondary_mask & MOX::_skill_data[j + 1].skill_mask) == 0)) 
                     {
                         options_found++;
-                        if (random::Random_(options_found) == 1) {
-                            if (random::Random_(2) == 1) {
+                        if (game_random::Random_(options_found) == 1) {
+                            if (game_random::Random_(2) == 1) {
                                 selected_idx = (int16_t)j;
                             } else {
                                 selected_idx = (int16_t)(j + 1);
@@ -193,8 +193,8 @@ namespace OFFICER {
                         ((*primary_mask & MOX::_skill_data[j + 1].skill_mask) == 0)) 
                     {
                         options_found++;
-                        if (random::Random_(options_found) == 1) {
-                            if (random::Random_(2) == 1) {
+                        if (game_random::Random_(options_found) == 1) {
+                            if (game_random::Random_(2) == 1) {
                                 selected_idx = (int16_t)j;
                             } else {
                                 selected_idx = (int16_t)(j + 1);
@@ -318,8 +318,8 @@ namespace OFFICER {
         }
 
         for (int i = 0; i < 10; ++i) {
-            int16_t idx1 = (int16_t)random::Random_(10) - 1;
-            int16_t idx2 = (int16_t)random::Random_(10) - 1;
+            int16_t idx1 = (int16_t)game_random::Random_(10) - 1;
+            int16_t idx2 = (int16_t)game_random::Random_(10) - 1;
             if (idx1 != idx2) {
                 int16_t tmp = leader_indices[idx1];
                 leader_indices[idx1] = leader_indices[idx2];
@@ -345,8 +345,8 @@ namespace OFFICER {
         }
 
         for (int i = 0; i < 25; ++i) {
-            int16_t idx1 = (int16_t)random::Random_(25) - 1;
-            int16_t idx2 = (int16_t)random::Random_(25) - 1;
+            int16_t idx1 = (int16_t)game_random::Random_(25) - 1;
+            int16_t idx2 = (int16_t)game_random::Random_(25) - 1;
             if (idx1 != idx2) {
                 int16_t tmp = leader_indices[idx1];
                 leader_indices[idx1] = leader_indices[idx2];
@@ -2309,8 +2309,8 @@ namespace OFFICER {
 
         if (Player_Can_Hire_More_Officers_(player_idx)) {
             if (chance > 0) {
-                // random::Random_(100) returns 1..100
-                if ((static_cast<int16_t>(random::Random_(100)) - 1) < chance) {
+                // game_random::Random_(100) returns 1..100
+                if ((static_cast<int16_t>(game_random::Random_(100)) - 1) < chance) {
                     should_generate = true;
                 }
             }
@@ -2490,7 +2490,7 @@ namespace OFFICER {
         }
 
         do {
-            int32_t roll = random::Random_((int32_t)limit);
+            int32_t roll = game_random::Random_((int32_t)limit);
             int16_t leader_idx = (int16_t)roll - 1;
 
             bool type_match = false;
@@ -3315,7 +3315,7 @@ void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t
     }
 
     while (count != 0) {
-        int32_t rnd = (int32_t)random::Random_((uint32_t)available_count);
+        int32_t rnd = (int32_t)game_random::Random_((uint32_t)available_count);
         int16_t tech_id = available_techs[rnd - 1];
 
         COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], tech_id);

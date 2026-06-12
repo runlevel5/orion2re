@@ -735,7 +735,7 @@ namespace BEAMS {
 
     /** Draw fighter beam fire for the current frame and report whether more frames remain. */
     int8_t __cdecl Draw_Fighter_Beam_(int16_t* fighter_coords, int16_t count, int16_t target_x, int16_t target_y, int16_t weapon_type, int16_t frame) {
-        uint32_t original_seed = random::Get_Random_Seed_();
+        uint32_t original_seed = game_random::Get_Random_Seed_();
         
         graphics::Set_Window_(0, 0, 639, 350);
         video::Clip_On_();
@@ -765,7 +765,7 @@ namespace BEAMS {
 
         video::Clip_Off_();
         int16_t max_frames = BEAMS::Get_Max_Frames_();
-        random::Set_Random_Seed_(original_seed);
+        game_random::Set_Random_Seed_(original_seed);
 
         if (max_frames > frame) {
             return 1;
@@ -1289,7 +1289,7 @@ namespace BEAMS {
         int16_t special_timer[2] = { 0, 0 };
         int16_t fx_idx = 0;
 
-        uint32_t seed = random::Get_Random_Seed_();
+        uint32_t seed = game_random::Get_Random_Seed_();
         int16_t ship_range = Get_Ship_Range_(attacker_x, attacker_y, target_x, target_y);
 
         _g_pierced_shield_flag = 0;
@@ -1378,8 +1378,8 @@ namespace BEAMS {
                                         if (shield_radius <= max_radius) {
                                             max_radius = shield_radius;
                                         }
-                                        rand_offsets[i + 2] = (int16_t)random::Random_(max_radius) - max_radius / 2;
-                                        rand_offsets[i] = (int16_t)random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i + 2] = (int16_t)game_random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i] = (int16_t)game_random::Random_(max_radius) - max_radius / 2;
                                     }
                                     else {
                                         apply_random = true;
@@ -1390,10 +1390,10 @@ namespace BEAMS {
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
                                     int16_t base = max_radius / 2;
-                                    rand_offsets[i + 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i + 2] *= (int16_t)(random::Random_(2) - 1);
-                                    rand_offsets[i] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i + 2] = base + (int16_t)game_random::Random_(radius);
+                                    rand_offsets[i + 2] *= (int16_t)(game_random::Random_(2) - 1);
+                                    rand_offsets[i] = base + (int16_t)game_random::Random_(radius);
+                                    rand_offsets[i] *= (int16_t)(game_random::Random_(2) - 1);
                                 }
                                 else {
                                     apply_random = true;
@@ -1405,10 +1405,10 @@ namespace BEAMS {
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
                                     int16_t base = max_radius / 2;
-                                    rand_offsets[i + 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i + 2] *= (int16_t)(random::Random_(2) - 1);
-                                    rand_offsets[i] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i + 2] = base + (int16_t)game_random::Random_(radius);
+                                    rand_offsets[i + 2] *= (int16_t)(game_random::Random_(2) - 1);
+                                    rand_offsets[i] = base + (int16_t)game_random::Random_(radius);
+                                    rand_offsets[i] *= (int16_t)(game_random::Random_(2) - 1);
                                 }
                                 else {
                                     apply_random = true;
@@ -1428,10 +1428,10 @@ namespace BEAMS {
                                     }
                                     int16_t radius = (shield_radius + (shield_radius >> 31 & 3)) / 4 + 1;
                                     int16_t base = shield_radius / 2;
-                                    rand_offsets[i + 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i + 2] *= (int16_t)(random::Random_(2) - 1);
-                                    rand_offsets[i] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i + 2] = base + (int16_t)game_random::Random_(radius);
+                                    rand_offsets[i + 2] *= (int16_t)(game_random::Random_(2) - 1);
+                                    rand_offsets[i] = base + (int16_t)game_random::Random_(radius);
+                                    rand_offsets[i] *= (int16_t)(game_random::Random_(2) - 1);
                                 }
                             }
                         }
@@ -1706,7 +1706,7 @@ namespace BEAMS {
             _shield_display_status = 0;
             _reflection_field_display_status = 0;
             video::Clip_Off_();
-            random::Set_Random_Seed_(seed);
+            game_random::Set_Random_Seed_(seed);
         }
     }
 
@@ -2321,8 +2321,8 @@ namespace BEAMS {
 
         if ((bx2 == target_x && by2 == target_y) || (_max_frames - 2 <= frame_index)) {
             _ship_hit_now_flag[is_palette_not_90] = 1;
-            bx2 += random::Random_(3) - 1;
-            random::Random_(3);
+            bx2 += game_random::Random_(3) - 1;
+            game_random::Random_(3);
         } else {
             _ship_hit_now_flag[is_palette_not_90] = 0;
         }
@@ -2603,8 +2603,8 @@ namespace BEAMS {
                     int32_t arg17 = 8 / div_val;
                     int32_t arg16 = 12 / div_val;
                     
-                    int32_t rand_y = random::Random_(5) + end_y - 3;
-                    int32_t rand_x = random::Random_(5) + end_x - 3;
+                    int32_t rand_y = game_random::Random_(5) + end_y - 3;
+                    int32_t rand_x = game_random::Random_(5) + end_x - 3;
 
                     bolt::Bolt_Line_(start_x, start_y, rand_x, rand_y, palette_base_index, 12, 100, 4, frame_index * 4, 0, 0, 0, 0, 1, 0, arg16, arg17, arg18, 0);
                     break;

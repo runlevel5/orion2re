@@ -154,7 +154,7 @@ namespace RACESCRN {
                             treaty = 5;
                         }
                         strcpy(treaty_text_buffer, MOX::_treaty_labels[treaty]);
-                        _strupr(treaty_text_buffer);
+                        strupr(treaty_text_buffer);
                     }
 
                     if (MOX::_cur_plyr_ptr->research_treaty[display->player_idx] != 0) {

@@ -135,7 +135,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
         RUSS::Mox_Update_();
     }
 
-    FILE* file = fopen("lastrace.rac", "rb");
+    FILE* file = fopen_case("lastrace.rac", "rb");
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
         _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, 12, 1, 0x1F);
@@ -339,7 +339,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
         }
         
         if (input_field == field_ids[13]) {
-            FILE* race_file = fopen("lastrace.rac", "rb");
+            FILE* race_file = fopen_case("lastrace.rac", "rb");
             if (_custom_flag == 0) {
                 _custom_flag = 1;
                 fields::Clear_Fields_Above_(field_ids[12]);
@@ -655,7 +655,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                     }
 
                     if (popup_result == 2) {
-                        FILE* race_file = fopen("lastrace.rac", "wb");
+                        FILE* race_file = fopen_case("lastrace.rac", "wb");
                         if (race_file != nullptr) {
                             fwrite(player->traits, sizeof(player->traits), 1, race_file);
                             fwrite(&player->race, sizeof(player->race), 1, race_file);
@@ -751,7 +751,7 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
         "RACENAME.LBX",
         0,
         MOX::_screen_seg,
-        (int32_t)random::Random_(8) + (int32_t)race_idx * 8 - 1,
+        (int32_t)game_random::Random_(8) + (int32_t)race_idx * 8 - 1,
         1,
         sizeof(original_name)
     );
@@ -940,26 +940,18 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
     if (RACESEL::_old_race != RACESEL::_displayed_race) {
         RACESEL::_race_button_status[static_cast<int32_t>(RACESEL::_old_race)] = 0;
         RACESEL::_race_button_status[static_cast<int32_t>(RACESEL::_displayed_race)] = 1;
+    }
 
-        if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
-            animation = (s_animation_header*)buffer::Buffer_Reload_(
-                    "RACESEL.LBX",
-                    static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
-                    MOX::_global_cache_seg);
-            animate::Draw_Palette_(animation);
-        }
+    if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
+        animation = (s_animation_header*)buffer::Buffer_Reload_(
+                "RACESEL.LBX",
+                static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
+                MOX::_global_cache_seg);
+        animate::Draw_(0x36, 0x3f, animation);
     } else {
-        if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
-            animation = (s_animation_header*)buffer::Buffer_Reload_(
-                    "RACESEL.LBX",
-                    static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
-                    MOX::_global_cache_seg);
-            animate::Draw_(0x36, 0x3f, animation);
-        } else {
-            fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
-            KEN::Ken_Get_Text_Message_(0x48, text_message, sizeof(text_message));
-            BILL::_Print_Paragraph_(0x3c, 0xaf, 0x118, text_message, 2);
-        }
+        fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
+        KEN::Ken_Get_Text_Message_(0x48, text_message, sizeof(text_message));
+        BILL::_Print_Paragraph_(0x3c, 0xaf, 0x118, text_message, 2);
     }
 
     RACESEL::_old_race = RACESEL::_displayed_race;

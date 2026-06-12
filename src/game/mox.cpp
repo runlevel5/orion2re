@@ -162,13 +162,13 @@ namespace MOX {
     int16_t _wait_button;
     int16_t _scan_button;
     int16_t _missile_field[300];
-    int16_t _combat_grid[81][68];
+    int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
     int16_t _weapon_mod_field_status[15];
     int16_t _weapon_button[8];
     int16_t _ship_turn_order[210];
     int16_t _repl_fields[10];
     int16_t _side_end_of_turn[15];
-    int16_t DAT_0059730e;
+    int16_t _unused_ship_turn_order_marker;
     int16_t _design_choice_items[40];
     int16_t _weapon_mod_fields[15];
     int16_t _weapon_arc_field[5];
@@ -526,7 +526,7 @@ namespace MOX {
     s_animation_header* _far_star_seg;
     uint8_t _fleet_icon_selection_status[64];
     s_animation_header* _star_seg[40];
-    s_animation_header* _sun_seg[6];
+    s_animation_header* _sun_seg[7];
     uint16_t _n_stats_to_generate;
     uint32_t _global_cache_size;
     uint32_t _cmd_line_seed;
@@ -647,7 +647,7 @@ namespace MOX {
     int16_t _combat_defender_player;
     s_combat_bomb_result _combat_bomb_result;
 
-    s_global_combat_data _global_combat_data;
+    s_combat_data _global_combat_data;
 
     int16_t* _officers_original_star_id;
 
@@ -879,7 +879,7 @@ namespace MOX {
     int16_t _screen_mouse_list_type;
     int16_t _temp_star_handle;
     s_animation_header* _gate_icon_seg[16];
-    int16_t DAT_0059bd1e;
+    int16_t _moveable_box_reorder_fallback;
     int16_t _moveable_box_order[5];
     int16_t _box_off_flag[5];
     s_saved_box _saved_boxes[5];

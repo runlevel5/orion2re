@@ -139,7 +139,7 @@ namespace COMBAT1 {
 
         combat_msg.viewport_x = MOX::_cur_combat_x;
         combat_msg.viewport_y = MOX::_cur_combat_y;
-        combat_msg.random_seed = random::Get_Random_Seed_();
+        combat_msg.random_seed = game_random::Get_Random_Seed_();
         combat_msg.message_code = message_code;
         combat_msg.arg1 = arg1;
         combat_msg.arg2 = arg2;
@@ -533,9 +533,9 @@ namespace COMBAT1 {
 
                                     int16_t ptr_x = mouse::Pointer_X_();
                                     if ((ptr_x < 5 && MOX::_cur_combat_x > 0) || 
-                                        (mouse::Pointer_X_() > 635 && MOX::_cur_combat_x < 49) || 
+                                        (mouse::Pointer_X_() > 635 && MOX::_cur_combat_x < COMBAT_GRID_WIDTH - COMBAT_GRID_VIEW_WIDTH) || 
                                         (mouse::Pointer_Y_() < 5 && MOX::_cur_combat_y > 0) || 
-                                        (mouse::Pointer_Y_() > 475 && MOX::_cur_combat_y < 50)) {
+                                        (mouse::Pointer_Y_() > 475 && MOX::_cur_combat_y < COMBAT_GRID_HEIGHT - COMBAT_GRID_VIEW_HEIGHT)) {
                                         COMBINIT::Scroll_Combat_Screen_();
                                     }
 
@@ -571,7 +571,10 @@ namespace COMBAT1 {
                                             }
                                         }
                                         
-                                        int16_t tgt_idx = MOX::_combat_grid[tx][ty];
+                                        int16_t tgt_idx = -1;
+                                        if (tx >= 0 && tx < COMBAT_GRID_WIDTH && ty >= 0 && ty < COMBAT_GRID_HEIGHT) {
+                                            tgt_idx = MOX::_combat_grid[tx][ty];
+                                        }
                                         if (MOX::_board_flag + MOX::_skan_flag <= 0) {
                                             if (tgt_idx == 2000) {
                                                 int8_t orig_owner = MOX::_combat_data[MOX::_cur_ship].owner;
@@ -719,7 +722,7 @@ namespace COMBAT1 {
                                             int16_t f12 = MOX::_new_message.arg2;
                                             int16_t f14 = MOX::_new_message.arg3;
                                             int16_t f8 = MOX::_new_message.message_code;
-                                            random::Set_Random_Seed_(MOX::_new_message.random_seed);
+                                            game_random::Set_Random_Seed_(MOX::_new_message.random_seed);
                                             struct_::Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
 
                                             switch (f8) {
@@ -1385,14 +1388,14 @@ namespace COMBAT1 {
         int grid_idx = 1;
         int16_t x_val = 0;
 
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < COMBAT_GRID_VIEW_WIDTH; ++i) {
             int16_t y_val = 0;
-            for (int j = 0; j < 18; ++j) {
+            for (int j = 0; j < COMBAT_GRID_VIEW_HEIGHT; ++j) {
                 MOX::_combat_mouse_grid[grid_idx].x1 = x_val;
                 MOX::_combat_mouse_grid[grid_idx].x2 = x_val + 0x13;
                 MOX::_combat_mouse_grid[grid_idx].y1 = y_val;
 
-                if (j == 17) {
+                if (j == COMBAT_GRID_VIEW_MAX_Y) {
                     MOX::_combat_mouse_grid[grid_idx].y2 = y_val + 0x16;
                 } else {
                     MOX::_combat_mouse_grid[grid_idx].y2 = y_val + 0x13;
@@ -1413,12 +1416,18 @@ namespace COMBAT1 {
             }
         }
 
-        for (int grid_x = 31; grid_x >= 0; --grid_x) {
-            for (int grid_y = 17; grid_y >= 0; --grid_y) {
-                int idx = grid_x * 18 + grid_y + 1;
+        for (int grid_x = COMBAT_GRID_VIEW_MAX_X; grid_x >= 0; --grid_x) {
+            for (int grid_y = COMBAT_GRID_VIEW_MAX_Y; grid_y >= 0; --grid_y) {
+                int idx = grid_x * COMBAT_GRID_VIEW_HEIGHT + grid_y + 1;
+                int16_t target_ship = -1;
+                int16_t world_x = grid_x + MOX::_cur_combat_x;
+                int16_t world_y = grid_y + MOX::_cur_combat_y;
+
+                if (world_x >= 0 && world_x < COMBAT_GRID_WIDTH && world_y >= 0 && world_y < COMBAT_GRID_HEIGHT) {
+                    target_ship = MOX::_combat_grid[world_x][world_y];
+                }
 
                 if (MOX::_skan_flag == 1) {
-                    int16_t target_ship = MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y];
                     if (target_ship < 0 || target_ship >= MOX::_combat_total_ship_count) {
                         MOX::_combat_mouse_grid[idx].icon = 14;
                         MOX::_combat_mouse_grid[idx].frame = 12;
@@ -1427,7 +1436,6 @@ namespace COMBAT1 {
                         MOX::_combat_mouse_grid[idx].frame = 12;
                     }
                 } else if (MOX::_board_flag == 1) {
-                    int16_t target_ship = MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y];
                     if (target_ship < 0 || target_ship >= MOX::_combat_total_ship_count ||
                         MOX::_combat_data[target_ship].owner == MOX::_combat_data[MOX::_cur_ship].owner) {
                         MOX::_combat_mouse_grid[idx].icon = 2;
@@ -1437,7 +1445,6 @@ namespace COMBAT1 {
                         MOX::_combat_mouse_grid[idx].frame = 12;
                     }
                 } else {
-                    int16_t target_ship = MOX::_combat_grid[grid_x + MOX::_cur_combat_x][grid_y + MOX::_cur_combat_y];
                     if (target_ship < 0) {
                         MOX::_combat_mouse_grid[idx].icon = 2;
                         MOX::_combat_mouse_grid[idx].frame = 12;
@@ -1479,25 +1486,25 @@ namespace COMBAT1 {
             int idx_base = 558;
             int16_t x_val_base = size_info + 620;
 
-            for (int grid_x = 31; grid_x >= 0; --grid_x) {
+            for (int grid_x = COMBAT_GRID_VIEW_MAX_X; grid_x >= 0; --grid_x) {
                 int16_t y_end = size_info + 340;
 
-                for (int grid_y = 17; grid_y >= 0; --grid_y) {
+                for (int grid_y = COMBAT_GRID_VIEW_MAX_Y; grid_y >= 0; --grid_y) {
                     int idx = idx_base + grid_y + 1;
                     int16_t icon = MOX::_combat_mouse_grid[idx].icon;
 
                     if (icon >= 4 && icon <= 11) {
                         if (size_info == 20) {
-                            if (grid_x < 31 && grid_y < 17) {
-                                MOX::_combat_mouse_grid[idx + 19].icon = icon;
+                            if (grid_x < COMBAT_GRID_VIEW_MAX_X && grid_y < COMBAT_GRID_VIEW_MAX_Y) {
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT + 1].icon = icon;
                             }
                         } else if (size_info == 10) {
-                            int16_t icon19 = MOX::_combat_mouse_grid[idx + 19].icon;
+                            int16_t icon19 = MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT + 1].icon;
                             if (icon19 < 4 || icon19 > 11) {
-                                MOX::_combat_mouse_grid[idx + 19].x1 = 0;
-                                MOX::_combat_mouse_grid[idx + 19].x2 = 0;
-                                MOX::_combat_mouse_grid[idx + 19].y1 = 0;
-                                MOX::_combat_mouse_grid[idx + 19].y2 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT + 1].x1 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT + 1].x2 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT + 1].y1 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT + 1].y2 = 0;
                             }
 
                             int16_t icon1 = MOX::_combat_mouse_grid[idx + 1].icon;
@@ -1508,12 +1515,12 @@ namespace COMBAT1 {
                                 MOX::_combat_mouse_grid[idx + 1].y2 = 0;
                             }
 
-                            int16_t icon18 = MOX::_combat_mouse_grid[idx + 18].icon;
+                            int16_t icon18 = MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT].icon;
                             if (icon18 < 4 || icon18 > 11) {
-                                MOX::_combat_mouse_grid[idx + 18].x1 = 0;
-                                MOX::_combat_mouse_grid[idx + 18].x2 = 0;
-                                MOX::_combat_mouse_grid[idx + 18].y1 = 0;
-                                MOX::_combat_mouse_grid[idx + 18].y2 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT].x1 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT].x2 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT].y1 = 0;
+                                MOX::_combat_mouse_grid[idx + COMBAT_GRID_VIEW_HEIGHT].y2 = 0;
                             }
                         }
 
@@ -1525,7 +1532,7 @@ namespace COMBAT1 {
                     y_end -= 20;
                 }
                 x_val_base -= 20;
-                idx_base -= 18;
+                idx_base -= COMBAT_GRID_VIEW_HEIGHT;
             }
         }
 
@@ -1592,8 +1599,8 @@ namespace COMBAT1 {
         int16_t i;
         int16_t j;
 
-        for (i = 0; i < 81; ++i) {
-            for (j = 0; j < 68; ++j) {
+        for (i = 0; i < COMBAT_GRID_WIDTH; ++i) {
+            for (j = 0; j < COMBAT_GRID_HEIGHT; ++j) {
                 MOX::_combat_grid[i][j] = -1;
             }
         }
@@ -1933,9 +1940,9 @@ namespace COMBAT1 {
         ship_y = ship->y;
         x_pixel = 0;
 
-        for (int16_t x = 0; x < 81; ++x) {
+        for (int16_t x = 0; x < COMBAT_GRID_WIDTH; ++x) {
             y_pixel = 0;
-            for (int16_t y = 0; y < 68; ++y) {
+            for (int16_t y = 0; y < COMBAT_GRID_HEIGHT; ++y) {
                 int16_t* grid_cell = &MOX::_combat_grid[x][y];
 
                 if (*grid_cell == -1) {
@@ -1951,7 +1958,7 @@ namespace COMBAT1 {
                         if (footprint == 1) {
                             for (int16_t f_dx = 0; f_dx < 2; ++f_dx) {
                                 for (int16_t f_dy = 0; f_dy < 2; ++f_dy) {
-                                    if ((x + f_dx > 80) || (y + f_dy > 67)) {
+                                    if ((x + f_dx >= COMBAT_GRID_WIDTH) || (y + f_dy >= COMBAT_GRID_HEIGHT)) {
                                         *grid_cell = -1;
                                     } else {
                                         int16_t cell_val = MOX::_combat_grid[x + f_dx][y + f_dy];
@@ -1964,7 +1971,7 @@ namespace COMBAT1 {
                         } else if (footprint == 2) {
                             for (int16_t f_dx = 0; f_dx <= 2; ++f_dx) {
                                 for (int16_t f_dy = 0; f_dy <= 2; ++f_dy) {
-                                    if ((x + f_dx > 80) || (y + f_dy > 67)) {
+                                    if ((x + f_dx >= COMBAT_GRID_WIDTH) || (y + f_dy >= COMBAT_GRID_HEIGHT)) {
                                         *grid_cell = -1;
                                     } else {
                                         int16_t cell_val = MOX::_combat_grid[x + f_dx][y + f_dy];
@@ -1976,7 +1983,7 @@ namespace COMBAT1 {
                             }
                         }
 
-                        if ((81 - footprint < x) || (68 - footprint < y)) {
+                        if ((COMBAT_GRID_WIDTH - footprint < x) || (COMBAT_GRID_HEIGHT - footprint < y)) {
                             *grid_cell = -1;
                         }
 

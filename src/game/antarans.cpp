@@ -1,10 +1,10 @@
 #include "pch.h"
 
 namespace antarans {
-    uint8_t _antaran_ship_cost[9] = {2, 5, 12, 30, 75, 0, 0, 0, 0};
-    uint8_t _n_max_antaran_off_ships[9] = {4, 4, 3, 2, 2, 0, 0, 0, 0};
+    uint8_t _antaran_ship_cost[HULL_CLASS_COUNT] = {2, 5, 12, 30, 75, 0, 0, 0, 0};
+    uint8_t _n_max_antaran_off_ships[HULL_CLASS_COUNT] = {4, 4, 3, 2, 2, 0, 0, 0, 0};
     uint8_t _offensive_titan_ship_built;
-    uint8_t _n_max_antaran_def_ships[9] = {0, 0, 3, 2, 7, 0, 0, 0, 0};
+    uint8_t _n_max_antaran_def_ships[HULL_CLASS_COUNT] = {0, 0, 3, 2, 7, 0, 0, 0, 0};
 
     int32_t __cdecl Delta_Stardate_() {
         return MOX::_stardate - 35000;
@@ -77,7 +77,7 @@ namespace antarans {
     int16_t __cdecl Next_Antaran_Ship_Size_() {
         int16_t result = -1;
 
-        for (int16_t i = 8; i >= 0; --i) {
+        for (int16_t i = HULL_CLASS_COUNT - 1; i >= 0; --i) {
             if (result != -1) {
                 break;
             }
@@ -94,7 +94,7 @@ namespace antarans {
     }
 
     bool __cdecl Antaran_Defensive_Force_At_Maximum_() {
-        for (int i = 0; i < 9; ++i) {
+        for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
             uint8_t max_val = _n_max_antaran_def_ships[i];
 
             // If a ship type has a maximum threshold specified, check if current count meets it
@@ -151,13 +151,13 @@ namespace antarans {
             int32_t chosen_size = -1;
             uint16_t starting_size = (MOX::_settings.starting_civilization_level == 2);
 
-            for (uint16_t size = starting_size; size < 9; ++size) {
+            for (uint16_t size = starting_size; size < HULL_CLASS_COUNT; ++size) {
                 bool is_allowed_by_time = false;
-                if (size == 0) {
+                if (size == SHIP_SIZE_SMALL) {
                     if ((int32_t)No_Small_Ships_After_N_Turns_() >= time_ref) {
                         is_allowed_by_time = true;
                     }
-                } else if (size == 1) {
+                } else if (size == SHIP_SIZE_MEDIUM) {
                     if ((int32_t)No_Medium_Ships_After_N_Turns_() >= time_ref) {
                         is_allowed_by_time = true;
                     }
@@ -176,20 +176,20 @@ namespace antarans {
 
                             if (!is_offensive) {
                                 sprintf(MOX::_temp_string, ">> current def ships (by size) : ");
-                                for (int i = 0; i < 9; ++i) {
+                                for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                                     char buf[20];
                                     sprintf(buf, "%2d ", MOX::_antarans.defensive_ships[i]);
                                     strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
                                 }
                             } else {
                                 sprintf(MOX::_temp_string, ">> current off ships (by size) : ");
-                                for (int i = 0; i < 9; ++i) {
+                                for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                                     char buf[20];
                                     sprintf(buf, "%2d ", MOX::_antarans.offensive_ships[i]);
                                     strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
                                 }
                                 sprintf(MOX::_temp_string, ">> off ships deployed (by size): ");
-                                for (int i = 0; i < 9; ++i) {
+                                for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                                     char buf[20];
                                     sprintf(buf, "%2d ", MOX::_antarans.offensive_deployed[i]);
                                     strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
@@ -218,7 +218,7 @@ namespace antarans {
             ships[chosen_size] = current_count + 1;
 
             // If small ships hit their cap, reset the cap
-            if (chosen_size <= 2 && _n_max_antaran_off_ships[chosen_size] == current_count + 1) {
+            if (chosen_size <= SHIP_SIZE_LARGE && _n_max_antaran_off_ships[chosen_size] == current_count + 1) {
                 _n_max_antaran_off_ships[chosen_size] = 0;
             }
 
@@ -229,9 +229,9 @@ namespace antarans {
                     (int)*resources, (int)chosen_size, (int)ships[chosen_size]);
 
             // Special Titan logic (size 4) on Hard/Impossible difficulty
-            if (chosen_size == 4 && _offensive_titan_ship_built == 0 && MOX::_settings.game_difficulty > 2) {
+            if (chosen_size == SHIP_SIZE_TITAN && _offensive_titan_ship_built == 0 && MOX::_settings.game_difficulty > 2) {
                 _offensive_titan_ship_built = 1;
-                for (int i = 0; i < 9; ++i) {
+                for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                     _antaran_ship_cost[i] = (uint8_t)((_antaran_ship_cost[i] * 90) / 100);
                 }
             }
@@ -272,8 +272,8 @@ namespace antarans {
 
         int16_t shuffle_limit = *star_count / 2;
         for (int16_t i = 0; i < shuffle_limit; ++i) {
-            int16_t idx1 = (int16_t)random::Random_(*star_count) - 1;
-            int16_t idx2 = (int16_t)random::Random_(*star_count) - 1;
+            int16_t idx1 = (int16_t)game_random::Random_(*star_count) - 1;
+            int16_t idx2 = (int16_t)game_random::Random_(*star_count) - 1;
 
             if (idx1 != idx2) {
                 int16_t temp = star_list[idx1];
@@ -293,7 +293,7 @@ namespace antarans {
         if (star_count > 0) {
             for (int16_t i = 0; i < star_count; ++i) {
                 // Reservoir sampling: pick the i-th star with 1/(i+1) probability
-                if (random::Random_((int32_t)i + 1) == 1) {
+                if (game_random::Random_((int32_t)i + 1) == 1) {
                     target_star_idx = star_indices[i];
                 }
             }
@@ -322,7 +322,7 @@ namespace antarans {
 
     int16_t __cdecl Antaran_Defensive_Force_() {
         int16_t total_force = 0;
-        for (int32_t i = 0; i < 9; ++i) {
+        for (int32_t i = 0; i < HULL_CLASS_COUNT; ++i) {
             total_force += (int16_t)(MOX::_antarans.defensive_ships[i] * (uint16_t)_antaran_ship_cost[i]);
         }
         return total_force;
@@ -343,14 +343,14 @@ namespace antarans {
         int16_t target_star = Get_Antaran_Target_Star_(EVENTS::Get_Antaran_Victim_());
 
         sprintf(MOX::_temp_string, "-< ships (by size)          : ");
-        for (int i = 0; i < 9; ++i) {
+        for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
             char buf[16];
             sprintf(buf, "%2d ", (int)MOX::_antarans.offensive_ships[i]);
             strcat(MOX::_temp_string, buf);
         }
 
         sprintf(MOX::_temp_string, "-< ships deployed (by size) : ");
-        for (int i = 0; i < 9; ++i) {
+        for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
             char buf[16];
             sprintf(buf, "%2d ", (int)MOX::_antarans.offensive_deployed[i]);
             strcat(MOX::_temp_string, buf);
@@ -415,7 +415,7 @@ namespace antarans {
     int16_t __cdecl Antaran_Offensive_Force_() {
         int16_t total_force = 0;
 
-        for (int i = 0; i < 9; ++i) {
+        for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
             // Ship cost is treated as an unsigned byte value (0-255) in the calculation.
             uint8_t ship_cost = _antaran_ship_cost[i];
             int16_t ship_count = MOX::_antarans.offensive_ships[i];
@@ -483,7 +483,7 @@ namespace antarans {
         }
 
         bool has_available_offensive_ships = false;
-        for (int16_t i = 0; i < 9 && !has_available_offensive_ships; ++i) {
+        for (int16_t i = 0; i < HULL_CLASS_COUNT && !has_available_offensive_ships; ++i) {
             int32_t available_ships =
                 (int32_t)MOX::_antarans.offensive_ships[i] -
                 (int32_t)MOX::_antarans.offensive_deployed[i];
@@ -500,7 +500,7 @@ namespace antarans {
 
         // If there's built-up pressure, perform a random check to decide on the attack
         if (MOX::_antarans.attack_pressure > 0) {
-            int16_t random_val = (int16_t)random::Random_(200) - 1;
+            int16_t random_val = (int16_t)game_random::Random_(200) - 1;
             if ((int32_t)MOX::_antarans.attack_pressure + 1 > (int32_t)random_val) {
                 should_attack = true;
             }

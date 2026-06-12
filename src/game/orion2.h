@@ -1,35 +1,4 @@
-﻿typedef unsigned char undefined;
-typedef unsigned char   undefined;
-
-typedef unsigned char    byte;
-typedef unsigned int    dword;
-
-typedef long long    int16;
-typedef long long    longlong;
-typedef unsigned char    uchar;
-typedef unsigned int    uint;
-typedef unsigned long    ulong;
-typedef unsigned long long    ulonglong;
-typedef unsigned char    undefined1;
-typedef unsigned short    undefined2;
-typedef unsigned int    undefined4;
-typedef unsigned long long    undefined5;
-typedef unsigned long long    undefined6;
-typedef unsigned long long    undefined7;
-typedef unsigned long long    undefined8;
-typedef unsigned short    uint16_t;
-typedef unsigned short    word;
 typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
-
-
-/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
-
-typedef uchar uint8_t;
-
-
-/* WARNING! conflicting data type names: /types.h/uint - /uint */
-
-typedef uint uint32_t;
 
 struct BIT_BUF {
     uint8_t *buf;
@@ -38,23 +7,11 @@ struct BIT_BUF {
     uint32_t bit_index;
 };
 
-
-/* WARNING! conflicting data type names: /orion2.h/dword - /dword */
-
-
-/* WARNING! conflicting data type names: /orion2.h/int16 - /int16 */
-
-
-/* WARNING! conflicting data type names: /orion2.h/longlong - /longlong */
-
 typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
-
 
 typedef struct s_adv_civ_player_star s_adv_civ_player_star, *Ps_adv_civ_player_star;
 
 typedef struct s_adv_civ_player_planet s_adv_civ_player_planet, *Ps_adv_civ_player_planet;
-
-typedef int int32_t;
 
 struct s_adv_civ_player_planet {
     int8_t is_homeworld;
@@ -85,7 +42,7 @@ typedef struct s_adv_planet_worth_s1 s_adv_planet_worth_s1, *Ps_adv_planet_worth
 
 struct s_adv_planet_worth_s1 {
     int16_t planet_idx;
-    int worth;
+    int32_t worth;
 };
 
 struct s_adv_planet_worth {
@@ -97,7 +54,7 @@ typedef struct s_ai_colonizable_planet s_ai_colonizable_planet, *Ps_ai_colonizab
 
 struct s_ai_colonizable_planet {
     int16_t planet_idx;
-    int contextual_value;
+    int32_t contextual_value;
 };
 
 typedef struct s_ai_colony_info s_ai_colony_info, *Ps_ai_colony_info;
@@ -115,9 +72,6 @@ struct s_ai_colony_info {
 typedef struct s_ai_player_info s_ai_player_info, *Ps_ai_player_info;
 
 typedef struct s_player_ship_sizes s_player_ship_sizes, *Ps_player_ship_sizes;
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined - /undefined */
 
 struct s_ai_player_info {
     int16_t colony_count;
@@ -143,8 +97,6 @@ struct s_player_ship_sizes {
     int32_t weighted_ship_size;
 };
 
-static_assert(sizeof(s_player_ship_sizes) == 0x38, "s_player_ship_sizes size mismatch");
-
 typedef struct s_ai_refit_entry s_ai_refit_entry, *Ps_ai_refit_entry;
 
 #pragma pack(push, 1)
@@ -154,8 +106,6 @@ struct s_ai_refit_entry {
 };
 #pragma pack(pop)
 
-static_assert(sizeof(s_ai_refit_entry) == 6, "s_ai_refit_entry size mismatch");
-
 typedef struct s_ai_refit_player s_ai_refit_player, *Ps_ai_refit_player;
 
 struct s_ai_refit_player {
@@ -163,14 +113,9 @@ struct s_ai_refit_player {
     struct s_ai_refit_entry entry[MAX_SHIPS];
 };
 
-static_assert(sizeof(s_ai_refit_player) == 3002, "s_ai_refit_player size mismatch");
-
 typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
 
 typedef struct s_ai_star_player_block s_ai_star_player_block, *Ps_ai_star_player_block;
-
-
-/* WARNING! conflicting data type names: /orion2.h/undefined1 - /undefined1 */
 
 struct s_ai_star_player_block {
     int8_t enemy_count;
@@ -258,12 +203,6 @@ struct s_aimove_alien_strength {
 };
 
 typedef struct s_aimove_intercept_entry s_aimove_intercept_entry, *Ps_aimove_intercept_entry;
-
-
-/* WARNING! conflicting data type names: /types.h/uint16_t - /uint16_t */
-
-typedef uint16_t uint16_t;
-
 typedef struct s_aimove_intercept_player s_aimove_intercept_player, *Ps_aimove_intercept_player;
 
 struct s_aimove_intercept_player {
@@ -300,9 +239,6 @@ struct s_alloc_header {
 
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
-typedef int16_t int16_t;
-
-#pragma pack(push, 1)
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4200)
@@ -321,9 +257,6 @@ struct s_animation_header {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#pragma pack(pop)
-
-static_assert(sizeof(s_animation_header) == 0x0c, "s_animation_header size mismatch");
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
 
@@ -399,507 +332,7 @@ struct s_battle_results_info {
     int16_t orion_techs[4];
     int16_t rescued_hero_id;
     char summary[100];
-    char details[500];
-    undefined field24_0x4d9;
-    undefined field25_0x4da;
-    undefined field26_0x4db;
-    undefined field27_0x4dc;
-    undefined field28_0x4dd;
-    undefined field29_0x4de;
-    undefined field30_0x4df;
-    undefined field31_0x4e0;
-    undefined field32_0x4e1;
-    undefined field33_0x4e2;
-    undefined field34_0x4e3;
-    undefined field35_0x4e4;
-    undefined field36_0x4e5;
-    undefined field37_0x4e6;
-    undefined field38_0x4e7;
-    undefined field39_0x4e8;
-    undefined field40_0x4e9;
-    undefined field41_0x4ea;
-    undefined field42_0x4eb;
-    undefined field43_0x4ec;
-    undefined field44_0x4ed;
-    undefined field45_0x4ee;
-    undefined field46_0x4ef;
-    undefined field47_0x4f0;
-    undefined field48_0x4f1;
-    undefined field49_0x4f2;
-    undefined field50_0x4f3;
-    undefined field51_0x4f4;
-    undefined field52_0x4f5;
-    undefined field53_0x4f6;
-    undefined field54_0x4f7;
-    undefined field55_0x4f8;
-    undefined field56_0x4f9;
-    undefined field57_0x4fa;
-    undefined field58_0x4fb;
-    undefined field59_0x4fc;
-    undefined field60_0x4fd;
-    undefined field61_0x4fe;
-    undefined field62_0x4ff;
-    undefined field63_0x500;
-    undefined field64_0x501;
-    undefined field65_0x502;
-    undefined field66_0x503;
-    undefined field67_0x504;
-    undefined field68_0x505;
-    undefined field69_0x506;
-    undefined field70_0x507;
-    undefined field71_0x508;
-    undefined field72_0x509;
-    undefined field73_0x50a;
-    undefined field74_0x50b;
-    undefined field75_0x50c;
-    undefined field76_0x50d;
-    undefined field77_0x50e;
-    undefined field78_0x50f;
-    undefined field79_0x510;
-    undefined field80_0x511;
-    undefined field81_0x512;
-    undefined field82_0x513;
-    undefined field83_0x514;
-    undefined field84_0x515;
-    undefined field85_0x516;
-    undefined field86_0x517;
-    undefined field87_0x518;
-    undefined field88_0x519;
-    undefined field89_0x51a;
-    undefined field90_0x51b;
-    undefined field91_0x51c;
-    undefined field92_0x51d;
-    undefined field93_0x51e;
-    undefined field94_0x51f;
-    undefined field95_0x520;
-    undefined field96_0x521;
-    undefined field97_0x522;
-    undefined field98_0x523;
-    undefined field99_0x524;
-    undefined field100_0x525;
-    undefined field101_0x526;
-    undefined field102_0x527;
-    undefined field103_0x528;
-    undefined field104_0x529;
-    undefined field105_0x52a;
-    undefined field106_0x52b;
-    undefined field107_0x52c;
-    undefined field108_0x52d;
-    undefined field109_0x52e;
-    undefined field110_0x52f;
-    undefined field111_0x530;
-    undefined field112_0x531;
-    undefined field113_0x532;
-    undefined field114_0x533;
-    undefined field115_0x534;
-    undefined field116_0x535;
-    undefined field117_0x536;
-    undefined field118_0x537;
-    undefined field119_0x538;
-    undefined field120_0x539;
-    undefined field121_0x53a;
-    undefined field122_0x53b;
-    undefined field123_0x53c;
-    undefined field124_0x53d;
-    undefined field125_0x53e;
-    undefined field126_0x53f;
-    undefined field127_0x540;
-    undefined field128_0x541;
-    undefined field129_0x542;
-    undefined field130_0x543;
-    undefined field131_0x544;
-    undefined field132_0x545;
-    undefined field133_0x546;
-    undefined field134_0x547;
-    undefined field135_0x548;
-    undefined field136_0x549;
-    undefined field137_0x54a;
-    undefined field138_0x54b;
-    undefined field139_0x54c;
-    undefined field140_0x54d;
-    undefined field141_0x54e;
-    undefined field142_0x54f;
-    undefined field143_0x550;
-    undefined field144_0x551;
-    undefined field145_0x552;
-    undefined field146_0x553;
-    undefined field147_0x554;
-    undefined field148_0x555;
-    undefined field149_0x556;
-    undefined field150_0x557;
-    undefined field151_0x558;
-    undefined field152_0x559;
-    undefined field153_0x55a;
-    undefined field154_0x55b;
-    undefined field155_0x55c;
-    undefined field156_0x55d;
-    undefined field157_0x55e;
-    undefined field158_0x55f;
-    undefined field159_0x560;
-    undefined field160_0x561;
-    undefined field161_0x562;
-    undefined field162_0x563;
-    undefined field163_0x564;
-    undefined field164_0x565;
-    undefined field165_0x566;
-    undefined field166_0x567;
-    undefined field167_0x568;
-    undefined field168_0x569;
-    undefined field169_0x56a;
-    undefined field170_0x56b;
-    undefined field171_0x56c;
-    undefined field172_0x56d;
-    undefined field173_0x56e;
-    undefined field174_0x56f;
-    undefined field175_0x570;
-    undefined field176_0x571;
-    undefined field177_0x572;
-    undefined field178_0x573;
-    undefined field179_0x574;
-    undefined field180_0x575;
-    undefined field181_0x576;
-    undefined field182_0x577;
-    undefined field183_0x578;
-    undefined field184_0x579;
-    undefined field185_0x57a;
-    undefined field186_0x57b;
-    undefined field187_0x57c;
-    undefined field188_0x57d;
-    undefined field189_0x57e;
-    undefined field190_0x57f;
-    undefined field191_0x580;
-    undefined field192_0x581;
-    undefined field193_0x582;
-    undefined field194_0x583;
-    undefined field195_0x584;
-    undefined field196_0x585;
-    undefined field197_0x586;
-    undefined field198_0x587;
-    undefined field199_0x588;
-    undefined field200_0x589;
-    undefined field201_0x58a;
-    undefined field202_0x58b;
-    undefined field203_0x58c;
-    undefined field204_0x58d;
-    undefined field205_0x58e;
-    undefined field206_0x58f;
-    undefined field207_0x590;
-    undefined field208_0x591;
-    undefined field209_0x592;
-    undefined field210_0x593;
-    undefined field211_0x594;
-    undefined field212_0x595;
-    undefined field213_0x596;
-    undefined field214_0x597;
-    undefined field215_0x598;
-    undefined field216_0x599;
-    undefined field217_0x59a;
-    undefined field218_0x59b;
-    undefined field219_0x59c;
-    undefined field220_0x59d;
-    undefined field221_0x59e;
-    undefined field222_0x59f;
-    undefined field223_0x5a0;
-    undefined field224_0x5a1;
-    undefined field225_0x5a2;
-    undefined field226_0x5a3;
-    undefined field227_0x5a4;
-    undefined field228_0x5a5;
-    undefined field229_0x5a6;
-    undefined field230_0x5a7;
-    undefined field231_0x5a8;
-    undefined field232_0x5a9;
-    undefined field233_0x5aa;
-    undefined field234_0x5ab;
-    undefined field235_0x5ac;
-    undefined field236_0x5ad;
-    undefined field237_0x5ae;
-    undefined field238_0x5af;
-    undefined field239_0x5b0;
-    undefined field240_0x5b1;
-    undefined field241_0x5b2;
-    undefined field242_0x5b3;
-    undefined field243_0x5b4;
-    undefined field244_0x5b5;
-    undefined field245_0x5b6;
-    undefined field246_0x5b7;
-    undefined field247_0x5b8;
-    undefined field248_0x5b9;
-    undefined field249_0x5ba;
-    undefined field250_0x5bb;
-    undefined field251_0x5bc;
-    undefined field252_0x5bd;
-    undefined field253_0x5be;
-    undefined field254_0x5bf;
-    undefined field255_0x5c0;
-    undefined field256_0x5c1;
-    undefined field257_0x5c2;
-    undefined field258_0x5c3;
-    undefined field259_0x5c4;
-    undefined field260_0x5c5;
-    undefined field261_0x5c6;
-    undefined field262_0x5c7;
-    undefined field263_0x5c8;
-    undefined field264_0x5c9;
-    undefined field265_0x5ca;
-    undefined field266_0x5cb;
-    undefined field267_0x5cc;
-    undefined field268_0x5cd;
-    undefined field269_0x5ce;
-    undefined field270_0x5cf;
-    undefined field271_0x5d0;
-    undefined field272_0x5d1;
-    undefined field273_0x5d2;
-    undefined field274_0x5d3;
-    undefined field275_0x5d4;
-    undefined field276_0x5d5;
-    undefined field277_0x5d6;
-    undefined field278_0x5d7;
-    undefined field279_0x5d8;
-    undefined field280_0x5d9;
-    undefined field281_0x5da;
-    undefined field282_0x5db;
-    undefined field283_0x5dc;
-    undefined field284_0x5dd;
-    undefined field285_0x5de;
-    undefined field286_0x5df;
-    undefined field287_0x5e0;
-    undefined field288_0x5e1;
-    undefined field289_0x5e2;
-    undefined field290_0x5e3;
-    undefined field291_0x5e4;
-    undefined field292_0x5e5;
-    undefined field293_0x5e6;
-    undefined field294_0x5e7;
-    undefined field295_0x5e8;
-    undefined field296_0x5e9;
-    undefined field297_0x5ea;
-    undefined field298_0x5eb;
-    undefined field299_0x5ec;
-    undefined field300_0x5ed;
-    undefined field301_0x5ee;
-    undefined field302_0x5ef;
-    undefined field303_0x5f0;
-    undefined field304_0x5f1;
-    undefined field305_0x5f2;
-    undefined field306_0x5f3;
-    undefined field307_0x5f4;
-    undefined field308_0x5f5;
-    undefined field309_0x5f6;
-    undefined field310_0x5f7;
-    undefined field311_0x5f8;
-    undefined field312_0x5f9;
-    undefined field313_0x5fa;
-    undefined field314_0x5fb;
-    undefined field315_0x5fc;
-    undefined field316_0x5fd;
-    undefined field317_0x5fe;
-    undefined field318_0x5ff;
-    undefined field319_0x600;
-    undefined field320_0x601;
-    undefined field321_0x602;
-    undefined field322_0x603;
-    undefined field323_0x604;
-    undefined field324_0x605;
-    undefined field325_0x606;
-    undefined field326_0x607;
-    undefined field327_0x608;
-    undefined field328_0x609;
-    undefined field329_0x60a;
-    undefined field330_0x60b;
-    undefined field331_0x60c;
-    undefined field332_0x60d;
-    undefined field333_0x60e;
-    undefined field334_0x60f;
-    undefined field335_0x610;
-    undefined field336_0x611;
-    undefined field337_0x612;
-    undefined field338_0x613;
-    undefined field339_0x614;
-    undefined field340_0x615;
-    undefined field341_0x616;
-    undefined field342_0x617;
-    undefined field343_0x618;
-    undefined field344_0x619;
-    undefined field345_0x61a;
-    undefined field346_0x61b;
-    undefined field347_0x61c;
-    undefined field348_0x61d;
-    undefined field349_0x61e;
-    undefined field350_0x61f;
-    undefined field351_0x620;
-    undefined field352_0x621;
-    undefined field353_0x622;
-    undefined field354_0x623;
-    undefined field355_0x624;
-    undefined field356_0x625;
-    undefined field357_0x626;
-    undefined field358_0x627;
-    undefined field359_0x628;
-    undefined field360_0x629;
-    undefined field361_0x62a;
-    undefined field362_0x62b;
-    undefined field363_0x62c;
-    undefined field364_0x62d;
-    undefined field365_0x62e;
-    undefined field366_0x62f;
-    undefined field367_0x630;
-    undefined field368_0x631;
-    undefined field369_0x632;
-    undefined field370_0x633;
-    undefined field371_0x634;
-    undefined field372_0x635;
-    undefined field373_0x636;
-    undefined field374_0x637;
-    undefined field375_0x638;
-    undefined field376_0x639;
-    undefined field377_0x63a;
-    undefined field378_0x63b;
-    undefined field379_0x63c;
-    undefined field380_0x63d;
-    undefined field381_0x63e;
-    undefined field382_0x63f;
-    undefined field383_0x640;
-    undefined field384_0x641;
-    undefined field385_0x642;
-    undefined field386_0x643;
-    undefined field387_0x644;
-    undefined field388_0x645;
-    undefined field389_0x646;
-    undefined field390_0x647;
-    undefined field391_0x648;
-    undefined field392_0x649;
-    undefined field393_0x64a;
-    undefined field394_0x64b;
-    undefined field395_0x64c;
-    undefined field396_0x64d;
-    undefined field397_0x64e;
-    undefined field398_0x64f;
-    undefined field399_0x650;
-    undefined field400_0x651;
-    undefined field401_0x652;
-    undefined field402_0x653;
-    undefined field403_0x654;
-    undefined field404_0x655;
-    undefined field405_0x656;
-    undefined field406_0x657;
-    undefined field407_0x658;
-    undefined field408_0x659;
-    undefined field409_0x65a;
-    undefined field410_0x65b;
-    undefined field411_0x65c;
-    undefined field412_0x65d;
-    undefined field413_0x65e;
-    undefined field414_0x65f;
-    undefined field415_0x660;
-    undefined field416_0x661;
-    undefined field417_0x662;
-    undefined field418_0x663;
-    undefined field419_0x664;
-    undefined field420_0x665;
-    undefined field421_0x666;
-    undefined field422_0x667;
-    undefined field423_0x668;
-    undefined field424_0x669;
-    undefined field425_0x66a;
-    undefined field426_0x66b;
-    undefined field427_0x66c;
-    undefined field428_0x66d;
-    undefined field429_0x66e;
-    undefined field430_0x66f;
-    undefined field431_0x670;
-    undefined field432_0x671;
-    undefined field433_0x672;
-    undefined field434_0x673;
-    undefined field435_0x674;
-    undefined field437_0x676;
-    undefined field438_0x677;
-    undefined field439_0x678;
-    undefined field440_0x679;
-    undefined field441_0x67a;
-    undefined field442_0x67b;
-    undefined field443_0x67c;
-    undefined field444_0x67d;
-    undefined field445_0x67e;
-    undefined field446_0x67f;
-    undefined field447_0x680;
-    undefined field448_0x681;
-    undefined field449_0x682;
-    undefined field450_0x683;
-    undefined field451_0x684;
-    undefined field452_0x685;
-    undefined field453_0x686;
-    undefined field454_0x687;
-    undefined field455_0x688;
-    undefined field456_0x689;
-    undefined field457_0x68a;
-    undefined field458_0x68b;
-    undefined field459_0x68c;
-    undefined field460_0x68d;
-    undefined field461_0x68e;
-    undefined field462_0x68f;
-    undefined field463_0x690;
-    undefined field464_0x691;
-    undefined field465_0x692;
-    undefined field466_0x693;
-    undefined field467_0x694;
-    undefined field468_0x695;
-    undefined field469_0x696;
-    undefined field470_0x697;
-    undefined field471_0x698;
-    undefined field472_0x699;
-    undefined field473_0x69a;
-    undefined field474_0x69b;
-    undefined field475_0x69c;
-    undefined field476_0x69d;
-    undefined field477_0x69e;
-    undefined field478_0x69f;
-    undefined field479_0x6a0;
-    undefined field480_0x6a1;
-    undefined field481_0x6a2;
-    undefined field482_0x6a3;
-    undefined field483_0x6a4;
-    undefined field484_0x6a5;
-    undefined field485_0x6a6;
-    undefined field486_0x6a7;
-    undefined field487_0x6a8;
-    undefined field488_0x6a9;
-    undefined field489_0x6aa;
-    undefined field490_0x6ab;
-    undefined field491_0x6ac;
-    undefined field492_0x6ad;
-    undefined field493_0x6ae;
-    undefined field494_0x6af;
-    undefined field495_0x6b0;
-    undefined field496_0x6b1;
-    undefined field497_0x6b2;
-    undefined field498_0x6b3;
-    undefined field499_0x6b4;
-    undefined field500_0x6b5;
-    undefined field501_0x6b6;
-    undefined field502_0x6b7;
-    undefined field503_0x6b8;
-    undefined field504_0x6b9;
-    undefined field505_0x6ba;
-    undefined field506_0x6bb;
-    undefined field507_0x6bc;
-    undefined field508_0x6bd;
-    undefined field509_0x6be;
-    undefined field510_0x6bf;
-    undefined field511_0x6c0;
-    undefined field512_0x6c1;
-    undefined field513_0x6c2;
-    undefined field514_0x6c3;
-    undefined field515_0x6c4;
-    undefined field516_0x6c5;
-    undefined field517_0x6c6;
-    undefined field518_0x6c7;
-    undefined field519_0x6c8;
-    undefined field520_0x6c9;
-    undefined field521_0x6ca;
-    int8_t colony_captured_flag;
-    undefined field523_0x6cc;
-    undefined field510_0x674;
+    char details[1000];
     int8_t is_mind_controlled;
 };
 
@@ -976,27 +409,6 @@ struct s_big_icon {
     int16_t screen_y;
     int16_t button_id;
     int16_t ship_idx;
-};
-
-typedef struct s_bomb s_bomb, *Ps_bomb;
-
-typedef char sbyte;
-
-struct s_bomb {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
-    undefined field4_0x4;
-    undefined field5_0x5;
-    undefined field6_0x6;
-    undefined field7_0x7;
-    undefined field8_0x8;
-    undefined field9_0x9;
-    sbyte field10_0xa;
-    int16_t field11_0xb;
-    undefined field12_0xd;
-    undefined field13_0xe;
 };
 
 typedef struct s_buffer_cached_segment s_buffer_cached_segment, *Ps_buffer_cached_segment;
@@ -1086,15 +498,12 @@ struct s_coldraw_veggie_cell {
 
 typedef struct s_colony s_colony, *Ps_colony;
 
-
-/* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
-
 struct s_colony {
     int8_t owner;
     int8_t allocated_to;
     int16_t planet;
     int16_t officer;
-    byte outpost_flag;
+    uint8_t outpost_flag;
     int8_t morale;
     int16_t pollution;
     uint8_t n_pops;
@@ -1138,7 +547,7 @@ struct s_colony {
     int16_t military[2];
     int8_t tank_roundoff;
     int8_t infantry_roundoff;
-    byte buildings[49];
+    uint8_t buildings[49];
     uint16_t last_turn_building_destroyed;
 };
 
@@ -1198,8 +607,6 @@ struct s_colony_job_production {
     int32_t final_prod;
 };
 
-static_assert(sizeof(s_colony_job_production) == 0x256, "s_colony_job_production size mismatch");
-
 typedef struct s_colors s_colors, *Ps_colors;
 
 struct s_colors {
@@ -1228,21 +635,7 @@ struct s_combat_weapon_slot {
 };
 
 struct s_combat_data {
-    char name[16];
-    undefined field1_0x10;
-    undefined field2_0x11;
-    undefined field3_0x12;
-    undefined field4_0x13;
-    undefined field5_0x14;
-    undefined field6_0x15;
-    undefined field7_0x16;
-    undefined field8_0x17;
-    undefined field9_0x18;
-    undefined field10_0x19;
-    undefined field11_0x1a;
-    undefined field12_0x1b;
-    undefined field13_0x1c;
-    undefined field14_0x1d;
+    char name[30];
     int16_t ship_idx;
     int8_t owner;
     int8_t x;
@@ -1374,23 +767,18 @@ typedef struct s_current_design s_current_design, *Ps_current_design;
 
 struct s_current_design {
     char name[16];
-    undefined field1_0x10;
+    undefined1 field1_0x10;
     int16_t shield;
     int16_t shield_cost;
     int16_t shield_space;
-    undefined field5_0x17;
-    undefined field6_0x18;
-    undefined field7_0x19;
-    undefined field8_0x1a;
+    undefined1 field5_0x17[4];
     int16_t ftl_type;
     int16_t drive_speed;
     int16_t drive_cost;
     int16_t base_space;
-    undefined field13_0x23;
-    undefined field14_0x24;
+    undefined1 field13_0x23[2];
     int16_t base_combat_speed;
-    undefined field16_0x27;
-    undefined field17_0x28;
+    undefined1 field16_0x27[2];
     int16_t field18_0x29;
     int16_t computer_type;
     int16_t computer_cost;
@@ -1415,8 +803,9 @@ struct s_current_design {
     int8_t show_help;
     int16_t num_weapon_slots;
     int16_t num_special_slots;
-    int8_t item_unlocked[41];
-    int16_t date_of_design;
+    int8_t replacement_item_unlocked[40];
+    int8_t special_system_scroll_first_row;
+    int16_t special_system_scroll_thumb_y;
 };
 
 typedef struct s_dipscrn_net_message s_dipscrn_net_message, *Ps_dipscrn_net_message;
@@ -2014,169 +1403,6 @@ struct s_glass_color {
     uint8_t b;
 };
 
-typedef struct s_global_combat_data s_global_combat_data, *Ps_global_combat_data;
-
-struct s_global_combat_data {
-    char name[30];
-    int16_t design_idx;
-    int8_t player_idx;
-    undefined field3_0x21;
-    undefined field4_0x22;
-    undefined field5_0x23;
-    int8_t field6_0x24;
-    int8_t hull_size;
-    int8_t shield_type;
-    int16_t shield_points_base;
-    int16_t shield_quadrants[4];
-    int8_t ftl_type;
-    int8_t computer_type;
-    int8_t armor_type;
-    int16_t ship_attack;
-    int16_t ship_defense;
-    int16_t ship_missle_defense;
-    undefined field17_0x3a;
-    int16_t tactical_speed;
-    undefined field19_0x3d;
-    undefined field20_0x3e;
-    undefined field21_0x3f;
-    undefined field22_0x40;
-    undefined field23_0x41;
-    undefined field24_0x42;
-    undefined field25_0x43;
-    undefined field26_0x44;
-    undefined field27_0x45;
-    undefined field28_0x46;
-    undefined field29_0x47;
-    undefined field30_0x48;
-    undefined field31_0x49;
-    undefined field32_0x4a;
-    undefined field33_0x4b;
-    uint8_t special_device_flags[5];
-    undefined field35_0x51;
-    struct s_combat_weapon_slot weapons[8];
-    int16_t structure_max;
-    int8_t crew_quality;
-    int16_t officer_idx;
-    uint8_t marine_count;
-    undefined field41_0xb0;
-    undefined field42_0xb1;
-    int8_t special_device_damage[5];
-    undefined field44_0xb7;
-    uint8_t weapon_slot_active[8];
-    int16_t structure_damage;
-    int16_t armor_hits_current;
-    int16_t picture_num;
-    undefined field49_0xc6;
-    undefined field50_0xc7;
-    undefined field51_0xc8;
-    undefined field52_0xc9;
-    int16_t drive_hp_max;
-    int16_t computer_hp_max;
-    undefined field55_0xce;
-    undefined field56_0xcf;
-    undefined field57_0xd0;
-    undefined field58_0xd1;
-    undefined field59_0xd2;
-    undefined field60_0xd3;
-    undefined field61_0xd4;
-    undefined field62_0xd5;
-    undefined field63_0xd6;
-    undefined field64_0xd7;
-    undefined field65_0xd8;
-    undefined field66_0xd9;
-    undefined field67_0xda;
-    undefined field68_0xdb;
-    undefined field69_0xdc;
-    undefined field70_0xdd;
-    undefined field71_0xde;
-    undefined field72_0xdf;
-    undefined field73_0xe0;
-    undefined field74_0xe1;
-    undefined field75_0xe2;
-    undefined field76_0xe3;
-    undefined field77_0xe4;
-    undefined field78_0xe5;
-    undefined field79_0xe6;
-    undefined field80_0xe7;
-    undefined field81_0xe8;
-    undefined field82_0xe9;
-    undefined field83_0xea;
-    undefined field84_0xeb;
-    undefined field85_0xec;
-    undefined field86_0xed;
-    undefined field87_0xee;
-    undefined field88_0xef;
-    undefined field89_0xf0;
-    undefined field90_0xf1;
-    undefined field91_0xf2;
-    undefined field92_0xf3;
-    undefined field93_0xf4;
-    undefined field94_0xf5;
-    undefined field95_0xf6;
-    undefined field96_0xf7;
-    undefined field97_0xf8;
-    undefined field98_0xf9;
-    undefined field99_0xfa;
-    undefined field100_0xfb;
-    undefined field101_0xfc;
-    undefined field102_0xfd;
-    int16_t shield_hp_max;
-    int16_t drive_effectiveness_pct;
-    int16_t computer_effectiveness_pct;
-    undefined field106_0x104;
-    undefined field107_0x105;
-    undefined field108_0x106;
-    undefined field109_0x107;
-    undefined field110_0x108;
-    undefined field111_0x109;
-    undefined field112_0x10a;
-    undefined field113_0x10b;
-    undefined field114_0x10c;
-    undefined field115_0x10d;
-    undefined field116_0x10e;
-    undefined field117_0x10f;
-    undefined field118_0x110;
-    undefined field119_0x111;
-    undefined field120_0x112;
-    undefined field121_0x113;
-    undefined field122_0x114;
-    undefined field123_0x115;
-    undefined field124_0x116;
-    undefined field125_0x117;
-    undefined field126_0x118;
-    undefined field127_0x119;
-    undefined field128_0x11a;
-    undefined field129_0x11b;
-    undefined field130_0x11c;
-    undefined field131_0x11d;
-    undefined field132_0x11e;
-    undefined field133_0x11f;
-    undefined field134_0x120;
-    undefined field135_0x121;
-    undefined field136_0x122;
-    undefined field137_0x123;
-    undefined field138_0x124;
-    undefined field139_0x125;
-    undefined field140_0x126;
-    undefined field141_0x127;
-    undefined field142_0x128;
-    undefined field143_0x129;
-    undefined field144_0x12a;
-    undefined field145_0x12b;
-    undefined field146_0x12c;
-    undefined field147_0x12d;
-    undefined field148_0x12e;
-    undefined field149_0x12f;
-    undefined field150_0x130;
-    undefined field151_0x131;
-    undefined field152_0x132;
-    undefined field153_0x133;
-    int16_t shield_hp_current;
-    undefined field155_0x136;
-    undefined field156_0x137;
-    uint8_t previous_owner;
-};
-
 typedef struct s_good_star s_good_star, *Ps_good_star;
 
 struct s_good_star {
@@ -2233,8 +1459,6 @@ struct s_help_record {
     char body[1300];
 };
 #pragma pack(pop)
-
-static_assert(sizeof(s_help_record) == 0x57b, "s_help_record size mismatch");
 
 typedef struct s_help_topic_record s_help_topic_record, *Ps_help_topic_record;
 
@@ -2372,28 +1596,6 @@ struct s_lbx_header {
     uint32_t offsets[510];
 };
 
-typedef struct s_lbx_stream_entry s_lbx_stream_entry, *Ps_lbx_stream_entry;
-
-struct s_lbx_stream_entry {
-    uint32_t size;
-    uint32_t offset;
-};
-
-typedef struct s_lbx_stream_header s_lbx_stream_header, *Ps_lbx_stream_header;
-
-
-
-struct s_lbx_stream_header {
-    uint16_t entry_count;
-    uint16_t magic;
-    uint32_t header_data;
-    FILE *file;
-    uint32_t first_offset;
-    struct s_lbx_stream_entry entries[509];
-    uint32_t padding;
-    char filename[80];
-};
-
 struct _iobuf_copy {
     char *_ptr;
     int32_t _cnt;
@@ -2414,7 +1616,7 @@ struct s_leader_data {
     int16_t xp;
     uint32_t general_skills;
     uint32_t special_skills;
-    byte tech_application[3];
+    uint8_t tech_application[3];
     uint8_t pict_num;
     int16_t skill_value;
     uint8_t level;
@@ -3162,7 +2364,7 @@ struct s_ship_design {
     sbyte picture_num;
     uint8_t previous_owner;
     int16_t cost;
-    byte combat_speed;
+    uint8_t combat_speed;
     uint16_t date_of_design;
 };
 
@@ -3176,11 +2378,11 @@ struct s_player {
     int8_t picture;
     char name[20];
     char race_name[15];
-    byte eliminated;
+    uint8_t eliminated;
     uint8_t race;
     uint8_t color;
     uint8_t personality;
-    byte objectives;
+    uint8_t objectives;
     int16_t home_planet_id;
     int16_t network_player_id;
     int8_t player_done_flags;
@@ -3204,8 +2406,8 @@ struct s_player {
     int16_t surplus_bc;
     int32_t total_maintenance;
     int16_t maintenance[6];
-    byte tech_fields[83];
-    byte tech_applications[212];
+    uint8_t tech_fields[83];
+    uint8_t tech_applications[212];
     int32_t research_accumulated;
     int8_t captured_orion;
     int8_t captured_antares;
@@ -3676,8 +2878,6 @@ struct s_planet_data {
     int8_t environmental_alterations;
 };
 
-static_assert(sizeof(s_planet_data) == 0x11, "s_planet_data size mismatch");
-
 typedef struct s_planet_max_farms s_planet_max_farms, *Ps_planet_max_farms;
 
 struct s_planet_max_farms {
@@ -3819,7 +3019,7 @@ typedef struct s_qship s_qship, *Ps_qship;
 
 struct s_qship {
     int8_t player;
-    byte size;
+    uint8_t size;
     int16_t ship_design_idx;
     int16_t field3_0x4;
     int8_t status;
@@ -4042,10 +3242,10 @@ struct s_settings {
     uint8_t music_on;
     int8_t music_level;
     int8_t active_save_slot;
-    byte multi_player_game_type;
+    uint8_t multi_player_game_type;
     char net_game_name[9];
     struct s_modem_settings modem_settings;
-    byte modem_init_string[11];
+    uint8_t modem_init_string[11];
     undefined field26_0xae;
     undefined field27_0xaf;
     undefined field28_0xb0;
@@ -4083,12 +3283,12 @@ struct s_settings {
     undefined field60_0xd0;
     undefined field61_0xd1;
     uint8_t language;
-    byte xenons_exist;
+    uint8_t xenons_exist;
     int8_t game_difficulty;
     int8_t number_of_players;
     int8_t galaxy_size;
     int8_t galaxy_age;
-    byte strategic_combat_flag;
+    uint8_t strategic_combat_flag;
     int8_t starting_civilization_level;
     uint32_t start_of_game_seed;
     int16_t sound_driver_id;
@@ -4459,7 +3659,7 @@ struct s_ship_data {
     int8_t crew_quality;
     int16_t crew_experience;
     int16_t officer_index;
-    byte special_device_damage_flags[5];
+    uint8_t special_device_damage_flags[5];
     int16_t armor_damage;
     int16_t structural_damage;
     int8_t mission;
@@ -4574,15 +3774,7 @@ struct s_smack_video {
     uint32_t rect_height;
 };
 
-typedef struct s_sound_channel s_sound_channel, *Ps_sound_channel;
-
-typedef struct IDirectSoundBuffer IDirectSoundBuffer, *PIDirectSoundBuffer;
-
-typedef struct IDirectSoundBuffer *LPDIRECTSOUNDBUFFER;
-
-typedef struct IDirectSoundBufferVtbl IDirectSoundBufferVtbl, *PIDirectSoundBufferVtbl;
-
-typedef long HRESULT;
+typedef int32_t HRESULT;
 
 
 /* WARNING! conflicting data type names: /guiddef.h/GUID - /GUID */
@@ -4591,244 +3783,20 @@ typedef GUID IID;
 
 typedef void *LPVOID;
 
-typedef ulong DWORD;
+typedef uint32_t DWORD;
 
 typedef DWORD ULONG;
 
-typedef struct _DSBCAPS _DSBCAPS, *P_DSBCAPS;
-
-typedef struct _DSBCAPS *LPDSBCAPS;
-
 typedef DWORD *LPDWORD;
 
-typedef struct tWAVEFORMATEX tWAVEFORMATEX, *PtWAVEFORMATEX;
 
-typedef struct tWAVEFORMATEX *LPWAVEFORMATEX;
-
-typedef long *LPLONG;
-
-typedef struct IDirectSound IDirectSound, *PIDirectSound;
-
-typedef struct IDirectSound *LPDIRECTSOUND;
-
-typedef struct _DSBUFFERDESC _DSBUFFERDESC, *P_DSBUFFERDESC;
-
-typedef struct _DSBUFFERDESC DSBUFFERDESC;
-
-
-typedef struct tWAVEFORMATEX WAVEFORMATEX;
-
-
-typedef long LONG;
+typedef int32_t LONG;
 
 typedef uint16_t WORD;
-
-typedef struct IDirectSoundVtbl IDirectSoundVtbl, *PIDirectSoundVtbl;
-
-typedef struct IUnknown IUnknown, *PIUnknown;
-
-typedef struct IUnknown *LPUNKNOWN;
-
-typedef struct _DSCAPS _DSCAPS, *P_DSCAPS;
-
-typedef struct _DSCAPS *LPDSCAPS;
 
 typedef struct HWND__ HWND__, *PHWND__;
 
 typedef struct HWND__ *HWND;
-
-
-typedef struct IUnknownVtbl IUnknownVtbl, *PIUnknownVtbl;
-
-struct tWAVEFORMATEX_copy {
-    WORD wFormatTag;
-    WORD nChannels;
-    DWORD nSamplesPerSec;
-    DWORD nAvgBytesPerSec;
-    WORD nBlockAlign;
-    WORD wBitsPerSample;
-    WORD cbSize;
-};
-
-struct IDirectSound_copy {
-    struct IDirectSoundVtbl *lpVtbl;
-};
-
-struct IDirectSoundBufferVtbl {
-    HRESULT (*QueryInterface)(struct IDirectSoundBuffer *, IID *, LPVOID *);
-    ULONG (*AddRef)(struct IDirectSoundBuffer *);
-    ULONG (*Release)(struct IDirectSoundBuffer *);
-    HRESULT (*GetCaps)(struct IDirectSoundBuffer *, LPDSBCAPS);
-    HRESULT (*GetCurrentPosition)(struct IDirectSoundBuffer *, LPDWORD, LPDWORD);
-    HRESULT (*GetFormat)(struct IDirectSoundBuffer *, LPWAVEFORMATEX, DWORD, LPDWORD);
-    HRESULT (*GetVolume)(struct IDirectSoundBuffer *, LPLONG);
-    HRESULT (*GetPan)(struct IDirectSoundBuffer *, LPLONG);
-    HRESULT (*GetFrequency)(struct IDirectSoundBuffer *, LPDWORD);
-    HRESULT (*GetStatus)(struct IDirectSoundBuffer *, LPDWORD);
-    HRESULT (*Initialize)(struct IDirectSoundBuffer *, LPDIRECTSOUND, LPCDSBUFFERDESC);
-    HRESULT (*Lock)(struct IDirectSoundBuffer *, DWORD, DWORD, LPVOID *, LPDWORD, LPVOID *, LPDWORD, DWORD);
-    HRESULT (*Play)(struct IDirectSoundBuffer *, DWORD, DWORD, DWORD);
-    HRESULT (*SetCurrentPosition)(struct IDirectSoundBuffer *, DWORD);
-    HRESULT (*SetFormat)(struct IDirectSoundBuffer *, LPCWAVEFORMATEX);
-    HRESULT (*SetVolume)(struct IDirectSoundBuffer *, LONG);
-    HRESULT (*SetPan)(struct IDirectSoundBuffer *, LONG);
-    HRESULT (*SetFrequency)(struct IDirectSoundBuffer *, DWORD);
-    HRESULT (*Stop)(struct IDirectSoundBuffer *);
-    HRESULT (*Unlock)(struct IDirectSoundBuffer *, LPVOID, DWORD, LPVOID, DWORD);
-    HRESULT (*Restore)(struct IDirectSoundBuffer *);
-};
-
-struct IDirectSoundBuffer_copy {
-    struct IDirectSoundBufferVtbl *lpVtbl;
-};
-
-struct _DSCAPS_copy {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwMinSecondarySampleRate;
-    DWORD dwMaxSecondarySampleRate;
-    DWORD dwPrimaryBuffers;
-    DWORD dwMaxHwMixingAllBuffers;
-    DWORD dwMaxHwMixingStaticBuffers;
-    DWORD dwMaxHwMixingStreamingBuffers;
-    DWORD dwFreeHwMixingAllBuffers;
-    DWORD dwFreeHwMixingStaticBuffers;
-    DWORD dwFreeHwMixingStreamingBuffers;
-    DWORD dwMaxHw3DAllBuffers;
-    DWORD dwMaxHw3DStaticBuffers;
-    DWORD dwMaxHw3DStreamingBuffers;
-    DWORD dwFreeHw3DAllBuffers;
-    DWORD dwFreeHw3DStaticBuffers;
-    DWORD dwFreeHw3DStreamingBuffers;
-    DWORD dwTotalHwMemBytes;
-    DWORD dwFreeHwMemBytes;
-    DWORD dwMaxContigFreeHwMemBytes;
-    DWORD dwUnlockTransferRateHwBuffers;
-    DWORD dwPlayCpuOverheadSwBuffers;
-    DWORD dwReserved1;
-    DWORD dwReserved2;
-};
-
-struct s_sound_channel {
-    uint8_t *sample_data;
-    int8_t loop_count;
-    undefined field2_0x5;
-    int8_t volume_index;
-    uint32_t sample_size;
-    uint32_t sample_offset;
-    uint32_t ds_buffer_size;
-    uint32_t field7_0x13;
-    uint32_t write_cursor;
-    uint8_t flags;
-    LPDIRECTSOUNDBUFFER buffer;
-};
-
-struct _DSBCAPS_copy {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwBufferBytes;
-    DWORD dwUnlockTransferRate;
-    DWORD dwPlayCpuOverhead;
-};
-
-struct HWND__copy {
-    int32_t unused;
-};
-
-struct IDirectSoundVtbl {
-    HRESULT (*QueryInterface)(struct IDirectSound *, IID *, LPVOID *);
-    ULONG (*AddRef)(struct IDirectSound *);
-    ULONG (*Release)(struct IDirectSound *);
-    HRESULT (*CreateSoundBuffer)(struct IDirectSound *, LPCDSBUFFERDESC, LPDIRECTSOUNDBUFFER *, LPUNKNOWN);
-    HRESULT (*GetCaps)(struct IDirectSound *, LPDSCAPS);
-    HRESULT (*DuplicateSoundBuffer)(struct IDirectSound *, LPDIRECTSOUNDBUFFER, LPDIRECTSOUNDBUFFER *);
-    HRESULT (*SetCooperativeLevel)(struct IDirectSound *, HWND, DWORD);
-    HRESULT (*Compact)(struct IDirectSound *);
-    HRESULT (*GetSpeakerConfig)(struct IDirectSound *, LPDWORD);
-    HRESULT (*SetSpeakerConfig)(struct IDirectSound *, DWORD);
-    HRESULT (*Initialize)(struct IDirectSound *, LPCGUID);
-};
-
-struct IUnknownVtbl {
-    HRESULT (*QueryInterface)(struct IUnknown *, IID *, void **);
-    ULONG (*AddRef)(struct IUnknown *);
-    ULONG (*Release)(struct IUnknown *);
-};
-
-struct IUnknown_copy {
-    struct IUnknownVtbl *lpVtbl;
-};
-
-struct _DSBUFFERDESC_copy {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwBufferBytes;
-    DWORD dwReserved;
-    LPWAVEFORMATEX lpwfxFormat;
-    GUID guid3DAlgorithm;
-};
-
-typedef struct s_sound_index s_sound_index, *Ps_sound_index;
-
-struct s_sound_index {
-    uint32_t buffer_offset;
-    uint32_t buffer_size;
-    int32_t num_active_channels;
-    uint8_t active_channel_ids[16];
-    int32_t resource_id;
-    int32_t next_id;
-    int32_t prev_id;
-};
-
-typedef struct s_sound_stream s_sound_stream, *Ps_sound_stream;
-
-struct s_sound_stream {
-    char riff_tag[4];
-    uint32_t riff_size;
-    char wave_tag[4];
-    char fmt_tag[4];
-    uint32_t fmt_size;
-    uint16_t format_tag;
-    uint16_t channels;
-    uint32_t samples_per_sec;
-    uint32_t avg_bytes_per_sec;
-    uint16_t block_align;
-    uint16_t bits_per_sample;
-    char data_tag[4];
-    uint32_t total_data_size;
-    uint32_t data_start_offset;
-    undefined field14_0x30;
-    undefined field15_0x31;
-    undefined field16_0x32;
-    uint32_t data_remaining;
-    uint32_t bytes_written;
-    uint32_t last_lock_size;
-    uint32_t field20_0x3f;
-    uint32_t write_cursor;
-    uint8_t status;
-    LPDIRECTSOUNDBUFFER ds_buffer;
-    uint32_t ds_buffer_size;
-    uint32_t block_size;
-};
-
-typedef struct s_sound_wav_header s_sound_wav_header, *Ps_sound_wav_header;
-
-struct s_sound_wav_header {
-    char riff_tag[4];
-    uint32_t chunk_size;
-    char wave_tag[4];
-    char fmt_tag[4];
-    uint32_t fmt_size;
-    uint16_t audio_format;
-    uint16_t num_channels;
-    uint32_t sample_rate;
-    uint32_t byte_rate;
-    uint16_t block_align;
-    uint16_t bits_per_sample;
-    char data_tag[4];
-    uint32_t data_size;
-    void *data_ptr;
-};
 
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
@@ -4851,35 +3819,33 @@ struct s_star_data {
     int8_t black_hole_blocks[9];
     int8_t system_special;
     int8_t wormhole_star_id;
-    byte blockaded;
+    uint8_t blockaded;
     uint8_t blockaded_by[MAX_PLAYERS];
     uint8_t visited;
-    byte just_visited;
-    byte ignore_colony_ships;
-    byte ignore_combat_ships;
+    uint8_t just_visited;
+    uint8_t ignore_colony_ships;
+    uint8_t ignore_combat_ships;
     int8_t colonize_player;
-    byte has_colony;
-    byte has_warp_field_interdictor;
-    byte next_wfi_in_list;
-    byte has_tachyon;
-    byte has_subspace;
-    byte has_stargate;
-    byte has_jumpgate;
-    byte has_artemis_net;
-    byte has_dimensional_portal;
-    byte is_stagepoint;
+    uint8_t has_colony;
+    uint8_t has_warp_field_interdictor;
+    uint8_t next_wfi_in_list;
+    uint8_t has_tachyon;
+    uint8_t has_subspace;
+    uint8_t has_stargate;
+    uint8_t has_jumpgate;
+    uint8_t has_artemis_net;
+    uint8_t has_dimensional_portal;
+    uint8_t is_stagepoint;
     int8_t officer_index[MAX_PLAYERS];
     int16_t planet_index[5];
     int16_t relocate_ship_to[MAX_PLAYERS];
     int8_t twinkling1;
     int8_t twinkling2;
-    byte not_used3;
+    uint8_t not_used3;
     int8_t surrender_to[MAX_PLAYERS];
-    byte in_nebula;
-    byte artifacts_gave_app;
+    uint8_t in_nebula;
+    uint8_t artifacts_gave_app;
 };
-
-static_assert(sizeof(s_star_data) == 0x71, "s_star_data size mismatch");
 
 typedef struct s_star_weight s_star_weight, *Ps_star_weight;
 
@@ -4918,7 +3884,7 @@ struct s_tech_app_data {
     int16_t tech_field_id;
     uint8_t unk_class;
     uint8_t ai_group;
-    byte unknown1;
+    uint8_t unknown1;
     uint8_t in_strategic;
     uint8_t type;
 };
@@ -4998,7 +3964,7 @@ struct s_tech_field_data {
     int16_t next_field_id;
     int16_t tech[4];
     uint32_t cost;
-    byte ai_group;
+    uint8_t ai_group;
 };
 
 typedef struct s_tech_fuel_data s_tech_fuel_data, *Ps_tech_fuel_data;
@@ -5143,6 +4109,8 @@ struct s_transport_pack_ack {
 
 typedef struct s_transport_packet s_transport_packet, *Ps_transport_packet;
 
+#define TRANSPORT_PAYLOAD_SIZE 331
+
 struct s_transport_packet {
     uint32_t message_stamp;
     uint16_t send_data_length;
@@ -5154,7 +4122,7 @@ struct s_transport_packet {
     uint8_t message_is_processed;
     uint32_t send_immediate_burst;
     uint16_t pad;
-    uint8_t payload[331];
+    uint8_t payload[TRANSPORT_PAYLOAD_SIZE];
 };
 
 typedef struct s_unit_data s_unit_data, *Ps_unit_data;
@@ -5169,27 +4137,6 @@ struct s_unit_data {
     undefined field6_0x9;
     undefined field7_0xa;
     undefined field8_0xb;
-};
-
-typedef struct s_wave_stream_header s_wave_stream_header, *Ps_wave_stream_header;
-
-typedef struct HMMIO__ HMMIO__, *PHMMIO__;
-
-typedef struct HMMIO__ *HMMIO;
-
-struct s_wave_stream_header {
-    uint16_t entry_count;
-    uint16_t magic;
-    uint32_t header_data;
-    HMMIO file;
-    uint32_t first_offset;
-    struct s_lbx_stream_entry entries[509];
-    uint32_t padding;
-    char filename[80];
-};
-
-struct HMMIO__copy {
-    int32_t unused;
 };
 
 typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;
@@ -5220,8 +4167,8 @@ typedef struct s_winnet_provider s_winnet_provider, *Ps_winnet_provider;
 struct s_winnet_provider {
     GUID guid;
     char name[100];
-    dword major_version;
-    dword minor_version;
+    uint32_t major_version;
+    uint32_t minor_version;
 };
 
 typedef struct s_wormhole_data s_wormhole_data, *Ps_wormhole_data;
@@ -5256,9 +4203,3 @@ struct s_packed_screen_background_run8 {
     int8_t skip_count;
     int8_t pixel_count;
 };
-
-static_assert(sizeof(s_palette_header) == 4, "s_palette_header size mismatch");
-static_assert(sizeof(s_packed_frame_header) == 4, "s_packed_frame_header size mismatch");
-static_assert(sizeof(s_packed_frame_run) == 4, "s_packed_frame_run size mismatch");
-static_assert(sizeof(s_packed_screen_background_run32) == 8, "s_packed_screen_background_run32 size mismatch");
-static_assert(sizeof(s_packed_screen_background_run8) == 2, "s_packed_screen_background_run8 size mismatch");

@@ -1,9 +1,6 @@
 #pragma once
 #include <cstdint>
 
-struct s_lbx_stream_header;
-struct s_wave_stream_header;
-
 namespace lbx {
     /* Initializes an LBX stream header and loads its record offset table.
      * @param header Stream state to initialize.

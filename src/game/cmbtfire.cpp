@@ -37,7 +37,7 @@ namespace CMBTFIRE {
 
         if (n_to_destroy > 0) {
             do {
-                int random_val = random::Random_(found_count);
+                int random_val = game_random::Random_(found_count);
                 int idx = random_val - 1;
                 int16_t building_id = defense_list[idx];
 
@@ -466,7 +466,7 @@ namespace CMBTFIRE {
                 break;
             }
 
-            int16_t rand_val = (int16_t)random::Random_(100);
+            int16_t rand_val = (int16_t)game_random::Random_(100);
             if (rand_val > 95) {
                 rand_val = 100;
             } else {
@@ -573,7 +573,7 @@ namespace CMBTFIRE {
         damage_range = TECHDATA::_weapons[weapon_id].max_damage - min_damage;
 
         for (int16_t i = 0; i < MOX::_missile[missile_idx].quantity; ++i) {
-            roll = (int16_t)random::Random_(100);
+            roll = (int16_t)game_random::Random_(100);
             if (roll > 0) {
                 internal_damage = 0;
                 if (damage_range > 0) {
@@ -843,7 +843,7 @@ namespace CMBTFIRE {
             int32_t damage_range = max_damage - min_damage;
 
             for (int16_t i = 0; i < MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left; ++i) {
-                int16_t current_damage = (int16_t)(((random::Random_(100) * damage_range) / 100) + min_damage);
+                int16_t current_damage = (int16_t)(((game_random::Random_(100) * damage_range) / 100) + min_damage);
                 Apply_Damage_To_Planet_(&current_damage, 0, TECHDATA::_weapons[weapon_id].natural_mods);
                 total_damage += current_damage;
             }
@@ -881,7 +881,7 @@ namespace CMBTFIRE {
                     *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
                 }
 
-                if ((int)random::Random_(100) <= *damage) {
+                if ((int)game_random::Random_(100) <= *damage) {
                     colony_hits = 1;
                     bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                     MOX::_combat_bomb_result.bio_hits_remaining += 1;
@@ -1502,7 +1502,7 @@ namespace CMBTFIRE {
         for (int16_t loop_counter = 0; loop_counter < total_shots; ++loop_counter) {
             if (continue_firing == 0) break;
 
-            int roll = random::Random_(100);
+            int roll = game_random::Random_(100);
             if ((weapon_flags_00 & 0x400) != 0) {
                 roll = 100;
             }
@@ -1515,7 +1515,7 @@ namespace CMBTFIRE {
             }
 
             if (COMBINIT::Does_Combat_Ship_Have_Special_(target, 8)) {
-                if (random::Random_(100) <= 30) {
+                if (game_random::Random_(100) <= 30) {
                     roll = -1000;
                 }
             }
@@ -1536,7 +1536,7 @@ namespace CMBTFIRE {
                 }
 
                 if (COMBINIT::Does_Combat_Ship_Have_Special_(target, 0x1A)) {
-                    if ((int)random::Random_(current_damage + 15) > current_damage) {
+                    if ((int)game_random::Random_(current_damage + 15) > current_damage) {
                         *damage += current_damage;
                         current_damage = 0;
                     }
@@ -1596,7 +1596,7 @@ namespace CMBTFIRE {
         int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[source_ship_idx].reflected_damage_pool + 50) / 100);
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 8) != 0) {
-            if (random::Random_(100) > 30) {
+            if (game_random::Random_(100) > 30) {
                 damage = 0;
             }
         }

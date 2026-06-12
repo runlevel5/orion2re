@@ -108,7 +108,7 @@ namespace INITGAME {
     }
 
     void Write_Game_Settings_() {
-        FILE* settings_file = fopen("mox.set", "wb");
+        FILE* settings_file = fopen_case("mox.set", "wb");
 
         if (settings_file == nullptr) {
             exitm::Exit_With_Message("Unable to open mox.set");
@@ -125,7 +125,7 @@ namespace INITGAME {
         int16_t map_index = 0;
         int16_t generation_success;
 
-        MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
+        MOX::_settings.start_of_game_seed = game_random::Get_Random_Seed_();
         MOX2::Set_Game_Seed();
         MOX::_stardate = 35000;
         MOX::_NUM_PLAYERS = num_players;
@@ -152,7 +152,7 @@ namespace INITGAME {
         MSG_::Allocate_Msg_Slots_();
 
         MOX2::Set_Game_Seed();
-        MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
+        MOX::_settings.start_of_game_seed = game_random::Get_Random_Seed_();
 
         do {
             MAPGEN::Universe_Generation_((uint8_t)galaxy_size, (uint8_t)galaxy_age, (int8_t)game_difficulty);
@@ -264,7 +264,7 @@ namespace INITGAME {
             FILEDEF::Save_Moo_Custom_Player_Data_(MOX::_player);
         }
 
-        random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
+        game_random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
     }
 
     void __cdecl Init_Players_(void) {
@@ -305,7 +305,7 @@ namespace INITGAME {
         int16_t race_idx = 0;
         while (true) {
           bool unique_race = true;
-          race_idx = (int16_t)(random::Random_(13) - 1);
+          race_idx = (int16_t)(game_random::Random_(13) - 1);
 
           for (int16_t prev_player_idx = 0; prev_player_idx < player_idx; ++prev_player_idx) {
             if (!unique_race) {
@@ -346,7 +346,7 @@ namespace INITGAME {
 
         RUSS::Mox_Update_();
 
-        int16_t color_idx = (int16_t)(random::Random_(8) - 1);
+        int16_t color_idx = (int16_t)(game_random::Random_(8) - 1);
         while (true) {
           bool duplicate_color = false;
 
@@ -374,7 +374,7 @@ namespace INITGAME {
             "RACENAME.LBX",
             0,
             MOX::_screen_seg,
-            race_idx * 8 + random::Random_(8) - 1,
+            race_idx * 8 + game_random::Random_(8) - 1,
             1,
             20);
         RUSS::Mox_Update_();
@@ -469,8 +469,8 @@ namespace INITGAME {
             }
             else if (i == 65) {
                 // Special randomized tech application for leader at index 65
-                MOX::_leaders[i].tech_application[0] = (uint8_t)random::Random_(102) - 1;
-                MOX::_leaders[i].tech_application[1] = (uint8_t)random::Random_(102) + 101;
+                MOX::_leaders[i].tech_application[0] = (uint8_t)game_random::Random_(102) - 1;
+                MOX::_leaders[i].tech_application[1] = (uint8_t)game_random::Random_(102) + 101;
             }
 
             // Calculate and set the skill value for this leader.
@@ -506,7 +506,7 @@ namespace INITGAME {
         // Process standard Space Monsters
         while (star_ptr < end_ptr) {
             if (star_ptr->system_special == SYSTEM_SPECIAL_SPACE_MONSTER) {
-                int32_t ship_type = random::Random_(5) + 9;
+                int32_t ship_type = game_random::Random_(5) + 9;
                 int16_t star_idx = (int16_t)(star_ptr - MOX::_star);
                 int16_t planet_idx = HOMEGEN::Random_Planet_(star_idx);
 

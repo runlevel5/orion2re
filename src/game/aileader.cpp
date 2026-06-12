@@ -21,9 +21,9 @@ namespace aileader {
                         hire_criteria_met = true;
                     } else if ((general_skills & 0x3CCC3) != 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x80000) != 0 && player->traits[19] == 0) {
+                    } else if ((general_skills & 0x80000) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x40000) != 0 && player->traits[19] == 0) {
+                    } else if ((general_skills & 0x40000) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
                         hire_criteria_met = true;
                     } else if (leader->type == 0 && (leader->special_skills & 0xC0C0) != 0) {
                         hire_criteria_met = true;
@@ -86,7 +86,7 @@ namespace aileader {
 
                     // Farmer (Bits 2-3)
                     if ((skills & 0x000C) && colony->food2_per_farmer != 0) {
-                        star_scores[star_index] += colony->production[0];
+                        star_scores[star_index] += colony->production[ECON_FOOD];
                     }
 
                     // Administrator (Bits 4-5)
@@ -96,16 +96,16 @@ namespace aileader {
 
                     // Industrialist (Bits 8-9)
                     if (skills & 0x0300) {
-                        star_scores[star_index] += colony->production[1];
+                        star_scores[star_index] += colony->production[ECON_INDUSTRY];
                     }
 
                     // Researcher (Bits 12-13)
                     if (skills & 0x3000) {
-                        star_scores[star_index] += colony->production[2];
+                        star_scores[star_index] += colony->production[ECON_RESEARCH];
                     }
 
                     // Diplomat/Telepath? (Bits 14-15)
-                    if ((skills & 0xC000) && (MOX::_player[player_index].traits[0] / 2 != 3)) {
+                    if ((skills & 0xC000) && (MOX::_player[player_index].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3)) {
                         star_scores[star_index] += (uint8_t)colony->n_pops;
                     }
 
@@ -148,7 +148,7 @@ namespace aileader {
 
             if (current_ship->owner == (char)player_index &&
                 current_ship->status <= 2 &&
-                current_ship->d.ship_type == 0 &&
+                current_ship->d.ship_type == SHIP_TYPE_COMBAT &&
                 current_ship->officer_index == -1)
             {
                 if (best_ship == nullptr || (
@@ -180,7 +180,7 @@ namespace aileader {
         s_ship_data* ships_end = &MOX::_ship[MOX::_NUM_SHIPS];
 
         for (s_ship_data* ship = MOX::_ship; ship < ships_end; ++ship) {
-            if (ship->owner == player_index && ship->status <= 2 && ship->d.ship_type == 0 && ship->officer_index == -1) {
+            if (ship->owner == player_index && ship->status <= 2 && ship->d.ship_type == SHIP_TYPE_COMBAT && ship->officer_index == -1) {
                 int16_t ship_index = (int16_t)(ship - MOX::_ship);
                 if (OFFICER::Ships_In_Same_Place_(ship_index, original_location)) {
                     if (ship->d.size >= best_ship->d.size &&

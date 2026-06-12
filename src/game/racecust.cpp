@@ -275,7 +275,7 @@ void __cdecl Race_Customization_(int16_t player_idx)
     // Only applies on Hard (3) or Impossible (4) difficulties
     if (MOX::_settings.game_difficulty > 2) {
         int32_t difficulty_offset = MOX::_settings.game_difficulty - 3;
-        int32_t random_offset = random::Random_(3) - 1;
+        int32_t random_offset = game_random::Random_(3) - 1;
         
         // The arrays are grouped in blocks of 5.
         // Base calculation: (race * 2 + diff) * 5 + random(-1..1 offset + 1)

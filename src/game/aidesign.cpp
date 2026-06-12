@@ -4,49 +4,49 @@ namespace aidesign {
     int16_t _min_weapon_count_table[8] = {1, 2, 3, 5, 7, 10, 0, 0};
 
     s_spcl _bio_weapon_spcl[5] = {
-        {22, 0},
-        {33, 0},
-        {2, 0},
-        {26, 1},
-        {25, 1},
+        {SPECIAL_PHASE_SHIFTER, 0},
+        {SPECIAL_SUB_SPACE_TELEPORTER, 0},
+        {SPECIAL_AUGMENTED_ENGINES, 0},
+        {WEAPON_BIO_TERMINATOR, 1},
+        {WEAPON_DEATH_SPORE, 1},
     };
     s_spcl _capture_spcl[5] = {
-        {35, 0},
-        {39, 1},
-        {28, 1},
-        {36, 0},
-        {37, 0},
+        {SPECIAL_TRANSPORTERS, 0},
+        {WEAPON_TRACTOR_BEAM, 1},
+        {WEAPON_ASSAULT_SHUTTLE, 1},
+        {SPECIAL_TROOP_PODS, 0},
+        {SPECIAL_WARP_DISSIPATOR, 0},
     };
     s_spcl _cloaking_spcl[3] = {
-        {23, 0},
-        {6, 0},
-        {31, 0},
+        {SPECIAL_PHASING_CLOAK, 0},
+        {SPECIAL_CLOAKING_DEVICE, 0},
+        {SPECIAL_STEALTH_FIELD, 0},
     };
     s_spcl _beam_defense_spcl[4] = {
-        {17, 0},
-        {8, 0},
-        {2, 0},
-        {18, 0},
+        {SPECIAL_INERTIAL_NULLIFIER, 0},
+        {SPECIAL_DISPLACEMENT_DEVICE, 0},
+        {SPECIAL_AUGMENTED_ENGINES, 0},
+        {SPECIAL_INERTIAL_STABILIZER, 0},
     };
     s_spcl _missile_defense_spcl[8] = {
-        {38, 0},
-        {21, 0},
-        {13, 1},
-        {9, 0},
-        {36, 1},
-        {8, 0},
-        {19, 0},
-        {33, 1},
+        {SPECIAL_WIDE_AREA_JAMMER, 0},
+        {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {SPECIAL_ECM_JAMMER, 0},
+        {WEAPON_PULSAR, 1},
+        {SPECIAL_DISPLACEMENT_DEVICE, 0},
+        {SPECIAL_LIGHTNING_FIELD, 0},
+        {WEAPON_ANTI_MISSILE_ROCKET, 1},
     };
     s_spcl _armor_spcl[3] = {
-        {3, 0},
-        {14, 0},
-        {27, 0},
+        {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
+        {SPECIAL_HEAVY_ARMOR, 0},
+        {SPECIAL_REINFORCED_HULL, 0},
     };
     s_spcl _shield_spcl[3] = {
-        {13, 0},
-        {20, 0},
-        {30, 0},
+        {SPECIAL_HARD_SHIELDS, 0},
+        {SPECIAL_MULTI_PHASED_SHIELDS, 0},
+        {SPECIAL_SHIELD_CAPACITOR, 0},
     };
 
     s_aidesign_ship_design _ship_design_tables[7][6] = {
@@ -108,82 +108,82 @@ namespace aidesign {
         },
     };
     s_spcl _beam_offense_spcl[7] = {
-        {34, 0},
-        {1, 0},
-        {15, 0},
-        {25, 0},
-        {32, 0},
-        {16, 0},
-        {5, 0},
+        {SPECIAL_TIME_WARP_FACILITATOR, 0},
+        {SPECIAL_ACHILLES_TARGETING_UNIT, 0},
+        {SPECIAL_HIGH_ENERGY_FOCUS, 0},
+        {SPECIAL_RANGEMASTER_UNIT, 0},
+        {SPECIAL_STRUCTURAL_ANALYZER, 0},
+        {SPECIAL_HYPER_X_CAPACITORS, 0},
+        {SPECIAL_BATTLE_SCANNER, 0},
     };
     s_spcl _missile_offense_spcl[2] = {
-        {34, 0},
-        {12, 0},
+        {SPECIAL_TIME_WARP_FACILITATOR, 0},
+        {SPECIAL_FAST_MISSILE_RACKS, 0},
     };
     s_spcl _special_weapons_spcl[5] = {
-        {38, 1},
-        {37, 1},
-        {10, 0},
-        {35, 1},
-        {34, 1},
+        {WEAPON_STELLAR_CONVERTER, 1},
+        {WEAPON_BLACK_HOLE_GENERATOR, 1},
+        {SPECIAL_ENERGY_ABSORBER, 0},
+        {WEAPON_PLASMA_WEB, 1},
+        {WEAPON_GYRO_DESTABILIZER, 1},
     };
     s_spcl _special_device_spcl[12] = {
-        {24, 0},
-        {13, 1},
-        {36, 1},
-        {32, 1},
-        {23, 0},
-        {6, 0},
-        {31, 0},
-        {26, 0},
-        {22, 0},
-        {33, 0},
-        {37, 0},
-        {28, 0},
+        {SPECIAL_QUANTUM_DETONATOR, 0},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {WEAPON_PULSAR, 1},
+        {WEAPON_STASIS_FIELD, 1},
+        {SPECIAL_PHASING_CLOAK, 0},
+        {SPECIAL_CLOAKING_DEVICE, 0},
+        {SPECIAL_STEALTH_FIELD, 0},
+        {SPECIAL_REFLECTION_FIELD, 0},
+        {SPECIAL_PHASE_SHIFTER, 0},
+        {SPECIAL_SUB_SPACE_TELEPORTER, 0},
+        {SPECIAL_WARP_DISSIPATOR, 0},
+        {SPECIAL_SCOUT_LAB, 0},
     };
     s_spcl _defense_specials_f_spcl[20] = {
-        {29, 0},
-        {8, 0},
-        {19, 0},
-        {13, 0},
-        {38, 0},
-        {21, 0},
-        {14, 0},
-        {17, 0},
-        {9, 0},
-        {27, 0},
-        {18, 0},
-        {2, 0},
-        {30, 0},
-        {20, 0},
-        {33, 1},
-        {26, 0},
-        {13, 1},
-        {36, 1},
-        {3, 0},
-        {0, 0},
+        {SPECIAL_SECURITY_STATIONS, 0},
+        {SPECIAL_DISPLACEMENT_DEVICE, 0},
+        {SPECIAL_LIGHTNING_FIELD, 0},
+        {SPECIAL_HARD_SHIELDS, 0},
+        {SPECIAL_WIDE_AREA_JAMMER, 0},
+        {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
+        {SPECIAL_HEAVY_ARMOR, 0},
+        {SPECIAL_INERTIAL_NULLIFIER, 0},
+        {SPECIAL_ECM_JAMMER, 0},
+        {SPECIAL_REINFORCED_HULL, 0},
+        {SPECIAL_INERTIAL_STABILIZER, 0},
+        {SPECIAL_AUGMENTED_ENGINES, 0},
+        {SPECIAL_SHIELD_CAPACITOR, 0},
+        {SPECIAL_MULTI_PHASED_SHIELDS, 0},
+        {WEAPON_ANTI_MISSILE_ROCKET, 1},
+        {SPECIAL_REFLECTION_FIELD, 0},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {WEAPON_PULSAR, 1},
+        {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
+        {SPECIAL_NO_SPECIAL, 0},
     };
     s_spcl _defense_specials_t_spcl[20] = {
-        {29, 0},
-        {8, 0},
-        {19, 0},
-        {13, 0},
-        {38, 0},
-        {21, 0},
-        {14, 0},
-        {17, 0},
-        {9, 0},
-        {27, 0},
-        {18, 0},
-        {2, 0},
-        {30, 0},
-        {20, 0},
-        {33, 1},
-        {26, 0},
-        {13, 1},
-        {36, 1},
-        {3, 0},
-        {0, 0},
+        {SPECIAL_SECURITY_STATIONS, 0},
+        {SPECIAL_DISPLACEMENT_DEVICE, 0},
+        {SPECIAL_LIGHTNING_FIELD, 0},
+        {SPECIAL_HARD_SHIELDS, 0},
+        {SPECIAL_WIDE_AREA_JAMMER, 0},
+        {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
+        {SPECIAL_HEAVY_ARMOR, 0},
+        {SPECIAL_INERTIAL_NULLIFIER, 0},
+        {SPECIAL_ECM_JAMMER, 0},
+        {SPECIAL_REINFORCED_HULL, 0},
+        {SPECIAL_INERTIAL_STABILIZER, 0},
+        {SPECIAL_AUGMENTED_ENGINES, 0},
+        {SPECIAL_SHIELD_CAPACITOR, 0},
+        {SPECIAL_MULTI_PHASED_SHIELDS, 0},
+        {WEAPON_ANTI_MISSILE_ROCKET, 1},
+        {SPECIAL_REFLECTION_FIELD, 0},
+        {WEAPON_SPATIAL_COMPRESSOR, 1},
+        {WEAPON_PULSAR, 1},
+        {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
+        {SPECIAL_NO_SPECIAL, 0},
     };
 
     void __cdecl Determine_Beam_Weapon_Modifications_(
@@ -206,7 +206,7 @@ namespace aidesign {
         int16_t spec2_mods[40];
         int16_t spec1_mods[40];
 
-        for (int16_t i = 1; i < 40; ++i) {
+        for (int16_t i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
             if (TECHDATA::_weapons[i].type == 0 && MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
                 weapon_id[weapon_count] = i;
                 spec1_mods[weapon_count] = 0;
@@ -252,7 +252,7 @@ namespace aidesign {
 
         int16_t best_comp = INITSHIP::Best_Computer_(player_idx);
         int16_t comp_bonus = TECHDATA::_computers[best_comp].bonus;
-        comp_bonus += MOX::_player[player_idx].traits[7];
+        comp_bonus += MOX::_player[player_idx].traits[TRAIT_SHIP_ATTACK];
 
         int16_t target_defense;
         int16_t target_shield_value;
@@ -263,7 +263,7 @@ namespace aidesign {
         } else {
             target_shield_value = AIPOWER::Get_Best_Ship_Shield_Value_(first_living_player);
             int16_t best_drive = INITSHIP::Best_Warp_Drive_(first_living_player);
-            target_defense = MOX::_player[first_living_player].traits[6] + TECHDATA::_drives[best_drive].combat_speed_min[2] * 5;
+            target_defense = MOX::_player[first_living_player].traits[TRAIT_SHIP_DEFENSE] + TECHDATA::_drives[best_drive].combat_speed_min[2] * 5;
         }
 
         int16_t net_bonus = comp_bonus - target_defense;
@@ -275,48 +275,48 @@ namespace aidesign {
 
             int16_t cur_bonus = net_bonus;
 
-            if (TECHDATA::_weapon_modifications[4].level <= min_lvl) {
-                weapon_mods[i] += 0x10;
+            if (TECHDATA::_weapon_modifications[WEAPON_MOD_CONTINUOUS].level <= min_lvl) {
+                weapon_mods[i] += WEAPON_MOD_FLAG_CONTINUOUS;
                 if (net_bonus < 50) {
-                    spec1_mods[i] += 0x10;
-                    spec2_mods[i] += 0x10;
+                    spec1_mods[i] += WEAPON_MOD_FLAG_CONTINUOUS;
+                    spec2_mods[i] += WEAPON_MOD_FLAG_CONTINUOUS;
                     cur_bonus = net_bonus + 25;
                 }
             }
 
-            if (cur_bonus > 0 && TECHDATA::_weapon_modifications[5].level <= min_lvl) {
-                spec1_mods[i] += 0x20;
-                spec2_mods[i] += 0x20;
+            if (cur_bonus > 0 && TECHDATA::_weapon_modifications[WEAPON_MOD_NO_RANGE_DISSIPATION].level <= min_lvl) {
+                spec1_mods[i] += WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION;
+                spec2_mods[i] += WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION;
             }
 
-            if (cur_bonus >= 0 && TECHDATA::_weapon_modifications[7].level <= min_lvl) {
+            if (cur_bonus >= 0 && TECHDATA::_weapon_modifications[WEAPON_MOD_AUTO_FIRE].level <= min_lvl) {
                 if (cur_bonus > 30) {
-                    weapon_mods[i] += 0x80;
+                    weapon_mods[i] += WEAPON_MOD_FLAG_AUTO_FIRE;
                 }
-                spec1_mods[i] += 0x80;
-                spec2_mods[i] += 0x80;
+                spec1_mods[i] += WEAPON_MOD_FLAG_AUTO_FIRE;
+                spec2_mods[i] += WEAPON_MOD_FLAG_AUTO_FIRE;
             }
 
             uint16_t avail = TECHDATA::_weapons[w_id].available_mods;
 
-            weapon_mods[i] = (weapon_mods[i] + 4) & avail;
-            if ((weapon_mods[i] & 4) == 0) {
+            weapon_mods[i] = (weapon_mods[i] + WEAPON_MOD_FLAG_POINT_DEFENCE) & avail;
+            if ((weapon_mods[i] & WEAPON_MOD_FLAG_POINT_DEFENCE) == 0) {
                 weapon_mods[i] = 0;
             }
 
-            if (TECHDATA::_weapon_modifications[3].level <= min_lvl) {
-                spec1_mods[i] += 8;
-                spec2_mods[i] += 8;
+            if (TECHDATA::_weapon_modifications[WEAPON_MOD_ARMOR_PIERCING].level <= min_lvl) {
+                spec1_mods[i] += WEAPON_MOD_FLAG_ARMOR_PIERCING;
+                spec2_mods[i] += WEAPON_MOD_FLAG_ARMOR_PIERCING;
             }
 
-            if (TECHDATA::_weapon_modifications[6].level <= min_lvl) {
-                spec1_mods[i] += 0x40;
-                spec2_mods[i] += 0x40;
+            if (TECHDATA::_weapon_modifications[WEAPON_MOD_SHIELD_PIERCING].level <= min_lvl) {
+                spec1_mods[i] += WEAPON_MOD_FLAG_SHIELD_PIERCING;
+                spec2_mods[i] += WEAPON_MOD_FLAG_SHIELD_PIERCING;
             }
 
-            if (TECHDATA::_weapon_modifications[8].level <= min_lvl) {
-                spec1_mods[i] += 0x100;
-                spec2_mods[i] += 0x100;
+            if (TECHDATA::_weapon_modifications[WEAPON_MOD_ENVELOPING].level <= min_lvl) {
+                spec1_mods[i] += WEAPON_MOD_FLAG_ENVELOPING;
+                spec2_mods[i] += WEAPON_MOD_FLAG_ENVELOPING;
             }
 
             spec1_mods[i] &= avail;
@@ -330,7 +330,7 @@ namespace aidesign {
         if (MOX::_settings.game_difficulty < 2) {
             int16_t idx1 = weapon_count - 1;
             while (idx1 >= 0) {
-                if ((TECHDATA::_weapons[weapon_id[idx1]].available_mods & 4) != 0) {
+                if ((TECHDATA::_weapons[weapon_id[idx1]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENCE) != 0) {
                     break;
                 }
                 idx1--;
@@ -341,7 +341,7 @@ namespace aidesign {
                 *spec0 = 0;
             } else {
                 *type0 = weapon_id[idx1];
-                *spec0 = 4;
+                *spec0 = WEAPON_MOD_FLAG_POINT_DEFENCE;
             }
 
             *type1 = weapon_id[weapon_count - 1];
@@ -349,7 +349,7 @@ namespace aidesign {
 
             int16_t idx2 = weapon_count - 1;
             while (idx2 >= 0) {
-                if ((TECHDATA::_weapons[weapon_id[idx2]].available_mods & 2) != 0) {
+                if ((TECHDATA::_weapons[weapon_id[idx2]].available_mods & WEAPON_MOD_FLAG_HEAVY_MOUNT) != 0) {
                     break;
                 }
                 idx2--;
@@ -360,11 +360,11 @@ namespace aidesign {
                 *spec2 = 0;
             } else {
                 *type2 = weapon_id[idx2];
-                *spec2 = 2;
+                *spec2 = WEAPON_MOD_FLAG_HEAVY_MOUNT;
             }
         } else {
             if (weapon_count == 1) {
-                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & 4) == 0) {
+                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENCE) == 0) {
                     *type0 = 0;
                 } else {
                     *type0 = weapon_id[0];
@@ -374,7 +374,7 @@ namespace aidesign {
                 *type1 = weapon_id[0];
                 *spec1 = spec1_mods[0] & 0x7ff9;
 
-                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & 2) == 0) {
+                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & WEAPON_MOD_FLAG_HEAVY_MOUNT) == 0) {
                     *type2 = 0;
                 } else {
                     *type2 = weapon_id[0];
@@ -446,7 +446,7 @@ namespace aidesign {
                 if (max_damage_idx < 0) {
                     *type2 = 0;
                     *spec2 = 0;
-                } else if (weapon_count == 1 && (TECHDATA::_weapons[weapon_id[0]].available_mods & 2) == 0) {
+                } else if (weapon_count == 1 && (TECHDATA::_weapons[weapon_id[0]].available_mods & WEAPON_MOD_FLAG_HEAVY_MOUNT) == 0) {
                     *type2 = 0;
                 } else {
                     int16_t best_idx = 0;
@@ -501,30 +501,30 @@ namespace aidesign {
         int16_t r_base = (int16_t)((0x14 - comp_tech) * hull_size);
 
         int16_t spec0_mod_count = 0;
-        for (uint16_t m = 8; m < 0x200; m *= 2) {
+        for (uint16_t m = WEAPON_MOD_FLAG_ARMOR_PIERCING; m < WEAPON_MOD_FLAG_MIRV; m *= 2) {
             if ((m & *spec0) != 0) {
                 spec0_mod_count++;
             }
         }
 
         int16_t spec1_mod_count = 0;
-        for (uint16_t m = 8; m < 0x200; m *= 2) {
+        for (uint16_t m = WEAPON_MOD_FLAG_ARMOR_PIERCING; m < WEAPON_MOD_FLAG_MIRV; m *= 2) {
             if ((m & *spec1) != 0) {
                 spec1_mod_count++;
             }
         }
 
         int16_t spec2_mod_count = 0;
-        for (uint16_t m = 8; m < 0x200; m *= 2) {
+        for (uint16_t m = WEAPON_MOD_FLAG_ARMOR_PIERCING; m < WEAPON_MOD_FLAG_MIRV; m *= 2) {
             if ((m & *spec2) != 0) {
                 spec2_mod_count++;
             }
         }
 
         int32_t arc0_threshold = (int32_t)r_base + (int32_t)spec0_mod_count * 20;
-        if ((int32_t)random::Random_(100) < arc0_threshold) {
+        if ((int32_t)game_random::Random_(100) < arc0_threshold) {
             int32_t arc0_inner_threshold = (int32_t)(r_base / 2) + (int32_t)spec0_mod_count * 20;
-            if ((int32_t)random::Random_(100) < arc0_inner_threshold) {
+            if ((int32_t)game_random::Random_(100) < arc0_inner_threshold) {
                 *arc0 = 16;
             } else {
                 *arc0 = 2;
@@ -532,12 +532,12 @@ namespace aidesign {
         }
 
         int32_t arc1_threshold = (int32_t)spec1_mod_count * 20 + (int32_t)(r_base / 2);
-        if ((int32_t)random::Random_(100) < arc1_threshold) {
+        if ((int32_t)game_random::Random_(100) < arc1_threshold) {
             *arc1 = 2;
         }
 
         int32_t arc2_threshold = (int32_t)spec2_mod_count * 20 + (int32_t)(r_base / 4);
-        if ((int32_t)random::Random_(100) < arc2_threshold) {
+        if ((int32_t)game_random::Random_(100) < arc2_threshold) {
             *arc2 = 2;
         }
     }
@@ -555,7 +555,7 @@ namespace aidesign {
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
                     if (Special_Legal_For_Design_(design, item_id)) {
                         // Check if player has Stealth trait, if so skip Stealth Field device
-                        if (MOX::_player[player_idx].traits[TRAIT_STEALTHY_SHIPS] == 0 || item_id != 31 /* SPCL_STEALTH_FIELD */) {
+                        if (MOX::_player[player_idx].traits[TRAIT_STEALTHY_SHIPS] == 0 || item_id != SPECIAL_STEALTH_FIELD) {
                             int8_t mini_cat = DESIGN::Miniaturization_Category_(tech_app_id);
                             int16_t tech_lvl = DESIGN::Tech_Level_(player_idx, tech_app_id);
                             int16_t base_space = TECHDATA::_specials[item_id].space_per_ship_type[design->size];
@@ -652,8 +652,8 @@ namespace aidesign {
             &types[2], &specials[2], &arcs[2]
         );
 
-        specials[0] |= 0x4;
-        specials[2] |= 0x2;
+        specials[0] |= WEAPON_MOD_FLAG_POINT_DEFENCE;
+        specials[2] |= WEAPON_MOD_FLAG_HEAVY_MOUNT;
 
         int16_t weapon_type = types[weapon_class];
         int16_t weapon_specials = specials[weapon_class];
@@ -730,7 +730,7 @@ namespace aidesign {
         switch ((uint8_t)player->ship_design_theme) {
             case 0:
             case 100: {
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                     case 2:
                     case 3:
@@ -764,7 +764,7 @@ namespace aidesign {
             }
 
             case 1: {
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         return get_default_class();
                     case 2:
@@ -797,7 +797,7 @@ namespace aidesign {
             }
 
             case 2:
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         result = get_default_class();
                         break;
@@ -836,7 +836,7 @@ namespace aidesign {
                 [[fallthrough]];
 
             case 3:
-                switch ((int16_t)random::Random_(20)) {
+                switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         return get_default_class();
                     case 2:
@@ -897,7 +897,7 @@ namespace aidesign {
                 }
             }
             i++;
-        } while (i < 212);
+        } while (i < TECH_APP_COUNT);
 
         return max_ai_group;
     }
@@ -1075,8 +1075,8 @@ namespace aidesign {
         int16_t scores[40];
         int num_candidates = 0;
 
-        for (int i = 1; i < 40; ++i) {
-            if (TECHDATA::_weapons[i].type == 3 && (TECHDATA::_weapons[i].natural_mods & 0x80) == 0) {
+        for (int i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
+            if (TECHDATA::_weapons[i].type == 3 && (TECHDATA::_weapons[i].natural_mods & WEAPON_MOD_FLAG_AUTO_FIRE) == 0) {
                 int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                     candidates[num_candidates] = i;
@@ -1203,7 +1203,7 @@ namespace aidesign {
         uint16_t weapon_mods[20];
         int16_t count = 0;
 
-        for (int16_t i = 1; i < 40; ++i) {
+        for (int16_t i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
             uint8_t type = TECHDATA::_weapons[i].type;
             if (type == 1 || type == 2) {
                 uint16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
@@ -1267,18 +1267,18 @@ namespace aidesign {
 
                     if (mini_level >= 1) {
                         if (comp_tech > 0) {
-                            weapon_mods[i] += 0x0400;
+                            weapon_mods[i] += WEAPON_MOD_FLAG_ECCM;
                         }
-                        weapon_mods[i] += 0x5820;
+                        weapon_mods[i] += WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION | WEAPON_MOD_FLAG_HEAVILY_ARMORED | WEAPON_MOD_FLAG_FAST | WEAPON_MOD_FLAG_OVERLOADED;
                     }
 
                     if (mini_level >= 2) {
-                        weapon_mods[i] += 0x0300;
+                        weapon_mods[i] += WEAPON_MOD_FLAG_ENVELOPING | WEAPON_MOD_FLAG_MIRV;
                     }
 
-                    if (MOX::_player[player_idx].tech_applications[59] == 3) {
+                    if (MOX::_player[player_idx].tech_applications[TECH_APP_EMISSIONS_GUIDANCE_SYSTEM] == 3) {
                         if (mini_level >= 2) {
-                            weapon_mods[i] += 0x2000;
+                            weapon_mods[i] += WEAPON_MOD_FLAG_EMISSION_GUIDANCE;
                         }
                     }
 
@@ -1329,16 +1329,16 @@ namespace aidesign {
             space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
 
             if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
-                if (mods & 0x0800) {
-                    mods ^= 0x0800;
+                if (mods & WEAPON_MOD_FLAG_HEAVILY_ARMORED) {
+                    mods ^= WEAPON_MOD_FLAG_HEAVILY_ARMORED;
                     *out_weapon_mods = mods;
                 }
 
                 space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
 
                 if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
-                    if (mods & 0x1000) {
-                        mods ^= 0x1000;
+                    if (mods & WEAPON_MOD_FLAG_FAST) {
+                        mods ^= WEAPON_MOD_FLAG_FAST;
                         *out_weapon_mods = mods;
                     }
 
@@ -1420,25 +1420,25 @@ namespace aidesign {
 
         ship_class = Get_Ship_Class_(player_idx);
 
-        if (hull_idx == 5 && (player->tech_applications[TECH_APP_STELLAR_CONVERTER] == 3)) {
-            if (random::Random_(4) < 4) {
+        if (hull_idx == SHIP_SIZE_DOOM_STAR && (player->tech_applications[TECH_APP_STELLAR_CONVERTER] == 3)) {
+            if (game_random::Random_(4) < 4) {
                 ship_class = 6;
             }
         }
 
-        if (player->tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == 3 && hull_idx > 3) {
-            if (random::Random_(4) < 4) {
+        if (player->tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == 3 && hull_idx > SHIP_SIZE_HUGE) {
+            if (game_random::Random_(4) < 4) {
                 ship_class = 6;
             }
         }
 
         struct_::Clear_Structure_(design, 99);
 
-        if (hull_idx == 5) {
+        if (hull_idx == SHIP_SIZE_DOOM_STAR) {
             design->picture_num = 0x2b; /* '+' */
-            strcpy(design->name, TECHDATA::_hull_data[5].name);
+            strcpy(design->name, TECHDATA::_hull_data[SHIP_SIZE_DOOM_STAR].name);
         } else {
-            design->picture_num = (int8_t)random::Random_(8) + (int8_t)hull_idx * 8 - 1;
+            design->picture_num = (int8_t)game_random::Random_(8) + (int8_t)hull_idx * 8 - 1;
             uint8_t player_race = player->race;
             DESIGN::Get_Ship_Design_Name_(player_race, hull_idx, (int16_t)(design->picture_num % 8), design->name);
         }
@@ -1460,7 +1460,7 @@ namespace aidesign {
 
         if (player->tech_applications[TECH_APP_BATTLE_PODS] == 3) {
             remaining_space += remaining_space / 2;
-            struct_::Set_Bit_Field_(design->special_device_flags, 4);
+            struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_BATTLE_PODS);
         }
 
         remaining_space -= DESIGN::Shield_Space_Given_M_Level_((int16_t)design->shield_type, (int16_t)design->size, player_idx);
@@ -1624,10 +1624,10 @@ namespace aidesign {
 
             case 7:
                 if (player->tech_applications[TECH_APP_EXTENDED_FUEL_TANKS] == 3) {
-                    struct_::Set_Bit_Field_(design->special_device_flags, 11);
-                    int8_t cat = DESIGN::Miniaturization_Category_(63);
-                    int16_t m_level = DESIGN::Miniaturization_Level_(player_idx, 63);
-                    int16_t fuel_tank_base_space = TECHDATA::_specials[11].space_per_ship_type[0];
+                    struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+                    int8_t cat = DESIGN::Miniaturization_Category_(TECH_APP_EXTENDED_FUEL_TANKS);
+                    int16_t m_level = DESIGN::Miniaturization_Level_(player_idx, TECH_APP_EXTENDED_FUEL_TANKS);
+                    int16_t fuel_tank_base_space = TECHDATA::_specials[SPECIAL_EXTENDED_FUEL_TANKS].space_per_ship_type[0];
                     remaining_space -= DESIGN::Space_Given_M_Level_(fuel_tank_base_space, m_level, cat);
                 }
                 /* fallthrough */
@@ -1686,7 +1686,7 @@ namespace aidesign {
         }
 
         if (design->shield_type == 0) {
-            if (tech_id == 13 || tech_id == 20 || tech_id == 30) {
+            if (tech_id == SPECIAL_HARD_SHIELDS || tech_id == SPECIAL_MULTI_PHASED_SHIELDS || tech_id == SPECIAL_SHIELD_CAPACITOR) {
                 result = 0;
             }
         }

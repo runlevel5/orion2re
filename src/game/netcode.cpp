@@ -4,19 +4,18 @@ namespace netcode {
     uint32_t _netInitialized;
     int8_t _tpSending;
     uint8_t _inComms;
-    IDirectPlay* _dplay;
     recv_fn _recv_fn;
     int32_t _connection_type;
     int32_t _in_send_message;
 
-    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
+    int32_t __cdecl Do_Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network) {
         RUSS::Mox_Update_();
-        int32_t result = Net_Init_(mode, guid, recv_fn_ptr, network);
+        int32_t result = Net_Init_(mode, recv_fn_ptr, network);
         RUSS::Mox_Update_();
         return result;
     }
 
-    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, recv_fn recv_fn_ptr, s_network* network) {
+    int32_t __cdecl Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network) {
         int32_t result = 0;
         _connection_type = mode;
 
@@ -26,7 +25,7 @@ namespace netcode {
 
             // TCP - original wants IPX
             result = WINNET::Init_Connection_(2);
-            WINNET::Refresh_Game_List_(guid);
+            WINNET::Refresh_Game_List_();
 
             _recv_fn = recv_fn_ptr;
         }
@@ -52,39 +51,13 @@ namespace netcode {
     }
 
     char* __cdecl Net_Get_Game_Name_(uint32_t session_idx) {
-        if (session_idx >= (uint32_t)WINNET::_session_count) {
-            return nullptr;
-        }
-
-        if (_dplay == nullptr) {
-            return nullptr;
-        }
-
-        if (&WINNET::_sessions[session_idx] != nullptr) {
-            return WINNET::_sessions[session_idx]->szSessionName;
-        }
-
-        return nullptr;
+        return WINNET::Get_Game_Name_(session_idx);
     }
 
     void __cdecl Net_Uninit_()
     {
         if (_connection_type == 0) {
-            if (_dplay != nullptr) {
-                _dplay->Close();
-                _dplay->Release();
-                _dplay = nullptr;
-            }
-
-            if (WINNET::_session_count != 0) {
-                for (uint32_t i = 0; i < WINNET::_session_count; ++i) {
-                    if (WINNET::_sessions[i] != nullptr) {
-                        ::free(WINNET::_sessions[i]);
-                        WINNET::_sessions[i] = nullptr;
-                    }
-                }
-            }
-            WINNET::_session_count = 0;
+            WINNET::Shutdown_();
         }
 
         if (_connection_type == 1 || _connection_type == 2) {
@@ -97,53 +70,11 @@ namespace netcode {
     }
 
     int32_t __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name) {
-        uint32_t found_idx = 0xffffffff;
-
-        if (WINNET::_session_count != 0) {
-            for (uint32_t i = 0; i < WINNET::_session_count; ++i) {
-                const char* name = Net_Get_Game_Name_(i);
-                if (strcmp(game_name, name) == 0) {
-                    found_idx = i;
-                    break;
-                }
-            }
-        }
-
-        if (found_idx == 0xffffffff) {
+        if (!WINNET::Join_Game_(game_name, password, player_name)) {
             return 0;
         }
 
-        if (found_idx >= WINNET::_session_count) {
-            return 0;
-        }
-
-        DPSESSIONDESC* session = WINNET::_sessions[found_idx];
-        WINNET::Refresh_Player_List_(session->dwSession);
-
-        DPSESSIONDESC session_desc;
-        memset(&session_desc, 0, sizeof(session_desc));
-
-        session_desc.dwSize = sizeof(DPSESSIONDESC); // 0x7c
-        session_desc.guidSession = session->guidSession;
-        session_desc.dwFlags = 1 /* DPOPEN_JOIN */;
-        session_desc.dwSession = session->dwSession;
-
-        if (password != nullptr) {
-            strcpy(session_desc.szPassword, password);
-        }
-
-        HRESULT hr = _dplay->Open(&session_desc);
-        if (hr != 0) {
-            _dplay->Release();
-            _dplay = nullptr;
-            return 0;
-        }
-
-        DPID player_id;
-        WINNET::Create_Player_(&player_id, player_name, "");
-        WINNET::_local_player_id = player_id;
-
-        comcore::ComInit_(0x1c2, session->szSessionName, _recv_fn);
+        comcore::ComInit_(0x1c2, const_cast<char*>(game_name), _recv_fn);
 
         _netInitialized = 1;
         return 1;
@@ -186,9 +117,7 @@ namespace netcode {
     }
 
     void __cdecl Net_Disable_New_Players_() {
-        if (_dplay != nullptr) {
-            _dplay->EnableNewPlayers(0);
-        }
+        WINNET::Net_Disable_New_Players_();
     }
 
     uint32_t __cdecl Net_Host_ID_() {
@@ -222,7 +151,7 @@ namespace netcode {
         if (_in_send_message == 0) {
             _in_send_message = 1;
         } else {
-            ::OutputDebugStringA("REENTERING (Net_Send_Message)!!!!");
+            SDL_Log("REENTERING (Net_Send_Message)!!!!");
         }
 
         if (_connection_type == 3) {
@@ -279,38 +208,10 @@ namespace netcode {
         return status;
     }
 
-    int32_t __cdecl Net_Create_Game_(GUID guid, const char* name, int32_t max_players, const char* password, const char* player_name) {
-        DPSESSIONDESC session_desc;
-        DPID player_id;
-
-        memset(&session_desc, 0, sizeof(DPSESSIONDESC));
-        session_desc.dwSize = sizeof(DPSESSIONDESC);
-        session_desc.guidSession = guid;
-        session_desc.dwFlags = 2;
-        session_desc.dwMaxPlayers = max_players;
-
-        strcpy(session_desc.szSessionName, name);
-
-        if (password != nullptr) {
-            strcpy(session_desc.szPassword, password);
-        }
-
-        HRESULT hr = _dplay->Open(&session_desc);
-        if (hr != 0) {
-            _dplay->Release();
-            _dplay = nullptr;
+    int32_t __cdecl Net_Create_Game_(const char* name, int32_t max_players, const char* password, const char* player_name) {
+        if (!WINNET::Create_Game_(name, max_players, password, player_name)) {
             return 0;
         }
-
-        DPSESSIONDESC* new_session = (DPSESSIONDESC*)::malloc(sizeof(DPSESSIONDESC));
-        WINNET::_sessions[WINNET::_session_count] = new_session;
-        memcpy(new_session, &session_desc, sizeof(DPSESSIONDESC));
-        WINNET::_session_count++;
-
-        WINNET::Net_Enable_New_Players();
-
-        WINNET::Create_Player_(&player_id, player_name, "");
-        WINNET::_local_player_id = player_id;
 
         comcore::ComInit_(0x1c2, const_cast<char*>(name), _recv_fn);
 

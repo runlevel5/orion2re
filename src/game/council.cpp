@@ -775,7 +775,7 @@ namespace council {
         }
 
         /* Determine whether the vote is cast based on the final score. */
-        return (int32_t)random::Random_(200) <= (int32_t)vote_score;
+        return (int32_t)game_random::Random_(200) <= (int32_t)vote_score;
     }
 
     void __cdecl Get_Player_Voted_Winner_Message_(int16_t unused_callback_arg) {
@@ -783,7 +783,7 @@ namespace council {
         int16_t message_idx;
         do {
             /* BUG: message_idx can be -1 if Random_(14) returns 0. */
-            message_idx = (int16_t)random::Random_(14) - 1;
+            message_idx = (int16_t)game_random::Random_(14) - 1;
         } while (_player_voted_winner_message_id[message_idx] != 0xFF);
 
         _player_voted_winner_message_id[message_idx] = (uint8_t)message_idx;

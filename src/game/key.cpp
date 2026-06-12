@@ -33,6 +33,19 @@ namespace key {
         return key_code;
     }
 
+    int32_t Wait_For_Key_() {
+        int32_t key_code;
+
+        do {
+            key_code = Read_Key_();
+            if (key_code == 0) {
+                SDL_Delay(1);
+            }
+        } while (key_code == 0);
+
+        return key_code;
+    }
+
     int16_t Scan_Key_() {
         if (Keyboard_Status_() == 1) {
             int16_t key = (int16_t)Read_Key_();

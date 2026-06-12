@@ -32,7 +32,7 @@ namespace DESBOX {
     const char s__00551120[] = "\x1b";  // fmtpara color-attribute control byte reused as a non-printing field label.
 
     int16_t __cdecl Special_System_Choices_() {
-        memset(MOX::_design->item_unlocked, 0, 40 * sizeof(MOX::_design->item_unlocked[0]));
+        memset(MOX::_design->replacement_item_unlocked, 0, sizeof(MOX::_design->replacement_item_unlocked));
 
         const int16_t replacement_slot = MOX::_design_screen_replacement_slot;
 
@@ -271,8 +271,8 @@ namespace DESBOX {
             }
         }
 
-        MOX::_design->item_unlocked[40] = static_cast<int8_t>(MOX::_scroll_bar->first_visible_row);
-        MOX::_design->date_of_design = MOX::_scroll_bar->thumb_center_y;
+        MOX::_design->special_system_scroll_first_row = static_cast<int8_t>(MOX::_scroll_bar->first_visible_row);
+        MOX::_design->special_system_scroll_thumb_y = MOX::_scroll_bar->thumb_center_y;
         MOX::_scroll_bar = nullptr;
 
         allocate::Pop_Block_(MOX::_global_data_seg);
@@ -755,7 +755,7 @@ namespace DESBOX {
 
         memset(MOX::_design_choice_items, 0, sizeof(MOX::_design_choice_items));
 
-        memset(MOX::_design->item_unlocked, 0, 40 * sizeof(MOX::_design->item_unlocked[0]));
+        memset(MOX::_design->replacement_item_unlocked, 0, sizeof(MOX::_design->replacement_item_unlocked));
 
         if (MOX::_design_screen_replacement_type == 2 /* SHIELDS */) {
             MOX::_scroll_bar->total_rows = 6;
@@ -763,7 +763,7 @@ namespace DESBOX {
                 // If it is the first item (basic shield) or it has been researched (tech status 3)
                 if (idx == 0 || MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECHDATA::_shields[idx].tech_app_id] == 3) {
                     MOX::_design_choice_items[idx] = idx;
-                    MOX::_design->item_unlocked[idx] = 1;
+                    MOX::_design->replacement_item_unlocked[idx] = 1;
                 } else {
                     MOX::_design_choice_items[idx] = -1;
                 }
@@ -774,7 +774,7 @@ namespace DESBOX {
                 // If it is the first item (basic computer) or it has been researched (tech status 3)
                 if (idx == 0 || MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECHDATA::_computers[idx].tech_app_id] == 3) {
                     MOX::_design_choice_items[idx] = idx;
-                    MOX::_design->item_unlocked[idx] = 1;
+                    MOX::_design->replacement_item_unlocked[idx] = 1;
                 } else {
                     MOX::_design_choice_items[idx] = -1;
                 }
@@ -1392,7 +1392,7 @@ namespace DESBOX {
         fields::Assign_Auto_Function_(Draw_Weapons_Replacement_Box_, 1);
         Get_Weapons_Box_Base_Dimensions_();
         Set_Up_Weapon_Display_(replacement_slot);
-        Weapon_Replacement_Help_(MOX::_design_screen_replacement_slot);
+        Weapon_Replacement_Help_(_field_item_chosen);
 
         int16_t redraw_flag = 1;
 
@@ -1643,16 +1643,16 @@ namespace DESBOX {
     }
 
     int16_t __cdecl Weapon_Choices_(int16_t player_idx) {
-        memset(MOX::_design->item_unlocked, 0, 40 * sizeof(MOX::_design->item_unlocked[0]));
+        memset(MOX::_design->replacement_item_unlocked, 0, sizeof(MOX::_design->replacement_item_unlocked));
         memset(MOX::_weapon_filter, 0xFF, 40 * sizeof(s_weapon_filter_item));
 
         MOX::_weapon_filter[0].weapon_idx = 0;
         MOX::_weapon_filter[0].tech_cost = 99999;
-        MOX::_design->item_unlocked[0] = 1;
+        MOX::_design->replacement_item_unlocked[0] = 1;
         MOX::_scroll_bar->total_rows = 1;
 
         for (int16_t w_idx = 1; w_idx < 40; w_idx++) {
-            MOX::_design->item_unlocked[w_idx] = 0;
+            MOX::_design->replacement_item_unlocked[w_idx] = 0;
             uint16_t tech_app_id = TECHDATA::_weapons[w_idx].tech_app_id;
 
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
@@ -1815,17 +1815,17 @@ namespace DESBOX {
     }
 
     void __cdecl Space_With_Weapons_() {
-        MOX::_design->item_unlocked[0] = 1;
+        MOX::_design->replacement_item_unlocked[0] = 1;
 
         for (int16_t i = 1; i < 40; ++i) {
             int16_t weapon_idx = Weapon_Index_(i);
-            MOX::_design->item_unlocked[i] = 0;
+            MOX::_design->replacement_item_unlocked[i] = 0;
 
             if (weapon_idx > -1) {
                 if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECHDATA::_weapons[weapon_idx].tech_app_id] == 3) {
                     int16_t space = Space_With_Weapon_(weapon_idx);
                     if (space <= MOX::_design->hull_space) {
-                        MOX::_design->item_unlocked[i] = 1;
+                        MOX::_design->replacement_item_unlocked[i] = 1;
                     }
                 }
             }
@@ -1958,9 +1958,9 @@ namespace DESBOX {
     void __cdecl Weapon_Replacement_Help_(int16_t weapon_idx) {
         uint8_t needs_racks = 0;
 
-        if (weapon_idx >= 0) {
+        if (weapon_idx >= 0 && weapon_idx < MOX::_scroll_bar->total_rows) {
             int16_t actual_weapon_idx = Weapon_Index_(weapon_idx);
-            if (DESIGN::Weapon_Needs_Racks_(actual_weapon_idx) != 0) {
+            if (actual_weapon_idx > 0 && DESIGN::Weapon_Needs_Racks_(actual_weapon_idx) != 0) {
                 needs_racks = 1;
             }
         }
@@ -2231,7 +2231,7 @@ namespace DESBOX {
                 selected = true;
             }
 
-            if (_field_item_scanned == loop_count && row_idx > -1 && MOX::_design->item_unlocked[row_idx] != 0) {
+            if (_field_item_scanned == loop_count && row_idx > -1 && MOX::_design->replacement_item_unlocked[row_idx] != 0) {
                 s_colors colors = *MISC::Font_Colors2_(2, 0x55, 0x58);
                 fonts::Set_Font_Style_(2, &colors);
                 MISC::Increase_Font_Color_Range_(MOX::_multi_colored_line_start);
@@ -2241,7 +2241,7 @@ namespace DESBOX {
                     pcolors = MISC::Font_Colors2_(2, 0x55, 0x5C);
                 } else if (row_idx <= -1) {
                     pcolors = MISC::Font_Colors2_(2, 0x55, 0x59);
-                } else if (MOX::_design->item_unlocked[row_idx] != 0) {
+                } else if (MOX::_design->replacement_item_unlocked[row_idx] != 0) {
                     pcolors = MISC::Font_Colors2_(2, 0x55, 0x5A);
                 } else {
                     pcolors = MISC::Font_Colors2_(2, 0x55, 0x57);
@@ -2266,7 +2266,7 @@ namespace DESBOX {
                 if (num_weapons >= 99) {
                     num_weapons = 99;
                 }
-                if (MOX::_design->item_unlocked[row_idx] != 0 && num_weapons <= 1) {
+                if (MOX::_design->replacement_item_unlocked[row_idx] != 0 && num_weapons <= 1) {
                     num_weapons = 1;
                 }
             }
@@ -2370,7 +2370,7 @@ namespace DESBOX {
             s_colors color_scanned;
             s_colors* current_colors;
 
-            if (MOX::_repl_fields[i] == static_cast<int16_t>(DESBOX::_field_item_scanned) && MOX::_design->item_unlocked[i] != 0) {
+            if (MOX::_repl_fields[i] == static_cast<int16_t>(DESBOX::_field_item_scanned) && MOX::_design->replacement_item_unlocked[i] != 0) {
                 color_scanned.colors[0] = 0;
                 for (int j = 1; j < 8; ++j) {
                     color_scanned.colors[j] = color_unlocked.colors[j] + static_cast<uint8_t>(MOX::_multi_colored_line_start);
@@ -2378,7 +2378,7 @@ namespace DESBOX {
                 current_colors = &color_scanned;
             } else if (DESBOX::_field_item_chosen == i) {
                 current_colors = &color_selected;
-            } else if (MOX::_design->item_unlocked[i] != 0) {
+            } else if (MOX::_design->replacement_item_unlocked[i] != 0) {
                 current_colors = &color_unlocked;
             } else {
                 current_colors = &color_locked;
@@ -2482,7 +2482,7 @@ namespace DESBOX {
         for (int16_t idx = 0; idx < MOX::_scroll_bar->total_rows; idx++) {
             s_colors* current_color;
 
-            if (MOX::_repl_fields[idx] == _field_item_scanned && MOX::_design->item_unlocked[idx] != 0) {
+            if (MOX::_repl_fields[idx] == _field_item_scanned && MOX::_design->replacement_item_unlocked[idx] != 0) {
                 colors_3.colors[0] = 0;
                 for (int i = 1; i < 8; i++) {
                     colors_3.colors[i] = colors_1.colors[i] + static_cast<uint8_t>(MOX::_multi_colored_line_start);
@@ -2490,7 +2490,7 @@ namespace DESBOX {
                 current_color = &colors_3;
             } else if (idx == _field_item_chosen) {
                 current_color = &colors_0;
-            } else if (MOX::_design->item_unlocked[idx] != 0) {
+            } else if (MOX::_design->replacement_item_unlocked[idx] != 0) {
                 current_color = &colors_1;
             } else {
                 current_color = &colors_2;
@@ -2556,8 +2556,7 @@ namespace DESBOX {
         // Subtract half thumb height (standard signed division used in assembly)
         center_y -= (int16_t)(MOX::_scroll_bar->thumb_height_px / 2);
 
-        // Update first_visible_row from design item_unlocked[40] (offset 0x122)
-        MOX::_scroll_bar->first_visible_row = (int16_t)MOX::_design->item_unlocked[40];
+        MOX::_scroll_bar->first_visible_row = (int16_t)MOX::_design->special_system_scroll_first_row;
 
         // Final thumb center y calculation
         center_y -= (int16_t)(MOX::_scroll_bar->first_visible_row * step_size);

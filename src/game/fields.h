@@ -20,7 +20,7 @@ namespace fields {
     extern int16_t _multi_hotkey_active_field;
     extern uint16_t _draw_fields_flag;
     extern char s__00551100[1];
-    extern char* DAT_0055afc0;
+    extern char* _invalid_field_string_ptr;
     extern int32_t _max_fields_count;
     extern uint8_t _exit_the_list_field;
     extern s_field* _fields;
@@ -113,6 +113,7 @@ namespace fields {
     /* Adds a scroll field that updates a bound value within the supplied range.
      * value: Pointer to the value controlled by the scroll field.
      * hotkey_str: Optional hotkey string; only the first character is used.
+     * The related FIELD_TYPE_SCROLL_RETURN action reuses the same detail.scroll payload.
      */
     int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max, int16_t return_value, int16_t set_value, int16_t width, int16_t height, int16_t* value, const char* hotkey_str, int8_t sound);
 
@@ -124,6 +125,7 @@ namespace fields {
     // The payload stores the shared selection pointer plus this field's selected value.
     int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t button_value, const char* hotkey, int8_t sound);
 
+    // Type 14 clipped circle fields use detail.circle for hit testing.
     int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int8_t sound);
@@ -153,8 +155,6 @@ namespace fields {
      * count: Number of help-box records.
      */
     void __cdecl Set_Help_List_(s_help_box* help_data, int16_t count);
-
-    void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int8_t sound);
 
     void __cdecl Invoke_Auto_Function_();
     void __cdecl Invoke_Saved_Auto_Function_();
@@ -209,7 +209,7 @@ namespace fields {
 
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int8_t sound);
 
-    // Type 10 list rows store a per-row selectability flag at detail+0x2.
+    // Type 10 string list rows store a per-row selectability flag at detail+0x2.
     int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, const char* help, int16_t is_selectable, int8_t* value, int16_t help_start, int16_t gradient_mode, uint8_t* gradient_palette, int32_t gradient_extra, s_animation_header* gradient_pic, int32_t unused_param_12, const char* hotkey_str, const char* unused_param_14);
 
     void __cdecl Mark_Fields_();

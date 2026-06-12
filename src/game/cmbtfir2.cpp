@@ -434,7 +434,7 @@ namespace CMBTFIR2 {
                 }
 
                 int16_t chance = _artemis_net_chance[size_class];
-                int32_t roll = random::Random_(100);
+                int32_t roll = game_random::Random_(100);
 
                 if (chance < roll) {
                     is_active = false;
@@ -444,7 +444,7 @@ namespace CMBTFIR2 {
                         MOX::_combat_data[ship_idx].shield_arc_current[i] = 0;
                     }
 
-                    int32_t total_damage = random::Random_(0x191) + 0x95; // Random(401) + 149
+                    int32_t total_damage = game_random::Random_(0x191) + 0x95; // Random(401) + 149
                     
                     while (total_damage > 0 && !CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx)) {
                         int16_t damage = 0x14; // 20
@@ -465,7 +465,7 @@ namespace CMBTFIR2 {
                 } else {
                     // Strategic combat
                     int16_t shield_id = MOX::_qcombat_data[ship_idx].shield_id;
-                    int16_t damage = (int16_t)(random::Random_(0xC9) + 0x4A); // Random(201) + 74
+                    int16_t damage = (int16_t)(game_random::Random_(0xC9) + 0x4A); // Random(201) + 74
                     
                     MOX::_qcombat_data[ship_idx].shield_id = 0;
                     COMBAT::Apply_Damage_To_Qship_(ship_idx, damage);
@@ -834,7 +834,7 @@ namespace CMBTFIR2 {
                                 int32_t threshold_denom = ((-2 - MOX::_combat_data[attacker_idx].ai_range_tactic) / 3) + 9;
                                 int16_t threshold = (int16_t)((100 * (9 - range1)) / threshold_denom);
 
-                                if ((int)random::Random_(100) <= threshold) {
+                                if ((int)game_random::Random_(100) <= threshold) {
                                     for (int16_t i = 0; i < 8; ++i) {
                                         active_backup[i] = MOX::_combat_data[attacker_idx].weapons[i].active;
                                         int16_t weapon_id = MOX::_combat_data[attacker_idx].weapons[i].weapon_id;
@@ -921,7 +921,7 @@ namespace CMBTFIR2 {
         int16_t total_space;
         int16_t choice;
 
-        random::Random_(100);
+        game_random::Random_(100);
         *raid_type = -1;
 
         total_space = CMBTFIR2::Total_Internal_Space_(ship_idx);
@@ -995,7 +995,7 @@ namespace CMBTFIR2 {
         int16_t choice;
         bool found;
 
-        random_roll = (int16_t)random::Random_(100);
+        random_roll = (int16_t)game_random::Random_(100);
         *hit_type = -1;
 
         if (internal_only != 0) {
@@ -1232,7 +1232,7 @@ namespace CMBTFIR2 {
 
         if (flag == 1 && ship->marine_count != 0xFF && damage_absorbed > 0) {
             for (int16_t i = 0; i < damage_absorbed; ++i) {
-                if (random::Random_(100) <= 1) {
+                if (game_random::Random_(100) <= 1) {
                     Kill_Crew_(target_ship_idx, 1);
                 }
                 MOX::_ken_trace = 0;
@@ -1289,8 +1289,8 @@ namespace CMBTFIR2 {
         if (*raiders > 0) {
             do {
                 int16_t raid_target = 50;
-                int16_t diff = (int16_t)(attacker_strength + (int16_t)random::Random_(100));
-                diff -= (int16_t)(target_strength + (int16_t)random::Random_(100));
+                int16_t diff = (int16_t)(attacker_strength + (int16_t)game_random::Random_(100));
+                diff -= (int16_t)(target_strength + (int16_t)game_random::Random_(100));
 
                 if (diff > 20) {
                     int16_t hits = 2;
@@ -1723,7 +1723,7 @@ namespace CMBTFIR2 {
         CMBTFIR2::Clear_Capturing_Flag_(ship_idx);
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* SPEC_HIGH_ENERGY_FOCUS */)) {
-            if (random::Random_(10) < 6) {
+            if (game_random::Random_(10) < 6) {
                 CMBTFIRE::Destroy_Ship_(ship_idx, x, y, 4);
                 return;
             }
