@@ -13,6 +13,7 @@ namespace platform {
 		SDL_Renderer* g_sdl_renderer;
 		SDL_Texture* g_sdl_present_texture;
 		uint32_t* g_sdl_present_pixels;
+		video::s_palette_color g_present_palette_entries[256];
 		uint32_t g_fps_window_start_ms;
 		uint32_t g_fps_frame_count;
 
@@ -58,8 +59,7 @@ namespace platform {
 
 		[[noreturn]] void Force_Immediate_Process_Exit_() {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "platform: Force_Immediate_Process_Exit");
-			sound::Destroy_Sound_();
-			SDL_Quit();
+			Prepare_Exit_();
 			exit(0);
 		}
 
@@ -364,18 +364,9 @@ namespace platform {
 				return;
 			}
 
-			video::s_palette_color palette_entries[256];
-			if (video::g_palette_mutex != nullptr) {
-				SDL_LockMutex(video::g_palette_mutex);
-			}
-			memcpy(palette_entries, video::g_palette_entries, sizeof(palette_entries));
-			if (video::g_palette_mutex != nullptr) {
-				SDL_UnlockMutex(video::g_palette_mutex);
-			}
-
 			const int32_t pixel_count = video::g_screen_res_x * video::g_screen_res_y;
 			for (int32_t i = 0; i < pixel_count; ++i) {
-				const video::s_palette_color& pal = palette_entries[src_pixels[i]];
+				const video::s_palette_color& pal = g_present_palette_entries[src_pixels[i]];
 				g_sdl_present_pixels[i] =
 					0xFF000000u |
 					((uint32_t)pal.r << 16) |
@@ -383,7 +374,7 @@ namespace platform {
 					(uint32_t)pal.b;
 			}
 
-			Composite_Cursor_On_Present_Pixels_(palette_entries);
+			Composite_Cursor_On_Present_Pixels_(g_present_palette_entries);
 
 #if ORION2RE_ENABLE_FPS_COUNTER
 			if (g_sdl_window != nullptr) {
@@ -732,6 +723,7 @@ namespace platform {
     {
         uint8_t* dst = g_present_surface;
         const uint8_t* src = video::g_page_published.pixels;
+        memcpy(g_present_palette_entries, video::g_submitted_palette_entries, sizeof(g_present_palette_entries));
         for (int32_t y = 0; y < video::g_screen_res_y; ++y) {
             memcpy(dst + y * video::g_screen_res_x, src + y * video::g_screen_res_x, (size_t)video::g_screen_res_x);
         }

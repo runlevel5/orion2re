@@ -55,6 +55,7 @@ namespace ERIC {
             while (fade_level >= 0) {
                 palstore::Darken_Palette_((int32_t)fade_level);
                 _fade_percent = (uint8_t)fade_level;
+                video::Submit_Palette_();
                 RUSS::Mox_Update_();
                 fade_level -= 10;
             }
@@ -76,6 +77,7 @@ namespace ERIC {
                 do {
                     palstore::Darken_Palette_(current_fade);
                     _fade_percent = (uint8_t)current_fade;
+                    video::Submit_Palette_();
                     RUSS::Mox_Update_();
                     current_fade += _fade_speed_in_percent;
                 } while (current_fade < 101);

@@ -179,6 +179,7 @@ namespace JIM {
 
         for (int16_t current_fade = _darken_palette_value; current_fade <= 100; current_fade += 10) {
             palstore::Darken_Palette_((int32_t)current_fade);
+            video::Submit_Palette_();
             RUSS::Mox_Update_();
         }
 

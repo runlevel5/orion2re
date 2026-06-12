@@ -55,6 +55,7 @@ namespace video {
 	extern s_glass_color _glass_colors[16];
 
 	extern s_palette_color g_palette_entries[256];
+	extern s_palette_color g_submitted_palette_entries[256];
 
 	extern s_palette_entry _current_palette[256];
 
@@ -91,6 +92,7 @@ namespace video {
 	void __cdecl Init_Off_Page_Ownership_();
 	void __cdecl Shutdown_Off_Page_Ownership_();
 	void __cdecl Publish_Off_Page_();
+	void __cdecl Submit_Palette_();
 	bool __cdecl Try_Begin_Off_Page_Present_();
 	void __cdecl End_Off_Page_Present_();
 

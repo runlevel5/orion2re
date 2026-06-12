@@ -84,6 +84,7 @@ namespace palstore {
             }
 
             Darken_Palette_((int32_t)intensity);
+            video::Submit_Palette_();
             RUSS::Mox_Update_();
 
             if (intensity-- == 0) {

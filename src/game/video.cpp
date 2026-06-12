@@ -19,6 +19,7 @@ namespace video {
 	uint8_t _glass_remap_colors[16][256];
 	s_glass_color _glass_colors[16];
 	s_palette_color g_palette_entries[256];
+	s_palette_color g_submitted_palette_entries[256];
 	s_palette_entry _current_palette[256];
 	uint8_t* _palette_list[65];
 	uint8_t _palette_reds[256];
@@ -152,6 +153,36 @@ namespace video {
 
 		const size_t page_size = (size_t)video::g_screen_res_x * (size_t)video::g_screen_res_y;
 		memcpy(g_page_published.pixels, g_page_off.pixels, page_size);
+		if (g_palette_mutex != nullptr) {
+			SDL_LockMutex(g_palette_mutex);
+		}
+		memcpy(g_submitted_palette_entries, g_palette_entries, sizeof(g_submitted_palette_entries));
+		if (g_palette_mutex != nullptr) {
+			SDL_UnlockMutex(g_palette_mutex);
+		}
+		g_off_page_state = OFF_PAGE_PUBLISHED;
+		++g_off_page_generation;
+		SDL_UnlockMutex(g_off_page_mutex);
+	}
+
+	void __cdecl Submit_Palette_() {
+		if (g_off_page_mutex == nullptr || g_off_page_condition == nullptr) {
+			return;
+		}
+
+		SDL_LockMutex(g_off_page_mutex);
+		while (g_off_page_state != OFF_PAGE_WRITABLE) {
+			SDL_WaitCondition(g_off_page_condition, g_off_page_mutex);
+		}
+
+		if (g_palette_mutex != nullptr) {
+			SDL_LockMutex(g_palette_mutex);
+		}
+		memcpy(g_submitted_palette_entries, g_palette_entries, sizeof(g_submitted_palette_entries));
+		if (g_palette_mutex != nullptr) {
+			SDL_UnlockMutex(g_palette_mutex);
+		}
+
 		g_off_page_state = OFF_PAGE_PUBLISHED;
 		++g_off_page_generation;
 		SDL_UnlockMutex(g_off_page_mutex);
