@@ -175,12 +175,12 @@ namespace COMBAT {
         for (int i = 0; i < MOX::_combat_total_ship_count; i++) {
             if (MOX::_qcombat_data[i].status != 0 && MOX::_qcombat_data[i].size > 4 && star_idx != MOX::_NUM_STARS) {
                 int16_t building_id = 0;
-                if (MOX::_qcombat_data[i].size == 6) {
-                    building_id = 0x28; // Star Base
-                } else if (MOX::_qcombat_data[i].size == 7) {
-                    building_id = 8; // Battlestation
-                } else if (MOX::_qcombat_data[i].size == 8) {
-                    building_id = 0x29; // Star Fortress
+                if (MOX::_qcombat_data[i].size == HULL_STAR_BASE) {
+                    building_id = BUILDING_STAR_BASE;
+                } else if (MOX::_qcombat_data[i].size == HULL_BATTLESTATION) {
+                    building_id = BUILDING_BATTLESTATION;
+                } else if (MOX::_qcombat_data[i].size == HULL_STAR_FORTRESS) {
+                    building_id = BUILDING_STAR_FORTRESS;
                 }
                 
                 if (building_id != 0) {
@@ -192,7 +192,7 @@ namespace COMBAT {
             if (ship_design_idx != -1) {
                 uint8_t player = (uint8_t)MOX::_qcombat_data[i].player;
                 if (leader_combat_bonuses[player] <= 0 && 
-                   (player >= MAX_PLAYERS || (MOX::_player[player].tech_applications[4] != 3 && MOX::_player[player].traits[17] == 0))) {
+                   (player >= MAX_PLAYERS || (MOX::_player[player].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] != 3 && MOX::_player[player].traits[TRAIT_CYBERNETIC] == 0))) {
                     if (MOX::_settings.strategic_combat_flag == 1) {
                         MOX::_ship[ship_design_idx].structural_damage = MOX::_qcombat_data[i].structural_damage;
                     } else {
@@ -216,7 +216,7 @@ namespace COMBAT {
                 int16_t officer_idx = MOX::_qcombat_data[i].officer_idx;
                 if (officer_idx != -1) {
                     if (MOX::_leaders[officer_idx].eta <= 0) {
-                        if (MOX::_player[MOX::_qcombat_data[i].player].tech_applications[179] == 3) {
+                        if (MOX::_player[MOX::_qcombat_data[i].player].tech_applications[TECH_APP_SURVIVAL_PODS] == 3) {
                             survived_officer_ids[survived_officers_count] = officer_idx;
                             survived_officers_count++;
                         } else {
@@ -305,7 +305,7 @@ namespace COMBAT {
         if (MOX::_cmbt_colony_id != -1) {
             if (MOX::_colony[MOX::_cmbt_colony_id].n_pops == 0) {
                 int16_t has_buildings = 0;
-                for (int i = 0; i < 49; i++) {
+                for (int i = 0; i < BUILDING_COUNT; i++) {
                     has_buildings += MOX::_colony[MOX::_cmbt_colony_id].buildings[i];
                 }
                 
@@ -396,7 +396,7 @@ namespace COMBAT {
         if (num_ships > 0) {
             for (int16_t i = 0; i < num_ships; ++i) {
                 int16_t ship_idx = ship_indices[i];
-                if (MOX::_ship[ship_idx].d.ship_type == 0) {
+                if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT) {
                     uint8_t ship_size = MOX::_ship[ship_idx].d.size;
                     int16_t best_strat_special = INITSHIP::Best_Strat_Special_Weapon_(player_idx, ship_size);
                     INITSHIP::Update_Strategic_Ship_(ship_idx);
@@ -492,33 +492,33 @@ namespace COMBAT {
             q0->max_hits = Get_Colony_Hits_();
             q0->ship_design_idx = -1;
 
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[28] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_RADIATION_SHIELD] != 0) {
                 q0->missile_defense_bonus += 10;
                 q0->beam_defense_bonus = (int16_t)(q0->beam_defense_bonus * 10);
             }
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[23] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_BARRIER_SHIELD] != 0) {
                 q0->missile_defense_bonus += 30;
                 q0->beam_defense_bonus = (int16_t)(q0->beam_defense_bonus * 30);
             }
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[24] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_FLUX_SHIELD] != 0) {
                 q0->missile_defense_bonus += 20;
                 q0->beam_defense_bonus = (int16_t)(q0->beam_defense_bonus * 20);
             }
 
             q0->missile_weapon_id = 0;
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[26] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_MISSILE_BASE] != 0) {
                 q0->missile_weapon_id = best_missile;
                 MOX::_colony_defense_flags += 1;
             }
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[47] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_FIGHTER_GARRISON] != 0) {
                 q0->special_weapon_id = best_colony_strat_special;
                 MOX::_colony_defense_flags += 8;
             }
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[27] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_GROUND_BATTERIES] != 0) {
                 q0->beam_weapon_id = best_beam;
                 MOX::_colony_defense_flags += 2;
             }
-            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[42] != 0) {
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_STELLAR_CONVERTER] != 0) {
                 MOX::_colony_defense_flags += 4;
             }
 
@@ -529,11 +529,11 @@ namespace COMBAT {
             }
 
             s_colony* colony_ptr = &MOX::_colony[MOX::_cmbt_colony_id];
-            if (colony_ptr->buildings[40] != 0) {
+            if (colony_ptr->buildings[BUILDING_STAR_BASE] != 0) {
                 s_qship* qs = &MOX::_qcombat_data[MOX::_combat_total_ship_count];
                 qs->player = colony_ptr->owner;
                 qs->ship_design_idx = -1;
-                qs->size = 6;
+                qs->size = HULL_STAR_BASE;
                 qs->status = 0;
                 qs->field3_0x4 = -1;
                 qs->missile_weapon_id = best_missile;
@@ -541,19 +541,19 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[6].strat_hits) / 100);
+                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[HULL_STAR_BASE].strat_hits) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[6].strat_def_bonus;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[HULL_STAR_BASE].strat_def_bonus;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
                 return;
             }
-            if (colony_ptr->buildings[8] != 0) {
+            if (colony_ptr->buildings[BUILDING_BATTLESTATION] != 0) {
                 s_qship* qs = &MOX::_qcombat_data[MOX::_combat_total_ship_count];
                 qs->player = colony_ptr->owner;
                 qs->ship_design_idx = -1;
-                qs->size = 7;
+                qs->size = HULL_BATTLESTATION;
                 qs->status = 0;
                 qs->field3_0x4 = -1;
                 qs->missile_weapon_id = best_missile;
@@ -561,19 +561,19 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[7].strat_hits) / 100);
+                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[HULL_BATTLESTATION].strat_hits) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[7].strat_def_bonus;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[HULL_BATTLESTATION].strat_def_bonus;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
                 return;
             }
-            if (colony_ptr->buildings[41] != 0) {
+            if (colony_ptr->buildings[BUILDING_STAR_FORTRESS] != 0) {
                 s_qship* qs = &MOX::_qcombat_data[MOX::_combat_total_ship_count];
                 qs->player = colony_ptr->owner;
                 qs->ship_design_idx = -1;
-                qs->size = 8;
+                qs->size = HULL_STAR_FORTRESS;
                 qs->status = 0;
                 qs->field3_0x4 = -1;
                 qs->missile_weapon_id = best_missile;
@@ -581,9 +581,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[8].strat_hits) / 100);
+                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[HULL_STAR_FORTRESS].strat_hits) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[8].strat_def_bonus;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[HULL_STAR_FORTRESS].strat_def_bonus;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -807,11 +807,11 @@ namespace COMBAT {
             // Apply sensor bonus to hit chance by reducing target defense
             if (attacker_player_idx < MAX_PLAYERS) {
                 s_player* player = &MOX::_player[attacker_player_idx];
-                if (player->tech_applications[160 /* TECH_APP_SENSORS */] == 3) {
+                if (player->tech_applications[TECH_APP_SENSORS] == 3) {
                     defense_bonus -= 70;
-                } else if (player->tech_applications[116 /* TECH_APP_NEUTRON_SCANNER */] == 3) {
+                } else if (player->tech_applications[TECH_APP_NEUTRON_SCANNER] == 3) {
                     defense_bonus -= 40;
-                } else if (player->tech_applications[181 /* TECH_APP_TACHYON_SCANNER */] == 3) {
+                } else if (player->tech_applications[TECH_APP_TACHYON_SCANNER] == 3) {
                     defense_bonus -= 20;
                 }
             } else {
@@ -912,21 +912,21 @@ namespace COMBAT {
                 // Check and destroy Missile Base
                 if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_colony_defense_flags & 0x4)) {
                     MOX::_colony_defense_flags ^= 0x4;
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, 42 /* 0x2a */);
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STELLAR_CONVERTER);
                     MOX::_qcombat_data->structural_damage -= 40;
                 }
 
                 // Check and destroy Star Base
                 if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_colony_defense_flags & 0x1)) {
                     MOX::_colony_defense_flags ^= 0x1;
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, 26 /* 0x1a */);
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_MISSILE_BASE);
                     MOX::_qcombat_data->structural_damage -= 40;
                 }
 
                 // Check and destroy Battle Station
                 if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_colony_defense_flags & 0x2)) {
                     MOX::_colony_defense_flags ^= 0x2;
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, 27 /* 0x1b */);
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_GROUND_BATTERIES);
                     MOX::_qcombat_data->missile_defense_bonus -= 10;
                     MOX::_qcombat_data->structural_damage -= 40;
                 }
@@ -934,7 +934,7 @@ namespace COMBAT {
                 // Check and destroy Star Fortress
                 if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_colony_defense_flags & 0x8)) {
                     MOX::_colony_defense_flags ^= 0x8;
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, 47 /* 0x2f */);
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_FIGHTER_GARRISON);
                     MOX::_qcombat_data->structural_damage -= 40;
                 }
 
@@ -979,7 +979,7 @@ namespace COMBAT {
     }
 
     int16_t __cdecl Combat_Satelite_Check_(uint8_t type) {
-        if (type == 8 /* Starbase */ || type == 40 /* Battlestation */ || type == 41 /* Fortress */) {
+        if (type == BUILDING_BATTLESTATION || type == BUILDING_STAR_BASE || type == BUILDING_STAR_FORTRESS) {
             return 1;
         }
         return 0;
@@ -997,7 +997,7 @@ namespace COMBAT {
         int16_t hits = (uint8_t)colony->n_pops + colony->military[0] + colony->military[1];
 
         // Add 1 hit for every building that is not a combat satellite
-        for (uint8_t i = 0; i < 49; ++i) {
+        for (uint8_t i = 0; i < BUILDING_COUNT; ++i) {
             if (colony->buildings[i] != 0) {
                 if (Combat_Satelite_Check_(i) == 0) {
                     hits++;
@@ -1192,7 +1192,7 @@ namespace COMBAT {
 
         if (colony_damage_flags & 0x1) {
             strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[26].name);
+            strcat(stats_msg, TECHDATA::_buildings[BUILDING_MISSILE_BASE].name);
             strcat(stats_msg, string::s_X250);
             strcat(stats_msg, string::s_1);
             strcat(stats_msg, string::s_X312);
@@ -1206,7 +1206,7 @@ namespace COMBAT {
 
         if (colony_damage_flags & 0x2) {
             strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[27].name);
+            strcat(stats_msg, TECHDATA::_buildings[BUILDING_GROUND_BATTERIES].name);
             strcat(stats_msg, string::s_X250);
             strcat(stats_msg, string::s_1);
             strcat(stats_msg, string::s_X312);
@@ -1220,7 +1220,7 @@ namespace COMBAT {
 
         if (colony_damage_flags & 0x8) {
             strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[47].name);
+            strcat(stats_msg, TECHDATA::_buildings[BUILDING_FIGHTER_GARRISON].name);
             strcat(stats_msg, string::s_X250);
             strcat(stats_msg, string::s_1);
             strcat(stats_msg, string::s_X312);
@@ -1234,7 +1234,7 @@ namespace COMBAT {
 
         if (colony_damage_flags & 0x4) {
             strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[42].name);
+            strcat(stats_msg, TECHDATA::_buildings[BUILDING_STELLAR_CONVERTER].name);
             strcat(stats_msg, string::s_X250);
             strcat(stats_msg, string::s_1);
             strcat(stats_msg, string::s_X312);
@@ -1333,7 +1333,7 @@ namespace COMBAT {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
             if (MOX::_planet[planet_idx].star_index == MOX::_ship[i].location &&
-                MOX::_ship[i].d.ship_type == 0 &&
+                MOX::_ship[i].d.ship_type == SHIP_TYPE_COMBAT &&
                 MOX::_ship[i].status == 0 &&
                 MOX::_ship[i].owner == result->attacker_idx) {
 
@@ -1374,7 +1374,7 @@ namespace COMBAT {
 
         if (ship_count > 0) {
             for (int16_t i = 0; i < ship_count; ++i) {
-                if (MOX::_ship[ship_array[i]].d.ship_type == 0) {
+                if (MOX::_ship[ship_array[i]].d.ship_type == SHIP_TYPE_COMBAT) {
                     COMBINIT::Load_Combat_Ship_(ship_array[i], MOX::_combat_total_ship_count);
                     MOX::_combat_data[MOX::_combat_total_ship_count].x = 0;
                     MOX::_combat_data[MOX::_combat_total_ship_count].y = 0;

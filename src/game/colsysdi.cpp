@@ -2,7 +2,7 @@
 
 namespace COLSYSDI {
     s_animation_header* __cdecl Planet_Anims_(int16_t climate, int16_t planet_size) {
-        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, climate * 5 + planet_size + 11, MOX::_global_cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, climate * (PLANET_SIZE_HUGE + 1) + planet_size + 11, MOX::_global_cache_seg);
     }
 
     void __cdecl Draw_Col_Sys_Disp_(int16_t x, int16_t y) {
@@ -22,13 +22,13 @@ namespace COLSYSDI {
                     climate = MOX::_colony[planet->colony_index].climate;
                 }
                 
-                if (planet->planet_type == 3) {
+                if (planet->planet_type == PLANET_TYPE_PLANET) {
                     s_animation_header* anim = Planet_Anims_(climate, planet->size);
                     ERIC::Draw_Centered_(x + 15, y + i * 24 + 14, anim);
-                } else if (planet->planet_type == 2) {
+                } else if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
                     s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3E, MOX::_global_cache_seg);
                     ERIC::Draw_Centered_(x + 15, y + i * 24 + 14, anim);
-                } else if (planet->planet_type == 1) {
+                } else if (planet->planet_type == PLANET_TYPE_ASTEROID) {
                     s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3F, MOX::_global_cache_seg);
                     ERIC::Draw_Centered_(x + 15, y + i * 24 + 14, anim);
                 }
@@ -86,7 +86,7 @@ namespace COLSYSDI {
 
     void __cdecl Planet_Summary_String_(char* summary_text, int16_t planet_idx, int16_t font_player_idx) {
         char* gravity_and_mineral_str[8];
-        char* size_str[5];
+        char* size_str[PLANET_SIZE_HUGE + 1];
         char* gas_giant_str;
         char* asteroid_str;
         char pop_str[500];
@@ -132,11 +132,11 @@ namespace COLSYSDI {
             climate = MOX::_colony[colony_idx].climate;
         }
 
-        if (planet->planet_type != 3) {
-            if (planet->planet_type == 2) {
+        if (planet->planet_type != PLANET_TYPE_PLANET) {
+            if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
                 sprintf(summary_text, ESTRINGS::E_Strings_(0x46), gas_giant_str);
             }
-            if (planet->planet_type == 1) {
+            if (planet->planet_type == PLANET_TYPE_ASTEROID) {
                 sprintf(summary_text, ESTRINGS::E_Strings_(0x46), asteroid_str);
             }
             return;

@@ -551,10 +551,10 @@ namespace CMBTSPEC {
 
         int16_t total_damage_accum = 0;
         if (attack_count > 0) {
-            int16_t range = TECHDATA::_weapons[34].max_damage - TECHDATA::_weapons[34].min_damage + 1;
+            int16_t range = TECHDATA::_weapons[WEAPON_GYRO_DESTABILIZER].max_damage - TECHDATA::_weapons[WEAPON_GYRO_DESTABILIZER].min_damage + 1;
             for (int i = 0; i < attack_count; ++i) {
                 int32_t roll = game_random::Random_(range);
-                int16_t base_dmg = TECHDATA::_weapons[34].min_damage + (int16_t)roll - 1;
+                int16_t base_dmg = TECHDATA::_weapons[WEAPON_GYRO_DESTABILIZER].min_damage + (int16_t)roll - 1;
                 total_damage_accum += (int16_t)(base_dmg * (MOX::_combat_data[target_idx].size_class + 1));
             }
         }
@@ -817,35 +817,35 @@ namespace CMBTSPEC {
             step = 3;
         }
 
-        if (missile->type == 0x13 || missile->type == 0x28) {
+        if (missile->type == WEAPON_PROTON_TORPEDO || missile->type == WEAPON_DRAGON_BREATH) {
             max_dist = 10000;
             missile->travel_dist = 10000;
         }
 
         if (MOX::_super_fast_flag == 0) {
             switch (missile->type) {
-            case 0x0E:
+            case WEAPON_NUCLEAR_MISSILE:
                 sound_handle = ERICNET::Mox_Play_Sound_(0x20);
                 sound::Pitch_Bend_Sound_(sound_handle, 500);
                 break;
-            case 0x0F:
+            case WEAPON_MERCULITE_MISSILE:
                 ERICNET::Mox_Play_Sound_(0x20);
                 break;
-            case 0x10:
+            case WEAPON_PULSON_MISSILE:
                 sound_handle = ERICNET::Mox_Play_Sound_(0x20);
                 sound::Pitch_Bend_Sound_(sound_handle, -1500);
                 break;
-            case 0x11:
+            case WEAPON_ZEON_MISSILE:
                 sound_handle = ERICNET::Mox_Play_Sound_(0x20);
                 sound::Pitch_Bend_Sound_(sound_handle, -2500);
                 break;
-            case 0x12:
+            case WEAPON_ANTI_MATTER_TORP:
                 ERICNET::Mox_Play_Sound_(0x3D);
                 break;
-            case 0x13:
+            case WEAPON_PROTON_TORPEDO:
                 ERICNET::Mox_Play_Sound_(0x3C);
                 break;
-            case 0x14:
+            case WEAPON_PLASMA_TORPEDO:
                 ERICNET::Mox_Play_Sound_(0x3B);
                 break;
             default:
@@ -964,7 +964,7 @@ namespace CMBTSPEC {
         int16_t total_damage = 0;
         int16_t total_struct_damage = 0;
         int16_t bonus = MOX::_ordnance_bonus[MOX::_combat_data[attacker_idx].owner];
-        int16_t base_damage = TECHDATA::_weapons[38].max_damage;
+        int16_t base_damage = TECHDATA::_weapons[WEAPON_STELLAR_CONVERTER].max_damage;
         int16_t damage_per_hit = (bonus * num_shots * base_damage) / 100;
 
         for (int16_t i = 0; i < 4; ++i) {
@@ -1801,22 +1801,22 @@ namespace CMBTSPEC {
 
                     if (sfx_type == 0) {
                         for (int16_t k = 0; k < shot_count; ++k) {
-                            damage += TECHDATA::_weapons[44].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[44].max_damage -
-                                TECHDATA::_weapons[44].min_damage + 1) - 1;
+                            damage += TECHDATA::_weapons[WEAPON_PLASMA_FLUX].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[WEAPON_PLASMA_FLUX].max_damage -
+                                TECHDATA::_weapons[WEAPON_PLASMA_FLUX].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else if (sfx_type == 1) {
                         for (int16_t k = 0; k < shot_count; ++k) {
-                            damage += TECHDATA::_weapons[36].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[36].max_damage -
-                                TECHDATA::_weapons[36].min_damage + 1) - 1;
+                            damage += TECHDATA::_weapons[WEAPON_PULSAR].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[WEAPON_PULSAR].max_damage -
+                                TECHDATA::_weapons[WEAPON_PULSAR].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
                     else if (sfx_type == 2) {
                         for (int16_t k = 0; k < shot_count; ++k) {
-                            damage += TECHDATA::_weapons[13].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[13].max_damage -
-                                TECHDATA::_weapons[13].min_damage + 1) - 1;
+                            damage += TECHDATA::_weapons[WEAPON_SPATIAL_COMPRESSOR].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[WEAPON_SPATIAL_COMPRESSOR].max_damage -
+                                TECHDATA::_weapons[WEAPON_SPATIAL_COMPRESSOR].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
                     }
@@ -1850,22 +1850,22 @@ namespace CMBTSPEC {
 
             if (sfx_type == 0) {
                 for (int16_t k = 0; k < shot_count; ++k) {
-                    damage += TECHDATA::_weapons[44].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[44].max_damage -
-                        TECHDATA::_weapons[44].min_damage + 1) - 1;
+                    damage += TECHDATA::_weapons[WEAPON_PLASMA_FLUX].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[WEAPON_PLASMA_FLUX].max_damage -
+                        TECHDATA::_weapons[WEAPON_PLASMA_FLUX].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else if (sfx_type == 1) {
                 for (int16_t k = 0; k < shot_count; ++k) {
-                    damage += TECHDATA::_weapons[36].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[36].max_damage -
-                        TECHDATA::_weapons[36].min_damage + 1) - 1;
+                    damage += TECHDATA::_weapons[WEAPON_PULSAR].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[WEAPON_PULSAR].max_damage -
+                        TECHDATA::_weapons[WEAPON_PULSAR].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }
             else if (sfx_type == 2) {
                 for (int16_t k = 0; k < shot_count; ++k) {
-                    damage += TECHDATA::_weapons[13].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[13].max_damage -
-                        TECHDATA::_weapons[13].min_damage + 1) - 1;
+                    damage += TECHDATA::_weapons[WEAPON_SPATIAL_COMPRESSOR].min_damage + (int16_t)game_random::Random_(TECHDATA::_weapons[WEAPON_SPATIAL_COMPRESSOR].max_damage -
+                        TECHDATA::_weapons[WEAPON_SPATIAL_COMPRESSOR].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[source_ship_idx].owner] * damage) / 100);
             }

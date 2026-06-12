@@ -739,15 +739,15 @@ namespace council {
             }
 
             /* Apply diplomatic trait modifiers. */
-            if (MOX::_player[candidate_idx].traits[20] == 1) {
+            if (MOX::_player[candidate_idx].traits[TRAIT_CHARISMATIC] == 1) {
                 vote_score += 40;
             }
-            if (MOX::_player[candidate_idx].traits[19] == 1) {
+            if (MOX::_player[candidate_idx].traits[TRAIT_REPULSIVE] == 1) {
                 vote_score -= 100;
             }
 
             /* Apply the relevant diplomacy tech modifier. */
-            if (MOX::_player[candidate_idx].tech_applications[200] == 3) {
+            if (MOX::_player[candidate_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
                 vote_score += 30;
             }
 

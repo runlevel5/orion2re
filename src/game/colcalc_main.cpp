@@ -174,30 +174,30 @@ namespace COLCALC {
 
         // Handle unique system specials (Orion/Guardians/Monsters/Artifacts)
         switch (MOX::_star[star_idx].system_special) {
-        case 2:
-        case 3:
-            MOX::_star[star_idx].system_special = 0;
+        case SYSTEM_SPECIAL_SPACE_DEBRIS:
+        case SYSTEM_SPECIAL_PIRATE_CACHE:
+            MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
             break;
-        case 6:
-        case 7:
-            MOX::_star[star_idx].system_special = 0;
+        case SYSTEM_SPECIAL_NATIVES:
+        case SYSTEM_SPECIAL_SPLINTER_COLONY:
+            MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
             for (int i = 0; i < 5; ++i) {
                 int16_t p_idx = MOX::_star[star_idx].planet_index[i];
                 if (p_idx != -1) {
-                    MOX::_planet[p_idx].planet_special = 0;
+                    MOX::_planet[p_idx].planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
                 }
             }
             break;
-        case 8:
+        case SYSTEM_SPECIAL_MAROONED_HERO:
             // Deassign officers if the system special is removed (e.g., Orion conquered)
             for (int16_t i = 0; i < MAX_LEADERS; ++i) {
                 if (MOX::_leaders[i].status == 5 && MOX::_leaders[i].location == star_idx) {
                     OFFICER::Deassign_Officer_(i);
                 }
             }
-            MOX::_star[star_idx].system_special = 0;
+            MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
             break;
-        case 10:
+        case SYSTEM_SPECIAL_ANCIENT_ARTIFACTS:
             MOX::_star[star_idx].artifacts_gave_app = 1;
             break;
         }
@@ -601,8 +601,8 @@ namespace COLCALC {
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == player_idx) {
-                // Check for Science Lab bit (0x1c = 28)?
-                if (struct_::Test_Bit_Field_(ship->d.special_device_flags, 0x1c) && ship->status < 4) {
+                // Check for Scout Lab bit.
+                if (struct_::Test_Bit_Field_(ship->d.special_device_flags, SPECIAL_SCOUT_LAB) && ship->status < 4) {
                     total_research += (1 << (ship->d.size & 0x1F));
                 }
             }
@@ -779,7 +779,7 @@ namespace COLCALC {
 
         if (leader_idx != -1) {
             auto& leader = MOX::_leaders[leader_idx];
-            if (econ_type == 0 /* ECON_FOOD */) {
+            if (econ_type == ECON_FOOD) {
                 if (leader.special_skills & 0x8 /* Labor Leader */) {
                     officer_bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
                 }
@@ -787,7 +787,7 @@ namespace COLCALC {
                     officer_bonus = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                 }
             }
-            else if (econ_type == 1 /* ECON_INDUSTRY */) {
+            else if (econ_type == ECON_INDUSTRY) {
                 if (leader.special_skills & 0x200 /* Industrialist */) {
                     officer_bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
                 }
@@ -795,7 +795,7 @@ namespace COLCALC {
                     officer_bonus = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                 }
             }
-            else if (econ_type == 2 /* ECON_RESEARCH */) {
+            else if (econ_type == ECON_RESEARCH) {
                 if (leader.special_skills & 0x2000 /* Science Leader */) {
                     officer_bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
                 }
@@ -817,8 +817,8 @@ namespace COLCALC {
                 if (out) {
                     final.base_prod += cur_stat.base_prod;
                     final.racial_bonuses[race] += cur_stat.racial_bonuses[race];
-                    for (int j = 0; j < 212; ++j) final.tech_apps[j] += cur_stat.tech_apps[j];
-                    for (int j = 0; j < 49; ++j) final.buildings_prod[j] += cur_stat.buildings_prod[j];
+                    for (int j = 0; j < TECH_APP_COUNT; ++j) final.tech_apps[j] += cur_stat.tech_apps[j];
+                    for (int j = 0; j < BUILDING_COUNT; ++j) final.buildings_prod[j] += cur_stat.buildings_prod[j];
                     final.food_bonus += cur_stat.food_bonus;
                     final.artifacts_bonus += cur_stat.artifacts_bonus;
                     final.intelligence_bonus += cur_stat.intelligence_bonus;
@@ -829,7 +829,7 @@ namespace COLCALC {
                 final.base_prod_scaled += scaled_base;
 
                 bool morale_applies = base_morale_applies;
-                if (econ_type != 1 /* ECON_INDUSTRY */ && race == 8 /* Androids/Cybernetic */) {
+                if (econ_type != ECON_INDUSTRY && race == 8 /* Androids/Cybernetic */) {
                     morale_applies = false;
                 }
 
@@ -849,7 +849,7 @@ namespace COLCALC {
                 }
                 final.morale_bonus += cur_stat.morale_bonus;
 
-                if (econ_type <= 1 /* FOOD or INDUSTRY */) {
+                if (econ_type <= ECON_INDUSTRY /* FOOD or INDUSTRY */) {
                     if (govt_type == 6 /* Unification */) {
                         cur_stat.govt_bonus = (int)pop_base_prod * 10;
                     }
@@ -863,7 +863,7 @@ namespace COLCALC {
                         final.blockaded_penalty += cur_stat.blockaded_penalty;
                     }
                 }
-                else if (econ_type == 2 /* RESEARCH */) {
+                else if (econ_type == ECON_RESEARCH) {
                     switch (govt_type) {
                     case 0: cur_stat.govt_bonus = (int)pop_base_prod * -10; break;
                     case 1: cur_stat.govt_bonus = (int)pop_base_prod * -5; break;
@@ -894,7 +894,7 @@ namespace COLCALC {
             memcpy(out, &final, sizeof(s_colony_job_production));
         }
 
-        if (econ_type == 0 /* ECON_FOOD */) {
+        if (econ_type == ECON_FOOD) {
             return (final.final_prod + 20) / 40;
         }
         return (final.final_prod + 10) / 20;
@@ -1032,13 +1032,13 @@ namespace COLCALC {
         }
         plr->maintenance[1] = (int16_t)(active_freighters / 2);
 
-        int32_t ship_counts[9] = { 0 };
+        int32_t ship_counts[HULL_CLASS_COUNT] = { 0 };
         int32_t noncombat_ships = 0;
 
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* s = &MOX::_ship[i];
             if (s->owner == player_idx && s->status < 3 && s->just_built == 0) {
-                if (s->d.ship_type == 0) {
+                if (s->d.ship_type == SHIP_TYPE_COMBAT) {
                     ship_counts[(int8_t)s->d.size]++;
                 }
                 else {
@@ -1050,7 +1050,7 @@ namespace COLCALC {
 
         if (debug_out) {
             char* ptr = debug_out;
-            for (int i = 0; i < 9; ++i) {
+            for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                 if (ship_counts[i] > 0) {
                     if (ship_counts[i] == 1) {
                         ptr += sprintf(ptr, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
@@ -1324,7 +1324,7 @@ namespace COLCALC {
                 }
             }
 
-            for (int i = 0; i < 49; ++i) {
+            for (int i = 0; i < BUILDING_COUNT; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
                     ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
@@ -1447,7 +1447,7 @@ namespace COLCALC {
                 }
             }
 
-            for (int i = 0; i < 49; ++i) {
+            for (int i = 0; i < BUILDING_COUNT; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
                     len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
                 }
@@ -1633,13 +1633,13 @@ namespace COLCALC {
                 p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
             }
 
-            for (int i = 0; i < 212; ++i) {
+            for (int i = 0; i < TECH_APP_COUNT; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
                     p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
-            for (int i = 0; i < 49; ++i) {
+            for (int i = 0; i < BUILDING_COUNT; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
                     p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }

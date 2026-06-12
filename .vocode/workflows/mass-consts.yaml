@@ -97,9 +97,11 @@ workflows:
           * Focus only on that single provided file.
           * Do not read, patch, or coordinate changes with any sibling file or any other project file.
           * Replace hard-coded uses with the matching symbolic constant from `src/game/orion2_consts.h` only when the code in that file is clearly expressing that exact constant semantically.
+          * Ignore comments when determining semantic meaning; comments may be stale or misleading.
+          * Derive semantic meaning from the actual code behavior and structure, not from comments.
           * Treat semantic meaning as the primary requirement. A numeric value match alone is never sufficient.
           * If multiple constants share the same numeric value, use the one that matches the surrounding domain meaning, not merely the value.
-          * Verify the intended meaning from nearby identifiers, data structures, loop purpose, comments, index usage, and related operations before replacing a literal.
+          * Verify the intended meaning from nearby identifiers, data structures, loop purpose, index usage, control flow, and related operations before replacing a literal.
           * Convert all clearly relevant hard-coded uses in the claimed file, not just the first one you find.
           * Before finishing the file or continuing to the next claim, verify every replacement you made still preserves the exact same numeric value and the same semantic meaning in context.
           * Confirm each inserted symbolic constant resolves to exactly the literal value it replaced, and revert any candidate edit where either the numeric value or the intended meaning does not match exactly.

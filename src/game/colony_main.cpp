@@ -501,7 +501,7 @@ namespace COLONY {
         Clear_Satellite_Array_();
 
         int bldg_count = 0;
-        for (int16_t bldg_id = 0; bldg_id < 49; ++bldg_id) {
+        for (int16_t bldg_id = 0; bldg_id < BUILDING_COUNT; ++bldg_id) {
             if (MOX::_colony[colony_idx].buildings[bldg_id] != 0) {
                 if (is_ui_view == 0 || bldg_count < 18) {
                     if (TECHDATA::_buildings[bldg_id].type == 7 /* Satellite */) {
@@ -894,7 +894,7 @@ namespace COLONY {
             break;
         default:
             COLONY::Set_Colony_Font_();
-            if (producing_id >= 1 && producing_id < 49) {
+            if (producing_id >= 1 && producing_id < BUILDING_COUNT) {
                 COLONY::Draw_Current_Building_(producing_id);
             }
             else if (producing_id <= -100) {
@@ -993,7 +993,7 @@ namespace COLONY {
             MOX::_temp_star_handle = (int16_t)_star_handle;
             MOX::_return_screen = MOX::_current_screen;
             MOX::_screen_mouse_list_type = 1;
-            MOX::_current_screen = 29 /* 0x1d */;
+            MOX::_current_screen = SCREEN_OFFICERS;
             return 0;
         }
 

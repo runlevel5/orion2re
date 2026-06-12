@@ -208,7 +208,7 @@ namespace COLBLDG {
 
                     if (MOX::_settings.strategic_combat_flag == 0) {
                         can_build = true;
-                    } else if (current_player.ship_designs[i].size != 4 /* Not a Titan */) {
+                    } else if (current_player.ship_designs[i].size != SHIP_SIZE_TITAN) {
                         can_build = true;
                     } else if (owner_player.tech_applications[TECH_APP_TITAN_CONSTRUCTION] == 3) {
                         can_build = true;
@@ -543,7 +543,7 @@ namespace COLBLDG {
                     }
                 }
 
-                if (is_available && planet.planet_type == 3) {
+                if (is_available && planet.planet_type == PLANET_TYPE_PLANET) {
                     uncolonized_count++;
                 }
             }
@@ -581,7 +581,7 @@ namespace COLBLDG {
                 if (colony->buildings[BUILDING_STAR_BASE] == 0 &&
                     colony->buildings[BUILDING_STAR_FORTRESS] == 0 &&
                     colony->buildings[BUILDING_BATTLESTATION] == 0 &&
-                    MOX::_player[MOX::_PLAYER_NUM].ship_designs[-50 - mil_idx].size >= 2 &&
+                    MOX::_player[MOX::_PLAYER_NUM].ship_designs[-50 - mil_idx].size >= SHIP_SIZE_LARGE &&
                     _field_mode != 1) {
                     current_palette = &_l_font_dim_color_array;
                 } else if (_field_mode == 1 && mil_idx == _scanned_prod) {
@@ -641,16 +641,16 @@ namespace COLBLDG {
 
     int16_t __cdecl Auto_Design_Type_(int16_t design_code) {
         if (design_code == -12 /* 0xfff4 */) {
-            return 1;
+            return SHIP_TYPE_COLONY;
         }
         if (design_code == -17 /* 0xffef */) {
-            return 4;
+            return SHIP_TYPE_OUTPOST;
         }
         if (design_code == -11 /* 0xfff5 */) {
-            return 2;
+            return SHIP_TYPE_TRANSPORT;
         }
 
-        return 0;
+        return SHIP_TYPE_COMBAT;
     }
 
     void __cdecl Draw_Build_Queue_() {
@@ -659,7 +659,7 @@ namespace COLBLDG {
         int16_t scanned_id = _scanned_prod;
 
         for (int16_t i = 0; i < 7; ++i) {
-            int16_t active_idx = (_active_prod[0] < 49) ? -1 : (_active_prod[0] - 49);
+            int16_t active_idx = (_active_prod[0] < BUILDING_COUNT) ? -1 : (_active_prod[0] - BUILDING_COUNT);
 
             bool show_delete = false;
 
@@ -914,7 +914,7 @@ namespace COLBLDG {
             case 0:
                 return;
             default: {
-                if (item_id > 0 && item_id < 49 /* 0x31 */) {
+                if (item_id > 0 && item_id < BUILDING_COUNT) {
                     Draw_Building_Info_(item_id);
                     return;
                 }
@@ -1075,7 +1075,7 @@ namespace COLBLDG {
         (*line_count)++;
 
         // 2. Draw Maintenance if applicable
-        if (product_idx > 0 && product_idx < 49) {
+        if (product_idx > 0 && product_idx < BUILDING_COUNT) {
             int32_t maint = (int32_t)TECHDATA::_buildings[product_idx].maintenance;
             format_str = ESTRINGS::E_Strings_(HESTR_16F_PENALTY);
             sprintf(buffer, format_str, maint);
@@ -1107,7 +1107,7 @@ namespace COLBLDG {
         }
 
         // 5. Special case for Gravity Generator (ID 25)
-        if (product_idx > 0 && product_idx < 49 && product_idx == 25) {
+        if (product_idx > 0 && product_idx < BUILDING_COUNT && product_idx == BUILDING_GRAVITY_GENERATOR) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
             int8_t gravity_class = MOX::_planet[planet_idx].gravity_class;
             char* gravity_str = MOX::_planet_gravity_string[gravity_class];
@@ -1312,7 +1312,7 @@ namespace COLBLDG {
 
     int16_t __cdecl First_Prod_Queue_Slot_(int16_t prod_idx) {
         for (int16_t i = 0; i < 7; ++i) {
-            if (prod_idx > 0 && prod_idx < 49) {
+            if (prod_idx > 0 && prod_idx < BUILDING_COUNT) {
                 if (_current_item[i] == prod_idx) {
                     return i;
                 }
@@ -1343,7 +1343,7 @@ namespace COLBLDG {
 
     int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t item_id) {
         for (int16_t i = 0; i < 7; ++i) {
-            if (item_id > 0 && item_id < 49) {
+            if (item_id > 0 && item_id < BUILDING_COUNT) {
                 if (MOX::_colony[colony_idx].producing[i] == item_id) {
                     return i;
                 }
@@ -1570,8 +1570,8 @@ namespace COLBLDG {
                             return;
                         }
                         Delete_From_Queue_(first_slot);
-                        if (_active_prod[0] >= 0x31) {
-                            if ((_active_prod[0] - first_slot) == 0x31) {
+                        if (_active_prod[0] >= BUILDING_COUNT) {
+                            if ((_active_prod[0] - first_slot) == BUILDING_COUNT) {
                                 _active_prod[0] = -1;
                             }
                         }
@@ -1635,9 +1635,9 @@ namespace COLBLDG {
                         Do_Draw_Build_Queue_();
                         return;
                     }
-                    _active_prod[0] = i + 0x31;
+                    _active_prod[0] = i + BUILDING_COUNT;
                 } else {
-                    int16_t active_idx = _active_prod[0] - 0x31;
+                    int16_t active_idx = _active_prod[0] - BUILDING_COUNT;
                     bool do_delete = false;
 
                     if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0) {
@@ -1695,8 +1695,8 @@ namespace COLBLDG {
             return;
         }
 
-        if (active_idx >= 49 /* 0x31 */) {
-            int16_t rel_idx = active_idx - 49;
+        if (active_idx >= BUILDING_COUNT) {
+            int16_t rel_idx = active_idx - BUILDING_COUNT;
             int16_t current = _current_item[rel_idx];
             int16_t scanned_prod = _scanned_prod;
             int16_t scanned_field = _scanned_field;
@@ -1921,7 +1921,7 @@ namespace COLBLDG {
 
         bool add_to_queue = false;
 
-        if ((product_id > 0 && product_id < 49) ||
+        if ((product_id > 0 && product_id < BUILDING_COUNT) ||
             product_id == -3 ||
             product_id == -2 ||
             product_id == -10 ||
@@ -1950,16 +1950,16 @@ namespace COLBLDG {
             int16_t auto_type = COLBLDG::Auto_Design_Type_(product_id);
             int16_t owner = MOX::_colony[COLONY::_colony_handle].owner;
             
-            if (auto_type == 1) {
+            if (auto_type == SHIP_TYPE_COLONY) {
                 design_slot = 5;
                 INITSHIP::Load_Colony_Ship_Design_(owner, &MOX::_player[owner].ship_designs[5]);
-            } else if (auto_type == 4) {
+            } else if (auto_type == SHIP_TYPE_OUTPOST) {
                 design_slot = 5;
                 INITSHIP::Load_Outpost_Ship_Design_(owner, &MOX::_player[owner].ship_designs[5]);
-            } else if (auto_type == 2) {
+            } else if (auto_type == SHIP_TYPE_TRANSPORT) {
                 design_slot = 5;
                 INITSHIP::Load_Transport_Ship_Design_(owner, &MOX::_player[owner].ship_designs[5]);
-            } else if (auto_type == 0) {
+            } else if (auto_type == SHIP_TYPE_COMBAT) {
                 if (product_id == -16) {
                     design_slot = 5;
                     if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
@@ -2000,10 +2000,10 @@ namespace COLBLDG {
             } else {
                 int8_t size = MOX::_player[MOX::_PLAYER_NUM].ship_designs[-50 - product_id].size;
                 int16_t owner = MOX::_colony[COLONY::_colony_handle].owner;
-                if (size == 4 && MOX::_player[owner].tech_applications[186] != 3) {
+                if (size == SHIP_SIZE_TITAN && MOX::_player[owner].tech_applications[TECH_APP_TITAN_CONSTRUCTION] != 3) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(0x246));
                     COLBLDG::Do_Draw_Build_Queue_();
-                } else if (size == 5 && MOX::_player[owner].tech_applications[55] != 3) {
+                } else if (size == SHIP_SIZE_DOOM_STAR && MOX::_player[owner].tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] != 3) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(0x245));
                     COLBLDG::Do_Draw_Build_Queue_();
                 } else {
@@ -2018,7 +2018,7 @@ namespace COLBLDG {
         }
 
         if (COLBLDG::_active_prod[0] != -1 && COLBLDG::_field_mode != 2) {
-            COLBLDG::Insert_Before_Queue_Slot_(q_len, COLBLDG::_active_prod[0] - 49);
+            COLBLDG::Insert_Before_Queue_Slot_(q_len, COLBLDG::_active_prod[0] - BUILDING_COUNT);
             COLONY::Reset_Mouse_Picture_();
         }
         
@@ -2200,7 +2200,7 @@ namespace COLBLDG {
         strcpy(buf3, ESTRINGS::E_Strings_(0xC));
 
         uint8_t* mods_ptr = (uint8_t*)&weapon->specials;
-        for (int16_t bit = 0; bit < 15; bit++) {
+        for (int16_t bit = 0; bit < WEAPON_MOD_COUNT; bit++) {
             if (struct_::Test_Bit_Field_(mods_ptr, bit)) {
                 if (bit == 1 || bit == 2) {
                     strcat(buf1, TECHDATA::_weapon_modifications[bit].name_plural);

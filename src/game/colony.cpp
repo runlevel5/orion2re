@@ -421,7 +421,7 @@ namespace COLONY {
     int16_t __cdecl Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(int16_t colony_idx, int16_t product_id) {
         s_colony* colony = &MOX::_colony[colony_idx];
         int16_t remaining_cost = COLCALC::Colony_Product_Cost_(colony, product_id);
-        int16_t net_production = colony->production[1];
+        int16_t net_production = colony->production[ECON_INDUSTRY];
 
         if (net_production >= remaining_cost) {
             return 1;
@@ -731,17 +731,17 @@ namespace COLONY {
     }
 
     void __cdecl Draw_Colony_Info_Production_() {
-        Draw_Colony_Info_Production_For_(3);
-        Draw_Colony_Info_Production_For_(0);
-        Draw_Colony_Info_Production_For_(1);
-        Draw_Colony_Info_Production_For_(2);
+        Draw_Colony_Info_Production_For_(ECON_BC);
+        Draw_Colony_Info_Production_For_(ECON_FOOD);
+        Draw_Colony_Info_Production_For_(ECON_INDUSTRY);
+        Draw_Colony_Info_Production_For_(ECON_RESEARCH);
     }
 
     void __cdecl Draw_Colony_Info_Production_For_(int32_t selection) {
         int16_t row_index;
         int16_t row_adjust;
 
-        if (selection == 3) {
+        if (selection == ECON_BC) {
             row_index = -1;
             row_adjust = -3;
         } else {
@@ -1306,16 +1306,14 @@ namespace COLONY {
         }
 
         if (animation_type == 0) {
-            // Check technology application at index 0x90 (144)
-            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[0x90] == 3) {
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
                 return COLONY::Military_Anims_(2, param_2);
             }
             return COLONY::Military_Anims_(1, param_2);
         }
 
         if (animation_type == 1) {
-            // Check technology application at index 0x18 (24)
-            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[0x18] == 3) {
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
                 return COLONY::Military_Anims_(4, param_2);
             }
             return COLONY::Military_Anims_(3, param_2);
@@ -1951,9 +1949,12 @@ namespace COLONY {
                 }
 
                 if (demolish_match) {
-                    if (bldg_id == 3 /* Star Base */ || bldg_id == 14 /* Battlestation */ || 
-                        bldg_id == 40 /* Star Fortress */ || bldg_id == 41 /* Orbital Missile Base */ || 
-                        bldg_id == 8 /* Marine Barracks */ || bldg_id == 9 /* Armor Barracks */) {
+                    if (bldg_id == BUILDING_ARTEMIS_SYSTEM_NET ||
+                        bldg_id == BUILDING_DIMENSIONAL_PORTAL ||
+                        bldg_id == BUILDING_STAR_BASE ||
+                        bldg_id == BUILDING_STAR_FORTRESS ||
+                        bldg_id == BUILDING_BATTLESTATION ||
+                        bldg_id == BUILDING_CAPITOL) {
                         return;
                     }
 
@@ -1990,9 +1991,11 @@ namespace COLONY {
                 }
 
                 if (info_match) {
-                    if (bldg_id == 3 /* Star Base */ || bldg_id == 14 /* Battlestation */ || 
-                        bldg_id == 40 /* Star Fortress */ || bldg_id == 41 /* Orbital Missile Base */ || 
-                        bldg_id == 8 /* Marine Barracks */) {
+                    if (bldg_id == BUILDING_ARTEMIS_SYSTEM_NET ||
+                        bldg_id == BUILDING_DIMENSIONAL_PORTAL ||
+                        bldg_id == BUILDING_STAR_BASE ||
+                        bldg_id == BUILDING_STAR_FORTRESS ||
+                        bldg_id == BUILDING_BATTLESTATION) {
                         return;
                     }
 
@@ -2274,7 +2277,7 @@ namespace COLONY {
     int16_t __cdecl N_Bldgs_(int16_t colony_idx) {
         int16_t count = 0;
 
-        for (int16_t i = 1; i < 49; ++i) {
+        for (int16_t i = BUILDING_NO_BUILDING + 1; i < BUILDING_COUNT; ++i) {
             if (MOX::_colony[colony_idx].buildings[i] != 0) {
                 count++;
             }
@@ -2286,12 +2289,12 @@ namespace COLONY {
     char* __cdecl Player_Troop_Name_(int16_t player_idx, int16_t troop_type, int16_t race) {
         switch (troop_type) {
             case 0:
-                if (MOX::_player[player_idx].tech_applications[0x18] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
                     return ESTRINGS::E_Strings_(0x1F8);
                 }
                 return ESTRINGS::E_Strings_(0xC3);
             case 1:
-                if (MOX::_player[player_idx].tech_applications[0x90] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_POWERED_ARMOR] != 3) {
                     return ESTRINGS::E_Strings_(0x14D);
                 }
                 return ESTRINGS::E_Strings_(0x1AC);
@@ -2307,12 +2310,12 @@ namespace COLONY {
     s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_idx, int16_t anim_type, int16_t frame) {
         switch (anim_type) {
             case 0:
-                if (MOX::_player[player_idx].tech_applications[0x18] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
                     return Military_Anims_(3, frame);
                 }
                 return Military_Anims_(4, frame);
             case 1:
-                if (MOX::_player[player_idx].tech_applications[0x90] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_POWERED_ARMOR] != 3) {
                     return Military_Anims_(1, frame);
                 }
                 return Military_Anims_(2, frame);

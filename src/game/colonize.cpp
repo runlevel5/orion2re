@@ -344,7 +344,7 @@ namespace COLONIZE {
         if (is_outpost == 0) {
             colony->n_pops = 1;
 
-            if (planet->food_per_farmer < 1 || MOX::_player[player_idx].traits[18] != 0 || MOX::_player[player_idx].traits[17] != 0) {
+            if (planet->food_per_farmer < 1 || MOX::_player[player_idx].traits[TRAIT_EATS_MINERALS] != 0 || MOX::_player[player_idx].traits[TRAIT_CYBERNETIC] != 0) {
                 colony->pop[0] = (colony->pop[0] & 0xFFFFFEFF) | 0x80;
             } else {
                 colony->pop[0] = colony->pop[0] & 0xFFFFFE7F;
@@ -369,7 +369,7 @@ namespace COLONIZE {
             }
 
             if (is_reused) {
-                colony->buildings[22] = 1;
+                colony->buildings[BUILDING_MARINE_BARRACKS] = 1;
             }
 
             COLCALC::Colony_Calculation_(colony_idx);

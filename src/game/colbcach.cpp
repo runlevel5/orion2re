@@ -3,7 +3,7 @@
 namespace COLBCACH {
     s_animation_header* __cdecl Cache_Load_Bldg_(int16_t building_x, int16_t building_y, int16_t building_type) {
         char filename[28];
-        int32_t type_index = (int32_t)building_type - 1;
+        int32_t type_index = (int32_t)building_type - BUILDING_ALIEN_CONTROL_CENTER;
         int32_t file_number = type_index / 10;
         int32_t frame_index = type_index % 10;
 

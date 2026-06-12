@@ -39,7 +39,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     }
 
     for (int i = 0; i < 8; ++i) {
-        if (MOX::_ship[ship_idx].d.ship_type == 0) {
+        if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT) {
             MOX::_global_combat_data.weapons[i].weapon_id = MOX::_ship[ship_idx].d.ship_weapon[i].type;
             MOX::_global_combat_data.weapons[i].count = MOX::_ship[ship_idx].d.ship_weapon[i].current_count;
             MOX::_global_combat_data.weapons[i].arc = MOX::_ship[ship_idx].d.ship_weapon[i].firing_arc;
@@ -61,13 +61,13 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
                 MOX::_global_combat_data.weapons[i].ammo = TECHDATA::_weapons[weapon_id].ammo;
             }
 
-            if (weapon_id == 33) {
+            if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
                 MOX::_global_combat_data.weapons[i].ammo *= MOX::_global_combat_data.weapons[i].count;
             }
 
             MOX::_global_combat_data.weapons[i].status = 0;
         } else {
-            MOX::_global_combat_data.weapons[i].weapon_id = 0;
+            MOX::_global_combat_data.weapons[i].weapon_id = WEAPON_NO_WEAPONS;
         }
     }
 
@@ -78,11 +78,11 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     MOX::_global_combat_data.crew_quality = MOX::_ship[ship_idx].crew_quality;
     MOX::_global_combat_data.officer_idx = MOX::_ship[ship_idx].officer_index;
 
-    if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner <= MAX_PLAYERS) {
+    if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT && MOX::_ship[ship_idx].owner <= MAX_PLAYERS) {
         MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.size_class].marines;
 
-        if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 36)) {
-            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, 36)) {
+        if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_TROOP_PODS)) {
+            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, SPECIAL_TROOP_PODS)) {
                 MOX::_global_combat_data.marine_count *= 2;
             }
         }
@@ -94,7 +94,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     MOX::_global_combat_data.armor_remaining = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_ship[ship_idx].armor_damage;
     MOX::_global_combat_data.armor_type = MOX::_ship[ship_idx].d.armor_type;
 
-    if (MOX::_global_combat_data.size_class == 5) {
+    if (MOX::_global_combat_data.size_class == HULL_DOOM_STAR) {
         MOX::_global_combat_data.structure_damage = MOX::_ship[ship_idx].structural_damage;
         MOX::_global_combat_data.picture_num = 43; /* 0x2B */
     } else {
@@ -125,8 +125,8 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         MOX::_global_combat_data.shield_arc_max =
             TECHDATA::_shields[MOX::_global_combat_data.shield_type].shield_class * shield_hull_mult * 5;
 
-        if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 20)) {
-            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, 20)) {
+        if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_MULTI_PHASED_SHIELDS)) {
+            if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, SPECIAL_MULTI_PHASED_SHIELDS)) {
                 MOX::_global_combat_data.shield_arc_max += MOX::_global_combat_data.shield_arc_max / 2;
             }
         }
@@ -141,8 +141,8 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     MOX::_global_combat_data.current_speed = MOX::_ship[ship_idx].d.combat_speed;
 
-    if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, 2)) {
-        if (!struct_::Test_Bit_Field_(MOX::_ship[ship_idx].special_device_damage_flags, 2)) {
+    if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, SPECIAL_AUGMENTED_ENGINES)) {
+        if (!struct_::Test_Bit_Field_(MOX::_ship[ship_idx].special_device_damage_flags, SPECIAL_AUGMENTED_ENGINES)) {
             MOX::_global_combat_data.current_speed += 5;
         }
     }
@@ -165,14 +165,14 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
 int16_t __cdecl Ship_Size_Offset_(int16_t size) {
     switch (size) {
-    case 0:
+    case HULL_FRIGATE:
         return 1;
-    case 1:
-    case 2:
+    case HULL_DESTROYER:
+    case HULL_CRUISER:
         return 2;
-    case 3:
-    case 4:
-    case 5:
+    case HULL_BATTLESHIP:
+    case HULL_TITAN:
+    case HULL_DOOM_STAR:
         return 3;
     default:
         return 0;
@@ -275,7 +275,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
             combat->weapons[i].ammo = TECHDATA::_weapons[weapon_id].ammo;
         }
 
-        if (combat->weapons[i].weapon_id == 0x21 /* 33 */) {
+        if (combat->weapons[i].weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
             combat->weapons[i].ammo *= combat->weapons[i].count;
         }
 
@@ -295,10 +295,10 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->officer_idx = officer_idx;
     }
 
-    if (ship->d.ship_type == 0 && ship->owner <= MAX_PLAYERS) {
+    if (ship->d.ship_type == SHIP_TYPE_COMBAT && ship->owner <= MAX_PLAYERS) {
         combat->marine_count = (uint8_t)TECHDATA::_hull_data[combat->size_class].marines;
-        if (struct_::Test_Bit_Field_(combat->special_device_flags, 0x24 /* 36 */) == 1 &&
-            struct_::Test_Bit_Field_(combat->special_device_damage_flags, 0x24 /* 36 */) == 0) {
+        if (struct_::Test_Bit_Field_(combat->special_device_flags, SPECIAL_TROOP_PODS) == 1 &&
+            struct_::Test_Bit_Field_(combat->special_device_damage_flags, SPECIAL_TROOP_PODS) == 0) {
             combat->marine_count *= 2;
         }
     } else {
@@ -314,7 +314,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->structure_damage = combat->structure_max - 1;
     }
 
-    if (combat->size_class == 5 && combat->owner < MAX_PLAYERS) {
+    if (combat->size_class == HULL_DOOM_STAR && combat->owner < MAX_PLAYERS) {
         combat->picture_num = 43 /* 0x2b */;
     } else {
         combat->picture_num = ship->d.picture_num;
@@ -332,19 +332,19 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->shield_arc_current[i] = combat->shield_arc_max;
     }
 
-    if (combat->owner > MAX_PLAYERS && combat->ftl_type == 0) {
+    if (combat->owner > MAX_PLAYERS && combat->ftl_type == DRIVE_NO_DRIVE) {
         switch (combat->owner) {
             case 9:
             case 11:
-                combat->ftl_type = 4;
+                combat->ftl_type = DRIVE_ANTI_MATTER_DRIVE;
                 break;
             case 10:
             case 14:
-                combat->ftl_type = 2;
+                combat->ftl_type = DRIVE_FUSION_DRIVE;
                 break;
             case 12:
             case 13:
-                combat->ftl_type = 6;
+                combat->ftl_type = DRIVE_INTERPHASED_DRIVE;
                 break;
             default:
                 break;
@@ -367,16 +367,16 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
     ship->special_cooldown = 0xFF;
     ship->special_status_timer = 0;
 
-    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 6)) {
+    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_CLOAKING_DEVICE)) {
         ship->special_status_flag = 1;
-    } else if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 23 /* 0x17 */)) {
+    } else if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_PHASING_CLOAK)) {
         ship->special_status_flag = 4;
         ship->special_status_timer = 10;
     } else {
         ship->special_status_flag = 0;
     }
 
-    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 16 /* 0x10 */)) {
+    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_HYPER_X_CAPACITORS)) {
         for (int i = 0; i < 8; ++i) {
             if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == 0) {
                 ship->weapons[i].status = 1;
@@ -384,7 +384,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
         }
     }
 
-    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 12 /* 0x0C */)) {
+    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_FAST_MISSILE_RACKS)) {
         for (int i = 0; i < 8; ++i) {
             if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == 1) {
                 ship->weapons[i].status = 1;
@@ -395,13 +395,13 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
 
 int16_t __cdecl Type_Of_Space_Station_(int16_t colony_idx) {
     if (MOX::_colony[colony_idx].buildings[BUILDING_STAR_BASE] != 0) {
-        return 6;
+        return HULL_STAR_BASE;
     }
     if (MOX::_colony[colony_idx].buildings[BUILDING_BATTLESTATION] != 0) {
-        return 7;
+        return HULL_BATTLESTATION;
     }
     if (MOX::_colony[colony_idx].buildings[BUILDING_STAR_FORTRESS] != 0) {
-        return 8;
+        return HULL_STAR_FORTRESS;
     }
     return -1;
 }
@@ -426,13 +426,13 @@ int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx) {
 
         // Shields are suppressed in a nebula unless the ship has specific warp/shield stabilization (Special 13)
         if (MOX::_in_nebula_flag != 0) {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 13 /* 0x0d */) == 0) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HARD_SHIELDS) == 0) {
                 max_shield = 0;
             }
         }
 
         // Shield multipliers or hardening (Special 20) increase capacity by 50%
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 20 /* 0x14 */) != 0) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_MULTI_PHASED_SHIELDS) != 0) {
             max_shield = (max_shield * 3) / 2;
         }
     }
@@ -535,30 +535,30 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
     int16_t loaded_ships_1 = 0;
     for (int16_t i = 0; i < plr1_ship_count; ++i) {
-        if (MOX::_ship[plr1_ships[i]].d.ship_type == 0 && loaded_ships_1 < 100) {
+        if (MOX::_ship[plr1_ships[i]].d.ship_type == SHIP_TYPE_COMBAT && loaded_ships_1 < 100) {
             Load_Combat_Ship_(plr1_ships[i], MOX::_combat_total_ship_count);
 
             for (int j = 0; j < 8; ++j) {
                 switch (MOX::_combat_data[MOX::_combat_total_ship_count].weapons[j].weapon_id) {
-                    case 35: // 0x23
-                    case 45: // 0x2D
+                    case WEAPON_PLASMA_WEB:
+                    case WEAPON_CAUSTIC_SLIME:
                         has_plasma_web = 1;
                         break;
-                    case 37: // 0x25
+                    case WEAPON_BLACK_HOLE_GENERATOR:
                         has_bhg = 1;
                         break;
-                    case 38: // 0x26
+                    case WEAPON_STELLAR_CONVERTER:
                         has_stellar_converter = 1;
                         break;
-                    case 39: // 0x27
+                    case WEAPON_TRACTOR_BEAM:
                         has_tractor_beam = 1;
                         break;
                 }
             }
 
-            if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 23) == 0) {
+            if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_PHASING_CLOAK) == 0) {
                 COMBINIT::_real_attack_flag = 1;
-                if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 6) != 0) {
+                if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_CLOAKING_DEVICE) != 0) {
                     has_cloaking = 1;
                 }
             } else {
@@ -567,7 +567,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
             // Original binary calls this and discards the result.
             Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 10);
-            if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 26) != 0) {
+            if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_REFLECTION_FIELD) != 0) {
                 has_special_26 = 1;
             }
 
@@ -593,7 +593,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
     if (no_defender_ships) {
         for (int16_t i = 0; i < plr2_ship_count; ++i) {
-            if (MOX::_ship[plr2_ships[i]].d.ship_type == 0) {
+            if (MOX::_ship[plr2_ships[i]].d.ship_type == SHIP_TYPE_COMBAT) {
                 no_defender_ships = false;
                 break;
             }
@@ -751,29 +751,29 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             qsort(plr2_ships, plr2_ship_count, sizeof(*plr2_ships), qsort_ship_array_by_size_);
             int16_t loaded_ships_2 = 0;
             for (int16_t i = 0; i < plr2_ship_count; ++i) {
-                if (MOX::_ship[plr2_ships[i]].d.ship_type == 0 && loaded_ships_2 < 100) {
+                if (MOX::_ship[plr2_ships[i]].d.ship_type == SHIP_TYPE_COMBAT && loaded_ships_2 < 100) {
                     Load_Combat_Ship_(plr2_ships[i], MOX::_combat_total_ship_count);
 
                     for (int j = 0; j < 8; ++j) {
                         switch (MOX::_combat_data[MOX::_combat_total_ship_count].weapons[j].weapon_id) {
-                            case 35: // 0x23
-                            case 45: // 0x2D
+                            case WEAPON_PLASMA_WEB:
+                            case WEAPON_CAUSTIC_SLIME:
                                 has_plasma_web = 1;
                                 break;
-                            case 37: // 0x25
+                            case WEAPON_BLACK_HOLE_GENERATOR:
                                 has_bhg = 1;
                                 break;
-                            case 38: // 0x26
+                            case WEAPON_STELLAR_CONVERTER:
                                 has_stellar_converter = 1;
                                 break;
-                            case 39: // 0x27
+                            case WEAPON_TRACTOR_BEAM:
                                 has_tractor_beam = 1;
                                 break;
                         }
                     }
 
-                    if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 6) == 0 &&
-                        Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 23) == 0) {
+                    if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_CLOAKING_DEVICE) == 0 &&
+                        Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_PHASING_CLOAK) == 0) {
                         // Empty
                     } else {
                         has_cloaking = 1;
@@ -781,7 +781,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
                     // Original binary calls this and discards the result.
                     Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 10);
-                    if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 26) != 0) {
+                    if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_REFLECTION_FIELD) != 0) {
                         has_special_26 = 1;
                     }
 
@@ -1120,19 +1120,19 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
 void __cdecl Load_Combat_Antaran_Ship_(int16_t ship_idx, int16_t ship_size) {
     switch (ship_size) {
-    case 0:
+    case HULL_FRIGATE:
         INITSHIP::Load_Small_Antaran_Combat_Ship_(ship_idx);
         break;
-    case 1:
+    case HULL_DESTROYER:
         INITSHIP::Load_Medium_Antaran_Combat_Ship_(ship_idx);
         break;
-    case 2:
+    case HULL_CRUISER:
         INITSHIP::Load_Large_Antaran_Combat_Ship_(ship_idx);
         break;
-    case 3:
+    case HULL_BATTLESHIP:
         INITSHIP::Load_Huge_Antaran_Combat_Ship_(ship_idx);
         break;
-    case 4:
+    case HULL_TITAN:
         INITSHIP::Load_Titan_Antaran_Combat_Ship_(ship_idx);
         break;
     default:
@@ -1160,22 +1160,22 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     int n = MOX::_combat_total_ship_count;
     s_combat_data* ship = &MOX::_combat_data[n];
 
-    ship->computer_type = 5;
-    ship->armor_type = 6;
+    ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
-    strcpy(ship->name, TECHDATA::_hull_data[8].name);
+    strcpy(ship->name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name);
 
     ship->structure_max = (int16_t)(
-        TECHDATA::_hull_data[8].structure_hp +
-        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].structure_hp) / 100);
+        TECHDATA::_hull_data[HULL_STAR_FORTRESS].structure_hp +
+        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[HULL_STAR_FORTRESS].structure_hp) / 100);
     ship->structure_max = (int16_t)(ship->structure_max * 3);
 
     ship->armor_remaining = (int16_t)(
-        TECHDATA::_hull_data[8].armor_hp +
-        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].armor_hp) / 100);
+        TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp +
+        ((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp) / 100);
     ship->armor_remaining = (int16_t)(ship->armor_remaining * 3);
 
-    int32_t fortress_size_scaled = (int32_t)TECHDATA::_hull_data[8].size * 5;
+    int32_t fortress_size_scaled = (int32_t)TECHDATA::_hull_data[HULL_STAR_FORTRESS].size * 5;
     fortress_size_scaled = (fortress_size_scaled + ((fortress_size_scaled >> 31) & 3)) >> 2;
     int16_t fortress_weapon_space = (int16_t)((fortress_size_scaled - (fortress_size_scaled >> 31)) >> 1);
 
@@ -1184,8 +1184,8 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->owner = (int8_t)MOX::_combat_defender_player;
     ship->previous_owner = (uint8_t)MOX::_combat_defender_player;
     ship->ship_idx = -1;
-    ship->ftl_type = 0;
-    ship->shield_type = 0;
+    ship->ftl_type = DRIVE_NO_DRIVE;
+    ship->shield_type = SHIELD_NO_SHIELD;
     ship->unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1193,21 +1193,21 @@ void __cdecl Load_Antaran_Star_Fortress_() {
         ship->special_device_damage_flags[i] = 0;
     }
 
-    struct_::Set_Bit_Field_(ship->special_device_flags, 5);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 7);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 24);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 26);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 14);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 27);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 29);
-    struct_::Set_Bit_Field_(ship->special_device_flags, 32);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_BATTLE_SCANNER);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_DAMPER_FIELD);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_QUANTUM_DETONATOR);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_REFLECTION_FIELD);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_HEAVY_ARMOR);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_REINFORCED_HULL);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_SECURITY_STATIONS);
+    struct_::Set_Bit_Field_(ship->special_device_flags, SPECIAL_STRUCTURAL_ANALYZER);
 
     for (int i = 0; i < 8; ++i) {
         struct_::Clear_Structure_(&ship->weapons[i], sizeof(ship->weapons[i]));
     }
 
     int w_idx = 0;
-    ship->weapons[w_idx].weapon_id = 11;
+    ship->weapons[w_idx].weapon_id = WEAPON_DEATH_RAY;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
     ship->weapons[w_idx].arc = 15;
@@ -1222,7 +1222,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].shots_left = (uint8_t)count0;
 
     w_idx++;
-    ship->weapons[w_idx].weapon_id = 4;
+    ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
     ship->weapons[w_idx].arc = 15;
@@ -1241,7 +1241,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
             ship->weapons[w_idx].count = 99;
             ship->weapons[w_idx].shots_left = 99;
             w_idx++;
-            ship->weapons[w_idx].weapon_id = 4;
+            ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
             ship->weapons[w_idx].active = 1;
             ship->weapons[w_idx].ammo = -1;
             ship->weapons[w_idx].arc = 15;
@@ -1252,7 +1252,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].shots_left = (uint8_t)count1;
 
     w_idx++;
-    ship->weapons[w_idx].weapon_id = 4;
+    ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
     ship->weapons[w_idx].arc = 15;
@@ -1271,7 +1271,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
             ship->weapons[w_idx].count = 99;
             ship->weapons[w_idx].shots_left = 99;
             w_idx++;
-            ship->weapons[w_idx].weapon_id = 4;
+            ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
             ship->weapons[w_idx].active = 1;
             ship->weapons[w_idx].ammo = -1;
             ship->weapons[w_idx].arc = 15;
@@ -1282,7 +1282,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].shots_left = (uint8_t)count2;
 
     w_idx++;
-    ship->weapons[w_idx].weapon_id = 4;
+    ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
     ship->weapons[w_idx].arc = 15;
@@ -1302,7 +1302,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 
     ship->crew_quality = 3;
     ship->officer_idx = 0x42;
-    ship->marine_count = (uint8_t)TECHDATA::_hull_data[8].marines;
+    ship->marine_count = (uint8_t)TECHDATA::_hull_data[HULL_STAR_FORTRESS].marines;
     ship->current_speed = 0;
     ship->structure_damage = 0;
     ship->is_retreating = 0;
@@ -1327,17 +1327,17 @@ void __cdecl Load_Antaran_Planet_() {
     MOX::_combat_data->unit_status = 0;
     MOX::_combat_data->owner = MAX_PLAYERS;
     MOX::_combat_data->previous_owner = MAX_PLAYERS;
-    MOX::_combat_data->ftl_type = 0;
+    MOX::_combat_data->ftl_type = DRIVE_NO_DRIVE;
     MOX::_combat_data->is_retreating = 0;
-    MOX::_combat_data->shield_type = 0;
+    MOX::_combat_data->shield_type = SHIELD_NO_SHIELD;
     MOX::_combat_data->shield_arc_max = 0;
 
     for (int i = 0; i < 4; ++i) {
         MOX::_combat_data->shield_arc_current[i] = 0;
     }
 
-    MOX::_combat_data->computer_type = 5;
-    MOX::_combat_data->armor_type = 6;
+    MOX::_combat_data->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    MOX::_combat_data->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     for (int i = 0; i < 5; ++i) {
         MOX::_combat_data->special_device_flags[i] = 0;
@@ -1425,19 +1425,19 @@ int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx) {
         int8_t planet_size = MOX::_planet[planet_idx].size;
 
         switch (planet_size) {
-        case 0:
+        case PLANET_SIZE_TINY:
             size_threshold = 3;
             break;
-        case 1:
+        case PLANET_SIZE_SMALL:
             size_threshold = 4;
             break;
-        case 2:
+        case PLANET_SIZE_MEDIUM:
             size_threshold = 6;
             break;
-        case 3:
+        case PLANET_SIZE_LARGE:
             size_threshold = 7;
             break;
-        case 4:
+        case PLANET_SIZE_HUGE:
             size_threshold = 8;
             break;
         default:
@@ -1509,7 +1509,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     MOX::_combat_data->owner = MOX::_colony[colony_idx].owner;
     MOX::_combat_data->previous_owner = MOX::_colony[colony_idx].owner;
     MOX::_combat_data->ship_idx = -1;
-    MOX::_combat_data->ftl_type = 0;
+    MOX::_combat_data->ftl_type = DRIVE_NO_DRIVE;
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->is_retreating = 0;
 
@@ -1524,7 +1524,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         MOX::_combat_data->shield_type = 0x18;
         max_hits = TECHDATA::_planetary_shields[2].absorption;
     } else {
-        MOX::_combat_data->shield_type = 0;
+        MOX::_combat_data->shield_type = SHIELD_NO_SHIELD;
         max_hits = 0;
     }
 
@@ -1548,7 +1548,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     for (int i = 0; i < 8; i++) {
-        MOX::_combat_data->weapons[i].weapon_id = 0;
+        MOX::_combat_data->weapons[i].weapon_id = WEAPON_NO_WEAPONS;
     }
 
     int16_t weapon_index = 0;
@@ -1692,8 +1692,8 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     if (weapon_index > 0) {
-        if (MOX::_player[MOX::_combat_defender_player].tech_applications[0x1a] == 3) {
-            struct_::Set_Bit_Field_(MOX::_combat_data->special_device_flags, 5);
+        if (MOX::_player[MOX::_combat_defender_player].tech_applications[TECH_APP_BATTLE_SCANNER] == 3) {
+            struct_::Set_Bit_Field_(MOX::_combat_data->special_device_flags, SPECIAL_BATTLE_SCANNER);
         }
     }
 
@@ -1720,13 +1720,13 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     int16_t armor_absorption = TECHDATA::_armor[MOX::_combat_data[MOX::_combat_total_ship_count].armor_type].ships_bonus;
     int16_t space = 0;
 
-    if (station_type == 6) {
-        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[6].name);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[6].structure_hp;
-        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[6].armor_hp +
-            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[6].armor_hp) / 100);
+    if (station_type == HULL_STAR_BASE) {
+        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_BASE].name);
+        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[HULL_STAR_BASE].structure_hp;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp +
+            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp) / 100);
 
-        int16_t size = TECHDATA::_hull_data[6].size;
+        int16_t size = TECHDATA::_hull_data[HULL_STAR_BASE].size;
         if (MOX::_player[defender].tech_applications[89] == 3) {
             size = (size * 5) / 4;
         }
@@ -1734,13 +1734,13 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         space = size - half_size;
         MOX::_combat_data[MOX::_combat_total_ship_count].size_class = 2;
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 40;
-    } else if (station_type == 7) {
-        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[7].name);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[7].structure_hp;
-        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[7].armor_hp +
-            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[7].armor_hp) / 100);
+    } else if (station_type == HULL_BATTLESTATION) {
+        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_BATTLESTATION].name);
+        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[HULL_BATTLESTATION].structure_hp;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp +
+            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp) / 100);
 
-        int16_t size = TECHDATA::_hull_data[7].size;
+        int16_t size = TECHDATA::_hull_data[HULL_BATTLESTATION].size;
         if (MOX::_player[defender].tech_applications[89] == 3) {
             size = (size * 5) / 4;
         }
@@ -1748,13 +1748,13 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         space = size - half_size;
         MOX::_combat_data[MOX::_combat_total_ship_count].size_class = 3;
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 41;
-    } else if (station_type == 8) {
-        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[8].name);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[8].structure_hp;
-        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[8].armor_hp +
-            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[8].armor_hp) / 100);
+    } else if (station_type == HULL_STAR_FORTRESS) {
+        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name);
+        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[HULL_STAR_FORTRESS].structure_hp;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp +
+            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp) / 100);
 
-        int16_t size = TECHDATA::_hull_data[8].size;
+        int16_t size = TECHDATA::_hull_data[HULL_STAR_FORTRESS].size;
         if (MOX::_player[defender].tech_applications[89] == 3) {
             size = (size * 5) / 4;
         }
@@ -1767,7 +1767,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].owner = (int8_t)defender;
     MOX::_combat_data[MOX::_combat_total_ship_count].previous_owner = (uint8_t)defender;
     MOX::_combat_data[MOX::_combat_total_ship_count].ship_idx = -1;
-    MOX::_combat_data[MOX::_combat_total_ship_count].ftl_type = 0;
+    MOX::_combat_data[MOX::_combat_total_ship_count].ftl_type = DRIVE_NO_DRIVE;
     MOX::_combat_data[MOX::_combat_total_ship_count].shield_type = (int8_t)INITSHIP::Best_Ship_Shield_(defender);
     MOX::_combat_data[MOX::_combat_total_ship_count].unit_status = 0;
 
@@ -1777,74 +1777,74 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     }
 
     int bit_count = 0;
-    if (MOX::_player[defender].tech_applications[82] == 3) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 14);
+    if (MOX::_player[defender].tech_applications[TECH_APP_HEAVY_ARMOR] == 3) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_HEAVY_ARMOR);
         MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining *= 3;
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[56] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 27);
+    if (MOX::_player[defender].tech_applications[TECH_APP_REINFORCED_HULL] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_REINFORCED_HULL);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[161] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 30);
+    if (MOX::_player[defender].tech_applications[TECH_APP_SHIELD_CAPACITORS] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_SHIELD_CAPACITOR);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[81] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 13);
+    if (MOX::_player[defender].tech_applications[TECH_APP_HARD_SHIELDS] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_HARD_SHIELDS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[112] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 20);
+    if (MOX::_player[defender].tech_applications[TECH_APP_MULTI_PHASED_SHIELDS] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_MULTI_PHASED_SHIELDS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[199] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 38);
+    if (MOX::_player[defender].tech_applications[TECH_APP_WIDE_AREA_JAMMER] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_WIDE_AREA_JAMMER);
         bit_count++;
-    } else if (MOX::_player[defender].tech_applications[111] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 21);
+    } else if (MOX::_player[defender].tech_applications[TECH_APP_MULTI_WAVE_ECM_JAMMER] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_MULTI_WAVE_ECM_JAMMER);
         bit_count++;
-    } else if (MOX::_player[defender].tech_applications[57] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 9);
-        bit_count++;
-    }
-    if (MOX::_player[defender].tech_applications[196] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 37);
+    } else if (MOX::_player[defender].tech_applications[TECH_APP_ECM_JAMMER] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_ECM_JAMMER);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[159] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 29);
+    if (MOX::_player[defender].tech_applications[TECH_APP_WARP_DISSIPATER] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_WARP_DISSIPATOR);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[26] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 5);
+    if (MOX::_player[defender].tech_applications[TECH_APP_SECURITY_STATIONS] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_SECURITY_STATIONS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[85] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 15);
+    if (MOX::_player[defender].tech_applications[TECH_APP_BATTLE_SCANNER] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_BATTLE_SCANNER);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[175] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 32);
+    if (MOX::_player[defender].tech_applications[TECH_APP_HIGH_ENERGY_FOCUS] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_HIGH_ENERGY_FOCUS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[1] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 1);
+    if (MOX::_player[defender].tech_applications[TECH_APP_STRUCTURAL_ANALYZER] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_STRUCTURAL_ANALYZER);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[151] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 25);
+    if (MOX::_player[defender].tech_applications[TECH_APP_ACHILLES_TARGETING_UNIT] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_ACHILLES_TARGETING_UNIT);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[190] == 3 && bit_count < 8) {
-        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 35);
+    if (MOX::_player[defender].tech_applications[TECH_APP_RANGEMASTER_UNIT] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_RANGEMASTER_UNIT);
+        bit_count++;
+    }
+    if (MOX::_player[defender].tech_applications[TECH_APP_TRANSPORTERS] == 3 && bit_count < 8) {
+        struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_TRANSPORTERS);
         bit_count++;
     }
 
     MOX::_combat_data[MOX::_combat_total_ship_count].structure_max +=
         (int16_t)(((int32_t)MOX::_combat_data[MOX::_combat_total_ship_count].structure_max * armor_absorption) / 100);
 
-    if (COMBINIT::Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 27)) {
+    if (COMBINIT::Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_REINFORCED_HULL)) {
         MOX::_combat_data[MOX::_combat_total_ship_count].structure_max *= 3;
     }
 
@@ -2029,7 +2029,7 @@ void __cdecl Deploy_Ships_() {
     MOX::_combat_data[0].size_class = 100;
 
     for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
-        if (MOX::_combat_data[i].ftl_type == 0) {
+        if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
             saved_size = MOX::_combat_data[i].size_class;
             MOX::_combat_data[i].size_class = 99;
         }
@@ -2040,14 +2040,14 @@ void __cdecl Deploy_Ships_() {
     MOX::_combat_data[0].size_class = 3;
 
     for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
-        if (MOX::_combat_data[i].ftl_type == 0) {
+        if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
             MOX::_combat_data[i].size_class = saved_size;
         }
     }
 
     for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
-        if (ship->ftl_type == 0) {
+        if (ship->ftl_type == DRIVE_NO_DRIVE) {
             int8_t x_pos;
             if (defender_deploy_x < 40) {
                 x_pos = MOX::_combat_data[0].x + 11;
@@ -2226,7 +2226,7 @@ void __cdecl Recharge_Shields_() {
             ship->shield_current_hits > 0) {
 
             int32_t recharge_rate = 3;
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 30 /* High Energy Focus? */) != 0) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SHIELD_CAPACITOR) != 0) {
                 recharge_rate = 10;
             }
 
@@ -2555,7 +2555,7 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         COMBINIT::Init_Special_Devices_(i);
         s_combat_data* ship = &MOX::_combat_data[i];
 
-        if (ship->ftl_type == 0 && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
+        if (ship->ftl_type == DRIVE_NO_DRIVE && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
             if (star_idx != MOX::_NUM_STARS) {
                 s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
                 if (col->buildings[BUILDING_STAR_BASE] != 0) {
@@ -2880,19 +2880,19 @@ void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out
             int8_t planet_size = MOX::_planet[planet_idx].size;
 
             switch (planet_size) {
-                case 0:
+                case PLANET_SIZE_TINY:
                     result_offset = 30;
                     break;
-                case 1:
+                case PLANET_SIZE_SMALL:
                     result_offset = 40;
                     break;
-                case 2:
+                case PLANET_SIZE_MEDIUM:
                     result_offset = 60;
                     break;
-                case 3:
+                case PLANET_SIZE_LARGE:
                     result_offset = 70;
                     break;
-                case 4:
+                case PLANET_SIZE_HUGE:
                     result_offset = 80;
                     break;
                 default:
@@ -2904,16 +2904,16 @@ void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out
         int8_t size_class = MOX::_combat_data[ship_idx].size_class;
 
         switch (size_class) {
-            case 0:
+            case HULL_FRIGATE:
                 result_offset = 10;
                 break;
-            case 1:
-            case 2:
+            case HULL_DESTROYER:
+            case HULL_CRUISER:
                 result_offset = 20;
                 break;
-            case 3:
-            case 4:
-            case 5:
+            case HULL_BATTLESHIP:
+            case HULL_TITAN:
+            case HULL_DOOM_STAR:
                 result_offset = 30;
                 break;
             default:

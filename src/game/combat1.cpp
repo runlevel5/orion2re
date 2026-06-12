@@ -187,7 +187,7 @@ namespace COMBAT1 {
         if (MOX::_combat_total_ship_count > 0) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (Combat_Ship_Is_Functional_(i) != 0) {
-                    if (param_2 == 0 || COMBINIT::Does_Combat_Ship_Have_Special_(i, 0x22) != 0) {
+                    if (param_2 == 0 || COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TIME_WARP_FACILITATOR) != 0) {
                         if (MOX::_combat_init != 0 || MOX::_combat_data[i].owner == param_1) {
                             Init_Ship_For_Start_Of_Turn_(i);
                         }
@@ -205,7 +205,7 @@ namespace COMBAT1 {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].unit_status == 0) {
                     if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
-                        if (param_2 == 0 || COMBINIT::Does_Combat_Ship_Have_Special_(i, 0x22) != 0) {
+                        if (param_2 == 0 || COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TIME_WARP_FACILITATOR) != 0) {
                             if (MOX::_combat_init != 0 || MOX::_combat_data[i].owner == param_1) {
                                 if (MOX::_combat_data[i].is_captured == 0) {
                                     MOX::_ship_turn_order[order_idx] = i;
@@ -452,7 +452,7 @@ namespace COMBAT1 {
                                                 if (MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active < -1) {
                                                     MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active = 1;
                                                 }
-                                                if (MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active != 1 && MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].weapon_id == 0x27) {
+                                                if (MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active != 1 && MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].weapon_id == WEAPON_TRACTOR_BEAM) {
                                                     MOX::_combat_data[MOX::_cur_ship].special_cooldown = 0xFF;
                                                 }
                                                 if (MOX::_net_flag != 0) {
@@ -806,7 +806,7 @@ namespace COMBAT1 {
                                                     if (MOX::_combat_data[MOX::_cur_ship].weapons[f10].active < -1) {
                                                         MOX::_combat_data[MOX::_cur_ship].weapons[f10].active = 1;
                                                     }
-                                                    if (MOX::_combat_data[MOX::_cur_ship].weapons[f10].active != 1 && MOX::_combat_data[MOX::_cur_ship].weapons[f10].weapon_id == 0x27) {
+                                                    if (MOX::_combat_data[MOX::_cur_ship].weapons[f10].active != 1 && MOX::_combat_data[MOX::_cur_ship].weapons[f10].weapon_id == WEAPON_TRACTOR_BEAM) {
                                                         MOX::_combat_data[MOX::_cur_ship].special_cooldown = 0xFF;
                                                     }
                                                     break;
@@ -966,8 +966,8 @@ namespace COMBAT1 {
         } else {
             int combat_speed = (uint8_t)MOX::_combat_data[ship_idx].combat_speed_base;
             
-            if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_flags, 2) == 1 &&
-                struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_damage_flags, 2) == 0) {
+            if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_flags, SPECIAL_AUGMENTED_ENGINES) == 1 &&
+                struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_damage_flags, SPECIAL_AUGMENTED_ENGINES) == 0) {
                 combat_speed += 5;
             }
             
@@ -987,7 +987,7 @@ namespace COMBAT1 {
                 speed = 0;
             }
             
-            if (owner < MAX_PLAYERS && MOX::_player[owner].traits[29] != 0) {
+            if (owner < MAX_PLAYERS && MOX::_player[owner].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 speed += 4;
             }
             
@@ -997,7 +997,7 @@ namespace COMBAT1 {
                     if (MOX::_combat_data[i].special_cooldown == ship_idx && 
                         Combat_Ship_Is_Functional_(i)) {
                         for (int j = 0; j < 8; ++j) {
-                            if (MOX::_combat_data[i].weapons[j].weapon_id == 39 /* Tractor Beam */) {
+                            if (MOX::_combat_data[i].weapons[j].weapon_id == WEAPON_TRACTOR_BEAM) {
                                 tractor_beams += MOX::_combat_data[i].weapons[j].count;
                             }
                         }
@@ -1067,7 +1067,7 @@ namespace COMBAT1 {
             s_combat_weapon_slot* slot = &ship->weapons[i];
             int8_t count = slot->count;
 
-            if (slot->weapon_id == 0x20 /* Stasis Field */) {
+            if (slot->weapon_id == WEAPON_STASIS_FIELD) {
                 if ((int16_t)count < stasis_count) {
                     slot->shots_left = 0;
                     stasis_count -= (int16_t)count;
@@ -1082,13 +1082,13 @@ namespace COMBAT1 {
                 slot->active = 1;
             }
 
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 16 /* 0x10 */) != 0) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HYPER_X_CAPACITORS) != 0) {
                 if (TECHDATA::_weapons[slot->weapon_id].type == 0 && slot->status != 1) {
                     slot->status = 2;
                 }
             }
 
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 12 /* 0x0C */) != 0) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_FAST_MISSILE_RACKS) != 0) {
                 if (TECHDATA::_weapons[slot->weapon_id].type == 1 && slot->status != 1) {
                     slot->status = 2;
                 }
@@ -1580,8 +1580,7 @@ namespace COMBAT1 {
         int16_t total_ships = MOX::_combat_total_ship_count;
 
         for (int16_t i = 0; i < total_ships; ++i) {
-            // 0x25 = Shield Dissipator
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, 0x25) != 0) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WARP_DISSIPATOR) != 0) {
                 s_combat_data* ship = &MOX::_combat_data[i];
 
                 if (ship->is_captured == 0 && ship->unit_status == 0 && ship->owner != player_idx) {
@@ -1619,11 +1618,11 @@ namespace COMBAT1 {
                             } else {
                                 int8_t planet_size = MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size;
                                 switch (planet_size) {
-                                    case 0: dim = 3; break;
-                                    case 1: dim = 4; break;
-                                    case 2: dim = 6; break;
-                                    case 3: dim = 7; break;
-                                    case 4: dim = 8; break;
+                                    case PLANET_SIZE_TINY: dim = 3; break;
+                                    case PLANET_SIZE_SMALL: dim = 4; break;
+                                    case PLANET_SIZE_MEDIUM: dim = 6; break;
+                                    case PLANET_SIZE_LARGE: dim = 7; break;
+                                    case PLANET_SIZE_HUGE: dim = 8; break;
                                     default: dim = 6; break;
                                 }
                             }
@@ -1663,7 +1662,7 @@ namespace COMBAT1 {
     void __cdecl Initiate_Boarding_Action_(int16_t attacker_idx, int16_t defender_idx) {
         bool can_board = true;
         int16_t range = CMBTAI::Range_To_Ship_(attacker_idx, defender_idx);
-        int16_t has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* SPEC_TRANSPORTERS */);
+        int16_t has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS);
         int16_t max_range = (has_transporters == 1) ? 4 : 1;
         s_combat_data* target = &MOX::_combat_data[defender_idx];
         char msg_buffer[80];
@@ -1923,7 +1922,7 @@ namespace COMBAT1 {
         int16_t x_pixel;
         int16_t y_pixel;
 
-        if (((COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x21 /* SUBSPACE_TELEPORTER */) ||
+        if (((COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) ||
               COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x16 /* TRANSPORTER */)) &&
              CMBTFIR2::Used_Teleporter_(ship_idx) == 0) &&
             (range < 20)) {
@@ -1993,9 +1992,9 @@ namespace COMBAT1 {
                                 *grid_cell = -1;
                             }
 
-                            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x21 /* SUBSPACE_TELEPORTER */)) {
+                            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER)) {
                                 if (*grid_cell == -1 && CMBTFIR2::Used_Teleporter_(ship_idx) == 0) {
-                                    if (CMBTFIRE::Special_Is_Turned_On_(ship_idx, 0x21 /* SUBSPACE_TELEPORTER */) == 1) {
+                                    if (CMBTFIRE::Special_Is_Turned_On_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) == 1) {
                                         if (CMBTAI::Range_To_XY_(ship_idx, x_pixel, y_pixel) <= 20) {
                                             *grid_cell = 2000;
                                         }

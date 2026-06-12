@@ -42,7 +42,7 @@ namespace COLREFIT {
             if (MOX::_ship[ship_idx].owner == MOX::_PLAYER_NUM &&
                 MOX::_ship[ship_idx].status < 3 &&
                 MOX::_ship[ship_idx].location == MOX::_screen_data &&
-                MOX::_ship[ship_idx].d.ship_type == 0 &&
+                MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT &&
                 n_ships < MAX_SHIPS) {
 
                 _g_ship_list_ptr[n_ships] = ship_idx;

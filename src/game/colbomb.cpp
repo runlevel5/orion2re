@@ -64,7 +64,7 @@ namespace COLBOMB {
             line_count++;
         }
 
-        for (int32_t building_idx = 0; building_idx < 49; building_idx++) {
+        for (int32_t building_idx = 0; building_idx < BUILDING_COUNT; building_idx++) {
             if (line_count >= 15) {
                 break;
             }

@@ -775,7 +775,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
     star_idx = (int16_t)(star - MOX::_star);
     Reset_One_Shot_System_Special_(star);
 
-    if (star->system_special != 0 && (*_star_has_nonplayer)[star_idx] == 0) {
+    if (star->system_special != SYSTEM_SPECIAL_NO_SPECIAL && (*_star_has_nonplayer)[star_idx] == 0) {
         eligible_player_count = 0;
         memset(player_present, 0, sizeof(player_present));
 
@@ -790,17 +790,17 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
             player_idx = RUSS::Get_Weighted_Choice_Char_(player_present, MOX::_NUM_PLAYERS);
 
             switch (star->system_special) {
-            case 2:
+            case SYSTEM_SPECIAL_SPACE_DEBRIS:
                 MOX::_player[player_idx].bc += 50;
                 star->system_special = player_idx + 50;
                 break;
 
-            case 3:
+            case SYSTEM_SPECIAL_PIRATE_CACHE:
                 MOX::_player[player_idx].bc += 100;
                 star->system_special = player_idx + 60;
                 break;
 
-            case 7:
+            case SYSTEM_SPECIAL_SPLINTER_COLONY:
                 star->system_special = player_idx + 70;
                 (*_star_has_player)[star_idx][player_idx].colony_count = 1;
                 colony = Free_Colony_Slot_();
@@ -823,10 +823,10 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                     pop_val = (pop_val & ~0xF) | (player_idx & 0xF);
                     pop_val = (pop_val & ~0x70) | ((player_idx << 4) & 0x70);
 
-                    if (MOX::_planet[planet_idx].food_per_farmer == 0 || MOX::_player[player_idx].traits[18] != 0) {
+                    if (MOX::_planet[planet_idx].food_per_farmer == 0 || MOX::_player[player_idx].traits[TRAIT_EATS_MINERALS] != 0) {
                         int r = game_random::Random_(2);
                         pop_val = (((r << 7) ^ pop_val) & 0x180) ^ pop_val;
-                    } else if (MOX::_player[player_idx].traits[17] == 0) {
+                    } else if (MOX::_player[player_idx].traits[TRAIT_CYBERNETIC] == 0) {
                         pop_val &= ~0x180;
                     } else if (i == 0) {
                         pop_val = (pop_val & ~0x100) | 0x80;
@@ -843,11 +843,11 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                 colony->just_produced = -39 /* 0xFFD9 */;
                 break;
 
-            case 8:
+            case SYSTEM_SPECIAL_MAROONED_HERO:
                 star->system_special = player_idx + 80;
                 break;
 
-            case 10:
+            case SYSTEM_SPECIAL_ANCIENT_ARTIFACTS:
                 if (star->artifacts_gave_app == 0) {
                     uint8_t* picked_tech_ids;
                     int r;
@@ -905,7 +905,7 @@ void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
             }
         }
         // Clear the system special flag
-        star->system_special = 0;
+        star->system_special = SYSTEM_SPECIAL_NO_SPECIAL;
     }
 }
 
@@ -1154,7 +1154,7 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* ta
             int16_t colony_idx = COMBFIND::_target.colony_targets[i];
             int8_t owner = MOX::_colony[colony_idx].owner;
 
-            if (MOX::_player[owner].traits[26 /* TRAIT_LUCKY */] != 0) {
+            if (MOX::_player[owner].traits[TRAIT_LUCKY] != 0) {
                 lucky_count++;
                 if (game_random::Random_(lucky_count) == 1) {
                     lucky_target = colony_idx;
@@ -1187,7 +1187,7 @@ void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* ta
             int16_t player_idx = COMBFIND::_target.player_targets[i];
 
             // If player is valid index and not lucky, prioritize them
-            if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[26 /* TRAIT_LUCKY */] == 0) {
+            if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_LUCKY] == 0) {
                 non_lucky_count++;
                 if (game_random::Random_(non_lucky_count) == 1) {
                     non_lucky_target = player_idx;
@@ -1506,7 +1506,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
 
     if (result->player_info.combat_result >= 0) {
         if (plr1_idx < MAX_PLAYERS) {
-            if (_current_star_has_player[plr1_idx].ship_sizes[0] == 0 && colony_idx == -1) {
+            if (_current_star_has_player[plr1_idx].ship_sizes[SHIP_TYPE_COMBAT] == 0 && colony_idx == -1) {
                 Kill_Noncombat_Ships_(&ships[plr1_ship_offset], plr1_ship_count);
             } else {
                 Determine_Retreat_Ships_(star_idx, plr1_idx, colony_idx);
@@ -1782,7 +1782,7 @@ void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int1
 }
 
 void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx) {
-    _current_star_has_player[player_idx].ship_sizes[0] = 0;
+    _current_star_has_player[player_idx].ship_sizes[SHIP_TYPE_COMBAT] = 0;
     _current_star_has_player[player_idx].has_player = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1896,7 +1896,7 @@ void __cdecl Get_Best_Colony_Target_(
             uint32_t enemy_ground_str = enemy_ground_str_vs;
 
             bool player_is_omni = false;
-            if (MOX::_player[player_idx].traits[25] != 0 && MOX::_player[owner].traits[25] == 0) {
+            if (MOX::_player[player_idx].traits[TRAIT_TELEPATHIC] != 0 && MOX::_player[owner].traits[TRAIT_TELEPATHIC] == 0) {
                 player_is_omni = true;
             }
 
@@ -1915,7 +1915,7 @@ void __cdecl Get_Best_Colony_Target_(
                     if (condition2 || enemy_space_str_vs != 0) {
                         if (colony->n_pops != 1 ||
                             (colony->pop[0] & 0xF) != player_idx ||
-                            (*_star_has_player)[star_idx][player_idx].ship_sizes[2] != 0 ||
+                            (*_star_has_player)[star_idx][player_idx].ship_sizes[SHIP_TYPE_TRANSPORT] != 0 ||
                             MOX::_player[player_idx].personality == 1)
                         {
                             is_valid = true;
@@ -2013,10 +2013,10 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             BOMB::Destroy_Colony_(colony, 2);
                             ERIC::Play_Planetary_Destruction_Flic_();
                             COMBFIND::_current_star_has_player[colony_owner].colony_count--;
-                            MOX::_planet[planet_idx].planet_type = 1 /* PLANET_TYPE_ASTEROIDS */;
+                            MOX::_planet[planet_idx].planet_type = PLANET_TYPE_ASTEROID;
                             if (MOX::_planet[planet_idx].planet_special != 0) {
                                 MOX::_planet[planet_idx].planet_special = 0;
-                                MOX::_star[star_idx].system_special = 0;
+                                MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
                             }
                             NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, old_n_pops);
                             loop_done = true;
@@ -2145,7 +2145,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             } else {
                                 if (colony->n_pops == 1 && (colony->pop[0] & 0xF) == (uint32_t)attacker_id && 
                                     MOX::_player[attacker_id].personality != 1 && (COMBFIND::Player_Owns_Transports_(attacker_id) || 
-                                    (MOX::_player[attacker_id].traits[25] != 0 && MOX::_player[colony_owner].traits[25] == 0))) {
+                                    (MOX::_player[attacker_id].traits[TRAIT_TELEPATHIC] != 0 && MOX::_player[colony_owner].traits[TRAIT_TELEPATHIC] == 0))) {
                                     done = true;
                                 } else if (bio_hits == 0) {
                                     int used = BOMB::Resolve_Bomb_Hit_(colony, &results->bomb, bomb_hits);
@@ -2356,7 +2356,7 @@ uint8_t __cdecl Has_Stellar_Converter_(int16_t* ship_list, int16_t ship_count) {
     for (int32_t i = 0; i < ship_count; ++i) {
         int32_t ship_idx = ship_list[i];
         if (MOX::_ship[ship_idx].status == 0) {
-            if (INITSHIP::Ship_Has_Weapon_(ship_idx, 0x26) != 0) {
+            if (INITSHIP::Ship_Has_Weapon_(ship_idx, WEAPON_STELLAR_CONVERTER) != 0) {
                 return 1;
             }
         }

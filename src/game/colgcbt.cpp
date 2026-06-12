@@ -138,7 +138,7 @@ namespace COLGCBT {
         _anims[39] = _anims[29];
         _anims[36] = _anims[26];
 
-        if (MOX::_player[_g_defend_ptr->player_id].tech_applications[24] == 3) {
+        if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
             _anims[23] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 15, MOX::_screen_seg);
             _anims[20] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 16, MOX::_screen_seg);
             _anims[22] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 17, MOX::_screen_seg);
@@ -240,8 +240,8 @@ namespace COLGCBT {
 
             if (input != 0) {
                 if (_display_fast == 0 &&
-                    (uint8_t)attacker->current_troop_type_idx < 4 &&
-                    (uint8_t)defender->current_troop_type_idx < 4) {
+                    (uint8_t)attacker->current_troop_type_idx < UNIT_COUNT &&
+                    (uint8_t)defender->current_troop_type_idx < UNIT_COUNT) {
                     _display_fast = 1;
                 }
                 else {
@@ -296,7 +296,7 @@ namespace COLGCBT {
     }
 
     int16_t __cdecl Get_Next_Troop_Type_(uint8_t side) {
-        for (int16_t i = 0; i < 4; ++i) {
+        for (int16_t i = 0; i < UNIT_COUNT; ++i) {
             if (side == 0) {
                 if (N_Troop_Type_(i, side) < _g_attack_ptr->unit_counts[i]) {
                     return i;
@@ -315,15 +315,15 @@ namespace COLGCBT {
             case 0:
                 return _explosion_anim;
             case 1:
-                return _anims[(type + side * 4) * 5];
+                return _anims[(type + side * UNIT_COUNT) * 5];
             case 2:
-                return _anims[(type + side * 4) * 5 + 1];
+                return _anims[(type + side * UNIT_COUNT) * 5 + 1];
             case 3:
-                return _anims[(type + side * 4) * 5 + 2];
+                return _anims[(type + side * UNIT_COUNT) * 5 + 2];
             case 4:
-                return _anims[(type + side * 4) * 5 + 3];
+                return _anims[(type + side * UNIT_COUNT) * 5 + 3];
             case 5:
-                return _anims[(type + side * 4) * 5 + 4];
+                return _anims[(type + side * UNIT_COUNT) * 5 + 4];
             default:
                 return nullptr;
         }
@@ -579,12 +579,12 @@ namespace COLGCBT {
                 if (unit->anim_frame % 2 == 0) {
                     modify_x = true;
                 } else {
-                    if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] != 3) {
+                    if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
                         modify_x = true;
                     }
                 }
             } else if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
                     if (unit->anim_frame % 2 == 0 && unit->anim_frame > 1) {
                         modify_x = true;
                     }
@@ -592,7 +592,7 @@ namespace COLGCBT {
                     modify_x = true;
                 }
             } else {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] != 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
                     modify_x = true;
                 }
             }
@@ -625,7 +625,7 @@ namespace COLGCBT {
     void __cdecl Draw_Summary_() {
         bool attackers_defeated = true;
 
-        for (int32_t i = 0; i < 4; ++i) {
+        for (int32_t i = 0; i < UNIT_COUNT; ++i) {
             if (_g_attack_ptr->unit_counts[i] > 0) {
                 attackers_defeated = false;
             }
@@ -812,7 +812,7 @@ namespace COLGCBT {
 
     void __cdecl Print_Best_Summary_(s_invasion_side_info* side_info, int16_t* row) {
         if (side_info->combat_modifiers.antigrav_bonus != 0) {
-            Print_Data_(TECHDATA::_technology_applications[9].name,
+            Print_Data_(TECHDATA::_technology_applications[TECH_APP_ANTI_GRAV_HARNESS].name,
                         (uint8_t)side_info->combat_modifiers.antigrav_bonus,
                         row,
                         side_info);
@@ -869,8 +869,8 @@ namespace COLGCBT {
 
         COLONY::Set_Colony_Font_To_(3);
 
-        if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
-            (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
+        if ((uint8_t)_g_attack_ptr->current_troop_type_idx < UNIT_COUNT &&
+            (uint8_t)_g_defend_ptr->current_troop_type_idx < UNIT_COUNT) {
 
             char buffer[500];
             char* race_name = MOX::_player[_g_attack_ptr->player_id].race_name;
@@ -897,8 +897,8 @@ namespace COLGCBT {
         for (;;) {
             _g_ctr++;
 
-            if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
-                (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
+            if ((uint8_t)_g_attack_ptr->current_troop_type_idx < UNIT_COUNT &&
+                (uint8_t)_g_defend_ptr->current_troop_type_idx < UNIT_COUNT) {
                 if (_start_combat == 0) {
                     _start_combat = 1;
                 } else {
@@ -919,8 +919,8 @@ namespace COLGCBT {
                 return;
             }
 
-            if ((uint8_t)_g_attack_ptr->current_troop_type_idx >= 4 ||
-                (uint8_t)_g_defend_ptr->current_troop_type_idx >= 4) {
+            if ((uint8_t)_g_attack_ptr->current_troop_type_idx >= UNIT_COUNT ||
+                (uint8_t)_g_defend_ptr->current_troop_type_idx >= UNIT_COUNT) {
                 return;
             }
         }
@@ -931,7 +931,7 @@ namespace COLGCBT {
         int16_t valid_troop_idx = 0;
         char local_str[500];
 
-        for (int32_t i = 0; i < 4; i++) {
+        for (int32_t i = 0; i < UNIT_COUNT; i++) {
             if (side_info->unit_counts[i] != 0) {
                 active_unit_count++;
             }
@@ -940,7 +940,7 @@ namespace COLGCBT {
         int16_t spacing = 261 / (active_unit_count + 1);
         int16_t cur_x = x + spacing;
 
-        for (int32_t j = 0; j < 4; j++) {
+        for (int32_t j = 0; j < UNIT_COUNT; j++) {
             if (side_info->unit_counts[j] != 0) {
                 uint8_t race = (uint8_t)MOX::_player[side_info->player_id].race;
                 s_animation_header* anim = COLONY::Player_Troop_Anim_(side_info->player_id, j, race);
@@ -1151,19 +1151,19 @@ namespace COLGCBT {
 
         if (side_info != nullptr) {
             switch (side_info->combat_modifiers.rifle_tech_app_id) {
-                case 73:
+                case TECH_APP_FUSION_RIFLE:
                     sound_id = 9;
                     break;
-                case 101:
+                case TECH_APP_LASER_RIFLE:
                     sound_id = 1;
                     break;
-                case 128:
+                case TECH_APP_PHASOR_RIFLE:
                     sound_id = 19;
                     break;
-                case 138:
+                case TECH_APP_PLASMA_RIFLE:
                     sound_id = 13;
                     break;
-                case 145:
+                case TECH_APP_PULSE_RIFLE:
                     sound_id = 12;
                     break;
                 default:
@@ -1187,7 +1187,7 @@ namespace COLGCBT {
         int16_t y_step_frames[11] = { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
 
         if (unit->state == 4) {
-            if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[24] != 3 && unit->anim_frame % 3 == 2) ||
+            if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3 && unit->anim_frame % 3 == 2) ||
                 y_step_frames[unit->anim_frame] == 1) {
                 unit->y += unit->y_offset;
             }
@@ -1211,8 +1211,8 @@ namespace COLGCBT {
                 break;
 
             case 2:
-                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
-                    (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
+                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < UNIT_COUNT &&
+                    (uint8_t)_g_defend_ptr->current_troop_type_idx < UNIT_COUNT) {
                     unit->state = 3;
                 } else {
                     unit->state = 4;
@@ -1220,8 +1220,8 @@ namespace COLGCBT {
                 break;
 
             case 3:
-                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
-                    (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
+                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < UNIT_COUNT &&
+                    (uint8_t)_g_defend_ptr->current_troop_type_idx < UNIT_COUNT) {
                     uint32_t rnd = game_random::Random_(4);
                     if (rnd == 1) {
                         unit->state = 4;
@@ -1246,8 +1246,8 @@ namespace COLGCBT {
                 sound::Fadeout_Sound_(unit->sound_handle, 10);
                 unit->sound_handle = 0;
 
-                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < 4 &&
-                    (uint8_t)_g_defend_ptr->current_troop_type_idx < 4) {
+                if ((uint8_t)_g_attack_ptr->current_troop_type_idx < UNIT_COUNT &&
+                    (uint8_t)_g_defend_ptr->current_troop_type_idx < UNIT_COUNT) {
                     if (game_random::Random_(2) == 1) {
                         unit->state = 3;
                         break;
@@ -1284,7 +1284,7 @@ namespace COLGCBT {
 
         if (unit->side == 0) {
             if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
                     *out_x = width - 15;
                     *out_y = 14;
                 } else {
@@ -1297,7 +1297,7 @@ namespace COLGCBT {
             }
         } else if (unit->side == 1) {
             if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
                     *out_x = 15;
                     *out_y = 14;
                 } else if (unit->state == 5) {
@@ -1323,7 +1323,7 @@ namespace COLGCBT {
             side = _g_defend_ptr;
         }
 
-        uint8_t rifle_idx = (uint8_t)(side->combat_modifiers.rifle_tech_app_id - 73);
+        uint8_t rifle_idx = (uint8_t)(side->combat_modifiers.rifle_tech_app_id - TECH_APP_FUSION_RIFLE);
         if (rifle_idx > 72) {
             return 1;
         }
@@ -1372,7 +1372,7 @@ namespace COLGCBT {
         int16_t p14;
 
         switch (rifle_id) {
-            case 73:  /* Laser Rifle */
+            case TECH_APP_FUSION_RIFLE:  /* Fusion Rifle */
                 p6 = 11;
                 p7 = 40;
                 p5 = 183;
@@ -1384,7 +1384,7 @@ namespace COLGCBT {
                 p14 = 0;
                 p12 = 0;
                 break;
-            case 101: /* Fusion Rifle */
+            case TECH_APP_LASER_RIFLE: /* Laser Rifle */
                 p5 = 236;
                 p8 = 1;
                 p9 = 236;
@@ -1396,7 +1396,7 @@ namespace COLGCBT {
                 p14 = 0;
                 p12 = 1;
                 break;
-            case 128: /* Phasor Rifle */
+            case TECH_APP_PHASOR_RIFLE: /* Phasor Rifle */
                 p8 = 2;
                 p5 = 236;
                 p6 = 4;
@@ -1408,7 +1408,7 @@ namespace COLGCBT {
                 p13 = 1;
                 p12 = 1;
                 break;
-            case 138: /* Plasma Rifle */
+            case TECH_APP_PLASMA_RIFLE: /* Plasma Rifle */
                 p8 = 2;
                 p9 = 236;
                 p5 = 236;
@@ -1420,7 +1420,7 @@ namespace COLGCBT {
                 p10 = 239;
                 p12 = 0;
                 break;
-            case 145: /* Disruptor Rifle */
+            case TECH_APP_PULSE_RIFLE: /* Pulse Rifle */
                 p6 = 11;
                 p7 = 10;
                 p5 = 95;

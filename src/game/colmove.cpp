@@ -503,7 +503,8 @@ namespace COLMOVE {
     uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t new_job) {
         int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
 
-        if ((pop_state == 3 || pop_state == 6) && (new_job == 2 || new_job == 1)) {
+        if ((pop_state == 3 || pop_state == 6)
+                && (new_job == ECON_RESEARCH || new_job == ECON_INDUSTRY)) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x20A));
             return 0;
         }
@@ -525,7 +526,7 @@ namespace COLMOVE {
         uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
         int16_t sum_colonists_again = COLONY::Sum_Colonists_(colony_idx, new_job, -1, -1, 0, -1);
 
-        if (max_farms > sum_colonists_again || new_job != 0) {
+        if (max_farms > sum_colonists_again || new_job != ECON_FOOD) {
             uint32_t pop_val = MOX::_colony[colony_idx].pop[pop_idx];
             uint32_t job_shifted = (uint32_t)new_job << 7;
 

@@ -879,7 +879,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                     COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
 
                     MOX::_return_screen = MOX::_current_screen;
-                    MOX::_current_screen = 1;
+                    MOX::_current_screen = SCREEN_COLONY;
                     *p_input_field = _x_fields[3];
                 }
             } else if (_list_col_prod_fields[i] == current_input) {
@@ -903,7 +903,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                 }
 
                 MOX::_return_screen = MOX::_current_screen;
-                MOX::_current_screen = 25 /* 0x19 */;
+                MOX::_current_screen = SCREEN_QUEUE_POPUP;
                 return false;
             } else if (COLSUM::_list_fields[i] + current_input == 0) {
                 int16_t colony_idx = COLSUM::_list_col[i];
@@ -1032,8 +1032,8 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
     }
 
     int16_t __cdecl cmp_Food_(int16_t colony_idx1, int16_t colony_idx2) {
-        return cmp_(MOX::_colony[colony_idx1].production[0],
-                    MOX::_colony[colony_idx2].production[0]);
+        return cmp_(MOX::_colony[colony_idx1].production[ECON_FOOD],
+                    MOX::_colony[colony_idx2].production[ECON_FOOD]);
     }
 
     int16_t __cdecl cmp_Industry_(int16_t param_1, int16_t param_2) {
@@ -1183,7 +1183,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         }
 
         // Handle specific building indices (1-48)
-        if (param_1 > 0 && param_1 < 49) {
+        if (param_1 > 0 && param_1 < BUILDING_COUNT) {
             return static_cast<int16_t>(TECHDATA::_buildings[param_1].cost) + 10;
         }
 
@@ -1204,7 +1204,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         // Specific indices returning 0
         if (param_1 == -11 || param_1 == -12 || param_1 == -13 || 
             param_1 == -17 || param_1 == -16 || param_1 == -8 || 
-            param_1 == -9 || param_1 >= 49) {
+            param_1 == -9 || param_1 >= BUILDING_COUNT) {
             return 0;
         }
 

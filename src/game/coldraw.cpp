@@ -42,17 +42,17 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
 
     s_colony* colony = &MOX::_colony[colony_idx];
 
-    if (prod_type != 1) {
+    if (prod_type != ECON_INDUSTRY) {
         int32_t imp_val = abs((int32_t)colony->imports[prod_type]);
         import_tens = (int16_t)(imp_val / 10);
         import_units = (int16_t)(imp_val % 10);
     }
 
-    if (prod_type == 0) {
-        int32_t imp_val_1 = abs((int32_t)colony->imports[1]);
+    if (prod_type == ECON_FOOD) {
+        int32_t imp_val_1 = abs((int32_t)colony->imports[ECON_INDUSTRY]);
         secondary_tens = (int16_t)(imp_val_1 / 10);
         secondary_units = (int16_t)(imp_val_1 % 10);
-    } else if (prod_type == 1) {
+    } else if (prod_type == ECON_INDUSTRY) {
         secondary_tens = colony->pollution / 10;
         secondary_units = colony->pollution % 10;
     }
@@ -71,7 +71,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     int16_t net_units;
 
     if ((int8_t)colony->imports[prod_type] < 0) {
-        if (prod_type == 1) {
+        if (prod_type == ECON_INDUSTRY) {
             int32_t adj_prod = (int32_t)prod_val - colony->maintenance[prod_type];
             if (adj_prod < 0) adj_prod = 0;
             net_tens = (int16_t)(adj_prod / 10);
@@ -82,7 +82,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
             net_units = (int16_t)(adj_prod % 10);
         }
     } else {
-        if (colony->maintenance[1] == 0 || prod_type != 1) {
+        if (colony->maintenance[ECON_INDUSTRY] == 0 || prod_type != ECON_INDUSTRY) {
             net_tens = prod_val / 10;
             net_units = prod_val % 10;
         } else {
@@ -96,7 +96,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     int16_t total_tens = import_tens + secondary_tens + net_tens + shortage_tens;
     int16_t total_units = import_units + secondary_units + net_units + shortage_units;
 
-    if (colony->imports[prod_type] != 0 && prod_type != 1) {
+    if (colony->imports[prod_type] != 0 && prod_type != ECON_INDUSTRY) {
         total_units++;
     }
     if (secondary_tens != 0 || secondary_units != 0) {
@@ -125,7 +125,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     }
 
     if (secondary_tens != 0 || secondary_units != 0) {
-        if (prod_type == 1) {
+        if (prod_type == ECON_INDUSTRY) {
             for (int i = 0; i < secondary_tens; ++i) {
                 animate::Draw_(step * drawn_count + x, y, COLONY::Import_Anims_(1, 1, frame));
                 drawn_count++;
@@ -134,7 +134,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
                 animate::Draw_(step * drawn_count + x, y, COLONY::Import_Anims_(1, 0, frame));
                 drawn_count++;
             }
-        } else if (prod_type == 0) {
+        } else if (prod_type == ECON_FOOD) {
             for (int i = 0; i < secondary_tens; ++i) {
                 animate::Draw_(step * drawn_count + x, y, COLONY::Prod_Anims_(1, 1, frame));
                 drawn_count++;
@@ -149,7 +149,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
 
     drawn_count++;
 
-    if (colony->imports[prod_type] <= 0 || prod_type == 1) {
+    if (colony->imports[prod_type] <= 0 || prod_type == ECON_INDUSTRY) {
         for (int i = 0; i < import_tens; ++i) {
             animate::Draw_(step * drawn_count + x, y, COLONY::Prod_Anims_(prod_type, 1, frame));
             drawn_count++;
@@ -192,7 +192,7 @@ void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, in
     int32_t morale_count = morale_count_abs;
 
     s_player* player = &MOX::_player[(int8_t)colony->owner];
-    int8_t govt_trait = player->traits[0];
+    int8_t govt_trait = player->traits[TRAIT_CURRENT_GOVERNMENT];
 
     if (govt_trait >= 6) {
         morale_count = 0;
@@ -312,7 +312,7 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
         end_idx = job_filter + 1;
     }
 
-    if (mode == 0 && job_filter == 0 && MOX::_colony[colony_idx].max_farms == 0) {
+    if (mode == 0 && job_filter == ECON_FOOD && MOX::_colony[colony_idx].max_farms == 0) {
         COLONY::Set_Colony_Font_To_(3);
         if (MOX::_settings.language == 1 && MOX::_current_screen == SCREEN_COLONY_SUMMARY) {
             BILL::Squeeze_Print_Paragraph_(left_x, top_y - 1, right_x - left_x, 34, ESTRINGS::E_Strings_(387 /* ESTR_NO_FARMING */), 2);
@@ -389,7 +389,7 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
 post_loop_dispatch:
     switch (mode) {
         case 0:
-            if (show_farm_shadows != 0 && job_filter == 0) {
+            if (show_farm_shadows != 0 && job_filter == ECON_FOOD) {
                 const uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
                 if (max_farms != 0xff) {
                     if (pop_draw_index < (int16_t)max_farms) {
@@ -790,20 +790,20 @@ int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {
     const int32_t climate = MOX::_planet[planet_idx].climate;
 
     switch (climate) {
-    case 0:
+    case PLANET_CLIMATE_TOXIC:
         return (game_random::Random_(2) == 1) ? 5 : 9;
 
-    case 1:
-    case 2:
+    case PLANET_CLIMATE_RADIATED:
+    case PLANET_CLIMATE_BARREN:
         return (game_random::Random_(2) == 1) ? 6 : 4;
 
-    case 3:
+    case PLANET_CLIMATE_DESERT:
         return 8;
 
-    case 4:
+    case PLANET_CLIMATE_TUNDRA:
         return 4;
 
-    case 5:
+    case PLANET_CLIMATE_OCEAN:
         switch (game_random::Random_(4)) {
         case 1:
             return 7;
@@ -817,14 +817,14 @@ int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {
             return veggie_type;
         }
 
-    case 6:
+    case PLANET_CLIMATE_SWAMP:
         return 10;
 
-    case 7:
+    case PLANET_CLIMATE_ARID:
         return 1;
 
-    case 8:
-    case 9:
+    case PLANET_CLIMATE_TERRAN:
+    case PLANET_CLIMATE_GAIA:
         switch (game_random::Random_(4)) {
         case 1:
             return 12;

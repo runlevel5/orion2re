@@ -68,56 +68,56 @@
 [X] src/game/cmbtmis.h
 [X] src/game/cmbtmov1.cpp
 [X] src/game/cmbtmov1.h
-[ ] src/game/cmbtspec.cpp
-[ ] src/game/cmbtspec.h
-[ ] src/game/colbcach.cpp
-[ ] src/game/colbcach.h
-[ ] src/game/colbldg.cpp
-[ ] src/game/colbldg.h
-[ ] src/game/colbomb.cpp
-[ ] src/game/colbomb.h
-[ ] src/game/colcalc.cpp
-[ ] src/game/colcalc.h
-[ ] src/game/colcalc_main.cpp
-[ ] src/game/coldraw.cpp
-[ ] src/game/coldraw.h
-[ ] src/game/colgcbt.cpp
-[ ] src/game/colgcbt.h
-[ ] src/game/colland.cpp
-[ ] src/game/colland.h
-[ ] src/game/colmove.cpp
-[ ] src/game/colmove.h
-[ ] src/game/colonize.cpp
-[ ] src/game/colonize.h
-[ ] src/game/colony.cpp
-[ ] src/game/colony.h
-[ ] src/game/colony_main.cpp
-[ ] src/game/colrefit.cpp
-[ ] src/game/colrefit.h
-[ ] src/game/colsum.cpp
-[ ] src/game/colsum.h
-[ ] src/game/colsysdi.cpp
-[ ] src/game/colsysdi.h
-[ ] src/game/colxport.cpp
-[ ] src/game/colxport.h
-[ ] src/game/combat.cpp
-[ ] src/game/combat.h
-[ ] src/game/combat1.cpp
-[ ] src/game/combat1.h
-[ ] src/game/combfind.cpp
-[ ] src/game/combfind.h
-[ ] src/game/combinit.cpp
-[ ] src/game/combinit.h
-[ ] src/game/comcore.cpp
-[ ] src/game/comcore.h
-[ ] src/game/compat.cpp
-[ ] src/game/compat.h
-[ ] src/game/consts.h
-[ ] src/game/contact.cpp
-[ ] src/game/contact.h
-[ ] src/game/council.cpp
-[ ] src/game/council.h
-[ ] src/game/deps.h
+[X] src/game/cmbtspec.cpp
+[X] src/game/cmbtspec.h
+[X] src/game/colbcach.cpp
+[X] src/game/colbcach.h
+[X] src/game/colbldg.cpp
+[X] src/game/colbldg.h
+[X] src/game/colbomb.cpp
+[X] src/game/colbomb.h
+[X] src/game/colcalc.cpp
+[X] src/game/colcalc.h
+[X] src/game/colcalc_main.cpp
+[X] src/game/coldraw.cpp
+[X] src/game/coldraw.h
+[X] src/game/colgcbt.cpp
+[X] src/game/colgcbt.h
+[X] src/game/colland.cpp
+[X] src/game/colland.h
+[X] src/game/colmove.cpp
+[X] src/game/colmove.h
+[X] src/game/colonize.cpp
+[X] src/game/colonize.h
+[X] src/game/colony.cpp
+[X] src/game/colony.h
+[X] src/game/colony_main.cpp
+[X] src/game/colrefit.cpp
+[X] src/game/colrefit.h
+[X] src/game/colsum.cpp
+[X] src/game/colsum.h
+[X] src/game/colsysdi.cpp
+[X] src/game/colsysdi.h
+[X] src/game/colxport.cpp
+[X] src/game/colxport.h
+[X] src/game/combat.cpp
+[X] src/game/combat.h
+[X] src/game/combat1.cpp
+[X] src/game/combat1.h
+[X] src/game/combfind.cpp
+[X] src/game/combfind.h
+[X] src/game/combinit.cpp
+[X] src/game/combinit.h
+[X] src/game/comcore.cpp
+[X] src/game/comcore.h
+[X] src/game/compat.cpp
+[X] src/game/compat.h
+[X] src/game/consts.h
+[X] src/game/contact.cpp
+[X] src/game/contact.h
+[X] src/game/council.cpp
+[X] src/game/council.h
+[X] src/game/deps.h
 [ ] src/game/desbox.cpp
 [ ] src/game/desbox.h
 [ ] src/game/design.cpp

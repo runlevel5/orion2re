@@ -31,7 +31,7 @@ namespace COLLAND {
         char* size_str = MOX::_planet_size_string[planet->size];
 
         if (planet->colony_index == -1) {
-            if (planet->planet_type != 3 /* PLANET_TYPE_PLANET */) {
+            if (planet->planet_type != PLANET_TYPE_PLANET) {
                 char* gas_giant_msg = ESTRINGS::E_Strings_(0x132 /* ESTR_GAS_GIANT__UNINHABITABLE */);
                 sprintf(buffer, gas_giant_msg);
                 fonts::Print_(0x14, 0x3c, buffer);
