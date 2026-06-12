@@ -2,21 +2,21 @@
 #include <stdint.h>
 
 #pragma pack(push, 1)
+// Message 0x2A shares the tail layout of s_net_pack_start_game; the first 6 bytes
+// are repurposed locally while waiting for the host to begin the loaded game.
 struct s_load_net_screen_packet {
     int16_t begin_state;
-    uint8_t field2_0x2;
-    uint8_t field3_0x3;
-    uint8_t field4_0x4;
-    uint8_t field5_0x5;
+    uint16_t ignored_net_host_id_upper16;
+    int16_t ignored_num_connected_players;
     int32_t network_ids[MAX_PLAYERS];
-    uint8_t field38_0x26;
-    uint8_t field39_0x27;
+    uint8_t random_events;
+    uint8_t game_difficulty;
     int8_t number_of_players;
-    uint8_t field41_0x29;
-    uint8_t field42_0x2a;
-    uint8_t field43_0x2b;
-    uint8_t field44_0x2c;
-    uint8_t field45_0x2d;
+    uint8_t galaxy_size;
+    uint8_t galaxy_age;
+    uint8_t strategic_combat_flag;
+    uint8_t starting_civilization_level;
+    uint8_t xenons_exist;
     char version_string[50];
 };
 #pragma pack(pop)

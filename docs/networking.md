@@ -615,6 +615,73 @@ Replace DirectPlay with plain TCP but keep peer mesh connectivity, one connectio
 
 Not chosen for the current preferred plan.
 
+## Runtime and integration model
+
+The router should be implemented as one simple single-threaded service loop.
+
+### Goals for the runtime model
+
+- keep the core loop single-threaded and easy to reason about
+- support first-class cross-platform builds
+- handle a couple of hundred concurrent players across multiple sessions
+- run both as a standalone application and from inside the game process for LAN play
+- avoid process-forking assumptions in the design
+
+### Preferred integration shape
+
+The core router API should expose a blocking run model.
+
+- the standalone CLI runs that blocking loop directly
+- the game may start the same blocking loop on an SDL-managed worker thread for LAN hosting
+- the game may also provide its own wrapper API around start, stop, and join behavior
+
+This keeps the router core simple and self-contained while still fitting the game's embedding needs.
+
+### Threading implications
+
+The router logic itself should remain single-threaded.
+
+- all sockets, session tables, connection state, and routing decisions live on the router loop thread
+- the core should not depend on cross-thread access to its internal state
+- when hosted by the game, thread lifecycle can be handled outside the core by a small wrapper that starts the blocking loop on an SDL thread and requests shutdown when needed
+
+The important boundary is that threading is an integration detail around the loop, not a complexity source inside the loop.
+
+## Event loop implementation direction
+
+`select()` is not an acceptable foundation for the new router.
+
+### Why not `select()`
+
+- descriptor-count scaling is too weak for the expected community-hosted usage
+- it is a poor fit for a service expected to handle hundreds of concurrent players
+
+### Preferred direction: libuv
+
+Use libuv as the event loop and socket runtime for the first implementation.
+
+### Why libuv fits this project
+
+- it preserves a simple single-threaded event-loop design
+- it gives strong cross-platform support without maintaining separate `epoll`, `kqueue`, and Windows backends ourselves
+- it is lightweight enough relative to the scope of the router
+- it provides the readiness and async wake primitives needed for clean shutdown and embedded hosting
+- it supports the TCP, UDP, and timer needs of the router in one portable runtime layer
+
+This is a better tradeoff than either `select()` or a custom platform-poller abstraction for the first version.
+
+### Intended loop behavior
+
+The router loop should own:
+
+- TCP listener setup and accept handling
+- client connection read and write processing
+- UDP LAN discovery handling
+- timer-driven cleanup, heartbeat, or session expiry work if needed
+- shutdown wakeup and loop termination
+
+Even when the service is started from the game on a worker thread, the actual networking model should still be one blocking single-threaded event loop.
+
 ## Large state transfer handling
 
 The current game has several large payload flows, including game-state broadcast and combat/turn-order packet groups. These are currently chunked because the legacy transport stack could not safely treat them as single messages.
