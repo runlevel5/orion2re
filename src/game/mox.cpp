@@ -647,7 +647,7 @@ namespace MOX {
     int16_t _combat_defender_player;
     s_combat_bomb_result _combat_bomb_result;
 
-    s_global_combat_data _global_combat_data;
+    s_combat_data _global_combat_data;
 
     int16_t* _officers_original_star_id;
 

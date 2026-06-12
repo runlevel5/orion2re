@@ -24,13 +24,13 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     strcpy(MOX::_global_combat_data.name, MOX::_ship[ship_idx].d.name);
 
-    MOX::_global_combat_data.player_idx = MOX::_ship[ship_idx].owner;
+    MOX::_global_combat_data.owner = MOX::_ship[ship_idx].owner;
     MOX::_global_combat_data.previous_owner = MOX::_ship[ship_idx].d.previous_owner;
     MOX::_global_combat_data.ship_idx = ship_idx;
     MOX::_global_combat_data.shield_type = MOX::_ship[ship_idx].d.shield_type;
     MOX::_global_combat_data.computer_type = MOX::_ship[ship_idx].d.computer_type;
     MOX::_global_combat_data.ftl_type = MOX::_ship[ship_idx].d.ftl_type;
-    MOX::_global_combat_data.hull_size = MOX::_ship[ship_idx].d.size;
+    MOX::_global_combat_data.size_class = MOX::_ship[ship_idx].d.size;
     MOX::_global_combat_data.unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -79,7 +79,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     MOX::_global_combat_data.officer_idx = MOX::_ship[ship_idx].officer_index;
 
     if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner <= MAX_PLAYERS) {
-        MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.hull_size].marines;
+        MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.size_class].marines;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 36)) {
             if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, 36)) {
@@ -91,10 +91,10 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     }
 
     MOX::_global_combat_data.structure_max = INITSHIP::Get_Ship_Structure_(ship_idx);
-    MOX::_global_combat_data.armor_hits_current = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_ship[ship_idx].armor_damage;
+    MOX::_global_combat_data.armor_remaining = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_ship[ship_idx].armor_damage;
     MOX::_global_combat_data.armor_type = MOX::_ship[ship_idx].d.armor_type;
 
-    if (MOX::_global_combat_data.hull_size == 5) {
+    if (MOX::_global_combat_data.size_class == 5) {
         MOX::_global_combat_data.structure_damage = MOX::_ship[ship_idx].structural_damage;
         MOX::_global_combat_data.picture_num = 43; /* 0x2B */
     } else {
@@ -106,59 +106,59 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     CMBTFIR2::Init_Internal_Space_((s_combat_data*)&MOX::_global_combat_data);
 
-    MOX::_global_combat_data.shield_hp_current =
-        ((100 - MOX::_ship[ship_idx].shield_damage_percent) * MOX::_global_combat_data.shield_hp_max) / 100;
+    MOX::_global_combat_data.shield_current_hits =
+        ((100 - MOX::_ship[ship_idx].shield_damage_percent) * MOX::_global_combat_data.shield_max_hits) / 100;
 
-    MOX::_global_combat_data.drive_effectiveness_pct =
-        ((100 - MOX::_ship[ship_idx].drive_damage_percent) * MOX::_global_combat_data.drive_hp_max) / 100;
+    MOX::_global_combat_data.drive_current_hits =
+        ((100 - MOX::_ship[ship_idx].drive_damage_percent) * MOX::_global_combat_data.drive_max_hits) / 100;
 
-    MOX::_global_combat_data.computer_effectiveness_pct =
-        MOX::_global_combat_data.computer_hp_max - MOX::_ship[ship_idx].computer_damage;
+    MOX::_global_combat_data.computer_current_hits =
+        MOX::_global_combat_data.computer_max_hits - MOX::_ship[ship_idx].computer_damage;
 
     if (MOX::_global_combat_data.shield_type <= 0) {
-        MOX::_global_combat_data.shield_points_base = 0;
+        MOX::_global_combat_data.shield_arc_max = 0;
     } else {
-        int16_t shield_hull_mult = MOX::_global_combat_data.hull_size < 5
-            ? MOX::_global_combat_data.hull_size + 1
-            : MOX::_global_combat_data.hull_size + 2;
+        int16_t shield_hull_mult = MOX::_global_combat_data.size_class < 5
+            ? MOX::_global_combat_data.size_class + 1
+            : MOX::_global_combat_data.size_class + 2;
 
-        MOX::_global_combat_data.shield_points_base =
+        MOX::_global_combat_data.shield_arc_max =
             TECHDATA::_shields[MOX::_global_combat_data.shield_type].shield_class * shield_hull_mult * 5;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 20)) {
             if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, 20)) {
-                MOX::_global_combat_data.shield_points_base += MOX::_global_combat_data.shield_points_base / 2;
+                MOX::_global_combat_data.shield_arc_max += MOX::_global_combat_data.shield_arc_max / 2;
             }
         }
 
-        MOX::_global_combat_data.shield_points_base =
-            (MOX::_global_combat_data.shield_points_base * MOX::_global_combat_data.shield_hp_current + MOX::_global_combat_data.shield_hp_max - 1) / MOX::_global_combat_data.shield_hp_max;
+        MOX::_global_combat_data.shield_arc_max =
+            (MOX::_global_combat_data.shield_arc_max * MOX::_global_combat_data.shield_current_hits + MOX::_global_combat_data.shield_max_hits - 1) / MOX::_global_combat_data.shield_max_hits;
     }
 
     for (int i = 0; i < 4; ++i) {
-        MOX::_global_combat_data.shield_quadrants[i] = MOX::_global_combat_data.shield_points_base;
+        MOX::_global_combat_data.shield_arc_current[i] = MOX::_global_combat_data.shield_arc_max;
     }
 
-    MOX::_global_combat_data.tactical_speed = MOX::_ship[ship_idx].d.combat_speed;
+    MOX::_global_combat_data.current_speed = MOX::_ship[ship_idx].d.combat_speed;
 
     if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, 2)) {
         if (!struct_::Test_Bit_Field_(MOX::_ship[ship_idx].special_device_damage_flags, 2)) {
-            MOX::_global_combat_data.tactical_speed += 5;
+            MOX::_global_combat_data.current_speed += 5;
         }
     }
 
-    int32_t drive_speed_adjustment = (2 * MOX::_global_combat_data.drive_hp_max) / -3;
-    MOX::_global_combat_data.tactical_speed =
-        ((MOX::_global_combat_data.drive_effectiveness_pct + drive_speed_adjustment) * MOX::_global_combat_data.tactical_speed) /
-        (drive_speed_adjustment + MOX::_global_combat_data.drive_hp_max);
+    int32_t drive_speed_adjustment = (2 * MOX::_global_combat_data.drive_max_hits) / -3;
+    MOX::_global_combat_data.current_speed =
+        ((MOX::_global_combat_data.drive_current_hits + drive_speed_adjustment) * MOX::_global_combat_data.current_speed) /
+        (drive_speed_adjustment + MOX::_global_combat_data.drive_max_hits);
 
-    if (MOX::_global_combat_data.tactical_speed < 0) {
-        MOX::_global_combat_data.tactical_speed = 0;
+    if (MOX::_global_combat_data.current_speed < 0) {
+        MOX::_global_combat_data.current_speed = 0;
     }
 
-    if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
-        if (MOX::_player[MOX::_global_combat_data.player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-            MOX::_global_combat_data.tactical_speed += 4;
+    if (MOX::_global_combat_data.owner < MAX_PLAYERS) {
+        if (MOX::_player[MOX::_global_combat_data.owner].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+            MOX::_global_combat_data.current_speed += 4;
         }
     }
 }

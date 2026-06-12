@@ -174,9 +174,9 @@ namespace CMBTDRW1 {
 
             INITSHIP::Get_Ship_Combat_Bonuses_(
                 ship_idx, 
-                &MOX::_global_combat_data.ship_defense, 
-                &MOX::_global_combat_data.ship_missle_defense, 
-                &MOX::_global_combat_data.ship_attack
+                &MOX::_global_combat_data.tac_val_defense, 
+                &MOX::_global_combat_data.tac_val_evade, 
+                &MOX::_global_combat_data.tac_val_attack
             );
 
             uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(98, 98);
@@ -197,7 +197,7 @@ namespace CMBTDRW1 {
         }
 
         if (MOX::_global_combat_data.officer_idx == -1) {
-            int16_t p_idx = (int16_t)MOX::_global_combat_data.player_idx;
+            int16_t p_idx = (int16_t)MOX::_global_combat_data.owner;
             if (p_idx >= MAX_PLAYERS) p_idx = 0;
             
             uint8_t race = (uint8_t)MOX::_player[p_idx].race;
@@ -1553,7 +1553,7 @@ skip_cursor:
         MOX::_ship_data_id = ship_idx;
 
         if (ship_idx == 0) {
-            MOX::_global_combat_data.drive_effectiveness_pct = -666;
+            MOX::_global_combat_data.drive_current_hits = -666;
         }
 
         video::Set_Page_Off_();
@@ -3129,7 +3129,7 @@ skip_cursor:
         view_x = static_cast<int16_t>(0x149 - animate::Get_Width_((s_animation_header*)MOX::_scan_ship_seg) / 2);
         view_y = static_cast<int16_t>(0x0F9 - animate::Get_Height_((s_animation_header*)MOX::_scan_ship_seg) / 2);
 
-        is_special_target = (MOX::_global_combat_data.drive_effectiveness_pct == -666);
+        is_special_target = (MOX::_global_combat_data.drive_current_hits == -666);
         use_remap_view =
             (MOX::_current_screen == 0) ||
             (MOX::_current_screen == 4) ||
@@ -3164,7 +3164,7 @@ skip_cursor:
                 0,
                 panel_color);
 
-            if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
+            if (MOX::_global_combat_data.owner < MAX_PLAYERS) {
                 graphics::Interlaced_Fill_(
                     view_x + 0xEC,
                     view_y + 0x1A,
@@ -3194,7 +3194,7 @@ skip_cursor:
 
             CMBTDRW1::Draw_Ship_Status_((int16_t)(view_x + 0x0A), (int16_t)(view_y + 0x18), MOX::_ship_data_id);
 
-            player_idx = MOX::_global_combat_data.player_idx;
+            player_idx = MOX::_global_combat_data.owner;
             if (player_idx < 9) {
                 if (MOX::_global_combat_data.officer_idx == -1) {
                     animate::Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
@@ -3239,7 +3239,7 @@ skip_cursor:
                 0,
                 panel_color);
 
-            if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
+            if (MOX::_global_combat_data.owner < MAX_PLAYERS) {
                 graphics::Interlaced_Fill_(
                     view_x + 0xEC,
                     view_y + 0x1A,
@@ -3269,7 +3269,7 @@ skip_cursor:
 
             CMBTDRW1::Remap_Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18));
 
-            if (MOX::_global_combat_data.player_idx < MAX_PLAYERS) {
+            if (MOX::_global_combat_data.owner < MAX_PLAYERS) {
                 if (MOX::_global_combat_data.officer_idx == -1) {
                     animate::Remap_Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
                 } else {
@@ -3300,14 +3300,14 @@ skip_cursor:
         KEN::Ken_Get_Text_Message_(9, message_text, 0x50);
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
-        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.ship_attack);
+        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.tac_val_attack);
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
 
         row_y = static_cast<int16_t>(row_y + 0x0C);
         KEN::Ken_Get_Text_Message_(10, message_text, 0x50);
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
-        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.ship_defense);
+        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.tac_val_defense);
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
 
         row_y = static_cast<int16_t>(row_y + 0x0C);
@@ -3315,11 +3315,11 @@ skip_cursor:
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
         sprintf(line_text, "%d%s",
-                static_cast<int32_t>(MOX::_global_combat_data.ship_missle_defense),
+                static_cast<int32_t>(MOX::_global_combat_data.tac_val_evade),
                 "%");
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
 
-        if (MOX::_global_combat_data.player_idx <= 9) {
+        if (MOX::_global_combat_data.owner <= 9) {
             fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
             Copy_Crew_Quality_Without_Parenthetical(
                 line_text,
@@ -3366,7 +3366,7 @@ skip_cursor:
         fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
 
         KEN::Ken_Get_Text_Message_(
-            (MOX::_global_combat_data.player_idx <= 9) ? 14 : 0x57,
+            (MOX::_global_combat_data.owner <= 9) ? 14 : 0x57,
             message_text,
             0x50);
         fonts::Print_(left_panel_x, row_y, message_text);
@@ -3377,16 +3377,16 @@ skip_cursor:
                 line_text,
                 "%s%d%s%d%s",
                 "(",
-                static_cast<int32_t>(MOX::_global_combat_data.drive_effectiveness_pct),
+                static_cast<int32_t>(MOX::_global_combat_data.drive_current_hits),
                 "/",
-                static_cast<int32_t>(MOX::_global_combat_data.drive_hp_max),
+                static_cast<int32_t>(MOX::_global_combat_data.drive_max_hits),
                 ")");
             fonts::Print_Right_(left_panel_right_x, row_y + 0x03, line_text);
         }
 
         fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
 
-        if (MOX::_global_combat_data.player_idx <= 9) {
+        if (MOX::_global_combat_data.owner <= 9) {
             fonts::Print_(right_panel_x, row_y, TECHDATA::_armor[MOX::_global_combat_data.armor_type].name);
         } else {
             KEN::Ken_Get_Text_Message_(0x58, message_text, 0x50);
@@ -3399,7 +3399,7 @@ skip_cursor:
             left_panel_x,
             row_y - 0x02,
             left_panel_right_x,
-            row_y + ((MOX::_global_combat_data.player_idx <= 9) ? 0x15 : 0x08),
+            row_y + ((MOX::_global_combat_data.owner <= 9) ? 0x15 : 0x08),
             0,
             panel_fill_color);
 
@@ -3407,13 +3407,13 @@ skip_cursor:
             right_panel_x,
             row_y - 0x02,
             right_panel_right_x,
-            row_y + ((MOX::_global_combat_data.player_idx <= 9) ? 0x15 : 0x08),
+            row_y + ((MOX::_global_combat_data.owner <= 9) ? 0x15 : 0x08),
             0,
             panel_fill_color);
 
         fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
 
-        if (MOX::_global_combat_data.player_idx <= 9) {
+        if (MOX::_global_combat_data.owner <= 9) {
             KEN::Ken_Get_Text_Message_(15, message_text, 0x50);
             sprintf(
                 line_text,
@@ -3448,7 +3448,7 @@ skip_cursor:
 
         fonts::Print_(right_value_x, row_y, line_text);
 
-        if (MOX::_global_combat_data.player_idx <= 9) {
+        if (MOX::_global_combat_data.owner <= 9) {
             row_y = static_cast<int16_t>(row_y + 0x0C);
         }
 
@@ -3457,21 +3457,21 @@ skip_cursor:
             line_text,
             "%s%d%s",
             "^ ",
-            static_cast<int32_t>(MOX::_global_combat_data.tactical_speed),
+            static_cast<int32_t>(MOX::_global_combat_data.current_speed),
             message_text);
         fonts::Print_(left_value_x, row_y, line_text);
 
-        if (MOX::_global_combat_data.player_idx <= 9) {
+        if (MOX::_global_combat_data.owner <= 9) {
             if (!is_special_target) {
                 int16_t hull_index;
                 if (MOX::_global_combat_data.ftl_type == 0) {
-                    if (MOX::_global_combat_data.player_idx == 8) {
+                    if (MOX::_global_combat_data.owner == 8) {
                         hull_index = 8;
                     } else {
                         hull_index = COMBINIT::Type_Of_Space_Station_(MOX::_cmbt_colony_id);
                     }
                 } else {
-                    hull_index = MOX::_global_combat_data.hull_size;
+                    hull_index = MOX::_global_combat_data.size_class;
                 }
 
                 int32_t armor_total = TECHDATA::_hull_data[hull_index].armor_hp;
@@ -3488,7 +3488,7 @@ skip_cursor:
                 sprintf(
                     line_text,
                     message_text,
-                    static_cast<int32_t>(MOX::_global_combat_data.armor_hits_current),
+                    static_cast<int32_t>(MOX::_global_combat_data.armor_remaining),
                     armor_total);
                 fonts::Print_(right_value_x, row_y, line_text);
             } else {
@@ -3504,7 +3504,7 @@ skip_cursor:
 
         row_y = static_cast<int16_t>(row_y + 0x10);
 
-        if (MOX::_global_combat_data.player_idx <= 9) {
+        if (MOX::_global_combat_data.owner <= 9) {
             fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
             KEN::Ken_Get_Text_Message_(0x15, message_text, 0x50);
             fonts::Print_(left_panel_x, row_y, message_text);
@@ -3514,9 +3514,9 @@ skip_cursor:
                 line_text,
                 "%s%d%s%d%s",
                 "(",
-                static_cast<int32_t>(MOX::_global_combat_data.computer_effectiveness_pct),
+                static_cast<int32_t>(MOX::_global_combat_data.computer_current_hits),
                 "/",
-                static_cast<int32_t>(MOX::_global_combat_data.computer_hp_max),
+                static_cast<int32_t>(MOX::_global_combat_data.computer_max_hits),
                 ")");
             fonts::Print_Right_(left_panel_right_x, row_y + 0x03, line_text);
 
@@ -3538,9 +3538,9 @@ skip_cursor:
                         line_text,
                         "%s%d%s%d%s",
                         "(",
-                        static_cast<int32_t>(MOX::_global_combat_data.shield_hp_current),
+                        static_cast<int32_t>(MOX::_global_combat_data.shield_current_hits),
                         "/",
-                        static_cast<int32_t>(MOX::_global_combat_data.shield_hp_max),
+                        static_cast<int32_t>(MOX::_global_combat_data.shield_max_hits),
                         ")");
                     fonts::Print_Right_(right_panel_right_x, row_y + 0x03, line_text);
                 }
@@ -3567,7 +3567,7 @@ skip_cursor:
             row_y = static_cast<int16_t>(row_y + 0x03);
 
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-            if (MOX::_global_combat_data.computer_effectiveness_pct > 0) {
+            if (MOX::_global_combat_data.computer_current_hits > 0) {
                 KEN::Ken_Get_Text_Message_(0x16, message_text, 0x50);
                 sprintf(
                     line_text,
@@ -3585,16 +3585,16 @@ skip_cursor:
                 sprintf(
                     line_text,
                     message_text,
-                    static_cast<int32_t>(MOX::_global_combat_data.shield_points_base));
+                    static_cast<int32_t>(MOX::_global_combat_data.shield_arc_max));
             } else {
                 int32_t shield_value;
-                if (MOX::_global_combat_data.player_idx == 8) {
+                if (MOX::_global_combat_data.owner == 8) {
                     shield_value = 0;
                 } else {
-                    const int16_t best_shield = INITSHIP::Best_Ship_Shield_(MOX::_global_combat_data.player_idx);
+                    const int16_t best_shield = INITSHIP::Best_Ship_Shield_(MOX::_global_combat_data.owner);
                     shield_value =
                         static_cast<int32_t>(TECHDATA::_shields[best_shield].shield_class) +
-                        static_cast<int32_t>(MOX::_global_combat_data.shield_points_base);
+                        static_cast<int32_t>(MOX::_global_combat_data.shield_arc_max);
                 }
                 sprintf(line_text, message_text, shield_value);
             }
