@@ -21,9 +21,9 @@
 #include "consts.h"
 
 #pragma pack(push, 1)
-#include "orion2.h"
 #include "orion2_consts.h"
 #include "orion2_str.h"
+#include "orion2.h"
 #pragma pack(pop)
 
 #include "lbx_types.h"

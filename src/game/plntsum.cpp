@@ -85,7 +85,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
             int16_t special_id = 0;
             char system_special = MOX::_star[star_idx].system_special;
-            if (system_special > 0 && system_special != 11 /* P_SPEC_NONE */) {
+            if (system_special > 0 && system_special != SYSTEM_SPECIAL_ORION_STAR) {
                 special_id = static_cast<int16_t>(system_special);
             }
 
@@ -93,7 +93,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
                 char* special_str = nullptr;
                 char special_buf[80];
 
-                if (MOX::_star[star_idx].system_special == 9) {
+                if (MOX::_star[star_idx].system_special == SYSTEM_SPECIAL_SPACE_MONSTER) {
                     int16_t ship_idx = HAROLD::First_Ship_Orbiting_Star_(&MOX::_star[star_idx]);
                     if (ship_idx != -1) {
                         special_str = MOX::_ship[ship_idx].d.name;
@@ -219,8 +219,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     ship_type = MOX::_ship[nearest_ship_idx].d.ship_type;
     ship_origin_star_idx = HAROLD::Absolute_Location_(MOX::_ship[nearest_ship_idx].location);
 
-    if (((ship_origin_star_idx != target_star_idx) && (ship_type == 1 /* COLONY_SHIP */) && (PLNTSUM::_planet_summary[summary_idx].colony_eta > 0)) ||
-        ((ship_type == 4 /* OUTPOST_SHIP */) && (PLNTSUM::_planet_summary[summary_idx].outpost_eta > 0))) {
+    if (((ship_origin_star_idx != target_star_idx) && (ship_type == SHIP_TYPE_COLONY) && (PLNTSUM::_planet_summary[summary_idx].colony_eta > 0)) ||
+        ((ship_type == SHIP_TYPE_OUTPOST) && (PLNTSUM::_planet_summary[summary_idx].outpost_eta > 0))) {
         
         sprintf(msg_buffer, HAROLD::H_Message_(0x134 /* HESTR_134_YOU_ALREADY_HAVE_ONE_C */), &MOX::_star[target_star_idx]);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
@@ -492,7 +492,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
             if (owner == MOX::_PLAYER_NUM && star_id > -1) {
                 uint8_t ship_type = MOX::_ship[ship_idx].d.ship_type;
-                if (ship_type == 1 /* SHIP_TYPE_COLONY */ || ship_type == 4 /* SHIP_TYPE_OUTPOST */) {
+                if (ship_type == SHIP_TYPE_COLONY || ship_type == SHIP_TYPE_OUTPOST) {
                     int16_t turns = HAROLD::N_Turns_To_Star_(ship_idx, star_id);
                     int16_t planet_idx = Colony_Ship_Auto_Colonization_(&MOX::_ship[ship_idx]);
 
@@ -502,7 +502,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     }
 
                     if (summary_idx > -1) {
-                        if (ship_type == 1 /* SHIP_TYPE_COLONY */) {
+                        if (ship_type == SHIP_TYPE_COLONY) {
                             _planet_summary[summary_idx].colony_eta = (int8_t)turns;
                         } else {
                             _planet_summary[summary_idx].outpost_eta = (int8_t)turns;
@@ -598,26 +598,26 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         int choice_mode;
 
         if (PLNTSUM::_send_choice == 0) {
-            choice_mode = 1;
+            choice_mode = SHIP_TYPE_COLONY;
         } else {
-            choice_mode = 4;
+            choice_mode = SHIP_TYPE_OUTPOST;
         }
 
         for (short i = 0; i < MOX::_scroll_bar->total_rows; ++i) {
-            if (choice_mode == 1) {
+            if (choice_mode == SHIP_TYPE_COLONY) {
                 PLNTSUM::_planet_summary[i].best_colony_eta = 9999;
-            } else if (choice_mode == 4) {
+            } else if (choice_mode == SHIP_TYPE_OUTPOST) {
                 PLNTSUM::_planet_summary[i].best_outpost_eta = 9999;
             }
         }
 
         for (int16_t i = 0; i < PLNTSUM::_n_ships_in_summary; ++i) {
-            if (choice_mode == 1) {
+            if (choice_mode == SHIP_TYPE_COLONY) {
                 short ship_idx = PLNTSUM::_ship_summary[i].colony_ship_idx;
                 if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
                     PLNTSUM::Set_Colony_Ship_To_Star_Distances_(i, ship_idx);
                 }
-            } else if (choice_mode == 4) {
+            } else if (choice_mode == SHIP_TYPE_OUTPOST) {
                 short ship_idx = PLNTSUM::_ship_summary[i].outpost_ship_idx;
                 if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
                     PLNTSUM::Set_Outpost_Ship_To_Star_Distances_(i, ship_idx);
@@ -912,7 +912,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                         int16_t owner = HACCESS::Ship_Owner_(ship_idx);
                         s_ship_data* ship = &MOX::_ship[ship_idx];
 
-                        if (ship->d.ship_type == 1 /* SHIP_TYPE_COLONY */ && owner == MOX::_PLAYER_NUM && ship->status < 3) {
+                        if (ship->d.ship_type == SHIP_TYPE_COLONY && owner == MOX::_PLAYER_NUM && ship->status < 3) {
                             _ship_summary[_n_ships_in_summary].colony_ship_idx = ship_idx;
                             if (Ship_Is_Not_Colonizing_(ship)) {
                                 _found_colony_ship = 1;
@@ -921,7 +921,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                             } else {
                                 _ship_summary[_n_ships_in_summary].colony_available = false;
                             }
-                        } else if (ship->d.ship_type == 4 /* SHIP_TYPE_OUTPOST */ && owner == MOX::_PLAYER_NUM && ship->status < 3) {
+                        } else if (ship->d.ship_type == SHIP_TYPE_OUTPOST && owner == MOX::_PLAYER_NUM && ship->status < 3) {
                             _ship_summary[_n_ships_in_summary].outpost_ship_idx = ship_idx;
                             if (Ship_Is_Not_Colonizing_(ship)) {
                                 _found_outpost_ship = 1;
@@ -969,7 +969,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             bool passes_filter = true;
 
             // Initial requirements: must be a planet, not owned by player, not an outpost
-            if (MOX::_planet[i].planet_type != 3 /* PLANET_TYPE_PLANET */) {
+            if (MOX::_planet[i].planet_type != PLANET_TYPE_PLANET) {
                 passes_filter = false;
             } else if (Planet_Has_Players_Colony_(i)) {
                 passes_filter = false;
@@ -1269,11 +1269,11 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                             }
                         }
                     } else if (PLNTSUM::_screen->colony_icons[i] == clicked_field_id) {
-                        PLNTSUM::Undo_Send_Order_(explored_idx, 1);
+                        PLNTSUM::Undo_Send_Order_(explored_idx, SHIP_TYPE_COLONY);
                         PLNTSUM::Determine_Button_Status_();
                         PLNTSUM::Reset_Ship_To_Star_Distances_();
                     } else if (PLNTSUM::_screen->output_icons[i] == clicked_field_id) {
-                        PLNTSUM::Undo_Send_Order_(explored_idx, 4);
+                        PLNTSUM::Undo_Send_Order_(explored_idx, SHIP_TYPE_OUTPOST);
                         PLNTSUM::Determine_Button_Status_();
                         PLNTSUM::Reset_Ship_To_Star_Distances_();
                     }
@@ -1497,14 +1497,14 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
         if (found) break;
 
         if (PLNTSUM::_planet_summary[i].explored == planet_idx) {
-            if (order_type == 1) {
+            if (order_type == SHIP_TYPE_COLONY) {
                 ship_idx = PLNTSUM::_planet_summary[i].best_colony_ship_idx;
             } else {
                 ship_idx = PLNTSUM::_planet_summary[i].best_outpost_ship_idx;
             }
 
             if (!MAINSCR::Ship_Can_Be_Selected_(ship_idx)) {
-                int16_t msg_id = (order_type == 1) ? 0x149 /* HESTR_149_YOU_ARE_UNABLE_TO_UNDO */ : 0x14A /* HESTR_14A_YOU_ARE_UNABLE_TO_UNDO */;
+                int16_t msg_id = (order_type == SHIP_TYPE_COLONY) ? 0x149 /* HESTR_149_YOU_ARE_UNABLE_TO_UNDO */ : 0x14A /* HESTR_14A_YOU_ARE_UNABLE_TO_UNDO */;
                 const char* msg = HAROLD::H_Message_(msg_id);
                 strcpy(buffer1, msg);
                 char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
@@ -1538,7 +1538,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
         const char* eta_raw = HAROLD::H_Message_(eta_msg_id);
         sprintf(eta_str, eta_raw, (uint32_t)(uint8_t)MOX::_g_ship_move_info.turns_left);
 
-        int16_t heading_msg_id = (order_type == 1) ? 0x14D /* HESTR_14D_COLONY_SHIP_HEADING_TO */ : 0x14E /* HESTR_14E_OUTPOST_SHIP_HEADING_T */;
+        int16_t heading_msg_id = (order_type == SHIP_TYPE_COLONY) ? 0x14D /* HESTR_14D_COLONY_SHIP_HEADING_TO */ : 0x14E /* HESTR_14E_OUTPOST_SHIP_HEADING_T */;
         const char* heading_raw = HAROLD::H_Message_(heading_msg_id);
         strcpy(buffer1, heading_raw);
 
@@ -1693,7 +1693,7 @@ void Draw_Rotating_Planets_() {
                 s_planet_data* planet = &MOX::_planet[explored_planet_idx];
 
                 // Planet animation index is determined by climate type and planet size
-                int16_t anim_idx = (int16_t)planet->climate * 5 + (int16_t)planet->size;
+                int16_t anim_idx = (int16_t)planet->climate * (PLANET_SIZE_HUGE + 1) + (int16_t)planet->size;
                 s_animation_header* anim = PLNTSUM::_p_rotating_planet[anim_idx];
 
                 int16_t width = animate::Get_Width_(anim);
@@ -1743,7 +1743,7 @@ void __cdecl Fill_Summary_Screen_Scroll_Bar_(void) {
 }
 
 void __cdecl Load_Planet_Pictures_() {
-    for (int16_t i = 0; i < 50; ++i) {
+    for (int16_t i = 0; i < (PLANET_CLIMATE_GAIA + 1) * (PLANET_SIZE_HUGE + 1); ++i) {
         s_animation_header* segment = Load_Planet_Segment_(i);
         _p_rotating_planet[i] = segment;
         RUSS::Mox_Update_();
@@ -1791,7 +1791,7 @@ void __cdecl Draw_Mini_Planet_Summary_Screen_() {
 
         if (ship_ptr->location >= 500) {
             uint8_t type = ship_ptr->d.ship_type;
-            if (type == 1 || type == 4) {
+            if (type == SHIP_TYPE_COLONY || type == SHIP_TYPE_OUTPOST) {
                 PLNTSUM::Draw_Nearest_Ship_Directional_Line_(ship_ptr->location);
             }
         }
@@ -1848,7 +1848,7 @@ void __cdecl Summary_Screen_Print_Scanned_() {
         int16_t star_id = scanned_field - 1000;
         bool visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_id) || HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
 
-        if (MOX::_star[star_id].spectral_class == 6 /* Black Hole */) {
+        if (MOX::_star[star_id].spectral_class == STAR_CLASS_BLACK_HOLE) {
             strcpy(msg_buffer, HAROLD::H_Message_(325 /* HESTR_145_BLACK_HOLE */));
             status = 1;
         } else if (!visited) {
@@ -1971,7 +1971,7 @@ void Planet_Summary_Screen_() {
 
     _p_rotating_planet = (s_animation_header**)allocate::Allocate_Next_Block_(
         MOX::_screen_seg,
-        sizeof(*_p_rotating_planet) * 50
+        sizeof(*_p_rotating_planet) * ((PLANET_CLIMATE_GAIA + 1) * (PLANET_SIZE_HUGE + 1))
     );
     Load_Planet_Pictures_();
     Determine_Button_Status_();
@@ -1984,7 +1984,7 @@ void Planet_Summary_Screen_() {
         int16_t current_scanned = _screen->scanned_input;
 
         if (_screen->esc_button == input_id) {
-            MOX::_current_screen = 0 /* SCREEN_MAIN */;
+            MOX::_current_screen = SCREEN_MAIN;
             exit_flag = 1;
         }
 

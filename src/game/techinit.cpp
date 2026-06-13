@@ -33,107 +33,107 @@ void __cdecl Load_Tech_Names_() {
 
     RUSS::Mox_Update_();
 
-    TECHDATA::_technology_fields[0].name = tech_name_block;
-    for (uint32_t i = 1; i < 83; ++i) {
+    TECHDATA::_technology_fields[TECH_FIELD_STARTING_TECH].name = tech_name_block;
+    for (uint32_t i = 1; i < TECH_FIELD_COUNT; ++i) {
         TECHDATA::_technology_fields[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 212; ++i) {
+    for (uint32_t i = 0; i < TECH_APP_COUNT; ++i) {
         TECHDATA::_technology_applications[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 49; ++i) {
+    for (uint32_t i = 0; i < BUILDING_COUNT; ++i) {
         TECHDATA::_buildings[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 40; ++i) {
+    for (uint32_t i = 0; i < SPECIAL_COUNT; ++i) {
         TECHDATA::_specials[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 7; ++i) {
+    for (uint32_t i = 0; i < ARMOR_COUNT; ++i) {
         TECHDATA::_armor[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 6; ++i) {
+    for (uint32_t i = 0; i < SHIELD_COUNT; ++i) {
         TECHDATA::_shields[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 46; ++i) {
+    for (uint32_t i = 0; i < WEAPON_COUNT; ++i) {
         TECHDATA::_weapons[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 6; ++i) {
+    for (uint32_t i = 0; i < COMPUTER_COUNT; ++i) {
         TECHDATA::_computers[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
-    for (uint32_t i = 0; i < 7; ++i) {
+    for (uint32_t i = 0; i < DRIVE_COUNT; ++i) {
         TECHDATA::_drives[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
-    for (uint32_t i = 0; i < 4; ++i) {
+    for (uint32_t i = 0; i < UNIT_COUNT; ++i) {
         TECHDATA::_units[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 6; ++i) {
+    for (uint32_t i = 0; i < FUEL_COUNT; ++i) {
         TECHDATA::_fuel[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
-    for (uint32_t i = 0; i < 15; ++i) {
+    for (uint32_t i = 0; i < WEAPON_MOD_COUNT; ++i) {
         TECHDATA::_weapon_modifications[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 15; ++i) {
+    for (uint32_t i = 0; i < WEAPON_MOD_COUNT; ++i) {
         TECHDATA::_weapon_modifications[i].name_plural =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 46; ++i) {
+    for (uint32_t i = 0; i < WEAPON_COUNT; ++i) {
         TECHDATA::_weapons[i].name_plural =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 9; ++i) {
+    for (uint32_t i = 0; i < HULL_CLASS_COUNT; ++i) {
         TECHDATA::_hull_data[i].name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
 
     RUSS::Mox_Update_();
 
-    for (uint32_t i = 0; i < 9; ++i) {
+    for (uint32_t i = 0; i < HULL_CLASS_COUNT; ++i) {
         TECHDATA::_hull_data[i].size_name =
             Advance_To_Next_String_(tech_name_block, string_offset);
     }
@@ -142,20 +142,30 @@ void __cdecl Load_Tech_Names_() {
 int16_t __cdecl Tech_Is_Legal_For_Player_(int16_t player_idx, int16_t tech_id) {
     int16_t is_legal = 1;
 
-    if (MOX::_player[player_idx].traits[0] == 6) {
-        if (tech_id == 0x56 || tech_id == 0xC3 || tech_id == 0x8D) {
+    if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 6) {
+        if (tech_id == TECH_APP_HOLO_SIMULATOR ||
+            tech_id == TECH_APP_VIRTUAL_REALITY_NETWORK ||
+            tech_id == TECH_APP_PLEASURE_DOME) {
             is_legal = 0;
         }
     }
 
-    if (MOX::_player[player_idx].traits[23] != 0) {
-        if (tech_id == 0x8E || tech_id == 0x13 || tech_id == 0x32 || tech_id == 0x71) {
+    if (MOX::_player[player_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] != 0) {
+        if (tech_id == TECH_APP_POLLUTION_PROCESSOR ||
+            tech_id == TECH_APP_ATMOSPHERIC_RENEWER ||
+            tech_id == TECH_APP_CORE_WASTE_DUMPS ||
+            tech_id == TECH_APP_NANO_DISASSEMBLERS) {
             is_legal = 0;
         }
     }
 
-    if (MOX::_player[player_idx].traits[18] != 0) {
-        if (tech_id == 0x06 || tech_id == 0x1D || tech_id == 0x44 || tech_id == 0x57 || tech_id == 0xA2 || tech_id == 0xB2) {
+    if (MOX::_player[player_idx].traits[TRAIT_EATS_MINERALS] != 0) {
+        if (tech_id == TECH_APP_ANDROID_FARMERS ||
+            tech_id == TECH_APP_BIOMORPHIC_FUNGI ||
+            tech_id == TECH_APP_FOOD_REPLICATORS ||
+            tech_id == TECH_APP_HYDROPONIC_FARM ||
+            tech_id == TECH_APP_SOIL_ENRICHMENT ||
+            tech_id == TECH_APP_SUBTERRANEAN_FARMS) {
             is_legal = 0;
         }
     }
@@ -179,14 +189,14 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   s_player* player = &MOX::_player[player_idx];
   int16_t starting_tech_count = 0;
 
-  player->tech_fields[0x12] = 2;
-  player->tech_fields[0x37] = 2;
-  player->tech_fields[0x39] = 2;
-  player->tech_fields[0x1D] = 2;
-  player->tech_fields[0x07] = 2;
-  player->tech_fields[0x16] = 2;
-  player->tech_fields[0x1C] = 2;
-  player->tech_fields[0x0A] = 2;
+  player->tech_fields[TECH_FIELD_ASTRO_BIOLOGY] = 2;
+  player->tech_fields[TECH_FIELD_NUCLEAR_FISSION] = 2;
+  player->tech_fields[TECH_FIELD_PHYSICS] = 2;
+  player->tech_fields[TECH_FIELD_ENGINEERING] = 2;
+  player->tech_fields[TECH_FIELD_ADVANCED_MAGNETISM] = 2;
+  player->tech_fields[TECH_FIELD_CHEMISTRY] = 2;
+  player->tech_fields[TECH_FIELD_ELECTRONICS] = 2;
+  player->tech_fields[TECH_FIELD_MILITARY_TACTICS] = 2;
 
   switch (MOX::_settings.starting_civilization_level) {
   case 0:
@@ -202,15 +212,15 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     break;
   }
 
-  player->tech_fields[0] = 3;
+  player->tech_fields[TECH_FIELD_STARTING_TECH] = 3;
 
-  for (int16_t tech_app_id = 1; tech_app_id < 0xD4; ++tech_app_id) {
+  for (int16_t tech_app_id = 1; tech_app_id < TECH_APP_COUNT; ++tech_app_id) {
     int16_t tech_field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
 
-    if (tech_field_id != 6) {
-      if (tech_field_id == 0) {
+    if (tech_field_id != TECH_FIELD_ADVANCED_GOVERNMENTS) {
+      if (tech_field_id == TECH_FIELD_STARTING_TECH) {
         player->tech_applications[tech_app_id] = 3;
-      } else if ((player->traits[0x15] == 0 || tech_field_id == -1 ||
+      } else if ((player->traits[TRAIT_UNCREATIVE] == 0 || tech_field_id == -1 ||
                   TECHDATA::_technology_fields[tech_field_id].cost == 0x32 ||
                   tech_field_id == 0x17) &&
                  TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id)) {
@@ -226,7 +236,8 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   }
 
   for (int16_t tech_slot_idx = 0; tech_slot_idx < 4; ++tech_slot_idx) {
-    int16_t tech_app_id = TECHDATA::_technology_fields[6].tech[tech_slot_idx];
+    int16_t tech_app_id =
+        TECHDATA::_technology_fields[TECH_FIELD_ADVANCED_GOVERNMENTS].tech[tech_slot_idx];
     if (tech_app_id <= 0) {
       break;
     }
@@ -234,27 +245,27 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     player->tech_applications[tech_app_id] = 0;
   }
 
-  switch (player->traits[0]) {
+  switch (player->traits[TRAIT_CURRENT_GOVERNMENT]) {
   case 0:
-    player->tech_applications[0x2A] = 1;
+    player->tech_applications[TECH_APP_CONFEDERATION] = 1;
     break;
   case 2:
-    player->tech_applications[0x5C] = 1;
+    player->tech_applications[TECH_APP_IMPERIUM] = 1;
     break;
   case 4:
-    player->tech_applications[0x41] = 1;
+    player->tech_applications[TECH_APP_FEDERATION] = 1;
     break;
   case 6:
-    player->tech_applications[0x4D] = 1;
-    player->tech_applications[0x56] = 0;
-    player->tech_applications[0x8D] = 0;
-    player->tech_applications[0xC3] = 0;
+    player->tech_applications[TECH_APP_GALACTIC_UNIFICATION] = 1;
+    player->tech_applications[TECH_APP_HOLO_SIMULATOR] = 0;
+    player->tech_applications[TECH_APP_PLEASURE_DOME] = 0;
+    player->tech_applications[TECH_APP_VIRTUAL_REALITY_NETWORK] = 0;
     break;
   }
 
   player->tech_applications[0] = 0;
 
-  for (int16_t tech_field_id = 1; tech_field_id < 0x4A; ++tech_field_id) {
+  for (int16_t tech_field_id = 1; tech_field_id < TECH_FIELD_XENON_TECHNOLOGY; ++tech_field_id) {
     const int16_t* field_tech_ids = TECHDATA::_technology_fields[tech_field_id].tech;
     int16_t missing_count = 0;
     bool has_app = false;
@@ -287,9 +298,9 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     }
   }
 
-  player->tech_fields[0x4A] = 0;
+  player->tech_fields[TECH_FIELD_XENON_TECHNOLOGY] = 0;
 
-  for (int16_t tech_field_id = 0x4B; tech_field_id < 0x53; ++tech_field_id) {
+  for (int16_t tech_field_id = TECH_FIELD_BIOLOGY; tech_field_id < TECH_FIELD_COUNT; ++tech_field_id) {
     if (player->tech_fields[tech_field_id] == 0) {
       player->tech_fields[tech_field_id] = 1;
     }
@@ -326,7 +337,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
       player->tech_fields[field_id] = 3;
       player->tech_fields[TECHDATA::_technology_fields[field_id].next_field_id] = 2;
 
-      if (player->traits[0x16] == 0) {
+      if (player->traits[TRAIT_CREATIVE] == 0) {
         player->tech_applications[selected_tech_app_id] = 3;
       } else {
         for (int16_t tech_slot_idx = 0; tech_slot_idx < 4; ++tech_slot_idx) {
@@ -341,8 +352,8 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
         }
       }
 
-      if (field_id == 6) {
-        ++player->traits[0];
+      if (field_id == TECH_FIELD_ADVANCED_GOVERNMENTS) {
+        ++player->traits[TRAIT_CURRENT_GOVERNMENT];
       }
     }
   }
@@ -361,54 +372,55 @@ void __cdecl Init_Tech_() {
     RUSS::Mox_Update_();
     RUSS::Mox_Update_();
 
-    for (int16_t building_index = 1; building_index < 49; ++building_index) {
+    for (int16_t building_index = 1; building_index < BUILDING_COUNT; ++building_index) {
         TECHDATA::_technology_applications[TECHDATA::_buildings[building_index].tech_app].type = 1;
     }
 
     RUSS::Mox_Update_();
 
-    for (int16_t special_index = 1; special_index < 40; ++special_index) {
+    for (int16_t special_index = 1; special_index < SPECIAL_COUNT; ++special_index) {
         TECHDATA::_technology_applications[TECHDATA::_specials[special_index].tech_app_id].type = 9;
     }
 
     RUSS::Mox_Update_();
 
-    for (int16_t armor_index = 1; armor_index < 7; ++armor_index) {
+    for (int16_t armor_index = 1; armor_index < ARMOR_COUNT; ++armor_index) {
         TECHDATA::_technology_applications[TECHDATA::_armor[armor_index].tech_app_id].type = 7;
     }
 
     RUSS::Mox_Update_();
 
-    for (int16_t shield_index = 1; shield_index < 6; ++shield_index) {
+    for (int16_t shield_index = 1; shield_index < SHIELD_COUNT; ++shield_index) {
         TECHDATA::_technology_applications[TECHDATA::_shields[shield_index].tech_app_id].type = 2;
     }
 
     RUSS::Mox_Update_();
 
-    for (int16_t weapon_index = 1; weapon_index < 46; ++weapon_index) {
+    for (int16_t weapon_index = 1; weapon_index < WEAPON_COUNT; ++weapon_index) {
         TECHDATA::_technology_applications[TECHDATA::_weapons[weapon_index].tech_app_id].type = 3;
     }
 
     RUSS::Mox_Update_();
 
-    for (int16_t computer_index = 1; computer_index < 6; ++computer_index) {
+    for (int16_t computer_index = 1; computer_index < COMPUTER_COUNT; ++computer_index) {
         TECHDATA::_technology_applications[TECHDATA::_computers[computer_index].tech_app_id].type = 8;
     }
 
-    for (int16_t drive_index = 1; drive_index < 7; ++drive_index) {
+    for (int16_t drive_index = 1; drive_index < DRIVE_COUNT; ++drive_index) {
         TECHDATA::_technology_applications[TECHDATA::_drives[drive_index].tech_app_id].type = 5;
     }
 
-    for (int16_t fuel_index = 1; fuel_index < 6; ++fuel_index) {
+    for (int16_t fuel_index = 1; fuel_index < FUEL_COUNT; ++fuel_index) {
         TECHDATA::_technology_applications[TECHDATA::_fuel[fuel_index].tech_app_id].type = 4;
     }
 
     RUSS::Mox_Update_();
 
-    for (int16_t tech_app_index = 0; tech_app_index < 212; ++tech_app_index) {
+    for (int16_t tech_app_index = 0; tech_app_index < TECH_APP_COUNT; ++tech_app_index) {
         int16_t tech_field_id = TECHDATA::_technology_applications[tech_app_index].tech_field_id;
 
-        if (tech_field_id != 0 && tech_field_id != -1 && tech_field_id != 0x4A) {
+        if (tech_field_id != TECH_FIELD_STARTING_TECH && tech_field_id != -1 &&
+            tech_field_id != TECH_FIELD_XENON_TECHNOLOGY) {
             s_tech_field_data& tech_field = TECHDATA::_technology_fields[tech_field_id];
             int16_t* tech_slot_ptrs[4] = {
                 &tech_field.tech[0],

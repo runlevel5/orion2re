@@ -114,7 +114,7 @@ namespace SYS {
                 s_planet_data* planet = &MOX::_planet[planet_idx];
                 int8_t planet_size = planet->size;
                 if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
-                    planet_size = 4;
+                    planet_size = PLANET_SIZE_HUGE;
                 }
 
                 int32_t x_out, y_out, orbit_pos_out;
@@ -206,8 +206,8 @@ namespace SYS {
         uint16_t climate = (uint16_t)(uint8_t)planet->climate;
         int8_t size = planet->size;
 
-        if (size > 3) {
-            size = 4;
+        if (size > PLANET_SIZE_LARGE) {
+            size = PLANET_SIZE_HUGE;
         }
 
         if (colony_idx > -1 && colony_idx < (int16_t)MOX::_NUM_COLONIES && planet->planet_type != PLANET_TYPE_GAS_GIANT) {
@@ -377,17 +377,17 @@ namespace SYS {
                 setvesa::Add_Square_To_Scan_List_(x + 100, y + 100, anim_hdr->width + x + 99, anim_hdr->height + y + 99);
             }
 
-            switch (static_cast<uint8_t>(anim_hdr->flags) & 3) {
-            case 0:
+            switch (static_cast<uint8_t>(anim_hdr->flags) & ANIMATION_FLAG_DRAW_MODE_MASK) {
+            case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                 SYS::Remap_Draw_Animated_Sprite_Mask_(x, y, anim_frame, mask_frame);
                 break;
-            case 1:
+            case ANIMATION_DRAW_MODE_BITMAP:
                 exitm::Exit_With_Message("Remap draw not support bitmaps");
                 break;
-            case 2:
+            case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                 exitm::Exit_With_Message("Remap draw not support screen");
                 break;
-            case 3:
+            case ANIMATION_DRAW_MODE_REFRESH_MASK:
                 exitm::Exit_With_Message("Remap draw not support map");
                 break;
             }
@@ -397,17 +397,17 @@ namespace SYS {
                     setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
                 }
 
-                switch (static_cast<uint8_t>(anim_hdr->flags) & 3) {
-                case 0:
+                switch (static_cast<uint8_t>(anim_hdr->flags) & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                     SYS::Remap_Clipped_Draw_Animated_Sprite_Mask_(x, y, anim_frame, mask_frame);
                     break;
-                case 1:
+                case ANIMATION_DRAW_MODE_BITMAP:
                     exitm::Exit_With_Message("Remap draw not support bitmaps");
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     exitm::Exit_With_Message("Remap draw not support screen");
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                     exitm::Exit_With_Message("Remap draw not support map");
                     break;
                 }
@@ -470,7 +470,7 @@ namespace SYS {
         if (planet_type == PLANET_TYPE_PLANET) {
             planet_mask_index = static_cast<int16_t>(MOX::_planet[planet_idx].size);
         } else {
-            planet_mask_index = 4;
+            planet_mask_index = PLANET_SIZE_HUGE;
         }
 
         int32_t bitmap_size = bitmap::Get_Bitmap_Size_(0x120, 0x9a);
@@ -548,7 +548,7 @@ namespace SYS {
             int16_t planet_idx = MOX::_sys_disp[i].orbit;
             int8_t orbit_idx = MOX::_sys_disp[i].orbit_idx;
             if (planet_idx > -1) {
-                if (MOX::_planet[planet_idx].planet_type == 3 || MOX::_planet[planet_idx].planet_type == 2) {
+                if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_PLANET || MOX::_planet[planet_idx].planet_type == PLANET_TYPE_GAS_GIANT) {
                     Draw_Planet_With_Pierced_Ring_(planet_idx, i, base_x, base_y, content_w, content_h, y_offset, x_offset);
                 } else {
                     MOX::_asteroid_seg = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 0x5b, (void*)MOX::_global_cache_seg);
@@ -567,7 +567,7 @@ namespace SYS {
         int16_t anim_h = animate::Get_Height_(_system_display_sun_seg);
         int16_t anim_w = animate::Get_Width_(_system_display_sun_seg);
 
-        if (MOX::_current_screen == 0x1d) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             animate::Draw_(0x1c0, 0x5c, _system_display_sun_seg);
         } else {
             // BUG: original code cross-references widths/heights
@@ -636,7 +636,7 @@ namespace SYS {
     {
         int16_t x1, y1, x2, y2;
 
-        if (MOX::_current_screen == 0x1d) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             x1 = 0x132;
             y1 = 0x11;
             x2 = 0x270;
@@ -681,7 +681,7 @@ namespace SYS {
         char local_64[100];
 
         MOX::_ship_frame = (short)((MOX::_ship_frame + 1) % 32000);
-        if (MOX::_current_screen == 0) {
+        if (MOX::_current_screen == SCREEN_MAIN) {
             graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
             video::Clip_On_();
         }
@@ -714,17 +714,17 @@ namespace SYS {
                 Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
             }
 
-            if (MOX::_current_screen == 0x1d) {
+            if (MOX::_current_screen == SCREEN_OFFICERS) {
                 graphics::Save_Window_();
                 graphics::Set_Window_(0, 0, 0x27f, 0x1df);
                 video::Clip_On_();
-                Draw_System_Special_Popup_(content_w + base_x - 5, y_offset + content_h + base_y + 0x28, 9, star_idx);
+                Draw_System_Special_Popup_(content_w + base_x - 5, y_offset + content_h + base_y + 0x28, SYSTEM_SPECIAL_SPACE_MONSTER, star_idx);
                 graphics::Restore_Window_();
                 video::Clip_Off_();
                 return;
             }
 
-            Draw_System_Special_Popup_(content_w + base_x + 5, y_offset + content_h + base_y, 9, star_idx);
+            Draw_System_Special_Popup_(content_w + base_x + 5, y_offset + content_h + base_y, SYSTEM_SPECIAL_SPACE_MONSTER, star_idx);
             const char* pcVar5 = HAROLD::H_Message_(0x16a);
             sprintf(local_64, pcVar5, &MOX::_star[star_idx]);
             Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, local_64);
@@ -746,7 +746,7 @@ namespace SYS {
 
             short local_c2;
             short sStack_c0;
-            if (MOX::_current_screen == 0x1d) {
+            if (MOX::_current_screen == SCREEN_OFFICERS) {
                 local_c2 = 0x270;
                 sStack_c0 = 0xbb;
             } else {
@@ -799,14 +799,14 @@ namespace SYS {
             if (psVar1->orbit > -1) {
                 s_planet_data* psVar8 = &MOX::_planet[psVar1->orbit];
                 int8_t planet_size = psVar8->size;
-                if (psVar8->planet_type == '\x02') {
-                    planet_size = 4;
+                if (psVar8->planet_type == PLANET_TYPE_GAS_GIANT) {
+                    planet_size = PLANET_SIZE_HUGE;
                 }
                 short sVar11 = psVar1->x + x_offset + content_w + 0x9f + base_x;
                 short sVar_y = psVar1->y + y_offset + content_h + 0x58 + base_y;
 
                 if (psVar8->colony_index > -1) {
-                    if (psVar8->planet_type == '\x01') {
+                    if (psVar8->planet_type == PLANET_TYPE_ASTEROID) {
                         short offset = (short)(MOX::_rot_plan_dim[planet_size] >> 1);
                         sVar11 += offset;
                         sVar_y += offset;
@@ -825,14 +825,14 @@ namespace SYS {
             short sVar11 = MOX::_sys_disp[sVar15].orbit;
             if (sVar11 > -1) {
                 int8_t planet_size = MOX::_planet[sVar11].size;
-                if (MOX::_planet[sVar11].planet_type == '\x02') {
-                    planet_size = 4;
+                if (MOX::_planet[sVar11].planet_type == PLANET_TYPE_GAS_GIANT) {
+                    planet_size = PLANET_SIZE_HUGE;
                 }
                 short sVar4 = (short)(MOX::_sys_disp[sVar15].x + x_offset + content_w + 0x9f + base_x);
                 short sVar_y = (short)(MOX::_sys_disp[sVar15].y + y_offset + content_h + 0x58 + base_y);
 
                 if (MOX::_sys_disp[sVar15].orbit_idx == MOX::_system_icon_scanned) {
-                    if (MOX::_planet[sVar11].planet_type != '\x01') {
+                    if (MOX::_planet[sVar11].planet_type != PLANET_TYPE_ASTEROID) {
                         uint16_t dim = (uint16_t)MOX::_rot_plan_dim[planet_size];
                         Draw_System_Highlight_(sVar11, dim, dim, sVar4, sVar_y);
                     }
@@ -851,7 +851,7 @@ namespace SYS {
             Print_Gate_Info_(star_idx, MOX::_system_icon_scanned - 2000, base_x, base_y, content_w, content_h, x_offset, y_offset);
         }
 
-        if (MOX::_current_screen != 0x1d) {
+        if (MOX::_current_screen != SCREEN_OFFICERS) {
             Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, title_text);
         }
     }
@@ -861,7 +861,7 @@ namespace SYS {
         *bases_count = 0;
         *colony_ships_count = 0;
         *transports_count = 0;
-        memset(ship_sizes, 0, 6 * sizeof(int16_t));
+        memset(ship_sizes, 0, (SHIP_SIZE_DOOM_STAR + 1) * sizeof(int16_t));
 
         if (MOX::_NUM_SHIPS <= 0) {
             return;
@@ -883,18 +883,18 @@ namespace SYS {
             }
 
             int16_t size = (int16_t)ship->d.size;
-            if (size > 5) {
-                size = 5;
+            if (size > SHIP_SIZE_DOOM_STAR) {
+                size = SHIP_SIZE_DOOM_STAR;
             }
 
             switch (ship->d.ship_type) {
-                case 0:
+                case SHIP_TYPE_COMBAT:
                     ship_sizes[size]++;
                     break;
                 case 1:
                     (*bases_count)++;
                     break;
-                case 2:
+                case SHIP_TYPE_TRANSPORT:
                     (*transports_count)++;
                     break;
                 case 4:
@@ -913,7 +913,7 @@ namespace SYS {
         *out_x = x + off_x + 0xE9;
         *out_y = y + off_y + 0xF3;
 
-        if (MOX::_current_screen == 0x1D) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             *out_x += 0x3C;
             *out_y -= 0x46;
         }
@@ -925,7 +925,7 @@ namespace SYS {
 
         SYS::Get_Gate_Icon_XY_(x, y, width, height, (int16_t)unused_arg, &out_x, &out_y);
 
-        if (MOX::_current_screen == 29 /* SCREEN_GALAXY */) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             out_y -= 6;
         }
 
@@ -1076,7 +1076,15 @@ namespace SYS {
             int16_t line_spacing,
             bool draw) {
         int16_t visible_count = 0;
-        const int16_t special_building_ids[7] = { 0x29, 0x28, 0x08, 0x1A, 0x1B, 0x2A, 0x2F };
+        const int16_t special_building_ids[7] = {
+            BUILDING_STAR_FORTRESS,
+            BUILDING_STAR_BASE,
+            BUILDING_BATTLESTATION,
+            BUILDING_MISSILE_BASE,
+            BUILDING_GROUND_BATTERIES,
+            BUILDING_STELLAR_CONVERTER,
+            BUILDING_FIGHTER_GARRISON,
+        };
 
         s_colony* colony = &MOX::_colony[colony_idx];
 
@@ -1129,7 +1137,7 @@ namespace SYS {
         int16_t group_b_count;
         int16_t group_c_count;
         int16_t unknown_count;
-        int16_t hull_counts[6];
+        int16_t hull_counts[SHIP_SIZE_DOOM_STAR + 1];
         s_colors font_colors;
         char line_buffer[200];
         char ship_name[80];
@@ -1138,7 +1146,7 @@ namespace SYS {
         *width_out = 0;
         *height_out = 4;
 
-        if (MOX::_current_screen == 0x1d) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             print_x = static_cast<int16_t>(base_x + x_offset + 8);
             print_y = static_cast<int16_t>(base_y + y_offset + 10);
         } else {
@@ -1221,7 +1229,7 @@ namespace SYS {
                 ++visible_detail_lines;
             }
 
-            for (int16_t hull_idx = 0; hull_idx < 6; ++hull_idx) {
+            for (int16_t hull_idx = 0; hull_idx < SHIP_SIZE_DOOM_STAR + 1; ++hull_idx) {
                 if (hull_counts[hull_idx] > 0) {
                     ++visible_detail_lines;
                 }
@@ -1240,7 +1248,7 @@ namespace SYS {
                 }
             }
 
-            for (int16_t hull_idx = 0; hull_idx < 6; ++hull_idx) {
+            for (int16_t hull_idx = 0; hull_idx < SHIP_SIZE_DOOM_STAR + 1; ++hull_idx) {
                 const int16_t hull_count = hull_counts[hull_idx];
                 if (hull_count > 0) {
                     const char* hull_name =
@@ -1379,7 +1387,7 @@ namespace SYS {
         const int16_t text_x = static_cast<int16_t>(text_left + inner_left + left + 6);
         int16_t current_y = static_cast<int16_t>(text_top + inner_top + top + 7);
 
-        if (planet->planet_type == 2) {
+        if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
             strcpy(title_buffer, HAROLD::H_Message_(0x15f));
 
             if (draw) {
@@ -1390,7 +1398,7 @@ namespace SYS {
                     *max_width = width;
                 }
             }
-        } else if (planet->planet_type == 1) {
+        } else if (planet->planet_type == PLANET_TYPE_ASTEROID) {
             strcpy(title_buffer, HAROLD::H_Message_(0x160));
 
             if (draw) {
@@ -1476,7 +1484,7 @@ namespace SYS {
             current_y = static_cast<int16_t>(current_y + line_advance);
             *total_height = static_cast<int16_t>(*total_height + line_advance);
 
-            if (static_cast<int8_t>(planet->gravity_class) == 1) {
+            if (static_cast<int8_t>(planet->gravity_class) == PLANET_GRAVITY_NORMAL_G) {
                 sprintf(
                         detail_buffer,
                         "%s",
@@ -1546,7 +1554,7 @@ namespace SYS {
         int16_t origin_y;
         int16_t saved_window_status;
 
-        if (MOX::_current_screen == 0) {
+        if (MOX::_current_screen == SCREEN_MAIN) {
             left_padding = 0x0D;
             paragraph_top = 0x2F;
             box_width = static_cast<int16_t>(MOX::_moveable_box[0].width - 0x1A);
@@ -1554,7 +1562,7 @@ namespace SYS {
             paragraph_height = static_cast<int16_t>(MOX::_moveable_box[0].height - 0x5B);
             origin_x = static_cast<int16_t>(MOX::_moveable_box[0].content_offset_x + MOX::_moveable_box[0].x);
             origin_y = static_cast<int16_t>(MOX::_moveable_box[0].content_offset_y + MOX::_moveable_box[0].y);
-        } else if (MOX::_current_screen == 0x1D) {
+        } else if (MOX::_current_screen == SCREEN_OFFICERS) {
             box_width = 0x013E;
             paragraph_top = 0;
             paragraph_width = 0x0125;
@@ -1807,14 +1815,14 @@ namespace SYS {
             }
 
             const s_planet_data& planet = MOX::_planet[planet_idx];
-            if (planet.planet_type == 1) {
+            if (planet.planet_type == PLANET_TYPE_ASTEROID) {
                 MOX::_planet_buttons[orbit_slot] = -1000;
                 continue;
             }
 
             int8_t planet_size = planet.size;
-            if (planet.planet_type == 2) {
-                planet_size = 4;
+            if (planet.planet_type == PLANET_TYPE_GAS_GIANT) {
+                planet_size = PLANET_SIZE_HUGE;
             }
 
             GEO::Get_Orbit_Display_X_Y_(
@@ -1883,7 +1891,7 @@ namespace SYS {
             &gate_icon_x,
             &gate_icon_y);
 
-        if (MOX::_current_screen == 0x1D) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             gate_icon_y = static_cast<int16_t>(gate_icon_y - 6);
         }
 
@@ -1909,7 +1917,7 @@ namespace SYS {
                 0);
         }
 
-        if (MOX::_current_screen == 0x1D) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             *out_system_field = fields::Add_Hidden_Field_(
                 static_cast<int16_t>(base_x + popup_offset_x),
                 static_cast<int16_t>(base_y + popup_offset_y),
@@ -2144,7 +2152,7 @@ namespace SYS {
 
         s_animation_header** display_ship_pic = &MOX::_system_display_ships[display_slot].pic;
 
-        if (MOX::_current_screen == 0x1d) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             *display_ship_pic = SYS::Buffer_Reload_System_Ships_(display_slot);
             *x = static_cast<int16_t>(*layout_state + 5);
             *y = static_cast<int16_t>(0xb1 - animate::Get_Height_(*display_ship_pic));

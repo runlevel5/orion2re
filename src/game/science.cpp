@@ -247,7 +247,7 @@ namespace SCIENCE {
                         ++current_entry_index;
 
                         int32_t weapon_mask = discovery_data[current_entry_index];
-                        uint16_t weapon_mod_index = 1;
+                        uint16_t weapon_mod_index = WEAPON_MOD_HEAVY_MOUNT;
                         weapon_mod_text[0] = '\0';
 
                         while (weapon_mask != 0) {
@@ -380,7 +380,7 @@ namespace SCIENCE {
             const int16_t* field_tech_ids = TECHDATA::_technology_fields[research_field].tech;
             for (uint16_t tech_slot = 0; tech_slot < 4; ++tech_slot) {
                 const int16_t tech_id = field_tech_ids[tech_slot];
-                if (tech_id > 0 && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
+                if (tech_id > TECH_APP_NO_TECH && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
                     researched_tech_ids[researched_tech_count++] = tech_id;
                 }
             }

@@ -87,19 +87,19 @@ namespace TURNSUM {
         MOX2::action_func_t auto_func;
         s_list_item list_items[100];
 
-        MOX::_current_screen = 0;
+        MOX::_current_screen = SCREEN_MAIN;
         num_msgs = MSG_::N_Msgs_For_Player_(MOX::_PLAYER_NUM);
 
         if (num_msgs <= 0)
         {
-            if (MOX::_current_screen == 0)
+            if (MOX::_current_screen == SCREEN_MAIN)
             {
-                MOX::_current_screen = 0x27;
+                MOX::_current_screen = SCREEN_REPORTS;
             }
             return;
         }
 
-        if (MOX::_return_screen == 0x27)
+        if (MOX::_return_screen == SCREEN_REPORTS)
         {
             _g_turn_message_ix = 0;
         }
@@ -179,8 +179,8 @@ namespace TURNSUM {
                         if (MSG_::Goto_Msg_Colony_(&MSG_::_msgs[msg_idx]) != 0)
                         {
                             input_field = field_hidden_bg;
-                            MOX::_current_screen = 1;
-                            MOX::_return_screen = 0x28;
+                            MOX::_current_screen = SCREEN_COLONY;
+                            MOX::_return_screen = SCREEN_TURN_SUMMARY;
                             _g_turn_message_ix = msg_idx;
                         }
                     }
@@ -219,9 +219,9 @@ namespace TURNSUM {
                     {
                         MOX2::Put_Auto_Function_(&auto_func);
                         fields::Clear_Fields_();
-                        if (MOX::_current_screen == 0)
+                        if (MOX::_current_screen == SCREEN_MAIN)
                         {
-                            MOX::_current_screen = 0x27;
+                            MOX::_current_screen = SCREEN_REPORTS;
                         }
                         return;
                     }

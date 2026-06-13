@@ -1390,7 +1390,7 @@ namespace DESIGN {
         int16_t result_id = -1;
 
         if (category == 3) { // Weapon Category
-            for (int16_t i = 0; i < WEAPON_COUNT; ++i) {
+            for (int16_t i = 0; i < WEAPON_DRAGON_BREATH; ++i) {
                 if (TECHDATA::_weapons[i].tech_app_id == app_id) {
                     result_id = i;
                     break;

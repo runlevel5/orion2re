@@ -23,25 +23,25 @@ namespace raceopt {
 
     void __cdecl Setup_Evolutionary_Upgrade_(int16_t player_idx) {
         s_player& plr = MOX::_player[player_idx];
-        int8_t original_traits0 = plr.traits[0];
+        int8_t original_traits0 = plr.traits[TRAIT_CURRENT_GOVERNMENT];
 
         if (plr.objectives == 100) {
             struct_::Copy_Structure_(
                 &plr.evolutionary_upgrade_traits[1],
                 &plr.traits[1],
-                sizeof(plr.traits) - sizeof(plr.traits[0]));
+                sizeof(plr.traits) - sizeof(plr.traits[TRAIT_CURRENT_GOVERNMENT]));
 
-            plr.evolutionary_upgrade_traits[0] = original_traits0 & 0x0E;
+            plr.evolutionary_upgrade_traits[TRAIT_CURRENT_GOVERNMENT] = original_traits0 & 0x0E;
 
             Evolutionary_Mutation_Screen_(plr.evolutionary_upgrade_traits);
 
-            plr.traits[0] = original_traits0;
+            plr.traits[TRAIT_CURRENT_GOVERNMENT] = original_traits0;
         }
         else {
             struct_::Copy_Structure_(
                 &plr.traits[1],
                 &plr.evolutionary_upgrade_traits[1],
-                sizeof(plr.traits) - sizeof(plr.traits[0]));
+                sizeof(plr.traits) - sizeof(plr.traits[TRAIT_CURRENT_GOVERNMENT]));
         }
 
         plr.picked_evolutionary_upgrade = 1;
@@ -50,7 +50,7 @@ namespace raceopt {
     void __cdecl Evolutionary_Mutation_Screen_(int8_t *traits) {
         MOX2::action_func_t previous_auto_function;
         int16_t previous_button_values[10];
-        int8_t baseline_flags[31];
+        int8_t baseline_flags[TRAIT_COUNT];
         char message_text[200];
         char message_line[100];
         
@@ -259,7 +259,7 @@ namespace raceopt {
         Convert_Player_To_Flags_EM_(MOX::_player[player_idx].traits);
         Calculate_Picks_();
 
-        if (MOX::_player[player_idx].tech_applications[62] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3) {
             _picks += 4;
         }
 
@@ -778,7 +778,7 @@ namespace raceopt {
             }
         }
 
-        for (int16_t i = 10; i < 31; ++i) {
+        for (int16_t i = 10; i < TRAIT_COUNT; ++i) {
             _option_toggle[i - 10 + insert_offset] =
                     static_cast<int16_t>(player_flags[i]);
 
@@ -1296,7 +1296,7 @@ namespace raceopt {
             player->traits[15] = 0;
         }
 
-        for (int16_t trait_index = 16; trait_index < 31; ++trait_index) {
+        for (int16_t trait_index = 16; trait_index < TRAIT_COUNT; ++trait_index) {
             player->traits[trait_index] = static_cast<int8_t>(_option_toggle[trait_index - 9]);
         }
     }
@@ -1324,7 +1324,7 @@ namespace raceopt {
             _option_toggle[6] = 0;
         }
 
-        for (trait_index = 16; trait_index < 31; ++trait_index) {
+        for (trait_index = 16; trait_index < TRAIT_COUNT; ++trait_index) {
             _option_toggle[trait_index - 9] =
                 static_cast<int16_t>(player->traits[trait_index]);
         }

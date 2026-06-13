@@ -71,7 +71,7 @@ namespace reduce {
     void __cdecl Add_Reduced_Palette_Group_(s_animation_header* anim) {
         animate::_animation_header = anim;
 
-        if ((anim->flags & 0x10) == 0) {
+        if ((anim->flags & ANIMATION_FLAG_HAS_PALETTE) == 0) {
             exitm::Exit_With_Message("Palette Reduction Pictures Must Have Palette");
         }
 

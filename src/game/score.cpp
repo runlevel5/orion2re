@@ -197,8 +197,8 @@ namespace SCORE {
         }
 
         Hall_Of_Fame_Screen_(rank_index);
-        MOX::_current_screen = 10;
-        MOX::_previous_screen = 14 /* 0xE */;
+        MOX::_current_screen = SCREEN_MAIN_MENU;
+        MOX::_previous_screen = SCREEN_HALL_OF_FAME;
     }
 
     void __cdecl Create_Default_HOF_File_() {
@@ -1107,7 +1107,7 @@ namespace SCORE {
         *hyper_tech_count = 0;
 
         // Count completed technology fields (value 3 indicates known/researched)
-        for (int16_t i = 0; i < 83 /* 0x53 */; ++i) {
+        for (int16_t i = 0; i < TECH_FIELD_COUNT; ++i) {
             if (MOX::_player[player_idx].tech_fields[i] == 3) {
                 *tech_count += 1;
             }

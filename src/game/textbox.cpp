@@ -37,7 +37,7 @@ namespace TEXTBOX {
         int16_t total_height = height + 85;
         int16_t centered_y;
 
-        if (MOX::_current_screen == 0) {
+        if (MOX::_current_screen == SCREEN_MAIN) {
             *x_ptr = 84;
             centered_y = (400 - total_height) / 2 + 21;
             if (centered_y < 6) {
@@ -275,16 +275,16 @@ namespace TEXTBOX {
 
         int16_t color_group;
         switch (MOX::_current_screen) {
-        case 1:
-        case 20:
-        case 25:
-        case 33:
+        case SCREEN_COLONY:
+        case SCREEN_COLONY_SUMMARY:
+        case SCREEN_QUEUE_POPUP:
+        case SCREEN_COLONY_LANDING:
             color_group = 2;
             break;
-        case 9:
+        case SCREEN_INFO:
             color_group = 3;
             break;
-        case 10:
+        case SCREEN_MAIN_MENU:
             color_group = 1;
             break;
         default:

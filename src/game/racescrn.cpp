@@ -870,7 +870,7 @@ namespace RACESCRN {
                     palette::Restore_Palette_();
                     BILL::Turn_Off_Palettes_(0, 255);
                     fields::Enable_Draw_All_Fields_();
-                    MOX::_current_screen = 0;
+                    MOX::_current_screen = SCREEN_MAIN;
                     return;
                 }
 

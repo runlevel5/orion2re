@@ -27,15 +27,15 @@ namespace SHIPSTAK {
     }
 
     bool __cdecl Ship_Has_Stealth_Device_(int16_t ship_idx) {
-        if (Ship_Has_Special_(ship_idx, 0x1F) != 0) {
+        if (Ship_Has_Special_(ship_idx, SPECIAL_STEALTH_FIELD) != 0) {
             return true;
         }
 
-        if (Ship_Has_Special_(ship_idx, 0x06) != 0) {
+        if (Ship_Has_Special_(ship_idx, SPECIAL_CLOAKING_DEVICE) != 0) {
             return true;
         }
 
-        if (Ship_Has_Special_(ship_idx, 0x17) != 0) {
+        if (Ship_Has_Special_(ship_idx, SPECIAL_PHASING_CLOAK) != 0) {
             return true;
         }
 
@@ -104,7 +104,7 @@ namespace SHIPSTAK {
             }
         }
 
-        if (MOX::_player[MOX::_PLAYER_NUM].traits[27] == 0) {
+        if (MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_OMNISCIENCE] == 0) {
             Remove_Non_Detected_Ships_();
         }
 
@@ -117,13 +117,13 @@ namespace SHIPSTAK {
         const int16_t player_num = (int16_t)MOX::_PLAYER_NUM;
         int16_t scan_range = 2;
 
-        if ((int8_t)MOX::_player[player_num].tech_applications[0xB5] == 3) {
+        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_TACHYON_SCANNER] == 3) {
             scan_range = 4;
         }
-        if ((int8_t)MOX::_player[player_num].tech_applications[0x74] == 3) {
+        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_NEUTRON_SCANNER] == 3) {
             scan_range = 6;
         }
-        if ((int8_t)MOX::_player[player_num].tech_applications[0xA0] == 3) {
+        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_SENSORS] == 3) {
             scan_range = 9;
         }
 
@@ -153,13 +153,13 @@ namespace SHIPSTAK {
                             best_detection = 1000;
                         } else {
                             int16_t detection = scan_range;
-                            if (colony.buildings[0x28] != 0) {
+                            if (colony.buildings[BUILDING_STAR_BASE] != 0) {
                                 detection += 2;
                             }
-                            if (colony.buildings[8] != 0) {
+                            if (colony.buildings[BUILDING_BATTLESTATION] != 0) {
                                 detection += 4;
                             }
-                            if (colony.buildings[0x29] != 0) {
+                            if (colony.buildings[BUILDING_STAR_FORTRESS] != 0) {
                                 detection += 6;
                             }
                             detection -= range_steps;
@@ -185,7 +185,7 @@ namespace SHIPSTAK {
                             best_detection = 1000;
                         } else {
                             int16_t detection = scan_range - range_steps;
-                            if (SHIPSTAK::Ship_Has_Special_(other_ship_idx, 5) != 0) {
+                            if (SHIPSTAK::Ship_Has_Special_(other_ship_idx, SPECIAL_BATTLE_SCANNER) != 0) {
                                 detection += 2;
                             }
                             if (best_detection < detection) {
@@ -208,7 +208,7 @@ namespace SHIPSTAK {
 
                         if (owner == MAX_PLAYERS) {
                             detection = -5;
-                        } else if (owner < MAX_PLAYERS && MOX::_player[owner].traits[28] == 1) {
+                        } else if (owner < MAX_PLAYERS && MOX::_player[owner].traits[TRAIT_STEALTHY_SHIPS] == 1) {
                             detection = 500;
                         } else {
                             if ((int8_t)ship.status == 1) {
@@ -216,13 +216,13 @@ namespace SHIPSTAK {
                             }
                         }
 
-                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, 0x1F) != 0) {
+                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, SPECIAL_STEALTH_FIELD) != 0) {
                             detection += 500;
                         }
-                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, 6) != 0) {
+                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, SPECIAL_CLOAKING_DEVICE) != 0) {
                             detection += 500;
                         }
-                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, 0x17) != 0) {
+                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, SPECIAL_PHASING_CLOAK) != 0) {
                             detection += 500;
                         }
 
@@ -282,16 +282,16 @@ namespace SHIPSTAK {
                 const auto& ship = MOX::_ship[ship_idx];
 
                 switch (ship.d.ship_type) {
-                case 0:
+                case SHIP_TYPE_COMBAT:
                     stack_array[*count_ptr * 2 + 1] = (int16_t)ship.d.size * 50 + (int16_t)ship.d.picture_num;
                     break;
-                case 1:
+                case SHIP_TYPE_COLONY:
                     stack_array[*count_ptr * 2 + 1] = -1;
                     break;
-                case 2:
+                case SHIP_TYPE_TRANSPORT:
                     stack_array[*count_ptr * 2 + 1] = -2;
                     break;
-                case 4:
+                case SHIP_TYPE_OUTPOST:
                     stack_array[*count_ptr * 2 + 1] = -3;
                     break;
                 default:

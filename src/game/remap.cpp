@@ -189,7 +189,7 @@ namespace remap {
     void __cdecl Calculate_Picture_Remap_Colors_(s_animation_header* animation_header) {
         animate::_animation_header = animation_header;
 
-        if (!(animate::_animation_header->flags & 0x10)) {
+        if (!(animate::_animation_header->flags & ANIMATION_FLAG_HAS_PALETTE)) {
             exitm::Exit_With_Message("Remapped Picture Must Have Palette");
         }
 
@@ -213,7 +213,7 @@ namespace remap {
         char error_text[100];
 
         animate::_animation_header = animation;
-        if ((animation->flags & 0x10) == 0) {
+        if ((animation->flags & ANIMATION_FLAG_HAS_PALETTE) == 0) {
             exitm::Exit_With_Message("Get_Picture_Color  Picture Must Have Palette");
         }
 

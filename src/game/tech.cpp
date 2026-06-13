@@ -208,7 +208,7 @@ namespace TECH {
         else {
             accept_btn_id = -1;
             Init_Entry_Positions_(entries);
-            if (static_cast<uint8_t>(MOX::_cur_plyr_ptr->current_research_field) > 0x4A) {
+            if (static_cast<uint8_t>(MOX::_cur_plyr_ptr->current_research_field) >= TECH_FIELD_BIOLOGY) {
                 MOX::_cur_plyr_ptr->current_research_field = 0;
             }
             extra_fields_cnt = Init_Entry_Data_(entries, 0);
@@ -555,7 +555,7 @@ namespace TECH {
 
             if (tech_field_id == 0) continue;
 
-            if (tech_field_id < 75) {
+            if (tech_field_id < TECH_FIELD_BIOLOGY) {
                 int visible_app_count = 0;
                 int16_t* techs = TECHDATA::_technology_fields[tech_field_id].tech;
                 for (int app_index = 0; app_index < 4; ++app_index) {
@@ -657,7 +657,7 @@ namespace TECH {
 
         bool is_creative = false;
         if (is_current_field) {
-            if (MOX::_cur_plyr_ptr->traits[22 /* TRAIT_CREATIVE */] == 1) {
+            if (MOX::_cur_plyr_ptr->traits[TRAIT_CREATIVE] == 1) {
                 is_creative = true;
             }
             else {
@@ -708,7 +708,7 @@ namespace TECH {
         int16_t i = entry->selected_app_index;
         int16_t upper_bound = i + 1;
 
-        if (MOX::_player[MOX::_PLAYER_NUM].traits[22] == 1 ||
+        if (MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_CREATIVE] == 1 ||
             tech_id == 0x37 ||
             tech_id == 0x39 ||
             tech_id == 0x1D ||
@@ -1014,14 +1014,14 @@ namespace TECH {
     }
 
     int16_t __cdecl Get_Hyper_Tech_App_ID_(int16_t tech_id) {
-        if (tech_id >= 75) {
-            tech_id += 129;
+        if (tech_id >= TECH_FIELD_BIOLOGY) {
+            tech_id += TECH_APP_BIOLOGY - TECH_FIELD_BIOLOGY;
         }
         return tech_id;
     }
 
     char* __cdecl Technology_Fields_Name_(int16_t tech_field_id) {
-        if (tech_field_id < 75) {
+        if (tech_field_id < TECH_FIELD_BIOLOGY) {
             return TECHDATA::_technology_fields[tech_field_id].name;
         }
 
@@ -1053,7 +1053,8 @@ namespace TECH {
 
             if (MOX::_cur_plyr_ptr->current_research_field == field_id) {
                 status = 4;
-            } else if (field_id >= 75 && MOX::_cur_plyr_ptr->hyper_advanced_tech[field_id - 75] > 20) {
+            } else if (field_id >= TECH_FIELD_BIOLOGY &&
+                       MOX::_cur_plyr_ptr->hyper_advanced_tech[field_id - TECH_FIELD_BIOLOGY] > 20) {
                 status = 3;
             }
 
@@ -1118,11 +1119,11 @@ namespace TECH {
     }
 
     char* __cdecl Technology_Applications_Name_(int16_t tech_app_id, int16_t player_idx) {
-        if (tech_app_id < 204) {
+        if (tech_app_id < TECH_APP_BIOLOGY) {
             return TECHDATA::_technology_applications[tech_app_id].name;
         }
 
-        uint8_t hyper_tech = MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - 204];
+        uint8_t hyper_tech = MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - TECH_APP_BIOLOGY];
 
         strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[tech_app_id].name);
         strcat(MOX::_temp_string_buf + 1, " ");

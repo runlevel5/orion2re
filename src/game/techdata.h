@@ -5,22 +5,22 @@ struct s_unit_data;
 
 namespace TECHDATA {
     extern s_techdata_planetary_shield _planetary_shields[4];
-    extern s_tech_armor_data _armor[7];
-    extern s_tech_building_data _buildings[49];
-    extern s_tech_hull_data _hull_data[9];
-    extern s_tech_fuel_data _fuel[6];
-    extern s_tech_app_data _technology_applications[212];
-    extern s_tech_field_data _technology_fields[83];
-    extern s_tech_drive_data _drives[7];
-    extern s_tech_shield_data _shields[6];
-    extern s_tech_computer_data _computers[6];
-    extern s_tech_specials_data _specials[40];
-    extern s_tech_weapon_data _weapons[46];
-    extern s_tech_weapon_mod_data _weapon_modifications[15];
+    extern s_tech_armor_data _armor[ARMOR_COUNT];
+    extern s_tech_building_data _buildings[BUILDING_COUNT];
+    extern s_tech_hull_data _hull_data[HULL_CLASS_COUNT];
+    extern s_tech_fuel_data _fuel[FUEL_COUNT];
+    extern s_tech_app_data _technology_applications[TECH_APP_COUNT];
+    extern s_tech_field_data _technology_fields[TECH_FIELD_COUNT];
+    extern s_tech_drive_data _drives[DRIVE_COUNT];
+    extern s_tech_shield_data _shields[SHIELD_COUNT];
+    extern s_tech_computer_data _computers[COMPUTER_COUNT];
+    extern s_tech_specials_data _specials[SPECIAL_COUNT];
+    extern s_tech_weapon_data _weapons[WEAPON_COUNT];
+    extern s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT];
 
     extern int16_t _starting_tech_field_ids[6];
 
-    extern s_unit_data _units[4];
+    extern s_unit_data _units[UNIT_COUNT];
 
     extern s_tech_data_rifle _rifles[6];
 

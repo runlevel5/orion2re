@@ -28,7 +28,7 @@ namespace REPORT {
                 if (colony_idx != -1) {
                     s_colony* colony = &MOX::_colony[colony_idx];
                     
-                    if (colony->owner == player_idx && colony->buildings[11] > 0) {
+                    if (colony->owner == player_idx && colony->buildings[BUILDING_COLONY_BASE] > 0) {
                         return colony;
                     }
                 }
@@ -75,7 +75,7 @@ namespace REPORT {
                     s_MSG* msg = &MSG_::_msgs[first_idx + i];
 
                     switch (msg->msg_type) {
-                    case 0:
+                    case MSG_TYPE_COLONY:
                         switch (msg->u.colony.subtype) {
                         case 4:
                         case 9:
@@ -92,18 +92,18 @@ namespace REPORT {
                         }
                         break;
 
-                    case 4:
-                    case 5:
-                    case 7:
+                    case MSG_TYPE_FINANCIAL:
+                    case MSG_TYPE_LOST_SHIP:
+                    case MSG_TYPE_LOST_COLONY:
                         should_show = true;
                         break;
 
-                    case 8:
-                    case 16:
+                    case MSG_TYPE_HYPERSPACE_FLUX:
+                    case MSG_TYPE_ANOMALY:
                         should_show = false;
                         break;
 
-                    case 9:
+                    case MSG_TYPE_HYPERSPACE_BEAST:
                         if (msg->u.hyperspace_beast.ship_idx != -1 &&
                             msg->u.hyperspace_beast.fate != 0) {
                             should_show = true;
@@ -113,7 +113,7 @@ namespace REPORT {
                         }
                         break;
 
-                    case 17:
+                    case MSG_TYPE_DIPLOMACY:
                         if ((uint8_t)msg->u.diplomacy.plr_a == (uint8_t)MOX::_PLAYER_NUM) {
                             should_show = false;
                         }
@@ -135,8 +135,8 @@ namespace REPORT {
                 if (should_show) {
                     result = 4;
                     if (show_summary != 0) {
-                        MOX::_current_screen = 0x28 /* SCREEN_TURN_SUMMARY */;
-                        MOX::_return_screen = 0x27 /* SCREEN_REPORTS */;
+                        MOX::_current_screen = SCREEN_TURN_SUMMARY;
+                        MOX::_return_screen = SCREEN_REPORTS;
                         MOX::_global_esc = 1;
                         uint8_t mask = 1;
                         mask = (uint8_t)(mask << (uint8_t)player_idx);
@@ -154,8 +154,8 @@ namespace REPORT {
             if (MOX::_star[star_idx].colonize_player == player_idx) {
                 if (struct_::Test_Bit_Field_(_done_colonize_check, star_idx) == 0) {
                     s_colony* colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
-                    s_ship_data* colony_ship = Player_Ship_Type_At_Star_(player_idx, 1, star_idx, 0);
-                    s_ship_data* outpost_ship = Player_Ship_Type_At_Star_(player_idx, 4, star_idx, 0);
+                    s_ship_data* colony_ship = Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_COLONY, star_idx, 0);
+                    s_ship_data* outpost_ship = Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_OUTPOST, star_idx, 0);
 
                     bool has_ships = false;
                     if (colony_ship != nullptr || outpost_ship != nullptr) {
@@ -215,7 +215,7 @@ namespace REPORT {
                                     }
 
                                     while (colony_base != nullptr && planet_idx < 0) {
-                                        int refund = TECHDATA::_buildings[11].cost / 2;
+                                        int refund = TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
                                         char msg[200];
                                         sprintf(msg, _really_trash_colony_base_fmt, refund);
                                         if (GENDRAW::Do_Confirmation_Box_(msg) == 0) {
@@ -223,7 +223,7 @@ namespace REPORT {
                                         } else {
                                             do {
                                                 MOX::_player[player_idx].bc += refund;
-                                                colony_base->buildings[11] = 0;
+                                                colony_base->buildings[BUILDING_COLONY_BASE] = 0;
                                                 colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
                                             } while (colony_base != nullptr);
                                             break;
@@ -249,7 +249,7 @@ namespace REPORT {
                                             MAINSCR::Update_Ship_Icons_In_Between_Turns_();
                                             colony_base = nullptr;
                                         } else {
-                                            ERICNET::Remove_Building_((int16_t)(colony_base - MOX::_colony), 11);
+                                            ERICNET::Remove_Building_((int16_t)(colony_base - MOX::_colony), BUILDING_COLONY_BASE);
                                             colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
                                         }
 
@@ -257,8 +257,8 @@ namespace REPORT {
                                             struct_::Set_Bit_Field_(_done_colonize_check, star_idx);
                                             if (colony_base != nullptr) {
                                                 do {
-                                                    MOX::_player[player_idx].bc += TECHDATA::_buildings[11].cost / 2;
-                                                    colony_base->buildings[11] = 0;
+                                                    MOX::_player[player_idx].bc += TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
+                                                    colony_base->buildings[BUILDING_COLONY_BASE] = 0;
                                                     colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
                                                 } while (colony_base != nullptr);
                                             }
@@ -266,7 +266,7 @@ namespace REPORT {
 
                                         if (MOX::_settings.animations_on != 0) {
                                             MOX::_current_screen = 0x21; /* SCR_COLONIZE */
-                                            MOX::_return_screen = 0x27; /* SCR_TURN_SUMMARY */
+                                            MOX::_return_screen = SCREEN_REPORTS;
                                             MOX::_screen_data = MOX::_planet[planet_idx].star_index;
                                             MOX::_global_esc = 1;
                                             COLONY::_orbit_temp = MOX::_planet[planet_idx].orbit;
@@ -456,7 +456,7 @@ namespace REPORT {
             uint8_t field_idx = (uint8_t)MOX::_player[player_idx].current_research_field;
 
             // Check if current research field progress is at state 3 and field is 0
-            if (MOX::_player[player_idx].tech_fields[field_idx] == 3 && field_idx == 0) {
+            if (MOX::_player[player_idx].tech_fields[field_idx] == 3 && field_idx == TECH_FIELD_STARTING_TECH) {
                 if (select_tech != 0) {
                     TECH::Tech_Select_();
                 }
@@ -512,7 +512,7 @@ namespace REPORT {
 
         // Check if player has researched Evolutionary Mutation (Tech App 62) 
         // and hasn't picked the upgrade yet.
-        if (plr->tech_applications[62 /* TECH_APP_EVOLUTIONARY_MUTATION */] == 3 &&
+        if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3 &&
             plr->picked_evolutionary_upgrade == 0) {
             
             result = 1;
@@ -530,12 +530,12 @@ namespace REPORT {
 
         if (special < 50) {
             switch (special) {
-                case 0:
-                case 4:
-                case 5:
-                case 6:
-                case 10:
-                case 11:
+                case SYSTEM_SPECIAL_NO_SPECIAL:
+                case SYSTEM_SPECIAL_GOLD_DEPOSITS:
+                case SYSTEM_SPECIAL_GEM_DEPOSITS:
+                case SYSTEM_SPECIAL_NATIVES:
+                case SYSTEM_SPECIAL_ANCIENT_ARTIFACTS:
+                case SYSTEM_SPECIAL_ORION_STAR:
                     return special;
                 default:
                     return 0;
@@ -596,7 +596,7 @@ namespace REPORT {
                     star->just_visited &= ~(1 << (uint8_t)player_idx);
                     
                     if (has_special != 0) {
-                        star->system_special = 0;
+                        star->system_special = SYSTEM_SPECIAL_NO_SPECIAL;
                     }
                 }
                 return 1;
@@ -717,8 +717,8 @@ namespace REPORT {
                     if (colony->pop[j] & 0x400) {
                         if (show_screen != 0) {
                             MOVEBOX::Remove_Box_Check_();
-                            MOX::_current_screen = 1;
-                            MOX::_return_screen = 39 /* SCREEN_REPORTS */;
+                            MOX::_current_screen = SCREEN_COLONY;
+                            MOX::_return_screen = SCREEN_REPORTS;
                             
                             int16_t planet_idx = colony->planet;
                             s_planet_data* planet = &MOX::_planet[planet_idx];
@@ -838,8 +838,8 @@ namespace REPORT {
 
         if (do_jump != 0) {
             MOVEBOX::Remove_Box_Check_();
-            MOX::_return_screen = 39 /* SCREEN_REPORTS */;
-            MOX::_current_screen = 1 /* SCREEN_COLONY */;
+            MOX::_return_screen = SCREEN_REPORTS;
+            MOX::_current_screen = SCREEN_COLONY;
             
             // Set up planet specific data for the colony screen jump
             MOX::_screen_data = (int16_t)MOX::_planet[target_colony->planet].star_index;

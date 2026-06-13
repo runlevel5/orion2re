@@ -13,10 +13,10 @@ namespace replace {
 
         for (int16_t frame = 0; frame < animate::_animation_header->frame_count; frame++) {
             uint8_t *frame_data = (uint8_t*)animate::_animation_header + animate::_animation_header->frame_offsets[frame];
-            uint8_t flags = animate::_animation_header->flags & 3;
+            uint8_t flags = animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK;
 
             switch (flags) {
-            case 0:
+            case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
             {
                 int32_t current_y = *(uint16_t*)(frame_data + 2);
                 int32_t word_offset = 2;
@@ -45,7 +45,7 @@ namespace replace {
                 }
                 break;
             }
-            case 1:
+            case ANIMATION_DRAW_MODE_BITMAP:
             {
                 int32_t size = animate::_animation_header->height * animate::_animation_header->width;
                 for (int32_t i = 0; i < size; i++) {
@@ -55,7 +55,7 @@ namespace replace {
                 }
                 break;
             }
-            case 2:
+            case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
             {
                 int16_t chunks = 5;
                 int32_t offset = 0;
@@ -86,7 +86,7 @@ namespace replace {
                 }
                 break;
             }
-            case 3:
+            case ANIMATION_DRAW_MODE_REFRESH_MASK:
                 Exit_With_Message_();
                 break;
             }
@@ -101,8 +101,8 @@ namespace replace {
                 s_animation_header *current_anim = animate::_animation_header;
                 uint8_t *frame_data = (uint8_t*)current_anim + current_anim->frame_offsets[frame_idx];
 
-                switch (current_anim->flags & 3) {
-                    case 0: {
+                switch (current_anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                    case ANIMATION_DRAW_MODE_ANIMATED_SPRITE: {
                         int32_t y = *(uint16_t*)(frame_data + 2);
                         int32_t data_offset_words = 2;
                         int32_t height = current_anim->height;
@@ -129,7 +129,7 @@ namespace replace {
                         }
                         break;
                     }
-                    case 1: {
+                    case ANIMATION_DRAW_MODE_BITMAP: {
                         int32_t size = (int32_t)current_anim->height * current_anim->width;
                         if (size > 0) {
                             for (int32_t i = 0; i < size; ++i) {
@@ -140,7 +140,7 @@ namespace replace {
                         }
                         break;
                     }
-                    case 2: {
+                    case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND: {
                         int16_t loop_count = 5;
                         int32_t offset = 0;
                         while (loop_count != 0) {
@@ -169,7 +169,7 @@ namespace replace {
                         }
                         break;
                     }
-                    case 3: {
+                    case ANIMATION_DRAW_MODE_REFRESH_MASK: {
                         Exit_With_Message_();
                         break;
                     }
@@ -211,8 +211,8 @@ namespace replace {
                     (uint8_t*)animate::_animation_header +
                     animate::_animation_header->frame_offsets[frame];
 
-                switch (animate::_animation_header->flags & 3) {
-                case 0: {
+                switch (animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE: {
                     int32_t line_y = ((uint16_t*)frame_data)[1];
                     int32_t height = animate::_animation_header->height;
                     int32_t word_offset = 2;
@@ -237,7 +237,7 @@ namespace replace {
                     }
                     break;
                 }
-                case 1: {
+                case ANIMATION_DRAW_MODE_BITMAP: {
                     int32_t area = animate::_animation_header->width * animate::_animation_header->height;
                     if (area > 0) {
                         for (int32_t i = 0; i < area; i++) {
@@ -249,7 +249,7 @@ namespace replace {
                     }
                     break;
                 }
-                case 2: {
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND: {
                     int16_t blocks = 5;
                     int32_t offset = 0;
                     do {
@@ -279,7 +279,7 @@ namespace replace {
                     } while (blocks != 0);
                     break;
                 }
-                case 3: {
+                case ANIMATION_DRAW_MODE_REFRESH_MASK: {
                     Exit_With_Message_();
                     break;
                 }

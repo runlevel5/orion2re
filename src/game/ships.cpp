@@ -5,7 +5,7 @@ namespace SHIPS {
     void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship) {
         uint8_t ship_type = ship->d.ship_type;
 
-        if (ship_type == 1 || ship_type == 4) {
+        if (ship_type == SHIP_TYPE_COLONY || ship_type == SHIP_TYPE_OUTPOST) {
             ship->d.ship_weapon[0].type = -1;
             ship->d.ship_weapon[1].type = 0;
         }
@@ -552,7 +552,7 @@ namespace SHIPS {
         int16_t target_y;
 
         // Check if current screen is Galaxy (0), System (12/0x0C), or Special (39/0x27)
-        if (MOX::_current_screen == 0 || MOX::_current_screen == 0x27 || MOX::_current_screen == 0x0C) {
+        if (MOX::_current_screen == SCREEN_MAIN || MOX::_current_screen == SCREEN_REPORTS || MOX::_current_screen == SCREEN_MAIN_NEXT_TURN) {
             SHIPS::Get_Ship_Icon_Dimensions_((int16_t)zoom_index, &MOX::_ship_icon_width[zoom_index], &MOX::_ship_icon_height[zoom_index]);
 
             // Adjust destination to the center of the ship icon

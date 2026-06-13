@@ -131,17 +131,17 @@ void __cdecl Reload_Race_Selection_Screen_() {
     allocate::Push_Block_(MOX::_screen_seg);
 
     for (int i = 0; i < 13; ++i) {
-        _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, i, 1, 0x1F);
+        _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, i, 1, TRAIT_COUNT);
         RUSS::Mox_Update_();
     }
 
     FILE* file = fopen_case("lastrace.rac", "rb");
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
-        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, 12, 1, 0x1F);
+        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, 12, 1, TRAIT_COUNT);
 
         // Overwrite template with saved race data
-        fread(_race_specials[13], 31, 1, file);
+        fread(_race_specials[13], TRAIT_COUNT, 1, file);
         Convert_Custom_Race_Flags_(_race_specials[13]);
         RUSS::Mox_Update_();
 
@@ -260,7 +260,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                         } while (screen_state == 1);
                         
                         if (screen_state == 2) {
-                            for (int trait_idx = 1; trait_idx < 10; ++trait_idx) {
+                            for (int trait_idx = TRAIT_POP_GROWTH_BONUS; trait_idx < TRAIT_LOW_G_WORLD; ++trait_idx) {
                                 if (plr->traits[trait_idx] != 0) {
                                     plr->traits[trait_idx] =
                                         MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx] - 1];
@@ -351,7 +351,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                 }
             } else if (race_file) {
                 uint8_t loaded_race;
-                uint8_t discarded_traits[31];
+                uint8_t discarded_traits[TRAIT_COUNT];
                 fread(discarded_traits, sizeof(discarded_traits), 1, race_file);
                 struct_::Copy_Structure_(plr->traits, _race_specials[13], sizeof(plr->traits));
                 fread(&loaded_race, sizeof(loaded_race), 1, race_file);
@@ -966,13 +966,13 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
         line_index = 0;
         total_lines = 0;
 
-        for (int16_t ability_id = 1; ability_id < 10; ++ability_id) {
+        for (int16_t ability_id = TRAIT_POP_GROWTH_BONUS; ability_id < TRAIT_LOW_G_WORLD; ++ability_id) {
             if (race_specials[ability_id] != 0) {
                 ++total_lines;
             }
         }
 
-        for (int16_t ability_id = 10; ability_id < 0x1f; ++ability_id) {
+        for (int16_t ability_id = TRAIT_LOW_G_WORLD; ability_id < TRAIT_COUNT; ++ability_id) {
             if (race_specials[ability_id] != 0) {
                 ++total_lines;
             }
@@ -980,7 +980,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
         ++total_lines;
 
-        for (int16_t ability_id = 1; ability_id < 10; ++ability_id) {
+        for (int16_t ability_id = TRAIT_POP_GROWTH_BONUS; ability_id < TRAIT_LOW_G_WORLD; ++ability_id) {
             if (race_specials[ability_id] != 0) {
                 RACESEL::Message_Build_(&line_index, total_lines, paragraph);
                 strcat(paragraph, MOX::_special_ability_names[ability_id]);
@@ -1013,7 +1013,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
             }
         }
 
-        for (int16_t ability_id = 10; ability_id < 0x1f; ++ability_id) {
+        for (int16_t ability_id = TRAIT_LOW_G_WORLD; ability_id < TRAIT_COUNT; ++ability_id) {
             if (race_specials[ability_id] == 1) {
                 RACESEL::Message_Build_(&line_index, total_lines, paragraph);
                 strcat(paragraph, MOX::_special_ability_names[ability_id]);

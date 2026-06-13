@@ -226,7 +226,7 @@ namespace spy {
                     if (player->objectives != 0) {
                         game_random::Random_(8);
                     }
-                    if (player->traits[9] > 0) {
+                    if (player->traits[TRAIT_SPYING_BONUS] > 0) {
                         game_random::Random_(5);
                     }
                     total_spies = 1;
@@ -235,13 +235,13 @@ namespace spy {
                         total_spies = 1;
                     } else if (game_random::Random_(25) == 1) {
                         total_spies = 1;
-                    } else if (player->traits[9] > 0 && game_random::Random_(6) == 1) {
+                    } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random_(6) == 1) {
                         total_spies = 1;
                     }
                 } else if (MOX::_settings.game_difficulty == 2) {
                     if (player->objectives == 0 && game_random::Random_(13) == 1) {
                         total_spies = 1;
-                    } else if (player->traits[9] > 0 && game_random::Random_(13) == 1) {
+                    } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random_(13) == 1) {
                         total_spies = 1;
                     }
                 }
@@ -447,7 +447,7 @@ namespace spy {
 
                 s_MSG msg;
                 memset(&msg, 0, sizeof(s_MSG));
-                msg.msg_type = 10 /* MSG_TYPE_LOST_ATTACKING_SPY */;
+                msg.msg_type = MSG_TYPE_LOST_ATTACKING_SPY;
                 msg.u.lost_attacking_spy.player_idx = player_idx;
                 MSG_::Add_Msg_(msg, other_plr_idx);
             }
@@ -464,7 +464,7 @@ namespace spy {
             if (actually_lost > 0) {
                 s_MSG msg;
                 memset(&msg, 0, sizeof(s_MSG));
-                msg.msg_type = 11 /* MSG_TYPE_LOST_DEFENDING_SPY */;
+                msg.msg_type = MSG_TYPE_LOST_DEFENDING_SPY;
                 msg.u.lost_defending_spy.count = actually_lost;
                 MSG_::Add_Msg_(msg, player_idx);
             }
@@ -510,7 +510,7 @@ namespace spy {
 
         if (assassin_plr_a != -1) {
             s_MSG msg = {};
-            msg.msg_type = 15; /* MSG_TYPE_SPY_ASSASSINATION */
+            msg.msg_type = MSG_TYPE_SPY_ASSASSINATION;
             msg.u.spy_assasination.plr_a = (int8_t)assassin_plr_a;
             msg.u.spy_assasination.plr_b = (int8_t)assassin_plr_b;
 
@@ -679,11 +679,10 @@ namespace spy {
         for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
             if (colony->owner == victim_player_idx) {
-                for (int32_t b_idx = 0; b_idx < 49; ++b_idx) {
+                for (int32_t b_idx = 0; b_idx < BUILDING_COUNT; ++b_idx) {
                     s_tech_building_data* building_data = &TECHDATA::_buildings[b_idx];
 
-                    // Skip BUILDING_CAPITOL (index 9)
-                    if (b_idx == 9 /* BUILDING_CAPITOL */) {
+                    if (b_idx == BUILDING_CAPITOL) {
                         continue;
                     }
 

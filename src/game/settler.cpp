@@ -157,7 +157,7 @@ namespace settler {
                         s_MSG msg;
                         memset(&msg, 0, sizeof(msg));
 
-                        msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                        msg.msg_type = MSG_TYPE_COLONY;
                         // Note: Original game truncates planet_idx > 255 due to 8-bit field, which we accurately preserve.
                         msg.u.colony.planet_idx = planet_idx;
                         msg.u.colony.subtype = 5 /* s_MSG_colony_settlers */;

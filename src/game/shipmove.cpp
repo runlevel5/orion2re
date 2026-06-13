@@ -115,7 +115,7 @@ namespace SHIPMOVE {
      * Iterates backwards through fuel tiers 5 down to 1, checking if the required tech is level 3.
      */
     void __cdecl Update_Player_Ship_Range_(s_player* player) {
-        for (int i = 5; i >= 1; --i) {
+        for (int i = FUEL_COUNT - 1; i > FUEL_NO_FUEL_CELLS; --i) {
             int16_t tech_idx = TECHDATA::_fuel[i].tech_app_id;
 
             // Check if the tech application for this fuel tier is fully researched (level 3)
@@ -318,7 +318,7 @@ namespace SHIPMOVE {
 
         int16_t range = MOX::_player[ship->owner].ship_range;
 
-        if (struct_::Test_Bit_Field_(ship->d.special_device_flags, 11)) {
+        if (struct_::Test_Bit_Field_(ship->d.special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS)) {
             range = (range * 3 + 1) / 2;
         }
 
@@ -482,7 +482,7 @@ namespace SHIPMOVE {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
             if (!colony_flag_needed) {
-                if (ship->d.ship_type == 1 || ship->d.ship_type == 4) {
+                if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
                     colony_flag_needed = true;
                 }
             }
@@ -537,12 +537,12 @@ namespace SHIPMOVE {
 
         if (owner < MAX_PLAYERS) {
             // Check for Orion discovery
-            if (MOX::_star[star_idx].system_special == 11 /* Orion */ && MOX::_star[star_idx].visited == 0) {
+            if (MOX::_star[star_idx].system_special == SYSTEM_SPECIAL_ORION_STAR && MOX::_star[star_idx].visited == 0) {
                 EVENTS::Event_Orion_Discovered_((int16_t)owner);
             }
 
             // Update colony ship arrival flags
-            if (ship->d.ship_type == 1 /* Colony Ship */ || ship->d.ship_type == 4 /* Colony Base */) {
+            if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
                 MOX::_star[ship->location].ignore_colony_ships &= ~(1 << owner);
             }
 
@@ -591,7 +591,7 @@ namespace SHIPMOVE {
         std::memset(move_info, 0, sizeof(*move_info));
 
         if (MOX::_NUM_STARS != target_star_idx && player_idx < MAX_PLAYERS) {
-            if (MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
+            if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] == 0) {
                 if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
                     move_info->hyperspace_flux = 1;
                     return;
@@ -998,7 +998,7 @@ namespace SHIPMOVE {
                                 if (ship->officer_index == -1) {
                                     if (replacement_ship == nullptr ||
                                         replacement_ship->d.size < ship->d.size) {
-                                        if (ship->d.ship_type == 0) {
+                                        if (ship->d.ship_type == SHIP_TYPE_COMBAT) {
                                             replacement_ship = ship;
                                         }
                                     }

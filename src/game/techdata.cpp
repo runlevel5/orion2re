@@ -12,7 +12,7 @@ s_techdata_planetary_shield _planetary_shields[4] = {
     { 129, 0, 20 }
 };
 
-s_tech_armor_data _armor[7] = {
+s_tech_armor_data _armor[ARMOR_COUNT] = {
     { kEmptyName, 0, 0, 0, 0, -100, 0, 0 },
     { kEmptyName, 1, 187, 1, 5, 0, 0, 0 },
     { kEmptyName, 2, 191, 2, 10, 100, 0, 50 },
@@ -22,7 +22,7 @@ s_tech_armor_data _armor[7] = {
     { kEmptyName, 6, 201, 6, 30, 900, 0, 250 }
 };
 
-s_tech_building_data _buildings[49] = {
+s_tech_building_data _buildings[BUILDING_COUNT] = {
     { kEmptyName, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0 },
     { kEmptyName, 1, 0, 5, 60, 1, 4, 0, 0, 0, 0 },
     { kEmptyName, 2, 0, 14, 150, 2, 0, 0, 0, 0, 0 },
@@ -74,7 +74,7 @@ s_tech_building_data _buildings[49] = {
     { kEmptyName, 48, 0, 16, 800, 0, 0, 0, 0, 0, 0 }
 };
 
-s_tech_hull_data _hull_data[9] = {
+s_tech_hull_data _hull_data[HULL_CLASS_COUNT] = {
     { 20, 25, 5, 4, 4, 1, 2, 1, 1, 0, 0, 0, 50, 4, kEmptyName, kEmptyName },
     { 70, 60, 8, 10, 10, 2, 5, 2, 2, 0, 0, 0, 40, 15, kEmptyName, kEmptyName },
     { 250, 120, 12, 30, 30, 5, 10, 6, 2, 1, 0, 2, 30, 25, kEmptyName, kEmptyName },
@@ -86,7 +86,7 @@ s_tech_hull_data _hull_data[9] = {
     { 2500, 1200, 80, 120, 120, 20, 0, 30, 10, 10, 0, 0, -10, 500, kEmptyName, kEmptyName }
 };
 
-s_tech_fuel_data _fuel[6] = {
+s_tech_fuel_data _fuel[FUEL_COUNT] = {
     { kEmptyName, 0, 0, 0 },
     { kEmptyName, 1, 167, 4 },
     { kEmptyName, 2, 51, 6 },
@@ -95,7 +95,7 @@ s_tech_fuel_data _fuel[6] = {
     { kEmptyName, 5, 184, 255 }
 };
 
-s_tech_app_data _technology_applications[212] = {
+s_tech_app_data _technology_applications[TECH_APP_COUNT] = {
     { kEmptyName, 0, 0, 0, 0, 0, 1, 0 },
     { kEmptyName, 1, 49, 1, 27, 0, 1, 0 },
     { kEmptyName, 2, 48, 1, 32, 0, 1, 0 },
@@ -310,7 +310,7 @@ s_tech_app_data _technology_applications[212] = {
     { kEmptyName, 211, 82, 0, 41, 0, 1, 0 }
 };
 
-s_tech_field_data _technology_fields[83] = {
+s_tech_field_data _technology_fields[TECH_FIELD_COUNT] = {
     { kEmptyName, 0, 0, 0, { 0, 0, 0, 0 }, 0, 0 },
     { kEmptyName, 1, 18, 34, { 0, 0, 0, 0 }, 400, 5 },
     { kEmptyName, 2, 9, 47, { 0, 0, 0, 0 }, 650, 6 },
@@ -396,7 +396,7 @@ s_tech_field_data _technology_fields[83] = {
     { kEmptyName, 82, 32, 0, { 0, 0, 0, 0 }, 15000, 18 }
 };
 
-s_tech_drive_data _drives[7] = {
+s_tech_drive_data _drives[DRIVE_COUNT] = {
     { kEmptyName, 0, 0, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, 0 },
     { kEmptyName, 1, 120, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 10, 8, 6, 5, 4, 3 }, { 20, 18, 16, 15, 14, 13 }, 2 },
     { kEmptyName, 2, 72, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 12, 10, 8, 7, 6, 5 }, { 22, 20, 18, 17, 16, 15 }, 3 },
@@ -406,7 +406,7 @@ s_tech_drive_data _drives[7] = {
     { kEmptyName, 6, 95, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 20, 18, 16, 15, 14, 13 }, { 30, 28, 26, 25, 24, 23 }, 7 }
 };
 
-s_tech_shield_data _shields[6] = {
+s_tech_shield_data _shields[SHIELD_COUNT] = {
     { kEmptyName, 0, 0, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { kEmptyName, 1, 33, { 5, 10, 20, 50, 100, 200 }, { 3, 5, 10, 25, 50, 100 }, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50 },
     { kEmptyName, 2, 34, { 5, 10, 20, 50, 100, 200 }, { 3, 5, 10, 25, 50, 100 }, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 },
@@ -415,7 +415,7 @@ s_tech_shield_data _shields[6] = {
     { kEmptyName, 5, 37, { 5, 10, 20, 50, 100, 200 }, { 3, 5, 10, 25, 50, 100 }, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250 }
 };
 
-s_tech_computer_data _computers[6] = {
+s_tech_computer_data _computers[COMPUTER_COUNT] = {
     { kEmptyName, 0, 0, { 0, 0, 0, 0, 0, 0 }, 0 },
     { kEmptyName, 1, 58, { 5, 15, 50, 125, 300, 800 }, 25 },
     { kEmptyName, 2, 122, { 5, 15, 50, 125, 300, 800 }, 50 },
@@ -424,7 +424,7 @@ s_tech_computer_data _computers[6] = {
     { kEmptyName, 5, 110, { 5, 15, 50, 125, 300, 800 }, 125 }
 };
 
-s_tech_specials_data _specials[40] = {
+s_tech_specials_data _specials[SPECIAL_COUNT] = {
     { kEmptyName, 0, 0, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, 0, 0 },
     { kEmptyName, 1, 1, { 10, 15, 25, 50, 100, 250 }, { 15, 22, 37, 75, 150, 375 }, { 1, 0, 0, 0, 0, 0 }, 1, 100 },
     { kEmptyName, 2, 20, { 10, 15, 25, 50, 100, 250 }, { 5, 7, 12, 25, 50, 125 }, { 2, 0, 0, 0, 0, 0 }, 0, 0 },
@@ -467,7 +467,7 @@ s_tech_specials_data _specials[40] = {
     { kEmptyName, 39, 23, { 4, 10, 20, 40, 80, 200 }, { 5, 10, 20, 50, 125, 500 }, { 3, 0, 0, 0, 0, 0 }, 0, 0 }
 };
 
-s_tech_weapon_data _weapons[46] = {
+s_tech_weapon_data _weapons[WEAPON_COUNT] = {
     { kEmptyName, kEmptyName, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
     { kEmptyName, kEmptyName, 1, 104, 0, -1, 10, 7, 4, 6, 6, 6, 6, 142 },
     { kEmptyName, kEmptyName, 2, 78, 0, -1, 10, 10, 4, 18, 18, 10, 10, 138 },
@@ -516,7 +516,7 @@ s_tech_weapon_data _weapons[46] = {
     { kEmptyName, kEmptyName, 45, 0, 5, -1, 300, 100, 0, 25, 50, 4, 12, 0 }
 };
 
-s_tech_weapon_mod_data _weapon_modifications[15] = {
+s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT] = {
     { kEmptyName, kEmptyName, 0, 0, 0, 0, 0 },
     { kEmptyName, kEmptyName, 1, 0, 100, 100, 1 },
     { kEmptyName, kEmptyName, 2, 0, -50, -50, 1 },
@@ -536,7 +536,7 @@ s_tech_weapon_mod_data _weapon_modifications[15] = {
 
 int16_t _starting_tech_field_ids[6] = { 29, 55, 22, 57, 28, 23 };
 
-s_unit_data _units[4] = {
+s_unit_data _units[UNIT_COUNT] = {
     { kEmptyName, 0, 0, 0, 0, 0, 0, 0, 0 },
     { kEmptyName, 1, 0, 40, 0, 1, 0, 1, 0 },
     { kEmptyName, 2, 0, 100, 0, 2, 0, 2, 0 },
