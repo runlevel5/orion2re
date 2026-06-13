@@ -765,6 +765,9 @@ namespace platform {
     void __cdecl Service_Pending_Window_Events_() {
     }
 
+    void __cdecl Pump_Game_Input_Queue_() {
+    }
+
     bool __cdecl Update_Active_World_Frame_() {
         return true;
     }

@@ -57,6 +57,7 @@ namespace platform {
 	// Functions
 	bool Create_Video_Buffers_(int16_t video_mode);
 	void __cdecl Service_Pending_Window_Events_();
+	void __cdecl Pump_Game_Input_Queue_();
 	bool __cdecl Update_Active_World_Frame_();
 	uint32_t Lock_Appropriate_Render_Buffer();
 	void Unlock_Appropriate_Render_Buffer();

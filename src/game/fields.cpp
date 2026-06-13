@@ -624,6 +624,7 @@ namespace fields {
     }
 
     int16_t __cdecl Scan_Input_() {
+        platform::Pump_Game_Input_Queue_();
         mouse::Pointer_X_();
         mouse::Pointer_Y_();
         mouse::Check_Mouse_Shape_();
@@ -660,6 +661,7 @@ namespace fields {
     }
 
     int16_t __cdecl Scan_Field_() {
+        platform::Pump_Game_Input_Queue_();
         int16_t mouse_x = static_cast<int16_t>(mouse::Pointer_X_());
         int16_t mouse_y = static_cast<int16_t>(mouse::Pointer_Y_());
         mouse::Check_Mouse_Shape_();

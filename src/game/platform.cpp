@@ -16,9 +16,112 @@ namespace platform {
 		video::s_palette_color g_present_palette_entries[256];
 		uint32_t g_fps_window_start_ms;
 		uint32_t g_fps_frame_count;
+		constexpr int32_t k_cursor_dimension = 24;
+		constexpr int32_t k_cursor_pixel_count = k_cursor_dimension * k_cursor_dimension;
+		constexpr uint16_t k_input_queue_capacity = 256;
+
+		enum e_input_event_type : uint8_t {
+			INPUT_EVENT_MOUSE = 0,
+			INPUT_EVENT_KEY = 1,
+		};
+
+		struct s_input_event {
+			e_input_event_type type;
+			int16_t mouse_x;
+			int16_t mouse_y;
+			uint16_t mouse_buttons;
+			uint32_t key_code;
+			uint32_t scan_code;
+		};
+
+		struct s_present_cursor_state {
+			uint8_t* pixels;
+			int16_t offset;
+			int16_t shape;
+			uint8_t enabled;
+		};
+
+		SDL_Mutex* g_input_queue_mutex;
+		s_input_event g_input_event_queue[k_input_queue_capacity];
+		uint16_t g_input_queue_read;
+		uint16_t g_input_queue_write;
+		uint16_t g_sdl_mouse_buttons;
+		s_present_cursor_state g_present_cursor_states[2];
+		SDL_AtomicInt g_present_cursor_state_index;
+		SDL_AtomicInt g_present_mouse_x;
+		SDL_AtomicInt g_present_mouse_y;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
 		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries);
+
+		void Set_Present_Mouse_Position_(int16_t x, int16_t y) {
+			SDL_SetAtomicInt(&g_present_mouse_x, (int)x);
+			SDL_SetAtomicInt(&g_present_mouse_y, (int)y);
+		}
+
+		uint16_t Previous_Input_Queue_Index_(uint16_t index) {
+			return (index == 0) ? (uint16_t)(k_input_queue_capacity - 1) : (uint16_t)(index - 1);
+		}
+
+		void Enqueue_Key_Input_Event_(uint32_t key_code, uint32_t scan_code) {
+			if (g_input_queue_mutex == nullptr) {
+				return;
+			}
+
+			SDL_LockMutex(g_input_queue_mutex);
+
+			const uint16_t next_write = (uint16_t)((g_input_queue_write + 1) % k_input_queue_capacity);
+			if (next_write == g_input_queue_read) {
+				g_input_queue_read = (uint16_t)((g_input_queue_read + 1) % k_input_queue_capacity);
+			}
+
+			s_input_event& event = g_input_event_queue[g_input_queue_write];
+			event.type = INPUT_EVENT_KEY;
+			event.mouse_x = 0;
+			event.mouse_y = 0;
+			event.mouse_buttons = 0;
+			event.key_code = key_code;
+			event.scan_code = scan_code;
+			g_input_queue_write = next_write;
+
+			SDL_UnlockMutex(g_input_queue_mutex);
+		}
+
+		void Enqueue_Mouse_Input_Event_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons) {
+			if (g_input_queue_mutex == nullptr) {
+				return;
+			}
+
+			SDL_LockMutex(g_input_queue_mutex);
+
+			if (g_input_queue_read != g_input_queue_write) {
+				const uint16_t last_index = Previous_Input_Queue_Index_(g_input_queue_write);
+				s_input_event& last_event = g_input_event_queue[last_index];
+				if (last_event.type == INPUT_EVENT_MOUSE &&
+					last_event.mouse_buttons == mouse_buttons) {
+					last_event.mouse_x = mouse_x;
+					last_event.mouse_y = mouse_y;
+					SDL_UnlockMutex(g_input_queue_mutex);
+					return;
+				}
+			}
+
+			const uint16_t next_write = (uint16_t)((g_input_queue_write + 1) % k_input_queue_capacity);
+			if (next_write == g_input_queue_read) {
+				g_input_queue_read = (uint16_t)((g_input_queue_read + 1) % k_input_queue_capacity);
+			}
+
+			s_input_event& event = g_input_event_queue[g_input_queue_write];
+			event.type = INPUT_EVENT_MOUSE;
+			event.mouse_x = mouse_x;
+			event.mouse_y = mouse_y;
+			event.mouse_buttons = mouse_buttons;
+			event.key_code = 0;
+			event.scan_code = 0;
+			g_input_queue_write = next_write;
+
+			SDL_UnlockMutex(g_input_queue_mutex);
+		}
 
 		int16_t Round_Float_To_Int16_(float value) {
 			long rounded_value = lroundf(value);
@@ -288,18 +391,18 @@ namespace platform {
 
 			if ((key_event.mod & SDL_KMOD_ALT) != 0) {
 				if (Translate_Alt_Key_(key_event.key, &translated_key_code)) {
-					Queue_Key_Code_(translated_key_code, scan_code);
+					Enqueue_Key_Input_Event_(translated_key_code, scan_code);
 				}
 				return;
 			}
 
 			if (Translate_Non_Character_Key_(key_event.key, &translated_key_code)) {
-				Queue_Key_Code_(translated_key_code, scan_code);
+				Enqueue_Key_Input_Event_(translated_key_code, scan_code);
 				return;
 			}
 
 			if (Translate_Printable_Key_(key_event.key, key_event.mod, &translated_key_code)) {
-				Queue_Key_Code_(translated_key_code + (scan_code << 8), scan_code);
+				Enqueue_Key_Input_Event_(translated_key_code + (scan_code << 8), scan_code);
 			}
 		}
 
@@ -412,35 +515,38 @@ namespace platform {
 		}
 
 		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries) {
-			if (g_sdl_present_pixels == nullptr ||
-				palette_entries == nullptr ||
-				mouse::_mouse_enabled == 0 ||
-				video::_current_mouse_shape <= 0) {
+			if (g_sdl_present_pixels == nullptr || palette_entries == nullptr) {
 				return;
 			}
 
-			if ((int32_t)video::_current_mouse_shape != g_last_cursor_shape) {
-				Update_Cursor_Image_();
-				g_last_cursor_shape = (int32_t)video::_current_mouse_shape;
+			const int32_t cursor_state_index = SDL_GetAtomicInt(&g_present_cursor_state_index);
+			const s_present_cursor_state& cursor_state =
+				g_present_cursor_states[cursor_state_index];
+
+			if (cursor_state.pixels == nullptr ||
+				cursor_state.enabled == 0 ||
+				cursor_state.shape <= 0) {
+				return;
 			}
 
-			const int32_t offset = mouse::Get_Pointer_Offset_();
-			const int32_t dst_x0 = (int32_t)g_mouse_x + offset;
-			const int32_t dst_y0 = (int32_t)g_mouse_y + offset;
+			const int32_t dst_x0 =
+				SDL_GetAtomicInt(&g_present_mouse_x) + (int32_t)cursor_state.offset;
+			const int32_t dst_y0 =
+				SDL_GetAtomicInt(&g_present_mouse_y) + (int32_t)cursor_state.offset;
 
-			for (int32_t row = 0; row < 24; ++row) {
+			for (int32_t row = 0; row < k_cursor_dimension; ++row) {
 				const int32_t dst_y = dst_y0 + row;
 				if (dst_y < 0 || dst_y >= video::g_screen_res_y) {
 					continue;
 				}
 
-				for (int32_t col = 0; col < 24; ++col) {
+				for (int32_t col = 0; col < k_cursor_dimension; ++col) {
 					const int32_t dst_x = dst_x0 + col;
 					if (dst_x < 0 || dst_x >= video::g_screen_res_x) {
 						continue;
 					}
 
-					const uint8_t pixel = g_cursor_surface_1[row * 24 + col];
+					const uint8_t pixel = cursor_state.pixels[row * k_cursor_dimension + col];
 					if (pixel == 0) {
 						continue;
 					}
@@ -594,6 +700,8 @@ namespace platform {
 
     void Cleanup_Surfaces()
     {
+        uint8_t* const alternate_cursor_surface = _cursor_surface;
+
         if (g_present_surface != nullptr) {
             free(g_present_surface);
             g_present_surface = nullptr;
@@ -603,6 +711,14 @@ namespace platform {
             free(g_cursor_surface_1);
             g_cursor_surface_1 = nullptr;
         }
+
+        if (alternate_cursor_surface != nullptr && alternate_cursor_surface != g_cursor_surface_1) {
+            free(alternate_cursor_surface);
+        }
+        _cursor_surface = nullptr;
+
+        g_present_cursor_states[0].pixels = nullptr;
+        g_present_cursor_states[1].pixels = nullptr;
 
         video::Free_Page_Buffers_();
         video::Shutdown_Off_Page_Ownership_();
@@ -659,33 +775,47 @@ namespace platform {
                 int32_t window_width = 0;
                 int32_t window_height = 0;
                 SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
-                mouse::User_Mouse_Handler_(
-                    Map_Window_Coord_To_Game_Coord_(event.motion.x, window_width, video::g_screen_res_x),
-                    Map_Window_Coord_To_Game_Coord_(event.motion.y, window_height, video::g_screen_res_y),
-                    (uint16_t)mouse::_mouse_buttons);
+                const int16_t mouse_x =
+                    Map_Window_Coord_To_Game_Coord_(event.motion.x, window_width, video::g_screen_res_x);
+                const int16_t mouse_y =
+                    Map_Window_Coord_To_Game_Coord_(event.motion.y, window_height, video::g_screen_res_y);
+
+                Set_Present_Mouse_Position_(mouse_x, mouse_y);
+                Enqueue_Mouse_Input_Event_(mouse_x, mouse_y, g_sdl_mouse_buttons);
                 continue;
             }
 
             if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
-                uint16_t mouse_buttons = 0;
+                uint16_t mouse_buttons = g_sdl_mouse_buttons;
                 int32_t window_width = 0;
                 int32_t window_height = 0;
                 SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
 
-                if ((event.button.button == SDL_BUTTON_LEFT && event.button.down) ||
-                    (event.button.button != SDL_BUTTON_LEFT && (mouse::_mouse_buttons & 1) != 0)) {
-                    mouse_buttons |= 1;
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    if (event.button.down) {
+                        mouse_buttons |= 1;
+                    } else {
+                        mouse_buttons &= (uint16_t)~1u;
+                    }
                 }
 
-                if ((event.button.button == SDL_BUTTON_RIGHT && event.button.down) ||
-                    (event.button.button != SDL_BUTTON_RIGHT && (mouse::_mouse_buttons & 2) != 0)) {
-                    mouse_buttons |= 2;
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    if (event.button.down) {
+                        mouse_buttons |= 2;
+                    } else {
+                        mouse_buttons &= (uint16_t)~2u;
+                    }
                 }
 
-                mouse::User_Mouse_Handler_(
-                    Map_Window_Coord_To_Game_Coord_(event.button.x, window_width, video::g_screen_res_x),
-                    Map_Window_Coord_To_Game_Coord_(event.button.y, window_height, video::g_screen_res_y),
-                    mouse_buttons);
+                g_sdl_mouse_buttons = mouse_buttons;
+
+                const int16_t mouse_x =
+                    Map_Window_Coord_To_Game_Coord_(event.button.x, window_width, video::g_screen_res_x);
+                const int16_t mouse_y =
+                    Map_Window_Coord_To_Game_Coord_(event.button.y, window_height, video::g_screen_res_y);
+
+                Set_Present_Mouse_Position_(mouse_x, mouse_y);
+                Enqueue_Mouse_Input_Event_(mouse_x, mouse_y, mouse_buttons);
                 continue;
             }
         }
@@ -733,6 +863,7 @@ namespace platform {
     {
         g_mouse_x = x;
         g_mouse_y = y;
+        Set_Present_Mouse_Position_(x, y);
 
         if (g_sdl_window != nullptr) {
             int32_t window_width = 0;
@@ -747,15 +878,29 @@ namespace platform {
 
     void __cdecl Create_Cursor_Surface() {
         if (platform::g_cursor_surface_1 == nullptr) {
-            platform::g_cursor_surface_1 = (uint8_t*)malloc(24 * 24);
+            platform::g_cursor_surface_1 = (uint8_t*)malloc(k_cursor_pixel_count);
         }
 
-        if (platform::g_cursor_surface_1 == nullptr) {
+        if (platform::_cursor_surface == nullptr) {
+            platform::_cursor_surface = (uint8_t*)malloc(k_cursor_pixel_count);
+        }
+
+        if (platform::g_cursor_surface_1 == nullptr || platform::_cursor_surface == nullptr) {
             exitm::Exit_With_Message("Create_Cursor_Surface failed");
         }
 
-        memset(platform::g_cursor_surface_1, 0, 24 * 24);
-        platform::_cursor_surface = platform::g_cursor_surface_1;
+        memset(platform::g_cursor_surface_1, 0, k_cursor_pixel_count);
+        memset(platform::_cursor_surface, 0, k_cursor_pixel_count);
+
+        g_present_cursor_states[0].pixels = platform::g_cursor_surface_1;
+        g_present_cursor_states[1].pixels = platform::_cursor_surface;
+        g_present_cursor_states[0].offset = 0;
+        g_present_cursor_states[1].offset = 0;
+        g_present_cursor_states[0].shape = 0;
+        g_present_cursor_states[1].shape = 0;
+        g_present_cursor_states[0].enabled = 0;
+        g_present_cursor_states[1].enabled = 0;
+        SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
     }
 
     void __cdecl Toggle_Pages_Stub_() {
@@ -776,8 +921,22 @@ namespace platform {
         g_pending_toggle_pages = false;
         g_window_focus_state = 1;
         g_has_lost_focus = false;
+		g_input_queue_read = 0;
+		g_input_queue_write = 0;
+		g_sdl_mouse_buttons = 0;
+		SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
+		Set_Present_Mouse_Position_(0, 0);
 		g_fps_window_start_ms = 0;
 		g_fps_frame_count = 0;
+
+		if (g_input_queue_mutex == nullptr) {
+			g_input_queue_mutex = SDL_CreateMutex();
+		}
+		if (g_input_queue_mutex == nullptr) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
+			SDL_Quit();
+			return 0;
+		}
 
 #ifdef FULLSCREEN
         int nWidth = k_windowed_logical_width;
@@ -822,11 +981,6 @@ namespace platform {
         while (g_should_exit != 1) {
             Service_Pending_Window_Events_();
 
-            if (_updating_cursor_img == 1) {
-                Update_Cursor_Image_();
-                _updating_cursor_img = 0;
-            }
-
             Present_Published_Off_Page_();
             SDL_Delay(1);
         }
@@ -840,20 +994,73 @@ namespace platform {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop shutdown");
         Cleanup_Surfaces();
         Destroy_Main_Window_();
+		if (g_input_queue_mutex != nullptr) {
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+		}
         SDL_Quit();
 
         return 0;
     }
 
-    void __cdecl Update_Cursor_Image_() {
-        if (video::_current_mouse_shape > 0) {
-            uint8_t* const src =
-                &video::_mouse_palette[((int32_t)video::_current_mouse_shape - 1) * 0x240];
+    void __cdecl Pump_Game_Input_Queue_() {
+        if (g_input_queue_mutex == nullptr) {
+            return;
+        }
 
-            for (int32_t row = 0; row < 0x18; ++row) {
-                memcpy(&platform::_cursor_surface[row * 0x18], &src[row * 0x18], 0x18);
+        s_input_event pending_events[k_input_queue_capacity];
+        uint16_t pending_count = 0;
+
+        SDL_LockMutex(g_input_queue_mutex);
+        while (g_input_queue_read != g_input_queue_write && pending_count < k_input_queue_capacity) {
+            pending_events[pending_count] = g_input_event_queue[g_input_queue_read];
+            g_input_queue_read = (uint16_t)((g_input_queue_read + 1) % k_input_queue_capacity);
+            ++pending_count;
+        }
+        SDL_UnlockMutex(g_input_queue_mutex);
+
+        for (uint16_t i = 0; i < pending_count; ++i) {
+            const s_input_event& event = pending_events[i];
+            if (event.type == INPUT_EVENT_MOUSE) {
+                mouse::User_Mouse_Handler_(event.mouse_x, event.mouse_y, event.mouse_buttons);
+            } else {
+                Queue_Key_Code_(event.key_code, event.scan_code);
             }
         }
+    }
+
+    void __cdecl Update_Cursor_Image_() {
+        if (g_present_cursor_states[0].pixels == nullptr ||
+            g_present_cursor_states[1].pixels == nullptr) {
+            return;
+        }
+
+        const int32_t read_index = SDL_GetAtomicInt(&g_present_cursor_state_index);
+        const int32_t write_index = (read_index == 0) ? 1 : 0;
+        s_present_cursor_state& cursor_state = g_present_cursor_states[write_index];
+
+        cursor_state.offset = (int16_t)mouse::Get_Pointer_Offset_();
+        cursor_state.shape = video::_current_mouse_shape;
+        cursor_state.enabled = (mouse::_mouse_enabled != 0) ? 1 : 0;
+
+        if (cursor_state.enabled != 0 &&
+            cursor_state.shape > 0 &&
+            video::_mouse_palette != nullptr) {
+            uint8_t* const src =
+                &video::_mouse_palette[((int32_t)cursor_state.shape - 1) * k_cursor_pixel_count];
+
+            for (int32_t row = 0; row < k_cursor_dimension; ++row) {
+                memcpy(
+                    &cursor_state.pixels[row * k_cursor_dimension],
+                    &src[row * k_cursor_dimension],
+                    k_cursor_dimension);
+            }
+        } else {
+            memset(cursor_state.pixels, 0, k_cursor_pixel_count);
+        }
+
+        g_last_cursor_shape = (int32_t)cursor_state.shape;
+        SDL_SetAtomicInt(&g_present_cursor_state_index, write_index);
     }
 
     void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count) {

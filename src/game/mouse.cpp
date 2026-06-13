@@ -18,18 +18,21 @@ namespace mouse {
     uint16_t _mouse_buffer_flag2;
 
     int16_t __cdecl Mouse_Buffer_() {
+        platform::Pump_Game_Input_Queue_();
         int16_t old_flag = _mouse_buffer_flag;
         _mouse_buffer_flag = 0;
         return old_flag;
     }
 
     uint16_t __cdecl Mouse_Buffer2_() {
+        platform::Pump_Game_Input_Queue_();
         uint16_t original_flag = _mouse_buffer_flag2;
         _mouse_buffer_flag2 = 0;
         return original_flag;
     }
 
     int16_t __cdecl Mouse_Button_() {
+        platform::Pump_Game_Input_Queue_();
         if (_mouse_overide_flag == 0) {
             return _mouse_buttons;
         }
@@ -42,14 +45,16 @@ namespace mouse {
         _current_mouse_list = mouse_list;
 
         Check_Mouse_Shape_();
-        platform::_updating_cursor_img = 1;
+        platform::Update_Cursor_Image_();
     }
 
     int16_t Pointer_X_() {
+        platform::Pump_Game_Input_Queue_();
         return platform::g_mouse_x;
     }
 
     int16_t Pointer_Y_() {
+        platform::Pump_Game_Input_Queue_();
         return platform::g_mouse_y;
     }
 
@@ -134,10 +139,12 @@ namespace mouse {
     void __cdecl Save_Mouse_State_() {
         _mouse_state = _mouse_enabled;
         _mouse_enabled = 0;
+        platform::Update_Cursor_Image_();
     }
 
     void __cdecl Restore_Mouse_State_() {
         _mouse_enabled = _mouse_state;
+        platform::Update_Cursor_Image_();
     }
 
     int16_t __cdecl Mouse_Buffer_Button_() {
@@ -154,10 +161,12 @@ namespace mouse {
 
     void __cdecl Disable_Mouse_() {
         _mouse_enabled = 0;
+        platform::Update_Cursor_Image_();
     }
 
     void __cdecl Enable_Mouse_() {
         _mouse_enabled = 1;
+        platform::Update_Cursor_Image_();
     }
 
     void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons) {
@@ -215,6 +224,7 @@ namespace mouse {
 
         if ((mouse::_mouse_enabled == 1) && !platform::g_pending_toggle_pages) {
             mouse::Check_Mouse_Shape_();
+            platform::Update_Cursor_Image_();
         }
 
         mouse::_in_mouse_handler = 0;
