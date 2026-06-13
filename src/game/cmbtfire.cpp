@@ -94,11 +94,22 @@ namespace CMBTFIRE {
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_() {
         if (MOX::_cmbt_colony_id != -1) {
-            // Packs Fighter Garrison, Stellar Converter, Ground Batteries, and Missile Base into bits 3..0.
-            return (((int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_FIGHTER_GARRISON] * 2 |
-                     (int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_STELLAR_CONVERTER]) * 2 |
-                    (int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_GROUND_BATTERIES]) * 2 |
-                    (int16_t)MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_MISSILE_BASE];
+            int16_t defenses = 0;
+
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_MISSILE_BASE] != 0) {
+                defenses |= COMBAT_PLANET_DEFENSE_MISSILE_BASE;
+            }
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_GROUND_BATTERIES] != 0) {
+                defenses |= COMBAT_PLANET_DEFENSE_GROUND_BATTERIES;
+            }
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_STELLAR_CONVERTER] != 0) {
+                defenses |= COMBAT_PLANET_DEFENSE_STELLAR_CONVERTER;
+            }
+            if (MOX::_colony[MOX::_cmbt_colony_id].buildings[BUILDING_FIGHTER_GARRISON] != 0) {
+                defenses |= COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON;
+            }
+
+            return defenses;
         }
         return 0;
     }

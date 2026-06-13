@@ -368,8 +368,8 @@ namespace SYS {
         animate::_animation_header = anim_hdr;
         SYS::_mask_header = mask_hdr;
 
-        uint8_t* anim_frame = (uint8_t*)anim_hdr + anim_hdr->frame_offsets[anim_hdr->current_frame];
-        int8_t* mask_frame = (int8_t*)mask_hdr + mask_hdr->frame_offsets[mask_hdr->current_frame];
+        uint8_t* anim_frame = Animation_Frame_Data_(anim_hdr, anim_hdr->current_frame);
+        int8_t* mask_frame = (int8_t*)Animation_Frame_Data_(mask_hdr, mask_hdr->current_frame);
 
         if (!is_clipped) {
             if (video::screen_refresh_flag >= 2) {

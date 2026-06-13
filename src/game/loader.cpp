@@ -99,7 +99,7 @@ namespace LOADER {
         MOX::_screen_seg = screen_anim;
 
         // Initialize the start of the frame offset data area
-        memset(screen_anim->frame_offsets, 0, sizeof(screen_anim->frame_offsets[0]) * 5);
+        memset(Animation_Frame_Offsets_(screen_anim), 0, sizeof(uint32_t) * 5);
     }
 
     void __cdecl Load_Player_Special_Names_() {

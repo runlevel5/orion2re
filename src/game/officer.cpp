@@ -1250,8 +1250,8 @@ namespace OFFICER {
     }
 
     void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta) {
-        int leader_idx = leader - MOX::_leaders;
-        int ship_idx = ship - MOX::_ship;
+        int leader_idx = (int)(leader - MOX::_leaders);
+        int ship_idx = (int)(ship - MOX::_ship);
 
         // If the ship already has an officer, clear that officer's assignment data.
         short current_officer_idx = ship->officer_index;

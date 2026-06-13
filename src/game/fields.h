@@ -62,6 +62,160 @@ namespace fields {
     extern int16_t _mouse_auto_exit;
     extern uint32_t _draw_override_flag;
 
+    [[noreturn]] inline void __cdecl Field_Type_Mismatch_(const char* helper_name, int16_t actual_type) {
+        char message[96];
+        snprintf(message, sizeof(message), "%s type mismatch (%d)", helper_name, (int)actual_type);
+#if !defined(NDEBUG)
+        SDL_TriggerBreakpoint();
+#endif
+        exitm::Exit_With_Message(message);
+        abort();
+    }
+
+    inline s_field_button* __cdecl Field_Data_Button_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_BUTTON) {
+            Field_Type_Mismatch_("Field_Data_Button_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.button;
+    }
+
+    inline const s_field_button* __cdecl Field_Data_Button_(const s_field* field) {
+        return Field_Data_Button_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_irregular_button* __cdecl Field_Data_Irregular_Button_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_IRREGULAR_BUTTON) {
+            Field_Type_Mismatch_("Field_Data_Irregular_Button_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.irregular_button;
+    }
+
+    inline const s_field_irregular_button* __cdecl Field_Data_Irregular_Button_(const s_field* field) {
+        return Field_Data_Irregular_Button_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_radio* __cdecl Field_Data_Radio_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_RADIO) {
+            Field_Type_Mismatch_("Field_Data_Radio_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.radio;
+    }
+
+    inline const s_field_radio* __cdecl Field_Data_Radio_(const s_field* field) {
+        return Field_Data_Radio_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_locked* __cdecl Field_Data_Locked_Button_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_LOCKED) {
+            Field_Type_Mismatch_("Field_Data_Locked_Button_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.locked;
+    }
+
+    inline const s_field_locked* __cdecl Field_Data_Locked_Button_(const s_field* field) {
+        return Field_Data_Locked_Button_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_multi_button* __cdecl Field_Data_Multi_Button_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_MULTI_BUTTON) {
+            Field_Type_Mismatch_("Field_Data_Multi_Button_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.multibtn;
+    }
+
+    inline const s_field_multi_button* __cdecl Field_Data_Multi_Button_(const s_field* field) {
+        return Field_Data_Multi_Button_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_scroll* __cdecl Field_Data_Scroll_(s_field* field) {
+        if (field == nullptr || (field->field_type != FIELD_TYPE_SCROLL && field->field_type != FIELD_TYPE_SCROLL_RETURN)) {
+            Field_Type_Mismatch_("Field_Data_Scroll_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.scroll;
+    }
+
+    inline const s_field_scroll* __cdecl Field_Data_Scroll_(const s_field* field) {
+        return Field_Data_Scroll_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_input_string* __cdecl Field_Data_Legacy_Input_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_LEGACY_INPUT) {
+            Field_Type_Mismatch_("Field_Data_Legacy_Input_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.input;
+    }
+
+    inline const s_field_input_string* __cdecl Field_Data_Legacy_Input_(const s_field* field) {
+        return Field_Data_Legacy_Input_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_cont_input* __cdecl Field_Data_Continuous_Input_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_CONTINUOUS_INPUT) {
+            Field_Type_Mismatch_("Field_Data_Continuous_Input_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.cont_input;
+    }
+
+    inline const s_field_cont_input* __cdecl Field_Data_Continuous_Input_(const s_field* field) {
+        return Field_Data_Continuous_Input_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_string_list* __cdecl Field_Data_String_List_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_STRING_LIST) {
+            Field_Type_Mismatch_("Field_Data_String_List_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.strings;
+    }
+
+    inline const s_field_string_list* __cdecl Field_Data_String_List_(const s_field* field) {
+        return Field_Data_String_List_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_grid* __cdecl Field_Data_Grid_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_GRID) {
+            Field_Type_Mismatch_("Field_Data_Grid_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.grid;
+    }
+
+    inline const s_field_grid* __cdecl Field_Data_Grid_(const s_field* field) {
+        return Field_Data_Grid_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_circle* __cdecl Field_Data_Circle_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_CIRCLE) {
+            Field_Type_Mismatch_("Field_Data_Circle_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.circle;
+    }
+
+    inline const s_field_circle* __cdecl Field_Data_Circle_(const s_field* field) {
+        return Field_Data_Circle_(const_cast<s_field*>(field));
+    }
+
+    inline s_field_multi_hotkey* __cdecl Field_Data_Multi_Hot_Key_(s_field* field) {
+        if (field == nullptr || field->field_type != FIELD_TYPE_MULTI_HOTKEY) {
+            Field_Type_Mismatch_("Field_Data_Multi_Hot_Key_", field != nullptr ? field->field_type : -1);
+        }
+
+        return &field->detail.multi_hotkey;
+    }
+
+    inline const s_field_multi_hotkey* __cdecl Field_Data_Multi_Hot_Key_(const s_field* field) {
+        return Field_Data_Multi_Hot_Key_(const_cast<s_field*>(field));
+    }
+
     void __cdecl Assign_Update_Function_(MOX2::action_func_t fn);
     void __cdecl Save_Auto_Function_();
     void __cdecl Deactivate_Auto_Function_();
@@ -90,9 +244,8 @@ namespace fields {
 
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound);
 
-    // Type 13 irregular buttons reuse the button payload, but the two legacy short
-    // fields at detail+0x1c/+0x20 are alternate sprite draw coordinates rather than
-    // help metadata.
+    // Type 13 irregular buttons have their own payload with explicit sprite draw
+    // coordinates.
     int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t draw_x, int16_t draw_y, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);

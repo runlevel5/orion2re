@@ -275,7 +275,7 @@ namespace WINNET {
     }
 
     namespace {
-        int32_t __cdecl Refresh_Player_List_(DWORD session_id) {
+        int32_t __cdecl Refresh_Player_List_(uint32_t session_id) {
 #if !ORION2RE_ENABLE_NETWORKING
             (void)session_id;
             _player_count = 0;

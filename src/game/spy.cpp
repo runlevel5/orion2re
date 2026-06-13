@@ -39,7 +39,7 @@ namespace spy {
         int32_t max_leader_def_bonus = 0;
         int32_t max_leader_atk_bonus = 0;
 
-        int32_t player_idx = player - MOX::_player;
+        int32_t player_idx = (int32_t)(player - MOX::_player);
 
         for (int32_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
@@ -514,7 +514,7 @@ namespace spy {
             msg.u.spy_assasination.plr_a = (int8_t)assassin_plr_a;
             msg.u.spy_assasination.plr_b = (int8_t)assassin_plr_b;
 
-            int32_t leader_idx = leader - MOX::_leaders;
+            int32_t leader_idx = (int32_t)(leader - MOX::_leaders);
             msg.u.spy_assasination.leader_id = (int8_t)leader_idx;
             msg.u.spy_assasination.victim_id = (int8_t)victim_player_idx;
 
@@ -527,8 +527,8 @@ namespace spy {
     }
 
     void __cdecl Steal_App_(s_player* attacker, s_player* victim, int8_t frame_flag) {
-        int32_t attacker_idx = attacker - MOX::_player;
-        int32_t victim_idx = victim - MOX::_player;
+        int32_t attacker_idx = (int32_t)(attacker - MOX::_player);
+        int32_t victim_idx = (int32_t)(victim - MOX::_player);
         int32_t chosen_app_id = -1;
         uint32_t total_cost = 0;
 

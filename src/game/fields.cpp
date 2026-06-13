@@ -313,11 +313,12 @@ namespace fields {
         }
 
         field->field_type = FIELD_TYPE_MULTI_BUTTON;
-        field->detail.multibtn.help = help;
-        field->detail.multibtn.pic = pic;
-        field->detail.multibtn.draw_style = animate::Get_Full_Store_Flag_(pic);
-        field->detail.multibtn.selection = value;
-        field->detail.multibtn.button_value = button_value;
+        s_field_multi_button* multi_button = Field_Data_Multi_Button_(field);
+        multi_button->help = help;
+        multi_button->pic = pic;
+        multi_button->draw_style = animate::Get_Full_Store_Flag_(pic);
+        multi_button->selection = value;
+        multi_button->button_value = button_value;
 
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -346,9 +347,10 @@ namespace fields {
         if (field->hotkey > '`' && field->hotkey < '{') {
             field->hotkey -= 0x20;
         }
-        field->detail.button.help = help;
-        field->detail.button.pic = pic;
-        field->detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
+        s_field_button* button = Field_Data_Button_(field);
+        button->help = help;
+        button->pic = pic;
+        button->draw_style = animate::Get_Full_Store_Flag_(pic);
 
         int16_t current_id = _fields_count;
         _fields_count++;
@@ -379,10 +381,11 @@ namespace fields {
         }
 
         _fields[current_field].field_type = FIELD_TYPE_RADIO;
-        _fields[current_field].detail.radio.help = help;
-        _fields[current_field].detail.radio.pic = pic;
-        _fields[current_field].detail.radio.draw_style = animate::Get_Full_Store_Flag_(pic);
-        _fields[current_field].detail.radio.selection = variable;
+        s_field_radio* radio = Field_Data_Radio_(&_fields[current_field]);
+        radio->help = help;
+        radio->pic = pic;
+        radio->draw_style = animate::Get_Full_Store_Flag_(pic);
+        radio->selection = variable;
 
         _fields_count++;
 
@@ -423,9 +426,10 @@ namespace fields {
         if (field->hotkey > '`' && field->hotkey < '{') {
             field->hotkey -= 0x20;
         }
-        field->detail.button.help = help;
-        field->detail.button.pic = pic;
-        field->detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
+        s_field_button* button = Field_Data_Button_(field);
+        button->help = help;
+        button->pic = pic;
+        button->draw_style = animate::Get_Full_Store_Flag_(pic);
         
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -447,7 +451,6 @@ namespace fields {
 
         field.x = x;
         field.y = y;
-        field.detail.button.help = help;
         field.x_end = x_end;
         field.y_end = y_end;
 
@@ -455,17 +458,19 @@ namespace fields {
         field.font_color = fonts::Get_Current_Font_Color_();
 
         field.sound = (int16_t)sound;
-        field.detail.button.pic = pic;
-        field.detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
+        field.field_type = FIELD_TYPE_IRREGULAR_BUTTON;
+        s_field_irregular_button* irregular_button = Field_Data_Irregular_Button_(&field);
+        irregular_button->help = help;
+        irregular_button->pic = pic;
+        irregular_button->draw_style = animate::Get_Full_Store_Flag_(pic);
 
         field.hotkey = *hotkey;
         if (field.hotkey >= 'a' && field.hotkey <= 'z') {
             field.hotkey -= 32;
         }
 
-        field.detail.button.help_start = draw_x;
-        field.detail.button.background_color = draw_y;
-        field.field_type = FIELD_TYPE_IRREGULAR_INPUT;
+        irregular_button->draw_x = draw_x;
+        irregular_button->draw_y = draw_y;
 
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -487,10 +492,11 @@ namespace fields {
         field.sound = static_cast<int16_t>(sound);
         field.field_type = FIELD_TYPE_GRID;
 
-        field.detail.grid.step_x = step_x;
-        field.detail.grid.step_y = step_y;
-        field.detail.grid.grid_x_ptr = grid_x;
-        field.detail.grid.grid_y_ptr = grid_y;
+        s_field_grid* grid = Field_Data_Grid_(&field);
+        grid->step_x = step_x;
+        grid->step_y = step_y;
+        grid->grid_x_ptr = grid_x;
+        grid->grid_y_ptr = grid_y;
 
         field.hotkey = '\0';
 
@@ -527,7 +533,9 @@ namespace fields {
         _fields[current].y = y;
         _fields[current].font_style = fonts::Get_Current_Font_Style_();
         _fields[current].font_color = &_list_normal_color;
-        _fields[current].detail.cont_input.highlight_color = &_list_highlight_colors;
+        _fields[current].field_type = FIELD_TYPE_CONTINUOUS_INPUT;
+        s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[current]);
+        cont_input->highlight_color = &_list_highlight_colors;
 
         _fields[current].x_end = x + width;
         _fields[current].y_end = y + height;
@@ -536,15 +544,14 @@ namespace fields {
             max_length = (int16_t)sizeof(_continuous_string);
         }
 
-        _fields[current].detail.cont_input.max_length = max_length;
+        cont_input->max_length = max_length;
         _fields[current].hotkey = 0;
         _fields[current].sound = sound;
-        _fields[current].detail.cont_input.buffer = value;
-        _fields[current].detail.cont_input.full_store_flag = 0;
-        _fields[current].detail.cont_input.pic = pic;
-        _fields[current].detail.cont_input.background_color = background_color;
-        _fields[current].detail.cont_input.font_shadow_style = font_shadow_style;
-        _fields[current].field_type = FIELD_TYPE_CONTINUOUS_INPUT;
+        cont_input->buffer = value;
+        cont_input->full_store_flag = 0;
+        cont_input->pic = pic;
+        cont_input->background_color = background_color;
+        cont_input->font_shadow_style = font_shadow_style;
 
         _fields_count++;
 
@@ -562,20 +569,22 @@ namespace fields {
         _fields[_fields_count].y = y;
         _fields[_fields_count].x_end = _fields[_fields_count].x + width;
         _fields[_fields_count].y_end = _fields[_fields_count].y + height;
-        _fields[_fields_count].detail.scroll.return_value = return_value;
-        _fields[_fields_count].detail.scroll.set_value = set_value;
-        _fields[_fields_count].detail.scroll.range_min = range_min;
-        _fields[_fields_count].detail.scroll.range_max = range_max;
         _fields[_fields_count].sound = sound;
+        _fields[_fields_count].field_type = FIELD_TYPE_SCROLL;
+
+        s_field_scroll* scroll = Field_Data_Scroll_(&_fields[_fields_count]);
+        scroll->return_value = return_value;
+        scroll->set_value = set_value;
+        scroll->range_min = range_min;
+        scroll->range_max = range_max;
 
         if (height < width) {
-            _fields[_fields_count].detail.scroll.is_vertical = 0;
+            scroll->is_vertical = 0;
         } else {
-            _fields[_fields_count].detail.scroll.is_vertical = 1;
+            scroll->is_vertical = 1;
         }
 
-        _fields[_fields_count].field_type = FIELD_TYPE_SCROLL;
-        _fields[_fields_count].detail.scroll.value = value;
+        scroll->value = value;
         _fields[_fields_count].hotkey = hotkey_str[0];
 
         if (_fields[_fields_count].hotkey > '`' && _fields[_fields_count].hotkey < '{') {
@@ -603,9 +612,10 @@ namespace fields {
         field->hotkey = '\0';
         field->field_type = FIELD_TYPE_MULTI_HOTKEY;
 
-        field->detail.multi_hotkey.help = help_text;
-        field->detail.multi_hotkey.help_start = 0;
-        field->detail.multi_hotkey.help_len = (short)strlen(help_text);
+        s_field_multi_hotkey* multi_hotkey = Field_Data_Multi_Hot_Key_(field);
+        multi_hotkey->help = help_text;
+        multi_hotkey->help_start = 0;
+        multi_hotkey->help_len = (short)strlen(help_text);
 
         _multi_hotkey_active_field = 1;
         _fields_count++;
@@ -626,20 +636,23 @@ namespace fields {
         int16_t type = field->field_type;
 
         if (type == FIELD_TYPE_SCROLL_RETURN) {
-            *field->detail.scroll.value = field->detail.scroll.set_value;
-            return field->detail.scroll.return_value;
+            s_field_scroll* scroll = Field_Data_Scroll_(field);
+            *scroll->value = scroll->set_value;
+            return scroll->return_value;
         }
 
         if (type == FIELD_TYPE_STRING_LIST) {
-            if (field->detail.strings.is_selectable == 0) {
+            s_field_string_list* string_list = Field_Data_String_List_(field);
+            if (string_list->is_selectable == 0) {
                 return 0;
             }
         }
 
         if (type == FIELD_TYPE_GRID) {
             if (_down_mouse_button == -1 || _fields[_down_mouse_button].field_type != FIELD_TYPE_GRID) {
-                *field->detail.grid.grid_x_ptr = (int16_t)((mouse::Pointer_X_() - field->x) / field->detail.grid.step_x);
-                *field->detail.grid.grid_y_ptr = (int16_t)((mouse::Pointer_Y_() - field->y) / field->detail.grid.step_y);
+                s_field_grid* grid = Field_Data_Grid_(field);
+                *grid->grid_x_ptr = (int16_t)((mouse::Pointer_X_() - field->x) / grid->step_x);
+                *grid->grid_y_ptr = (int16_t)((mouse::Pointer_Y_() - field->y) / grid->step_y);
             }
         }
 
@@ -690,10 +703,11 @@ namespace fields {
         if (current_field.hotkey > '`' && current_field.hotkey < '{') {
             current_field.hotkey -= 0x20;
         }
-        current_field.detail.radio.help = help;
-        current_field.detail.radio.pic = pic;
-        current_field.detail.radio.draw_style = animate::Get_Full_Store_Flag_(pic);
-        current_field.detail.radio.selection = selection;
+        s_field_locked* locked = Field_Data_Locked_Button_(&current_field);
+        locked->help = help;
+        locked->pic = pic;
+        locked->draw_style = animate::Get_Full_Store_Flag_(pic);
+        locked->selection = selection;
 
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -739,28 +753,29 @@ namespace fields {
         _fields[index].font_style = fonts::Get_Current_Font_Style_();
         _fields[index].font_color = &_list_normal_color;
 
-        _fields[index].detail.strings.highlight_color = &_list_highlight_colors;
-        _fields[index].detail.strings.gradient_colors = &_list_special_colors;
+        _fields[index].field_type = FIELD_TYPE_STRING_LIST;
+        s_field_string_list* string_list = Field_Data_String_List_(&_fields[index]);
+        string_list->highlight_color = &_list_highlight_colors;
+        string_list->gradient_colors = &_list_special_colors;
 
         _fields[index].y_end = y + fonts::Get_Font_Height_() + 1;
-        _fields[index].detail.strings.help_start = help_start;
+        string_list->help_start = help_start;
         _fields[index].hotkey = *hotkey_str;
 
-        _fields[index].detail.strings.is_selectable = is_selectable;
+        string_list->is_selectable = is_selectable;
 
         if (_fields[index].hotkey >= 'a' && _fields[index].hotkey <= 'z') {
             _fields[index].hotkey -= 0x20;
         }
 
-        _fields[index].detail.strings.help = help;
-        _fields[index].detail.strings.value = value;
-        _fields[index].detail.strings.gradient_mode = gradient_mode;
-        _fields[index].detail.strings.gradient_palette = gradient_palette;
-        _fields[index].detail.strings.gradient_extra = gradient_extra;
-        _fields[index].detail.strings.gradient_pic = gradient_pic;
+        string_list->help = help;
+        string_list->value = value;
+        string_list->gradient_mode = gradient_mode;
+        string_list->gradient_palette = gradient_palette;
+        string_list->gradient_extra = gradient_extra;
+        string_list->gradient_pic = gradient_pic;
         (void)unused_param_12;
         (void)unused_param_14;
-        _fields[index].field_type = FIELD_TYPE_STRING_LIST;
 
         _fields_count++;
         return _fields_count - 1;
@@ -880,10 +895,11 @@ namespace fields {
             _fields[_fields_count].y_end = static_cast<int16_t>(max_y);
         }
 
-        _fields[_fields_count].detail.circle.center_x = center_x;
-        _fields[_fields_count].detail.circle.center_y = center_y;
-        _fields[_fields_count].detail.circle.radius_squared = radius * radius;
         _fields[_fields_count].field_type = FIELD_TYPE_CIRCLE;
+        s_field_circle* circle = Field_Data_Circle_(&_fields[_fields_count]);
+        circle->center_x = center_x;
+        circle->center_y = center_y;
+        circle->radius_squared = radius * radius;
         _fields[_fields_count].sound = sound;
         _fields[_fields_count].hotkey = *hotkey;
 
@@ -964,18 +980,20 @@ namespace fields {
                 int16_t field_type = _fields[field_idx].field_type;
                 
                 if (field_type == FIELD_TYPE_RADIO) {
-                    if (*_fields[field_idx].detail.radio.selection == 0) {
-                        *_fields[field_idx].detail.radio.selection = 1;
+                    s_field_radio* radio = Field_Data_Radio_(&_fields[field_idx]);
+                    if (*radio->selection == 0) {
+                        *radio->selection = 1;
                     } else {
-                        *_fields[field_idx].detail.radio.selection = 0;
+                        *radio->selection = 0;
                     }
                 } else if (field_type == FIELD_TYPE_LOCKED) {
-                    if (*_fields[field_idx].detail.radio.selection == 0) {
-                        *_fields[field_idx].detail.radio.selection = 1;
+                    s_field_locked* locked = Field_Data_Locked_Button_(&_fields[field_idx]);
+                    if (*locked->selection == 0) {
+                        *locked->selection = 1;
                     }
                 } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
                     _down_mouse_button = -1;
-                    return _fields[field_idx].detail.scroll.return_value;
+                    return Field_Data_Scroll_(&_fields[field_idx])->return_value;
                 }
                 
                 if (field_type != FIELD_TYPE_HIDDEN && field_type != FIELD_TYPE_MULTI_HOTKEY) {
@@ -1005,11 +1023,12 @@ namespace fields {
                 
                 if (scanned_field > 0) {
                     if (_fields[scanned_field].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
+                        s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[scanned_field]);
                         if (_input_field_active == 0) {
                             if (_active_input_field_number == scanned_field) {
                                 int16_t len = 0;
                                 if (_continuous_string[0] != '\0') {
-                                    while (len < _fields[scanned_field].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                                    while (len < cont_input->max_length && _continuous_string[len] != '\0') {
                                         len++;
                                     }
                                 }
@@ -1017,7 +1036,7 @@ namespace fields {
                                     len--;
                                 }
                                 _continuous_string[len] = '\0';
-                                strcpy(_fields[scanned_field].detail.cont_input.buffer, _continuous_string);
+                                strcpy(cont_input->buffer, _continuous_string);
                                 _active_input_field_number = -1;
                                 _cursor_position = 0;
                             } else {
@@ -1035,8 +1054,9 @@ namespace fields {
                         }
                     } else if (_input_field_active != 0) {
                         int16_t len = 0;
+                        s_field_cont_input* active_cont_input = Field_Data_Continuous_Input_(&_fields[_active_input_field_number]);
                         if (_continuous_string[0] != '\0') {
-                            while (len < _fields[_active_input_field_number].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                            while (len < active_cont_input->max_length && _continuous_string[len] != '\0') {
                                 len++;
                             }
                         }
@@ -1044,7 +1064,7 @@ namespace fields {
                             len--;
                         }
                         _continuous_string[len] = '\0';
-                        strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+                        strcpy(active_cont_input->buffer, _continuous_string);
                         _cursor_position = 0;
                         _input_field_active = 0;
                         _active_input_field_number = -1;
@@ -1058,18 +1078,20 @@ namespace fields {
                     
                     int16_t field_type = _fields[scanned_field].field_type;
                     if (field_type == FIELD_TYPE_RADIO) {
-                        if (*_fields[scanned_field].detail.radio.selection == 0) {
-                            *_fields[scanned_field].detail.radio.selection = 1;
+                        s_field_radio* radio = Field_Data_Radio_(&_fields[scanned_field]);
+                        if (*radio->selection == 0) {
+                            *radio->selection = 1;
                         } else {
-                            *_fields[scanned_field].detail.radio.selection = 0;
+                            *radio->selection = 0;
                         }
                     } else if (field_type == FIELD_TYPE_LOCKED) {
-                        if (*_fields[scanned_field].detail.radio.selection == 0) {
-                            *_fields[scanned_field].detail.radio.selection = 1;
+                        s_field_locked* locked = Field_Data_Locked_Button_(&_fields[scanned_field]);
+                        if (*locked->selection == 0) {
+                            *locked->selection = 1;
                         }
                     } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
                         _down_mouse_button = -1;
-                        return _fields[scanned_field].detail.scroll.return_value;
+                        return Field_Data_Scroll_(&_fields[scanned_field])->return_value;
                     }
                     
                     if (_mouse_auto_exit == 0) {
@@ -1081,9 +1103,12 @@ namespace fields {
                 
                 if (_list_field_on != 0) {
                     for (int16_t i = 1; i < _fields_count; ++i) {
-                        if (_fields[i].field_type == FIELD_TYPE_STRING_LIST && *_fields[i].detail.strings.value == _fields[i].detail.strings.help_start && _fields[i].detail.strings.is_selectable != 0) {
-                            _down_mouse_button = -1;
-                            return i;
+                        if (_fields[i].field_type == FIELD_TYPE_STRING_LIST) {
+                            s_field_string_list* string_list = Field_Data_String_List_(&_fields[i]);
+                            if (*string_list->value == string_list->help_start && string_list->is_selectable != 0) {
+                                _down_mouse_button = -1;
+                                return i;
+                            }
                         }
                     }
                 }
@@ -1102,8 +1127,9 @@ namespace fields {
             }
             
             if (_input_field_active > 0) {
+                s_field_cont_input* active_cont_input = Field_Data_Continuous_Input_(&_fields[_active_input_field_number]);
                 if (key_code == 0x011B) {
-                    strcpy(_continuous_string, _fields[_active_input_field_number].detail.cont_input.buffer);
+                    strcpy(_continuous_string, active_cont_input->buffer);
                     int16_t act_num = _active_input_field_number;
                     _active_input_field_number = -1;
                     _input_field_active = 0;
@@ -1118,7 +1144,7 @@ namespace fields {
                     if (_active_input_field_first == 0) {
                         int16_t len = 0;
                         if (_continuous_string[0] != '\0') {
-                            while (len < _fields[_active_input_field_number].detail.cont_input.max_length - 1 && _continuous_string[len] != '\0' && _continuous_string[len] != '_') {
+                            while (len < active_cont_input->max_length - 1 && _continuous_string[len] != '\0' && _continuous_string[len] != '_') {
                                 len++;
                             }
                         }
@@ -1135,7 +1161,7 @@ namespace fields {
                     if (chr >= 0x20 && chr <= 0x7E && chr != 0x5F) {
                         _active_input_field_first = 0;
                         if (_active_input_field_number >= 0 && _active_input_field_number < _fields_count) {
-                            int16_t font_shadow = _fields[_active_input_field_number].detail.cont_input.font_shadow_style;
+                            int16_t font_shadow = active_cont_input->font_shadow_style;
                             if (font_shadow == -1) {
                                 fonts::Set_Font_Style_Shadow_Down_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
                             } else if (font_shadow == 0) {
@@ -1147,10 +1173,10 @@ namespace fields {
                             }
                         }
                         int16_t len = 0;
-                        while (_continuous_string[len] != '_' && _continuous_string[len] != '\0' && len < _fields[_active_input_field_number].detail.cont_input.max_length - 1) {
+                        while (_continuous_string[len] != '_' && _continuous_string[len] != '\0' && len < active_cont_input->max_length - 1) {
                             len++;
                         }
-                        if (len < _fields[_active_input_field_number].detail.cont_input.max_length - 1 && fonts::Get_String_Width_(_continuous_string) + _fields[_active_input_field_number].x <= _fields[_active_input_field_number].x_end) {
+                        if (len < active_cont_input->max_length - 1 && fonts::Get_String_Width_(_continuous_string) + _fields[_active_input_field_number].x <= _fields[_active_input_field_number].x_end) {
                             _continuous_string[len] = (char)chr;
                             _continuous_string[len + 1] = '\0';
                         } else {
@@ -1209,9 +1235,10 @@ namespace fields {
                         break;
                     }
                     
-                    int dx = buf_x - _fields[i].detail.circle.center_x;
-                    int dy = buf_y - _fields[i].detail.circle.center_y;
-                    if (dx * dx + dy * dy <= _fields[i].detail.circle.radius_squared) {
+                    s_field_circle* circle = Field_Data_Circle_(&_fields[i]);
+                    int dx = buf_x - circle->center_x;
+                    int dy = buf_y - circle->center_y;
+                    if (dx * dx + dy * dy <= circle->radius_squared) {
                         field_idx = i;
                         break;
                     }
@@ -1227,15 +1254,15 @@ namespace fields {
                 
                 switch (_fields[field_idx].field_type) {
                     case FIELD_TYPE_RADIO:
-                        if (*_fields[field_idx].detail.radio.selection == 0) {
-                            *_fields[field_idx].detail.radio.selection = 1;
+                        if (*Field_Data_Radio_(&_fields[field_idx])->selection == 0) {
+                            *Field_Data_Radio_(&_fields[field_idx])->selection = 1;
                         } else {
-                            *_fields[field_idx].detail.radio.selection = 0;
+                            *Field_Data_Radio_(&_fields[field_idx])->selection = 0;
                         }
                         break;
                     case FIELD_TYPE_LOCKED:
-                        if (*_fields[field_idx].detail.radio.selection == 0) {
-                            *_fields[field_idx].detail.radio.selection = 1;
+                        if (*Field_Data_Locked_Button_(&_fields[field_idx])->selection == 0) {
+                            *Field_Data_Locked_Button_(&_fields[field_idx])->selection = 1;
                         }
                         break;
                     case FIELD_TYPE_LEGACY_INPUT:
@@ -1243,26 +1270,30 @@ namespace fields {
                         break;
                     case FIELD_TYPE_SCROLL_RETURN:
                         _down_mouse_button = -1;
-                        return _fields[field_idx].detail.scroll.return_value;
+                        return Field_Data_Scroll_(&_fields[field_idx])->return_value;
                     case FIELD_TYPE_CONTINUOUS_INPUT:
+                        {
+                            s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[field_idx]);
                         if (_input_field_active == 0) {
-                            strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                            strcpy(_continuous_string, cont_input->buffer);
                             _input_field_active = 1;
                             _cursor_on = 0;
                             _cursor_position = 0;
                             _active_input_field_number = field_idx;
                         } else if (field_idx != _active_input_field_number) {
-                            strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                            strcpy(_continuous_string, cont_input->buffer);
                             _cursor_on = 0;
                             _cursor_position = 0;
                             _active_input_field_number = field_idx;
                         }
                         break;
+                        }
                     default:
                         if (_input_field_active != 0) {
                             int16_t len = 0;
+                            s_field_cont_input* active_cont_input = Field_Data_Continuous_Input_(&_fields[_active_input_field_number]);
                             if (_continuous_string[0] != '\0') {
-                                while (len < _fields[_active_input_field_number].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                                while (len < active_cont_input->max_length && _continuous_string[len] != '\0') {
                                     len++;
                                 }
                             }
@@ -1270,7 +1301,7 @@ namespace fields {
                                 len--;
                             }
                             _continuous_string[len] = '\0';
-                            strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+                            strcpy(active_cont_input->buffer, _continuous_string);
                             _input_field_active = 0;
                             _active_input_field_number = -1;
                         }
@@ -1360,8 +1391,9 @@ namespace fields {
                 }
                 
                 if (_fields[field_idx].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
+                    s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[field_idx]);
                     if (_input_field_active == 0 || field_idx != _active_input_field_number) {
-                        strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                        strcpy(_continuous_string, cont_input->buffer);
                         _input_field_active = 1;
                         _active_input_field_first = 1;
                         _cursor_position = 0;
@@ -1370,8 +1402,9 @@ namespace fields {
                     }
                 } else if (_input_field_active != 0) {
                     int16_t len = 0;
+                    s_field_cont_input* active_cont_input = Field_Data_Continuous_Input_(&_fields[_active_input_field_number]);
                     if (_continuous_string[0] != '\0') {
-                        while (len < _fields[_active_input_field_number].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                        while (len < active_cont_input->max_length && _continuous_string[len] != '\0') {
                             len++;
                         }
                     }
@@ -1379,7 +1412,7 @@ namespace fields {
                         len--;
                     }
                     _continuous_string[len] = '\0';
-                    strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+                    strcpy(active_cont_input->buffer, _continuous_string);
                     _active_input_field_number = -1;
                     _input_field_active = 0;
                 }
@@ -1408,15 +1441,15 @@ namespace fields {
                 
                 switch (_fields[field_idx].field_type) {
                     case FIELD_TYPE_RADIO:
-                        if (*_fields[field_idx].detail.radio.selection == 0) {
-                            *_fields[field_idx].detail.radio.selection = 1;
+                        if (*Field_Data_Radio_(&_fields[field_idx])->selection == 0) {
+                            *Field_Data_Radio_(&_fields[field_idx])->selection = 1;
                         } else {
-                            *_fields[field_idx].detail.radio.selection = 0;
+                            *Field_Data_Radio_(&_fields[field_idx])->selection = 0;
                         }
                         break;
                     case FIELD_TYPE_LOCKED:
-                        if (*_fields[field_idx].detail.radio.selection == 0) {
-                            *_fields[field_idx].detail.radio.selection = 1;
+                        if (*Field_Data_Locked_Button_(&_fields[field_idx])->selection == 0) {
+                            *Field_Data_Locked_Button_(&_fields[field_idx])->selection = 1;
                         }
                         break;
                     case FIELD_TYPE_LEGACY_INPUT:
@@ -1425,10 +1458,10 @@ namespace fields {
                     case FIELD_TYPE_SCROLL_RETURN:
                         _down_mouse_button = -1;
                         if (mouse_btn != 2) {
-                            return _fields[field_idx].detail.scroll.return_value;
+                            return Field_Data_Scroll_(&_fields[field_idx])->return_value;
                         }
                         if (_mouse_cancel_disabled != 0) {
-                            return -_fields[field_idx].detail.scroll.return_value;
+                            return -Field_Data_Scroll_(&_fields[field_idx])->return_value;
                         }
                         return -1;
                 }
@@ -1555,7 +1588,7 @@ namespace fields {
             if (first_valid_index < 0 || first_valid_index >= index) {
                 *selected_index = -1;
             } else {
-                *selected_index = static_cast<int8_t>(_fields[first_valid_index + 1].detail.strings.help_start);
+                *selected_index = static_cast<int8_t>(Field_Data_String_List_(&_fields[first_valid_index + 1])->help_start);
             }
         }
 
@@ -1590,7 +1623,7 @@ namespace fields {
             if (_list_field_scan_flag != 0) {
                 int16_t scan_idx = Scan_Input_();
                 if (scan_idx > 0) {
-                    *selected_index = static_cast<int8_t>(_fields[scan_idx].detail.strings.help_start);
+                    *selected_index = static_cast<int8_t>(Field_Data_String_List_(&_fields[scan_idx])->help_start);
                 }
             }
 
@@ -1612,7 +1645,7 @@ namespace fields {
     }
 
     void __cdecl F11_Key_() {
-        MEMORYSTATUS memory_status;
+        s_memorystatus memory_status;
         char buffer[80];
 
         Clear_Fields_();
@@ -1630,45 +1663,46 @@ namespace fields {
 
     void __cdecl Find_Bar_Position_(int16_t field_idx) {
         s_field* field = &_fields[field_idx];
+        s_field_scroll* scroll = Field_Data_Scroll_(field);
         int16_t new_value;
 
-        if (field->detail.scroll.is_vertical == 0) {
+        if (scroll->is_vertical == 0) {
             int16_t width = field->x_end - field->x;
             int16_t mouse_x = mouse::Pointer_X_() + _pointer_offset;
 
             if (mouse_x >= field->x_end) {
-                new_value = field->detail.scroll.range_max;
+                new_value = scroll->range_max;
             } else if (mouse_x <= field->x) {
-                new_value = field->detail.scroll.range_min;
+                new_value = scroll->range_min;
             } else {
                 int delta = mouse_x - field->x;
-                int range = field->detail.scroll.range_max - field->detail.scroll.range_min;
-                new_value = (int16_t)((delta * range) / width) + field->detail.scroll.range_min;
+                int range = scroll->range_max - scroll->range_min;
+                new_value = (int16_t)((delta * range) / width) + scroll->range_min;
             }
         } else {
             int16_t height = field->y_end - field->y;
             int16_t mouse_y = mouse::Pointer_Y_() + _pointer_offset;
 
             if (mouse_y >= field->y_end) {
-                new_value = field->detail.scroll.range_min;
+                new_value = scroll->range_min;
             } else if (mouse_y <= field->y) {
-                new_value = field->detail.scroll.range_max;
+                new_value = scroll->range_max;
             } else {
                 int delta = field->y_end - mouse_y;
-                int range = field->detail.scroll.range_max - field->detail.scroll.range_min;
+                int range = scroll->range_max - scroll->range_min;
                 new_value = (int16_t)((delta * range) / height);
             }
         }
 
-        if (new_value < field->detail.scroll.return_value) {
-            new_value = field->detail.scroll.return_value;
+        if (new_value < scroll->return_value) {
+            new_value = scroll->return_value;
         }
 
-        if (new_value > field->detail.scroll.set_value) {
-            new_value = field->detail.scroll.set_value;
+        if (new_value > scroll->set_value) {
+            new_value = scroll->set_value;
         }
 
-        *field->detail.scroll.value = new_value;
+        *scroll->value = new_value;
     }
 
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound) {
@@ -1736,101 +1770,146 @@ namespace fields {
 
                 switch (f->field_type) {
                     case FIELD_TYPE_BUTTON:
-                        animate::Reset_Animation_Frame_(f->detail.button.pic);
-                        animate::Draw_(f->x, f->y, f->detail.button.pic);
-                        if (f->detail.button.help != nullptr && *f->detail.button.help != '\0') {
-                            fonts::Set_Font_Style_(f->font_style, f->font_color);
-                            int16_t h = fonts::Get_Font_Height_() - 1;
-                            fonts::Print_Centered_(
-                                f->x + (f->x_end - f->x) / 2,
-                                f->y + (f->y_end - f->y) / 2 - h / 2,
-                                f->detail.button.help
-                            );
-                        }
-                        break;
-                    case FIELD_TYPE_RADIO:
-                    case FIELD_TYPE_LOCKED:
-                        if (*f->detail.radio.selection == 0) {
-                            animate::Reset_Animation_Frame_(f->detail.radio.pic);
-                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
-                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                        {
+                            s_field_button* button = Field_Data_Button_(f);
+                            animate::Reset_Animation_Frame_(button->pic);
+                            animate::Draw_(f->x, f->y, button->pic);
+                            if (button->help != nullptr && *button->help != '\0') {
                                 fonts::Set_Font_Style_(f->font_style, f->font_color);
                                 int16_t h = fonts::Get_Font_Height_() - 1;
                                 fonts::Print_Centered_(
                                     f->x + (f->x_end - f->x) / 2,
                                     f->y + (f->y_end - f->y) / 2 - h / 2,
-                                    f->detail.radio.help
+                                    button->help
                                 );
                             }
-                        } else {
-                            if (f->detail.radio.draw_style != 0) {
-                                animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
+                        }
+                        break;
+                    case FIELD_TYPE_RADIO:
+                        {
+                            s_field_radio* radio = Field_Data_Radio_(f);
+                            if (*radio->selection == 0) {
+                                animate::Reset_Animation_Frame_(radio->pic);
+                                animate::Draw_(f->x, f->y, radio->pic);
+                                if (radio->help != nullptr && *radio->help != '\0') {
+                                    fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                    int16_t h = fonts::Get_Font_Height_() - 1;
+                                    fonts::Print_Centered_(
+                                        f->x + (f->x_end - f->x) / 2,
+                                        f->y + (f->y_end - f->y) / 2 - h / 2,
+                                        radio->help
+                                    );
+                                }
                             } else {
-                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
-                                animate::Draw_(f->x, f->y, f->detail.radio.pic);
+                                if (radio->draw_style != 0) {
+                                    animate::Set_Animation_Frame_(radio->pic, 1);
+                                } else {
+                                    animate::Reset_Animation_Frame_(radio->pic);
+                                    animate::Draw_(f->x, f->y, radio->pic);
+                                }
+                                animate::Draw_(f->x, f->y, radio->pic);
+                                if (radio->help != nullptr && *radio->help != '\0') {
+                                    fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                    int16_t h = fonts::Get_Font_Height_() - 1;
+                                    fonts::Print_Centered_(
+                                        f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
+                                        f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
+                                        radio->help
+                                    );
+                                }
                             }
-                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
-                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
-                                fonts::Set_Font_Style_(f->font_style, f->font_color);
-                                int16_t h = fonts::Get_Font_Height_() - 1;
-                                fonts::Print_Centered_(
-                                    f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
-                                    f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
-                                    f->detail.radio.help
-                                );
+                        }
+                        break;
+                    case FIELD_TYPE_LOCKED:
+                        {
+                            s_field_locked* locked = Field_Data_Locked_Button_(f);
+                            if (*locked->selection == 0) {
+                                animate::Reset_Animation_Frame_(locked->pic);
+                                animate::Draw_(f->x, f->y, locked->pic);
+                                if (locked->help != nullptr && *locked->help != '\0') {
+                                    fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                    int16_t h = fonts::Get_Font_Height_() - 1;
+                                    fonts::Print_Centered_(
+                                        f->x + (f->x_end - f->x) / 2,
+                                        f->y + (f->y_end - f->y) / 2 - h / 2,
+                                        locked->help
+                                    );
+                                }
+                            } else {
+                                if (locked->draw_style != 0) {
+                                    animate::Set_Animation_Frame_(locked->pic, 1);
+                                } else {
+                                    animate::Reset_Animation_Frame_(locked->pic);
+                                    animate::Draw_(f->x, f->y, locked->pic);
+                                }
+                                animate::Draw_(f->x, f->y, locked->pic);
+                                if (locked->help != nullptr && *locked->help != '\0') {
+                                    fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                    int16_t h = fonts::Get_Font_Height_() - 1;
+                                    fonts::Print_Centered_(
+                                        f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
+                                        f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
+                                        locked->help
+                                    );
+                                }
                             }
                         }
                         break;
                     case FIELD_TYPE_MULTI_BUTTON:
-                        if (*f->detail.multibtn.selection == f->detail.multibtn.button_value) {
-                            if (f->detail.multibtn.draw_style != 0) {
-                                animate::Set_Animation_Frame_(f->detail.multibtn.pic, 1);
+                        {
+                            s_field_multi_button* multi_button = Field_Data_Multi_Button_(f);
+                            if (*multi_button->selection == multi_button->button_value) {
+                                if (multi_button->draw_style != 0) {
+                                    animate::Set_Animation_Frame_(multi_button->pic, 1);
+                                } else {
+                                    animate::Reset_Animation_Frame_(multi_button->pic);
+                                    animate::Draw_(f->x, f->y, multi_button->pic);
+                                }
+                                animate::Draw_(f->x, f->y, multi_button->pic);
+                                if (multi_button->help != nullptr && *multi_button->help != '\0') {
+                                    fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                    int16_t h = fonts::Get_Font_Height_() - 1;
+                                    fonts::Print_Centered_(
+                                        f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
+                                        f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
+                                        multi_button->help
+                                    );
+                                }
                             } else {
-                                animate::Reset_Animation_Frame_(f->detail.multibtn.pic);
-                                animate::Draw_(f->x, f->y, f->detail.multibtn.pic);
-                            }
-                            animate::Draw_(f->x, f->y, f->detail.multibtn.pic);
-                            if (f->detail.multibtn.help != nullptr && *f->detail.multibtn.help != '\0') {
-                                fonts::Set_Font_Style_(f->font_style, f->font_color);
-                                int16_t h = fonts::Get_Font_Height_() - 1;
-                                fonts::Print_Centered_(
-                                    f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
-                                    f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
-                                    f->detail.multibtn.help
-                                );
-                            }
-                        } else {
-                            animate::Reset_Animation_Frame_(f->detail.multibtn.pic);
-                            animate::Draw_(f->x, f->y, f->detail.multibtn.pic);
-                            if (f->detail.multibtn.help != nullptr && *f->detail.multibtn.help != '\0') {
-                                fonts::Set_Font_Style_(f->font_style, f->font_color);
-                                int16_t h = fonts::Get_Font_Height_() - 1;
-                                fonts::Print_Centered_(
-                                    f->x + (f->x_end - f->x) / 2,
-                                    f->y + (f->y_end - f->y) / 2 - h / 2,
-                                    f->detail.multibtn.help
-                                );
+                                animate::Reset_Animation_Frame_(multi_button->pic);
+                                animate::Draw_(f->x, f->y, multi_button->pic);
+                                if (multi_button->help != nullptr && *multi_button->help != '\0') {
+                                    fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                    int16_t h = fonts::Get_Font_Height_() - 1;
+                                    fonts::Print_Centered_(
+                                        f->x + (f->x_end - f->x) / 2,
+                                        f->y + (f->y_end - f->y) / 2 - h / 2,
+                                        multi_button->help
+                                    );
+                                }
                             }
                         }
                         break;
                     case FIELD_TYPE_LEGACY_INPUT:
                         if (_down_mouse_button != i) {
+                            s_field_input_string* legacy_input = Field_Data_Legacy_Input_(f);
                             fonts::Set_Font_Style_(f->font_style, f->font_color);
-                            fonts::Set_Font_Highlight_Colors_(f->detail.input.highlight_color);
-                            if (f->detail.input.background_color != 0) {
-                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.input.background_color));
+                            fonts::Set_Font_Highlight_Colors_(legacy_input->highlight_color);
+                            if (legacy_input->background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(legacy_input->background_color));
                             }
-                            if (f->detail.input.draw_style == 0) {
-                                fonts::Print_(f->x, f->y, f->detail.input.buffer);
+                            if (legacy_input->draw_style == 0) {
+                                fonts::Print_(f->x, f->y, legacy_input->buffer);
                             } else {
-                                fonts::Print_Right_(f->x_end, f->y, f->detail.input.buffer);
+                                fonts::Print_Right_(f->x_end, f->y, legacy_input->buffer);
                             }
                         }
                         break;
                     case FIELD_TYPE_SCROLL: {
-                        int16_t return_val = f->detail.scroll.return_value;
-                        int16_t set_val = f->detail.scroll.set_value;
-                        int16_t val = *f->detail.scroll.value;
+                        s_field_scroll* scroll = Field_Data_Scroll_(f);
+                        int16_t return_val = scroll->return_value;
+                        int16_t set_val = scroll->set_value;
+                        int16_t val = *scroll->value;
                         
                         if (val < return_val) {
                             val = return_val;
@@ -1838,10 +1917,11 @@ namespace fields {
                         if (val > set_val) {
                             val = set_val;
                         }
-                        *f->detail.scroll.value = val;
+                        *scroll->value = val;
                         break;
                     }
                     case FIELD_TYPE_STRING_LIST: {
+                        s_field_string_list* string_list = Field_Data_String_List_(f);
                         fonts::Set_Font_Style_(f->font_style, f->font_color);
                         int16_t spacing = fonts::Get_Font_Vertical_Spacing_() / 2;
                         if (spacing == 0) {
@@ -1849,32 +1929,33 @@ namespace fields {
                         }
                         int16_t font_height = fonts::Get_Font_Height_();
 
-                        if (*f->detail.strings.value == f->detail.strings.help_start) {
+                        if (*string_list->value == string_list->help_start) {
                             graphics::Gradient_Fill_(
                                 f->x - 1,
                                 f->y - spacing + 1,
                                 f->x_end,
                                 f->y + font_height + 1,
-                                f->detail.strings.gradient_mode,
-                                f->detail.strings.gradient_palette,
-                                f->detail.strings.gradient_extra,
-                                f->detail.strings.gradient_pic,
-                                f->detail.strings.gradient_colors
+                                string_list->gradient_mode,
+                                string_list->gradient_palette,
+                                string_list->gradient_extra,
+                                string_list->gradient_pic,
+                                string_list->gradient_colors
                             );
-                            if (f->detail.strings.gradient_mode == 17) {
-                                fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
+                            if (string_list->gradient_mode == 17) {
+                                fonts::Set_Font_Style_(f->font_style, string_list->highlight_color);
                             }
-                            fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
-                        } else if (f->detail.strings.is_selectable == 0) {
-                            fonts::Set_Font_Style_(f->font_style, f->detail.strings.gradient_colors);
-                            fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
+                            fonts::Print_(f->x, f->y + 1, string_list->help);
+                        } else if (string_list->is_selectable == 0) {
+                            fonts::Set_Font_Style_(f->font_style, string_list->gradient_colors);
+                            fonts::Print_(f->x, f->y + 1, string_list->help);
                         } else {
-                            fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
+                            fonts::Print_(f->x, f->y + 1, string_list->help);
                         }
                         break;
                     }
                     case FIELD_TYPE_CONTINUOUS_INPUT: {
-                        int16_t shadow_style = f->detail.cont_input.font_shadow_style;
+                        s_field_cont_input* cont_input = Field_Data_Continuous_Input_(f);
+                        int16_t shadow_style = cont_input->font_shadow_style;
                         if (_active_input_field_number == i) {
                             if (shadow_style == -1) {
                                 fonts::Set_Font_Style_Shadow_Down_(f->font_style, f->font_color);
@@ -1886,11 +1967,11 @@ namespace fields {
                                 fonts::Set_Font_Style_(f->font_style, f->font_color);
                             }
 
-                            fonts::Set_Font_Highlight_Colors_(f->detail.cont_input.highlight_color);
+                            fonts::Set_Font_Highlight_Colors_(cont_input->highlight_color);
                             fonts::Set_Highlight_Colors_On_();
 
-                            if (f->detail.cont_input.background_color != 0) {
-                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.cont_input.background_color));
+                            if (cont_input->background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(cont_input->background_color));
                             }
 
                             int16_t pos = _cursor_position / 2;
@@ -1906,7 +1987,7 @@ namespace fields {
                                 if (pos == 0) {
                                     int16_t len = 0;
                                     if (_continuous_string[0] != '_') {
-                                        while (len < f->detail.cont_input.max_length && _continuous_string[len] != '_') {
+                                        while (len < cont_input->max_length && _continuous_string[len] != '_') {
                                             len++;
                                         }
                                     }
@@ -1914,19 +1995,19 @@ namespace fields {
                                 } else {
                                     int16_t len = 0;
                                     if (_continuous_string[0] != '\0') {
-                                        while (len < f->detail.cont_input.max_length - 1 && _continuous_string[len] != '\0') {
+                                        while (len < cont_input->max_length - 1 && _continuous_string[len] != '\0') {
                                             len++;
                                         }
                                     }
-                                    if (len < f->detail.cont_input.max_length - 1) {
+                                    if (len < cont_input->max_length - 1) {
                                         _continuous_string[len] = '_';
                                         _continuous_string[len + 1] = '\0';
                                     }
                                 }
                             }
 
-                            if (f->detail.cont_input.pic != nullptr) {
-                                animate::Draw_(f->x, f->y, f->detail.cont_input.pic);
+                            if (cont_input->pic != nullptr) {
+                                animate::Draw_(f->x, f->y, cont_input->pic);
                             }
 
                             int16_t height = f->y_end - f->y;
@@ -1949,16 +2030,16 @@ namespace fields {
                                 fonts::Set_Font_Style_(f->font_style, f->font_color);
                             }
 
-                            if (f->detail.cont_input.background_color != 0) {
-                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.cont_input.background_color));
+                            if (cont_input->background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(cont_input->background_color));
                             }
 
                             int16_t height = f->y_end - f->y;
                             int16_t font_height = fonts::Get_Font_Height_();
                             if (height > font_height) {
-                                fonts::Print_(f->x + 10, f->y + (height / 2) - (font_height / 2), f->detail.cont_input.buffer);
+                                fonts::Print_(f->x + 10, f->y + (height / 2) - (font_height / 2), cont_input->buffer);
                             } else {
-                                fonts::Print_(f->x + 10, f->y, f->detail.cont_input.buffer);
+                                fonts::Print_(f->x + 10, f->y, cont_input->buffer);
                             }
                         }
                         break;
@@ -2019,7 +2100,7 @@ namespace fields {
 
                 if ((type_down != FIELD_TYPE_MULTI_BUTTON || _fields[field_idx].field_type == FIELD_TYPE_MULTI_BUTTON) &&
                     (type_down != FIELD_TYPE_STRING_LIST || (_fields[field_idx].field_type == FIELD_TYPE_STRING_LIST &&
-                                         _fields[field_idx].detail.strings.is_selectable != 0))) {
+                                         Field_Data_String_List_(&_fields[field_idx])->is_selectable != 0))) {
                     Draw_Field_(down_idx, 0);
                 }
 
@@ -2048,9 +2129,10 @@ namespace fields {
 
     void __cdecl Copy_Continuous_String_() {
         int16_t len = 0;
+        s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[_active_input_field_number]);
 
         if (_continuous_string[0] != '\0') {
-            int16_t max_len = _fields[_active_input_field_number].detail.cont_input.max_length;
+            int16_t max_len = cont_input->max_length;
             do {
                 if (len >= max_len) {
                     break;
@@ -2065,7 +2147,7 @@ namespace fields {
 
         _continuous_string[len] = '\0';
 
-        strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+        strcpy(cont_input->buffer, _continuous_string);
     }
 
     void __cdecl Draw_Visible_Fields_() {
@@ -2086,137 +2168,174 @@ namespace fields {
 
                 switch (_fields[i].field_type) {
                     case FIELD_TYPE_BUTTON: {
-                        animate::Reset_Animation_Frame_(_fields[i].detail.button.pic);
-                        animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.button.pic);
-                        if (_fields[i].detail.button.help != nullptr && _fields[i].detail.button.help[0] != '\0') {
+                        s_field_button* button = Field_Data_Button_(&_fields[i]);
+                        animate::Reset_Animation_Frame_(button->pic);
+                        animate::Draw_(_fields[i].x, _fields[i].y, button->pic);
+                        if (button->help != nullptr && button->help[0] != '\0') {
                             fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                             int font_height = fonts::Get_Font_Height_();
                             int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
                             int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
-                            fonts::Print_Centered_(cx, cy, _fields[i].detail.button.help);
+                            fonts::Print_Centered_(cx, cy, button->help);
                         }
                         break;
                     }
                     case FIELD_TYPE_RADIO:
+                        {
+                            s_field_radio* radio = Field_Data_Radio_(&_fields[i]);
+                            if (*radio->selection == 0) {
+                                animate::Reset_Animation_Frame_(radio->pic);
+                                animate::Draw_(_fields[i].x, _fields[i].y, radio->pic);
+                                if (radio->help != nullptr && radio->help[0] != '\0') {
+                                    fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                                    int font_height = fonts::Get_Font_Height_();
+                                    int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
+                                    int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
+                                    fonts::Print_Centered_(cx, cy, radio->help);
+                                }
+                            } else {
+                                if (radio->draw_style != 0) {
+                                    animate::Set_Animation_Frame_(radio->pic, 1);
+                                } else {
+                                    animate::Reset_Animation_Frame_(radio->pic);
+                                    animate::Draw_(_fields[i].x, _fields[i].y, radio->pic);
+                                }
+                                animate::Draw_(_fields[i].x, _fields[i].y, radio->pic);
+                                if (radio->help != nullptr && radio->help[0] != '\0') {
+                                    fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                                    int font_height = fonts::Get_Font_Height_();
+                                    int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2 + _selected_button_text_x_offset;
+                                    int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2) + _selected_button_text_y_offset;
+                                    fonts::Print_Centered_(cx, cy, radio->help);
+                                }
+                            }
+                        }
+                        break;
                     case FIELD_TYPE_LOCKED: {
-                        if (*_fields[i].detail.radio.selection == 0) {
-                            animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
-                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
-                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                        s_field_locked* locked = Field_Data_Locked_Button_(&_fields[i]);
+                        if (*locked->selection == 0) {
+                            animate::Reset_Animation_Frame_(locked->pic);
+                            animate::Draw_(_fields[i].x, _fields[i].y, locked->pic);
+                            if (locked->help != nullptr && locked->help[0] != '\0') {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                                 int font_height = fonts::Get_Font_Height_();
                                 int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
                                 int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
-                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                                fonts::Print_Centered_(cx, cy, locked->help);
                             }
                         } else {
-                            if (_fields[i].detail.radio.draw_style != 0) {
-                                animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
+                            if (locked->draw_style != 0) {
+                                animate::Set_Animation_Frame_(locked->pic, 1);
                             } else {
-                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
-                                animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
+                                animate::Reset_Animation_Frame_(locked->pic);
+                                animate::Draw_(_fields[i].x, _fields[i].y, locked->pic);
                             }
-                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
-                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                            animate::Draw_(_fields[i].x, _fields[i].y, locked->pic);
+                            if (locked->help != nullptr && locked->help[0] != '\0') {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                                 int font_height = fonts::Get_Font_Height_();
                                 int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2 + _selected_button_text_x_offset;
                                 int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2) + _selected_button_text_y_offset;
-                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                                fonts::Print_Centered_(cx, cy, locked->help);
                             }
                         }
                         break;
                     }
                     case FIELD_TYPE_MULTI_BUTTON: {
-                        if (*_fields[i].detail.multibtn.selection == _fields[i].detail.multibtn.button_value) {
-                            if (_fields[i].detail.multibtn.draw_style != 0) {
-                                animate::Set_Animation_Frame_(_fields[i].detail.multibtn.pic, 1);
+                        s_field_multi_button* multi_button = Field_Data_Multi_Button_(&_fields[i]);
+                        if (*multi_button->selection == multi_button->button_value) {
+                            if (multi_button->draw_style != 0) {
+                                animate::Set_Animation_Frame_(multi_button->pic, 1);
                             } else {
-                                animate::Reset_Animation_Frame_(_fields[i].detail.multibtn.pic);
-                                animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.multibtn.pic);
+                                animate::Reset_Animation_Frame_(multi_button->pic);
+                                animate::Draw_(_fields[i].x, _fields[i].y, multi_button->pic);
                             }
-                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.multibtn.pic);
-                            if (_fields[i].detail.multibtn.help != nullptr && _fields[i].detail.multibtn.help[0] != '\0') {
+                            animate::Draw_(_fields[i].x, _fields[i].y, multi_button->pic);
+                            if (multi_button->help != nullptr && multi_button->help[0] != '\0') {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                                 int font_height = fonts::Get_Font_Height_();
                                 int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2 + _selected_button_text_x_offset;
                                 int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2) + _selected_button_text_y_offset;
-                                fonts::Print_Centered_(cx, cy, _fields[i].detail.multibtn.help);
+                                fonts::Print_Centered_(cx, cy, multi_button->help);
                             }
                         } else {
-                            animate::Reset_Animation_Frame_(_fields[i].detail.multibtn.pic);
-                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.multibtn.pic);
-                            if (_fields[i].detail.multibtn.help != nullptr && _fields[i].detail.multibtn.help[0] != '\0') {
+                            animate::Reset_Animation_Frame_(multi_button->pic);
+                            animate::Draw_(_fields[i].x, _fields[i].y, multi_button->pic);
+                            if (multi_button->help != nullptr && multi_button->help[0] != '\0') {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                                 int font_height = fonts::Get_Font_Height_();
                                 int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
                                 int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
-                                fonts::Print_Centered_(cx, cy, _fields[i].detail.multibtn.help);
+                                fonts::Print_Centered_(cx, cy, multi_button->help);
                             }
                         }
                         break;
                     }
                     case FIELD_TYPE_LEGACY_INPUT: {
+                        s_field_input_string* legacy_input = Field_Data_Legacy_Input_(&_fields[i]);
                         if (_down_mouse_button != i) {
                             fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
-                            fonts::Set_Font_Highlight_Colors_(_fields[i].detail.input.highlight_color);
-                            if (_fields[i].detail.input.background_color != 0) {
-                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.input.background_color);
+                            fonts::Set_Font_Highlight_Colors_(legacy_input->highlight_color);
+                            if (legacy_input->background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)legacy_input->background_color);
                             }
-                            if (_fields[i].detail.input.draw_style == 0) {
-                                fonts::Print_(_fields[i].x, _fields[i].y, _fields[i].detail.input.buffer);
+                            if (legacy_input->draw_style == 0) {
+                                fonts::Print_(_fields[i].x, _fields[i].y, legacy_input->buffer);
                             } else {
-                                fonts::Print_Right_(_fields[i].x_end, _fields[i].y, _fields[i].detail.input.buffer);
+                                fonts::Print_Right_(_fields[i].x_end, _fields[i].y, legacy_input->buffer);
                             }
                         }
                         break;
                     }
                     case FIELD_TYPE_SCROLL: {
-                        int16_t ret_val = _fields[i].detail.scroll.return_value;
-                        int16_t max_val = _fields[i].detail.scroll.set_value;
-                        int16_t cur_val = *_fields[i].detail.scroll.value;
+                        s_field_scroll* scroll = Field_Data_Scroll_(&_fields[i]);
+                        int16_t ret_val = scroll->return_value;
+                        int16_t max_val = scroll->set_value;
+                        int16_t cur_val = *scroll->value;
                         if (cur_val < ret_val) {
                             cur_val = ret_val;
                         }
                         if (max_val < cur_val) {
                             cur_val = max_val;
                         }
-                        *_fields[i].detail.scroll.value = cur_val;
+                        *scroll->value = cur_val;
                         break;
                     }
                     case FIELD_TYPE_STRING_LIST: {
+                        s_field_string_list* string_list = Field_Data_String_List_(&_fields[i]);
                         fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                         int spacing = fonts::Get_Font_Vertical_Spacing_() / 2;
                         if (spacing == 0) {
                             spacing = 1;
                         }
                         int font_height = fonts::Get_Font_Height_();
-                        if (*_fields[i].detail.strings.value == _fields[i].detail.strings.help_start) {
+                        if (*string_list->value == string_list->help_start) {
                             graphics::Gradient_Fill_(
                                 _fields[i].x - 1,
                                 (_fields[i].y - spacing) + 1,
                                 _fields[i].x_end,
                                 _fields[i].y + font_height + 1,
-                                _fields[i].detail.strings.gradient_mode,
-                                _fields[i].detail.strings.gradient_palette,
-                                _fields[i].detail.strings.gradient_extra,
-                                _fields[i].detail.strings.gradient_pic,
-                                _fields[i].detail.strings.gradient_colors
+                                string_list->gradient_mode,
+                                string_list->gradient_palette,
+                                string_list->gradient_extra,
+                                string_list->gradient_pic,
+                                string_list->gradient_colors
                             );
-                            if (_fields[i].detail.strings.gradient_mode == 17) {
-                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.highlight_color);
+                            if (string_list->gradient_mode == 17) {
+                                fonts::Set_Font_Style_(_fields[i].font_style, string_list->highlight_color);
                             }
-                            fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
-                        } else if (_fields[i].detail.strings.is_selectable == 0) {
-                            fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].detail.strings.gradient_colors);
-                            fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
+                            fonts::Print_(_fields[i].x, _fields[i].y + 1, string_list->help);
+                        } else if (string_list->is_selectable == 0) {
+                            fonts::Set_Font_Style_(_fields[i].font_style, string_list->gradient_colors);
+                            fonts::Print_(_fields[i].x, _fields[i].y + 1, string_list->help);
                         } else {
-                            fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
+                            fonts::Print_(_fields[i].x, _fields[i].y + 1, string_list->help);
                         }
                         break;
                     }
                     case FIELD_TYPE_CONTINUOUS_INPUT: {
-                        int shadow_style = _fields[i].detail.cont_input.font_shadow_style;
+                        s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[i]);
+                        int shadow_style = cont_input->font_shadow_style;
                         if (i != _active_input_field_number) {
                             if (shadow_style == -1) {
                                 fonts::Set_Font_Style_Shadow_Down_(_fields[i].font_style, _fields[i].font_color);
@@ -2228,16 +2347,16 @@ namespace fields {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                             }
 
-                            if (_fields[i].detail.cont_input.background_color != 0) {
-                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.cont_input.background_color);
+                            if (cont_input->background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)cont_input->background_color);
                             }
 
                             int font_height = fonts::Get_Font_Height_();
                             if (font_height < _fields[i].y_end - _fields[i].y) {
                                 int y_centered = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - (font_height / 2);
-                                fonts::Print_(_fields[i].x + 10, y_centered, _fields[i].detail.cont_input.buffer);
+                                fonts::Print_(_fields[i].x + 10, y_centered, cont_input->buffer);
                             } else {
-                                fonts::Print_(_fields[i].x + 10, _fields[i].y, _fields[i].detail.cont_input.buffer);
+                                fonts::Print_(_fields[i].x + 10, _fields[i].y, cont_input->buffer);
                             }
                         } else {
                             if (shadow_style == -1) {
@@ -2250,11 +2369,11 @@ namespace fields {
                                 fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
                             }
 
-                            fonts::Set_Font_Highlight_Colors_(_fields[i].detail.cont_input.highlight_color);
+                            fonts::Set_Font_Highlight_Colors_(cont_input->highlight_color);
                             fonts::Set_Highlight_Colors_On_();
 
-                            if (_fields[i].detail.cont_input.background_color != 0) {
-                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.cont_input.background_color);
+                            if (cont_input->background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)cont_input->background_color);
                             }
 
                             int cur_pos = _cursor_position / 2;
@@ -2268,23 +2387,23 @@ namespace fields {
                             if (cursor_changed) {
                                 if (cur_pos == 0) {
                                     int len = 0;
-                                    while (len < _fields[i].detail.cont_input.max_length - 1 && _continuous_string[len] != '_') {
+                                    while (len < cont_input->max_length - 1 && _continuous_string[len] != '_') {
                                         len++;
                                     }
                                     _continuous_string[len] = '\0';
                                 } else {
                                     int len = 0;
-                                    while (len < _fields[i].detail.cont_input.max_length - 2 && _continuous_string[len] != '\0') {
+                                    while (len < cont_input->max_length - 2 && _continuous_string[len] != '\0') {
                                         len++;
                                     }
-                                    if (len < _fields[i].detail.cont_input.max_length - 1) {
+                                    if (len < cont_input->max_length - 1) {
                                         strcat(_continuous_string, "_");
                                     }
                                 }
                             }
 
-                            if (_fields[i].detail.cont_input.pic != nullptr) {
-                                animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.cont_input.pic);
+                            if (cont_input->pic != nullptr) {
+                                animate::Draw_(_fields[i].x, _fields[i].y, cont_input->pic);
                             }
 
                             int font_height = fonts::Get_Font_Height_();
@@ -2339,12 +2458,13 @@ namespace fields {
             }
 
             if (_fields[i].field_type == FIELD_TYPE_MULTI_HOTKEY) {
-                int16_t help_start = _fields[i].detail.multi_hotkey.help_start;
+                s_field_multi_hotkey* multi_hotkey = Field_Data_Multi_Hot_Key_(&_fields[i]);
+                int16_t help_start = multi_hotkey->help_start;
 
-                if (_fields[i].detail.multi_hotkey.help[help_start] == hotkey) {
-                    _fields[i].detail.multi_hotkey.help_start++;
+                if (multi_hotkey->help[help_start] == hotkey) {
+                    multi_hotkey->help_start++;
 
-                    if (_fields[i].detail.multi_hotkey.help_start == _fields[i].detail.multi_hotkey.help_len) {
+                    if (multi_hotkey->help_start == multi_hotkey->help_len) {
                         result = i;
                     }
                 }
@@ -2357,7 +2477,7 @@ namespace fields {
     void __cdecl Clear_Multi_Hot_Key_Offsets_() {
         for (int16_t i = 0; i < _fields_count; ++i) {
             if (_fields[i].field_type == FIELD_TYPE_MULTI_HOTKEY) {
-                _fields[i].detail.multi_hotkey.help_start = 0;
+                Field_Data_Multi_Hot_Key_(&_fields[i])->help_start = 0;
             }
         }
     }
@@ -2463,9 +2583,10 @@ namespace fields {
 
     void __cdecl Increment_Scroll_Bar_(int16_t field_idx) {
         s_field* field = &_fields[field_idx];
-        int16_t range_min = field->detail.scroll.range_min;
-        int16_t* value_ptr = field->detail.scroll.value;
-        int32_t range_diff = field->detail.scroll.range_max - range_min;
+        s_field_scroll* scroll = Field_Data_Scroll_(field);
+        int16_t range_min = scroll->range_min;
+        int16_t* value_ptr = scroll->value;
+        int32_t range_diff = scroll->range_max - range_min;
 
         int32_t percent = (((int32_t)*value_ptr - (int32_t)range_min) * 100) / range_diff + 5;
 
@@ -2473,32 +2594,33 @@ namespace fields {
         if (percent <= 100) {
             new_val = (int16_t)(range_min + ((percent * range_diff) / 100));
         } else {
-            new_val = field->detail.scroll.set_value;
+            new_val = scroll->set_value;
         }
 
-        if (new_val > field->detail.scroll.set_value) {
-            new_val = field->detail.scroll.set_value;
+        if (new_val > scroll->set_value) {
+            new_val = scroll->set_value;
         }
 
         *value_ptr = new_val;
     }
 
     void __cdecl Decrement_Scroll_Bar_(int16_t field_idx) {
-        int16_t range_min = _fields[field_idx].detail.scroll.range_min;
-        int16_t* value_ptr = _fields[field_idx].detail.scroll.value;
-        int16_t range = _fields[field_idx].detail.scroll.range_max - range_min;
+        s_field_scroll* scroll = Field_Data_Scroll_(&_fields[field_idx]);
+        int16_t range_min = scroll->range_min;
+        int16_t* value_ptr = scroll->value;
+        int16_t range = scroll->range_max - range_min;
 
         int16_t pct = (int16_t)((((*value_ptr - range_min) * 100) / range) - 5);
 
         int16_t new_value;
         if (pct < 0) {
-            new_value = _fields[field_idx].detail.scroll.return_value;
+            new_value = scroll->return_value;
         } else {
             new_value = range_min + (int16_t)(((int32_t)pct * range) / 100);
         }
 
-        if (new_value < _fields[field_idx].detail.scroll.return_value) {
-            new_value = _fields[field_idx].detail.scroll.return_value;
+        if (new_value < scroll->return_value) {
+            new_value = scroll->return_value;
         }
 
         *value_ptr = new_value;
@@ -2516,140 +2638,154 @@ namespace fields {
             case FIELD_TYPE_IRREGULAR_BUTTON: {
                 int16_t x_pos;
                 int16_t y_pos;
+                const char* help_text;
+                s_animation_header* pic;
+                int16_t draw_style;
 
                 if (field->field_type == FIELD_TYPE_IRREGULAR_BUTTON) {
-                    x_pos = field->detail.button.help_start;
-                    y_pos = field->detail.button.background_color;
+                    const s_field_irregular_button* irregular_button = Field_Data_Irregular_Button_(field);
+                    x_pos = irregular_button->draw_x;
+                    y_pos = irregular_button->draw_y;
+                    help_text = irregular_button->help;
+                    pic = irregular_button->pic;
+                    draw_style = irregular_button->draw_style;
                 } else {
+                    const s_field_button* button = Field_Data_Button_(field);
                     x_pos = field->x;
                     y_pos = field->y;
+                    help_text = button->help;
+                    pic = button->pic;
+                    draw_style = button->draw_style;
                 }
 
                 if (action == 0) {
-                    animate::Reset_Animation_Frame_(field->detail.button.pic);
-                    animate::Draw_(x_pos, y_pos, field->detail.button.pic);
+                    animate::Reset_Animation_Frame_(pic);
+                    animate::Draw_(x_pos, y_pos, pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.button.help
+                        help_text
                     );
                 } else {
-                    if (field->detail.button.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.button.pic);
-                        animate::Draw_(x_pos, y_pos, field->detail.button.pic);
+                    if (draw_style == 0) {
+                        animate::Reset_Animation_Frame_(pic);
+                        animate::Draw_(x_pos, y_pos, pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                        animate::Set_Animation_Frame_(pic, 1);
                     }
-                    animate::Draw_(x_pos, y_pos, field->detail.button.pic);
+                    animate::Draw_(x_pos, y_pos, pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.button.help
+                        help_text
                     );
                 }
                 break;
             }
             case FIELD_TYPE_RADIO: {
-                if (action != 0 && *field->detail.radio.selection != 1) {
-                    if (field->detail.radio.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.radio.pic);
-                        animate::Draw_(field->x, field->y, field->detail.radio.pic);
+                const s_field_radio* radio = Field_Data_Radio_(field);
+                if (action != 0 && *radio->selection != 1) {
+                    if (radio->draw_style == 0) {
+                        animate::Reset_Animation_Frame_(radio->pic);
+                        animate::Draw_(field->x, field->y, radio->pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.radio.pic, 1);
+                        animate::Set_Animation_Frame_(radio->pic, 1);
                     }
-                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
+                    animate::Draw_(field->x, field->y, radio->pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.radio.help
+                        radio->help
                     );
                 } else {
-                    animate::Reset_Animation_Frame_(field->detail.radio.pic);
-                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
+                    animate::Reset_Animation_Frame_(radio->pic);
+                    animate::Draw_(field->x, field->y, radio->pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.radio.help
+                        radio->help
                     );
                 }
                 break;
             }
             case FIELD_TYPE_LOCKED: {
-                if (*field->detail.radio.selection == 0 && action != 1) {
-                    animate::Reset_Animation_Frame_(field->detail.radio.pic);
-                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
+                const s_field_locked* locked = Field_Data_Locked_Button_(field);
+                if (*locked->selection == 0 && action != 1) {
+                    animate::Reset_Animation_Frame_(locked->pic);
+                    animate::Draw_(field->x, field->y, locked->pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.radio.help
+                        locked->help
                     );
                 } else {
-                    if (field->detail.radio.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.radio.pic);
-                        animate::Draw_(field->x, field->y, field->detail.radio.pic);
+                    if (locked->draw_style == 0) {
+                        animate::Reset_Animation_Frame_(locked->pic);
+                        animate::Draw_(field->x, field->y, locked->pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.radio.pic, 1);
+                        animate::Set_Animation_Frame_(locked->pic, 1);
                     }
-                    animate::Draw_(field->x, field->y, field->detail.radio.pic);
+                    animate::Draw_(field->x, field->y, locked->pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.radio.help
+                        locked->help
                     );
                 }
                 break;
             }
             case FIELD_TYPE_MULTI_BUTTON: {
+                s_field_multi_button* multi_button = Field_Data_Multi_Button_(field);
                 if (action == 0) {
-                    *field->detail.multibtn.selection = -1000;
+                    *multi_button->selection = -1000;
                 } else {
-                    *field->detail.multibtn.selection = field->detail.multibtn.button_value;
+                    *multi_button->selection = multi_button->button_value;
                 }
 
-                if (*field->detail.multibtn.selection != field->detail.multibtn.button_value) {
-                    animate::Reset_Animation_Frame_(field->detail.multibtn.pic);
-                    animate::Draw_(field->x, field->y, field->detail.multibtn.pic);
+                if (*multi_button->selection != multi_button->button_value) {
+                    animate::Reset_Animation_Frame_(multi_button->pic);
+                    animate::Draw_(field->x, field->y, multi_button->pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
-                        field->detail.multibtn.help
+                        multi_button->help
                     );
                 } else {
-                    if (field->detail.multibtn.draw_style == 0) {
-                        animate::Reset_Animation_Frame_(field->detail.multibtn.pic);
-                        animate::Draw_(field->x, field->y, field->detail.multibtn.pic);
+                    if (multi_button->draw_style == 0) {
+                        animate::Reset_Animation_Frame_(multi_button->pic);
+                        animate::Draw_(field->x, field->y, multi_button->pic);
                     } else {
-                        animate::Set_Animation_Frame_(field->detail.multibtn.pic, 1);
+                        animate::Set_Animation_Frame_(multi_button->pic, 1);
                     }
-                    animate::Draw_(field->x, field->y, field->detail.multibtn.pic);
+                    animate::Draw_(field->x, field->y, multi_button->pic);
 
                     fonts::Set_Font_Style_(field->font_style, field->font_color);
                     int16_t font_height = fonts::Get_Font_Height_();
                     fonts::Print_Centered_(
                         field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
                         field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
-                        field->detail.multibtn.help
+                        multi_button->help
                     );
                 }
                 break;
@@ -2667,27 +2803,28 @@ namespace fields {
                 break;
             }
             case FIELD_TYPE_GRID: {
+                s_field_grid* grid = Field_Data_Grid_(field);
                 _pointer_offset = mouse::Get_Pointer_Offset_();
                 if (action == 1) {
-                    *field->detail.grid.grid_x_ptr = (mouse::Pointer_X_() - field->x + _pointer_offset) / field->detail.grid.step_x;
-                    *field->detail.grid.grid_y_ptr = (mouse::Pointer_Y_() - field->y + _pointer_offset) / field->detail.grid.step_y;
+                    *grid->grid_x_ptr = (mouse::Pointer_X_() - field->x + _pointer_offset) / grid->step_x;
+                    *grid->grid_y_ptr = (mouse::Pointer_Y_() - field->y + _pointer_offset) / grid->step_y;
 
-                    int16_t max_x = (field->x_end - field->x) / field->detail.grid.step_x;
-                    if (max_x < *field->detail.grid.grid_x_ptr) {
-                        *field->detail.grid.grid_x_ptr = max_x;
+                    int16_t max_x = (field->x_end - field->x) / grid->step_x;
+                    if (max_x < *grid->grid_x_ptr) {
+                        *grid->grid_x_ptr = max_x;
                     }
 
-                    int16_t max_y = (field->y_end - field->y) / field->detail.grid.step_y;
-                    if (max_y < *field->detail.grid.grid_y_ptr) {
-                        *field->detail.grid.grid_y_ptr = max_y;
+                    int16_t max_y = (field->y_end - field->y) / grid->step_y;
+                    if (max_y < *grid->grid_y_ptr) {
+                        *grid->grid_y_ptr = max_y;
                     }
 
-                    if (*field->detail.grid.grid_x_ptr < 0) {
-                        *field->detail.grid.grid_x_ptr = 0;
+                    if (*grid->grid_x_ptr < 0) {
+                        *grid->grid_x_ptr = 0;
                     }
 
-                    if (*field->detail.grid.grid_y_ptr < 0) {
-                        *field->detail.grid.grid_y_ptr = 0;
+                    if (*grid->grid_y_ptr < 0) {
+                        *grid->grid_y_ptr = 0;
                     }
                 }
                 break;
@@ -2766,7 +2903,8 @@ namespace fields {
         _cursor_position = 0;
 
         s_field* field = &_fields[field_idx];
-        int16_t max_length = field->detail.input.max_length;
+        s_field_input_string* legacy_input = Field_Data_Legacy_Input_(field);
+        int16_t max_length = legacy_input->max_length;
         int16_t max_width = field->x_end - field->x;
         bool is_editing_started = false;
 
@@ -2774,7 +2912,7 @@ namespace fields {
         fonts::Set_Font_Style_(field->font_style, field->font_color);
 
         char buffer[64];
-        strcpy(buffer, field->detail.input.buffer);
+        strcpy(buffer, legacy_input->buffer);
 
         len = (int16_t)strlen(buffer);
 
@@ -2789,7 +2927,7 @@ namespace fields {
             _cursor_count = max_length;
         }
 
-        strcpy(field->detail.input.buffer, buffer);
+        strcpy(legacy_input->buffer, buffer);
         int16_t font_height = fonts::Get_Font_Height_();
         Display_Input_Field_(field_idx, buffer);
 
@@ -2929,7 +3067,7 @@ namespace fields {
             }
         }
 
-        strcpy(_fields[field_idx].detail.input.buffer, buffer);
+        strcpy(Field_Data_Legacy_Input_(&_fields[field_idx])->buffer, buffer);
 
         if (done != 0) {
             while (mouse::Mouse_Button_() != 0) {
@@ -2946,11 +3084,12 @@ namespace fields {
     void __cdecl Display_Input_Field_(int16_t field_idx, char* input_buffer) {
         char cursor_color_ramp[16];
         char local_40[64];
+        s_field_input_string* legacy_input = Field_Data_Legacy_Input_(&_fields[field_idx]);
 
         timer::Mark_Time_();
         video::Set_Page_Off_();
 
-        strcpy(cursor_color_ramp, _fields[field_idx].detail.input.cursor_color_ramp);
+        strcpy(cursor_color_ramp, legacy_input->cursor_color_ramp);
         strcpy(local_40, input_buffer);
 
         Invoke_Auto_Function_();
@@ -2958,20 +3097,20 @@ namespace fields {
         fonts::Set_Font_Style_(_fields[field_idx].font_style, _fields[field_idx].font_color);
         short font_height = fonts::Get_Font_Height_() - 1;
 
-        if (_fields[field_idx].detail.input.background_color != 0) {
+        if (legacy_input->background_color != 0) {
             graphics::Fill_(
                 _fields[field_idx].x - 1,
                 _fields[field_idx].y,
                 _fields[field_idx].x_end,
                 _fields[field_idx].y_end,
-                static_cast<uint8_t>(_fields[field_idx].detail.input.background_color)
+                static_cast<uint8_t>(legacy_input->background_color)
             );
         }
 
         char char_str[2];
         char_str[1] = '\0';
 
-        short input_mode = _fields[field_idx].detail.input.input_mode;
+        short input_mode = legacy_input->input_mode;
 
         if (input_mode == 0) {
             char_str[0] = local_40[_cursor_count];

@@ -85,7 +85,7 @@ namespace bitmap {
         header->loop_frame = 0;
         header->keyframe_interval = 0;
         header->flags = ANIMATION_DRAW_MODE_BITMAP;
-        header->frame_offsets[0] = kBitmapFrameDataOffset;
+        Animation_Frame_Offsets_(header)[0] = kBitmapFrameDataOffset;
     }
 
     void __cdecl Create_Blank_Bitmap_(int16_t width, int16_t height, void* bitmap) {
@@ -128,7 +128,7 @@ namespace bitmap {
         int32_t height = src_hdr->height;
         int32_t width = src_hdr->width;
 
-        uint8_t* src_pixels = (uint8_t*)src_hdr + src_hdr->frame_offsets[src_hdr->current_frame];
+        uint8_t* src_pixels = Animation_Frame_Data_(src_hdr, src_hdr->current_frame);
 
         if (flip_mode == 0 || flip_mode == 1) {
             if (src_hdr == dst_hdr) {
@@ -153,7 +153,7 @@ namespace bitmap {
         animate::_animation_header = src;
         int16_t width = src->width;
         int16_t height = src->height;
-        uint32_t offset = src->frame_offsets[src->current_frame];
+        uint32_t offset = Animation_Frame_Offsets_(src)[src->current_frame];
 
         Create_Bitmap_Header_(width, height, dst);
 
@@ -171,7 +171,7 @@ namespace bitmap {
         int16_t height = src->height;
         int16_t current_frame = src->current_frame;
 
-        uint8_t* src_pixels = (uint8_t*)src + src->frame_offsets[current_frame];
+        uint8_t* src_pixels = Animation_Frame_Data_(src, current_frame);
         uint8_t* dst_pixels = src_pixels;
 
         if (src != dst) {
@@ -194,7 +194,7 @@ namespace bitmap {
         int16_t width = src->width;
         int16_t height = src->height;
 
-        uint8_t* src_pixels = (uint8_t*)src + src->frame_offsets[src->current_frame];
+        uint8_t* src_pixels = Animation_Frame_Data_(src, src->current_frame);
         uint8_t* dest_pixels;
 
         if (src == dest) {
@@ -214,7 +214,7 @@ namespace bitmap {
     void __cdecl Mask_Out_Bitmap_With_Bitmap_(int16_t x, int16_t y, s_animation_header* dest, s_animation_header* src, int16_t type) {
         animate::_animation_header = src;
 
-        uint8_t* src_frame_data_orig = (uint8_t*)src + src->frame_offsets[src->current_frame];
+        uint8_t* src_frame_data_orig = Animation_Frame_Data_(src, src->current_frame);
         uint8_t* src_ptr = src_frame_data_orig;
 
         if (x < 0) {
@@ -235,7 +235,7 @@ namespace bitmap {
             return;
         }
 
-        uint8_t* dest_frame_data_orig = (uint8_t*)dest + dest->frame_offsets[dest->current_frame];
+        uint8_t* dest_frame_data_orig = Animation_Frame_Data_(dest, dest->current_frame);
         uint8_t* dest_ptr = dest_frame_data_orig;
 
         if (x < 0) {
@@ -300,7 +300,7 @@ namespace bitmap {
         int32_t dy = y2 - y1;
         int32_t line_len = special::isqrt_(dy * dy + dx * dx);
 
-        int32_t frame_offset = img->frame_offsets[img->current_frame];
+        int32_t frame_offset = Animation_Frame_Offsets_(img)[img->current_frame];
         uint8_t* frame_pixels = (uint8_t*)img + frame_offset;
 
         if (x1 == x2 && y1 == y2) {
@@ -484,7 +484,7 @@ namespace bitmap {
             draw_height = kMouseCursorDimension - y;
         }
 
-        uint8_t* src = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
+        uint8_t* src = Animation_Frame_Data_(anim, anim->current_frame);
         int32_t src_idx = 0;
         int32_t dst_idx = x + y * kMouseCursorDimension;
         int32_t dst_skip = kMouseCursorDimension - draw_width;
@@ -564,7 +564,7 @@ namespace bitmap {
 
     void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t start_color, int16_t end_color) {
         animate::_animation_header = anim;
-        uint32_t* pixels = (uint32_t*)((uint8_t*)anim + anim->frame_offsets[anim->current_frame]);
+        uint32_t* pixels = (uint32_t*)Animation_Frame_Data_(anim, anim->current_frame);
         shear::Mask_Bitmap_Colors_Pixels_(pixels, start_color, end_color, 0, anim->width, anim->height);
     }
 
@@ -575,7 +575,7 @@ namespace bitmap {
         int32_t src_height = src_anim->height;
         int32_t src_width = src_anim->width;
 
-        uint8_t* src_pixels = (uint8_t*)src_anim + src_anim->frame_offsets[src_anim->current_frame];
+        uint8_t* src_pixels = Animation_Frame_Data_(src_anim, src_anim->current_frame);
 
         if (x < 0 && -x >= src_width) {
             return;
@@ -602,7 +602,7 @@ namespace bitmap {
 
         int32_t dst_width = dst_anim->width;
         int32_t dst_height = dst_anim->height;
-        uint8_t* dst_pixels = (uint8_t*)dst_anim + dst_anim->frame_offsets[dst_anim->current_frame];
+        uint8_t* dst_pixels = Animation_Frame_Data_(dst_anim, dst_anim->current_frame);
 
         if (y > dst_height) {
             return;
@@ -699,7 +699,7 @@ namespace bitmap {
             return;
         }
 
-        uint8_t* src_frame_ptr = (uint8_t*)src + src->frame_offsets[src->current_frame];
+        uint8_t* src_frame_ptr = Animation_Frame_Data_(src, src->current_frame);
         uint8_t* dst_frame_ptr;
 
         if (src != dst) {
@@ -743,7 +743,7 @@ namespace bitmap {
         animate::_animation_header = src;
         int16_t current_frame = src->current_frame;
         int16_t width = src->width;
-        uint8_t* src_data = (uint8_t*)src + src->frame_offsets[current_frame];
+        uint8_t* src_data = Animation_Frame_Data_(src, current_frame);
         int16_t height = src->height;
 
         uint8_t* dest_data = src_data;
@@ -784,7 +784,7 @@ namespace bitmap {
         int16_t end_y = src->height + y - 1;
         
         if (x_i < dest_width_i && y < dest_height && end_x >= 0 && end_y >= 0) {
-            int32_t frame_offset = src->frame_offsets[src->current_frame];
+            int32_t frame_offset = Animation_Frame_Offsets_(src)[src->current_frame];
             
             int32_t dest_x;
             int16_t src_skip_x;
@@ -932,7 +932,7 @@ namespace bitmap {
         animate::_animation_header = src;
 
         if ((src->flags & ANIMATION_FLAG_DRAW_MODE_MASK) == ANIMATION_DRAW_MODE_BITMAP) {
-            uint8_t* src_pixels = (uint8_t*)src + src->frame_offsets[src->current_frame];
+            uint8_t* src_pixels = Animation_Frame_Data_(src, src->current_frame);
             uint8_t* dst_pixels = (uint8_t*)dest + kBitmapFrameDataOffset;
             struct_::Copy_Structure_(dst_pixels, src_pixels, width * height);
             return;
@@ -950,7 +950,7 @@ namespace bitmap {
 
             for (int32_t frame = start_frame; frame <= animate::_animation_header->current_frame; ++frame) {
                 s_animation_header* anim = animate::_animation_header;
-                uint8_t* frame_data = (uint8_t*)anim + anim->frame_offsets[frame];
+                uint8_t* frame_data = Animation_Frame_Data_(anim, frame);
 
                 int32_t y = reinterpret_cast<const s_packed_frame_header*>(frame_data)->start_y;
                 int32_t word_offset = 2;
@@ -995,7 +995,7 @@ namespace bitmap {
         int16_t width = src->width;
         int16_t height = src->height;
 
-        uint8_t* src_pixels = (uint8_t*)src + src->frame_offsets[src->current_frame];
+        uint8_t* src_pixels = Animation_Frame_Data_(src, src->current_frame);
         uint8_t* dest_pixels;
 
         if (dest == src) {
@@ -1024,7 +1024,7 @@ namespace bitmap {
         const int32_t width = animation_header->width;
         const int32_t height = animation_header->height;
         uint8_t* const frame_pixels =
-            (uint8_t*)animation_header + animation_header->frame_offsets[frame_index];
+            Animation_Frame_Data_(animation_header, frame_index);
 
         replace::_palette_color_list = replace::_graphics_buffer;
         replace::Establish_Color_Gradient_(start_color, end_color);

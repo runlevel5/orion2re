@@ -203,7 +203,7 @@ FILE* fopen_case(const char* path, const char* mode) {
     return nullptr;
 }
 
-void Query_Memory_Status_(MEMORYSTATUS* memory_status) {
+void Query_Memory_Status_(s_memorystatus* memory_status) {
     uint64_t total_phys;
     uint32_t clamped_total_phys;
 

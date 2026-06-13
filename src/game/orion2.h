@@ -239,10 +239,6 @@ struct s_alloc_header {
 
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4200)
-#endif
 struct s_animation_header {
     int16_t width;
     int16_t height;
@@ -252,11 +248,23 @@ struct s_animation_header {
     int8_t keyframe_interval;
     uint8_t unknown_0xa;
     undefined1 flags;
-    uint32_t frame_offsets[0];
 };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+
+inline uint32_t* Animation_Frame_Offsets_(s_animation_header* header) {
+    return reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(header) + sizeof(s_animation_header));
+}
+
+inline const uint32_t* Animation_Frame_Offsets_(const s_animation_header* header) {
+    return reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(header) + sizeof(s_animation_header));
+}
+
+inline uint8_t* Animation_Frame_Data_(s_animation_header* header, int32_t frame) {
+    return reinterpret_cast<uint8_t*>(header) + Animation_Frame_Offsets_(header)[frame];
+}
+
+inline const uint8_t* Animation_Frame_Data_(const s_animation_header* header, int32_t frame) {
+    return reinterpret_cast<const uint8_t*>(header) + Animation_Frame_Offsets_(header)[frame];
+}
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
 
@@ -856,6 +864,8 @@ typedef union s_field_detail s_field_detail, *Ps_field_detail;
 
 typedef struct s_field_button s_field_button, *Ps_field_button;
 
+typedef struct s_field_locked s_field_locked, *Ps_field_locked;
+
 typedef struct s_field_grid s_field_grid, *Ps_field_grid;
 
 typedef struct s_field_radio s_field_radio, *Ps_field_radio;
@@ -874,211 +884,117 @@ typedef struct s_field_circle s_field_circle, *Ps_field_circle;
 
 typedef struct s_field_multi_hotkey s_field_multi_hotkey, *Ps_field_multi_hotkey;
 
+typedef struct s_field_irregular_button s_field_irregular_button, *Ps_field_irregular_button;
+
+typedef struct s_field_hidden s_field_hidden, *Ps_field_hidden;
+
 struct s_field_grid {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    int16_t field2_0x2;
-    struct s_colors *highlight_color;
-    char *help;
     int16_t step_x;
-    undefined field6_0xe;
-    undefined field7_0xf;
     int16_t step_y;
-    undefined field9_0x12;
-    undefined field10_0x13;
     int16_t *grid_x_ptr;
     int16_t *grid_y_ptr;
-    struct s_animation_header *pic;
-    int16_t field14_0x20;
-    undefined field15_0x22;
-    undefined field16_0x23;
 };
 
 struct s_field_circle {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    int16_t field2_0x2;
-    struct s_colors *highlight_color;
     int16_t center_x;
-    undefined field5_0xa;
-    undefined field6_0xb;
     int16_t center_y;
-    undefined field8_0xe;
-    undefined field9_0xf;
     int32_t radius_squared;
 };
 
 struct s_field_scroll {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    int16_t field2_0x2;
-    struct s_colors *highlight_color;
     int16_t return_value;
-    undefined field5_0xa;
-    undefined field6_0xb;
     int16_t set_value;
-    undefined field8_0xe;
-    undefined field9_0xf;
-    int16_t *value;
     int16_t range_min;
-    undefined field12_0x16;
-    undefined field13_0x17;
     int16_t range_max;
-    undefined field15_0x1a;
-    undefined field16_0x1b;
     int16_t is_vertical;
-    undefined field18_0x1e;
-    undefined field19_0x1f;
-    int16_t field20_0x20;
-    undefined field21_0x22;
-    undefined field22_0x23;
+    int16_t *value;
 };
 
 struct s_field_multi_button {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    int16_t field2_0x2;
-    struct s_colors *highlight_color;
     const char *help;
-    int16_t button_value;
-    undefined field8_0xe;
-    undefined field9_0xf;
-    int16_t *selection;
-    int16_t draw_style;
-    undefined field10_0x16;
-    undefined field11_0x17;
-    int32_t field12_0x18;
     struct s_animation_header *pic;
-    int16_t field14_0x20;
-    undefined field15_0x22;
-    undefined field16_0x23;
+    int16_t draw_style;
+    int16_t *selection;
+    int16_t button_value;
 };
 
 struct s_field_button {
-    int16_t field0_0x0;
-    int16_t field2_0x2;
-    struct s_colors *highlight_color;
     const char *help;
-    int16_t help_start;
-    undefined field6_0xe;
-    undefined field7_0xf;
-    int16_t background_color;
-    undefined field9_0x12;
-    undefined field10_0x13;
-    int16_t draw_style;
-    undefined field12_0x16;
-    undefined field13_0x17;
-    int32_t field14_0x18;
     struct s_animation_header *pic;
-    int16_t font_shadow_style;
-    undefined field17_0x22;
-    undefined field18_0x23;
+    int16_t draw_style;
+};
+
+struct s_field_irregular_button {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+    int16_t draw_x;
+    int16_t draw_y;
+};
+
+struct s_field_locked {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+    int16_t *selection;
 };
 
 struct s_field_input_string {
-    int16_t field0_0x0;
-    int16_t field2_0x2;
     struct s_colors *highlight_color;
     char *buffer;
-    int16_t field6_0xc;
-    undefined field7_0xe;
-    undefined field8_0xf;
     int16_t background_color;
-    undefined field10_0x12;
-    undefined field11_0x13;
     int16_t draw_style;
-    undefined field13_0x16;
-    undefined field14_0x17;
     int16_t input_mode;
-    undefined field16_0x1a;
-    undefined field17_0x1b;
     int16_t max_length;
-    undefined field19_0x1e;
-    undefined field20_0x1f;
     char *cursor_color_ramp;
 };
 
 struct s_field_string_list {
-    int16_t gradient_mode;
-    int16_t is_selectable;
     struct s_colors *highlight_color;
     const char *help;
-    int16_t help_start;
-    undefined2 field5_0xe;
     int8_t *value;
+    int16_t help_start;
+    int16_t is_selectable;
+    struct s_colors *gradient_colors;
+    int16_t gradient_mode;
     uint8_t *gradient_palette;
     int32_t gradient_extra;
     struct s_animation_header *gradient_pic;
-    struct s_colors *gradient_colors;
 };
 
 struct s_field_radio {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    int16_t is_active;
-    struct s_colors *highlight_color;
     const char *help;
-    int16_t value;
-    undefined field6_0xe;
-    undefined field7_0xf;
-    int16_t *selection;
-    int16_t draw_style;
-    undefined field10_0x16;
-    undefined field11_0x17;
-    int32_t field12_0x18;
     struct s_animation_header *pic;
-    int16_t field14_0x20;
-    undefined field15_0x22;
-    undefined field16_0x23;
+    int16_t draw_style;
+    int16_t *selection;
 };
 
 struct s_field_cont_input {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    int16_t field2_0x2;
     struct s_colors *highlight_color;
+    int16_t max_length;
     char *buffer;
+    int16_t full_store_flag;
     struct s_animation_header *pic;
     int16_t background_color;
-    undefined field7_0x12;
-    undefined field8_0x13;
-    int16_t full_store_flag;
-    undefined field10_0x16;
-    undefined field11_0x17;
-    int32_t field12_0x18;
-    int16_t max_length;
-    undefined field14_0x1e;
-    undefined field15_0x1f;
     int16_t font_shadow_style;
-    undefined field17_0x22;
-    undefined field18_0x23;
 };
 
 struct s_field_multi_hotkey {
-    int16_t field0_0x0;
-    int16_t field2_0x2;
-    struct s_colors *highlight_color;
     const char *help;
     int16_t help_start;
-    undefined field6_0xe;
-    undefined field7_0xf;
     int16_t help_len;
-    undefined field9_0x12;
-    undefined field10_0x13;
-    int16_t draw_style;
-    undefined field12_0x16;
-    undefined field13_0x17;
-    int32_t field14_0x18;
-    struct s_animation_header *pic;
-    int16_t font_shadow_style;
-    undefined field17_0x22;
-    undefined field18_0x23;
+};
+
+struct s_field_hidden {
+    uint8_t unused;
 };
 
 union s_field_detail {
     struct s_field_button button;
+    struct s_field_irregular_button irregular_button;
     struct s_field_grid grid;
     struct s_field_radio radio;
+    struct s_field_locked locked;
     struct s_field_scroll scroll;
     struct s_field_input_string input;
     struct s_field_cont_input cont_input;
@@ -1086,6 +1002,7 @@ union s_field_detail {
     struct s_field_string_list strings;
     struct s_field_circle circle;
     struct s_field_multi_hotkey multi_hotkey;
+    struct s_field_hidden hidden;
 };
 
 struct s_field {
@@ -3774,29 +3691,7 @@ struct s_smack_video {
     uint32_t rect_height;
 };
 
-typedef int32_t HRESULT;
-
-
-/* WARNING! conflicting data type names: /guiddef.h/GUID - /GUID */
-
-typedef GUID IID;
-
-typedef void *LPVOID;
-
-typedef uint32_t DWORD;
-
-typedef DWORD ULONG;
-
-typedef DWORD *LPDWORD;
-
-
-typedef int32_t LONG;
-
 typedef uint16_t WORD;
-
-typedef struct HWND__ HWND__, *PHWND__;
-
-typedef struct HWND__ *HWND;
 
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
@@ -4183,6 +4078,14 @@ struct s_palette_header {
     int16_t start_index;
     int16_t count;
 };
+
+inline s_palette_header* Animation_Palette_Header_(s_animation_header* header) {
+    return reinterpret_cast<s_palette_header*>(Animation_Frame_Offsets_(header) + header->frame_count + 1);
+}
+
+inline const s_palette_header* Animation_Palette_Header_(const s_animation_header* header) {
+    return reinterpret_cast<const s_palette_header*>(Animation_Frame_Offsets_(header) + header->frame_count + 1);
+}
 
 struct s_packed_frame_header {
     uint16_t unknown_0;

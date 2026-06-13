@@ -3,6 +3,7 @@
 namespace diplomac {
     namespace {
         constexpr std::intptr_t kInvalidTributePlayerMarker = -1599;
+        constexpr std::intptr_t kImpossiblePeaceEndedPlayerMarker = -1839;
     }
 
     int16_t _diplomacy_proposal_system_bribe;
@@ -584,9 +585,9 @@ namespace diplomac {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 if (MOX::_player[i].treaty[j] == 3) {
-                    // REVIEW: This invalid pointer comparison appears to mirror decompiled binary behavior
-                    // and likely stands in for a missing recovered field or flag.
-                    if ((MOX::_player + i) == (s_player*)0xFFFFF8D1) {
+                    // Preserve the original impossible x86 address comparison literally,
+                    // but express it as an integer compare to avoid x64 pointer-cast warnings.
+                    if ((std::intptr_t)(MOX::_player + i) == kImpossiblePeaceEndedPlayerMarker) {
                         MOX::_player[i].treaty[j] = 0;
                         MOX::_player[j].treaty[i] = 0;
                         MSG_::Add_Peace_Ended_Msg_(i, j);

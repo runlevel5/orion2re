@@ -527,7 +527,7 @@ namespace platform {
     }
 
     bool Create_Video_Buffers_(int16_t video_mode) {
-        MEMORYSTATUS mem_status;
+        s_memorystatus mem_status;
         Query_Memory_Status_(&mem_status);
 
         g_video_mode = video_mode;

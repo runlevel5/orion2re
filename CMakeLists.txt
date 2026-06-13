@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(orion2re LANGUAGES C CXX)
 
+include(CTest)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(ORION2RE_TARGET_ARCH x86)
@@ -72,6 +74,8 @@ endif()
 
 set(ORION2RE_VENDORED_SDL3_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/SDL")
 set(ORION2RE_VENDORED_SDL3_COMMIT "8e37db5e797b6167f3a00d697d816a684bd259c7")
+set(ORION2RE_VENDORED_DOCTEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/doctest")
+set(ORION2RE_VENDORED_DOCTEST_COMMIT "1da23a3e8119ec5cce4f9388e91b065e20bf06f5")
 set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
 
 if(MSVC)
@@ -88,11 +92,21 @@ endif()
 option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds" OFF)
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
 option(ORION2RE_ENABLE_NETWORKING "Enable legacy DirectPlay networking" OFF)
+option(ORION2RE_BUILD_TESTS "Build tests" OFF)
+
+set(ORION2RE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests")
 
 if(NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
     message(FATAL_ERROR
         "This project requires the SDL3 submodule at vendors/SDL. "
         "Run 'git submodule update --init --recursive vendors/SDL' and ensure it is pinned to ${ORION2RE_VENDORED_SDL3_COMMIT}."
+    )
+endif()
+
+if(ORION2RE_BUILD_TESTS AND NOT EXISTS "${ORION2RE_VENDORED_DOCTEST_DIR}/doctest/doctest.h")
+    message(FATAL_ERROR
+        "Tests require the doctest submodule at vendors/doctest. "
+        "Run 'git submodule update --init --recursive vendors/doctest' and ensure it is pinned to ${ORION2RE_VENDORED_DOCTEST_COMMIT}."
     )
 endif()
 
@@ -246,4 +260,8 @@ if(ORION2RE_ENABLE_ASAN)
     else()
         message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is unsupported for the current compiler.")
     endif()
+endif()
+
+if(ORION2RE_BUILD_TESTS)
+    include("${ORION2RE_TESTS_DIR}/tests.cmake")
 endif()

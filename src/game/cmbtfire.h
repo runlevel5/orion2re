@@ -1,6 +1,11 @@
 #pragma once
 #include <cstdint>
 
+#define COMBAT_PLANET_DEFENSE_MISSILE_BASE 0x1
+#define COMBAT_PLANET_DEFENSE_GROUND_BATTERIES 0x2
+#define COMBAT_PLANET_DEFENSE_STELLAR_CONVERTER 0x4
+#define COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON 0x8
+
 namespace CMBTFIRE {
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);

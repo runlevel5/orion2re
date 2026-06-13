@@ -193,8 +193,7 @@ namespace remap {
             exitm::Exit_With_Message("Remapped Picture Must Have Palette");
         }
 
-        animate::_palette_header =
-            (s_palette_header*)&animate::_animation_header->frame_offsets[(int32_t)animate::_animation_header->frame_count + 1];
+        animate::_palette_header = Animation_Palette_Header_(animate::_animation_header);
 
         Create_Picture_Remap_Palette_(
             (uint8_t*)animate::_palette_header + sizeof(*animate::_palette_header),
@@ -217,8 +216,7 @@ namespace remap {
             exitm::Exit_With_Message("Get_Picture_Color  Picture Must Have Palette");
         }
 
-        animate::_palette_header =
-            (s_palette_header*)&animate::_animation_header->frame_offsets[(int32_t)animate::_animation_header->frame_count + 1];
+        animate::_palette_header = Animation_Palette_Header_(animate::_animation_header);
 
         const int32_t palette_start = animate::_palette_header->start_index;
         const int32_t palette_end = palette_start + animate::_palette_header->count;

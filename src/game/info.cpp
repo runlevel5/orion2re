@@ -444,7 +444,7 @@ namespace INFO {
         int32_t total_pixels = (int32_t)anim->height * (int32_t)anim->width;
 
         if (total_pixels > 0) {
-            uint8_t* pixel_ptr = reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(anim) + anim->frame_offsets[anim->current_frame]);
+            uint8_t* pixel_ptr = Animation_Frame_Data_(anim, anim->current_frame);
 
             while (total_pixels > 0) {
                 uint8_t pixel = *pixel_ptr;

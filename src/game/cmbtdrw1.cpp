@@ -2924,10 +2924,10 @@ skip_cursor:
         int frame = progress % 16;
         animate::Set_Animation_Frame_(MOX::_darken_plasma_map, frame);
 
-        int32_t* darken_frame_offsets = (int32_t*)(MOX::_darken_plasma_map + 1);
+        const uint32_t* darken_frame_offsets = Animation_Frame_Offsets_(MOX::_darken_plasma_map);
         uint8_t* darken_data = (uint8_t*)MOX::_darken_plasma_map + darken_frame_offsets[MOX::_darken_plasma_map->current_frame];
 
-        int32_t* bitmap_frame_offsets = (int32_t*)(bitmap + 1);
+        const uint32_t* bitmap_frame_offsets = Animation_Frame_Offsets_(bitmap);
         uint8_t* bitmap_data = (uint8_t*)bitmap + bitmap_frame_offsets[bitmap->current_frame];
 
         int16_t darkness = 0;

@@ -29,9 +29,9 @@ typedef struct _GUID {
 } GUID;
 #endif
 
-#if !defined(ORION2RE_MEMORYSTATUS_DEFINED)
-#define ORION2RE_MEMORYSTATUS_DEFINED
-struct MEMORYSTATUS {
+#if !defined(ORION2RE_S_MEMORYSTATUS_DEFINED)
+#define ORION2RE_S_MEMORYSTATUS_DEFINED
+struct s_memorystatus {
     uint32_t dwLength;
     uint32_t dwMemoryLoad;
     uint32_t dwTotalPhys;
@@ -46,7 +46,7 @@ struct MEMORYSTATUS {
 bool File_Exists_(const char* path);
 bool Cleanup_Path_(const char* input_path, char* output_path, size_t output_path_size, bool ensure_trailing_separator = false);
 FILE* fopen_case(const char* path, const char* mode);
-void Query_Memory_Status_(MEMORYSTATUS* memory_status);
+void Query_Memory_Status_(s_memorystatus* memory_status);
 int Show_Message_Box_(void* window_handle, const char* text, const char* caption, bool is_error = false);
 
 #if defined(_WIN32)

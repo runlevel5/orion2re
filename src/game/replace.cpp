@@ -12,7 +12,7 @@ namespace replace {
         }
 
         for (int16_t frame = 0; frame < animate::_animation_header->frame_count; frame++) {
-            uint8_t *frame_data = (uint8_t*)animate::_animation_header + animate::_animation_header->frame_offsets[frame];
+            uint8_t *frame_data = Animation_Frame_Data_(animate::_animation_header, frame);
             uint8_t flags = animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK;
 
             switch (flags) {
@@ -99,7 +99,7 @@ namespace replace {
         if (anim->frame_count > 0) {
             for (int16_t frame_idx = 0; frame_idx < animate::_animation_header->frame_count; ++frame_idx) {
                 s_animation_header *current_anim = animate::_animation_header;
-                uint8_t *frame_data = (uint8_t*)current_anim + current_anim->frame_offsets[frame_idx];
+                uint8_t *frame_data = Animation_Frame_Data_(current_anim, frame_idx);
 
                 switch (current_anim->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
                     case ANIMATION_DRAW_MODE_ANIMATED_SPRITE: {
@@ -207,9 +207,7 @@ namespace replace {
 
         if (animate::_animation_header->frame_count > 0) {
             for (int16_t frame = 0; frame < animate::_animation_header->frame_count; frame++) {
-                uint8_t* frame_data =
-                    (uint8_t*)animate::_animation_header +
-                    animate::_animation_header->frame_offsets[frame];
+                uint8_t* frame_data = Animation_Frame_Data_(animate::_animation_header, frame);
 
                 switch (animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
                 case ANIMATION_DRAW_MODE_ANIMATED_SPRITE: {
@@ -291,9 +289,7 @@ namespace replace {
     void __cdecl Shift_Palette_Range_(s_animation_header* anim, int32_t shift) {
         animate::_animation_header = anim;
 
-        uint8_t* pal_header_ptr =
-            (uint8_t*)&anim->frame_offsets[anim->frame_count] + sizeof(anim->frame_offsets[0]);
-        animate::_palette_header = (s_palette_header*)pal_header_ptr;
+        animate::_palette_header = Animation_Palette_Header_(anim);
 
         if (animate::_palette_header->count + shift > 256) {
             exitm::Exit_With_Message("Shift_Palette_Range() exceeds 256 colors");

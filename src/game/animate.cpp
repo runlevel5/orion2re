@@ -92,7 +92,7 @@ namespace animate {
             Set_Animation_Palette_();
         }
 
-        uint8_t* frame_data = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
+        uint8_t* frame_data = Animation_Frame_Data_(anim, anim->current_frame);
 
         int16_t x_end = anim->width + x - 1;
         int16_t y_end = anim->height + y - 1;
@@ -366,9 +366,7 @@ namespace animate {
     }
 
     void __cdecl Set_Animation_Palette_() {
-        _palette_header = (s_palette_header*)(
-            &_animation_header->frame_offsets[_animation_header->frame_count + 1]
-        );
+        _palette_header = Animation_Palette_Header_(_animation_header);
 
         const int16_t start_index = _palette_header->start_index;
         const int16_t count = _palette_header->count;
@@ -469,7 +467,7 @@ namespace animate {
             }
         }
 
-        uint8_t* frame_ptr = (uint8_t*)anim + anim->frame_offsets[anim->current_frame];
+        uint8_t* frame_ptr = Animation_Frame_Data_(anim, anim->current_frame);
 
         if (clipped) {
             if (_dot_stencil_flag == 0) {
@@ -548,7 +546,7 @@ namespace animate {
             Set_Animation_Palette_();
         }
 
-        uint8_t* sprite = (uint8_t*)header + header->frame_offsets[header->current_frame];
+        uint8_t* sprite = Animation_Frame_Data_(header, header->current_frame);
 
         bool is_clipped = false;
 

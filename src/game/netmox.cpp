@@ -548,7 +548,7 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        uint32_t block_size = ptr - block;
+        uint32_t block_size = (uint32_t)(ptr - block);
         uint8_t* send_ptr;
         int32_t send_size;
         s_net_modem_file* file;
@@ -580,7 +580,7 @@ namespace NETMOX {
             uint8_t* current_ptr = send_ptr;
 
             while (current_ptr < send_ptr + send_size) {
-                uint32_t remaining = (send_ptr + send_size) - current_ptr;
+                uint32_t remaining = (uint32_t)((send_ptr + send_size) - current_ptr);
                 uint32_t chunk_size = remaining > 0x7800 ? 0x7800 : remaining;
                 chunk_idx++;
 
@@ -608,7 +608,7 @@ namespace NETMOX {
         if (flag == 0) {
             ptr = buffer + size;
             s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("rb", 0);
-            size = NETMOX::Decode_Difference_Buffer_(file_handle, ptr, 0xE1000 - size, buffer, size);
+            size = NETMOX::Decode_Difference_Buffer_(file_handle, ptr, (int)(0xE1000 - size), buffer, (int)size);
             NETMOX::Close_Modem_File_(file_handle);
 
             if (size == 0) {
@@ -617,7 +617,7 @@ namespace NETMOX {
             }
         }
 
-        s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("wb", size);
+        s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("wb", (uint32_t)size);
         NETMOX::Write_Modem_File_(file_handle, ptr, size);
         NETMOX::Close_Modem_File_(file_handle);
 
@@ -1059,7 +1059,7 @@ namespace NETMOX {
         while (chunk_ptr < out) {
             RUSS::Mox_Update_();
 
-            int32_t chunk_size = out - chunk_ptr;
+            int32_t chunk_size = (int32_t)(out - chunk_ptr);
             if (chunk_size > 0x7800) {
                 chunk_size = 0x7800;
             }
@@ -2236,7 +2236,7 @@ namespace NETMOX {
             RUSS::Mox_Update_();
         }
 
-        int32_t size = local_4 - packet;
+        int32_t size = (int32_t)(local_4 - packet);
         if (size <= 0x8000) {
             NETMOX::Mox_Send_Message_(_net.local_net_id, 0x15, packet, (uint16_t)size);
         } else {
@@ -2256,7 +2256,7 @@ namespace NETMOX {
             uint8_t* ptr = packet;
             while (ptr < local_4) {
                 RUSS::Mox_Update_();
-                int32_t chunk_size = local_4 - ptr;
+                int32_t chunk_size = (int32_t)(local_4 - ptr);
                 if (chunk_size > 0x7800) {
                     chunk_size = 0x7800;
                 }
@@ -2378,7 +2378,7 @@ namespace NETMOX {
             RUSS::Mox_Update_();
         }
 
-        int32_t msg_len = ptr - packet;
+        int32_t msg_len = (int32_t)(ptr - packet);
 
         if (msg_len <= 0x8000) {
             NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 0x12, packet, (uint16_t)msg_len);
@@ -2392,7 +2392,7 @@ namespace NETMOX {
             while (send_ptr < ptr) {
                 RUSS::Mox_Update_();
 
-                int32_t chunk_len = ptr - send_ptr;
+                int32_t chunk_len = (int32_t)(ptr - send_ptr);
                 if (chunk_len > 0x7800) {
                     chunk_len = 0x7800;
                 }

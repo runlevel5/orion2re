@@ -589,8 +589,9 @@ namespace MAINMENU {
     int32_t __cdecl Get_File_Animation_Block_Space_() {
         s_animation_header* header = init::_io_buffer;
         int16_t index = header->current_frame;
-        int32_t current_val = header->frame_offsets[index];
-        int32_t next_val = header->frame_offsets[index + 1];
+        const uint32_t* frame_offsets = Animation_Frame_Offsets_(header);
+        int32_t current_val = frame_offsets[index];
+        int32_t next_val = frame_offsets[index + 1];
         return (next_val - current_val) + 1;
     }
 

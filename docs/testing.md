@@ -11,7 +11,7 @@ The testing plan should therefore:
 - work with the current CMake build
 - require minimal architectural change up front
 - support incremental adoption on tightly coupled legacy code
-- allow narrow test seams and stubs where platform code blocks direct testing
+- allow narrow test seams and fakes where platform code blocks direct testing
 - remain compatible with future refactoring into cleaner internal libraries
 
 The strategy intentionally favors a practical first step over an idealized design.
@@ -63,6 +63,8 @@ For `doctest`, the runner can be as small as:
 #include "doctest/doctest.h"
 ```
 
+In this repository, the header should be provided by the pinned submodule at `vendors/doctest`.
+
 That single translation unit is enough to produce a working test executable once linked with the chosen test sources.
 
 ## Key design decision
@@ -83,69 +85,52 @@ The first testing phase should build test executables from hand-picked productio
 
 This means tests are allowed to compile selected production implementation files directly into the test binary.
 
-## Preferred initial build model
+## Preferred build model
 
-## One test executable, subset build
+## One executable per file under test
 
-Start with one test executable that contains:
+Use separate test executables for each production file or tightly related file cluster under test.
 
-- one `doctest` runner source file
-- a small number of test source files
-- only the production `.cpp` files needed by those tests
-- any required support or stub sources
+Each test executable should contain:
+
+- one shared `doctest` runner source file
+- one primary unit test source file under `tests/unit/`
+- only the production `.cpp` files needed for that test target
+- any reusable fake sources needed for linkage or assertions
 
 ### Why
 
-- lowest setup cost
-- avoids large build-system refactors
-- makes dependency problems visible on a per-module basis
-- lets the team expand coverage only where value is clear
+- improves isolation between unrelated modules
+- keeps source lists and fake dependencies explicit
+- makes it easier to mock or fake only the local seam
+- avoids one large legacy test binary with shared mutable state
+- scales better as more coupled modules become testable
 
-### Example shape
+### Directory shape
 
 ```text
 tests/
   test_main.cpp
-  support/
-    platform_stubs.cpp
-    test_config.h
-  game/
-    test_angle.cpp
-    test_bitio.cpp
-    test_fmtpara.cpp
-third_party/
-  doctest/
-    doctest.h
+  unit/
+    test_fields.cpp
+    test_fields_helpers.cpp
+    test_lbx.cpp
+    test_sound.cpp
+    test_colony.cpp
+  fakes/
+    fake_mmio.cpp
+    fake_sound.cpp
+    fake_video.cpp
+    fake_memory.cpp
 ```
 
-### Example CMake shape
+Not every listed example file must exist immediately. The structure shows the intended organization.
 
-```cmake
-include(CTest)
-option(ORION2RE_BUILD_TESTS "Build tests" ON)
+### CMake organization
 
-if(ORION2RE_BUILD_TESTS)
-    add_executable(orion2re_tests
-        tests/test_main.cpp
-        tests/game/test_angle.cpp
-        tests/game/test_bitio.cpp
-        tests/support/platform_stubs.cpp
+Keep test-target definitions under `cmake/tests/` and include them from the top-level `CMakeLists.txt` only when tests are enabled.
 
-        src/game/angle.cpp
-        src/game/bitio.cpp
-        src/game/estrings.cpp
-    )
-
-    target_include_directories(orion2re_tests PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/src"
-        "${CMAKE_CURRENT_SOURCE_DIR}/third_party"
-    )
-
-    add_test(NAME orion2re_tests COMMAND orion2re_tests)
-endif()
-```
-
-This is only an example. The exact source list should stay intentionally small in the first iteration.
+This keeps the main build focused on production targets while allowing test-only helpers and target factories to live in their own CMake files.
 
 ## Testable code selection strategy
 
@@ -195,23 +180,23 @@ Use the smallest workable mechanism:
 - compile-time seams guarded by local test-only defines when necessary
 - minimal test initialization of required global state
 
-### Link-time stubs
+### Link-time fakes
 
-If a production file calls external functions that are irrelevant to the behavior under test, provide stub definitions in a test support source file.
+If a production file calls external functions that are irrelevant to the behavior under test, provide fake definitions in reusable test support source files.
 
 Example shape:
 
 ```cpp
-extern "C" void plat_log(const char* msg) {
-    (void)msg;
-}
+int16_t fake_pointer_x;
 
-int game_ticks() {
-    return 0;
+namespace mouse {
+    int16_t Pointer_X_() {
+        return fake_pointer_x;
+    }
 }
 ```
 
-This often satisfies linkage without pulling in large platform subsystems.
+These fakes may also expose small helper state so tests can control return values and inspect calls.
 
 ### Wrapper seams
 
@@ -260,16 +245,17 @@ Avoid building large integration scenarios into the very first test harness.
 - add `ORION2RE_BUILD_TESTS` option
 - vendor `doctest`
 - add one test runner source file
-- add one test executable
-- register it with `add_test`
+- add a shared unit-test target helper under `cmake/tests/`
+- add the first per-file test executables
+- register each one with `add_test`
 
 This phase establishes the tooling without forcing broad source movement.
 
 ## Phase 2: subset testing of selected modules
 
-- add a few test files for selected utility modules
-- compile required production `.cpp` files directly into the test target
-- add support stubs where linkage requires them
+- add a few test files for selected modules under `tests/unit/`
+- compile required production `.cpp` files directly into each test target
+- add reusable fakes under `tests/fakes/` where linkage requires them
 - run tests under normal Debug builds
 
 This phase proves the viability of the approach on real code.
@@ -325,10 +311,11 @@ The recommended testing foundation is:
 
 - CTest as the top-level test runner
 - `doctest` as the lightweight C++ framework
-- one initial test executable
-- direct compilation of selected production `.cpp` files into the test target
-- narrow support stubs to bypass platform dependencies
+- separate executables per file under test
+- direct compilation of selected production `.cpp` files into each test target
+- reusable hand-written fakes to bypass platform dependencies
 - characterization tests for legacy behavior
+- test CMake files isolated under `cmake/tests/`
 - gradual expansion, with internal libraries introduced only when they become naturally useful
 
 This approach matches the current state of the codebase better than a mandatory library-first test design. It gives the project a realistic path to useful automated tests now while still leaving room for cleaner target structure later.

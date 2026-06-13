@@ -793,7 +793,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             Load_Colony_Defense_(colony_idx);
         }
 
-        if ((CMBTFIRE::Does_Combat_Planet_Have_Defenses_() & 4) != 0) {
+        if ((CMBTFIRE::Does_Combat_Planet_Have_Defenses_() & COMBAT_PLANET_DEFENSE_STELLAR_CONVERTER) != 0) {
             has_stellar_converter = 1;
         }
 
@@ -1612,40 +1612,38 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     if (MOX::_colony[colony_idx].buildings[BUILDING_FIGHTER_GARRISON] != 0) {
-        MOX::_combat_data->weapons[weapon_index].weapon_id = 0x26;
-        MOX::_combat_data->weapons[weapon_index].count = 1;
+        int16_t weapon_id_fg = WEAPON_INTERCEPTOR;
+        int16_t count_fg = 5;
+
+        if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == 3) {
+            weapon_id_fg = WEAPON_HEAVY_FIGHTER;
+            count_fg = 2;
+        } else if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[TECH_APP_BOMBER_BAYS] == 3) {
+            weapon_id_fg = WEAPON_BOMBER;
+            count_fg = 3;
+        }
+
+        MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_fg;
+        MOX::_combat_data->weapons[weapon_index].count = (int8_t)count_fg;
         MOX::_combat_data->weapons[weapon_index].arc = 0xf;
         MOX::_combat_data->weapons[weapon_index].specials = 0;
-        MOX::_combat_data->weapons[weapon_index].ammo = -1;
+        MOX::_combat_data->weapons[weapon_index].ammo = 1;
         MOX::_combat_data->weapons[weapon_index].active = 1;
         MOX::_combat_data->weapons[weapon_index].status = 0;
-        MOX::_combat_data->weapons[weapon_index].shots_left = 1;
+        MOX::_combat_data->weapons[weapon_index].shots_left = (int8_t)count_fg;
         weapon_index++;
     }
 
     if (MOX::_colony[colony_idx].buildings[BUILDING_STELLAR_CONVERTER] != 0) {
-        int16_t weapon_id_sc = 0x1f;
-        int16_t count_sc = 5;
-
-        if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[0x53] == 3) {
-            weapon_id_sc = 0x1d;
-            count_sc = 2;
-        } else if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[0x1f] == 3) {
-            weapon_id_sc = 0x1e;
-            count_sc = 3;
-        }
-
-        for (int i = 0; i < 2; i++) {
-            MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_sc;
-            MOX::_combat_data->weapons[weapon_index].count = (int8_t)count_sc;
-            MOX::_combat_data->weapons[weapon_index].arc = 0xf;
-            MOX::_combat_data->weapons[weapon_index].specials = 0;
-            MOX::_combat_data->weapons[weapon_index].status = 0;
-            MOX::_combat_data->weapons[weapon_index].ammo = 1;
-            MOX::_combat_data->weapons[weapon_index].active = 1;
-            MOX::_combat_data->weapons[weapon_index].shots_left = (int8_t)count_sc;
-            weapon_index++;
-        }
+        MOX::_combat_data->weapons[weapon_index].weapon_id = WEAPON_STELLAR_CONVERTER;
+        MOX::_combat_data->weapons[weapon_index].count = 1;
+        MOX::_combat_data->weapons[weapon_index].arc = 0xf;
+        MOX::_combat_data->weapons[weapon_index].specials = 0;
+        MOX::_combat_data->weapons[weapon_index].status = 0;
+        MOX::_combat_data->weapons[weapon_index].ammo = -1;
+        MOX::_combat_data->weapons[weapon_index].active = 1;
+        MOX::_combat_data->weapons[weapon_index].shots_left = 1;
+        weapon_index++;
     }
 
     if (MOX::_colony[colony_idx].buildings[BUILDING_MISSILE_BASE] != 0) {

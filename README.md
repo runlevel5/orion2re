@@ -69,6 +69,12 @@ Build it:
 cmake --build --preset win32-debug
 ```
 
+Tests are opt-in and are not built by default. To configure, build, and run the current unit tests:
+
+```sh
+tools/run-tests.sh
+```
+
 Available presets:
 
 - `win32-debug`

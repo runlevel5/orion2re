@@ -75,8 +75,7 @@ namespace reduce {
             exitm::Exit_With_Message("Palette Reduction Pictures Must Have Palette");
         }
 
-        animate::_palette_header = (s_palette_header*)((uint8_t*)anim +
-                                   (anim->frame_count * sizeof(anim->frame_offsets[0])) + 0x10);
+        animate::_palette_header = Animation_Palette_Header_(anim);
 
         int16_t palette_count = animate::_palette_header->count;
 

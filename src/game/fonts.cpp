@@ -943,7 +943,7 @@ namespace fonts {
         int16_t rows = clip_height - clip_y;
 
         if (rows > 0) {
-            uint8_t* frame_ptr = (uint8_t*)bitmap + bitmap->frame_offsets[current_frame];
+            uint8_t* frame_ptr = Animation_Frame_Data_(bitmap, current_frame);
             do {
                 int32_t dest_clip_start = clip_x + dest_offset;
                 int32_t dest_clip_end = dest_clip_start + clip_width;
