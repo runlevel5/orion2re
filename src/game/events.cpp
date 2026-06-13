@@ -28,8 +28,8 @@ namespace EVENTS {
 
             if (pick != -1) {
                 int16_t planet_idx = MOX::_colony[pick].planet;
-                // Mineral class 3 or higher required for depletion event
-                if (MOX::_planet[planet_idx].mineral_class > 3) {
+                // Mineral class richer than MINERAL_RESOURCE_RICH required for depletion event
+                if (MOX::_planet[planet_idx].mineral_class > MINERAL_RESOURCE_RICH) {
                     found_colony_idx = pick;
                 }
             }
@@ -246,7 +246,7 @@ namespace EVENTS {
             s_player& player = MOX::_player[i];
 
             // Check if player is active and has the 'Lucky' trait (index 26)
-            if (player.eliminated == 0 && player.traits[26 /* TRAIT_LUCKY */] == 1) {
+            if (player.eliminated == 0 && player.traits[TRAIT_LUCKY] == 1) {
                 int16_t chance = player.time_since_last_lucky_event / lucky_divisor;
 
                 if (chance >= (int16_t)game_random::Random_(1000)) {
@@ -292,12 +292,12 @@ namespace EVENTS {
                 {
                     int16_t planet_idx = _event_data[i].target_id;
                     int8_t old_climate = MOX::_planet[planet_idx].climate;
-                    MOX::_planet[planet_idx].climate = 8 /* Gaia */;
-                    MOX::_planet[planet_idx].food_per_farmer += (MOX::_food_per_farmer_table[8] - MOX::_food_per_farmer_table[old_climate]);
+                    MOX::_planet[planet_idx].climate = PLANET_CLIMATE_TERRAN;
+                    MOX::_planet[planet_idx].food_per_farmer += (MOX::_food_per_farmer_table[PLANET_CLIMATE_TERRAN] - MOX::_food_per_farmer_table[old_climate]);
                     int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
                     if (colony_idx != -1) {
                         COLCALC::Colony_Calculation_(colony_idx);
-                        COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 0x2C /* Weather Controller */);
+                        COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_TERRAFORMING);
                     }
                     _event_data[i].status = 5;
                     break;
@@ -395,7 +395,7 @@ namespace EVENTS {
                 case 11:
                 {
                     int8_t mineral = MOX::_planet[_event_data[i].target_id].mineral_class - 1;
-                    if (mineral <= 0) mineral = 0;
+                    if (mineral <= MINERAL_RESOURCE_ULTRA_POOR) mineral = MINERAL_RESOURCE_ULTRA_POOR;
                     MOX::_planet[_event_data[i].target_id].mineral_class = mineral;
                     int16_t colony_idx = MOX::_planet[_event_data[i].target_id].colony_index;
                     if (colony_idx != -1) {
@@ -408,7 +408,7 @@ namespace EVENTS {
                 case 12:
                 {
                     int8_t mineral = MOX::_planet[_event_data[i].target_id].mineral_class + 2;
-                    if (mineral >= 4) mineral = 4;
+                    if (mineral >= MINERAL_RESOURCE_ULTRA_RICH) mineral = MINERAL_RESOURCE_ULTRA_RICH;
                     MOX::_planet[_event_data[i].target_id].mineral_class = mineral;
                     int16_t colony_idx = MOX::_planet[_event_data[i].target_id].colony_index;
                     if (colony_idx != -1) {
@@ -1108,7 +1108,7 @@ namespace EVENTS {
                         }
                     }
 
-                    if (plr->traits[26] == 1) {
+                    if (plr->traits[TRAIT_LUCKY] == 1) {
                         weight /= 3;
                     }
 
@@ -1235,7 +1235,7 @@ namespace EVENTS {
     void __cdecl Update_Lucky_Players_Events_() {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             // Index 0x1a corresponds to the 'Lucky' racial trait
-            if (MOX::_player[i].eliminated == 0 && MOX::_player[i].traits[0x1a] == 1) {
+            if (MOX::_player[i].eliminated == 0 && MOX::_player[i].traits[TRAIT_LUCKY] == 1) {
                 MOX::_player[i].time_since_last_lucky_event++;
             }
         }
@@ -1254,7 +1254,7 @@ namespace EVENTS {
             int16_t picked = Pick_Random_Colony_No_Outpost_((int8_t)player_idx);
             if (picked != -1) {
                 int16_t planet_idx = MOX::_colony[picked].planet;
-                if (MOX::_planet[planet_idx].climate < 8) {
+                if (MOX::_planet[planet_idx].climate < PLANET_CLIMATE_TERRAN) {
                     colony_idx = picked;
                     break;
                 }
@@ -1274,7 +1274,7 @@ namespace EVENTS {
 
                 if (MOX::_colony[i].owner == player_idx) {
                     int16_t planet_idx = MOX::_colony[i].planet;
-                    if (MOX::_planet[planet_idx].climate < 8) {
+                    if (MOX::_planet[planet_idx].climate < PLANET_CLIMATE_TERRAN) {
                         colony_idx = i;
                     }
                 }
@@ -1390,7 +1390,7 @@ namespace EVENTS {
 
                 // Mineral classes: 0=Ultra Poor, 1=Poor, 2=Abundant, 3=Rich, 4=Ultra Rich
                 // The check is for mineral_class < 4.
-                if (MOX::_planet[planet_idx].mineral_class < 4) {
+                if (MOX::_planet[planet_idx].mineral_class < MINERAL_RESOURCE_ULTRA_RICH) {
                     colony_idx = random_idx;
                 }
             }
@@ -1590,7 +1590,7 @@ namespace EVENTS {
                         int16_t colony_idx = MOX::_planet[planet_ptr_idx].colony_index;
                         if (colony_idx != -1) {
                             // Check if colony is not an outpost and does not have building index 9
-                            if (MOX::_colony[colony_idx].outpost_flag == 0 && MOX::_colony[colony_idx].buildings[9] == 0) {
+                            if (MOX::_colony[colony_idx].outpost_flag == 0 && MOX::_colony[colony_idx].buildings[BUILDING_CAPITOL] == 0) {
                                 found = 1;
                             }
                         }
@@ -1687,7 +1687,7 @@ namespace EVENTS {
     }
 
     int16_t __cdecl Colony_Research_Points_(int16_t colony_idx) {
-        return MOX::_colony[colony_idx].production[2];
+        return MOX::_colony[colony_idx].production[ECON_RESEARCH];
     }
 
     /**
@@ -1803,7 +1803,7 @@ namespace EVENTS {
         int16_t selected_player = candidates[selection_idx];
 
         // The "Lucky" trait (index 26) protects from bad events.
-        if (type == 0 && MOX::_player[selected_player].traits[26] == 1) {
+        if (type == 0 && MOX::_player[selected_player].traits[TRAIT_LUCKY] == 1) {
             return -1;
         }
 

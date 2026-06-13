@@ -716,7 +716,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
             MOX::_fleet_movement_icon[visible_icon_idx].y = icon_button_y;
 
             int16_t ship_picture_y_offset = 2;
-            if (MOX::_ship[ship_idx].d.size == 5) {
+            if (MOX::_ship[ship_idx].d.size == SHIP_SIZE_DOOM_STAR) {
                 ship_picture_y_offset = 0;
             }
 
@@ -1524,7 +1524,7 @@ uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
         }
 
         ship_idx = MOX::_ship_node[current_node].ship_idx;
-        if (MOX::_ship[ship_idx].d.ship_type == 4) {
+        if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_OUTPOST) {
             for (int16_t planet_slot = 0; planet_slot < 5; ++planet_slot) {
                 if (FLEETPOP::Can_Build_Outpost_(MOX::_star[location].planet_index[planet_slot]) != 0) {
                     can_build_outpost = 1;
@@ -1580,7 +1580,7 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
                 const int16_t ship_idx = MOX::_ship_node[current_node].ship_idx;
                 (void)HACCESS::Ship_Owner_(ship_idx);
 
-                if (MOX::_ship[ship_idx].d.ship_type == 2) {
+                if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_TRANSPORT) {
                     for (int16_t planet_slot = 0; planet_slot < 5; ++planet_slot) {
                         const int16_t planet_idx = MOX::_star[star_idx].planet_index[planet_slot];
                         if (planet_idx != -1) {
@@ -1683,7 +1683,7 @@ int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
             ship_idx = MOX::_ship_node[current_node_index].ship_idx;
             HACCESS::Ship_Owner_(ship_idx);
 
-            if (MOX::_ship[ship_idx].d.ship_type == 1) {
+            if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COLONY) {
                 int16_t planet_slot = 0;
 
                 if (!found_colonizable_planet) {
@@ -1731,7 +1731,7 @@ int8_t __cdecl Planet_Is_Colonizable_(int16_t planet_idx) {
 
     if (planet_idx > -1) {
         s_planet_data* planet = &MOX::_planet[planet_idx];
-        if (planet->planet_type == 3) {
+        if (planet->planet_type == PLANET_TYPE_PLANET) {
             int16_t colony_idx = planet->colony_index;
             if (colony_idx == -1 || MOX::_colony[colony_idx].outpost_flag != 0) {
                 is_colonizable = 1;
@@ -1773,7 +1773,7 @@ int8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t ship_count) {
       }
 
       const int16_t ship_idx = MOX::_ship_node[stack_node_idx].ship_idx;
-      if ((MOX::_ship[ship_idx].d.ship_type == 0) &&
+      if ((MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT) &&
           (MOX::_ship[ship_idx].status < 3) &&
           (HACCESS::Ship_Owner_(ship_idx) == MOX::_PLAYER_NUM)) {
         has_owned_combat_ship = true;

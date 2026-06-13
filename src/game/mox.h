@@ -66,14 +66,14 @@ namespace MOX {
     extern int16_t _scan_button;
     extern int16_t _missile_field[300];
     extern int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
-    extern int16_t _weapon_mod_field_status[15];
+    extern int16_t _weapon_mod_field_status[WEAPON_MOD_COUNT];
     extern int16_t _weapon_button[8];
     extern int16_t _ship_turn_order[210];
     extern int16_t _repl_fields[10];
     extern int16_t _side_end_of_turn[15];
     extern int16_t _unused_ship_turn_order_marker;
     extern int16_t _design_choice_items[40];
-    extern int16_t _weapon_mod_fields[15];
+    extern int16_t _weapon_mod_fields[WEAPON_MOD_COUNT];
     extern int16_t _weapon_arc_field[5];
     extern int16_t _weapon_rack_field[5];
     extern int16_t _multi_colored_box_color_start;

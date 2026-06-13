@@ -17,12 +17,12 @@ namespace DIP_SCRN {
     extern uint8_t _talker_ambassador;
     extern int16_t _diplomacy_current_music;
     extern int16_t _net_diplomacy_esc_pressed;
-    extern uint8_t _target_tech_list[212];
+    extern uint8_t _target_tech_list[TECH_APP_COUNT];
     extern uint8_t _listen_ambassador;
     extern int16_t _exchange_tech_count;
     extern char* _main_diplomacy_list[9];
     extern char* _propose_treaty_diplomacy_list[7];
-    extern uint8_t _exchange_tech_list[212];
+    extern uint8_t _exchange_tech_list[TECH_APP_COUNT];
     extern char _chat_message[100];
     extern int16_t _diplomacy_quit_chat_field;
     extern int16_t _net_diplomacy_treaty_type;

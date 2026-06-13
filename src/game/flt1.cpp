@@ -86,14 +86,14 @@ namespace FLT1 {
 
             (void)HACCESS::Ship_Owner_(ship_idx);
 
-            if (MOX::_scanned_big_ship == index_global && MOX::_current_screen == 4) {
+            if (MOX::_scanned_big_ship == index_global && MOX::_current_screen == SCREEN_FLEET) {
                 Draw_Box_Around_Scanned_Ship_(index_global);
             }
 
             if (MOX::_fltscrn_big_icon[index_global].selected != 0) {
                 int16_t draw_x;
                 int16_t draw_y;
-                if (MOX::_current_screen == 4) {
+                if (MOX::_current_screen == SCREEN_FLEET) {
                     draw_y = y + 1;
                     draw_x = x - 2;
                 } else {
@@ -129,7 +129,7 @@ namespace FLT1 {
         s_colors local_green = MAINSCR::_ship_direction_line_green_colors;
         s_colors local_red = MAINSCR::_ship_direction_line_red_colors;
 
-        if (screen_id == 4) {
+        if (screen_id == SCREEN_FLEET) {
             if (MOX::_small_ship_stack_ptr > -1) {
                 int16_t first_sel = First_Selected_Ship_();
                 if (first_sel != -1) {
@@ -153,7 +153,7 @@ namespace FLT1 {
         }
 
         if (draw_dest) {
-            if (MOX::_g_ship_move_info.moving == 0 || MOX::_star[MOX::_galaxy_map_scanned_star].spectral_class == 6) {
+            if (MOX::_g_ship_move_info.moving == 0 || MOX::_star[MOX::_galaxy_map_scanned_star].spectral_class == STAR_CLASS_BLACK_HOLE) {
                 temp_color = local_red;
             } else {
                 temp_color = local_green;
@@ -270,7 +270,7 @@ namespace FLT1 {
         int16_t anim_x;
         uint8_t color;
 
-        if (MOX::_current_screen == 4) {
+        if (MOX::_current_screen == SCREEN_FLEET) {
             x = 0x25E;
             y = 0x56;
             width = 0xC;
@@ -398,7 +398,7 @@ namespace FLT1 {
             FLT2::Print_Fltscrn_Scanned_Star_Name_();
         }
 
-        if (MOX::_scanned_big_ship > -1 && MOX::_scanned_big_ship < 250 && MOX::_current_screen == 4) {
+        if (MOX::_scanned_big_ship > -1 && MOX::_scanned_big_ship < 250 && MOX::_current_screen == SCREEN_FLEET) {
             graphics::Set_Window_(15, 282, 320, 465);
             video::Clip_On_();
             FLT2::Print_Scanned_Ship_Data_(MOX::_fltscrn_big_icon[MOX::_scanned_big_ship].ship_idx);
@@ -406,8 +406,8 @@ namespace FLT1 {
             graphics::Reset_Window_();
         }
 
-        FLT1::Draw_Fltscrn_Relocation_Lines_(4);
-        FLT1::Draw_Fltscrn_Ship_Destination_Lines_(4);
+        FLT1::Draw_Fltscrn_Relocation_Lines_(SCREEN_FLEET);
+        FLT1::Draw_Fltscrn_Ship_Destination_Lines_(SCREEN_FLEET);
         MOVEBOX::Draw_Galaxy_Map_Box_(nullptr, nullptr, 15, 52, 305, 182, 0, 0, 0, 0, 1, -1);
 
         if (FLT1::_relocate_button_mode != 1) {
@@ -451,7 +451,7 @@ namespace FLT1 {
         }
 
         if (MOX::_fltscrn_stack_owner > -1 && MOX::_skip_draw_ships == 0 && MOX::_small_ship_stack_ptr > -1) {
-            FLT1::Draw_Fltscrn_Big_Ship_Icons_(4);
+            FLT1::Draw_Fltscrn_Big_Ship_Icons_(SCREEN_FLEET);
         } else {
             MOX::_skip_draw_ships = 0;
         }
@@ -638,7 +638,7 @@ namespace FLT1 {
                 if (_merging_relocations == 0) {
                     if (_relocate_button_mode == 1) {
                         Star_Relocation_(&scan_val.words[1], &relocate_target_star_idx, clicked_star_id);
-                    } else if (MOX::_star[clicked_star_id].spectral_class == 6) {
+                    } else if (MOX::_star[clicked_star_id].spectral_class == STAR_CLASS_BLACK_HOLE) {
                         char msg_buf_78[80];
                         sprintf(msg_buf_78, HAROLD::H_Message_(0x78));
                         HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_78, 3);
@@ -687,7 +687,7 @@ namespace FLT1 {
             }
 
             if (input == btn_close) {
-                MOX::_current_screen = 0;
+                MOX::_current_screen = SCREEN_MAIN;
                 fields::Clear_Fields_();
                 fields::Deactivate_Auto_Function_();
                 MOX::_galaxy_map_scanned_star = -1;
@@ -721,8 +721,8 @@ namespace FLT1 {
                     strcpy(msg_buf_79, HAROLD::H_Message_(0x79));
                     HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_79, 0);
                 } else {
-                    MOX::_current_screen = 29;
-                    MOX::_return_screen = 4;
+                    MOX::_current_screen = SCREEN_OFFICERS;
+                    MOX::_return_screen = SCREEN_FLEET;
                     exit_flag = 1;
                     MOX::_temp_star_handle = MOX::_system_star_id;
                 }
@@ -1098,7 +1098,7 @@ namespace FLT1 {
         int16_t x = icon->screen_x;
         int16_t y = icon->screen_y;
 
-        if (MOX::_current_screen == 4 /* SCR_FLEET */) {
+        if (MOX::_current_screen == SCREEN_FLEET) {
             animate::Draw_(x - 3, y - 1, MOX::_scanned_box_seg);
         } else {
             animate::Draw_(x - 2, y - 2, MOX::_scanned_box_seg);
@@ -1333,7 +1333,7 @@ namespace FLT1 {
         int16_t num_new_techs = 0;
 
         int16_t fuel_id = INITSHIP::Best_Ship_Fuel_(ship->owner);
-        if (fuel_id > -1 && fuel_id < 6) {
+        if (fuel_id > -1 && fuel_id < FUEL_COUNT) {
             uint16_t tech_id = TECHDATA::_fuel[fuel_id].tech_app_id;
             if (!HACCESS::Player_Has_Tech_(tech_id, player_id)) {
                 tech_apps[num_new_techs++] = tech_id;
@@ -1445,7 +1445,7 @@ namespace FLT1 {
         colors.colors[6] = 9;
         colors.colors[7] = 10;
 
-        if (screen_id == 4) {
+        if (screen_id == SCREEN_FLEET) {
             local_a = 52 /* 0x34 */;
             view_y = 15 /* 0x0F */;
             view_x = 305 /* 0x131 */;
@@ -1626,7 +1626,7 @@ namespace FLT1 {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        if (star->spectral_class == 6 /* Black Hole */) {
+        if (star->spectral_class == STAR_CLASS_BLACK_HOLE) {
             ok_to_relocate = false;
             if (prompt_flag == 0) {
                 strcpy(msg_buf, HAROLD::H_Message_(0x84));

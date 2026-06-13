@@ -118,177 +118,177 @@
 [X] src/game/council.cpp
 [X] src/game/council.h
 [X] src/game/deps.h
-[ ] src/game/desbox.cpp
-[ ] src/game/desbox.h
-[ ] src/game/design.cpp
-[ ] src/game/design.h
-[ ] src/game/design_main.cpp
-[ ] src/game/dip_scrn.cpp
-[ ] src/game/dip_scrn.h
-[ ] src/game/dip_scrn_main.cpp
-[ ] src/game/diplodef.cpp
-[ ] src/game/diplodef.h
-[ ] src/game/diplomac.cpp
-[ ] src/game/diplomac.h
-[ ] src/game/dos.cpp
-[ ] src/game/dos.h
-[ ] src/game/draw.cpp
-[ ] src/game/draw.h
-[ ] src/game/eric.cpp
-[ ] src/game/eric.h
-[ ] src/game/erichelp.cpp
-[ ] src/game/erichelp.h
-[ ] src/game/ericnet.cpp
-[ ] src/game/ericnet.h
-[ ] src/game/estrings.cpp
-[ ] src/game/estrings.h
-[ ] src/game/evanhelp.cpp
-[ ] src/game/evanhelp.h
-[ ] src/game/events.cpp
-[ ] src/game/events.h
-[ ] src/game/exitm.cpp
-[ ] src/game/exitm.h
-[ ] src/game/fade.cpp
-[ ] src/game/fade.h
-[ ] src/game/fakebuts.cpp
-[ ] src/game/fakebuts.h
-[ ] src/game/farload.cpp
-[ ] src/game/farload.h
-[ ] src/game/fields.cpp
-[ ] src/game/fields.h
-[ ] src/game/fieldsav.cpp
-[ ] src/game/fieldsav.h
-[ ] src/game/file_ani.cpp
-[ ] src/game/file_ani.h
-[ ] src/game/filedef.cpp
-[ ] src/game/filedef.h
-[ ] src/game/firepts.cpp
-[ ] src/game/firepts.h
-[ ] src/game/flcqueue.cpp
-[ ] src/game/flcqueue.h
-[ ] src/game/fleetpop.cpp
-[ ] src/game/fleetpop.h
-[ ] src/game/flt.cpp
-[ ] src/game/flt.h
-[ ] src/game/flt1.cpp
-[ ] src/game/flt1.h
-[ ] src/game/flt2.cpp
-[ ] src/game/flt2.h
-[ ] src/game/fmtpara.cpp
-[ ] src/game/fmtpara.h
-[ ] src/game/fontdraw.cpp
-[ ] src/game/fontdraw.h
-[ ] src/game/fonts.cpp
-[ ] src/game/fonts.h
-[ ] src/game/gendraw.cpp
-[ ] src/game/gendraw.h
-[ ] src/game/geo.cpp
-[ ] src/game/geo.h
-[ ] src/game/global.cpp
-[ ] src/game/global.h
-[ ] src/game/graphics.cpp
-[ ] src/game/graphics.h
-[ ] src/game/haccess.cpp
-[ ] src/game/haccess.h
-[ ] src/game/harold.cpp
-[ ] src/game/harold.h
-[ ] src/game/homegen.cpp
-[ ] src/game/homegen.h
-[ ] src/game/hotpop.cpp
-[ ] src/game/hotpop.h
-[ ] src/game/info.cpp
-[ ] src/game/info.h
-[ ] src/game/init.cpp
-[ ] src/game/init.h
-[ ] src/game/initgame.cpp
-[ ] src/game/initgame.h
-[ ] src/game/initship.cpp
-[ ] src/game/initship.h
-[ ] src/game/invasion.cpp
-[ ] src/game/invasion.h
-[ ] src/game/jim.cpp
-[ ] src/game/jim.h
-[ ] src/game/ken.cpp
-[ ] src/game/ken.h
-[ ] src/game/key.cpp
-[ ] src/game/key.h
-[ ] src/game/lbx.cpp
-[ ] src/game/lbx.h
-[ ] src/game/lbx_types.h
-[ ] src/game/line.cpp
-[ ] src/game/line.h
-[ ] src/game/list.cpp
-[ ] src/game/list.h
-[ ] src/game/loader.cpp
-[ ] src/game/loader.h
-[ ] src/game/loadsave.cpp
-[ ] src/game/loadsave.h
-[ ] src/game/lostship.cpp
-[ ] src/game/lostship.h
-[ ] src/game/mainmenu.cpp
-[ ] src/game/mainmenu.h
-[ ] src/game/mainpups.cpp
-[ ] src/game/mainpups.h
-[ ] src/game/mainscr.cpp
-[ ] src/game/mainscr.h
-[ ] src/game/mainscr2.cpp
-[ ] src/game/mainscr2.h
-[ ] src/game/mainscr_main.cpp
-[ ] src/game/maintain.cpp
-[ ] src/game/maintain.h
-[ ] src/game/mapgen.cpp
-[ ] src/game/mapgen.h
-[ ] src/game/misc.cpp
-[ ] src/game/misc.h
-[ ] src/game/motrans.cpp
-[ ] src/game/motrans.h
-[ ] src/game/mouse.cpp
-[ ] src/game/mouse.h
-[ ] src/game/movebox.cpp
-[ ] src/game/movebox.h
-[ ] src/game/mox.cpp
-[ ] src/game/mox.h
-[ ] src/game/mox2.cpp
-[ ] src/game/mox2.h
-[ ] src/game/msg.cpp
-[ ] src/game/msg.h
-[ ] src/game/multplay.cpp
-[ ] src/game/multplay.h
-[ ] src/game/namestar.cpp
-[ ] src/game/namestar.h
-[ ] src/game/net.cpp
-[ ] src/game/net.h
-[ ] src/game/netcode.cpp
-[ ] src/game/netcode.h
-[ ] src/game/netmox.cpp
-[ ] src/game/netmox.h
-[ ] src/game/netstart.cpp
-[ ] src/game/netstart.h
-[ ] src/game/netstrat.cpp
-[ ] src/game/netstrat.h
-[ ] src/game/netturn.cpp
-[ ] src/game/netturn.h
-[ ] src/game/newgame.cpp
-[ ] src/game/newgame.h
-[ ] src/game/newpup.cpp
-[ ] src/game/newpup.h
-[ ] src/game/newtech.cpp
-[ ] src/game/newtech.h
-[ ] src/game/nextturn.cpp
-[ ] src/game/nextturn.h
-[ ] src/game/npcdiplo.cpp
-[ ] src/game/npcdiplo.h
-[ ] src/game/ocpolpup.cpp
-[ ] src/game/ocpolpup.h
-[ ] src/game/officer.cpp
-[ ] src/game/officer.h
-[ ] src/game/orion2.h
-[ ] src/game/orion2_consts.h
-[ ] src/game/orion2_str.h
-[ ] src/game/palette.cpp
-[ ] src/game/palette.h
-[ ] src/game/palstore.cpp
-[ ] src/game/palstore.h
+[X] src/game/desbox.cpp
+[X] src/game/desbox.h
+[X] src/game/design.cpp
+[X] src/game/design.h
+[X] src/game/design_main.cpp
+[X] src/game/dip_scrn.cpp
+[X] src/game/dip_scrn.h
+[X] src/game/dip_scrn_main.cpp
+[X] src/game/diplodef.cpp
+[X] src/game/diplodef.h
+[X] src/game/diplomac.cpp
+[X] src/game/diplomac.h
+[X] src/game/dos.cpp
+[X] src/game/dos.h
+[X] src/game/draw.cpp
+[X] src/game/draw.h
+[X] src/game/eric.cpp
+[X] src/game/eric.h
+[X] src/game/erichelp.cpp
+[X] src/game/erichelp.h
+[X] src/game/ericnet.cpp
+[X] src/game/ericnet.h
+[X] src/game/estrings.cpp
+[X] src/game/estrings.h
+[X] src/game/evanhelp.cpp
+[X] src/game/evanhelp.h
+[X] src/game/events.cpp
+[X] src/game/events.h
+[X] src/game/exitm.cpp
+[X] src/game/exitm.h
+[X] src/game/fade.cpp
+[X] src/game/fade.h
+[X] src/game/fakebuts.cpp
+[X] src/game/fakebuts.h
+[X] src/game/farload.cpp
+[X] src/game/farload.h
+[X] src/game/fields.cpp
+[X] src/game/fields.h
+[X] src/game/fieldsav.cpp
+[X] src/game/fieldsav.h
+[X] src/game/file_ani.cpp
+[X] src/game/file_ani.h
+[X] src/game/filedef.cpp
+[X] src/game/filedef.h
+[X] src/game/firepts.cpp
+[X] src/game/firepts.h
+[X] src/game/flcqueue.cpp
+[X] src/game/flcqueue.h
+[X] src/game/fleetpop.cpp
+[X] src/game/fleetpop.h
+[X] src/game/flt.cpp
+[X] src/game/flt.h
+[X] src/game/flt1.cpp
+[X] src/game/flt1.h
+[X] src/game/flt2.cpp
+[X] src/game/flt2.h
+[X] src/game/fmtpara.cpp
+[X] src/game/fmtpara.h
+[X] src/game/fontdraw.cpp
+[X] src/game/fontdraw.h
+[X] src/game/fonts.cpp
+[X] src/game/fonts.h
+[X] src/game/gendraw.cpp
+[X] src/game/gendraw.h
+[X] src/game/geo.cpp
+[X] src/game/geo.h
+[X] src/game/global.cpp
+[X] src/game/global.h
+[X] src/game/graphics.cpp
+[X] src/game/graphics.h
+[X] src/game/haccess.cpp
+[X] src/game/haccess.h
+[X] src/game/harold.cpp
+[X] src/game/harold.h
+[X] src/game/homegen.cpp
+[X] src/game/homegen.h
+[X] src/game/hotpop.cpp
+[X] src/game/hotpop.h
+[X] src/game/info.cpp
+[X] src/game/info.h
+[X] src/game/init.cpp
+[X] src/game/init.h
+[X] src/game/initgame.cpp
+[X] src/game/initgame.h
+[X] src/game/initship.cpp
+[X] src/game/initship.h
+[X] src/game/invasion.cpp
+[X] src/game/invasion.h
+[X] src/game/jim.cpp
+[X] src/game/jim.h
+[X] src/game/ken.cpp
+[X] src/game/ken.h
+[X] src/game/key.cpp
+[X] src/game/key.h
+[X] src/game/lbx.cpp
+[X] src/game/lbx.h
+[X] src/game/lbx_types.h
+[X] src/game/line.cpp
+[X] src/game/line.h
+[X] src/game/list.cpp
+[X] src/game/list.h
+[X] src/game/loader.cpp
+[X] src/game/loader.h
+[X] src/game/loadsave.cpp
+[X] src/game/loadsave.h
+[X] src/game/lostship.cpp
+[X] src/game/lostship.h
+[X] src/game/mainmenu.cpp
+[X] src/game/mainmenu.h
+[X] src/game/mainpups.cpp
+[X] src/game/mainpups.h
+[X] src/game/mainscr.cpp
+[X] src/game/mainscr.h
+[X] src/game/mainscr2.cpp
+[X] src/game/mainscr2.h
+[X] src/game/mainscr_main.cpp
+[X] src/game/maintain.cpp
+[X] src/game/maintain.h
+[X] src/game/mapgen.cpp
+[X] src/game/mapgen.h
+[X] src/game/misc.cpp
+[X] src/game/misc.h
+[X] src/game/motrans.cpp
+[X] src/game/motrans.h
+[X] src/game/mouse.cpp
+[X] src/game/mouse.h
+[X] src/game/movebox.cpp
+[X] src/game/movebox.h
+[X] src/game/mox.cpp
+[X] src/game/mox.h
+[X] src/game/mox2.cpp
+[X] src/game/mox2.h
+[X] src/game/msg.cpp
+[X] src/game/msg.h
+[X] src/game/multplay.cpp
+[X] src/game/multplay.h
+[X] src/game/namestar.cpp
+[X] src/game/namestar.h
+[X] src/game/net.cpp
+[X] src/game/net.h
+[X] src/game/netcode.cpp
+[X] src/game/netcode.h
+[X] src/game/netmox.cpp
+[X] src/game/netmox.h
+[X] src/game/netstart.cpp
+[X] src/game/netstart.h
+[X] src/game/netstrat.cpp
+[X] src/game/netstrat.h
+[X] src/game/netturn.cpp
+[X] src/game/netturn.h
+[X] src/game/newgame.cpp
+[X] src/game/newgame.h
+[X] src/game/newpup.cpp
+[X] src/game/newpup.h
+[X] src/game/newtech.cpp
+[X] src/game/newtech.h
+[X] src/game/nextturn.cpp
+[X] src/game/nextturn.h
+[X] src/game/npcdiplo.cpp
+[X] src/game/npcdiplo.h
+[X] src/game/ocpolpup.cpp
+[X] src/game/ocpolpup.h
+[X] src/game/officer.cpp
+[X] src/game/officer.h
+[X] src/game/orion2.h
+[X] src/game/orion2_consts.h
+[X] src/game/orion2_str.h
+[X] src/game/palette.cpp
+[X] src/game/palette.h
+[X] src/game/palstore.cpp
+[X] src/game/palstore.h
 [ ] src/game/paragrph.cpp
 [ ] src/game/paragrph.h
 [ ] src/game/platform.cpp

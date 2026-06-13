@@ -164,7 +164,7 @@ namespace MSG_ {
         char local_c8[200];
 
         switch (param_2->msg_type) {
-            case 0 /* MSG_TYPE_COLONY */: {
+            case MSG_TYPE_COLONY: {
                 char* pcVar6 = HACCESS::Get_Planet_Name_((int16_t)(param_2->u).colony.planet_idx);
                 switch ((param_2->u).colony.subtype) {
                     case 0:
@@ -174,7 +174,7 @@ namespace MSG_ {
                         return;
                     case 1: {
                         int16_t sVar4 = (param_2->u).colony.c.build.build_id;
-                        if (sVar4 < 1 || sVar4 > 0x30) {
+                        if (sVar4 < BUILDING_ALIEN_CONTROL_CENTER || sVar4 >= BUILDING_COUNT) {
                             if (sVar4 < -99) {
                                 char* pcVar8 = _msg_colony_built_ship_fmt;
                                 if ((param_2->u).colony.c.build.is_refit != 0) {
@@ -319,21 +319,21 @@ namespace MSG_ {
                 }
                 break;
             }
-            case 1 /* MSG_TYPE_DECLARE_ALLIANCE */:
+            case MSG_TYPE_DECLARE_ALLIANCE:
                 sprintf(param_1, _s_and_s_declare_alliance_fmt,
                              MOX::_player[(param_2->u).players.player_a_idx].race_name,
                              MOX::_player[(param_2->u).players.player_b_idx].race_name);
                 return;
-            case 2 /* MSG_TYPE_DECLARE_WAR */:
+            case MSG_TYPE_DECLARE_WAR:
                 sprintf(param_1, _s_and_s_declare_war_fmt,
                              MOX::_player[(param_2->u).players.player_a_idx].race_name,
                              MOX::_player[(param_2->u).players.player_b_idx].race_name);
                 return;
-            case 4 /* MSG_TYPE_FINANCIAL */:
+            case MSG_TYPE_FINANCIAL:
                 sprintf(param_1, _msg_financial_fmt, (int)(param_2->u).financial.a,
                              (int)(param_2->u).financial.b);
                 return;
-            case 5 /* MSG_TYPE_LOST_SHIP */: {
+            case MSG_TYPE_LOST_SHIP: {
                 s_ship_data* psVar13 = &MOX::_ship[(param_2->u).lost_ship.ship_idx];
                 int iVar9 = sprintf(param_1, _msg_lost_ship_fmt, TECHDATA::_hull_data[psVar13->d.size].name, psVar13,
                                          (int)psVar13->d.cost, &MOX::_star[(param_2->u).lost_ship.star_idx]);
@@ -345,7 +345,7 @@ namespace MSG_ {
                 }
                 break;
             }
-            case 6 /* MSG_TYPE_SCRAP_SHIP */: {
+            case MSG_TYPE_SCRAP_SHIP: {
                 int16_t sVar4 = (param_2->u).scrap_ship.where;
                 if (sVar4 < MOX::_NUM_STARS) {
                     s_ship_data* psVar13 = &MOX::_ship[(param_2->u).scrap_ship.ship_idx];
@@ -358,7 +358,7 @@ namespace MSG_ {
                              psVar13, (int)psVar13->d.cost);
                 return;
             }
-            case 7 /* MSG_TYPE_LOST_COLONY */: {
+            case MSG_TYPE_LOST_COLONY: {
                 char* pcVar6 = _lost_colony_reason_strings[(param_2->u).lost_colony.reason];
                 char* pcVar8 = HACCESS::Get_Planet_Name_((param_2->u).lost_colony.planet_idx);
                 int iVar9 = sprintf(param_1, _msg_lost_colony_fmt,
@@ -371,10 +371,10 @@ namespace MSG_ {
                 }
                 break;
             }
-            case 8 /* MSG_TYPE_HYPERSPACE_FLUX */:
+            case MSG_TYPE_HYPERSPACE_FLUX:
                 strcpy(param_1, _msg_hyperspace_flux_fmt);
                 return;
-            case 9 /* MSG_TYPE_HYPERSPACE_BEAST */: {
+            case MSG_TYPE_HYPERSPACE_BEAST: {
                 int16_t sVar4 = (param_2->u).hyperspace_beast.ship_idx;
                 if (sVar4 == -1) {
                     strcpy(param_1, _msg_hyperspace_beast_hungry_fmt);
@@ -395,11 +395,11 @@ namespace MSG_ {
                 }
                 break;
             }
-            case 10 /* MSG_TYPE_LOST_ATTACKING_SPY */:
+            case MSG_TYPE_LOST_ATTACKING_SPY:
                 sprintf(param_1, _msg_lost_attacking_spy_fmt,
                              MOX::_player[(param_2->u).lost_attacking_spy.player_idx].race_name);
                 return;
-            case 11 /* MSG_TYPE_LOST_DEFENDING_SPY */: {
+            case MSG_TYPE_LOST_DEFENDING_SPY: {
                 int16_t sVar4 = (param_2->u).lost_defending_spy.count;
                 if (sVar4 != 1) {
                     sprintf(param_1, _msg_lost_defending_spies_fmt, (int)sVar4);
@@ -408,17 +408,17 @@ namespace MSG_ {
                 strcpy(param_1, _msg_lost_defending_spy_fmt);
                 return;
             }
-            case 12 /* MSG_TYPE_ARTEMIS */:
+            case MSG_TYPE_ARTEMIS:
                 sprintf(param_1, _msg_artemis_fmt, &MOX::_star[(uint8_t)(param_2->u).artemis.star_idx]);
                 return;
-            case 13 /* MSG_TYPE_ARTEMIS_LEADER */: {
+            case MSG_TYPE_ARTEMIS_LEADER: {
                 int iVar9 = sprintf(param_1, _msg_artemis_leader_fmt,
                                          &MOX::_star[(param_2->u).artemis_leader.star_idx]);
                 sprintf(param_1 + iVar9, _leader_fate_strings[(param_2->u).artemis_leader.fate],
                              &MOX::_leaders[(param_2->u).artemis_leader.leader_idx]);
                 return;
             }
-            case 14 /* MSG_TYPE_FAILED_RETREAT */: {
+            case MSG_TYPE_FAILED_RETREAT: {
                 uint16_t uVar5 = (param_2->u).retreat.ships_lost;
                 char* pcVar6 = _msg_d_ships_killed_retreating_fmt;
                 if (uVar5 == 1) {
@@ -434,7 +434,7 @@ namespace MSG_ {
                 }
                 break;
             }
-            case 15 /* MSG_TYPE_SPY_ASSASSINATION */: {
+            case MSG_TYPE_SPY_ASSASSINATION: {
                 uint8_t bVar3 = (param_2->u).spy_assasination.plr_b;
                 uint8_t plr_a = (param_2->u).spy_assasination.plr_a;
                 if (plr_a == bVar3) {
@@ -457,21 +457,21 @@ namespace MSG_ {
                              MOX::_player[plr_a].name, local_c8);
                 return;
             }
-            case 16 /* MSG_TYPE_ANOMALY */:
+            case MSG_TYPE_ANOMALY:
                 sprintf(param_1, _msg_anomaly_fmt, &MOX::_star[(param_2->u).anomaly.star_idx]);
                 return;
-            case 17 /* MSG_TYPE_DIPLOMACY */:
+            case MSG_TYPE_DIPLOMACY:
                 sprintf(param_1, _msg_diplomacy_strings[(uint8_t)(param_2->u).diplomacy.diplomacy_idx],
                              MOX::_player[(uint8_t)(param_2->u).diplomacy.plr_a].race_name,
                              MOX::_player[(uint8_t)(param_2->u).diplomacy.plr_b].race_name);
                 return;
-            case 18 /* MSG_TYPE_EEL_SPAWNED */:
+            case MSG_TYPE_EEL_SPAWNED:
                 sprintf(param_1, _msg_eel_spawned_fmt, &MOX::_star[(param_2->u).eel.star_idx]);
                 return;
-            case 19 /* MSG_TYPE_EEL_VANISHED */:
+            case MSG_TYPE_EEL_VANISHED:
                 sprintf(param_1, _msg_eel_vanished_fmt, &MOX::_star[(param_2->u).eel.star_idx]);
                 return;
-            case 20 /* MSG_TYPE_ARTIFACTS */:
+            case MSG_TYPE_ARTIFACTS:
                 if ((param_2->u).artifacts.tech2 == '\0') {
                     sprintf(local_c8, MOX::s_fmt_s,
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name);
@@ -483,10 +483,10 @@ namespace MSG_ {
                 }
                 sprintf(param_1, _msg_artifacts_fmt, local_c8, &MOX::_star[(param_2->u).artifacts.star_idx]);
                 return;
-            case 21 /* MSG_TYPE_APRIL1 */:
+            case MSG_TYPE_APRIL1:
                 strcpy(param_1, _msg_april1_fmt);
                 return;
-            case 22 /* MSG_TYPE_SCRAP_LEADER */:
+            case MSG_TYPE_SCRAP_LEADER:
                 sprintf(param_1, _msg_scrap_leader_fmt,
                              &MOX::_leaders[(uint8_t)(param_2->u).scrap_leader.leader_idx]);
                 return;
@@ -619,7 +619,7 @@ namespace MSG_ {
      * this function updates the screen state to navigate to that colony's management view.
      */
     int8_t __cdecl Goto_Msg_Colony_(s_MSG* msg) {
-        if (msg->msg_type == 0 /* MSG_TYPE_COLONY */) {
+        if (msg->msg_type == MSG_TYPE_COLONY) {
             uint8_t planet_idx = msg->u.colony.planet_idx;
             int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
@@ -627,8 +627,8 @@ namespace MSG_ {
                 s_colony* colony = &MOX::_colony[colony_idx];
 
                 if (colony->owner == MOX::_PLAYER_NUM) {
-                    MOX::_return_screen = 9;
-                    MOX::_current_screen = 1;
+                    MOX::_return_screen = SCREEN_INFO;
+                    MOX::_current_screen = SCREEN_COLONY;
 
                     s_planet_data* planet = &MOX::_planet[colony->planet];
                     MOX::_screen_data = (int16_t)planet->star_index;

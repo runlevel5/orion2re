@@ -312,8 +312,8 @@ namespace DIP_SCRN {
     void __cdecl Diplomacy_Offer_Gift_(int16_t player_idx, int16_t target_idx) {
         uint8_t options[16] = { 0 };
         int16_t local_446 = 0;
-        uint8_t local_424[212];
-        int32_t local_350[212];
+        uint8_t local_424[TECH_APP_COUNT];
+        int32_t local_350[TECH_APP_COUNT];
 
         options[0] = 1;
         options[1] = 1;
@@ -1674,7 +1674,7 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Diplomacy_Set_Main_Options_(int16_t player_id, int16_t target_id, uint8_t* options) {
-        int32_t tech_list_buffer[212];
+        int32_t tech_list_buffer[TECH_APP_COUNT];
         int16_t diff_tech_count;
 
         if (MOX::_player[player_id].treaty[target_id] < 4) {
@@ -1840,8 +1840,8 @@ namespace DIP_SCRN {
 
         int8_t list_pos = 0;
         char text_buffer[80];
-        uint8_t tech_list[212];
-        int32_t aiStack_350[212];
+        uint8_t tech_list[TECH_APP_COUNT];
+        int32_t aiStack_350[TECH_APP_COUNT];
         int16_t sStack_488;
         int16_t result = -1;
 

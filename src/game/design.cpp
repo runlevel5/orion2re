@@ -11,7 +11,7 @@ namespace DESIGN {
     int16_t _design_computer_replacement_field;
     int32_t _printed_cost;
     uint8_t _changed_design_name;
-    uint8_t _add_size_button_flag[6];
+    uint8_t _add_size_button_flag[SHIP_SIZE_DOOM_STAR + 1];
 
     const char s_comma_space[3] = ", ";
 
@@ -248,7 +248,7 @@ namespace DESIGN {
         }
 
         if (found_damper) {
-            MOX::_design->shield = 0;
+            MOX::_design->shield = SHIELD_NO_SHIELD;
         }
 
         return found_damper;
@@ -340,7 +340,7 @@ namespace DESIGN {
             int16_t special_idx = design->special_devices[i];
             if (special_idx > 0) {
                 int16_t base_cost = TECHDATA::_specials[special_idx].cost_per_ship_type[design->ship_size];
-                if (special_idx == 4) { // Device 4 keeps its base cost without miniaturization adjustment.
+                if (special_idx == SPECIAL_BATTLE_PODS) {
                     design->special_device_cost[i] = base_cost;
                 } else {
                     int16_t special_tech_level = Tech_Level_(player_idx, TECHDATA::_specials[special_idx].tech_app_id);
@@ -422,9 +422,8 @@ namespace DESIGN {
         for (int i = 0; i < 8; ++i) {
             int16_t device_id = design->special_devices[i];
             if (device_id > 0) {
-                if (device_id == 4) {
-                    // Device 4 keeps its base space without miniaturization adjustment.
-                    design->special_device_space[i] = TECHDATA::_specials[4].space_per_ship_type[design->ship_size];
+                if (device_id == SPECIAL_BATTLE_PODS) {
+                    design->special_device_space[i] = TECHDATA::_specials[SPECIAL_BATTLE_PODS].space_per_ship_type[design->ship_size];
                 } else {
                     int16_t tech_app = TECHDATA::_specials[device_id].tech_app_id;
                     int8_t min_cat = Miniaturization_Category_(tech_app);
@@ -504,7 +503,7 @@ namespace DESIGN {
         s_current_design* design = MOX::_design;
         int16_t multiplier;
 
-        if (design->ship_size < 5) {
+        if (design->ship_size < SHIP_SIZE_DOOM_STAR) {
             multiplier = design->ship_size + 1;
         } else {
             multiplier = design->ship_size + 2;
@@ -965,7 +964,7 @@ namespace DESIGN {
 
         if (MOX::_ship_icon_lf_button == static_cast<uint16_t>(field)) {
             int16_t ship_size = MOX::_design->ship_size;
-            if (ship_size != 5) {
+            if (ship_size != SHIP_SIZE_DOOM_STAR) {
                 MOX::_design->picture_type--;
                 if (MOX::_design->picture_type < ship_size * 8) {
                     MOX::_design->picture_type = ship_size * 8 + 7;
@@ -978,7 +977,7 @@ namespace DESIGN {
             }
         } else if (MOX::_ship_icon_rt_button == static_cast<uint16_t>(field)) {
             int16_t ship_size = MOX::_design->ship_size;
-            if (ship_size != 5) {
+            if (ship_size != SHIP_SIZE_DOOM_STAR) {
                 MOX::_design->picture_type++;
                 if (MOX::_design->picture_type > (ship_size * 8 + 7)) {
                     MOX::_design->picture_type = ship_size * 8;
@@ -1070,7 +1069,7 @@ namespace DESIGN {
         while ((*dest++ = *src++) != '\0');
 
         template_out->size = (int8_t)d->ship_size;
-        template_out->shield_type = 0;
+        template_out->shield_type = SHIELD_NO_SHIELD;
         template_out->ftl_type = (int8_t)d->ftl_type;
         template_out->computer_type = (int8_t)d->computer_type;
         template_out->armor_type = (int8_t)d->armor_type;
@@ -1100,32 +1099,32 @@ namespace DESIGN {
     }
 
     void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2) {
-        if (size_idx >= 0 && size_idx <= 5) {
+        if (size_idx >= 0 && size_idx <= SHIP_SIZE_DOOM_STAR) {
             *x1 = 118;
             *x2 = 227;
 
             switch (size_idx) {
-                case 0:
+                case SHIP_SIZE_SMALL:
                     *y1 = 54;
                     *y2 = 69;
                     break;
-                case 1:
+                case SHIP_SIZE_MEDIUM:
                     *y1 = 70;
                     *y2 = 84;
                     break;
-                case 2:
+                case SHIP_SIZE_LARGE:
                     *y1 = 85;
                     *y2 = 102;
                     break;
-                case 3:
+                case SHIP_SIZE_HUGE:
                     *y1 = 103;
                     *y2 = 117;
                     break;
-                case 4:
+                case SHIP_SIZE_TITAN:
                     *y1 = 118;
                     *y2 = 132;
                     break;
-                case 5:
+                case SHIP_SIZE_DOOM_STAR:
                     *y1 = 133;
                     *y2 = 149;
                     break;
@@ -1145,7 +1144,7 @@ namespace DESIGN {
 
         // shipname.lbx entry: variant_idx + ((race_idx * 6 + design_idx) * 8)
         // original code performs this through 16-bit arithmetic before sign-extension
-        int16_t entry_idx = (int16_t)(variant_idx + (int16_t)((int16_t)(race_idx * 6) + design_idx) * 8);
+        int16_t entry_idx = (int16_t)(variant_idx + (int16_t)((int16_t)(race_idx * (SHIP_SIZE_DOOM_STAR + 1)) + design_idx) * 8);
 
         char* loaded_name = (char*)farload::Far_Reload_Next_Data_(
             "shipname.lbx",
@@ -1213,7 +1212,7 @@ namespace DESIGN {
                 }
             }
             app_idx++;
-        } while (app_idx < 212);
+        } while (app_idx < TECH_APP_COUNT);
 
         return space_found;
     }
@@ -1262,7 +1261,7 @@ namespace DESIGN {
             animate::Draw_(544, 439, _dark_build_design_button_seg);
         }
 
-        for (int size_idx = 0; size_idx < 6; ++size_idx) {
+        for (int size_idx = 0; size_idx <= SHIP_SIZE_DOOM_STAR; ++size_idx) {
             int16_t btn_x, btn_y, btn_w, btn_h;
             if (MOX::_refit_ship == 0) {
                 if (_add_size_button_flag[size_idx] != 1) {
@@ -1331,7 +1330,7 @@ namespace DESIGN {
     bool __cdecl Space_For_System_Replacement_() {
         int16_t found_count = 0;
 
-        for (int16_t app_idx = 0; app_idx < 212; ++app_idx) {
+        for (int16_t app_idx = 0; app_idx < TECH_APP_COUNT; ++app_idx) {
             if (found_count != 0) break;
 
             if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == 3) {
@@ -1374,12 +1373,12 @@ namespace DESIGN {
 
     int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_idx) {
         if (player_idx > -1 && player_idx < MOX::_NUM_PLAYERS) {
-            if (tech_idx < 0 || tech_idx >= 212 /* 0xd4 */) {
+            if (tech_idx < 0 || tech_idx >= TECH_APP_COUNT) {
                 RUSS::PFMT_(0, 2, "Bad required_tech in Tech_Level()... %d", (int32_t)tech_idx);
                 key::Wait_For_Key_();
             }
 
-            if (tech_idx != 0 && MOX::_player[player_idx].tech_applications[tech_idx] != 1) {
+            if (tech_idx != TECH_APP_NO_TECH && MOX::_player[player_idx].tech_applications[tech_idx] != 1) {
                 return Miniaturization_Level_(player_idx, tech_idx);
             }
         }
@@ -1391,7 +1390,7 @@ namespace DESIGN {
         int16_t result_id = -1;
 
         if (category == 3) { // Weapon Category
-            for (int16_t i = 0; i < 40; ++i) {
+            for (int16_t i = 0; i < WEAPON_COUNT; ++i) {
                 if (TECHDATA::_weapons[i].tech_app_id == app_id) {
                     result_id = i;
                     break;
@@ -1447,7 +1446,7 @@ namespace DESIGN {
 
         s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
 
-        for (int16_t i = 0; i < 212; ++i) {
+        for (int16_t i = 0; i < TECH_APP_COUNT; ++i) {
             if (player->tech_applications[i] == 3) {
                 if ((int16_t)DESBOX::Application_Type_(i) == application_type) {
                     replacement_count++;
@@ -1524,7 +1523,7 @@ namespace DESIGN {
         bool any_mod = false;
         out_buffer[0] = '\0';
 
-        for (int16_t i = 0; i < 15; ++i) {
+        for (int16_t i = 0; i < WEAPON_MOD_COUNT; ++i) {
             if ((mod_mask >> (i & 0x1f)) & 1) {
                 const char* mod_name = TECHDATA::_weapon_modifications[i].name_plural;
 
@@ -1619,10 +1618,10 @@ namespace DESIGN {
         auto& app = TECHDATA::_technology_applications[tech_app];
 
         if (app.type == 3) {
-            if (tech_app == TECHDATA::_weapons[31].tech_app_id ||
-                tech_app == TECHDATA::_weapons[30].tech_app_id ||
-                tech_app == TECHDATA::_weapons[28].tech_app_id ||
-                tech_app == TECHDATA::_weapons[29].tech_app_id) {
+            if (tech_app == TECHDATA::_weapons[WEAPON_INTERCEPTOR].tech_app_id ||
+                tech_app == TECHDATA::_weapons[WEAPON_BOMBER].tech_app_id ||
+                tech_app == TECHDATA::_weapons[WEAPON_ASSAULT_SHUTTLE].tech_app_id ||
+                tech_app == TECHDATA::_weapons[WEAPON_HEAVY_FIGHTER].tech_app_id) {
                 return 2;
             }
 
@@ -1633,11 +1632,11 @@ namespace DESIGN {
                 return 0;
             }
         } else if (app.type == 9) {
-            if (tech_app == TECHDATA::_specials[2].tech_app_id ||
-                tech_app == TECHDATA::_specials[27].tech_app_id ||
-                tech_app == TECHDATA::_specials[11].tech_app_id ||
-                tech_app == TECHDATA::_specials[14].tech_app_id ||
-                tech_app == TECHDATA::_specials[36].tech_app_id) {
+            if (tech_app == TECHDATA::_specials[SPECIAL_AUGMENTED_ENGINES].tech_app_id ||
+                tech_app == TECHDATA::_specials[SPECIAL_REINFORCED_HULL].tech_app_id ||
+                tech_app == TECHDATA::_specials[SPECIAL_EXTENDED_FUEL_TANKS].tech_app_id ||
+                tech_app == TECHDATA::_specials[SPECIAL_HEAVY_ARMOR].tech_app_id ||
+                tech_app == TECHDATA::_specials[SPECIAL_TROOP_PODS].tech_app_id) {
                 return 2;
             }
             return 1;
@@ -1650,15 +1649,15 @@ namespace DESIGN {
         *bonus1_out = 100;
         *bonus2_out = 100;
 
-        if ((flags & 0x2) != 0) {
-            int16_t index = MISC::Bit_Value_To_Num_(2, 15);
+        if ((flags & WEAPON_MOD_FLAG_HEAVY_MOUNT) != 0) {
+            int16_t index = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_HEAVY_MOUNT, WEAPON_MOD_COUNT);
             *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
             *bonus2_out += TECHDATA::_weapon_modifications[index].space;
             return;
         }
 
-        if ((flags & 0x4) != 0) {
-            int16_t index = MISC::Bit_Value_To_Num_(4, 15);
+        if ((flags & WEAPON_MOD_FLAG_POINT_DEFENCE) != 0) {
+            int16_t index = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_POINT_DEFENCE, WEAPON_MOD_COUNT);
             *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
             *bonus2_out += TECHDATA::_weapon_modifications[index].space;
         }
@@ -1680,74 +1679,74 @@ namespace DESIGN {
         *bonus1 = 0;
         *bonus2 = 0;
 
-        if (mods & 0x4000 /* WEAPON_MOD_FLAG_OVERLOADED */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x4000, 15);
+        if (mods & WEAPON_MOD_FLAG_OVERLOADED) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_OVERLOADED, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0008 /* WEAPON_MOD_FLAG_ARMOR_PIERCING */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0008, 15);
+        if (mods & WEAPON_MOD_FLAG_ARMOR_PIERCING) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_ARMOR_PIERCING, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0010 /* WEAPON_MOD_FLAG_CONTINUOUS */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0010, 15);
+        if (mods & WEAPON_MOD_FLAG_CONTINUOUS) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_CONTINUOUS, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0020 /* WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0020, 15);
+        if (mods & WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0040 /* WEAPON_MOD_FLAG_SHIELD_PIERCING */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0040, 15);
+        if (mods & WEAPON_MOD_FLAG_SHIELD_PIERCING) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_SHIELD_PIERCING, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0080 /* WEAPON_MOD_FLAG_AUTO_FIRE */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0080, 15);
+        if (mods & WEAPON_MOD_FLAG_AUTO_FIRE) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_AUTO_FIRE, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0100 /* WEAPON_MOD_FLAG_ENVELOPING */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0100, 15);
+        if (mods & WEAPON_MOD_FLAG_ENVELOPING) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_ENVELOPING, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0200 /* WEAPON_MOD_FLAG_MIRV */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0200, 15);
+        if (mods & WEAPON_MOD_FLAG_MIRV) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_MIRV, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0400 /* WEAPON_MOD_FLAG_ECCM */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0400, 15);
+        if (mods & WEAPON_MOD_FLAG_ECCM) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_ECCM, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x0800 /* WEAPON_MOD_FLAG_HEAVILY_ARMORED */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x0800, 15);
+        if (mods & WEAPON_MOD_FLAG_HEAVILY_ARMORED) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_HEAVILY_ARMORED, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x1000 /* WEAPON_MOD_FLAG_FAST */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x1000, 15);
+        if (mods & WEAPON_MOD_FLAG_FAST) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_FAST, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
-        if (mods & 0x2000 /* WEAPON_MOD_FLAG_EMISSION_GUIDANCE */) {
-            int16_t idx = MISC::Bit_Value_To_Num_(0x2000, 15);
+        if (mods & WEAPON_MOD_FLAG_EMISSION_GUIDANCE) {
+            int16_t idx = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_EMISSION_GUIDANCE, WEAPON_MOD_COUNT);
             *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
             *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
@@ -1759,8 +1758,8 @@ namespace DESIGN {
         int16_t level = 0;
 
         while (next_id != 0) {
-            if (next_id >= 75) {
-                level += (int16_t)MOX::_player[player_idx].hyper_advanced_tech[next_id - 75];
+            if (next_id >= TECH_FIELD_BIOLOGY) {
+                level += (int16_t)MOX::_player[player_idx].hyper_advanced_tech[next_id - TECH_FIELD_BIOLOGY];
                 break;
             }
 
@@ -1868,17 +1867,20 @@ namespace DESIGN {
         special_msg[0] = '\0';
 
         // Check for weapons with special descriptive text instead of damage numbers
-        if (weapon_id == 13 || weapon_id == 28 || weapon_id == 32 || weapon_id == 33 ||
-            weapon_id == 34 || weapon_id == 26 || weapon_id == 25 || weapon_id == 31 ||
-            weapon_id == 30 || weapon_id == 29 || weapon_id == 36 || weapon_id == 35 ||
-            weapon_id == 37 || weapon_id == 39) {
+        if (weapon_id == WEAPON_SPATIAL_COMPRESSOR || weapon_id == WEAPON_ASSAULT_SHUTTLE ||
+            weapon_id == WEAPON_STASIS_FIELD || weapon_id == WEAPON_ANTI_MISSILE_ROCKET ||
+            weapon_id == WEAPON_GYRO_DESTABILIZER || weapon_id == WEAPON_BIO_TERMINATOR ||
+            weapon_id == WEAPON_DEATH_SPORE || weapon_id == WEAPON_INTERCEPTOR ||
+            weapon_id == WEAPON_BOMBER || weapon_id == WEAPON_HEAVY_FIGHTER ||
+            weapon_id == WEAPON_PULSAR || weapon_id == WEAPON_PLASMA_WEB ||
+            weapon_id == WEAPON_BLACK_HOLE_GENERATOR || weapon_id == WEAPON_TRACTOR_BEAM) {
 
             const char* msg = HAROLD::H_Message_(HESTR_065_SPECIAL);
             strcpy(special_msg, msg);
-        } else if (weapon_id == 29 || weapon_id == 30) {
+        } else if (weapon_id == WEAPON_HEAVY_FIGHTER || weapon_id == WEAPON_BOMBER) {
             min_damage = INITSHIP::Best_Bomb_Weapon_(MOX::_PLAYER_NUM);
             max_damage = min_damage;
-        } else if (weapon_id == 31) {
+        } else if (weapon_id == WEAPON_INTERCEPTOR) {
             // Point Defense damage is half of its best weapon's damage
             min_damage = INITSHIP::Best_Point_Defense_Weapon_(MOX::_PLAYER_NUM) / 2;
             max_damage = min_damage;
@@ -1886,38 +1888,38 @@ namespace DESIGN {
 
         if (is_design_slot) {
             uint16_t specials = MOX::_design->weapon_specials[weapon_idx];
-            if (specials & 0x4000) { // Overloaded
+            if (specials & WEAPON_MOD_FLAG_OVERLOADED) {
                 min_damage = (min_damage * 150) / 100;
                 max_damage = (max_damage * 150) / 100;
-            } else if (specials & 4) { // Continuous
+            } else if (specials & WEAPON_MOD_FLAG_POINT_DEFENCE) {
                 min_damage = (min_damage * 50 + 50) / 100;
                 max_damage = (max_damage * 50) / 100;
                 if (max_damage < min_damage) {
                     max_damage = min_damage;
                 }
-            } else if (specials & 2) { // Heavy Mount
+            } else if (specials & WEAPON_MOD_FLAG_HEAVY_MOUNT) {
                 min_damage = (min_damage * 150) / 100;
                 max_damage = (max_damage * 150) / 100;
             }
         } else {
             if (row_idx == field_item_chosen) {
-                if (MOX::_weapon_mod_field_status[14] > 0) {
+                if (MOX::_weapon_mod_field_status[WEAPON_MOD_OVERLOADED] > 0) {
                     min_damage = (min_damage * 150) / 100;
                     max_damage = (max_damage * 150) / 100;
-                } else if (MOX::_weapon_mod_field_status[2] > 0) {
+                } else if (MOX::_weapon_mod_field_status[WEAPON_MOD_POINT_DEFENSE] > 0) {
                     min_damage = (min_damage * 50 + 50) / 100;
                     max_damage = (max_damage * 50) / 100;
                     if (max_damage < min_damage) {
                         max_damage = min_damage;
                     }
-                } else if (MOX::_weapon_mod_field_status[1] > 0) {
+                } else if (MOX::_weapon_mod_field_status[WEAPON_MOD_HEAVY_MOUNT] > 0) {
                     min_damage = (min_damage * 150) / 100;
                     max_damage = (max_damage * 150) / 100;
                 }
             }
         }
 
-        if (weapon_id == 0) {
+        if (weapon_id == WEAPON_NO_WEAPONS) {
             strcpy(buffer, "0");
             return;
         }

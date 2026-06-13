@@ -36,7 +36,7 @@ namespace DESBOX {
 
         const int16_t replacement_slot = MOX::_design_screen_replacement_slot;
 
-        for (int i = 0; i < 40; ++i) {
+        for (int i = 0; i < SPECIAL_COUNT; ++i) {
             MOX::_design_choice_items[i] = -1;
             MOX::_design_choice_item_selected[i] = 0;
         }
@@ -45,7 +45,7 @@ namespace DESBOX {
         MOX::_scroll_bar->total_rows = 1;
 
         for (int i = 0; i < 39; ++i) {
-            if (MOX::_scroll_bar->total_rows >= 40) {
+            if (MOX::_scroll_bar->total_rows >= SPECIAL_COUNT) {
                 break;
             }
 
@@ -276,16 +276,16 @@ namespace DESBOX {
         MOX::_scroll_bar = nullptr;
 
         allocate::Pop_Block_(MOX::_global_data_seg);
-        MOX::_current_screen = 3;
+        MOX::_current_screen = SCREEN_DESIGN;
         
         DESIGN::Update_Calculated_Design_Data_(MOX::_PLAYER_NUM);
         fields::Clear_Fields_();
     }
     void __cdecl Add_Replacement_Weapon_Fields_(int16_t* cancel_btn_field, int16_t* screen_field) {
         int16_t rack_quantities[5] = {2, 5, 10, 15, 20};
-        int16_t mod_fields[15] = {0};
-        int16_t mod_xs[15] = {0};
-        int16_t mod_ys[15] = {0};
+        int16_t mod_fields[WEAPON_MOD_COUNT] = {0};
+        int16_t mod_xs[WEAPON_MOD_COUNT] = {0};
+        int16_t mod_ys[WEAPON_MOD_COUNT] = {0};
         char choice_str[80];
 
         int16_t mid_box_h = animate::Get_Height_(MOX::_weapons_mid_box_seg);
@@ -473,7 +473,7 @@ namespace DESBOX {
 
         int16_t mods_base_y = _replacement_box_base_y + total_top_mid_h;
 
-        for (int16_t i = 1; i < 15; i++) {
+        for (int16_t i = 1; i < WEAPON_MOD_COUNT; i++) {
             if (_field_item_chosen > -1) {
                 if (Mod_Allowed_On_Weapon_Type_((uint8_t)i)) {
                     if (Should_Add_Mod_(i)) {
@@ -598,7 +598,7 @@ namespace DESBOX {
                 DESIGN::Clear_Weapon_Slot_(slot_idx);
                 DESIGN::Update_Calculated_Design_Data_(MOX::_PLAYER_NUM);
             }
-            MOX::_current_screen = 3;
+            MOX::_current_screen = SCREEN_DESIGN;
             *exit_flag = 1;
             return;
         }
@@ -661,7 +661,7 @@ namespace DESBOX {
             }
 
             DESIGN::Update_Calculated_Design_Data_(MOX::_PLAYER_NUM);
-            MOX::_current_screen = 3;
+            MOX::_current_screen = SCREEN_DESIGN;
             *exit_flag = 1;
         }
     }
@@ -758,7 +758,7 @@ namespace DESBOX {
         memset(MOX::_design->replacement_item_unlocked, 0, sizeof(MOX::_design->replacement_item_unlocked));
 
         if (MOX::_design_screen_replacement_type == 2 /* SHIELDS */) {
-            MOX::_scroll_bar->total_rows = 6;
+            MOX::_scroll_bar->total_rows = SHIELD_COUNT;
             for (int16_t idx = 0; idx < MOX::_scroll_bar->total_rows; ++idx) {
                 // If it is the first item (basic shield) or it has been researched (tech status 3)
                 if (idx == 0 || MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECHDATA::_shields[idx].tech_app_id] == 3) {
@@ -769,7 +769,7 @@ namespace DESBOX {
                 }
             }
         } else if (MOX::_design_screen_replacement_type == 8 /* COMPUTERS */) {
-            MOX::_scroll_bar->total_rows = 6;
+            MOX::_scroll_bar->total_rows = COMPUTER_COUNT;
             for (int16_t idx = 0; idx < MOX::_scroll_bar->total_rows; ++idx) {
                 // If it is the first item (basic computer) or it has been researched (tech status 3)
                 if (idx == 0 || MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECHDATA::_computers[idx].tech_app_id] == 3) {
@@ -984,7 +984,7 @@ namespace DESBOX {
         int16_t weapon_idx = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
         uint16_t mods_mask = 0;
 
-        for (int16_t i = 0; i < 15; ++i) {
+        for (int16_t i = 0; i < WEAPON_MOD_COUNT; ++i) {
             if (MOX::_weapon_mod_field_status[i] == 1) {
                 mods_mask |= (1 << i);
             }
@@ -1187,16 +1187,16 @@ namespace DESBOX {
     int16_t __cdecl Valid_Modifications_(uint8_t* mod_status_list) {
         int16_t valid_count = 0;
 
-        memset(mod_status_list, 0, 15 * sizeof(*mod_status_list));
+        memset(mod_status_list, 0, WEAPON_MOD_COUNT * sizeof(*mod_status_list));
 
         if (_field_item_chosen > -1) {
             int16_t weapon_idx = Weapon_Index_(_field_item_chosen);
             uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
 
-            for (int16_t mod_idx = 1; mod_idx < 15; mod_idx++) {
-                if (mod_idx == 13) {
+            for (int16_t mod_idx = 1; mod_idx < WEAPON_MOD_COUNT; mod_idx++) {
+                if (mod_idx == WEAPON_MOD_EMMISIONS_GUIDANCE) {
                     if (TECHDATA::_weapons[weapon_idx].type == 1 &&
-                        MOX::_player[MOX::_PLAYER_NUM].tech_applications[59] == 3) {
+                        MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_EMISSIONS_GUIDANCE_SYSTEM] == 3) {
                         New_Mod_Space_(static_cast<uint8_t>(mod_idx));
                         valid_count++;
                         mod_status_list[mod_idx] = 1;
@@ -1446,7 +1446,7 @@ namespace DESBOX {
                 _special_filter_button_status = _special_filter_button_status == 0 ? 1 : 0;
             }
 
-            for (int16_t i = 1; i < 15; ++i) {
+            for (int16_t i = 1; i < WEAPON_MOD_COUNT; ++i) {
                 if (-MOX::_weapon_mod_fields[i] == input) {
                     Print_Weapon_Mod_Help_Description_(i);
                 } else if (MOX::_weapon_mod_fields[i] == input && _valid_mods[i] == 1) {
@@ -1504,7 +1504,7 @@ namespace DESBOX {
                 }
             }
 
-            for (int16_t i = 0; i < 15; ++i) {
+            for (int16_t i = 0; i < WEAPON_MOD_COUNT; ++i) {
                 if (MOX::_weapon_mod_fields[i] == input && _valid_mods[i] > 0xF8) {
                     Print_Weapon_Modification_Message_(i);
                 }
@@ -1598,7 +1598,7 @@ namespace DESBOX {
         allocate::Pop_Block_(MOX::_global_data_seg);
         fields::Deactivate_Auto_Function_();
         fields::Clear_Fields_();
-        MOX::_current_screen = 3;
+        MOX::_current_screen = SCREEN_DESIGN;
     }
 
     int8_t __cdecl Application_Type_(int16_t tech_app_id) {
@@ -1680,7 +1680,7 @@ namespace DESBOX {
                     case 4:
                     case 5:
                         if (_special_filter_button_status != 0) {
-                            if (TECHDATA::_weapons[w_idx].weapon_id == 0x27) {
+                            if (TECHDATA::_weapons[w_idx].weapon_id == WEAPON_TRACTOR_BEAM) {
                                 if (!Have_Tractor_Beam_Weapon_()) {
                                     add_weapon = true;
                                 }
@@ -1764,15 +1764,15 @@ namespace DESBOX {
     }
 
     void __cdecl Draw_Weapons_Mod_Box_(int16_t param_1, int16_t param_2) {
-        int16_t mod_types[15] = {0};
-        int16_t mod_y[15] = {0};
-        int16_t mod_x[15] = {0};
+        int16_t mod_types[WEAPON_MOD_COUNT] = {0};
+        int16_t mod_y[WEAPON_MOD_COUNT] = {0};
+        int16_t mod_x[WEAPON_MOD_COUNT] = {0};
 
         animate::Draw_(param_1 + 0xe0, param_2 + 0x46, MOX::_weapons_blank_mods_seg);
 
         Get_Weapon_Mod_Field_XYs_(mod_types, mod_x, mod_y);
 
-        for (int16_t i = 1; i < 15; i++) {
+        for (int16_t i = 1; i < WEAPON_MOD_COUNT; i++) {
             if (_field_item_chosen > -1) {
                 if (Mod_Allowed_On_Weapon_Type_((uint8_t)i)) {
                     if (Should_Add_Mod_(i)) {
@@ -1799,13 +1799,13 @@ namespace DESBOX {
         bool has_tractor_beam = false;
 
         if (MOX::_design_screen_replacement_slot == -1 ||
-            MOX::_design->weapon_type[MOX::_design_screen_replacement_slot] != 0x27) {
+            MOX::_design->weapon_type[MOX::_design_screen_replacement_slot] != WEAPON_TRACTOR_BEAM) {
 
             for (int16_t i = 0; i < 8; ++i) {
                 if (has_tractor_beam) {
                     break;
                 }
-                if (MOX::_design->weapon_type[i] == 0x27 /* Tractor Beam */) {
+                if (MOX::_design->weapon_type[i] == WEAPON_TRACTOR_BEAM) {
                     has_tractor_beam = true;
                 }
             }
@@ -1918,7 +1918,7 @@ namespace DESBOX {
             }
         }
 
-        for (int16_t i = 1; i < 15; ++i) {
+        for (int16_t i = 1; i < WEAPON_MOD_COUNT; ++i) {
             if ((_weapon_replacement_mods >> i) & 1) {
                 MOX::_weapon_mod_field_status[i] = 1;
             }
@@ -2020,7 +2020,7 @@ namespace DESBOX {
 
     void __cdecl Update_Weapon_Modification_Data_() {
         uint16_t mods = 0;
-        for (int16_t i = 1; i < 15; ++i) {
+        for (int16_t i = 1; i < WEAPON_MOD_COUNT; ++i) {
             if (MOX::_weapon_mod_field_status[i] == 1) {
                 mods |= (1 << i);
             }
@@ -2044,7 +2044,7 @@ namespace DESBOX {
             Weapon_Index_(_field_item_chosen);
             *modifications = 0;
 
-            for (int16_t i = 1; i < 15; ++i) {
+            for (int16_t i = 1; i < WEAPON_MOD_COUNT; ++i) {
                 if (MOX::_weapon_mod_field_status[i] == 1) {
                     *modifications |= (1 << i);
                 }
@@ -2062,7 +2062,7 @@ namespace DESBOX {
             MOX::_weapon_rack_field[i] = -1000;
         }
 
-        for (int16_t i = 0; i < 15; ++i) {
+        for (int16_t i = 0; i < WEAPON_MOD_COUNT; ++i) {
             MOX::_weapon_mod_fields[i] = -1000;
         }
     }
@@ -2134,7 +2134,7 @@ namespace DESBOX {
             return;
         }
 
-        for (int16_t i = 1; i < 15; ++i) {
+        for (int16_t i = 1; i < WEAPON_MOD_COUNT; ++i) {
             int16_t mod_idx = -1;
 
             if (DESBOX::Should_Add_Mod_(i)) {

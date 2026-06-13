@@ -92,7 +92,7 @@ namespace HOMEGEN {
 
             if (!Star_Has_Planet_(target_star_idx)) {
                 s_star_data* target_star = &MOX::_star[target_star_idx];
-                target_star->spectral_class = 4; // M-class (Red)
+                target_star->spectral_class = STAR_CLASS_M;
 
                 int32_t r_size = game_random::Random_(10) - 1;
                 if (r_size < 3) target_star->size = 0;
@@ -111,9 +111,9 @@ namespace HOMEGEN {
 
                     s_planet_data* new_planet = &MOX::_planet[MOX::_planet_count];
                     new_planet->orbit = orbit;
-                    new_planet->planet_type = 3; // Terran
+                    new_planet->planet_type = PLANET_TYPE_PLANET;
 
-                    MAPGEN::Generate_Satellite_(target_star_idx, orbit, 3);
+                    MAPGEN::Generate_Satellite_(target_star_idx, orbit, PLANET_TYPE_PLANET);
                     MOX::_planet_count++;
                 }
             }
@@ -475,7 +475,7 @@ namespace HOMEGEN {
                     HAROLD::Is_Colony_Star_(i) ||
                     Is_Added_Food_World_(i) ||
                     HAROLD::Empty_System_(i) ||
-                    MOX::_star[i].spectral_class == 6) // Black Hole
+                    MOX::_star[i].spectral_class == STAR_CLASS_BLACK_HOLE)
                 {
                     invalid_stars_count++;
                 }
@@ -512,7 +512,7 @@ namespace HOMEGEN {
                 !HAROLD::Is_Home_Star_(i) &&
                 !HAROLD::Is_Colony_Star_(i) &&
                 !HAROLD::Empty_System_(i) &&
-                MOX::_star[i].spectral_class != 6)
+                MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE)
             {
                 weights[i] = 1;
             }
@@ -566,7 +566,7 @@ namespace HOMEGEN {
     void __cdecl Make_One_Planet_(int16_t star_idx, int16_t planet_idx, int16_t orbit_idx, int8_t is_food_planet) {
         s_star_data& star = MOX::_star[star_idx];
 
-        if (is_food_planet != 0 && star.spectral_class >= 5) {
+        if (is_food_planet != 0 && star.spectral_class >= STAR_CLASS_DWARF) {
             star.spectral_class = (int8_t)(game_random::Random_(5) - 1);
         }
 
@@ -588,13 +588,13 @@ namespace HOMEGEN {
         planet.n_terraforms = 0;
         planet.max_farms = 0;
         planet.max_population = 0;
-        planet.planet_special = 0;
+        planet.planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
         planet.environmental_alterations = 0;
 
         planet.orbit = (int8_t)orbit_idx;
-        planet.planet_type = 3;
+        planet.planet_type = PLANET_TYPE_PLANET;
 
-        MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit_idx, 3);
+        MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit_idx, PLANET_TYPE_PLANET);
         MAPGEN::_make_food_planet = 0;
 
         if (MOX::_planet_count == planet_idx) {
@@ -663,7 +663,7 @@ namespace HOMEGEN {
             int16_t p_idx = planet_indices[i];
             if (p_idx != -1) {
                 int8_t type = MOX::_planet[p_idx].planet_type;
-                if (type > 0 && type < 4) {
+                if (type >= PLANET_TYPE_ASTEROID && type <= PLANET_TYPE_PLANET) {
                     weights[i] = 1;
                 }
             }
@@ -690,7 +690,7 @@ namespace HOMEGEN {
         bool has_planet_special = false;
         for (int i = 0; i < 5; ++i) {
             int16_t p_idx = star->planet_index[i];
-            if (p_idx > -1 && MOX::_planet[p_idx].planet_special > 0) {
+            if (p_idx > -1 && MOX::_planet[p_idx].planet_special > SYSTEM_SPECIAL_NO_SPECIAL) {
                 has_planet_special = true;
                 break;
             }
@@ -701,7 +701,7 @@ namespace HOMEGEN {
                 for (int i = 0; i < 5; ++i) {
                     int16_t p_idx = star->planet_index[i];
                     if (p_idx > -1) {
-                        MOX::_planet[p_idx].planet_special = 0;
+                        MOX::_planet[p_idx].planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
                     }
                 }
                 need_new_special = 1;
@@ -725,12 +725,12 @@ namespace HOMEGEN {
 
         switch (monster_type) {
         case 10:
-            size_weights[2] = 1;
-            size_weights[3] = 1;
-            size_weights[4] = 1;
-            mineral_weights[3] = 1;
-            mineral_weights[4] = 1;
-            if (planet->planet_type == 3) {
+            size_weights[PLANET_SIZE_MEDIUM] = 1;
+            size_weights[PLANET_SIZE_LARGE] = 1;
+            size_weights[PLANET_SIZE_HUGE] = 1;
+            mineral_weights[MINERAL_RESOURCE_RICH] = 1;
+            mineral_weights[MINERAL_RESOURCE_ULTRA_RICH] = 1;
+            if (planet->planet_type == PLANET_TYPE_PLANET) {
                 should_upgrade_climate = false;
             } else {
                 for (int i = 0; i < 10; ++i) climate_weights[i] = 1;
@@ -738,28 +738,28 @@ namespace HOMEGEN {
             break;
         case 11:
         case 14:
-            size_weights[3] = 1;
-            size_weights[4] = 1;
-            mineral_weights[3] = 1;
-            mineral_weights[4] = 1;
-            climate_weights[8] = 1;
-            climate_weights[9] = 1;
+            size_weights[PLANET_SIZE_LARGE] = 1;
+            size_weights[PLANET_SIZE_HUGE] = 1;
+            mineral_weights[MINERAL_RESOURCE_RICH] = 1;
+            mineral_weights[MINERAL_RESOURCE_ULTRA_RICH] = 1;
+            climate_weights[PLANET_CLIMATE_TERRAN] = 1;
+            climate_weights[PLANET_CLIMATE_GAIA] = 1;
             break;
         case 12:
-            size_weights[2] = 1;
-            size_weights[3] = 1;
-            size_weights[4] = 1;
-            mineral_weights[3] = 1;
-            mineral_weights[4] = 1;
-            climate_weights[8] = 1;
-            climate_weights[9] = 1;
+            size_weights[PLANET_SIZE_MEDIUM] = 1;
+            size_weights[PLANET_SIZE_LARGE] = 1;
+            size_weights[PLANET_SIZE_HUGE] = 1;
+            mineral_weights[MINERAL_RESOURCE_RICH] = 1;
+            mineral_weights[MINERAL_RESOURCE_ULTRA_RICH] = 1;
+            climate_weights[PLANET_CLIMATE_TERRAN] = 1;
+            climate_weights[PLANET_CLIMATE_GAIA] = 1;
             break;
         case 13:
-            size_weights[3] = 1;
-            size_weights[4] = 1;
-            mineral_weights[3] = 1;
-            mineral_weights[4] = 1;
-            if (planet->planet_type == 3) {
+            size_weights[PLANET_SIZE_LARGE] = 1;
+            size_weights[PLANET_SIZE_HUGE] = 1;
+            mineral_weights[MINERAL_RESOURCE_RICH] = 1;
+            mineral_weights[MINERAL_RESOURCE_ULTRA_RICH] = 1;
+            if (planet->planet_type == PLANET_TYPE_PLANET) {
                 should_upgrade_climate = false;
             } else {
                 for (int i = 0; i < 10; ++i) climate_weights[i] = 1;
@@ -769,7 +769,7 @@ namespace HOMEGEN {
             break;
         }
 
-        planet->planet_type = 3;
+        planet->planet_type = PLANET_TYPE_PLANET;
 
         int16_t new_size = RUSS::Get_Weighted_Choice_Short_(size_weights, 5);
         if ((int16_t)planet->size < new_size) {
@@ -822,9 +822,9 @@ namespace HOMEGEN {
                     MOX::_planet_count = (uint16_t)existing_planet_idx;
 
                     MOX::_planet[existing_planet_idx].orbit = (int8_t)orbit;
-                    MOX::_planet[existing_planet_idx].planet_type = 3; // PLANET_TYPE_PLANET
+                    MOX::_planet[existing_planet_idx].planet_type = PLANET_TYPE_PLANET;
 
-                    MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit, 3);
+                    MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit, PLANET_TYPE_PLANET);
                     
                     MOX::_planet_count = saved_global_count;
                 }
@@ -864,9 +864,9 @@ namespace HOMEGEN {
 
                 Enforce_3_Planet_Minimum_(i);
 
-                int16_t climate_threshold = 8;
+                int16_t climate_threshold = PLANET_CLIMATE_TERRAN;
                 if (player->traits[TRAIT_AQUATIC] != 0) { // Aquatic
-                    climate_threshold = 5;
+                    climate_threshold = PLANET_CLIMATE_OCEAN;
                 }
 
                 Enforce_Climate_(i, climate_threshold, &home_planet_id);
@@ -877,16 +877,16 @@ namespace HOMEGEN {
                 if (player->traits[TRAIT_LARGE_HOME_WORLD] == 0) { // Not Large Home World
                     Enforce_Medium_Planet_Size_(home_planet_id);
                 } else {
-                    Set_Planet_Size(home_planet_id, 3); // PLANET_SIZE_LARGE
+                    Set_Planet_Size(home_planet_id, PLANET_SIZE_LARGE);
                 }
 
                 Enforce_Planet_Type_(i, home_planet_id);
                 Enforce_Planet_Abundant_Mineral_Class(home_planet_id);
 
                 if (player->traits[TRAIT_RICH_HOME_WORLD] > 0) { // Rich Home World
-                    Enforce_Mineral_Richness_(home_planet_id, 3);
+                    Enforce_Mineral_Richness_(home_planet_id, MINERAL_RESOURCE_RICH);
                 } else if (player->traits[TRAIT_RICH_HOME_WORLD] < 0) { // Poor Home World
-                    Enforce_Mineral_Richness_(home_planet_id, 1);
+                    Enforce_Mineral_Richness_(home_planet_id, MINERAL_RESOURCE_POOR);
                 }
 
                 if (player->traits[TRAIT_ANCIENT_HOME_WORLD] != 0) { // Ancient Home World (Artifacts)
@@ -895,9 +895,9 @@ namespace HOMEGEN {
 
                 int8_t gravity_type;
                 if (player->traits[TRAIT_LOW_G_WORLD] != 0) {
-                    gravity_type = 0;
+                    gravity_type = PLANET_GRAVITY_LOW_G;
                 } else {
-                    gravity_type = (player->traits[TRAIT_HEAVY_G_WORLD] == 0) ? 1 : 2; // Normal-G or Heavy-G
+                    gravity_type = (player->traits[TRAIT_HEAVY_G_WORLD] == 0) ? PLANET_GRAVITY_NORMAL_G : PLANET_GRAVITY_HEAVY_G;
                 }
                 Enforce_Gravity_(home_planet_id, gravity_type, owner_idx);
 
@@ -1009,7 +1009,7 @@ namespace HOMEGEN {
         for (int i = 0; i < 5; ++i) {
             int16_t planet_idx = star.planet_index[i];
             if (planet_idx > -1) {
-                MOX::_planet[planet_idx].planet_special = 0;
+                MOX::_planet[planet_idx].planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
             }
         }
     }
@@ -1019,9 +1019,6 @@ namespace HOMEGEN {
     }
 
     void __cdecl Enforce_Medium_Planet_Size_(int16_t planet_idx) {
-        // Size 2 corresponds to PLANET_SIZE_MEDIUM
-        const int8_t PLANET_SIZE_MEDIUM = 2;
-
         s_planet_data& planet = MOX::_planet[planet_idx];
 
         if (planet.size != PLANET_SIZE_MEDIUM) {
@@ -1041,7 +1038,7 @@ namespace HOMEGEN {
             }
         }
 
-        MOX::_planet[planet_idx].planet_type = 3;
+        MOX::_planet[planet_idx].planet_type = PLANET_TYPE_PLANET;
     }
 
     void __cdecl Enforce_Planet_Abundant_Mineral_Class(int16_t planet_idx) {
@@ -1244,8 +1241,6 @@ namespace HOMEGEN {
     }
 
     void __cdecl Enforce_Mineral_Richness_(int16_t planet_index, int16_t mineral_class) {
-        constexpr int8_t STAR_CLASS_DWARF = 5;
-
         s_planet_data* planet = &MOX::_planet[planet_index];
         planet->mineral_class = (int8_t)mineral_class;
 

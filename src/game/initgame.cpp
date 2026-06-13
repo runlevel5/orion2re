@@ -274,7 +274,7 @@ namespace INITGAME {
           MOX::_global_data_seg,
           0,
           1,
-          31);
+          TRAIT_COUNT);
       RUSS::Mox_Update_();
 
       for (int16_t race_special_idx = 1; race_special_idx < 13; ++race_special_idx) {
@@ -285,7 +285,7 @@ namespace INITGAME {
                 MOX::_global_data_seg,
                 race_special_idx,
                 1,
-                31);
+                TRAIT_COUNT);
         RUSS::Mox_Update_();
       }
 

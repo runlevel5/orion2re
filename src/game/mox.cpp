@@ -163,14 +163,14 @@ namespace MOX {
     int16_t _scan_button;
     int16_t _missile_field[300];
     int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
-    int16_t _weapon_mod_field_status[15];
+    int16_t _weapon_mod_field_status[WEAPON_MOD_COUNT];
     int16_t _weapon_button[8];
     int16_t _ship_turn_order[210];
     int16_t _repl_fields[10];
     int16_t _side_end_of_turn[15];
     int16_t _unused_ship_turn_order_marker;
     int16_t _design_choice_items[40];
-    int16_t _weapon_mod_fields[15];
+    int16_t _weapon_mod_fields[WEAPON_MOD_COUNT];
     int16_t _weapon_arc_field[5];
     int16_t _weapon_rack_field[5];
     int16_t _multi_colored_box_color_start;
@@ -512,7 +512,7 @@ namespace MOX {
     s_animation_header* _weapons_rack_text_seg[5];
     s_animation_header* _weapons_special_seg[18];
     s_weapon_filter_item* _weapon_filter;
-    char* _special_desc_string[39];
+    char* _special_desc_string[SPECIAL_COUNT - 1];
     char* _weapon_notes_string[40];
     s_animation_header* _d_scroll_bar_seg;
     s_animation_header* _weapons_rack_seg;

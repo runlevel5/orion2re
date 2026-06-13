@@ -163,131 +163,131 @@ namespace KEN {
 
             int8_t* traits = MOX::_player[i].traits;
 
-            if (traits[1] == 50) {
+            if (traits[TRAIT_POP_GROWTH_BONUS] == 50) {
                 obj_w[5] = 11;
                 obj_w[2] = 11;
             }
-            if (traits[1] == 100) {
+            if (traits[TRAIT_POP_GROWTH_BONUS] == 100) {
                 obj_w[5] += 100;
                 obj_w[2] += 100;
             }
-            if (traits[2] == 1) {
+            if (traits[TRAIT_FOOD_BONUS] == 1) {
                 obj_w[5] += 3;
                 obj_w[4] = 5;
                 obj_w[3] = 5;
             }
-            if (traits[2] == 2) {
+            if (traits[TRAIT_FOOD_BONUS] == 2) {
                 obj_w[5] += 100;
                 obj_w[4] += 100;
                 obj_w[3] += 100;
             }
-            if (traits[3] == 1) {
+            if (traits[TRAIT_PRODUCTION_BONUS] == 1) {
                 obj_w[5] += 3;
                 obj_w[4] += 3;
                 obj_w[3] += 3;
             }
-            if (traits[3] == 2) {
+            if (traits[TRAIT_PRODUCTION_BONUS] == 2) {
                 obj_w[5] += 10;
                 obj_w[4] += 10;
                 obj_w[3] += 10;
             }
-            if (traits[4] == 1) {
+            if (traits[TRAIT_RESEARCH_BONUS] == 1) {
                 obj_w[4] += 3;
                 obj_w[3] += 10;
             }
-            if (traits[4] == 2) {
+            if (traits[TRAIT_RESEARCH_BONUS] == 2) {
                 obj_w[4] += 10;
                 obj_w[3] += 100;
             }
-            if (traits[6] == 20) {
+            if (traits[TRAIT_SHIP_DEFENSE] == 20) {
                 obj_w[1] = 12;
                 spec_w[3] = 102;
                 des_w[1] = 11;
             }
-            if (traits[6] == 40) {
+            if (traits[TRAIT_SHIP_DEFENSE] == 40) {
                 obj_w[1] += 100;
                 spec_w[3] += 1000;
                 des_w[1] += 100;
             }
-            if (traits[7] == 25) {
+            if (traits[TRAIT_SHIP_ATTACK] == 25) {
                 spec_w[4] = 4;
                 des_w[0] = 102;
                 obj_w[1] += 10;
             }
-            if (traits[7] == 50) {
+            if (traits[TRAIT_SHIP_ATTACK] == 50) {
                 obj_w[1] += 100;
                 spec_w[4] += 10;
                 des_w[0] += 1000;
             }
-            if (traits[8] == 10) {
+            if (traits[TRAIT_GROUND_COMBAT_BONUS] == 10) {
                 spec_w[1] = 102;
                 obj_w[2] += 10;
             }
-            if (traits[8] == 20) {
+            if (traits[TRAIT_GROUND_COMBAT_BONUS] == 20) {
                 obj_w[2] += 100;
                 spec_w[1] += 1000;
             }
-            if (traits[9] == 10) {
+            if (traits[TRAIT_SPYING_BONUS] == 10) {
                 obj_w[0] = 4;
             }
-            if (traits[9] == 20) {
+            if (traits[TRAIT_SPYING_BONUS] == 20) {
                 obj_w[0] += 10;
             }
-            if (traits[10] == 1) {
+            if (traits[TRAIT_LOW_G_WORLD] == 1) {
                 obj_w[4] += 10;
                 obj_w[5] += 3;
                 obj_w[3] += 3;
             }
-            if (traits[11] == 1) {
+            if (traits[TRAIT_HEAVY_G_WORLD] == 1) {
                 obj_w[2] += 10;
                 spec_w[1] += 1000;
             }
-            if (traits[12] == 1) {
+            if (traits[TRAIT_AQUATIC] == 1) {
                 obj_w[4] += 3;
                 obj_w[5] += 3;
                 obj_w[3] += 3;
             }
-            if (traits[13] == 1) {
+            if (traits[TRAIT_SUBTERRANEAN] == 1) {
                 obj_w[4] += 10;
                 obj_w[5] += 3;
                 obj_w[3] += 3;
             }
-            if (traits[14] == 1) {
+            if (traits[TRAIT_LARGE_HOME_WORLD] == 1) {
                 obj_w[4] += 3;
                 obj_w[5] += 10;
             }
-            if (traits[15] == 1) {
+            if (traits[TRAIT_RICH_HOME_WORLD] == 1) {
                 obj_w[4] += 10;
             }
-            if (traits[17] == 1) {
+            if (traits[TRAIT_CYBERNETIC] == 1) {
                 obj_w[4] += 3;
                 des_w[0] += 10;
                 spec_w[5] = 1002;
             }
-            if (traits[18] == 1) {
+            if (traits[TRAIT_EATS_MINERALS] == 1) {
                 obj_w[4] += 3;
                 obj_w[2] += 10;
                 obj_w[3] += 3;
             }
-            if (traits[20] == 1) {
+            if (traits[TRAIT_CHARISMATIC] == 1) {
                 obj_w[0] += 100;
             }
-            if (traits[22] == 1) {
+            if (traits[TRAIT_CREATIVE] == 1) {
                 obj_w[3] += 1000;
             }
-            if (traits[23] == 1) {
+            if (traits[TRAIT_ENVIRONMENT_IMMUNE] == 1) {
                 obj_w[4] += 100;
             }
-            if (traits[24] == 1) {
+            if (traits[TRAIT_FANTASTIC_TRADERS] == 1) {
                 obj_w[0] += 100;
             }
-            if (traits[28] == 1) {
+            if (traits[TRAIT_STEALTHY_SHIPS] == 1) {
                 obj_w[1] += 100;
             }
-            if (traits[30] == 1) {
+            if (traits[TRAIT_WARLORD] == 1) {
                 obj_w[2] += 10;
             }
-            if (traits[29] == 1) {
+            if (traits[TRAIT_TRANS_DIMENSIONAL] == 1) {
                 obj_w[2] += 10;
                 obj_w[1] += 13;
                 spec_w[3] += 100;
@@ -391,10 +391,10 @@ namespace KEN {
     }
 
     void __cdecl Get_Derelict_Applications_(int16_t player_idx, uint16_t* app_array, int16_t* app_count) {
-        int16_t best_shield_idx = 0;
-        int16_t max_weapon_idx = 3;
+        int16_t best_shield_idx = SHIELD_NO_SHIELD;
+        int16_t max_weapon_idx = WEAPON_LASER_CANNON;
         int16_t min_diff = 200;
-        int16_t best_weapon_idx = 0;
+        int16_t best_weapon_idx = WEAPON_NO_WEAPONS;
 
         *app_count = 0;
 
@@ -414,13 +414,13 @@ namespace KEN {
 
         uint16_t shield_app_id = TECHDATA::_shields[best_shield_idx].tech_app_id;
 
-        if (TECHDATA::_technology_applications[TECHDATA::_weapons[max_weapon_idx].tech_app_id].tech_field_id == 0x4A) {
-            max_weapon_idx = 10;
+        if (TECHDATA::_technology_applications[TECHDATA::_weapons[max_weapon_idx].tech_app_id].tech_field_id == TECH_FIELD_XENON_TECHNOLOGY) {
+            max_weapon_idx = WEAPON_DISRUPTER;
         }
 
-        for (int16_t i = 1; i < 40; ++i) {
+        for (int16_t i = WEAPON_MASS_DRIVER; i < 40; ++i) {
             if (TECHDATA::_weapons[i].type == 0 &&
-                TECHDATA::_technology_applications[TECHDATA::_weapons[i].tech_app_id].tech_field_id != 0x4A) {
+                TECHDATA::_technology_applications[TECHDATA::_weapons[i].tech_app_id].tech_field_id != TECH_FIELD_XENON_TECHNOLOGY) {
 
                 int16_t diff = TECHDATA::_weapons[i].max_damage - TECHDATA::_weapons[max_weapon_idx].max_damage;
 

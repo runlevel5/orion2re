@@ -35,7 +35,7 @@ namespace FIREPTS {
             result = 0;
         }
 
-        if (weapon_id == 27 && result <= 2) {
+        if (weapon_id == WEAPON_MAULER_DEVICE && result <= 2) {
             result = 2;
         }
 

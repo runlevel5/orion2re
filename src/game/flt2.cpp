@@ -115,7 +115,7 @@ void __cdecl Clear_All_Selection_Status_() {
 
 void __cdecl Get_Fltscrn_Big_Icon_XY_(int16_t icon_idx, int16_t* out_x, int16_t* out_y) {
     // Preserve the original unused screen check.
-    (void)(MOX::_current_screen == 4);
+    (void)(MOX::_current_screen == SCREEN_FLEET);
 
     int16_t columns = MOX::_big_icon_display_columns;
 
@@ -129,7 +129,7 @@ void __cdecl Get_Fltscrn_Big_Icon_XY_(int16_t icon_idx, int16_t* out_x, int16_t*
 
 int16_t __cdecl Get_Filter_Button_Status_()
 {
-    if (MOX::_current_screen == 0x1D ||
+    if (MOX::_current_screen == SCREEN_OFFICERS ||
         (MOX::_fltscrn_combat_button_status == 1 && MOX::_fltscrn_support_button_status == 1)) {
         return 0;
     }
@@ -184,14 +184,14 @@ bool __cdecl Ok_To_Add_Ship_(int16_t ship_idx) {
     }
 
     if (filter_status == 1) {
-        if (ship_type == 2 || ship_type == 1 || ship_type == 4) {
+        if (ship_type == SHIP_TYPE_TRANSPORT || ship_type == SHIP_TYPE_COLONY || ship_type == SHIP_TYPE_OUTPOST) {
             return true;
         }
         return false;
     }
 
     if (filter_status == 2) {
-        return ship_type == 0;
+        return ship_type == SHIP_TYPE_COMBAT;
     }
 
     return false;
@@ -289,7 +289,7 @@ void __cdecl Add_Fltscrn_Big_Icon_Fields_(int16_t base_index) {
     int16_t y;
     int16_t icon_idx;
 
-    if (MOX::_current_screen == 4 /* SCREEN_GALAXY */) {
+    if (MOX::_current_screen == SCREEN_FLEET) {
         width_offset = 0x3a;
         height_offset = 0x39;
     } else {
@@ -381,7 +381,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
         MOX::_g_ship_move_info.hyperspace_flux = 0;
 
         if (visited == 0 &&
-            MOX::_player[MOX::_PLAYER_NUM].traits[27] == 0 &&
+            MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_OMNISCIENCE] == 0 &&
             OFFICER::One_Leader_With_Galactic_Lore_(MOX::_PLAYER_NUM) == 0) {
 
             if (HAROLD::Contact_With_One_Colony_(MOX::_galaxy_map_scanned_star) == 0) {
@@ -412,7 +412,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
     } else if (MOX::_g_ship_move_info.hyperspace_flux != 0) {
         status = 9;
     } else if (MOX::_g_ship_move_info.moving != 0) {
-        if (MOX::_star[MOX::_galaxy_map_scanned_star].spectral_class == 6) {
+        if (MOX::_star[MOX::_galaxy_map_scanned_star].spectral_class == STAR_CLASS_BLACK_HOLE) {
             status = 3;
         } else {
             owner = MOX::_star[MOX::_galaxy_map_scanned_star].owner;
@@ -537,9 +537,9 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     char unused_msg_98[20];
 
     uint8_t ship_type = MOX::_ship[ship_idx].d.ship_type;
-    bool is_ship_type_2 = (ship_type == 2);
-    bool is_ship_type_1 = (ship_type == 1);
-    bool is_ship_type_4 = (ship_type == 4);
+    bool is_ship_type_2 = (ship_type == SHIP_TYPE_TRANSPORT);
+    bool is_ship_type_1 = (ship_type == SHIP_TYPE_COLONY);
+    bool is_ship_type_4 = (ship_type == SHIP_TYPE_OUTPOST);
 
     // Preserve the original message loads even though the copied strings are not reused here.
     strcpy(unused_msg_95, HAROLD::H_Message_(0x95));
@@ -555,11 +555,11 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_record));
         
         int16_t help_idx = 0;
-        if (ship_type == 1) {
+        if (ship_type == SHIP_TYPE_COLONY) {
             help_idx = 0x29;
-        } else if (ship_type == 2) {
+        } else if (ship_type == SHIP_TYPE_TRANSPORT) {
             help_idx = 0xBD;
-        } else if (ship_type == 4) {
+        } else if (ship_type == SHIP_TYPE_OUTPOST) {
             help_idx = 0x6D;
         }
 
@@ -658,7 +658,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         fonts::Set_Font_Style_(2, &temp_colors);
         
         bool has_info = false;
-        if (visited || MOX::_player[MOX::_PLAYER_NUM].traits[27] != 0 || OFFICER::One_Leader_With_Galactic_Lore_(MOX::_PLAYER_NUM)) {
+        if (visited || MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_OMNISCIENCE] != 0 || OFFICER::One_Leader_With_Galactic_Lore_(MOX::_PLAYER_NUM)) {
             has_info = true;
         } else {
             has_info = HAROLD::Contact_With_One_Colony_(star_idx);

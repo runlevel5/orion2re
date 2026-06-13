@@ -259,7 +259,7 @@ namespace NETSTART {
         if (!netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net)) {
             RUSS::Mox_Update_();
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
-            MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
             NETMOX::_net.sync_state = 0;
             return 0;
         }
@@ -267,7 +267,7 @@ namespace NETSTART {
         if (NETMOX::_net.mode == 0) {
             MULTPLAY::Choose_Multi_Network_Game_Screen_();
             if (NETMOX::_net.cur_game_name[0] == '\0') {
-                MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETMOX::_net.sync_state = 0;
                 return 0;
             }
@@ -275,7 +275,7 @@ namespace NETSTART {
             if (!netcode::Net_Join_Game_(NETMOX::_net.cur_game_name, empty_str, myname_str)) {
                 GENDRAW::Message_Box_(NETSTART::_game_full_string);
                 NETMOX::_net.sync_state = 0;
-                MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETSTART::Mox_Net_Uninit_();
                 return 0;
             }
@@ -283,7 +283,7 @@ namespace NETSTART {
             netcode::Set_Null_Modem_Slave_();
             if (NETMOX::_net.mode == 1) {
                 if (!NETSTART::Do_Answer_()) {
-                    MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
+                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
                     NETMOX::_net.sync_state = 0;
                     return 0;
                 }
@@ -308,7 +308,7 @@ namespace NETSTART {
 
         if (NETMOX::_net.sync_state == 45) {
             NETMOX::_net.sync_state = 0;
-            MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
             NETSTART::Mox_Net_Uninit_();
             GENDRAW::Message_Box_(NETSTART::_no_more_player_slots_error);
             return 0;
@@ -322,7 +322,7 @@ namespace NETSTART {
             result = (uint8_t)NETSTART::Net_Pick_Position_();
             if (!result) {
                 NETMOX::_net.sync_state = 0;
-                MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETSTART::Mox_Net_Uninit_();
             }
         }
@@ -349,7 +349,7 @@ namespace NETSTART {
         if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             NETMOX::_net.sync_state = 0;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
-            MOX::_current_screen = 15;
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
             return 0;
         }
 
@@ -357,7 +357,7 @@ namespace NETSTART {
             if (Russ_Net_Create_Game_(NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
-                MOX::_current_screen = 15;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 Mox_Net_Uninit_();
                 return 0;
             }
@@ -368,7 +368,7 @@ namespace NETSTART {
             if (NETMOX::_net.mode == 1) {
                 if (Do_Dial_(NETMOX::_net.modem_settings.cmd_reset) == 0) {
                     NETMOX::_net.sync_state = 0;
-                    MOX::_current_screen = 15;
+                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
                     return 0;
                 }
             }
@@ -653,7 +653,7 @@ namespace NETSTART {
 
         if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
-            MOX::_current_screen = 15;
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
             NETMOX::_net.sync_state = 0;
             return 0;
         }
@@ -662,7 +662,7 @@ namespace NETSTART {
             if (Russ_Net_Create_Game_(NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
                 NETMOX::_net.sync_state = 0;
-                MOX::_current_screen = 15;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 Mox_Net_Uninit_();
                 return 0;
             }
@@ -673,7 +673,7 @@ namespace NETSTART {
             if (NETMOX::_net.mode == 1) {
                 if (Do_Dial_(NETMOX::_net.modem_settings.cmd_reset) == 0) {
                     NETMOX::_net.sync_state = 0;
-                    MOX::_current_screen = 15;
+                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
                     return 0;
                 }
             }
@@ -701,7 +701,7 @@ namespace NETSTART {
 
         if (choose_result == -1) {
             NETMOX::_net.sync_state = 0;
-            MOX::_current_screen = 15;
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
             return 0;
         }
 

@@ -280,7 +280,7 @@ namespace MAINSCR {
         fields::Set_Field_Outline_Color_(20);
         fields::Disable_Cancel_();
         _zoom_box_increment_value = 1;
-        _officer_screen_return_screen = -1;
+        _officer_screen_return_screen = SCREEN_UNKNOWN;
         MOX::_draw_system_display_without_button = 0;
         MOX::_skip_fields = 0;
         _main_screen_scanned_star = -1;
@@ -331,7 +331,7 @@ namespace MAINSCR {
                 SYS::Clear_System_Display_Loaded_Flag_();
             }
             fonts::Load_Palette_(0, 0, 0xad);
-            if (MOX::_previous_screen == 0x24) {
+            if (MOX::_previous_screen == SCREEN_TECH_CHANGE) {
                 video::Set_Page_Off_();
                 MAINSCR::Draw_Mini_Main_Screen_();
                 video::Copy_Off_To_Back_();
@@ -602,10 +602,10 @@ namespace MAINSCR {
             }
 
             if (input == _game_button && MOX::_skip_fields == 0) {
-                MOX::_current_screen = 8;
+                MOX::_current_screen = SCREEN_GAME;
                 exit_flag = 1;
                 MOX::_screen_data = 0;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
             }
 
             const int8_t active_save_slot = MOX::_settings.active_save_slot;
@@ -631,7 +631,7 @@ namespace MAINSCR {
                     MAINSCR::Draw_Mini_Main_Screen_();
                     RUSS::Mox_Sync_Update_();
                 }
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
                 MOX::_current_screen = SCREEN_FLEET;
                 _officer_screen_return_screen = SCREEN_FLEET;
                 exit_flag = 1;
@@ -640,13 +640,13 @@ namespace MAINSCR {
             if (input == _colonies_button && MOX::_skip_fields == 0) {
                 MOX::_current_screen = SCREEN_COLONY_SUMMARY;
                 exit_flag = 1;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
             }
 
             if (input == _info_button && MOX::_skip_fields == 0) {
                 MOX::_current_screen = SCREEN_INFO;
                 exit_flag = 1;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
             }
 
             if (input == _next_button && MOX::_skip_fields == 0) {
@@ -658,15 +658,15 @@ namespace MAINSCR {
             }
 
             if (input == _races_button && MOX::_skip_fields == 0) {
-                MOX::_current_screen = 6;
+                MOX::_current_screen = SCREEN_RACE;
                 exit_flag = 1;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
             }
 
             if (input == _planets_button && MOX::_skip_fields == 0) {
-                MOX::_current_screen = 0x20;
+                MOX::_current_screen = SCREEN_PLANET_SUMMARY;
                 exit_flag = 1;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
             }
 
             if (input == _leaders_button && MOX::_skip_fields == 0) {
@@ -683,10 +683,10 @@ namespace MAINSCR {
                     design_num = MAINSCR::Get_Star_Id_For_Officers_Screen_();
                 }
                 MOX::_temp_star_handle = design_num;
-                _officer_screen_return_screen = 0;
+                _officer_screen_return_screen = SCREEN_MAIN;
                 MOX::_current_screen = SCREEN_OFFICERS;
                 exit_flag = 1;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
             }
 
             if (input == _research_window_field && MOX::_skip_fields == 0) {
@@ -701,9 +701,9 @@ namespace MAINSCR {
                 if (MOVEBOX::Moveable_Box_Selected_(2)) {
                     MAINSCR2::_force_main_screen_fade = 1;
                 }
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
                 _clear_fleet_fields = 0;
-                MOX::_current_screen = 0x24;
+                MOX::_current_screen = SCREEN_TECH_CHANGE;
                 exit_flag = 1;
             }
             else if (input == _freighters_window_field) {
@@ -713,14 +713,14 @@ namespace MAINSCR {
                     HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 3);
                 }
                 else {
-                    MOX::_return_screen = 0;
+                    MOX::_return_screen = SCREEN_MAIN;
                     _clear_fleet_fields = 0;
                     MOX::_current_screen = HESTR_023_ONE_OR_MORE_SHIPS_CHOS;
                     exit_flag = 1;
                 }
             }
             else if (input == _command_points_window_field && MOX::_skip_fields == 0) {
-                MOX::_return_screen = 0;
+                MOX::_return_screen = SCREEN_MAIN;
                 _clear_fleet_fields = 0;
                 MOX::_current_screen = HESTR_02B_COST;
                 exit_flag = 1;
@@ -737,7 +737,7 @@ namespace MAINSCR {
                 RUSS::Mox_Sync_Update_();
                 MAINSCR::Tax_Rate_Popup_();
                 COLCALC::Do_Player_Colony_Calculations_(MOX::_PLAYER_NUM);
-                MOX::_current_screen = 0;
+                MOX::_current_screen = SCREEN_MAIN;
                 exit_flag = 1;
                 _clear_fleet_fields = 0;
             }

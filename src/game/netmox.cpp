@@ -1631,13 +1631,13 @@ namespace NETMOX {
                 }
                 else {
                     // Preserve assembly logic exactly:
-                    // traits[20] != 0 => 3, else traits[19] == 0 => 2, else 1
-                    if (MOX::_player[i].traits[20] != 0) {
+                    // TRAIT_CHARISMATIC != 0 => 3, else TRAIT_REPULSIVE == 0 => 2, else 1
+                    if (MOX::_player[i].traits[TRAIT_CHARISMATIC] != 0) {
                         weights[i] = 3;
                     }
                     else {
                         weights[i] = 1;
-                        if (MOX::_player[i].traits[19] == 0) {
+                        if (MOX::_player[i].traits[TRAIT_REPULSIVE] == 0) {
                             weights[i] = 2;
                         }
                     }

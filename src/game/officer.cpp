@@ -86,7 +86,7 @@ namespace OFFICER {
         } else {
             int player_idx = (int)(int8_t)leader->player_index;
             // trait[30] corresponds to TRAIT_WARLORD
-            warlord = MOX::_player[player_idx].traits[30];
+            warlord = MOX::_player[player_idx].traits[TRAIT_WARLORD];
         }
 
         int16_t level = Get_Officer_Base_Level_(xp, warlord);
@@ -282,7 +282,7 @@ namespace OFFICER {
             int16_t star_idx = leader.location;
             if (star_idx != -1) {
                 if (leader.status == 5) { // Active/Assigned status
-                    MOX::_star[star_idx].system_special = 0;
+                    MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
                 }
                 if (player_idx != -1 && MOX::_star[star_idx].officer_index[player_idx] == (int8_t)leader_idx) {
                     MOX::_star[star_idx].officer_index[player_idx] = -1;
@@ -885,7 +885,7 @@ namespace OFFICER {
         palette::Clear_Palette_Changes_(0, 0xFF);
         ERIC::Fast_Fade_Out_();
 
-        if (MOX::_previous_screen == 1) {
+        if (MOX::_previous_screen == SCREEN_COLONY) {
             MOX::_officer_scrn_type = 1;
             if (MOX::_temp_star_handle > -1) {
                 MOX::_small_ship_stack_ptr = MOX::_temp_star_handle;
@@ -1831,7 +1831,7 @@ namespace OFFICER {
 
         if (MOX::_officer_scrn_type == 1 /* OFFICER_SCREEN */) {
             if (OFFICER::_officer_star_displayed == -1) {
-                if (static_cast<uint8_t>(MOX::_previous_screen) == 1) {
+                if (static_cast<uint8_t>(MOX::_previous_screen) == SCREEN_COLONY) {
                     MOX::_officer_selected = -1;
                     OFFICER::_officer_star_displayed = MOX::_temp_star_handle;
                 } else {
@@ -2347,7 +2347,7 @@ namespace OFFICER {
             int8_t special = MOX::_star[star_idx].system_special;
 
             // Checks for Orion (8) or specific player-range systems (80 to 80 + _NUM_PLAYERS)
-            if (special == 8 || (special >= 80 && (special - 80) < MOX::_NUM_PLAYERS)) {
+            if (special == SYSTEM_SPECIAL_MAROONED_HERO || (special >= 80 && (special - 80) < MOX::_NUM_PLAYERS)) {
                 bool found = false;
                 // Iterate through all possible leaders (67 slots)
                 for (int leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
@@ -3221,7 +3221,7 @@ namespace OFFICER {
     }
 
 int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
-    switch (static_cast<int32_t>(MOX::_player[player_idx].traits[0]) / 2) {
+    switch (static_cast<int32_t>(MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT]) / 2) {
     case 0:
         return 1;
     case 1:
@@ -3303,7 +3303,7 @@ void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_
 }
 
 void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t* tech_list, int16_t* num_techs) {
-    int16_t available_techs[212];
+    int16_t available_techs[TECH_APP_COUNT];
     int16_t available_count = 0;
 
     memset(available_techs, -1, sizeof(available_techs));
@@ -3443,8 +3443,8 @@ void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx,
                                         int16_t *available_count) {
   *available_count = 0;
 
-  for (int16_t tech_idx = 0; tech_idx < 212; ++tech_idx) {
-    if (TECHDATA::_technology_applications[tech_idx].tech_field_id == 74) {
+  for (int16_t tech_idx = 0; tech_idx < TECH_APP_COUNT; ++tech_idx) {
+    if (TECHDATA::_technology_applications[tech_idx].tech_field_id == TECH_FIELD_XENON_TECHNOLOGY) {
       if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_idx)) {
         available_techs[*available_count] = tech_idx;
         ++(*available_count);
@@ -3550,7 +3550,7 @@ void __cdecl Print_Officer_Data_(
     OFFICER::Get_Officer_Costs_(officer_id, &status4_cost, &other_cost);
     fonts::Set_Outline_Color_(0, 0);
 
-    if (MOX::_current_screen == 0x1d) {
+    if (MOX::_current_screen == SCREEN_OFFICERS) {
         if (officer_list_index > -1 &&
             MOX::_officer_id_list[officer_list_index] ==
                 static_cast<int16_t>(MOX::_officer_scanned)) {
@@ -3566,7 +3566,7 @@ void __cdecl Print_Officer_Data_(
         text_colors = OFFICER::_normal_text_colors;
     }
 
-    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+    if (MOX::_current_screen == SCREEN_OFFICERS && OFFICER::_offscrn_ask_for_hire_popup == 0) {
         sprintf(text_buffer, "%s", OFFICER::Leader_Name_(officer_id, false));
         fonts::Set_Font_Style_Outline_(3, &text_colors);
         fonts::Set_Font_Spacing_(1);
@@ -3578,7 +3578,7 @@ void __cdecl Print_Officer_Data_(
         fonts::Print_(name_x, current_y, text_buffer);
     }
 
-    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+    if (MOX::_current_screen == SCREEN_OFFICERS && OFFICER::_offscrn_ask_for_hire_popup == 0) {
         text_colors.colors[0] = ';';
         fonts::Set_Font_Style_(0, &text_colors);
 
@@ -3641,7 +3641,7 @@ void __cdecl Print_Officer_Data_(
 
         OFFICER::Get_Officer_Costs_(officer_id, &unused_cost_a, &unused_cost_b);
 
-        if (MOX::_current_screen == 0x1d) {
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
             sprintf(
                 status_text,
                 HAROLD::H_Message_(0x10d),
@@ -3653,7 +3653,7 @@ void __cdecl Print_Officer_Data_(
         fonts::Set_Font_Style_(2, &OFFICER::_red_colors);
     }
 
-    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+    if (MOX::_current_screen == SCREEN_OFFICERS && OFFICER::_offscrn_ask_for_hire_popup == 0) {
         int16_t centered_status_y =
             static_cast<int16_t>(portrait_y + portrait_status_offset_y + 1);
         s_colors saved_colors{};
@@ -3691,7 +3691,7 @@ void __cdecl Print_Officer_Data_(
     fonts::Set_Font_Style_Outline_(3, &text_colors);
     fonts::Set_Font_Spacing_(1);
 
-    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+    if (MOX::_current_screen == SCREEN_OFFICERS && OFFICER::_offscrn_ask_for_hire_popup == 0) {
         current_y = static_cast<int16_t>(current_y + 0x10);
     }
 
@@ -3733,7 +3733,7 @@ void __cdecl Print_Officer_Data_(
                 static_cast<int32_t>(bonus));
 
             const int16_t value_x =
-                (MOX::_current_screen == 0x1d)
+                (MOX::_current_screen == SCREEN_OFFICERS)
                     ? static_cast<int16_t>(text_x + right_column_offset_x - 3)
                     : static_cast<int16_t>(text_x + right_column_offset_x + 3);
 
@@ -3768,7 +3768,7 @@ void __cdecl Print_Officer_Data_(
                 static_cast<int32_t>(bonus));
 
             const int16_t value_x =
-                (MOX::_current_screen == 0x1d)
+                (MOX::_current_screen == SCREEN_OFFICERS)
                     ? static_cast<int16_t>(text_x + right_column_offset_x - 3)
                     : static_cast<int16_t>(text_x + right_column_offset_x + 3);
 

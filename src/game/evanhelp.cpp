@@ -61,7 +61,7 @@ namespace EVANHELP {
         {423, 293, 332, 385, 362},
     };
 
-    s_help_box _main_menu_screen_help_list[6] = {
+    s_help_box _main_menu_screen_help_list[MAIN_MENU_BTN_QUIT + 1] = {
         {645, 415, 172, 567, 193},
         {646, 415, 195, 567, 215},
         {647, 415, 217, 567, 238},

@@ -1597,7 +1597,7 @@ namespace LOADSAVE {
             Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0], 0);
         }
 
-        if (MOX::_current_screen == 0x0D) {
+        if (MOX::_current_screen == SCREEN_NEW_GAME) {
             ERIC::Fast_Fade_Out_();
         } else if (_loaded_new_game == 0) {
             fields::Clear_Fields_();

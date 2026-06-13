@@ -11,8 +11,8 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
         bonuses->has_battleoids = 1;
         bonuses->powered_armor_bonus = 10;
         bonuses->has_powered_armor = 1;
-        bonuses->best_armor_tech_app_id = (uint8_t)TECHDATA::_armor[6].tech_app_id;
-        bonuses->troop_bonus = TECHDATA::_armor[6].troops_bonus;
+        bonuses->best_armor_tech_app_id = (uint8_t)TECHDATA::_armor[ARMOR_XENTRONIUM_ARMOR].tech_app_id;
+        bonuses->troop_bonus = TECHDATA::_armor[ARMOR_XENTRONIUM_ARMOR].troops_bonus;
         bonuses->rifle_tech_app_id = (uint8_t)TECHDATA::_rifles[5].tech_app_id;
         bonuses->rifle_bonus = TECHDATA::_rifles[5].bonus;
         bonuses->personal_shield_tech_app_id = (uint8_t)TECHDATA::_personal_shields[1].tech_app_id;
@@ -397,7 +397,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         Resolve_Ground_Combat_(&rebel_side, &defender_side);
 
         s_MSG msg = {};
-        msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+        msg.msg_type = MSG_TYPE_COLONY;
         msg.u.colony.planet_idx = (uint8_t)colony->planet;
         msg.u.colony.subtype = 9 /* s_MSG_colony_rebellion */;
         msg.u.colony.c.rebels.owner_player = (int8_t)rebel_player;
@@ -473,7 +473,7 @@ void __cdecl Resolve_Invasion_Troops_(s_invasion_side_info info) {
     if (info.n_ships > 0) {
         for (int16_t i = 0; i < info.n_ships; ++i) {
             int16_t ship_idx = info.ship_list[i];
-            if (MOX::_ship[ship_idx].d.ship_type == 2 /* Troop Transport */) {
+            if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_TRANSPORT) {
                 if (remaining_infantry < 4) {
                     SHIPS::Kill_Ship_(ship_idx);
                 } else {
@@ -527,7 +527,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
     if (results != nullptr) {
         int16_t captured_techs[4] = { 0 };
-        uint16_t weights[212];
+        uint16_t weights[TECH_APP_COUNT];
         int32_t captured_count = 0;
         int32_t chance_base;
 
@@ -537,7 +537,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
             chance_base = MOX::_settings.game_difficulty * 5 + 115;
         }
 
-        for (int32_t i = 0; i < 49; ++i) {
+        for (int32_t i = 0; i < BUILDING_COUNT; ++i) {
             if (colony->buildings[i] != 0) {
                 int16_t tech_app = TECHDATA::_buildings[i].tech_app;
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[new_owner_idx], tech_app)) {
@@ -816,7 +816,7 @@ void __cdecl Get_Invasion_Info_(int16_t* ship_list, int16_t n_ships, s_colony* c
     attacker_side->n_ships = n_ships;
 
     for (int16_t i = 0; i < n_ships; ++i) {
-        if (MOX::_ship[ship_list[i]].d.ship_type == 2 /* Transport */) {
+        if (MOX::_ship[ship_list[i]].d.ship_type == SHIP_TYPE_TRANSPORT) {
             attacker_side->unit_counts[1] += 4;
         }
     }
@@ -869,7 +869,7 @@ void __cdecl Invade_(int16_t* ship_list, int16_t n_ships, int16_t colony_id, s_b
 
         for (int16_t i = 0; i < n_ships; ++i) {
             int16_t ship_idx = ship_list[i];
-            if (MOX::_ship[ship_idx].d.ship_type == 2 /* Transport */) {
+            if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_TRANSPORT) {
                 SHIPS::Kill_Ship_(ship_idx);
             }
         }

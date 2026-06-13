@@ -80,11 +80,11 @@ int16_t __cdecl Newgame_Screen_(void) {
         if (input == NEWGAME::_fields[8]) {
             NEWGAME::Temps_To_Globals_();
             if (MOX::_game_type == 1) {
-                MOX::_current_screen = 16 /* 0x10 */;
+                MOX::_current_screen = SCREEN_HOTSEAT;
                 result = 1;
                 exit_screen = true;
             } else if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-                MOX::_current_screen = 21 /* 0x15 */;
+                MOX::_current_screen = SCREEN_START_NET;
                 result = 1;
                 exit_screen = true;
             } else {

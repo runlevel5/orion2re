@@ -85,7 +85,7 @@ namespace file_ani {
     void __cdecl Draw_File_Animation_() {
         animate::_animation_header = (s_animation_header*)init::_io_buffer;
         
-        if ((animate::_animation_header->flags & 0x10) != 0) {
+        if ((animate::_animation_header->flags & ANIMATION_FLAG_HAS_PALETTE) != 0) {
             animate::Set_Animation_Palette_();
         }
         
@@ -114,44 +114,44 @@ namespace file_ani {
         }
         
         uint8_t flags = animate::_animation_header->flags;
-        if ((flags & 0x08) != 0) {
-            switch (flags & 3) {
-                case 0:
+        if ((flags & ANIMATION_FLAG_GLASSED) != 0) {
+            switch (flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                     animate::Draw_Glassed_Animated_Sprite_(0, 0, _file_animation_buffer);
                     break;
-                case 1:
+                case ANIMATION_DRAW_MODE_BITMAP:
                     animate::Draw_Glassed_Bitmap_Sprite_(0, 0, _file_animation_buffer);
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     animate::Draw_Glassed_Screen_Background_Off_(_file_animation_buffer);
                     if (video::screen_refresh_flag >= 2) {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                     }
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                 default:
                     exitm::Exit_With_Message("Refresh Mask can't be drawn");
                     break;
             }
         } else {
-            switch (flags & 3) {
-                case 0:
+            switch (flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+                case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                     video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Animated_Sprite_(0, 0, _file_animation_buffer);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
-                case 1:
+                case ANIMATION_DRAW_MODE_BITMAP:
                     video::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                     draw::Draw_Bitmap_Sprite_(0, 0, _file_animation_buffer);
                     platform::Unlock_Appropriate_Render_Buffer();
                     break;
-                case 2:
+                case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                     animate::Draw_Screen_Background_Off_(_file_animation_buffer);
                     if (video::screen_refresh_flag >= 2) {
                         setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                     }
                     break;
-                case 3:
+                case ANIMATION_DRAW_MODE_REFRESH_MASK:
                 default:
                     exitm::Exit_With_Message("Refresh Mask can't be drawn");
                     break;
@@ -180,7 +180,7 @@ namespace file_ani {
             video::screen_refresh_flag = saved_refresh_flag;
         }
 
-        if (animate::_animation_header->flags & 0x10) {
+        if (animate::_animation_header->flags & ANIMATION_FLAG_HAS_PALETTE) {
             animate::Set_Animation_Palette_();
         }
 
@@ -197,21 +197,21 @@ namespace file_ani {
         fseek(_file_animation_fptr, _file_animation_start + frame_offset, 0);
         fread(_file_animation_buffer, frame_size, 1, _file_animation_fptr);
 
-        if (animate::_animation_header->flags & 0x08) {
+        if (animate::_animation_header->flags & ANIMATION_FLAG_GLASSED) {
             exitm::Exit_With_Message("Differentail File Animation Can not be glassed");
         }
 
-        switch (animate::_animation_header->flags & 0x03) {
-        case 0:
+        switch (animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+        case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
             animate::Draw_Animated_Sprite_Back_Diff_(0, 0, _file_animation_buffer);
             break;
-        case 1:
+        case ANIMATION_DRAW_MODE_BITMAP:
             exitm::Exit_With_Message("Differentail File Animation Can not be bitmap");
             break;
-        case 2:
+        case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
             exitm::Exit_With_Message("Differentail File Animation Can not be masked");
             break;
-        case 3:
+        case ANIMATION_DRAW_MODE_REFRESH_MASK:
             exitm::Exit_With_Message("Refresh Mask can't be drawn");
             break;
         }
@@ -326,7 +326,7 @@ namespace file_ani {
             exitm::Exit_With_Message("Too many frames for multi file animation");
         }
 
-        if (animate::_animation_header->flags & 0x10) {
+        if (animate::_animation_header->flags & ANIMATION_FLAG_HAS_PALETTE) {
             animate::Set_Animation_Palette_();
         }
 
@@ -354,17 +354,17 @@ namespace file_ani {
             );
         }
 
-        switch (animate::_animation_header->flags & 3) {
-            case 0:
+        switch (animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK) {
+            case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
                 animate::Draw_Animated_Sprite_Back_Diff_(0, 0, _file_animation_buffer);
                 break;
-            case 1:
+            case ANIMATION_DRAW_MODE_BITMAP:
                 exitm::Exit_With_Message("Differentail File Animation Can not be bitmap");
                 break;
-            case 2:
+            case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
                 exitm::Exit_With_Message("Differentail File Animation Can not be masked");
                 break;
-            case 3:
+            case ANIMATION_DRAW_MODE_REFRESH_MASK:
                 exitm::Exit_With_Message("Refresh Mask can't be drawn");
                 break;
         }
@@ -395,7 +395,7 @@ namespace file_ani {
             exitm::Exit_With_Message("Too many frames for multi file animation");
         }
 
-        if ((animate::_animation_header->flags & 0x10) != 0) {
+        if ((animate::_animation_header->flags & ANIMATION_FLAG_HAS_PALETTE) != 0) {
             animate::Set_Animation_Palette_();
         }
 
@@ -425,21 +425,21 @@ namespace file_ani {
             );
         }
 
-        uint8_t mode = animate::_animation_header->flags & 3;
+        uint8_t mode = animate::_animation_header->flags & ANIMATION_FLAG_DRAW_MODE_MASK;
         switch (mode) {
-        case 0:
+        case ANIMATION_DRAW_MODE_ANIMATED_SPRITE:
             draw::Draw_Animated_Sprite_(0, 0, sprite);
             break;
-        case 1:
+        case ANIMATION_DRAW_MODE_BITMAP:
             draw::Draw_Bitmap_Sprite_(0, 0, sprite);
             break;
-        case 2:
+        case ANIMATION_DRAW_MODE_SCREEN_BACKGROUND:
             animate::Draw_Screen_Background_Off_(sprite);
             if (video::screen_refresh_flag >= 2) {
                 setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
             }
             break;
-        case 3:
+        case ANIMATION_DRAW_MODE_REFRESH_MASK:
             exitm::Exit_With_Message("Refresh Mask can't be drawn");
             break;
         }
@@ -482,7 +482,7 @@ namespace file_ani {
             exitm::Exit_With_Message("Too many frames for multi file animation");
         }
 
-        if ((animate::_animation_header->flags & 0x10) != 0) {
+        if ((animate::_animation_header->flags & ANIMATION_FLAG_HAS_PALETTE) != 0) {
             animate::Set_Animation_Palette_();
         }
     }

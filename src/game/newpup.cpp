@@ -96,7 +96,7 @@ namespace NEWPUP {
     void __cdecl Print_Best_Summary_(s_invasion_side_info* side_info, int16_t* row) {
         if (side_info->combat_modifiers.antigrav_bonus != 0) {
             Print_Data_(
-                TECHDATA::_technology_applications[9].name,
+                TECHDATA::_technology_applications[TECH_APP_ANTI_GRAV_HARNESS].name,
                 (uint8_t)side_info->combat_modifiers.antigrav_bonus,
                 row,
                 side_info

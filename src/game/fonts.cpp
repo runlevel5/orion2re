@@ -553,7 +553,7 @@ namespace fonts {
     void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t max_width, s_animation_header* bitmap) {
         animate::_animation_header = bitmap;
 
-        if ((bitmap->flags & 3) != 1) {
+        if ((bitmap->flags & ANIMATION_FLAG_DRAW_MODE_MASK) != ANIMATION_DRAW_MODE_BITMAP) {
             exitm::Exit_With_Message("Print only works on bitmaps");
         }
 

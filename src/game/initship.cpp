@@ -103,13 +103,13 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Ship_Fuel_(int16_t player_idx) {
         if (player_idx >= MAX_PLAYERS) {
-            return 5;
+            return FUEL_THORIUM_FUEL_CELLS;
         }
 
         int16_t best_fuel_idx = 0;
         int16_t best_range = TECHDATA::_fuel[0].ship_range;
 
-        for (int16_t i = 0; i < 6; ++i) {
+        for (int16_t i = 0; i < FUEL_COUNT; ++i) {
             // Check if player has researched this fuel technology (application value 3)
             // and if it provides a better range than the current best.
             if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app_id] == 3) {
@@ -130,21 +130,21 @@ namespace INITSHIP {
                 case 8:  // Antarans
                 case 12:
                 case 13:
-                    return 6;
+                    return DRIVE_INTERPHASED_DRIVE;
                 case 9:
                 case 11:
-                    return 4;
+                    return DRIVE_ANTI_MATTER_DRIVE;
                 case 10:
                 case 14:
-                    return 2;
+                    return DRIVE_FUSION_DRIVE;
                 default:
-                    return 0;
+                    return DRIVE_NO_DRIVE;
             }
         }
 
-        int16_t best_warp_index = 0;
+        int16_t best_warp_index = DRIVE_NO_DRIVE;
         // Search through warp drive techs 1-6 (Nuclear to Interdimensional)
-        for (int16_t i = 1; i < 7; ++i) {
+        for (int16_t i = DRIVE_NUCLEAR_DRIVE; i < DRIVE_COUNT; ++i) {
             int16_t app_idx = TECHDATA::_drives[i].tech_app_id;
             // Status 3 indicates that the technology has been researched
             if (MOX::_player[player_idx].tech_applications[app_idx] == 3) {
@@ -249,18 +249,18 @@ namespace INITSHIP {
         if (player_idx >= MAX_PLAYERS) {
             // Antarans or Space Monsters
             if (player_idx == 8 || player_idx == 9) {
-                return 6; // Xentronium
+                return ARMOR_XENTRONIUM_ARMOR;
             }
             if (player_idx >= 10 && player_idx <= 14) {
-                return 0; // No armor?
+                return ARMOR_NO_ARMOR;
             }
-            return 1; // Default: Titanium
+            return ARMOR_TITANIUM_ARMOR;
         }
 
-        int16_t best_armor_idx = 1; // Start with Titanium Armor
+        int16_t best_armor_idx = ARMOR_TITANIUM_ARMOR;
 
         // Check for Tritanium (2) through Xentronium (6)
-        for (int16_t i = 2; i < 7; ++i) {
+        for (int16_t i = ARMOR_TRITANIUM_ARMOR; i < ARMOR_COUNT; ++i) {
             int16_t tech_id = TECHDATA::_armor[i].tech_app_id;
 
             // 3 indicates the tech application is fully researched/available
@@ -274,12 +274,12 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Computer_(int16_t player_idx) {
         if (player_idx >= MAX_PLAYERS) {
-            return 5;
+            return COMPUTER_MOLECULARTRONIC_COMPUTER;
         }
 
-        int16_t best_computer_idx = 0;
+        int16_t best_computer_idx = COMPUTER_NO_COMPUTER;
 
-        for (int16_t i = 1; i < 6; ++i) {
+        for (int16_t i = COMPUTER_ELECTRONIC_COMPUTER; i < COMPUTER_COUNT; ++i) {
             if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app_id] == 3) {
                 best_computer_idx = i;
             }
@@ -289,10 +289,10 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
-        int16_t best_shield_idx = 0;
+        int16_t best_shield_idx = SHIELD_NO_SHIELD;
 
         if (player_idx < MAX_PLAYERS) {
-            for (int16_t i = 1; i < 6; ++i) {
+            for (int16_t i = SHIELD_CLASS_I_SHIELD; i < SHIELD_COUNT; ++i) {
                 if (MOX::_player[player_idx].tech_applications[TECHDATA::_shields[i].tech_app_id] == 3) {
                     best_shield_idx = i;
                 }
@@ -305,17 +305,17 @@ namespace INITSHIP {
         }
 
         if (player_idx == 9) {
-            return 3;
+            return SHIELD_CLASS_V_SHIELD;
         }
 
-        return 0;
+        return SHIELD_NO_SHIELD;
     }
 
     int16_t __cdecl Best_Shield_Special_(int16_t player_idx) {
         if (player_idx < MAX_PLAYERS) {
             // Check if player has Hard Shields tech application researched (level 3)
             if (MOX::_player[player_idx].tech_applications[TECH_APP_HARD_SHIELDS] == 3) {
-                return 13; /* HARD_SHIELDS_SPECIAL */
+                return SPECIAL_HARD_SHIELDS;
             }
         }
         return 0;
@@ -371,10 +371,10 @@ namespace INITSHIP {
 
         strcpy(design->name, "Raider");
 
-        design->ship_type = 0;
-        design->shield_type = 0;
-        design->size = 0;
-        design->computer_type = 5;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->shield_type = SHIELD_NO_SHIELD;
+        design->size = SHIP_SIZE_SMALL;
+        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
         design->speed = 1;
 
         design->ship_weapon[0].firing_arc = 1;
@@ -391,8 +391,8 @@ namespace INITSHIP {
         design->ship_weapon[1].firing_arc = 15;
         design->ship_weapon[1].type = 24;
 
-        design->armor_type = 6;
-        design->ftl_type = 5;
+        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
+        design->ftl_type = DRIVE_HYPER_DRIVE;
 
         struct_::Set_Bit_Field_(design->special_device_flags, 7);
         struct_::Set_Bit_Field_(design->special_device_flags, 24);
@@ -413,13 +413,13 @@ namespace INITSHIP {
 
         strcpy(design->name, "Marauder");
 
-        design->ship_type = 0;
-        design->shield_type = 0;
-        design->size = 1;
-        design->ftl_type = 5;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->shield_type = SHIELD_NO_SHIELD;
+        design->size = SHIP_SIZE_MEDIUM;
+        design->ftl_type = DRIVE_HYPER_DRIVE;
         design->speed = 1;
-        design->computer_type = 5;
-        design->armor_type = 6;
+        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
         // Weapon 0: Beam (Type 4)
         design->ship_weapon[0].type = 4;
@@ -466,9 +466,9 @@ namespace INITSHIP {
 
         strcpy(design->name, "Interdictor");
 
-        design->ship_type = 0;
-        design->shield_type = 0;
-        design->computer_type = 5;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->shield_type = SHIELD_NO_SHIELD;
+        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
 
         design->ship_weapon[0].type = 4;
         design->speed = 1;
@@ -480,16 +480,16 @@ namespace INITSHIP {
 
         design->ship_weapon[1].type = 4;
         design->ship_weapon[1].firing_arc = 1;
-        design->size = 3;
+        design->size = SHIP_SIZE_HUGE;
         design->ship_weapon[1].ammo = 0;
         design->ship_weapon[1].count = 4;
-        design->armor_type = 6;
+        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
         design->ship_weapon[1].current_count = 4;
 
         design->ship_weapon[2].firing_arc = 1;
         design->ship_weapon[2].specials = 0;
         design->ship_weapon[2].ammo = 10;
-        design->ftl_type = 5;
+        design->ftl_type = DRIVE_HYPER_DRIVE;
         design->ship_weapon[2].count = 15;
         design->ship_weapon[2].current_count = 15;
 
@@ -546,13 +546,13 @@ namespace INITSHIP {
         struct_::Clear_Structure_(design, sizeof(*design));
         memcpy(design->name, global::s_Intruder_005576a0, 9);
 
-        design->ship_type = 0;
-        design->shield_type = 0;
-        design->computer_type = 5;
-        design->size = 2;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->shield_type = SHIELD_NO_SHIELD;
+        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+        design->size = SHIP_SIZE_LARGE;
         design->speed = 1;
-        design->ftl_type = 5;
-        design->armor_type = 6;
+        design->ftl_type = DRIVE_HYPER_DRIVE;
+        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
         design->ship_weapon[0].type = 4;
         design->ship_weapon[0].count = 4;
@@ -611,13 +611,13 @@ namespace INITSHIP {
 
         strcpy(design->name, "Harbinger");
 
-        design->size = 4;
-        design->ship_type = 0;
-        design->shield_type = 0;
-        design->computer_type = 5;
+        design->size = SHIP_SIZE_TITAN;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->shield_type = SHIELD_NO_SHIELD;
+        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
         design->speed = 1;
-        design->ftl_type = 5;
-        design->armor_type = 6;
+        design->ftl_type = DRIVE_HYPER_DRIVE;
+        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
         design->ship_weapon[0].type = 4;
         design->ship_weapon[0].count = 20;
@@ -697,19 +697,19 @@ namespace INITSHIP {
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size) {
         switch (hull_size) {
-            case 0:
+            case SHIP_SIZE_SMALL:
                 INITSHIP::Load_Small_Antaran_Design_(design);
                 break;
-            case 1:
+            case SHIP_SIZE_MEDIUM:
                 INITSHIP::Load_Medium_Antaran_Design_(design);
                 break;
-            case 2:
+            case SHIP_SIZE_LARGE:
                 INITSHIP::Load_Large_Antaran_Design_(design);
                 break;
-            case 3:
+            case SHIP_SIZE_HUGE:
                 INITSHIP::Load_Huge_Antaran_Design_(design);
                 break;
-            case 4:
+            case SHIP_SIZE_TITAN:
                 INITSHIP::Load_Titan_Antaran_Design_(design);
                 break;
             default:
@@ -723,15 +723,15 @@ namespace INITSHIP {
         const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_COLONY][(uint8_t)MOX::_settings.language];
         strcpy(design->name, localized_name);
 
-        design->size = 0;
+        design->size = SHIP_SIZE_SMALL;
         design->ship_type = SHIP_TYPE_COLONY;
-        design->shield_type = 0;
+        design->shield_type = SHIELD_NO_SHIELD;
 
         design->ftl_type = (int8_t)Best_Warp_Drive_(player_idx);
-        design->computer_type = 0;
+        design->computer_type = COMPUTER_NO_COMPUTER;
 
         int16_t armor = Best_Armor_(player_idx);
-        if (armor > 1) {
+        if (armor > ARMOR_TITANIUM_ARMOR) {
             armor--;
         }
         design->armor_type = (int8_t)armor;
@@ -750,14 +750,14 @@ namespace INITSHIP {
 
         strcpy(design->name, MOX::_ship_type_names[SHIP_TYPE_OUTPOST][(uint8_t)MOX::_settings.language]);
 
-        design->size = 0;
-        design->ship_type = 4;
-        design->shield_type = 0;
+        design->size = SHIP_SIZE_SMALL;
+        design->ship_type = SHIP_TYPE_OUTPOST;
+        design->shield_type = SHIELD_NO_SHIELD;
         design->ftl_type = static_cast<int8_t>(Best_Warp_Drive_(player_idx));
-        design->computer_type = 0;
+        design->computer_type = COMPUTER_NO_COMPUTER;
 
         int16_t best_armor = Best_Armor_(player_idx);
-        if (best_armor > 1) {
+        if (best_armor > ARMOR_TITANIUM_ARMOR) {
             best_armor--;
         }
         design->armor_type = static_cast<int8_t>(best_armor);
@@ -769,7 +769,7 @@ namespace INITSHIP {
         design->speed = static_cast<int8_t>(TECHDATA::_drives[design->ftl_type].warp_speed);
         design->combat_speed = static_cast<int8_t>(TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size]);
 
-        design->cost = static_cast<int16_t>(COLCALC::Ship_Type_Cost_For_Player_(4, player_idx));
+        design->cost = static_cast<int16_t>(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_OUTPOST, player_idx));
     }
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
@@ -803,7 +803,7 @@ namespace INITSHIP {
                     Repair_Ship_Full_(i);
                 } else {
                     if (ship.location >= 0 && ship.location < MAX_STARS && 
-                        ship.status == 0 && ship.d.ship_type == 0) {
+                        ship.status == 0 && ship.d.ship_type == SHIP_TYPE_COMBAT) {
                         
                         if (struct_::Test_Bit_Field_(&MOX::_star[ship.location].has_colony, (int16_t)ship.owner)) {
                             Repair_Ship_Full_(i);
@@ -820,7 +820,7 @@ namespace INITSHIP {
         int16_t armor_absorption_pct = TECHDATA::_armor[(int16_t)ship->d.armor_type].ships_bonus;
         int16_t base_armor_hp = TECHDATA::_hull_data[(int16_t)ship->d.size].armor_hp;
 
-        int16_t has_special_armor = (int16_t)struct_::Test_Bit_Field_(ship->d.special_device_flags, 14);
+        int16_t has_special_armor = (int16_t)struct_::Test_Bit_Field_(ship->d.special_device_flags, SPECIAL_HEAVY_ARMOR);
 
         int16_t total_hits = (int16_t)(((int32_t)armor_absorption_pct * base_armor_hp) / 100) + base_armor_hp;
 
@@ -1059,7 +1059,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Get_Design_Structure_(s_ship_design d) {
-        int16_t has_special = (int16_t)struct_::Test_Bit_Field_(d.special_device_flags, 27 /* 0x1b */);
+        int16_t has_special = (int16_t)struct_::Test_Bit_Field_(d.special_device_flags, SPECIAL_REINFORCED_HULL);
         int16_t hull_idx = (int16_t)d.size;
         int16_t absorption = TECHDATA::_armor[(int16_t)d.armor_type].ships_bonus;
 
@@ -1450,10 +1450,10 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
-    ship->shield_type = 0;
-    ship->computer_type = 5;
-    ship->ftl_type = 5;
-    ship->size_class = 0;
+    ship->shield_type = SHIELD_NO_SHIELD;
+    ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    ship->ftl_type = DRIVE_HYPER_DRIVE;
+    ship->size_class = SHIP_SIZE_SMALL;
     ship->unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1483,7 +1483,7 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->crew_quality = 3;
     ship->officer_idx = -1;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
-    ship->armor_type = 6;
+    ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     int16_t absorption_percent = TECHDATA::_armor[ship->armor_type].ships_bonus;
     ship->structure_max = (int16_t)(((absorption_percent + 100) * (int16_t)TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
@@ -1504,10 +1504,10 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
-    ship->shield_type = 0;
-    ship->computer_type = 5;
-    ship->ftl_type = 5;
-    ship->size_class = 1;
+    ship->shield_type = SHIELD_NO_SHIELD;
+    ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    ship->ftl_type = DRIVE_HYPER_DRIVE;
+    ship->size_class = SHIP_SIZE_MEDIUM;
     ship->unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1562,7 +1562,7 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->crew_quality = 3;
     ship->officer_idx = -1;
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
-    ship->armor_type = 6;
+    ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     int32_t armor_factor = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
     
@@ -1626,10 +1626,10 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
-    ship->shield_type = 0;
-    ship->computer_type = 5;
-    ship->ftl_type = 5;
-    ship->size_class = 2;
+    ship->shield_type = SHIELD_NO_SHIELD;
+    ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    ship->ftl_type = DRIVE_HYPER_DRIVE;
+    ship->size_class = SHIP_SIZE_LARGE;
     ship->unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1700,7 +1700,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     ship->crew_quality = 3;
     ship->officer_idx = -1;
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
-    ship->armor_type = 6 /* ARMOR_NEUTRONTUIM */;
+    ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     int32_t armor_boost = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
     ship->structure_max = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
@@ -1721,10 +1721,10 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
-    ship->shield_type = 0;
-    ship->computer_type = 5;
-    ship->ftl_type = 5;
-    ship->size_class = 3;
+    ship->shield_type = SHIELD_NO_SHIELD;
+    ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    ship->ftl_type = DRIVE_HYPER_DRIVE;
+    ship->size_class = SHIP_SIZE_HUGE;
     ship->unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1815,7 +1815,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->crew_quality = 3;
     ship->officer_idx = -1;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
-    ship->armor_type = 6;
+    ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     int32_t armor_factor = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
     ship->structure_max = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
@@ -1836,10 +1836,10 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
-    ship->shield_type = 0;
-    ship->computer_type = 5;
-    ship->ftl_type = 5;
-    ship->size_class = 4;
+    ship->shield_type = SHIELD_NO_SHIELD;
+    ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    ship->ftl_type = DRIVE_HYPER_DRIVE;
+    ship->size_class = SHIP_SIZE_TITAN;
     ship->unit_status = 0;
 
     for (int i = 0; i < 5; ++i) {
@@ -1958,7 +1958,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     ship->crew_quality = 3;
     ship->officer_idx = -1;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
-    ship->armor_type = 6;
+    ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     int16_t abs_pct = TECHDATA::_armor[ship->armor_type].ships_bonus;
     ship->structure_max = (int16_t)((abs_pct + 100) * (int16_t)TECHDATA::_hull_data[ship->size_class].structure_hp / 100);
@@ -1976,11 +1976,11 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
 
     strcpy(design->name, MOX::_race_names[14]);
 
-    design->ship_type = 0;
-    design->size = 4;
-    design->ftl_type = 0;
+    design->ship_type = SHIP_TYPE_COMBAT;
+    design->size = SHIP_SIZE_TITAN;
+    design->ftl_type = DRIVE_NO_DRIVE;
     design->speed = 0;
-    design->shield_type = 3;
+    design->shield_type = SHIELD_CLASS_V_SHIELD;
 
     design->ship_weapon[0].type = 11;
     design->ship_weapon[0].count = 2;
@@ -2017,8 +2017,8 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
     design->ship_weapon[4].specials = 0;
     design->ship_weapon[4].ammo = 0;
 
-    design->computer_type = 5;
-    design->armor_type = 6;
+    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    design->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
     struct_::Set_Bit_Field_(design->special_device_flags, 3);
     struct_::Set_Bit_Field_(design->special_device_flags, 13);
@@ -2041,12 +2041,12 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
     strcpy(design->name, MOX::_race_names[15]);
 
     if (is_large != 0) {
-        design->ship_type = 0;
-        design->size = 3;
-        design->shield_type = 0;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->size = SHIP_SIZE_HUGE;
+        design->shield_type = SHIELD_NO_SHIELD;
         design->ftl_type = (int8_t)Best_Warp_Drive_(10);
-        design->computer_type = 2;
-        design->armor_type = 0;
+        design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
+        design->armor_type = ARMOR_NO_ARMOR;
         design->ship_weapon[0].specials = 0;
         design->ship_weapon[0].firing_arc = 15;
         design->ship_weapon[0].ammo = 0;
@@ -2063,12 +2063,12 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
         design->ship_weapon[1].type = 23;
         design->combat_speed = TECHDATA::_drives[(uint8_t)design->ftl_type].combat_speed_min[design->size];
     } else {
-        design->size = 2;
-        design->ship_type = 0;
-        design->shield_type = 0;
-        design->computer_type = 2;
-        design->armor_type = 0;
-        design->ftl_type = 0;
+        design->size = SHIP_SIZE_LARGE;
+        design->ship_type = SHIP_TYPE_COMBAT;
+        design->shield_type = SHIELD_NO_SHIELD;
+        design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
+        design->armor_type = ARMOR_NO_ARMOR;
+        design->ftl_type = DRIVE_NO_DRIVE;
         design->ship_weapon[0].specials = 0;
         design->speed = 0;
         design->ship_weapon[0].ammo = 0;
@@ -2092,14 +2092,14 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
     // Copy "Crystal" or specific race name from the race names array
     strcpy(design->name, MOX::_race_names[16]);
 
-    design->ship_type = 0;
-    design->computer_type = 5;
-    design->shield_type = 0;
+    design->ship_type = SHIP_TYPE_COMBAT;
+    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    design->shield_type = SHIELD_NO_SHIELD;
 
     if (variant != 0) {
         // Crystal variant
-        design->armor_type = 0;
-        design->size = 4;
+        design->armor_type = ARMOR_NO_ARMOR;
+        design->size = SHIP_SIZE_TITAN;
         int16_t best_drive = Best_Warp_Drive_(11);
         design->ftl_type = (int8_t)best_drive;
         design->ship_weapon[0].firing_arc = 15;
@@ -2119,8 +2119,8 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
         design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     } else {
         // Guardian variant
-        design->armor_type = 0;
-        design->ftl_type = 0;
+        design->armor_type = ARMOR_NO_ARMOR;
+        design->ftl_type = DRIVE_NO_DRIVE;
         design->ship_weapon[0].specials = 0;
         design->speed = 0;
         design->ship_weapon[0].firing_arc = 15;
@@ -2128,7 +2128,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
         design->ship_weapon[0].count = 1;
         design->ship_weapon[0].current_count = 1;
         design->ship_weapon[1].firing_arc = 15;
-        design->size = 2;
+        design->size = SHIP_SIZE_LARGE;
         design->ship_weapon[1].ammo = 10;
         design->ship_weapon[1].specials = 0;
         design->ship_weapon[0].type = 42;
@@ -2148,13 +2148,13 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
     strcpy(design->name, MOX::_race_names[17]);
 
-    design->ship_type = 0;
-    design->computer_type = 5;
-    design->shield_type = 0;
+    design->ship_type = SHIP_TYPE_COMBAT;
+    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    design->shield_type = SHIELD_NO_SHIELD;
 
     if (is_monster != 0) {
-        design->armor_type = 0;
-        design->size = 4;
+        design->armor_type = ARMOR_NO_ARMOR;
+        design->size = SHIP_SIZE_TITAN;
         design->speed = 1;
 
         design->ftl_type = (int8_t)Best_Warp_Drive_(12);
@@ -2177,9 +2177,9 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
         design->picture_num = 10;
         design->combat_speed = modifier + 4;
     } else {
-        design->armor_type = 0;
+        design->armor_type = ARMOR_NO_ARMOR;
         design->speed = 0;
-        design->size = 2;
+        design->size = SHIP_SIZE_LARGE;
 
         design->ship_weapon[0].type = 0x29;
         design->ship_weapon[0].firing_arc = 15;
@@ -2215,14 +2215,14 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel
 
     strcpy(design->name, MOX::_race_names[18]);
 
-    design->ship_type = 0;
-    design->computer_type = 4;
-    design->shield_type = 0;
+    design->ship_type = SHIP_TYPE_COMBAT;
+    design->computer_type = COMPUTER_CYBERTRONIC_COMPUTER;
+    design->shield_type = SHIELD_NO_SHIELD;
 
     if (is_greater_eel != 0) {
-        design->size = 3;
+        design->size = SHIP_SIZE_HUGE;
         design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(13 /* TECH_WARP_DRIVE */);
-        design->armor_type = 0;
+        design->armor_type = ARMOR_NO_ARMOR;
         design->speed = 1;
 
         struct_::Set_Bit_Field_(design->special_device_flags, 19 /* SPECIAL_DEVICE_19 */);
@@ -2237,11 +2237,11 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel
         design->picture_num = 11;
         design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 8;
     } else {
-        design->armor_type = 0;
+        design->armor_type = ARMOR_NO_ARMOR;
         int16_t best_warp = INITSHIP::Best_Warp_Drive_(13 /* TECH_WARP_DRIVE */);
 
-        design->ftl_type = 0;
-        design->size = 2;
+        design->ftl_type = DRIVE_NO_DRIVE;
+        design->size = SHIP_SIZE_LARGE;
         design->speed = 0;
 
         struct_::Set_Bit_Field_(design->special_device_flags, 19 /* SPECIAL_DEVICE_19 */);
@@ -2267,13 +2267,13 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) 
 
     strcpy(design->name, MOX::_race_names[19]);
 
-    design->ship_type = 0;
-    design->computer_type = 2;
-    design->shield_type = 0;
+    design->ship_type = SHIP_TYPE_COMBAT;
+    design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
+    design->shield_type = SHIELD_NO_SHIELD;
 
     if (is_monster != 0) {
-        design->size = 4;
-        design->armor_type = 0;
+        design->size = SHIP_SIZE_TITAN;
+        design->armor_type = ARMOR_NO_ARMOR;
         design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(14);
         design->speed = 1;
         design->ship_weapon[0].type = 43;
@@ -2285,7 +2285,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) 
         design->picture_num = 12;
         design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     } else {
-        design->size = 2;
+        design->size = SHIP_SIZE_LARGE;
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(14);
         design->speed = 0;
         design->ship_weapon[0].type = 43;
@@ -2312,15 +2312,15 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_TRANSPORT][(uint8_t)MOX::_settings.language];
     strcpy(design->name, localized_name);
 
-    design->size = 0;          // Small/Transport size
-    design->ship_type = 2;      // Transport type
-    design->shield_type = 0;
+    design->size = SHIP_SIZE_SMALL;
+    design->ship_type = SHIP_TYPE_TRANSPORT;
+    design->shield_type = SHIELD_NO_SHIELD;
 
     design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(player_idx);
-    design->computer_type = 0;
+    design->computer_type = COMPUTER_NO_COMPUTER;
 
     int16_t best_armor = INITSHIP::Best_Armor_(player_idx);
-    if (best_armor > 1) {
+    if (best_armor > ARMOR_TITANIUM_ARMOR) {
         best_armor--;
     }
     design->armor_type = (int8_t)best_armor;
@@ -2345,7 +2345,7 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
 
     // Set production cost
-    design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(2, player_idx);
+    design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_TRANSPORT, player_idx);
 }
 
 void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
@@ -2353,13 +2353,13 @@ void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
 
     strcpy(design->name, "Avenger");
 
-    design->computer_type = 5;
-    design->ship_type = 0;
-    design->shield_type = 0;
-    design->size = 3;
-    design->armor_type = 6;
+    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
+    design->ship_type = SHIP_TYPE_COMBAT;
+    design->shield_type = SHIELD_NO_SHIELD;
+    design->size = SHIP_SIZE_HUGE;
+    design->armor_type = ARMOR_XENTRONIUM_ARMOR;
     design->speed = 8;
-    design->ftl_type = 6;
+    design->ftl_type = DRIVE_INTERPHASED_DRIVE;
 
     design->ship_weapon[0].type = 4;
     design->ship_weapon[0].firing_arc = 1;
@@ -2419,7 +2419,7 @@ void __cdecl Update_Ship_Names_To_New_Language_(void) {
         s_ship_data* ship = &MOX::_ship[ship_index];
         const int32_t ship_type = (int32_t)ship->d.ship_type;
 
-        if (ship_type != 0) {
+        if (ship_type != SHIP_TYPE_COMBAT) {
             const char* localized_name = MOX::_ship_type_names[ship_type][(uint8_t)MOX::_settings.language];
 
             strcpy(ship->d.name, localized_name);

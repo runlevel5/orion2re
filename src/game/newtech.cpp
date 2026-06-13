@@ -170,64 +170,64 @@ namespace newtech {
 
         switch (ai_group) {
             case 0:
-                if (MOX::_player[player_idx].traits[2] < 0) modifier = 100;
-                else if (MOX::_player[player_idx].traits[2] > 0) modifier = 10;
+                if (MOX::_player[player_idx].traits[TRAIT_FOOD_BONUS] < 0) modifier = 100;
+                else if (MOX::_player[player_idx].traits[TRAIT_FOOD_BONUS] > 0) modifier = 10;
 
-                if (MOX::_player[player_idx].traits[18] != 0) modifier = 1;
-                else if (MOX::_player[player_idx].traits[17] != 0) modifier = 20;
+                if (MOX::_player[player_idx].traits[TRAIT_EATS_MINERALS] != 0) modifier = 1;
+                else if (MOX::_player[player_idx].traits[TRAIT_CYBERNETIC] != 0) modifier = 20;
                 break;
             case 1:
-                if (MOX::_player[player_idx].traits[3] < 0) modifier = 100;
+                if (MOX::_player[player_idx].traits[TRAIT_PRODUCTION_BONUS] < 0) modifier = 100;
                 break;
             case 2:
-                if (MOX::_player[player_idx].traits[4] < 0) modifier = 100;
-                else if (MOX::_player[player_idx].traits[4] > 0) modifier = 100;
+                if (MOX::_player[player_idx].traits[TRAIT_RESEARCH_BONUS] < 0) modifier = 100;
+                else if (MOX::_player[player_idx].traits[TRAIT_RESEARCH_BONUS] > 0) modifier = 100;
                 break;
             case 3:
-                if (MOX::_player[player_idx].traits[5] < 0) modifier = 100;
-                else if (MOX::_player[player_idx].traits[5] > 0) modifier = 20;
+                if (MOX::_player[player_idx].traits[TRAIT_TAX_BONUS] < 0) modifier = 100;
+                else if (MOX::_player[player_idx].traits[TRAIT_TAX_BONUS] > 0) modifier = 20;
                 break;
             case 4:
-                if (MOX::_player[player_idx].traits[3] > 0) modifier = 100;
-                if (MOX::_player[player_idx].traits[23] != 0) modifier = 1;
+                if (MOX::_player[player_idx].traits[TRAIT_PRODUCTION_BONUS] > 0) modifier = 100;
+                if (MOX::_player[player_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] != 0) modifier = 1;
                 break;
             case 6:
-                if (MOX::_player[player_idx].traits[13] != 0) modifier = 20;
-                if (MOX::_player[player_idx].traits[1] < 0) modifier = 100;
-                else if (MOX::_player[player_idx].traits[1] > 0) modifier = 5;
+                if (MOX::_player[player_idx].traits[TRAIT_SUBTERRANEAN] != 0) modifier = 20;
+                if (MOX::_player[player_idx].traits[TRAIT_POP_GROWTH_BONUS] < 0) modifier = 100;
+                else if (MOX::_player[player_idx].traits[TRAIT_POP_GROWTH_BONUS] > 0) modifier = 5;
                 break;
             case 12:
-                if (MOX::_player[player_idx].traits[9] < 0 || MOX::_player[player_idx].traits[9] > 0) modifier = 50;
-                if (MOX::_player[player_idx].traits[0] / 2 == 2) modifier = 50;
+                if (MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS] < 0 || MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS] > 0) modifier = 50;
+                if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == 2) modifier = 50;
                 break;
             case 16:
-                if (MOX::_player[player_idx].traits[8] < 0) modifier = 20;
+                if (MOX::_player[player_idx].traits[TRAIT_GROUND_COMBAT_BONUS] < 0) modifier = 20;
                 break;
             case 18:
-                if (MOX::_player[player_idx].traits[6] < 0) modifier = 50;
+                if (MOX::_player[player_idx].traits[TRAIT_SHIP_DEFENSE] < 0) modifier = 50;
                 break;
             case 25:
-                if (MOX::_player[player_idx].traits[7] < 0) modifier = 100;
+                if (MOX::_player[player_idx].traits[TRAIT_SHIP_ATTACK] < 0) modifier = 100;
                 break;
             case 27:
-                if (MOX::_player[player_idx].traits[7] > 0) modifier = 100;
+                if (MOX::_player[player_idx].traits[TRAIT_SHIP_ATTACK] > 0) modifier = 100;
                 break;
             case 28:
-                if (MOX::_player[player_idx].traits[6] > 0) modifier = 100;
+                if (MOX::_player[player_idx].traits[TRAIT_SHIP_DEFENSE] > 0) modifier = 100;
                 break;
             case 37:
-                if (MOX::_player[player_idx].traits[28] != 0) modifier = 1;
+                if (MOX::_player[player_idx].traits[TRAIT_STEALTHY_SHIPS] != 0) modifier = 1;
                 break;
             case 40:
-                if (MOX::_player[player_idx].traits[0] / 2 == 3) modifier = 1;
+                if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == 3) modifier = 1;
                 break;
         }
 
         if (tech_app_idx == 5) {
-            if (MOX::_player[player_idx].traits[25] != 0) modifier = 1;
-        } else if (tech_app_idx == 0x83) {
-            if (MOX::_player[player_idx].traits[11] != 0) modifier = 1;
-            else if (MOX::_player[player_idx].traits[10] != 0) modifier = 50;
+            if (MOX::_player[player_idx].traits[TRAIT_TELEPATHIC] != 0) modifier = 1;
+        } else if (tech_app_idx == TECH_APP_PLANETARY_GRAVITY_GENERATOR) {
+            if (MOX::_player[player_idx].traits[TRAIT_HEAVY_G_WORLD] != 0) modifier = 1;
+            else if (MOX::_player[player_idx].traits[TRAIT_LOW_G_WORLD] != 0) modifier = 50;
         }
 
         if (MOX::_player[player_idx].objectives == 100) {
@@ -241,7 +241,7 @@ namespace newtech {
         uint32_t val = 0;
         if (category_is_multi == 0) {
             int last_known_field_ai_group = 0;
-            for (int i = 0; i < 204; ++i) {
+            for (int i = 0; i < TECH_APP_BIOLOGY; ++i) {
                 if (TECHDATA::_technology_applications[i].ai_group == ai_group &&
                     MOX::_player[player_idx].tech_applications[i] == 3) {
                     last_known_field_ai_group = TECHDATA::_technology_fields[TECHDATA::_technology_applications[i].tech_field_id].ai_group;
@@ -312,7 +312,7 @@ namespace newtech {
 
         if (val == 0 && MOX::_player[player_idx].tech_fields[tech_field_id] == 2) {
             bool found = false;
-            for (int i = 0; i < 204; ++i) {
+            for (int i = 0; i < TECH_APP_BIOLOGY; ++i) {
                 if (found) break;
                 if (i == tech_app_idx) continue;
                 if (TECHDATA::_technology_applications[i].tech_field_id == tech_field_id) {
@@ -330,12 +330,12 @@ namespace newtech {
     }
 
     int8_t __cdecl All_Gray_Boxes_Researched_(s_player* player) {
-        if (player->tech_fields[0x37] == 3 &&
-            player->tech_fields[0x17] == 3 &&
-            player->tech_fields[0x39] == 3 &&
-            player->tech_fields[0x1D] == 3 &&
-            player->tech_fields[0x16] == 3 &&
-            player->tech_fields[0x1C] == 3) {
+        if (player->tech_fields[TECH_FIELD_NUCLEAR_FISSION] == 3 &&
+            player->tech_fields[TECH_FIELD_COLD_FUSION] == 3 &&
+            player->tech_fields[TECH_FIELD_PHYSICS] == 3 &&
+            player->tech_fields[TECH_FIELD_ENGINEERING] == 3 &&
+            player->tech_fields[TECH_FIELD_CHEMISTRY] == 3 &&
+            player->tech_fields[TECH_FIELD_ELECTRONICS] == 3) {
             return 1;
         }
         return 0;
@@ -346,41 +346,41 @@ namespace newtech {
 
         switch (rand_val) {
             case 1:
-                return 0xcc;
+                return TECH_APP_BIOLOGY;
             case 2:
             case 3:
             case 4:
             case 5:
             case 6:
-                return 0xcd;
+                return TECH_APP_POWER;
             case 7:
             case 8:
             case 9:
             case 10:
             case 11:
-                return 0xce;
+                return TECH_APP_PHYSICS;
             case 12:
             case 13:
-                return 0xcf;
+                return TECH_APP_CONSTRUCTION;
             case 14:
             case 15:
             case 16:
             case 17:
-                return 0xd0;
+                return TECH_APP_FIELDS;
             case 18:
-                return 0xd1;
+                return TECH_APP_CHEMISTRY;
             case 19:
-                return 0xd2;
+                return TECH_APP_COMPUTERS;
             case 20:
-                return 0xd3;
+                return TECH_APP_SOCIOLOGY;
             default:
                 return -1;
         }
     }
 
     int16_t __cdecl Choose_Tech_Application_(int16_t player_idx) {
-        uint32_t tech_values[212] = { 0 };
-        uint32_t weighted_choices[212] = { 0 };
+        uint32_t tech_values[TECH_APP_COUNT] = { 0 };
+        uint32_t weighted_choices[TECH_APP_COUNT] = { 0 };
         const int32_t tech_choice_count = (int32_t)(sizeof(tech_values) / sizeof(tech_values[0]));
         uint32_t max_weighted_choice = 0;
         bool has_candidate_tech = false;
@@ -395,17 +395,17 @@ namespace newtech {
 
                 int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
 
-                if (tech_field_id < 75 && player->tech_fields[tech_field_id] == 2) {
+                if (tech_field_id < TECH_FIELD_BIOLOGY && player->tech_fields[tech_field_id] == 2) {
                     uint32_t value = Calc_Tech_Value_(player_idx, i);
 
                     if (!all_gray_boxes) {
                         switch (tech_field_id) {
-                            case 22:
-                            case 23:
-                            case 28:
-                            case 29:
-                            case 55:
-                            case 57:
+                            case TECH_FIELD_CHEMISTRY:
+                            case TECH_FIELD_COLD_FUSION:
+                            case TECH_FIELD_ELECTRONICS:
+                            case TECH_FIELD_ENGINEERING:
+                            case TECH_FIELD_NUCLEAR_FISSION:
+                            case TECH_FIELD_PHYSICS:
                                 value += 1;
                                 break;
                             default:

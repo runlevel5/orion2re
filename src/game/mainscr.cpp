@@ -78,7 +78,7 @@ namespace MAINSCR {
         uint8_t screen = (uint8_t)MOX::_previous_screen;
 
         if (screen == SCREEN_MAIN ||
-            screen == 0xBU /* SCREEN_UNK2 */ ||
+            screen == SCREEN_UNK2 ||
             screen == SCREEN_COLONIZATION_IN_MAIN ||
             screen == SCREEN_BUILDING_OUTPOSTS_IN_MAIN ||
             screen == SCREEN_SCRAP_FREIGHTERS ||
@@ -2278,7 +2278,7 @@ namespace MAINSCR {
             int16_t scale = HAROLD::Map_Scale_To_Zoom_Level_();
             int16_t radius;
 
-            if (MOX::_star[star_idx].spectral_class == 6) {
+            if (MOX::_star[star_idx].spectral_class == STAR_CLASS_BLACK_HOLE) {
                 radius = zoom_radii[scale];
             } else {
                 radius = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
@@ -3180,16 +3180,16 @@ namespace MAINSCR {
 
                 if (MOX::_fleet_box.colonize_btn_active != 0 && MOX::_fleet_box_colonize_button == param_2) {
                     MOX::_eta_star_id = -1;
-                    MOX::_current_screen = 0x1E /* SCREEN_COLONIZATION_IN_MAIN */;
-                    MOX::_return_screen = 0 /* SCREEN_MAIN */;
+                    MOX::_current_screen = SCREEN_COLONIZATION_IN_MAIN;
+                    MOX::_return_screen = SCREEN_MAIN;
                     *param_4 = 1;
                     continue;
                 }
 
                 if (MOX::_fleet_box.transport_btn_active != 0 && MOX::_fleet_box_transport_button == param_2) {
-                    if (FLEETPOP::At_Least_One_Ship_Of_Type_Selected_(2) != 0) {
-                        MOX::_current_screen = 0x22 /* SCREEN_UNLOADING_TRANSPORTS_IN_MAIN */;
-                        MOX::_return_screen = 0 /* SCREEN_MAIN */;
+                    if (FLEETPOP::At_Least_One_Ship_Of_Type_Selected_(SHIP_TYPE_TRANSPORT) != 0) {
+                        MOX::_current_screen = SCREEN_UNLOADING_TRANSPORTS_IN_MAIN;
+                        MOX::_return_screen = SCREEN_MAIN;
                         *param_4 = 1;
                     } else {
                         char local_578[200];
@@ -3200,8 +3200,8 @@ namespace MAINSCR {
                 }
 
                 if (MOX::_fleet_box.outpost_btn_active != 0 && MOX::_fleet_box_outpost_button == param_2) {
-                    MOX::_current_screen = 0x1F;
-                    MOX::_return_screen = 0 /* SCREEN_MAIN */;
+                    MOX::_current_screen = SCREEN_BUILDING_OUTPOSTS_IN_MAIN;
+                    MOX::_return_screen = SCREEN_MAIN;
                     *param_4 = 1;
                     continue;
                 }

@@ -249,7 +249,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         int32_t random_roll = game_random::Random_(10);
         int8_t spectral_class = MOX::_star[star_idx].spectral_class;
 
-        if (spectral_class >= 0 && spectral_class < 6) {
+        if (spectral_class >= 0 && spectral_class < STAR_CLASS_BLACK_HOLE) {
             int32_t table_index = (random_roll - 1) * 6 + (int32_t)spectral_class;
             return (int8_t)MOX::_class_to_mineral[table_index];
         }
@@ -283,7 +283,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     MAPGEN::_companion_star = 1;
                     int8_t spectral = MOX::_star[star_idx].spectral_class;
 
-                    if (spectral == 0) {
+                    if (spectral == STAR_CLASS_B) {
                         satellite_type = 5;
                     } else {
                         satellite_type = (uint8_t)(spectral + 4);
@@ -295,7 +295,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             }
 
             // Validation: Cannot have a Gas Giant (type 2) in the 0th orbit (too close to star)
-        } while (satellite_type == 2 && orbit == 0);
+        } while (satellite_type == PLANET_TYPE_GAS_GIANT && orbit == 0);
 
         // Debug assertion: Check for invalid satellite type 0
         if (satellite_type == 0) {
@@ -392,7 +392,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             }
         }
 
-        if (spectral_class < 6) {
+        if (spectral_class < STAR_CLASS_BLACK_HOLE) {
             int8_t group = MOX::_class_to_group[spectral_class].group[orbit];
 
             Update_Planet_Group_Cache();
@@ -494,7 +494,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
                 if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
                     int16_t mapped_idx = MOX::_star[(int8_t)backup_p->star_index].planet_index[random_idx];
-                    if (mapped_idx > -1 && _pl[mapped_idx].planet_type != 2 /* PLANET_TYPE_GAS_GIANT */) {
+                    if (mapped_idx > -1 && _pl[mapped_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
                         backup_p->colony_index = -2;
                         MOX::_planet_count--;
                     }
@@ -577,15 +577,17 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             int16_t p_idx = MOX::_star[star_idx].planet_index[i];
             if (p_idx >= 0) {
                 s_planet_data* planet = &MOX::_planet[p_idx];
-                if (planet->planet_type == 3 && planet->planet_special == 0) {
+                if (planet->planet_type == PLANET_TYPE_PLANET && planet->planet_special == SYSTEM_SPECIAL_NO_SPECIAL) {
                     valid_planets[i] = 1;
                     int8_t climate = planet->climate;
                     // Habitable climates: Desert, Arid, Tundra, Ocean, Swamp, Terran, Gaia
-                    if (climate == 3 || climate == 7 || climate == 4 || climate == 5 ||
-                        climate == 6 || climate == 8 || climate == 9) {
+                    if (climate == PLANET_CLIMATE_DESERT || climate == PLANET_CLIMATE_ARID ||
+                        climate == PLANET_CLIMATE_TUNDRA || climate == PLANET_CLIMATE_OCEAN ||
+                        climate == PLANET_CLIMATE_SWAMP || climate == PLANET_CLIMATE_TERRAN ||
+                        climate == PLANET_CLIMATE_GAIA) {
                         habitable_planets[i] = 1;
                         has_habitable = true;
-                        if (planet->size >= 2) { // Medium or larger
+                        if (planet->size >= PLANET_SIZE_MEDIUM) { // Medium or larger
                             large_planets[i] = 1;
                             has_large = true;
                         }
@@ -596,26 +598,26 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
         int16_t tries = 0;
         uint16_t system_weights[12];
-        system_weights[0] = 0;
+        system_weights[SYSTEM_SPECIAL_NO_SPECIAL] = 0;
 
         while (true) {
             for (int s = 1; s < 12; ++s) {
                 if ((excluded_mask >> s) & 1) {
                     system_weights[s] = 0;
                 }
-                else if (s == 8) { // Marooned Hero
+                else if (s == SYSTEM_SPECIAL_MAROONED_HERO) { // Marooned Hero
                     system_weights[s] = (MOX::_zoom_count + 2 >= _n_marooned_heroes) ?
                         MOX::_planet_special_weighted_chance[s] : 0;
                 }
-                else if (s == 6 || s == 7) { // Natives, Splinter Colony
+                else if (s == SYSTEM_SPECIAL_NATIVES || s == SYSTEM_SPECIAL_SPLINTER_COLONY) { // Natives, Splinter Colony
                     system_weights[s] = (has_large) ?
                         MOX::_planet_special_weighted_chance[s] : 0;
                 }
-                else if (s == 10) { // Ancient Artifacts
+                else if (s == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) { // Ancient Artifacts
                     system_weights[s] = (has_habitable) ?
                         MOX::_planet_special_weighted_chance[s] : 0;
                 }
-                else if (s == 9) { // Space Monster
+                else if (s == SYSTEM_SPECIAL_SPACE_MONSTER) { // Space Monster
                     system_weights[s] = (MOX2::_user_wants_n_space_monsters) ?
                         MOX::_planet_special_weighted_chance[s] : 0;
                 }
@@ -628,9 +630,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             *special_out = (int8_t)choice;
             bool success = false;
 
-            if ((uint32_t)choice - 1 <= 9) { // Switch only handles specials 1-10
+            if (choice >= SYSTEM_SPECIAL_STABLE_WORMHOLE && choice <= SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
                 switch (choice) {
-                case 1: // Stable Wormhole
+                case SYSTEM_SPECIAL_STABLE_WORMHOLE:
                     if (commit_changes && _n_wormholes < (MOX::_settings.galaxy_size * 4 + 4)) {
                         *wormhole_out = 1;
                         _n_wormholes++;
@@ -638,17 +640,17 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     }
                     break;
 
-                case 2: // Space Debris
-                case 3: // Pirate Cache
-                case 9: // Space Monster
+                case SYSTEM_SPECIAL_SPACE_DEBRIS:
+                case SYSTEM_SPECIAL_PIRATE_CACHE:
+                case SYSTEM_SPECIAL_SPACE_MONSTER:
                     if (commit_changes) {
                         MOX::_star[star_idx].system_special = (int8_t)choice;
                     }
                     success = true;
                     break;
 
-                case 4: // Gold Deposits
-                case 5: // Gem Deposits
+                case SYSTEM_SPECIAL_GOLD_DEPOSITS:
+                case SYSTEM_SPECIAL_GEM_DEPOSITS:
                 {
                     int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(valid_planets, 5);
                     if (p_idx >= 0) {
@@ -662,8 +664,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     break;
                 }
 
-                case 6: // Natives
-                case 7: // Splinter Colony
+                case SYSTEM_SPECIAL_NATIVES:
+                case SYSTEM_SPECIAL_SPLINTER_COLONY:
                 {
                     int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(large_planets, 5);
                     if (p_idx >= 0) {
@@ -677,7 +679,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     break;
                 }
 
-                case 8: // Marooned Hero
+                case SYSTEM_SPECIAL_MAROONED_HERO:
                     _n_marooned_heroes++; // Increment global attempt counter
                     if (commit_changes) {
                         MOX::_star[star_idx].system_special = (int8_t)choice;
@@ -685,7 +687,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     success = true;
                     break;
 
-                case 10: // Ancient Artifacts
+                case SYSTEM_SPECIAL_ANCIENT_ARTIFACTS:
                 {
                     int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(habitable_planets, 5);
                     if (p_idx >= 0) {
@@ -705,19 +707,19 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
             tries++;
             if (tries > 100) {
-                *special_out = 0;
+                *special_out = SYSTEM_SPECIAL_NO_SPECIAL;
                 break;
             }
         }
     }
 
     void __cdecl Generate_Star_Special_(int16_t star_idx, int16_t* wormhole_out, uint8_t* special_counts) {
-        int8_t special_type = 0;
+        int8_t special_type = SYSTEM_SPECIAL_NO_SPECIAL;
 
         if ((int16_t)MOX::_planet_special < (int16_t)game_random::Random_(100)) {
             Get_A_Planet_Or_Star_Special_(star_idx, wormhole_out, &special_type, 1, 0);
         } else {
-            special_type = 0;
+            special_type = SYSTEM_SPECIAL_NO_SPECIAL;
         }
 
         int16_t monster_chance;
@@ -1053,7 +1055,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         int16_t type = Generate_Satellite_Type_(star_idx, orbit);
 
         // Check if satellite type is Small (1), Medium (2), or Large (3)
-        if (type == 1 || type == 2 || type == 3) {
+        if (type == PLANET_TYPE_ASTEROID || type == PLANET_TYPE_GAS_GIANT || type == PLANET_TYPE_PLANET) {
             MOX::_star[star_idx].planet_index[orbit] = (int16_t)MOX::_planet_count;
 
             s_planet_data& planet = MOX::_planet[MOX::_planet_count];
@@ -1451,7 +1453,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                         }
                     }
 
-                    if (MOX::_star[_star_count].spectral_class != 6 && planets_per_star[_star_count] > 0 && _star_count > 0) {
+                    if (MOX::_star[_star_count].spectral_class != STAR_CLASS_BLACK_HOLE && planets_per_star[_star_count] > 0 && _star_count > 0) {
                         Generate_Star_Special_(_star_count, &unused_wormhole_flag, _special_count);
                     }
 

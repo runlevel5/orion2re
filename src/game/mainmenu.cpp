@@ -251,23 +251,23 @@ namespace MAINMENU {
         s_animation_header* anim_to_draw = nullptr;
         int16_t draw_y = 0;
 
-        if (_mainmenu->fields[0].field == MOX::_scanned_field) {
-            anim_to_draw = _mainmenu->fields[0].field1_0x4; // MAIN_MENU_BTN_CONTINUE
+        if (_mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field1_0x4;
             draw_y = 0xAC;
-        } else if (_mainmenu->fields[1].field == MOX::_scanned_field) { // MAIN_MENU_BTN_LOAD
-            anim_to_draw = _mainmenu->fields[1].field1_0x4;
+        } else if (_mainmenu->fields[MAIN_MENU_BTN_LOAD].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[MAIN_MENU_BTN_LOAD].field1_0x4;
             draw_y = 0xC3;
-        } else if (_mainmenu->fields[2].field == MOX::_scanned_field) { // MAIN_MENU_BTN_NEW
-            anim_to_draw = _mainmenu->fields[2].field1_0x4;
+        } else if (_mainmenu->fields[MAIN_MENU_BTN_NEW].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[MAIN_MENU_BTN_NEW].field1_0x4;
             draw_y = 0xD9;
-        } else if (_mainmenu->fields[3].field == MOX::_scanned_field) { // MAIN_MENU_BTN_MULTIPLAY
-            anim_to_draw = _mainmenu->fields[3].field1_0x4;
+        } else if (_mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field1_0x4;
             draw_y = 0xF0;
-        } else if (_mainmenu->fields[4].field == MOX::_scanned_field) { // MAIN_MENU_BTN_HELP
-            anim_to_draw = _mainmenu->fields[4].field1_0x4;
+        } else if (_mainmenu->fields[MAIN_MENU_BTN_HELP].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[MAIN_MENU_BTN_HELP].field1_0x4;
             draw_y = 0x106;
-        } else if (_mainmenu->fields[5].field == MOX::_scanned_field) { // MAIN_MENU_BTN_QUIT
-            anim_to_draw = _mainmenu->fields[5].field1_0x4;
+        } else if (_mainmenu->fields[MAIN_MENU_BTN_QUIT].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[MAIN_MENU_BTN_QUIT].field1_0x4;
             draw_y = 0x11D;
         }
 
@@ -276,11 +276,11 @@ namespace MAINMENU {
         }
 
         // Special handling for disabled/state-specific buttons (ID -1000)
-        if (_mainmenu->fields[0].field == -1000) { // -1000
-            animate::Draw_(0x19F, 0xAC, _mainmenu->fields[0].field2_0x8);
+        if (_mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field == -1000) { // -1000
+            animate::Draw_(0x19F, 0xAC, _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field2_0x8);
         }
-        if (_mainmenu->fields[1].field == -1000) { // -1000
-            animate::Draw_(0x19F, 0xC3, _mainmenu->fields[1].field2_0x8);
+        if (_mainmenu->fields[MAIN_MENU_BTN_LOAD].field == -1000) { // -1000
+            animate::Draw_(0x19F, 0xC3, _mainmenu->fields[MAIN_MENU_BTN_LOAD].field2_0x8);
         }
 
         if (_credit_num != 0) {

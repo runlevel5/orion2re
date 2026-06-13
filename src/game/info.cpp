@@ -343,18 +343,18 @@ namespace INFO {
 
         int8_t* traits = MOX::_player[idx].traits;
 
-        for (int trait_idx = 0; trait_idx < 31; ++trait_idx) {
+        for (int trait_idx = 0; trait_idx < TRAIT_COUNT; ++trait_idx) {
             int8_t trait_val = traits[trait_idx];
 
-            if (trait_val != 0 || trait_idx == 0) {
+            if (trait_val != 0 || trait_idx == TRAIT_CURRENT_GOVERNMENT) {
                 char local_40[64];
                 char local_80[64];
 
                 strcpy(local_40, "^ ");
 
-                if (trait_idx == 0) {
+                if (trait_idx == TRAIT_CURRENT_GOVERNMENT) {
                     strcat(local_40, MOX::_government_labels[trait_val]);
-                } else if (trait_idx == 15) {
+                } else if (trait_idx == TRAIT_RICH_HOME_WORLD) {
                     if (trait_val < 0) {
                         strcat(local_40, MOX::_special_ability_names[31]);
                     } else {
@@ -366,8 +366,8 @@ namespace INFO {
 
                 char* print_str = local_40;
 
-                if (trait_idx > 0 && trait_idx < 10) {
-                    if (trait_idx == 2) {
+                if (trait_idx > TRAIT_CURRENT_GOVERNMENT && trait_idx < TRAIT_LOW_G_WORLD) {
+                    if (trait_idx == TRAIT_FOOD_BONUS) {
                         strcpy(local_80, local_40);
                         if (trait_val < 0) {
                             strcat(local_80, "-0.5");
@@ -377,7 +377,7 @@ namespace INFO {
                             strcat(local_80, "+2");
                         }
                         print_str = local_80;
-                    } else if (trait_idx == 5) {
+                    } else if (trait_idx == TRAIT_TAX_BONUS) {
                         strcpy(local_80, local_40);
                         if (trait_val < 0) {
                             strcat(local_80, "-");
@@ -406,21 +406,21 @@ namespace INFO {
     void __cdecl Race_Statistics_Specials_Help_(int16_t x, int16_t y, uint8_t player_idx) {
         s_player* player = &MOX::_player[player_idx];
 
-        for (int i = 0; i < 31; ++i) {
+        for (int i = 0; i < TRAIT_COUNT; ++i) {
             int8_t trait_val = player->traits[i];
 
-            if (trait_val != 0 || i == 0) {
+            if (trait_val != 0 || i == TRAIT_CURRENT_GOVERNMENT) {
                 int16_t help_id;
 
-                if (i == 0) {
+                if (i == TRAIT_CURRENT_GOVERNMENT) {
                     help_id = (int16_t)(trait_val / 2) + 474;
-                } else if (i == 15) {
+                } else if (i == TRAIT_RICH_HOME_WORLD) {
                     if (trait_val < 0) {
                         help_id = 458;
                     } else {
                         help_id = 457;
                     }
-                } else if (i < 15) {
+                } else if (i < TRAIT_RICH_HOME_WORLD) {
                     help_id = (int16_t)i + 442;
                 } else {
                     help_id = (int16_t)i + 443;
@@ -526,7 +526,7 @@ namespace INFO {
         video::Set_Refresh_Stencil_();
 
         _g_reference_screen_type = 0;
-        if (MOX::_return_screen == 0) {
+        if (MOX::_return_screen == SCREEN_MAIN) {
             _g_turn_message_ix = 0;
         }
 
@@ -644,7 +644,7 @@ namespace INFO {
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
 
-        MOX::_current_screen = 0;
+        MOX::_current_screen = SCREEN_MAIN;
     }
 
     void __cdecl Build_Maint_Chart_Bitmaps_(s_animation_header** sprites, s_animation_header** bars, s_animation_header** labels, int32_t* values) {
@@ -2086,8 +2086,8 @@ namespace INFO {
                 if (input_field >= _g_first_list_field && input_field <= _g_last_list_field) {
                     if (MSG_::Goto_Msg_Colony_(&MSG_::_msgs[_g_selected_msg_p->group_id])) {
                         _g_turn_message_ix = _g_selected_msg_p->group_id;
-                        MOX::_current_screen = 1;
-                        MOX::_return_screen = 9;
+                        MOX::_current_screen = SCREEN_COLONY;
+                        MOX::_return_screen = SCREEN_INFO;
                         input_field = _g_exit_field;
                     }
                 } else {

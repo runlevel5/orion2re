@@ -34,7 +34,7 @@ namespace HAROLD {
             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
 
             if (planet_idx != -1) {
-                if (MOX::_planet[planet_idx].planet_type == 3) {
+                if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_PLANET) {
                     count++;
                 }
             }
@@ -82,7 +82,7 @@ namespace HAROLD {
 
     /** Returns whether the star's spectral class falls in the habitable range. */
     bool __cdecl Habitable_Spectral_Class_(int16_t star_idx) {
-        return MOX::_star[star_idx].spectral_class < 6;
+        return MOX::_star[star_idx].spectral_class < STAR_CLASS_BLACK_HOLE;
     }
 
     /** Returns whether the system contains outposts but no full colonies. */

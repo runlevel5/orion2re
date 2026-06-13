@@ -637,8 +637,11 @@ namespace HACCESS {
     }
 
     int8_t __cdecl Special_Is_Planet_Special_(int16_t special_type) {
-        if (special_type == 4 || special_type == 5 || special_type == 6 ||
-            special_type == 7 || special_type == 10) {
+        if (special_type == SYSTEM_SPECIAL_GOLD_DEPOSITS ||
+            special_type == SYSTEM_SPECIAL_GEM_DEPOSITS ||
+            special_type == SYSTEM_SPECIAL_NATIVES ||
+            special_type == SYSTEM_SPECIAL_SPLINTER_COLONY ||
+            special_type == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
             return 1;
         }
 

@@ -14,12 +14,12 @@ namespace DIP_SCRN {
     uint8_t _talker_ambassador;
     int16_t _diplomacy_current_music;
     int16_t _net_diplomacy_esc_pressed;
-    uint8_t _target_tech_list[212];
+    uint8_t _target_tech_list[TECH_APP_COUNT];
     uint8_t _listen_ambassador;
     int16_t _exchange_tech_count;
     char* _main_diplomacy_list[9];
     char* _propose_treaty_diplomacy_list[7];
-    uint8_t _exchange_tech_list[212];
+    uint8_t _exchange_tech_list[TECH_APP_COUNT];
     char _chat_message[100];
     int16_t _diplomacy_quit_chat_field;
     int16_t _net_diplomacy_treaty_type;
@@ -468,8 +468,8 @@ namespace DIP_SCRN {
 
     void __cdecl Get_Diplomacy_Tech_List_(int16_t player_a_idx, int16_t player_b_idx, int16_t* tech_count_ptr, uint8_t* tech_list_buffer) {
         int16_t local_count;
-        uint8_t local_tech_list[212];
-        int32_t local_buffer[212]; // Buffer for NPC diplomacy calculations
+        uint8_t local_tech_list[TECH_APP_COUNT];
+        int32_t local_buffer[TECH_APP_COUNT]; // Buffer for NPC diplomacy calculations
 
         // Initialize output buffer
         memset(tech_list_buffer, 0, 10);
@@ -1037,7 +1037,7 @@ namespace DIP_SCRN {
                         Get_Human_Tech_Exchange_First_Message_(player_1, player_2, tech_1);
                         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 4, text_msg, 40);
 
-                        int32_t tech_categories[212];
+                        int32_t tech_categories[TECH_APP_COUNT];
                         memset(tech_categories, 0, sizeof(tech_categories));
                         memset(tech_categories, 1, 15);
 
@@ -1395,8 +1395,8 @@ namespace DIP_SCRN {
         demand_list_flags[5] = 1;
 
         int16_t local_624 = 0;
-        uint8_t local_5b4[212];
-        int32_t local_350[212];
+        uint8_t local_5b4[TECH_APP_COUNT];
+        int32_t local_350[TECH_APP_COUNT];
         npcdiplo::Get_Differential_Tech_List_(player_num, ambassador_idx, 0, 0xc343cb00, local_5b4, local_350, &local_624, 1);
         if (local_624 > 0) {
             demand_list_flags[6] = 1;
@@ -1657,9 +1657,9 @@ namespace DIP_SCRN {
         int16_t done_flag;
         uint8_t options[11];
         char title_buf[40];
-        uint8_t tech_list[212];
+        uint8_t tech_list[TECH_APP_COUNT];
         char msg_buf[400];
-        int32_t costs[212];
+        int32_t costs[TECH_APP_COUNT];
 
         _chat_message[0] = s__00551100[0];
         _chat_base_x = 10;
@@ -1954,7 +1954,7 @@ namespace DIP_SCRN {
             else {
                 _chat_mode_flag = 0;
 
-                if (MOX::_player[_talker_ambassador].traits[19] == 1 || MOX::_player[_listen_ambassador].traits[19] == 1) {
+                if (MOX::_player[_talker_ambassador].traits[TRAIT_REPULSIVE] == 1 || MOX::_player[_listen_ambassador].traits[TRAIT_REPULSIVE] == 1) {
                     Get_Main_Repulsive_Diplomacy_Choices_(_talker_ambassador, _listen_ambassador, 1);
                     fields::Clear_Fields_();
                 }

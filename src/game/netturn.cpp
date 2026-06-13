@@ -86,8 +86,8 @@ namespace NETTURN {
 
                 if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
                     ERICNET::Mox_Play_Sound_(0x33);
-                    MOX::_previous_screen = 0x25;
-                    MOX::_current_screen = 0x27;
+                    MOX::_previous_screen = SCREEN_NET_NEXT_TURN;
+                    MOX::_current_screen = SCREEN_REPORTS;
                     return;
                 }
 
@@ -98,8 +98,8 @@ namespace NETTURN {
 
                 NETSTART::Mox_Net_Uninit_();
                 MOX::_game_type = 0;
-                MOX::_previous_screen = 0x25;
-                MOX::_current_screen = 10;
+                MOX::_previous_screen = SCREEN_NET_NEXT_TURN;
+                MOX::_current_screen = SCREEN_MAIN_MENU;
                 return;
             }
         }

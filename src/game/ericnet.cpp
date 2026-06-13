@@ -4,9 +4,18 @@
 namespace ERICNET {
     int8_t _start_civ_level[3] = {3, 5, 9};
     int16_t _buildlist[44] = {
-        41, 8, 40, 21, 22, 15, 7, 20, 37, 4, 31, 33, 34, 39, 2,
-        12, 13, 32, 35, 10, 43, 16, 28, 25, 18, 19, 24, 26, 47, 27,
-        6, 5, 23, 36, 29, 30, 46, 14, 45, 3, 42, 38, 0, 0,
+        BUILDING_STAR_FORTRESS, BUILDING_BATTLESTATION, BUILDING_STAR_BASE, BUILDING_HYDROPONIC_FARM,
+        BUILDING_MARINE_BARRACKS, BUILDING_BIOSPHERES, BUILDING_AUTOMATED_FACTORY, BUILDING_HOLO_SIMULATOR,
+        BUILDING_SOIL_ENRICHMENT, BUILDING_ASTRO_UNIVERSITY, BUILDING_PLEASURE_DOME, BUILDING_RECYCLOTRON,
+        BUILDING_ROBOTIC_FACTORY, BUILDING_SPACEPORT, BUILDING_ARMOR_BARRACKS, BUILDING_DEEP_CORE_MINE,
+        BUILDING_CORE_WASTE_DUMP, BUILDING_POLLUTION_PROCESSOR, BUILDING_RESEARCH_LAB, BUILDING_CLONING_CENTER,
+        BUILDING_SUBTERRANEAN_FARMS, BUILDING_FOOD_REPLICATORS, BUILDING_RADIATION_SHIELD,
+        BUILDING_GRAVITY_GENERATOR, BUILDING_CURRENCY_EXCHANGE, BUILDING_GALACTIC_CYBERNET, BUILDING_FLUX_SHIELD,
+        BUILDING_MISSILE_BASE, BUILDING_FIGHTER_GARRISON, BUILDING_GROUND_BATTERIES, BUILDING_AUTOLAB,
+        BUILDING_ATMOSPHERE_RENEWER, BUILDING_BARRIER_SHIELD, BUILDING_ROBO_MINER_PLANT,
+        BUILDING_STOCK_EXCHANGE, BUILDING_SUPERCOMPUTER, BUILDING_WEATHER_CONTROLLER,
+        BUILDING_DIMENSIONAL_PORTAL, BUILDING_WARP_INTERDICTOR, BUILDING_ARTEMIS_SYSTEM_NET,
+        BUILDING_STELLAR_CONVERTER, BUILDING_SPACE_ACADEMY, BUILDING_NO_BUILDING, BUILDING_NO_BUILDING,
     };
 
     void __cdecl Init_Homeworld_Colony2_(int16_t planet_idx, int16_t player_idx, uint8_t is_homeworld) {
@@ -31,7 +40,7 @@ namespace ERICNET {
 
         int16_t population_limit = COLCALC::Colony_Race_Pop_Limit_(&colony, player_idx);
 
-        if (MOX::_settings.starting_civilization_level == 2 /* Post-War */) {
+        if (MOX::_settings.starting_civilization_level == 2 /* Advanced */) {
             int32_t growth_mod = MOX::_player[player_idx].traits[TRAIT_POP_GROWTH_BONUS];
             colony.n_pops = (int8_t)(((growth_mod + 300) * (int32_t)population_limit * 6) / 3000);
 
@@ -74,7 +83,7 @@ namespace ERICNET {
         }
 
         int16_t added_buildings_count = 0;
-        for (int j = 0; ERICNET::_buildlist[j] != 0; ++j) {
+        for (int j = 0; ERICNET::_buildlist[j] != BUILDING_NO_BUILDING; ++j) {
             if (added_buildings_count >= ERICNET::_start_civ_level[MOX::_settings.starting_civilization_level]) {
                 break;
             }
@@ -87,22 +96,22 @@ namespace ERICNET {
             if (COLCALC::Colony_Can_Build_Product_(&colony, building_id)) {
                 bool can_add = true;
                 switch (building_id) {
-                    case 5:
-                    case 13:
-                    case 32:
+                    case BUILDING_ATMOSPHERE_RENEWER:
+                    case BUILDING_CORE_WASTE_DUMP:
+                    case BUILDING_POLLUTION_PROCESSOR:
                         can_add = (MOX::_player[player_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0);
                         break;
-                    case 10:
-                    case 25:
+                    case BUILDING_CLONING_CENTER:
+                    case BUILDING_GRAVITY_GENERATOR:
                         can_add = ((int32_t)(uint8_t)colony.n_pops < (int32_t)population_limit);
                         break;
-                    case 20:
-                    case 31:
+                    case BUILDING_HOLO_SIMULATOR:
+                    case BUILDING_PLEASURE_DOME:
                         can_add = (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3);
                         break;
-                    case 21:
-                    case 37:
-                    case 43:
+                    case BUILDING_HYDROPONIC_FARM:
+                    case BUILDING_SOIL_ENRICHMENT:
+                    case BUILDING_SUBTERRANEAN_FARMS:
                         can_add = (MOX::_player[player_idx].traits[TRAIT_EATS_MINERALS] == 0);
                         break;
                     default:
@@ -249,7 +258,7 @@ namespace ERICNET {
         uint8_t clear_combat_ignore = 0;
 
         switch (building_idx) {
-            case 2: /* Armor Barracks / Tanks */
+            case BUILDING_ARMOR_BARRACKS:
                 colony->tank_roundoff = 0;
                 {
                     int16_t limit = invasion::Colony_Tank_Barracks_Limit_(colony);
@@ -260,48 +269,48 @@ namespace ERICNET {
                 }
                 break;
 
-            case 3:
-            case 14:
-            case 45: /* Artemis System */
+            case BUILDING_ARTEMIS_SYSTEM_NET:
+            case BUILDING_DIMENSIONAL_PORTAL:
+            case BUILDING_WARP_INTERDICTOR:
                 recompute_star = 1;
                 break;
 
-            case 9: /* Galactic Headquarters */
+            case BUILDING_CAPITOL:
                 player->home_planet_id = colony->planet;
                 for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
                     if (i != colony_idx && MOX::_colony[i].owner == colony->owner) {
-                        COLBLDG::Delete_Prod_From_Colony_Queue_(i, 9);
+                        COLBLDG::Delete_Prod_From_Colony_Queue_(i, BUILDING_CAPITOL);
                     }
                 }
                 break;
 
-            case 11: /* Colony Ship stuff */
+            case BUILDING_COLONY_BASE:
                 star->ignore_colony_ships &= ~(1 << (colony->owner & 0x1F));
                 break;
 
-            case 13: /* Recycler Upgrade logic */
-                if (colony->buildings[32]) {
-                    colony->buildings[32] = 0;
-                    player->bc += TECHDATA::_buildings[32].cost;
+            case BUILDING_CORE_WASTE_DUMP:
+                if (colony->buildings[BUILDING_POLLUTION_PROCESSOR]) {
+                    colony->buildings[BUILDING_POLLUTION_PROCESSOR] = 0;
+                    player->bc += TECHDATA::_buildings[BUILDING_POLLUTION_PROCESSOR].cost;
                 }
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 32);
-                if (colony->buildings[5]) {
-                    colony->buildings[5] = 0;
-                    player->bc += TECHDATA::_buildings[5].cost;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_POLLUTION_PROCESSOR);
+                if (colony->buildings[BUILDING_ATMOSPHERE_RENEWER]) {
+                    colony->buildings[BUILDING_ATMOSPHERE_RENEWER] = 0;
+                    player->bc += TECHDATA::_buildings[BUILDING_ATMOSPHERE_RENEWER].cost;
                 }
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 5);
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_ATMOSPHERE_RENEWER);
                 break;
 
-            case 17: /* Atmosphere Renewer / Weather Controller */
-                if (colony->climate == 8 /* Tundra */) {
-                    planet->climate = 9;
-                    planet->food_per_farmer += (MOX::_food_per_farmer_table[9] - MOX::_food_per_farmer_table[8]);
+            case BUILDING_GAIA_TRANSFORMATION:
+                if (colony->climate == PLANET_CLIMATE_TERRAN) {
+                    planet->climate = PLANET_CLIMATE_GAIA;
+                    planet->food_per_farmer += (MOX::_food_per_farmer_table[PLANET_CLIMATE_GAIA] - MOX::_food_per_farmer_table[PLANET_CLIMATE_TERRAN]);
                 }
                 add_to_list = 0;
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 44);
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_TERRAFORMING);
                 break;
 
-            case 22: /* Marine Barracks / Infantry */
+            case BUILDING_MARINE_BARRACKS:
                 colony->infantry_roundoff = 0;
                 {
                     int16_t limit = invasion::Colony_Infantry_Barracks_Limit_(colony);
@@ -312,64 +321,64 @@ namespace ERICNET {
                 }
                 break;
 
-            case 23:
-                colony->buildings[24] = 0;
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 24);
+            case BUILDING_BARRIER_SHIELD:
+                colony->buildings[BUILDING_FLUX_SHIELD] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_FLUX_SHIELD);
                 /* fallthrough */
-            case 24:
-                colony->buildings[28] = 0;
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 28);
+            case BUILDING_FLUX_SHIELD:
+                colony->buildings[BUILDING_RADIATION_SHIELD] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_RADIATION_SHIELD);
                 /* fallthrough */
-            case 28:
-            case 26:
-            case 27:
-            case 42:
+            case BUILDING_RADIATION_SHIELD:
+            case BUILDING_MISSILE_BASE:
+            case BUILDING_GROUND_BATTERIES:
+            case BUILDING_STELLAR_CONVERTER:
                 clear_combat_ignore = 1;
                 break;
 
-            case 37: /* Soil Enrichment */
+            case BUILDING_SOIL_ENRICHMENT:
                 planet->food_per_farmer += 1;
                 add_to_list = 0;
                 planet->environmental_alterations |= 0x2;
                 break;
 
-            case 41:
-                colony->buildings[8] = 0;
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 8);
+            case BUILDING_STAR_FORTRESS:
+                colony->buildings[BUILDING_BATTLESTATION] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_BATTLESTATION);
                 /* fallthrough */
-            case 8:
-                colony->buildings[40] = 0;
-                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 40);
+            case BUILDING_BATTLESTATION:
+                colony->buildings[BUILDING_STAR_BASE] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_STAR_BASE);
                 /* fallthrough */
-            case 40:
+            case BUILDING_STAR_BASE:
                 recompute_star = 1;
                 clear_combat_ignore = 1;
                 break;
 
-            case 44: /* Terraforming */
+            case BUILDING_TERRAFORMING:
             {
                 int16_t p_idx = colony->planet;
                 int8_t old_climate = colony->climate;
                 switch (old_climate) {
-                    case 2: /* Barren */
+                    case PLANET_CLIMATE_BARREN:
                         if (star->planet_index[0] == p_idx || star->planet_index[1] == p_idx) {
-                            MOX::_planet[p_idx].climate = 3; /* Desert */
+                            MOX::_planet[p_idx].climate = PLANET_CLIMATE_DESERT;
                         } else if (star->planet_index[3] == p_idx || star->planet_index[4] == p_idx) {
-                            MOX::_planet[p_idx].climate = 4; /* Tundra */
+                            MOX::_planet[p_idx].climate = PLANET_CLIMATE_TUNDRA;
                         } else {
-                            MOX::_planet[p_idx].climate = (game_random::Random_(2) != 1) ? 4 : 3;
+                            MOX::_planet[p_idx].climate = (game_random::Random_(2) != 1) ? PLANET_CLIMATE_TUNDRA : PLANET_CLIMATE_DESERT;
                         }
                         break;
-                    case 3: /* Desert */
-                        MOX::_planet[p_idx].climate = 7; /* Arid */
+                    case PLANET_CLIMATE_DESERT:
+                        MOX::_planet[p_idx].climate = PLANET_CLIMATE_ARID;
                         break;
-                    case 4: /* Tundra */
-                        MOX::_planet[p_idx].climate = 6; /* Swamp */
+                    case PLANET_CLIMATE_TUNDRA:
+                        MOX::_planet[p_idx].climate = PLANET_CLIMATE_SWAMP;
                         break;
-                    case 5: /* Ocean */
-                    case 6: /* Swamp */
-                    case 7: /* Arid */
-                        MOX::_planet[p_idx].climate = 8; /* Terran */
+                    case PLANET_CLIMATE_OCEAN:
+                    case PLANET_CLIMATE_SWAMP:
+                    case PLANET_CLIMATE_ARID:
+                        MOX::_planet[p_idx].climate = PLANET_CLIMATE_TERRAN;
                         break;
                 }
                 add_to_list = 0;
@@ -378,27 +387,27 @@ namespace ERICNET {
             }
             break;
 
-            case 48: /* Stellar Converter Transform / Artificial Planet */
+            case BUILDING_ARTIFICIAL_PLANET:
             {
                 int16_t target_planet = -1;
                 int8_t size = 0;
                 
-                // Look for Asteroid Belt
+                // Look for a gas giant first.
                 for (int i = 0; i < 5; ++i) {
                     int16_t p_idx = star->planet_index[i];
-                    if (p_idx != -1 && MOX::_planet[p_idx].planet_type == 2 /* Asteroid */) {
+                    if (p_idx != -1 && MOX::_planet[p_idx].planet_type == PLANET_TYPE_GAS_GIANT) {
                         target_planet = p_idx;
-                        size = 4; // Large
+                        size = PLANET_SIZE_HUGE;
                         break;
                     }
                 }
-                // Look for Gas Giant
+                // Otherwise use an asteroid belt.
                 if (target_planet == -1) {
                     for (int i = 0; i < 5; ++i) {
                         int16_t p_idx = star->planet_index[i];
-                        if (p_idx != -1 && MOX::_planet[p_idx].planet_type == 1 /* Gas Giant */) {
+                        if (p_idx != -1 && MOX::_planet[p_idx].planet_type == PLANET_TYPE_ASTEROID) {
                             target_planet = p_idx;
-                            size = 3; // Medium
+                            size = PLANET_SIZE_LARGE;
                             break;
                         }
                     }
@@ -406,13 +415,13 @@ namespace ERICNET {
 
                 if (target_planet != -1) {
                     s_planet_data* tp = &MOX::_planet[target_planet];
-                    tp->planet_type = 3; /* Normal */
+                    tp->planet_type = PLANET_TYPE_PLANET;
                     tp->size = size;
-                    tp->gravity_class = 1; /* Normal Gravity */
+                    tp->gravity_class = PLANET_GRAVITY_NORMAL_G;
                     tp->group = 0;
-                    tp->climate = 2; /* Barren */
+                    tp->climate = PLANET_CLIMATE_BARREN;
                     tp->climate_bg_type = (int8_t)game_random::Random_(3) - 1;
-                    tp->mineral_class = 2; /* Abundant */
+                    tp->mineral_class = MINERAL_RESOURCE_ABUNDANT;
                     tp->food_per_farmer = 0;
                     tp->n_terraforms = 0;
                     tp->max_farms = MOX::_planet_max_farms[size];
@@ -430,7 +439,7 @@ namespace ERICNET {
 
         if (recompute_star) {
             COLCALC::Compute_Star_Colony_Stuff_(star);
-            if (building_idx == 45 /* Artemis System */) {
+            if (building_idx == BUILDING_WARP_INTERDICTOR) {
                 SHIPMOVE::Update_Ship_ETAs_((int32_t)colony->owner);
             }
         }
@@ -469,40 +478,40 @@ namespace ERICNET {
         MOX::_colony[colony_idx].buildings[building_id] = 0;
 
         switch (building_id) {
-            case 8:  /* BLDG_SUBTERRANEAN_FARMS */
-            case 40: /* BLDG_GAIA_CONTROLLER */
-            case 41: /* BLDG_EVOLUTIONARY_MUTATION */
+            case BUILDING_BATTLESTATION:
+            case BUILDING_STAR_BASE:
+            case BUILDING_STAR_FORTRESS:
                 for (int16_t i = 0; i < 7; ++i) {
                     int16_t prod_val = MOX::_colony[colony_idx].producing[i];
                     if (prod_val < -99) {
                         int16_t ship_idx = -100 - prod_val;
-                        if (MOX::_ship[ship_idx].d.size > 1) {
+                        if (MOX::_ship[ship_idx].d.size >= SHIP_SIZE_LARGE) {
                             COLBLDG::Delete_From_Colony_Queue_(colony_idx, i);
                             i--;
                         }
                     }
                 }
                 // Fallthrough
-            case 3:  /* BLDG_STAR_BASE */
-            case 14: /* BLDG_BATTLESTATION */
-            case 45: /* BLDG_STAR_FORTRESS */
+            case BUILDING_ARTEMIS_SYSTEM_NET:
+            case BUILDING_DIMENSIONAL_PORTAL:
+            case BUILDING_WARP_INTERDICTOR:
                 COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[MOX::_planet[MOX::_colony[colony_idx].planet].star_index]);
-                if (building_id == 45 /* BLDG_STAR_FORTRESS */) {
+                if (building_id == BUILDING_WARP_INTERDICTOR) {
                     SHIPMOVE::Update_Ship_ETAs_((int32_t)MOX::_colony[colony_idx].owner);
                     return;
                 }
                 break;
 
-            case 9: /* BLDG_CAPITOL */
+            case BUILDING_CAPITOL:
                 invasion::Assign_New_Home_Planet_((int8_t)MOX::_colony[colony_idx].owner, colony_idx);
                 return;
 
-            case 22: /* BLDG_ANDROIDS */
+            case BUILDING_MARINE_BARRACKS:
                 for (int16_t i = 0; i < 7; ++i) {
                     int16_t prod_val = MOX::_colony[colony_idx].producing[i];
                     if (prod_val < -99) {
                         int16_t ship_idx = -100 - prod_val;
-                        if (MOX::_ship[ship_idx].d.ship_type == 2 /* SHIP_TYPE_COLONY_SHIP */) {
+                        if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_TRANSPORT) {
                             COLBLDG::Delete_From_Colony_Queue_(colony_idx, i);
                             i--;
                         }
@@ -510,14 +519,14 @@ namespace ERICNET {
                 }
                 return;
 
-            case 23: /* BLDG_ATMOSPHERIC_RENEWER */
-            case 24: /* BLDG_WEATHER_CONTROLLER */
-            case 28: /* BLDG_CORE_WASTE_DUMP */
-                if (MOX::_planet[MOX::_colony[colony_idx].planet].climate < 2) {
-                    COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 44 /* PROD_RECENTERING */);
+            case BUILDING_BARRIER_SHIELD:
+            case BUILDING_FLUX_SHIELD:
+            case BUILDING_RADIATION_SHIELD:
+                if (MOX::_planet[MOX::_colony[colony_idx].planet].climate < PLANET_CLIMATE_BARREN) {
+                    COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_TERRAFORMING);
                 }
                 // Fallthrough
-            case 15: /* BLDG_POLLUTION_PROCESSOR */
+            case BUILDING_BIOSPHERES:
                 COLCALC::Colony_Environmental_Stuff_(&MOX::_colony[colony_idx]);
                 invasion::Enforce_Population_Limits_At_Colony_(&MOX::_colony[colony_idx]);
                 COLCALC::Colony_Calculation_(colony_idx);

@@ -2,7 +2,12 @@
 
 namespace maintain {
     int32_t (*_ship_worths)[MAX_SHIPS];
-    uint8_t _research_building_table[4] = {6, 30, 19, 35};
+    uint8_t _research_building_table[4] = {
+        BUILDING_AUTOLAB,
+        BUILDING_SUPERCOMPUTER,
+        BUILDING_GALACTIC_CYBERNET,
+        BUILDING_RESEARCH_LAB
+    };
 
     /**
      * Determines if a building is processed in the first maintenance phase.
@@ -20,7 +25,7 @@ namespace maintain {
             return false;
         }
 
-        return building_idx != 9;
+        return building_idx != BUILDING_CAPITOL;
     }
 
     void __cdecl Player_Maintenance_(s_player* player) {
@@ -70,7 +75,7 @@ namespace maintain {
         if (eligible_count > 0 && MOX::_NUM_SHIPS > 0) {
             for (int j = 0; j < (int)MOX::_NUM_SHIPS; ++j) {
                 s_ship_data& ship = MOX::_ship[j];
-                if (ship.owner == player_idx && ship.status < 5 && ship.d.ship_type == 0) {
+                if (ship.owner == player_idx && ship.status < 5 && ship.d.ship_type == SHIP_TYPE_COMBAT) {
                     for (int k = 0; k < (int)MOX::_NUM_PLAYERS; ++k) {
                         if (eligible_players[k]) {
                             worths[j] += AIPOWER::Ship_Strength_Vs_Ships_(j, (int16_t)k);
@@ -82,35 +87,35 @@ namespace maintain {
         }
 
         if (((int32_t)player->command_points * 4) / 3 < (int32_t)player->command_points_used) {
-            Kill_Ships_(player, 1, 1, 4);
-            Kill_Ships_(player, 1, 0, 4);
-            Kill_Ships_(player, 1, 1, 2);
-            Kill_Ships_(player, 1, 1, 0);
-            Kill_Ships_(player, 0, 1, 4);
-            Kill_Ships_(player, 0, 0, 4);
-            Kill_Ships_(player, 0, 1, 2);
-            Kill_Ships_(player, 0, 1, 0);
+            Kill_Ships_(player, 1, 1, SHIP_TYPE_OUTPOST);
+            Kill_Ships_(player, 1, 0, SHIP_TYPE_OUTPOST);
+            Kill_Ships_(player, 1, 1, SHIP_TYPE_TRANSPORT);
+            Kill_Ships_(player, 1, 1, SHIP_TYPE_COMBAT);
+            Kill_Ships_(player, 0, 1, SHIP_TYPE_OUTPOST);
+            Kill_Ships_(player, 0, 0, SHIP_TYPE_OUTPOST);
+            Kill_Ships_(player, 0, 1, SHIP_TYPE_TRANSPORT);
+            Kill_Ships_(player, 0, 1, SHIP_TYPE_COMBAT);
         }
 
         Kill_Buildings_(player, Phase1_Building_);
-        Kill_Ships_(player, 1, 1, 4);
-        Kill_Ships_(player, 1, 0, 4);
-        Kill_Ships_(player, 0, 1, 4);
-        Kill_Ships_(player, 0, 0, 4);
-        Kill_Ships_(player, 1, 1, 2);
-        Kill_Ships_(player, 1, 1, 0);
-        Kill_Ships_(player, 0, 1, 2);
-        Kill_Ships_(player, 0, 1, 0);
+        Kill_Ships_(player, 1, 1, SHIP_TYPE_OUTPOST);
+        Kill_Ships_(player, 1, 0, SHIP_TYPE_OUTPOST);
+        Kill_Ships_(player, 0, 1, SHIP_TYPE_OUTPOST);
+        Kill_Ships_(player, 0, 0, SHIP_TYPE_OUTPOST);
+        Kill_Ships_(player, 1, 1, SHIP_TYPE_TRANSPORT);
+        Kill_Ships_(player, 1, 1, SHIP_TYPE_COMBAT);
+        Kill_Ships_(player, 0, 1, SHIP_TYPE_TRANSPORT);
+        Kill_Ships_(player, 0, 1, SHIP_TYPE_COMBAT);
         Kill_Buildings_(player, Phase2_Building_);
-        Kill_Ships_(player, 1, 0, 2);
-        Kill_Ships_(player, 0, 0, 2);
-        Kill_Ships_(player, 1, 1, 1);
-        Kill_Ships_(player, 0, 1, 1);
-        Kill_Ships_(player, 1, 0, 1);
-        Kill_Ships_(player, 0, 0, 1);
+        Kill_Ships_(player, 1, 0, SHIP_TYPE_TRANSPORT);
+        Kill_Ships_(player, 0, 0, SHIP_TYPE_TRANSPORT);
+        Kill_Ships_(player, 1, 1, SHIP_TYPE_COLONY);
+        Kill_Ships_(player, 0, 1, SHIP_TYPE_COLONY);
+        Kill_Ships_(player, 1, 0, SHIP_TYPE_COLONY);
+        Kill_Ships_(player, 0, 0, SHIP_TYPE_COLONY);
         Kill_Spy_(player);
-        Kill_Ships_(player, 1, 0, 0);
-        Kill_Ships_(player, 0, 0, 0);
+        Kill_Ships_(player, 1, 0, SHIP_TYPE_COMBAT);
+        Kill_Ships_(player, 0, 0, SHIP_TYPE_COMBAT);
         Kill_Leaders_(player);
         Kill_Buildings_(player, All_But_Capitol_);
 
@@ -361,13 +366,13 @@ namespace maintain {
         int32_t worth = TECHDATA::_buildings[building_idx].cost;
 
         switch (building_idx) {
-        case 2:
-        case 0x16: {
+        case BUILDING_ARMOR_BARRACKS:
+        case BUILDING_MARINE_BARRACKS: {
             const int32_t owner_player_idx = colony->owner;
             const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
 
             if (owner_trait_group >= 0 && owner_trait_group <= 1) {
-                if (building_idx == 0x16) {
+                if (building_idx == BUILDING_MARINE_BARRACKS) {
                     if (colony->buildings[0] == 0) {
                         return worth * 8;
                     }
@@ -380,17 +385,17 @@ namespace maintain {
             break;
         }
 
-        case 7:
+        case BUILDING_AUTOMATED_FACTORY:
             return worth * 8;
 
-        case 0x0c:
+        case BUILDING_DEEP_CORE_MINE:
             return worth * 7;
 
-        case 0x0f:
+        case BUILDING_BIOSPHERES:
             return worth * 8;
 
-        case 0x14:
-        case 0x1f: {
+        case BUILDING_HOLO_SIMULATOR:
+        case BUILDING_PLEASURE_DOME: {
             const int32_t owner_player_idx = colony->owner;
             const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
 
@@ -400,10 +405,10 @@ namespace maintain {
             break;
         }
 
-        case 0x15:
+        case BUILDING_HYDROPONIC_FARM:
             return worth * 6;
 
-        case 0x19:
+        case BUILDING_GRAVITY_GENERATOR:
             return worth * 4;
 
         default:

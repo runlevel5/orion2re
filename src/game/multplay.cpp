@@ -401,7 +401,7 @@ namespace MULTPLAY {
                 MOX::_settings.multi_player_game_type = 4;
             }
             else if (input_field == MOX::_mp_screen->field_id_cancel) {
-                MOX::_current_screen = 10;
+                MOX::_current_screen = SCREEN_MAIN_MENU;
                 done = true;
             }
             else if (input_field == MOX::_mp_screen->field_id_help) {
@@ -439,7 +439,7 @@ namespace MULTPLAY {
             }
             else if (input_field == MOX::_mp_screen->field_id_accept) {
                 bool proceed = true;
-                MOX::_current_screen = 0xF;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 if (Get_Valid_MP_Save_Games_(valid_saves) != 0) {
                     if (MOX::_settings.multi_player_game_type == 3) {
                         if (Warning_Box_Has_Opponent_Pressed_() == 0) {
@@ -448,19 +448,19 @@ namespace MULTPLAY {
                     }
 
                     if (proceed) {
-                        MOX::_current_screen = 0x29 /* SCREEN_LOAD_NET */;
+                        MOX::_current_screen = SCREEN_LOAD_NET;
                         FILEDEF::Save_Game_Settings_();
                         fields::Clear_Fields_();
                         int16_t result = Load_Multi_Player_Game_Screen_();
                         if (result <= -1 || result >= 10) {
                             Load_MP_Setup_Pictures_();
-                            MOX::_current_screen = 0xF /* SCREEN_MULTI_PLAYER */;
+                            MOX::_current_screen = SCREEN_MULTI_PLAYER;
                         }
                         else if (MOX::_game_type == 1) {
-                            MOX::_current_screen = 0x11 /* SCREEN_HOTSEAT_SELECT_PLAYER */;
+                            MOX::_current_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
                         }
                         else {
-                            MOX::_current_screen = 0x29 /* SCREEN_LOAD_NET */;
+                            MOX::_current_screen = SCREEN_LOAD_NET;
                         }
                         done = true;
                     }
@@ -469,7 +469,7 @@ namespace MULTPLAY {
             else if (input_field == MOX::_mp_screen->field_id_next) {
                 if (MOX::_settings.multi_player_game_type == 3) {
                     if (Warning_Box_Has_Opponent_Pressed_() != 0) {
-                        MOX::_current_screen = 0xD;
+                        MOX::_current_screen = SCREEN_NEW_GAME;
                         done = true;
                     }
                 }
@@ -482,12 +482,12 @@ namespace MULTPLAY {
                         v = (v ^ s) - s;
                         MOX::_settings.net_game_name[6] = (char)(v + 'a');
                     }
-                    MOX::_current_screen = 0xD;
+                    MOX::_current_screen = SCREEN_NEW_GAME;
                     done = true;
                 }
             }
             else if (input_field == MOX::_mp_screen->field_id_back) {
-                MOX::_current_screen = 0x16;
+                MOX::_current_screen = SCREEN_JOIN_NET;
                 done = true;
             }
 
@@ -584,8 +584,8 @@ namespace MULTPLAY {
             if (selected_player_idx != -1) {
                 MOX::_PLAYER_NUM = selected_player_idx;
             }
-            MOX::_current_screen = 0x27 /* SCREEN_REPORTS */;
-            MOX::_return_screen = 0x11 /* SCREEN_HOTSEAT_SELECT_PLAYER */;
+            MOX::_current_screen = SCREEN_REPORTS;
+            MOX::_return_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
             Restore_Hotseat_Map_Info_();
 
             int home_planet_id = MOX::_player[MOX::_PLAYER_NUM].home_planet_id;
@@ -593,8 +593,8 @@ namespace MULTPLAY {
             s_star_data* star = &MOX::_star[star_idx];
             MAINSCR::Center_Map_(star->x, star->y);
         } else {
-            MOX::_current_screen = 0xC;
-            MOX::_return_screen = 0x11;
+            MOX::_current_screen = SCREEN_MAIN_NEXT_TURN;
+            MOX::_return_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
         }
 
         if (REPORT::Must_Display_Reports_(MOX::_PLAYER_NUM)) {
@@ -1210,7 +1210,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
             }
 
             if (input_id == MOX::_mp_screen->field_id_cancel) {
-                MOX::_current_screen = 15;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 result = -1;
                 exit_loop = true;
             }
@@ -1818,7 +1818,7 @@ int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
 
         if (MOX::_mp_screen->field_id_cancel == input_field) {
             result = -1;
-            MOX::_current_screen = 15 /* 0xf */;
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
             exit_screen = true;
             netcode::Net_Uninit_();
             NETMOX::_net.cur_game_name[0] = '\0';

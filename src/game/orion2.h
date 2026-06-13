@@ -89,7 +89,7 @@ struct s_ai_player_info {
 };
 
 struct s_player_ship_sizes {
-    int32_t ship_counts[9];
+    int32_t ship_counts[HULL_CLASS_COUNT];
     int32_t target_ship_size;
     int32_t combat_ship_count;
     int32_t combat_command_points_used;
@@ -264,9 +264,9 @@ struct s_antaran {
     int16_t attack_pressure;
     int16_t resource_offensive;
     int16_t resource_defensive;
-    int16_t defensive_ships[9];
-    int16_t offensive_ships[9];
-    int16_t offensive_deployed[9];
+    int16_t defensive_ships[HULL_CLASS_COUNT];
+    int16_t offensive_ships[HULL_CLASS_COUNT];
+    int16_t offensive_deployed[HULL_CLASS_COUNT];
     undefined1 field6_0x3c;
     int32_t invasion_stardate;
     uint8_t attack_notified_mask;
@@ -307,9 +307,9 @@ struct s_invasion_player_bonuses {
 
 struct s_invasion_side_info {
     int16_t player_id;
-    int16_t unit_strengths[4];
-    int16_t unit_counts[4];
-    int8_t unit_hps[4];
+    int16_t unit_strengths[UNIT_COUNT];
+    int16_t unit_counts[UNIT_COUNT];
+    int8_t unit_hps[UNIT_COUNT];
     int8_t current_troop_type_idx;
     int8_t current_unit_damage;
     int8_t round_hit_unit_type;
@@ -325,7 +325,7 @@ struct s_battle_results_info {
     struct s_invasion_side_info attacker_invasion;
     struct s_invasion_side_info defender_invasion;
     int32_t ground_defense_strength;
-    int16_t captured_techs_data[212];
+    int16_t captured_techs_data[TECH_APP_COUNT];
     int16_t captured_tech_id;
     int16_t captured_tech_planet_id;
     int8_t planet_destroyed_flag;
@@ -346,7 +346,7 @@ struct s_combat_bomb_result {
     int16_t infantry_killed;
     int16_t tanks_killed;
     int16_t population_killed;
-    int8_t buildings_destroyed[49];
+    int8_t buildings_destroyed[BUILDING_COUNT];
     int16_t bio_pop_killed;
     int8_t damage_occurred;
     int8_t colony_wiped_out;
@@ -547,7 +547,7 @@ struct s_colony {
     int16_t military[2];
     int8_t tank_roundoff;
     int8_t infantry_roundoff;
-    uint8_t buildings[49];
+    uint8_t buildings[BUILDING_COUNT];
     uint16_t last_turn_building_destroyed;
 };
 
@@ -562,10 +562,10 @@ typedef struct s_colony_combat_popup_data s_colony_combat_popup_data, *Ps_colony
 struct s_colony_combat_popup_data {
     int16_t colony_idx;
     int8_t attacker_player_id;
-    int16_t attacker_unit_counts[4];
+    int16_t attacker_unit_counts[UNIT_COUNT];
     int8_t has_stellar_converter;
     int8_t defender_player_id;
-    int16_t defender_unit_counts[4];
+    int16_t defender_unit_counts[UNIT_COUNT];
     int16_t n_pops;
     int16_t n_bldgs;
     int16_t best_shield_bldg;
@@ -590,8 +590,8 @@ enum {
 struct s_colony_job_production {
     int32_t base_prod;
     int16_t racial_bonuses[COLONY_JOB_RACIAL_BONUS_COUNT];
-    int16_t tech_apps[212];
-    int16_t buildings_prod[49];
+    int16_t tech_apps[TECH_APP_COUNT];
+    int16_t buildings_prod[BUILDING_COUNT];
     int32_t food_bonus;
     int32_t artifacts_bonus;
     int32_t intelligence_bonus;
@@ -2406,8 +2406,8 @@ struct s_player {
     int16_t surplus_bc;
     int32_t total_maintenance;
     int16_t maintenance[6];
-    uint8_t tech_fields[83];
-    uint8_t tech_applications[212];
+    uint8_t tech_fields[TECH_FIELD_COUNT];
+    uint8_t tech_applications[TECH_APP_COUNT];
     int32_t research_accumulated;
     int8_t captured_orion;
     int8_t captured_antares;
@@ -2514,8 +2514,8 @@ struct s_player {
     int8_t diplomacy_demand_rejection_message[MAX_PLAYERS];
     uint8_t last_diplomacy_threat_turn[MAX_PLAYERS];
     int8_t delayed_diplomacy_orders[MAX_PLAYERS];
-    int8_t traits[31];
-    int8_t evolutionary_upgrade_traits[31];
+    int8_t traits[TRAIT_COUNT];
+    int8_t evolutionary_upgrade_traits[TRAIT_COUNT];
     int8_t picked_evolutionary_upgrade;
     int8_t applied_evolutionary_upgrade;
     int8_t fleet_history[350];

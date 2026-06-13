@@ -3,9 +3,9 @@
 #include <cstdint>
 
 namespace npcdiplo {
-    extern s_npcdiplo_tech _human_tech[212];
+    extern s_npcdiplo_tech _human_tech[TECH_APP_COUNT];
 
-    extern s_npcdiplo_tech _target_tech[212];
+    extern s_npcdiplo_tech _target_tech[TECH_APP_COUNT];
 
     /// Computes the reaction score for a proposed technology exchange.
     /// @param player_idx Player evaluating the exchange.

@@ -107,7 +107,7 @@ namespace HOTPOP {
             }
 
             if (input == btn_cancel) {
-                MOX::_current_screen = 15;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 exit_code = 1;
             }
 
@@ -150,7 +150,7 @@ namespace HOTPOP {
                 if (RACESEL::Race_Selection_Screen_(temp_player) == 0) {
                     EVANHELP::Set_Hotseat_Setup_Screen_Help_List_(center_x, center_y);
                     if (HOTPOP::_hotseat_human_players == 0) {
-                        MOX::_current_screen = 15;
+                        MOX::_current_screen = SCREEN_MULTI_PLAYER;
                         exit_code = 1;
                     }
                 } else {
@@ -181,7 +181,7 @@ namespace HOTPOP {
                         MOX::_settings.strategic_combat_flag,
                         MOX::_settings.starting_civilization_level
                     );
-                    MOX::_current_screen = 17;
+                    MOX::_current_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
                 }
                 return;
             }

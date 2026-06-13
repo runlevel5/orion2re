@@ -52,7 +52,7 @@ namespace DESIGN {
             Set_Flashing_Colors_(3, 1);
         }
 
-        if (MOX::_design->shield == 0) {
+        if (MOX::_design->shield == SHIELD_NO_SHIELD) {
             fonts::Print_(0x1B5, 0x38, HAROLD::H_Message_(HESTR_036_NO_SHIELD));
             fonts::Set_Font_Style_(2, &style2_colors);
             fonts::Set_Font_Spacing_(1);
@@ -110,7 +110,7 @@ namespace DESIGN {
         for (int i = 0; i < 8; ++i) {
             int16_t slot = (int16_t)i + (int16_t)MOX::_first_weapon_ctr;
             if (i - (int)MOX::_scanned_field == -1000) {
-                if (MOX::_design->weapon_type[slot] < 1) {
+                if (MOX::_design->weapon_type[slot] <= WEAPON_NO_WEAPONS) {
                     show_replacement_msg = true;
                 }
                 else {
@@ -121,7 +121,7 @@ namespace DESIGN {
                 fonts::Set_Font_Style_(2, &style2_colors);
             }
 
-            if (MOX::_design->weapon_type[slot] > 0) {
+            if (MOX::_design->weapon_type[slot] != WEAPON_NO_WEAPONS) {
                 Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str);
                 Weapon_Arc_String_(MOX::_design->weapon_firing_arc[i], arc_str);
 
@@ -206,7 +206,7 @@ namespace DESIGN {
         for (int i = 0; i < 8; ++i) {
             int16_t slot = (int16_t)i + (int16_t)MOX::_first_special_system_ctr;
             if (i - (int)MOX::_scanned_field == -2000) {
-                if (MOX::_design->special_devices[slot] < 1) {
+                if (MOX::_design->special_devices[slot] <= SPECIAL_NO_SPECIAL) {
                     show_replacement_msg = true;
                 }
                 else {
@@ -218,7 +218,7 @@ namespace DESIGN {
                 fonts::Set_Font_Style_(2, &style2_colors);
             }
 
-            if (MOX::_design->special_devices[slot] > 0) {
+            if (MOX::_design->special_devices[slot] != SPECIAL_NO_SPECIAL) {
                 int dev_idx = MOX::_design->special_devices[slot];
                 const char* dev_name = TECHDATA::_specials[dev_idx].name;
                 fonts::Print_(0x23, y_pos, dev_name);
@@ -399,7 +399,7 @@ namespace DESIGN {
                 MOX::_design->ship_size = MOX::_design_size;
                 MOX::_design->hull_space = TECHDATA::_hull_data[MOX::_design->ship_size].size;
                 needs_refresh = 1;
-                if (MOX::_design->ship_size == 5) {
+                if (MOX::_design->ship_size == SHIP_SIZE_DOOM_STAR) {
                     MOX::_design->picture_type = 43;
                 }
                 else {
@@ -449,7 +449,7 @@ namespace DESIGN {
                 Add_Design_Buttons_();
             }
 
-            for (int16_t i = 0; i < 6; ++i) {
+            for (int16_t i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
                 if (MOX::_design_ship_size_field[i] == input_field) {
                     if (_add_size_button_flag[i] < 241) {
                         _changed_design_name = 0;
@@ -512,10 +512,10 @@ namespace DESIGN {
         MOX::_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 5, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
             MOX::_design_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 6 + i, MOX::_screen_seg);
         }
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
             MOX::_darkened_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 6 + i, MOX::_screen_seg);
         }
 
@@ -594,12 +594,12 @@ namespace DESIGN {
      * Rebuilds the clickable controls for the current design-screen state.
      */
     void __cdecl Add_Design_Buttons_() {
-        for (int16_t i = 0; i < 6; ++i) {
+        for (int16_t i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
             _add_size_button_flag[i] = Add_Size_Button_();
         }
 
         int16_t field_x1, field_y1, field_x2, field_y2;
-        for (int16_t i = 0; i < 6; ++i) {
+        for (int16_t i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
             Get_Ship_Size_Button_Field_XY_(i, &field_x1, &field_y1, &field_x2, &field_y2);
             if (_add_size_button_flag[i] == 1) {
                 MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(field_x1, field_y1, "", MOX::_design_size_button_seg[i], &MOX::_design_size, i, "", 0x29 /* ) */);
@@ -615,15 +615,15 @@ namespace DESIGN {
             int16_t weapon_idx = i + MOX::_first_weapon_ctr;
             MOX::_weapons_clear_button[i] = -1000;
 
-            if (((i < 1) || (MOX::_design->weapon_type[weapon_idx] < 1)) && !replacement_exists_3) {
+            if (((i < 1) || (MOX::_design->weapon_type[weapon_idx] <= WEAPON_NO_WEAPONS)) && !replacement_exists_3) {
                 MOX::_weapons_count_minus_button[i] = -1000;
                 MOX::_weapons_count_plus_button[i] = -1000;
                 MOX::_weapons_field[i] = -1000;
             }
             else {
-                if (MOX::_design->weapon_type[weapon_idx] < 1 || MOX::_design->weapon_count[weapon_idx] < 2) {
+                if (MOX::_design->weapon_type[weapon_idx] <= WEAPON_NO_WEAPONS || MOX::_design->weapon_count[weapon_idx] < 2) {
                     MOX::_weapons_count_minus_button[i] = -1000;
-                    if (MOX::_design->weapon_type[weapon_idx] > 0) {
+                    if (MOX::_design->weapon_type[weapon_idx] > WEAPON_NO_WEAPONS) {
                         fields::Add_Hidden_Field_(0x37, weapon_y, 0x44, weapon_y + 12, "", 0);
                     }
                 }
@@ -637,10 +637,10 @@ namespace DESIGN {
                     (uint8_t)MOX::_design->weapon_ammo[weapon_idx],
                     MOX::_design->weapon_specials[weapon_idx]);
 
-                if (MOX::_design->weapon_type[weapon_idx] < 1 ||
+                if (MOX::_design->weapon_type[weapon_idx] <= WEAPON_NO_WEAPONS ||
                     ((MOX::_design->hull_space - MOX::_design->space_used) - (int32_t)next_weapon_space + (int32_t)MOX::_design->weapon_space[weapon_idx] < 0)) {
                     MOX::_weapons_count_plus_button[i] = -1000;
-                    if (MOX::_design->weapon_type[weapon_idx] > 0) {
+                    if (MOX::_design->weapon_type[weapon_idx] > WEAPON_NO_WEAPONS) {
                         fields::Add_Hidden_Field_(0x13, weapon_y, 0x20, weapon_y + 12, "", 0x29 /* ) */);
                     }
                 }
@@ -649,7 +649,7 @@ namespace DESIGN {
                 }
 
                 int16_t h_x, h_w;
-                if (MOX::_design->weapon_type[weapon_idx] < 1) {
+                if (MOX::_design->weapon_type[weapon_idx] <= WEAPON_NO_WEAPONS) {
                     h_x = 0x10;
                     h_w = 0x26F;
                 }

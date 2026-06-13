@@ -110,7 +110,7 @@ namespace MAINPUPS {
     }
 
     void __cdecl Do_Popup_Setup_(int16_t star_idx, s_animation_header* popup_anim) {
-        if (MOX::_current_screen != 0) {
+        if (MOX::_current_screen != SCREEN_MAIN) {
             _explode_flag = 0;
         }
 
@@ -323,7 +323,7 @@ namespace MAINPUPS {
         s_planet_data* p = &MOX::_planet[planet_idx];
 
         if (p->colony_index == -1) {
-            if (p->planet_type != 3) {
+            if (p->planet_type != PLANET_TYPE_PLANET) {
                 char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
                 int len = sprintf(buffer, ESTRINGS::E_Strings_(0x56), planet_name);
                 sprintf(buffer + len, ESTRINGS::E_Strings_(0x133));
@@ -966,14 +966,14 @@ namespace MAINPUPS {
             input_val = fields::Get_Input_();
             scanned_val = fields::Scan_Input_();
 
-            if (_g_special == 0) {
+            if (_g_special == SYSTEM_SPECIAL_NO_SPECIAL) {
                 Evaluate_Discovery_Input_(&input_val, &scanned_val);
             } else {
-                if (_g_special == 8) {
+                if (_g_special == SYSTEM_SPECIAL_MAROONED_HERO) {
                     int16_t prev_x = _g_x;
                     int16_t prev_y = _g_y;
                     
-                    _g_special = 0;
+                    _g_special = SYSTEM_SPECIAL_NO_SPECIAL;
 
                     uint8_t can_join = OFFICER::Marooned_Hero_At_Star_Can_Join_(
                         star_idx, &leader_idx, MOX::_PLAYER_NUM);
@@ -993,7 +993,7 @@ namespace MAINPUPS {
                     fields::Assign_Auto_Function_(Draw_Discovery_Popup_, 1);
                 } else if (input_val != 0) {
                     input_val = 0;
-                    _g_special = 0;
+                    _g_special = SYSTEM_SPECIAL_NO_SPECIAL;
                     COLONY::_full_draw = 1;
                 }
 
@@ -1005,7 +1005,7 @@ namespace MAINPUPS {
             Draw_Discovery_Popup_();
             RUSS::Mox_Sync_Update_();
 
-        } while (input_val < 1 || _g_special != 0);
+        } while (input_val < 1 || _g_special != SYSTEM_SPECIAL_NO_SPECIAL);
 
         Do_Popup_Cleanup_();
     }
@@ -1067,7 +1067,7 @@ namespace MAINPUPS {
 
     s_animation_header* __cdecl System_Special_Anim_(int16_t star_idx, int16_t anim_type) {
         if (_anims[7] == nullptr) {
-            if (anim_type == 9) {
+            if (anim_type == SYSTEM_SPECIAL_SPACE_MONSTER) {
                 int16_t monster_idx = RUSS::Star_To_Monster_(star_idx);
                 _anims[7] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, monster_idx + 15, MOX::_screen_seg);
             } else {
@@ -1557,7 +1557,7 @@ namespace MAINPUPS {
             47 /* 0x2f */
         );
 
-        if (MAINPUPS::_g_special != 0 && MAINPUPS::_g_special != 8) {
+        if (MAINPUPS::_g_special != SYSTEM_SPECIAL_NO_SPECIAL && MAINPUPS::_g_special != SYSTEM_SPECIAL_MAROONED_HERO) {
             SYS::Draw_System_Special_Popup_(
                 static_cast<int16_t>(MAINPUPS::_g_x + 6),
                 static_cast<int16_t>(MAINPUPS::_g_y + 76 /* 0x4c */),
@@ -1579,18 +1579,18 @@ namespace MAINPUPS {
         int16_t saved_y = _g_y;
         int16_t selection_result = 0;
 
-        if (_g_special == 0) {
+        if (_g_special == SYSTEM_SPECIAL_NO_SPECIAL) {
             if (*selected_field == _mp_fields[2]) {
                 selection_result = -1;
                 *refresh_flag = 1;
             } else {
                 selection_result = Check_System_Display_Fields_Selection_(selected_field, field_data, refresh_flag);
             }
-        } else if (_g_special == 8) {
+        } else if (_g_special == SYSTEM_SPECIAL_MAROONED_HERO) {
             int16_t marooned_hero_idx;
             uint8_t can_join;
 
-            _g_special = 0;
+            _g_special = SYSTEM_SPECIAL_NO_SPECIAL;
             can_join = OFFICER::Marooned_Hero_At_Star_Can_Join_(_g_star_n, &marooned_hero_idx, MOX::_PLAYER_NUM);
             if (can_join == 0) {
                 Marooned_Officer_Fails_Popup_(_g_star_n, marooned_hero_idx);
@@ -1607,7 +1607,7 @@ namespace MAINPUPS {
             fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
             ERICHELP::Set_New_System_Discovery_Popup_Help_List_();
         } else if (*selected_field != 0) {
-            _g_special = 0;
+            _g_special = SYSTEM_SPECIAL_NO_SPECIAL;
             COLONY::_full_draw = 1;
         }
 
@@ -1697,7 +1697,7 @@ namespace MAINPUPS {
 
         fonts::Set_Font_Style_(1, &_main_scr_font_colors);
 
-        if (_g_special != 0 && _g_special != 8) {
+        if (_g_special != SYSTEM_SPECIAL_NO_SPECIAL && _g_special != SYSTEM_SPECIAL_MAROONED_HERO) {
             SYS::Draw_System_Special_Popup_(
                 _g_x,
                 static_cast<int16_t>(_g_y + 0x32),
@@ -2102,16 +2102,16 @@ namespace MAINPUPS {
     int16_t __cdecl Get_Colony_Best_Shield_Bldg_(int16_t colony_idx) {
         int16_t best_shield_id = -1;
 
-        if (MOX::_colony[colony_idx].buildings[28] != 0) {
-            best_shield_id = 28;
+        if (MOX::_colony[colony_idx].buildings[BUILDING_RADIATION_SHIELD] != 0) {
+            best_shield_id = BUILDING_RADIATION_SHIELD;
         }
 
-        if (MOX::_colony[colony_idx].buildings[24] != 0) {
-            best_shield_id = 24;
+        if (MOX::_colony[colony_idx].buildings[BUILDING_FLUX_SHIELD] != 0) {
+            best_shield_id = BUILDING_FLUX_SHIELD;
         }
 
-        if (MOX::_colony[colony_idx].buildings[23] != 0) {
-            best_shield_id = 23;
+        if (MOX::_colony[colony_idx].buildings[BUILDING_BARRIER_SHIELD] != 0) {
+            best_shield_id = BUILDING_BARRIER_SHIELD;
         }
 
         return best_shield_id;
@@ -2162,7 +2162,7 @@ namespace MAINPUPS {
             int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_((int16_t)COLONY::_sys_disp_star_handle, planet_scanned);
 
             if (_selection_state_flag == 0) {
-                if (MOX::_planet[planet_idx].planet_type != 3) {
+                if (MOX::_planet[planet_idx].planet_type != PLANET_TYPE_PLANET) {
                     return fail_with_help(0x236, true, true);
                 }
 
@@ -2194,7 +2194,7 @@ namespace MAINPUPS {
             }
 
             if (_selection_state_flag == 3) {
-                if (MOX::_planet[planet_idx].planet_type == 3) {
+                if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_PLANET) {
                     return fail_with_help(0x235, false, false);
                 }
 
@@ -2286,7 +2286,7 @@ namespace MAINPUPS {
         }
 
         if (leader_idx == 47 /* 0x2F */) {
-            int8_t trait0 = MOX::_player[player_idx].traits[0];
+            int8_t trait0 = MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT];
             // Check if the trait index is even
             if ((trait0 % 2) == 0) {
                 const char* gov_label = MOX::_government_labels[trait0 + 1];
@@ -2791,7 +2791,7 @@ namespace MAINPUPS {
             si++;
         }
 
-        if (MOX::_player[_g_data_ptr->attacker_player_id].traits[25] == 0 || popup_mode == 2 || _g_data_ptr->n_pops <= 0) {
+        if (MOX::_player[_g_data_ptr->attacker_player_id].traits[TRAIT_TELEPATHIC] == 0 || popup_mode == 2 || _g_data_ptr->n_pops <= 0) {
             _mp_fields[15] = -1000;
         } else {
             s_animation_header* anim;
@@ -2871,7 +2871,7 @@ namespace MAINPUPS {
 
                 if (colony_idx == -1) {
                     int16_t str_id;
-                    if (MOX::_planet[planet_id].planet_type == 3) {
+                    if (MOX::_planet[planet_id].planet_type == PLANET_TYPE_PLANET) {
                         str_id = 0x250;
                     } else {
                         str_id = 0x24F;
@@ -2939,10 +2939,10 @@ namespace MAINPUPS {
             MOX::_star[star_idx].just_visited &= static_cast<uint8_t>(~(1 << static_cast<uint8_t>(MOX::_PLAYER_NUM)));
 
             if (MOX::_star[star_idx].system_special >= 50) {
-                MOX::_star[star_idx].system_special = 0;
+                MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
             }
         } else {
-            _g_special = 0;
+            _g_special = SYSTEM_SPECIAL_NO_SPECIAL;
         }
     }
 }

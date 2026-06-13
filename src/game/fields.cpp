@@ -963,13 +963,13 @@ namespace fields {
                 Push_Field_Down_(field_idx, ptr_x, ptr_y);
                 int16_t field_type = _fields[field_idx].field_type;
                 
-                if (field_type == 1) {
+                if (field_type == FIELD_TYPE_RADIO) {
                     if (*_fields[field_idx].detail.radio.selection == 0) {
                         *_fields[field_idx].detail.radio.selection = 1;
                     } else {
                         *_fields[field_idx].detail.radio.selection = 0;
                     }
-                } else if (field_type == 2) {
+                } else if (field_type == FIELD_TYPE_LOCKED) {
                     if (*_fields[field_idx].detail.radio.selection == 0) {
                         *_fields[field_idx].detail.radio.selection = 1;
                     }
@@ -1057,13 +1057,13 @@ namespace fields {
                     }
                     
                     int16_t field_type = _fields[scanned_field].field_type;
-                    if (field_type == 1) {
+                    if (field_type == FIELD_TYPE_RADIO) {
                         if (*_fields[scanned_field].detail.radio.selection == 0) {
                             *_fields[scanned_field].detail.radio.selection = 1;
                         } else {
                             *_fields[scanned_field].detail.radio.selection = 0;
                         }
-                    } else if (field_type == 2) {
+                    } else if (field_type == FIELD_TYPE_LOCKED) {
                         if (*_fields[scanned_field].detail.radio.selection == 0) {
                             *_fields[scanned_field].detail.radio.selection = 1;
                         }
@@ -1226,14 +1226,14 @@ namespace fields {
                 }
                 
                 switch (_fields[field_idx].field_type) {
-                    case 1:
+                    case FIELD_TYPE_RADIO:
                         if (*_fields[field_idx].detail.radio.selection == 0) {
                             *_fields[field_idx].detail.radio.selection = 1;
                         } else {
                             *_fields[field_idx].detail.radio.selection = 0;
                         }
                         break;
-                    case 2:
+                    case FIELD_TYPE_LOCKED:
                         if (*_fields[field_idx].detail.radio.selection == 0) {
                             *_fields[field_idx].detail.radio.selection = 1;
                         }
@@ -1407,14 +1407,14 @@ namespace fields {
                 _last_button_x = ptr_x;
                 
                 switch (_fields[field_idx].field_type) {
-                    case 1:
+                    case FIELD_TYPE_RADIO:
                         if (*_fields[field_idx].detail.radio.selection == 0) {
                             *_fields[field_idx].detail.radio.selection = 1;
                         } else {
                             *_fields[field_idx].detail.radio.selection = 0;
                         }
                         break;
-                    case 2:
+                    case FIELD_TYPE_LOCKED:
                         if (*_fields[field_idx].detail.radio.selection == 0) {
                             *_fields[field_idx].detail.radio.selection = 1;
                         }
@@ -1450,16 +1450,16 @@ namespace fields {
 
     void __cdecl Disable_Draw_Field_(int16_t field_idx) {
         switch (_fields[field_idx].field_type) {
-            case 0:
+            case FIELD_TYPE_BUTTON:
                 _fields[field_idx].field_type = -1001;
                 break;
-            case 1:
+            case FIELD_TYPE_RADIO:
                 _fields[field_idx].field_type = -1;
                 break;
-            case 2:
+            case FIELD_TYPE_LOCKED:
                 _fields[field_idx].field_type = -2;
                 break;
-            case 3:
+            case FIELD_TYPE_MULTI_BUTTON:
                 _fields[field_idx].field_type = -3;
                 break;
             default:
@@ -1472,14 +1472,14 @@ namespace fields {
 
         if (field_type > -3) {
             if (field_type == -2) {
-                _fields[field_idx].field_type = 2;
+                _fields[field_idx].field_type = FIELD_TYPE_LOCKED;
             } else if (field_type == -1) {
-                _fields[field_idx].field_type = 1;
+                _fields[field_idx].field_type = FIELD_TYPE_RADIO;
             }
         } else if (field_type == -3) {
-            _fields[field_idx].field_type = 3;
+            _fields[field_idx].field_type = FIELD_TYPE_MULTI_BUTTON;
         } else if (field_type == -1001) {
-            _fields[field_idx].field_type = 0;
+            _fields[field_idx].field_type = FIELD_TYPE_BUTTON;
         }
     }
 
@@ -1735,7 +1735,7 @@ namespace fields {
                 }
 
                 switch (f->field_type) {
-                    case 0:
+                    case FIELD_TYPE_BUTTON:
                         animate::Reset_Animation_Frame_(f->detail.button.pic);
                         animate::Draw_(f->x, f->y, f->detail.button.pic);
                         if (f->detail.button.help != nullptr && *f->detail.button.help != '\0') {
@@ -1748,8 +1748,8 @@ namespace fields {
                             );
                         }
                         break;
-                    case 1:
-                    case 2:
+                    case FIELD_TYPE_RADIO:
+                    case FIELD_TYPE_LOCKED:
                         if (*f->detail.radio.selection == 0) {
                             animate::Reset_Animation_Frame_(f->detail.radio.pic);
                             animate::Draw_(f->x, f->y, f->detail.radio.pic);
@@ -1781,7 +1781,7 @@ namespace fields {
                             }
                         }
                         break;
-                    case 3:
+                    case FIELD_TYPE_MULTI_BUTTON:
                         if (*f->detail.multibtn.selection == f->detail.multibtn.button_value) {
                             if (f->detail.multibtn.draw_style != 0) {
                                 animate::Set_Animation_Frame_(f->detail.multibtn.pic, 1);
@@ -2085,7 +2085,7 @@ namespace fields {
                 }
 
                 switch (_fields[i].field_type) {
-                    case 0: {
+                    case FIELD_TYPE_BUTTON: {
                         animate::Reset_Animation_Frame_(_fields[i].detail.button.pic);
                         animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.button.pic);
                         if (_fields[i].detail.button.help != nullptr && _fields[i].detail.button.help[0] != '\0') {
@@ -2097,8 +2097,8 @@ namespace fields {
                         }
                         break;
                     }
-                    case 1:
-                    case 2: {
+                    case FIELD_TYPE_RADIO:
+                    case FIELD_TYPE_LOCKED: {
                         if (*_fields[i].detail.radio.selection == 0) {
                             animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
                             animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
@@ -2127,7 +2127,7 @@ namespace fields {
                         }
                         break;
                     }
-                    case 3: {
+                    case FIELD_TYPE_MULTI_BUTTON: {
                         if (*_fields[i].detail.multibtn.selection == _fields[i].detail.multibtn.button_value) {
                             if (_fields[i].detail.multibtn.draw_style != 0) {
                                 animate::Set_Animation_Frame_(_fields[i].detail.multibtn.pic, 1);
@@ -2512,7 +2512,7 @@ namespace fields {
         s_field* field = &_fields[field_idx];
 
         switch (field->field_type) {
-            case 0:
+            case FIELD_TYPE_BUTTON:
             case FIELD_TYPE_IRREGULAR_BUTTON: {
                 int16_t x_pos;
                 int16_t y_pos;
@@ -2555,7 +2555,7 @@ namespace fields {
                 }
                 break;
             }
-            case 1: {
+            case FIELD_TYPE_RADIO: {
                 if (action != 0 && *field->detail.radio.selection != 1) {
                     if (field->detail.radio.draw_style == 0) {
                         animate::Reset_Animation_Frame_(field->detail.radio.pic);
@@ -2586,7 +2586,7 @@ namespace fields {
                 }
                 break;
             }
-            case 2: {
+            case FIELD_TYPE_LOCKED: {
                 if (*field->detail.radio.selection == 0 && action != 1) {
                     animate::Reset_Animation_Frame_(field->detail.radio.pic);
                     animate::Draw_(field->x, field->y, field->detail.radio.pic);
@@ -2617,7 +2617,7 @@ namespace fields {
                 }
                 break;
             }
-            case 3: {
+            case FIELD_TYPE_MULTI_BUTTON: {
                 if (action == 0) {
                     *field->detail.multibtn.selection = -1000;
                 } else {

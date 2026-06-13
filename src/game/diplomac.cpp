@@ -169,8 +169,8 @@ namespace diplomac {
         int16_t personality_idx = Get_Player_Diplomacy_Personality_(player_idx, target_idx);
         score += diplomac::_personality_sneak_attack_modifiers[personality_idx];
 
-        if (MOX::_player[target_idx].tech_applications[200] == 3) score += 5;
-        if (MOX::_player[target_idx].traits[20] == 1 /* TRAIT_TELEPATHIC */) score += 10;
+        if (MOX::_player[target_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) score += 5;
+        if (MOX::_player[target_idx].traits[TRAIT_CHARISMATIC] == 1) score += 10;
 
         score = (score + COLCALC::Best_Leader_Diplomat_Bonus_(target_idx) - MOX::_settings.game_difficulty) + 15;
 
@@ -212,7 +212,7 @@ namespace diplomac {
                         return 4; /* ULTIMATUM */
                     }
 
-                    if (MOX::_player[player_idx].traits[19] == 0 && MOX::_player[target_idx].traits[19] == 0) {
+                    if (MOX::_player[player_idx].traits[TRAIT_REPULSIVE] == 0 && MOX::_player[target_idx].traits[TRAIT_REPULSIVE] == 0) {
                         if (special::isqrt_(demands_count + 4) < (uint32_t)game_random::Random_(4)) {
                             *out_eval_threshold = severity;
                             *out_message_id = msg_id;
@@ -1083,8 +1083,8 @@ namespace diplomac {
             }
         }
 
-        // Trait modifier: traits[20]
-        if (MOX::_player[p_a].traits[20] == 1) {
+        // Trait modifier: Charismatic
+        if (MOX::_player[p_a].traits[TRAIT_CHARISMATIC] == 1) {
             if (scaled_amount < 1) {
                 scaled_amount /= 2;
             } else {
@@ -2745,8 +2745,8 @@ namespace diplomac {
             severity = 10;
         }
 
-        uint8_t diff_tech_list[212];
-        int32_t diff_tech_categories[212];
+        uint8_t diff_tech_list[TECH_APP_COUNT];
+        int32_t diff_tech_categories[TECH_APP_COUNT];
         int16_t num_techs = 0;
         int16_t tech_severity_limit = 0;
 
@@ -3310,18 +3310,18 @@ namespace diplomac {
             break;
         }
 
-        if (MOX::_player[proposer_idx].traits[20] != 0) {
+        if (MOX::_player[proposer_idx].traits[TRAIT_CHARISMATIC] != 0) {
             score += 50;
         }
-        else if (MOX::_player[proposer_idx].traits[19] != 0) {
+        else if (MOX::_player[proposer_idx].traits[TRAIT_REPULSIVE] != 0) {
             score -= 50;
         }
 
-        if (MOX::_player[proposer_idx].traits[25] != 0) {
+        if (MOX::_player[proposer_idx].traits[TRAIT_TELEPATHIC] != 0) {
             score += 25;
         }
 
-        if (MOX::_player[proposer_idx].tech_applications[200] == 3) {
+        if (MOX::_player[proposer_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
             score += 30;
         }
 

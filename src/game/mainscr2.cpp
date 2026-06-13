@@ -117,7 +117,7 @@ namespace MAINSCR2 {
         int8_t report_mode;
         bool should_fade = false;
 
-        MOX::_current_screen = 0;
+        MOX::_current_screen = SCREEN_MAIN;
         report_mode = REPORT::Must_Display_Reports_(MOX::_PLAYER_NUM);
 
         if (report_mode != 0) {
@@ -141,7 +141,7 @@ namespace MAINSCR2 {
         }
 
         if (report_mode == 3) {
-            if ((int8_t)MOX::_previous_screen != 10) {
+            if ((int8_t)MOX::_previous_screen != SCREEN_MAIN_MENU) {
                 should_fade = false;
             } else if (MOX::_at_least_one_tactical_combat != 0 && report_mode != 0) {
                 should_fade = true;
@@ -164,8 +164,8 @@ namespace MAINSCR2 {
 
         MAINSCR2::Do_Begin_Of_Turn_();
 
-        if (MOX::_current_screen == 1) {
-            MOX::_return_screen = 39 /* SCREEN_REPORTS */;
+        if (MOX::_current_screen == SCREEN_COLONY) {
+            MOX::_return_screen = SCREEN_REPORTS;
         }
 
         if (MOX::_at_least_one_report != 0) {
@@ -261,7 +261,7 @@ namespace MAINSCR2 {
         } while (!done);
 
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
-        MOX::_current_screen = 0;
+        MOX::_current_screen = SCREEN_MAIN;
     }
 
     void __cdecl Scrap_Freighters_() {
@@ -352,7 +352,7 @@ namespace MAINSCR2 {
                 for (int16_t i = 0; i < MOX::_fleet_box.count; ++i) {
                     int16_t ship_id = HACCESS::Fleet_Movement_Ship_Id_(i);
 
-                    if (MOX::_ship[ship_id].d.ship_type == 4) {
+                    if (MOX::_ship[ship_id].d.ship_type == SHIP_TYPE_OUTPOST) {
                         found_outpost_ship = true;
                         outpost_ship_id = ship_id;
                         break;
@@ -430,7 +430,7 @@ namespace MAINSCR2 {
             if (MOX::_fleet_box.count > 0) {
                 for (int16_t box_idx = 0; box_idx < MOX::_fleet_box.count; ++box_idx) {
                     int16_t current_ship_idx = HACCESS::Fleet_Movement_Ship_Id_(box_idx);
-                    if (MOX::_ship[current_ship_idx].d.ship_type == 1) {
+                    if (MOX::_ship[current_ship_idx].d.ship_type == SHIP_TYPE_COLONY) {
                         found_colony_ship = true;
                         ship_idx = current_ship_idx;
                         break;
@@ -553,7 +553,7 @@ namespace MAINSCR2 {
 
         Begin_Of_Turn_(&cancel_turn);
 
-        MAINSCR::_officer_screen_return_screen = 0x27; /* '\'' */
+        MAINSCR::_officer_screen_return_screen = SCREEN_REPORTS;
 
         bool enemy_ship_coming = HACCESS::Enemy_Ship_Going_To_My_Colony_();
 

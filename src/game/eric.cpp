@@ -317,12 +317,12 @@ namespace ERIC {
     }
 
     int8_t __cdecl Player_Can_Mind_Control_Colony_(int16_t player_idx, int16_t colony_idx) {
-        if (MOX::_player[player_idx].traits[25] != 0) {
-            if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, 2, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
+        if (MOX::_player[player_idx].traits[TRAIT_TELEPATHIC] != 0) {
+            if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, SHIP_SIZE_LARGE, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
                 if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 0, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
                     // Note: The original code calls this function twice with identical arguments.
                     if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 0, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
-                        if (MOX::_player[MOX::_colony[colony_idx].owner].traits[25] == 0) {
+                        if (MOX::_player[MOX::_colony[colony_idx].owner].traits[TRAIT_TELEPATHIC] == 0) {
                             return 1;
                         }
                     }
@@ -334,7 +334,7 @@ namespace ERIC {
 
     int8_t __cdecl Player_Can_Mind_Control_Colony_With_Help_(int16_t player_idx, int16_t colony_idx)
     {
-        if (MOX::_player[player_idx].traits[25] == 0)
+        if (MOX::_player[player_idx].traits[TRAIT_TELEPATHIC] == 0)
         {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x233));
             return 0;
@@ -343,7 +343,7 @@ namespace ERIC {
         int16_t planet_idx = MOX::_colony[colony_idx].planet;
         int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
-        if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, 2, star_idx) == 0)
+        if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, SHIP_SIZE_LARGE, star_idx) == 0)
         {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x24C));
             return 0;
@@ -359,7 +359,7 @@ namespace ERIC {
             return 0;
         }
 
-        if (MOX::_player[owner_idx].traits[25] != 0)
+        if (MOX::_player[owner_idx].traits[TRAIT_TELEPATHIC] != 0)
         {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x201));
             return 0;
@@ -374,7 +374,7 @@ namespace ERIC {
 
     int16_t __cdecl Player_Capitol_World_(int16_t player_idx) {
         for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
-            if (MOX::_colony[i].buildings[9] != 0 && MOX::_colony[i].owner == player_idx) {
+            if (MOX::_colony[i].buildings[BUILDING_CAPITOL] != 0 && MOX::_colony[i].owner == player_idx) {
                 return i;
             }
         }

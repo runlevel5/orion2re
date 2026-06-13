@@ -54,7 +54,7 @@ void __cdecl Setup_Input_Box_Popup_() {
     int16_t font_style = MISC::Get_Font_Style_();
     int16_t font_spacing = MISC::Get_Font_Spacing_();
     
-    if (MOX::_current_screen == 13) {
+    if (MOX::_current_screen == SCREEN_NEW_GAME) {
         MOX::_mox_font_colors_offset = 20;
         s_colors* new_colors = MISC::Font_Colors2_(font_style, 10, 26);
         _input_box.colors2 = *new_colors;
