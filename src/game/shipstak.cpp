@@ -216,13 +216,13 @@ namespace SHIPSTAK {
                             }
                         }
 
-                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, SPECIAL_STEALTH_FIELD) != 0) {
+                        if (SHIPSTAK::Ship_Has_Special_(node_ship_idx, SPECIAL_STEALTH_FIELD) != 0) {
                             detection += 500;
                         }
-                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, SPECIAL_CLOAKING_DEVICE) != 0) {
+                        if (SHIPSTAK::Ship_Has_Special_(node_ship_idx, SPECIAL_CLOAKING_DEVICE) != 0) {
                             detection += 500;
                         }
-                        if (struct_::Test_Bit_Field_(ship.special_device_damage_flags, SPECIAL_PHASING_CLOAK) != 0) {
+                        if (SHIPSTAK::Ship_Has_Special_(node_ship_idx, SPECIAL_PHASING_CLOAK) != 0) {
                             detection += 500;
                         }
 
