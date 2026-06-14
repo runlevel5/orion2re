@@ -1418,6 +1418,12 @@ namespace COLCALC {
         colony->bought_outright = (int16_t)product_total_cost - colony->production_spent;
     }
 
+    void __cdecl Normalize_Stored_Production_For_Setting_(s_colony* colony) {
+        if (colony->producing[0] == -3 || colony->producing[0] == -2 || colony->producing[0] == -1) {
+            colony->production_spent = 0;
+        }
+    }
+
     int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type) {
         switch (govt_type) {
             case 1:
@@ -3479,6 +3485,8 @@ namespace COLCALC {
         if (colony->auto_building != 0 && current_product >= -3 && current_product <= -1) {
             AIBUILD::Player_Colony_Autobuild_(colony);
         }
+
+        Normalize_Stored_Production_For_Setting_(colony);
 
         const int32_t product_cost = static_cast<int32_t>(COLCALC::Colony_Producing_Product_Cost_(colony));
         colony->just_produced = -1;

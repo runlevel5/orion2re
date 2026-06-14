@@ -1911,6 +1911,8 @@ namespace COLBLDG {
             colony->producing[i] = _current_item[i];
         }
 
+        COLCALC::Normalize_Stored_Production_For_Setting_(colony);
+
         if (original_front_item != colony->producing[0]) {
             colony->bought_outright = 0;
         }

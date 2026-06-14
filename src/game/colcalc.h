@@ -72,6 +72,12 @@ namespace COLCALC {
 
     void __cdecl Colony_Buy_Outright_(int16_t colony_idx);
 
+    /**
+     * Clears stored item production when the front queue entry is a non-item setting.
+     * This prevents colonies from banking item progress while using Trade Goods/Housing.
+     */
+    void __cdecl Normalize_Stored_Production_For_Setting_(s_colony* colony);
+
     int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony);
 
     void __cdecl Apply_Colony_Changes_(s_colony* colony);
