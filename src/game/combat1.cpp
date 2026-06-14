@@ -924,14 +924,6 @@ namespace COMBAT1 {
                             CMBTSPEC::Draw_Cloak_(i, 1);
                             MOX::_combat_data[i].special_status_flag = 1;
                         }
-                        if (MOX::_combat_data[i].special_status_flag == 4) {
-                            MOX::_combat_data[i].special_status_timer--;
-                            if (MOX::_combat_data[i].special_status_timer == 0) {
-                                CMBTSPEC::Draw_Cloak_(i, 5);
-                                CMBTSPEC::Draw_Cloak_(i, 1);
-                                MOX::_combat_data[i].special_status_flag = 1;
-                            }
-                        }
                         if (MOX::_combat_data[i].special_status_flag == 7) {
                             CMBTSPEC::Draw_Cloak_(i, 4);
                             MOX::_combat_data[i].special_status_flag = 4;
@@ -953,6 +945,33 @@ namespace COMBAT1 {
             }
             if (MOX::_net_flag != 0) {
                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+            }
+        }
+    }
+
+    void __cdecl Update_Phasing_Cloak_Timers_() {
+        if (MOX::_combat_total_ship_count <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            if (Combat_Ship_Is_Functional_(i) == 0) {
+                continue;
+            }
+
+            s_combat_data* ship = &MOX::_combat_data[i];
+            if (ship->special_status_flag != 4) {
+                continue;
+            }
+
+            if (ship->special_status_timer > 0) {
+                ship->special_status_timer--;
+            }
+
+            if (ship->special_status_timer == 0) {
+                CMBTSPEC::Draw_Cloak_(i, 5);
+                CMBTSPEC::Draw_Cloak_(i, 1);
+                ship->special_status_flag = 1;
             }
         }
     }

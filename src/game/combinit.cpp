@@ -2270,6 +2270,7 @@ void __cdecl Increment_Bhg_(int16_t player_idx) {
 void __cdecl End_Of_Turn_Bookeeping_() {
     Recharge_Shields_();
     Repair_All_Combat_Ships_();
+    COMBAT1::Update_Phasing_Cloak_Timers_();
 
     Increment_Bhg_(MOX::_combat_attacker_player);
     if (MOX::_combat_defender_player != MOX::_combat_attacker_player) {
