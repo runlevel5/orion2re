@@ -450,8 +450,16 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     int16_t __cdecl Colony_Ship_Auto_Colonization_(s_ship_data* ship) {
+        if ((ship->d.ship_type != SHIP_TYPE_COLONY && ship->d.ship_type != SHIP_TYPE_OUTPOST) ||
+            ship->status >= 3) {
+            return -1;
+        }
+
         if (ship->d.ship_weapon[1].type == 1) {
-            return ship->d.ship_weapon[0].type;
+            int16_t planet_idx = ship->d.ship_weapon[0].type;
+            if (planet_idx >= 0 && planet_idx < MAX_PLANETS) {
+                return planet_idx;
+            }
         }
         return -1;
     }
@@ -490,11 +498,15 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             int16_t star_id = HAROLD::Absolute_Location_(MOX::_ship[ship_idx].location);
             int16_t owner = HACCESS::Ship_Owner_(ship_idx);
 
-            if (owner == MOX::_PLAYER_NUM && star_id > -1) {
+            if (owner == MOX::_PLAYER_NUM && star_id > -1 && MOX::_ship[ship_idx].status < 3) {
                 uint8_t ship_type = MOX::_ship[ship_idx].d.ship_type;
                 if (ship_type == SHIP_TYPE_COLONY || ship_type == SHIP_TYPE_OUTPOST) {
                     int16_t turns = HAROLD::N_Turns_To_Star_(ship_idx, star_id);
                     int16_t planet_idx = Colony_Ship_Auto_Colonization_(&MOX::_ship[ship_idx]);
+
+                    if (planet_idx == -1 || MOX::_planet[planet_idx].colony_index != -1) {
+                        continue;
+                    }
 
                     int16_t summary_idx = -1;
                     if (planet_idx > -1) {

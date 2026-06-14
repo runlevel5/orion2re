@@ -42,6 +42,11 @@ namespace SHIPS {
             }
         }
 
+        // Colony and outpost ships encode temporary auto-colonization state in
+        // design weapon slots. Clear that state before retiring the ship so
+        // stale summary or report paths cannot reuse a consumed assignment.
+        SHIPS::Clear_Auto_Colonization_Flag_(&MOX::_ship[ship_idx]);
+
         MOX::_ship[ship_idx].location = -1;
         MOX::_ship[ship_idx].status = 5;
     }
