@@ -50,7 +50,7 @@ Sources:
 
 ## Historical 1.40 workaround that should not be copied as-is
 
-- [ ] Last Race multiplayer bugs: pressing `Last Race` can crash LAN games, and multiplayer can also allow duplicate race portraits. Patch 1.40 solved this by removing the `Last Race` button, but feature removal is not an accepted fix here.
+- [x] Last Race multiplayer bugs: pressing `Last Race` could crash LAN games, and multiplayer could also allow duplicate race portraits because the original flow reserved pseudo-slot `13` over the network while the loaded `lastrace.rac` data switched the player to a real base race `0..12`. Fixed in source by keeping `Last Race` as a local UI entry only and using the saved base race itself for multiplayer race reservation, release, and downstream banner/portrait identity. The source path also rejects invalid saved base-race ids defensively. Historical patch 1.40 handled this by removing the `Last Race` button from multiplayer entirely; source keeps the feature and fixes the actual race-identity mismatch instead.
 - [ ] Modem Comm Info / TEN regression: patch 1.40 disabled the modem `Comm Info` button and the `TEN` button to make room for patch code. If this project needs to preserve those features, the underlying space or architecture problem should be solved instead of copying the disablement.
 
 ## Notes

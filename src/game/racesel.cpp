@@ -3,6 +3,10 @@
 
 namespace RACESEL {
 
+static bool Is_Valid_Last_Race_Base_Race_(uint8_t race_idx) {
+    return race_idx < 13;
+}
+
 int16_t _custom_flag;
 int16_t _displayed_race;
 int16_t _old_race;
@@ -355,9 +359,16 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                 fread(discarded_traits, sizeof(discarded_traits), 1, race_file);
                 struct_::Copy_Structure_(plr->traits, _race_specials[13], sizeof(plr->traits));
                 fread(&loaded_race, sizeof(loaded_race), 1, race_file);
+
+                if (!Is_Valid_Last_Race_Base_Race_(loaded_race)) {
+                    fclose(race_file);
+                    field_ids[13] = -1000;
+                    continue;
+                }
+
                 plr->race = loaded_race;
                 uint8_t can_request =
-                    (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_(13);
+                    (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_(loaded_race);
                 
                 if (!can_request) {
                     fclose(race_file);
