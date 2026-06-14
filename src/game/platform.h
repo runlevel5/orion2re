@@ -48,16 +48,13 @@ namespace platform {
 
 	extern uint8_t* _offscreen_surface;
 
-	extern int32_t g_last_cursor_shape;
-
-	extern int16_t g_mouse_x;
-
-	extern int16_t g_mouse_y;
-
 	// Functions
 	bool Create_Video_Buffers_(int16_t video_mode);
 	void __cdecl Service_Pending_Window_Events_();
 	void __cdecl Pump_Game_Input_Queue_();
+	int16_t __cdecl Get_Mouse_X_();
+	int16_t __cdecl Get_Mouse_Y_();
+	void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y);
 	bool __cdecl Update_Active_World_Frame_();
 	uint32_t Lock_Appropriate_Render_Buffer();
 	void Unlock_Appropriate_Render_Buffer();

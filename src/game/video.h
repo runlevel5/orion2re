@@ -27,10 +27,6 @@ namespace video {
 
 	extern uint8_t* _video_memory;
 
-	extern int16_t _current_mouse_list_ptr;
-
-	extern int16_t _current_mouse_shape;
-
 	extern uint8_t* _current_video_page;
 
 	struct s_scan_list_entry {
@@ -95,6 +91,10 @@ namespace video {
 	void __cdecl Submit_Palette_();
 	bool __cdecl Try_Begin_Off_Page_Present_();
 	void __cdecl End_Off_Page_Present_();
+	int16_t __cdecl Get_Current_Mouse_List_Ptr_();
+	void __cdecl Set_Current_Mouse_List_Ptr_(int16_t mouse_list_ptr);
+	int16_t __cdecl Get_Current_Mouse_Shape_();
+	void __cdecl Set_Current_Mouse_Shape_(int16_t mouse_shape);
 
 	// Functions
 	// Switches refresh handling to stencil mode for the next page update.

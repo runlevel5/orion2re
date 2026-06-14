@@ -644,16 +644,7 @@ namespace HAROLD {
     }
 
     void __cdecl Save_Mouse_List_() {
-        int16_t count = mouse::_current_mouse_list_count;
-
-        // The list is capped at 10 entries
-        if (count >= 10) {
-            count = 10;
-        }
-
-        HAROLD::_saved_mouse_list_count = count;
-
-        memcpy(HAROLD::_saved_mouse_list, mouse::_current_mouse_list, (size_t)count * sizeof(HAROLD::_saved_mouse_list[0]));
+        HAROLD::_saved_mouse_list_count = mouse::Copy_Current_Mouse_List_(_saved_mouse_list, 10);
     }
 
     void __cdecl Restore_Mouse_List_() {

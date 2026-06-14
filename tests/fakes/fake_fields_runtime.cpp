@@ -768,6 +768,19 @@ namespace platform {
     void __cdecl Pump_Game_Input_Queue_() {
     }
 
+    int16_t __cdecl Get_Mouse_X_() {
+        return 0;
+    }
+
+    int16_t __cdecl Get_Mouse_Y_() {
+        return 0;
+    }
+
+    void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y) {
+        (void)x;
+        (void)y;
+    }
+
     bool __cdecl Update_Active_World_Frame_() {
         return true;
     }

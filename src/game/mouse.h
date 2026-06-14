@@ -1,22 +1,6 @@
 #pragma once
 
 namespace mouse {
-    extern uint16_t _mouse_enabled;
-
-    extern uint16_t _mouse_state;
-
-    extern int16_t _current_mouse_list_count;
-
-    extern uint32_t _num;
-
-    extern int16_t _mouse_buffer_button;
-
-    extern int16_t _mouse_buffer_x;
-
-    extern int16_t _mouse_buffer_y;
-
-    extern s_mouse_list* _current_mouse_list;
-
     /// Updates the active cursor shape from the current mouse hit-test list.
     void __cdecl Check_Mouse_Shape_();
 
@@ -28,20 +12,6 @@ namespace mouse {
     /// @param mouse_y Current pointer Y coordinate.
     /// @param mouse_buttons Current mouse button bitmask.
     void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons);
-
-    extern int32_t _in_mouse_handler;
-
-    extern int16_t _mouse_overide_flag;
-
-    extern int16_t _mouse_overide_right_button;
-
-    extern int16_t _mouse_overide_left_button;
-
-    extern int16_t _mouse_buttons;
-
-    extern int16_t _mouse_buffer_flag;
-
-    extern uint16_t _mouse_buffer_flag2;
 
     /// Returns and clears the primary mouse-buffer flag.
     int16_t __cdecl Mouse_Buffer_();
@@ -83,6 +53,16 @@ namespace mouse {
 
     /// Restores the previously saved mouse-enabled state.
     void __cdecl Restore_Mouse_State_();
+
+    /// Resets runtime mouse state, buffers, and active-list tracking.
+    void __cdecl Reset_Mouse_Runtime_();
+
+    /// Returns nonzero when the logical game-thread mouse is enabled.
+    uint16_t __cdecl Mouse_Enabled_();
+
+    /// Copies the active mouse hit-test list into caller-owned storage.
+    /// Returns the number of copied entries.
+    int16_t __cdecl Copy_Current_Mouse_List_(s_mouse_list* out_mouse_list, int16_t max_count);
 
     /// Returns the buffered mouse button state.
     int16_t __cdecl Mouse_Buffer_Button_();

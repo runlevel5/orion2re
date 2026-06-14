@@ -7,8 +7,10 @@ namespace video {
 	s_page_buffer g_page_back = {};
 	s_page_buffer g_page_published = {};
 	uint8_t* _video_memory;
-	int16_t _current_mouse_list_ptr;
-	int16_t _current_mouse_shape;
+	namespace {
+		int16_t g_current_mouse_list_ptr;
+		int16_t g_current_mouse_shape;
+	}
 	uint8_t* _current_video_page;
 	int32_t screen_refresh_flag;
 	int16_t _old_screen_dump_flag;
@@ -163,6 +165,22 @@ namespace video {
 		g_off_page_state = OFF_PAGE_PUBLISHED;
 		++g_off_page_generation;
 		SDL_UnlockMutex(g_off_page_mutex);
+	}
+
+	int16_t __cdecl Get_Current_Mouse_List_Ptr_() {
+		return g_current_mouse_list_ptr;
+	}
+
+	void __cdecl Set_Current_Mouse_List_Ptr_(int16_t mouse_list_ptr) {
+		g_current_mouse_list_ptr = mouse_list_ptr;
+	}
+
+	int16_t __cdecl Get_Current_Mouse_Shape_() {
+		return g_current_mouse_shape;
+	}
+
+	void __cdecl Set_Current_Mouse_Shape_(int16_t mouse_shape) {
+		g_current_mouse_shape = mouse_shape;
 	}
 
 	void __cdecl Submit_Palette_() {
@@ -371,8 +389,8 @@ namespace video {
         fields::Draw_Visible_Fields_();
         mouse::Disable_Mouse_();
 
-        g_cached_mouse_x = platform::g_mouse_x;
-        g_cached_mouse_y = platform::g_mouse_y;
+        g_cached_mouse_x = mouse::Pointer_X_();
+        g_cached_mouse_y = mouse::Pointer_Y_();
 
         if (g_window_focus_state != 0) {
             palette::Refresh_Palette_();
@@ -477,14 +495,11 @@ namespace video {
     void __cdecl Init_Video_Drivers_() {
         video::_is_initializing = 1;
 
-        platform::g_mouse_x = 0;
+        platform::Set_Logical_Mouse_Position_(0, 0);
         ::g_cached_mouse_x = 0;
-        platform::g_mouse_y = 0;
         ::g_cached_mouse_y = 0;
 
-        mouse::_mouse_enabled = 0;
-        mouse::_mouse_buffer_flag = 0;
-        mouse::_mouse_buffer_flag2 = 0;
+        mouse::Reset_Mouse_Runtime_();
 
         platform::Create_Cursor_Surface();
 
@@ -498,7 +513,7 @@ namespace video {
         platform::Force_Cursor_Pos(g_screen_res_x / 2, g_screen_res_y / 2);
 
         video::_is_initializing = 0;
-        mouse::_mouse_enabled = 1;
+        mouse::Enable_Mouse_();
     }
 
     void __cdecl Set_Page_Back_() {

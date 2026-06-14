@@ -50,12 +50,12 @@ namespace mouse {
 
     int16_t Pointer_X_() {
         platform::Pump_Game_Input_Queue_();
-        return platform::g_mouse_x;
+        return platform::Get_Mouse_X_();
     }
 
     int16_t Pointer_Y_() {
         platform::Pump_Game_Input_Queue_();
-        return platform::g_mouse_y;
+        return platform::Get_Mouse_Y_();
     }
 
     void __cdecl Check_Mouse_Buffer_() {
@@ -70,33 +70,33 @@ namespace mouse {
 
             _mouse_buffer_flag = 1;
             _mouse_buffer_flag2 = 1;
-            _mouse_buffer_x = platform::g_mouse_x;
-            _mouse_buffer_y = platform::g_mouse_y;
+            _mouse_buffer_x = platform::Get_Mouse_X_();
+            _mouse_buffer_y = platform::Get_Mouse_Y_();
         }
 
         ++_num;
     }
 
     void __cdecl Check_Mouse_Shape_() {
-        video::_current_mouse_list_ptr = -1;
+        video::Set_Current_Mouse_List_Ptr_(-1);
 
         for (int i = 0; i < (int)mouse::_current_mouse_list_count; ++i) {
             s_mouse_list* entry = &mouse::_current_mouse_list[i];
 
             // Note: frame field is used as a coordinate offset for the mouse position check
-            int adjusted_x = (int)platform::g_mouse_x + (int)entry->frame;
-            int adjusted_y = (int)platform::g_mouse_y + (int)entry->frame;
+            int adjusted_x = (int)platform::Get_Mouse_X_() + (int)entry->frame;
+            int adjusted_y = (int)platform::Get_Mouse_Y_() + (int)entry->frame;
 
             if (entry->x1 <= adjusted_x && adjusted_x <= entry->x2 &&
                 entry->y1 <= adjusted_y && adjusted_y <= entry->y2) {
-                video::_current_mouse_list_ptr = (int16_t)i;
+                video::Set_Current_Mouse_List_Ptr_((int16_t)i);
             }
         }
 
-        if (video::_current_mouse_list_ptr == -1) {
-            video::_current_mouse_shape = 0;
+        if (video::Get_Current_Mouse_List_Ptr_() == -1) {
+            video::Set_Current_Mouse_Shape_(0);
         } else {
-            video::_current_mouse_shape = mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+            video::Set_Current_Mouse_Shape_(mouse::_current_mouse_list[video::Get_Current_Mouse_List_Ptr_()].icon);
         }
     }
 
@@ -113,13 +113,15 @@ namespace mouse {
      * Caller must ensure a valid mouse-list entry is currently selected.
      */
     int __cdecl Get_Pointer_Offset_() {
+        const int16_t current_mouse_list_ptr = video::Get_Current_Mouse_List_Ptr_();
+
         if (_current_mouse_list == nullptr ||
-            video::_current_mouse_list_ptr < 0 ||
-            video::_current_mouse_list_ptr >= _current_mouse_list_count) {
+            current_mouse_list_ptr < 0 ||
+            current_mouse_list_ptr >= _current_mouse_list_count) {
             return 0;
         }
 
-        return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].frame;
+        return (int)mouse::_current_mouse_list[current_mouse_list_ptr].frame;
     }
 
     /**
@@ -127,13 +129,53 @@ namespace mouse {
      * Caller must ensure a valid mouse-list entry is currently selected.
      */
     int __cdecl Get_Pointer_Image_Number_() {
+        const int16_t current_mouse_list_ptr = video::Get_Current_Mouse_List_Ptr_();
+
         if (_current_mouse_list == nullptr ||
-            video::_current_mouse_list_ptr < 0 ||
-            video::_current_mouse_list_ptr >= _current_mouse_list_count) {
+            current_mouse_list_ptr < 0 ||
+            current_mouse_list_ptr >= _current_mouse_list_count) {
             return 0;
         }
 
-        return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+        return (int)mouse::_current_mouse_list[current_mouse_list_ptr].icon;
+    }
+
+    void __cdecl Reset_Mouse_Runtime_() {
+        _mouse_enabled = 0;
+        _mouse_state = 0;
+        _current_mouse_list_count = 0;
+        _num = 0;
+        _mouse_buffer_button = 0;
+        _mouse_buffer_x = 0;
+        _mouse_buffer_y = 0;
+        _current_mouse_list = nullptr;
+        _in_mouse_handler = 0;
+        _mouse_overide_flag = 0;
+        _mouse_overide_right_button = 0;
+        _mouse_overide_left_button = 0;
+        _mouse_buttons = 0;
+        _mouse_buffer_flag = 0;
+        _mouse_buffer_flag2 = 0;
+        video::Set_Current_Mouse_List_Ptr_(-1);
+        video::Set_Current_Mouse_Shape_(0);
+    }
+
+    uint16_t __cdecl Mouse_Enabled_() {
+        return _mouse_enabled;
+    }
+
+    int16_t __cdecl Copy_Current_Mouse_List_(s_mouse_list* out_mouse_list, int16_t max_count) {
+        if (out_mouse_list == nullptr || max_count <= 0 || _current_mouse_list == nullptr || _current_mouse_list_count <= 0) {
+            return 0;
+        }
+
+        int16_t copy_count = _current_mouse_list_count;
+        if (copy_count > max_count) {
+            copy_count = max_count;
+        }
+
+        memcpy(out_mouse_list, _current_mouse_list, (size_t)copy_count * sizeof(out_mouse_list[0]));
+        return copy_count;
     }
 
     void __cdecl Save_Mouse_State_() {
@@ -189,11 +231,10 @@ namespace mouse {
         mouse::_in_mouse_handler = 1;
 
         if (platform::g_pending_toggle_pages) {
-            const int16_t previous_mouse_x = platform::g_mouse_x;
-            const int16_t previous_mouse_y = platform::g_mouse_y;
+            const int16_t previous_mouse_x = platform::Get_Mouse_X_();
+            const int16_t previous_mouse_y = platform::Get_Mouse_Y_();
 
-            platform::g_mouse_x = mouse_x;
-            platform::g_mouse_y = mouse_y;
+            platform::Set_Logical_Mouse_Position_(mouse_x, mouse_y);
             mouse::_mouse_buttons = (int16_t)mouse_buttons;
 
             mouse::Check_Mouse_Buffer_();
@@ -204,16 +245,14 @@ namespace mouse {
             // synthetic SetCursorPos echoes to the same logical position. In windowed mode,
             // real user movement can also arrive here, so only discard same-coordinate echoes.
             if (mouse_x == previous_mouse_x && mouse_y == previous_mouse_y) {
-                platform::g_mouse_x = previous_mouse_x;
-                platform::g_mouse_y = previous_mouse_y;
+                platform::Set_Logical_Mouse_Position_(previous_mouse_x, previous_mouse_y);
             }
 
             return;
         }
 
         if (mouse::_mouse_overide_flag == 0) {
-            platform::g_mouse_x = mouse_x;
-            platform::g_mouse_y = mouse_y;
+            platform::Set_Logical_Mouse_Position_(mouse_x, mouse_y);
             mouse::_mouse_buttons = (int16_t)mouse_buttons;
         } else {
             mouse::_mouse_buttons =

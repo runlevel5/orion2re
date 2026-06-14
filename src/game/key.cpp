@@ -1,20 +1,19 @@
 #include "pch.h"
 
 namespace key {
-    int32_t _last_key_pressed[10];
+    namespace {
+        int32_t g_last_key_pressed[10];
+        uint8_t g_key_pressed;
+        uint8_t g_key_write;
+        int8_t g_key_read;
+    }
 
-    uint8_t _key_pressed;
-
-    uint8_t _key_write;
-
-    int8_t _key_read;
-
-    constexpr int32_t kLastKeyPressedCount = sizeof(_last_key_pressed) / sizeof(_last_key_pressed[0]);
+    constexpr int32_t kLastKeyPressedCount = sizeof(g_last_key_pressed) / sizeof(g_last_key_pressed[0]);
 
     uint8_t Keyboard_Status_() {
         platform::Pump_Game_Input_Queue_();
-        if (_key_pressed == 1) {
-            _key_pressed = 0;
+        if (g_key_pressed == 1) {
+            g_key_pressed = 0;
             return 1;
         }
         return 0;
@@ -23,18 +22,18 @@ namespace key {
     int32_t Read_Key_() {
         platform::Pump_Game_Input_Queue_();
 
-        if (_key_pressed == 0 && _key_read == _key_write) {
+        if (g_key_pressed == 0 && g_key_read == g_key_write) {
             return 0;
         }
 
-        int8_t current_index = _key_read;
-        int32_t key_code = _last_key_pressed[current_index];
-        _key_read = (current_index + 1) % kLastKeyPressedCount;
+        int8_t current_index = g_key_read;
+        int32_t key_code = g_last_key_pressed[current_index];
+        g_key_read = (current_index + 1) % kLastKeyPressedCount;
 
-        if (_key_read == _key_write) {
-            _key_pressed = 0;
+        if (g_key_read == g_key_write) {
+            g_key_pressed = 0;
         } else {
-            _key_pressed = 1;
+            g_key_pressed = 1;
         }
 
         return key_code;
@@ -63,5 +62,12 @@ namespace key {
             return key;
         }
         return 0;
+    }
+
+    void Push_Key_Code_(uint32_t key_code, uint32_t scan_code) {
+        g_key_pressed = 1;
+        g_last_key_pressed[g_key_write] = (int32_t)key_code;
+        g_key_write = (uint8_t)((g_key_write + 1) % kLastKeyPressedCount);
+        g_last_scan_code = scan_code;
     }
 }

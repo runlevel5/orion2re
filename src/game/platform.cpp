@@ -251,10 +251,7 @@ namespace platform {
 		}
 
 		void Queue_Key_Code_(uint32_t key_code, uint32_t scan_code) {
-			key::_key_pressed = true;
-			key::_last_key_pressed[key::_key_write] = (int32_t)key_code;
-			key::_key_write = (key::_key_write + 1) % 10;
-			g_last_scan_code = scan_code;
+			key::Push_Key_Code_(key_code, scan_code);
 		}
 
 		bool Translate_Non_Character_Key_(SDL_Keycode keycode, uint32_t* translated_key_code) {
@@ -861,8 +858,7 @@ namespace platform {
 
     void Force_Cursor_Pos(int16_t x, int16_t y)
     {
-        g_mouse_x = x;
-        g_mouse_y = y;
+        Set_Logical_Mouse_Position_(x, y);
         Set_Present_Mouse_Position_(x, y);
 
         if (g_sdl_window != nullptr) {
@@ -874,6 +870,19 @@ namespace platform {
                 Map_Game_Coord_To_Window_Coord_(x, video::g_screen_res_x, window_width),
                 Map_Game_Coord_To_Window_Coord_(y, video::g_screen_res_y, window_height));
         }
+    }
+
+    int16_t __cdecl Get_Mouse_X_() {
+        return g_mouse_x;
+    }
+
+    int16_t __cdecl Get_Mouse_Y_() {
+        return g_mouse_y;
+    }
+
+    void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y) {
+        g_mouse_x = x;
+        g_mouse_y = y;
     }
 
     void __cdecl Create_Cursor_Surface() {
@@ -1040,8 +1049,8 @@ namespace platform {
         s_present_cursor_state& cursor_state = g_present_cursor_states[write_index];
 
         cursor_state.offset = (int16_t)mouse::Get_Pointer_Offset_();
-        cursor_state.shape = video::_current_mouse_shape;
-        cursor_state.enabled = (mouse::_mouse_enabled != 0) ? 1 : 0;
+        cursor_state.shape = (int16_t)mouse::Get_Pointer_Image_Number_();
+        cursor_state.enabled = (mouse::Mouse_Enabled_() != 0) ? 1 : 0;
 
         if (cursor_state.enabled != 0 &&
             cursor_state.shape > 0 &&
