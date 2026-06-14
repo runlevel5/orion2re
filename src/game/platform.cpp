@@ -256,6 +256,7 @@ namespace platform {
 
 		bool Translate_Non_Character_Key_(SDL_Keycode keycode, uint32_t* translated_key_code) {
 			switch (keycode) {
+			case SDLK_ESCAPE: *translated_key_code = 0x011B; return true;
 			case SDLK_BACKSPACE: *translated_key_code = 0x0E08; return true;
 			case SDLK_TAB: *translated_key_code = 0x0F09; return true;
 			case SDLK_RETURN: *translated_key_code = 0x1C0D; return true;

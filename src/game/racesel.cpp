@@ -316,7 +316,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                             for (int j = 0; j < 13; ++j) {
                                 field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", _race_button[j], &_race_button_status[j], "", 40);
                             }
-                            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", (s_animation_header*)_last_race_seg, &_race_button_status[13], "", 40);
+                            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", _race_button[13], &_race_button_status[13], "", 40);
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                             RACESEL::Set_Race_Select_Help_();
                             _custom_flag = 0;

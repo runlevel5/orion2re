@@ -20,7 +20,7 @@ Sources:
 ### UI and race selection
 
 - [ ] Ship leader crash: viewing ship leaders with no ships can crash the game.
-- [ ] ESC from Custom Race screen bug: after creating a custom race, pressing ESC can cause the Select Race screen to show `Last Race` instead of `Custom`.
+- [x] ESC from Custom Race screen bug: after creating a custom race, pressing ESC can cause the Select Race screen to show `Last Race` instead of `Custom`. Fixed in source by restoring the real `Custom` button when canceling out of the custom-race editor. Historical patch 1.40 handled this with a fixup-pointer retarget to the correct button data.
 
 ### Economy and production
 
@@ -29,6 +29,7 @@ Sources:
 
 ### Colony and galaxy state
 
+- [ ] Home system quality issue: starting home systems can generate without any colonizable planet besides the homeworld; patch 1.40 changed generation to guarantee at least one colonizable planet in each home system.
 - [ ] Arti planet bug: in LAN play, an artifacts world can lose its artifacts special when another player ends the turn first.
 - [ ] Cloned colony ship / outpost ship bug: colony ships and outpost ships can sometimes remain after founding a colony or outpost.
 
