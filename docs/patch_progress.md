@@ -24,7 +24,7 @@ Sources:
 ### Economy and production
 
 - [ ] Credit cheat: under some conditions a colony can both generate Trade Goods income and still keep production toward a build item in the same turn.
-- [ ] Repeat Build cancel exploit: a bought repeat-build item can be canceled to convert money into stored production.
+- [x] Repeat Build cancel exploit: a bought repeat-build item can be canceled to convert money into stored production. Fixed in source by clearing `bought_outright` whenever build-queue edits change `producing[0]` as the popup commits back to the colony, so purchased production cannot transfer to a different front item. Historical patch 1.40 handled this at the UI level by blocking cancellation or movement of the first queue item after an outright purchase; source now enforces the accounting invariant directly instead of relying only on popup restrictions.
 
 ### Colony and galaxy state
 

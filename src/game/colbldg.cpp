@@ -1902,10 +1902,17 @@ namespace COLBLDG {
     }
 
     void __cdecl Do_Exit_Screen_Cleanup_() {
+        s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
+        int16_t original_front_item = colony->producing[0];
+
         Remove_Ships_(1);
 
         for (int16_t i = 0; i < 7; ++i) {
-            MOX::_colony[COLONY::_colony_handle].producing[i] = _current_item[i];
+            colony->producing[i] = _current_item[i];
+        }
+
+        if (original_front_item != colony->producing[0]) {
+            colony->bought_outright = 0;
         }
     }
 
