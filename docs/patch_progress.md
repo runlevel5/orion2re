@@ -13,7 +13,6 @@ Sources:
 
 ### Stability and rendering
 
-- [ ] Missing VESA bug: the game can wrongly report that `VESA.COM` must be loaded even when proper VESA VBE support is present.
 - [ ] Display redraw overwrite bug #1: a display redraw path can write outside the VESA display memory window, causing random crashes and lockups.
 - [ ] Display redraw overwrite bug #2: another display redraw path can write outside the video frame buffers, causing save corruption, crashes, and other undefined behavior.
 
@@ -29,9 +28,13 @@ Sources:
 
 ### Colony and galaxy state
 
-- [ ] Home system quality issue: starting home systems can generate without any colonizable planet besides the homeworld; patch 1.40 changed generation to guarantee at least one colonizable planet in each home system.
+- [x] Home system quality issue: starting home systems can generate without any colonizable planet besides the homeworld. Source inspection shows the restored `HOMEGEN::Enforce_3_Planet_Minimum_()` already matches the historical 1.40 behavior: each home system is forced to contain at least three true `PLANET_TYPE_PLANET` bodies before homeworld selection, which leaves at least two additional planets after one is chosen as the homeworld. As in the original 1.40 patch, this guarantees additional real planets, not specifically additional habitable planets. No further source change was required for this bug after comparison against the original binaries.
 - [ ] Arti planet bug: in LAN play, an artifacts world can lose its artifacts special when another player ends the turn first.
 - [ ] Cloned colony ship / outpost ship bug: colony ships and outpost ships can sometimes remain after founding a colony or outpost.
+
+## Separate source-level fixes for original bugs not covered by patch 1.40
+
+- [x] `HOMEGEN::Usable_Orbit_()` random-probe bug: the original code checked `_planet[_planet_count].planet_type` instead of the candidate orbit occupant, so source now uses the actual `p_idx` planet when deciding whether an occupied orbit is reusable.
 
 ### Detection, cloaking, and combat
 

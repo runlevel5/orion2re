@@ -628,7 +628,7 @@ namespace HOMEGEN {
                 result_orbit = orbit_candidate;
                 found = true;
             } else if (p_idx >= 0 && p_idx < MOX::_planet_count) {
-                if (MOX::_planet[MOX::_planet_count].planet_type != PLANET_TYPE_PLANET) {
+                if (MOX::_planet[p_idx].planet_type != PLANET_TYPE_PLANET) {
                     result_orbit = orbit_candidate;
                     found = true;
                 }
