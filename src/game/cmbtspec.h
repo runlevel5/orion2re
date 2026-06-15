@@ -15,6 +15,14 @@ namespace CMBTSPEC {
      */
     void __cdecl Draw_Continuing_Tractor_(int16_t ship_idx);
 
+    /** Validates and returns the active tractor-beam target for a combat ship.
+     * Invalid or stale tractor links are cleared in place.
+     * @param ship_idx Combat ship index emitting the beam.
+     * @param target_ship_idx Output target ship index when a valid link exists.
+     * @return Nonzero when the ship still has a valid active tractor target.
+     */
+    bool __cdecl Try_Get_Active_Tractor_Target_(int16_t ship_idx, int16_t* target_ship_idx);
+
     /** Starts the looping ship engine sound effect if it is not already active. */
     void __cdecl Start_Ship_Engine_SFX_();
 

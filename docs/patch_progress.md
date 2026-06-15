@@ -1,15 +1,17 @@
-# Patch 1.40 bug TODOs
+# Historical patch bug TODOs
 
-This file tracks bugs documented by the historical Master of Orion II 1.40 patch.
+This file tracks bugs documented by historical Master of Orion II patches.
 
-The goal here is to keep the bug reports, not to blindly copy the original patch behavior. If 1.40 handled a problem by disabling or removing a feature, record the bug but do not treat that workaround as an accepted solution in this project.
+The goal here is to keep the bug reports, not to blindly copy original patch behavior. If a historical patch handled a problem by disabling or removing a feature, record the bug but do not treat that workaround as an accepted solution in this project.
+
+## Patch 1.40
 
 Sources:
 
 - FAQ: https://lordbrazen.blogspot.com/2005/01/moo2v140-patch-faq.html
 - Changelog: https://moo2mod.com/patch/CHANGELOG_140.TXT
 
-## TODO
+### TODO
 
 ### Stability and rendering
 
@@ -41,13 +43,23 @@ Sources:
 - [x] Stealth Field bug: ships with Stealth Field can still appear on long-range galaxy map scans. Fixed in source by correcting `SHIPSTAK::Remove_Non_Detected_Ships_()` to test for working stealth/cloak specials via `Ship_Has_Special_()` instead of testing `special_device_damage_flags` directly. The original logic only added the concealment penalty when the device was damaged, so healthy stealth systems stayed visible. Historical patch 1.40 handled this with injected DOS-side detection code; source now fixes the root condition directly in the shared visibility path.
 - [x] Cloak techs bug: ships with Cloaking Device or Phasing Cloak can still appear on long-range galaxy map scans. Fixed by the same source-level visibility correction as the Stealth Field bug, since all three concealment systems were affected by the same reversed condition. Historical patch 1.40 patched the relevant scan logic in binary; source now expresses the intended rule directly by checking whether the special is present and not damaged.
 - [x] Phasing Cloak bug: after 10 combat rounds, phasing cloak reversion does not apply correctly to all players. Fixed in source by moving the phasing-cloak timer countdown out of the per-side end-of-turn pass in `COMBAT1::Do_Combat_Turn()` and into shared round-end bookkeeping via `COMBAT1::Update_Phasing_Cloak_Timers_()` called from `COMBINIT::End_Of_Turn_Bookeeping_()`. This makes phasing-cloak expiration advance once per combat round for every active phased ship in both classic side-order and initiative combat, instead of depending on which side's cleanup block ran. Historical patch 1.40 handled the problem with a tiny DOS-side overwrite suppression near the shared phasing-cloak path; source now fixes the actual timing rule directly rather than preserving the binary workaround.
-- [ ] Tractor Beam crash: active tractor beams can crash the game while ships are moving, especially when one of the ships is off-screen.
+- [x] Tractor Beam crash: active tractor beams can crash the game while ships are moving, especially when one of the ships is off-screen. Fixed in source by hardening the live tractor-link state and clipping every tractor-beam draw to the active combat window before calling `bitmap::Draw_Bitmap_Line_()`. `CMBTSPEC::Try_Get_Active_Tractor_Target_()` now clears stale `special_cooldown` links before the draw and movement code uses them, `CMBTSPEC::Draw_Continuing_Tractor_()`, `CMBTSPEC::Draw_Moving_Tractor_()`, and `CMBTSPEC::Tractor_Beam_()` now reject fully off-screen beam segments instead of feeding inverted bounds into the bitmap-line renderer, and `CMBTMOV1::Move_Ship_()` no longer stores moving tractor participants in a tiny fixed array that could overflow during heavily linked combats. This keeps working tractor beams visible when they should be, while preventing both stale-link dereferences and off-screen beam rasterization from turning into combat crashes. Historical patch 1.40 fixed the issue in the DOS binary; source now fixes the restored tractor state and rendering paths directly instead of reproducing a binary-only workaround.
 - [x] Black Hole Generator with initiative bug: when ship initiative is enabled, a Black Hole Generator can immobilize a target instead of destroying it. Fixed in source by moving `Increment_Bhg_()` into shared end-of-round combat bookkeeping, so black-hole victims advance once per round in both classic side-order and initiative combat. Historical patch 1.40 handled this with DOS-side control-flow hooks that restored the countdown from an alternate initiative path; source now reuses the existing countdown logic directly from the common round boundary instead of relying on mode-specific binary detours.
 
 ## Historical 1.40 workaround that should not be copied as-is
 
 - [x] Last Race multiplayer bugs: pressing `Last Race` could crash LAN games, and multiplayer could also allow duplicate race portraits because the original flow reserved pseudo-slot `13` over the network while the loaded `lastrace.rac` data switched the player to a real base race `0..12`. Fixed in source by keeping `Last Race` as a local UI entry only and using the saved base race itself for multiplayer race reservation, release, and downstream banner/portrait identity. The source path also rejects invalid saved base-race ids defensively. Historical patch 1.40 handled this by removing the `Last Race` button from multiplayer entirely; source keeps the feature and fixes the actual race-identity mismatch instead.
 
-## Notes
+### Notes
 
 - The FAQ's short fixed-bug summary is older and smaller than the later 1.40 changelog. This list uses the later changelog as the fuller source and keeps the FAQ wording where it adds useful bug detail.
+
+## Patch 1.50
+
+Sources:
+
+- TBD
+
+### TODO
+
+- No 1.50 items recorded yet.

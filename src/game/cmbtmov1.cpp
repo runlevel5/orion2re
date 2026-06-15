@@ -212,19 +212,21 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             }
         }
 
-        int16_t tractor_ships[10];
+        int16_t tractor_ships[MAX_SHIPS + 1];
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         if (!skip_normal_move) {
             int16_t center_x, center_y;
             COMBINIT::Ship_Center_Offsets_(ship_idx, &center_x, &center_y);
 
-            if (ship->special_cooldown != 0xFF) {
+            int16_t tractor_target_idx;
+            if (CMBTSPEC::Try_Get_Active_Tractor_Target_(ship_idx, &tractor_target_idx)) {
                 tractor_ships[tractor_count++] = ship_idx;
             }
 
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                if (MOX::_combat_data[i].special_cooldown == ship_idx && MOX::_combat_data[i].unit_status == 0) {
+                if (MOX::_combat_data[i].special_cooldown == ship_idx &&
+                    CMBTSPEC::Try_Get_Active_Tractor_Target_(i, &tractor_target_idx)) {
                     tractor_ships[tractor_count++] = i;
                 }
             }
@@ -407,10 +409,10 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
         if (tractor_count > 0) {
             for (int16_t t = 0; t < tractor_count; ++t) {
                 int16_t t_ship_idx = tractor_ships[t];
-                s_combat_data* t_ship = &MOX::_combat_data[t_ship_idx];
-                if (t_ship->unit_status == 0) {
-                    if (CMBTAI::Range_To_Ship_(t_ship_idx, t_ship->special_cooldown) > 4) {
-                        t_ship->special_cooldown = 0xFF;
+                int16_t target_ship_idx;
+                if (CMBTSPEC::Try_Get_Active_Tractor_Target_(t_ship_idx, &target_ship_idx)) {
+                    if (CMBTAI::Range_To_Ship_(t_ship_idx, target_ship_idx) > 4) {
+                        MOX::_combat_data[t_ship_idx].special_cooldown = 0xFF;
                     }
                 }
             }

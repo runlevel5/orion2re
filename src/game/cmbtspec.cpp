@@ -5,6 +5,44 @@
 namespace CMBTSPEC {
     int32_t _g_engine_sfx_handle;
 
+    bool __cdecl Draw_Clipped_Tractor_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* bitmap) {
+        if (line::Clip_Line_(&x1, &y1, &x2, &y2) != 0) {
+            return false;
+        }
+
+        bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, bitmap);
+        return true;
+    }
+
+    bool __cdecl Try_Get_Active_Tractor_Target_(int16_t ship_idx, int16_t* target_ship_idx) {
+        if (ship_idx < 0 || ship_idx >= MOX::_combat_total_ship_count) {
+            return false;
+        }
+
+        s_combat_data& ship = MOX::_combat_data[ship_idx];
+        if (ship.unit_status != 0) {
+            ship.special_cooldown = 0xFF;
+            return false;
+        }
+
+        int16_t target_idx = (int16_t)ship.special_cooldown;
+        if (target_idx == 0xFF) {
+            return false;
+        }
+
+        if (target_idx >= MOX::_combat_total_ship_count || target_idx == ship_idx ||
+            MOX::_combat_data[target_idx].unit_status != 0) {
+            ship.special_cooldown = 0xFF;
+            return false;
+        }
+
+        if (target_ship_idx != nullptr) {
+            *target_ship_idx = target_idx;
+        }
+
+        return true;
+    }
+
     void __cdecl Draw_Cloak_(int16_t ship_idx, int16_t cloak_type) {
         int16_t unused_x, unused_y;
         int16_t offset_x, offset_y;
@@ -90,7 +128,9 @@ namespace CMBTSPEC {
         int16_t x1, y1, x2, y2;
         int16_t target_idx;
 
-        target_idx = (int16_t)MOX::_combat_data[ship_idx].special_cooldown;
+        if (!Try_Get_Active_Tractor_Target_(ship_idx, &target_idx)) {
+            return;
+        }
 
         COMBINIT::Ship_Center_Offsets_(ship_idx, &x1, &y1);
         x1 += (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20;
@@ -112,7 +152,7 @@ namespace CMBTSPEC {
 
         graphics::Set_Window_(0, 0, 639, 350);
         video::Clip_On_();
-        bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, temp_bitmap);
+        Draw_Clipped_Tractor_Line_(x1, y1, x2, y2, temp_bitmap);
         video::Clip_Off_();
 
         palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
@@ -120,8 +160,12 @@ namespace CMBTSPEC {
     }
 
     void __cdecl Draw_Moving_Tractor_(int16_t ship_idx, int16_t center_x, int16_t center_y) {
-        int16_t target_ship_idx = (int16_t)MOX::_combat_data[ship_idx].special_cooldown;
+        int16_t target_ship_idx;
         int16_t x1, y1, x2, y2;
+
+        if (!Try_Get_Active_Tractor_Target_(ship_idx, &target_ship_idx)) {
+            return;
+        }
 
         COMBINIT::Ship_Center_Offsets_(ship_idx, &x1, &y1);
         if (ship_idx == MOX::_cur_ship) {
@@ -150,7 +194,7 @@ namespace CMBTSPEC {
 
         bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bmp, MOX::_small_tractor_seg);
         bitmap::Set_Picture_Glassed_((s_animation_header*)temp_bmp);
-        bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, temp_bmp);
+        Draw_Clipped_Tractor_Line_(x1, y1, x2, y2, temp_bmp);
 
         allocate::Pop_Block_(MOX::_screen_seg);
         palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
@@ -609,7 +653,7 @@ namespace CMBTSPEC {
                 palette::Restore_Glass_Remap_Block_(MOX::_tractor_remap_colors);
                 graphics::Set_Window_(0, 0, 639, 350);
                 video::Clip_On_();
-                bitmap::Draw_Bitmap_Line_(src_x, src_y, dst_x, dst_y, h1);
+                Draw_Clipped_Tractor_Line_(src_x, src_y, dst_x, dst_y, h1);
                 graphics::Reset_Window_();
                 video::Clip_Off_();
                 palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
