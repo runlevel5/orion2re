@@ -44,6 +44,11 @@ orion2re_add_unit_test(test_fields_helpers
         tests/fakes/fake_exitm.cpp
 )
 
+orion2re_add_unit_test(test_video_scan_bounds
+    SOURCES
+        tests/unit/test_video_scan_bounds.cpp
+)
+
 orion2re_add_unit_test(test_fields
     SOURCES
         tests/unit/test_fields.cpp

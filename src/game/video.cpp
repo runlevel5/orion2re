@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "video_scan_bounds.h"
+
 namespace video {
 	int32_t g_screen_res_x;
 	int32_t g_screen_res_y;
@@ -269,21 +271,31 @@ namespace video {
 	}
 
 	void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2) {
+		if (y < 0 || y >= g_screen_res_y || x1 >= g_screen_res_x || x2 < 0) {
+			return;
+		}
+
 		if (x1 < 0) {
 			x1 = 0;
-		}
-		if (y < 0) {
-			y = 0;
 		}
 		if (x2 >= g_screen_res_x) {
 			x2 = g_screen_res_x - 1;
 		}
-		if (y >= g_screen_res_y) {
-			y = g_screen_res_y - 1;
+
+		int32_t min_x_scaled32 = x1 >> 2;
+		int32_t max_x_scaled32 = x2 >> 2;
+		const int32_t row_dword_width = (g_screen_res_x + 3) >> 2;
+		if (!Normalize_Scan_Span_(
+			min_x_scaled32,
+			max_x_scaled32,
+			row_dword_width,
+			&min_x_scaled32,
+			&max_x_scaled32)) {
+			return;
 		}
 
-		int16_t min_x_scaled = (int16_t)(x1 >> 2);
-		int16_t max_x_scaled = (int16_t)(x2 >> 2);
+		int16_t min_x_scaled = (int16_t)min_x_scaled32;
+		int16_t max_x_scaled = (int16_t)max_x_scaled32;
 
 		s_scan_list_entry* scan_list = _refresh_scan_list;
 		s_scan_list_entry& scan_entry = scan_list[y];
@@ -337,6 +349,10 @@ namespace video {
 	}
 
 	void __cdecl Add_Dot_To_Scan_List_(int32_t x, int32_t y) {
+		if (!Is_Scan_Dot_Onscreen_(x, y, g_screen_res_x, g_screen_res_y)) {
+			return;
+		}
+
 		int32_t scaled_x32 = x >> 2;
 		int16_t scaled_x = (int16_t)scaled_x32;
 		s_scan_list_entry* scan_entry = &_refresh_scan_list[y];
@@ -461,16 +477,24 @@ namespace video {
 
         uint8_t* offscreen_surface = platform::_offscreen_surface;
         uint32_t* alt_offscreen_surface = (uint32_t*)video::g_page_off.pixels;
-        const int32_t dwords_per_row =
-            (g_screen_res_x + ((g_screen_res_x >> 31) & 3)) >> 2;
+        if (offscreen_surface == nullptr ||
+            alt_offscreen_surface == nullptr ||
+            g_screen_res_x <= 0 ||
+            g_screen_res_y <= 0) {
+            platform::Unlock_Offscreen_Surface_();
+            return;
+        }
+
+        const int32_t dwords_per_row = (g_screen_res_x + 3) >> 2;
 
         int32_t row_dword_offset = 0;
         for (int32_t row = 0; row < g_screen_res_y; ++row) {
             const s_scan_list_entry& scan = video::_refresh_stencil_list[row];
-            const int32_t min_x = scan.min_x;
+            int32_t min_x = scan.min_x;
+            int32_t max_x = scan.max_x;
 
-            if (min_x != -1) {
-                const int32_t count = (int32_t)scan.max_x - min_x + 1;
+            if (Normalize_Scan_Span_(min_x, max_x, dwords_per_row, &min_x, &max_x)) {
+                const int32_t count = max_x - min_x + 1;
                 const int32_t dword_offset = row_dword_offset + min_x;
                 platform::Copy_Dwords_(
                     alt_offscreen_surface + dword_offset,
