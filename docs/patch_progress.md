@@ -14,7 +14,7 @@ Sources:
 ### Stability and rendering
 
 - [x] Display redraw overwrite bug #1: a partial display redraw path could write outside the DOS VESA display window, causing random crashes and lockups. Fixed in source by hardening the shared scan-list pipeline instead of reproducing the DOS-side VESA workaround: `video::Add_Line_To_Scan_List_()` now rejects fully off-screen lines and normalizes clipped dword spans, `video::Add_Dot_To_Scan_List_()` now ignores off-screen dots instead of indexing the scan list out of bounds, and `video::Stencil_Out_Background_()` now validates and clamps each stencil-row span before copying from the back page into the off page. This preserves the intended partial-redraw behavior while preventing malformed scan-list entries from propagating into memory overwrites. Historical patch 1.40 handled the bug with a DOS binary helper around `video::Partial_Screen_Dump_Hi_Res_()` that clamped the final VESA-window copy; source now fixes both the scan-entry producers and the shared consumer directly in the restored rendering path.
-- [ ] Display redraw overwrite bug #2: another display redraw path can write outside the video frame buffers, causing save corruption, crashes, and other undefined behavior.
+- [x] Display redraw overwrite bug #2: another display redraw path can write outside the video frame buffers, causing save corruption, crashes, and other undefined behavior. Fixed in source by hardening the remaining rectangle-based scan-list producer in `setvesa::Add_Square_To_Scan_List_()`: it now accepts clipped updates that land on row or column `0`, rejects rectangles that become inverted after clipping, and normalizes the final dword span with the shared scan-bounds helper before touching `_refresh_scan_list` or `_refresh_stencil_list`. This complements the earlier source fixes in `video::Add_Line_To_Scan_List_()`, `video::Add_Dot_To_Scan_List_()`, and `video::Stencil_Out_Background_()` so malformed partial-redraw rectangles cannot propagate into out-of-bounds frame-buffer copies. Historical patch 1.40 handled the problem with DOS-side clamping helpers around the partial screen-dump copy path; source now fixes the remaining bad producer directly in the shared redraw pipeline instead of relying on a late binary copy guard.
 
 ### UI and race selection
 
@@ -44,14 +44,9 @@ Sources:
 - [ ] Tractor Beam crash: active tractor beams can crash the game while ships are moving, especially when one of the ships is off-screen.
 - [x] Black Hole Generator with initiative bug: when ship initiative is enabled, a Black Hole Generator can immobilize a target instead of destroying it. Fixed in source by moving `Increment_Bhg_()` into shared end-of-round combat bookkeeping, so black-hole victims advance once per round in both classic side-order and initiative combat. Historical patch 1.40 handled this with DOS-side control-flow hooks that restored the countdown from an alternate initiative path; source now reuses the existing countdown logic directly from the common round boundary instead of relying on mode-specific binary detours.
 
-### Networking
-
-- [ ] LAN packet send bug: the original game can lock up or crash during native Windows XP LAN play because of packet-send handling in `RKERNEL.COM`.
-
 ## Historical 1.40 workaround that should not be copied as-is
 
 - [x] Last Race multiplayer bugs: pressing `Last Race` could crash LAN games, and multiplayer could also allow duplicate race portraits because the original flow reserved pseudo-slot `13` over the network while the loaded `lastrace.rac` data switched the player to a real base race `0..12`. Fixed in source by keeping `Last Race` as a local UI entry only and using the saved base race itself for multiplayer race reservation, release, and downstream banner/portrait identity. The source path also rejects invalid saved base-race ids defensively. Historical patch 1.40 handled this by removing the `Last Race` button from multiplayer entirely; source keeps the feature and fixes the actual race-identity mismatch instead.
-- [ ] Modem Comm Info / TEN regression: patch 1.40 disabled the modem `Comm Info` button and the `TEN` button to make room for patch code. If this project needs to preserve those features, the underlying space or architecture problem should be solved instead of copying the disablement.
 
 ## Notes
 

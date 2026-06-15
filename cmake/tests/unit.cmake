@@ -47,6 +47,10 @@ orion2re_add_unit_test(test_fields_helpers
 orion2re_add_unit_test(test_video_scan_bounds
     SOURCES
         tests/unit/test_video_scan_bounds.cpp
+    PRODUCTION_SOURCES
+        src/game/setvesa.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_video.cpp
 )
 
 orion2re_add_unit_test(test_fields

@@ -1,8 +1,10 @@
 #include "pch.h"
 
+#include "video_scan_bounds.h"
+
 namespace setvesa {
     void __cdecl Add_Square_To_Scan_List_(int32_t left, int32_t top, int32_t right, int32_t bottom) {
-        if (video::g_screen_res_x <= left || video::g_screen_res_y <= top || right <= 0 || bottom <= 0) {
+        if (video::g_screen_res_x <= left || video::g_screen_res_y <= top || right < 0 || bottom < 0) {
             return;
         }
 
@@ -22,15 +24,24 @@ namespace setvesa {
             bottom = video::g_screen_res_y - 1;
         }
 
-        left >>= 2;
-        right >>= 2;
-
-        if (right < left) {
-            exitm::Exit_With_Message("Add Square to scan list failed..");
+        if (bottom < top) {
+            return;
         }
 
-        const int16_t min_scan_x = (int16_t)left;
-        const int16_t max_scan_x = (int16_t)right;
+        int32_t min_scan_x32 = left >> 2;
+        int32_t max_scan_x32 = right >> 2;
+        const int32_t row_dword_width = (video::g_screen_res_x + 3) >> 2;
+        if (!video::Normalize_Scan_Span_(
+            min_scan_x32,
+            max_scan_x32,
+            row_dword_width,
+            &min_scan_x32,
+            &max_scan_x32)) {
+            return;
+        }
+
+        const int16_t min_scan_x = (int16_t)min_scan_x32;
+        const int16_t max_scan_x = (int16_t)max_scan_x32;
 
         if (video::screen_refresh_flag == 2) {
             for (int32_t row = top; row <= bottom; ++row) {
