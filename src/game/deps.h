@@ -74,6 +74,7 @@
 #include "netstrat.h"
 #include "transprt.h"
 #include "motrans.h"
+#include "netadapter.h"
 #include "netcode.h"
 #include "winnet.h"
 #include "comcore.h"

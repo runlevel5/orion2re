@@ -414,7 +414,7 @@ namespace NETSTART {
             netcode::Net_Disable_New_Players_();
         }
 
-        uint8_t users[256];
+        int16_t users[256];
         NETMOX::_net.num_connected_players = static_cast<int8_t>(netcode::Net_Get_Users_(users));
 
         if (NETMOX::_net.num_connected_players > MOX::_settings.number_of_players) {
@@ -640,7 +640,7 @@ namespace NETSTART {
         uint8_t fade_flag = 0;
         uint8_t status[MAX_PLAYERS] = { 0 };
         s_load_net_screen_packet payload = {};
-        uint8_t user_list[256];
+        int16_t user_list[256];
 
         NETMOX::_net.sync_state = 36;
         NETTURN::Net_Init_Host_Election_();
@@ -869,7 +869,7 @@ namespace NETSTART {
     }
 
     int __cdecl Dump_Users_() {
-        uint8_t buffer[20];
+        int16_t buffer[20];
         return netcode::Net_Get_Users_(buffer);
     }
 

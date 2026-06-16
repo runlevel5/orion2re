@@ -198,6 +198,10 @@ target_compile_definitions(orion2re PRIVATE
     ORION2RE_ENABLE_NETWORKING=$<BOOL:${ORION2RE_ENABLE_NETWORKING}>
 )
 
+target_precompile_headers(orion2re PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
+)
+
 target_link_libraries(orion2re PRIVATE
     SDL3::SDL3-static
     uv_a
@@ -235,10 +239,6 @@ if(MSVC)
     target_compile_options(orion2re PRIVATE /W3 /permissive-)
     target_compile_options(orion2re-router PRIVATE /W3 /permissive-)
     target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
-
-    target_precompile_headers(orion2re PRIVATE
-        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
-    )
 
     target_compile_definitions(orion2re PRIVATE
         WIN32

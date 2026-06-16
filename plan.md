@@ -68,3 +68,113 @@
    - Only move on once the previous stage compiles cleanly or all remaining failures are understood and isolated.
    - Latest validation: repository scans are clean for the recently removed global Windows headers, active palette Win32 type usage, and recent compat-layer C++ stdlib usage; current configure still advances until the broader build-system portability limits take over.
    - Follow-up validation: non-networking configure still advances on Linux after the `_WINDOWS` define cleanup, but the configure run remains slow in vendored SDL detection and timed out before reaching the first project compile failure.
+
+12. Remove `WINNET` and integrate router service connectivity
+   - Goal: replace the active Windows/DirectPlay multiplayer path with the project-owned TCP router service while preserving the existing high-level gameplay packet model.
+   - Existing router status:
+     - `src/network/router_protocol.*`, `router_core.*`, `router_service.*`, and `router_cli.*` already implement the service-side protocol, session management, TCP routing, UDP LAN discovery replies, and standalone `orion2re-router` target.
+     - Focused router tests cover protocol framing, session lifecycle, direct/broadcast routing, member events, service startup/shutdown, malformed frames, backpressure, and UDP discovery.
+   - Add a game-facing router client layer:
+     - Create `src/network/router_client.h` and `src/network/router_client.cpp`.
+     - Own one TCP connection to a selected router endpoint.
+     - Send and receive length-prefixed `router_protocol` frames.
+     - Maintain the router-assigned local `network_id` and current `session_id`.
+     - Cache session-list results returned by `LIST_SESSIONS`.
+     - Cache current session members from `MEMBER_LIST`, `MEMBER_JOINED`, and `MEMBER_LEFT`.
+     - Queue received opaque `GAME_DATA` payloads for the game layer.
+     - Queue membership/session lifecycle events for the game layer.
+     - Expose a nonblocking pump/update API suitable for `netcode::Net_Update_()`.
+     - Keep this layer gameplay-opaque; it must not convert players to AI, elect gameplay hosts, or interpret MOX/NETMOX packet IDs.
+     - Status: implemented and covered by `test_router_client`.
+   - Add the legacy-compatible game adapter:
+     - Create `src/game/netadapter.h` and `src/game/netadapter.cpp`.
+     - This is the compatibility seam between old gameplay code and the new router client.
+     - Mirror only the behavior still needed by `netcode`, `comcore`, `NETSTART`, and `NETMOX`; do not recreate DirectPlay concepts that are no longer useful.
+     - Initial adapter responsibilities:
+       - initialize/shutdown the router client
+       - connect to a LAN or online router endpoint
+       - refresh and expose session lists
+       - create/register a session
+       - join a session by cached session record
+       - enable/disable new joins through `SET_SESSION_OPEN`
+       - return local network ID
+       - return connected network IDs for `Net_Get_Users_()` compatibility
+       - send direct game payloads with `SEND_TO`
+       - send broadcast game payloads with `SEND_BROADCAST`
+       - poll queued received game payloads
+       - expose member-left/session-closed events to gameplay recovery code
+     - Status: implemented and covered by `test_netadapter`.
+   - Network ID allocation rules:
+     - Router-assigned IDs must never overlap legacy game broadcast sentinels `0x7FFE` and `0x7FFF`.
+     - Router-assigned IDs must remain representable by existing signed 16-bit game fields such as `network_player_id`, `net_host_id`, `host_election_id`, and `local_net_id`.
+     - Router-assigned IDs are therefore constrained to `1..0x7FFD`.
+     - Allocation wraps to the first free active-safe ID and never collides with a currently connected client.
+     - If all IDs are active, the router returns `ROUTER_ERROR_ROUTER_FULL` instead of assigning a duplicate or sentinel ID.
+     - Status: implemented and covered by `test_router_core` allocator cases.
+   - Widen legacy user-list APIs:
+     - `netcode::Net_Get_Users_()` and current `NETSTART` buffers must carry at least 16-bit IDs, not `uint8_t` IDs.
+     - Status: `Net_Get_Users_()` now accepts `int16_t*`; active `NETSTART` user-list buffers and the TEN stub signature were widened.
+   - Update `netcode.cpp` mode 0 to use `netadapter`:
+     - Replace `WINNET::Init_Connection_(2)` with adapter initialization and router endpoint selection.
+     - Replace `WINNET::Refresh_Game_List_()` with router session listing.
+     - Replace `WINNET::Create_Game_()` with adapter session registration.
+     - Replace `WINNET::Join_Game_()` with adapter session join.
+     - Keep modem/TEN branches untouched until the router path is stable.
+     - Preserve the public `netcode` API so higher gameplay code does not need a large first-pass rewrite.
+     - Keep `Net_Get_Game_Count_()`, `Net_Get_Game_Name_()`, `Net_Create_Game_()`, `Net_Join_Game_()`, `Net_Get_Users_()`, `Net_Disable_New_Players_()`, `Net_Send_Message_()`, `Net_Update_()`, and `Net_Status_()` behavior-compatible from callers' point of view.
+     - Status: initial mode 0 wiring is implemented and the main `orion2re` target builds.
+   - Bypass `transprt.cpp` for router-backed gameplay traffic:
+     - TCP router frames already provide reliable ordered delivery, so the legacy ACK/burst/fragmentation transport should not be used on the router path.
+     - Encode each gameplay send as one router game envelope containing:
+       - game message type
+       - payload byte count
+       - payload bytes
+     - Send the game envelope as router `SEND_TO` or `SEND_BROADCAST` payload.
+     - On receive, decode the small game envelope and invoke the existing registered gameplay receive callback, currently `NETMOX::Receive_Message_()` through `netcode::_recv_fn`.
+     - Keep `transprt.cpp` compiled but unused initially, then delete it after router mode is proven.
+     - For compatibility, make router-mode `Net_Status_()` report send success once the client layer accepts/queues the frame; no long-running `_tpSending` loop should remain on the router path.
+     - Status: initial router-mode send/receive bypass is implemented through `netadapter`; broader `comcore` cleanup remains.
+   - Simplify `comcore` on the router path:
+     - Short term: keep `comcore::ComInit_()` only as callback/buffer setup if that minimizes gameplay churn.
+     - Route mode 0 sends and polls through `netadapter` instead of `WINNET::Send_Message_()` and `WINNET::Poll_Message_()`.
+     - Remove router-mode handling for DirectPlay session packets such as create-player, destroy-player, and keepalive packets.
+     - Treat router member events as the source of truth for membership changes.
+     - Medium term: split `comcore` into a deleted legacy transport path and a simple router dispatch path.
+     - Status: pending cleanup; mode 0 no longer relies on comcore for active send/update, but `ComInit_()` is still used for legacy initialization side effects.
+   - Wire router membership loss into `NETMOX` recovery:
+     - Add an explicit adapter/game bridge for abrupt disconnects, for example `NETMOX::Handle_Network_Player_Disconnected_(int player_idx)`.
+     - Map router network IDs to game player slots using existing game-owned state such as `MOX::_player[i].network_player_id` and `NETMOX::Net_Id_To_Player_Id_()`.
+     - The router/client layer only reports `MEMBER_LEFT`; gameplay owns the dropout-to-AI policy.
+     - For abrupt disconnect, remaining clients should deterministically elect the recovery coordinator from shared game state, initially lowest remaining connected game player index.
+     - Only the elected coordinator should synthesize and broadcast the existing game-level dropout/AI takeover packet.
+     - Reuse `NETMOX::Decode_Drop_Out_Info_()` and `RUSS::Make_Player_Into_AI_()` paths where practical.
+     - Status: pending; current netcode logs member-left/session events but does not yet invoke gameplay recovery.
+   - Update multiplayer UI session flow:
+     - Keep the first pass minimally invasive by preserving current session-list display behavior.
+     - Internally track router `session_id` instead of joining solely by session name because names are ambiguous.
+     - Session records should carry router ID, session ID, session name, host name, player counts, build string, and open/closed state.
+     - Later UI polish can expose the extra router/session metadata directly.
+     - Status: adapter caches router session IDs, but existing UI still passes names through the legacy netcode API.
+   - Bootstrap behavior and UI mode mapping:
+     - Make the LAN button act as the LAN router mode toggle.
+     - LAN mode should use local router discovery and/or an embedded local router service for hosting.
+     - For LAN hosting, start the existing blocking `Router_Service_Run()` on an SDL-managed worker thread, then connect the local client to it.
+     - Stop and join the embedded router thread during multiplayer shutdown.
+     - Repurpose the modem path as the online/direct-IP adapter path.
+     - Online/direct-IP mode should connect to a manually entered router host/IP and TCP port, defaulting to port `47800`.
+     - Keep LAN and online modes using the same router protocol after bootstrap; only endpoint discovery differs.
+     - Status: direct endpoint configuration currently uses the existing modem reset text field as a temporary host string source when present; proper UI mapping remains pending.
+   - Remove `WINNET` after adapter parity:
+     - First remove mode 0 call sites of `WINNET::*` from `netcode.cpp`, `comcore.cpp`, `transprt.cpp`, and related gameplay code.
+     - Remove public includes of `winnet.h` from active code.
+     - Delete `src/game/winnet.cpp` and `src/game/winnet.h` once no active code references them.
+     - Remove DirectPlay import-library generation and `dplayx.def` from the active build if they become unused.
+     - Retire or rename `ORION2RE_ENABLE_NETWORKING` so it no longer means legacy DirectPlay networking.
+     - Status: pending; `WINNET` still exists and is still compiled, but active mode 0 `netcode` path no longer initializes/sends/receives through it.
+   - Testing checkpoints:
+     - Add unit tests for `router_client` connect/hello/list/create/join/send/receive/event handling.
+     - Add unit tests for `netadapter` session-list caching, local ID propagation, membership tracking, direct send, broadcast send, and member-left exposure.
+     - Add an integration-style test using an in-process `s_router_service` plus two clients.
+     - Keep existing `test_router_protocol`, `test_router_core`, and `test_router_service` passing.
+     - Build with legacy DirectPlay disabled and confirm router networking does not require Windows SDK or DirectPlay headers.
+     - Latest validation: `test_router_protocol`, `test_router_core`, `test_router_service`, `test_router_client`, and `test_netadapter` pass; `orion2re` builds in `build-router-tests`.

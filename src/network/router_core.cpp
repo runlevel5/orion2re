@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <limits>
 #include <utility>
 
 namespace network::router {
@@ -18,6 +19,53 @@ s_router_outbound_message Make_Error_(t_router_connection_id connection_id, uint
     s_router_message response = Make_Message_(ROUTER_MESSAGE_ERROR, request_id);
     Encode_Error_Payload(code, message, &response.payload);
     return {connection_id, std::move(response)};
+}
+
+uint32_t Next_Network_Id_(uint32_t network_id) {
+    if (network_id >= ROUTER_MAX_ASSIGNED_NETWORK_ID || network_id < ROUTER_MIN_ASSIGNED_NETWORK_ID) {
+        return ROUTER_MIN_ASSIGNED_NETWORK_ID;
+    }
+    return network_id + 1;
+}
+
+uint32_t Allocate_Network_Id_(s_router_core_state* state) {
+    uint32_t candidate = state->next_network_id;
+    for (uint32_t attempts = 0; attempts < ROUTER_ASSIGNED_NETWORK_ID_COUNT; ++attempts) {
+        if (candidate < ROUTER_MIN_ASSIGNED_NETWORK_ID || candidate > ROUTER_MAX_ASSIGNED_NETWORK_ID) {
+            candidate = ROUTER_MIN_ASSIGNED_NETWORK_ID;
+        }
+
+        if (state->network_to_connection.find(candidate) == state->network_to_connection.end()) {
+            state->next_network_id = Next_Network_Id_(candidate);
+            return candidate;
+        }
+
+        candidate = Next_Network_Id_(candidate);
+    }
+
+    return 0;
+}
+
+uint32_t Next_Session_Id_(uint32_t session_id) {
+    if (session_id == std::numeric_limits<uint32_t>::max() || session_id == 0) {
+        return 1;
+    }
+    return session_id + 1;
+}
+
+uint32_t Allocate_Session_Id_(s_router_core_state* state) {
+    uint32_t candidate = state->next_session_id != 0 ? state->next_session_id : 1;
+    const uint32_t first_candidate = candidate;
+
+    do {
+        if (candidate != 0 && state->sessions.find(candidate) == state->sessions.end()) {
+            state->next_session_id = Next_Session_Id_(candidate);
+            return candidate;
+        }
+        candidate = Next_Session_Id_(candidate);
+    } while (candidate != first_candidate);
+
+    return 0;
 }
 
 s_router_message Make_Routed_Game_Data_(const s_router_client_state* sender, uint32_t target_network_id, const s_router_message* message) {
@@ -192,7 +240,7 @@ void Router_Core_Init(s_router_core_state* state, const char* router_id) {
     }
 
     Router_Copy_String(state->router_id, sizeof(state->router_id), (router_id != nullptr && router_id[0] != '\0') ? router_id : "router");
-    state->next_network_id = 1;
+    state->next_network_id = ROUTER_MIN_ASSIGNED_NETWORK_ID;
     state->next_session_id = 1;
     state->clients.clear();
     state->network_to_connection.clear();
@@ -255,8 +303,14 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
             return;
         }
 
+        const uint32_t network_id = Allocate_Network_Id_(state);
+        if (network_id == 0) {
+            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_ROUTER_FULL, "router has no available network ids"));
+            return;
+        }
+
         client.greeted = true;
-        client.network_id = state->next_network_id++;
+        client.network_id = network_id;
         Router_Copy_String(client.client_name, sizeof(client.client_name), hello.client_name[0] != '\0' ? hello.client_name : "Player");
         Router_Copy_String(client.build_string, sizeof(client.build_string), hello.build_string);
         state->network_to_connection[client.network_id] = connection_id;
@@ -304,7 +358,11 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
         }
 
         s_router_session_state session;
-        session.info.session_id = state->next_session_id++;
+        session.info.session_id = Allocate_Session_Id_(state);
+        if (session.info.session_id == 0) {
+            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_ROUTER_FULL, "router has no available session ids"));
+            return;
+        }
         Router_Copy_String(session.info.router_id, sizeof(session.info.router_id), state->router_id);
         Router_Copy_String(session.info.session_name, sizeof(session.info.session_name), registration.session_name);
         Router_Copy_String(session.info.host_name, sizeof(session.info.host_name), registration.host_name[0] != '\0' ? registration.host_name : client.client_name);

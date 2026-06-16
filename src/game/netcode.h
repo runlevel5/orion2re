@@ -60,9 +60,9 @@ namespace netcode {
     void __cdecl Set_Null_Modem_Host_();
 
     /** Writes connected user IDs into the caller buffer and returns the count.
-     * @param users Output buffer for user IDs, or nullptr to query the count only.
+     * @param users Output buffer for 16-bit user IDs, or nullptr to query the count only.
      */
-    int32_t __cdecl Net_Get_Users_(uint8_t* users);
+    int32_t __cdecl Net_Get_Users_(int16_t* users);
 
     /** Prevents DirectPlay from accepting new players. */
     void __cdecl Net_Disable_New_Players_();

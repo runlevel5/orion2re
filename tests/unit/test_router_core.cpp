@@ -121,6 +121,92 @@ DOCTEST_TEST_CASE("hello assigns stable network ids and register exposes session
     DOCTEST_CHECK(sessions[0].session_id == 1);
 }
 
+DOCTEST_TEST_CASE("network id allocation skips legacy broadcast sentinels and wraps to an unused id") {
+    s_router_core_state core;
+    Router_Core_Init(&core, "router-test");
+    Router_Core_Open_Connection(&core, 1);
+    Router_Core_Open_Connection(&core, 2);
+
+    core.next_network_id = ROUTER_MAX_ASSIGNED_NETWORK_ID;
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Hello_("last", 1));
+    DOCTEST_REQUIRE(output.size() == 1);
+
+    s_router_welcome_payload welcome;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Welcome_Payload(&output[0].message.payload, &welcome, &error));
+    DOCTEST_CHECK(welcome.network_id == ROUTER_MAX_ASSIGNED_NETWORK_ID);
+
+    output = Handle_Message_(&core, 2, Make_Hello_("wrapped", 2));
+    DOCTEST_REQUIRE(output.size() == 1);
+    DOCTEST_REQUIRE(Decode_Welcome_Payload(&output[0].message.payload, &welcome, &error));
+    DOCTEST_CHECK(welcome.network_id == ROUTER_MIN_ASSIGNED_NETWORK_ID);
+    DOCTEST_CHECK(welcome.network_id != ROUTER_RESERVED_BROADCAST_EXCLUDING_SELF_ID);
+    DOCTEST_CHECK(welcome.network_id != ROUTER_RESERVED_BROADCAST_INCLUDING_SELF_ID);
+}
+
+DOCTEST_TEST_CASE("network id allocation never collides with an active connection after wrap") {
+    s_router_core_state core;
+    Router_Core_Init(&core, "router-test");
+    Router_Core_Open_Connection(&core, 1);
+    Router_Core_Open_Connection(&core, 2);
+
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Hello_("first", 1));
+    DOCTEST_REQUIRE(output.size() == 1);
+    core.next_network_id = ROUTER_MIN_ASSIGNED_NETWORK_ID;
+
+    output = Handle_Message_(&core, 2, Make_Hello_("second", 2));
+    DOCTEST_REQUIRE(output.size() == 1);
+
+    s_router_welcome_payload welcome;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Welcome_Payload(&output[0].message.payload, &welcome, &error));
+    DOCTEST_CHECK(welcome.network_id == ROUTER_MIN_ASSIGNED_NETWORK_ID + 1);
+}
+
+DOCTEST_TEST_CASE("network id allocation reports router full when all game-compatible ids are active") {
+    s_router_core_state core;
+    Router_Core_Init(&core, "router-test");
+    Router_Core_Open_Connection(&core, 1);
+
+    for (uint32_t network_id = ROUTER_MIN_ASSIGNED_NETWORK_ID; network_id <= ROUTER_MAX_ASSIGNED_NETWORK_ID; ++network_id) {
+        core.network_to_connection[network_id] = network_id;
+    }
+
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Hello_("overflow", 1));
+    DOCTEST_REQUIRE(output.size() == 1);
+    DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_ERROR);
+
+    s_router_error_payload error_payload;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Error_Payload(&output[0].message.payload, &error_payload, &error));
+    DOCTEST_CHECK(error_payload.code == ROUTER_ERROR_ROUTER_FULL);
+    DOCTEST_CHECK(Router_Core_Client_Network_Id(&core, 1) == 0);
+}
+
+DOCTEST_TEST_CASE("session id allocation wraps without colliding with active sessions") {
+    s_router_core_state core;
+    Router_Core_Init(&core, "router-test");
+    Router_Core_Open_Connection(&core, 1);
+    Router_Core_Open_Connection(&core, 2);
+    Handle_Message_(&core, 1, Make_Hello_("host-a", 1));
+    Handle_Message_(&core, 2, Make_Hello_("host-b", 2));
+
+    core.next_session_id = UINT32_MAX;
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Register_(3));
+    DOCTEST_REQUIRE(output.size() == 2);
+    DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_SESSION_REGISTERED);
+
+    s_router_session_info session;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Session_Info_Payload(&output[0].message.payload, &session, &error));
+    DOCTEST_CHECK(session.session_id == UINT32_MAX);
+
+    output = Handle_Message_(&core, 2, Make_Register_(4));
+    DOCTEST_REQUIRE(output.size() == 2);
+    DOCTEST_REQUIRE(Decode_Session_Info_Payload(&output[0].message.payload, &session, &error));
+    DOCTEST_CHECK(session.session_id == 1);
+}
+
 DOCTEST_TEST_CASE("join plus direct and broadcast sends route opaque game payloads") {
     s_router_core_state core;
     Router_Core_Init(&core, "router-test");

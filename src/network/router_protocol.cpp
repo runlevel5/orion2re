@@ -101,7 +101,8 @@ void Router_Copy_String(char* destination, uint32_t destination_size, const char
         return;
     }
 
-    std::snprintf(destination, destination_size, "%s", source);
+    std::strncpy(destination, source, destination_size - 1);
+    destination[destination_size - 1] = '\0';
 }
 
 Bit_Stream::Bit_Stream() = default;

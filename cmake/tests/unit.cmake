@@ -16,6 +16,10 @@ function(orion2re_add_unit_test TARGET_NAME)
         "${CMAKE_CURRENT_SOURCE_DIR}/tests"
     )
 
+    target_precompile_headers(${TARGET_NAME} PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
+    )
+
     target_link_libraries(${TARGET_NAME} PRIVATE
         SDL3::SDL3-static
         ${ORION2RE_TEST_LIBRARIES}
@@ -23,9 +27,6 @@ function(orion2re_add_unit_test TARGET_NAME)
 
     if(MSVC)
         target_compile_options(${TARGET_NAME} PRIVATE /W3 /permissive-)
-        target_precompile_headers(${TARGET_NAME} PRIVATE
-            "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
-        )
         target_compile_definitions(${TARGET_NAME} PRIVATE
             WIN32
             DOCTEST_CONFIG_NO_WINDOWS_SEH
@@ -90,6 +91,31 @@ orion2re_add_unit_test(test_router_service
     SOURCES
         tests/unit/test_router_service.cpp
     PRODUCTION_SOURCES
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+)
+
+orion2re_add_unit_test(test_netadapter
+    SOURCES
+        tests/unit/test_netadapter.cpp
+    PRODUCTION_SOURCES
+        src/game/netadapter.cpp
+        src/network/router_client.cpp
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+)
+
+orion2re_add_unit_test(test_router_client
+    SOURCES
+        tests/unit/test_router_client.cpp
+    PRODUCTION_SOURCES
+        src/network/router_client.cpp
         src/network/router_core.cpp
         src/network/router_protocol.cpp
         src/network/router_service.cpp

@@ -23,7 +23,7 @@ namespace ten {
     }
 
     /* Returns TEN user data through a caller-provided buffer; current stub always returns 0. */
-    inline int32_t __cdecl TEN_Get_Users_(uint8_t*) {
+    inline int32_t __cdecl TEN_Get_Users_(int16_t*) {
         return 0;
     }
 

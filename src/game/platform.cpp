@@ -14,7 +14,7 @@ namespace platform {
 		SDL_Texture* g_sdl_present_texture;
 		SDL_Surface* g_sdl_screen_index_surface;
 		SDL_Surface* g_sdl_present_argb_surface;
-		SDL_Surface* g_sdl_cursor_surfaces[2];
+		SDL_Surface* g_sdl_cursor_surface;
 		SDL_Palette* g_sdl_present_palette;
 		uint32_t* g_sdl_present_pixels;
 		video::s_palette_color g_present_palette_entries[256];
@@ -44,19 +44,23 @@ namespace platform {
 		};
 
 		SDL_Mutex* g_input_queue_mutex;
+		SDL_Mutex* g_present_cursor_mutex;
 		s_input_event g_input_event_queue[k_input_queue_capacity];
 		uint16_t g_input_queue_read;
 		uint16_t g_input_queue_write;
 		uint16_t g_sdl_mouse_buttons;
-		s_present_cursor_state g_present_cursor_states[2];
-		SDL_AtomicInt g_present_cursor_state_index;
+		s_present_cursor_state g_pending_cursor_state;
+		s_present_cursor_state g_active_cursor_state;
+		uint32_t g_pending_cursor_generation;
+		uint32_t g_applied_cursor_generation;
 		SDL_AtomicInt g_present_mouse_x;
 		SDL_AtomicInt g_present_mouse_y;
 		SDL_AtomicInt g_present_refresh_requested;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
 		bool Ensure_Present_Palette_();
-		bool Ensure_Cursor_Surface_(int32_t cursor_state_index);
+		bool Ensure_Cursor_Surface_();
+		void Apply_Pending_Cursor_State_();
 		void Blit_Cursor_On_Present_Surface_();
 
 		void Request_Present_Refresh_() {
@@ -361,17 +365,12 @@ namespace platform {
 			return g_sdl_present_palette != nullptr;
 		}
 
-		bool Ensure_Cursor_Surface_(int32_t cursor_state_index) {
-			if (cursor_state_index < 0 || cursor_state_index >= 2) {
-				return false;
-			}
-
-			if (g_sdl_cursor_surfaces[cursor_state_index] != nullptr) {
+		bool Ensure_Cursor_Surface_() {
+			if (g_sdl_cursor_surface != nullptr) {
 				return true;
 			}
 
-			if (!Ensure_Present_Palette_() ||
-				g_present_cursor_states[cursor_state_index].pixels == nullptr) {
+			if (!Ensure_Present_Palette_() || g_cursor_surface_1 == nullptr) {
 				return false;
 			}
 
@@ -379,7 +378,7 @@ namespace platform {
 				k_cursor_dimension,
 				k_cursor_dimension,
 				SDL_PIXELFORMAT_INDEX8,
-				g_present_cursor_states[cursor_state_index].pixels,
+				g_cursor_surface_1,
 				k_cursor_dimension);
 			if (cursor_surface == nullptr) {
 				return false;
@@ -391,8 +390,27 @@ namespace platform {
 				return false;
 			}
 
-			g_sdl_cursor_surfaces[cursor_state_index] = cursor_surface;
+			g_sdl_cursor_surface = cursor_surface;
 			return true;
+		}
+
+		void Apply_Pending_Cursor_State_() {
+			if (g_present_cursor_mutex == nullptr ||
+				g_cursor_surface_1 == nullptr ||
+				_cursor_surface == nullptr) {
+				return;
+			}
+
+			SDL_LockMutex(g_present_cursor_mutex);
+			if (g_pending_cursor_generation != g_applied_cursor_generation) {
+				g_active_cursor_state.offset = g_pending_cursor_state.offset;
+				g_active_cursor_state.shape = g_pending_cursor_state.shape;
+				g_active_cursor_state.enabled = g_pending_cursor_state.enabled;
+				g_active_cursor_state.pixels = g_cursor_surface_1;
+				memcpy(g_cursor_surface_1, _cursor_surface, k_cursor_pixel_count);
+				g_applied_cursor_generation = g_pending_cursor_generation;
+			}
+			SDL_UnlockMutex(g_present_cursor_mutex);
 		}
 
 		bool Ensure_Present_Backend_() {
@@ -481,17 +499,14 @@ namespace platform {
 				}
 			}
 
-			Ensure_Cursor_Surface_(0);
-			Ensure_Cursor_Surface_(1);
+			Ensure_Cursor_Surface_();
 			return true;
 		}
 
 		void Destroy_Present_Backend_() {
-			for (int32_t i = 0; i < 2; ++i) {
-				if (g_sdl_cursor_surfaces[i] != nullptr) {
-					SDL_DestroySurface(g_sdl_cursor_surfaces[i]);
-					g_sdl_cursor_surfaces[i] = nullptr;
-				}
+			if (g_sdl_cursor_surface != nullptr) {
+				SDL_DestroySurface(g_sdl_cursor_surface);
+				g_sdl_cursor_surface = nullptr;
 			}
 
 			if (g_sdl_present_argb_surface != nullptr) {
@@ -568,9 +583,8 @@ namespace platform {
 				return;
 			}
 
-			const int32_t cursor_state_index = SDL_GetAtomicInt(&g_present_cursor_state_index);
-			const s_present_cursor_state& cursor_state =
-				g_present_cursor_states[cursor_state_index];
+			Apply_Pending_Cursor_State_();
+			const s_present_cursor_state& cursor_state = g_active_cursor_state;
 
 			if (cursor_state.pixels == nullptr ||
 				cursor_state.enabled == 0 ||
@@ -578,7 +592,7 @@ namespace platform {
 				return;
 			}
 
-			if (!Ensure_Cursor_Surface_(cursor_state_index)) {
+			if (!Ensure_Cursor_Surface_()) {
 				return;
 			}
 
@@ -589,7 +603,7 @@ namespace platform {
 
 			SDL_Rect dst_rect = {dst_x0, dst_y0, k_cursor_dimension, k_cursor_dimension};
 			(void)SDL_BlitSurface(
-				g_sdl_cursor_surfaces[cursor_state_index],
+				g_sdl_cursor_surface,
 				nullptr,
 				g_sdl_present_argb_surface,
 				&dst_rect);
@@ -753,8 +767,10 @@ namespace platform {
         }
         _cursor_surface = nullptr;
 
-        g_present_cursor_states[0].pixels = nullptr;
-        g_present_cursor_states[1].pixels = nullptr;
+        g_pending_cursor_state = {};
+        g_active_cursor_state = {};
+        g_pending_cursor_generation = 0;
+        g_applied_cursor_generation = 0;
 
         video::Free_Page_Buffers_();
         video::Shutdown_Off_Page_Ownership_();
@@ -951,17 +967,24 @@ namespace platform {
         memset(platform::g_cursor_surface_1, 0, k_cursor_pixel_count);
         memset(platform::_cursor_surface, 0, k_cursor_pixel_count);
 
-        g_present_cursor_states[0].pixels = platform::g_cursor_surface_1;
-        g_present_cursor_states[1].pixels = platform::_cursor_surface;
-        g_present_cursor_states[0].offset = 0;
-        g_present_cursor_states[1].offset = 0;
-        g_present_cursor_states[0].shape = 0;
-        g_present_cursor_states[1].shape = 0;
-        g_present_cursor_states[0].enabled = 0;
-        g_present_cursor_states[1].enabled = 0;
-        SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
-		Ensure_Cursor_Surface_(0);
-		Ensure_Cursor_Surface_(1);
+        if (g_present_cursor_mutex != nullptr) {
+            SDL_LockMutex(g_present_cursor_mutex);
+        }
+
+        g_pending_cursor_state.pixels = platform::_cursor_surface;
+        g_pending_cursor_state.offset = 0;
+        g_pending_cursor_state.shape = 0;
+        g_pending_cursor_state.enabled = 0;
+        g_active_cursor_state.pixels = platform::g_cursor_surface_1;
+        g_active_cursor_state.offset = 0;
+        g_active_cursor_state.shape = 0;
+        g_active_cursor_state.enabled = 0;
+        g_pending_cursor_generation = 0;
+        g_applied_cursor_generation = 0;
+
+        if (g_present_cursor_mutex != nullptr) {
+            SDL_UnlockMutex(g_present_cursor_mutex);
+        }
     }
 
     void __cdecl Toggle_Pages_Stub_() {
@@ -986,14 +1009,28 @@ namespace platform {
 		g_input_queue_write = 0;
 		g_sdl_mouse_buttons = 0;
 		SDL_SetAtomicInt(&g_present_refresh_requested, 0);
-		SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
 		Set_Present_Mouse_Position_(0, 0);
+		g_pending_cursor_state = {};
+		g_active_cursor_state = {};
+		g_pending_cursor_generation = 0;
+		g_applied_cursor_generation = 0;
 
 		if (g_input_queue_mutex == nullptr) {
 			g_input_queue_mutex = SDL_CreateMutex();
 		}
 		if (g_input_queue_mutex == nullptr) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
+			SDL_Quit();
+			return 0;
+		}
+
+		if (g_present_cursor_mutex == nullptr) {
+			g_present_cursor_mutex = SDL_CreateMutex();
+		}
+		if (g_present_cursor_mutex == nullptr) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
 			SDL_Quit();
 			return 0;
 		}
@@ -1011,6 +1048,10 @@ namespace platform {
         g_sdl_window = SDL_CreateWindow("Microprose", nWidth, nHeight, window_flags);
         if (g_sdl_window == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateWindow failed: %s", SDL_GetError());
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
             SDL_Quit();
             return 0;
         }
@@ -1023,6 +1064,10 @@ namespace platform {
         if (!Create_Video_Buffers_(4)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: Create_Video_Buffers failed");
             Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
             SDL_Quit();
             return 0;
         }
@@ -1033,6 +1078,10 @@ namespace platform {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateThread failed: %s", SDL_GetError());
             Cleanup_Surfaces();
             Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
             SDL_Quit();
             return 0;
         }
@@ -1057,6 +1106,10 @@ namespace platform {
 		if (g_input_queue_mutex != nullptr) {
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
+		}
+		if (g_present_cursor_mutex != nullptr) {
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
 		}
         SDL_Quit();
 
@@ -1090,18 +1143,22 @@ namespace platform {
     }
 
     void __cdecl Update_Cursor_Image_() {
-        if (g_present_cursor_states[0].pixels == nullptr ||
-            g_present_cursor_states[1].pixels == nullptr) {
+        if (_cursor_surface == nullptr || g_present_cursor_mutex == nullptr) {
             return;
         }
 
-        const int32_t read_index = SDL_GetAtomicInt(&g_present_cursor_state_index);
-        const int32_t write_index = (read_index == 0) ? 1 : 0;
-        s_present_cursor_state& cursor_state = g_present_cursor_states[write_index];
+        const int16_t cursor_offset = (int16_t)mouse::Get_Pointer_Offset_();
+        const int16_t cursor_shape = (int16_t)mouse::Get_Pointer_Image_Number_();
+        const uint8_t cursor_enabled = (mouse::Mouse_Enabled_() != 0) ? 1 : 0;
+        int16_t published_cursor_shape = 0;
 
-        cursor_state.offset = (int16_t)mouse::Get_Pointer_Offset_();
-        cursor_state.shape = (int16_t)mouse::Get_Pointer_Image_Number_();
-        cursor_state.enabled = (mouse::Mouse_Enabled_() != 0) ? 1 : 0;
+        SDL_LockMutex(g_present_cursor_mutex);
+        s_present_cursor_state& cursor_state = g_pending_cursor_state;
+
+        cursor_state.pixels = _cursor_surface;
+        cursor_state.offset = cursor_offset;
+        cursor_state.shape = cursor_shape;
+        cursor_state.enabled = cursor_enabled;
 
         if (cursor_state.enabled != 0 &&
             cursor_state.shape > 0 &&
@@ -1119,9 +1176,11 @@ namespace platform {
             memset(cursor_state.pixels, 0, k_cursor_pixel_count);
         }
 
-        g_last_cursor_shape = (int32_t)cursor_state.shape;
-		Ensure_Cursor_Surface_(write_index);
-        SDL_SetAtomicInt(&g_present_cursor_state_index, write_index);
+        published_cursor_shape = cursor_state.shape;
+        ++g_pending_cursor_generation;
+        SDL_UnlockMutex(g_present_cursor_mutex);
+
+        g_last_cursor_shape = (int32_t)published_cursor_shape;
 		Request_Present_Refresh_();
     }
 
