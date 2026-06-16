@@ -63,6 +63,7 @@ uint32_t Session_Id(const s_adapter* adapter);
 bool Has_Pending_Client_Events(const s_adapter* adapter);
 
 bool Refresh_Game_List(s_adapter* adapter);
+uint32_t Game_List_Revision(const s_adapter* adapter);
 int32_t Game_Count(const s_adapter* adapter);
 const char* Game_Name(const s_adapter* adapter, uint32_t session_index);
 uint32_t Game_Session_Id(const s_adapter* adapter, uint32_t session_index);

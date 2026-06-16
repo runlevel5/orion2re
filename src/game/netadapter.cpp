@@ -58,6 +58,7 @@ struct s_state {
     std::deque<s_game_packet> packets;
     std::deque<s_event> events;
     uint32_t next_request_id = 1;
+    uint32_t session_list_revision = 0;
 };
 
 s_adapter::s_adapter()
@@ -80,6 +81,7 @@ void Init(s_adapter* adapter, const s_config* config) {
     adapter->state->packets.clear();
     adapter->state->events.clear();
     adapter->state->next_request_id = 1;
+    adapter->state->session_list_revision = 0;
 
     network::router::s_router_client_config client_config;
     Copy_Config_To_Client_(&adapter->state->config, &client_config);
@@ -118,6 +120,9 @@ void Pump(s_adapter* adapter) {
     network::router::s_router_client_event client_event;
     while (network::router::Router_Client_Pop_Event(&adapter->state->client, &client_event)) {
         switch (client_event.kind) {
+        case network::router::ROUTER_CLIENT_EVENT_SESSION_LIST:
+            adapter->state->session_list_revision++;
+            break;
         case network::router::ROUTER_CLIENT_EVENT_GAME_DATA: {
             s_game_packet packet;
             if (Decode_Game_Packet_(&client_event.message, &packet)) {
@@ -200,6 +205,13 @@ bool Refresh_Game_List(s_adapter* adapter) {
         return false;
     }
     return network::router::Router_Client_Request_Session_List(&adapter->state->client, adapter->state->next_request_id++);
+}
+
+uint32_t Game_List_Revision(const s_adapter* adapter) {
+    if (adapter == nullptr || adapter->state == nullptr) {
+        return 0;
+    }
+    return adapter->state->session_list_revision;
 }
 
 int32_t Game_Count(const s_adapter* adapter) {

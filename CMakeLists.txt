@@ -97,6 +97,7 @@ option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds"
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
 option(ORION2RE_ENABLE_NETWORKING "Enable legacy DirectPlay networking" OFF)
 option(ORION2RE_BUILD_TESTS "Build tests" OFF)
+option(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL "Exclude runtime executables from the default all target" ${ORION2RE_BUILD_TESTS})
 
 set(ORION2RE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests")
 
@@ -169,6 +170,12 @@ file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
+list(REMOVE_ITEM ORION2RE_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game/comcore.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game/transprt.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game/winnet.cpp"
+)
+
 set(ORION2RE_ROUTER_SOURCES
     src/network/router_cli.cpp
     src/network/router_core.cpp
@@ -183,6 +190,10 @@ add_executable(orion2re
     "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_bitstream.c"
     "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_hufftree.c"
 )
+
+if(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL)
+    set_target_properties(orion2re PROPERTIES EXCLUDE_FROM_ALL YES)
+endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
     ${ORION2RE_SOURCES}
@@ -211,6 +222,10 @@ add_executable(orion2re-router
     tools/router_main.cpp
     ${ORION2RE_ROUTER_SOURCES}
 )
+
+if(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL)
+    set_target_properties(orion2re-router PROPERTIES EXCLUDE_FROM_ALL YES)
+endif()
 
 target_compile_features(orion2re-router PRIVATE cxx_std_20)
 target_include_directories(orion2re-router PRIVATE

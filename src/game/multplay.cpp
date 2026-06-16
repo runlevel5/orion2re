@@ -2,6 +2,7 @@
 
 namespace {
     constexpr int kPlayerRemapPaletteStart = 144;
+    clock_t g_network_game_list_refresh_timer = 0;
 }
 
 namespace MULTPLAY {
@@ -1776,7 +1777,7 @@ int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
     int16_t input_field;
     int16_t scan_id;
 
-    WINNET::_net_refresh_timer = 0;
+    g_network_game_list_refresh_timer = 0;
     MOX2::Get_Auto_Function_(&saved_auto_fn);
     fields::Clear_Fields_();
     fields::Set_Input_Delay_(3);
@@ -1920,9 +1921,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 }
 
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
-        if (WINNET::_net_refresh_timer < clock() + 5000) {
-            WINNET::Refresh_Game_List_();
-            WINNET::_net_refresh_timer = clock();
+        if (g_network_game_list_refresh_timer == 0 || clock() >= g_network_game_list_refresh_timer + 5000) {
+            netcode::Net_Refresh_Game_List_();
+            g_network_game_list_refresh_timer = clock();
         }
 
         int16_t display_count;
@@ -1984,9 +1985,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
         clock_t now = clock();
-        if (now + 5000 /* 5 seconds */ > WINNET::_net_refresh_timer) {
-            WINNET::Refresh_Game_List_();
-            WINNET::_net_refresh_timer = clock();
+        if (g_network_game_list_refresh_timer == 0 || now >= g_network_game_list_refresh_timer + 5000) {
+            netcode::Net_Refresh_Game_List_();
+            g_network_game_list_refresh_timer = clock();
         }
 
         int16_t count = 10;

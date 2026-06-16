@@ -584,7 +584,6 @@ namespace NETSTART {
         }
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
-        transprt::_num_net_players = NETMOX::_net.num_connected_players;
 
         NETMOX::Broadcast_Game_Data_Differential_(1);
 
@@ -842,7 +841,6 @@ namespace NETSTART {
         NETMOX::Mox_Send_Message_(0x7FFE, 42, &payload, sizeof(payload));
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
-        transprt::_num_net_players = NETMOX::_net.num_connected_players;
         NETMOX::Broadcast_Game_Data_Differential_(1);
         NETMOX::_net.player_race_selected_flags[MOX::_PLAYER_NUM] = 1;
 

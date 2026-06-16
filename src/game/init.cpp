@@ -23,9 +23,6 @@ namespace init {
         sound::Init_Sound_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "init: sound initialized");
 
-        WINNET::Init_Providers_();
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "init: network providers initialized");
-
         if (*font_name == '\0') {
             sysfont::Load_System_Font_();
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "init: system font loaded");

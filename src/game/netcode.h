@@ -32,6 +32,9 @@ namespace netcode {
     /** Returns the number of discovered game sessions. */
     int32_t __cdecl Net_Get_Game_Count_();
 
+    /** Requests a fresh session list from the active router and returns the cached count after pumping for a response. */
+    int32_t __cdecl Net_Refresh_Game_List_();
+
     /** Returns the number of known players in the active session list. */
     int32_t __cdecl Get_Player_Count_();
 

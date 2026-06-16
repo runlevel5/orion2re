@@ -11,6 +11,7 @@ namespace netcode {
     namespace {
         netadapter::s_adapter _router_adapter;
         int32_t _router_last_send_successful;
+        uint32_t _router_wait_session_list_revision;
 
         void __cdecl Pump_Router_Packets_() {
             netadapter::Pump(&_router_adapter);
@@ -40,11 +41,11 @@ namespace netcode {
             }
         }
 
-        void __cdecl Pump_Router_Until_(bool (*predicate)()) {
-            clock_t start_time = clock();
+        void __cdecl Pump_Router_Until_(bool (*predicate)(), uint32_t timeout_ms) {
+            uint64_t start_time = SDL_GetTicks();
             while (!predicate()) {
                 Pump_Router_Packets_();
-                if ((uint32_t)(clock() - start_time) >= 120000) {
+                if ((uint32_t)(SDL_GetTicks() - start_time) >= timeout_ms) {
                     break;
                 }
                 SDL_Delay(1);
@@ -56,7 +57,7 @@ namespace netcode {
         }
 
         bool __cdecl Router_Session_List_Ready_() {
-            return netadapter::Game_Count(&_router_adapter) != 0 || !netadapter::Has_Pending_Client_Events(&_router_adapter);
+            return netadapter::Game_List_Revision(&_router_adapter) != _router_wait_session_list_revision;
         }
 
         bool __cdecl Router_Session_Ready_() {
@@ -72,6 +73,19 @@ namespace netcode {
                 }
             }
             return -1;
+        }
+
+        int32_t __cdecl Refresh_Router_Game_List_(uint32_t timeout_ms) {
+            if (_connection_type != 0) {
+                return 0;
+            }
+
+            _router_wait_session_list_revision = netadapter::Game_List_Revision(&_router_adapter);
+            if (!netadapter::Refresh_Game_List(&_router_adapter)) {
+                return netadapter::Game_Count(&_router_adapter);
+            }
+            Pump_Router_Until_(Router_Session_List_Ready_, timeout_ms);
+            return netadapter::Game_Count(&_router_adapter);
         }
 
         void __cdecl Init_Router_Config_(netadapter::s_config* config, const char* player_name, s_network* network) {
@@ -106,12 +120,11 @@ namespace netcode {
             netadapter::Init(&_router_adapter, &config);
             result = netadapter::Connect(&_router_adapter) ? 1 : 0;
             if (result != 0) {
-                Pump_Router_Until_(Router_Local_Id_Ready_);
+                Pump_Router_Until_(Router_Local_Id_Ready_, 5000);
                 result = Router_Local_Id_Ready_() ? 1 : 0;
             }
             if (result != 0) {
-                netadapter::Refresh_Game_List(&_router_adapter);
-                Pump_Router_Packets_();
+                Refresh_Router_Game_List_(1000);
             }
 
             _recv_fn = recv_fn_ptr;
@@ -137,12 +150,16 @@ namespace netcode {
         return 0;
     }
 
+    int32_t __cdecl Net_Refresh_Game_List_() {
+        return Refresh_Router_Game_List_(1000);
+    }
+
     int32_t __cdecl Get_Player_Count_() {
         if (_connection_type == 0) {
             Pump_Router_Packets_();
             return netadapter::Get_Users(&_router_adapter, nullptr, 0);
         }
-        return WINNET::_player_count;
+        return 0;
     }
 
     char* __cdecl Net_Get_Game_Name_(uint32_t session_idx) {
@@ -150,7 +167,7 @@ namespace netcode {
             Pump_Router_Packets_();
             return const_cast<char*>(netadapter::Game_Name(&_router_adapter, session_idx));
         }
-        return WINNET::Get_Game_Name_(session_idx);
+        return nullptr;
     }
 
     void __cdecl Net_Uninit_()
@@ -172,20 +189,18 @@ namespace netcode {
         (void)password;
         int32_t session_index = Find_Router_Game_By_Name_(game_name);
         if (session_index < 0) {
-            netadapter::Refresh_Game_List(&_router_adapter);
-            Pump_Router_Until_(Router_Session_List_Ready_);
+            Refresh_Router_Game_List_(1000);
             session_index = Find_Router_Game_By_Name_(game_name);
         }
         if (session_index < 0 || !netadapter::Join_Game(&_router_adapter, (uint32_t)session_index, player_name)) {
             return 0;
         }
 
-        Pump_Router_Until_(Router_Session_Ready_);
+        Pump_Router_Until_(Router_Session_Ready_, 5000);
         if (!Router_Session_Ready_()) {
             return 0;
         }
 
-        comcore::ComInit_(0x1c2, const_cast<char*>(game_name), _recv_fn);
         net::_thisHost = netadapter::Local_Network_Id(&_router_adapter);
 
         _netInitialized = 1;
@@ -237,7 +252,6 @@ namespace netcode {
             return;
         }
 
-        WINNET::Net_Disable_New_Players_();
     }
 
     uint32_t __cdecl Net_Host_ID_() {
@@ -320,12 +334,11 @@ namespace netcode {
             return 0;
         }
 
-        Pump_Router_Until_(Router_Session_Ready_);
+        Pump_Router_Until_(Router_Session_Ready_, 5000);
         if (!Router_Session_Ready_()) {
             return 0;
         }
 
-        comcore::ComInit_(0x1c2, const_cast<char*>(name), _recv_fn);
         net::_thisHost = netadapter::Local_Network_Id(&_router_adapter);
 
         _netInitialized = 1;
