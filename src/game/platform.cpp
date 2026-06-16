@@ -12,10 +12,12 @@ namespace platform {
 		SDL_Window* g_sdl_window;
 		SDL_Renderer* g_sdl_renderer;
 		SDL_Texture* g_sdl_present_texture;
+		SDL_Surface* g_sdl_screen_index_surface;
+		SDL_Surface* g_sdl_present_argb_surface;
+		SDL_Surface* g_sdl_cursor_surfaces[2];
+		SDL_Palette* g_sdl_present_palette;
 		uint32_t* g_sdl_present_pixels;
 		video::s_palette_color g_present_palette_entries[256];
-		uint32_t g_fps_window_start_ms;
-		uint32_t g_fps_frame_count;
 		constexpr int32_t k_cursor_dimension = 24;
 		constexpr int32_t k_cursor_pixel_count = k_cursor_dimension * k_cursor_dimension;
 		constexpr uint16_t k_input_queue_capacity = 256;
@@ -50,13 +52,31 @@ namespace platform {
 		SDL_AtomicInt g_present_cursor_state_index;
 		SDL_AtomicInt g_present_mouse_x;
 		SDL_AtomicInt g_present_mouse_y;
+		SDL_AtomicInt g_present_refresh_requested;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
-		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries);
+		bool Ensure_Present_Palette_();
+		bool Ensure_Cursor_Surface_(int32_t cursor_state_index);
+		void Blit_Cursor_On_Present_Surface_();
+
+		void Request_Present_Refresh_() {
+			SDL_SetAtomicInt(&g_present_refresh_requested, 1);
+		}
+
+		bool Consume_Present_Refresh_Request_() {
+			return SDL_SetAtomicInt(&g_present_refresh_requested, 0) != 0;
+		}
 
 		void Set_Present_Mouse_Position_(int16_t x, int16_t y) {
+			const int previous_x = SDL_GetAtomicInt(&g_present_mouse_x);
+			const int previous_y = SDL_GetAtomicInt(&g_present_mouse_y);
+
 			SDL_SetAtomicInt(&g_present_mouse_x, (int)x);
 			SDL_SetAtomicInt(&g_present_mouse_y, (int)y);
+
+			if (previous_x != (int)x || previous_y != (int)y) {
+				Request_Present_Refresh_();
+			}
 		}
 
 		uint16_t Previous_Input_Queue_Index_(uint16_t index) {
@@ -164,90 +184,6 @@ namespace platform {
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "platform: Force_Immediate_Process_Exit");
 			Prepare_Exit_();
 			exit(0);
-		}
-
-		void Fill_Rect_32_(int32_t x, int32_t y, int32_t width, int32_t height, uint32_t color) {
-			if (g_sdl_present_pixels == nullptr) {
-				return;
-			}
-
-			for (int32_t row = 0; row < height; ++row) {
-				const int32_t dst_y = y + row;
-				if (dst_y < 0 || dst_y >= video::g_screen_res_y) {
-					continue;
-				}
-
-				for (int32_t col = 0; col < width; ++col) {
-					const int32_t dst_x = x + col;
-					if (dst_x < 0 || dst_x >= video::g_screen_res_x) {
-						continue;
-					}
-
-					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] = color;
-				}
-			}
-		}
-
-		void Draw_Glyph_3x5_(int32_t x, int32_t y, char glyph, uint32_t color) {
-			static const uint8_t k_digits[10][5] = {
-				{0x7, 0x5, 0x5, 0x5, 0x7},
-				{0x2, 0x6, 0x2, 0x2, 0x7},
-				{0x7, 0x1, 0x7, 0x4, 0x7},
-				{0x7, 0x1, 0x7, 0x1, 0x7},
-				{0x5, 0x5, 0x7, 0x1, 0x1},
-				{0x7, 0x4, 0x7, 0x1, 0x7},
-				{0x7, 0x4, 0x7, 0x5, 0x7},
-				{0x7, 0x1, 0x1, 0x1, 0x1},
-				{0x7, 0x5, 0x7, 0x5, 0x7},
-				{0x7, 0x5, 0x7, 0x1, 0x7},
-			};
-			static const uint8_t k_f[5] = {0x7, 0x4, 0x6, 0x4, 0x4};
-			static const uint8_t k_p[5] = {0x6, 0x5, 0x6, 0x4, 0x4};
-			static const uint8_t k_s[5] = {0x7, 0x4, 0x7, 0x1, 0x7};
-			static const uint8_t k_colon[5] = {0x0, 0x2, 0x0, 0x2, 0x0};
-			const uint8_t* rows = nullptr;
-
-			if (glyph >= '0' && glyph <= '9') {
-				rows = k_digits[glyph - '0'];
-			} else if (glyph == 'F') {
-				rows = k_f;
-			} else if (glyph == 'P') {
-				rows = k_p;
-			} else if (glyph == 'S') {
-				rows = k_s;
-			} else if (glyph == ':') {
-				rows = k_colon;
-			}
-
-			if (rows == nullptr) {
-				return;
-			}
-
-			for (int32_t row = 0; row < 5; ++row) {
-				for (int32_t col = 0; col < 3; ++col) {
-					if ((rows[row] & (1 << (2 - col))) == 0) {
-						continue;
-					}
-
-					const int32_t dst_x = x + col;
-					const int32_t dst_y = y + row;
-					if (dst_x < 0 || dst_x >= video::g_screen_res_x || dst_y < 0 || dst_y >= video::g_screen_res_y) {
-						continue;
-					}
-
-					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] = color;
-				}
-			}
-		}
-
-		void Draw_Text_3x5_(int32_t x, int32_t y, const char* text, uint32_t color) {
-			if (text == nullptr) {
-				return;
-			}
-
-			for (int32_t i = 0; text[i] != '\0'; ++i) {
-				Draw_Glyph_3x5_(x + i * 4, y, text[i], color);
-			}
 		}
 
 		void Queue_Key_Code_(uint32_t key_code, uint32_t scan_code) {
@@ -405,45 +341,174 @@ namespace platform {
 		}
 
 		void Present_Published_Off_Page_() {
-			Update_Active_World_Frame_();
+			if (Update_Active_Screen_Frame_()) {
+				Request_Present_Refresh_();
+			}
+
+			if (!Consume_Present_Refresh_Request_()) {
+				return;
+			}
+
 			Present_Indexed_Buffer_(g_present_surface);
 		}
 
-		bool Ensure_Present_Backend_() {
-			if (g_sdl_renderer != nullptr && g_sdl_present_texture != nullptr && g_sdl_present_pixels != nullptr) {
+		bool Ensure_Present_Palette_() {
+			if (g_sdl_present_palette != nullptr) {
 				return true;
 			}
 
-			g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, nullptr);
-			if (g_sdl_renderer == nullptr) {
-				g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, "software");
-			}
-			if (g_sdl_renderer == nullptr) {
+			g_sdl_present_palette = SDL_CreatePalette(256);
+			return g_sdl_present_palette != nullptr;
+		}
+
+		bool Ensure_Cursor_Surface_(int32_t cursor_state_index) {
+			if (cursor_state_index < 0 || cursor_state_index >= 2) {
 				return false;
 			}
 
-			// Match the original frame-present cadence more closely by blocking on
-			// display refresh when the active renderer backend supports it.
-			(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+			if (g_sdl_cursor_surfaces[cursor_state_index] != nullptr) {
+				return true;
+			}
 
-			g_sdl_present_texture = SDL_CreateTexture(
-				g_sdl_renderer,
-				SDL_PIXELFORMAT_ARGB8888,
-				SDL_TEXTUREACCESS_STREAMING,
-				video::g_screen_res_x,
-				video::g_screen_res_y);
+			if (!Ensure_Present_Palette_() ||
+				g_present_cursor_states[cursor_state_index].pixels == nullptr) {
+				return false;
+			}
+
+			SDL_Surface* cursor_surface = SDL_CreateSurfaceFrom(
+				k_cursor_dimension,
+				k_cursor_dimension,
+				SDL_PIXELFORMAT_INDEX8,
+				g_present_cursor_states[cursor_state_index].pixels,
+				k_cursor_dimension);
+			if (cursor_surface == nullptr) {
+				return false;
+			}
+
+			if (!SDL_SetSurfacePalette(cursor_surface, g_sdl_present_palette) ||
+				!SDL_SetSurfaceColorKey(cursor_surface, true, 0)) {
+				SDL_DestroySurface(cursor_surface);
+				return false;
+			}
+
+			g_sdl_cursor_surfaces[cursor_state_index] = cursor_surface;
+			return true;
+		}
+
+		bool Ensure_Present_Backend_() {
+			if (g_sdl_renderer != nullptr &&
+				g_sdl_present_texture != nullptr &&
+				g_sdl_present_palette != nullptr &&
+				g_sdl_screen_index_surface != nullptr &&
+				g_sdl_present_argb_surface != nullptr &&
+				g_sdl_present_pixels != nullptr) {
+				return true;
+			}
+
+			if (g_sdl_renderer == nullptr) {
+				g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, nullptr);
+				if (g_sdl_renderer == nullptr) {
+					g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, "software");
+				}
+				if (g_sdl_renderer == nullptr) {
+					return false;
+				}
+
+				// Match the original frame-present cadence more closely by blocking on
+				// display refresh when the active renderer backend supports it.
+				(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+			}
+
 			if (g_sdl_present_texture == nullptr) {
+				g_sdl_present_texture = SDL_CreateTexture(
+					g_sdl_renderer,
+					SDL_PIXELFORMAT_ARGB8888,
+					SDL_TEXTUREACCESS_STREAMING,
+					video::g_screen_res_x,
+					video::g_screen_res_y);
+				if (g_sdl_present_texture == nullptr) {
+					return false;
+				}
+			}
+
+			if (g_sdl_present_pixels == nullptr) {
+				const size_t pixel_count =
+					(size_t)video::g_screen_res_x *
+					(size_t)video::g_screen_res_y;
+				g_sdl_present_pixels = (uint32_t*)malloc(pixel_count * sizeof(uint32_t));
+				if (g_sdl_present_pixels == nullptr) {
+					return false;
+				}
+				memset(g_sdl_present_pixels, 0, pixel_count * sizeof(uint32_t));
+			}
+
+			if (!Ensure_Present_Palette_()) {
 				return false;
 			}
 
-			g_sdl_present_pixels = (uint32_t*)malloc(
-				(size_t)video::g_screen_res_x *
-				(size_t)video::g_screen_res_y *
-				sizeof(uint32_t));
-			return g_sdl_present_pixels != nullptr;
+			if (g_sdl_screen_index_surface == nullptr) {
+				if (g_present_surface == nullptr) {
+					return false;
+				}
+
+				SDL_Surface* screen_index_surface = SDL_CreateSurfaceFrom(
+					video::g_screen_res_x,
+					video::g_screen_res_y,
+					SDL_PIXELFORMAT_INDEX8,
+					g_present_surface,
+					video::g_screen_res_x);
+				if (screen_index_surface == nullptr) {
+					return false;
+				}
+
+				if (!SDL_SetSurfacePalette(screen_index_surface, g_sdl_present_palette)) {
+					SDL_DestroySurface(screen_index_surface);
+					return false;
+				}
+
+				g_sdl_screen_index_surface = screen_index_surface;
+			}
+
+			if (g_sdl_present_argb_surface == nullptr) {
+				g_sdl_present_argb_surface = SDL_CreateSurfaceFrom(
+					video::g_screen_res_x,
+					video::g_screen_res_y,
+					SDL_PIXELFORMAT_ARGB8888,
+					g_sdl_present_pixels,
+					video::g_screen_res_x * (int32_t)sizeof(uint32_t));
+				if (g_sdl_present_argb_surface == nullptr) {
+					return false;
+				}
+			}
+
+			Ensure_Cursor_Surface_(0);
+			Ensure_Cursor_Surface_(1);
+			return true;
 		}
 
 		void Destroy_Present_Backend_() {
+			for (int32_t i = 0; i < 2; ++i) {
+				if (g_sdl_cursor_surfaces[i] != nullptr) {
+					SDL_DestroySurface(g_sdl_cursor_surfaces[i]);
+					g_sdl_cursor_surfaces[i] = nullptr;
+				}
+			}
+
+			if (g_sdl_present_argb_surface != nullptr) {
+				SDL_DestroySurface(g_sdl_present_argb_surface);
+				g_sdl_present_argb_surface = nullptr;
+			}
+
+			if (g_sdl_screen_index_surface != nullptr) {
+				SDL_DestroySurface(g_sdl_screen_index_surface);
+				g_sdl_screen_index_surface = nullptr;
+			}
+
+			if (g_sdl_present_palette != nullptr) {
+				SDL_DestroyPalette(g_sdl_present_palette);
+				g_sdl_present_palette = nullptr;
+			}
+
 			if (g_sdl_present_texture != nullptr) {
 				SDL_DestroyTexture(g_sdl_present_texture);
 				g_sdl_present_texture = nullptr;
@@ -460,47 +525,33 @@ namespace platform {
 			}
 		}
 
+		void Update_SDL_Palette_() {
+			if (g_sdl_present_palette == nullptr) {
+				return;
+			}
+
+			SDL_Color colors[256];
+			for (int32_t i = 0; i < 256; ++i) {
+				colors[i].r = g_present_palette_entries[i].r;
+				colors[i].g = g_present_palette_entries[i].g;
+				colors[i].b = g_present_palette_entries[i].b;
+				colors[i].a = 255;
+			}
+
+			(void)SDL_SetPaletteColors(g_sdl_present_palette, colors, 0, 256);
+		}
+
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels) {
 			if (src_pixels == nullptr || !Ensure_Present_Backend_()) {
 				return;
 			}
 
-			const int32_t pixel_count = video::g_screen_res_x * video::g_screen_res_y;
-			for (int32_t i = 0; i < pixel_count; ++i) {
-				const video::s_palette_color& pal = g_present_palette_entries[src_pixels[i]];
-				g_sdl_present_pixels[i] =
-					0xFF000000u |
-					((uint32_t)pal.r << 16) |
-					((uint32_t)pal.g << 8) |
-					(uint32_t)pal.b;
+			Update_SDL_Palette_();
+			if (!SDL_BlitSurface(g_sdl_screen_index_surface, nullptr, g_sdl_present_argb_surface, nullptr)) {
+				return;
 			}
 
-			Composite_Cursor_On_Present_Pixels_(g_present_palette_entries);
-
-#if ORION2RE_ENABLE_FPS_COUNTER
-			if (g_sdl_window != nullptr) {
-				const uint32_t now_ms = (uint32_t)SDL_GetTicks();
-				if (g_fps_window_start_ms == 0) {
-					g_fps_window_start_ms = now_ms;
-				}
-
-				++g_fps_frame_count;
-
-				static uint32_t s_displayed_fps_value = 0;
-				const uint32_t elapsed_ms = now_ms - g_fps_window_start_ms;
-				if (elapsed_ms >= 1000) {
-					s_displayed_fps_value = (g_fps_frame_count * 1000u) / elapsed_ms;
-					g_fps_window_start_ms = now_ms;
-					g_fps_frame_count = 0;
-				}
-
-				char fps_text[16];
-				snprintf(fps_text, sizeof(fps_text), "FPS:%u", s_displayed_fps_value);
-				Fill_Rect_32_(4, 4, 4 * (int32_t)strlen(fps_text) + 4, 9, 0xC0000000u);
-				Draw_Text_3x5_(6, 6, fps_text, 0xFFFFFFFFu);
-			}
-#endif
-
+			Blit_Cursor_On_Present_Surface_();
 			SDL_UpdateTexture(
 				g_sdl_present_texture,
 				nullptr,
@@ -512,8 +563,8 @@ namespace platform {
 			SDL_RenderPresent(g_sdl_renderer);
 		}
 
-		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries) {
-			if (g_sdl_present_pixels == nullptr || palette_entries == nullptr) {
+		void Blit_Cursor_On_Present_Surface_() {
+			if (g_sdl_present_argb_surface == nullptr) {
 				return;
 			}
 
@@ -527,36 +578,21 @@ namespace platform {
 				return;
 			}
 
+			if (!Ensure_Cursor_Surface_(cursor_state_index)) {
+				return;
+			}
+
 			const int32_t dst_x0 =
 				SDL_GetAtomicInt(&g_present_mouse_x) + (int32_t)cursor_state.offset;
 			const int32_t dst_y0 =
 				SDL_GetAtomicInt(&g_present_mouse_y) + (int32_t)cursor_state.offset;
 
-			for (int32_t row = 0; row < k_cursor_dimension; ++row) {
-				const int32_t dst_y = dst_y0 + row;
-				if (dst_y < 0 || dst_y >= video::g_screen_res_y) {
-					continue;
-				}
-
-				for (int32_t col = 0; col < k_cursor_dimension; ++col) {
-					const int32_t dst_x = dst_x0 + col;
-					if (dst_x < 0 || dst_x >= video::g_screen_res_x) {
-						continue;
-					}
-
-					const uint8_t pixel = cursor_state.pixels[row * k_cursor_dimension + col];
-					if (pixel == 0) {
-						continue;
-					}
-
-					const video::s_palette_color& pal = palette_entries[pixel];
-					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] =
-						0xFF000000u |
-						((uint32_t)pal.r << 16) |
-						((uint32_t)pal.g << 8) |
-						(uint32_t)pal.b;
-				}
-			}
+			SDL_Rect dst_rect = {dst_x0, dst_y0, k_cursor_dimension, k_cursor_dimension};
+			(void)SDL_BlitSurface(
+				g_sdl_cursor_surfaces[cursor_state_index],
+				nullptr,
+				g_sdl_present_argb_surface,
+				&dst_rect);
 		}
 	}
 
@@ -698,6 +734,8 @@ namespace platform {
 
     void Cleanup_Surfaces()
     {
+        Destroy_Present_Backend_();
+
         uint8_t* const alternate_cursor_surface = _cursor_surface;
 
         if (g_present_surface != nullptr) {
@@ -732,7 +770,7 @@ namespace platform {
 		g_main_window = nullptr;
     }
 
-	bool __cdecl Update_Active_World_Frame_() {
+	bool __cdecl Update_Active_Screen_Frame_() {
 		if (!video::Try_Begin_Off_Page_Present_()) {
 			return false;
 		}
@@ -753,6 +791,16 @@ namespace platform {
                 Force_Immediate_Process_Exit_();
             }
 
+			if (event.type == SDL_EVENT_WINDOW_EXPOSED ||
+				event.type == SDL_EVENT_WINDOW_RESIZED ||
+				event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED ||
+				event.type == SDL_EVENT_WINDOW_RESTORED ||
+				event.type == SDL_EVENT_WINDOW_MAXIMIZED ||
+				event.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED) {
+				Request_Present_Refresh_();
+				continue;
+			}
+
             if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
                 g_window_focus_state = 0;
                 continue;
@@ -761,6 +809,7 @@ namespace platform {
             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED) {
                 g_window_focus_state = 1;
                 SDL_HideCursor();
+				Request_Present_Refresh_();
                 continue;
             }
 
@@ -911,6 +960,8 @@ namespace platform {
         g_present_cursor_states[0].enabled = 0;
         g_present_cursor_states[1].enabled = 0;
         SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
+		Ensure_Cursor_Surface_(0);
+		Ensure_Cursor_Surface_(1);
     }
 
     void __cdecl Toggle_Pages_Stub_() {
@@ -934,10 +985,9 @@ namespace platform {
 		g_input_queue_read = 0;
 		g_input_queue_write = 0;
 		g_sdl_mouse_buttons = 0;
+		SDL_SetAtomicInt(&g_present_refresh_requested, 0);
 		SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
 		Set_Present_Mouse_Position_(0, 0);
-		g_fps_window_start_ms = 0;
-		g_fps_frame_count = 0;
 
 		if (g_input_queue_mutex == nullptr) {
 			g_input_queue_mutex = SDL_CreateMutex();
@@ -1070,7 +1120,9 @@ namespace platform {
         }
 
         g_last_cursor_shape = (int32_t)cursor_state.shape;
+		Ensure_Cursor_Surface_(write_index);
         SDL_SetAtomicInt(&g_present_cursor_state_index, write_index);
+		Request_Present_Refresh_();
     }
 
     void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count) {

@@ -6,10 +6,6 @@
 #define ORION2RE_64BIT_BUILD 0
 #endif
 
-#ifndef ORION2RE_ENABLE_FPS_COUNTER
-#define ORION2RE_ENABLE_FPS_COUNTER 1
-#endif
-
 extern uint8_t g_ten_game_number;
 extern int16_t g_cached_mouse_x;
 extern int16_t g_cached_mouse_y;
@@ -55,7 +51,7 @@ namespace platform {
 	int16_t __cdecl Get_Mouse_X_();
 	int16_t __cdecl Get_Mouse_Y_();
 	void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y);
-	bool __cdecl Update_Active_World_Frame_();
+	bool __cdecl Update_Active_Screen_Frame_();
 	uint32_t Lock_Appropriate_Render_Buffer();
 	void Unlock_Appropriate_Render_Buffer();
 	void Copy_Off_Page_To_Present_Surface_();
