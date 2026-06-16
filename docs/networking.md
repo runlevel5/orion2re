@@ -73,6 +73,8 @@ If a player drops:
 - their `network_player_id` is cleared
 - the session continues without them
 
+This behavior must be preserved in the new networking path, but it should be game-owned rather than router-owned. The router can report that a network member left; it cannot synthesize the game-state packet that converts that empire to AI because the router is intentionally packet-opaque.
+
 If the original human wants back in, a new session must be created, typically by loading a save and starting multiplayer again.
 
 This is important because it means the game already tolerates "disconnect means that human is gone for this session." That aligns naturally with ordinary TCP connection loss.
@@ -238,6 +240,8 @@ Therefore:
 - gameplay-level host election or promotion can still be useful and should remain in the game if we want live authority migration
 - if the router itself goes away, the session is considered lost and recovery falls back to rehost-from-save
 
+The important rule is that gameplay authority must not be assigned by the router. If the current gameplay host disappears, there is no host left to promote anyone. The remaining clients must perform a hostless, deterministic recovery election using router membership plus their synchronized game state. The router only reports who remains connected.
+
 ### Why
 
 - current game already cannot support true rejoin of a dropped player into an in-progress session
@@ -249,11 +253,15 @@ Therefore:
 
 If host authority is lost:
 
-- if the router is still up, the session can remain alive and gameplay authority may be promoted to another client by game logic
+- if the router is still up, the session remains alive while at least one client remains connected
+- if the gameplay host is lost, remaining clients independently choose a recovery coordinator / new gameplay host by a deterministic game-level rule
+- the elected recovery coordinator sends the game-level dropout / AI-takeover packet for the disconnected player to the remaining clients
 - if the router is gone, the session is considered lost
 - when the session is lost, players use a synchronized autosave or latest manual save
 - one player becomes the new host explicitly
 - a new session is created
+
+The recovery election must not require a message from the disconnected host. A simple first rule is acceptable, for example "lowest remaining connected game player index wins." The exact rule must be deterministic from state already known to every remaining client.
 
 ### Tradeoffs
 
@@ -295,6 +303,8 @@ The router protocol needs:
 
 - a routing/control envelope owned by the new implementation
 - opaque game payload bytes that are forwarded to clients or the host as needed
+
+The client layer may still preserve existing game-level packet IDs and payload layouts, including dropout packets such as `s_net_pack_drop_out_info`, but those packets are game payloads. They are not router control messages.
 
 ## Router responsibilities
 
@@ -341,7 +351,10 @@ Exact field names can change, but the logical operations should look like this:
 - `LEAVE_SESSION`
 - `SEND_TO`
 - `SEND_BROADCAST`
-- `DISCONNECT_NOTICE`
+- `MEMBER_LIST`
+- `MEMBER_JOINED`
+- `MEMBER_LEFT`
+- `SESSION_CLOSED`
 
 Potential envelope fields:
 
@@ -351,6 +364,8 @@ Potential envelope fields:
 - target network id
 - payload size
 - flags
+
+The router assigns the network ID for each TCP connection. Clients must not be allowed to claim their own sender ID. For routed game payloads, the router should ignore client-supplied sender/session fields and stamp forwarded packets with the server-side connection's validated network ID and session ID.
 
 ## Session model
 
@@ -363,6 +378,68 @@ The new design should preserve that model:
 - one router session record corresponds to one pending or active game
 
 This keeps the mental model close to the current UI and reduces rewrite pressure.
+
+## Session lifetime
+
+A router session should not be tied to the client that originally registered it.
+
+The session lifetime rule is:
+
+- a session remains alive while at least one client is still connected to it
+- when a non-final member leaves, the router removes that member and notifies the remaining members
+- when the last member leaves, the router deletes the session
+- if the registering client leaves while other members remain, the session becomes ownerless but remains routable
+
+An ownerless session should normally be closed to new joins. This matches the in-progress-game case where late rejoin is not supported. If pre-game lobby host transfer is wanted later, it should be added as an explicit game/client command rather than as implicit router promotion.
+
+The router must not auto-promote a new session owner when the original owner disconnects. Automatic router ownership promotion can accidentally become gameplay-host promotion and would couple routing policy to game authority.
+
+## Dropout and AI takeover
+
+Router membership loss and game dropout are separate events.
+
+When a TCP client disconnects, the router should emit a membership-left event containing the disconnected router network ID. The new client layer maps that ID to a game player index using game-owned session state.
+
+The game is responsible for converting a disconnected human empire to AI. Existing logic already has useful pieces:
+
+- `MOX::_player[i].network_player_id` identifies the network owner for a game player slot
+- `NETMOX::Net_Id_To_Player_Id_()` maps a network ID back to a game player index
+- `NETMOX::Send_Drop_Out_Info_()` builds and sends `s_net_pack_drop_out_info`
+- `NETMOX::Decode_Drop_Out_Info_()` applies the remote dropout state and calls AI conversion logic
+- `RUSS::Make_Player_Into_AI_()` performs the actual human-to-AI transition
+
+For voluntary abdication or surrender, the leaving client can still send the existing dropout packet before disconnecting.
+
+For abrupt disconnect, the leaving client cannot send that packet. The remaining clients should run a hostless recovery election. The elected recovery coordinator should synthesize and broadcast the same game-level dropout information for the disconnected player. Other clients should wait for that dropout packet and then apply it through the existing decode path.
+
+This likely deserves an explicit helper rather than reusing voluntary-dropout code blindly. A future helper could look like:
+
+```cpp
+NETMOX::Host_Send_Player_Disconnected_Info_(int player_idx);
+```
+
+That helper can reuse the `s_net_pack_drop_out_info` payload layout while making the intent clear: the elected recovery coordinator is reporting another player's abrupt disconnect.
+
+## Hostless recovery election
+
+The recovery election must be independent of the lost host.
+
+Expected flow after `MEMBER_LEFT` for a gameplay host:
+
+1. router removes the TCP member and broadcasts member-left to the remaining session members
+2. each remaining client maps the departed network ID to a game player index
+3. each remaining client removes that player from its live-human candidate set
+4. each remaining client independently computes the same recovery coordinator
+5. only the elected coordinator broadcasts the dropout / AI-takeover packet
+6. all clients apply that packet and continue normal game synchronization
+
+The first deterministic election rule can be simple:
+
+- choose the lowest remaining connected game player index
+
+This is preferable to choosing the lowest router network ID because most existing game state and sync arrays are keyed by game player index. The rule can evolve later, but it must remain deterministic and based only on shared state.
+
+Existing turn-host election in `NETTURN` can remain useful after recovery, but it cannot be the first step after abrupt host loss if it still waits for the disconnected player. The disconnect bridge must first remove the lost player from the active human set or convert that player to AI.
 
 ## Router vs session
 
@@ -488,6 +565,8 @@ The host game process remains gameplay-authoritative. The router handles only se
 Chosen as the preferred first implementation model.
 
 Important consequence: if the gameplay host exits while the router stays alive, clients may remain connected to the router and the game may promote a new authoritative gameplay host. If the router exits, the session is lost regardless of gameplay-host logic.
+
+The phrase "promote a new authoritative gameplay host" means hostless game-side recovery, not router-side owner promotion. Remaining clients must elect the new authority deterministically from shared state.
 
 ## Option C: router-based gameplay authority over time
 
@@ -647,6 +726,38 @@ The router logic itself should remain single-threaded.
 
 The important boundary is that threading is an integration detail around the loop, not a complexity source inside the loop.
 
+## New client-layer integration model
+
+The replacement for `WINNET` should be a project-owned client layer rather than another DirectPlay-shaped wrapper.
+
+The client layer owns:
+
+- UDP router discovery bootstrap
+- TCP connection to one selected router
+- session listing and join/create commands
+- local mapping between router network IDs and game player indexes
+- converting router member events into game lifecycle events
+- queued receive API for opaque game payloads
+- direct and broadcast send APIs over the router protocol
+
+The client layer should not own:
+
+- game host election
+- dropout-to-AI policy
+- turn progression
+- validation of gameplay decisions
+
+Those remain in `NETMOX`, `NETTURN`, and related gameplay code.
+
+The key integration point for disconnects should be explicit. A future shape could be:
+
+```cpp
+Network_Client_On_Member_Left(uint32_t network_id);
+NETMOX::Handle_Network_Player_Disconnected_(int player_idx);
+```
+
+The first function belongs to the networking client layer. The second belongs to gameplay synchronization and should run the recovery election / dropout-broadcast behavior described above.
+
 ## Event loop implementation direction
 
 `select()` is not an acceptable foundation for the new router.
@@ -760,8 +871,9 @@ The ideal time is after the host-authoritative world-state update has been recei
 
 - simplify `netcode` to one main backend for network play
 - remove modem/null-modem/serial assumptions from active code paths
-- remove or stub host-election logic if no longer needed
+- keep or adapt game-level host-election logic for hostless recovery while the router remains alive
 - replace any DirectPlay-specific lifecycle assumptions in UI code
+- add explicit disconnect-to-AI handling for abrupt member loss
 
 ## Phase 4: recovery and polish
 
@@ -794,7 +906,9 @@ The preferred architecture is:
 - host game process remains gameplay-authoritative initially
 - router remains shallow and mostly packet-opaque
 - no network-level host election is required for routing
-- gameplay-host election or promotion may remain in game code while the router is alive
+- gameplay-host election or promotion remains in game code while the router is alive
+- sessions remain alive until their last member disconnects
+- disconnected humans are converted to AI by game logic, not by the router
 - router loss falls back to explicit rehost from synchronized save
 
 This approach removes the deepest legacy dependencies while preserving the current gameplay packet model as much as practical. It is a good balance between cleanup, portability, implementation cost, and operational simplicity.

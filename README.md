@@ -11,12 +11,14 @@ This repository does not include the original game data. To play, you must own a
 - CMake 3.20 or newer
 - Ninja
 - Either:
+  - macOS build environment with an arm64-capable Clang toolchain
   - Windows build environment with an MSVC toolchain
   - Linux build environment with MinGW-w64 cross-compilers
 - Original Master of Orion II game files from GOG or Steam
 
 Supported build paths:
 
+- Native macOS arm64 builds
 - Native Linux builds
 - Native Windows builds with MSVC for x86 and x64
 - Linux-hosted MinGW-w64 cross-builds for Win32 and Win64 with networking disabled
@@ -95,6 +97,9 @@ Available presets:
 - `linux-x86-debug`
 - `linux-x86-release`
 - `linux-x86-debug-asan`
+- `osx-debug`
+- `osx-release`
+- `osx-debug-asan`
 
 Example release build:
 

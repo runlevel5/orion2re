@@ -14,7 +14,12 @@ namespace timer {
     void __cdecl Release_Time_(int32_t ticks) {
         const uint32_t target_ticks = (uint32_t)ticks * 55;
 
+        while ((uint32_t)Get_Time_Since_Mark_() + 2 < target_ticks) {
+            SDL_Delay(1);
+        }
+
         while ((uint32_t)Get_Time_Since_Mark_() < target_ticks) {
+            SDL_Delay(0);
         }
     }
 }

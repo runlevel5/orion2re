@@ -1,8 +1,14 @@
 #include "pch.h"
 
+#include "network/router_cli.h"
+
 #include <SDL3/SDL_main.h>
 
 int main(int argc, char** argv) {
+    if (network::router::Is_Router_CLI_Command(argc, argv)) {
+        return network::router::Run_Router_CLI(argc, argv);
+    }
+
     size_t command_line_length = 0;
     for (int i = 1; i < argc; ++i) {
         command_line_length += strlen(argv[i]);

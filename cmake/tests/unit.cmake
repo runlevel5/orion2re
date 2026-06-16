@@ -1,5 +1,5 @@
 function(orion2re_add_unit_test TARGET_NAME)
-    cmake_parse_arguments(ORION2RE_TEST "" "" "SOURCES;PRODUCTION_SOURCES;FAKE_SOURCES" ${ARGN})
+    cmake_parse_arguments(ORION2RE_TEST "" "" "SOURCES;PRODUCTION_SOURCES;FAKE_SOURCES;LIBRARIES" ${ARGN})
 
     add_executable(${TARGET_NAME}
         tests/test_main.cpp
@@ -18,6 +18,7 @@ function(orion2re_add_unit_test TARGET_NAME)
 
     target_link_libraries(${TARGET_NAME} PRIVATE
         SDL3::SDL3-static
+        ${ORION2RE_TEST_LIBRARIES}
     )
 
     if(MSVC)
@@ -68,4 +69,30 @@ orion2re_add_unit_test(test_fields
         tests/fakes/fake_sound.cpp
         tests/fakes/fake_textbox.cpp
         tests/fakes/fake_video.cpp
+)
+
+orion2re_add_unit_test(test_router_protocol
+    SOURCES
+        tests/unit/test_router_protocol.cpp
+    PRODUCTION_SOURCES
+        src/network/router_protocol.cpp
+)
+
+orion2re_add_unit_test(test_router_core
+    SOURCES
+        tests/unit/test_router_core.cpp
+    PRODUCTION_SOURCES
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+)
+
+orion2re_add_unit_test(test_router_service
+    SOURCES
+        tests/unit/test_router_service.cpp
+    PRODUCTION_SOURCES
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
 )

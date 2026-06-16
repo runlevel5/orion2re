@@ -5,3 +5,6 @@
 	path = vendors/doctest
 	url = https://github.com/doctest/doctest.git
 	branch = master
+[submodule "vendors/libuv"]
+	path = vendors/libuv
+	url = https://github.com/libuv/libuv.git

@@ -4,6 +4,19 @@ namespace smckplay {
     smk _smk;
     uint32_t _lastkey;
 
+    namespace {
+        smk Open_Smacker_File_(const char* file_name) {
+            char resolved_path[512];
+            const char* open_path = file_name;
+
+            if (Resolve_File_Path_Case_(file_name, resolved_path, sizeof(resolved_path))) {
+                open_path = resolved_path;
+            }
+
+            return smk_open_file(open_path, SMK_MODE_MEMORY);
+        }
+    }
+
     struct s_smacker_state {
         unsigned long width = 0;
         unsigned long height = 0;
@@ -130,20 +143,20 @@ namespace smckplay {
         (void)mode;
         (void)options;
 
-        char path_buffer[100];
+        char path_buffer[512];
         Reset_Smacker_State_();
 
-        ::strcpy(path_buffer, file_name);
-
-        _smk = smk_open_file(path_buffer, SMK_MODE_MEMORY);
+        _smk = Open_Smacker_File_(file_name);
         if (_smk == nullptr) {
             if (farload::_secondary_drive_path[0] == '\0') {
                 return 0;
             }
 
-            ::strcpy(path_buffer, farload::_secondary_drive_path);
-            ::strcat(path_buffer, file_name);
-            _smk = smk_open_file(path_buffer, SMK_MODE_MEMORY);
+            if (snprintf(path_buffer, sizeof(path_buffer), "%s%s", farload::_secondary_drive_path, file_name) >= (int)sizeof(path_buffer)) {
+                return 0;
+            }
+
+            _smk = Open_Smacker_File_(path_buffer);
         }
 
         if (_smk == nullptr) {

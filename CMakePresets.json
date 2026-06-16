@@ -350,6 +350,57 @@
         "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
       }
+    },
+    {
+      "name": "osx-debug",
+      "displayName": "macOS ARM64 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "ORION2RE_ENABLE_NETWORKING": "OFF",
+        "ORION2RE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "osx-release",
+      "displayName": "macOS ARM64 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "ORION2RE_ENABLE_NETWORKING": "OFF",
+        "ORION2RE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "osx-debug-asan",
+      "displayName": "macOS ARM64 Debug (ASan)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "ORION2RE_ENABLE_NETWORKING": "OFF",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -441,6 +492,21 @@
     {
       "name": "linux-x86-debug-asan",
       "configurePreset": "linux-x86-debug-asan",
+      "configuration": "Debug"
+    },
+    {
+      "name": "osx-debug",
+      "configurePreset": "osx-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "osx-release",
+      "configurePreset": "osx-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "osx-debug-asan",
+      "configurePreset": "osx-debug-asan",
       "configuration": "Debug"
     }
   ]

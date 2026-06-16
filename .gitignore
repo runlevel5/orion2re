@@ -10,3 +10,4 @@ out/
 /CMakeUserPresets.json
 /cmake/local-user.cmake
 build-*/
+Testing

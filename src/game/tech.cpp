@@ -1014,10 +1014,26 @@ namespace TECH {
     }
 
     int16_t __cdecl Get_Hyper_Tech_App_ID_(int16_t tech_id) {
-        if (tech_id >= TECH_FIELD_BIOLOGY) {
-            tech_id += TECH_APP_BIOLOGY - TECH_FIELD_BIOLOGY;
+        switch (tech_id) {
+        case TECH_FIELD_BIOLOGY:
+            return TECH_APP_BIOLOGY;
+        case TECH_FIELD_POWER:
+            return TECH_APP_POWER;
+        case TECH_FIELD_PHYSICS_2:
+            return TECH_APP_PHYSICS;
+        case TECH_FIELD_CONSTRUCTION:
+            return TECH_APP_CONSTRUCTION;
+        case TECH_FIELD_FIELDS:
+            return TECH_APP_FIELDS;
+        case TECH_FIELD_CHEMISTRY_2:
+            return TECH_APP_CHEMISTRY;
+        case TECH_FIELD_COMPUTERS:
+            return TECH_APP_COMPUTERS;
+        case TECH_FIELD_SOCIOLOGY:
+            return TECH_APP_SOCIOLOGY;
+        default:
+            return tech_id;
         }
-        return tech_id;
     }
 
     char* __cdecl Technology_Fields_Name_(int16_t tech_field_id) {

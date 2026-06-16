@@ -12,6 +12,29 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     else()
         message(FATAL_ERROR "Linux builds are only supported for x86 and x64 targets.")
     endif()
+elseif(APPLE)
+    set(ORION2RE_MACOS_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
+    if(NOT ORION2RE_MACOS_ARCHITECTURES)
+        set(ORION2RE_MACOS_ARCHITECTURES "${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
+
+    foreach(ORION2RE_MACOS_ARCH IN LISTS ORION2RE_MACOS_ARCHITECTURES)
+        string(TOLOWER "${ORION2RE_MACOS_ARCH}" ORION2RE_MACOS_ARCH_NORMALIZED)
+
+        if(ORION2RE_MACOS_ARCH_NORMALIZED STREQUAL "arm64"
+           OR ORION2RE_MACOS_ARCH_NORMALIZED STREQUAL "arm64e"
+           OR ORION2RE_MACOS_ARCH_NORMALIZED STREQUAL "aarch64")
+            set(ORION2RE_TARGET_ARCH arm64)
+        else()
+            message(FATAL_ERROR "macOS builds are only supported for arm64 targets.")
+        endif()
+    endforeach()
+
+    if(NOT ORION2RE_TARGET_ARCH)
+        message(FATAL_ERROR "macOS builds require CMAKE_OSX_ARCHITECTURES or CMAKE_SYSTEM_PROCESSOR to resolve to arm64.")
+    endif()
+
+    set(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG -mlittle-endian)
 elseif(WIN32)
     set(ORION2RE_WINDOWS_ARCH "" CACHE STRING "Target Windows architecture (x86 or x64)")
     set_property(CACHE ORION2RE_WINDOWS_ARCH PROPERTY STRINGS x86 x64)
@@ -76,6 +99,8 @@ set(ORION2RE_VENDORED_SDL3_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/SDL")
 set(ORION2RE_VENDORED_SDL3_COMMIT "8e37db5e797b6167f3a00d697d816a684bd259c7")
 set(ORION2RE_VENDORED_DOCTEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/doctest")
 set(ORION2RE_VENDORED_DOCTEST_COMMIT "1da23a3e8119ec5cce4f9388e91b065e20bf06f5")
+set(ORION2RE_VENDORED_LIBUV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libuv")
+set(ORION2RE_VENDORED_LIBUV_COMMIT "5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b")
 set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
 
 if(MSVC)
@@ -96,6 +121,18 @@ option(ORION2RE_BUILD_TESTS "Build tests" OFF)
 
 set(ORION2RE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests")
 
+if(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG)
+    include(CheckCCompilerFlag)
+    include(CheckCXXCompilerFlag)
+
+    check_c_compiler_flag("${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}" ORION2RE_C_SUPPORTS_LITTLE_ENDIAN_FLAG)
+    check_cxx_compiler_flag("${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}" ORION2RE_CXX_SUPPORTS_LITTLE_ENDIAN_FLAG)
+
+    if(NOT ORION2RE_C_SUPPORTS_LITTLE_ENDIAN_FLAG OR NOT ORION2RE_CXX_SUPPORTS_LITTLE_ENDIAN_FLAG)
+        message(FATAL_ERROR "The configured compiler must support ${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG} for macOS arm64 builds.")
+    endif()
+endif()
+
 if(NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
     message(FATAL_ERROR
         "This project requires the SDL3 submodule at vendors/SDL. "
@@ -107,6 +144,13 @@ if(ORION2RE_BUILD_TESTS AND NOT EXISTS "${ORION2RE_VENDORED_DOCTEST_DIR}/doctest
     message(FATAL_ERROR
         "Tests require the doctest submodule at vendors/doctest. "
         "Run 'git submodule update --init --recursive vendors/doctest' and ensure it is pinned to ${ORION2RE_VENDORED_DOCTEST_COMMIT}."
+    )
+endif()
+
+if(NOT EXISTS "${ORION2RE_VENDORED_LIBUV_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR
+        "The router service requires the libuv submodule at vendors/libuv. "
+        "Run 'git submodule update --init --recursive vendors/libuv' and ensure it is pinned to ${ORION2RE_VENDORED_LIBUV_COMMIT}."
     )
 endif()
 
@@ -123,6 +167,12 @@ set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("${ORION2RE_VENDORED_SDL3_DIR}" EXCLUDE_FROM_ALL)
 
+set(LIBUV_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(LIBUV_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LIBUV_BUILD_BENCH OFF CACHE BOOL "" FORCE)
+
+add_subdirectory("${ORION2RE_VENDORED_LIBUV_DIR}" EXCLUDE_FROM_ALL)
+
 if(MSVC AND WIN32 AND ORION2RE_GAME_DIR)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_GAME_DIR}")
@@ -138,6 +188,13 @@ file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
 
 file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+)
+
+set(ORION2RE_ROUTER_SOURCES
+    src/network/router_cli.cpp
+    src/network/router_core.cpp
+    src/network/router_protocol.cpp
+    src/network/router_service.cpp
 )
 
 add_executable(orion2re
@@ -164,7 +221,26 @@ target_compile_definitions(orion2re PRIVATE
 
 target_link_libraries(orion2re PRIVATE
     SDL3::SDL3-static
+    uv_a
 )
+
+add_executable(orion2re-router
+    tools/router_main.cpp
+    ${ORION2RE_ROUTER_SOURCES}
+)
+
+target_compile_features(orion2re-router PRIVATE cxx_std_20)
+target_include_directories(orion2re-router PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+target_link_libraries(orion2re-router PRIVATE
+    uv_a
+)
+
+if(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG)
+    target_compile_options(orion2re PRIVATE "${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}")
+    target_compile_options(orion2re-router PRIVATE "${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}")
+endif()
 
 if(WIN32)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
@@ -178,6 +254,7 @@ endif()
 
 if(MSVC)
     target_compile_options(orion2re PRIVATE /W3 /permissive-)
+    target_compile_options(orion2re-router PRIVATE /W3 /permissive-)
     target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
 
     target_precompile_headers(orion2re PRIVATE
@@ -185,6 +262,12 @@ if(MSVC)
     )
 
     target_compile_definitions(orion2re PRIVATE
+        WIN32
+        $<$<CONFIG:Debug>:_CRT_SECURE_NO_DEPRECATE>
+        $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_DEPRECATE>
+    )
+
+    target_compile_definitions(orion2re-router PRIVATE
         WIN32
         $<$<CONFIG:Debug>:_CRT_SECURE_NO_DEPRECATE>
         $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_DEPRECATE>
@@ -253,10 +336,14 @@ if(ORION2RE_ENABLE_ASAN)
 
     if(MSVC)
         target_compile_options(orion2re PRIVATE /fsanitize=address)
+        target_compile_options(orion2re-router PRIVATE /fsanitize=address)
         target_link_options(orion2re PRIVATE /INFERASANLIBS /fsanitize=address)
+        target_link_options(orion2re-router PRIVATE /INFERASANLIBS /fsanitize=address)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_compile_options(orion2re PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+        target_compile_options(orion2re-router PRIVATE -fsanitize=address -fno-omit-frame-pointer)
         target_link_options(orion2re PRIVATE -fsanitize=address)
+        target_link_options(orion2re-router PRIVATE -fsanitize=address)
     else()
         message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is unsupported for the current compiler.")
     endif()
