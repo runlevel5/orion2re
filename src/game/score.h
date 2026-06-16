@@ -2,6 +2,56 @@
 #include <cstdint>
 
 struct s_hof;
+struct s_animation_header;
+struct s_colors;
+
+typedef struct s_hiscore s_hiscore, *Ps_hiscore;
+
+struct s_hiscore {
+    struct s_animation_header *mouse_cursor_anim;
+    struct s_animation_header *main_background_anim;
+    struct s_animation_header *report_bitmap;
+    struct s_animation_header *race_icon_anims[14];
+    struct s_animation_header *race_icon_frame_anim;
+    struct s_animation_header *background_anim;
+    int16_t screen_field_handle;
+    int16_t current_input_state;
+    int16_t exit_hotkey_handle;
+    int16_t prev_input_state;
+    int16_t entry_field_handles[10];
+    int8_t player_idx;
+    int16_t score_antares;
+    uint8_t is_first_draw;
+    int16_t score_captured_colonists;
+    struct s_colors colors;
+    int16_t score_elimination;
+    struct s_colors temp_colors;
+    struct s_colors alt_colors;
+    int16_t num_opponents_defeated;
+    int16_t raw_captured_population;
+    int16_t raw_captured_colonies;
+    int8_t captured_pop_race_ids[16];
+    int16_t reg_pop;
+    int16_t raw_population;
+    int16_t score_orion;
+    int16_t score_population;
+    int16_t raw_technology;
+    int16_t score_technology;
+    int16_t score_raw_subtotal;
+    int16_t score_time;
+    int16_t score_final;
+    int16_t score_council;
+    int16_t next_draw_y;
+    int16_t timer_ticks;
+    int16_t score_modifier_pct;
+    int8_t flash_color_offset;
+    int8_t flash_direction;
+    uint8_t flash_timer_ticks;
+    int8_t highlighted_entry_idx;
+    undefined field40_0xbc;
+    struct s_hiscore_pop pop_units[16];
+    int16_t sort_list[10][2];
+};
 
 namespace SCORE {
     extern s_hof _hof;

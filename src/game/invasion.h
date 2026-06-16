@@ -1,4 +1,5 @@
 #pragma once
+
 namespace invasion {
     /// Unloads transport ships into a colony until its infantry cap is reached.
     int __cdecl Unload_Transports_(s_colony* colony, int16_t* transport_ship_ids, int num_transports);

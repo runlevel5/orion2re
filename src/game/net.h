@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_comcore_poll_buf;
+
 namespace net {
     extern uint32_t _thisHost;
 

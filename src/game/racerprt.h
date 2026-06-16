@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_racescrn_icon_layout;
+
 namespace RACERPRT {
     extern s_colors _report_normal_color;
     extern uint8_t _race_report_jim_hack;

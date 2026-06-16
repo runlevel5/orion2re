@@ -1,5 +1,18 @@
 #pragma once
 
+typedef struct s_skill_data s_skill_data, *Ps_skill_data;
+
+struct s_skill_data {
+    uint8_t skill_id;
+    uint32_t skill_mask;
+    uint8_t skill_type;
+    int16_t strength;
+    int8_t level_up;
+    int8_t cost;
+    const char *name;
+    const char *format_str;
+};
+
 namespace MOX {
     extern const char _ship_type_names[5][6][16];
     extern int8_t _tech_categories[51][2];

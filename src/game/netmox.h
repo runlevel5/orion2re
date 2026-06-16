@@ -1,5 +1,15 @@
 #pragma once
 
+typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;
+
+struct s_net_modem_file {
+    uint32_t mode;
+    FILE *file;
+    uint8_t *buffer;
+    uint8_t *current_ptr;
+    uint32_t buffer_size;
+};
+
 namespace NETMOX {
     extern s_network _net;
 

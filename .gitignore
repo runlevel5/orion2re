@@ -2,6 +2,7 @@ orion2re/
 .vs
 .vocode/data/
 .vocode/sessions/
+.DS_Store
 Release
 build/
 out/

@@ -1,5 +1,59 @@
 #pragma once
 
+struct s_player;
+struct s_animation_header;
+
+typedef struct s_racescrn_icon_layout s_racescrn_icon_layout, *Ps_racescrn_icon_layout;
+typedef struct s_racescrn_mouse_group s_racescrn_mouse_group, *Ps_racescrn_mouse_group;
+typedef struct s_racescrn_race_display s_racescrn_race_display, *Ps_racescrn_race_display;
+
+struct s_racescrn_icon_layout {
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    int16_t spacing_x;
+    void (__cdecl *render_fn)(struct s_racescrn_mouse_group*);
+};
+
+struct s_racescrn_mouse_group {
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    int16_t total_height;
+    int16_t total_width;
+    uint16_t count;
+    int16_t field7_0xe;
+    int16_t icon_width;
+    int16_t spacing_x;
+    struct s_animation_header *sprite1;
+    struct s_animation_header *sprite2;
+    void (__cdecl *render_fn)(struct s_racescrn_mouse_group*);
+};
+
+struct s_racescrn_race_display {
+    int16_t list_idx;
+    int16_t player_idx;
+    struct s_player *player;
+    int16_t race;
+    int8_t is_empty_slot;
+    int8_t is_eliminated;
+    struct s_racescrn_mouse_group spy_icons_group;
+    int16_t agent_mission_idx;
+    int16_t relationship_slider_y;
+    int16_t relationshiop_field_id;
+    char *relationship_text;
+    int16_t main_interaction_field_id;
+    char *player_name;
+    struct s_animation_header *race_portrait_img;
+    struct s_animation_header *relationship_slider_img;
+    struct s_animation_header *eliminated_overlay_img;
+    struct s_animation_header *spy_icon_img;
+    struct s_animation_header *sabotage_icon_img;
+    struct s_animation_header *assassination_icon_img;
+};
+
 namespace RACESCRN {
     using render_fn = void(*)(s_racescrn_mouse_group*);
 

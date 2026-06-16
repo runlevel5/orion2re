@@ -1,5 +1,14 @@
 #pragma once
 
+typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
+
+struct BIT_BUF {
+    uint8_t *buf;
+    uint8_t mask;
+    uint32_t rack;
+    uint32_t bit_index;
+};
+
 namespace bitio {
     /**
      * @brief Allocates and initializes a bit buffer for reading from a byte stream.

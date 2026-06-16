@@ -1,5 +1,35 @@
 #pragma once
 
+struct s_animation_header;
+struct s_colors;
+
+typedef struct s_input_box_state s_input_box_state, *Ps_input_box_state;
+
+struct s_input_box_state {
+    struct s_animation_header *pic;
+    struct s_animation_header *bg;
+    struct s_colors font_colors;
+    struct s_colors colors2;
+    char prompt_text[60];
+    int16_t bg_height;
+    int8_t show_cancel_anim;
+    int16_t prompt_y;
+    int16_t cancel_x;
+    int16_t cancel_y;
+    int16_t input_x;
+    int16_t input_y;
+    int16_t x;
+    int16_t y;
+    int16_t input_type;
+    int16_t max_length;
+    int16_t max_input_length;
+    int16_t unk1;
+    char input_text[100];
+    int16_t accept_field_id;
+    int16_t cancel_field_id;
+    int16_t field21_0xd5;
+};
+
 namespace namestar {
     /* Returns the screen-space X coordinate used to center the star-name popup. */
     int16_t __cdecl Star_Name_Popup_Screen_Center_X_();

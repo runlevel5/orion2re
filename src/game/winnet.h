@@ -1,5 +1,7 @@
 #pragma once
 
+struct s_comcore_poll_buf;
+
 namespace WINNET {
     extern int32_t _provider_count;
 

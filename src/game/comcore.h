@@ -2,6 +2,30 @@
 
 #include "pch.h"
 
+typedef struct s_comcore_poll_buf s_comcore_poll_buf, *Ps_comcore_poll_buf;
+
+struct s_comcore_poll_buf {
+    uint32_t id_from;
+    uint32_t id_to;
+    uint32_t len;
+    uint8_t *send_buf;
+};
+
+typedef struct s_comcore_req_buf s_comcore_req_buf, *Ps_comcore_req_buf;
+
+struct s_comcore_req_buf {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    uint8_t *send_buf;
+    undefined field5_0x8;
+    undefined field6_0x9;
+    undefined field7_0xa;
+    undefined field8_0xb;
+    int32_t buf_size;
+};
+
 namespace comcore {
     using recv_handler_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
