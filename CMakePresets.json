@@ -363,7 +363,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_OSX_ARCHITECTURES": "arm64",
         "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
@@ -380,7 +379,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_OSX_ARCHITECTURES": "arm64",
         "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
@@ -397,7 +395,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_OSX_ARCHITECTURES": "arm64",
         "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
       }

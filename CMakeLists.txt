@@ -13,27 +13,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         message(FATAL_ERROR "Linux builds are only supported for x86 and x64 targets.")
     endif()
 elseif(APPLE)
-    set(ORION2RE_MACOS_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
-    if(NOT ORION2RE_MACOS_ARCHITECTURES)
-        set(ORION2RE_MACOS_ARCHITECTURES "${CMAKE_SYSTEM_PROCESSOR}")
-    endif()
-
-    foreach(ORION2RE_MACOS_ARCH IN LISTS ORION2RE_MACOS_ARCHITECTURES)
-        string(TOLOWER "${ORION2RE_MACOS_ARCH}" ORION2RE_MACOS_ARCH_NORMALIZED)
-
-        if(ORION2RE_MACOS_ARCH_NORMALIZED STREQUAL "arm64"
-           OR ORION2RE_MACOS_ARCH_NORMALIZED STREQUAL "arm64e"
-           OR ORION2RE_MACOS_ARCH_NORMALIZED STREQUAL "aarch64")
-            set(ORION2RE_TARGET_ARCH arm64)
-        else()
-            message(FATAL_ERROR "macOS builds are only supported for arm64 targets.")
-        endif()
-    endforeach()
-
-    if(NOT ORION2RE_TARGET_ARCH)
-        message(FATAL_ERROR "macOS builds require CMAKE_OSX_ARCHITECTURES or CMAKE_SYSTEM_PROCESSOR to resolve to arm64.")
-    endif()
-
     set(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG -mlittle-endian)
 elseif(WIN32)
     set(ORION2RE_WINDOWS_ARCH "" CACHE STRING "Target Windows architecture (x86 or x64)")
@@ -129,7 +108,7 @@ if(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG)
     check_cxx_compiler_flag("${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}" ORION2RE_CXX_SUPPORTS_LITTLE_ENDIAN_FLAG)
 
     if(NOT ORION2RE_C_SUPPORTS_LITTLE_ENDIAN_FLAG OR NOT ORION2RE_CXX_SUPPORTS_LITTLE_ENDIAN_FLAG)
-        message(FATAL_ERROR "The configured compiler must support ${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG} for macOS arm64 builds.")
+        message(FATAL_ERROR "The configured compiler must support ${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG} for macOS builds.")
     endif()
 endif()
 

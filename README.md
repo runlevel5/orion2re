@@ -23,9 +23,15 @@ Supported build paths:
 - Native Windows builds with MSVC for x86 and x64
 - Linux-hosted MinGW-w64 cross-builds for Win32 and Win64 with networking disabled
 
-## SDL3 submodule
+macOS builds use the native host architecture.
 
-The project requires the SDL3 submodule at `vendors/SDL`.
+## Vendored submodules
+
+The project requires these vendored submodules:
+
+- SDL3 at `vendors/SDL`
+- libuv at `vendors/libuv`
+- doctest at `vendors/doctest` when building tests
 
 Clone the repository with submodules:
 
@@ -36,7 +42,7 @@ git clone --recurse-submodules <repo-url>
 If you already cloned the repository without submodules, initialize it with:
 
 ```sh
-git submodule update --init --recursive vendors/SDL
+git submodule update --init --recursive
 ```
 
 Bootstrap dependencies and verify required tools first:
@@ -53,11 +59,21 @@ Windows `cmd.exe`:
 tools\bootstrap_deps.bat
 ```
 
-The bootstrap scripts verify that `git`, `cmake`, and `ninja` are available, then initialize the SDL3 submodule and verify that it is pinned correctly.
+The bootstrap scripts verify that `git`, `cmake`, and `ninja` are available, then initialize the SDL3 and libuv submodules and verify that they are pinned correctly.
 
 The repository is expected to be pinned to SDL commit `8e37db5e797b6167f3a00d697d816a684bd259c7` (`release-3.4.10`).
+The repository is expected to be pinned to libuv commit `5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b`.
 
 ## Build
+
+Native macOS arm64 example:
+
+```sh
+cmake --preset osx-debug
+cmake --build --preset osx-debug
+```
+
+The macOS presets use the native host architecture and require a compiler that accepts the little-endian flag `-mlittle-endian`.
 
 Configure a preset:
 
@@ -106,6 +122,13 @@ Example release build:
 ```sh
 cmake --preset win32-release
 cmake --build --preset win32-release
+```
+
+Native macOS release example:
+
+```sh
+cmake --preset osx-release
+cmake --build --preset osx-release
 ```
 
 ## Cross-compiling Windows builds from Linux
