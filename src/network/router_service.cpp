@@ -64,7 +64,8 @@ struct s_router_client_connection {
     s_router_service_state* service = nullptr;
     t_router_connection_id connection_id = 0;
     uv_tcp_t tcp;
-    std::vector<uint8_t> read_buffer;
+    Bit_Stream read_buffer;
+    s_router_frame_codec frame_codec;
     uint32_t pending_write_bytes = 0;
     uint64_t bytes_read = 0;
     uint64_t bytes_written = 0;
@@ -338,30 +339,40 @@ void Router_Service_Log_Action_(
         break;
     }
     case ROUTER_MESSAGE_SEND_TO:
+    {
+        const s_router_frame_codec_stats compression = connection->frame_codec.Stats();
         Router_Service_Log_Verbosef_(
             state,
-            "game data direct peer=%s:%u conn=%u network=%u session=%u target=%u bytes=%u",
+            "game data direct peer=%s:%u conn=%u network=%u session=%u target=%u bytes=%u compressed_bytes=%u compression_saved=%d",
             connection->peer_address,
             (unsigned)connection->peer_port,
             (unsigned)connection->connection_id,
             (unsigned)network_id,
             (unsigned)session_id,
             (unsigned)request->header.target_network_id,
-            (unsigned)request->payload.Size());
+            (unsigned)compression.last_uncompressed_payload_bytes_in,
+            (unsigned)compression.last_compressed_payload_bytes_in,
+            (int)(compression.last_uncompressed_payload_bytes_in - compression.last_compressed_payload_bytes_in));
         break;
+    }
     case ROUTER_MESSAGE_SEND_BROADCAST:
+    {
+        const s_router_frame_codec_stats compression = connection->frame_codec.Stats();
         Router_Service_Log_Verbosef_(
             state,
-            "game data broadcast peer=%s:%u conn=%u network=%u session=%u recipients=%u bytes=%u include_self=%u",
+            "game data broadcast peer=%s:%u conn=%u network=%u session=%u recipients=%u bytes=%u compressed_bytes=%u compression_saved=%d include_self=%u",
             connection->peer_address,
             (unsigned)connection->peer_port,
             (unsigned)connection->connection_id,
             (unsigned)network_id,
             (unsigned)session_id,
             (unsigned)output->size(),
-            (unsigned)request->payload.Size(),
+            (unsigned)compression.last_uncompressed_payload_bytes_in,
+            (unsigned)compression.last_compressed_payload_bytes_in,
+            (int)(compression.last_uncompressed_payload_bytes_in - compression.last_compressed_payload_bytes_in),
             (request->header.flags & ROUTER_FLAG_BROADCAST_INCLUDE_SENDER) != 0 ? 1U : 0U);
         break;
+    }
     default:
         Router_Service_Log_Verbosef_(
             state,
@@ -584,12 +595,11 @@ void Router_Service_Send_Output_(s_router_service_state* state, const s_router_o
     }
 
     s_router_write_request* write_request = new s_router_write_request{};
-    Encode_Frame(&output->message, &write_request->data);
-    write_request->byte_count = write_request->data.Size();
 
     s_router_client_connection* connection = connection_it->second;
-    if (write_request->byte_count > state->config.max_pending_write_bytes ||
-        connection->pending_write_bytes > state->config.max_pending_write_bytes - write_request->byte_count) {
+    const uint32_t max_encoded_size = Encoded_Frame_Max_Size(&output->message);
+    if (max_encoded_size > state->config.max_pending_write_bytes ||
+        connection->pending_write_bytes > state->config.max_pending_write_bytes - max_encoded_size) {
         Router_Service_Logf_(
             state,
             "dropping outbound router message for connection %u because pending write bytes would exceed %u",
@@ -598,6 +608,9 @@ void Router_Service_Send_Output_(s_router_service_state* state, const s_router_o
         delete write_request;
         return;
     }
+
+    Encode_Frame(&output->message, &connection->frame_codec, &write_request->data);
+    write_request->byte_count = write_request->data.Size();
 
     connection->pending_write_bytes += write_request->byte_count;
     connection->bytes_written += write_request->byte_count;
@@ -636,7 +649,7 @@ void Router_Service_Send_Protocol_Error_And_Close_(s_router_service_state* state
     Router_Service_Send_Outputs_(state, &output);
 
     s_router_write_request* write_request = new s_router_write_request{};
-    Encode_Frame(&error_message, &write_request->data);
+    Encode_Frame(&error_message, &connection->frame_codec, &write_request->data);
     write_request->byte_count = write_request->data.Size();
     write_request->buffer = uv_buf_init((char*)write_request->data.Data(), write_request->data.Size());
     write_request->request.data = write_request;
@@ -726,12 +739,12 @@ void Router_Service_Read_Callback_(uv_stream_t* stream, ssize_t bytes_read, cons
     if (bytes_read > 0) {
         const uint8_t* bytes = (const uint8_t*)buffer->base;
         connection->bytes_read += (uint64_t)bytes_read;
-        connection->read_buffer.insert(connection->read_buffer.end(), bytes, bytes + bytes_read);
+        connection->read_buffer.Write_Bytes(bytes, (uint32_t)bytes_read);
 
         for (;;) {
             s_router_message message;
             std::string error_message;
-            const e_frame_read_status status = Try_Read_Frame(&connection->read_buffer, state->config.max_frame_size, &message, &error_message);
+            const e_frame_read_status status = Try_Read_Frame(&connection->read_buffer, state->config.max_frame_size, &connection->frame_codec, &message, &error_message);
             if (status == FRAME_READ_NEED_MORE_DATA) {
                 break;
             }
@@ -787,16 +800,23 @@ void Router_Service_Client_Close_Callback_(uv_handle_t* handle) {
 
     s_router_service_state* state = connection->service;
     if (state != nullptr) {
+        const s_router_frame_codec_stats compression = connection->frame_codec.Stats();
         Router_Service_Log_Verbosef_(
             state,
-            "traffic peer=%s:%u conn=%u frames_in=%u frames_out=%u bytes_in=%llu bytes_out=%llu",
+            "traffic peer=%s:%u conn=%u frames_in=%u frames_out=%u bytes_in=%llu bytes_out=%llu compressed_payload_in=%llu/%llu compressed_payload_out=%llu/%llu compression_saved_in=%lld compression_saved_out=%lld",
             connection->peer_address,
             (unsigned)connection->peer_port,
             (unsigned)connection->connection_id,
             (unsigned)connection->frames_read,
             (unsigned)connection->frames_written,
             (unsigned long long)connection->bytes_read,
-            (unsigned long long)connection->bytes_written);
+            (unsigned long long)connection->bytes_written,
+            (unsigned long long)compression.compressed_payload_bytes_in,
+            (unsigned long long)compression.uncompressed_payload_bytes_in,
+            (unsigned long long)compression.compressed_payload_bytes_out,
+            (unsigned long long)compression.uncompressed_payload_bytes_out,
+            (long long)(compression.uncompressed_payload_bytes_in - compression.compressed_payload_bytes_in),
+            (long long)(compression.uncompressed_payload_bytes_out - compression.compressed_payload_bytes_out));
         Router_Service_Log_Verbosef_(
             state,
             "connection closed peer=%s:%u conn=%u",

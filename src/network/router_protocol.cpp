@@ -6,8 +6,13 @@
 #include <limits>
 #include <utility>
 
+#include <lz4.h>
+
 namespace network::router {
 namespace {
+
+constexpr uint32_t ROUTER_LZ4_MAX_DICTIONARY_SIZE = 64U * 1024U;
+constexpr uint16_t ROUTER_KNOWN_PACKET_FLAGS = ROUTER_PACKET_FLAG_PAYLOAD_LZ4_COMPRESSED;
 
 [[noreturn]] void Crash_Write_Failed_() {
     std::abort();
@@ -89,6 +94,144 @@ bool Read_Member_Info_(Bit_Stream* reader, s_router_member_info* member) {
     return true;
 }
 
+uint32_t Max_Wire_Frame_Size_(uint32_t max_frame_size) {
+    uint64_t max_wire_size = max_frame_size;
+    if (max_frame_size >= ROUTER_MESSAGE_HEADER_SIZE) {
+        const uint32_t max_payload_size = max_frame_size - ROUTER_MESSAGE_HEADER_SIZE;
+        if (max_payload_size <= (uint32_t)std::numeric_limits<int>::max()) {
+            const int compressed_bound = LZ4_compressBound((int)max_payload_size);
+            if (compressed_bound > 0) {
+                const uint64_t compressed_wire_size = (uint64_t)ROUTER_MESSAGE_HEADER_SIZE + (uint32_t)compressed_bound;
+                if (compressed_wire_size > max_wire_size) {
+                    max_wire_size = compressed_wire_size;
+                }
+            }
+        }
+    }
+
+    max_wire_size += ROUTER_PACKET_HEADER_SIZE;
+    if (max_wire_size > std::numeric_limits<uint32_t>::max()) {
+        return std::numeric_limits<uint32_t>::max();
+    }
+    return (uint32_t)max_wire_size;
+}
+
+void Save_Lz4_Dictionary_(Bit_Stream* dictionary, const uint8_t* data, uint32_t size) {
+    if (dictionary == nullptr || size == 0) {
+        return;
+    }
+
+    Bit_Stream combined;
+    combined.Reserve(dictionary->Size() + size);
+    combined.Write_Bytes(dictionary->Data(), dictionary->Size());
+    combined.Write_Bytes(data, size);
+
+    const uint32_t dictionary_size = combined.Size() > ROUTER_LZ4_MAX_DICTIONARY_SIZE ? ROUTER_LZ4_MAX_DICTIONARY_SIZE : combined.Size();
+    dictionary->Set_Buffer(combined.Data() + combined.Size() - dictionary_size, dictionary_size);
+}
+
+bool Decode_Message_Header_(const uint8_t* data, uint32_t size, s_router_message* message, uint32_t* payload_size, std::string* error_message) {
+    if (message == nullptr || payload_size == nullptr) {
+        Set_Error_(error_message, "message output is null");
+        return false;
+    }
+    if (data == nullptr || size < ROUTER_MESSAGE_HEADER_SIZE) {
+        Set_Error_(error_message, "message body is shorter than the fixed header");
+        return false;
+    }
+
+    uint32_t magic = 0;
+    uint16_t version = 0;
+    uint16_t kind = 0;
+
+    Read_Header_Uint32_(data, 0, &magic);
+    Read_Header_Uint16_(data, 4, &version);
+    Read_Header_Uint16_(data, 6, &kind);
+    if (magic != ROUTER_PROTOCOL_MAGIC) {
+        Set_Error_(error_message, "invalid router protocol magic");
+        return false;
+    }
+    if (version != ROUTER_PROTOCOL_VERSION) {
+        Set_Error_(error_message, "unsupported router protocol version");
+        return false;
+    }
+    if (!Is_Known_Message_Kind(kind)) {
+        Set_Error_(error_message, "unknown router message kind");
+        return false;
+    }
+
+    s_router_message decoded;
+    decoded.header.kind = (e_router_message_kind)kind;
+    Read_Header_Uint32_(data, 8, &decoded.header.flags);
+    Read_Header_Uint32_(data, 12, &decoded.header.session_id);
+    Read_Header_Uint32_(data, 16, &decoded.header.sender_network_id);
+    Read_Header_Uint32_(data, 20, &decoded.header.target_network_id);
+    Read_Header_Uint32_(data, 24, &decoded.header.request_id);
+    Read_Header_Uint32_(data, 28, payload_size);
+
+    *message = std::move(decoded);
+    return true;
+}
+
+}
+
+struct s_router_frame_codec_state {
+    LZ4_stream_t* encode_stream = nullptr;
+    LZ4_streamDecode_t* decode_stream = nullptr;
+    Bit_Stream encode_dictionary;
+    Bit_Stream decode_dictionary;
+    s_router_frame_codec_stats stats;
+};
+
+s_router_frame_codec::s_router_frame_codec()
+    : state(std::make_unique<s_router_frame_codec_state>()) {
+    state->encode_stream = LZ4_createStream();
+    state->decode_stream = LZ4_createStreamDecode();
+    if (state->encode_stream == nullptr || state->decode_stream == nullptr) {
+        Crash_Write_Failed_();
+    }
+}
+
+s_router_frame_codec::~s_router_frame_codec() {
+    if (state != nullptr) {
+        if (state->encode_stream != nullptr) {
+            LZ4_freeStream(state->encode_stream);
+            state->encode_stream = nullptr;
+        }
+        if (state->decode_stream != nullptr) {
+            LZ4_freeStreamDecode(state->decode_stream);
+            state->decode_stream = nullptr;
+        }
+    }
+}
+
+void s_router_frame_codec::Reset() {
+    if (state == nullptr) {
+        state = std::make_unique<s_router_frame_codec_state>();
+    }
+    if (state->encode_stream == nullptr) {
+        state->encode_stream = LZ4_createStream();
+    } else {
+        LZ4_resetStream_fast(state->encode_stream);
+    }
+    if (state->decode_stream == nullptr) {
+        state->decode_stream = LZ4_createStreamDecode();
+    } else {
+        LZ4_setStreamDecode(state->decode_stream, nullptr, 0);
+    }
+    if (state->encode_stream == nullptr || state->decode_stream == nullptr) {
+        Crash_Write_Failed_();
+    }
+    state->encode_dictionary.Clear();
+    state->decode_dictionary.Clear();
+    state->stats = {};
+}
+
+s_router_frame_codec_stats s_router_frame_codec::Stats() const {
+    if (state == nullptr) {
+        return {};
+    }
+    return state->stats;
 }
 
 void Router_Copy_String(char* destination, uint32_t destination_size, const char* source) {
@@ -176,6 +319,26 @@ void Bit_Stream::Set_Buffer(const uint8_t* data, uint32_t size) {
 
 void Bit_Stream::Reserve(uint32_t size) {
     Grow_To_(size);
+}
+
+void Bit_Stream::Resize(uint32_t size) {
+    Grow_To_(size);
+    size_ = size;
+    if (read_offset_ > size_) {
+        read_offset_ = size_;
+    }
+}
+
+void Bit_Stream::Consume(uint32_t size) {
+    if (size >= size_) {
+        size_ = 0;
+        read_offset_ = 0;
+        return;
+    }
+
+    std::memmove(data_, data_ + size, size_ - size);
+    size_ -= size;
+    read_offset_ = read_offset_ > size ? read_offset_ - size : 0;
 }
 
 void Bit_Stream::Write_Uint8(uint8_t value) {
@@ -327,6 +490,10 @@ bool Bit_Stream::At_End() const {
     return read_offset_ == size_;
 }
 
+uint8_t* Bit_Stream::Data() {
+    return data_;
+}
+
 const uint8_t* Bit_Stream::Data() const {
     return data_;
 }
@@ -410,58 +577,103 @@ void Encode_Message_Body(const s_router_message* message, Bit_Stream* output) {
 }
 
 void Encode_Frame(const s_router_message* message, Bit_Stream* output) {
+    s_router_frame_codec codec;
+    Encode_Frame(message, &codec, output);
+}
+
+uint32_t Encoded_Frame_Max_Size(const s_router_message* message) {
+    if (message == nullptr) {
+        return 0;
+    }
+
+    uint64_t frame_size = 4U + ROUTER_PACKET_HEADER_SIZE + ROUTER_MESSAGE_HEADER_SIZE;
+    if (message->payload.Size() != 0) {
+        if (message->payload.Size() > (uint32_t)std::numeric_limits<int>::max()) {
+            return std::numeric_limits<uint32_t>::max();
+        }
+
+        const int compressed_bound = LZ4_compressBound((int)message->payload.Size());
+        if (compressed_bound <= 0) {
+            return std::numeric_limits<uint32_t>::max();
+        }
+        frame_size += (uint32_t)compressed_bound;
+    }
+
+    if (frame_size > std::numeric_limits<uint32_t>::max()) {
+        return std::numeric_limits<uint32_t>::max();
+    }
+    return (uint32_t)frame_size;
+}
+
+void Encode_Frame(const s_router_message* message, s_router_frame_codec* codec, Bit_Stream* output) {
     if (message == nullptr || output == nullptr) {
         Crash_Write_Failed_();
     }
+    if (codec == nullptr || codec->state == nullptr || codec->state->encode_stream == nullptr) {
+        Crash_Write_Failed_();
+    }
 
-    Bit_Stream body;
-    Encode_Message_Body(message, &body);
+    uint16_t packet_flags = 0;
+    Bit_Stream wire_payload;
+    if (message->payload.Size() != 0) {
+        if (message->payload.Size() > (uint32_t)std::numeric_limits<int>::max()) {
+            Crash_Write_Failed_();
+        }
+
+        const int compressed_bound = LZ4_compressBound((int)message->payload.Size());
+        if (compressed_bound <= 0) {
+            Crash_Write_Failed_();
+        }
+
+        wire_payload.Resize((uint32_t)compressed_bound);
+        LZ4_loadDict(
+            codec->state->encode_stream,
+            (const char*)codec->state->encode_dictionary.Data(),
+            (int)codec->state->encode_dictionary.Size());
+        const int compressed_size = LZ4_compress_fast_continue(
+            codec->state->encode_stream,
+            (const char*)message->payload.Data(),
+            (char*)wire_payload.Data(),
+            (int)message->payload.Size(),
+            compressed_bound,
+            1);
+        if (compressed_size <= 0) {
+            Crash_Write_Failed_();
+        }
+        wire_payload.Resize((uint32_t)compressed_size);
+        Save_Lz4_Dictionary_(&codec->state->encode_dictionary, message->payload.Data(), message->payload.Size());
+        codec->state->stats.uncompressed_payload_bytes_out += message->payload.Size();
+        codec->state->stats.compressed_payload_bytes_out += wire_payload.Size();
+        packet_flags |= ROUTER_PACKET_FLAG_PAYLOAD_LZ4_COMPRESSED;
+    }
+
+    const uint32_t frame_size = ROUTER_PACKET_HEADER_SIZE + ROUTER_MESSAGE_HEADER_SIZE + wire_payload.Size();
+    if (frame_size < wire_payload.Size()) {
+        Crash_Write_Failed_();
+    }
 
     output->Clear();
-    output->Reserve(4 + body.Size());
-    output->Write_Uint32(body.Size());
-    output->Write_Bytes(body.Data(), body.Size());
+    output->Reserve(4 + frame_size);
+    output->Write_Uint32(frame_size);
+    output->Write_Uint16(packet_flags);
+    output->Write_Uint32(ROUTER_PROTOCOL_MAGIC);
+    output->Write_Uint16((uint16_t)ROUTER_PROTOCOL_VERSION);
+    output->Write_Uint16((uint16_t)message->header.kind);
+    output->Write_Uint32(message->header.flags);
+    output->Write_Uint32(message->header.session_id);
+    output->Write_Uint32(message->header.sender_network_id);
+    output->Write_Uint32(message->header.target_network_id);
+    output->Write_Uint32(message->header.request_id);
+    output->Write_Uint32(message->payload.Size());
+    output->Write_Bytes(wire_payload.Data(), wire_payload.Size());
 }
 
 bool Decode_Message_Body(const uint8_t* data, uint32_t size, s_router_message* message, std::string* error_message) {
-    if (message == nullptr) {
-        Set_Error_(error_message, "message output is null");
-        return false;
-    }
-    if (data == nullptr || size < ROUTER_MESSAGE_HEADER_SIZE) {
-        Set_Error_(error_message, "message body is shorter than the fixed header");
-        return false;
-    }
-
-    uint32_t magic = 0;
-    uint16_t version = 0;
-    uint16_t kind = 0;
     uint32_t payload_size = 0;
-
-    Read_Header_Uint32_(data, 0, &magic);
-    Read_Header_Uint16_(data, 4, &version);
-    Read_Header_Uint16_(data, 6, &kind);
-    if (magic != ROUTER_PROTOCOL_MAGIC) {
-        Set_Error_(error_message, "invalid router protocol magic");
-        return false;
-    }
-    if (version != ROUTER_PROTOCOL_VERSION) {
-        Set_Error_(error_message, "unsupported router protocol version");
-        return false;
-    }
-    if (!Is_Known_Message_Kind(kind)) {
-        Set_Error_(error_message, "unknown router message kind");
-        return false;
-    }
-
     s_router_message decoded;
-    decoded.header.kind = (e_router_message_kind)kind;
-    Read_Header_Uint32_(data, 8, &decoded.header.flags);
-    Read_Header_Uint32_(data, 12, &decoded.header.session_id);
-    Read_Header_Uint32_(data, 16, &decoded.header.sender_network_id);
-    Read_Header_Uint32_(data, 20, &decoded.header.target_network_id);
-    Read_Header_Uint32_(data, 24, &decoded.header.request_id);
-    Read_Header_Uint32_(data, 28, &payload_size);
+    if (!Decode_Message_Header_(data, size, &decoded, &payload_size, error_message)) {
+        return false;
+    }
 
     if (payload_size != size - ROUTER_MESSAGE_HEADER_SIZE) {
         Set_Error_(error_message, "payload size does not match frame body size");
@@ -473,35 +685,104 @@ bool Decode_Message_Body(const uint8_t* data, uint32_t size, s_router_message* m
     return true;
 }
 
-e_frame_read_status Try_Read_Frame(std::vector<uint8_t>* input_buffer, uint32_t max_frame_size, s_router_message* message, std::string* error_message) {
-    if (input_buffer == nullptr || message == nullptr) {
+e_frame_read_status Try_Read_Frame(Bit_Stream* input_buffer, uint32_t max_frame_size, s_router_message* message, std::string* error_message) {
+    s_router_frame_codec codec;
+    return Try_Read_Frame(input_buffer, max_frame_size, &codec, message, error_message);
+}
+
+e_frame_read_status Try_Read_Frame(Bit_Stream* input_buffer, uint32_t max_frame_size, s_router_frame_codec* codec, s_router_message* message, std::string* error_message) {
+    if (input_buffer == nullptr || codec == nullptr || codec->state == nullptr || message == nullptr) {
         Set_Error_(error_message, "frame read argument is null");
         return FRAME_READ_PROTOCOL_ERROR;
     }
 
-    if (input_buffer->size() < 4) {
+    if (input_buffer->Size() < 4) {
         return FRAME_READ_NEED_MORE_DATA;
     }
 
     uint32_t frame_size = 0;
-    Read_Header_Uint32_(input_buffer->data(), 0, &frame_size);
-    if (frame_size < ROUTER_MESSAGE_HEADER_SIZE) {
-        Set_Error_(error_message, "frame size is smaller than the fixed header");
+    Read_Header_Uint32_(input_buffer->Data(), 0, &frame_size);
+    if (frame_size < ROUTER_PACKET_HEADER_SIZE + ROUTER_MESSAGE_HEADER_SIZE) {
+        Set_Error_(error_message, "frame size is smaller than the packet header");
         return FRAME_READ_PROTOCOL_ERROR;
     }
-    if (frame_size > max_frame_size) {
+    if (frame_size > Max_Wire_Frame_Size_(max_frame_size)) {
         Set_Error_(error_message, "frame size exceeds configured maximum");
         return FRAME_READ_PROTOCOL_ERROR;
     }
-    if (input_buffer->size() < 4u + frame_size) {
+    if (input_buffer->Size() < 4u + frame_size) {
         return FRAME_READ_NEED_MORE_DATA;
     }
 
-    if (!Decode_Message_Body(input_buffer->data() + 4, frame_size, message, error_message)) {
+    const uint8_t* frame_data = input_buffer->Data() + 4;
+    uint16_t packet_flags = 0;
+    Read_Header_Uint16_(frame_data, 0, &packet_flags);
+    if ((packet_flags & ~ROUTER_KNOWN_PACKET_FLAGS) != 0) {
+        Set_Error_(error_message, "unknown packet flags");
         return FRAME_READ_PROTOCOL_ERROR;
     }
 
-    input_buffer->erase(input_buffer->begin(), input_buffer->begin() + 4 + frame_size);
+    const uint8_t* body_data = frame_data + ROUTER_PACKET_HEADER_SIZE;
+    const uint32_t body_size = frame_size - ROUTER_PACKET_HEADER_SIZE;
+    const bool payload_compressed = (packet_flags & ROUTER_PACKET_FLAG_PAYLOAD_LZ4_COMPRESSED) != 0;
+    if (payload_compressed) {
+        uint32_t payload_size = 0;
+        s_router_message decoded;
+        if (!Decode_Message_Header_(body_data, body_size, &decoded, &payload_size, error_message)) {
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+        if (payload_size == 0) {
+            Set_Error_(error_message, "compressed payload has zero uncompressed size");
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+        if (max_frame_size < ROUTER_MESSAGE_HEADER_SIZE || payload_size > max_frame_size - ROUTER_MESSAGE_HEADER_SIZE) {
+            Set_Error_(error_message, "uncompressed payload size exceeds configured maximum");
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+        const uint32_t compressed_payload_size = body_size - ROUTER_MESSAGE_HEADER_SIZE;
+        if (payload_size > (uint32_t)std::numeric_limits<int>::max() || compressed_payload_size > (uint32_t)std::numeric_limits<int>::max()) {
+            Set_Error_(error_message, "compressed payload is too large for lz4");
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+
+        Bit_Stream payload;
+        payload.Resize(payload_size);
+        LZ4_setStreamDecode(
+            codec->state->decode_stream,
+            (const char*)codec->state->decode_dictionary.Data(),
+            (int)codec->state->decode_dictionary.Size());
+        const int decoded_size = LZ4_decompress_safe_continue(
+            codec->state->decode_stream,
+            (const char*)body_data + ROUTER_MESSAGE_HEADER_SIZE,
+            (char*)payload.Data(),
+            (int)compressed_payload_size,
+            (int)payload_size);
+        if (decoded_size != (int)payload_size) {
+            Set_Error_(error_message, "lz4 payload decompression failed");
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+        Save_Lz4_Dictionary_(&codec->state->decode_dictionary, payload.Data(), payload.Size());
+        codec->state->stats.uncompressed_payload_bytes_in += payload.Size();
+        codec->state->stats.compressed_payload_bytes_in += compressed_payload_size;
+        codec->state->stats.last_uncompressed_payload_bytes_in = payload.Size();
+        codec->state->stats.last_compressed_payload_bytes_in = compressed_payload_size;
+
+        decoded.payload = std::move(payload);
+        *message = std::move(decoded);
+    } else {
+        if (body_size > max_frame_size) {
+            Set_Error_(error_message, "frame size exceeds configured maximum");
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+        if (!Decode_Message_Body(body_data, body_size, message, error_message)) {
+            return FRAME_READ_PROTOCOL_ERROR;
+        }
+        Save_Lz4_Dictionary_(&codec->state->decode_dictionary, message->payload.Data(), message->payload.Size());
+        codec->state->stats.last_uncompressed_payload_bytes_in = message->payload.Size();
+        codec->state->stats.last_compressed_payload_bytes_in = message->payload.Size();
+    }
+
+    input_buffer->Consume(4 + frame_size);
     return FRAME_READ_MESSAGE_READY;
 }
 

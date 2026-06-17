@@ -80,6 +80,8 @@ set(ORION2RE_VENDORED_DOCTEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/doctest")
 set(ORION2RE_VENDORED_DOCTEST_COMMIT "1da23a3e8119ec5cce4f9388e91b065e20bf06f5")
 set(ORION2RE_VENDORED_LIBUV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libuv")
 set(ORION2RE_VENDORED_LIBUV_COMMIT "5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b")
+set(ORION2RE_VENDORED_LZ4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/lz4")
+set(ORION2RE_VENDORED_LZ4_COMMIT "0774d05537f9762f838f7ab541b7765f1a729cb5")
 set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
 
 if(MSVC)
@@ -133,6 +135,13 @@ if(NOT EXISTS "${ORION2RE_VENDORED_LIBUV_DIR}/CMakeLists.txt")
     )
 endif()
 
+if(NOT EXISTS "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.h" OR NOT EXISTS "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.c")
+    message(FATAL_ERROR
+        "The router protocol requires the lz4 submodule at vendors/lz4. "
+        "Run 'git submodule update --init --recursive vendors/lz4' and ensure it is pinned to ${ORION2RE_VENDORED_LZ4_COMMIT}."
+    )
+endif()
+
 if(NOT EXISTS "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c")
     message(FATAL_ERROR
         "This project requires libsmacker sources at vendors/libsmacker."
@@ -151,6 +160,13 @@ set(LIBUV_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(LIBUV_BUILD_BENCH OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("${ORION2RE_VENDORED_LIBUV_DIR}" EXCLUDE_FROM_ALL)
+
+add_library(orion2re_lz4 STATIC
+    "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.c"
+)
+target_include_directories(orion2re_lz4 PUBLIC
+    "${ORION2RE_VENDORED_LZ4_DIR}/lib"
+)
 
 if(MSVC AND WIN32 AND ORION2RE_GAME_DIR)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
@@ -206,6 +222,7 @@ target_precompile_headers(orion2re PRIVATE
 target_link_libraries(orion2re PRIVATE
     SDL3::SDL3-static
     uv_a
+    orion2re_lz4
 )
 
 add_executable(orion2re-router
@@ -223,6 +240,7 @@ target_include_directories(orion2re-router PRIVATE
 )
 target_link_libraries(orion2re-router PRIVATE
     uv_a
+    orion2re_lz4
 )
 
 if(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG)

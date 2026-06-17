@@ -31,6 +31,9 @@ struct Service_Thread_Guard_ {
 
 struct Test_Log_ {
     std::atomic<int> backpressure_drops{0};
+    std::atomic<int> broadcast_data_sizes{0};
+    std::atomic<int> compression_stats{0};
+    std::atomic<int> direct_data_sizes{0};
     std::atomic<int> protocol_errors{0};
 };
 
@@ -41,6 +44,21 @@ void Test_Log_Callback_(const char* message, void* user_data) {
     }
     if (std::strstr(message, "dropping outbound router message") != nullptr) {
         log->backpressure_drops.fetch_add(1);
+    }
+    if (std::strstr(message, "game data broadcast") != nullptr &&
+        std::strstr(message, "bytes=") != nullptr &&
+        std::strstr(message, "compressed_bytes=") != nullptr &&
+        std::strstr(message, "compression_saved=") != nullptr) {
+        log->broadcast_data_sizes.fetch_add(1);
+    }
+    if (std::strstr(message, "game data direct") != nullptr &&
+        std::strstr(message, "bytes=") != nullptr &&
+        std::strstr(message, "compressed_bytes=") != nullptr &&
+        std::strstr(message, "compression_saved=") != nullptr) {
+        log->direct_data_sizes.fetch_add(1);
+    }
+    if (std::strstr(message, "traffic peer=") != nullptr && std::strstr(message, "compressed_payload_in=") != nullptr) {
+        log->compression_stats.fetch_add(1);
     }
     if (std::strstr(message, "protocol") != nullptr || std::strstr(message, "frame") != nullptr) {
         log->protocol_errors.fetch_add(1);
@@ -81,14 +99,15 @@ s_router_message Make_Join_(uint32_t session_id, uint32_t request_id) {
     return message;
 }
 
-std::vector<uint8_t> Copy_Stream_(const Bit_Stream& stream) {
-    return std::vector<uint8_t>(stream.Data(), stream.Data() + stream.Size());
+bool Stream_Equals_(const Bit_Stream& stream, const uint8_t* data, uint32_t size) {
+    return stream.Size() == size && (size == 0 || std::memcmp(stream.Data(), data, size) == 0);
 }
 
 struct Uv_Test_Client_ {
     uv_loop_t loop{};
     uv_tcp_t tcp{};
-    std::vector<uint8_t> read_buffer;
+    Bit_Stream read_buffer;
+    s_router_frame_codec frame_codec;
     std::vector<s_router_message> received_messages;
     bool loop_initialized = false;
     bool tcp_initialized = false;
@@ -147,7 +166,7 @@ struct Uv_Test_Client_ {
 
     bool Send(const s_router_message& message) {
         Bit_Stream frame;
-        Encode_Frame(&message, &frame);
+        Encode_Frame(&message, &frame_codec, &frame);
         return Send_Raw(frame.Data(), frame.Size());
     }
 
@@ -266,11 +285,11 @@ struct Uv_Test_Client_ {
         Uv_Test_Client_* client = (Uv_Test_Client_*)stream->data;
         if (bytes_read > 0) {
             const uint8_t* bytes = (const uint8_t*)buffer->base;
-            client->read_buffer.insert(client->read_buffer.end(), bytes, bytes + bytes_read);
+            client->read_buffer.Write_Bytes(bytes, (uint32_t)bytes_read);
             for (;;) {
                 s_router_message message;
                 std::string error_message;
-                const e_frame_read_status status = Try_Read_Frame(&client->read_buffer, ROUTER_DEFAULT_MAX_FRAME_SIZE, &message, &error_message);
+                const e_frame_read_status status = Try_Read_Frame(&client->read_buffer, ROUTER_DEFAULT_MAX_FRAME_SIZE, &client->frame_codec, &message, &error_message);
                 if (status == FRAME_READ_NEED_MORE_DATA) {
                     break;
                 }
@@ -300,7 +319,7 @@ struct Uv_Test_Client_ {
 struct Uv_Udp_Client_ {
     uv_loop_t loop{};
     uv_udp_t udp{};
-    std::vector<uint8_t> reply;
+    Bit_Stream reply;
     bool loop_initialized = false;
     bool udp_initialized = false;
     bool send_done = false;
@@ -364,7 +383,7 @@ struct Uv_Udp_Client_ {
     }
 
     bool Wait_For_Reply() {
-        return Pump_Until_([&]() { return !reply.empty(); });
+        return Pump_Until_([&]() { return reply.Size() != 0; });
     }
 
     void Close() {
@@ -414,7 +433,8 @@ struct Uv_Udp_Client_ {
         Uv_Udp_Client_* client = (Uv_Udp_Client_*)handle->data;
         if (bytes_read > 0) {
             const uint8_t* bytes = (const uint8_t*)buffer->base;
-            client->reply.assign(bytes, bytes + bytes_read);
+            client->reply.Clear();
+            client->reply.Write_Bytes(bytes, (uint32_t)bytes_read);
         } else if (bytes_read < 0 && bytes_read != UV_EOF) {
             client->error = (int)bytes_read;
         }
@@ -497,6 +517,10 @@ DOCTEST_TEST_CASE("uv TCP service performs hello, session registration, join, an
     config.tcp_port = 0;
     config.enable_discovery = false;
     config.enable_signal_handlers = false;
+    config.verbose_logging = true;
+    Test_Log_ log;
+    config.log_callback = Test_Log_Callback_;
+    config.log_user_data = &log;
     Router_Copy_String(config.router_id, sizeof(config.router_id), "tcp-router");
 
     s_router_service service;
@@ -566,7 +590,7 @@ DOCTEST_TEST_CASE("uv TCP service performs hello, session registration, join, an
     DOCTEST_REQUIRE(host.Wait_For_Messages(5));
     DOCTEST_CHECK(host.received_messages[4].header.kind == ROUTER_MESSAGE_GAME_DATA);
     DOCTEST_CHECK(host.received_messages[4].header.sender_network_id == guest_welcome.network_id);
-    DOCTEST_CHECK(Copy_Stream_(host.received_messages[4].payload) == std::vector<uint8_t>{42, 43});
+    DOCTEST_CHECK(Stream_Equals_(host.received_messages[4].payload, direct_payload, sizeof(direct_payload)));
 
     s_router_message broadcast;
     broadcast.header.kind = ROUTER_MESSAGE_SEND_BROADCAST;
@@ -577,8 +601,8 @@ DOCTEST_TEST_CASE("uv TCP service performs hello, session registration, join, an
     DOCTEST_REQUIRE(host.Send(broadcast));
     DOCTEST_REQUIRE(host.Wait_For_Messages(6));
     DOCTEST_REQUIRE(guest.Wait_For_Messages(5));
-    DOCTEST_CHECK(Copy_Stream_(host.received_messages[5].payload) == std::vector<uint8_t>{7, 8, 9});
-    DOCTEST_CHECK(Copy_Stream_(guest.received_messages[4].payload) == std::vector<uint8_t>{7, 8, 9});
+    DOCTEST_CHECK(Stream_Equals_(host.received_messages[5].payload, broadcast_payload, sizeof(broadcast_payload)));
+    DOCTEST_CHECK(Stream_Equals_(guest.received_messages[4].payload, broadcast_payload, sizeof(broadcast_payload)));
 
     guest.Close();
     host.Close();
@@ -587,6 +611,9 @@ DOCTEST_TEST_CASE("uv TCP service performs hello, session registration, join, an
     service_guard.service = nullptr;
     service_guard.service_thread = nullptr;
     DOCTEST_CHECK(run_result == 0);
+    DOCTEST_CHECK(log.broadcast_data_sizes.load() == 1);
+    DOCTEST_CHECK(log.compression_stats.load() >= 2);
+    DOCTEST_CHECK(log.direct_data_sizes.load() == 1);
 }
 
 DOCTEST_TEST_CASE("uv TCP service returns protocol error before closing malformed frames") {
@@ -640,19 +667,20 @@ DOCTEST_TEST_CASE("uv TCP service handles multiple framed messages in one write"
     DOCTEST_REQUIRE(client.Connect(Router_Service_Bound_Tcp_Port(&service)));
 
     Bit_Stream hello_frame;
+    s_router_frame_codec frame_codec;
     s_router_message hello = Make_Hello_("host", 1);
-    Encode_Frame(&hello, &hello_frame);
+    Encode_Frame(&hello, &frame_codec, &hello_frame);
 
     Bit_Stream list_frame;
     s_router_message list;
     list.header.kind = ROUTER_MESSAGE_LIST_SESSIONS;
     list.header.request_id = 2;
-    Encode_Frame(&list, &list_frame);
+    Encode_Frame(&list, &frame_codec, &list_frame);
 
-    std::vector<uint8_t> combined;
-    combined.insert(combined.end(), hello_frame.Data(), hello_frame.Data() + hello_frame.Size());
-    combined.insert(combined.end(), list_frame.Data(), list_frame.Data() + list_frame.Size());
-    DOCTEST_REQUIRE(client.Send_Raw(combined.data(), (uint32_t)combined.size()));
+    Bit_Stream combined;
+    combined.Write_Bytes(hello_frame.Data(), hello_frame.Size());
+    combined.Write_Bytes(list_frame.Data(), list_frame.Size());
+    DOCTEST_REQUIRE(client.Send_Raw(combined.Data(), combined.Size()));
     DOCTEST_REQUIRE(client.Wait_For_Messages(2));
     DOCTEST_CHECK(client.received_messages[0].header.kind == ROUTER_MESSAGE_WELCOME);
     DOCTEST_CHECK(client.received_messages[1].header.kind == ROUTER_MESSAGE_SESSION_LIST);
@@ -755,10 +783,9 @@ DOCTEST_TEST_CASE("uv UDP discovery socket replies to binary probe") {
     DOCTEST_REQUIRE(client.Send_Probe(Router_Service_Bound_Discovery_Port(&service)));
     DOCTEST_REQUIRE(client.Wait_For_Reply());
 
-    Bit_Stream reply_payload(client.reply.data(), (uint32_t)client.reply.size());
     s_router_discovery_reply reply;
     std::string error;
-    DOCTEST_REQUIRE(Decode_Discovery_Reply(&reply_payload, &reply, &error));
+    DOCTEST_REQUIRE(Decode_Discovery_Reply(&client.reply, &reply, &error));
     DOCTEST_CHECK(reply.tcp_port == Router_Service_Bound_Tcp_Port(&service));
     DOCTEST_CHECK(std::strcmp(reply.router_id, "udp-router") == 0);
     DOCTEST_CHECK(std::strcmp(reply.router_name, "UDP Router") == 0);

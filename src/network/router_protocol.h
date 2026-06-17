@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -8,6 +9,8 @@
 #define ROUTER_PROTOCOL_VERSION 1U
 #define ROUTER_VERSION 1U
 #define ROUTER_MESSAGE_HEADER_SIZE 32U
+#define ROUTER_PACKET_HEADER_SIZE 2U
+#define ROUTER_PACKET_FLAG_PAYLOAD_LZ4_COMPRESSED (1U << 0)
 #define ROUTER_DEFAULT_MAX_FRAME_SIZE (16U * 1024U * 1024U)
 
 #define ROUTER_DISCOVERY_MAGIC 0x4452324fU
@@ -103,6 +106,8 @@ public:
     void Clear();
     void Set_Buffer(const uint8_t* data, uint32_t size);
     void Reserve(uint32_t size);
+    void Resize(uint32_t size);
+    void Consume(uint32_t size);
     void Write_Uint8(uint8_t value);
     void Write_Uint16(uint16_t value);
     void Write_Uint32(uint32_t value);
@@ -118,6 +123,7 @@ public:
     bool Read_String(uint32_t* string_length, uint32_t output_size, char* output);
     bool Read_ASCIIZ_String(uint32_t* string_length, uint32_t output_size, char* output);
     bool At_End() const;
+    uint8_t* Data();
     const uint8_t* Data() const;
     uint32_t Size() const;
     uint32_t Tell() const;
@@ -134,6 +140,30 @@ private:
 struct s_router_message {
     s_router_message_header header;
     Bit_Stream payload;
+};
+
+struct s_router_frame_codec_stats {
+    uint64_t uncompressed_payload_bytes_in = 0;
+    uint64_t compressed_payload_bytes_in = 0;
+    uint64_t uncompressed_payload_bytes_out = 0;
+    uint64_t compressed_payload_bytes_out = 0;
+    uint32_t last_uncompressed_payload_bytes_in = 0;
+    uint32_t last_compressed_payload_bytes_in = 0;
+};
+
+struct s_router_frame_codec_state;
+
+struct s_router_frame_codec {
+    s_router_frame_codec();
+    ~s_router_frame_codec();
+
+    s_router_frame_codec(const s_router_frame_codec&) = delete;
+    s_router_frame_codec& operator=(const s_router_frame_codec&) = delete;
+
+    void Reset();
+    s_router_frame_codec_stats Stats() const;
+
+    std::unique_ptr<s_router_frame_codec_state> state;
 };
 
 enum e_frame_read_status {
@@ -201,10 +231,13 @@ struct s_router_discovery_reply {
 bool Is_Known_Message_Kind(uint16_t value);
 
 void Encode_Message_Body(const s_router_message* message, Bit_Stream* output);
+uint32_t Encoded_Frame_Max_Size(const s_router_message* message);
+void Encode_Frame(const s_router_message* message, s_router_frame_codec* codec, Bit_Stream* output);
 void Encode_Frame(const s_router_message* message, Bit_Stream* output);
 
 bool Decode_Message_Body(const uint8_t* data, uint32_t size, s_router_message* message, std::string* error_message);
-e_frame_read_status Try_Read_Frame(std::vector<uint8_t>* input_buffer, uint32_t max_frame_size, s_router_message* message, std::string* error_message);
+e_frame_read_status Try_Read_Frame(Bit_Stream* input_buffer, uint32_t max_frame_size, s_router_frame_codec* codec, s_router_message* message, std::string* error_message);
+e_frame_read_status Try_Read_Frame(Bit_Stream* input_buffer, uint32_t max_frame_size, s_router_message* message, std::string* error_message);
 
 void Encode_Text_Payload(const char* text, Bit_Stream* payload);
 bool Decode_Text_Payload(const Bit_Stream* payload, uint32_t output_size, char* output, std::string* error_message);

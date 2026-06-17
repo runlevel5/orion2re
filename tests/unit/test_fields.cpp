@@ -2473,6 +2473,14 @@ DOCTEST_TEST_CASE("interpret mouse input held right button over button returns n
     DOCTEST_CHECK(fields::Interpret_Mouse_Input_() == -field_idx);
 }
 
+DOCTEST_TEST_CASE("get input returns cancel after shutdown is requested") {
+    Fields_Test_Reset reset;
+
+    platform::g_should_exit = 1;
+
+    DOCTEST_CHECK(fields::Get_Input_() == -1);
+}
+
 }
 
 #undef s_animation_header

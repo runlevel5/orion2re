@@ -83,6 +83,8 @@ orion2re_add_unit_test(test_router_protocol
         tests/unit/test_router_protocol.cpp
     PRODUCTION_SOURCES
         src/network/router_protocol.cpp
+    LIBRARIES
+        orion2re_lz4
 )
 
 orion2re_add_unit_test(test_router_core
@@ -91,6 +93,8 @@ orion2re_add_unit_test(test_router_core
     PRODUCTION_SOURCES
         src/network/router_core.cpp
         src/network/router_protocol.cpp
+    LIBRARIES
+        orion2re_lz4
 )
 
 orion2re_add_unit_test(test_router_service
@@ -102,6 +106,7 @@ orion2re_add_unit_test(test_router_service
         src/network/router_service.cpp
     LIBRARIES
         uv_a
+        orion2re_lz4
     LINK_SDL
 )
 
@@ -116,6 +121,7 @@ orion2re_add_unit_test(test_router_session_browser
         src/network/router_service.cpp
     LIBRARIES
         uv_a
+        orion2re_lz4
     LINK_SDL
 )
 
@@ -131,6 +137,7 @@ orion2re_add_unit_test(test_netadapter
         src/network/router_service.cpp
     LIBRARIES
         uv_a
+        orion2re_lz4
     LINK_SDL
 )
 
@@ -144,5 +151,6 @@ orion2re_add_unit_test(test_router_client
         src/network/router_service.cpp
     LIBRARIES
         uv_a
+        orion2re_lz4
     LINK_SDL
 )

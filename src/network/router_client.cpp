@@ -43,7 +43,8 @@ struct s_router_client_state {
     uint32_t local_network_id = 0;
     uint32_t session_id = 0;
     char router_id[ROUTER_ID_SIZE] = {};
-    std::vector<uint8_t> read_buffer;
+    Bit_Stream read_buffer;
+    s_router_frame_codec frame_codec;
     std::deque<s_router_client_event> events;
     std::vector<s_router_session_info> sessions;
     std::vector<s_router_member_info> members;
@@ -258,12 +259,12 @@ void Router_Client_Read_Callback_(uv_stream_t* stream, ssize_t bytes_read, const
 
     if (bytes_read > 0) {
         const uint8_t* bytes = (const uint8_t*)buffer->base;
-        state->read_buffer.insert(state->read_buffer.end(), bytes, bytes + bytes_read);
+        state->read_buffer.Write_Bytes(bytes, (uint32_t)bytes_read);
 
         for (;;) {
             s_router_message message;
             std::string error_message;
-            const e_frame_read_status status = Try_Read_Frame(&state->read_buffer, state->config.max_frame_size, &message, &error_message);
+            const e_frame_read_status status = Try_Read_Frame(&state->read_buffer, state->config.max_frame_size, &state->frame_codec, &message, &error_message);
             if (status == FRAME_READ_NEED_MORE_DATA) {
                 break;
             }
@@ -335,7 +336,8 @@ void Router_Client_Init(s_router_client* client, const s_router_client_config* c
     client->state->connect_status = 0;
     client->state->connect_done = false;
     client->state->disconnected_event_sent = false;
-    client->state->read_buffer.clear();
+    client->state->read_buffer.Clear();
+    client->state->frame_codec.Reset();
     client->state->events.clear();
     client->state->sessions.clear();
     client->state->members.clear();
@@ -515,15 +517,15 @@ bool Router_Client_Send_Message(s_router_client* client, const s_router_message*
     }
 
     s_router_client_state* state = client->state.get();
-    s_router_client_write_request* write_request = new s_router_client_write_request{};
-    Encode_Frame(message, &write_request->data);
-    write_request->byte_count = write_request->data.Size();
-
-    if (write_request->byte_count > state->config.max_pending_write_bytes ||
-        state->pending_write_bytes > state->config.max_pending_write_bytes - write_request->byte_count) {
-        delete write_request;
+    const uint32_t max_encoded_size = Encoded_Frame_Max_Size(message);
+    if (max_encoded_size > state->config.max_pending_write_bytes ||
+        state->pending_write_bytes > state->config.max_pending_write_bytes - max_encoded_size) {
         return false;
     }
+
+    s_router_client_write_request* write_request = new s_router_client_write_request{};
+    Encode_Frame(message, &state->frame_codec, &write_request->data);
+    write_request->byte_count = write_request->data.Size();
 
     state->pending_write_bytes += write_request->byte_count;
     write_request->buffer = uv_buf_init((char*)write_request->data.Data(), write_request->data.Size());
@@ -535,6 +537,7 @@ bool Router_Client_Send_Message(s_router_client* client, const s_router_message*
         state->pending_write_bytes -= write_request->byte_count;
         state->last_error = result;
         delete write_request;
+        Router_Client_Begin_Close_(state, true);
         return false;
     }
     return true;
