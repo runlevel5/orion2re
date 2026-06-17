@@ -192,8 +192,8 @@ namespace netcode {
                     netadapter::Last_Error(&_router_adapter),
                     netadapter::Last_Error_Message(&_router_adapter));
 
+                netadapter::Shutdown(&_router_adapter);
                 if (attempt != ROUTER_CONNECT_ATTEMPTS) {
-                    netadapter::Shutdown(&_router_adapter);
                     SDL_Delay(ROUTER_CONNECT_RETRY_DELAY_MS);
                 }
             }
