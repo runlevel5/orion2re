@@ -62,6 +62,7 @@ namespace platform {
 		bool Ensure_Cursor_Surface_();
 		void Apply_Pending_Cursor_State_();
 		void Blit_Cursor_On_Present_Surface_();
+		void Sync_Mouse_State_From_SDL_();
 
 		void Request_Present_Refresh_() {
 			SDL_SetAtomicInt(&g_present_refresh_requested, 1);
@@ -608,6 +609,42 @@ namespace platform {
 				g_sdl_present_argb_surface,
 				&dst_rect);
 		}
+
+		void Sync_Mouse_State_From_SDL_() {
+			if (g_sdl_window == nullptr || g_window_focus_state == 0) {
+				return;
+			}
+
+			float mouse_x = 0.0f;
+			float mouse_y = 0.0f;
+			const SDL_MouseButtonFlags sdl_buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+
+			int32_t window_width = 0;
+			int32_t window_height = 0;
+			SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
+
+			const int16_t mapped_mouse_x =
+				Map_Window_Coord_To_Game_Coord_(mouse_x, window_width, video::g_screen_res_x);
+			const int16_t mapped_mouse_y =
+				Map_Window_Coord_To_Game_Coord_(mouse_y, window_height, video::g_screen_res_y);
+
+			uint16_t mapped_buttons = 0;
+			if ((sdl_buttons & SDL_BUTTON_LMASK) != 0) {
+				mapped_buttons |= 1;
+			}
+			if ((sdl_buttons & SDL_BUTTON_RMASK) != 0) {
+				mapped_buttons |= 2;
+			}
+
+			Set_Present_Mouse_Position_(mapped_mouse_x, mapped_mouse_y);
+
+			if (mapped_mouse_x != platform::Get_Mouse_X_() ||
+				mapped_mouse_y != platform::Get_Mouse_Y_() ||
+				mapped_buttons != g_sdl_mouse_buttons) {
+				g_sdl_mouse_buttons = mapped_buttons;
+				Enqueue_Mouse_Input_Event_(mapped_mouse_x, mapped_mouse_y, mapped_buttons);
+			}
+		}
 	}
 
 	uint32_t g_os_ver;
@@ -820,6 +857,8 @@ namespace platform {
 
             if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
                 g_window_focus_state = 0;
+				g_sdl_mouse_buttons = 0;
+				Enqueue_Mouse_Input_Event_(g_mouse_x, g_mouse_y, 0);
                 continue;
             }
 
@@ -827,6 +866,7 @@ namespace platform {
                 g_window_focus_state = 1;
                 SDL_HideCursor();
 				Request_Present_Refresh_();
+				Sync_Mouse_State_From_SDL_();
                 continue;
             }
 

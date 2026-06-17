@@ -15,11 +15,9 @@
      - Expose a nonblocking pump/update API suitable for `netcode::Net_Update_()`.
      - Keep this layer gameplay-opaque; it must not convert players to AI, elect gameplay hosts, or interpret MOX/NETMOX packet IDs.
      - Status: implemented and covered by `test_router_client`.
-     - Simplification follow-up:
-       - Re-evaluate whether the client should continue to use libuv at all.
-       - The router service still benefits from libuv because it multiplexes many connections and UDP discovery.
-       - The client only owns one TCP connection, so a plain socket implementation with one dedicated blocking reader thread plus thread-safe send/receive queues may be simpler and easier to debug than the current libuv pump/callback client.
-       - If the current bounded-retry fix stabilizes startup, defer this rewrite; if client-side flakiness continues, replace only the client transport with a plain-socket worker-thread implementation while keeping the router service on libuv.
+     - Runtime direction:
+       - Keep libuv as the shared runtime for both the router service and the game-facing client layer.
+       - Client-side startup and connect-path issues should be debugged and fixed within the libuv-based implementation rather than treated as a reason to split the client onto a separate plain-socket/threaded transport.
    - Add the legacy-compatible game adapter:
      - Create `src/game/netadapter.h` and `src/game/netadapter.cpp`.
      - This is the compatibility seam between old gameplay code and the new router client.
@@ -94,7 +92,7 @@
      - For abrupt disconnect, remaining clients should deterministically elect the recovery coordinator from shared game state, initially lowest remaining connected game player index.
      - Only the elected coordinator should synthesize and broadcast the existing game-level dropout/AI takeover packet.
      - Reuse `NETMOX::Decode_Drop_Out_Info_()` and `RUSS::Make_Player_Into_AI_()` paths where practical.
-     - Status: pending; current netcode logs member-left/session events but does not yet invoke gameplay recovery.
+     - Status: initial bridge is implemented. `netcode` maps adapter `MEMBER_LEFT` events through `NETMOX::Net_Id_To_Player_Id_()` and calls `NETMOX::Handle_Network_Player_Disconnected_()`, which elects a recovery coordinator and broadcasts the existing dropout/AI takeover payload.
    - Update multiplayer UI session flow:
      - Keep the first pass minimally invasive by preserving current session-list display behavior.
      - Internally track router `session_id` instead of joining solely by session name because names are ambiguous.
@@ -109,7 +107,7 @@
      - Repurpose the modem path as the online/direct-IP adapter path.
      - Online/direct-IP mode should connect to a manually entered router host/IP and TCP port, defaulting to port `47800`.
      - Keep LAN and online modes using the same router protocol after bootstrap; only endpoint discovery differs.
-     - Status: direct endpoint configuration currently uses the existing modem reset text field as a temporary host string source when present; proper UI mapping remains pending.
+     - Status: adapter bootstrap modes now cover direct endpoint, LAN discovery, and embedded LAN hosting. `src/network/router_session_browser.*` owns session discovery: direct mode queries one configured TCP router; LAN mode sends UDP broadcast only, connects to responding routers, requests session lists, and returns one combined cached session list. LAN discovery is transparent to `netcode` and returns an empty session list when no routers reply instead of failing initialization. LAN hosting starts/stops the embedded router on an SDL thread. The modem button/path is now the temporary online/direct-router path using the modem reset text field as `host[:port]`; proper UI labeling remains pending.
    - Remove `WINNET` after adapter parity:
      - First remove mode 0 call sites of `WINNET::*` from `netcode.cpp`, `comcore.cpp`, `transprt.cpp`, and related gameplay code.
      - Remove public includes of `winnet.h` from active code.
@@ -120,7 +118,8 @@
    - Testing checkpoints:
      - Add unit tests for `router_client` connect/hello/list/create/join/send/receive/event handling.
      - Add unit tests for `netadapter` session-list caching, local ID propagation, membership tracking, direct send, broadcast send, and member-left exposure.
+     - Add unit tests for the network-layer session browser direct queries, LAN discovery empty results, duplicate endpoint handling, and combined multi-router results.
      - Add an integration-style test using an in-process `s_router_service` plus two clients.
      - Keep existing `test_router_protocol`, `test_router_core`, and `test_router_service` passing.
      - Build with legacy DirectPlay disabled and confirm router networking does not require Windows SDK or DirectPlay headers.
-     - Latest validation: `test_router_protocol`, `test_router_core`, `test_router_service`, `test_router_client`, and `test_netadapter` pass; `orion2re` builds in `build-router-tests`.
+     - Latest validation: `cmake --build --preset linux-debug-asan-tests --target test_router_protocol test_router_core test_router_service test_router_client test_router_session_browser test_netadapter orion2re`, `ctest --preset linux-router-tests`, and `cmake --build --preset linux-debug --target orion2re` pass.

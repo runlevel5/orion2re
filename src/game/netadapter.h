@@ -33,9 +33,18 @@ struct s_event {
     network::router::s_router_error_payload error;
 };
 
+enum e_bootstrap_mode {
+    BOOTSTRAP_DIRECT_ENDPOINT,
+    BOOTSTRAP_LAN_DISCOVERY,
+    BOOTSTRAP_EMBEDDED_LAN_HOST,
+};
+
 struct s_config {
     char host[ROUTER_ADDRESS_SIZE] = "127.0.0.1";
     uint16_t tcp_port = 47800;
+    uint16_t discovery_port = 47800;
+    uint32_t discovery_timeout_ms = 750;
+    e_bootstrap_mode bootstrap_mode = BOOTSTRAP_DIRECT_ENDPOINT;
     char client_name[ROUTER_PLAYER_NAME_SIZE] = "Player";
     char build_string[ROUTER_BUILD_STRING_SIZE] = "orion2re";
 };

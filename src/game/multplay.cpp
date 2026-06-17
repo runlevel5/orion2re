@@ -1151,7 +1151,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         bool exit_loop = false;
         int16_t result = -1;
 
-        if (MOX::_game_type == 2) {
+        if (MOX::_game_type == 2 || (MOX::_game_type == 3 && NETMOX::_net.mode == 1)) {
             MULTPLAY::Change_MP_Game_Name_();
             strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
 

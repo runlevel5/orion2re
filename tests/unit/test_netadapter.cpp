@@ -258,4 +258,175 @@ DOCTEST_TEST_CASE("adapter refresh updates cached session list when sessions dis
     DOCTEST_CHECK(run_result == 0);
 }
 
+DOCTEST_TEST_CASE("adapter falls back to a valid name for unnamed hosted sessions") {
+    s_router_config service_config;
+    Router_Copy_String(service_config.listen_host, sizeof(service_config.listen_host), "127.0.0.1");
+    service_config.tcp_port = 0;
+    service_config.enable_discovery = false;
+    service_config.enable_signal_handlers = false;
+
+    s_router_service service;
+    Router_Service_Init(&service, &service_config);
+    int run_result = -1;
+    std::thread service_thread;
+    Service_Thread_Guard_ service_guard{&service, &service_thread};
+    DOCTEST_REQUIRE(Start_Test_Service_(&service, &service_thread, &run_result));
+
+    netadapter::s_adapter host;
+    netadapter::s_adapter browser;
+    netadapter::s_config host_config = Make_Config_(Router_Service_Bound_Tcp_Port(&service), "host");
+    netadapter::s_config browser_config = Make_Config_(Router_Service_Bound_Tcp_Port(&service), "browser");
+    netadapter::Init(&host, &host_config);
+    netadapter::Init(&browser, &browser_config);
+
+    DOCTEST_REQUIRE(netadapter::Connect(&host));
+    DOCTEST_REQUIRE(Wait_For_Local_Id_(&host));
+    DOCTEST_REQUIRE(netadapter::Create_Game(&host, "", 4, "Host"));
+    DOCTEST_REQUIRE(Wait_For_Session_(&host));
+
+    DOCTEST_REQUIRE(netadapter::Connect(&browser));
+    DOCTEST_REQUIRE(Wait_For_Local_Id_(&browser));
+    DOCTEST_REQUIRE(netadapter::Refresh_Game_List(&browser));
+    DOCTEST_REQUIRE(Wait_For_Game_Count_(&browser, 1));
+    DOCTEST_CHECK(std::strcmp(netadapter::Game_Name(&browser, 0), "Game") == 0);
+
+    netadapter::Shutdown(&browser);
+    netadapter::Shutdown(&host);
+    Router_Service_Request_Stop(&service);
+    service_thread.join();
+    service_guard.service = nullptr;
+    service_guard.service_thread = nullptr;
+    DOCTEST_CHECK(run_result == 0);
+}
+
+DOCTEST_TEST_CASE("adapter refresh hides games closed to new players") {
+    s_router_config service_config;
+    Router_Copy_String(service_config.listen_host, sizeof(service_config.listen_host), "127.0.0.1");
+    service_config.tcp_port = 0;
+    service_config.enable_discovery = false;
+    service_config.enable_signal_handlers = false;
+
+    s_router_service service;
+    Router_Service_Init(&service, &service_config);
+    int run_result = -1;
+    std::thread service_thread;
+    Service_Thread_Guard_ service_guard{&service, &service_thread};
+    DOCTEST_REQUIRE(Start_Test_Service_(&service, &service_thread, &run_result));
+
+    netadapter::s_adapter host;
+    netadapter::s_adapter browser;
+    netadapter::s_config host_config = Make_Config_(Router_Service_Bound_Tcp_Port(&service), "host");
+    netadapter::s_config browser_config = Make_Config_(Router_Service_Bound_Tcp_Port(&service), "browser");
+    netadapter::Init(&host, &host_config);
+    netadapter::Init(&browser, &browser_config);
+
+    DOCTEST_REQUIRE(netadapter::Connect(&host));
+    DOCTEST_REQUIRE(Wait_For_Local_Id_(&host));
+    DOCTEST_REQUIRE(netadapter::Create_Game(&host, "Started", 4, "Host"));
+    DOCTEST_REQUIRE(Wait_For_Session_(&host));
+
+    DOCTEST_REQUIRE(netadapter::Connect(&browser));
+    DOCTEST_REQUIRE(Wait_For_Local_Id_(&browser));
+    uint32_t revision = netadapter::Game_List_Revision(&browser);
+    DOCTEST_REQUIRE(netadapter::Refresh_Game_List(&browser));
+    DOCTEST_REQUIRE(Wait_For_Game_List_Revision_(&browser, revision));
+    DOCTEST_CHECK(netadapter::Game_Count(&browser) == 1);
+
+    DOCTEST_REQUIRE(netadapter::Set_New_Players_Enabled(&host, false));
+    Pump_For_(&host, std::chrono::milliseconds(50));
+    revision = netadapter::Game_List_Revision(&browser);
+    DOCTEST_REQUIRE(netadapter::Refresh_Game_List(&browser));
+    DOCTEST_REQUIRE(Wait_For_Game_List_Revision_(&browser, revision));
+    DOCTEST_CHECK(netadapter::Game_Count(&browser) == 0);
+
+    netadapter::Shutdown(&browser);
+    netadapter::Shutdown(&host);
+    Router_Service_Request_Stop(&service);
+    service_thread.join();
+    service_guard.service = nullptr;
+    service_guard.service_thread = nullptr;
+    DOCTEST_CHECK(run_result == 0);
+}
+
+DOCTEST_TEST_CASE("adapter LAN discovery does not use localhost fallback") {
+    s_router_config service_config;
+    Router_Copy_String(service_config.listen_host, sizeof(service_config.listen_host), "127.0.0.1");
+    service_config.tcp_port = 0;
+    service_config.discovery_port = 0;
+    service_config.enable_discovery = true;
+    service_config.enable_signal_handlers = false;
+
+    s_router_service service;
+    Router_Service_Init(&service, &service_config);
+    int run_result = -1;
+    std::thread service_thread;
+    Service_Thread_Guard_ service_guard{&service, &service_thread};
+    DOCTEST_REQUIRE(Start_Test_Service_(&service, &service_thread, &run_result));
+    DOCTEST_REQUIRE(Router_Service_Bound_Discovery_Port(&service) != 0);
+
+    netadapter::s_adapter host;
+    netadapter::s_config host_config = Make_Config_(Router_Service_Bound_Tcp_Port(&service), "host");
+    netadapter::Init(&host, &host_config);
+    DOCTEST_REQUIRE(netadapter::Connect(&host));
+    DOCTEST_REQUIRE(Wait_For_Local_Id_(&host));
+    DOCTEST_REQUIRE(netadapter::Create_Game(&host, "Discovered", 4, "Host"));
+    DOCTEST_REQUIRE(Wait_For_Session_(&host));
+
+    netadapter::s_adapter browser;
+    netadapter::s_config browser_config = Make_Config_(0, "browser");
+    browser_config.bootstrap_mode = netadapter::BOOTSTRAP_LAN_DISCOVERY;
+    browser_config.discovery_port = Router_Service_Bound_Discovery_Port(&service);
+    browser_config.discovery_timeout_ms = 500;
+    netadapter::Init(&browser, &browser_config);
+
+    DOCTEST_REQUIRE(netadapter::Connect(&browser));
+    DOCTEST_REQUIRE(netadapter::Refresh_Game_List(&browser));
+    DOCTEST_REQUIRE(Wait_For_Game_List_Revision_(&browser, 0));
+    DOCTEST_CHECK(netadapter::Game_Count(&browser) == 0);
+    DOCTEST_CHECK_FALSE(netadapter::Is_Connected(&browser));
+
+    netadapter::Shutdown(&browser);
+    netadapter::Shutdown(&host);
+    Router_Service_Request_Stop(&service);
+    service_thread.join();
+    service_guard.service = nullptr;
+    service_guard.service_thread = nullptr;
+    DOCTEST_CHECK(run_result == 0);
+}
+
+DOCTEST_TEST_CASE("adapter LAN discovery without routers succeeds with empty list") {
+    netadapter::s_adapter browser;
+    netadapter::s_config browser_config = Make_Config_(0, "browser");
+    browser_config.bootstrap_mode = netadapter::BOOTSTRAP_LAN_DISCOVERY;
+    browser_config.discovery_port = 9;
+    browser_config.discovery_timeout_ms = 50;
+    netadapter::Init(&browser, &browser_config);
+
+    DOCTEST_REQUIRE(netadapter::Connect(&browser));
+    DOCTEST_CHECK_FALSE(netadapter::Is_Connected(&browser));
+    DOCTEST_REQUIRE(netadapter::Refresh_Game_List(&browser));
+    DOCTEST_REQUIRE(Wait_For_Game_List_Revision_(&browser, 0));
+    DOCTEST_CHECK(netadapter::Game_Count(&browser) == 0);
+
+    netadapter::Shutdown(&browser);
+}
+
+DOCTEST_TEST_CASE("adapter embedded LAN host starts local router and creates a session") {
+    netadapter::s_adapter host;
+    netadapter::s_config host_config = Make_Config_(0, "host");
+    host_config.bootstrap_mode = netadapter::BOOTSTRAP_EMBEDDED_LAN_HOST;
+    host_config.tcp_port = 0;
+    host_config.discovery_port = 0;
+    host_config.discovery_timeout_ms = 1000;
+    netadapter::Init(&host, &host_config);
+
+    DOCTEST_REQUIRE(netadapter::Connect(&host));
+    DOCTEST_REQUIRE(Wait_For_Local_Id_(&host));
+    DOCTEST_REQUIRE(netadapter::Create_Game(&host, "Embedded", 4, "Host"));
+    DOCTEST_REQUIRE(Wait_For_Session_(&host));
+    DOCTEST_REQUIRE(Wait_For_Users_(&host, 1));
+
+    netadapter::Shutdown(&host);
+}
+
 }

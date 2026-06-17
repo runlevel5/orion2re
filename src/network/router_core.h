@@ -48,5 +48,6 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
 uint32_t Router_Core_Client_Network_Id(const s_router_core_state* state, t_router_connection_id connection_id);
 uint32_t Router_Core_Client_Session_Id(const s_router_core_state* state, t_router_connection_id connection_id);
 void Router_Core_List_Sessions(const s_router_core_state* state, std::vector<s_router_session_info>* sessions);
+void Router_Core_List_Open_Sessions(const s_router_core_state* state, std::vector<s_router_session_info>* sessions);
 
 }

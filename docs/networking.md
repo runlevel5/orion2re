@@ -769,7 +769,7 @@ The first function belongs to the networking client layer. The second belongs to
 
 ### Preferred direction: libuv
 
-Use libuv as the event loop and socket runtime for the first implementation.
+Use libuv as the event loop and socket runtime for the first implementation of both the router and the game-side networking client layer.
 
 ### Why libuv fits this project
 
@@ -778,6 +778,8 @@ Use libuv as the event loop and socket runtime for the first implementation.
 - it is lightweight enough relative to the scope of the router
 - it provides the readiness and async wake primitives needed for clean shutdown and embedded hosting
 - it supports the TCP, UDP, and timer needs of the router in one portable runtime layer
+
+The same reasoning applies to the client layer. We do want libuv there as well, rather than splitting the implementation between libuv on the router side and some separate socket/event model on the client side.
 
 This is a better tradeoff than either `select()` or a custom platform-poller abstraction for the first version.
 

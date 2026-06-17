@@ -343,11 +343,21 @@ DOCTEST_TEST_CASE("session owner can disable and re-enable new joins like Direct
     DOCTEST_REQUIRE(Decode_Error_Payload(&output[0].message.payload, &closed_error, &closed_parse_error));
     DOCTEST_CHECK(closed_error.code == ROUTER_ERROR_SESSION_CLOSED);
 
+    s_router_message list_sessions;
+    list_sessions.header.kind = ROUTER_MESSAGE_LIST_SESSIONS;
+    list_sessions.header.request_id = 6;
+    output = Handle_Message_(&core, 2, list_sessions);
+    DOCTEST_REQUIRE(output.size() == 1);
+    DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_SESSION_LIST);
+    std::vector<s_router_session_info> listed_sessions;
+    DOCTEST_REQUIRE(Decode_Session_List_Payload(&output[0].message.payload, &listed_sessions, &closed_parse_error));
+    DOCTEST_CHECK(listed_sessions.empty());
+
     close_session.header.flags = ROUTER_FLAG_SESSION_OPEN;
-    close_session.header.request_id = 6;
+    close_session.header.request_id = 7;
     output = Handle_Message_(&core, 1, close_session);
     DOCTEST_REQUIRE(output.size() == 1);
-    output = Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 5));
+    output = Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 8));
     DOCTEST_REQUIRE(output.size() == 3);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_JOINED_SESSION);
 }

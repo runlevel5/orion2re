@@ -105,6 +105,20 @@ orion2re_add_unit_test(test_router_service
     LINK_SDL
 )
 
+orion2re_add_unit_test(test_router_session_browser
+    SOURCES
+        tests/unit/test_router_session_browser.cpp
+    PRODUCTION_SOURCES
+        src/network/router_client.cpp
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_session_browser.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+    LINK_SDL
+)
+
 orion2re_add_unit_test(test_netadapter
     SOURCES
         tests/unit/test_netadapter.cpp
@@ -113,6 +127,7 @@ orion2re_add_unit_test(test_netadapter
         src/network/router_client.cpp
         src/network/router_core.cpp
         src/network/router_protocol.cpp
+        src/network/router_session_browser.cpp
         src/network/router_service.cpp
     LIBRARIES
         uv_a

@@ -29,6 +29,23 @@ char* _combat_button_strings[2];
 char _localized_gal_size_label[20];
 char* _opp_button_strings[MAX_PLAYERS - 1];
 
+namespace {
+
+bool Show_Net_Game_Name_() {
+    return MOX::_game_type == 2 || (MOX::_game_type == 3 && NETMOX::_net.mode == 1);
+}
+
+void Ensure_Settings_Net_Game_Name_() {
+    if (MOX::_settings.net_game_name[0] != '\0') {
+        return;
+    }
+
+    memcpy(MOX::_settings.net_game_name, "Moo II ", 8);
+    MOX::_settings.net_game_name[6] = (char)('a' + ((int32_t)clock() % 26));
+}
+
+}
+
 int16_t __cdecl Newgame_Screen_(void) {
     memcpy(NEWGAME::_color_ken.colors, "y{z|||||", sizeof(NEWGAME::_color_ken.colors));
 
@@ -264,7 +281,8 @@ void __cdecl Update_Fields_() {
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings_(0x0C), _anims[2], &_xenon_attacks_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings_(0x0C), _anims[1], (int16_t*)&_combat_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
 
-    if (MOX::_game_type == 2 /* NET_GAME */) {
+    if (Show_Net_Game_Name_()) {
+        Ensure_Settings_Net_Game_Name_();
         strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
         fields::Add_Continuous_String_Input_Field_(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, NETMOX::_net.cur_game_name, 8, 0, 0, 0, 0);
     }
@@ -293,7 +311,7 @@ void __cdecl Draw_Newgame_Screen_() {
     FAKEBUTS::Draw_Click_Thru_Fields_();
     Draw_Pictures_();
 
-    if (MOX::_game_type == 2 /* NET_GAME */) {
+    if (Show_Net_Game_Name_()) {
         animate::Draw_(_g_x + 0xD9, _g_y + 0x179, _anims[5]);
     }
 

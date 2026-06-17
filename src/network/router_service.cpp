@@ -253,7 +253,7 @@ void Router_Service_Log_Action_(
         break;
     case ROUTER_MESSAGE_LIST_SESSIONS: {
         std::vector<s_router_session_info> sessions;
-        Router_Core_List_Sessions(&state->core, &sessions);
+        Router_Core_List_Open_Sessions(&state->core, &sessions);
         Router_Service_Log_Verbosef_(
             state,
             "session list peer=%s:%u conn=%u network=%u count=%u",

@@ -444,7 +444,7 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
         s_router_message response = Make_Message_(ROUTER_MESSAGE_SESSION_LIST, request_id);
         response.header.target_network_id = client.network_id;
         std::vector<s_router_session_info> sessions;
-        Router_Core_List_Sessions(state, &sessions);
+        Router_Core_List_Open_Sessions(state, &sessions);
         Encode_Session_List_Payload(&sessions, &response.payload);
         output->push_back({connection_id, std::move(response)});
         return;
@@ -601,6 +601,23 @@ void Router_Core_List_Sessions(const s_router_core_state* state, std::vector<s_r
     sessions->reserve(state->sessions.size());
     for (const auto& entry : state->sessions) {
         sessions->push_back(entry.second.info);
+    }
+    std::sort(sessions->begin(), sessions->end(), [](const s_router_session_info& lhs, const s_router_session_info& rhs) {
+        return lhs.session_id < rhs.session_id;
+    });
+}
+
+void Router_Core_List_Open_Sessions(const s_router_core_state* state, std::vector<s_router_session_info>* sessions) {
+    if (state == nullptr || sessions == nullptr) {
+        return;
+    }
+
+    sessions->clear();
+    sessions->reserve(state->sessions.size());
+    for (const auto& entry : state->sessions) {
+        if (entry.second.info.open) {
+            sessions->push_back(entry.second.info);
+        }
     }
     std::sort(sessions->begin(), sessions->end(), [](const s_router_session_info& lhs, const s_router_session_info& rhs) {
         return lhs.session_id < rhs.session_id;
