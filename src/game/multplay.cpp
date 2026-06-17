@@ -1771,7 +1771,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
 
 int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
     MOX2::action_func_t saved_auto_fn;
-    int16_t result;
+    int16_t result = 0;
     int16_t game_count;
     bool exit_screen = false;
     int16_t input_field;

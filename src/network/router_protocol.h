@@ -6,6 +6,7 @@
 
 #define ROUTER_PROTOCOL_MAGIC 0x5452324fU
 #define ROUTER_PROTOCOL_VERSION 1U
+#define ROUTER_VERSION 1U
 #define ROUTER_MESSAGE_HEADER_SIZE 32U
 #define ROUTER_DEFAULT_MAX_FRAME_SIZE (16U * 1024U * 1024U)
 
@@ -143,7 +144,7 @@ enum e_frame_read_status {
 
 struct s_router_hello_payload {
     char client_name[ROUTER_PLAYER_NAME_SIZE] = {};
-    char build_string[ROUTER_BUILD_STRING_SIZE] = {};
+    uint32_t protocol_version = 0;
 };
 
 struct s_router_welcome_payload {
@@ -156,6 +157,10 @@ struct s_router_session_registration_payload {
     char host_name[ROUTER_PLAYER_NAME_SIZE] = {};
     char build_string[ROUTER_BUILD_STRING_SIZE] = {};
     uint16_t max_players = 0;
+};
+
+struct s_router_join_session_payload {
+    char build_string[ROUTER_BUILD_STRING_SIZE] = {};
 };
 
 struct s_router_session_info {
@@ -204,7 +209,7 @@ e_frame_read_status Try_Read_Frame(std::vector<uint8_t>* input_buffer, uint32_t 
 void Encode_Text_Payload(const char* text, Bit_Stream* payload);
 bool Decode_Text_Payload(const Bit_Stream* payload, uint32_t output_size, char* output, std::string* error_message);
 
-void Encode_Hello_Payload(const char* client_name, const char* build_string, Bit_Stream* payload);
+void Encode_Hello_Payload(const char* client_name, uint32_t protocol_version, Bit_Stream* payload);
 bool Decode_Hello_Payload(const Bit_Stream* payload, s_router_hello_payload* hello, std::string* error_message);
 
 void Encode_Welcome_Payload(uint32_t network_id, const char* router_id, Bit_Stream* payload);
@@ -212,6 +217,9 @@ bool Decode_Welcome_Payload(const Bit_Stream* payload, s_router_welcome_payload*
 
 void Encode_Session_Registration_Payload(const s_router_session_registration_payload* registration, Bit_Stream* payload);
 bool Decode_Session_Registration_Payload(const Bit_Stream* payload, s_router_session_registration_payload* registration, std::string* error_message);
+
+void Encode_Join_Session_Payload(const s_router_join_session_payload* join, Bit_Stream* payload);
+bool Decode_Join_Session_Payload(const Bit_Stream* payload, s_router_join_session_payload* join, std::string* error_message);
 
 void Encode_Session_Info_Payload(const s_router_session_info* session_info, Bit_Stream* payload);
 bool Decode_Session_Info_Payload(const Bit_Stream* payload, s_router_session_info* session_info, std::string* error_message);

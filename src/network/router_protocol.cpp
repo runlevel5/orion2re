@@ -530,13 +530,13 @@ bool Decode_Text_Payload(const Bit_Stream* payload, uint32_t output_size, char* 
     return true;
 }
 
-void Encode_Hello_Payload(const char* client_name, const char* build_string, Bit_Stream* payload) {
+void Encode_Hello_Payload(const char* client_name, uint32_t protocol_version, Bit_Stream* payload) {
     if (payload == nullptr) {
         Crash_Write_Failed_();
     }
     payload->Clear();
     payload->Write_String(client_name);
-    payload->Write_String(build_string);
+    payload->Write_Uint32(protocol_version);
 }
 
 bool Decode_Hello_Payload(const Bit_Stream* payload, s_router_hello_payload* hello, std::string* error_message) {
@@ -546,8 +546,33 @@ bool Decode_Hello_Payload(const Bit_Stream* payload, s_router_hello_payload* hel
     }
     Bit_Stream reader = *payload;
     if (!reader.Read_String(nullptr, sizeof(hello->client_name), hello->client_name) ||
-        !reader.Read_String(nullptr, sizeof(hello->build_string), hello->build_string)) {
+        !reader.Read_Uint32(&hello->protocol_version)) {
         Set_Error_(error_message, "invalid hello payload");
+        return false;
+    }
+    if (!reader.At_End()) {
+        Set_Error_(error_message, "payload has trailing bytes");
+        return false;
+    }
+    return true;
+}
+
+void Encode_Join_Session_Payload(const s_router_join_session_payload* join, Bit_Stream* payload) {
+    if (join == nullptr || payload == nullptr) {
+        Crash_Write_Failed_();
+    }
+    payload->Clear();
+    payload->Write_String(join->build_string);
+}
+
+bool Decode_Join_Session_Payload(const Bit_Stream* payload, s_router_join_session_payload* join, std::string* error_message) {
+    if (payload == nullptr || join == nullptr) {
+        Set_Error_(error_message, "join session output is null");
+        return false;
+    }
+    Bit_Stream reader = *payload;
+    if (!reader.Read_String(nullptr, sizeof(join->build_string), join->build_string)) {
+        Set_Error_(error_message, "invalid join session payload");
         return false;
     }
     if (!reader.At_End()) {

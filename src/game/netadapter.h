@@ -40,6 +40,12 @@ struct s_config {
     char build_string[ROUTER_BUILD_STRING_SIZE] = "orion2re";
 };
 
+enum e_connect_failure_phase {
+    CONNECT_FAILURE_NONE,
+    CONNECT_FAILURE_TCP_CONNECT,
+    CONNECT_FAILURE_HELLO_SEND,
+};
+
 struct s_state;
 
 struct s_adapter {
@@ -58,9 +64,12 @@ void Shutdown(s_adapter* adapter);
 void Pump(s_adapter* adapter);
 
 bool Is_Connected(const s_adapter* adapter);
+int Last_Error(const s_adapter* adapter);
+const char* Last_Error_Message(const s_adapter* adapter);
 uint32_t Local_Network_Id(const s_adapter* adapter);
 uint32_t Session_Id(const s_adapter* adapter);
 bool Has_Pending_Client_Events(const s_adapter* adapter);
+e_connect_failure_phase Connect_Failure_Phase(const s_adapter* adapter);
 
 bool Refresh_Game_List(s_adapter* adapter);
 uint32_t Game_List_Revision(const s_adapter* adapter);

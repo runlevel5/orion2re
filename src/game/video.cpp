@@ -408,7 +408,7 @@ namespace video {
         g_cached_mouse_x = mouse::Pointer_X_();
         g_cached_mouse_y = mouse::Pointer_Y_();
 
-        if (g_window_focus_state != 0) {
+        if (g_window_focus_state != 0 || platform::k_keep_rendering_when_unfocused) {
             palette::Refresh_Palette_();
             mouse::Enable_Mouse_();
 

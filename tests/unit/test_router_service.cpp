@@ -51,7 +51,7 @@ s_router_message Make_Hello_(const char* name, uint32_t request_id) {
     s_router_message message;
     message.header.kind = ROUTER_MESSAGE_HELLO;
     message.header.request_id = request_id;
-    Encode_Hello_Payload(name, "test-build", &message.payload);
+    Encode_Hello_Payload(name, ROUTER_VERSION, &message.payload);
     return message;
 }
 
@@ -66,6 +66,18 @@ s_router_message Make_Register_(uint32_t request_id) {
     message.header.kind = ROUTER_MESSAGE_REGISTER_SESSION;
     message.header.request_id = request_id;
     Encode_Session_Registration_Payload(&registration, &message.payload);
+    return message;
+}
+
+s_router_message Make_Join_(uint32_t session_id, uint32_t request_id) {
+    s_router_join_session_payload join;
+    Router_Copy_String(join.build_string, sizeof(join.build_string), "test-build");
+
+    s_router_message message;
+    message.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
+    message.header.session_id = session_id;
+    message.header.request_id = request_id;
+    Encode_Join_Session_Payload(&join, &message.payload);
     return message;
 }
 
@@ -537,11 +549,7 @@ DOCTEST_TEST_CASE("uv TCP service performs hello, session registration, join, an
     DOCTEST_REQUIRE(sessions.size() == 1);
     DOCTEST_CHECK(std::strcmp(sessions[0].session_name, "TCP Game") == 0);
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = registered_session.session_id;
-    join.header.request_id = 5;
-    DOCTEST_REQUIRE(guest.Send(join));
+    DOCTEST_REQUIRE(guest.Send(Make_Join_(registered_session.session_id, 5)));
     DOCTEST_REQUIRE(guest.Wait_For_Messages(4));
     DOCTEST_CHECK(guest.received_messages[2].header.kind == ROUTER_MESSAGE_JOINED_SESSION);
     DOCTEST_CHECK(guest.received_messages[3].header.kind == ROUTER_MESSAGE_MEMBER_LIST);

@@ -19,6 +19,7 @@ struct s_router_client_state {
     t_router_connection_id connection_id = 0;
     uint32_t network_id = 0;
     uint32_t session_id = 0;
+    uint32_t protocol_version = 0;
     char client_name[ROUTER_PLAYER_NAME_SIZE] = {};
     char build_string[ROUTER_BUILD_STRING_SIZE] = {};
     bool greeted = false;

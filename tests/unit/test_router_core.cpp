@@ -14,15 +14,15 @@ s_router_message Make_Hello_(const char* name, uint32_t request_id) {
     s_router_message message;
     message.header.kind = ROUTER_MESSAGE_HELLO;
     message.header.request_id = request_id;
-    Encode_Hello_Payload(name, "test-build", &message.payload);
+    Encode_Hello_Payload(name, ROUTER_VERSION, &message.payload);
     return message;
 }
 
-s_router_message Make_Hello_Build_(const char* name, const char* build_string, uint32_t request_id) {
+s_router_message Make_Hello_Version_(const char* name, uint32_t protocol_version, uint32_t request_id) {
     s_router_message message;
     message.header.kind = ROUTER_MESSAGE_HELLO;
     message.header.request_id = request_id;
-    Encode_Hello_Payload(name, build_string, &message.payload);
+    Encode_Hello_Payload(name, protocol_version, &message.payload);
     return message;
 }
 
@@ -37,6 +37,18 @@ s_router_message Make_Register_(uint32_t request_id) {
     message.header.kind = ROUTER_MESSAGE_REGISTER_SESSION;
     message.header.request_id = request_id;
     Encode_Session_Registration_Payload(&registration, &message.payload);
+    return message;
+}
+
+s_router_message Make_Join_Build_(uint32_t session_id, const char* build_string, uint32_t request_id) {
+    s_router_join_session_payload join;
+    Router_Copy_String(join.build_string, sizeof(join.build_string), build_string);
+
+    s_router_message message;
+    message.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
+    message.header.session_id = session_id;
+    message.header.request_id = request_id;
+    Encode_Join_Session_Payload(&join, &message.payload);
     return message;
 }
 
@@ -216,11 +228,7 @@ DOCTEST_TEST_CASE("join plus direct and broadcast sends route opaque game payloa
     Handle_Message_(&core, 2, Make_Hello_("guest", 2));
     Handle_Message_(&core, 1, Make_Register_(3));
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = 1;
-    join.header.request_id = 4;
-    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 2, join);
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 4));
     DOCTEST_REQUIRE(output.size() == 3);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_JOINED_SESSION);
     DOCTEST_CHECK(output[1].message.header.kind == ROUTER_MESSAGE_MEMBER_LIST);
@@ -288,10 +296,7 @@ DOCTEST_TEST_CASE("disconnect removes membership and notifies remaining session 
     Handle_Message_(&core, 2, Make_Hello_("guest", 2));
     Handle_Message_(&core, 1, Make_Register_(3));
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = 1;
-    Handle_Message_(&core, 2, join);
+    Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 0));
 
     std::vector<s_router_outbound_message> output;
     Router_Core_Close_Connection(&core, 2, &output);
@@ -330,11 +335,7 @@ DOCTEST_TEST_CASE("session owner can disable and re-enable new joins like Direct
     DOCTEST_REQUIRE(output.size() == 1);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_OK);
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = 1;
-    join.header.request_id = 5;
-    output = Handle_Message_(&core, 2, join);
+    output = Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 5));
     DOCTEST_REQUIRE(output.size() == 1);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_ERROR);
     s_router_error_payload closed_error;
@@ -346,7 +347,7 @@ DOCTEST_TEST_CASE("session owner can disable and re-enable new joins like Direct
     close_session.header.request_id = 6;
     output = Handle_Message_(&core, 1, close_session);
     DOCTEST_REQUIRE(output.size() == 1);
-    output = Handle_Message_(&core, 2, join);
+    output = Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 5));
     DOCTEST_REQUIRE(output.size() == 3);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_JOINED_SESSION);
 }
@@ -356,15 +357,11 @@ DOCTEST_TEST_CASE("join rejects mismatched client builds") {
     Router_Core_Init(&core, "router-test");
     Router_Core_Open_Connection(&core, 1);
     Router_Core_Open_Connection(&core, 2);
-    Handle_Message_(&core, 1, Make_Hello_Build_("host", "build-a", 1));
-    Handle_Message_(&core, 2, Make_Hello_Build_("guest", "build-b", 2));
+    Handle_Message_(&core, 1, Make_Hello_("host", 1));
+    Handle_Message_(&core, 2, Make_Hello_("guest", 2));
     Handle_Message_(&core, 1, Make_Register_Build_("build-a", 3));
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = 1;
-    join.header.request_id = 4;
-    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 2, join);
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 2, Make_Join_Build_(1, "build-b", 4));
     DOCTEST_REQUIRE(output.size() == 1);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_ERROR);
 
@@ -374,13 +371,44 @@ DOCTEST_TEST_CASE("join rejects mismatched client builds") {
     DOCTEST_CHECK(error_payload.code == ROUTER_ERROR_BUILD_MISMATCH);
 }
 
-DOCTEST_TEST_CASE("register requires authoritative hello build string") {
+DOCTEST_TEST_CASE("register uses session build string independently from hello router version") {
     s_router_core_state core;
     Router_Core_Init(&core, "router-test");
     Router_Core_Open_Connection(&core, 1);
-    Handle_Message_(&core, 1, Make_Hello_Build_("host", "", 1));
+    Handle_Message_(&core, 1, Make_Hello_("host", 1));
 
     std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Register_Build_("claimed-build", 2));
+    DOCTEST_REQUIRE(output.size() == 2);
+    DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_SESSION_REGISTERED);
+
+    s_router_session_info session;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Session_Info_Payload(&output[0].message.payload, &session, &error));
+    DOCTEST_CHECK(std::strcmp(session.build_string, "claimed-build") == 0);
+}
+
+DOCTEST_TEST_CASE("register rejects unsupported router hello version") {
+    s_router_core_state core;
+    Router_Core_Init(&core, "router-test");
+    Router_Core_Open_Connection(&core, 1);
+
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Hello_Version_("host", ROUTER_VERSION + 1, 1));
+    DOCTEST_REQUIRE(output.size() == 1);
+    DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_ERROR);
+
+    s_router_error_payload error_payload;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Error_Payload(&output[0].message.payload, &error_payload, &error));
+    DOCTEST_CHECK(error_payload.code == ROUTER_ERROR_INVALID_MESSAGE);
+}
+
+DOCTEST_TEST_CASE("register still requires a build string for hosted sessions") {
+    s_router_core_state core;
+    Router_Core_Init(&core, "router-test");
+    Router_Core_Open_Connection(&core, 1);
+    Handle_Message_(&core, 1, Make_Hello_("host", 1));
+
+    std::vector<s_router_outbound_message> output = Handle_Message_(&core, 1, Make_Register_Build_("", 2));
     DOCTEST_REQUIRE(output.size() == 1);
     DOCTEST_CHECK(output[0].message.header.kind == ROUTER_MESSAGE_ERROR);
 
@@ -399,10 +427,7 @@ DOCTEST_TEST_CASE("unregister sends dedicated session closed notice") {
     Handle_Message_(&core, 2, Make_Hello_("guest", 2));
     Handle_Message_(&core, 1, Make_Register_(3));
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = 1;
-    Handle_Message_(&core, 2, join);
+    Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 0));
 
     s_router_message unregister;
     unregister.header.kind = ROUTER_MESSAGE_UNREGISTER_SESSION;
@@ -428,11 +453,8 @@ DOCTEST_TEST_CASE("session owner disconnect leaves session alive without promoti
     Handle_Message_(&core, 3, Make_Hello_("guest-b", 3));
     Handle_Message_(&core, 1, Make_Register_(4));
 
-    s_router_message join;
-    join.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
-    join.header.session_id = 1;
-    Handle_Message_(&core, 2, join);
-    Handle_Message_(&core, 3, join);
+    Handle_Message_(&core, 2, Make_Join_Build_(1, "test-build", 0));
+    Handle_Message_(&core, 3, Make_Join_Build_(1, "test-build", 0));
 
     std::vector<s_router_outbound_message> output;
     Router_Core_Close_Connection(&core, 1, &output);

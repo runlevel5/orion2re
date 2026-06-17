@@ -29,6 +29,117 @@ namespace NETMOX {
 
     uint8_t _next_update_player_counter;
 
+    namespace {
+#pragma pack(push, 1)
+        struct s_net_pack_player_disconnected_info_ {
+            int16_t player_idx;
+            s_net_pack_drop_out_info drop_out_info;
+        };
+#pragma pack(pop)
+
+        bool Is_Valid_Game_Player_(int player_idx) {
+            return player_idx >= 0 && player_idx < MOX::_NUM_PLAYERS && player_idx < MAX_PLAYERS;
+        }
+
+        bool Is_Connected_Game_Player_(int player_idx) {
+            return Is_Valid_Game_Player_(player_idx) && MOX::_player[player_idx].network_player_id != -1;
+        }
+
+        int Elect_Disconnect_Recovery_Coordinator_(int disconnected_player_idx) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS && i < MAX_PLAYERS; ++i) {
+                if (i != disconnected_player_idx && MOX::_player[i].network_player_id != -1) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        bool Is_Local_Game_Player_(int player_idx) {
+            return Is_Valid_Game_Player_(player_idx) &&
+                (player_idx == MOX::_PLAYER_NUM || MOX::_player[player_idx].network_player_id == _net.net_host_id);
+        }
+
+        void Promote_Recovery_Coordinator_If_Needed_(int disconnected_player_idx, int16_t disconnected_network_id) {
+            int coordinator_idx = Elect_Disconnect_Recovery_Coordinator_(disconnected_player_idx);
+            if (coordinator_idx < 0) {
+                return;
+            }
+
+            int16_t coordinator_network_id = MOX::_player[coordinator_idx].network_player_id;
+            if (coordinator_network_id == -1) {
+                return;
+            }
+
+            if (_net.host_election_id == disconnected_network_id || _net.host_election_id == -1) {
+                _net.host_election_id = coordinator_network_id;
+            }
+            if (_net.host_election_winner_id == disconnected_network_id || _net.host_election_winner_id == -1) {
+                _net.host_election_winner_id = coordinator_network_id;
+            }
+            if (_net.local_net_id == disconnected_network_id || _net.local_net_id == -1) {
+                _net.local_net_id = coordinator_network_id;
+            }
+        }
+
+        void Apply_Drop_Out_Bookkeeping_(int player_idx, int16_t disconnected_network_id, bool promote_recovery_coordinator) {
+            if (promote_recovery_coordinator) {
+                Promote_Recovery_Coordinator_If_Needed_(player_idx, disconnected_network_id);
+            }
+
+            if (_net.num_connected_players > 0) {
+                _net.num_connected_players--;
+            }
+            _net.players_hit_next_turn[player_idx] = 1;
+
+            if (_net.local_net_id == _net.net_host_id) {
+                if (_net.host_active_player_id == player_idx) {
+                    _net.host_active_player_id = -1;
+                }
+
+                _net.player_is_active_flags[player_idx] = 0;
+                _net.host_sync_counter++;
+
+                if (static_cast<uint8_t>(_net.host_sync_counter) == MOX::_NUM_PLAYERS) {
+                    _net.sync_state = 11;
+                }
+            }
+        }
+
+        void Build_Drop_Out_Info_From_Local_State_(int player_idx, s_net_pack_drop_out_info* packet) {
+            MOX::_player[player_idx].network_player_id = -1;
+            RUSS::Make_Player_Into_AI_(player_idx);
+
+            memcpy(&packet->player_data, &MOX::_player[player_idx], sizeof(s_player));
+
+            if (MOX::_NUM_STARS > 0) {
+                for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                    packet->star_surrender_to[i] = MOX::_star[i].surrender_to[player_idx];
+                }
+            }
+        }
+
+        void Apply_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info, bool promote_recovery_coordinator) {
+            if (!Is_Valid_Game_Player_(player_idx) || drop_out_info == nullptr) {
+                return;
+            }
+
+            int16_t disconnected_network_id = MOX::_player[player_idx].network_player_id;
+            if (MOX::_player[player_idx].network_player_id == _net.host_election_winner_id) {
+                _net.host_election_winner_id = -1;
+            }
+
+            RUSS::Make_Player_Into_AI_(player_idx);
+
+            memcpy(&MOX::_player[player_idx], &drop_out_info->player_data, sizeof(s_player));
+
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                MOX::_star[i].surrender_to[player_idx] = drop_out_info->star_surrender_to[i];
+            }
+
+            Apply_Drop_Out_Bookkeeping_(player_idx, disconnected_network_id, promote_recovery_coordinator);
+        }
+    }
+
     int32_t __cdecl Net_Id_To_Player_Id_(int32_t player_idx) {
         for (int32_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].network_player_id == player_idx) {
@@ -493,7 +604,7 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        size = 71 * sizeof(s_leader_data);
+        size = MAX_LEADERS * sizeof(s_leader_data);
         memcpy(ptr, MOX::_leaders, size);
         ptr += size;
 
@@ -703,8 +814,8 @@ namespace NETMOX {
         memcpy(MOX::_ship, ptr, MAX_SHIPS * sizeof(s_ship_data));
         ptr += MAX_SHIPS * sizeof(s_ship_data);
 
-        memcpy(MOX::_leaders, ptr, 71 * sizeof(s_leader_data));
-        ptr += 71 * sizeof(s_leader_data);
+        memcpy(MOX::_leaders, ptr, MAX_LEADERS * sizeof(s_leader_data));
+        ptr += MAX_LEADERS * sizeof(s_leader_data);
 
         REPORT::_n_reports = *(int16_t*)ptr;
         ptr += sizeof(int16_t);
@@ -1122,6 +1233,31 @@ namespace NETMOX {
                 }
             }
         } while (any_processed != 0);
+    }
+
+    void __cdecl Host_Send_Player_Disconnected_Info_(int player_idx) {
+        if (!Is_Connected_Game_Player_(player_idx)) {
+            return;
+        }
+
+        int16_t disconnected_network_id = MOX::_player[player_idx].network_player_id;
+        s_net_pack_player_disconnected_info_ packet;
+        packet.player_idx = (int16_t)player_idx;
+        Build_Drop_Out_Info_From_Local_State_(player_idx, &packet.drop_out_info);
+        Apply_Drop_Out_Bookkeeping_(player_idx, disconnected_network_id, true);
+
+        Mox_Send_Message_(0x7FFE, NET_MSG_PLAYER_DISCONNECTED, &packet, (uint16_t)sizeof(packet));
+    }
+
+    void __cdecl Handle_Network_Player_Disconnected_(int player_idx) {
+        if (_net.is_network_active == 0 || !Is_Connected_Game_Player_(player_idx) || Is_Local_Game_Player_(player_idx)) {
+            return;
+        }
+
+        int coordinator_idx = Elect_Disconnect_Recovery_Coordinator_(player_idx);
+        if (coordinator_idx >= 0 && Is_Local_Game_Player_(coordinator_idx)) {
+            Host_Send_Player_Disconnected_Info_(player_idx);
+        }
     }
 
     int __cdecl Decode_Difference_Buffer_(s_net_modem_file* modem_file, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len) {
@@ -2105,33 +2241,16 @@ namespace NETMOX {
     }
 
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info) {
-        if (MOX::_player[player_idx].network_player_id == _net.host_election_winner_id) {
-            _net.host_election_winner_id = -1;
+        Apply_Drop_Out_Info_(player_idx, drop_out_info, false);
+    }
+
+    void __cdecl Decode_Player_Disconnected_Info_(void* data, uint32_t len) {
+        if (data == nullptr || len != sizeof(s_net_pack_player_disconnected_info_)) {
+            return;
         }
 
-        RUSS::Make_Player_Into_AI_(player_idx);
-
-        memcpy(&MOX::_player[player_idx], &drop_out_info->player_data, sizeof(s_player));
-
-        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
-            MOX::_star[i].surrender_to[player_idx] = drop_out_info->star_surrender_to[i];
-        }
-
-        _net.num_connected_players--;
-        _net.players_hit_next_turn[player_idx] = 1;
-
-        if (_net.local_net_id == _net.net_host_id) {
-            if (_net.host_active_player_id == player_idx) {
-                _net.host_active_player_id = -1;
-            }
-
-            _net.player_is_active_flags[player_idx] = 0;
-            _net.host_sync_counter++;
-
-            if (static_cast<uint8_t>(_net.host_sync_counter) == MOX::_NUM_PLAYERS) {
-                _net.sync_state = 11;
-            }
-        }
+        s_net_pack_player_disconnected_info_* packet = (s_net_pack_player_disconnected_info_*)data;
+        Apply_Drop_Out_Info_(packet->player_idx, &packet->drop_out_info, true);
     }
 
     void __cdecl Send_Battle_Results_(int16_t star_id, int16_t player_id, int16_t target_player_id, int16_t combat_defender_id, int16_t combat_planet_id, int16_t combat_result) {

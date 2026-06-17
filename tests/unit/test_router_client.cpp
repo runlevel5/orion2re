@@ -100,7 +100,7 @@ DOCTEST_TEST_CASE("client connects, joins sessions, routes game data, and receiv
     Router_Client_Init(&guest, &guest_config);
 
     DOCTEST_REQUIRE(Router_Client_Connect(&host));
-    DOCTEST_REQUIRE(Router_Client_Send_Hello(&host, "host", "test-build", 1));
+    DOCTEST_REQUIRE(Router_Client_Send_Hello(&host, "host", ROUTER_VERSION, 1));
     DOCTEST_REQUIRE(Wait_For_Client_Events_(&host, 1));
 
     s_router_client_event event;
@@ -122,7 +122,7 @@ DOCTEST_TEST_CASE("client connects, joins sessions, routes game data, and receiv
     DOCTEST_CHECK(Router_Client_Members(&host)[0].network_id == 1);
 
     DOCTEST_REQUIRE(Router_Client_Connect(&guest));
-    DOCTEST_REQUIRE(Router_Client_Send_Hello(&guest, "guest", "test-build", 3));
+    DOCTEST_REQUIRE(Router_Client_Send_Hello(&guest, "guest", ROUTER_VERSION, 3));
     DOCTEST_REQUIRE(Wait_For_Client_Events_(&guest, 1));
     DOCTEST_REQUIRE(Router_Client_Pop_Event(&guest, &event));
     DOCTEST_CHECK(event.kind == ROUTER_CLIENT_EVENT_WELCOME);
@@ -136,7 +136,7 @@ DOCTEST_TEST_CASE("client connects, joins sessions, routes game data, and receiv
     DOCTEST_CHECK(std::strcmp(event.sessions[0].session_name, "Client Game") == 0);
     DOCTEST_REQUIRE(Router_Client_Sessions(&guest).size() == 1);
 
-    DOCTEST_REQUIRE(Router_Client_Join_Session(&guest, 1, 5));
+    DOCTEST_REQUIRE(Router_Client_Join_Session(&guest, 1, "test-build", 5));
     DOCTEST_REQUIRE(Wait_For_Client_Events_(&guest, 2));
     DOCTEST_REQUIRE(Router_Client_Pop_Event(&guest, &event));
     DOCTEST_CHECK(event.kind == ROUTER_CLIENT_EVENT_JOINED_SESSION);

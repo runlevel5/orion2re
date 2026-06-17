@@ -29,6 +29,8 @@ void Print_Usage_(const char* program_name) {
         "  --name NAME             Router display name for LAN discovery\n"
         "  --no-discovery          Disable UDP LAN discovery replies\n"
         "  --no-signal-handlers    Disable SIGINT/SIGTERM handlers\n"
+        "  --verbose               Enable detailed message/discovery/traffic logging\n"
+        "  --quiet                 Disable detailed logging; keep important router events only\n"
         "  --help                  Show this help\n",
         program_name != nullptr ? program_name : "orion2re-router");
 }
@@ -99,6 +101,14 @@ int Run_Router_CLI(int argc, char** argv) {
         }
         if (std::strcmp(arg, "--no-signal-handlers") == 0) {
             config.enable_signal_handlers = false;
+            continue;
+        }
+        if (std::strcmp(arg, "--verbose") == 0 || std::strcmp(arg, "-v") == 0) {
+            config.verbose_logging = true;
+            continue;
+        }
+        if (std::strcmp(arg, "--quiet") == 0 || std::strcmp(arg, "-q") == 0) {
+            config.verbose_logging = false;
             continue;
         }
 

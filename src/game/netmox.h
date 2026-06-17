@@ -51,7 +51,13 @@ namespace NETMOX {
 
     void __cdecl Russ_Change_Relations_(int16_t change, int16_t attacker, int16_t defender, int16_t reason, int16_t star_idx, int16_t param6);
 
+    constexpr uint16_t NET_MSG_PLAYER_DISCONNECTED = 0x45;
+
     void __cdecl Send_Drop_Out_Info_(int player_idx, uint16_t msg_type);
+
+    void __cdecl Host_Send_Player_Disconnected_Info_(int player_idx);
+
+    void __cdecl Handle_Network_Player_Disconnected_(int player_idx);
 
     void __cdecl Russ_Event_Monster_Update_(int16_t owner, int16_t p2, int16_t p3);
 
@@ -155,6 +161,8 @@ namespace NETMOX {
     void __cdecl Send_Dragon_Info_(int32_t colony_id);
 
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info);
+
+    void __cdecl Decode_Player_Disconnected_Info_(void* data, uint32_t len);
 
     void __cdecl Send_Battle_Results_(int16_t star_id, int16_t player_id, int16_t target_player_id, int16_t combat_defender_id, int16_t combat_planet_id, int16_t combat_result);
 

@@ -12,6 +12,63 @@ namespace netcode {
         netadapter::s_adapter _router_adapter;
         int32_t _router_last_send_successful;
         uint32_t _router_wait_session_list_revision;
+        constexpr uint32_t ROUTER_CONNECT_ATTEMPTS = 3;
+        constexpr uint32_t ROUTER_CONNECT_RETRY_DELAY_MS = 250;
+
+        bool __cdecl Is_Router_Host_Char_(char value) {
+            return (value >= '0' && value <= '9') ||
+                (value >= 'A' && value <= 'Z') ||
+                (value >= 'a' && value <= 'z') ||
+                value == '.' || value == '-';
+        }
+
+        bool __cdecl Parse_Router_Endpoint_(const char* text, netadapter::s_config* config) {
+            if (text == nullptr || config == nullptr || text[0] == '\0') {
+                return false;
+            }
+
+            char host[ROUTER_ADDRESS_SIZE] = {};
+            uint32_t host_len = 0;
+            const char* cursor = text;
+            while (*cursor != '\0' && *cursor != ':' && host_len + 1 < sizeof(host)) {
+                if (!Is_Router_Host_Char_(*cursor)) {
+                    return false;
+                }
+                host[host_len++] = *cursor++;
+            }
+            if (host_len == 0) {
+                return false;
+            }
+
+            uint16_t port = config->tcp_port;
+            if (*cursor == ':') {
+                ++cursor;
+                uint32_t parsed_port = 0;
+                if (*cursor == '\0') {
+                    return false;
+                }
+                while (*cursor != '\0') {
+                    if (*cursor < '0' || *cursor > '9') {
+                        return false;
+                    }
+                    parsed_port = parsed_port * 10 + (uint32_t)(*cursor - '0');
+                    if (parsed_port > 65535) {
+                        return false;
+                    }
+                    ++cursor;
+                }
+                if (parsed_port == 0) {
+                    return false;
+                }
+                port = (uint16_t)parsed_port;
+            } else if (*cursor != '\0') {
+                return false;
+            }
+
+            network::router::Router_Copy_String(config->host, sizeof(config->host), host);
+            config->tcp_port = port;
+            return true;
+        }
 
         void __cdecl Pump_Router_Packets_() {
             netadapter::Pump(&_router_adapter);
@@ -31,6 +88,10 @@ namespace netcode {
             while (netadapter::Poll_Event(&_router_adapter, &event)) {
                 if (event.kind == netadapter::EVENT_MEMBER_LEFT) {
                     SDL_Log("Router member left: %u", (unsigned)event.network_id);
+                    int32_t player_idx = NETMOX::Net_Id_To_Player_Id_((int32_t)event.network_id);
+                    if (player_idx >= 0) {
+                        NETMOX::Handle_Network_Player_Disconnected_(player_idx);
+                    }
                 } else if (event.kind == netadapter::EVENT_SESSION_CLOSED) {
                     SDL_Log("Router session closed");
                 } else if (event.kind == netadapter::EVENT_DISCONNECTED) {
@@ -91,12 +152,52 @@ namespace netcode {
         void __cdecl Init_Router_Config_(netadapter::s_config* config, const char* player_name, s_network* network) {
             *config = netadapter::s_config{};
             if (network != nullptr && network->modem_settings.cmd_reset[0] != '\0') {
-                network::router::Router_Copy_String(config->host, sizeof(config->host), network->modem_settings.cmd_reset);
+                if (Parse_Router_Endpoint_(network->modem_settings.cmd_reset, config)) {
+                    SDL_Log("Router endpoint from clear string: %s:%u", config->host, (unsigned)config->tcp_port);
+                } else {
+                    SDL_Log("Ignoring invalid router endpoint in clear string '%s'; using %s:%u", network->modem_settings.cmd_reset, config->host, (unsigned)config->tcp_port);
+                }
             }
             if (player_name != nullptr && player_name[0] != '\0') {
                 network::router::Router_Copy_String(config->client_name, sizeof(config->client_name), player_name);
             }
             network::router::Router_Copy_String(config->build_string, sizeof(config->build_string), GAME_BUILD_DATE);
+        }
+
+        int32_t __cdecl Connect_Router_With_Retry_(const netadapter::s_config* config) {
+            for (uint32_t attempt = 1; attempt <= ROUTER_CONNECT_ATTEMPTS; ++attempt) {
+                if (netadapter::Connect(&_router_adapter)) {
+                    return 1;
+                }
+
+                const char* failure_phase = "startup";
+                switch (netadapter::Connect_Failure_Phase(&_router_adapter)) {
+                case netadapter::CONNECT_FAILURE_TCP_CONNECT:
+                    failure_phase = "TCP connect";
+                    break;
+                case netadapter::CONNECT_FAILURE_HELLO_SEND:
+                    failure_phase = "HELLO send";
+                    break;
+                default:
+                    break;
+                }
+
+                SDL_Log(
+                    "Router %s attempt %u/%u failed for %s:%u, error=%d (%s)",
+                    failure_phase,
+                    (unsigned)attempt,
+                    (unsigned)ROUTER_CONNECT_ATTEMPTS,
+                    config->host,
+                    (unsigned)config->tcp_port,
+                    netadapter::Last_Error(&_router_adapter),
+                    netadapter::Last_Error_Message(&_router_adapter));
+
+                if (attempt != ROUTER_CONNECT_ATTEMPTS) {
+                    netadapter::Shutdown(&_router_adapter);
+                    SDL_Delay(ROUTER_CONNECT_RETRY_DELAY_MS);
+                }
+            }
+            return 0;
         }
     }
 
@@ -110,6 +211,7 @@ namespace netcode {
     int32_t __cdecl Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network) {
         int32_t result = 0;
         _connection_type = mode;
+        SDL_Log("Net_Init mode=%u", (unsigned)mode);
 
         if (mode == 0) {
             time_::_time = time_::time_;
@@ -117,11 +219,17 @@ namespace netcode {
 
             netadapter::s_config config;
             Init_Router_Config_(&config, nullptr, network);
+            SDL_Log("Router connecting to %s:%u", config.host, (unsigned)config.tcp_port);
             netadapter::Init(&_router_adapter, &config);
-            result = netadapter::Connect(&_router_adapter) ? 1 : 0;
+            result = Connect_Router_With_Retry_(&config);
             if (result != 0) {
                 Pump_Router_Until_(Router_Local_Id_Ready_, 5000);
                 result = Router_Local_Id_Ready_() ? 1 : 0;
+                if (result == 0) {
+                    SDL_Log("Router connected but WELCOME was not received within timeout");
+                } else {
+                    SDL_Log("Router connected as network id %u", (unsigned)netadapter::Local_Network_Id(&_router_adapter));
+                }
             }
             if (result != 0) {
                 Refresh_Router_Game_List_(1000);

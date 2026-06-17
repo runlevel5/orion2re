@@ -59,6 +59,7 @@ struct s_state {
     std::deque<s_event> events;
     uint32_t next_request_id = 1;
     uint32_t session_list_revision = 0;
+    e_connect_failure_phase connect_failure_phase = CONNECT_FAILURE_NONE;
 };
 
 s_adapter::s_adapter()
@@ -82,6 +83,7 @@ void Init(s_adapter* adapter, const s_config* config) {
     adapter->state->events.clear();
     adapter->state->next_request_id = 1;
     adapter->state->session_list_revision = 0;
+    adapter->state->connect_failure_phase = CONNECT_FAILURE_NONE;
 
     network::router::s_router_client_config client_config;
     Copy_Config_To_Client_(&adapter->state->config, &client_config);
@@ -92,14 +94,20 @@ bool Connect(s_adapter* adapter) {
     if (adapter == nullptr || adapter->state == nullptr) {
         return false;
     }
+    adapter->state->connect_failure_phase = CONNECT_FAILURE_NONE;
     if (!network::router::Router_Client_Connect(&adapter->state->client)) {
+        adapter->state->connect_failure_phase = CONNECT_FAILURE_TCP_CONNECT;
         return false;
     }
-    return network::router::Router_Client_Send_Hello(
+    if (!network::router::Router_Client_Send_Hello(
         &adapter->state->client,
         adapter->state->config.client_name,
-        adapter->state->config.build_string,
-        adapter->state->next_request_id++);
+        ROUTER_VERSION,
+        adapter->state->next_request_id++)) {
+        adapter->state->connect_failure_phase = CONNECT_FAILURE_HELLO_SEND;
+        return false;
+    }
+    return true;
 }
 
 void Shutdown(s_adapter* adapter) {
@@ -180,6 +188,20 @@ bool Is_Connected(const s_adapter* adapter) {
     return adapter != nullptr && adapter->state != nullptr && network::router::Router_Client_Is_Connected(&adapter->state->client);
 }
 
+int Last_Error(const s_adapter* adapter) {
+    if (adapter == nullptr || adapter->state == nullptr) {
+        return 0;
+    }
+    return network::router::Router_Client_Last_Error(&adapter->state->client);
+}
+
+const char* Last_Error_Message(const s_adapter* adapter) {
+    if (adapter == nullptr || adapter->state == nullptr) {
+        return "no adapter";
+    }
+    return network::router::Router_Client_Last_Error_Message(&adapter->state->client);
+}
+
 uint32_t Local_Network_Id(const s_adapter* adapter) {
     if (adapter == nullptr || adapter->state == nullptr) {
         return 0;
@@ -198,6 +220,13 @@ bool Has_Pending_Client_Events(const s_adapter* adapter) {
     return adapter != nullptr &&
         adapter->state != nullptr &&
         network::router::Router_Client_Event_Count(&adapter->state->client) != 0;
+}
+
+e_connect_failure_phase Connect_Failure_Phase(const s_adapter* adapter) {
+    if (adapter == nullptr || adapter->state == nullptr) {
+        return CONNECT_FAILURE_NONE;
+    }
+    return adapter->state->connect_failure_phase;
 }
 
 bool Refresh_Game_List(s_adapter* adapter) {
@@ -262,7 +291,11 @@ bool Join_Game(s_adapter* adapter, uint32_t session_index, const char* player_na
     if (adapter == nullptr || adapter->state == nullptr || session_id == 0) {
         return false;
     }
-    return network::router::Router_Client_Join_Session(&adapter->state->client, session_id, adapter->state->next_request_id++);
+    return network::router::Router_Client_Join_Session(
+        &adapter->state->client,
+        session_id,
+        adapter->state->config.build_string,
+        adapter->state->next_request_id++);
 }
 
 bool Set_New_Players_Enabled(s_adapter* adapter, bool enabled) {

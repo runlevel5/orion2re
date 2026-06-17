@@ -4030,6 +4030,10 @@ namespace MAINSCR {
             NETMOX::Decode_Drop_Out_Info_(from_player_id, (s_net_pack_drop_out_info*)data);
             break;
         }
+        case NETMOX::NET_MSG_PLAYER_DISCONNECTED: {
+            NETMOX::Decode_Player_Disconnected_Info_(data, len);
+            break;
+        }
         case 0x39: {
             if (NETMOX::_net.host_election_id == NETMOX::_net.net_host_id) {
                 exitm::Exit_With_Message(NETMOX::_only_1_host_allowed_error);

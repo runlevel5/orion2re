@@ -302,6 +302,10 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
             output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_INVALID_MESSAGE, parse_error.c_str()));
             return;
         }
+        if (hello.protocol_version != ROUTER_VERSION) {
+            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_INVALID_MESSAGE, "unsupported router version"));
+            return;
+        }
 
         const uint32_t network_id = Allocate_Network_Id_(state);
         if (network_id == 0) {
@@ -311,8 +315,9 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
 
         client.greeted = true;
         client.network_id = network_id;
+        client.protocol_version = hello.protocol_version;
         Router_Copy_String(client.client_name, sizeof(client.client_name), hello.client_name[0] != '\0' ? hello.client_name : "Player");
-        Router_Copy_String(client.build_string, sizeof(client.build_string), hello.build_string);
+        client.build_string[0] = '\0';
         state->network_to_connection[client.network_id] = connection_id;
 
         s_router_message welcome = Make_Message_(ROUTER_MESSAGE_WELCOME, request_id);
@@ -348,12 +353,8 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
             output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_INVALID_MESSAGE, "max_players must be greater than zero"));
             return;
         }
-        if (client.build_string[0] == '\0') {
-            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_BUILD_MISMATCH, "HELLO build string is required"));
-            return;
-        }
-        if (registration.build_string[0] != '\0' && std::strcmp(registration.build_string, client.build_string) != 0) {
-            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_BUILD_MISMATCH, "session build does not match client build"));
+        if (registration.build_string[0] == '\0') {
+            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_BUILD_MISMATCH, "session build string is required"));
             return;
         }
 
@@ -368,7 +369,8 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
         Router_Copy_String(session.info.host_name, sizeof(session.info.host_name), registration.host_name[0] != '\0' ? registration.host_name : client.client_name);
         session.info.current_players = 1;
         session.info.max_players = registration.max_players;
-        Router_Copy_String(session.info.build_string, sizeof(session.info.build_string), client.build_string);
+        Router_Copy_String(session.info.build_string, sizeof(session.info.build_string), registration.build_string);
+        Router_Copy_String(client.build_string, sizeof(client.build_string), registration.build_string);
         session.owner_network_id = client.network_id;
         session.member_network_ids.push_back(client.network_id);
         session.new_players_enabled = true;
@@ -459,8 +461,15 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
             return;
         }
 
+        s_router_join_session_payload join;
+        std::string parse_error;
+        if (!Decode_Join_Session_Payload(&message->payload, &join, &parse_error)) {
+            output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_INVALID_MESSAGE, parse_error.c_str()));
+            return;
+        }
+
         s_router_session_state& session = session_it->second;
-        if (client.build_string[0] == '\0' || session.info.build_string[0] == '\0' || std::strcmp(session.info.build_string, client.build_string) != 0) {
+        if (join.build_string[0] == '\0' || session.info.build_string[0] == '\0' || std::strcmp(session.info.build_string, join.build_string) != 0) {
             output->push_back(Make_Error_(connection_id, request_id, ROUTER_ERROR_BUILD_MISMATCH, "client build does not match session build"));
             return;
         }
@@ -473,6 +482,7 @@ void Router_Core_Handle_Message(s_router_core_state* state, t_router_connection_
             return;
         }
 
+        Router_Copy_String(client.build_string, sizeof(client.build_string), join.build_string);
         const s_router_member_info joining_member = Make_Member_Info_(&session, &client);
         session.member_network_ids.push_back(client.network_id);
         session.info.current_players = (uint16_t)session.member_network_ids.size();

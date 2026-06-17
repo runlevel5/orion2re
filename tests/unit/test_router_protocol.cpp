@@ -89,7 +89,7 @@ DOCTEST_TEST_CASE("framed messages round trip with fixed routing header and payl
 DOCTEST_TEST_CASE("frame reader waits for complete message before consuming bytes") {
     s_router_message message;
     message.header.kind = ROUTER_MESSAGE_HELLO;
-    Encode_Hello_Payload("alice", "test-build", &message.payload);
+    Encode_Hello_Payload("alice", ROUTER_VERSION, &message.payload);
 
     Bit_Stream encoded_frame;
     Encode_Frame(&message, &encoded_frame);
@@ -108,7 +108,20 @@ DOCTEST_TEST_CASE("frame reader waits for complete message before consuming byte
     s_router_hello_payload hello;
     DOCTEST_REQUIRE(Decode_Hello_Payload(&decoded.payload, &hello, &error));
     DOCTEST_CHECK(std::strcmp(hello.client_name, "alice") == 0);
-    DOCTEST_CHECK(std::strcmp(hello.build_string, "test-build") == 0);
+    DOCTEST_CHECK(hello.protocol_version == ROUTER_VERSION);
+}
+
+DOCTEST_TEST_CASE("join session payload preserves client build string") {
+    s_router_join_session_payload join;
+    Router_Copy_String(join.build_string, sizeof(join.build_string), "test-build");
+
+    Bit_Stream payload;
+    Encode_Join_Session_Payload(&join, &payload);
+
+    s_router_join_session_payload decoded;
+    std::string error;
+    DOCTEST_REQUIRE(Decode_Join_Session_Payload(&payload, &decoded, &error));
+    DOCTEST_CHECK(std::strcmp(decoded.build_string, "test-build") == 0);
 }
 
 DOCTEST_TEST_CASE("session list payload preserves browser-visible metadata") {

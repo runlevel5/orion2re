@@ -13,6 +13,8 @@ extern int32_t g_window_focus_state;
 extern uint32_t g_last_scan_code;
 
 namespace platform {
+	constexpr bool k_keep_rendering_when_unfocused = true;
+
 	// Variables
 	extern uint32_t g_os_ver;
 	extern uint32_t g_win_minor;

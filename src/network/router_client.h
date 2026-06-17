@@ -66,6 +66,8 @@ void Router_Client_Disconnect(s_router_client* client);
 int Router_Client_Pump(s_router_client* client);
 
 bool Router_Client_Is_Connected(const s_router_client* client);
+int Router_Client_Last_Error(const s_router_client* client);
+const char* Router_Client_Last_Error_Message(const s_router_client* client);
 uint32_t Router_Client_Local_Network_Id(const s_router_client* client);
 uint32_t Router_Client_Session_Id(const s_router_client* client);
 const char* Router_Client_Router_Id(const s_router_client* client);
@@ -75,12 +77,12 @@ size_t Router_Client_Event_Count(const s_router_client* client);
 bool Router_Client_Pop_Event(s_router_client* client, s_router_client_event* event);
 
 bool Router_Client_Send_Message(s_router_client* client, const s_router_message* message);
-bool Router_Client_Send_Hello(s_router_client* client, const char* client_name, const char* build_string, uint32_t request_id);
+bool Router_Client_Send_Hello(s_router_client* client, const char* client_name, uint32_t protocol_version, uint32_t request_id);
 bool Router_Client_Request_Session_List(s_router_client* client, uint32_t request_id);
 bool Router_Client_Register_Session(s_router_client* client, const s_router_session_registration_payload* registration, uint32_t request_id);
 bool Router_Client_Unregister_Session(s_router_client* client, uint32_t session_id, uint32_t request_id);
 bool Router_Client_Set_Session_Open(s_router_client* client, uint32_t session_id, bool open, uint32_t request_id);
-bool Router_Client_Join_Session(s_router_client* client, uint32_t session_id, uint32_t request_id);
+bool Router_Client_Join_Session(s_router_client* client, uint32_t session_id, const char* build_string, uint32_t request_id);
 bool Router_Client_Leave_Session(s_router_client* client, uint32_t request_id);
 bool Router_Client_Send_To(s_router_client* client, uint32_t target_network_id, const uint8_t* payload, uint32_t payload_size, uint32_t request_id);
 bool Router_Client_Send_Broadcast(s_router_client* client, const uint8_t* payload, uint32_t payload_size, uint32_t flags, uint32_t request_id);

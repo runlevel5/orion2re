@@ -446,6 +446,18 @@ bool Router_Client_Is_Connected(const s_router_client* client) {
     return client != nullptr && client->state != nullptr && client->state->connected;
 }
 
+int Router_Client_Last_Error(const s_router_client* client) {
+    if (client == nullptr || client->state == nullptr) {
+        return 0;
+    }
+    return client->state->last_error;
+}
+
+const char* Router_Client_Last_Error_Message(const s_router_client* client) {
+    const int error = Router_Client_Last_Error(client);
+    return error == 0 ? "no error" : uv_strerror(error);
+}
+
 uint32_t Router_Client_Local_Network_Id(const s_router_client* client) {
     if (client == nullptr || client->state == nullptr) {
         return 0;
@@ -528,11 +540,11 @@ bool Router_Client_Send_Message(s_router_client* client, const s_router_message*
     return true;
 }
 
-bool Router_Client_Send_Hello(s_router_client* client, const char* client_name, const char* build_string, uint32_t request_id) {
+bool Router_Client_Send_Hello(s_router_client* client, const char* client_name, uint32_t protocol_version, uint32_t request_id) {
     s_router_message message;
     message.header.kind = ROUTER_MESSAGE_HELLO;
     message.header.request_id = request_id;
-    Encode_Hello_Payload(client_name, build_string, &message.payload);
+    Encode_Hello_Payload(client_name, protocol_version, &message.payload);
     return Router_Client_Send_Message(client, &message);
 }
 
@@ -571,11 +583,15 @@ bool Router_Client_Set_Session_Open(s_router_client* client, uint32_t session_id
     return Router_Client_Send_Message(client, &message);
 }
 
-bool Router_Client_Join_Session(s_router_client* client, uint32_t session_id, uint32_t request_id) {
+bool Router_Client_Join_Session(s_router_client* client, uint32_t session_id, const char* build_string, uint32_t request_id) {
+    s_router_join_session_payload join;
+    Router_Copy_String(join.build_string, sizeof(join.build_string), build_string);
+
     s_router_message message;
     message.header.kind = ROUTER_MESSAGE_JOIN_SESSION;
     message.header.session_id = session_id;
     message.header.request_id = request_id;
+    Encode_Join_Session_Payload(&join, &message.payload);
     return Router_Client_Send_Message(client, &message);
 }
 

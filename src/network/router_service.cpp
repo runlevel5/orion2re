@@ -3,6 +3,7 @@
 #include "network/router_core.h"
 
 #include <atomic>
+#include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -65,6 +66,12 @@ struct s_router_client_connection {
     uv_tcp_t tcp;
     std::vector<uint8_t> read_buffer;
     uint32_t pending_write_bytes = 0;
+    uint64_t bytes_read = 0;
+    uint64_t bytes_written = 0;
+    uint32_t frames_read = 0;
+    uint32_t frames_written = 0;
+    char peer_address[ROUTER_ADDRESS_SIZE] = "unknown";
+    uint16_t peer_port = 0;
     bool closing = false;
 };
 
@@ -91,10 +98,284 @@ void Router_Service_Log_(s_router_service_state* state, const char* message) {
     std::fprintf(stderr, "orion2-router: %s\n", message);
 }
 
-void Router_Service_Logf_(s_router_service_state* state, const char* format, uint32_t value_a, uint32_t value_b) {
+void Router_Service_Logf_(s_router_service_state* state, const char* format, ...) {
     char message[256]{};
-    std::snprintf(message, sizeof(message), format, value_a, value_b);
+    va_list args;
+    va_start(args, format);
+    std::vsnprintf(message, sizeof(message), format, args);
+    va_end(args);
     Router_Service_Log_(state, message);
+}
+
+void Router_Service_Log_Verbosef_(s_router_service_state* state, const char* format, ...) {
+    if (state == nullptr || !state->config.verbose_logging) {
+        return;
+    }
+
+    char message[256]{};
+    va_list args;
+    va_start(args, format);
+    std::vsnprintf(message, sizeof(message), format, args);
+    va_end(args);
+    Router_Service_Log_(state, message);
+}
+
+const char* Router_Message_Kind_Name_(e_router_message_kind kind) {
+    switch (kind) {
+    case ROUTER_MESSAGE_HELLO: return "HELLO";
+    case ROUTER_MESSAGE_WELCOME: return "WELCOME";
+    case ROUTER_MESSAGE_REGISTER_SESSION: return "REGISTER_SESSION";
+    case ROUTER_MESSAGE_SESSION_REGISTERED: return "SESSION_REGISTERED";
+    case ROUTER_MESSAGE_UNREGISTER_SESSION: return "UNREGISTER_SESSION";
+    case ROUTER_MESSAGE_LIST_SESSIONS: return "LIST_SESSIONS";
+    case ROUTER_MESSAGE_SESSION_LIST: return "SESSION_LIST";
+    case ROUTER_MESSAGE_JOIN_SESSION: return "JOIN_SESSION";
+    case ROUTER_MESSAGE_JOINED_SESSION: return "JOINED_SESSION";
+    case ROUTER_MESSAGE_LEAVE_SESSION: return "LEAVE_SESSION";
+    case ROUTER_MESSAGE_LEFT_SESSION: return "LEFT_SESSION";
+    case ROUTER_MESSAGE_SEND_TO: return "SEND_TO";
+    case ROUTER_MESSAGE_SEND_BROADCAST: return "SEND_BROADCAST";
+    case ROUTER_MESSAGE_GAME_DATA: return "GAME_DATA";
+    case ROUTER_MESSAGE_OK: return "OK";
+    case ROUTER_MESSAGE_ERROR: return "ERROR";
+    case ROUTER_MESSAGE_SET_SESSION_OPEN: return "SET_SESSION_OPEN";
+    case ROUTER_MESSAGE_MEMBER_LIST: return "MEMBER_LIST";
+    case ROUTER_MESSAGE_MEMBER_JOINED: return "MEMBER_JOINED";
+    case ROUTER_MESSAGE_MEMBER_LEFT: return "MEMBER_LEFT";
+    case ROUTER_MESSAGE_SESSION_CLOSED: return "SESSION_CLOSED";
+    default: return "UNKNOWN";
+    }
+}
+
+const s_router_client_state* Router_Service_Core_Client_(const s_router_service_state* state, t_router_connection_id connection_id) {
+    if (state == nullptr) {
+        return nullptr;
+    }
+    auto client_it = state->core.clients.find(connection_id);
+    if (client_it == state->core.clients.end()) {
+        return nullptr;
+    }
+    return &client_it->second;
+}
+
+void Router_Service_Set_Peer_Info_(s_router_client_connection* connection) {
+    if (connection == nullptr) {
+        return;
+    }
+
+    sockaddr_storage address{};
+    int address_size = sizeof(address);
+    if (uv_tcp_getpeername(&connection->tcp, (sockaddr*)&address, &address_size) != 0) {
+        Router_Copy_String(connection->peer_address, sizeof(connection->peer_address), "unknown");
+        connection->peer_port = 0;
+        return;
+    }
+
+    if (address.ss_family == AF_INET) {
+        sockaddr_in* ipv4 = (sockaddr_in*)&address;
+        uv_ip4_name(ipv4, connection->peer_address, sizeof(connection->peer_address));
+        connection->peer_port = (uint16_t)ntohs(ipv4->sin_port);
+    } else if (address.ss_family == AF_INET6) {
+        sockaddr_in6* ipv6 = (sockaddr_in6*)&address;
+        uv_ip6_name(ipv6, connection->peer_address, sizeof(connection->peer_address));
+        connection->peer_port = (uint16_t)ntohs(ipv6->sin6_port);
+    } else {
+        Router_Copy_String(connection->peer_address, sizeof(connection->peer_address), "unknown");
+        connection->peer_port = 0;
+    }
+}
+
+bool Router_Service_Log_Error_Output_(s_router_service_state* state, const s_router_client_connection* connection, const s_router_message* request, const std::vector<s_router_outbound_message>* output) {
+    for (const s_router_outbound_message& outbound : *output) {
+        if (outbound.connection_id != connection->connection_id || outbound.message.header.kind != ROUTER_MESSAGE_ERROR) {
+            continue;
+        }
+
+        s_router_error_payload error;
+        std::string parse_error;
+        if (Decode_Error_Payload(&outbound.message.payload, &error, &parse_error)) {
+            Router_Service_Logf_(
+                state,
+                "reject peer=%s:%u conn=%u request=%s code=%u message=\"%s\"",
+                connection->peer_address,
+                (unsigned)connection->peer_port,
+                (unsigned)connection->connection_id,
+                Router_Message_Kind_Name_(request->header.kind),
+                (unsigned)error.code,
+                error.message);
+        } else {
+            Router_Service_Logf_(
+                state,
+                "reject peer=%s:%u conn=%u request=%s code=? message=\"invalid error payload\"",
+                connection->peer_address,
+                (unsigned)connection->peer_port,
+                (unsigned)connection->connection_id,
+                Router_Message_Kind_Name_(request->header.kind));
+        }
+        return true;
+    }
+    return false;
+}
+
+void Router_Service_Log_Action_(
+    s_router_service_state* state,
+    const s_router_client_connection* connection,
+    const s_router_message* request,
+    const std::vector<s_router_outbound_message>* output,
+    uint32_t before_network_id,
+    uint32_t before_session_id
+) {
+    if (state == nullptr || connection == nullptr || request == nullptr || output == nullptr) {
+        return;
+    }
+    if (Router_Service_Log_Error_Output_(state, connection, request, output)) {
+        return;
+    }
+
+    const s_router_client_state* client = Router_Service_Core_Client_(state, connection->connection_id);
+    const uint32_t network_id = client != nullptr ? client->network_id : before_network_id;
+    const uint32_t session_id = client != nullptr ? client->session_id : before_session_id;
+
+    switch (request->header.kind) {
+    case ROUTER_MESSAGE_HELLO:
+        if (client != nullptr && client->greeted) {
+            Router_Service_Logf_(
+                state,
+                "client hello peer=%s:%u conn=%u network=%u name=\"%s\" version=%u router=\"%s\"",
+                connection->peer_address,
+                (unsigned)connection->peer_port,
+                (unsigned)connection->connection_id,
+                (unsigned)network_id,
+                client->client_name,
+                (unsigned)client->protocol_version,
+                state->core.router_id);
+        }
+        break;
+    case ROUTER_MESSAGE_LIST_SESSIONS: {
+        std::vector<s_router_session_info> sessions;
+        Router_Core_List_Sessions(&state->core, &sessions);
+        Router_Service_Log_Verbosef_(
+            state,
+            "session list peer=%s:%u conn=%u network=%u count=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)sessions.size());
+        break;
+    }
+    case ROUTER_MESSAGE_REGISTER_SESSION: {
+        const auto session_it = state->core.sessions.find(session_id);
+        if (session_it != state->core.sessions.end()) {
+            const s_router_session_info& info = session_it->second.info;
+            Router_Service_Logf_(
+                state,
+                "session created peer=%s:%u conn=%u network=%u session=%u name=\"%s\" host=\"%s\" players=%u/%u build=\"%s\" open=%u",
+                connection->peer_address,
+                (unsigned)connection->peer_port,
+                (unsigned)connection->connection_id,
+                (unsigned)network_id,
+                (unsigned)info.session_id,
+                info.session_name,
+                info.host_name,
+                (unsigned)info.current_players,
+                (unsigned)info.max_players,
+                info.build_string,
+                info.open ? 1U : 0U);
+        }
+        break;
+    }
+    case ROUTER_MESSAGE_JOIN_SESSION: {
+        const auto session_it = state->core.sessions.find(session_id);
+        if (session_it != state->core.sessions.end()) {
+            const s_router_session_info& info = session_it->second.info;
+            Router_Service_Logf_(
+                state,
+                "member joined peer=%s:%u conn=%u network=%u session=%u name=\"%s\" players=%u/%u",
+                connection->peer_address,
+                (unsigned)connection->peer_port,
+                (unsigned)connection->connection_id,
+                (unsigned)network_id,
+                (unsigned)info.session_id,
+                client != nullptr ? client->client_name : "",
+                (unsigned)info.current_players,
+                (unsigned)info.max_players);
+        }
+        break;
+    }
+    case ROUTER_MESSAGE_LEAVE_SESSION:
+        Router_Service_Logf_(
+            state,
+            "member left peer=%s:%u conn=%u network=%u session=%u reason=leave",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)before_network_id,
+            (unsigned)before_session_id);
+        break;
+    case ROUTER_MESSAGE_UNREGISTER_SESSION:
+        Router_Service_Logf_(
+            state,
+            "session closed peer=%s:%u conn=%u network=%u session=%u reason=unregister",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)(request->header.session_id != 0 ? request->header.session_id : before_session_id));
+        break;
+    case ROUTER_MESSAGE_SET_SESSION_OPEN: {
+        const bool open = (request->header.flags & ROUTER_FLAG_SESSION_OPEN) != 0;
+        const auto session_it = state->core.sessions.find(request->header.session_id != 0 ? request->header.session_id : session_id);
+        const uint32_t logged_session_id = session_it != state->core.sessions.end() ? session_it->second.info.session_id : (request->header.session_id != 0 ? request->header.session_id : session_id);
+        Router_Service_Logf_(
+            state,
+            open ? "session reopened peer=%s:%u conn=%u network=%u session=%u" : "session locked/game-starting peer=%s:%u conn=%u network=%u session=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)logged_session_id);
+        break;
+    }
+    case ROUTER_MESSAGE_SEND_TO:
+        Router_Service_Log_Verbosef_(
+            state,
+            "game data direct peer=%s:%u conn=%u network=%u session=%u target=%u bytes=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)session_id,
+            (unsigned)request->header.target_network_id,
+            (unsigned)request->payload.Size());
+        break;
+    case ROUTER_MESSAGE_SEND_BROADCAST:
+        Router_Service_Log_Verbosef_(
+            state,
+            "game data broadcast peer=%s:%u conn=%u network=%u session=%u recipients=%u bytes=%u include_self=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)session_id,
+            (unsigned)output->size(),
+            (unsigned)request->payload.Size(),
+            (request->header.flags & ROUTER_FLAG_BROADCAST_INCLUDE_SENDER) != 0 ? 1U : 0U);
+        break;
+    default:
+        Router_Service_Log_Verbosef_(
+            state,
+            "message peer=%s:%u conn=%u network=%u session=%u kind=%s bytes=%u outputs=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)session_id,
+            Router_Message_Kind_Name_(request->header.kind),
+            (unsigned)request->payload.Size(),
+            (unsigned)output->size());
+        break;
+    }
 }
 
 void Router_Service_Close_Handle_(uv_handle_t* handle) {
@@ -212,10 +493,47 @@ void Router_Service_Close_Client_(s_router_service_state* state, s_router_client
         return;
     }
 
+    const s_router_client_state* client = Router_Service_Core_Client_(state, connection->connection_id);
+    const uint32_t network_id = client != nullptr ? client->network_id : 0;
+    const uint32_t session_id = client != nullptr ? client->session_id : 0;
+    if (notify_core) {
+        Router_Service_Logf_(
+            state,
+            "connection dropped peer=%s:%u conn=%u network=%u session=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)session_id);
+    }
+    Router_Service_Log_Verbosef_(
+        state,
+        "connection closing peer=%s:%u conn=%u network=%u session=%u notify=%u",
+        connection->peer_address,
+        (unsigned)connection->peer_port,
+        (unsigned)connection->connection_id,
+        (unsigned)network_id,
+        (unsigned)session_id,
+        notify_core ? 1U : 0U);
+
     connection->closing = true;
     uv_read_stop((uv_stream_t*)&connection->tcp);
     std::vector<s_router_outbound_message> output;
     Router_Core_Close_Connection(&state->core, connection->connection_id, &output);
+    if (session_id != 0) {
+        Router_Service_Logf_(
+            state,
+            "member left peer=%s:%u conn=%u network=%u session=%u reason=%s",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)network_id,
+            (unsigned)session_id,
+            notify_core ? "disconnect" : "shutdown");
+        if (state->core.sessions.find(session_id) == state->core.sessions.end()) {
+            Router_Service_Logf_(state, "session deleted session=%u reason=last-member-left", (unsigned)session_id);
+        }
+    }
     if (notify_core) {
         Router_Service_Send_Outputs_(state, &output);
     }
@@ -227,6 +545,8 @@ void Router_Service_Begin_Shutdown_(s_router_service_state* state) {
         return;
     }
     state->shutting_down = true;
+
+    Router_Service_Logf_(state, "router shutting down clients=%u sessions=%u", (unsigned)state->clients.size(), (unsigned)state->core.sessions.size());
 
     std::vector<s_router_client_connection*> clients;
     clients.reserve(state->clients.size());
@@ -280,6 +600,8 @@ void Router_Service_Send_Output_(s_router_service_state* state, const s_router_o
     }
 
     connection->pending_write_bytes += write_request->byte_count;
+    connection->bytes_written += write_request->byte_count;
+    connection->frames_written++;
 
     write_request->buffer = uv_buf_init((char*)write_request->data.Data(), write_request->data.Size());
     write_request->request.data = write_request;
@@ -374,9 +696,16 @@ void Router_Service_Tcp_Connection_Callback_(uv_stream_t* server, int status) {
         return;
     }
 
+    Router_Service_Set_Peer_Info_(connection);
     uv_tcp_nodelay(&connection->tcp, 1);
     state->clients[connection->connection_id] = connection;
     Router_Core_Open_Connection(&state->core, connection->connection_id);
+    Router_Service_Logf_(
+        state,
+        "connection accepted peer=%s:%u conn=%u",
+        connection->peer_address,
+        (unsigned)connection->peer_port,
+        (unsigned)connection->connection_id);
 
     result = uv_read_start((uv_stream_t*)&connection->tcp, Router_Service_Alloc_Callback_, Router_Service_Read_Callback_);
     if (result != 0) {
@@ -396,6 +725,7 @@ void Router_Service_Read_Callback_(uv_stream_t* stream, ssize_t bytes_read, cons
     s_router_service_state* state = connection->service;
     if (bytes_read > 0) {
         const uint8_t* bytes = (const uint8_t*)buffer->base;
+        connection->bytes_read += (uint64_t)bytes_read;
         connection->read_buffer.insert(connection->read_buffer.end(), bytes, bytes + bytes_read);
 
         for (;;) {
@@ -411,7 +741,12 @@ void Router_Service_Read_Callback_(uv_stream_t* stream, ssize_t bytes_read, cons
             }
 
             std::vector<s_router_outbound_message> output;
+            connection->frames_read++;
+            const s_router_client_state* before_client = Router_Service_Core_Client_(state, connection->connection_id);
+            const uint32_t before_network_id = before_client != nullptr ? before_client->network_id : 0;
+            const uint32_t before_session_id = before_client != nullptr ? before_client->session_id : 0;
             Router_Core_Handle_Message(&state->core, connection->connection_id, &message, &output);
+            Router_Service_Log_Action_(state, connection, &message, &output, before_network_id, before_session_id);
             Router_Service_Send_Outputs_(state, &output);
             if (connection->closing) {
                 break;
@@ -452,6 +787,22 @@ void Router_Service_Client_Close_Callback_(uv_handle_t* handle) {
 
     s_router_service_state* state = connection->service;
     if (state != nullptr) {
+        Router_Service_Log_Verbosef_(
+            state,
+            "traffic peer=%s:%u conn=%u frames_in=%u frames_out=%u bytes_in=%llu bytes_out=%llu",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id,
+            (unsigned)connection->frames_read,
+            (unsigned)connection->frames_written,
+            (unsigned long long)connection->bytes_read,
+            (unsigned long long)connection->bytes_written);
+        Router_Service_Log_Verbosef_(
+            state,
+            "connection closed peer=%s:%u conn=%u",
+            connection->peer_address,
+            (unsigned)connection->peer_port,
+            (unsigned)connection->connection_id);
         state->clients.erase(connection->connection_id);
     }
     delete connection;
@@ -477,6 +828,18 @@ void Router_Service_Udp_Recv_Callback_(uv_udp_t* handle, ssize_t bytes_read, con
     s_router_service_state* state = (s_router_service_state*)handle->data;
     if (state != nullptr && bytes_read > 0 && address != nullptr) {
         if (Is_Discovery_Probe((const uint8_t*)buffer->base, (uint32_t)bytes_read)) {
+            char address_text[ROUTER_ADDRESS_SIZE] = "unknown";
+            uint16_t port = 0;
+            if (address->sa_family == AF_INET) {
+                sockaddr_in* ipv4 = (sockaddr_in*)address;
+                uv_ip4_name(ipv4, address_text, sizeof(address_text));
+                port = (uint16_t)ntohs(ipv4->sin_port);
+            } else if (address->sa_family == AF_INET6) {
+                sockaddr_in6* ipv6 = (sockaddr_in6*)address;
+                uv_ip6_name(ipv6, address_text, sizeof(address_text));
+                port = (uint16_t)ntohs(ipv6->sin6_port);
+            }
+            Router_Service_Log_Verbosef_(state, "discovery probe peer=%s:%u", address_text, (unsigned)port);
             Router_Service_Send_Discovery_Reply_(state, address);
         }
     }
@@ -552,6 +915,17 @@ int Router_Service_Run(s_router_service* service) {
     }
     if (result == 0 && state->config.enable_discovery) {
         result = Router_Service_Start_Udp_Discovery_(state);
+    }
+
+    if (result == 0) {
+        Router_Service_Logf_(
+            state,
+            "router started id=\"%s\" listen=%s:%u discovery=%u discovery_port=%u",
+            state->config.router_id,
+            state->config.listen_host,
+            (unsigned)state->bound_tcp_port.load(),
+            state->config.enable_discovery ? 1U : 0U,
+            (unsigned)state->bound_discovery_port.load());
     }
 
     if (result != 0 || state->stop_requested.load()) {

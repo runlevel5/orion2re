@@ -18,6 +18,7 @@ struct s_router_config {
     uint16_t tcp_port = ROUTER_DEFAULT_PORT;
     bool enable_discovery = true;
     bool enable_signal_handlers = true;
+    bool verbose_logging = false;
     uint16_t discovery_port = ROUTER_DEFAULT_PORT;
     char router_id[ROUTER_ID_SIZE] = "local-router";
     char router_name[ROUTER_NAME_SIZE] = "Orion2 Router";
