@@ -8,3 +8,6 @@
 [submodule "vendors/libuv"]
 	path = vendors/libuv
 	url = https://github.com/libuv/libuv.git
+[submodule "vendors/lz4"]
+	path = vendors/lz4
+	url = https://github.com/lz4/lz4.git
