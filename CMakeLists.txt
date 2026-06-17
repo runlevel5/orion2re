@@ -169,12 +169,6 @@ file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
-list(REMOVE_ITEM ORION2RE_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/game/comcore.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/game/transprt.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/game/winnet.cpp"
-)
-
 set(ORION2RE_ROUTER_SOURCES
     src/network/router_cli.cpp
     src/network/router_core.cpp

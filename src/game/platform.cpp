@@ -750,6 +750,7 @@ namespace platform {
     {
         Destroy_Present_Backend_();
 
+        uint8_t* const primary_cursor_surface = g_cursor_surface_1;
         uint8_t* const alternate_cursor_surface = _cursor_surface;
 
         if (g_present_surface != nullptr) {
@@ -757,12 +758,12 @@ namespace platform {
             g_present_surface = nullptr;
         }
 
-        if (g_cursor_surface_1 != nullptr) {
-            free(g_cursor_surface_1);
+        if (primary_cursor_surface != nullptr) {
+            free(primary_cursor_surface);
             g_cursor_surface_1 = nullptr;
         }
 
-        if (alternate_cursor_surface != nullptr && alternate_cursor_surface != g_cursor_surface_1) {
+        if (alternate_cursor_surface != nullptr && alternate_cursor_surface != primary_cursor_surface) {
             free(alternate_cursor_surface);
         }
         _cursor_surface = nullptr;
@@ -1038,11 +1039,11 @@ namespace platform {
 #ifdef FULLSCREEN
         int nWidth = k_windowed_logical_width;
         int nHeight = k_windowed_logical_height;
-        SDL_WindowFlags window_flags = SDL_WINDOW_FULLSCREEN;
+        SDL_WindowFlags window_flags = SDL_WINDOW_FULLSCREEN | SDL_WINDOW_HIDDEN;
 #else
         int nWidth = k_windowed_logical_width;
         int nHeight = k_windowed_logical_height;
-        SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE;
+        SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 #endif
 
         g_sdl_window = SDL_CreateWindow("Microprose", nWidth, nHeight, window_flags);
@@ -1055,9 +1056,24 @@ namespace platform {
             SDL_Quit();
             return 0;
         }
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: window created");
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: hidden window created");
 
 		g_main_window = g_sdl_window;
+
+		g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, nullptr);
+		if (g_sdl_renderer == nullptr) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateRenderer failed: %s", SDL_GetError());
+			Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			SDL_Quit();
+			return 0;
+		}
+		(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+		SDL_ShowWindow(g_sdl_window);
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: renderer initialized and window shown");
 
         SDL_HideCursor();
 

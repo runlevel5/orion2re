@@ -86,7 +86,7 @@
      - Remove router-mode handling for DirectPlay session packets such as create-player, destroy-player, and keepalive packets.
      - Treat router member events as the source of truth for membership changes.
      - Medium term: split `comcore` into a deleted legacy transport path and a simple router dispatch path.
-     - Status: pending cleanup; mode 0 no longer relies on comcore for active send/update, but `ComInit_()` is still used for legacy initialization side effects.
+     - Status: complete for the router path; `comcore` and the legacy transport path have been removed from the active tree.
    - Wire router membership loss into `NETMOX` recovery:
      - Add an explicit adapter/game bridge for abrupt disconnects, for example `NETMOX::Handle_Network_Player_Disconnected_(int player_idx)`.
      - Map router network IDs to game player slots using existing game-owned state such as `MOX::_player[i].network_player_id` and `NETMOX::Net_Id_To_Player_Id_()`.
@@ -116,7 +116,7 @@
      - Delete `src/game/winnet.cpp` and `src/game/winnet.h` once no active code references them.
      - Remove DirectPlay import-library generation and `dplayx.def` from the active build if they become unused.
      - Retire or rename `ORION2RE_ENABLE_NETWORKING` so it no longer means legacy DirectPlay networking.
-     - Status: DirectPlay import-library generation and the `ORION2RE_ENABLE_NETWORKING` active-build option are removed. `WINNET` sources still exist in the tree but are excluded from the active target and are only referenced by excluded legacy `comcore`/`transprt` code.
+     - Status: `WINNET`, `comcore`, `transprt`, the local DirectPlay header, and `dplayx.def` have been removed from the active tree; DirectPlay import-library generation and the `ORION2RE_ENABLE_NETWORKING` active-build option are removed.
    - Testing checkpoints:
      - Add unit tests for `router_client` connect/hello/list/create/join/send/receive/event handling.
      - Add unit tests for `netadapter` session-list caching, local ID propagation, membership tracking, direct send, broadcast send, and member-left exposure.
