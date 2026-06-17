@@ -67,7 +67,7 @@ namespace netcode {
      */
     int32_t __cdecl Net_Get_Users_(int16_t* users);
 
-    /** Prevents DirectPlay from accepting new players. */
+    /** Prevents the active router session from accepting new players. */
     void __cdecl Net_Disable_New_Players_();
 
     /** Returns the current host network ID for the active backend. */

@@ -14,10 +14,6 @@
 
 #include "compat.h"
 
-#if ORION2RE_ENABLE_NETWORKING
-#include "../dplay.h"
-#endif
-
 #include "consts.h"
 
 #include "orion2_consts.h"

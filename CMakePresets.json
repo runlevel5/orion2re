@@ -184,7 +184,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x86.cmake",
         "ORION2RE_WINDOWS_ARCH": "x86",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -202,7 +201,6 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x86.cmake",
         "ORION2RE_WINDOWS_ARCH": "x86",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -220,7 +218,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x64.cmake",
         "ORION2RE_WINDOWS_ARCH": "x64",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -238,7 +235,6 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x64.cmake",
         "ORION2RE_WINDOWS_ARCH": "x64",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -254,7 +250,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -270,7 +265,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -286,7 +280,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
       }
     },
@@ -306,8 +299,7 @@
         "CMAKE_CXX_FLAGS": "-m32",
         "CMAKE_EXE_LINKER_FLAGS": "-m32",
         "CMAKE_SHARED_LINKER_FLAGS": "-m32",
-        "CMAKE_MODULE_LINKER_FLAGS": "-m32",
-        "ORION2RE_ENABLE_NETWORKING": "OFF"
+        "CMAKE_MODULE_LINKER_FLAGS": "-m32"
       }
     },
     {
@@ -326,8 +318,7 @@
         "CMAKE_CXX_FLAGS": "-m32",
         "CMAKE_EXE_LINKER_FLAGS": "-m32",
         "CMAKE_SHARED_LINKER_FLAGS": "-m32",
-        "CMAKE_MODULE_LINKER_FLAGS": "-m32",
-        "ORION2RE_ENABLE_NETWORKING": "OFF"
+        "CMAKE_MODULE_LINKER_FLAGS": "-m32"
       }
     },
     {
@@ -347,7 +338,6 @@
         "CMAKE_EXE_LINKER_FLAGS": "-m32",
         "CMAKE_SHARED_LINKER_FLAGS": "-m32",
         "CMAKE_MODULE_LINKER_FLAGS": "-m32",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
       }
     },
@@ -363,7 +353,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -379,7 +368,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -395,7 +383,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
       }
     },

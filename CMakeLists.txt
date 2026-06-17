@@ -95,7 +95,6 @@ endif()
 
 option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds" OFF)
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
-option(ORION2RE_ENABLE_NETWORKING "Enable legacy DirectPlay networking" OFF)
 option(ORION2RE_BUILD_TESTS "Build tests" OFF)
 option(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL "Exclude runtime executables from the default all target" ${ORION2RE_BUILD_TESTS})
 
@@ -205,9 +204,6 @@ target_include_directories(orion2re PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
 )
-target_compile_definitions(orion2re PRIVATE
-    ORION2RE_ENABLE_NETWORKING=$<BOOL:${ORION2RE_ENABLE_NETWORKING}>
-)
 
 target_precompile_headers(orion2re PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
@@ -277,39 +273,6 @@ if(MSVC)
         $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
     )
 
-    set(ORION2RE_IMPORT_LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/import-libs")
-    set(ORION2RE_LIB_TOOL "${CMAKE_LIB}")
-    if(NOT ORION2RE_LIB_TOOL)
-        set(ORION2RE_LIB_TOOL lib)
-    endif()
-
-    if(ORION2RE_ENABLE_NETWORKING)
-        add_custom_command(
-            OUTPUT
-                "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
-            COMMAND "${ORION2RE_LIB_TOOL}"
-                "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-                "/machine:${ORION2RE_TARGET_ARCH}"
-                /name:DPLAYX.DLL
-                "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            DEPENDS
-                "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-            VERBATIM
-        )
-
-        add_custom_target(orion2re_windows_importlibs
-            DEPENDS
-                "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-        )
-
-        add_dependencies(orion2re orion2re_windows_importlibs)
-
-        target_link_libraries(orion2re PRIVATE
-            "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-        )
-    endif()
-
     target_link_options(orion2re PRIVATE
         /DYNAMICBASE
         /NXCOMPAT
@@ -317,10 +280,6 @@ if(MSVC)
         $<$<CONFIG:Release>:/OPT:ICF>
         $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/DEBUG>
     )
-elseif(WIN32)
-    if(ORION2RE_ENABLE_NETWORKING)
-        message(WARNING "Legacy DirectPlay networking import library setup remains MSVC-specific; non-MSVC Windows networking builds may need additional link setup.")
-    endif()
 endif()
 
 if(ORION2RE_ENABLE_ASAN)

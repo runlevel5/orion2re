@@ -116,7 +116,7 @@
      - Delete `src/game/winnet.cpp` and `src/game/winnet.h` once no active code references them.
      - Remove DirectPlay import-library generation and `dplayx.def` from the active build if they become unused.
      - Retire or rename `ORION2RE_ENABLE_NETWORKING` so it no longer means legacy DirectPlay networking.
-     - Status: pending; `WINNET` still exists and is still compiled, but active mode 0 `netcode` path no longer initializes/sends/receives through it.
+     - Status: DirectPlay import-library generation and the `ORION2RE_ENABLE_NETWORKING` active-build option are removed. `WINNET` sources still exist in the tree but are excluded from the active target and are only referenced by excluded legacy `comcore`/`transprt` code.
    - Testing checkpoints:
      - Add unit tests for `router_client` connect/hello/list/create/join/send/receive/event handling.
      - Add unit tests for `netadapter` session-list caching, local ID propagation, membership tracking, direct send, broadcast send, and member-left exposure.
