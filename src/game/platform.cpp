@@ -56,6 +56,10 @@ namespace platform {
 		SDL_AtomicInt g_present_mouse_x;
 		SDL_AtomicInt g_present_mouse_y;
 		SDL_AtomicInt g_present_refresh_requested;
+		SDL_Mutex* g_exit_mutex;
+		SDL_Condition* g_exit_condition;
+		SDL_AtomicInt g_exit_requested;
+		SDL_AtomicInt g_game_thread_exited;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
 		bool Ensure_Present_Palette_();
@@ -185,10 +189,31 @@ namespace platform {
 			return ((float)coord * (float)(window_extent - 1)) / (float)(game_extent - 1);
 		}
 
-		[[noreturn]] void Force_Immediate_Process_Exit_() {
-			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "platform: Force_Immediate_Process_Exit");
-			Prepare_Exit_();
-			exit(0);
+		void Copy_Exit_Message_(const char* message) {
+			if (message == nullptr) {
+				g_exit_message[0] = '\0';
+				return;
+			}
+
+			strncpy(g_exit_message, message, sizeof(g_exit_message) - 1);
+			g_exit_message[sizeof(g_exit_message) - 1] = '\0';
+		}
+
+		bool Ensure_Exit_Primitives_() {
+			if (g_exit_mutex == nullptr) {
+				g_exit_mutex = SDL_CreateMutex();
+			}
+
+			if (g_exit_condition == nullptr) {
+				g_exit_condition = SDL_CreateCondition();
+			}
+
+			return g_exit_mutex != nullptr && g_exit_condition != nullptr;
+		}
+
+		void Request_SDL_Exit_() {
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL requested exit");
+			Request_Exit_();
 		}
 
 		void Queue_Key_Code_(uint32_t key_code, uint32_t scan_code) {
@@ -655,7 +680,7 @@ namespace platform {
 	void* g_env_strings;
 	SDL_Thread* g_worker_thread_handle;
 	uint32_t _updating_cursor_img;
-	uint8_t g_should_exit;
+	char g_exit_message[k_exit_message_size];
 	void* g_main_window;
 	volatile bool g_pending_toggle_pages;
 	int16_t g_video_mode;
@@ -672,6 +697,105 @@ namespace platform {
 
     constexpr int32_t k_windowed_logical_width = 640;
     constexpr int32_t k_windowed_logical_height = 480;
+
+	bool __cdecl Init_Exit_() {
+		const bool initialized = Ensure_Exit_Primitives_();
+		Reset_Exit_();
+		return initialized;
+	}
+
+	void __cdecl Shutdown_Exit_() {
+		if (g_exit_condition != nullptr) {
+			SDL_DestroyCondition(g_exit_condition);
+			g_exit_condition = nullptr;
+		}
+
+		if (g_exit_mutex != nullptr) {
+			SDL_DestroyMutex(g_exit_mutex);
+			g_exit_mutex = nullptr;
+		}
+
+		SDL_SetAtomicInt(&g_exit_requested, 0);
+		SDL_SetAtomicInt(&g_game_thread_exited, 0);
+		g_exit_message[0] = '\0';
+	}
+
+	void __cdecl Reset_Exit_() {
+		Ensure_Exit_Primitives_();
+
+		if (g_exit_mutex != nullptr) {
+			SDL_LockMutex(g_exit_mutex);
+		}
+
+		SDL_SetAtomicInt(&g_exit_requested, 0);
+		SDL_SetAtomicInt(&g_game_thread_exited, 0);
+		g_exit_message[0] = '\0';
+
+		if (g_exit_condition != nullptr) {
+			SDL_BroadcastCondition(g_exit_condition);
+		}
+
+		if (g_exit_mutex != nullptr) {
+			SDL_UnlockMutex(g_exit_mutex);
+		}
+	}
+
+	void __cdecl Request_Exit_(const char* message) {
+		Ensure_Exit_Primitives_();
+
+		if (g_exit_mutex != nullptr) {
+			SDL_LockMutex(g_exit_mutex);
+		}
+
+		if (SDL_GetAtomicInt(&g_exit_requested) == 0) {
+			Copy_Exit_Message_(message);
+			SDL_SetAtomicInt(&g_exit_requested, 1);
+		} else if (g_exit_message[0] == '\0' && message != nullptr && message[0] != '\0') {
+			Copy_Exit_Message_(message);
+		}
+
+		if (g_exit_condition != nullptr) {
+			SDL_BroadcastCondition(g_exit_condition);
+		}
+
+		if (g_exit_mutex != nullptr) {
+			SDL_UnlockMutex(g_exit_mutex);
+		}
+	}
+
+	bool __cdecl Exit_Requested_() {
+		return SDL_GetAtomicInt(&g_exit_requested) != 0;
+	}
+
+	const char* __cdecl Exit_Message_() {
+		return g_exit_message;
+	}
+
+	void __cdecl Check_Exit_() {
+		if (Exit_Requested_()) {
+			throw process_exit_requested{};
+		}
+	}
+
+	void __cdecl Mark_Game_Thread_Exited_() {
+		SDL_SetAtomicInt(&g_game_thread_exited, 1);
+
+		if (g_exit_mutex != nullptr) {
+			SDL_LockMutex(g_exit_mutex);
+		}
+
+		if (g_exit_condition != nullptr) {
+			SDL_BroadcastCondition(g_exit_condition);
+		}
+
+		if (g_exit_mutex != nullptr) {
+			SDL_UnlockMutex(g_exit_mutex);
+		}
+	}
+
+	bool __cdecl Game_Thread_Exited_() {
+		return SDL_GetAtomicInt(&g_game_thread_exited) != 0;
+	}
 
     void Parse_Ten_Cmd_Parameter_(const char* input_str) {
         if (input_str == nullptr) {
@@ -778,9 +902,7 @@ namespace platform {
 
     void __cdecl Prepare_Exit_() {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Prepare_Exit");
-        sound::Destroy_Sound_();
-        netcode::Net_Uninit_();
-        g_should_exit = 1;
+		Request_Exit_();
     }
 
     void Cleanup_Surfaces()
@@ -842,7 +964,8 @@ namespace platform {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT ||
                 event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
-                Force_Immediate_Process_Exit_();
+				Request_SDL_Exit_();
+				continue;
             }
 
 			if (event.type == SDL_EVENT_WINDOW_EXPOSED ||
@@ -1041,8 +1164,13 @@ namespace platform {
             return 0;
         }
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL video initialized");
+		if (!Init_Exit_()) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: exit primitives initialization failed: %s", SDL_GetError());
+			Shutdown_Exit_();
+			SDL_Quit();
+			return 0;
+		}
 
-        g_should_exit = 0;
         g_pending_toggle_pages = false;
         g_window_focus_state = 1;
         g_has_lost_focus = false;
@@ -1061,6 +1189,7 @@ namespace platform {
 		}
 		if (g_input_queue_mutex == nullptr) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
+			Shutdown_Exit_();
 			SDL_Quit();
 			return 0;
 		}
@@ -1072,6 +1201,7 @@ namespace platform {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
 			SDL_Quit();
 			return 0;
 		}
@@ -1093,6 +1223,7 @@ namespace platform {
 			g_present_cursor_mutex = nullptr;
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
             SDL_Quit();
             return 0;
         }
@@ -1108,6 +1239,7 @@ namespace platform {
 			g_present_cursor_mutex = nullptr;
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
 			SDL_Quit();
 			return 0;
 		}
@@ -1124,6 +1256,7 @@ namespace platform {
 			g_present_cursor_mutex = nullptr;
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
             SDL_Quit();
             return 0;
         }
@@ -1138,17 +1271,22 @@ namespace platform {
 			g_present_cursor_mutex = nullptr;
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
             SDL_Quit();
             return 0;
         }
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: worker thread created");
 
-        while (g_should_exit != 1) {
+        while (!Game_Thread_Exited_()) {
             Service_Pending_Window_Events_();
 
             Present_Published_Off_Page_();
             SDL_Delay(1);
         }
+
+		if (!Exit_Requested_()) {
+			Request_Exit_();
+		}
 
         if (g_worker_thread_handle != nullptr) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: waiting for worker thread");
@@ -1167,6 +1305,7 @@ namespace platform {
 			SDL_DestroyMutex(g_present_cursor_mutex);
 			g_present_cursor_mutex = nullptr;
 		}
+		Shutdown_Exit_();
         SDL_Quit();
 
         return 0;

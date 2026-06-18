@@ -401,6 +401,8 @@ namespace video {
 	}
 
     void __cdecl Toggle_Pages_() {
+        platform::Check_Exit_();
+
         platform::g_pending_toggle_pages = true;
         fields::Draw_Visible_Fields_();
         mouse::Disable_Mouse_();

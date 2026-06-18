@@ -14,6 +14,9 @@ extern uint32_t g_last_scan_code;
 
 namespace platform {
 	constexpr bool k_keep_rendering_when_unfocused = true;
+	constexpr int32_t k_exit_message_size = 256;
+
+	struct process_exit_requested {};
 
 	// Variables
 	extern uint32_t g_os_ver;
@@ -24,7 +27,7 @@ namespace platform {
 	extern void* g_env_strings;
 	extern SDL_Thread* g_worker_thread_handle;
 	extern uint32_t _updating_cursor_img;
-	extern uint8_t g_should_exit;
+	extern char g_exit_message[k_exit_message_size];
 
 	extern void* g_main_window;
 
@@ -47,6 +50,15 @@ namespace platform {
 	extern uint8_t* _offscreen_surface;
 
 	// Functions
+	bool __cdecl Init_Exit_();
+	void __cdecl Shutdown_Exit_();
+	void __cdecl Reset_Exit_();
+	void __cdecl Request_Exit_(const char* message = nullptr);
+	bool __cdecl Exit_Requested_();
+	const char* __cdecl Exit_Message_();
+	void __cdecl Check_Exit_();
+	void __cdecl Mark_Game_Thread_Exited_();
+	bool __cdecl Game_Thread_Exited_();
 	bool Create_Video_Buffers_(int16_t video_mode);
 	void __cdecl Service_Pending_Window_Events_();
 	void __cdecl Pump_Game_Input_Queue_();

@@ -97,6 +97,7 @@ namespace test::fakes {
         video::_screen_window_x2 = 639;
         video::_screen_window_y2 = 479;
 
+        platform::Reset_Exit_();
         fields::Clear_Fields_();
         fields::_help_list_active = 0;
         fields::_help_list_count = 0;
@@ -742,7 +743,7 @@ namespace platform {
     void* g_env_strings = nullptr;
     SDL_Thread* g_worker_thread_handle = nullptr;
     uint32_t _updating_cursor_img = 0;
-    uint8_t g_should_exit = 0;
+    char g_exit_message[k_exit_message_size] = "";
     void* g_main_window = nullptr;
     volatile bool g_pending_toggle_pages = false;
     int16_t g_video_mode = 0;
@@ -756,6 +757,67 @@ namespace platform {
     int32_t g_last_cursor_shape = 0;
     int16_t g_mouse_x = 0;
     int16_t g_mouse_y = 0;
+
+    namespace {
+        bool g_exit_requested = false;
+        bool g_thread_exited = false;
+
+        void Copy_Exit_Message_(const char* message) {
+            if (message == nullptr) {
+                g_exit_message[0] = '\0';
+                return;
+            }
+
+            std::strncpy(g_exit_message, message, sizeof(g_exit_message) - 1);
+            g_exit_message[sizeof(g_exit_message) - 1] = '\0';
+        }
+    }
+
+    bool __cdecl Init_Exit_() {
+        Reset_Exit_();
+        return true;
+    }
+
+    void __cdecl Shutdown_Exit_() {
+        Reset_Exit_();
+    }
+
+    void __cdecl Reset_Exit_() {
+        g_exit_requested = false;
+        g_thread_exited = false;
+        g_exit_message[0] = '\0';
+    }
+
+    void __cdecl Request_Exit_(const char* message) {
+        if (!g_exit_requested) {
+            Copy_Exit_Message_(message);
+            g_exit_requested = true;
+        } else if (g_exit_message[0] == '\0' && message != nullptr && message[0] != '\0') {
+            Copy_Exit_Message_(message);
+        }
+    }
+
+    bool __cdecl Exit_Requested_() {
+        return g_exit_requested;
+    }
+
+    const char* __cdecl Exit_Message_() {
+        return g_exit_message;
+    }
+
+    void __cdecl Check_Exit_() {
+        if (g_exit_requested) {
+            throw process_exit_requested{};
+        }
+    }
+
+    void __cdecl Mark_Game_Thread_Exited_() {
+        g_thread_exited = true;
+    }
+
+    bool __cdecl Game_Thread_Exited_() {
+        return g_thread_exited;
+    }
 
     bool Create_Video_Buffers_(int16_t video_mode) {
         (void)video_mode;
@@ -816,6 +878,7 @@ namespace platform {
     }
 
     void __cdecl Prepare_Exit_() {
+        Request_Exit_();
     }
 
     void __cdecl Update_Cursor_Image_() {

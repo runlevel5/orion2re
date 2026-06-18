@@ -2473,12 +2473,12 @@ DOCTEST_TEST_CASE("interpret mouse input held right button over button returns n
     DOCTEST_CHECK(fields::Interpret_Mouse_Input_() == -field_idx);
 }
 
-DOCTEST_TEST_CASE("get input returns cancel after shutdown is requested") {
+DOCTEST_TEST_CASE("get input throws after exit is requested") {
     Fields_Test_Reset reset;
 
-    platform::g_should_exit = 1;
+    platform::Request_Exit_();
 
-    DOCTEST_CHECK(fields::Get_Input_() == -1);
+    DOCTEST_CHECK_THROWS_AS(fields::Get_Input_(), platform::process_exit_requested);
 }
 
 }

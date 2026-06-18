@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <exception>
+
 namespace ALLOC = allocate;
 
 namespace MOX2 {
@@ -409,7 +411,26 @@ namespace MOX2 {
 
     int SDLCALL thunk_main2_(void* unused) {
         (void)unused;
-        main2_();
+        try {
+            main2_();
+        } catch (const platform::process_exit_requested&) {
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: game thread exit requested message='%s'", platform::Exit_Message_());
+        } catch (const std::exception& ex) {
+            SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "mox2: unhandled game thread exception: %s", ex.what());
+            platform::Request_Exit_(ex.what());
+        } catch (...) {
+            SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "mox2: unknown game thread exception");
+            platform::Request_Exit_("unknown game thread exception");
+        }
+
+        sound::Destroy_Sound_();
+        netcode::Net_Uninit_();
+
+        if (!platform::Exit_Requested_()) {
+            platform::Request_Exit_();
+        }
+
+        platform::Mark_Game_Thread_Exited_();
         return 0;
     }
 

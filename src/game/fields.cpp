@@ -117,6 +117,8 @@ namespace fields {
     }
 
     void __cdecl Invoke_Auto_Function_() {
+        platform::Check_Exit_();
+
         if (_auto_active_flag != 0) {
             _function();
         }
@@ -151,6 +153,8 @@ namespace fields {
     }
 
     int16_t __cdecl Get_Input_() {
+        platform::Check_Exit_();
+
         if (_input_delay > 0) {
             _input_delay--;
             return 0;
@@ -234,6 +238,8 @@ namespace fields {
     }
 
     void __cdecl Quick_Call_Auto_Function_() {
+        platform::Check_Exit_();
+
         if (_auto_active_flag == 0) {
             platform::Toggle_Pages_Stub_();
             return;
@@ -251,6 +257,8 @@ namespace fields {
     }
 
     void __cdecl Call_Auto_Function_() {
+        platform::Check_Exit_();
+
         if (_auto_active_flag == 0) {
             platform::Toggle_Pages_Stub_();
             return;
@@ -624,6 +632,8 @@ namespace fields {
     }
 
     int16_t __cdecl Scan_Input_() {
+        platform::Check_Exit_();
+
         platform::Pump_Game_Input_Queue_();
         mouse::Pointer_X_();
         mouse::Pointer_Y_();
@@ -661,6 +671,8 @@ namespace fields {
     }
 
     int16_t __cdecl Scan_Field_() {
+        platform::Check_Exit_();
+
         platform::Pump_Game_Input_Queue_();
         int16_t mouse_x = static_cast<int16_t>(mouse::Pointer_X_());
         int16_t mouse_y = static_cast<int16_t>(mouse::Pointer_Y_());
@@ -796,6 +808,7 @@ namespace fields {
 
         if (timeout == 0) {
             do {
+                platform::Check_Exit_();
                 if (key::Keyboard_Status_()) {
                     has_input = true;
                 }
@@ -807,6 +820,7 @@ namespace fields {
         } else {
             int ticks = 0;
             do {
+                platform::Check_Exit_();
                 if (key::Keyboard_Status_()) {
                     has_input = true;
                 }
@@ -916,6 +930,8 @@ namespace fields {
     }
 
     int16_t __cdecl Interpret_Mouse_Input_() {
+        platform::Check_Exit_();
+
         int16_t field_idx = 0;
         _down_mouse_button = -1;
         _auto_input_variable = 0;
@@ -1597,6 +1613,7 @@ namespace fields {
         int16_t input;
         bool exit_flag;
         do {
+            platform::Check_Exit_();
             timer::Mark_Time_();
             input = Get_Input_();
 
@@ -1661,6 +1678,7 @@ namespace fields {
         Show_Message_Box_(platform::g_main_window, buffer, "Microprose", true);
 
         platform::Prepare_Exit_();
+        platform::Check_Exit_();
     }
 
     void __cdecl Find_Bar_Position_(int16_t field_idx) {
@@ -2900,6 +2918,8 @@ namespace fields {
     }
 
     void __cdecl Input_String_(int16_t field_idx) {
+        platform::Check_Exit_();
+
         int16_t len = 0;
         _cursor_count = 0;
         _cursor_position = 0;
@@ -2935,8 +2955,10 @@ namespace fields {
 
         int16_t done = 0;
         while (done == 0) {
+            platform::Check_Exit_();
             int16_t key_code = 0;
             while (done == 0) {
+                platform::Check_Exit_();
                 key_code = key::Scan_Key_();
                 if (mouse::Mouse_Button_() != 0 || mouse::Mouse_Buffer_() != 0) {
                     done = 1;
@@ -3073,6 +3095,7 @@ namespace fields {
 
         if (done != 0) {
             while (mouse::Mouse_Button_() != 0) {
+                platform::Check_Exit_();
                 // Wait for mouse release
             }
         }
@@ -3084,6 +3107,8 @@ namespace fields {
     }
 
     void __cdecl Display_Input_Field_(int16_t field_idx, char* input_buffer) {
+        platform::Check_Exit_();
+
         char cursor_color_ramp[16];
         char local_40[64];
         s_field_input_string* legacy_input = Field_Data_Legacy_Input_(&_fields[field_idx]);
