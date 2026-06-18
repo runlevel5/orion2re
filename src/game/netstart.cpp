@@ -164,64 +164,6 @@ namespace NETSTART {
         return 1;
     }
 
-    int8_t __cdecl Do_Answer_() {
-        clock_t start_time = clock();
-        simmodem::Modem_Reset_(NETMOX::_net.modem_settings.cmd_reset);
-
-        int8_t is_connected = 0;
-        if (simmodem::Modem_Answer_() != 0) {
-            if (simmodem::Modem_Connected_() == 0) {
-                while ((clock() - start_time) < 90000) {
-                    RUSS::Mox_Update_();
-                    if (simmodem::Modem_Connected_() != 0) {
-                        break;
-                    }
-                }
-            }
-            is_connected = (int8_t)simmodem::Modem_Connected_();
-        }
-
-        if (is_connected != 0) {
-            return is_connected;
-        }
-
-        GENDRAW::Message_Box_(NETSTART::_answering_failed_error);
-        netcode::Net_Uninit_();
-        return 0;
-    }
-
-    bool __cdecl Do_Dial_(char* phone_number) {
-        clock_t start_time = clock();
-        bool dial_success = simmodem::Modem_Dial_Number_(phone_number);
-
-        if (dial_success) {
-            char modem_error[80];
-            simmodem::Get_Modem_Error_(modem_error);
-
-            if (strlen(modem_error) > 1) {
-                GENDRAW::Message_Box_(modem_error);
-                netcode::Net_Uninit_();
-                return false;
-            }
-
-            while (!simmodem::Modem_Connected_()) {
-                if (clock() - start_time >= 90000) {
-                    break;
-                }
-                RUSS::Mox_Update_();
-            }
-
-            dial_success = simmodem::Modem_Connected_() != 0;
-            if (dial_success) {
-                return true;
-            }
-        }
-
-        GENDRAW::Message_Box_(_dialing_failed_error);
-        netcode::Net_Uninit_();
-        return false;
-    }
-
     char* __cdecl Load_Netstart_Strings_(char* buffer) {
         char* current = buffer;
 
@@ -296,14 +238,11 @@ namespace NETSTART {
                 return 0;
             }
         } else {
-            netcode::Set_Null_Modem_Slave_();
-            if (NETMOX::_net.mode == 2) {
-                if (!NETSTART::Do_Answer_()) {
-                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
-                    NETMOX::_net.sync_state = 0;
-                    return 0;
-                }
-            }
+            GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
+            NETMOX::_net.sync_state = 0;
+            NETSTART::Mox_Net_Uninit_();
+            return 0;
         }
 
         NETMOX::_net.is_network_active = 1;
@@ -377,10 +316,6 @@ namespace NETSTART {
                 Mox_Net_Uninit_();
                 return 0;
             }
-        }
-
-        if (NETMOX::_net.mode == 2) {
-            netcode::Set_Null_Modem_Host_();
         }
 
         NETMOX::_net.is_network_active = 1;
@@ -673,10 +608,6 @@ namespace NETSTART {
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 Mox_Net_Uninit_();
                 return 0;
-            }
-        } else {
-            if (NETMOX::_net.mode == 2) {
-                netcode::Set_Null_Modem_Host_();
             }
         }
 

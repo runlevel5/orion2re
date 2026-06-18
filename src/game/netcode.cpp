@@ -159,9 +159,9 @@ namespace netcode {
             if (parse_endpoint && network != nullptr && network->modem_settings.cmd_reset[0] != '\0') {
                 if (Parse_Router_Endpoint_(network->modem_settings.cmd_reset, config)) {
                     endpoint_configured = true;
-                    SDL_Log("Router endpoint from clear string: %s:%u", config->host, (unsigned)config->tcp_port);
+                    SDL_Log("Router endpoint from setup field: %s:%u", config->host, (unsigned)config->tcp_port);
                 } else {
-                    SDL_Log("Ignoring invalid router endpoint in clear string '%s'; using %s:%u", network->modem_settings.cmd_reset, config->host, (unsigned)config->tcp_port);
+                    SDL_Log("Ignoring invalid router endpoint '%s'; using %s:%u", network->modem_settings.cmd_reset, config->host, (unsigned)config->tcp_port);
                 }
             }
             if (player_name != nullptr && player_name[0] != '\0') {
@@ -260,7 +260,9 @@ namespace netcode {
         }
 
         if (mode == 2) {
-            result = simmodem::Init_Modem_(network, recv_fn_ptr);
+            SDL_Log("Serial/null-modem networking is no longer supported");
+            _connection_type = -1;
+            return 0;
         }
 
         if (mode == 3) {
@@ -304,10 +306,6 @@ namespace netcode {
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
             netadapter::Shutdown(&_router_adapter);
         }
-
-        if (_connection_type == 2) {
-            simmodem::Uninit_Modem_();
-        }
     }
 
     int32_t __cdecl Net_Is_Sending_() {
@@ -336,27 +334,9 @@ namespace netcode {
         return 1;
     }
 
-    void __cdecl Set_Null_Modem_Slave_() {
-        net::_thisHost = 2;
-        simmodem::_connected_to_id = 1;
-    }
-
-    void __cdecl Set_Null_Modem_Host_() {
-        net::_thisHost = 1;
-        simmodem::_connected_to_id = 2;
-    }
-
     int32_t __cdecl Net_Get_Users_(int16_t* users) {
         if (_connection_type == 3) {
             return ten::TEN_Get_Users_(users);
-        }
-
-        if (_connection_type == 2) {
-            if (users != nullptr) {
-                users[0] = (int16_t)net::_thisHost;
-                users[1] = simmodem::_connected_to_id;
-            }
-            return 2;
         }
 
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
@@ -405,10 +385,6 @@ namespace netcode {
             }
             _inComms = 0;
         }
-
-        if (_connection_type == 2) {
-            motrans::Modem_Update_();
-        }
     }
 
     uint32_t __cdecl Net_Send_Message_(int32_t target_id, int16_t msg_type, void* packet, uint32_t size) {
@@ -429,10 +405,6 @@ namespace netcode {
             Pump_Router_Packets_();
         }
 
-        if (_connection_type == 2) {
-            motrans::Modem_Send_Message_(target_id, msg_type, data, size);
-        }
-
         _in_send_message = 0;
         return Net_Status_() & 4;
     }
@@ -448,10 +420,6 @@ namespace netcode {
 
         if (_connection_type == 3) {
             status |= 4;
-        }
-
-        if (_connection_type == 2) {
-            return motrans::Modem_Status_();
         }
 
         return status;

@@ -18,14 +18,14 @@ namespace netcode {
     /** Initializes networking while pumping MOX before and after backend setup.
      * @param mode Connection backend selector.
      * @param recv_fn_ptr Callback invoked for received packets.
-     * @param network Modem/network configuration for modem modes.
+     * @param network Network configuration for router-backed modes.
      */
     int32_t __cdecl Do_Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network);
 
     /** Initializes the requested networking backend.
      * @param mode Connection backend selector.
      * @param recv_fn_ptr Callback invoked for received packets.
-     * @param network Modem/network configuration for modem modes.
+     * @param network Network configuration for router-backed modes.
      */
     int32_t __cdecl Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network);
 
@@ -55,12 +55,6 @@ namespace netcode {
 
     /** Returns whether a transport send is currently in progress. */
     int32_t __cdecl Net_Is_Sending_();
-
-    /** Configures the null-modem connection as the slave endpoint. */
-    void __cdecl Set_Null_Modem_Slave_();
-
-    /** Configures the null-modem connection as the host endpoint. */
-    void __cdecl Set_Null_Modem_Host_();
 
     /** Writes connected user IDs into the caller buffer and returns the count.
      * @param users Output buffer for 16-bit user IDs, or nullptr to query the count only.

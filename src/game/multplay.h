@@ -6,9 +6,9 @@ struct s_player;
 struct s_colors;
 
 namespace MULTPLAY {
-    /* Restores the default modem settings in the global settings block. */
+    /* Restores the default direct-router endpoint in the global settings block. */
     void __cdecl Set_Default_Modem_Settings_();
-    /* Copies the saved modem settings into the active network state. */
+    /* Copies the saved direct-router endpoint into the active network state. */
     void __cdecl Copy_Modem_Defaults_To_Net_Struct_();
 
     /* Runs the main multiplayer setup screen loop. */
@@ -30,33 +30,21 @@ namespace MULTPLAY {
 
     /* Adds the main multiplayer setup fields. */
     void __cdecl Add_MP_Setup_Screen_Fields_();
-    /* Adds the secondary modem setup fields for the current dropdown mode. */
+    /* Adds the direct-router endpoint setup action fields. */
     void __cdecl Add_Modem_Setup_Fields2_();
-    /* Loads the modem setup screen assets. */
+    /* Loads the direct-router endpoint setup screen assets. */
     void __cdecl Load_Modem_Setup_Screen_();
 
-    /* Runs the null-modem setup screen loop. */
-    void __cdecl NullModem_Setup_Screen_();
-
-    /* Loads the null-modem setup screen assets. */
-    void __cdecl Load_NullModem_Setup_Screen_();
-
-    /* Draws the null-modem setup screen. */
-    void __cdecl Draw_NullModem_Setup_Screen_();
-
-    /* Adds the null-modem setup fields for the current dropdown mode. */
-    void __cdecl Add_NullModem_Setup_Fields_();
-
-    /* Runs the modem setup screen loop. */
+    /* Runs the direct-router endpoint setup screen loop. */
     void __cdecl Modem_Setup_Screen_();
 
-    /* Adds the editable modem command input fields. */
+    /* Adds the editable direct-router endpoint input field. */
     void __cdecl Add_Modem_Setup_Fields_();
 
-    /* Draws the modem setup screen. */
+    /* Draws the direct-router endpoint setup screen. */
     void __cdecl Draw_Modem_Setup_Screen_();
 
-    /* Prints the current modem command strings onto the setup screen. */
+    /* Prints the current direct-router endpoint onto the setup screen. */
     void __cdecl Print_Modem_Strings_();
 
     /* Prompts for a network game name and rejects duplicates. */
@@ -64,9 +52,6 @@ namespace MULTPLAY {
 
     /* Adds the multiplayer load-screen fields and returns whether any valid saves were added. */
     int8_t __cdecl Add_Load_MP_Game_Screen_Fields_();
-
-    /* Opens the help entry for a modem setup field if field_id matches one. */
-    bool __cdecl Check_Modem_Init_Help_Fields_(int16_t field_id, uint8_t language);
 
     /* Runs the multiplayer load-game screen and returns the selected slot or -1. */
     int16_t __cdecl Load_Multi_Player_Game_Screen_();
@@ -84,8 +69,6 @@ namespace MULTPLAY {
     inline const char* const lbx_filename = s_MULTIGM_LBX_00558d04;
 
     extern s_palette_entry _green_pal_colors[16];
-
-    extern char _baud_rate_strings[8][6];
 
     /* Scans save slots and writes compatible multiplayer save types into valid_types_out. */
     int8_t __cdecl Do_Get_Valid_MP_Save_Games_(int8_t* valid_types_out);
