@@ -3784,7 +3784,11 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_COMBAT_SYNC_RESET: {
-            memset(&NETMOX::_net.player_net_info[0].player_state, 0, 180);
+            memset(
+                &NETMOX::_net.player_net_info,
+                0,
+                offsetof(s_network, sync_state) - offsetof(s_network, player_net_info)
+            );
             NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
             break;
         }

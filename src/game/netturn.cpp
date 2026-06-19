@@ -164,7 +164,11 @@ namespace NETTURN {
         COLCALC::No_Op1_();
         NETMOX::_net.sync_phase_active_flag = 0;
 
-        memset(&NETMOX::_net.player_net_info[0].player_state, 0, 180);
+        memset(
+            &NETMOX::_net.player_net_info,
+            0,
+            offsetof(s_network, sync_state) - offsetof(s_network, player_net_info)
+        );
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
