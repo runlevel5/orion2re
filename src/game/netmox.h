@@ -1,10 +1,8 @@
 #pragma once
 
-typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;
+typedef struct s_net_snapshot_cache s_net_snapshot_cache, *Ps_net_snapshot_cache;
 
-struct s_net_modem_file {
-    uint32_t mode;
-    FILE *file;
+struct s_net_snapshot_cache {
     uint8_t *buffer;
     uint8_t *current_ptr;
     uint32_t buffer_size;
@@ -19,11 +17,11 @@ namespace NETMOX {
 
     extern char* _only_1_host_allowed_error;
 
-    extern char* _modem_diff_buffer_error;
+    extern char* _net_snapshot_diff_buffer_error;
 
-    extern char* _modem_disk_error;
+    extern char* _net_snapshot_cache_error;
 
-    extern s_net_modem_file _secret_modem_file;
+    extern s_net_snapshot_cache _net_snapshot_cache;
 
     extern char* _sending_chunk_d_of_d_fmt;
 
@@ -90,23 +88,21 @@ namespace NETMOX {
 
     int8_t __cdecl Decode_Broadcast_Game_Data_Differential_(void* buffer, size_t size, uint8_t flag);
 
-    s_net_modem_file* __cdecl Open_Modem_File_(const char* mode, uint32_t size);
+    s_net_snapshot_cache* __cdecl Open_Net_Snapshot_Cache_(uint32_t size);
 
-    int __cdecl fseek_modem_file_(s_net_modem_file* mod_file, int offset, int origin);
+    int __cdecl fseek_net_snapshot_cache_(s_net_snapshot_cache* cache, int offset, int origin);
 
-    size_t __cdecl fread_modem_file_(void* ptr, size_t size, size_t count, s_net_modem_file* stream);
+    size_t __cdecl fread_net_snapshot_cache_(void* ptr, size_t size, size_t count, s_net_snapshot_cache* stream);
 
-    size_t __cdecl fwrite_modem_file_(const void* buffer, size_t size, size_t count, s_net_modem_file* stream);
+    size_t __cdecl fwrite_net_snapshot_cache_(const void* buffer, size_t size, size_t count, s_net_snapshot_cache* stream);
 
-    int __cdecl Decode_Difference_Buffer_(s_net_modem_file* modem_file, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len);
+    int __cdecl Decode_Difference_Buffer_(s_net_snapshot_cache* cache, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len);
 
-    int32_t __cdecl Make_Difference_Buffer_(s_net_modem_file* file, uint8_t* buffer, int32_t buffer_size, uint8_t* diff_buffer, int32_t diff_buffer_max_size);
+    int32_t __cdecl Make_Difference_Buffer_(s_net_snapshot_cache* cache, uint8_t* buffer, int32_t buffer_size, uint8_t* diff_buffer, int32_t diff_buffer_max_size);
 
-    int32_t __cdecl fgetc_modem_file_(s_net_modem_file* modem_file);
+    int32_t __cdecl fgetc_net_snapshot_cache_(s_net_snapshot_cache* cache);
 
-    void __cdecl Close_Modem_File_(s_net_modem_file* file_handle);
-
-    void __cdecl Write_Modem_File_(s_net_modem_file* stream, const void* buffer, size_t size);
+    void __cdecl Write_Net_Snapshot_Cache_(s_net_snapshot_cache* cache, const void* buffer, size_t size);
 
     void __cdecl Send_Game_Orders_();
 

@@ -162,7 +162,7 @@ DOCTEST_TEST_CASE("adapter creates and joins router sessions and routes game pac
     DOCTEST_CHECK(std::strcmp(netadapter::Game_Name(&guest, 0), "Adapter Game") == 0);
     DOCTEST_CHECK(netadapter::Game_Session_Id(&guest, 0) == 1);
 
-    DOCTEST_REQUIRE(netadapter::Join_Game(&guest, 0, "Guest"));
+    DOCTEST_REQUIRE(netadapter::Join_Game(&guest, netadapter::Game_Session_Id(&guest, 0), "Guest"));
     DOCTEST_REQUIRE(Wait_For_Session_(&guest));
     DOCTEST_REQUIRE(Wait_For_Users_(&guest, 2));
     DOCTEST_REQUIRE(Wait_For_Users_(&host, 2));

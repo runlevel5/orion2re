@@ -4,7 +4,6 @@
 
 #include <cstring>
 
-uint8_t g_ten_game_number = 0;
 int16_t g_cached_mouse_x = 0;
 int16_t g_cached_mouse_y = 0;
 int32_t g_window_focus_state = 0;

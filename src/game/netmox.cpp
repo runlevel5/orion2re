@@ -9,11 +9,11 @@ namespace NETMOX {
 
     char* _only_1_host_allowed_error;
 
-    char* _modem_diff_buffer_error;
+    char* _net_snapshot_diff_buffer_error;
 
-    char* _modem_disk_error;
+    char* _net_snapshot_cache_error;
 
-    s_net_modem_file _secret_modem_file;
+    s_net_snapshot_cache _net_snapshot_cache;
 
     char* _sending_chunk_d_of_d_fmt;
 
@@ -150,10 +150,10 @@ namespace NETMOX {
     }
 
     char* __cdecl Load_Netmox_Strings_(char* strings) {
-        _modem_disk_error = strings;
+        _net_snapshot_cache_error = strings;
         strings += strlen(strings) + 1;
 
-        _modem_diff_buffer_error = strings;
+        _net_snapshot_diff_buffer_error = strings;
         strings += strlen(strings) + 1;
 
         _incompatible_versions_error = strings;
@@ -662,26 +662,24 @@ namespace NETMOX {
         uint32_t block_size = (uint32_t)(ptr - block);
         uint8_t* send_ptr;
         int32_t send_size;
-        s_net_modem_file* file;
+        s_net_snapshot_cache* cache;
 
         if (use_diff != 0) {
-            file = Open_Modem_File_("wb", block_size);
-            Write_Modem_File_(file, block, block_size);
+            cache = Open_Net_Snapshot_Cache_(block_size);
+            Write_Net_Snapshot_Cache_(cache, block, block_size);
             send_ptr = block;
             send_size = block_size;
         }
         else {
-            file = Open_Modem_File_("rb", 0);
+            cache = Open_Net_Snapshot_Cache_(0);
             send_ptr = block + block_size;
-            send_size = Make_Difference_Buffer_(file, block, block_size, send_ptr, 0xe1000 - block_size);
-            Close_Modem_File_(file);
+            send_size = Make_Difference_Buffer_(cache, block, block_size, send_ptr, 0xe1000 - block_size);
 
-            file = Open_Modem_File_("wb", block_size);
-            Write_Modem_File_(file, block, block_size);
+            cache = Open_Net_Snapshot_Cache_(block_size);
+            Write_Net_Snapshot_Cache_(cache, block, block_size);
         }
 
         RUSS::Mox_Update_();
-        Close_Modem_File_(file);
 
         int16_t chunk_count = (int16_t)((send_size + 0x77ff) / 0x7800);
         Mox_Send_Message_(0x7ffe, 2, &chunk_count, sizeof(chunk_count));
@@ -718,9 +716,8 @@ namespace NETMOX {
 
         if (flag == 0) {
             ptr = buffer + size;
-            s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("rb", 0);
-            size = NETMOX::Decode_Difference_Buffer_(file_handle, ptr, (int)(0xE1000 - size), buffer, (int)size);
-            NETMOX::Close_Modem_File_(file_handle);
+            s_net_snapshot_cache* cache = NETMOX::Open_Net_Snapshot_Cache_(0);
+            size = NETMOX::Decode_Difference_Buffer_(cache, ptr, (int)(0xE1000 - size), buffer, (int)size);
 
             if (size == 0) {
                 exitm::Exit_With_message2_("error decoding broadcast");
@@ -728,9 +725,8 @@ namespace NETMOX {
             }
         }
 
-        s_net_modem_file* file_handle = NETMOX::Open_Modem_File_("wb", (uint32_t)size);
-        NETMOX::Write_Modem_File_(file_handle, ptr, size);
-        NETMOX::Close_Modem_File_(file_handle);
+        s_net_snapshot_cache* cache = NETMOX::Open_Net_Snapshot_Cache_((uint32_t)size);
+        NETMOX::Write_Net_Snapshot_Cache_(cache, ptr, size);
 
         RUSS::Mox_Update_();
 
@@ -1260,12 +1256,12 @@ namespace NETMOX {
         }
     }
 
-    int __cdecl Decode_Difference_Buffer_(s_net_modem_file* modem_file, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len) {
+    int __cdecl Decode_Difference_Buffer_(s_net_snapshot_cache* cache, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len) {
         uint8_t* out_ptr = out_buffer;
         uint8_t* diff_end = diff_buffer + diff_len;
 
-        if (fseek_modem_file_(modem_file, 0, 0) != 0) {
-            exitm::Exit_With_message2_("fseek modem_file");
+        if (fseek_net_snapshot_cache_(cache, 0, 0) != 0) {
+            exitm::Exit_With_message2_("fseek net snapshot cache");
             return 0;
         }
 
@@ -1277,8 +1273,8 @@ namespace NETMOX {
             uint8_t b = *diff_buffer;
             if (b <= 0xF4) {
                 uint32_t size = b;
-                if (fread_modem_file_(out_ptr, size, 1, modem_file) != 1) {
-                    exitm::Exit_With_message2_("fread modem_file");
+                if (fread_net_snapshot_cache_(out_ptr, size, 1, cache) != 1) {
+                    exitm::Exit_With_message2_("fread net snapshot cache");
                     return 0;
                 }
                 diff_buffer++;
@@ -1292,8 +1288,8 @@ namespace NETMOX {
                 }
             } else {
                 uint32_t skip = b - 0xF5;
-                if (fseek_modem_file_(modem_file, skip, 1) != 0) {
-                    exitm::Exit_With_message2_("fseek ahead modem_file");
+                if (fseek_net_snapshot_cache_(cache, skip, 1) != 0) {
+                    exitm::Exit_With_message2_("fseek ahead net snapshot cache");
                     return 0;
                 }
                 memcpy(out_ptr, diff_buffer + 1, skip);
@@ -1304,42 +1300,34 @@ namespace NETMOX {
         }
     }
 
-    size_t __cdecl fread_modem_file_(void* ptr, size_t size, size_t count, s_net_modem_file* modem_file) {
-        if (modem_file->mode == 1) {
-            return fread(ptr, size, count, modem_file->file);
-        }
-
-        if (modem_file->mode != 2) {
+    size_t __cdecl fread_net_snapshot_cache_(void* ptr, size_t size, size_t count, s_net_snapshot_cache* cache) {
+        if (cache->buffer == nullptr) {
             return 0;
         }
 
         size_t total_size = count * size;
-        memcpy(ptr, modem_file->current_ptr, total_size);
+        memcpy(ptr, cache->current_ptr, total_size);
 
-        modem_file->current_ptr += total_size;
+        cache->current_ptr += total_size;
 
-        if (modem_file->buffer + modem_file->buffer_size < modem_file->current_ptr) {
+        if (cache->buffer + cache->buffer_size < cache->current_ptr) {
             return 0;
         }
 
         return count;
     }
 
-    size_t __cdecl fwrite_modem_file_(const void* ptr, size_t size, size_t count, s_net_modem_file* stream) {
-        if (stream->mode == 1) {
-            return fwrite(ptr, size, count, stream->file);
-        }
-
-        if (stream->mode == 2) {
+    size_t __cdecl fwrite_net_snapshot_cache_(const void* ptr, size_t size, size_t count, s_net_snapshot_cache* cache) {
+        if (cache->buffer != nullptr) {
             size_t total_size = count * size;
 
             // BUG: potential overflow if total_size > (buffer + buffer_size - current_ptr)
-            memcpy(stream->current_ptr, ptr, total_size);
+            memcpy(cache->current_ptr, ptr, total_size);
 
-            uint8_t* new_ptr = stream->current_ptr + total_size;
-            stream->current_ptr = new_ptr;
+            uint8_t* new_ptr = cache->current_ptr + total_size;
+            cache->current_ptr = new_ptr;
 
-            if (stream->buffer + stream->buffer_size < new_ptr) {
+            if (cache->buffer + cache->buffer_size < new_ptr) {
                 return 0;
             }
 
@@ -1349,37 +1337,33 @@ namespace NETMOX {
         return 0;
     }
 
-    int32_t __cdecl fgetc_modem_file_(s_net_modem_file* modem_file) {
-        if (modem_file->mode == 1) {
-            return fgetc(modem_file->file);
-        }
-
-        if (modem_file->mode == 2) {
-            if (modem_file->buffer + modem_file->buffer_size == modem_file->current_ptr) {
+    int32_t __cdecl fgetc_net_snapshot_cache_(s_net_snapshot_cache* cache) {
+        if (cache->buffer != nullptr) {
+            if (cache->buffer + cache->buffer_size == cache->current_ptr) {
                 return -1;
             }
-            uint8_t val = *modem_file->current_ptr;
-            modem_file->current_ptr++;
+            uint8_t val = *cache->current_ptr;
+            cache->current_ptr++;
             return val;
         }
 
         return 0;
     }
 
-    int32_t __cdecl Make_Difference_Buffer_(s_net_modem_file* file, uint8_t* buffer, int32_t buffer_size, uint8_t* diff_buffer, int32_t diff_buffer_max_size) {
+    int32_t __cdecl Make_Difference_Buffer_(s_net_snapshot_cache* cache, uint8_t* buffer, int32_t buffer_size, uint8_t* diff_buffer, int32_t diff_buffer_max_size) {
         uint32_t count = 0;
         uint32_t state = 0;
         uint8_t* ptr = buffer;
         uint8_t* out_ptr = diff_buffer;
 
-        if (NETMOX::fseek_modem_file_(file, 0, 0) != 0) {
-            exitm::Exit_With_message2_(NETMOX::_modem_disk_error);
+        if (NETMOX::fseek_net_snapshot_cache_(cache, 0, 0) != 0) {
+            exitm::Exit_With_message2_(NETMOX::_net_snapshot_cache_error);
         }
 
         do {
-            int c = NETMOX::fgetc_modem_file_(file);
+            int c = NETMOX::fgetc_net_snapshot_cache_(cache);
             if (c == -1 && ptr != buffer + buffer_size) {
-                exitm::Exit_With_message2_(NETMOX::_modem_disk_error);
+                exitm::Exit_With_message2_(NETMOX::_net_snapshot_cache_error);
             }
 
             switch (state) {
@@ -1459,7 +1443,7 @@ namespace NETMOX {
             }
 
             if (out_ptr >= diff_buffer + diff_buffer_max_size) {
-                exitm::Exit_With_message2_(NETMOX::_modem_diff_buffer_error);
+                exitm::Exit_With_message2_(NETMOX::_net_snapshot_diff_buffer_error);
             }
 
             ptr++;
@@ -1473,17 +1457,17 @@ namespace NETMOX {
         return static_cast<int32_t>(out_ptr + 1 - diff_buffer);
     }
 
-    void __cdecl Write_Modem_File_(s_net_modem_file* stream, const void* buffer, size_t size) {
+    void __cdecl Write_Net_Snapshot_Cache_(s_net_snapshot_cache* cache, const void* buffer, size_t size) {
         RUSS::Mox_Update_();
 
-        if (fseek_modem_file_(stream, 0, 0) != 0) {
-            exitm::Exit_With_message2_(_modem_disk_error);
+        if (fseek_net_snapshot_cache_(cache, 0, 0) != 0) {
+            exitm::Exit_With_message2_(_net_snapshot_cache_error);
         }
 
         RUSS::Mox_Update_();
 
-        if (fwrite_modem_file_(buffer, size, 1, stream) != 1) {
-            exitm::Exit_With_message2_(_modem_disk_error);
+        if (fwrite_net_snapshot_cache_(buffer, size, 1, cache) != 1) {
+            exitm::Exit_With_message2_(_net_snapshot_cache_error);
         }
 
         RUSS::Mox_Update_();
@@ -1531,35 +1515,21 @@ namespace NETMOX {
         }
     }
 
-    void __cdecl Close_Modem_File_(s_net_modem_file* file_handle) {
-        RUSS::Mox_Update_();
-
-        if (file_handle->mode == 1) {
-            if (fclose(file_handle->file) != 0) {
-                exitm::Exit_With_message2_(_modem_disk_error);
-            }
-            file_handle->file = nullptr;
-            file_handle->mode = 0;
-        }
-    }
-
-    int __cdecl fseek_modem_file_(s_net_modem_file* mod_file, int offset, int origin) {
-        if (mod_file->mode == 1) {
-            return fseek(mod_file->file, offset, origin);
+    int __cdecl fseek_net_snapshot_cache_(s_net_snapshot_cache* cache, int offset, int origin) {
+        if (cache->buffer == nullptr) {
+            return -1;
         }
 
-        if (mod_file->mode == 2) {
-            if (origin == 0 /* SEEK_SET */) {
-                mod_file->current_ptr = mod_file->buffer + offset;
-                return 0;
-            }
-            if (origin == 1 /* SEEK_CUR */) {
-                mod_file->current_ptr = mod_file->current_ptr + offset;
-                return 0;
-            }
+        if (origin == 0 /* SEEK_SET */) {
+            cache->current_ptr = cache->buffer + offset;
+            return 0;
+        }
+        if (origin == 1 /* SEEK_CUR */) {
+            cache->current_ptr = cache->current_ptr + offset;
+            return 0;
         }
 
-        return 0;
+        return -1;
     }
 
     void __cdecl Decode_Game_Orders_(void* data, uint32_t len) {
@@ -1722,33 +1692,31 @@ namespace NETMOX {
         RUSS::Mox_Update_();
     }
 
-    s_net_modem_file* __cdecl Open_Modem_File_(const char* mode_str, uint32_t size) {
+    s_net_snapshot_cache* __cdecl Open_Net_Snapshot_Cache_(uint32_t size) {
         RUSS::Mox_Update_();
 
-        if (_secret_modem_file.mode == 2 && size != 0 && size != _secret_modem_file.buffer_size) {
-            free(_secret_modem_file.buffer);
-            _secret_modem_file.mode = 0;
+        if (_net_snapshot_cache.buffer != nullptr && size != 0 && size != _net_snapshot_cache.buffer_size) {
+            free(_net_snapshot_cache.buffer);
+            _net_snapshot_cache.buffer = nullptr;
         }
 
-        if (_secret_modem_file.mode == 0) {
-            _secret_modem_file.buffer = static_cast<uint8_t*>(malloc(size));
-            if (_secret_modem_file.buffer != nullptr) {
-                _secret_modem_file.buffer_size = size;
-                _secret_modem_file.current_ptr = _secret_modem_file.buffer;
-                _secret_modem_file.mode = 2;
-                return &_secret_modem_file;
+        if (_net_snapshot_cache.buffer == nullptr) {
+            if (size == 0) {
+                exitm::Exit_With_message2_(_net_snapshot_cache_error);
+                return &_net_snapshot_cache;
             }
 
-            _secret_modem_file.file = fopen_case("modem.tmp", mode_str);
-            if (_secret_modem_file.file == nullptr) {
-                exitm::Exit_With_message2_(_modem_disk_error);
-                return &_secret_modem_file;
+            _net_snapshot_cache.buffer = static_cast<uint8_t*>(malloc(size));
+            if (_net_snapshot_cache.buffer == nullptr) {
+                exitm::Exit_With_message2_(_net_snapshot_cache_error);
+                return &_net_snapshot_cache;
             }
 
-            _secret_modem_file.mode = 1;
+            _net_snapshot_cache.buffer_size = size;
         }
 
-        return &_secret_modem_file;
+        _net_snapshot_cache.current_ptr = _net_snapshot_cache.buffer;
+        return &_net_snapshot_cache;
     }
 
     int16_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id) {

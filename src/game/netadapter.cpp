@@ -417,33 +417,39 @@ bool Create_Game(s_adapter* adapter, const char* name, int32_t max_players, cons
     return network::router::Router_Client_Register_Session(&adapter->state->client, &registration, adapter->state->next_request_id++);
 }
 
-bool Join_Game(s_adapter* adapter, uint32_t session_index, const char* player_name) {
+bool Join_Game(s_adapter* adapter, uint32_t session_id, const char* player_name) {
     (void)player_name;
-    if (adapter == nullptr || adapter->state == nullptr) {
+    if (adapter == nullptr || adapter->state == nullptr || session_id == 0) {
         return false;
     }
 
     const std::vector<network::router::s_router_session_record>& sessions = network::router::Router_Session_Browser_Sessions(&adapter->state->browser);
-    if (session_index >= sessions.size() || sessions[session_index].session.session_id == 0) {
+    const network::router::s_router_session_record* record = nullptr;
+    for (const network::router::s_router_session_record& candidate : sessions) {
+        if (candidate.session.session_id == session_id) {
+            record = &candidate;
+            break;
+        }
+    }
+    if (record == nullptr) {
         return false;
     }
 
-    const network::router::s_router_session_record& record = sessions[session_index];
-    if (!record.session.open) {
+    if (!record->session.open) {
         return false;
     }
 
     if (!network::router::Router_Client_Is_Connected(&adapter->state->client) ||
-        std::strcmp(record.router.host, adapter->state->config.host) != 0 ||
-        record.router.tcp_port != adapter->state->config.tcp_port) {
-        if (!Connect_Client_To_Endpoint_(adapter->state.get(), &record.router)) {
+        std::strcmp(record->router.host, adapter->state->config.host) != 0 ||
+        record->router.tcp_port != adapter->state->config.tcp_port) {
+        if (!Connect_Client_To_Endpoint_(adapter->state.get(), &record->router)) {
             return false;
         }
     }
 
     return network::router::Router_Client_Join_Session(
         &adapter->state->client,
-        record.session.session_id,
+        session_id,
         adapter->state->config.build_string,
         adapter->state->next_request_id++);
 }

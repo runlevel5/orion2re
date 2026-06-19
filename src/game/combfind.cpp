@@ -163,7 +163,7 @@ void __cdecl Search_For_Battles_() {
             }
         }
         _attack_confirmed = nullptr;
-    } else if (MOX::_game_type < 4) { /* Case 2 (Client IP), Case 3 (Ten) */
+    } else if (MOX::_game_type < 4) {
         NETMOX::_net.sync_state = 0xE;
         Client_Combat_Loop_();
         NETMOX::Mox_Send_Message_(0x7FFE, 0x1A, nullptr, 0);
@@ -1385,7 +1385,7 @@ int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
             s_combfind_star_has_player& star_info = (*COMBFIND::_star_has_player)[star_idx][i];
 
             if (star_info.colony_count != 0 || star_info.has_player != 0) {
-                if (NETMOX::_net.player_net_info[i].combat_attacker_id != 0xFF) {
+                if (NETMOX::_net.player_net_info[i].combat_attacker_id != -1) {
                     return 1;
                 }
 

@@ -43,12 +43,17 @@ namespace netcode {
      */
     char* __cdecl Net_Get_Game_Name_(uint32_t session_idx);
 
-    /** Joins a discovered game session by name and creates the local player.
-     * @param game_name Session name to match.
+    /** Returns the router session ID for a discovered session.
+     * @param session_idx Zero-based session index.
+     */
+    uint32_t __cdecl Net_Get_Game_Session_Id_(uint32_t session_idx);
+
+    /** Joins a discovered game session by ID and creates the local player.
+     * @param session_id Router session ID to join.
      * @param password Optional session password.
      * @param player_name Local player display name.
      */
-    int32_t __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name);
+    int32_t __cdecl Net_Join_Game_(uint32_t session_id, const char* password, const char* player_name);
 
     /** Shuts down the active networking backend and releases session state. */
     void __cdecl Net_Uninit_();

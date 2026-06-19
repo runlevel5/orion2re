@@ -103,7 +103,7 @@ namespace INITGAME {
         sprintf(MOX::_settings.net_game_name, "MOX-%d", clock_value % 10);
 
         // Finalize default settings
-        MULTPLAY::Set_Default_Modem_Settings_();
+        MULTPLAY::Set_Default_Online_Settings_();
         INITGAME::Write_Game_Settings_();
     }
 

@@ -2487,7 +2487,7 @@ namespace MAINSCR {
                     done_count++;
                 }
             }
-            else if ((MOX::_game_type == 2 /* GAME_NETWORK */ || MOX::_game_type == 3 /* GAME_MODEM */)) {
+            else if (MOX::_game_type == 2 || MOX::_game_type == 3) {
                 if (NETMOX::_net.players_hit_next_turn[i] != 0) {
                     done_count++;
                 }

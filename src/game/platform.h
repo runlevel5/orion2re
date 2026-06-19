@@ -6,7 +6,6 @@
 #define ORION2RE_64BIT_BUILD 0
 #endif
 
-extern uint8_t g_ten_game_number;
 extern int16_t g_cached_mouse_x;
 extern int16_t g_cached_mouse_y;
 extern int32_t g_window_focus_state;

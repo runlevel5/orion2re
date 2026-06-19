@@ -7,9 +7,9 @@ struct s_colors;
 
 namespace MULTPLAY {
     /* Restores the default direct-router endpoint in the global settings block. */
-    void __cdecl Set_Default_Modem_Settings_();
+    void __cdecl Set_Default_Online_Settings_();
     /* Copies the saved direct-router endpoint into the active network state. */
-    void __cdecl Copy_Modem_Defaults_To_Net_Struct_();
+    void __cdecl Copy_Online_Defaults_To_Net_Struct_();
 
     /* Runs the main multiplayer setup screen loop. */
     void __cdecl Multi_Player_Screen_();
@@ -31,21 +31,21 @@ namespace MULTPLAY {
     /* Adds the main multiplayer setup fields. */
     void __cdecl Add_MP_Setup_Screen_Fields_();
     /* Adds the direct-router endpoint setup action fields. */
-    void __cdecl Add_Modem_Setup_Fields2_();
+    void __cdecl Add_Online_Setup_Fields2_();
     /* Loads the direct-router endpoint setup screen assets. */
-    void __cdecl Load_Modem_Setup_Screen_();
+    void __cdecl Load_Online_Setup_Screen_();
 
     /* Runs the direct-router endpoint setup screen loop. */
-    void __cdecl Modem_Setup_Screen_();
+    void __cdecl Online_Setup_Screen_();
 
     /* Adds the editable direct-router endpoint input field. */
-    void __cdecl Add_Modem_Setup_Fields_();
+    void __cdecl Add_Online_Setup_Fields_();
 
     /* Draws the direct-router endpoint setup screen. */
-    void __cdecl Draw_Modem_Setup_Screen_();
+    void __cdecl Draw_Online_Setup_Screen_();
 
     /* Prints the current direct-router endpoint onto the setup screen. */
-    void __cdecl Print_Modem_Strings_();
+    void __cdecl Print_Online_Strings_();
 
     /* Prompts for a network game name and rejects duplicates. */
     void __cdecl Change_MP_Game_Name_();

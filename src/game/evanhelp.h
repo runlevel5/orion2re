@@ -7,10 +7,6 @@ struct s_help_box;
 namespace EVANHELP {
     extern s_help_box _main_screen_help_list[25];
 
-    extern s_help_box _static_null_modem_setup_screen_help_list[4];
-
-    extern s_help_box _null_modem_setup_screen_help_list[4];
-
     extern s_help_box _static_design_screen_help_list[13];
 
     extern s_help_box _design_screen_help_list[13];
@@ -92,13 +88,6 @@ namespace EVANHELP {
 
     /** Activates the predefined help regions for the multiplayer setup screen. */
     void __cdecl Set_Multi_Player_Setup_Screen_Help_List_();
-
-    /**
-     * Copies and offsets the null-modem setup help regions before activating them.
-     * @param x_offset Horizontal offset applied to each help box.
-     * @param y_offset Vertical offset applied to each help box.
-     */
-    void __cdecl Set_Null_Modem_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset);
 
     extern s_help_box* _prev_help_struct_pointer;
     extern int16_t _prev_help_list_active;

@@ -46,7 +46,6 @@
 #include "shipmove.h"
 #include "harold.h"
 #include "sound.h"
-#include "ten.h"
 #include "fields.h"
 #include "fieldsav.h"
 #include "firepts.h"

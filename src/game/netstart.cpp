@@ -200,7 +200,6 @@ namespace NETSTART {
     uint8_t __cdecl Join_Net_Screen_() {
         uint8_t result = 0;
         uint8_t fade_status;
-        const char* empty_str = "";
         const char* myname_str = s_myname_005597dc;
 
         NETMOX::_net.sync_state = 5;
@@ -223,13 +222,13 @@ namespace NETSTART {
 
         if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             MULTPLAY::Choose_Multi_Network_Game_Screen_();
-            if (NETMOX::_net.cur_game_name[0] == '\0') {
+            if (NETMOX::_net.cur_session_id == 0) {
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETMOX::_net.sync_state = 0;
                 return 0;
             }
 
-            if (!netcode::Net_Join_Game_(NETMOX::_net.cur_game_name, empty_str, myname_str)) {
+            if (!netcode::Net_Join_Game_(NETMOX::_net.cur_session_id, "", myname_str)) {
                 MULTPLAY::Reload_Initializing_Net_Info_();
                 GENDRAW::Message_Box_(NETSTART::_game_full_string);
                 NETMOX::_net.sync_state = 0;
@@ -249,7 +248,7 @@ namespace NETSTART {
         NETMOX::_net.net_host_id = netcode::Net_Host_ID_();
         MULTPLAY::Reload_Join_Net_Screen_();
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639, 479, empty_str, 0);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 2);
 
         memset(RACESEL::_color_flag, 0, 8);
@@ -280,11 +279,6 @@ namespace NETSTART {
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETSTART::Mox_Net_Uninit_();
             }
-        }
-
-        if (NETMOX::_net.mode == 3) {
-            ten::Ten_Stop(1);
-            ten::Ten_Flag();
         }
 
         return result;
@@ -328,7 +322,7 @@ namespace NETSTART {
             NETMOX::_net.network_sync_complete_flag = 1;
         }
 
-        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1 || NETMOX::_net.mode == 3) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             MULTPLAY::Reload_Waiting_For_Joiners_Screen_();
             fields::Clear_Fields_();
             MULTPLAY::Add_Waiting_For_Joiners_Field_();
@@ -424,11 +418,6 @@ namespace NETSTART {
 
         NETMOX::_net.player_color_selected_flags[MOX::_PLAYER_NUM] = 1;
         MOX::_player[MOX::_PLAYER_NUM].objectives = 100;
-
-        if (NETMOX::_net.mode == 3) {
-            ten::Ten_Stop(1);
-            ten::Ten_Flag();
-        }
 
         RUSS::Mox_Update_();
 
@@ -684,7 +673,7 @@ namespace NETSTART {
 
             if (NETMOX::_net.joining_net_id == -1) {
                 if (NETMOX::_net.num_connected_players == connected_count ||
-                    (connected_count == 2 && NETMOX::_net.mode == 2)) {
+                    (connected_count == 2 && NETMOX::_net.mode == 1)) {
                     payload.begin_state = 1;
                 } else {
                     if (netcode::Net_Get_Users_(nullptr) == connected_count) {
@@ -708,16 +697,11 @@ namespace NETSTART {
             }
         }
 
-        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1 || NETMOX::_net.mode == 3) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             netcode::Net_Disable_New_Players_();
         }
 
         fields::Assign_Auto_Function_(SCORE::nullsub, 2);
-
-        if (NETMOX::_net.mode == 3) {
-            ten::Ten_Stop(1);
-            ten::Ten_Flag();
-        }
 
         NETMOX::_net.num_connected_players = 0;
         if (MOX::_NUM_PLAYERS > 0) {

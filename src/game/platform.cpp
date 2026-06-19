@@ -1,6 +1,5 @@
 #include "pch.h"
 
-uint8_t g_ten_game_number;
 int16_t g_cached_mouse_x;
 int16_t g_cached_mouse_y;
 int32_t g_window_focus_state;
@@ -797,44 +796,6 @@ namespace platform {
 		return SDL_GetAtomicInt(&g_game_thread_exited) != 0;
 	}
 
-    void Parse_Ten_Cmd_Parameter_(const char* input_str) {
-        if (input_str == nullptr) {
-            return;
-        }
-
-        uint32_t input_len = 0;
-        while (input_str[input_len] != '\0') {
-            input_len++;
-        }
-
-        if (input_len == 0) {
-            return;
-        }
-
-        char* copy_buffer = (char*)malloc(input_len + 4);
-        if (copy_buffer == nullptr) {
-            return;
-        }
-
-        for (uint32_t i = 0; i <= input_len; ++i) {
-            copy_buffer[i] = input_str[i];
-        }
-
-        strlwr(copy_buffer);
-
-        // Search for "/ten=" in the lowercased command line.
-        char* match_ptr = strstr(copy_buffer, "/ten=");
-        if (match_ptr != nullptr) {
-            char* target = match_ptr + (sizeof("/ten=") - 1);
-            target[1] = '\0';
-
-            int parsed_val = atoi(target);
-            ::g_ten_game_number = (uint8_t)parsed_val;
-        }
-
-        free(copy_buffer);
-    }
-
     bool cleanup() {
         Prepare_Exit_();
         Destroy_Main_Window_();
@@ -1157,7 +1118,6 @@ namespace platform {
 
     int Run_Main_Loop(const char* command_line) {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop start cmd='%s'", command_line != nullptr ? command_line : "");
-        Parse_Ten_Cmd_Parameter_(command_line);
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError());

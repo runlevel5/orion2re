@@ -87,7 +87,7 @@ const char* Game_Name(const s_adapter* adapter, uint32_t session_index);
 uint32_t Game_Session_Id(const s_adapter* adapter, uint32_t session_index);
 
 bool Create_Game(s_adapter* adapter, const char* name, int32_t max_players, const char* player_name);
-bool Join_Game(s_adapter* adapter, uint32_t session_index, const char* player_name);
+bool Join_Game(s_adapter* adapter, uint32_t session_id, const char* player_name);
 bool Set_New_Players_Enabled(s_adapter* adapter, bool enabled);
 int32_t Get_Users(const s_adapter* adapter, uint32_t* users, int32_t max_users);
 

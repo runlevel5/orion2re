@@ -1279,18 +1279,12 @@ struct s_missile {
     int8_t is_active;
 };
 
-typedef struct s_modem_settings s_modem_settings, *Ps_modem_settings;
+typedef struct s_online_settings s_online_settings, *Ps_online_settings;
 
-struct s_modem_settings {
-    int32_t com_port_index;
-    uint32_t baud_rate;
-    uint8_t parity;
-    uint32_t data_bits;
-    uint32_t serial_cfg_ext;
-    char cmd_reset[30];
-    char cmd_init[30];
-    char cmd_hangup[30];
-    char dial_number[24];
+struct s_online_settings {
+    uint8_t reserved_0x00[17];
+    char endpoint[30];
+    uint8_t reserved_0x2f[84];
 };
 
 typedef struct s_mouse_list s_mouse_list, *Ps_mouse_list;
@@ -1359,8 +1353,8 @@ struct s_mp_screen {
     undefined field20_0x5d;
     undefined field21_0x5e;
     struct s_animation_header *anim_network;
-    struct s_animation_header *anim_modem;
-    struct s_animation_header *anim_serial;
+    struct s_animation_header *anim_online;
+    struct s_animation_header *anim_unused_connection;
     struct s_animation_header *anim_hotseat;
     struct s_animation_header *anim_btn_unk_3;
     struct s_animation_header *anim_btn_cancel;
@@ -1395,8 +1389,8 @@ struct s_mp_screen {
     int8_t save_slot_valid[10];
     int16_t field_id_close_dropdown;
     int16_t field_id_network;
-    int16_t field_id_modem;
-    int16_t field_id_serial;
+    int16_t field_id_online;
+    int16_t field_id_unused_connection;
     int16_t field_id_hotseat;
     int16_t field_id_cancel;
     int16_t field_id_ok;
@@ -1411,8 +1405,8 @@ struct s_mp_screen {
     int16_t screen_x;
     int16_t screen_y;
     int16_t flag_network_disabled;
-    int16_t flag_modem_disabled;
-    int16_t flag_serial_type;
+    int16_t flag_online_disabled;
+    int16_t flag_unused_connection;
     int16_t flag_hotseat_disabled;
     int16_t setup_screen_state;
     int16_t last_scan_id;
@@ -2035,14 +2029,14 @@ struct s_net_player {
 typedef struct s_network s_network, *Ps_network;
 
 struct s_network {
-    struct s_modem_settings modem_settings;
-    char modem_init_str[11];
+    struct s_online_settings online_settings;
+    char online_init_str[11];
     undefined field2_0x8e;
     undefined field3_0x8f;
     undefined field4_0x90;
     undefined field5_0x91;
     undefined field6_0x92;
-    int8_t modem_initialized;
+    int8_t online_initialized;
     uint8_t mode;
     int32_t joining_net_id;
     int8_t num_connected_players;
@@ -2204,6 +2198,7 @@ struct s_network {
     int8_t diplomacy_initiator_id;
     int8_t diplomacy_active_flag;
     undefined field168_0x209;
+    uint32_t cur_session_id;
 };
 
 typedef struct s_npcdiplo_tech s_npcdiplo_tech, *Ps_npcdiplo_tech;
@@ -2574,14 +2569,14 @@ struct s_settings {
     int8_t active_save_slot;
     uint8_t multi_player_game_type;
     char net_game_name[9];
-    struct s_modem_settings modem_settings;
-    uint8_t modem_init_string[11];
+    struct s_online_settings online_settings;
+    uint8_t online_init_string[11];
     undefined field26_0xae;
     undefined field27_0xaf;
     undefined field28_0xb0;
     undefined field29_0xb1;
     undefined field30_0xb2;
-    int8_t modem_initialized;
+    int8_t online_initialized;
     int8_t combat_speedx2_flag;
     int8_t combat_legal_moves_flag;
     int8_t combat_missile_impact_flag;

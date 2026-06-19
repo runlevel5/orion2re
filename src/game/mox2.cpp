@@ -279,8 +279,6 @@ namespace MOX2 {
 
         MOX2::Set_Mox_Alt_Path_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: alternate path set to '%s'", farload::_secondary_drive_path);
-        ten::init();
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: ten init complete");
         fields::Assign_Update_Function_(RUSS::Mox_Update_);
         fonts::Load_Palette_(5, 0, 0xFF);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
@@ -373,10 +371,8 @@ namespace MOX2 {
 
         KEN::Ken_Init_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Ken_Init complete, entering screen control");
-        // TEN-only startup hook removed: TEN restoration is intentionally out of scope for this codebase.
         MOX2::Screen_Control_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Screen_Control returned");
-        // TEN-only shutdown hook removed: TEN restoration is intentionally out of scope for this codebase.
 
         // Copy leave message
         const char* thanks_src = nullptr;

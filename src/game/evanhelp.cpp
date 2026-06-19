@@ -19,15 +19,6 @@ namespace EVANHELP {
         {296, 542, 426, 618, 479},
     };
 
-    s_help_box _static_null_modem_setup_screen_help_list[4] = {
-        {666, 38, 77, 172, 100},
-        {667, 205, 77, 373, 100},
-        {673, 58, 123, 157, 150},
-        {674, 251, 123, 351, 150},
-    };
-
-    s_help_box _null_modem_setup_screen_help_list[4];
-
     s_help_box _static_design_screen_help_list[13] = {
         {375, 17, 15, 227, 44},
         {376, 231, 53, 427, 150},
@@ -340,14 +331,6 @@ namespace EVANHELP {
         }
 
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_design_screen_help_list, 13);
-    }
-
-    void __cdecl Set_Null_Modem_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset) {
-        memcpy(_null_modem_setup_screen_help_list,
-               _static_null_modem_setup_screen_help_list,
-               sizeof(_static_null_modem_setup_screen_help_list));
-        Offset_Help_Field_XYs_(_null_modem_setup_screen_help_list, 4, x_offset, y_offset);
-        MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_null_modem_setup_screen_help_list, 4);
     }
 
     void __cdecl Get_Application_Description_(char* dest, int16_t item_index) {

@@ -129,17 +129,6 @@ namespace netcode {
             return netadapter::Session_Id(&_router_adapter) != 0;
         }
 
-        int32_t __cdecl Find_Router_Game_By_Name_(const char* game_name) {
-            int32_t game_count = netadapter::Game_Count(&_router_adapter);
-            for (int32_t i = 0; i < game_count; ++i) {
-                const char* candidate = netadapter::Game_Name(&_router_adapter, (uint32_t)i);
-                if (candidate != nullptr && game_name != nullptr && strcmp(candidate, game_name) == 0) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         int32_t __cdecl Refresh_Router_Game_List_(uint32_t timeout_ms) {
             if (!Is_Router_Mode_((uint32_t)_connection_type)) {
                 return 0;
@@ -156,12 +145,12 @@ namespace netcode {
         bool __cdecl Init_Router_Config_(netadapter::s_config* config, const char* player_name, s_network* network, bool parse_endpoint) {
             *config = netadapter::s_config{};
             bool endpoint_configured = false;
-            if (parse_endpoint && network != nullptr && network->modem_settings.cmd_reset[0] != '\0') {
-                if (Parse_Router_Endpoint_(network->modem_settings.cmd_reset, config)) {
+            if (parse_endpoint && network != nullptr && network->online_settings.endpoint[0] != '\0') {
+                if (Parse_Router_Endpoint_(network->online_settings.endpoint, config)) {
                     endpoint_configured = true;
                     SDL_Log("Router endpoint from setup field: %s:%u", config->host, (unsigned)config->tcp_port);
                 } else {
-                    SDL_Log("Ignoring invalid router endpoint '%s'; using %s:%u", network->modem_settings.cmd_reset, config->host, (unsigned)config->tcp_port);
+                    SDL_Log("Ignoring invalid router endpoint '%s'; using %s:%u", network->online_settings.endpoint, config->host, (unsigned)config->tcp_port);
                 }
             }
             if (player_name != nullptr && player_name[0] != '\0') {
@@ -260,7 +249,7 @@ namespace netcode {
         }
 
         if (mode == 2) {
-            SDL_Log("Serial/null-modem networking is no longer supported");
+            SDL_Log("Unsupported legacy networking mode");
             _connection_type = -1;
             return 0;
         }
@@ -301,6 +290,14 @@ namespace netcode {
         return nullptr;
     }
 
+    uint32_t __cdecl Net_Get_Game_Session_Id_(uint32_t session_idx) {
+        if (Is_Router_Mode_((uint32_t)_connection_type)) {
+            Pump_Router_Packets_();
+            return netadapter::Game_Session_Id(&_router_adapter, session_idx);
+        }
+        return 0;
+    }
+
     void __cdecl Net_Uninit_()
     {
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
@@ -312,14 +309,12 @@ namespace netcode {
         return (int32_t)netcode::_tpSending;
     }
 
-    int32_t __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name) {
+    int32_t __cdecl Net_Join_Game_(uint32_t session_id, const char* password, const char* player_name) {
         (void)password;
-        int32_t session_index = Find_Router_Game_By_Name_(game_name);
-        if (session_index < 0) {
-            Refresh_Router_Game_List_(1000);
-            session_index = Find_Router_Game_By_Name_(game_name);
+        if (session_id == 0) {
+            return 0;
         }
-        if (session_index < 0 || !netadapter::Join_Game(&_router_adapter, (uint32_t)session_index, player_name)) {
+        if (!netadapter::Join_Game(&_router_adapter, session_id, player_name)) {
             return 0;
         }
 
@@ -335,10 +330,6 @@ namespace netcode {
     }
 
     int32_t __cdecl Net_Get_Users_(int16_t* users) {
-        if (_connection_type == 3) {
-            return ten::TEN_Get_Users_(users);
-        }
-
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
             Pump_Router_Packets_();
             uint32_t router_users[256]{};
@@ -364,9 +355,6 @@ namespace netcode {
     }
 
     uint32_t __cdecl Net_Host_ID_() {
-        if (_connection_type == 3) {
-            return ten::TEN_Get_Host_Id_();
-        }
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
             return netadapter::Local_Network_Id(&_router_adapter);
         }
@@ -374,10 +362,6 @@ namespace netcode {
     }
 
     void __cdecl Net_Update_() {
-        if (_connection_type == 3) {
-            ten::Ten_Update_();
-        }
-
         if (Is_Router_Mode_((uint32_t)_connection_type) && _inComms == 0) {
             _inComms = 1;
             if (_netInitialized != 0) {
@@ -396,10 +380,6 @@ namespace netcode {
             SDL_Log("REENTERING (Net_Send_Message)!!!!");
         }
 
-        if (_connection_type == 3) {
-            ten::Send_Message_(target_id, msg_type, data, size);
-        }
-
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
             _router_last_send_successful = netadapter::Send_Game_Message(&_router_adapter, (uint32_t)target_id, (uint16_t)msg_type, data, size) ? 1 : 0;
             Pump_Router_Packets_();
@@ -416,10 +396,6 @@ namespace netcode {
             if (_router_last_send_successful != 0) {
                 status |= 4;
             }
-        }
-
-        if (_connection_type == 3) {
-            status |= 4;
         }
 
         return status;
