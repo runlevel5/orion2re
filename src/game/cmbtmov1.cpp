@@ -125,7 +125,7 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
         opponent_idx = MOX::_combat_defender_player;
     }
 
-    NETMOX::Mox_Send_Message_(MOX::_player[opponent_idx].network_player_id, 1004 /* 0x3ec */, &opponent_idx, sizeof(opponent_idx));
+    NETMOX::Mox_Send_Message_(MOX::_player[opponent_idx].network_player_id, TACTICAL_NET_PACKET_WAIT_FOR_OPPONENT, &opponent_idx, sizeof(opponent_idx));
 
     while (MOX::_combat_done_waiting == 0) {
         if (show_wait_message == 0) {
@@ -825,9 +825,9 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
     (void)sender_net_id;
     (void)message_size;
 
-    if (message_id >= 1000 && message_id < 2000) {
+    if (message_id >= TACTICAL_NET_PACKET_ACTION && message_id < DIP_NET_PACKET_MESSAGE) {
         switch (message_id) {
-            case 1000:
+            case TACTICAL_NET_PACKET_ACTION:
                 if (MOX::_new_message.message_code == 0) {
                     struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
                     MOX::_tactical_net_choice = MOX::_new_message.message_code;
@@ -838,7 +838,7 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
                 MOX::_tactical_net_choice = MOX::_new_message.message_code;
                 return;
 
-            case 1002: {
+            case TACTICAL_NET_PACKET_AUTO_COMBAT_DISABLED: {
                 
                 int16_t player_idx = message->viewport_x;
                 MOX::_auto_combat_flag[player_idx] = 0;
@@ -857,16 +857,16 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
                 break;
             }
 
-            case 1003:
+            case TACTICAL_NET_PACKET_MISSILE_WARNING:
                 MOX::_saved_msl_warn = MOX::_msl_impact_warning_flag;
                 MOX::_msl_impact_warning_flag = message->viewport_x;
                 return;
 
-            case 1004:
+            case TACTICAL_NET_PACKET_WAIT_FOR_OPPONENT:
                 MOX::_combat_done_waiting++;
                 return;
 
-            case 1005:
+            case TACTICAL_NET_PACKET_INIT_SYNC:
                 if (message->viewport_x == 1) {
                     MOX::_combat_init = message->viewport_x;
                 }

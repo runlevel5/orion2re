@@ -1,6 +1,8 @@
 #pragma once
 
 namespace AIMOVE {
+    inline constexpr int ENEMY_STRENGTH_TURN_WINDOW = 10;
+
 #pragma pack(push, 1)
     struct s_ai_stage_point {
         uint8_t star_idx;

@@ -7,7 +7,7 @@ namespace CHAT {
         size_t len = strlen(text) + 1;
 
         if (_chat_info->count == 14) {
-            memmove(_chat_info, _chat_info->messages + 1, 0x42A);
+            memmove(_chat_info, _chat_info->messages + 1, sizeof(_chat_info->messages) - sizeof(_chat_info->messages[0]));
             _chat_info->count = 13;
         }
 
@@ -20,7 +20,7 @@ namespace CHAT {
         for (int32_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
             if (MOX::_player[player_index].objectives == 0x64) {
                 int32_t message_len = (int32_t)(strlen(msg) + 1);
-                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, 0x27, msg, (uint16_t)message_len);
+                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, NET_PACKET_CHAT, msg, (uint16_t)message_len);
                 RUSS::Mox_Update_();
             }
         }
@@ -40,7 +40,7 @@ namespace CHAT {
                     len = 80;
                 }
 
-                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, (uint16_t)0x2D, msg, (uint16_t)(len + 1));
+                NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, NET_PACKET_GNN_CHAT, msg, (uint16_t)(len + 1));
                 RUSS::Mox_Update_();
             }
         }

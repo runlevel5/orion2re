@@ -19,7 +19,7 @@ namespace NETSTART {
             }
 
             if (MOX::_settings.net_game_name[0] == '\0') {
-                memcpy(MOX::_settings.net_game_name, "Moo II ", 8);
+                memcpy(MOX::_settings.net_game_name, "Moo II ", sizeof("Moo II "));
                 MOX::_settings.net_game_name[6] = (char)('a' + ((int32_t)clock() % 26));
             }
 
@@ -43,7 +43,7 @@ namespace NETSTART {
         NETMOX::_net.total_chunk_count = 0;
         NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
 
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PLAYER_SETUP, local_player, 3753 /* s_player size */);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PLAYER_SETUP, local_player, sizeof(*local_player));
 
         while (NETMOX::_net.total_chunk_count == 0) {
             fields::Get_Input_();
@@ -101,7 +101,7 @@ namespace NETSTART {
 
         if (MULTPLAY::Choose_Network_Plyrs_Screen_(&selection, connected_players, false, true) == -1) {
             message_buffer = -1;
-            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, 4);
+            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, sizeof(message_buffer));
             return 0;
         }
 
@@ -110,7 +110,7 @@ namespace NETSTART {
 
         NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
         message_buffer = (int32_t)selection;
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, 4);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, sizeof(message_buffer));
 
         fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
         MULTPLAY::Reload_Getting_Data_Info_();
@@ -251,8 +251,8 @@ namespace NETSTART {
         fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 2);
 
-        memset(RACESEL::_color_flag, 0, 8);
-        memset(RACESEL::_race_flag, 0, 14);
+        memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
+        memset(RACESEL::_race_flag, 0, sizeof(RACESEL::_race_flag));
 
         while (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_JOINING) {
             fields::Get_Input_();
@@ -269,10 +269,10 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_SELECT_RACE) {
-            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_NETWORK_SYNC_STATUS, &MOX::_nebula_screen_seg, 4);
+            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_NETWORK_SYNC_STATUS, &MOX::_nebula_screen_seg, sizeof(MOX::_nebula_screen_seg));
             result = (uint8_t)NETSTART::Net_Select_Race_();
         } else if (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_PICK_POSITION) {
-            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_NETWORK_SYNC_STATUS, &MOX::_nebula_screen_seg, 4);
+            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_NETWORK_SYNC_STATUS, &MOX::_nebula_screen_seg, sizeof(MOX::_nebula_screen_seg));
             result = (uint8_t)NETSTART::Net_Pick_Position_();
             if (!result) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
@@ -559,7 +559,7 @@ namespace NETSTART {
             return 0;
         }
 
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_REQUEST_PLAYER_RACE, &race_idx, 1);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_REQUEST_PLAYER_RACE, &race_idx, sizeof(race_idx));
 
         while (RACESEL::_race_flag[race_idx] == 0) {
             RUSS::Mox_Update_();
@@ -797,7 +797,7 @@ namespace NETSTART {
             return 0;
         }
 
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_REQUEST_PLAYER_COLOR, &requested_color, 1);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_REQUEST_PLAYER_COLOR, &requested_color, sizeof(requested_color));
 
         while (RACESEL::_color_flag[requested_color] == 0) {
             int32_t unused_zero = 0;

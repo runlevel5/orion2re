@@ -1,5 +1,9 @@
 #include "pch.h"
 
+namespace {
+    using s_system_display_loaded_flag = char[20];
+}
+
 namespace SYS {
     void* _sys_data_buffer;
 
@@ -45,17 +49,17 @@ namespace SYS {
 
     void __cdecl Clear_System_Display_Loaded_Flag_() {
         if (MOX::_star_name_loaded_string != nullptr) {
-            memset(MOX::_star_name_loaded_string, 0, 20);
+            memset(MOX::_star_name_loaded_string, 0, sizeof(s_system_display_loaded_flag));
         }
     }
 
     void __cdecl Set_System_Display_Loaded_Flag_(int16_t star_idx) {
         char temp_buffer[120];
 
-        char* allocated = (char*)allocate::Allocate_First_Block_((void*)SYS::_sys_data_buffer, 20);
+        char* allocated = (char*)allocate::Allocate_First_Block_((void*)SYS::_sys_data_buffer, sizeof(s_system_display_loaded_flag));
         MOX::_star_name_loaded_string = allocated;
 
-        memset(allocated, 0, 20);
+        memset(allocated, 0, sizeof(s_system_display_loaded_flag));
 
         s_star_data* star = &MOX::_star[star_idx];
 
@@ -648,8 +652,7 @@ namespace SYS {
             y1 = content_h + base_y + y_offset - 1;
         }
 
-        s_colors font_colors;
-        memcpy(&font_colors, MISC::Font_Colors2_(4, 'n', 's'), sizeof(font_colors));
+        s_colors font_colors = *MISC::Font_Colors2_(4, 'n', 's');
 
         if (fill_mode != 0) {
             int16_t clipped_y2 = video::_screen_window_y2;
@@ -1370,7 +1373,7 @@ namespace SYS {
         (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
         (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
-        memcpy(&font_colors, MISC::Font_Colors2_(2, 0x3c, 0x43), sizeof(font_colors));
+        font_colors = *MISC::Font_Colors2_(2, 0x3c, 0x43);
 
         const int16_t colony_idx = planet->colony_index;
         s_colony* colony = nullptr;

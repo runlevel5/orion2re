@@ -989,7 +989,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             if (MOX::_PLAYER_NUM == MOX::_combat_attacker_player) {
                 net_plr = MOX::_combat_defender_player;
             }
-            NETMOX::Mox_Send_Message_(MOX::_player[net_plr].network_player_id, 0x3ED, &MOX::_combat_init, 2);
+            NETMOX::Mox_Send_Message_(MOX::_player[net_plr].network_player_id, TACTICAL_NET_PACKET_INIT_SYNC, &MOX::_combat_init, sizeof(MOX::_combat_init));
             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(0);
         }
         

@@ -544,7 +544,7 @@ namespace INITSHIP {
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
-        memcpy(design->name, global::s_Intruder_005576a0, 9);
+        memcpy(design->name, global::s_Intruder_005576a0, sizeof("Intruder"));
 
         design->ship_type = SHIP_TYPE_COMBAT;
         design->shield_type = SHIELD_NO_SHIELD;

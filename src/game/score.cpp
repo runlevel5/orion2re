@@ -843,7 +843,7 @@ namespace SCORE {
         char scor_buf[16];
 
         // This local string copy appears in the original binary but is not explicitly used.
-        memcpy(scor_buf, "scor", 5);
+        strcpy(scor_buf, "scor");
 
         SCORE::_hi->score_elimination = SCORE::Get_Elimination_Score_(player_idx);
         SCORE::_hi->score_technology = SCORE::Get_Technology_Score_(player_idx);

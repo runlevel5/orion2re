@@ -655,9 +655,9 @@ namespace SHIPS {
         );
         allocate::Release_Block_(MOX::_global_data_seg);
 
-        memset(slot_counts, 0x02, 0x120);
+        memset(slot_counts, 0x02, MAX_STARS * sizeof(uint32_t));
         memset(MOX::_ship_icon, 0xFF, sizeof(MOX::_ship_icon));
-        memset(build_items, 0xFF, 0x168);
+        memset(build_items, 0xFF, MAX_STARS * sizeof(*build_items));
 
         MOX::_ship_icon_count = 0;
         bool need_sort = false;

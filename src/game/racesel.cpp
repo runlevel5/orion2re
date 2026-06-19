@@ -719,7 +719,7 @@ void __cdecl Unrequest_Race_(uint8_t race_idx) {
     RACESEL::_race_flag[race_idx] = 0;
 
     // Send network message to the host about updated race selection status
-    NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 0x3e /* NET_MSG_RACE_SELECTION_STATUS */, &race_idx, 1);
+    NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PLAYER_RACE_DESELECT_REQUEST, &race_idx, sizeof(race_idx));
 }
 
 void __cdecl Draw_Naming_Popup_() {

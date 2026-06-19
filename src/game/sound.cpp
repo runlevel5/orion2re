@@ -75,7 +75,7 @@ namespace sound {
 
     namespace {
         void Copy_FourCC_Tag_(char* dest, const char* src) {
-            memcpy(dest, src, 4);
+            memcpy(dest, src, sizeof(uint32_t));
         }
 
         void Initialize_Sound_Indices_(uint32_t buffer_size) {

@@ -929,7 +929,7 @@ namespace AIBUILD {
         uint16_t weights[52];
         int16_t max_score = 0;
 
-        memset(weights, 0, 102);
+        memset(weights, 0, sizeof(weights));
 
         Find_Buildable_Buildings_(colony, weights);
 

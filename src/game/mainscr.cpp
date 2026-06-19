@@ -3784,7 +3784,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_COMBAT_SYNC_RESET: {
-            memset(NETMOX::_net.player_net_info, 0, 45 * sizeof(int32_t)); // 180 bytes
+            memset(&NETMOX::_net.player_net_info[0].player_state, 0, 180);
             NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
             break;
         }
@@ -3795,7 +3795,8 @@ namespace MAINSCR {
         }
         case NET_PACKET_COMBAT_TARGET_CHOSEN: {
             const s_case11_packet* packet = (const s_case11_packet*)data;
-            memcpy(&NETMOX::_net.player_net_info[from_player_id].combat_defender_id, packet, 4);
+            NETMOX::_net.player_net_info[from_player_id].combat_defender_id = packet->sync_star_id;
+            NETMOX::_net.player_net_info[from_player_id].combat_planet_id = packet->sync_planet_id;
             NETMOX::_net.player_net_info[from_player_id].combat_target_player_id = packet->sync_colony_id;
             NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_COMBAT_TARGET_CHOSEN;
             break;

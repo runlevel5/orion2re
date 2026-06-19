@@ -27,11 +27,7 @@ macOS builds use the native host architecture.
 
 ## Vendored submodules
 
-The project requires these vendored submodules:
-
-- SDL3 at `vendors/SDL`
-- libuv at `vendors/libuv`
-- doctest at `vendors/doctest` when building tests
+The project uses vendored submodules for SDL3, libuv, and doctest (for tests).
 
 Clone the repository with submodules:
 
@@ -59,32 +55,22 @@ Windows `cmd.exe`:
 tools\bootstrap_deps.bat
 ```
 
-The bootstrap scripts verify that `git`, `cmake`, and `ninja` are available, then initialize the SDL3 and libuv submodules and verify that they are pinned correctly.
-
-The repository is expected to be pinned to SDL commit `8e37db5e797b6167f3a00d697d816a684bd259c7` (`release-3.4.10`).
-The repository is expected to be pinned to libuv commit `5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b`.
+The bootstrap scripts verify required tools and initialize the pinned submodules.
 
 ## Build
 
-Native macOS arm64 example:
+Configure and build with a preset:
+
+```sh
+cmake --preset win32-debug
+cmake --build --preset win32-debug
+```
+
+Native macOS example:
 
 ```sh
 cmake --preset osx-debug
 cmake --build --preset osx-debug
-```
-
-The macOS presets use the native host architecture and require a compiler that accepts the little-endian flag `-mlittle-endian`.
-
-Configure a preset:
-
-```sh
-cmake --preset win32-debug
-```
-
-Build it:
-
-```sh
-cmake --build --preset win32-debug
 ```
 
 Tests are opt-in and are not built by default. To configure, build, and run the current unit tests:
@@ -93,42 +79,13 @@ Tests are opt-in and are not built by default. To configure, build, and run the 
 tools/run-tests.sh
 ```
 
-Available presets:
-
-- `win32-debug`
-- `win32-release`
-- `win32-release-pdb`
-- `win32-debug-asan`
-- `win64-debug`
-- `win64-release`
-- `win64-release-pdb`
-- `win64-debug-asan`
-- `mingw-win32-debug`
-- `mingw-win32-release`
-- `mingw-win64-debug`
-- `mingw-win64-release`
-- `linux-debug`
-- `linux-release`
-- `linux-debug-asan`
-- `linux-x86-debug`
-- `linux-x86-release`
-- `linux-x86-debug-asan`
-- `osx-debug`
-- `osx-release`
-- `osx-debug-asan`
+For the full preset list and per-platform details, see `CMakePresets.json`.
 
 Example release build:
 
 ```sh
 cmake --preset win32-release
 cmake --build --preset win32-release
-```
-
-Native macOS release example:
-
-```sh
-cmake --preset osx-release
-cmake --build --preset osx-release
 ```
 
 ## Cross-compiling Windows builds from Linux
@@ -153,15 +110,13 @@ cmake --preset mingw-win64-release
 cmake --build --preset mingw-win64-release
 ```
 
-The MinGW presets target Windows with vendored SDL and keep legacy DirectPlay networking disabled.
-
-The MinGW toolchain files also request static GCC and C++ runtime linkage so the generated Windows executables do not depend on the MinGW runtime DLLs.
+See `CMakePresets.json` for the available MinGW presets.
 
 ## Customization script
 
 The repository includes `tools/create_user_preset.sh` to create a local CMake override file at `cmake/local-user.cmake`.
 
-The script sets `ORION2RE_GAME_DIR`, which is used as the runtime output directory and debugger working directory for supported Win32 MSVC builds.
+The script sets `ORION2RE_GAME_DIR`, used as the runtime output directory and debugger working directory for supported builds.
 
 Usage:
 
@@ -178,4 +133,4 @@ cmake --preset win32-debug
 cmake --build --preset win32-debug
 ```
 
-If `ORION2RE_GAME_DIR` points to your installed game directory, the built executable and debug output will be placed there for supported configurations.
+If `ORION2RE_GAME_DIR` points to your installed game directory, supported configurations will place the built executable and debug output there.

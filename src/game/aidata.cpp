@@ -251,7 +251,7 @@ namespace AIDATA {
         }
 
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
-            memset(MOX::_player[p].total_ship_strength, 0, 32);
+            memset(MOX::_player[p].total_ship_strength, 0, sizeof(MOX::_player[p].total_ship_strength));
         }
 
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {

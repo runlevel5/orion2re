@@ -303,7 +303,7 @@ namespace NETMOX {
             _net.diplomacy_target_id = -1;
             _net.sync_state = NET_SYNC_STATE_AI_DIPLOMACY_CANCEL_PENDING;
             if (_net.host_election_winner_id != -1) {
-                Mox_Send_Message_(_net.host_election_winner_id, NET_PACKET_AI_DIPLOMACY_CANCEL_REQUEST, &_net.diplomacy_target_id, 1);
+                Mox_Send_Message_(_net.host_election_winner_id, NET_PACKET_AI_DIPLOMACY_CANCEL_REQUEST, &_net.diplomacy_target_id, sizeof(_net.diplomacy_target_id));
             }
         }
     }
@@ -321,7 +321,7 @@ namespace NETMOX {
         _net.diplomacy_target_id = player_idx;
 
         if (_net.host_election_winner_id != -1) {
-            Mox_Send_Message_(_net.host_election_winner_id, NET_PACKET_AI_DIPLOMACY_REQUEST, &player_idx, 1);
+            Mox_Send_Message_(_net.host_election_winner_id, NET_PACKET_AI_DIPLOMACY_REQUEST, &player_idx, sizeof(player_idx));
         }
     }
 
@@ -329,9 +329,9 @@ namespace NETMOX {
         int32_t player_id = Net_Id_To_Player_Id_(net_id & 0xFFFF);
         _in_receive_message = 1;
 
-        if (packet_id >= 2000) {
+        if (packet_id >= DIP_NET_PACKET_MESSAGE) {
             DIP_SCRN::Diplomacy_Receive_Message_(net_id, packet_id, len, reinterpret_cast<s_dipscrn_net_message*>(packet));
-        } else if (packet_id >= 1000) {
+        } else if (packet_id >= TACTICAL_NET_PACKET_ACTION) {
             CMBTMOV1::Tactical_Combat_Receive_Message_(net_id, packet_id, len, reinterpret_cast<s_net_tactical_combat_message*>(packet));
         } else {
             MAINSCR::Main_Receive_Message_(player_id, net_id, packet_id, len, packet);
@@ -917,7 +917,7 @@ namespace NETMOX {
             int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].diplomacy_target_id;
             NETMOX::_net.ai_diplomacy_done_mask &= ~(1 << current_player_idx);
             message_sent = true;
-            NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, NET_PACKET_AI_DIPLOMACY_DONE, &remote_player_id, 1);
+            NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, NET_PACKET_AI_DIPLOMACY_DONE, &remote_player_id, sizeof(remote_player_id));
         }
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -953,7 +953,7 @@ namespace NETMOX {
                 if (!(NETMOX::_net.players_sync_mask[remote_player_id] & (1 << current_player_idx))) {
                     message_sent = true;
                     NETMOX::_net.ai_diplomacy_active_mask &= ~(1 << current_player_idx);
-                    NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, NET_PACKET_AI_DIPLOMACY_BEGIN, &remote_player_id, 1);
+                    NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, NET_PACKET_AI_DIPLOMACY_BEGIN, &remote_player_id, sizeof(remote_player_id));
                 }
             }
         }
@@ -963,7 +963,7 @@ namespace NETMOX {
                 int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].diplomacy_target_id;
                 NETMOX::_net.ai_diplomacy_cancel_mask &= ~(1 << current_player_idx);
                 message_sent = true;
-                NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, NET_PACKET_AI_DIPLOMACY_CANCELLED, &remote_player_id, 1);
+                NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, NET_PACKET_AI_DIPLOMACY_CANCELLED, &remote_player_id, sizeof(remote_player_id));
             }
         }
 
@@ -1006,7 +1006,7 @@ namespace NETMOX {
                 s_NET_MSG_COLOR color_msg;
                 color_msg.color = MOX::_player[current_player_idx].color;
                 color_msg.player_idx = (int8_t)current_player_idx;
-                NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_PLAYER_COLOR_SELECTED, &color_msg, 2);
+                NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_PLAYER_COLOR_SELECTED, &color_msg, sizeof(color_msg));
             }
         }
 
@@ -1017,7 +1017,7 @@ namespace NETMOX {
                 s_NET_MSG_RACE race_msg;
                 race_msg.race = MOX::_player[current_player_idx].race;
                 race_msg.player_idx = (int8_t)current_player_idx;
-                NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_PLAYER_RACE_SELECTED, &race_msg, 2);
+                NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_PLAYER_RACE_SELECTED, &race_msg, sizeof(race_msg));
             }
         }
 
@@ -1028,7 +1028,7 @@ namespace NETMOX {
                 uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field146_0x1f3);
                 player_race_selection_sync_flags[current_player_idx] = 1;
                 uint8_t race = MOX::_player[current_player_idx].race;
-                NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_PLAYER_RACE_DESELECTED, &race, 1);
+                NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_PLAYER_RACE_DESELECTED, &race, sizeof(race));
             }
         }
 
@@ -1406,7 +1406,7 @@ namespace NETMOX {
                     count++;
                     if (count == 9) {
                         *out_ptr++ = 0xFE;
-                        memcpy(out_ptr, ptr - 8, 9);
+                        memcpy(out_ptr, ptr - 8, sizeof(uint8_t[9]));
                         out_ptr += 9;
                         state = 0;
                     } else if (*ptr == c) {
@@ -1431,7 +1431,7 @@ namespace NETMOX {
                     count++;
                     if (count == 9) {
                         *out_ptr++ = 0xFE;
-                        memcpy(out_ptr, ptr - 8, 9);
+                        memcpy(out_ptr, ptr - 8, sizeof(uint8_t[9]));
                         out_ptr += 9;
                         state = 0;
                     } else {

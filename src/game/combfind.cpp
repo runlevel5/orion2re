@@ -394,7 +394,7 @@ void __cdecl Client_Combat_Loop_() {
             } else {
                 NETMOX::_net.combat_target_player_id = (int16_t)MOX::_colony[target_colony].owner;
             }
-            NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_COMBAT_TARGET_CHOSEN, &NETMOX::_net.combat_defender_id, 6);
+            NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_COMBAT_TARGET_CHOSEN, &NETMOX::_net.combat_defender_id, sizeof(NETMOX::_net.combat_defender_id) + sizeof(NETMOX::_net.combat_planet_id) + sizeof(NETMOX::_net.combat_target_player_id));
             break;
 
         case NET_SYNC_STATE_RECEIVING_YOU_ARE_TARGET_INFO:
@@ -418,7 +418,7 @@ void __cdecl Client_Combat_Loop_() {
 
         case NET_SYNC_STATE_COMBAT_TACTICAL_ATTACKER:
             memset(&local_battle_results_1, 0, sizeof(s_battle_results));
-            memcpy(&local_battle_results_1, &NETMOX::_net.sync_state, 12);
+            memcpy(&local_battle_results_1, &NETMOX::_net.sync_state, sizeof(local_battle_results_1.player_info));
             local_battle_results_1.planet_id = NETMOX::_net.combat_planet_id;
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_1, 0);
             local_battle_results_1.player_info.combat_result = (int8_t)result;
@@ -458,7 +458,7 @@ void __cdecl Client_Combat_Loop_() {
 
         case NET_SYNC_STATE_COMBAT_STRATEGIC_ATTACKER:
             memset(&local_battle_results_2, 0, sizeof(s_battle_results));
-            memcpy(&local_battle_results_2, &NETMOX::_net.sync_state, 12);
+            memcpy(&local_battle_results_2, &NETMOX::_net.sync_state, sizeof(local_battle_results_2.player_info));
             local_battle_results_2.planet_id = NETMOX::_net.combat_planet_id;
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_2, 0);
             local_battle_results_2.player_info.combat_result = (int8_t)result;
@@ -487,7 +487,7 @@ void __cdecl Client_Combat_Loop_() {
                 NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_DRAGON_NO_BRIBE, nullptr, 0);
             } else {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
-                NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_DRAGON_BRIBE_DESTINATION, &new_star_target, 4);
+                NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_DRAGON_BRIBE_DESTINATION, &new_star_target, sizeof(new_star_target));
             }
             break;
 

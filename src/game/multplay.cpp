@@ -352,7 +352,7 @@ namespace MULTPLAY {
                 }
                 else {
                     if (MOX::_settings.net_game_name[0] == '\0') {
-                        memcpy(MOX::_settings.net_game_name, "Moo II ", 8);
+                        memcpy(MOX::_settings.net_game_name, "Moo II ", sizeof("Moo II "));
                         int32_t v = (int32_t)clock();
                         int32_t s = v >> 31;
                         v = ((v ^ s) - s) & 0x1F;
@@ -739,7 +739,7 @@ void __cdecl Load_Online_Setup_Screen_(void) {
 
             if (NETMOX::_net.cur_game_name[0] == '\0') {
                 // Initialize default game name "MooII " with a random letter at the end
-                memcpy(NETMOX::_net.cur_game_name, "MooII ", 7); /* s_MooII_0055aa80 */
+                memcpy(NETMOX::_net.cur_game_name, "MooII ", sizeof("MooII ")); /* s_MooII_0055aa80 */
                 NETMOX::_net.cur_game_name[5] = (char)(clock() % 25) + 'a';
             }
         }

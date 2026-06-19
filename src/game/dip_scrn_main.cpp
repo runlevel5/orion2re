@@ -844,10 +844,10 @@ namespace DIP_SCRN {
             DIP_SCRN::_net_diplomacy_message.sender_player_id = static_cast<uint8_t>(sender_id);
             DIP_SCRN::_net_diplomacy_message.target_player_id = static_cast<uint8_t>(target_id);
             DIP_SCRN::_net_diplomacy_message.arg1 = gift_type;
-            DIP_SCRN::_net_diplomacy_message.msg_type = 1004 /* DIP_NET_MSG_GIFT_RESPONSE */;
+            DIP_SCRN::_net_diplomacy_message.msg_type = DIP_NET_MSG_GIFT_RESPONSE;
             DIP_SCRN::_net_diplomacy_message.arg2 = gift_arg;
 
-            NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, 2000, &DIP_SCRN::_net_diplomacy_message, 8);
+            NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, DIP_NET_PACKET_MESSAGE, &DIP_SCRN::_net_diplomacy_message, sizeof(DIP_SCRN::_net_diplomacy_message));
             RUSS::Mox_Update_();
         }
 
@@ -2262,7 +2262,7 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.msg_type = 0x82;
 
                         NETMOX::Mox_Send_Message_(
-                            MOX::_player[param_1].network_player_id, 2000,
+                            MOX::_player[param_1].network_player_id, DIP_NET_PACKET_MESSAGE,
                             (uint8_t*)&_net_diplomacy_message, 8
                         );
                         RUSS::Mox_Update_();

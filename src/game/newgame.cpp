@@ -40,7 +40,7 @@ void Ensure_Settings_Net_Game_Name_() {
         return;
     }
 
-    memcpy(MOX::_settings.net_game_name, "Moo II ", 8);
+    memcpy(MOX::_settings.net_game_name, "Moo II ", sizeof("Moo II "));
     MOX::_settings.net_game_name[6] = (char)('a' + ((int32_t)clock() % 26));
 }
 

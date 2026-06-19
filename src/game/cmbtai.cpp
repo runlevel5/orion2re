@@ -266,14 +266,14 @@ void __cdecl Toggle_Auto_Combat_Flags_() {
             MOX::_super_fast_flag = 0;
 
             if (MOX::_net_flag != 0) {
-                NETMOX::Mox_Send_Message_(MOX::_player[MOX::_combat_defender_player].network_player_id, 0x3ea, &off_val, 2);
+                NETMOX::Mox_Send_Message_(MOX::_player[MOX::_combat_defender_player].network_player_id, TACTICAL_NET_PACKET_AUTO_COMBAT_DISABLED, &off_val, sizeof(off_val));
             }
         } else {
             MOX::_auto_combat_flag[1] = 0;
             MOX::_super_fast_flag = 0;
 
             if (MOX::_net_flag != 0) {
-                NETMOX::Mox_Send_Message_(MOX::_player[ship_owner].network_player_id, 0x3ea, &on_val, 2);
+                NETMOX::Mox_Send_Message_(MOX::_player[ship_owner].network_player_id, TACTICAL_NET_PACKET_AUTO_COMBAT_DISABLED, &on_val, sizeof(on_val));
             }
         }
     } else {
@@ -283,14 +283,14 @@ void __cdecl Toggle_Auto_Combat_Flags_() {
             MOX::_super_fast_flag = 0;
 
             if (MOX::_net_flag != 0) {
-                NETMOX::Mox_Send_Message_(MOX::_player[MOX::_combat_attacker_player].network_player_id, 0x3ea, &on_val, 2);
+                NETMOX::Mox_Send_Message_(MOX::_player[MOX::_combat_attacker_player].network_player_id, TACTICAL_NET_PACKET_AUTO_COMBAT_DISABLED, &on_val, sizeof(on_val));
             }
         } else {
             MOX::_auto_combat_flag[0] = 0;
             MOX::_super_fast_flag = 0;
 
             if (MOX::_net_flag != 0) {
-                NETMOX::Mox_Send_Message_(MOX::_player[ship_owner].network_player_id, 0x3ea, &off_val, 2);
+                NETMOX::Mox_Send_Message_(MOX::_player[ship_owner].network_player_id, TACTICAL_NET_PACKET_AUTO_COMBAT_DISABLED, &off_val, sizeof(off_val));
             }
         }
     }
@@ -1414,7 +1414,7 @@ void __cdecl Resolve_Ai_Boarding_(int16_t attacker_idx, int16_t target_idx, int1
 
         if (MOX::_net_flag != 0) {
             if ((action_type == 1 || action_type == 2) && (MOX::_PLAYER_NUM != MOX::_net_destination)) {
-                COMBAT1::Send_Tactical_Combat_Message_(MOX::_net_destination, 0x271f, target_idx, marines_to_send, action_type);
+                COMBAT1::Send_Tactical_Combat_Message_(MOX::_net_destination, TACTICAL_NET_MSG_BOARDING_ACTION, target_idx, marines_to_send, action_type);
             }
         }
 
