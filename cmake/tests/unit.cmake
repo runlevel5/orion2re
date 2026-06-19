@@ -51,6 +51,22 @@ orion2re_add_unit_test(test_fields_helpers
         tests/fakes/fake_exitm.cpp
 )
 
+orion2re_add_unit_test(test_netturn_host_selection
+    SOURCES
+        tests/unit/test_netturn_host_selection.cpp
+    PRODUCTION_SOURCES
+        src/game/netturn.cpp
+        src/game/netmox.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_netturn_runtime.cpp
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_netturn_host_selection PRIVATE -ffunction-sections -fdata-sections)
+    target_link_options(test_netturn_host_selection PRIVATE -Wl,--gc-sections)
+endif()
+
 orion2re_add_unit_test(test_video_scan_bounds
     SOURCES
         tests/unit/test_video_scan_bounds.cpp

@@ -161,7 +161,7 @@ namespace netcode {
         }
 
         bool __cdecl Is_Router_Host_Startup_(uint32_t mode, const s_network* network) {
-            return mode == 0 && network != nullptr && network->sync_state == 1;
+            return mode == 0 && network != nullptr && network->sync_state == NET_SYNC_STATE_HOST_STARTUP;
         }
 
         int32_t __cdecl Connect_Router_With_Retry_(const netadapter::s_config* config) {

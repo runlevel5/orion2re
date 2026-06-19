@@ -356,7 +356,7 @@ struct s_combat_bomb_result {
 };
 
 struct s_net_player_info {
-    int8_t packet_type;
+    int8_t player_state;
     uint8_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;
@@ -2163,8 +2163,7 @@ struct s_network {
     uint8_t players_ready_mask[MAX_PLAYERS];
     undefined field132_0x1ad;
     int8_t player_is_active_flags[MAX_PLAYERS];
-    int32_t field134_0x1b6;
-    int32_t field135_0x1ba;
+    int8_t host_election_rank_sync_cache[MAX_PLAYERS];
     char cur_game_name[9];
     int8_t player_color_selected_flags[MAX_PLAYERS];
     undefined all_ai_game_sync_flag;

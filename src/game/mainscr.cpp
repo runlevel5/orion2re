@@ -3592,7 +3592,7 @@ namespace MAINSCR {
 
     void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t param_2, uint16_t msg_type, uint32_t len, void* data) {
         switch (msg_type) {
-        case 0x00: {
+        case NET_PACKET_START_GAME: {
             s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
             MOX::_NUM_PLAYERS = pack->number_of_players;
             MOX::_settings.random_events = pack->random_events;
@@ -3624,14 +3624,14 @@ namespace MAINSCR {
             }
 
             if (MOX::_PLAYER_NUM != -1) {
-                NETMOX::_net.sync_state = 0x06;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_CLIENT_SELECT_RACE;
             }
             else {
-                NETMOX::_net.sync_state = 0x2D;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_CLIENT_NO_AVAILABLE_SLOT;
             }
             break;
         }
-        case 0x01: {
+        case NET_PACKET_PLAYER_SETUP: {
             NETMOX::_net.player_connected_flags[from_player_id] = 1;
             memcpy(&MOX::_player[from_player_id], data, (uint16_t)len);
 
@@ -3644,11 +3644,11 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x02:
-        case 0x0D:
-        case 0x2E:
-        case 0x32:
-        case 0x34: {
+        case NET_PACKET_GAME_DATA_CHUNK_COUNT:
+        case NET_PACKET_GAME_ORDERS_CHUNK_COUNT:
+        case NET_PACKET_PICK_TARGET_INFO_CHUNK_COUNT:
+        case NET_PACKET_BATTLE_RESULTS_CHUNK_COUNT:
+        case NET_PACKET_YOU_ARE_TARGET_INFO_CHUNK_COUNT: {
             const s_chunk_count_packet* packet = (const s_chunk_count_packet*)data;
             NETMOX::_net.total_chunk_count = packet->total_chunk_count;
             NETMOX::_net.received_chunk_count = 0;
@@ -3656,44 +3656,44 @@ namespace MAINSCR {
             allocate::Push_Block_(MOX::_screen_seg);
             NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xE1000);
 
-            if (msg_type == 0x02) {
+            if (msg_type == NET_PACKET_GAME_DATA_CHUNK_COUNT) {
                 NETMOX::_net.host_election_winner_id = param_2;
                 NETTURN::Net_Init_Host_Election_();
             }
-            else if (msg_type == 0x2E) {
-                NETMOX::_net.sync_state = 0x0F;
+            else if (msg_type == NET_PACKET_PICK_TARGET_INFO_CHUNK_COUNT) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_PICK_TARGET_INFO;
             }
-            else if (msg_type == 0x32) {
-                NETMOX::_net.sync_state = 0x22;
+            else if (msg_type == NET_PACKET_BATTLE_RESULTS_CHUNK_COUNT) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_BATTLE_RESULTS_CHUNKS;
             }
-            else if (msg_type == 0x34) {
-                NETMOX::_net.sync_state = 0x12;
+            else if (msg_type == NET_PACKET_YOU_ARE_TARGET_INFO_CHUNK_COUNT) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_YOU_ARE_TARGET_INFO;
             }
             break;
         }
-        case 0x03:
-        case 0x2F:
-        case 0x33:
-        case 0x35:
-        case 0x0E: {
+        case NET_PACKET_GAME_DATA_CHUNK:
+        case NET_PACKET_PICK_TARGET_INFO_CHUNK:
+        case NET_PACKET_BATTLE_RESULTS_CHUNK:
+        case NET_PACKET_YOU_ARE_TARGET_INFO_CHUNK:
+        case NET_PACKET_GAME_ORDERS_CHUNK: {
             uint8_t* dest = (uint8_t*)NETMOX::_net.network_data_ptr + (NETMOX::_net.received_chunk_count * 0x7800);
             memcpy(dest, data, len & 0xFFFF);
 
             NETMOX::_net.received_chunk_count++;
             NETMOX::_net.total_bytes_received += (len & 0xFFFF);
 
-            if (msg_type == 0x0E && NETMOX::_net.total_chunk_count == NETMOX::_net.received_chunk_count) {
+            if (msg_type == NET_PACKET_GAME_ORDERS_CHUNK && NETMOX::_net.total_chunk_count == NETMOX::_net.received_chunk_count) {
                 NETMOX::_net.host_sync_counter++;
                 if ((uint8_t)NETMOX::_net.host_sync_counter == MOX::_NUM_PLAYERS) {
-                    NETMOX::_net.sync_state = 0x0B;
+                    NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_BEGIN_TURN;
                 }
                 else {
-                    NETMOX::_net.sync_state = 0x09;
+                    NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_WAITING_FOR_ORDERS;
                 }
             }
             break;
         }
-        case 0x04: {
+        case NET_PACKET_HOST_ELECTION_RANK: {
             int8_t rank = *(int8_t*)data;
             int8_t hit_next = *(int8_t*)((uint8_t*)data + 4);
             NETMOX::_net.host_election_player_rank[from_player_id] = rank;
@@ -3705,10 +3705,10 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x05: {
+        case NET_PACKET_AI_DIPLOMACY_REQUEST: {
             int8_t remote_id = *(int8_t*)data;
             NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = remote_id;
-            NETMOX::_net.player_net_info[from_player_id].packet_type = '&';
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_AI_DIPLOMACY_REQUESTED;
 
             int next_talker = NETMOX::Get_Next_AI_Talker_(remote_id);
             if (next_talker == -1) {
@@ -3717,42 +3717,42 @@ namespace MAINSCR {
             else {
                 NETMOX::_net.ai_diplomacy_active_mask |= (1 << (from_player_id & 0x1F));
                 NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = remote_id;
-                NETMOX::_net.player_net_info[from_player_id].packet_type = '(';
+                NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_AI_DIPLOMACY_ACTIVE;
             }
             break;
         }
-        case 0x06: {
-            if (NETMOX::_net.sync_state == '%' || NETMOX::_net.sync_state == '&') {
-                NETMOX::_net.sync_state = '(';
+        case NET_PACKET_AI_DIPLOMACY_BEGIN: {
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_AI_DIPLOMACY_REQUESTED || NETMOX::_net.sync_state == NET_SYNC_STATE_AI_DIPLOMACY_DONE) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_AI_DIPLOMACY_READY;
             }
             break;
         }
-        case 0x07: {
-            if (NETMOX::_net.sync_state == '%') {
-                NETMOX::_net.sync_state = '&';
+        case NET_PACKET_AI_DIPLOMACY_DONE: {
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_AI_DIPLOMACY_REQUESTED) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_AI_DIPLOMACY_DONE;
             }
             break;
         }
-        case 0x08: {
-            if (NETMOX::_net.player_net_info[from_player_id].packet_type != '&') {
+        case NET_PACKET_AI_DIPLOMACY_CANCEL_REQUEST: {
+            if (NETMOX::_net.player_net_info[from_player_id].player_state != NET_PLAYER_STATE_AI_DIPLOMACY_REQUESTED) {
                 NETMOX::_net.ai_diplomacy_active_mask &= ~(1 << (from_player_id & 0x1F));
                 int next_talker = NETMOX::Get_Next_AI_Talker_(NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id);
                 if (next_talker != -1) {
                     NETMOX::_net.ai_diplomacy_active_mask |= (1 << (next_talker & 0x1F));
-                    NETMOX::_net.player_net_info[next_talker].packet_type = '(';
+                    NETMOX::_net.player_net_info[next_talker].player_state = NET_PLAYER_STATE_AI_DIPLOMACY_ACTIVE;
                 }
             }
             NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = -1;
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x04;
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_READY;
             NETMOX::_net.ai_diplomacy_cancel_mask |= (1 << (from_player_id & 0x1F));
             break;
         }
-        case 0x09: {
+        case NET_PACKET_AI_DIPLOMACY_CANCELLED: {
             NETMOX::_net.diplomacy_target_id = -1;
-            NETMOX::_net.sync_state = 0x04;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
             break;
         }
-        case 0x0A: {
+        case NET_PACKET_AI_DIPLOMACY_END_STATE: {
             s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)data;
             int8_t remote_id = NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id;
 
@@ -3764,92 +3764,92 @@ namespace MAINSCR {
             }
 
             NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = -1;
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x04;
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_READY;
             NETMOX::_net.players_sync_mask[remote_id] = 0xFF;
             NETMOX::_net.diplomacy_sync_mask[remote_id] = from_player_id;
 
             int next_talker = NETMOX::Get_Next_AI_Talker_(remote_id);
             if (next_talker != -1) {
                 NETMOX::_net.ai_diplomacy_active_mask |= (1 << (next_talker & 0x1F));
-                NETMOX::_net.player_net_info[next_talker].packet_type = '(';
+                NETMOX::_net.player_net_info[next_talker].player_state = NET_PLAYER_STATE_AI_DIPLOMACY_ACTIVE;
             }
             break;
         }
-        case 0x0B: {
+        case NET_PACKET_TURN_END_REQUEST: {
             NETMOX::_net.player_is_active_flags[from_player_id] = 1;
             break;
         }
-        case 0x0C: {
-            NETMOX::_net.sync_state = 0x0D;
+        case NET_PACKET_SEND_GAME_ORDERS_REQUEST: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_GAME_ORDERS;
             break;
         }
-        case 0x0F: {
+        case NET_PACKET_COMBAT_SYNC_RESET: {
             memset(NETMOX::_net.player_net_info, 0, 45 * sizeof(int32_t)); // 180 bytes
-            NETMOX::_net.sync_state = 0x0E;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
             break;
         }
-        case 0x10: {
-            NETMOX::_net.sync_state = 0x10;
+        case NET_PACKET_PICK_TARGET_INFO: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_PICKING_COMBAT_TARGET;
             NETMOX::Decode_Pick_Target_Info_(data, len);
             break;
         }
-        case 0x11: {
+        case NET_PACKET_COMBAT_TARGET_CHOSEN: {
             const s_case11_packet* packet = (const s_case11_packet*)data;
             memcpy(&NETMOX::_net.player_net_info[from_player_id].combat_defender_id, packet, 4);
             NETMOX::_net.player_net_info[from_player_id].combat_target_player_id = packet->sync_colony_id;
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x11;
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_COMBAT_TARGET_CHOSEN;
             break;
         }
-        case 0x12: {
+        case NET_PACKET_YOU_ARE_TARGET_INFO: {
             NETMOX::Decode_You_Are_Target_Info_(data, len);
             break;
         }
-        case 0x13: {
-            NETMOX::_net.sync_state = 0x14;
+        case NET_PACKET_COMBAT_EXECUTE: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_ATTACKER;
             break;
         }
-        case 0x14: {
+        case NET_PACKET_COMBAT_RESOLUTION_BEGIN: {
             if (MOX::_settings.strategic_combat_flag != 0) {
-                NETMOX::_net.sync_state = 0x18;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_STRATEGIC_ATTACKER;
             }
             else if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 'd') {
-                NETMOX::_net.sync_state = 0x14;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_ATTACKER;
             }
             else {
-                NETMOX::_net.sync_state = 0x16;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_ATTACKER_VS_NONHUMAN;
             }
             break;
         }
-        case 0x15: {
+        case NET_PACKET_BATTLE_RESULTS: {
             NETMOX::Decode_Battle_Results_(data, (uint16_t)len);
             break;
         }
-        case 0x16:
-        case 0x18: {
+        case NET_PACKET_STRATEGIC_BATTLE_RESULTS:
+        case NET_PACKET_STRATEGIC_RESULTS_READY: {
             memcpy(NETMOX::_net.combat_results_data, data, sizeof(s_battle_results)); // 1742 bytes copied
-            if (msg_type == 0x16) {
-                NETMOX::_net.sync_state = 0x19;
+            if (msg_type == NET_PACKET_STRATEGIC_BATTLE_RESULTS) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_RESULTS_DISPLAY;
             }
             else {
-                NETMOX::_net.sync_state = 0x1A;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_STRATEGIC_RESULTS_RECEIVED;
             }
             break;
         }
-        case 0x17: {
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x0E;
+        case NET_PACKET_COMBAT_RESULTS_ACK: {
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_COMBAT_READY;
             NETMOX::_net.player_net_info[from_player_id].combat_attacker_id = -1;
             NETMOX::_net.sync_phase_active_flag = 0;
             break;
         }
-        case 0x19: {
-            NETMOX::_net.sync_state = 0x0E;
+        case NET_PACKET_STRATEGIC_RESULTS_ACK: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
             break;
         }
-        case 0x1A: {
-            NETMOX::_net.sync_state = 0x07;
+        case NET_PACKET_COMBAT_PHASE_COMPLETE: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
             break;
         }
-        case 0x1B: {
+        case NET_PACKET_REQUEST_HUMAN_DIPLOMACY: {
             s_net_pack_req_human_diplomacy* pack = (s_net_pack_req_human_diplomacy*)data;
             if (NETMOX::_net.players_hit_next_turn[MOX::_PLAYER_NUM] == 0) {
                 memcpy(&MOX::_player[from_player_id], &pack->player, sizeof(s_player));
@@ -3858,9 +3858,9 @@ namespace MAINSCR {
                     MOX::_star[i].surrender_to[from_player_id] = pack->surrender_to[i];
                 }
 
-                if (NETMOX::_net.sync_state == ')' && NETMOX::_net.diplomacy_target_id == from_player_id) {
+                if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_REQUESTED && NETMOX::_net.diplomacy_target_id == from_player_id) {
                     uint8_t mask = ~(1 << (from_player_id & 0x1F));
-                    NETMOX::_net.sync_state = '.';
+                    NETMOX::_net.sync_state = NET_SYNC_STATE_HUMAN_DIPLOMACY_CONNECTING;
                     NETMOX::_net.diplomacy_initiator_id = from_player_id;
                     NETMOX::_net.players_active_mask &= mask;
                     NETMOX::_net.players_ready_mask[0] &= mask;
@@ -3877,12 +3877,12 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x1C: {
+        case NET_PACKET_ACCEPT_HUMAN_DIPLOMACY: {
             memcpy(&MOX::_player[from_player_id], data, sizeof(s_player));
 
-            if (NETMOX::_net.sync_state == ')' && NETMOX::_net.diplomacy_target_id == from_player_id) {
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_REQUESTED && NETMOX::_net.diplomacy_target_id == from_player_id) {
                 uint8_t mask = ~(1 << (from_player_id & 0x1F));
-                NETMOX::_net.sync_state = '.';
+                NETMOX::_net.sync_state = NET_SYNC_STATE_HUMAN_DIPLOMACY_CONNECTING;
                 NETMOX::_net.diplomacy_initiator_id = from_player_id;
                 NETMOX::_net.players_active_mask &= mask;
                 NETMOX::_net.players_ready_mask[0] &= mask;
@@ -3898,46 +3898,46 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x1D: {
-            NETMOX::_net.sync_state = '*';
+        case NET_PACKET_HUMAN_DIPLOMACY_IGNORED: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_HUMAN_DIPLOMACY_REJECTED;
             break;
         }
-        case 0x1F: {
+        case NET_PACKET_CANCEL_HUMAN_DIPLOMACY: {
             uint8_t mask = ~(1 << (from_player_id & 0x1F));
             NETMOX::_net.players_active_mask &= mask;
             NETMOX::_net.players_ready_mask[0] &= mask;
 
-            if (NETMOX::_net.sync_state == '+' && NETMOX::_net.diplomacy_target_id == from_player_id) {
-                NETMOX::_net.sync_state = 0x04;
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_READY && NETMOX::_net.diplomacy_target_id == from_player_id) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
                 NETMOX::_net.diplomacy_target_id = -1;
                 NETMOX::_net.diplomacy_active_flag = 0;
             }
-            if (NETMOX::_net.sync_state == '.' && NETMOX::_net.diplomacy_target_id == from_player_id) {
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_CONNECTING && NETMOX::_net.diplomacy_target_id == from_player_id) {
                 if (NETMOX::_net.diplomacy_active_flag == 0) {
-                    NETMOX::_net.sync_state = ')';
+                    NETMOX::_net.sync_state = NET_SYNC_STATE_HUMAN_DIPLOMACY_REQUESTED;
                 }
                 else {
-                    NETMOX::_net.sync_state = 0x04;
+                    NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
                 }
                 NETMOX::_net.diplomacy_active_flag = 0;
                 NETMOX::_net.diplomacy_initiator_id = -1;
             }
             break;
         }
-        case 0x20: {
-            NETMOX::_net.sync_state = ',';
+        case NET_PACKET_PICK_YOUR_POSITION: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_CLIENT_PICK_POSITION;
             NETMOX::_net.host_election_id = param_2;
             NETMOX::Decode_Pick_Your_Position_((s_net_pack_pick_your_position*)data, (uint16_t)len);
             break;
         }
-        case 0x21: {
+        case NET_PACKET_PICK_YOUR_POSITION_RESULT: {
             int32_t target_id;
             memcpy(&target_id, data, sizeof(target_id));
             MOX::_player[target_id].network_player_id = param_2;
             NETMOX::_net.joining_net_id = -1;
             break;
         }
-        case 0x22: {
+        case NET_PACKET_SYNC_PLAYER_STATE: {
             s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)data;
             int target_id = pack->target_player_id;
 
@@ -3949,33 +3949,33 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x23: {
-            NETMOX::_net.sync_state = 0x1C;
+        case NET_PACKET_DRAGON_INFO: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_DRAGON_BRIBE_PROMPT;
             NETMOX::Decode_Dragon_Info_((int32_t*)data, (uint16_t)len);
             break;
         }
-        case 0x24: {
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x1D;
+        case NET_PACKET_DRAGON_NO_BRIBE: {
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_HUMAN_DIPLOMACY_IGNORED;
             break;
         }
-        case 0x25: {
+        case NET_PACKET_DRAGON_BRIBE_DESTINATION: {
             NETMOX::_net.field168_0x209 = *(uint8_t*)data;
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x1E;
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_DRAGON_BRIBE_DESTINATION;
             break;
         }
-        case 0x26: {
-            if (NETMOX::_net.sync_state == ')' && NETMOX::_net.diplomacy_target_id == from_player_id) {
+        case NET_PACKET_HUMAN_DIPLOMAT_WAIT: {
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_REQUESTED && NETMOX::_net.diplomacy_target_id == from_player_id) {
                 NETMOX::_net.human_diplomat_wait_flag = 1;
             }
             break;
         }
-        case 0x27: {
+        case NET_PACKET_CHAT: {
             if (CHAT::_chat_info != nullptr) {
                 CHAT::Receive_Chat_Msg_(from_player_id, (char*)data);
             }
             break;
         }
-        case 0x2A: {
+        case NET_PACKET_LOAD_GAME_START: {
             s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
             if (strcmp(pack->version_string, GAME_BUILD_DATE) != 0) {
                 char error_msg[256];
@@ -3991,14 +3991,14 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x2B: {
+        case NET_PACKET_PLAYER_COLOR_SELECTED: {
             uint8_t color_idx = *(uint8_t*)data;
             uint8_t player_idx = *(uint8_t*)((uint8_t*)data + 1);
             RACESEL::_color_flag[color_idx] = 1;
             MOX::_player[player_idx].color = color_idx;
             break;
         }
-        case 0x2C: {
+        case NET_PACKET_REQUEST_PLAYER_COLOR: {
             uint8_t color_idx = *(uint8_t*)data;
             if (RACESEL::_color_flag[color_idx] == 0) {
                 RACESEL::_color_flag[color_idx] = 1;
@@ -4007,34 +4007,34 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x2D: {
+        case NET_PACKET_GNN_CHAT: {
             if (CHAT::_chat_info != nullptr) {
                 CHAT::Receive_Chat_Msg_(8, (char*)data);
             }
             break;
         }
-        case 0x30: {
-            NETMOX::_net.player_net_info[from_player_id].packet_type = 0x1F;
+        case NET_PACKET_BATTLE_RESULTS_CHUNK_REQUEST: {
+            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_BATTLE_RESULTS_CHUNK_REQUESTED;
             break;
         }
-        case 0x31: {
-            NETMOX::_net.sync_state = ' ';
+        case NET_PACKET_BATTLE_RESULTS_CHUNK_READY: {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_SENDING_BATTLE_RESULTS_CHUNKS;
             break;
         }
-        case 0x36: {
+        case NET_PACKET_PLAYER_PHASE_READY: {
             NETMOX::_net.player_race_selected_flags[from_player_id] = 1;
             break;
         }
-        case 0x37:
-        case 0x38: {
+        case NET_PACKET_PLAYER_ABDICATED:
+        case NET_PACKET_PLAYER_SURRENDERED: {
             NETMOX::Decode_Drop_Out_Info_(from_player_id, (s_net_pack_drop_out_info*)data);
             break;
         }
-        case NETMOX::NET_MSG_PLAYER_DISCONNECTED: {
+        case NET_PACKET_PLAYER_DISCONNECTED: {
             NETMOX::Decode_Player_Disconnected_Info_(data, len);
             break;
         }
-        case 0x39: {
+        case NET_PACKET_PLAYER_RACE_SELECTED: {
             if (NETMOX::_net.host_election_id == NETMOX::_net.net_host_id) {
                 exitm::Exit_With_Message(NETMOX::_only_1_host_allowed_error);
             }
@@ -4044,7 +4044,7 @@ namespace MAINSCR {
             MOX::_player[player_idx].race = race_idx;
             break;
         }
-        case 0x3A: {
+        case NET_PACKET_REQUEST_PLAYER_RACE: {
             uint8_t race_idx = *(uint8_t*)data;
             if (RACESEL::_race_flag[race_idx] == 0) {
                 RACESEL::_race_flag[race_idx] = 1;
@@ -4053,64 +4053,64 @@ namespace MAINSCR {
             }
             break;
         }
-        case 0x3B: {
+        case NET_PACKET_FORCE_PLAYER_ELIMINATED: {
             MOX::_player[MOX::_PLAYER_NUM].eliminated = 1;
             break;
         }
-        case 0x3C: {
+        case NET_PACKET_MONSTER_UPDATE: {
             s_net_pack_monster_update monster_update;
             memcpy(&monster_update, data, sizeof(monster_update));
             EVENTS::Event_Monster_Update_((int16_t)monster_update.param_1, (int16_t)monster_update.param_2,
                                           (int16_t)monster_update.param_3);
             break;
         }
-        case 0x3D: {
+        case NET_PACKET_PLAYER_RACE_DESELECTED: {
             uint8_t race_idx = *(uint8_t*)data;
             RACESEL::_race_flag[race_idx] = 0;
             break;
         }
-        case 0x3E: {
+        case NET_PACKET_PLAYER_RACE_DESELECT_REQUEST: {
             uint8_t race_idx = *(uint8_t*)data;
             RACESEL::_race_flag[race_idx] = 0;
             NETMOX::_net.player_race_deselected_flags[from_player_id] = 1;
             break;
         }
-        case 0x3F: {
+        case NET_PACKET_RACE_SELECTION_SYNCED: {
             NETMOX::_net.race_selection_changed = 0;
             break;
         }
-        case 0x40: {
-            NETMOX::_net.tactical_combat_sync_state = 1;
+        case NET_PACKET_TACTICAL_COMBAT_START: {
+            NETMOX::_net.tactical_combat_sync_state = NET_TACTICAL_COMBAT_SYNC_STARTED;
             break;
         }
-        case 0x41: {
-            NETMOX::_net.tactical_combat_sync_state = 2;
+        case NET_PACKET_TACTICAL_COMBAT_END: {
+            NETMOX::_net.tactical_combat_sync_state = NET_TACTICAL_COMBAT_SYNC_FINISHED;
             break;
         }
-        case 0x42: {
+        case NET_PACKET_NETWORK_SYNC_STATUS: {
             if (*(int32_t*)data == 0) {
                 NETMOX::_net.network_sync_complete_flag = 0;
             }
             break;
         }
-        case 0x43: {
+        case NET_PACKET_CHANGE_RELATIONS: {
             int16_t relation_params[6];
             memcpy(relation_params, data, sizeof(relation_params));
             diplomac::Change_Relations_(relation_params[0], relation_params[1], relation_params[2],
                                         relation_params[3], relation_params[4], relation_params[5]);
             break;
         }
-        case 0x44: {
+        case NET_PACKET_HUMAN_DIPLOMACY_READY_DATA: {
             memcpy(&MOX::_player[from_player_id], data, sizeof(s_player));
-            if (NETMOX::_net.sync_state == '.' && NETMOX::_net.diplomacy_target_id == from_player_id) {
+            if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_CONNECTING && NETMOX::_net.diplomacy_target_id == from_player_id) {
                 uint8_t mask = ~(1 << (from_player_id & 0x1F));
-                NETMOX::_net.sync_state = '+';
+                NETMOX::_net.sync_state = NET_SYNC_STATE_HUMAN_DIPLOMACY_READY;
                 NETMOX::_net.players_active_mask &= mask;
                 NETMOX::_net.players_ready_mask[0] &= mask;
             }
             break;
         }
-        case 100: { // 0x64
+        case NET_PACKET_DECLARE_WAR: {
             int32_t target_player_id;
             memcpy(&target_player_id, data, sizeof(target_player_id));
             diplomac::Declare_War_((int16_t)from_player_id, (int16_t)target_player_id);
