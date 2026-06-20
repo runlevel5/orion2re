@@ -1,5 +1,14 @@
 #pragma once
 
+struct s_animation_header;
+
+typedef struct s_officer_picture_slot s_officer_picture_slot, *Ps_officer_picture_slot;
+
+struct s_officer_picture_slot {
+    struct s_animation_header *pic;
+    int16_t officer_id;
+};
+
 namespace OFFICER {
     extern char s_OFFICER_LBX_00556980[16];
 

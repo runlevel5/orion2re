@@ -12,6 +12,21 @@ namespace NETSTART {
 
     char s_myname_005597dc[7] = "myname";
 
+    namespace {
+        void Ensure_Net_Game_Name_() {
+            if (NETMOX::_net.cur_game_name[0] != '\0') {
+                return;
+            }
+
+            if (MOX::_settings.net_game_name[0] == '\0') {
+                memcpy(MOX::_settings.net_game_name, "Moo II ", sizeof("Moo II "));
+                MOX::_settings.net_game_name[6] = (char)('a' + ((int32_t)clock() % 26));
+            }
+
+            strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
+        }
+    }
+
     int8_t __cdecl Net_Select_Race_() {
         uint8_t fade_flag;
         s_player* local_player = &MOX::_player[MOX::_PLAYER_NUM];
@@ -26,9 +41,9 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
 
         NETMOX::_net.total_chunk_count = 0;
-        NETMOX::_net.sync_state = 7; /* PACKET_TYPE_RACE_SELECTION */
+        NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
 
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 1, local_player, 3753 /* s_player size */);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PLAYER_SETUP, local_player, sizeof(*local_player));
 
         while (NETMOX::_net.total_chunk_count == 0) {
             fields::Get_Input_();
@@ -61,7 +76,7 @@ namespace NETSTART {
 
         allocate::Pop_Block_(MOX::_screen_seg);
         NETMOX::_net.total_chunk_count = 0;
-        NETMOX::_net.sync_state = 4; /* PACKET_TYPE_MAP_SYNC */
+        NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
 
         MOX2::Init_Map_Pictures_Default__();
         fields::Clear_Fields_();
@@ -86,16 +101,16 @@ namespace NETSTART {
 
         if (MULTPLAY::Choose_Network_Plyrs_Screen_(&selection, connected_players, false, true) == -1) {
             message_buffer = -1;
-            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 33 /* 0x21 */, &message_buffer, 4);
+            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, sizeof(message_buffer));
             return 0;
         }
 
         fields::Clear_Fields_();
         fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, "", 0);
 
-        NETMOX::_net.sync_state = 7;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
         message_buffer = (int32_t)selection;
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 33 /* 0x21 */, &message_buffer, 4);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, sizeof(message_buffer));
 
         fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
         MULTPLAY::Reload_Getting_Data_Info_();
@@ -136,7 +151,7 @@ namespace NETSTART {
             }
         }
 
-        NETMOX::_net.sync_state = 4;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
         MOX2::Init_Map_Pictures_Default__();
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
@@ -147,64 +162,6 @@ namespace NETSTART {
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
         return 1;
-    }
-
-    int8_t __cdecl Do_Answer_() {
-        clock_t start_time = clock();
-        simmodem::Modem_Reset_(NETMOX::_net.modem_settings.cmd_reset);
-
-        int8_t is_connected = 0;
-        if (simmodem::Modem_Answer_() != 0) {
-            if (simmodem::Modem_Connected_() == 0) {
-                while ((clock() - start_time) < 90000) {
-                    RUSS::Mox_Update_();
-                    if (simmodem::Modem_Connected_() != 0) {
-                        break;
-                    }
-                }
-            }
-            is_connected = (int8_t)simmodem::Modem_Connected_();
-        }
-
-        if (is_connected != 0) {
-            return is_connected;
-        }
-
-        GENDRAW::Message_Box_(NETSTART::_answering_failed_error);
-        netcode::Net_Uninit_();
-        return 0;
-    }
-
-    bool __cdecl Do_Dial_(char* phone_number) {
-        clock_t start_time = clock();
-        bool dial_success = simmodem::Modem_Dial_Number_(phone_number);
-
-        if (dial_success) {
-            char modem_error[80];
-            simmodem::Get_Modem_Error_(modem_error);
-
-            if (strlen(modem_error) > 1) {
-                GENDRAW::Message_Box_(modem_error);
-                netcode::Net_Uninit_();
-                return false;
-            }
-
-            while (!simmodem::Modem_Connected_()) {
-                if (clock() - start_time >= 90000) {
-                    break;
-                }
-                RUSS::Mox_Update_();
-            }
-
-            dial_success = simmodem::Modem_Connected_() != 0;
-            if (dial_success) {
-                return true;
-            }
-        }
-
-        GENDRAW::Message_Box_(_dialing_failed_error);
-        netcode::Net_Uninit_();
-        return false;
     }
 
     char* __cdecl Load_Netstart_Strings_(char* buffer) {
@@ -243,10 +200,9 @@ namespace NETSTART {
     uint8_t __cdecl Join_Net_Screen_() {
         uint8_t result = 0;
         uint8_t fade_status;
-        const char* empty_str = "";
         const char* myname_str = s_myname_005597dc;
 
-        NETMOX::_net.sync_state = 5;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_CLIENT_JOINING;
 
         NETTURN::Net_Init_Host_Election_();
         MULTPLAY::Reload_Initializing_Net_Info_();
@@ -260,83 +216,76 @@ namespace NETSTART {
             RUSS::Mox_Update_();
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = SCREEN_MULTI_PLAYER;
-            NETMOX::_net.sync_state = 0;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
             return 0;
         }
 
-        if (NETMOX::_net.mode == 0) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             MULTPLAY::Choose_Multi_Network_Game_Screen_();
-            if (NETMOX::_net.cur_game_name[0] == '\0') {
+            if (NETMOX::_net.cur_session_id == 0) {
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
-                NETMOX::_net.sync_state = 0;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
                 return 0;
             }
 
-            if (!netcode::Net_Join_Game_(NETMOX::_net.cur_game_name, empty_str, myname_str)) {
+            if (!netcode::Net_Join_Game_(NETMOX::_net.cur_session_id, "", myname_str)) {
+                MULTPLAY::Reload_Initializing_Net_Info_();
                 GENDRAW::Message_Box_(NETSTART::_game_full_string);
-                NETMOX::_net.sync_state = 0;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETSTART::Mox_Net_Uninit_();
                 return 0;
             }
         } else {
-            netcode::Set_Null_Modem_Slave_();
-            if (NETMOX::_net.mode == 1) {
-                if (!NETSTART::Do_Answer_()) {
-                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
-                    NETMOX::_net.sync_state = 0;
-                    return 0;
-                }
-            }
+            GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
+            MOX::_current_screen = SCREEN_MULTI_PLAYER;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
+            NETSTART::Mox_Net_Uninit_();
+            return 0;
         }
 
         NETMOX::_net.is_network_active = 1;
         NETMOX::_net.net_host_id = netcode::Net_Host_ID_();
         MULTPLAY::Reload_Join_Net_Screen_();
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639, 479, empty_str, 0);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 2);
 
-        memset(RACESEL::_color_flag, 0, 8);
-        memset(RACESEL::_race_flag, 0, 14);
+        memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
+        memset(RACESEL::_race_flag, 0, sizeof(RACESEL::_race_flag));
 
-        while (NETMOX::_net.sync_state == 5) {
+        while (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_JOINING) {
             fields::Get_Input_();
             MULTPLAY::Draw_Generic_Net_Info_Screen_();
             RUSS::Mox_Sync_Update_();
         }
 
-        if (NETMOX::_net.sync_state == 45) {
-            NETMOX::_net.sync_state = 0;
+        if (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_NO_AVAILABLE_SLOT) {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
             MOX::_current_screen = SCREEN_MULTI_PLAYER;
             NETSTART::Mox_Net_Uninit_();
             GENDRAW::Message_Box_(NETSTART::_no_more_player_slots_error);
             return 0;
         }
 
-        if (NETMOX::_net.sync_state == 6) {
-            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 66, &MOX::_nebula_screen_seg, 4);
+        if (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_SELECT_RACE) {
+            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_NETWORK_SYNC_STATUS, &MOX::_nebula_screen_seg, sizeof(MOX::_nebula_screen_seg));
             result = (uint8_t)NETSTART::Net_Select_Race_();
-        } else if (NETMOX::_net.sync_state == 44) {
-            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 66, &MOX::_nebula_screen_seg, 4);
+        } else if (NETMOX::_net.sync_state == NET_SYNC_STATE_CLIENT_PICK_POSITION) {
+            NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_NETWORK_SYNC_STATUS, &MOX::_nebula_screen_seg, sizeof(MOX::_nebula_screen_seg));
             result = (uint8_t)NETSTART::Net_Pick_Position_();
             if (!result) {
-                NETMOX::_net.sync_state = 0;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 NETSTART::Mox_Net_Uninit_();
             }
-        }
-
-        if (NETMOX::_net.mode == 3) {
-            ten::Ten_Stop(1);
-            ten::Ten_Flag();
         }
 
         return result;
     }
 
     uint8_t __cdecl Start_Net_Screen_() {
-        NETMOX::_net.sync_state = 1;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_STARTUP;
         NETTURN::Net_Init_Host_Election_();
         MULTPLAY::Reload_Initializing_Net_Info_();
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 1);
@@ -347,30 +296,19 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
 
         if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
-            NETMOX::_net.sync_state = 0;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = SCREEN_MULTI_PLAYER;
             return 0;
         }
 
-        if (NETMOX::_net.mode == 0) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             if (Russ_Net_Create_Game_(NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
-                NETMOX::_net.sync_state = 0;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 Mox_Net_Uninit_();
                 return 0;
-            }
-        }
-
-        if (NETMOX::_net.mode == 2 || NETMOX::_net.mode == 1) {
-            netcode::Set_Null_Modem_Host_();
-            if (NETMOX::_net.mode == 1) {
-                if (Do_Dial_(NETMOX::_net.modem_settings.cmd_reset) == 0) {
-                    NETMOX::_net.sync_state = 0;
-                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
-                    return 0;
-                }
             }
         }
 
@@ -384,7 +322,7 @@ namespace NETSTART {
             NETMOX::_net.network_sync_complete_flag = 1;
         }
 
-        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 3) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             MULTPLAY::Reload_Waiting_For_Joiners_Screen_();
             fields::Clear_Fields_();
             MULTPLAY::Add_Waiting_For_Joiners_Field_();
@@ -414,7 +352,7 @@ namespace NETSTART {
             netcode::Net_Disable_New_Players_();
         }
 
-        uint8_t users[256];
+        int16_t users[256];
         NETMOX::_net.num_connected_players = static_cast<int8_t>(netcode::Net_Get_Users_(users));
 
         if (NETMOX::_net.num_connected_players > MOX::_settings.number_of_players) {
@@ -426,7 +364,7 @@ namespace NETSTART {
         s_net_pack_start_game msg;
         memset(msg.net_ids, 0, sizeof(msg.net_ids));
 
-        NETMOX::_net.sync_state = 2;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_ASSIGN_PLAYERS;
         MOX::_PLAYER_NUM = -1;
 
         if (NETMOX::_net.num_connected_players != 0) {
@@ -468,7 +406,7 @@ namespace NETSTART {
         memset(RACESEL::_race_flag, 0, sizeof(RACESEL::_race_flag));
         memset(NETMOX::_net.player_color_selected_flags, 0, sizeof(NETMOX::_net.player_color_selected_flags));
 
-        NETMOX::_net.sync_state = 3;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_WAITING_FOR_PLAYER_SETUP;
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
@@ -481,14 +419,9 @@ namespace NETSTART {
         NETMOX::_net.player_color_selected_flags[MOX::_PLAYER_NUM] = 1;
         MOX::_player[MOX::_PLAYER_NUM].objectives = 100;
 
-        if (NETMOX::_net.mode == 3) {
-            ten::Ten_Stop(1);
-            ten::Ten_Flag();
-        }
-
         RUSS::Mox_Update_();
 
-        NETMOX::Mox_Send_Message_(0x7FFE, 0, &msg, sizeof(msg));
+        NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_START_GAME, &msg, sizeof(msg));
 
         MULTPLAY::Reload_Wait_For_Race_Info_();
         MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &unused, 11);
@@ -578,20 +511,19 @@ namespace NETSTART {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                NETMOX::_net.player_net_info[i].packet_type = 4;
+                NETMOX::_net.player_net_info[i].player_state = NET_PLAYER_STATE_READY;
                 NETMOX::_net.player_net_info[i].diplomacy_target_id = -1;
             }
         }
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
-        transprt::_num_net_players = NETMOX::_net.num_connected_players;
 
         NETMOX::Broadcast_Game_Data_Differential_(1);
 
         NETMOX::_net.player_race_selected_flags[MOX::_PLAYER_NUM] = 1;
         NETMOX::_net.field_1db = 0;
         NETMOX::_net.field_1df = 0;
-        NETMOX::_net.sync_state = 4;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
 
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
@@ -627,7 +559,7 @@ namespace NETSTART {
             return 0;
         }
 
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 58, &race_idx, 1);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_REQUEST_PLAYER_RACE, &race_idx, sizeof(race_idx));
 
         while (RACESEL::_race_flag[race_idx] == 0) {
             RUSS::Mox_Update_();
@@ -640,9 +572,9 @@ namespace NETSTART {
         uint8_t fade_flag = 0;
         uint8_t status[MAX_PLAYERS] = { 0 };
         s_load_net_screen_packet payload = {};
-        uint8_t user_list[256];
+        int16_t user_list[256];
 
-        NETMOX::_net.sync_state = 36;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_LOAD_GAME_HOST_SETUP;
         NETTURN::Net_Init_Host_Election_();
         MULTPLAY::Reload_Initializing_Net_Info_();
 
@@ -654,28 +586,17 @@ namespace NETSTART {
         if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = SCREEN_MULTI_PLAYER;
-            NETMOX::_net.sync_state = 0;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
             return 0;
         }
 
-        if (NETMOX::_net.mode == 0) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             if (Russ_Net_Create_Game_(NETMOX::_net.cur_game_name, MAX_PLAYERS, "", s_myname_005597dc) == 0) {
                 GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
-                NETMOX::_net.sync_state = 0;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 Mox_Net_Uninit_();
                 return 0;
-            }
-        } else {
-            if (NETMOX::_net.mode == 2 || NETMOX::_net.mode == 1) {
-                netcode::Set_Null_Modem_Host_();
-            }
-            if (NETMOX::_net.mode == 1) {
-                if (Do_Dial_(NETMOX::_net.modem_settings.cmd_reset) == 0) {
-                    NETMOX::_net.sync_state = 0;
-                    MOX::_current_screen = SCREEN_MULTI_PLAYER;
-                    return 0;
-                }
             }
         }
 
@@ -700,7 +621,7 @@ namespace NETSTART {
         fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
 
         if (choose_result == -1) {
-            NETMOX::_net.sync_state = 0;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_IDLE;
             MOX::_current_screen = SCREEN_MULTI_PLAYER;
             return 0;
         }
@@ -752,7 +673,7 @@ namespace NETSTART {
 
             if (NETMOX::_net.joining_net_id == -1) {
                 if (NETMOX::_net.num_connected_players == connected_count ||
-                    (connected_count == 2 && (NETMOX::_net.mode == 1 || NETMOX::_net.mode == 2))) {
+                    (connected_count == 2 && NETMOX::_net.mode == 1)) {
                     payload.begin_state = 1;
                 } else {
                     if (netcode::Net_Get_Users_(nullptr) == connected_count) {
@@ -776,16 +697,11 @@ namespace NETSTART {
             }
         }
 
-        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 3) {
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) {
             netcode::Net_Disable_New_Players_();
         }
 
         fields::Assign_Auto_Function_(SCORE::nullsub, 2);
-
-        if (NETMOX::_net.mode == 3) {
-            ten::Ten_Stop(1);
-            ten::Ten_Flag();
-        }
 
         NETMOX::_net.num_connected_players = 0;
         if (MOX::_NUM_PLAYERS > 0) {
@@ -826,7 +742,7 @@ namespace NETSTART {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int32_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                NETMOX::_net.player_net_info[i].packet_type = 4;
+                NETMOX::_net.player_net_info[i].player_state = NET_PLAYER_STATE_READY;
                 NETMOX::_net.player_net_info[i].diplomacy_target_id = -1;
             }
         }
@@ -839,16 +755,15 @@ namespace NETSTART {
         }
 
         strcpy(payload.version_string, GAME_BUILD_DATE);
-        NETMOX::Mox_Send_Message_(0x7FFE, 42, &payload, sizeof(payload));
+        NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_LOAD_GAME_START, &payload, sizeof(payload));
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
-        transprt::_num_net_players = NETMOX::_net.num_connected_players;
         NETMOX::Broadcast_Game_Data_Differential_(1);
         NETMOX::_net.player_race_selected_flags[MOX::_PLAYER_NUM] = 1;
 
         NETMOX::_net.field_1db = 0;
         NETMOX::_net.field_1df = 0;
-        NETMOX::_net.sync_state = 4;
+        NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
 
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
@@ -863,13 +778,17 @@ namespace NETSTART {
 
     int32_t __cdecl Russ_Net_Create_Game_(const char* game_name, int32_t max_players, const char* str1, const char* str2) {
         RUSS::Mox_Update_();
+        if ((NETMOX::_net.mode == 0 || NETMOX::_net.mode == 1) && (game_name == nullptr || game_name[0] == '\0')) {
+            Ensure_Net_Game_Name_();
+            game_name = NETMOX::_net.cur_game_name;
+        }
         int32_t result = netcode::Net_Create_Game_(game_name, max_players, str1, str2);
         RUSS::Mox_Update_();
         return result;
     }
 
     int __cdecl Dump_Users_() {
-        uint8_t buffer[20];
+        int16_t buffer[20];
         return netcode::Net_Get_Users_(buffer);
     }
 
@@ -878,7 +797,7 @@ namespace NETSTART {
             return 0;
         }
 
-        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 0x2c, &requested_color, 1);
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_REQUEST_PLAYER_COLOR, &requested_color, sizeof(requested_color));
 
         while (RACESEL::_color_flag[requested_color] == 0) {
             int32_t unused_zero = 0;

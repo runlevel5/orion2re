@@ -28,7 +28,6 @@ namespace FILEDEF {
         fclose(file);
 
         RUSS::Assert_Settings_();
-        fclose(file);
 
         return true;
     }

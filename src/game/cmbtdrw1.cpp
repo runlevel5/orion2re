@@ -540,15 +540,9 @@ namespace CMBTDRW1 {
         int16_t visible_special_count = 0;
         int16_t y_pos = 0x17c;
 
-        // Manual setup of color palettes based on disassembled byte writes
-        memset(color_active.colors, 0x53 /* 'S' */, 8);
-        color_active.colors[0] = 0x50; /* 'P' */
-
-        color_inactive.colors[0] = 0xdf;
-        memset(&color_inactive.colors[1], 0xdc, 6);
-
-        color_damaged.colors[0] = 0x48; /* 'H' */
-        memset(&color_damaged.colors[1], 0x4a /* 'J' */, 7);
+        color_active = {{0x50, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53}};
+        color_inactive = {{0xDF, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC}};
+        color_damaged = {{0x48, 0x4A, 0x4A, 0x4A, 0x4A, 0x4A, 0x4A, 0x4A}};
 
         graphics::Interlaced_Fill_(0x72, 0x17a, 0x107, 0x1d2, 0, 0xc7 /* 199 */);
 
@@ -1982,11 +1976,11 @@ skip_cursor:
             int32_t picture_num;
 
             if (previous_owner < MAX_PLAYERS && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
-                memcpy(lbx_name, "cmbtshp.lbx", 12);
+                strcpy(lbx_name, "cmbtshp.lbx");
                 uint8_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
             } else {
-                memcpy(lbx_name, "monster.lbx", 12);
+                strcpy(lbx_name, "monster.lbx");
                 if (MOX::_combat_data[ship_idx].picture_num == 0x2C) {
                     picture_num = 25;
                 } else {

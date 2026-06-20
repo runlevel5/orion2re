@@ -39,8 +39,6 @@ namespace NETSTART {
 
     int32_t __cdecl Russ_Net_Create_Game_(const char* game_name, int32_t max_players, const char* str1, const char* str2);
 
-    bool __cdecl Do_Dial_(char* phone_number);
-
     char* __cdecl Load_Netstart_Strings_(char* buffer);
     int8_t __cdecl Request_Race_(uint8_t race_idx);
     int8_t __cdecl Request_Banner_Color_(uint8_t requested_color);
@@ -52,6 +50,4 @@ namespace NETSTART {
     int8_t __cdecl Net_Select_Race_();
 
     int8_t __cdecl Net_Pick_Position_();
-
-    int8_t __cdecl Do_Answer_();
 }

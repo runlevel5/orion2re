@@ -6,17 +6,17 @@
 #define ORION2RE_64BIT_BUILD 0
 #endif
 
-#ifndef ORION2RE_ENABLE_FPS_COUNTER
-#define ORION2RE_ENABLE_FPS_COUNTER 1
-#endif
-
-extern uint8_t g_ten_game_number;
 extern int16_t g_cached_mouse_x;
 extern int16_t g_cached_mouse_y;
 extern int32_t g_window_focus_state;
 extern uint32_t g_last_scan_code;
 
 namespace platform {
+	constexpr bool k_keep_rendering_when_unfocused = true;
+	constexpr int32_t k_exit_message_size = 256;
+
+	struct process_exit_requested {};
+
 	// Variables
 	extern uint32_t g_os_ver;
 	extern uint32_t g_win_minor;
@@ -26,7 +26,7 @@ namespace platform {
 	extern void* g_env_strings;
 	extern SDL_Thread* g_worker_thread_handle;
 	extern uint32_t _updating_cursor_img;
-	extern uint8_t g_should_exit;
+	extern char g_exit_message[k_exit_message_size];
 
 	extern void* g_main_window;
 
@@ -49,13 +49,22 @@ namespace platform {
 	extern uint8_t* _offscreen_surface;
 
 	// Functions
+	bool __cdecl Init_Exit_();
+	void __cdecl Shutdown_Exit_();
+	void __cdecl Reset_Exit_();
+	void __cdecl Request_Exit_(const char* message = nullptr);
+	bool __cdecl Exit_Requested_();
+	const char* __cdecl Exit_Message_();
+	void __cdecl Check_Exit_();
+	void __cdecl Mark_Game_Thread_Exited_();
+	bool __cdecl Game_Thread_Exited_();
 	bool Create_Video_Buffers_(int16_t video_mode);
 	void __cdecl Service_Pending_Window_Events_();
 	void __cdecl Pump_Game_Input_Queue_();
 	int16_t __cdecl Get_Mouse_X_();
 	int16_t __cdecl Get_Mouse_Y_();
 	void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y);
-	bool __cdecl Update_Active_World_Frame_();
+	bool __cdecl Update_Active_Screen_Frame_();
 	uint32_t Lock_Appropriate_Render_Buffer();
 	void Unlock_Appropriate_Render_Buffer();
 	void Copy_Off_Page_To_Present_Surface_();

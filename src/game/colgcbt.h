@@ -1,5 +1,25 @@
 #pragma once
 
+struct s_animation_header;
+
+typedef struct s_ground_unit s_ground_unit, *Ps_ground_unit;
+
+struct s_ground_unit {
+    int16_t x;
+    int16_t y;
+    undefined1 field2_0x4;
+    uint8_t state;
+    int8_t type;
+    int8_t side;
+    int8_t anim_frame;
+    int8_t action_timer;
+    int16_t y_offset;
+    int8_t is_hit;
+    struct s_ground_unit *target;
+    int32_t sound_id;
+    int32_t sound_handle;
+};
+
 namespace COLGCBT {
     extern s_help_box _colony_ground_combat_screen_help[3];
     extern s_mouse_list _mouse_list_blank;

@@ -180,9 +180,9 @@ namespace DIP_SCRN {
                 _net_diplomacy_message.sender_player_id = (uint8_t)sender_id;
                 _net_diplomacy_message.target_player_id = (uint8_t)target_id;
                 _net_diplomacy_message.arg1 = treaty_type;
-                _net_diplomacy_message.msg_type = 1001 /* 0x3e9 */;
+                _net_diplomacy_message.msg_type = DIP_NET_MSG_BREAK_TREATY;
                 _net_diplomacy_message.arg2 = _response_message;
-                NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, 2000, &_net_diplomacy_message, 8);
+                NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                 RUSS::Mox_Update_();
             }
         }
@@ -256,9 +256,9 @@ namespace DIP_SCRN {
                     _net_diplomacy_message.sender_player_id = (uint8_t)sender_id;
                     _net_diplomacy_message.target_player_id = (uint8_t)target_id;
                     _net_diplomacy_message.arg1 = 0;
-                    _net_diplomacy_message.msg_type = 0x3EA;
+                    _net_diplomacy_message.msg_type = DIP_NET_MSG_DECLARE_WAR;
 
-                    NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, 2000, &_net_diplomacy_message, 8);
+                    NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                     RUSS::Mox_Update_();
                 }
                 _response_message = 0xA0;
@@ -303,9 +303,9 @@ namespace DIP_SCRN {
                     DIP_SCRN::_net_diplomacy_message.sender_player_id = (uint8_t)sender_player_id;
                     DIP_SCRN::_net_diplomacy_message.target_player_id = (uint8_t)target_player_id;
                     DIP_SCRN::_net_diplomacy_message.arg1 = 0;
-                    DIP_SCRN::_net_diplomacy_message.msg_type = 1003 /* 0x3eb */;
+                    DIP_SCRN::_net_diplomacy_message.msg_type = DIP_NET_MSG_SURRENDER;
 
-                    NETMOX::Mox_Send_Message_(target_plr->network_player_id, 2000, &DIP_SCRN::_net_diplomacy_message, 8);
+                    NETMOX::Mox_Send_Message_(target_plr->network_player_id, DIP_NET_PACKET_MESSAGE, &DIP_SCRN::_net_diplomacy_message, sizeof(DIP_SCRN::_net_diplomacy_message));
                     RUSS::Mox_Update_();
                 }
             }
@@ -363,7 +363,7 @@ namespace DIP_SCRN {
 
                 NETMOX::Mox_Send_Message_(
                     MOX::_player[player_idx].network_player_id,
-                    0x834 /* MSG_NET_CHAT */,
+                    DIP_NET_PACKET_CHAT,
                     DIP_SCRN::_net_diplomacy_chat_message,
                     sizeof(DIP_SCRN::_net_diplomacy_chat_message)
                 );
@@ -443,10 +443,10 @@ namespace DIP_SCRN {
         DIP_SCRN::_net_diplomacy_message.sender_player_id = (uint8_t)player_id;
         DIP_SCRN::_net_diplomacy_message.target_player_id = (uint8_t)target_player_id;
         DIP_SCRN::_net_diplomacy_message.arg1 = treaty_type;
-        DIP_SCRN::_net_diplomacy_message.msg_type = 1000;
+        DIP_SCRN::_net_diplomacy_message.msg_type = DIP_NET_MSG_TREATY_PROPOSAL;
         DIP_SCRN::_net_diplomacy_message.arg2 = (int16_t)_response_message;
 
-        NETMOX::Mox_Send_Message_(MOX::_player[target_player_id].network_player_id, 2000, &DIP_SCRN::_net_diplomacy_message, 8);
+        NETMOX::Mox_Send_Message_(MOX::_player[target_player_id].network_player_id, DIP_NET_PACKET_MESSAGE, &DIP_SCRN::_net_diplomacy_message, sizeof(DIP_SCRN::_net_diplomacy_message));
         RUSS::Mox_Update_();
 
         DIP_SCRN::Get_Listen_Mode_Message_(target_player_id);
@@ -472,7 +472,7 @@ namespace DIP_SCRN {
         int32_t local_buffer[TECH_APP_COUNT]; // Buffer for NPC diplomacy calculations
 
         // Initialize output buffer
-        memset(tech_list_buffer, 0, 10);
+        memset(tech_list_buffer, 0, 10 * sizeof(*tech_list_buffer));
 
         aitech::Get_Max_Technology_Value_(player_a_idx);
 
@@ -585,13 +585,13 @@ namespace DIP_SCRN {
                 _net_diplomacy_message.sender_player_id = (uint8_t)player_idx;
                 _net_diplomacy_message.target_player_id = target_player_id;
                 _net_diplomacy_message.arg2 = -1;
-                _net_diplomacy_message.msg_type = 1006 /* 0x3ee */;
+                _net_diplomacy_message.msg_type = DIP_NET_MSG_GOODBYE;
 
                 NETMOX::Mox_Send_Message_(
                     MOX::_player[player_idx].network_player_id,
-                    2000,
+                    DIP_NET_PACKET_MESSAGE,
                     &_net_diplomacy_message,
-                    8
+                    sizeof(_net_diplomacy_message)
                 );
                 RUSS::Mox_Update_();
                 _net_diplomacy_esc_pressed = 1;
@@ -1069,11 +1069,11 @@ namespace DIP_SCRN {
                     } else {
                         _net_diplomacy_message.arg2 = 0;
                         _net_diplomacy_message.sender_player_id = (uint8_t)player_1;
-                        _net_diplomacy_message.msg_type = 0x3F1;
+                        _net_diplomacy_message.msg_type = DIP_NET_MSG_TECH_EXCHANGE_PROPOSE;
                         _net_diplomacy_message.target_player_id = (uint8_t)player_2;
                         _net_diplomacy_message.arg1 = tech_1;
 
-                        NETMOX::Mox_Send_Message_(MOX::_player[player_2].network_player_id, 2000, &_net_diplomacy_message, 8);
+                        NETMOX::Mox_Send_Message_(MOX::_player[player_2].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                         RUSS::Mox_Update_();
 
                         Get_Listen_Mode_Message_(player_2);
@@ -1100,11 +1100,11 @@ namespace DIP_SCRN {
 
                             _net_diplomacy_message.arg1 = action;
                             _net_diplomacy_message.sender_player_id = (uint8_t)player_1;
-                            _net_diplomacy_message.msg_type = 0x3F2;
+                            _net_diplomacy_message.msg_type = DIP_NET_MSG_TECH_EXCHANGE_DECISION;
                             _net_diplomacy_message.target_player_id = (uint8_t)player_2;
                             _net_diplomacy_message.arg2 = tech_2;
 
-                            NETMOX::Mox_Send_Message_(MOX::_player[player_2].network_player_id, 2000, &_net_diplomacy_message, 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[player_2].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
 
                             if (action == -1) {
@@ -1220,10 +1220,10 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.sender_player_id = (uint8_t)player_idx;
                         _net_diplomacy_message.target_player_id = (uint8_t)target_player_idx;
                         _net_diplomacy_message.arg1 = system_sel;
-                        _net_diplomacy_message.msg_type = 1007; // 0x3ef
+                        _net_diplomacy_message.msg_type = DIP_NET_MSG_BETTER_OFFER_SYSTEM;
                         _net_diplomacy_message.arg2 = _response_message;
 
-                        NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 2000, &_net_diplomacy_message, 8);
+                        NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                         RUSS::Mox_Update_();
                         Get_Listen_Mode_Message_(target_player_idx);
                         _net_diplomacy_message.arg2 = -1;
@@ -1274,10 +1274,10 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.sender_player_id = (uint8_t)player_idx;
                         _net_diplomacy_message.target_player_id = (uint8_t)target_player_idx;
                         _net_diplomacy_message.arg1 = tech_app_id;
-                        _net_diplomacy_message.msg_type = 1008; // 0x3f0
+                        _net_diplomacy_message.msg_type = DIP_NET_MSG_BETTER_OFFER_TECH;
                         _net_diplomacy_message.arg2 = _response_message;
 
-                        NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 2000, &_net_diplomacy_message, 8);
+                        NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                         RUSS::Mox_Update_();
                         _net_diplomacy_message.arg2 = -1;
                         Get_Listen_Mode_Message_(target_player_idx);
@@ -1317,10 +1317,10 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.sender_player_id = (uint8_t)player_idx;
                         _net_diplomacy_message.target_player_id = (uint8_t)target_player_idx;
                         _net_diplomacy_message.arg1 = money_amount;
-                        _net_diplomacy_message.msg_type = 1013; // 0x3f5
+                        _net_diplomacy_message.msg_type = DIP_NET_MSG_BETTER_OFFER_BC;
                         _net_diplomacy_message.arg2 = _response_message;
 
-                        NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 2000, &_net_diplomacy_message, 8);
+                        NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, DIP_NET_PACKET_MESSAGE, &_net_diplomacy_message, sizeof(_net_diplomacy_message));
                         RUSS::Mox_Update_();
                         _net_diplomacy_message.arg2 = -1;
                         Get_Listen_Mode_Message_(target_player_idx);
@@ -1720,8 +1720,8 @@ namespace DIP_SCRN {
                     int32_t resp = _response_message;
                     _chat_mode_flag = 0;
 
-                    if (resp <= 1000) {
-                        if (resp == 1000) {
+                    if (resp <= DIP_NET_MSG_TREATY_PROPOSAL) {
+                        if (resp == DIP_NET_MSG_TREATY_PROPOSAL) {
                             _response_message = _net_diplomacy_message.arg2;
                             _net_diplomacy_treaty_type = _net_diplomacy_message.arg1;
                             int16_t choice = Get_Human_Treaty_Choice_(_talker_ambassador, _listen_ambassador, _net_diplomacy_message.arg1);
@@ -1730,7 +1730,7 @@ namespace DIP_SCRN {
                             _net_diplomacy_message.arg2 = choice;
                             _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(_talker_ambassador);
                             _net_diplomacy_message.target_player_id = static_cast<uint8_t>(_listen_ambassador);
-                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
                             _response_message = 0;
                             _old_response_message = 0;
@@ -1749,9 +1749,9 @@ namespace DIP_SCRN {
                             done_flag = 1;
                         }
                     }
-                    else if (resp <= 1013) {
+                    else if (resp <= DIP_NET_MSG_BETTER_OFFER_BC) {
                         switch (resp) {
-                        case 1001: {
+                        case DIP_NET_MSG_BREAK_TREATY: {
                             _response_message = _net_diplomacy_message.arg2;
                             Get_Human_Break_Treaty_Message_(_talker_ambassador, _net_diplomacy_message.arg1);
                             switch (_net_diplomacy_message.arg1) {
@@ -1774,14 +1774,14 @@ namespace DIP_SCRN {
                             _old_response_message = 0;
                             break;
                         }
-                        case 1002: {
+                        case DIP_NET_MSG_DECLARE_WAR: {
                             Get_Human_Declare_War_Message_(_talker_ambassador);
                             _response_message = 0;
                             _old_response_message = 0;
                             diplomac::Declare_War_(_talker_ambassador, _listen_ambassador);
                             break;
                         }
-                        case 1003: {
+                        case DIP_NET_MSG_SURRENDER: {
                             _response_message = 0;
                             _old_response_message = 0;
                             Get_Human_Surrender_Message_(_talker_ambassador);
@@ -1789,7 +1789,7 @@ namespace DIP_SCRN {
                             done_flag = 1;
                             break;
                         }
-                        case 1004: {
+                        case DIP_NET_MSG_GIFT_RESPONSE: {
                             _response_message = 0;
                             _old_response_message = 0;
                             Get_Human_Offer_Gift_Message_(_talker_ambassador, _net_diplomacy_message.arg1, _net_diplomacy_message.arg2);
@@ -1814,7 +1814,7 @@ namespace DIP_SCRN {
                             }
                             break;
                         }
-                        case 1005: {
+                        case DIP_NET_MSG_DEMAND: {
                             Get_Human_Demand_Message_(_talker_ambassador, _listen_ambassador, _net_diplomacy_message.arg1, _net_diplomacy_message.arg2);
                             int16_t demand_choice = Get_Human_Demand_Choice_(_listen_ambassador, _talker_ambassador, _net_diplomacy_message.arg1, _net_diplomacy_message.arg2);
                             _response_message = 0xA8;
@@ -1827,12 +1827,12 @@ namespace DIP_SCRN {
                             _net_diplomacy_message.arg2 = demand_choice;
                             _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(_talker_ambassador);
                             _net_diplomacy_message.target_player_id = static_cast<uint8_t>(_listen_ambassador);
-                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
                             Get_Listen_Mode_Message_(_talker_ambassador);
                             break;
                         }
-                        case 1007: {
+                        case DIP_NET_MSG_BETTER_OFFER_SYSTEM: {
                             _response_message = _old_response_message;
                             int16_t list_choice = Diplomacy_Generic_System_List_(_net_diplomacy_message.arg1, _talker_ambassador, _listen_ambassador, 0);
                             if (list_choice == -1) {
@@ -1850,13 +1850,13 @@ namespace DIP_SCRN {
                             _net_diplomacy_message.arg2 = list_choice;
                             _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(_talker_ambassador);
                             _net_diplomacy_message.target_player_id = static_cast<uint8_t>(_listen_ambassador);
-                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
                             _response_message = 0;
                             _old_response_message = 0;
                             break;
                         }
-                        case 1008: {
+                        case DIP_NET_MSG_BETTER_OFFER_TECH: {
                             _response_message = _old_response_message;
                             char* tech_name = TECH::Technology_Applications_Name_(_net_diplomacy_message.arg1, _talker_ambassador);
                             sprintf(msg_buf, "  %s", tech_name);
@@ -1875,13 +1875,13 @@ namespace DIP_SCRN {
                             _net_diplomacy_message.arg2 = list_choice;
                             _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(_talker_ambassador);
                             _net_diplomacy_message.target_player_id = static_cast<uint8_t>(_listen_ambassador);
-                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
                             _response_message = 0;
                             _old_response_message = 0;
                             break;
                         }
-                        case 1009: {
+                        case DIP_NET_MSG_TECH_EXCHANGE_PROPOSE: {
                             _response_message = 0;
                             _old_response_message = 0;
                             Get_Human_Tech_Exchange_First_Message_(_talker_ambassador, _listen_ambassador, _net_diplomacy_message.arg1);
@@ -1896,12 +1896,12 @@ namespace DIP_SCRN {
                             _net_diplomacy_message.arg2 = exch_choice;
                             _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(_talker_ambassador);
                             _net_diplomacy_message.target_player_id = static_cast<uint8_t>(_listen_ambassador);
-                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
                             Get_Listen_Mode_Message_(_talker_ambassador);
                             break;
                         }
-                        case 1010: {
+                        case DIP_NET_MSG_TECH_EXCHANGE_DECISION: {
                             _response_message = 0;
                             _old_response_message = 0;
                             if (_net_diplomacy_message.arg1 == -1) {
@@ -1916,13 +1916,13 @@ namespace DIP_SCRN {
                             _old_response_message = 0;
                             break;
                         }
-                        case 1011: {
+                        case DIP_NET_MSG_SWITCH_TALKER: {
                             _response_message = 0;
                             _old_response_message = 0;
                             sprintf(_diplomacy_message, "%s", s__00551100);
                             break;
                         }
-                        case 1013: {
+                        case DIP_NET_MSG_BETTER_OFFER_BC: {
                             _response_message = _old_response_message;
                             sprintf(msg_buf, s__d_BC_00552384, _net_diplomacy_message.arg1);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
@@ -1941,7 +1941,7 @@ namespace DIP_SCRN {
                             _net_diplomacy_message.arg2 = list_choice;
                             _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(_talker_ambassador);
                             _net_diplomacy_message.target_player_id = static_cast<uint8_t>(_listen_ambassador);
-                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                            NETMOX::Mox_Send_Message_(MOX::_player[_talker_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                             RUSS::Mox_Update_();
                             _response_message = 0;
                             _old_response_message = 0;
@@ -2044,7 +2044,7 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.arg2 = -1;
                         _net_diplomacy_message.msg_type = 0x82;
                         done_flag = 1;
-                        NETMOX::Mox_Send_Message_(MOX::_player[_listen_ambassador].network_player_id, 2000, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), 8);
+                        NETMOX::Mox_Send_Message_(MOX::_player[_listen_ambassador].network_player_id, DIP_NET_PACKET_MESSAGE, reinterpret_cast<uint8_t*>(&_net_diplomacy_message), sizeof(_net_diplomacy_message));
                         RUSS::Mox_Update_();
                         fields::Clear_Fields_();
                         break;
@@ -2114,12 +2114,12 @@ namespace DIP_SCRN {
             _net_diplomacy_message.sender_player_id = (uint8_t)player_id;
             _net_diplomacy_message.target_player_id = (uint8_t)target_player_id;
             _net_diplomacy_message.arg1 = demand_type;
-            _net_diplomacy_message.msg_type = 1005 /* 0x3ED */;
+            _net_diplomacy_message.msg_type = DIP_NET_MSG_DEMAND;
             _net_diplomacy_message.arg2 = demand_arg;
 
             NETMOX::Mox_Send_Message_(
                 MOX::_player[target_player_id].network_player_id, 
-                2000 /* 0x7D0 */, 
+                DIP_NET_PACKET_MESSAGE,
                 &_net_diplomacy_message, 
                 8
             );
@@ -2325,7 +2325,7 @@ namespace DIP_SCRN {
         JIM::Get_Text_Message_(s_jimtext2_lbx, 0x3A /* 58 */, _system_x_star_system_buffer, 0x23 /* 35 */);
         JIM::Decode_Text_System_(_system_x_star_system_buffer, star_idx, 0x23);
 
-        memset(enabled_flags, 1, 10);
+        memset(enabled_flags, 1, sizeof(enabled_flags));
 
         JIM::Get_Text_Message_(s_jimtext_lbx, 0x4B /* 75 */, list_title, 0x28 /* 40 */);
 
@@ -2421,13 +2421,13 @@ namespace DIP_SCRN {
         // Note: _net_diplomacy_message.arg1 is left uninitialized by this function.
 
         DIP_SCRN::_net_diplomacy_message.arg2 = -1;
-        DIP_SCRN::_net_diplomacy_message.msg_type = 1012 /* 0x3F4 */;
+        DIP_SCRN::_net_diplomacy_message.msg_type = DIP_NET_MSG_HANDSHAKE;
 
         NETMOX::Mox_Send_Message_(
             MOX::_player[sender_player_id].network_player_id,
-            2000 /* 0x7D0 */,
+            DIP_NET_PACKET_MESSAGE,
             &DIP_SCRN::_net_diplomacy_message,
-            8
+            sizeof(DIP_SCRN::_net_diplomacy_message)
         );
 
         RUSS::Mox_Update_();
@@ -2463,12 +2463,12 @@ namespace DIP_SCRN {
         // Populate message with original state before variables were swapped
         DIP_SCRN::_net_diplomacy_message.sender_player_id = original_listen;
         DIP_SCRN::_net_diplomacy_message.target_player_id = original_talker;
-        DIP_SCRN::_net_diplomacy_message.msg_type = 1011 /* 0x3F3 */;
+        DIP_SCRN::_net_diplomacy_message.msg_type = DIP_NET_MSG_SWITCH_TALKER;
 
         // Send message to the new talker (who was the original listener)
         NETMOX::Mox_Send_Message_(
             MOX::_player[DIP_SCRN::_talker_ambassador].network_player_id,
-            2000,
+            DIP_NET_PACKET_MESSAGE,
             &DIP_SCRN::_net_diplomacy_message,
             sizeof(s_dipscrn_net_message)
         );
@@ -2518,11 +2518,11 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg) {
-        if (msg_code < 2000 || msg_code >= 3000) {
+        if (msg_code < DIP_NET_PACKET_MESSAGE || msg_code >= DIP_NET_PACKET_RANGE_END) {
             return;
         }
 
-        if (msg_code == 2000) {
+        if (msg_code == DIP_NET_PACKET_MESSAGE) {
             _net_diplomacy_chat_message[0] = s__00551100[0];
             _receive_chat_message[0] = s__00551100[0];
 
@@ -2533,11 +2533,11 @@ namespace DIP_SCRN {
             _net_diplomacy_message.arg1 = net_msg->arg1;
 
             switch (_net_diplomacy_message.msg_type) {
-                case 1006 /* 0x3ee */:
+                case DIP_NET_MSG_GOODBYE:
                     _net_diplomacy_esc_pressed = 1;
                     return;
 
-                case 1011 /* 0x3f3 */:
+                case DIP_NET_MSG_SWITCH_TALKER:
                     _net_diplomacy_message.msg_type = 0;
                     _response_message = 0;
                     _old_response_message = 0;
@@ -2545,11 +2545,11 @@ namespace DIP_SCRN {
                     // Fallthrough to default behavior
                     break;
 
-                case 1012 /* 0x3f4 */:
+                case DIP_NET_MSG_HANDSHAKE:
                     _synch_up_established_flag = 1;
                     return;
 
-                case 1014 /* 0x3f6 */:
+                case DIP_NET_MSG_UNUSED_0x3F6:
                     return;
 
                 default:
@@ -2562,7 +2562,7 @@ namespace DIP_SCRN {
             return;
         }
 
-        if (msg_code == 2100 /* 0x834 */) {
+        if (msg_code == DIP_NET_PACKET_CHAT) {
             strcpy(_receive_chat_message, (char*)net_msg);
         }
     }

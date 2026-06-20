@@ -1,6 +1,19 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
+
+typedef struct s_flic_queue_entry s_flic_queue_entry, *Ps_flic_queue_entry;
+
+struct s_flic_queue_entry {
+    int16_t x;
+    int16_t y;
+    int16_t current_frame;
+    struct s_animation_header *animation;
+    uint8_t play_mode;
+    uint8_t use_clipping;
+};
+
 namespace FLCQUEUE {
     extern int16_t _n_queue_entries;
 

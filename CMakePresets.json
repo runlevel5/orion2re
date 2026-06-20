@@ -184,7 +184,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x86.cmake",
         "ORION2RE_WINDOWS_ARCH": "x86",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -202,7 +201,6 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x86.cmake",
         "ORION2RE_WINDOWS_ARCH": "x86",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -220,7 +218,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x64.cmake",
         "ORION2RE_WINDOWS_ARCH": "x64",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -238,7 +235,6 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/mingw-w64-x64.cmake",
         "ORION2RE_WINDOWS_ARCH": "x64",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -254,7 +250,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -270,7 +265,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_BUILD_TESTS": "OFF"
       }
     },
@@ -286,7 +280,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
       }
     },
@@ -306,8 +299,7 @@
         "CMAKE_CXX_FLAGS": "-m32",
         "CMAKE_EXE_LINKER_FLAGS": "-m32",
         "CMAKE_SHARED_LINKER_FLAGS": "-m32",
-        "CMAKE_MODULE_LINKER_FLAGS": "-m32",
-        "ORION2RE_ENABLE_NETWORKING": "OFF"
+        "CMAKE_MODULE_LINKER_FLAGS": "-m32"
       }
     },
     {
@@ -326,8 +318,7 @@
         "CMAKE_CXX_FLAGS": "-m32",
         "CMAKE_EXE_LINKER_FLAGS": "-m32",
         "CMAKE_SHARED_LINKER_FLAGS": "-m32",
-        "CMAKE_MODULE_LINKER_FLAGS": "-m32",
-        "ORION2RE_ENABLE_NETWORKING": "OFF"
+        "CMAKE_MODULE_LINKER_FLAGS": "-m32"
       }
     },
     {
@@ -347,8 +338,119 @@
         "CMAKE_EXE_LINKER_FLAGS": "-m32",
         "CMAKE_SHARED_LINKER_FLAGS": "-m32",
         "CMAKE_MODULE_LINKER_FLAGS": "-m32",
-        "ORION2RE_ENABLE_NETWORKING": "OFF",
         "ORION2RE_ENABLE_ASAN": "ON"
+      }
+    },
+    {
+      "name": "osx-debug",
+      "displayName": "macOS ARM64 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "osx-release",
+      "displayName": "macOS ARM64 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ORION2RE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "osx-debug-asan",
+      "displayName": "macOS ARM64 Debug (ASan)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${hostSystemName}/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      }
+    },
+    {
+      "name": "win32-debug-asan-tests",
+      "displayName": "Win32 Debug (ASan) + Tests",
+      "inherits": "win32-debug-asan",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "win64-debug-asan-tests",
+      "displayName": "Win64 Debug (ASan) + Tests",
+      "inherits": "win64-debug-asan",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "mingw-win32-debug-asan-tests",
+      "displayName": "MinGW Win32 Debug (ASan) + Tests",
+      "inherits": "mingw-win32-debug",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      }
+    },
+    {
+      "name": "mingw-win64-debug-asan-tests",
+      "displayName": "MinGW Win64 Debug (ASan) + Tests",
+      "inherits": "mingw-win64-debug",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON",
+        "ORION2RE_ENABLE_ASAN": "ON"
+      }
+    },
+    {
+      "name": "linux-debug-asan-tests",
+      "displayName": "Linux Native Debug (ASan) + Tests",
+      "inherits": "linux-debug-asan",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "linux-router",
+      "displayName": "Linux Router Only",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "ORION2RE_BUILD_GAME": "OFF",
+        "ORION2RE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "linux-x86-debug-asan-tests",
+      "displayName": "Linux x86 Debug (ASan) + Tests",
+      "inherits": "linux-x86-debug-asan",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "osx-debug-asan-tests",
+      "displayName": "macOS ARM64 Debug (ASan) + Tests",
+      "inherits": "osx-debug-asan",
+      "cacheVariables": {
+        "ORION2RE_BUILD_TESTS": "ON"
       }
     }
   ],
@@ -442,6 +544,85 @@
       "name": "linux-x86-debug-asan",
       "configurePreset": "linux-x86-debug-asan",
       "configuration": "Debug"
+    },
+    {
+      "name": "osx-debug",
+      "configurePreset": "osx-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "osx-release",
+      "configurePreset": "osx-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "osx-debug-asan",
+      "configurePreset": "osx-debug-asan",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win32-debug-asan-tests",
+      "configurePreset": "win32-debug-asan-tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win64-debug-asan-tests",
+      "configurePreset": "win64-debug-asan-tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "mingw-win32-debug-asan-tests",
+      "configurePreset": "mingw-win32-debug-asan-tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "mingw-win64-debug-asan-tests",
+      "configurePreset": "mingw-win64-debug-asan-tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-debug-asan-tests",
+      "configurePreset": "linux-debug-asan-tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-router",
+      "configurePreset": "linux-router",
+      "configuration": "Debug",
+      "targets": [
+        "orion2re-router"
+      ]
+    },
+    {
+      "name": "linux-x86-debug-asan-tests",
+      "configurePreset": "linux-x86-debug-asan-tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "osx-debug-asan-tests",
+      "configurePreset": "osx-debug-asan-tests",
+      "configuration": "Debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "linux-debug-asan-tests",
+      "configurePreset": "linux-debug-asan-tests",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-router-tests",
+      "configurePreset": "linux-debug-asan-tests",
+      "filter": {
+        "include": {
+          "name": "test_router_protocol|test_router_core|test_router_service|test_router_client|test_router_session_browser|test_netadapter"
+        }
+      },
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }

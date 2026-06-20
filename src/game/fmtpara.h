@@ -2,6 +2,78 @@
 
 struct s_animation_header;
 
+typedef struct s_fmtpara_break s_fmtpara_break, *Ps_fmtpara_break;
+typedef struct s_fmtpara_style s_fmtpara_style, *Ps_fmtpara_style;
+
+struct s_fmtpara_style {
+    int8_t font_id;
+    undefined1 highlight;
+    uint8_t fg_color;
+    uint8_t bg_color;
+    uint8_t color_attr;
+    int16_t font_height_px;
+    int8_t *char_widths;
+    int16_t space_width;
+};
+
+struct s_fmtpara_break {
+    const char *break_str_next;
+    int16_t break_x;
+    int16_t break_x_candidate;
+    int16_t insert_case;
+    int16_t line_y_offset;
+    int16_t font_spacing;
+    int16_t nest_depth;
+    int16_t char_count;
+    int16_t space_count;
+    bool break_is_backspace;
+    bool break_valid;
+    s_fmtpara_style style;
+};
+
+typedef struct s_fmtpara_global s_fmtpara_global, *Ps_fmtpara_global;
+
+struct s_fmtpara_global {
+    int16_t min_x;
+    int16_t min_y;
+    int16_t max_x;
+    int16_t max_y;
+    void *item_ptr[16];
+    int8_t item_type[16];
+    void *user_fn;
+    bool cond_flag;
+    bool use_plural;
+};
+
+typedef struct s_fmtpara_para s_fmtpara_para, *Ps_fmtpara_para;
+
+struct s_fmtpara_para {
+    int16_t para_y;
+    const char *str;
+    int16_t x1;
+    int16_t x2;
+    int16_t y;
+    int16_t y_origin;
+    int16_t width;
+    struct s_animation_header *seg;
+    bool do_render;
+    int16_t line_start_x;
+    int16_t line_right_limit_x;
+    int16_t y2_limit;
+    undefined field12_0x1b;
+    undefined field13_0x1c;
+    int16_t line_advance_y;
+    int16_t para_advance_y;
+    int16_t first_line_indent;
+    int16_t right_indent;
+    int16_t left_indent;
+    int8_t justify_mode;
+    int8_t paragraph_break;
+    int16_t nest_depth;
+    const char *nest_stack[9];
+    struct s_fmtpara_line *line;
+};
+
 namespace FMTPARA {
     using user_fn = void(*)(s_fmtpara_para*, uint32_t, int32_t);
 

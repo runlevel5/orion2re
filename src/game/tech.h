@@ -8,6 +8,32 @@ struct s_colors;
 struct s_animation_header;
 struct s_fieldsav_data;
 
+typedef struct s_list_item_research s_list_item_research, *Ps_list_item_research;
+
+struct s_list_item_research {
+    int16_t x;
+    int16_t y;
+    int16_t id;
+    uint8_t current_app_index;
+    int16_t selected_app_index;
+    char field_name[62];
+    uint8_t group_id;
+    uint8_t group_color_index;
+    int16_t button_field_id;
+    int16_t button_value;
+    struct s_animation_header *button_image;
+    int16_t tech_field_id;
+    int32_t research_cost_remaining;
+    char buf[20];
+    int8_t visible_app_count;
+    char app_names[4][64];
+    int16_t label_x;
+    int16_t app_label_y[4];
+    int16_t app_click_field_ids[4];
+    int16_t app_ids[4];
+    int16_t list_win_x;
+};
+
 namespace TECH {
     /** Opens the technology selection screen for the current player. */
     void __cdecl Tech_Select_();

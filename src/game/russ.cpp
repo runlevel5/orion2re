@@ -213,6 +213,7 @@ namespace RUSS {
     }
 
     void __cdecl Mox_Update_() {
+        platform::Check_Exit_();
         sound::Sound_Update_();
         NETMOX::Mox_Net_Update_();
     }

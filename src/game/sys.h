@@ -1,6 +1,8 @@
 #pragma once
 
 namespace SYS {
+    inline constexpr size_t SYSTEM_DISPLAY_LOADED_FLAG_LENGTH = 20;
+
     extern void* _sys_data_buffer;
 
     extern uint8_t _draw_sun_before_planet;

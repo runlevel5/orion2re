@@ -1,6 +1,5 @@
 #include "pch.h"
 
-uint8_t g_ten_game_number;
 int16_t g_cached_mouse_x;
 int16_t g_cached_mouse_y;
 int32_t g_window_focus_state;
@@ -12,10 +11,12 @@ namespace platform {
 		SDL_Window* g_sdl_window;
 		SDL_Renderer* g_sdl_renderer;
 		SDL_Texture* g_sdl_present_texture;
+		SDL_Surface* g_sdl_screen_index_surface;
+		SDL_Surface* g_sdl_present_argb_surface;
+		SDL_Surface* g_sdl_cursor_surface;
+		SDL_Palette* g_sdl_present_palette;
 		uint32_t* g_sdl_present_pixels;
 		video::s_palette_color g_present_palette_entries[256];
-		uint32_t g_fps_window_start_ms;
-		uint32_t g_fps_frame_count;
 		constexpr int32_t k_cursor_dimension = 24;
 		constexpr int32_t k_cursor_pixel_count = k_cursor_dimension * k_cursor_dimension;
 		constexpr uint16_t k_input_queue_capacity = 256;
@@ -42,21 +43,48 @@ namespace platform {
 		};
 
 		SDL_Mutex* g_input_queue_mutex;
+		SDL_Mutex* g_present_cursor_mutex;
 		s_input_event g_input_event_queue[k_input_queue_capacity];
 		uint16_t g_input_queue_read;
 		uint16_t g_input_queue_write;
 		uint16_t g_sdl_mouse_buttons;
-		s_present_cursor_state g_present_cursor_states[2];
-		SDL_AtomicInt g_present_cursor_state_index;
+		s_present_cursor_state g_pending_cursor_state;
+		s_present_cursor_state g_active_cursor_state;
+		uint32_t g_pending_cursor_generation;
+		uint32_t g_applied_cursor_generation;
 		SDL_AtomicInt g_present_mouse_x;
 		SDL_AtomicInt g_present_mouse_y;
+		SDL_AtomicInt g_present_refresh_requested;
+		SDL_Mutex* g_exit_mutex;
+		SDL_Condition* g_exit_condition;
+		SDL_AtomicInt g_exit_requested;
+		SDL_AtomicInt g_game_thread_exited;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
-		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries);
+		bool Ensure_Present_Palette_();
+		bool Ensure_Cursor_Surface_();
+		void Apply_Pending_Cursor_State_();
+		void Blit_Cursor_On_Present_Surface_();
+		void Sync_Mouse_State_From_SDL_();
+
+		void Request_Present_Refresh_() {
+			SDL_SetAtomicInt(&g_present_refresh_requested, 1);
+		}
+
+		bool Consume_Present_Refresh_Request_() {
+			return SDL_SetAtomicInt(&g_present_refresh_requested, 0) != 0;
+		}
 
 		void Set_Present_Mouse_Position_(int16_t x, int16_t y) {
+			const int previous_x = SDL_GetAtomicInt(&g_present_mouse_x);
+			const int previous_y = SDL_GetAtomicInt(&g_present_mouse_y);
+
 			SDL_SetAtomicInt(&g_present_mouse_x, (int)x);
 			SDL_SetAtomicInt(&g_present_mouse_y, (int)y);
+
+			if (previous_x != (int)x || previous_y != (int)y) {
+				Request_Present_Refresh_();
+			}
 		}
 
 		uint16_t Previous_Input_Queue_Index_(uint16_t index) {
@@ -160,94 +188,31 @@ namespace platform {
 			return ((float)coord * (float)(window_extent - 1)) / (float)(game_extent - 1);
 		}
 
-		[[noreturn]] void Force_Immediate_Process_Exit_() {
-			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "platform: Force_Immediate_Process_Exit");
-			Prepare_Exit_();
-			exit(0);
-		}
-
-		void Fill_Rect_32_(int32_t x, int32_t y, int32_t width, int32_t height, uint32_t color) {
-			if (g_sdl_present_pixels == nullptr) {
+		void Copy_Exit_Message_(const char* message) {
+			if (message == nullptr) {
+				g_exit_message[0] = '\0';
 				return;
 			}
 
-			for (int32_t row = 0; row < height; ++row) {
-				const int32_t dst_y = y + row;
-				if (dst_y < 0 || dst_y >= video::g_screen_res_y) {
-					continue;
-				}
-
-				for (int32_t col = 0; col < width; ++col) {
-					const int32_t dst_x = x + col;
-					if (dst_x < 0 || dst_x >= video::g_screen_res_x) {
-						continue;
-					}
-
-					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] = color;
-				}
-			}
+			strncpy(g_exit_message, message, sizeof(g_exit_message) - 1);
+			g_exit_message[sizeof(g_exit_message) - 1] = '\0';
 		}
 
-		void Draw_Glyph_3x5_(int32_t x, int32_t y, char glyph, uint32_t color) {
-			static const uint8_t k_digits[10][5] = {
-				{0x7, 0x5, 0x5, 0x5, 0x7},
-				{0x2, 0x6, 0x2, 0x2, 0x7},
-				{0x7, 0x1, 0x7, 0x4, 0x7},
-				{0x7, 0x1, 0x7, 0x1, 0x7},
-				{0x5, 0x5, 0x7, 0x1, 0x1},
-				{0x7, 0x4, 0x7, 0x1, 0x7},
-				{0x7, 0x4, 0x7, 0x5, 0x7},
-				{0x7, 0x1, 0x1, 0x1, 0x1},
-				{0x7, 0x5, 0x7, 0x5, 0x7},
-				{0x7, 0x5, 0x7, 0x1, 0x7},
-			};
-			static const uint8_t k_f[5] = {0x7, 0x4, 0x6, 0x4, 0x4};
-			static const uint8_t k_p[5] = {0x6, 0x5, 0x6, 0x4, 0x4};
-			static const uint8_t k_s[5] = {0x7, 0x4, 0x7, 0x1, 0x7};
-			static const uint8_t k_colon[5] = {0x0, 0x2, 0x0, 0x2, 0x0};
-			const uint8_t* rows = nullptr;
-
-			if (glyph >= '0' && glyph <= '9') {
-				rows = k_digits[glyph - '0'];
-			} else if (glyph == 'F') {
-				rows = k_f;
-			} else if (glyph == 'P') {
-				rows = k_p;
-			} else if (glyph == 'S') {
-				rows = k_s;
-			} else if (glyph == ':') {
-				rows = k_colon;
+		bool Ensure_Exit_Primitives_() {
+			if (g_exit_mutex == nullptr) {
+				g_exit_mutex = SDL_CreateMutex();
 			}
 
-			if (rows == nullptr) {
-				return;
+			if (g_exit_condition == nullptr) {
+				g_exit_condition = SDL_CreateCondition();
 			}
 
-			for (int32_t row = 0; row < 5; ++row) {
-				for (int32_t col = 0; col < 3; ++col) {
-					if ((rows[row] & (1 << (2 - col))) == 0) {
-						continue;
-					}
-
-					const int32_t dst_x = x + col;
-					const int32_t dst_y = y + row;
-					if (dst_x < 0 || dst_x >= video::g_screen_res_x || dst_y < 0 || dst_y >= video::g_screen_res_y) {
-						continue;
-					}
-
-					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] = color;
-				}
-			}
+			return g_exit_mutex != nullptr && g_exit_condition != nullptr;
 		}
 
-		void Draw_Text_3x5_(int32_t x, int32_t y, const char* text, uint32_t color) {
-			if (text == nullptr) {
-				return;
-			}
-
-			for (int32_t i = 0; text[i] != '\0'; ++i) {
-				Draw_Glyph_3x5_(x + i * 4, y, text[i], color);
-			}
+		void Request_SDL_Exit_() {
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL requested exit");
+			Request_Exit_();
 		}
 
 		void Queue_Key_Code_(uint32_t key_code, uint32_t scan_code) {
@@ -405,45 +370,185 @@ namespace platform {
 		}
 
 		void Present_Published_Off_Page_() {
-			Update_Active_World_Frame_();
+			if (Update_Active_Screen_Frame_()) {
+				Request_Present_Refresh_();
+			}
+
+			if (!Consume_Present_Refresh_Request_()) {
+				return;
+			}
+
 			Present_Indexed_Buffer_(g_present_surface);
 		}
 
-		bool Ensure_Present_Backend_() {
-			if (g_sdl_renderer != nullptr && g_sdl_present_texture != nullptr && g_sdl_present_pixels != nullptr) {
+		bool Ensure_Present_Palette_() {
+			if (g_sdl_present_palette != nullptr) {
 				return true;
 			}
 
-			g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, nullptr);
-			if (g_sdl_renderer == nullptr) {
-				g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, "software");
+			g_sdl_present_palette = SDL_CreatePalette(256);
+			return g_sdl_present_palette != nullptr;
+		}
+
+		bool Ensure_Cursor_Surface_() {
+			if (g_sdl_cursor_surface != nullptr) {
+				return true;
 			}
-			if (g_sdl_renderer == nullptr) {
+
+			if (!Ensure_Present_Palette_() || g_cursor_surface_1 == nullptr) {
 				return false;
 			}
 
-			// Match the original frame-present cadence more closely by blocking on
-			// display refresh when the active renderer backend supports it.
-			(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+			SDL_Surface* cursor_surface = SDL_CreateSurfaceFrom(
+				k_cursor_dimension,
+				k_cursor_dimension,
+				SDL_PIXELFORMAT_INDEX8,
+				g_cursor_surface_1,
+				k_cursor_dimension);
+			if (cursor_surface == nullptr) {
+				return false;
+			}
 
-			g_sdl_present_texture = SDL_CreateTexture(
-				g_sdl_renderer,
-				SDL_PIXELFORMAT_ARGB8888,
-				SDL_TEXTUREACCESS_STREAMING,
-				video::g_screen_res_x,
-				video::g_screen_res_y);
+			if (!SDL_SetSurfacePalette(cursor_surface, g_sdl_present_palette) ||
+				!SDL_SetSurfaceColorKey(cursor_surface, true, 0)) {
+				SDL_DestroySurface(cursor_surface);
+				return false;
+			}
+
+			g_sdl_cursor_surface = cursor_surface;
+			return true;
+		}
+
+		void Apply_Pending_Cursor_State_() {
+			if (g_present_cursor_mutex == nullptr ||
+				g_cursor_surface_1 == nullptr ||
+				_cursor_surface == nullptr) {
+				return;
+			}
+
+			SDL_LockMutex(g_present_cursor_mutex);
+			if (g_pending_cursor_generation != g_applied_cursor_generation) {
+				g_active_cursor_state.offset = g_pending_cursor_state.offset;
+				g_active_cursor_state.shape = g_pending_cursor_state.shape;
+				g_active_cursor_state.enabled = g_pending_cursor_state.enabled;
+				g_active_cursor_state.pixels = g_cursor_surface_1;
+				memcpy(g_cursor_surface_1, _cursor_surface, k_cursor_pixel_count);
+				g_applied_cursor_generation = g_pending_cursor_generation;
+			}
+			SDL_UnlockMutex(g_present_cursor_mutex);
+		}
+
+		bool Ensure_Present_Backend_() {
+			if (g_sdl_renderer != nullptr &&
+				g_sdl_present_texture != nullptr &&
+				g_sdl_present_palette != nullptr &&
+				g_sdl_screen_index_surface != nullptr &&
+				g_sdl_present_argb_surface != nullptr &&
+				g_sdl_present_pixels != nullptr) {
+				return true;
+			}
+
+			if (g_sdl_renderer == nullptr) {
+				g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, nullptr);
+				if (g_sdl_renderer == nullptr) {
+					g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, "software");
+				}
+				if (g_sdl_renderer == nullptr) {
+					return false;
+				}
+
+				// Match the original frame-present cadence more closely by blocking on
+				// display refresh when the active renderer backend supports it.
+				(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+			}
+
 			if (g_sdl_present_texture == nullptr) {
+				g_sdl_present_texture = SDL_CreateTexture(
+					g_sdl_renderer,
+					SDL_PIXELFORMAT_ARGB8888,
+					SDL_TEXTUREACCESS_STREAMING,
+					video::g_screen_res_x,
+					video::g_screen_res_y);
+				if (g_sdl_present_texture == nullptr) {
+					return false;
+				}
+			}
+
+			if (g_sdl_present_pixels == nullptr) {
+				const size_t pixel_count =
+					(size_t)video::g_screen_res_x *
+					(size_t)video::g_screen_res_y;
+				g_sdl_present_pixels = (uint32_t*)malloc(pixel_count * sizeof(uint32_t));
+				if (g_sdl_present_pixels == nullptr) {
+					return false;
+				}
+				memset(g_sdl_present_pixels, 0, pixel_count * sizeof(uint32_t));
+			}
+
+			if (!Ensure_Present_Palette_()) {
 				return false;
 			}
 
-			g_sdl_present_pixels = (uint32_t*)malloc(
-				(size_t)video::g_screen_res_x *
-				(size_t)video::g_screen_res_y *
-				sizeof(uint32_t));
-			return g_sdl_present_pixels != nullptr;
+			if (g_sdl_screen_index_surface == nullptr) {
+				if (g_present_surface == nullptr) {
+					return false;
+				}
+
+				SDL_Surface* screen_index_surface = SDL_CreateSurfaceFrom(
+					video::g_screen_res_x,
+					video::g_screen_res_y,
+					SDL_PIXELFORMAT_INDEX8,
+					g_present_surface,
+					video::g_screen_res_x);
+				if (screen_index_surface == nullptr) {
+					return false;
+				}
+
+				if (!SDL_SetSurfacePalette(screen_index_surface, g_sdl_present_palette)) {
+					SDL_DestroySurface(screen_index_surface);
+					return false;
+				}
+
+				g_sdl_screen_index_surface = screen_index_surface;
+			}
+
+			if (g_sdl_present_argb_surface == nullptr) {
+				g_sdl_present_argb_surface = SDL_CreateSurfaceFrom(
+					video::g_screen_res_x,
+					video::g_screen_res_y,
+					SDL_PIXELFORMAT_ARGB8888,
+					g_sdl_present_pixels,
+					video::g_screen_res_x * (int32_t)sizeof(uint32_t));
+				if (g_sdl_present_argb_surface == nullptr) {
+					return false;
+				}
+			}
+
+			Ensure_Cursor_Surface_();
+			return true;
 		}
 
 		void Destroy_Present_Backend_() {
+			if (g_sdl_cursor_surface != nullptr) {
+				SDL_DestroySurface(g_sdl_cursor_surface);
+				g_sdl_cursor_surface = nullptr;
+			}
+
+			if (g_sdl_present_argb_surface != nullptr) {
+				SDL_DestroySurface(g_sdl_present_argb_surface);
+				g_sdl_present_argb_surface = nullptr;
+			}
+
+			if (g_sdl_screen_index_surface != nullptr) {
+				SDL_DestroySurface(g_sdl_screen_index_surface);
+				g_sdl_screen_index_surface = nullptr;
+			}
+
+			if (g_sdl_present_palette != nullptr) {
+				SDL_DestroyPalette(g_sdl_present_palette);
+				g_sdl_present_palette = nullptr;
+			}
+
 			if (g_sdl_present_texture != nullptr) {
 				SDL_DestroyTexture(g_sdl_present_texture);
 				g_sdl_present_texture = nullptr;
@@ -460,47 +565,33 @@ namespace platform {
 			}
 		}
 
+		void Update_SDL_Palette_() {
+			if (g_sdl_present_palette == nullptr) {
+				return;
+			}
+
+			SDL_Color colors[256];
+			for (int32_t i = 0; i < 256; ++i) {
+				colors[i].r = g_present_palette_entries[i].r;
+				colors[i].g = g_present_palette_entries[i].g;
+				colors[i].b = g_present_palette_entries[i].b;
+				colors[i].a = 255;
+			}
+
+			(void)SDL_SetPaletteColors(g_sdl_present_palette, colors, 0, 256);
+		}
+
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels) {
 			if (src_pixels == nullptr || !Ensure_Present_Backend_()) {
 				return;
 			}
 
-			const int32_t pixel_count = video::g_screen_res_x * video::g_screen_res_y;
-			for (int32_t i = 0; i < pixel_count; ++i) {
-				const video::s_palette_color& pal = g_present_palette_entries[src_pixels[i]];
-				g_sdl_present_pixels[i] =
-					0xFF000000u |
-					((uint32_t)pal.r << 16) |
-					((uint32_t)pal.g << 8) |
-					(uint32_t)pal.b;
+			Update_SDL_Palette_();
+			if (!SDL_BlitSurface(g_sdl_screen_index_surface, nullptr, g_sdl_present_argb_surface, nullptr)) {
+				return;
 			}
 
-			Composite_Cursor_On_Present_Pixels_(g_present_palette_entries);
-
-#if ORION2RE_ENABLE_FPS_COUNTER
-			if (g_sdl_window != nullptr) {
-				const uint32_t now_ms = (uint32_t)SDL_GetTicks();
-				if (g_fps_window_start_ms == 0) {
-					g_fps_window_start_ms = now_ms;
-				}
-
-				++g_fps_frame_count;
-
-				static uint32_t s_displayed_fps_value = 0;
-				const uint32_t elapsed_ms = now_ms - g_fps_window_start_ms;
-				if (elapsed_ms >= 1000) {
-					s_displayed_fps_value = (g_fps_frame_count * 1000u) / elapsed_ms;
-					g_fps_window_start_ms = now_ms;
-					g_fps_frame_count = 0;
-				}
-
-				char fps_text[16];
-				snprintf(fps_text, sizeof(fps_text), "FPS:%u", s_displayed_fps_value);
-				Fill_Rect_32_(4, 4, 4 * (int32_t)strlen(fps_text) + 4, 9, 0xC0000000u);
-				Draw_Text_3x5_(6, 6, fps_text, 0xFFFFFFFFu);
-			}
-#endif
-
+			Blit_Cursor_On_Present_Surface_();
 			SDL_UpdateTexture(
 				g_sdl_present_texture,
 				nullptr,
@@ -512,18 +603,21 @@ namespace platform {
 			SDL_RenderPresent(g_sdl_renderer);
 		}
 
-		void Composite_Cursor_On_Present_Pixels_(const video::s_palette_color* palette_entries) {
-			if (g_sdl_present_pixels == nullptr || palette_entries == nullptr) {
+		void Blit_Cursor_On_Present_Surface_() {
+			if (g_sdl_present_argb_surface == nullptr) {
 				return;
 			}
 
-			const int32_t cursor_state_index = SDL_GetAtomicInt(&g_present_cursor_state_index);
-			const s_present_cursor_state& cursor_state =
-				g_present_cursor_states[cursor_state_index];
+			Apply_Pending_Cursor_State_();
+			const s_present_cursor_state& cursor_state = g_active_cursor_state;
 
 			if (cursor_state.pixels == nullptr ||
 				cursor_state.enabled == 0 ||
 				cursor_state.shape <= 0) {
+				return;
+			}
+
+			if (!Ensure_Cursor_Surface_()) {
 				return;
 			}
 
@@ -532,30 +626,47 @@ namespace platform {
 			const int32_t dst_y0 =
 				SDL_GetAtomicInt(&g_present_mouse_y) + (int32_t)cursor_state.offset;
 
-			for (int32_t row = 0; row < k_cursor_dimension; ++row) {
-				const int32_t dst_y = dst_y0 + row;
-				if (dst_y < 0 || dst_y >= video::g_screen_res_y) {
-					continue;
-				}
+			SDL_Rect dst_rect = {dst_x0, dst_y0, k_cursor_dimension, k_cursor_dimension};
+			(void)SDL_BlitSurface(
+				g_sdl_cursor_surface,
+				nullptr,
+				g_sdl_present_argb_surface,
+				&dst_rect);
+		}
 
-				for (int32_t col = 0; col < k_cursor_dimension; ++col) {
-					const int32_t dst_x = dst_x0 + col;
-					if (dst_x < 0 || dst_x >= video::g_screen_res_x) {
-						continue;
-					}
+		void Sync_Mouse_State_From_SDL_() {
+			if (g_sdl_window == nullptr || g_window_focus_state == 0) {
+				return;
+			}
 
-					const uint8_t pixel = cursor_state.pixels[row * k_cursor_dimension + col];
-					if (pixel == 0) {
-						continue;
-					}
+			float mouse_x = 0.0f;
+			float mouse_y = 0.0f;
+			const SDL_MouseButtonFlags sdl_buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
 
-					const video::s_palette_color& pal = palette_entries[pixel];
-					g_sdl_present_pixels[dst_y * video::g_screen_res_x + dst_x] =
-						0xFF000000u |
-						((uint32_t)pal.r << 16) |
-						((uint32_t)pal.g << 8) |
-						(uint32_t)pal.b;
-				}
+			int32_t window_width = 0;
+			int32_t window_height = 0;
+			SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
+
+			const int16_t mapped_mouse_x =
+				Map_Window_Coord_To_Game_Coord_(mouse_x, window_width, video::g_screen_res_x);
+			const int16_t mapped_mouse_y =
+				Map_Window_Coord_To_Game_Coord_(mouse_y, window_height, video::g_screen_res_y);
+
+			uint16_t mapped_buttons = 0;
+			if ((sdl_buttons & SDL_BUTTON_LMASK) != 0) {
+				mapped_buttons |= 1;
+			}
+			if ((sdl_buttons & SDL_BUTTON_RMASK) != 0) {
+				mapped_buttons |= 2;
+			}
+
+			Set_Present_Mouse_Position_(mapped_mouse_x, mapped_mouse_y);
+
+			if (mapped_mouse_x != platform::Get_Mouse_X_() ||
+				mapped_mouse_y != platform::Get_Mouse_Y_() ||
+				mapped_buttons != g_sdl_mouse_buttons) {
+				g_sdl_mouse_buttons = mapped_buttons;
+				Enqueue_Mouse_Input_Event_(mapped_mouse_x, mapped_mouse_y, mapped_buttons);
 			}
 		}
 	}
@@ -568,7 +679,7 @@ namespace platform {
 	void* g_env_strings;
 	SDL_Thread* g_worker_thread_handle;
 	uint32_t _updating_cursor_img;
-	uint8_t g_should_exit;
+	char g_exit_message[k_exit_message_size];
 	void* g_main_window;
 	volatile bool g_pending_toggle_pages;
 	int16_t g_video_mode;
@@ -586,43 +697,104 @@ namespace platform {
     constexpr int32_t k_windowed_logical_width = 640;
     constexpr int32_t k_windowed_logical_height = 480;
 
-    void Parse_Ten_Cmd_Parameter_(const char* input_str) {
-        if (input_str == nullptr) {
-            return;
-        }
+	bool __cdecl Init_Exit_() {
+		const bool initialized = Ensure_Exit_Primitives_();
+		Reset_Exit_();
+		return initialized;
+	}
 
-        uint32_t input_len = 0;
-        while (input_str[input_len] != '\0') {
-            input_len++;
-        }
+	void __cdecl Shutdown_Exit_() {
+		if (g_exit_condition != nullptr) {
+			SDL_DestroyCondition(g_exit_condition);
+			g_exit_condition = nullptr;
+		}
 
-        if (input_len == 0) {
-            return;
-        }
+		if (g_exit_mutex != nullptr) {
+			SDL_DestroyMutex(g_exit_mutex);
+			g_exit_mutex = nullptr;
+		}
 
-        char* copy_buffer = (char*)malloc(input_len + 4);
-        if (copy_buffer == nullptr) {
-            return;
-        }
+		SDL_SetAtomicInt(&g_exit_requested, 0);
+		SDL_SetAtomicInt(&g_game_thread_exited, 0);
+		g_exit_message[0] = '\0';
+	}
 
-        for (uint32_t i = 0; i <= input_len; ++i) {
-            copy_buffer[i] = input_str[i];
-        }
+	void __cdecl Reset_Exit_() {
+		Ensure_Exit_Primitives_();
 
-        strlwr(copy_buffer);
+		if (g_exit_mutex != nullptr) {
+			SDL_LockMutex(g_exit_mutex);
+		}
 
-        // Search for "/ten=" in the lowercased command line.
-        char* match_ptr = strstr(copy_buffer, "/ten=");
-        if (match_ptr != nullptr) {
-            char* target = match_ptr + (sizeof("/ten=") - 1);
-            target[1] = '\0';
+		SDL_SetAtomicInt(&g_exit_requested, 0);
+		SDL_SetAtomicInt(&g_game_thread_exited, 0);
+		g_exit_message[0] = '\0';
 
-            int parsed_val = atoi(target);
-            ::g_ten_game_number = (uint8_t)parsed_val;
-        }
+		if (g_exit_condition != nullptr) {
+			SDL_BroadcastCondition(g_exit_condition);
+		}
 
-        free(copy_buffer);
-    }
+		if (g_exit_mutex != nullptr) {
+			SDL_UnlockMutex(g_exit_mutex);
+		}
+	}
+
+	void __cdecl Request_Exit_(const char* message) {
+		Ensure_Exit_Primitives_();
+
+		if (g_exit_mutex != nullptr) {
+			SDL_LockMutex(g_exit_mutex);
+		}
+
+		if (SDL_GetAtomicInt(&g_exit_requested) == 0) {
+			Copy_Exit_Message_(message);
+			SDL_SetAtomicInt(&g_exit_requested, 1);
+		} else if (g_exit_message[0] == '\0' && message != nullptr && message[0] != '\0') {
+			Copy_Exit_Message_(message);
+		}
+
+		if (g_exit_condition != nullptr) {
+			SDL_BroadcastCondition(g_exit_condition);
+		}
+
+		if (g_exit_mutex != nullptr) {
+			SDL_UnlockMutex(g_exit_mutex);
+		}
+	}
+
+	bool __cdecl Exit_Requested_() {
+		return SDL_GetAtomicInt(&g_exit_requested) != 0;
+	}
+
+	const char* __cdecl Exit_Message_() {
+		return g_exit_message;
+	}
+
+	void __cdecl Check_Exit_() {
+		if (Exit_Requested_()) {
+			throw process_exit_requested{};
+		}
+	}
+
+	void __cdecl Mark_Game_Thread_Exited_() {
+		SDL_SetAtomicInt(&g_game_thread_exited, 1);
+
+		if (g_exit_mutex != nullptr) {
+			SDL_LockMutex(g_exit_mutex);
+		}
+
+		if (g_exit_condition != nullptr) {
+			SDL_BroadcastCondition(g_exit_condition);
+		}
+
+		if (g_exit_mutex != nullptr) {
+			SDL_UnlockMutex(g_exit_mutex);
+		}
+	}
+
+	bool __cdecl Game_Thread_Exited_() {
+		return SDL_GetAtomicInt(&g_game_thread_exited) != 0;
+	}
 
     bool cleanup() {
         Prepare_Exit_();
@@ -691,13 +863,14 @@ namespace platform {
 
     void __cdecl Prepare_Exit_() {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Prepare_Exit");
-        sound::Destroy_Sound_();
-        netcode::Net_Uninit_();
-        g_should_exit = 1;
+		Request_Exit_();
     }
 
     void Cleanup_Surfaces()
     {
+        Destroy_Present_Backend_();
+
+        uint8_t* const primary_cursor_surface = g_cursor_surface_1;
         uint8_t* const alternate_cursor_surface = _cursor_surface;
 
         if (g_present_surface != nullptr) {
@@ -705,18 +878,20 @@ namespace platform {
             g_present_surface = nullptr;
         }
 
-        if (g_cursor_surface_1 != nullptr) {
-            free(g_cursor_surface_1);
+        if (primary_cursor_surface != nullptr) {
+            free(primary_cursor_surface);
             g_cursor_surface_1 = nullptr;
         }
 
-        if (alternate_cursor_surface != nullptr && alternate_cursor_surface != g_cursor_surface_1) {
+        if (alternate_cursor_surface != nullptr && alternate_cursor_surface != primary_cursor_surface) {
             free(alternate_cursor_surface);
         }
         _cursor_surface = nullptr;
 
-        g_present_cursor_states[0].pixels = nullptr;
-        g_present_cursor_states[1].pixels = nullptr;
+        g_pending_cursor_state = {};
+        g_active_cursor_state = {};
+        g_pending_cursor_generation = 0;
+        g_applied_cursor_generation = 0;
 
         video::Free_Page_Buffers_();
         video::Shutdown_Off_Page_Ownership_();
@@ -732,7 +907,7 @@ namespace platform {
 		g_main_window = nullptr;
     }
 
-	bool __cdecl Update_Active_World_Frame_() {
+	bool __cdecl Update_Active_Screen_Frame_() {
 		if (!video::Try_Begin_Off_Page_Present_()) {
 			return false;
 		}
@@ -750,17 +925,32 @@ namespace platform {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT ||
                 event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
-                Force_Immediate_Process_Exit_();
+				Request_SDL_Exit_();
+				continue;
             }
+
+			if (event.type == SDL_EVENT_WINDOW_EXPOSED ||
+				event.type == SDL_EVENT_WINDOW_RESIZED ||
+				event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED ||
+				event.type == SDL_EVENT_WINDOW_RESTORED ||
+				event.type == SDL_EVENT_WINDOW_MAXIMIZED ||
+				event.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED) {
+				Request_Present_Refresh_();
+				continue;
+			}
 
             if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
                 g_window_focus_state = 0;
+				g_sdl_mouse_buttons = 0;
+				Enqueue_Mouse_Input_Event_(g_mouse_x, g_mouse_y, 0);
                 continue;
             }
 
             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED) {
                 g_window_focus_state = 1;
                 SDL_HideCursor();
+				Request_Present_Refresh_();
+				Sync_Mouse_State_From_SDL_();
                 continue;
             }
 
@@ -902,15 +1092,24 @@ namespace platform {
         memset(platform::g_cursor_surface_1, 0, k_cursor_pixel_count);
         memset(platform::_cursor_surface, 0, k_cursor_pixel_count);
 
-        g_present_cursor_states[0].pixels = platform::g_cursor_surface_1;
-        g_present_cursor_states[1].pixels = platform::_cursor_surface;
-        g_present_cursor_states[0].offset = 0;
-        g_present_cursor_states[1].offset = 0;
-        g_present_cursor_states[0].shape = 0;
-        g_present_cursor_states[1].shape = 0;
-        g_present_cursor_states[0].enabled = 0;
-        g_present_cursor_states[1].enabled = 0;
-        SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
+        if (g_present_cursor_mutex != nullptr) {
+            SDL_LockMutex(g_present_cursor_mutex);
+        }
+
+        g_pending_cursor_state.pixels = platform::_cursor_surface;
+        g_pending_cursor_state.offset = 0;
+        g_pending_cursor_state.shape = 0;
+        g_pending_cursor_state.enabled = 0;
+        g_active_cursor_state.pixels = platform::g_cursor_surface_1;
+        g_active_cursor_state.offset = 0;
+        g_active_cursor_state.shape = 0;
+        g_active_cursor_state.enabled = 0;
+        g_pending_cursor_generation = 0;
+        g_applied_cursor_generation = 0;
+
+        if (g_present_cursor_mutex != nullptr) {
+            SDL_UnlockMutex(g_present_cursor_mutex);
+        }
     }
 
     void __cdecl Toggle_Pages_Stub_() {
@@ -919,31 +1118,50 @@ namespace platform {
 
     int Run_Main_Loop(const char* command_line) {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop start cmd='%s'", command_line != nullptr ? command_line : "");
-        Parse_Ten_Cmd_Parameter_(command_line);
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError());
             return 0;
         }
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL video initialized");
+		if (!Init_Exit_()) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: exit primitives initialization failed: %s", SDL_GetError());
+			Shutdown_Exit_();
+			SDL_Quit();
+			return 0;
+		}
 
-        g_should_exit = 0;
         g_pending_toggle_pages = false;
         g_window_focus_state = 1;
         g_has_lost_focus = false;
 		g_input_queue_read = 0;
 		g_input_queue_write = 0;
 		g_sdl_mouse_buttons = 0;
-		SDL_SetAtomicInt(&g_present_cursor_state_index, 0);
+		SDL_SetAtomicInt(&g_present_refresh_requested, 0);
 		Set_Present_Mouse_Position_(0, 0);
-		g_fps_window_start_ms = 0;
-		g_fps_frame_count = 0;
+		g_pending_cursor_state = {};
+		g_active_cursor_state = {};
+		g_pending_cursor_generation = 0;
+		g_applied_cursor_generation = 0;
 
 		if (g_input_queue_mutex == nullptr) {
 			g_input_queue_mutex = SDL_CreateMutex();
 		}
 		if (g_input_queue_mutex == nullptr) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
+			Shutdown_Exit_();
+			SDL_Quit();
+			return 0;
+		}
+
+		if (g_present_cursor_mutex == nullptr) {
+			g_present_cursor_mutex = SDL_CreateMutex();
+		}
+		if (g_present_cursor_mutex == nullptr) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateMutex failed: %s", SDL_GetError());
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
 			SDL_Quit();
 			return 0;
 		}
@@ -951,28 +1169,54 @@ namespace platform {
 #ifdef FULLSCREEN
         int nWidth = k_windowed_logical_width;
         int nHeight = k_windowed_logical_height;
-        SDL_WindowFlags window_flags = SDL_WINDOW_FULLSCREEN;
+        SDL_WindowFlags window_flags = SDL_WINDOW_FULLSCREEN | SDL_WINDOW_HIDDEN;
 #else
         int nWidth = k_windowed_logical_width;
         int nHeight = k_windowed_logical_height;
-        SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE;
+        SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 #endif
 
         g_sdl_window = SDL_CreateWindow("Microprose", nWidth, nHeight, window_flags);
         if (g_sdl_window == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateWindow failed: %s", SDL_GetError());
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
             SDL_Quit();
             return 0;
         }
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: window created");
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: hidden window created");
 
 		g_main_window = g_sdl_window;
+
+		g_sdl_renderer = SDL_CreateRenderer(g_sdl_window, nullptr);
+		if (g_sdl_renderer == nullptr) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateRenderer failed: %s", SDL_GetError());
+			Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
+			SDL_Quit();
+			return 0;
+		}
+		(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
+		SDL_ShowWindow(g_sdl_window);
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: renderer initialized and window shown");
 
         SDL_HideCursor();
 
         if (!Create_Video_Buffers_(4)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: Create_Video_Buffers failed");
             Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
             SDL_Quit();
             return 0;
         }
@@ -983,17 +1227,26 @@ namespace platform {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateThread failed: %s", SDL_GetError());
             Cleanup_Surfaces();
             Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
             SDL_Quit();
             return 0;
         }
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: worker thread created");
 
-        while (g_should_exit != 1) {
+        while (!Game_Thread_Exited_()) {
             Service_Pending_Window_Events_();
 
             Present_Published_Off_Page_();
             SDL_Delay(1);
         }
+
+		if (!Exit_Requested_()) {
+			Request_Exit_();
+		}
 
         if (g_worker_thread_handle != nullptr) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: waiting for worker thread");
@@ -1008,6 +1261,11 @@ namespace platform {
 			SDL_DestroyMutex(g_input_queue_mutex);
 			g_input_queue_mutex = nullptr;
 		}
+		if (g_present_cursor_mutex != nullptr) {
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+		}
+		Shutdown_Exit_();
         SDL_Quit();
 
         return 0;
@@ -1040,18 +1298,22 @@ namespace platform {
     }
 
     void __cdecl Update_Cursor_Image_() {
-        if (g_present_cursor_states[0].pixels == nullptr ||
-            g_present_cursor_states[1].pixels == nullptr) {
+        if (_cursor_surface == nullptr || g_present_cursor_mutex == nullptr) {
             return;
         }
 
-        const int32_t read_index = SDL_GetAtomicInt(&g_present_cursor_state_index);
-        const int32_t write_index = (read_index == 0) ? 1 : 0;
-        s_present_cursor_state& cursor_state = g_present_cursor_states[write_index];
+        const int16_t cursor_offset = (int16_t)mouse::Get_Pointer_Offset_();
+        const int16_t cursor_shape = (int16_t)mouse::Get_Pointer_Image_Number_();
+        const uint8_t cursor_enabled = (mouse::Mouse_Enabled_() != 0) ? 1 : 0;
+        int16_t published_cursor_shape = 0;
 
-        cursor_state.offset = (int16_t)mouse::Get_Pointer_Offset_();
-        cursor_state.shape = (int16_t)mouse::Get_Pointer_Image_Number_();
-        cursor_state.enabled = (mouse::Mouse_Enabled_() != 0) ? 1 : 0;
+        SDL_LockMutex(g_present_cursor_mutex);
+        s_present_cursor_state& cursor_state = g_pending_cursor_state;
+
+        cursor_state.pixels = _cursor_surface;
+        cursor_state.offset = cursor_offset;
+        cursor_state.shape = cursor_shape;
+        cursor_state.enabled = cursor_enabled;
 
         if (cursor_state.enabled != 0 &&
             cursor_state.shape > 0 &&
@@ -1069,8 +1331,12 @@ namespace platform {
             memset(cursor_state.pixels, 0, k_cursor_pixel_count);
         }
 
-        g_last_cursor_shape = (int32_t)cursor_state.shape;
-        SDL_SetAtomicInt(&g_present_cursor_state_index, write_index);
+        published_cursor_shape = cursor_state.shape;
+        ++g_pending_cursor_generation;
+        SDL_UnlockMutex(g_present_cursor_mutex);
+
+        g_last_cursor_shape = (int32_t)published_cursor_shape;
+		Request_Present_Refresh_();
     }
 
     void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count) {

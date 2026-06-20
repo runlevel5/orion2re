@@ -305,7 +305,7 @@ namespace HOMEGEN {
         s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
         _good_stars = (s_good_star*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x5418);
-        memset(_good_stars, 0, 0x120);
+        memset(_good_stars, 0, MAX_STARS * sizeof(*_good_stars));
 
         for (int i = 0; i < MAX_PLAYERS; ++i) {
             _nearest_food_worlds[i] = -1;

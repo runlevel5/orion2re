@@ -14,17 +14,11 @@
 
 #include "compat.h"
 
-#if ORION2RE_ENABLE_NETWORKING
-#include "../dplay.h"
-#endif
-
 #include "consts.h"
 
-#pragma pack(push, 1)
 #include "orion2_consts.h"
 #include "orion2_str.h"
 #include "orion2.h"
-#pragma pack(pop)
 
 #include "lbx_types.h"
 #include "sound_types.h"
@@ -52,7 +46,6 @@
 #include "shipmove.h"
 #include "harold.h"
 #include "sound.h"
-#include "ten.h"
 #include "fields.h"
 #include "fieldsav.h"
 #include "firepts.h"
@@ -72,13 +65,9 @@
 #include "multplay.h"
 #include "net.h"
 #include "netmox.h"
-#include "arith1e.h"
 #include "netstrat.h"
-#include "transprt.h"
-#include "motrans.h"
+#include "netadapter.h"
 #include "netcode.h"
-#include "winnet.h"
-#include "comcore.h"
 #include "timer.h"
 #include "time.h"
 #include "contact.h"
@@ -176,7 +165,6 @@
 #include "design.h"
 #include "aibuild.h"
 #include "colxport.h"
-#include "simmodem.h"
 #include "textbox.h"
 #include "namestar.h"
 #include "mainpups.h"
@@ -211,7 +199,6 @@
 #include "cmbtspec.h"
 #include "cmbtai.h"
 #include "beams.h"
-#include "bitio.h"
 #include "lbx.h"
 #include "colbomb.h"
 #include "aibomb.h"

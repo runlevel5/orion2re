@@ -1,24 +1,9 @@
 #include "doctest/doctest.h"
 
 #include "game/compat.h"
+#include "game/setvesa.h"
+#include "game/video.h"
 #include "game/video_scan_bounds.h"
-
-namespace video {
-    struct s_scan_list_entry {
-        int16_t min_x;
-        int16_t max_x;
-    };
-
-    extern int32_t g_screen_res_x;
-    extern int32_t g_screen_res_y;
-    extern int32_t screen_refresh_flag;
-    extern s_scan_list_entry* _refresh_scan_list;
-    extern s_scan_list_entry* _refresh_stencil_list;
-}
-
-namespace setvesa {
-    void __cdecl Add_Square_To_Scan_List_(int32_t left, int32_t top, int32_t right, int32_t bottom);
-}
 
 DOCTEST_TEST_SUITE("video scan bounds") {
 

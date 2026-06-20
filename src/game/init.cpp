@@ -1,11 +1,15 @@
 #include "pch.h"
 
 namespace init {
+    namespace {
+        constexpr size_t kIoBufferSize = 0x2000;
+    }
+
     s_animation_header* _io_buffer;
 
     void __cdecl Create_IO_Buffer_() {
-        _io_buffer = (s_animation_header*)malloc(0x2000);
-        memset(_io_buffer, 0, 0x2000);
+        _io_buffer = (s_animation_header*)malloc(kIoBufferSize);
+        memset(_io_buffer, 0, kIoBufferSize);
     }
 
     int8_t __cdecl Init_Drivers_(uint32_t unused, char* font_name) {
@@ -22,9 +26,6 @@ namespace init {
 
         sound::Init_Sound_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "init: sound initialized");
-
-        WINNET::Init_Providers_();
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "init: network providers initialized");
 
         if (*font_name == '\0') {
             sysfont::Load_System_Font_();

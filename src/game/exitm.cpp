@@ -10,7 +10,8 @@ namespace exitm {
 
         Show_Message_Box_(platform::g_main_window, message, "Microprose");
 
-        platform::Prepare_Exit_();
+        platform::Request_Exit_(message);
+        platform::Check_Exit_();
     }
 
     void __cdecl Exit_With_message2_(const char* message) {

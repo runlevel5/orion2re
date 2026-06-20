@@ -2473,6 +2473,14 @@ DOCTEST_TEST_CASE("interpret mouse input held right button over button returns n
     DOCTEST_CHECK(fields::Interpret_Mouse_Input_() == -field_idx);
 }
 
+DOCTEST_TEST_CASE("get input throws after exit is requested") {
+    Fields_Test_Reset reset;
+
+    platform::Request_Exit_();
+
+    DOCTEST_CHECK_THROWS_AS(fields::Get_Input_(), platform::process_exit_requested);
+}
+
 }
 
 #undef s_animation_header

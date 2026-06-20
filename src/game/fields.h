@@ -1,5 +1,158 @@
 #pragma once
 
+struct s_animation_header;
+struct s_colors;
+
+#pragma pack(push, 1)
+
+typedef struct s_field s_field, *Ps_field;
+typedef union s_field_detail s_field_detail, *Ps_field_detail;
+typedef struct s_field_button s_field_button, *Ps_field_button;
+typedef struct s_field_locked s_field_locked, *Ps_field_locked;
+typedef struct s_field_grid s_field_grid, *Ps_field_grid;
+typedef struct s_field_radio s_field_radio, *Ps_field_radio;
+typedef struct s_field_scroll s_field_scroll, *Ps_field_scroll;
+typedef struct s_field_cont_input s_field_cont_input, *Ps_field_cont_input;
+typedef struct s_field_input_string s_field_input_string, *Ps_field_input_string;
+typedef struct s_field_multi_button s_field_multi_button, *Ps_field_multi_button;
+typedef struct s_field_string_list s_field_string_list, *Ps_field_string_list;
+typedef struct s_field_circle s_field_circle, *Ps_field_circle;
+typedef struct s_field_multi_hotkey s_field_multi_hotkey, *Ps_field_multi_hotkey;
+typedef struct s_field_irregular_button s_field_irregular_button, *Ps_field_irregular_button;
+typedef struct s_field_hidden s_field_hidden, *Ps_field_hidden;
+
+struct s_field_grid {
+    int16_t step_x;
+    int16_t step_y;
+    int16_t *grid_x_ptr;
+    int16_t *grid_y_ptr;
+};
+
+struct s_field_circle {
+    int16_t center_x;
+    int16_t center_y;
+    int32_t radius_squared;
+};
+
+struct s_field_scroll {
+    int16_t return_value;
+    int16_t set_value;
+    int16_t range_min;
+    int16_t range_max;
+    int16_t is_vertical;
+    int16_t *value;
+};
+
+struct s_field_multi_button {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+    int16_t *selection;
+    int16_t button_value;
+};
+
+struct s_field_button {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+};
+
+struct s_field_irregular_button {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+    int16_t draw_x;
+    int16_t draw_y;
+};
+
+struct s_field_locked {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+    int16_t *selection;
+};
+
+struct s_field_input_string {
+    struct s_colors *highlight_color;
+    char *buffer;
+    int16_t background_color;
+    int16_t draw_style;
+    int16_t input_mode;
+    int16_t max_length;
+    char *cursor_color_ramp;
+};
+
+struct s_field_string_list {
+    struct s_colors *highlight_color;
+    const char *help;
+    int8_t *value;
+    int16_t help_start;
+    int16_t is_selectable;
+    struct s_colors *gradient_colors;
+    int16_t gradient_mode;
+    uint8_t *gradient_palette;
+    int32_t gradient_extra;
+    struct s_animation_header *gradient_pic;
+};
+
+struct s_field_radio {
+    const char *help;
+    struct s_animation_header *pic;
+    int16_t draw_style;
+    int16_t *selection;
+};
+
+struct s_field_cont_input {
+    struct s_colors *highlight_color;
+    int16_t max_length;
+    char *buffer;
+    int16_t full_store_flag;
+    struct s_animation_header *pic;
+    int16_t background_color;
+    int16_t font_shadow_style;
+};
+
+struct s_field_multi_hotkey {
+    const char *help;
+    int16_t help_start;
+    int16_t help_len;
+};
+
+struct s_field_hidden {
+    uint8_t unused;
+};
+
+union s_field_detail {
+    struct s_field_button button;
+    struct s_field_irregular_button irregular_button;
+    struct s_field_grid grid;
+    struct s_field_radio radio;
+    struct s_field_locked locked;
+    struct s_field_scroll scroll;
+    struct s_field_input_string input;
+    struct s_field_cont_input cont_input;
+    struct s_field_multi_button multibtn;
+    struct s_field_string_list strings;
+    struct s_field_circle circle;
+    struct s_field_multi_hotkey multi_hotkey;
+    struct s_field_hidden hidden;
+};
+
+struct s_field {
+    int16_t x;
+    int16_t y;
+    int16_t x_end;
+    int16_t y_end;
+    int16_t field_type;
+    int16_t font_style;
+    struct s_colors *font_color;
+    union s_field_detail detail;
+    char hotkey;
+    int16_t sound;
+};
+
+#pragma pack(pop)
+
 namespace fields {
     inline constexpr int32_t MAX_FIELDS_COUNT = 250;
 

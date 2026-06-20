@@ -1,11 +1,4 @@
-typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
-
-struct BIT_BUF {
-    uint8_t *buf;
-    uint8_t mask;
-    uint32_t rack;
-    uint32_t bit_index;
-};
+#pragma pack(push, 1)
 
 typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
 
@@ -363,7 +356,7 @@ struct s_combat_bomb_result {
 };
 
 struct s_net_player_info {
-    int8_t packet_type;
+    int8_t player_state;
     uint8_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;
@@ -440,21 +433,6 @@ typedef struct s_class_group s_class_group, *Ps_class_group;
 
 struct s_class_group {
     int8_t planet_group_by_orbit[5];
-};
-
-typedef struct s_click_through_field s_click_through_field, *Ps_click_through_field;
-
-struct s_click_through_field {
-    int16_t x1;
-    int16_t y1;
-    int16_t x2;
-    int16_t y2;
-    int16_t field_id1;
-    int16_t field_id2;
-    char **strings;
-    int16_t state_count;
-    int16_t *value;
-    uint8_t color;
 };
 
 typedef struct s_coldraw_road s_coldraw_road, *Ps_coldraw_road;
@@ -563,28 +541,6 @@ typedef struct s_colony_bldg s_colony_bldg, *Ps_colony_bldg;
 
 struct s_colony_bldg {
     int32_t buildings[6];
-};
-
-typedef struct s_colony_combat_popup_data s_colony_combat_popup_data, *Ps_colony_combat_popup_data;
-
-struct s_colony_combat_popup_data {
-    int16_t colony_idx;
-    int8_t attacker_player_id;
-    int16_t attacker_unit_counts[UNIT_COUNT];
-    int8_t has_stellar_converter;
-    int8_t defender_player_id;
-    int16_t defender_unit_counts[UNIT_COUNT];
-    int16_t n_pops;
-    int16_t n_bldgs;
-    int16_t best_shield_bldg;
-    struct s_combat_bomb_result *bomb;
-    struct s_invasion_side_info *attacker;
-    struct s_invasion_side_info *defender;
-    int32_t random_seed;
-    int16_t bombardment_result;
-    undefined field14_0x2d;
-    undefined field15_0x2e;
-    undefined field16_0x2f;
 };
 
 typedef struct s_colony_job_production s_colony_job_production, *Ps_colony_job_production;
@@ -738,30 +694,6 @@ struct s_comcore_open_req {
     uint32_t msg_size;
 };
 
-typedef struct s_comcore_poll_buf s_comcore_poll_buf, *Ps_comcore_poll_buf;
-
-struct s_comcore_poll_buf {
-    uint32_t id_from;
-    uint32_t id_to;
-    uint32_t len;
-    uint8_t *send_buf;
-};
-
-typedef struct s_comcore_req_buf s_comcore_req_buf, *Ps_comcore_req_buf;
-
-struct s_comcore_req_buf {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
-    uint8_t *send_buf;
-    undefined field5_0x8;
-    undefined field6_0x9;
-    undefined field7_0xa;
-    undefined field8_0xb;
-    int32_t buf_size;
-};
-
 typedef struct s_crew_data s_crew_data, *Ps_crew_data;
 
 struct s_crew_data {
@@ -849,188 +781,6 @@ struct s_event_data {
     int16_t max_amount;
 };
 
-typedef struct s_fake_button s_fake_button, *Ps_fake_button;
-
-struct s_fake_button {
-    int16_t x;
-    int16_t y;
-    int16_t field_id;
-    struct s_animation_header *pic;
-};
-
-typedef struct s_field s_field, *Ps_field;
-
-typedef union s_field_detail s_field_detail, *Ps_field_detail;
-
-typedef struct s_field_button s_field_button, *Ps_field_button;
-
-typedef struct s_field_locked s_field_locked, *Ps_field_locked;
-
-typedef struct s_field_grid s_field_grid, *Ps_field_grid;
-
-typedef struct s_field_radio s_field_radio, *Ps_field_radio;
-
-typedef struct s_field_scroll s_field_scroll, *Ps_field_scroll;
-
-typedef struct s_field_cont_input s_field_cont_input, *Ps_field_cont_input;
-
-typedef struct s_field_input_string s_field_input_string, *Ps_field_input_string;
-
-typedef struct s_field_multi_button s_field_multi_button, *Ps_field_multi_button;
-
-typedef struct s_field_string_list s_field_string_list, *Ps_field_string_list;
-
-typedef struct s_field_circle s_field_circle, *Ps_field_circle;
-
-typedef struct s_field_multi_hotkey s_field_multi_hotkey, *Ps_field_multi_hotkey;
-
-typedef struct s_field_irregular_button s_field_irregular_button, *Ps_field_irregular_button;
-
-typedef struct s_field_hidden s_field_hidden, *Ps_field_hidden;
-
-struct s_field_grid {
-    int16_t step_x;
-    int16_t step_y;
-    int16_t *grid_x_ptr;
-    int16_t *grid_y_ptr;
-};
-
-struct s_field_circle {
-    int16_t center_x;
-    int16_t center_y;
-    int32_t radius_squared;
-};
-
-struct s_field_scroll {
-    int16_t return_value;
-    int16_t set_value;
-    int16_t range_min;
-    int16_t range_max;
-    int16_t is_vertical;
-    int16_t *value;
-};
-
-struct s_field_multi_button {
-    const char *help;
-    struct s_animation_header *pic;
-    int16_t draw_style;
-    int16_t *selection;
-    int16_t button_value;
-};
-
-struct s_field_button {
-    const char *help;
-    struct s_animation_header *pic;
-    int16_t draw_style;
-};
-
-struct s_field_irregular_button {
-    const char *help;
-    struct s_animation_header *pic;
-    int16_t draw_style;
-    int16_t draw_x;
-    int16_t draw_y;
-};
-
-struct s_field_locked {
-    const char *help;
-    struct s_animation_header *pic;
-    int16_t draw_style;
-    int16_t *selection;
-};
-
-struct s_field_input_string {
-    struct s_colors *highlight_color;
-    char *buffer;
-    int16_t background_color;
-    int16_t draw_style;
-    int16_t input_mode;
-    int16_t max_length;
-    char *cursor_color_ramp;
-};
-
-struct s_field_string_list {
-    struct s_colors *highlight_color;
-    const char *help;
-    int8_t *value;
-    int16_t help_start;
-    int16_t is_selectable;
-    struct s_colors *gradient_colors;
-    int16_t gradient_mode;
-    uint8_t *gradient_palette;
-    int32_t gradient_extra;
-    struct s_animation_header *gradient_pic;
-};
-
-struct s_field_radio {
-    const char *help;
-    struct s_animation_header *pic;
-    int16_t draw_style;
-    int16_t *selection;
-};
-
-struct s_field_cont_input {
-    struct s_colors *highlight_color;
-    int16_t max_length;
-    char *buffer;
-    int16_t full_store_flag;
-    struct s_animation_header *pic;
-    int16_t background_color;
-    int16_t font_shadow_style;
-};
-
-struct s_field_multi_hotkey {
-    const char *help;
-    int16_t help_start;
-    int16_t help_len;
-};
-
-struct s_field_hidden {
-    uint8_t unused;
-};
-
-union s_field_detail {
-    struct s_field_button button;
-    struct s_field_irregular_button irregular_button;
-    struct s_field_grid grid;
-    struct s_field_radio radio;
-    struct s_field_locked locked;
-    struct s_field_scroll scroll;
-    struct s_field_input_string input;
-    struct s_field_cont_input cont_input;
-    struct s_field_multi_button multibtn;
-    struct s_field_string_list strings;
-    struct s_field_circle circle;
-    struct s_field_multi_hotkey multi_hotkey;
-    struct s_field_hidden hidden;
-};
-
-struct s_field {
-    int16_t x;
-    int16_t y;
-    int16_t x_end;
-    int16_t y_end;
-    int16_t field_type;
-    int16_t font_style;
-    struct s_colors *font_color;
-    union s_field_detail detail;
-    char hotkey;
-    int16_t sound;
-};
-
-typedef struct s_fieldsav_data s_fieldsav_data, *Ps_fieldsav_data;
-
-struct s_fieldsav_data {
-    int16_t field_count;
-    int16_t input_delay;
-    int16_t down_mouse_button;
-    int16_t auto_input_variable;
-    int16_t input_field_active;
-    int16_t active_input_field_number;
-    int16_t max_fields_count;
-    struct s_field *fields;
-};
-
 typedef struct s_file_buffer_entry s_file_buffer_entry, *Ps_file_buffer_entry;
 
 struct s_file_buffer_entry {
@@ -1087,47 +837,6 @@ struct s_fleet_movement_icon {
     int16_t ship_node_idx;
 };
 
-typedef struct s_flic_queue_entry s_flic_queue_entry, *Ps_flic_queue_entry;
-
-struct s_flic_queue_entry {
-    int16_t x;
-    int16_t y;
-    int16_t current_frame;
-    struct s_animation_header *animation;
-    uint8_t play_mode;
-    uint8_t use_clipping;
-};
-
-typedef struct s_fmtpara_break s_fmtpara_break, *Ps_fmtpara_break;
-
-typedef struct s_fmtpara_style s_fmtpara_style, *Ps_fmtpara_style;
-
-struct s_fmtpara_style {
-    int8_t font_id;
-    undefined1 highlight;
-    uint8_t fg_color;
-    uint8_t bg_color;
-    uint8_t color_attr;
-    int16_t font_height_px;
-    int8_t *char_widths;
-    int16_t space_width;
-};
-
-struct s_fmtpara_break {
-    const char *break_str_next;
-    int16_t break_x;
-    int16_t break_x_candidate;
-    int16_t insert_case;
-    int16_t line_y_offset;
-    int16_t font_spacing;
-    int16_t nest_depth;
-    int16_t char_count;
-    int16_t space_count;
-    bool break_is_backspace;
-    bool break_valid;
-    s_fmtpara_style style;
-};
-
 typedef struct s_fmtpara_char s_fmtpara_char, *Ps_fmtpara_char;
 
 struct s_fmtpara_char {
@@ -1137,20 +846,6 @@ struct s_fmtpara_char {
     uint8_t fg_and_attr;
     uint8_t bg_color;
     int8_t ch;
-};
-
-typedef struct s_fmtpara_global s_fmtpara_global, *Ps_fmtpara_global;
-
-struct s_fmtpara_global {
-    int16_t min_x;
-    int16_t min_y;
-    int16_t max_x;
-    int16_t max_y;
-    void *item_ptr[16];
-    int8_t item_type[16];
-    void *user_fn;
-    bool cond_flag;
-    bool use_plural;
 };
 
 typedef struct s_fmtpara_line s_fmtpara_line, *Ps_fmtpara_line;
@@ -1170,35 +865,6 @@ struct s_fmtpara_line {
     int16_t font_spacing;
     bool line_done;
     int8_t line_started;
-};
-
-typedef struct s_fmtpara_para s_fmtpara_para, *Ps_fmtpara_para;
-
-struct s_fmtpara_para {
-    int16_t para_y;
-    const char *str;
-    int16_t x1;
-    int16_t x2;
-    int16_t y;
-    int16_t y_origin;
-    int16_t width;
-    struct s_animation_header *seg;
-    bool do_render;
-    int16_t line_start_x;
-    int16_t line_right_limit_x;
-    int16_t y2_limit;
-    undefined field12_0x1b;
-    undefined field13_0x1c;
-    int16_t line_advance_y;
-    int16_t para_advance_y;
-    int16_t first_line_indent;
-    int16_t right_indent;
-    int16_t left_indent;
-    int8_t justify_mode;
-    int8_t paragraph_break;
-    int16_t nest_depth;
-    const char *nest_stack[9];
-    struct s_fmtpara_line *line;
 };
 
 typedef struct s_font s_font, *Ps_font;
@@ -1336,24 +1002,6 @@ struct s_good_star {
     uint16_t star_count;
 };
 
-typedef struct s_ground_unit s_ground_unit, *Ps_ground_unit;
-
-struct s_ground_unit {
-    int16_t x;
-    int16_t y;
-    undefined1 field2_0x4;
-    uint8_t state;
-    int8_t type;
-    int8_t side;
-    int8_t anim_frame;
-    int8_t action_timer;
-    int16_t y_offset;
-    int8_t is_hit;
-    struct s_ground_unit *target;
-    int32_t sound_id;
-    int32_t sound_handle;
-};
-
 typedef struct s_help_box s_help_box, *Ps_help_box;
 
 struct s_help_box {
@@ -1384,59 +1032,11 @@ struct s_help_topic_record {
     uint32_t id;
 };
 
-typedef struct s_hiscore s_hiscore, *Ps_hiscore;
-
 typedef struct s_hiscore_pop s_hiscore_pop, *Ps_hiscore_pop;
 
 struct s_hiscore_pop {
     int16_t race_id;
     int16_t icon_id;
-};
-
-struct s_hiscore {
-    struct s_animation_header *mouse_cursor_anim;
-    struct s_animation_header *main_background_anim;
-    struct s_animation_header *report_bitmap;
-    struct s_animation_header *race_icon_anims[14];
-    struct s_animation_header *race_icon_frame_anim;
-    struct s_animation_header *background_anim;
-    int16_t screen_field_handle;
-    int16_t current_input_state;
-    int16_t exit_hotkey_handle;
-    int16_t prev_input_state;
-    int16_t entry_field_handles[10];
-    int8_t player_idx;
-    int16_t score_antares;
-    uint8_t is_first_draw;
-    int16_t score_captured_colonists;
-    struct s_colors colors;
-    int16_t score_elimination;
-    struct s_colors temp_colors;
-    struct s_colors alt_colors;
-    int16_t num_opponents_defeated;
-    int16_t raw_captured_population;
-    int16_t raw_captured_colonies;
-    int8_t captured_pop_race_ids[16];
-    int16_t reg_pop;
-    int16_t raw_population;
-    int16_t score_orion;
-    int16_t score_population;
-    int16_t raw_technology;
-    int16_t score_technology;
-    int16_t score_raw_subtotal;
-    int16_t score_time;
-    int16_t score_final;
-    int16_t score_council;
-    int16_t next_draw_y;
-    int16_t timer_ticks;
-    int16_t score_modifier_pct;
-    int8_t flash_color_offset;
-    int8_t flash_direction;
-    uint8_t flash_timer_ticks;
-    int8_t highlighted_entry_idx;
-    undefined field40_0xbc;
-    struct s_hiscore_pop pop_units[16];
-    int16_t sort_list[10][2];
 };
 
 typedef struct s_hiscore_tmp_pop s_hiscore_tmp_pop, *Ps_hiscore_tmp_pop;
@@ -1477,33 +1077,6 @@ struct s_hotseat_system_box_state {
     int16_t field3_0x6;
 };
 
-typedef struct s_input_box_state s_input_box_state, *Ps_input_box_state;
-
-struct s_input_box_state {
-    struct s_animation_header *pic;
-    struct s_animation_header *bg;
-    struct s_colors font_colors;
-    struct s_colors colors2;
-    char prompt_text[60];
-    int16_t bg_height;
-    int8_t show_cancel_anim;
-    int16_t prompt_y;
-    int16_t cancel_x;
-    int16_t cancel_y;
-    int16_t input_x;
-    int16_t input_y;
-    int16_t x;
-    int16_t y;
-    int16_t input_type;
-    int16_t max_length;
-    int16_t max_input_length;
-    int16_t unk1;
-    char input_text[100];
-    int16_t accept_field_id;
-    int16_t cancel_field_id;
-    int16_t field21_0xd5;
-};
-
 typedef struct s_lbx_header s_lbx_header, *Ps_lbx_header;
 
 struct s_lbx_header {
@@ -1542,78 +1115,6 @@ struct s_leader_data {
     char display_level_popup;
     sbyte status;
     int8_t player_index;
-};
-
-typedef struct s_list_item s_list_item, *Ps_list_item;
-
-struct s_list_item {
-    int16_t x;
-    int16_t y;
-    uint8_t stop_flag;
-    uint8_t is_selectable;
-    uint8_t current_app_index;
-    char group_name[64];
-    uint8_t group_id;
-    uint8_t group_color_index;
-    uint8_t app_count;
-    int16_t app_base_x;
-    int16_t app_x_max;
-    int16_t app_y_offsets[16];
-    uint8_t app_ids[16];
-    uint8_t tech_app_ids[16];
-    uint8_t tech_app_status[16];
-};
-
-typedef struct s_list_item_research s_list_item_research, *Ps_list_item_research;
-
-struct s_list_item_research {
-    int16_t x;
-    int16_t y;
-    int16_t id;
-    uint8_t current_app_index;
-    int16_t selected_app_index;
-    char field_name[62];
-    uint8_t group_id;
-    uint8_t group_color_index;
-    int16_t button_field_id;
-    int16_t button_value;
-    struct s_animation_header *button_image;
-    int16_t tech_field_id;
-    int32_t research_cost_remaining;
-    char buf[20];
-    int8_t visible_app_count;
-    char app_names[4][64];
-    int16_t label_x;
-    int16_t app_label_y[4];
-    int16_t app_click_field_ids[4];
-    int16_t app_ids[4];
-    int16_t list_win_x;
-};
-
-typedef struct s_list_state s_list_state, *Ps_list_state;
-
-struct s_list_state {
-    int16_t x;
-    int16_t y;
-    int16_t item_width;
-    int16_t y_max;
-    int16_t *app_y_table;
-    int16_t *app_ymin_offsets;
-    int16_t *app_ymax_offsets;
-    uint8_t item_spacing;
-    uint8_t num_items;
-    struct s_list_item *items;
-    struct s_list_item *selected_item;
-    uint8_t max_page;
-    uint8_t cur_page;
-    uint8_t group_font;
-    uint8_t item_font;
-    void *draw_app_cb;
-    uint8_t app_x_offset;
-    uint8_t marker_color;
-    struct s_colors *active_color;
-    struct s_colors *group_colors[4];
-    struct s_colors *disabled_color;
 };
 
 typedef struct s_main_menu s_main_menu, *Ps_main_menu;
@@ -1778,18 +1279,12 @@ struct s_missile {
     int8_t is_active;
 };
 
-typedef struct s_modem_settings s_modem_settings, *Ps_modem_settings;
+typedef struct s_online_settings s_online_settings, *Ps_online_settings;
 
-struct s_modem_settings {
-    int32_t com_port_index;
-    uint32_t baud_rate;
-    uint8_t parity;
-    uint32_t data_bits;
-    uint32_t serial_cfg_ext;
-    char cmd_reset[30];
-    char cmd_init[30];
-    char cmd_hangup[30];
-    char dial_number[24];
+struct s_online_settings {
+    uint8_t reserved_0x00[17];
+    char endpoint[30];
+    uint8_t reserved_0x2f[84];
 };
 
 typedef struct s_mouse_list s_mouse_list, *Ps_mouse_list;
@@ -1857,21 +1352,20 @@ struct s_mp_screen {
     undefined field19_0x5c;
     undefined field20_0x5d;
     undefined field21_0x5e;
-    struct s_animation_header *anim_ten;
-    struct s_animation_header *anim_modem;
-    struct s_animation_header *anim_serial;
     struct s_animation_header *anim_network;
+    struct s_animation_header *anim_online;
+    struct s_animation_header *anim_unused_connection;
+    struct s_animation_header *anim_hotseat;
     struct s_animation_header *anim_btn_unk_3;
     struct s_animation_header *anim_btn_cancel;
     undefined field28_0x77;
     undefined field29_0x78;
     undefined field30_0x79;
     undefined field31_0x7a;
-    struct s_animation_header *anim_btn_next;
-    struct s_animation_header *anim_btn_accept;
-    struct s_animation_header *anim_btn_back;
+    struct s_animation_header *anim_btn_start_game;
+    struct s_animation_header *anim_btn_load_game;
+    struct s_animation_header *anim_btn_join_game;
     struct s_animation_header *anim_btn_setup;
-    struct s_animation_header *anim_btn_help;
     struct s_animation_header *anim_btn_begin;
     struct s_animation_header *anim_unk_3;
     undefined field39_0x97;
@@ -1894,27 +1388,26 @@ struct s_mp_screen {
     int16_t player_field_ids[MAX_PLAYERS];
     int8_t save_slot_valid[10];
     int16_t field_id_close_dropdown;
-    int16_t field_id_ten;
-    int16_t field_id_modem;
-    int16_t field_id_serial;
     int16_t field_id_network;
+    int16_t field_id_online;
+    int16_t field_id_unused_connection;
+    int16_t field_id_hotseat;
     int16_t field_id_cancel;
     int16_t field_id_ok;
-    int16_t field_id_next;
-    int16_t field_id_accept;
-    int16_t field_id_back;
+    int16_t field_id_start_game;
+    int16_t field_id_load_game;
+    int16_t field_id_join_game;
     int16_t field_id_setup;
-    int16_t field_id_help;
     int16_t field_id_begin;
     undefined field71_0xef;
     undefined field72_0xf0;
     int16_t lbx_entry_num;
     int16_t screen_x;
     int16_t screen_y;
-    int16_t flag_ten_disabled;
-    int16_t flag_modem_disabled;
-    int16_t flag_serial_type;
     int16_t flag_network_disabled;
+    int16_t flag_online_disabled;
+    int16_t flag_unused_connection;
+    int16_t flag_hotseat_disabled;
     int16_t setup_screen_state;
     int16_t last_scan_id;
     uint8_t is_host_flag;
@@ -2208,16 +1701,6 @@ struct s_net_tactical_combat_message {
     int16_t arg1;
     int16_t arg2;
     int16_t arg3;
-};
-
-typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;
-
-struct s_net_modem_file {
-    uint32_t mode;
-    FILE *file;
-    uint8_t *buffer;
-    uint8_t *current_ptr;
-    uint32_t buffer_size;
 };
 
 typedef struct s_net_pack_change_relation s_net_pack_change_relation, *Ps_net_pack_change_relation;
@@ -2546,14 +2029,14 @@ struct s_net_player {
 typedef struct s_network s_network, *Ps_network;
 
 struct s_network {
-    struct s_modem_settings modem_settings;
-    char modem_init_str[11];
+    struct s_online_settings online_settings;
+    char online_init_str[11];
     undefined field2_0x8e;
     undefined field3_0x8f;
     undefined field4_0x90;
     undefined field5_0x91;
     undefined field6_0x92;
-    int8_t modem_initialized;
+    int8_t online_initialized;
     uint8_t mode;
     int32_t joining_net_id;
     int8_t num_connected_players;
@@ -2680,8 +2163,7 @@ struct s_network {
     uint8_t players_ready_mask[MAX_PLAYERS];
     undefined field132_0x1ad;
     int8_t player_is_active_flags[MAX_PLAYERS];
-    int32_t field134_0x1b6;
-    int32_t field135_0x1ba;
+    int8_t host_election_rank_sync_cache[MAX_PLAYERS];
     char cur_game_name[9];
     int8_t player_color_selected_flags[MAX_PLAYERS];
     undefined all_ai_game_sync_flag;
@@ -2715,6 +2197,7 @@ struct s_network {
     int8_t diplomacy_initiator_id;
     int8_t diplomacy_active_flag;
     undefined field168_0x209;
+    uint32_t cur_session_id;
 };
 
 typedef struct s_npcdiplo_tech s_npcdiplo_tech, *Ps_npcdiplo_tech;
@@ -2722,13 +2205,6 @@ typedef struct s_npcdiplo_tech s_npcdiplo_tech, *Ps_npcdiplo_tech;
 struct s_npcdiplo_tech {
     int32_t value;
     uint8_t index;
-};
-
-typedef struct s_officer_picture_slot s_officer_picture_slot, *Ps_officer_picture_slot;
-
-struct s_officer_picture_slot {
-    struct s_animation_header *pic;
-    int16_t officer_id;
 };
 
 typedef struct s_officer_skill_help s_officer_skill_help, *Ps_officer_skill_help;
@@ -2873,22 +2349,6 @@ struct s_plntsum_planet {
     int8_t outpost_eta;
 };
 
-typedef struct s_plntsum_screen s_plntsum_screen, *Ps_plntsum_screen;
-
-struct s_plntsum_screen {
-    struct s_animation_header *pics[14];
-    int16_t buttons[10];
-    int16_t fields[8];
-    int16_t colony_icons[8];
-    int16_t output_icons[8];
-    int16_t up_button;
-    int16_t dn_button;
-    int16_t esc_button;
-    int16_t planet_icons[MAX_STARS];
-    bool refresh_fields;
-    int16_t scanned_input;
-};
-
 typedef struct s_plntsum_ship s_plntsum_ship, *Ps_plntsum_ship;
 
 struct s_plntsum_ship {
@@ -2974,59 +2434,6 @@ typedef struct s_racecust_race_evolution s_racecust_race_evolution, *Ps_racecust
 struct s_racecust_race_evolution {
     uint8_t count;
     struct s_racecust_trait_mod items[2];
-};
-
-typedef struct s_racescrn_icon_layout s_racescrn_icon_layout, *Ps_racescrn_icon_layout;
-
-struct s_racescrn_icon_layout {
-    int16_t x1;
-    int16_t y1;
-    int16_t x2;
-    int16_t y2;
-    int16_t spacing_x;
-    void (__cdecl *render_fn)(struct s_racescrn_mouse_group*);
-};
-
-typedef struct s_racescrn_mouse_group s_racescrn_mouse_group, *Ps_racescrn_mouse_group;
-
-struct s_racescrn_mouse_group {
-    int16_t x1;
-    int16_t y1;
-    int16_t x2;
-    int16_t y2;
-    int16_t total_height;
-    int16_t total_width;
-    uint16_t count;
-    int16_t field7_0xe;
-    int16_t icon_width;
-    int16_t spacing_x;
-    struct s_animation_header *sprite1;
-    struct s_animation_header *sprite2;
-    void (__cdecl *render_fn)(struct s_racescrn_mouse_group*);
-};
-
-typedef struct s_racescrn_race_display s_racescrn_race_display, *Ps_racescrn_race_display;
-
-struct s_racescrn_race_display {
-    int16_t list_idx;
-    int16_t player_idx;
-    struct s_player *player;
-    int16_t race;
-    int8_t is_empty_slot;
-    int8_t is_eliminated;
-    struct s_racescrn_mouse_group spy_icons_group;
-    int16_t agent_mission_idx;
-    int16_t relationship_slider_y;
-    int16_t relationshiop_field_id;
-    char *relationship_text;
-    int16_t main_interaction_field_id;
-    char *player_name;
-    struct s_animation_header *race_portrait_img;
-    struct s_animation_header *relationship_slider_img;
-    struct s_animation_header *eliminated_overlay_img;
-    struct s_animation_header *spy_icon_img;
-    struct s_animation_header *sabotage_icon_img;
-    struct s_animation_header *assassination_icon_img;
 };
 
 typedef struct s_report s_report, *Ps_report;
@@ -3161,14 +2568,14 @@ struct s_settings {
     int8_t active_save_slot;
     uint8_t multi_player_game_type;
     char net_game_name[9];
-    struct s_modem_settings modem_settings;
-    uint8_t modem_init_string[11];
+    struct s_online_settings online_settings;
+    uint8_t online_init_string[11];
     undefined field26_0xae;
     undefined field27_0xaf;
     undefined field28_0xb0;
     undefined field29_0xb1;
     undefined field30_0xb2;
-    int8_t modem_initialized;
+    int8_t online_initialized;
     int8_t combat_speedx2_flag;
     int8_t combat_legal_moves_flag;
     int8_t combat_missile_impact_flag;
@@ -3659,19 +3066,6 @@ struct s_ship_node {
     int8_t selected;
 };
 
-typedef struct s_skill_data s_skill_data, *Ps_skill_data;
-
-struct s_skill_data {
-    uint8_t skill_id;
-    uint32_t skill_mask;
-    uint8_t skill_type;
-    int16_t strength;
-    int8_t level_up;
-    int8_t cost;
-    const char *name;
-    const char *format_str;
-};
-
 typedef struct s_smack_video s_smack_video, *Ps_smack_video;
 
 struct s_smack_video {
@@ -3771,58 +3165,6 @@ struct s_system_display_ships {
     struct s_animation_header *pic;
 };
 
-typedef struct s_tech_app_data s_tech_app_data, *Ps_tech_app_data;
-
-struct s_tech_app_data {
-    char *name;
-    uint16_t tech_app_id;
-    int16_t tech_field_id;
-    uint8_t unk_class;
-    uint8_t ai_group;
-    uint8_t unknown1;
-    uint8_t in_strategic;
-    uint8_t type;
-};
-
-typedef struct s_tech_armor_data s_tech_armor_data, *Ps_tech_armor_data;
-
-struct s_tech_armor_data {
-    char *name;
-    int16_t armor_id;
-    int16_t tech_app_id;
-    undefined field3_0x8;
-    uint8_t troops_bonus;
-    int16_t ships_bonus;
-    int16_t cost_percent;
-    uint8_t strategic_hp;
-};
-
-typedef struct s_tech_building_data s_tech_building_data, *Ps_tech_building_data;
-
-struct s_tech_building_data {
-    char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
-    int16_t tech_app;
-    int32_t cost;
-    int16_t maintenance;
-    int8_t type;
-    undefined1 field7_0xf;
-    undefined1 field8_0x10;
-    undefined1 field9_0x11;
-    undefined1 field10_0x12;
-};
-
-typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data;
-
-struct s_tech_computer_data {
-    char *name;
-    uint16_t computer_id;
-    uint16_t tech_app_id;
-    uint16_t cost_by_ship_type[6];
-    int16_t bonus;
-};
-
 typedef struct s_tech_data_personal_shield s_tech_data_personal_shield, *Ps_tech_data_personal_shield;
 
 struct s_tech_data_personal_shield {
@@ -3835,148 +3177,6 @@ typedef struct s_tech_data_rifle s_tech_data_rifle, *Ps_tech_data_rifle;
 struct s_tech_data_rifle {
     int16_t tech_app_id;
     int8_t bonus;
-};
-
-typedef struct s_tech_drive_data s_tech_drive_data, *Ps_tech_drive_data;
-
-struct s_tech_drive_data {
-    char *name;
-    uint16_t drive_id;
-    uint16_t tech_app_id;
-    uint16_t space_per_ship_type[6];
-    uint16_t cost_per_ship_type[6];
-    int8_t combat_speed_min[6];
-    uint8_t combat_speed_max[6];
-    uint16_t warp_speed;
-};
-
-typedef struct s_tech_field_data s_tech_field_data, *Ps_tech_field_data;
-
-struct s_tech_field_data {
-    char *name;
-    int16_t tech_field_id;
-    int16_t prev_field_id;
-    int16_t next_field_id;
-    int16_t tech[4];
-    uint32_t cost;
-    uint8_t ai_group;
-};
-
-typedef struct s_tech_fuel_data s_tech_fuel_data, *Ps_tech_fuel_data;
-
-struct s_tech_fuel_data {
-    char *name;
-    uint16_t fuel_id;
-    uint16_t tech_app_id;
-    uint16_t ship_range;
-};
-
-typedef struct s_tech_hull_data s_tech_hull_data, *Ps_tech_hull_data;
-
-struct s_tech_hull_data {
-    uint16_t cost;
-    int16_t size;
-    uint16_t marines;
-    int16_t armor_hp;
-    uint16_t structure_hp;
-    uint16_t computer_hp;
-    uint16_t drive_hp;
-    uint16_t shield_hp;
-    uint16_t strat_beam;
-    uint16_t strat_missile;
-    uint16_t strat_special;
-    uint16_t strat_bomb;
-    int16_t strat_def_bonus;
-    int16_t strat_hits;
-    char *name;
-    char *size_name;
-};
-
-typedef struct s_tech_review_achievement s_tech_review_achievement, *Ps_tech_review_achievement;
-
-struct s_tech_review_achievement {
-    uint8_t id;
-    uint8_t flags; /* Bit 2 (0x04) = Group Header, Bit 3 (0x08) = End of Array */
-};
-
-typedef struct s_tech_shield_data s_tech_shield_data, *Ps_tech_shield_data;
-
-struct s_tech_shield_data {
-    char *name;
-    uint16_t shield_id;
-    uint16_t tech_app_id;
-    uint16_t space_per_ship_type[6];
-    uint16_t cost_per_ship_type[6];
-    uint16_t shield_class;
-    undefined field6_0x22;
-    undefined field7_0x23;
-    undefined field8_0x24;
-    undefined field9_0x25;
-    undefined field10_0x26;
-    undefined field11_0x27;
-    undefined field12_0x28;
-    undefined field13_0x29;
-    undefined field14_0x2a;
-    undefined field15_0x2b;
-    undefined field16_0x2c;
-    undefined field17_0x2d;
-    undefined field18_0x2e;
-    undefined field19_0x2f;
-    undefined field20_0x30;
-    undefined field21_0x31;
-    undefined field22_0x32;
-    undefined field23_0x33;
-    undefined field24_0x34;
-    undefined field25_0x35;
-    undefined field26_0x36;
-    undefined field27_0x37;
-    undefined field28_0x38;
-    undefined field29_0x39;
-    uint8_t unk_strat_value;
-};
-
-typedef struct s_tech_specials_data s_tech_specials_data, *Ps_tech_specials_data;
-
-struct s_tech_specials_data {
-    char *name;
-    uint16_t special_id;
-    uint16_t tech_app_id;
-    uint16_t space_per_ship_type[6];
-    uint16_t cost_per_ship_type[6];
-    uint16_t exclude[6];
-    int8_t category;
-    int16_t strategic;
-};
-
-typedef struct s_tech_weapon_data s_tech_weapon_data, *Ps_tech_weapon_data;
-
-struct s_tech_weapon_data {
-    char *name;
-    char *name_plural;
-    uint16_t weapon_id;
-    uint16_t tech_app_id;
-    uint8_t type;
-    int8_t ammo;
-    uint16_t size;
-    int16_t cost;
-    uint16_t natural_mods;
-    int16_t min_damage;
-    int16_t max_damage;
-    uint8_t strat_min_damage;
-    uint8_t strat_max_damage;
-    uint16_t available_mods;
-};
-
-typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;
-
-struct s_tech_weapon_mod_data {
-    char *name;
-    char *name_plural;
-    uint8_t mod_id;
-    int8_t level;
-    int16_t cost;
-    int16_t space;
-    uint8_t col5;
 };
 
 typedef struct s_techdata_planetary_shield s_techdata_planetary_shield, *Ps_techdata_planetary_shield;
@@ -4018,20 +3218,6 @@ struct s_transport_packet {
     uint32_t send_immediate_burst;
     uint16_t pad;
     uint8_t payload[TRANSPORT_PAYLOAD_SIZE];
-};
-
-typedef struct s_unit_data s_unit_data, *Ps_unit_data;
-
-struct s_unit_data {
-    char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
-    undefined field3_0x6;
-    undefined field4_0x7;
-    undefined field5_0x8;
-    undefined field6_0x9;
-    undefined field7_0xa;
-    undefined field8_0xb;
 };
 
 typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;
@@ -4106,3 +3292,5 @@ struct s_packed_screen_background_run8 {
     int8_t skip_count;
     int8_t pixel_count;
 };
+
+#pragma pack(pop)

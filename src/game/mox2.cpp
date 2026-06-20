@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <exception>
+
 namespace ALLOC = allocate;
 
 namespace MOX2 {
@@ -277,8 +279,6 @@ namespace MOX2 {
 
         MOX2::Set_Mox_Alt_Path_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: alternate path set to '%s'", farload::_secondary_drive_path);
-        ten::init();
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: ten init complete");
         fields::Assign_Update_Function_(RUSS::Mox_Update_);
         fonts::Load_Palette_(5, 0, 0xFF);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
@@ -371,10 +371,8 @@ namespace MOX2 {
 
         KEN::Ken_Init_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Ken_Init complete, entering screen control");
-        // TEN-only startup hook removed: TEN restoration is intentionally out of scope for this codebase.
         MOX2::Screen_Control_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Screen_Control returned");
-        // TEN-only shutdown hook removed: TEN restoration is intentionally out of scope for this codebase.
 
         // Copy leave message
         const char* thanks_src = nullptr;
@@ -409,7 +407,26 @@ namespace MOX2 {
 
     int SDLCALL thunk_main2_(void* unused) {
         (void)unused;
-        main2_();
+        try {
+            main2_();
+        } catch (const platform::process_exit_requested&) {
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: game thread exit requested message='%s'", platform::Exit_Message_());
+        } catch (const std::exception& ex) {
+            SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "mox2: unhandled game thread exception: %s", ex.what());
+            platform::Request_Exit_(ex.what());
+        } catch (...) {
+            SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "mox2: unknown game thread exception");
+            platform::Request_Exit_("unknown game thread exception");
+        }
+
+        sound::Destroy_Sound_();
+        netcode::Net_Uninit_();
+
+        if (!platform::Exit_Requested_()) {
+            platform::Request_Exit_();
+        }
+
+        platform::Mark_Game_Thread_Exited_();
         return 0;
     }
 

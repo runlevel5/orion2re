@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_player;
+
 #pragma pack(push, 1)
 struct s_net_election_msg {
     int32_t rank;
@@ -31,6 +33,9 @@ namespace NETTURN {
 
     /** Returns whether any AI-player sync mask still requires host broadcast data. */
     int8_t __cdecl Must_Broadcast_AI_Player_Data_();
+
+    /** Returns the lowest active player slot that can serve as the next-turn host, or -1 if none qualify. */
+    int32_t __cdecl Determine_Lowest_Active_Host_Player_(const s_player* players, int32_t num_players);
 
     /** Resets host-election and per-turn network sync state for the next turn. */
     void __cdecl Net_Init_Host_Election_();

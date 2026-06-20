@@ -2,6 +2,8 @@
 
 namespace {
     constexpr int kPlayerRemapPaletteStart = 144;
+    constexpr uint8_t kMpSetupPopupBackgroundColor = 0x09;
+    clock_t g_network_game_list_refresh_timer = 0;
 }
 
 namespace MULTPLAY {
@@ -31,17 +33,6 @@ namespace MULTPLAY {
         {1, 5, 50, 4},
     };
 
-    char _baud_rate_strings[8][6] = {
-        "1200",
-        "2400",
-        "4800",
-        "9600",
-        "14400",
-        "19200",
-        "28800",
-        "38400",
-    };
-
     uint8_t _allow_chat_mode;
 
     const char s__00551100[1] = "";
@@ -50,7 +41,7 @@ namespace MULTPLAY {
 
     const char s_S_005569cc[2] = "S";
 
-    void __cdecl Draw_Modem_Setup_Screen_(void) {
+    void __cdecl Draw_Online_Setup_Screen_(void) {
         char buffer[128];
         s_colors local_colors;
         int16_t x = MOX::_mp_screen->screen_x;
@@ -70,85 +61,6 @@ namespace MULTPLAY {
         s_colors* font_ptr = MISC::Font_Colors2_(4, 0x92, 0x98);
         local_colors = *font_ptr;
         fonts::Set_Font_Style_(4, &local_colors);
-
-        sprintf(buffer, "COM%d", NETMOX::_net.modem_settings.com_port_index + 1);
-        fonts::Print_(x + 130, y + 63, buffer);
-
-        fonts::Set_Font_Style_(4, &local_colors);
-        sprintf(buffer, "%ld", NETMOX::_net.modem_settings.baud_rate);
-        fonts::Print_(x + 300, y + 63, buffer);
-
-        int16_t msg_id = (NETMOX::_net.modem_initialized != 0) ? 0xf7 /* HESTR_0F7_TONE */ : 0xf8 /* HESTR_0F8_PULSE */;
-        const char* msg_str = HAROLD::H_Message_(msg_id);
-        sprintf(buffer, MOX::s_fmt_s, msg_str);
-
-        MISC::Set_Fitted_Font_Style_(buffer, &local_colors, 3, 2, 0, 0x4d, 0);
-        int16_t font_height = MISC::Get_Font_Style_();
-        fonts::Print_Centered_(x + 339, y - font_height + 163, buffer);
-
-        fonts::Set_Font_Style_(4, &local_colors);
-
-        if (MOX::_mp_screen->flag_modem_disabled == 1) {
-            MULTPLAY::Print_Modem_Strings_();
-
-            int16_t bx_offset = x + 143;
-            int16_t current_y = y + 81;
-
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
-            animate::Draw_(bx_offset, current_y, MOX::_mp_screen->btn_accept_off);
-
-            current_y += 12;
-
-            for (int i = 0; i < 8; ++i) {
-                if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
-                    s_colors* sel_font = MISC::Font_Colors2_(3, 0x92, 0x9a);
-                    local_colors = *sel_font;
-                    fonts::Set_Font_Style_(3, &local_colors);
-
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
-                    animate::Draw_(x + 148, current_y, MOX::_mp_screen->btn_accept_on);
-                }
-                else {
-                    s_colors* norm_font = MISC::Font_Colors2_(3, 0x92, 0x97);
-                    local_colors = *norm_font;
-                    fonts::Set_Font_Style_(3, &local_colors);
-                }
-
-                sprintf(buffer, "COM%d", i + 1);
-                fonts::Print_(x + 170, current_y + 3, buffer);
-                current_y += 15;
-            }
-        }
-        else if (MOX::_mp_screen->flag_modem_disabled == 2) {
-            MULTPLAY::Print_Modem_Strings_();
-
-            int16_t bx_offset = x + 298;
-            int16_t current_y = y + 81;
-
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
-            animate::Draw_(bx_offset, current_y, MOX::_mp_screen->btn_accept_off);
-
-            current_y += 12;
-
-            for (int i = 0; i < 8; ++i) {
-                if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
-                    s_colors* sel_font = MISC::Font_Colors2_(3, 0x92, 0x9a);
-                    local_colors = *sel_font;
-                    fonts::Set_Font_Style_(3, &local_colors);
-
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
-                    animate::Draw_(x + 303, current_y, MOX::_mp_screen->btn_accept_on);
-                }
-                else {
-                    s_colors* norm_font = MISC::Font_Colors2_(3, 0x92, 0x97);
-                    local_colors = *norm_font;
-                    fonts::Set_Font_Style_(3, &local_colors);
-                }
-
-                fonts::Print_Right_(x + 366, current_y + 3, MULTPLAY::_baud_rate_strings[i]);
-                current_y += 15;
-            }
-        }
     }
 
     void __cdecl Load_Net_Next_Turn_Screen_(int8_t fade_in) {
@@ -256,34 +168,34 @@ namespace MULTPLAY {
 
         animate::Draw_(screen->screen_x, screen->screen_y, screen->res_setup_bg);
 
-        animate::Set_Animation_Frame_(screen->anim_ten, screen->flag_ten_disabled);
-        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0x5B, screen->anim_ten);
-
-        animate::Set_Animation_Frame_(screen->anim_modem, screen->flag_modem_disabled);
-        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0x7A, screen->anim_modem);
-
-        animate::Set_Animation_Frame_(screen->anim_serial, screen->flag_serial_type);
-        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0x9B, screen->anim_serial);
-
-        animate::Set_Animation_Frame_(screen->anim_network, screen->flag_network_disabled);
-        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0xBB, screen->anim_network);
-
         int16_t sx = screen->screen_x;
         int16_t sy = screen->screen_y;
+        graphics::Fill_(sx + 0x38, sy + 0xB8, sx + 0x38 + animate::Get_Width_(screen->anim_hotseat) + 6, sy + 0xBB + animate::Get_Height_(screen->anim_hotseat) + 4, kMpSetupPopupBackgroundColor);
 
-        if (screen->field_id_next == -1000) {
-            animate::Set_Animation_Frame_(screen->anim_btn_next, 2);
-            animate::Draw_(sx + 0x10D, sy + 0x5B, screen->anim_btn_next);
+        animate::Set_Animation_Frame_(screen->anim_network, screen->flag_network_disabled);
+        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0x5B, screen->anim_network);
+
+        animate::Set_Animation_Frame_(screen->anim_online, screen->flag_online_disabled);
+        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0x7A, screen->anim_online);
+
+        animate::Set_Animation_Frame_(screen->anim_hotseat, screen->flag_hotseat_disabled);
+        animate::Draw_(screen->screen_x + 0x3B, screen->screen_y + 0x9B, screen->anim_hotseat);
+
+        graphics::Fill_(sx + 0x6E, sy + 0xDC, sx + 0x181, sy + 0xFE, kMpSetupPopupBackgroundColor);
+
+        if (screen->field_id_start_game == -1000) {
+            animate::Set_Animation_Frame_(screen->anim_btn_start_game, 2);
+            animate::Draw_(sx + 0x10D, sy + 0x5B, screen->anim_btn_start_game);
         }
 
-        if (screen->field_id_accept == -1000) {
-            animate::Set_Animation_Frame_(screen->anim_btn_accept, 2);
-            animate::Draw_(sx + 0x10D, sy + 0x7A, screen->anim_btn_accept);
+        if (screen->field_id_load_game == -1000) {
+            animate::Set_Animation_Frame_(screen->anim_btn_load_game, 2);
+            animate::Draw_(sx + 0x10D, sy + 0x7A, screen->anim_btn_load_game);
         }
 
-        if (screen->field_id_back == -1000) {
-            animate::Set_Animation_Frame_(screen->anim_btn_back, 2);
-            animate::Draw_(sx + 0x10D, sy + 0x9B, screen->anim_btn_back);
+        if (screen->field_id_join_game == -1000) {
+            animate::Set_Animation_Frame_(screen->anim_btn_join_game, 2);
+            animate::Draw_(sx + 0x10D, sy + 0x9B, screen->anim_btn_join_game);
         }
 
         if (screen->field_id_setup == -1000) {
@@ -307,34 +219,22 @@ namespace MULTPLAY {
         MOX::_mp_screen->screen_x = (640 - animate::Get_Width_(MOX::_mp_screen->res_setup_bg)) / 2;
         MOX::_mp_screen->screen_y = (480 - animate::Get_Height_(MOX::_mp_screen->res_setup_bg)) / 2;
 
-        MOX::_mp_screen->anim_ten = (s_animation_header*)farload::Far_Reload_(s_MULTIGM_LBX_00558d04, 2, MOX::_screen_seg);
-        MOX::_mp_screen->anim_modem = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 3, MOX::_screen_seg);
-        MOX::_mp_screen->anim_serial = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 4, MOX::_screen_seg);
-        MOX::_mp_screen->anim_network = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 5, MOX::_screen_seg);
+        MOX::_mp_screen->anim_network = (s_animation_header*)farload::Far_Reload_(s_MULTIGM_LBX_00558d04, 2, MOX::_screen_seg);
+        MOX::_mp_screen->anim_online = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 3, MOX::_screen_seg);
+        MOX::_mp_screen->anim_hotseat = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 5, MOX::_screen_seg);
         MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 6, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_next = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 7, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_accept = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 8, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_back = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 9, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_start_game = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 7, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_load_game = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 8, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_join_game = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 9, MOX::_screen_seg);
         MOX::_mp_screen->anim_btn_setup = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 10, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_help = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 256, MOX::_screen_seg);
 
-        MULTPLAY::Copy_Modem_Defaults_To_Net_Struct_();
+        MULTPLAY::Copy_Online_Defaults_To_Net_Struct_();
     }
 
-    void __cdecl Set_Default_Modem_Settings_(void) {
-        MOX::_settings.modem_settings.com_port_index = 1;
-        MOX::_settings.modem_settings.serial_cfg_ext = 0;
-        MOX::_settings.modem_settings.baud_rate = 19200 /* 0x4B00 */;
-        MOX::_settings.modem_settings.parity = 'E' /* 0x45 */;
-        MOX::_settings.modem_settings.data_bits = 7;
-
-        strcpy(MOX::_settings.modem_settings.cmd_reset, MOX::s_ATZ_0055AA7C);
-        strcpy(MOX::_settings.modem_settings.cmd_init, MOX::s_AT_K0_M1_D2_0055AA6C);
-        strcpy(MOX::_settings.modem_settings.cmd_hangup, MOX::s_AT_H0_S0_0_0055AA60);
-        strcpy(MOX::_settings.modem_settings.dial_number, MOX::s_5551212_0055AA58);
-
-        MOX::_settings.modem_initialized = 1;
-        MOX::_settings.modem_settings.com_port_index = 0;
+    void __cdecl Set_Default_Online_Settings_(void) {
+        memset(&MOX::_settings.online_settings, 0, sizeof(MOX::_settings.online_settings));
+        strcpy(MOX::_settings.online_settings.endpoint, "127.0.0.1:47800");
+        MOX::_settings.online_initialized = 0;
     }
 
     int16_t __cdecl Warning_Box_Has_Opponent_Pressed_() {
@@ -345,8 +245,6 @@ namespace MULTPLAY {
     void __cdecl Multi_Player_Screen_() {
         MOX2::action_func_t saved_auto_func;
         int8_t valid_saves[12];
-        char msg_header[300];
-        char msg_body[752];
         int16_t input_field;
         bool done = false;
 
@@ -388,48 +286,26 @@ namespace MULTPLAY {
             timer::Mark_Time_();
             input_field = fields::Get_Input_();
 
-            if (input_field == MOX::_mp_screen->field_id_ten && MOX::_mp_screen->flag_ten_disabled == 0) {
+            if (input_field == MOX::_mp_screen->field_id_network && MOX::_mp_screen->flag_network_disabled == 0) {
                 MOX::_settings.multi_player_game_type = 1;
             }
-            else if (input_field == MOX::_mp_screen->field_id_modem && MOX::_mp_screen->flag_modem_disabled == 0) {
+            else if (input_field == MOX::_mp_screen->field_id_online && MOX::_mp_screen->flag_online_disabled == 0) {
                 MOX::_settings.multi_player_game_type = 2;
             }
-            else if (input_field == MOX::_mp_screen->field_id_serial && MOX::_mp_screen->flag_serial_type == 0) {
-                MOX::_settings.multi_player_game_type = 3;
-            }
-            else if (input_field == MOX::_mp_screen->field_id_network && MOX::_mp_screen->flag_network_disabled == 0) {
+            else if (input_field == MOX::_mp_screen->field_id_hotseat && MOX::_mp_screen->flag_hotseat_disabled == 0) {
                 MOX::_settings.multi_player_game_type = 4;
             }
             else if (input_field == MOX::_mp_screen->field_id_cancel) {
                 MOX::_current_screen = SCREEN_MAIN_MENU;
                 done = true;
             }
-            else if (input_field == MOX::_mp_screen->field_id_help) {
-                strcpy(msg_header, HAROLD::H_Message_(0x1D /* HESTR_01D_PLAY_MASTER_OF_ORION_I */));
-                strcpy(msg_body, HAROLD::H_Message_(0x1E /* HESTR_01E_COMBATTING_COMPUTERIZE */));
-                strcat(msg_body, HAROLD::H_Message_(0x1F /* HESTR_01F_THIS_WILL_GUIDE_YOU_TH */));
-                TEXTBOX::Text_Box_(msg_header, msg_body);
-            }
-
-            if (input_field == MOX::_mp_screen->field_id_setup) {
-                if (MOX::_mp_screen->flag_serial_type != 0) {
-                    video::Set_Page_Off_();
-                    Draw_MP_Setup_Screen_();
-                    RUSS::Mox_Sync_Update_();
-                    MOX::_settings.multi_player_game_type = 3;
-                    NullModem_Setup_Screen_();
-                    Load_MP_Setup_Pictures_();
-                    fields::Assign_Auto_Function_(Draw_MP_Setup_Screen_, 1);
-                    fields::Clear_Fields_();
-                    Add_MP_Setup_Screen_Fields_();
-                    EVANHELP::Set_Multi_Player_Setup_Screen_Help_List_();
-                }
-                else if (MOX::_mp_screen->flag_modem_disabled != 0) {
+            else if (input_field == MOX::_mp_screen->field_id_setup) {
+                if (MOX::_mp_screen->flag_online_disabled != 0) {
                     video::Set_Page_Off_();
                     Draw_MP_Setup_Screen_();
                     RUSS::Mox_Sync_Update_();
                     MOX::_settings.multi_player_game_type = 2;
-                    Modem_Setup_Screen_();
+                    Online_Setup_Screen_();
                     Load_MP_Setup_Pictures_();
                     fields::Assign_Auto_Function_(Draw_MP_Setup_Screen_, 1);
                     fields::Clear_Fields_();
@@ -437,7 +313,7 @@ namespace MULTPLAY {
                     EVANHELP::Set_Multi_Player_Setup_Screen_Help_List_();
                 }
             }
-            else if (input_field == MOX::_mp_screen->field_id_accept) {
+            else if (input_field == MOX::_mp_screen->field_id_load_game) {
                 bool proceed = true;
                 MOX::_current_screen = SCREEN_MULTI_PLAYER;
                 if (Get_Valid_MP_Save_Games_(valid_saves) != 0) {
@@ -466,7 +342,7 @@ namespace MULTPLAY {
                     }
                 }
             }
-            else if (input_field == MOX::_mp_screen->field_id_next) {
+            else if (input_field == MOX::_mp_screen->field_id_start_game) {
                 if (MOX::_settings.multi_player_game_type == 3) {
                     if (Warning_Box_Has_Opponent_Pressed_() != 0) {
                         MOX::_current_screen = SCREEN_NEW_GAME;
@@ -475,7 +351,7 @@ namespace MULTPLAY {
                 }
                 else {
                     if (MOX::_settings.net_game_name[0] == '\0') {
-                        memcpy(MOX::_settings.net_game_name, "Moo II ", 8);
+                        memcpy(MOX::_settings.net_game_name, "Moo II ", sizeof("Moo II "));
                         int32_t v = (int32_t)clock();
                         int32_t s = v >> 31;
                         v = ((v ^ s) - s) & 0x1F;
@@ -486,7 +362,7 @@ namespace MULTPLAY {
                     done = true;
                 }
             }
-            else if (input_field == MOX::_mp_screen->field_id_back) {
+            else if (input_field == MOX::_mp_screen->field_id_join_game) {
                 MOX::_current_screen = SCREEN_JOIN_NET;
                 done = true;
             }
@@ -604,78 +480,6 @@ namespace MULTPLAY {
         }
     }
 
-    void __cdecl NullModem_Setup_Screen_() {
-        int32_t orig_com_port = (int32_t)NETMOX::_net.modem_settings.com_port_index;
-        int32_t orig_baud_rate = (int32_t)NETMOX::_net.modem_settings.baud_rate;
-        int16_t exit_screen = 0;
-        int16_t input_field;
-
-        MULTPLAY::Load_NullModem_Setup_Screen_();
-        fields::Assign_Auto_Function_(MULTPLAY::Draw_NullModem_Setup_Screen_, 1);
-        EVANHELP::Set_Null_Modem_Setup_Screen_Help_List_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y);
-
-        do {
-            fields::Clear_Fields_();
-            MULTPLAY::Add_NullModem_Setup_Fields_();
-
-            input_field = fields::Get_Input_();
-            MOX::_mp_screen->last_scan_id = fields::Scan_Input_();
-
-            if (MOX::_mp_screen->flag_serial_type == 1) {
-                for (int16_t i = 0; i < 8; ++i) {
-                    if (MOX::_mp_screen->game_list_field_ids[i] == input_field) {
-                        input_field = -1;
-                        NETMOX::_net.modem_settings.com_port_index = i;
-                        MOX::_mp_screen->flag_serial_type = 0;
-                        break;
-                    }
-                }
-            }
-
-            if (MOX::_mp_screen->flag_serial_type == 2) {
-                for (int16_t i = 0; i < 8; ++i) {
-                    if (MOX::_mp_screen->game_list_field_ids[i] == input_field) {
-                        input_field = -1;
-                        NETMOX::_net.modem_settings.baud_rate = atol(MULTPLAY::_baud_rate_strings[i]);
-                        MOX::_mp_screen->flag_serial_type = 0;
-                        break;
-                    }
-                }
-            }
-
-            if (MOX::_mp_screen->game_list_field_ids[0] == input_field) {
-                MOX::_mp_screen->flag_serial_type = 1;
-                MOX::_mp_screen->last_scan_id = -1;
-                fields::Clear_Fields_();
-            } else if (MOX::_mp_screen->game_list_field_ids[1] == input_field) {
-                MOX::_mp_screen->flag_serial_type = 2;
-                MOX::_mp_screen->last_scan_id = -1;
-                fields::Clear_Fields_();
-            }
-
-            if (MOX::_mp_screen->field_id_close_dropdown == input_field) {
-                MOX::_mp_screen->flag_serial_type = 0;
-            } else if (MOX::_mp_screen->field_id_cancel == input_field) {
-                NETMOX::_net.modem_settings.com_port_index = orig_com_port;
-                NETMOX::_net.modem_settings.baud_rate = orig_baud_rate;
-                exit_screen = 1;
-            } else if (MOX::_mp_screen->field_id_ok == input_field) {
-                exit_screen = 1;
-            }
-
-            if (exit_screen == 0) {
-                video::Set_Page_Off_();
-                MULTPLAY::Draw_NullModem_Setup_Screen_();
-                RUSS::Mox_Sync_Update_();
-            }
-
-        } while (exit_screen == 0);
-
-        MOX::_settings.modem_settings = NETMOX::_net.modem_settings;
-
-        FILEDEF::Save_Game_Settings_();
-    }
-
     int8_t __cdecl Get_Valid_MP_Save_Games_(int8_t* valid_types_out) {
         int8_t result;
         const char* warning_msg;
@@ -707,33 +511,10 @@ namespace MULTPLAY {
         return found_valid;
     }
 
-    void __cdecl Copy_Modem_Defaults_To_Net_Struct_() {
-        NETMOX::_net.modem_settings = MOX::_settings.modem_settings;
-
-        if ((int32_t)NETMOX::_net.modem_settings.com_port_index < 0 || (int32_t)NETMOX::_net.modem_settings.com_port_index > 7) {
-            NETMOX::_net.modem_settings.com_port_index = 1;
-        }
-
-        uint32_t baud = NETMOX::_net.modem_settings.baud_rate;
-        if (baud != 1200 && baud != 4800 && baud != 9600 &&
-            baud != 14400 && baud != 19200 && baud != 28800 &&
-            baud != 38400) {
-            NETMOX::_net.modem_settings.baud_rate = 14400;
-        }
-
-        if (NETMOX::_net.modem_settings.parity != 'E' && NETMOX::_net.modem_settings.parity != 'O') {
-            NETMOX::_net.modem_settings.parity = 'E';
-        }
-
-        if ((int32_t)NETMOX::_net.modem_settings.com_port_index < 0 || (int32_t)NETMOX::_net.modem_settings.com_port_index >= 8) {
-            NETMOX::_net.modem_settings.com_port_index = 0;
-        }
-
-        if ((int32_t)NETMOX::_net.modem_settings.baud_rate < 1200) {
-            NETMOX::_net.modem_settings.baud_rate = 1200;
-        }
-        else if ((int32_t)NETMOX::_net.modem_settings.baud_rate > 38400) {
-            NETMOX::_net.modem_settings.baud_rate = 38400;
+    void __cdecl Copy_Online_Defaults_To_Net_Struct_() {
+        NETMOX::_net.online_settings = MOX::_settings.online_settings;
+        if (NETMOX::_net.online_settings.endpoint[0] == '\0') {
+            strcpy(NETMOX::_net.online_settings.endpoint, "127.0.0.1:47800");
         }
     }
 
@@ -746,9 +527,9 @@ namespace MULTPLAY {
         x = MOX::_mp_screen->screen_x;
         y = MOX::_mp_screen->screen_y;
 
-        // TEN hidden field
-        anim = MOX::_mp_screen->anim_ten;
-        MOX::_mp_screen->field_id_ten = fields::Add_Hidden_Field_(
+        // LAN/router hidden field.
+        anim = MOX::_mp_screen->anim_network;
+        MOX::_mp_screen->field_id_network = fields::Add_Hidden_Field_(
             x + 0x3B,
             y + 0x5B,
             x + 0x3B + animate::Get_Width_(anim),
@@ -757,9 +538,9 @@ namespace MULTPLAY {
             0x28 /* 40 */
         );
 
-        // Modem hidden field
-        anim = MOX::_mp_screen->anim_modem;
-        MOX::_mp_screen->field_id_modem = fields::Add_Hidden_Field_(
+        // Online hidden field.
+        anim = MOX::_mp_screen->anim_online;
+        MOX::_mp_screen->field_id_online = fields::Add_Hidden_Field_(
             x + 0x3B,
             y + 0x7A,
             x + 0x3B + animate::Get_Width_(anim),
@@ -768,35 +549,14 @@ namespace MULTPLAY {
             0x28 /* 40 */
         );
 
-        // Serial hidden field
-        anim = MOX::_mp_screen->anim_serial;
-        MOX::_mp_screen->field_id_serial = fields::Add_Hidden_Field_(
+        // Hotseat hidden field.
+        anim = MOX::_mp_screen->anim_hotseat;
+        MOX::_mp_screen->field_id_hotseat = fields::Add_Hidden_Field_(
             x + 0x3B,
             y + 0x9B,
             x + 0x3B + animate::Get_Width_(anim),
             y + 0x9B + animate::Get_Height_(anim),
-            "U",
-            0x28 /* 40 */
-        );
-
-        // Network hidden field
-        anim = MOX::_mp_screen->anim_network;
-        MOX::_mp_screen->field_id_network = fields::Add_Hidden_Field_(
-            x + 0x3B,
-            y + 0xBB,
-            x + 0x3B + animate::Get_Width_(anim),
-            y + 0xBB + animate::Get_Height_(anim),
             "H",
-            0x28 /* 40 */
-        );
-
-        // Help button
-        MOX::_mp_screen->field_id_help = fields::Add_Button_Field_(
-            x + 0x6E,
-            y + 0xDC,
-            s__00551100,
-            MOX::_mp_screen->anim_btn_help,
-            "T",
             0x28 /* 40 */
         );
 
@@ -813,56 +573,54 @@ namespace MULTPLAY {
         );
 
         // Check if any multi-player method is enabled
-        if (MOX::_mp_screen->flag_ten_disabled != 1 &&
-            MOX::_mp_screen->flag_modem_disabled != 1 &&
-            MOX::_mp_screen->flag_serial_type != 1 &&
-            MOX::_mp_screen->flag_network_disabled != 1)
+        if (MOX::_mp_screen->flag_network_disabled != 1 &&
+            MOX::_mp_screen->flag_online_disabled != 1 &&
+            MOX::_mp_screen->flag_hotseat_disabled != 1)
         {
-            MOX::_mp_screen->field_id_next = -1000;
-            MOX::_mp_screen->field_id_accept = -1000;
-            MOX::_mp_screen->field_id_back = -1000;
+            MOX::_mp_screen->field_id_start_game = -1000;
+            MOX::_mp_screen->field_id_load_game = -1000;
+            MOX::_mp_screen->field_id_join_game = -1000;
             MOX::_mp_screen->field_id_setup = -1000;
             Set_Multi_Player_Game_Type_();
             return;
         }
 
-        // Next button
-        MOX::_mp_screen->field_id_next = fields::Add_Button_Field_(
+        // Start Game button
+        MOX::_mp_screen->field_id_start_game = fields::Add_Button_Field_(
             x + 0x10D,
             y + 0x5B,
             s__00551100,
-            MOX::_mp_screen->anim_btn_next,
+            MOX::_mp_screen->anim_btn_start_game,
             "S",
             0x28 /* 40 */
         );
 
-        // Accept button
-        MOX::_mp_screen->field_id_accept = fields::Add_Button_Field_(
+        // Load Game button
+        MOX::_mp_screen->field_id_load_game = fields::Add_Button_Field_(
             x + 0x10D,
             y + 0x7A,
             s__00551100,
-            MOX::_mp_screen->anim_btn_accept,
+            MOX::_mp_screen->anim_btn_load_game,
             "L",
             0x28 /* 40 */
         );
 
-        // Back button
-        if (MOX::_mp_screen->flag_network_disabled == 1) {
-            MOX::_mp_screen->field_id_back = -1000;
+        // Join Game button
+        if (MOX::_mp_screen->flag_hotseat_disabled == 1) {
+            MOX::_mp_screen->field_id_join_game = -1000;
         } else {
-            MOX::_mp_screen->field_id_back = fields::Add_Button_Field_(
+            MOX::_mp_screen->field_id_join_game = fields::Add_Button_Field_(
                 x + 0x10D,
                 y + 0x9B,
                 s__00551100,
-                MOX::_mp_screen->anim_btn_back,
+                MOX::_mp_screen->anim_btn_join_game,
                 "J",
                 0x28 /* 40 */
             );
         }
 
         // Setup button
-        if (MOX::_mp_screen->flag_modem_disabled != 1 &&
-            MOX::_mp_screen->flag_serial_type != 1)
+        if (MOX::_mp_screen->flag_online_disabled != 1)
         {
             MOX::_mp_screen->field_id_setup = -1000;
         } else {
@@ -879,65 +637,24 @@ namespace MULTPLAY {
         Set_Multi_Player_Game_Type_();
     }
 
-    void __cdecl Add_Modem_Setup_Fields2_(void) {
+    void __cdecl Add_Online_Setup_Fields2_(void) {
         int16_t screen_x = MOX::_mp_screen->screen_x;
         int16_t screen_y = MOX::_mp_screen->screen_y;
 
-        MOX::_mp_screen->field_id_cancel = -1000;
+        int16_t btn_y = screen_y + 0xC7;
 
-        if (MOX::_mp_screen->flag_modem_disabled == 1) {
-            int16_t start_x = screen_x + 0x94;
-            int16_t current_y = screen_y + 0x56;
-            int16_t end_x = start_x + 0x55;
+        MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(
+            screen_x + 0x3D, btn_y, s__00551100, MOX::_mp_screen->anim_btn_cancel, s__00551120, 0x28
+        );
 
-            for (int i = 0; i < 8; ++i) {
-                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(start_x, current_y, end_x, current_y + 0xF, s__00551100, 0x28);
-                current_y += 0xF;
-            }
-        }
-        else if (MOX::_mp_screen->flag_modem_disabled == 2) {
-            int16_t start_x = screen_x + 0x12F;
-            int16_t current_y = screen_y + 0x60;
-            int16_t end_x = start_x + 0x50;
-
-            for (int i = 0; i < 8; ++i) {
-                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(start_x, current_y, end_x, current_y + 0xF, s__00551100, 0x28);
-                current_y += 0xF;
-            }
-        }
-        else {
-            int16_t btn_y = screen_y + 0xC7;
-
-            MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(
-                screen_x + 0x3D, btn_y, s__00551100, MOX::_mp_screen->anim_btn_cancel, s__00551120, 0x28
-            );
-
-            MOX::_mp_screen->field_id_ok = fields::Add_Button_Field_(
-                screen_x + 0xFF, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 0x28
-            );
-
-            int16_t hidden_y1 = screen_y + 0x3E;
-            int16_t hidden_y2 = screen_y + 0x4D;
-
-            MOX::_mp_screen->game_list_field_ids[0] = fields::Add_Hidden_Field_(
-                screen_x + 0x7A, hidden_y1, screen_x + 0xCA, hidden_y2, s__00551100, 0x28
-            );
-
-            MOX::_mp_screen->game_list_field_ids[1] = fields::Add_Hidden_Field_(
-                screen_x + 0x124, hidden_y1, screen_x + 0x174, hidden_y2, s__00551100, 0x28
-            );
-
-            MOX::_mp_screen->game_list_field_ids[5] = fields::Add_Hidden_Field_(
-                screen_x + 0x126, screen_y + 0x9D, screen_x + 0x176, screen_y + 0xAC, s__00551100, 0x28
-            );
-        }
+        MOX::_mp_screen->field_id_ok = fields::Add_Button_Field_(
+            screen_x + 0xFF, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 0x28
+        );
 
         MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
-
-        MOX::_mp_screen->field_id_close_dropdown = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0x29);
     }
 
-void __cdecl Load_Modem_Setup_Screen_(void) {
+void __cdecl Load_Online_Setup_Screen_(void) {
     MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
 
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
@@ -958,158 +675,34 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
     MOX::_mp_screen->subscreen_mode = 1;
 }
 
-    void __cdecl Add_NullModem_Setup_Fields_() {
-        int16_t screen_x = MOX::_mp_screen->screen_x;
-        int16_t screen_y = MOX::_mp_screen->screen_y;
-
-        if (MOX::_mp_screen->flag_serial_type == 1) {
-            int16_t x1 = screen_x + 0x86;
-            int16_t y1 = screen_y + 0x74;
-            int16_t x2 = x1 + 0x50;
-            for (int i = 0; i < 8; ++i) {
-                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(x1, y1, x2, y1 + 0xE, s__00551100, 41);
-                y1 += 15;
-            }
-        } else if (MOX::_mp_screen->flag_serial_type == 2) {
-            int16_t x1 = screen_x + 0x12C;
-            int16_t y1 = screen_y + 0x73;
-            int16_t x2 = x1 + 0x50;
-            for (int i = 0; i < 8; ++i) {
-                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(x1, y1, x2, y1 + 14, s__00551100, 41);
-                y1 += 15;
-            }
-        } else {
-            MOX::_mp_screen->game_list_field_ids[0] = fields::Add_Hidden_Field_(screen_x + 0x76, screen_y + 0x52, screen_x + 0xC6, screen_y + 0x61, s__00551100, 41);
-            MOX::_mp_screen->game_list_field_ids[1] = fields::Add_Hidden_Field_(screen_x + 0x121, screen_y + 0x51, screen_x + 0x16F, screen_y + 0x60, s__00551100, 41);
-
-            int16_t btn_y = screen_y + 0x7C;
-            MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(screen_x + 0x3B, btn_y, s__00551100, MOX::_mp_screen->anim_btn_cancel, s__00551120, 40);
-            MOX::_mp_screen->field_id_ok = fields::Add_Button_Field_(screen_x + 0xFD, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 40);
-        }
-
-        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
-        MOX::_mp_screen->field_id_close_dropdown = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
-    }
-
-    void __cdecl Load_NullModem_Setup_Screen_(void) {
-        int16_t width;
-        int16_t height;
-
-        MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
-
-        memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
-
-        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
-
-        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
-        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x23, MOX::_global_cache_seg);
-        MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x26, MOX::_global_cache_seg);
-        MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x27, MOX::_global_cache_seg);
-
-        MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x24, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_unk_3 = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x25, MOX::_screen_seg);
-
-        width = animate::Get_Width_(MOX::_mp_screen->bg_seg);
-        MOX::_mp_screen->screen_x = (640 - width) / 2;
-
-        height = animate::Get_Height_(MOX::_mp_screen->bg_seg);
-        MOX::_mp_screen->screen_y = (480 - height) / 2;
-
-        NETMOX::_net.modem_settings = MOX::_settings.modem_settings;
-    }
-
-    void __cdecl Modem_Setup_Screen_() {
-        uint8_t original_lang = MOX::_settings.language;
+    void __cdecl Online_Setup_Screen_() {
         int16_t help_anchor_field;
         bool exit_loop = false;
         bool save_on_exit = false;
-        bool redraw_flag = false;
-        bool first_pass = true;
-        char cmd_reset_buf[40];
-        char cmd_init_buf[40];
-        char cmd_hangup_buf[40];
-        char dial_number_buf[40];
         s_network net_backup;
 
-        MOX::_settings.language = 0;
-        HAROLD::Load_Language_Fonts_();
         fields::Disable_Cancel_();
 
         memcpy(&net_backup, &NETMOX::_net, sizeof(s_network));
 
-        strcpy(cmd_reset_buf, NETMOX::_net.modem_settings.cmd_reset);
-        strcpy(cmd_init_buf, NETMOX::_net.modem_settings.cmd_init);
-        strcpy(cmd_hangup_buf, NETMOX::_net.modem_settings.cmd_hangup);
-        strcpy(dial_number_buf, NETMOX::_net.modem_settings.dial_number);
-
         fields::Clear_Fields_();
-        Load_Modem_Setup_Screen_();
-        fields::Assign_Auto_Function_(Draw_Modem_Setup_Screen_, 1);
-        Add_Modem_Setup_Fields_();
+        Load_Online_Setup_Screen_();
+        fields::Assign_Auto_Function_(Draw_Online_Setup_Screen_, 1);
+        Add_Online_Setup_Fields_();
 
         help_anchor_field = fields::_fields_count;
         fields::Deactivate_Help_List_();
         help_anchor_field--;
 
         while (!exit_loop) {
-            if (first_pass) {
-                fields::Clear_Fields_Above_(help_anchor_field);
-            } else {
-                fields::Clear_Fields_();
-            }
+            fields::Clear_Fields_Above_(help_anchor_field);
 
-            Add_Modem_Setup_Fields2_();
+            Add_Online_Setup_Fields2_();
             int16_t input_id = fields::Get_Input_();
             int16_t scan_id = fields::Scan_Input_();
             MOX::_mp_screen->last_scan_id = scan_id;
 
-            // Mode 1: COM Port selection dropdown
-            if (MOX::_mp_screen->flag_modem_disabled == 1) {
-                for (int16_t i = 0; i < 8; ++i) {
-                    if (MOX::_mp_screen->game_list_field_ids[i] == input_id) {
-                        input_id = -1;
-                        redraw_flag = true;
-                        NETMOX::_net.modem_settings.com_port_index = (int32_t)i;
-                        MOX::_mp_screen->flag_modem_disabled = 0;
-                        break;
-                    }
-                }
-            }
-
-            // Mode 2: Baud rate selection dropdown
-            if (MOX::_mp_screen->flag_modem_disabled == 2) {
-                for (int16_t i = 0; i < 8; ++i) {
-                    if (MOX::_mp_screen->game_list_field_ids[i] == input_id) {
-                        input_id = -1;
-                        redraw_flag = true;
-                        NETMOX::_net.modem_settings.baud_rate = (int32_t)atol(MULTPLAY::_baud_rate_strings[i]);
-                        MOX::_mp_screen->flag_modem_disabled = 0;
-                        break;
-                    }
-                }
-            }
-
-            if (Check_Modem_Init_Help_Fields_(input_id, original_lang)) {
-                redraw_flag = true;
-            }
-
-            if (MOX::_mp_screen->game_list_field_ids[0] == input_id) {
-                MOX::_mp_screen->flag_modem_disabled = 1; /* COM selection mode */
-                MOX::_mp_screen->last_scan_id = -1;
-                fields::Clear_Fields_();
-                first_pass = false;
-            } else if (MOX::_mp_screen->game_list_field_ids[1] == input_id) {
-                MOX::_mp_screen->flag_modem_disabled = 2; /* Baud selection mode */
-                MOX::_mp_screen->last_scan_id = -1;
-                fields::Clear_Fields_();
-                first_pass = false;
-            } else if (MOX::_mp_screen->game_list_field_ids[5] == input_id) {
-                NETMOX::_net.modem_initialized = !NETMOX::_net.modem_initialized;
-            } else if (MOX::_mp_screen->field_id_close_dropdown == input_id) {
-                MOX::_mp_screen->flag_modem_disabled = 0;
-                redraw_flag = true;
-                MOX::_mp_screen->last_scan_id = -1;
-            } else if (MOX::_mp_screen->field_id_cancel == input_id) {
+            if (MOX::_mp_screen->field_id_cancel == input_id) {
                 save_on_exit = false;
                 exit_loop = true;
                 memcpy(&NETMOX::_net, &net_backup, sizeof(s_network));
@@ -1119,28 +712,17 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
             }
 
             if (!exit_loop) {
-                if (!redraw_flag) {
-                    video::Set_Page_Off_();
-                    Draw_Modem_Setup_Screen_();
-                    RUSS::Mox_Sync_Update_();
-                } else {
-                    redraw_flag = false;
-                    fields::Clear_Fields_();
-                    Add_Modem_Setup_Fields_();
-                    first_pass = true;
-                    help_anchor_field = fields::_fields_count - 1;
-                }
+                video::Set_Page_Off_();
+                Draw_Online_Setup_Screen_();
+                RUSS::Mox_Sync_Update_();
             }
         }
 
         if (save_on_exit) {
-            MOX::_settings.modem_settings = NETMOX::_net.modem_settings;
+            MOX::_settings.online_settings = NETMOX::_net.online_settings;
 
             FILEDEF::Save_Game_Settings_();
         }
-
-        MOX::_settings.language = original_lang;
-        HAROLD::Load_Language_Fonts_();
     }
 
     int16_t __cdecl Load_Multi_Player_Game_Screen_(void) {
@@ -1150,13 +732,13 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         bool exit_loop = false;
         int16_t result = -1;
 
-        if (MOX::_game_type == 2) {
+        if (MOX::_game_type == 2 || (MOX::_game_type == 3 && NETMOX::_net.mode == 1)) {
             MULTPLAY::Change_MP_Game_Name_();
             strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
 
             if (NETMOX::_net.cur_game_name[0] == '\0') {
                 // Initialize default game name "MooII " with a random letter at the end
-                memcpy(NETMOX::_net.cur_game_name, "MooII ", 7); /* s_MooII_0055aa80 */
+                memcpy(NETMOX::_net.cur_game_name, "MooII ", sizeof("MooII ")); /* s_MooII_0055aa80 */
                 NETMOX::_net.cur_game_name[5] = (char)(clock() % 25) + 'a';
             }
         }
@@ -1229,78 +811,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         return result;
     }
 
-    void __cdecl Draw_NullModem_Setup_Screen_(void) {
-        int16_t x = MOX::_mp_screen->screen_x;
-        int16_t y = MOX::_mp_screen->screen_y;
-        char buffer[32];
-        s_colors style_colors;
-
-        video::Set_Page_Off_();
-
-        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
-        animate::Draw_(0, 0, MOX::_mp_screen->pic);
-
-        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
-        animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
-
-        memcpy(&video::_current_palette[kPlayerRemapPaletteStart], MULTPLAY::_green_pal_colors, sizeof(MULTPLAY::_green_pal_colors));
-
-        MOX::_mox_font_colors_offset = 150;
-        style_colors = *MISC::Font_Colors2_(4, 146, 152);
-        fonts::Set_Font_Style_(4, &style_colors);
-
-        s_modem_settings* settings = &NETMOX::_net.modem_settings;
-
-        sprintf(buffer, "COM:%d", settings->com_port_index + 1);
-        fonts::Print_(x + 119, y + 83, buffer);
-
-        sprintf(buffer, "%ld", settings->baud_rate);
-        fonts::Print_(x + 293, y + 83, buffer);
-
-        if (MOX::_mp_screen->flag_serial_type == 1) {
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
-            animate::Draw_(x + 129, y + 101, MOX::_mp_screen->btn_accept_off);
-
-            int16_t cur_y = y + 101;
-            for (int i = 0; i < 8; ++i) {
-                cur_y += 15;
-                if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
-                    style_colors = *MISC::Font_Colors2_(3, 146, 154);
-                    fonts::Set_Font_Style_(3, &style_colors);
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
-                    animate::Draw_(x + 134, cur_y, MOX::_mp_screen->btn_accept_on);
-                } else {
-                    style_colors = *MISC::Font_Colors2_(3, 146, 151);
-                    fonts::Set_Font_Style_(3, &style_colors);
-                }
-                sprintf(buffer, "COM:%d", i + 1);
-                fonts::Print_(x + 156, cur_y + 3, buffer);
-            }
-            return;
-        }
-
-        if (MOX::_mp_screen->flag_serial_type == 2) {
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
-            animate::Draw_(x + 295, y + 100, MOX::_mp_screen->btn_accept_off);
-
-            int16_t cur_y = y + 100;
-            for (int i = 0; i < 8; ++i) {
-                cur_y += 15;
-                if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
-                    style_colors = *MISC::Font_Colors2_(3, 146, 154);
-                    fonts::Set_Font_Style_(3, &style_colors);
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
-                    animate::Draw_(x + 300, cur_y, MOX::_mp_screen->btn_accept_on);
-                } else {
-                    style_colors = *MISC::Font_Colors2_(3, 146, 151);
-                    fonts::Set_Font_Style_(3, &style_colors);
-                }
-                fonts::Print_Right_(x + 363, cur_y + 3, MULTPLAY::_baud_rate_strings[i]);
-            }
-        }
-    }
-
-    void __cdecl Add_Modem_Setup_Fields_() {
+    void __cdecl Add_Online_Setup_Fields_() {
         int16_t sx = MOX::_mp_screen->screen_x;
         int16_t sy = MOX::_mp_screen->screen_y;
         
@@ -1311,64 +822,8 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         fonts::Set_Font_Style_(static_cast<uint8_t>(MOX::_mp_screen->subscreen_mode), &local_colors);
         
         MOX::_mp_screen->game_list_field_ids[3] = fields::Add_Continuous_String_Input_Field_(
-            x_offset, sy + 0x81, 0x9A, 0x10, NETMOX::_net.modem_settings.cmd_reset, 0x1E, 0, 0, 0x29, 0
+            x_offset, sy + 0x81, 0x9A, 0x10, NETMOX::_net.online_settings.endpoint, 0x1E, 0, 0, 0x29, 0
         );
-        MOX::_mp_screen->game_list_field_ids[4] = fields::Add_Continuous_String_Input_Field_(
-            x_offset, sy + 0x99, 0x9A, 0x10, NETMOX::_net.modem_settings.cmd_init, 0x1E, 0, 0, 0x29, 0
-        
-        );
-        MOX::_mp_screen->game_list_field_ids[6] = fields::Add_Continuous_String_Input_Field_(
-            x_offset, sy + 0xB1, 0x9A, 0x10, NETMOX::_net.modem_settings.cmd_hangup, 0x1E, 0, 0, 0x29, 0
-        );
-        
-        MOX::_mox_font_colors_offset = 0x96;
-        
-        p_colors = MISC::Font_Colors2_(4, 0x92, 0x98);
-        local_colors = *p_colors;
-        
-        fonts::Set_Font_Style_(4, &local_colors);
-        
-        MOX::_mp_screen->game_list_field_ids[2] = fields::Add_Continuous_String_Input_Field_(
-            sx + 0x91, sy + 0x5B, 0x96, 0x10, NETMOX::_net.modem_settings.dial_number, 0x20, 0, 0, 0x29, 0
-        );
-    }
-
-    bool __cdecl Check_Modem_Init_Help_Fields_(int16_t field_id, uint8_t language) {
-        int16_t help_id = -1;
-
-        if (MOX::_mp_screen->game_list_field_ids[0] + field_id == 0) {
-            help_id = 0x29A;
-        } else if (MOX::_mp_screen->game_list_field_ids[1] + field_id == 0) {
-            help_id = 0x29B;
-        } else if (MOX::_mp_screen->game_list_field_ids[5] + field_id == 0) {
-            help_id = 0x2A0;
-        } else if (MOX::_mp_screen->field_id_cancel + field_id == 0) {
-            help_id = 0x2A1;
-        } else if (MOX::_mp_screen->field_id_ok + field_id == 0) {
-            help_id = 0x2A2;
-        } else if (MOX::_mp_screen->game_list_field_ids[3] + field_id == 0) {
-            help_id = 0x29D;
-        } else if (MOX::_mp_screen->game_list_field_ids[4] + field_id == 0) {
-            help_id = 0x29E;
-        } else if (MOX::_mp_screen->game_list_field_ids[6] + field_id == 0) {
-            help_id = 0x29F;
-        } else if (MOX::_mp_screen->game_list_field_ids[2] + field_id == 0) {
-            help_id = 0x29C;
-        }
-
-        if (help_id != -1) {
-            MOX::_settings.language = language;
-            HAROLD::Load_Language_Fonts_();
-
-            TEXTBOX::Draw_Help_Entry_(help_id);
-
-            MOX::_settings.language = 0;
-            HAROLD::Load_Language_Fonts_();
-
-            return true;
-        }
-
-        return false;
     }
 
 void __cdecl Load_Load_MP_Game_Screen_(void) {
@@ -1511,7 +966,7 @@ void __cdecl Change_MP_Game_Name_() {
     LOADSAVE::Save_Session_Related_Settings_();
 }
 
-void __cdecl Print_Modem_Strings_() {
+void __cdecl Print_Online_Strings_() {
     int16_t screen_x = MOX::_mp_screen->screen_x;
     int16_t screen_y = MOX::_mp_screen->screen_y;
     s_colors* colors_ptr;
@@ -1523,17 +978,7 @@ void __cdecl Print_Modem_Strings_() {
     int16_t x_offset_batch = screen_x + 0x86;
     fonts::Set_Font_Style_(1, &local_colors);
 
-    fonts::Print_(x_offset_batch, screen_y + 0x85, NETMOX::_net.modem_settings.cmd_reset);
-    fonts::Print_(x_offset_batch, screen_y + 0x9D, NETMOX::_net.modem_settings.cmd_init);
-    fonts::Print_(x_offset_batch, screen_y + 0xB5, NETMOX::_net.modem_settings.cmd_hangup);
-
-    MOX::_mox_font_colors_offset = 0x96;
-
-    colors_ptr = MISC::Font_Colors2_(4, 0x92, 0x98);
-    local_colors = *colors_ptr;
-
-    fonts::Set_Font_Style_(4, &local_colors);
-    fonts::Print_(screen_x + 0x9B, screen_y + 0x5C, NETMOX::_net.modem_settings.dial_number);
+    fonts::Print_(x_offset_batch, screen_y + 0x85, NETMOX::_net.online_settings.endpoint);
 }
 
 int8_t __cdecl Hotseat_Player_Status_(int16_t player_idx) {
@@ -1770,13 +1215,13 @@ void __cdecl Add_Net_Next_Turn_Fields_()
 
 int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
     MOX2::action_func_t saved_auto_fn;
-    int16_t result;
+    int16_t result = 0;
     int16_t game_count;
     bool exit_screen = false;
     int16_t input_field;
     int16_t scan_id;
 
-    WINNET::_net_refresh_timer = 0;
+    g_network_game_list_refresh_timer = 0;
     MOX2::Get_Auto_Function_(&saved_auto_fn);
     fields::Clear_Fields_();
     fields::Set_Input_Delay_(3);
@@ -1811,6 +1256,7 @@ int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
                 char* game_name = netcode::Net_Get_Game_Name_(i);
                 if (game_name[0] != '\0') {
                     strcpy(NETMOX::_net.cur_game_name, game_name);
+                    NETMOX::_net.cur_session_id = netcode::Net_Get_Game_Session_Id_(i);
                     exit_screen = true;
                 }
             }
@@ -1822,6 +1268,7 @@ int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
             exit_screen = true;
             netcode::Net_Uninit_();
             NETMOX::_net.cur_game_name[0] = '\0';
+            NETMOX::_net.cur_session_id = 0;
         }
 
         if (!exit_screen) {
@@ -1920,9 +1367,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 }
 
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
-        if (WINNET::_net_refresh_timer < clock() + 5000) {
-            WINNET::Refresh_Game_List_();
-            WINNET::_net_refresh_timer = clock();
+        if (g_network_game_list_refresh_timer == 0 || clock() >= g_network_game_list_refresh_timer + 5000) {
+            netcode::Net_Refresh_Game_List_();
+            g_network_game_list_refresh_timer = clock();
         }
 
         int16_t display_count;
@@ -1984,9 +1431,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
         clock_t now = clock();
-        if (now + 5000 /* 5 seconds */ > WINNET::_net_refresh_timer) {
-            WINNET::Refresh_Game_List_();
-            WINNET::_net_refresh_timer = clock();
+        if (g_network_game_list_refresh_timer == 0 || now >= g_network_game_list_refresh_timer + 5000) {
+            netcode::Net_Refresh_Game_List_();
+            g_network_game_list_refresh_timer = clock();
         }
 
         int16_t count = 10;
@@ -2754,40 +2201,28 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     void __cdecl Set_Multi_Player_Game_Type_(void) {
         const uint8_t multi_player_game_type = MOX::_settings.multi_player_game_type;
 
-        if (multi_player_game_type == 2) {
+        if (multi_player_game_type == 2 || multi_player_game_type == 3) {
+            MOX::_settings.multi_player_game_type = 2;
             MOX::_game_type = 3;
-            MOX::_mp_screen->flag_ten_disabled = 0;
-            MOX::_mp_screen->flag_modem_disabled = 1;
-            MOX::_mp_screen->flag_serial_type = 0;
             MOX::_mp_screen->flag_network_disabled = 0;
+            MOX::_mp_screen->flag_online_disabled = 1;
+            MOX::_mp_screen->flag_hotseat_disabled = 0;
             NETMOX::_net.mode = 1;
-            return;
-        }
-
-        if (multi_player_game_type == 3) {
-            MOX::_game_type = 3;
-            MOX::_mp_screen->flag_ten_disabled = 0;
-            MOX::_mp_screen->flag_modem_disabled = 0;
-            MOX::_mp_screen->flag_serial_type = 1;
-            MOX::_mp_screen->flag_network_disabled = 0;
-            NETMOX::_net.mode = 2;
             return;
         }
 
         if (multi_player_game_type == 4) {
             MOX::_game_type = 1;
-            MOX::_mp_screen->flag_ten_disabled = 0;
-            MOX::_mp_screen->flag_modem_disabled = 0;
-            MOX::_mp_screen->flag_serial_type = 0;
-            MOX::_mp_screen->flag_network_disabled = 1;
+            MOX::_mp_screen->flag_network_disabled = 0;
+            MOX::_mp_screen->flag_online_disabled = 0;
+            MOX::_mp_screen->flag_hotseat_disabled = 1;
             return;
         }
 
         MOX::_game_type = 2;
-        MOX::_mp_screen->flag_ten_disabled = 1;
-        MOX::_mp_screen->flag_modem_disabled = 0;
-        MOX::_mp_screen->flag_serial_type = 0;
-        MOX::_mp_screen->flag_network_disabled = 0;
+        MOX::_mp_screen->flag_network_disabled = 1;
+        MOX::_mp_screen->flag_online_disabled = 0;
+        MOX::_mp_screen->flag_hotseat_disabled = 0;
         NETMOX::_net.mode = 0;
     }
 

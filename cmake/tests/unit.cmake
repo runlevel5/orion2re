@@ -1,5 +1,5 @@
 function(orion2re_add_unit_test TARGET_NAME)
-    cmake_parse_arguments(ORION2RE_TEST "" "" "SOURCES;PRODUCTION_SOURCES;FAKE_SOURCES" ${ARGN})
+    cmake_parse_arguments(ORION2RE_TEST "LINK_SDL" "" "SOURCES;PRODUCTION_SOURCES;FAKE_SOURCES;LIBRARIES" ${ARGN})
 
     add_executable(${TARGET_NAME}
         tests/test_main.cpp
@@ -16,15 +16,22 @@ function(orion2re_add_unit_test TARGET_NAME)
         "${CMAKE_CURRENT_SOURCE_DIR}/tests"
     )
 
+    target_precompile_headers(${TARGET_NAME} PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
+    )
+
+    target_link_libraries(${TARGET_NAME} PRIVATE SDL3::Headers)
+
+    if(ORION2RE_TEST_LINK_SDL)
+        target_link_libraries(${TARGET_NAME} PRIVATE SDL3::SDL3-static)
+    endif()
+
     target_link_libraries(${TARGET_NAME} PRIVATE
-        SDL3::SDL3-static
+        ${ORION2RE_TEST_LIBRARIES}
     )
 
     if(MSVC)
         target_compile_options(${TARGET_NAME} PRIVATE /W3 /permissive-)
-        target_precompile_headers(${TARGET_NAME} PRIVATE
-            "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
-        )
         target_compile_definitions(${TARGET_NAME} PRIVATE
             WIN32
             DOCTEST_CONFIG_NO_WINDOWS_SEH
@@ -43,6 +50,22 @@ orion2re_add_unit_test(test_fields_helpers
     FAKE_SOURCES
         tests/fakes/fake_exitm.cpp
 )
+
+orion2re_add_unit_test(test_netturn_host_selection
+    SOURCES
+        tests/unit/test_netturn_host_selection.cpp
+    PRODUCTION_SOURCES
+        src/game/netturn.cpp
+        src/game/netmox.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_netturn_runtime.cpp
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_netturn_host_selection PRIVATE -ffunction-sections -fdata-sections)
+    target_link_options(test_netturn_host_selection PRIVATE -Wl,--gc-sections)
+endif()
 
 orion2re_add_unit_test(test_video_scan_bounds
     SOURCES
@@ -68,4 +91,82 @@ orion2re_add_unit_test(test_fields
         tests/fakes/fake_sound.cpp
         tests/fakes/fake_textbox.cpp
         tests/fakes/fake_video.cpp
+    LINK_SDL
+)
+
+orion2re_add_unit_test(test_router_protocol
+    SOURCES
+        tests/unit/test_router_protocol.cpp
+    PRODUCTION_SOURCES
+        src/network/router_protocol.cpp
+    LIBRARIES
+        orion2re_lz4
+)
+
+orion2re_add_unit_test(test_router_core
+    SOURCES
+        tests/unit/test_router_core.cpp
+    PRODUCTION_SOURCES
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+    LIBRARIES
+        orion2re_lz4
+)
+
+orion2re_add_unit_test(test_router_service
+    SOURCES
+        tests/unit/test_router_service.cpp
+    PRODUCTION_SOURCES
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+        orion2re_lz4
+    LINK_SDL
+)
+
+orion2re_add_unit_test(test_router_session_browser
+    SOURCES
+        tests/unit/test_router_session_browser.cpp
+    PRODUCTION_SOURCES
+        src/network/router_client.cpp
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_session_browser.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+        orion2re_lz4
+    LINK_SDL
+)
+
+orion2re_add_unit_test(test_netadapter
+    SOURCES
+        tests/unit/test_netadapter.cpp
+    PRODUCTION_SOURCES
+        src/game/netadapter.cpp
+        src/network/router_client.cpp
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_session_browser.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+        orion2re_lz4
+    LINK_SDL
+)
+
+orion2re_add_unit_test(test_router_client
+    SOURCES
+        tests/unit/test_router_client.cpp
+    PRODUCTION_SOURCES
+        src/network/router_client.cpp
+        src/network/router_core.cpp
+        src/network/router_protocol.cpp
+        src/network/router_service.cpp
+    LIBRARIES
+        uv_a
+        orion2re_lz4
+    LINK_SDL
 )

@@ -375,11 +375,11 @@ namespace ADVCIV {
         _star_colony_owner = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_STARS);
         _planet_worth_to_player = (s_adv_planet_worth*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x3c8);
 
-        memset(_adv_civ_player, 0, 0x8500);
-        memset(_parsec, 0, 0x5100);
+        memset(_adv_civ_player, 0, MAX_PLAYERS * sizeof(*_adv_civ_player));
+        memset(_parsec, 0, MAX_STARS * sizeof(*_parsec));
         memset(_planet_selected_flag, 0xFF, MAX_PLANETS);
         memset(_star_colony_owner, 0xFF, MAX_STARS);
-        memset(_planet_worth_to_player, 0xFF, 0x3c8);
+        memset(_planet_worth_to_player, 0xFF, MAX_PLAYERS * sizeof(*_planet_worth_to_player));
 
         for (int16_t p_idx = 0; p_idx < (int16_t)MOX::_NUM_PLAYERS; ++p_idx) {
             int16_t hw_idx = MOX::_player[p_idx].home_planet_id;

@@ -1,5 +1,23 @@
 #pragma once
 
+struct s_animation_header;
+
+typedef struct s_plntsum_screen s_plntsum_screen, *Ps_plntsum_screen;
+
+struct s_plntsum_screen {
+    struct s_animation_header *pics[14];
+    int16_t buttons[10];
+    int16_t fields[8];
+    int16_t colony_icons[8];
+    int16_t output_icons[8];
+    int16_t up_button;
+    int16_t dn_button;
+    int16_t esc_button;
+    int16_t planet_icons[MAX_STARS];
+    bool refresh_fields;
+    int16_t scanned_input;
+};
+
 namespace PLNTSUM {
     extern int16_t _plntscrn_delta_y[9];
     extern int16_t _sort_choice;

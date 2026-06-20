@@ -482,11 +482,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 key::Wait_For_Key_();
             }
 
-            _pl = (s_planet_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x17E8);
-            memcpy(_pl, MOX::_planet, 0x17E8);
+            _pl = (s_planet_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, MAX_PLANETS * sizeof(*MOX::_planet));
+            memcpy(_pl, MOX::_planet, MAX_PLANETS * sizeof(*MOX::_planet));
 
-            s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FC8);
-            memcpy(star_backup, MOX::_star, 0x1FC8);
+            s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_STARS * sizeof(*MOX::_star));
+            memcpy(star_backup, MOX::_star, MAX_STARS * sizeof(*MOX::_star));
 
             while (max_planets <= MOX::_planet_count - gas_giant_count) {
                 int32_t random_idx = game_random::Random_(static_cast<int32_t>(MOX::_planet_count)) - 1;
@@ -1286,7 +1286,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             MOX::_star_width = 37;
             MOX::_star_height = 37;
             _companion_star = 0;
-            memset(MOX::_planet, 0, 0x17E8);
+            memset(MOX::_planet, 0, MAX_PLANETS * sizeof(*MOX::_planet));
             RUSS::Mox_Update_();
 
             _name_seg = farload::Far_Reload_Data_("starname.lbx", 1, MOX::_screen_seg, 0, 0x33D, 0xF);
@@ -1393,8 +1393,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 MOX::_NUM_COLONIES = 0;
                 memset(_special_count, 0, sizeof(_special_count));
                 MOX::_planet_count = 0;
-                memset(MOX::_planet, 0, 0x17E8);
-                memset(MOX::_star, 0, 0x1FC8);
+                memset(MOX::_planet, 0, MAX_PLANETS * sizeof(*MOX::_planet));
+                memset(MOX::_star, 0, MAX_STARS * sizeof(*MOX::_star));
                 memset(planets_per_star, 0, sizeof(planets_per_star));
 
                 if (Set_Star_XYs_(grid_x, grid_y, gal_age, 1, 1)) {

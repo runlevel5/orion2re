@@ -72,7 +72,7 @@ namespace AIMOVE {
 
     void __cdecl Move_AI_(int16_t player_idx) {
         int8_t local_b88[MAX_STARS];
-        int8_t local_b40[MAX_STARS * 10];
+        int8_t local_b40[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
         s_ai_colonizable_planet local_870[MAX_PLANETS];
 
         RUSS::Mox_Update_();
@@ -211,8 +211,8 @@ namespace AIMOVE {
 
     void __cdecl Move_To_Unexplored_Stars_() {
         int8_t star_flags_0[MAX_STARS];
-        int32_t enemy_strength_1[10];
-        int32_t enemy_strength_2[10];
+        int32_t enemy_strength_1[ENEMY_STRENGTH_TURN_WINDOW];
+        int32_t enemy_strength_2[ENEMY_STRENGTH_TURN_WINDOW];
         int16_t ship_indices[MAX_SHIPS];
         s_ship_move_info move_info;
         int16_t local_4a0[2];
@@ -267,7 +267,7 @@ namespace AIMOVE {
                             int16_t loc = MOX::_ship[ship_idx].location;
                             uint8_t turns = (*AIDATA::_n_turns_from_to)[loc][i][_i_ai];
                             
-                            if (turns < min_turns && turns < 10 && enemy_strength_2[turns] == 0) {
+                            if (turns < min_turns && turns < ENEMY_STRENGTH_TURN_WINDOW && enemy_strength_2[turns] == 0) {
                                 min_turns = turns;
                                 best_ship_idx = j;
                                 best_star = (int32_t)i;
@@ -308,14 +308,14 @@ namespace AIMOVE {
                 // If so, iterate through stars to identify retreat/flee targets.
                 for (int star_idx = 0; star_idx < (int)MOX::_NUM_STARS; ++star_idx) {
                     // Each star entry in flee_stars is 10 bytes wide.
-                    int8_t* star_flee_ptr = &_flee_stars[star_idx * 10];
+                    int8_t* star_flee_ptr = &_flee_stars[star_idx * ENEMY_STRENGTH_TURN_WINDOW];
 
                     // Only mark the star if it hasn't been processed yet.
                     if (star_flee_ptr[0] == 0) {
                         // Check if player i has a colony at this star (has_colony is a bitmask).
                         if ((MOX::_star[star_idx].has_colony >> i) & 1) {
                             // Mark all 10 bytes for this star as fleeing locations.
-                            memset(star_flee_ptr, 1, 10);
+                            memset(star_flee_ptr, 1, ENEMY_STRENGTH_TURN_WINDOW);
                         }
                     }
                 }
@@ -442,7 +442,7 @@ namespace AIMOVE {
         int star_idx = (int)(int16_t)star_id;
         uint8_t in_nebula = MOX::_star[star_idx].in_nebula;
 
-        memset(turn_strengths, 0, 10 * sizeof(int));
+        memset(turn_strengths, 0, sizeof(int[ENEMY_STRENGTH_TURN_WINDOW]));
 
         s_ship_data* ship = MOX::_ship;
         s_ship_data* ship_end = MOX::_ship + (int16_t)MOX::_NUM_SHIPS;
@@ -457,7 +457,7 @@ namespace AIMOVE {
                 } else {
                     int location_diff = (int)(int16_t)ship->location - star_idx;
                     // Location diffs of 500 and 1000 relate to travel/wormhole logic
-                    if ((location_diff == 500 || location_diff == 1000) && ship->turns_left < 10) {
+                    if ((location_diff == 500 || location_diff == 1000) && ship->turns_left < ENEMY_STRENGTH_TURN_WINDOW) {
                         uint16_t(*strength_table)[MAX_SHIPS][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
                         turn_strengths[ship->turns_left] += (*strength_table)[ship_idx][_i_ai];
                     }
@@ -468,7 +468,7 @@ namespace AIMOVE {
         }
 
         cumulative_strengths[0] = turn_strengths[0];
-        for (int t = 1; t < 10; ++t) {
+        for (int t = 1; t < ENEMY_STRENGTH_TURN_WINDOW; ++t) {
             cumulative_strengths[t] = turn_strengths[t] + cumulative_strengths[t - 1];
         }
     }
@@ -1887,7 +1887,7 @@ namespace AIMOVE {
 
         // Initialize copy of target_info
         if (target_info != nullptr) {
-            memcpy(&target_info_copy, target_info, 10);
+            memcpy(&target_info_copy, target_info, sizeof(target_info_copy));
 
             puVar8 = &target_info_copy;
         }
@@ -2053,7 +2053,7 @@ namespace AIMOVE {
                 knocked_out_stars[*num_knocked_out] = (int8_t)star_idx;
                 (*num_knocked_out)++;
 
-                memset(&_flee_stars[star_idx * 10], 1, 10);
+                memset(&_flee_stars[star_idx * ENEMY_STRENGTH_TURN_WINDOW], 1, ENEMY_STRENGTH_TURN_WINDOW);
             }
         }
     }
@@ -2464,11 +2464,11 @@ namespace AIMOVE {
 
     int8_t __cdecl Get_Best_Escorted_Colony_Ship_(int16_t* colony_ships, int16_t* num_colony_ships, int16_t star_idx, int16_t max_turns)
     {
-        int32_t enemy_strength[10] = { 0 };
-        int32_t enemy_strength2[10];
-        int32_t total_enemy_strength[10];
+        int32_t enemy_strength[ENEMY_STRENGTH_TURN_WINDOW] = { 0 };
+        int32_t enemy_strength2[ENEMY_STRENGTH_TURN_WINDOW];
+        int32_t total_enemy_strength[ENEMY_STRENGTH_TURN_WINDOW];
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < ENEMY_STRENGTH_TURN_WINDOW; ++i) {
             total_enemy_strength[i] = 0;
         }
 
@@ -2479,7 +2479,7 @@ namespace AIMOVE {
                 if (p != AIMOVE::_i_ai) {
                     int8_t treaty = AIMOVE::_p_ai->treaty[p];
                     if (treaty < 1 || treaty > 3 || MOX::_player[p].objectives == 100) {
-                        for (int t = 0; t < 10; ++t) {
+                        for (int t = 0; t < ENEMY_STRENGTH_TURN_WINDOW; ++t) {
                             total_enemy_strength[t] += (*AIDATA::_possible_ship_strengths)[star_idx][p][AIMOVE::_i_ai][t];
                         }
                     }
@@ -2510,7 +2510,7 @@ namespace AIMOVE {
                     if (first_combat_ship != -1) {
                         int32_t total_escort_strength = 0;
                         bool is_valid_strength = false;
-                        if (max_turns < 10 || enemy_strength2[9] != 0) {
+                        if (max_turns < ENEMY_STRENGTH_TURN_WINDOW || enemy_strength2[ENEMY_STRENGTH_TURN_WINDOW - 1] != 0) {
                             is_valid_strength = true;
                         }
 
@@ -2547,10 +2547,10 @@ namespace AIMOVE {
                                 }
 
                                 if (is_valid_strength || total_escort_strength <= strength * 2) {
-                                    if (turns < 10 && turns < best_max_turn) {
+                                    if (turns < ENEMY_STRENGTH_TURN_WINDOW && turns < best_max_turn) {
                                         int32_t t2 = turns + 2;
-                                        if (t2 > 9) {
-                                            t2 = 9;
+                                        if (t2 >= ENEMY_STRENGTH_TURN_WINDOW) {
+                                            t2 = ENEMY_STRENGTH_TURN_WINDOW - 1;
                                         }
                                         if (enemy_strength2[t2] < strength) {
                                             bool can_escort = true;
@@ -2558,8 +2558,8 @@ namespace AIMOVE {
                                             if (total_enemy_strength[turns] > strength && total_escort_strength > strength) {
                                                 can_escort = false;
                                             }
-                                            if (t < 10) {
-                                                for (; t < 10; ++t) {
+                                            if (t < ENEMY_STRENGTH_TURN_WINDOW) {
+                                                for (; t < ENEMY_STRENGTH_TURN_WINDOW; ++t) {
                                                     if (enemy_strength[t] > strength) {
                                                         can_escort = false;
                                                     }
@@ -2603,10 +2603,10 @@ namespace AIMOVE {
 
                     if (MOX::_ship[fleet[0]].location - star_idx == 500) {
                         uint8_t turns = MOX::_ship[fleet[0]].turns_left;
-                        if (turns < 10 && turns <= max_turns) {
+                        if (turns < ENEMY_STRENGTH_TURN_WINDOW && turns <= max_turns) {
                             if (turns < best_max_turn && enemy_strength2[turns] < strength) {
                                 bool can_escort = true;
-                                for (int32_t t = turns + 1; t < 10; ++t) {
+                                for (int32_t t = turns + 1; t < ENEMY_STRENGTH_TURN_WINDOW; ++t) {
                                     if (enemy_strength[t] > strength) {
                                         can_escort = false;
                                         break;
@@ -2627,10 +2627,10 @@ namespace AIMOVE {
                         int16_t dest_star;
                         int16_t turns;
                         AIMOVE::Move_Ships_With_Possible_Intermediate_(fleet, star_idx, &dest_star, &turns);
-                        if (dest_star != -1 && turns < 10 && turns <= max_turns) {
+                        if (dest_star != -1 && turns < ENEMY_STRENGTH_TURN_WINDOW && turns <= max_turns) {
                             if (turns < best_max_turn && enemy_strength2[turns] < strength) {
                                 bool can_escort = true;
-                                for (int32_t t = turns + 1; t < 10; ++t) {
+                                for (int32_t t = turns + 1; t < ENEMY_STRENGTH_TURN_WINDOW; ++t) {
                                     if (enemy_strength[t] > strength) {
                                         can_escort = false;
                                         break;
@@ -2716,7 +2716,7 @@ namespace AIMOVE {
 
         if ((*AIDATA::_i_all_combat_ships)[player_id][star_idx] != -1 &&
             MOX::_settings.game_difficulty > 1) {
-            int8_t flee_stars[MAX_STARS * 10];
+            int8_t flee_stars[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
 
             s_attack_info attack_info;
 

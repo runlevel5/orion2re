@@ -542,7 +542,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     int16_t icon_button_x;
     int16_t icon_button_y;
 
-    memcpy(title, "llllllll", 8);
+    strcpy(title, "llllllll");
 
     for (int16_t i = 0; i < 8; ++i) {
         if (i == 0) {

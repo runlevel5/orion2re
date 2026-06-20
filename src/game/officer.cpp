@@ -2095,9 +2095,7 @@ namespace OFFICER {
         if (race_name[0] != '\0') {
             strings::String_To_Upper_(race_name);
 
-            s_colors* p_colors = MISC::Font_Colors2_(4, 'L', 'O');
-            s_colors local_colors;
-            memcpy(local_colors.colors, p_colors->colors, 8);
+            s_colors local_colors = *MISC::Font_Colors2_(4, 'L', 'O');
 
             fonts::Set_Font_Style_Outline_(4, &local_colors);
             fonts::Print_Centered_(print_x + 102, print_y + 5, race_name);
@@ -3435,7 +3433,7 @@ void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name) {
         break;
     }
 
-    memcpy(lbx_name, skill_description_lbx_name, 13);
+    strcpy(lbx_name, skill_description_lbx_name);
 }
 
 void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx,
@@ -3695,7 +3693,7 @@ void __cdecl Print_Officer_Data_(
         current_y = static_cast<int16_t>(current_y + 0x10);
     }
 
-    memcpy(dot_text, " .", 3);
+    strcpy(dot_text, " .");
     fonts::Get_String_Width_(dot_text);
     OFFICER::Get_Skill_Data_Max_Pixel_Width_(officer_id);
 

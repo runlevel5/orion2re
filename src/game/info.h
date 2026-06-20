@@ -10,6 +10,13 @@ struct s_list_item;
 struct s_list_state;
 struct s_tech_review_achievement;
 
+typedef struct s_tech_review_achievement s_tech_review_achievement, *Ps_tech_review_achievement;
+
+struct s_tech_review_achievement {
+    uint8_t id;
+    uint8_t flags; /* Bit 2 (0x04) = Group Header, Bit 3 (0x08) = End of Array */
+};
+
 namespace INFO {
     extern s_tech_review_achievement* _review_list[4];
 

@@ -18,19 +18,22 @@ namespace netcode {
     /** Initializes networking while pumping MOX before and after backend setup.
      * @param mode Connection backend selector.
      * @param recv_fn_ptr Callback invoked for received packets.
-     * @param network Modem/network configuration for modem modes.
+     * @param network Network configuration for router-backed modes.
      */
     int32_t __cdecl Do_Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network);
 
     /** Initializes the requested networking backend.
      * @param mode Connection backend selector.
      * @param recv_fn_ptr Callback invoked for received packets.
-     * @param network Modem/network configuration for modem modes.
+     * @param network Network configuration for router-backed modes.
      */
     int32_t __cdecl Net_Init_(uint32_t mode, recv_fn recv_fn_ptr, s_network* network);
 
     /** Returns the number of discovered game sessions. */
     int32_t __cdecl Net_Get_Game_Count_();
+
+    /** Requests a fresh session list from the active router and returns the cached count after pumping for a response. */
+    int32_t __cdecl Net_Refresh_Game_List_();
 
     /** Returns the number of known players in the active session list. */
     int32_t __cdecl Get_Player_Count_();
@@ -40,12 +43,17 @@ namespace netcode {
      */
     char* __cdecl Net_Get_Game_Name_(uint32_t session_idx);
 
-    /** Joins a discovered game session by name and creates the local player.
-     * @param game_name Session name to match.
+    /** Returns the router session ID for a discovered session.
+     * @param session_idx Zero-based session index.
+     */
+    uint32_t __cdecl Net_Get_Game_Session_Id_(uint32_t session_idx);
+
+    /** Joins a discovered game session by ID and creates the local player.
+     * @param session_id Router session ID to join.
      * @param password Optional session password.
      * @param player_name Local player display name.
      */
-    int32_t __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name);
+    int32_t __cdecl Net_Join_Game_(uint32_t session_id, const char* password, const char* player_name);
 
     /** Shuts down the active networking backend and releases session state. */
     void __cdecl Net_Uninit_();
@@ -53,18 +61,12 @@ namespace netcode {
     /** Returns whether a transport send is currently in progress. */
     int32_t __cdecl Net_Is_Sending_();
 
-    /** Configures the null-modem connection as the slave endpoint. */
-    void __cdecl Set_Null_Modem_Slave_();
-
-    /** Configures the null-modem connection as the host endpoint. */
-    void __cdecl Set_Null_Modem_Host_();
-
     /** Writes connected user IDs into the caller buffer and returns the count.
-     * @param users Output buffer for user IDs, or nullptr to query the count only.
+     * @param users Output buffer for 16-bit user IDs, or nullptr to query the count only.
      */
-    int32_t __cdecl Net_Get_Users_(uint8_t* users);
+    int32_t __cdecl Net_Get_Users_(int16_t* users);
 
-    /** Prevents DirectPlay from accepting new players. */
+    /** Prevents the active router session from accepting new players. */
     void __cdecl Net_Disable_New_Players_();
 
     /** Returns the current host network ID for the active backend. */

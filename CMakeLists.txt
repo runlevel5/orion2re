@@ -12,6 +12,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     else()
         message(FATAL_ERROR "Linux builds are only supported for x86 and x64 targets.")
     endif()
+elseif(APPLE)
+    set(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG -mlittle-endian)
 elseif(WIN32)
     set(ORION2RE_WINDOWS_ARCH "" CACHE STRING "Target Windows architecture (x86 or x64)")
     set_property(CACHE ORION2RE_WINDOWS_ARCH PROPERTY STRINGS x86 x64)
@@ -76,6 +78,10 @@ set(ORION2RE_VENDORED_SDL3_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/SDL")
 set(ORION2RE_VENDORED_SDL3_COMMIT "8e37db5e797b6167f3a00d697d816a684bd259c7")
 set(ORION2RE_VENDORED_DOCTEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/doctest")
 set(ORION2RE_VENDORED_DOCTEST_COMMIT "1da23a3e8119ec5cce4f9388e91b065e20bf06f5")
+set(ORION2RE_VENDORED_LIBUV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libuv")
+set(ORION2RE_VENDORED_LIBUV_COMMIT "5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b")
+set(ORION2RE_VENDORED_LZ4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/lz4")
+set(ORION2RE_VENDORED_LZ4_COMMIT "0774d05537f9762f838f7ab541b7765f1a729cb5")
 set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
 
 if(MSVC)
@@ -91,12 +97,29 @@ endif()
 
 option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds" OFF)
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
-option(ORION2RE_ENABLE_NETWORKING "Enable legacy DirectPlay networking" OFF)
+option(ORION2RE_BUILD_GAME "Build the SDL game executable" ON)
 option(ORION2RE_BUILD_TESTS "Build tests" OFF)
+option(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL "Exclude runtime executables from the default all target" ${ORION2RE_BUILD_TESTS})
 
 set(ORION2RE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests")
 
-if(NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
+if(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG)
+    include(CheckCCompilerFlag)
+    include(CheckCXXCompilerFlag)
+
+    check_c_compiler_flag("${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}" ORION2RE_C_SUPPORTS_LITTLE_ENDIAN_FLAG)
+    check_cxx_compiler_flag("${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}" ORION2RE_CXX_SUPPORTS_LITTLE_ENDIAN_FLAG)
+
+    if(NOT ORION2RE_C_SUPPORTS_LITTLE_ENDIAN_FLAG OR NOT ORION2RE_CXX_SUPPORTS_LITTLE_ENDIAN_FLAG)
+        message(FATAL_ERROR "The configured compiler must support ${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG} for macOS builds.")
+    endif()
+endif()
+
+if(ORION2RE_BUILD_TESTS AND NOT ORION2RE_BUILD_GAME)
+    message(FATAL_ERROR "ORION2RE_BUILD_TESTS currently requires ORION2RE_BUILD_GAME=ON because the test targets depend on SDL.")
+endif()
+
+if((ORION2RE_BUILD_GAME OR ORION2RE_BUILD_TESTS) AND NOT EXISTS "${ORION2RE_VENDORED_SDL3_DIR}/CMakeLists.txt")
     message(FATAL_ERROR
         "This project requires the SDL3 submodule at vendors/SDL. "
         "Run 'git submodule update --init --recursive vendors/SDL' and ensure it is pinned to ${ORION2RE_VENDORED_SDL3_COMMIT}."
@@ -110,18 +133,54 @@ if(ORION2RE_BUILD_TESTS AND NOT EXISTS "${ORION2RE_VENDORED_DOCTEST_DIR}/doctest
     )
 endif()
 
+if(NOT EXISTS "${ORION2RE_VENDORED_LIBUV_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR
+        "The router service requires the libuv submodule at vendors/libuv. "
+        "Run 'git submodule update --init --recursive vendors/libuv' and ensure it is pinned to ${ORION2RE_VENDORED_LIBUV_COMMIT}."
+    )
+endif()
+
+if(NOT EXISTS "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.h" OR NOT EXISTS "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.c")
+    message(FATAL_ERROR
+        "The router protocol requires the lz4 submodule at vendors/lz4. "
+        "Run 'git submodule update --init --recursive vendors/lz4' and ensure it is pinned to ${ORION2RE_VENDORED_LZ4_COMMIT}."
+    )
+endif()
+
 if(NOT EXISTS "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c")
     message(FATAL_ERROR
         "This project requires libsmacker sources at vendors/libsmacker."
     )
 endif()
 
-set(SDL_SHARED OFF CACHE BOOL "" FORCE)
-set(SDL_STATIC ON CACHE BOOL "" FORCE)
-set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
-set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+if(ORION2RE_BUILD_GAME OR ORION2RE_BUILD_TESTS)
+    set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+    set(SDL_STATIC ON CACHE BOOL "" FORCE)
+    set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+    set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("${ORION2RE_VENDORED_SDL3_DIR}" EXCLUDE_FROM_ALL)
+    add_subdirectory("${ORION2RE_VENDORED_SDL3_DIR}" EXCLUDE_FROM_ALL)
+
+    if(UNIX AND NOT APPLE AND SDL_UNIX_CONSOLE_BUILD AND ORION2RE_BUILD_GAME)
+        message(WARNING
+            "SDL_UNIX_CONSOLE_BUILD is enabled, so the orion2re game target is being built without desktop video backends and is not intended for gameplay. "
+            "Use -DORION2RE_BUILD_GAME=OFF to build only orion2re-router."
+        )
+    endif()
+endif()
+
+set(LIBUV_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(LIBUV_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LIBUV_BUILD_BENCH OFF CACHE BOOL "" FORCE)
+
+add_subdirectory("${ORION2RE_VENDORED_LIBUV_DIR}" EXCLUDE_FROM_ALL)
+
+add_library(orion2re_lz4 STATIC
+    "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.c"
+)
+target_include_directories(orion2re_lz4 PUBLIC
+    "${ORION2RE_VENDORED_LZ4_DIR}/lib"
+)
 
 if(MSVC AND WIN32 AND ORION2RE_GAME_DIR)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
@@ -132,117 +191,134 @@ if(MSVC AND WIN32 AND ORION2RE_GAME_DIR)
     set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_GAME_DIR}")
 endif()
 
-file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+if(ORION2RE_BUILD_GAME)
+    file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    )
+
+    file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+    )
+endif()
+
+set(ORION2RE_ROUTER_SOURCES
+    src/network/router_cli.cpp
+    src/network/router_core.cpp
+    src/network/router_protocol.cpp
+    src/network/router_service.cpp
 )
 
-file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+if(ORION2RE_BUILD_GAME)
+    add_executable(orion2re
+        ${ORION2RE_SOURCES}
+        ${ORION2RE_HEADERS}
+        "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c"
+        "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_bitstream.c"
+        "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_hufftree.c"
+    )
+
+    if(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL)
+        set_target_properties(orion2re PROPERTIES EXCLUDE_FROM_ALL YES)
+    endif()
+
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
+        ${ORION2RE_SOURCES}
+        ${ORION2RE_HEADERS}
+    )
+
+    target_compile_features(orion2re PRIVATE cxx_std_20)
+    target_include_directories(orion2re PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+        "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
+    )
+
+    target_precompile_headers(orion2re PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
+    )
+
+    target_link_libraries(orion2re PRIVATE
+        SDL3::SDL3-static
+        uv_a
+        orion2re_lz4
+    )
+endif()
+
+add_executable(orion2re-router
+    tools/router_main.cpp
+    ${ORION2RE_ROUTER_SOURCES}
 )
 
-add_executable(orion2re
-    ${ORION2RE_SOURCES}
-    ${ORION2RE_HEADERS}
-    "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c"
-    "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_bitstream.c"
-    "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_hufftree.c"
-)
+if(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL)
+    set_target_properties(orion2re-router PROPERTIES EXCLUDE_FROM_ALL YES)
+endif()
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES
-    ${ORION2RE_SOURCES}
-    ${ORION2RE_HEADERS}
-)
-
-target_compile_features(orion2re PRIVATE cxx_std_20)
-target_include_directories(orion2re PRIVATE
+target_compile_features(orion2re-router PRIVATE cxx_std_20)
+target_include_directories(orion2re-router PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
 )
-target_compile_definitions(orion2re PRIVATE
-    ORION2RE_ENABLE_NETWORKING=$<BOOL:${ORION2RE_ENABLE_NETWORKING}>
-)
-
-target_link_libraries(orion2re PRIVATE
-    SDL3::SDL3-static
+target_link_libraries(orion2re-router PRIVATE
+    uv_a
+    orion2re_lz4
 )
 
-if(WIN32)
+if(ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG)
+    if(TARGET orion2re)
+        target_compile_options(orion2re PRIVATE "${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}")
+    endif()
+    target_compile_options(orion2re-router PRIVATE "${ORION2RE_LITTLE_ENDIAN_COMPILE_FLAG}")
+endif()
+
+if(WIN32 AND TARGET orion2re)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
 endif()
 
-if(ORION2RE_GAME_DIR)
+if(ORION2RE_GAME_DIR AND TARGET orion2re)
     set_target_properties(orion2re PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${ORION2RE_GAME_DIR}"
     )
 endif()
 
 if(MSVC)
-    target_compile_options(orion2re PRIVATE /W3 /permissive-)
-    target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
+    if(TARGET orion2re)
+        target_compile_options(orion2re PRIVATE /W3 /permissive-)
+    endif()
+    target_compile_options(orion2re-router PRIVATE /W3 /permissive-)
+    if(TARGET orion2re)
+        target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
+    endif()
 
-    target_precompile_headers(orion2re PRIVATE
-        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h>"
-    )
+    if(TARGET orion2re)
+        target_compile_definitions(orion2re PRIVATE
+            WIN32
+            $<$<CONFIG:Debug>:_CRT_SECURE_NO_DEPRECATE>
+            $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_DEPRECATE>
+        )
+    endif()
 
-    target_compile_definitions(orion2re PRIVATE
+    target_compile_definitions(orion2re-router PRIVATE
         WIN32
         $<$<CONFIG:Debug>:_CRT_SECURE_NO_DEPRECATE>
         $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_DEPRECATE>
     )
 
-    target_compile_options(orion2re PRIVATE
-        $<$<CONFIG:Debug>:/RTC1>
-        $<$<CONFIG:Debug>:/GS>
-        $<$<CONFIG:Release>:/Gy>
-        $<$<CONFIG:Release>:/Oi>
-        $<$<CONFIG:Release>:/GS>
-        $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zi>
-        $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
-    )
-
-    set(ORION2RE_IMPORT_LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}/import-libs")
-    set(ORION2RE_LIB_TOOL "${CMAKE_LIB}")
-    if(NOT ORION2RE_LIB_TOOL)
-        set(ORION2RE_LIB_TOOL lib)
-    endif()
-
-    if(ORION2RE_ENABLE_NETWORKING)
-        add_custom_command(
-            OUTPUT
-                "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            COMMAND "${CMAKE_COMMAND}" -E make_directory "${ORION2RE_IMPORT_LIB_DIR}"
-            COMMAND "${ORION2RE_LIB_TOOL}"
-                "/def:${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-                "/machine:${ORION2RE_TARGET_ARCH}"
-                /name:DPLAYX.DLL
-                "/out:${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-            DEPENDS
-                "${CMAKE_CURRENT_SOURCE_DIR}/dplayx.def"
-            VERBATIM
+    if(TARGET orion2re)
+        target_compile_options(orion2re PRIVATE
+            $<$<CONFIG:Debug>:/RTC1>
+            $<$<CONFIG:Debug>:/GS>
+            $<$<CONFIG:Release>:/Gy>
+            $<$<CONFIG:Release>:/Oi>
+            $<$<CONFIG:Release>:/GS>
+            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zi>
+            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/Zo>
         )
 
-        add_custom_target(orion2re_windows_importlibs
-            DEPENDS
-                "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
+        target_link_options(orion2re PRIVATE
+            /DYNAMICBASE
+            /NXCOMPAT
+            $<$<CONFIG:Release>:/OPT:REF>
+            $<$<CONFIG:Release>:/OPT:ICF>
+            $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/DEBUG>
         )
-
-        add_dependencies(orion2re orion2re_windows_importlibs)
-
-        target_link_libraries(orion2re PRIVATE
-            "${ORION2RE_IMPORT_LIB_DIR}/dplayx.lib"
-        )
-    endif()
-
-    target_link_options(orion2re PRIVATE
-        /DYNAMICBASE
-        /NXCOMPAT
-        $<$<CONFIG:Release>:/OPT:REF>
-        $<$<CONFIG:Release>:/OPT:ICF>
-        $<$<AND:$<CONFIG:Release>,$<BOOL:${ORION2RE_RELEASE_DEBUG_INFO}>>:/DEBUG>
-    )
-elseif(WIN32)
-    if(ORION2RE_ENABLE_NETWORKING)
-        message(WARNING "Legacy DirectPlay networking import library setup remains MSVC-specific; non-MSVC Windows networking builds may need additional link setup.")
     endif()
 endif()
 
@@ -252,11 +328,23 @@ if(ORION2RE_ENABLE_ASAN)
     endif()
 
     if(MSVC)
-        target_compile_options(orion2re PRIVATE /fsanitize=address)
-        target_link_options(orion2re PRIVATE /INFERASANLIBS /fsanitize=address)
+        if(TARGET orion2re)
+            target_compile_options(orion2re PRIVATE /fsanitize=address)
+        endif()
+        target_compile_options(orion2re-router PRIVATE /fsanitize=address)
+        if(TARGET orion2re)
+            target_link_options(orion2re PRIVATE /INFERASANLIBS /fsanitize=address)
+        endif()
+        target_link_options(orion2re-router PRIVATE /INFERASANLIBS /fsanitize=address)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-        target_compile_options(orion2re PRIVATE -fsanitize=address -fno-omit-frame-pointer)
-        target_link_options(orion2re PRIVATE -fsanitize=address)
+        if(TARGET orion2re)
+            target_compile_options(orion2re PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+        endif()
+        target_compile_options(orion2re-router PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+        if(TARGET orion2re)
+            target_link_options(orion2re PRIVATE -fsanitize=address)
+        endif()
+        target_link_options(orion2re-router PRIVATE -fsanitize=address)
     else()
         message(FATAL_ERROR "ORION2RE_ENABLE_ASAN is unsupported for the current compiler.")
     endif()
