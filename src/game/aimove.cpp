@@ -1,9 +1,5 @@
 #include "pch.h"
 
-namespace {
-    using s_flee_star_slots = int8_t[10];
-}
-
 namespace AIMOVE {
     s_player* _p_ai;
     s_ai_colonizable_planet* _colonizable;
@@ -76,7 +72,7 @@ namespace AIMOVE {
 
     void __cdecl Move_AI_(int16_t player_idx) {
         int8_t local_b88[MAX_STARS];
-        int8_t local_b40[MAX_STARS * 10];
+        int8_t local_b40[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
         s_ai_colonizable_planet local_870[MAX_PLANETS];
 
         RUSS::Mox_Update_();
@@ -312,14 +308,14 @@ namespace AIMOVE {
                 // If so, iterate through stars to identify retreat/flee targets.
                 for (int star_idx = 0; star_idx < (int)MOX::_NUM_STARS; ++star_idx) {
                     // Each star entry in flee_stars is 10 bytes wide.
-                    int8_t* star_flee_ptr = &_flee_stars[star_idx * 10];
+                    int8_t* star_flee_ptr = &_flee_stars[star_idx * ENEMY_STRENGTH_TURN_WINDOW];
 
                     // Only mark the star if it hasn't been processed yet.
                     if (star_flee_ptr[0] == 0) {
                         // Check if player i has a colony at this star (has_colony is a bitmask).
                         if ((MOX::_star[star_idx].has_colony >> i) & 1) {
                             // Mark all 10 bytes for this star as fleeing locations.
-                            memset(star_flee_ptr, 1, sizeof(s_flee_star_slots));
+                            memset(star_flee_ptr, 1, ENEMY_STRENGTH_TURN_WINDOW);
                         }
                     }
                 }
@@ -2057,7 +2053,7 @@ namespace AIMOVE {
                 knocked_out_stars[*num_knocked_out] = (int8_t)star_idx;
                 (*num_knocked_out)++;
 
-                memset(&_flee_stars[star_idx * sizeof(s_flee_star_slots)], 1, sizeof(s_flee_star_slots));
+                memset(&_flee_stars[star_idx * ENEMY_STRENGTH_TURN_WINDOW], 1, ENEMY_STRENGTH_TURN_WINDOW);
             }
         }
     }
@@ -2720,7 +2716,7 @@ namespace AIMOVE {
 
         if ((*AIDATA::_i_all_combat_ships)[player_id][star_idx] != -1 &&
             MOX::_settings.game_difficulty > 1) {
-            int8_t flee_stars[MAX_STARS * 10];
+            int8_t flee_stars[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
 
             s_attack_info attack_info;
 
