@@ -356,7 +356,7 @@ void __cdecl Client_Combat_Loop_() {
     memset(local_attack_confirmed, 0, sizeof(local_attack_confirmed));
     COMBFIND::_attack_confirmed = (int8_t (*)[MAX_PLAYERS][MAX_PLAYERS])local_attack_confirmed;
 
-    while (NETMOX::_net.sync_state >= NET_SYNC_STATE_COMBAT_TACTICAL_ATTACKER && NETMOX::_net.sync_state < NET_SYNC_STATE_COMBAT_COMPLETE) {
+    while (NETMOX::_net.sync_state >= NET_SYNC_STATE_COMBAT_READY && NETMOX::_net.sync_state < NET_SYNC_STATE_COMBAT_COMPLETE) {
         RUSS::Mox_Update_();
         MULTPLAY::Chat_Box_Input_Loop_();
         RUSS::Mox_Update_();
@@ -409,9 +409,9 @@ void __cdecl Client_Combat_Loop_() {
 
         case NET_SYNC_STATE_COMBAT_RESOLUTION_DISPATCH:
             if (NETMOX::_net.combat_attacker_id < MAX_PLAYERS && MOX::_player[(int)NETMOX::_net.combat_attacker_id].objectives == 100) {
-                NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_BATTLE_RESULTS_CHUNKS;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_DEFENDER;
             } else {
-                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_COMPLETE;
+                NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_DEFENDER_VS_NONHUMAN;
             }
             ERICNET::Mox_Play_Sound_(51 /* 0x33 */);
             break;
