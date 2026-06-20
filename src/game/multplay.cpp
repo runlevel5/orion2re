@@ -61,7 +61,6 @@ namespace MULTPLAY {
         s_colors* font_ptr = MISC::Font_Colors2_(4, 0x92, 0x98);
         local_colors = *font_ptr;
         fonts::Set_Font_Style_(4, &local_colors);
-        MULTPLAY::Print_Online_Strings_();
     }
 
     void __cdecl Load_Net_Next_Turn_Screen_(int8_t fade_in) {

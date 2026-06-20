@@ -73,6 +73,17 @@ cmake --preset osx-debug
 cmake --build --preset osx-debug
 ```
 
+Router-only Linux example:
+
+```sh
+cmake --preset linux-router
+cmake --build --preset linux-router
+```
+
+This skips the `orion2re` game target and its SDL video backend requirements, which is the preferred path when you only need `orion2re-router` on a Linux machine without X11 or Wayland development packages.
+
+If you use `-DSDL_UNIX_CONSOLE_BUILD=ON`, CMake can configure SDL without desktop video backends, but the `orion2re` game target is not intended to be playable in that mode. Prefer `-DORION2RE_BUILD_GAME=OFF` for router-only work.
+
 Tests are opt-in and are not built by default. To configure, build, and run the current unit tests:
 
 ```sh

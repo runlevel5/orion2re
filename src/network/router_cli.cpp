@@ -27,6 +27,7 @@ void Print_Usage_(const char* program_name) {
         "  --discovery-port PORT   UDP LAN discovery port (default: 47800)\n"
         "  --router-id ID          Router identity advertised to clients\n"
         "  --name NAME             Router display name for LAN discovery\n"
+        "  --discovery             Enable UDP LAN discovery replies\n"
         "  --no-discovery          Disable UDP LAN discovery replies\n"
         "  --no-signal-handlers    Disable SIGINT/SIGTERM handlers\n"
         "  --verbose               Enable detailed message/discovery/traffic logging\n"
@@ -58,6 +59,7 @@ bool Is_Router_CLI_Command(int argc, char** argv) {
 
 int Run_Router_CLI(int argc, char** argv) {
     s_router_config config;
+    config.enable_discovery = false;
     int arg_index = 1;
     if (argc >= 2 && Is_Command_Token_(argv[1])) {
         arg_index = 2;
@@ -85,6 +87,10 @@ int Run_Router_CLI(int argc, char** argv) {
                 std::fprintf(stderr, "Invalid --discovery-port value.\n");
                 return 2;
             }
+            continue;
+        }
+        if (std::strcmp(arg, "--discovery") == 0) {
+            config.enable_discovery = true;
             continue;
         }
         if (std::strcmp(arg, "--router-id") == 0 && i + 1 < argc) {

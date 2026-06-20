@@ -429,6 +429,15 @@
       }
     },
     {
+      "name": "linux-router",
+      "displayName": "Linux Router Only",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "ORION2RE_BUILD_GAME": "OFF",
+        "ORION2RE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
       "name": "linux-x86-debug-asan-tests",
       "displayName": "Linux x86 Debug (ASan) + Tests",
       "inherits": "linux-x86-debug-asan",
@@ -575,6 +584,14 @@
       "name": "linux-debug-asan-tests",
       "configurePreset": "linux-debug-asan-tests",
       "configuration": "Debug"
+    },
+    {
+      "name": "linux-router",
+      "configurePreset": "linux-router",
+      "configuration": "Debug",
+      "targets": [
+        "orion2re-router"
+      ]
     },
     {
       "name": "linux-x86-debug-asan-tests",
