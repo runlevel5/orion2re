@@ -21,6 +21,11 @@ namespace platform {
 		constexpr int32_t k_cursor_pixel_count = k_cursor_dimension * k_cursor_dimension;
 		constexpr uint16_t k_input_queue_capacity = 256;
 
+		enum e_present_scaler : uint8_t {
+			PRESENT_SCALER_PIXELART = 0,
+			PRESENT_SCALER_BILINEAR = 1,
+		};
+
 		enum e_input_event_type : uint8_t {
 			INPUT_EVENT_MOUSE = 0,
 			INPUT_EVENT_KEY = 1,
@@ -59,10 +64,15 @@ namespace platform {
 		SDL_Condition* g_exit_condition;
 		SDL_AtomicInt g_exit_requested;
 		SDL_AtomicInt g_game_thread_exited;
+		e_present_scaler g_present_scaler = PRESENT_SCALER_PIXELART;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
 		bool Ensure_Present_Palette_();
 		bool Ensure_Cursor_Surface_();
+		bool Ensure_Render_Presentation_();
+		bool Configure_Present_Texture_();
+		SDL_Texture* Resolve_Present_Source_Texture_();
+		void Present_Texture_To_Output_(SDL_Texture* texture);
 		void Apply_Pending_Cursor_State_();
 		void Blit_Cursor_On_Present_Surface_();
 		void Sync_Mouse_State_From_SDL_();
@@ -163,6 +173,22 @@ namespace platform {
 			return (int16_t)rounded_value;
 		}
 
+		int16_t Clamp_Game_Coord_(float coord, int32_t game_extent) {
+			if (game_extent <= 1) {
+				return 0;
+			}
+
+			long rounded_value = lroundf(coord);
+			if (rounded_value < 0) {
+				return 0;
+			}
+			if (rounded_value > game_extent - 1) {
+				return (int16_t)(game_extent - 1);
+			}
+
+			return (int16_t)rounded_value;
+		}
+
 		int16_t Map_Window_Coord_To_Game_Coord_(float coord, int32_t window_extent, int32_t game_extent) {
 			if (window_extent <= 1 || game_extent <= 1) {
 				return 0;
@@ -186,6 +212,109 @@ namespace platform {
 			}
 
 			return ((float)coord * (float)(window_extent - 1)) / (float)(game_extent - 1);
+		}
+
+		void Map_Window_Point_To_Game_Point_(
+			float window_x,
+			float window_y,
+			int16_t* game_x,
+			int16_t* game_y) {
+			if (game_x == nullptr || game_y == nullptr) {
+				return;
+			}
+
+			float logical_x = window_x;
+			float logical_y = window_y;
+			if (g_sdl_renderer != nullptr &&
+				SDL_RenderCoordinatesFromWindow(g_sdl_renderer, window_x, window_y, &logical_x, &logical_y)) {
+				*game_x = Clamp_Game_Coord_(logical_x, video::g_screen_res_x);
+				*game_y = Clamp_Game_Coord_(logical_y, video::g_screen_res_y);
+				return;
+			}
+
+			int32_t window_width = 0;
+			int32_t window_height = 0;
+			if (g_sdl_window != nullptr) {
+				SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
+			}
+
+			*game_x = Map_Window_Coord_To_Game_Coord_(window_x, window_width, video::g_screen_res_x);
+			*game_y = Map_Window_Coord_To_Game_Coord_(window_y, window_height, video::g_screen_res_y);
+		}
+
+		void Map_Game_Point_To_Window_Point_(
+			int16_t game_x,
+			int16_t game_y,
+			float* window_x,
+			float* window_y) {
+			if (window_x == nullptr || window_y == nullptr) {
+				return;
+			}
+
+			if (g_sdl_renderer != nullptr &&
+				SDL_RenderCoordinatesToWindow(g_sdl_renderer, (float)game_x, (float)game_y, window_x, window_y)) {
+				return;
+			}
+
+			int32_t window_width = 0;
+			int32_t window_height = 0;
+			if (g_sdl_window != nullptr) {
+				SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
+			}
+
+			*window_x = Map_Game_Coord_To_Window_Coord_(game_x, video::g_screen_res_x, window_width);
+			*window_y = Map_Game_Coord_To_Window_Coord_(game_y, video::g_screen_res_y, window_height);
+		}
+
+		SDL_ScaleMode Get_Present_Texture_Scale_Mode_() {
+			switch (g_present_scaler) {
+			case PRESENT_SCALER_BILINEAR:
+				return SDL_SCALEMODE_LINEAR;
+			case PRESENT_SCALER_PIXELART:
+			default:
+				return SDL_SCALEMODE_PIXELART;
+			}
+		}
+
+		bool Ensure_Render_Presentation_() {
+			if (g_sdl_renderer == nullptr || video::g_screen_res_x <= 0 || video::g_screen_res_y <= 0) {
+				return false;
+			}
+
+			return SDL_SetRenderDrawColor(g_sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE) &&
+				SDL_SetRenderLogicalPresentation(
+					g_sdl_renderer,
+					video::g_screen_res_x,
+					video::g_screen_res_y,
+					SDL_LOGICAL_PRESENTATION_LETTERBOX);
+		}
+
+		bool Configure_Present_Texture_() {
+			if (g_sdl_present_texture == nullptr) {
+				return false;
+			}
+
+			const SDL_ScaleMode preferred_scale_mode = Get_Present_Texture_Scale_Mode_();
+			if (SDL_SetTextureScaleMode(g_sdl_present_texture, preferred_scale_mode)) {
+				return true;
+			}
+
+			return preferred_scale_mode == SDL_SCALEMODE_NEAREST ||
+				SDL_SetTextureScaleMode(g_sdl_present_texture, SDL_SCALEMODE_NEAREST);
+		}
+
+		SDL_Texture* Resolve_Present_Source_Texture_() {
+			return g_sdl_present_texture;
+		}
+
+		void Present_Texture_To_Output_(SDL_Texture* texture) {
+			if (g_sdl_renderer == nullptr || texture == nullptr) {
+				return;
+			}
+
+			SDL_RenderClear(g_sdl_renderer);
+			SDL_RenderTexture(g_sdl_renderer, texture, nullptr, nullptr);
+			SDL_RenderPresent(g_sdl_renderer);
 		}
 
 		void Copy_Exit_Message_(const char* message) {
@@ -213,6 +342,22 @@ namespace platform {
 		void Request_SDL_Exit_() {
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL requested exit");
 			Request_Exit_();
+		}
+
+		bool Toggle_Fullscreen_Mode_() {
+			if (g_sdl_window == nullptr) {
+				return false;
+			}
+
+			const bool fullscreen_enabled = (SDL_GetWindowFlags(g_sdl_window) & SDL_WINDOW_FULLSCREEN) != 0;
+			if (!SDL_SetWindowFullscreen(g_sdl_window, !fullscreen_enabled)) {
+				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_SetWindowFullscreen failed: %s", SDL_GetError());
+				return false;
+			}
+
+			Request_Present_Refresh_();
+			Sync_Mouse_State_From_SDL_();
+			return true;
 		}
 
 		void Queue_Key_Code_(uint32_t key_code, uint32_t scan_code) {
@@ -352,6 +497,12 @@ namespace platform {
 			uint32_t translated_key_code = 0;
 			const uint32_t scan_code = key_event.raw;
 
+			if ((key_event.mod & SDL_KMOD_ALT) != 0 &&
+				(key_event.key == SDLK_RETURN || key_event.key == SDLK_KP_ENTER)) {
+				Toggle_Fullscreen_Mode_();
+				return;
+			}
+
 			if ((key_event.mod & SDL_KMOD_ALT) != 0) {
 				if (Translate_Alt_Key_(key_event.key, &translated_key_code)) {
 					Enqueue_Key_Input_Event_(translated_key_code, scan_code);
@@ -462,6 +613,10 @@ namespace platform {
 				(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
 			}
 
+			if (!Ensure_Render_Presentation_()) {
+				return false;
+			}
+
 			if (g_sdl_present_texture == nullptr) {
 				g_sdl_present_texture = SDL_CreateTexture(
 					g_sdl_renderer,
@@ -470,6 +625,10 @@ namespace platform {
 					video::g_screen_res_x,
 					video::g_screen_res_y);
 				if (g_sdl_present_texture == nullptr) {
+					return false;
+				}
+
+				if (!Configure_Present_Texture_()) {
 					return false;
 				}
 			}
@@ -598,9 +757,7 @@ namespace platform {
 				g_sdl_present_pixels,
 				video::g_screen_res_x * (int32_t)sizeof(uint32_t));
 
-			SDL_RenderClear(g_sdl_renderer);
-			SDL_RenderTexture(g_sdl_renderer, g_sdl_present_texture, nullptr, nullptr);
-			SDL_RenderPresent(g_sdl_renderer);
+			Present_Texture_To_Output_(Resolve_Present_Source_Texture_());
 		}
 
 		void Blit_Cursor_On_Present_Surface_() {
@@ -643,14 +800,9 @@ namespace platform {
 			float mouse_y = 0.0f;
 			const SDL_MouseButtonFlags sdl_buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
 
-			int32_t window_width = 0;
-			int32_t window_height = 0;
-			SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
-
-			const int16_t mapped_mouse_x =
-				Map_Window_Coord_To_Game_Coord_(mouse_x, window_width, video::g_screen_res_x);
-			const int16_t mapped_mouse_y =
-				Map_Window_Coord_To_Game_Coord_(mouse_y, window_height, video::g_screen_res_y);
+			int16_t mapped_mouse_x = 0;
+			int16_t mapped_mouse_y = 0;
+			Map_Window_Point_To_Game_Point_(mouse_x, mouse_y, &mapped_mouse_x, &mapped_mouse_y);
 
 			uint16_t mapped_buttons = 0;
 			if ((sdl_buttons & SDL_BUTTON_LMASK) != 0) {
@@ -960,13 +1112,9 @@ namespace platform {
             }
 
             if (event.type == SDL_EVENT_MOUSE_MOTION) {
-                int32_t window_width = 0;
-                int32_t window_height = 0;
-                SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
-                const int16_t mouse_x =
-                    Map_Window_Coord_To_Game_Coord_(event.motion.x, window_width, video::g_screen_res_x);
-                const int16_t mouse_y =
-                    Map_Window_Coord_To_Game_Coord_(event.motion.y, window_height, video::g_screen_res_y);
+                int16_t mouse_x = 0;
+                int16_t mouse_y = 0;
+                Map_Window_Point_To_Game_Point_(event.motion.x, event.motion.y, &mouse_x, &mouse_y);
 
                 Set_Present_Mouse_Position_(mouse_x, mouse_y);
                 Enqueue_Mouse_Input_Event_(mouse_x, mouse_y, g_sdl_mouse_buttons);
@@ -975,9 +1123,6 @@ namespace platform {
 
             if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
                 uint16_t mouse_buttons = g_sdl_mouse_buttons;
-                int32_t window_width = 0;
-                int32_t window_height = 0;
-                SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (event.button.down) {
@@ -997,10 +1142,9 @@ namespace platform {
 
                 g_sdl_mouse_buttons = mouse_buttons;
 
-                const int16_t mouse_x =
-                    Map_Window_Coord_To_Game_Coord_(event.button.x, window_width, video::g_screen_res_x);
-                const int16_t mouse_y =
-                    Map_Window_Coord_To_Game_Coord_(event.button.y, window_height, video::g_screen_res_y);
+                int16_t mouse_x = 0;
+                int16_t mouse_y = 0;
+                Map_Window_Point_To_Game_Point_(event.button.x, event.button.y, &mouse_x, &mouse_y);
 
                 Set_Present_Mouse_Position_(mouse_x, mouse_y);
                 Enqueue_Mouse_Input_Event_(mouse_x, mouse_y, mouse_buttons);
@@ -1053,13 +1197,13 @@ namespace platform {
         Set_Present_Mouse_Position_(x, y);
 
         if (g_sdl_window != nullptr) {
-            int32_t window_width = 0;
-            int32_t window_height = 0;
-            SDL_GetWindowSize(g_sdl_window, &window_width, &window_height);
+            float window_x = 0.0f;
+            float window_y = 0.0f;
+            Map_Game_Point_To_Window_Point_(x, y, &window_x, &window_y);
             SDL_WarpMouseInWindow(
                 g_sdl_window,
-                Map_Game_Coord_To_Window_Coord_(x, video::g_screen_res_x, window_width),
-                Map_Game_Coord_To_Window_Coord_(y, video::g_screen_res_y, window_height));
+                window_x,
+                window_y);
         }
     }
 
@@ -1220,6 +1364,18 @@ namespace platform {
             SDL_Quit();
             return 0;
         }
+		if (!Ensure_Render_Presentation_()) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
+			Cleanup_Surfaces();
+			Destroy_Main_Window_();
+			SDL_DestroyMutex(g_present_cursor_mutex);
+			g_present_cursor_mutex = nullptr;
+			SDL_DestroyMutex(g_input_queue_mutex);
+			g_input_queue_mutex = nullptr;
+			Shutdown_Exit_();
+			SDL_Quit();
+			return 0;
+		}
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: video buffers created");
 
         g_worker_thread_handle = SDL_CreateThread(MOX2::thunk_main2_, "MOX2::main2_", nullptr);
