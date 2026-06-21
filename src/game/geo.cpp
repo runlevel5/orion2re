@@ -500,7 +500,13 @@ namespace GEO {
         }
 
         if (!is_within_distance) {
-            if (abs_dot > 0xFFFF || distance_sq * line_len_sq < abs_dot * abs_dot) {
+            if (abs_dot > 0xFFFF) {
+                return false;
+            }
+
+            const uint32_t lhs = (uint32_t)distance_sq * (uint32_t)line_len_sq;
+            const uint32_t rhs = (uint32_t)abs_dot * (uint32_t)abs_dot;
+            if (lhs < rhs) {
                 return false;
             }
         }
