@@ -1884,8 +1884,8 @@ struct s_player {
     sbyte last_turn_treaty[MAX_PLAYERS];
     int8_t diplomacy_proposal_request[MAX_PLAYERS];
     int8_t diplomacy_proposal_tribute_bribe[MAX_PLAYERS];
-    int8_t diplomacy_proposal_tech_bribe1[MAX_PLAYERS];
-    int8_t diplomacy_proposal_tech_bribe2[MAX_PLAYERS];
+    uint8_t diplomacy_proposal_tech_bribe1[MAX_PLAYERS];
+    uint8_t diplomacy_proposal_tech_bribe2[MAX_PLAYERS];
     int16_t diplomacy_proposal_gold_bribe[MAX_PLAYERS];
     int8_t diplomacy_proposal_war_player[MAX_PLAYERS];
     int32_t diplomacy_proposal_exchange_max_value[MAX_PLAYERS];
@@ -1896,7 +1896,7 @@ struct s_player {
     int8_t sneak_attack_player;
     int8_t council_threat;
     int16_t reward_amount[MAX_PLAYERS];
-    int8_t reward_tech[MAX_PLAYERS];
+    uint8_t reward_tech[MAX_PLAYERS];
     int8_t reward_attack_player[MAX_PLAYERS];
     int16_t food_shortage_duration;
     int8_t trust_worthiness[MAX_PLAYERS];

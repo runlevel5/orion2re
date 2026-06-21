@@ -2115,7 +2115,7 @@ namespace COLBLDG {
 
     void __cdecl Insert_Before_Queue_Slot_(int16_t source_slot_idx, int16_t target_slot_idx) {
         int16_t item1 = _current_item[source_slot_idx];
-        int16_t item2 = _current_item[source_slot_idx + 1];
+        int16_t item2 = (source_slot_idx < 6) ? _current_item[source_slot_idx + 1] : -1;
 
         if (_current_item[target_slot_idx] == -10) {
             target_slot_idx--;
@@ -2124,7 +2124,7 @@ namespace COLBLDG {
         if (item1 == -10) {
             source_slot_idx--;
             item1 = _current_item[source_slot_idx];
-            item2 = _current_item[source_slot_idx + 1];
+            item2 = (source_slot_idx < 6) ? _current_item[source_slot_idx + 1] : -1;
         }
 
         Squish_Out_Queue_Slot_(source_slot_idx);

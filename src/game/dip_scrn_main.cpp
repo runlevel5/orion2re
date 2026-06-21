@@ -2293,7 +2293,7 @@ namespace DIP_SCRN {
         if (MOX::_player[player_idx].diplomacy_proposal_tech_bribe1[target_idx] != 0) {
             COLCALC::Player_Gets_Tech_App_(
                 &MOX::_player[target_idx],
-                (int16_t)(uint8_t)MOX::_player[player_idx].diplomacy_proposal_tech_bribe1[target_idx]
+                MOX::_player[player_idx].diplomacy_proposal_tech_bribe1[target_idx]
             );
             return;
         }
