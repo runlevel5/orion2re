@@ -16,7 +16,7 @@ namespace FLEETPOP {
             thumb_y +
             0x43);
 
-        int16_t end_y = static_cast<int16_t>(start_y + track_len);
+        int16_t end_y = static_cast<int16_t>(start_y + thumb_height);
         int16_t x = static_cast<int16_t>(MOX::_fleet_box.x + MOX::_moveable_box[2].content_offset_x + 0xC0);
         uint8_t color = 0x74;
 
