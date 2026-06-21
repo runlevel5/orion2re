@@ -1185,10 +1185,13 @@ namespace COLGCBT {
         animate::Get_Animation_Frame_Count_(seg);
 
         int16_t y_step_frames[11] = { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
+        constexpr int y_step_frame_count = sizeof(y_step_frames) / sizeof(y_step_frames[0]);
+        bool uses_y_step = unit->anim_frame >= 0 && unit->anim_frame < y_step_frame_count &&
+            y_step_frames[unit->anim_frame] == 1;
 
         if (unit->state == 4) {
             if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3 && unit->anim_frame % 3 == 2) ||
-                y_step_frames[unit->anim_frame] == 1) {
+                uses_y_step) {
                 unit->y += unit->y_offset;
             }
         }

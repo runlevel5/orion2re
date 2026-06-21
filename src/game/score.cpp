@@ -1171,9 +1171,12 @@ namespace SCORE {
                 for (int16_t pop_idx = 0; pop_idx < MOX::_colony[col_idx].n_pops; ++pop_idx) {
                     if (limit_reached) break;
 
-                    uint32_t pop_entry = MOX::_colony[col_idx].pop[pop_idx];
-                    int16_t p_idx = (int16_t)(pop_entry & 0xF);
-                    int16_t race_id = (int16_t)(uint8_t)MOX::_player[p_idx].race;
+                    int16_t effective_player_idx = COLONY::Get_Effective_Pop_Player_(col_idx, pop_idx);
+                    if (effective_player_idx < 0 || effective_player_idx >= MAX_PLAYERS) {
+                        continue;
+                    }
+
+                    int16_t race_id = (int16_t)(uint8_t)MOX::_player[effective_player_idx].race;
 
                     if (race_id < 14) {
                         if (collected_count == total_pop_limit) {
