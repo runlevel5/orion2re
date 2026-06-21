@@ -1343,6 +1343,7 @@ namespace MAINSCR {
         _more_money_cheat = fields::Add_Multi_Hot_Key_Field_("MOOLA");
         _get_tech_cheat = fields::Add_Multi_Hot_Key_Field_("MENLO");
         _omniscience_cheat = fields::Add_Multi_Hot_Key_Field_("ISEEALL");
+        _all_ai_cheat = fields::Add_Multi_Hot_Key_Field_("ALLAI");
         _hi_score_cheat = fields::Add_Multi_Hot_Key_Field_("SCORE");
         _last_field = fields::_fields_count - 1;
     }

@@ -2359,21 +2359,6 @@ struct s_plntsum_ship {
     bool output_available;
 };
 
-typedef struct s_pop_info s_pop_info, *Ps_pop_info;
-
-// Legacy compiler-dependent bitfield view kept only as documentation.
-// Use the POP helper API for stable access to serialized pop records.
-struct s_pop_info {
-    uint32_t race:4;
-    uint32_t loyalty:3;
-    uint32_t job:2;
-    uint32_t conquered:1;
-    uint32_t unknown1:4;
-    uint32_t starve_priority:2;
-    uint32_t unknown2:15;
-    uint32_t employed:1;
-};
-
 typedef struct s_potential_colony_info s_potential_colony_info, *Ps_potential_colony_info;
 
 struct s_potential_colony_info {

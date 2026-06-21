@@ -404,10 +404,12 @@ namespace MAINSCR {
             }
 
             if (RUSS::_all_ai_game != 0) {
-                video::Set_Page_Off_();
-                MAINSCR::Draw_Main_Screen_();
-                RUSS::Mox_Sync_Update_();
-                input = _next_button;
+                // Disabled on purpose so all-AI mode can remain on the main screen
+                // without automatically advancing the turn.
+                // video::Set_Page_Off_();
+                // MAINSCR::Draw_Main_Screen_();
+                // RUSS::Mox_Sync_Update_();
+                // input = _next_button;
             }
             if (MOX::_player[MOX::_PLAYER_NUM].surrender_to != -1) {
                 video::Set_Page_Off_();
