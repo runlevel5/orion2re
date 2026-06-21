@@ -2361,6 +2361,8 @@ struct s_plntsum_ship {
 
 typedef struct s_pop_info s_pop_info, *Ps_pop_info;
 
+// Legacy compiler-dependent bitfield view kept only as documentation.
+// Use the POP helper API for stable access to serialized pop records.
 struct s_pop_info {
     uint32_t race:4;
     uint32_t loyalty:3;

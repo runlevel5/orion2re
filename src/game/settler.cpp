@@ -3,7 +3,7 @@
 namespace settler {
     int8_t __cdecl Add_Settler_To_Colony_(uint32_t settler_data, s_colony* colony) {
         bool is_full = false;
-        int16_t race_idx = (int16_t)((settler_data & 0x000F0000) >> 16);
+        int16_t race_idx = (int16_t)SETTLER_DATA::Get_Race(settler_data);
 
         if (!Room_For_Another_(colony, race_idx, 0)) {
             is_full = true;
@@ -14,38 +14,32 @@ namespace settler {
 
                 for (int32_t i = 0; i < (uint8_t)colony->n_pops; ++i) {
                     uint32_t pop_val = colony->pop[i];
-                    if ((pop_val & 0x00000180) == 0) {
+                    if (POP::Is_Farmer(pop_val)) {
                         farmer_count++;
-                        if (target_pop == nullptr && (pop_val & 0x0000000F) < 8) {
+                        if (target_pop == nullptr && POP::Get_Race(pop_val) < POP::RACE_ANDROID) {
                             target_pop = &colony->pop[i];
                         }
                     }
                 }
 
                 if (farmer_count >= (uint8_t)colony->max_farms) {
-                    if ((settler_data & 0x000F0000) < 0x00080000) {
+                    if (race_idx < (int16_t)POP::RACE_ANDROID) {
                         settler_data = (settler_data & 0xFEFFFFFF) | 0x02000000;
                     } else if (target_pop != nullptr) {
-                        *target_pop = (*target_pop & 0xFFFFFF7F) | 0x00000100;
+                        POP::Set_Prof(target_pop, POP::PROF_SCIENTIST);
                     }
                 }
             }
         }
 
         if (!is_full) {
-            uint32_t race_info = settler_data >> 16;
             uint8_t n_pops = (uint8_t)colony->n_pops;
             uint32_t* pop_slot = &colony->pop[n_pops];
-            uint32_t new_pop = *pop_slot;
-
-            new_pop = (new_pop ^ race_info) & 0x0000000F ^ new_pop;
-            new_pop = ((race_info << 4) ^ new_pop) & 0x00000070 ^ new_pop;
-            new_pop = ((settler_data >> 17) ^ new_pop) & 0x00000180 ^ new_pop;
-
-            new_pop |= 0x00000200;
-            new_pop &= 0xFFFFFBFF;
-
-            *pop_slot = new_pop;
+            POP::Set_Race(pop_slot, (uint32_t)race_idx);
+            POP::Set_Original_Owner(pop_slot, (uint32_t)race_idx);
+            POP::Set_Prof(pop_slot, SETTLER_DATA::Get_Prof(settler_data));
+            POP::Set_Assigned(pop_slot, true);
+            POP::Set_Conquered(pop_slot, false);
             colony->n_pops++;
         }
 
@@ -61,7 +55,7 @@ namespace settler {
         int32_t matching_pop_count = 0;
 
         for (int32_t i = 0; i < (uint8_t)colony->n_pops; ++i) {
-            int16_t current_pop_race = (int16_t)(colony->pop[i] & 0xF);
+            int16_t current_pop_race = (int16_t)POP::Get_Race(colony->pop[i]);
             if (COLCALC::Colony_Race_Pop_Limit_(colony, current_pop_race) <= pop_limit) {
                 matching_pop_count++;
             }
@@ -241,7 +235,7 @@ namespace settler {
             return;
         }
 
-        if ((source_colony->pop[selected_pop_idx] & 0x400) != 0) {
+        if (POP::Is_Conquered(source_colony->pop[selected_pop_idx])) {
             result->selected_pop_flag_0x400 = 1;
             return;
         }
@@ -263,7 +257,7 @@ namespace settler {
             }
         }
 
-        if (Room_For_Another_(dest_colony, source_colony->pop[selected_pop_idx] & 0x0f, 1) == 0) {
+        if (Room_For_Another_(dest_colony, (int16_t)POP::Get_Race(source_colony->pop[selected_pop_idx]), 1) == 0) {
             result->no_room_at_destination = 1;
         }
 
@@ -294,22 +288,19 @@ namespace settler {
             const uint32_t pop_value = *pop_slot;
             uint32_t encoded_settler = pop_value;
 
-            encoded_settler ^= ((pop_value << 16) ^ encoded_settler) & 0x000F0000;
-            encoded_settler ^= ((pop_value << 17) ^ encoded_settler) & 0x03000000;
+            SETTLER_DATA::Set_Race(&encoded_settler, POP::Get_Race(pop_value));
+            SETTLER_DATA::Set_Prof(&encoded_settler, POP::Get_Prof(pop_value));
 
             if (dest_star_index == source_star_index) {
                 Add_Settler_To_Colony_(encoded_settler, dest_colony);
             } else {
-                encoded_settler ^=
-                        ((((uint32_t)Settler_ETA_(owner_player, source_star_index, dest_star_index)) << 20) ^
-                          encoded_settler) &
-                         0x00F00000;
-                encoded_settler ^=
-                        (((uint32_t)(int32_t)(source_colony - MOX::_colony) ^ encoded_settler) &
-                         0x000000FF);
-                encoded_settler ^=
-                        ((((uint32_t)(int32_t)dest_colony->planet << 8) ^ encoded_settler) &
-                         0x0000FF00);
+                SETTLER_DATA::Set_Eta(
+                        &encoded_settler,
+                        (uint32_t)Settler_ETA_(owner_player, source_star_index, dest_star_index));
+                SETTLER_DATA::Set_Source_Colony(
+                        &encoded_settler,
+                        (uint32_t)(int32_t)(source_colony - MOX::_colony));
+                SETTLER_DATA::Set_Dest_Planet(&encoded_settler, (uint32_t)dest_colony->planet);
 
                 const int32_t freighted_index = (int32_t)owner_player->settlers_freighted;
                 owner_player->settlers[freighted_index].val = encoded_settler;

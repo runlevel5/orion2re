@@ -39,7 +39,7 @@ namespace AIDATA {
 
         if (colony->n_pops != 0) {
             for (int i = 0; i < (int)colony->n_pops; ++i) {
-                uint32_t player_id = colony->pop[i] & 0x0F;
+                uint32_t player_id = POP::Get_Race(colony->pop[i]);
                 if (player_id < MAX_PLAYERS) {
                     total_pops++;
                     player_counts[player_id]++;
@@ -361,7 +361,7 @@ namespace AIDATA {
                 s_ai_colony_info& ai_col = (*_ai_colony_info)[c];
                 RUSS::Mox_Update_();
                 for (int p_idx = 0; p_idx < col.n_pops; ++p_idx) {
-                    if (col.pop[p_idx] & 0x400) {
+                    if (POP::Is_Conquered(col.pop[p_idx])) {
                         ai_col.n_flagged_pops++;
                     }
                 }

@@ -19,6 +19,7 @@
 #include "orion2_consts.h"
 #include "orion2_str.h"
 #include "orion2.h"
+#include "pop.h"
 
 #include "lbx_types.h"
 #include "sound_types.h"

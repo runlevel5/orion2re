@@ -910,7 +910,7 @@ namespace AIBUILD {
     bool __cdecl Colony_Is_Conquered_(s_colony* colony) {
         for (uint8_t i = 0; i < (uint8_t)colony->n_pops; ++i) {
             uint32_t pop_data = colony->pop[i];
-            uint32_t pop_owner = pop_data & 0x0F;
+            uint32_t pop_owner = POP::Get_Race(pop_data);
 
             if (pop_owner < MAX_PLAYERS && (int8_t)pop_owner != colony->owner) {
                 if (MOX::_player[pop_owner].eliminated == 0) {

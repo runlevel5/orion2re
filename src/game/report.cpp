@@ -714,7 +714,7 @@ namespace REPORT {
             if (colony->owner == (int8_t)player_idx && colony->occupation_policy == 4) {
                 uint8_t num_pops = colony->n_pops;
                 for (int j = 0; j < (uint8_t)num_pops; ++j) {
-                    if (colony->pop[j] & 0x400) {
+                    if (POP::Is_Conquered(colony->pop[j])) {
                         if (show_screen != 0) {
                             MOVEBOX::Remove_Box_Check_();
                             MOX::_current_screen = SCREEN_COLONY;

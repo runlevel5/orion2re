@@ -55,11 +55,11 @@ namespace aidudes {
                 for (int j = (int)info->pop_tail_idx - 1; j >= (int)info->first_assignable_pop_idx; --j) {
                     uint32_t* pop_entry = &col->pop[j];
 
-                    if ((*pop_entry & 0x180) != 0x80) {
+                    if (!POP::Is_Worker(*pop_entry)) {
                         break;
                     }
 
-                    *pop_entry = (*pop_entry & ~0x80) | 0x100;
+                    POP::Set_Prof(pop_entry, POP::PROF_SCIENTIST);
                 }
 
                 COLCALC::Colony_Calculation_((int16_t)colony_idx);
@@ -523,9 +523,8 @@ namespace aidudes {
 
         uint32_t& pop_flags = colony.pop[cur_pop_idx];
 
-        pop_flags = (pop_flags & 0xffffff7f) | 0x100;
-
-        pop_flags |= 0x200;
+        POP::Set_Prof(&pop_flags, POP::PROF_SCIENTIST);
+        POP::Set_Assigned(&pop_flags, true);
 
         colony_info->cur_pop_idx = cur_pop_idx + 1;
 
@@ -539,9 +538,8 @@ namespace aidudes {
 
         uint32_t& pop_record = colony->pop[(uint8_t)info->pop_end_idx];
 
-        pop_record = (pop_record & 0xFFFFFEFF) | 0x80;
-
-        pop_record |= 0x200;
+        POP::Set_Prof(&pop_record, POP::PROF_WORKER);
+        POP::Set_Assigned(&pop_record, true);
 
         Compute_Max_Min_R_I_Worthiness_(info);
     }
@@ -580,8 +578,8 @@ namespace aidudes {
 
             info->pop_tail_idx--;
             uint8_t idx = info->pop_tail_idx;
-            // Mark pop as worker and set AI worker flags
-            colony->pop[idx] = (colony->pop[idx] & 0xFFFFFEFF) | 0x80 | 0x200;
+            POP::Set_Prof(&colony->pop[idx], POP::PROF_WORKER);
+            POP::Set_Assigned(&colony->pop[idx], true);
             info->n_workers++;
 
             COLCALC::Pre_Import_Computing_(colony);
@@ -612,11 +610,12 @@ namespace aidudes {
 
         if (colony->food2_per_farmer == 0) {
             int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((uint16_t)(uint8_t)colony_info->colony_idx);
-            uint32_t job_mask = (is_researching == 0) ? 0x80 : 0x100;
+            POP::e_prof prof = (is_researching == 0) ? POP::PROF_WORKER : POP::PROF_SCIENTIST;
 
             while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
-                colony->pop[(uint8_t)colony_info->cur_pop_idx] = (colony->pop[(uint8_t)colony_info->cur_pop_idx] & 0xFFFFFE7F) | job_mask;
-                colony->pop[(uint8_t)colony_info->cur_pop_idx] |= 0x200;
+                uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
+                POP::Set_Prof(&pop, prof);
+                POP::Set_Assigned(&pop, true);
                 colony_info->cur_pop_idx++;
             }
         } else {
@@ -630,15 +629,17 @@ namespace aidudes {
 
                 if (total_food_needed > colony->production[0] * 2) {
                     if ((uint8_t)colony_info->n_farmers < (uint8_t)colony->max_farms) {
-                        colony->pop[(uint8_t)colony_info->cur_pop_idx] &= 0xFFFFFE7F;
-                        colony->pop[(uint8_t)colony_info->cur_pop_idx] |= 0x200;
+                        uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
+                        POP::Set_Prof(&pop, POP::PROF_FARMER);
+                        POP::Set_Assigned(&pop, true);
                         colony_info->cur_pop_idx++;
                         colony_info->n_farmers++;
                     }
                 } else {
                     colony_info->pop_end_idx--;
-                    colony->pop[(uint8_t)colony_info->pop_end_idx] = (colony->pop[(uint8_t)colony_info->pop_end_idx] & 0xFFFFFEFF) | 0x80;
-                    colony->pop[(uint8_t)colony_info->pop_end_idx] |= 0x200;
+                    uint32_t& pop = colony->pop[(uint8_t)colony_info->pop_end_idx];
+                    POP::Set_Prof(&pop, POP::PROF_WORKER);
+                    POP::Set_Assigned(&pop, true);
                 }
                 COLCALC::Pre_Import_Computing_(colony);
             }
@@ -687,36 +688,33 @@ namespace aidudes {
 
         for (int i = 0; i < (int)colony->n_pops; ++i) {
             uint32_t pop_entry = pop_ptr[i];
-            uint32_t race_idx = pop_entry & 0xF;
+            uint32_t race_idx = POP::Get_Race(pop_entry);
 
-            if (race_idx == 8 /* Android */ || race_idx == 9 /* Native */) {
+            if (POP::Is_Android_Or_Native(pop_entry)) {
                 colony_info->first_assignable_pop_idx++;
-                uint32_t job = (pop_entry >> 7) & 0x3;
+                POP::e_prof prof = POP::Get_Prof(pop_entry);
 
-                if (job == 0 /* Farmer */) {
+                if (prof == POP::PROF_FARMER) {
                     colony_info->n_farmers++;
-                } else if (job == 1 /* Worker */) {
+                } else if (prof == POP::PROF_WORKER) {
                     colony_info->n_workers++;
-                } else if (job == 2 /* Scientist */) {
+                } else if (prof == POP::PROF_SCIENTIST) {
                     if (do_not_research != 0) {
-                        // Clear bit 9 (manual/locked assignment bit) if research is disabled
-                        pop_ptr[i] &= ~0x200;
+                        POP::Set_Assigned(&pop_ptr[i], false);
                     }
                 }
             } else {
-                // For other biological races, clear manual assignment bit 9
-                pop_ptr[i] &= ~0x200;
+                POP::Set_Assigned(&pop_ptr[i], false);
             }
 
             // Re-evaluate current pop entry state after potential modifications
             uint32_t current_pop = pop_ptr[i];
-            uint32_t current_race = current_pop & 0xF;
+            uint32_t current_race = POP::Get_Race(current_pop);
 
             // Check if population is affected by pollution (not Android/Native and not Tolerant)
-            if (current_race < 8) {
+            if (current_race < POP::RACE_ANDROID) {
                 if (MOX::_player[current_race].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
-                    // If not rioting (bit 10) or colony is being assimilated/conquered
-                    if (!(current_pop & 0x400) || (colony->occupation_policy >= 2 && colony->occupation_policy <= 3)) {
+                    if (!POP::Is_Conquered(current_pop) || (colony->occupation_policy >= 2 && colony->occupation_policy <= 3)) {
                         non_immune_pops++;
                     }
                 }
@@ -743,16 +741,16 @@ namespace aidudes {
         const uint32_t* pop1 = (const uint32_t*)a;
         const uint32_t* pop2 = (const uint32_t*)b;
         uint8_t flag1 = 0;
-        uint32_t val1 = *pop1 & 0xF;
+        uint32_t val1 = POP::Get_Race(*pop1);
 
-        if (val1 == 8 || val1 == 9) {
+        if (val1 == POP::RACE_ANDROID || val1 == POP::RACE_NATIVE) {
             flag1 = 1;
         }
 
         uint8_t flag2 = 0;
-        uint32_t val2 = *pop2 & 0xF;
+        uint32_t val2 = POP::Get_Race(*pop2);
 
-        if (val2 == 8 || val2 == 9) {
+        if (val2 == POP::RACE_ANDROID || val2 == POP::RACE_NATIVE) {
             flag2 = 1;
         }
 
@@ -786,7 +784,7 @@ namespace aidudes {
         uint32_t val1 = *(const uint32_t*)a;
         uint32_t val2 = *(const uint32_t*)b;
 
-        return (int)(val1 & 0x0F) - (int)(val2 & 0x0F);
+        return (int)POP::Get_Race(val1) - (int)POP::Get_Race(val2);
     }
 
     void __cdecl Assign_Empire_Building_(int16_t player_idx) {
@@ -1349,7 +1347,7 @@ namespace aidudes {
         int prod2 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop2, 0);
 
         int score1;
-        if ((*pop1 & 0x180) == 0x80 /* Farmer */) {
+        if (POP::Is_Worker(*pop1)) {
             score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop1, 1);
             if (_Sort_Pops_colony_info->pollution_at_start < _Sort_Pops_colony_data->pollution) {
                 score1 += 1000;
@@ -1359,7 +1357,7 @@ namespace aidudes {
         }
 
         int score2;
-        if ((*pop2 & 0x180) == 0x80 /* Farmer */) {
+        if (POP::Is_Worker(*pop2)) {
             score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop2, 1);
             if (_Sort_Pops_colony_info->pollution_at_start < _Sort_Pops_colony_data->pollution) {
                 score2 += 1000;
@@ -1379,19 +1377,20 @@ namespace aidudes {
         uint32_t val1 = *pop1;
         uint32_t val2 = *pop2;
 
-        if (((val1 ^ val2) & 0x180) == 0) {
-            return (int)(val1 & 0xF) - (int)(val2 & 0xF);
+        if (POP::Get_Prof(val1) == POP::Get_Prof(val2)) {
+            return (int)POP::Get_Race(val1) - (int)POP::Get_Race(val2);
         }
 
-        return (int)((val1 & 0x180) >> 7) - (int)((val2 & 0x180) >> 7);
+        return (int)POP::Get_Prof(val1) - (int)POP::Get_Prof(val2);
     }
 
     void __cdecl Make_First_Unassigned_Into_Farmer_(s_aidudes_colony_info* info) {
         s_colony* colony = &MOX::_colony[(uint8_t)info->colony_idx];
         int16_t old_pollution = colony->pollution;
 
-        colony->pop[(uint8_t)info->cur_pop_idx] &= 0xFFFFFE7F;
-        colony->pop[(uint8_t)info->cur_pop_idx] |= 0x0200;
+        uint32_t& pop = colony->pop[(uint8_t)info->cur_pop_idx];
+        POP::Set_Prof(&pop, POP::PROF_FARMER);
+        POP::Set_Assigned(&pop, true);
 
         info->cur_pop_idx++;
         info->n_farmers++;
@@ -1513,7 +1512,7 @@ namespace aidudes {
         int16_t base_production = COLCALC::Colony_Pop_Prod_Produced_(colony, flags, 0);
         int worthiness;
 
-        if ((*flags & 0x180) == 0x80) {
+        if (POP::Is_Worker(*flags)) {
             int16_t mode1_production = COLCALC::Colony_Pop_Prod_Produced_(colony, flags, 1);
             worthiness = (int)base_production - (int)mode1_production;
 

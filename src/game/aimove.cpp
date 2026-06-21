@@ -2235,7 +2235,7 @@ namespace AIMOVE {
         uint32_t n_pops = (uint8_t)colony->n_pops;
         if ((int32_t)n_pops < min_pop && colony->outpost_flag == 0 && _p_ai->personality != 1 && n_pops != 0) {
             for (uint32_t i = 0; i < n_pops; ++i) {
-                if ((colony->pop[i] & 0xF) == _i_ai) {
+                if (POP::Get_Race(colony->pop[i]) == (uint32_t)_i_ai) {
                     can_attack = false;
                 }
             }

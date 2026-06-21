@@ -1508,7 +1508,6 @@ namespace sound {
         if (SDL_GetAudioStreamQueued(_stream_data.ds_buffer) == 0) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: ended file=%s entry=%d", _currentStreamFilename, _currentStreamId);
             _stream_data.status ^= 1;
-            Pause_SDL_Stream_(_stream_data.ds_buffer);
             _audioPlaybackActive = 0;
         }
     }
@@ -1516,7 +1515,6 @@ namespace sound {
     void __cdecl Stop_Stream_Loop_() {
         if (_stream_data.ds_buffer != nullptr) {
             Clear_SDL_Stream_(_stream_data.ds_buffer);
-            Pause_SDL_Stream_(_stream_data.ds_buffer);
         }
 
         _loopStream = 0;
