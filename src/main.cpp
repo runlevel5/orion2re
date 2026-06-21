@@ -1,13 +1,51 @@
 #include "pch.h"
 
-#include "network/router_cli.h"
-
 #include <SDL3/SDL_main.h>
 
-int main(int argc, char** argv) {
-    if (network::router::Is_Router_CLI_Command(argc, argv)) {
-        return network::router::Run_Router_CLI(argc, argv);
+#if defined(ORION2RE_ASAN_BUILD)
+extern "C" const char* __asan_default_options() {
+    return "log_path=logs/asan";
+}
+
+static void Build_Path_(char* output, size_t output_size, const char* base_path, const char* relative_path) {
+    if (base_path != nullptr && base_path[0] != '\0') {
+        snprintf(output, output_size, "%s%s", base_path, relative_path);
+    } else {
+        snprintf(output, output_size, "%s", relative_path);
     }
+}
+
+static void Set_Environment_Variable_If_Unset_(const char* name, const char* value) {
+    if (SDL_getenv(name) != nullptr) {
+        return;
+    }
+
+    SDL_setenv_unsafe(name, value, 0);
+}
+
+static void Configure_Asan_Runtime_() {
+    const char* base_path = SDL_GetBasePath();
+    char logs_path[1024];
+
+    Build_Path_(logs_path, sizeof(logs_path), base_path, "logs");
+    SDL_CreateDirectory(logs_path);
+
+#if defined(_WIN32)
+    char dumps_path[1024];
+    char dump_file_path[1024];
+
+    Build_Path_(dumps_path, sizeof(dumps_path), base_path, "dumps");
+    SDL_CreateDirectory(dumps_path);
+    Build_Path_(dump_file_path, sizeof(dump_file_path), base_path, "dumps\\orion2re.dmp");
+    Set_Environment_Variable_If_Unset_("ASAN_SAVE_DUMPS", dump_file_path);
+#endif
+}
+#endif
+
+int main(int argc, char** argv) {
+#if defined(ORION2RE_ASAN_BUILD)
+    Configure_Asan_Runtime_();
+#endif
 
     size_t command_line_length = 0;
     for (int i = 1; i < argc; ++i) {

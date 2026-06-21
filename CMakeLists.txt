@@ -327,6 +327,10 @@ if(ORION2RE_ENABLE_ASAN)
         message(FATAL_ERROR "ORION2RE_ENABLE_ASAN requires a Debug build.")
     endif()
 
+    if(TARGET orion2re)
+        target_compile_definitions(orion2re PRIVATE ORION2RE_ASAN_BUILD=1)
+    endif()
+
     if(MSVC)
         if(TARGET orion2re)
             target_compile_options(orion2re PRIVATE /fsanitize=address)

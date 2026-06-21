@@ -5,7 +5,6 @@ set -euo pipefail
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 ROOT_DIR=$(cd -- "$SCRIPT_DIR/.." && pwd)
 RELEASES_DIR="$ROOT_DIR/test-releases"
-LAUNCHER_PATH="$ROOT_DIR/tools/run_with_asan_logging.bat"
 
 fail() {
     echo "ERROR: $*" >&2
@@ -42,7 +41,6 @@ require_file "$pdb_path"
 asan_dll_path=$(find "/mnt/c/Program Files/Microsoft Visual Studio" -type f -name 'clang_rt.asan_dynamic-i386.dll' | sort | tail -n 1)
 [[ -n "$asan_dll_path" ]] || fail "Could not find clang_rt.asan_dynamic-i386.dll under Visual Studio installation"
 require_file "$asan_dll_path"
-require_file "$LAUNCHER_PATH"
 
 stamp=$(date +%Y%m%d_%H%M%S)
 rand_id=$(printf '%06x' "$((RANDOM << 16 | RANDOM))")
@@ -56,10 +54,9 @@ mkdir -p "$release_dir" "$tester_dir"
 cp "$exe_path" "$tester_dir/"
 cp "$pdb_path" "$tester_dir/"
 cp "$asan_dll_path" "$tester_dir/"
-cp "$LAUNCHER_PATH" "$tester_dir/"
 
 cat > "$tester_dir/README.txt" <<EOF
-Run run_with_asan_logging.bat to start the game with ASan logging enabled.
+Run orion2re.exe directly. ASan logging is enabled automatically in ASan builds.
 
 If the game crashes, send back the newest files from:
 - logs
@@ -84,7 +81,6 @@ echo "Tester package contents:"
 echo "  tester-package/$(basename "$exe_path")"
 echo "  tester-package/$(basename "$pdb_path")"
 echo "  tester-package/$(basename "$asan_dll_path")"
-echo "  tester-package/$(basename "$LAUNCHER_PATH")"
 echo "  tester-package/README.txt"
 echo "Zip archive:"
 echo "  ${release_name}.zip"

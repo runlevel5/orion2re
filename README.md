@@ -27,7 +27,7 @@ macOS builds use the native host architecture.
 
 ## Vendored submodules
 
-The project uses vendored submodules for SDL3, libuv, and doctest (for tests).
+The project uses vendored submodules for third-party dependencies.
 
 Clone the repository with submodules:
 
@@ -35,7 +35,7 @@ Clone the repository with submodules:
 git clone --recurse-submodules <repo-url>
 ```
 
-If you already cloned the repository without submodules, initialize it with:
+If you already cloned the repository without submodules, initialize and update them with:
 
 ```sh
 git submodule update --init --recursive
@@ -55,7 +55,7 @@ Windows `cmd.exe`:
 tools\bootstrap_deps.bat
 ```
 
-The bootstrap scripts verify required tools and initialize the pinned submodules.
+The bootstrap scripts verify required tools and sync the pinned submodules used by the project.
 
 ## Build
 
@@ -80,9 +80,7 @@ cmake --preset linux-router
 cmake --build --preset linux-router
 ```
 
-This skips the `orion2re` game target and its SDL video backend requirements, which is the preferred path when you only need `orion2re-router` on a Linux machine without X11 or Wayland development packages.
-
-If you use `-DSDL_UNIX_CONSOLE_BUILD=ON`, CMake can configure SDL without desktop video backends, but the `orion2re` game target is not intended to be playable in that mode. Prefer `-DORION2RE_BUILD_GAME=OFF` for router-only work.
+This skips the `orion2re` game target and is the preferred path when you only need `orion2re-router`, especially on a headless Linux machine. Prefer `-DORION2RE_BUILD_GAME=OFF` for router-only work.
 
 Tests are opt-in and are not built by default. To configure, build, and run the current unit tests:
 
