@@ -4,19 +4,6 @@ namespace smckplay {
     smk _smk;
     uint32_t _lastkey;
 
-    namespace {
-        smk Open_Smacker_File_(const char* file_name) {
-            char resolved_path[512];
-            const char* open_path = file_name;
-
-            if (Resolve_File_Path_Case_(file_name, resolved_path, sizeof(resolved_path))) {
-                open_path = resolved_path;
-            }
-
-            return smk_open_file(open_path, SMK_MODE_MEMORY);
-        }
-    }
-
     struct s_smacker_state {
         unsigned long width = 0;
         unsigned long height = 0;
@@ -33,6 +20,19 @@ namespace smckplay {
     };
 
     s_smacker_state _smacker_state;
+
+    namespace {
+        smk Open_Smacker_File_(const char* file_name) {
+            char resolved_path[512];
+            const char* open_path = file_name;
+
+            if (Resolve_File_Path_Case_(file_name, resolved_path, sizeof(resolved_path))) {
+                open_path = resolved_path;
+            }
+
+            return smk_open_file(open_path, SMK_MODE_MEMORY);
+        }
+    }
 
     void Reset_Smacker_State_() {
         memset(&_smacker_state, 0, sizeof(_smacker_state));
@@ -244,7 +244,10 @@ namespace smckplay {
             const Uint64 frame_duration_ns = (_smacker_state.microseconds_per_frame > 0.0)
                 ? (Uint64)(_smacker_state.microseconds_per_frame * 1000.0)
                 : 0;
-            _smacker_state.next_frame_tick_ns = SDL_GetTicksNS() + frame_duration_ns;
+            // Advance from the prior presentation target so occasional slow
+            // frames do not permanently rebase the schedule and drain audio
+            // lead over time.
+            _smacker_state.next_frame_tick_ns += frame_duration_ns;
         }
     }
 

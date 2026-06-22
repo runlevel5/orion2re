@@ -1876,7 +1876,7 @@ namespace AIMOVE {
     {
         s_attack_info target_info_copy;
         s_attack_info* puVar8 = nullptr;
-        int16_t max_score = 0;
+        uint16_t max_score = 0;
         bool valid_target_found = false;
         
         s_ship_move_info move_info;
@@ -1985,6 +1985,10 @@ namespace AIMOVE {
             }
 
             int16_t best_colony_idx = RUSS::Get_Weighted_Choice_Short_(scores, MAX_COLONIES);
+            if (best_colony_idx == -1) {
+                return;
+            }
+
             int8_t best_mission = mission_array[best_colony_idx];
             int16_t best_planet_idx = MOX::_colony[best_colony_idx].planet;
             int8_t best_star_idx = MOX::_planet[best_planet_idx].star_index;
