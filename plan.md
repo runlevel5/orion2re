@@ -24,4 +24,4 @@
 
 * Sound
 
-  * [ ] Cracking sound in intro movie - gain, clipping, buffering, not sure.
+  * [X] Popping sound in intro movie - libsmacker sound buffer underrun. Fixed by taking care of inconsistent frame decoding.
