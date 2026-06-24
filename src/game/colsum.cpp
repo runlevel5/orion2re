@@ -255,12 +255,12 @@ namespace COLSUM {
         _x_fields[3] = fields::Add_Button_Field_(531, 445, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(40), 40);
         _x_fields[4] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(135));
         _x_fields[5] = fields::Add_Multi_Button_Field_(89, 446, ESTRINGS::E_Strings_(12), _anims[4], &_g_sort_index, 0, ESTRINGS::E_Strings_(384), 41);
-        _x_fields[6] = fields::Add_Multi_Button_Field_(140, 446, s_p_005510fc, _anims[5], &_g_sort_index, 1, ESTRINGS::E_Strings_(12), 41);
-        _x_fields[7] = fields::Add_Multi_Button_Field_(219, 446, s_f_005510f8, _anims[6], &_g_sort_index, 2, ESTRINGS::E_Strings_(12), 41);
-        _x_fields[8] = fields::Add_Multi_Button_Field_(262, 446, ESTRINGS::E_Strings_(327), _anims[7], &_g_sort_index, 3, ESTRINGS::E_Strings_(12), 41);
-        _x_fields[9] = fields::Add_Multi_Button_Field_(326, 446, s_s_005510f4, _anims[8], &_g_sort_index, 4, ESTRINGS::E_Strings_(12), 41);
-        _x_fields[10] = fields::Add_Multi_Button_Field_(393, 446, ESTRINGS::E_Strings_(436), _anims[9], &_g_sort_index, 5, ESTRINGS::E_Strings_(12), 41);
-        _x_fields[11] = fields::Add_Multi_Button_Field_(480, 446, ESTRINGS::E_Strings_(193), _anims[10], &_g_sort_index, 6, ESTRINGS::E_Strings_(12), 41);
+        _x_fields[6] = fields::Add_Multi_Button_Field_(140, 446, ESTRINGS::E_Strings_(12), _anims[5], &_g_sort_index, 1, s_p_005510fc, 41);
+        _x_fields[7] = fields::Add_Multi_Button_Field_(219, 446, ESTRINGS::E_Strings_(12), _anims[6], &_g_sort_index, 2, s_f_005510f8, 41);
+        _x_fields[8] = fields::Add_Multi_Button_Field_(262, 446, ESTRINGS::E_Strings_(12), _anims[7], &_g_sort_index, 3, ESTRINGS::E_Strings_(327), 41);
+        _x_fields[9] = fields::Add_Multi_Button_Field_(326, 446, ESTRINGS::E_Strings_(12), _anims[8], &_g_sort_index, 4, s_s_005510f4, 41);
+        _x_fields[10] = fields::Add_Multi_Button_Field_(393, 446, ESTRINGS::E_Strings_(12), _anims[9], &_g_sort_index, 5, ESTRINGS::E_Strings_(436), 41);
+        _x_fields[11] = fields::Add_Multi_Button_Field_(480, 446, ESTRINGS::E_Strings_(12), _anims[10], &_g_sort_index, 6, ESTRINGS::E_Strings_(193), 41);
 
         if (num_colonies < 10) {
             _x_fields[12] = -1000;
