@@ -1267,7 +1267,11 @@ namespace platform {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError());
             return 0;
         }
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL video initialized");
+        const char* video_driver = SDL_GetCurrentVideoDriver();
+        SDL_LogInfo(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "platform: SDL video initialized, driver: %s",
+            video_driver != nullptr ? video_driver : "<unknown>");
 		if (!Init_Exit_()) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: exit primitives initialization failed: %s", SDL_GetError());
 			Shutdown_Exit_();
@@ -1349,7 +1353,11 @@ namespace platform {
 		}
 		(void)SDL_SetRenderVSync(g_sdl_renderer, 1);
 		SDL_ShowWindow(g_sdl_window);
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: renderer initialized and window shown");
+		const char* renderer_name = SDL_GetRendererName(g_sdl_renderer);
+		SDL_LogInfo(
+			SDL_LOG_CATEGORY_APPLICATION,
+			"platform: renderer initialized and window shown, backend: %s",
+			renderer_name != nullptr ? renderer_name : "<unknown>");
 
         SDL_HideCursor();
 

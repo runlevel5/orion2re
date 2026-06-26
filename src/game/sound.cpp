@@ -562,8 +562,13 @@ namespace sound {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL_InitSubSystem(SDL_INIT_AUDIO) failed: %s", SDL_GetError());
                 return;
             }
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL audio subsystem initialized");
         }
+
+        const char* audio_driver = SDL_GetCurrentAudioDriver();
+        SDL_LogInfo(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "sound: SDL audio subsystem initialized, driver: %s",
+            audio_driver != nullptr ? audio_driver : "<unknown>");
 
         memset(&_soundLbxHandle, 0, sizeof(s_lbx_stream_header));
         memset(&_musicLbxHandle, 0, sizeof(s_lbx_stream_header));
