@@ -1410,6 +1410,10 @@ namespace platform {
             g_worker_thread_handle = nullptr;
         }
 
+		if (g_exit_message[0] != '\0') {
+			Show_Message_Box_(g_main_window, g_exit_message, "Microprose", true);
+		}
+
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop shutdown");
         Cleanup_Surfaces();
         Destroy_Main_Window_();

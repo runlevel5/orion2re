@@ -1,10 +1,11 @@
 #include "pch.h"
 
-#include <stdexcept>
-
 namespace exitm {
     void __cdecl Exit_With_Message(const char* message) {
-        throw std::runtime_error(message != nullptr ? message : "");
+        platform::Request_Exit_(message);
+        fields::Clear_Fields_();
+        video::Clear_Display_And_Release_Palette_();
+        platform::Check_Exit_();
     }
 
     void __cdecl Exit_With_message2_(const char* message) {

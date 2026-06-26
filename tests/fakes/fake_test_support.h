@@ -78,6 +78,9 @@ namespace test::fakes {
     extern int32_t g_last_played_sound;
     extern int16_t g_last_help_id;
     extern int g_mark_time_calls;
+    extern std::string g_last_message_box_text;
+    extern std::string g_last_message_box_caption;
+    extern bool g_last_message_box_is_error;
     extern std::vector<int32_t> g_release_time_calls;
     extern std::vector<Draw_Call> g_draw_calls;
     extern std::vector<Print_Centered_Call> g_print_centered_calls;

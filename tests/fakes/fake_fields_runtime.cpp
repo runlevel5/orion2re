@@ -13,6 +13,9 @@ namespace test::fakes {
     int32_t g_last_played_sound = -1;
     int16_t g_last_help_id = -1;
     int g_mark_time_calls = 0;
+    std::string g_last_message_box_text;
+    std::string g_last_message_box_caption;
+    bool g_last_message_box_is_error = false;
     std::vector<int32_t> g_release_time_calls;
     std::vector<Draw_Call> g_draw_calls;
     std::vector<Print_Centered_Call> g_print_centered_calls;
@@ -53,6 +56,9 @@ namespace test::fakes {
         g_last_played_sound = -1;
         g_last_help_id = -1;
         g_mark_time_calls = 0;
+        g_last_message_box_text.clear();
+        g_last_message_box_caption.clear();
+        g_last_message_box_is_error = false;
         g_release_time_calls.clear();
         g_draw_calls.clear();
         g_print_centered_calls.clear();
@@ -907,8 +913,8 @@ void Query_Memory_Status_(s_memorystatus* memory_status) {
 
 int Show_Message_Box_(void* window_handle, const char* text, const char* caption, bool is_error) {
     (void)window_handle;
-    (void)text;
-    (void)caption;
-    (void)is_error;
+    test::fakes::g_last_message_box_text = text != nullptr ? text : "";
+    test::fakes::g_last_message_box_caption = caption != nullptr ? caption : "";
+    test::fakes::g_last_message_box_is_error = is_error;
     return 0;
 }
