@@ -194,15 +194,83 @@ void Finish_Discovery_(s_router_session_browser_state* state) {
     state->discovery_timer_initialized = false;
 }
 
-void Complete_Refresh_(s_router_session_browser_state* state) {
+void Disconnect_Queries_(s_router_session_browser_state* state) {
     for (std::unique_ptr<s_router_query>& query : state->queries) {
         if (query != nullptr) {
             Router_Client_Disconnect(&query->client);
         }
     }
     state->queries.clear();
+}
+
+void Complete_Refresh_(s_router_session_browser_state* state) {
+    if (state->config.mode != ROUTER_SESSION_BROWSER_DIRECT_ENDPOINT) {
+        Disconnect_Queries_(state);
+    }
     state->phase = BROWSER_IDLE;
     state->revision++;
+}
+
+bool Start_Direct_Query_(s_router_session_browser_state* state, const s_router_endpoint& endpoint) {
+    s_router_query* query = nullptr;
+    if (state->queries.size() == 1 && state->queries[0] != nullptr && Endpoints_Match_(state->queries[0]->endpoint, endpoint)) {
+        query = state->queries[0].get();
+    } else {
+        Disconnect_Queries_(state);
+        std::unique_ptr<s_router_query> direct_query = std::make_unique<s_router_query>();
+        direct_query->endpoint = endpoint;
+        state->queries.push_back(std::move(direct_query));
+        query = state->queries[0].get();
+    }
+
+    query->endpoint = endpoint;
+    query->deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(state->config.request_timeout_ms);
+    query->started = false;
+    query->complete = false;
+
+    Router_Client_Pump(&query->client);
+    if (!Router_Client_Is_Connected(&query->client)) {
+        Router_Client_Disconnect(&query->client);
+
+        s_router_client_config client_config;
+        Router_Copy_String(client_config.host, sizeof(client_config.host), endpoint.host);
+        client_config.tcp_port = endpoint.tcp_port;
+        client_config.connect_timeout_ms = state->config.connect_timeout_ms;
+        Router_Client_Init(&query->client, &client_config);
+
+        if (!Router_Client_Connect(&query->client)) {
+            if (state->last_error == 0) {
+                state->last_error = Router_Client_Last_Error(&query->client);
+            }
+            query->complete = true;
+            state->phase = BROWSER_QUERYING;
+            return false;
+        }
+
+        if (!Router_Client_Send_Hello(&query->client, state->config.client_name, ROUTER_VERSION, state->next_request_id++)) {
+            if (state->last_error == 0) {
+                state->last_error = Router_Client_Last_Error(&query->client);
+            }
+            Router_Client_Disconnect(&query->client);
+            query->complete = true;
+            state->phase = BROWSER_QUERYING;
+            return false;
+        }
+    }
+
+    if (!Router_Client_Request_Session_List(&query->client, state->next_request_id++)) {
+        if (state->last_error == 0) {
+            state->last_error = Router_Client_Last_Error(&query->client);
+        }
+        Router_Client_Disconnect(&query->client);
+        query->complete = true;
+        state->phase = BROWSER_QUERYING;
+        return false;
+    }
+
+    query->started = true;
+    state->phase = BROWSER_QUERYING;
+    return true;
 }
 
 bool Start_Query_(s_router_session_browser_state* state, const s_router_endpoint& endpoint) {
@@ -355,12 +423,7 @@ void Router_Session_Browser_Shutdown(s_router_session_browser* browser) {
         return;
     }
     Finish_Discovery_(browser->state.get());
-    for (std::unique_ptr<s_router_query>& query : browser->state->queries) {
-        if (query != nullptr) {
-            Router_Client_Disconnect(&query->client);
-        }
-    }
-    browser->state->queries.clear();
+    Disconnect_Queries_(browser->state.get());
     browser->state->phase = BROWSER_IDLE;
 }
 
@@ -370,7 +433,14 @@ bool Router_Session_Browser_Refresh(s_router_session_browser* browser) {
     }
 
     s_router_session_browser_state* state = browser->state.get();
-    Router_Session_Browser_Shutdown(browser);
+    const bool preserve_direct_query =
+        state->config.mode == ROUTER_SESSION_BROWSER_DIRECT_ENDPOINT &&
+        state->phase == BROWSER_IDLE &&
+        state->queries.size() == 1 &&
+        state->queries[0] != nullptr;
+    if (!preserve_direct_query) {
+        Router_Session_Browser_Shutdown(browser);
+    }
     state->sessions.clear();
     state->endpoints.clear();
     state->last_error = 0;
@@ -390,7 +460,7 @@ bool Router_Session_Browser_Refresh(s_router_session_browser* browser) {
         Router_Copy_String(endpoint.host, sizeof(endpoint.host), state->config.host);
         endpoint.tcp_port = state->config.tcp_port;
         state->endpoints.push_back(endpoint);
-        Start_Queries_(state);
+        Start_Direct_Query_(state, endpoint);
         return true;
     }
 
@@ -431,6 +501,13 @@ void Router_Session_Browser_Pump(s_router_session_browser* browser) {
         if (all_complete) {
             Complete_Refresh_(state);
         }
+    }
+
+    if (state->phase == BROWSER_IDLE &&
+        state->config.mode == ROUTER_SESSION_BROWSER_DIRECT_ENDPOINT &&
+        state->queries.size() == 1 &&
+        state->queries[0] != nullptr) {
+        Router_Client_Pump(&state->queries[0]->client);
     }
 }
 

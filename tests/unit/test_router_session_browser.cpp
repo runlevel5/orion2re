@@ -5,6 +5,7 @@
 #include "network/router_session_browser.h"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstring>
 #include <thread>
@@ -12,6 +13,24 @@
 using namespace network::router;
 
 namespace {
+
+struct Browser_Log_ {
+    std::atomic<int> accepted_connections{0};
+    std::atomic<int> closed_connections{0};
+};
+
+void Browser_Log_Callback_(const char* message, void* user_data) {
+    Browser_Log_* log = static_cast<Browser_Log_*>(user_data);
+    if (log == nullptr || message == nullptr) {
+        return;
+    }
+    if (std::strstr(message, "connection accepted peer=") != nullptr) {
+        log->accepted_connections.fetch_add(1);
+    }
+    if (std::strstr(message, "connection closed peer=") != nullptr) {
+        log->closed_connections.fetch_add(1);
+    }
+}
 
 struct Service_Thread_Guard_ {
     s_router_service* service = nullptr;
@@ -27,7 +46,7 @@ struct Service_Thread_Guard_ {
 
 bool Start_Test_Service_(s_router_service* service, std::thread* service_thread, int* run_result) {
     *run_result = -1;
-    *service_thread = std::thread([&]() {
+    *service_thread = std::thread([service, run_result]() {
         *run_result = Router_Service_Run(service);
     });
 
@@ -62,6 +81,14 @@ bool Wait_For_Browser_Revision_(s_router_session_browser* browser, uint32_t prev
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     return Router_Session_Browser_Revision(browser) != previous_revision;
+}
+
+bool Wait_For_Log_Value_(const std::atomic<int>* value, int expected_minimum) {
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+    while (value->load() < expected_minimum && std::chrono::steady_clock::now() < deadline) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    return value->load() >= expected_minimum;
 }
 
 s_router_client_config Make_Client_Config_(uint16_t port) {
@@ -138,6 +165,58 @@ DOCTEST_TEST_CASE("direct endpoint refresh returns a session snapshot") {
     DOCTEST_CHECK(sessions[0].router.tcp_port == Router_Service_Bound_Tcp_Port(&service));
 
     Router_Session_Browser_Shutdown(&browser);
+    Router_Client_Disconnect(&host);
+    Router_Service_Request_Stop(&service);
+    service_thread.join();
+    service_guard.service = nullptr;
+    service_guard.service_thread = nullptr;
+    DOCTEST_CHECK(run_result == 0);
+}
+
+DOCTEST_TEST_CASE("direct endpoint refresh reuses one connection and shutdown closes it") {
+    Browser_Log_ browser_log;
+
+    s_router_config service_config;
+    Router_Copy_String(service_config.listen_host, sizeof(service_config.listen_host), "127.0.0.1");
+    service_config.tcp_port = 0;
+    service_config.enable_discovery = false;
+    service_config.enable_signal_handlers = false;
+    service_config.verbose_logging = true;
+    service_config.log_callback = Browser_Log_Callback_;
+    service_config.log_user_data = &browser_log;
+
+    s_router_service service;
+    Router_Service_Init(&service, &service_config);
+    int run_result = -1;
+    std::thread service_thread;
+    Service_Thread_Guard_ service_guard{&service, &service_thread};
+    DOCTEST_REQUIRE(Start_Test_Service_(&service, &service_thread, &run_result));
+    s_router_client host;
+    DOCTEST_REQUIRE(Create_Service_Session_(&host, Router_Service_Bound_Tcp_Port(&service), "host", "Direct Game"));
+
+    s_router_session_browser browser;
+    s_router_session_browser_config browser_config;
+    browser_config.mode = ROUTER_SESSION_BROWSER_DIRECT_ENDPOINT;
+    Router_Copy_String(browser_config.host, sizeof(browser_config.host), "127.0.0.1");
+    browser_config.tcp_port = Router_Service_Bound_Tcp_Port(&service);
+    Router_Copy_String(browser_config.client_name, sizeof(browser_config.client_name), "browser");
+    Router_Session_Browser_Init(&browser, &browser_config);
+
+    DOCTEST_REQUIRE(Router_Session_Browser_Refresh(&browser));
+    DOCTEST_REQUIRE(Wait_For_Browser_Revision_(&browser, 0));
+    DOCTEST_CHECK(Router_Session_Browser_Sessions(&browser).size() == 1);
+    DOCTEST_REQUIRE(Wait_For_Log_Value_(&browser_log.accepted_connections, 2));
+
+    const uint32_t revision = Router_Session_Browser_Revision(&browser);
+    DOCTEST_REQUIRE(Router_Session_Browser_Refresh(&browser));
+    DOCTEST_REQUIRE(Wait_For_Browser_Revision_(&browser, revision));
+    DOCTEST_CHECK(Router_Session_Browser_Sessions(&browser).size() == 1);
+    DOCTEST_CHECK(browser_log.accepted_connections.load() == 2);
+    DOCTEST_CHECK(browser_log.closed_connections.load() == 0);
+
+    Router_Session_Browser_Shutdown(&browser);
+    DOCTEST_REQUIRE(Wait_For_Log_Value_(&browser_log.closed_connections, 1));
+
     Router_Client_Disconnect(&host);
     Router_Service_Request_Stop(&service);
     service_thread.join();
