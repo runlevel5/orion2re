@@ -507,14 +507,14 @@ namespace DIP_SCRN {
         int16_t selected_idx;
         int16_t result = 0;
 
-        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x4F, choice_text[0], 40);
-        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x50, choice_text[1], 40);
+        JIM::Get_Text_Message_("jimtext.lbx", 0x4F, choice_text[0], 40);
+        JIM::Get_Text_Message_("jimtext.lbx", 0x50, choice_text[1], 40);
 
         choice_text[2][0] = DIP_SCRN::s_empty[0];
 
         if (DIP_SCRN::Check_Better_Offer_Available_(player_a, player_b) == 1) {
             num_choices = 3;
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x52, choice_text[2], 40);
+            JIM::Get_Text_Message_("jimtext.lbx", 0x52, choice_text[2], 40);
         }
 
         DIP_SCRN::_response_message = 0;
@@ -523,7 +523,7 @@ namespace DIP_SCRN {
         DIP_SCRN::Get_Human_Propose_Treaty_Message_(treaty_type);
         fields::Deactivate_Help_List_();
 
-        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x4A, title_text, 40);
+        JIM::Get_Text_Message_("jimtext.lbx", 0x4A, title_text, 40);
 
         selected_idx = DIP_SCRN::Diplomacy_Generic_List_(num_choices, (char*)choice_text, 0, title_text);
 
@@ -2517,7 +2517,10 @@ namespace DIP_SCRN {
         return 0;
     }
 
-    void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg) {
+    void __cdecl Diplomacy_Receive_Message_(uint32_t from_player_id, uint16_t msg_code, uint32_t payload_len_or_unused, s_dipscrn_net_message* message) {
+        (void)from_player_id;
+        (void)payload_len_or_unused;
+
         if (msg_code < DIP_NET_PACKET_MESSAGE || msg_code >= DIP_NET_PACKET_RANGE_END) {
             return;
         }
@@ -2526,11 +2529,11 @@ namespace DIP_SCRN {
             _net_diplomacy_chat_message[0] = s__00551100[0];
             _receive_chat_message[0] = s__00551100[0];
 
-            _net_diplomacy_message.sender_player_id = net_msg->sender_player_id;
-            _net_diplomacy_message.target_player_id = net_msg->target_player_id;
-            _net_diplomacy_message.msg_type = net_msg->msg_type;
-            _net_diplomacy_message.arg2 = net_msg->arg2;
-            _net_diplomacy_message.arg1 = net_msg->arg1;
+            _net_diplomacy_message.sender_player_id = message->sender_player_id;
+            _net_diplomacy_message.target_player_id = message->target_player_id;
+            _net_diplomacy_message.msg_type = message->msg_type;
+            _net_diplomacy_message.arg2 = message->arg2;
+            _net_diplomacy_message.arg1 = message->arg1;
 
             switch (_net_diplomacy_message.msg_type) {
                 case DIP_NET_MSG_GOODBYE:
@@ -2563,7 +2566,7 @@ namespace DIP_SCRN {
         }
 
         if (msg_code == DIP_NET_PACKET_CHAT) {
-            strlcpy(_receive_chat_message, (char*)net_msg, sizeof(_receive_chat_message));
+            strlcpy(_receive_chat_message, (char*)message, sizeof(_receive_chat_message));
         }
     }
 }

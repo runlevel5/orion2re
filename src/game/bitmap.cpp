@@ -987,7 +987,7 @@ namespace bitmap {
         }
     }
 
-    void __cdecl Jumble_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t param_3, int16_t param_4) {
+    void __cdecl Jumble_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t noise_threshold, int16_t jumble_mask) {
         uint32_t seed = game_random::Get_Random_Seed_();
 
         animate::_animation_header = src;
@@ -1006,7 +1006,7 @@ namespace bitmap {
             dest_pixels = (uint8_t*)dest + kBitmapFrameDataOffset;
         }
 
-        shear::Jumble_Bitmap_Pixels_(src_pixels, param_4, param_3, dest_pixels, width, height);
+        shear::Jumble_Bitmap_Pixels_(src_pixels, jumble_mask, noise_threshold, dest_pixels, width, height);
 
         game_random::Set_Random_Seed_(seed);
     }

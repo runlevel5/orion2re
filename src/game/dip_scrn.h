@@ -102,7 +102,7 @@ namespace DIP_SCRN {
 
     void __cdecl Get_Net_Diplomacy_Choices_();
     void __cdecl Get_Main_Diplomacy_Choices_();
-    void __cdecl Get_Main_Repulsive_Diplomacy_Choices_(int16_t param_1, int16_t param_2, int8_t param_3);
+    void __cdecl Get_Main_Repulsive_Diplomacy_Choices_(int16_t speaker_player_id, int16_t listener_player_id, int8_t net_mode);
     void __cdecl Diplomacy_Display_Response_();
 
     void __cdecl Draw_Diplomacy_Synch_Mode_();
@@ -137,9 +137,9 @@ namespace DIP_SCRN {
 
     void __cdecl Add_Diplomacy_Turn_Summary_Messages_();
 
-    void __cdecl Diplomacy_Mouse_Init_(int16_t param_1);
+    void __cdecl Diplomacy_Mouse_Init_(int16_t ambassador_player_id);
 
-    void __cdecl Get_Diplomacy_Statement_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4);
+    void __cdecl Get_Diplomacy_Statement_(int16_t statement_id, int16_t speaker_player_id, int16_t listener_player_id, char* out_text);
 
     void __cdecl Setup_Back_Page_();
 
@@ -178,7 +178,7 @@ namespace DIP_SCRN {
     extern char* _main_net_repulsive_diplomacy_list[6];
     extern s_dipscrn_net_message _net_diplomacy_message;
 
-    void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg);
+    void __cdecl Diplomacy_Receive_Message_(uint32_t from_player_id, uint16_t msg_code, uint32_t payload_len_or_unused, s_dipscrn_net_message* message);
 
     void __cdecl Diplomacy_Main_Net_Chat_(int16_t player_idx, int16_t target_player_idx);
 

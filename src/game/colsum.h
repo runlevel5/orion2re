@@ -56,7 +56,7 @@ namespace COLSUM {
 
     void __cdecl Sort_Col_List_();
 
-    int16_t __cdecl cmp_(int16_t param_1, int16_t param_2);
+    int16_t __cdecl cmp_(int16_t lhs, int16_t rhs);
 
     int16_t __cdecl cmp_Alpha_(int16_t colony_idx_1, int16_t colony_idx_2);
 
@@ -64,13 +64,13 @@ namespace COLSUM {
 
     int16_t __cdecl cmp_Food_(int16_t colony_idx1, int16_t colony_idx2);
 
-    int16_t __cdecl cmp_Industry_(int16_t param_1, int16_t param_2);
+    int16_t __cdecl cmp_Industry_(int16_t colony_idx_1, int16_t colony_idx_2);
 
     int16_t __cdecl cmp_Research_(int16_t colony_idx_1, int16_t colony_idx_2);
 
     int16_t __cdecl cmp_Prod_(int16_t colony_idx_1, int16_t colony_idx_2);
 
-    int16_t __cdecl cmp_BC_(int16_t param_1, int16_t param_2);
+    int16_t __cdecl cmp_BC_(int16_t colony_idx_1, int16_t colony_idx_2);
 
     int16_t __cdecl Switched_cmp_(int16_t a1, int16_t a2);
 
@@ -78,7 +78,7 @@ namespace COLSUM {
 
     void __cdecl Draw_Colony_Summary_();
 
-    void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3);
+    void __cdecl Update_First_(int16_t visible_rows, int16_t* first_visible_index, int16_t* slider_position);
 
     void __cdecl Decrement_First_(int16_t num_items);
 
@@ -106,15 +106,15 @@ namespace COLSUM {
 
     bool __cdecl Evaluate_Input_(int16_t* input_val, int16_t* scan_val);
 
-    bool __cdecl Evaluate_Col_List_Input_(int16_t* field_ptr, int16_t* param_2);
+    bool __cdecl Evaluate_Col_List_Input_(int16_t* field_ptr, int16_t* scan_val);
 
     void __cdecl Evaluate_Colony_Pop_Input_(int16_t* input_field_1, int16_t* input_field_2, int16_t colony_idx_in_list);
 
     int16_t __cdecl Get_Selected_Pop_(int16_t colony_idx, int16_t job_idx);
 
-    int16_t __cdecl Get_Scanned_Pop_(int16_t param_1, int16_t param_2);
+    int16_t __cdecl Get_Scanned_Pop_(int16_t colony_list_row, int16_t job_type);
 
-    void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2);
+    void __cdecl Check_Galaxy_Map_Fields_(int16_t* clicked_field, int16_t* hovered_field);
 
     void __cdecl Draw_Scan_Info_();
 

@@ -38,11 +38,11 @@ namespace COLSUM {
     const char s_f_005510f8[2] = "f";
     const char s_p_005510fc[2] = "p";
 
-    void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2) {
+    void __cdecl Check_Galaxy_Map_Fields_(int16_t* clicked_field, int16_t* hovered_field) {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             int16_t best_planet = Pick_Best_Planet_To_Goto_At_Star_(star_idx);
 
-            if (*param_1 == MOX::_galaxy_map_star_field[star_idx] && best_planet != -1) {
+            if (*clicked_field == MOX::_galaxy_map_star_field[star_idx] && best_planet != -1) {
                 for (int16_t colony_list_idx = 0; colony_list_idx < MOX::_NUM_COLONIES; ++colony_list_idx) {
                     int16_t col_idx = COLXPORT::_g_colony_list_ptr[colony_list_idx];
 
@@ -63,7 +63,7 @@ namespace COLSUM {
                 }
             }
 
-            if (*param_2 == MOX::_galaxy_map_star_field[star_idx]) {
+            if (*hovered_field == MOX::_galaxy_map_star_field[star_idx]) {
                 best_planet = Pick_Best_Planet_To_Goto_At_Star_(star_idx);
                 MOX::_galaxy_map_scanned_star = star_idx;
 
@@ -187,16 +187,16 @@ namespace COLSUM {
         COLONY::_using_colony_screen_palette = 0;
     }
 
-    void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3) {
-        if (COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) < param_1) {
-            *param_3 = -1;
-            *param_2 = 0;
+    void __cdecl Update_First_(int16_t visible_rows, int16_t* first_visible_index, int16_t* slider_position) {
+        if (COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) < visible_rows) {
+            *slider_position = -1;
+            *first_visible_index = 0;
             return;
         }
 
-        if ((int32_t)COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) - *param_3 - *param_2 != param_1) {
+        if ((int32_t)COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) - *slider_position - *first_visible_index != visible_rows) {
             COLONY::_full_draw = 1;
-            *param_2 = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) - *param_3 - param_1;
+            *first_visible_index = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) - *slider_position - visible_rows;
             COLONY::_scanned_pop = -1;
         }
     }
@@ -366,26 +366,26 @@ namespace COLSUM {
         } while (outer_count != 0);
     }
 
-    int16_t __cdecl Switched_cmp_(int16_t param_1, int16_t param_2) {
-        if (param_1 == -1 || param_2 == -1) {
+    int16_t __cdecl Switched_cmp_(int16_t colony_idx_1, int16_t colony_idx_2) {
+        if (colony_idx_1 == -1 || colony_idx_2 == -1) {
             return 0;
         }
 
         switch (_g_sort_index) {
             case 0:
-                return cmp_Alpha_(param_1, param_2);
+                return cmp_Alpha_(colony_idx_1, colony_idx_2);
             case 1:
-                return -cmp_Pops_(param_1, param_2);
+                return -cmp_Pops_(colony_idx_1, colony_idx_2);
             case 2:
-                return -cmp_Food_(param_1, param_2);
+                return -cmp_Food_(colony_idx_1, colony_idx_2);
             case 3:
-                return -cmp_Industry_(param_1, param_2);
+                return -cmp_Industry_(colony_idx_1, colony_idx_2);
             case 4:
-                return -cmp_Research_(param_1, param_2);
+                return -cmp_Research_(colony_idx_1, colony_idx_2);
             case 5:
-                return cmp_Prod_(param_1, param_2);
+                return cmp_Prod_(colony_idx_1, colony_idx_2);
             case 6:
-                return -cmp_BC_(param_1, param_2);
+                return -cmp_BC_(colony_idx_1, colony_idx_2);
             default:
                 return 0;
         }
@@ -747,7 +747,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         video::Clip_Off_();
     }
 
-    bool __cdecl Evaluate_Input_(int16_t* field_ptr, int16_t* param_2) {
+    bool __cdecl Evaluate_Input_(int16_t* field_ptr, int16_t* scan_val) {
         int16_t field = *field_ptr;
 
         if (field == _x_fields[1]) {
@@ -806,8 +806,8 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             return true;
         }
 
-        bool result = Evaluate_Col_List_Input_(field_ptr, param_2);
-        Check_Galaxy_Map_Fields_(field_ptr, param_2);
+        bool result = Evaluate_Col_List_Input_(field_ptr, scan_val);
+        Check_Galaxy_Map_Fields_(field_ptr, scan_val);
 
         return result;
     }
@@ -923,35 +923,35 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         return true;
     }
 
-    int16_t __cdecl Get_Scanned_Pop_(int16_t param_1, int16_t param_2) {
-        int16_t colony_idx = _list_col[param_1];
+    int16_t __cdecl Get_Scanned_Pop_(int16_t colony_list_row, int16_t job_type) {
+        int16_t colony_idx = _list_col[colony_list_row];
         int16_t val_ebx;
         int16_t val_ebp;
 
-        if (param_2 == -1) {
+        if (job_type == -1) {
             val_ebx = 101 /* 0x65 */;
-        } else if (param_2 == 0) {
+        } else if (job_type == 0) {
             val_ebx = 236 /* 0xec */;
         } else {
-            val_ebx = (param_2 == 1) ? 378 /* 0x17a */ : 512 /* 0x200 */;
+            val_ebx = (job_type == 1) ? 378 /* 0x17a */ : 512 /* 0x200 */;
         }
 
-        if (param_2 == 0) {
+        if (job_type == 0) {
             val_ebp = 101 /* 0x65 */;
-        } else if (param_2 == 1) {
+        } else if (job_type == 1) {
             val_ebp = 236 /* 0xec */;
         } else {
-            val_ebp = (param_2 == 2) ? 378 /* 0x17a */ : 512 /* 0x200 */;
+            val_ebp = (job_type == 2) ? 378 /* 0x17a */ : 512 /* 0x200 */;
         }
 
-        int32_t list_idx = (int32_t)param_1 * 3 + (int32_t)param_2;
+        int32_t list_idx = (int32_t)colony_list_row * 3 + (int32_t)job_type;
 
         int16_t result = COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
             colony_idx,
-            param_2,
+            job_type,
             4,
             val_ebp,
-            (int16_t)(param_1 * 31 + 38),
+            (int16_t)(colony_list_row * 31 + 38),
             (int16_t)(val_ebx - 10),
             0,
             _list_col_pop_ref[list_idx].refs,
@@ -1016,12 +1016,12 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         return (int16_t)strcasecmp(name1, name2);
     }
 
-    int16_t __cdecl cmp_(int16_t param_1, int16_t param_2) {
-        if (param_1 < param_2) {
+    int16_t __cdecl cmp_(int16_t lhs, int16_t rhs) {
+        if (lhs < rhs) {
             return -1;
         }
 
-        return (int16_t)(param_2 < param_1);
+        return (int16_t)(rhs < lhs);
     }
 
     int16_t __cdecl cmp_Pops_(int16_t colony_idx1, int16_t colony_idx2) {
@@ -1036,9 +1036,9 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                     MOX::_colony[colony_idx2].production[ECON_FOOD]);
     }
 
-    int16_t __cdecl cmp_Industry_(int16_t param_1, int16_t param_2) {
-        return cmp_(MOX::_colony[param_1].production[ECON_INDUSTRY],
-                    MOX::_colony[param_2].production[ECON_INDUSTRY]);
+    int16_t __cdecl cmp_Industry_(int16_t colony_idx_1, int16_t colony_idx_2) {
+        return cmp_(MOX::_colony[colony_idx_1].production[ECON_INDUSTRY],
+                    MOX::_colony[colony_idx_2].production[ECON_INDUSTRY]);
     }
 
     int16_t __cdecl cmp_Research_(int16_t colony_idx_1, int16_t colony_idx_2) {
@@ -1046,9 +1046,9 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                     MOX::_colony[colony_idx_2].production[ECON_RESEARCH]);
     }
 
-    int16_t __cdecl cmp_BC_(int16_t param_1, int16_t param_2) {
-        return cmp_(MOX::_colony[param_1].production[ECON_BC],
-                    MOX::_colony[param_2].production[ECON_BC]);
+    int16_t __cdecl cmp_BC_(int16_t colony_idx_1, int16_t colony_idx_2) {
+        return cmp_(MOX::_colony[colony_idx_1].production[ECON_BC],
+                    MOX::_colony[colony_idx_2].production[ECON_BC]);
     }
 
     int16_t __cdecl cmp_Prod_(int16_t colony_idx_1, int16_t colony_idx_2) {
@@ -1172,44 +1172,44 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         }
     }
 
-    int16_t __cdecl Prod_To_Sort_Type_(int16_t param_1) {
-        if (param_1 <= -100) {
+    int16_t __cdecl Prod_To_Sort_Type_(int16_t production_id) {
+        if (production_id <= -100) {
             // Index logic: -100 maps to ship 0, -101 to ship 1, etc.
-            return static_cast<int16_t>(MOX::_ship[-100 - param_1].d.size) + 10000;
+            return static_cast<int16_t>(MOX::_ship[-100 - production_id].d.size) + 10000;
         }
 
-        if (param_1 == -15) {
+        if (production_id == -15) {
             return 9999;
         }
 
         // Handle specific building indices (1-48)
-        if (param_1 > 0 && param_1 < BUILDING_COUNT) {
-            return static_cast<int16_t>(TECHDATA::_buildings[param_1].cost) + 10;
+        if (production_id > 0 && production_id < BUILDING_COUNT) {
+            return static_cast<int16_t>(TECHDATA::_buildings[production_id].cost) + 10;
         }
 
         // Special categories of items/projects
-        if (param_1 == -6 || param_1 == -4 || param_1 == -5 || param_1 == -7) {
+        if (production_id == -6 || production_id == -4 || production_id == -5 || production_id == -7) {
             return -1;
         }
 
-        if (param_1 == -3 || param_1 == -2 || param_1 == -10) {
+        if (production_id == -3 || production_id == -2 || production_id == -10) {
             return -2;
         }
 
         // Broad range return
-        if (param_1 > -100 && param_1 <= -50) {
+        if (production_id > -100 && production_id <= -50) {
             return 0;
         }
 
         // Specific indices returning 0
-        if (param_1 == -11 || param_1 == -12 || param_1 == -13 || 
-            param_1 == -17 || param_1 == -16 || param_1 == -8 || 
-            param_1 == -9 || param_1 >= BUILDING_COUNT) {
+        if (production_id == -11 || production_id == -12 || production_id == -13 || 
+            production_id == -17 || production_id == -16 || production_id == -8 || 
+            production_id == -9 || production_id >= BUILDING_COUNT) {
             return 0;
         }
 
-        // Optimized fallback for param_1 == -1
-        if (param_1 == -1) {
+        // Optimized fallback for production_id == -1
+        if (production_id == -1) {
             return -1;
         }
 

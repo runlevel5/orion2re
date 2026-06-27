@@ -159,336 +159,351 @@ namespace MSG_ {
         }
     }
 
-    void __cdecl sprintf_msg_(char* param_1, s_MSG* param_2) {
-        char local_dc[20];
-        char local_c8[200];
+    void __cdecl sprintf_msg_(char* out_text, s_MSG* msg) {
+        char and_text[20];
+        char details_text[200];
 
-        switch (param_2->msg_type) {
+        switch (msg->msg_type) {
             case MSG_TYPE_COLONY: {
-                char* pcVar6 = HACCESS::Get_Planet_Name_((int16_t)(param_2->u).colony.planet_idx);
-                switch ((param_2->u).colony.subtype) {
-                    case 0:
-                        sprintf(param_1, _msg_colony_scrap_building_fmt,
-                                     TECHDATA::_buildings[(param_2->u).colony.c.scrap.building_id].name, pcVar6,
-                                     (int)(param_2->u).colony.c.scrap.bc);
+                const auto& colony_msg = msg->u.colony;
+                const char* planet_name = HACCESS::Get_Planet_Name_((int16_t)colony_msg.planet_idx);
+
+                switch (colony_msg.subtype) {
+                    case 0: {
+                        const auto& scrap_msg = colony_msg.c.scrap;
+                        sprintf(out_text, _msg_colony_scrap_building_fmt,
+                                     TECHDATA::_buildings[scrap_msg.building_id].name, planet_name,
+                                     (int)scrap_msg.bc);
                         return;
+                    }
                     case 1: {
-                        int16_t sVar4 = (param_2->u).colony.c.build.build_id;
-                        if (sVar4 < BUILDING_ALIEN_CONTROL_CENTER || sVar4 >= BUILDING_COUNT) {
-                            if (sVar4 < -99) {
-                                char* pcVar8 = _msg_colony_built_ship_fmt;
-                                if ((param_2->u).colony.c.build.is_refit != 0) {
-                                    pcVar8 = _msg_colony_built_refit_fmt;
+                        const auto& build_msg = colony_msg.c.build;
+                        int16_t build_id = build_msg.build_id;
+                        if (build_id < BUILDING_ALIEN_CONTROL_CENTER || build_id >= BUILDING_COUNT) {
+                            if (build_id < -99) {
+                                const char* build_fmt = _msg_colony_built_ship_fmt;
+                                if (build_msg.is_refit != 0) {
+                                    build_fmt = _msg_colony_built_refit_fmt;
                                 }
-                                sprintf(param_1, pcVar8, pcVar6, &MOX::_ship[-100 - sVar4]);
+                                sprintf(out_text, build_fmt, planet_name, &MOX::_ship[-100 - build_id]);
                             } else {
-                                switch (sVar4) {
+                                switch (build_id) {
                                     case -15:
-                                        sprintf(param_1, _msg_colony_built_freighter_fmt, pcVar6);
+                                        sprintf(out_text, _msg_colony_built_freighter_fmt, planet_name);
                                         break;
                                     case -7:
-                                        sprintf(param_1, _msg_colony_built_spy_fmt, pcVar6);
+                                        sprintf(out_text, _msg_colony_built_spy_fmt, planet_name);
                                         break;
                                     case -6:
-                                        sprintf(param_1, _msg_colony_built_android_scientist_fmt, pcVar6);
+                                        sprintf(out_text, _msg_colony_built_android_scientist_fmt, planet_name);
                                         break;
                                     case -5:
-                                        sprintf(param_1, _msg_colony_built_android_worker_fmt, pcVar6);
+                                        sprintf(out_text, _msg_colony_built_android_worker_fmt, planet_name);
                                         break;
                                     case -4:
-                                        sprintf(param_1, _msg_colony_built_android_farmer_fmt, pcVar6);
+                                        sprintf(out_text, _msg_colony_built_android_farmer_fmt, planet_name);
                                         break;
                                     default:
                                         break;
                                 }
                             }
                         } else {
-                            sprintf(param_1, _msg_colony_built_building_fmt, pcVar6, TECHDATA::_buildings[sVar4].name);
+                            sprintf(out_text, _msg_colony_built_building_fmt, planet_name, TECHDATA::_buildings[build_id].name);
                         }
 
-                        int16_t product_id = (param_2->u).colony.c.build.product_id;
+                        int16_t product_id = build_msg.product_id;
                         if (product_id != -1) {
-                            char* pcVar6_fmt = _msg_colony_built_next_queue_fmt;
-                            if ((param_2->u).colony.c.build.append_fmt != 0) {
-                                pcVar6_fmt = _msg_colony_built_auto_build_fmt;
+                            const char* queue_fmt = _msg_colony_built_next_queue_fmt;
+                            if (build_msg.append_fmt != 0) {
+                                queue_fmt = _msg_colony_built_auto_build_fmt;
                             }
-                            char* pcVar7 = AIBUILD::Product_Name_(product_id);
-                            sprintf(param_1 + strlen(param_1), pcVar6_fmt, pcVar7);
+                            const char* product_name = AIBUILD::Product_Name_(product_id);
+                            sprintf(out_text + strlen(out_text), queue_fmt, product_name);
                             return;
                         }
                         break;
                     }
                     case 2: {
-                        uint32_t uVar11 = (uint32_t)(param_2->u).colony.c.assimilation.val;
-                        char* pcVar8 = _native_msg;
-                        if ((int)uVar11 < (int)MOX::_NUM_PLAYERS) {
-                            pcVar8 = MOX::_player[uVar11].race_name;
+                        uint32_t race_idx = (uint32_t)colony_msg.c.assimilation.val;
+                        const char* victim_race_name = _native_msg;
+                        if ((int)race_idx < (int)MOX::_NUM_PLAYERS) {
+                            victim_race_name = MOX::_player[race_idx].race_name;
                         }
-                        sprintf(param_1, _msg_colony_genocide_fmt, pcVar8, pcVar6);
+                        sprintf(out_text, _msg_colony_genocide_fmt, victim_race_name, planet_name);
                         return;
                     }
                     case 3:
-                        sprintf(param_1, _msg_colony_assimilation_fmt,
-                                     MOX::_player[(param_2->u).colony.c.assimilation.val].race_name, pcVar6);
+                        sprintf(out_text, _msg_colony_assimilation_fmt,
+                                     MOX::_player[colony_msg.c.assimilation.val].race_name, planet_name);
                         return;
                     case 4: {
-                        uint8_t bVar3 = (param_2->u).colony.c.starvation.a;
-                        if (bVar3 == 0) {
-                            sprintf(param_1, _msg_colony_starvation_ind_fmt, pcVar6,
-                                         (uint32_t)(uint8_t)(param_2->u).colony.c.starvation.b);
+                        uint8_t food_loss = colony_msg.c.starvation.a;
+                        if (food_loss == 0) {
+                            sprintf(out_text, _msg_colony_starvation_ind_fmt, planet_name,
+                                         (uint32_t)(uint8_t)colony_msg.c.starvation.b);
                             return;
                         }
-                        uint8_t bVar2 = (param_2->u).colony.c.starvation.b;
-                        if (bVar2 != 0) {
-                            sprintf(param_1, _msg_colony_starvation_both_fmt, pcVar6, (uint32_t)bVar3, (uint32_t)bVar2);
+                        uint8_t industry_loss = colony_msg.c.starvation.b;
+                        if (industry_loss != 0) {
+                            sprintf(out_text, _msg_colony_starvation_both_fmt, planet_name, (uint32_t)food_loss, (uint32_t)industry_loss);
                             return;
                         }
-                        sprintf(param_1, _msg_colony_starvation_food_fmt, pcVar6, (uint32_t)bVar3);
+                        sprintf(out_text, _msg_colony_starvation_food_fmt, planet_name, (uint32_t)food_loss);
                         return;
                     }
                     case 5: {
-                        uint8_t bVar3 = (param_2->u).colony.c.settlers.settlers;
-                        char* pcVar8 = _msg_colony_d_settlers_arrived_fmt;
-                        if (bVar3 == 1) {
-                            pcVar8 = _msg_colony_1_settler_arrived_fmt;
+                        const auto& settlers_msg = colony_msg.c.settlers;
+                        uint8_t settler_count = settlers_msg.settlers;
+                        const char* settlers_fmt = _msg_colony_d_settlers_arrived_fmt;
+                        if (settler_count == 1) {
+                            settlers_fmt = _msg_colony_1_settler_arrived_fmt;
                         }
-                        int iVar9 = sprintf(param_1, pcVar8, (uint32_t)bVar3, pcVar6);
-                        if ((param_2->u).colony.c.settlers.blockaded != 0) {
-                            strcpy(param_1 + iVar9, _msg_colony_settlers_arrived_blockaded_fmt);
+                        int base_len = sprintf(out_text, settlers_fmt, (uint32_t)settler_count, planet_name);
+                        if (settlers_msg.blockaded != 0) {
+                            strcpy(out_text + base_len, _msg_colony_settlers_arrived_blockaded_fmt);
                             return;
                         }
-                        uint8_t over_limit = (param_2->u).colony.c.settlers.over_limit;
+                        uint8_t over_limit = settlers_msg.over_limit;
                         if (over_limit != 0) {
-                            char* pcVar6_fmt = _msg_colony_d_settlers_arrived_over_limit_fmt;
+                            const char* over_limit_fmt = _msg_colony_d_settlers_arrived_over_limit_fmt;
                             if (over_limit == 1) {
-                                pcVar6_fmt = _msg_colony_1_settler_arrived_over_limit_fmt;
+                                over_limit_fmt = _msg_colony_1_settler_arrived_over_limit_fmt;
                             }
-                            sprintf(param_1 + iVar9, pcVar6_fmt, (uint32_t)over_limit);
+                            sprintf(out_text + base_len, over_limit_fmt, (uint32_t)over_limit);
                         }
                         return;
                     }
                     case 6:
-                        sprintf(param_1, _msg_colony_plague_fmt, pcVar6);
+                        sprintf(out_text, _msg_colony_plague_fmt, planet_name);
                         return;
                     case 7:
-                        sprintf(param_1, _msg_colony_boom_fmt, pcVar6);
+                        sprintf(out_text, _msg_colony_boom_fmt, planet_name);
                         return;
                     case 8:
-                        sprintf(param_1, _msg_colony_comet_fmt, pcVar6);
+                        sprintf(out_text, _msg_colony_comet_fmt, planet_name);
                         return;
                     case 9: {
-                        uint32_t uVar11 = (uint32_t)(uint8_t)(param_2->u).colony.c.rebels.owner_player;
-                        uint8_t bVar3 = (param_2->u).colony.c.rebels.rebels;
-                        if ((int)MOX::_PLAYER_NUM != (int)uVar11) {
-                            if ((uint8_t)(param_2->u).colony.c.rebels.lost < bVar3) {
-                                char* pcVar8 = _msg_colony_d_rebels_won_fmt;
-                                if (bVar3 == 1) {
-                                    pcVar8 = _msg_colony_1_rebel_won_fmt;
+                        const auto& rebels_msg = colony_msg.c.rebels;
+                        uint32_t owner_player_idx = (uint32_t)(uint8_t)rebels_msg.owner_player;
+                        uint8_t rebel_count = rebels_msg.rebels;
+                        if ((int)MOX::_PLAYER_NUM != (int)owner_player_idx) {
+                            if ((uint8_t)rebels_msg.lost < rebel_count) {
+                                const char* rebellion_fmt = _msg_colony_d_rebels_won_fmt;
+                                if (rebel_count == 1) {
+                                    rebellion_fmt = _msg_colony_1_rebel_won_fmt;
                                 }
-                                sprintf(param_1, pcVar8, (uint32_t)bVar3, MOX::_player[uVar11].race_name, pcVar6,
-                                             (uint32_t)(uint8_t)(param_2->u).colony.c.rebels.lost);
+                                sprintf(out_text, rebellion_fmt, (uint32_t)rebel_count, MOX::_player[owner_player_idx].race_name, planet_name,
+                                             (uint32_t)(uint8_t)rebels_msg.lost);
                                 return;
                             }
-                            char* pcVar8 = _msg_colony_d_rebels_lost_fmt;
-                            if (bVar3 == 1) {
-                                pcVar8 = _msg_colony_1_rebel_lost_fmt;
+                            const char* rebellion_fmt = _msg_colony_d_rebels_lost_fmt;
+                            if (rebel_count == 1) {
+                                rebellion_fmt = _msg_colony_1_rebel_lost_fmt;
                             }
-                            sprintf(param_1, pcVar8, (uint32_t)bVar3, MOX::_player[uVar11].race_name, pcVar6);
+                            sprintf(out_text, rebellion_fmt, (uint32_t)rebel_count, MOX::_player[owner_player_idx].race_name, planet_name);
                             return;
                         }
-                        uint8_t bVar2 = (param_2->u).colony.c.rebels.lost;
-                        if (bVar2 < bVar3) {
-                            sprintf(param_1, _msg_colony_your_rebellion_won_fmt, (uint32_t)bVar3, pcVar6, (uint32_t)bVar2);
+                        uint8_t lost_rebels = rebels_msg.lost;
+                        if (lost_rebels < rebel_count) {
+                            sprintf(out_text, _msg_colony_your_rebellion_won_fmt, (uint32_t)rebel_count, planet_name, (uint32_t)lost_rebels);
                             return;
                         }
-                        sprintf(param_1, _msg_colony_your_rebellion_lost_fmt, (uint32_t)bVar3, pcVar6);
+                        sprintf(out_text, _msg_colony_your_rebellion_lost_fmt, (uint32_t)rebel_count, planet_name);
                         return;
                     }
                     case 10:
-                        sprintf(param_1, _msg_colony_no_room_for_android_fmt, pcVar6);
+                        sprintf(out_text, _msg_colony_no_room_for_android_fmt, planet_name);
                         return;
                     case 11: {
-                        uint8_t bVar3 = (param_2->u).colony.c.android_killed.race_idx;
-                        char* pcVar8 = _native_msg;
-                        if (bVar3 < MAX_PLAYERS) {
-                            pcVar8 = MOX::_player[bVar3].race_name;
+                        uint8_t race_idx = colony_msg.c.android_killed.race_idx;
+                        const char* victim_race_name = _native_msg;
+                        if (race_idx < MAX_PLAYERS) {
+                            victim_race_name = MOX::_player[race_idx].race_name;
                         }
-                        sprintf(param_1, _msg_colony_android_killed_organic_fmt, pcVar6, pcVar8);
+                        sprintf(out_text, _msg_colony_android_killed_organic_fmt, planet_name, victim_race_name);
                         return;
                     }
                 }
                 break;
             }
             case MSG_TYPE_DECLARE_ALLIANCE:
-                sprintf(param_1, _s_and_s_declare_alliance_fmt,
-                             MOX::_player[(param_2->u).players.player_a_idx].race_name,
-                             MOX::_player[(param_2->u).players.player_b_idx].race_name);
+                sprintf(out_text, _s_and_s_declare_alliance_fmt,
+                             MOX::_player[msg->u.players.player_a_idx].race_name,
+                             MOX::_player[msg->u.players.player_b_idx].race_name);
                 return;
             case MSG_TYPE_DECLARE_WAR:
-                sprintf(param_1, _s_and_s_declare_war_fmt,
-                             MOX::_player[(param_2->u).players.player_a_idx].race_name,
-                             MOX::_player[(param_2->u).players.player_b_idx].race_name);
+                sprintf(out_text, _s_and_s_declare_war_fmt,
+                             MOX::_player[msg->u.players.player_a_idx].race_name,
+                             MOX::_player[msg->u.players.player_b_idx].race_name);
                 return;
             case MSG_TYPE_FINANCIAL:
-                sprintf(param_1, _msg_financial_fmt, (int)(param_2->u).financial.a,
-                             (int)(param_2->u).financial.b);
+                sprintf(out_text, _msg_financial_fmt, (int)msg->u.financial.a,
+                             (int)msg->u.financial.b);
                 return;
             case MSG_TYPE_LOST_SHIP: {
-                s_ship_data* psVar13 = &MOX::_ship[(param_2->u).lost_ship.ship_idx];
-                int iVar9 = sprintf(param_1, _msg_lost_ship_fmt, TECHDATA::_hull_data[psVar13->d.size].name, psVar13,
-                                         (int)psVar13->d.cost, &MOX::_star[(param_2->u).lost_ship.star_idx]);
-                uint8_t cVar1 = (param_2->u).lost_ship.leader_idx;
-                if (cVar1 != 0xFF) {
-                    sprintf(param_1 + iVar9, _leader_fate_strings[(param_2->u).lost_ship.fate],
-                                 &MOX::_leaders[cVar1]);
+                const auto& lost_ship_msg = msg->u.lost_ship;
+                s_ship_data* ship = &MOX::_ship[lost_ship_msg.ship_idx];
+                int base_len = sprintf(out_text, _msg_lost_ship_fmt, TECHDATA::_hull_data[ship->d.size].name, ship,
+                                         (int)ship->d.cost, &MOX::_star[lost_ship_msg.star_idx]);
+                uint8_t leader_idx = lost_ship_msg.leader_idx;
+                if (leader_idx != 0xFF) {
+                    sprintf(out_text + base_len, _leader_fate_strings[lost_ship_msg.fate],
+                                 &MOX::_leaders[leader_idx]);
                     return;
                 }
                 break;
             }
             case MSG_TYPE_SCRAP_SHIP: {
-                int16_t sVar4 = (param_2->u).scrap_ship.where;
-                if (sVar4 < MOX::_NUM_STARS) {
-                    s_ship_data* psVar13 = &MOX::_ship[(param_2->u).scrap_ship.ship_idx];
-                    sprintf(param_1, _msg_scrap_ship_bc_fmt, TECHDATA::_hull_data[psVar13->d.size].name, psVar13,
-                                 (int)psVar13->d.cost, &MOX::_star[sVar4], (int)(param_2->u).scrap_ship.bc);
+                const auto& scrap_ship_msg = msg->u.scrap_ship;
+                int16_t location_idx = scrap_ship_msg.where;
+                s_ship_data* ship = &MOX::_ship[scrap_ship_msg.ship_idx];
+                if (location_idx < MOX::_NUM_STARS) {
+                    sprintf(out_text, _msg_scrap_ship_bc_fmt, TECHDATA::_hull_data[ship->d.size].name, ship,
+                                 (int)ship->d.cost, &MOX::_star[location_idx], (int)scrap_ship_msg.bc);
                     return;
                 }
-                s_ship_data* psVar13 = &MOX::_ship[(param_2->u).scrap_ship.ship_idx];
-                sprintf(param_1, _msg_scrap_ship_hyperspace_fmt, TECHDATA::_hull_data[psVar13->d.size].name,
-                             psVar13, (int)psVar13->d.cost);
+                sprintf(out_text, _msg_scrap_ship_hyperspace_fmt, TECHDATA::_hull_data[ship->d.size].name,
+                             ship, (int)ship->d.cost);
                 return;
             }
             case MSG_TYPE_LOST_COLONY: {
-                char* pcVar6 = _lost_colony_reason_strings[(param_2->u).lost_colony.reason];
-                char* pcVar8 = HACCESS::Get_Planet_Name_((param_2->u).lost_colony.planet_idx);
-                int iVar9 = sprintf(param_1, _msg_lost_colony_fmt,
-                                         _msg_colony_or_outpost[(uint8_t)(param_2->u).lost_colony.colony_or_outpost],
-                                         pcVar8, pcVar6);
-                int16_t sVar4 = (param_2->u).lost_colony.leader_idx;
-                if (sVar4 != -1) {
-                    sprintf(param_1 + iVar9, _msg_lost_colony_leader_fmt, &MOX::_leaders[sVar4]);
+                const auto& lost_colony_msg = msg->u.lost_colony;
+                const char* reason_text = _lost_colony_reason_strings[lost_colony_msg.reason];
+                const char* planet_name = HACCESS::Get_Planet_Name_(lost_colony_msg.planet_idx);
+                int base_len = sprintf(out_text, _msg_lost_colony_fmt,
+                                         _msg_colony_or_outpost[(uint8_t)lost_colony_msg.colony_or_outpost],
+                                         planet_name, reason_text);
+                int16_t leader_idx = lost_colony_msg.leader_idx;
+                if (leader_idx != -1) {
+                    sprintf(out_text + base_len, _msg_lost_colony_leader_fmt, &MOX::_leaders[leader_idx]);
                     return;
                 }
                 break;
             }
             case MSG_TYPE_HYPERSPACE_FLUX:
-                strcpy(param_1, _msg_hyperspace_flux_fmt);
+                strcpy(out_text, _msg_hyperspace_flux_fmt);
                 return;
             case MSG_TYPE_HYPERSPACE_BEAST: {
-                int16_t sVar4 = (param_2->u).hyperspace_beast.ship_idx;
-                if (sVar4 == -1) {
-                    strcpy(param_1, _msg_hyperspace_beast_hungry_fmt);
+                const auto& beast_msg = msg->u.hyperspace_beast;
+                int16_t ship_idx = beast_msg.ship_idx;
+                if (ship_idx == -1) {
+                    strcpy(out_text, _msg_hyperspace_beast_hungry_fmt);
                     return;
                 }
-                if ((param_2->u).hyperspace_beast.fate == 0) {
-                    sprintf(param_1, _msg_hyperspace_beast_ate_other_ship_fmt,
-                                 MOX::_player[MOX::_ship[sVar4].owner].race_name);
+                if (beast_msg.fate == 0) {
+                    sprintf(out_text, _msg_hyperspace_beast_ate_other_ship_fmt,
+                                 MOX::_player[MOX::_ship[ship_idx].owner].race_name);
                     return;
                 }
-                int iVar9 = sprintf(param_1, _msg_hyperspace_beast_ate_your_ship_fmt, &MOX::_ship[sVar4],
-                                         &MOX::_star[(param_2->u).hyperspace_beast.star_idx]);
-                uint8_t cVar1 = (param_2->u).hyperspace_beast.officer_idx;
-                if (cVar1 != 0xFF) {
-                    sprintf(param_1 + iVar9, _leader_fate_strings[(uint8_t)(param_2->u).hyperspace_beast.leader_status],
-                                 &MOX::_leaders[cVar1]);
+                int base_len = sprintf(out_text, _msg_hyperspace_beast_ate_your_ship_fmt, &MOX::_ship[ship_idx],
+                                         &MOX::_star[beast_msg.star_idx]);
+                uint8_t officer_idx = beast_msg.officer_idx;
+                if (officer_idx != 0xFF) {
+                    sprintf(out_text + base_len, _leader_fate_strings[(uint8_t)beast_msg.leader_status],
+                                 &MOX::_leaders[officer_idx]);
                     return;
                 }
                 break;
             }
             case MSG_TYPE_LOST_ATTACKING_SPY:
-                sprintf(param_1, _msg_lost_attacking_spy_fmt,
-                             MOX::_player[(param_2->u).lost_attacking_spy.player_idx].race_name);
+                sprintf(out_text, _msg_lost_attacking_spy_fmt,
+                             MOX::_player[msg->u.lost_attacking_spy.player_idx].race_name);
                 return;
             case MSG_TYPE_LOST_DEFENDING_SPY: {
-                int16_t sVar4 = (param_2->u).lost_defending_spy.count;
-                if (sVar4 != 1) {
-                    sprintf(param_1, _msg_lost_defending_spies_fmt, (int)sVar4);
+                int16_t spy_count = msg->u.lost_defending_spy.count;
+                if (spy_count != 1) {
+                    sprintf(out_text, _msg_lost_defending_spies_fmt, (int)spy_count);
                     return;
                 }
-                strcpy(param_1, _msg_lost_defending_spy_fmt);
+                strcpy(out_text, _msg_lost_defending_spy_fmt);
                 return;
             }
             case MSG_TYPE_ARTEMIS:
-                sprintf(param_1, _msg_artemis_fmt, &MOX::_star[(uint8_t)(param_2->u).artemis.star_idx]);
+                sprintf(out_text, _msg_artemis_fmt, &MOX::_star[(uint8_t)msg->u.artemis.star_idx]);
                 return;
             case MSG_TYPE_ARTEMIS_LEADER: {
-                int iVar9 = sprintf(param_1, _msg_artemis_leader_fmt,
-                                         &MOX::_star[(param_2->u).artemis_leader.star_idx]);
-                sprintf(param_1 + iVar9, _leader_fate_strings[(param_2->u).artemis_leader.fate],
-                             &MOX::_leaders[(param_2->u).artemis_leader.leader_idx]);
+                const auto& artemis_leader_msg = msg->u.artemis_leader;
+                int base_len = sprintf(out_text, _msg_artemis_leader_fmt,
+                                         &MOX::_star[artemis_leader_msg.star_idx]);
+                sprintf(out_text + base_len, _leader_fate_strings[artemis_leader_msg.fate],
+                             &MOX::_leaders[artemis_leader_msg.leader_idx]);
                 return;
             }
             case MSG_TYPE_FAILED_RETREAT: {
-                uint16_t uVar5 = (param_2->u).retreat.ships_lost;
-                char* pcVar6 = _msg_d_ships_killed_retreating_fmt;
-                if (uVar5 == 1) {
-                    pcVar6 = _msg_1_ship_killed_retreating_fmt;
+                const auto& retreat_msg = msg->u.retreat;
+                uint16_t ships_lost = retreat_msg.ships_lost;
+                const char* retreat_fmt = _msg_d_ships_killed_retreating_fmt;
+                if (ships_lost == 1) {
+                    retreat_fmt = _msg_1_ship_killed_retreating_fmt;
                 }
-                int iVar9 = sprintf(param_1, pcVar6, (uint32_t)uVar5, &MOX::_star[(uint8_t)(param_2->u).retreat.star_idx]);
-                int iVar10 = sprintf(param_1 + iVar9, "  %s",
-                                          _failed_retreat_reason_strings[(uint8_t)(param_2->u).retreat.reason]);
-                uint8_t bVar3 = (param_2->u).retreat.leader_count;
-                if (bVar3 != 0) {
-                    sprintf(param_1 + iVar9 + iVar10, _msg_failed_retreat_leader_fmt, (uint32_t)bVar3);
+                int base_len = sprintf(out_text, retreat_fmt, (uint32_t)ships_lost, &MOX::_star[(uint8_t)retreat_msg.star_idx]);
+                int reason_len = sprintf(out_text + base_len, "  %s",
+                                          _failed_retreat_reason_strings[(uint8_t)retreat_msg.reason]);
+                uint8_t leader_count = retreat_msg.leader_count;
+                if (leader_count != 0) {
+                    sprintf(out_text + base_len + reason_len, _msg_failed_retreat_leader_fmt, (uint32_t)leader_count);
                     return;
                 }
                 break;
             }
             case MSG_TYPE_SPY_ASSASSINATION: {
-                uint8_t bVar3 = (param_2->u).spy_assasination.plr_b;
-                uint8_t plr_a = (param_2->u).spy_assasination.plr_a;
-                if (plr_a == bVar3) {
-                    strlcpy(local_c8, _msg_defensive_spy_fmt, sizeof(local_c8));
+                const auto& assassination_msg = msg->u.spy_assasination;
+                uint8_t defending_player_idx = assassination_msg.plr_b;
+                uint8_t attacking_player_idx = assassination_msg.plr_a;
+                if (attacking_player_idx == defending_player_idx) {
+                    strlcpy(details_text, _msg_defensive_spy_fmt, sizeof(details_text));
                 } else {
-                    snprintf(local_c8, sizeof(local_c8), _msg_offensive_spy_fmt, MOX::_player[bVar3].name);
+                    snprintf(details_text, sizeof(details_text), _msg_offensive_spy_fmt, MOX::_player[defending_player_idx].name);
                 }
-                if ((param_2->u).spy_assasination.victim_id != MOX::_PLAYER_NUM) {
-                    sprintf(param_1, _msg_spy_assassinated_fmt, local_c8);
+                if (assassination_msg.victim_id != MOX::_PLAYER_NUM) {
+                    sprintf(out_text, _msg_spy_assassinated_fmt, details_text);
                     return;
                 }
                 if (MOX::_settings.language == 4) {
-                    sprintf(param_1, _msg_spy_assassinated_victim_fmt,
-                                 &MOX::_leaders[(uint8_t)(param_2->u).spy_assasination.leader_id], local_c8,
-                                 MOX::_player[plr_a].name);
+                    sprintf(out_text, _msg_spy_assassinated_victim_fmt,
+                                 &MOX::_leaders[(uint8_t)assassination_msg.leader_id], details_text,
+                                 MOX::_player[attacking_player_idx].name);
                     return;
                 }
-                sprintf(param_1, _msg_spy_assassinated_victim_fmt,
-                             &MOX::_leaders[(uint8_t)(param_2->u).spy_assasination.leader_id],
-                             MOX::_player[plr_a].name, local_c8);
+                sprintf(out_text, _msg_spy_assassinated_victim_fmt,
+                             &MOX::_leaders[(uint8_t)assassination_msg.leader_id],
+                             MOX::_player[attacking_player_idx].name, details_text);
                 return;
             }
             case MSG_TYPE_ANOMALY:
-                sprintf(param_1, _msg_anomaly_fmt, &MOX::_star[(param_2->u).anomaly.star_idx]);
+                sprintf(out_text, _msg_anomaly_fmt, &MOX::_star[msg->u.anomaly.star_idx]);
                 return;
             case MSG_TYPE_DIPLOMACY:
-                sprintf(param_1, _msg_diplomacy_strings[(uint8_t)(param_2->u).diplomacy.diplomacy_idx],
-                             MOX::_player[(uint8_t)(param_2->u).diplomacy.plr_a].race_name,
-                             MOX::_player[(uint8_t)(param_2->u).diplomacy.plr_b].race_name);
+                sprintf(out_text, _msg_diplomacy_strings[(uint8_t)msg->u.diplomacy.diplomacy_idx],
+                             MOX::_player[(uint8_t)msg->u.diplomacy.plr_a].race_name,
+                             MOX::_player[(uint8_t)msg->u.diplomacy.plr_b].race_name);
                 return;
             case MSG_TYPE_EEL_SPAWNED:
-                sprintf(param_1, _msg_eel_spawned_fmt, &MOX::_star[(param_2->u).eel.star_idx]);
+                sprintf(out_text, _msg_eel_spawned_fmt, &MOX::_star[msg->u.eel.star_idx]);
                 return;
             case MSG_TYPE_EEL_VANISHED:
-                sprintf(param_1, _msg_eel_vanished_fmt, &MOX::_star[(param_2->u).eel.star_idx]);
+                sprintf(out_text, _msg_eel_vanished_fmt, &MOX::_star[msg->u.eel.star_idx]);
                 return;
-            case MSG_TYPE_ARTIFACTS:
-                if ((param_2->u).artifacts.tech2 == '\0') {
-                    snprintf(local_c8, sizeof(local_c8), MOX::s_fmt_s,
-                                 TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name);
+            case MSG_TYPE_ARTIFACTS: {
+                const auto& artifacts_msg = msg->u.artifacts;
+                if (artifacts_msg.tech2 == '\0') {
+                    snprintf(details_text, sizeof(details_text), MOX::s_fmt_s,
+                                 TECHDATA::_technology_applications[(uint8_t)artifacts_msg.tech1].name);
                 } else {
-                    KEN::Ken_Get_Text_Message_(0x68, local_dc, 0x13);
-                    snprintf(local_c8, sizeof(local_c8), "%s %s %s",
-                                 TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name, local_dc,
-                                 TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech2].name);
+                    KEN::Ken_Get_Text_Message_(0x68, and_text, 0x13);
+                    snprintf(details_text, sizeof(details_text), "%s %s %s",
+                                 TECHDATA::_technology_applications[(uint8_t)artifacts_msg.tech1].name, and_text,
+                                 TECHDATA::_technology_applications[(uint8_t)artifacts_msg.tech2].name);
                 }
-                sprintf(param_1, _msg_artifacts_fmt, local_c8, &MOX::_star[(param_2->u).artifacts.star_idx]);
+                sprintf(out_text, _msg_artifacts_fmt, details_text, &MOX::_star[artifacts_msg.star_idx]);
                 return;
+            }
             case MSG_TYPE_APRIL1:
-                strcpy(param_1, _msg_april1_fmt);
+                strcpy(out_text, _msg_april1_fmt);
                 return;
             case MSG_TYPE_SCRAP_LEADER:
-                sprintf(param_1, _msg_scrap_leader_fmt,
-                             &MOX::_leaders[(uint8_t)(param_2->u).scrap_leader.leader_idx]);
+                sprintf(out_text, _msg_scrap_leader_fmt,
+                             &MOX::_leaders[(uint8_t)msg->u.scrap_leader.leader_idx]);
                 return;
             default:
                 break;

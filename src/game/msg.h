@@ -92,7 +92,7 @@ namespace MSG_ {
     extern char* _msg_colony_1_settler_arrived_fmt;
     extern char* _msg_colony_d_settlers_arrived_over_limit_fmt;
 
-    void __cdecl sprintf_msg_(char* param_1, s_MSG* param_2);
+    void __cdecl sprintf_msg_(char* out_text, s_MSG* msg);
 
     void __cdecl Add_Msg_All_(s_MSG msg);
 

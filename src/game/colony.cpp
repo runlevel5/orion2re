@@ -341,10 +341,10 @@ namespace COLONY {
         return;
     }
 
-    s_animation_header* __cdecl Prod_Anims_(int16_t param_1, int16_t param_2, int8_t param_3) {
-        int32_t index = (int32_t)param_1 + (int32_t)param_2 * 4;
+    s_animation_header* __cdecl Prod_Anims_(int16_t production_type, int16_t variant, int8_t frame) {
+        int32_t index = (int32_t)production_type + (int32_t)variant * 4;
 
-        if (param_3 != 0) {
+        if (frame != 0) {
             index += 27;
         }
 
@@ -405,13 +405,13 @@ namespace COLONY {
     /**
      * @address 004dc300
      * @brief Marks a specific colony building as rubble.
-     * @param param_1 The identifier of the building to destroy.
+     * @param building_id The identifier of the building to destroy.
      */
-    void __cdecl Turn_To_Rubble_CR_Bldg_(int16_t param_1) {
+    void __cdecl Turn_To_Rubble_CR_Bldg_(int16_t building_id) {
         int16_t row;
         int16_t col;
 
-        if (Get_Bldg_CR_(param_1, &row, &col)) {
+        if (Get_Bldg_CR_(building_id, &row, &col)) {
             _full_draw = 1;
             // Value 8 represents the 'Rubble' state for a building
             _colony_bldgs[row].buildings[col] = 8;
@@ -659,7 +659,9 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t param_2) {
+    void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t pulse_style) {
+        (void)pulse_style;
+
         int16_t x;
         int16_t y;
 
@@ -792,9 +794,9 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Print_Building_Name_(int16_t param_1, int16_t param_2) {
-        if (param_1 != -1 && param_2 != -1) {
-            int32_t building_id = _colony_bldgs[param_1].buildings[param_2];
+    void __cdecl Print_Building_Name_(int16_t row, int16_t col) {
+        if (row != -1 && col != -1) {
+            int32_t building_id = _colony_bldgs[row].buildings[col];
 
             char* name = CR_Building_Name_(static_cast<int16_t>(building_id));
             Print_Scanned_String_(name);
@@ -1205,7 +1207,7 @@ namespace COLONY {
         TEXTBOX::Text_Box_(COLCALC::_morale_summary_msg, buffer);
     }
 
-    void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t x, int16_t y, int16_t ship_picture_num) {
         uint8_t ship_palette_map[31] = {
             0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
             0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60,
@@ -1213,11 +1215,11 @@ namespace COLONY {
             0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f
         };
 
-        if (COLONY::_ship_bitm_n != param_3) {
-            COLONY::_ship_bitm_n = param_3;
+        if (COLONY::_ship_bitm_n != ship_picture_num) {
+            COLONY::_ship_bitm_n = ship_picture_num;
             COLONY::_g_ship_player_n = (int32_t)MOX::_PLAYER_NUM;
 
-            s_animation_header* ship_seg = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, param_3);
+            s_animation_header* ship_seg = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, ship_picture_num);
             bitmap::Draw_Picture_To_Bitmap_(COLONY::_ship_bitm, ship_seg);
 
             replace::Replace_Color_Range_(COLONY::_ship_bitm, ship_palette_map, 1, 31 /* 0x1f */);
@@ -1229,7 +1231,7 @@ namespace COLONY {
             }
         }
 
-        ERIC::Draw_Centered_(param_1, param_2, COLONY::_ship_bitm);
+        ERIC::Draw_Centered_(x, y, COLONY::_ship_bitm);
     }
 
     int16_t __cdecl Pop_To_Pop_State_(int16_t colony_idx, int16_t pop_idx) {
@@ -1289,9 +1291,9 @@ namespace COLONY {
         fonts::Print_Centered_(61, 135, text);
     }
 
-    s_animation_header* __cdecl Military_Anims_(int16_t param_1, int16_t param_2) {
+    s_animation_header* __cdecl Military_Anims_(int16_t animation_variant, int16_t frame) {
         // Calculation is done in 16-bit registers in disassembly
-        int16_t entry_index = (int16_t)(param_2 * 13 + param_1 + 6);
+        int16_t entry_index = (int16_t)(frame * 13 + animation_variant + 6);
 
         return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             COLONY::_RACEICON_LBX,
@@ -1300,27 +1302,27 @@ namespace COLONY {
         ));
     }
 
-    s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t param_2) {
+    s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t frame) {
         if (animation_type == -1) {
-            return COLONY::Military_Anims_(0, param_2);
+            return COLONY::Military_Anims_(0, frame);
         }
 
         if (animation_type == 0) {
             if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
-                return COLONY::Military_Anims_(2, param_2);
+                return COLONY::Military_Anims_(2, frame);
             }
-            return COLONY::Military_Anims_(1, param_2);
+            return COLONY::Military_Anims_(1, frame);
         }
 
         if (animation_type == 1) {
             if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
-                return COLONY::Military_Anims_(4, param_2);
+                return COLONY::Military_Anims_(4, frame);
             }
-            return COLONY::Military_Anims_(3, param_2);
+            return COLONY::Military_Anims_(3, frame);
         }
 
         // Fallthrough for other animation types
-        return COLONY::Military_Anims_(animation_type, param_2);
+        return COLONY::Military_Anims_(animation_type, frame);
     }
 
 
@@ -1343,8 +1345,8 @@ namespace COLONY {
         );
     }
 
-    int8_t __cdecl Evaluate_Input_(int16_t* param_1, int16_t* param_2) {
-        uint32_t system_fields = Check_System_Display_Fields_(param_1, param_2);
+    int8_t __cdecl Evaluate_Input_(int16_t* input_field, int16_t* scan_field) {
+        uint32_t system_fields = Check_System_Display_Fields_(input_field, scan_field);
 
         // Mask: 0xFFFF00FF clears bits 8-15 (AH register)
         uint32_t masked_fields = system_fields & 0xFFFF00FF;
@@ -1352,11 +1354,11 @@ namespace COLONY {
 
         // TEST AX, AX checks bits 0-15 of EAX. Since bits 8-15 are 0, this checks AL.
         if (COLONY::_drawing_display != 2 && (uint16_t)masked_fields != 0) {
-            result = Evaluate_Screen_Input_(param_1);
-            Check_Job_Fields_(param_1, param_2);
-            Check_Military_Fields_(param_1, param_2);
-            Check_Satellite_Fields_(param_1, param_2);
-            Check_Bldg_Fields_(param_1, param_2);
+            result = Evaluate_Screen_Input_(input_field);
+            Check_Job_Fields_(input_field, scan_field);
+            Check_Military_Fields_(input_field, scan_field);
+            Check_Satellite_Fields_(input_field, scan_field);
+            Check_Bldg_Fields_(input_field, scan_field);
         }
 
         return result;
@@ -1430,34 +1432,34 @@ namespace COLONY {
         COLONY::Add_Screen_Fields_();
     }
 
-    int16_t __cdecl Get_Scanned_Pop_(int16_t param_1) {
+    int16_t __cdecl Get_Scanned_Pop_(int16_t field_idx) {
         _g_colony_n = static_cast<int16_t>(_colony_handle);
 
         return COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
             static_cast<int16_t>(_colony_handle),
-            param_1,
+            field_idx,
             4,
             310,
-            param_1 * 30 + 62,
+            field_idx * 30 + 62,
             510,
             1,
-            _pop_fields_ref[param_1],
-            &_pop_fields_count[param_1],
-            &_pop_fields_coord_var[param_1],
-            &_job_fields[param_1]
+            _pop_fields_ref[field_idx],
+            &_pop_fields_count[field_idx],
+            &_pop_fields_coord_var[field_idx],
+            &_job_fields[field_idx]
         );
     }
 
-    int16_t __cdecl Get_Selected_Pop_(int16_t param_1) {
-        int32_t index = (int32_t)param_1;
+    int16_t __cdecl Get_Selected_Pop_(int16_t job_type) {
+        int32_t index = (int32_t)job_type;
 
-        // Note: The assembly calculates (short)(param_1 * 30 + 62) as the 5th argument.
+        // Note: The assembly calculates (short)(job_type * 30 + 62) as the 5th argument.
         return COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
             static_cast<int16_t>(_colony_handle),
-            param_1,
+            job_type,
             3,
             310,
-            static_cast<int16_t>(param_1 * 30 + 62),
+            static_cast<int16_t>(job_type * 30 + 62),
             510,
             1,
             _pop_fields_ref[index],
@@ -1568,13 +1570,13 @@ namespace COLONY {
         fields::Enable_Draw_All_Fields_();
     }
 
-    void __cdecl Check_Satellite_Fields_(int16_t* param_1, int16_t* param_2) {
+    void __cdecl Check_Satellite_Fields_(int16_t* input_field, int16_t* scan_field) {
         char local_buffer[500];
 
         _scanned_satellite = -1;
 
         for (int16_t i = 0; i < 10; ++i) {
-            if (_colony_satellite_fields[i] == *param_1) {
+            if (_colony_satellite_fields[i] == *input_field) {
                 int16_t building_idx = _colony_satellites[i];
 
                 if (MOX::_colony[_colony_handle].last_turn_building_destroyed == MOX::_stardate) {
@@ -1600,14 +1602,14 @@ namespace COLONY {
                         Restore_Control_();
                     }
                 }
-            } else if (_colony_satellite_fields[i] + *param_1 == 0) {
+            } else if (_colony_satellite_fields[i] + *input_field == 0) {
                 int16_t building_idx = _colony_satellites[i];
                 COLBLDG::Get_App_Description_String_(local_buffer, TECHDATA::_buildings[building_idx].tech_app);
                 char* bld_name = Real_Building_Name2_(building_idx);
                 TEXTBOX::Text_Box_(bld_name, local_buffer);
             }
 
-            if (_colony_satellite_fields[i] == *param_2) {
+            if (_colony_satellite_fields[i] == *scan_field) {
                 _scanned_satellite = _colony_satellites[i];
             }
         }
@@ -1776,18 +1778,18 @@ namespace COLONY {
         }
     }
 
-    uint32_t __cdecl Check_System_Display_Fields_(int16_t* param_1, int16_t* param_2) {
+    uint32_t __cdecl Check_System_Display_Fields_(int16_t* input_field, int16_t* scan_field) {
         int16_t scanned_star_out;
         int16_t scanned_val_out;
         char description[2000];
 
         if (COLONY::_drawing_display == 0) {
-            if (*param_1 == COLONY::_sys_disp_fields[0]) {
+            if (*input_field == COLONY::_sys_disp_fields[0]) {
                 COLONY::_drawing_display = 1;
                 COLONY::_full_draw = 1;
             } else {
                 for (int16_t i = 0; i < 5; ++i) {
-                    if (COLONY::_sys_disp_planet_fields[i] == *param_1) {
+                    if (COLONY::_sys_disp_planet_fields[i] == *input_field) {
                         if (COLONY::_field_mode == 1) {
                             int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                             COLMOVE::Send_Cluster_(MOX::_planet[planet_idx].colony_index, -1);
@@ -1817,23 +1819,23 @@ namespace COLONY {
                             }
                             return 1;
                         }
-                    } else if (COLONY::_sys_disp_summ_fields[i] == *param_1) {
+                    } else if (COLONY::_sys_disp_summ_fields[i] == *input_field) {
                         int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                         if (MOX::_planet[planet_idx].planet_type == 3 /* Gas Giant */) {
                             COLONY::_planet_display_handle = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                             COLONY::_drawing_display = 2;
                             return 1;
                         }
-                    } else if (*param_2 == COLONY::_sys_disp_planet_fields[i]) {
+                    } else if (*scan_field == COLONY::_sys_disp_planet_fields[i]) {
                         COLONY::_g_scanned_planet = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                     }
                 }
             }
         } else if (COLONY::_drawing_display == 1) {
-            int16_t scan_res = (int16_t)MAINSCR::Scan_Galaxy_Map_Fields_(*param_2, *param_1, &scanned_star_out, &scanned_val_out);
+            int16_t scan_res = (int16_t)MAINSCR::Scan_Galaxy_Map_Fields_(*scan_field, *input_field, &scanned_star_out, &scanned_val_out);
             COLONY::_sys_disp_scanned_star_handle = -1;
 
-            if (*param_1 == COLONY::_galaxy_map_name_field) {
+            if (*input_field == COLONY::_galaxy_map_name_field) {
                 COLONY::_drawing_display = 0;
                 COLONY::_full_draw = 1;
                 COLONY::_g_scanned_planet = -1;
@@ -1924,7 +1926,7 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Check_Bldg_Fields_(int16_t* param_1, int16_t* param_2) {
+    void __cdecl Check_Bldg_Fields_(int16_t* input_field, int16_t* scan_field) {
         _scanned_bldg_C = -1;
         _scanned_bldg_R = -1;
 
@@ -1940,9 +1942,9 @@ namespace COLONY {
 
                 // Case: Potential Demolish
                 bool demolish_match = false;
-                if (field_val == *param_1) {
+                if (field_val == *input_field) {
                     demolish_match = true;
-                } else if (_colony_fields[0] == *param_1) {
+                } else if (_colony_fields[0] == *input_field) {
                     if (XY_In_Bldg_Poly_(mouse_x, mouse_y, (int16_t)row, (int16_t)col) && bldg_id != 0) {
                         demolish_match = true;
                     }
@@ -1982,9 +1984,9 @@ namespace COLONY {
 
                 // Case: Potential Info Description
                 bool info_match = false;
-                if (field_val + *param_1 == 0) {
+                if (field_val + *input_field == 0) {
                     info_match = true;
-                } else if (_colony_fields[0] + *param_1 == 0) {
+                } else if (_colony_fields[0] + *input_field == 0) {
                     if (XY_In_Bldg_Poly_(mouse_x, mouse_y, (int16_t)row, (int16_t)col) && bldg_id != 0) {
                         info_match = true;
                     }
@@ -2007,7 +2009,7 @@ namespace COLONY {
 
                 // Case: Potential Selection Scan
                 bool scan_match = false;
-                if (field_val == *param_2) {
+                if (field_val == *scan_field) {
                     scan_match = true;
                 } else if (XY_In_Bldg_Poly_(mouse_x, mouse_y, (int16_t)row, (int16_t)col) && bldg_id != 0) {
                     scan_match = true;
@@ -2022,23 +2024,23 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Check_Military_Fields_(int16_t* param_1, int16_t* param_2) {
+    void __cdecl Check_Military_Fields_(int16_t* input_field, int16_t* scan_field) {
         COLONY::_scanned_military = -1;
 
-        if (COLONY::_field_mode == 2 && *param_1 != 0) {
+        if (COLONY::_field_mode == 2 && *input_field != 0) {
             COLONY::Drop_Military_();
-            *param_1 = 0;
+            *input_field = 0;
         }
 
         for (int16_t i = 0; i < 2; ++i) {
-            // Note: *param_1 is re-evaluated in each iteration as per assembly MOV CX, [ESI]
-            if (COLONY::_military_fields[i] == *param_1) {
+            // Note: *input_field is re-evaluated in each iteration as per assembly MOV CX, [ESI]
+            if (COLONY::_military_fields[i] == *input_field) {
                 NEWPUP::Troop_Popup_();
                 COLONY::Show_Colony_Screen_();
-                *param_1 = 0;
+                *input_field = 0;
             }
 
-            if (COLONY::_military_fields[i] == *param_2) {
+            if (COLONY::_military_fields[i] == *scan_field) {
                 COLONY::_scanned_military = i;
             }
         }
@@ -2104,7 +2106,9 @@ namespace COLONY {
         _step_squish = 0;
     }
 
-    int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t param_5, int16_t param_6) {
+    int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t moved_flag, int16_t conquered_flag) {
+        (void)moved_flag;
+
         _colonists_count = 0;
         s_colony* colony = &MOX::_colony[colony_idx];
 
@@ -2127,7 +2131,7 @@ namespace COLONY {
                     int16_t pop_state = Pop_To_Pop_State_(colony_idx, i);
                     if (pop_state == state || state == -1) {
                         if ((int)((pop_data & 0x180) >> 7) == (int)job || job == -1) {
-                            if ((int)((pop_data & 0x400) >> 10) == (int)param_6 || param_6 == -1) {
+                            if ((int)((pop_data & 0x400) >> 10) == (int)conquered_flag || conquered_flag == -1) {
                                 // Bit 9: 0x200
                                 if (pop_data & 0x200) {
                                     _colonists_count++;

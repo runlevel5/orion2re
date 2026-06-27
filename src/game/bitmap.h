@@ -96,6 +96,6 @@ namespace bitmap {
     // Masks and brightens `dst_anim` with `src_anim` at (`x`, `y`), starting from `color`.
     void __cdecl Mask_Brighten_Bitmap_(int32_t x, int32_t y, s_animation_header* dst_anim, s_animation_header* src_anim, uint8_t color);
 
-    // Applies the jumble effect from `src` into `dest` using the two effect parameters.
-    void __cdecl Jumble_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t param_3, int16_t param_4);
+    // Applies the jumble effect from `src` into `dest` using the configured noise threshold and jumble mask.
+    void __cdecl Jumble_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t noise_threshold, int16_t jumble_mask);
 }

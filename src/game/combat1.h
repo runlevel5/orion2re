@@ -63,8 +63,8 @@ namespace COMBAT1 {
     void __cdecl Seeking_Missiles_(int16_t player_idx);
 
     // Runs one tactical-combat turn pass.
-    // player_idx: side being processed; param_2: nonzero limits work to the special-gated pass.
-    void __cdecl Do_Combat_Turn_(int16_t param_1, int16_t param_2);
+    // active_player_id: side being processed; time_warp_only: nonzero limits work to the special-gated pass.
+    void __cdecl Do_Combat_Turn_(int16_t active_player_id, int16_t time_warp_only);
     // Applies end-of-round phasing-cloak timer countdown and reversion for all combat ships.
     void __cdecl Update_Phasing_Cloak_Timers_();
     int16_t __cdecl Check_For_Winner_();

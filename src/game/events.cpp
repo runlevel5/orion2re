@@ -2288,7 +2288,7 @@ namespace EVENTS {
             if (MOX::_settings.show_gnn_report == 1) {
                 Drive_Event_Screen_();
             } else {
-                JIM::Get_Text_Message_(JIM::jimtext_lbx, 29, text_buffer, sizeof(text_buffer));
+                JIM::Get_Text_Message_("jimtext.lbx", 29, text_buffer, sizeof(text_buffer));
                 MAINSCR::Mini_Main_Screen_Text_Box_(text_buffer, _event_message);
                 fields::Clear_Fields_();
             }

@@ -695,15 +695,15 @@ namespace SYS {
                     return;
                 }
                 Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 0);
-                const char* pcVar5;
+                const char* title_text;
                 if (HAROLD::Contact_With_One_Colony_(star_idx) == '\0') {
-                    pcVar5 = HAROLD::H_Message_(0x16b);
+                    title_text = HAROLD::H_Message_(0x16b);
                 } else {
-                    pcVar5 = HAROLD::H_Message_(0x16a);
-                    snprintf(local_64, sizeof(local_64), pcVar5, &MOX::_star[star_idx]);
-                    pcVar5 = local_64;
+                    title_text = HAROLD::H_Message_(0x16a);
+                    snprintf(local_64, sizeof(local_64), title_text, &MOX::_star[star_idx]);
+                    title_text = local_64;
                 }
-                Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, pcVar5);
+                Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, title_text);
                 Print_Empty_System_Data_(star_idx);
                 return;
             }
@@ -724,8 +724,8 @@ namespace SYS {
             }
 
             Draw_System_Special_Popup_(content_w + base_x + 5, y_offset + content_h + base_y, SYSTEM_SPECIAL_SPACE_MONSTER, star_idx);
-            const char* pcVar5 = HAROLD::H_Message_(0x16a);
-            snprintf(local_64, sizeof(local_64), pcVar5, &MOX::_star[star_idx]);
+            const char* title_fmt = HAROLD::H_Message_(0x16a);
+            snprintf(local_64, sizeof(local_64), title_fmt, &MOX::_star[star_idx]);
             Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, local_64);
             return;
         }
@@ -735,12 +735,12 @@ namespace SYS {
         }
 
         MOX::_system_star_id_for_auto_select = star_idx;
-        int iVar6 = (int)star_idx;
-        if (MOX::_star[iVar6].wormhole_star_id > -1) {
-            short sVar15 = (short)MOX::_star[iVar6].wormhole_star_id;
-            s_colors* psVar7 = MISC::Font_Colors2_(1, 'n', 's');
+        int star_index = (int)star_idx;
+        if (MOX::_star[star_index].wormhole_star_id > -1) {
+            short wormhole_star_id = (short)MOX::_star[star_index].wormhole_star_id;
+            s_colors* wormhole_font_colors = MISC::Font_Colors2_(1, 'n', 's');
             s_colors local_bc;
-            memcpy(&local_bc, psVar7, sizeof(s_colors));
+            memcpy(&local_bc, wormhole_font_colors, sizeof(s_colors));
             fonts::Set_Font_Style_(1, &local_bc);
 
             short local_c2;
@@ -751,25 +751,25 @@ namespace SYS {
             } else {
                 local_c2 = base_x + 0x149 + content_w;
                 sStack_c0 = content_h;
-                short sVar11 = fonts::Get_Font_Height_();
-                sStack_c0 = (sStack_c0 - sVar11) + 0xe4 + base_y;
+                short font_height = fonts::Get_Font_Height_();
+                sStack_c0 = (sStack_c0 - font_height) + 0xe4 + base_y;
             }
 
             char local_b4[100];
             local_b4[0] = '\0';
 
-            if (MOX::_star[iVar6].wormhole_star_id <= -1) {
+            if (MOX::_star[star_index].wormhole_star_id <= -1) {
                 if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
-                    const char* pcVar5 = MOX::_planet_special_string[MOX::_star[iVar6].system_special];
-                    strlcpy(local_b4, pcVar5, sizeof(local_b4));
+                    const char* special_text = MOX::_planet_special_string[MOX::_star[star_index].system_special];
+                    strlcpy(local_b4, special_text, sizeof(local_b4));
                 }
             } else {
-                if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, sVar15)) {
-                    const char* pcVar5 = HAROLD::H_Message_(0x16c);
-                    snprintf(local_b4, sizeof(local_b4), pcVar5, &MOX::_star[sVar15]);
+                if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, wormhole_star_id)) {
+                    const char* wormhole_fmt = HAROLD::H_Message_(0x16c);
+                    snprintf(local_b4, sizeof(local_b4), wormhole_fmt, &MOX::_star[wormhole_star_id]);
                 } else {
-                    const char* pcVar5 = HAROLD::H_Message_(0x16d);
-                    strlcpy(local_b4, pcVar5, sizeof(local_b4));
+                    const char* unknown_wormhole_text = HAROLD::H_Message_(0x16d);
+                    strlcpy(local_b4, unknown_wormhole_text, sizeof(local_b4));
                 }
             }
 

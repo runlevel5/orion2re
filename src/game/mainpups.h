@@ -215,7 +215,7 @@ namespace MAINPUPS {
 
     void __cdecl Player_Attacked_Popup_(int16_t attacker_idx, int16_t defender_idx, int16_t star_idx, int16_t colony_idx);
 
-    int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t var, char* msg, int16_t param_5);
+    int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t initial_value, char* msg, int16_t popup_style);
 
     void __cdecl Clear_New_Officer_Slots_();
 

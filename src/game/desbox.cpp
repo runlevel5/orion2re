@@ -1763,12 +1763,12 @@ namespace DESBOX {
         return 0;
     }
 
-    void __cdecl Draw_Weapons_Mod_Box_(int16_t param_1, int16_t param_2) {
+    void __cdecl Draw_Weapons_Mod_Box_(int16_t x, int16_t y) {
         int16_t mod_types[WEAPON_MOD_COUNT] = {0};
         int16_t mod_y[WEAPON_MOD_COUNT] = {0};
         int16_t mod_x[WEAPON_MOD_COUNT] = {0};
 
-        animate::Draw_(param_1 + 0xe0, param_2 + 0x46, MOX::_weapons_blank_mods_seg);
+        animate::Draw_(x + 0xe0, y + 0x46, MOX::_weapons_blank_mods_seg);
 
         Get_Weapon_Mod_Field_XYs_(mod_types, mod_x, mod_y);
 
@@ -1788,7 +1788,7 @@ namespace DESBOX {
 
                         s_animation_header* anim = MOX::_weapons_special_seg[mod_types[i]];
                         animate::Set_Animation_Frame_(anim, frame);
-                        animate::Draw_(param_1 + mod_x[i], param_2 + mod_y[i], anim);
+                        animate::Draw_(x + mod_x[i], y + mod_y[i], anim);
                     }
                 }
             }

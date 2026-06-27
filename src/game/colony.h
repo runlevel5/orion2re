@@ -145,8 +145,8 @@ namespace COLONY {
 
     s_animation_header* __cdecl Colony_Pop_Icon_(int16_t race_index);
 
-    s_animation_header* __cdecl Military_Anims_(int16_t param_1, int16_t param_2);
-    s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t param_2);
+    s_animation_header* __cdecl Military_Anims_(int16_t animation_variant, int16_t frame);
+    s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t frame);
 
     /**
      * Maps a colony pop record to the colony-screen portrait state.
@@ -192,7 +192,7 @@ namespace COLONY {
 
     char* __cdecl Player_Troop_Name_(int16_t player_idx, int16_t troop_type, int16_t race);
 
-    void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3);
+    void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t x, int16_t y, int16_t ship_picture_num);
 
     void __cdecl Do_Load_Colony_Anims_();
 
@@ -206,7 +206,7 @@ namespace COLONY {
      */
     s_animation_header* __cdecl People_Anim_(int16_t job_type, int16_t pop_state, int16_t race_idx);
 
-    s_animation_header* __cdecl Prod_Anims_(int16_t param_1, int16_t param_2, int8_t param_3);
+    s_animation_header* __cdecl Prod_Anims_(int16_t production_type, int16_t variant, int8_t frame);
 
     s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame);
 
@@ -250,7 +250,7 @@ namespace COLONY {
 
     bool __cdecl Get_Bldg_CR_(int16_t building_id, int16_t* row_out, int16_t* col_out);
 
-    void __cdecl Turn_To_Rubble_CR_Bldg_(int16_t param_1);
+    void __cdecl Turn_To_Rubble_CR_Bldg_(int16_t building_id);
 
     void __cdecl Bldg_Back_To_Front_(int16_t building_type, int16_t* out_val1, int16_t* out_val2);
 
@@ -262,13 +262,13 @@ namespace COLONY {
 
     void __cdecl Draw_Colony_Info_Background_();
 
-    void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t param_2);
+    void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t pulse_style);
 
     void __cdecl Print_Sys_Disp_Scanned_String_(char* text);
 
     void __cdecl Print_Scanned_String_(char* text);
 
-    void __cdecl Print_Building_Name_(int16_t param_1, int16_t param_2);
+    void __cdecl Print_Building_Name_(int16_t row, int16_t col);
 
     void __cdecl Print_Scanned_Military_();
 
@@ -342,9 +342,9 @@ namespace COLONY {
 
     bool __cdecl Colony_Has_Natives_(int16_t colony_idx);
 
-    int8_t __cdecl Evaluate_Input_(int16_t* param_1, int16_t* param_2);
+    int8_t __cdecl Evaluate_Input_(int16_t* input_field, int16_t* scan_field);
 
-    uint32_t __cdecl Check_System_Display_Fields_(int16_t* param_1, int16_t* param_2);
+    uint32_t __cdecl Check_System_Display_Fields_(int16_t* input_field, int16_t* scan_field);
 
     void __cdecl Do_Cheats_();
 
@@ -364,13 +364,13 @@ namespace COLONY {
 
     int16_t __cdecl Get_Scanned_Pop_(int16_t field_idx);
 
-    int16_t __cdecl Get_Selected_Pop_(int16_t param_1);
+    int16_t __cdecl Get_Selected_Pop_(int16_t job_type);
 
-    void __cdecl Check_Military_Fields_(int16_t* param_1, int16_t* param_2);
+    void __cdecl Check_Military_Fields_(int16_t* input_field, int16_t* scan_field);
 
-    void __cdecl Check_Satellite_Fields_(int16_t* param_1, int16_t* param_2);
+    void __cdecl Check_Satellite_Fields_(int16_t* input_field, int16_t* scan_field);
 
-    void __cdecl Check_Bldg_Fields_(int16_t* param_1, int16_t* param_2);
+    void __cdecl Check_Bldg_Fields_(int16_t* input_field, int16_t* scan_field);
 
     void __cdecl Fix_Colony_Queue_(int16_t colony_idx);
 
@@ -386,7 +386,7 @@ namespace COLONY {
 
     void __cdecl Clear_Sys_Disp_Fields_();
 
-    int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t param_5, int16_t param_6);
+    int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t moved_flag, int16_t conquered_flag);
 
     void __cdecl Reset_Field_Mode_();
 

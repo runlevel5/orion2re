@@ -252,49 +252,40 @@ namespace GEO {
         return black_hole_count;
     }
 
-#include <stdlib.h>
-#include <time.h>
-
     void __cdecl Get_Orbit_Display_X_Y_(int32_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos) {
-        int32_t base_time = (star_idx * 7) + (int32_t)MOX::_stardate;
-        
-        // Complex multiplier calculation for 5311 * base_time
-        int32_t scaled_time = base_time;
-        int32_t t5 = scaled_time * 5;
-        int32_t t41 = scaled_time + (t5 * 8);
-        int32_t t83 = scaled_time + (t41 * 2);
-        int32_t dividend = (t83 << 6) - scaled_time; // (83 * 64 - 1) * base_time = 5311 * base_time
-
-        int32_t denominator = (orbit_idx * 100) + star_idx + 150;
-        int32_t angle = (dividend / denominator) % 360;
-        int16_t angle16 = (int16_t)angle;
+        const int32_t orbit_time = (star_idx * 7) + (int32_t)MOX::_stardate;
+        const int32_t angle_numerator = orbit_time * 5311;
+        const int32_t angle_divisor = (orbit_idx * 100) + star_idx + 150;
+        const int32_t orbit_angle = (angle_numerator / angle_divisor) % 360;
+        const int16_t orbit_angle16 = (int16_t)orbit_angle;
 
         // The binary reads radii from the second pair in the orbit constants table.
-        int32_t cos_res = angle::Cos_(angle16, GEO::_orbit_consts[orbit_idx + 1][0]);
-        int32_t x_val = cos_res + 5;
-        if (x_val >= 0) {
-            x_val += 5; // Result: (cos + 10) / 10
+        const int16_t orbit_radius_x = GEO::_orbit_consts[orbit_idx + 1][0];
+        const int16_t orbit_radius_y = GEO::_orbit_consts[orbit_idx + 1][1];
+
+        int32_t rounded_x = angle::Cos_(orbit_angle16, orbit_radius_x) + 5;
+        if (rounded_x >= 0) {
+            rounded_x += 5; // Result: (cos + 10) / 10
         } else {
-            x_val -= 5; // Result: cos / 10
+            rounded_x -= 5; // Result: cos / 10
         }
-        *out_x = x_val / 10;
+        *out_x = rounded_x / 10;
 
         // Y coordinate calculation with rounding and inversion
-        int32_t sin_res = angle::Sin_(angle16, GEO::_orbit_consts[orbit_idx + 1][1]);
-        int32_t y_val = sin_res - 5;
-        if (y_val >= 0) {
-            y_val += 5; // Result: sin / 10
+        int32_t rounded_y = angle::Sin_(orbit_angle16, orbit_radius_y) - 5;
+        if (rounded_y >= 0) {
+            rounded_y += 5; // Result: sin / 10
         } else {
-            y_val -= 5; // Result: (sin - 10) / 10
+            rounded_y -= 5; // Result: (sin - 10) / 10
         }
-        *out_y = -(y_val / 10);
+        *out_y = -(rounded_y / 10);
 
         // Calculate rotation frame (32 frames total)
-        int32_t rotation_frame = ((angle + 6) * 32) / 360;
-        if (rotation_frame == 32) {
-            rotation_frame = 0;
+        int32_t orbit_frame = ((orbit_angle + 6) * 32) / 360;
+        if (orbit_frame == 32) {
+            orbit_frame = 0;
         }
-        *orbit_pos = rotation_frame;
+        *orbit_pos = orbit_frame;
     }
 
     /**

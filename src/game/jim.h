@@ -11,18 +11,8 @@ namespace JIM {
     extern int16_t _jim_fade_music_flag;
     extern int16_t _jim_old_transition_id;
 
-    extern const char s_STREAM_LBX[];
-    extern const char s_STREAMHD_LBX_00555908[];
-
     extern s_mouse_list _logo_mouse_list;
     extern int16_t _darken_palette_value;
-
-    extern const char jimtext_lbx[];
-
-    extern const char s_intro_lbx[];
-    extern const char s_simtex_lbx[];
-    extern const char s_logo_lbx[];
-    extern const char s_fmt_ssimtex_lbx[];
 
     // Returns true when the Simtex logo asset exists on either configured data path.
     bool __cdecl Check_For_Simtex_Logo_();
@@ -60,8 +50,6 @@ namespace JIM {
      */
     void __cdecl Get_Text_Message_(const char* filename, int16_t message_index, char* dest, int16_t max_len);
 
-    extern const char s_Message_too_long[];
-
     void __cdecl Decode_Text_Name_And_Tech_(char* buffer, int16_t name_idx, int16_t tech_idx, int16_t max_len);
 
     void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t name_idx, int16_t other_name_idx, int16_t tech_idx, int16_t max_len);
@@ -96,10 +84,6 @@ namespace JIM {
      * @param max_len Capacity of message_buffer, including the terminator.
      */
     void __cdecl Decode_Text_Message_(char* message_buffer, int16_t player1_id, int16_t star_id, int16_t tech_app1_id, int16_t number, int16_t player2_id, int16_t tech_app2_id, int16_t tech_field_id, int16_t max_len);
-
-    extern const char s_d_comma_d_0055239c[];
-    extern const char s_d_dot_d_005523a4[];
-    extern const char s_Decode_message_too_long_0055593c[];
 
     void __cdecl Decode_Text_Year_(char* buffer, int16_t max_len);
 

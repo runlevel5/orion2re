@@ -1481,39 +1481,39 @@ namespace FMTPARA {
         return 0;
     }
 
-    char __cdecl FN_Set_Origin_(char param_1, int32_t param_2, int16_t param_3, bool param_4, bool param_5) {
-        if (param_4 == 0 /* false */) {
-            if (param_3 == 1) {
-                if (param_5 != 0 /* true */) {
-                    param_2 += (int32_t)_para_p->x1;
+    char __cdecl FN_Set_Origin_(char func_char, int32_t value, int16_t origin_axis, bool parse_failed, bool relative) {
+        if (parse_failed == 0 /* false */) {
+            if (origin_axis == 1) {
+                if (relative != 0 /* true */) {
+                    value += (int32_t)_para_p->x1;
                 }
                 // Bounds check: 0 <= x < 640
-                if (param_2 >= 0 && param_2 < 640) {
-                    _para_p->x1 = (int16_t)param_2;
-                    return param_1;
+                if (value >= 0 && value < 640) {
+                    _para_p->x1 = (int16_t)value;
+                    return func_char;
                 }
             }
-            else if (param_3 == 2) {
-                if (param_5 != 0 /* true */) {
-                    param_2 += (int32_t)_para_p->y;
+            else if (origin_axis == 2) {
+                if (relative != 0 /* true */) {
+                    value += (int32_t)_para_p->y;
                 }
                 // Bounds check: 0 <= y < 480
-                if (param_2 >= 0 && param_2 < 480) {
-                    _para_p->y = (int16_t)param_2;
-                    return param_1;
+                if (value >= 0 && value < 480) {
+                    _para_p->y = (int16_t)value;
+                    return func_char;
                 }
             }
-            else if (param_3 == 3) {
-                if (param_5 != 0 /* true */) {
-                    param_2 += (int32_t)_para_p->width;
+            else if (origin_axis == 3) {
+                if (relative != 0 /* true */) {
+                    value += (int32_t)_para_p->width;
                 }
                 // Bounds check: 0 < width <= 640
-                if (param_2 > 0 && param_2 <= 640) {
-                    _para_p->width = (int16_t)param_2;
+                if (value > 0 && value <= 640) {
+                    _para_p->width = (int16_t)value;
                 }
             }
         }
-        return param_1;
+        return func_char;
     }
 
     char __cdecl FN_Set_V_Spacing_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {

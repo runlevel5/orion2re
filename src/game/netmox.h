@@ -70,7 +70,7 @@ namespace NETMOX {
     void __cdecl Send_You_Are_Target_Info_(
         int16_t target_player_idx,
         int16_t other_player_idx,
-        int16_t param_3,
+        int16_t defender_id,
         int16_t colony_idx,
         int16_t star_idx);
 
@@ -168,7 +168,7 @@ namespace NETMOX {
     struct s_packet_0x12 {
         int16_t star_idx;
         int16_t other_player_idx;
-        int16_t param_3;
+        int16_t defender_id;
         int16_t colony_idx;
     };
 

@@ -525,37 +525,37 @@ namespace council {
 
         switch (_council_state) {
         case 0:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 15, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 15, _council_message, 200);
             break;
 
         case 1:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 16, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 16, _council_message, 200);
             JIM::Decode_Text_Name_And_Name_(_council_message, _council_nominee_[0], _council_nominee_[1], 200);
             break;
 
         case 2:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 17, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 17, _council_message, 200);
             JIM::Decode_Text_Name_And_Stat_(_council_message, _council_nominee_[_council_vote_for], _council_vote_cast, 200);
             break;
 
         case 3:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 18, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 18, _council_message, 200);
             JIM::Decode_Text_Name_And_Stat_(_council_message, _council_voter, _council_vote_cast, 200);
             break;
 
         case 4:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 19, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 19, _council_message, 200);
             JIM::Decode_Text_Race_(_council_message, _council_nominee_[_council_vote_for], 200);
             break;
 
         case 5:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 20, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 20, _council_message, 200);
             break;
 
         case 6:
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 21, _council_message, 200);
+            JIM::Get_Text_Message_("jimtext.lbx", 21, _council_message, 200);
             if (diplodef::_COUNCIL_FLAG == 2) {
-                JIM::Get_Text_Message_(JIM::jimtext_lbx, 22, temp_buffer, sizeof(temp_buffer));
+                JIM::Get_Text_Message_("jimtext.lbx", 22, temp_buffer, sizeof(temp_buffer));
                 JIM::Decode_Text_Race_(temp_buffer, _winning_player, sizeof(temp_buffer));
                 strcat(_council_message, temp_buffer);
             }
@@ -612,9 +612,9 @@ namespace council {
             fonts::Set_Font_Highlight_Colors_(&council::_council_highlight_colors);
             fonts::Set_Font_LF_(4);
 
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1A, choice_labels[0], sizeof(choice_labels[0]));
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1B, choice_labels[1], sizeof(choice_labels[1]));
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x1C, prompt_text, sizeof(prompt_text));
+            JIM::Get_Text_Message_("jimtext.lbx", 0x1A, choice_labels[0], sizeof(choice_labels[0]));
+            JIM::Get_Text_Message_("jimtext.lbx", 0x1B, choice_labels[1], sizeof(choice_labels[1]));
+            JIM::Get_Text_Message_("jimtext.lbx", 0x1C, prompt_text, sizeof(prompt_text));
 
             list_metadata = 0;
             active_mask[0] = 1;

@@ -3,6 +3,8 @@
 namespace netcode {
     using recv_fn = void(__cdecl*)(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
+    extern uint32_t _thisHost;
+
     extern uint32_t _netInitialized;
 
     extern int8_t _tpSending;

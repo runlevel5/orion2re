@@ -6,27 +6,16 @@ namespace JIM {
     int16_t _jim_old_music_id = -1;
     int16_t _jim_fade_music_flag = -1;
     int16_t _jim_old_transition_id = -1;
-    const char s_STREAM_LBX[] = "STREAM.LBX";
-    const char s_STREAMHD_LBX_00555908[] = "STREAMHD.LBX";
     s_mouse_list _logo_mouse_list = {0, 0, 0, 0, 639, 479};
     int16_t _darken_palette_value;
-    const char jimtext_lbx[] = "jimtext.lbx";
-    const char s_intro_lbx[] = "intro.lbx";
-    const char s_simtex_lbx[] = "simtex.lbx";
-    const char s_logo_lbx[] = "logo.LBX";
-    const char s_fmt_ssimtex_lbx[] = "%ssimtex.lbx";
-    const char s_Message_too_long[] = "Message #%d in %s too long (%d).";
-    const char s_d_comma_d_0055239c[] = "%d,%d";
-    const char s_d_dot_d_005523a4[] = "%d.%d";
-    const char s_Decode_message_too_long_0055593c[] = "Decode message too long (%d).\n%s";
 
     bool __cdecl Check_For_Simtex_Logo_() {
         char find_buffer[80];
         char secondary_path[80];
 
-        snprintf(secondary_path, sizeof(secondary_path), s_fmt_ssimtex_lbx, farload::_secondary_drive_path);
+        snprintf(secondary_path, sizeof(secondary_path), "%ssimtex.lbx", farload::_secondary_drive_path);
 
-        if (dos::DIR_(s_simtex_lbx, find_buffer)) {
+        if (dos::DIR_("simtex.lbx", find_buffer)) {
             return true;
         }
 
@@ -55,7 +44,7 @@ namespace JIM {
         bool user_interrupted = false;
 
         if (Check_For_Simtex_Logo_() == 0) {
-            file_ani::Open_File_Animation_(s_logo_lbx, 0);
+            file_ani::Open_File_Animation_("logo.LBX", 0);
             video::Set_Page_Off_();
             palstore::Darken_Palette_(100);
             mouse::Set_Mouse_List_(&_logo_mouse_list, 1);
@@ -106,7 +95,7 @@ namespace JIM {
             }
         } else {
             // Play Simtex cinematic if Simtex logo is present
-            SMACK::Play_Cinematic_(s_simtex_lbx, 0, 0);
+            SMACK::Play_Cinematic_("simtex.lbx", 0, 0);
             sound::Stop_Stream_();
             _jim_current_stream = -1;
         }
@@ -117,7 +106,7 @@ namespace JIM {
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
 
-            file_ani::Open_File_Animation_(s_logo_lbx, 1);
+            file_ani::Open_File_Animation_("logo.LBX", 1);
             int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
             file_ani::Draw_File_Animation_();
             video::Copy_Off_To_Back_();
@@ -170,7 +159,7 @@ namespace JIM {
         video::Copy_Off_To_Back_();
 
         if (skip_requested == 0) {
-            SMACK::Play_Cinematic_(s_intro_lbx, 0, 1);
+            SMACK::Play_Cinematic_("intro.lbx", 0, 1);
         }
     }
 
@@ -216,7 +205,7 @@ namespace JIM {
 
         _jim_current_stream = (int16_t)((clock() % 3) + 1);
 
-        sound::Set_Stream_Filename_(s_STREAM_LBX);
+        sound::Set_Stream_Filename_("STREAM.LBX");
         sound::Play_Stream_(_jim_current_stream);
         sound::Loop_Stream_(-1);
 
@@ -322,9 +311,9 @@ namespace JIM {
                         break;
                     case 0x88:
                         if (MOX::_settings.language == 0) {
-                            snprintf(temp_buf, sizeof(temp_buf), s_d_dot_d_005523a4, MOX::_stardate / 10, MOX::_stardate % 10);
+                            snprintf(temp_buf, sizeof(temp_buf), "%d.%d", MOX::_stardate / 10, MOX::_stardate % 10);
                         } else {
-                            snprintf(temp_buf, sizeof(temp_buf), s_d_comma_d_0055239c, MOX::_stardate / 10, MOX::_stardate % 10);
+                            snprintf(temp_buf, sizeof(temp_buf), "%d,%d", MOX::_stardate / 10, MOX::_stardate % 10);
                         }
                         src_ptr = temp_buf;
                         break;
@@ -348,7 +337,7 @@ namespace JIM {
         dest_buf[dest_len] = '\0';
 
         if (strlen(dest_buf) >= (uint32_t)(max_len - 1)) {
-            snprintf(dest_buf, sizeof(dest_buf), s_Decode_message_too_long_0055593c, max_len, message_buffer);
+            snprintf(dest_buf, sizeof(dest_buf), "Decode message too long (%d).\n%s", max_len, message_buffer);
             exitm::Exit_With_Message(dest_buf);
         } else {
             strcpy(message_buffer, dest_buf);
@@ -372,7 +361,7 @@ namespace JIM {
         int16_t message_len = (int16_t)strlen(buffer);
 
         if (max_len - 1 <= message_len || message_len >= (int16_t)(sizeof(buffer) - 1)) {
-            snprintf(buffer, sizeof(buffer), s_Message_too_long, message_index, filename, message_len);
+            snprintf(buffer, sizeof(buffer), "Message #%d in %s too long (%d).", message_index, filename, message_len);
             exitm::Exit_With_Message(buffer);
             return;
         }
@@ -409,7 +398,7 @@ namespace JIM {
             int32_t ticks = clock();
             _jim_current_stream = (int16_t)((ticks % 3) + 4);
 
-            sound::Set_Stream_Filename_(s_STREAM_LBX);
+            sound::Set_Stream_Filename_("STREAM.LBX");
             sound::Play_Stream_(_jim_current_stream);
             sound::Loop_Stream_(-1);
             sound::Set_Stream_Volume_(0);
@@ -449,10 +438,10 @@ namespace JIM {
             sound::Stop_Stream_();
 
             if (_jim_old_music_id <= 100) {
-                sound::Set_Stream_Filename_(s_STREAM_LBX);
+                sound::Set_Stream_Filename_("STREAM.LBX");
                 sound::Play_Stream_(_jim_old_music_id);
             } else {
-                sound::Set_Stream_Filename_(s_STREAMHD_LBX_00555908);
+                sound::Set_Stream_Filename_("STREAMHD.LBX");
                 sound::Play_Stream_(_jim_old_music_id - 100);
             }
 
@@ -480,14 +469,14 @@ namespace JIM {
             if (_jim_old_transition_id == -2) {
                 int32_t ticks = (int32_t)clock();
                 _jim_current_stream = (int16_t)((ticks % 3) + 1);
-                sound::Set_Stream_Filename_(s_STREAM_LBX);
+                sound::Set_Stream_Filename_("STREAM.LBX");
                 sound::Play_Stream_(_jim_current_stream);
             } else {
                 if (_jim_old_transition_id <= 100) {
-                    sound::Set_Stream_Filename_(s_STREAM_LBX);
+                    sound::Set_Stream_Filename_("STREAM.LBX");
                     sound::Play_Stream_(_jim_old_transition_id);
                 } else {
-                    sound::Set_Stream_Filename_(s_STREAMHD_LBX_00555908);
+                    sound::Set_Stream_Filename_("STREAMHD.LBX");
                     sound::Play_Stream_(_jim_old_transition_id - 100);
                 }
                 _jim_current_stream = _jim_old_transition_id;

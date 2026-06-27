@@ -64,7 +64,6 @@
 #include "loader.h"
 #include "sys.h"
 #include "multplay.h"
-#include "net.h"
 #include "netmox.h"
 #include "netstrat.h"
 #include "netadapter.h"

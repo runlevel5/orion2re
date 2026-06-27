@@ -1616,13 +1616,13 @@ namespace CMBTFIRE {
             damage /= 2;
         }
 
-        uint16_t uVar4 = 0;
+        uint16_t damage_result_flags = 0;
         int16_t shield_hit_result = 0;
 
         if (damage > 0) {
             int16_t analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, SPECIAL_ACHILLES_TARGETING_UNIT);
             int16_t structural_analyzer_bonus = COMBINIT::Does_Combat_Ship_Have_Special_(source_ship_idx, SPECIAL_STRUCTURAL_ANALYZER);
-            uVar4 = Apply_Ship_Damage_(target_ship_idx, &damage, &shield_hit_result, target_shield_arc, 0, 0, structural_analyzer_bonus, analyzer_bonus, 0);
+            damage_result_flags = Apply_Ship_Damage_(target_ship_idx, &damage, &shield_hit_result, target_shield_arc, 0, 0, structural_analyzer_bonus, analyzer_bonus, 0);
         }
 
         int16_t is_dead = Is_Combat_Ship_Dead_(target_ship_idx);
@@ -1634,8 +1634,8 @@ namespace CMBTFIRE {
 
             beam_fx_entries[0].weapon_id = 0x2e;
             beam_fx_entries[0].shot_count = 1;
-            beam_fx_entries[0].special_flag = uVar4 & 1;
-            beam_fx_entries[0].result_flags = (uVar4 & 2) != 0;
+            beam_fx_entries[0].special_flag = damage_result_flags & 1;
+            beam_fx_entries[0].result_flags = (damage_result_flags & 2) != 0;
             beam_fx_entries[0].accum_hit_x = damage;
             beam_fx_entries[0].accum_hit_y = shield_hit_result;
             beam_fx_entries[0].is_damage_entry = 0;

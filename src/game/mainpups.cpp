@@ -668,7 +668,7 @@ namespace MAINPUPS {
         Add_Slider_Fields_(_g_min, _g_max, &_g_var);
     }
 
-    int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t var, char* msg, int16_t param_5) {
+    int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t initial_value, char* msg, int16_t popup_style) {
         int16_t input = 0;
         _last_scanned_field = -1;
         int16_t done = 0;
@@ -677,10 +677,10 @@ namespace MAINPUPS {
         _g_min = min;
         _g_max = max;
         _g_msg = msg;
-        _g_var = var;
+        _g_var = initial_value;
 
         Load_SLIDER_Popup_();
-        Do_Popup_Setup_(param_5, _anims[14]);
+        Do_Popup_Setup_(popup_style, _anims[14]);
         remap::Calculate_Picture_Remap_Colors_(_anims[14]);
         fields::Deactivate_Auto_Function_();
         fields::Assign_Auto_Function_(Draw_Slider_Popup_, 1);

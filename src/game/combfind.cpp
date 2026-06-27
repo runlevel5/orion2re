@@ -2485,14 +2485,14 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     }
 
     if (_n_battle_stars == 0) {
-        bool bVar3 = false;
+        bool waiting_for_combat_ready_player = false;
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives == 100 /* 'd' */ && NETMOX::_net.player_net_info[i].player_state != NET_PLAYER_STATE_COMBAT_READY) {
                 RUSS::Mox_Update_();
-                bVar3 = true;
+                waiting_for_combat_ready_player = true;
             }
         }
-        if (!bVar3) {
+        if (!waiting_for_combat_ready_player) {
             NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_COMPLETE;
         }
         _in_net_update = 0;

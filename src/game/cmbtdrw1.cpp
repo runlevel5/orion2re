@@ -1940,17 +1940,17 @@ skip_cursor:
             break;
         }
 
-        int iVar2 = (facing_dir - 1) / 4;
-        if (iVar2 <= 0) {
-            iVar2 = 0;
+        int facing_quadrant = (facing_dir - 1) / 4;
+        if (facing_quadrant <= 0) {
+            facing_quadrant = 0;
         }
 
-        if (iVar2 == 1) {
+        if (facing_quadrant == 1) {
             *out_x -= 2;
-        } else if (iVar2 == 2) {
+        } else if (facing_quadrant == 2) {
             *out_x -= 2;
             *out_y -= 1;
-        } else if (iVar2 == 3) {
+        } else if (facing_quadrant == 3) {
             *out_y -= 1;
         }
 
@@ -2478,32 +2478,32 @@ skip_cursor:
         MISC::Restore_Window_Status_(window_status);
     }
 
-    void __cdecl Draw_Ship_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    void __cdecl Draw_Ship_(int16_t ship_idx, int16_t draw_x, int16_t draw_y) {
         int16_t frame_lookup[4] = {1, 2, 3, 2};
         const int16_t local_56 = 4;
         int16_t frame_idx;
-        uint8_t previous_owner = MOX::_combat_data[param_1].previous_owner;
+        uint8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
 
         if (previous_owner <= 9) {
-            frame_idx = frame_lookup[((MOX::_ship_frame / 2) + param_1) % 4];
+            frame_idx = frame_lookup[((MOX::_ship_frame / 2) + ship_idx) % 4];
         } else {
             frame_idx = (MOX::_ship_frame / 2) % 4;
         }
 
         int16_t x_offset, y_offset;
-        Get_Draw_Ship_Offsets_(param_1, &x_offset, &y_offset);
+        Get_Draw_Ship_Offsets_(ship_idx, &x_offset, &y_offset);
 
-        if (param_1 == 0) {
+        if (ship_idx == 0) {
             animate::Draw_((MOX::_combat_data[0].x - MOX::_cur_combat_x) * 20 + x_offset,
                            (MOX::_combat_data[0].y - MOX::_cur_combat_y) * 20 + y_offset,
                            MOX::_combat_planet_seg);
-            COMBINIT::Ship_Center_Offsets_(0, &param_2, &param_3);
+            COMBINIT::Ship_Center_Offsets_(0, &draw_x, &draw_y);
             return;
         }
 
-        int8_t facing_dir = MOX::_combat_data[param_1].facing_dir;
-        s_animation_header *anim = MOX::_combat_data[param_1].ship_image_seg;
-        int8_t owner = MOX::_combat_data[param_1].owner;
+        int8_t facing_dir = MOX::_combat_data[ship_idx].facing_dir;
+        s_animation_header *anim = MOX::_combat_data[ship_idx].ship_image_seg;
+        int8_t owner = MOX::_combat_data[ship_idx].owner;
 
         if (anim == nullptr || previous_owner != owner) {
             uint8_t local_40[32];
@@ -2515,16 +2515,16 @@ skip_cursor:
 
             char lbx_name[12];
             int16_t picture_num;
-            if (previous_owner < MAX_PLAYERS && MOX::_combat_data[param_1].picture_num != 44 /* 0x2c */) {
+            if (previous_owner < MAX_PLAYERS && MOX::_combat_data[ship_idx].picture_num != 44 /* 0x2c */) {
                 strlcpy(lbx_name, "cmbtshp.lbx", sizeof(lbx_name));
                 int16_t color = MOX::_player[previous_owner].color;
-                picture_num = color * 45 + MOX::_combat_data[param_1].picture_num;
+                picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
             } else {
                 strlcpy(lbx_name, "monster.lbx", sizeof(lbx_name));
-                if (MOX::_combat_data[param_1].picture_num == 44 /* 0x2c */) {
+                if (MOX::_combat_data[ship_idx].picture_num == 44 /* 0x2c */) {
                     picture_num = 25; /* 0x19 */
                 } else {
-                    picture_num = MOX::_combat_data[param_1].picture_num;
+                    picture_num = MOX::_combat_data[ship_idx].picture_num;
                 }
             }
             
@@ -2544,9 +2544,9 @@ skip_cursor:
 
         switch (quadrant) {
             case 0: {
-                int16_t done = CMBTFIR2::Combat_Ship_Done_(param_1);
+                int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
-                if (done == 0 && MOX::_combat_data[param_1].is_captured == 0) {
+                if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
                     draw_frame = local_56 * facing_dir + frame_idx;
                 } else {
                     draw_frame = local_56 * facing_dir;
@@ -2556,9 +2556,9 @@ skip_cursor:
                 break;
             }
             case 1: {
-                int16_t done = CMBTFIR2::Combat_Ship_Done_(param_1);
+                int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
-                if (done == 0 && MOX::_combat_data[param_1].is_captured == 0) {
+                if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
                     draw_frame = local_56 * (8 - facing_dir) + frame_idx;
                 } else {
                     draw_frame = local_56 * (8 - facing_dir);
@@ -2569,9 +2569,9 @@ skip_cursor:
                 break;
             }
             case 2: {
-                int16_t done = CMBTFIR2::Combat_Ship_Done_(param_1);
+                int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
-                if (done == 0 && MOX::_combat_data[param_1].is_captured == 0) {
+                if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
                     draw_frame = local_56 * (facing_dir - 8) + frame_idx;
                 } else {
                     draw_frame = local_56 * (facing_dir - 8);
@@ -2583,9 +2583,9 @@ skip_cursor:
                 break;
             }
             case 3: {
-                int16_t done = CMBTFIR2::Combat_Ship_Done_(param_1);
+                int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
-                if (done == 0 && MOX::_combat_data[param_1].is_captured == 0) {
+                if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
                     draw_frame = local_56 * (16 - facing_dir) + frame_idx;
                 } else {
                     draw_frame = local_56 * (16 - facing_dir);
@@ -2597,42 +2597,42 @@ skip_cursor:
             }
         }
 
-        uint8_t status_flag = MOX::_combat_data[param_1].special_status_flag;
+        uint8_t status_flag = MOX::_combat_data[ship_idx].special_status_flag;
         if (status_flag == 4) {
             if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_PLAYER_NUM || MOX::_game_type == 1) {
                 bitmap::Outline_Bitmap_(MOX::_ship_bitmap, MOX::_draw_ship_bitmap, 5, 0);
                 bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_ship_bitmap, MOX::_draw_ship_bitmap, 0);
-                animate::Draw_(x_offset + param_2, y_offset + param_3, MOX::_ship_bitmap);
+                animate::Draw_(x_offset + draw_x, y_offset + draw_y, MOX::_ship_bitmap);
             }
             return;
         }
 
         if (status_flag == 1 || status_flag == 5) {
-            int val = (MOX::_ship_frame + param_1 * 2) % 16;
+            int val = (MOX::_ship_frame + ship_idx * 2) % 16;
             Plasma_Darken_(MOX::_draw_ship_bitmap, val, 3);
         }
 
-        if (MOX::_combat_data[param_1].reflected_damage_pool > 0 &&
-            !CMBTMOV1::Ship_Is_In_Stasis_(param_1) &&
-            !CMBTMOV1::Ship_In_Black_Hole_(param_1) &&
-            MOX::_combat_data[param_1].plasma_web_damage == 0) {
-            CMBTFIRE::Draw_Energy_Absorber_(param_1, param_2, param_3);
+        if (MOX::_combat_data[ship_idx].reflected_damage_pool > 0 &&
+            !CMBTMOV1::Ship_Is_In_Stasis_(ship_idx) &&
+            !CMBTMOV1::Ship_In_Black_Hole_(ship_idx) &&
+            MOX::_combat_data[ship_idx].plasma_web_damage == 0) {
+            CMBTFIRE::Draw_Energy_Absorber_(ship_idx, draw_x, draw_y);
         }
 
-        animate::Draw_(x_offset + param_2, y_offset + param_3, MOX::_draw_ship_bitmap);
+        animate::Draw_(x_offset + draw_x, y_offset + draw_y, MOX::_draw_ship_bitmap);
 
-        if (CMBTMOV1::Ship_Is_In_Stasis_(param_1)) {
-            CMBTSPEC::Draw_Stasis_Ball_(param_1, 100, 0, 0);
+        if (CMBTMOV1::Ship_Is_In_Stasis_(ship_idx)) {
+            CMBTSPEC::Draw_Stasis_Ball_(ship_idx, 100, 0, 0);
             return;
         }
 
-        if (MOX::_combat_data[param_1].plasma_web_damage > 0) {
-            CMBTSPEC::Draw_Plasma_Web_(param_1, param_2, param_3);
+        if (MOX::_combat_data[ship_idx].plasma_web_damage > 0) {
+            CMBTSPEC::Draw_Plasma_Web_(ship_idx, draw_x, draw_y);
             return;
         }
 
-        if (CMBTMOV1::Ship_In_Black_Hole_(param_1)) {
-            CMBTFIRE::Draw_BHG_(param_1, 0, 0);
+        if (CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
+            CMBTFIRE::Draw_BHG_(ship_idx, 0, 0);
         }
     }
 

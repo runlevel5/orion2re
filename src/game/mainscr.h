@@ -153,7 +153,7 @@ namespace MAINSCR {
 
     void __cdecl Clear_Main_Screen_Fields_();
 
-    void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, int16_t x_box, int16_t y_box, int16_t width, int16_t height, int16_t flag);
+    void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, int16_t x_box, int16_t y_box, int16_t width, int16_t height, int16_t mode);
 
     void __cdecl Set_Popup_Draw_XY_(int16_t popup_type, int16_t ship_icon_idx, int16_t* out_w, int16_t* out_h);
 
@@ -318,12 +318,12 @@ namespace MAINSCR {
     /**
      * Dispatches a network payload received while the main screen is active.
      * @param from_player_id Sending network player index.
-     * @param param_2 Message-specific secondary value.
+     * @param sender_net_id_or_host_id Message-specific sender network id or host election id.
      * @param msg_type Network message type.
-     * @param len Payload size in bytes.
-     * @param data Raw payload buffer.
+     * @param payload_len Payload size in bytes.
+     * @param payload Raw payload buffer.
      */
-    void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t param_2, uint16_t msg_type, uint32_t len, void* data);
+    void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t sender_net_id_or_host_id, uint16_t msg_type, uint32_t payload_len, void* payload);
 
     int16_t __cdecl Scan_Galaxy_Map_Fields_(int16_t field_id_1, int16_t field_id_2, int16_t* star_idx_ptr_1, int16_t* star_idx_ptr_2);
     int32_t __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor);
@@ -345,11 +345,11 @@ namespace MAINSCR {
     /**
      * Routes hover and click input to the active movable-box widgets on the main screen.
      * @param mouse_input Current hover field id.
-     * @param input Activated field id.
+     * @param input_field Activated field id.
      * @param scan_input Current scanned field id.
      * @param out_exit_flag Set when the handler changes screens.
      */
-    void __cdecl Scan_Moveable_Box_Fields(int16_t mouse_input, int16_t input, int32_t scan_input, int16_t* out_exit_flag);
+    void __cdecl Scan_Moveable_Box_Fields(int16_t mouse_input, int16_t input_field, int32_t scan_input, int16_t* out_exit_flag);
 
     void __cdecl Get_Star_Name_Info_(int16_t star_idx, int16_t* out_x, int16_t* out_y, int16_t* out_width);
 

@@ -241,7 +241,7 @@ namespace FMTPARA {
 
     char __cdecl FN_Set_Margins_(char status, int32_t margin_val, int16_t side, bool skip_logic, bool flag);
 
-    char __cdecl FN_Set_Origin_(char param_1, int32_t param_2, int16_t param_3, bool param_4, bool param_5);
+    char __cdecl FN_Set_Origin_(char func_char, int32_t value, int16_t origin_axis, bool parse_failed, bool relative);
 
     char __cdecl FN_Set_FF_Size_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 

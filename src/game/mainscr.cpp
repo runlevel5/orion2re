@@ -3096,14 +3096,14 @@ namespace MAINSCR {
         return result;
     }
 
-    void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4) {
+    void __cdecl Scan_Moveable_Box_Fields(int16_t mouse_input, int16_t input_field, int32_t scan_input, int16_t* out_exit_flag) {
         for (int16_t box_idx = 0; box_idx < 5; ++box_idx) {
             if (!MOVEBOX::Moveable_Box_Selected_(box_idx)) {
                 continue;
             }
 
-            if (MOX::_moveable_box[box_idx].close_btn == param_2) {
-                if (param_1 == 0) {
+            if (MOX::_moveable_box[box_idx].close_btn == input_field) {
+                if (mouse_input == 0) {
                     if (box_idx == 0) {
                         video::Set_Page_Off_();
                         Draw_Main_Screen_();
@@ -3120,8 +3120,8 @@ namespace MAINSCR {
                     continue;
                 }
             } else {
-                if (param_1 == 0 && box_idx != MOX::_moveable_box_order[0]) {
-                    if (MOVEBOX::Box_Field_Selected_(box_idx, param_2)) {
+                if (mouse_input == 0 && box_idx != MOX::_moveable_box_order[0]) {
+                    if (MOVEBOX::Box_Field_Selected_(box_idx, input_field)) {
                         MOVEBOX::Move_Box_To_Top_(MOX::_moveable_box[box_idx].index);
                     }
                 }
@@ -3130,7 +3130,7 @@ namespace MAINSCR {
             if (MOX::_moveable_box[box_idx].index == 1) {
                 int16_t scanned_star_id;
                 int16_t center_star_id;
-                int16_t scan_res = Scan_Galaxy_Map_Fields_((int16_t)param_3, param_2, &scanned_star_id, &center_star_id);
+                int16_t scan_res = Scan_Galaxy_Map_Fields_((int16_t)scan_input, input_field, &scanned_star_id, &center_star_id);
                 MOX::_galaxy_map_scanned_star = scanned_star_id;
 
                 if (HAROLD::Map_Scale_To_Zoom_Level_() != MOX::_max_zoom_count) {
@@ -3147,13 +3147,13 @@ namespace MAINSCR {
             }
 
             if (MOVEBOX::Moveable_Box_Selected_(2) && MOX::_moveable_box[box_idx].index == 2) {
-                if (param_2 == MOX::_fleet_box_scroll_up_button) {
+                if (input_field == MOX::_fleet_box_scroll_up_button) {
                     SCROLL::Scroll_Up_One_Item_(&MOX::_fltpop_scroll_bar);
-                } else if (param_2 == MOX::_fleet_box_scroll_dn_button) {
+                } else if (input_field == MOX::_fleet_box_scroll_dn_button) {
                     SCROLL::Scroll_Down_One_Item_(&MOX::_fltpop_scroll_bar);
                 }
 
-                if (param_2 == MOX::_fleet_movement_all_button) {
+                if (input_field == MOX::_fleet_movement_all_button) {
                     if (MOX::_fleet_movement_icons_on == 1 || FLEETPOP::Fleet_Buttons_Chosen_() == MOX::_fleet_box.count) {
                         FLEETPOP::Set_Fleet_Movement_Icon_Selections_(0, 0);
                         HACCESS::Clear_Fleet_Box_Selected_Ship_Status_();
@@ -3165,7 +3165,7 @@ namespace MAINSCR {
                 }
 
                 int16_t local_5e2;
-                int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(param_3, param_2, &_fleet_icon_chosen, &local_5e2);
+                int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(scan_input, input_field, &_fleet_icon_chosen, &local_5e2);
                 MOX::_fleet_ship_scanned = -1;
                 if (local_5e2 > -1) {
                     MOX::_eta_star_id = -1;
@@ -3180,19 +3180,19 @@ namespace MAINSCR {
                     MOX::_draw_main_screen_to_back = 1;
                 }
 
-                if (MOX::_fleet_box.colonize_btn_active != 0 && MOX::_fleet_box_colonize_button == param_2) {
+                if (MOX::_fleet_box.colonize_btn_active != 0 && MOX::_fleet_box_colonize_button == input_field) {
                     MOX::_eta_star_id = -1;
                     MOX::_current_screen = SCREEN_COLONIZATION_IN_MAIN;
                     MOX::_return_screen = SCREEN_MAIN;
-                    *param_4 = 1;
+                    *out_exit_flag = 1;
                     continue;
                 }
 
-                if (MOX::_fleet_box.transport_btn_active != 0 && MOX::_fleet_box_transport_button == param_2) {
+                if (MOX::_fleet_box.transport_btn_active != 0 && MOX::_fleet_box_transport_button == input_field) {
                     if (FLEETPOP::At_Least_One_Ship_Of_Type_Selected_(SHIP_TYPE_TRANSPORT) != 0) {
                         MOX::_current_screen = SCREEN_UNLOADING_TRANSPORTS_IN_MAIN;
                         MOX::_return_screen = SCREEN_MAIN;
-                        *param_4 = 1;
+                        *out_exit_flag = 1;
                     } else {
                         char local_578[200];
                         strlcpy(local_578, HAROLD::H_Message_(0x20 /* HESTR_020_OPTION_DISABLED_DURING */), sizeof(local_578));
@@ -3201,14 +3201,14 @@ namespace MAINSCR {
                     continue;
                 }
 
-                if (MOX::_fleet_box.outpost_btn_active != 0 && MOX::_fleet_box_outpost_button == param_2) {
+                if (MOX::_fleet_box.outpost_btn_active != 0 && MOX::_fleet_box_outpost_button == input_field) {
                     MOX::_current_screen = SCREEN_BUILDING_OUTPOSTS_IN_MAIN;
                     MOX::_return_screen = SCREEN_MAIN;
-                    *param_4 = 1;
+                    *out_exit_flag = 1;
                     continue;
                 }
 
-                if (MOX::_fleet_box.engage_btn_active != 0 && MOX::_fleet_box_engage_button == param_2) {
+                if (MOX::_fleet_box.engage_btn_active != 0 && MOX::_fleet_box_engage_button == input_field) {
                     int16_t star_id = HACCESS::Ship_Stack_Star_Id_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
                     if (star_id > -1 && star_id < MOX::_NUM_STARS) {
                         MOX::_star[star_id].ignore_combat_ships &= ~(1 << MOX::_PLAYER_NUM);
@@ -3216,7 +3216,7 @@ namespace MAINSCR {
                     continue;
                 }
 
-                if (MOX::_fleet_box.attack_btn_active != 0 && MOX::_fleet_box_attack_button == param_2 && MOX::_fleet_box_attack_button > 0) {
+                if (MOX::_fleet_box.attack_btn_active != 0 && MOX::_fleet_box_attack_button == input_field && MOX::_fleet_box_attack_button > 0) {
                     if (!FLEETPOP::Some_Icon_Selected_()) {
                         char local_4b0[200];
                         strlcpy(local_4b0, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(local_4b0));
@@ -3389,17 +3389,17 @@ namespace MAINSCR {
         }
     }
 
-    void __cdecl Draw_Exploding_Plasma_Box_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7)
+    void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, int16_t x_box, int16_t y_box, int16_t width, int16_t height, int16_t mode)
     {
         uint32_t random_seed = game_random::Get_Random_Seed_();
         MOX::_animated_star = 0xFFFF;
 
-        if (param_7 == 2) {
+        if (mode == 2) {
             int16_t node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
             int16_t n_icons = FLEETPOP::N_Fleet_Icons_(node);
             FLEETPOP::Fleet_Box_Data_(n_icons);
-            param_5 = MOX::_fleet_box.width;
-            param_6 = MOX::_fleet_box.height;
+            width = MOX::_fleet_box.width;
+            height = MOX::_fleet_box.height;
         }
 
         int16_t saved_window;
@@ -3408,27 +3408,27 @@ namespace MAINSCR {
         video::Clip_On_();
 
         if (animate::_clipping_flag == 1) {
-            if (param_3 < video::_screen_window_x1) {
-                param_3 = video::_screen_window_x1;
+            if (x_box < video::_screen_window_x1) {
+                x_box = video::_screen_window_x1;
             }
-            if (param_4 < video::_screen_window_y1) {
-                param_4 = video::_screen_window_y1;
+            if (y_box < video::_screen_window_y1) {
+                y_box = video::_screen_window_y1;
             }
-            if (video::_screen_window_x2 < param_5 + param_3) {
-                param_5 = video::_screen_window_x2 - param_3;
+            if (video::_screen_window_x2 < width + x_box) {
+                width = video::_screen_window_x2 - x_box;
             }
-            if (video::_screen_window_y2 < param_6 + param_4) {
-                param_6 = video::_screen_window_y2 - param_4;
+            if (video::_screen_window_y2 < height + y_box) {
+                height = video::_screen_window_y2 - y_box;
             }
         }
 
-        int16_t original_x2 = param_3;
-        int16_t original_y2 = param_4;
+        int16_t original_x2 = x_box;
+        int16_t original_y2 = y_box;
 
         fields::Disable_Draw_All_Fields_();
-        param_5 -= 3;
-        param_6 -= 3;
-        MOVEBOX::N_Moveable_Boxes_Selected_(param_7);
+        width -= 3;
+        height -= 3;
+        MOVEBOX::N_Moveable_Boxes_Selected_(mode);
         video::Set_Page_Off_();
         Draw_Main_Screen_Filled_(1);
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
@@ -3447,36 +3447,36 @@ namespace MAINSCR {
         int16_t dest_x = original_x2;
         int16_t dest_y = original_y2;
 
-        if (param_1 < dest_x) {
-            if (param_2 <= dest_y) {
+        if (x_start < dest_x) {
+            if (y_start <= dest_y) {
                 dest_x += 3;
                 dest_y += 3;
             } else {
-                if (dest_y + param_6 <= 0x1a5) {
-                    dest_y += param_6;
+                if (dest_y + height <= 0x1a5) {
+                    dest_y += height;
                 }
                 dest_y -= 3;
             }
         } else {
-            if (param_2 <= dest_y) {
-                if (dest_x + param_5 <= 0x20f) {
-                    dest_x += param_5;
+            if (y_start <= dest_y) {
+                if (dest_x + width <= 0x20f) {
+                    dest_x += width;
                 }
                 dest_x -= 3;
             } else {
-                if (dest_x + param_5 <= 0x20f) {
-                    dest_x += param_5;
+                if (dest_x + width <= 0x20f) {
+                    dest_x += width;
                 }
-                if (dest_y + param_6 <= 0x1cb) {
-                    dest_y += param_6;
+                if (dest_y + height <= 0x1cb) {
+                    dest_y += height;
                 }
                 dest_x -= 3;
                 dest_y -= 3;
             }
         }
 
-        int16_t step_x = (dest_x - param_1) / 10;
-        int16_t step_y = (dest_y - param_2) / 10;
+        int16_t step_x = (dest_x - x_start) / 10;
+        int16_t step_y = (dest_y - y_start) / 10;
         int16_t accum_x = 0;
         int16_t accum_y = 0;
 
@@ -3484,26 +3484,26 @@ namespace MAINSCR {
             int16_t w_offset;
             int16_t h_offset;
 
-            if (original_x2 <= param_1) {
-                if (param_2 <= original_y2) {
-                    w_offset = (param_5 * i) / -10;
-                    h_offset = (param_6 * i) / 10;
+            if (original_x2 <= x_start) {
+                if (y_start <= original_y2) {
+                    w_offset = (width * i) / -10;
+                    h_offset = (height * i) / 10;
                 } else {
-                    w_offset = (param_5 * i) / -10;
-                    h_offset = (param_6 * i) / -10;
+                    w_offset = (width * i) / -10;
+                    h_offset = (height * i) / -10;
                 }
             } else {
-                if (param_2 <= original_y2) {
-                    w_offset = (param_5 * i) / 10;
-                    h_offset = (param_6 * i) / 10;
+                if (y_start <= original_y2) {
+                    w_offset = (width * i) / 10;
+                    h_offset = (height * i) / 10;
                 } else {
-                    w_offset = (param_5 * i) / 10;
-                    h_offset = (param_6 * i) / -10;
+                    w_offset = (width * i) / 10;
+                    h_offset = (height * i) / -10;
                 }
             }
 
-            int16_t box_x = param_1 + accum_x + w_offset;
-            int16_t box_y = param_2 + accum_y + h_offset;
+            int16_t box_x = x_start + accum_x + w_offset;
+            int16_t box_y = y_start + accum_y + h_offset;
 
             if (box_x < 0x15) {
                 box_x = 0x16;
@@ -3542,15 +3542,15 @@ namespace MAINSCR {
             if (original_y2 < video::_screen_window_y1) {
                 original_y2 = video::_screen_window_y1;
             }
-            if (video::_screen_window_x2 < original_x2 + param_5) {
-                param_5 = video::_screen_window_x2 - original_x2;
+            if (video::_screen_window_x2 < original_x2 + width) {
+                width = video::_screen_window_x2 - original_x2;
             }
-            if (video::_screen_window_y2 < original_y2 + param_6) {
-                param_6 = video::_screen_window_y2 - original_y2;
+            if (video::_screen_window_y2 < original_y2 + height) {
+                height = video::_screen_window_y2 - original_y2;
             }
         }
 
-        line::Plasma_Box_(original_x2, original_y2, (uint16_t)param_5, param_6, 3, color_anim, (uint8_t)unk_color, plasma_color_map);
+        line::Plasma_Box_(original_x2, original_y2, (uint16_t)width, height, 3, color_anim, (uint8_t)unk_color, plasma_color_map);
         RUSS::Mox_Sync_Update_();
         fields::Enable_Draw_All_Fields_();
         MOX::_draw_main_screen_to_back = 1;
@@ -3592,10 +3592,10 @@ namespace MAINSCR {
         MOX::_cur_map_scale = saved_map_scale;
     }
 
-    void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t param_2, uint16_t msg_type, uint32_t len, void* data) {
+    void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t sender_net_id_or_host_id, uint16_t msg_type, uint32_t payload_len, void* payload) {
         switch (msg_type) {
         case NET_PACKET_START_GAME: {
-            s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
+            s_net_pack_start_game* pack = (s_net_pack_start_game*)payload;
             MOX::_NUM_PLAYERS = pack->number_of_players;
             MOX::_settings.random_events = pack->random_events;
             MOX::_settings.game_difficulty = pack->game_difficulty;
@@ -3635,7 +3635,7 @@ namespace MAINSCR {
         }
         case NET_PACKET_PLAYER_SETUP: {
             NETMOX::_net.player_connected_flags[from_player_id] = 1;
-            memcpy(&MOX::_player[from_player_id], data, (uint16_t)len);
+            memcpy(&MOX::_player[from_player_id], payload, (uint16_t)payload_len);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
@@ -3648,25 +3648,25 @@ namespace MAINSCR {
         }
         case NET_PACKET_GAME_DATA_PAYLOAD: {
             allocate::Push_Block_(MOX::_screen_seg);
-            if (len > k_max_game_data_payload_bytes) {
+            if (payload_len > k_max_game_data_payload_bytes) {
                 exitm::Exit_With_Message("game data payload too large");
             }
-            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, len);
-            memcpy(NETMOX::_net.network_data_ptr, data, len);
-            NETMOX::_net.host_election_winner_id = param_2;
+            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, payload_len);
+            memcpy(NETMOX::_net.network_data_ptr, payload, payload_len);
+            NETMOX::_net.host_election_winner_id = sender_net_id_or_host_id;
             NETTURN::Net_Init_Host_Election_();
-            NETMOX::_net.total_bytes_received = len;
+            NETMOX::_net.total_bytes_received = payload_len;
             break;
         }
         case NET_PACKET_GAME_ORDERS_PAYLOAD: {
-            if (data == nullptr || len == 0 || len > k_max_game_data_payload_bytes) {
+            if (payload == nullptr || payload_len == 0 || payload_len > k_max_game_data_payload_bytes) {
                 exitm::Exit_With_Message("game orders payload invalid");
             }
 
             allocate::Push_Block_(MOX::_screen_seg);
-            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, len);
-            memcpy(NETMOX::_net.network_data_ptr, data, len);
-            NETMOX::_net.total_bytes_received = len;
+            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, payload_len);
+            memcpy(NETMOX::_net.network_data_ptr, payload, payload_len);
+            NETMOX::_net.total_bytes_received = payload_len;
             NETMOX::_net.host_sync_counter++;
             if ((uint8_t)NETMOX::_net.host_sync_counter == MOX::_NUM_PLAYERS) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_BEGIN_TURN;
@@ -3677,8 +3677,8 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_HOST_ELECTION_RANK: {
-            int8_t rank = *(int8_t*)data;
-            int8_t hit_next = *(int8_t*)((uint8_t*)data + 4);
+            int8_t rank = *(int8_t*)payload;
+            int8_t hit_next = *(int8_t*)((uint8_t*)payload + 4);
             NETMOX::_net.host_election_player_rank[from_player_id] = rank;
             NETMOX::_net.players_hit_next_turn[from_player_id] = hit_next;
 
@@ -3689,7 +3689,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_AI_DIPLOMACY_REQUEST: {
-            int8_t remote_id = *(int8_t*)data;
+            int8_t remote_id = *(int8_t*)payload;
             NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id = remote_id;
             NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_AI_DIPLOMACY_REQUESTED;
 
@@ -3736,7 +3736,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_AI_DIPLOMACY_END_STATE: {
-            s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)data;
+            s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)payload;
             int8_t remote_id = NETMOX::_net.player_net_info[from_player_id].diplomacy_target_id;
 
             memcpy(&MOX::_player[remote_id], &pack->target_player, sizeof(s_player));
@@ -3777,11 +3777,11 @@ namespace MAINSCR {
         }
         case NET_PACKET_PICK_TARGET_INFO: {
             NETMOX::_net.sync_state = NET_SYNC_STATE_PICKING_COMBAT_TARGET;
-            NETMOX::Decode_Pick_Target_Info_(data, len);
+            NETMOX::Decode_Pick_Target_Info_(payload, payload_len);
             break;
         }
         case NET_PACKET_COMBAT_TARGET_CHOSEN: {
-            const s_case11_packet* packet = (const s_case11_packet*)data;
+            const s_case11_packet* packet = (const s_case11_packet*)payload;
             NETMOX::_net.player_net_info[from_player_id].combat_defender_id = packet->sync_star_id;
             NETMOX::_net.player_net_info[from_player_id].combat_planet_id = packet->sync_planet_id;
             NETMOX::_net.player_net_info[from_player_id].combat_target_player_id = packet->sync_colony_id;
@@ -3789,7 +3789,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_YOU_ARE_TARGET_INFO: {
-            NETMOX::Decode_You_Are_Target_Info_(data, len);
+            NETMOX::Decode_You_Are_Target_Info_(payload, payload_len);
             break;
         }
         case NET_PACKET_COMBAT_EXECUTE: {
@@ -3809,12 +3809,12 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_BATTLE_RESULTS: {
-            NETMOX::Decode_Battle_Results_(data, len);
+            NETMOX::Decode_Battle_Results_(payload, payload_len);
             break;
         }
         case NET_PACKET_STRATEGIC_BATTLE_RESULTS:
         case NET_PACKET_STRATEGIC_RESULTS_READY: {
-            memcpy(NETMOX::_net.combat_results_data, data, sizeof(s_battle_results)); // 1742 bytes copied
+            memcpy(NETMOX::_net.combat_results_data, payload, sizeof(s_battle_results)); // 1742 bytes copied
             if (msg_type == NET_PACKET_STRATEGIC_BATTLE_RESULTS) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_RESULTS_DISPLAY;
             }
@@ -3838,7 +3838,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_REQUEST_HUMAN_DIPLOMACY: {
-            s_net_pack_req_human_diplomacy* pack = (s_net_pack_req_human_diplomacy*)data;
+            s_net_pack_req_human_diplomacy* pack = (s_net_pack_req_human_diplomacy*)payload;
             if (NETMOX::_net.players_hit_next_turn[MOX::_PLAYER_NUM] == 0) {
                 memcpy(&MOX::_player[from_player_id], &pack->player, sizeof(s_player));
 
@@ -3866,7 +3866,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_ACCEPT_HUMAN_DIPLOMACY: {
-            memcpy(&MOX::_player[from_player_id], data, sizeof(s_player));
+            memcpy(&MOX::_player[from_player_id], payload, sizeof(s_player));
 
             if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_REQUESTED && NETMOX::_net.diplomacy_target_id == from_player_id) {
                 uint8_t mask = ~(1 << (from_player_id & 0x1F));
@@ -3914,19 +3914,19 @@ namespace MAINSCR {
         }
         case NET_PACKET_PICK_YOUR_POSITION: {
             NETMOX::_net.sync_state = NET_SYNC_STATE_CLIENT_PICK_POSITION;
-            NETMOX::_net.host_election_id = param_2;
-            NETMOX::Decode_Pick_Your_Position_((s_net_pack_pick_your_position*)data, (uint16_t)len);
+            NETMOX::_net.host_election_id = sender_net_id_or_host_id;
+            NETMOX::Decode_Pick_Your_Position_((s_net_pack_pick_your_position*)payload, (uint16_t)payload_len);
             break;
         }
         case NET_PACKET_PICK_YOUR_POSITION_RESULT: {
             int32_t target_id;
-            memcpy(&target_id, data, sizeof(target_id));
-            MOX::_player[target_id].network_player_id = param_2;
+            memcpy(&target_id, payload, sizeof(target_id));
+            MOX::_player[target_id].network_player_id = sender_net_id_or_host_id;
             NETMOX::_net.joining_net_id = -1;
             break;
         }
         case NET_PACKET_SYNC_PLAYER_STATE: {
-            s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)data;
+            s_net_pack_end_ai_diplomacy* pack = (s_net_pack_end_ai_diplomacy*)payload;
             int target_id = pack->target_player_id;
 
             memcpy(&MOX::_player[target_id], &pack->target_player, sizeof(s_player));
@@ -3939,7 +3939,7 @@ namespace MAINSCR {
         }
         case NET_PACKET_DRAGON_INFO: {
             NETMOX::_net.sync_state = NET_SYNC_STATE_DRAGON_BRIBE_PROMPT;
-            NETMOX::Decode_Dragon_Info_((int32_t*)data, (uint16_t)len);
+            NETMOX::Decode_Dragon_Info_((int32_t*)payload, (uint16_t)payload_len);
             break;
         }
         case NET_PACKET_DRAGON_NO_BRIBE: {
@@ -3947,7 +3947,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_DRAGON_BRIBE_DESTINATION: {
-            NETMOX::_net.field168_0x209 = *(uint8_t*)data;
+            NETMOX::_net.field168_0x209 = *(uint8_t*)payload;
             NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_DRAGON_BRIBE_DESTINATION;
             break;
         }
@@ -3959,12 +3959,12 @@ namespace MAINSCR {
         }
         case NET_PACKET_CHAT: {
             if (CHAT::_chat_info != nullptr) {
-                CHAT::Receive_Chat_Msg_(from_player_id, (char*)data);
+                CHAT::Receive_Chat_Msg_(from_player_id, (char*)payload);
             }
             break;
         }
         case NET_PACKET_LOAD_GAME_START: {
-            s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
+            s_net_pack_start_game* pack = (s_net_pack_start_game*)payload;
             if (strcmp(pack->version_string, GAME_BUILD_DATE) != 0) {
                 char error_msg[256];
                 snprintf(error_msg, sizeof(error_msg), NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
@@ -3980,14 +3980,14 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_PLAYER_COLOR_SELECTED: {
-            uint8_t color_idx = *(uint8_t*)data;
-            uint8_t player_idx = *(uint8_t*)((uint8_t*)data + 1);
+            uint8_t color_idx = *(uint8_t*)payload;
+            uint8_t player_idx = *(uint8_t*)((uint8_t*)payload + 1);
             RACESEL::_color_flag[color_idx] = 1;
             MOX::_player[player_idx].color = color_idx;
             break;
         }
         case NET_PACKET_REQUEST_PLAYER_COLOR: {
-            uint8_t color_idx = *(uint8_t*)data;
+            uint8_t color_idx = *(uint8_t*)payload;
             if (RACESEL::_color_flag[color_idx] == 0) {
                 RACESEL::_color_flag[color_idx] = 1;
                 MOX::_player[from_player_id].color = color_idx;
@@ -3997,7 +3997,7 @@ namespace MAINSCR {
         }
         case NET_PACKET_GNN_CHAT: {
             if (CHAT::_chat_info != nullptr) {
-                CHAT::Receive_Chat_Msg_(8, (char*)data);
+                CHAT::Receive_Chat_Msg_(8, (char*)payload);
             }
             break;
         }
@@ -4007,25 +4007,25 @@ namespace MAINSCR {
         }
         case NET_PACKET_PLAYER_ABDICATED:
         case NET_PACKET_PLAYER_SURRENDERED: {
-            NETMOX::Decode_Drop_Out_Info_(from_player_id, (s_net_pack_drop_out_info*)data);
+            NETMOX::Decode_Drop_Out_Info_(from_player_id, (s_net_pack_drop_out_info*)payload);
             break;
         }
         case NET_PACKET_PLAYER_DISCONNECTED: {
-            NETMOX::Decode_Player_Disconnected_Info_(data, len);
+            NETMOX::Decode_Player_Disconnected_Info_(payload, payload_len);
             break;
         }
         case NET_PACKET_PLAYER_RACE_SELECTED: {
             if (NETMOX::_net.host_election_id == NETMOX::_net.net_host_id) {
                 exitm::Exit_With_Message(NETMOX::_only_1_host_allowed_error);
             }
-            uint8_t race_idx = *(uint8_t*)data;
-            uint8_t player_idx = *(uint8_t*)((uint8_t*)data + 1);
+            uint8_t race_idx = *(uint8_t*)payload;
+            uint8_t player_idx = *(uint8_t*)((uint8_t*)payload + 1);
             RACESEL::_race_flag[race_idx] = 1;
             MOX::_player[player_idx].race = race_idx;
             break;
         }
         case NET_PACKET_REQUEST_PLAYER_RACE: {
-            uint8_t race_idx = *(uint8_t*)data;
+            uint8_t race_idx = *(uint8_t*)payload;
             if (RACESEL::_race_flag[race_idx] == 0) {
                 RACESEL::_race_flag[race_idx] = 1;
                 MOX::_player[from_player_id].race = race_idx;
@@ -4039,18 +4039,18 @@ namespace MAINSCR {
         }
         case NET_PACKET_MONSTER_UPDATE: {
             s_net_pack_monster_update monster_update;
-            memcpy(&monster_update, data, sizeof(monster_update));
+            memcpy(&monster_update, payload, sizeof(monster_update));
             EVENTS::Event_Monster_Update_((int16_t)monster_update.param_1, (int16_t)monster_update.param_2,
                                           (int16_t)monster_update.param_3);
             break;
         }
         case NET_PACKET_PLAYER_RACE_DESELECTED: {
-            uint8_t race_idx = *(uint8_t*)data;
+            uint8_t race_idx = *(uint8_t*)payload;
             RACESEL::_race_flag[race_idx] = 0;
             break;
         }
         case NET_PACKET_PLAYER_RACE_DESELECT_REQUEST: {
-            uint8_t race_idx = *(uint8_t*)data;
+            uint8_t race_idx = *(uint8_t*)payload;
             RACESEL::_race_flag[race_idx] = 0;
             NETMOX::_net.player_race_deselected_flags[from_player_id] = 1;
             break;
@@ -4068,20 +4068,20 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_NETWORK_SYNC_STATUS: {
-            if (*(int32_t*)data == 0) {
+            if (*(int32_t*)payload == 0) {
                 NETMOX::_net.network_sync_complete_flag = 0;
             }
             break;
         }
         case NET_PACKET_CHANGE_RELATIONS: {
             int16_t relation_params[6];
-            memcpy(relation_params, data, sizeof(relation_params));
+            memcpy(relation_params, payload, sizeof(relation_params));
             diplomac::Change_Relations_(relation_params[0], relation_params[1], relation_params[2],
                                         relation_params[3], relation_params[4], relation_params[5]);
             break;
         }
         case NET_PACKET_HUMAN_DIPLOMACY_READY_DATA: {
-            memcpy(&MOX::_player[from_player_id], data, sizeof(s_player));
+            memcpy(&MOX::_player[from_player_id], payload, sizeof(s_player));
             if (NETMOX::_net.sync_state == NET_SYNC_STATE_HUMAN_DIPLOMACY_CONNECTING && NETMOX::_net.diplomacy_target_id == from_player_id) {
                 uint8_t mask = ~(1 << (from_player_id & 0x1F));
                 NETMOX::_net.sync_state = NET_SYNC_STATE_HUMAN_DIPLOMACY_READY;
@@ -4092,7 +4092,7 @@ namespace MAINSCR {
         }
         case NET_PACKET_DECLARE_WAR: {
             int32_t target_player_id;
-            memcpy(&target_player_id, data, sizeof(target_player_id));
+            memcpy(&target_player_id, payload, sizeof(target_player_id));
             diplomac::Declare_War_((int16_t)from_player_id, (int16_t)target_player_id);
             break;
         }

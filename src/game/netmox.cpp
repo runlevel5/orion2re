@@ -2159,7 +2159,7 @@ namespace NETMOX {
     void __cdecl Send_You_Are_Target_Info_(
         int16_t target_player_idx,
         int16_t other_player_idx,
-        int16_t param_3,
+        int16_t defender_id,
         int16_t colony_idx,
         int16_t star_idx)
     {
@@ -2172,7 +2172,7 @@ namespace NETMOX {
 
         writer.Write_Int16_(star_idx);
         writer.Write_Int16_(other_player_idx);
-        writer.Write_Int16_(param_3);
+        writer.Write_Int16_(defender_id);
         writer.Write_Int16_(colony_idx);
 
         if (MOX::_player[target_player_idx].network_player_id != _net.local_net_id) {

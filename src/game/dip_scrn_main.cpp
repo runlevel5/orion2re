@@ -460,10 +460,10 @@ namespace DIP_SCRN {
         }
     }
 
-    void __cdecl Diplomacy_Mouse_Init_(int16_t param_1) {
+    void __cdecl Diplomacy_Mouse_Init_(int16_t ambassador_player_id) {
         _diplomacy_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x395);
         s_animation_header* diplomat_anim = (s_animation_header*)
-            farload::Far_Reload_Next_("DIPLOMAT.LBX", (int)MOX::_player[param_1].race, MOX::_screen_seg);
+            farload::Far_Reload_Next_("DIPLOMAT.LBX", (int)MOX::_player[ambassador_player_id].race, MOX::_screen_seg);
 
         bitmap::Clear_Mouse_Image_(0);
         bitmap::Create_Blank_Bitmap_(30, 30, _diplomacy_mouse_bitmap);
@@ -546,7 +546,7 @@ namespace DIP_SCRN {
         Load_Diplomacy_Text_Messages_();
 
         _diplomacy_current_music = -1;
-        _diplomacy_good_music = (int16_t)MOX::_player[param_1].race + 1;
+        _diplomacy_good_music = (int16_t)MOX::_player[ambassador_player_id].race + 1;
         _diplomacy_bad_music = (int16_t)game_random::Random_(3) + 13;
     }
 
@@ -565,8 +565,8 @@ namespace DIP_SCRN {
         }
     }
 
-    void __cdecl Get_Diplomacy_Statement_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4) {
-        param_4[0] = '\0';
+    void __cdecl Get_Diplomacy_Statement_(int16_t statement_id, int16_t speaker_player_id, int16_t listener_player_id, char* out_text) {
+        out_text[0] = '\0';
 
         char filename[16];
         switch (MOX::_settings.language) {
@@ -580,16 +580,16 @@ namespace DIP_SCRN {
         }
 
         bool add_framed = false;
-        if (param_1 == 0x14 || param_1 == 0x16 || param_1 == 0x1D || param_1 == 0x1F ||
-            param_1 == 0x28 || param_1 == 0x2A || param_1 == 0x31 || param_1 == 0x33 ||
-            param_1 == 0x3A || param_1 == 0x3C || param_1 == 0x48 || param_1 == 0x4A ||
-            param_1 == 0x8F || param_1 == 0x91) {
+        if (statement_id == 0x14 || statement_id == 0x16 || statement_id == 0x1D || statement_id == 0x1F ||
+            statement_id == 0x28 || statement_id == 0x2A || statement_id == 0x31 || statement_id == 0x33 ||
+            statement_id == 0x3A || statement_id == 0x3C || statement_id == 0x48 || statement_id == 0x4A ||
+            statement_id == 0x8F || statement_id == 0x91) {
             add_framed = true;
         }
 
-        int file_msg_id = param_1;
-        if (add_framed || param_1 == 0x6A) {
-            file_msg_id = param_1 - 1;
+        int file_msg_id = statement_id;
+        if (add_framed || statement_id == 0x6A) {
+            file_msg_id = statement_id - 1;
         }
 
         uint8_t buf[5202];
@@ -603,61 +603,61 @@ namespace DIP_SCRN {
         for (int i = 0; record[i] != '\0'; ++i) {
             uint8_t c = record[i];
             if (c < 0x80 || c > 0x95) {
-                param_4[out_idx++] = c;
+                out_text[out_idx++] = c;
                 continue;
             }
 
-            param_4[out_idx] = '\0';
+            out_text[out_idx] = '\0';
             const char* replacement = nullptr;
             char temp_buf[64];
 
             switch (c) {
             case 0x80:
-                replacement = MOX::_player[param_2].name;
+                replacement = MOX::_player[speaker_player_id].name;
                 break;
             case 0x81:
-                replacement = MOX::_player[param_2].race_name;
+                replacement = MOX::_player[speaker_player_id].race_name;
                 break;
             case 0x82:
-                replacement = MOX::_player[param_3].race_name;
+                replacement = MOX::_player[listener_player_id].race_name;
                 break;
             case 0x83:
-                replacement = MOX::_player[param_3].name;
+                replacement = MOX::_player[listener_player_id].name;
                 break;
             case 0x84:
-                replacement = An_(MOX::_player[param_2].race_name);
+                replacement = An_(MOX::_player[speaker_player_id].race_name);
                 break;
             case 0x85:
-                replacement = An_(MOX::_player[param_3].race_name);
+                replacement = An_(MOX::_player[listener_player_id].race_name);
                 break;
             case 0x86:
-                replacement = MOX::_star[MOX::_player[param_3].diplomacy_system[param_2]].name;
+                replacement = MOX::_star[MOX::_player[listener_player_id].diplomacy_system[speaker_player_id]].name;
                 break;
             case 0x87:
             case 0x88:
-                replacement = MOX::_player[MOX::_player[param_3].diplomacy_proposal_war_player[param_2]].race_name;
+                replacement = MOX::_player[MOX::_player[listener_player_id].diplomacy_proposal_war_player[speaker_player_id]].race_name;
                 break;
             case 0x89:
-                replacement = TECH::Technology_Applications_Name_(MOX::_player[param_3].diplomacy_proposal_exchange_tech[param_2], param_3);
+                replacement = TECH::Technology_Applications_Name_(MOX::_player[listener_player_id].diplomacy_proposal_exchange_tech[speaker_player_id], listener_player_id);
                 break;
             case 0x8A: {
-                int treaty = MOX::_player[param_3].treaty[param_2];
+                int treaty = MOX::_player[listener_player_id].treaty[speaker_player_id];
                 if (treaty == 1 || treaty == 2) {
                     replacement = MOX::_treaty_labels[treaty];
                 }
-                else if (MOX::_player[param_3].trade_treaty[param_2] != 0) {
+                else if (MOX::_player[listener_player_id].trade_treaty[speaker_player_id] != 0) {
                     replacement = _statement_trade_treaty_buffer;
                 }
-                else if (MOX::_player[param_3].research_treaty[param_2] != 0) {
+                else if (MOX::_player[listener_player_id].research_treaty[speaker_player_id] != 0) {
                     replacement = _statement_research_treaty_buffer;
                 }
                 break;
             }
             case 0x8B:
-                replacement = MOX::_player[MOX::_player[param_3].diplomacy_proposal_war_player[param_2]].name;
+                replacement = MOX::_player[MOX::_player[listener_player_id].diplomacy_proposal_war_player[speaker_player_id]].name;
                 break;
             case 0x8C: {
-                int gift = MOX::_player[param_3].last_gift[param_2];
+                int gift = MOX::_player[listener_player_id].last_gift[speaker_player_id];
                 if (gift >= 1 && gift <= 4) {
                     JIM::Get_Text_Message_(s_jimtext2_lbx, 0x4A + gift, temp_buf, 40);
                     replacement = temp_buf;
@@ -668,7 +668,7 @@ namespace DIP_SCRN {
                 break;
             }
             case 0x8D:
-                replacement = TECHDATA::_buildings[MOX::_player[param_3].diplomacy_value[param_2]].name;
+                replacement = TECHDATA::_buildings[MOX::_player[listener_player_id].diplomacy_value[speaker_player_id]].name;
                 break;
             case 0x8E:
                 if (MOX::_settings.language == 0) {
@@ -683,34 +683,34 @@ namespace DIP_SCRN {
                 break;
             case 0x90:
             case 0x95:
-                if (MOX::_player[param_3].diplomacy_proposal_tribute_bribe[param_2] == 0) {
-                    if (MOX::_player[param_3].diplomacy_proposal_tech_bribe1[param_2] != 0) {
-                        replacement = TECH::Technology_Applications_Name_(MOX::_player[param_3].diplomacy_proposal_tech_bribe1[param_2], param_3);
+                if (MOX::_player[listener_player_id].diplomacy_proposal_tribute_bribe[speaker_player_id] == 0) {
+                    if (MOX::_player[listener_player_id].diplomacy_proposal_tech_bribe1[speaker_player_id] != 0) {
+                        replacement = TECH::Technology_Applications_Name_(MOX::_player[listener_player_id].diplomacy_proposal_tech_bribe1[speaker_player_id], listener_player_id);
                     }
-                    else if (MOX::_player[param_3].diplomacy_proposal_gold_bribe[param_2] == 0) {
-                        if (MOX::_player[param_3].diplomacy_proposal_system_bribe[param_2] != -1) {
+                    else if (MOX::_player[listener_player_id].diplomacy_proposal_gold_bribe[speaker_player_id] == 0) {
+                        if (MOX::_player[listener_player_id].diplomacy_proposal_system_bribe[speaker_player_id] != -1) {
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 0x3A, temp_buf, 50);
-                            JIM::Decode_Text_System_(temp_buf, MOX::_player[param_3].diplomacy_proposal_system_bribe[param_2], 50);
+                            JIM::Decode_Text_System_(temp_buf, MOX::_player[listener_player_id].diplomacy_proposal_system_bribe[speaker_player_id], 50);
                             replacement = temp_buf;
                         }
                     }
                     else {
-                        snprintf(temp_buf, sizeof(temp_buf), s_fmt_BC, MOX::_player[param_3].diplomacy_proposal_gold_bribe[param_2]);
+                        snprintf(temp_buf, sizeof(temp_buf), s_fmt_BC, MOX::_player[listener_player_id].diplomacy_proposal_gold_bribe[speaker_player_id]);
                         replacement = temp_buf;
                     }
                 }
                 else {
                     strlcpy(temp_buf, _percent_tribute_treaty_buffer, sizeof(temp_buf));
-                    int stat_val = (MOX::_player[param_3].diplomacy_proposal_tribute_bribe[param_2] == 1) ? 5 : 10;
+                    int stat_val = (MOX::_player[listener_player_id].diplomacy_proposal_tribute_bribe[speaker_player_id] == 1) ? 5 : 10;
                     JIM::Decode_Text_Stat_(temp_buf, stat_val, 40);
                     replacement = temp_buf;
                 }
                 break;
             case 0x91:
-                replacement = MOX::_player[MOX::_player[param_3].diplomacy_proposal_war_player[param_2]].race_name;
+                replacement = MOX::_player[MOX::_player[listener_player_id].diplomacy_proposal_war_player[speaker_player_id]].race_name;
                 break;
             case 0x92: {
-                int broken = MOX::_player[param_3].last_broken_treaty[param_2];
+                int broken = MOX::_player[listener_player_id].last_broken_treaty[speaker_player_id];
                 if (broken == 7) {
                     replacement = _statement_trade_treaty_buffer;
                 }
@@ -723,23 +723,23 @@ namespace DIP_SCRN {
                 break;
             }
             case 0x93:
-                replacement = MOX::_star[MOX::_player[param_3].diplomacy_system[param_2]].name;
+                replacement = MOX::_star[MOX::_player[listener_player_id].diplomacy_system[speaker_player_id]].name;
                 break;
             case 0x94:
-                replacement = MOX::_player[MOX::_player[param_3].trust_breaker_player[param_2]].race_name;
+                replacement = MOX::_player[MOX::_player[listener_player_id].trust_breaker_player[speaker_player_id]].race_name;
                 break;
             }
 
             if (replacement) {
-                strcpy(param_4 + out_idx, replacement);
+                strcpy(out_text + out_idx, replacement);
                 out_idx += static_cast<int>(strlen(replacement));
             }
         }
 
-        param_4[out_idx] = '\0';
+        out_text[out_idx] = '\0';
 
         if (add_framed) {
-            strcat(param_4, _you_were_framed_buffer);
+            strcat(out_text, _you_were_framed_buffer);
         }
 
         Start_Diplomacy_Music_(buf[0]);
@@ -2140,7 +2140,7 @@ namespace DIP_SCRN {
         }
     }
 
-    void __cdecl Get_Main_Repulsive_Diplomacy_Choices_(int16_t param_1, int16_t param_2, int8_t param_3) {
+    void __cdecl Get_Main_Repulsive_Diplomacy_Choices_(int16_t speaker_player_id, int16_t listener_player_id, int8_t net_mode) {
         int16_t done = 0;
 
         while (true) {
@@ -2151,7 +2151,7 @@ namespace DIP_SCRN {
             flags[3] = 1;
             flags[4] = 1;
 
-            if (MOX::_player[param_1].treaty[param_2] < 4) {
+            if (MOX::_player[speaker_player_id].treaty[listener_player_id] < 4) {
                 flags[0] = 0;
             }
             else {
@@ -2159,11 +2159,11 @@ namespace DIP_SCRN {
             }
 
             flags[2] = 0;
-            if (COLCALC::May_Surrender_Empire_(param_1, param_2)) {
+            if (COLCALC::May_Surrender_Empire_(speaker_player_id, listener_player_id)) {
                 flags[2] = 1;
             }
 
-            if (param_3 == 0 && diplomac::Find_Worst_Modifier_(param_1, param_2) < -99) {
+            if (net_mode == 0 && diplomac::Find_Worst_Modifier_(speaker_player_id, listener_player_id) < -99) {
                 if (_old_response_message != _response_message) {
                     Diplomacy_Display_Response_();
                 }
@@ -2187,7 +2187,7 @@ namespace DIP_SCRN {
                 int16_t list_size = 0;
                 int16_t* help_entry = nullptr;
 
-                if (param_3 == 1) {
+                if (net_mode == 1) {
                     for (int i = 0; i < 6; ++i) {
                         strlcpy(_diplomacy_list_choice[i], _main_net_repulsive_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
                     }
@@ -2215,7 +2215,7 @@ namespace DIP_SCRN {
                     0x11, nullptr, 0, nullptr, 0, 0
                 );
 
-                if (param_3 == 1 && choice == 3) {
+                if (net_mode == 1 && choice == 3) {
                     choice = 5;
                 }
 
@@ -2223,28 +2223,28 @@ namespace DIP_SCRN {
                 case 0: {
                     *_diplomacy_message = s_empty_string_00551100[0];
                     _old_response_message = -1;
-                    int16_t proposal = Diplomacy_Determine_Treaty_Proposal_(param_1, param_2, 3);
-                    diplomac::Adjust_Diplomat_Modifiers_(param_1, param_2);
+                    int16_t proposal = Diplomacy_Determine_Treaty_Proposal_(speaker_player_id, listener_player_id, 3);
+                    diplomac::Adjust_Diplomat_Modifiers_(speaker_player_id, listener_player_id);
                     if (proposal == 1) {
-                        diplomac::Declare_Peace_(param_1, param_2);
+                        diplomac::Declare_Peace_(speaker_player_id, listener_player_id);
                     }
                     break;
                 }
                 case 1:
-                    if (Diplomacy_Declare_War_Resolution_(param_1, param_2) == 1) {
+                    if (Diplomacy_Declare_War_Resolution_(speaker_player_id, listener_player_id) == 1) {
                         done = 1;
                         Diplomacy_Display_Response_();
                         _net_diplomacy_esc_pressed = 1;
                     }
                     break;
                 case 2:
-                    if (Diplomacy_Surrender_(param_1, param_2) == 1) {
+                    if (Diplomacy_Surrender_(speaker_player_id, listener_player_id) == 1) {
                         done = 1;
                         _net_diplomacy_esc_pressed = 1;
                     }
                     break;
                 case 5:
-                    Diplomacy_Main_Net_Chat_(param_2, param_1);
+                    Diplomacy_Main_Net_Chat_(listener_player_id, speaker_player_id);
                     if (_net_diplomacy_esc_pressed == 1) {
                         done = 1;
                     }
@@ -2253,15 +2253,15 @@ namespace DIP_SCRN {
                 case 3:
                 case 4:
                     done = 1;
-                    if (param_3 == 1) {
-                        _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(param_1);
-                        _net_diplomacy_message.target_player_id = static_cast<uint8_t>(param_2);
+                    if (net_mode == 1) {
+                        _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(speaker_player_id);
+                        _net_diplomacy_message.target_player_id = static_cast<uint8_t>(listener_player_id);
                         _net_diplomacy_esc_pressed = 1;
                         _net_diplomacy_message.arg2 = -1;
                         _net_diplomacy_message.msg_type = 0x82;
 
                         NETMOX::Mox_Send_Message_(
-                            MOX::_player[param_1].network_player_id, DIP_NET_PACKET_MESSAGE,
+                            MOX::_player[speaker_player_id].network_player_id, DIP_NET_PACKET_MESSAGE,
                             (uint8_t*)&_net_diplomacy_message, 8
                         );
                         RUSS::Mox_Update_();

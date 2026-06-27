@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace netcode {
+    uint32_t _thisHost;
     uint32_t _netInitialized;
     int8_t _tpSending;
     uint8_t _inComms;
@@ -323,7 +324,7 @@ namespace netcode {
             return 0;
         }
 
-        net::_thisHost = netadapter::Local_Network_Id(&_router_adapter);
+        _thisHost = netadapter::Local_Network_Id(&_router_adapter);
 
         _netInitialized = 1;
         return 1;
@@ -358,7 +359,7 @@ namespace netcode {
         if (Is_Router_Mode_((uint32_t)_connection_type)) {
             return netadapter::Local_Network_Id(&_router_adapter);
         }
-        return net::_thisHost;
+        return _thisHost;
     }
 
     void __cdecl Net_Update_() {
@@ -412,7 +413,7 @@ namespace netcode {
             return 0;
         }
 
-        net::_thisHost = netadapter::Local_Network_Id(&_router_adapter);
+        _thisHost = netadapter::Local_Network_Id(&_router_adapter);
 
         _netInitialized = 1;
         return 1;

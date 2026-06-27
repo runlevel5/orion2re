@@ -3,7 +3,7 @@
 namespace FLT1 {
     void __cdecl Draw_Box_Around_Scanned_Ship_(int16_t icon_idx);
 
-    void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t param_1);
+    void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t screen_id);
 
     /** Draws fleet relocation lines for the requested fleet-screen layout.
      * @param screen_id Fleet-screen layout identifier used to choose the map viewport.

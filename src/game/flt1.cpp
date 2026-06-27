@@ -44,12 +44,12 @@ namespace FLT1 {
         scroll_bar->thumb_center_y = scroll_bar->track_len_px - (scroll_height / 2);
     }
 
-    void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t param_1) {
+    void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t screen_id) {
         int16_t damage_width;
         int16_t damage_y_off;
         int16_t damage_x_off;
 
-        if (param_1 == 0x1d) {
+        if (screen_id == 0x1d) {
             damage_width = 3;
             damage_y_off = 0x39;
             damage_x_off = 0x39;
