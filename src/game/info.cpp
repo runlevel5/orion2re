@@ -350,49 +350,49 @@ namespace INFO {
                 char local_40[64];
                 char local_80[64];
 
-                strcpy(local_40, "^ ");
+                strlcpy(local_40, "^ ", sizeof(local_40));
 
                 if (trait_idx == TRAIT_CURRENT_GOVERNMENT) {
-                    strcat(local_40, MOX::_government_labels[trait_val]);
+                    strlcat(local_40, MOX::_government_labels[trait_val], sizeof(local_40));
                 } else if (trait_idx == TRAIT_RICH_HOME_WORLD) {
                     if (trait_val < 0) {
-                        strcat(local_40, MOX::_special_ability_names[31]);
+                        strlcat(local_40, MOX::_special_ability_names[31], sizeof(local_40));
                     } else {
-                        strcat(local_40, MOX::_special_ability_names[15]);
+                        strlcat(local_40, MOX::_special_ability_names[15], sizeof(local_40));
                     }
                 } else {
-                    strcat(local_40, MOX::_special_ability_names[trait_idx]);
+                    strlcat(local_40, MOX::_special_ability_names[trait_idx], sizeof(local_40));
                 }
 
                 char* print_str = local_40;
 
                 if (trait_idx > TRAIT_CURRENT_GOVERNMENT && trait_idx < TRAIT_LOW_G_WORLD) {
                     if (trait_idx == TRAIT_FOOD_BONUS) {
-                        strcpy(local_80, local_40);
+                        strlcpy(local_80, local_40, sizeof(local_80));
                         if (trait_val < 0) {
-                            strcat(local_80, "-0.5");
+                            strlcat(local_80, "-0.5", sizeof(local_80));
                         } else if (trait_val == 2) {
-                            strcat(local_80, "+1");
+                            strlcat(local_80, "+1", sizeof(local_80));
                         } else {
-                            strcat(local_80, "+2");
+                            strlcat(local_80, "+2", sizeof(local_80));
                         }
                         print_str = local_80;
                     } else if (trait_idx == TRAIT_TAX_BONUS) {
-                        strcpy(local_80, local_40);
+                        strlcpy(local_80, local_40, sizeof(local_80));
                         if (trait_val < 0) {
-                            strcat(local_80, "-");
+                            strlcat(local_80, "-", sizeof(local_80));
                         } else {
-                            strcat(local_80, "+");
+                            strlcat(local_80, "+", sizeof(local_80));
                         }
 
                         if (trait_val == 2) {
-                            strcat(local_80, "1 BC");
+                            strlcat(local_80, "1 BC", sizeof(local_80));
                         } else {
-                            strcat(local_80, "0.5 BC");
+                            strlcat(local_80, "0.5 BC", sizeof(local_80));
                         }
                         print_str = local_80;
                     } else {
-                        sprintf(local_80, "%s%+i", local_40, (int)trait_val);
+                        snprintf(local_80, sizeof(local_80), "%s%+i", local_40, (int)trait_val);
                         print_str = local_80;
                     }
                 }
@@ -576,7 +576,7 @@ namespace INFO {
         int16_t field_counter = fields::Get_Field_Counter_();
 
         const char* format = (MOX::_settings.language == 0) ? "%i.%i" : "%i,%i";
-        sprintf(stardate_str, format, (int)(MOX::_stardate / 10), (int)(MOX::_stardate % 10));
+        snprintf(stardate_str, sizeof(stardate_str), format, (int)(MOX::_stardate / 10), (int)(MOX::_stardate % 10));
 
         _race_statistics_page = 1;
         int16_t input_field = 0;
@@ -695,9 +695,9 @@ namespace INFO {
             fonts::Set_Font_Style_(2, INFO::PTR__orange_text_colors[i]);
 
             if (i == 0) {
-                sprintf(buffer, "%i", (int)MOX::_cur_plyr_ptr->bc_produced);
+                snprintf(buffer, sizeof(buffer), "%i", (int)MOX::_cur_plyr_ptr->bc_produced);
                 JIM::Get_Text_Message_("billtext.lbx", 19, lbx_msg, 40);
-                strcat(buffer, lbx_msg);
+                strlcat(buffer, lbx_msg, sizeof(buffer));
 
                 if (fonts::Get_String_Width_(buffer) > 126) {
                     fonts::Set_Font_Spacing_(1);
@@ -706,7 +706,7 @@ namespace INFO {
                 fonts::Print_Centered_To_Bitmap_(92, 3, buffer, label);
                 fonts::_font_header.font_style_spacing = fonts::_font_header.font_spacing[2];
             } else {
-                sprintf(buffer, "%3i%%", (int)values[i]);
+                snprintf(buffer, sizeof(buffer), "%3i%%", (int)values[i]);
                 fonts::Print_To_Bitmap_(27, 3, buffer, label);
 
                 s_colors text_colors;
@@ -1006,7 +1006,7 @@ namespace INFO {
 
         Draw_Drop_Area_(INFO::_category_drops);
         JIM::Get_Text_Message_("billtext.lbx", 12 /* BILL_MSG_CATEGORY_HEADER */, header_text, 80);
-        strcat(header_text, MOX::_help_category_labels[INFO::_g_reference_ix]);
+        strlcat(header_text, MOX::_help_category_labels[INFO::_g_reference_ix], sizeof(header_text));
         fonts::Print_Centered_(416, 67, header_text);
 
         INFO::_g_category_header.items = items;
@@ -1022,7 +1022,7 @@ namespace INFO {
             s_help_topic_record* topic = (s_help_topic_record*)
                 farload::Far_Reload_Data_(lbx_name, INFO::_g_reference_ix, record_buffer, i, 1, sizeof(s_help_topic_record))
             ;
-            strcpy(items[i].group_name, topic->text);
+            strlcpy(items[i].group_name, topic->text, sizeof(items[i].group_name));
             record_offsets[i] = topic->id;
             items[i].group_id = (uint8_t)i;
             items[i].group_color_index = 0;
@@ -1034,9 +1034,9 @@ namespace INFO {
             for (j = 0; j < (count - 1); j++) {
                 if (Compare_Unsigned_Strings_(items[j].group_name, items[j + 1].group_name) > 0) {
                     char temp_name[64];
-                    strcpy(temp_name, items[j].group_name);
-                    strcpy(items[j].group_name, items[j + 1].group_name);
-                    strcpy(items[j + 1].group_name, temp_name);
+                    strlcpy(temp_name, items[j].group_name, sizeof(temp_name));
+                    strlcpy(items[j].group_name, items[j + 1].group_name, sizeof(items[j].group_name));
+                    strlcpy(items[j + 1].group_name, temp_name, sizeof(items[j + 1].group_name));
 
                     uint32_t temp_off = record_offsets[j];
                     record_offsets[j] = record_offsets[j + 1];
@@ -1629,9 +1629,9 @@ namespace INFO {
 
             if ((current_val % 5 == 0) && (fraction != 0)) {
                 if (MOX::_settings.language == 0) {
-                    sprintf(buffer, "%i.%i", whole, fraction);
+                    snprintf(buffer, sizeof(buffer), "%i.%i", whole, fraction);
                 } else {
-                    sprintf(buffer, "%i,%i", whole, fraction);
+                    snprintf(buffer, sizeof(buffer), "%i,%i", whole, fraction);
                 }
             } else {
                 itoa(whole, buffer, 10);
@@ -1682,7 +1682,7 @@ namespace INFO {
                 uint8_t active_idx = MOX::_active_player[i];
                 fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[active_idx]);
 
-                strcpy(race_name, MOX::_player[active_idx].race_name);
+                strlcpy(race_name, MOX::_player[active_idx].race_name, sizeof(race_name));
                 strupr(race_name);
 
                 fonts::Print_Centered_To_Bitmap_(91, 0, race_name, player_panels[i]);
@@ -1814,7 +1814,7 @@ namespace INFO {
 
         for (int i = 1; i < 17; ++i) {
             if ((uint8_t)MOX::_help_category_labels[i][0] > 0x39 /* '9' */) {
-                sprintf(category_strs[category_count], "^ %s", MOX::_help_category_labels[i]);
+                snprintf(category_strs[category_count], sizeof(category_strs[category_count]), "^ %s", MOX::_help_category_labels[i]);
                 fonts::Print_(0xdd, y_pos, category_strs[category_count]);
                 fields::Add_Hidden_Field_(0xdd, y_pos - 2, 0x19b, y_pos + 18, "", 0);
                 category_indices[category_count] = (int16_t)i;
@@ -1832,7 +1832,7 @@ namespace INFO {
         for (int i = 0; i < (int)record_count; ++i) {
             record = (s_help_topic_record*)farload::Far_Reload_Data_(lbx_name, 0xf, reload_buffer, i, 1, sizeof(s_help_topic_record));
             topic_ids[i] = record->id;
-            sprintf(how_to_strs[i], "^ %s", record->text);
+            snprintf(how_to_strs[i], sizeof(how_to_strs[i]), "^ %s", record->text);
             fonts::Print_(0x1a5, y_pos, how_to_strs[i]);
             fields::Add_Hidden_Field_(0x1a5, y_pos - 2, 0x263, y_pos + 18, "", 0);
             y_pos += 20;
@@ -1895,7 +1895,7 @@ namespace INFO {
         ));
 
         JIM::Get_Text_Message_("billtext.lbx", 13, title_combined, 80);
-        strcat(title_combined, loaded_help_text->title);
+        strlcat(title_combined, loaded_help_text->title, sizeof(title_combined));
 
         fonts::Print_Centered_(414, 67, title_combined);
 

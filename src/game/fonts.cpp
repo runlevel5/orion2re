@@ -906,7 +906,7 @@ namespace fonts {
 
         _font_data = font_blob;
 
-        strcpy(_font_name, filename);
+        strlcpy(_font_name, filename, sizeof(_font_name));
     }
 
     void __cdecl Disp_PSTR_(int32_t x, int32_t y, const char* format, ...) {

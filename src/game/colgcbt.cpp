@@ -645,7 +645,7 @@ namespace COLGCBT {
         char* format_str = ESTRINGS::E_Strings_(string_id);
 
         char buffer[500];
-        sprintf(buffer, format_str, planet_name, race_name);
+        snprintf(buffer, sizeof(buffer), format_str, planet_name, race_name);
 
         fonts::Print_Centered_(319, 10, buffer);
     }
@@ -748,7 +748,7 @@ namespace COLGCBT {
         int16_t y_pos = (*row * 11) + 0x32;
 
         /* fmtpara \x1A0/\x1A1 switch the inserted label/value runs to left and right justification. */
-        sprintf(text_buf, ESTRINGS::E_Strings_(0x4B), "\x1A" "0", label, "\x1A" "1", value);
+        snprintf(text_buf, sizeof(text_buf), ESTRINGS::E_Strings_(0x4B), "\x1A" "0", label, "\x1A" "1", value);
 
         FMTPARA::Print_Formatted_Paragraph_(x_pos + 9, y_pos, 0xF3, text_buf, 0);
 
@@ -875,7 +875,7 @@ namespace COLGCBT {
             char buffer[500];
             char* race_name = MOX::_player[_g_attack_ptr->player_id].race_name;
             char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[COLONY::_colony_handle].planet);
-            sprintf(buffer, ESTRINGS::E_Strings_(0x2F), planet_name, race_name);
+            snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x2F), planet_name, race_name);
             fonts::Print_Centered_(0x13F, 10, buffer);
 
         } else {
@@ -948,32 +948,32 @@ namespace COLGCBT {
                 COLONY::Set_Colony_Font_To_Player_(1, (int8_t)_g_attack_ptr->player_id);
 
                 int32_t strength = side_info->unit_strengths[j] - side_info->combat_modifiers.difficulty_bonus;
-                sprintf(local_str, ESTRINGS::E_Strings_(13), strength);
+                snprintf(local_str, sizeof(local_str), ESTRINGS::E_Strings_(13), strength);
                 fonts::Print_Centered_(cur_x, 176, local_str);
 
                 uint8_t hp = (uint8_t)side_info->unit_hps[j];
                 if (hp <= 1) {
-                    sprintf(local_str, ESTRINGS::E_Strings_(22), hp);
+                    snprintf(local_str, sizeof(local_str), ESTRINGS::E_Strings_(22), hp);
                 } else {
-                    sprintf(local_str, ESTRINGS::E_Strings_(23), hp);
+                    snprintf(local_str, sizeof(local_str), ESTRINGS::E_Strings_(23), hp);
                 }
                 fonts::Print_Centered_(cur_x, 167, local_str);
 
                 if (MOX::_settings.language == 4) {
-                    sprintf(local_str, "%s: %d",
-                            COLONY::Player_Troop_Name_(side_info->player_id, j, race),
-                            side_info->unit_counts[j]);
+                    snprintf(local_str, sizeof(local_str), "%s: %d",
+                             COLONY::Player_Troop_Name_(side_info->player_id, j, race),
+                             side_info->unit_counts[j]);
                 } else {
-                    sprintf(local_str, ESTRINGS::E_Strings_(14),
-                            side_info->unit_counts[j],
-                            COLONY::Player_Troop_Name_(side_info->player_id, j, race));
+                    snprintf(local_str, sizeof(local_str), ESTRINGS::E_Strings_(14),
+                             side_info->unit_counts[j],
+                             COLONY::Player_Troop_Name_(side_info->player_id, j, race));
                 }
                 fonts::Print_Centered_(cur_x, 158, local_str);
 
                 ERIC::Draw_Bottom_Centered_(x + (valid_troop_idx + 1) * spacing, 157, anim);
 
                 // This call effectively acts as a no-op since the result is never printed
-                sprintf(local_str, ESTRINGS::E_Strings_(124), side_info->unit_counts[j]);
+                snprintf(local_str, sizeof(local_str), ESTRINGS::E_Strings_(124), side_info->unit_counts[j]);
 
                 valid_troop_idx++;
                 cur_x += spacing;

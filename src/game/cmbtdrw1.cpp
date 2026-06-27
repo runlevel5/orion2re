@@ -22,15 +22,15 @@ namespace CMBTDRW1 {
 
         char str[4][4] = {0};
         if (MOX::_settings.language == 4) {
-            strcpy(str[0], "A");
-            strcpy(str[1], "D");
-            strcpy(str[2], "I");
-            strcpy(str[3], "S");
+            strlcpy(str[0], "A", sizeof(str[0]));
+            strlcpy(str[1], "D", sizeof(str[1]));
+            strlcpy(str[2], "I", sizeof(str[2]));
+            strlcpy(str[3], "S", sizeof(str[3]));
         } else {
-            strcpy(str[0], "F");
-            strcpy(str[1], "R");
-            strcpy(str[2], "B");
-            strcpy(str[3], "L");
+            strlcpy(str[0], "F", sizeof(str[0]));
+            strlcpy(str[1], "R", sizeof(str[1]));
+            strlcpy(str[2], "B", sizeof(str[2]));
+            strlcpy(str[3], "L", sizeof(str[3]));
         }
 
         int16_t local_3a[7];
@@ -170,8 +170,8 @@ namespace CMBTDRW1 {
             COMBINIT::Load_Display_Combat_Ship_(ship_idx);
             
             // BUG: Potential buffer overflow if name is longer than 15 characters
-            strcpy(ship_name, MOX::_global_combat_data.name);
 
+            strlcpy(ship_name, MOX::_global_combat_data.name, sizeof(ship_name));
             INITSHIP::Get_Ship_Combat_Bonuses_(
                 ship_idx, 
                 &MOX::_global_combat_data.tac_val_defense, 
@@ -230,7 +230,7 @@ namespace CMBTDRW1 {
         if (is_editable) {
             strings::Trim_(ship_name);
             if (ship_name[0] != '\0') {
-                strcpy(MOX::_ship[ship_idx].d.name, ship_name);
+                strlcpy(MOX::_ship[ship_idx].d.name, ship_name, sizeof(MOX::_ship[ship_idx].d.name));
             }
         }
 
@@ -509,7 +509,7 @@ namespace CMBTDRW1 {
             if (MOX::_cur_ship != -1) {
                 fonts::Set_Font_Style_Shadow_Down_(2, &MOX::_combat_green);
                 fonts::Set_Outline_Color_(0, 0);
-                strcpy(local_ship_name, MOX::_combat_data[MOX::_cur_ship].name);
+                strlcpy(local_ship_name, MOX::_combat_data[MOX::_cur_ship].name, sizeof(local_ship_name));
                 BILL::Squeeze_Print_Centered_(59, 362, local_ship_name, 88);
                 Draw_Ship_Status_(14, 376, MOX::_cur_ship);
                 Draw_Grey_Damage_Bars_(14, 376, MOX::_cur_ship);
@@ -720,7 +720,7 @@ skip_box:
                                     graphics::Interlaced_Fill_(401, 362, 489, 374, 0, 199);
                                     
                                     char ship_name[32];
-                                    strcpy(ship_name, MOX::_combat_data[hov_ship].name);
+                                    strlcpy(ship_name, MOX::_combat_data[hov_ship].name, sizeof(ship_name));
                                     BILL::Squeeze_Print_Centered_(445, 362, ship_name, 89);
                                     
                                     Draw_Ship_Status_(400, 376, hov_ship);
@@ -1976,11 +1976,11 @@ skip_cursor:
             int32_t picture_num;
 
             if (previous_owner < MAX_PLAYERS && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
-                strcpy(lbx_name, "cmbtshp.lbx");
+                strlcpy(lbx_name, "cmbtshp.lbx", sizeof(lbx_name));
                 uint8_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
             } else {
-                strcpy(lbx_name, "monster.lbx");
+                strlcpy(lbx_name, "monster.lbx", sizeof(lbx_name));
                 if (MOX::_combat_data[ship_idx].picture_num == 0x2C) {
                     picture_num = 25;
                 } else {
@@ -2059,7 +2059,7 @@ skip_cursor:
 
                 fonts::Set_Font_Style_(0, &MOX::_combat_green);
                 KEN::Ken_Get_Text_Message_(0, local_50, 0x50);
-                strcpy(local_a0, local_50);
+                strlcpy(local_a0, local_50, sizeof(local_a0));
 
                 if (MOX::_cmbt_colony_id == -1) {
                     itoa(0x23, local_b4, 10);
@@ -2068,23 +2068,23 @@ skip_cursor:
                 }
                 
 
-                strcat(local_a0, local_b4);
-                strcat(local_a0, "  ");
 
+                strlcat(local_a0, local_b4, sizeof(local_a0));
+                strlcat(local_a0, "  ", sizeof(local_a0));
                 if (MOX::_cmbt_colony_id != -1) {
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[1] > 0) {
                         KEN::Ken_Get_Text_Message_(1, local_50, 0x50);
-                        strcat(local_a0, local_50);
+                        strlcat(local_a0, local_50, sizeof(local_a0));
                         itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], local_b4, 10);
-                        strcat(local_a0, local_b4);
-                        strcat(local_a0, "  ");
+                        strlcat(local_a0, local_b4, sizeof(local_a0));
+                        strlcat(local_a0, "  ", sizeof(local_a0));
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[0] > 0) {
                         KEN::Ken_Get_Text_Message_(2, local_50, 0x50);
-                        strcat(local_a0, local_50);
+                        strlcat(local_a0, local_50, sizeof(local_a0));
                         itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], local_b4, 10);
-                        strcat(local_a0, local_b4);
-                        strcat(local_a0, "  ");
+                        strlcat(local_a0, local_b4, sizeof(local_a0));
+                        strlcat(local_a0, "  ", sizeof(local_a0));
                     }
                 }
 
@@ -2516,11 +2516,11 @@ skip_cursor:
             char lbx_name[12];
             int16_t picture_num;
             if (previous_owner < MAX_PLAYERS && MOX::_combat_data[param_1].picture_num != 44 /* 0x2c */) {
-                strcpy(lbx_name, "cmbtshp.lbx");
+                strlcpy(lbx_name, "cmbtshp.lbx", sizeof(lbx_name));
                 int16_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[param_1].picture_num;
             } else {
-                strcpy(lbx_name, "monster.lbx");
+                strlcpy(lbx_name, "monster.lbx", sizeof(lbx_name));
                 if (MOX::_combat_data[param_1].picture_num == 44 /* 0x2c */) {
                     picture_num = 25; /* 0x19 */
                 } else {
@@ -2846,18 +2846,18 @@ skip_cursor:
                     if ((specials & 4) == 0) {
                         local_a0[0] = '\0';
                     } else {
-                        strcpy(local_a0, TECHDATA::_weapon_modifications[2].name_plural);
-                        strcat(local_a0, " ");
+                        strlcpy(local_a0, TECHDATA::_weapon_modifications[2].name_plural, sizeof(local_a0));
+                        strlcat(local_a0, " ", sizeof(local_a0));
                     }
                 } else {
-                    strcpy(local_a0, TECHDATA::_weapon_modifications[1].name_plural);
-                    strcat(local_a0, " ");
+                    strlcpy(local_a0, TECHDATA::_weapon_modifications[1].name_plural, sizeof(local_a0));
+                    strlcat(local_a0, " ", sizeof(local_a0));
                 }
 
                 if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left == 1) {
-                    strcat(local_a0, TECHDATA::_weapons[w_id].name);
+                    strlcat(local_a0, TECHDATA::_weapons[w_id].name, sizeof(local_a0));
                 } else {
-                    strcat(local_a0, TECHDATA::_weapons[w_id].name_plural);
+                    strlcat(local_a0, TECHDATA::_weapons[w_id].name_plural, sizeof(local_a0));
                 }
 
                 if (display_color_mode == 0) {
@@ -2869,41 +2869,41 @@ skip_cursor:
                 }
 
                 if (rack == 1 || rack == 3 || rack == 4 || w_id == WEAPON_ANTI_MISSILE_ROCKET) {
-                    strcat(local_a0, " x");
+                    strlcat(local_a0, " x", sizeof(local_a0));
                     _itoa(ammo, local_64, 10);
-                    strcat(local_a0, local_64);
+                    strlcat(local_a0, local_64, sizeof(local_a0));
                 } else if (rack == 2) {
                     if (ammo > 0) {
-                        strcat(local_a0, " ");
+                        strlcat(local_a0, " ", sizeof(local_a0));
                         _itoa(ammo, local_64, 10);
-                        strcat(local_a0, local_64);
+                        strlcat(local_a0, local_64, sizeof(local_a0));
                         KEN::Ken_Get_Text_Message_(85, local_50, 80);
-                        strcat(local_a0, local_50);
+                        strlcat(local_a0, local_50, sizeof(local_a0));
                     }
                 } else if (rack == 0) {
-                    strcat(local_a0, " (");
+                    strlcat(local_a0, " (", sizeof(local_a0));
                     switch (arc) {
                         case 1:
                             KEN::Ken_Get_Text_Message_(3, local_50, 80);
-                            strcat(local_a0, local_50);
+                            strlcat(local_a0, local_50, sizeof(local_a0));
                             break;
                         case 2:
                             KEN::Ken_Get_Text_Message_(4, local_50, 80);
-                            strcat(local_a0, local_50);
+                            strlcat(local_a0, local_50, sizeof(local_a0));
                             break;
                         case 4:
                             KEN::Ken_Get_Text_Message_(6, local_50, 80);
-                            strcat(local_a0, local_50);
+                            strlcat(local_a0, local_50, sizeof(local_a0));
                             break;
                         case 8:
                             KEN::Ken_Get_Text_Message_(5, local_50, 80);
-                            strcat(local_a0, local_50);
+                            strlcat(local_a0, local_50, sizeof(local_a0));
                             break;
                         case 15:
-                            strcat(local_a0, "360");
+                            strlcat(local_a0, "360", sizeof(local_a0));
                             break;
                     }
-                    strcat(local_a0, ")");
+                    strlcat(local_a0, ")", sizeof(local_a0));
                 }
 
                 fonts::Set_Outline_Color_(0, 0);
@@ -3308,7 +3308,7 @@ skip_cursor:
         KEN::Ken_Get_Text_Message_(11, message_text, 0x50);
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
-        sprintf(line_text, "%d%s",
+        snprintf(line_text, sizeof(line_text), "%d%s",
                 static_cast<int32_t>(MOX::_global_combat_data.tac_val_evade),
                 "%");
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
@@ -3367,8 +3367,9 @@ skip_cursor:
 
         if (!is_special_target && (MOX::_global_combat_data.ftl_type > 0)) {
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-            sprintf(
+            snprintf(
                 line_text,
+                sizeof(line_text),
                 "%s%d%s%d%s",
                 "(",
                 static_cast<int32_t>(MOX::_global_combat_data.drive_current_hits),
@@ -3409,8 +3410,9 @@ skip_cursor:
 
         if (MOX::_global_combat_data.owner <= 9) {
             KEN::Ken_Get_Text_Message_(15, message_text, 0x50);
-            sprintf(
+            snprintf(
                 line_text,
+                sizeof(line_text),
                 "%s%d%s",
                 "^ ",
                 static_cast<int32_t>(TECHDATA::_drives[MOX::_global_combat_data.ftl_type].warp_speed),
@@ -3420,16 +3422,18 @@ skip_cursor:
 
         if (!is_special_target) {
             KEN::Ken_Get_Text_Message_(0x59, message_text, 0x50);
-            sprintf(
+            snprintf(
                 line_text,
+                sizeof(line_text),
                 message_text,
                 static_cast<int32_t>(MOX::_global_combat_data.structure_max) -
                     static_cast<int32_t>(MOX::_global_combat_data.structure_damage),
                 static_cast<int32_t>(MOX::_global_combat_data.structure_max));
         } else {
             const int16_t best_armor = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
-            sprintf(
+            snprintf(
                 line_text,
+                sizeof(line_text),
                 "%s%d%s%s",
                 "^ ",
                 static_cast<int32_t>(TECHDATA::_armor[best_armor].ships_bonus) + 100,
@@ -3447,8 +3451,9 @@ skip_cursor:
         }
 
         KEN::Ken_Get_Text_Message_(17, message_text, 0x50);
-        sprintf(
+        snprintf(
             line_text,
+            sizeof(line_text),
             "%s%d%s",
             "^ ",
             static_cast<int32_t>(MOX::_global_combat_data.current_speed),
@@ -3479,8 +3484,9 @@ skip_cursor:
                 }
 
                 KEN::Ken_Get_Text_Message_(0x5B, message_text, 0x50);
-                sprintf(
+                snprintf(
                     line_text,
+                    sizeof(line_text),
                     message_text,
                     static_cast<int32_t>(MOX::_global_combat_data.armor_remaining),
                     armor_total);
@@ -3504,8 +3510,9 @@ skip_cursor:
             fonts::Print_(left_panel_x, row_y, message_text);
 
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-            sprintf(
+            snprintf(
                 line_text,
+                sizeof(line_text),
                 "%s%d%s%d%s",
                 "(",
                 static_cast<int32_t>(MOX::_global_combat_data.computer_current_hits),
@@ -3528,8 +3535,9 @@ skip_cursor:
 
                 if (MOX::_global_combat_data.shield_type > 0) {
                     fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-                    sprintf(
+                    snprintf(
                         line_text,
+                        sizeof(line_text),
                         "%s%d%s%d%s",
                         "(",
                         static_cast<int32_t>(MOX::_global_combat_data.shield_current_hits),
@@ -3563,8 +3571,9 @@ skip_cursor:
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
             if (MOX::_global_combat_data.computer_current_hits > 0) {
                 KEN::Ken_Get_Text_Message_(0x16, message_text, 0x50);
-                sprintf(
+                snprintf(
                     line_text,
+                    sizeof(line_text),
                     message_text,
                     static_cast<int32_t>(
                         TECHDATA::_computers[MOX::_global_combat_data.computer_type].bonus));
@@ -3576,8 +3585,9 @@ skip_cursor:
 
             KEN::Ken_Get_Text_Message_(0x18, message_text, 0x50);
             if (!is_special_target) {
-                sprintf(
+                snprintf(
                     line_text,
+                    sizeof(line_text),
                     message_text,
                     static_cast<int32_t>(MOX::_global_combat_data.shield_arc_max));
             } else {
@@ -3590,7 +3600,7 @@ skip_cursor:
                         static_cast<int32_t>(TECHDATA::_shields[best_shield].shield_class) +
                         static_cast<int32_t>(MOX::_global_combat_data.shield_arc_max);
                 }
-                sprintf(line_text, message_text, shield_value);
+                snprintf(line_text, sizeof(line_text), message_text, shield_value);
             }
             fonts::Print_(right_value_x, row_y, line_text);
 
@@ -3632,36 +3642,36 @@ skip_cursor:
                         ? TECHDATA::_weapons[weapon_id].name
                         : TECHDATA::_weapons[weapon_id].name_plural;
 
-                sprintf(quantity_text, "%d%s%s", static_cast<int32_t>(slot.count), " ", weapon_name);
+                snprintf(quantity_text, sizeof(quantity_text), "%d%s%s", static_cast<int32_t>(slot.count), " ", weapon_name);
 
-                strcpy(arc_text, " (");
+                strlcpy(arc_text, " (", sizeof(arc_text));
                 switch (weapon_arc) {
                     case 1:
                         KEN::Ken_Get_Text_Message_(3, message_text, 0x50);
-                        strcat(arc_text, message_text);
+                        strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
                     case 2:
                         KEN::Ken_Get_Text_Message_(4, message_text, 0x50);
-                        strcat(arc_text, message_text);
+                        strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
                     case 4:
                         KEN::Ken_Get_Text_Message_(6, message_text, 0x50);
-                        strcat(arc_text, message_text);
+                        strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
                     case 8:
                         KEN::Ken_Get_Text_Message_(5, message_text, 0x50);
-                        strcat(arc_text, message_text);
+                        strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
                     case 15:
-                        strcat(arc_text, "360");
+                        strlcat(arc_text, "360", sizeof(arc_text));
                         break;
                     default:
                         break;
                 }
-                strcat(arc_text, ")");
+                strlcat(arc_text, ")", sizeof(arc_text));
 
                 if (weapon_arc != 1) {
-                    strcat(quantity_text, arc_text);
+                    strlcat(quantity_text, arc_text, sizeof(quantity_text));
                 }
 
                 fonts::Print_(left_value_x, row_y, quantity_text);
@@ -3719,9 +3729,9 @@ skip_cursor:
                     for (int32_t mod_index = 0; mod_index < WEAPON_MOD_COUNT; ++mod_index) {
                         if ((mod_bits & 1) != 0) {
                             if (line_text[0] != '\0') {
-                                strcat(line_text, ", ");
+                                strlcat(line_text, ", ", sizeof(line_text));
                             }
-                            strcat(line_text, TECHDATA::_weapon_modifications[mod_index].name_plural);
+                            strlcat(line_text, TECHDATA::_weapon_modifications[mod_index].name_plural, sizeof(line_text));
                         }
                         mod_bits >>= 1;
                     }
@@ -3790,27 +3800,27 @@ skip_cursor:
         switch (crew_quality) {
         case 0:
             KEN::Ken_Get_Text_Message_(0x1f, format_text, 0x50);
-            sprintf(MOX::_temp_string, format_text, 0);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 0);
             return MOX::_temp_string;
 
         case 1:
             KEN::Ken_Get_Text_Message_(0x20, format_text, 0x50);
-            sprintf(MOX::_temp_string, format_text, 100);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 100);
             return MOX::_temp_string;
 
         case 2:
             KEN::Ken_Get_Text_Message_(0x21, format_text, 0x50);
-            sprintf(MOX::_temp_string, format_text, 200);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 200);
             return MOX::_temp_string;
 
         case 3:
             KEN::Ken_Get_Text_Message_(0x22, format_text, 0x50);
-            sprintf(MOX::_temp_string, format_text, 300);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 300);
             return MOX::_temp_string;
 
         case 4:
             KEN::Ken_Get_Text_Message_(0x23, format_text, 0x50);
-            sprintf(MOX::_temp_string, format_text, 300);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 300);
             break;
 
         default:

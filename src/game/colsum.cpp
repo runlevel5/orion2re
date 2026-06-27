@@ -549,21 +549,21 @@ namespace COLSUM {
             s_star_data* star = &MOX::_star[planet->star_index];
 
             if ((star->blockaded >> (MOX::_PLAYER_NUM & 0x1F) & 1) == 0) {
-                sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x0C));
-                sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x0C));
+                strlcpy(sub_buffer1, ESTRINGS::E_Strings_(0x0C), sizeof(sub_buffer1));
+                strlcpy(sub_buffer2, ESTRINGS::E_Strings_(0x0C), sizeof(sub_buffer2));
             } else {
                 /* Fmtpara: "\x1B2" switches the following text to an alternate inline color attribute. */
-                sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), "\x1B" "2");
-                sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x86));
+                snprintf(sub_buffer1, sizeof(sub_buffer1), ESTRINGS::E_Strings_(0x46), "\x1B" "2");
+                strlcpy(sub_buffer2, ESTRINGS::E_Strings_(0x86), sizeof(sub_buffer2));
             }
 
-            sprintf(buffer, ESTRINGS::E_Strings_(0x51), sub_buffer1, HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer2);
+            snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x51), sub_buffer1, HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer2);
             paragraph_type = 0x59;
         } else {
             /* Fmtpara: "\x1B1" and "\x1B2" switch the event label to specific inline color attributes. */
             const char* event_prefix = Event_Good_(event_id) ? "\x1B" "1" : "\x1B" "2";
-            sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), event_prefix);
-            sprintf(buffer, ESTRINGS::E_Strings_(0x55), HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer1, _wee_event_strings[event_id]);
+            snprintf(sub_buffer1, sizeof(sub_buffer1), ESTRINGS::E_Strings_(0x46), event_prefix);
+            snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x55), HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer1, _wee_event_strings[event_id]);
             paragraph_type = 0x57;
         }
 
@@ -582,15 +582,15 @@ namespace COLSUM {
                 /* Fmtpara: these inline "\x1B?" sequences apply specific color attributes to the auto-build text. */
                 if (turn_count < 1 || turn_count > 9999) {
                     if (colony->auto_building == 0) {
-                        sprintf(buffer, ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
+                        snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
                     } else {
-                        sprintf(buffer, ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing));
+                        snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing));
                     }
                 } else {
                     if (colony->auto_building == 0) {
-                        sprintf(buffer, ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                        snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     } else {
-                        sprintf(buffer, ESTRINGS::E_Strings_(0x5C), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                        snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5C), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     }
                 }
 
@@ -601,7 +601,7 @@ namespace COLSUM {
             }
 
             if (colony->auto_building != 0) {
-                sprintf(buffer, ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(-1));
+                snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(-1));
                 BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
                 fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
             }
@@ -1008,10 +1008,10 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         char* planet_name_ptr;
 
         planet_name_ptr = HACCESS::Get_Planet_Name_No_Prime_(MOX::_colony[colony_idx_1].planet);
-        strcpy(name1, planet_name_ptr);
+        strlcpy(name1, planet_name_ptr, sizeof(name1));
 
         planet_name_ptr = HACCESS::Get_Planet_Name_No_Prime_(MOX::_colony[colony_idx_2].planet);
-        strcpy(name2, planet_name_ptr);
+        strlcpy(name2, planet_name_ptr, sizeof(name2));
 
         return (int16_t)strcasecmp(name1, name2);
     }
@@ -1156,17 +1156,17 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
             char* format = ESTRINGS::E_Strings_(74 /* 0x4a */);
 
-            sprintf(buffer, format,
-                    sign_str,
-                    MOX::_planet_size_string[planet->size],
-                    MOX::_planet_climate_string[climate_idx],
-                    MOX::_planet_gravity_string[planet->gravity_class],
-                    MOX::_mineral_class_string[planet->mineral_class],
-                    (uint32_t)(uint8_t)colony->n_pops,
-                    (int32_t)max_pop,
-                    sign_str,
-                    (int32_t)total_growth,
-                    "\x1B" "0");
+            snprintf(buffer, sizeof(buffer), format,
+                     sign_str,
+                     MOX::_planet_size_string[planet->size],
+                     MOX::_planet_climate_string[climate_idx],
+                     MOX::_planet_gravity_string[planet->gravity_class],
+                     MOX::_mineral_class_string[planet->mineral_class],
+                     (uint32_t)(uint8_t)colony->n_pops,
+                     (int32_t)max_pop,
+                     sign_str,
+                     (int32_t)total_growth,
+                     "\x1B" "0");
 
             BILL::Squeeze_Print_Formatted_Paragraph_(13, 354, 80, 88, buffer, 0);
         }

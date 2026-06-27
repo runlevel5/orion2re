@@ -81,12 +81,12 @@ namespace MAINSCR2 {
                             if (struct_::Test_Bit_Field_(MOX::_star[star_idx].black_hole_blocks, MOX::_temp_star_handle) != 0) {
                                 fonts::Set_Outline_Color_(0, 0);
                                 fonts::Set_Font_Style_Outline_(2, &blocked_path_outline_colors);
-                                strcpy(distance_text, HAROLD::H_Message_(234));
+                                strlcpy(distance_text, HAROLD::H_Message_(234), sizeof(distance_text));
                                 MISC::Change_Font_Style_(1);
                             } else {
                                 fonts::Set_Outline_Color_(0, 0);
                                 fonts::Set_Font_Style_Outline_(2, &distance_outline_colors);
-                                sprintf(distance_text, HAROLD::H_Message_(235), distance);
+                                snprintf(distance_text, sizeof(distance_text), HAROLD::H_Message_(235), distance);
                             }
 
                             int16_t width = fonts::Get_String_Width_(distance_text);
@@ -271,7 +271,7 @@ namespace MAINSCR2 {
         int16_t scrap_amount = settler::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
 
         if (scrap_amount <= 0) {
-            strcpy(message_text, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
+            strlcpy(message_text, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(message_text));
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 3);
         } else {
             fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
@@ -293,13 +293,13 @@ namespace MAINSCR2 {
                 if (plr->n_freighters <= count || plr->surplus_freighters <= count) {
                     const char* str1 = HAROLD::H_Message_((count == 1) ? 0xf0 /* HESTR_0F0_FREIGHTER */ : 0xf1 /* HESTR_0F1_FREIGHTERS */);
                     const char* str2 = HAROLD::H_Message_((plr->surplus_freighters == 1) ? 0xf0 : 0xf1);
-                    sprintf(message_text, HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
+                    snprintf(message_text, sizeof(message_text), HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
                     box_result = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 1);
                 }
 
                 if (box_result != 0 && count > 0) {
                     const char* str3 = HAROLD::H_Message_((count == 1) ? 0xf0 : 0xf1);
-                    sprintf(message_text, HAROLD::H_Message_(0xef), count, str3);
+                    snprintf(message_text, sizeof(message_text), HAROLD::H_Message_(0xef), count, str3);
                     HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 0);
 
                     int16_t new_freighters = plr->n_freighters - count;
@@ -586,7 +586,7 @@ namespace MAINSCR2 {
             char* race_name = MOX::_player[MOX::_PLAYER_NUM].race_name;
             char* format = (char*)HAROLD::H_Message_(0xE9);
 
-            sprintf(msg_buffer, format, race_name, stardate_div, stardate_mod);
+            snprintf(msg_buffer, sizeof(msg_buffer), format, race_name, stardate_div, stardate_mod);
 
             int16_t str_width = fonts::Get_String_Width_(msg_buffer);
             int16_t font_height = fonts::Get_Font_Height_();

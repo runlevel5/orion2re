@@ -1264,7 +1264,7 @@ namespace HAROLD {
             break;
 
         case 2:
-            strcpy(buffer, MOX::_temp_string);
+            strlcpy(buffer, MOX::_temp_string, sizeof(buffer));
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
             TEXTBOX::Text_Box_(buffer, message);
@@ -1557,8 +1557,9 @@ namespace HAROLD {
             }
 
             if (string_length > max_length) {
-                sprintf(
+                snprintf(
                     error_message,
+                    sizeof(error_message),
                     "(%s) String #%d Too Long, check terminator (strlen: %i)",
                     strings_file,
                     static_cast<int32_t>(string_index),

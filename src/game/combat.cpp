@@ -1014,25 +1014,25 @@ namespace COMBAT {
 
         switch (player_idx) {
             case 8:
-                strcpy(name_buf, s_Antaran_00557e54);
+                strlcpy(name_buf, s_Antaran_00557e54, sizeof(name_buf));
                 break;
             case 9:
-                strcpy(name_buf, s_Guardian_00557e48);
+                strlcpy(name_buf, s_Guardian_00557e48, sizeof(name_buf));
                 break;
             case 10:
-                strcpy(name_buf, s_Amoeba_00557e40);
+                strlcpy(name_buf, s_Amoeba_00557e40, sizeof(name_buf));
                 break;
             case 11:
-                strcpy(name_buf, s_Crystal_00557e24);
+                strlcpy(name_buf, s_Crystal_00557e24, sizeof(name_buf));
                 break;
             case 12:
-                strcpy(name_buf, s_Dragon_00557e38);
+                strlcpy(name_buf, s_Dragon_00557e38, sizeof(name_buf));
                 break;
             case 13:
-                strcpy(name_buf, s_Eel_00557e2c);
+                strlcpy(name_buf, s_Eel_00557e2c, sizeof(name_buf));
                 break;
             case 14:
-                strcpy(name_buf, s_Hydra_00557e30);
+                strlcpy(name_buf, s_Hydra_00557e30, sizeof(name_buf));
                 break;
             default:
                 break;
@@ -1103,13 +1103,13 @@ namespace COMBAT {
         strcat(result_msg, location_name);
 
         if (MOX::_combat_attacker_player < MAX_PLAYERS) {
-            strcpy(attacker_race_name, MOX::_player[MOX::_combat_attacker_player].race_name);
+            strlcpy(attacker_race_name, MOX::_player[MOX::_combat_attacker_player].race_name, sizeof(attacker_race_name));
         } else {
             Get_Non_Player_Name_(MOX::_combat_attacker_player, attacker_race_name);
         }
 
         if (MOX::_combat_defender_player < MAX_PLAYERS) {
-            strcpy(defender_race_name, MOX::_player[MOX::_combat_defender_player].race_name);
+            strlcpy(defender_race_name, MOX::_player[MOX::_combat_defender_player].race_name, sizeof(defender_race_name));
         } else {
             Get_Non_Player_Name_(MOX::_combat_defender_player, defender_race_name);
         }

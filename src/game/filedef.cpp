@@ -47,9 +47,9 @@ namespace FILEDEF {
         itoa(slot_index + 1, slot_str, 10);
 
         char filename[260];
-        strcpy(filename, "SAVE");
-        strcat(filename, slot_str);
-        strcat(filename, ".GAM");
+        strlcpy(filename, "SAVE", sizeof(filename));
+        strlcat(filename, slot_str, sizeof(filename));
+        strlcat(filename, ".GAM", sizeof(filename));
 
         RUSS::Assert_Settings_();
 
@@ -160,7 +160,7 @@ namespace FILEDEF {
 
         HAROLD::Save_Mouse_List_();
 
-        sprintf(filename, "SAVE%d.GAM", slot_index + 1);
+        snprintf(filename, sizeof(filename), "SAVE%d.GAM", slot_index + 1);
 
         RUSS::Mox_Update_();
         RUSS::Assert_Settings_();
@@ -183,7 +183,7 @@ namespace FILEDEF {
             case 4: fmt = "Il file SAVE%d.GAM non > valido! Provate a caricarne un altro o iniziate una nuova partita"; break;
             }
             if (fmt) {
-                sprintf(error_message, fmt, slot_index + 1);
+                snprintf(error_message, sizeof(error_message), fmt, slot_index + 1);
             }
             GENDRAW::Warning_Box_(error_message);
             video::Set_Page_Off_();
@@ -345,9 +345,9 @@ namespace FILEDEF {
 
             itoa(i + 1, num_str, 10);
 
-            strcpy(filename, "SAVE");
-            strcat(filename, num_str);
-            strcat(filename, ".GAM");
+            strlcpy(filename, "SAVE", sizeof(filename));
+            strlcat(filename, num_str, sizeof(filename));
+            strlcat(filename, ".GAM", sizeof(filename));
 
             if (File_Exists_(filename)) {
                 FILE* fp = fopen_case(filename, "rb");
@@ -359,18 +359,18 @@ namespace FILEDEF {
 
                     if (LOADSAVE::Is_Valid_Game_Type_(type)) {
                         if (i == 9) {
-                            strcpy(MOX::_save_game_description[i].description, "(Auto Save)");
+                            strlcpy(MOX::_save_game_description[i].description, "(Auto Save)", sizeof(MOX::_save_game_description[i].description));
                         } else if (MOX::_save_game_description[i].description[0] == '\0') {
-                            strcpy(MOX::_save_game_description[i].description, "<< no description >>");
+                            strlcpy(MOX::_save_game_description[i].description, "<< no description >>", sizeof(MOX::_save_game_description[i].description));
                         }
                     } else {
                         save_times[i] = -1;
-                        strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
+                        strlcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184), sizeof(MOX::_save_game_description[i].description));
                     }
                     fclose(fp);
                 }
             } else {
-                strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
+                strlcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184), sizeof(MOX::_save_game_description[i].description));
                 save_times[i] = -1;
             }
         }
@@ -380,7 +380,7 @@ namespace FILEDEF {
         int8_t game_type = -1;
         char filename[16];
 
-        sprintf(filename, "SAVE%d.GAM", save_slot + 1);
+        snprintf(filename, sizeof(filename), "SAVE%d.GAM", save_slot + 1);
         FILE* file = fopen_case(filename, "rb");
         if (file != nullptr) {
             if (fseek(file, 0x2D, SEEK_SET) == 0) {

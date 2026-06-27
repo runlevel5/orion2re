@@ -284,7 +284,7 @@ namespace file_ani {
             }
 
             char full_path[60];
-            sprintf(full_path, "%s%s", farload::_secondary_drive_path, filename);
+            snprintf(full_path, sizeof(full_path), "%s%s", farload::_secondary_drive_path, filename);
 
             _file_animation[slot] = fopen_case(full_path, "rb");
 

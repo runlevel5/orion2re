@@ -1147,7 +1147,7 @@ namespace fields {
             if (_input_field_active > 0) {
                 s_field_cont_input* active_cont_input = Field_Data_Continuous_Input_(&_fields[_active_input_field_number]);
                 if (key_code == 0x011B) {
-                    strcpy(_continuous_string, active_cont_input->buffer);
+                    strlcpy(_continuous_string, active_cont_input->buffer, sizeof(_continuous_string));
                     int16_t act_num = _active_input_field_number;
                     _active_input_field_number = -1;
                     _input_field_active = 0;
@@ -1293,13 +1293,13 @@ namespace fields {
                         {
                             s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[field_idx]);
                         if (_input_field_active == 0) {
-                            strcpy(_continuous_string, cont_input->buffer);
+                            strlcpy(_continuous_string, cont_input->buffer, sizeof(_continuous_string));
                             _input_field_active = 1;
                             _cursor_on = 0;
                             _cursor_position = 0;
                             _active_input_field_number = field_idx;
                         } else if (field_idx != _active_input_field_number) {
-                            strcpy(_continuous_string, cont_input->buffer);
+                            strlcpy(_continuous_string, cont_input->buffer, sizeof(_continuous_string));
                             _cursor_on = 0;
                             _cursor_position = 0;
                             _active_input_field_number = field_idx;
@@ -1411,7 +1411,7 @@ namespace fields {
                 if (_fields[field_idx].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
                     s_field_cont_input* cont_input = Field_Data_Continuous_Input_(&_fields[field_idx]);
                     if (_input_field_active == 0 || field_idx != _active_input_field_number) {
-                        strcpy(_continuous_string, cont_input->buffer);
+                        strlcpy(_continuous_string, cont_input->buffer, sizeof(_continuous_string));
                         _input_field_active = 1;
                         _active_input_field_first = 1;
                         _cursor_position = 0;
@@ -2417,7 +2417,7 @@ namespace fields {
                                         len++;
                                     }
                                     if (len < cont_input->max_length - 1) {
-                                        strcat(_continuous_string, "_");
+                                        strlcat(_continuous_string, "_", sizeof(_continuous_string));
                                     }
                                 }
                             }
@@ -2934,7 +2934,7 @@ namespace fields {
         fonts::Set_Font_Style_(field->font_style, field->font_color);
 
         char buffer[64];
-        strcpy(buffer, legacy_input->buffer);
+        strlcpy(buffer, legacy_input->buffer, sizeof(buffer));
 
         len = (int16_t)strlen(buffer);
 
@@ -3116,8 +3116,8 @@ namespace fields {
         timer::Mark_Time_();
         video::Set_Page_Off_();
 
-        strcpy(cursor_color_ramp, legacy_input->cursor_color_ramp);
-        strcpy(local_40, input_buffer);
+        strlcpy(cursor_color_ramp, legacy_input->cursor_color_ramp, sizeof(cursor_color_ramp));
+        strlcpy(local_40, input_buffer, sizeof(local_40));
 
         Invoke_Auto_Function_();
 

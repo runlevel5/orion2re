@@ -100,7 +100,7 @@ namespace INITGAME {
 
         // Generate default network name: MOX-<clock % 10>
         const int32_t clock_value = (int32_t)clock();
-        sprintf(MOX::_settings.net_game_name, "MOX-%d", clock_value % 10);
+        snprintf(MOX::_settings.net_game_name, sizeof(MOX::_settings.net_game_name), "MOX-%d", clock_value % 10);
 
         // Finalize default settings
         MULTPLAY::Set_Default_Online_Settings_();
@@ -324,7 +324,7 @@ namespace INITGAME {
         }
 
         player.race = (uint8_t)race_idx;
-        strcpy(player.race_name, MOX::_race_names[race_idx]);
+        strlcpy(player.race_name, MOX::_race_names[race_idx], sizeof(player.race_name));
 
         struct_::Copy_Structure_(player.traits, RACESEL::_race_specials[race_idx], sizeof(player.traits));
         struct_::Copy_Structure_(player.evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx],
@@ -381,7 +381,7 @@ namespace INITGAME {
 
         allocate::Pop_Block_(MOX::_screen_seg);
 
-        strcpy(player.name, player_name);
+        strlcpy(player.name, player_name, sizeof(player.name));
       }
 
       RUSS::Mox_Update_();

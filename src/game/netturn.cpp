@@ -301,7 +301,7 @@ namespace NETTURN {
         COMBFIND::_current_star_has_player = nullptr;
         COMBFIND::_current_star_has_nonplayer = nullptr;
 
-        strcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt);
+        strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
 
         while (NETMOX::_net.total_chunk_count == 0 && MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             MULTPLAY::Chat_Box_Input_Loop_();
@@ -309,7 +309,7 @@ namespace NETTURN {
 
         if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                sprintf(MOX::_temp_string, NETTURN::_chunk_progress_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
+                snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETTURN::_chunk_progress_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
                 MULTPLAY::Chat_Box_Input_Loop_();
             }
 

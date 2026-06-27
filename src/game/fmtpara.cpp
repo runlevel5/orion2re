@@ -883,7 +883,7 @@ namespace FMTPARA {
             int len = (int)strlen(_tmp_str);
             int digit = _tmp_str[len - 1] - '0';
             /* \a^2. renders the ordinal suffix in superscript and \a^0. restores the previous style. */
-            sprintf(_tmp_str2, "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);
+            snprintf(_tmp_str2, sizeof(_tmp_str2), "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);
             Insert_String_(_tmp_str2);
             break;
         }
@@ -896,7 +896,7 @@ namespace FMTPARA {
                 itoa(val, _tmp_str, 10);
                 int len = (int)strlen(_tmp_str);
                 int digit = _tmp_str[len - 1] - '0';
-                sprintf(_tmp_str2, "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);
+                snprintf(_tmp_str2, sizeof(_tmp_str2), "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);
                 Insert_String_(_tmp_str2);
             }
             break;

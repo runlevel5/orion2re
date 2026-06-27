@@ -692,7 +692,7 @@ namespace NETMOX {
                 uint32_t chunk_size = remaining > 0x7800 ? 0x7800 : remaining;
                 chunk_idx++;
 
-                sprintf(MOX::_temp_string, _sending_chunk_d_of_d_fmt, chunk_idx, chunk_count);
+                snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), _sending_chunk_d_of_d_fmt, chunk_idx, chunk_count);
 
                 do {
                     video::Set_Page_Off_();
@@ -1089,7 +1089,7 @@ namespace NETMOX {
                 order->officer_index = MOX::_star[i].officer_index[MOX::_PLAYER_NUM];
 
                 if (MOX::_star[i].colonize_player == MOX::_PLAYER_NUM) {
-                    strcpy(order->name, MOX::_star[i].name);
+                    strlcpy(order->name, MOX::_star[i].name, sizeof(order->name));
                 }
 
                 order->surrender_to = MOX::_star[i].surrender_to[MOX::_PLAYER_NUM];
@@ -1177,7 +1177,7 @@ namespace NETMOX {
 
             chunk_idx++;
 
-            sprintf(MOX::_temp_string, NETMOX::_sending_chunk_d_of_d_fmt, chunk_idx, num_chunks);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETMOX::_sending_chunk_d_of_d_fmt, chunk_idx, num_chunks);
 
             do {
                 MULTPLAY::Chat_Box_Input_Loop_();
@@ -1585,7 +1585,7 @@ namespace NETMOX {
                 star->officer_index[player_idx] = update[0x13];
 
                 if (star->colonize_player == player_idx) {
-                    strcpy(star->name, (const char*)(update + 4));
+                    strlcpy(star->name, (const char*)(update + 4), sizeof(star->name));
                 }
 
                 star->surrender_to[player_idx] = update[0x17];

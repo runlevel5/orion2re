@@ -23,7 +23,7 @@ namespace NETSTART {
                 MOX::_settings.net_game_name[6] = (char)('a' + ((int32_t)clock() % 26));
             }
 
-            strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
+            strlcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name, sizeof(NETMOX::_net.cur_game_name));
         }
     }
 
@@ -53,14 +53,14 @@ namespace NETSTART {
 
         MULTPLAY::Reload_Getting_Data_Info_();
 
-        strcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt);
+        strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
         video::Set_Page_Off_();
         MULTPLAY::Draw_SendGet_Net_Info_Screen_();
         fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
         RUSS::Mox_Sync_Update_();
 
         while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-            sprintf(MOX::_temp_string, NETSTART::_receiving_chunk_d_of_d, 
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETSTART::_receiving_chunk_d_of_d, 
                     NETMOX::_net.received_chunk_count + 1, NETMOX::_net.total_chunk_count);
             MULTPLAY::Draw_SendGet_Net_Info_Screen_();
             fields::Get_Input_();
@@ -115,7 +115,7 @@ namespace NETSTART {
         fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
         MULTPLAY::Reload_Getting_Data_Info_();
 
-        strcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt);
+        strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
 
         while (NETMOX::_net.total_chunk_count == 0) {
             fields::Get_Input_();
@@ -125,7 +125,7 @@ namespace NETSTART {
         }
 
         while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-            sprintf(MOX::_temp_string, NETSTART::_receiving_chunk_d_of_d, (int)NETMOX::_net.received_chunk_count + 1, (int)NETMOX::_net.total_chunk_count);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETSTART::_receiving_chunk_d_of_d, (int)NETMOX::_net.received_chunk_count + 1, (int)NETMOX::_net.total_chunk_count);
             fields::Get_Input_();
             MULTPLAY::Draw_SendGet_Net_Info_Screen_();
             RUSS::Mox_Sync_Update_();
@@ -399,7 +399,7 @@ namespace NETSTART {
         msg.starting_civilization_level = MOX::_settings.starting_civilization_level;
         msg.xenons_exist = MOX::_settings.xenons_exist;
 
-        strcpy(msg.version_string, GAME_BUILD_DATE);
+        strlcpy(msg.version_string, GAME_BUILD_DATE, sizeof(msg.version_string));
 
         memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
         memset(NETMOX::_net.player_connected_flags, 0, sizeof(NETMOX::_net.player_connected_flags));
@@ -754,7 +754,7 @@ namespace NETSTART {
             }
         }
 
-        strcpy(payload.version_string, GAME_BUILD_DATE);
+        strlcpy(payload.version_string, GAME_BUILD_DATE, sizeof(payload.version_string));
         NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_LOAD_GAME_START, &payload, sizeof(payload));
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;

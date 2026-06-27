@@ -1323,7 +1323,7 @@ namespace CMBTMIS {
         fonts::Set_Font_Style_(0, &MOX::_combat_green);
 
         KEN::Ken_Get_Text_Message_(52, msg_buf, 80);
-        strcpy(status_str, msg_buf);
+        strlcpy(status_str, msg_buf, sizeof(status_str));
 
         if (MOX::_missile[missile_idx].is_anti_missile_rocket == 0) {
             target_name = MOX::_combat_data[MOX::_missile[missile_idx].target_unit_idx].name;
@@ -1332,7 +1332,7 @@ namespace CMBTMIS {
             target_name = TECHDATA::_weapons[MOX::_missile[target_idx].type].name;
         }
 
-        strcat(status_str, target_name);
+        strlcat(status_str, target_name, sizeof(status_str));
         fonts::Print_Centered_(x_off + 43, y_off + 2, status_str);
 
         itoa(MOX::_missile[missile_idx].quantity, status_str, 10);
@@ -1341,9 +1341,9 @@ namespace CMBTMIS {
         if (TECHDATA::_weapons[weapon_type].type == 1) {
             int16_t msg_id = (MOX::_missile[missile_idx].quantity == 1) ? 53 : 107;
             KEN::Ken_Get_Text_Message_(msg_id, msg_buf, 80);
-            strcat(status_str, msg_buf);
+            strlcat(status_str, msg_buf, sizeof(status_str));
         } else if (TECHDATA::_weapons[weapon_type].type == 4) {
-            strcat(status_str, " ");
+            strlcat(status_str, " ", sizeof(status_str));
             const char* weapon_name;
             if (weapon_type == WEAPON_BOMBER) {
                 weapon_name = (MOX::_missile[missile_idx].quantity == 1) ? TECHDATA::_weapons[WEAPON_BOMBER].name : TECHDATA::_weapons[WEAPON_BOMBER].name_plural;
@@ -1354,11 +1354,11 @@ namespace CMBTMIS {
             } else {
                 weapon_name = (MOX::_missile[missile_idx].quantity == 1) ? TECHDATA::_weapons[WEAPON_ASSAULT_SHUTTLE].name : TECHDATA::_weapons[WEAPON_ASSAULT_SHUTTLE].name_plural;
             }
-            strcat(status_str, weapon_name);
+            strlcat(status_str, weapon_name, sizeof(status_str));
         } else {
             int16_t msg_id = (MOX::_missile[missile_idx].quantity == 1) ? 54 : 108;
             KEN::Ken_Get_Text_Message_(msg_id, msg_buf, 80);
-            strcat(status_str, msg_buf);
+            strlcat(status_str, msg_buf, sizeof(status_str));
         }
 
         fonts::Print_Centered_(x_off + 43, y_off + 81, status_str);

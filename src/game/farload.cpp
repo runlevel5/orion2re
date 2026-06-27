@@ -118,7 +118,7 @@ void* __cdecl Farload_(char* file_name, int32_t entry_idx) {
         }
 
         if (load_header) {
-            strcpy(_farload_file_name, library_name);
+            strlcpy(_farload_file_name, library_name, sizeof(_farload_file_name));
             _farload_fptr = fopen_case(library_name, "rb");
             
             if (_farload_fptr == nullptr) {
@@ -126,8 +126,8 @@ void* __cdecl Farload_(char* file_name, int32_t entry_idx) {
                     Error_Handler_(library_name, 1, entry_idx);
                 }
 
-                strcpy(fallback_path, _secondary_drive_path);
-                strcat(fallback_path, _farload_file_name);
+                strlcpy(fallback_path, _secondary_drive_path, sizeof(fallback_path));
+                strlcat(fallback_path, _farload_file_name, sizeof(fallback_path));
 
                 _farload_fptr = fopen_case(fallback_path, "rb");
                 if (_farload_fptr == nullptr) {
@@ -280,7 +280,7 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int32_t en
     }
 
     if (need_to_open) {
-        strcpy(_farload_file_name, file_name);
+        strlcpy(_farload_file_name, file_name, sizeof(_farload_file_name));
         _farload_fptr = fopen_case(file_name, "rb");
 
         if (_farload_fptr == nullptr) {
@@ -289,8 +289,8 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int32_t en
             }
 
             char full_path[sizeof(_secondary_drive_path) + sizeof(_farload_file_name)];
-            strcpy(full_path, _secondary_drive_path);
-            strcat(full_path, _farload_file_name);
+            strlcpy(full_path, _secondary_drive_path, sizeof(full_path));
+            strlcat(full_path, _farload_file_name, sizeof(full_path));
 
             _farload_fptr = fopen_case(full_path, "rb");
             if (_farload_fptr == nullptr) {

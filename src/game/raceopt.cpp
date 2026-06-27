@@ -104,9 +104,9 @@ namespace raceopt {
         ERIC::Fast_Fade_In_();
         
         KEN::Ken_Get_Text_Message_(77, message_line, sizeof(message_line));
-        strcpy(message_text, message_line);
+        strlcpy(message_text, message_line, sizeof(message_text));
         KEN::Ken_Get_Text_Message_(78, message_line, sizeof(message_line));
-        strcat(message_text, message_line);
+        strlcat(message_text, message_line, sizeof(message_text));
         GENDRAW::Message_Box_(message_text);
         
         video::Set_Page_Back_();
@@ -396,7 +396,7 @@ namespace raceopt {
 
             int cost_idx = opt_string_idx + (-3 - opt_string_idx) / 4;
             itoa(_ability_costs[cost_idx], num_buf, 10);
-            strcpy(str_buf, num_buf);
+            strlcpy(str_buf, num_buf, sizeof(str_buf));
 
             int16_t dots_start = col_start_x + fonts::Get_String_Width_(_opt_string[opt_string_idx]) - 1;
             int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
@@ -440,7 +440,7 @@ namespace raceopt {
                     char str_buf[12];
 
                     itoa(_ability_costs[opt_string_idx - 11], num_buf, 10);
-                    strcpy(str_buf, num_buf);
+                    strlcpy(str_buf, num_buf, sizeof(str_buf));
 
                     int16_t dots_start = col_2_start_x + fonts::Get_String_Width_(_opt_string[opt_string_idx]) - 1;
                     int16_t dots_end = col_x[col_idx + 1] - fonts::Get_String_Width_(str_buf) - 50;
@@ -672,7 +672,7 @@ namespace raceopt {
             if (draw_text2) {
                 char local_5c[12];
                 itoa(_ability_costs[neg_idx], local_5c, 10);
-                strcpy(local_50, local_5c);
+                strlcpy(local_50, local_5c, sizeof(local_50));
 
                 int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
 
@@ -729,7 +729,7 @@ namespace raceopt {
                         if (draw_text3) {
                             char local_5c[12];
                             itoa(_ability_costs[item_idx - 11], local_5c, 10);
-                            strcpy(local_50, local_5c);
+                            strlcpy(local_50, local_5c, sizeof(local_50));
 
                             int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
 

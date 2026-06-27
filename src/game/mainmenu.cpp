@@ -112,7 +112,7 @@ namespace MAINMENU {
         char find_data[16];
 
         uint8_t game_type = FILEDEF::Get_Game_Type_From_Saved_Game_(9);
-        sprintf(save_filename, "save%d.gam", 10);
+        snprintf(save_filename, sizeof(save_filename), "save%d.gam", 10);
         fields::Clear_Fields_();
 
         bool can_continue = false;
@@ -303,7 +303,7 @@ namespace MAINMENU {
             return;
         }
 
-        strcpy(buffer, credits[index][0]);
+        strlcpy(buffer, credits[index][0], sizeof(buffer));
         fonts::Print_To_Bitmap_(0, 0, buffer, bitmap);
 
         int16_t x_pos = 0;
@@ -318,7 +318,7 @@ namespace MAINMENU {
             }
         }
 
-        strcpy(buffer, credits[index][1]);
+        strlcpy(buffer, credits[index][1], sizeof(buffer));
         fonts::Print_To_Bitmap_((int16_t)MAINMENU::_credits_column_one + 4, 0, buffer, bitmap);
     }
 
@@ -564,13 +564,13 @@ namespace MAINMENU {
             allocate::Push_Block_(MOX::_screen_seg);
             data = (char*)farload::Far_Reload_Next_Data_(path, 0, MOX::_screen_seg, entry_idx++, 1, 127);
             allocate::Pop_Block_(MOX::_screen_seg);
-            strcpy(_credits[credit_idx][0], data);
+            strlcpy(_credits[credit_idx][0], data, sizeof(_credits[credit_idx][0]));
 
             // Load second line of credit entry
             allocate::Push_Block_(MOX::_screen_seg);
             data = (char*)farload::Far_Reload_Next_Data_(path, 0, MOX::_screen_seg, entry_idx++, 1, 127);
             allocate::Pop_Block_(MOX::_screen_seg);
-            strcpy(_credits[credit_idx][1], data);
+            strlcpy(_credits[credit_idx][1], data, sizeof(_credits[credit_idx][1]));
         }
 
         _credit_num = 1;

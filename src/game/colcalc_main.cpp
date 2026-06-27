@@ -1697,7 +1697,7 @@ namespace COLCALC {
 
             if (colony->n_food_replicated != 0) {
                 char temp[256];
-                sprintf(temp, _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
+                snprintf(temp, sizeof(temp), _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
                 p += sprintf(p, "\t%d\t%s\r", (int32_t)(uint8_t)colony->n_food_replicated * -2, temp);
                 colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
             }

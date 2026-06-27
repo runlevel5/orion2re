@@ -133,8 +133,8 @@ void __cdecl Setup_Input_Box_Popup_() {
     fields::_cursor_position = 0;
     fields::_cursor_on = 0;
     
-    strcpy(fields::_continuous_string, _input_box.input_text);
     
+    strlcpy(fields::_continuous_string, _input_box.input_text, sizeof(fields::_continuous_string));
     MOX::_FULL_DRAW_SCREEN_FLAG = 0;
     fields::_active_input_field_first = 1;
     fields::Assign_Auto_Function_(Draw_Input_Box_Popup_, 1);
@@ -255,7 +255,7 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
         max_name_width = 0xCD;
     }
 
-    strcpy(backup_name, MOX::_star[star_idx].name);
+    strlcpy(backup_name, MOX::_star[star_idx].name, sizeof(backup_name));
 
     int8_t result;
     if (use_animated_popup != 0) {
@@ -265,7 +265,7 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
     }
 
     if (MOX::_star[star_idx].name[0] == '\0') {
-        strcpy(MOX::_star[star_idx].name, backup_name);
+        strlcpy(MOX::_star[star_idx].name, backup_name, sizeof(MOX::_star[star_idx].name));
     }
 
     fonts::Get_String_Width_(MOX::_star[star_idx].name);
@@ -305,14 +305,14 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     memset(&_input_box, 0, sizeof(s_input_box_state));
 
     if (strlen(input_text) < sizeof(_input_box.input_text)) {
-        strcpy(_input_box.input_text, input_text);
+        strlcpy(_input_box.input_text, input_text, sizeof(_input_box.input_text));
     } else {
         strncpy(_input_box.input_text, input_text, sizeof(_input_box.input_text));
         _input_box.input_text[sizeof(_input_box.input_text) - 1] = '\0';
     }
 
     if (strlen(prompt_text) < sizeof(_input_box.prompt_text)) {
-        strcpy(_input_box.prompt_text, prompt_text);
+        strlcpy(_input_box.prompt_text, prompt_text, sizeof(_input_box.prompt_text));
     } else {
         strncpy(_input_box.prompt_text, prompt_text, sizeof(_input_box.prompt_text));
         _input_box.prompt_text[sizeof(_input_box.prompt_text) - 1] = '\0';
@@ -355,7 +355,7 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
 
     char original_input_text[sizeof(_input_box.input_text)];
     if (strlen(_input_box.input_text) < sizeof(original_input_text)) {
-        strcpy(original_input_text, _input_box.input_text);
+        strlcpy(original_input_text, _input_box.input_text, sizeof(original_input_text));
     } else {
         strncpy(original_input_text, _input_box.input_text, sizeof(original_input_text));
         original_input_text[sizeof(original_input_text) - 1] = '\0';
@@ -380,7 +380,7 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
 
         if (input < 0) {
             popup_action = 1;
-            strcpy(_input_box.input_text, original_input_text);
+            strlcpy(_input_box.input_text, original_input_text, sizeof(_input_box.input_text));
             accepted = 0;
         }
 

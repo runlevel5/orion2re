@@ -68,8 +68,8 @@ namespace lbx {
         if (header->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char full_path[sizeof(header->filename)];
-                strcpy(full_path, farload::_secondary_drive_path);
-                strcat(full_path, filename);
+                strlcpy(full_path, farload::_secondary_drive_path, sizeof(full_path));
+                strlcat(full_path, filename, sizeof(full_path));
                 header->file = fopen_case(full_path, "r+b");
             }
             
@@ -91,7 +91,7 @@ namespace lbx {
             return;
         }
 
-        strcpy(header->filename, filename);
+        strlcpy(header->filename, filename, sizeof(header->filename));
     }
 
     uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t record_idx) {
@@ -129,8 +129,8 @@ namespace lbx {
         if (stream->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char full_path[sizeof(stream->filename)];
-                strcpy(full_path, farload::_secondary_drive_path);
-                strcat(full_path, filename);
+                strlcpy(full_path, farload::_secondary_drive_path, sizeof(full_path));
+                strlcat(full_path, filename, sizeof(full_path));
                 stream->file = fopen_case(full_path, "rb");
             }
             if (stream->file == nullptr) {
@@ -154,7 +154,7 @@ namespace lbx {
             return;
         }
 
-        strcpy(stream->filename, filename);
+        strlcpy(stream->filename, filename, sizeof(stream->filename));
 
         if (was_music_active == 1) {
             sound::_musicActive = 1;

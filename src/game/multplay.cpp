@@ -76,7 +76,7 @@ namespace MULTPLAY {
 
         memset(MOX::_mp_screen, 0, sizeof(s_mp_screen));
 
-        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+        strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
 
         MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2A /* 42 */, MOX::_global_cache_seg);
         top_w = animate::Get_Width_(MOX::_mp_screen->anim_turn_screen_top);
@@ -211,7 +211,7 @@ namespace MULTPLAY {
         memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
         MOX::_mp_screen->needs_full_redraw = 1;
-        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+        strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
 
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
         MOX::_mp_screen->res_setup_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 1, MOX::_global_cache_seg);
@@ -233,7 +233,7 @@ namespace MULTPLAY {
 
     void __cdecl Set_Default_Online_Settings_(void) {
         memset(&MOX::_settings.online_settings, 0, sizeof(MOX::_settings.online_settings));
-        strcpy(MOX::_settings.online_settings.endpoint, "127.0.0.1:47800");
+        strlcpy(MOX::_settings.online_settings.endpoint, "127.0.0.1:47800", sizeof(MOX::_settings.online_settings.endpoint));
         MOX::_settings.online_initialized = 0;
     }
 
@@ -514,7 +514,7 @@ namespace MULTPLAY {
     void __cdecl Copy_Online_Defaults_To_Net_Struct_() {
         NETMOX::_net.online_settings = MOX::_settings.online_settings;
         if (NETMOX::_net.online_settings.endpoint[0] == '\0') {
-            strcpy(NETMOX::_net.online_settings.endpoint, "127.0.0.1:47800");
+            strlcpy(NETMOX::_net.online_settings.endpoint, "127.0.0.1:47800", sizeof(NETMOX::_net.online_settings.endpoint));
         }
     }
 
@@ -659,7 +659,7 @@ void __cdecl Load_Online_Setup_Screen_(void) {
 
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-    strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+    strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
 
     MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
     MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 32, MOX::_global_cache_seg);
@@ -734,7 +734,7 @@ void __cdecl Load_Online_Setup_Screen_(void) {
 
         if (MOX::_game_type == 2 || (MOX::_game_type == 3 && NETMOX::_net.mode == 1)) {
             MULTPLAY::Change_MP_Game_Name_();
-            strcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name);
+            strlcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name, sizeof(NETMOX::_net.cur_game_name));
 
             if (NETMOX::_net.cur_game_name[0] == '\0') {
                 // Initialize default game name "MooII " with a random letter at the end
@@ -784,7 +784,7 @@ void __cdecl Load_Online_Setup_Screen_(void) {
                         }
                     } else {
                         const char* fmt = HAROLD::H_Message_(0xFD /* HESTR_0FD_SAVE_D_IS_NOT_A_VALID_ */);
-                        sprintf(warning_msg, fmt, i);
+                        snprintf(warning_msg, sizeof(warning_msg), fmt, i);
                         GENDRAW::Warning_Box_(warning_msg);
                         result = -1;
                     }
@@ -836,7 +836,7 @@ void __cdecl Load_Load_MP_Game_Screen_(void) {
     MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-    strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+    strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
 
     MOX::_save_game_dates = (char*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 1000);
     MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
@@ -933,8 +933,9 @@ void __cdecl Change_MP_Game_Name_() {
         
         fields::Assign_Auto_Function_(SCORE::nullsub, 1);
         
-        strcpy(prompt, HAROLD::H_Message_(0xFE /* HESTR_0FE_ENTER_NET_GAME_NAME */));
         
+        strlcpy(prompt, HAROLD::H_Message_(0xFE /* HESTR_0FE_ENTER_NET_GAME_NAME */), sizeof(prompt));
+
         y = namestar::Star_Name_Popup_Screen_Center_Y_();
         x = namestar::Star_Name_Popup_Screen_Center_X_();
         
@@ -950,7 +951,7 @@ void __cdecl Change_MP_Game_Name_() {
                 }
                 
                 if (strcmp(MOX::_settings.net_game_name, netcode::Net_Get_Game_Name_(i)) == 0) {
-                    sprintf(warning_msg, HAROLD::H_Message_(0xFF /* HESTR_0FF_S_IS_ALREADY_A_GAME_NA */), MOX::_settings.net_game_name);
+                    snprintf(warning_msg, sizeof(warning_msg), HAROLD::H_Message_(0xFF /* HESTR_0FF_S_IS_ALREADY_A_GAME_NA */), MOX::_settings.net_game_name);
                     GENDRAW::Warning_Box_(warning_msg);
                     already_exists = true;
                     is_valid = false;
@@ -1159,8 +1160,8 @@ void __cdecl Add_Net_Next_Turn_Fields_()
     fonts::Set_Font_Special_Colors_(&local_colors2);
     
     char name_buffer[80];
-    sprintf(name_buffer, "(%s)  ", MOX::_player[MOX::_PLAYER_NUM].name);
     
+    snprintf(name_buffer, sizeof(name_buffer), "(%s)  ", MOX::_player[MOX::_PLAYER_NUM].name);
     int16_t name_width = fonts::Get_String_Width_(name_buffer);
     MULTPLAY::_global_chat_string[0] = '\0';
     
@@ -1255,7 +1256,7 @@ int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
             if (input_field > 0 && MOX::_mp_screen->game_list_field_ids[i] == input_field) {
                 char* game_name = netcode::Net_Get_Game_Name_(i);
                 if (game_name[0] != '\0') {
-                    strcpy(NETMOX::_net.cur_game_name, game_name);
+                    strlcpy(NETMOX::_net.cur_game_name, game_name, sizeof(NETMOX::_net.cur_game_name));
                     NETMOX::_net.cur_session_id = netcode::Net_Get_Game_Session_Id_(i);
                     exit_screen = true;
                 }
@@ -1348,7 +1349,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-    strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+    strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
     MOX::_mp_screen->lbx_entry_num = lbx_entry_num;
 
     MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
@@ -1388,7 +1389,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             char* name_ptr = netcode::Net_Get_Game_Name_(i);
             if (name_ptr[0] != '\0') {
                 char game_name[100];
-                strcpy(game_name, name_ptr);
+                strlcpy(game_name, name_ptr, sizeof(game_name));
 
                 bool is_selected = (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id);
                 s_colors* font_colors;
@@ -1482,7 +1483,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
 
-        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+        strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
 
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
 
@@ -1710,12 +1711,12 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                     MOX::_mox_font_colors_offset = (uint8_t)(c2 + 1);
                     s_colors chat_colors = *MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, (uint8_t)(c1 + 1), (uint8_t)(c3 + 2));
                     fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &chat_colors);
-                    sprintf(chat_buffer, "(%s)  %s", MOX::_player[sender_id].name, CHAT::_chat_info->messages[i].text);
+                    snprintf(chat_buffer, sizeof(chat_buffer), "(%s)  %s", MOX::_player[sender_id].name, CHAT::_chat_info->messages[i].text);
                 } else {
                     MOX::_mox_font_colors_offset = 16;
                     s_colors gnn_colors = *MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, 12, 23);
                     fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &gnn_colors);
-                    sprintf(chat_buffer, "( GNN )  %s", CHAT::_chat_info->messages[i].text);
+                    snprintf(chat_buffer, sizeof(chat_buffer), "( GNN )  %s", CHAT::_chat_info->messages[i].text);
                 }
 
                 if (i == 0) {
@@ -1733,7 +1734,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
 
         char final_name_buffer[100];
-        sprintf(final_name_buffer, "(%s)  ", MOX::_player[MOX::_PLAYER_NUM].name);
+        snprintf(final_name_buffer, sizeof(final_name_buffer), "(%s)  ", MOX::_player[MOX::_PLAYER_NUM].name);
 
         uint8_t pc1, pc2, pc3;
         MULTPLAY::Get_Main_Palette_Base_Colors_(MOX::_PLAYER_NUM, &pc1, &pc2, &pc3);
@@ -1796,7 +1797,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
         memset(MOX::_mp_screen, 0, sizeof(s_mp_screen));
 
-        strcpy(MOX::_mp_screen->signature, "Evan Axelrad");
+        strlcpy(MOX::_mp_screen->signature, "Evan Axelrad", sizeof(MOX::_mp_screen->signature));
         MOX::_mp_screen->needs_full_redraw = 1;
 
         MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
@@ -1897,7 +1898,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 fonts::Set_Font_Style_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, font_colors);
                 char* race_name = HACCESS::Race_Name_String_(player_idx);
                 char buffer[100];
-                sprintf(buffer, MOX::s_fmt_scanned_star_info, plr->name, race_name);
+                snprintf(buffer, sizeof(buffer), MOX::s_fmt_scanned_star_info, plr->name, race_name);
 
                 int16_t font_h = fonts::Get_Font_Height_();
                 int16_t print_y = screen_y + 0x40 + y_offset_for_player_row + (29 - font_h) / 2;
@@ -2029,7 +2030,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         int16_t msg_id = (num_users == 1) ? 0xF9 : 0xFA;
         const char* format = HAROLD::H_Message_(msg_id);
 
-        sprintf(buffer, format, (int)num_users);
+        snprintf(buffer, sizeof(buffer), format, (int)num_users);
 
         fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
         fonts::Print_(MOX::_mp_screen->screen_x + 120 /* 0x78 */, MOX::_mp_screen->screen_y + 71 /* 0x47 */, buffer);
@@ -2115,7 +2116,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         int32_t total_users = netcode::Net_Get_Users_(nullptr);
         const char* format = HAROLD::H_Message_(251 /* 0xfb */);
-        sprintf(msg_buffer, format, (int32_t)connected_count, total_users);
+        snprintf(msg_buffer, sizeof(msg_buffer), format, (int32_t)connected_count, total_users);
 
         fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
         fonts::Print_(MOX::_mp_screen->screen_x + 118 /* 0x76 */, MOX::_mp_screen->screen_y + 73 /* 0x49 */, msg_buffer);
@@ -2425,8 +2426,8 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         const int16_t score = SCORE::Player_Score_(player_idx);
         const char* const score_text = MISC::Get_Comma_String_(score);
 
-        strcpy(message_format, HAROLD::H_Message_(0xFC));
-        sprintf(line, message_format, player->name, player->race_name, score_text);
+        strlcpy(message_format, HAROLD::H_Message_(0xFC), sizeof(message_format));
+        snprintf(line, sizeof(line), message_format, player->name, player->race_name, score_text);
         fonts::Print_(print_x, print_y, line);
     }
 

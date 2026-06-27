@@ -25,7 +25,7 @@ namespace SYS {
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_idx) {
         char buffer[120];
 
-        sprintf(buffer, "%d> %s", (int)star_idx, MOX::_star[star_idx].name);
+        snprintf(buffer, sizeof(buffer), "%d> %s", (int)star_idx, MOX::_star[star_idx].name);
 
         size_t len = strlen(buffer);
         if (len >= SYSTEM_DISPLAY_LOADED_FLAG_LENGTH) {
@@ -59,13 +59,13 @@ namespace SYS {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        sprintf(temp_buffer, "%d> %s", (int)star_idx, star->name);
+        snprintf(temp_buffer, sizeof(temp_buffer), "%d> %s", (int)star_idx, star->name);
 
         if (strlen(temp_buffer) >= SYSTEM_DISPLAY_LOADED_FLAG_LENGTH) {
-            temp_buffer[SYSTEM_DISPLAY_LOADED_FLAG_LENGTH] = '\0';
+            temp_buffer[SYSTEM_DISPLAY_LOADED_FLAG_LENGTH - 1] = '\0';
         }
 
-        sprintf(MOX::_star_name_loaded_string, temp_buffer);
+        strlcpy(MOX::_star_name_loaded_string, temp_buffer, SYSTEM_DISPLAY_LOADED_FLAG_LENGTH);
     }
 
     bool __cdecl Ok_To_View_System_(int16_t star_idx, int16_t player_idx) {
@@ -236,8 +236,8 @@ namespace SYS {
         char main_text[1000];
         s_potential_colony_info info;
 
-        strcpy(bonus_msg_buf, HAROLD::H_Message_(HESTR_16E_BONUS));
-        strcpy(penalty_msg_buf, HAROLD::H_Message_(HESTR_16F_PENALTY));
+        strlcpy(bonus_msg_buf, HAROLD::H_Message_(HESTR_16E_BONUS), sizeof(bonus_msg_buf));
+        strlcpy(penalty_msg_buf, HAROLD::H_Message_(HESTR_16F_PENALTY), sizeof(penalty_msg_buf));
 
         COLCALC::Compute_Potential_Colony_Info_(
             &MOX::_player[MOX::_PLAYER_NUM],
@@ -246,69 +246,69 @@ namespace SYS {
         );
 
         /* fmtpara: \aM25,30. adjusts paragraph margins, \x1A left-align/right-align control code prefixes the following digit. */
-        sprintf(fmt_text, "\aM25,30." "\x1A" "0%s", HAROLD::H_Message_(HESTR_170_MAX_POPULATION));
-        strcat(fmt_text, "\x1A" "1");
-        strcat(fmt_text, "%d\n");
+        snprintf(fmt_text, sizeof(fmt_text), "\aM25,30." "\x1A" "0%s", HAROLD::H_Message_(HESTR_170_MAX_POPULATION));
+        strlcat(fmt_text, "\x1A" "1", sizeof(fmt_text));
+        strlcat(fmt_text, "%d\n", sizeof(fmt_text));
 
         int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
-        sprintf(main_text, fmt_text, (int)max_pop);
+        snprintf(main_text, sizeof(main_text), fmt_text, (int)max_pop);
 
         /* fmtpara: \x1A control code prefixes the following alignment digit. */
         if (info.food == 0) {
-            sprintf(line_text, "\x1A" "0%s" "\x1A" "10\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "10\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
         } else {
             int food_val = (int)info.food / 2;
-            sprintf(line_text, "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_val);
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_val);
         }
-        strcat(main_text, line_text);
+        strlcat(main_text, line_text, sizeof(main_text));
 
-        sprintf(line_text, "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
-        strcat(main_text, line_text);
+        snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
+        strlcat(main_text, line_text, sizeof(main_text));
 
-        sprintf(line_text, "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_173_RESEARCH_PER_SCIENTIST), (int)info.research);
-        strcat(main_text, line_text);
+        snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_173_RESEARCH_PER_SCIENTIST), (int)info.research);
+        strlcat(main_text, line_text, sizeof(main_text));
 
         if (info.maintenance == 0) {
             /* fmtpara: \aM25,27. changes the paragraph margin before the following status line. */
-            strcat(main_text, "\aM25,27.");
-            sprintf(line_text, "\x1A" "0%s" "\x1A" "1--\n", HAROLD::H_Message_(HESTR_174_NO_MAINTENANCE_BONUS));
-            strcat(main_text, line_text);
+            strlcat(main_text, "\aM25,27.", sizeof(main_text));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1--\n", HAROLD::H_Message_(HESTR_174_NO_MAINTENANCE_BONUS));
+            strlcat(main_text, line_text, sizeof(main_text));
         } else {
             /* fmtpara: \aM25,17. changes the paragraph margin before the following status line. */
-            strcat(main_text, "\aM25,17.");
-            sprintf(line_text, "\x1A" "0%s", HAROLD::H_Message_(HESTR_175_MAINTENANCE));
+            strlcat(main_text, "\aM25,17.", sizeof(main_text));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s", HAROLD::H_Message_(HESTR_175_MAINTENANCE));
 
             int16_t msg_id = (info.maintenance <= 0) ? HESTR_189_MAINTENANCE_BONUS : HESTR_18A_MAINTENANCE_PENALTY;
-            sprintf(line_text, "\x1A" "0%s" "\x1A" "1", HAROLD::H_Message_(msg_id));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1", HAROLD::H_Message_(msg_id));
 
             int abs_maint = abs((int)info.maintenance);
-            sprintf(val_text, "%d%%\n", abs_maint);
+            snprintf(val_text, sizeof(val_text), "%d%%\n", abs_maint);
 
-            strcat(line_text, val_text);
-            strcat(main_text, line_text);
+            strlcat(line_text, val_text, sizeof(line_text));
+            strlcat(main_text, line_text, sizeof(main_text));
         }
 
         if (info.worker_bonus == 0) {
-            strcat(main_text, "\aM25,27.");
-            sprintf(line_text, "\x1A" "0%s" "\x1A" "1--\n", HAROLD::H_Message_(HESTR_176_NO_WORKER_BONUS));
-            strcat(main_text, line_text);
+            strlcat(main_text, "\aM25,27.", sizeof(main_text));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1--\n", HAROLD::H_Message_(HESTR_176_NO_WORKER_BONUS));
+            strlcat(main_text, line_text, sizeof(main_text));
         } else {
-            strcat(main_text, "\aM25,17.");
-            sprintf(line_text, "\x1A" "0%s", HAROLD::H_Message_(HESTR_177_WORKER));
+            strlcat(main_text, "\aM25,17.", sizeof(main_text));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s", HAROLD::H_Message_(HESTR_177_WORKER));
 
             int16_t msg_id = (info.worker_bonus > 0) ? HESTR_18B_WORKER_BONUS : HESTR_18C_WORKER_PENALTY;
-            sprintf(line_text, "\x1A" "0%s" "\x1A" "1", HAROLD::H_Message_(msg_id));
+            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1", HAROLD::H_Message_(msg_id));
 
             int abs_bonus = abs((int)info.worker_bonus);
-            sprintf(val_text, "%d%%\n", abs_bonus);
+            snprintf(val_text, sizeof(val_text), "%d%%\n", abs_bonus);
 
-            strcat(line_text, val_text);
-            strcat(main_text, line_text);
+            strlcat(line_text, val_text, sizeof(line_text));
+            strlcat(main_text, line_text, sizeof(main_text));
         }
 
-        strcpy(fmt_text, HAROLD::H_Message_(HESTR_178_COLONY_INFO_FOR_S));
+        strlcpy(fmt_text, HAROLD::H_Message_(HESTR_178_COLONY_INFO_FOR_S), sizeof(fmt_text));
         char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
-        sprintf(title_text, fmt_text, planet_name);
+        snprintf(title_text, sizeof(title_text), fmt_text, planet_name);
 
         TEXTBOX::Text_Box_(title_text, main_text);
     }
@@ -700,7 +700,7 @@ namespace SYS {
                     pcVar5 = HAROLD::H_Message_(0x16b);
                 } else {
                     pcVar5 = HAROLD::H_Message_(0x16a);
-                    sprintf(local_64, pcVar5, &MOX::_star[star_idx]);
+                    snprintf(local_64, sizeof(local_64), pcVar5, &MOX::_star[star_idx]);
                     pcVar5 = local_64;
                 }
                 Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, pcVar5);
@@ -725,7 +725,7 @@ namespace SYS {
 
             Draw_System_Special_Popup_(content_w + base_x + 5, y_offset + content_h + base_y, SYSTEM_SPECIAL_SPACE_MONSTER, star_idx);
             const char* pcVar5 = HAROLD::H_Message_(0x16a);
-            sprintf(local_64, pcVar5, &MOX::_star[star_idx]);
+            snprintf(local_64, sizeof(local_64), pcVar5, &MOX::_star[star_idx]);
             Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, local_64);
             return;
         }
@@ -761,15 +761,15 @@ namespace SYS {
             if (MOX::_star[iVar6].wormhole_star_id <= -1) {
                 if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
                     const char* pcVar5 = MOX::_planet_special_string[MOX::_star[iVar6].system_special];
-                    strcpy(local_b4, pcVar5);
+                    strlcpy(local_b4, pcVar5, sizeof(local_b4));
                 }
             } else {
                 if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, sVar15)) {
                     const char* pcVar5 = HAROLD::H_Message_(0x16c);
-                    sprintf(local_b4, pcVar5, &MOX::_star[sVar15]);
+                    snprintf(local_b4, sizeof(local_b4), pcVar5, &MOX::_star[sVar15]);
                 } else {
                     const char* pcVar5 = HAROLD::H_Message_(0x16d);
-                    strcpy(local_b4, pcVar5);
+                    strlcpy(local_b4, pcVar5, sizeof(local_b4));
                 }
             }
 
@@ -1155,12 +1155,12 @@ namespace SYS {
 
         if (ship_node_num >= 5000) {
             ship_idx = MOX::_ship_node[static_cast<int16_t>(ship_node_num - 5000)].ship_idx;
-            sprintf(ship_name, MOX::_ship[ship_idx].d.name);
+            strlcpy(ship_name, MOX::_ship[ship_idx].d.name, sizeof(ship_name));
         } else {
             ship_idx = MOX::_ship_node[ship_node_num].ship_idx;
             owner = HACCESS::Ship_Owner_(ship_idx);
             if (owner >= MAX_PLAYERS) {
-                sprintf(ship_name, MOX::_ship[ship_idx].d.name);
+                strlcpy(ship_name, MOX::_ship[ship_idx].d.name, sizeof(ship_name));
             }
         }
 
@@ -1234,7 +1234,7 @@ namespace SYS {
                 }
             }
 
-            sprintf(line_buffer, HAROLD::H_Message_(0x163), player->race_name);
+            snprintf(line_buffer, sizeof(line_buffer), HAROLD::H_Message_(0x163), player->race_name);
             fonts::Set_Font_Style_(2, &font_colors);
             fonts::Set_Font_Spacing_(1);
 
@@ -1255,7 +1255,7 @@ namespace SYS {
                             ? TECHDATA::_hull_data[hull_idx].name
                             : TECHDATA::_hull_data[hull_idx].size_name;
 
-                    sprintf(line_buffer, "%2d %s", static_cast<int32_t>(hull_count), hull_name);
+                    snprintf(line_buffer, sizeof(line_buffer), "%2d %s", static_cast<int32_t>(hull_count), hull_name);
                     print_y = static_cast<int16_t>(print_y + static_cast<int16_t>(line_step));
 
                     if (draw_text) {
@@ -1272,9 +1272,9 @@ namespace SYS {
 
             if (group_a_count > 0) {
                 if (group_a_count == 1) {
-                    sprintf(line_buffer, HAROLD::H_Message_(0x164), static_cast<int32_t>(group_a_count));
+                    snprintf(line_buffer, sizeof(line_buffer), HAROLD::H_Message_(0x164), static_cast<int32_t>(group_a_count));
                 } else {
-                    sprintf(line_buffer, HAROLD::H_Message_(0x165));
+                    strlcpy(line_buffer, HAROLD::H_Message_(0x165), sizeof(line_buffer));
                 }
 
                 print_y = static_cast<int16_t>(print_y + static_cast<int16_t>(line_step));
@@ -1291,8 +1291,9 @@ namespace SYS {
             }
 
             if (group_b_count > 0) {
-                sprintf(
+                snprintf(
                     line_buffer,
+                    sizeof(line_buffer),
                     HAROLD::H_Message_(group_b_count == 1 ? 0x166 : 0x167),
                     static_cast<int32_t>(group_b_count)
                 );
@@ -1311,8 +1312,9 @@ namespace SYS {
             }
 
             if (group_c_count > 0) {
-                sprintf(
+                snprintf(
                     line_buffer,
+                    sizeof(line_buffer),
                     HAROLD::H_Message_(group_c_count == 1 ? 0x168 : 0x169),
                     static_cast<int32_t>(group_c_count)
                 );
@@ -1387,7 +1389,7 @@ namespace SYS {
         int16_t current_y = static_cast<int16_t>(text_top + inner_top + top + 7);
 
         if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
-            strcpy(title_buffer, HAROLD::H_Message_(0x15f));
+            strlcpy(title_buffer, HAROLD::H_Message_(0x15f), sizeof(title_buffer));
 
             if (draw) {
                 fonts::Print_(text_x, current_y, title_buffer);
@@ -1398,7 +1400,7 @@ namespace SYS {
                 }
             }
         } else if (planet->planet_type == PLANET_TYPE_ASTEROID) {
-            strcpy(title_buffer, HAROLD::H_Message_(0x160));
+            strlcpy(title_buffer, HAROLD::H_Message_(0x160), sizeof(title_buffer));
 
             if (draw) {
                 fonts::Print_(text_x, current_y, title_buffer);
@@ -1412,16 +1414,16 @@ namespace SYS {
             const uint8_t climate_idx =
                     static_cast<uint8_t>(colony != nullptr ? colony->climate : planet->climate);
 
-            sprintf(title_buffer, "%s ", HACCESS::Get_Planet_Name_No_Prime_(planet_idx));
+            snprintf(title_buffer, sizeof(title_buffer), "%s ", HACCESS::Get_Planet_Name_No_Prime_(planet_idx));
 
             if (colony != nullptr) {
-                sprintf(detail_buffer, "(%s", MOX::_player[colony_owner].race_name);
-                strcat(title_buffer, detail_buffer);
+                snprintf(detail_buffer, sizeof(detail_buffer), "(%s", MOX::_player[colony_owner].race_name);
+                strlcat(title_buffer, detail_buffer, sizeof(title_buffer));
 
                 if (colony->outpost_flag != 0) {
-                    strcat(title_buffer, HAROLD::H_Message_(0x161));
+                    strlcat(title_buffer, HAROLD::H_Message_(0x161), sizeof(title_buffer));
                 } else {
-                    strcat(title_buffer, ")");
+                    strlcat(title_buffer, ")", sizeof(title_buffer));
                 }
             }
 
@@ -1436,8 +1438,9 @@ namespace SYS {
                 }
             }
 
-            sprintf(
+            snprintf(
                     detail_buffer,
+                    sizeof(detail_buffer),
                     "%s, %s",
                     MOX::_planet_size_string[static_cast<int8_t>(planet->size)],
                     MOX::_planet_climate_string[climate_idx]);
@@ -1457,14 +1460,16 @@ namespace SYS {
                     COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
 
             if (colony != nullptr) {
-                sprintf(
+                snprintf(
                         detail_buffer,
+                        sizeof(detail_buffer),
                         HAROLD::H_Message_(0x181),
                         static_cast<uint32_t>(static_cast<uint8_t>(colony->n_pops)),
                         static_cast<int32_t>(max_population));
             } else {
-                sprintf(
+                snprintf(
                         detail_buffer,
+                        sizeof(detail_buffer),
                         HAROLD::H_Message_(0x162),
                         static_cast<int32_t>(max_population));
             }
@@ -1484,13 +1489,15 @@ namespace SYS {
             *total_height = static_cast<int16_t>(*total_height + line_advance);
 
             if (static_cast<int8_t>(planet->gravity_class) == PLANET_GRAVITY_NORMAL_G) {
-                sprintf(
+                snprintf(
                         detail_buffer,
+                        sizeof(detail_buffer),
                         "%s",
                         MOX::_mineral_class_string[static_cast<int8_t>(planet->mineral_class)]);
             } else {
-                sprintf(
+                snprintf(
                         detail_buffer,
+                        sizeof(detail_buffer),
                         "%s, %s",
                         MOX::_mineral_class_string[static_cast<int8_t>(planet->mineral_class)],
                         MOX::_planet_gravity_string[static_cast<int8_t>(planet->gravity_class)]);
@@ -1636,47 +1643,47 @@ namespace SYS {
 
         switch (gate_type) {
         case 0:
-            strcpy(info_text, HAROLD::H_Message_(0x17C));
+            strlcpy(info_text, HAROLD::H_Message_(0x17C), sizeof(info_text));
             gate_label_width = fonts::Get_String_Width_(info_text);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                     if (HAROLD::Player_Has_Dimensional_Portal_(&MOX::_player[player_idx], &MOX::_star[star_idx])) {
-                        strcat(info_text, MOX::_player[player_idx].name);
-                        strcat(info_text, ", ");
+                        strlcat(info_text, MOX::_player[player_idx].name, sizeof(info_text));
+                        strlcat(info_text, ", ", sizeof(info_text));
                     }
                 }
             }
 
             info_text[static_cast<int32_t>(strlen(info_text)) - 2] = '\0';
-            strcat(info_text, ")");
+            strlcat(info_text, ")", sizeof(info_text));
             break;
 
         case 1:
-            strcpy(info_text, HAROLD::H_Message_(0x17A));
+            strlcpy(info_text, HAROLD::H_Message_(0x17A), sizeof(info_text));
             gate_label_width = fonts::Get_String_Width_(info_text);
             break;
 
         case 2:
-            strcpy(info_text, HAROLD::H_Message_(0x179));
+            strlcpy(info_text, HAROLD::H_Message_(0x179), sizeof(info_text));
             gate_label_width = fonts::Get_String_Width_(info_text);
             break;
 
         case 3:
-            strcpy(info_text, HAROLD::H_Message_(0x17B));
+            strlcpy(info_text, HAROLD::H_Message_(0x17B), sizeof(info_text));
             gate_label_width = fonts::Get_String_Width_(info_text);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                     if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[player_idx], &MOX::_star[star_idx])) {
-                        strcat(info_text, MOX::_player[player_idx].race_name);
-                        strcat(info_text, ", ");
+                        strlcat(info_text, MOX::_player[player_idx].race_name, sizeof(info_text));
+                        strlcat(info_text, ", ", sizeof(info_text));
                     }
                 }
             }
 
             info_text[static_cast<int32_t>(strlen(info_text)) - 2] = '\0';
-            strcat(info_text, ")");
+            strlcat(info_text, ")", sizeof(info_text));
             break;
 
         default:
@@ -1711,7 +1718,7 @@ namespace SYS {
         char popup_text[80];
 
         const char* const format = HAROLD::H_Message_(0x16A);
-        sprintf(popup_text, format, star);
+        snprintf(popup_text, sizeof(popup_text), format, star);
 
         SYS::Init_System_Display_(star_idx);
         SYS::Draw_System_Display_Popup_(

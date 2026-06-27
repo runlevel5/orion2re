@@ -196,21 +196,21 @@ namespace DESBOX {
                                 } else if (exclusion_result != 0) {
                                     if (strcmp(TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name, TECHDATA::_specials[exclude_special].name) == 0) {
                                         MISC::Get_LBX_Message_(0x42, msg42_base);
-                                        sprintf(msg42, msg42_base, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
+                                        snprintf(msg42, sizeof(msg42), msg42_base, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
                                     } else {
                                         MISC::Get_LBX_Message_(0x43, msg43_base);
                                         char* name_item = TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name;
                                         char* name_excl = TECHDATA::_specials[exclude_special].name;
                                         const char* article_item = MISC::Is_Vowel_(name_item[0]) ? "an" : "a";
                                         const char* article_excl = MISC::Is_Vowel_(name_excl[0]) ? "an" : "a";
-                                        sprintf(msg42, msg43_base, article_excl, name_excl, article_item, name_item);
+                                        snprintf(msg42, sizeof(msg42), msg43_base, article_excl, name_excl, article_item, name_item);
                                     }
                                     GENDRAW::Warning_Box_(msg42);
                                     redraw_warning = 1;
                                 }
                             } else {
                                 MISC::Get_LBX_Message_(0x41, msg41);
-                                sprintf(msg42, msg41, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
+                                snprintf(msg42, sizeof(msg42), msg41, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
                                 GENDRAW::Warning_Box_(msg42);
                                 redraw_warning = 1;
                             }
@@ -679,7 +679,7 @@ namespace DESBOX {
                 Weapon_Index_(_field_item_chosen);
                 int16_t space = static_cast<int16_t>(New_Mod_Space_(static_cast<uint8_t>(mod_idx)));
                 MISC::Get_LBX_Message_(0x3A, format);
-                sprintf(message, format, 
+                snprintf(message, sizeof(message), format, 
                         TECHDATA::_weapon_modifications[mod_idx].name, 
                         (MOX::_design->space_used - MOX::_design->hull_space) + space);
                 break;
@@ -697,27 +697,27 @@ namespace DESBOX {
                     msg_idx = 0x3C;
                 }
                 MISC::Get_LBX_Message_(msg_idx, format);
-                sprintf(message, format, level_diff, 
+                snprintf(message, sizeof(message), format, level_diff, 
                         TECHDATA::_technology_applications[app_id].name, 
                         TECHDATA::_weapon_modifications[mod_idx].name);
                 break;
             }
             case 0xFB: {
-                strcpy(message, HAROLD::H_Message_(0x3D));
+                strlcpy(message, HAROLD::H_Message_(0x3D), sizeof(message));
                 break;
             }
             case 0xFC: {
-                strcpy(message, HAROLD::H_Message_(0x3E));
+                strlcpy(message, HAROLD::H_Message_(0x3E), sizeof(message));
                 break;
             }
             case 0xFD: {
-                strcpy(message, HAROLD::H_Message_(0x3F));
+                strlcpy(message, HAROLD::H_Message_(0x3F), sizeof(message));
                 break;
             }
             case 0xFE: {
                 int16_t wpn_idx = Weapon_Index_(_field_item_chosen);
                 MISC::Get_LBX_Message_(0x40, format);
-                sprintf(message, format, 
+                snprintf(message, sizeof(message), format, 
                         TECHDATA::_weapon_modifications[mod_idx].name, 
                         TECHDATA::_weapons[wpn_idx].name);
                 break;
@@ -933,7 +933,7 @@ namespace DESBOX {
                 name_ptr = TECHDATA::_computers[choice_item].name;
             }
 
-            strcpy(title, name_ptr);
+            strlcpy(title, name_ptr, sizeof(title));
 
             if (description[0] != '\0') {
                 TEXTBOX::Text_Box_(title, description);
@@ -1326,11 +1326,11 @@ namespace DESBOX {
 
         uint8_t racks[5] = { 2, 5, 10, 15, 20 };
 
-        strcpy(local_824, HAROLD::H_Message_(0x46));
-        strcpy(local_806, HAROLD::H_Message_(0x47));
-        strcpy(local_7e8, HAROLD::H_Message_(0x48));
-        strcpy(local_7ca, HAROLD::H_Message_(0x49));
-        strcpy(local_7ac, "360");
+        strlcpy(local_824, HAROLD::H_Message_(0x46), sizeof(local_824));
+        strlcpy(local_806, HAROLD::H_Message_(0x47), sizeof(local_806));
+        strlcpy(local_7e8, HAROLD::H_Message_(0x48), sizeof(local_7e8));
+        strlcpy(local_7ca, HAROLD::H_Message_(0x49), sizeof(local_7ca));
+        strlcpy(local_7ac, "360", sizeof(local_7ac));
 
         char* arc_strings[5] = { local_824, local_806, local_7e8, local_7ca, local_7ac };
 
@@ -1416,7 +1416,7 @@ namespace DESBOX {
                     if (weap_type == 0 && MOX::_weapon_arc_field[i] == input) {
                         if (_valid_arcs_racks[i] == 0) {
                             MISC::Get_LBX_Message_(0x4B, acStack_78c);
-                            sprintf(acStack_888, acStack_78c, arc_strings[i]);
+                            snprintf(acStack_888, sizeof(acStack_888), acStack_78c, arc_strings[i]);
                             GENDRAW::Message_Box_(acStack_888);
                         } else {
                             _weapon_replacement_arcs = 1 << i;
@@ -1425,7 +1425,7 @@ namespace DESBOX {
                     } else if ((weap_type == 1 || weap_type == 2) && MOX::_weapon_rack_field[i] == input) {
                         if (_valid_arcs_racks[i] == 0) {
                             MISC::Get_LBX_Message_(0x4C, acStack_6c4);
-                            sprintf(acStack_888, acStack_6c4, racks[i]);
+                            snprintf(acStack_888, sizeof(acStack_888), acStack_6c4, racks[i]);
                             GENDRAW::Message_Box_(acStack_888);
                         } else {
                             _weapon_replacement_arcs = 0x10;
@@ -1518,7 +1518,7 @@ namespace DESBOX {
                     int16_t wtype = DESIGN::Weapon_Type_(weap_idx);
                     if (wtype == 3 || wtype == 4 || wtype == 5) {
                         MISC::Get_LBX_Message_(0x4F, acStack_5fc);
-                        sprintf(acStack_888, acStack_5fc, TECHDATA::_weapons[weap_idx].name);
+                        snprintf(acStack_888, sizeof(acStack_888), acStack_5fc, TECHDATA::_weapons[weap_idx].name);
                         GENDRAW::Message_Box_(acStack_888);
                     }
                 }
@@ -1759,7 +1759,7 @@ namespace DESBOX {
             return 1;
         }
 
-        strcpy(MOX::_temp_string, HAROLD::H_Message_(0x45));
+        strlcpy(MOX::_temp_string, HAROLD::H_Message_(0x45), sizeof(MOX::_temp_string));
         return 0;
     }
 
@@ -1941,14 +1941,14 @@ namespace DESBOX {
         s_help_record* base_desc = static_cast<s_help_record*>(
             farload::Far_Reload_Next_Data_(help_lbx_name, 0, block, 400, 1, sizeof(s_help_record))
         );
-        strcpy(desc_text, base_desc->body);
-        strcat(desc_text, "\n\n");
+        strlcpy(desc_text, base_desc->body, sizeof(desc_text));
+        strlcat(desc_text, "\n\n", sizeof(desc_text));
 
         s_help_record* mod_desc = static_cast<s_help_record*>(
             farload::Far_Reload_Next_Data_(help_lbx_name, 0, block, mod_id + 400, 1, sizeof(s_help_record))
         );
-        strcpy(mod_text, mod_desc->body);
-        strcat(desc_text, mod_text);
+        strlcpy(mod_text, mod_desc->body, sizeof(mod_text));
+        strlcat(desc_text, mod_text, sizeof(desc_text));
 
         TEXTBOX::Text_Box_(mod_desc->title, desc_text);
 
@@ -2252,8 +2252,8 @@ namespace DESBOX {
 
             char cost_str[20];
             char space_str[20];
-            sprintf(cost_str, "%d", weapon_cost);
-            sprintf(space_str, "%d", weapon_space);
+            snprintf(cost_str, sizeof(cost_str), "%d", weapon_cost);
+            snprintf(space_str, sizeof(space_str), "%d", weapon_space);
 
             if (selected) {
                 animate::Draw_(x, cur_y + 1, MOX::_weapons_selected_seg);
@@ -2273,9 +2273,9 @@ namespace DESBOX {
 
             char name_str[80];
             if (weapon_idx <= 0) {
-                strcpy(name_str, HAROLD::H_Message_(0x32));
+                strlcpy(name_str, HAROLD::H_Message_(0x32), sizeof(name_str));
             } else {
-                sprintf(name_str, "%s (%d)", TECHDATA::_weapons[weapon_idx].name, num_weapons);
+                snprintf(name_str, sizeof(name_str), "%s (%d)", TECHDATA::_weapons[weapon_idx].name, num_weapons);
             }
 
             fonts::Set_Font_Spacing_(1);
@@ -2305,7 +2305,7 @@ namespace DESBOX {
             if (weapon_idx == 0) {
                 name_str[0] = '\0';
             } else {
-                strcpy(name_str, MOX::_weapon_notes_string[weapon_idx]);
+                strlcpy(name_str, MOX::_weapon_notes_string[weapon_idx], sizeof(name_str));
                 s_colors colors;
                 fonts::Get_Colors_(&colors);
                 fonts::Set_Font_Style_(2, &colors);
@@ -2511,7 +2511,7 @@ namespace DESBOX {
 
                 fonts::Print_(x1, current_y, TECHDATA::_computers[item].name);
 
-                sprintf(sprint_buf, strings::s_fmt_plus_d_00557ed0, TECHDATA::_computers[item].bonus);
+                snprintf(sprint_buf, sizeof(sprint_buf), strings::s_fmt_plus_d_00557ed0, TECHDATA::_computers[item].bonus);
                 fonts::Print_Centered_(current_x + 0xE1 + w1 / 2, current_y, sprint_buf);
             } else {
                 continue;
@@ -2826,8 +2826,8 @@ namespace DESBOX {
                 if (special_id > -1) {
                     System_Added_Cost_And_Space_(item_idx, &cost, &space);
 
-                    strcpy(special_desc, MOX::_special_desc_string[special_id]);
-                    strcpy(special_name, TECHDATA::_specials[special_id].name);
+                    strlcpy(special_desc, MOX::_special_desc_string[special_id], sizeof(special_desc));
+                    strlcpy(special_name, TECHDATA::_specials[special_id].name, sizeof(special_name));
 
                     int16_t item_space = space;
                     if (MOX::_design_screen_replacement_slot > -1 && MOX::_design->special_devices[MOX::_design_screen_replacement_slot] > 0) {
@@ -2869,8 +2869,8 @@ namespace DESBOX {
                     }
                     else {
                         MISC::Get_Font_Style_();
-                        sprintf(cost_str, "%d", cost);
-                        sprintf(space_str, "%d", space);
+                        snprintf(cost_str, sizeof(cost_str), "%d", cost);
+                        snprintf(space_str, sizeof(space_str), "%d", space);
 
                         fonts::Set_Font_Spacing_(1);
                         fonts::Print_(base_x + 0x20, local_y, special_name);

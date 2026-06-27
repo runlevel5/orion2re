@@ -404,7 +404,7 @@ namespace HOMEGEN {
         // concatenates companion star name if fill_msg is short, 
         // but fill_msg is completely overwritten later by H_Message.
         if (strlen(MAPGEN::_fill_msg) < 35) {
-            strcat(MAPGEN::_fill_msg, ".");
+            strlcat(MAPGEN::_fill_msg, ".", sizeof(MAPGEN::_fill_msg));
         }
 
         video::Set_Page_Back_();
@@ -420,7 +420,7 @@ namespace HOMEGEN {
 
         // Load specific UI string and render it to the cached bitmap
         const char* msg_str = HAROLD::H_Message_(0xA1);
-        strcpy(MAPGEN::_fill_msg, msg_str);
+        strlcpy(MAPGEN::_fill_msg, msg_str, sizeof(MAPGEN::_fill_msg));
 
         fonts::Set_Font_Style_Outline_Heavy_(4, &colors1);
         fonts::Set_Outline_Color_(2, 1);
@@ -944,7 +944,7 @@ namespace HOMEGEN {
 
         if (candidate_count == 0) {
             char error_msg[128];
-            sprintf(error_msg, "Found no satellites after 3_MIN enforcement: Star: %d", (int)star_idx);
+            snprintf(error_msg, sizeof(error_msg), "Found no satellites after 3_MIN enforcement: Star: %d", (int)star_idx);
             exitm::Exit_With_Message(error_msg);
             return;
         }

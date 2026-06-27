@@ -267,13 +267,13 @@ namespace MOVEBOX {
                 bool has_colony = HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, scanned_star_idx);
 
                 if (off_idx == -1 || !has_colony) {
-                    strcpy(buffer, star.name);
+                    strlcpy(buffer, star.name, sizeof(buffer));
                 } else {
                     s_leader_data& leader = MOX::_leaders[off_idx];
                     int8_t eta = leader.eta;
 
                     if (eta <= 0) {
-                        sprintf(buffer, MOX::s_fmt_scanned_star_info, star.name, leader.name);
+                        snprintf(buffer, sizeof(buffer), MOX::s_fmt_scanned_star_info, star.name, leader.name);
                     } else {
                         const char* fmt;
                         if (eta == 1) {
@@ -281,11 +281,11 @@ namespace MOVEBOX {
                         } else {
                             fmt = HAROLD::H_Message_(147);
                         }
-                        sprintf(buffer, fmt, star.name, leader.name, eta);
+                        snprintf(buffer, sizeof(buffer), fmt, star.name, leader.name, eta);
                     }
                 }
             } else {
-                strcpy(buffer, HAROLD::H_Message_(148));
+                strlcpy(buffer, HAROLD::H_Message_(148), sizeof(buffer));
             }
 
             MISC::Set_Fitted_Font_Style_(buffer, &font_colors, 3, 2, 0, 203, 1);

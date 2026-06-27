@@ -1202,7 +1202,7 @@ namespace MAINSCR {
         } while (tech_app_idx < 204); // 0xcc
 
         const char* format_str = HAROLD::H_Message_(0xdc);
-        sprintf(buffer, format_str, (int)num_granted);
+        snprintf(buffer, sizeof(buffer), format_str, (int)num_granted);
 
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
     }
@@ -1232,7 +1232,7 @@ namespace MAINSCR {
                 Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 1);
             }
 
-            strcpy(dialog_text, msg_src);
+            strlcpy(dialog_text, msg_src, sizeof(dialog_text));
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, dialog_text, 0);
             MOX::_draw_main_screen_to_back = 1;
             Update_Star_Owners_();
@@ -1248,7 +1248,7 @@ namespace MAINSCR {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             player->bc += 1000;
             const char* msg_fmt = HAROLD::H_Message_(215); // HESTR_0D7_S_HAS_BEEN_GIVEN_A_GIF
-            sprintf(message_buffer, msg_fmt, player->race_name, 1000);
+            snprintf(message_buffer, sizeof(message_buffer), msg_fmt, player->race_name, 1000);
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 0);
             Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 3);
             return;
@@ -1258,7 +1258,7 @@ namespace MAINSCR {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             const char* tech_name = TECHDATA::_technology_applications[(uint8_t)player->current_research_application].name;
             const char* msg_fmt = HAROLD::H_Message_(216); // HESTR_0D8_S_WILL_BE_KNOWN
-            sprintf(message_buffer, msg_fmt, tech_name);
+            snprintf(message_buffer, sizeof(message_buffer), msg_fmt, tech_name);
             player->research_accumulated = 9999;
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 0);
             Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 4);
@@ -1273,7 +1273,7 @@ namespace MAINSCR {
         if (key == _hi_score_cheat) {
             int16_t score = SCORE::Do_Calculate_Hi_Score_(MOX::_PLAYER_NUM);
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            sprintf(dialog_text, "Current score for %s is %d", player->name, (int)score);
+            snprintf(dialog_text, sizeof(dialog_text), "Current score for %s is %d", player->name, (int)score);
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, dialog_text, 0);
         }
     }
@@ -1321,7 +1321,7 @@ namespace MAINSCR {
                     const char* format_msg = HAROLD::H_Message_(217);
                     char buffer[80];
 
-                    sprintf(buffer, format_msg, planet_name);
+                    snprintf(buffer, sizeof(buffer), format_msg, planet_name);
 
                     HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
                 } else {
@@ -1640,7 +1640,7 @@ namespace MAINSCR {
             HAROLD::Set_Player_Font_Style_(owner, 0);
             char* race_name = HACCESS::Race_Name_String_(owner);
 
-            sprintf(print_buffer, MOX::s_fmt_scanned_star_info, star->name, race_name);
+            snprintf(print_buffer, sizeof(print_buffer), MOX::s_fmt_scanned_star_info, star->name, race_name);
         } else if (owner == -1) {
             for (int16_t i = 0; i < 8; ++i) {
                 if (i < 2) {
@@ -1649,7 +1649,7 @@ namespace MAINSCR {
                     text_colors.colors[i] = 0x0C;
                 }
             }
-            sprintf(print_buffer, MOX::s_fmt_s, star->name);
+            snprintf(print_buffer, sizeof(print_buffer), MOX::s_fmt_s, star->name);
         } else if (owner == -2) {
             for (int16_t i = 0; i < 8; ++i) {
                 if (i < 2) {
@@ -1658,7 +1658,7 @@ namespace MAINSCR {
                     text_colors.colors[i] = 0x1F;
                 }
             }
-            sprintf(print_buffer, MOX::s_fmt_contested, star->name);
+            snprintf(print_buffer, sizeof(print_buffer), MOX::s_fmt_contested, star->name);
         }
 
         if (owner == -1 || owner == -2) {
@@ -1961,8 +1961,7 @@ namespace MAINSCR {
                 other_player->cheated = 1;
 
                 MISC::Get_LBX_Message_(22 /* LBX_MSG_CHEAT_WARNING */, lbx_msg);
-                
-                sprintf(output_msg, lbx_msg, name_buf, race_buf);
+                snprintf(output_msg, sizeof(output_msg), lbx_msg, name_buf, race_buf);
 
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, output_msg, 3);
                 video::Set_Page_Off_();
@@ -2588,7 +2587,7 @@ namespace MAINSCR {
                 if (!MAINSCR::_moving_a_stack || MOX::_mouse_XY.hovering_star_idx == -1) {
                     MOX::_mouse_XY.hovering_ship_icon_idx = i;
                     MOX::_mouse_XY.selected = 0;
-                    sprintf(icon_label, "ship icon %d", (int)i);
+                    snprintf(icon_label, sizeof(icon_label), "ship icon %d", (int)i);
                     MOX::_mouse_XY.hovering_star_idx = -1;
                 }
                 found = true;
@@ -2747,8 +2746,8 @@ namespace MAINSCR {
                 int16_t text_width = fonts::Get_String_Width_(star_ptr->name);
                 
                 char buffer[80];
-                sprintf(buffer, "%s, len = %d", star_ptr->name, (int32_t)text_width);
                 
+                snprintf(buffer, sizeof(buffer), "%s, len = %d", star_ptr->name, (int32_t)text_width);
                 star_processed = true;
             }
 
@@ -2809,10 +2808,10 @@ namespace MAINSCR {
         case 0: /* DI = -1010 */
             if (MOX::_disallow_saves_code == 0) {
                 FILEDEF::Save_Game_(9);
-                strcpy(msg_buffer, HAROLD::H_Message_(211 /* HESTR_0D3_GAME_SAVED */));
+                strlcpy(msg_buffer, HAROLD::H_Message_(211 /* HESTR_0D3_GAME_SAVED */), sizeof(msg_buffer));
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
             } else {
-                strcpy(msg_buffer, HAROLD::H_Message_(212 /* HESTR_0D4_SAVE_GAME_FUNCTION_DIS */));
+                strlcpy(msg_buffer, HAROLD::H_Message_(212 /* HESTR_0D4_SAVE_GAME_FUNCTION_DIS */), sizeof(msg_buffer));
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
             }
             break;
@@ -2866,7 +2865,7 @@ namespace MAINSCR {
                 }
             } else {
                 int16_t msg_id = (reloc_count == 1) ? 209 /* 0xD1 */ : 210 /* 0xD2 */;
-                strcpy(msg_buffer, HAROLD::H_Message_(msg_id));
+                strlcpy(msg_buffer, HAROLD::H_Message_(msg_id), sizeof(msg_buffer));
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
             }
             break;
@@ -2990,37 +2989,37 @@ namespace MAINSCR {
         switch (option_idx) {
             case 0:
                 MOX::_settings.end_of_turn_summary = (MOX::_settings.end_of_turn_summary == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xa6));
+                strlcpy(option_name, HAROLD::H_Message_(0xa6), sizeof(option_name));
                 status_flag = MOX::_settings.end_of_turn_summary;
                 break;
 
             case 1:
                 MOX::_settings.end_of_turn_wait = (MOX::_settings.end_of_turn_wait == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xa7));
+                strlcpy(option_name, HAROLD::H_Message_(0xa7), sizeof(option_name));
                 status_flag = MOX::_settings.end_of_turn_wait;
                 break;
 
             case 2:
                 MOX::_settings.enemy_moves = (MOX::_settings.enemy_moves == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xa8));
+                strlcpy(option_name, HAROLD::H_Message_(0xa8), sizeof(option_name));
                 status_flag = MOX::_settings.enemy_moves;
                 break;
 
             case 4:
                 MOX::_settings.auto_select_ships = (MOX::_settings.auto_select_ships == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xaa));
+                strlcpy(option_name, HAROLD::H_Message_(0xaa), sizeof(option_name));
                 status_flag = MOX::_settings.auto_select_ships;
                 break;
 
             case 5:
                 MOX::_settings.animations_on = (MOX::_settings.animations_on == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xab));
+                strlcpy(option_name, HAROLD::H_Message_(0xab), sizeof(option_name));
                 status_flag = MOX::_settings.animations_on;
                 break;
 
             case 6:
                 MOX::_settings.auto_select_colony = (MOX::_settings.auto_select_colony == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xac));
+                strlcpy(option_name, HAROLD::H_Message_(0xac), sizeof(option_name));
                 status_flag = MOX::_settings.auto_select_colony;
                 if (status_flag != 0) {
                     HACCESS::Set_All_Colony_Auto_Select_Flags_();
@@ -3029,7 +3028,7 @@ namespace MAINSCR {
 
             case 7:
                 MOX::_settings.show_relocation_lines = (MOX::_settings.show_relocation_lines == 0);
-                strcpy(option_name, HAROLD::H_Message_(0xad));
+                strlcpy(option_name, HAROLD::H_Message_(0xad), sizeof(option_name));
                 status_flag = MOX::_settings.show_relocation_lines;
                 break;
 
@@ -3039,7 +3038,7 @@ namespace MAINSCR {
 
         const char* status_text = HAROLD::H_Message_(status_flag ? 0xe7 /* ON */ : 0xe8 /* OFF */);
 
-        sprintf(message, "%s %s", option_name, status_text);
+        snprintf(message, sizeof(message), "%s %s", option_name, status_text);
 
         LOADSAVE::Save_Session_Related_Settings_();
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
@@ -3194,7 +3193,7 @@ namespace MAINSCR {
                         *param_4 = 1;
                     } else {
                         char local_578[200];
-                        strcpy(local_578, HAROLD::H_Message_(0x20 /* HESTR_020_OPTION_DISABLED_DURING */));
+                        strlcpy(local_578, HAROLD::H_Message_(0x20 /* HESTR_020_OPTION_DISABLED_DURING */), sizeof(local_578));
                         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_578, 0);
                     }
                     continue;
@@ -3218,7 +3217,7 @@ namespace MAINSCR {
                 if (MOX::_fleet_box.attack_btn_active != 0 && MOX::_fleet_box_attack_button == param_2 && MOX::_fleet_box_attack_button > 0) {
                     if (!FLEETPOP::Some_Icon_Selected_()) {
                         char local_4b0[200];
-                        strcpy(local_4b0, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
+                        strlcpy(local_4b0, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(local_4b0));
                         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_4b0, 3);
                     } else {
                         int16_t local_3e8[MAX_SHIPS];
@@ -3227,8 +3226,8 @@ namespace MAINSCR {
                         
                         int16_t msg_idx = (count == 1) ? 0xE4 : 0xE5;
                         char local_5dc[100];
-                        sprintf(local_5dc, HAROLD::H_Message_(msg_idx), count);
                         
+                        snprintf(local_5dc, sizeof(local_5dc), HAROLD::H_Message_(msg_idx), count);
                         if (HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_5dc, 1) != 0) {
                             int16_t num_deployed = SHIPS::Deploy_Ships_To_Attack_Antares_();
                             MOX::_first_node_ptr_in_stack_ = -1;
@@ -3607,7 +3606,7 @@ namespace MAINSCR {
 
             if (strcmp(pack->version_string, GAME_BUILD_DATE) != 0) {
                 char error_msg[256];
-                sprintf(error_msg, NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
+                snprintf(error_msg, sizeof(error_msg), NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
                 exitm::Exit_With_Message(error_msg);
             }
 
@@ -3985,7 +3984,7 @@ namespace MAINSCR {
             s_net_pack_start_game* pack = (s_net_pack_start_game*)data;
             if (strcmp(pack->version_string, GAME_BUILD_DATE) != 0) {
                 char error_msg[256];
-                sprintf(error_msg, NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
+                snprintf(error_msg, sizeof(error_msg), NETMOX::_incompatible_versions_error, pack->version_string, GAME_BUILD_DATE);
                 exitm::Exit_With_Message(error_msg);
             }
 
@@ -4250,7 +4249,7 @@ namespace MAINSCR {
         s_player* player = &MOX::_player[player_index];
         const char* message_format = HAROLD::H_Message_(0xDB);
 
-        sprintf(MOX::_temp_string, message_format, player->name, player->race_name);
+        snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), message_format, player->name, player->race_name);
         fonts::Print_(static_cast<int16_t>(popup_x + 0x27), static_cast<int16_t>(popup_y + 0x3C), MOX::_temp_string);
     }
 

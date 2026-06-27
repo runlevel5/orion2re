@@ -44,7 +44,7 @@ namespace HACCESS {
             current_owner = (int32_t)MOX::_ship[ship_idx].owner;
         }
 
-        sprintf(message, "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n", (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
+        snprintf(message, sizeof(message), "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n", (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
 
         exitm::Exit_With_Message(message);
 
@@ -223,7 +223,7 @@ namespace HACCESS {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        sprintf(buffer, "%s %s", star->name, numeral_str);
+        snprintf(buffer, sizeof(buffer), "%s %s", star->name, numeral_str);
 
         if (strlen(buffer) > 30) {
             buffer[30] = '\0';
@@ -301,7 +301,7 @@ namespace HACCESS {
     }
 
     char* __cdecl Design_Name_(int16_t player_idx, int16_t design_idx) {
-        strcpy(MOX::_temp_string, MOX::_player[player_idx].ship_designs[design_idx].name);
+        strlcpy(MOX::_temp_string, MOX::_player[player_idx].ship_designs[design_idx].name, sizeof(MOX::_temp_string));
 
         return MOX::_temp_string;
     }
@@ -378,7 +378,7 @@ namespace HACCESS {
 
         Race_Name_(race_index, local_buffer);
 
-        strcpy(MOX::_temp_string, local_buffer);
+        strlcpy(MOX::_temp_string, local_buffer, sizeof(MOX::_temp_string));
 
         return MOX::_temp_string;
     }

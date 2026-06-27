@@ -609,7 +609,7 @@ namespace MISC {
         int32_t abs_val = (value ^ sign) - sign;
 
         char raw_buf[32];
-        sprintf(raw_buf, "%ld", abs_val);
+        snprintf(raw_buf, sizeof(raw_buf), "%ld", abs_val);
 
         int16_t len = (int16_t)strlen(raw_buf);
         int16_t num_separators = (len - 1) / 3;
@@ -618,7 +618,7 @@ namespace MISC {
 
         if (num_separators == 0) {
             // Using raw_buf as format string to copy into temp_string
-            sprintf(MOX::_temp_string, raw_buf);
+            strlcpy(MOX::_temp_string, raw_buf, sizeof(MOX::_temp_string));
         } else {
             char grouped_buf[32];
             int16_t src_idx = len - 1;
@@ -641,7 +641,7 @@ namespace MISC {
                 group_counter++;
             }
 
-            strcpy(MOX::_temp_string, grouped_buf);
+            strlcpy(MOX::_temp_string, grouped_buf, sizeof(MOX::_temp_string));
         }
 
         if (value < 0) {

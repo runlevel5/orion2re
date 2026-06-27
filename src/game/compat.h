@@ -7,6 +7,14 @@
 
 #include <SDL3/SDL.h>
 
+#if !defined(HAVE_STRLCPY) && !defined(strlcpy)
+#define strlcpy SDL_strlcpy
+#endif
+
+#if !defined(HAVE_STRLCAT) && !defined(strlcat)
+#define strlcat SDL_strlcat
+#endif
+
 #if !defined(_MSC_VER) && !defined(__cdecl)
 #define __cdecl
 #endif

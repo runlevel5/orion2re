@@ -2325,7 +2325,7 @@ namespace EVENTS {
         }
 
         char lbx_name[13];
-        strcpy(lbx_name, event_lbx);
+        strlcpy(lbx_name, event_lbx, sizeof(lbx_name));
 
         char buffer[300];
         int16_t index = event_subtype + (event_type * 4);
@@ -2488,7 +2488,7 @@ namespace EVENTS {
 
             for (int16_t k = 0; k < count; ++k) {
                 /* fmtpara: \aX repositions the text cursor before each ranked entry. */
-                sprintf(temp_str, "\x07" "X%d.%d. %s", spacing, k + 1, MOX::_player[player_indices[k]].race_name);
+                snprintf(temp_str, sizeof(temp_str), "\x07" "X%d.%d. %s", spacing, k + 1, MOX::_player[player_indices[k]].race_name);
                 strcat(out_str, temp_str);
 
                 if (((k + 1) % 3) == 0) {

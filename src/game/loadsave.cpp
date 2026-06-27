@@ -161,7 +161,7 @@ namespace LOADSAVE {
 
             if (desc_entry[0] == '\0' && star_date_entry[0] != '\0') {
                 const char* fmt = HAROLD::H_Message_(203);
-                sprintf(desc_entry, fmt, i);
+                snprintf(MOX::_save_game_description[i].description, sizeof(MOX::_save_game_description[i].description), fmt, i);
             }
         }
 
@@ -359,7 +359,7 @@ namespace LOADSAVE {
 
                     if (load_success == 0) {
                         const char* msg = HAROLD::H_Message_(184); // 0xb8
-                        sprintf(msg_buffer, msg, static_cast<int>(selected_slot));
+                        snprintf(msg_buffer, sizeof(msg_buffer), msg, static_cast<int>(selected_slot));
                         Game_Popup_User_Box_(msg_buffer, 3);
                         MOX::_return_screen = MOX::_previous_screen;
                     } else {
@@ -470,7 +470,7 @@ namespace LOADSAVE {
         bool saved_successfully = false;
         int16_t active_slot_idx = -1;
 
-        strcpy(_empty_save_slot_message, HAROLD::H_Message_(0x184));
+        strlcpy(_empty_save_slot_message, HAROLD::H_Message_(0x184), sizeof(_empty_save_slot_message));
 
         Load_Month_Names_();
         EVANHELP::Set_Save_Game_Screen_Help_List_();
@@ -509,7 +509,7 @@ namespace LOADSAVE {
                         fields::_cursor_on = 0;
                         fields::_active_input_field_number = _game_popup_fields->saved_game_fields[i];
 
-                        strcpy(fields::_continuous_string, MOX::_save_game_description[i].description);
+                        strlcpy(fields::_continuous_string, MOX::_save_game_description[i].description, sizeof(fields::_continuous_string));
 
                         fields::_active_input_field_first = 1;
                         active_slot_idx = i;
@@ -539,13 +539,13 @@ namespace LOADSAVE {
                     s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
                     const char* colony_str = HAROLD::H_Message_(colonies == 1 ? 0xbc : 0xbd);
 
-                    sprintf(temp_buffer, "%s, %s, %d %s", plr->name, plr->race_name, (int)colonies, colony_str);
+                    snprintf(temp_buffer, sizeof(temp_buffer), "%s, %s, %d %s", plr->name, plr->race_name, (int)colonies, colony_str);
                     if (strlen(temp_buffer) >= 0x25) {
                         temp_buffer[0x24] = '\0';
                     }
-                    strcpy(target_desc, temp_buffer);
+                    strlcpy(MOX::_save_game_description[active_slot_idx].description, temp_buffer, sizeof(MOX::_save_game_description[active_slot_idx].description));
                 } else if (copy_saved_field_text) {
-                    strcpy(target_desc, fields::_continuous_string);
+                    strlcpy(MOX::_save_game_description[active_slot_idx].description, fields::_continuous_string, sizeof(MOX::_save_game_description[active_slot_idx].description));
                 }
 
                 FILEDEF::Save_Game_(active_slot_idx);
@@ -646,7 +646,7 @@ namespace LOADSAVE {
             if (star_date_value > 0) {
                 // Fetch the prefix (e.g., "Stardate " or "D ")
                 const char* prefix = HAROLD::H_Message_(202);
-                strcpy(local_str_buf, prefix);
+                strlcpy(local_str_buf, prefix, sizeof(local_str_buf));
 
                 char itoa_buf[12];
                 itoa(star_date_value, itoa_buf, 10);
@@ -935,7 +935,7 @@ namespace LOADSAVE {
 
         if (message_id != 0) {
             const char* format = HAROLD::H_Message_(message_id);
-            sprintf(buffer, format, (int)(int16_t)(file_index + 1));
+            snprintf(buffer, sizeof(buffer), format, (int)(int16_t)(file_index + 1));
         }
 
         Game_Popup_User_Box_(buffer, 3);
@@ -1232,7 +1232,7 @@ namespace LOADSAVE {
                 }
             } else if (input == _game_popup_fields->btn_main_new_id) {
                 const char* msg = HAROLD::H_Message_(0xBA); // "QUIT TO MAIN MENU?"
-                strcpy(text_buffer, msg);
+                strlcpy(text_buffer, msg, sizeof(text_buffer));
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     MOX::_game_type = 0;
@@ -1249,7 +1249,7 @@ namespace LOADSAVE {
                 }
             } else if (input == _game_popup_fields->btn_main_quit_id) {
                 const char* msg = HAROLD::H_Message_(0xBB); // "QUIT TO WINDOWS?"
-                strcpy(text_buffer, msg);
+                strlcpy(text_buffer, msg, sizeof(text_buffer));
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     FILEDEF::Save_Game_(9);
@@ -1288,7 +1288,7 @@ namespace LOADSAVE {
                     event_processed = true;
                 } else {
                     const char* msg = HAROLD::H_Message_(0xB9); // "CAN'T SAVE NOW"
-                    strcpy(text_buffer, msg);
+                    strlcpy(text_buffer, msg, sizeof(text_buffer));
                     event_processed = true;
                     Game_Popup_User_Box_(text_buffer, 0);
                     *out_finished = 1;
@@ -1624,7 +1624,7 @@ namespace LOADSAVE {
         s_save_game_description* save_description = &MOX::_save_game_description[save_slot];
         const char* message_format = HAROLD::H_Message_(0xCD);
 
-        sprintf(message_buffer, message_format, save_slot, save_description);
+        snprintf(message_buffer, sizeof(message_buffer), message_format, save_slot, save_description->description);
 
         int16_t choice = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 1);
         if (choice != 0) {
@@ -1796,7 +1796,7 @@ namespace LOADSAVE {
         int32_t slot = MOX::_settings.active_save_slot;
         const char* format_str = HAROLD::H_Message_(0xcc);
 
-        sprintf(text_buffer, format_str, slot, MOX::_save_game_description[slot].description);
+        snprintf(text_buffer, sizeof(text_buffer), format_str, slot, MOX::_save_game_description[slot].description);
 
         int16_t box_res = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, text_buffer, 1);
 

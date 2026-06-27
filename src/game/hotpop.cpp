@@ -122,15 +122,15 @@ namespace HOTPOP {
                         exit_code = 2;
                     }
                 } else {
-                    strcpy(msg_players_plural, HAROLD::H_Message_(165));
+                    strlcpy(msg_players_plural, HAROLD::H_Message_(165), sizeof(msg_players_plural));
                     
                     if ((MOX::_settings.number_of_players - HOTPOP::_hotseat_human_players) == 1) {
-                        strcpy(remaining_player_label, HAROLD::H_Message_(164));
+                        strlcpy(remaining_player_label, HAROLD::H_Message_(164), sizeof(remaining_player_label));
                     } else {
-                        strcpy(remaining_player_label, HAROLD::H_Message_(165));
+                        strlcpy(remaining_player_label, HAROLD::H_Message_(165), sizeof(remaining_player_label));
                     }
 
-                    sprintf(warning_buf, HAROLD::H_Message_(163), 
+                    snprintf(warning_buf, sizeof(warning_buf), HAROLD::H_Message_(163), 
                             HOTPOP::_hotseat_human_players, msg_players_plural, 
                             (MOX::_settings.number_of_players - HOTPOP::_hotseat_human_players), 
                             remaining_player_label);

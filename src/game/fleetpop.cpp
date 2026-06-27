@@ -542,7 +542,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     int16_t icon_button_x;
     int16_t icon_button_y;
 
-    strcpy(title, "llllllll");
+    strlcpy(title, "llllllll", sizeof(title));
 
     for (int16_t i = 0; i < 8; ++i) {
         if (i == 0) {
@@ -616,13 +616,13 @@ void __cdecl Draw_Fleet_Movement_Box_() {
             MOX::_mox_font_colors_offset = 0x71;
             MISC::Get_Mox_Font_Colors_(4, 'o', 's', &font_colors);
             HACCESS::Race_Name_(stack_owner, race_or_ship_name);
-            sprintf(title, HAROLD::H_Message_(0x66), race_or_ship_name);
+            snprintf(title, sizeof(title), HAROLD::H_Message_(0x66), race_or_ship_name);
             fonts::Set_Font_Style_Outline_(4, &font_colors);
             fonts::Set_Outline_Color_(2, 1);
             fonts::Set_Font_Spacing_(1);
         } else {
             MISC::Get_Mox_Font_Colors_(4, 'K', 'N', &font_colors);
-            strcpy(title, MOX::_ship[MOX::_ship_node[head_node_ptr].ship_idx].d.name);
+            strlcpy(title, MOX::_ship[MOX::_ship_node[head_node_ptr].ship_idx].d.name, sizeof(title));
             strings::String_To_Upper_(title);
             fonts::Set_Font_Style_Outline_(4, &font_colors);
             fonts::Set_Outline_Color_(2, 1);
@@ -1097,57 +1097,57 @@ void __cdecl Print_Fleet_Box_Info_() {
         break;
 
     case 1:
-        sprintf(text, HAROLD::H_Message_(0x67), MOX::_star[info_value].name);
+        snprintf(text, sizeof(text), HAROLD::H_Message_(0x67), MOX::_star[info_value].name);
         break;
 
     case 2:
         if (MOX::_NUM_STARS == static_cast<int16_t>(destination_star)) {
-            strcpy(text, HAROLD::H_Message_(0x68));
+            strlcpy(text, HAROLD::H_Message_(0x68), sizeof(text));
         } else if (info_value == 1) {
-            sprintf(text, HAROLD::H_Message_(0x69), 1, MOX::_star[destination_star].name);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0x69), 1, MOX::_star[destination_star].name);
         } else {
-            sprintf(text, HAROLD::H_Message_(0x6a), info_value, MOX::_star[destination_star].name);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0x6a), info_value, MOX::_star[destination_star].name);
         }
         break;
 
     case 3:
         if (info_value == 1) {
-            sprintf(text, HAROLD::H_Message_(0x6b), info_value);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0x6b), info_value);
         } else {
-            sprintf(text, HAROLD::H_Message_(0x6c), info_value);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0x6c), info_value);
         }
         break;
 
     case 4:
-        strcpy(text, HAROLD::H_Message_(0x6d));
+        strlcpy(text, HAROLD::H_Message_(0x6d), sizeof(text));
         use_primary_colors = false;
         break;
 
     case 5:
-        strcpy(text, HAROLD::H_Message_(0x6e));
+        strlcpy(text, HAROLD::H_Message_(0x6e), sizeof(text));
         use_primary_colors = false;
         break;
 
     case 6:
         if (info_value == 1) {
-            sprintf(text, HAROLD::H_Message_(0x6f), 1, MOX::_star[destination_star].name);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0x6f), 1, MOX::_star[destination_star].name);
         } else {
-            sprintf(text, HAROLD::H_Message_(0x70), info_value, MOX::_star[destination_star].name);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0x70), info_value, MOX::_star[destination_star].name);
         }
         use_primary_colors = false;
         break;
 
     case 7:
         if (info_value == 0) {
-            sprintf(text, HAROLD::H_Message_(0x71));
+            strlcpy(text, HAROLD::H_Message_(0x71), sizeof(text));
         } else {
-            sprintf(text, HAROLD::H_Message_(0xeb), info_value);
+            snprintf(text, sizeof(text), HAROLD::H_Message_(0xeb), info_value);
         }
         use_primary_colors = false;
         break;
 
     case 8:
-        strcpy(text, HAROLD::H_Message_(0x73));
+        strlcpy(text, HAROLD::H_Message_(0x73), sizeof(text));
         use_primary_colors = false;
         break;
 

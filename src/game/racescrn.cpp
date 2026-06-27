@@ -153,7 +153,7 @@ namespace RACESCRN {
                         if (treaty > 5) {
                             treaty = 5;
                         }
-                        strcpy(treaty_text_buffer, MOX::_treaty_labels[treaty]);
+                        strlcpy(treaty_text_buffer, MOX::_treaty_labels[treaty], sizeof(treaty_text_buffer));
                         strupr(treaty_text_buffer);
                     }
 
@@ -183,33 +183,33 @@ namespace RACESCRN {
                         }
 
                         /* fmtpara '\r' starts a new paragraph line inside the treaty summary. */
-                        sprintf(treaty_segment_buffer, "\r%s%i%s", _research_treaty_buffer, research_level, type_str);
-                        strcat(treaty_text_buffer, treaty_segment_buffer);
+                        snprintf(treaty_segment_buffer, sizeof(treaty_segment_buffer), "\r%s%i%s", _research_treaty_buffer, research_level, type_str);
+                        strlcat(treaty_text_buffer, treaty_segment_buffer, sizeof(treaty_text_buffer));
                     }
 
                     if (MOX::_cur_plyr_ptr->trade_treaty[display->player_idx] != 0) {
                         int16_t trade_level = MOX::_cur_plyr_ptr->current_trade_agreement_level[display->player_idx];
                         const char* format = (MOX::_settings.language == 1) ? "\r%s%iMC" : "\r%s%iBC";
-                        sprintf(treaty_segment_buffer, format, _trade_treaty_buffer, trade_level);
-                        strcat(treaty_text_buffer, treaty_segment_buffer);
+                        snprintf(treaty_segment_buffer, sizeof(treaty_segment_buffer), format, _trade_treaty_buffer, trade_level);
+                        strlcat(treaty_text_buffer, treaty_segment_buffer, sizeof(treaty_text_buffer));
                     }
 
                     if (MOX::_cur_plyr_ptr->tribute_treaty[display->player_idx] != 0) {
-                        strcat(treaty_text_buffer, "\r");
-                        strcpy(treaty_segment_buffer, _giving_treaty_buffer);
+                        strlcat(treaty_text_buffer, "\r", sizeof(treaty_text_buffer));
+                        strlcpy(treaty_segment_buffer, _giving_treaty_buffer, sizeof(treaty_segment_buffer));
                         int stat_num = (MOX::_cur_plyr_ptr->tribute_treaty[display->player_idx] == 1) ? 5 : 10;
                         JIM::Decode_Text_Stat_(treaty_segment_buffer, stat_num, sizeof(treaty_segment_buffer));
-                        strcat(treaty_text_buffer, treaty_segment_buffer);
+                        strlcat(treaty_text_buffer, treaty_segment_buffer, sizeof(treaty_text_buffer));
                     } else if (MOX::_player[display->player_idx].tribute_treaty[MOX::_PLAYER_NUM] != 0) {
-                        strcat(treaty_text_buffer, "\r");
-                        strcpy(treaty_segment_buffer, _receiving_treaty_buffer);
+                        strlcat(treaty_text_buffer, "\r", sizeof(treaty_text_buffer));
+                        strlcpy(treaty_segment_buffer, _receiving_treaty_buffer, sizeof(treaty_segment_buffer));
                         int stat_num = (MOX::_player[display->player_idx].tribute_treaty[MOX::_PLAYER_NUM] == 1) ? 5 : 10;
                         JIM::Decode_Text_Stat_(treaty_segment_buffer, stat_num, sizeof(treaty_segment_buffer));
-                        strcat(treaty_text_buffer, treaty_segment_buffer);
+                        strlcat(treaty_text_buffer, treaty_segment_buffer, sizeof(treaty_text_buffer));
                     }
 
                     if (strlen(treaty_text_buffer) < 1) {
-                        strcpy(treaty_text_buffer, MOX::_treaty_labels[0]);
+                        strlcpy(treaty_text_buffer, MOX::_treaty_labels[0], sizeof(treaty_text_buffer));
                     }
 
                     fonts::Set_Font_Style_(2, &_race_normal_color);
@@ -222,10 +222,10 @@ namespace RACESCRN {
         fonts::Set_Font_Style_(3, &_race_normal_color);
         spy::Compute_Spy_Bonuses_(MOX::_cur_plyr_ptr, &spy_bonus, &agent_bonus);
 
-        sprintf(treaty_segment_buffer, "%s%hi%%", _spy_bonus_str, spy_bonus);
+        snprintf(treaty_segment_buffer, sizeof(treaty_segment_buffer), "%s%hi%%", _spy_bonus_str, spy_bonus);
         BILL::Squeeze_Centered_Print_(0x1A1, 0x174, treaty_segment_buffer, 0x62);
 
-        sprintf(treaty_segment_buffer, "%s%hi%%", _agent_bonus_str, agent_bonus);
+        snprintf(treaty_segment_buffer, sizeof(treaty_segment_buffer), "%s%hi%%", _agent_bonus_str, agent_bonus);
         BILL::Squeeze_Centered_Print_(0x207, 0x174, treaty_segment_buffer, 0x61);
     }
 
@@ -592,13 +592,13 @@ namespace RACESCRN {
 
         if (RACESCRN::_net_state == 1) {
             animate::Draw_(0x85, 0xBF, (s_animation_header*)RACESCRN::_netbox_seg);
-            strcpy(text_buffer, RACESCRN::_diplomacy_net_requesting_buffer);
+            strlcpy(text_buffer, RACESCRN::_diplomacy_net_requesting_buffer, sizeof(text_buffer));
             race_idx = NETMOX::Net_Diplomacy_With_();
             JIM::Decode_Text_Race_(text_buffer, (int16_t)race_idx, sizeof(text_buffer));
             FMTPARA::Print_Formatted_Paragraph_(0x8F, 0xDA, 0x15E, text_buffer, 2);
         } else if (RACESCRN::_net_state == 2) {
             animate::Draw_(0x85, 0xBF, (s_animation_header*)RACESCRN::_netbox_seg);
-            strcpy(text_buffer, RACESCRN::_diplomacy_net_wait_buffer);
+            strlcpy(text_buffer, RACESCRN::_diplomacy_net_wait_buffer, sizeof(text_buffer));
             race_idx = NETMOX::Net_Diplomacy_With_();
             JIM::Decode_Text_Race2_(text_buffer, (int16_t)race_idx, sizeof(text_buffer));
             FMTPARA::Print_Formatted_Paragraph_(0x8F, 0xD1, 0x15E, text_buffer, 2);
@@ -899,7 +899,7 @@ namespace RACESCRN {
                             if (MOX::_cur_plyr_ptr->treaty[target_player_idx] >= 4) {
                                 break;
                             }
-                            strcpy(message_buffer, _declare_war_buffer);
+                            strlcpy(message_buffer, _declare_war_buffer, sizeof(message_buffer));
                             JIM::Decode_Text_Race_(message_buffer, target_player_idx, sizeof(message_buffer));
                             if (GENDRAW::Do_Confirmation_Box_(message_buffer) == 1) {
                                 MOX::_player[MOX::_PLAYER_NUM].delayed_diplomacy_orders[target_player_idx] = 0;

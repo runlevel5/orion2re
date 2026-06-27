@@ -17,13 +17,13 @@ namespace COLLAND {
         if (planet->colony_index == -1) {
             char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
             char* fmt = ESTRINGS::E_Strings_(0x46 /* ESTR_S1 */);
-            sprintf(buffer, fmt, planet_name);
+            snprintf(buffer, sizeof(buffer), fmt, planet_name);
         } else {
             s_colony* colony = &MOX::_colony[planet->colony_index];
             char* race_name = MOX::_player[colony->owner].race_name;
             char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
             char* fmt = ESTRINGS::E_Strings_(0x28 /* ESTR_S__S_COLONY */);
-            sprintf(buffer, fmt, planet_name, race_name);
+            snprintf(buffer, sizeof(buffer), fmt, planet_name, race_name);
         }
         fonts::Print_(0x14, 0x28, buffer);
 
@@ -33,7 +33,7 @@ namespace COLLAND {
         if (planet->colony_index == -1) {
             if (planet->planet_type != PLANET_TYPE_PLANET) {
                 char* gas_giant_msg = ESTRINGS::E_Strings_(0x132 /* ESTR_GAS_GIANT__UNINHABITABLE */);
-                sprintf(buffer, gas_giant_msg);
+                strlcpy(buffer, gas_giant_msg, sizeof(buffer));
                 fonts::Print_(0x14, 0x3c, buffer);
                 return;
             }
@@ -49,17 +49,17 @@ namespace COLLAND {
             size_climate_fmt = ESTRINGS::E_Strings_(0x2d /* ESTR_S_S */);
         }
 
-        sprintf(buffer, size_climate_fmt, size_str, climate_str);
+        snprintf(buffer, sizeof(buffer), size_climate_fmt, size_str, climate_str);
         BILL::_Print_Paragraph_(0x14, 0x3c, 0x26b, buffer, 0);
 
         int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
         char* fmt_pop = ESTRINGS::E_Strings_(0x1f);
-        sprintf(buffer, fmt_pop, (int)max_pop);
+        snprintf(buffer, sizeof(buffer), fmt_pop, (int)max_pop);
         fonts::Print_(0x14, 0x50, buffer);
 
         char* mineral_str = MOX::_mineral_class_string[planet->mineral_class];
         char* fmt_minerals = ESTRINGS::E_Strings_(0x176);
-        sprintf(buffer, fmt_minerals, mineral_str);
+        snprintf(buffer, sizeof(buffer), fmt_minerals, mineral_str);
         fonts::Print_(0x14, 100, buffer);
 
         fonts::Print_(0x14, 0x78, MOX::_planet_gravity_string[planet->gravity_class]);
@@ -67,7 +67,7 @@ namespace COLLAND {
         if (planet->planet_special != 0) {
             char* special_str = MOX::_planet_special_string[planet->planet_special];
             char* fmt_special = ESTRINGS::E_Strings_(0x46 /* ESTR_S1 */);
-            sprintf(buffer, fmt_special, special_str);
+            snprintf(buffer, sizeof(buffer), fmt_special, special_str);
             BILL::_Print_Paragraph_(0x14, 0x8c, 0x26b, buffer, 0);
         }
     }
@@ -109,7 +109,7 @@ namespace COLLAND {
 
             char* planet_name = HACCESS::Get_Planet_Name_((int16_t)COLONY::_planet_handle);
             char* title_fmt = ESTRINGS::E_Strings_(0xE5 /* ESTR_COLONY_BUILT_ON_S */);
-            sprintf(buffer, title_fmt, planet_name);
+            snprintf(buffer, sizeof(buffer), title_fmt, planet_name);
             fonts::Print_Centered_(0x13F, 10, buffer);
 
             if (COLONY::_full_draw != 0) {

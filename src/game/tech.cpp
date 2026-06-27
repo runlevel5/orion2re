@@ -245,7 +245,7 @@ namespace TECH {
         _g_entries_p = entries;
 
         player_race = MOX::_player[MOX::_PLAYER_NUM].race;
-        sprintf(science_race_lbx_name, "SR_R%x_SC.LBX", player_race);
+        snprintf(science_race_lbx_name, sizeof(science_race_lbx_name), "SR_R%x_SC.LBX", player_race);
 
         RUSS::Mox_Update_();
 
@@ -561,7 +561,7 @@ namespace TECH {
                 for (int app_index = 0; app_index < 4; ++app_index) {
                     int16_t app_id = techs[app_index];
                     if (MOX::_cur_plyr_ptr->tech_applications[app_id] == 1) {
-                        strcpy(item->app_names[visible_app_count], Technology_Applications_Name_(app_id, MOX::_PLAYER_NUM));
+                        strlcpy(item->app_names[visible_app_count], Technology_Applications_Name_(app_id, MOX::_PLAYER_NUM), sizeof(item->app_names[visible_app_count]));
                         item->app_ids[visible_app_count] = app_id;
                         item->app_click_field_ids[visible_app_count] = fields::Add_Hidden_Field_(
                             item->x,
@@ -576,7 +576,7 @@ namespace TECH {
                 }
 
                 if (visible_app_count == 0) {
-                    strcpy(item->app_names[0], local_50);
+                    strlcpy(item->app_names[0], local_50, sizeof(item->app_names[0]));
                     item->app_ids[0] = 0;
                     item->app_click_field_ids[0] = fields::Add_Hidden_Field_(
                         item->x,
@@ -593,7 +593,7 @@ namespace TECH {
             }
             else {
                 uint16_t app_id = Get_Hyper_Tech_App_ID_(tech_field_id);
-                strcpy(item->app_names[0], Technology_Applications_Name_(app_id, MOX::_PLAYER_NUM));
+                strlcpy(item->app_names[0], Technology_Applications_Name_(app_id, MOX::_PLAYER_NUM), sizeof(item->app_names[0]));
                 item->app_ids[0] = Get_Hyper_Tech_App_ID_(tech_field_id);
                 item->app_click_field_ids[0] = fields::Add_Hidden_Field_(
                     item->x,
@@ -624,10 +624,10 @@ namespace TECH {
             case 2:
             default: fmt_ptr = "%i RP"; break;
             }
-            strcpy(fmt, fmt_ptr);
-            sprintf(item->buf, fmt, item->research_cost_remaining);
+            strlcpy(fmt, fmt_ptr, sizeof(fmt));
+            snprintf(item->buf, sizeof(item->buf), fmt, item->research_cost_remaining);
 
-            strcpy(item->field_name, Technology_Fields_Name_(tech_field_id));
+            strlcpy(item->field_name, Technology_Fields_Name_(tech_field_id), sizeof(item->field_name));
 
             ++valid_count;
         }
@@ -757,7 +757,7 @@ namespace TECH {
         JIM::Get_Text_Message_("billtext.lbx", 0x3D, text_buffer, sizeof(text_buffer));
 
         itoa(cost, cost_str, 10);
-        strcat(text_buffer, cost_str);
+        strlcat(text_buffer, cost_str, sizeof(text_buffer));
 
         const char* suffix;
         switch (MOX::_settings.language) {
@@ -780,12 +780,13 @@ namespace TECH {
             suffix = " RP";
             break;
         }
-        strcat(text_buffer, suffix);
+        strlcat(text_buffer, suffix, sizeof(text_buffer));
 
         /* fmtpara: \aF3. selects font 3, \x1A3 fully justifies the body text,
            then \r starts a new paragraph and \aY+3.\x1A2 centers the cost line. */
-        sprintf(
+        snprintf(
             desc_buffer,
+            sizeof(desc_buffer),
             "\aF3.\x1A" "3%s\r\aY+3.\x1A" "2%s",
             loaded_data->body,
             text_buffer
@@ -902,8 +903,8 @@ namespace TECH {
             graphics::Fill_(win_x, 0x1F, fill_x2, 0x1C1, 0);
             animate::Draw_(win_x, 0x1F, win_bg_1);
 
-            strcpy(title_buf, _tech_group_names[entry->id]);
-            strcat(title_buf, msg_buf);
+            strlcpy(title_buf, _tech_group_names[entry->id], sizeof(title_buf));
+            strlcat(title_buf, msg_buf, sizeof(title_buf));
 
             fonts::Set_Font_Style_(4, _tech_color);
             fonts::Print_Centered_(text_x, 0x2F, title_buf);
@@ -986,7 +987,7 @@ namespace TECH {
     void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
-        strcpy(buffer, " ");
+        strlcpy(buffer, " ", sizeof(buffer));
 
         char star_idx = MOX::_planet[planet_idx].star_index;
         char planet_num = HAROLD::Planet_Number_(planet_idx);
@@ -1004,13 +1005,13 @@ namespace TECH {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        sprintf(buffer, "%s %s", star->name, numeral_str);
+        snprintf(buffer, sizeof(buffer), "%s %s", star->name, numeral_str);
 
         if (strlen(buffer) > 30) {
             buffer[30] = '\0';
         }
 
-        strcpy(out_str, buffer);
+        strlcpy(out_str, buffer, 31);
     }
 
     int16_t __cdecl Get_Hyper_Tech_App_ID_(int16_t tech_id) {
@@ -1041,7 +1042,7 @@ namespace TECH {
             return TECHDATA::_technology_fields[tech_field_id].name;
         }
 
-        strcpy(_hyper_field_name_buffer, MOX::_hyper_field_title);
+        strlcpy(_hyper_field_name_buffer, MOX::_hyper_field_title, sizeof(_hyper_field_name_buffer));
         return _hyper_field_name_buffer;
     }
 
@@ -1065,7 +1066,7 @@ namespace TECH {
             uint8_t status = MOX::_cur_plyr_ptr->tech_fields[field_id];
             item->group_id = static_cast<uint8_t>(field_id);
 
-            strcpy(item->group_name, Technology_Fields_Name_(static_cast<uint16_t>(field_id)));
+            strlcpy(item->group_name, Technology_Fields_Name_(static_cast<uint16_t>(field_id)), sizeof(item->group_name));
 
             if (MOX::_cur_plyr_ptr->current_research_field == field_id) {
                 status = 4;

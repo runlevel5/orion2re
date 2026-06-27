@@ -171,37 +171,37 @@ namespace antarans {
                         if (!debug_headers_printed) {
                             debug_headers_printed = true;
                             const char* side = is_offensive ? "Offensive" : "Defensive";
-                            sprintf(MOX::_temp_string, "\n(%4d.%d) Building Antaran %s ships:",
-                                    (int)MOX::_stardate / 10, (int)MOX::_stardate % 10, side);
+                            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), "\n(%4d.%d) Building Antaran %s ships:",
+                                     (int)MOX::_stardate / 10, (int)MOX::_stardate % 10, side);
 
                             if (!is_offensive) {
-                                sprintf(MOX::_temp_string, ">> current def ships (by size) : ");
+                                snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), ">> current def ships (by size) : ");
                                 for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                                     char buf[20];
-                                    sprintf(buf, "%2d ", MOX::_antarans.defensive_ships[i]);
-                                    strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
+                                    snprintf(buf, sizeof(buf), "%2d ", MOX::_antarans.defensive_ships[i]);
+                                    strlcat(MOX::_temp_string, buf, sizeof(MOX::_temp_string));
                                 }
                             } else {
-                                sprintf(MOX::_temp_string, ">> current off ships (by size) : ");
+                                snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), ">> current off ships (by size) : ");
                                 for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                                     char buf[20];
-                                    sprintf(buf, "%2d ", MOX::_antarans.offensive_ships[i]);
-                                    strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
+                                    snprintf(buf, sizeof(buf), "%2d ", MOX::_antarans.offensive_ships[i]);
+                                    strlcat(MOX::_temp_string, buf, sizeof(MOX::_temp_string));
                                 }
-                                sprintf(MOX::_temp_string, ">> off ships deployed (by size): ");
+                                snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), ">> off ships deployed (by size): ");
                                 for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                                     char buf[20];
-                                    sprintf(buf, "%2d ", MOX::_antarans.offensive_deployed[i]);
-                                    strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
+                                    snprintf(buf, sizeof(buf), "%2d ", MOX::_antarans.offensive_deployed[i]);
+                                    strlcat(MOX::_temp_string, buf, sizeof(MOX::_temp_string));
                                 }
                             }
                         }
 
-                        sprintf(MOX::_temp_string, "-------- building size %d, resources = %d, n_ships[%d] = %d",
-                                (int)size, (int)*resources, (int)size, (int)ships[size]);
+                        snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), "-------- building size %d, resources = %d, n_ships[%d] = %d",
+                                 (int)size, (int)*resources, (int)size, (int)ships[size]);
 
-                        sprintf(MOX::_temp_string, "-------- n_max_ships[%d] = %d, cost = %d",
-                                (int)size, (int)max_ships[size], (int)_antaran_ship_cost[size]);
+                        snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), "-------- n_max_ships[%d] = %d, cost = %d",
+                                 (int)size, (int)max_ships[size], (int)_antaran_ship_cost[size]);
 
                         chosen_size = (int32_t)size;
                         break;
@@ -225,8 +225,8 @@ namespace antarans {
             uint8_t cost = _antaran_ship_cost[chosen_size];
             *resources = (short)(*resources - cost);
 
-            sprintf(MOX::_temp_string, "-------- after build: resources = %3d, n_ships[%d] = %2d",
-                    (int)*resources, (int)chosen_size, (int)ships[chosen_size]);
+            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), "-------- after build: resources = %3d, n_ships[%d] = %2d",
+                     (int)*resources, (int)chosen_size, (int)ships[chosen_size]);
 
             // Special Titan logic (size 4) on Hard/Impossible difficulty
             if (chosen_size == SHIP_SIZE_TITAN && _offensive_titan_ship_built == 0 && MOX::_settings.game_difficulty > 2) {
@@ -239,7 +239,7 @@ namespace antarans {
     }
 
     void __cdecl Build_Antaran_Defensive_Ships_() {
-        strcpy(MOX::_temp_string, "defensive");
+        strlcpy(MOX::_temp_string, "defensive", sizeof(MOX::_temp_string));
 
         Build_Antaran_Ships_(
             &MOX::_antarans.resource_defensive,
@@ -250,7 +250,7 @@ namespace antarans {
     }
 
     void __cdecl Build_Antaran_Offensive_Ships_() {
-        strcpy(MOX::_temp_string, "offensive");
+        strlcpy(MOX::_temp_string, "offensive", sizeof(MOX::_temp_string));
 
         Build_Antaran_Ships_(
             &MOX::_antarans.resource_offensive,
@@ -342,18 +342,18 @@ namespace antarans {
     bool __cdecl Deploy_Antaran_Ships_() {
         int16_t target_star = Get_Antaran_Target_Star_(EVENTS::Get_Antaran_Victim_());
 
-        sprintf(MOX::_temp_string, "-< ships (by size)          : ");
+        snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), "-< ships (by size)          : ");
         for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
             char buf[16];
-            sprintf(buf, "%2d ", (int)MOX::_antarans.offensive_ships[i]);
-            strcat(MOX::_temp_string, buf);
+            snprintf(buf, sizeof(buf), "%2d ", (int)MOX::_antarans.offensive_ships[i]);
+            strlcat(MOX::_temp_string, buf, sizeof(MOX::_temp_string));
         }
 
-        sprintf(MOX::_temp_string, "-< ships deployed (by size) : ");
+        snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), "-< ships deployed (by size) : ");
         for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
             char buf[16];
-            sprintf(buf, "%2d ", (int)MOX::_antarans.offensive_deployed[i]);
-            strcat(MOX::_temp_string, buf);
+            snprintf(buf, sizeof(buf), "%2d ", (int)MOX::_antarans.offensive_deployed[i]);
+            strlcat(MOX::_temp_string, buf, sizeof(MOX::_temp_string));
         }
 
         int16_t ship_idx = -1;

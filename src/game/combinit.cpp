@@ -22,7 +22,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         INITSHIP::Update_Strategic_Ship_(ship_idx);
     }
 
-    strcpy(MOX::_global_combat_data.name, MOX::_ship[ship_idx].d.name);
+    strlcpy(MOX::_global_combat_data.name, MOX::_ship[ship_idx].d.name, sizeof(MOX::_global_combat_data.name));
 
     MOX::_global_combat_data.owner = MOX::_ship[ship_idx].owner;
     MOX::_global_combat_data.previous_owner = MOX::_ship[ship_idx].d.previous_owner;
@@ -232,7 +232,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
     s_ship_data* ship = &MOX::_ship[ship_idx];
     s_combat_data* combat = &MOX::_combat_data[combat_idx];
 
-    strcpy(combat->name, ship->d.name);
+    strlcpy(combat->name, ship->d.name, sizeof(combat->name));
     combat->owner = ship->owner;
     combat->previous_owner = ship->d.previous_owner;
     combat->ship_idx = ship_idx;
@@ -1161,7 +1161,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
     ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
 
-    strcpy(ship->name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name);
+    strlcpy(ship->name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name, sizeof(ship->name));
 
     ship->structure_max = (int16_t)(
         TECHDATA::_hull_data[HULL_STAR_FORTRESS].structure_hp +
@@ -1318,7 +1318,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 void __cdecl Load_Antaran_Planet_() {
     struct_::Clear_Structure_(MOX::_combat_data, sizeof(*MOX::_combat_data));
 
-    strcpy(MOX::_combat_data->name, "Antares");
+    strlcpy(MOX::_combat_data->name, "Antares", sizeof(MOX::_combat_data->name));
     MOX::_combat_data->ship_idx = -1;
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->size_class = 5;
@@ -1372,10 +1372,10 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
     }
 
     if (player_idx < MAX_PLAYERS) {
-        strcpy(lbx_filename, "cmbtshp.lbx");
+        strlcpy(lbx_filename, "cmbtshp.lbx", sizeof(lbx_filename));
         lbx_index = (int)MOX::_player[player_idx].color * 45 + 44;
     } else {
-        strcpy(lbx_filename, "monster.lbx");
+        strlcpy(lbx_filename, "monster.lbx", sizeof(lbx_filename));
         lbx_index = player_idx + 5;
     }
 
@@ -1502,7 +1502,7 @@ void __cdecl Load_Colony_Defense_(int16_t colony_idx) {
 
 void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(MOX::_colony[colony_idx].planet);
-    strcpy(MOX::_combat_data->name, planet_name);
+    strlcpy(MOX::_combat_data->name, planet_name, sizeof(MOX::_combat_data->name));
 
     MOX::_combat_data->owner = MOX::_colony[colony_idx].owner;
     MOX::_combat_data->previous_owner = MOX::_colony[colony_idx].owner;
@@ -1717,7 +1717,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     int16_t space = 0;
 
     if (station_type == HULL_STAR_BASE) {
-        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_BASE].name);
+        strlcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_BASE].name, sizeof(MOX::_combat_data[MOX::_combat_total_ship_count].name));
         MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[HULL_STAR_BASE].structure_hp;
         MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp +
             (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp) / 100);
@@ -1731,7 +1731,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         MOX::_combat_data[MOX::_combat_total_ship_count].size_class = 2;
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 40;
     } else if (station_type == HULL_BATTLESTATION) {
-        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_BATTLESTATION].name);
+        strlcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_BATTLESTATION].name, sizeof(MOX::_combat_data[MOX::_combat_total_ship_count].name));
         MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[HULL_BATTLESTATION].structure_hp;
         MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp +
             (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp) / 100);
@@ -1745,7 +1745,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         MOX::_combat_data[MOX::_combat_total_ship_count].size_class = 3;
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 41;
     } else if (station_type == HULL_STAR_FORTRESS) {
-        strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name);
+        strlcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name, sizeof(MOX::_combat_data[MOX::_combat_total_ship_count].name));
         MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[HULL_STAR_FORTRESS].structure_hp;
         MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp +
             (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp) / 100);
@@ -2461,11 +2461,11 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
             int16_t lbx_index;
 
             if ((uint8_t)ship->previous_owner < MAX_PLAYERS && ship->picture_num != 44) {
-                strcpy(lbx_filename, "cmbtshp.lbx");
+                strlcpy(lbx_filename, "cmbtshp.lbx", sizeof(lbx_filename));
                 lbx_index = (int16_t)MOX::_player[player_idx].color * 45 + ship->picture_num;
             }
             else {
-                strcpy(lbx_filename, "monster.lbx");
+                strlcpy(lbx_filename, "monster.lbx", sizeof(lbx_filename));
                 lbx_index = (ship->picture_num == 44) ? 0x19 : ship->picture_num;
             }
 

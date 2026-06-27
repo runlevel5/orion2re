@@ -8,9 +8,9 @@ namespace COLBCACH {
         int32_t frame_index = type_index % 10;
 
         char* filename_format = ESTRINGS::E_Strings_(ESTR_BLDGDLBX1);
-        sprintf(filename, filename_format, file_number);
 
         void* global_cache_seg = MOX::_global_cache_seg;
+        snprintf(filename, sizeof(filename), filename_format, file_number);
         
         int16_t base_building_frame = COLONY::Bldg_Coords_To_Effective_Frame_(building_x, building_y);
 

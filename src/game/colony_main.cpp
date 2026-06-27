@@ -737,7 +737,7 @@ namespace COLONY {
                 int prod_remaining = (int)(int16_t)COLCALC::Colony_Producing_Product_Cost_(col) - (int)col->production_spent;
                 int actual_buy_cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(col);
 
-                sprintf(buf, ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
+                snprintf(buf, sizeof(buf), ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
                     actual_buy_cost, prod_remaining);
 
                 if (GENDRAW::Do_Confirmation_Box_(buf) != 0) {
@@ -753,7 +753,7 @@ namespace COLONY {
         else {
             int16_t short_by = (int16_t)((uint16_t)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) -
                 (uint16_t)MOX::_player[col->owner].bc);
-            sprintf(buf, ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_AFFORD_THIS_INCREASE_IN_PRODUCTION_YOU_ARE_SHORT_BY_D_BC),
+            snprintf(buf, sizeof(buf), ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_AFFORD_THIS_INCREASE_IN_PRODUCTION_YOU_ARE_SHORT_BY_D_BC),
                 short_by);
             GENDRAW::Help_(buf);
             COLONY::Show_Colony_Screen_();
@@ -768,7 +768,7 @@ namespace COLONY {
         if (MOX::_colony[handle].occupation_policy == 0) {
             char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
             char* fmt = ESTRINGS::E_Strings_(ESTR_ANNIHILATING_S);
-            sprintf(buffer, fmt, planet_name);
+            snprintf(buffer, sizeof(buffer), fmt, planet_name);
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
             Set_Colony_Font_To_Red_(4, (uint8_t)cycle_val);
         }
@@ -776,7 +776,7 @@ namespace COLONY {
             char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
             char* colony_type = Colony_Type_(handle);
             char* fmt = ESTRINGS::E_Strings_(ESTR_SCOLONY_OF_S);
-            sprintf(buffer, fmt, colony_type, planet_name);
+            snprintf(buffer, sizeof(buffer), fmt, colony_type, planet_name);
             Set_Colony_Font_To_(4);
         }
 
@@ -825,7 +825,7 @@ namespace COLONY {
         int roundoff_rem = sum_roundoff % 1000;
 
         char* pop_fmt = ESTRINGS::E_Strings_(ESTR_POP_D03D_K_DK);
-        sprintf(buffer, pop_fmt, total_pop, roundoff_rem, sum_growth);
+        snprintf(buffer, sizeof(buffer), pop_fmt, total_pop, roundoff_rem, sum_growth);
 
         fonts::Set_Font_Style_Shadow_Down_(2, &_font_color_array);
         fonts::Print_Right_(638, 3, buffer);
@@ -911,7 +911,7 @@ namespace COLONY {
         COLONY::Draw_Current_Production_Graph_();
 
         char* name_str = COLBLDG::Selection_Name_(producing_id);
-        strcpy(name_buffer, name_str);
+        strlcpy(name_buffer, name_str, sizeof(name_buffer));
 
         fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
         BILL::Squeeze_Print_Paragraph_(0x20a /* 522 */, 0x26 /* 38 */, 0x70 /* 112 */, 0x8d /* 141 */, name_buffer, 2);
@@ -1176,7 +1176,7 @@ namespace COLONY {
 
                 animate::Draw_((int16_t)((int16_t)start_x * 30), (int16_t)(0x1df - height), anim);
 
-                sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
+                snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
                 Set_Colony_Font_To_(3);
 
                 anim = Military_Anim_((int16_t)military_index, (int16_t)race);

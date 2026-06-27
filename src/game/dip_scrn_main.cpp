@@ -115,7 +115,7 @@ namespace DIP_SCRN {
         fields::Set_Input_Delay_(1);
 
         for (int i = 0; i < 7; ++i) {
-            strcpy(_diplomacy_list_choice[i], _break_treaty_diplomacy_list[i]);
+            strlcpy(_diplomacy_list_choice[i], _break_treaty_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
         }
 
         fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
@@ -275,8 +275,7 @@ namespace DIP_SCRN {
 
         for (int16_t i = 0; i < item_count; ++i) {
             const char* src = reinterpret_cast<const char*>(list_strings + i * 40);
-            char* dst = _diplomacy_list_choice[i];
-            strcpy(dst, src);
+            strlcpy(_diplomacy_list_choice[i], src, sizeof(_diplomacy_list_choice[i]));
         }
 
         int16_t cancel_idx;
@@ -358,7 +357,7 @@ namespace DIP_SCRN {
         fields::Set_Input_Delay_(1);
 
         for (int i = 0; i < 7; ++i) {
-            strcpy(_diplomacy_list_choice[i], _offer_diplomacy_list[i]);
+            strlcpy(_diplomacy_list_choice[i], _offer_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
         }
 
         fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
@@ -571,13 +570,13 @@ namespace DIP_SCRN {
 
         char filename[16];
         switch (MOX::_settings.language) {
-        case 1: strcpy(filename, s_DIPLOMSG_LBX); break;
-        case 2: strcpy(filename, s_DIPLOMSF_LBX); break;
-        case 3: strcpy(filename, s_DIPLOMSS_LBX); break;
-        case 4: strcpy(filename, s_DIPLOMSI_LBX); break;
-        case 5: strcpy(filename, s_DIPLOMSP_LBX); break;
+        case 1: strlcpy(filename, s_DIPLOMSG_LBX, sizeof(filename)); break;
+        case 2: strlcpy(filename, s_DIPLOMSF_LBX, sizeof(filename)); break;
+        case 3: strlcpy(filename, s_DIPLOMSS_LBX, sizeof(filename)); break;
+        case 4: strlcpy(filename, s_DIPLOMSI_LBX, sizeof(filename)); break;
+        case 5: strlcpy(filename, s_DIPLOMSP_LBX, sizeof(filename)); break;
         case 0:
-        default: strcpy(filename, s_DIPLOMSE_LBX); break;
+        default: strlcpy(filename, s_DIPLOMSE_LBX, sizeof(filename)); break;
         }
 
         bool add_framed = false;
@@ -673,10 +672,10 @@ namespace DIP_SCRN {
                 break;
             case 0x8E:
                 if (MOX::_settings.language == 0) {
-                    sprintf(temp_buf, s_fmt_dot, MOX::_stardate / 10, MOX::_stardate % 10);
+                    snprintf(temp_buf, sizeof(temp_buf), s_fmt_dot, MOX::_stardate / 10, MOX::_stardate % 10);
                 }
                 else {
-                    sprintf(temp_buf, s_fmt_comma, MOX::_stardate / 10, MOX::_stardate % 10);
+                    snprintf(temp_buf, sizeof(temp_buf), s_fmt_comma, MOX::_stardate / 10, MOX::_stardate % 10);
                 }
                 replacement = temp_buf;
                 break;
@@ -696,12 +695,12 @@ namespace DIP_SCRN {
                         }
                     }
                     else {
-                        sprintf(temp_buf, s_fmt_BC, MOX::_player[param_3].diplomacy_proposal_gold_bribe[param_2]);
+                        snprintf(temp_buf, sizeof(temp_buf), s_fmt_BC, MOX::_player[param_3].diplomacy_proposal_gold_bribe[param_2]);
                         replacement = temp_buf;
                     }
                 }
                 else {
-                    strcpy(temp_buf, _percent_tribute_treaty_buffer);
+                    strlcpy(temp_buf, _percent_tribute_treaty_buffer, sizeof(temp_buf));
                     int stat_val = (MOX::_player[param_3].diplomacy_proposal_tribute_bribe[param_2] == 1) ? 5 : 10;
                     JIM::Decode_Text_Stat_(temp_buf, stat_val, 40);
                     replacement = temp_buf;
@@ -793,7 +792,7 @@ namespace DIP_SCRN {
 
         for (int16_t i = 0; i < 3; ++i) {
             char* src = _agree_diplomacy_list[i];
-            strcpy(_diplomacy_list_choice[i], src);
+            strlcpy(_diplomacy_list_choice[i], src, sizeof(_diplomacy_list_choice[i]));
         }
 
         fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
@@ -953,7 +952,7 @@ namespace DIP_SCRN {
         }
 
         for (int i = 0; i < choice_count; ++i) {
-            sprintf(_diplomacy_list_choice[i], s__d_BC_00552384, (int)bc_options[i]);
+            snprintf(_diplomacy_list_choice[i], sizeof(_diplomacy_list_choice[i]), s__d_BC_00552384, (int)bc_options[i]);
             if (MOX::_player[player_idx].bc < (int)bc_options[i]) {
                 selection_flags[i] = 0;
             }
@@ -1183,7 +1182,7 @@ namespace DIP_SCRN {
                 fields::Set_Input_Delay_(1);
 
                 for (int i = 0; i < 9; ++i) {
-                    strcpy(_diplomacy_list_choice[i], _main_diplomacy_list[i]);
+                    strlcpy(_diplomacy_list_choice[i], _main_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
                 }
 
                 fonts::Set_Outline_Color_(0, 0xF8);
@@ -1603,11 +1602,11 @@ namespace DIP_SCRN {
         char local_str[120];
 
         if (MOX::_player[_current_ambassador].objectives == 100 /* 'd' */) {
-            strcpy(local_str, _player_number_name_buffer);
+            strlcpy(local_str, _player_number_name_buffer, sizeof(local_str));
             JIM::Decode_Text_Name_And_Stat_(local_str, _current_ambassador, _current_ambassador + 1, 0x78);
         }
         else {
-            strcpy(local_str, _player_name_ambassador_buffer);
+            strlcpy(local_str, _player_name_ambassador_buffer, sizeof(local_str));
             JIM::Decode_Text_Race_(local_str, _current_ambassador, 0x78);
         }
 
@@ -1619,7 +1618,7 @@ namespace DIP_SCRN {
                     fonts::Set_Outline_Color_(0xF8, 0xF8);
                     fonts::Set_Font_Style_Shadow_Down_(4, &_diplomacy_normal_colors);
 
-                    sprintf(local_str, "%s sez: %s", MOX::_player[_current_ambassador].name, _receive_chat_message);
+                    snprintf(local_str, sizeof(local_str), "%s sez: %s", MOX::_player[_current_ambassador].name, _receive_chat_message);
                     fonts::Print_Centered_(0x140, 0x1D, local_str);
                 }
             }
@@ -1752,7 +1751,7 @@ namespace DIP_SCRN {
             uint8_t list_highlight[16];
             memset(list_highlight, 1, 15);
 
-            strcpy(_diplomacy_list_choice[0], str_prev);
+            strlcpy(_diplomacy_list_choice[0], str_prev, sizeof(_diplomacy_list_choice[0]));
 
             int16_t item_values[16];
             item_values[0] = -1;
@@ -1776,7 +1775,7 @@ namespace DIP_SCRN {
                 for (int16_t i = 0; i < items_to_process; i++) {
                     int16_t target_idx = i + has_prev;
                     char* tech_name = TECH::Technology_Applications_Name_((uint8_t)tech_ids[start_idx + i], tech_app_player);
-                    sprintf(_diplomacy_list_choice[target_idx], "  %s", tech_name);
+                    snprintf(_diplomacy_list_choice[target_idx], sizeof(_diplomacy_list_choice[target_idx]), "  %s", tech_name);
                     item_values[target_idx] = (uint8_t)tech_ids[start_idx + i];
                 }
             }
@@ -1784,7 +1783,7 @@ namespace DIP_SCRN {
             int16_t list_idx = items_to_process;
 
             if (btn_next != -1) {
-                strcpy(_diplomacy_list_choice[list_idx], str_next);
+                strlcpy(_diplomacy_list_choice[list_idx], str_next, sizeof(_diplomacy_list_choice[list_idx]));
                 item_values[list_idx] = -1;
                 list_idx++;
             }
@@ -1793,7 +1792,7 @@ namespace DIP_SCRN {
                 list_idx++;
             }
 
-            strcpy(_diplomacy_list_choice[list_idx], str_cancel);
+            strlcpy(_diplomacy_list_choice[list_idx], str_cancel, sizeof(_diplomacy_list_choice[list_idx]));
             item_values[list_idx] = 0x265;
             _diplomacy_list_choice[list_idx + 1][0] = s_empty_string_00551100[0];
 
@@ -2050,7 +2049,7 @@ namespace DIP_SCRN {
         fields::Set_Input_Delay_(1);
 
         for (int16_t i = 0; i < 7; ++i) {
-            strcpy(_diplomacy_list_choice[i], _propose_treaty_diplomacy_list[i]);
+            strlcpy(_diplomacy_list_choice[i], _propose_treaty_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
         }
 
         fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
@@ -2190,14 +2189,14 @@ namespace DIP_SCRN {
 
                 if (param_3 == 1) {
                     for (int i = 0; i < 6; ++i) {
-                        strcpy(_diplomacy_list_choice[i], _main_net_repulsive_diplomacy_list[i]);
+                        strlcpy(_diplomacy_list_choice[i], _main_net_repulsive_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
                     }
                     help_entry = _main_net_repulsive_diplomacy_help_entry;
                     list_size = 6;
                 }
                 else {
                     for (int i = 0; i < 5; ++i) {
-                        strcpy(_diplomacy_list_choice[i], _main_repulsive_diplomacy_list[i]);
+                        strlcpy(_diplomacy_list_choice[i], _main_repulsive_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
                     }
                     help_entry = _main_repulsive_diplomacy_help_entry;
                     list_size = 5;

@@ -359,7 +359,7 @@ namespace DIP_SCRN {
                 fields::Clear_Fields_();
                 DIP_SCRN::_chat_mode_flag = 0;
 
-                strcpy(DIP_SCRN::_net_diplomacy_chat_message, DIP_SCRN::_chat_message);
+                strlcpy(DIP_SCRN::_net_diplomacy_chat_message, DIP_SCRN::_chat_message, sizeof(DIP_SCRN::_net_diplomacy_chat_message));
 
                 NETMOX::Mox_Send_Message_(
                     MOX::_player[player_idx].network_player_id,
@@ -1014,7 +1014,7 @@ namespace DIP_SCRN {
         char diplomacy_list[3][40];
 
         for (int i = 0; i < 3; i++) {
-            strcpy(diplomacy_list[i], _agree_diplomacy_list[i]);
+            strlcpy(diplomacy_list[i], _agree_diplomacy_list[i], sizeof(diplomacy_list[i]));
         }
 
         uint16_t accepted = 0;
@@ -1206,7 +1206,7 @@ namespace DIP_SCRN {
             if (selection == offer_system_id) {
                 system_sel = Diplomacy_System_Display_(player_idx, _current_ambassador, 0);
                 if (system_sel != -1) {
-                    sprintf(list_items[0], s_fmt_s_0055236c, MOX::_star[system_sel].name);
+                    snprintf(list_items[0], sizeof(list_items[0]), s_fmt_s_0055236c, MOX::_star[system_sel].name);
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(target_player_idx);
                         confirm = Diplomacy_Generic_System_List_(system_sel, player_idx, target_player_idx, 0);
@@ -1252,14 +1252,14 @@ namespace DIP_SCRN {
                 if (tech_list_count > 0) {
                     for (int i = 0; i < tech_list_count; i++) {
                         char* tech_name = TECH::Technology_Applications_Name_(tech_list[i], MOX::_PLAYER_NUM);
-                        sprintf(list_items[i], s_fmt_s_0055236c, tech_name);
+                        snprintf(list_items[i], sizeof(list_items[i]), s_fmt_s_0055236c, tech_name);
                     }
                 }
                 tech_sel = Diplomacy_Generic_List_(tech_list_count, (char*)list_items, 1, _offer_title);
                 if (tech_sel != -1) {
                     tech_app_id = tech_list[tech_sel];
                     char* tech_name = TECH::Technology_Applications_Name_(tech_app_id, player_idx);
-                    sprintf(list_items[0], s_fmt_s_0055236c, tech_name);
+                    snprintf(list_items[0], sizeof(list_items[0]), s_fmt_s_0055236c, tech_name);
 
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(player_idx);
@@ -1300,7 +1300,7 @@ namespace DIP_SCRN {
             else if (selection == offer_money_id) {
                 money_amount = Diplomacy_Offer_Money_(player_idx, target_player_idx, 0);
                 if (money_amount > 0) {
-                    sprintf(list_items[0], s_fmt_d_bc_00552384, money_amount);
+                    snprintf(list_items[0], sizeof(list_items[0]), s_fmt_d_bc_00552384, money_amount);
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(player_idx);
                         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 9, list_title, 40);
@@ -1416,7 +1416,7 @@ namespace DIP_SCRN {
         fields::Set_Input_Delay_(1);
 
         for (int i = 0; i < 11; ++i) {
-            strcpy(_diplomacy_list_choice[i], _demand_diplomacy_list[i]);
+            strlcpy(_diplomacy_list_choice[i], _demand_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
         }
 
         fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
@@ -1436,7 +1436,7 @@ namespace DIP_SCRN {
             case 0: {
                 char treaties_str_list[15][40];
                 for (int i = 0; i < treaties_1_count; ++i) {
-                    sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_1[i]].name);
+                    snprintf(treaties_str_list[i], sizeof(treaties_str_list[i]), s__s_0055236c, MOX::_player[treaties_1[i]].name);
                 }
                 char title[40];
                 JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x47, title, 40);
@@ -1461,7 +1461,7 @@ namespace DIP_SCRN {
             case 1: {
                 char treaties_str_list[15][40];
                 for (int i = 0; i < treaties_2_count; ++i) {
-                    sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_2[i]].name);
+                    snprintf(treaties_str_list[i], sizeof(treaties_str_list[i]), s__s_0055236c, MOX::_player[treaties_2[i]].name);
                 }
                 char title[40];
                 JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x48, title, 40);
@@ -1486,7 +1486,7 @@ namespace DIP_SCRN {
             case 2: {
                 char treaties_str_list[15][40];
                 for (int i = 0; i < treaties_3_count; ++i) {
-                    sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_3[i]].name);
+                    snprintf(treaties_str_list[i], sizeof(treaties_str_list[i]), s__s_0055236c, MOX::_player[treaties_3[i]].name);
                 }
                 char title[40];
                 JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x49, title, 40);
@@ -1859,7 +1859,7 @@ namespace DIP_SCRN {
                         case DIP_NET_MSG_BETTER_OFFER_TECH: {
                             _response_message = _old_response_message;
                             char* tech_name = TECH::Technology_Applications_Name_(_net_diplomacy_message.arg1, _talker_ambassador);
-                            sprintf(msg_buf, "  %s", tech_name);
+                            snprintf(msg_buf, sizeof(msg_buf), "  %s", tech_name);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
                             int16_t list_choice = Diplomacy_Generic_List_(1, msg_buf, 1, title_buf);
                             if (list_choice == -1) {
@@ -1919,12 +1919,12 @@ namespace DIP_SCRN {
                         case DIP_NET_MSG_SWITCH_TALKER: {
                             _response_message = 0;
                             _old_response_message = 0;
-                            sprintf(_diplomacy_message, "%s", s__00551100);
+                            snprintf(_diplomacy_message, sizeof(_diplomacy_message), "%s", s__00551100);
                             break;
                         }
                         case DIP_NET_MSG_BETTER_OFFER_BC: {
                             _response_message = _old_response_message;
-                            sprintf(msg_buf, s__d_BC_00552384, _net_diplomacy_message.arg1);
+                            snprintf(msg_buf, sizeof(msg_buf), s__d_BC_00552384, _net_diplomacy_message.arg1);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
                             int16_t list_choice = Diplomacy_Generic_List_(1, msg_buf, 1, title_buf);
                             if (list_choice == -1) {
@@ -1965,7 +1965,7 @@ namespace DIP_SCRN {
                     Diplomacy_Set_Main_Options_(_talker_ambassador, _listen_ambassador, options);
 
                     for (int i = 0; i < 11; ++i) {
-                        strcpy(_diplomacy_list_choice[i], _main_net_diplomacy_list[i]);
+                        strlcpy(_diplomacy_list_choice[i], _main_net_diplomacy_list[i], sizeof(_diplomacy_list_choice[i]));
                     }
 
                     fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
@@ -2378,11 +2378,11 @@ namespace DIP_SCRN {
             fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_special_colors);
         }
 
-        strcpy(text_buffer, DIP_SCRN::_system_x_star_system_buffer);
+        strlcpy(text_buffer, DIP_SCRN::_system_x_star_system_buffer, sizeof(text_buffer));
 
         if (!COLCALC::May_Surrender_Star_(star_idx, DIP_SCRN::_diplomacy_system_giver, DIP_SCRN::_diplomacy_system_receiver)) {
             fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_special_colors);
-            strcat(text_buffer, DIP_SCRN::_system_unsurrenderable_buffer);
+            strlcat(text_buffer, DIP_SCRN::_system_unsurrenderable_buffer, sizeof(text_buffer));
             use_special_colors = true;
         }
 
@@ -2402,10 +2402,10 @@ namespace DIP_SCRN {
                 uint8_t planet_idx = DIP_SCRN::_diplomacy_system_planet_list[i];
                 s_planet_data* planet = &MOX::_planet[planet_idx];
 
-                sprintf(text_buffer, "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
+                snprintf(text_buffer, sizeof(text_buffer), "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
 
                 if ((int16_t)planet_idx == selected_planet_idx) {
-                    strcat(text_buffer, DIP_SCRN::_system_homeworld_buffer);
+                    strlcat(text_buffer, DIP_SCRN::_system_homeworld_buffer, sizeof(text_buffer));
                 }
 
                 fonts::Print_(10, y_offset + 291 /* 0x123 */, text_buffer);
@@ -2541,7 +2541,7 @@ namespace DIP_SCRN {
                     _net_diplomacy_message.msg_type = 0;
                     _response_message = 0;
                     _old_response_message = 0;
-                    sprintf(_diplomacy_message, s__00551100);
+                    strlcpy(_diplomacy_message, s__00551100, sizeof(_diplomacy_message));
                     // Fallthrough to default behavior
                     break;
 
@@ -2563,7 +2563,7 @@ namespace DIP_SCRN {
         }
 
         if (msg_code == DIP_NET_PACKET_CHAT) {
-            strcpy(_receive_chat_message, (char*)net_msg);
+            strlcpy(_receive_chat_message, (char*)net_msg, sizeof(_receive_chat_message));
         }
     }
 }

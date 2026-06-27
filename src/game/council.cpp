@@ -166,18 +166,18 @@ namespace council {
         int16_t print_x = 30;
         for (int i = 0; i < 2; ++i) {
             if (council::_council_nominee_vote_total[i] < 1) {
-                strcpy(buffer, council::_council_no_votes_message);
+                strlcpy(buffer, council::_council_no_votes_message, sizeof(buffer));
                 JIM::Decode_Text_Race_(buffer, council::_council_nominee_[i], sizeof(buffer));
             } else {
                 char* msg = (council::_council_nominee_vote_total[i] < 2) ? council::_council_vote_message : council::_council_votes_message;
-                strcpy(buffer, msg);
+                strlcpy(buffer, msg, sizeof(buffer));
                 JIM::Decode_Text_Name_And_Stat_(buffer, council::_council_nominee_[i], council::_council_nominee_vote_total[i], sizeof(buffer));
             }
             fonts::Print_(print_x, 30, buffer);
             print_x += 421;
         }
 
-        sprintf(buffer, "%d %s", (int)council::_council_total_votes, council::_council_votes_total_message);
+        snprintf(buffer, sizeof(buffer), "%d %s", (int)council::_council_total_votes, council::_council_votes_total_message);
         fonts::Print_Centered_(320, 30, buffer);
 
         for (int i = 0; i < council::_council_total_members; ++i) {
@@ -233,13 +233,13 @@ namespace council {
         if (MOX::_PLAYER_NUM == council::_council_nominee_[0]) {
             JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[0], sizeof(list_items[0]));
         } else {
-            sprintf(list_items[0], "  %s", MOX::_player[council::_council_nominee_[0]].name);
+            snprintf(list_items[0], sizeof(list_items[0]), "  %s", MOX::_player[council::_council_nominee_[0]].name);
         }
 
         if (MOX::_PLAYER_NUM == council::_council_nominee_[1]) {
             JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[1], sizeof(list_items[1]));
         } else {
-            sprintf(list_items[1], "  %s", MOX::_player[council::_council_nominee_[1]].name);
+            snprintf(list_items[1], sizeof(list_items[1]), "  %s", MOX::_player[council::_council_nominee_[1]].name);
         }
 
         JIM::Get_Text_Message_("jimtext.lbx", 25 /* ABSTAIN */, list_items[2], sizeof(list_items[2]));

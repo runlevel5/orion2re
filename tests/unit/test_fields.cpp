@@ -673,7 +673,7 @@ DOCTEST_TEST_CASE("copy continuous string trims trailing cursor marker before co
 
     const int16_t field_idx = fields::Add_Continuous_String_Input_Field_(10, 20, 40, 10, buffer, 12, 0, &picture, 0, 0);
 
-    std::strcpy(fields::_continuous_string, "alpha_");
+    strlcpy(fields::_continuous_string, "alpha_", sizeof(fields::_continuous_string));
     fields::_active_input_field_number = field_idx;
 
     fields::Copy_Continuous_String_();
@@ -712,7 +712,7 @@ DOCTEST_TEST_CASE("interpret mouse input switches active continuous input field"
 
     fields::_input_field_active = 1;
     fields::_active_input_field_number = 1;
-    std::strcpy(fields::_continuous_string, "staged");
+    strlcpy(fields::_continuous_string, "staged", sizeof(fields::_continuous_string));
 
     test::fakes::g_mouse_button = 0;
     test::fakes::g_mouse_buffer_flag = 1;
@@ -1057,7 +1057,7 @@ DOCTEST_TEST_CASE("interpret mouse input enter confirms active continuous input 
     const int16_t field_idx = fields::Add_Continuous_String_Input_Field_(10, 20, 40, 10, buffer, 12, 0, &picture, 0, 0);
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
-    std::strcpy(fields::_continuous_string, "after_");
+    strlcpy(fields::_continuous_string, "after_", sizeof(fields::_continuous_string));
     test::fakes::g_keyboard_status = 1;
     test::fakes::g_read_key_value = 0x1C0D;
 
@@ -1226,7 +1226,7 @@ DOCTEST_TEST_CASE("draw visible fields renders continuous input and appends curs
     const int16_t field_idx = fields::Add_Continuous_String_Input_Field_(10, 20, 60, 16, buffer, 12, 3, &picture, 0, 0);
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
-    std::strcpy(fields::_continuous_string, "Alpha");
+    strlcpy(fields::_continuous_string, "Alpha", sizeof(fields::_continuous_string));
     fields::_cursor_on = 0;
     fields::_cursor_position = 2;
 
@@ -1247,7 +1247,7 @@ DOCTEST_TEST_CASE("draw visible fields removes continuous input cursor marker wh
     const int16_t field_idx = fields::Add_Continuous_String_Input_Field_(10, 20, 60, 16, buffer, 12, 0, &picture, 0, 0);
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
-    std::strcpy(fields::_continuous_string, "Alpha_");
+    strlcpy(fields::_continuous_string, "Alpha_", sizeof(fields::_continuous_string));
     fields::_cursor_on = 1;
     fields::_cursor_position = 1;
 
@@ -1345,7 +1345,7 @@ DOCTEST_TEST_CASE("draw visible fields back renders active continuous input with
     const int16_t field_idx = fields::Add_Continuous_String_Input_Field_(10, 20, 60, 16, buffer, 12, 3, &picture, 0, 0);
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
-    std::strcpy(fields::_continuous_string, "Alpha");
+    strlcpy(fields::_continuous_string, "Alpha", sizeof(fields::_continuous_string));
     fields::_cursor_on = 0;
 
     fields::Draw_Visible_Fields_Back_();
@@ -2309,7 +2309,7 @@ DOCTEST_TEST_CASE("interpret mouse input keyboard escape returns cancel before c
     const int16_t field_idx = fields::Add_Continuous_String_Input_Field_(10, 20, 40, 10, buffer, 12, 0, &picture, 0, 0);
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
-    std::strcpy(fields::_continuous_string, "editing_");
+    strlcpy(fields::_continuous_string, "editing_", sizeof(fields::_continuous_string));
     test::fakes::g_keyboard_status = 1;
     test::fakes::g_read_key_value = 0x011B;
 
@@ -2328,7 +2328,7 @@ DOCTEST_TEST_CASE("interpret mouse input keyboard delete clears active continuou
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
     fields::_active_input_field_first = 1;
-    std::strcpy(fields::_continuous_string, "stored");
+    strlcpy(fields::_continuous_string, "stored", sizeof(fields::_continuous_string));
     test::fakes::g_keyboard_status = 1;
     test::fakes::g_read_key_value = 0x0E7F;
 
@@ -2346,7 +2346,7 @@ DOCTEST_TEST_CASE("interpret mouse input keyboard backspace truncates active con
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
     fields::_active_input_field_first = 0;
-    std::strcpy(fields::_continuous_string, "AB_");
+    strlcpy(fields::_continuous_string, "AB_", sizeof(fields::_continuous_string));
     test::fakes::g_keyboard_status = 1;
     test::fakes::g_read_key_value = 0x0E08;
 
@@ -2363,7 +2363,7 @@ DOCTEST_TEST_CASE("interpret mouse input keyboard printable character appends to
     fields::_input_field_active = 1;
     fields::_active_input_field_number = field_idx;
     fields::_active_input_field_first = 1;
-    std::strcpy(fields::_continuous_string, "AB");
+    strlcpy(fields::_continuous_string, "AB", sizeof(fields::_continuous_string));
     test::fakes::g_keyboard_status = 1;
     test::fakes::g_read_key_value = 'C';
     test::fakes::g_string_width = 1;
@@ -2401,7 +2401,7 @@ DOCTEST_TEST_CASE("interpret mouse input buffered click on non-input commits act
     const int16_t button_idx = fields::Add_Button_Field_(80, 20, "Go", &picture, "g", 0);
     fields::_input_field_active = 1;
     fields::_active_input_field_number = input_idx;
-    std::strcpy(fields::_continuous_string, "new_");
+    strlcpy(fields::_continuous_string, "new_", sizeof(fields::_continuous_string));
     test::fakes::g_mouse_button = 0;
     test::fakes::g_mouse_buffer_flag = 1;
     test::fakes::g_mouse_buffer_flag2 = 1;

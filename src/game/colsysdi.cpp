@@ -143,13 +143,13 @@ namespace COLSYSDI {
         }
 
         if (colony_idx == -1) {
-            strcpy(pop_str, ESTRINGS::E_Strings_(0xC));
+            strlcpy(pop_str, ESTRINGS::E_Strings_(0xC), sizeof(pop_str));
         } else {
             if (font_player_idx != -1) {
                 COLONY::Set_Colony_Font_To_Player_((uint8_t)font_player_idx, MOX::_colony[colony_idx].owner);
             }
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_colony[colony_idx].owner);
-            sprintf(pop_str, ESTRINGS::E_Strings_(0x8), (int)MOX::_colony[colony_idx].n_pops, (int)max_pop);
+            snprintf(pop_str, sizeof(pop_str), ESTRINGS::E_Strings_(0x8), (int)MOX::_colony[colony_idx].n_pops, (int)max_pop);
         }
 
         if (colony_idx == -1) {

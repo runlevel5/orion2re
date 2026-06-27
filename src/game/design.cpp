@@ -1308,7 +1308,7 @@ namespace DESIGN {
                     int16_t colony_idx = DESIGN::Get_Colony_Handle_();
                     char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
                     is_formatted = true;
-                    sprintf(planet_name_buf, planet_name);
+                    strlcpy(planet_name_buf, planet_name, sizeof(planet_name_buf));
                 }
                 break;
             default:
@@ -1319,7 +1319,7 @@ namespace DESIGN {
             MISC::Get_LBX_Message_(message_id, lbx_msg);
             if (is_formatted) {
                 const char* hull_name = TECHDATA::_hull_data[MOX::_design->ship_size].name;
-                sprintf(formatted_msg, lbx_msg, planet_name_buf, hull_name);
+                snprintf(formatted_msg, sizeof(formatted_msg), lbx_msg, planet_name_buf, hull_name);
                 GENDRAW::Message_Box_(formatted_msg);
             } else {
                 GENDRAW::Message_Box_(lbx_msg);
@@ -1876,7 +1876,7 @@ namespace DESIGN {
             weapon_id == WEAPON_BLACK_HOLE_GENERATOR || weapon_id == WEAPON_TRACTOR_BEAM) {
 
             const char* msg = HAROLD::H_Message_(HESTR_065_SPECIAL);
-            strcpy(special_msg, msg);
+            strlcpy(special_msg, msg, sizeof(special_msg));
         } else if (weapon_id == WEAPON_HEAVY_FIGHTER || weapon_id == WEAPON_BOMBER) {
             min_damage = INITSHIP::Best_Bomb_Weapon_(MOX::_PLAYER_NUM);
             max_damage = min_damage;

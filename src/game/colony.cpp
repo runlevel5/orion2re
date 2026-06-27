@@ -720,7 +720,7 @@ namespace COLONY {
             if (leader.eta > 0) {
                 char local_buffer[500];
                 char* format = ESTRINGS::E_Strings_(285);
-                sprintf(local_buffer, format, (int)leader.eta);
+                snprintf(local_buffer, sizeof(local_buffer), format, (int)leader.eta);
                 fonts::Print_Centered_(586, 433, local_buffer);
                 return;
             } else {
@@ -866,7 +866,7 @@ namespace COLONY {
             int unit_count = (int)MOX::_colony[COLONY::_colony_handle].military[COLONY::_scanned_military];
 
             char* format = ESTRINGS::E_Strings_(14 /* ESTR_MILITARY_COUNT_FORMAT */);
-            sprintf(buffer, format, unit_count, unit_name);
+            snprintf(buffer, sizeof(buffer), format, unit_count, unit_name);
 
             COLONY::Print_Scanned_String_(buffer);
         }
@@ -926,7 +926,7 @@ namespace COLONY {
                 str_job = Job_String_((int16_t)((pop_data >> 7) & 3));
 
                 format_str = ESTRINGS::E_Strings_(76);
-                sprintf(buffer, format_str, str_job, str_race, str_conquered, str_state);
+                snprintf(buffer, sizeof(buffer), format_str, str_job, str_race, str_conquered, str_state);
             } else {
                 str_job = Job_String_((int16_t)((pop_data >> 7) & 3));
                 str_state = Pop_State_String_(Pop_To_Pop_State_(handle_s, COLONY::_scanned_pop));
@@ -934,7 +934,7 @@ namespace COLONY {
                 str_conquered = Conquered_String_((bool)((pop_data >> 10) & 1));
 
                 format_str = ESTRINGS::E_Strings_(76);
-                sprintf(buffer, format_str, str_conquered, str_race, str_state, str_job);
+                snprintf(buffer, sizeof(buffer), format_str, str_conquered, str_race, str_state, str_job);
             }
 
             Set_Colony_Font_();
@@ -985,7 +985,7 @@ namespace COLONY {
 
         format = ESTRINGS::E_Strings_(ESTR_D_TURNS);
 
-        sprintf(buffer, format, static_cast<int32_t>(turns));
+        snprintf(buffer, sizeof(buffer), format, static_cast<int32_t>(turns));
 
         fonts::Print_Right_(624, 103, buffer);
     }
@@ -1015,7 +1015,7 @@ namespace COLONY {
         if (production_id == -39) {
             char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
             char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_COLONIZED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
-            sprintf(buffer, format, planet_name);
+            snprintf(buffer, sizeof(buffer), format, planet_name);
             GENDRAW::Help_(buffer);
             Show_Colony_Screen_();
             colony->just_produced = -1;
@@ -1025,7 +1025,7 @@ namespace COLONY {
         if (production_id == -40) {
             char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
             char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_CONQUERED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
-            sprintf(buffer, format, planet_name);
+            snprintf(buffer, sizeof(buffer), format, planet_name);
             GENDRAW::Help_(buffer);
             Show_Colony_Screen_();
             colony->just_produced = -1;
@@ -1035,7 +1035,7 @@ namespace COLONY {
         if (production_id == -41) {
             char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
             char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_LIBERATED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
-            sprintf(buffer, format, planet_name);
+            snprintf(buffer, sizeof(buffer), format, planet_name);
             GENDRAW::Help_(buffer);
             Show_Colony_Screen_();
             colony->just_produced = -1;
@@ -1045,7 +1045,7 @@ namespace COLONY {
         char* selection_name = COLBLDG::Selection_Name_(production_id);
         char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
         char* format = ESTRINGS::E_Strings_(ESTR_S_FINISHED_BUILDING_S_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
-        sprintf(buffer, format, planet_name, selection_name);
+        snprintf(buffer, sizeof(buffer), format, planet_name, selection_name);
         GENDRAW::Help_(buffer);
         Show_Colony_Screen_();
         colony->just_produced = -1;
@@ -1587,7 +1587,7 @@ namespace COLONY {
                     char* bld_name = Real_Building_Name2_(building_idx);
                     char* fmt = ESTRINGS::E_Strings_(0x107);
 
-                    sprintf(local_buffer, fmt, bld_name, scrap_value);
+                    snprintf(local_buffer, sizeof(local_buffer), fmt, bld_name, scrap_value);
 
                     if (GENDRAW::Do_Confirmation_Box_(local_buffer) != 0) {
                         MOX::_colony[_colony_handle].last_turn_building_destroyed = (uint16_t)MOX::_stardate;
@@ -1868,7 +1868,7 @@ namespace COLONY {
         char input_buf[20];
 
         // Copy menu title into buffer
-        strcpy(input_buf, ESTRINGS::E_Strings_(12));
+        strlcpy(input_buf, ESTRINGS::E_Strings_(12), sizeof(input_buf));
 
         RUSS::PFMT_(0, 0x17, ESTRINGS::E_Strings_(ESTR_ELSE__COL_CALC_WRAPPER));
         RUSS::PFMT_(0, 0x16, ESTRINGS::E_Strings_(ESTR_Q__PRODUCTION__10000));
@@ -1966,8 +1966,8 @@ namespace COLONY {
                     }
 
                     int32_t refund_val = TECHDATA::_buildings[bldg_id].cost / 2;
-                    sprintf(buffer, ESTRINGS::E_Strings_(0x107), CR_Building_Name_((int16_t)bldg_id), refund_val);
                     
+                    snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x107), CR_Building_Name_((int16_t)bldg_id), refund_val);
                     if (GENDRAW::Confirmation_Box_(buffer)) {
                         col_ref.last_turn_building_destroyed = (uint16_t)MOX::_stardate;
                         Turn_To_Rubble_CR_Bldg_((int16_t)bldg_id);

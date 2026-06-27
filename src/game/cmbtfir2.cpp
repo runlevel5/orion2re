@@ -1331,28 +1331,28 @@ namespace CMBTFIR2 {
         char num_buf[12];
 
         KEN::Ken_Get_Text_Message_(42, temp_str, sizeof(temp_str));
-        strcpy(title_str, temp_str);
-        strcat(title_str, target->name);
+        strlcpy(title_str, temp_str, sizeof(title_str));
+        strlcat(title_str, target->name, sizeof(title_str));
 
         KEN::Ken_Get_Text_Message_(92, temp_str, sizeof(temp_str));
-        strcpy(body_str, temp_str);
+        strlcpy(body_str, temp_str, sizeof(body_str));
 
         itoa(attacker_strength, num_buf, 10);
-        strcat(body_str, num_buf);
+        strlcat(body_str, num_buf, sizeof(body_str));
 
-        strcat(body_str, "          ");
+        strlcat(body_str, "          ", sizeof(body_str));
 
         KEN::Ken_Get_Text_Message_(93, temp_str, sizeof(temp_str));
-        strcat(body_str, temp_str);
+        strlcat(body_str, temp_str, sizeof(body_str));
 
         itoa(target_strength, num_buf, 10);
-        strcat(body_str, num_buf);
+        strlcat(body_str, num_buf, sizeof(body_str));
 
-        strcat(body_str, "\n\n");
+        strlcat(body_str, "\n\n", sizeof(body_str));
 
         if (total_damage <= 0) {
             KEN::Ken_Get_Text_Message_(47, temp_str, sizeof(temp_str));
-            strcat(body_str, temp_str);
+            strlcat(body_str, temp_str, sizeof(body_str));
         } else {
             int16_t is_dead = CMBTFIRE::Is_Combat_Ship_Dead_(target_idx);
             if (is_dead > 0) {
@@ -1361,64 +1361,64 @@ namespace CMBTFIR2 {
 
             if (raid_results[0] > 0) {
                 KEN::Ken_Get_Text_Message_(43, temp_str, sizeof(temp_str));
-                strcat(body_str, temp_str);
+                strlcat(body_str, temp_str, sizeof(body_str));
             }
 
             if (raid_results[1] > 0) {
                 KEN::Ken_Get_Text_Message_(44, temp_str, sizeof(temp_str));
-                strcat(body_str, temp_str);
+                strlcat(body_str, temp_str, sizeof(body_str));
 
                 if (target->shield_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, sizeof(temp_str));
                 }
-                strcat(body_str, temp_str);
+                strlcat(body_str, temp_str, sizeof(body_str));
             }
 
             if (raid_results[2] > 0) {
                 KEN::Ken_Get_Text_Message_(21, temp_str, sizeof(temp_str));
-                strcat(body_str, temp_str);
-                strcat(body_str, " ");
+                strlcat(body_str, temp_str, sizeof(body_str));
+                strlcat(body_str, " ", sizeof(body_str));
 
                 if (target->computer_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, sizeof(temp_str));
                 }
-                strcat(body_str, temp_str);
+                strlcat(body_str, temp_str, sizeof(body_str));
             }
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 3] > 0) {
                     itoa(raid_results[k + 3], num_buf, 10);
-                    strcat(body_str, num_buf);
-                    strcat(body_str, " ");
+                    strlcat(body_str, num_buf, sizeof(body_str));
+                    strlcat(body_str, " ", sizeof(body_str));
 
                     if (raid_results[k + 3] < 2) {
-                        strcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name);
+                        strlcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name, sizeof(body_str));
                     } else {
-                        strcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name_plural);
+                        strlcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name_plural, sizeof(body_str));
                     }
-                    strcat(body_str, " ");
+                    strlcat(body_str, " ", sizeof(body_str));
 
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
-                    strcat(body_str, temp_str);
+                    strlcat(body_str, temp_str, sizeof(body_str));
                 }
             }
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 11] > 0) {
                     itoa(raid_results[k + 11], num_buf, 10);
-                    strcat(body_str, num_buf);
-                    strcat(body_str, " ");
+                    strlcat(body_str, num_buf, sizeof(body_str));
+                    strlcat(body_str, " ", sizeof(body_str));
 
                     int16_t special_id = Get_Combat_Ship_Special_Id_(target_idx, k);
-                    strcat(body_str, TECHDATA::_specials[special_id].name);
-                    strcat(body_str, " ");
+                    strlcat(body_str, TECHDATA::_specials[special_id].name, sizeof(body_str));
+                    strlcat(body_str, " ", sizeof(body_str));
 
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
-                    strcat(body_str, temp_str);
+                    strlcat(body_str, temp_str, sizeof(body_str));
                 }
             }
         }
@@ -1426,31 +1426,31 @@ namespace CMBTFIR2 {
         if (target_raiders < *raiders) {
             int16_t lost = *raiders - target_raiders;
             itoa(lost, num_buf, 10);
-            strcat(body_str, string::s_Newline);
-            strcat(body_str, num_buf);
-            strcat(body_str, " ");
+            strlcat(body_str, string::s_Newline, sizeof(body_str));
+            strlcat(body_str, num_buf, sizeof(body_str));
+            strlcat(body_str, " ", sizeof(body_str));
 
             if (lost < 2) {
                 KEN::Ken_Get_Text_Message_(94, temp_str, sizeof(temp_str));
             } else {
                 KEN::Ken_Get_Text_Message_(95, temp_str, sizeof(temp_str));
             }
-            strcat(body_str, temp_str);
+            strlcat(body_str, temp_str, sizeof(body_str));
         }
 
         if (marines < (int16_t)(uint8_t)target->marine_count) {
             int16_t lost = (int16_t)(uint8_t)target->marine_count - marines;
             itoa(lost, num_buf, 10);
-            strcat(body_str, string::s_Newline);
-            strcat(body_str, num_buf);
-            strcat(body_str, " ");
+            strlcat(body_str, string::s_Newline, sizeof(body_str));
+            strlcat(body_str, num_buf, sizeof(body_str));
+            strlcat(body_str, " ", sizeof(body_str));
 
             if (lost < 2) {
                 KEN::Ken_Get_Text_Message_(96, temp_str, sizeof(temp_str));
             } else {
                 KEN::Ken_Get_Text_Message_(97, temp_str, sizeof(temp_str));
             }
-            strcat(body_str, temp_str);
+            strlcat(body_str, temp_str, sizeof(body_str));
         }
 
         int sound_handle = ERICNET::Mox_Play_Sound_(67); // 0x43
@@ -1537,8 +1537,8 @@ namespace CMBTFIR2 {
         char msg_buf[500];
 
         KEN::Ken_Get_Text_Message_(0x30, tmp_buf, sizeof(tmp_buf));
-        strcpy(header_buf, tmp_buf);
-        strcat(header_buf, defender->name);
+        strlcpy(header_buf, tmp_buf, sizeof(header_buf));
+        strlcat(header_buf, defender->name, sizeof(header_buf));
 
         if (attacker->owner >= MAX_PLAYERS || MOX::_player[attacker->owner].objectives != 'd') {
             side1.unit_strengths[1] -= side1.combat_modifiers.difficulty_bonus;
@@ -1558,23 +1558,23 @@ namespace CMBTFIR2 {
         FMTPARA::Set_Paragraph_Sint_Pointer_(7, &side2.unit_strengths[1]);
 
         // fmtpara 0x1A + '2' switches the paragraph to centered alignment.
-        strcpy(msg_buf, "\0322");
+        strlcpy(msg_buf, "\0322", sizeof(msg_buf));
         KEN::Ken_Get_Text_Message_(0x5C, tmp_buf, sizeof(tmp_buf));
-        strcat(msg_buf, tmp_buf);
+        strlcat(msg_buf, tmp_buf, sizeof(msg_buf));
         // fmtpara 0x18 + 'B' inserts paragraph variable 6, and \aX175. moves the text cursor horizontally.
-        strcat(msg_buf, "\030B6\aX175.");
+        strlcat(msg_buf, "\030B6\aX175.", sizeof(msg_buf));
         KEN::Ken_Get_Text_Message_(0x5D, tmp_buf, sizeof(tmp_buf));
-        strcat(msg_buf, tmp_buf);
+        strlcat(msg_buf, tmp_buf, sizeof(msg_buf));
         KEN::Ken_Get_Text_Message_(0x64, tmp_buf, sizeof(tmp_buf));
         // fmtpara 0x18 + 'B' inserts variables 7, 0, 3, and 1, while the alignment codes and
         // \aX cursor moves lay out the boarding-strength summary across centered columns.
-        strcat(msg_buf, "\030B7\n\0321\030B0\aX80.\0321\030B3\aX255.\0320\n\0321\030B1\aX80.\0320\aX82. ");
-        strcat(msg_buf, tmp_buf);
+        strlcat(msg_buf, "\030B7\n\0321\030B0\aX80.\0321\030B3\aX255.\0320\n\0321\030B1\aX80.\0320\aX82. ", sizeof(msg_buf));
+        strlcat(msg_buf, tmp_buf, sizeof(msg_buf));
         // fmtpara right-aligns variable 4, then restores left alignment and advances the cursor.
-        strcat(msg_buf, "\0321\030B4\aX255.\0320\aX257. ");
-        strcat(msg_buf, tmp_buf);
+        strlcat(msg_buf, "\0321\030B4\aX255.\0320\aX257. ", sizeof(msg_buf));
+        strlcat(msg_buf, tmp_buf, sizeof(msg_buf));
         // fmtpara cursor moves place divider lines and the trailing summary fields before restoring centered alignment.
-        strcat(msg_buf, "\n\aX48.-------\aX223.-------\n\0321\030B2\aX80.\0321\030B5\aX255.\0320\n\n\0322");
+        strlcat(msg_buf, "\n\aX48.-------\aX223.-------\n\0321\030B2\aX80.\0321\030B5\aX255.\0320\n\n\0322", sizeof(msg_buf));
 
         bool is_timed = true;
         int16_t auto_combat_flag = (defender->owner == MOX::_combat_attacker_player) ? MOX::_auto_combat_flag[0] : MOX::_auto_combat_flag[1];
@@ -1596,7 +1596,7 @@ namespace CMBTFIR2 {
         }
 
         KEN::Ken_Get_Text_Message_(result_msg_id, tmp_buf, sizeof(tmp_buf));
-        strcat(msg_buf, tmp_buf);
+        strlcat(msg_buf, tmp_buf, sizeof(msg_buf));
 
         int32_t sound_handle = ERICNET::Mox_Play_Sound_(0x43);
 

@@ -439,7 +439,7 @@ void __cdecl Init_Tech_() {
 
             if (free_slot_index == -1) {
                 itoa(tech_app_index, error_message, 10);
-                strcat(error_message, " tech has too many apps");
+                strlcat(error_message, " tech has too many apps", sizeof(error_message));
                 exitm::Exit_With_Message(error_message);
             } else {
                 *tech_slot_ptrs[free_slot_index] = tech_app_index;

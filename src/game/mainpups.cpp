@@ -481,16 +481,16 @@ namespace MAINPUPS {
         MOX2::Get_Auto_Function_(&_eric_saved_autofunction);
 
         if (colony_idx == -1) {
-            strcpy(location_name, MOX::_star[star_idx].name);
+            strlcpy(location_name, MOX::_star[star_idx].name, sizeof(location_name));
         } else {
-            strcpy(location_name, HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet));
+            strlcpy(location_name, HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet), sizeof(location_name));
         }
 
         if (attacker_idx >= 0 && attacker_idx < MAX_PLAYERS) {
             if (MOX::_settings.language == 4) {
-                sprintf(attacker_name, "%s", MOX::_player[attacker_idx].race_name);
+                snprintf(attacker_name, sizeof(attacker_name), "%s", MOX::_player[attacker_idx].race_name);
             } else {
-                sprintf(attacker_name, ESTRINGS::E_Strings_(0x3A), MOX::_player[attacker_idx].race_name);
+                snprintf(attacker_name, sizeof(attacker_name), ESTRINGS::E_Strings_(0x3A), MOX::_player[attacker_idx].race_name);
             }
         } else {
             int16_t str_id;
@@ -504,18 +504,19 @@ namespace MAINPUPS {
                 case 14: str_id = 0xA3;  break;
                 default: str_id = 0xA4;  break;
             }
-            sprintf(attacker_name, ESTRINGS::E_Strings_(str_id));
+            strlcpy(attacker_name, ESTRINGS::E_Strings_(str_id), sizeof(attacker_name));
         }
 
         if (defender_idx >= 0 && defender_idx < MAX_PLAYERS) {
-            sprintf(defender_name, ESTRINGS::E_Strings_(0x46), MOX::_player[defender_idx].race_name);
+            snprintf(defender_name, sizeof(defender_name), ESTRINGS::E_Strings_(0x46), MOX::_player[defender_idx].race_name);
         } else {
-            sprintf(defender_name, ESTRINGS::E_Strings_(0xA5));
+            strlcpy(defender_name, ESTRINGS::E_Strings_(0xA5), sizeof(defender_name));
         }
 
         if (MOX::_settings.language == 4) {
-            sprintf(
+            snprintf(
                 formatted_msg,
+                sizeof(formatted_msg),
                 "SI COMBATTE NEL SISTEMA %s\n\n  Attaccante: %s\n  Difensore: %s",
                 location_name,
                 attacker_name,
@@ -523,7 +524,7 @@ namespace MAINPUPS {
             );
         } else {
             int16_t format_id = (colony_idx == -1) ? 0x31 : 0x30;
-            sprintf(formatted_msg, ESTRINGS::E_Strings_(format_id), attacker_name, defender_name, location_name);
+            snprintf(formatted_msg, sizeof(formatted_msg), ESTRINGS::E_Strings_(format_id), attacker_name, defender_name, location_name);
         }
 
         ERICHELP::Set_Player_Attacked_Popup_Help_List_();
@@ -882,7 +883,7 @@ namespace MAINPUPS {
                     char* level_name = MOX::_officer_level_names[leader->level];
                     char buffer[500];
 
-                    sprintf(buffer, ESTRINGS::E_Strings_(0x1fb), level_name, leader, info_cost);
+                    snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x1fb), level_name, leader, info_cost);
                     TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1bf), buffer);
 
                     fields::Deactivate_Auto_Function_();
@@ -897,7 +898,7 @@ namespace MAINPUPS {
                     char* level_name = MOX::_officer_level_names[leader->level];
                     char buffer[500];
 
-                    sprintf(buffer, ESTRINGS::E_Strings_(0x1fa), level_name, leader, info_cost);
+                    snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x1fa), level_name, leader, info_cost);
                     TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x141), buffer);
 
                     fields::Deactivate_Auto_Function_();
@@ -1300,7 +1301,7 @@ namespace MAINPUPS {
                     char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[MAINPUPS::_g_data_ptr->colony_idx].planet);
 
                     char* fmt = ESTRINGS::E_Strings_(str_id);
-                    sprintf(buffer, fmt, planet_name, race_name);
+                    snprintf(buffer, sizeof(buffer), fmt, planet_name, race_name);
                     GENDRAW::Help_(buffer);
 
                     COLONY::_full_draw = 1;
@@ -1540,7 +1541,7 @@ namespace MAINPUPS {
 
         star_ptr = &MOX::_star[COLONY::_sys_disp_star_handle];
         format = ESTRINGS::E_Strings_(456 /* 0x1c8 */);
-        sprintf(msg_buffer, format, star_ptr->name);
+        snprintf(msg_buffer, sizeof(msg_buffer), format, star_ptr->name);
 
         anim = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", 73 /* 0x49 */, MOX::_global_cache_seg);
         MAINPUPS::Get_Picture_Draw_XY_(anim);
@@ -1681,7 +1682,7 @@ namespace MAINPUPS {
         if (draw_selection_popup) {
             s_star_data* selected_star = &MOX::_star[_g_star_n];
             const char* format = ESTRINGS::E_Strings_(string_id);
-            sprintf(popup_text, format, selected_star->name);
+            snprintf(popup_text, sizeof(popup_text), format, selected_star->name);
 
             SYS::Draw_System_Display_Popup_(
                 (short)COLONY::_sys_disp_star_handle,
@@ -1847,7 +1848,8 @@ namespace MAINPUPS {
                                                               MAINPUPS::_g_officer);
                 leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
                 format_string = ESTRINGS::E_Strings_(2);
-                sprintf(message_buffer,
+                snprintf(message_buffer,
+                        sizeof(message_buffer),
                         format_string,
                         leader_name,
                         officer_cost,
@@ -1858,19 +1860,19 @@ namespace MAINPUPS {
                                                               MAINPUPS::_g_officer);
                 leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
                 format_string = ESTRINGS::E_Strings_(6);
-                sprintf(message_buffer, format_string, leader_name, officer_cost);
+                snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
             } else if (field_state == 2) {
                 officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
                                                               MAINPUPS::_g_officer);
                 leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
                 format_string = ESTRINGS::E_Strings_(5);
-                sprintf(message_buffer, format_string, leader_name, officer_cost);
+                snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
             } else if (field_state == 3) {
                 officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
                                                               MAINPUPS::_g_officer);
                 leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
                 format_string = ESTRINGS::E_Strings_(4);
-                sprintf(message_buffer, format_string, leader_name, officer_cost);
+                snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
             }
 
             BILL::Squeeze_Paragraph_Centered_(MAINPUPS::_g_x + 0x0e,
@@ -2027,7 +2029,7 @@ namespace MAINPUPS {
         char* race_name = MOX::_player[MAINPUPS::_g_player_n].race_name;
         char* format = ESTRINGS::E_Strings_(0x45);
 
-        sprintf(buffer, format, race_name, star->name);
+        snprintf(buffer, sizeof(buffer), format, race_name, star->name);
 
         SYS::Draw_System_Display_Popup_(
             (int16_t)COLONY::_sys_disp_star_handle,
@@ -2075,17 +2077,17 @@ namespace MAINPUPS {
         if (_officer_gains_level_state == 0) {
             char* name = OFFICER::Leader_Name_(_g_officer, 0);
             char* format = ESTRINGS::E_Strings_(1);
-            sprintf(message_buffer, format, name);
+            snprintf(message_buffer, sizeof(message_buffer), format, name);
         }
         else if (_officer_gains_level_state == 1) {
             char* name = OFFICER::Leader_Name_(_g_officer, 0);
             char* format = ESTRINGS::E_Strings_(584);
-            sprintf(message_buffer, format, name);
+            snprintf(message_buffer, sizeof(message_buffer), format, name);
         }
         else if (_officer_gains_level_state == 2) {
             char* name = OFFICER::Leader_Name_(_g_officer, 0);
             char* format = ESTRINGS::E_Strings_(585);
-            sprintf(message_buffer, format, name);
+            snprintf(message_buffer, sizeof(message_buffer), format, name);
         }
         // Preserve the original binary behavior for unexpected state values by
         // intentionally leaving message_buffer untouched.
@@ -2421,10 +2423,10 @@ namespace MAINPUPS {
             MOVEBOX::Draw_Galaxy_Map_Box_(anim_b, anim_c, 302, 156, 148, 94, 0, 0, 0, 0, 0, 0);
 
             if (_field_mode == 1) {
-                sprintf(msg_buffer, ESTRINGS::E_Strings_(464), MOX::_player[_g_player_n].name);
+                snprintf(msg_buffer, sizeof(msg_buffer), ESTRINGS::E_Strings_(464), MOX::_player[_g_player_n].name);
             } else {
                 int16_t str_idx = (_field_mode == 2) ? 583 : 555;
-                sprintf(msg_buffer, ESTRINGS::E_Strings_(str_idx), 500, MOX::_player[_g_player_n].name, MOX::_star[_g_star_n].name);
+                snprintf(msg_buffer, sizeof(msg_buffer), ESTRINGS::E_Strings_(str_idx), 500, MOX::_player[_g_player_n].name, MOX::_star[_g_star_n].name);
             }
 
             BILL::Squeeze_Formatted_Paragraph_Centered_(188, 271, 262, 35, msg_buffer, 2);
@@ -2598,10 +2600,10 @@ namespace MAINPUPS {
 
             if (_g_state == 0 || _g_state == 1) {
                 char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[_g_data_ptr->colony_idx].planet);
-                sprintf(text_buffer, ESTRINGS::E_Strings_(458), planet_name);
+                snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(458), planet_name);
             } else if (_g_state == 2) {
                 char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[_g_data_ptr->colony_idx].planet);
-                sprintf(text_buffer, ESTRINGS::E_Strings_(337), planet_name);
+                snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(337), planet_name);
             }
 
             fonts::Print_Centered_(x_center, _g_y + 20, text_buffer);
@@ -2616,7 +2618,7 @@ namespace MAINPUPS {
 
         if (_g_data_ptr->n_bldgs > 0) {
             animate::Remap_Draw_(_g_x + 20, _g_y + 50, _anims[23]);
-            sprintf(text_buffer, ESTRINGS::E_Strings_(19), _g_data_ptr->n_bldgs);
+            snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(19), _g_data_ptr->n_bldgs);
             fonts::Print_(_g_x + 55, _g_y + 50, text_buffer);
             list_idx = 1;
         }
@@ -2626,7 +2628,7 @@ namespace MAINPUPS {
             animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, _anims[24]);
             
             char* bldg_name = COLONY::CR_Building_Name_(_g_data_ptr->best_shield_bldg);
-            sprintf(text_buffer, ESTRINGS::E_Strings_(70), bldg_name);
+            snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(70), bldg_name);
             fonts::Print_(_g_x + 55, _g_y + y_offs + 50, text_buffer);
             list_idx++;
         }
@@ -2641,7 +2643,7 @@ namespace MAINPUPS {
             s_animation_header* pop_anim = COLONY::People_Anim_(anim_idx, 2, race);
             animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, pop_anim);
             
-            sprintf(text_buffer, ESTRINGS::E_Strings_(20), _g_data_ptr->n_pops);
+            snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(20), _g_data_ptr->n_pops);
             fonts::Print_(_g_x + 55, _g_y + y_offs + 50, text_buffer);
             list_idx++;
         }
@@ -2657,9 +2659,9 @@ namespace MAINPUPS {
                 char* troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->defender_player_id, unit_idx, race);
                 
                 if (MOX::_settings.language == 4) {
-                    sprintf(text_buffer, "%s: %d", troop_name, _g_data_ptr->defender_unit_counts[unit_idx]);
+                    snprintf(text_buffer, sizeof(text_buffer), "%s: %d", troop_name, _g_data_ptr->defender_unit_counts[unit_idx]);
                 } else {
-                    sprintf(text_buffer, ESTRINGS::E_Strings_(14), _g_data_ptr->defender_unit_counts[unit_idx], troop_name);
+                    snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(14), _g_data_ptr->defender_unit_counts[unit_idx], troop_name);
                 }
                 
                 fonts::Print_(_g_x + 55, _g_y + y_offs + 50, text_buffer);
@@ -2677,8 +2679,8 @@ namespace MAINPUPS {
             
             char* att_troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->attacker_player_id, 1, attacker_race);
             char* fmt = ESTRINGS::E_Strings_(14);
-            sprintf(text_buffer, fmt, _g_data_ptr->attacker_unit_counts[1], att_troop_name);
             
+            snprintf(text_buffer, sizeof(text_buffer), fmt, _g_data_ptr->attacker_unit_counts[1], att_troop_name);
             anim_w = animate::Get_Width_(_anims[3]);
             fonts::Print_Right_(_g_x + anim_w - 45, _g_y + 50, text_buffer);
             right_list_idx = 1;
@@ -2691,9 +2693,9 @@ namespace MAINPUPS {
             animate::Remap_Draw_(_g_x + anim_w - 40, _g_y + right_y_offs + 50, _anims[22]);
             
             if (_g_state == 0 || _g_state == 2) {
-                sprintf(text_buffer, ESTRINGS::E_Strings_(21), _g_data_ptr->bombardment_result);
+                snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(21), _g_data_ptr->bombardment_result);
             } else {
-                sprintf(text_buffer, ESTRINGS::E_Strings_(18), _g_data_ptr->bombardment_result);
+                snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(18), _g_data_ptr->bombardment_result);
             }
             
             anim_w = animate::Get_Width_(_anims[3]);

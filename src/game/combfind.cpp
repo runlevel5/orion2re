@@ -1489,7 +1489,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
                 star_or_planet_name = HACCESS::Get_Planet_Name_(planet_idx);
             }
             char* attacker_name = COLCALC::Player_Name_(plr2_idx);
-            sprintf(msg_buf, _s_attacks_you_at_s_msg, attacker_name, star_or_planet_name);
+            snprintf(msg_buf, sizeof(msg_buf), _s_attacks_you_at_s_msg, attacker_name, star_or_planet_name);
             GENDRAW::Message_Box_(msg_buf);
         }
     }
@@ -2746,7 +2746,7 @@ void __cdecl GNN_Reports_Combat_(int player1_idx, int player2_idx) {
     char* name2 = COLCALC::Player_Name_(p2);
     char* name1 = COLCALC::Player_Name_(p1);
 
-    sprintf(buf, _combat_is_reported_between_s_and_s_msg, name1, name2);
+    snprintf(buf, sizeof(buf), _combat_is_reported_between_s_and_s_msg, name1, name2);
 
     CHAT::Send_GNN_Chat_Msg_(buf);
 }

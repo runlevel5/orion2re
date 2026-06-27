@@ -473,7 +473,7 @@ namespace MOX2 {
             }
 
             if (error_text != nullptr) {
-                sprintf(error_message, error_text);
+                strlcpy(error_message, error_text, sizeof(error_message));
             }
 
             exitm::Exit_With_Message(error_message);
@@ -502,10 +502,10 @@ namespace MOX2 {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: alternate asset path parsed '%s'", alternate_path);
 
         if (alternate_path[path_length - 1] != '\\') {
-            strcat(alternate_path, "\\");
+            strlcat(alternate_path, "\\", sizeof(alternate_path));
         }
 
-        sprintf(diplomat_path, "%sdiplomat.lbx", alternate_path);
+        snprintf(diplomat_path, sizeof(diplomat_path), "%sdiplomat.lbx", alternate_path);
 
         if (dos::DIR_("diplomat.lbx", alternate_path)) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: diplomat.lbx found in cwd");
@@ -536,7 +536,7 @@ namespace MOX2 {
         }
 
         if (error_text != nullptr) {
-            sprintf(error_message, error_text);
+            strlcpy(error_message, error_text, sizeof(error_message));
         }
 
         exitm::Exit_With_Message(error_message);

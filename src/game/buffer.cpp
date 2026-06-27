@@ -218,7 +218,7 @@ namespace buffer {
     }
 
     if (!reuse_current_file) {
-      strcpy(farload::_farload_file_name, file_name);
+      strlcpy(farload::_farload_file_name, file_name, sizeof(farload::_farload_file_name));
       farload::_farload_fptr = fopen_case(file_name, "rb");
 
       if (farload::_farload_fptr == nullptr) {
@@ -226,8 +226,8 @@ namespace buffer {
           farload::Error_Handler_(file_name, 1, entry_index);
         }
 
-        strcpy(secondary_file_name, farload::_secondary_drive_path);
-        strcat(secondary_file_name, farload::_farload_file_name);
+        strlcpy(secondary_file_name, farload::_secondary_drive_path, sizeof(secondary_file_name));
+        strlcat(secondary_file_name, farload::_farload_file_name, sizeof(secondary_file_name));
         farload::_farload_fptr = fopen_case(secondary_file_name, "rb");
 
         if (farload::_farload_fptr == nullptr) {

@@ -24,7 +24,7 @@ namespace JIM {
         char find_buffer[80];
         char secondary_path[80];
 
-        sprintf(secondary_path, s_fmt_ssimtex_lbx, farload::_secondary_drive_path);
+        snprintf(secondary_path, sizeof(secondary_path), s_fmt_ssimtex_lbx, farload::_secondary_drive_path);
 
         if (dos::DIR_(s_simtex_lbx, find_buffer)) {
             return true;
@@ -304,14 +304,14 @@ namespace JIM {
                         src_ptr = temp_buf;
                         break;
                     case 0x83:
-                        strcpy(temp_buf, TECH::Technology_Applications_Name_(tech_app1_id, player1_id));
+                        strlcpy(temp_buf, TECH::Technology_Applications_Name_(tech_app1_id, player1_id), sizeof(temp_buf));
                         src_ptr = temp_buf;
                         break;
                     case 0x84:
                         src_ptr = MOX::_player[player2_id].name;
                         break;
                     case 0x85:
-                        strcpy(temp_buf, TECH::Technology_Applications_Name_(tech_app2_id, player2_id));
+                        strlcpy(temp_buf, TECH::Technology_Applications_Name_(tech_app2_id, player2_id), sizeof(temp_buf));
                         src_ptr = temp_buf;
                         break;
                     case 0x86:
@@ -322,18 +322,18 @@ namespace JIM {
                         break;
                     case 0x88:
                         if (MOX::_settings.language == 0) {
-                            sprintf(temp_buf, s_d_dot_d_005523a4, MOX::_stardate / 10, MOX::_stardate % 10);
+                            snprintf(temp_buf, sizeof(temp_buf), s_d_dot_d_005523a4, MOX::_stardate / 10, MOX::_stardate % 10);
                         } else {
-                            sprintf(temp_buf, s_d_comma_d_0055239c, MOX::_stardate / 10, MOX::_stardate % 10);
+                            snprintf(temp_buf, sizeof(temp_buf), s_d_comma_d_0055239c, MOX::_stardate / 10, MOX::_stardate % 10);
                         }
                         src_ptr = temp_buf;
                         break;
                     case 0x89:
-                        strcpy(temp_buf, TECH::Technology_Fields_Name_(tech_field_id));
+                        strlcpy(temp_buf, TECH::Technology_Fields_Name_(tech_field_id), sizeof(temp_buf));
                         src_ptr = temp_buf;
                         break;
                     case 0x8A:
-                        strcpy(temp_buf, HACCESS::Get_Planet_Name_(star_id));
+                        strlcpy(temp_buf, HACCESS::Get_Planet_Name_(star_id), sizeof(temp_buf));
                         src_ptr = temp_buf;
                         break;
                 }
@@ -348,7 +348,7 @@ namespace JIM {
         dest_buf[dest_len] = '\0';
 
         if (strlen(dest_buf) >= (uint32_t)(max_len - 1)) {
-            sprintf(dest_buf, s_Decode_message_too_long_0055593c, max_len, message_buffer);
+            snprintf(dest_buf, sizeof(dest_buf), s_Decode_message_too_long_0055593c, max_len, message_buffer);
             exitm::Exit_With_Message(dest_buf);
         } else {
             strcpy(message_buffer, dest_buf);
@@ -372,7 +372,7 @@ namespace JIM {
         int16_t message_len = (int16_t)strlen(buffer);
 
         if (max_len - 1 <= message_len || message_len >= (int16_t)(sizeof(buffer) - 1)) {
-            sprintf(buffer, s_Message_too_long, message_index, filename, message_len);
+            snprintf(buffer, sizeof(buffer), s_Message_too_long, message_index, filename, message_len);
             exitm::Exit_With_Message(buffer);
             return;
         }

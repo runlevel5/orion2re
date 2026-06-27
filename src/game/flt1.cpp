@@ -597,7 +597,7 @@ namespace FLT1 {
             } else if (input == (int16_t)0xFBAF) {
                 HACCESS::Clear_All_Star_Relocations_(MOX::_PLAYER_NUM);
                 char msg_buf_76[200];
-                strcpy(msg_buf_76, HAROLD::H_Message_(0x76));
+                strlcpy(msg_buf_76, HAROLD::H_Message_(0x76), sizeof(msg_buf_76));
                 HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_76, 0);
             } else if (input == (int16_t)0xFC13) {
                 if (_merging_relocations == 0) {
@@ -640,7 +640,7 @@ namespace FLT1 {
                         Star_Relocation_(&scan_val.words[1], &relocate_target_star_idx, clicked_star_id);
                     } else if (MOX::_star[clicked_star_id].spectral_class == STAR_CLASS_BLACK_HOLE) {
                         char msg_buf_78[80];
-                        sprintf(msg_buf_78, HAROLD::H_Message_(0x78));
+                        strlcpy(msg_buf_78, HAROLD::H_Message_(0x78), sizeof(msg_buf_78));
                         HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_78, 3);
                     } else {
                         int16_t first_ship = First_Selected_Ship_();
@@ -658,7 +658,7 @@ namespace FLT1 {
                     _relocate_button_mode = 0;
                     HACCESS::Set_All_Star_Relocations_(clicked_star_id, MOX::_PLAYER_NUM);
                     char msg_buf_77[80];
-                    sprintf(msg_buf_77, HAROLD::H_Message_(0x77), MOX::_star[clicked_star_id].name);
+                    snprintf(msg_buf_77, sizeof(msg_buf_77), HAROLD::H_Message_(0x77), MOX::_star[clicked_star_id].name);
                     HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_77, 0);
                     scan_val.words[1] = -1;
                     relocate_target_star_idx = -1;
@@ -718,7 +718,7 @@ namespace FLT1 {
             if (input == btn_add_officers) {
                 if (MOX::_add_officers_button == 0) {
                     char msg_buf_79[200];
-                    strcpy(msg_buf_79, HAROLD::H_Message_(0x79));
+                    strlcpy(msg_buf_79, HAROLD::H_Message_(0x79), sizeof(msg_buf_79));
                     HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_79, 0);
                 } else {
                     MOX::_current_screen = SCREEN_OFFICERS;
@@ -888,7 +888,7 @@ namespace FLT1 {
 
         format = HAROLD::H_Message_(137);
 
-        sprintf(message, format, star->name);
+        snprintf(message, sizeof(message), format, star->name);
 
         HACCESS::Clear_Star_Relocation_(star_idx, MOX::_PLAYER_NUM);
 
@@ -925,7 +925,7 @@ namespace FLT1 {
         const char* format;
 
         format = HAROLD::H_Message_(0x75 /* HESTR_075_S_CANNOT_RECEIVE_ORDER */);
-        sprintf(buffer, format, ship->d.name);
+        snprintf(buffer, sizeof(buffer), format, ship->d.name);
 
         HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, buffer, 0);
 
@@ -1379,7 +1379,7 @@ namespace FLT1 {
             char message[500];
 
             MISC::Get_LBX_Message_(116, lbx_message);
-            sprintf(message, lbx_message, ship->d.name);
+            snprintf(message, sizeof(message), lbx_message, ship->d.name);
 
             int32_t first_idx = game_random::Random_(num_new_techs) - 1;
             int16_t num_acquired = 1;
@@ -1399,14 +1399,14 @@ namespace FLT1 {
                 if (tech_id != 0) {
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_id], tech_id);
 
-                    strcat(message, "\x1A" "0");
-                    strcat(message, "^ ");
-                    strcat(message, TECHDATA::_technology_applications[tech_id].name);
-                    strcat(message, string::s_Newline);
+                    strlcat(message, "\x1A" "0", sizeof(message));
+                    strlcat(message, "^ ", sizeof(message));
+                    strlcat(message, TECHDATA::_technology_applications[tech_id].name, sizeof(message));
+                    strlcat(message, string::s_Newline, sizeof(message));
                 }
             }
 
-            strcpy(MOX::_temp_string, ship->d.name);
+            strlcpy(MOX::_temp_string, ship->d.name, sizeof(MOX::_temp_string));
 
             if (show_msg != 0) {
                 HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, message, 2);
@@ -1497,11 +1497,11 @@ namespace FLT1 {
                 }
 
                 char msg_buf[300];
-                sprintf(msg_buf, HAROLD::H_Message_(msg_id), MOX::_player[player_idx].race_name);
+                snprintf(msg_buf, sizeof(msg_buf), HAROLD::H_Message_(msg_id), MOX::_player[player_idx].race_name);
 
                 if (HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf, 1) == 0) {
                     char cancel_msg_buf[200];
-                    strcpy(cancel_msg_buf, HAROLD::H_Message_(127 /* 0x7f */));
+                    strlcpy(cancel_msg_buf, HAROLD::H_Message_(127 /* 0x7f */), sizeof(cancel_msg_buf));
                     HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, cancel_msg_buf, 3);
                     return 0;
                 }
@@ -1514,14 +1514,14 @@ namespace FLT1 {
                 if (MOX::_ship[ship_idx].officer_index > -1) {
                     if (interactive != 0) {
                         char leader_name_buf[200];
-                        strcpy(leader_name_buf, OFFICER::Leader_Name_(MOX::_ship[ship_idx].officer_index, 1));
+                        strlcpy(leader_name_buf, OFFICER::Leader_Name_(MOX::_ship[ship_idx].officer_index, 1), sizeof(leader_name_buf));
 
                         char msg_buf[300];
-                        sprintf(msg_buf, HAROLD::H_Message_(126 /* 0x7e */), MOX::_ship[ship_idx].d.name, leader_name_buf);
+                        snprintf(msg_buf, sizeof(msg_buf), HAROLD::H_Message_(126 /* 0x7e */), MOX::_ship[ship_idx].d.name, leader_name_buf);
 
                         if (HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf, 1) == 0) {
                             char cancel_msg_buf[200];
-                            strcpy(cancel_msg_buf, HAROLD::H_Message_(127 /* 0x7f */));
+                            strlcpy(cancel_msg_buf, HAROLD::H_Message_(127 /* 0x7f */), sizeof(cancel_msg_buf));
                             HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, cancel_msg_buf, 3);
                             return 0;
                         }
@@ -1537,11 +1537,11 @@ namespace FLT1 {
             int16_t msg_id = (num_ships == 1) ? 128 /* 0x80 */ : 129 /* 0x81 */;
 
             char msg_buf[300];
-            sprintf(msg_buf, HAROLD::H_Message_(msg_id), scrap_value);
+            snprintf(msg_buf, sizeof(msg_buf), HAROLD::H_Message_(msg_id), scrap_value);
 
             if (HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf, 1) == 0) {
                 char cancel_msg_buf[200];
-                strcpy(cancel_msg_buf, HAROLD::H_Message_(127 /* 0x7f */));
+                strlcpy(cancel_msg_buf, HAROLD::H_Message_(127 /* 0x7f */), sizeof(cancel_msg_buf));
                 HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, cancel_msg_buf, 3);
                 return 0;
             }
@@ -1604,7 +1604,7 @@ namespace FLT1 {
         if (result != 0) {
             if (struct_::Test_Bit_Field_(MOX::_star[src_star_idx].black_hole_blocks, dst_star_idx) != 0) {
                 fmt = HAROLD::H_Message_(0x82 /* 130 */);
-                sprintf(message, fmt, MOX::_star[src_star_idx].name, MOX::_star[dst_star_idx].name);
+                snprintf(message, sizeof(message), fmt, MOX::_star[src_star_idx].name, MOX::_star[dst_star_idx].name);
 
                 result = 0;
                 HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, message, 3);
@@ -1629,9 +1629,9 @@ namespace FLT1 {
         if (star->spectral_class == STAR_CLASS_BLACK_HOLE) {
             ok_to_relocate = false;
             if (prompt_flag == 0) {
-                strcpy(msg_buf, HAROLD::H_Message_(0x84));
+                strlcpy(msg_buf, HAROLD::H_Message_(0x84), sizeof(msg_buf));
             } else {
-                strcpy(msg_buf, HAROLD::H_Message_(0x83));
+                strlcpy(msg_buf, HAROLD::H_Message_(0x83), sizeof(msg_buf));
             }
         } else {
             if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
@@ -1640,23 +1640,23 @@ namespace FLT1 {
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
                     if (prompt_flag != 0) {
-                        sprintf(sprintf_buf, HAROLD::H_Message_(0x87), star->name, race_name_buf);
+                        snprintf(sprintf_buf, sizeof(sprintf_buf), HAROLD::H_Message_(0x87), star->name, race_name_buf);
                         ok_to_relocate = (bool)HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, sprintf_buf, 1);
                     } else {
                         ok_to_relocate = false;
                     }
                 } else {
                     if (prompt_flag == 0 && !HACCESS::Player_Has_Colony_In_System_(MOX::_PLAYER_NUM, star_idx)) {
-                        sprintf(msg_buf, HAROLD::H_Message_(0x88), star->name);
+                        snprintf(msg_buf, sizeof(msg_buf), HAROLD::H_Message_(0x88), star->name);
                         ok_to_relocate = false;
                     }
                 }
             } else {
                 ok_to_relocate = false;
                 if (prompt_flag == 0) {
-                    strcpy(msg_buf, HAROLD::H_Message_(0x86));
+                    strlcpy(msg_buf, HAROLD::H_Message_(0x86), sizeof(msg_buf));
                 } else {
-                    strcpy(msg_buf, HAROLD::H_Message_(0x85));
+                    strlcpy(msg_buf, HAROLD::H_Message_(0x85), sizeof(msg_buf));
                 }
             }
         }

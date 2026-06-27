@@ -242,7 +242,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                         fields::Clear_Fields_();
                         struct_::Copy_Structure_(plr->traits, _race_specials[i], sizeof(plr->traits));
                         plr->race = (uint8_t)i;
-                        strcpy(plr->race_name, MOX::_race_names[i]);
+                        strlcpy(plr->race_name, MOX::_race_names[i], sizeof(plr->race_name));
                         fields::Deactivate_Help_List_();
                         
                         int screen_state;
@@ -298,7 +298,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                     } else {
                         struct_::Copy_Structure_(plr->traits, _race_specials[i], sizeof(plr->traits));
                         plr->race = (uint8_t)i;
-                        strcpy(plr->race_name, MOX::_race_names[i]);
+                        strlcpy(plr->race_name, MOX::_race_names[i], sizeof(plr->race_name));
                         fields::Deactivate_Auto_Function_();
                         fields::Clear_Fields_();
                         if (Racial_Option_Screen_(plr) == 1) {
@@ -767,7 +767,7 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
         sizeof(original_name)
     );
 
-    strcpy(original_name, RACESEL::_temp_ruler_name);
+    strlcpy(original_name, RACESEL::_temp_ruler_name, sizeof(original_name));
 
     KEN::Ken_Get_Text_Message_(0x6A, popup_text, sizeof(popup_text));
 
@@ -994,7 +994,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
         for (int16_t ability_id = TRAIT_POP_GROWTH_BONUS; ability_id < TRAIT_LOW_G_WORLD; ++ability_id) {
             if (race_specials[ability_id] != 0) {
                 RACESEL::Message_Build_(&line_index, total_lines, paragraph);
-                strcat(paragraph, MOX::_special_ability_names[ability_id]);
+                strlcat(paragraph, MOX::_special_ability_names[ability_id], sizeof(paragraph));
 
                 const int32_t special_level = static_cast<int8_t>(race_specials[ability_id]);
                 const int8_t bonus =
@@ -1002,13 +1002,13 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
                 if (ability_id == 5) {
                     if (bonus == 1) {
-                        strcpy(bonus_text, "1/2");
+                        strlcpy(bonus_text, "1/2", sizeof(bonus_text));
                     } else {
-                        strcpy(bonus_text, "1");
+                        strlcpy(bonus_text, "1", sizeof(bonus_text));
                     }
                 } else if (ability_id == 2) {
                     if (bonus == 1) {
-                        strcpy(bonus_text, "1/2");
+                        strlcpy(bonus_text, "1/2", sizeof(bonus_text));
                     } else {
                         itoa(static_cast<int32_t>(bonus / 2), bonus_text, 10);
                     }
@@ -1017,22 +1017,22 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
                 }
 
                 if (bonus > 0) {
-                    strcat(paragraph, "+");
+                    strlcat(paragraph, "+", sizeof(paragraph));
                 }
 
-                strcat(paragraph, bonus_text);
+                strlcat(paragraph, bonus_text, sizeof(paragraph));
             }
         }
 
         for (int16_t ability_id = TRAIT_LOW_G_WORLD; ability_id < TRAIT_COUNT; ++ability_id) {
             if (race_specials[ability_id] == 1) {
                 RACESEL::Message_Build_(&line_index, total_lines, paragraph);
-                strcat(paragraph, MOX::_special_ability_names[ability_id]);
+                strlcat(paragraph, MOX::_special_ability_names[ability_id], sizeof(paragraph));
             }
         }
 
         RACESEL::Message_Build_(&line_index, total_lines, paragraph);
-        strcat(paragraph, MOX::_government_labels[static_cast<int8_t>(race_specials[0])]);
+        strlcat(paragraph, MOX::_government_labels[static_cast<int8_t>(race_specials[0])], sizeof(paragraph));
 
         fonts::Set_Font_Style_Shadow_Down_(2, &shadow_colors);
         fonts::Set_Outline_Color_(0, 0);

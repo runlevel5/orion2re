@@ -1436,7 +1436,7 @@ namespace aidesign {
 
         if (hull_idx == SHIP_SIZE_DOOM_STAR) {
             design->picture_num = 0x2b; /* '+' */
-            strcpy(design->name, TECHDATA::_hull_data[SHIP_SIZE_DOOM_STAR].name);
+            strlcpy(design->name, TECHDATA::_hull_data[SHIP_SIZE_DOOM_STAR].name, sizeof(design->name));
         } else {
             design->picture_num = (int8_t)game_random::Random_(8) + (int8_t)hull_idx * 8 - 1;
             uint8_t player_race = player->race;
@@ -1445,7 +1445,7 @@ namespace aidesign {
 
         if (ship_class == 7) {
             KEN::Ken_Get_Text_Message_(0x54, temp_name, 0xf);
-            strcpy(design->name, temp_name);
+            strlcpy(design->name, temp_name, sizeof(design->name));
         }
 
         design->ship_type = 0;

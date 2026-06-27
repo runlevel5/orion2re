@@ -72,7 +72,7 @@ namespace allocate {
     void __cdecl Allocation_Error_(int32_t requested_bytes) {
         char message_buffer[100];
 
-        sprintf(message_buffer, "Couldn't Allocate %d Increase Virtual", requested_bytes);
+        snprintf(message_buffer, sizeof(message_buffer), "Couldn't Allocate %d Increase Virtual", requested_bytes);
 
         exitm::Exit_With_Message(message_buffer);
     }
@@ -89,7 +89,7 @@ namespace allocate {
     void __cdecl Reallocation_Error_(uint32_t requested_size, int32_t bytes_short, int32_t block_capacity) {
         char buffer[100];
 
-        sprintf(buffer, "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n", requested_size, bytes_short, block_capacity);
+        snprintf(buffer, sizeof(buffer), "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n", requested_size, bytes_short, block_capacity);
 
         exitm::Exit_With_Message(buffer);
     }

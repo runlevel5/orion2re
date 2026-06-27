@@ -1633,7 +1633,7 @@ void __cdecl Crystal_Control_(int16_t ship_idx) {
             ship->is_captured = 0;
 
             KEN::Ken_Get_Text_Message_(0x4c, msg_buffer, 0x50);
-            strcat(msg_buffer, ship->name);
+            strlcat(msg_buffer, ship->name, sizeof(msg_buffer));
 
             palette::Refresh_Palette_();
             GENDRAW::Message_Box_(msg_buffer);

@@ -20,12 +20,12 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     MOX::_cur_plyr_ptr = &MOX::_player[player_idx];
 
     if (MOX::_cur_plyr_ptr->objectives == 100) {
-        strcpy(local_180, MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality]);
+        strlcpy(local_180, MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality], sizeof(local_180));
     } else {
         /* fmtpara: '\r' starts a new paragraph between the personality and objective lines. */
-        sprintf(local_180, "%s\r%s",
-                MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality],
-                MOX::_objective_labels[MOX::_cur_plyr_ptr->objectives]);
+        snprintf(local_180, sizeof(local_180), "%s\r%s",
+                 MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality],
+                 MOX::_objective_labels[MOX::_cur_plyr_ptr->objectives]);
     }
 
     FMTPARA::Set_Paragraph_Integer_Pointer_(0, &paragraph_integer);
@@ -55,12 +55,12 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
         for (int16_t other_player_idx = 0; other_player_idx < MOX::_NUM_PLAYERS; ++other_player_idx) {
             if (other_player_idx != player_idx) {
                 if (MOX::_cur_plyr_ptr->treaty[other_player_idx] == 2) {
-                    strcat(acStack_200, MOX::_player[other_player_idx].race_name);
-                    strcat(acStack_200, string::s_Newline);
+                    strlcat(acStack_200, MOX::_player[other_player_idx].race_name, sizeof(acStack_200));
+                    strlcat(acStack_200, string::s_Newline, sizeof(acStack_200));
                     num_alliances++;
                 } else if (MOX::_cur_plyr_ptr->treaty[other_player_idx] >= 4) {
-                    strcat(acStack_280, MOX::_player[other_player_idx].race_name);
-                    strcat(acStack_280, string::s_Newline);
+                    strlcat(acStack_280, MOX::_player[other_player_idx].race_name, sizeof(acStack_280));
+                    strlcat(acStack_280, string::s_Newline, sizeof(acStack_280));
                     num_wars++;
                 }
             }
@@ -69,11 +69,11 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
 
     if (num_alliances == 0) {
         JIM::Get_Text_Message_("billtext.lbx", 0x1D, acStack_200, 0x28);
-        strcat(acStack_200, string::s_Newline);
+        strlcat(acStack_200, string::s_Newline, sizeof(acStack_200));
     }
     if (num_wars == 0) {
         JIM::Get_Text_Message_("billtext.lbx", 0x1E, acStack_280, 0x28);
-        strcat(acStack_280, string::s_Newline);
+        strlcat(acStack_280, string::s_Newline, sizeof(acStack_280));
     }
 
     RUSS::Mox_Update_();
@@ -82,7 +82,7 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     RUSS::Mox_Update_();
 
     /* fmtpara: '\n' inserts paragraph breaks between the treaty headings and their race-name lists. */
-    sprintf(acStack_100, "%s\n%s\n%s\n%s", acStack_318, acStack_200, acStack_2a8, acStack_280);
+    snprintf(acStack_100, sizeof(acStack_100), "%s\n%s\n%s\n%s", acStack_318, acStack_200, acStack_2a8, acStack_280);
 
     INFO::_g_exit_field = fields::Add_Button_Field_(0x216, 0x1B1, "", screen_anims[1], "\x1B", '(');
 

@@ -340,7 +340,7 @@ namespace INITSHIP {
 
     void __cdecl Auto_Strategic_Design_Ship_(int16_t player_idx, int16_t design_idx, s_ship_design* design) {
         // Copy the default name for this hull type (e.g., "Frigate")
-        strcpy(design->name, TECHDATA::_hull_data[design_idx].name);
+        strlcpy(design->name, TECHDATA::_hull_data[design_idx].name, sizeof(design->name));
 
         design->size = static_cast<int8_t>(design_idx);
         design->ftl_type = static_cast<int8_t>(Best_Warp_Drive_(player_idx));
@@ -369,7 +369,7 @@ namespace INITSHIP {
     void __cdecl Load_Small_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, "Raider");
+        strlcpy(design->name, "Raider", sizeof(design->name));
 
         design->ship_type = SHIP_TYPE_COMBAT;
         design->shield_type = SHIELD_NO_SHIELD;
@@ -411,7 +411,7 @@ namespace INITSHIP {
     void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, "Marauder");
+        strlcpy(design->name, "Marauder", sizeof(design->name));
 
         design->ship_type = SHIP_TYPE_COMBAT;
         design->shield_type = SHIELD_NO_SHIELD;
@@ -464,7 +464,7 @@ namespace INITSHIP {
     void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, "Interdictor");
+        strlcpy(design->name, "Interdictor", sizeof(design->name));
 
         design->ship_type = SHIP_TYPE_COMBAT;
         design->shield_type = SHIELD_NO_SHIELD;
@@ -544,7 +544,7 @@ namespace INITSHIP {
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
-        memcpy(design->name, global::s_Intruder_005576a0, sizeof("Intruder"));
+        strlcpy(design->name, global::s_Intruder_005576a0, sizeof(design->name));
 
         design->ship_type = SHIP_TYPE_COMBAT;
         design->shield_type = SHIELD_NO_SHIELD;
@@ -609,7 +609,7 @@ namespace INITSHIP {
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, "Harbinger");
+        strlcpy(design->name, "Harbinger", sizeof(design->name));
 
         design->size = SHIP_SIZE_TITAN;
         design->ship_type = SHIP_TYPE_COMBAT;
@@ -721,7 +721,7 @@ namespace INITSHIP {
         struct_::Clear_Structure_(design, sizeof(*design));
 
         const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_COLONY][(uint8_t)MOX::_settings.language];
-        strcpy(design->name, localized_name);
+        strlcpy(design->name, localized_name, sizeof(design->name));
 
         design->size = SHIP_SIZE_SMALL;
         design->ship_type = SHIP_TYPE_COLONY;
@@ -748,7 +748,7 @@ namespace INITSHIP {
     void __cdecl Load_Outpost_Ship_Design_(int16_t player_idx, s_ship_design* design) {
         struct_::Clear_Structure_(design, sizeof(*design));
 
-        strcpy(design->name, MOX::_ship_type_names[SHIP_TYPE_OUTPOST][(uint8_t)MOX::_settings.language]);
+        strlcpy(design->name, MOX::_ship_type_names[SHIP_TYPE_OUTPOST][(uint8_t)MOX::_settings.language], sizeof(design->name));
 
         design->size = SHIP_SIZE_SMALL;
         design->ship_type = SHIP_TYPE_OUTPOST;
@@ -774,7 +774,7 @@ namespace INITSHIP {
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
         aidesign::Auto_Design_Ship_(owner_idx, design, 5);
-        strcpy(design->name, TECHDATA::_hull_data[5].name);
+        strlcpy(design->name, TECHDATA::_hull_data[5].name, sizeof(design->name));
     }
 
     void __cdecl Repair_Ships_At_Colonies_() {
@@ -1446,7 +1446,7 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
 void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    strcpy(ship->name, "Raider");
+    strlcpy(ship->name, "Raider", sizeof(ship->name));
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1500,7 +1500,7 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
 void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    strcpy(ship->name, "Marauder");
+    strlcpy(ship->name, "Marauder", sizeof(ship->name));
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1622,7 +1622,7 @@ void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bo
 void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     s_combat_data* ship = &MOX::_combat_data[combat_idx];
 
-    strcpy(ship->name, global::s_Intruder_005576a0);
+    strlcpy(ship->name, global::s_Intruder_005576a0, sizeof(ship->name));
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1717,7 +1717,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    strcpy(ship->name, "Interdictor");
+    strlcpy(ship->name, "Interdictor", sizeof(ship->name));
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1832,7 +1832,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     s_combat_data* ship = &MOX::_combat_data[ship_index];
 
-    strcpy(ship->name, MOX::s_Harbinger);
+    strlcpy(ship->name, MOX::s_Harbinger, sizeof(ship->name));
     ship->owner = 8;
     ship->previous_owner = 8;
     ship->ship_idx = -1;
@@ -1974,7 +1974,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
     struct_::Clear_Structure_(design, sizeof(*design));
 
-    strcpy(design->name, MOX::_race_names[14]);
+    strlcpy(design->name, MOX::_race_names[14], sizeof(design->name));
 
     design->ship_type = SHIP_TYPE_COMBAT;
     design->size = SHIP_SIZE_TITAN;
@@ -2038,7 +2038,7 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
 
 void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
-    strcpy(design->name, MOX::_race_names[15]);
+    strlcpy(design->name, MOX::_race_names[15], sizeof(design->name));
 
     if (is_large != 0) {
         design->ship_type = SHIP_TYPE_COMBAT;
@@ -2090,8 +2090,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
     struct_::Clear_Structure_(design, sizeof(*design));
     
     // Copy "Crystal" or specific race name from the race names array
-    strcpy(design->name, MOX::_race_names[16]);
-
+    strlcpy(design->name, MOX::_race_names[16], sizeof(design->name));
     design->ship_type = SHIP_TYPE_COMBAT;
     design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
     design->shield_type = SHIELD_NO_SHIELD;
@@ -2146,7 +2145,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
 
 void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
-    strcpy(design->name, MOX::_race_names[17]);
+    strlcpy(design->name, MOX::_race_names[17], sizeof(design->name));
 
     design->ship_type = SHIP_TYPE_COMBAT;
     design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
@@ -2213,7 +2212,7 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
 void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
 
-    strcpy(design->name, MOX::_race_names[18]);
+    strlcpy(design->name, MOX::_race_names[18], sizeof(design->name));
 
     design->ship_type = SHIP_TYPE_COMBAT;
     design->computer_type = COMPUTER_CYBERTRONIC_COMPUTER;
@@ -2265,7 +2264,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel
 void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) {
     struct_::Clear_Structure_(design, sizeof(s_ship_design));
 
-    strcpy(design->name, MOX::_race_names[19]);
+    strlcpy(design->name, MOX::_race_names[19], sizeof(design->name));
 
     design->ship_type = SHIP_TYPE_COMBAT;
     design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
@@ -2310,7 +2309,7 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
 
     // Copy localized "Transport" name
     const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_TRANSPORT][(uint8_t)MOX::_settings.language];
-    strcpy(design->name, localized_name);
+    strlcpy(design->name, localized_name, sizeof(design->name));
 
     design->size = SHIP_SIZE_SMALL;
     design->ship_type = SHIP_TYPE_TRANSPORT;
@@ -2351,7 +2350,7 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
 void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
     struct_::Clear_Structure_(design, sizeof(*design));
 
-    strcpy(design->name, "Avenger");
+    strlcpy(design->name, "Avenger", sizeof(design->name));
 
     design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
     design->ship_type = SHIP_TYPE_COMBAT;
@@ -2422,7 +2421,7 @@ void __cdecl Update_Ship_Names_To_New_Language_(void) {
         if (ship_type != SHIP_TYPE_COMBAT) {
             const char* localized_name = MOX::_ship_type_names[ship_type][(uint8_t)MOX::_settings.language];
 
-            strcpy(ship->d.name, localized_name);
+            strlcpy(ship->d.name, localized_name, sizeof(ship->d.name));
         }
     }
 }

@@ -189,8 +189,9 @@ namespace COLMOVE {
                         if (settle_result.eta_turns != 0) {
                             if (settle_result.no_room_at_destination == 0) {
                                 if (warning_state != 1) {
-                                    sprintf(
+                                    snprintf(
                                             message,
+                                            sizeof(message),
                                             ESTRINGS::E_Strings_(0x209),
                                             (uint32_t)settle_result.eta_turns);
                                     warning_state = 1;
@@ -202,13 +203,15 @@ namespace COLMOVE {
                                         COLMOVE::Get_Num_Unemployed_(COLMOVE::_cluster_colony_n);
 
                                 if (moved_count == 0) {
-                                    sprintf(
+                                    snprintf(
                                             message,
+                                            sizeof(message),
                                             ESTRINGS::E_Strings_(0x206),
                                             (uint32_t)settle_result.eta_turns);
                                 } else {
-                                    sprintf(
+                                    snprintf(
                                             message,
+                                            sizeof(message),
                                             ESTRINGS::E_Strings_(0x204),
                                             (int32_t)moved_count,
                                             (int32_t)unemployed_count,
@@ -224,10 +227,11 @@ namespace COLMOVE {
                                     COLMOVE::Get_Num_Unemployed_(COLMOVE::_cluster_colony_n);
 
                             if (moved_count == 0) {
-                                sprintf(message, ESTRINGS::E_Strings_(0x205));
+                                strlcpy(message, ESTRINGS::E_Strings_(0x205), sizeof(message));
                             } else {
-                                sprintf(
+                                snprintf(
                                         message,
+                                        sizeof(message),
                                         ESTRINGS::E_Strings_(0x203),
                                         (int32_t)moved_count,
                                         (int32_t)unemployed_count);
@@ -452,12 +456,14 @@ namespace COLMOVE {
         }
 
         if (moved_count > 0) {
-            strcpy(
+            strlcpy(
                     source_planet_name,
-                    HACCESS::Get_Planet_Name_(MOX::_colony[COLMOVE::_cluster_colony_n].planet));
-            strcpy(
+                    HACCESS::Get_Planet_Name_(MOX::_colony[COLMOVE::_cluster_colony_n].planet),
+                    sizeof(source_planet_name));
+            strlcpy(
                     destination_planet_name,
-                    HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet));
+                    HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet),
+                    sizeof(destination_planet_name));
 
             ERIC::String_Builder2_(
                     message,

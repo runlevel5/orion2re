@@ -87,7 +87,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             MAPGEN::Get_Star_Name_(i);
             HAROLD::Set_Player_Font_Style_(0, 0);
             char formatted_name[32];
-            sprintf(formatted_name, HAROLD::s___s__00556ae4, MOX::_star[i].name);
+            snprintf(formatted_name, sizeof(formatted_name), HAROLD::s___s__00556ae4, MOX::_star[i].name);
 
             // Manual check for short names to append "w"
             uint32_t name_len = 0;
@@ -1315,7 +1315,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 video::Copy_Back_To_Off_();
 
                 char* msg = (char*)HAROLD::H_Message_(0xF2);
-                strcpy(_fill_msg, msg);
+                strlcpy(_fill_msg, msg, sizeof(_fill_msg));
 
                 uint32_t bsize = bitmap::Get_Bitmap_Size_(325, 30);
                 _fill_msg_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bsize);
@@ -1355,7 +1355,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 grid_y = 8;
                 break;
             default:
-                sprintf(error_buf, "Galaxy size %d is undefined", galaxy_size);
+                snprintf(error_buf, sizeof(error_buf), "Galaxy size %d is undefined", galaxy_size);
                 exitm::Exit_With_Message(error_buf);
                 return;
             }

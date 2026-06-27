@@ -438,9 +438,9 @@ namespace MSG_ {
                 uint8_t bVar3 = (param_2->u).spy_assasination.plr_b;
                 uint8_t plr_a = (param_2->u).spy_assasination.plr_a;
                 if (plr_a == bVar3) {
-                    strcpy(local_c8, _msg_defensive_spy_fmt);
+                    strlcpy(local_c8, _msg_defensive_spy_fmt, sizeof(local_c8));
                 } else {
-                    sprintf(local_c8, _msg_offensive_spy_fmt, MOX::_player[bVar3].name);
+                    snprintf(local_c8, sizeof(local_c8), _msg_offensive_spy_fmt, MOX::_player[bVar3].name);
                 }
                 if ((param_2->u).spy_assasination.victim_id != MOX::_PLAYER_NUM) {
                     sprintf(param_1, _msg_spy_assassinated_fmt, local_c8);
@@ -473,11 +473,11 @@ namespace MSG_ {
                 return;
             case MSG_TYPE_ARTIFACTS:
                 if ((param_2->u).artifacts.tech2 == '\0') {
-                    sprintf(local_c8, MOX::s_fmt_s,
+                    snprintf(local_c8, sizeof(local_c8), MOX::s_fmt_s,
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name);
                 } else {
                     KEN::Ken_Get_Text_Message_(0x68, local_dc, 0x13);
-                    sprintf(local_c8, "%s %s %s",
+                    snprintf(local_c8, sizeof(local_c8), "%s %s %s",
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech1].name, local_dc,
                                  TECHDATA::_technology_applications[(uint8_t)(param_2->u).artifacts.tech2].name);
                 }

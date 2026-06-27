@@ -76,8 +76,9 @@ namespace NEWPUP {
         s_animation_header* anim;
 
         /* fmtpara: \x1A0 left-aligns the label segment and \x1A1 right-aligns the value segment. */
-        sprintf(
+        snprintf(
             text_buffer,
+            sizeof(text_buffer),
             ESTRINGS::E_Strings_(0x4B),
             "\x1A" "0",
             label,
@@ -211,8 +212,9 @@ namespace NEWPUP {
 
             COLONY::Set_Colony_Font_To_Player_(1, (uint8_t)player_id);
 
-            sprintf(
+            snprintf(
                 text_buffer,
+                sizeof(text_buffer),
                 ESTRINGS::E_Strings_(0x0d),
                 (int32_t)invasion_side->unit_strengths[troop_type] -
                 (int32_t)invasion_side->combat_modifiers.difficulty_bonus);
@@ -228,8 +230,9 @@ namespace NEWPUP {
             {
                 const uint8_t hit_points = (uint8_t)invasion_side->unit_hps[troop_type];
 
-                sprintf(
+                snprintf(
                     text_buffer,
+                    sizeof(text_buffer),
                     ESTRINGS::E_Strings_((hit_points > 1) ? 0x17 : 0x16),
                     (uint32_t)hit_points);
 
@@ -244,8 +247,9 @@ namespace NEWPUP {
                 const int32_t unit_count = (int32_t)invasion_side->unit_counts[troop_type];
                 char* troop_name = COLONY::Player_Troop_Name_(player_id, troop_type, race);
 
-                sprintf(
+                snprintf(
                     text_buffer,
+                    sizeof(text_buffer),
                     ESTRINGS::E_Strings_(0x0e),
                     unit_count,
                     troop_name);
@@ -267,7 +271,7 @@ namespace NEWPUP {
 
             {
                 const int32_t unit_count = (int32_t)invasion_side->unit_counts[troop_type];
-                sprintf(text_buffer, ESTRINGS::E_Strings_(0x7c), unit_count);
+                snprintf(text_buffer, sizeof(text_buffer), ESTRINGS::E_Strings_(0x7c), unit_count);
             }
 
             ++troop_type;

@@ -27,12 +27,12 @@ namespace BILL {
         FILE* dst_fp = fopen_case(dst_path, "wb");
 
         if (src_fp == nullptr) {
-            sprintf(msg_buf, "Could not open %s", src_path);
+            snprintf(msg_buf, sizeof(msg_buf), "Could not open %s", src_path);
             exitm::Exit_With_Message(msg_buf);
         }
 
         if (dst_fp == nullptr) {
-            sprintf(msg_buf, "Could not open %s", dst_path);
+            snprintf(msg_buf, sizeof(msg_buf), "Could not open %s", dst_path);
             exitm::Exit_With_Message(msg_buf);
         }
 
@@ -47,7 +47,7 @@ namespace BILL {
 
             size_t written = fwrite(read_buffer, 1, current_chunk_size, dst_fp);
             if (written != current_chunk_size) {
-                sprintf(msg_buf, "Error copying %s to %s (bytes: %i)", src_path, dst_path, total_bytes_read);
+                snprintf(msg_buf, sizeof(msg_buf), "Error copying %s to %s (bytes: %i)", src_path, dst_path, total_bytes_read);
                 exitm::Exit_With_Message(msg_buf);
             }
         } while (current_chunk_size == 4096);
@@ -61,7 +61,7 @@ namespace BILL {
         char find_data[52];
         char src_file_name[128];
 
-        sprintf(_dest_file_name, SCIENCE::_spy_anim_fmt,
+        snprintf(_dest_file_name, sizeof(_dest_file_name), SCIENCE::_spy_anim_fmt,
                  (uint32_t)(uint8_t)(MOX::_player[MOX::_PLAYER_NUM].race));
 
         if (dos::DIR_(_dest_file_name, find_data) == 0) {
@@ -69,8 +69,8 @@ namespace BILL {
                 dos::Delete_File_(find_data);
             }
 
-            strcpy(src_file_name, farload::_secondary_drive_path);
-            strcat(src_file_name, _dest_file_name);
+            strlcpy(src_file_name, farload::_secondary_drive_path, sizeof(src_file_name));
+            strlcat(src_file_name, _dest_file_name, sizeof(src_file_name));
 
             Copy_File_To_File_(src_file_name, _dest_file_name);
         }
@@ -88,15 +88,15 @@ namespace BILL {
 
         s_player* player = &MOX::_player[player_index];
 
-        sprintf(BILL::_dest_file_name, s_SR_R_x_SC_LBX, (uint32_t)(uint8_t)player->race);
+        snprintf(BILL::_dest_file_name, sizeof(BILL::_dest_file_name), s_SR_R_x_SC_LBX, (uint32_t)(uint8_t)player->race);
 
         if (!dos::DIR_(BILL::_dest_file_name, dir_entry)) {
             if (dos::DIR_(s_SR_R_wildcard_SC_LBX, dir_entry)) {
                 dos::Delete_File_(dir_entry);
             }
 
-            strcpy(source_path, farload::_secondary_drive_path);
-            strcat(source_path, BILL::_dest_file_name);
+            strlcpy(source_path, farload::_secondary_drive_path, sizeof(source_path));
+            strlcat(source_path, BILL::_dest_file_name, sizeof(source_path));
 
             Copy_File_To_File_(source_path, BILL::_dest_file_name);
         }
@@ -788,8 +788,9 @@ char* __cdecl Cache_Player_Trooper_Anim_() {
     char found_path[52];
     char source_path[128];
 
-    sprintf(
+    snprintf(
         BILL::_dest_file_name,
+        sizeof(BILL::_dest_file_name),
         SCIENCE::_trooper_anim_fmt,
         (unsigned int)(uint8_t)(MOX::_player[MOX::_PLAYER_NUM].race)
     );
@@ -799,8 +800,8 @@ char* __cdecl Cache_Player_Trooper_Anim_() {
             dos::Delete_File_(found_path);
         }
 
-        strcpy(source_path, farload::_secondary_drive_path);
-        strcat(source_path, BILL::_dest_file_name);
+        strlcpy(source_path, farload::_secondary_drive_path, sizeof(source_path));
+        strlcat(source_path, BILL::_dest_file_name, sizeof(source_path));
         BILL::Copy_File_To_File_(source_path, BILL::_dest_file_name);
     }
 

@@ -168,27 +168,27 @@ namespace SCORE {
                 rank_index = -1;
             } else {
                 if (current_score >= max_hof_score) {
-                    sprintf(buffer, HAROLD::H_Message_(0x27), MOX::_player[player_idx].name);
+                    snprintf(buffer, sizeof(buffer), HAROLD::H_Message_(0x27), MOX::_player[player_idx].name);
                 } else {
-                    sprintf(buffer, HAROLD::H_Message_(0x28), MOX::_player[player_idx].name);
+                    snprintf(buffer, sizeof(buffer), HAROLD::H_Message_(0x28), MOX::_player[player_idx].name);
                 }
                 GENDRAW::Warning_Box_(buffer);
             }
 
             if (!cheated) {
                 for (int i = 0; i < rank_index; ++i) {
-                    strcpy(_hof.player_names[i], _hof.player_names[i + 1]);
+                    strlcpy(_hof.player_names[i], _hof.player_names[i + 1], sizeof(_hof.player_names[i]));
                     _hof.scores[i] = _hof.scores[i + 1];
                     _hof.race_ids[i] = _hof.race_ids[i + 1];
                     _hof.difficulties[i] = _hof.difficulties[i + 1];
-                    strcpy(_hof.race_names[i], _hof.race_names[i + 1]);
+                    strlcpy(_hof.race_names[i], _hof.race_names[i + 1], sizeof(_hof.race_names[i]));
                 }
 
-                strcpy(_hof.player_names[rank_index], MOX::_player[player_idx].name);
+                strlcpy(_hof.player_names[rank_index], MOX::_player[player_idx].name, sizeof(_hof.player_names[rank_index]));
                 _hof.scores[rank_index] = current_score;
                 _hof.race_ids[rank_index] = (int16_t)(uint8_t)MOX::_player[player_idx].race;
                 _hof.difficulties[rank_index] = MOX::_settings.game_difficulty;
-                strcpy(_hof.race_names[rank_index], MOX::_player[player_idx].race_name);
+                strlcpy(_hof.race_names[rank_index], MOX::_player[player_idx].race_name, sizeof(_hof.race_names[rank_index]));
             }
 
             if (rank_index > -1 && !cheated) {
@@ -227,9 +227,9 @@ namespace SCORE {
             int16_t idx1 = (int16_t)game_random::Random_(8) + 1;
             int16_t idx2 = (int16_t)game_random::Random_(8) + 1;
             char temp_name[20];
-            strcpy(temp_name, _default_names[idx1]);
-            strcpy(_default_names[idx1], _default_names[idx2]);
-            strcpy(_default_names[idx2], temp_name);
+            strlcpy(temp_name, _default_names[idx1], sizeof(temp_name));
+            strlcpy(_default_names[idx1], _default_names[idx2], sizeof(_default_names[idx1]));
+            strlcpy(_default_names[idx2], temp_name, sizeof(_default_names[idx2]));
         }
 
         int16_t score_base = 1500;
@@ -241,13 +241,13 @@ namespace SCORE {
 
             _hof.scores[i] = score_base + (r2 * 10) + ((r1 - 1) * 15);
             _hof.difficulties[i] = (int8_t)(i % 5);
-            strcpy(_hof.player_names[i], _default_names[i]);
+            strlcpy(_hof.player_names[i], _default_names[i], sizeof(_hof.player_names[i]));
 
             int16_t race_idx = indices[i];
             if (i < 2) {
-                strcpy(_hof.race_names[i], MOX::_race_names[5]);
+                strlcpy(_hof.race_names[i], MOX::_race_names[5], sizeof(_hof.race_names[i]));
             } else {
-                strcpy(_hof.race_names[i], MOX::_race_names[race_idx]);
+                strlcpy(_hof.race_names[i], MOX::_race_names[race_idx], sizeof(_hof.race_names[i]));
             }
 
             score_base -= 125;
@@ -293,11 +293,11 @@ namespace SCORE {
 
         SCORE::_entry_to_flash = entry_to_flash_idx;
 
-        strcpy(SCORE::_difficulty_string[0], ESTRINGS::E_Strings_(0x221));
-        strcpy(SCORE::_difficulty_string[1], ESTRINGS::E_Strings_(0x118));
-        strcpy(SCORE::_difficulty_string[2], ESTRINGS::E_Strings_(0xbe));
-        strcpy(SCORE::_difficulty_string[3], ESTRINGS::E_Strings_(0x13e));
-        strcpy(SCORE::_difficulty_string[4], ESTRINGS::E_Strings_(0x148));
+        strlcpy(SCORE::_difficulty_string[0], ESTRINGS::E_Strings_(0x221), sizeof(SCORE::_difficulty_string[0]));
+        strlcpy(SCORE::_difficulty_string[1], ESTRINGS::E_Strings_(0x118), sizeof(SCORE::_difficulty_string[1]));
+        strlcpy(SCORE::_difficulty_string[2], ESTRINGS::E_Strings_(0xbe), sizeof(SCORE::_difficulty_string[2]));
+        strlcpy(SCORE::_difficulty_string[3], ESTRINGS::E_Strings_(0x13e), sizeof(SCORE::_difficulty_string[3]));
+        strlcpy(SCORE::_difficulty_string[4], ESTRINGS::E_Strings_(0x148), sizeof(SCORE::_difficulty_string[4]));
 
         if (SCORE::HOF_Version_Number_() != 0x82) {
             SCORE::Create_Default_HOF_File_();
@@ -562,11 +562,11 @@ namespace SCORE {
         palette::Refresh_Palette_();
         palstore::Darken_Palette_(100);
 
-        strcpy(_difficulty_string[0], ESTRINGS::E_Strings_(545));
-        strcpy(_difficulty_string[1], ESTRINGS::E_Strings_(280));
-        strcpy(_difficulty_string[2], ESTRINGS::E_Strings_(190));
-        strcpy(_difficulty_string[3], ESTRINGS::E_Strings_(318));
-        strcpy(_difficulty_string[4], ESTRINGS::E_Strings_(328));
+        strlcpy(_difficulty_string[0], ESTRINGS::E_Strings_(545), sizeof(_difficulty_string[0]));
+        strlcpy(_difficulty_string[1], ESTRINGS::E_Strings_(280), sizeof(_difficulty_string[1]));
+        strlcpy(_difficulty_string[2], ESTRINGS::E_Strings_(190), sizeof(_difficulty_string[2]));
+        strlcpy(_difficulty_string[3], ESTRINGS::E_Strings_(318), sizeof(_difficulty_string[3]));
+        strlcpy(_difficulty_string[4], ESTRINGS::E_Strings_(328), sizeof(_difficulty_string[4]));
 
         video::Set_Page_Off_();
         Draw_Hall_Of_Fame_Screen_();
@@ -596,11 +596,11 @@ namespace SCORE {
         for (int16_t i = 0; i < 10; ++i) {
             int16_t idx = sort_list[i][1];
 
-            strcpy(local_hof.player_names[i], _hof.player_names[idx]);
+            strlcpy(local_hof.player_names[i], _hof.player_names[idx], sizeof(local_hof.player_names[i]));
             local_hof.scores[i] = _hof.scores[idx];
             local_hof.race_ids[i] = _hof.race_ids[idx];
             local_hof.difficulties[i] = _hof.difficulties[idx];
-            strcpy(local_hof.race_names[i], _hof.race_names[idx]);
+            strlcpy(local_hof.race_names[i], _hof.race_names[idx], sizeof(local_hof.race_names[i]));
         }
 
         _hof = local_hof;
@@ -631,7 +631,7 @@ namespace SCORE {
         int raw_population = (int)SCORE::_hi->raw_population;
         char* format = (char*)HAROLD::H_Message_(0x15C /* HESTR_15C_D_POPULATION */);
 
-        sprintf(buffer, format, raw_population);
+        snprintf(buffer, sizeof(buffer), format, raw_population);
 
         SCORE::Draw_Generic_Score_(
             SCORE::_hi->score_population,
@@ -650,11 +650,11 @@ namespace SCORE {
 
         if (num_defeated == 0) {
             const char* msg = HAROLD::H_Message_(0x158 /* HESTR_158_PLAYERS_ELIMINATED */);
-            strcpy(message_buffer, msg);
+            strlcpy(message_buffer, msg, sizeof(message_buffer));
         } else {
             int16_t msg_id = (num_defeated == 1) ? 0x159 : 0x15a;
             const char* fmt = HAROLD::H_Message_(msg_id);
-            sprintf(message_buffer, fmt, (int32_t)num_defeated);
+            snprintf(message_buffer, sizeof(message_buffer), fmt, (int32_t)num_defeated);
         }
 
         SCORE::Draw_Generic_Score_(SCORE::_hi->score_elimination, message_buffer, SCORE::Draw_Eliminated_Race_Pictures_, 0x168);
@@ -688,7 +688,7 @@ namespace SCORE {
         }
 
         format = HAROLD::H_Message_(message_id);
-        sprintf(buffer, format, (int32_t)SCORE::_hi->raw_captured_colonies);
+        snprintf(buffer, sizeof(buffer), format, (int32_t)SCORE::_hi->raw_captured_colonies);
 
         SCORE::Draw_Generic_Score_(SCORE::_hi->score_captured_colonists, buffer, SCORE::Draw_Cap_Pop_, 0x168 /* 360 */);
     }
@@ -713,7 +713,7 @@ namespace SCORE {
         int16_t font_height = fonts::Get_Font_Height_();
 
         const char* format = HAROLD::H_Message_(350 /* 0x15E */);
-        sprintf(buffer, format, (int32_t)stardate_calc);
+        snprintf(buffer, sizeof(buffer), format, (int32_t)stardate_calc);
 
         SCORE::Print_Score_String_(140 /* 0x8C */, 139 /* 0x8B */, score, buffer);
 
@@ -762,7 +762,7 @@ namespace SCORE {
                     fonts::Set_Outline_Color_(2, 1);
                     fonts::Set_Font_Spacing_(1);
 
-                    sprintf(buffer, "%d.%d", defeated_score / 10, defeated_score % 10);
+                    snprintf(buffer, sizeof(buffer), "%d.%d", defeated_score / 10, defeated_score % 10);
 
                     int16_t centerX = current_x + (icon_width / 2);
                     fonts::Print_Centered_(centerX, base_y + 3, buffer);
@@ -843,7 +843,7 @@ namespace SCORE {
         char scor_buf[16];
 
         // This local string copy appears in the original binary but is not explicitly used.
-        strcpy(scor_buf, "scor");
+        strlcpy(scor_buf, "scor", sizeof(scor_buf));
 
         SCORE::_hi->score_elimination = SCORE::Get_Elimination_Score_(player_idx);
         SCORE::_hi->score_technology = SCORE::Get_Technology_Score_(player_idx);
@@ -879,21 +879,21 @@ namespace SCORE {
         fonts::Set_Font_Spacing_(1);
 
         char label_buffer[80];
-        strcpy(label_buffer, HAROLD::H_Message_(0x157));
+        strlcpy(label_buffer, HAROLD::H_Message_(0x157), sizeof(label_buffer));
         int16_t label_width = fonts::Get_String_Width_(label_buffer);
 
         char score_buffer[80];
         if (_hi->score_raw_subtotal == _hi->score_final) {
-            sprintf(score_buffer, "%d", (int)_hi->score_final);
+            snprintf(score_buffer, sizeof(score_buffer), "%d", (int)_hi->score_final);
         } else {
             char modifier_str[16];
             int16_t modifier = _hi->score_modifier_pct;
             if (modifier < 100) {
-                sprintf(modifier_str, ".%d", (int)modifier);
+                snprintf(modifier_str, sizeof(modifier_str), ".%d", (int)modifier);
             } else {
-                sprintf(modifier_str, "%d.%d", (int)(modifier / 100), (int)(modifier % 100));
+                snprintf(modifier_str, sizeof(modifier_str), "%d.%d", (int)(modifier / 100), (int)(modifier % 100));
             }
-            sprintf(score_buffer, "(%d x %s) %d", (int)_hi->score_raw_subtotal, modifier_str, (int)_hi->score_final);
+            snprintf(score_buffer, sizeof(score_buffer), "(%d x %s) %d", (int)_hi->score_raw_subtotal, modifier_str, (int)_hi->score_final);
         }
 
         int16_t score_width = fonts::Get_String_Width_(score_buffer);
@@ -908,7 +908,7 @@ namespace SCORE {
         s_colors dot_colors = *dot_colors_ptr;
 
         char dot_str[4];
-        strcpy(dot_str, ".");
+        strlcpy(dot_str, ".", sizeof(dot_str));
         int16_t dot_width = fonts::Get_String_Width_(dot_str);
 
         int16_t y = next_draw_y + 10;
@@ -947,15 +947,15 @@ namespace SCORE {
         dot_colors = *palette_colors;
 
         // Copy dot string "."
-        strcpy(dot_str, ".");
+        strlcpy(dot_str, ".", sizeof(dot_str));
         dot_width = fonts::Get_String_Width_(dot_str);
 
         // Copy label string
-        strcpy(label_buf, label);
+        strlcpy(label_buf, label, sizeof(label_buf));
         label_width = fonts::Get_String_Width_(label_buf);
 
         // Format score string
-        sprintf(score_buf, "%d", (int)score);
+        snprintf(score_buf, sizeof(score_buf), "%d", (int)score);
         score_width = fonts::Get_String_Width_(score_buf) + 3;
 
         // Print label
