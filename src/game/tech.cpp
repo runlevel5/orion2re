@@ -532,8 +532,8 @@ namespace TECH {
     }
 
     int16_t __cdecl Init_Entry_Data_(s_list_item_research* entries, int32_t research_cost_offset) {
-        char local_50[80];
-        JIM::Get_Text_Message_("billtext.lbx", 62, local_50, sizeof(local_50));
+        char no_available_app_text[80];
+        JIM::Get_Text_Message_("billtext.lbx", 62, no_available_app_text, sizeof(no_available_app_text));
         int16_t valid_count = 0;
 
         s_list_item_research* item = entries;
@@ -576,7 +576,7 @@ namespace TECH {
                 }
 
                 if (visible_app_count == 0) {
-                    strlcpy(item->app_names[0], local_50, sizeof(item->app_names[0]));
+                    strlcpy(item->app_names[0], no_available_app_text, sizeof(item->app_names[0]));
                     item->app_ids[0] = 0;
                     item->app_click_field_ids[0] = fields::Add_Hidden_Field_(
                         item->x,

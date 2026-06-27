@@ -110,17 +110,17 @@ void __cdecl Load_Xport_Anims_() {
 }
 
 int16_t __cdecl Xport_Popup_() {
-    int16_t local_colony_list[MAX_COLONIES];
+    int16_t colony_list_buffer[MAX_COLONIES];
     int16_t input_id;
     int16_t selected_colony = -1;
 
     for (int32_t i = 0; i < 15; ++i) {
-        local_colony_list[i] = -1;
+        colony_list_buffer[i] = -1;
     }
 
-    memset(&local_colony_list[15], 0, (MAX_COLONIES - 15) * sizeof(local_colony_list[0]));
+    memset(&colony_list_buffer[15], 0, (MAX_COLONIES - 15) * sizeof(colony_list_buffer[0]));
 
-    _g_colony_list_ptr = local_colony_list;
+    _g_colony_list_ptr = colony_list_buffer;
     COLONY::_full_draw = 1;
 
     Build_Global_Colony_List_();

@@ -1364,12 +1364,12 @@ namespace MAINPUPS {
         int16_t bombing_result,
         int8_t has_stellar_converter)
     {
-        s_colony_combat_popup_data local_30;
+        s_colony_combat_popup_data popup_data;
 
-        _g_data_ptr = &local_30;
+        _g_data_ptr = &popup_data;
 
         Update_CCP_Display_Data_Bombing_(
-            &local_30,
+            &popup_data,
             bomb,
             attacker,
             defender,
@@ -1381,7 +1381,7 @@ namespace MAINPUPS {
 
         _explode_flag = 0;
 
-        return Colony_Combat_Popup_(&local_30, 1);
+        return Colony_Combat_Popup_(&popup_data, 1);
     }
 
     /**

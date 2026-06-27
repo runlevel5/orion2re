@@ -29,8 +29,6 @@ namespace NETTURN {
 
     extern char* _waiting_message_fmt;
 
-    extern char* _chunk_progress_fmt;
-
     /** Returns whether any AI-player sync mask still requires host broadcast data. */
     int8_t __cdecl Must_Broadcast_AI_Player_Data_();
 

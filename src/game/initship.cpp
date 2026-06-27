@@ -883,46 +883,46 @@ namespace INITSHIP {
     }
 
     void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* ship_defense, int16_t* ship_missile_defense, int16_t* ship_attack) {
-        int16_t local_defense = 0;
-        int16_t local_missile_defense = 0;
-        int16_t local_attack = 0;
+        int16_t defense_bonus = 0;
+        int16_t missile_defense_bonus = 0;
+        int16_t attack_bonus = 0;
 
         s_ship_data* ship = &MOX::_ship[ship_idx];
         s_ship_design design_copy;
         memcpy(&design_copy, &ship->d, sizeof(s_ship_design));
 
-        Get_Design_Combat_Bonuses_(design_copy, &local_attack, &local_defense, &local_missile_defense);
+        Get_Design_Combat_Bonuses_(design_copy, &attack_bonus, &defense_bonus, &missile_defense_bonus);
 
         if (ship->officer_index > -1) {
             int16_t helmsman_bonus = CMBTFIR2::Helmsman_Bonus_(ship->officer_index);
-            local_defense += helmsman_bonus;
-            local_missile_defense += (int16_t)(helmsman_bonus / 2);
+            defense_bonus += helmsman_bonus;
+            missile_defense_bonus += (int16_t)(helmsman_bonus / 2);
 
-            local_attack += CMBTFIR2::Weaponry_Bonus_(ship->officer_index);
+            attack_bonus += CMBTFIR2::Weaponry_Bonus_(ship->officer_index);
         }
 
         int16_t crew_def_bonus = MOX::_crew_data[(int)ship->crew_quality].defense;
-        local_defense += crew_def_bonus;
-        local_missile_defense += (int16_t)(crew_def_bonus / 2);
-        local_attack += MOX::_crew_data[(int)ship->crew_quality].attack;
+        defense_bonus += crew_def_bonus;
+        missile_defense_bonus += (int16_t)(crew_def_bonus / 2);
+        attack_bonus += MOX::_crew_data[(int)ship->crew_quality].attack;
 
         if (ship->owner < MAX_PLAYERS) {
             s_player* owner_player = &MOX::_player[(int)ship->owner];
 
             int16_t trait_def_bonus = (int16_t)owner_player->traits[TRAIT_SHIP_DEFENSE];
-            local_defense += trait_def_bonus;
-            local_missile_defense += (int16_t)(trait_def_bonus / 2);
+            defense_bonus += trait_def_bonus;
+            missile_defense_bonus += (int16_t)(trait_def_bonus / 2);
 
-            local_attack += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
+            attack_bonus += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
 
             if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                local_defense += 20;
+                defense_bonus += 20;
             }
         }
 
-        *ship_defense = local_defense;
-        *ship_missile_defense = local_missile_defense;
-        *ship_attack = local_attack;
+        *ship_defense = defense_bonus;
+        *ship_missile_defense = missile_defense_bonus;
+        *ship_attack = attack_bonus;
     }
 
     int16_t __cdecl Cost_Of_Strategic_Design_(int16_t govt_type, s_ship_design* design) {

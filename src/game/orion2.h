@@ -1974,10 +1974,6 @@ struct s_net_pack_pick_your_position {
     struct s_player players[MAX_PLAYERS];
 };
 
-struct s_chunk_count_packet {
-    int16_t total_chunk_count;
-};
-
 struct s_case11_packet {
     int16_t sync_star_id;
     int16_t sync_planet_id;
@@ -2044,6 +2040,7 @@ struct s_network {
     int8_t player_connected_flags[MAX_PLAYERS];
     int16_t host_election_id;
     uint32_t total_bytes_received;
+    // Layout-preserving legacy fields from removed game-layer chunk assembly.
     int16_t received_chunk_count;
     int16_t total_chunk_count;
     void *network_data_ptr;

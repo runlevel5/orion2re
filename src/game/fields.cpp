@@ -1596,9 +1596,9 @@ namespace fields {
             _list_highlight_colors.colors[i] = cur_highlight->colors[i];
         }
 
-        int8_t local_4 = 0;
+        int8_t help_selection_placeholder = 0;
         int16_t help_field_idx = Add_String_List_Field_(
-            x, y, width, help, 1, &local_4, 1, 0, nullptr, 0, nullptr, 0, s__00551100, unused_param_14
+            x, y, width, help, 1, &help_selection_placeholder, 1, 0, nullptr, 0, nullptr, 0, s__00551100, unused_param_14
         );
 
         int8_t cur_selection = *selected_index;
@@ -3110,14 +3110,14 @@ namespace fields {
         platform::Check_Exit_();
 
         char cursor_color_ramp[16];
-        char local_40[64];
+        char display_buffer[64];
         s_field_input_string* legacy_input = Field_Data_Legacy_Input_(&_fields[field_idx]);
 
         timer::Mark_Time_();
         video::Set_Page_Off_();
 
         strlcpy(cursor_color_ramp, legacy_input->cursor_color_ramp, sizeof(cursor_color_ramp));
-        strlcpy(local_40, input_buffer, sizeof(local_40));
+        strlcpy(display_buffer, input_buffer, sizeof(display_buffer));
 
         Invoke_Auto_Function_();
 
@@ -3140,12 +3140,12 @@ namespace fields {
         short input_mode = legacy_input->input_mode;
 
         if (input_mode == 0) {
-            char_str[0] = local_40[_cursor_count];
-            local_40[_cursor_count] = '\0';
-            short prefix_width = fonts::Get_String_Width_(local_40);
+            char_str[0] = display_buffer[_cursor_count];
+            display_buffer[_cursor_count] = '\0';
+            short prefix_width = fonts::Get_String_Width_(display_buffer);
             short cursor_x = _fields[field_idx].x + prefix_width;
 
-            local_40[_cursor_count] = char_str[0];
+            display_buffer[_cursor_count] = char_str[0];
             if (char_str[0] == '\0') {
                 char_str[0] = ' ';
             }
@@ -3176,12 +3176,12 @@ namespace fields {
                 } while (lines != 0);
             }
         } else if (input_mode == 1) {
-            char_str[0] = local_40[_cursor_count];
-            local_40[_cursor_count] = '\0';
-            short prefix_width = fonts::Get_String_Width_(local_40);
+            char_str[0] = display_buffer[_cursor_count];
+            display_buffer[_cursor_count] = '\0';
+            short prefix_width = fonts::Get_String_Width_(display_buffer);
             short cursor_x = _fields[field_idx].x + prefix_width;
 
-            local_40[_cursor_count] = char_str[0];
+            display_buffer[_cursor_count] = char_str[0];
             if (char_str[0] == '\0') {
                 char_str[0] = ' ';
             }
@@ -3202,7 +3202,7 @@ namespace fields {
         }
 
         fonts::Set_Font_Style_(_fields[field_idx].font_style, _fields[field_idx].font_color);
-        fonts::Print_(_fields[field_idx].x, _fields[field_idx].y, local_40);
+        fonts::Print_(_fields[field_idx].x, _fields[field_idx].y, display_buffer);
         palette::Refresh_Palette_();
         platform::Toggle_Pages_Stub_();
         timer::Release_Time_(_auto_function_delay);

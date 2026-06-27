@@ -65,14 +65,14 @@ namespace FIREPTS {
         point_idx = (point_idx % 4) + (int32_t)attacker_picture_num * 4;
         int16_t* fp_data = (int16_t*)_fp_data_ptr[color_idx];
 
-        int32_t local_x = fp_data[point_idx * 2] - 0x1A;
-        int32_t local_y = fp_data[point_idx * 2 + 1] - 0x18;
+        int32_t offset_x = fp_data[point_idx * 2] - 0x1A;
+        int32_t offset_y = fp_data[point_idx * 2 + 1] - 0x18;
 
         int32_t rotation_angle = ((int32_t)attacker_facing_dir * -360) / 16;
 
-        angle::Rotate_Coordinates_(rotation_angle, &local_x, &local_y);
+        angle::Rotate_Coordinates_(rotation_angle, &offset_x, &offset_y);
 
-        *fp_x = (int16_t)local_x;
-        *fp_y = (int16_t)local_y;
+        *fp_x = (int16_t)offset_x;
+        *fp_y = (int16_t)offset_y;
     }
 }

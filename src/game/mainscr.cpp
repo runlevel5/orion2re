@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace MAINSCR {
+    constexpr uint32_t k_max_game_data_payload_bytes = 0xE1000u;
+
     int16_t _zoom_in_button;
     int16_t _zoom_out_button;
     int16_t _whole_screen_field;
@@ -3644,52 +3646,33 @@ namespace MAINSCR {
             }
             break;
         }
-        case NET_PACKET_GAME_DATA_CHUNK_COUNT:
-        case NET_PACKET_GAME_ORDERS_CHUNK_COUNT:
-        case NET_PACKET_PICK_TARGET_INFO_CHUNK_COUNT:
-        case NET_PACKET_BATTLE_RESULTS_CHUNK_COUNT:
-        case NET_PACKET_YOU_ARE_TARGET_INFO_CHUNK_COUNT: {
-            const s_chunk_count_packet* packet = (const s_chunk_count_packet*)data;
-            NETMOX::_net.total_chunk_count = packet->total_chunk_count;
-            NETMOX::_net.received_chunk_count = 0;
-            NETMOX::_net.total_bytes_received = 0;
+        case NET_PACKET_GAME_DATA_PAYLOAD: {
             allocate::Push_Block_(MOX::_screen_seg);
-            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xE1000);
-
-            if (msg_type == NET_PACKET_GAME_DATA_CHUNK_COUNT) {
-                NETMOX::_net.host_election_winner_id = param_2;
-                NETTURN::Net_Init_Host_Election_();
+            if (len > k_max_game_data_payload_bytes) {
+                exitm::Exit_With_Message("game data payload too large");
             }
-            else if (msg_type == NET_PACKET_PICK_TARGET_INFO_CHUNK_COUNT) {
-                NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_PICK_TARGET_INFO;
-            }
-            else if (msg_type == NET_PACKET_BATTLE_RESULTS_CHUNK_COUNT) {
-                NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_BATTLE_RESULTS_CHUNKS;
-            }
-            else if (msg_type == NET_PACKET_YOU_ARE_TARGET_INFO_CHUNK_COUNT) {
-                NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_YOU_ARE_TARGET_INFO;
-            }
+            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, len);
+            memcpy(NETMOX::_net.network_data_ptr, data, len);
+            NETMOX::_net.host_election_winner_id = param_2;
+            NETTURN::Net_Init_Host_Election_();
+            NETMOX::_net.total_bytes_received = len;
             break;
         }
-        case NET_PACKET_GAME_DATA_CHUNK:
-        case NET_PACKET_PICK_TARGET_INFO_CHUNK:
-        case NET_PACKET_BATTLE_RESULTS_CHUNK:
-        case NET_PACKET_YOU_ARE_TARGET_INFO_CHUNK:
-        case NET_PACKET_GAME_ORDERS_CHUNK: {
-            uint8_t* dest = (uint8_t*)NETMOX::_net.network_data_ptr + (NETMOX::_net.received_chunk_count * 0x7800);
-            memcpy(dest, data, len & 0xFFFF);
+        case NET_PACKET_GAME_ORDERS_PAYLOAD: {
+            if (data == nullptr || len == 0 || len > k_max_game_data_payload_bytes) {
+                exitm::Exit_With_Message("game orders payload invalid");
+            }
 
-            NETMOX::_net.received_chunk_count++;
-            NETMOX::_net.total_bytes_received += (len & 0xFFFF);
-
-            if (msg_type == NET_PACKET_GAME_ORDERS_CHUNK && NETMOX::_net.total_chunk_count == NETMOX::_net.received_chunk_count) {
-                NETMOX::_net.host_sync_counter++;
-                if ((uint8_t)NETMOX::_net.host_sync_counter == MOX::_NUM_PLAYERS) {
-                    NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_BEGIN_TURN;
-                }
-                else {
-                    NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_WAITING_FOR_ORDERS;
-                }
+            allocate::Push_Block_(MOX::_screen_seg);
+            NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, len);
+            memcpy(NETMOX::_net.network_data_ptr, data, len);
+            NETMOX::_net.total_bytes_received = len;
+            NETMOX::_net.host_sync_counter++;
+            if ((uint8_t)NETMOX::_net.host_sync_counter == MOX::_NUM_PLAYERS) {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_BEGIN_TURN;
+            }
+            else {
+                NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_WAITING_FOR_ORDERS;
             }
             break;
         }
@@ -3826,7 +3809,7 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_BATTLE_RESULTS: {
-            NETMOX::Decode_Battle_Results_(data, (uint16_t)len);
+            NETMOX::Decode_Battle_Results_(data, len);
             break;
         }
         case NET_PACKET_STRATEGIC_BATTLE_RESULTS:
@@ -4016,14 +3999,6 @@ namespace MAINSCR {
             if (CHAT::_chat_info != nullptr) {
                 CHAT::Receive_Chat_Msg_(8, (char*)data);
             }
-            break;
-        }
-        case NET_PACKET_BATTLE_RESULTS_CHUNK_REQUEST: {
-            NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_BATTLE_RESULTS_CHUNK_REQUESTED;
-            break;
-        }
-        case NET_PACKET_BATTLE_RESULTS_CHUNK_READY: {
-            NETMOX::_net.sync_state = NET_SYNC_STATE_SENDING_BATTLE_RESULTS_CHUNKS;
             break;
         }
         case NET_PACKET_PLAYER_PHASE_READY: {

@@ -71,27 +71,27 @@ namespace AIMOVE {
     }
 
     void __cdecl Move_AI_(int16_t player_idx) {
-        int8_t local_b88[MAX_STARS];
-        int8_t local_b40[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
-        s_ai_colonizable_planet local_870[MAX_PLANETS];
+        int8_t nonplayer_presence_storage[MAX_STARS];
+        int8_t flee_star_storage[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
+        s_ai_colonizable_planet colonizable_planet_storage[MAX_PLANETS];
 
         RUSS::Mox_Update_();
 
         _i_ai = player_idx;
-        _colonizable = local_870;
+        _colonizable = colonizable_planet_storage;
         _p_ai = &MOX::_player[player_idx];
 
-        Get_Colonizable_Planets_(local_870, &_n_colonizable);
+        Get_Colonizable_Planets_(colonizable_planet_storage, &_n_colonizable);
 
         qsort(_colonizable, _n_colonizable, 6, Sort_colonizable_);
 
-        _flee_stars = local_b40;
-        memset(_flee_stars, 0, sizeof(local_b40));
+        _flee_stars = flee_star_storage;
+        memset(_flee_stars, 0, sizeof(flee_star_storage));
 
         Mark_Flee_Stars_(player_idx);
 
-        _nonplayer_here = (int8_t(*)[MAX_STARS])local_b88;
-        memset(_nonplayer_here, 0, sizeof(local_b88));
+        _nonplayer_here = (int8_t(*)[MAX_STARS])nonplayer_presence_storage;
+        memset(_nonplayer_here, 0, sizeof(nonplayer_presence_storage));
 
         s_ship_data* ship = MOX::_ship;
         if (ship < MOX::_ship + MOX::_NUM_SHIPS) {
@@ -215,7 +215,7 @@ namespace AIMOVE {
         int32_t enemy_strength_2[ENEMY_STRENGTH_TURN_WINDOW];
         int16_t ship_indices[MAX_SHIPS];
         s_ship_move_info move_info;
-        int16_t local_4a0[2];
+        int16_t single_ship_list[2];
 
         memset(star_flags_0, 0, sizeof(star_flags_0));
 
@@ -276,14 +276,14 @@ namespace AIMOVE {
                     }
                     
                     if (best_ship_idx != -1) {
-                        local_4a0[0] = ship_indices[best_ship_idx];
-                        local_4a0[1] = -1;
+                        single_ship_list[0] = ship_indices[best_ship_idx];
+                        single_ship_list[1] = -1;
                         num_ships_selected--;
                         ship_indices[best_ship_idx] = ship_indices[num_ships_selected];
                         
-                        SHIPMOVE::Ships_Try_To_Move_To_(local_4a0, (int16_t)best_star, &move_info);
-                        MOX::_ship[local_4a0[0]].mission = 7;
-                        SHIPMOVE::Make_Ships_Move_To_(local_4a0, (int16_t)best_star, &move_info);
+                        SHIPMOVE::Ships_Try_To_Move_To_(single_ship_list, (int16_t)best_star, &move_info);
+                        MOX::_ship[single_ship_list[0]].mission = 7;
+                        SHIPMOVE::Make_Ships_Move_To_(single_ship_list, (int16_t)best_star, &move_info);
                     }
                 }
             }
@@ -699,11 +699,11 @@ namespace AIMOVE {
     }
 
     void __cdecl Move_To_Stage_Points_() {
-        uint8_t local_5d7;
+        uint8_t warp_beast_caution;
         if (EVENTS::Event_Check_Warp_Beast_() != 0 && _p_ai->traits[TRAIT_LUCKY] == 0) {
-            local_5d7 = 1;
+            warp_beast_caution = 1;
         } else {
-            local_5d7 = 0;
+            warp_beast_caution = 0;
         }
 
         int32_t total_stage_weight = 0;
@@ -788,7 +788,7 @@ namespace AIMOVE {
                     s_ship_move_info move_info;
                     SHIPMOVE::Ships_Try_To_Move_To_(ship_list, intermediate_star, &move_info);
                     uint8_t turns_left = move_info.turns_left;
-                    if (turns_left <= 1 || local_5d7 == 0) {
+                    if (turns_left <= 1 || warp_beast_caution == 0) {
                         SHIPMOVE::Make_Ships_Move_To_(ship_list, intermediate_star, &move_info);
                     }
                 }
@@ -805,7 +805,7 @@ namespace AIMOVE {
             int32_t best_ship_i = -1;
             uint32_t best_ship_star = 0xFFFFFFFF;
 
-            int32_t best_turns = (local_5d7 == 1) ? 2 : 255;
+            int32_t best_turns = (warp_beast_caution == 1) ? 2 : 255;
 
             RUSS::Mox_Update_();
 
@@ -1490,11 +1490,11 @@ namespace AIMOVE {
     void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate) {
         int num_intercepting_ships;
         int16_t intercepting_ships[MAX_SHIPS];
-        int8_t star_valid_target[MAX_STARS];
-        int local_1670;
+        int8_t knocked_out_stars[MAX_STARS];
+        int num_knocked_out;
 
         Gather_Intercepting_Ships_(intercepting_ships, &num_intercepting_ships, star_to_intercept_idx);
-        Knock_Out_Impossible_Interceptions_(intercepts, count, star_valid_target, &local_1670, is_desperate);
+        Knock_Out_Impossible_Interceptions_(intercepts, count, knocked_out_stars, &num_knocked_out, is_desperate);
 
         while (true) {
             if (*count <= 0) {

@@ -23,8 +23,6 @@ namespace NETMOX {
 
     extern s_net_snapshot_cache _net_snapshot_cache;
 
-    extern char* _sending_chunk_d_of_d_fmt;
-
     extern char* _incompatible_versions_error;
 
     extern char* _ambassador_left_before_you_arrived_fmt;
@@ -80,7 +78,7 @@ namespace NETMOX {
 
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
-    int32_t __cdecl Mox_Send_Message_(int16_t recipient_net_id, uint16_t msg_type, void* packet, uint16_t packet_len);
+    int32_t __cdecl Mox_Send_Message_(int16_t recipient_net_id, uint16_t msg_type, void* packet, uint32_t packet_len);
 
     void __cdecl Decode_Game_Orders_(void* data, uint32_t len);
 
@@ -148,7 +146,7 @@ namespace NETMOX {
 
     void __cdecl Decode_You_Are_Target_Info_(void* packet_data, uint32_t len);
 
-    void __cdecl Decode_Battle_Results_(void* packet_data, uint16_t len);
+    void __cdecl Decode_Battle_Results_(void* packet_data, uint32_t len);
 
     void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* packet, uint16_t len);
 

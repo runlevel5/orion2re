@@ -46,11 +46,11 @@ int16_t __cdecl Ai_Stasis_Check_(int16_t player_idx) {
 }
 
 int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t target_idx, int16_t count, int16_t distance, int16_t target_type_flag) {
-    int16_t local_c = 0;
-    int16_t local_a = 0;
-    int32_t local_8;
+    int16_t range_penalty = 0;
+    int16_t damage_bonus_pct = 0;
+    int32_t attack_defense_delta;
     int32_t points_blocked;
-    int16_t local_e = 0;
+    int16_t use_planetary_shield_adjustment = 0;
 
     uint16_t specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
     int16_t weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
@@ -59,7 +59,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
         int16_t has_hard_shields = COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS);
         if (has_hard_shields != 0 || (specials & 0x40) == 0) {
             if (target_idx == 0) {
-                local_e = 1;
+                use_planetary_shield_adjustment = 1;
                 points_blocked = MOX::_combat_data[0].shield_arc_max;
             } else {
                 int16_t blocked = 0;
@@ -85,27 +85,27 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
 
     int32_t dist_modifier;
     if (TECHDATA::_weapons[weapon_id].type == 0) {
-        CMBTFIRE::Get_Beam_Weapon_Modifiers_(ship_idx, distance, specials, weapon_id, &local_c, &local_a);
-        dist_modifier = 40 - local_c;
+        CMBTFIRE::Get_Beam_Weapon_Modifiers_(ship_idx, distance, specials, weapon_id, &range_penalty, &damage_bonus_pct);
+        dist_modifier = 40 - range_penalty;
         if (dist_modifier > 95) {
             dist_modifier = 95;
         }
-        local_8 = MOX::_combat_data[ship_idx].tac_val_attack;
+        attack_defense_delta = MOX::_combat_data[ship_idx].tac_val_attack;
         if (target_type_flag == 0) {
-            local_8 -= MOX::_combat_data[target_idx].tac_val_defense;
+            attack_defense_delta -= MOX::_combat_data[target_idx].tac_val_defense;
         } else {
             int16_t source_unit_idx = MOX::_missile[target_idx].source_unit_idx;
             int16_t owner = MOX::_combat_data[source_unit_idx].owner;
-            local_8 -= CMBTMIS::Missile_Dcv_(MOX::_missile[target_idx].type, owner);
+            attack_defense_delta -= CMBTMIS::Missile_Dcv_(MOX::_missile[target_idx].type, owner);
         }
     } else {
-        local_a = 100;
+        damage_bonus_pct = 100;
         dist_modifier = 0;
-        local_c = 0;
-        local_8 = 0;
+        range_penalty = 0;
+        attack_defense_delta = 0;
     }
 
-    int32_t ordnance_bonus = MOX::_ordnance_bonus[MOX::_combat_data[ship_idx].owner] + local_a - 100;
+    int32_t ordnance_bonus = MOX::_ordnance_bonus[MOX::_combat_data[ship_idx].owner] + damage_bonus_pct - 100;
     
     int32_t min_damage = (TECHDATA::_weapons[weapon_id].min_damage * ordnance_bonus + 50) / 100;
     if (min_damage < 1) {
@@ -117,7 +117,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
         max_damage = min_damage;
     }
 
-    if (local_e != 0 && TECHDATA::_weapons[weapon_id].type == 0) {
+    if (use_planetary_shield_adjustment != 0 && TECHDATA::_weapons[weapon_id].type == 0) {
         int16_t shield_id = INITSHIP::Best_Ship_Shield_(MOX::_combat_defender_player);
         min_damage /= 2;
         max_damage /= 2;
@@ -136,7 +136,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
         }
     }
 
-    int32_t actual_dmg = GEO::Actual_Expected_Damage_(min_damage, max_damage, dist_modifier, local_8, points_blocked);
+    int32_t actual_dmg = GEO::Actual_Expected_Damage_(min_damage, max_damage, dist_modifier, attack_defense_delta, points_blocked);
     return count * actual_dmg;
 }
 

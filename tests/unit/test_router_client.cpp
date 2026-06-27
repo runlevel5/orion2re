@@ -32,7 +32,7 @@ std::vector<uint8_t> Copy_Stream_(const Bit_Stream& stream) {
 
 bool Start_Test_Service_(s_router_service* service, std::thread* service_thread, int* run_result) {
     *run_result = -1;
-    *service_thread = std::thread([&]() {
+    *service_thread = std::thread([service, run_result]() {
         *run_result = Router_Service_Run(service);
     });
 

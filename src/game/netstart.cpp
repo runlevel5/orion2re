@@ -2,7 +2,6 @@
 
 namespace NETSTART {
     char* _dialing_failed_error;
-    char* _receiving_chunk_d_of_d;
     char* _really_begin_game_with_unused_slots_msg;
     char* _really_start_with_only_1_msg;
     char* _no_more_player_slots_error;
@@ -40,42 +39,22 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        NETMOX::_net.total_chunk_count = 0;
+        NETMOX::_net.network_data_ptr = nullptr;
         NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
 
         NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PLAYER_SETUP, local_player, sizeof(*local_player));
 
-        while (NETMOX::_net.total_chunk_count == 0) {
+        while (NETMOX::_net.network_data_ptr == nullptr) {
             fields::Get_Input_();
             MULTPLAY::Draw_Generic_Net_Info_Screen_();
             RUSS::Mox_Sync_Update_();
         }
 
-        MULTPLAY::Reload_Getting_Data_Info_();
-
-        strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
-        video::Set_Page_Off_();
-        MULTPLAY::Draw_SendGet_Net_Info_Screen_();
-        fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
-        RUSS::Mox_Sync_Update_();
-
-        while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETSTART::_receiving_chunk_d_of_d, 
-                    NETMOX::_net.received_chunk_count + 1, NETMOX::_net.total_chunk_count);
-            MULTPLAY::Draw_SendGet_Net_Info_Screen_();
-            fields::Get_Input_();
-            RUSS::Mox_Sync_Update_();
-        }
-
-        NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, 
-                                                       NETMOX::_net.total_bytes_received, 1);
         
         NETMOX::_net.field_1db = 0;
         NETMOX::_net.field_1df = 0;
         NETMOX::_net.network_data_ptr = nullptr;
-
         allocate::Pop_Block_(MOX::_screen_seg);
-        NETMOX::_net.total_chunk_count = 0;
         NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
 
         MOX2::Init_Map_Pictures_Default__();
@@ -109,6 +88,7 @@ namespace NETSTART {
         fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, "", 0);
 
         NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
+        NETMOX::_net.network_data_ptr = nullptr;
         message_buffer = (int32_t)selection;
         NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, NET_PACKET_PICK_YOUR_POSITION_RESULT, &message_buffer, sizeof(message_buffer));
 
@@ -117,16 +97,9 @@ namespace NETSTART {
 
         strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
 
-        while (NETMOX::_net.total_chunk_count == 0) {
+        while (NETMOX::_net.network_data_ptr == nullptr) {
             fields::Get_Input_();
             video::Set_Page_Off_();
-            MULTPLAY::Draw_SendGet_Net_Info_Screen_();
-            RUSS::Mox_Sync_Update_();
-        }
-
-        while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-            snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETSTART::_receiving_chunk_d_of_d, (int)NETMOX::_net.received_chunk_count + 1, (int)NETMOX::_net.total_chunk_count);
-            fields::Get_Input_();
             MULTPLAY::Draw_SendGet_Net_Info_Screen_();
             RUSS::Mox_Sync_Update_();
         }
@@ -136,7 +109,6 @@ namespace NETSTART {
         NETMOX::_net.field_1df = 0;
         NETMOX::_net.network_data_ptr = nullptr;
         allocate::Pop_Block_(MOX::_screen_seg);
-        NETMOX::_net.total_chunk_count = 0;
 
         MOX::_temp_string[0] = '\0';
         MOX::_PLAYER_NUM = -1;
@@ -176,7 +148,6 @@ namespace NETSTART {
         _game_full_string = current;
         current += strlen(current) + 1;
 
-        _receiving_chunk_d_of_d = current;
         current += strlen(current) + 1;
 
         _answering_failed_error = current;

@@ -27,7 +27,6 @@ namespace NETSTART {
     uint8_t __cdecl Load_Net_Screen_();
 
     extern char* _dialing_failed_error;
-    extern char* _receiving_chunk_d_of_d;
     extern char* _really_begin_game_with_unused_slots_msg;
     extern char* _really_start_with_only_1_msg;
     extern char* _no_more_player_slots_error;

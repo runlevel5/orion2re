@@ -4,8 +4,6 @@ namespace NETTURN {
 
     char* _waiting_message_fmt;
 
-    char* _chunk_progress_fmt;
-
     int32_t __cdecl Determine_Lowest_Active_Host_Player_(const s_player* players, int32_t num_players) {
         if (players == nullptr || num_players <= 0) {
             return -1;
@@ -107,9 +105,7 @@ namespace NETTURN {
 
         char* next_ptr = _waiting_message_fmt + strlen(_waiting_message_fmt) + 1;
 
-        _chunk_progress_fmt = next_ptr;
-
-        return _chunk_progress_fmt + strlen(_chunk_progress_fmt) + 1;
+        return next_ptr + strlen(next_ptr) + 1;
     }
 
     void __cdecl Host_Next_Turn_() {
@@ -154,7 +150,6 @@ namespace NETTURN {
                 NETMOX::Decode_Game_Orders_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
                 NETMOX::_net.network_data_ptr = nullptr;
                 allocate::Pop_Block_(MOX::_screen_seg);
-                NETMOX::_net.total_chunk_count = 0;
                 NETMOX::_net.players_ready_mask[NETMOX::_net.host_active_player_id + 1] = 1;
                 NETMOX::_net.host_active_player_id = -1;
             }
@@ -302,17 +297,13 @@ namespace NETTURN {
         COMBFIND::_current_star_has_nonplayer = nullptr;
 
         strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
+        NETMOX::_net.network_data_ptr = nullptr;
 
-        while (NETMOX::_net.total_chunk_count == 0 && MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
+        while (NETMOX::_net.network_data_ptr == nullptr && MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             MULTPLAY::Chat_Box_Input_Loop_();
         }
 
         if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
-            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), NETTURN::_chunk_progress_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
-                MULTPLAY::Chat_Box_Input_Loop_();
-            }
-
             while (!NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 0)) {
                 exitm::Exit_With_Message("craziness");
             }
@@ -320,9 +311,7 @@ namespace NETTURN {
             NETMOX::_net.field_1db = 0;
             NETMOX::_net.field_1df = 0;
             NETMOX::_net.network_data_ptr = nullptr;
-
             allocate::Pop_Block_(MOX::_screen_seg);
-            NETMOX::_net.total_chunk_count = 0;
             NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
 
             MAINSCR::Update_Ship_Icons_In_Between_Turns_();

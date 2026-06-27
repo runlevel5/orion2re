@@ -49,6 +49,8 @@ orion2re_add_unit_test(test_fields_helpers
         tests/unit/test_fields_helpers.cpp
     FAKE_SOURCES
         tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_fields_helpers_runtime.cpp
+        tests/fakes/fake_video.cpp
 )
 
 orion2re_add_unit_test(test_pop_helpers
@@ -64,13 +66,25 @@ orion2re_add_unit_test(test_netturn_host_selection
         src/game/netmox.cpp
     FAKE_SOURCES
         tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_fields_helpers_runtime.cpp
         tests/fakes/fake_netturn_runtime.cpp
+        tests/fakes/fake_video.cpp
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_netturn_host_selection PRIVATE -ffunction-sections -fdata-sections)
-    target_link_options(test_netturn_host_selection PRIVATE -Wl,--gc-sections)
 endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU" AND NOT APPLE)
+    target_link_options(test_netturn_host_selection PRIVATE -Wl,--gc-sections)
+elseif(APPLE)
+    target_link_options(test_netturn_host_selection PRIVATE -Wl,-dead_strip)
+endif()
+
+orion2re_add_unit_test(test_netmox_packet_limits
+    SOURCES
+        tests/unit/test_netmox_packet_limits.cpp
+)
 
 orion2re_add_unit_test(test_video_scan_bounds
     SOURCES

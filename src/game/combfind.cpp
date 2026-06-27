@@ -362,16 +362,6 @@ void __cdecl Client_Combat_Loop_() {
         RUSS::Mox_Update_();
 
         switch (NETMOX::_net.sync_state) {
-        case NET_SYNC_STATE_RECEIVING_PICK_TARGET_INFO:
-            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                RUSS::Mox_Update_();
-            }
-            NETMOX::Decode_Pick_Target_Info_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
-            NETMOX::_net.network_data_ptr = nullptr;
-            allocate::Pop_Block_(MOX::_screen_seg);
-            NETMOX::_net.total_chunk_count = 0;
-            break;
-
         case NET_SYNC_STATE_PICKING_COMBAT_TARGET:
             fields::Assign_Auto_Function_(SCORE::nullsub, 1);
             video::Set_Page_Off_();
@@ -395,16 +385,6 @@ void __cdecl Client_Combat_Loop_() {
                 NETMOX::_net.combat_target_player_id = (int16_t)MOX::_colony[target_colony].owner;
             }
             NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_COMBAT_TARGET_CHOSEN, &NETMOX::_net.combat_defender_id, sizeof(NETMOX::_net.combat_defender_id) + sizeof(NETMOX::_net.combat_planet_id) + sizeof(NETMOX::_net.combat_target_player_id));
-            break;
-
-        case NET_SYNC_STATE_RECEIVING_YOU_ARE_TARGET_INFO:
-            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                RUSS::Mox_Update_();
-            }
-            NETMOX::Decode_You_Are_Target_Info_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
-            NETMOX::_net.network_data_ptr = nullptr;
-            allocate::Pop_Block_(MOX::_screen_seg);
-            NETMOX::_net.total_chunk_count = 0;
             break;
 
         case NET_SYNC_STATE_COMBAT_RESOLUTION_DISPATCH:
@@ -489,17 +469,6 @@ void __cdecl Client_Combat_Loop_() {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
                 NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_DRAGON_BRIBE_DESTINATION, &new_star_target, sizeof(new_star_target));
             }
-            break;
-
-        case NET_SYNC_STATE_RECEIVING_BATTLE_RESULTS_CHUNKS:
-            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                RUSS::Mox_Update_();
-            }
-            NETMOX::Decode_Battle_Results_(NETMOX::_net.network_data_ptr, (uint16_t)NETMOX::_net.total_bytes_received);
-            NETMOX::_net.network_data_ptr = nullptr;
-            allocate::Pop_Block_(MOX::_screen_seg);
-            NETMOX::_net.total_chunk_count = 0;
-            NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
             break;
 
         default:
@@ -1390,10 +1359,6 @@ int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
                 }
 
                 if (MOX::_PLAYER_NUM == i) {
-                    if (NETMOX::_net.sync_state >= NET_SYNC_STATE_WAITING_FOR_BATTLE_RESULTS_CHUNKS && NETMOX::_net.sync_state <= NET_SYNC_STATE_RECEIVING_BATTLE_RESULTS_CHUNKS) {
-                        return 1;
-                    }
-
                     if (NETMOX::_net.network_data_ptr != nullptr) {
                         return 1;
                     }
@@ -2515,14 +2480,6 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                 NETMOX::_net.field82_0x160 = (undefined)0xff;
                 break;
             }
-            case NET_PLAYER_STATE_BATTLE_RESULTS_CHUNK_REQUESTED: {
-                if (NETMOX::_net.sync_state == NET_SYNC_STATE_COMBAT_READY) {
-                    NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_BATTLE_RESULTS_CHUNKS;
-                    NETMOX::_net.player_net_info[i].player_state = NET_PLAYER_STATE_BATTLE_RESULTS_CHUNK_PENDING;
-                    NETMOX::Mox_Send_Message_((int16_t)MOX::_player[i].network_player_id, NET_PACKET_BATTLE_RESULTS_CHUNK_READY, nullptr, 0);
-                }
-                break;
-            }
             }
         }
     }
@@ -2544,7 +2501,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     }
 
     uint8_t state = NETMOX::_net.player_net_info[MOX::_PLAYER_NUM].player_state;
-    if (state == NET_PLAYER_STATE_PICK_TARGET_INFO || state == NET_PLAYER_STATE_RECEIVING_PICK_TARGET_INFO || NETMOX::_net.sync_phase_active_flag != 0) {
+    if (state == NET_PLAYER_STATE_PICK_TARGET_INFO || NETMOX::_net.sync_phase_active_flag != 0) {
         _in_net_update = 0;
         RUSS::Mox_Update_();
         return;
