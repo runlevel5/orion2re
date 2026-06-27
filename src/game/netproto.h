@@ -17,6 +17,7 @@ namespace NETPROTO {
         int32_t Read_Int32_();
 
         void Read_Bytes_(void* dest, size_t size);
+        uint32_t Length_() const;
         uint8_t* Ptr_() const;
 
     private:
@@ -44,6 +45,7 @@ namespace NETPROTO {
         void Write_Int32_(int32_t value);
 
         void Write_Bytes_(const void* src, size_t size);
+        uint32_t Length_() const;
         uint8_t* Ptr_() const;
 
     private:

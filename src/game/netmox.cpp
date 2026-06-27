@@ -534,15 +534,14 @@ namespace NETMOX {
         s_net_pack_pick_your_position* packet =
             (s_net_pack_pick_your_position*)allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_net_pack_pick_your_position));
 
-        packet->num_players = MOX::_NUM_PLAYERS;
-
         int32_t num_players = MOX::_NUM_PLAYERS;
+        packet->num_players = MOX::_NUM_PLAYERS;
 
         // Copy the current player list into the network packet
         memcpy(packet->players, MOX::_player, num_players * (int32_t)sizeof(s_player));
 
         uint16_t msg_size = (uint16_t)(sizeof(packet->num_players) + num_players * (int32_t)sizeof(packet->players[0]));
-        NETMOX::Mox_Send_Message_(network_player_id, NET_PACKET_PICK_YOUR_POSITION, packet, (uint16_t)msg_size);
+        NETMOX::Mox_Send_Message_(network_player_id, NET_PACKET_PICK_YOUR_POSITION, packet, msg_size);
 
         allocate::Pop_Block_(MOX::_screen_seg);
     }
@@ -550,122 +549,92 @@ namespace NETMOX {
     void __cdecl Broadcast_Game_Data_Differential_(uint8_t use_diff) {
         allocate::Push_Block_(MOX::_screen_seg);
         uint8_t* block = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xe1000);
-        uint8_t* ptr = block;
+        NETPROTO::Packet_Writer_ writer(block, 0xe1000, "invalid broadcast game data payload");
 
         // Assemble a packed byte stream from primitive values using the original x86 little-endian layout.
-        * (int16_t*)ptr = _net.host_election_id;
-        ptr += sizeof(int16_t);
-
-        * (uint32_t*)ptr = MOX::_stardate;
-        ptr += sizeof(uint32_t);
-
-        *ptr++ = MOX::_settings.random_events;
-        *ptr++ = MOX::_settings.game_difficulty;
-        *ptr++ = MOX::_settings.number_of_players;
-        *ptr++ = MOX::_settings.galaxy_size;
-        *ptr++ = MOX::_settings.galaxy_age;
-        *ptr++ = MOX::_settings.strategic_combat_flag;
-        *ptr++ = MOX::_settings.starting_civilization_level;
-        *ptr++ = MOX::_settings.xenons_exist;
+        writer.Write_Int16_(_net.host_election_id);
+        writer.Write_Uint32_(MOX::_stardate);
+        writer.Write_Uint8_(MOX::_settings.random_events);
+        writer.Write_Uint8_(MOX::_settings.game_difficulty);
+        writer.Write_Uint8_(MOX::_settings.number_of_players);
+        writer.Write_Uint8_(MOX::_settings.galaxy_size);
+        writer.Write_Uint8_(MOX::_settings.galaxy_age);
+        writer.Write_Uint8_(MOX::_settings.strategic_combat_flag);
+        writer.Write_Uint8_(MOX::_settings.starting_civilization_level);
+        writer.Write_Uint8_(MOX::_settings.xenons_exist);
 
         RUSS::Mox_Update_();
 
-        * (int32_t*)ptr = game_random::Get_Random_Seed_();
-        ptr += sizeof(int32_t);
+        writer.Write_Int32_(game_random::Get_Random_Seed_());
 
-        * (uint16_t*)ptr = MOX::_NUM_PLAYERS;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)MOX::_NUM_PLAYERS);
 
         uint32_t size = MOX::_NUM_PLAYERS * sizeof(s_player);
-        memcpy(ptr, MOX::_player, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_player, size);
 
-        * (uint16_t*)ptr = MOX::_NUM_STARS;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)MOX::_NUM_STARS);
 
         size = (MOX::_NUM_STARS + 1) * sizeof(s_star_data);
-        memcpy(ptr, MOX::_star, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_star, size);
 
-        * (uint16_t*)ptr = MOX::_planet_count;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)MOX::_planet_count);
 
         size = MOX::_planet_count * sizeof(s_planet_data);
-        memcpy(ptr, MOX::_planet, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_planet, size);
 
-        * (uint16_t*)ptr = MOX::_NUM_COLONIES;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)MOX::_NUM_COLONIES);
 
         size = MAX_COLONIES * sizeof(s_colony);
-        memcpy(ptr, MOX::_colony, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_colony, size);
 
-        * (int16_t*)ptr = MOX::_NUM_SHIPS;
-        ptr += sizeof(uint16_t);
+        writer.Write_Int16_((int16_t)MOX::_NUM_SHIPS);
 
         size = MAX_SHIPS * sizeof(s_ship_data);
-        memcpy(ptr, MOX::_ship, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_ship, size);
 
         RUSS::Mox_Update_();
 
         size = MAX_LEADERS * sizeof(s_leader_data);
-        memcpy(ptr, MOX::_leaders, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_leaders, size);
 
-        * (uint16_t*)ptr = REPORT::_n_reports;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)REPORT::_n_reports);
 
         size = 50 * sizeof(s_report);
-        memcpy(ptr, REPORT::_reports, size);
-        ptr += size;
+        writer.Write_Bytes_(REPORT::_reports, size);
 
         size = 36 * sizeof(s_event_data);
-        memcpy(ptr, EVENTS::_event_data, size);
-        ptr += size;
+        writer.Write_Bytes_(EVENTS::_event_data, size);
 
         size = MOX::_NUM_PLAYERS;
-        memcpy(ptr, MSG_::_first_msg, size);
-        ptr += size;
+        writer.Write_Bytes_(MSG_::_first_msg, size);
 
-        memcpy(ptr, MSG_::_max_msgs, size);
-        ptr += size;
+        writer.Write_Bytes_(MSG_::_max_msgs, size);
 
-        memcpy(ptr, MSG_::_n_msgs, size);
-        ptr += size;
+        writer.Write_Bytes_(MSG_::_n_msgs, size);
 
         size = 100 * sizeof(s_MSG);
-        memcpy(ptr, MSG_::_msgs, size);
-        ptr += size;
+        writer.Write_Bytes_(MSG_::_msgs, size);
 
-        * (uint16_t*)ptr = diplodef::_COUNCIL_FLAG;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)diplodef::_COUNCIL_FLAG);
 
-        * (uint16_t*)ptr = diplodef::_next_council_meeting_turn;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_((uint16_t)diplodef::_next_council_meeting_turn);
 
-        memcpy(ptr, &MOX::_antarans, sizeof(s_antaran));
-        ptr += sizeof(s_antaran);
+        writer.Write_Bytes_(&MOX::_antarans, sizeof(s_antaran));
 
-        *ptr++ = MOX::_NUM_NEBULAS;
+        writer.Write_Uint8_(MOX::_NUM_NEBULAS);
 
         size = MOX::_NUM_NEBULAS * sizeof(s_nebula);
-        memcpy(ptr, MOX::_nebula, size);
-        ptr += size;
+        writer.Write_Bytes_(MOX::_nebula, size);
 
-        * (uint32_t*)ptr = EVENTS::_last_event_year;
-        ptr += sizeof(uint32_t);
+        writer.Write_Uint32_(EVENTS::_last_event_year);
 
-        * (uint16_t*)ptr = EVENTS::_event_delay_count;
-        ptr += sizeof(uint16_t);
+        writer.Write_Uint16_(EVENTS::_event_delay_count);
 
-        memcpy(ptr, MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
-        ptr += sizeof(MOX::_bill_savegame);
+        writer.Write_Bytes_(MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
 
         RUSS::Mox_Update_();
 
-        uint32_t block_size = (uint32_t)(ptr - block);
+        uint32_t block_size = writer.Length_();
         uint8_t* send_ptr;
         int32_t send_size;
         s_net_snapshot_cache* cache;
@@ -1040,15 +1009,11 @@ namespace NETMOX {
     void __cdecl Send_Game_Orders_() {
         allocate::Push_Block_(MOX::_screen_seg);
         uint8_t* packet = reinterpret_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 350000));
+        NETPROTO::Packet_Writer_ writer(packet, 350000, "invalid game orders payload");
 
-        uint8_t* out = packet;
-        *reinterpret_cast<uint32_t*>(out) = MOX::_stardate;
-        out += sizeof(uint32_t);
-
-        *out++ = static_cast<uint8_t>(MOX::_PLAYER_NUM);
-
-        memcpy(out, &MOX::_player[MOX::_PLAYER_NUM], sizeof(s_player));
-        out += sizeof(s_player);
+        writer.Write_Uint32_(MOX::_stardate);
+        writer.Write_Uint8_(static_cast<uint8_t>(MOX::_PLAYER_NUM));
+        writer.Write_Bytes_(&MOX::_player[MOX::_PLAYER_NUM], sizeof(s_player));
 
         RUSS::Mox_Update_();
 
@@ -1081,66 +1046,52 @@ namespace NETMOX {
             }
         }
 
-        memcpy(out, star_orders, MOX::_NUM_STARS * sizeof(s_net_pack_star_order));
-        out += MOX::_NUM_STARS * sizeof(s_net_pack_star_order);
+        writer.Write_Bytes_(star_orders, MOX::_NUM_STARS * sizeof(s_net_pack_star_order));
 
         RUSS::Mox_Update_();
 
-        *reinterpret_cast<int16_t*>(out) = (int16_t)MOX::_NUM_COLONIES;
-        out += sizeof(int16_t);
+        writer.Write_Int16_((int16_t)MOX::_NUM_COLONIES);
 
         if (MOX::_NUM_COLONIES > 0) {
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
                 if (MOX::_colony[i].owner == MOX::_PLAYER_NUM) {
-                    *reinterpret_cast<int16_t*>(out) = i;
-                    out += sizeof(int16_t);
-                    memcpy(out, &MOX::_colony[i], sizeof(s_colony));
-                    out += sizeof(s_colony);
+                    writer.Write_Int16_(i);
+                    writer.Write_Bytes_(&MOX::_colony[i], sizeof(s_colony));
                 }
             }
         }
 
-        *reinterpret_cast<int16_t*>(out) = -1;
-        out += sizeof(int16_t);
-
-        int16_t* p_num_ships = reinterpret_cast<int16_t*>(out);
-        out += sizeof(int16_t);
+        writer.Write_Int16_(-1);
 
         RUSS::Mox_Update_();
 
-        *p_num_ships = (int16_t)MOX::_NUM_SHIPS;
+        writer.Write_Int16_((int16_t)MOX::_NUM_SHIPS);
 
         if (MOX::_NUM_SHIPS > 0) {
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
                 if (MOX::_ship[i].owner == MOX::_PLAYER_NUM && MOX::_ship[i].status != 5) {
-                    *reinterpret_cast<int16_t*>(out) = i;
-                    out += sizeof(int16_t);
-                    memcpy(out, &MOX::_ship[i], sizeof(s_ship_data));
-                    out += sizeof(s_ship_data);
+                    writer.Write_Int16_(i);
+                    writer.Write_Bytes_(&MOX::_ship[i], sizeof(s_ship_data));
                 }
             }
         }
 
-        *reinterpret_cast<int16_t*>(out) = -1;
-        out += sizeof(int16_t);
+        writer.Write_Int16_(-1);
 
         RUSS::Mox_Update_();
 
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM) {
-                *reinterpret_cast<int16_t*>(out) = i;
-                out += sizeof(int16_t);
-                memcpy(out, &MOX::_leaders[i], sizeof(s_leader_data));
-                out += sizeof(s_leader_data);
+                writer.Write_Int16_(i);
+                writer.Write_Bytes_(&MOX::_leaders[i], sizeof(s_leader_data));
             }
         }
 
-        *reinterpret_cast<int16_t*>(out) = -1;
-        out += sizeof(int16_t);
+        writer.Write_Int16_(-1);
 
         RUSS::Mox_Update_();
 
-        int32_t packet_size = (int32_t)(out - packet);
+        int32_t packet_size = (int32_t)writer.Length_();
         _net.sync_state = NET_SYNC_STATE_COMBAT_READY;
         _net.combat_attacker_id = -1;
         NETMOX::Mox_Send_Message_(_net.local_net_id, NET_PACKET_GAME_ORDERS_PAYLOAD, packet, (uint32_t)packet_size);
@@ -2123,103 +2074,83 @@ namespace NETMOX {
         allocate::Push_Block_(MOX::_screen_seg);
         uint32_t alloc_size = include_remote_state ? k_medium_network_payload_bytes : sizeof(int16_t) * 4;
         uint8_t* packet = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
-        uint8_t* local_4 = packet;
+        NETPROTO::Packet_Writer_ writer(packet, alloc_size, "invalid combat payload");
 
-        *reinterpret_cast<int16_t*>(local_4) = player_num;
-        local_4 += 2;
-        *reinterpret_cast<int16_t*>(local_4) = player_id;
-        local_4 += 2;
-        *reinterpret_cast<int16_t*>(local_4) = target_player_id;
-        local_4 += 2;
-        *reinterpret_cast<int16_t*>(local_4) = combat_result;
-        local_4 += 2;
+        writer.Write_Int16_(player_num);
+        writer.Write_Int16_(player_id);
+        writer.Write_Int16_(target_player_id);
+        writer.Write_Int16_(combat_result);
 
         if (include_remote_state) {
+            writer.Write_Int16_(star_id);
 
-            *reinterpret_cast<int16_t*>(local_4) = star_id;
-            local_4 += 2;
+            writer.Require_(k_star_player_presence_payload_bytes);
+            uint8_t* star_presence_start = writer.Ptr_();
+            uint8_t* star_presence_ptr = star_presence_start;
+            COMBFIND::Send_Star_Player_Presence_(&star_presence_ptr, -1);
+            writer.Skip_(star_presence_ptr - star_presence_start);
 
-            COMBFIND::Send_Star_Player_Presence_(&local_4, -1);
-
-            *reinterpret_cast<int16_t*>(local_4) = combat_defender_id;
-            local_4 += 2;
-            *reinterpret_cast<int16_t*>(local_4) = combat_planet_id;
-            local_4 += 2;
+            writer.Write_Int16_(combat_defender_id);
+            writer.Write_Int16_(combat_planet_id);
 
             RUSS::Mox_Update_();
 
             if (player_id < MAX_PLAYERS) {
-                memcpy(local_4, MOX::_player[player_id].tech_applications, sizeof(MOX::_player[player_id].tech_applications));
-                local_4 += sizeof(MOX::_player[player_id].tech_applications);
-                *local_4 = MOX::_star[star_id].officer_index[player_id];
-                local_4++;
+                writer.Write_Bytes_(MOX::_player[player_id].tech_applications, sizeof(MOX::_player[player_id].tech_applications));
+                writer.Write_Uint8_((uint8_t)MOX::_star[star_id].officer_index[player_id]);
             }
 
             if (target_player_id < MAX_PLAYERS) {
-                memcpy(local_4, MOX::_player[target_player_id].tech_applications, sizeof(MOX::_player[target_player_id].tech_applications));
-                local_4 += sizeof(MOX::_player[target_player_id].tech_applications);
-                *local_4 = MOX::_star[star_id].officer_index[target_player_id];
-                local_4++;
+                writer.Write_Bytes_(MOX::_player[target_player_id].tech_applications, sizeof(MOX::_player[target_player_id].tech_applications));
+                writer.Write_Uint8_((uint8_t)MOX::_star[star_id].officer_index[target_player_id]);
             }
 
             RUSS::Mox_Update_();
 
             for (int16_t i = 0; i < MAX_LEADERS; i++) {
                 if (MOX::_leaders[i].player_index == player_id || MOX::_leaders[i].player_index == target_player_id) {
-                    *reinterpret_cast<int16_t*>(local_4) = i;
-                    local_4 += 2;
-                    memcpy(local_4, &MOX::_leaders[i], sizeof(s_leader_data));
-                    local_4 += sizeof(s_leader_data);
+                    writer.Write_Int16_(i);
+                    writer.Write_Bytes_(&MOX::_leaders[i], sizeof(s_leader_data));
                 }
             }
 
-            *reinterpret_cast<int16_t*>(local_4) = -1;
-            local_4 += 2;
+            writer.Write_Int16_(-1);
 
             RUSS::Mox_Update_();
 
             if (combat_planet_id != -1) {
                 int16_t colony_idx = MOX::_planet[combat_planet_id].colony_index;
-                *reinterpret_cast<int16_t*>(local_4) = colony_idx;
-                local_4 += 2;
-                *local_4 = MOX::_planet[combat_planet_id].planet_type;
-                local_4++;
-                *local_4 = MOX::_planet[combat_planet_id].climate;
-                local_4++;
-                *reinterpret_cast<int16_t*>(local_4) = colony_idx;
-                local_4 += 2;
+                writer.Write_Int16_(colony_idx);
+                writer.Write_Int8_(MOX::_planet[combat_planet_id].planet_type);
+                writer.Write_Char_(MOX::_planet[combat_planet_id].climate);
+                writer.Write_Int16_(colony_idx);
 
                 if (colony_idx != -1) {
-                    memcpy(local_4, &MOX::_colony[colony_idx], sizeof(s_colony));
-                    local_4 += sizeof(s_colony);
+                    writer.Write_Bytes_(&MOX::_colony[colony_idx], sizeof(s_colony));
                 }
             }
 
             RUSS::Mox_Update_();
 
-            *reinterpret_cast<int16_t*>(local_4) = (int16_t)MOX::_NUM_SHIPS;
-            local_4 += 2;
+            writer.Write_Int16_((int16_t)MOX::_NUM_SHIPS);
 
             if (MOX::_NUM_SHIPS > 0) {
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; i++) {
                     if (MOX::_ship[i].location == star_id && MOX::_ship[i].status != 5) {
                         if (MOX::_ship[i].owner == player_id || MOX::_ship[i].owner == target_player_id) {
-                            *reinterpret_cast<int16_t*>(local_4) = i;
-                            local_4 += 2;
-                            memcpy(local_4, &MOX::_ship[i], sizeof(s_ship_data));
-                            local_4 += sizeof(s_ship_data);
+                            writer.Write_Int16_(i);
+                            writer.Write_Bytes_(&MOX::_ship[i], sizeof(s_ship_data));
                         }
                     }
                 }
             }
 
-            *reinterpret_cast<int16_t*>(local_4) = -1;
-            local_4 += 2;
+            writer.Write_Int16_(-1);
 
             RUSS::Mox_Update_();
         }
 
-        int32_t size = (int32_t)(local_4 - packet);
+        int32_t size = (int32_t)writer.Length_();
         NETMOX::Mox_Send_Message_(_net.local_net_id, NET_PACKET_BATTLE_RESULTS, packet, (uint32_t)size);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -2237,52 +2168,46 @@ namespace NETMOX {
         uint32_t alloc_size =
             (target_player_idx == MOX::_PLAYER_NUM) ? sizeof(s_packet_0x12) : k_medium_network_payload_bytes;
         uint8_t* packet = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
+        NETPROTO::Packet_Writer_ writer(packet, alloc_size, "invalid combat payload");
 
-        s_packet_0x12* hdr = reinterpret_cast<s_packet_0x12*>(packet);
-        hdr->star_idx = star_idx;
-        hdr->other_player_idx = other_player_idx;
-        hdr->param_3 = param_3;
-        hdr->colony_idx = colony_idx;
-
-        uint8_t* ptr = packet + sizeof(s_packet_0x12);
+        writer.Write_Int16_(star_idx);
+        writer.Write_Int16_(other_player_idx);
+        writer.Write_Int16_(param_3);
+        writer.Write_Int16_(colony_idx);
 
         if (MOX::_player[target_player_idx].network_player_id != _net.local_net_id) {
-            COMBFIND::Send_Star_Player_Presence_(&ptr, star_idx);
+            writer.Require_(k_star_player_presence_payload_bytes);
+            uint8_t* star_presence_start = writer.Ptr_();
+            uint8_t* star_presence_ptr = star_presence_start;
+            COMBFIND::Send_Star_Player_Presence_(&star_presence_ptr, star_idx);
+            writer.Skip_(star_presence_ptr - star_presence_start);
             RUSS::Mox_Update_();
 
             if (other_player_idx < MAX_PLAYERS) {
-                memcpy(ptr, MOX::_player[other_player_idx].tech_applications, sizeof(MOX::_player[other_player_idx].tech_applications));
-                ptr += sizeof(MOX::_player[other_player_idx].tech_applications);
+                writer.Write_Bytes_(MOX::_player[other_player_idx].tech_applications, sizeof(MOX::_player[other_player_idx].tech_applications));
             }
 
             if (target_player_idx < MAX_PLAYERS) {
-                memcpy(ptr, MOX::_player[target_player_idx].tech_applications, sizeof(MOX::_player[target_player_idx].tech_applications));
-                ptr += sizeof(MOX::_player[target_player_idx].tech_applications);
+                writer.Write_Bytes_(MOX::_player[target_player_idx].tech_applications, sizeof(MOX::_player[target_player_idx].tech_applications));
             }
 
             RUSS::Mox_Update_();
 
             for (int16_t i = 0; i < MAX_LEADERS; ++i) {
                 if (MOX::_leaders[i].player_index == other_player_idx || MOX::_leaders[i].player_index == target_player_idx) {
-                    *reinterpret_cast<int16_t*>(ptr) = i;
-                    ptr += sizeof(int16_t);
-
-                    memcpy(ptr, &MOX::_leaders[i], sizeof(s_leader_data));
-                    ptr += sizeof(s_leader_data);
+                    writer.Write_Int16_(i);
+                    writer.Write_Bytes_(&MOX::_leaders[i], sizeof(s_leader_data));
                 }
             }
 
-            *reinterpret_cast<int16_t*>(ptr) = -1;
-            ptr += sizeof(int16_t);
+            writer.Write_Int16_(-1);
 
             if (other_player_idx < MAX_PLAYERS) {
-                *ptr = MOX::_star[star_idx].officer_index[other_player_idx];
-                ptr++;
+                writer.Write_Uint8_((uint8_t)MOX::_star[star_idx].officer_index[other_player_idx]);
             }
 
             if (target_player_idx < MAX_PLAYERS) {
-                *ptr = MOX::_star[star_idx].officer_index[target_player_idx];
-                ptr++;
+                writer.Write_Uint8_((uint8_t)MOX::_star[star_idx].officer_index[target_player_idx]);
             }
 
             RUSS::Mox_Update_();
@@ -2290,48 +2215,35 @@ namespace NETMOX {
             if (colony_idx != -1) {
                 int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
-                *reinterpret_cast<int16_t*>(ptr) = (int16_t)MOX::_NUM_COLONIES;
-                ptr += sizeof(int16_t);
-                *reinterpret_cast<int16_t*>(ptr) = planet_idx;
-                ptr += sizeof(int16_t);
-                *reinterpret_cast<int16_t*>(ptr) = MOX::_planet[planet_idx].colony_index;
-                ptr += sizeof(int16_t);
-
-                *ptr = MOX::_planet[planet_idx].planet_type;
-                ptr++;
-                *ptr = MOX::_planet[planet_idx].climate;
-                ptr++;
-
-                memcpy(ptr, &MOX::_colony[colony_idx], sizeof(s_colony));
-                ptr += sizeof(s_colony);
+                writer.Write_Int16_((int16_t)MOX::_NUM_COLONIES);
+                writer.Write_Int16_(planet_idx);
+                writer.Write_Int16_(MOX::_planet[planet_idx].colony_index);
+                writer.Write_Int8_(MOX::_planet[planet_idx].planet_type);
+                writer.Write_Char_(MOX::_planet[planet_idx].climate);
+                writer.Write_Bytes_(&MOX::_colony[colony_idx], sizeof(s_colony));
             }
 
             RUSS::Mox_Update_();
 
-            *reinterpret_cast<int16_t*>(ptr) = (int16_t)MOX::_NUM_SHIPS;
-            ptr += sizeof(int16_t);
+            writer.Write_Int16_((int16_t)MOX::_NUM_SHIPS);
 
             if (MOX::_NUM_SHIPS > 0) {
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
                     if (MOX::_ship[i].location == star_idx && MOX::_ship[i].status != 5) {
                         if (MOX::_ship[i].owner == other_player_idx || MOX::_ship[i].owner == target_player_idx) {
-                            *reinterpret_cast<int16_t*>(ptr) = i;
-                            ptr += sizeof(int16_t);
-
-                            memcpy(ptr, &MOX::_ship[i], sizeof(s_ship_data));
-                            ptr += sizeof(s_ship_data);
+                            writer.Write_Int16_(i);
+                            writer.Write_Bytes_(&MOX::_ship[i], sizeof(s_ship_data));
                         }
                     }
                 }
             }
 
-            *reinterpret_cast<int16_t*>(ptr) = -1;
-            ptr += sizeof(int16_t);
+            writer.Write_Int16_(-1);
 
             RUSS::Mox_Update_();
         }
 
-        int32_t msg_len = (int32_t)(ptr - packet);
+        int32_t msg_len = (int32_t)writer.Length_();
         NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, NET_PACKET_YOU_ARE_TARGET_INFO, packet, (uint32_t)msg_len);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -2343,92 +2255,78 @@ namespace NETMOX {
         uint32_t alloc_size =
             (player_idx == MOX::_PLAYER_NUM) ? (sizeof(int16_t) + sizeof(s_combfind_target)) : k_medium_network_payload_bytes;
         uint8_t* packet = static_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size));
-        uint8_t* local_8 = packet;
+        NETPROTO::Packet_Writer_ writer(packet, alloc_size, "invalid combat payload");
 
-        *reinterpret_cast<int16_t*>(local_8) = star_idx;
-        local_8 += 2;
-
-        memcpy(local_8, target_info, sizeof(s_combfind_target));
-        local_8 += sizeof(s_combfind_target);
+        writer.Write_Int16_(star_idx);
+        writer.Write_Bytes_(target_info, sizeof(s_combfind_target));
 
         if (MOX::_player[player_idx].network_player_id != _net.local_net_id) {
-            COMBFIND::Send_Star_Player_Presence_(&local_8, star_idx);
+            writer.Require_(k_star_player_presence_payload_bytes);
+            uint8_t* star_presence_start = writer.Ptr_();
+            uint8_t* star_presence_ptr = star_presence_start;
+            COMBFIND::Send_Star_Player_Presence_(&star_presence_ptr, star_idx);
+            writer.Skip_(star_presence_ptr - star_presence_start);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                    memcpy(local_8, MOX::_player[i].tech_applications, sizeof(MOX::_player[i].tech_applications));
-                    local_8 += sizeof(MOX::_player[i].tech_applications);
+                    writer.Write_Bytes_(MOX::_player[i].tech_applications, sizeof(MOX::_player[i].tech_applications));
                 }
             }
 
             RUSS::Mox_Update_();
 
             for (int16_t i = 0; i < MAX_LEADERS; i++) {
-                *reinterpret_cast<int16_t*>(local_8) = i;
-                local_8 += 2;
-                memcpy(local_8, &MOX::_leaders[i], sizeof(s_leader_data));
-                local_8 += sizeof(s_leader_data);
+                writer.Write_Int16_(i);
+                writer.Write_Bytes_(&MOX::_leaders[i], sizeof(s_leader_data));
                 RUSS::Mox_Update_();
             }
 
-            *reinterpret_cast<int16_t*>(local_8) = -1;
-            local_8 += 2;
+            writer.Write_Int16_(-1);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                    *local_8 = MOX::_star[star_idx].officer_index[i];
-                    local_8++;
+                    writer.Write_Uint8_((uint8_t)MOX::_star[star_idx].officer_index[i]);
                 }
             }
 
             RUSS::Mox_Update_();
 
-            *reinterpret_cast<int16_t*>(local_8) = (int16_t)MOX::_NUM_COLONIES;
-            local_8 += 2;
+            writer.Write_Int16_((int16_t)MOX::_NUM_COLONIES);
 
             for (int i = 0; i < 5; i++) {
                 int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
                 if (planet_idx != -1) {
-                    *reinterpret_cast<int16_t*>(local_8) = MOX::_planet[planet_idx].colony_index;
-                    local_8 += 2;
-                    *local_8 = MOX::_planet[planet_idx].planet_type;
-                    local_8++;
-                    *local_8 = MOX::_planet[planet_idx].climate;
-                    local_8++;
-                    *reinterpret_cast<int16_t*>(local_8) = MOX::_planet[planet_idx].colony_index;
-                    local_8 += 2;
+                    writer.Write_Int16_(MOX::_planet[planet_idx].colony_index);
+                    writer.Write_Int8_(MOX::_planet[planet_idx].planet_type);
+                    writer.Write_Char_(MOX::_planet[planet_idx].climate);
+                    writer.Write_Int16_(MOX::_planet[planet_idx].colony_index);
 
                     if (MOX::_planet[planet_idx].colony_index != -1) {
-                        memcpy(local_8, &MOX::_colony[MOX::_planet[planet_idx].colony_index], sizeof(s_colony));
-                        local_8 += sizeof(s_colony);
+                        writer.Write_Bytes_(&MOX::_colony[MOX::_planet[planet_idx].colony_index], sizeof(s_colony));
                     }
                 }
             }
 
             RUSS::Mox_Update_();
 
-            *reinterpret_cast<int16_t*>(local_8) = (int16_t)MOX::_NUM_SHIPS;
-            local_8 += 2;
+            writer.Write_Int16_((int16_t)MOX::_NUM_SHIPS);
 
             if (MOX::_NUM_SHIPS > 0) {
                 for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; i++) {
                     if (MOX::_ship[i].location == star_idx && MOX::_ship[i].status != 5) {
-                        *reinterpret_cast<int16_t*>(local_8) = i;
-                        local_8 += 2;
-                        memcpy(local_8, &MOX::_ship[i], sizeof(s_ship_data));
-                        local_8 += sizeof(s_ship_data);
+                        writer.Write_Int16_(i);
+                        writer.Write_Bytes_(&MOX::_ship[i], sizeof(s_ship_data));
                         RUSS::Mox_Update_();
                     }
                 }
             }
 
-            *reinterpret_cast<int16_t*>(local_8) = -1;
-            local_8 += 2;
+            writer.Write_Int16_(-1);
         }
 
         RUSS::Mox_Update_();
 
-        int32_t diff = static_cast<int32_t>(local_8 - packet);
+        int32_t diff = static_cast<int32_t>(writer.Length_());
         NETMOX::Mox_Send_Message_(MOX::_player[player_idx].network_player_id, NET_PACKET_PICK_TARGET_INFO, packet, (uint32_t)diff);
 
         allocate::Pop_Block_(MOX::_screen_seg);

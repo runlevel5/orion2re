@@ -70,6 +70,10 @@ namespace NETPROTO {
         _ptr += size;
     }
 
+    uint32_t Packet_Reader_::Length_() const {
+        return static_cast<uint32_t>(_ptr - _start);
+    }
+
     uint8_t* Packet_Reader_::Ptr_() const {
         return _ptr;
     }
@@ -134,6 +138,10 @@ namespace NETPROTO {
         Require_(size);
         memcpy(_ptr, src, size);
         _ptr += size;
+    }
+
+    uint32_t Packet_Writer_::Length_() const {
+        return static_cast<uint32_t>(_ptr - _start);
     }
 
     uint8_t* Packet_Writer_::Ptr_() const {
