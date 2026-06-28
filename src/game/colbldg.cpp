@@ -173,7 +173,7 @@ namespace COLBLDG {
 
         s_player& current_player = MOX::_player[MOX::_PLAYER_NUM];
 
-        if (current_player.tech_applications[TECH_APP_FREIGHTERS] == 3) {
+        if (current_player.tech_applications[TECH_APP_FREIGHTERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             if (COLCALC::Colony_Can_Build_Product_(&colony, -15 /* Freighters */)) {
                 _military_indexes[_n_military_indexes++] = -15;
             }
@@ -182,15 +182,15 @@ namespace COLBLDG {
         s_player& owner_player = MOX::_player[colony.owner];
 
         if (owner_player.ship_range > 0 && owner_player.ship_speed != 0) {
-            if (owner_player.tech_applications[TECH_APP_COLONY_SHIP] == 3) {
+            if (owner_player.tech_applications[TECH_APP_COLONY_SHIP] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 _military_indexes[_n_military_indexes++] = -12;
             }
 
-            if (owner_player.tech_applications[TECH_APP_OUTPOST_SHIP] == 3) {
+            if (owner_player.tech_applications[TECH_APP_OUTPOST_SHIP] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 _military_indexes[_n_military_indexes++] = -17;
             }
 
-            if (owner_player.tech_applications[TECH_APP_TRANSPORT] == 3 &&
+            if (owner_player.tech_applications[TECH_APP_TRANSPORT] == TECH_RESEARCH_STATUS_RESEARCHED &&
                 colony.buildings[BUILDING_MARINE_BARRACKS] != 0) {
                 _military_indexes[_n_military_indexes++] = -11;
             }
@@ -210,7 +210,7 @@ namespace COLBLDG {
                         can_build = true;
                     } else if (current_player.ship_designs[i].size != SHIP_SIZE_TITAN) {
                         can_build = true;
-                    } else if (owner_player.tech_applications[TECH_APP_TITAN_CONSTRUCTION] == 3) {
+                    } else if (owner_player.tech_applications[TECH_APP_TITAN_CONSTRUCTION] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         can_build = true;
                     }
 
@@ -220,7 +220,7 @@ namespace COLBLDG {
                 }
             }
 
-            if (owner_player.tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] == 3 &&
+            if (owner_player.tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] == TECH_RESEARCH_STATUS_RESEARCHED &&
                 MOX::_settings.strategic_combat_flag != 0) {
                 _military_indexes[_n_military_indexes++] = -16;
             }
@@ -2009,10 +2009,10 @@ namespace COLBLDG {
             } else {
                 int8_t size = MOX::_player[MOX::_PLAYER_NUM].ship_designs[-50 - product_id].size;
                 int16_t owner = MOX::_colony[COLONY::_colony_handle].owner;
-                if (size == SHIP_SIZE_TITAN && MOX::_player[owner].tech_applications[TECH_APP_TITAN_CONSTRUCTION] != 3) {
+                if (size == SHIP_SIZE_TITAN && MOX::_player[owner].tech_applications[TECH_APP_TITAN_CONSTRUCTION] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(0x246));
                     COLBLDG::Do_Draw_Build_Queue_();
-                } else if (size == SHIP_SIZE_DOOM_STAR && MOX::_player[owner].tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] != 3) {
+                } else if (size == SHIP_SIZE_DOOM_STAR && MOX::_player[owner].tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(0x245));
                     COLBLDG::Do_Draw_Build_Queue_();
                 } else {

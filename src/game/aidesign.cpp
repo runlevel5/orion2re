@@ -207,7 +207,7 @@ namespace aidesign {
         int16_t spec1_mods[40];
 
         for (int16_t i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
-            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM && MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
+            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM && MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 weapon_id[weapon_count] = i;
                 spec1_mods[weapon_count] = 0;
                 spec2_mods[weapon_count] = 0;
@@ -552,7 +552,7 @@ namespace aidesign {
             if (list[i].type == 0) {
                 int16_t tech_app_id = TECHDATA::_specials[item_id].tech_app_id;
 
-                if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
+                if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     if (Special_Legal_For_Design_(design, item_id)) {
                         // Check if player has Stealth trait, if so skip Stealth Field device
                         if (MOX::_player[player_idx].traits[TRAIT_STEALTHY_SHIPS] == 0 || item_id != SPECIAL_STEALTH_FIELD) {
@@ -580,7 +580,7 @@ namespace aidesign {
                     }
 
                     int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_app_id;
-                    if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == 3 /* LEARNED */ && !already_has_fighter_bay) {
+                    if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED && !already_has_fighter_bay) {
                         int32_t weapon_unit_space = DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
                         int16_t max_count = (int16_t)(space_available / weapon_unit_space);
 
@@ -720,7 +720,7 @@ namespace aidesign {
         int16_t result = 0;
 
         auto get_default_class = [&]() -> int16_t {
-            return (player->tech_applications[TECH_APP_LASER_CANNON] == 3) ? 0 : 3;
+            return (player->tech_applications[TECH_APP_LASER_CANNON] == TECH_RESEARCH_STATUS_RESEARCHED) ? 0 : 3;
         };
 
         auto get_fighters_fallback = [&]() -> int16_t {
@@ -887,7 +887,7 @@ namespace aidesign {
             auto& app = TECHDATA::_technology_applications[i];
 
             if (app.ai_group == tech_type) {
-                if (MOX::_player[player_idx].tech_applications[i] == 3) {
+                if (MOX::_player[player_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t field_id = app.tech_field_id;
                     uint8_t field_group = TECHDATA::_technology_fields[field_id].ai_group;
 
@@ -954,11 +954,11 @@ namespace aidesign {
     int16_t __cdecl Special_Weapons_Available_(int16_t player_idx) {
         auto& player = MOX::_player[player_idx];
 
-        if (player.tech_applications[TECH_APP_GYRO_DESTABILIZER] == 3 ||
-            player.tech_applications[TECH_APP_ENERGY_ABSORBER] == 3 ||
-            player.tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == 3 ||
-            player.tech_applications[TECH_APP_STELLAR_CONVERTER] == 3 ||
-            player.tech_applications[TECH_APP_PLASMA_WEB] == 3) {
+        if (player.tech_applications[TECH_APP_GYRO_DESTABILIZER] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player.tech_applications[TECH_APP_ENERGY_ABSORBER] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player.tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player.tech_applications[TECH_APP_STELLAR_CONVERTER] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player.tech_applications[TECH_APP_PLASMA_WEB] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 1;
         }
 
@@ -977,7 +977,7 @@ namespace aidesign {
                 tech_app_id = (int16_t)TECHDATA::_weapons[id].tech_app_id;
             }
 
-            if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return 1;
             }
         }
@@ -988,9 +988,9 @@ namespace aidesign {
     int16_t __cdecl Fighters_Available_(int16_t player_idx) {
         const auto& player = MOX::_player[player_idx];
 
-        if (player.tech_applications[TECH_APP_FIGHTER_BAYS] == 3 ||
-            player.tech_applications[TECH_APP_BOMBER_BAYS] == 3 ||
-            player.tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == 3) {
+        if (player.tech_applications[TECH_APP_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player.tech_applications[TECH_APP_BOMBER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player.tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 1;
         }
 
@@ -1003,7 +1003,7 @@ namespace aidesign {
         int16_t total_fighters = 0;
         int16_t total_space_used = 0;
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             space_per_weapon = DESIGN::Weapon_Space_(player_idx, WEAPON_HEAVY_FIGHTER, 1, 0x10, 1, 0);
             if (available_space / space_per_weapon > 0) {
                 weapon_type = WEAPON_HEAVY_FIGHTER;
@@ -1011,7 +1011,7 @@ namespace aidesign {
             }
         }
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_BOMBER_BAYS] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_BOMBER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             space_per_weapon = DESIGN::Weapon_Space_(player_idx, WEAPON_BOMBER, 1, 0x10, 1, 0);
             if (available_space / space_per_weapon > 0) {
                 weapon_type = WEAPON_BOMBER;
@@ -1078,7 +1078,7 @@ namespace aidesign {
         for (int i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
             if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BOMB && (TECHDATA::_weapons[i].natural_mods & WEAPON_MOD_FLAG_AUTO_FIRE) == 0) {
                 int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
-                if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+                if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     candidates[num_candidates] = i;
                     int16_t field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
                     scores[num_candidates] = TECHDATA::_technology_fields[field_id].ai_group;
@@ -1207,7 +1207,7 @@ namespace aidesign {
             uint8_t type = TECHDATA::_weapons[i].type;
             if (type == WEAPON_TYPE_MISSILE || type == WEAPON_TYPE_TORPEDO) {
                 uint16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
-                if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+                if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     weapon_indices[count] = i;
                     weapon_mods[count] = 0;
                     int16_t tech_field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
@@ -1276,7 +1276,7 @@ namespace aidesign {
                         weapon_mods[i] += WEAPON_MOD_FLAG_ENVELOPING | WEAPON_MOD_FLAG_MIRV;
                     }
 
-                    if (MOX::_player[player_idx].tech_applications[TECH_APP_EMISSIONS_GUIDANCE_SYSTEM] == 3) {
+                    if (MOX::_player[player_idx].tech_applications[TECH_APP_EMISSIONS_GUIDANCE_SYSTEM] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         if (mini_level >= 2) {
                             weapon_mods[i] += WEAPON_MOD_FLAG_EMISSION_GUIDANCE;
                         }
@@ -1420,13 +1420,13 @@ namespace aidesign {
 
         ship_class = Get_Ship_Class_(player_idx);
 
-        if (hull_idx == SHIP_SIZE_DOOM_STAR && (player->tech_applications[TECH_APP_STELLAR_CONVERTER] == 3)) {
+        if (hull_idx == SHIP_SIZE_DOOM_STAR && (player->tech_applications[TECH_APP_STELLAR_CONVERTER] == TECH_RESEARCH_STATUS_RESEARCHED)) {
             if (game_random::Random_(4) < 4) {
                 ship_class = 6;
             }
         }
 
-        if (player->tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == 3 && hull_idx > SHIP_SIZE_HUGE) {
+        if (player->tech_applications[TECH_APP_BLACK_HOLE_GENERATOR] == TECH_RESEARCH_STATUS_RESEARCHED && hull_idx > SHIP_SIZE_HUGE) {
             if (game_random::Random_(4) < 4) {
                 ship_class = 6;
             }
@@ -1458,7 +1458,7 @@ namespace aidesign {
 
         remaining_space = TECHDATA::_hull_data[hull_idx].size;
 
-        if (player->tech_applications[TECH_APP_BATTLE_PODS] == 3) {
+        if (player->tech_applications[TECH_APP_BATTLE_PODS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             remaining_space += remaining_space / 2;
             struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_BATTLE_PODS);
         }
@@ -1623,7 +1623,7 @@ namespace aidesign {
                 break;
 
             case 7:
-                if (player->tech_applications[TECH_APP_EXTENDED_FUEL_TANKS] == 3) {
+                if (player->tech_applications[TECH_APP_EXTENDED_FUEL_TANKS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
                     int8_t cat = DESIGN::Miniaturization_Category_(TECH_APP_EXTENDED_FUEL_TANKS);
                     int16_t m_level = DESIGN::Miniaturization_Level_(player_idx, TECH_APP_EXTENDED_FUEL_TANKS);

@@ -884,10 +884,10 @@ namespace CMBTFIRE {
             if (MOX::_combat_data->shield_type != 0x17) {
                 s_player* defender = &MOX::_player[MOX::_combat_defender_player];
 
-                if (defender->tech_applications[TECH_APP_MICROBIOTICS] == 3) {
+                if (defender->tech_applications[TECH_APP_MICROBIOTICS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     *damage = *damage / 2;
                 }
-                else if (defender->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == 3) {
+                else if (defender->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
                 }
 

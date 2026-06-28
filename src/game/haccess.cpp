@@ -592,7 +592,7 @@ namespace HACCESS {
     }
 
     bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx) {
-        return MOX::_player[player_idx].tech_applications[tech_idx] == 3;
+        return MOX::_player[player_idx].tech_applications[tech_idx] == TECH_RESEARCH_STATUS_RESEARCHED;
     }
 
     int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_idx) {

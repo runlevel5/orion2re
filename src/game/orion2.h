@@ -551,6 +551,12 @@ enum {
     COLONY_JOB_RACIAL_BONUS_COUNT = 10,
 };
 
+typedef enum TECH_RESEARCH_STATUS {
+    TECH_RESEARCH_STATUS_UNAVAILABLE = 0,
+    TECH_RESEARCH_STATUS_AVAILABLE = 1,
+    TECH_RESEARCH_STATUS_RESEARCHED = 3,
+} TECH_RESEARCH_STATUS;
+
 struct s_colony_job_production {
     int32_t base_prod;
     int16_t racial_bonuses[COLONY_JOB_RACIAL_BONUS_COUNT];

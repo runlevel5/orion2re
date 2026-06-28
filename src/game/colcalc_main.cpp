@@ -33,7 +33,7 @@ namespace COLCALC {
             }
 
             if (colony->buildings[BUILDING_HOLO_SIMULATOR]) holo_simulator_bonus = 4;
-            if (player->tech_applications[TECH_APP_VIRTUAL_REALITY_NETWORK] == 3) vr_network_bonus = 4;
+            if (player->tech_applications[TECH_APP_VIRTUAL_REALITY_NETWORK] == TECH_RESEARCH_STATUS_RESEARCHED) vr_network_bonus = 4;
             if (colony->buildings[BUILDING_PLEASURE_DOME]) pleasure_dome_bonus = 6;
 
             int8_t owner_trait0 = MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT];
@@ -48,7 +48,7 @@ namespace COLCALC {
                 if (!has_capitol) no_capital_penalty = _non_capital_morale_lookup[owner_gov];
             }
 
-            if (gov_type < 2 && player->tech_applications[TECH_APP_PSIONICS] == 3) psychophysics_bonus = 2;
+            if (gov_type < 2 && player->tech_applications[TECH_APP_PSIONICS] == TECH_RESEARCH_STATUS_RESEARCHED) psychophysics_bonus = 2;
 
             if (colony->buildings[BUILDING_MARINE_BARRACKS]) {
                 marine_barracks_bonus = _barracks_morale_lookup[govt];
@@ -438,10 +438,10 @@ namespace COLCALC {
                 int growth_modifier = MOX::_player[i].traits[TRAIT_POP_GROWTH_BONUS] + 100;
                 s_player* owner_ptr = &MOX::_player[static_cast<uint8_t>(colony->owner)];
 
-                if (owner_ptr->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == 3) {
+                if (owner_ptr->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     growth_modifier += 50;
                 }
-                else if (owner_ptr->tech_applications[TECH_APP_MICROBIOTICS] == 3) {
+                else if (owner_ptr->tech_applications[TECH_APP_MICROBIOTICS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     growth_modifier += 25;
                 }
 
@@ -694,7 +694,7 @@ namespace COLCALC {
     }
 
     void __cdecl Player_Gets_Tech_App_(s_player* plr, int16_t tech_app_id) {
-        plr->tech_applications[tech_app_id] = 3;
+        plr->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_RESEARCHED;
         plr->got_new_app = 1;
 
         switch (tech_app_id) {
@@ -962,15 +962,15 @@ namespace COLCALC {
 
         int32_t comm_tech_idx = -1;
         int32_t comm_tech_bonus_per_base = 0;
-        if (plr->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == 3) {
+        if (plr->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             comm_tech_idx = TECH_APP_HYPERSPACE_COMMUNICATIONS;
             comm_tech_bonus_per_base = 3;
         }
-        else if (plr->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
+        else if (plr->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             comm_tech_idx = TECH_APP_SUB_SPACE_COMMUNICATIONS;
             comm_tech_bonus_per_base = 2;
         }
-        else if (plr->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
+        else if (plr->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             comm_tech_idx = TECH_APP_TACHYON_COMMUNICATIONS;
             comm_tech_bonus_per_base = 1;
         }
@@ -1182,7 +1182,7 @@ namespace COLCALC {
 
         int income_base = taxes_collected + special_planet_bc;
 
-        if (MOX::_player[owner_idx].tech_applications[TECH_APP_GALACTIC_CURRENCY_EXCHANGE] == 3) {
+        if (MOX::_player[owner_idx].tech_applications[TECH_APP_GALACTIC_CURRENCY_EXCHANGE] == TECH_RESEARCH_STATUS_RESEARCHED) {
             galactic_currency_bc = income_base / 2;
         }
 
@@ -1556,7 +1556,7 @@ namespace COLCALC {
             int32_t base_pollution = static_cast<int32_t>(static_cast<int16_t>(base_worker_prod)) + bonus_robotic_factory;
             int32_t reduction_size = _industry_planet_size_lookup[MOX::_planet[colony->planet].size];
 
-            if (MOX::_player[colony->owner].tech_applications[TECH_APP_NANO_DISASSEMBLERS] == 3) {
+            if (MOX::_player[colony->owner].tech_applications[TECH_APP_NANO_DISASSEMBLERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 reduction_size *= 2;
             }
 
@@ -1847,7 +1847,7 @@ namespace COLCALC {
             if (player_idx < MAX_PLAYERS) {
                 trait_bonus = (int16_t)MOX::_player[idx].traits[TRAIT_RESEARCH_BONUS];
 
-                if (colony->owner == (int8_t)player_idx && MOX::_player[idx].tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == 3) {
+                if (colony->owner == (int8_t)player_idx && MOX::_player[idx].tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     intelligence_bonus = 1;
                 }
             }

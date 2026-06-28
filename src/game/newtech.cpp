@@ -22,7 +22,7 @@ namespace newtech {
 
                 for (int app_idx = 0; app_idx < 75; ++app_idx) {
                     if (TECHDATA::_technology_applications[app_idx].ai_group == target_ai_group) {
-                        if (player->tech_applications[app_idx] == 3) {
+                        if (player->tech_applications[app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             int16_t field_id = TECHDATA::_technology_applications[app_idx].tech_field_id;
                             uint8_t field_ai_group = TECHDATA::_technology_fields[field_id].ai_group;
 
@@ -58,7 +58,7 @@ namespace newtech {
 
         for (int i = 0; i < 75; ++i) {
             if (TECHDATA::_technology_applications[i].ai_group == target_ai_group) {
-                if (MOX::_player[player_idx].tech_applications[i] == 3) {
+                if (MOX::_player[player_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
                     uint8_t field_ai_group = TECHDATA::_technology_fields[tech_field_id].ai_group;
 
@@ -77,7 +77,7 @@ namespace newtech {
             return 0;
         }
 
-        if (MOX::_player[player_idx].tech_applications[tech_app_idx] == 3) {
+        if (MOX::_player[player_idx].tech_applications[tech_app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 0;
         }
 
@@ -243,7 +243,7 @@ namespace newtech {
             int last_known_field_ai_group = 0;
             for (int i = 0; i < TECH_APP_BIOLOGY; ++i) {
                 if (TECHDATA::_technology_applications[i].ai_group == ai_group &&
-                    MOX::_player[player_idx].tech_applications[i] == 3) {
+                    MOX::_player[player_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     last_known_field_ai_group = TECHDATA::_technology_fields[TECHDATA::_technology_applications[i].tech_field_id].ai_group;
                 }
             }
@@ -316,7 +316,7 @@ namespace newtech {
                 if (found) break;
                 if (i == tech_app_idx) continue;
                 if (TECHDATA::_technology_applications[i].tech_field_id == tech_field_id) {
-                    if (MOX::_player[player_idx].tech_applications[i] != 3) {
+                    if (MOX::_player[player_idx].tech_applications[i] != TECH_RESEARCH_STATUS_RESEARCHED) {
                         found = true;
                     }
                 }
@@ -390,7 +390,7 @@ namespace newtech {
         Set_Competition_Tech_Values_(player_idx);
 
         for (int32_t i = 1; i < tech_choice_count; ++i) {
-            if (player->tech_applications[i] == 1 &&
+            if (player->tech_applications[i] == TECH_RESEARCH_STATUS_AVAILABLE &&
                 (MOX::_settings.strategic_combat_flag == 0 || TECHDATA::_technology_applications[i].in_strategic != 0)) {
 
                 int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;

@@ -282,7 +282,7 @@ namespace AIBUILD {
         }
 
         AIBUILD::_player_n_transports[player_idx][1] = 0;
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_TRANSPORT] == 3 && AIBUILD::_player_ship_sizes[player_idx].weighted_ship_size > 1) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_TRANSPORT] == TECH_RESEARCH_STATUS_RESEARCHED && AIBUILD::_player_ship_sizes[player_idx].weighted_ship_size > 1) {
             int32_t colony_limit = ((*AIDATA::_ai_player_info)[player_idx].colony_count + 2) / 3;
             int32_t transport_avg = (max_transports + 1 + total_transports / total_contacts) / 2;
             
@@ -554,15 +554,15 @@ namespace AIBUILD {
         int8_t gravity = planet->gravity_class;
         
         bool is_industrial_focus = false;
-        if (colony->buildings[BUILDING_AUTOMATED_FACTORY] == 0 && player->tech_applications[TECH_APP_AUTOMATED_FACTORIES] == 3 && planet->mineral_class <= 2) {
+        if (colony->buildings[BUILDING_AUTOMATED_FACTORY] == 0 && player->tech_applications[TECH_APP_AUTOMATED_FACTORIES] == TECH_RESEARCH_STATUS_RESEARCHED && planet->mineral_class <= 2) {
             is_industrial_focus = true;
         }
 
         bool is_military_focus = false;
         int8_t ground_trait = player->traits[0 /* TRAIT_GROUND_COMBAT */] / 2;
         if (ground_trait >= 0 && ground_trait <= 1) {
-            if ((colony->buildings[BUILDING_MARINE_BARRACKS] == 0 && player->tech_applications[TECH_APP_MARINE_BARRACKS] == 3) ||
-                (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0 && player->tech_applications[TECH_APP_ARMOR_BARRACKS] == 3)) {
+            if ((colony->buildings[BUILDING_MARINE_BARRACKS] == 0 && player->tech_applications[TECH_APP_MARINE_BARRACKS] == TECH_RESEARCH_STATUS_RESEARCHED) ||
+                (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0 && player->tech_applications[TECH_APP_ARMOR_BARRACKS] == TECH_RESEARCH_STATUS_RESEARCHED)) {
                 is_military_focus = true;
             }
         }

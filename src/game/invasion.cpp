@@ -23,14 +23,14 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
 
     s_player* player = &MOX::_player[player_idx];
 
-    if (player->tech_applications[TECH_APP_ANTI_GRAV_HARNESS] == 3) {
+    if (player->tech_applications[TECH_APP_ANTI_GRAV_HARNESS] == TECH_RESEARCH_STATUS_RESEARCHED) {
         bonuses->antigrav_bonus = 10;
     }
-    if (player->tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+    if (player->tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
         bonuses->battleoids_bonus = 10;
         bonuses->has_battleoids = 1;
     }
-    if (player->tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
+    if (player->tech_applications[TECH_APP_POWERED_ARMOR] == TECH_RESEARCH_STATUS_RESEARCHED) {
         bonuses->powered_armor_bonus = 10;
         bonuses->has_powered_armor = 1;
     }
@@ -564,7 +564,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
             memset(weights, 0, sizeof(weights));
             for (int32_t i = 0; i < 204; ++i) {
-                if (MOX::_player[old_owner_idx].tech_applications[i] == 3) {
+                if (MOX::_player[old_owner_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[new_owner_idx], i)) {
                         weights[i] = 1;
                     }

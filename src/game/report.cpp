@@ -512,7 +512,7 @@ namespace REPORT {
 
         // Check if player has researched Evolutionary Mutation (Tech App 62) 
         // and hasn't picked the upgrade yet.
-        if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3 &&
+        if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == TECH_RESEARCH_STATUS_RESEARCHED &&
             plr->picked_evolutionary_upgrade == 0) {
             
             result = 1;

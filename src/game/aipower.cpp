@@ -548,11 +548,11 @@ namespace AIPOWER {
         int16_t pd_count = 10;
         s_player* player = &MOX::_player[player_idx];
 
-        if (player->tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == 3) {
+        if (player->tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             pd_count = 0;
             bomber_modifier = 0;
             bomber_count = 4;
-        } else if (player->tech_applications[TECH_APP_BOMBER_BAYS] == 3) {
+        } else if (player->tech_applications[TECH_APP_BOMBER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             pd_count = 0;
             bomber_modifier = 6;
         }

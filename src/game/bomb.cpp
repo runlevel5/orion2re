@@ -156,7 +156,7 @@ namespace BOMB {
             hit_idx -= target_building_count;
             if (hit_idx < (int32_t)colony->military[0]) {
                 int32_t needed_strength = 1;
-                if (owner_player->tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
+                if (owner_player->tech_applications[TECH_APP_POWERED_ARMOR] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     needed_strength = 2;
                 }
                 if (owner_player->traits[TRAIT_HEAVY_G_WORLD] != 0) {
@@ -176,7 +176,7 @@ namespace BOMB {
             hit_idx -= (int32_t)colony->military[0];
             if (hit_idx < (int32_t)colony->military[1]) {
                 int32_t needed_strength = 2;
-                if (owner_player->tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+                if (owner_player->tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     needed_strength = 3;
                 }
                 if (owner_player->traits[TRAIT_HEAVY_G_WORLD] != 0) {

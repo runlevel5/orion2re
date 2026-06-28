@@ -78,7 +78,7 @@ namespace CMBTMIS {
         int16_t owner_player = MOX::_combat_data[missile.source_unit_idx].owner;
 
         if (TECHDATA::_weapons[missile.type].type == WEAPON_TYPE_FIGHTER || 
-            (owner_player < MAX_PLAYERS && MOX::_player[owner_player].tech_applications[TECH_APP_DAUNTLESS_GUIDANCE_SYSTEM] == 3)) {
+            (owner_player < MAX_PLAYERS && MOX::_player[owner_player].tech_applications[TECH_APP_DAUNTLESS_GUIDANCE_SYSTEM] == TECH_RESEARCH_STATUS_RESEARCHED)) {
             
             int16_t min_range = 30000;
             int16_t target_player = MOX::_combat_attacker_player;
@@ -327,11 +327,11 @@ namespace CMBTMIS {
             }
 
             if (owner < MAX_PLAYERS) {
-                if (MOX::_player[owner].tech_applications[TECH_APP_SENSORS] == 3) {
+                if (MOX::_player[owner].tech_applications[TECH_APP_SENSORS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     evade -= 70;
-                } else if (MOX::_player[owner].tech_applications[TECH_APP_NEUTRON_SCANNER] == 3) {
+                } else if (MOX::_player[owner].tech_applications[TECH_APP_NEUTRON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     evade -= 40;
-                } else if (MOX::_player[owner].tech_applications[TECH_APP_TACHYON_SCANNER] == 3) {
+                } else if (MOX::_player[owner].tech_applications[TECH_APP_TACHYON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     evade -= 20;
                 }
             } else {

@@ -1613,10 +1613,10 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         int16_t weapon_id_fg = WEAPON_INTERCEPTOR;
         int16_t count_fg = 5;
 
-        if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == 3) {
+        if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             weapon_id_fg = WEAPON_HEAVY_FIGHTER;
             count_fg = 2;
-        } else if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[TECH_APP_BOMBER_BAYS] == 3) {
+        } else if (MOX::_player[MOX::_colony[colony_idx].owner].tech_applications[TECH_APP_BOMBER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             weapon_id_fg = WEAPON_BOMBER;
             count_fg = 3;
         }
@@ -1688,7 +1688,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     if (weapon_index > 0) {
-        if (MOX::_player[MOX::_combat_defender_player].tech_applications[TECH_APP_BATTLE_SCANNER] == 3) {
+        if (MOX::_player[MOX::_combat_defender_player].tech_applications[TECH_APP_BATTLE_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             struct_::Set_Bit_Field_(MOX::_combat_data->special_device_flags, SPECIAL_BATTLE_SCANNER);
         }
     }
@@ -1723,7 +1723,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
             (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp) / 100);
 
         int16_t size = TECHDATA::_hull_data[HULL_STAR_BASE].size;
-        if (MOX::_player[defender].tech_applications[89] == 3) {
+        if (MOX::_player[defender].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             size = (size * 5) / 4;
         }
         int16_t half_size = size / 2;
@@ -1737,7 +1737,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
             (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp) / 100);
 
         int16_t size = TECHDATA::_hull_data[HULL_BATTLESTATION].size;
-        if (MOX::_player[defender].tech_applications[89] == 3) {
+        if (MOX::_player[defender].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             size = (size * 5) / 4;
         }
         int16_t half_size = size / 2;
@@ -1751,7 +1751,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
             (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp) / 100);
 
         int16_t size = TECHDATA::_hull_data[HULL_STAR_FORTRESS].size;
-        if (MOX::_player[defender].tech_applications[89] == 3) {
+        if (MOX::_player[defender].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             size = (size * 5) / 4;
         }
         int16_t half_size = size / 2;
@@ -1773,66 +1773,66 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     }
 
     int bit_count = 0;
-    if (MOX::_player[defender].tech_applications[TECH_APP_HEAVY_ARMOR] == 3) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_HEAVY_ARMOR] == TECH_RESEARCH_STATUS_RESEARCHED) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_HEAVY_ARMOR);
         MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining *= 3;
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_REINFORCED_HULL] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_REINFORCED_HULL] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_REINFORCED_HULL);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_SHIELD_CAPACITORS] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_SHIELD_CAPACITORS] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_SHIELD_CAPACITOR);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_HARD_SHIELDS] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_HARD_SHIELDS] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_HARD_SHIELDS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_MULTI_PHASED_SHIELDS] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_MULTI_PHASED_SHIELDS] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_MULTI_PHASED_SHIELDS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_WIDE_AREA_JAMMER] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_WIDE_AREA_JAMMER] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_WIDE_AREA_JAMMER);
         bit_count++;
-    } else if (MOX::_player[defender].tech_applications[TECH_APP_MULTI_WAVE_ECM_JAMMER] == 3 && bit_count < 8) {
+    } else if (MOX::_player[defender].tech_applications[TECH_APP_MULTI_WAVE_ECM_JAMMER] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_MULTI_WAVE_ECM_JAMMER);
         bit_count++;
-    } else if (MOX::_player[defender].tech_applications[TECH_APP_ECM_JAMMER] == 3 && bit_count < 8) {
+    } else if (MOX::_player[defender].tech_applications[TECH_APP_ECM_JAMMER] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_ECM_JAMMER);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_WARP_DISSIPATER] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_WARP_DISSIPATER] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_WARP_DISSIPATOR);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_SECURITY_STATIONS] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_SECURITY_STATIONS] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_SECURITY_STATIONS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_BATTLE_SCANNER] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_BATTLE_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_BATTLE_SCANNER);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_HIGH_ENERGY_FOCUS] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_HIGH_ENERGY_FOCUS] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_HIGH_ENERGY_FOCUS);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_STRUCTURAL_ANALYZER] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_STRUCTURAL_ANALYZER] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_STRUCTURAL_ANALYZER);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_ACHILLES_TARGETING_UNIT] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_ACHILLES_TARGETING_UNIT] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_ACHILLES_TARGETING_UNIT);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_RANGEMASTER_UNIT] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_RANGEMASTER_UNIT] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_RANGEMASTER_UNIT);
         bit_count++;
     }
-    if (MOX::_player[defender].tech_applications[TECH_APP_TRANSPORTERS] == 3 && bit_count < 8) {
+    if (MOX::_player[defender].tech_applications[TECH_APP_TRANSPORTERS] == TECH_RESEARCH_STATUS_RESEARCHED && bit_count < 8) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, SPECIAL_TRANSPORTERS);
         bit_count++;
     }
@@ -2590,7 +2590,7 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
                 if (MOX::_leaders[officer_idx].eta > 0) {
                     OFFICER::Move_Officer_To_Pool_(officer_idx);
                 } else {
-                    if (MOX::_player[ship->owner].tech_applications[TECH_APP_SURVIVAL_PODS] == 3) {
+                    if (MOX::_player[ship->owner].tech_applications[TECH_APP_SURVIVAL_PODS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         leaders[leader_count] = officer_idx;
                         leader_count++;
                         MOX::_ship[ship->ship_idx].officer_index = -1;
@@ -2602,7 +2602,7 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         } else {
             if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_AUTOMATED_REPAIR_UNIT) == 1 ||
                 CMBTFIR2::Get_Fleet_Engineer_Bonus_(ship->owner) > 0 ||
-                (ship->owner < MAX_PLAYERS && (MOX::_player[ship->owner].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] == 3 ||
+                (ship->owner < MAX_PLAYERS && (MOX::_player[ship->owner].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] == TECH_RESEARCH_STATUS_RESEARCHED ||
                                      MOX::_player[ship->owner].traits[TRAIT_CYBERNETIC] != 0))) {
                 
                 CMBTFIR2::Clear_Internal_Space_(ship);

@@ -117,13 +117,13 @@ namespace SHIPSTAK {
         const int16_t player_num = (int16_t)MOX::_PLAYER_NUM;
         int16_t scan_range = 2;
 
-        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_TACHYON_SCANNER] == 3) {
+        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_TACHYON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             scan_range = 4;
         }
-        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_NEUTRON_SCANNER] == 3) {
+        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_NEUTRON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             scan_range = 6;
         }
-        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_SENSORS] == 3) {
+        if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_SENSORS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             scan_range = 9;
         }
 

@@ -170,7 +170,7 @@ namespace diplomac {
         int16_t personality_idx = Get_Player_Diplomacy_Personality_(player_idx, target_idx);
         score += diplomac::_personality_sneak_attack_modifiers[personality_idx];
 
-        if (MOX::_player[target_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) score += 5;
+        if (MOX::_player[target_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) score += 5;
         if (MOX::_player[target_idx].traits[TRAIT_CHARISMATIC] == 1) score += 10;
 
         score = (score + COLCALC::Best_Leader_Diplomat_Bonus_(target_idx) - MOX::_settings.game_difficulty) + 15;
@@ -2521,7 +2521,7 @@ namespace diplomac {
                 // Loop through known technologies to find highest AI group value
                 for (int i = 0; i < 204; ++i) {
                     // If player A has learned this application
-                    if (MOX::_player[plr_a].tech_applications[i] == 3) {
+                    if (MOX::_player[plr_a].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         int16_t field_id = TECHDATA::_technology_applications[i].tech_field_id;
                         uint8_t ai_group = TECHDATA::_technology_fields[field_id].ai_group;
                         if (ai_group > max_ai_group) {
@@ -2758,14 +2758,14 @@ namespace diplomac {
             uint32_t player_max_ai_group = 1;
 
             for (int i = 0; i < 204; ++i) {
-                if (MOX::_player[player_idx].tech_applications[i] == 3) {
+                if (MOX::_player[player_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
                     uint8_t ai_group = TECHDATA::_technology_fields[tech_field_id].ai_group;
                     if (target_max_ai_group < ai_group) {
                         target_max_ai_group = ai_group;
                     }
                 }
-                if (MOX::_player[target_idx].tech_applications[i] == 3) {
+                if (MOX::_player[target_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
                     uint8_t ai_group = TECHDATA::_technology_fields[tech_field_id].ai_group;
                     if (player_max_ai_group < ai_group) {
@@ -3322,7 +3322,7 @@ namespace diplomac {
             score += 25;
         }
 
-        if (MOX::_player[proposer_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
+        if (MOX::_player[proposer_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) {
             score += 30;
         }
 

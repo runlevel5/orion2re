@@ -229,7 +229,7 @@ namespace COLCALC {
                     max_design_idx = starting_ship_points;
                     if (max_design_idx >= 4) {
                         max_design_idx = 4;
-                        if (player->tech_applications[TECH_APP_TITAN_CONSTRUCTION] != 3) {
+                        if (player->tech_applications[TECH_APP_TITAN_CONSTRUCTION] != TECH_RESEARCH_STATUS_RESEARCHED) {
                             max_design_idx = 3;
                         }
                     }
@@ -321,10 +321,10 @@ namespace COLCALC {
                 colony->buildings[BUILDING_BATTLESTATION] != 0 ||
                 colony->buildings[BUILDING_STAR_FORTRESS] != 0) {
 
-                if (MOX::_player[owner].tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
+                if (MOX::_player[owner].tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     star->has_tachyon |= owner_bit;
                 }
-                if (MOX::_player[owner].tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
+                if (MOX::_player[owner].tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     star->has_subspace |= owner_bit;
                 }
             }
@@ -337,11 +337,11 @@ namespace COLCALC {
                 star->has_dimensional_portal |= owner_bit;
             }
 
-            if (MOX::_player[owner].tech_applications[TECH_APP_JUMP_GATE] == 3) {
+            if (MOX::_player[owner].tech_applications[TECH_APP_JUMP_GATE] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 star->has_jumpgate |= owner_bit;
             }
 
-            if (MOX::_player[owner].tech_applications[TECH_APP_STAR_GATE] == 3) {
+            if (MOX::_player[owner].tech_applications[TECH_APP_STAR_GATE] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 star->has_stargate |= owner_bit;
             }
         }
@@ -546,7 +546,6 @@ namespace COLCALC {
     }
 
     int16_t __cdecl Colony_Food2_Per_Farmer_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
-        // TECH_APP_BIOMORPHIC_FUNGI maps to tech_applications[29].
         int16_t food_total = (int16_t)MOX::_planet[colony->planet].food_per_farmer * 2;
 
         if (out != nullptr) {
@@ -554,8 +553,7 @@ namespace COLCALC {
         }
 
         if (food_total == 0) {
-            // Check if player has Biomorphic Fungi (level 3)
-            if (MOX::_player[player_idx].tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 food_total = 2;
                 if (out != nullptr) {
                     out->tech_apps[TECH_APP_BIOMORPHIC_FUNGI] = 2;
@@ -622,7 +620,7 @@ namespace COLCALC {
             }
         }
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_MICROLITE_CONSTRUCTION] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_MICROLITE_CONSTRUCTION] == TECH_RESEARCH_STATUS_RESEARCHED) {
             industry += 1;
             if (out != nullptr) {
                 out->tech_apps[TECH_APP_MICROLITE_CONSTRUCTION] = 1;
@@ -797,7 +795,7 @@ namespace COLCALC {
 
         int16_t pop_limit = Size_And_Climate_Race_Pop_Limit_(planet->size, (int)planet->climate, player_idx);
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == TECH_RESEARCH_STATUS_RESEARCHED) {
             pop_limit += 5;
         }
 
@@ -887,7 +885,7 @@ namespace COLCALC {
         );
 
         // Tech bonus: Advanced City Planning
-        if (MOX::_player[colony->owner].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == 3) {
+        if (MOX::_player[colony->owner].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == TECH_RESEARCH_STATUS_RESEARCHED) {
             pop_limit += 5;
         }
 
@@ -1191,7 +1189,7 @@ namespace COLCALC {
     }
 
     bool __cdecl Player_May_Get_Tech_App_(s_player* plr, int tech_app) {
-        if (plr->tech_applications[tech_app] == 3) {
+        if (plr->tech_applications[tech_app] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return false;
         }
 
@@ -1507,11 +1505,11 @@ namespace COLCALC {
             int tech_id = (int)(int16_t)techs[i];
 
             if (tech_id > 0) {
-                if (player->tech_applications[tech_id] == 1) {
+                if (player->tech_applications[tech_id] == TECH_RESEARCH_STATUS_AVAILABLE) {
                     // Player already owns a tech in this field
                     owned_count++;
                 }
-                else if (player->tech_applications[tech_id] == 0) {
+                else if (player->tech_applications[tech_id] == TECH_RESEARCH_STATUS_UNAVAILABLE) {
                     // Candidate selection logic
                     bool is_valid = true;
 
@@ -1545,7 +1543,7 @@ namespace COLCALC {
 
         // If no tech is owned in this field and we found valid candidates, unlock the picked one
         if (owned_count == 0 && candidates_count > 0) {
-            player->tech_applications[selected_tech_id] = 1;
+            player->tech_applications[selected_tech_id] = TECH_RESEARCH_STATUS_AVAILABLE;
         }
     }
 
@@ -1567,7 +1565,7 @@ namespace COLCALC {
             int16_t* techs_in_field = TECHDATA::_technology_fields[field_idx].tech;
             for (int i = 0; i < 4; ++i) {
                 int16_t tech_id = techs_in_field[i];
-                if (tech_id > 0 && player_tech_applications[tech_id] == 1) {
+                if (tech_id > 0 && player_tech_applications[tech_id] == TECH_RESEARCH_STATUS_AVAILABLE) {
                     techs_known++;
                 }
             }
@@ -1621,7 +1619,7 @@ namespace COLCALC {
 
         int16_t food_val = static_cast<int16_t>(planet->food_per_farmer) * 2;
 
-        if (food_val == 0 && plr->tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == 3) {
+        if (food_val == 0 && plr->tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == TECH_RESEARCH_STATUS_RESEARCHED) {
             food_val = 2;
         }
 
@@ -1658,7 +1656,7 @@ namespace COLCALC {
 
         results->industry = static_cast<int16_t>(_minerals_per_mine[planet->mineral_class]);
 
-        if (plr->tech_applications[TECH_APP_MICROLITE_CONSTRUCTION] == 3) {
+        if (plr->tech_applications[TECH_APP_MICROLITE_CONSTRUCTION] == TECH_RESEARCH_STATUS_RESEARCHED) {
             results->industry += 1;
         }
 
@@ -1669,7 +1667,7 @@ namespace COLCALC {
         }
 
         results->research = 3 + static_cast<int16_t>(plr->traits[TRAIT_RESEARCH_BONUS]);
-        if (plr->tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == 3) {
+        if (plr->tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == TECH_RESEARCH_STATUS_RESEARCHED) {
             results->research += 1;
         }
 
@@ -1889,7 +1887,7 @@ namespace COLCALC {
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
         for (int i = 0; i < 83; ++i) {
-            if (surrender_plr->tech_applications[i] == 3 /* TECH_OWNED */) {
+            if (surrender_plr->tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (Player_May_Get_Tech_App_(receiver_plr, (int16_t)i)) {
                     Player_Gets_Tech_App_(receiver_plr, (int16_t)i);
                 }
@@ -2449,8 +2447,7 @@ namespace COLCALC {
                 int16_t* techs = TECHDATA::_technology_fields[field_id].tech;
                 for (int i = 0; i < 4; ++i) {
                     int16_t tech_id = techs[i];
-                    // tech_applications[id] == 1 usually means it was just researched but not yet applied
-                    if (tech_id > 0 && player->tech_applications[tech_id] == 1) {
+                    if (tech_id > 0 && player->tech_applications[tech_id] == TECH_RESEARCH_STATUS_AVAILABLE) {
                         Player_Gets_Tech_App_(player, (int16_t)tech_id);
                     }
                 }
@@ -2567,7 +2564,7 @@ namespace COLCALC {
                 int16_t tech_id = techs[j];
                 if (tech_id > 0) {
                     divisor++;
-                    if (player->tech_applications[tech_id] == 3) {
+                    if (player->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         numerator++;
                     }
                 }
@@ -2809,7 +2806,7 @@ namespace COLCALC {
         uint8_t owner = colony->owner;
 
         if (product > 0 && product < BUILDING_COUNT) {
-            if (MOX::_player[owner].tech_applications[TECHDATA::_buildings[product].tech_app] == 3 &&
+            if (MOX::_player[owner].tech_applications[TECHDATA::_buildings[product].tech_app] == TECH_RESEARCH_STATUS_RESEARCHED &&
                 colony->buildings[product] == 0) {
                 
                 switch (product) {
@@ -2959,24 +2956,24 @@ namespace COLCALC {
                         if (ship_design->size < 2) return 1;
                         if (COLCALC::Colony_Can_Build_Large_Ships_(colony)) {
                             if (ship_design->size == 4) {
-                                if (MOX::_player[owner].tech_applications[TECH_APP_TITAN_CONSTRUCTION] == 3) return 1;
+                                if (MOX::_player[owner].tech_applications[TECH_APP_TITAN_CONSTRUCTION] == TECH_RESEARCH_STATUS_RESEARCHED) return 1;
                                 return 0;
                             }
                             if (ship_design->size == 5) {
-                                if (MOX::_player[owner].tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] == 3) return 1;
+                                if (MOX::_player[owner].tech_applications[TECH_APP_DOOM_STAR_CONSTRUCTION] == TECH_RESEARCH_STATUS_RESEARCHED) return 1;
                                 return 0;
                             }
                             return 1;
                         }
                         return 0;
                     case SHIP_TYPE_COLONY:
-                        if (MOX::_player[owner].tech_applications[TECH_APP_COLONY_SHIP] == 3) return 1;
+                        if (MOX::_player[owner].tech_applications[TECH_APP_COLONY_SHIP] == TECH_RESEARCH_STATUS_RESEARCHED) return 1;
                         return 0;
                     case SHIP_TYPE_TRANSPORT:
-                        if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0 && MOX::_player[owner].tech_applications[TECH_APP_TRANSPORT] == 3) return 1;
+                        if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0 && MOX::_player[owner].tech_applications[TECH_APP_TRANSPORT] == TECH_RESEARCH_STATUS_RESEARCHED) return 1;
                         return 0;
                     case SHIP_TYPE_OUTPOST:
-                        if (MOX::_player[owner].tech_applications[TECH_APP_OUTPOST_SHIP] == 3) return 1;
+                        if (MOX::_player[owner].tech_applications[TECH_APP_OUTPOST_SHIP] == TECH_RESEARCH_STATUS_RESEARCHED) return 1;
                         return 0;
                     default:
                         return 0;
@@ -2990,20 +2987,20 @@ namespace COLCALC {
                     case -1:
                         return 1;
                     case -15:
-                        if (MOX::_player[owner].tech_applications[TECH_APP_FREIGHTERS] == 3) return 1;
+                        if (MOX::_player[owner].tech_applications[TECH_APP_FREIGHTERS] == TECH_RESEARCH_STATUS_RESEARCHED) return 1;
                         return 0;
                     case -6:
-                        if (MOX::_player[owner].tech_applications[TECH_APP_ANDROID_SCIENTISTS] == 3) {
+                        if (MOX::_player[owner].tech_applications[TECH_APP_ANDROID_SCIENTISTS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             return (COLCALC::Room_For_Another_Dude_(colony, 8) == 1) ? 1 : 2;
                         }
                         return 0;
                     case -5:
-                        if (MOX::_player[owner].tech_applications[TECH_APP_ANDROID_WORKERS] == 3) {
+                        if (MOX::_player[owner].tech_applications[TECH_APP_ANDROID_WORKERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             return (COLCALC::Room_For_Another_Dude_(colony, 8) == 1) ? 1 : 2;
                         }
                         return 0;
                     case -4:
-                        if (MOX::_player[owner].tech_applications[TECH_APP_ANDROID_FARMERS] == 3) {
+                        if (MOX::_player[owner].tech_applications[TECH_APP_ANDROID_FARMERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             return (COLCALC::Room_For_Another_Dude_(colony, 8) == 1) ? 1 : 2;
                         }
                         return 0;

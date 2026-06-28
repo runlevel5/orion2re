@@ -112,20 +112,20 @@ namespace SHIPMOVE {
 
     /**
      * Updates the movement range of the player's ships based on their researched fuel tech tiers.
-     * Iterates backwards through fuel tiers 5 down to 1, checking if the required tech is level 3.
+     * Iterates backwards through fuel tiers 5 down to 1, checking if the required tech is researched.
      */
     void __cdecl Update_Player_Ship_Range_(s_player* player) {
         for (int i = FUEL_COUNT - 1; i > FUEL_NO_FUEL_CELLS; --i) {
             int16_t tech_idx = TECHDATA::_fuel[i].tech_app_id;
 
-            // Check if the tech application for this fuel tier is fully researched (level 3)
-            if (player->tech_applications[tech_idx] == 3) {
+            // Check if the tech application for this fuel tier is fully researched
+            if (player->tech_applications[tech_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 player->ship_range = TECHDATA::_fuel[i].ship_range;
                 return;
             }
         }
 
-        // If no fuel upgrades (tiers 1-5) are researched to level 3, range is set to 0.
+        // If no fuel upgrades (tiers 1-5) are researched, range is set to 0.
         player->ship_range = 0;
     }
 
@@ -277,13 +277,13 @@ namespace SHIPMOVE {
         s_player* player = &MOX::_player[owner];
 
         // Check for Hyperspace Communications
-        if (player->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == 3) {
+        if (player->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return true;
         }
 
         // Check if player has simpler comms tech and is near a relay
-        if (player->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3 ||
-            player->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
+        if (player->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED ||
+            player->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
 
             uint8_t player_mask = (uint8_t)((uint32_t)1 << ((uint8_t)ship->owner & 0x1F));
 
@@ -979,7 +979,7 @@ namespace SHIPMOVE {
                 if (leader->eta > 0) {
                     msg.u.hyperspace_beast.leader_status = 1;
                 } else {
-                    if (MOX::_player[(uint8_t)selected_ship->owner].tech_applications[TECH_APP_SURVIVAL_PODS] == 3) {
+                    if (MOX::_player[(uint8_t)selected_ship->owner].tech_applications[TECH_APP_SURVIVAL_PODS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         s_ship_data* replacement_ship = nullptr;
                         bool found_similar = false;
 

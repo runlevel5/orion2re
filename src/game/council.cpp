@@ -747,7 +747,7 @@ namespace council {
             }
 
             /* Apply the relevant diplomacy tech modifier. */
-            if (MOX::_player[candidate_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
+            if (MOX::_player[candidate_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 vote_score += 30;
             }
 

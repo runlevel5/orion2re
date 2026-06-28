@@ -1308,14 +1308,14 @@ namespace COLONY {
         }
 
         if (animation_type == 0) {
-            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_POWERED_ARMOR] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return COLONY::Military_Anims_(2, frame);
             }
             return COLONY::Military_Anims_(1, frame);
         }
 
         if (animation_type == 1) {
-            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return COLONY::Military_Anims_(4, frame);
             }
             return COLONY::Military_Anims_(3, frame);
@@ -2293,12 +2293,12 @@ namespace COLONY {
     char* __cdecl Player_Troop_Name_(int16_t player_idx, int16_t troop_type, int16_t race) {
         switch (troop_type) {
             case 0:
-                if (MOX::_player[player_idx].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_BATTLEOIDS] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     return ESTRINGS::E_Strings_(0x1F8);
                 }
                 return ESTRINGS::E_Strings_(0xC3);
             case 1:
-                if (MOX::_player[player_idx].tech_applications[TECH_APP_POWERED_ARMOR] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_POWERED_ARMOR] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     return ESTRINGS::E_Strings_(0x14D);
                 }
                 return ESTRINGS::E_Strings_(0x1AC);
@@ -2314,12 +2314,12 @@ namespace COLONY {
     s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_idx, int16_t anim_type, int16_t frame) {
         switch (anim_type) {
             case 0:
-                if (MOX::_player[player_idx].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_BATTLEOIDS] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     return Military_Anims_(3, frame);
                 }
                 return Military_Anims_(4, frame);
             case 1:
-                if (MOX::_player[player_idx].tech_applications[TECH_APP_POWERED_ARMOR] != 3) {
+                if (MOX::_player[player_idx].tech_applications[TECH_APP_POWERED_ARMOR] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     return Military_Anims_(1, frame);
                 }
                 return Military_Anims_(2, frame);

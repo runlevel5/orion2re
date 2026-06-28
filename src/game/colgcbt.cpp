@@ -138,7 +138,7 @@ namespace COLGCBT {
         _anims[39] = _anims[29];
         _anims[36] = _anims[26];
 
-        if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+        if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             _anims[23] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 15, MOX::_screen_seg);
             _anims[20] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 16, MOX::_screen_seg);
             _anims[22] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLGCBT_LBX, 17, MOX::_screen_seg);
@@ -579,12 +579,12 @@ namespace COLGCBT {
                 if (unit->anim_frame % 2 == 0) {
                     modify_x = true;
                 } else {
-                    if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
+                    if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != TECH_RESEARCH_STATUS_RESEARCHED) {
                         modify_x = true;
                     }
                 }
             } else if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     if (unit->anim_frame % 2 == 0 && unit->anim_frame > 1) {
                         modify_x = true;
                     }
@@ -592,7 +592,7 @@ namespace COLGCBT {
                     modify_x = true;
                 }
             } else {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != TECH_RESEARCH_STATUS_RESEARCHED) {
                     modify_x = true;
                 }
             }
@@ -1064,7 +1064,7 @@ namespace COLGCBT {
 
         if (unit->side == 0) {
             if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[24] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     *x_offset = width - 9;
                     *y_offset = 13;
                 } else {
@@ -1077,7 +1077,7 @@ namespace COLGCBT {
             }
         } else if (unit->side == 1) {
             if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[24] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     *x_offset = 9;
                     *y_offset = 13;
                 } else {
@@ -1190,7 +1190,7 @@ namespace COLGCBT {
             y_step_frames[unit->anim_frame] == 1;
 
         if (unit->state == 4) {
-            if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != 3 && unit->anim_frame % 3 == 2) ||
+            if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] != TECH_RESEARCH_STATUS_RESEARCHED && unit->anim_frame % 3 == 2) ||
                 uses_y_step) {
                 unit->y += unit->y_offset;
             }
@@ -1287,7 +1287,7 @@ namespace COLGCBT {
 
         if (unit->side == 0) {
             if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     *out_x = width - 15;
                     *out_y = 14;
                 } else {
@@ -1300,7 +1300,7 @@ namespace COLGCBT {
             }
         } else if (unit->side == 1) {
             if (unit->type == 0) {
-                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[TECH_APP_BATTLEOIDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     *out_x = 15;
                     *out_y = 14;
                 } else if (unit->state == 5) {

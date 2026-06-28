@@ -390,7 +390,7 @@ namespace AIMOVE {
     }
 
     void __cdecl Delete_Already_Assigned_Planets_(s_ai_colonizable_planet* colonizable_planets, int16_t* num_planets) {
-        if (_p_ai->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] != 3) {
+        if (_p_ai->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] != TECH_RESEARCH_STATUS_RESEARCHED) {
             for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
                 s_ship_data* ship = &MOX::_ship[i];
 

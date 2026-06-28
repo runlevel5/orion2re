@@ -442,7 +442,7 @@ namespace KEN {
             (*app_count)++;
         }
 
-        if (MOX::_player[player_idx].tech_applications[shield_app_id] != 3) {
+        if (MOX::_player[player_idx].tech_applications[shield_app_id] != TECH_RESEARCH_STATUS_RESEARCHED) {
             app_array[*app_count] = shield_app_id;
             (*app_count)++;
         }

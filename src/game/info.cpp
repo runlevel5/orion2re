@@ -1520,7 +1520,7 @@ namespace INFO {
                 app_idx = 0;
             } else {
                 // If the player has researched the technology application, add it to the item's application list
-                if (MOX::_cur_plyr_ptr->tech_applications[ach->id] == 3 /* Researched */) {
+                if (MOX::_cur_plyr_ptr->tech_applications[ach->id] == TECH_RESEARCH_STATUS_RESEARCHED /* Researched */) {
                     item->tech_app_ids[app_idx] = ach->id;
                     item->tech_app_status[app_idx] = MOX::_cur_plyr_ptr->tech_applications[ach->id];
                     app_idx++;

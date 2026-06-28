@@ -380,7 +380,7 @@ namespace SCIENCE {
             const int16_t* field_tech_ids = TECHDATA::_technology_fields[research_field].tech;
             for (uint16_t tech_slot = 0; tech_slot < 4; ++tech_slot) {
                 const int16_t tech_id = field_tech_ids[tech_slot];
-                if (tech_id > TECH_APP_NO_TECH && MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
+                if (tech_id > TECH_APP_NO_TECH && MOX::_cur_plyr_ptr->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     researched_tech_ids[researched_tech_count++] = tech_id;
                 }
             }

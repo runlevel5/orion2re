@@ -259,7 +259,7 @@ namespace raceopt {
         Convert_Player_To_Flags_EM_(MOX::_player[player_idx].traits);
         Calculate_Picks_();
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == TECH_RESEARCH_STATUS_RESEARCHED) {
             _picks += 4;
         }
 

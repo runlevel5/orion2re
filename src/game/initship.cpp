@@ -112,7 +112,7 @@ namespace INITSHIP {
         for (int16_t i = 0; i < FUEL_COUNT; ++i) {
             // Check if player has researched this fuel technology (application value 3)
             // and if it provides a better range than the current best.
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (TECHDATA::_fuel[i].ship_range > best_range) {
                     best_range = TECHDATA::_fuel[i].ship_range;
                     best_fuel_idx = i;
@@ -147,7 +147,7 @@ namespace INITSHIP {
         for (int16_t i = DRIVE_NUCLEAR_DRIVE; i < DRIVE_COUNT; ++i) {
             int16_t app_idx = TECHDATA::_drives[i].tech_app_id;
             // Status 3 indicates that the technology has been researched
-            if (MOX::_player[player_idx].tech_applications[app_idx] == 3) {
+            if (MOX::_player[player_idx].tech_applications[app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 best_warp_index = i;
             }
         }
@@ -264,7 +264,7 @@ namespace INITSHIP {
             int16_t tech_id = TECHDATA::_armor[i].tech_app_id;
 
             // 3 indicates the tech application is fully researched/available
-            if (MOX::_player[player_idx].tech_applications[tech_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 best_armor_idx = i;
             }
         }
@@ -280,7 +280,7 @@ namespace INITSHIP {
         int16_t best_computer_idx = COMPUTER_NO_COMPUTER;
 
         for (int16_t i = COMPUTER_ELECTRONIC_COMPUTER; i < COMPUTER_COUNT; ++i) {
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 best_computer_idx = i;
             }
         }
@@ -293,7 +293,7 @@ namespace INITSHIP {
 
         if (player_idx < MAX_PLAYERS) {
             for (int16_t i = SHIELD_CLASS_I_SHIELD; i < SHIELD_COUNT; ++i) {
-                if (MOX::_player[player_idx].tech_applications[TECHDATA::_shields[i].tech_app_id] == 3) {
+                if (MOX::_player[player_idx].tech_applications[TECHDATA::_shields[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     best_shield_idx = i;
                 }
             }
@@ -313,8 +313,7 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Shield_Special_(int16_t player_idx) {
         if (player_idx < MAX_PLAYERS) {
-            // Check if player has Hard Shields tech application researched (level 3)
-            if (MOX::_player[player_idx].tech_applications[TECH_APP_HARD_SHIELDS] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECH_APP_HARD_SHIELDS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return SPECIAL_HARD_SHIELDS;
             }
         }
@@ -964,9 +963,8 @@ namespace INITSHIP {
 
         // Iterate through known beam weapons (0-39)
         for (int16_t i = 0; i < 40; ++i) {
-            // Check if player has researched/learned this weapon (level 3)
-            // and ensure it is a beam weapon.
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3 &&
+            // Check if player has researched this weapon and ensure it is a beam weapon.
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
                 TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM) {
 
                 // Track weapon with highest damage
@@ -987,7 +985,7 @@ namespace INITSHIP {
         if (player_idx < MAX_PLAYERS) {
             for (int16_t i = 0; i < 40; ++i) {
                 // check if player has researched the weapon (value 3 usually means fully researched/available)
-                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
+                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     if (TECHDATA::_weapons[i].type == WEAPON_TYPE_MISSILE || TECHDATA::_weapons[i].type == WEAPON_TYPE_TORPEDO) {
                         if (max_damage < TECHDATA::_weapons[i].max_damage) {
                             best_idx = i;
@@ -1028,7 +1026,7 @@ namespace INITSHIP {
             for (int16_t i = 0; i < 40; ++i) {
                 const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
-                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 /* TECH_STATE_RESEARCHED */ &&
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
                     (weapon.available_mods & 0x4 /* WPN_SPECIAL_POINT_DEFENSE */) != 0 &&
                     weapon.type == WEAPON_TYPE_BEAM)
                 {
@@ -1086,7 +1084,7 @@ namespace INITSHIP {
         if (player_idx < MAX_PLAYERS) {
             for (int i = 0; i < 40; ++i) {
                 const auto& weapon = TECHDATA::_weapons[i];
-                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
                     weapon.type == WEAPON_TYPE_MISSILE &&
                     weapon.max_damage > max_damage) {
                     best_weapon_idx = (int16_t)i;
@@ -1137,8 +1135,7 @@ namespace INITSHIP {
             s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
             s_player& player = MOX::_player[player_idx];
 
-            // Check if player knows the weapon technology (3 = TECH_STATE_KNOWN)
-            if (player.tech_applications[weapon.tech_app_id] == 3) {
+            if (player.tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (weapon.type == WEAPON_TYPE_SPECIAL || weapon.type == WEAPON_TYPE_FIGHTER) {
                     if ((uint8_t)weapon.strat_max_damage > max_priority) {
                         best_weapon = i;
@@ -1264,7 +1261,7 @@ namespace INITSHIP {
 
         if (player_idx < MAX_PLAYERS) {
             // Check for Megafluxers tech application
-            if (MOX::_player[player_idx].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 weapon_count = (int16_t)((weapon_count * 3) / 2);
             }
         }
@@ -1282,7 +1279,7 @@ namespace INITSHIP {
         for (int16_t i = 0; i < 40 /* 0x28 */; ++i) {
             const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
-            if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+            if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
                 weapon.type == WEAPON_TYPE_BOMB &&
                 weapon.max_damage > max_damage)
             {
@@ -1302,8 +1299,7 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
         for (int16_t i = 0; i < 40; ++i) {
             int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
 
-            // Check if the player has researched the weapon to full application (level 3)
-            if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if ((TECHDATA::_weapons[i].available_mods & 0x4) && (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM)) {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
                     
@@ -1345,7 +1341,7 @@ int16_t __cdecl Best_Beam_To_Hit_Special_(int16_t player_idx) {
 
             // Check if the player has researched the tech associated with this special device
             // 3 usually corresponds to the application being learned/available
-            if (MOX::_player[player_idx].tech_applications[spec.tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[spec.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 // Check if special belongs to the correct category (1 = beam accuracy)
                 if (spec.category == 1) {
                     if (spec.strategic > max_bonus) {
@@ -1369,7 +1365,7 @@ int16_t __cdecl Best_Beam_Damage_Special_(int16_t player_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
             // Check if player has fully researched the tech for this special device
-            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 // Check if the device is categorized as a beam damage special (2 or 7)
                 if (special.category == 2 || special.category == 7) {
                     if (max_bonus < special.strategic) {
@@ -1393,7 +1389,7 @@ int16_t __cdecl Best_Beam_Defense_Special_(int16_t player_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
             // Check if the player has researched the technology for this special device
-            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 // Category 3 and 6 represent beam defense enhancements
                 if (special.category == 3 || special.category == 6) {
                     if (special.strategic > max_bonus) {
@@ -1424,7 +1420,7 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
 
             // Check if the player has researched the tech application associated with this special
             // Value 3 typically indicates the tech application is known/learned.
-            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 // Category 4 and 6 represent missile defense systems (e.g., Jammer, Lightning Field)
                 if (special.category == 4 || special.category == 6) {
                     if (special.strategic > best_bonus) {
@@ -2431,7 +2427,7 @@ int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
             const int16_t tech_app_id =
                 static_cast<int16_t>(TECHDATA::_specials[special_idx].tech_app_id);
 
-            if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 const int8_t category = TECHDATA::_specials[special_idx].category;
 
                 if ((category == 5 || category == 7) &&

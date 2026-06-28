@@ -219,18 +219,18 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
 
     if (tech_field_id != TECH_FIELD_ADVANCED_GOVERNMENTS) {
       if (tech_field_id == TECH_FIELD_STARTING_TECH) {
-        player->tech_applications[tech_app_id] = 3;
+        player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_RESEARCHED;
       } else if ((player->traits[TRAIT_UNCREATIVE] == 0 || tech_field_id == -1 ||
                   TECHDATA::_technology_fields[tech_field_id].cost == 0x32 ||
                   tech_field_id == 0x17) &&
                  TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id)) {
-        player->tech_applications[tech_app_id] = 1;
+        player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_AVAILABLE;
       } else {
-        player->tech_applications[tech_app_id] = 0;
+        player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_UNAVAILABLE;
       }
 
       if (tech_app_id == 0x34 && MOX::_settings.xenons_exist == 0) {
-        player->tech_applications[tech_app_id] = 0;
+        player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_UNAVAILABLE;
       }
     }
   }
@@ -242,28 +242,28 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
       break;
     }
 
-    player->tech_applications[tech_app_id] = 0;
+    player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_UNAVAILABLE;
   }
 
   switch (player->traits[TRAIT_CURRENT_GOVERNMENT]) {
   case 0:
-    player->tech_applications[TECH_APP_CONFEDERATION] = 1;
+    player->tech_applications[TECH_APP_CONFEDERATION] = TECH_RESEARCH_STATUS_AVAILABLE;
     break;
   case 2:
-    player->tech_applications[TECH_APP_IMPERIUM] = 1;
+    player->tech_applications[TECH_APP_IMPERIUM] = TECH_RESEARCH_STATUS_AVAILABLE;
     break;
   case 4:
-    player->tech_applications[TECH_APP_FEDERATION] = 1;
+    player->tech_applications[TECH_APP_FEDERATION] = TECH_RESEARCH_STATUS_AVAILABLE;
     break;
   case 6:
-    player->tech_applications[TECH_APP_GALACTIC_UNIFICATION] = 1;
-    player->tech_applications[TECH_APP_HOLO_SIMULATOR] = 0;
-    player->tech_applications[TECH_APP_PLEASURE_DOME] = 0;
-    player->tech_applications[TECH_APP_VIRTUAL_REALITY_NETWORK] = 0;
+    player->tech_applications[TECH_APP_GALACTIC_UNIFICATION] = TECH_RESEARCH_STATUS_AVAILABLE;
+    player->tech_applications[TECH_APP_HOLO_SIMULATOR] = TECH_RESEARCH_STATUS_UNAVAILABLE;
+    player->tech_applications[TECH_APP_PLEASURE_DOME] = TECH_RESEARCH_STATUS_UNAVAILABLE;
+    player->tech_applications[TECH_APP_VIRTUAL_REALITY_NETWORK] = TECH_RESEARCH_STATUS_UNAVAILABLE;
     break;
   }
 
-  player->tech_applications[0] = 0;
+  player->tech_applications[0] = TECH_RESEARCH_STATUS_UNAVAILABLE;
 
   for (int16_t tech_field_id = 1; tech_field_id < TECH_FIELD_XENON_TECHNOLOGY; ++tech_field_id) {
     const int16_t* field_tech_ids = TECHDATA::_technology_fields[tech_field_id].tech;
@@ -280,7 +280,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
         break;
       }
 
-      if (player->tech_applications[tech_app_id] == 0) {
+      if (player->tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_UNAVAILABLE) {
         ++missing_count;
       } else {
         has_app = true;
@@ -294,7 +294,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
         tech_app_id = field_tech_ids[random_slot_idx];
       } while (!TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id));
 
-      player->tech_applications[tech_app_id] = 1;
+      player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_AVAILABLE;
     }
   }
 
@@ -326,7 +326,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
         }
 
         if (TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id)) {
-          player->tech_applications[tech_app_id] = 3;
+          player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_RESEARCHED;
         }
       }
     } else {
@@ -338,7 +338,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
       player->tech_fields[TECHDATA::_technology_fields[field_id].next_field_id] = 2;
 
       if (player->traits[TRAIT_CREATIVE] == 0) {
-        player->tech_applications[selected_tech_app_id] = 3;
+        player->tech_applications[selected_tech_app_id] = TECH_RESEARCH_STATUS_RESEARCHED;
       } else {
         for (int16_t tech_slot_idx = 0; tech_slot_idx < 4; ++tech_slot_idx) {
           int16_t tech_app_id = field_tech_ids[tech_slot_idx];
@@ -347,7 +347,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
           }
 
           if (TECHINIT::Tech_Is_Legal_For_Player_(player_idx, tech_app_id)) {
-            player->tech_applications[tech_app_id] = 3;
+            player->tech_applications[tech_app_id] = TECH_RESEARCH_STATUS_RESEARCHED;
           }
         }
       }

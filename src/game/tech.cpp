@@ -560,7 +560,7 @@ namespace TECH {
                 int16_t* techs = TECHDATA::_technology_fields[tech_field_id].tech;
                 for (int app_index = 0; app_index < 4; ++app_index) {
                     int16_t app_id = techs[app_index];
-                    if (MOX::_cur_plyr_ptr->tech_applications[app_id] == 1) {
+                    if (MOX::_cur_plyr_ptr->tech_applications[app_id] == TECH_RESEARCH_STATUS_AVAILABLE) {
                         strlcpy(item->app_names[visible_app_count], Technology_Applications_Name_(app_id, MOX::_PLAYER_NUM), sizeof(item->app_names[visible_app_count]));
                         item->app_ids[visible_app_count] = app_id;
                         item->app_click_field_ids[visible_app_count] = fields::Add_Hidden_Field_(
@@ -1080,7 +1080,7 @@ namespace TECH {
                     for (int i = 0; i < 4; ++i) {
                         int16_t tech_id = TECHDATA::_technology_fields[field_id].tech[i];
 
-                        if (MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
+                        if (MOX::_cur_plyr_ptr->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             status = 1;
                             break;
                         }

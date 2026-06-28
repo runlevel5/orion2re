@@ -397,7 +397,7 @@ namespace npcdiplo {
 
                                     for (int16_t tech_id = 1; tech_id < 204; ++tech_id) {
                                         // P1 offers to P2
-                                        if (p1->tech_applications[tech_id] == 3 && p2->tech_applications[tech_id] != 3) {
+                                        if (p1->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED && p2->tech_applications[tech_id] != TECH_RESEARCH_STATUS_RESEARCHED) {
                                             if (COLCALC::Player_May_Get_Tech_App_(p2, tech_id)) {
                                                 int16_t field_id = TECHDATA::_technology_applications[tech_id].tech_field_id;
                                                 uint32_t cost = TECHDATA::_technology_fields[field_id].cost;
@@ -412,7 +412,7 @@ namespace npcdiplo {
                                         }
 
                                         // P2 offers to P1
-                                        if (p2->tech_applications[tech_id] == 3 && p1->tech_applications[tech_id] != 3) {
+                                        if (p2->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED && p1->tech_applications[tech_id] != TECH_RESEARCH_STATUS_RESEARCHED) {
                                             if (COLCALC::Player_May_Get_Tech_App_(p1, tech_id)) {
                                                 int16_t field_id = TECHDATA::_technology_applications[tech_id].tech_field_id;
                                                 uint32_t cost = TECHDATA::_technology_fields[field_id].cost;
@@ -517,7 +517,7 @@ namespace npcdiplo {
                 }
 
                 // Resistance to jealousy if Xeno Psychology learned
-                if (p_i.tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
+                if (p_i.tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     hatred_score = (int16_t)((hatred_score * 2) / 3);
                 }
 
@@ -983,7 +983,7 @@ namespace npcdiplo {
         }
 
         // Xeno Psychology makes diplomatic proposals slightly more likely.
-        if (other->tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
+        if (other->tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) {
             score -= 5;
         }
 
@@ -1025,7 +1025,7 @@ namespace npcdiplo {
         newtech::Set_Competition_Tech_Values_(player_idx);
 
         for (int16_t tech_idx = 0; tech_idx < 204; ++tech_idx) {
-            if (MOX::_player[other_player_idx].tech_applications[tech_idx] == 3) {
+            if (MOX::_player[other_player_idx].tech_applications[tech_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 uint32_t tech_value = newtech::Calc_Tech_Value_(player_idx, tech_idx);
 
                 if (tech_idx == TECH_APP_CONFEDERATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 0) {
@@ -1078,7 +1078,7 @@ namespace npcdiplo {
             reaction += 50;
         }
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) {
             reaction += 50;
         }
 
@@ -1160,7 +1160,7 @@ namespace npcdiplo {
             expectation += 50;
         }
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == 3) {
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_XENO_PSYCHOLOGY] == TECH_RESEARCH_STATUS_RESEARCHED) {
             expectation += 50;
         }
 
@@ -1194,7 +1194,7 @@ namespace npcdiplo {
             newtech::Set_Competition_Tech_Values_(player_idx);
             
             for (int32_t i = 0; i < 204; ++i) {
-                if (MOX::_player[target_player_idx].tech_applications[i] == 3) {
+                if (MOX::_player[target_player_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int32_t tech_value = newtech::Calc_Tech_Value_(player_idx, i);
                     if (tech_value * 2 != 0) {
                         _human_tech[num_elements].index = i;
@@ -1233,7 +1233,7 @@ namespace npcdiplo {
         int human_count = 0;
 
         for (int i = 0; i < 204; i++) {
-            if (MOX::_player[player_a].tech_applications[i] == 3) {
+            if (MOX::_player[player_a].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_b], i)) {
                     int32_t val = newtech::Calc_Tech_Value_(player_b, i);
                     if (val != 0) {
@@ -1262,7 +1262,7 @@ namespace npcdiplo {
         int max_target_val = (reaction_modifier * max_human_tech) / reaction_modifier;
 
         for (int i = 0; i < TECH_APP_COUNT; i++) {
-            if (MOX::_player[player_b].tech_applications[i] == 3) {
+            if (MOX::_player[player_b].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_a], i)) {
                     int32_t val = newtech::Calc_Tech_Value_(player_a, i);
                     if (val != 0 && val <= max_target_val) {

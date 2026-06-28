@@ -8,23 +8,23 @@ namespace spy {
     int16_t __cdecl Tech_Spy_Bonus_(s_player* player) {
         int16_t bonus = 0;
 
-        if (player->tech_applications[TECH_APP_CYBER_SECURITY_LINK] == 3) {
+        if (player->tech_applications[TECH_APP_CYBER_SECURITY_LINK] == TECH_RESEARCH_STATUS_RESEARCHED) {
             bonus = 10;
         }
 
-        if (player->tech_applications[TECH_APP_NEURAL_SCANNER] == 3) {
+        if (player->tech_applications[TECH_APP_NEURAL_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             bonus += 10;
         }
 
-        if (player->tech_applications[TECH_APP_PSIONICS] == 3) {
+        if (player->tech_applications[TECH_APP_PSIONICS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             bonus += 10;
         }
 
-        if (player->tech_applications[TECH_APP_STEALTH_SUIT] == 3) {
+        if (player->tech_applications[TECH_APP_STEALTH_SUIT] == TECH_RESEARCH_STATUS_RESEARCHED) {
             bonus += 10;
         }
 
-        if (player->tech_applications[TECH_APP_TELEPATHIC_TRAINING] == 3) {
+        if (player->tech_applications[TECH_APP_TELEPATHIC_TRAINING] == TECH_RESEARCH_STATUS_RESEARCHED) {
             bonus += 5;
         }
 
@@ -294,7 +294,7 @@ namespace spy {
                     uint32_t total_cost = 0;
 
                     for (int16_t j = 0; j < 204; j++) {
-                        if (MOX::_player[i].tech_applications[j] == 3) {
+                        if (MOX::_player[i].tech_applications[j] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             if (COLCALC::Player_May_Get_Tech_App_(player, j)) {
                                 int16_t field_id = TECHDATA::_technology_applications[j].tech_field_id;
                                 if (field_id != 0) {
@@ -533,7 +533,7 @@ namespace spy {
         uint32_t total_cost = 0;
 
         for (int i = 0; i < 204 /* 0xCC */; ++i) {
-            if (victim->tech_applications[i] == 3) {
+            if (victim->tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (COLCALC::Player_May_Get_Tech_App_(attacker, i)) {
                     int16_t field_id = TECHDATA::_technology_applications[i].tech_field_id;
                     if (field_id != 0 && attacker->current_research_field != (int8_t)field_id) {
@@ -629,7 +629,7 @@ namespace spy {
 
             // If a tech application id is provided, ensure the candidate doesn't already know it
             if (tech_app_id != -1) {
-                if (MOX::_player[i].tech_applications[tech_app_id] == 3) {
+                if (MOX::_player[i].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     continue;
                 }
             }

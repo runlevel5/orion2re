@@ -5,7 +5,7 @@ namespace aitech {
         for (int32_t i = ARMOR_COUNT - 1; i > ARMOR_NO_ARMOR; --i) {
             int16_t tech_id = TECHDATA::_armor[i].tech_app_id;
 
-            if (player->tech_applications[tech_id] == 3) {
+            if (player->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return i;
             }
         }
@@ -18,7 +18,7 @@ namespace aitech {
         while (shield_idx > SHIELD_NO_SHIELD) {
             int16_t tech_id = TECHDATA::_shields[shield_idx].tech_app_id;
 
-            if (player->tech_applications[tech_id] == 3) {
+            if (player->tech_applications[tech_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return shield_idx;
             }
 
@@ -31,7 +31,7 @@ namespace aitech {
     int32_t __cdecl Player_Best_Rifle_(s_player* player) {
         int32_t i = 5;
         while (i > 0) {
-            if (player->tech_applications[TECHDATA::_rifles[i].tech_app_id] == 3) {
+            if (player->tech_applications[TECHDATA::_rifles[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return i;
             }
             i--;
@@ -44,7 +44,7 @@ namespace aitech {
         s_tech_data_personal_shield* shield_data = &TECHDATA::_personal_shields[1];
 
         do {
-            if (player->tech_applications[shield_data->tech_app_id] == 3) {
+            if (player->tech_applications[shield_data->tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return index;
             }
 
@@ -60,7 +60,7 @@ namespace aitech {
 
         while (fuel_idx > FUEL_NO_FUEL_CELLS) {
             int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app_id;
-            if (player->tech_applications[tech_idx] == 3) {
+            if (player->tech_applications[tech_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return fuel_idx;
             }
             fuel_idx--;
@@ -75,7 +75,7 @@ namespace aitech {
         while (computer_idx > COMPUTER_NO_COMPUTER) {
             int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app_id;
 
-            if (player->tech_applications[tech_app_idx] == 3) {
+            if (player->tech_applications[tech_app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return computer_idx;
             }
 
@@ -86,15 +86,15 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Planetary_Shield_(s_player* player) {
-        if (player->tech_applications[TECH_APP_PLANETARY_BARRIER_SHIELD] == 3) {
+        if (player->tech_applications[TECH_APP_PLANETARY_BARRIER_SHIELD] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 3;
         }
 
-        if (player->tech_applications[TECH_APP_PLANETARY_FLUX_SHIELD] == 3) {
+        if (player->tech_applications[TECH_APP_PLANETARY_FLUX_SHIELD] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 2;
         }
 
-        if (player->tech_applications[TECH_APP_PLANETARY_RADIATION_SHIELD] == 3) {
+        if (player->tech_applications[TECH_APP_PLANETARY_RADIATION_SHIELD] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 1;
         }
 
@@ -106,7 +106,7 @@ namespace aitech {
         while (drive_idx > DRIVE_NO_DRIVE) {
             int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app_id;
 
-            if (player->tech_applications[tech_app_idx] == 3) {
+            if (player->tech_applications[tech_app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return drive_idx;
             }
 
@@ -151,7 +151,7 @@ namespace aitech {
             // Calculate Best Weapon scores based on technology costs
             for (int w_idx = WEAPON_MASS_DRIVER; w_idx <= WEAPON_SPATIAL_COMPRESSOR; ++w_idx) {
                 uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
-                if (plr->tech_applications[app_id] == 3) {
+                if (plr->tech_applications[app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                     uint8_t cost_score = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
                     if (cost_score > (uint8_t)plr_info->best_weapon1) {
@@ -162,7 +162,7 @@ namespace aitech {
 
             for (int w_idx = WEAPON_NUCLEAR_MISSILE; w_idx <= WEAPON_PLASMA_TORPEDO; ++w_idx) {
                 uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
-                if (plr->tech_applications[app_id] == 3) {
+                if (plr->tech_applications[app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                     uint8_t cost_score = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
                     if (cost_score > (uint8_t)plr_info->best_weapon2) {
@@ -293,7 +293,7 @@ namespace aitech {
 
             // Check for Colonization status
             bool can_colonize =
-                (plr->tech_applications[TECH_APP_THORIUM_FUEL_CELLS] == 3) ||
+                (plr->tech_applications[TECH_APP_THORIUM_FUEL_CELLS] == TECH_RESEARCH_STATUS_RESEARCHED) ||
                 (AIMOVE::Best_Uncolonized_Undestined_Planet_((int16_t)p_idx) != -1);
             
             plr_info->colonization_idle = can_colonize ? 0 : 1;
@@ -312,7 +312,7 @@ namespace aitech {
             if (plr->eliminated == 0 && plr->objectives != 100) {
                 aitech::AI_Tech_Select_(plr);
 
-                if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3 && plr->picked_evolutionary_upgrade == 0) {
+                if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == TECH_RESEARCH_STATUS_RESEARCHED && plr->picked_evolutionary_upgrade == 0) {
                     raceopt::Setup_Evolutionary_Upgrade_((short)i);
                 }
             }
@@ -360,7 +360,7 @@ namespace aitech {
     void __cdecl AI_Tech_Select_(s_player *player) {
         bool needs_new_tech = false;
 
-        // Check if current field research is completed (level 3) or if a new app was recently acquired
+        // Check if current field research is completed or if a new app was recently acquired
         if (player->tech_fields[(uint8_t)player->current_research_field] == 3 || player->got_new_app != 0) {
             needs_new_tech = true;
         }

@@ -270,7 +270,7 @@ namespace DESIGN {
         int16_t ship_size = MOX::_design->ship_size;
         int32_t hull_size = TECHDATA::_hull_data[ship_size].size;
 
-        if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
+        if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             hull_size = (hull_size * 125) / 100;
         }
 
@@ -1201,7 +1201,7 @@ namespace DESIGN {
                 return true;
             }
 
-            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == 3) {
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if ((int16_t)DESBOX::Application_Type_(app_idx) == 3) {
                     int16_t tech_id = DESIGN::Tech_App_To_Tech_Id_(app_idx, 3);
                     uint32_t space_req = DESIGN::One_Weapon_Space_(tech_id);
@@ -1333,7 +1333,7 @@ namespace DESIGN {
         for (int16_t app_idx = 0; app_idx < TECH_APP_COUNT; ++app_idx) {
             if (found_count != 0) break;
 
-            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == 3) {
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if ((int16_t)DESBOX::Application_Type_(app_idx) == 9) {
                     bool device_fits = false;
 
@@ -1378,7 +1378,7 @@ namespace DESIGN {
                 key::Wait_For_Key_();
             }
 
-            if (tech_idx != TECH_APP_NO_TECH && MOX::_player[player_idx].tech_applications[tech_idx] != 1) {
+            if (tech_idx != TECH_APP_NO_TECH && MOX::_player[player_idx].tech_applications[tech_idx] != TECH_RESEARCH_STATUS_AVAILABLE) {
                 return Miniaturization_Level_(player_idx, tech_idx);
             }
         }
@@ -1447,7 +1447,7 @@ namespace DESIGN {
         s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
 
         for (int16_t i = 0; i < TECH_APP_COUNT; ++i) {
-            if (player->tech_applications[i] == 3) {
+            if (player->tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if ((int16_t)DESBOX::Application_Type_(i) == application_type) {
                     replacement_count++;
                 }

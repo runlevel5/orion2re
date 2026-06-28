@@ -192,7 +192,7 @@ namespace COMBAT {
             if (ship_design_idx != -1) {
                 uint8_t player = (uint8_t)MOX::_qcombat_data[i].player;
                 if (leader_combat_bonuses[player] <= 0 && 
-                   (player >= MAX_PLAYERS || (MOX::_player[player].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] != 3 && MOX::_player[player].traits[TRAIT_CYBERNETIC] == 0))) {
+                   (player >= MAX_PLAYERS || (MOX::_player[player].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] != TECH_RESEARCH_STATUS_RESEARCHED && MOX::_player[player].traits[TRAIT_CYBERNETIC] == 0))) {
                     if (MOX::_settings.strategic_combat_flag == 1) {
                         MOX::_ship[ship_design_idx].structural_damage = MOX::_qcombat_data[i].structural_damage;
                     } else {
@@ -216,7 +216,7 @@ namespace COMBAT {
                 int16_t officer_idx = MOX::_qcombat_data[i].officer_idx;
                 if (officer_idx != -1) {
                     if (MOX::_leaders[officer_idx].eta <= 0) {
-                        if (MOX::_player[MOX::_qcombat_data[i].player].tech_applications[TECH_APP_SURVIVAL_PODS] == 3) {
+                        if (MOX::_player[MOX::_qcombat_data[i].player].tech_applications[TECH_APP_SURVIVAL_PODS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                             survived_officer_ids[survived_officers_count] = officer_idx;
                             survived_officers_count++;
                         } else {
@@ -807,11 +807,11 @@ namespace COMBAT {
             // Apply sensor bonus to hit chance by reducing target defense
             if (attacker_player_idx < MAX_PLAYERS) {
                 s_player* player = &MOX::_player[attacker_player_idx];
-                if (player->tech_applications[TECH_APP_SENSORS] == 3) {
+                if (player->tech_applications[TECH_APP_SENSORS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     defense_bonus -= 70;
-                } else if (player->tech_applications[TECH_APP_NEUTRON_SCANNER] == 3) {
+                } else if (player->tech_applications[TECH_APP_NEUTRON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     defense_bonus -= 40;
-                } else if (player->tech_applications[TECH_APP_TACHYON_SCANNER] == 3) {
+                } else if (player->tech_applications[TECH_APP_TACHYON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     defense_bonus -= 20;
                 }
             } else {

@@ -983,7 +983,7 @@ namespace AIDATA {
         s_player* owner_ptr = &MOX::_player[owner_idx];
 
         // Check for Alien Management Center tech
-        if (owner_ptr->tech_applications[TECH_APP_ALIEN_MANAGEMENT_CENTER] == 3) {
+        if (owner_ptr->tech_applications[TECH_APP_ALIEN_MANAGEMENT_CENTER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             return 0;
         }
 
@@ -1039,8 +1039,8 @@ namespace AIDATA {
 
             // Check if player can reach the star directly
             if (plr->ship_speed != 0 &&
-                plr->tech_applications[TECH_APP_JUMP_GATE] != 3 &&
-                plr->tech_applications[TECH_APP_STAR_GATE] != 3 &&
+                plr->tech_applications[TECH_APP_JUMP_GATE] != TECH_RESEARCH_STATUS_RESEARCHED &&
+                plr->tech_applications[TECH_APP_STAR_GATE] != TECH_RESEARCH_STATUS_RESEARCHED &&
                 MOX::_star[source_star_idx].wormhole_star_id == -1 &&
                 MOX::_star[dest_star_idx].wormhole_star_id == -1 &&
                 (*_n_turns_from_to)[source_star_idx][dest_star_idx][player_idx] != 0xFF) {
@@ -1251,7 +1251,7 @@ namespace AIDATA {
         }
 
         if (evaluating_player_idx != colony->owner || colony->buildings[BUILDING_GRAVITY_GENERATOR] == 0) {
-            int grav_gen_bonus = (evaluating_player->tech_applications[TECH_APP_PLANETARY_GRAVITY_GENERATOR] == 3) ? 1 : 0;
+            int grav_gen_bonus = (evaluating_player->tech_applications[TECH_APP_PLANETARY_GRAVITY_GENERATOR] == TECH_RESEARCH_STATUS_RESEARCHED) ? 1 : 0;
             int gravity = planet->gravity_class;
 
             if (gravity == PLANET_GRAVITY_LOW_G) {
@@ -1316,7 +1316,7 @@ namespace AIDATA {
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, player_idx);
 
             int32_t total_pop_sum = max_pop + subterranean_bonus;
-            if (evaluating_player->tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == 3) {
+            if (evaluating_player->tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 total_pop_sum += 5;
             }
 
@@ -1338,8 +1338,8 @@ namespace AIDATA {
             }
 
             int32_t food_per_farmer = planet->food_per_farmer;
-            bool has_grav_gen_tech = (evaluating_player->tech_applications[TECH_APP_PLANETARY_GRAVITY_GENERATOR] == 3);
-            if (food_per_farmer == 0 && evaluating_player->tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == 3) {
+            bool has_grav_gen_tech = (evaluating_player->tech_applications[TECH_APP_PLANETARY_GRAVITY_GENERATOR] == TECH_RESEARCH_STATUS_RESEARCHED);
+            if (food_per_farmer == 0 && evaluating_player->tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 food_per_farmer = 1;
             }
 

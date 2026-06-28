@@ -1951,11 +1951,11 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         int16_t evade = MOX::_combat_data[target_ship_idx].tac_val_evade;
         if (attacker_player_idx < MAX_PLAYERS) {
             s_player* attacker = &MOX::_player[attacker_player_idx];
-            if (attacker->tech_applications[TECH_APP_SENSORS] == 3) {
+            if (attacker->tech_applications[TECH_APP_SENSORS] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 evade -= 70;
-            } else if (attacker->tech_applications[TECH_APP_NEUTRON_SCANNER] == 3) {
+            } else if (attacker->tech_applications[TECH_APP_NEUTRON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 evade -= 40;
-            } else if (attacker->tech_applications[TECH_APP_TACHYON_SCANNER] == 3) {
+            } else if (attacker->tech_applications[TECH_APP_TACHYON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 evade -= 20;
             }
         } else {
