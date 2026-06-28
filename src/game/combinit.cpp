@@ -55,9 +55,9 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
             int16_t weapon_id = MOX::_global_combat_data.weapons[i].weapon_id;
 
-            if (TECHDATA::_weapons[weapon_id].type == 2) {
+            if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_TORPEDO) {
                 MOX::_global_combat_data.weapons[i].ammo = 0;
-            } else if (TECHDATA::_weapons[weapon_id].type != 1) {
+            } else if (TECHDATA::_weapons[weapon_id].type != WEAPON_TYPE_MISSILE) {
                 MOX::_global_combat_data.weapons[i].ammo = TECHDATA::_weapons[weapon_id].ammo;
             }
 
@@ -269,9 +269,9 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->weapons[i].shots_left = combat->weapons[i].count;
 
         uint16_t weapon_id = combat->weapons[i].weapon_id;
-        if (TECHDATA::_weapons[weapon_id].type == 2) {
+        if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_TORPEDO) {
             combat->weapons[i].ammo = 0;
-        } else if (TECHDATA::_weapons[weapon_id].type != 1) {
+        } else if (TECHDATA::_weapons[weapon_id].type != WEAPON_TYPE_MISSILE) {
             combat->weapons[i].ammo = TECHDATA::_weapons[weapon_id].ammo;
         }
 
@@ -378,7 +378,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_HYPER_X_CAPACITORS)) {
         for (int i = 0; i < 8; ++i) {
-            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == 0) {
+            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == WEAPON_TYPE_BEAM) {
                 ship->weapons[i].status = 1;
             }
         }
@@ -386,7 +386,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_FAST_MISSILE_RACKS)) {
         for (int i = 0; i < 8; ++i) {
-            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == 1) {
+            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == WEAPON_TYPE_MISSILE) {
                 ship->weapons[i].status = 1;
             }
         }
@@ -1675,7 +1675,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
             MOX::_combat_data->weapons[weapon_index].specials = specials_m;
             MOX::_combat_data->weapons[weapon_index].status = 0;
 
-            if (TECHDATA::_weapons[weapon_id_m].type == 1) {
+            if (TECHDATA::_weapons[weapon_id_m].type == WEAPON_TYPE_MISSILE) {
                 MOX::_combat_data->weapons[weapon_index].ammo = 125;
             } else {
                 MOX::_combat_data->weapons[weapon_index].ammo = 0;
@@ -1936,7 +1936,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = missile_id;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
-    if (TECHDATA::_weapons[missile_id].type == 1) {
+    if (TECHDATA::_weapons[missile_id].type == WEAPON_TYPE_MISSILE) {
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 20;
     } else {
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 0;
@@ -1957,7 +1957,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         // Bug in original binary: potential buffer overflow into structure_max
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = missile_id;
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
-        if (TECHDATA::_weapons[missile_id].type == 1) {
+        if (TECHDATA::_weapons[missile_id].type == WEAPON_TYPE_MISSILE) {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 20;
         } else {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 0;
@@ -2283,7 +2283,7 @@ void __cdecl End_Of_Turn_Bookeeping_() {
             s_combat_weapon_slot* slot = &MOX::_combat_data->weapons[i];
             uint16_t weapon_id = slot->weapon_id;
 
-            if (TECHDATA::_weapons[weapon_id].type == 4) {
+            if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_FIGHTER) {
                 slot->ammo = 1;
             }
         }

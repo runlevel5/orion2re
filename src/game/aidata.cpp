@@ -125,12 +125,12 @@ namespace AIDATA {
                 uint16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                 uint8_t normalized_cost = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
 
-                int8_t weapon_rack_type = TECHDATA::_weapons[weapon_type].type;
-                if (weapon_rack_type == 0 /* RACK_BEAM */) {
+                int8_t weapon_type_class = TECHDATA::_weapons[weapon_type].type;
+                if (weapon_type_class == WEAPON_TYPE_BEAM) {
                     if (normalized_cost > best_beam_cost) {
                         best_beam_cost = normalized_cost;
                     }
-                } else if (weapon_rack_type == 1 /* RACK_MISSILE */ || weapon_rack_type == 2 /* RACK_TORPEDO */) {
+                } else if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_TORPEDO) {
                     if (normalized_cost > best_missile_cost) {
                         best_missile_cost = normalized_cost;
                     }

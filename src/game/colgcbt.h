@@ -41,8 +41,8 @@ namespace COLGCBT {
 
     extern s_animation_header* _anims[40];
 
-    extern uint8_t _player_color_array[64];
-    extern uint8_t _short_player_color_array[64];
+    extern uint8_t _player_color_array[MAX_PLAYERS][8];
+    extern uint8_t _short_player_color_array[MAX_PLAYERS][4];
 
     /**
      * Recolors a ground-combat animation with the selected player's palette.

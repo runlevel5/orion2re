@@ -46,8 +46,8 @@ namespace CMBTFIRE {
                 switch (building_id) {
                     case BUILDING_MISSILE_BASE:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
-                            if (rack == 1 || rack == 2) {
+                            int8_t weapon_type_class = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
+                            if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_TORPEDO) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
                             }
@@ -56,8 +56,8 @@ namespace CMBTFIRE {
 
                     case BUILDING_GROUND_BATTERIES:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
-                            if (rack == 0) {
+                            int8_t weapon_type_class = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
+                            if (weapon_type_class == WEAPON_TYPE_BEAM) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
                             }
@@ -66,8 +66,8 @@ namespace CMBTFIRE {
 
                     case BUILDING_STELLAR_CONVERTER:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
-                            if (rack == 5) {
+                            int8_t weapon_type_class = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
+                            if (weapon_type_class == WEAPON_TYPE_SPECIAL) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
                             }
@@ -76,8 +76,8 @@ namespace CMBTFIRE {
 
                     case BUILDING_FIGHTER_GARRISON:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
-                            if (rack == 4) {
+                            int8_t weapon_type_class = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
+                            if (weapon_type_class == WEAPON_TYPE_FIGHTER) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
                             }
@@ -223,15 +223,15 @@ namespace CMBTFIRE {
             is_legal = CMBTFIRE::Weapon_Can_Fire_At_Missiles_(weapon_id, specials);
 
             int16_t missile_type = MOX::_missile[target_idx].type;
-            int8_t rack = TECHDATA::_weapons[missile_type].type;
+            int8_t weapon_type_class = TECHDATA::_weapons[missile_type].type;
 
-            if (rack == 4 /* Torpedo */) {
+            if (weapon_type_class == WEAPON_TYPE_FIGHTER) {
                 if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     is_legal = 0;
                 }
             }
 
-            if (rack == 2 /* Missile */) {
+            if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                 is_legal = 0;
             }
 
@@ -249,8 +249,8 @@ namespace CMBTFIRE {
             }
 
             if (is_legal != 0) {
-                int8_t rack = TECHDATA::_weapons[weapon_id].type;
-                if (rack == 3 /* Fighter */ && target_idx != 0) {
+                int8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
+                if (weapon_type_class == WEAPON_TYPE_BOMB && target_idx != 0) {
                     is_legal = 0;
                 } else if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     is_legal = 0;
@@ -258,7 +258,7 @@ namespace CMBTFIRE {
                     if (weapon_id == WEAPON_ASSAULT_SHUTTLE) {
                         is_legal = 0;
                     }
-                    if (rack == 5 /* Special/Bomb */) {
+                    if (weapon_type_class == WEAPON_TYPE_SPECIAL) {
                         switch (weapon_id) {
                             case WEAPON_SPATIAL_COMPRESSOR:
                             case WEAPON_STASIS_FIELD:
@@ -397,35 +397,34 @@ namespace CMBTFIRE {
             return 0;
         }
 
-        int8_t rack = TECHDATA::_weapons[weapon_idx].type;
+        int8_t weapon_type_class = TECHDATA::_weapons[weapon_idx].type;
 
-        // Preserve the original unsigned bounds check before the rack jump table.
-        if ((uint32_t)(int32_t)rack > 5) {
+        if ((uint32_t)(int32_t)weapon_type_class > WEAPON_TYPE_SPECIAL) {
             return 0;
         }
 
-        switch (rack) {
-            case 0:
+        switch (weapon_type_class) {
+            case WEAPON_TYPE_BEAM:
                 if ((flags & 0x0002) == 0) {
                     return 1;
                 }
                 break;
 
-            case 4:
+            case WEAPON_TYPE_FIGHTER:
                 if (weapon_idx == WEAPON_INTERCEPTOR) {
                     result = 1;
                 }
                 // fallthrough
 
-            case 5:
+            case WEAPON_TYPE_SPECIAL:
                 if (weapon_idx == WEAPON_PULSAR || weapon_idx == WEAPON_SPATIAL_COMPRESSOR || weapon_idx == WEAPON_ANTI_MISSILE_ROCKET) {
                     result = 1;
                 }
                 break;
 
-            case 1:
-            case 2:
-            case 3:
+            case WEAPON_TYPE_MISSILE:
+            case WEAPON_TYPE_TORPEDO:
+            case WEAPON_TYPE_BOMB:
             default:
                 break;
         }
@@ -1014,7 +1013,7 @@ namespace CMBTFIRE {
         int16_t secondary_damage_total = 0;
         int16_t total_hits_on_target = 0;
         int16_t beam_fx_count = 0;
-        int16_t weapon_rack_type = 0;
+        int16_t weapon_type_class = 0;
         int16_t weapon_slot_idx = 0;
         int16_t fire_result_flags = 0;
 
@@ -1067,12 +1066,12 @@ namespace CMBTFIRE {
                     s_combat_weapon_slot* weapon = &MOX::_combat_data[source_ship_idx].weapons[weapon_slot_idx];
                     if (weapon->weapon_id != 0) {
                         fire_result_flags = 0;
-                        weapon_rack_type = TECHDATA::_weapons[weapon->weapon_id].type;
+                        weapon_type_class = TECHDATA::_weapons[weapon->weapon_id].type;
 
                         if (COMBAT1::Weapon_Is_On_(source_ship_idx, weapon_slot_idx) != 0 &&
                             (target_arc_mask & weapon->arc) != 0) {
                             
-                            if (weapon_rack_type == 2) {
+                            if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                                 if (weapon->ammo != 0) continue;
                             } else {
                                 if (weapon->ammo == 0) continue;
@@ -1110,7 +1109,7 @@ namespace CMBTFIRE {
                                         }
                                     }
 
-                                    if (needs_snap && weapon_rack_type == 0) {
+                                    if (needs_snap && weapon_type_class == WEAPON_TYPE_BEAM) {
                                         int16_t snap_x, snap_y;
                                         if (flag == 0) {
                                             snap_x = MOX::_combat_data[target_ship_idx].x;
@@ -1122,7 +1121,7 @@ namespace CMBTFIRE {
                                         COMBINIT::Snap_Center_Combat_Screen_(snap_x, snap_y);
                                     }
 
-                                    if (beam_fx_entries[0].weapon_id != 0 && weapon_rack_type != 0) {
+                                    if (beam_fx_entries[0].weapon_id != 0 && weapon_type_class != WEAPON_TYPE_BEAM) {
                                         BEAMS::Beam_SFX_(
                                             source_ship_idx,
                                             sx + MOX::_cur_combat_x * -20,
@@ -1144,8 +1143,8 @@ namespace CMBTFIRE {
                                     if (continue_firing != 1) break;
                                     if (Is_Combat_Ship_Dead_(source_ship_idx) != 0) break;
 
-                                    switch (weapon_rack_type) {
-                                        case 0: {
+                                    switch (weapon_type_class) {
+                                        case WEAPON_TYPE_BEAM: {
                                             int16_t fire_res = Fire_Beam_Weapon_(
                                                 source_ship_idx, target_ship_idx, weapon->weapon_id,
                                                 weapon->specials, flag, &beam_hit_offset_x, &beam_hit_offset_y, &primary_damage
@@ -1185,11 +1184,11 @@ namespace CMBTFIRE {
                                             weapon->shots_left--;
                                             break;
                                         }
-                                        case 1:
-                                        case 2:
-                                        case 4: {
+                                        case WEAPON_TYPE_MISSILE:
+                                        case WEAPON_TYPE_TORPEDO:
+                                        case WEAPON_TYPE_FIGHTER: {
                                             CMBTMIS::Fire_Missile_(source_ship_idx, target_ship_idx, weapon_slot_idx, flag);
-                                            if (weapon_rack_type == 2) {
+                                            if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                                                 weapon->ammo = TECHDATA::_weapons[weapon->weapon_id].ammo;
                                             } else {
                                                 weapon->ammo--;
@@ -1197,14 +1196,14 @@ namespace CMBTFIRE {
                                             weapon->shots_left = 0;
                                             break;
                                         }
-                                        case 3: {
+                                        case WEAPON_TYPE_BOMB: {
                                             int16_t bomb_hits = Fire_Bomb_(source_ship_idx, target_ship_idx, weapon_slot_idx);
                                             total_hits_on_target = bomb_hits;
                                             weapon->shots_left = 0;
                                             weapon->ammo--;
                                             break;
                                         }
-                                        case 5: {
+                                        case WEAPON_TYPE_SPECIAL: {
                                             Fire_Special_Weapon_(source_ship_idx, sx, sy, target_ship_idx, weapon_slot_idx, flag);
                                             if (weapon->weapon_id == WEAPON_STASIS_FIELD) {
                                                 continue_firing = 0;
@@ -1242,7 +1241,7 @@ namespace CMBTFIRE {
                                 }
 
                                 if (fire_result_flags == 1 && MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
-                                    if (weapon_rack_type == 0) {
+                                    if (weapon_type_class == WEAPON_TYPE_BEAM) {
                                         beam_fx_entries[beam_fx_count].weapon_id = weapon->weapon_id;
                                         if (primary_damage_total > 0 || secondary_damage_total > 0) {
                                             struct_::Copy_Structure_(&beam_fx_entries[beam_fx_count + 1], &beam_fx_entries[beam_fx_count], 15);
@@ -1260,7 +1259,7 @@ namespace CMBTFIRE {
                                             video::Set_Page_Off_();
                                         }
                                         beam_fx_count++;
-                                    } else if (weapon_rack_type == 3) {
+                                    } else if (weapon_type_class == WEAPON_TYPE_BOMB) {
                                         CMBTDRW1::Draw_Bombs_(source_ship_idx, target_ship_idx, weapon->weapon_id, total_hits_on_target);
                                     }
                                 }
@@ -1363,7 +1362,7 @@ namespace CMBTFIRE {
             case WEAPON_ANTI_MISSILE_ROCKET:
                 if (target_type != 0) {
                     int16_t type = MOX::_missile[target_idx].type;
-                    if (TECHDATA::_weapons[type].type == 1 || TECHDATA::_weapons[type].type == 4) {
+                    if (TECHDATA::_weapons[type].type == WEAPON_TYPE_MISSILE || TECHDATA::_weapons[type].type == WEAPON_TYPE_FIGHTER) {
                         if (CMBTMIS::Missile_Owner_(target_idx) != MOX::_combat_data[ship_idx].owner) {
                             CMBTSPEC::Anti_Missile_Rockets_(ship_idx, x, y, target_idx, weapon_slot_idx, range);
                         }

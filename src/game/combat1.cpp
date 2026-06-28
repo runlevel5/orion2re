@@ -1102,18 +1102,18 @@ namespace COMBAT1 {
             }
 
             if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HYPER_X_CAPACITORS) != 0) {
-                if (TECHDATA::_weapons[slot->weapon_id].type == 0 && slot->status != 1) {
+                if (TECHDATA::_weapons[slot->weapon_id].type == WEAPON_TYPE_BEAM && slot->status != 1) {
                     slot->status = 2;
                 }
             }
 
             if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_FAST_MISSILE_RACKS) != 0) {
-                if (TECHDATA::_weapons[slot->weapon_id].type == 1 && slot->status != 1) {
+                if (TECHDATA::_weapons[slot->weapon_id].type == WEAPON_TYPE_MISSILE && slot->status != 1) {
                     slot->status = 2;
                 }
             }
 
-            if (slot->weapon_id > 0 && TECHDATA::_weapons[slot->weapon_id].type == 2) {
+            if (slot->weapon_id > 0 && TECHDATA::_weapons[slot->weapon_id].type == WEAPON_TYPE_TORPEDO) {
                 if (slot->ammo > 0) {
                     slot->ammo--;
                 }
@@ -1849,7 +1849,7 @@ namespace COMBAT1 {
                 }
 
                 if (resolve_flag == 1) {
-                    if (TECHDATA::_weapons[missile->type].type != 4 /* FIGHTER */ || missile->is_active == 1) {
+                    if (TECHDATA::_weapons[missile->type].type != WEAPON_TYPE_FIGHTER || missile->is_active == 1) {
                         resolved_missile_idx[resolve_count] = i;
                         resolved_target_idx[resolve_count] = target_idx;
                         resolve_count++;
@@ -1896,7 +1896,7 @@ namespace COMBAT1 {
             s_missile* missile = &MOX::_missile[k];
             int16_t target_idx = missile->target_unit_idx;
 
-            if (missile->type < 1 || TECHDATA::_weapons[missile->type].type == 4 /* FIGHTER */ || 
+            if (missile->type < 1 || TECHDATA::_weapons[missile->type].type == WEAPON_TYPE_FIGHTER || 
                 missile->fighter_count == -1 || missile->is_anti_missile_rocket != 0) {
                 if (missile->fighter_count == -1) {
                     missile->fighter_count = 0;

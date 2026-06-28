@@ -127,9 +127,9 @@ namespace AIPOWER {
             }
 
             if (slot_strength != 0) {
-                int8_t rack_type = TECHDATA::_weapons[weapon_type].type;
-                switch (rack_type) {
-                    case 0: {
+                int8_t weapon_type_class = TECHDATA::_weapons[weapon_type].type;
+                switch (weapon_type_class) {
+                    case WEAPON_TYPE_BEAM: {
                         int16_t hit_chance = (attack_bonus - defense_bonus) + 50;
                         if (slot_specials != 0) {
                             hit_chance += 25;
@@ -139,17 +139,17 @@ namespace AIPOWER {
                         slot_strength = (slot_strength * (uint32_t)hit_chance) / 100;
                         break;
                     }
-                    case 1: {
+                    case WEAPON_TYPE_MISSILE: {
                         uint8_t ammo = ship->d.ship_weapon[i].ammo;
                         if (ammo == 2) {
                             slot_strength = (slot_strength * 3) >> 2;
                         }
                         break;
                     }
-                    case 2:
+                    case WEAPON_TYPE_TORPEDO:
                         slot_strength = (slot_strength * 3) >> 2;
                         break;
-                    case 3:
+                    case WEAPON_TYPE_BOMB:
                         slot_strength = 0;
                         break;
                     default:
@@ -270,9 +270,9 @@ namespace AIPOWER {
                 int16_t weapon_type = MOX::_ship[ship_idx].d.ship_weapon[i].type;
                 if (weapon_type > 0) {
                     int16_t weapon_damage;
-                    uint8_t rack_type = TECHDATA::_weapons[weapon_type].type;
+                    uint8_t weapon_type_class = TECHDATA::_weapons[weapon_type].type;
 
-                    if (rack_type == 0 || rack_type == 2) {
+                    if (weapon_type_class == WEAPON_TYPE_BEAM || weapon_type_class == WEAPON_TYPE_TORPEDO) {
                         weapon_damage = TECHDATA::_weapons[weapon_type].max_damage / 2;
                     } else {
                         weapon_damage = TECHDATA::_weapons[weapon_type].max_damage;

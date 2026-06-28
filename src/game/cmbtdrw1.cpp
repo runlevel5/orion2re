@@ -2807,13 +2807,13 @@ skip_cursor:
                     display_color_mode = 0;
                 }
 
-                uint8_t rack = TECHDATA::_weapons[w_id].type;
+                uint8_t weapon_type_class = TECHDATA::_weapons[w_id].type;
                 int16_t ammo = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].ammo;
                 int8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
                 uint8_t status = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].status;
 
-                if (((rack == 1 || rack == 3 || rack == 4) && ammo == 0) ||
-                    (rack == 2 && ammo > 0) ||
+                if (((weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER) && ammo == 0) ||
+                    (weapon_type_class == WEAPON_TYPE_TORPEDO && ammo > 0) ||
                     (shots_left == 0 && status != 1)) {
                     display_color_mode = 2;
                 }
@@ -2868,11 +2868,11 @@ skip_cursor:
                     fonts::Set_Font_Style_Shadow_Down_(1, &color_a8);
                 }
 
-                if (rack == 1 || rack == 3 || rack == 4 || w_id == WEAPON_ANTI_MISSILE_ROCKET) {
+                if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER || w_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     strlcat(weapon_label, " x", sizeof(weapon_label));
                     _itoa(ammo, ammo_text, 10);
                     strlcat(weapon_label, ammo_text, sizeof(weapon_label));
-                } else if (rack == 2) {
+                } else if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                     if (ammo > 0) {
                         strlcat(weapon_label, " ", sizeof(weapon_label));
                         _itoa(ammo, ammo_text, 10);
@@ -2880,7 +2880,7 @@ skip_cursor:
                         KEN::Ken_Get_Text_Message_(85, arc_text, 80);
                         strlcat(weapon_label, arc_text, sizeof(weapon_label));
                     }
-                } else if (rack == 0) {
+                } else if (weapon_type_class == WEAPON_TYPE_BEAM) {
                     strlcat(weapon_label, " (", sizeof(weapon_label));
                     switch (arc) {
                         case 1:

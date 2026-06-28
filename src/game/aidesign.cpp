@@ -207,7 +207,7 @@ namespace aidesign {
         int16_t spec1_mods[40];
 
         for (int16_t i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
-            if (TECHDATA::_weapons[i].type == 0 && MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
+            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM && MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
                 weapon_id[weapon_count] = i;
                 spec1_mods[weapon_count] = 0;
                 spec2_mods[weapon_count] = 0;
@@ -1076,7 +1076,7 @@ namespace aidesign {
         int num_candidates = 0;
 
         for (int i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
-            if (TECHDATA::_weapons[i].type == 3 && (TECHDATA::_weapons[i].natural_mods & WEAPON_MOD_FLAG_AUTO_FIRE) == 0) {
+            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BOMB && (TECHDATA::_weapons[i].natural_mods & WEAPON_MOD_FLAG_AUTO_FIRE) == 0) {
                 int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                     candidates[num_candidates] = i;
@@ -1205,7 +1205,7 @@ namespace aidesign {
 
         for (int16_t i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
             uint8_t type = TECHDATA::_weapons[i].type;
-            if (type == 1 || type == 2) {
+            if (type == WEAPON_TYPE_MISSILE || type == WEAPON_TYPE_TORPEDO) {
                 uint16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                     weapon_indices[count] = i;

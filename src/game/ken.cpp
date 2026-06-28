@@ -419,7 +419,7 @@ namespace KEN {
         }
 
         for (int16_t i = WEAPON_MASS_DRIVER; i < 40; ++i) {
-            if (TECHDATA::_weapons[i].type == 0 &&
+            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM &&
                 TECHDATA::_technology_applications[TECHDATA::_weapons[i].tech_app_id].tech_field_id != TECH_FIELD_XENON_TECHNOLOGY) {
 
                 int16_t diff = TECHDATA::_weapons[i].max_damage - TECHDATA::_weapons[max_weapon_idx].max_damage;

@@ -55,7 +55,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
     uint16_t specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
     int16_t weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
 
-    if (target_type_flag == 0) {
+    if (target_type_flag == TARGET_TYPE_SHIP) {
         int16_t has_hard_shields = COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS);
         if (has_hard_shields != 0 || (specials & 0x40) == 0) {
             if (target_idx == 0) {
@@ -84,14 +84,14 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
     }
 
     int32_t dist_modifier;
-    if (TECHDATA::_weapons[weapon_id].type == 0) {
+    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
         CMBTFIRE::Get_Beam_Weapon_Modifiers_(ship_idx, distance, specials, weapon_id, &range_penalty, &damage_bonus_pct);
         dist_modifier = 40 - range_penalty;
         if (dist_modifier > 95) {
             dist_modifier = 95;
         }
         attack_defense_delta = MOX::_combat_data[ship_idx].tac_val_attack;
-        if (target_type_flag == 0) {
+        if (target_type_flag == TARGET_TYPE_SHIP) {
             attack_defense_delta -= MOX::_combat_data[target_idx].tac_val_defense;
         } else {
             int16_t source_unit_idx = MOX::_missile[target_idx].source_unit_idx;
@@ -117,7 +117,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
         max_damage = min_damage;
     }
 
-    if (use_planetary_shield_adjustment != 0 && TECHDATA::_weapons[weapon_id].type == 0) {
+    if (use_planetary_shield_adjustment != 0 && TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
         int16_t shield_id = INITSHIP::Best_Ship_Shield_(MOX::_combat_defender_player);
         min_damage /= 2;
         max_damage /= 2;
@@ -152,7 +152,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
             range = 1;
         } else {
             short bearing;
-            if (target_type == 0) {
+            if (target_type == TARGET_TYPE_SHIP) {
                 bearing = CMBTDRW1::Relative_Bearing_(source_idx, target_idx);
             } else {
                 bearing = CMBTDRW1::Relative_Bearing_XY_(source_idx, MOX::_missile[target_idx].x, MOX::_missile[target_idx].y);
@@ -162,10 +162,10 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
 
             if (COMBAT1::Weapon_Is_On_(source_idx, weapon_slot)) {
                 if ((arc & (int16_t)MOX::_combat_data[source_idx].weapons[weapon_slot].arc) != 0) {
-                    uint8_t rack = TECHDATA::_weapons[weapon_id].type;
+                    uint8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
                     bool can_fire = false;
 
-                    if (rack == 2) {
+                    if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                         if (MOX::_combat_data[source_idx].weapons[weapon_slot].ammo == 0) {
                             can_fire = true;
                         }
@@ -183,13 +183,13 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
         }
 
         if (count > 0) {
-            uint8_t rack = TECHDATA::_weapons[weapon_id].type;
+            uint8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
 
-            if (rack == 1 || rack == 4 || rack == 2) {
+            if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_FIGHTER || weapon_type_class == WEAPON_TYPE_TORPEDO) {
                 expected_damage = Expected_Missile_Damage_(target_idx, weapon_id, count, specials, MOX::_combat_data[source_idx].owner);
-            } else if (rack == 0 || rack == 3) {
+            } else if (weapon_type_class == WEAPON_TYPE_BEAM || weapon_type_class == WEAPON_TYPE_BOMB) {
                 expected_damage = Expected_Beam_Bomb_Damage_(source_idx, weapon_slot, target_idx, count, range, target_type);
-            } else if (rack == 5) {
+            } else if (weapon_type_class == WEAPON_TYPE_SPECIAL) {
                 int16_t min_dam = TECHDATA::_weapons[weapon_id].min_damage;
                 int16_t max_dam = TECHDATA::_weapons[weapon_id].max_damage;
                 int32_t avg_damage_sum = ((int32_t)min_dam) + ((int32_t)max_dam);
@@ -207,7 +207,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                         expected_damage = 1000;
                         break;
                     case WEAPON_ANTI_MISSILE_ROCKET:
-                        if (target_type != 0) {
+                        if (target_type != TARGET_TYPE_SHIP) {
                             s_missile* m = &MOX::_missile[target_idx];
                             int hits = CMBTMIS::Get_Missile_Hits_(m->type, MOX::_combat_data[m->source_unit_idx].owner, m->specials);
                             expected_damage = hits * (((8 - range) * count * 5 + 25) * 2 / 100);
@@ -246,8 +246,8 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
         expected_damage >>= 2;
     }
 
-    uint8_t rack = TECHDATA::_weapons[weapon_id].type;
-    if (rack == 0 || rack == 3) {
+    uint8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
+    if (weapon_type_class == WEAPON_TYPE_BEAM || weapon_type_class == WEAPON_TYPE_BOMB) {
         expected_damage = (int32_t)(((uint32_t)(expected_damage + 99)) / 100);
     }
 
@@ -440,22 +440,22 @@ int16_t __cdecl Will_Missile_Do_Damage_(int16_t target_idx, int16_t missile_idx)
     s_missile* missile = &MOX::_missile[missile_idx];
     int16_t type = missile->type;
 
-    if (TECHDATA::_weapons[type].type != 4) {
+    if (TECHDATA::_weapons[type].type != WEAPON_TYPE_FIGHTER) {
         damage = TECHDATA::_weapons[type].max_damage;
     } else {
         switch (type) {
-        case 28:
+        case WEAPON_ASSAULT_SHUTTLE:
             damage = 100;
             break;
-        case 29:
-        case 30:
+        case WEAPON_HEAVY_FIGHTER:
+        case WEAPON_BOMBER:
         {
             int16_t owner = MOX::_combat_data[missile->source_unit_idx].owner;
             int16_t fighter_type = MOX::_fighter_bomb_type[owner];
             damage = TECHDATA::_weapons[fighter_type].max_damage;
             break;
         }
-        case 31:
+        case WEAPON_INTERCEPTOR:
         {
             int16_t owner = MOX::_combat_data[missile->source_unit_idx].owner;
             int16_t fighter_type = MOX::_fighter_beam_type[owner];
@@ -511,19 +511,19 @@ bool __cdecl Safe_To_Fire_Sphere_Weapon_(int16_t source_ship_idx) {
     for (int16_t missile_idx = 0; missile_idx < 300; ++missile_idx) {
         int16_t weapon_type = MOX::_missile[missile_idx].type;
         if (weapon_type > 0) {
-            if (TECHDATA::_weapons[weapon_type].type != 2 /* RACK_HEAVY/MIRV */) {
+            if (TECHDATA::_weapons[weapon_type].type != WEAPON_TYPE_TORPEDO) {
                 int16_t distance = Range_To_Missile_(source_ship_idx, missile_idx);
                 if (distance < 3) {
                     int16_t missile_owner = CMBTMIS::Missile_Owner_(missile_idx);
                     int16_t quantity = MOX::_missile[missile_idx].quantity;
                     if (MOX::_combat_data[source_ship_idx].owner == missile_owner) {
-                        if (TECHDATA::_weapons[weapon_type].type == 4 /* RACK_FIGHTER */) {
+                        if (TECHDATA::_weapons[weapon_type].type == WEAPON_TYPE_FIGHTER) {
                             friendly_fighter_qty += quantity;
                         } else {
                             friendly_missile_qty += quantity;
                         }
                     } else {
-                        if (TECHDATA::_weapons[weapon_type].type == 4 /* RACK_FIGHTER */) {
+                        if (TECHDATA::_weapons[weapon_type].type == WEAPON_TYPE_FIGHTER) {
                             enemy_fighter_qty += quantity;
                         } else {
                             enemy_missile_qty += quantity;
@@ -631,7 +631,7 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
                     ship->weapons[weapon_idx].active = 1;
                     int16_t target_idx_inner = Get_Current_Target_(MOX::_cur_ship, last_target);
 
-                    if (ship->target_type_flag == 0 /* Ship */) {
+                    if (ship->target_type_flag == TARGET_TYPE_SHIP) {
                         if (target_idx_inner != -1) {
                             last_target = target_idx_inner;
                         }
@@ -643,12 +643,12 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
                     }
 
                     if (target_idx_inner != -1) {
-                        if (TECHDATA::_weapons[weapon_id].type == 0) { // Beam weapon
+                        if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
                             uint16_t specials = ship->weapons[weapon_idx].specials;
                             if (!(specials & 2)) {
                                 if (!(specials & 4) || Is_Ship_Targeted_By_Missile_(MOX::_cur_ship) == 0) {
                                     int16_t range;
-                                    if (ship->target_type_flag == 0) {
+                                    if (ship->target_type_flag == TARGET_TYPE_SHIP) {
                                         range = Range_To_Ship_(MOX::_cur_ship, target_idx_inner);
                                     } else {
                                         range = Range_To_Missile_(MOX::_cur_ship, target_idx_inner);
@@ -662,7 +662,7 @@ void __cdecl Do_Auto_Ship_Turn_(void) {
 
                         if (!skip_fire) {
                             int16_t t_x, t_y;
-                            if (ship->target_type_flag == 1 /* Missile */) {
+                            if (ship->target_type_flag == TARGET_TYPE_MISSILE) {
                                 t_x = MOX::_missile[target_idx_inner].x;
                                 t_y = MOX::_missile[target_idx_inner].y;
                                 action_result = CMBTFIRE::Fire_Ship_(MOX::_cur_ship, ship->x * 20, ship->y * 20, target_idx_inner, t_x, t_y, 1);
@@ -835,8 +835,7 @@ int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx) {
             for (int16_t slot_idx = 0; slot_idx < 8; ++slot_idx) {
                 int16_t weapon_id = ship->weapons[slot_idx].weapon_id;
 
-                // Weapons with rack type 0 (beams) or weapon ID 19 (Mauler Device)
-                if (TECHDATA::_weapons[weapon_id].type == 0 || weapon_id == 19 /* WEAPON_MAULER_DEVICE */) {
+                if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_MAULER_DEVICE) {
                     bool is_long_range = false;
 
                     if ((TECHDATA::_weapons[weapon_id].natural_mods & 4 /* W_CONT_BEAM */) != 0) {
@@ -885,8 +884,7 @@ int16_t __cdecl Get_Effective_Beam_Strength_(int16_t player_idx) {
                 for (int16_t weapon_idx = 0; weapon_idx < 8; ++weapon_idx) {
                     int16_t weapon_id = ship->weapons[weapon_idx].weapon_id;
 
-                    // Check if weapon is a beam (rack == 0) or specific weapon 0x13
-                    if (TECHDATA::_weapons[weapon_id].type == 0 || weapon_id == 0x13) {
+                    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_SPATIAL_COMPRESSOR) {
                         total_strength += CMBTAI::Get_Effective_Weapon_Damage_(ship_idx, weapon_idx);
                     }
                 }
@@ -933,7 +931,7 @@ int16_t __cdecl Select_Ship_To_Target_(int16_t ship_idx) {
  * @return The index of the selected target ship, or 0 in specific edge cases where no ship is found.
  */
 int16_t __cdecl Choose_Target_(int16_t ship_idx) {
-    MOX::_combat_data[ship_idx].target_type_flag = 0;
+    MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_SHIP;
 
     int16_t target_idx = CMBTAI::Select_Ship_To_Target_(ship_idx);
 
@@ -962,40 +960,37 @@ int16_t __cdecl Is_Ship_Out_Of_Ammo_(int16_t ship_idx) {
             s_combat_weapon_slot& slot = MOX::_combat_data[ship_idx].weapons[slot_idx];
 
             if (slot.weapon_id != 0 && slot.count > 0) {
-                int8_t rack_type = TECHDATA::_weapons[slot.weapon_id].type;
+                int8_t weapon_type_class = TECHDATA::_weapons[slot.weapon_id].type;
 
-                switch (rack_type) {
-                    case 0:
-                    case 2:
-                        // Standard weapons and torpedoes are not ammo-limited in AI logic or have internal replenishment
+                switch (weapon_type_class) {
+                    case WEAPON_TYPE_BEAM:
+                    case WEAPON_TYPE_TORPEDO:
                         out_of_ammo = 0;
                         break;
 
-                    case 1: // Missiles
+                    case WEAPON_TYPE_MISSILE:
                         if (slot.ammo > 0) {
                             out_of_ammo = 0;
                         }
                         break;
 
-                    case 3: // Bombs
-                        // Only count as having ammo if the ship is the attacker
+                    case WEAPON_TYPE_BOMB:
                         if (slot.ammo > 0 && MOX::_combat_data[ship_idx].owner == MOX::_combat_attacker_player) {
                             out_of_ammo = 0;
                         }
                         break;
 
-                    case 4: // Fighters
+                    case WEAPON_TYPE_FIGHTER:
                         if (slot.ammo > 0) {
                             out_of_ammo = 0;
                         } else {
-                            // Even if hangar is empty, if fighters are still in space, the ship has combat capacity
                             if (CMBTAI::Check_For_Launched_Fighters_(ship_idx) == 1) {
                                 out_of_ammo = 0;
                             }
                         }
                         break;
 
-                    case 5:
+                    case WEAPON_TYPE_SPECIAL:
                         if (slot.weapon_id == WEAPON_ANTI_MISSILE_ROCKET) {
                             if (slot.ammo > 0) {
                                 out_of_ammo = 0;
@@ -1037,7 +1032,7 @@ int32_t __cdecl Target_Ship_Value_(int16_t attacker_idx, int16_t target_idx, int
 
     for (int16_t w = 0; w < 8; ++w) {
         int16_t expected_dmg = CMBTAI::Expected_Weapon_Damage_(attacker_idx, w, target_idx, 0, range);
-        if (target_idx != 0 && TECHDATA::_weapons[MOX::_combat_data[attacker_idx].weapons[w].weapon_id].type == 4) {
+        if (target_idx != 0 && TECHDATA::_weapons[MOX::_combat_data[attacker_idx].weapons[w].weapon_id].type == WEAPON_TYPE_FIGHTER) {
             expected_dmg *= 2;
         }
         damage_dealt += expected_dmg;
@@ -1113,8 +1108,8 @@ int8_t __cdecl Combat_Ship_Class_(int16_t ship_idx, int16_t target_idx) {
             continue;
         }
 
-        int8_t rack = TECHDATA::_weapons[weapon_id].type;
-        switch (rack) {
+        int8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
+        switch (weapon_type_class) {
         case 0: {
             int16_t d1 = Expected_Weapon_Damage_(ship_idx, slot, target_idx, 0, 1);
             int16_t d5 = Expected_Weapon_Damage_(ship_idx, slot, target_idx, 0, 5);
@@ -1212,10 +1207,10 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
     }
 
     bool skip_ai_movement = false;
-    if (cur_ship->target_type_flag == 0 /* TARGET_TYPE_SHIP */) {
+    if (cur_ship->target_type_flag == TARGET_TYPE_SHIP) {
         int8_t mode = MOX::_player_mode[cur_ship->owner];
         if (mode == 3 || mode == 2) {
-            if (MOX::_combat_turn != 1 || TECHDATA::_weapons[cur_ship->weapons[0].weapon_id].type != 1) {
+            if (MOX::_combat_turn != 1 || TECHDATA::_weapons[cur_ship->weapons[0].weapon_id].type != WEAPON_TYPE_MISSILE) {
                 skip_ai_movement = true;
             }
         }
@@ -1230,7 +1225,7 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
         int16_t target_x;
         int16_t target_y;
 
-        if (cur_ship->target_type_flag == 1 /* TARGET_TYPE_MISSILE */) {
+        if (cur_ship->target_type_flag == TARGET_TYPE_MISSILE) {
             target_y = MOX::_missile[target_idx].y / 20;
             target_x = MOX::_missile[target_idx].x / 20;
         } else {
@@ -1254,7 +1249,7 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
                 for (int16_t gy = 0; gy < 68; ++gy) {
                     if (MOX::_combat_grid[gx][gy] == 2000) {
                         int16_t dist_from_hex;
-                        if (cur_ship->target_type_flag == 1 /* TARGET_TYPE_MISSILE */) {
+                        if (cur_ship->target_type_flag == TARGET_TYPE_MISSILE) {
                             dist_from_hex = special::Range_(gx, gy, MOX::_missile[target_idx].x / 20, MOX::_missile[target_idx].y / 20);
                         } else {
                             dist_from_hex = special::Range_(gx, gy, (int16_t)MOX::_combat_data[target_idx].x, (int16_t)MOX::_combat_data[target_idx].y);
@@ -1292,7 +1287,7 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
     int16_t final_target_x;
     int16_t final_target_y;
 
-    if (cur_ship->target_type_flag == 0 /* TARGET_TYPE_SHIP */) {
+    if (cur_ship->target_type_flag == TARGET_TYPE_SHIP) {
         final_target_y = (int16_t)MOX::_combat_data[target_idx].y;
         final_target_x = (int16_t)MOX::_combat_data[target_idx].x;
     } else {
@@ -1532,9 +1527,7 @@ int16_t __cdecl Check_For_Launched_Fighters_(int16_t source_unit_idx) {
 
         // Check if the missile/fighter belongs to the specified source unit
         if (MOX::_missile[i].source_unit_idx == source_unit_idx) {
-            // Check if the weapon type associated with this missile is a fighter rack
-            // rack type 4 corresponds to WEAPON_RACK_FIGHTER
-            if (TECHDATA::_weapons[MOX::_missile[i].type].type == 4 /* WEAPON_RACK_FIGHTER */) {
+            if (TECHDATA::_weapons[MOX::_missile[i].type].type == WEAPON_TYPE_FIGHTER) {
                 found = 1;
             }
         }
@@ -1664,10 +1657,10 @@ int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t reference_target_i
         ship_target = Get_Current_Ship_Target_(ship_idx, -1, &ship_score);
 
         if (ship_score / 2 > missile_score) {
-            MOX::_combat_data[ship_idx].target_type_flag = 0 /* Ship */;
+            MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_SHIP;
             return ship_target;
         } else {
-            MOX::_combat_data[ship_idx].target_type_flag = 1 /* Missile */;
+            MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_MISSILE;
             return missile_target;
         }
     } else {
@@ -1676,10 +1669,10 @@ int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t reference_target_i
         missile_target = Get_Current_Missile_Target_(ship_idx, &missile_score);
 
         if (missile_score / 2 > ship_score) {
-            MOX::_combat_data[ship_idx].target_type_flag = 1 /* Missile */;
+            MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_MISSILE;
             return missile_target;
         } else {
-            MOX::_combat_data[ship_idx].target_type_flag = 0 /* Ship */;
+            MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_SHIP;
             return ship_target;
         }
     }
@@ -1689,7 +1682,7 @@ int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out
     int32_t best_value = -5000;
     int16_t best_missile_idx = -1;
 
-    MOX::_combat_data[unit_idx].target_type_flag = 0; /* ship */
+    MOX::_combat_data[unit_idx].target_type_flag = TARGET_TYPE_SHIP;
 
     for (int16_t i = 0; i < 300; ++i) {
         s_missile* missile = &MOX::_missile[i];
@@ -1697,9 +1690,8 @@ int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out
         if (missile->type > 0 && missile->quantity > 0) {
             if (MOX::_combat_data[missile->source_unit_idx].owner != MOX::_combat_data[unit_idx].owner) {
                 if (CMBTAI::Will_Missile_Do_Damage_(unit_idx, i)) {
-                    int8_t rack = TECHDATA::_weapons[missile->type].type;
-                    // Filters for specific weapon racks (possibly missile/torpedo variants)
-                    if (rack == 1 || rack == 4) {
+                    int8_t weapon_type_class = TECHDATA::_weapons[missile->type].type;
+                    if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_FIGHTER) {
                         int32_t current_value = CMBTAI::Target_Missile_Value_(unit_idx, i, 1);
                         if (best_value < current_value) {
                             best_missile_idx = i;
@@ -1802,12 +1794,12 @@ int16_t __cdecl Get_Current_Ship_Target_(int16_t current_ship_idx, int16_t refer
                     int16_t bearing = CMBTDRW1::Relative_Bearing_(current_ship_idx, target_idx);
                     int8_t arc_mask = CMBTDRW1::Get_Weapon_Arc_(bearing);
                     
-                    int8_t rack = TECHDATA::_weapons[weapon->weapon_id].type;
+                    int8_t weapon_type_class = TECHDATA::_weapons[weapon->weapon_id].type;
                     
                     if (COMBAT1::Weapon_Is_On_(current_ship_idx, weapon_idx) != 0) {
                         if (weapon->shots_left > 0) {
                             if ((arc_mask & weapon->arc) != 0) {
-                                if (rack == 2) {
+                                if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                                     if (weapon->ammo != 0) {
                                         continue;
                                     }
@@ -1923,17 +1915,17 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
     }
 
     s_tech_weapon_data* weapon = &TECHDATA::_weapons[weapon_id];
-    if (weapon->type == 4) {
+    if (weapon->type == WEAPON_TYPE_FIGHTER) {
         int16_t base_damage = 0;
         switch (weapon_id) {
-            case 28:
+            case WEAPON_ASSAULT_SHUTTLE:
                 base_damage = 100;
                 break;
-            case 29:
-            case 30:
+            case WEAPON_HEAVY_FIGHTER:
+            case WEAPON_BOMBER:
                 base_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[attacker_player_idx]].max_damage;
                 break;
-            case 31:
+            case WEAPON_INTERCEPTOR:
                 base_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[attacker_player_idx]].max_damage;
                 break;
             default:
@@ -2031,22 +2023,21 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
 
     int16_t weapon_damage;
     int16_t missile_type = missile->type;
-    if (TECHDATA::_weapons[missile_type].type == 4 /* RACK_FIGHTER */) {
+    if (TECHDATA::_weapons[missile_type].type == WEAPON_TYPE_FIGHTER) {
         int16_t source_owner = MOX::_combat_data[missile->source_unit_idx].owner;
         switch (missile_type) {
-            case 0x1c: // Heavy Fighter
+            case WEAPON_ASSAULT_SHUTTLE:
                 weapon_damage = 100;
                 break;
-            case 0x1d: // Fighter Bomber 1
-            case 0x1e: // Fighter Bomber 2
-                // Fighter loadouts are stored for the 8 regular players plus the Antaran slot.
+            case WEAPON_HEAVY_FIGHTER:
+            case WEAPON_BOMBER:
                 if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
                     weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[source_owner]].max_damage;
                 } else {
                     weapon_damage = 0;
                 }
                 break;
-            case 0x1f: // Fighter Interceptor/Beam
+            case WEAPON_INTERCEPTOR:
                 if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
                     weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[source_owner]].max_damage;
                 } else {
@@ -2074,7 +2065,7 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
 
     int32_t final_value = (int16_t)(uint16_t)((weapon_damage - shield_blocked) * effective_missile_hits);
 
-    if (TECHDATA::_weapons[missile->type].type != 4) {
+    if (TECHDATA::_weapons[missile->type].type != WEAPON_TYPE_FIGHTER) {
         final_value /= 2;
     }
 
@@ -2092,25 +2083,25 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
 int16_t __cdecl Convert_Ordinal_To_Msl_Type_(int16_t ordinal) {
     switch (ordinal) {
         case 0:
-            return 14 /* 0x0e */;
+            return WEAPON_NUCLEAR_MISSILE;
         case 1:
-            return 15 /* 0x0f */;
+            return WEAPON_MERCULITE_MISSILE;
         case 2:
-            return 16 /* 0x10 */;
+            return WEAPON_PULSON_MISSILE;
         case 3:
-            return 17 /* 0x11 */;
+            return WEAPON_ZEON_MISSILE;
         case 4:
-            return 29 /* 0x1d */;
+            return WEAPON_HEAVY_FIGHTER;
         case 5:
-            return 30 /* 0x1e */;
+            return WEAPON_BOMBER;
         case 6:
-            return 31 /* 0x1f */;
+            return WEAPON_INTERCEPTOR;
         case 7:
-            return 18 /* 0x12 */;
+            return WEAPON_ANTI_MATTER_TORP;
         case 8:
-            return 20 /* 0x14 */;
+            return WEAPON_PLASMA_TORPEDO;
         case 9:
-            return 38 /* 0x26 */;
+            return WEAPON_STELLAR_CONVERTER;
         default:
             return ordinal;
     }
@@ -2147,10 +2138,10 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
                 int8_t count = MOX::_combat_data[i].weapons[j].count;
                 if (count <= 0) continue;
 
-                int8_t rack = TECHDATA::_weapons[weapon_id].type;
-                if (rack == 1 || rack == 4) {
+                int8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
+                if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_FIGHTER) {
                     if (MOX::_combat_data[i].weapons[j].ammo <= 0) continue;
-                } else if (rack != 2) {
+                } else if (weapon_type_class != WEAPON_TYPE_TORPEDO) {
                     continue;
                 }
 
@@ -2177,14 +2168,14 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
 
     for (int16_t i = 0; i < 300; ++i) {
         s_missile* msl = &MOX::_missile[i];
-        if (msl->type > 0 && TECHDATA::_weapons[msl->type].type == 4 && MOX::_combat_data[msl->source_unit_idx].owner == player_idx) {
-            if (msl->type == 29 /* WEAP_FIGHTER */) {
+        if (msl->type > 0 && TECHDATA::_weapons[msl->type].type == WEAPON_TYPE_FIGHTER && MOX::_combat_data[msl->source_unit_idx].owner == player_idx) {
+            if (msl->type == WEAPON_HEAVY_FIGHTER) {
                 missile_counts[4] += msl->quantity;
                 total_quantity += msl->quantity;
-            } else if (msl->type == 30 /* WEAP_BOMBER */) {
+            } else if (msl->type == WEAPON_BOMBER) {
                 missile_counts[5] += msl->quantity;
                 total_quantity += msl->quantity;
-            } else if (msl->type == 31 /* WEAP_HEAVY_BOMBER */) {
+            } else if (msl->type == WEAPON_INTERCEPTOR) {
                 missile_counts[6] += msl->quantity;
                 total_quantity += msl->quantity;
             }
@@ -2216,7 +2207,7 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
                     int16_t remaining_pd_count = 0;
 
                     if (CMBTFIRE::Weapon_Can_Fire_At_Missiles_(weapon_id, MOX::_combat_data[i].weapons[j].specials)) {
-                        if (TECHDATA::_weapons[weapon_id].type == 0) {
+                        if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
                             remaining_pd_count = MOX::_combat_data[i].weapons[j].count;
                             while (current_ordinal <= 6 && remaining_pd_count > 0) {
                                 int16_t kills = Average_Missile_Kills_(i, j, missile_counts[current_ordinal], msl_type, &remaining_pd_count, -1);
@@ -2234,7 +2225,7 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
                         }
                     }
 
-                    if (TECHDATA::_weapons[weapon_id].type == 0) {
+                    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
                         *beam_strength += TECHDATA::_weapons[weapon_id].max_damage * remaining_pd_count;
                     }
                 }
@@ -2283,7 +2274,7 @@ int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx
 
     int16_t current_health = *remaining_pd_count;
 
-    if (TECHDATA::_weapons[msl_type].type != 2) {
+    if (TECHDATA::_weapons[msl_type].type != WEAPON_TYPE_TORPEDO) {
         int16_t hit_chance = (CMBTMIS::Missile_Dcv_(msl_type, target_player) - 
                               MOX::_combat_data[ship_idx].tac_val_attack - 
                               MOX::_ranged_to_hit_penalty[range]) + 40;
@@ -2416,18 +2407,18 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
     for (int16_t i = 0; i < 300; ++i) {
         int16_t type = MOX::_missile[i].type;
         if (type > 0) {
-            if (TECHDATA::_weapons[type].type != 2) {
+            if (TECHDATA::_weapons[type].type != WEAPON_TYPE_TORPEDO) {
                 int16_t range = Range_To_Missile_(ship_idx, i);
                 if (range < 3) {
                     int16_t owner = CMBTMIS::Missile_Owner_(i);
                     if (owner == ship->owner) {
-                        if (TECHDATA::_weapons[type].type == 4) {
+                        if (TECHDATA::_weapons[type].type == WEAPON_TYPE_FIGHTER) {
                             friendly_rack4 += MOX::_missile[i].quantity;
                         } else {
                             friendly_other += MOX::_missile[i].quantity;
                         }
                     } else {
-                        if (TECHDATA::_weapons[type].type == 4) {
+                        if (TECHDATA::_weapons[type].type == WEAPON_TYPE_FIGHTER) {
                             enemy_rack4 += MOX::_missile[i].quantity;
                         } else {
                             score += MOX::_missile[i].quantity;

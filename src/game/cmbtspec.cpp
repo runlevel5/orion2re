@@ -1827,8 +1827,8 @@ namespace CMBTSPEC {
 
         for (int32_t i = 0; i < 300; ++i) {
             if (MOX::_missile[i].type > 0 &&
-                TECHDATA::_weapons[MOX::_missile[i].type].type != 2 &&
-                (TECHDATA::_weapons[MOX::_missile[i].type].type != 4 || game_random::Random_(2) != 1))
+                TECHDATA::_weapons[MOX::_missile[i].type].type != WEAPON_TYPE_TORPEDO &&
+                (TECHDATA::_weapons[MOX::_missile[i].type].type != WEAPON_TYPE_FIGHTER || game_random::Random_(2) != 1))
             {
                 int32_t mx = (int32_t)MOX::_missile[i].x + (int32_t)MOX::_cur_combat_x * -20;
                 int32_t my = (int32_t)MOX::_missile[i].y + (int32_t)MOX::_cur_combat_y * -20;

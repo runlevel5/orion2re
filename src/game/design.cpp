@@ -1626,9 +1626,9 @@ namespace DESIGN {
             }
 
             int16_t weapon_idx = HACCESS::Weapons_Index_From_Tech_App_(tech_app);
-            int8_t rack = TECHDATA::_weapons[weapon_idx].type;
+            int8_t weapon_type_class = TECHDATA::_weapons[weapon_idx].type;
 
-            if (rack == 3 || rack == 1 || rack == 0) {
+            if (weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BEAM) {
                 return 0;
             }
         } else if (app.type == 9) {

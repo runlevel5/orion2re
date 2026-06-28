@@ -1195,7 +1195,7 @@ namespace DESBOX {
 
             for (int16_t mod_idx = 1; mod_idx < WEAPON_MOD_COUNT; mod_idx++) {
                 if (mod_idx == WEAPON_MOD_EMMISIONS_GUIDANCE) {
-                    if (TECHDATA::_weapons[weapon_idx].type == 1 &&
+                    if (TECHDATA::_weapons[weapon_idx].type == WEAPON_TYPE_MISSILE &&
                         MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_EMISSIONS_GUIDANCE_SYSTEM] == 3) {
                         New_Mod_Space_(static_cast<uint8_t>(mod_idx));
                         valid_count++;
@@ -2087,17 +2087,15 @@ namespace DESBOX {
 
         uint8_t shift = mod_idx & 0x1F;
 
-        // Check if the specific weapon modification is allowed based on the weapon type.
-        // Each weapon type (0, 1, 2) has a bitmask defining allowed modifications.
-        if (weapon_type == 0) {
+        if (weapon_type == WEAPON_TYPE_BEAM) {
             return (int8_t)((0x01FE >> shift) & 1);
         }
 
-        if (weapon_type == 1) {
+        if (weapon_type == WEAPON_TYPE_MISSILE) {
             return (int8_t)((0x3E00 >> shift) & 1);
         }
 
-        if (weapon_type == 2) {
+        if (weapon_type == WEAPON_TYPE_TORPEDO) {
             return (int8_t)((0x6520 >> shift) & 1);
         }
 
@@ -2110,8 +2108,7 @@ namespace DESBOX {
 
         if (DESBOX::_field_item_chosen > -1) {
             int16_t weapon_idx = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
-            // If it's a beam weapon (type 0) and no firing arc is selected, it's invalid.
-            if (DESIGN::Weapon_Type_(weapon_idx) == 0 && DESBOX::_weapon_replacement_arcs == -1) {
+            if (DESIGN::Weapon_Type_(weapon_idx) == WEAPON_TYPE_BEAM && DESBOX::_weapon_replacement_arcs == -1) {
                 is_valid = 0;
                 const char* msg = HAROLD::H_Message_(0x44 /* MSG_MUST_SELECT_FIRING_ARC */);
                 strcpy(error_msg_out, msg);

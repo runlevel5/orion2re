@@ -598,6 +598,22 @@ struct s_combat_weapon_slot {
     uint8_t status;
 };
 
+typedef enum WEAPON_TYPE {
+    WEAPON_TYPE_BEAM=0,
+    WEAPON_TYPE_MISSILE=1,
+    WEAPON_TYPE_TORPEDO=2,
+    WEAPON_TYPE_BOMB=3,
+    WEAPON_TYPE_FIGHTER=4,
+    WEAPON_TYPE_SPECIAL=5,
+    WEAPON_TYPE_COUNT=6
+} WEAPON_TYPE;
+
+typedef enum TARGET_TYPE {
+    TARGET_TYPE_SHIP=0,
+    TARGET_TYPE_MISSILE=1,
+    TARGET_TYPE_COUNT=2
+} TARGET_TYPE;
+
 struct s_combat_data {
     char name[30];
     int16_t ship_idx;
