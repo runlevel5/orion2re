@@ -1508,7 +1508,7 @@ namespace CMBTFIRE {
             range_modifier = 95;
         }
 
-        int16_t local_e = 0;
+        int16_t shield_hit_y = 0;
 
         for (int16_t loop_counter = 0; loop_counter < total_shots; ++loop_counter) {
             if (continue_firing == 0) break;
@@ -1559,16 +1559,16 @@ namespace CMBTFIRE {
                             int16_t dmg_val = current_damage;
                             int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_ACHILLES_TARGETING_UNIT);
                             int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_STRUCTURAL_ANALYZER);
-                            return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &dmg_val, &local_e, shield_idx, specials, weapon_flags_00, special20, special1, 0);
+                            return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &dmg_val, &shield_hit_y, shield_idx, specials, weapon_flags_00, special20, special1, 0);
                             *hit_x += dmg_val;
-                            *hit_y += local_e;
+                            *hit_y += shield_hit_y;
                         }
                     } else {
                         int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_ACHILLES_TARGETING_UNIT);
                         int16_t special20 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_STRUCTURAL_ANALYZER);
-                        return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &current_damage, &local_e, shield_arc, specials, weapon_flags_00, special20, special1, 0);
+                        return_flags |= CMBTFIRE::Apply_Ship_Damage_(target, &current_damage, &shield_hit_y, shield_arc, specials, weapon_flags_00, special20, special1, 0);
                         *hit_x += current_damage;
-                        *hit_y += local_e;
+                        *hit_y += shield_hit_y;
                     }
                 }
             } else {

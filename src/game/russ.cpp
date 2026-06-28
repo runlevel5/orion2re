@@ -129,9 +129,9 @@ namespace RUSS {
                 int16_t swap_index = (int16_t)(index + random_offset - 1);
                 ++index;
 
-                int8_t temp = buffer[current_index];
+                int8_t swapped_value = buffer[current_index];
                 buffer[current_index] = buffer[swap_index];
-                buffer[swap_index] = temp;
+                buffer[swap_index] = swapped_value;
             } while (index < length);
         }
     }
@@ -145,9 +145,9 @@ namespace RUSS {
             int32_t random_offset = game_random::Random_((int32_t)count - i);
             int16_t target_idx = (int16_t)(i + random_offset - 1);
 
-            int32_t temp = array[i];
+            int32_t swapped_value = array[i];
             array[i] = array[target_idx];
-            array[target_idx] = temp;
+            array[target_idx] = swapped_value;
         }
     }
 
@@ -159,11 +159,11 @@ namespace RUSS {
         for (int16_t i = 0; i < count; ++i) {
             int32_t random_offset = game_random::Random_((int32_t)count - i);
 
-            int16_t temp = data[i];
+            int16_t swapped_value = data[i];
             int16_t target_idx = (int16_t)(i + random_offset - 1);
 
             data[i] = data[target_idx];
-            data[target_idx] = temp;
+            data[target_idx] = swapped_value;
         }
     }
 
@@ -195,7 +195,7 @@ namespace RUSS {
         }
 
         if (num_elements > 0) {
-            uint8_t temp[128];
+            uint8_t swap_buffer[128];
             for (int16_t i = 0; i < num_elements; ++i) {
                 int32_t random_offset = game_random::Random_((int32_t)num_elements - i);
                 int16_t j = i + (int16_t)random_offset - 1;
@@ -204,9 +204,9 @@ namespace RUSS {
                     uint8_t* element_i = (uint8_t*)buffer + (int32_t)i * (int32_t)element_size;
                     uint8_t* element_j = (uint8_t*)buffer + (int32_t)j * (int32_t)element_size;
 
-                    memcpy(temp, element_i, element_size);
+                    memcpy(swap_buffer, element_i, element_size);
                     memcpy(element_i, element_j, element_size);
-                    memcpy(element_j, temp, element_size);
+                    memcpy(element_j, swap_buffer, element_size);
                 }
             }
         }

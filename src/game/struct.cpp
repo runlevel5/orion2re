@@ -73,17 +73,17 @@ namespace struct_ {
             if (((std::uintptr_t)left_ptr & 1U) == 0) {
                 uint32_t count = byte_count;
                 do {
-                    uint8_t temp = *right_bytes;
+                    uint8_t swapped_byte = *right_bytes;
                     *right_bytes++ = *left_bytes;
-                    *left_bytes++ = temp;
+                    *left_bytes++ = swapped_byte;
                 } while (--count != 0);
                 return;
             }
 
             {
-                uint8_t temp = *right_bytes;
+                uint8_t swapped_byte = *right_bytes;
                 *right_bytes++ = *left_bytes;
-                *left_bytes++ = temp;
+                *left_bytes++ = swapped_byte;
             }
 
             byte_count -= 1;
@@ -91,21 +91,21 @@ namespace struct_ {
             uint32_t dword_count = byte_count >> 2;
             if (dword_count != 0) {
                 do {
-                    uint32_t temp;
-                    memcpy(&temp, right_bytes, sizeof(temp));
-                    memcpy(right_bytes, left_bytes, sizeof(temp));
-                    memcpy(left_bytes, &temp, sizeof(temp));
-                    right_bytes += sizeof(temp);
-                    left_bytes += sizeof(temp);
+                    uint32_t swapped_dword;
+                    memcpy(&swapped_dword, right_bytes, sizeof(swapped_dword));
+                    memcpy(right_bytes, left_bytes, sizeof(swapped_dword));
+                    memcpy(left_bytes, &swapped_dword, sizeof(swapped_dword));
+                    right_bytes += sizeof(swapped_dword);
+                    left_bytes += sizeof(swapped_dword);
                 } while (--dword_count != 0);
             }
 
             uint32_t tail_count = byte_count & 3;
             if (tail_count != 0) {
                 do {
-                    uint8_t temp = *right_bytes;
+                    uint8_t swapped_byte = *right_bytes;
                     *right_bytes++ = *left_bytes;
-                    *left_bytes++ = temp;
+                    *left_bytes++ = swapped_byte;
                 } while (--tail_count != 0);
             }
 
@@ -115,9 +115,9 @@ namespace struct_ {
         if (((std::uintptr_t)left_ptr & 1U) != 0) {
             uint32_t count = byte_count;
             do {
-                uint8_t temp = *right_bytes;
+                uint8_t swapped_byte = *right_bytes;
                 *right_bytes++ = *left_bytes;
-                *left_bytes++ = temp;
+                *left_bytes++ = swapped_byte;
             } while (--count != 0);
             return;
         }
@@ -125,21 +125,21 @@ namespace struct_ {
         uint32_t dword_count = byte_count >> 2;
         if (dword_count != 0) {
             do {
-                uint32_t temp;
-                memcpy(&temp, right_bytes, sizeof(temp));
-                memcpy(right_bytes, left_bytes, sizeof(temp));
-                memcpy(left_bytes, &temp, sizeof(temp));
-                right_bytes += sizeof(temp);
-                left_bytes += sizeof(temp);
+                uint32_t swapped_dword;
+                memcpy(&swapped_dword, right_bytes, sizeof(swapped_dword));
+                memcpy(right_bytes, left_bytes, sizeof(swapped_dword));
+                memcpy(left_bytes, &swapped_dword, sizeof(swapped_dword));
+                right_bytes += sizeof(swapped_dword);
+                left_bytes += sizeof(swapped_dword);
             } while (--dword_count != 0);
         }
 
         uint32_t tail_count = byte_count & 3;
         if (tail_count != 0) {
             do {
-                uint8_t temp = *right_bytes;
+                uint8_t swapped_byte = *right_bytes;
                 *right_bytes++ = *left_bytes;
-                *left_bytes++ = temp;
+                *left_bytes++ = swapped_byte;
             } while (--tail_count != 0);
         }
     }

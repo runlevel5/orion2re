@@ -1313,26 +1313,26 @@ namespace DESBOX {
     }
 
     void __cdecl Weapons_Replacement_Box_() {
-        char local_824[30];
-        char local_806[30];
-        char local_7e8[30];
-        char local_7ca[30];
-        char local_7ac[4];
-        char acStack_888[100];
-        char acStack_78c[200];
-        char acStack_6c4[200];
-        char acStack_5fc[200];
-        char acStack_534[1332];
+        char front_arc_text[30];
+        char rear_arc_text[30];
+        char beam_arc_text[30];
+        char left_arc_text[30];
+        char full_arc_text[4];
+        char message_box_text[100];
+        char invalid_arc_format[200];
+        char invalid_rack_format[200];
+        char incompatible_weapon_format[200];
+        char tech_application_description[1332];
 
         uint8_t racks[5] = { 2, 5, 10, 15, 20 };
 
-        strlcpy(local_824, HAROLD::H_Message_(0x46), sizeof(local_824));
-        strlcpy(local_806, HAROLD::H_Message_(0x47), sizeof(local_806));
-        strlcpy(local_7e8, HAROLD::H_Message_(0x48), sizeof(local_7e8));
-        strlcpy(local_7ca, HAROLD::H_Message_(0x49), sizeof(local_7ca));
-        strlcpy(local_7ac, "360", sizeof(local_7ac));
+        strlcpy(front_arc_text, HAROLD::H_Message_(0x46), sizeof(front_arc_text));
+        strlcpy(rear_arc_text, HAROLD::H_Message_(0x47), sizeof(rear_arc_text));
+        strlcpy(beam_arc_text, HAROLD::H_Message_(0x48), sizeof(beam_arc_text));
+        strlcpy(left_arc_text, HAROLD::H_Message_(0x49), sizeof(left_arc_text));
+        strlcpy(full_arc_text, "360", sizeof(full_arc_text));
 
-        char* arc_strings[5] = { local_824, local_806, local_7e8, local_7ca, local_7ac };
+        char* arc_strings[5] = { front_arc_text, rear_arc_text, beam_arc_text, left_arc_text, full_arc_text };
 
         allocate::Push_Block_(MOX::_global_data_seg);
         MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, sizeof(*MOX::_scroll_bar));
@@ -1415,18 +1415,18 @@ namespace DESBOX {
                 for (int16_t i = 0; i < 5; ++i) {
                     if (weap_type == 0 && MOX::_weapon_arc_field[i] == input) {
                         if (_valid_arcs_racks[i] == 0) {
-                            MISC::Get_LBX_Message_(0x4B, acStack_78c);
-                            snprintf(acStack_888, sizeof(acStack_888), acStack_78c, arc_strings[i]);
-                            GENDRAW::Message_Box_(acStack_888);
+                            MISC::Get_LBX_Message_(0x4B, invalid_arc_format);
+                            snprintf(message_box_text, sizeof(message_box_text), invalid_arc_format, arc_strings[i]);
+                            GENDRAW::Message_Box_(message_box_text);
                         } else {
                             _weapon_replacement_arcs = 1 << i;
                         }
                         continue;
                     } else if ((weap_type == 1 || weap_type == 2) && MOX::_weapon_rack_field[i] == input) {
                         if (_valid_arcs_racks[i] == 0) {
-                            MISC::Get_LBX_Message_(0x4C, acStack_6c4);
-                            snprintf(acStack_888, sizeof(acStack_888), acStack_6c4, racks[i]);
-                            GENDRAW::Message_Box_(acStack_888);
+                            MISC::Get_LBX_Message_(0x4C, invalid_rack_format);
+                            snprintf(message_box_text, sizeof(message_box_text), invalid_rack_format, racks[i]);
+                            GENDRAW::Message_Box_(message_box_text);
                         } else {
                             _weapon_replacement_arcs = 0x10;
                             _weapon_replacement_rack = i;
@@ -1499,8 +1499,8 @@ namespace DESBOX {
                 if (weap_idx <= 0) {
                     TEXTBOX::Draw_Help_Entry_(0x2B2);
                 } else {
-                    EVANHELP::Get_Application_Description_(acStack_534, TECHDATA::_weapons[weap_idx].tech_app_id);
-                    TEXTBOX::Text_Box_(TECHDATA::_weapons[weap_idx].name, acStack_534);
+                    EVANHELP::Get_Application_Description_(tech_application_description, TECHDATA::_weapons[weap_idx].tech_app_id);
+                    TEXTBOX::Text_Box_(TECHDATA::_weapons[weap_idx].name, tech_application_description);
                 }
             }
 
@@ -1517,9 +1517,9 @@ namespace DESBOX {
                     int16_t weap_idx = Weapon_Index_(_field_item_chosen);
                     int16_t wtype = DESIGN::Weapon_Type_(weap_idx);
                     if (wtype == 3 || wtype == 4 || wtype == 5) {
-                        MISC::Get_LBX_Message_(0x4F, acStack_5fc);
-                        snprintf(acStack_888, sizeof(acStack_888), acStack_5fc, TECHDATA::_weapons[weap_idx].name);
-                        GENDRAW::Message_Box_(acStack_888);
+                        MISC::Get_LBX_Message_(0x4F, incompatible_weapon_format);
+                        snprintf(message_box_text, sizeof(message_box_text), incompatible_weapon_format, TECHDATA::_weapons[weap_idx].name);
+                        GENDRAW::Message_Box_(message_box_text);
                     }
                 }
             }
@@ -1833,7 +1833,7 @@ namespace DESBOX {
     }
 
     int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx) {
-        int16_t local_2 = 0;
+        int16_t zero_space = 0;
         int16_t rack_space;
         int16_t weapon_space;
 
@@ -1857,8 +1857,8 @@ namespace DESBOX {
                 rack_space = 0;
             }
         } else {
-            weapon_space = local_2;
-            rack_space = local_2;
+            weapon_space = zero_space;
+            rack_space = zero_space;
         }
 
         int16_t total_space;
@@ -2773,18 +2773,18 @@ namespace DESBOX {
         int16_t space;
         int16_t item_idx;
         int16_t j;
-        int16_t local_162 = 3;
-        s_colors sStack_160;
-        s_colors local_158;
-        s_colors local_150;
-        s_colors local_148;
+        int16_t fitted_font_style = 3;
+        s_colors saved_font_colors;
+        s_colors header_colors;
+        s_colors unavailable_colors;
+        s_colors available_colors;
         char space_str[20];
         char cost_str[20];
         char special_name[80];
         char special_desc[200];
 
-        local_158 = *MISC::Font_Colors2_(4, 'U', '\\');
-        fonts::Set_Font_Style_(4, &local_158);
+        header_colors = *MISC::Font_Colors2_(4, 'U', '\\');
+        fonts::Set_Font_Style_(4, &header_colors);
 
         int16_t local_y = base_y + 0x46;
         fonts::Print_(base_x + 0x44, local_y, HAROLD::H_Message_(0x37));
@@ -2792,9 +2792,9 @@ namespace DESBOX {
         fonts::Print_(base_x + 0x106, local_y, HAROLD::H_Message_(0x2b));
         fonts::Print_(base_x + 0x156, local_y, HAROLD::H_Message_(0x38));
 
-        local_150 = *MISC::Font_Colors2_(2, 'U', 'W');
-        local_158 = *MISC::Font_Colors2_(2, 'U', '\\');
-        local_148 = *MISC::Font_Colors2_(3, 'U', 'Z');
+        unavailable_colors = *MISC::Font_Colors2_(2, 'U', 'W');
+        header_colors = *MISC::Font_Colors2_(2, 'U', '\\');
+        available_colors = *MISC::Font_Colors2_(3, 'U', 'Z');
 
         local_y = base_y + 0x59;
 
@@ -2804,11 +2804,11 @@ namespace DESBOX {
         int16_t i = 1;
         do {
             fonts::Set_Font_Spacing_(1);
-            fonts::Get_Colors_(&sStack_160);
-            MISC::Set_Fitted_Font_Style_(TECHDATA::_specials[i].name, &sStack_160, local_162, 1, -1, 0xa5, 1);
+            fonts::Get_Colors_(&saved_font_colors);
+            MISC::Set_Fitted_Font_Style_(TECHDATA::_specials[i].name, &saved_font_colors, fitted_font_style, 1, -1, 0xa5, 1);
             int16_t style = MISC::Get_Font_Style_();
-            if (style < local_162) {
-                local_162 = style;
+            if (style < fitted_font_style) {
+                fitted_font_style = style;
             }
             i++;
         } while (i < 0x27);
@@ -2848,16 +2848,16 @@ namespace DESBOX {
                     }
 
                     if (!can_fit) {
-                        fonts::Set_Font_Style_(local_162, &local_150);
+                        fonts::Set_Font_Style_(fitted_font_style, &unavailable_colors);
                     }
                     else {
-                        fonts::Set_Font_Style_(local_162, &local_148);
+                        fonts::Set_Font_Style_(fitted_font_style, &available_colors);
                     }
 
                     if (_field_item_scanned == j && can_fit) {
                         s_colors temp_colors;
                         temp_colors = *MISC::Font_Colors2_(2, 'U', 'X');
-                        fonts::Set_Font_Style_(local_162, &temp_colors);
+                        fonts::Set_Font_Style_(fitted_font_style, &temp_colors);
                         MISC::Increase_Font_Color_Range_(MOX::_multi_colored_line_start);
                     }
 
@@ -2879,8 +2879,8 @@ namespace DESBOX {
                         fonts::Print_Right_(base_x + 0xe3, local_y, space_str);
                         fonts::Print_Right_(base_x + 0x124, local_y, cost_str);
 
-                        fonts::Get_Colors_(&local_158);
-                        fonts::Set_Font_Style_(local_162, &sStack_160);
+                        fonts::Get_Colors_(&header_colors);
+                        fonts::Set_Font_Style_(fitted_font_style, &saved_font_colors);
 
                         fonts::Set_Font_Spacing_(1);
                         fonts::Print_(base_x + 0x13e, local_y, special_desc);

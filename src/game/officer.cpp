@@ -321,9 +321,9 @@ namespace OFFICER {
             int16_t idx1 = (int16_t)game_random::Random_(10) - 1;
             int16_t idx2 = (int16_t)game_random::Random_(10) - 1;
             if (idx1 != idx2) {
-                int16_t tmp = leader_indices[idx1];
+                int16_t swapped_leader_idx = leader_indices[idx1];
                 leader_indices[idx1] = leader_indices[idx2];
-                leader_indices[idx2] = tmp;
+                leader_indices[idx2] = swapped_leader_idx;
             }
         }
 
@@ -348,9 +348,9 @@ namespace OFFICER {
             int16_t idx1 = (int16_t)game_random::Random_(25) - 1;
             int16_t idx2 = (int16_t)game_random::Random_(25) - 1;
             if (idx1 != idx2) {
-                int16_t tmp = leader_indices[idx1];
+                int16_t swapped_leader_idx = leader_indices[idx1];
                 leader_indices[idx1] = leader_indices[idx2];
-                leader_indices[idx2] = tmp;
+                leader_indices[idx2] = swapped_leader_idx;
             }
         }
 
@@ -2962,7 +2962,7 @@ namespace OFFICER {
 
         FLT2::Add_Fltscrn_Small_Icon_Fields_();
 
-        int16_t local_2;
+        int16_t galaxy_map_name_field;
         MOVEBOX::Add_Galaxy_Map_Fields_2_(
             0x132, 
             0xeb, 
@@ -2973,7 +2973,7 @@ namespace OFFICER {
             0, 
             0, 
             1, 
-            &local_2, 
+            &galaxy_map_name_field, 
             MOX::_galaxy_map_star_field, 
             &MOX::_galaxy_map_grid_field
         );
@@ -3032,10 +3032,10 @@ namespace OFFICER {
     }
 
     void __cdecl Add_Display_Popup_Fields_(int16_t system_id) {
-        int16_t local_4;
-        int16_t local_2;
+        int16_t popup_close_field;
+        int16_t popup_name_field;
 
-        SYS::Add_System_Display_Popup_Fields_(system_id, 0x132, 0x11, 0, 0, 0, 0, &local_4, nullptr, &local_2);
+        SYS::Add_System_Display_Popup_Fields_(system_id, 0x132, 0x11, 0, 0, 0, 0, &popup_close_field, nullptr, &popup_name_field);
     }
 
     void __cdecl Print_ETA_On_Officer_Picture_(int16_t leader_idx, int16_t x, int16_t y, int16_t w) {

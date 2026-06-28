@@ -525,18 +525,18 @@ namespace raceopt {
         int16_t loop3_j = 0;
         int16_t cost_diff = 0;
 
-        s_colors local_64;
-        local_64.colors[0] = 0x89;
-        local_64.colors[1] = 0x91;
-        local_64.colors[2] = 0x91;
-        local_64.colors[3] = 0x91;
-        local_64.colors[4] = 0x91;
-        local_64.colors[5] = 0x91;
-        local_64.colors[6] = 0x91;
-        local_64.colors[7] = 0x91;
+        s_colors disabled_value_colors;
+        disabled_value_colors.colors[0] = 0x89;
+        disabled_value_colors.colors[1] = 0x91;
+        disabled_value_colors.colors[2] = 0x91;
+        disabled_value_colors.colors[3] = 0x91;
+        disabled_value_colors.colors[4] = 0x91;
+        disabled_value_colors.colors[5] = 0x91;
+        disabled_value_colors.colors[6] = 0x91;
+        disabled_value_colors.colors[7] = 0x91;
 
         s_colors disabled_cost_color = {{ 0x89, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95 }};
-        char local_50[12];
+        char ability_cost_text[12];
 
         fonts::Set_Font_Style_Shadow_Down_(3, &_color_opt);
         fonts::Set_Outline_Color_(0x77, 0);
@@ -601,28 +601,28 @@ namespace raceopt {
                         _group_button[item_idx] == -1000) 
                     {
                         draw_text = true;
-                        fonts::Set_Font_Style_Shadow_Down_(2, &local_64);
+                        fonts::Set_Font_Style_Shadow_Down_(2, &disabled_value_colors);
                     }
                 }
 
                 if (draw_text) {
-                    char local_5c[12];
-                    local_50[0] = '\0';
-                    local_50[1] = '\0';
-                    itoa(_ability_costs[neg_idx], local_5c, 10);
-                    strcpy(local_50 + 1, local_5c);
+                    char ability_cost_digits[12];
+                    ability_cost_text[0] = '\0';
+                    ability_cost_text[1] = '\0';
+                    itoa(_ability_costs[neg_idx], ability_cost_digits, 10);
+                    strcpy(ability_cost_text + 1, ability_cost_digits);
 
                     fonts::Print_(x_coords[col_idx], y, _opt_string[item_idx]);
                     int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
                     
                     int dots_start = x_coords[col_idx] - 1 + str_w;
-                    int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(local_50) - 0x32;
+                    int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(ability_cost_text) - 0x32;
                     
                     for (int x = dots_start; x < target_x - 4; x += 4) {
                         fonts::Print_(x, y, ".");
                     }
                     
-                    fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y, local_50);
+                    fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y, ability_cost_text);
                 }
                 
                 y += 0xD;
@@ -665,26 +665,26 @@ namespace raceopt {
             } else {
                 if (_ability_costs[neg_idx] + _negative_picks < -10 || _picks - cost_diff < 0) {
                     draw_text2 = true;
-                    fonts::Set_Font_Style_Shadow_Down_(2, &local_64);
+                    fonts::Set_Font_Style_Shadow_Down_(2, &disabled_value_colors);
                 }
             }
 
             if (draw_text2) {
-                char local_5c[12];
-                itoa(_ability_costs[neg_idx], local_5c, 10);
-                strlcpy(local_50, local_5c, sizeof(local_50));
+                char ability_cost_digits[12];
+                itoa(_ability_costs[neg_idx], ability_cost_digits, 10);
+                strlcpy(ability_cost_text, ability_cost_digits, sizeof(ability_cost_text));
 
                 int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
 
                 int dots_start = x_coords[col_idx] - 1 + str_w;
-                int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(local_50) - 0x32;
+                int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(ability_cost_text) - 0x32;
 
                 for (int x = dots_start; x < target_x - 4; x += 4) {
                     fonts::Print_(x, y2, ".");
                 }
 
                 fonts::Print_(x_coords[col_idx], y2, _opt_string[item_idx]);
-                fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y2, local_50);
+                fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y2, ability_cost_text);
             }
 
             y2 += 0xD;
@@ -720,28 +720,28 @@ namespace raceopt {
                                 _ability_costs[item_idx - 11] + _negative_picks < -10) 
                             {
                                 animate::Draw_(x_coords[col_idx] - 0x14, y3, _off_button_seg);
-                                fonts::Set_Font_Style_Shadow_Down_(2, &local_64);
+                                fonts::Set_Font_Style_Shadow_Down_(2, &disabled_value_colors);
                             } else {
                                 draw_text3 = false;
                             }
                         }
 
                         if (draw_text3) {
-                            char local_5c[12];
-                            itoa(_ability_costs[item_idx - 11], local_5c, 10);
-                            strlcpy(local_50, local_5c, sizeof(local_50));
+                            char ability_cost_digits[12];
+                            itoa(_ability_costs[item_idx - 11], ability_cost_digits, 10);
+                            strlcpy(ability_cost_text, ability_cost_digits, sizeof(ability_cost_text));
 
                             int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
 
                             int dots_start = x_coords[col_idx] - 1 + str_w;
-                            int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(local_50) - 0x32;
+                            int target_x = x_coords[col_idx + 1] - fonts::Get_String_Width_(ability_cost_text) - 0x32;
 
                             for (int x = dots_start; x < target_x - 4; x += 4) {
                                 fonts::Print_(x, y3, ".");
                             }
 
                             fonts::Print_(x_coords[col_idx], y3, _opt_string[item_idx]);
-                            fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y3, local_50);
+                            fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y3, ability_cost_text);
                         }
 
                         y3 += 0x10;

@@ -528,9 +528,9 @@ namespace line {
                 Plasma_Line_(x2, y1, x2, y2, replace::_graphics_buffer, width);
 
                 for (int16_t mirror_index = 0; mirror_index < 511; ++mirror_index) {
-                    uint8_t tmp = replace::_graphics_buffer[mirror_index];
+                    uint8_t mirrored_pixel = replace::_graphics_buffer[mirror_index];
                     replace::_graphics_buffer[mirror_index] = replace::_graphics_buffer[1022 - mirror_index];
-                    replace::_graphics_buffer[1022 - mirror_index] = tmp;
+                    replace::_graphics_buffer[1022 - mirror_index] = mirrored_pixel;
                 }
 
                 Plasma_Line_(x1, y1, x1, y2, replace::_graphics_buffer, height + width);

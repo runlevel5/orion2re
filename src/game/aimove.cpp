@@ -2368,10 +2368,10 @@ namespace AIMOVE {
                 int32_t reachable = N_Enemy_Stars_Reachable_(_i_ai, owner, star_idx);
                 uint32_t reachable_sq = special::isqrt_(reachable * 100);
 
-                uint32_t temp = (colony_worth * total_space_strength) / defending_space;
-                temp = (temp * total_bomb_strength) / defending_ground;
+                uint32_t attack_strength = (colony_worth * total_space_strength) / defending_space;
+                attack_strength = (attack_strength * total_bomb_strength) / defending_ground;
 
-                attack_worthiness = (reachable_sq * temp) / 10;
+                attack_worthiness = (reachable_sq * attack_strength) / 10;
 
                 if (target_info != nullptr) {
                     uint32_t target_val = (total_space_strength * 100 / defending_space * total_bomb_strength) / defending_ground;

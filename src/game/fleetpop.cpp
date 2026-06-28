@@ -125,8 +125,8 @@ namespace FLEETPOP {
     }
 
 void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t allow_input_fields) {
-    int16_t local_a = -1;
-    int16_t local_8 = -1;
+    int16_t first_icon_x = -1;
+    int16_t first_icon_y = -1;
     int16_t stack_node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
 
     if (stack_node == MOX::_first_node_ptr_in_stack_) {
@@ -152,11 +152,11 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t allow_inpu
             int16_t icon_x = MOX::_fleet_movement_icon[i].x;
             int16_t icon_y = MOX::_fleet_movement_icon[i].y;
 
-            if (local_a < 0) {
-                local_a = icon_x;
+            if (first_icon_x < 0) {
+                first_icon_x = icon_x;
             }
-            if (local_8 < 0) {
-                local_8 = icon_y;
+            if (first_icon_y < 0) {
+                first_icon_y = icon_y;
             }
 
             HACCESS::Fleet_Movement_Ship_Id_(i);

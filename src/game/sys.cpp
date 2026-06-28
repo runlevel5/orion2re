@@ -677,7 +677,7 @@ namespace SYS {
     }
 
     void __cdecl Draw_System_Display_Popup_(int16_t star_idx, int8_t draw_border, const char* title_text, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset) {
-        char local_64[100];
+        char title_buffer[100];
 
         MOX::_ship_frame = (short)((MOX::_ship_frame + 1) % 32000);
         if (MOX::_current_screen == SCREEN_MAIN) {
@@ -700,8 +700,8 @@ namespace SYS {
                     title_text = HAROLD::H_Message_(0x16b);
                 } else {
                     title_text = HAROLD::H_Message_(0x16a);
-                    snprintf(local_64, sizeof(local_64), title_text, &MOX::_star[star_idx]);
-                    title_text = local_64;
+                    snprintf(title_buffer, sizeof(title_buffer), title_text, &MOX::_star[star_idx]);
+                    title_text = title_buffer;
                 }
                 Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, title_text);
                 Print_Empty_System_Data_(star_idx);
@@ -725,8 +725,8 @@ namespace SYS {
 
             Draw_System_Special_Popup_(content_w + base_x + 5, y_offset + content_h + base_y, SYSTEM_SPECIAL_SPACE_MONSTER, star_idx);
             const char* title_fmt = HAROLD::H_Message_(0x16a);
-            snprintf(local_64, sizeof(local_64), title_fmt, &MOX::_star[star_idx]);
-            Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, local_64);
+            snprintf(title_buffer, sizeof(title_buffer), title_fmt, &MOX::_star[star_idx]);
+            Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, title_buffer);
             return;
         }
 
@@ -739,42 +739,42 @@ namespace SYS {
         if (MOX::_star[star_index].wormhole_star_id > -1) {
             short wormhole_star_id = (short)MOX::_star[star_index].wormhole_star_id;
             s_colors* wormhole_font_colors = MISC::Font_Colors2_(1, 'n', 's');
-            s_colors local_bc;
-            memcpy(&local_bc, wormhole_font_colors, sizeof(s_colors));
-            fonts::Set_Font_Style_(1, &local_bc);
+            s_colors wormhole_title_colors;
+            memcpy(&wormhole_title_colors, wormhole_font_colors, sizeof(s_colors));
+            fonts::Set_Font_Style_(1, &wormhole_title_colors);
 
-            short local_c2;
-            short sStack_c0;
+            short wormhole_text_right_x;
+            short wormhole_text_y;
             if (MOX::_current_screen == SCREEN_OFFICERS) {
-                local_c2 = 0x270;
-                sStack_c0 = 0xbb;
+                wormhole_text_right_x = 0x270;
+                wormhole_text_y = 0xbb;
             } else {
-                local_c2 = base_x + 0x149 + content_w;
-                sStack_c0 = content_h;
+                wormhole_text_right_x = base_x + 0x149 + content_w;
+                wormhole_text_y = content_h;
                 short font_height = fonts::Get_Font_Height_();
-                sStack_c0 = (sStack_c0 - font_height) + 0xe4 + base_y;
+                wormhole_text_y = (wormhole_text_y - font_height) + 0xe4 + base_y;
             }
 
-            char local_b4[100];
-            local_b4[0] = '\0';
+            char wormhole_info_text[100];
+            wormhole_info_text[0] = '\0';
 
             if (MOX::_star[star_index].wormhole_star_id <= -1) {
                 if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
                     const char* special_text = MOX::_planet_special_string[MOX::_star[star_index].system_special];
-                    strlcpy(local_b4, special_text, sizeof(local_b4));
+                    strlcpy(wormhole_info_text, special_text, sizeof(wormhole_info_text));
                 }
             } else {
                 if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, wormhole_star_id)) {
                     const char* wormhole_fmt = HAROLD::H_Message_(0x16c);
-                    snprintf(local_b4, sizeof(local_b4), wormhole_fmt, &MOX::_star[wormhole_star_id]);
+                    snprintf(wormhole_info_text, sizeof(wormhole_info_text), wormhole_fmt, &MOX::_star[wormhole_star_id]);
                 } else {
                     const char* unknown_wormhole_text = HAROLD::H_Message_(0x16d);
-                    strlcpy(local_b4, unknown_wormhole_text, sizeof(local_b4));
+                    strlcpy(wormhole_info_text, unknown_wormhole_text, sizeof(wormhole_info_text));
                 }
             }
 
-            if (local_b4[0] != '\0') {
-                fonts::Print_Right_(local_c2, sStack_c0, local_b4);
+            if (wormhole_info_text[0] != '\0') {
+                fonts::Print_Right_(wormhole_text_right_x, wormhole_text_y, wormhole_info_text);
             }
         }
 
@@ -793,52 +793,52 @@ namespace SYS {
             Draw_Sun_Seg_(star_idx, base_x, base_y, content_w, content_h, y_offset, x_offset);
         }
 
-        for (short sVar15 = 0; sVar15 < 5; ++sVar15) {
-            s_sys_disp* psVar1 = &MOX::_sys_disp[sVar15];
-            if (psVar1->orbit > -1) {
-                s_planet_data* psVar8 = &MOX::_planet[psVar1->orbit];
-                int8_t planet_size = psVar8->size;
-                if (psVar8->planet_type == PLANET_TYPE_GAS_GIANT) {
+        for (short orbit_slot = 0; orbit_slot < 5; ++orbit_slot) {
+            s_sys_disp* orbit_display = &MOX::_sys_disp[orbit_slot];
+            if (orbit_display->orbit > -1) {
+                s_planet_data* planet = &MOX::_planet[orbit_display->orbit];
+                int8_t planet_size = planet->size;
+                if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
                     planet_size = PLANET_SIZE_HUGE;
                 }
-                short sVar11 = psVar1->x + x_offset + content_w + 0x9f + base_x;
-                short sVar_y = psVar1->y + y_offset + content_h + 0x58 + base_y;
+                short marker_x = orbit_display->x + x_offset + content_w + 0x9f + base_x;
+                short marker_y = orbit_display->y + y_offset + content_h + 0x58 + base_y;
 
-                if (psVar8->colony_index > -1) {
-                    if (psVar8->planet_type == PLANET_TYPE_ASTEROID) {
+                if (planet->colony_index > -1) {
+                    if (planet->planet_type == PLANET_TYPE_ASTEROID) {
                         short offset = (short)(MOX::_rot_plan_dim[planet_size] >> 1);
-                        sVar11 += offset;
-                        sVar_y += offset;
+                        marker_x += offset;
+                        marker_y += offset;
                     }
-                    short sVar4 = (short)MOX::_colony[psVar8->colony_index].owner;
-                    if (MOX::_colony[psVar8->colony_index].outpost_flag == '\0') {
-                        Draw_Colony_Marker_(sVar11, sVar_y, sVar4);
+                    short colony_owner = (short)MOX::_colony[planet->colony_index].owner;
+                    if (MOX::_colony[planet->colony_index].outpost_flag == '\0') {
+                        Draw_Colony_Marker_(marker_x, marker_y, colony_owner);
                     } else {
-                        Draw_Outpost_Marker_(sVar11, sVar_y, sVar4);
+                        Draw_Outpost_Marker_(marker_x, marker_y, colony_owner);
                     }
                 }
             }
         }
 
-        for (short sVar15 = 0; sVar15 < 5; ++sVar15) {
-            short sVar11 = MOX::_sys_disp[sVar15].orbit;
-            if (sVar11 > -1) {
-                int8_t planet_size = MOX::_planet[sVar11].size;
-                if (MOX::_planet[sVar11].planet_type == PLANET_TYPE_GAS_GIANT) {
+        for (short orbit_slot = 0; orbit_slot < 5; ++orbit_slot) {
+            short planet_idx = MOX::_sys_disp[orbit_slot].orbit;
+            if (planet_idx > -1) {
+                int8_t planet_size = MOX::_planet[planet_idx].size;
+                if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_GAS_GIANT) {
                     planet_size = PLANET_SIZE_HUGE;
                 }
-                short sVar4 = (short)(MOX::_sys_disp[sVar15].x + x_offset + content_w + 0x9f + base_x);
-                short sVar_y = (short)(MOX::_sys_disp[sVar15].y + y_offset + content_h + 0x58 + base_y);
+                short highlight_x = (short)(MOX::_sys_disp[orbit_slot].x + x_offset + content_w + 0x9f + base_x);
+                short highlight_y = (short)(MOX::_sys_disp[orbit_slot].y + y_offset + content_h + 0x58 + base_y);
 
-                if (MOX::_sys_disp[sVar15].orbit_idx == MOX::_system_icon_scanned) {
-                    if (MOX::_planet[sVar11].planet_type != PLANET_TYPE_ASTEROID) {
+                if (MOX::_sys_disp[orbit_slot].orbit_idx == MOX::_system_icon_scanned) {
+                    if (MOX::_planet[planet_idx].planet_type != PLANET_TYPE_ASTEROID) {
                         uint16_t dim = (uint16_t)MOX::_rot_plan_dim[planet_size];
-                        Draw_System_Highlight_(sVar11, dim, dim, sVar4, sVar_y);
+                        Draw_System_Highlight_(planet_idx, dim, dim, highlight_x, highlight_y);
                     }
-                    short local_c4, local_c6;
-                    Print_Planet_Info_Short_(sVar11, &local_c4, &local_c6);
-                    MISC::Draw_Darkened_Box_(x_offset + content_w + base_x, y_offset + content_h + base_y, local_c4 + 9, local_c6 + 4, 0x3f);
-                    Print_Planet_Info_(base_x, base_y, content_w, content_h, sVar11, x_offset, y_offset);
+                    short info_box_width, info_box_height;
+                    Print_Planet_Info_Short_(planet_idx, &info_box_width, &info_box_height);
+                    MISC::Draw_Darkened_Box_(x_offset + content_w + base_x, y_offset + content_h + base_y, info_box_width + 9, info_box_height + 4, 0x3f);
+                    Print_Planet_Info_(base_x, base_y, content_w, content_h, planet_idx, x_offset, y_offset);
                 }
             }
         }

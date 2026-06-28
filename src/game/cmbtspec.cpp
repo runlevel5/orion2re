@@ -556,8 +556,8 @@ namespace CMBTSPEC {
             }
 
             while (true) {
-                int16_t temp = rotations_left % 16;
-                if (temp != 15 && temp >= 2) break;
+                int16_t normalized_rotation = rotations_left % 16;
+                if (normalized_rotation != 15 && normalized_rotation >= 2) break;
                 rotations_left += (int16_t)game_random::Random_(13);
             }
 

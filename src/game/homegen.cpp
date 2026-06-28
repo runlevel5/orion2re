@@ -259,9 +259,9 @@ namespace HOMEGEN {
             for (int i = 0; i < 4; ++i) {
                 int idx1 = game_random::Random_(sel_list->count) - 1;
                 int idx2 = game_random::Random_(sel_list->count) - 1;
-                int16_t tmp = sel_list->stars[idx1];
+                int16_t swapped_star = sel_list->stars[idx1];
                 sel_list->stars[idx1] = sel_list->stars[idx2];
-                sel_list->stars[idx2] = tmp;
+                sel_list->stars[idx2] = swapped_star;
             }
 
             // Clear the player-slot output list.
@@ -291,9 +291,9 @@ namespace HOMEGEN {
             int16_t idx2 = (uint16_t)game_random::Random_((int32_t)MOX::_NUM_PLAYERS) - 1;
 
             if (idx1 != idx2) {
-                int16_t temp = home_star_ids[idx1];
+                int16_t swapped_home_star = home_star_ids[idx1];
                 home_star_ids[idx1] = home_star_ids[idx2];
-                home_star_ids[idx2] = temp;
+                home_star_ids[idx2] = swapped_home_star;
             }
         }
     }

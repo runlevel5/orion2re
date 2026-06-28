@@ -80,9 +80,9 @@ void __cdecl Flip_Bitmap_Down_Same_(uint8_t* data, uint32_t width, uint32_t heig
         uint8_t* right = row_end;
 
         do {
-            uint8_t temp = *right;
+            uint8_t swapped_pixel = *right;
             *right = *left;
-            *left = temp;
+            *left = swapped_pixel;
             right--;
             left++;
         } while (--half_width != 0);
@@ -114,9 +114,9 @@ void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, uint32_t width, uint32_t he
         uint32_t w = width;
 
         do {
-            uint8_t temp = *cur_bottom;
+            uint8_t swapped_pixel = *cur_bottom;
             *cur_bottom = *cur_top;
-            *cur_top = temp;
+            *cur_top = swapped_pixel;
 
             cur_bottom++;
             cur_top++;

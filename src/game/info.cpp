@@ -347,53 +347,53 @@ namespace INFO {
             int8_t trait_val = traits[trait_idx];
 
             if (trait_val != 0 || trait_idx == TRAIT_CURRENT_GOVERNMENT) {
-                char local_40[64];
-                char local_80[64];
+                char trait_label[64];
+                char formatted_trait_text[64];
 
-                strlcpy(local_40, "^ ", sizeof(local_40));
+                strlcpy(trait_label, "^ ", sizeof(trait_label));
 
                 if (trait_idx == TRAIT_CURRENT_GOVERNMENT) {
-                    strlcat(local_40, MOX::_government_labels[trait_val], sizeof(local_40));
+                    strlcat(trait_label, MOX::_government_labels[trait_val], sizeof(trait_label));
                 } else if (trait_idx == TRAIT_RICH_HOME_WORLD) {
                     if (trait_val < 0) {
-                        strlcat(local_40, MOX::_special_ability_names[31], sizeof(local_40));
+                        strlcat(trait_label, MOX::_special_ability_names[31], sizeof(trait_label));
                     } else {
-                        strlcat(local_40, MOX::_special_ability_names[15], sizeof(local_40));
+                        strlcat(trait_label, MOX::_special_ability_names[15], sizeof(trait_label));
                     }
                 } else {
-                    strlcat(local_40, MOX::_special_ability_names[trait_idx], sizeof(local_40));
+                    strlcat(trait_label, MOX::_special_ability_names[trait_idx], sizeof(trait_label));
                 }
 
-                char* print_str = local_40;
+                char* print_str = trait_label;
 
                 if (trait_idx > TRAIT_CURRENT_GOVERNMENT && trait_idx < TRAIT_LOW_G_WORLD) {
                     if (trait_idx == TRAIT_FOOD_BONUS) {
-                        strlcpy(local_80, local_40, sizeof(local_80));
+                        strlcpy(formatted_trait_text, trait_label, sizeof(formatted_trait_text));
                         if (trait_val < 0) {
-                            strlcat(local_80, "-0.5", sizeof(local_80));
+                            strlcat(formatted_trait_text, "-0.5", sizeof(formatted_trait_text));
                         } else if (trait_val == 2) {
-                            strlcat(local_80, "+1", sizeof(local_80));
+                            strlcat(formatted_trait_text, "+1", sizeof(formatted_trait_text));
                         } else {
-                            strlcat(local_80, "+2", sizeof(local_80));
+                            strlcat(formatted_trait_text, "+2", sizeof(formatted_trait_text));
                         }
-                        print_str = local_80;
+                        print_str = formatted_trait_text;
                     } else if (trait_idx == TRAIT_TAX_BONUS) {
-                        strlcpy(local_80, local_40, sizeof(local_80));
+                        strlcpy(formatted_trait_text, trait_label, sizeof(formatted_trait_text));
                         if (trait_val < 0) {
-                            strlcat(local_80, "-", sizeof(local_80));
+                            strlcat(formatted_trait_text, "-", sizeof(formatted_trait_text));
                         } else {
-                            strlcat(local_80, "+", sizeof(local_80));
+                            strlcat(formatted_trait_text, "+", sizeof(formatted_trait_text));
                         }
 
                         if (trait_val == 2) {
-                            strlcat(local_80, "1 BC", sizeof(local_80));
+                            strlcat(formatted_trait_text, "1 BC", sizeof(formatted_trait_text));
                         } else {
-                            strlcat(local_80, "0.5 BC", sizeof(local_80));
+                            strlcat(formatted_trait_text, "0.5 BC", sizeof(formatted_trait_text));
                         }
-                        print_str = local_80;
+                        print_str = formatted_trait_text;
                     } else {
-                        snprintf(local_80, sizeof(local_80), "%s%+i", local_40, (int)trait_val);
-                        print_str = local_80;
+                        snprintf(formatted_trait_text, sizeof(formatted_trait_text), "%s%+i", trait_label, (int)trait_val);
+                        print_str = formatted_trait_text;
                     }
                 }
 

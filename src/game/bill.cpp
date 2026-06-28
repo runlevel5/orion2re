@@ -694,7 +694,7 @@ namespace BILL {
             int16_t last_break_out_index = 0;
             int16_t current_y = y;
             int16_t max_y = 0x1DF - (int16_t)fonts::_font_header.current_height;
-            char local_c8[200];
+            char wrapped_line[200];
 
             char current_char = text[0];
             while (current_char != '\0') {
@@ -727,7 +727,7 @@ namespace BILL {
                         process_line_break = true;
                     } else {
                         char_index++;
-                        local_c8[out_index] = current_char;
+                        wrapped_line[out_index] = current_char;
                         out_index++;
                         current_width += fonts::_font_header.font_style_spacing;
                     }
@@ -736,10 +736,10 @@ namespace BILL {
                 }
 
                 if (process_line_break) {
-                    if (out_index > 0 && local_c8[out_index - 1] == ' ') {
+                    if (out_index > 0 && wrapped_line[out_index - 1] == ' ') {
                         while (out_index > 1) {
                             out_index--;
-                            if (local_c8[out_index - 1] != ' ') {
+                            if (wrapped_line[out_index - 1] != ' ') {
                                 break;
                             }
                         }
@@ -747,14 +747,14 @@ namespace BILL {
 
                     if (out_index > 0 || break_char == '\r') {
                         if (break_char == '\b') {
-                            local_c8[out_index] = '-';
+                            wrapped_line[out_index] = '-';
                             out_index++;
                         } else if ((uint8_t)break_char <= 0x20) {
                             char_index++;
                         }
 
-                        local_c8[out_index] = '\0';
-                        _Print_String_Bill_(x, current_y, width, local_c8, color, draw_flag, bitmap);
+                        wrapped_line[out_index] = '\0';
+                        _Print_String_Bill_(x, current_y, width, wrapped_line, color, draw_flag, bitmap);
 
                         current_y += (int16_t)fonts::_font_header.line_height;
                         out_index = 0;
@@ -772,12 +772,12 @@ namespace BILL {
                 current_char = text[char_index];
             }
 
-            local_c8[out_index] = '\0';
+            wrapped_line[out_index] = '\0';
             if (out_index > 0) {
                 if (color == 3) {
                     color = 0;
                 }
-                _Print_String_Bill_(x, current_y, width, local_c8, color, draw_flag, bitmap);
+                _Print_String_Bill_(x, current_y, width, wrapped_line, color, draw_flag, bitmap);
             }
 
             __pp_max_height = current_y - y + (int16_t)fonts::_font_header.current_height;

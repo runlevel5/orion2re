@@ -2615,7 +2615,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
 }
 
 void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
-    s_battle_results local_6d0;
+    s_battle_results battle_results;
 
     int8_t attacker_id = (int8_t)NETMOX::_net.player_net_info[player_idx].combat_attacker_id;
     int16_t combat_star_id = (int16_t)NETMOX::_net.player_net_info[player_idx].combat_star_id;
@@ -2637,19 +2637,19 @@ void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
         return;
     }
 
-    memset(&local_6d0, 0, sizeof(s_battle_results));
+    memset(&battle_results, 0, sizeof(s_battle_results));
 
     // The first 12 bytes of s_battle_results map exactly to the 12 bytes of s_net_player_info.
-    memcpy(&local_6d0, &NETMOX::_net.player_net_info[player_idx], sizeof(NETMOX::_net.player_net_info[player_idx]));
+    memcpy(&battle_results, &NETMOX::_net.player_net_info[player_idx], sizeof(NETMOX::_net.player_net_info[player_idx]));
 
-    local_6d0.planet_id = local_6d0.player_info.combat_planet_id;
+    battle_results.planet_id = battle_results.player_info.combat_planet_id;
 
-    local_6d0.player_info.combat_result = (int8_t)Do_1_Combat_(
+    battle_results.player_info.combat_result = (int8_t)Do_1_Combat_(
         (int16_t)combat_star_id,
         (int16_t)attacker_id,
         NETMOX::_net.player_net_info[player_idx].combat_defender_id,
         NETMOX::_net.player_net_info[player_idx].combat_planet_id,
-        &local_6d0,
+        &battle_results,
         0
     );
 
@@ -2662,7 +2662,7 @@ void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
     NETMOX::Mox_Send_Message_(
         MOX::_player[player_idx].network_player_id,
         NET_PACKET_STRATEGIC_BATTLE_RESULTS,
-        &local_6d0,
+        &battle_results,
         (uint16_t)sizeof(s_battle_results)
     );
 }

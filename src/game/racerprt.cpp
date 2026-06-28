@@ -8,22 +8,22 @@ s_racescrn_icon_layout _spy_group_data = {24, 216, 187, 239, 24, nullptr};
 
 void __cdecl Race_Report_Screen_(int16_t player_idx) {
     int32_t paragraph_integer;
-    char acStack_318[40];
+    char spy_status_text[40];
     s_animation_header* screen_anims[10];
     s_racescrn_mouse_group spy_icon_group;
-    char acStack_2a8[40];
-    char acStack_280[128];
-    char acStack_200[128];
-    char local_180[128];
-    char acStack_100[256];
+    char war_heading_text[40];
+    char war_race_list[128];
+    char alliance_race_list[128];
+    char personality_objective_text[128];
+    char treaty_summary_text[256];
 
     MOX::_cur_plyr_ptr = &MOX::_player[player_idx];
 
     if (MOX::_cur_plyr_ptr->objectives == 100) {
-        strlcpy(local_180, MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality], sizeof(local_180));
+        strlcpy(personality_objective_text, MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality], sizeof(personality_objective_text));
     } else {
         /* fmtpara: '\r' starts a new paragraph between the personality and objective lines. */
-        snprintf(local_180, sizeof(local_180), "%s\r%s",
+        snprintf(personality_objective_text, sizeof(personality_objective_text), "%s\r%s",
                  MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality],
                  MOX::_objective_labels[MOX::_cur_plyr_ptr->objectives]);
     }
@@ -47,20 +47,20 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     RACESCRN::Setup_Icon_Group_Data_(&spy_icon_group, &RACERPRT::_spy_group_data, spy_count, spy_icon_sprite, nullptr);
 
     int16_t num_wars = 0;
-    acStack_200[0] = '\0';
+    alliance_race_list[0] = '\0';
     int16_t num_alliances = 0;
-    acStack_280[0] = '\0';
+    war_race_list[0] = '\0';
 
     if (MOX::_NUM_PLAYERS > 0) {
         for (int16_t other_player_idx = 0; other_player_idx < MOX::_NUM_PLAYERS; ++other_player_idx) {
             if (other_player_idx != player_idx) {
                 if (MOX::_cur_plyr_ptr->treaty[other_player_idx] == 2) {
-                    strlcat(acStack_200, MOX::_player[other_player_idx].race_name, sizeof(acStack_200));
-                    strlcat(acStack_200, string::s_Newline, sizeof(acStack_200));
+                    strlcat(alliance_race_list, MOX::_player[other_player_idx].race_name, sizeof(alliance_race_list));
+                    strlcat(alliance_race_list, string::s_Newline, sizeof(alliance_race_list));
                     num_alliances++;
                 } else if (MOX::_cur_plyr_ptr->treaty[other_player_idx] >= 4) {
-                    strlcat(acStack_280, MOX::_player[other_player_idx].race_name, sizeof(acStack_280));
-                    strlcat(acStack_280, string::s_Newline, sizeof(acStack_280));
+                    strlcat(war_race_list, MOX::_player[other_player_idx].race_name, sizeof(war_race_list));
+                    strlcat(war_race_list, string::s_Newline, sizeof(war_race_list));
                     num_wars++;
                 }
             }
@@ -68,21 +68,21 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
     }
 
     if (num_alliances == 0) {
-        JIM::Get_Text_Message_("billtext.lbx", 0x1D, acStack_200, 0x28);
-        strlcat(acStack_200, string::s_Newline, sizeof(acStack_200));
+        JIM::Get_Text_Message_("billtext.lbx", 0x1D, alliance_race_list, 0x28);
+        strlcat(alliance_race_list, string::s_Newline, sizeof(alliance_race_list));
     }
     if (num_wars == 0) {
-        JIM::Get_Text_Message_("billtext.lbx", 0x1E, acStack_280, 0x28);
-        strlcat(acStack_280, string::s_Newline, sizeof(acStack_280));
+        JIM::Get_Text_Message_("billtext.lbx", 0x1E, war_race_list, 0x28);
+        strlcat(war_race_list, string::s_Newline, sizeof(war_race_list));
     }
 
     RUSS::Mox_Update_();
-    JIM::Get_Text_Message_("billtext.lbx", 0x1F, acStack_318, 0x28);
-    JIM::Get_Text_Message_("billtext.lbx", 0x20, acStack_2a8, 0x28);
+    JIM::Get_Text_Message_("billtext.lbx", 0x1F, spy_status_text, 0x28);
+    JIM::Get_Text_Message_("billtext.lbx", 0x20, war_heading_text, 0x28);
     RUSS::Mox_Update_();
 
     /* fmtpara: '\n' inserts paragraph breaks between the treaty headings and their race-name lists. */
-    snprintf(acStack_100, sizeof(acStack_100), "%s\n%s\n%s\n%s", acStack_318, acStack_200, acStack_2a8, acStack_280);
+    snprintf(treaty_summary_text, sizeof(treaty_summary_text), "%s\n%s\n%s\n%s", spy_status_text, alliance_race_list, war_heading_text, war_race_list);
 
     INFO::_g_exit_field = fields::Add_Button_Field_(0x216, 0x1B1, "", screen_anims[1], "\x1B", '(');
 
@@ -112,27 +112,27 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
         BILL::Squeeze_Paragraph_Centered_(0x2A, 0x87, 0x80, 0x1A, MOX::_cur_plyr_ptr->name, 2);
 
         fonts::Set_Font_Style_(4, &RACERPRT::_report_normal_color);
-        BILL::Squeeze_Paragraph_Centered_(0x18, 0xA7, 0xA4, 0x2A, local_180, 2);
+        BILL::Squeeze_Paragraph_Centered_(0x18, 0xA7, 0xA4, 0x2A, personality_objective_text, 2);
 
         if (spy_count == 0) {
             fonts::Set_Font_Style_(3, &RACERPRT::_report_normal_color);
-            JIM::Get_Text_Message_("billtext.lbx", 0x1C, acStack_318, 0x28);
+            JIM::Get_Text_Message_("billtext.lbx", 0x1C, spy_status_text, 0x28);
         } else {
             RACESCRN::Draw_Icon_Group_(&spy_icon_group);
             fonts::Set_Font_Style_(2, &RACERPRT::_report_normal_color);
             if (spy_count <= 1) {
-                JIM::Get_Text_Message_("billtext.lbx", 0x4B, acStack_318, 0x28);
+                JIM::Get_Text_Message_("billtext.lbx", 0x4B, spy_status_text, 0x28);
             } else {
-                JIM::Get_Text_Message_("billtext.lbx", 0x4A, acStack_318, 0x28);
-                JIM::Decode_Text_Stat_(acStack_318, spy_count, 0x28);
+                JIM::Get_Text_Message_("billtext.lbx", 0x4A, spy_status_text, 0x28);
+                JIM::Decode_Text_Stat_(spy_status_text, spy_count, 0x28);
             }
         }
         
-        BILL::Squeeze_Centered_Print_(0x18, 0xDE, acStack_318, 0xA4);
+        BILL::Squeeze_Centered_Print_(0x18, 0xDE, spy_status_text, 0xA4);
         RUSS::Mox_Update_();
 
         fonts::Set_Font_Style_(4, &RACERPRT::_report_normal_color);
-        BILL::Squeeze_Formatted_Paragraph_Centered_(0x18, 0x123, 0xA4, 0xAA, acStack_100, 2);
+        BILL::Squeeze_Formatted_Paragraph_Centered_(0x18, 0x123, 0xA4, 0xAA, treaty_summary_text, 2);
 
         video::Copy_Off_To_Back_();
         ERIC::Fast_Fade_In_();

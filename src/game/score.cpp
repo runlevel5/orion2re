@@ -217,9 +217,9 @@ namespace SCORE {
             int16_t idx1 = (int16_t)game_random::Random_(11) + 1;
             int16_t idx2 = (int16_t)game_random::Random_(11) + 1;
             if (idx2 != idx1) {
-                int16_t temp = indices[idx1];
+                int16_t swapped_index = indices[idx1];
                 indices[idx1] = indices[idx2];
-                indices[idx2] = temp;
+                indices[idx2] = swapped_index;
             }
         }
 

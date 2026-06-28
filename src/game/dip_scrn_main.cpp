@@ -310,9 +310,9 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Offer_Gift_(int16_t player_idx, int16_t target_idx) {
         uint8_t options[16] = { 0 };
-        int16_t local_446 = 0;
-        uint8_t local_424[TECH_APP_COUNT];
-        int32_t local_350[TECH_APP_COUNT];
+        int16_t differential_tech_count = 0;
+        uint8_t differential_tech_ids[TECH_APP_COUNT];
+        int32_t differential_tech_scores[TECH_APP_COUNT];
 
         options[0] = 1;
         options[1] = 1;
@@ -336,10 +336,10 @@ namespace DIP_SCRN {
             }
         }
 
-        local_446 = 0;
-        npcdiplo::Get_Differential_Tech_List_(target_idx, player_idx, 0, 0xc343cb00, local_424, local_350, &local_446, 1);
+        differential_tech_count = 0;
+        npcdiplo::Get_Differential_Tech_List_(target_idx, player_idx, 0, 0xc343cb00, differential_tech_ids, differential_tech_scores, &differential_tech_count, 1);
 
-        if (local_446 > 0) {
+        if (differential_tech_count > 0) {
             options[2] = 1;
         }
 
@@ -407,12 +407,12 @@ namespace DIP_SCRN {
 
         case 2:
         {
-            int16_t tech_idx = Diplomacy_Generic_Exchange_Tech_List_(player_idx, target_idx, _offer_title, local_424, local_446, 0);
+            int16_t tech_idx = Diplomacy_Generic_Exchange_Tech_List_(player_idx, target_idx, _offer_title, differential_tech_ids, differential_tech_count, 0);
             if (tech_idx == -1) {
                 *_diplomacy_message = MOX::s__00551100[0];
             }
             else {
-                uint8_t tech_app = local_424[tech_idx];
+                uint8_t tech_app = differential_tech_ids[tech_idx];
                 _old_response_message = -1;
                 COLCALC::Player_Gets_Tech_App_(&MOX::_player[target_idx], tech_app);
 
@@ -1841,7 +1841,7 @@ namespace DIP_SCRN {
         char text_buffer[80];
         uint8_t tech_list[TECH_APP_COUNT];
         int32_t aiStack_350[TECH_APP_COUNT];
-        int16_t sStack_488;
+        int16_t target_system_id;
         int16_t result = -1;
 
         fields::Deactivate_Help_List_();
@@ -1882,7 +1882,7 @@ namespace DIP_SCRN {
                 MOX::_player[_current_ambassador].diplomacy_proposal_exchange_max_value[MOX::_PLAYER_NUM],
                 tech_list,
                 aiStack_350,
-                &sStack_488,
+                &target_system_id,
                 1
             );
 
@@ -1893,7 +1893,7 @@ namespace DIP_SCRN {
                 MOX::_PLAYER_NUM,
                 text_buffer,
                 tech_list,
-                sStack_488,
+                target_system_id,
                 1
             );
 

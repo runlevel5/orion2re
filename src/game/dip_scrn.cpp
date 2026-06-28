@@ -1394,11 +1394,11 @@ namespace DIP_SCRN {
 
         demand_list_flags[5] = 1;
 
-        int16_t local_624 = 0;
-        uint8_t local_5b4[TECH_APP_COUNT];
-        int32_t local_350[TECH_APP_COUNT];
-        npcdiplo::Get_Differential_Tech_List_(player_num, ambassador_idx, 0, 0xc343cb00, local_5b4, local_350, &local_624, 1);
-        if (local_624 > 0) {
+        int16_t differential_tech_count = 0;
+        uint8_t differential_tech_ids[TECH_APP_COUNT];
+        int32_t differential_tech_scores[TECH_APP_COUNT];
+        npcdiplo::Get_Differential_Tech_List_(player_num, ambassador_idx, 0, 0xc343cb00, differential_tech_ids, differential_tech_scores, &differential_tech_count, 1);
+        if (differential_tech_count > 0) {
             demand_list_flags[6] = 1;
         }
 
@@ -1550,11 +1550,11 @@ namespace DIP_SCRN {
                 return;
             }
             case 6: {
-                int16_t selection_tech = Diplomacy_Generic_Exchange_Tech_List_(player_num, ambassador_idx, _demand_title, local_5b4, local_624, 0);
+                int16_t selection_tech = Diplomacy_Generic_Exchange_Tech_List_(player_num, ambassador_idx, _demand_title, differential_tech_ids, differential_tech_count, 0);
                 if (selection_tech == -1) break;
 
                 _old_response_message = -1;
-                uint8_t tech_val = local_5b4[selection_tech];
+                uint8_t tech_val = differential_tech_ids[selection_tech];
                 int16_t response;
                 if (MOX::_player[ambassador_idx].objectives == 100) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 6, tech_val, &response);

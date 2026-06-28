@@ -1429,7 +1429,7 @@ namespace FLT1 {
 
     void __cdecl Draw_Fltscrn_Relocation_Lines_(int16_t screen_id) {
         s_colors colors;
-        int16_t local_a;
+        int16_t map_left;
         int16_t view_y;
         int16_t view_x;
         int16_t zoom;
@@ -1446,12 +1446,12 @@ namespace FLT1 {
         colors.colors[7] = 10;
 
         if (screen_id == SCREEN_FLEET) {
-            local_a = 52 /* 0x34 */;
+            map_left = 52 /* 0x34 */;
             view_y = 15 /* 0x0F */;
             view_x = 305 /* 0x131 */;
             zoom = 182 /* 0xB6 */;
         } else {
-            local_a = 235 /* 0xEB */;
+            map_left = 235 /* 0xEB */;
             view_y = 306 /* 0x132 */;
             view_x = 318 /* 0x13E */;
             zoom = 169 /* 0xA9 */;
@@ -1461,8 +1461,8 @@ namespace FLT1 {
             if (HACCESS::Star_Has_Relocation_(star_idx, MOX::_PLAYER_NUM)) {
                 int16_t relocation_target_idx = HACCESS::Relocation_(star_idx, MOX::_PLAYER_NUM);
 
-                MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, view_y, local_a, view_x, zoom, 0, 0, 1, &x1, &y1);
-                MOVEBOX::Get_Galaxy_Map_Star_XY_(relocation_target_idx, view_y, local_a, view_x, zoom, 0, 0, 1, &x2, &y2);
+                MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, view_y, map_left, view_x, zoom, 0, 0, 1, &x1, &y1);
+                MOVEBOX::Get_Galaxy_Map_Star_XY_(relocation_target_idx, view_y, map_left, view_x, zoom, 0, 0, 1, &x2, &y2);
 
                 SHIPS::Draw_Ship_Destination_Line_(x2 + 3, y2 + 3, x1, y1, &colors);
             }

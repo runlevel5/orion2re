@@ -2192,12 +2192,12 @@ void __cdecl Draw_Outpost_ETA_(int16_t unused_planet_sum_idx, int16_t scroll_idx
 }
 
 void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, int8_t highlight_type) {
-    uint8_t local_1;
+    uint8_t glow_color;
 
     if (colony_idx != -1) {
-        Player_Colors_(MOX::_colony[colony_idx].owner, colors, highlight_type, &local_1);
+        Player_Colors_(MOX::_colony[colony_idx].owner, colors, highlight_type, &glow_color);
     } else {
-        Player_Colors_(-1, colors, highlight_type, &local_1);
+        Player_Colors_(-1, colors, highlight_type, &glow_color);
     }
 }
 

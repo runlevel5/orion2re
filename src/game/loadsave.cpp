@@ -465,7 +465,7 @@ namespace LOADSAVE {
      */
     void __cdecl Do_Save_Game_Popup_(int16_t* out_should_close) {
         char temp_buffer[37];
-        int16_t sStack_6c, sStack_6a;
+        int16_t popup_accept_field, popup_cancel_field;
         int16_t exit_popup = 0;
         bool saved_successfully = false;
         int16_t active_slot_idx = -1;
@@ -479,7 +479,7 @@ namespace LOADSAVE {
         MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, "\x1B", 0x29);
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
-        Add_Game_Popup_Fields_(&sStack_6c, &sStack_6a);
+        Add_Game_Popup_Fields_(&popup_accept_field, &popup_cancel_field);
         MOX::_global_var = 0;
 
         do {
@@ -1414,12 +1414,12 @@ namespace LOADSAVE {
      * @address 00510750
      */
     void __cdecl _Draw_Options_Game_Popup_() {
-        s_colors local_8;
+        s_colors outline_colors;
         MOX::_mox_font_colors_offset = 0x55; // 'U'
         s_colors* palette = MISC::Font_Colors2_(2, 0x55, 0x7E); // 'U', '~'
 
         // Copy the palette colors locally
-        memcpy(local_8.colors, palette->colors, sizeof(local_8.colors));
+        memcpy(outline_colors.colors, palette->colors, sizeof(outline_colors.colors));
 
         if (_print_data_to_bitmap == 0) {
             if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
@@ -1430,8 +1430,8 @@ namespace LOADSAVE {
             }
         }
 
-        fonts::Set_Font_Style_Outline_(2, &local_8);
-        fonts::Set_Outline_Color_(0, static_cast<uint16_t>(local_8.colors[0]));
+        fonts::Set_Font_Style_Outline_(2, &outline_colors);
+        fonts::Set_Outline_Color_(0, static_cast<uint16_t>(outline_colors.colors[0]));
         fonts::Set_Font_Spacing_(1);
 
         for (int i = 0; i < 13; ++i) {

@@ -1843,215 +1843,215 @@ namespace BEAMS {
             return;
         }
 
-        s_weapon_visual_fx local_2c;
+        s_weapon_visual_fx weapon_fx_template;
 
         switch (weapon_id) {
             case WEAPON_MASS_DRIVER:
-                Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x6b, 0xc3, 0xda, 0xfc, 0xff);
-                local_2c.thickness = 1;
-                local_2c.anim_style = 1;
-                local_2c.sfx_sprite_id = 4;
-                local_2c.duration = 20;
-                local_2c.unk = 0;
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x59, 0x6b, 0xc3, 0xda, 0xfc, 0xff);
+                weapon_fx_template.thickness = 1;
+                weapon_fx_template.anim_style = 1;
+                weapon_fx_template.sfx_sprite_id = 4;
+                weapon_fx_template.duration = 20;
+                weapon_fx_template.wide_bolt_size_bonus = 0;
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_GAUSS_CANNON:
-                Set_Weapon_Visual_FX_Colors_(&local_2c, 0x59, 0x67, 0x6c, 0xb2, 0xc8, 0xc8);
-                local_2c.thickness = 1;
-                local_2c.anim_style = 1;
-                local_2c.sfx_sprite_id = 6;
-                local_2c.duration = 20;
-                local_2c.unk = 0;
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x59, 0x67, 0x6c, 0xb2, 0xc8, 0xc8);
+                weapon_fx_template.thickness = 1;
+                weapon_fx_template.anim_style = 1;
+                weapon_fx_template.sfx_sprite_id = 6;
+                weapon_fx_template.duration = 20;
+                weapon_fx_template.wide_bolt_size_bonus = 0;
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_LASER_CANNON:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 0;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 0;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 2;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xc8, 0x14, 0x20, 0xff, 0x50, 0x0a);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 2;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_PARTICLE_BEAM:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
-                    local_2c.thickness = 0;
-                    local_2c.anim_style = 0;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
+                    weapon_fx_template.thickness = 0;
+                    weapon_fx_template.anim_style = 0;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
-                    local_2c.thickness = 0;
-                    local_2c.anim_style = 2;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x5e, 0x70, 0xcd, 0xba, 0xdd, 0xff);
+                    weapon_fx_template.thickness = 0;
+                    weapon_fx_template.anim_style = 2;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_FUSION_BEAM:
                 if (((weapon_specials & 0x10) != 0) && ((weapon_specials & 0x100) != 0)) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 3;
-                    local_2c.sfx_sprite_id = 100;
-                    local_2c.duration = 25;
-                    local_2c.unk = 1;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 3;
+                    weapon_fx_template.sfx_sprite_id = 100;
+                    weapon_fx_template.duration = 25;
+                    weapon_fx_template.wide_bolt_size_bonus = 1;
                 } else if ((weapon_specials & 0x10) != 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 2;
-                    local_2c.sfx_sprite_id = 120;
-                    local_2c.duration = 30;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 2;
+                    weapon_fx_template.sfx_sprite_id = 120;
+                    weapon_fx_template.duration = 30;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else if ((weapon_specials & 0x100) != 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 1;
-                    local_2c.sfx_sprite_id = 100;
-                    local_2c.duration = 25;
-                    local_2c.unk = 1;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 1;
+                    weapon_fx_template.sfx_sprite_id = 100;
+                    weapon_fx_template.duration = 25;
+                    weapon_fx_template.wide_bolt_size_bonus = 1;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 1;
-                    local_2c.sfx_sprite_id = 120;
-                    local_2c.duration = 30;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xd2, 0x46, 0x00, 0xff, 0xa2, 0x00);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 1;
+                    weapon_fx_template.sfx_sprite_id = 120;
+                    weapon_fx_template.duration = 30;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_ION_PULSE_CANNON:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
-                    local_2c.thickness = 2;
-                    local_2c.anim_style = 1;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
+                    weapon_fx_template.thickness = 2;
+                    weapon_fx_template.anim_style = 1;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
-                    local_2c.thickness = 2;
-                    local_2c.anim_style = 2;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x94, 0x9b, 0x49, 0xfe, 0xfe, 0x94);
+                    weapon_fx_template.thickness = 2;
+                    weapon_fx_template.anim_style = 2;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_GRAVITON_BEAM:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
-                    local_2c.thickness = 2;
-                    local_2c.anim_style = 3;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
+                    weapon_fx_template.thickness = 2;
+                    weapon_fx_template.anim_style = 3;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
-                    local_2c.thickness = 2;
-                    local_2c.anim_style = 3;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x44, 0x98, 0x8f, 0x93, 0xff, 0xff);
+                    weapon_fx_template.thickness = 2;
+                    weapon_fx_template.anim_style = 3;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_NEUTRON_BLASTER:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 1;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 1;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 2;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x92, 0x53, 0xba, 0xff, 0xb8, 0xff);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 2;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_PHASOR:
             case WEAPON_PHASOR_EYE:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 0;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 0;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
-                    local_2c.thickness = 1;
-                    local_2c.anim_style = 2;
-                    local_2c.sfx_sprite_id = 200;
-                    local_2c.duration = 50;
-                    local_2c.unk = 0;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xa9, 0x2b, 0x00, 0xff, 0xa6, 0x60);
+                    weapon_fx_template.thickness = 1;
+                    weapon_fx_template.anim_style = 2;
+                    weapon_fx_template.sfx_sprite_id = 200;
+                    weapon_fx_template.duration = 50;
+                    weapon_fx_template.wide_bolt_size_bonus = 0;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_DISRUPTER:
-                Set_Weapon_Visual_FX_Colors_(&local_2c, 0x6b, 0xa2, 0x16, 0xf2, 0xff, 0x35);
-                local_2c.thickness = 1;
-                local_2c.anim_style = 1;
-                local_2c.sfx_sprite_id = 40;
-                local_2c.duration = 30;
-                local_2c.unk = 0;
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0x6b, 0xa2, 0x16, 0xf2, 0xff, 0x35);
+                weapon_fx_template.thickness = 1;
+                weapon_fx_template.anim_style = 1;
+                weapon_fx_template.sfx_sprite_id = 40;
+                weapon_fx_template.duration = 30;
+                weapon_fx_template.wide_bolt_size_bonus = 0;
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_DEATH_RAY:
             case WEAPON_CRYSTAL_RAY:
-                Set_Weapon_Visual_FX_Colors_(&local_2c, 0xc9, 0x53, 0xc4, 0xff, 0xb8, 0xff);
-                local_2c.thickness = 1;
-                local_2c.anim_style = 3;
-                local_2c.sfx_sprite_id = 200;
-                local_2c.duration = 50;
-                local_2c.unk = 0;
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xc9, 0x53, 0xc4, 0xff, 0xb8, 0xff);
+                weapon_fx_template.thickness = 1;
+                weapon_fx_template.anim_style = 3;
+                weapon_fx_template.sfx_sprite_id = 200;
+                weapon_fx_template.duration = 50;
+                weapon_fx_template.wide_bolt_size_bonus = 0;
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_PLASMA_CANNON:
                 if ((weapon_specials & 0x10) == 0) {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
-                    local_2c.thickness = 2;
-                    local_2c.anim_style = 1;
-                    local_2c.sfx_sprite_id = 100;
-                    local_2c.duration = 30;
-                    local_2c.unk = 1;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
+                    weapon_fx_template.thickness = 2;
+                    weapon_fx_template.anim_style = 1;
+                    weapon_fx_template.sfx_sprite_id = 100;
+                    weapon_fx_template.duration = 30;
+                    weapon_fx_template.wide_bolt_size_bonus = 1;
                 } else {
-                    Set_Weapon_Visual_FX_Colors_(&local_2c, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
-                    local_2c.thickness = 2;
-                    local_2c.anim_style = 3;
-                    local_2c.sfx_sprite_id = 100;
-                    local_2c.duration = 30;
-                    local_2c.unk = 1;
+                    Set_Weapon_Visual_FX_Colors_(&weapon_fx_template, 0xd2, 0x53, 0x00, 0xff, 0xff, 0x52);
+                    weapon_fx_template.thickness = 2;
+                    weapon_fx_template.anim_style = 3;
+                    weapon_fx_template.sfx_sprite_id = 100;
+                    weapon_fx_template.duration = 30;
+                    weapon_fx_template.wide_bolt_size_bonus = 1;
                 }
-                memcpy(out_fx, &local_2c, sizeof(local_2c));
+                memcpy(out_fx, &weapon_fx_template, sizeof(weapon_fx_template));
                 break;
 
             case WEAPON_MAULER_DEVICE:
@@ -2593,7 +2593,7 @@ namespace BEAMS {
                 }
                 case 1: {
                     int32_t cond = fx.sfx_sprite_id >= 10 ? 1 : 0;
-                    int32_t size = fx.unk * 2 + 7;
+                    int32_t size = fx.wide_bolt_size_bonus * 2 + 7;
                     bolt::Wide_Bolt_Line_(x1, y1, x2, y2, palette_base_index, 12, 50, 3, (uint16_t)frame_index, 0, 1, cond, 1, 0, 0, 12, 3, size, 1, 2, 0);
                     break;
                 }

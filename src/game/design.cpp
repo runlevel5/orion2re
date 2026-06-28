@@ -101,50 +101,50 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, s_ship_design* ship_design) {
-        s_current_design local_design;
+        s_current_design current_design;
 
-        struct_::Clear_Structure_(&local_design, sizeof(local_design));
+        struct_::Clear_Structure_(&current_design, sizeof(current_design));
 
-        MOX::_design = &local_design;
+        MOX::_design = &current_design;
 
-        // strcpy(local_design.name, ship_design->name)
+        // strcpy(current_design.name, ship_design->name)
         char* src = ship_design->name;
-        char* dst = local_design.name;
+        char* dst = current_design.name;
         while (*src) {
             *dst++ = *src++;
         }
         *dst = '\0';
 
-        local_design.ftl_type = static_cast<int16_t>(ship_design->ftl_type);
-        local_design.drive_speed = TECHDATA::_drives[local_design.ftl_type].warp_speed;
-        local_design.ship_size = static_cast<int16_t>(ship_design->size);
+        current_design.ftl_type = static_cast<int16_t>(ship_design->ftl_type);
+        current_design.drive_speed = TECHDATA::_drives[current_design.ftl_type].warp_speed;
+        current_design.ship_size = static_cast<int16_t>(ship_design->size);
 
-        local_design.hull_space = DESIGN::Total_Design_Space_();
-        local_design.computer_type = static_cast<int16_t>(ship_design->computer_type);
-        local_design.picture_type = static_cast<int16_t>(ship_design->picture_num);
-        local_design.armor_type = static_cast<int16_t>(ship_design->armor_type);
+        current_design.hull_space = DESIGN::Total_Design_Space_();
+        current_design.computer_type = static_cast<int16_t>(ship_design->computer_type);
+        current_design.picture_type = static_cast<int16_t>(ship_design->picture_num);
+        current_design.armor_type = static_cast<int16_t>(ship_design->armor_type);
 
-        local_design.fuel_type = INITSHIP::Best_Ship_Fuel_(player_idx);
+        current_design.fuel_type = INITSHIP::Best_Ship_Fuel_(player_idx);
 
         for (int i = 0; i < 8; ++i) {
-            local_design.weapon_type[i] = ship_design->ship_weapon[i].type;
-            local_design.weapon_count[i] = static_cast<int16_t>(ship_design->ship_weapon[i].count);
-            local_design.weapon_specials[i] = ship_design->ship_weapon[i].specials;
-            local_design.weapon_firing_arc[i] = ship_design->ship_weapon[i].firing_arc;
-            local_design.weapon_ammo[i] = ship_design->ship_weapon[i].ammo;
+            current_design.weapon_type[i] = ship_design->ship_weapon[i].type;
+            current_design.weapon_count[i] = static_cast<int16_t>(ship_design->ship_weapon[i].count);
+            current_design.weapon_specials[i] = ship_design->ship_weapon[i].specials;
+            current_design.weapon_firing_arc[i] = ship_design->ship_weapon[i].firing_arc;
+            current_design.weapon_ammo[i] = ship_design->ship_weapon[i].ammo;
         }
 
         for (int i = 0; i < 8; ++i) {
-            local_design.special_devices[i] = 0;
-            local_design.special_device_cost[i] = 0;
-            local_design.special_device_space[i] = 0;
+            current_design.special_devices[i] = 0;
+            current_design.special_device_cost[i] = 0;
+            current_design.special_device_space[i] = 0;
         }
 
         int16_t special_idx = 0;
         bool stop_search = false;
         for (uint32_t i = 0; i < 0x27 && !stop_search; ++i) {
             if (struct_::Test_Bit_Field_(ship_design->special_device_flags, static_cast<uint16_t>(i))) {
-                local_design.special_devices[special_idx] = static_cast<int16_t>(i);
+                current_design.special_devices[special_idx] = static_cast<int16_t>(i);
                 special_idx++;
                 if (special_idx >= 8) {
                     stop_search = true;
@@ -152,10 +152,10 @@ namespace DESIGN {
             }
         }
 
-        local_design.base_combat_speed = Current_Design_Combat_Speed_(MOX::_design);
+        current_design.base_combat_speed = Current_Design_Combat_Speed_(MOX::_design);
         Update_Calculated_Design_Data_(player_idx);
 
-        return static_cast<int16_t>(local_design.total_cost);
+        return static_cast<int16_t>(current_design.total_cost);
     }
 
     uint8_t __cdecl Current_Design_Size_(int16_t player_idx, int16_t design_idx) {
@@ -666,8 +666,8 @@ namespace DESIGN {
         }
 
         int16_t special_bonus_pct;
-        int16_t local_4;
-        Bonus_For_Special_Mods_(specials, &special_bonus_pct, &local_4);
+        int16_t cost_bonus_pct;
+        Bonus_For_Special_Mods_(specials, &special_bonus_pct, &cost_bonus_pct);
 
         int16_t space_bonus = 0;
         if (DESIGN::Weapon_Type_(weapon_idx) == 0) {

@@ -33,18 +33,18 @@ namespace CMBTDRW1 {
             strlcpy(str[3], "L", sizeof(str[3]));
         }
 
-        int16_t local_3a[7];
-        local_3a[1] = 15;
-        local_3a[2] = 22;
-        local_3a[3] = 25;
-        local_3a[4] = 30;
-        local_3a[5] = 33;
-        local_3a[6] = 33;
+        int16_t ship_center_and_size[7];
+        ship_center_and_size[1] = 15;
+        ship_center_and_size[2] = 22;
+        ship_center_and_size[3] = 25;
+        ship_center_and_size[4] = 30;
+        ship_center_and_size[5] = 33;
+        ship_center_and_size[6] = 33;
 
         int16_t cy;
-        COMBINIT::Ship_Center_Offsets_(MOX::_cur_ship, local_3a, &cy);
+        COMBINIT::Ship_Center_Offsets_(MOX::_cur_ship, ship_center_and_size, &cy);
 
-        int16_t cx = local_3a[0];
+        int16_t cx = ship_center_and_size[0];
         cx += MOX::_combat_data[MOX::_cur_ship].x * 20;
         cy += MOX::_combat_data[MOX::_cur_ship].y * 20;
 
@@ -55,7 +55,7 @@ namespace CMBTDRW1 {
         int16_t dx[4];
         int16_t dy[4];
 
-        int16_t sz = local_3a[MOX::_combat_data[MOX::_cur_ship].size_class + 1];
+        int16_t sz = ship_center_and_size[MOX::_combat_data[MOX::_cur_ship].size_class + 1];
 
         int idx0 = (facing / 4) % 4;
         int idx1 = (idx0 + 1) % 4;
@@ -1964,12 +1964,12 @@ skip_cursor:
         uint8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
 
         if (anim == nullptr || MOX::_combat_data[ship_idx].owner != previous_owner) {
-            uint8_t local_40[32];
-            uint8_t local_20[32];
+            uint8_t attacker_palette_remap[32];
+            uint8_t defender_palette_remap[32];
 
             for (int16_t i = 0; i < 32; ++i) {
-                local_40[i] = i + 0x20;
-                local_20[i] = i + 0x60;
+                attacker_palette_remap[i] = i + 0x20;
+                defender_palette_remap[i] = i + 0x60;
             }
 
             char lbx_name[12];
@@ -1991,9 +1991,9 @@ skip_cursor:
             anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_name, picture_num, MOX::_global_cache_seg);
 
             if (MOX::_combat_data[ship_idx].owner == MOX::_combat_attacker_player) {
-                replace::Replace_Color_Range_(anim, local_40, 0x60, 0x20);
+                replace::Replace_Color_Range_(anim, attacker_palette_remap, 0x60, 0x20);
             } else {
-                replace::Replace_Color_Range_(anim, local_20, 0x20, 0x20);
+                replace::Replace_Color_Range_(anim, defender_palette_remap, 0x20, 0x20);
             }
         }
 
@@ -2053,43 +2053,43 @@ skip_cursor:
             s_combat_data* planet_combat = &MOX::_combat_data[0];
 
             if (planet_combat->owner != 8) {
-                char local_50[80];
-                char local_a0[80];
-                char local_b4[12];
+                char combat_text_segment[80];
+                char colony_status_text[80];
+                char value_text[12];
 
                 fonts::Set_Font_Style_(0, &MOX::_combat_green);
-                KEN::Ken_Get_Text_Message_(0, local_50, 0x50);
-                strlcpy(local_a0, local_50, sizeof(local_a0));
+                KEN::Ken_Get_Text_Message_(0, combat_text_segment, 0x50);
+                strlcpy(colony_status_text, combat_text_segment, sizeof(colony_status_text));
 
                 if (MOX::_cmbt_colony_id == -1) {
-                    itoa(0x23, local_b4, 10);
+                    itoa(0x23, value_text, 10);
                 } else {
-                    itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, local_b4, 10);
+                    itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, value_text, 10);
                 }
                 
 
 
-                strlcat(local_a0, local_b4, sizeof(local_a0));
-                strlcat(local_a0, "  ", sizeof(local_a0));
+                strlcat(colony_status_text, value_text, sizeof(colony_status_text));
+                strlcat(colony_status_text, "  ", sizeof(colony_status_text));
                 if (MOX::_cmbt_colony_id != -1) {
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[1] > 0) {
-                        KEN::Ken_Get_Text_Message_(1, local_50, 0x50);
-                        strlcat(local_a0, local_50, sizeof(local_a0));
-                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], local_b4, 10);
-                        strlcat(local_a0, local_b4, sizeof(local_a0));
-                        strlcat(local_a0, "  ", sizeof(local_a0));
+                        KEN::Ken_Get_Text_Message_(1, combat_text_segment, 0x50);
+                        strlcat(colony_status_text, combat_text_segment, sizeof(colony_status_text));
+                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], value_text, 10);
+                        strlcat(colony_status_text, value_text, sizeof(colony_status_text));
+                        strlcat(colony_status_text, "  ", sizeof(colony_status_text));
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[0] > 0) {
-                        KEN::Ken_Get_Text_Message_(2, local_50, 0x50);
-                        strlcat(local_a0, local_50, sizeof(local_a0));
-                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], local_b4, 10);
-                        strlcat(local_a0, local_b4, sizeof(local_a0));
-                        strlcat(local_a0, "  ", sizeof(local_a0));
+                        KEN::Ken_Get_Text_Message_(2, combat_text_segment, 0x50);
+                        strlcat(colony_status_text, combat_text_segment, sizeof(colony_status_text));
+                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], value_text, 10);
+                        strlcat(colony_status_text, value_text, sizeof(colony_status_text));
+                        strlcat(colony_status_text, "  ", sizeof(colony_status_text));
                     }
                 }
 
-                fonts::Print_(x + 2, y + 0x48, local_a0);
-                local_a0[0] = '\0';
+                fonts::Print_(x + 2, y + 0x48, colony_status_text);
+                colony_status_text[0] = '\0';
 
                 if (MOX::_cmbt_colony_id != -1) {
                     int16_t current_y = y + 4;
@@ -2334,9 +2334,9 @@ skip_cursor:
                 }
                 fonts::Set_Font_Style_Shadow_Down_(1, &shadow_color);
                 
-                char local_50[80];
-                KEN::Ken_Get_Text_Message_(0x47, local_50, 0x50);
-                fonts::Print_Centered_(x + 45, y + 70, local_50);
+                char disabled_ship_text[80];
+                KEN::Ken_Get_Text_Message_(0x47, disabled_ship_text, 0x50);
+                fonts::Print_Centered_(x + 45, y + 70, disabled_ship_text);
             }
         }
     }
@@ -2363,7 +2363,7 @@ skip_cursor:
 
         int16_t move_step_fast = x_offset / 3;
         int16_t move_step_slow = x_offset / 4 + 1;
-        int16_t local_e = 0;
+        int16_t retreat_offset_x = 0;
         int16_t frame_step = 1;
 
         COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[ship_idx].x, MOX::_combat_data[ship_idx].y);
@@ -2461,16 +2461,16 @@ skip_cursor:
                 animate::Draw_(draw_x, draw_y, effect_seg);
 
                 graphics::Set_Window_(x1, y1, x2, y2);
-                Draw_Ship_(ship_idx, MOX::_cur_combat_x * -20 + local_e + base_x,
+                Draw_Ship_(ship_idx, MOX::_cur_combat_x * -20 + retreat_offset_x + base_x,
                                      MOX::_cur_combat_y * -20 + base_y);
 
                 RUSS::Mox_Sync_Update_();
                 timer::Release_Time_(1);
 
                 if (MOX::_combat_attacker_player == owner) {
-                    local_e -= step;
+                    retreat_offset_x -= step;
                 } else {
-                    local_e += step;
+                    retreat_offset_x += step;
                 }
             }
         }
@@ -2480,7 +2480,7 @@ skip_cursor:
 
     void __cdecl Draw_Ship_(int16_t ship_idx, int16_t draw_x, int16_t draw_y) {
         int16_t frame_lookup[4] = {1, 2, 3, 2};
-        const int16_t local_56 = 4;
+        const int16_t ship_frame_stride = 4;
         int16_t frame_idx;
         uint8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
 
@@ -2506,11 +2506,11 @@ skip_cursor:
         int8_t owner = MOX::_combat_data[ship_idx].owner;
 
         if (anim == nullptr || previous_owner != owner) {
-            uint8_t local_40[32];
-            uint8_t local_20[32];
+            uint8_t attacker_palette_remap[32];
+            uint8_t defender_palette_remap[32];
             for (int i = 0; i < 32; ++i) {
-                local_40[i] = i + 32;
-                local_20[i] = i + 96;
+                attacker_palette_remap[i] = i + 32;
+                defender_palette_remap[i] = i + 96;
             }
 
             char lbx_name[12];
@@ -2531,9 +2531,9 @@ skip_cursor:
             anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_name, picture_num, MOX::_global_cache_seg);
             
             if (owner == MOX::_combat_attacker_player) {
-                replace::Replace_Color_Range_(anim, local_40, 96 /* 0x60 */, 32 /* 0x20 */);
+                replace::Replace_Color_Range_(anim, attacker_palette_remap, 96 /* 0x60 */, 32 /* 0x20 */);
             } else {
-                replace::Replace_Color_Range_(anim, local_20, 32 /* 0x20 */, 32 /* 0x20 */);
+                replace::Replace_Color_Range_(anim, defender_palette_remap, 32 /* 0x20 */, 32 /* 0x20 */);
             }
         }
 
@@ -2547,9 +2547,9 @@ skip_cursor:
                 int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
                 if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
-                    draw_frame = local_56 * facing_dir + frame_idx;
+                    draw_frame = ship_frame_stride * facing_dir + frame_idx;
                 } else {
-                    draw_frame = local_56 * facing_dir;
+                    draw_frame = ship_frame_stride * facing_dir;
                 }
                 animate::Set_Animation_Frame_(anim, draw_frame);
                 bitmap::Draw_Picture_To_Bitmap_(MOX::_draw_ship_bitmap, anim);
@@ -2559,9 +2559,9 @@ skip_cursor:
                 int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
                 if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
-                    draw_frame = local_56 * (8 - facing_dir) + frame_idx;
+                    draw_frame = ship_frame_stride * (8 - facing_dir) + frame_idx;
                 } else {
-                    draw_frame = local_56 * (8 - facing_dir);
+                    draw_frame = ship_frame_stride * (8 - facing_dir);
                 }
                 animate::Set_Animation_Frame_(anim, draw_frame);
                 bitmap::Draw_Picture_To_Bitmap_(MOX::_ship_bitmap, anim);
@@ -2572,9 +2572,9 @@ skip_cursor:
                 int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
                 if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
-                    draw_frame = local_56 * (facing_dir - 8) + frame_idx;
+                    draw_frame = ship_frame_stride * (facing_dir - 8) + frame_idx;
                 } else {
-                    draw_frame = local_56 * (facing_dir - 8);
+                    draw_frame = ship_frame_stride * (facing_dir - 8);
                 }
                 animate::Set_Animation_Frame_(anim, draw_frame);
                 bitmap::Draw_Picture_To_Bitmap_(MOX::_draw_ship_bitmap, anim);
@@ -2586,9 +2586,9 @@ skip_cursor:
                 int16_t done = CMBTFIR2::Combat_Ship_Done_(ship_idx);
                 int16_t draw_frame;
                 if (done == 0 && MOX::_combat_data[ship_idx].is_captured == 0) {
-                    draw_frame = local_56 * (16 - facing_dir) + frame_idx;
+                    draw_frame = ship_frame_stride * (16 - facing_dir) + frame_idx;
                 } else {
-                    draw_frame = local_56 * (16 - facing_dir);
+                    draw_frame = ship_frame_stride * (16 - facing_dir);
                 }
                 animate::Set_Animation_Frame_(anim, draw_frame);
                 bitmap::Draw_Picture_To_Bitmap_(MOX::_ship_bitmap, anim);
@@ -2751,9 +2751,9 @@ skip_cursor:
         s_colors color_a8 = {{ 0xdf, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc, 0xdc }};
         s_colors color_6c = {{ 0x48, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a }};
 
-        char local_a0[52];
-        char local_64[20];
-        char local_50[80];
+        char weapon_label[52];
+        char ammo_text[20];
+        char arc_text[80];
 
         graphics::Interlaced_Fill_(114, 378, 263, 466, 0, 199);
 
@@ -2844,20 +2844,20 @@ skip_cursor:
 
                 if ((specials & 2) == 0) {
                     if ((specials & 4) == 0) {
-                        local_a0[0] = '\0';
+                        weapon_label[0] = '\0';
                     } else {
-                        strlcpy(local_a0, TECHDATA::_weapon_modifications[2].name_plural, sizeof(local_a0));
-                        strlcat(local_a0, " ", sizeof(local_a0));
+                        strlcpy(weapon_label, TECHDATA::_weapon_modifications[2].name_plural, sizeof(weapon_label));
+                        strlcat(weapon_label, " ", sizeof(weapon_label));
                     }
                 } else {
-                    strlcpy(local_a0, TECHDATA::_weapon_modifications[1].name_plural, sizeof(local_a0));
-                    strlcat(local_a0, " ", sizeof(local_a0));
+                    strlcpy(weapon_label, TECHDATA::_weapon_modifications[1].name_plural, sizeof(weapon_label));
+                    strlcat(weapon_label, " ", sizeof(weapon_label));
                 }
 
                 if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left == 1) {
-                    strlcat(local_a0, TECHDATA::_weapons[w_id].name, sizeof(local_a0));
+                    strlcat(weapon_label, TECHDATA::_weapons[w_id].name, sizeof(weapon_label));
                 } else {
-                    strlcat(local_a0, TECHDATA::_weapons[w_id].name_plural, sizeof(local_a0));
+                    strlcat(weapon_label, TECHDATA::_weapons[w_id].name_plural, sizeof(weapon_label));
                 }
 
                 if (display_color_mode == 0) {
@@ -2869,46 +2869,46 @@ skip_cursor:
                 }
 
                 if (rack == 1 || rack == 3 || rack == 4 || w_id == WEAPON_ANTI_MISSILE_ROCKET) {
-                    strlcat(local_a0, " x", sizeof(local_a0));
-                    _itoa(ammo, local_64, 10);
-                    strlcat(local_a0, local_64, sizeof(local_a0));
+                    strlcat(weapon_label, " x", sizeof(weapon_label));
+                    _itoa(ammo, ammo_text, 10);
+                    strlcat(weapon_label, ammo_text, sizeof(weapon_label));
                 } else if (rack == 2) {
                     if (ammo > 0) {
-                        strlcat(local_a0, " ", sizeof(local_a0));
-                        _itoa(ammo, local_64, 10);
-                        strlcat(local_a0, local_64, sizeof(local_a0));
-                        KEN::Ken_Get_Text_Message_(85, local_50, 80);
-                        strlcat(local_a0, local_50, sizeof(local_a0));
+                        strlcat(weapon_label, " ", sizeof(weapon_label));
+                        _itoa(ammo, ammo_text, 10);
+                        strlcat(weapon_label, ammo_text, sizeof(weapon_label));
+                        KEN::Ken_Get_Text_Message_(85, arc_text, 80);
+                        strlcat(weapon_label, arc_text, sizeof(weapon_label));
                     }
                 } else if (rack == 0) {
-                    strlcat(local_a0, " (", sizeof(local_a0));
+                    strlcat(weapon_label, " (", sizeof(weapon_label));
                     switch (arc) {
                         case 1:
-                            KEN::Ken_Get_Text_Message_(3, local_50, 80);
-                            strlcat(local_a0, local_50, sizeof(local_a0));
+                            KEN::Ken_Get_Text_Message_(3, arc_text, 80);
+                            strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
                         case 2:
-                            KEN::Ken_Get_Text_Message_(4, local_50, 80);
-                            strlcat(local_a0, local_50, sizeof(local_a0));
+                            KEN::Ken_Get_Text_Message_(4, arc_text, 80);
+                            strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
                         case 4:
-                            KEN::Ken_Get_Text_Message_(6, local_50, 80);
-                            strlcat(local_a0, local_50, sizeof(local_a0));
+                            KEN::Ken_Get_Text_Message_(6, arc_text, 80);
+                            strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
                         case 8:
-                            KEN::Ken_Get_Text_Message_(5, local_50, 80);
-                            strlcat(local_a0, local_50, sizeof(local_a0));
+                            KEN::Ken_Get_Text_Message_(5, arc_text, 80);
+                            strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
                         case 15:
-                            strlcat(local_a0, "360", sizeof(local_a0));
+                            strlcat(weapon_label, "360", sizeof(weapon_label));
                             break;
                     }
-                    strlcat(local_a0, ")", sizeof(local_a0));
+                    strlcat(weapon_label, ")", sizeof(weapon_label));
                 }
 
                 fonts::Set_Outline_Color_(0, 0);
                 fonts::Set_Font_Spacing_(1);
-                fonts::Print_(131, y_pos, local_a0);
+                fonts::Print_(131, y_pos, weapon_label);
             }
             y_pos += 11;
         }

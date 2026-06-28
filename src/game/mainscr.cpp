@@ -3164,12 +3164,12 @@ namespace MAINSCR {
                     continue;
                 }
 
-                int16_t local_5e2;
-                int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(scan_input, input_field, &_fleet_icon_chosen, &local_5e2);
+                int16_t scanned_ship_idx;
+                int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(scan_input, input_field, &_fleet_icon_chosen, &scanned_ship_idx);
                 MOX::_fleet_ship_scanned = -1;
-                if (local_5e2 > -1) {
+                if (scanned_ship_idx > -1) {
                     MOX::_eta_star_id = -1;
-                    MOX::_fleet_ship_scanned = local_5e2;
+                    MOX::_fleet_ship_scanned = scanned_ship_idx;
                 }
 
                 if (scan_res == 1) {
@@ -3194,9 +3194,9 @@ namespace MAINSCR {
                         MOX::_return_screen = SCREEN_MAIN;
                         *out_exit_flag = 1;
                     } else {
-                        char local_578[200];
-                        strlcpy(local_578, HAROLD::H_Message_(0x20 /* HESTR_020_OPTION_DISABLED_DURING */), sizeof(local_578));
-                        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_578, 0);
+                        char disabled_during_message[200];
+                        strlcpy(disabled_during_message, HAROLD::H_Message_(0x20 /* HESTR_020_OPTION_DISABLED_DURING */), sizeof(disabled_during_message));
+                        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, disabled_during_message, 0);
                     }
                     continue;
                 }
@@ -3218,19 +3218,19 @@ namespace MAINSCR {
 
                 if (MOX::_fleet_box.attack_btn_active != 0 && MOX::_fleet_box_attack_button == input_field && MOX::_fleet_box_attack_button > 0) {
                     if (!FLEETPOP::Some_Icon_Selected_()) {
-                        char local_4b0[200];
-                        strlcpy(local_4b0, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(local_4b0));
-                        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_4b0, 3);
+                        char no_ships_selected_message[200];
+                        strlcpy(no_ships_selected_message, HAROLD::H_Message_(0xE6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(no_ships_selected_message));
+                        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, no_ships_selected_message, 3);
                     } else {
-                        int16_t local_3e8[MAX_SHIPS];
-                        int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(local_3e8, MAX_SHIPS, 255);
+                        int16_t selected_ship_ids[MAX_SHIPS];
+                        int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, MAX_SHIPS, 255);
                         int16_t ship_id = HACCESS::Fleet_Movement_Ship_Id_(0);
                         
                         int16_t msg_idx = (count == 1) ? 0xE4 : 0xE5;
-                        char local_5dc[100];
+                        char confirmation_message[100];
                         
-                        snprintf(local_5dc, sizeof(local_5dc), HAROLD::H_Message_(msg_idx), count);
-                        if (HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_5dc, 1) != 0) {
+                        snprintf(confirmation_message, sizeof(confirmation_message), HAROLD::H_Message_(msg_idx), count);
+                        if (HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, confirmation_message, 1) != 0) {
                             int16_t num_deployed = SHIPS::Deploy_Ships_To_Attack_Antares_();
                             MOX::_first_node_ptr_in_stack_ = -1;
                             Update_Ship_Icons_In_Between_Turns_();

@@ -261,9 +261,9 @@ namespace HAROLD {
                     int16_t idx1 = (int16_t)game_random::Random_(count);
                     int16_t idx2 = (int16_t)game_random::Random_(count);
                     if (idx1 != idx2 && candidates[idx1] != -1 && candidates[idx2] != -1) {
-                        int16_t temp = candidates[idx1];
+                        int16_t swapped_candidate = candidates[idx1];
                         candidates[idx1] = candidates[idx2];
-                        candidates[idx2] = temp;
+                        candidates[idx2] = swapped_candidate;
                     }
                 }
 
@@ -603,9 +603,9 @@ namespace HAROLD {
             }
 
             if (idx1 != idx2) {
-                int16_t temp = list[idx1];
+                int16_t swapped_entry = list[idx1];
                 list[idx1] = list[idx2];
-                list[idx2] = temp;
+                list[idx2] = swapped_entry;
             }
 
             count++;

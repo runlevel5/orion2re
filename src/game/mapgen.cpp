@@ -1148,9 +1148,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             int32_t idx2 = game_random::Random_(829) - 1;
 
             if (idx1 != idx2) {
-                uint16_t temp = star_name_indices[idx1];
+                uint16_t swapped_name_idx = star_name_indices[idx1];
                 star_name_indices[idx1] = star_name_indices[idx2];
-                star_name_indices[idx2] = temp;
+                star_name_indices[idx2] = swapped_name_idx;
             }
         }
     }

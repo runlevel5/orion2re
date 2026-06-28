@@ -276,9 +276,9 @@ namespace antarans {
             int16_t idx2 = (int16_t)game_random::Random_(*star_count) - 1;
 
             if (idx1 != idx2) {
-                int16_t temp = star_list[idx1];
+                int16_t swapped_star = star_list[idx1];
                 star_list[idx1] = star_list[idx2];
-                star_list[idx2] = temp;
+                star_list[idx2] = swapped_star;
             }
         }
     }

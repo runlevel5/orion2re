@@ -45,9 +45,9 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
 
 void __cdecl Move_Ship_To_Front_Of_List_(int16_t icon_idx) {
     if (MOX::_n_fltscrn_big_icons > 1) {
-        s_big_icon temp = MOX::_fltscrn_big_icon[0];
+        s_big_icon first_icon = MOX::_fltscrn_big_icon[0];
         MOX::_fltscrn_big_icon[0] = MOX::_fltscrn_big_icon[icon_idx];
-        MOX::_fltscrn_big_icon[icon_idx] = temp;
+        MOX::_fltscrn_big_icon[icon_idx] = first_icon;
     }
 
     OFFICER::_fleet_icon_ship_id_to_move = -1;
@@ -340,9 +340,9 @@ void __cdecl Add_Fltscrn_Big_Icon_Fields_(int16_t base_index) {
 }
 
 void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
-    char local_50[80];
-    s_colors local_58;
-    int16_t local_5a = 0;
+    char status_text[80];
+    s_colors status_colors;
+    int16_t referenced_star_idx = 0;
     uint8_t visited;
     uint8_t has_moving_ships = 0;
     int16_t status = -1;
@@ -355,7 +355,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
         MOX::_fltscrn_ship_icon_selection_list[i] = -1;
     }
 
-    local_58 = _normal_colors;
+    status_colors = _normal_colors;
 
     if (Build_Fltscrn_Ship_List_(MOX::_fltscrn_ship_icon_selection_list) != 0) {
         has_moving_ships = 1;
@@ -404,7 +404,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
         if (visited != 0) {
             status = 5;
             val = MOX::_g_ship_move_info.parsecs;
-            local_5a = MOX::_galaxy_map_scanned_star;
+            referenced_star_idx = MOX::_galaxy_map_scanned_star;
         } else {
             status = 6;
             val = MOX::_g_ship_move_info.parsecs;
@@ -423,7 +423,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
                 if (visited != 0) {
                     status = 1;
                     val = MOX::_g_ship_move_info.turns_left;
-                    local_5a = MOX::_galaxy_map_scanned_star;
+                    referenced_star_idx = MOX::_galaxy_map_scanned_star;
                 } else {
                     status = 2;
                     val = MOX::_g_ship_move_info.turns_left;
@@ -434,80 +434,80 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
 
     switch (status) {
     case 0:
-        snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x67), MOX::_star[val].name);
-        local_58 = _normal_colors;
+        snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x67), MOX::_star[val].name);
+        status_colors = _normal_colors;
         break;
     case 1:
         if (val == 1) {
-            snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x69), val, MOX::_star[local_5a].name);
+            snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x69), val, MOX::_star[referenced_star_idx].name);
         } else {
-            snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x6A), val, MOX::_star[local_5a].name);
+            snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x6A), val, MOX::_star[referenced_star_idx].name);
         }
-        local_58 = _normal_colors;
+        status_colors = _normal_colors;
         break;
     case 2:
         if (val == 1) {
-            snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x6B), val);
+            snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x6B), val);
         } else {
-            snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x6C), val);
+            snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x6C), val);
         }
-        local_58 = _normal_colors;
+        status_colors = _normal_colors;
         break;
     case 3:
-        strlcpy(local_50, HAROLD::H_Message_(0x21), sizeof(local_50));
-        local_58 = _neutral_colors;
+        strlcpy(status_text, HAROLD::H_Message_(0x21), sizeof(status_text));
+        status_colors = _neutral_colors;
         break;
     case 4:
-        strlcpy(local_50, HAROLD::H_Message_(0x6E), sizeof(local_50));
-        local_58 = _neutral_colors;
+        strlcpy(status_text, HAROLD::H_Message_(0x6E), sizeof(status_text));
+        status_colors = _neutral_colors;
         break;
     case 5:
         if (val == 1) {
-            snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x6F), val, MOX::_star[local_5a].name);
+            snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x6F), val, MOX::_star[referenced_star_idx].name);
         } else {
-            snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x70), val, MOX::_star[local_5a].name);
+            snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x70), val, MOX::_star[referenced_star_idx].name);
         }
-        local_58 = _neutral_colors;
+        status_colors = _neutral_colors;
         break;
     case 6:
-        snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0xEB), val);
-        local_58 = _neutral_colors;
+        snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0xEB), val);
+        status_colors = _neutral_colors;
         break;
     case 7:
         owner = MOX::_star[MOX::_galaxy_map_scanned_star].owner;
         if (owner < 0 || owner >= MAX_PLAYERS) {
             owner = -1;
-            local_58 = _neutral_colors;
+            status_colors = _neutral_colors;
         }
         {
             int8_t leader_idx = (int8_t)MOX::_star[val].officer_index[MOX::_PLAYER_NUM];
             if (leader_idx == -1 || HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, val) == 0) {
-                strlcpy(local_50, MOX::_star[val].name, sizeof(local_50));
+                strlcpy(status_text, MOX::_star[val].name, sizeof(status_text));
             } else {
                 s_leader_data* leader = &MOX::_leaders[leader_idx];
                 if (leader->eta <= 0) {
-                    snprintf(local_50, sizeof(local_50), MOX::s_fmt_scanned_star_info, MOX::_star[val].name, leader->name);
+                    snprintf(status_text, sizeof(status_text), MOX::s_fmt_scanned_star_info, MOX::_star[val].name, leader->name);
                 } else if (leader->eta == 1) {
-                    snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x92), MOX::_star[val].name, leader->name, leader->eta);
+                    snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x92), MOX::_star[val].name, leader->name, leader->eta);
                 } else {
-                    snprintf(local_50, sizeof(local_50), HAROLD::H_Message_(0x93), MOX::_star[val].name, leader->name, leader->eta);
+                    snprintf(status_text, sizeof(status_text), HAROLD::H_Message_(0x93), MOX::_star[val].name, leader->name, leader->eta);
                 }
             }
         }
         break;
     case 8:
-        strlcpy(local_50, HAROLD::H_Message_(0x94), sizeof(local_50));
-        local_58 = _neutral_colors;
+        strlcpy(status_text, HAROLD::H_Message_(0x94), sizeof(status_text));
+        status_colors = _neutral_colors;
         break;
     case 9:
-        strlcpy(local_50, HAROLD::H_Message_(0x73), sizeof(local_50));
-        local_58 = _neutral_colors;
+        strlcpy(status_text, HAROLD::H_Message_(0x73), sizeof(status_text));
+        status_colors = _neutral_colors;
         break;
     default:
         break;
     }
 
-    MISC::Set_Fitted_Font_Style_(local_50, &local_58, 3, 2, 0, 0xBD, 1);
+    MISC::Set_Fitted_Font_Style_(status_text, &status_colors, 3, 2, 0, 0xBD, 1);
 
     if (owner != -1 && has_moving_ships == 0) {
         uint8_t color_idx = MOX::_main_palette_player_colors[(uint8_t)MOX::_player[owner].color];
@@ -515,14 +515,14 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
             color_idx = 0xF;
         }
         s_colors* temp_colors = MISC::Font_Colors2_(fonts::_current_font_style, color_idx, color_idx + 6);
-        local_58 = *temp_colors;
-        MISC::Set_Font_Colors_(&local_58);
+        status_colors = *temp_colors;
+        MISC::Set_Font_Colors_(&status_colors);
     }
 
-    int16_t str_w = fonts::Get_String_Width_(local_50);
+    int16_t str_w = fonts::Get_String_Width_(status_text);
     int16_t h = fonts::Get_Font_Height_();
 
-    fonts::Print_(169 - (str_w / 2), ((23 - h) / 2) + 248, local_50);
+    fonts::Print_(169 - (str_w / 2), ((23 - h) / 2) + 248, status_text);
 }
 
 void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {

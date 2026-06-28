@@ -3224,7 +3224,7 @@ struct s_weapon_visual_fx {
     int32_t anim_style;
     int32_t sfx_sprite_id;
     int32_t duration;
-    int32_t unk;
+    int32_t wide_bolt_size_bonus;
 };
 
 typedef struct s_winnet_provider s_winnet_provider, *Ps_winnet_provider;

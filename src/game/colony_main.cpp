@@ -668,27 +668,27 @@ namespace COLONY {
                     if (b1 != 0 && b_diag != 0 &&
                         static_cast<uint8_t>(TECHDATA::_buildings[b_diag].type) < static_cast<uint8_t>(TECHDATA::_buildings[b1].type)) {
                         swapped_flag = static_cast<int16_t>(b1);
-                        int32_t temp = b1;
+                        int32_t swapped_building = b1;
                         b1 = b_diag;
-                        b_diag = temp;
+                        b_diag = swapped_building;
                     }
 
                     int32_t& b_below = _colony_bldgs[row + 1].buildings[col];
                     if (b1 != 0 && b_below != 0 &&
                         static_cast<uint8_t>(TECHDATA::_buildings[b_below].type) < static_cast<uint8_t>(TECHDATA::_buildings[b1].type)) {
                         swapped_flag = static_cast<int16_t>(b1);
-                        int32_t temp = b1;
+                        int32_t swapped_building = b1;
                         b1 = b_below;
-                        b_below = temp;
+                        b_below = swapped_building;
                     }
 
                     int32_t& b_right = _colony_bldgs[row].buildings[col + 1];
                     if (b1 != 0 && b_right != 0 &&
                         static_cast<uint8_t>(TECHDATA::_buildings[b_right].type) < static_cast<uint8_t>(TECHDATA::_buildings[b1].type)) {
                         swapped_flag = static_cast<int16_t>(b1);
-                        int32_t temp = b1;
+                        int32_t swapped_building = b1;
                         b1 = b_right;
-                        b_right = temp;
+                        b_right = swapped_building;
                     }
                 }
             }

@@ -59,21 +59,21 @@ namespace strings {
     }
 
     void __cdecl Swap_Short_(int16_t* lhs, int16_t* rhs) {
-        int16_t temp = *lhs;
+        int16_t swapped_value = *lhs;
         *lhs = *rhs;
-        *rhs = temp;
+        *rhs = swapped_value;
     }
 
     void __cdecl Swap_Char_(uint8_t* lhs, uint8_t* rhs) {
-        uint8_t temp = *lhs;
+        uint8_t swapped_value = *lhs;
         *lhs = *rhs;
-        *rhs = temp;
+        *rhs = swapped_value;
     }
 
     void __cdecl Swap_(int32_t* lhs, int32_t* rhs) {
-        int32_t temp = *lhs;
+        int32_t swapped_value = *lhs;
         *lhs = *rhs;
-        *rhs = temp;
+        *rhs = swapped_value;
     }
 
     void __cdecl Delete_Structure_(int32_t index, void* array, uint32_t element_size_bytes, uint32_t element_count) {

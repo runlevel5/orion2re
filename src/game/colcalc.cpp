@@ -2150,9 +2150,9 @@ namespace COLCALC {
         }
 
         {
-            const int16_t temp = player_order[0];
+            const int16_t original_first_player = player_order[0];
             player_order[0] = player_order[owner_idx];
-            player_order[owner_idx] = temp;
+            player_order[owner_idx] = original_first_player;
         }
 
         RUSS::Shuffle_Sint_(&player_order[1], static_cast<int16_t>(MOX::_NUM_PLAYERS - 1));

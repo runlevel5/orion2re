@@ -330,7 +330,7 @@ namespace COLGCBT {
     }
 
     void __cdecl Resort_Units_(uint8_t side_idx) {
-        s_ground_unit temp;
+        s_ground_unit swapped_unit;
         int16_t passes = 40;
 
         do {
@@ -351,9 +351,9 @@ namespace COLGCBT {
                 int16_t height2 = animate::Get_Height_(anim2);
 
                 if (_g_units[side_idx][i + 1].y + height2 < _g_units[side_idx][i].y + height1) {
-                    struct_::Copy_Structure_(&temp, &_g_units[side_idx][i], sizeof(temp));
-                    struct_::Copy_Structure_(&_g_units[side_idx][i], &_g_units[side_idx][i + 1], sizeof(temp));
-                    struct_::Copy_Structure_(&_g_units[side_idx][i + 1], &temp, sizeof(temp));
+                    struct_::Copy_Structure_(&swapped_unit, &_g_units[side_idx][i], sizeof(swapped_unit));
+                    struct_::Copy_Structure_(&_g_units[side_idx][i], &_g_units[side_idx][i + 1], sizeof(swapped_unit));
+                    struct_::Copy_Structure_(&_g_units[side_idx][i + 1], &swapped_unit, sizeof(swapped_unit));
                 }
             }
             --passes;
