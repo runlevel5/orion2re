@@ -3321,7 +3321,7 @@ skip_cursor:
             fonts::Print_Centered_(view_x + 0xA6, row_y + 0x12, line_text);
         }
 
-        row_y = static_cast<int16_t>(row_y + 0x1A);
+        row_y = static_cast<int16_t>(row_y + 0x20);
         if (MOX::_global_combat_data.marine_count != 0xFF) {
             KEN::Ken_Get_Text_Message_(12, message_text, 0x50);
             fonts::Print_(view_x + 0x6F, row_y, message_text);
@@ -3621,7 +3621,7 @@ skip_cursor:
             left_panel_x,
             row_y + 0x0D,
             right_panel_right_x,
-            row_y + 0x56,
+            row_y + 0x66,
             0,
             panel_fill_color);
 

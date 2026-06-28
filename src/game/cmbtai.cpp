@@ -2032,16 +2032,26 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     int16_t weapon_damage;
     int16_t missile_type = missile->type;
     if (TECHDATA::_weapons[missile_type].type == 4 /* RACK_FIGHTER */) {
+        int16_t source_owner = MOX::_combat_data[missile->source_unit_idx].owner;
         switch (missile_type) {
             case 0x1c: // Heavy Fighter
                 weapon_damage = 100;
                 break;
             case 0x1d: // Fighter Bomber 1
             case 0x1e: // Fighter Bomber 2
-                weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[MOX::_combat_data[unit_idx].owner]].max_damage;
+                // Fighter loadouts are stored for the 8 regular players plus the Antaran slot.
+                if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
+                    weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[source_owner]].max_damage;
+                } else {
+                    weapon_damage = 0;
+                }
                 break;
             case 0x1f: // Fighter Interceptor/Beam
-                weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[MOX::_combat_data[unit_idx].owner]].max_damage;
+                if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
+                    weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[source_owner]].max_damage;
+                } else {
+                    weapon_damage = 0;
+                }
                 break;
             default:
                 weapon_damage = 0;
