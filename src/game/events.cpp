@@ -1089,7 +1089,7 @@ namespace EVENTS {
                     int16_t weight = plr->total_pop;
                     candidates[count] = i;
 
-                    if (plr->objectives == 100 /* 'd' */) {
+                    if (plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
                         switch (MOX::_settings.game_difficulty) {
                         case 0:
                             weight /= 10;

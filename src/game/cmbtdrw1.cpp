@@ -470,7 +470,7 @@ namespace CMBTDRW1 {
 
             if (MOX::_draw_legal_boxes_flag == 1 && MOX::_cur_ship > -1) {
                 int8_t owner = MOX::_combat_data[MOX::_cur_ship].owner;
-                if (owner < MAX_PLAYERS && MOX::_player[owner].objectives == 100) {
+                if (owner < MAX_PLAYERS && MOX::_player[owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Draw_Legal_Boxes_();
                 }
             }
@@ -853,7 +853,7 @@ skip_cursor:
 
         if (MOX::_missile_warning > 0 && 
             MOX::_combat_data[MOX::_cur_ship].owner < MAX_PLAYERS && 
-            MOX::_player[MOX::_combat_data[MOX::_cur_ship].owner].objectives == 100 /* 'd' */) {
+            MOX::_player[MOX::_combat_data[MOX::_cur_ship].owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
             
             if (MOX::_missile_warning == 1) {
                 int16_t ms_frame = animate::Get_Current_Frame_((s_animation_header*)MOX::_msl_warning_on_seg);

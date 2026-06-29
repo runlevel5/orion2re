@@ -107,7 +107,7 @@ namespace spy {
         if (num_active_players != 0) {
             for (int16_t j = 0; j < (int16_t)num_active_players; ++j) {
                 int8_t player_idx = active_player_indices[j];
-                if (MOX::_player[player_idx].objectives != 100 /* PLAYER_HUMAN */) {
+                if (MOX::_player[player_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                     Allocate_AI_Spies_(&MOX::_player[player_idx]);
                 }
             }
@@ -203,7 +203,7 @@ namespace spy {
 
                 if (their_spies_here > 0 && i != player_idx) {
                     int32_t val = their_spies_here;
-                    if (MOX::_player[i].objectives == 100) {
+                    if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         sum_spies_100 += val;
                         sum_spies_100_bonused += val * _spy_bonuses[i * 2];
                         if (max_spy_val_100 < val) {
@@ -223,7 +223,7 @@ namespace spy {
         if (total_spies == 0) {
             if ((*AIDATA::_ai_player_info)[player_idx].n_contacts > 0 && MOX::_stardate > 35030) {
                 if (MOX::_settings.game_difficulty == 4) {
-                    if (player->objectives != 0) {
+                    if (player->objectives != PLAYER_OBJECTIVE_DIPLOMATIC) {
                         game_random::Random_(8);
                     }
                     if (player->traits[TRAIT_SPYING_BONUS] > 0) {
@@ -231,7 +231,7 @@ namespace spy {
                     }
                     total_spies = 1;
                 } else if (MOX::_settings.game_difficulty == 3) {
-                    if (player->objectives == 0 && game_random::Random_(7) == 1) {
+                    if (player->objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random_(7) == 1) {
                         total_spies = 1;
                     } else if (game_random::Random_(25) == 1) {
                         total_spies = 1;
@@ -239,7 +239,7 @@ namespace spy {
                         total_spies = 1;
                     }
                 } else if (MOX::_settings.game_difficulty == 2) {
-                    if (player->objectives == 0 && game_random::Random_(13) == 1) {
+                    if (player->objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random_(13) == 1) {
                         total_spies = 1;
                     } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random_(13) == 1) {
                         total_spies = 1;
@@ -404,7 +404,7 @@ namespace spy {
 
             int32_t roll = other_spies_bonus + other_off - my_def - def_spies_bonus - rand2 + rand1;
 
-            if (other_player->objectives != 100 /* PLAYER_HUMAN */ && player->objectives == 100) {
+            if (other_player->objectives != PLAYER_OBJECTIVE_HUMAN && player->objectives == PLAYER_OBJECTIVE_HUMAN) {
                 roll += MOX::_settings.game_difficulty - 2;
             }
 

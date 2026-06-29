@@ -109,7 +109,7 @@ namespace RUSS {
         if (MOX::_game_type == 0) {
             RUSS::_all_ai_game = 1;
 
-            if (MOX::_player[MOX::_PLAYER_NUM].objectives == 0x64) {
+            if (MOX::_player[MOX::_PLAYER_NUM].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 Make_Player_Into_AI_((int32_t)MOX::_PLAYER_NUM);
             }
 

@@ -20,7 +20,7 @@ namespace DIP_SCRN {
 
         uint16_t initial_response = _response_message;
 
-        if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+        if (MOX::_player[target_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             proposal_result = Check_Human_Treaty_Proposal_(proposer_idx, target_idx, treaty_type);
         }
         else {
@@ -31,7 +31,7 @@ namespace DIP_SCRN {
             success = (proposal_result != 0) ? 1 : 0;
         }
         else {
-            if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+            if (MOX::_player[target_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 proposal_result = Diplomacy_Human_Need_Better_Offer_(proposer_idx, target_idx);
             }
             else {
@@ -66,7 +66,7 @@ namespace DIP_SCRN {
             }
         }
 
-        if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+        if (MOX::_player[target_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             if (success == 1) {
                 Get_Human_Form_Treaty_Message_(proposer_idx, target_idx, treaty_type, 3);
             }
@@ -384,7 +384,7 @@ namespace DIP_SCRN {
         case 0:
             _old_response_message = -1;
             diplomac::Start_Tribute_Treaty_(player_idx, target_idx, 1);
-            if (MOX::_player[target_idx].objectives != 100) {
+            if (MOX::_player[target_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 diplomac::Get_Gift_Response_(player_idx, target_idx, 2, 1, &_response_message);
                 npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
             }
@@ -396,7 +396,7 @@ namespace DIP_SCRN {
         case 1:
             _old_response_message = -1;
             diplomac::Start_Tribute_Treaty_(player_idx, target_idx, 2);
-            if (MOX::_player[target_idx].objectives != 100) {
+            if (MOX::_player[target_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 diplomac::Get_Gift_Response_(player_idx, target_idx, 2, 2, &_response_message);
                 npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
             }
@@ -416,7 +416,7 @@ namespace DIP_SCRN {
                 _old_response_message = -1;
                 COLCALC::Player_Gets_Tech_App_(&MOX::_player[target_idx], tech_app);
 
-                if (MOX::_player[target_idx].objectives != 100) {
+                if (MOX::_player[target_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                     diplomac::Get_Gift_Response_(player_idx, target_idx, 3, tech_app, &_response_message);
                     npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
                     npcdiplo::Get_Exchange_Tech_List_(player_idx, target_idx, &_exchange_tech_count, _target_tech_list, _exchange_tech_list);
@@ -436,7 +436,7 @@ namespace DIP_SCRN {
             }
             else {
                 _old_response_message = -1;
-                if (MOX::_player[target_idx].objectives != 100) {
+                if (MOX::_player[target_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                     diplomac::Get_Gift_Response_(player_idx, target_idx, 4, system_idx, &_response_message);
                     npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
                 }
@@ -974,7 +974,7 @@ namespace DIP_SCRN {
                 MOX::_player[player_idx].bc -= (int)result_bc;
                 MOX::_player[target_idx].bc += (int)result_bc;
 
-                if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+                if (MOX::_player[target_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Gift_Response_(player_idx, target_idx, 1, result_bc);
                 }
                 else {
@@ -1032,12 +1032,12 @@ namespace DIP_SCRN {
                 // Condition for player looking for an opportunity:
                 // Must not be eliminated, must not already have reached 100 objectives,
                 // and hyperspace flux must not be present.
-                if (player.eliminated == 0 && player.objectives != 100) {
+                if (player.eliminated == 0 && player.objectives != PLAYER_OBJECTIVE_HUMAN) {
                     if (EVENTS::Event_Check_Hyperspace_Flux_() == 0) {
                         // Condition for the target:
                         // Must have reached 100 objectives, must be a different player,
                         // must not be eliminated, and must be in contact and within range.
-                        if (target.objectives == 100 && p_idx != target_idx && target.eliminated == 0 &&
+                        if (target.objectives == PLAYER_OBJECTIVE_HUMAN && p_idx != target_idx && target.eliminated == 0 &&
                             player.contact[target_idx] == 1 && player.within_range[target_idx] == 1)
                         {
                             valid_opportunity = true;
@@ -1151,7 +1151,7 @@ namespace DIP_SCRN {
     void __cdecl Get_Main_Diplomacy_Choices_() {
         bool exit_flag = false;
 
-        if (MOX::_player[_current_ambassador].objectives != 100) {
+        if (MOX::_player[_current_ambassador].objectives != PLAYER_OBJECTIVE_HUMAN) {
             npcdiplo::Get_Exchange_Tech_List_(
                 MOX::_PLAYER_NUM,
                 _current_ambassador,
@@ -1291,7 +1291,7 @@ namespace DIP_SCRN {
         }
 
         bool do_net_logic = false;
-        if (MOX::_player[_current_ambassador].objectives == 100) {
+        if (MOX::_player[_current_ambassador].objectives == PLAYER_OBJECTIVE_HUMAN) {
             if (MOX::_game_type != 0 && MOX::_game_type != 1) {
                 do_net_logic = true;
             }
@@ -1414,7 +1414,7 @@ namespace DIP_SCRN {
             }
         }
         else {
-            if (MOX::_player[_current_ambassador].objectives != 0x64 /* 'd' */) {
+            if (MOX::_player[_current_ambassador].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 Diplomacy_Display_Response_();
             }
             _response_message = original_response;
@@ -1601,7 +1601,7 @@ namespace DIP_SCRN {
 
         char local_str[120];
 
-        if (MOX::_player[_current_ambassador].objectives == 100 /* 'd' */) {
+        if (MOX::_player[_current_ambassador].objectives == PLAYER_OBJECTIVE_HUMAN) {
             strlcpy(local_str, _player_number_name_buffer, sizeof(local_str));
             JIM::Decode_Text_Name_And_Stat_(local_str, _current_ambassador, _current_ambassador + 1, 0x78);
         }
@@ -1613,7 +1613,7 @@ namespace DIP_SCRN {
         fonts::Print_Centered_(0x140, 0xA, local_str);
 
         if (MOX::_game_type != 0 && MOX::_game_type != 1) {
-            if (MOX::_player[_current_ambassador].objectives == 100 /* 'd' */) {
+            if (MOX::_player[_current_ambassador].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 if (_receive_chat_message[0] != '\0') {
                     fonts::Set_Outline_Color_(0xF8, 0xF8);
                     fonts::Set_Font_Style_Shadow_Down_(4, &_diplomacy_normal_colors);
@@ -1677,7 +1677,7 @@ namespace DIP_SCRN {
         int16_t diff_tech_count;
 
         if (MOX::_player[player_id].treaty[target_id] < 4) {
-            if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+            if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 _exchange_tech_count = 0;
                 npcdiplo::Get_Differential_Tech_List_(target_id, player_id, 0, 0xC343CB00, _target_tech_list, tech_list_buffer, &diff_tech_count,
                     1);
@@ -1951,7 +1951,7 @@ namespace DIP_SCRN {
         fields::Deactivate_Help_List_();
 
         if (MOX::_game_type == 0 || MOX::_game_type == 1 ||
-            MOX::_player[_current_ambassador].objectives != 100 /* 'd' */) {
+            MOX::_player[_current_ambassador].objectives != PLAYER_OBJECTIVE_HUMAN) {
 
             count--;
             int16_t font_h = fonts::Get_Font_Height_();
@@ -2015,7 +2015,7 @@ namespace DIP_SCRN {
 
         if (MOX::_game_type == 0 ||
             MOX::_game_type == 1 ||
-            MOX::_player[_current_ambassador].objectives != 100 /* 'd' */) {
+            MOX::_player[_current_ambassador].objectives != PLAYER_OBJECTIVE_HUMAN) {
 
             _jim_help_list[0].x2 = 0x27F;
             _jim_help_list[0].x1 = 0;
@@ -2128,7 +2128,7 @@ namespace DIP_SCRN {
         }
 
         if (treaty_status == 1) {
-            if (MOX::_player[target_idx].objectives != 100 /* 'd' */) {
+            if (MOX::_player[target_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 npcdiplo::Get_Exchange_Tech_List_(
                     player_idx,
                     target_idx,

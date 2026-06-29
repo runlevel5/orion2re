@@ -168,7 +168,7 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Diplomacy_Break_Treaty_Resolution_(int16_t sender_id, int16_t target_id, int16_t treaty_type) {
-        if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+        if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
             if (MOX::_game_type == 1) {
                 Diplomacy_Load_New_Ambassador_(sender_id);
                 Get_Human_Break_Treaty_Message_(target_id, treaty_type);
@@ -191,7 +191,7 @@ namespace DIP_SCRN {
             case 1:
             case 2:
                 diplomac::Break_Treaties_(sender_id, target_id);
-                if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+                if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     _response_message = 153 /* 0x99 */;
                 } else {
                     diplomac::Get_Break_Treaty_Message_(sender_id, target_id, &_response_message);
@@ -200,7 +200,7 @@ namespace DIP_SCRN {
 
             case 7:
                 diplomac::Break_Trade_(sender_id, target_id);
-                if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+                if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     _response_message = 156 /* 0x9c */;
                 } else {
                     diplomac::Get_Break_Trade_Message_(sender_id, target_id, &_response_message);
@@ -209,7 +209,7 @@ namespace DIP_SCRN {
 
             case 8:
                 diplomac::Break_Research_(sender_id, target_id);
-                if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+                if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     _response_message = 158 /* 0x9e */;
                 } else {
                     diplomac::Get_Break_Research_Message_(sender_id, target_id, &_response_message);
@@ -219,7 +219,7 @@ namespace DIP_SCRN {
             case 9:
             case 10:
                 diplomac::Break_Tribute_(sender_id, target_id);
-                if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+                if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     _response_message = 171 /* 0xab */;
                 } else {
                     diplomac::Get_Break_Tribute_Treaty_Message_(sender_id, target_id, &_response_message);
@@ -244,7 +244,7 @@ namespace DIP_SCRN {
         if (Diplomacy_Generic_List_(1, buffer1, 1, buffer2) != -1) {
             result = 1;
 
-            if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
+            if (MOX::_player[target_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 if (MOX::_game_type == 1) {
                     Diplomacy_Load_New_Ambassador_(sender_id);
                     Get_Human_Declare_War_Message_(sender_id);
@@ -292,7 +292,7 @@ namespace DIP_SCRN {
             status = 1;
             s_player* target_plr = &MOX::_player[target_player_id];
 
-            if (target_plr->objectives == 100) {
+            if (target_plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
                 if (MOX::_game_type == 1) {
                     DIP_SCRN::Diplomacy_Load_New_Ambassador_(sender_player_id);
                     DIP_SCRN::Get_Human_Surrender_Message_(sender_player_id);
@@ -1031,7 +1031,7 @@ namespace DIP_SCRN {
                 uint16_t tech_1 = _target_tech_list[selected_tech_idx];
                 uint16_t tech_2 = 0;
 
-                if (MOX::_player[player_2].objectives == 100 /* 'd' */) {
+                if (MOX::_player[player_2].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(player_1);
                         Get_Human_Tech_Exchange_First_Message_(player_1, player_2, tech_1);
@@ -1138,7 +1138,7 @@ namespace DIP_SCRN {
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_1], tech_1);
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_2], tech_2);
 
-                    if (MOX::_player[player_2].objectives != 100 /* 'd' */) {
+                    if (MOX::_player[player_2].objectives != PLAYER_OBJECTIVE_HUMAN) {
                         npcdiplo::Get_Exchange_Tech_List_(player_1, player_2, &_exchange_tech_count, _target_tech_list, _exchange_tech_list);
                         diplomac::Adjust_Diplomat_Modifiers_(player_1, player_2);
                         MOX::_player[player_1].tech_exchange_modifier[player_2] -= 20;
@@ -1446,7 +1446,7 @@ namespace DIP_SCRN {
                 _old_response_message = -1;
                 uint8_t treaty_val = treaties_1[list_sel];
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 0, treaty_val, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 0, treaty_val, &response, &_response_message);
@@ -1471,7 +1471,7 @@ namespace DIP_SCRN {
                 _old_response_message = -1;
                 uint8_t treaty_val = treaties_2[list_sel];
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 1, treaty_val, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 1, treaty_val, &response, &_response_message);
@@ -1496,7 +1496,7 @@ namespace DIP_SCRN {
                 _old_response_message = -1;
                 uint8_t treaty_val = treaties_3[list_sel];
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 2, treaty_val, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 2, treaty_val, &response, &_response_message);
@@ -1511,7 +1511,7 @@ namespace DIP_SCRN {
             case 3: {
                 _old_response_message = -1;
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 3, 0, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 3, 0, &response, &_response_message);
@@ -1526,7 +1526,7 @@ namespace DIP_SCRN {
             case 4: {
                 _old_response_message = -1;
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 4, 0, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 4, 0, &response, &_response_message);
@@ -1541,7 +1541,7 @@ namespace DIP_SCRN {
             case 5: {
                 _old_response_message = -1;
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 5, 0, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 5, 0, &response, &_response_message);
@@ -1556,7 +1556,7 @@ namespace DIP_SCRN {
                 _old_response_message = -1;
                 uint8_t tech_val = differential_tech_ids[selection_tech];
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 6, tech_val, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 6, tech_val, &response, &_response_message);
@@ -1574,7 +1574,7 @@ namespace DIP_SCRN {
 
                 _old_response_message = -1;
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 7, selection_sys, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 7, selection_sys, &response, &_response_message);
@@ -1589,7 +1589,7 @@ namespace DIP_SCRN {
             case 8: {
                 _old_response_message = -1;
                 int16_t response;
-                if (MOX::_player[ambassador_idx].objectives == 100) {
+                if (MOX::_player[ambassador_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     Get_Human_Demand_Response_(player_num, ambassador_idx, 8, 0, &response);
                 } else {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 8, 0, &response, &_response_message);

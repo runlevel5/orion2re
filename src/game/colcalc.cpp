@@ -1684,7 +1684,7 @@ namespace COLCALC {
         for (int32_t i = 0; i < static_cast<int32_t>(MOX::_NUM_PLAYERS); ++i) {
             s_player& player = MOX::_player[i];
 
-            if (player.eliminated == 0 && player.objectives == 100) {
+            if (player.eliminated == 0 && player.objectives == PLAYER_OBJECTIVE_HUMAN) {
                 human_count++;
             }
         }

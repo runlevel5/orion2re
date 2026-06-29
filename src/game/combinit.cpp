@@ -720,8 +720,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::_combat_mouse_grid[0x36d].icon = 1;
 
         if (MOX::_game_type != 0 && MOX::_game_type != 1) {
-            if (MOX::_combat_attacker_player < MOX::_NUM_PLAYERS && MOX::_player[MOX::_combat_attacker_player].objectives == 100) {
-                if (MOX::_combat_defender_player < MOX::_NUM_PLAYERS && MOX::_player[MOX::_combat_defender_player].objectives == 100) {
+            if (MOX::_combat_attacker_player < MOX::_NUM_PLAYERS && MOX::_player[MOX::_combat_attacker_player].objectives == PLAYER_OBJECTIVE_HUMAN) {
+                if (MOX::_combat_defender_player < MOX::_NUM_PLAYERS && MOX::_player[MOX::_combat_defender_player].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     MOX::_net_flag = 1;
                 }
             }
@@ -2863,7 +2863,7 @@ void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
 void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t star_idx, int16_t colony_pop_lost) {
     if (player_idx < MAX_PLAYERS) {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives != 100 /* 'd' */ && i != player_idx) {
+            if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN && i != player_idx) {
                 int16_t change = -(int16_t)game_random::Random_(10);
                 NETMOX::Russ_Change_Relations_(change, player_idx, i, 6, star_idx, colony_pop_lost);
             }

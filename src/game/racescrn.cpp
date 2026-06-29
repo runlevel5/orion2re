@@ -914,7 +914,7 @@ namespace RACESCRN {
                                 break;
                             }
 
-                            if (MOX::_player[target_player_idx].objectives != 100) {
+                            if (MOX::_player[target_player_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                                 _net_state = 1;
                                 net_cancel_requested = 0;
                                 NETMOX::Net_Request_AI_Diplomacy_((uint8_t)target_player_idx);

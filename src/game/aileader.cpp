@@ -5,7 +5,7 @@ namespace aileader {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             s_player* player = &MOX::_player[i];
 
-            if (player->objectives != 100 /* HUMAN_PLAYER */) {
+            if (player->objectives != PLAYER_OBJECTIVE_HUMAN) {
                 int8_t leader_idx = player->officer_for_hire;
 
                 if (leader_idx != -1) {
@@ -51,7 +51,7 @@ namespace aileader {
 
             if (system_special >= 80 && system_special < 90) {
                 int16_t player_idx = (int16_t)(system_special - 80);
-                if (MOX::_player[player_idx].objectives != 100 /* HUMAN_PLAYER */) {
+                if (MOX::_player[player_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                     int16_t joined_result;
                     OFFICER::Marooned_Hero_At_Star_Can_Join_(star_idx, &joined_result, player_idx);
                 }
@@ -59,7 +59,7 @@ namespace aileader {
         }
 
         for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives != 100 /* HUMAN_PLAYER */) {
+            if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 Assign_Unassigned_Leaders_(i);
             }
         }

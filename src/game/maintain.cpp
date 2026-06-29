@@ -56,7 +56,7 @@ namespace maintain {
 
         if (eligible_count == 0) {
             for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
-                if (i != player_idx && !MOX::_player[i].eliminated && MOX::_player[i].objectives == 100) {
+                if (i != player_idx && !MOX::_player[i].eliminated && MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     eligible_players[i] = 1;
                     eligible_count++;
                 }
@@ -158,7 +158,7 @@ namespace maintain {
                         int32_t compensation = cost / 2;
                         player->bc += compensation;
 
-                        if (player->objectives != 100) {
+                        if (player->objectives != PLAYER_OBJECTIVE_HUMAN) {
                             player->bc += MOX::_settings.game_difficulty;
                         }
                     }
@@ -264,7 +264,7 @@ namespace maintain {
                 int16_t scrap_cost = maintain::Ship_Scrap_Value_(cheapest_ship);
                 player->bc += scrap_cost;
 
-                if (player->objectives != 100) {
+                if (player->objectives != PLAYER_OBJECTIVE_HUMAN) {
                     player->bc += MOX::_settings.game_difficulty;
                 }
 
@@ -460,7 +460,7 @@ namespace maintain {
                 ERICNET::Remove_Building_(colony_idx, (int16_t)best_building);
                 
                 player->bc += scrap_value;
-                if (player->objectives != 100) {
+                if (player->objectives != PLAYER_OBJECTIVE_HUMAN) {
                     player->bc += MOX::_settings.game_difficulty;
                 }
 

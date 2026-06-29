@@ -22,7 +22,7 @@ namespace AIBUILD {
             uint32_t count = 0;
 
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-                if (i != owner && !MOX::_player[i].eliminated && MOX::_player[i].objectives == 100) {
+                if (i != owner && !MOX::_player[i].eliminated && MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     count++;
                     total_str += (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
                 }
@@ -44,7 +44,7 @@ namespace AIBUILD {
                 if (i != owner && !MOX::_player[i].eliminated && (*AIDATA::_ai_player_info)[owner].reachable_players[i]) {
                     uint32_t ship_strength = (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
 
-                    if (MOX::_player[i].objectives == 100) {
+                    if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         total_human += ship_strength;
                         if (ship_strength < min_human) {
                             min_human = ship_strength;
@@ -202,7 +202,7 @@ namespace AIBUILD {
     }
 
     void __cdecl Compute_Needs_(int16_t player_idx) {
-        bool is_objective_1;
+        bool is_militarist;
         int32_t highest_ship_size_idx;
         int32_t total_contacts;
         int32_t total_transports;
@@ -214,7 +214,7 @@ namespace AIBUILD {
         int32_t max_ship_size_13;
         int32_t strength_target;
 
-        is_objective_1 = (MOX::_player[player_idx].objectives == 1);
+        is_militarist = (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_MILITARIST);
         highest_ship_size_idx = 0;
         total_contacts = 0;
         max_transports = 0;
@@ -229,7 +229,7 @@ namespace AIBUILD {
             if (player_idx != i) {
                 bool aware = ((*AIDATA::_ai_player_info)[player_idx].reachable_players[i] != 0);
                 if (!aware) {
-                    if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0 && MOX::_player[i].objectives == 100) {
+                    if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0 && MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         aware = true;
                     }
                 }
@@ -274,7 +274,7 @@ namespace AIBUILD {
         if (max_strength_vs_ships < AIBUILD::_player_total_strength_vs_ships[player_idx][0] || 
             (*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0) {
             int32_t rand_val = game_random::Random_(2);
-            AIBUILD::_player_ship_sizes[player_idx].target_ship_size = highest_ship_size_idx + 1 + rand_val + (is_objective_1 ? 1 : 0) - 1;
+            AIBUILD::_player_ship_sizes[player_idx].target_ship_size = highest_ship_size_idx + 1 + rand_val + (is_militarist ? 1 : 0) - 1;
         }
 
         if (total_contacts == 0) {
@@ -291,7 +291,7 @@ namespace AIBUILD {
             }
 
             if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players > 0) {
-                int32_t missing_need = (is_objective_1 ? 1 : 0) + (*AIDATA::_ai_player_info)[player_idx].n_reachable_players + (int32_t)special::isqrt_((*AIDATA::_ai_player_info)[player_idx].colony_count);
+                int32_t missing_need = (is_militarist ? 1 : 0) + (*AIDATA::_ai_player_info)[player_idx].n_reachable_players + (int32_t)special::isqrt_((*AIDATA::_ai_player_info)[player_idx].colony_count);
                 if (AIBUILD::_player_n_transports[player_idx][0] < missing_need) {
                     int32_t transport_shortfall = missing_need - AIBUILD::_player_n_transports[player_idx][0];
                     if (AIBUILD::_player_n_transports[player_idx][1] < transport_shortfall) {
@@ -316,7 +316,7 @@ namespace AIBUILD {
             }
         }
 
-        if (is_objective_1) {
+        if (is_militarist) {
             strength_target = max_strength_vs_ships;
         } else {
             strength_target = (max_strength_vs_ships + 1 + sum_strength_vs_ships / total_contacts) / 2;
@@ -334,8 +334,8 @@ namespace AIBUILD {
         int32_t current_need = AIBUILD::_player_total_strength_vs_ships[player_idx][2];
         if (current_need == 0 || MOX::_player[player_idx].command_points_used < MOX::_player[player_idx].command_points) {
             if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players > 0) {
-                if (game_random::Random_(10 - (is_objective_1 ? 1 : 0)) == 1) {
-                    AIBUILD::_player_total_strength_vs_ships[player_idx][2] += (is_objective_1 ? 4 : 0) + 1;
+                if (game_random::Random_(10 - (is_militarist ? 1 : 0)) == 1) {
+                    AIBUILD::_player_total_strength_vs_ships[player_idx][2] += (is_militarist ? 4 : 0) + 1;
                 }
             }
         } else if (MOX::_player[player_idx].bc < 50 || MOX::_player[player_idx].surplus_bc < 50) {
@@ -379,7 +379,7 @@ namespace AIBUILD {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
-                if (MOX::_player[player_idx].objectives == 0 && game_random::Random_(2) == 1) {
+                if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random_(2) == 1) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
@@ -526,10 +526,10 @@ namespace AIBUILD {
         int32_t colony_idx = (int32_t)(colony - MOX::_colony);
         s_ai_colony_info* ai_colony = &(*AIDATA::_ai_colony_info)[colony_idx];
 
-        int32_t objective_5_bonus = (player->objectives == 5);
-        int32_t objective_4_bonus = (player->objectives == 4);
-        int32_t objective_1_bonus = (player->objectives == 1);
-        int32_t objective_3_bonus = (player->objectives == 3);
+        int32_t objective_5_bonus = (player->objectives == PLAYER_OBJECTIVE_ECOLOGIST);
+        int32_t objective_4_bonus = (player->objectives == PLAYER_OBJECTIVE_INDUSTRIALIST);
+        int32_t objective_1_bonus = (player->objectives == PLAYER_OBJECTIVE_MILITARIST);
+        int32_t objective_3_bonus = (player->objectives == PLAYER_OBJECTIVE_TECHNOLOGIST);
 
         int32_t bc_score = 0;
         if (player->bc >= 1500) {
@@ -950,7 +950,7 @@ namespace AIBUILD {
         }
 
         int32_t difficulty = MOX::_settings.game_difficulty;
-        if (MOX::_player[(int32_t)colony->owner].objectives == 100) {
+        if (MOX::_player[(int32_t)colony->owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
             difficulty = 4;
         }
 

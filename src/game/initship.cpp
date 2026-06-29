@@ -5,7 +5,7 @@ namespace INITSHIP {
         s_player* plr = &MOX::_player[player_idx];
         int16_t design_flag = 0;
 
-        if (MOX::_settings.starting_civilization_level != 2 && plr->objectives == 0x64 /* 'd' */) {
+        if (MOX::_settings.starting_civilization_level != 2 && plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
             design_flag = 1;
         }
 
@@ -25,7 +25,7 @@ namespace INITSHIP {
             aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[i], i - design_flag);
         }
 
-        if (plr->objectives == 0x64 /* 'd' */) {
+        if (plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
             struct_::Clear_Structure_(&plr->ship_designs[5], sizeof(plr->ship_designs[5]));
         } else {
             aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[5], 5);
@@ -88,7 +88,7 @@ namespace INITSHIP {
             return;
         }
 
-        if (MOX::_player[player_idx].objectives == 100 /* 'd' */) {
+        if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             Update_Automatic_Design_Equipment_(player_idx);
             Update_Equipment_On_Ships_Being_Built_(player_idx);
             return;

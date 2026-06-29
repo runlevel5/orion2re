@@ -27,11 +27,11 @@ namespace npcdiplo {
                 }
 
                 // Skip if either player is pursuing "objective" status (e.g., Guardian/Antaran)
-                if (MOX::_player[i].objectives == 100) {
+                if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     continue;
                 }
 
-                if (MOX::_player[j].objectives == 100) {
+                if (MOX::_player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     continue;
                 }
 
@@ -59,7 +59,7 @@ namespace npcdiplo {
                     // Note: expansion_excess is negative here
                     int32_t base_penalty = (expansion_excess / difficulty_mod) * game_random::Random_(4);
                     int16_t relations_change = (int16_t)((base_penalty / 3) * 4);
-                    if (MOX::_player[i].objectives != 100) {
+                    if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN) {
                         relations_change /= 2;
                     }
 
@@ -83,13 +83,13 @@ namespace npcdiplo {
     void __cdecl NPC_Threats_() {
         for (int p1_idx = 0; p1_idx < MOX::_NUM_PLAYERS; ++p1_idx) {
             s_player& p1 = MOX::_player[p1_idx];
-            if (p1.objectives == 100 /* 'd' */) {
+            if (p1.objectives == PLAYER_OBJECTIVE_HUMAN) {
                 continue;
             }
 
             for (int p2_idx = 0; p2_idx < MOX::_NUM_PLAYERS; ++p2_idx) {
                 s_player& p2 = MOX::_player[p2_idx];
-                if (p2.objectives == 100 /* 'd' */) {
+                if (p2.objectives == PLAYER_OBJECTIVE_HUMAN) {
                     continue;
                 }
 
@@ -152,7 +152,7 @@ namespace npcdiplo {
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             auto& p_source = MOX::_player[i];
 
-            if (p_source.objectives == 100 /* HUMAN_OR_INVALID */ || p_source.eliminated) {
+            if (p_source.objectives == PLAYER_OBJECTIVE_HUMAN || p_source.eliminated) {
                 continue;
             }
 
@@ -180,7 +180,7 @@ namespace npcdiplo {
                     if (j != i && decision[j] == 0 && p_source.within_range[j] == 1 &&
                         p_source.peace_duration[j] < 1 && !p_target.eliminated) {
                         
-                        if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && p_target.objectives != 100) {
+                        if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && p_target.objectives != PLAYER_OBJECTIVE_HUMAN) {
                             int diff = MOX::_settings.game_difficulty;
                             int roll_limit = (diff * diff * 2 + 2) * 15;
                             if (game_random::Random_(roll_limit) == 1) {
@@ -195,7 +195,7 @@ namespace npcdiplo {
             // Case 2: Opportunistic Attack based on Relations
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
-                if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                if (j != i && p_target.objectives != PLAYER_OBJECTIVE_HUMAN && !p_target.eliminated) {
                     if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
                         p_source.peace_duration[j] < 1 &&
                         decision[j] == 0) {
@@ -216,7 +216,7 @@ namespace npcdiplo {
             if (p_source.failed_to_expand == 1) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     auto& p_target = MOX::_player[j];
-                    if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                    if (j != i && p_target.objectives != PLAYER_OBJECTIVE_HUMAN && !p_target.eliminated) {
                         if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
                             p_source.peace_duration[j] < 1 && decision[j] == 0) {
                             
@@ -233,7 +233,7 @@ namespace npcdiplo {
             if ((int16_t)game_random::Random_(100) < p_source.food_shortage_duration) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     auto& p_target = MOX::_player[j];
-                    if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                    if (j != i && p_target.objectives != PLAYER_OBJECTIVE_HUMAN && !p_target.eliminated) {
                         if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
                             p_source.peace_duration[j] < 1 && decision[j] == 0) {
                             
@@ -249,7 +249,7 @@ namespace npcdiplo {
             // Case 5: Revenge for colony losses
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
-                if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                if (j != i && p_target.objectives != PLAYER_OBJECTIVE_HUMAN && !p_target.eliminated) {
                     if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
                         p_source.peace_duration[j] < 1 && decision[j] == 0) {
                         
@@ -264,10 +264,10 @@ namespace npcdiplo {
             // Case 6: Suppress declarations against targets already at war with an objective player
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
-                if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                if (j != i && p_target.objectives != PLAYER_OBJECTIVE_HUMAN && !p_target.eliminated) {
                     for (int k = 0; k < MOX::_NUM_PLAYERS; ++k) {
                         auto& p_other = MOX::_player[k];
-                        if (k != i && k != j && p_other.objectives == 100 && !p_other.eliminated) {
+                        if (k != i && k != j && p_other.objectives == PLAYER_OBJECTIVE_HUMAN && !p_other.eliminated) {
                             if (p_other.treaty[j] >= 4) {
                                 decision[j] = 0;
                             }
@@ -279,7 +279,7 @@ namespace npcdiplo {
             // Case 7: Detailed personality threshold comparison
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
-                if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                if (j != i && p_target.objectives != PLAYER_OBJECTIVE_HUMAN && !p_target.eliminated) {
                     if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
                         decision[j] == 0 && p_source.peace_duration[j] < 1 &&
                         (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
@@ -300,7 +300,7 @@ namespace npcdiplo {
 
                         for (int k = 0; k < MOX::_NUM_PLAYERS; ++k) {
                             if (k != i && k != j && !MOX::_player[k].eliminated && 
-                                MOX::_player[k].objectives == 100 && MOX::_player[k].within_range[j] == 1) {
+                                MOX::_player[k].objectives == PLAYER_OBJECTIVE_HUMAN && MOX::_player[k].within_range[j] == 1) {
                                 
                                 int strength = diplomac::Fleet_Strength_Comparison_(k, i);
                                 if (strength > 100) {
@@ -320,9 +320,9 @@ namespace npcdiplo {
             // Case 8: Alliance protection logic (Difficulty >= Average)
             if (MOX::_settings.game_difficulty >= 3 /* HARD */) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-                    if (j != i && !MOX::_player[j].eliminated && MOX::_player[j].objectives != 100) {
+                    if (j != i && !MOX::_player[j].eliminated && MOX::_player[j].objectives != PLAYER_OBJECTIVE_HUMAN) {
                         for (int k = 0; k < MOX::_NUM_PLAYERS; ++k) {
-                            if (k != i && k != j && !MOX::_player[k].eliminated && MOX::_player[k].objectives != 100) {
+                            if (k != i && k != j && !MOX::_player[k].eliminated && MOX::_player[k].objectives != PLAYER_OBJECTIVE_HUMAN) {
                                 if (MOX::_player[k].treaty[j] >= 4) {
                                     decision[j] = 0;
                                 }
@@ -335,7 +335,7 @@ namespace npcdiplo {
             // Execution Loop 1: Immediate/Forced Declarations
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 if (j != i && decision[j] == 2 && p_source.peace_duration[j] < 1) {
-                    if (MOX::_player[j].objectives == 100 /* HUMAN */) {
+                    if (MOX::_player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         diplomac::Change_Relations_(-10000, j, i, reason[j], 0, 0);
                     }
                     diplomac::Declare_War_(i, j);
@@ -361,7 +361,7 @@ namespace npcdiplo {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     if (j != i && decision[j] == 1) {
                         if (--target_idx == 0) {
-                            if (MOX::_player[j].objectives == 100 /* HUMAN */) {
+                            if (MOX::_player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                                 diplomac::Change_Relations_(-10000, j, i, reason[j], 0, 0);
                             }
                             diplomac::Declare_War_(i, j);
@@ -381,13 +381,13 @@ namespace npcdiplo {
         for (int16_t p1_idx = 0; p1_idx < (int16_t)MOX::_NUM_PLAYERS; ++p1_idx) {
             s_player* p1 = &MOX::_player[p1_idx];
 
-            if (p1->objectives != 100 && p1->traits[TRAIT_REPULSIVE] == 0) {
+            if (p1->objectives != PLAYER_OBJECTIVE_HUMAN && p1->traits[TRAIT_REPULSIVE] == 0) {
                 if (MOX::_stardate % (int32_t)MOX::_NUM_PLAYERS == (int32_t)p1_idx) {
                     for (int16_t p2_idx = 0; p2_idx < (int16_t)MOX::_NUM_PLAYERS; ++p2_idx) {
                         if (p1_idx == p2_idx) continue;
 
                         s_player* p2 = &MOX::_player[p2_idx];
-                        if (p2->objectives != 100 && p2->traits[TRAIT_REPULSIVE] == 0 && p1->contact[p2_idx] != 0) {
+                        if (p2->objectives != PLAYER_OBJECTIVE_HUMAN && p2->traits[TRAIT_REPULSIVE] == 0 && p1->contact[p2_idx] != 0) {
                             if ((int16_t)game_random::Random_(100) < (int)p1->relations[p2_idx] + 50) {
                                 if ((int16_t)game_random::Random_(4) <= (int)MOX::_settings.game_difficulty) {
                                     int16_t best_tech_for_p1 = -1;
@@ -444,7 +444,7 @@ namespace npcdiplo {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             auto& p_i = MOX::_player[i];
 
-            if (p_i.objectives == 100 /* 'd' */ || p_i.eliminated != 0) {
+            if (p_i.objectives == PLAYER_OBJECTIVE_HUMAN || p_i.eliminated != 0) {
                 continue;
             }
 
@@ -455,7 +455,7 @@ namespace npcdiplo {
 
                 auto& p_j = MOX::_player[j];
 
-                if (p_j.objectives == 100 /* 'd' */ || p_j.eliminated != 0) {
+                if (p_j.objectives == PLAYER_OBJECTIVE_HUMAN || p_j.eliminated != 0) {
                     continue;
                 }
 
@@ -464,7 +464,7 @@ namespace npcdiplo {
                     int16_t war_count = 0;
                     for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
                         auto& p_k = MOX::_player[k];
-                        if (p_k.objectives == 100 /* 'd' */ && p_k.eliminated == 0) {
+                        if (p_k.objectives == PLAYER_OBJECTIVE_HUMAN && p_k.eliminated == 0) {
                             if (i != k && j != k && p_i.treaty[k] >= 4) {
                                 war_count++;
                             }
@@ -495,7 +495,7 @@ namespace npcdiplo {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             s_player& p_i = MOX::_player[i];
 
-            if (p_i.objectives == 100 /* 'd' */) {
+            if (p_i.objectives == PLAYER_OBJECTIVE_HUMAN) {
                 int16_t hatred_score = 0;
 
                 for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
@@ -531,7 +531,7 @@ namespace npcdiplo {
                         s_player& p_k = MOX::_player[k];
 
                         // Check for contact and ensure p_k is not also looking for a diplomatic win 'd'
-                        if (p_k.objectives != 100 /* 'd' */ &&
+                        if (p_k.objectives != PLAYER_OBJECTIVE_HUMAN &&
                             p_i.contact[k] &&
                             p_i.treaty[k] == 0 &&
                             p_i.research_treaty[k] == 0 &&
@@ -571,7 +571,7 @@ namespace npcdiplo {
         s_player* plr = &MOX::_player[player_idx];
 
         // Already surrendered
-        if (plr->objectives == 100 /* d */) {
+        if (plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
             return -1;
         }
 
@@ -658,7 +658,7 @@ namespace npcdiplo {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (plr->contact[i] == 1 && i != player_idx && !MOX::_player[i].eliminated) {
                 if (!COLCALC::May_Surrender_Empire_(player_idx, i)) continue;
-                if (MOX::_player[i].objectives == 100 /* d */) continue;
+                if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) continue;
                 if (plr->treaty[i] >= 4 /* NO_WAR */) continue;
                 if (best_pop <= MOX::_player[i].total_pop) {
                     best_target = i;
@@ -672,7 +672,7 @@ namespace npcdiplo {
             best_pop = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
                 if (plr->contact[i] == 1 && i != player_idx && !MOX::_player[i].eliminated) {
-                    if (MOX::_player[i].objectives != 100 /* d */ &&
+                    if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN &&
                         COLCALC::May_Surrender_Empire_(player_idx, i)) 
                     {
                         if (best_pop > MOX::_player[i].total_pop) {
@@ -727,9 +727,9 @@ namespace npcdiplo {
                 break;
             }
 
-            if (MOX::_player[i].objectives != 100) {
+            if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 for (int16_t j = k; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
-                    if (MOX::_player[j].objectives != 100) {
+                    if (MOX::_player[j].objectives != PLAYER_OBJECTIVE_HUMAN) {
                         /*
                          * Break player i's treaties with both empires when their
                          * existing treaty state conflicts with player i's pair of treaties.
@@ -759,7 +759,7 @@ namespace npcdiplo {
                     MOX::_player[player_idx].contact[i] == 1 &&
                     MOX::_player[player_idx].within_range[i] == 1) {
                     
-                    if (MOX::_player[i].objectives == 100 /* 'd' */) {
+                    if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         diplomac::Change_Relations_(-10000, i, player_idx, 19 /* 0x13 */, 0, 0);
                     }
 
@@ -778,12 +778,12 @@ namespace npcdiplo {
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             s_player& plr_i = MOX::_player[i];
-            if (plr_i.objectives == 100 /* HUMAN_PLAYER */) continue;
+            if (plr_i.objectives == PLAYER_OBJECTIVE_HUMAN) continue;
 
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 s_player& plr_j = MOX::_player[j];
 
-                if (plr_j.objectives == 100 /* HUMAN_PLAYER */) continue;
+                if (plr_j.objectives == PLAYER_OBJECTIVE_HUMAN) continue;
                 if (plr_i.traits[TRAIT_REPULSIVE] != 0) continue;
                 if (plr_j.traits[TRAIT_REPULSIVE] != 0) continue;
                 if (i == j) continue;
@@ -813,14 +813,14 @@ namespace npcdiplo {
                     for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
                         if (k != i && k != j) {
                             if (plr_j.treaty[k] >= 4) {
-                                if (MOX::_player[k].objectives == 100) {
+                                if (MOX::_player[k].objectives == PLAYER_OBJECTIVE_HUMAN) {
                                     num_player_allies++;
                                 } else {
                                     num_nonplayer_allies++;
                                 }
                             }
                             if (plr_i.treaty[k] >= 4) {
-                                if (MOX::_player[k].objectives == 100) {
+                                if (MOX::_player[k].objectives == PLAYER_OBJECTIVE_HUMAN) {
                                     num_player_allies++;
                                 } else {
                                     num_nonplayer_allies++;

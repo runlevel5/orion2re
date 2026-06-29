@@ -469,7 +469,7 @@ namespace COLCALC {
                 }
 
                 if (i == static_cast<uint8_t>(colony->owner) || race_conquered_count[i] == 0) {
-                    if (owner_ptr->objectives != 100) {
+                    if (owner_ptr->objectives != PLAYER_OBJECTIVE_HUMAN) {
                         growth_modifier += static_cast<int>(MOX::_settings.game_difficulty);
                     }
                 }
@@ -873,7 +873,7 @@ namespace COLCALC {
                     final.govt_bonus += cur_stat.govt_bonus;
                 }
 
-                if (MOX::_player[owner].objectives != 100 /* AI player check */) {
+                if (MOX::_player[owner].objectives != PLAYER_OBJECTIVE_HUMAN) {
                     int diff_bonus = _colony_job_production_difficulty_lookup[MOX::_settings.game_difficulty];
                     cur_stat.difficulty_bonus = diff_bonus;
                     final.difficulty_bonus += diff_bonus;
@@ -1073,7 +1073,7 @@ namespace COLCALC {
         if (plr->command_points_used != 0) {
             if (plr->command_points < plr->command_points_used) {
                 int32_t diff = plr->command_points_used - plr->command_points;
-                int32_t cost_mult = (plr->objectives == 'd') ? 10 : (12 - MOX::_settings.game_difficulty);
+                int32_t cost_mult = (plr->objectives == PLAYER_OBJECTIVE_HUMAN) ? 10 : (12 - MOX::_settings.game_difficulty);
                 plr->maintenance[2] = (int16_t)(cost_mult * diff);
                 if (debug_out) {
                     sprintf(debug_out, "(%s %d * %d + %d * %d : %d BC)\n", _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
@@ -1148,7 +1148,7 @@ namespace COLCALC {
         }
 
         int owner_idx = (int)colony->owner;
-        if (MOX::_player[owner_idx].objectives != 'd') {
+        if (MOX::_player[owner_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
             base_tax_per_pop += (int)_difficulty_bc_lookup_table[MOX::_settings.game_difficulty];
         }
 
@@ -1539,7 +1539,7 @@ namespace COLCALC {
             bonus_recycling = n_pops;
         }
 
-        if (MOX::_player[colony->owner].objectives != 100) {
+        if (MOX::_player[colony->owner].objectives != PLAYER_OBJECTIVE_HUMAN) {
             int32_t difficulty_bonus = (MOX::_settings.game_difficulty * n_pops + 4) >> 3;
             colony->n_industry_recyclers += static_cast<char>(difficulty_bonus);
         }

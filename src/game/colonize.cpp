@@ -305,7 +305,7 @@ namespace COLONIZE {
 
     void __cdecl All_AI_Colonize_() {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives != 100) {
+            if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 AI_Colonize_(i);
             }
         }

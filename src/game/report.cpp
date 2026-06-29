@@ -434,7 +434,7 @@ namespace REPORT {
     uint8_t __cdecl Must_Display_Reports_(int16_t player_idx) {
         int8_t displayed = 0;
 
-        if (MOX::_player[player_idx].objectives == 100) {
+        if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             displayed = REPORT::Display_Report_Aux_(player_idx, 0);
         }
 

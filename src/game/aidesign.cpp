@@ -257,7 +257,7 @@ namespace aidesign {
         int16_t target_defense;
         int16_t target_shield_value;
 
-        if (MOX::_player[player_idx].objectives == 100) {
+        if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             target_shield_value = 1;
             target_defense = TECHDATA::_drives[2].combat_speed_min[2] + 20;
         } else {

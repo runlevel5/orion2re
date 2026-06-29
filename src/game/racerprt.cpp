@@ -19,7 +19,7 @@ void __cdecl Race_Report_Screen_(int16_t player_idx) {
 
     MOX::_cur_plyr_ptr = &MOX::_player[player_idx];
 
-    if (MOX::_cur_plyr_ptr->objectives == 100) {
+    if (MOX::_cur_plyr_ptr->objectives == PLAYER_OBJECTIVE_HUMAN) {
         strlcpy(personality_objective_text, MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality], sizeof(personality_objective_text));
     } else {
         /* fmtpara: '\r' starts a new paragraph between the personality and objective lines. */

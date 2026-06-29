@@ -10,7 +10,7 @@ namespace NETTURN {
         }
 
         for (int32_t i = 0; i < num_players; ++i) {
-            if (players[i].objectives == 100 /* 'd' */ && players[i].network_player_id != -1 && players[i].eliminated == 0) {
+            if (players[i].objectives == PLAYER_OBJECTIVE_HUMAN && players[i].network_player_id != -1 && players[i].eliminated == 0) {
                 return i;
             }
         }
@@ -50,7 +50,7 @@ namespace NETTURN {
         election_msg.hit_next_turn = 1;
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives == 100 /* 'd' */) {
+            if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 if (MOX::_PLAYER_NUM != i) {
                     election_msg.rank = (int32_t)NETMOX::_net.host_election_player_rank[MOX::_PLAYER_NUM];
                     NETMOX::Mox_Send_Message_(MOX::_player[i].network_player_id, NET_PACKET_HOST_ELECTION_RANK, &election_msg, sizeof(election_msg));
@@ -113,7 +113,7 @@ namespace NETTURN {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                if (MOX::_player[i].objectives != 0x64 || MOX::_PLAYER_NUM == i || MOX::_player[i].eliminated != 0) {
+                if (MOX::_player[i].objectives != PLAYER_OBJECTIVE_HUMAN || MOX::_PLAYER_NUM == i || MOX::_player[i].eliminated != 0) {
                     NETMOX::_net.host_sync_counter++;
                     NETMOX::_net.players_ready_mask[i + 1] = 1;
                 }

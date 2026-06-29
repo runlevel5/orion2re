@@ -985,7 +985,7 @@ void __cdecl Print_Online_Strings_() {
 int8_t __cdecl Hotseat_Player_Status_(int16_t player_idx) {
     int8_t status = 0;
 
-    if (MOX::_player[player_idx].objectives == 100 && MOX::_player[player_idx].eliminated == 0) {
+    if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN && MOX::_player[player_idx].eliminated == 0) {
         status = (int8_t)((MOX::_player[player_idx].player_done_flags == 0) + 1);
     }
 
@@ -1673,7 +1673,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             s_colors font_colors_3 = *MISC::Font_Colors2_(4, (uint8_t)(c1 + 1), (uint8_t)(c3 + 4));
 
             s_player* plr = &MOX::_player[i];
-            if (plr->objectives == 100 /* 'd' */ && plr->eliminated == 0) {
+            if (plr->objectives == PLAYER_OBJECTIVE_HUMAN && plr->eliminated == 0) {
                 int16_t banner_x = (int16_t)((i % 2) * 294 + screen_x + 92);
                 int16_t banner_y = (int16_t)((i / 2) * 36 + screen_y + 63);
 
@@ -1856,7 +1856,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         int16_t y_offset_for_player_row = 0;
         for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
             s_player* plr = &MOX::_player[player_idx]; // size 0xEA9
-            if (plr->objectives == 100 /* 'd' */ && plr->eliminated == 0) {
+            if (plr->objectives == PLAYER_OBJECTIVE_HUMAN && plr->eliminated == 0) {
                 s_colors local_colors_1;
                 s_colors local_colors_2;
                 s_colors local_colors_3;
@@ -1946,7 +1946,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             s_player* plr = &MOX::_player[i];
 
-            if (plr->objectives == 100 && MOX::_mp_screen->player_connected_flags[i] == 0 && plr->eliminated == 0) {
+            if (plr->objectives == PLAYER_OBJECTIVE_HUMAN && MOX::_mp_screen->player_connected_flags[i] == 0 && plr->eliminated == 0) {
                 int16_t x1 = MOX::_mp_screen->screen_x + 106;
                 int16_t y1 = MOX::_mp_screen->screen_y + 64 + y_offset;
                 int16_t x2 = MOX::_mp_screen->screen_x + 435;
@@ -2173,7 +2173,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
-                if (MOX::_player[player_idx].objectives == 0x64) {
+                if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     if (MOX::_player[player_idx].eliminated != 0) {
                         MOX::_mp_screen->player_field_ids[player_idx] = -1000;
                         MOX::_mp_screen->game_list_field_ids[player_idx] = -1000;
@@ -2452,7 +2452,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 const int8_t player_status = MULTPLAY::Hotseat_Player_Status_(player_idx);
                 MOX::_mp_screen->player_button_status[player_idx] = player_status;
 
-                if ((MOX::_player[player_idx].objectives == 100) &&
+                if ((MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) &&
                     (MOX::_player[player_idx].eliminated == 0)) {
                     MOX::_mp_screen->forced_player_idx = player_idx;
                     ++MOX::_mp_screen->force_player_selection;

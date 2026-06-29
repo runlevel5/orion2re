@@ -3800,7 +3800,7 @@ namespace MAINSCR {
             if (MOX::_settings.strategic_combat_flag != 0) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_STRATEGIC_ATTACKER;
             }
-            else if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 'd') {
+            else if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_ATTACKER;
             }
             else {

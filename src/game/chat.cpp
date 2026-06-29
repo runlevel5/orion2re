@@ -18,7 +18,7 @@ namespace CHAT {
 
     void __cdecl Send_Chat_Msg_(char* msg) {
         for (int32_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
-            if (MOX::_player[player_index].objectives == 0x64) {
+            if (MOX::_player[player_index].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 int32_t message_len = (int32_t)(strlen(msg) + 1);
                 NETMOX::Mox_Send_Message_(MOX::_player[player_index].network_player_id, NET_PACKET_CHAT, msg, (uint16_t)message_len);
                 RUSS::Mox_Update_();
@@ -32,7 +32,7 @@ namespace CHAT {
         }
 
         for (int32_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
-            if (MOX::_player[player_index].objectives == 100) {
+            if (MOX::_player[player_index].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 int32_t len = (int32_t)strlen(msg);
 
                 if (len > 80) {

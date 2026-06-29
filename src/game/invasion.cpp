@@ -59,7 +59,7 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
         bonuses->subterranean_bonus = 10;
     }
 
-    if (player->objectives == 100) {
+    if (player->objectives == PLAYER_OBJECTIVE_HUMAN) {
         bonuses->difficulty_bonus = 0;
     } else {
         bonuses->difficulty_bonus = MOX::_settings.game_difficulty - 2;
@@ -375,8 +375,8 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
 
     int chance = total_rebel_pop * 10;
 
-    if (MOX::_player[colony->owner].objectives == 100 &&
-        MOX::_player[rebel_player].objectives != 100) {
+    if (MOX::_player[colony->owner].objectives == PLAYER_OBJECTIVE_HUMAN &&
+        MOX::_player[rebel_player].objectives != PLAYER_OBJECTIVE_HUMAN) {
         chance += MOX::_settings.game_difficulty * 4 - 8;
     }
 
@@ -531,7 +531,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
         int32_t captured_count = 0;
         int32_t chance_base;
 
-        if (MOX::_player[new_owner_idx].objectives == 100) {
+        if (MOX::_player[new_owner_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             chance_base = 125;
         } else {
             chance_base = MOX::_settings.game_difficulty * 5 + 115;
@@ -556,7 +556,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
         if (captured_count < 4) {
             int32_t chance_random;
-            if (MOX::_player[new_owner_idx].objectives == 100) {
+            if (MOX::_player[new_owner_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 chance_random = 65;
             } else {
                 chance_random = MOX::_settings.game_difficulty * 5 + 55;

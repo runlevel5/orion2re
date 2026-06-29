@@ -81,7 +81,7 @@ namespace newtech {
             return 0;
         }
 
-        if (MOX::_player[player_idx].objectives != 100 && tech_app_idx == 52) {
+        if (MOX::_player[player_idx].objectives != PLAYER_OBJECTIVE_HUMAN && tech_app_idx == 52) {
             return 0;
         }
 
@@ -147,23 +147,23 @@ namespace newtech {
         }
 
         switch (MOX::_player[player_idx].objectives) {
-            case 0:
+            case PLAYER_OBJECTIVE_DIPLOMATIC:
                 if (ai_group == 0xC || ai_group == 3 || ai_group == 0xB) modifier = 100;
                 break;
-            case 1:
+            case PLAYER_OBJECTIVE_MILITARIST:
                 if (ai_group == 0x11 || ai_group == 0x21) modifier = 100;
                 break;
-            case 2:
+            case PLAYER_OBJECTIVE_EXPANSIONIST:
                 if (ai_group == 0x27) modifier = 50;
                 else if (ai_group == 9 || ai_group == 10) modifier = 100;
                 break;
-            case 3:
+            case PLAYER_OBJECTIVE_TECHNOLOGIST:
                 if (ai_group == 2) modifier = 100;
                 break;
-            case 4:
+            case PLAYER_OBJECTIVE_INDUSTRIALIST:
                 if (ai_group == 1 || ai_group == 4) modifier = 100;
                 break;
-            case 5:
+            case PLAYER_OBJECTIVE_ECOLOGIST:
                 if (ai_group == 0 || ai_group == 4) modifier = 100;
                 break;
         }
@@ -230,7 +230,7 @@ namespace newtech {
             else if (MOX::_player[player_idx].traits[TRAIT_LOW_G_WORLD] != 0) modifier = 50;
         }
 
-        if (MOX::_player[player_idx].objectives == 100) {
+        if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             int diff_mult = MOX::_settings.game_difficulty * MOX::_settings.game_difficulty * 5 + 10;
             modifier = diff_mult * 5;
             if (ai_group == 0x1A || ai_group == 0x1B || ai_group == 0x1D || ai_group == 0x1E || ai_group == 0x21 || ai_group == 0x15) {
@@ -476,16 +476,16 @@ namespace newtech {
                 if (val != 0) {
                     bool keep = true;
                     switch (player->objectives) {
-                        case 0:
-                        case 5:
+                        case PLAYER_OBJECTIVE_DIPLOMATIC:
+                        case PLAYER_OBJECTIVE_ECOLOGIST:
                             if (val * 2 < max_weighted_choice) keep = false;
                             break;
-                        case 1:
-                        case 2:
+                        case PLAYER_OBJECTIVE_MILITARIST:
+                        case PLAYER_OBJECTIVE_EXPANSIONIST:
                             if (val * 6 < max_weighted_choice) keep = false;
                             break;
-                        case 3:
-                        case 4:
+                        case PLAYER_OBJECTIVE_TECHNOLOGIST:
+                        case PLAYER_OBJECTIVE_INDUSTRIALIST:
                             if (val * 5 < max_weighted_choice * 4) keep = false;
                             break;
                         default:

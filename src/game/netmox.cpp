@@ -731,7 +731,7 @@ namespace NETMOX {
                 MOX::_player[i].network_player_id = -1;
                 MOX::_player[i].objectives = 0;
             } else {
-                if (MOX::_player[i].objectives == 'd') {
+                if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     _net.num_connected_players++;
                 }
             }
@@ -890,7 +890,7 @@ namespace NETMOX {
                 memcpy(&sync_pkt.player2, &MOX::_player[sync_target_idx], sizeof(s_player));
 
                 if (MOX::_PLAYER_NUM != current_player_idx && sync_target_idx != current_player_idx) {
-                    if (MOX::_player[current_player_idx].objectives == 'd' &&
+                    if (MOX::_player[current_player_idx].objectives == PLAYER_OBJECTIVE_HUMAN &&
                         !message_sent && NETMOX::_net.player_race_selected_flags[current_player_idx]) {
                         
                         message_sent = true;
@@ -933,7 +933,7 @@ namespace NETMOX {
             int32_t player_num = MOX::_PLAYER_NUM;
             int8_t* player_rank_sync_flags = NETMOX::_net.host_election_rank_sync_cache;
             
-            if (current_player_idx != player_num && MOX::_player[current_player_idx].objectives == 'd') {
+            if (current_player_idx != player_num && MOX::_player[current_player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 int8_t local_rank = NETMOX::_net.host_election_player_rank[player_num];
                 if (player_rank_sync_flags[current_player_idx] != local_rank) {
                     message_sent = true;
@@ -1919,7 +1919,7 @@ namespace NETMOX {
             // Do not unpack if the reporter is the defender, the attacker is a valid player,
             // and the attacker is a human player (objective == 100 / 'd')
             if (defender_id == reporting_player_id && attacker_id < MAX_PLAYERS) {
-                if (MOX::_player[attacker_id].objectives == 100) {
+                if (MOX::_player[attacker_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     skip_unpack = true;
                 }
             }
@@ -2069,7 +2069,7 @@ namespace NETMOX {
         int16_t player_num = MOX::_PLAYER_NUM;
         bool include_remote_state =
             _net.local_net_id != _net.net_host_id &&
-            (player_num != target_player_id || player_id >= MAX_PLAYERS || MOX::_player[player_id].objectives != 100 /* 'd' */);
+            (player_num != target_player_id || player_id >= MAX_PLAYERS || MOX::_player[player_id].objectives != PLAYER_OBJECTIVE_HUMAN);
 
         allocate::Push_Block_(MOX::_screen_seg);
         uint32_t alloc_size = include_remote_state ? k_medium_network_payload_bytes : sizeof(int16_t) * 4;

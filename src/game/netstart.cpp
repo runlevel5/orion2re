@@ -32,7 +32,7 @@ namespace NETSTART {
 
         RACESEL::Race_Selection_Screen_(local_player);
 
-        local_player->objectives = 100;
+        local_player->objectives = PLAYER_OBJECTIVE_HUMAN;
         MULTPLAY::Reload_Generating_Map_Info_();
 
         MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &fade_flag, 11);
@@ -115,7 +115,7 @@ namespace NETSTART {
         NETMOX::_net.num_connected_players = 0;
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives == 100 /* 'd' */) {
+            if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 NETMOX::_net.num_connected_players++;
                 if (MOX::_player[i].network_player_id == NETMOX::_net.net_host_id) {
                     MOX::_PLAYER_NUM = (int16_t)i;
@@ -388,7 +388,7 @@ namespace NETSTART {
         RACESEL::Race_Selection_Screen_(&MOX::_player[MOX::_PLAYER_NUM]);
 
         NETMOX::_net.player_color_selected_flags[MOX::_PLAYER_NUM] = 1;
-        MOX::_player[MOX::_PLAYER_NUM].objectives = 100;
+        MOX::_player[MOX::_PLAYER_NUM].objectives = PLAYER_OBJECTIVE_HUMAN;
 
         RUSS::Mox_Update_();
 
@@ -614,7 +614,7 @@ namespace NETSTART {
         NETMOX::_net.num_connected_players = 0;
         if (MOX::_NUM_PLAYERS > 0) {
             for (int32_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
-                if (MOX::_player[i].objectives == 100) {
+                if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     NETMOX::_net.num_connected_players++;
                 }
             }
@@ -678,11 +678,11 @@ namespace NETSTART {
         if (MOX::_NUM_PLAYERS > 0) {
             for (int32_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
                 if (MOX::_player[i].network_player_id == -1) {
-                    if (MOX::_player[i].objectives == 100) {
+                    if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         RUSS::Make_Player_Into_AI_(i);
                     }
                 } else {
-                    MOX::_player[i].objectives = 100;
+                    MOX::_player[i].objectives = PLAYER_OBJECTIVE_HUMAN;
                     NETMOX::_net.num_connected_players++;
                 }
             }

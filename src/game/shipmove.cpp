@@ -511,9 +511,9 @@ namespace SHIPMOVE {
         for (int32_t i = 0; i < num_ships; ++i) {
             s_ship_data& ship = ship_array[i];
 
-            // AI players (owner 0-7) who aren't the primary human player (objectives != 100)
+            // AI players (owner 0-7) who aren't the primary human player
             // have their just_built flag cleared.
-            if (ship.owner < MAX_PLAYERS && MOX::_player[(int32_t)ship.owner].objectives != 100) {
+            if (ship.owner < MAX_PLAYERS && MOX::_player[(int32_t)ship.owner].objectives != PLAYER_OBJECTIVE_HUMAN) {
                 ship.just_built = 0;
             }
         }
@@ -558,7 +558,7 @@ namespace SHIPMOVE {
         if (owner < MAX_PLAYERS) {
             REPORT::_something_interesting_happened[owner] = 1;
 
-            if (MOX::_player[owner].objectives == 100) {
+            if (MOX::_player[owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 MOX::_star[star_idx].not_used3 = 0;
             }
         }

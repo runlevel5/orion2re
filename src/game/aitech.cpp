@@ -278,10 +278,10 @@ namespace aitech {
                     }
                 }
 
-                if (plr->objectives == 1) {
+                if (plr->objectives == PLAYER_OBJECTIVE_MILITARIST) {
                     plr_info->best_shield_delta++;
                     plr_info->best_computer_delta++;
-                } else if (plr->objectives == 3) {
+                } else if (plr->objectives == PLAYER_OBJECTIVE_TECHNOLOGIST) {
                     plr_info->best_computer_delta++;
                 }
 
@@ -309,7 +309,7 @@ namespace aitech {
         for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
             s_player* plr = &MOX::_player[i];
 
-            if (plr->eliminated == 0 && plr->objectives != 100) {
+            if (plr->eliminated == 0 && plr->objectives != PLAYER_OBJECTIVE_HUMAN) {
                 aitech::AI_Tech_Select_(plr);
 
                 if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == TECH_RESEARCH_STATUS_RESEARCHED && plr->picked_evolutionary_upgrade == 0) {

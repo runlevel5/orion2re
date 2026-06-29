@@ -1463,9 +1463,9 @@ namespace CMBTFIR2 {
         }
 
         bool show_timed_box = true;
-        if (is_auto == 0 && target_owner < MAX_PLAYERS && MOX::_player[target_owner].objectives == 100) {
+        if (is_auto == 0 && target_owner < MAX_PLAYERS && MOX::_player[target_owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
             show_timed_box = false;
-        } else if (MOX::_auto_combat == 0 && attacker_owner < MAX_PLAYERS && MOX::_player[attacker_owner].objectives == 100) {
+        } else if (MOX::_auto_combat == 0 && attacker_owner < MAX_PLAYERS && MOX::_player[attacker_owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
             show_timed_box = false;
         }
 
@@ -1540,11 +1540,11 @@ namespace CMBTFIR2 {
         strlcpy(header_buf, tmp_buf, sizeof(header_buf));
         strlcat(header_buf, defender->name, sizeof(header_buf));
 
-        if (attacker->owner >= MAX_PLAYERS || MOX::_player[attacker->owner].objectives != 'd') {
+        if (attacker->owner >= MAX_PLAYERS || MOX::_player[attacker->owner].objectives != PLAYER_OBJECTIVE_HUMAN) {
             side1.unit_strengths[1] -= side1.combat_modifiers.difficulty_bonus;
         }
 
-        if (defender->owner >= MAX_PLAYERS || MOX::_player[defender->owner].objectives != 'd') {
+        if (defender->owner >= MAX_PLAYERS || MOX::_player[defender->owner].objectives != PLAYER_OBJECTIVE_HUMAN) {
             side2.unit_strengths[1] -= side2.combat_modifiers.difficulty_bonus;
         }
 
@@ -1579,9 +1579,9 @@ namespace CMBTFIR2 {
         bool is_timed = true;
         int16_t auto_combat_flag = (defender->owner == MOX::_combat_attacker_player) ? MOX::_auto_combat_flag[0] : MOX::_auto_combat_flag[1];
 
-        if (auto_combat_flag == 0 && defender->owner < MAX_PLAYERS && MOX::_player[defender->owner].objectives == 'd') {
+        if (auto_combat_flag == 0 && defender->owner < MAX_PLAYERS && MOX::_player[defender->owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
             is_timed = false;
-        } else if (MOX::_auto_combat == 0 && attacker->owner < MAX_PLAYERS && MOX::_player[attacker->owner].objectives == 'd') {
+        } else if (MOX::_auto_combat == 0 && attacker->owner < MAX_PLAYERS && MOX::_player[attacker->owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
             is_timed = false;
         }
 

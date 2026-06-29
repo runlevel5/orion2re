@@ -18,7 +18,7 @@ namespace AIMOVE {
         for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
             s_player& plr = MOX::_player[i];
 
-            if (plr.objectives != 100 && plr.ship_speed != 0) {
+            if (plr.objectives != PLAYER_OBJECTIVE_HUMAN && plr.ship_speed != 0) {
                 RUSS::Mox_Update_();
 
                 if (plr.traits[TRAIT_TRANS_DIMENSIONAL] != 0 || EVENTS::Event_Check_Hyperspace_Flux_() == 0) {
@@ -412,7 +412,7 @@ namespace AIMOVE {
             }
         }
 
-        if (MOX::_player[_i_ai].objectives != 100 /* 'd' */) {
+        if (MOX::_player[_i_ai].objectives != PLAYER_OBJECTIVE_HUMAN) {
             for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
                 s_colony* colony = &MOX::_colony[i];
 
@@ -486,7 +486,7 @@ namespace AIMOVE {
                 if (_i_ai != i) {
                     if (((*AIDATA::_star_in_extended_range_of_player)[star_idx] >> i) & 1) {
                         if ((((*AIDATA::_star_in_range_of_player)[star_idx] >> i) & 1) ||
-                            MOX::_player[i].objectives == 'd') {
+                            MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
 
                             uint16_t strength;
                             if (in_nebula) {
@@ -1179,7 +1179,7 @@ namespace AIMOVE {
                         RUSS::Mox_Update_();
                         if (MOX::_settings.game_difficulty > 0) {
                             if (((MOX::_star[loc].has_colony >> ai_shift) & 1) != 0) {
-                                if (MOX::_settings.game_difficulty >= 2 || _p_ai->objectives == 1) {
+                                if (MOX::_settings.game_difficulty >= 2 || _p_ai->objectives == PLAYER_OBJECTIVE_MILITARIST) {
                                     int16_t ship_idx = i;
                                     for (int j = 4; j >= 0; j--) {
                                         int16_t planet_idx = MOX::_star[loc].planet_index[j];
@@ -1418,7 +1418,7 @@ namespace AIMOVE {
                 AIMOVE::Star_Has_Monster_(star_idx) == 0)
             {
                 if (MOX::_settings.game_difficulty >= 2 ||
-                    (MOX::_settings.game_difficulty >= 1 && AIMOVE::_p_ai->objectives == 2) ||
+                    (MOX::_settings.game_difficulty >= 1 && AIMOVE::_p_ai->objectives == PLAYER_OBJECTIVE_EXPANSIONIST) ||
                     (((*AIDATA::_star_in_range_of_player)[star_idx] >> AIMOVE::_i_ai) & 1) != 0)
                 {
                     AIMOVE::Get_Best_Unescorted_Colony_Ship_(my_colony_ships, &num_my_colony_ships, star_idx);
@@ -2183,7 +2183,7 @@ namespace AIMOVE {
             }
 
             // Fallback to checking objectives if personality was not recognized or is neutral
-            if (p_a->objectives == 1) {
+            if (p_a->objectives == PLAYER_OBJECTIVE_MILITARIST) {
                 result = 1;
             }
         }
@@ -2482,7 +2482,7 @@ namespace AIMOVE {
             for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                 if (p != AIMOVE::_i_ai) {
                     int8_t treaty = AIMOVE::_p_ai->treaty[p];
-                    if (treaty < 1 || treaty > 3 || MOX::_player[p].objectives == 100) {
+                    if (treaty < 1 || treaty > 3 || MOX::_player[p].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         for (int t = 0; t < ENEMY_STRENGTH_TURN_WINDOW; ++t) {
                             total_enemy_strength[t] += (*AIDATA::_possible_ship_strengths)[star_idx][p][AIMOVE::_i_ai][t];
                         }

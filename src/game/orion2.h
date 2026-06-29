@@ -545,18 +545,6 @@ struct s_colony_bldg {
 
 typedef struct s_colony_job_production s_colony_job_production, *Ps_colony_job_production;
 
-enum {
-    COLONY_JOB_RACIAL_BONUS_ANDROID = 8,
-    COLONY_JOB_RACIAL_BONUS_NATIVE = 9,
-    COLONY_JOB_RACIAL_BONUS_COUNT = 10,
-};
-
-typedef enum TECH_RESEARCH_STATUS {
-    TECH_RESEARCH_STATUS_UNAVAILABLE = 0,
-    TECH_RESEARCH_STATUS_AVAILABLE = 1,
-    TECH_RESEARCH_STATUS_RESEARCHED = 3,
-} TECH_RESEARCH_STATUS;
-
 struct s_colony_job_production {
     int32_t base_prod;
     int16_t racial_bonuses[COLONY_JOB_RACIAL_BONUS_COUNT];
@@ -603,22 +591,6 @@ struct s_combat_weapon_slot {
     int8_t shots_left;
     uint8_t status;
 };
-
-typedef enum WEAPON_TYPE {
-    WEAPON_TYPE_BEAM=0,
-    WEAPON_TYPE_MISSILE=1,
-    WEAPON_TYPE_TORPEDO=2,
-    WEAPON_TYPE_BOMB=3,
-    WEAPON_TYPE_FIGHTER=4,
-    WEAPON_TYPE_SPECIAL=5,
-    WEAPON_TYPE_COUNT=6
-} WEAPON_TYPE;
-
-typedef enum TARGET_TYPE {
-    TARGET_TYPE_SHIP=0,
-    TARGET_TYPE_MISSILE=1,
-    TARGET_TYPE_COUNT=2
-} TARGET_TYPE;
 
 struct s_combat_data {
     char name[30];

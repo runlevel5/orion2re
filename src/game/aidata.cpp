@@ -217,7 +217,7 @@ namespace AIDATA {
 
                 if (star_idx < MOX::_NUM_STARS) {
                     bool in_nebula = MOX::_star[star_idx].in_nebula != 0;
-                    if (owner < MAX_PLAYERS && turn_idx < 10 && MOX::_player[owner].objectives == 100) {
+                    if (owner < MAX_PLAYERS && turn_idx < 10 && MOX::_player[owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         (*_enroute_human_ships)[star_idx][turn_idx] = 1;
                     }
                     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
@@ -401,7 +401,7 @@ namespace AIDATA {
                 }
             }
             for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
-                if (MOX::_player[p].objectives != 100 && MOX::_player[p].eliminated == 0 && (((*_star_in_extended_range_of_player)[s] >> p) & 1)) {
+                if (MOX::_player[p].objectives != PLAYER_OBJECTIVE_HUMAN && MOX::_player[p].eliminated == 0 && (((*_star_in_extended_range_of_player)[s] >> p) & 1)) {
                     for (int other_p = MOX::_NUM_PLAYERS - 1; other_p >= 0; --other_p) {
                         if (other_p != p && (*_enroute_ships)[s][other_p][9]) {
                             ai_star.per_player[p].enemy_enroute_or_threat = 1;
@@ -594,7 +594,7 @@ namespace AIDATA {
         for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
             int flag = 0;
             for (int j = 0; j < MOX::_NUM_PLAYERS; j++) {
-                if (MOX::_player[j].objectives == 100) {
+                if (MOX::_player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                     player_treaty_matrix[i][j] = 1;
                 }
                 if (MOX::_player[i].treaty[j] > 3 && MOX::_player[i].treaty[j] < 7) {

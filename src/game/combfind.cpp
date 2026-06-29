@@ -116,7 +116,7 @@ void __cdecl Search_For_Battles_() {
                 int8_t unk_flag = 0;
 
                 if (attacker_idx < MAX_PLAYERS) {
-                    if (MOX::_player[attacker_idx].objectives != 100) {
+                    if (MOX::_player[attacker_idx].objectives != PLAYER_OBJECTIVE_HUMAN) {
                         Get_AI_Target_(star_idx, attacker_idx, &defender_idx, &colony_idx, &unk_flag);
                     } else {
                         if ((MOX::_star[star_idx].ignore_combat_ships & (1 << (attacker_idx & 0x1F))) == 0) {
@@ -140,7 +140,7 @@ void __cdecl Search_For_Battles_() {
 
                 if (attacker_idx == 12 /* Antarans */ && colony_idx != -1) {
                     int16_t bribe_planet_idx = -1;
-                    if (MOX::_player[final_defender_idx].objectives == 100) {
+                    if (MOX::_player[final_defender_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         bribe_planet_idx = MAINPUPS::Dragon_New_Star_Popup_(final_defender_idx, star_idx);
                     }
                     if (bribe_planet_idx != -1) {
@@ -388,7 +388,7 @@ void __cdecl Client_Combat_Loop_() {
             break;
 
         case NET_SYNC_STATE_COMBAT_RESOLUTION_DISPATCH:
-            if (NETMOX::_net.combat_attacker_id < MAX_PLAYERS && MOX::_player[(int)NETMOX::_net.combat_attacker_id].objectives == 100) {
+            if (NETMOX::_net.combat_attacker_id < MAX_PLAYERS && MOX::_player[(int)NETMOX::_net.combat_attacker_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_DEFENDER;
             } else {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_TACTICAL_DEFENDER_VS_NONHUMAN;
@@ -443,7 +443,7 @@ void __cdecl Client_Combat_Loop_() {
             result = COMBFIND::Do_1_Combat_((int16_t)NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_2, 0);
             local_battle_results_2.player_info.combat_result = (int8_t)result;
             MULTPLAY::Load_Net_Next_Turn_Screen_(1);
-            if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {
+            if (NETMOX::_net.combat_target_player_id < MAX_PLAYERS && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, NET_PACKET_STRATEGIC_BATTLE_RESULTS, &local_battle_results_2, sizeof(local_battle_results_2));
             }
             NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
@@ -1306,7 +1306,7 @@ int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx) {
     s_player* attacker = &MOX::_player[attacker_idx];
 
     // 0x64 ('d') represents human player
-    if (attacker->objectives == 100) {
+    if (attacker->objectives == PLAYER_OBJECTIVE_HUMAN) {
         return 1;
     }
 
@@ -1350,7 +1350,7 @@ int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) {
 
 int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
     for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-        if (MOX::_player[i].objectives == 100) {
+        if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN) {
             s_combfind_star_has_player& star_info = (*COMBFIND::_star_has_player)[star_idx][i];
 
             if (star_info.colony_count != 0 || star_info.has_player != 0) {
@@ -1496,7 +1496,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         if (plr2_idx == 9) { // Guardian defeated
             MOX::_player[plr1_idx].captured_orion = 1;
             OFFICER::Give_Player_Loknar_Special_(plr1_idx, result->info.orion_techs, &result->info.rescued_hero_id);
-            if (MOX::_player[plr1_idx].objectives == 100) {
+            if (MOX::_player[plr1_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
                     OFFICER::Rescued_Loknar_Popup_(plr1_idx, result->info.orion_techs, result->info.rescued_hero_id);
@@ -1518,7 +1518,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         if (plr1_idx == 9) { // Guardian defeated by attacker
             MOX::_player[plr2_idx].captured_orion = 1;
             OFFICER::Give_Player_Loknar_Special_(plr2_idx, result->info.orion_techs, &result->info.rescued_hero_id);
-            if (MOX::_player[plr2_idx].objectives == 100) {
+            if (MOX::_player[plr2_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
                     OFFICER::Rescued_Loknar_Popup_(plr2_idx, result->info.orion_techs, result->info.rescued_hero_id);
@@ -1563,13 +1563,13 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
 
     strategic_combat_flag = MOX::_settings.strategic_combat_flag;
 
-    if (attacker_idx < MAX_PLAYERS && MOX::_player[attacker_idx].objectives == 100 /* HUMAN */) {
+    if (attacker_idx < MAX_PLAYERS && MOX::_player[attacker_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
         plr1_is_human = true;
     } else {
         plr1_is_human = false;
     }
 
-    if (defender_idx < MAX_PLAYERS && MOX::_player[defender_idx].objectives == 100 /* HUMAN */) {
+    if (defender_idx < MAX_PLAYERS && MOX::_player[defender_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
         plr2_is_human = true;
     } else {
         plr2_is_human = false;
@@ -1674,7 +1674,7 @@ void __cdecl Kill_Noncombat_Ships_(int16_t* ship_indices, int16_t count) {
 
     int8_t owner_idx = MOX::_ship[ship_indices[0]].owner;
 
-    if (MOX::_player[owner_idx].objectives == 100 /* 'd' */ &&
+    if (MOX::_player[owner_idx].objectives == PLAYER_OBJECTIVE_HUMAN &&
         MOX::_game_type >= 0 && MOX::_game_type <= 1) {
         GENDRAW::Message_Box_(_noncombat_ships_destroyed_msg);
     }
@@ -1960,7 +1960,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
         BOMB::Destroy_Colony_(colony, 1);
         COMBFIND::_current_star_has_player[colony_owner].colony_count--;
     } else if (attacker_id < MAX_PLAYERS) {
-        if (MOX::_player[attacker_id].objectives == 'd' /* ECON_INDUSTRY */) {
+        if (MOX::_player[attacker_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
             bool is_active_player = false;
             if ((MOX::_game_type != 2 && MOX::_game_type != 3) || (MOX::_PLAYER_NUM == attacker_id)) {
                 is_active_player = true;
@@ -2096,7 +2096,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
 
                 if (bomb_hits != 0 || bio_hits != 0 || has_stellar) {
                     bool surrender = false;
-                    if (MOX::_player[colony_owner].objectives != 'd' /* ECON_INDUSTRY */ && MOX::_settings.game_difficulty > 2) {
+                    if (MOX::_player[colony_owner].objectives != PLAYER_OBJECTIVE_HUMAN && MOX::_settings.game_difficulty > 2) {
                         if (COLCALC::May_Surrender_Star_(enemy_star_idx, colony_owner, attacker_id) && (int)(colony->n_pops * 2) <= bomb_hits) {
                             surrender = true;
                         }
@@ -2159,7 +2159,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                         COMBINIT::Apply_Bio_Weapon_Penalty_(attacker_id, star_idx, results->bomb.bio_pop_killed);
                     }
 
-                    if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
+                    if (MOX::_player[colony_owner].objectives == PLAYER_OBJECTIVE_HUMAN && 
                         (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
                         MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
                         COLBOMB::Colony_Bombing_Screen_(&results->bomb);
@@ -2176,7 +2176,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                 if (!terminal_destroyed && !surrendered && 
                     invasion::Has_Defending_Troops_(attacker_id, ship_list, n_ships, (int16_t)colony_idx)) {
                     invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, &results->info);
-                    if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
+                    if (MOX::_player[colony_owner].objectives == PLAYER_OBJECTIVE_HUMAN && 
                         (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
                         MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id)) {
                         int invade_seed = game_random::Get_Random_Seed_();
@@ -2193,7 +2193,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                         COMBFIND::_current_star_has_player[colony_owner].colony_count--;
                     }
 
-                    if (MOX::_player[attacker_id].objectives == 'd' || MOX::_player[colony_owner].objectives == 'd') {
+                    if (MOX::_player[attacker_id].objectives == PLAYER_OBJECTIVE_HUMAN || MOX::_player[colony_owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         COMBFIND::_messed_up_fleet_palette = 1;
                     }
                 }
@@ -2215,7 +2215,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
         COMBAT::Bombardment_(&results->bomb);
         BOMB::Apply_Bomb_Hits_(&results->bomb);
 
-        if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
+        if (MOX::_player[colony_owner].objectives == PLAYER_OBJECTIVE_HUMAN && 
             (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
             MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
             
@@ -2420,7 +2420,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
 
                     uint8_t msg_type = 0;
                     if (MOX::_settings.strategic_combat_flag == 0) {
-                        if (sync_colony_id < MAX_PLAYERS && MOX::_player[sync_colony_id].objectives == 100 /* 'd' */) {
+                        if (sync_colony_id < MAX_PLAYERS && MOX::_player[sync_colony_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
                             NETMOX::_net.player_net_info[i].player_state = NET_PLAYER_STATE_COMBAT_TACTICAL_ATTACKER;
                             NETMOX::_net.player_net_info[sync_colony_id].player_state = NET_PLAYER_STATE_COMBAT_TACTICAL_DEFENDER;
                             int16_t colony_id = Target_Planet_To_Colony_(NETMOX::_net.player_net_info[i].combat_planet_id);
@@ -2487,7 +2487,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     if (_n_battle_stars == 0) {
         bool waiting_for_combat_ready_player = false;
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives == 100 /* 'd' */ && NETMOX::_net.player_net_info[i].player_state != NET_PLAYER_STATE_COMBAT_READY) {
+            if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN && NETMOX::_net.player_net_info[i].player_state != NET_PLAYER_STATE_COMBAT_READY) {
                 RUSS::Mox_Update_();
                 waiting_for_combat_ready_player = true;
             }
@@ -2539,7 +2539,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     NETMOX::_net.player_net_info[attacker_id].combat_attacker_id = (undefined)attacker_id;
 
     if (attacker_id < MAX_PLAYERS) {
-        if (MOX::_player[attacker_id].objectives == 100 /* 'd' */) {
+        if (MOX::_player[attacker_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
             if ((MOX::_star[star_id].ignore_combat_ships & (1 << attacker_id)) == 0) {
                 NETMOX::_net.player_net_info[attacker_id].player_state = NET_PLAYER_STATE_PICK_TARGET_INFO;
                 NETMOX::Send_Pick_Target_Info_(attacker_id, star_id, &_target);
@@ -2551,7 +2551,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     }
 
     int16_t target_sync_owner_id;
-    if (attacker_id < MAX_PLAYERS && MOX::_player[attacker_id].objectives == 100 /* 'd' */) {
+    if (attacker_id < MAX_PLAYERS && MOX::_player[attacker_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
         target_sync_owner_id = -1;
     } else {
         if (attacker_id < MAX_PLAYERS) {
@@ -2593,7 +2593,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
             }
         }
 
-        if (target_sync_owner_id < MAX_PLAYERS && MOX::_player[target_sync_owner_id].objectives == 100 /* 'd' */) {
+        if (target_sync_owner_id < MAX_PLAYERS && MOX::_player[target_sync_owner_id].objectives == PLAYER_OBJECTIVE_HUMAN) {
             if (attacker_id == 12 && target_colony_idx != -1) {
                 NETMOX::_net.player_net_info[target_sync_owner_id].player_state = NET_PLAYER_STATE_HUMAN_DIPLOMACY_READY_DATA;
                 NETMOX::Send_Dragon_Info_(target_colony_idx);

@@ -20,7 +20,7 @@ namespace aidudes {
         s_player* plr = MOX::_player;
 
         for (int16_t i = 0; i < num_players; ++i, ++plr) {
-            if (plr->objectives != 100) {
+            if (plr->objectives != PLAYER_OBJECTIVE_HUMAN) {
                 RUSS::Mox_Update_();
                 Colony_AI_(i);
             }
@@ -469,9 +469,9 @@ namespace aidudes {
         }
 
         if (aidudes::_p_ai->do_not_research == 0) {
-            if (aidudes::_p_ai->objectives == 3) {
+            if (aidudes::_p_ai->objectives == PLAYER_OBJECTIVE_TECHNOLOGIST) {
                 industry_mult = 12;
-            } else if (aidudes::_p_ai->objectives == 4) {
+            } else if (aidudes::_p_ai->objectives == PLAYER_OBJECTIVE_INDUSTRIALIST) {
                 research_mult += 2;
             }
         } else {
@@ -794,7 +794,7 @@ namespace aidudes {
         int war_level = AIBUILD::Player_War_Level_(player_idx);
         int colony_queue_count = 0;
 
-        bool is_objective_1 = (p->objectives == 1);
+        bool is_militarist = (p->objectives == PLAYER_OBJECTIVE_MILITARIST);
         bool low_money = (p->bc + p->surplus_bc < p->total_maintenance);
 
         int isqrt_val = 0;
@@ -811,7 +811,7 @@ namespace aidudes {
         RUSS::Mox_Update_();
 
         if (p->war_buildup_duration != 0 && war_level == 0) {
-            war_level = is_objective_1 + 1;
+            war_level = is_militarist + 1;
         }
 
         bool recalculate_colony = false;
@@ -890,7 +890,7 @@ namespace aidudes {
 
         int freighter_groups_assigned = 0;
         int16_t best_planet = AIMOVE::Best_Uncolonized_Undestined_Planet_(player_idx);
-        bool is_objective_2 = (p->objectives == 2);
+        bool is_expansionist = (p->objectives == PLAYER_OBJECTIVE_EXPANSIONIST);
 
         s_ship_design ship_design;
         ship_design.cost = 0;
@@ -956,7 +956,7 @@ namespace aidudes {
                     val += bonus;
 
                     int rand_val = game_random::Random_(700);
-                    int adjusted_rand = rand_val + 100 + (is_objective_2 ? 0 : 100);
+                    int adjusted_rand = rand_val + 100 + (is_expansionist ? 0 : 100);
 
                     if (adjusted_rand < (isqrt_val + 64) * val) {
                         want_colony_base = true;
@@ -987,7 +987,7 @@ namespace aidudes {
         RUSS::Mox_Update_();
         if (want_colony_base && p->tech_applications[TECH_APP_COLONY_SHIP] == TECH_RESEARCH_STATUS_RESEARCHED) {
             int r = 0;
-            if (is_objective_2 != 0) {
+            if (is_expansionist) {
                 if (game_random::Random_(5) == 1) {
                     r = 1;
                 }

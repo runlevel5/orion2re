@@ -306,9 +306,9 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     }
   }
 
-  const bool restore_objectives = player->objectives == 'd';
+  const bool restore_objectives = player->objectives == PLAYER_OBJECTIVE_HUMAN;
   if (restore_objectives) {
-    player->objectives = 1;
+    player->objectives = PLAYER_OBJECTIVE_MILITARIST;
   }
 
   for (int16_t starting_tier_idx = 0; starting_tier_idx < starting_tech_count; ++starting_tier_idx) {
@@ -359,7 +359,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   }
 
   if (restore_objectives) {
-    player->objectives = 'd';
+    player->objectives = PLAYER_OBJECTIVE_HUMAN;
   }
 
   player->best_ftl_drive = (char)INITSHIP::Best_Warp_Drive_(player_idx);

@@ -738,7 +738,7 @@ int16_t __cdecl Retreat_Check_(int16_t player_idx) {
     int32_t player_total_hits = 0;
     int16_t ship_remaining_hits[210] = {};
 
-    if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].objectives != 100 /* 'd' */ && MOX::_ai_retreat_flag == 1) {
+    if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].objectives != PLAYER_OBJECTIVE_HUMAN && MOX::_ai_retreat_flag == 1) {
         if (COMBAT1::Enemy_Dissipator_Exists_(player_idx) == 0) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (i == 0) {

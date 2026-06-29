@@ -750,7 +750,7 @@ namespace HAROLD {
         int16_t count = 0;
 
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-            if (MOX::_player[i].objectives == 0x64 /* 'd' */ && MOX::_player[i].eliminated == 0) {
+            if (MOX::_player[i].objectives == PLAYER_OBJECTIVE_HUMAN && MOX::_player[i].eliminated == 0) {
                 count++;
             }
         }
@@ -1361,7 +1361,7 @@ namespace HAROLD {
         for (int16_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
             s_player* const player = &MOX::_player[player_index];
 
-            if (player->objectives != 100) {
+            if (player->objectives != PLAYER_OBJECTIVE_HUMAN) {
                 const int16_t race_index =
                         static_cast<int16_t>(static_cast<uint8_t>(player->race));
 

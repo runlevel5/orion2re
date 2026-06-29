@@ -294,7 +294,7 @@ namespace INITGAME {
       for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
         s_player& player = MOX::_player[player_idx];
 
-        if (player.objectives == 100) {
+        if (player.objectives == PLAYER_OBJECTIVE_HUMAN) {
           struct_::Copy_Structure_(
               player.evolutionary_upgrade_traits,
               player.traits,

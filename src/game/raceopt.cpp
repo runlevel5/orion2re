@@ -25,7 +25,7 @@ namespace raceopt {
         s_player& plr = MOX::_player[player_idx];
         int8_t original_traits0 = plr.traits[TRAIT_CURRENT_GOVERNMENT];
 
-        if (plr.objectives == 100) {
+        if (plr.objectives == PLAYER_OBJECTIVE_HUMAN) {
             struct_::Copy_Structure_(
                 &plr.evolutionary_upgrade_traits[1],
                 &plr.traits[1],
