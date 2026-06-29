@@ -439,7 +439,9 @@ namespace AIBUILD {
                 if ((MOX::_star[star_idx].blockaded >> (player_idx & 0x1F)) & 1) continue;
 
                 int16_t producing = colony->producing[0];
-                if (producing >= -3 && producing <= -1) continue;
+                if (producing == COLONY_PRODUCTION_NONE ||
+                    producing == COLONY_PRODUCTION_RESEARCH ||
+                    producing == COLONY_PRODUCTION_HOUSING) continue;
 
                 int32_t cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(colony);
                 if (cost <= 0) continue;
@@ -505,7 +507,10 @@ namespace AIBUILD {
         if (colony->outpost_flag == 0 && colony->n_pops != 0) {
             int16_t current_production = colony->producing[0];
 
-            if (current_production == -38 || (current_production >= -3 && current_production <= -1)) {
+            if (current_production == COLONY_PRODUCTION_AI_UNASSIGNED ||
+                current_production == COLONY_PRODUCTION_NONE ||
+                current_production == COLONY_PRODUCTION_RESEARCH ||
+                current_production == COLONY_PRODUCTION_HOUSING) {
                 Assign_Colony_New_Building_(colony);
             }
         }
@@ -976,9 +981,9 @@ namespace AIBUILD {
             COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, choice);
             colony->producing[0] = choice;
         } else if (choice == BUILDING_COUNT) {
-            colony->producing[0] = -3;
+            colony->producing[0] = COLONY_PRODUCTION_HOUSING;
         } else if (choice == BUILDING_COUNT + 1) {
-            colony->producing[0] = -2;
+            colony->producing[0] = COLONY_PRODUCTION_RESEARCH;
         }
     }
 
@@ -995,7 +1000,7 @@ namespace AIBUILD {
     }
 
     char* __cdecl Product_Name_(int16_t product_id) {
-        if (product_id == -37) {
+        if (product_id == COLONY_PRODUCTION_AI_TRADE_GOODS) {
             return (char*)"AI trade goods";
         }
 

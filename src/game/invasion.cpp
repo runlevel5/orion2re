@@ -410,7 +410,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         if (rebel_side.current_troop_type_idx < 4) {
             Change_Colony_Ownership_(colony, rebel_side.player_id, 0);
             Resolve_Rebellion_Troops_(rebel_side);
-            colony->just_produced = -41;
+            colony->just_produced = COLONY_PRODUCTION_JUST_LIBERATED;
         }
     }
 }
@@ -674,7 +674,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     COLBLDG::Clear_Colony_Queue_(colony_idx);
 
     colony->production_spent = 0;
-    colony->just_produced = -40;
+    colony->just_produced = COLONY_PRODUCTION_JUST_CONQUERED;
     colony->occupation_points = 0;
     colony->occupation_policy = 4;
     colony->buildings[11] = 0;

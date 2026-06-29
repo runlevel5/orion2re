@@ -632,7 +632,7 @@ namespace COLONY {
         if (bldg_id >= 0) {
             COLONY::_colony_bldgs[row].buildings[col] = bldg_id;
         }
-        else if (bldg_id == -3) {
+        else if (bldg_id == COLONY_PRODUCTION_HOUSING) {
             house_mod++;
             int switch_idx = (int)house_mod % 4;
 
@@ -713,8 +713,7 @@ namespace COLONY {
             return;
         }
 
-        // -3 = ECON_HOUSING, -2 = ECON_TRADE_GOODS
-        if (col->producing[0] == -3 || col->producing[0] == -2) {
+        if (col->producing[0] == COLONY_PRODUCTION_HOUSING || col->producing[0] == COLONY_PRODUCTION_RESEARCH) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_BUY_HOUSING_OR_TRADE_GOODS_AS_THEY_ARE_SETTINGS_NOT_SPECIFIC_ITEMS));
             COLONY::Show_Colony_Screen_();
             return;
@@ -722,7 +721,7 @@ namespace COLONY {
 
         int buy_cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(col);
         if (buy_cost <= 0) {
-            if (col->producing[0] != -1 /* ECON_NONE */) {
+            if (col->producing[0] != COLONY_PRODUCTION_NONE) {
                 GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_SPEND_BCS_TO_GET_THIS_FASTER_THAN_IN_A_SINGLE_TURN));
             }
             else {
@@ -833,7 +832,7 @@ namespace COLONY {
     }
 
     void __cdecl Draw_Current_Building2_(int16_t x, int16_t y, int16_t building_id) {
-        if (building_id == -3) {
+        if (building_id == COLONY_PRODUCTION_HOUSING) {
             graphics::Set_Window_(517, 17, 639, 158);
             video::Clip_On_();
             COLONY::Draw_Building_With_Bottom_Centered_(579, 106, 14, 5, 5);
@@ -860,45 +859,45 @@ namespace COLONY {
         int16_t producing_id = colony.producing[0];
 
         switch (producing_id) {
-        case -15:
+        case COLONY_PRODUCTION_FREIGHTERS:
             COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x4d /* 77 */, 0x30 /* 48 */);
             break;
-        case -12:
+        case COLONY_PRODUCTION_COLONY_SHIP:
             COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x39 /* 57 */, 0x2d /* 45 */);
             break;
-        case -11:
+        case COLONY_PRODUCTION_TRANSPORT_SHIP:
             COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x39 /* 57 */, 0x2f /* 47 */);
             break;
-        case -8:
-        case -2:
-        case -1:
+        case COLONY_PRODUCTION_REFIT:
+        case COLONY_PRODUCTION_RESEARCH:
+        case COLONY_PRODUCTION_NONE:
         case 0:
             // Do nothing
             break;
-        case -7: {
+        case COLONY_PRODUCTION_SPY: {
             uint16_t race = (uint16_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
             s_animation_header* anim = COLONY::Spy_Anim_(race);
             ERIC::Draw_Centered_(0x242 /* 578 */, 0x4d /* 77 */, anim);
             break;
         }
-        case -6:
-        case -5:
-        case -4: {
+        case COLONY_PRODUCTION_SCIENTIST:
+        case COLONY_PRODUCTION_WORKER:
+        case COLONY_PRODUCTION_FARMER: {
             uint16_t race = (uint16_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
             s_animation_header* anim = COLONY::People_Anim_(0, 4, race);
             ERIC::Draw_Centered_(0x242 /* 578 */, 0x4d /* 77 */, anim);
             break;
         }
-        case -3:
-            COLONY::Draw_Current_Building_(-3);
+        case COLONY_PRODUCTION_HOUSING:
+            COLONY::Draw_Current_Building_(COLONY_PRODUCTION_HOUSING);
             break;
         default:
             COLONY::Set_Colony_Font_();
             if (producing_id >= 1 && producing_id < BUILDING_COUNT) {
                 COLONY::Draw_Current_Building_(producing_id);
             }
-            else if (producing_id <= -100) {
-                COLONY::Draw_Current_Ship_(-100 - producing_id);
+            else if (COLBLDG::Colony_Production_Is_Queued_Ship_(producing_id)) {
+                COLONY::Draw_Current_Ship_(COLBLDG::Colony_Production_Ship_Index_(producing_id));
             }
             else {
                 char* err_msg = ESTRINGS::E_Strings_(0xf7);

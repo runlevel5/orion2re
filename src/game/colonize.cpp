@@ -373,14 +373,14 @@ namespace COLONIZE {
             }
 
             COLCALC::Colony_Calculation_(colony_idx);
-            colony->just_produced = -39;
+            colony->just_produced = COLONY_PRODUCTION_JUST_COLONIZED;
         } else {
             colony->outpost_flag = 1;
             colony->n_pops = 0;
             colony->climate = planet->climate;
         }
 
-        colony->producing[0] = -1;
+        colony->producing[0] = COLONY_PRODUCTION_NONE;
         COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[planet->star_index]);
     }
 

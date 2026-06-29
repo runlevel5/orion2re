@@ -180,27 +180,27 @@ namespace MSG_ {
                         const auto& build_msg = colony_msg.c.build;
                         int16_t build_id = build_msg.build_id;
                         if (build_id < BUILDING_ALIEN_CONTROL_CENTER || build_id >= BUILDING_COUNT) {
-                            if (build_id < -99) {
+                            if (COLBLDG::Colony_Production_Is_Queued_Ship_(build_id)) {
                                 const char* build_fmt = _msg_colony_built_ship_fmt;
                                 if (build_msg.is_refit != 0) {
                                     build_fmt = _msg_colony_built_refit_fmt;
                                 }
-                                sprintf(out_text, build_fmt, planet_name, &MOX::_ship[-100 - build_id]);
+                                sprintf(out_text, build_fmt, planet_name, &MOX::_ship[COLBLDG::Colony_Production_Ship_Index_(build_id)]);
                             } else {
                                 switch (build_id) {
-                                    case -15:
+                                    case COLONY_PRODUCTION_FREIGHTERS:
                                         sprintf(out_text, _msg_colony_built_freighter_fmt, planet_name);
                                         break;
-                                    case -7:
+                                    case COLONY_PRODUCTION_SPY:
                                         sprintf(out_text, _msg_colony_built_spy_fmt, planet_name);
                                         break;
-                                    case -6:
+                                    case COLONY_PRODUCTION_SCIENTIST:
                                         sprintf(out_text, _msg_colony_built_android_scientist_fmt, planet_name);
                                         break;
-                                    case -5:
+                                    case COLONY_PRODUCTION_WORKER:
                                         sprintf(out_text, _msg_colony_built_android_worker_fmt, planet_name);
                                         break;
-                                    case -4:
+                                    case COLONY_PRODUCTION_FARMER:
                                         sprintf(out_text, _msg_colony_built_android_farmer_fmt, planet_name);
                                         break;
                                     default:
@@ -212,7 +212,7 @@ namespace MSG_ {
                         }
 
                         int16_t product_id = build_msg.product_id;
-                        if (product_id != -1) {
+                        if (product_id != COLONY_PRODUCTION_NONE) {
                             const char* queue_fmt = _msg_colony_built_next_queue_fmt;
                             if (build_msg.append_fmt != 0) {
                                 queue_fmt = _msg_colony_built_auto_build_fmt;

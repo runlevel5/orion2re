@@ -483,8 +483,8 @@ namespace ERICNET {
             case BUILDING_STAR_FORTRESS:
                 for (int16_t i = 0; i < 7; ++i) {
                     int16_t prod_val = MOX::_colony[colony_idx].producing[i];
-                    if (prod_val < -99) {
-                        int16_t ship_idx = -100 - prod_val;
+                    if (COLBLDG::Colony_Production_Is_Queued_Ship_(prod_val)) {
+                        int16_t ship_idx = COLBLDG::Colony_Production_Ship_Index_(prod_val);
                         if (MOX::_ship[ship_idx].d.size >= SHIP_SIZE_LARGE) {
                             COLBLDG::Delete_From_Colony_Queue_(colony_idx, i);
                             i--;
@@ -509,8 +509,8 @@ namespace ERICNET {
             case BUILDING_MARINE_BARRACKS:
                 for (int16_t i = 0; i < 7; ++i) {
                     int16_t prod_val = MOX::_colony[colony_idx].producing[i];
-                    if (prod_val < -99) {
-                        int16_t ship_idx = -100 - prod_val;
+                    if (COLBLDG::Colony_Production_Is_Queued_Ship_(prod_val)) {
+                        int16_t ship_idx = COLBLDG::Colony_Production_Ship_Index_(prod_val);
                         if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_TRANSPORT) {
                             COLBLDG::Delete_From_Colony_Queue_(colony_idx, i);
                             i--;

@@ -452,7 +452,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     int16_t __cdecl Colony_Ship_Auto_Colonization_(s_ship_data* ship) {
         if ((ship->d.ship_type != SHIP_TYPE_COLONY && ship->d.ship_type != SHIP_TYPE_OUTPOST) ||
             ship->status >= 3) {
-            return -1;
+            return COLONY_PRODUCTION_NONE;
         }
 
         if (ship->d.ship_weapon[1].type == 1) {
@@ -461,7 +461,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 return planet_idx;
             }
         }
-        return -1;
+        return COLONY_PRODUCTION_NONE;
     }
 
     void __cdecl Set_Auto_Colonize_Flag_(s_ship_data* ship, int16_t flag) {
@@ -481,7 +481,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             return true;
         }
 
-        if (is_in_warp_range && auto_col_status == -1) {
+        if (is_in_warp_range && auto_col_status == COLONY_PRODUCTION_NONE) {
             return true;
         }
 
@@ -504,7 +504,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     int16_t turns = HAROLD::N_Turns_To_Star_(ship_idx, star_id);
                     int16_t planet_idx = Colony_Ship_Auto_Colonization_(&MOX::_ship[ship_idx]);
 
-                    if (planet_idx == -1 || MOX::_planet[planet_idx].colony_index != -1) {
+                    if (planet_idx == COLONY_PRODUCTION_NONE || MOX::_planet[planet_idx].colony_index != -1) {
                         continue;
                     }
 

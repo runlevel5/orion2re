@@ -1010,37 +1010,37 @@ namespace COLONY {
 
     check_production:
         int16_t production_id = colony->just_produced;
-        if (production_id == -1) {
+        if (production_id == COLONY_PRODUCTION_NONE) {
             return;
         }
 
-        if (production_id == -39) {
+        if (production_id == COLONY_PRODUCTION_JUST_COLONIZED) {
             char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
             char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_COLONIZED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
             snprintf(buffer, sizeof(buffer), format, planet_name);
             GENDRAW::Help_(buffer);
             Show_Colony_Screen_();
-            colony->just_produced = -1;
+            colony->just_produced = COLONY_PRODUCTION_NONE;
             return;
         }
 
-        if (production_id == -40) {
+        if (production_id == COLONY_PRODUCTION_JUST_CONQUERED) {
             char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
             char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_CONQUERED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
             snprintf(buffer, sizeof(buffer), format, planet_name);
             GENDRAW::Help_(buffer);
             Show_Colony_Screen_();
-            colony->just_produced = -1;
+            colony->just_produced = COLONY_PRODUCTION_NONE;
             return;
         }
 
-        if (production_id == -41) {
+        if (production_id == COLONY_PRODUCTION_JUST_LIBERATED) {
             char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
             char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_LIBERATED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
             snprintf(buffer, sizeof(buffer), format, planet_name);
             GENDRAW::Help_(buffer);
             Show_Colony_Screen_();
-            colony->just_produced = -1;
+            colony->just_produced = COLONY_PRODUCTION_NONE;
             return;
         }
 
@@ -1050,21 +1050,21 @@ namespace COLONY {
         snprintf(buffer, sizeof(buffer), format, planet_name, selection_name);
         GENDRAW::Help_(buffer);
         Show_Colony_Screen_();
-        colony->just_produced = -1;
+        colony->just_produced = COLONY_PRODUCTION_NONE;
     }
 
     void __cdecl Fix_Colony_Queue_(int16_t colony_idx) {
         Defragment_Colony_Queue_(colony_idx);
 
-        while (MOX::_colony[colony_idx].producing[0] == -10) {
+        while (MOX::_colony[colony_idx].producing[0] == COLONY_PRODUCTION_REPEAT) {
             Squish_Out_Colony_Queue_Slot_(colony_idx, 0);
         }
     }
 
     void __cdecl Defragment_Colony_Queue_(int16_t colony_idx) {
         for (int16_t i = 0; i < 7; ++i) {
-            // BUG: if multiple slots are -1, some might be skipped due to shifting
-            if (MOX::_colony[colony_idx].producing[i] == -1) {
+            // BUG: if multiple slots are COLONY_PRODUCTION_NONE, some might be skipped due to shifting
+            if (MOX::_colony[colony_idx].producing[i] == COLONY_PRODUCTION_NONE) {
                 COLONY::Squish_Out_Colony_Queue_Slot_(colony_idx, i);
             }
         }
@@ -1073,8 +1073,8 @@ namespace COLONY {
     void __cdecl Cleanup_Colony_Queue_(int16_t colony_idx) {
         COLONY::Fix_Colony_Queue_(colony_idx);
 
-        if (MOX::_colony[colony_idx].producing[0] == -1) {
-            MOX::_colony[colony_idx].producing[0] = -2;
+        if (MOX::_colony[colony_idx].producing[0] == COLONY_PRODUCTION_NONE) {
+            MOX::_colony[colony_idx].producing[0] = COLONY_PRODUCTION_RESEARCH;
         }
     }
 
@@ -1084,7 +1084,7 @@ namespace COLONY {
                 MOX::_colony[colony_idx].producing[i] = MOX::_colony[colony_idx].producing[i + 1];
             }
         }
-        MOX::_colony[colony_idx].producing[6] = -1;
+        MOX::_colony[colony_idx].producing[6] = COLONY_PRODUCTION_NONE;
     }
 
     void __cdecl Col_Calc_Wrapper_(int16_t colony_idx) {
@@ -1303,7 +1303,7 @@ namespace COLONY {
     }
 
     s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t frame) {
-        if (animation_type == -1) {
+        if (animation_type == COLONY_PRODUCTION_NONE) {
             return COLONY::Military_Anims_(0, frame);
         }
 

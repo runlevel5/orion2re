@@ -825,8 +825,8 @@ namespace REPORT {
 
         for (int i = 0; i < num_colonies; ++i) {
             s_colony* colony = &MOX::_colony[i];
-            // Check if colony belongs to player, is not an outpost, and its production queue is empty (-1)
-            if (colony->owner == player_idx && colony->outpost_flag == 0 && colony->producing[0] == -1) {
+            // Check if colony belongs to player, is not an outpost, and its production queue is empty.
+            if (colony->owner == player_idx && colony->outpost_flag == 0 && colony->producing[0] == COLONY_PRODUCTION_NONE) {
                 target_colony = colony;
                 break;
             }

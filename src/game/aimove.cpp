@@ -416,7 +416,7 @@ namespace AIMOVE {
             for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
                 s_colony* colony = &MOX::_colony[i];
 
-                if (colony->owner == _i_ai && colony->producing[0] == 11 /* PROD_COLONY_SHIP */) {
+                if (colony->owner == _i_ai && colony->producing[0] == BUILDING_COLONY_BASE) {
                     int16_t colony_star_idx = MOX::_planet[colony->planet].star_index;
                     bool found = false;
 
@@ -431,7 +431,7 @@ namespace AIMOVE {
                     }
 
                     if (!found) {
-                        colony->producing[0] = -2;
+                        colony->producing[0] = COLONY_PRODUCTION_RESEARCH;
                     }
                 }
             }
@@ -2287,8 +2287,8 @@ namespace AIMOVE {
             if (current_bc + spent < 1 || eta <= producing_idx) break;
 
             int16_t prod_id = colony->producing[i];
-            if (prod_id < -99) {
-                int16_t ship_design_idx = -100 - prod_id;
+            if (COLBLDG::Colony_Production_Is_Queued_Ship_(prod_id)) {
+                int16_t ship_design_idx = COLBLDG::Colony_Production_Ship_Index_(prod_id);
                 if (MOX::_ship[ship_design_idx].d.ship_type == SHIP_TYPE_COMBAT) {
                     int32_t cost = MOX::_ship[ship_design_idx].d.cost;
                     if (cost > spent) {

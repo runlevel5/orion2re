@@ -809,7 +809,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 
                 COLCALC::Compute_Star_Colony_Stuff_(star);
                 COLCALC::Colony_Calculation_((int16_t)(colony - MOX::_colony));
-                colony->just_produced = -39 /* 0xFFD9 */;
+                colony->just_produced = COLONY_PRODUCTION_JUST_COLONIZED;
                 break;
 
             case SYSTEM_SPECIAL_MAROONED_HERO:

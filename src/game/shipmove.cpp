@@ -22,7 +22,7 @@ namespace SHIPMOVE {
             s_colony* col = &MOX::_colony[i];
             if (col->owner != -1 && col->outpost_flag == 0) {
                 for (int j = 0; j < 7; ++j) {
-                    if (col->producing[j] > -100) {
+                    if (col->producing[j] > COLONY_PRODUCTION_QUEUED_SHIP_BASE) {
                         int owner = col->owner;
                         colony_production_slots[owner]++;
                     }

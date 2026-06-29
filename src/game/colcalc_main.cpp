@@ -464,7 +464,7 @@ namespace COLCALC {
                 if (pop_boom) growth_modifier += 100;
                 if (plague) growth_modifier -= 200;
 
-                if (colony->producing[0] == -3) { // Housing
+                if (colony->producing[0] == COLONY_PRODUCTION_HOUSING) {
                     growth_modifier += ((colony->production[ECON_INDUSTRY] - colony->maintenance[ECON_INDUSTRY]) * 40) / total_pops;
                 }
 
@@ -1170,7 +1170,9 @@ namespace COLCALC {
         }
 
         int16_t producing = colony->producing[0];
-        if (producing == -37 || (producing < 0 && producing > -3)) {
+        if (producing == COLONY_PRODUCTION_AI_TRADE_GOODS ||
+            producing == COLONY_PRODUCTION_NONE ||
+            producing == COLONY_PRODUCTION_RESEARCH) {
             int surplus_ind = (int)colony->production[ECON_INDUSTRY] - (int)colony->maintenance[ECON_INDUSTRY];
             if (surplus_ind > 0) {
                 trade_goods_bc = surplus_ind;

@@ -443,11 +443,11 @@ namespace INITGAME {
         MOX::_star[star_idx].visited |= visited_player_mask;
 
         for (int32_t producing_idx = 0; producing_idx < (int32_t)(sizeof(colony->producing) / sizeof(colony->producing[0])); ++producing_idx) {
-            colony->producing[producing_idx] = -1;
+            colony->producing[producing_idx] = COLONY_PRODUCTION_NONE;
         }
 
         colony->occupation_policy = 4;
-        colony->just_produced = -1;
+        colony->just_produced = COLONY_PRODUCTION_NONE;
     }
 
     void __cdecl Init_Leaders_() {

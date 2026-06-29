@@ -31,8 +31,8 @@ namespace aidudes {
         s_colony* col = MOX::_colony;
         s_colony* end = MOX::_colony + (int16_t)MOX::_NUM_COLONIES;
         while (col < end) {
-            if (col->producing[0] == -37) {
-                col->producing[0] = -2;
+            if (col->producing[0] == COLONY_PRODUCTION_AI_TRADE_GOODS) {
+                col->producing[0] = COLONY_PRODUCTION_RESEARCH;
             }
             ++col;
         }
@@ -47,7 +47,7 @@ namespace aidudes {
             uint8_t colony_idx = (uint8_t)info->colony_idx;
             s_colony* col = &MOX::_colony[colony_idx];
 
-            bool is_colony_researching = (col->producing[0] == -2);
+            bool is_colony_researching = (col->producing[0] == COLONY_PRODUCTION_RESEARCH);
 
             if ((is_colony_researching && aidudes::_p_ai->do_not_research == 0) ||
                 EVENTS::Event_Check_Colony_Researching_((int16_t)colony_idx) != 0) {
@@ -126,16 +126,18 @@ namespace aidudes {
             bool should_rebuild = force_clear;
             if (!should_rebuild) {
                 int16_t producing = colony->producing[0];
-                if (producing == -1 || producing == -3 || 
-                    producing == -2 || producing == -10) {
+                if (producing == COLONY_PRODUCTION_NONE ||
+                    producing == COLONY_PRODUCTION_HOUSING ||
+                    producing == COLONY_PRODUCTION_RESEARCH ||
+                    producing == COLONY_PRODUCTION_REPEAT) {
                     should_rebuild = true;
                 }
             }
 
             if (should_rebuild) {
                 int16_t producing = colony->producing[0];
-                if (producing <= -100) {
-                    int ship_idx = -(producing + 100);
+                if (COLBLDG::Colony_Production_Is_Queued_Ship_(producing)) {
+                    int ship_idx = COLBLDG::Colony_Production_Ship_Index_(producing);
                     if (MOX::_ship[ship_idx].status == 4) {
                         return; // Abandon evaluation entirely if an outdated ship is being built
                     }
@@ -292,8 +294,8 @@ namespace aidudes {
             uint8_t colony_idx = (*aidudes::_our_colonies)[i].colony_idx;
             short producing_id = MOX::_colony[colony_idx].producing[0];
 
-            if (producing_id <= -100) {
-                int ship_idx = -producing_id - 100;
+            if (COLBLDG::Colony_Production_Is_Queued_Ship_(producing_id)) {
+                int ship_idx = COLBLDG::Colony_Production_Ship_Index_(producing_id);
                 s_ship_data& ship = MOX::_ship[ship_idx];
 
                 if (ship.d.ship_type == SHIP_TYPE_COMBAT) {
@@ -834,13 +836,13 @@ namespace aidudes {
 
                             bool delete_from_queue = false;
                             int16_t prod = temp_colony->producing[0];
-                            if (prod <= -100) {
-                                if (MOX::_ship[-prod - 100].d.ship_type != SHIP_TYPE_COMBAT) {
+                            if (COLBLDG::Colony_Production_Is_Queued_Ship_(prod)) {
+                                if (MOX::_ship[COLBLDG::Colony_Production_Ship_Index_(prod)].d.ship_type != SHIP_TYPE_COMBAT) {
                                     delete_from_queue = true;
                                 }
-                            } else if (prod > -8) {
-                                if (prod > -4) {
-                                    if (prod == -2) {
+                            } else if (prod > COLONY_PRODUCTION_SPY) {
+                                if (prod > COLONY_PRODUCTION_FARMER) {
+                                    if (prod == COLONY_PRODUCTION_RESEARCH) {
                                         recalculate_colony = true;
                                         delete_from_queue = true;
                                     }
@@ -855,17 +857,17 @@ namespace aidudes {
                         }
 
                         int16_t prod = temp_colony->producing[0];
-                        if (prod == -3) {
+                        if (prod == COLONY_PRODUCTION_HOUSING) {
                             // pass
-                        } else if (prod == -2) {
+                        } else if (prod == COLONY_PRODUCTION_RESEARCH) {
                             recalculate_colony = true;
-                        } else if (prod == -1) {
+                        } else if (prod == COLONY_PRODUCTION_NONE) {
                             // pass
                         } else {
                             continue;
                         }
 
-                        temp_colony->producing[0] = -38;
+                        temp_colony->producing[0] = COLONY_PRODUCTION_AI_UNASSIGNED;
                         colony_queue[colony_queue_count] = current_colony_idx;
                         colony_queue_count++;
                     }
@@ -1006,7 +1008,7 @@ namespace aidudes {
                                 no_range_or_speed = true;
                             } else {
                                 MOX::_ship[ship_idx].status = 6;
-                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ship_idx);
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLBLDG::Colony_Production_From_Ship_Index_(ship_idx));
                             }
                             want_colony_base = false;
                         }
@@ -1028,7 +1030,7 @@ namespace aidudes {
                 temp_colony->maintenance[1] < temp_colony->production[1]) {
 
                 int current_colony_idx = colony_queue[i];
-                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -37);
+                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLONY_PRODUCTION_AI_TRADE_GOODS);
                 COLCALC::Colony_Calculation_((int16_t)current_colony_idx);
                 continue;
             }
@@ -1215,7 +1217,7 @@ namespace aidudes {
                                     no_range_or_speed = true;
                                 } else {
                                     MOX::_ship[created_idx].status = 6;
-                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - created_idx);
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLBLDG::Colony_Production_From_Ship_Index_(created_idx));
                                     AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= AIBUILD::Mean_Ship_Strength_(&MOX::_ship[created_idx]);
                                 }
                                 break;
@@ -1228,7 +1230,7 @@ namespace aidudes {
                                     no_range_or_speed = true;
                                 } else {
                                     MOX::_ship[ds_idx].status = 6;
-                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ds_idx);
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLBLDG::Colony_Production_From_Ship_Index_(ds_idx));
                                     AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= AIBUILD::Mean_Ship_Strength_(&MOX::_ship[ds_idx]);
                                 }
                                 break;
@@ -1251,7 +1253,7 @@ namespace aidudes {
                     }
                     case 1:
                         if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 12) {
-                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -15);
+                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLONY_PRODUCTION_FREIGHTERS);
                             freighter_groups_assigned++;
                             AIBUILD::_player_n_freighter_groups_wanted[player_idx]--;
                         }
@@ -1290,7 +1292,7 @@ namespace aidudes {
                                     memcpy(&s->d, refit_design, sizeof(s_ship_design));
                                     s->d.cost = cost;
                                     s->status = 4;
-                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ship_idx);
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLBLDG::Colony_Production_From_Ship_Index_(ship_idx));
 
                                     p_refit->n_entries--;
                                     memmove(&p_refit->entry[j], &p_refit->entry[j + 1], (p_refit->n_entries - j) * sizeof(s_ai_refit_entry));
@@ -1306,7 +1308,7 @@ namespace aidudes {
                     }
                     case 3:
                         if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 15) {
-                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -7);
+                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLONY_PRODUCTION_SPY);
                             AIBUILD::_player_n_spies[player_idx][1]--;
                         }
                         choice_weights[3] = 0;
@@ -1323,7 +1325,7 @@ namespace aidudes {
                                     no_range_or_speed = true;
                                 } else {
                                     MOX::_ship[tr_idx].status = 6;
-                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - tr_idx);
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLBLDG::Colony_Production_From_Ship_Index_(tr_idx));
                                     AIBUILD::_player_n_transports[player_idx][1]--;
                                 }
                             }

@@ -198,7 +198,7 @@ namespace COLREFIT {
                     COLONY::_full_draw = 1;
                 } else {
                     int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
-                    if (COLCALC::Colony_Can_Build_Product_(&MOX::_colony[MOX::_planet[planet_idx].colony_index], -100 - ship_idx)) {
+                    if (COLCALC::Colony_Can_Build_Product_(&MOX::_colony[MOX::_planet[planet_idx].colony_index], COLBLDG::Colony_Production_From_Ship_Index_(ship_idx))) {
                         if (MOX::_ship[ship_idx].d.previous_owner == MOX::_PLAYER_NUM) {
                             if (MOX::_ship[ship_idx].officer_index == -1) {
                                 COLREFIT::_esc = 1;
@@ -440,7 +440,7 @@ namespace COLREFIT {
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
         int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
-        if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[colony_idx], -100 - ship_idx)) {
+        if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[colony_idx], COLBLDG::Colony_Production_From_Ship_Index_(ship_idx))) {
             COLONY::Set_Colony_Font_To_Red_(1, 1);
             char* text = ESTRINGS::E_Strings_(0x18B);
             BILL::Squeeze_Paragraph_Centered_(x_offset + 161, y_offset + 49, 55, 56, text, 2);
@@ -497,12 +497,12 @@ namespace COLREFIT {
             COLONY::Set_Colony_Font_To_Reg_Blue_(4, font_color);
 
             char* empty_str = ESTRINGS::E_Strings_(12);
-            char* selection_name = COLBLDG::Selection_Name_(-50 - design_idx);
+            char* selection_name = COLBLDG::Selection_Name_(COLBLDG::Colony_Production_From_Ship_Design_Index_(design_idx));
 
             if (strcmp(selection_name, empty_str) != 0) {
                 int32_t y = ((179 * (design_idx + 1)) / 8) + 49;
 
-                char* name_to_print = COLBLDG::Selection_Name_(-50 - design_idx);
+                char* name_to_print = COLBLDG::Selection_Name_(COLBLDG::Colony_Production_From_Ship_Design_Index_(design_idx));
                 fonts::Print_(183, (int16_t)y, name_to_print);
 
                 char* hull_name = TECHDATA::_hull_data[MOX::_player[player_num].ship_designs[design_idx].size].name;
@@ -604,7 +604,7 @@ namespace COLREFIT {
         );
 
         for (int16_t design_idx = 0; design_idx < 5; ++design_idx) {
-            if (strcmp(ESTRINGS::E_Strings_(0xC), COLBLDG::Selection_Name_(-50 - design_idx)) == 0) {
+            if (strcmp(ESTRINGS::E_Strings_(0xC), COLBLDG::Selection_Name_(COLBLDG::Colony_Production_From_Ship_Design_Index_(design_idx))) == 0) {
                 _fields[5 + design_idx] = -1000;
             } else {
                 _fields[5 + design_idx] = fields::Add_Hidden_Field_(

@@ -9,6 +9,31 @@ struct s_ship_design;
 struct s_ship_weapons;
 
 namespace COLBLDG {
+    static inline bool Colony_Production_Is_Queued_Ship_(int16_t production_id) {
+        return production_id <= COLONY_PRODUCTION_QUEUED_SHIP_BASE;
+    }
+
+    static inline bool Colony_Production_Is_Ship_Design_(int16_t production_id) {
+        return production_id > COLONY_PRODUCTION_QUEUED_SHIP_BASE &&
+               production_id <= COLONY_PRODUCTION_SHIP_DESIGN_BASE;
+    }
+
+    static inline int16_t Colony_Production_Ship_Index_(int16_t production_id) {
+        return (int16_t)(-production_id - 100);
+    }
+
+    static inline int16_t Colony_Production_Ship_Design_Index_(int16_t production_id) {
+        return (int16_t)(COLONY_PRODUCTION_SHIP_DESIGN_BASE - production_id);
+    }
+
+    static inline int16_t Colony_Production_From_Ship_Index_(int16_t ship_idx) {
+        return (int16_t)(COLONY_PRODUCTION_QUEUED_SHIP_BASE - ship_idx);
+    }
+
+    static inline int16_t Colony_Production_From_Ship_Design_Index_(int16_t design_idx) {
+        return (int16_t)(COLONY_PRODUCTION_SHIP_DESIGN_BASE - design_idx);
+    }
+
     extern int16_t _building_indexes[54];
     extern int16_t _n_building_indexes;
     // Size: short[54]
