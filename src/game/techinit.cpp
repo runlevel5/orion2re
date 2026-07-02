@@ -306,8 +306,8 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     }
   }
 
-  const bool restore_objectives = player->objectives == PLAYER_OBJECTIVE_HUMAN;
-  if (restore_objectives) {
+  const bool restore_human_objective = player->objectives == PLAYER_OBJECTIVE_HUMAN;
+  if (restore_human_objective) {
     player->objectives = PLAYER_OBJECTIVE_MILITARIST;
   }
 
@@ -358,7 +358,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     }
   }
 
-  if (restore_objectives) {
+  if (restore_human_objective) {
     player->objectives = PLAYER_OBJECTIVE_HUMAN;
   }
 
