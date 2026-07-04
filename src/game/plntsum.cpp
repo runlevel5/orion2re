@@ -131,7 +131,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
                 has_owner_label = true;
             } else if (HAROLD::Star_Guarded_By_Monster_(star_idx, &monster_race)) {
                 char race_buf[20];
-                HACCESS::Race_Name_(monster_race, race_buf);
+                HACCESS::Race_Name_(monster_race, race_buf, sizeof(race_buf));
                 snprintf(owner_label, sizeof(owner_label), "(%s)", race_buf);
                 has_owner_label = true;
             }
@@ -283,7 +283,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             bool user_confirmed_move = true;
             int16_t monster_race_summary_id;
             if (HAROLD::Star_Guarded_By_Monster_(target_star_idx, &monster_race_summary_id)) {
-                HACCESS::Race_Name_(monster_race_summary_id, race_name_buffer);
+                HACCESS::Race_Name_(monster_race_summary_id, race_name_buffer, sizeof(race_name_buffer));
                 mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 
                 int16_t msg_id = (PLNTSUM::_send_choice == 0) ? 0x13C /* HESTR_13C_S_IS_GUARDED_BY_A_S_DO */ : 0x13B /* HESTR_13B_S_IS_GUARDED_BY_A_S_DO */;

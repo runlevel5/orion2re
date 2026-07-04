@@ -1,6 +1,8 @@
 #pragma once
 
 namespace dos {
+    #define DOS_MAX_PATH 512
+
     /**
      * Returns the available free space on the current drive in bytes.
      * @return Available free space, or 0 if the query fails.
@@ -11,9 +13,10 @@ namespace dos {
      * Finds the first matching file for the provided pattern.
      * @param pattern Search pattern.
      * @param output_name Receives the matched filename.
+     * @param output_name_size Size of output_name in bytes.
      * @return true if a matching filename was written to output_name, otherwise false.
      */
-    bool __cdecl DIR_(const char* pattern, char* output_name);
+    bool __cdecl DIR_(const char* pattern, char* output_name, size_t output_name_size);
 
     /**
      * Deletes the file at the specified path.

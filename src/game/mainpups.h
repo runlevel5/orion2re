@@ -135,7 +135,7 @@ namespace MAINPUPS {
 
     void __cdecl Mainpups_Tested_Execute_Autofunction_();
 
-    void __cdecl Leader_Technology_String_(int16_t player_idx, int16_t leader_idx, char* output_buf);
+    void __cdecl Leader_Technology_String_(int16_t player_idx, int16_t leader_idx, char* output_buf, uint32_t output_buf_size);
 
     void __cdecl Evaluate_Tax_Rate_Input_(int16_t* input_val, int16_t* scan_val, int16_t* exit_flag);
 
@@ -183,7 +183,7 @@ namespace MAINPUPS {
 
     void __cdecl Marooned_Officer_Joins_Popup_(int16_t star_idx, int16_t officer_idx);
 
-    void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer);
+    void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer, uint32_t buffer_size);
 
     int16_t __cdecl Dragon_New_Star_Popup_(int16_t player_idx, int16_t star_idx);
 

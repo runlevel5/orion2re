@@ -557,7 +557,7 @@ namespace council {
             if (diplodef::_COUNCIL_FLAG == 2) {
                 JIM::Get_Text_Message_("jimtext.lbx", 22, temp_buffer, sizeof(temp_buffer));
                 JIM::Decode_Text_Race_(temp_buffer, _winning_player, sizeof(temp_buffer));
-                strcat(_council_message, temp_buffer);
+                strlcat(_council_message, temp_buffer, 210);
             }
             break;
 

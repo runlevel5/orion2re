@@ -182,8 +182,9 @@ namespace OFFICER {
     /**
      * Select the localized LBX file name for officer skill text.
      * @param lbx_name Receives the selected 8.3 LBX file name.
+     * @param lbx_name_size Size of the destination buffer in bytes.
      */
-    void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name);
+    void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name, uint32_t lbx_name_size);
 
     void __cdecl Print_Officer_Skill_Help_(int16_t skill_id, int16_t bonus, int16_t leader_idx);
 
@@ -197,7 +198,7 @@ namespace OFFICER {
 
     void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_t tech_app_count);
 
-    void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int16_t tech_app_count);
+    void __cdecl Make_Loknar_Message_(char* output, uint32_t output_size, const int16_t* tech_app_ids, int16_t tech_app_count);
 
     int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_idx);
 
@@ -284,7 +285,7 @@ namespace OFFICER {
 
     bool __cdecl Officer_Is_Female_(int16_t officer_idx);
 
-    void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest);
+    void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest, uint32_t dest_size);
 
     void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t field_x, int16_t officer_idx);
 
@@ -313,7 +314,7 @@ namespace OFFICER {
         int16_t* help_fields
     );
 
-    void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx);
+    void __cdecl Officer_Name_(char* buffer, uint32_t buffer_size, int16_t player_id, int16_t officer_idx);
 
     void __cdecl Draw_Officer_Skill_Icon_(int16_t x, int16_t y, int16_t skill_idx);
 

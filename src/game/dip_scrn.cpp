@@ -878,34 +878,34 @@ namespace DIP_SCRN {
         *_main_diplomacy_list[8] = *s__00551100;
         RUSS::Mox_Update_();
 
-        strcpy(_main_net_diplomacy_list[0], _main_diplomacy_list[0]);
-        strcpy(_main_net_diplomacy_list[1], _main_diplomacy_list[1]);
-        strcpy(_main_net_diplomacy_list[2], _main_diplomacy_list[2]);
-        strcpy(_main_net_diplomacy_list[3], _main_diplomacy_list[3]);
-        strcpy(_main_net_diplomacy_list[4], _main_diplomacy_list[4]);
-        strcpy(_main_net_diplomacy_list[5], _main_diplomacy_list[5]);
-        strcpy(_main_net_diplomacy_list[6], _main_diplomacy_list[6]);
+        strlcpy(_main_net_diplomacy_list[0], _main_diplomacy_list[0], DIP_SCRN_MAIN_LIST_CAPACITY);
+        strlcpy(_main_net_diplomacy_list[1], _main_diplomacy_list[1], DIP_SCRN_MAIN_LIST_CAPACITY);
+        strlcpy(_main_net_diplomacy_list[2], _main_diplomacy_list[2], DIP_SCRN_MAIN_LIST_CAPACITY);
+        strlcpy(_main_net_diplomacy_list[3], _main_diplomacy_list[3], DIP_SCRN_MAIN_LIST_CAPACITY);
+        strlcpy(_main_net_diplomacy_list[4], _main_diplomacy_list[4], DIP_SCRN_MAIN_LIST_CAPACITY);
+        strlcpy(_main_net_diplomacy_list[5], _main_diplomacy_list[5], DIP_SCRN_MAIN_LIST_CAPACITY);
+        strlcpy(_main_net_diplomacy_list[6], _main_diplomacy_list[6], DIP_SCRN_MAIN_LIST_CAPACITY);
 
         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x41, _main_net_diplomacy_list[7], 0x28);
         JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x27, _main_net_diplomacy_list[8], 0x28);
 
-        strcpy(_main_net_diplomacy_list[9], _main_diplomacy_list[7]);
+        strlcpy(_main_net_diplomacy_list[9], _main_diplomacy_list[7], DIP_SCRN_MAIN_LIST_CAPACITY);
         *_main_net_diplomacy_list[10] = *s__00551100;
 
         JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x2B, _main_repulsive_diplomacy_list[0], 0x1E);
 
-        strcpy(_main_repulsive_diplomacy_list[1], _main_diplomacy_list[5]);
-        strcpy(_main_repulsive_diplomacy_list[2], _main_diplomacy_list[6]);
-        strcpy(_main_repulsive_diplomacy_list[3], _main_diplomacy_list[7]);
+        strlcpy(_main_repulsive_diplomacy_list[1], _main_diplomacy_list[5], DIP_SCRN_SMALL_LIST_CAPACITY);
+        strlcpy(_main_repulsive_diplomacy_list[2], _main_diplomacy_list[6], DIP_SCRN_SMALL_LIST_CAPACITY);
+        strlcpy(_main_repulsive_diplomacy_list[3], _main_diplomacy_list[7], DIP_SCRN_SMALL_LIST_CAPACITY);
 
         *_main_repulsive_diplomacy_list[4] = *s__00551100;
         RUSS::Mox_Update_();
 
-        strcpy(_main_net_repulsive_diplomacy_list[0], _main_repulsive_diplomacy_list[0]);
-        strcpy(_main_net_repulsive_diplomacy_list[1], _main_diplomacy_list[5]);
-        strcpy(_main_net_repulsive_diplomacy_list[2], _main_diplomacy_list[6]);
-        strcpy(_main_net_repulsive_diplomacy_list[3], _main_net_diplomacy_list[7]);
-        strcpy(_main_net_repulsive_diplomacy_list[4], _main_diplomacy_list[7]);
+        strlcpy(_main_net_repulsive_diplomacy_list[0], _main_repulsive_diplomacy_list[0], DIP_SCRN_SMALL_LIST_CAPACITY);
+        strlcpy(_main_net_repulsive_diplomacy_list[1], _main_diplomacy_list[5], DIP_SCRN_SMALL_LIST_CAPACITY);
+        strlcpy(_main_net_repulsive_diplomacy_list[2], _main_diplomacy_list[6], DIP_SCRN_SMALL_LIST_CAPACITY);
+        strlcpy(_main_net_repulsive_diplomacy_list[3], _main_net_diplomacy_list[7], DIP_SCRN_SMALL_LIST_CAPACITY);
+        strlcpy(_main_net_repulsive_diplomacy_list[4], _main_diplomacy_list[7], DIP_SCRN_SMALL_LIST_CAPACITY);
 
         *_main_net_repulsive_diplomacy_list[5] = *s__00551100;
         RUSS::Mox_Update_();

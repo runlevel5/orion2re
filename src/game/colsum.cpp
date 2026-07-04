@@ -414,23 +414,23 @@ namespace COLSUM {
         s_player* player = &MOX::_player[player_num];
 
         // Part 0: BC
-        ERIC::String_Builder2_(buffer, 0, ESTRINGS::E_Strings_(0x76 /* 118 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->bc);
+        ERIC::String_Builder2_(buffer, sizeof(buffer), 0, ESTRINGS::E_Strings_(0x76 /* 118 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->bc);
 
         // Part 1: Surplus BC (with color formatting)
         const char* red_fmt = ERIC::Red_If_Negative_Fmt_String_(player->surplus_bc);
-        ERIC::String_Builder2_(buffer, 1, ESTRINGS::E_Strings_(0x6a /* 106 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, red_fmt, player->surplus_bc);
+        ERIC::String_Builder2_(buffer, sizeof(buffer), 1, ESTRINGS::E_Strings_(0x6a /* 106 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, red_fmt, player->surplus_bc);
 
         // Part 2: Total Population
-        ERIC::String_Builder2_(buffer, 2, ESTRINGS::E_Strings_(0x72 /* 114 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->total_pop);
+        ERIC::String_Builder2_(buffer, sizeof(buffer), 2, ESTRINGS::E_Strings_(0x72 /* 114 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->total_pop);
 
         // Part 3: Surplus Freighters
-        ERIC::String_Builder2_(buffer, 3, ESTRINGS::E_Strings_(0x67 /* 103 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->surplus_freighters);
+        ERIC::String_Builder2_(buffer, sizeof(buffer), 3, ESTRINGS::E_Strings_(0x67 /* 103 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->surplus_freighters);
 
         // Part 4: Surplus Food
-        ERIC::String_Builder2_(buffer, 4, ESTRINGS::E_Strings_(0x66 /* 102 ESTR_SFOOD_SD */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->surplus_food);
+        ERIC::String_Builder2_(buffer, sizeof(buffer), 4, ESTRINGS::E_Strings_(0x66 /* 102 ESTR_SFOOD_SD */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->surplus_food);
 
         // Part 5: Research Produced
-        ERIC::String_Builder2_(buffer, 5, ESTRINGS::E_Strings_(0x75 /* 117 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->research_produced);
+        ERIC::String_Builder2_(buffer, sizeof(buffer), 5, ESTRINGS::E_Strings_(0x75 /* 117 */), ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, player->research_produced);
 
         // Render the built strings
         FMTPARA::Print_Formatted_Paragraph_(520 /* 0x208 */, 354 /* 0x162 */, 104 /* 0x68 */, buffer, 3);

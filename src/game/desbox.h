@@ -143,7 +143,7 @@ namespace DESBOX {
 
     int8_t __cdecl Should_Add_Mod_(int16_t mod_idx);
 
-    int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out);
+    int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out, int32_t error_msg_out_size);
 
     extern const char s__00551100[];
     extern const char s_space[];

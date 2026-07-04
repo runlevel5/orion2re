@@ -5,8 +5,9 @@ namespace HACCESS {
     /** Copies the resolved race name into the caller-provided buffer.
      * @param race_id Player or race identifier to resolve.
      * @param race_name_out Destination buffer for the copied name.
+     * @param race_name_out_size Size of the destination buffer in bytes.
      */
-    void __cdecl Race_Name_(int16_t race_id, char* race_name_out);
+    void __cdecl Race_Name_(int16_t race_id, char* race_name_out, uint32_t race_name_out_size);
 
     void __cdecl Set_Colony_Auto_Select_For_Star_(int16_t star_idx, int16_t player_idx, int16_t* out_planet_idx);
 

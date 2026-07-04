@@ -12,7 +12,7 @@ namespace COMBAT {
     const char s_Guardian_00557e48[12] = "Guardian";
     const char s_Antaran_00557e54[8] = "Antaran";
 
-    int16_t __cdecl Strategic_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, char* summary, char* details) {
+    int16_t __cdecl Strategic_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, char* summary, int32_t summary_size, char* details, int32_t details_size) {
         MOX2::action_func_t auto_fn;
         int16_t leader_combat_bonuses[20];
 
@@ -300,7 +300,7 @@ namespace COMBAT {
             }
         }
 
-        Build_End_Of_Combat_Message_(summary, details, star_idx, colony_defense_flags, result);
+        Build_End_Of_Combat_Message_(summary, summary_size, details, details_size, star_idx, colony_defense_flags, result);
 
         if (MOX::_cmbt_colony_id != -1) {
             if (MOX::_colony[MOX::_cmbt_colony_id].n_pops == 0) {
@@ -1009,39 +1009,49 @@ namespace COMBAT {
         return hits * 40;
     }
 
-    void __cdecl Get_Non_Player_Name_(int16_t player_idx, char* out_name) {
-        char name_buf[20];
+    void __cdecl Get_Non_Player_Name_(int16_t player_idx, char* out_name, int32_t out_name_size) {
+        if (out_name_size <= 0) {
+            return;
+        }
+
+        const char* name = "";
 
         switch (player_idx) {
             case 8:
-                strlcpy(name_buf, s_Antaran_00557e54, sizeof(name_buf));
+                name = s_Antaran_00557e54;
                 break;
             case 9:
-                strlcpy(name_buf, s_Guardian_00557e48, sizeof(name_buf));
+                name = s_Guardian_00557e48;
                 break;
             case 10:
-                strlcpy(name_buf, s_Amoeba_00557e40, sizeof(name_buf));
+                name = s_Amoeba_00557e40;
                 break;
             case 11:
-                strlcpy(name_buf, s_Crystal_00557e24, sizeof(name_buf));
+                name = s_Crystal_00557e24;
                 break;
             case 12:
-                strlcpy(name_buf, s_Dragon_00557e38, sizeof(name_buf));
+                name = s_Dragon_00557e38;
                 break;
             case 13:
-                strlcpy(name_buf, s_Eel_00557e2c, sizeof(name_buf));
+                name = s_Eel_00557e2c;
                 break;
             case 14:
-                strlcpy(name_buf, s_Hydra_00557e30, sizeof(name_buf));
+                name = s_Hydra_00557e30;
                 break;
             default:
                 break;
         }
 
-        strcpy(out_name, name_buf);
+        strlcpy(out_name, name, (size_t)out_name_size);
     }
 
-    void __cdecl Build_End_Of_Combat_Message_(char* result_msg, char* stats_msg, int16_t star_idx, int16_t colony_damage_flags, int16_t outcome_type) {
+    void __cdecl Build_End_Of_Combat_Message_(char* result_msg, int32_t result_msg_size, char* stats_msg, int32_t stats_msg_size, int16_t star_idx, int16_t colony_damage_flags, int16_t outcome_type) {
+        if (result_msg_size <= 0 || stats_msg_size <= 0) {
+            return;
+        }
+
+        const size_t result_capacity = (size_t)result_msg_size;
+        const size_t stats_capacity = (size_t)stats_msg_size;
         int16_t attacker_total_ships[6];
         int16_t attacker_lost_ships[6];
         int16_t defender_total_ships[6];
@@ -1051,6 +1061,7 @@ namespace COMBAT {
         char attacker_race_name[20];
         char defender_race_name[20];
         char itoa_buffer[12];
+        char result_prefix[80];
         char msg_buffer[80];
 
         for (int i = 0; i < 6; ++i) {
@@ -1090,7 +1101,8 @@ namespace COMBAT {
             defender_total_ships[i] += defender_lost_ships[i];
         }
 
-        KEN::Ken_Get_Text_Message_(98 /* 0x62 */, result_msg, 80);
+        KEN::Ken_Get_Text_Message_(98 /* 0x62 */, result_prefix, 80);
+        strlcpy(result_msg, result_prefix, result_capacity);
 
         const char* location_name;
         if (star_idx == MOX::_NUM_STARS) {
@@ -1100,154 +1112,154 @@ namespace COMBAT {
         } else {
             location_name = HACCESS::Get_Planet_Name_(MOX::_colony[MOX::_cmbt_colony_id].planet);
         }
-        strcat(result_msg, location_name);
+        strlcat(result_msg, location_name, result_capacity);
 
         if (MOX::_combat_attacker_player < MAX_PLAYERS) {
             strlcpy(attacker_race_name, MOX::_player[MOX::_combat_attacker_player].race_name, sizeof(attacker_race_name));
         } else {
-            Get_Non_Player_Name_(MOX::_combat_attacker_player, attacker_race_name);
+            Get_Non_Player_Name_(MOX::_combat_attacker_player, attacker_race_name, sizeof(attacker_race_name));
         }
 
         if (MOX::_combat_defender_player < MAX_PLAYERS) {
             strlcpy(defender_race_name, MOX::_player[MOX::_combat_defender_player].race_name, sizeof(defender_race_name));
         } else {
-            Get_Non_Player_Name_(MOX::_combat_defender_player, defender_race_name);
+            Get_Non_Player_Name_(MOX::_combat_defender_player, defender_race_name, sizeof(defender_race_name));
         }
 
-        strcpy(stats_msg, string::s_X35);
-        strcat(stats_msg, attacker_race_name);
-        strcat(stats_msg, string::s_X255);
-        strcat(stats_msg, defender_race_name);
-        strcat(stats_msg, string::s_Newline);
+        strlcpy(stats_msg, string::s_X35, stats_capacity);
+        strlcat(stats_msg, attacker_race_name, stats_capacity);
+        strlcat(stats_msg, string::s_X255, stats_capacity);
+        strlcat(stats_msg, defender_race_name, stats_capacity);
+        strlcat(stats_msg, string::s_Newline, stats_capacity);
 
         KEN::Ken_Get_Text_Message_(99 /* 0x63 */, msg_buffer, 80);
-        strcat(stats_msg, msg_buffer);
-        strcat(stats_msg, string::s_Xplus25);
+        strlcat(stats_msg, msg_buffer, stats_capacity);
+        strlcat(stats_msg, string::s_Xplus25, stats_capacity);
 
         KEN::Ken_Get_Text_Message_(100 /* 0x64 */, msg_buffer, 80);
-        strcat(stats_msg, msg_buffer);
-        strcat(stats_msg, string::s_X227);
+        strlcat(stats_msg, msg_buffer, stats_capacity);
+        strlcat(stats_msg, string::s_X227, stats_capacity);
 
         KEN::Ken_Get_Text_Message_(99 /* 0x63 */, msg_buffer, 80);
-        strcat(stats_msg, msg_buffer);
-        strcat(stats_msg, string::s_Xplus21);
+        strlcat(stats_msg, msg_buffer, stats_capacity);
+        strlcat(stats_msg, string::s_Xplus21, stats_capacity);
 
         KEN::Ken_Get_Text_Message_(100 /* 0x64 */, msg_buffer, 80);
-        strcat(stats_msg, msg_buffer);
-        strcat(stats_msg, string::s_Newline);
+        strlcat(stats_msg, msg_buffer, stats_capacity);
+        strlcat(stats_msg, string::s_Newline, stats_capacity);
 
         for (int i = 0; i < 6; ++i) {
             if (attacker_total_ships[i] + defender_total_ships[i] > 0) {
-                strcat(stats_msg, string::s_X18);
+                strlcat(stats_msg, string::s_X18, stats_capacity);
                 if (attacker_total_ships[i] == 0) {
-                    strcat(stats_msg, string::s_Dash);
+                    strlcat(stats_msg, string::s_Dash, stats_capacity);
                 } else {
                     itoa(attacker_total_ships[i], itoa_buffer, 10);
-                    strcat(stats_msg, itoa_buffer);
+                    strlcat(stats_msg, itoa_buffer, stats_capacity);
                 }
 
-                strcat(stats_msg, string::s_X80);
+                strlcat(stats_msg, string::s_X80, stats_capacity);
                 if (attacker_lost_ships[i] == 0) {
-                    strcat(stats_msg, string::s_Dash);
+                    strlcat(stats_msg, string::s_Dash, stats_capacity);
                 } else {
                     itoa(attacker_lost_ships[i], itoa_buffer, 10);
-                    strcat(stats_msg, itoa_buffer);
+                    strlcat(stats_msg, itoa_buffer, stats_capacity);
                 }
 
-                strcat(stats_msg, string::s_X120);
-                strcat(stats_msg, TECHDATA::_hull_data[i].size_name);
+                strlcat(stats_msg, string::s_X120, stats_capacity);
+                strlcat(stats_msg, TECHDATA::_hull_data[i].size_name, stats_capacity);
 
-                strcat(stats_msg, string::s_X250);
+                strlcat(stats_msg, string::s_X250, stats_capacity);
                 if (defender_total_ships[i] == 0) {
-                    strcat(stats_msg, string::s_Dash);
+                    strlcat(stats_msg, string::s_Dash, stats_capacity);
                 } else {
                     itoa(defender_total_ships[i], itoa_buffer, 10);
-                    strcat(stats_msg, itoa_buffer);
+                    strlcat(stats_msg, itoa_buffer, stats_capacity);
                 }
 
-                strcat(stats_msg, string::s_X312);
+                strlcat(stats_msg, string::s_X312, stats_capacity);
                 if (defender_lost_ships[i] == 0) {
-                    strcat(stats_msg, string::s_Dash);
+                    strlcat(stats_msg, string::s_Dash, stats_capacity);
                 } else {
                     itoa(defender_lost_ships[i], itoa_buffer, 10);
-                    strcat(stats_msg, itoa_buffer);
+                    strlcat(stats_msg, itoa_buffer, stats_capacity);
                 }
-                strcat(stats_msg, string::s_Newline);
+                strlcat(stats_msg, string::s_Newline, stats_capacity);
             }
         }
 
         if (special_hull_idx != -1) {
-            strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_hull_data[special_hull_idx].name);
-            strcat(stats_msg, string::s_X250);
-            strcat(stats_msg, string::s_1);
-            strcat(stats_msg, string::s_X312);
+            strlcat(stats_msg, string::s_X120, stats_capacity);
+            strlcat(stats_msg, TECHDATA::_hull_data[special_hull_idx].name, stats_capacity);
+            strlcat(stats_msg, string::s_X250, stats_capacity);
+            strlcat(stats_msg, string::s_1, stats_capacity);
+            strlcat(stats_msg, string::s_X312, stats_capacity);
             if (special_alive) {
-                strcat(stats_msg, string::s_Dash);
+                strlcat(stats_msg, string::s_Dash, stats_capacity);
             } else {
-                strcat(stats_msg, string::s_1);
+                strlcat(stats_msg, string::s_1, stats_capacity);
             }
-            strcat(stats_msg, string::s_Newline);
+            strlcat(stats_msg, string::s_Newline, stats_capacity);
         }
 
         if (colony_damage_flags & 0x1) {
-            strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[BUILDING_MISSILE_BASE].name);
-            strcat(stats_msg, string::s_X250);
-            strcat(stats_msg, string::s_1);
-            strcat(stats_msg, string::s_X312);
+            strlcat(stats_msg, string::s_X120, stats_capacity);
+            strlcat(stats_msg, TECHDATA::_buildings[BUILDING_MISSILE_BASE].name, stats_capacity);
+            strlcat(stats_msg, string::s_X250, stats_capacity);
+            strlcat(stats_msg, string::s_1, stats_capacity);
+            strlcat(stats_msg, string::s_X312, stats_capacity);
             if (MOX::_colony_defense_flags & 0x1) {
-                strcat(stats_msg, string::s_Dash);
+                strlcat(stats_msg, string::s_Dash, stats_capacity);
             } else {
-                strcat(stats_msg, string::s_1);
+                strlcat(stats_msg, string::s_1, stats_capacity);
             }
-            strcat(stats_msg, string::s_Newline);
+            strlcat(stats_msg, string::s_Newline, stats_capacity);
         }
 
         if (colony_damage_flags & 0x2) {
-            strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[BUILDING_GROUND_BATTERIES].name);
-            strcat(stats_msg, string::s_X250);
-            strcat(stats_msg, string::s_1);
-            strcat(stats_msg, string::s_X312);
+            strlcat(stats_msg, string::s_X120, stats_capacity);
+            strlcat(stats_msg, TECHDATA::_buildings[BUILDING_GROUND_BATTERIES].name, stats_capacity);
+            strlcat(stats_msg, string::s_X250, stats_capacity);
+            strlcat(stats_msg, string::s_1, stats_capacity);
+            strlcat(stats_msg, string::s_X312, stats_capacity);
             if (MOX::_colony_defense_flags & 0x2) {
-                strcat(stats_msg, string::s_Dash);
+                strlcat(stats_msg, string::s_Dash, stats_capacity);
             } else {
-                strcat(stats_msg, string::s_1);
+                strlcat(stats_msg, string::s_1, stats_capacity);
             }
-            strcat(stats_msg, string::s_Newline);
+            strlcat(stats_msg, string::s_Newline, stats_capacity);
         }
 
         if (colony_damage_flags & 0x8) {
-            strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[BUILDING_FIGHTER_GARRISON].name);
-            strcat(stats_msg, string::s_X250);
-            strcat(stats_msg, string::s_1);
-            strcat(stats_msg, string::s_X312);
+            strlcat(stats_msg, string::s_X120, stats_capacity);
+            strlcat(stats_msg, TECHDATA::_buildings[BUILDING_FIGHTER_GARRISON].name, stats_capacity);
+            strlcat(stats_msg, string::s_X250, stats_capacity);
+            strlcat(stats_msg, string::s_1, stats_capacity);
+            strlcat(stats_msg, string::s_X312, stats_capacity);
             if (MOX::_colony_defense_flags & 0x8) {
-                strcat(stats_msg, string::s_Dash);
+                strlcat(stats_msg, string::s_Dash, stats_capacity);
             } else {
-                strcat(stats_msg, string::s_1);
+                strlcat(stats_msg, string::s_1, stats_capacity);
             }
-            strcat(stats_msg, string::s_Newline);
+            strlcat(stats_msg, string::s_Newline, stats_capacity);
         }
 
         if (colony_damage_flags & 0x4) {
-            strcat(stats_msg, string::s_X120);
-            strcat(stats_msg, TECHDATA::_buildings[BUILDING_STELLAR_CONVERTER].name);
-            strcat(stats_msg, string::s_X250);
-            strcat(stats_msg, string::s_1);
-            strcat(stats_msg, string::s_X312);
+            strlcat(stats_msg, string::s_X120, stats_capacity);
+            strlcat(stats_msg, TECHDATA::_buildings[BUILDING_STELLAR_CONVERTER].name, stats_capacity);
+            strlcat(stats_msg, string::s_X250, stats_capacity);
+            strlcat(stats_msg, string::s_1, stats_capacity);
+            strlcat(stats_msg, string::s_X312, stats_capacity);
             if (MOX::_colony_defense_flags & 0x4) {
-                strcat(stats_msg, string::s_Dash);
+                strlcat(stats_msg, string::s_Dash, stats_capacity);
             } else {
-                strcat(stats_msg, string::s_1);
+                strlcat(stats_msg, string::s_1, stats_capacity);
             }
-            strcat(stats_msg, string::s_Newline);
+            strlcat(stats_msg, string::s_Newline, stats_capacity);
         }
 
-        strcat(stats_msg, string::s_Newline2);
-        strcat(stats_msg, string::s_2);
+        strlcat(stats_msg, string::s_Newline2, stats_capacity);
+        strlcat(stats_msg, string::s_2, stats_capacity);
         if (outcome_type > 0) {
             KEN::Ken_Get_Text_Message_(101 /* 0x65 */, msg_buffer, 80);
         } else if (outcome_type < 0) {
@@ -1255,7 +1267,7 @@ namespace COMBAT {
         } else {
             KEN::Ken_Get_Text_Message_(103 /* 0x67 */, msg_buffer, 80);
         }
-        strcat(stats_msg, msg_buffer);
+        strlcat(stats_msg, msg_buffer, stats_capacity);
     }
 
     /**

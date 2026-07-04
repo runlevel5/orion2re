@@ -1440,7 +1440,7 @@ namespace aidesign {
         } else {
             design->picture_num = (int8_t)game_random::Random_(8) + (int8_t)hull_idx * 8 - 1;
             uint8_t player_race = player->race;
-            DESIGN::Get_Ship_Design_Name_(player_race, hull_idx, (int16_t)(design->picture_num % 8), design->name);
+            DESIGN::Get_Ship_Design_Name_(player_race, hull_idx, (int16_t)(design->picture_num % 8), design->name, sizeof(design->name));
         }
 
         if (ship_class == 7) {

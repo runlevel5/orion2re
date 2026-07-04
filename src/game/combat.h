@@ -13,7 +13,7 @@ namespace COMBAT {
      * @param summary Output summary text buffer.
      * @param details Output details text buffer.
      */
-    int16_t __cdecl Strategic_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, char* summary, char* details);
+    int16_t __cdecl Strategic_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, char* summary, int32_t summary_size, char* details, int32_t details_size);
 
     /**
      * Scan the supplied ships and record the highest available officer combat bonuses.
@@ -115,7 +115,7 @@ namespace COMBAT {
      * @param colony_damage_flags Initial colony defense flags snapshot.
      * @param outcome_type Final combat outcome code.
      */
-    void __cdecl Build_End_Of_Combat_Message_(char* result_msg, char* stats_msg, int16_t star_idx, int16_t colony_damage_flags, int16_t outcome_type);
+    void __cdecl Build_End_Of_Combat_Message_(char* result_msg, int32_t result_msg_size, char* stats_msg, int32_t stats_msg_size, int16_t star_idx, int16_t colony_damage_flags, int16_t outcome_type);
 
     /**
      * Display the supplied summary and details strings in a text box.
@@ -150,7 +150,7 @@ namespace COMBAT {
      * @param player_idx Non-player combatant index.
      * @param out_name Destination text buffer.
      */
-    void __cdecl Get_Non_Player_Name_(int16_t player_idx, char* out_name);
+    void __cdecl Get_Non_Player_Name_(int16_t player_idx, char* out_name, int32_t out_name_size);
 
     /**
      * Resolve strategic colony bombardment and return remaining colony hit units.

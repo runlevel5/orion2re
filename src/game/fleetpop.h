@@ -59,7 +59,7 @@ namespace FLEETPOP {
         int16_t* info_type);
 
     /** Formats the currently scanned fleet-ship name into the caller-provided buffer. */
-    void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text);
+    void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text, uint32_t out_text_size);
 
     extern uint8_t _n_added_buttons;
 

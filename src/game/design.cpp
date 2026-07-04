@@ -25,11 +25,7 @@ namespace DESIGN {
         struct_::Clear_Structure_(d, sizeof(*d));
 
         char* name = HACCESS::Design_Name_(player_idx, design_idx);
-        int32_t name_length = 0;
-        while (name[name_length] != '\0') name_length++;
-        for (int32_t i = 0; i <= name_length && i < (int32_t)sizeof(d->name); ++i) {
-            d->name[i] = name[i];
-        }
+        strlcpy(d->name, name, sizeof(d->name));
 
         d->ftl_type = INITSHIP::Best_Warp_Drive_(player_idx);
         d->drive_speed = TECHDATA::_drives[d->ftl_type].warp_speed;
@@ -107,13 +103,7 @@ namespace DESIGN {
 
         MOX::_design = &current_design;
 
-        // strcpy(current_design.name, ship_design->name)
-        char* src = ship_design->name;
-        char* dst = current_design.name;
-        while (*src) {
-            *dst++ = *src++;
-        }
-        *dst = '\0';
+        strlcpy(current_design.name, ship_design->name, sizeof(current_design.name));
 
         current_design.ftl_type = static_cast<int16_t>(ship_design->ftl_type);
         current_design.drive_speed = TECHDATA::_drives[current_design.ftl_type].warp_speed;
@@ -762,17 +752,13 @@ namespace DESIGN {
 
         if (MOX::_design->name[0] == '\0') {
             char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design_idx);
-            char* dest = MOX::_design->name;
-            while ((*dest++ = *default_name++) != '\0');
+            strlcpy(MOX::_design->name, default_name, sizeof(MOX::_design->name));
         }
 
         s_player* plr = &MOX::_player[player_idx];
         s_ship_design* target_design = &plr->ship_designs[design_idx];
 
-        // Copy name from current design to player record
-        char* src_name = MOX::_design->name;
-        char* dest_name = target_design->name;
-        while ((*dest_name++ = *src_name++) != '\0');
+        strlcpy(target_design->name, MOX::_design->name, sizeof(target_design->name));
 
         target_design->size = (int8_t)MOX::_design->ship_size;
         target_design->shield_type = (int8_t)MOX::_design->shield;
@@ -901,7 +887,7 @@ namespace DESIGN {
             } else if (clicked_field + weapon_field_id == 0) {
                 int16_t weapon_type = MOX::_design->weapon_type[i];
                 if (weapon_type > 0) {
-                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_weapons[weapon_type].tech_app_id);
+                    EVANHELP::Get_Application_Description_(description_buffer, sizeof(description_buffer), TECHDATA::_weapons[weapon_type].tech_app_id);
                     TEXTBOX::Text_Box_(TECHDATA::_weapons[weapon_type].name, description_buffer);
                 }
             }
@@ -949,7 +935,7 @@ namespace DESIGN {
             } else if ((field_id + clicked_field_id == 0)) {
                 int16_t special_id = MOX::_design->special_devices[i];
                 if (special_id > 0) {
-                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_app_id);
+                    EVANHELP::Get_Application_Description_(description_buffer, sizeof(description_buffer), TECHDATA::_specials[special_id].tech_app_id);
 
                     const char* title = TECHDATA::_specials[special_id].name;
                     TEXTBOX::Text_Box_(title, description_buffer);
@@ -973,7 +959,7 @@ namespace DESIGN {
             }
 
             if (_changed_design_name == 0) {
-                Get_Ship_Design_Name_(player_race, ship_size, icon_index, MOX::_design->name);
+                Get_Ship_Design_Name_(player_race, ship_size, icon_index, MOX::_design->name, sizeof(MOX::_design->name));
             }
         } else if (MOX::_ship_icon_rt_button == static_cast<uint16_t>(field)) {
             int16_t ship_size = MOX::_design->ship_size;
@@ -986,7 +972,7 @@ namespace DESIGN {
             }
 
             if (_changed_design_name == 0) {
-                Get_Ship_Design_Name_(player_race, ship_size, icon_index, MOX::_design->name);
+                Get_Ship_Design_Name_(player_race, ship_size, icon_index, MOX::_design->name, sizeof(MOX::_design->name));
             }
         }
     }
@@ -1021,7 +1007,11 @@ namespace DESIGN {
         Update_Calculated_Design_Data_(player_num);
     }
 
-    void __cdecl Get_Tech_Description_Lbx_Name_(char* buffer) {
+    void __cdecl Get_Tech_Description_Lbx_Name_(char* buffer, int32_t buffer_size) {
+        if (buffer_size <= 0) {
+            return;
+        }
+
         const char* src;
 
         switch (MOX::_settings.language) {
@@ -1042,9 +1032,7 @@ namespace DESIGN {
                 break;
         }
 
-        char* d = buffer;
-        const char* s = src;
-        while ((*d++ = *s++));
+        strlcpy(buffer, src, (size_t)buffer_size);
     }
 
     int16_t __cdecl Printed_Design_Cost_() {
@@ -1064,9 +1052,7 @@ namespace DESIGN {
     void __cdecl Build_Design_Template_(s_ship_design* template_out) {
         s_current_design* d = MOX::_design;
 
-        char* src = d->name;
-        char* dest = template_out->name;
-        while ((*dest++ = *src++) != '\0');
+        strlcpy(template_out->name, d->name, sizeof(template_out->name));
 
         template_out->size = (int8_t)d->ship_size;
         template_out->shield_type = SHIELD_NO_SHIELD;
@@ -1139,7 +1125,11 @@ namespace DESIGN {
         }
     }
 
-    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name) {
+    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name, int32_t out_name_size) {
+        if (out_name_size <= 0) {
+            return;
+        }
+
         allocate::Push_Block_(MOX::_global_data_seg);
 
         // shipname.lbx entry: variant_idx + ((race_idx * 6 + design_idx) * 8)
@@ -1157,7 +1147,7 @@ namespace DESIGN {
 
         allocate::Pop_Block_(MOX::_global_data_seg);
 
-        strcpy(out_name, loaded_name);
+        strlcpy(out_name, loaded_name, (size_t)out_name_size);
     }
 
     void __cdecl Set_Flashing_Colors_(int16_t font_style, int16_t spacing) {
@@ -1408,36 +1398,41 @@ namespace DESIGN {
         return result_id;
     }
 
-    void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str) {
+    void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str, int32_t dest_str_size) {
+        if (dest_str_size <= 0) {
+            return;
+        }
+
+        const size_t destination_size = (size_t)dest_str_size;
         char buffer[8];
         dest_str[0] = '\0';
 
         if (arc_flags & 0x01) {
             KEN::Ken_Get_Text_Message_(3, buffer, 6);
-            strcat(dest_str, buffer);
+            strlcat(dest_str, buffer, destination_size);
             return;
         }
 
         if (arc_flags & 0x02) {
             KEN::Ken_Get_Text_Message_(4, buffer, 6);
-            strcat(dest_str, buffer);
+            strlcat(dest_str, buffer, destination_size);
             return;
         }
 
         if (arc_flags & 0x04) {
             KEN::Ken_Get_Text_Message_(6, buffer, 6);
-            strcat(dest_str, buffer);
+            strlcat(dest_str, buffer, destination_size);
             return;
         }
 
         if (arc_flags & 0x08) {
             KEN::Ken_Get_Text_Message_(5, buffer, 6);
-            strcat(dest_str, buffer);
+            strlcat(dest_str, buffer, destination_size);
             return;
         }
 
         if (arc_flags & 0x10) {
-            strcpy(dest_str, "360");
+            strlcpy(dest_str, "360", destination_size);
         }
     }
 
@@ -1519,7 +1514,12 @@ namespace DESIGN {
         return (int16_t)result;
     }
 
-    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer) {
+    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int32_t out_buffer_size) {
+        if (out_buffer_size <= 0) {
+            return;
+        }
+
+        const size_t destination_size = (size_t)out_buffer_size;
         bool any_mod = false;
         out_buffer[0] = '\0';
 
@@ -1527,14 +1527,8 @@ namespace DESIGN {
             if ((mod_mask >> (i & 0x1f)) & 1) {
                 const char* mod_name = TECHDATA::_weapon_modifications[i].name_plural;
 
-                char* p = out_buffer;
-                while (*p) p++;
-                while ((*p++ = *mod_name++));
-
-                const char* sep = s_comma_space;
-                p = out_buffer;
-                while (*p) p++;
-                while ((*p++ = *sep++));
+                strlcat(out_buffer, mod_name, destination_size);
+                strlcat(out_buffer, s_comma_space, destination_size);
 
                 any_mod = true;
             }
@@ -1542,16 +1536,11 @@ namespace DESIGN {
 
         if (!any_mod) {
             const char* no_mods = HAROLD::H_Message_(HESTR_064_NO_MODIFICATIONS);
-            char* p = out_buffer;
-            while ((*p++ = *no_mods++));
+            strlcpy(out_buffer, no_mods, destination_size);
         }
 
-        uint32_t len = 0;
-        while (out_buffer[len] != '\0') {
-            len++;
-        }
-
-        if (len > 2 && out_buffer[len - 2] == ',') {
+        size_t len = strlen(out_buffer);
+        if (len > 2 && out_buffer[len - 2] == ',' && out_buffer[len - 1] == ' ') {
             out_buffer[len - 2] = '\0';
         }
     }
@@ -1843,7 +1832,12 @@ namespace DESIGN {
         MOX::_design->weapon_ammo[last_active_slot] = 0;
     }
 
-    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t field_item_chosen, int16_t row_idx) {
+    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int32_t buffer_size, int16_t field_item_chosen, int16_t row_idx) {
+        if (buffer_size <= 0) {
+            return;
+        }
+
+        const size_t destination_size = (size_t)buffer_size;
         bool is_design_slot = false;
         int16_t weapon_idx = 0;
         int16_t weapon_id;
@@ -1920,17 +1914,17 @@ namespace DESIGN {
         }
 
         if (weapon_id == WEAPON_NO_WEAPONS) {
-            strcpy(buffer, "0");
+            strlcpy(buffer, "0", destination_size);
             return;
         }
 
         if (special_msg[0] != '\0') {
-            strcpy(buffer, special_msg);
+            strlcpy(buffer, special_msg, destination_size);
         } else {
             if (min_damage != max_damage) {
-                sprintf(buffer, "%d-%d", (int)min_damage, (int)max_damage);
+                snprintf(buffer, destination_size, "%d-%d", (int)min_damage, (int)max_damage);
             } else {
-                sprintf(buffer, "%d", (int)max_damage);
+                snprintf(buffer, destination_size, "%d", (int)max_damage);
             }
         }
     }

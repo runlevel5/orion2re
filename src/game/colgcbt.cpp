@@ -805,7 +805,7 @@ namespace COLGCBT {
         }
 
         if (side_info->combat_modifiers.officer_idx > 0) {
-            OFFICER::Officer_Name_(officer_name, side_info->player_id, side_info->combat_modifiers.officer_idx);
+            OFFICER::Officer_Name_(officer_name, sizeof(officer_name), side_info->player_id, side_info->combat_modifiers.officer_idx);
             Print_Data_(officer_name, side_info->combat_modifiers.officer_bonus, y_pos, side_info);
         }
     }

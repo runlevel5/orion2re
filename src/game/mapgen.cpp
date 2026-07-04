@@ -94,7 +94,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             while (MOX::_star[i].name[name_len] != '\0') name_len++;
 
             if (name_len < 7) {
-                strcpy(formatted_name + strlen(formatted_name), "w");
+                strlcat(formatted_name, "w", sizeof(formatted_name));
             }
 
             collision_w = fonts::Get_String_Width_(formatted_name);

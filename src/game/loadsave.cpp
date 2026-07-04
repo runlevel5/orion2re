@@ -612,7 +612,7 @@ namespace LOADSAVE {
 
             slot_status[game_index] = 0;
 
-            if (!dos::DIR_(filename_buffer, filename_buffer)) {
+            if (!dos::DIR_(filename_buffer, filename_buffer, sizeof(filename_buffer))) {
                 slot_status[game_index] = 1;
             } else {
                 if (LOADSAVE::Check_Magic_Number_(filename_buffer) < 1) {
@@ -1758,8 +1758,9 @@ namespace LOADSAVE {
             return;
         }
 
-        sprintf(
+        snprintf(
                 out_string,
+                25,
                 "%3s %2d, %-4d  %2d:%2d",
                 LOADSAVE::_months[month],
                 static_cast<int>(day),

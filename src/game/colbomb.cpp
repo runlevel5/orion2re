@@ -26,7 +26,7 @@ namespace COLBOMB {
 
         COLONY::Set_Colony_Font_To_(4);
 
-        HACCESS::Race_Name_(_backup_results_ptr->attacker_idx, attacker_name);
+        HACCESS::Race_Name_(_backup_results_ptr->attacker_idx, attacker_name, sizeof(attacker_name));
 
         line_count = 1;
 

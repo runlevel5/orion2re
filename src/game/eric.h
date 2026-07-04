@@ -76,9 +76,10 @@ namespace ERIC {
 
     /* Builds formatted text into dest, either replacing or extending the current contents.
        dest: Destination buffer.
+       dest_size: Size of dest in bytes.
        build_mode: 0 replaces dest; nonzero appends using the localized join format.
        format: printf-style source format string. */
-    void __cdecl String_Builder2_(char* dest, int16_t build_mode, const char* format, ...);
+    void __cdecl String_Builder2_(char* dest, int32_t dest_size, int16_t build_mode, const char* format, ...);
 
     /* Returns the format prefix used when a numeric value should display as negative-colored text. */
     const char* __cdecl Red_If_Negative_Fmt_String_(int16_t value);

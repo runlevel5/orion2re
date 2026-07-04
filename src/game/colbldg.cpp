@@ -715,7 +715,7 @@ namespace COLBLDG {
         }
     }
 
-    void __cdecl Get_App_Description_String_(char* dest_str, int16_t app_id) {
+    void __cdecl Get_App_Description_String_(char* dest_str, uint32_t dest_str_size, int16_t app_id) {
         char lbx_name[20];
         s_help_record* record_ptr;
 
@@ -730,7 +730,7 @@ namespace COLBLDG {
 
         _desc_record_ptr = (uint8_t*)record_ptr;
 
-        strcpy(dest_str, record_ptr->body);
+        strlcpy(dest_str, record_ptr->body, dest_str_size);
     }
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {
@@ -1199,7 +1199,7 @@ namespace COLBLDG {
         for (int i = 0; i < 8; i++) {
             if (design->ship_weapon[i].type != 0) {
                 char temp_weapon_str[500];
-                Build_Weapon_String_(&design->ship_weapon[i], temp_weapon_str, '\0', design->ship_weapon[i].count);
+                Build_Weapon_String_(&design->ship_weapon[i], temp_weapon_str, sizeof(temp_weapon_str), '\0', design->ship_weapon[i].count);
 
                 if (fonts::Get_String_Width_(temp_weapon_str) <= 110) {
                     int str_id = ((weapons_added % 2) == 0) ? 87 : 88;
@@ -2230,7 +2230,7 @@ namespace COLBLDG {
         }
     }
 
-    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon, char* dest, uint8_t include_postfix_modifiers, uint8_t weapon_count) {
+    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon, char* dest, uint32_t dest_size, uint8_t include_postfix_modifiers, uint8_t weapon_count) {
         char buf1[500];
         char buf2[500];
         char buf3[500];
@@ -2261,9 +2261,9 @@ namespace COLBLDG {
         }
 
         if (include_postfix_modifiers != 0) {
-            sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, buf3);
+            snprintf(dest, dest_size, ESTRINGS::E_Strings_(0x51), buf1, buf2, buf3);
         } else {
-            sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, ESTRINGS::E_Strings_(0xC));
+            snprintf(dest, dest_size, ESTRINGS::E_Strings_(0x51), buf1, buf2, ESTRINGS::E_Strings_(0xC));
         }
     }
 

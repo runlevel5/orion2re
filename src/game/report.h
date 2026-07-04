@@ -73,9 +73,10 @@ namespace REPORT {
     /**
      * Formats a report record into a displayable text buffer.
      * @param buffer Destination text buffer.
+     * @param buffer_size Destination text buffer size in bytes.
      * @param report Report to format.
      */
-    void __cdecl sprintf_report_(char* buffer, s_report* report);
+    void __cdecl sprintf_report_(char* buffer, uint32_t buffer_size, s_report* report);
 
     /**
      * Runs the report pipeline for a player and optionally opens report UI.

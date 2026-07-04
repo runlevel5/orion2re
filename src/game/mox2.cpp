@@ -218,7 +218,7 @@ namespace MOX2 {
 
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Set_Mox_Language start");
 
-        if (dos::DIR_("language.ini", dir_buffer) != 0) {
+        if (dos::DIR_("language.ini", dir_buffer, sizeof(dir_buffer)) != 0) {
             FILE* file = fopen_case("language.ini", "rt");
             fgets(line_buffer, 0x3C, file);
             fclose(file);
@@ -254,7 +254,7 @@ namespace MOX2 {
         MOX::_sound_buffer = allocate::Allocate_Space_(0x64000);
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: sound buffer allocated=%p", MOX::_sound_buffer);
 
-        if (dos::DIR_("MOX.SET", mox_set_dir) != 0) {
+        if (dos::DIR_("MOX.SET", mox_set_dir, sizeof(mox_set_dir)) != 0) {
             FILEDEF::Load_Game_Settings_();
             if (MOX::_settings.version != 0x82) {
                 FILEDEF::Update_Game_Settings_Version_Number_();
@@ -455,7 +455,7 @@ namespace MOX2 {
 
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Set_Mox_Alt_Path start");
 
-        if (!dos::DIR_("orioncd.ini", alternate_path)) {
+        if (!dos::DIR_("orioncd.ini", alternate_path, sizeof(alternate_path))) {
             if (MOX::_settings.language == 0) {
                 error_text = "ORIONCD.INI not found. Please Re-Install Orion ][.";
             }
@@ -507,12 +507,12 @@ namespace MOX2 {
 
         snprintf(diplomat_path, sizeof(diplomat_path), "%sdiplomat.lbx", alternate_path);
 
-        if (dos::DIR_("diplomat.lbx", alternate_path)) {
+        if (dos::DIR_("diplomat.lbx", alternate_path, sizeof(alternate_path))) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: diplomat.lbx found in cwd");
             return;
         }
 
-        if (dos::DIR_(diplomat_path, alternate_path)) {
+        if (dos::DIR_(diplomat_path, alternate_path, sizeof(alternate_path))) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: diplomat.lbx found in alternate path");
             return;
         }

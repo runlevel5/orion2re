@@ -26,9 +26,7 @@ void* __cdecl Farload_Library_(const char* lib_name, int32_t entry_idx, void* al
     }
 
     if (!file_already_open) {
-        const char* src = lib_name;
-        char* dst = farload::_farload_file_name;
-        while ((*dst++ = *src++) != '\0');
+        strlcpy(farload::_farload_file_name, lib_name, sizeof(farload::_farload_file_name));
 
         farload::_farload_fptr = fopen_case(lib_name, "rb");
         if (farload::_farload_fptr == nullptr) {
@@ -36,12 +34,8 @@ void* __cdecl Farload_Library_(const char* lib_name, int32_t entry_idx, void* al
                 farload::Error_Handler_(lib_name, 1, entry_idx);
             }
 
-            char* p = fallback_path;
-            char* s = farload::_secondary_drive_path;
-            while ((*p++ = *s++) != '\0');
-            --p;
-            s = farload::_farload_file_name;
-            while ((*p++ = *s++) != '\0');
+            strlcpy(fallback_path, farload::_secondary_drive_path, sizeof(fallback_path));
+            strlcat(fallback_path, farload::_farload_file_name, sizeof(fallback_path));
 
             farload::_farload_fptr = fopen_case(fallback_path, "rb");
             if (farload::_farload_fptr == nullptr) {
@@ -211,40 +205,14 @@ void* __cdecl Far_Reload_Next_Data_(const char* filename, int32_t entry_idx, voi
 
 void __cdecl Error_Handler_(const char* filename, int32_t error_code, int32_t entry_num) {
     char message[120];
-    char itoa_buf[20];
-
-    auto strcpy_custom = [](char* dest, const char* src) -> char* {
-        while ((*dest = *src) != '\0') {
-            dest++;
-            src++;
-        }
-        return dest;
-    };
-
-    auto strcat_custom = [](char* dest, const char* src) -> char* {
-        while (*dest != '\0') dest++;
-        while ((*dest = *src) != '\0') {
-            dest++;
-            src++;
-        }
-        return dest;
-    };
-
-    char* current = strcpy_custom(message, filename);
-    current = strcat_custom(message, " [entry ");
-
-    itoa(entry_num, itoa_buf, 10);
-    current = strcat_custom(message, itoa_buf);
-    current = strcat_custom(message, "] ");
-
-    const char* detail = nullptr;
+    const char* detail = "";
 
     if (error_code >= 1 && error_code <= 16) {
         switch (error_code) {
         case 1:  detail = " could not be found."; break;
         case 2:  detail = " has been corrupted."; break;
         case 3:
-            strcpy_custom(message, "Insufficient memory. You need at least 575K free. Try removing all TSR's.");
+            strlcpy(message, "Insufficient memory. You need at least 575K free. Try removing all TSR's.", sizeof(message));
             exitm::Exit_With_Message(message);
             return;
         case 4:  detail = " has an improper entry number."; break;
@@ -258,9 +226,7 @@ void __cdecl Error_Handler_(const char* filename, int32_t error_code, int32_t en
         }
     }
 
-    if (detail) {
-        strcat_custom(message, detail);
-    }
+    snprintf(message, sizeof(message), "%s [entry %d]%s", filename, (int)entry_num, detail);
 
     exitm::Exit_With_Message(message);
 }

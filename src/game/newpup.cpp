@@ -178,6 +178,7 @@ namespace NEWPUP {
         if (side_info->combat_modifiers.officer_idx > 0) {
             OFFICER::Officer_Name_(
                 officer_name,
+                sizeof(officer_name),
                 side_info->player_id,
                 (int16_t)side_info->combat_modifiers.officer_idx);
 

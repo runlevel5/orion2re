@@ -376,7 +376,7 @@ namespace HACCESS {
     char* __cdecl Race_Name_String_(int16_t race_index) {
         char local_buffer[20];
 
-        Race_Name_(race_index, local_buffer);
+        Race_Name_(race_index, local_buffer, sizeof(local_buffer));
 
         strlcpy(MOX::_temp_string, local_buffer, sizeof(MOX::_temp_string));
 
@@ -680,15 +680,19 @@ namespace HACCESS {
         return enemy_approaching;
     }
 
-    void __cdecl Race_Name_(int16_t race_id, char* race_name_out) {
-        strcpy(race_name_out, "Human");
+    void __cdecl Race_Name_(int16_t race_id, char* race_name_out, uint32_t race_name_out_size) {
+        if (race_name_out == nullptr || race_name_out_size == 0) {
+            return;
+        }
+
+        strlcpy(race_name_out, "Human", race_name_out_size);
 
         if (race_id < MAX_PLAYERS) {
-            strcpy(race_name_out, MOX::_player[race_id].race_name);
+            strlcpy(race_name_out, MOX::_player[race_id].race_name, race_name_out_size);
         } else if (race_id == MAX_PLAYERS) {
-            strcpy(race_name_out, MOX::_race_names[13]);
+            strlcpy(race_name_out, MOX::_race_names[13], race_name_out_size);
         } else {
-            strcpy(race_name_out, MOX::_race_names[race_id + 5]);
+            strlcpy(race_name_out, MOX::_race_names[race_id + 5], race_name_out_size);
         }
     }
 

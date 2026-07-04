@@ -220,7 +220,7 @@ namespace DESBOX {
                         if (item_id <= 0) {
                             TEXTBOX::Draw_Help_Entry_(691);
                         } else {
-                            EVANHELP::Get_Application_Description_(desc, TECHDATA::_specials[item_id].tech_app_id);
+                            EVANHELP::Get_Application_Description_(desc, sizeof(desc), TECHDATA::_specials[item_id].tech_app_id);
                             TEXTBOX::Text_Box_(TECHDATA::_specials[item_id].name, desc);
                         }
                     }
@@ -501,7 +501,7 @@ namespace DESBOX {
             0x28
         );
 
-        if (!Weapon_Choice_Valid_(choice_str)) {
+        if (!Weapon_Choice_Valid_(choice_str, sizeof(choice_str))) {
             int16_t accept_y = _replacement_box_base_y + total_top_mid_h_minus_9 + 0x8b;
             int16_t accept_x = _replacement_box_base_x + 0x21a;
             int16_t accept_h = animate::Get_Height_(MOX::_weapons_accept_button_seg);
@@ -603,7 +603,7 @@ namespace DESBOX {
             return;
         }
 
-        if (DESBOX::Weapon_Choice_Valid_(msg_buffer) == 0) {
+        if (DESBOX::Weapon_Choice_Valid_(msg_buffer, sizeof(msg_buffer)) == 0) {
             GENDRAW::Message_Box_(msg_buffer);
             return;
         }
@@ -926,10 +926,10 @@ namespace DESBOX {
             const char* name_ptr = nullptr;
 
             if (MOX::_design_screen_replacement_type == 2) {
-                EVANHELP::Get_Application_Description_(description, TECHDATA::_shields[choice_item].tech_app_id);
+                EVANHELP::Get_Application_Description_(description, sizeof(description), TECHDATA::_shields[choice_item].tech_app_id);
                 name_ptr = TECHDATA::_shields[choice_item].name;
             } else if (MOX::_design_screen_replacement_type == 8) {
-                EVANHELP::Get_Application_Description_(description, TECHDATA::_computers[choice_item].tech_app_id);
+                EVANHELP::Get_Application_Description_(description, sizeof(description), TECHDATA::_computers[choice_item].tech_app_id);
                 name_ptr = TECHDATA::_computers[choice_item].name;
             }
 
@@ -1499,7 +1499,7 @@ namespace DESBOX {
                 if (weap_idx <= 0) {
                     TEXTBOX::Draw_Help_Entry_(0x2B2);
                 } else {
-                    EVANHELP::Get_Application_Description_(tech_application_description, TECHDATA::_weapons[weap_idx].tech_app_id);
+                    EVANHELP::Get_Application_Description_(tech_application_description, sizeof(tech_application_description), TECHDATA::_weapons[weap_idx].tech_app_id);
                     TEXTBOX::Text_Box_(TECHDATA::_weapons[weap_idx].name, tech_application_description);
                 }
             }
@@ -2102,16 +2102,20 @@ namespace DESBOX {
         return 0;
     }
 
-    int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out) {
+    int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out, int32_t error_msg_out_size) {
         int16_t is_valid = 1;
-        error_msg_out[0] = '\0';
+        if (error_msg_out_size > 0) {
+            error_msg_out[0] = '\0';
+        }
 
         if (DESBOX::_field_item_chosen > -1) {
             int16_t weapon_idx = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
             if (DESIGN::Weapon_Type_(weapon_idx) == WEAPON_TYPE_BEAM && DESBOX::_weapon_replacement_arcs == -1) {
                 is_valid = 0;
                 const char* msg = HAROLD::H_Message_(0x44 /* MSG_MUST_SELECT_FIRING_ARC */);
-                strcpy(error_msg_out, msg);
+                if (error_msg_out_size > 0) {
+                    strlcpy(error_msg_out, msg, (size_t)error_msg_out_size);
+                }
             }
         }
 
@@ -2279,7 +2283,7 @@ namespace DESBOX {
             fonts::Print_(x + 0x0C, cur_y, name_str);
             MISC::Set_Font_Default_Spacing_();
 
-            DESIGN::Design_Weapon_Damage_String_(weapon_idx, name_str, _field_item_chosen, row_idx);
+            DESIGN::Design_Weapon_Damage_String_(weapon_idx, name_str, sizeof(name_str), _field_item_chosen, row_idx);
 
             if (strcmp(name_str, HAROLD::H_Message_(0x65)) == 0) {
                 MISC::Change_Font_Style_(1);

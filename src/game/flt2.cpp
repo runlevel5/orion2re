@@ -705,7 +705,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
             no_weapons = true;
         } else {
             char arc_str[20];
-            DESIGN::Weapon_Arc_String_(MOX::_ship[ship_idx].d.ship_weapon[i].firing_arc, arc_str);
+            DESIGN::Weapon_Arc_String_(MOX::_ship[ship_idx].d.ship_weapon[i].firing_arc, arc_str, sizeof(arc_str));
             int16_t wep_type = MOX::_ship[ship_idx].d.ship_weapon[i].type;
             int8_t count = MOX::_ship[ship_idx].d.ship_weapon[i].count;
             

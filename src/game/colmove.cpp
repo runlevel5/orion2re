@@ -279,6 +279,7 @@ namespace COLMOVE {
                             if (settle_result.no_room_at_destination == 0) {
                                 ERIC::String_Builder2_(
                                         message,
+                                        sizeof(message),
                                         0,
                                         ESTRINGS::E_Strings_(0xFE),
                                         (uint32_t)settle_result.eta_turns);
@@ -286,53 +287,54 @@ namespace COLMOVE {
                             } else {
                                 ERIC::String_Builder2_(
                                         message,
+                                        sizeof(message),
                                         0,
                                         ESTRINGS::E_Strings_(0xFC),
                                         (uint32_t)settle_result.eta_turns);
                                 line_count = 1;
                             }
                         } else if (settle_result.no_room_at_destination != 0) {
-                            ERIC::String_Builder2_(message, 0, ESTRINGS::E_Strings_(0xFD));
+                            ERIC::String_Builder2_(message, sizeof(message), 0, ESTRINGS::E_Strings_(0xFD));
                             line_count = 1;
                         }
 
                         if (settle_result.dest_is_outpost != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x1FD));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x1FD));
                             ++line_count;
                         }
 
                         if (settle_result.only_one_pop_left != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x241));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x241));
                             ++line_count;
                         }
 
                         if (settle_result.max_settlers_in_transit != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x24D));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x24D));
                             ++line_count;
                         }
 
                         if (settle_result.source_blockaded != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x207));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x207));
                             ++line_count;
                         }
 
                         if (settle_result.insufficient_freighters != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x184));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x184));
                             ++line_count;
                         }
 
                         if (settle_result.dest_owner_mismatch != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x211));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x211));
                             ++line_count;
                         }
 
                         if (settle_result.field10_0xa != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20F));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x20F));
                             ++line_count;
                         }
 
                         if (settle_result.selected_pop_flag_0x400 != 0) {
-                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20E));
+                            ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x20E));
                             ++line_count;
                         }
 
@@ -340,6 +342,7 @@ namespace COLMOVE {
                             if (moved_count > 0) {
                                 ERIC::String_Builder2_(
                                         message,
+                                        sizeof(message),
                                         line_count,
                                         ESTRINGS::E_Strings_(0x80),
                                         (int32_t)moved_count);
@@ -364,6 +367,7 @@ namespace COLMOVE {
                         if (settle_result.no_room_at_destination == 0) {
                             ERIC::String_Builder2_(
                                     message,
+                                    sizeof(message),
                                     0,
                                     ESTRINGS::E_Strings_(0xFE),
                                     (uint32_t)settle_result.eta_turns);
@@ -371,53 +375,54 @@ namespace COLMOVE {
                         } else {
                             ERIC::String_Builder2_(
                                     message,
+                                    sizeof(message),
                                     0,
                                     ESTRINGS::E_Strings_(0xFC),
                                     (uint32_t)settle_result.eta_turns);
                             line_count = 1;
                         }
                     } else if (settle_result.no_room_at_destination != 0) {
-                        ERIC::String_Builder2_(message, 0, ESTRINGS::E_Strings_(0xFD));
+                        ERIC::String_Builder2_(message, sizeof(message), 0, ESTRINGS::E_Strings_(0xFD));
                         line_count = 1;
                     }
 
                     if (settle_result.dest_is_outpost != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x1FD));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x1FD));
                         ++line_count;
                     }
 
                     if (settle_result.only_one_pop_left != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x241));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x241));
                         ++line_count;
                     }
 
                     if (settle_result.max_settlers_in_transit != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x24D));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x24D));
                         ++line_count;
                     }
 
                     if (settle_result.source_blockaded != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x207));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x207));
                         ++line_count;
                     }
 
                     if (settle_result.insufficient_freighters != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x184));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x184));
                         ++line_count;
                     }
 
                     if (settle_result.dest_owner_mismatch != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x211));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x211));
                         ++line_count;
                     }
 
                     if (settle_result.field10_0xa != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20F));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x20F));
                         ++line_count;
                     }
 
                     if (settle_result.selected_pop_flag_0x400 != 0) {
-                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20E));
+                        ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x20E));
                         ++line_count;
                     }
 
@@ -425,6 +430,7 @@ namespace COLMOVE {
                         if (moved_count > 0) {
                             ERIC::String_Builder2_(
                                     message,
+                                    sizeof(message),
                                     line_count,
                                     ESTRINGS::E_Strings_(0x80),
                                     (int32_t)moved_count);
@@ -467,6 +473,7 @@ namespace COLMOVE {
 
             ERIC::String_Builder2_(
                     message,
+                    sizeof(message),
                     0,
                     ESTRINGS::E_Strings_(0x1D1),
                     (int32_t)moved_count,
@@ -478,17 +485,17 @@ namespace COLMOVE {
             int16_t line_count = 1;
 
             if (settle_result.dest_blockaded != 0) {
-                ERIC::String_Builder2_(message, 1, ESTRINGS::E_Strings_(0x84));
+                ERIC::String_Builder2_(message, sizeof(message), 1, ESTRINGS::E_Strings_(0x84));
                 line_count = 2;
             }
 
             if (settle_result.field10_0xa != 0) {
-                ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x85));
+                ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x85));
                 ++line_count;
             }
 
             if (extra_success_notice) {
-                ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x83));
+                ERIC::String_Builder2_(message, sizeof(message), line_count, ESTRINGS::E_Strings_(0x83));
             }
 
             COLONY::Reset_Mouse_Picture_();

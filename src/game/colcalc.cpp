@@ -2651,7 +2651,7 @@ namespace COLCALC {
             _tmp_quotient[0] = '+';
         }
 
-        int32_t n_chars = sprintf(&_tmp_quotient[1], "%d", val / denominator);
+        int32_t n_chars = snprintf(&_tmp_quotient[1], sizeof(_tmp_quotient) - 1, "%d", val / denominator);
         char* fraction_ptr = &_tmp_quotient[1] + n_chars;
 
         int32_t remainder = val % denominator;
@@ -2670,8 +2670,9 @@ namespace COLCALC {
                 scaled_remainder = (int32_t)((uint32_t)remainder * (uint32_t)multiplier);
             }
 
-            if (multiplier != 0) {
-                sprintf(fraction_ptr, ".%d", scaled_remainder / denominator);
+            if (multiplier != 0 && n_chars >= 0 && static_cast<size_t>(n_chars) < sizeof(_tmp_quotient) - 1) {
+                size_t remaining_size = sizeof(_tmp_quotient) - 1 - static_cast<size_t>(n_chars);
+                snprintf(fraction_ptr, remaining_size + 1, ".%d", scaled_remainder / denominator);
             }
         }
 

@@ -117,7 +117,7 @@ namespace MAINMENU {
 
         bool can_continue = false;
         if (game_type == 0 || game_type == 1) {
-            if (dos::DIR_(save_filename, find_data) == 1) {
+            if (dos::DIR_(save_filename, find_data, sizeof(find_data)) == 1) {
                 can_continue = true;
             }
         }
@@ -128,7 +128,7 @@ namespace MAINMENU {
             _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field = -1000;
         }
 
-        if (MOX::_disallow_saves_code == 0 && dos::DIR_("save?.gam", find_data) == 1) {
+        if (MOX::_disallow_saves_code == 0 && dos::DIR_("save?.gam", find_data, sizeof(find_data)) == 1) {
             _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = fields::Add_Hidden_Field_(0x19F, 0xC3, 0x237, 0xD7, "L", 0x29);
         } else {
             _mainmenu->fields[MAIN_MENU_BTN_LOAD].field = -1000;

@@ -1636,7 +1636,7 @@ namespace FLT1 {
         } else {
             if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
                 if (HAROLD::Star_Guarded_By_Monster_(star_idx, &guarded_by_race)) {
-                    HACCESS::Race_Name_(guarded_by_race, race_name_buf);
+                    HACCESS::Race_Name_(guarded_by_race, race_name_buf, sizeof(race_name_buf));
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
                     if (prompt_flag != 0) {

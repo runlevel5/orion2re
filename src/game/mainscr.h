@@ -138,7 +138,7 @@ namespace MAINSCR {
      * @param out_name Destination buffer for the generated label text.
      * @param out_bitmap_ptr Optional bitmap for contested or multi-owner labels.
      */
-    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* out_uses_bitmap, char* out_name, s_animation_header** out_bitmap_ptr);
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* out_uses_bitmap, char* out_name, int32_t out_name_size, s_animation_header** out_bitmap_ptr);
 
     extern uint8_t _already_faded_into_main_screen;
     extern uint8_t _in_auto_next_turn_mode;

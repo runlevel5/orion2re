@@ -326,35 +326,44 @@ namespace REPORT {
         return (uint8_t)REPORT::Display_Report_Aux_(player_idx, 1);
     }
 
-    void __cdecl sprintf_report_(char* buffer, s_report* report) {
+    void __cdecl sprintf_report_(char* buffer, uint32_t buffer_size, s_report* report) {
+        if (buffer == nullptr || buffer_size == 0 || report == nullptr) {
+            return;
+        }
+
+        buffer[0] = '\0';
+
         if (report->type == 1 /* MSG_TYPE_REPORT_YOUR_SPY */) {
             if (report->action == 0 /* SPY_ACTION_STEAL */) {
-                buffer += sprintf(buffer, REPORT::_your_spy_steals_fmt,
-                                  TECHDATA::_technology_applications[report->d.steal.tech_app_id].name,
-                                  MOX::_player[report->d.steal.victim_player_idx].race_name);
+                snprintf(buffer, buffer_size, REPORT::_your_spy_steals_fmt,
+                         TECHDATA::_technology_applications[report->d.steal.tech_app_id].name,
+                         MOX::_player[report->d.steal.victim_player_idx].race_name);
             } else if (report->action == 1 /* SPY_ACTION_SABOTAGE */) {
                 char* planet_name = HACCESS::Get_Planet_Name_(report->d.sabotage.planet_idx);
-                buffer += sprintf(buffer, REPORT::_your_spy_destroys_fmt,
-                                  MOX::_player[report->d.sabotage.victim_player_idx].race_name,
-                                  TECHDATA::_buildings[report->d.sabotage.building_id].name,
-                                  planet_name);
+                snprintf(buffer, buffer_size, REPORT::_your_spy_destroys_fmt,
+                         MOX::_player[report->d.sabotage.victim_player_idx].race_name,
+                         TECHDATA::_buildings[report->d.sabotage.building_id].name,
+                         planet_name);
             }
 
             if (report->d.steal.framed_player_idx != -1) {
-                sprintf(buffer, REPORT::_you_framed_fmt,
-                        MOX::_player[report->d.steal.framed_player_idx].race_name);
+                const size_t used_length = strlen(buffer);
+                if (used_length < buffer_size) {
+                    snprintf(buffer + used_length, buffer_size - used_length, REPORT::_you_framed_fmt,
+                             MOX::_player[report->d.steal.framed_player_idx].race_name);
+                }
             }
         } else if (report->type == 2 /* MSG_TYPE_REPORT_ENEMY_SPY */) {
             if (report->action == 0 /* SPY_ACTION_STEAL */) {
-                sprintf(buffer, REPORT::_enemy_spy_steals_fmt,
-                        MOX::_player[report->d.enemy_steal.enemy_player_idx].race_name,
-                        TECHDATA::_technology_applications[report->d.enemy_steal.tech_app_id].name);
+                snprintf(buffer, buffer_size, REPORT::_enemy_spy_steals_fmt,
+                         MOX::_player[report->d.enemy_steal.enemy_player_idx].race_name,
+                         TECHDATA::_technology_applications[report->d.enemy_steal.tech_app_id].name);
             } else if (report->action == 1 /* SPY_ACTION_SABOTAGE */) {
                 char* planet_name = HACCESS::Get_Planet_Name_(report->d.enemy_sabotage.planet_idx);
-                sprintf(buffer, REPORT::_enemy_spy_destroys_fmt,
-                        MOX::_player[report->d.enemy_sabotage.enemy_player_idx].race_name,
-                        TECHDATA::_buildings[report->d.enemy_sabotage.building_id].name,
-                        planet_name);
+                snprintf(buffer, buffer_size, REPORT::_enemy_spy_destroys_fmt,
+                         MOX::_player[report->d.enemy_sabotage.enemy_player_idx].race_name,
+                         TECHDATA::_buildings[report->d.enemy_sabotage.building_id].name,
+                         planet_name);
             }
         }
     }
@@ -806,7 +815,7 @@ namespace REPORT {
                         }
 
                         if (!report_handled) {
-                            REPORT::sprintf_report_(buf, &REPORT::_reports[i]);
+                            REPORT::sprintf_report_(buf, sizeof(buf), &REPORT::_reports[i]);
                             GENDRAW::Message_Box_(buf);
                         }
 

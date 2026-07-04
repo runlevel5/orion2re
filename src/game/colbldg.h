@@ -171,7 +171,7 @@ namespace COLBLDG {
      * @param include_postfix_modifiers Nonzero to append trailing modifier text.
      * @param weapon_count Number of copies mounted for pluralization and count output.
      */
-    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon, char* dest, uint8_t include_postfix_modifiers, uint8_t weapon_count);
+    void __cdecl Build_Weapon_String_(s_ship_weapons* weapon, char* dest, uint32_t dest_size, uint8_t include_postfix_modifiers, uint8_t weapon_count);
 
     int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t product_id);
 
@@ -195,7 +195,7 @@ namespace COLBLDG {
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id);
 
-    void __cdecl Get_App_Description_String_(char* dest_str, int16_t app_id);
+    void __cdecl Get_App_Description_String_(char* dest_str, uint32_t dest_str_size, int16_t app_id);
 
     void __cdecl Draw_Building_Info_(int16_t building_idx);
 

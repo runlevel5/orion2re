@@ -82,7 +82,7 @@ namespace DESIGN {
 
     void __cdecl Load_Design_Screen_Pictures_();
 
-    void __cdecl Get_Tech_Description_Lbx_Name_(char* buffer);
+    void __cdecl Get_Tech_Description_Lbx_Name_(char* buffer, int32_t buffer_size);
 
     void __cdecl Build_Initial_Design_Template_(int16_t player_idx, int16_t design_idx);
 
@@ -102,7 +102,7 @@ namespace DESIGN {
 
     void __cdecl Check_Plus_Minus_Buttons_(int16_t field);
 
-    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name);
+    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name, int32_t out_name_size);
 
     void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2);
 
@@ -120,13 +120,13 @@ namespace DESIGN {
 
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_();
 
-    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer);
+    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int32_t out_buffer_size);
 
-    void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str);
+    void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str, int32_t dest_str_size);
 
     int16_t __cdecl Weapon_Needs_Racks_(int16_t weapon_idx);
 
-    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t field_item_chosen, int16_t row_idx);
+    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int32_t buffer_size, int16_t field_item_chosen, int16_t row_idx);
 
     bool __cdecl Space_For_Weapon_Replacement_();
 

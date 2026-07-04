@@ -914,7 +914,7 @@ namespace fonts {
 
         va_list args;
         va_start(args, format);
-        vsprintf(buffer, format, args);
+        vsnprintf(buffer, sizeof(buffer), format, args);
         va_end(args);
 
         Print_Display_((int16_t)x, (int16_t)y, buffer, 0);

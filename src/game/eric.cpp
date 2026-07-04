@@ -422,24 +422,34 @@ namespace ERIC {
         palette::Clear_Palette_Changes_(0, 255);
     }
 
-    void __cdecl String_Builder2_(char* dest, int16_t build_mode, const char* format, ...) {
+    void __cdecl String_Builder2_(char* dest, int32_t dest_size, int16_t build_mode, const char* format, ...) {
         char local_buf[1000];
+        char existing_buf[1000];
         va_list args;
+
+        if (dest_size <= 0 || build_mode < 0) {
+            return;
+        }
 
         if (build_mode >= 0) {
             va_start(args, format);
-            uint32_t formatted_length = vsprintf(local_buf, format, args);
+            int formatted_length = vsnprintf(local_buf, sizeof(local_buf), format, args);
             va_end(args);
 
-            if (formatted_length >= sizeof(local_buf)) {
+            if (formatted_length < 0 || (size_t)formatted_length >= sizeof(local_buf)) {
                 exitm::Exit_With_Message(ESTRINGS::E_Strings_(408 /* ESTR_PFMT__STRING_BUILDER */));
                 return;
             }
 
             if (build_mode == 0) {
-                strcpy(dest, local_buf);
+                strlcpy(dest, local_buf, (size_t)dest_size);
             } else {
-                sprintf(dest, ESTRINGS::E_Strings_(71), dest, 13, local_buf);
+                strlcpy(existing_buf, dest, sizeof(existing_buf));
+
+                int combined_length = snprintf(dest, (size_t)dest_size, ESTRINGS::E_Strings_(71), existing_buf, 13, local_buf);
+                if (combined_length < 0 || combined_length >= dest_size) {
+                    exitm::Exit_With_Message(ESTRINGS::E_Strings_(408 /* ESTR_PFMT__STRING_BUILDER */));
+                }
             }
         }
     }

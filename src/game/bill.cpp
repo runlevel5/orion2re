@@ -64,8 +64,8 @@ namespace BILL {
         snprintf(_dest_file_name, sizeof(_dest_file_name), SCIENCE::_spy_anim_fmt,
                  (uint32_t)(uint8_t)(MOX::_player[MOX::_PLAYER_NUM].race));
 
-        if (dos::DIR_(_dest_file_name, find_data) == 0) {
-            if (dos::DIR_(SCIENCE::_spy_anim_find_pat, find_data) != 0) {
+        if (dos::DIR_(_dest_file_name, find_data, sizeof(find_data)) == 0) {
+            if (dos::DIR_(SCIENCE::_spy_anim_find_pat, find_data, sizeof(find_data)) != 0) {
                 dos::Delete_File_(find_data);
             }
 
@@ -90,8 +90,8 @@ namespace BILL {
 
         snprintf(BILL::_dest_file_name, sizeof(BILL::_dest_file_name), s_SR_R_x_SC_LBX, (uint32_t)(uint8_t)player->race);
 
-        if (!dos::DIR_(BILL::_dest_file_name, dir_entry)) {
-            if (dos::DIR_(s_SR_R_wildcard_SC_LBX, dir_entry)) {
+        if (!dos::DIR_(BILL::_dest_file_name, dir_entry, sizeof(dir_entry))) {
+            if (dos::DIR_(s_SR_R_wildcard_SC_LBX, dir_entry, sizeof(dir_entry))) {
                 dos::Delete_File_(dir_entry);
             }
 
@@ -795,8 +795,8 @@ char* __cdecl Cache_Player_Trooper_Anim_() {
         (unsigned int)(uint8_t)(MOX::_player[MOX::_PLAYER_NUM].race)
     );
 
-    if (dos::DIR_(BILL::_dest_file_name, found_path) == 0) {
-        if (dos::DIR_(SCIENCE::_trooper_anim_find_pat, found_path) != 0) {
+    if (dos::DIR_(BILL::_dest_file_name, found_path, sizeof(found_path)) == 0) {
+        if (dos::DIR_(SCIENCE::_trooper_anim_find_pat, found_path, sizeof(found_path)) != 0) {
             dos::Delete_File_(found_path);
         }
 

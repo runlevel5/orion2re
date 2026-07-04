@@ -24,7 +24,7 @@ namespace {
             char buffer[256];
 
             fonts::Set_Font_LF_(10);
-            MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
+            MSG_::sprintf_msg_(buffer, sizeof(buffer), &MSG_::_msgs[msg_idx]);
             fonts::Print_(x, y, "^");
             FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 320, buffer, 0);
         }

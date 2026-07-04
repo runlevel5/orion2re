@@ -1054,7 +1054,7 @@ namespace fields {
                                     len--;
                                 }
                                 _continuous_string[len] = '\0';
-                                strcpy(cont_input->buffer, _continuous_string);
+                                strlcpy(cont_input->buffer, _continuous_string, (size_t)cont_input->max_length + 1);
                                 _active_input_field_number = -1;
                                 _cursor_position = 0;
                             } else {
@@ -1082,7 +1082,7 @@ namespace fields {
                             len--;
                         }
                         _continuous_string[len] = '\0';
-                        strcpy(active_cont_input->buffer, _continuous_string);
+                        strlcpy(active_cont_input->buffer, _continuous_string, (size_t)active_cont_input->max_length + 1);
                         _cursor_position = 0;
                         _input_field_active = 0;
                         _active_input_field_number = -1;
@@ -1319,7 +1319,7 @@ namespace fields {
                                 len--;
                             }
                             _continuous_string[len] = '\0';
-                            strcpy(active_cont_input->buffer, _continuous_string);
+                            strlcpy(active_cont_input->buffer, _continuous_string, (size_t)active_cont_input->max_length + 1);
                             _input_field_active = 0;
                             _active_input_field_number = -1;
                         }
@@ -1430,7 +1430,7 @@ namespace fields {
                         len--;
                     }
                     _continuous_string[len] = '\0';
-                    strcpy(active_cont_input->buffer, _continuous_string);
+                    strlcpy(active_cont_input->buffer, _continuous_string, (size_t)active_cont_input->max_length + 1);
                     _active_input_field_number = -1;
                     _input_field_active = 0;
                 }
@@ -2167,7 +2167,7 @@ namespace fields {
 
         _continuous_string[len] = '\0';
 
-        strcpy(cont_input->buffer, _continuous_string);
+        strlcpy(cont_input->buffer, _continuous_string, (size_t)cont_input->max_length + 1);
     }
 
     void __cdecl Draw_Visible_Fields_() {
@@ -2949,7 +2949,7 @@ namespace fields {
             _cursor_count = max_length;
         }
 
-        strcpy(legacy_input->buffer, buffer);
+        strlcpy(legacy_input->buffer, buffer, (size_t)legacy_input->max_length + 1);
         int16_t font_height = fonts::Get_Font_Height_();
         Display_Input_Field_(field_idx, buffer);
 
@@ -3091,7 +3091,7 @@ namespace fields {
             }
         }
 
-        strcpy(Field_Data_Legacy_Input_(&_fields[field_idx])->buffer, buffer);
+        strlcpy(legacy_input->buffer, buffer, (size_t)legacy_input->max_length + 1);
 
         if (done != 0) {
             while (mouse::Mouse_Button_() != 0) {

@@ -42,35 +42,33 @@ void __cdecl Load_E_Strings_() {
 
     Load_H_And_Pro_File_Strings_();
 
-    char* maintext_lbx_name = ESTRINGS::_strings[368];
-
     if (MOX::_settings.language == 1) {
-        strcpy(maintext_lbx_name, "maingerm.lbx");
+        ESTRINGS::_strings[368] = const_cast<char*>("maingerm.lbx");
         return;
     }
 
     if (MOX::_settings.language == 0) {
-        strcpy(maintext_lbx_name, "maintext.lbx");
+        ESTRINGS::_strings[368] = const_cast<char*>("maintext.lbx");
         return;
     }
 
     if (MOX::_settings.language == 2) {
-        strcpy(maintext_lbx_name, "mainfren.lbx");
+        ESTRINGS::_strings[368] = const_cast<char*>("mainfren.lbx");
         return;
     }
 
     if (MOX::_settings.language == 3) {
-        strcpy(maintext_lbx_name, "mainspan.lbx");
+        ESTRINGS::_strings[368] = const_cast<char*>("mainspan.lbx");
         return;
     }
 
     if (MOX::_settings.language == 4) {
-        strcpy(maintext_lbx_name, "mainital.lbx");
+        ESTRINGS::_strings[368] = const_cast<char*>("mainital.lbx");
         return;
     }
 
     if (MOX::_settings.language == 5) {
-        strcpy(maintext_lbx_name, "mainpoli.lbx");
+        ESTRINGS::_strings[368] = const_cast<char*>("mainpoli.lbx");
     }
 }
 

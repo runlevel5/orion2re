@@ -180,7 +180,7 @@ namespace COLONY {
         s_animation_header* ui_anim = C_Anims_(0xe);
         animate::Draw_(x, y, ui_anim);
 
-        MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(planet_idx, buffer);
+        MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(planet_idx, buffer, sizeof(buffer));
 
         BILL::Squeeze_Print_Formatted_Paragraph_(x + 14, y + 45, 154, 140, buffer, 0);
     }

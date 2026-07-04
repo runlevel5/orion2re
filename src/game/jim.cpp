@@ -15,11 +15,11 @@ namespace JIM {
 
         snprintf(secondary_path, sizeof(secondary_path), "%ssimtex.lbx", farload::_secondary_drive_path);
 
-        if (dos::DIR_("simtex.lbx", find_buffer)) {
+        if (dos::DIR_("simtex.lbx", find_buffer, sizeof(find_buffer))) {
             return true;
         }
 
-        if (dos::DIR_(secondary_path, find_buffer)) {
+        if (dos::DIR_(secondary_path, find_buffer, sizeof(find_buffer))) {
             return true;
         }
 
@@ -327,7 +327,7 @@ namespace JIM {
                         break;
                 }
 
-                strcpy(&dest_buf[dest_len], src_ptr);
+                strlcpy(&dest_buf[dest_len], src_ptr, sizeof(dest_buf) - (size_t)dest_len);
                 dest_len = (int16_t)strlen(dest_buf);
             } else {
                 dest_buf[dest_len++] = current_char;
@@ -340,7 +340,7 @@ namespace JIM {
             snprintf(dest_buf, sizeof(dest_buf), "Decode message too long (%d).\n%s", max_len, message_buffer);
             exitm::Exit_With_Message(dest_buf);
         } else {
-            strcpy(message_buffer, dest_buf);
+            strlcpy(message_buffer, dest_buf, max_len);
         }
     }
 
@@ -366,7 +366,7 @@ namespace JIM {
             return;
         }
 
-        strcpy(dest, buffer);
+        strlcpy(dest, buffer, max_len);
     }
 
     void __cdecl Bill_Picture_To_Mouse_(s_animation_header* anim) {

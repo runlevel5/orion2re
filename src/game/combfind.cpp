@@ -1605,7 +1605,7 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
 
     if (strategic_combat_flag != 0) {
         combat_result_code = COMBAT::Strategic_Combat_(attacker_ships, attacker_count, defender_ships, defender_count,
-                                                       star_idx, colony_idx, results->info.summary, results->info.details);
+                                                       star_idx, colony_idx, results->info.summary, sizeof(results->info.summary), results->info.details, sizeof(results->info.details));
 
         // Show result dialog if human is involved or it is a local single player game
         if (not_multiplayer || MOX::_PLAYER_NUM == attacker_idx) {

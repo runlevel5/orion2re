@@ -333,7 +333,11 @@ namespace EVANHELP {
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_design_screen_help_list, 13);
     }
 
-    void __cdecl Get_Application_Description_(char* dest, int16_t item_index) {
+    void __cdecl Get_Application_Description_(char* dest, int32_t dest_size, int16_t item_index) {
+        if (dest_size <= 0) {
+            return;
+        }
+
         char help_lbx_name[20];
 
         TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
@@ -344,7 +348,7 @@ namespace EVANHELP {
 
         s_help_record* data = (s_help_record*)farload::Far_Reload_Next_Data_(help_lbx_name, 0, buffer, item_index, 1, sizeof(s_help_record));
 
-        strcpy(dest, data->body);
+        strlcpy(dest, data->body, (size_t)dest_size);
 
         allocate::Pop_Block_(MOX::_screen_seg);
     }

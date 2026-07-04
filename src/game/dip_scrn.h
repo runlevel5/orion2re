@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
 
+#define DIP_SCRN_MAIN_LIST_CAPACITY 40
+#define DIP_SCRN_SMALL_LIST_CAPACITY 30
+
 struct s_dipscrn_net_message;
 
 namespace DIP_SCRN {
@@ -139,7 +142,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Mouse_Init_(int16_t ambassador_player_id);
 
-    void __cdecl Get_Diplomacy_Statement_(int16_t statement_id, int16_t speaker_player_id, int16_t listener_player_id, char* out_text);
+    void __cdecl Get_Diplomacy_Statement_(int16_t statement_id, int16_t speaker_player_id, int16_t listener_player_id, char* out_text, size_t out_text_size);
 
     void __cdecl Setup_Back_Page_();
 

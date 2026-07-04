@@ -678,7 +678,7 @@ namespace HOMEGEN {
         int16_t star_idx = (int16_t)(star - MOX::_star);
         int16_t need_new_special = 0;
 
-        HACCESS::Race_Name_(monster_type, race_name);
+        HACCESS::Race_Name_(monster_type, race_name, sizeof(race_name));
 
         int32_t monster_mask = 2;
         if (monster_type == 12) {

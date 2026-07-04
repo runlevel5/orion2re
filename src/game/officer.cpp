@@ -2086,10 +2086,10 @@ namespace OFFICER {
         if (node_idx >= 5000) {
             int16_t adjusted_node_idx = node_idx - 0x137F;
             adjusted_node_idx = HACCESS::Ship_Stack_Owner_(adjusted_node_idx);
-            HACCESS::Race_Name_(adjusted_node_idx, race_name);
+            HACCESS::Race_Name_(adjusted_node_idx, race_name, sizeof(race_name));
         } else if (owner > 8) {
             int16_t adjusted_node_idx = HACCESS::Ship_Stack_Owner_(node_idx);
-            HACCESS::Race_Name_(adjusted_node_idx, race_name);
+            HACCESS::Race_Name_(adjusted_node_idx, race_name, sizeof(race_name));
         }
 
         if (race_name[0] != '\0') {
@@ -2124,7 +2124,7 @@ namespace OFFICER {
             fonts::Set_Font_Style_Outline_(1, &mox_colors);
             fonts::Set_Font_Spacing_(1);
 
-            HACCESS::Race_Name_(owner, race_name);
+            HACCESS::Race_Name_(owner, race_name, sizeof(race_name));
 
             char construction_buffer[512];
             char temp_sprintf_buf[256];
@@ -2763,7 +2763,7 @@ namespace OFFICER {
     void __cdecl Load_Officer_Skill_Name_Descriptions_() {
         char lbx_name[20];
 
-        Get_Skill_Description_LBX_Name_(lbx_name);
+        Get_Skill_Description_LBX_Name_(lbx_name, sizeof(lbx_name));
 
         for (int16_t i = 0; i < 27; ++i) {
             _officer_skill_name_string[i] = (char*)farload::Far_Reload_Next_Data_(
@@ -3095,7 +3095,7 @@ namespace OFFICER {
         }
 
         if (MOX::_settings.language == 4) {
-            Get_Italian_The_(leader_idx, title_prefix);
+            Get_Italian_The_(leader_idx, title_prefix, sizeof(title_prefix));
         } else {
             if (MOX::_settings.language == 2 && MISC::Is_Vowel_(MOX::_leaders[leader_idx].title[0])) {
                 MISC::Get_LBX_Message_(0x186, title_prefix);
@@ -3114,8 +3114,14 @@ namespace OFFICER {
         return MOX::_temp_string;
     }
 
-    void __cdecl Officer_Name_(char* dst, int16_t player_id, int16_t officer_idx) {
-        strcpy(dst, Leader_Name_(officer_idx, 0));
+    void __cdecl Officer_Name_(char* dst, uint32_t dst_size, int16_t player_id, int16_t officer_idx) {
+        (void)player_id;
+
+        if (dst == nullptr || dst_size == 0) {
+            return;
+        }
+
+        strlcpy(dst, Leader_Name_(officer_idx, 0), dst_size);
     }
 
     void __cdecl Find_Selected_Leader_(int16_t leader_idx) {
@@ -3273,18 +3279,22 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
-void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int16_t tech_app_count) {
+void __cdecl Make_Loknar_Message_(char* output, uint32_t output_size, const int16_t* tech_app_ids, int16_t tech_app_count) {
   const int16_t message_id = (MOX::_leaders[0x41].status == 6) ? 0x25 : 0x26;
 
-  strcpy(output, HAROLD::H_Message_(message_id));
+  if (output == nullptr || output_size == 0) {
+    return;
+  }
+
+  strlcpy(output, HAROLD::H_Message_(message_id), output_size);
 
   if (tech_app_count > 0) {
     /* fmtpara \x1A0 restores left alignment before each bullet line in the reward list. */
     for (int16_t tech_index = 0; tech_index < tech_app_count; ++tech_index) {
-      strcat(output, "\x1A" "0");
-      strcat(output, "^ ");
-      strcat(output, TECHDATA::_technology_applications[tech_app_ids[tech_index]].name);
-      strcat(output, string::s_Newline);
+      strlcat(output, "\x1A" "0", output_size);
+      strlcat(output, "^ ", output_size);
+      strlcat(output, TECHDATA::_technology_applications[tech_app_ids[tech_index]].name, output_size);
+      strlcat(output, string::s_Newline, output_size);
     }
   }
 }
@@ -3294,7 +3304,7 @@ void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_
     (void)unused;
 
     if (tech_app_count > 0) {
-        Make_Loknar_Message_(buffer, tech_app_ids, tech_app_count);
+        Make_Loknar_Message_(buffer, sizeof(buffer), tech_app_ids, tech_app_count);
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
     }
@@ -3413,8 +3423,12 @@ void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, 
  * Select the localized LBX file name for officer skill text.
  * @param lbx_name Receives the selected 8.3 LBX file name.
  */
-void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name) {
+void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name, uint32_t lbx_name_size) {
     const char* skill_description_lbx_name = "SKILDESC.LBX";
+
+    if (lbx_name == nullptr || lbx_name_size == 0) {
+        return;
+    }
 
     switch (MOX::_settings.language) {
     case 1:
@@ -3433,7 +3447,7 @@ void __cdecl Get_Skill_Description_LBX_Name_(char* lbx_name) {
         break;
     }
 
-    strcpy(lbx_name, skill_description_lbx_name);
+    strlcpy(lbx_name, skill_description_lbx_name, lbx_name_size);
 }
 
 void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx,
@@ -3451,25 +3465,29 @@ void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx,
   }
 }
 
-void __cdecl Get_Italian_The_(int16_t leader_idx, char* output) {
+void __cdecl Get_Italian_The_(int16_t leader_idx, char* output, uint32_t output_size) {
+    if (output == nullptr || output_size == 0) {
+        return;
+    }
+
     output[0] = '\0';
 
     if (MISC::Is_Vowel_(MOX::_leaders[leader_idx].title[0])) {
-        strcpy(output, HAROLD::H_Message_(HESTR_186_S));
+        strlcpy(output, HAROLD::H_Message_(HESTR_186_S), output_size);
         return;
     }
 
     if (leader_idx == 0x1a || leader_idx == 0x2b || leader_idx == 0x34) {
-        strcpy(output, ", lo ");
+        strlcpy(output, ", lo ", output_size);
         return;
     }
 
     if (Officer_Is_Female_(leader_idx)) {
-        strcpy(output, HAROLD::H_Message_(0x182 /* HESTR_182_THE */));
+        strlcpy(output, HAROLD::H_Message_(0x182 /* HESTR_182_THE */), output_size);
         return;
     }
 
-    strcpy(output, HAROLD::H_Message_(0x110 /* HESTR_110_THE */));
+    strlcpy(output, HAROLD::H_Message_(0x110 /* HESTR_110_THE */), output_size);
 }
 
 s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, uint8_t load_now) {

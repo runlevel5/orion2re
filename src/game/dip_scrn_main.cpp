@@ -487,19 +487,19 @@ namespace DIP_SCRN {
 
         _main_diplomacy_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
         for (int i = 0; i < 9; ++i) {
-            _main_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+            _main_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, DIP_SCRN_MAIN_LIST_CAPACITY);
         }
 
         for (int i = 0; i < 11; ++i) {
-            _main_net_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+            _main_net_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, DIP_SCRN_MAIN_LIST_CAPACITY);
         }
 
         for (int i = 0; i < 5; ++i) {
-            _main_repulsive_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+            _main_repulsive_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, DIP_SCRN_SMALL_LIST_CAPACITY);
         }
 
         for (int i = 0; i < 6; ++i) {
-            _main_net_repulsive_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+            _main_net_repulsive_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, DIP_SCRN_SMALL_LIST_CAPACITY);
         }
 
         _propose_treaty_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
@@ -565,7 +565,11 @@ namespace DIP_SCRN {
         }
     }
 
-    void __cdecl Get_Diplomacy_Statement_(int16_t statement_id, int16_t speaker_player_id, int16_t listener_player_id, char* out_text) {
+    void __cdecl Get_Diplomacy_Statement_(int16_t statement_id, int16_t speaker_player_id, int16_t listener_player_id, char* out_text, size_t out_text_size) {
+        if (out_text == nullptr || out_text_size == 0) {
+            return;
+        }
+
         out_text[0] = '\0';
 
         char filename[16];
@@ -599,15 +603,18 @@ namespace DIP_SCRN {
         int rnd_idx = game_random::Random_(count) - 1;
         char* record = reinterpret_cast<char*>(buf) + 2 + rnd_idx * 200;
 
-        int out_idx = 0;
         for (int i = 0; record[i] != '\0'; ++i) {
             uint8_t c = record[i];
             if (c < 0x80 || c > 0x95) {
-                out_text[out_idx++] = c;
+                char text_char[2];
+                text_char[0] = static_cast<char>(c);
+                text_char[1] = '\0';
+
+                if (strlcat(out_text, text_char, out_text_size) >= out_text_size) {
+                    break;
+                }
                 continue;
             }
-
-            out_text[out_idx] = '\0';
             const char* replacement = nullptr;
             char temp_buf[64];
 
@@ -731,15 +738,14 @@ namespace DIP_SCRN {
             }
 
             if (replacement) {
-                strcpy(out_text + out_idx, replacement);
-                out_idx += static_cast<int>(strlen(replacement));
+                if (strlcat(out_text, replacement, out_text_size) >= out_text_size) {
+                    break;
+                }
             }
         }
 
-        out_text[out_idx] = '\0';
-
         if (add_framed) {
-            strcat(out_text, _you_were_framed_buffer);
+            strlcat(out_text, _you_were_framed_buffer, out_text_size);
         }
 
         Start_Diplomacy_Music_(buf[0]);
@@ -1567,7 +1573,7 @@ namespace DIP_SCRN {
         if (_old_response_message != (int16_t)_response_message) {
             if (_response_message < 1000) {
                 _old_response_message = (int16_t)_response_message;
-                Get_Diplomacy_Statement_(_response_message, MOX::_PLAYER_NUM, _current_ambassador, _diplomacy_message);
+                Get_Diplomacy_Statement_(_response_message, MOX::_PLAYER_NUM, _current_ambassador, _diplomacy_message, sizeof(_diplomacy_message));
             }
             else {
                 _response_message = 0;
@@ -1979,7 +1985,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Fade_In_() {
         Diplomacy_Mouse_Init_(_current_ambassador);
-        Get_Diplomacy_Statement_(_response_message, MOX::_PLAYER_NUM, _current_ambassador, _diplomacy_message);
+        Get_Diplomacy_Statement_(_response_message, MOX::_PLAYER_NUM, _current_ambassador, _diplomacy_message, sizeof(_diplomacy_message));
         Setup_Back_Page_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         if (_ambassador_option != 0) {

@@ -24,7 +24,7 @@ namespace {
             char buffer[256];
 
             fonts::Set_Font_LF_(10);
-            MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
+            MSG_::sprintf_msg_(buffer, sizeof(buffer), &MSG_::_msgs[msg_idx]);
             fonts::Print_(x, y, "^");
             FMTPARA::Print_Formatted_Paragraph_(x + 13, y, 345, buffer, 0);
         }
@@ -1969,7 +1969,7 @@ namespace INFO {
                 item->group_color_index = 0;
                 item->tech_app_ids[0] = (uint8_t)msg_idx;
 
-                MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
+                MSG_::sprintf_msg_(buffer, sizeof(buffer), &MSG_::_msgs[msg_idx]);
 
                 int16_t height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(state->item_width, buffer);
                 item->app_count = (uint8_t)(height / font_lf);

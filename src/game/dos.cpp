@@ -3,7 +3,6 @@
 namespace dos {
     namespace {
         enum {
-            MAX_DOS_PATH = 512,
             NANOSECONDS_PER_SECOND = 1000000000,
         };
 
@@ -32,20 +31,20 @@ namespace dos {
             return slash;
         }
 
-        void Split_Search_Pattern_(const char* pattern, char* directory, char* filename_pattern) {
+        void Split_Search_Pattern_(const char* pattern, char* directory, size_t directory_size, char* filename_pattern, size_t filename_pattern_size) {
             const char* file_name;
             size_t directory_length;
 
             file_name = Get_File_Name_(pattern);
             if (file_name == pattern) {
-                strcpy(directory, ".");
-                strcpy(filename_pattern, pattern);
+                strlcpy(directory, ".", directory_size);
+                strlcpy(filename_pattern, pattern, filename_pattern_size);
                 return;
             }
 
             directory_length = (size_t)(file_name - pattern);
-            if (directory_length >= MAX_DOS_PATH) {
-                directory_length = MAX_DOS_PATH - 1;
+            if (directory_length >= directory_size) {
+                directory_length = directory_size - 1;
             }
 
             memcpy(directory, pattern, directory_length);
@@ -57,25 +56,29 @@ namespace dos {
             }
 
             if (directory[0] == '\0') {
-                strcpy(directory, ".");
+                strlcpy(directory, ".", directory_size);
             }
 
-            strcpy(filename_pattern, file_name);
+            strlcpy(filename_pattern, file_name, filename_pattern_size);
         }
     }
 
-    bool __cdecl DIR_(const char* pattern, char* output_name) {
-        char directory[MAX_DOS_PATH];
-        char filename_pattern[MAX_DOS_PATH];
+    bool __cdecl DIR_(const char* pattern, char* output_name, size_t output_name_size) {
+        char directory[DOS_MAX_PATH];
+        char filename_pattern[DOS_MAX_PATH];
         char** matches;
         int count;
 
-        if (pattern == nullptr || output_name == nullptr || pattern[0] == '\0') {
+        if (output_name == nullptr || output_name_size == 0) {
+            return false;
+        }
+
+        if (pattern == nullptr || pattern[0] == '\0') {
             output_name[0] = '\0';
             return false;
         }
 
-        Split_Search_Pattern_(pattern, directory, filename_pattern);
+        Split_Search_Pattern_(pattern, directory, sizeof(directory), filename_pattern, sizeof(filename_pattern));
 
         matches = SDL_GlobDirectory(directory, filename_pattern, SDL_GLOB_CASEINSENSITIVE, &count);
         if (matches == nullptr || count <= 0) {
@@ -86,7 +89,7 @@ namespace dos {
             return false;
         }
 
-        strcpy(output_name, Get_File_Name_(matches[0]));
+        strlcpy(output_name, Get_File_Name_(matches[0]), output_name_size);
         SDL_free(matches);
         return true;
     }

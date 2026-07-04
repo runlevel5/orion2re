@@ -35,7 +35,8 @@ namespace INITSHIP {
                 (int16_t)plr->race,
                 (int16_t)plr->ship_designs[5].size,
                 pic_mod_8,
-                plr->ship_designs[5].name
+                plr->ship_designs[5].name,
+                sizeof(plr->ship_designs[5].name)
             );
         }
     }

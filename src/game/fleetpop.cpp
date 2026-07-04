@@ -615,7 +615,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
         if (stack_owner < 9) {
             MOX::_mox_font_colors_offset = 0x71;
             MISC::Get_Mox_Font_Colors_(4, 'o', 's', &font_colors);
-            HACCESS::Race_Name_(stack_owner, race_or_ship_name);
+            HACCESS::Race_Name_(stack_owner, race_or_ship_name, sizeof(race_or_ship_name));
             snprintf(title, sizeof(title), HAROLD::H_Message_(0x66), race_or_ship_name);
             fonts::Set_Font_Style_Outline_(4, &font_colors);
             fonts::Set_Outline_Color_(2, 1);
@@ -1093,7 +1093,7 @@ void __cdecl Print_Fleet_Box_Info_() {
 
     switch (info_type) {
     case 0:
-        FLEETPOP::Get_Fleetpop_Scanned_Ship_Info_(text);
+        FLEETPOP::Get_Fleetpop_Scanned_Ship_Info_(text, sizeof(text));
         break;
 
     case 1:
@@ -1360,7 +1360,11 @@ void __cdecl Buffer_Reload_Fleetpop_Frame_() {
     MOX::_fleet_box.name_seg = seg;
 }
 
-void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
+void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text, uint32_t out_text_size) {
+    if (out_text == nullptr || out_text_size == 0) {
+        return;
+    }
+
     out_text[0] = '\0';
 
     if (MOX::_fleet_ship_scanned <= -1) {
@@ -1373,18 +1377,18 @@ void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
     const int16_t hull_size = static_cast<int8_t>(ship->d.size);
 
     if (MOX::_PLAYER_NUM == ship_owner) {
-        strcpy(out_text, ship->d.name);
+        strlcpy(out_text, ship->d.name, out_text_size);
         return;
     }
 
     if (ship_owner <= 8) {
         if (HACCESS::Is_Combat_Ship_(ship_idx)) {
-            sprintf(out_text, "%s", TECHDATA::_hull_data[hull_size].name);
+            strlcpy(out_text, TECHDATA::_hull_data[hull_size].name, out_text_size);
             return;
         }
     }
 
-    strcpy(out_text, ship->d.name);
+    strlcpy(out_text, ship->d.name, out_text_size);
 }
 
 bool __cdecl Check_For_Colonization_Button_() {

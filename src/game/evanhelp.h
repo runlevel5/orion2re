@@ -79,9 +79,10 @@ namespace EVANHELP {
     /**
      * Loads the application help text for the requested item into the caller buffer.
      * @param dest Destination buffer that receives the help text body.
+     * @param dest_size Size of the destination buffer in bytes.
      * @param item_index Help record index to load.
      */
-    void __cdecl Get_Application_Description_(char* dest, int16_t item_index);
+    void __cdecl Get_Application_Description_(char* dest, int32_t dest_size, int16_t item_index);
 
     /** Activates the predefined help regions for the main in-game screen. */
     void __cdecl Set_Main_Game_Screen_Help_List_();

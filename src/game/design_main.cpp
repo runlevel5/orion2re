@@ -122,8 +122,8 @@ namespace DESIGN {
             }
 
             if (MOX::_design->weapon_type[slot] != WEAPON_NO_WEAPONS) {
-                Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str);
-                Weapon_Arc_String_(MOX::_design->weapon_firing_arc[i], arc_str);
+                Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str, sizeof(mod_str));
+                Weapon_Arc_String_(MOX::_design->weapon_firing_arc[i], arc_str, sizeof(arc_str));
 
                 const char* base_name = (MOX::_design->weapon_count[slot] < 2) ?
                     TECHDATA::_weapons[MOX::_design->weapon_type[slot]].name :
@@ -138,7 +138,7 @@ namespace DESIGN {
                 }
 
                 fonts::Print_Integer_Right_(0x31, y_pos, MOX::_design->weapon_count[slot]);
-                Design_Weapon_Damage_String_(slot, buffer, -1, -1);
+                Design_Weapon_Damage_String_(slot, buffer, sizeof(buffer), -1, -1);
 
                 if (strcmp(buffer, "special") == 0) {
                     MISC::Change_Font_Style_(1);
@@ -457,7 +457,7 @@ namespace DESIGN {
                         int16_t sign = pic >> 15;
                         int16_t pic_val = ((((pic ^ sign) - sign) & 7) ^ sign) - sign;
                         int16_t race = (uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
-                        Get_Ship_Design_Name_(race, MOX::_design->ship_size, pic_val, MOX::_design->name);
+                        Get_Ship_Design_Name_(race, MOX::_design->ship_size, pic_val, MOX::_design->name, sizeof(MOX::_design->name));
                     }
                     else {
                         Print_Ship_Size_Error_Message_(i);
@@ -578,7 +578,7 @@ namespace DESIGN {
         MOX::_weapon_filter = (s_weapon_filter_item*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, sizeof(*MOX::_weapon_filter) * 40);
 
         char tech_lbx[20];
-        Get_Tech_Description_Lbx_Name_(tech_lbx);
+        Get_Tech_Description_Lbx_Name_(tech_lbx, sizeof(tech_lbx));
 
         for (int i = 0; i < 39; ++i) {
             MOX::_special_desc_string[i] = (char*)farload::Far_Reload_Next_Data_(tech_lbx, 1, MOX::_global_data_seg, i, 1, 100);

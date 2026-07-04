@@ -1604,7 +1604,7 @@ namespace COLONY {
                 }
             } else if (_colony_satellite_fields[i] + *input_field == 0) {
                 int16_t building_idx = _colony_satellites[i];
-                COLBLDG::Get_App_Description_String_(local_buffer, TECHDATA::_buildings[building_idx].tech_app);
+                COLBLDG::Get_App_Description_String_(local_buffer, sizeof(local_buffer), TECHDATA::_buildings[building_idx].tech_app);
                 char* bld_name = Real_Building_Name2_(building_idx);
                 TEXTBOX::Text_Box_(bld_name, local_buffer);
             }
@@ -1856,7 +1856,7 @@ namespace COLONY {
                 COLONY::_g_scanned_planet = -1;
             }
         } else if (COLONY::_drawing_display == 2) {
-            MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(COLONY::_planet_display_handle, description);
+            MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(COLONY::_planet_display_handle, description, sizeof(description));
             COLONY::_drawing_display = 0;
             COLONY::_planet_display_handle = -1;
             GENDRAW::Help_(description);
@@ -2001,7 +2001,7 @@ namespace COLONY {
                         return;
                     }
 
-                    COLBLDG::Get_App_Description_String_(buffer, TECHDATA::_buildings[bldg_id].tech_app);
+                    COLBLDG::Get_App_Description_String_(buffer, sizeof(buffer), TECHDATA::_buildings[bldg_id].tech_app);
                     TEXTBOX::Text_Box_(CR_Building_Name_((int16_t)bldg_id), buffer);
                     Show_Colony_Screen_();
                     return;

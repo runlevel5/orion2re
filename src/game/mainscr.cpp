@@ -277,7 +277,7 @@ namespace MAINSCR {
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             if (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE) {
-                Get_Star_Name_(i, 0, &star_type, star_name, &star_data);
+                Get_Star_Name_(i, 0, &star_type, star_name, sizeof(star_name), &star_data);
 
                 if (star_name[0] != '\0') {
                     Print_Star_Name(i, star_type, star_name, star_data);
@@ -1008,7 +1008,12 @@ namespace MAINSCR {
         fields::Enable_Draw_All_Fields_();
     }
 
-    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* out_uses_bitmap, char* out_name, s_animation_header** out_bitmap_ptr) {
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* out_uses_bitmap, char* out_name, int32_t out_name_size, s_animation_header** out_bitmap_ptr) {
+        if (out_name_size <= 0) {
+            *out_uses_bitmap = 0;
+            return;
+        }
+
         bool galactic_lore = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
         *out_name = '\0';
         *out_uses_bitmap = 0;
@@ -1041,9 +1046,7 @@ namespace MAINSCR {
             if (!has_contact) {
                 if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) return;
 
-                char* src = star_ptr->name;
-                char* dst = out_name;
-                while ((*dst++ = *src++));
+                strlcpy(out_name, star_ptr->name, (size_t)out_name_size);
 
                 int16_t font_style = HAROLD::Zoom_Level_Font_Style_();
                 apply_font_offsets(font_style);
@@ -1058,11 +1061,9 @@ namespace MAINSCR {
 
         // Logic for Lore or Contacted
         if (galactic_lore && MOX::_PLAYER_NUM != owner && !HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
-            sprintf(out_name, HAROLD::s___s__00556ae4, star_ptr->name);
+            snprintf(out_name, (size_t)out_name_size, HAROLD::s___s__00556ae4, star_ptr->name);
         } else {
-            char* src = star_ptr->name;
-            char* dst = out_name;
-            while ((*dst++ = *src++));
+            strlcpy(out_name, star_ptr->name, (size_t)out_name_size);
         }
 
         if (owner >= 0 && owner < MAX_PLAYERS) {
@@ -1372,7 +1373,7 @@ namespace MAINSCR {
         graphics::Set_Window_(0x16 /* 22 */, 0x16 /* 22 */, 0x20f /* 527 */, 0x1a5 /* 421 */);
         video::Clip_On_();
 
-        MAINSCR::Get_Star_Name_(star_idx, 1, &is_highlighted, star_name, &bitmap_ptr);
+        MAINSCR::Get_Star_Name_(star_idx, 1, &is_highlighted, star_name, sizeof(star_name), &bitmap_ptr);
 
         if (star_name[0] != '\0') {
             if (is_highlighted) {
@@ -3577,7 +3578,7 @@ namespace MAINSCR {
         HAROLD::Set_Player_Font_Style_(0, false);
         fonts::Set_Font_Spacing_(1);
 
-        MAINSCR::Get_Star_Name_(star_idx, 0, &is_visited, name_buffer, &unused_output);
+        MAINSCR::Get_Star_Name_(star_idx, 0, &is_visited, name_buffer, sizeof(name_buffer), &unused_output);
         MAINSCR::Get_Star_Draw_Coords_(star_idx, &star_draw_x, &star_draw_y);
 
         string_width = fonts::Get_String_Width_(name_buffer);

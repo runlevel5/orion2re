@@ -319,14 +319,21 @@ namespace MAINPUPS {
         MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, hotkey, (int8_t)sound);
     }
 
-    void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer) {
+    void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer, uint32_t buffer_size) {
+        if (buffer == nullptr || buffer_size == 0) {
+            return;
+        }
+
+        char chunk[256];
+        buffer[0] = '\0';
         s_planet_data* p = &MOX::_planet[planet_idx];
 
         if (p->colony_index == -1) {
             if (p->planet_type != PLANET_TYPE_PLANET) {
                 char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
-                int len = sprintf(buffer, ESTRINGS::E_Strings_(0x56), planet_name);
-                sprintf(buffer + len, ESTRINGS::E_Strings_(0x133));
+                snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x56), planet_name);
+                strlcat(buffer, chunk, buffer_size);
+                strlcat(buffer, ESTRINGS::E_Strings_(0x133), buffer_size);
                 return;
             }
 
@@ -335,89 +342,89 @@ namespace MAINPUPS {
 
             char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
             /* fmtpara \x1A0 and \x1A1 toggle inline paragraph justification for these stat lines. */
-            int len = sprintf(buffer, ESTRINGS::E_Strings_(0x52), "\x1A" "0", planet_name);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x52), "\x1A" "0", planet_name);
+            strlcat(buffer, chunk, buffer_size);
 
             char* climate_str = MOX::_planet_climate_string[p->climate];
             char* size_str = MOX::_planet_size_string[p->size];
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x4D), "\x1A" "0", size_str, climate_str);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x4D), "\x1A" "0", size_str, climate_str);
+            strlcat(buffer, chunk, buffer_size);
 
             char* mineral_str = MOX::_mineral_class_string[p->mineral_class];
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x6F), "\x1A" "0", mineral_str);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x6F), "\x1A" "0", mineral_str);
+            strlcat(buffer, chunk, buffer_size);
 
             char* gravity_str = MOX::_planet_gravity_string[p->gravity_class];
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x53), "\x1A" "0", gravity_str);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x53), "\x1A" "0", gravity_str);
+            strlcat(buffer, chunk, buffer_size);
 
             if ((potential_info.food % 2) == 0) {
-                len = sprintf(buffer, ESTRINGS::E_Strings_(0x65), "\x1A" "0", "\x1A" "1", potential_info.food / 2);
-                buffer += len;
+                snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x65), "\x1A" "0", "\x1A" "1", potential_info.food / 2);
             } else {
-                len = sprintf(buffer, ESTRINGS::E_Strings_(0x64), "\x1A" "0", "\x1A" "1", potential_info.food / 2, potential_info.food % 2);
-                buffer += len;
+                snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x64), "\x1A" "0", "\x1A" "1", potential_info.food / 2, potential_info.food % 2);
             }
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x6B), "\x1A" "0", "\x1A" "1", potential_info.industry);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x6B), "\x1A" "0", "\x1A" "1", potential_info.industry);
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x74), "\x1A" "0", "\x1A" "1", potential_info.research);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x74), "\x1A" "0", "\x1A" "1", potential_info.research);
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x6C), "\x1A" "0", "\x1A" "1", potential_info.maintenance);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x6C), "\x1A" "0", "\x1A" "1", potential_info.maintenance);
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x79), "\x1A" "0", "\x1A" "1", potential_info.worker_bonus);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x79), "\x1A" "0", "\x1A" "1", potential_info.worker_bonus);
+            strlcat(buffer, chunk, buffer_size);
 
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(p, MOX::_PLAYER_NUM);
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x6D), "\x1A" "0", "\x1A" "1", max_pop);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x6D), "\x1A" "0", "\x1A" "1", max_pop);
+            strlcat(buffer, chunk, buffer_size);
         } else {
             s_colony* c = &MOX::_colony[p->colony_index];
             char* race_name = MOX::_player[c->owner].race_name;
             char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
 
             /* fmtpara \x1A0 and \x1A1 toggle inline paragraph justification for these stat lines. */
-            int len = sprintf(buffer, ESTRINGS::E_Strings_(0x49), "\x1A" "0", planet_name, race_name);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x49), "\x1A" "0", planet_name, race_name);
+            strlcat(buffer, chunk, buffer_size);
 
             char* climate_str = MOX::_planet_climate_string[static_cast<uint8_t>(c->climate)];
             char* size_str = MOX::_planet_size_string[p->size];
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x4D), "\x1A" "0", size_str, climate_str);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x4D), "\x1A" "0", size_str, climate_str);
+            strlcat(buffer, chunk, buffer_size);
 
             char* mineral_str = MOX::_mineral_class_string[p->mineral_class];
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x6F), "\x1A" "0", mineral_str);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x6F), "\x1A" "0", mineral_str);
+            strlcat(buffer, chunk, buffer_size);
 
             char* gravity_str = MOX::_planet_gravity_string[p->gravity_class];
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x53), "\x1A" "0", gravity_str);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x53), "\x1A" "0", gravity_str);
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x5E), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->food2_per_farmer) / 2);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x5E), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->food2_per_farmer) / 2);
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x5F), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->industry_per_worker));
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x5F), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->industry_per_worker));
+            strlcat(buffer, chunk, buffer_size);
 
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x60), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->research_per_scientist));
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x60), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->research_per_scientist));
+            strlcat(buffer, chunk, buffer_size);
 
             if (c->owner == MOX::_PLAYER_NUM) {
-                len = sprintf(buffer, ESTRINGS::E_Strings_(0x70), "\x1A" "0", "\x1A" "1", c->morale * 5);
-                buffer += len;
+                snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x70), "\x1A" "0", "\x1A" "1", c->morale * 5);
+                strlcat(buffer, chunk, buffer_size);
             }
 
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(p, c->owner);
-            len = sprintf(buffer, ESTRINGS::E_Strings_(0x71), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->n_pops), max_pop);
-            buffer += len;
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x71), "\x1A" "0", "\x1A" "1", static_cast<uint8_t>(c->n_pops), max_pop);
+            strlcat(buffer, chunk, buffer_size);
         }
 
         if (p->planet_special != 0) {
             char* special_str = MOX::_planet_special_string[p->planet_special];
-            sprintf(buffer, ESTRINGS::E_Strings_(0x50), "\x1A" "0", special_str);
+            snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x50), "\x1A" "0", special_str);
+            strlcat(buffer, chunk, buffer_size);
         }
     }
 
@@ -1841,7 +1848,8 @@ namespace MAINPUPS {
             if (field_state == 0) {
                 MAINPUPS::Leader_Technology_String_(MAINPUPS::_g_player_n,
                                                     MAINPUPS::_g_officer,
-                                                    tech_buffer);
+                                                    tech_buffer,
+                                                    sizeof(tech_buffer));
                 maintenance_cost = OFFICER::Officer_Maintenance_(MAINPUPS::_g_player_n,
                                                                  MAINPUPS::_g_officer);
                 officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
@@ -2266,8 +2274,13 @@ namespace MAINPUPS {
         line::Line_(draw_x, MAINPUPS::_g_y + 153, draw_x, MAINPUPS::_g_y + 164, 32 /* ' ' */);
     }
 
-    void __cdecl Leader_Technology_String_(int16_t player_idx, int16_t leader_idx, char* output_buf) {
-        char* current_dest = output_buf;
+    void __cdecl Leader_Technology_String_(int16_t player_idx, int16_t leader_idx, char* output_buf, uint32_t output_buf_size) {
+        if (output_buf == nullptr || output_buf_size == 0) {
+            return;
+        }
+
+        char chunk[256];
+        output_buf[0] = '\0';
 
         for (int16_t i = 0; i < 3; ++i) {
             uint8_t tech_id = MOX::_leaders[leader_idx].tech_application[i];
@@ -2279,11 +2292,12 @@ namespace MAINPUPS {
                     prefix = ", ";
                 }
 
-                current_dest += sprintf(current_dest, prefix);
+                strlcat(output_buf, prefix, output_buf_size);
 
                 char* tech_name = TECHDATA::_technology_applications[tech_id].name;
                 const char* format = ESTRINGS::E_Strings_(7);
-                current_dest += sprintf(current_dest, format, tech_name);
+                snprintf(chunk, sizeof(chunk), format, tech_name);
+                strlcat(output_buf, chunk, output_buf_size);
             }
         }
 
@@ -2293,13 +2307,14 @@ namespace MAINPUPS {
             if ((trait0 % 2) == 0) {
                 const char* gov_label = MOX::_government_labels[trait0 + 1];
                 const char* format = ESTRINGS::E_Strings_(207 /* 0xCF */);
-                current_dest += sprintf(current_dest, format, gov_label);
+                snprintf(chunk, sizeof(chunk), format, gov_label);
+                strlcat(output_buf, chunk, output_buf_size);
             }
         }
 
-        if (current_dest == output_buf) {
+        if (output_buf[0] == '\0') {
             const char* format = ESTRINGS::E_Strings_(12 /* 0xC */);
-            sprintf(current_dest, format);
+            strlcpy(output_buf, format, output_buf_size);
         }
     }
 
@@ -2515,8 +2530,7 @@ namespace MAINPUPS {
     int8_t __cdecl New_Colony_Confirmation_Box_(int16_t planet_idx) {
         s_potential_colony_info potential_info;
         char msg_buffer[2000];
-        char* msg_ptr;
-        int len;
+        char chunk[256];
         int16_t food_val;
         int16_t food_rem;
 
@@ -2530,40 +2544,40 @@ namespace MAINPUPS {
 
         char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
         char* format_title = ESTRINGS::E_Strings_(0xD1); /* 209 */
-        len = sprintf(msg_buffer, format_title, planet_name);
-        msg_ptr = msg_buffer + len;
+        snprintf(msg_buffer, sizeof(msg_buffer), format_title, planet_name);
 
         food_val = potential_info.food;
         food_rem = food_val % 2;
 
         if (food_rem != 0) {
             char* format_food_odd = ESTRINGS::E_Strings_(0x64); /* 100 */
-            len = sprintf(msg_ptr, format_food_odd, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)(food_val / 2), (int)food_rem);
+            snprintf(chunk, sizeof(chunk), format_food_odd, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)(food_val / 2), (int)food_rem);
         } else {
             char* format_food_even = ESTRINGS::E_Strings_(0x65); /* 101 */
-            len = sprintf(msg_ptr, format_food_even, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)(food_val / 2));
+            snprintf(chunk, sizeof(chunk), format_food_even, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)(food_val / 2));
         }
-        msg_ptr += len;
+        strlcat(msg_buffer, chunk, sizeof(msg_buffer));
 
         char* format_ind = ESTRINGS::E_Strings_(0x6B); /* 107 */
-        len = sprintf(msg_ptr, format_ind, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.industry);
-        msg_ptr += len;
+        snprintf(chunk, sizeof(chunk), format_ind, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.industry);
+        strlcat(msg_buffer, chunk, sizeof(msg_buffer));
 
         char* format_res = ESTRINGS::E_Strings_(0x73); /* 115 */
-        len = sprintf(msg_ptr, format_res, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.research);
-        msg_ptr += len;
+        snprintf(chunk, sizeof(chunk), format_res, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.research);
+        strlcat(msg_buffer, chunk, sizeof(msg_buffer));
 
         char* format_maint = ESTRINGS::E_Strings_(0x6C); /* 108 */
-        len = sprintf(msg_ptr, format_maint, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.maintenance);
-        msg_ptr += len;
+        snprintf(chunk, sizeof(chunk), format_maint, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.maintenance);
+        strlcat(msg_buffer, chunk, sizeof(msg_buffer));
 
         char* format_bonus = ESTRINGS::E_Strings_(0x78); /* 120 */
-        len = sprintf(msg_ptr, format_bonus, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.worker_bonus);
-        msg_ptr += len;
+        snprintf(chunk, sizeof(chunk), format_bonus, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.worker_bonus);
+        strlcat(msg_buffer, chunk, sizeof(msg_buffer));
 
         int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
         char* format_pop = ESTRINGS::E_Strings_(0x6E); /* 110 */
-        sprintf(msg_ptr, format_pop, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)max_pop);
+        snprintf(chunk, sizeof(chunk), format_pop, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)max_pop);
+        strlcat(msg_buffer, chunk, sizeof(msg_buffer));
 
         int8_t result = (int8_t)GENDRAW::Confirmation_Box_(msg_buffer);
         fields::Deactivate_Help_List_();
