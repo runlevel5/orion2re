@@ -6,7 +6,6 @@
 #include <utility>
 
 namespace network::router {
-namespace {
 
 s_router_message Make_Message_(e_router_message_kind kind, uint32_t request_id) {
     s_router_message message;
@@ -230,8 +229,6 @@ void Leave_Client_Session_(s_router_core_state* state, s_router_client_state* cl
         session.new_players_enabled = false;
     }
     Refresh_Session_Open_State_(&session);
-}
-
 }
 
 void Router_Core_Init(s_router_core_state* state, const char* router_id) {

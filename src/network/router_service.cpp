@@ -17,8 +17,6 @@ namespace network::router {
 
 struct s_router_client_connection;
 
-namespace {
-
 struct s_router_write_request {
     uv_write_t request;
     uv_buf_t buffer;
@@ -33,8 +31,6 @@ struct s_router_udp_send_request {
     uv_buf_t buffer;
     Bit_Stream data;
 };
-
-}
 
 struct s_router_service_state {
     s_router_config config;
@@ -75,8 +71,6 @@ struct s_router_client_connection {
     uint16_t peer_port = 0;
     bool closing = false;
 };
-
-namespace {
 
 void Router_Service_Alloc_Callback_(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buffer);
 void Router_Service_Tcp_Connection_Callback_(uv_stream_t* server, int status);
@@ -873,8 +867,6 @@ void Router_Service_Udp_Send_Callback_(uv_udp_send_t* request, int status) {
     (void)status;
     s_router_udp_send_request* send_request = (s_router_udp_send_request*)request->data;
     delete send_request;
-}
-
 }
 
 void Build_Discovery_Reply(const s_router_config* config, uint16_t bound_tcp_port, Bit_Stream* output) {

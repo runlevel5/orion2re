@@ -9,7 +9,6 @@
 #include <uv.h>
 
 namespace network::router {
-namespace {
 
 enum e_browser_phase {
     BROWSER_IDLE,
@@ -90,8 +89,6 @@ void Discovery_Alloc_Callback_(uv_handle_t*, size_t suggested_size, uv_buf_t* bu
     buffer->len = static_cast<unsigned int>(allocation_size);
 }
 
-}
-
 struct s_router_session_browser_state {
     s_router_session_browser_config config;
     e_browser_phase phase = BROWSER_IDLE;
@@ -109,8 +106,6 @@ struct s_router_session_browser_state {
     uint32_t next_request_id = 1;
     int last_error = 0;
 };
-
-namespace {
 
 void Discovery_Send_Callback_(uv_udp_send_t* request, int status) {
     s_discovery_send_request* send_request = static_cast<s_discovery_send_request*>(request->data);
@@ -389,8 +384,6 @@ void Pump_Query_(s_router_session_browser_state* state, s_router_query* query) {
     if (!query->complete && std::chrono::steady_clock::now() >= query->deadline) {
         query->complete = true;
     }
-}
-
 }
 
 s_router_session_browser::s_router_session_browser()

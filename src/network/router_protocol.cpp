@@ -9,7 +9,6 @@
 #include <lz4.h>
 
 namespace network::router {
-namespace {
 
 constexpr uint32_t ROUTER_LZ4_MAX_DICTIONARY_SIZE = 64U * 1024U;
 constexpr uint16_t ROUTER_KNOWN_PACKET_FLAGS = ROUTER_PACKET_FLAG_PAYLOAD_LZ4_COMPRESSED;
@@ -171,8 +170,6 @@ bool Decode_Message_Header_(const uint8_t* data, uint32_t size, s_router_message
 
     *message = std::move(decoded);
     return true;
-}
-
 }
 
 struct s_router_frame_codec_state {

@@ -10,7 +10,6 @@
 #include <uv.h>
 
 namespace network::router {
-namespace {
 
 bool Is_Command_Token_(const char* value) {
     return value != nullptr &&
@@ -49,8 +48,6 @@ bool Parse_Port_(const char* text, uint16_t* port) {
 
     *port = (uint16_t)value;
     return true;
-}
-
 }
 
 bool Is_Router_CLI_Command(int argc, char** argv) {

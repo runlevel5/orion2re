@@ -13,8 +13,6 @@
 
 namespace network::router {
 
-namespace {
-
 struct s_router_client_write_request {
     uv_write_t request;
     uv_buf_t buffer;
@@ -22,8 +20,6 @@ struct s_router_client_write_request {
     s_router_client_state* client = nullptr;
     uint32_t byte_count = 0;
 };
-
-}
 
 struct s_router_client_state {
     s_router_client_config config;
@@ -49,8 +45,6 @@ struct s_router_client_state {
     std::vector<s_router_session_info> sessions;
     std::vector<s_router_member_info> members;
 };
-
-namespace {
 
 void Router_Client_Alloc_Callback_(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buffer);
 void Router_Client_Connect_Callback_(uv_connect_t* request, int status);
@@ -305,8 +299,6 @@ void Router_Client_Close_Callback_(uv_handle_t* handle) {
     state->tcp_closed = true;
     state->closing = false;
     state->connected = false;
-}
-
 }
 
 s_router_client::s_router_client()
