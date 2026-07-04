@@ -1138,8 +1138,9 @@ namespace COLONY {
 
     void __cdecl Show_Food_Production_(int16_t colony_idx) {
         char buffer[3000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
-        COLCALC::Colony_Food_Production_(&MOX::_colony[colony_idx], buffer);
+        COLCALC::Colony_Food_Production_(&MOX::_colony[colony_idx], &builder);
         TEXTBOX::Text_Box_(COLCALC::_food_summary_msg, buffer);
     }
 
@@ -1191,18 +1192,20 @@ namespace COLONY {
 
     void __cdecl Show_BC_Production_(int16_t colony_idx) {
         char local_buffer[3000];
+        STRBUILD::s_builder builder = STRBUILD::Init(local_buffer, sizeof(local_buffer));
 
-        COLCALC::Colony_BC_Production_(&MOX::_colony[colony_idx], local_buffer);
+        COLCALC::Colony_BC_Production_(&MOX::_colony[colony_idx], &builder);
 
         TEXTBOX::Text_Box_(COLCALC::_bc_summary_msg, local_buffer);
     }
 
     void __cdecl Show_Morale_(int16_t colony_idx) {
         char buffer[2000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
         s_colony* colony = &MOX::_colony[colony_idx];
 
-        COLCALC::Colony_Morale_(colony, buffer);
+        COLCALC::Colony_Morale_(colony, &builder);
 
         TEXTBOX::Text_Box_(COLCALC::_morale_summary_msg, buffer);
     }

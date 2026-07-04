@@ -1,5 +1,7 @@
 #pragma once
 
+#include "strbuild.h"
+
 namespace COLCALC {
     typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int16_t player_idx, s_colony_job_production* out);
 
@@ -268,7 +270,7 @@ namespace COLCALC {
      * @param colony Colony to evaluate.
      * @param debug_out Optional output buffer for the morale breakdown.
      */
-    void __cdecl Colony_Morale_(s_colony* colony, char* debug_out);
+    void __cdecl Colony_Morale_(s_colony* colony, STRBUILD::s_builder* debug_out);
 
     void __cdecl Colony_Industry_Maintenance_(s_colony* colony);
 
@@ -277,7 +279,7 @@ namespace COLCALC {
      * @param colony Colony to evaluate.
      * @param debug_out Optional output buffer for the industry summary.
      */
-    void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out);
+    void __cdecl Colony_Industry_Production_(s_colony* colony, STRBUILD::s_builder* debug_out);
 
     void __cdecl Show_Industry_Production_(short colony_idx);
 
@@ -297,7 +299,7 @@ namespace COLCALC {
      * @param colony Colony to evaluate.
      * @param debug_out Optional output buffer for the food summary.
      */
-    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out);
+    void __cdecl Colony_Food_Production_(s_colony* colony, STRBUILD::s_builder* debug_out);
 
     int16_t __cdecl Colony_Empire_Base_Food2_Produced_(const s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out);
 
@@ -309,11 +311,11 @@ namespace COLCALC {
 
     void __cdecl Colony_Replicators_(s_colony* colony);
 
-    void __cdecl Colony_Research_Production_(s_colony* colony, char* debug_out);
+    void __cdecl Colony_Research_Production_(s_colony* colony, STRBUILD::s_builder* debug_out);
 
     void __cdecl Colony_Industry_To_Tax_(s_colony* colony);
 
-    void __cdecl Colony_BC_Production_(s_colony* colony, char* debug_buf);
+    void __cdecl Colony_BC_Production_(s_colony* colony, STRBUILD::s_builder* debug_buf);
 
     void __cdecl Colony_BC_Maintenance_(s_colony* colony);
 
@@ -350,7 +352,7 @@ namespace COLCALC {
      * @param plr Player to update.
      * @param debug_out Optional output buffer for the maintenance summary.
      */
-    void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);
+    void __cdecl Compute_Player_Maintenance_(s_player* plr, STRBUILD::s_builder* debug_out);
 
     int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx);
 

@@ -159,6 +159,15 @@ DOCTEST_TEST_CASE("join session payload preserves client build string") {
     DOCTEST_CHECK(std::strcmp(decoded.build_string, "test-build") == 0);
 }
 
+DOCTEST_TEST_CASE("router copy string truncates and null terminates destination") {
+    char text[5]{};
+
+    Router_Copy_String(text, sizeof(text), "toolong");
+
+    DOCTEST_CHECK(std::strcmp(text, "tool") == 0);
+    DOCTEST_CHECK(text[sizeof(text) - 1] == '\0');
+}
+
 DOCTEST_TEST_CASE("session list payload preserves browser-visible metadata") {
     s_router_session_info session;
     session.session_id = 9;

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "strbuild.h"
+
 namespace COLBLDG {
 
     s_mouse_list _mouse_list_to[4] = {
@@ -1165,32 +1167,33 @@ namespace COLBLDG {
 
     void __cdecl Draw_Ship_Design_Info2_(s_ship_design* design) {
         char buffer[20000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
         fonts::Set_Font_Style_Shadow_Down_(1, &_l_font_color_array);
         fonts::Set_Font_Spacing_(1);
         fonts::Set_Font_Spacing_Width_(2);
 
-        Build_Ship_Design_Info_Formatted_Paragraph_(design, buffer);
+        Build_Ship_Design_Info_Formatted_Paragraph_(design, &builder);
         BILL::Squeeze_Print_Formatted_Paragraph_(212, 114, 248, 186, buffer, 0);
     }
 
-    static char* Append_Ship_Design_Info_Formatted_Paragraph_Details_(s_ship_design* design, char* buffer) {
+    static void Append_Ship_Design_Info_Formatted_Paragraph_Details_(s_ship_design* design, STRBUILD::s_builder* builder) {
         char prefix_str[16];
         char wide_item_strings[8][200];
 
         strlcpy(prefix_str, strings::s_t_T0_5_124__0055ac38, sizeof(prefix_str));
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(70), prefix_str);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(70), prefix_str);
 
         for (int i = 0; i < 8; i++) {
             wide_item_strings[i][0] = '\0';
         }
 
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(99), strings::s_0_0055110c, strings::s__0055ac34, design->cost);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(119), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_shields[design->shield_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(98), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_computers[design->computer_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(91), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_armor[design->armor_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(104), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_drives[design->ftl_type].name);
-        buffer += sprintf(buffer, ESTRINGS::E_Strings_(130), strings::s_0_0055110c);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(99), strings::s_0_0055110c, strings::s__0055ac34, design->cost);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(119), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_shields[design->shield_type].name);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(98), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_computers[design->computer_type].name);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(91), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_armor[design->armor_type].name);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(104), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_drives[design->ftl_type].name);
+        STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(130), strings::s_0_0055110c);
 
         int weapons_added = 0;
         int num_wide_weapons = 0;
@@ -1203,7 +1206,7 @@ namespace COLBLDG {
 
                 if (fonts::Get_String_Width_(temp_weapon_str) <= 110) {
                     int str_id = ((weapons_added % 2) == 0) ? 87 : 88;
-                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, (int)design->ship_weapon[i].count, temp_weapon_str);
+                    STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, (int)design->ship_weapon[i].count, temp_weapon_str);
                     weapons_added++;
                 } else {
                     strlcpy(wide_item_strings[num_wide_weapons], temp_weapon_str, sizeof(wide_item_strings[num_wide_weapons]));
@@ -1215,15 +1218,15 @@ namespace COLBLDG {
 
         if (num_wide_weapons > 0) {
             if ((weapons_added % 2) != 0) {
-                buffer += sprintf(buffer, ESTRINGS::E_Strings_(127));
+                STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(127));
             }
             for (int i = 0; i < num_wide_weapons; i++) {
-                buffer += sprintf(buffer, ESTRINGS::E_Strings_(88), strings::s_0_0055110c, wide_weapon_counts[i], wide_item_strings[i]);
+                STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(88), strings::s_0_0055110c, wide_weapon_counts[i], wide_item_strings[i]);
             }
         }
 
         if ((weapons_added % 2) == 1) {
-            buffer += sprintf(buffer, ESTRINGS::E_Strings_(127));
+            STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(127));
         }
 
         for (int i = 0; i < 8; i++) {
@@ -1238,12 +1241,12 @@ namespace COLBLDG {
             if (struct_::Test_Bit_Field_(design->special_device_flags, i)) {
                 if (!has_specials_prefix) {
                     has_specials_prefix = true;
-                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(129), strings::s_0_0055110c);
+                    STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(129), strings::s_0_0055110c);
                 }
 
                 if (fonts::Get_String_Width_(TECHDATA::_specials[i].name) <= 115) {
                     int str_id = ((specials_added % 2) == 0) ? 89 : 90;
-                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, TECHDATA::_specials[i].name);
+                    STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, TECHDATA::_specials[i].name);
                     specials_added++;
                 } else {
                     strlcpy(wide_item_strings[num_wide_specials], TECHDATA::_specials[i].name, sizeof(wide_item_strings[num_wide_specials]));
@@ -1254,26 +1257,22 @@ namespace COLBLDG {
 
         if (num_wide_specials > 0) {
             if ((specials_added % 2) != 0) {
-                buffer += sprintf(buffer, ESTRINGS::E_Strings_(127));
+                STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(127));
             }
             for (int i = 0; i < num_wide_specials; i++) {
-                buffer += sprintf(buffer, ESTRINGS::E_Strings_(90), strings::s_0_0055110c, wide_item_strings[i]);
+                STRBUILD::Sprintf(builder, ESTRINGS::E_Strings_(90), strings::s_0_0055110c, wide_item_strings[i]);
             }
         }
-
-        return buffer;
     }
 
-    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, char* buffer) {
-        Append_Ship_Design_Info_Formatted_Paragraph_Details_(design, buffer);
+    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, STRBUILD::s_builder* builder) {
+        Append_Ship_Design_Info_Formatted_Paragraph_Details_(design, builder);
     }
 
-    void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer) {
-        char* out = buffer;
-
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, STRBUILD::s_builder* builder) {
         if (ship->officer_index <= 0) {
-            out += sprintf(
-                out,
+            STRBUILD::Sprintf(
+                builder,
                 ESTRINGS::E_Strings_(79),
                 strings::s_0_0055110c,
                 ship->d.name,
@@ -1286,8 +1285,8 @@ namespace COLBLDG {
             strlcpy(leader_name, OFFICER::Leader_Name_(ship->officer_index, '\0'), sizeof(leader_name));
             strlcpy(crew_desc, FLT2::Crew_Description_String_((int16_t)(ship - MOX::_ship)), sizeof(crew_desc));
 
-            out += sprintf(
-                out,
+            STRBUILD::Sprintf(
+                builder,
                 ESTRINGS::E_Strings_(78),
                 strings::s_0_0055110c,
                 ship->d.name,
@@ -1296,16 +1295,16 @@ namespace COLBLDG {
             );
         }
 
-        Append_Ship_Design_Info_Formatted_Paragraph_Details_(&ship->d, out);
+        Append_Ship_Design_Info_Formatted_Paragraph_Details_(&ship->d, builder);
     }
 
-    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, char* buffer, char include_crew_details) {
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, STRBUILD::s_builder* builder, char include_crew_details) {
         // The original binary routes both plain design pointers and ship-backed design subobjects through 0050A5C0.
         // Split the source API into design-only and ship-only entry points, and keep this wrapper only for binary call compatibility.
         if (include_crew_details != '\0') {
-            Build_Ship_Info_Formatted_Paragraph_((s_ship_data*)ship_or_design, buffer);
+            Build_Ship_Info_Formatted_Paragraph_((s_ship_data*)ship_or_design, builder);
         } else {
-            Build_Ship_Design_Info_Formatted_Paragraph_((s_ship_design*)ship_or_design, buffer);
+            Build_Ship_Design_Info_Formatted_Paragraph_((s_ship_design*)ship_or_design, builder);
         }
     }
 

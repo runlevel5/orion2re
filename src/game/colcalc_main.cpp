@@ -1,7 +1,9 @@
 #include "pch.h"
 
+#include "strbuild.h"
+
 namespace COLCALC {
-    void __cdecl Colony_Morale_(s_colony* colony, char* debug_out) {
+    void __cdecl Colony_Morale_(s_colony* colony, STRBUILD::s_builder* debug_out) {
         int8_t owner = colony->owner;
         s_player* player = &MOX::_player[owner];
         int8_t govt = player->traits[TRAIT_CURRENT_GOVERNMENT];
@@ -67,57 +69,56 @@ namespace COLCALC {
 
         if (debug_out) {
             if (gov_type == 3) {
-                const char* src = _unification_has_no_morale_msg;
-                while ((*debug_out++ = *src++) != '\0');
+                STRBUILD::Copy(debug_out, _unification_has_no_morale_msg);
                 return;
             }
 
             // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
             // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
-            debug_out += sprintf(debug_out, "%s", "\x07" "T+15,+65.");
-            debug_out += sprintf(debug_out, "%s", "\x1A" "0");
+            STRBUILD::Sprintf(debug_out, "%s", "\x07" "T+15,+65.");
+            STRBUILD::Sprintf(debug_out, "%s", "\x1A" "0");
 
-            debug_out += sprintf(debug_out, "\t%+d%%\t%s%s\r",
+            STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s%s\r",
                 _morale_lookup_table[govt] * 5, _government_morale_msg, msg_barracks);
 
             if (no_capital_penalty != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     no_capital_penalty * 5, _no_capital_msg);
 
             if (mixed_race_penalty != 0)
-                debug_out += sprintf(debug_out, "\t%d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%d%%\t%s\r",
                     mixed_race_penalty * 5, _mixed_races_msg);
 
             if (barracks_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     barracks_bonus * 5, TECHDATA::_buildings[BUILDING_ARMOR_BARRACKS].name);
 
             if (marine_barracks_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     marine_barracks_bonus * 5, TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].name);
 
             if (psychophysics_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     psychophysics_bonus * 5, TECHDATA::_technology_applications[TECH_APP_PSIONICS].name);
 
             if (holo_simulator_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     holo_simulator_bonus * 5, TECHDATA::_buildings[BUILDING_HOLO_SIMULATOR].name);
 
             if (vr_network_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     vr_network_bonus * 5, TECHDATA::_technology_applications[TECH_APP_VIRTUAL_REALITY_NETWORK].name);
 
             if (pleasure_dome_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     pleasure_dome_bonus * 5, TECHDATA::_buildings[BUILDING_PLEASURE_DOME].name);
 
             if (leader_bonus != 0)
-                debug_out += sprintf(debug_out, "\t%+d%%\t%s\r",
+                STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                     leader_bonus * 5, _leader_bonus_msg);
 
-            debug_out += sprintf(debug_out, "\r");
-            sprintf(debug_out, "\t%+d%%\t%s\r",
+            STRBUILD::Sprintf(debug_out, "\r");
+            STRBUILD::Sprintf(debug_out, "\t%+d%%\t%s\r",
                 colony->morale * 5, _total_morale_msg);
         }
     }
@@ -900,7 +901,7 @@ namespace COLCALC {
         return (final.final_prod + 10) / 20;
     }
 
-    void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out) {
+    void __cdecl Compute_Player_Maintenance_(s_player* plr, STRBUILD::s_builder* debug_out) {
         int16_t player_idx = static_cast<int16_t>(plr - MOX::_player);
 
         plr->command_points = 0;
@@ -992,38 +993,36 @@ namespace COLCALC {
         }
 
         if (debug_out) {
-            char* ptr = debug_out;
-            ptr += sprintf(ptr, "%d %s\n", 5, _starting_command_points_msg);
+            STRBUILD::Sprintf(debug_out, "%d %s\n", 5, _starting_command_points_msg);
 
             if (n_star_bases > 0) {
-                if (n_star_bases == 1) ptr += sprintf(ptr, _d_from_1_star_base_msg, 1);
-                else ptr += sprintf(ptr, _d_from_d_star_bases_msg, n_star_bases, n_star_bases);
+                if (n_star_bases == 1) STRBUILD::Sprintf(debug_out, _d_from_1_star_base_msg, 1);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_star_bases_msg, n_star_bases, n_star_bases);
             }
             if (n_battlestations > 0) {
-                if (n_battlestations == 1) ptr += sprintf(ptr, _d_from_1_battlestation_msg, 2);
-                else ptr += sprintf(ptr, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
+                if (n_battlestations == 1) STRBUILD::Sprintf(debug_out, _d_from_1_battlestation_msg, 2);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
             }
             if (n_fortresses > 0) {
-                if (n_fortresses == 1) ptr += sprintf(ptr, _d_from_1_fortress_msg, 3);
-                else ptr += sprintf(ptr, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
+                if (n_fortresses == 1) STRBUILD::Sprintf(debug_out, _d_from_1_fortress_msg, 3);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
             }
             if (comm_tech_total != 0) {
-                ptr += sprintf(ptr, "%d : %s\n", comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
+                STRBUILD::Sprintf(debug_out, "%d : %s\n", comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
             }
             if (leader_cp_bonus != 0) {
-                ptr += sprintf(ptr, "%d : %s\n", leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
+                STRBUILD::Sprintf(debug_out, "%d : %s\n", leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
             }
             if (warlord_bonus != 0) {
-                ptr += sprintf(ptr, "%d %s\n", warlord_bonus, _from_warlord_msg);
+                STRBUILD::Sprintf(debug_out, "%d %s\n", warlord_bonus, _from_warlord_msg);
             }
             if (imperium_bonus != 0) {
-                ptr += sprintf(ptr, "%d %s\n", imperium_bonus, _from_imperium_msg);
+                STRBUILD::Sprintf(debug_out, "%d %s\n", imperium_bonus, _from_imperium_msg);
             }
             if (plr->command_points > 5) {
-                ptr += sprintf(ptr, "%d %s\n", (int)plr->command_points, _total_command_points_msg);
+                STRBUILD::Sprintf(debug_out, "%d %s\n", (int)plr->command_points, _total_command_points_msg);
             }
-            ptr += sprintf(ptr, "-------------------\n");
-            debug_out = ptr;
+            STRBUILD::Sprintf(debug_out, "-------------------\n");
         }
 
         int32_t active_freighters = plr->n_freighters;
@@ -1049,25 +1048,23 @@ namespace COLCALC {
         }
 
         if (debug_out) {
-            char* ptr = debug_out;
             for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                 if (ship_counts[i] > 0) {
                     if (ship_counts[i] == 1) {
-                        ptr += sprintf(ptr, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
+                        STRBUILD::Sprintf(debug_out, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
                     }
                     else {
-                        ptr += sprintf(ptr, _d_from_d_s_ships_msg, (i + 1) * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
+                        STRBUILD::Sprintf(debug_out, _d_from_d_s_ships_msg, (i + 1) * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
                     }
                 }
             }
             if (noncombat_ships > 0) {
-                if (noncombat_ships == 1) ptr += sprintf(ptr, _d_from_1_noncombat_ship_msg, 1);
-                else ptr += sprintf(ptr, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
+                if (noncombat_ships == 1) STRBUILD::Sprintf(debug_out, _d_from_1_noncombat_ship_msg, 1);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
             }
             const char* used_msg = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
-            ptr += sprintf(ptr, "%d %s\n", (int)plr->command_points_used, used_msg);
-            ptr += sprintf(ptr, "-------------------\n");
-            debug_out = ptr;
+            STRBUILD::Sprintf(debug_out, "%d %s\n", (int)plr->command_points_used, used_msg);
+            STRBUILD::Sprintf(debug_out, "-------------------\n");
         }
 
         if (plr->command_points_used != 0) {
@@ -1076,13 +1073,13 @@ namespace COLCALC {
                 int32_t cost_mult = (plr->objectives == PLAYER_OBJECTIVE_HUMAN) ? 10 : (12 - MOX::_settings.game_difficulty);
                 plr->maintenance[2] = (int16_t)(cost_mult * diff);
                 if (debug_out) {
-                    sprintf(debug_out, "(%s %d * %d + %d * %d : %d BC)\n", _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
+                    STRBUILD::Sprintf(debug_out, "(%s %d * %d + %d * %d : %d BC)\n", _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
                 }
             }
             else {
                 plr->maintenance[2] = 0;
                 if (debug_out) {
-                    sprintf(debug_out, "(%s 0 BC)\n", _ship_maintenance_costs_msg);
+                    STRBUILD::Sprintf(debug_out, "(%s 0 BC)\n", _ship_maintenance_costs_msg);
                 }
             }
         }
@@ -1104,7 +1101,7 @@ namespace COLCALC {
         }
     }
 
-    void __cdecl Colony_BC_Production_(s_colony* colony, char* debug_buf) {
+    void __cdecl Colony_BC_Production_(s_colony* colony, STRBUILD::s_builder* debug_buf) {
         if (colony->n_pops == 0) {
             colony->production[ECON_BC] = 0;
             return;
@@ -1114,7 +1111,7 @@ namespace COLCALC {
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
             colony->production[ECON_BC] = 0;
             if (debug_buf) {
-                strcpy(debug_buf, _anomaly_msg);
+                STRBUILD::Copy(debug_buf, _anomaly_msg);
             }
             return;
         }
@@ -1220,51 +1217,50 @@ namespace COLCALC {
             leader_bonus_bc + gov_bonus_bc + spaceport_bc);
 
         if (debug_buf) {
-            char* ptr = debug_buf;
             // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
             // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
-            ptr += sprintf(ptr, "%s", "\x07" "T+15,+65.");
-            ptr += sprintf(ptr, "%s", "\x1A" "0");
+            STRBUILD::Sprintf(debug_buf, "%s", "\x07" "T+15,+65.");
+            STRBUILD::Sprintf(debug_buf, "%s", "\x1A" "0");
 
             if (taxes_collected != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", taxes_collected, _taxes_collected_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", taxes_collected, _taxes_collected_msg);
             }
             if (morale_bonus > 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", morale_bonus, _morale_bonus_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", morale_bonus, _morale_bonus_msg);
             }
             else if (morale_bonus < 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", morale_bonus, _morale_penalty_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", morale_bonus, _morale_penalty_msg);
             }
             if (special_planet_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", special_planet_bc, _special_income_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", special_planet_bc, _special_income_msg);
             }
             if (leader_bonus_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", leader_bonus_bc, _leader_bonus_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", leader_bonus_bc, _leader_bonus_msg);
             }
             if (galactic_currency_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
             }
             if (stock_exchange_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
             }
             if (spaceport_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
             }
             if (gov_bonus_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", gov_bonus_bc, _government_bonus_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", gov_bonus_bc, _government_bonus_msg);
             }
             if (trade_goods_bc != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", trade_goods_bc, _trade_goods_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", trade_goods_bc, _trade_goods_msg);
             }
             if (colony->n_industry_taxed != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", (int)colony->n_industry_taxed, _taxed_from_industry_msg);
             }
-            ptr += sprintf(ptr, "%s", "\r");
-            sprintf(ptr, "\t%+d\t%s\r", (int)colony->production[ECON_BC], _total_income_msg);
+            STRBUILD::Sprintf(debug_buf, "%s", "\r");
+            STRBUILD::Sprintf(debug_buf, "\t%+d\t%s\r", (int)colony->production[ECON_BC], _total_income_msg);
         }
     }
 
-    void __cdecl Colony_Research_Production_(s_colony* colony, char* debug_out) {
+    void __cdecl Colony_Research_Production_(s_colony* colony, STRBUILD::s_builder* debug_out) {
         s_colony_job_production breakdown;
         int32_t res_lab_bonus, supercomp_bonus, cybernet_bonus, autolab_bonus;
 
@@ -1277,7 +1273,7 @@ namespace COLCALC {
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
             colony->production[ECON_RESEARCH] = 0;
             if (debug_out != nullptr) {
-                strcpy(debug_out, _anomaly_msg);
+                STRBUILD::Copy(debug_out, _anomaly_msg);
             }
             return;
         }
@@ -1294,89 +1290,88 @@ namespace COLCALC {
         colony->production[ECON_RESEARCH] = total_research;
 
         if (debug_out != nullptr) {
-            char* ptr = debug_out;
             // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
             // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
-            ptr += sprintf(ptr, "%s", "\x07" "T+15,+65.");
-            ptr += sprintf(ptr, "%s", "\x1A" "0");
+            STRBUILD::Sprintf(debug_out, "%s", "\x07" "T+15,+65.");
+            STRBUILD::Sprintf(debug_out, "%s", "\x1A" "0");
 
             if (breakdown.base_prod != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_scientists_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_scientists_msg);
             }
             if (breakdown.artifacts_bonus != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.artifacts_bonus, _artifacts_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.artifacts_bonus, _artifacts_bonus_msg);
             }
             if (breakdown.intelligence_bonus != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", breakdown.intelligence_bonus, _intelligence_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.intelligence_bonus, _intelligence_bonus_msg);
             }
 
             for (int i = 0; i < MAX_PLAYERS; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
-                    ptr += sprintf(ptr, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] != 0) {
-                ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
             }
 
             for (int i = 0; i < 204; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < BUILDING_COUNT; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    ptr += sprintf(ptr, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
             }
             if (breakdown.conquered_penalty != 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
             }
             if (breakdown.blockaded_penalty != 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
             }
             if (breakdown.morale_bonus > 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
             }
             if (breakdown.govt_bonus > 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
             }
             if (breakdown.officer_bonus != 0) {
-                ptr += sprintf(ptr, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
             }
 
             if (res_lab_bonus != 0) {
-                ptr += sprintf(ptr, "\t+%d\t%s\r", res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
+                STRBUILD::Sprintf(debug_out, "\t+%d\t%s\r", res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
             }
             if (supercomp_bonus != 0) {
-                ptr += sprintf(ptr, "\t+%d\t%s\r", supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
+                STRBUILD::Sprintf(debug_out, "\t+%d\t%s\r", supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
             }
             if (cybernet_bonus != 0) {
-                ptr += sprintf(ptr, "\t+%d\t%s\r", cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
+                STRBUILD::Sprintf(debug_out, "\t+%d\t%s\r", cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
             }
             if (autolab_bonus != 0) {
-                ptr += sprintf(ptr, "\t+%d\t%s\r", autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
+                STRBUILD::Sprintf(debug_out, "\t+%d\t%s\r", autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
             }
 
-            ptr += sprintf(ptr, "\r");
-            sprintf(ptr, "\t%+d\t%s\r", (int)total_research, _total_research_produced_msg);
+            STRBUILD::Sprintf(debug_out, "\r");
+            STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)total_research, _total_research_produced_msg);
         }
     }
 
 
-    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out) {
+    void __cdecl Colony_Food_Production_(s_colony* colony, STRBUILD::s_builder* debug_out) {
         if (colony->n_pops == 0) {
             colony->production[ECON_FOOD] = 0;
             return;
@@ -1386,7 +1381,7 @@ namespace COLCALC {
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             colony->production[ECON_FOOD] = 0;
             if (debug_out) {
-                strcpy(debug_out, _anomaly_msg);
+                STRBUILD::Copy(debug_out, _anomaly_msg);
             }
             return;
         }
@@ -1415,91 +1410,91 @@ namespace COLCALC {
         if (debug_out) {
             // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
             // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
-            int len = sprintf(debug_out, "%s", "\x07" "T+15,+65.");
-            len += sprintf(debug_out + len, "%s", "\x1A" "0");
+            STRBUILD::Sprintf(debug_out, "%s", "\x07" "T+15,+65.");
+            STRBUILD::Sprintf(debug_out, "%s", "\x1A" "0");
 
             if (breakdown.base_prod != 0) {
-                len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.base_prod / 2, _produced_by_farmers_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.base_prod / 2, _produced_by_farmers_msg);
             }
             if (breakdown.food_bonus != 0) {
-                len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.food_bonus / 2, _aquatic_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.food_bonus / 2, _aquatic_bonus_msg);
             }
 
             for (int i = 0; i < MAX_PLAYERS; ++i) {
                 int16_t val = breakdown.racial_bonuses[i];
                 if (val > 0) {
-                    len += sprintf(debug_out + len, "\t%+d\t%s %s\r", val / 2, MOX::_player[i].race_name, _bonus_msg);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s %s\r", val / 2, MOX::_player[i].race_name, _bonus_msg);
                 }
                 else if (val < 0) {
                     char* formatted = Format_Quotient_(val, 2);
-                    len += sprintf(debug_out + len, "\t%s\t%s %s\r", formatted, MOX::_player[i].race_name, _bonus_msg);
+                    STRBUILD::Sprintf(debug_out, "\t%s\t%s %s\r", formatted, MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_NATIVE] != 0) {
-                len += sprintf(debug_out + len, "\t%+d\t %s\r", breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_NATIVE] / 2, _native_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t %s\r", breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_NATIVE] / 2, _native_bonus_msg);
             }
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] != 0) {
-                len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] / 2, _android_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] / 2, _android_bonus_msg);
             }
 
             for (int i = 0; i < 204; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < BUILDING_COUNT; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    len += sprintf(debug_out + len, "\t%+d\t%s\r", breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
             }
             if (breakdown.conquered_penalty != 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
             }
             if (breakdown.blockaded_penalty != 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
             }
             if (breakdown.morale_bonus > 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
             }
             if (breakdown.govt_bonus > 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
             }
             if (breakdown.officer_bonus != 0) {
-                len += sprintf(debug_out + len, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
             }
 
             if (hydro_bonus != 0) {
-                len += sprintf(debug_out + len, "\t%+d\t%s\r", (int32_t)hydro_bonus, TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int32_t)hydro_bonus, TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
             }
             if (subterranean_bonus != 0) {
-                len += sprintf(debug_out + len, "\t%+d\t%s\r", (int32_t)subterranean_bonus, TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int32_t)subterranean_bonus, TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
             }
 
             if (colony->n_food_replicated != 0) {
                 int replication_amount = (int)(uint8_t)colony->n_food_replicated;
-                len += sprintf(debug_out + len, "\t%+d\t%s\r", replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
                 colony->production[ECON_FOOD] += (int16_t)replication_amount;
             }
 
-            len += sprintf(debug_out + len, "%s", "\r");
-            sprintf(debug_out + len, "\t%+d\t%s\r", (int)colony->production[ECON_FOOD], COLCALC::_total_food_produced_msg);
+            STRBUILD::Sprintf(debug_out, "%s", "\r");
+            STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)colony->production[ECON_FOOD], COLCALC::_total_food_produced_msg);
         }
     }
 
 
-    void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out) {
+    void __cdecl Colony_Industry_Production_(s_colony* colony, STRBUILD::s_builder* debug_out) {
         s_colony_job_production breakdown;
         uint32_t base_worker_prod;
         uint32_t bonus_recycling = 0;
@@ -1520,7 +1515,7 @@ namespace COLCALC {
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             colony->production[ECON_INDUSTRY] = 0;
             if (debug_out) {
-                strcpy(debug_out, _anomaly_msg);
+                STRBUILD::Copy(debug_out, _anomaly_msg);
             }
             return;
         }
@@ -1615,102 +1610,101 @@ namespace COLCALC {
         colony->production[ECON_INDUSTRY] = total_prod;
 
         if (debug_out) {
-            char* p = debug_out;
             // fmtpara: \aT+15,+65. defines tab stops for the column layout, \x1A0 restores
             // left alignment, and the row formats below use \t/\r for column and paragraph breaks.
-            p += sprintf(p, "%s", "\x07" "T+15,+65.");
-            p += sprintf(p, "%s", "\x1A" "0");
+            STRBUILD::Sprintf(debug_out, "%s", "\x07" "T+15,+65.");
+            STRBUILD::Sprintf(debug_out, "%s", "\x1A" "0");
 
             if (breakdown.base_prod != 0) {
-                p += sprintf(p, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_workers_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", breakdown.base_prod, _produced_by_workers_msg);
             }
 
             for (int i = 0; i < MAX_PLAYERS; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
-                    p += sprintf(p, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s %s\r", (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID] != 0) {
-                p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)breakdown.racial_bonuses[COLONY_JOB_RACIAL_BONUS_ANDROID], _android_bonus_msg);
             }
 
             for (int i = 0; i < TECH_APP_COUNT; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < BUILDING_COUNT; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    p += sprintf(p, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
+                    STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
             }
 
             if (breakdown.conquered_penalty != 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
             }
 
             if (breakdown.blockaded_penalty != 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
             }
 
             if (breakdown.morale_bonus > 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
             }
 
             if (breakdown.govt_bonus > 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
             }
 
             if (breakdown.officer_bonus != 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
             }
 
             if (bonus_recycling != 0) {
-                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
             }
             if (bonus_automated_factory != 0) {
-                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
             }
             if (bonus_robo_miner != 0) {
-                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
             }
             if (bonus_deep_core != 0) {
-                p += sprintf(p, "\t%+d\t%s\r", (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
             }
             if (bonus_robotic_factory != 0) {
-                p += sprintf(p, "\t%+d\t%s %s\r", (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
+                STRBUILD::Sprintf(debug_out, "\t%+d\t%s %s\r", (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
             }
 
             if (breakdown.pollution_penalty != 0) {
-                p += sprintf(p, "\t%s\t%s\r", Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
+                STRBUILD::Sprintf(debug_out, "\t%s\t%s\r", Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
             }
 
             if (colony->n_food_replicated != 0) {
                 char replicated_food_text[256];
                 snprintf(replicated_food_text, sizeof(replicated_food_text), _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
-                p += sprintf(p, "\t%d\t%s\r", (int32_t)(uint8_t)colony->n_food_replicated * -2, replicated_food_text);
+                STRBUILD::Sprintf(debug_out, "\t%d\t%s\r", (int32_t)(uint8_t)colony->n_food_replicated * -2, replicated_food_text);
                 colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
             }
 
             if (colony->n_industry_taxed != 0) {
-                p += sprintf(p, "\t-%d\t%s\r", (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                STRBUILD::Sprintf(debug_out, "\t-%d\t%s\r", (int)colony->n_industry_taxed, _taxed_from_industry_msg);
                 colony->production[ECON_INDUSTRY] -= colony->n_industry_taxed;
             }
 
-            p += sprintf(p, "%s", "\r");
-            sprintf(p, "\t%+d\t%s\r", (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
+            STRBUILD::Sprintf(debug_out, "%s", "\r");
+            STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
         }
     }
 

@@ -121,9 +121,10 @@ namespace COLCALC {
 
     void __cdecl Show_Command_Points_(int player_idx) {
         char msg_buffer[3000];
+        STRBUILD::s_builder builder = STRBUILD::Init(msg_buffer, sizeof(msg_buffer));
 
         // Assembly calculates offset: player_idx * 3753 (0xEA9)
-        Compute_Player_Maintenance_(&MOX::_player[player_idx], msg_buffer);
+        Compute_Player_Maintenance_(&MOX::_player[player_idx], &builder);
 
         TEXTBOX::Text_Box_(_command_summary_msg, msg_buffer);
     }
@@ -992,17 +993,19 @@ namespace COLCALC {
 
     void __cdecl Show_Industry_Production_(short colony_idx) {
         char buffer[3000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
         s_colony* colony = &MOX::_colony[colony_idx];
 
-        Colony_Industry_Production_(colony, buffer);
+        Colony_Industry_Production_(colony, &builder);
         TEXTBOX::Text_Box_(_industry_summary_msg, buffer);
     }
 
     void __cdecl Show_Research_Production_(int16_t colony_idx) {
         char buffer[3000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
-        Colony_Research_Production_(&MOX::_colony[colony_idx], buffer);
+        Colony_Research_Production_(&MOX::_colony[colony_idx], &builder);
         TEXTBOX::Text_Box_(_research_summary_msg, buffer);
     }
 

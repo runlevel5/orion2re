@@ -338,9 +338,10 @@ namespace COLREFIT {
 
     void __cdecl Show_Ship_Design_(s_ship_design* design) {
         char buffer[10000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
         COLONY::Set_Colony_Font_To_(1);
-        COLBLDG::Build_Ship_Design_Info_Formatted_Paragraph_(design, buffer);
+        COLBLDG::Build_Ship_Design_Info_Formatted_Paragraph_(design, &builder);
         BILL::Squeeze_Print_Formatted_Paragraph_(168, 248, 305, 169, buffer, 0);
     }
 
@@ -463,9 +464,10 @@ namespace COLREFIT {
 
     void __cdecl Scan_Ship_Info_(int16_t ship_idx) {
         char buffer[10000];
+        STRBUILD::s_builder builder = STRBUILD::Init(buffer, sizeof(buffer));
 
         COLONY::Set_Colony_Font_To_(1);
-        COLBLDG::Build_Ship_Info_Formatted_Paragraph_(&MOX::_ship[ship_idx], buffer);
+        COLBLDG::Build_Ship_Info_Formatted_Paragraph_(&MOX::_ship[ship_idx], &builder);
         BILL::Squeeze_Print_Formatted_Paragraph_(168, 248, 283, 169, buffer, 0);
     }
 

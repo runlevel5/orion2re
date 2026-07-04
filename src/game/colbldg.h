@@ -8,6 +8,10 @@ struct s_ship_data;
 struct s_ship_design;
 struct s_ship_weapons;
 
+namespace STRBUILD {
+    struct s_builder;
+}
+
 namespace COLBLDG {
     static inline bool Colony_Production_Is_Queued_Ship_(int16_t production_id) {
         return production_id <= COLONY_PRODUCTION_QUEUED_SHIP_BASE;
@@ -147,14 +151,14 @@ namespace COLBLDG {
      * @param design Ship design to describe.
      * @param buffer Destination paragraph buffer.
      */
-    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, char* buffer);
+    void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_design* design, STRBUILD::s_builder* builder);
 
     /**
      * Builds a formatted paragraph describing a ship and its crew state.
      * @param ship Ship instance to describe.
      * @param buffer Destination paragraph buffer.
      */
-    void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer);
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, STRBUILD::s_builder* builder);
 
     /**
      * Dispatches to the ship or design paragraph builder for binary-compatibility callers.
@@ -162,7 +166,7 @@ namespace COLBLDG {
      * @param buffer Destination paragraph buffer.
      * @param include_crew_details Nonzero when ship-specific crew details should be printed.
      */
-    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, char* buffer, char include_crew_details);
+    void __cdecl Build_Ship_Info_Formatted_Paragraph_Binary_(void* ship_or_design, STRBUILD::s_builder* builder, char include_crew_details);
 
     /**
      * Formats a weapon entry for ship-description output.
