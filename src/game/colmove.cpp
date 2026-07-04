@@ -155,7 +155,7 @@ namespace COLMOVE {
             return;
         }
 
-        COLMOVE::Colony_Pop_String_(COLMOVE::_cluster_colony_n, unemployed_pop_idx, pop_string);
+        COLMOVE::Colony_Pop_String_(COLMOVE::_cluster_colony_n, unemployed_pop_idx, pop_string, sizeof(pop_string));
 
         while (unemployed_pop_idx != -1) {
             if (colony_idx == COLMOVE::_cluster_colony_n) {
@@ -546,7 +546,11 @@ namespace COLMOVE {
         return 0;
     }
 
-    void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer) {
+    void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer, size_t output_buffer_size) {
+        if (output_buffer_size == 0) {
+            return;
+        }
+
         uint32_t pop_value = MOX::_colony[colony_idx].pop[pop_idx];
 
         if (MOX::_settings.language == 4) {
@@ -557,7 +561,7 @@ namespace COLMOVE {
             char* job_string = COLONY::Job_String_((int16_t)((pop_value >> 7) & 3U));
             char* format = ESTRINGS::E_Strings_(0x4C);
 
-            sprintf(output_buffer, format, job_string, pop_race_string, conquered_string, pop_state_string);
+            snprintf(output_buffer, output_buffer_size, format, job_string, pop_race_string, conquered_string, pop_state_string);
             return;
         }
 
@@ -568,6 +572,6 @@ namespace COLMOVE {
         char* conquered_string = COLONY::Conquered_String_((bool)((pop_value >> 10) & 1U));
         char* format = ESTRINGS::E_Strings_(0x4C);
 
-        sprintf(output_buffer, format, conquered_string, pop_race_string, pop_state_string, job_string);
+        snprintf(output_buffer, output_buffer_size, format, conquered_string, pop_race_string, pop_state_string, job_string);
     }
 }

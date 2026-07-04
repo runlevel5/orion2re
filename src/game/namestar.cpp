@@ -118,10 +118,10 @@ void __cdecl Setup_Input_Box_Popup_() {
     _input_box.accept_field_id = fields::Add_Continuous_String_Input_Field_(
         _input_box.input_x,
         _input_box.input_y,
-        _input_box.max_input_length,
+        _input_box.input_field_width,
         _input_box.unk1,
         _input_box.input_text,
-        _input_box.input_type,
+        _input_box.max_input_chars,
         0,
         0,
         41,
@@ -259,9 +259,9 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
 
     int8_t result;
     if (use_animated_popup != 0) {
-        result = Input_Box_Popup_Animated_(MOX::_star[star_idx].name, 15, max_name_width, prompt_text, x, y);
+        result = Input_Box_Popup_Animated_(MOX::_star[star_idx].name, sizeof(MOX::_star[star_idx].name), 15, max_name_width, prompt_text, x, y);
     } else {
-        result = Input_Box_Popup_(MOX::_star[star_idx].name, 15, max_name_width, prompt_text, x, y, 0);
+        result = Input_Box_Popup_(MOX::_star[star_idx].name, sizeof(MOX::_star[star_idx].name), 15, max_name_width, prompt_text, x, y, 0);
     }
 
     if (MOX::_star[star_idx].name[0] == '\0') {
@@ -297,29 +297,22 @@ int8_t __cdecl Can_Change_Star_Name_(int16_t star_idx) {
     return can_change;
 }
 
-int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim) {
+int8_t __cdecl Input_Box_Popup_(char* input_text, uint32_t input_text_size, int16_t max_input_length, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim) {
+    if (input_text == nullptr || input_text_size == 0 || prompt_text == nullptr) {
+        return 0;
+    }
+
     EVANHELP::Save_Help_List_();
     fields::Save_Auto_Function_();
     EVANHELP::Set_Input_Box_Help_List_();
 
     memset(&_input_box, 0, sizeof(s_input_box_state));
 
-    if (strlen(input_text) < sizeof(_input_box.input_text)) {
-        strlcpy(_input_box.input_text, input_text, sizeof(_input_box.input_text));
-    } else {
-        strncpy(_input_box.input_text, input_text, sizeof(_input_box.input_text));
-        _input_box.input_text[sizeof(_input_box.input_text) - 1] = '\0';
-    }
-
-    if (strlen(prompt_text) < sizeof(_input_box.prompt_text)) {
-        strlcpy(_input_box.prompt_text, prompt_text, sizeof(_input_box.prompt_text));
-    } else {
-        strncpy(_input_box.prompt_text, prompt_text, sizeof(_input_box.prompt_text));
-        _input_box.prompt_text[sizeof(_input_box.prompt_text) - 1] = '\0';
-    }
+    strlcpy(_input_box.input_text, input_text, sizeof(_input_box.input_text));
+    strlcpy(_input_box.prompt_text, prompt_text, sizeof(_input_box.prompt_text));
 
     _input_box.bg_height = 0x36;
-    _input_box.input_type = input_type;
+    _input_box.max_input_chars = max_input_length;
     _input_box.prompt_y = y + 3;
     _input_box.show_cancel_anim = show_cancel_anim;
     _input_box.cancel_x = x + 0x60;
@@ -328,12 +321,12 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     _input_box.input_y = y + 0x36;
 
     if (max_length == 0) {
-        _input_box.max_input_length = 205;
+        _input_box.input_field_width = 205;
     } else {
         if (max_length >= 205) {
-            _input_box.max_input_length = 205;
+            _input_box.input_field_width = 205;
         } else {
-            _input_box.max_input_length = max_length;
+            _input_box.input_field_width = max_length;
         }
     }
 
@@ -354,12 +347,7 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     _input_box.font_colors = *colors2;
 
     char original_input_text[sizeof(_input_box.input_text)];
-    if (strlen(_input_box.input_text) < sizeof(original_input_text)) {
-        strlcpy(original_input_text, _input_box.input_text, sizeof(original_input_text));
-    } else {
-        strncpy(original_input_text, _input_box.input_text, sizeof(original_input_text));
-        original_input_text[sizeof(original_input_text) - 1] = '\0';
-    }
+    strlcpy(original_input_text, _input_box.input_text, sizeof(original_input_text));
 
     Setup_Input_Box_Popup_();
 
@@ -404,7 +392,7 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     } while (popup_action == 0);
 
     strings::Trim_(_input_box.input_text);
-    strcpy(input_text, _input_box.input_text);
+    strlcpy(input_text, _input_box.input_text, input_text_size);
 
     allocate::Pop_Block_(MOX::_screen_seg);
     fields::Clear_Fields_();
@@ -416,8 +404,8 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     return accepted;
 }
 
-int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y) {
-    return Input_Box_Popup_(input_text, input_type, max_length, prompt_text, x, y, 1);
+int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, uint32_t input_text_size, int16_t max_input_length, int16_t max_length, char* prompt_text, int16_t x, int16_t y) {
+    return Input_Box_Popup_(input_text, input_text_size, max_input_length, max_length, prompt_text, x, y, 1);
 }
 
 } // namespace namestar

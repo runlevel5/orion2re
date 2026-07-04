@@ -42,7 +42,8 @@ namespace COLMOVE {
     // @param colony_idx Colony index containing the pop.
     // @param pop_idx Pop index to describe.
     // @param output_buffer Destination buffer for the formatted text.
-    void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer);
+    // @param output_buffer_size Size of the destination buffer in bytes.
+    void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer, size_t output_buffer_size);
 
     // Changes a pop to a new job if colony rules allow it.
     // @param colony_idx Colony index containing the pop.

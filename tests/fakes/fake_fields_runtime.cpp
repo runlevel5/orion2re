@@ -773,8 +773,7 @@ namespace platform {
                 return;
             }
 
-            std::strncpy(g_exit_message, message, sizeof(g_exit_message) - 1);
-            g_exit_message[sizeof(g_exit_message) - 1] = '\0';
+            strlcpy(g_exit_message, message, sizeof(g_exit_message));
         }
     }
 

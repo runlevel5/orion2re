@@ -336,7 +336,7 @@ namespace EVANHELP {
     void __cdecl Get_Application_Description_(char* dest, int16_t item_index) {
         char help_lbx_name[20];
 
-        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
         allocate::Push_Block_(MOX::_screen_seg);
 
         void* buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 2000);

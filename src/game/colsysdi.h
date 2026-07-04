@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace COLSYSDI {
     // Draws the colony system-display planet list at the given screen position.
     // x: Left edge of the system-display panel.
@@ -13,9 +15,10 @@ namespace COLSYSDI {
 
     // Formats the summary text shown for a planet in the system-display panel.
     // summary_text: Destination buffer for the formatted summary text.
+    // summary_text_size: Size of the destination buffer in bytes.
     // planet_idx: Planet index to summarize.
     // font_player_idx: Player slot used for colony text colorization, or -1 to skip recoloring.
-    void __cdecl Planet_Summary_String_(char* summary_text, int16_t planet_idx, int16_t font_player_idx);
+    void __cdecl Planet_Summary_String_(char* summary_text, size_t summary_text_size, int16_t planet_idx, int16_t font_player_idx);
 
     // Draws the scan marker for the colony's currently selected planet row.
     // x: Left edge of the scan-marker column.

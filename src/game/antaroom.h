@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+#define ANTARAN_ROOM_MESSAGE_CAPACITY 210
+
 struct s_mouse_list;
 struct s_colors;
 

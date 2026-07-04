@@ -247,7 +247,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                         
                         int screen_state;
                         do {
-                            screen_state = Naming_Popup_(plr->name, i);
+                            screen_state = Naming_Popup_(plr->name, sizeof(plr->name), i);
                             video::Set_Page_Back_();
                             auto anim = (s_animation_header*)buffer::Buffer_Reload_("RACEOPT.LBX", 0, MOX::_global_cache_seg);
                             animate::Draw_(0, 0, anim);
@@ -645,7 +645,7 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                     int16_t popup_result;
                     while (true) {
                         fields::Deactivate_Help_List_();
-                        popup_result = RACESEL::Naming_Popup_(player->name, static_cast<int16_t>(player->race));
+                        popup_result = RACESEL::Naming_Popup_(player->name, sizeof(player->name), static_cast<int16_t>(player->race));
 
                         video::Set_Page_Back_();
                         animate::Draw_(0, 0, (s_animation_header*)buffer::Buffer_Reload_("RACEOPT.LBX", 4, MOX::_global_cache_seg));
@@ -733,7 +733,7 @@ void __cdecl Draw_Naming_Popup_() {
   }
 }
 
-void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output_text) {
+void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output_text, uint32_t output_text_size) {
     int16_t next_count = static_cast<int16_t>(*message_count + 1);
     *message_count = next_count;
 
@@ -742,14 +742,14 @@ void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char
             char separator_text[80];
 
             KEN::Ken_Get_Text_Message_(0x68, separator_text, sizeof(separator_text));
-            strcat(output_text, separator_text);
+            strlcat(output_text, separator_text, output_text_size);
         }
     } else if (next_count > 1) {
-        strcat(output_text, DESIGN::s_comma_space);
+        strlcat(output_text, DESIGN::s_comma_space, output_text_size);
     }
 }
 
-int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
+int8_t __cdecl Naming_Popup_(char* output_name, uint32_t output_name_size, int16_t race_idx) {
     char original_name[20];
     char popup_text[80];
 
@@ -777,15 +777,17 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
     const int8_t popup_result = namestar::Input_Box_Popup_Animated_(
         RACESEL::_temp_ruler_name,
         sizeof(original_name),
+        sizeof(original_name),
         0x66,
         popup_text,
         center_x,
         center_y
     );
 
-    strcpy(
+    strlcpy(
         output_name,
-        (RACESEL::_temp_ruler_name[0] != '\0') ? RACESEL::_temp_ruler_name : original_name
+        (RACESEL::_temp_ruler_name[0] != '\0') ? RACESEL::_temp_ruler_name : original_name,
+        output_name_size
     );
 
     allocate::Pop_Block_(MOX::_screen_seg);
@@ -993,7 +995,7 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
         for (int16_t ability_id = TRAIT_POP_GROWTH_BONUS; ability_id < TRAIT_LOW_G_WORLD; ++ability_id) {
             if (race_specials[ability_id] != 0) {
-                RACESEL::Message_Build_(&line_index, total_lines, paragraph);
+                RACESEL::Message_Build_(&line_index, total_lines, paragraph, sizeof(paragraph));
                 strlcat(paragraph, MOX::_special_ability_names[ability_id], sizeof(paragraph));
 
                 const int32_t special_level = static_cast<int8_t>(race_specials[ability_id]);
@@ -1026,12 +1028,12 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
 
         for (int16_t ability_id = TRAIT_LOW_G_WORLD; ability_id < TRAIT_COUNT; ++ability_id) {
             if (race_specials[ability_id] == 1) {
-                RACESEL::Message_Build_(&line_index, total_lines, paragraph);
+                RACESEL::Message_Build_(&line_index, total_lines, paragraph, sizeof(paragraph));
                 strlcat(paragraph, MOX::_special_ability_names[ability_id], sizeof(paragraph));
             }
         }
 
-        RACESEL::Message_Build_(&line_index, total_lines, paragraph);
+        RACESEL::Message_Build_(&line_index, total_lines, paragraph, sizeof(paragraph));
         strlcat(paragraph, MOX::_government_labels[static_cast<int8_t>(race_specials[0])], sizeof(paragraph));
 
         fonts::Set_Font_Style_Shadow_Down_(2, &shadow_colors);

@@ -719,7 +719,7 @@ namespace COLBLDG {
         char lbx_name[20];
         s_help_record* record_ptr;
 
-        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name, sizeof(lbx_name));
 
         if (_last_app != app_id) {
             _last_app = app_id;
@@ -1018,7 +1018,7 @@ namespace COLBLDG {
         char help_lbx_name[20];
         char description_buffer[1332];
 
-        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
         fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
         fonts::Set_Font_Spacing_(1);
         fonts::Set_Font_Spacing_Width_(2);

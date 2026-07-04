@@ -125,8 +125,9 @@ namespace MAINMENU {
     /**
      * Selects the localized credits resource and font settings.
      * @param filename Output buffer for the chosen credits LBX filename.
+     * @param filename_size Size of the output buffer in bytes.
      */
-    void __cdecl Init_Credits_(char* filename);
+    void __cdecl Init_Credits_(char* filename, uint32_t filename_size);
 
     /**
      * Loads the scrolling credits text and scratch bitmap.

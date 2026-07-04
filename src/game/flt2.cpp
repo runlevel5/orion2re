@@ -564,7 +564,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         }
 
         char lbx_name[20];
-        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name, sizeof(lbx_name));
         
         s_help_record* lbx_data = (s_help_record*)farload::Far_Reload_Next_Data_(lbx_name, 0, help_data_block, help_idx, 1, sizeof(s_help_record));
         MOX::_mox_font_colors_offset = 0x72;

@@ -21,9 +21,8 @@ namespace COLBOMB {
     void __cdecl Do_Summary_String_Popup_() {
         char attacker_name[500];
         char message_buffer[4000];
-        char* message_cursor;
+        char line_buffer[4000];
         int32_t line_count;
-        int32_t len;
 
         COLONY::Set_Colony_Font_To_(4);
 
@@ -31,36 +30,35 @@ namespace COLBOMB {
 
         line_count = 1;
 
-        len = sprintf(
+        snprintf(
             message_buffer,
+            sizeof(message_buffer),
             ESTRINGS::E_Strings_(0x33),
             HACCESS::Get_Planet_Name_(MOX::_colony[_backup_results_ptr->colony_idx].planet),
             attacker_name
         );
 
-        message_cursor = message_buffer + len;
-
         if (_backup_results_ptr->population_killed != 0) {
-            len = sprintf(message_cursor, ESTRINGS::E_Strings_(0x1D), _backup_results_ptr->population_killed);
-            message_cursor += len;
+            snprintf(line_buffer, sizeof(line_buffer), ESTRINGS::E_Strings_(0x1D), _backup_results_ptr->population_killed);
+            strlcat(message_buffer, line_buffer, sizeof(message_buffer));
             line_count = 2;
         }
 
         if (_backup_results_ptr->infantry_killed != 0) {
-            len = sprintf(message_cursor, ESTRINGS::E_Strings_(0x18), _backup_results_ptr->infantry_killed);
-            message_cursor += len;
+            snprintf(line_buffer, sizeof(line_buffer), ESTRINGS::E_Strings_(0x18), _backup_results_ptr->infantry_killed);
+            strlcat(message_buffer, line_buffer, sizeof(message_buffer));
             line_count++;
         }
 
         if (_backup_results_ptr->tanks_killed != 0) {
-            len = sprintf(message_cursor, ESTRINGS::E_Strings_(0x11), _backup_results_ptr->tanks_killed);
-            message_cursor += len;
+            snprintf(line_buffer, sizeof(line_buffer), ESTRINGS::E_Strings_(0x11), _backup_results_ptr->tanks_killed);
+            strlcat(message_buffer, line_buffer, sizeof(message_buffer));
             line_count++;
         }
 
         if (_backup_results_ptr->is_bio_weapon != 0) {
-            len = sprintf(message_cursor, ESTRINGS::E_Strings_(0x1B), _backup_results_ptr->bio_pop_killed);
-            message_cursor += len;
+            snprintf(line_buffer, sizeof(line_buffer), ESTRINGS::E_Strings_(0x1B), _backup_results_ptr->bio_pop_killed);
+            strlcat(message_buffer, line_buffer, sizeof(message_buffer));
             line_count++;
         }
 
@@ -75,15 +73,15 @@ namespace COLBOMB {
                 } else {
                     building_format = ESTRINGS::E_Strings_(0x37);
                 }
-                len = sprintf(message_cursor, building_format, TECHDATA::_buildings[building_idx].name);
-                message_cursor += len;
+                snprintf(line_buffer, sizeof(line_buffer), building_format, TECHDATA::_buildings[building_idx].name);
+                strlcat(message_buffer, line_buffer, sizeof(message_buffer));
                 line_count++;
             }
         }
 
         if (line_count > 15) {
-            len = sprintf(message_cursor, ESTRINGS::E_Strings_(0x17A));
-            message_cursor += len;
+            snprintf(line_buffer, sizeof(line_buffer), ESTRINGS::E_Strings_(0x17A));
+            strlcat(message_buffer, line_buffer, sizeof(message_buffer));
         }
 
         if (_backup_results_ptr->colony_wiped_out != 0) {
@@ -93,7 +91,8 @@ namespace COLBOMB {
             } else {
                 wiped_out_format = ESTRINGS::E_Strings_(0x37);
             }
-            sprintf(message_cursor, wiped_out_format, HACCESS::Get_Planet_Name_(MOX::_colony[_backup_results_ptr->colony_idx].planet));
+            snprintf(line_buffer, sizeof(line_buffer), wiped_out_format, HACCESS::Get_Planet_Name_(MOX::_colony[_backup_results_ptr->colony_idx].planet));
+            strlcat(message_buffer, line_buffer, sizeof(message_buffer));
         }
 
         TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1F2), message_buffer);

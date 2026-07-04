@@ -20,9 +20,9 @@ struct s_input_box_state {
     int16_t input_y;
     int16_t x;
     int16_t y;
-    int16_t input_type;
+    int16_t max_input_chars;
     int16_t max_length;
-    int16_t max_input_length;
+    int16_t input_field_width;
     int16_t unk1;
     char input_text[100];
     int16_t accept_field_id;
@@ -77,14 +77,15 @@ namespace namestar {
 
     /* Shows a text input popup and copies the edited text back to the caller buffer.
      * input_text: Caller buffer that provides the initial text and receives the result.
-     * input_type: Input filtering mode for the field.
+     * input_text_size: Size of input_text in bytes.
+     * max_input_length: Maximum number of characters accepted by the input field.
      * max_length: Maximum accepted pixel width or zero for the default limit.
      * prompt_text: Prompt shown above the input field.
      * x, y: Popup origin in screen coordinates.
      * show_cancel_anim: Nonzero to use the animated cancel button.
      */
-    int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim);
+    int8_t __cdecl Input_Box_Popup_(char* input_text, uint32_t input_text_size, int16_t max_input_length, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim);
 
     /* Shows the animated text input popup variant. */
-    int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y);
+    int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, uint32_t input_text_size, int16_t max_input_length, int16_t max_length, char* prompt_text, int16_t x, int16_t y);
 }

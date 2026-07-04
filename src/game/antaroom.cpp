@@ -88,7 +88,7 @@ namespace ANTAROOM {
         animate::Draw_Palette_(pic);
         palette::Set_Palette_Changes_(0, 255);
         graphics::Fill_(0, 0, 639, 479, 0);
-        _antaran_room_message = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 210);
+        _antaran_room_message = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, ANTARAN_ROOM_MESSAGE_CAPACITY);
 
         int32_t remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
         uint8_t* anim_buf = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining - 100);
@@ -113,6 +113,6 @@ namespace ANTAROOM {
 
         farload::Farload_Data_Static_("antarmsg.LBX", message_lbx_index, buffer, 0, 1, sizeof(buffer));
 
-        strcpy(_antaran_room_message, buffer);
+        strlcpy(_antaran_room_message, buffer, ANTARAN_ROOM_MESSAGE_CAPACITY);
     }
 }

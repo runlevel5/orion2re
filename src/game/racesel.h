@@ -30,9 +30,10 @@ namespace RACESEL {
     /**
      * Shows the animated naming popup and writes the chosen or fallback ruler name to the caller buffer.
      * @param output_name Destination buffer for the resulting ruler name.
+     * @param output_name_size Size of output_name in bytes.
      * @param race_idx Selected race index used to choose default names.
      */
-    int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx);
+    int8_t __cdecl Naming_Popup_(char* output_name, uint32_t output_name_size, int16_t race_idx);
     /**
      * Shows the banner-color selection popup and stores the accepted color index.
      * @param selected_color Destination for the chosen banner color.
@@ -78,8 +79,9 @@ namespace RACESEL {
      * @param message_count Running number of entries already appended.
      * @param split_at_count Entry count where the final separator should be inserted.
      * @param output_text Destination string being built in place.
+     * @param output_text_size Size of output_text in bytes.
      */
-    void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output_text);
+    void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output_text, uint32_t output_text_size);
     /**
      * Draws the currently highlighted race portrait, availability state, and summary text.
      */

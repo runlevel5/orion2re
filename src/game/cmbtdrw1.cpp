@@ -3077,16 +3077,16 @@ skip_cursor:
         sound::Fadeout_Sound_(sound_handle, 10);
     }
 
-    static void Build_Signed_Bonus_String(char* out_text, int32_t value) {
+    static void Build_Signed_Bonus_String(char* out_text, size_t out_text_size, int32_t value) {
         if (value > 0) {
-            sprintf(out_text, "%s%d", "+", value);
+            snprintf(out_text, out_text_size, "+%d", value);
         } else {
-            sprintf(out_text, "%d", value);
+            snprintf(out_text, out_text_size, "%d", value);
         }
     }
 
-    static void Copy_Crew_Quality_Without_Parenthetical(char* out_text, int32_t crew_quality) {
-        strcpy(out_text, CMBTDRW1::Crew_Quality_String_(crew_quality));
+    static void Copy_Crew_Quality_Without_Parenthetical(char* out_text, size_t out_text_size, int32_t crew_quality) {
+        strlcpy(out_text, CMBTDRW1::Crew_Quality_String_(crew_quality), out_text_size);
         char* paren = strchr(out_text, '(');
         if (paren != nullptr) {
             *paren = '\0';
@@ -3294,14 +3294,14 @@ skip_cursor:
         KEN::Ken_Get_Text_Message_(9, message_text, 0x50);
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
-        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.tac_val_attack);
+        Build_Signed_Bonus_String(line_text, sizeof(line_text), MOX::_global_combat_data.tac_val_attack);
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
 
         row_y = static_cast<int16_t>(row_y + 0x0C);
         KEN::Ken_Get_Text_Message_(10, message_text, 0x50);
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
-        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.tac_val_defense);
+        Build_Signed_Bonus_String(line_text, sizeof(line_text), MOX::_global_combat_data.tac_val_defense);
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
 
         row_y = static_cast<int16_t>(row_y + 0x0C);
@@ -3317,6 +3317,7 @@ skip_cursor:
             fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
             Copy_Crew_Quality_Without_Parenthetical(
                 line_text,
+                sizeof(line_text),
                 static_cast<int32_t>(MOX::_global_combat_data.crew_quality));
             fonts::Print_Centered_(view_x + 0xA6, row_y + 0x12, line_text);
         }

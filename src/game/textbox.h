@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <cstdint>
 
 namespace TEXTBOX {
@@ -16,8 +17,9 @@ namespace TEXTBOX {
     extern int32_t _base_colors[3];
 
     /* Selects the localized help LBX filename for the active language.
-       help_lbx_name: Receives the output filename buffer. */
-    void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name);
+       help_lbx_name: Receives the output filename buffer.
+       help_lbx_name_size: Capacity of help_lbx_name in bytes. */
+    void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name, size_t help_lbx_name_size);
 
     /* Computes the textbox palette entries for the current screen and color set.
        color_set: Base palette set index.

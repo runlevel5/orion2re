@@ -1932,7 +1932,7 @@ namespace DESBOX {
         char desc_text[2664];
         char mod_text[1332];
 
-        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
         allocate::Push_Block_(MOX::_screen_seg);
 
         void* block = allocate::Allocate_Next_Block_(MOX::_screen_seg, 5000);

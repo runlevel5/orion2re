@@ -2267,10 +2267,10 @@ namespace EVENTS {
                 if (_current_event == 0) {
                     Start_Main_Event_();
                     _event_display_seg = 0;
-                    Get_Event_Message_(0, (int16_t)(game_random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
+                    Get_Event_Message_(0, (int16_t)(game_random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message, sizeof(_event_message));
                 } else {
                     _event_display_seg = 0;
-                    Get_Event_Message_(1, (int16_t)(game_random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
+                    Get_Event_Message_(1, (int16_t)(game_random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message, sizeof(_event_message));
                     _event_status_flag = 0;
                 }
                 Drive_Event_Screen_();
@@ -2282,7 +2282,7 @@ namespace EVENTS {
                 Load_Event_Picture_(event_id);
             }
 
-            Get_Event_Message_(event_id + 2, event_subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, _event_message);
+            Get_Event_Message_(event_id + 2, event_subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, _event_message, sizeof(_event_message));
             _event_status_flag = 0;
 
             if (MOX::_settings.show_gnn_report == 1) {
@@ -2309,8 +2309,13 @@ namespace EVENTS {
         int16_t star_idx,
         int16_t tech_app_idx1,
         int16_t tech_app_idx2,
-        char* out_str)
+        char* out_str,
+        uint32_t out_str_size)
     {
+        if (out_str_size == 0) {
+            return;
+        }
+
         out_str[0] = '\0';
         const char* event_lbx;
 
@@ -2333,6 +2338,20 @@ namespace EVENTS {
 
         int16_t out_len = 0;
         char temp_str[300];
+
+        auto append_text = [&](const char* text) {
+            if (text != nullptr) {
+                strlcat(out_str, text, out_str_size);
+                out_len = (int16_t)strlen(out_str);
+            }
+        };
+
+        auto append_char = [&](char c) {
+            if ((uint32_t)(out_len + 1) < out_str_size) {
+                out_str[out_len++] = c;
+                out_str[out_len] = '\0';
+            }
+        };
 
         for (int16_t i = 0; i < (int16_t)sizeof(buffer); ++i) {
             char c = buffer[i];
@@ -2416,7 +2435,7 @@ namespace EVENTS {
                     continue;
                 }
             } else {
-                out_str[out_len++] = c;
+                append_char(c);
                 continue;
             }
 
@@ -2424,22 +2443,21 @@ namespace EVENTS {
                 append_str = MOX::_player[fetch_player].race_name;
             }
 
-            out_str[out_len] = '\0';
-            strcat(out_str, append_str);
-            
-            if (out_len == 0) {
+            const int16_t old_out_len = out_len;
+            append_text(append_str);
+
+            if (old_out_len == 0 && out_len > 0) {
                 if (c == '\x8F') {
                     out_str[1] -= 0x20;
                 } else if (c == '\x90') {
                     out_str[0] -= 0x20;
                 }
             }
-            out_len = (int16_t)strlen(out_str);
         }
         out_str[out_len] = '\0';
 
         if (event_type == 0x21) {
-            strcat(out_str, string::s_Newline);
+            strlcat(out_str, string::s_Newline, out_str_size);
 
             int32_t bldg_costs[MAX_PLAYERS];
             if (event_subtype == 0) {
@@ -2480,7 +2498,7 @@ namespace EVENTS {
             }
 
             /* fmtpara: \x1A0 switches the appended ranking block to left alignment. */
-            strcat(out_str, "\x1A" "0");
+            strlcat(out_str, "\x1A" "0", out_str_size);
 
             int16_t spacing = (MOX::_settings.show_gnn_report == 1) ? 0x78 : 0x0A;
             int16_t initial_spacing = spacing;
@@ -2489,10 +2507,10 @@ namespace EVENTS {
             for (int16_t k = 0; k < count; ++k) {
                 /* fmtpara: \aX repositions the text cursor before each ranked entry. */
                 snprintf(temp_str, sizeof(temp_str), "\x07" "X%d.%d. %s", spacing, k + 1, MOX::_player[player_indices[k]].race_name);
-                strcat(out_str, temp_str);
+                strlcat(out_str, temp_str, out_str_size);
 
                 if (((k + 1) % 3) == 0) {
-                    strcat(out_str, string::s_Newline);
+                    strlcat(out_str, string::s_Newline, out_str_size);
                     spacing = initial_spacing;
                 } else {
                     spacing += 0x7D;

@@ -220,7 +220,7 @@ namespace SCIENCE {
                     palette::Refresh_Palette_();
 
                     bitmap::Copy_Bitmap_To_Bitmap_((s_animation_header*)previous_text_bitmap, (s_animation_header*)current_text_bitmap);
-                    TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+                    TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
 
                     char* formatted_text = (char*)farload::Far_Reload_Data_(
                             help_lbx_name,
@@ -252,9 +252,9 @@ namespace SCIENCE {
 
                         while (weapon_mask != 0) {
                             if ((weapon_mask & 1) != 0) {
-                                strcpy(&weapon_mod_text[strlen(weapon_mod_text)], TECHDATA::_weapon_modifications[weapon_mod_index].name);
+                                strlcat(weapon_mod_text, TECHDATA::_weapon_modifications[weapon_mod_index].name, sizeof(weapon_mod_text));
                                 /* fmtpara \r starts a new paragraph between modification names. */
-                                strcpy(&weapon_mod_text[strlen(weapon_mod_text)], "\r");
+                                strlcat(weapon_mod_text, "\r", sizeof(weapon_mod_text));
                             }
 
                             weapon_mask >>= 1;

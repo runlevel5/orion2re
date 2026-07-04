@@ -1239,40 +1239,40 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
 
     if (target_idx < MAX_PLAYERS && (*_attack_confirmed)[player_idx][target_idx] == 0) {
         int treaty_count = 0;
-        int offset = sprintf(message_buffer, "%s\n", _you_have_following_treaties_msg);
-        char* dest_ptr = message_buffer + offset;
+        strlcpy(message_buffer, _you_have_following_treaties_msg, sizeof(message_buffer));
+        strlcat(message_buffer, "\n", sizeof(message_buffer));
 
         // Check standard treaties (e.g., Non-Aggression, Alliance)
         int8_t treaty_type = MOX::_player[player_idx].treaty[target_idx];
         if (treaty_type > 0 && treaty_type < 4) {
             treaty_count = 1;
-            offset = sprintf(dest_ptr, "%s\n", MOX::_treaty_labels[treaty_type]);
-            dest_ptr += offset;
+            strlcat(message_buffer, MOX::_treaty_labels[treaty_type], sizeof(message_buffer));
+            strlcat(message_buffer, "\n", sizeof(message_buffer));
         }
 
         // Check trade treaty
         if (MOX::_player[player_idx].trade_treaty[target_idx] != 0) {
             treaty_count++;
-            offset = sprintf(dest_ptr, "%s\n", _trade_treaty_msg);
-            dest_ptr += offset;
+            strlcat(message_buffer, _trade_treaty_msg, sizeof(message_buffer));
+            strlcat(message_buffer, "\n", sizeof(message_buffer));
         }
 
         // Check research treaty
         if (MOX::_player[player_idx].research_treaty[target_idx] != 0) {
             treaty_count++;
-            offset = sprintf(dest_ptr, "%s\n", _research_treaty_msg);
-            dest_ptr += offset;
+            strlcat(message_buffer, _research_treaty_msg, sizeof(message_buffer));
+            strlcat(message_buffer, "\n", sizeof(message_buffer));
         }
 
         // Check if player is receiving tribute from the target
         if (MOX::_player[target_idx].tribute_treaty[player_idx] != 0) {
             treaty_count++;
-            offset = sprintf(dest_ptr, "%s\n", _receiving_tribute_msg);
-            dest_ptr += offset;
+            strlcat(message_buffer, _receiving_tribute_msg, sizeof(message_buffer));
+            strlcat(message_buffer, "\n", sizeof(message_buffer));
         }
 
         if (treaty_count != 0) {
-            sprintf(dest_ptr, _really_risk_war_msg);
+            strlcat(message_buffer, _really_risk_war_msg, sizeof(message_buffer));
             confirmed = (int8_t)GENDRAW::Confirmation_Box_(message_buffer);
 
             if (confirmed != 0) {

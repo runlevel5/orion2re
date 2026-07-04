@@ -14,24 +14,28 @@ namespace TEXTBOX {
     uint16_t _old_help_list_active;
     int32_t _base_colors[3] = {160, 192, 224};
 
-    void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name) {
+    void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name, size_t help_lbx_name_size) {
+        const char* selected_name;
+
         switch (MOX::_settings.language) {
             case 1: /* German */
-                strcpy(help_lbx_name, "GER_HELP.LBX");
+                selected_name = "GER_HELP.LBX";
                 break;
             case 2: /* French */
-                strcpy(help_lbx_name, "FRE_HELP.LBX");
+                selected_name = "FRE_HELP.LBX";
                 break;
             case 3: /* Spanish */
-                strcpy(help_lbx_name, "SPA_HELP.LBX");
+                selected_name = "SPA_HELP.LBX";
                 break;
             case 4: /* Italian */
-                strcpy(help_lbx_name, "ITA_HELP.LBX");
+                selected_name = "ITA_HELP.LBX";
                 break;
             default: /* English / Default */
-                strcpy(help_lbx_name, "HELP.LBX");
+                selected_name = "HELP.LBX";
                 break;
         }
+
+        strlcpy(help_lbx_name, selected_name, help_lbx_name_size);
     }
     void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height) {
         int16_t total_height = height + 85;
@@ -325,7 +329,7 @@ namespace TEXTBOX {
         uint32_t total_lbx_size = 0;
 
         char help_lbx_name[20];
-        Get_Help_Lbx_Name_(help_lbx_name);
+        Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
 
         s_help_record records[9];
         bool has_anim[9];

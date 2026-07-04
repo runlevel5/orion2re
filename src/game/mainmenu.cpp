@@ -546,7 +546,7 @@ namespace MAINMENU {
         int16_t credit_idx;
         int32_t entry_idx;
 
-        Init_Credits_(path);
+        Init_Credits_(path, sizeof(path));
         RUSS::Mox_Update_();
 
         // Load entry 0 to get the total number of credits
@@ -595,41 +595,41 @@ namespace MAINMENU {
         return (next_val - current_val) + 1;
     }
 
-    void __cdecl Init_Credits_(char* filename) {
+    void __cdecl Init_Credits_(char* filename, uint32_t filename_size) {
         switch (MOX::_settings.language) {
             case 1: /* German */
                 _credits_font_style = 2;
                 _credits_font_spacing = 2;
                 _credits_column_one = 0x9a;
-                strcpy(filename, "GERCRDTS.LBX");
+                strlcpy(filename, "GERCRDTS.LBX", filename_size);
                 return;
 
             case 2: /* French */
                 _credits_column_one = 0xa4;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                strcpy(filename, "FRECRDTS.LBX");
+                strlcpy(filename, "FRECRDTS.LBX", filename_size);
                 return;
 
             case 3: /* Spanish */
                 _credits_column_one = 0x92;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                strcpy(filename, "SPACRDTS.LBX");
+                strlcpy(filename, "SPACRDTS.LBX", filename_size);
                 return;
 
             case 4:
                 _credits_column_one = 0x92;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                strcpy(filename, "ITACRDTS.LBX");
+                strlcpy(filename, "ITACRDTS.LBX", filename_size);
                 return;
 
             default: /* English */
                 _credits_column_one = 0x7c;
                 _credits_font_spacing = 1;
                 _credits_font_style = 3;
-                strcpy(filename, "CREDITS.LBX");
+                strlcpy(filename, "CREDITS.LBX", filename_size);
                 return;
         }
     }

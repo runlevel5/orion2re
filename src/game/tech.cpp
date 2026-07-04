@@ -6,7 +6,7 @@ namespace {
         char buffer[80];
 
         buffer[0] = '^';
-        strcpy(buffer + 1, TECH::Technology_Applications_Name_(tech_app_id, MOX::_PLAYER_NUM));
+        strlcpy(buffer + 1, TECH::Technology_Applications_Name_(tech_app_id, MOX::_PLAYER_NUM), sizeof(buffer) - 1);
         BILL::Squeeze_Print_(x, y, buffer, 0xD5);
     }
 }
@@ -750,7 +750,7 @@ namespace TECH {
 
         void* out_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
 
-        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name, sizeof(lbx_name));
         s_help_record* loaded_data = (s_help_record*)farload::Far_Reload_Data_(lbx_name, 0, out_buffer, app_idx, 1, sizeof(s_help_record));
 
         int32_t cost = New_Get_Tech_Cost_(app_idx, 1, MOX::_PLAYER_NUM);
@@ -1142,17 +1142,17 @@ namespace TECH {
 
         uint8_t hyper_tech = MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - TECH_APP_BIOLOGY];
 
-        strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[tech_app_id].name);
-        strcat(MOX::_temp_string_buf + 1, " ");
+        strlcpy(MOX::_temp_string_buf, TECHDATA::_technology_applications[tech_app_id].name, sizeof(MOX::_temp_string_buf));
+        strlcat(MOX::_temp_string_buf, " ", sizeof(MOX::_temp_string_buf));
 
         if (hyper_tech > 0 && hyper_tech <= 20) {
-            strcat(MOX::_temp_string_buf + 1, MOX::_roman_literals[hyper_tech]);
+            strlcat(MOX::_temp_string_buf, MOX::_roman_literals[hyper_tech], sizeof(MOX::_temp_string_buf));
         } else {
-            char* end_ptr = (MOX::_temp_string_buf + 1) + strlen(MOX::_temp_string_buf + 1);
-            itoa((int)hyper_tech, end_ptr, 10);
+            char* end_ptr = MOX::_temp_string_buf + strlen(MOX::_temp_string_buf);
+            snprintf(end_ptr, sizeof(MOX::_temp_string_buf) - (size_t)(end_ptr - MOX::_temp_string_buf), "%u", (unsigned)hyper_tech);
         }
 
-        return MOX::_temp_string_buf + 1;
+        return MOX::_temp_string_buf;
     }
 
     void __cdecl Display_Selected_Entry_Text_(s_list_item_research* entry) {

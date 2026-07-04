@@ -348,7 +348,7 @@ namespace raceopt {
 
                 int cost_idx = opt_string_idx + (-3 - opt_string_idx) / 4;
                 itoa(_ability_costs[cost_idx], num_buf, 10);
-                strcpy(str_buf + strlen(str_buf), num_buf);
+                strlcat(str_buf, num_buf, sizeof(str_buf));
 
                 fonts::Print_(col_start_x, current_y, _opt_string[opt_string_idx]);
 
@@ -610,7 +610,7 @@ namespace raceopt {
                     ability_cost_text[0] = '\0';
                     ability_cost_text[1] = '\0';
                     itoa(_ability_costs[neg_idx], ability_cost_digits, 10);
-                    strcpy(ability_cost_text + 1, ability_cost_digits);
+                    strlcpy(ability_cost_text + 1, ability_cost_digits, sizeof(ability_cost_text) - 1);
 
                     fonts::Print_(x_coords[col_idx], y, _opt_string[item_idx]);
                     int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);

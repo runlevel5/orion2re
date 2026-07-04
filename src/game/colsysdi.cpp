@@ -36,7 +36,7 @@ namespace COLSYSDI {
                 COLONY::Set_Colony_Font_To_(1);
                 
                 char summary_text[500];
-                Planet_Summary_String_(summary_text, planet_idx, 1);
+                Planet_Summary_String_(summary_text, sizeof(summary_text), planet_idx, 1);
                 
                 BILL::_Print_Paragraph_(x + 28, text_y, 89 - x, summary_text, 0);
             }
@@ -84,12 +84,18 @@ namespace COLSYSDI {
         }
     }
 
-    void __cdecl Planet_Summary_String_(char* summary_text, int16_t planet_idx, int16_t font_player_idx) {
+    void __cdecl Planet_Summary_String_(char* summary_text, size_t summary_text_size, int16_t planet_idx, int16_t font_player_idx) {
         char* gravity_and_mineral_str[8];
         char* size_str[PLANET_SIZE_HUGE + 1];
         char* gas_giant_str;
         char* asteroid_str;
         char pop_str[500];
+
+        if (summary_text == nullptr || summary_text_size == 0) {
+            return;
+        }
+
+        summary_text[0] = '\0';
 
         s_planet_data* planet = &MOX::_planet[planet_idx];
         int16_t colony_idx = planet->colony_index;
@@ -134,10 +140,10 @@ namespace COLSYSDI {
 
         if (planet->planet_type != PLANET_TYPE_PLANET) {
             if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
-                sprintf(summary_text, ESTRINGS::E_Strings_(0x46), gas_giant_str);
+                snprintf(summary_text, summary_text_size, ESTRINGS::E_Strings_(0x46), gas_giant_str);
             }
             if (planet->planet_type == PLANET_TYPE_ASTEROID) {
-                sprintf(summary_text, ESTRINGS::E_Strings_(0x46), asteroid_str);
+                snprintf(summary_text, summary_text_size, ESTRINGS::E_Strings_(0x46), asteroid_str);
             }
             return;
         }
@@ -153,18 +159,18 @@ namespace COLSYSDI {
         }
 
         if (colony_idx == -1) {
-            sprintf(summary_text, ESTRINGS::E_Strings_(0x2C),
-                    size_str[(int)planet->size],
-                    MOX::_planet_climate_string[(int)climate],
-                    gravity_and_mineral_str[(int)planet->gravity_class],
-                    gravity_and_mineral_str[(int)planet->mineral_class + 3],
-                    pop_str);
+            snprintf(summary_text, summary_text_size, ESTRINGS::E_Strings_(0x2C),
+                     size_str[(int)planet->size],
+                     MOX::_planet_climate_string[(int)climate],
+                     gravity_and_mineral_str[(int)planet->gravity_class],
+                     gravity_and_mineral_str[(int)planet->mineral_class + 3],
+                     pop_str);
         } else {
-            sprintf(summary_text, ESTRINGS::E_Strings_(0x29),
-                    MOX::_player[(int)MOX::_colony[colony_idx].owner].race_name,
-                    gravity_and_mineral_str[(int)planet->gravity_class],
-                    gravity_and_mineral_str[(int)planet->mineral_class + 3],
-                    pop_str);
+            snprintf(summary_text, summary_text_size, ESTRINGS::E_Strings_(0x29),
+                     MOX::_player[(int)MOX::_colony[colony_idx].owner].race_name,
+                     gravity_and_mineral_str[(int)planet->gravity_class],
+                     gravity_and_mineral_str[(int)planet->mineral_class + 3],
+                     pop_str);
         }
     }
 

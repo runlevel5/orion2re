@@ -120,6 +120,7 @@ namespace EVENTS {
      * @param val1 First numeric or lookup substitution value.
      * @param val2 Second numeric substitution value.
      * @param out_str Destination buffer that receives the formatted message.
+     * @param out_str_size Size of the destination buffer in bytes.
      */
     void __cdecl Get_Event_Message_(
         int16_t event_type,
@@ -135,7 +136,8 @@ namespace EVENTS {
         int16_t star_idx,
         int16_t tech_app_idx1,
         int16_t tech_app_idx2,
-        char* out_str);
+        char* out_str,
+        uint32_t out_str_size);
 
     /** Runs the event-report input loop until the player dismisses the screen. */
     void __cdecl Drive_Event_Screen_();

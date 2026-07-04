@@ -454,9 +454,8 @@ namespace sound {
     }
 
     void __cdecl Set_Stream_Filename_(const char* filename) {
-        if (sound::_audioInitialized != 0) {
-            strncpy(_currentStreamFilename, filename, sizeof(_currentStreamFilename) - 1);
-            _currentStreamFilename[sizeof(_currentStreamFilename) - 1] = '\0';
+        if (sound::_audioInitialized != 0 && filename != nullptr) {
+            strlcpy(_currentStreamFilename, filename, sizeof(_currentStreamFilename));
             lbx::LBX_init_stream_(&sound::_streamLbxHandle, filename);
         }
     }

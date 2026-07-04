@@ -877,7 +877,7 @@ namespace INFO {
 
                     uint8_t tech_app_id = _g_selected_list_p->tech_app_ids[_g_selected_list_p->current_app_index];
 
-                    TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+                    TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
                     farload::Far_Reload_Data_(help_lbx_name, 0, text_buffer, tech_app_id, 1, sizeof(s_help_record));
 
                     fonts::Set_Font_Style_(2, &_info_normal_color);
@@ -1014,7 +1014,7 @@ namespace INFO {
         INFO::_g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
         record_buffer = allocate::Allocate_Next_Block_For_No_Header_Pool_(MOX::_screen_seg, sizeof(s_help_record));
 
-        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name, sizeof(lbx_name));
         int count = farload::Get_Farload_Data_Record_Count_(lbx_name, INFO::_g_reference_ix);
         INFO::_g_category_header.num_items = (uint8_t)count;
 
@@ -1825,7 +1825,7 @@ namespace INFO {
 
         void* reload_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, sizeof(s_help_topic_record));
         INFO::_g_first_how_to_field = fields::Get_Field_Counter_();
-        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name, sizeof(lbx_name));
         record_count = farload::Get_Farload_Data_Record_Count_(lbx_name, 0xf);
 
         y_pos = 100;
@@ -1887,7 +1887,7 @@ namespace INFO {
 
         (void)exit_code;
 
-        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name, sizeof(help_lbx_name));
         INFO::Draw_Multiple_Drop_Areas_(INFO::_how_to_drops, 2);
 
         loaded_help_text = static_cast<s_help_record*>(farload::Far_Reload_Next_Data_(

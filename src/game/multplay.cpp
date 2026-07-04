@@ -939,7 +939,7 @@ void __cdecl Change_MP_Game_Name_() {
         y = namestar::Star_Name_Popup_Screen_Center_Y_();
         x = namestar::Star_Name_Popup_Screen_Center_X_();
         
-        namestar::Input_Box_Popup_Animated_(MOX::_settings.net_game_name, 8, 0, prompt, x, y);
+        namestar::Input_Box_Popup_Animated_(MOX::_settings.net_game_name, sizeof(MOX::_settings.net_game_name), 8, 0, prompt, x, y);
         
         is_valid = true;
         already_exists = false;
