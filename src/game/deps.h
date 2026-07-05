@@ -42,6 +42,7 @@
 #include "mox.h"
 #include "mox2.h"
 #include "settings.h"
+#include "vfs.h"
 #include "initgame.h"
 #include "officer.h"
 #include "shipmove.h"

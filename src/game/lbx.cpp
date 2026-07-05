@@ -10,10 +10,10 @@ namespace sound {
 
 namespace lbx {
     namespace {
-        bool Read_LBX_Offsets_(FILE* file, s_lbx_stream_entry* entries, uint16_t entry_count, uint32_t* first_offset, const char* filename) {
+        bool Read_LBX_Offsets_(s_vfs_file* file, s_lbx_stream_entry* entries, uint16_t entry_count, uint32_t* first_offset, const char* filename) {
             uint32_t raw_offsets[LBX_OFFSET_COUNT] = {};
 
-            if (fread(raw_offsets, sizeof(raw_offsets[0]), LBX_OFFSET_COUNT, file) != LBX_OFFSET_COUNT) {
+            if (vfs::fread(raw_offsets, sizeof(raw_offsets[0]), LBX_OFFSET_COUNT, file) != LBX_OFFSET_COUNT) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "lbx: failed to read offset table from %s", filename);
                 return false;
             }
@@ -29,10 +29,10 @@ namespace lbx {
             return true;
         }
 
-        bool Read_LBX_Header_(FILE* file, uint16_t* entry_count, uint16_t* magic, uint32_t* header_data, const char* filename) {
+        bool Read_LBX_Header_(s_vfs_file* file, uint16_t* entry_count, uint16_t* magic, uint32_t* header_data, const char* filename) {
             s_lbx_disk_header disk_header = {};
 
-            if (fread(&disk_header, sizeof(disk_header), 1, file) != 1) {
+            if (vfs::fread(&disk_header, sizeof(disk_header), 1, file) != 1) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "lbx: failed to read header from %s", filename);
                 return false;
             }
@@ -63,30 +63,21 @@ namespace lbx {
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename) {
         memset(header, 0, sizeof(s_lbx_stream_header));
 
-        header->file = fopen_case(filename, "r+b");
-        
+        header->file = vfs::fopen(filename, "rb");
+
         if (header->file == nullptr) {
-            if (farload::_secondary_drive_path[0] != '\0') {
-                char full_path[sizeof(header->filename)];
-                strlcpy(full_path, farload::_secondary_drive_path, sizeof(full_path));
-                strlcat(full_path, filename, sizeof(full_path));
-                header->file = fopen_case(full_path, "r+b");
-            }
-            
-            if (header->file == nullptr) {
-                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "lbx: unable to open %s", filename);
-                return;
-            }
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "lbx: unable to open %s", filename);
+            return;
         }
 
         if (!Read_LBX_Header_(header->file, &header->entry_count, &header->magic, &header->header_data, filename)) {
-            fclose(header->file);
+            vfs::fclose(header->file);
             header->file = nullptr;
             return;
         }
 
         if (!Read_LBX_Offsets_(header->file, header->entries, header->entry_count, &header->first_offset, filename)) {
-            fclose(header->file);
+            vfs::fclose(header->file);
             header->file = nullptr;
             return;
         }
@@ -110,7 +101,7 @@ namespace lbx {
 
     void __cdecl LBX_uninit_(s_lbx_stream_header* header) {
         if (header->file != nullptr) {
-            fclose(header->file);
+            vfs::fclose(header->file);
         }
         memset(header, 0, sizeof(s_lbx_stream_header));
     }
@@ -119,36 +110,28 @@ namespace lbx {
         uint8_t was_music_active = sound::_musicActive;
 
         if (stream->file != nullptr && sound::_close_stream == 0) {
-            fclose(stream->file);
+            vfs::fclose(stream->file);
         }
 
         memset(stream, 0, sizeof(s_wave_stream_header));
 
-        stream->file = fopen_case(filename, "rb");
+        stream->file = vfs::fopen(filename, "rb");
 
         if (stream->file == nullptr) {
-            if (farload::_secondary_drive_path[0] != '\0') {
-                char full_path[sizeof(stream->filename)];
-                strlcpy(full_path, farload::_secondary_drive_path, sizeof(full_path));
-                strlcat(full_path, filename, sizeof(full_path));
-                stream->file = fopen_case(full_path, "rb");
-            }
-            if (stream->file == nullptr) {
-                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "lbx: unable to open stream %s", filename);
-                sound::_musicActive = 0;
-                return;
-            }
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "lbx: unable to open stream %s", filename);
+            sound::_musicActive = 0;
+            return;
         }
 
         if (!Read_LBX_Header_(stream->file, &stream->entry_count, &stream->magic, &stream->header_data, filename)) {
-            fclose(stream->file);
+            vfs::fclose(stream->file);
             stream->file = nullptr;
             sound::_musicActive = 0;
             return;
         }
 
         if (!Read_LBX_Offsets_(stream->file, stream->entries, stream->entry_count, &stream->first_offset, filename)) {
-            fclose(stream->file);
+            vfs::fclose(stream->file);
             stream->file = nullptr;
             sound::_musicActive = 0;
             return;
@@ -178,12 +161,12 @@ namespace lbx {
             ? header->first_offset
             : header->entries[record_idx - 1].offset;
 
-        if (fseek(header->file, offset, SEEK_SET) != 0) {
+        if (vfs::fseek(header->file, (int32_t)offset, SEEK_SET) != 0) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "lbx: seek failed for %s record %d", header->filename, record_idx);
             return;
         }
 
-        if (fread(buffer, header->entries[record_idx].size, 1, header->file) != 1) {
+        if (vfs::fread(buffer, header->entries[record_idx].size, 1, header->file) != 1) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "lbx: read failed for %s record %d", header->filename, record_idx);
         }
     }

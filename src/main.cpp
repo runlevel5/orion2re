@@ -47,6 +47,18 @@ int main(int argc, char** argv) {
     Configure_Asan_Runtime_();
 #endif
 
+    char* current_directory = SDL_GetCurrentDirectory();
+    const char* base_path = SDL_GetBasePath();
+    const char* vfs_base_path = current_directory != nullptr ? current_directory : base_path;
+
+    if (vfs::Init(vfs_base_path) == 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "main: vfs::Init failed for base path '%s'", vfs_base_path != nullptr ? vfs_base_path : "");
+        if (current_directory != nullptr) {
+            SDL_free(current_directory);
+        }
+        return -1;
+    }
+
     size_t command_line_length = 0;
     for (int i = 1; i < argc; ++i) {
         command_line_length += strlen(argv[i]);
@@ -78,6 +90,11 @@ int main(int argc, char** argv) {
     const int result = platform::Run_Main_Loop(command_line);
     if (command_line != nullptr) {
         free(command_line);
+    }
+
+    vfs::Shutdown();
+    if (current_directory != nullptr) {
+        SDL_free(current_directory);
     }
 
     return result;

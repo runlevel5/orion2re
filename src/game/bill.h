@@ -10,13 +10,7 @@ namespace BILL {
     void __cdecl Cache_Player_Scientist_Anim_();
     void __cdecl Record_History_();
 
-    /** Copies a file from src_path to dst_path and aborts on I/O failure.
-     *  @param src_path Source file path.
-     *  @param dst_path Destination file path.
-     */
-    void __cdecl Copy_File_To_File_(const char* src_path, const char* dst_path);
-
-    /** Ensures the selected player's scientist animation file is cached locally.
+    /** Returns the selected player's scientist animation filename.
      *  @param player_index Player whose race selects the animation file.
      */
     char* __cdecl Cache_Player_Scientist_Anim_Imp_(int16_t player_index);

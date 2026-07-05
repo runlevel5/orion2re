@@ -82,6 +82,8 @@ set(ORION2RE_VENDORED_LIBUV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libuv")
 set(ORION2RE_VENDORED_LIBUV_COMMIT "5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b")
 set(ORION2RE_VENDORED_LZ4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/lz4")
 set(ORION2RE_VENDORED_LZ4_COMMIT "0774d05537f9762f838f7ab541b7765f1a729cb5")
+set(ORION2RE_VENDORED_MINIZ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/miniz")
+set(ORION2RE_VENDORED_MINIZ_COMMIT "77d0dce8627735138c51770d1799a1ef48f2117d")
 set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
 
 if(MSVC)
@@ -147,6 +149,16 @@ if(NOT EXISTS "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.h" OR NOT EXISTS "${ORION2RE
     )
 endif()
 
+if((ORION2RE_BUILD_GAME OR ORION2RE_BUILD_TESTS) AND
+   (NOT EXISTS "${ORION2RE_VENDORED_MINIZ_DIR}/CMakeLists.txt" OR
+    NOT EXISTS "${ORION2RE_VENDORED_MINIZ_DIR}/miniz.h" OR
+    NOT EXISTS "${ORION2RE_VENDORED_MINIZ_DIR}/miniz.c"))
+    message(FATAL_ERROR
+        "VFS zip support requires the miniz submodule at vendors/miniz. "
+        "Run 'git submodule update --init --recursive vendors/miniz' and ensure it is pinned to ${ORION2RE_VENDORED_MINIZ_COMMIT}."
+    )
+endif()
+
 if(NOT EXISTS "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c")
     message(FATAL_ERROR
         "This project requires libsmacker sources at vendors/libsmacker."
@@ -167,6 +179,8 @@ if(ORION2RE_BUILD_GAME OR ORION2RE_BUILD_TESTS)
             "Use -DORION2RE_BUILD_GAME=OFF to build only orion2re-router."
         )
     endif()
+
+    add_subdirectory("${ORION2RE_VENDORED_MINIZ_DIR}" EXCLUDE_FROM_ALL)
 endif()
 
 set(LIBUV_BUILD_SHARED OFF CACHE BOOL "" FORCE)
@@ -240,6 +254,7 @@ if(ORION2RE_BUILD_GAME)
         SDL3::SDL3-static
         uv_a
         orion2re_lz4
+        miniz
     )
 endif()
 

@@ -3,6 +3,10 @@
 #include <cstdint>
 
 namespace file_ani {
+    #define FILE_ANI_PRELOAD_SIZE 0x2000u
+    #define FILE_ANI_MULTI_SLOT_COUNT 3u
+    #define FILE_ANI_MULTI_SLOT_SIZE 0xAAAu
+
     extern uint8_t* _file_animation_buffer;
 
     extern uint32_t _file_animation_open;
@@ -11,19 +15,19 @@ namespace file_ani {
 
     extern uint32_t _file_animation_end;
 
-    extern FILE* _file_animation_fptr;
+    extern s_vfs_file* _file_animation_fptr;
 
-    extern uint32_t _file_animation_opened_flag[3];
+    extern uint32_t _file_animation_opened_flag[FILE_ANI_MULTI_SLOT_COUNT];
 
-    extern FILE* _file_animation[3];
+    extern s_vfs_file* _file_animation[FILE_ANI_MULTI_SLOT_COUNT];
 
-    extern uint32_t _file_animation_start_multi[3];
+    extern uint32_t _file_animation_start_multi[FILE_ANI_MULTI_SLOT_COUNT];
 
-    extern uint32_t _file_animation_end_multi[3];
+    extern uint32_t _file_animation_end_multi[FILE_ANI_MULTI_SLOT_COUNT];
 
     extern uint32_t* _file_lbx_header;
 
-    extern uint32_t _file_animation_length_multi[3];
+    extern uint32_t _file_animation_length_multi[FILE_ANI_MULTI_SLOT_COUNT];
 
     extern uint32_t _file_animation_start;
 

@@ -24,13 +24,12 @@ namespace smckplay {
     namespace {
         smk Open_Smacker_File_(const char* file_name) {
             char resolved_path[512];
-            const char* open_path = file_name;
 
-            if (Resolve_File_Path_Case_(file_name, resolved_path, sizeof(resolved_path))) {
-                open_path = resolved_path;
+            if (vfs::Resolve_Read_Path_No_Zip(file_name, resolved_path, sizeof(resolved_path)) == 0) {
+                return nullptr;
             }
 
-            return smk_open_file(open_path, SMK_MODE_MEMORY);
+            return smk_open_file(resolved_path, SMK_MODE_MEMORY);
         }
     }
 
@@ -143,21 +142,9 @@ namespace smckplay {
         (void)mode;
         (void)options;
 
-        char path_buffer[512];
         Reset_Smacker_State_();
 
         _smk = Open_Smacker_File_(file_name);
-        if (_smk == nullptr) {
-            if (farload::_secondary_drive_path[0] == '\0') {
-                return 0;
-            }
-
-            if (snprintf(path_buffer, sizeof(path_buffer), "%s%s", farload::_secondary_drive_path, file_name) >= (int)sizeof(path_buffer)) {
-                return 0;
-            }
-
-            _smk = Open_Smacker_File_(path_buffer);
-        }
 
         if (_smk == nullptr) {
             return 0;

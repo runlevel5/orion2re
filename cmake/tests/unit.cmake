@@ -95,6 +95,65 @@ orion2re_add_unit_test(test_video_scan_bounds
         tests/fakes/fake_video.cpp
 )
 
+orion2re_add_unit_test(test_vfs
+    SOURCES
+        tests/unit/test_vfs.cpp
+    PRODUCTION_SOURCES
+        src/game/compat.cpp
+        src/game/vfs.cpp
+        src/game/vfs_file.cpp
+        src/game/vfs_lbx.cpp
+        src/game/vfs_path.cpp
+        src/game/vfs_zip.cpp
+    LIBRARIES
+        miniz
+    LINK_SDL
+)
+
+orion2re_add_unit_test(test_lbx_vfs
+    SOURCES
+        tests/unit/test_lbx_vfs.cpp
+    PRODUCTION_SOURCES
+        src/game/compat.cpp
+        src/game/lbx.cpp
+        src/game/vfs.cpp
+        src/game/vfs_file.cpp
+        src/game/vfs_lbx.cpp
+        src/game/vfs_path.cpp
+        src/game/vfs_zip.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_sound.cpp
+        tests/fakes/fake_test_state.cpp
+    LIBRARIES
+        miniz
+    LINK_SDL
+)
+
+orion2re_add_unit_test(test_farload_buffer_vfs
+    SOURCES
+        tests/unit/test_farload_buffer_vfs.cpp
+    PRODUCTION_SOURCES
+        src/game/buffer.cpp
+        src/game/compat.cpp
+        src/game/farload.cpp
+        src/game/vfs.cpp
+        src/game/vfs_file.cpp
+        src/game/vfs_lbx.cpp
+        src/game/vfs_path.cpp
+        src/game/vfs_zip.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_allocate.cpp
+        tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_fields_helpers_runtime.cpp
+        tests/fakes/fake_memory.cpp
+        tests/fakes/fake_sound.cpp
+        tests/fakes/fake_test_state.cpp
+        tests/fakes/fake_video.cpp
+    LIBRARIES
+        miniz
+    LINK_SDL
+)
+
 orion2re_add_unit_test(test_fields
     SOURCES
         tests/unit/test_fields.cpp

@@ -10,20 +10,9 @@ namespace JIM {
     int16_t _darken_palette_value;
 
     bool __cdecl Check_For_Simtex_Logo_() {
-        char find_buffer[80];
-        char secondary_path[80];
+        char resolved_path[80];
 
-        snprintf(secondary_path, sizeof(secondary_path), "%ssimtex.lbx", farload::_secondary_drive_path);
-
-        if (dos::DIR_("simtex.lbx", find_buffer, sizeof(find_buffer))) {
-            return true;
-        }
-
-        if (dos::DIR_(secondary_path, find_buffer, sizeof(find_buffer))) {
-            return true;
-        }
-
-        return false;
+        return vfs::Resolve_Read_Path_No_Zip("simtex.lbx", resolved_path, sizeof(resolved_path)) != 0;
     }
 
     void __cdecl Draw_Logos_(void) {

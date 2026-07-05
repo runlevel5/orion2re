@@ -3,6 +3,9 @@
 #include "fakes/fake_test_support.h"
 
 namespace sound {
+    uint8_t _close_stream = 1;
+    uint8_t _musicActive = 0;
+
     SDL_AudioStream* __cdecl Open_Playback_Stream_(uint16_t bits_per_sample, uint16_t channels, uint32_t sample_rate, int32_t volume_percent) {
         (void)bits_per_sample;
         (void)channels;

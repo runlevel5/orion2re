@@ -19,61 +19,9 @@ namespace BILL {
         MOX::_bill_savegame[5] = 1;
     }
 
-    void __cdecl Copy_File_To_File_(const char* src_path, const char* dst_path) {
-        char msg_buf[128];
-        char read_buffer[4096];
-
-        FILE* src_fp = fopen_case(src_path, "rb");
-        FILE* dst_fp = fopen_case(dst_path, "wb");
-
-        if (src_fp == nullptr) {
-            snprintf(msg_buf, sizeof(msg_buf), "Could not open %s", src_path);
-            exitm::Exit_With_Message(msg_buf);
-        }
-
-        if (dst_fp == nullptr) {
-            snprintf(msg_buf, sizeof(msg_buf), "Could not open %s", dst_path);
-            exitm::Exit_With_Message(msg_buf);
-        }
-
-        int32_t total_bytes_read = 0;
-        size_t current_chunk_size;
-
-        do {
-            current_chunk_size = fread(read_buffer, 1, 4096, src_fp);
-            total_bytes_read += (int32_t)current_chunk_size;
-
-            RUSS::Mox_Update_();
-
-            size_t written = fwrite(read_buffer, 1, current_chunk_size, dst_fp);
-            if (written != current_chunk_size) {
-                snprintf(msg_buf, sizeof(msg_buf), "Error copying %s to %s (bytes: %i)", src_path, dst_path, total_bytes_read);
-                exitm::Exit_With_Message(msg_buf);
-            }
-        } while (current_chunk_size == 4096);
-
-        fflush(dst_fp);
-        fclose(dst_fp);
-        fclose(src_fp);
-    }
-
     char* __cdecl Cache_Player_Spy_Anim_() {
-        char find_data[52];
-        char src_file_name[128];
-
         snprintf(_dest_file_name, sizeof(_dest_file_name), SCIENCE::_spy_anim_fmt,
                  (uint32_t)(uint8_t)(MOX::_player[MOX::_PLAYER_NUM].race));
-
-        if (dos::DIR_(_dest_file_name, find_data, sizeof(find_data)) == 0) {
-            if (dos::DIR_(SCIENCE::_spy_anim_find_pat, find_data, sizeof(find_data)) != 0) {
-                dos::Delete_File_(find_data);
-            }
-
-            strlcpy(src_file_name, farload::_secondary_drive_path, sizeof(src_file_name));
-            strlcat(src_file_name, _dest_file_name, sizeof(src_file_name));
-
-            Copy_File_To_File_(src_file_name, _dest_file_name);
-        }
 
         return _dest_file_name;
     }
@@ -83,23 +31,9 @@ namespace BILL {
     }
 
     char* __cdecl Cache_Player_Scientist_Anim_Imp_(int16_t player_index) {
-        char dir_entry[52];
-        char source_path[128];
-
         s_player* player = &MOX::_player[player_index];
 
         snprintf(BILL::_dest_file_name, sizeof(BILL::_dest_file_name), s_SR_R_x_SC_LBX, (uint32_t)(uint8_t)player->race);
-
-        if (!dos::DIR_(BILL::_dest_file_name, dir_entry, sizeof(dir_entry))) {
-            if (dos::DIR_(s_SR_R_wildcard_SC_LBX, dir_entry, sizeof(dir_entry))) {
-                dos::Delete_File_(dir_entry);
-            }
-
-            strlcpy(source_path, farload::_secondary_drive_path, sizeof(source_path));
-            strlcat(source_path, BILL::_dest_file_name, sizeof(source_path));
-
-            Copy_File_To_File_(source_path, BILL::_dest_file_name);
-        }
 
         return BILL::_dest_file_name;
     }
@@ -785,25 +719,12 @@ namespace BILL {
     }
 
 char* __cdecl Cache_Player_Trooper_Anim_() {
-    char found_path[52];
-    char source_path[128];
-
     snprintf(
         BILL::_dest_file_name,
         sizeof(BILL::_dest_file_name),
         SCIENCE::_trooper_anim_fmt,
         (unsigned int)(uint8_t)(MOX::_player[MOX::_PLAYER_NUM].race)
     );
-
-    if (dos::DIR_(BILL::_dest_file_name, found_path, sizeof(found_path)) == 0) {
-        if (dos::DIR_(SCIENCE::_trooper_anim_find_pat, found_path, sizeof(found_path)) != 0) {
-            dos::Delete_File_(found_path);
-        }
-
-        strlcpy(source_path, farload::_secondary_drive_path, sizeof(source_path));
-        strlcat(source_path, BILL::_dest_file_name, sizeof(source_path));
-        BILL::Copy_File_To_File_(source_path, BILL::_dest_file_name);
-    }
 
     return BILL::_dest_file_name;
 }

@@ -194,7 +194,6 @@ namespace buffer {
   }
 
   void* __cdecl Farload_Buffer_Library_(const char* file_name, int32_t entry_index, uint8_t* buffer_base) {
-    char secondary_file_name[60]; // BUG: secondary_file_name is too small and can overflow
     int32_t entry_size;
     int32_t victim_file_buffer_index;
     int32_t victim_segment_index;
@@ -202,60 +201,23 @@ namespace buffer {
     int32_t next_segment_index;
     int32_t freed_size;
     void* loaded_data;
-    bool reuse_current_file;
+    s_vfs_file* file;
+    int32_t current_offset;
 
     if (entry_index < 0) {
       farload::Error_Handler_(file_name, 4, entry_index);
     }
 
-    reuse_current_file = false;
-    if (farload::_farload_file_flag != 0) {
-      if (strcasecmp(file_name, farload::_farload_file_name) == 0) {
-        reuse_current_file = true;
-      } else if (farload::_farload_file_flag != 0) {
-        fclose(farload::_farload_fptr);
-      }
+    file = vfs::fopen_lbx(file_name, entry_index);
+    if (file == nullptr) {
+      farload::Error_Handler_(file_name, 1, entry_index);
     }
 
-    if (!reuse_current_file) {
-      strlcpy(farload::_farload_file_name, file_name, sizeof(farload::_farload_file_name));
-      farload::_farload_fptr = fopen_case(file_name, "rb");
-
-      if (farload::_farload_fptr == nullptr) {
-        if (farload::_secondary_drive_path[0] == '\0') {
-          farload::Error_Handler_(file_name, 1, entry_index);
-        }
-
-        strlcpy(secondary_file_name, farload::_secondary_drive_path, sizeof(secondary_file_name));
-        strlcat(secondary_file_name, farload::_farload_file_name, sizeof(secondary_file_name));
-        farload::_farload_fptr = fopen_case(secondary_file_name, "rb");
-
-        if (farload::_farload_fptr == nullptr) {
-          farload::Error_Handler_(file_name, 1, entry_index);
-        }
-      }
-
-      fread(&farload::_lbx_header, 0x800, 1, farload::_farload_fptr);
-
-      if (farload::_lbx_header.magic != 0xFEAD) {
-        farload::Error_Handler_(file_name, 7, entry_index);
-      }
-
-      farload::_farload_file_flag = 1;
+    entry_size = vfs::fsize(file);
+    if (entry_size < 0) {
+      vfs::fclose(file);
+      farload::Error_Handler_(file_name, 7, entry_index);
     }
-
-    if ((int16_t)farload::_lbx_header.entry_count <= entry_index) {
-      farload::Error_Handler_(file_name, 8, entry_index);
-    }
-
-    entry_size = static_cast<int32_t>(
-        farload::_lbx_header.offsets[entry_index + 1] -
-        farload::_lbx_header.offsets[entry_index]);
-
-    fseek(
-        farload::_farload_fptr,
-        (long)farload::_lbx_header.offsets[entry_index],
-        0);
 
     auto* pool_header =
         (allocate::s_alloc_header*)(buffer_base - sizeof(allocate::s_alloc_header));
@@ -265,6 +227,7 @@ namespace buffer {
       loaded_data = allocate::Allocate_Next_Block_No_Header_(buffer_base, entry_size);
 
       if (loaded_data == nullptr) {
+        current_offset = pool_header->current;
         buffer::Get_Lowest_Priority_(&victim_file_buffer_index, &victim_segment_index);
         buffer::Get_Next_Buffer_Address_(
             victim_file_buffer_index,
@@ -324,15 +287,21 @@ namespace buffer {
             .segments[victim_segment_index]
             .is_loaded = 0;
 
-        pool_header->current -= (uint32_t)freed_size;
+        pool_header->current = (uint32_t)(current_offset - freed_size);
       }
     }
 
     if (loaded_data == nullptr) {
+      vfs::fclose(file);
       farload::Error_Handler_(file_name, 5, entry_index);
     }
 
-    fread(loaded_data, static_cast<size_t>(entry_size), 1, farload::_farload_fptr);
+    if (vfs::fread(loaded_data, static_cast<size_t>(entry_size), 1, file) != 1) {
+      vfs::fclose(file);
+      farload::Error_Handler_(file_name, 7, entry_index);
+    }
+
+    vfs::fclose(file);
     return loaded_data;
   }
 

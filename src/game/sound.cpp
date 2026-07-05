@@ -72,6 +72,7 @@ namespace sound {
     int32_t _currentStreamId;
     int32_t _currentStreamVolume = 100;
     uint8_t _streamReadErrorLogged;
+    s_vfs_file* _streamEntryFile;
 
     namespace {
         void Copy_FourCC_Tag_(char* dest, const char* src) {
@@ -216,8 +217,7 @@ namespace sound {
         }
 
         bool Rewind_Stream_Source_() {
-            clearerr(_streamLbxHandle.file);
-            return fseek(_streamLbxHandle.file, _stream_data.data_start_offset, SEEK_SET) == 0;
+            return vfs::fseek(_streamEntryFile, _stream_data.data_start_offset, SEEK_SET) == 0;
         }
 
         bool Queue_Stream_Block_(uint32_t bytes_to_queue) {
@@ -548,6 +548,10 @@ namespace sound {
         _audioPlaybackActive = 0;
         _stream_data.status = 0;
         Destroy_SDL_Stream_(destroyed_stream);
+        if (_streamEntryFile != nullptr) {
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
+        }
 
         _audioInitialized = 0;
     }
@@ -841,10 +845,14 @@ namespace sound {
 
         memset(stream, 0, sizeof(s_sound_stream));
 
-        uint32_t entry_offset = _streamLbxHandle.entries[entry_index - 1].offset;
+        if (_streamEntryFile != nullptr) {
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
+        }
 
-        if (fseek(_streamLbxHandle.file, entry_offset, SEEK_SET) != 0) {
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: seek failed file=%s entry=%d offset=%u", _currentStreamFilename, entry_index, entry_offset);
+        _streamEntryFile = vfs::fopen_lbx(_currentStreamFilename, entry_index - 1);
+        if (_streamEntryFile == nullptr) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: entry open failed file=%s entry=%d", _currentStreamFilename, entry_index);
             return 0;
         }
 
@@ -853,35 +861,45 @@ namespace sound {
 
         s_sound_wav_header_disk disk_header = {};
 
-        if (fread(&disk_header, sizeof(disk_header), 1, _streamLbxHandle.file) != 1) {
+        if (vfs::fread(&disk_header, sizeof(disk_header), 1, _streamEntryFile) != 1) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: header read failed file=%s entry=%d", _currentStreamFilename, entry_index);
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
         memcpy(stream, &disk_header, sizeof(disk_header));
-        stream->data_start_offset = entry_offset + (uint32_t)sizeof(s_sound_wav_header_disk);
+        stream->data_start_offset = (uint32_t)sizeof(s_sound_wav_header_disk);
 
         Copy_FourCC_Tag_(tag_buffer, stream->riff_tag);
         if (strcasecmp(tag_buffer, "RIFF") != 0) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid RIFF tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->wave_tag);
         if (strcasecmp(tag_buffer, "WAVE") != 0) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid WAVE tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->fmt_tag);
         if (strcasecmp(tag_buffer, "fmt ") != 0) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid fmt tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
         Copy_FourCC_Tag_(tag_buffer, stream->data_tag);
         if (strcasecmp(tag_buffer, "data") != 0) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: invalid data tag file=%s entry=%d tag=%.4s", _currentStreamFilename, entry_index, tag_buffer);
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
@@ -895,10 +913,12 @@ namespace sound {
                 (unsigned int)stream->samples_per_sec,
                 (unsigned int)stream->total_data_size
             );
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
-        if (fseek(_streamLbxHandle.file, stream->data_start_offset, SEEK_SET) != 0) {
+        if (vfs::fseek(_streamEntryFile, (int32_t)stream->data_start_offset, SEEK_SET) != 0) {
             SDL_LogWarn(
                 SDL_LOG_CATEGORY_APPLICATION,
                 "stream: seek to data failed file=%s entry=%d data_offset=%u",
@@ -906,6 +926,8 @@ namespace sound {
                 entry_index,
                 stream->data_start_offset
             );
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
             return 0;
         }
 
@@ -987,13 +1009,13 @@ namespace sound {
     }
 
     uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr) {
-        size_t bytes_read = fread(buffer, 1, bytes_to_read, sound::_streamLbxHandle.file);
+        size_t bytes_read = vfs::fread(buffer, 1, bytes_to_read, sound::_streamEntryFile);
         if (bytes_read == bytes_to_read) {
             *bytes_read_ptr = (uint32_t)bytes_read;
             return 0;
         }
 
-        uint32_t status = ferror(sound::_streamLbxHandle.file) ? 1u : 4u;
+        uint32_t status = 4u;
 
         if (_streamReadErrorLogged == 0) {
             _streamReadErrorLogged = 1;
@@ -1519,6 +1541,11 @@ namespace sound {
     void __cdecl Stop_Stream_Loop_() {
         if (_stream_data.ds_buffer != nullptr) {
             Clear_SDL_Stream_(_stream_data.ds_buffer);
+        }
+
+        if (_streamEntryFile != nullptr) {
+            vfs::fclose(_streamEntryFile);
+            _streamEntryFile = nullptr;
         }
 
         _loopStream = 0;

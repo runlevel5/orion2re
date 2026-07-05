@@ -1,5 +1,7 @@
 #pragma once
 
+struct s_vfs_file;
+
 // Computed in-memory metadata; this is not read directly from the LBX file.
 struct s_lbx_stream_entry {
     uint32_t size;
@@ -22,7 +24,7 @@ struct s_lbx_stream_header {
     uint16_t entry_count;
     uint16_t magic;
     uint32_t header_data;
-    FILE* file;
+    s_vfs_file* file;
     uint32_t first_offset;
     s_lbx_stream_entry entries[509];
     uint32_t padding;
@@ -33,7 +35,7 @@ struct s_wave_stream_header {
     uint16_t entry_count;
     uint16_t magic;
     uint32_t header_data;
-    FILE* file;
+    s_vfs_file* file;
     uint32_t first_offset;
     s_lbx_stream_entry entries[509];
     uint32_t padding;

@@ -448,7 +448,6 @@ namespace MOX2 {
     void __cdecl Set_Mox_Alt_Path_() {
         char alternate_path[61];
         char error_message[100];
-        char diplomat_path[80];
         FILE* config_file;
         int16_t path_length;
         const char* error_text = nullptr;
@@ -499,21 +498,15 @@ namespace MOX2 {
         }
 
         farload::Set_Alternate_Path_(alternate_path);
+        vfs::Set_Raw_Fallback_Path(farload::_secondary_drive_path);
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: alternate asset path parsed '%s'", alternate_path);
 
         if (alternate_path[path_length - 1] != '\\') {
             strlcat(alternate_path, "\\", sizeof(alternate_path));
         }
 
-        snprintf(diplomat_path, sizeof(diplomat_path), "%sdiplomat.lbx", alternate_path);
-
-        if (dos::DIR_("diplomat.lbx", alternate_path, sizeof(alternate_path))) {
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: diplomat.lbx found in cwd");
-            return;
-        }
-
-        if (dos::DIR_(diplomat_path, alternate_path, sizeof(alternate_path))) {
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: diplomat.lbx found in alternate path");
+        if (vfs::File_Exists("diplomat.lbx") != 0) {
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: diplomat.lbx resolved through vfs");
             return;
         }
 
