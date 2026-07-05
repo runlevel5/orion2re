@@ -176,7 +176,7 @@ namespace COLBLDG {
 
         int16_t uncolonized_worlds = Star_N_Uncolonized_Worlds_(planet.star_index);
         if (N_Prods_In_Queue_(BUILDING_COLONY_BASE) < uncolonized_worlds) {
-            if (COLCALC::Colony_Can_Build_Product_(&colony, 11 /* Housing */)) {
+            if (COLCALC::Colony_Can_Build_Product_(&colony, BUILDING_COLONY_BASE)) {
                 _military_indexes[_n_military_indexes++] = BUILDING_COLONY_BASE;
             }
         }
