@@ -9,6 +9,7 @@ The config system should:
 - parse CFG files, including includes and commands
 - decode symbolic names and values using the external schema
 - interpret config operations directly against live globals and global tables
+- generate the decode layer from `config.json`
 - generate the interpreter from schema plus project-owned semantic mappings
 - support bulk notation, partial bulk notation, and skip markers correctly
 - avoid handwritten field-by-field loaders for regular tables
@@ -76,9 +77,21 @@ It does not provide project-specific semantic mapping such as:
 
 So `config.json` is sufficient for parsing support, decode, and validation, but not sufficient by itself to mutate live project memory.
 
-### 3. Decoded selectors must become numeric
+### 3. Decoded selectors must become numeric and resolve to logical positions
 
 After schema decode, every selector after the primary parameter name should resolve to a numeric selector id or numeric literal.
+
+For table-like parameters, decode should continue one step further and resolve the lhs selector sequence to a schema logical start position.
+
+For a regular row/column table, the logical position is the flattened schema index:
+
+```text
+logical_position = row_index * num_columns + column_index
+```
+
+For rowless flat tables, the logical position is just the column index.
+
+For single-column row-grouped tables, the logical position naturally advances through successive rows.
 
 Example:
 
@@ -112,6 +125,11 @@ weapon 3 13 = hv,pd,co,nr,af;
 ```
 
 So the decode layer must support both symbolic selector names and numeric selector addressing.
+
+The important boundary is:
+
+- Stage 2 resolves selector syntax into schema-level numeric identities and a logical start position
+- Stage 3 consumes that logical position and performs the actual field write mapping
 
 ### 4. The runtime is an interpreter, not a byte-offset patch VM
 
@@ -298,20 +316,32 @@ Generated code maps:
 
 - parameter names to numeric ids
 - selector identifiers to numeric selector ids
+- decoded lhs selector shape to a schema logical start position
 - enum values to numeric values
 - mask codes to numeric bitmasks
 - numeric enum ids to enum values where legal
 - numeric selector addressing to selector positions where legal
 - raw value shape to decoded operation structure
 
-This layer is driven by `config.json`.
+This layer is generated from `config.json`.
 
-Output is a decoded operation stream using:
+It should not depend on project-owned semantic bindings, because decode is an external-schema concern rather than a live-target concern.
+
+Output is a flat decoded write stream using:
 
 - numeric parameter ids
-- numeric selectors
-- typed primitive values
-- explicit skip values where `-` was used
+- resolved schema logical indices
+- typed decoded values
+
+A single parsed assignment may expand into zero or more decoded logical writes.
+
+Examples:
+
+- a scalar assignment expands to one decoded write
+- a bulk table assignment expands to one decoded write per non-skip rhs item
+- skip markers affect logical traversal during Stage 2 but do not need to be emitted as writes
+
+Decoded numeric selectors may still be retained for diagnostics, but Stage 3 should not need to re-resolve selector syntax or replay rhs traversal.
 
 Decode must support the following surface forms observed in real configs:
 
@@ -342,6 +372,28 @@ This layer is driven by:
 - `config.json`
 - a project-owned semantic bindings file
 
+So the generation split is:
+
+- Stage 2 generation uses `config.json` as its source
+- Stage 3 generation uses `config.json` plus semantic bindings as its sources
+
+Stage 3 should treat decoded logical writes as its input.
+
+For each decoded write, Stage 3 may derive:
+
+```text
+row_index = logical_index / num_columns
+column_index = logical_index % num_columns
+```
+
+Then:
+
+- `row_index` selects the row/object/array entry to mutate
+- `column_index` selects the stable schema field position within that row
+- semantic bindings map that stable field position to the actual typed target write
+
+No raw memory offsets are involved in this model.
+
 The key rule is:
 
 - traversal order comes from generated logical layout metadata
@@ -361,31 +413,33 @@ These should be explicitly marked as custom in the bindings file.
 
 ## Decoded runtime model
 
-The generated interpreter should work on decoded operations.
+The generated interpreter should work on decoded logical writes.
 
 Conceptually:
 
 ```cpp
-struct s_selector {
-    int32_t id;
-};
-
 struct s_value {
     int32_t kind;
     int32_t int_value;
     const char* string_value;
 };
 
-struct s_operation {
-    int32_t name_id;
-    const s_selector* lhs;
-    int32_t lhs_count;
-    const s_value* rhs;
-    int32_t rhs_count;
+struct s_decoded_write {
+    int32_t parameter_id;
+    int32_t logical_index;
+    s_value value;
 };
 ```
 
-At decode time, `-` should become an explicit skip value kind.
+Stage 2 is responsible for:
+
+- resolving the starting logical index from lhs selectors
+- walking logical positions across rhs items
+- applying skip semantics
+- decoding each non-skip rhs item to a typed value
+- emitting one `s_decoded_write` per actual write
+
+For scalar parameters, `logical_index` can be `0`.
 
 For example:
 
@@ -531,9 +585,9 @@ The generated interpreter should contain:
 - primitive typed readers chosen from schema
 - parameter dispatch by generated parameter id
 - generated field write dispatch by generated target field id
-- generic traversal for bulk notation using generated layout items
+- generated mapping from logical index to layout item
 
-The generated interpreter must not hardcode semantic chunks like "weapon_1_type implies exactly 5 following fields" as handwritten behavior. Those traversal relationships must come from generated layout.
+The generated interpreter must not hardcode semantic chunks like "weapon_1_type implies exactly 5 following fields" as handwritten behavior. Those traversal relationships belong to Stage 2 traversal plus generated layout metadata.
 
 ### Top-level dispatch
 
@@ -550,7 +604,9 @@ case CONFIG_NAME_ANTARAN_TITAN_DEFENSIVE:
 }
 ```
 
-`Resolve_Start_Logical_Index_()` must be generated from schema shape. It must support:
+Stage 2 logical-start resolution must be generated from schema shape. It must support:
+
+The equivalent logical-start resolution belongs to Stage 2 decode, not Stage 3 apply. It must support:
 
 - full-table start
 - row start
@@ -558,61 +614,70 @@ case CONFIG_NAME_ANTARAN_TITAN_DEFENSIVE:
 - column-only start for rowless tables
 - numeric selector forms where mods use numeric addressing
 
-### Generated traversal for layout-driven tables
+### Stage 2 traversal for layout-driven tables
 
 Conceptually:
 
 ```cpp
-static void Apply_Layout_Driven_Operation_(
-    const s_parameter_binding& Binding,
-    const s_operation& Operation)
+static void Decode_Operation_To_Writes_(
+    const s_schema_parameter& parameter,
+    const s_raw_operation& operation,
+    std::vector<s_decoded_write>& out_writes)
 {
-    int32_t Logical_Index = Resolve_Start_Logical_Index_(Binding, Operation.lhs, Operation.lhs_count);
+    int32_t logical_index = Resolve_Start_Logical_Index_(parameter, operation.lhs, operation.lhs_count);
 
-    for (int32_t Rhs_Index = 0; Rhs_Index < Operation.rhs_count; ++Rhs_Index, ++Logical_Index) {
-        const s_value& Value = Operation.rhs[Rhs_Index];
+    for (int32_t rhs_index = 0; rhs_index < operation.rhs_count; ++rhs_index, ++logical_index) {
+        const s_raw_value& raw_value = operation.rhs[rhs_index];
 
-        if (Value.kind == CONFIG_VALUE_SKIP) {
+        if (raw_value.kind == CONFIG_VALUE_SKIP) {
             continue;
         }
 
-        const s_layout_item& Item = Binding.layout[Logical_Index];
-        Apply_Layout_Item_Value_(Binding, Item, Value);
+        out_writes.push_back({
+            parameter.id,
+            logical_index,
+            Decode_Value_For_Logical_Index_(parameter, logical_index, raw_value),
+        });
     }
 }
 ```
 
-### Generated typed field writes
+### Stage 3 generated typed field writes
 
 Conceptually:
 
 ```cpp
-static void Apply_Layout_Item_Value_(
-    const s_parameter_binding& Binding,
-    const s_layout_item& Item,
-    const s_value& Value)
+static void Apply_Decoded_Write_(
+    const s_parameter_binding& binding,
+    const s_decoded_write& write)
 {
-    switch (Item.target_field_id) {
+    int32_t row_index = write.logical_index / binding.column_count;
+    int32_t column_index = write.logical_index % binding.column_count;
+    const s_layout_item& item = binding.layout[write.logical_index];
+
+    switch (item.target_field_id) {
     case FIELD_WEAPON_1_TYPE:
-        MOX::_antaran_titan_defensive.weapon_1_type = Read_Uint16_(Value);
+        MOX::_antaran_titan_defensive.weapon_1_type = Read_Uint16_(write.value);
         break;
     case FIELD_WEAPON_1_ARC:
-        MOX::_antaran_titan_defensive.weapon_1_arc = Read_Uint8_(Value);
+        MOX::_antaran_titan_defensive.weapon_1_arc = Read_Uint8_(write.value);
         break;
     case FIELD_WEAPON_1_MODS:
-        MOX::_antaran_titan_defensive.weapon_1_mods = Read_Mask_Uint16_(Value);
+        MOX::_antaran_titan_defensive.weapon_1_mods = Read_Mask_Uint16_(write.value);
         break;
     case FIELD_WEAPON_1_AMMO:
-        MOX::_antaran_titan_defensive.weapon_1_ammo = Read_Int16_(Value);
+        MOX::_antaran_titan_defensive.weapon_1_ammo = Read_Int16_(write.value);
         break;
     case FIELD_WEAPON_1_AMOUNT:
-        MOX::_antaran_titan_defensive.weapon_1_amount = Read_Uint8_(Value);
+        MOX::_antaran_titan_defensive.weapon_1_amount = Read_Uint8_(write.value);
         break;
     }
 }
 ```
 
 This gives immediate live-memory updates without exposing a low-level byte-offset patch VM.
+
+For rowless flat tables, `Binding.column_count` is the full logical field count and `Row_Index` remains `0`. For regular row tables, `Row_Index` selects the target entry and `Column_Index` identifies the stable schema field position to map.
 
 ## Supported config operation shapes
 
@@ -706,8 +771,8 @@ tools/config_codegen.cpp
 
 Inputs:
 
-- external `config.json`
-- project `config_bindings.json`
+- external `config.json` for generated ids, decode tables, selector decode, enum decode, mask decode, and schema-driven value readers
+- project `config_bindings.json` for generated live-target bindings and apply logic
 
 Outputs:
 
@@ -723,6 +788,11 @@ src/generated/config_ids.h
 src/generated/config_decode.cpp
 src/generated/config_apply.cpp
 ```
+
+In other words:
+
+- Stage 2 should be emitted into generated decode artifacts such as `src/generated/config_decode.cpp`
+- Stage 3 should be emitted into generated apply artifacts such as `src/generated/config_apply.cpp`
 
 ## CMake integration
 
@@ -769,10 +839,11 @@ Compile-time type mismatch is considered useful and should not be hidden.
 2. Keep the selector validation helper script.
 3. Define `config_bindings.json` schema.
 4. Implement native code generator.
-5. Generate a small subset of parameters first.
-6. Add support for skip-aware bulk notation in decoded operations.
-7. Wire generated interpreter into startup.
-8. Expand parameter coverage gradually.
+5. Generate Stage 2 decode code from `config.json`.
+6. Generate a small subset of Stage 3 apply bindings first.
+7. Add support for skip-aware bulk notation in decoded operations.
+8. Wire generated interpreter into startup.
+9. Expand parameter coverage gradually.
 
 ## Non-goals for the first version
 
