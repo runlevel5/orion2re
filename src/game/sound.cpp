@@ -850,7 +850,7 @@ namespace sound {
             _streamEntryFile = nullptr;
         }
 
-        _streamEntryFile = vfs::fopen_lbx(_currentStreamFilename, entry_index - 1);
+        _streamEntryFile = vfs::fopen_lbx(_currentStreamFilename, entry_index);
         if (_streamEntryFile == nullptr) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: entry open failed file=%s entry=%d", _currentStreamFilename, entry_index);
             return 0;
