@@ -1012,12 +1012,12 @@ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* targe
                             is_valid = true;
                         } else {
                             switch (player->personality) {
-                                case 0:
-                                case 1:
+                                case PLAYER_PERSONALITY_XENOPHOBIC:
+                                case PLAYER_PERSONALITY_RUTHLESS:
                                     is_valid = true;
                                     break;
-                                case 2:
-                                case 3:
+                                case PLAYER_PERSONALITY_AGGRESSIVE:
+                                case PLAYER_PERSONALITY_ERRATIC:
                                     is_valid = (game_random::Random_(2) - 1) != 0;
                                     break;
                             }
@@ -1325,12 +1325,12 @@ int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx) {
         attacker->research_treaty[target_idx] == 0) 
     {
         // Personality 0 is likely Ruthless/Aggressive
-        if (attacker->personality == 0) {
+        if (attacker->personality == PLAYER_PERSONALITY_XENOPHOBIC) {
             return 1;
         }
 
         // Personality 3 is likely erratic or opportunistic, having a small chance to attack
-        if (attacker->personality == 3) {
+        if (attacker->personality == PLAYER_PERSONALITY_ERRATIC) {
             if (game_random::Random_(10) == 1) {
                 return 1;
             }
@@ -1886,7 +1886,7 @@ void __cdecl Get_Best_Colony_Target_(
                         if (colony->n_pops != 1 ||
                             (colony->pop[0] & 0xF) != player_idx ||
                             (*_star_has_player)[star_idx][player_idx].ship_sizes[SHIP_TYPE_TRANSPORT] != 0 ||
-                            MOX::_player[player_idx].personality == 1)
+                            MOX::_player[player_idx].personality == PLAYER_PERSONALITY_RUTHLESS)
                         {
                             is_valid = true;
                         }
@@ -2114,7 +2114,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                                 success = true;
                             } else {
                                 if (colony->n_pops == 1 && (colony->pop[0] & 0xF) == (uint32_t)attacker_id && 
-                                    MOX::_player[attacker_id].personality != 1 && (COMBFIND::Player_Owns_Transports_(attacker_id) || 
+                                    MOX::_player[attacker_id].personality != PLAYER_PERSONALITY_RUTHLESS && (COMBFIND::Player_Owns_Transports_(attacker_id) || 
                                     (MOX::_player[attacker_id].traits[TRAIT_TELEPATHIC] != 0 && MOX::_player[colony_owner].traits[TRAIT_TELEPATHIC] == 0))) {
                                     done = true;
                                 } else if (bio_hits == 0) {

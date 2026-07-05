@@ -125,8 +125,8 @@ namespace npcdiplo {
                     } else {
                         // Negative severity (diplomatic insult/attack) increases threats
                         int16_t threat_threshold;
-                        if (p1.personality == 4 /* Aggressive/Ruthless */ && p1.dishonored_flag[p2_idx] == 1) {
-                            threat_threshold = diplodef::_personality_threat_modifiers[6];
+                        if (p1.personality == PLAYER_PERSONALITY_HONORABLE && p1.dishonored_flag[p2_idx] == 1) {
+                            threat_threshold = diplodef::_personality_threat_modifiers[PLAYER_PERSONALITY_DISHONORED];
                         } else {
                             threat_threshold = diplodef::_personality_threat_modifiers[p1.personality];
                         }
@@ -174,7 +174,7 @@ namespace npcdiplo {
             }
 
             // Case 1: Ruthless Aggression
-            if (p_source.personality == 3 /* RUTHLESS */) {
+            if (p_source.personality == PLAYER_PERSONALITY_ERRATIC) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     auto& p_target = MOX::_player[j];
                     if (j != i && decision[j] == 0 && p_source.within_range[j] == 1 &&
@@ -536,7 +536,7 @@ namespace npcdiplo {
                             p_i.treaty[k] == 0 &&
                             p_i.research_treaty[k] == 0 &&
                             p_i.trade_treaty[k] == 0 &&
-                            p_k.personality != 5) {
+                            p_k.personality != PLAYER_PERSONALITY_PACIFIST) {
                             
                             // Relationship penalty based on total treaties held by the winner candidate
                             p_i.relations[k] -= (int8_t)(hatred_score / 100);
@@ -913,14 +913,14 @@ namespace npcdiplo {
         if (accepted == 1) {
             if (rejection_val < 0) {
                 switch (player->personality) {
-                    case 0:
+                    case PLAYER_PERSONALITY_XENOPHOBIC:
                         rejection_val++;
                         break;
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
+                    case PLAYER_PERSONALITY_RUTHLESS:
+                    case PLAYER_PERSONALITY_AGGRESSIVE:
+                    case PLAYER_PERSONALITY_ERRATIC:
+                    case PLAYER_PERSONALITY_HONORABLE:
+                    case PLAYER_PERSONALITY_PACIFIST:
                         rejection_val = 1;
                         break;
                 }
@@ -933,20 +933,20 @@ namespace npcdiplo {
                 rejection_val--;
             } else {
                 switch (player->personality) {
-                    case 0:
+                    case PLAYER_PERSONALITY_XENOPHOBIC:
                         rejection_val = -1;
                         break;
-                    case 1:
-                    case 2:
-                    case 3:
+                    case PLAYER_PERSONALITY_RUTHLESS:
+                    case PLAYER_PERSONALITY_AGGRESSIVE:
+                    case PLAYER_PERSONALITY_ERRATIC:
                         rejection_val /= 2;
                         break;
-                    case 4:
+                    case PLAYER_PERSONALITY_HONORABLE:
                         if (player->dishonored_flag[other_player_idx] == 1) {
                             rejection_val = -1;
                         }
                         break;
-                    case 5:
+                    case PLAYER_PERSONALITY_PACIFIST:
                         rejection_val--;
                         break;
                 }
@@ -1083,8 +1083,8 @@ namespace npcdiplo {
         }
 
         int32_t personality_modifier;
-        if (MOX::_player[target_idx].personality == 4 && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
-            personality_modifier = diplodef::_personality_relation_modifiers[6];
+        if (MOX::_player[target_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
+            personality_modifier = diplodef::_personality_relation_modifiers[PLAYER_PERSONALITY_DISHONORED];
         } else {
             personality_modifier = diplodef::_personality_relation_modifiers[MOX::_player[target_idx].personality];
         }
@@ -1122,24 +1122,24 @@ namespace npcdiplo {
         *msg_type = 0xaf;
 
         switch (MOX::_player[player_idx].personality) {
-            case 0:
+            case PLAYER_PERSONALITY_XENOPHOBIC:
                 rejection_val = (int16_t)(game_random::Random_(4) - 6);
                 break;
-            case 1:
-            case 2:
+            case PLAYER_PERSONALITY_RUTHLESS:
+            case PLAYER_PERSONALITY_AGGRESSIVE:
                 rejection_val = (int16_t)(-1 - (int32_t)game_random::Random_(3));
                 break;
-            case 3:
+            case PLAYER_PERSONALITY_ERRATIC:
                 rejection_val = (int16_t)(-(int32_t)game_random::Random_(4));
                 break;
-            case 4:
+            case PLAYER_PERSONALITY_HONORABLE:
                 if (MOX::_player[player_idx].dishonored_flag[target_idx] == 1) {
                     rejection_val = (int16_t)(game_random::Random_(4) - 6);
                 } else {
                     rejection_val = (int16_t)(-(int32_t)game_random::Random_(3));
                 }
                 break;
-            case 5:
+            case PLAYER_PERSONALITY_PACIFIST:
                 rejection_val = (int16_t)(-(int32_t)game_random::Random_(3));
                 break;
             default:
@@ -1164,8 +1164,8 @@ namespace npcdiplo {
             expectation += 50;
         }
 
-        if (MOX::_player[target_idx].personality == 4 && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
-            expectation += diplodef::_personality_relation_modifiers[6];
+        if (MOX::_player[target_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
+            expectation += diplodef::_personality_relation_modifiers[PLAYER_PERSONALITY_DISHONORED];
         } else {
             expectation += diplodef::_personality_relation_modifiers[(uint8_t)MOX::_player[target_idx].personality];
         }

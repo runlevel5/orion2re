@@ -74,7 +74,7 @@ namespace diplomac {
             }
         }
 
-        if (MOX::_player[player_idx].personality == 3 /* RUTHLESS */) {
+        if (MOX::_player[player_idx].personality == PLAYER_PERSONALITY_ERRATIC) {
             if ((int16_t)game_random::Random_(200) <= MOX::_settings.game_difficulty + 1) {
                 msg_id = 109 /* 0x6D */;
                 severity = 100;
@@ -89,7 +89,7 @@ namespace diplomac {
             score = -150;
         }
 
-        if (MOX::_player[player_idx].personality == 1 /* AGGRESSIVE */) {
+        if (MOX::_player[player_idx].personality == PLAYER_PERSONALITY_RUTHLESS) {
             if (Fleet_Strength_Comparison_(player_idx, target_idx) >= 100) {
                 if (MOX::_player[player_idx].opportunity_actual_attacker_ratio[target_idx] >= 200 && 
                     MOX::_player[player_idx].opportunity_planet_num[target_idx] != -1) {
@@ -103,7 +103,7 @@ namespace diplomac {
             }
         }
 
-        if (MOX::_player[player_idx].personality == 0 /* XENOPHOBIC */) {
+        if (MOX::_player[player_idx].personality == PLAYER_PERSONALITY_XENOPHOBIC) {
             if (aitech::System_Proximity_Count_(player_idx, (uint8_t)target_idx) >= (int16_t)game_random::Random_(400)) {
                 msg_id = 121 /* 0x79 */;
                 min_mod = -150;
@@ -119,7 +119,7 @@ namespace diplomac {
         score += trust_mod;
 
         if ((Fleet_Strength_Comparison_(player_idx, target_idx) >= 300 || MOX::_player[player_idx].total_pop * 3 <= MOX::_player[player_idx].total_pop * 2) && 
-            MOX::_player[player_idx].personality != 5 /* PACIFIST */) {
+            MOX::_player[player_idx].personality != PLAYER_PERSONALITY_PACIFIST) {
             int16_t str_mod = (int16_t)(Fleet_Strength_Comparison_(player_idx, target_idx) / -40);
             if (str_mod < min_mod) {
                 msg_id = 112 /* 0x70 */;
@@ -186,7 +186,7 @@ namespace diplomac {
         }
 
         if ((MOX::_player[player_idx].treaty[target_idx] == 1 || MOX::_player[player_idx].treaty[target_idx] == 2) && 
-            Get_Player_Diplomacy_Personality_(player_idx, target_idx) == 4) {
+            Get_Player_Diplomacy_Personality_(player_idx, target_idx) == PLAYER_PERSONALITY_HONORABLE) {
             final_prob = 0;
         }
 
@@ -298,7 +298,7 @@ namespace diplomac {
                     }
 
                     if (eval_results[p2] == 2) {
-                        if (Get_Player_Diplomacy_Personality_(p1, p2) != 4) {
+                        if (Get_Player_Diplomacy_Personality_(p1, p2) != PLAYER_PERSONALITY_HONORABLE) {
                             Clear_Last_Threat_Turn_(p1, p2);
                             if (plr1->opportunity_planet_num[p2] == -1 || 
                                 plr1->opportunity_actual_attacker_ratio[p2] <= (int32_t)eval_ratios[p2]) 
@@ -435,12 +435,12 @@ namespace diplomac {
                     if (MOX::_player[j].objectives == PLAYER_OBJECTIVE_HUMAN) {
                         int16_t rejection_mod = 0;
                         switch (MOX::_player[i].personality) {
-                            case 0: rejection_mod = -3; break;
-                            case 1: rejection_mod = -2; break;
-                            case 2:
-                            case 3: rejection_mod = 0; break;
-                            case 4: rejection_mod = 2; break;
-                            case 5: rejection_mod = 5; break;
+                            case PLAYER_PERSONALITY_XENOPHOBIC: rejection_mod = -3; break;
+                            case PLAYER_PERSONALITY_RUTHLESS: rejection_mod = -2; break;
+                            case PLAYER_PERSONALITY_AGGRESSIVE:
+                            case PLAYER_PERSONALITY_ERRATIC: rejection_mod = 0; break;
+                            case PLAYER_PERSONALITY_HONORABLE: rejection_mod = 2; break;
+                            case PLAYER_PERSONALITY_PACIFIST: rejection_mod = 5; break;
                         }
                         MOX::_player[i].diplomacy_proposal_rejection[j] = rejection_mod;
                         MOX::_player[j].diplomacy_proposal_rejection[i] = rejection_mod;
@@ -599,9 +599,9 @@ namespace diplomac {
 
     int16_t __cdecl Get_Player_Diplomacy_Personality_(int16_t player_idx, int16_t target_idx) {
         // If personality is 4 (Honorable) and player has dishonored a treaty with the target
-        if (MOX::_player[player_idx].personality == 4 &&
+        if (MOX::_player[player_idx].personality == PLAYER_PERSONALITY_HONORABLE &&
             MOX::_player[player_idx].dishonored_flag[target_idx] == 1) {
-            return 6; /* PERSONALITY_DISHONORED_HONORABLE */
+            return PLAYER_PERSONALITY_DISHONORED;
         }
 
         // Return the actual personality byte, zero-extended to short
@@ -651,7 +651,7 @@ namespace diplomac {
 
         if (planet_num != -1 && actual_ratio >= 200) {
             int16_t personality = Get_Player_Diplomacy_Personality_(attacker_idx, target_idx);
-            if (personality != 4) {
+            if (personality != PLAYER_PERSONALITY_HONORABLE) {
                 attacker.sneak_attack_planet = planet_num;
                 attacker.sneak_attack_player = (int8_t)target_idx;
                 attacker.sneak_attack_message = message_idx + 70;
@@ -751,7 +751,7 @@ namespace diplomac {
                         case 11:
                             if (player_i.treaty[j] < 4 /* TREATY_WAR */) {
                                 int16_t personality = Get_Player_Diplomacy_Personality_(i, j);
-                                if (personality == 4 && 
+                                if (personality == PLAYER_PERSONALITY_HONORABLE && 
                                    (player_i.treaty[j] == 1 || player_i.treaty[j] == 2 || 
                                     player_i.trade_treaty[j] != 0 || player_i.research_treaty[j] != 0)) {
                                     player_i.dishonored_flag[j] = 1;
@@ -1072,11 +1072,11 @@ namespace diplomac {
         }
 
         // Personality modifiers
-        if (MOX::_player[p_b].personality == 4 /* personality 4 */ && scaled_amount < 0) {
+        if (MOX::_player[p_b].personality == PLAYER_PERSONALITY_HONORABLE && scaled_amount < 0) {
             scaled_amount *= 2;
         }
 
-        if (MOX::_player[p_b].personality == 0 /* personality 0 */) {
+        if (MOX::_player[p_b].personality == PLAYER_PERSONALITY_XENOPHOBIC) {
             if (scaled_amount < 0) {
                 scaled_amount = (scaled_amount * 3) / 2;
             } else if (scaled_amount > 0) {
@@ -1200,7 +1200,7 @@ namespace diplomac {
             penalty = -40;
         }
 
-        if (p1->personality == 4 /* PERSONALITY_AGGRESSIVE */) {
+        if (p1->personality == PLAYER_PERSONALITY_HONORABLE) {
             penalty *= 3;
         }
 
@@ -1213,7 +1213,7 @@ namespace diplomac {
 
             s_player* other = &MOX::_player[other_idx];
             if (other->eliminated == 0 && (p1->contact[other_idx] == 1 || p2->contact[other_idx] == 1)) {
-                if (other->personality == 4) {
+                if (other->personality == PLAYER_PERSONALITY_HONORABLE) {
                     other->trust_worthiness[p1_idx] -= 20;
                 } else {
                     other->trust_worthiness[p1_idx] -= 10;
@@ -1223,7 +1223,7 @@ namespace diplomac {
             }
         }
 
-        if (p2->personality == 4) {
+        if (p2->personality == PLAYER_PERSONALITY_HONORABLE) {
             p2->trust_worthiness[p1_idx] -= 20;
         } else {
             p2->trust_worthiness[p1_idx] -= 10;
@@ -1300,7 +1300,7 @@ namespace diplomac {
 
         // Additional penalties if no non-aggression pact exists and it was a trade treaty (type 1)
         if (plr2->treaty[p1_idx] < 4 && original_treaty == 1) {
-            if (plr1->personality == 4 /* PER_RUTHLESS */) {
+            if (plr1->personality == PLAYER_PERSONALITY_HONORABLE) {
                 plr1->broken_treaties_modifier[p2_idx] -= 15;
             } else {
                 plr1->broken_treaties_modifier[p2_idx] -= 5;
@@ -1481,7 +1481,7 @@ namespace diplomac {
 
             if (plr->threats[target_player] > 0) {
                 int16_t p_check = Get_Player_Diplomacy_Personality_(current_player, target_player);
-                if (p_check == 4 /* RUTHLESS */) {
+                if (p_check == PLAYER_PERSONALITY_HONORABLE) {
                     if (has_active_bond) {
                         plr->dishonored_flag[target_player] = 1;
                         MOX::_player[target_player].dishonored_flag[current_player] = 1;
@@ -1744,7 +1744,7 @@ namespace diplomac {
                     if (player.contact[i] == 1 && MOX::_player[target_idx].contact[i] == 1 &&
                         MOX::_player[target_idx].treaty[i] < 4 && player.relations[i] <= -50 &&
                         MOX::_player[i].ship_war_losses[player_idx] < player.ship_war_losses[i] &&
-                        player.personality != 0 && player.time_since_last_attack[i] >= 20 &&
+                        player.personality != PLAYER_PERSONALITY_XENOPHOBIC && player.time_since_last_attack[i] >= 20 &&
                         player.ship_war_losses[i] > 0) 
                     {
                         candidates[num_candidates++] = i;
@@ -2066,7 +2066,7 @@ namespace diplomac {
 
             // Check if player2 is not in a significant alliance and the broken research treaty was active (val 1)
             if (MOX::_player[p2].treaty[p1] < 4 && research_val == 1) {
-                if (MOX::_player[p1].personality == 4) {
+                if (MOX::_player[p1].personality == PLAYER_PERSONALITY_HONORABLE) {
                     MOX::_player[p1].broken_treaties_modifier[p2] -= 15;
                 } else {
                     MOX::_player[p1].broken_treaties_modifier[p2] -= 5;
@@ -2137,7 +2137,7 @@ namespace diplomac {
 
         // If there was an active tribute and no existing alliance, apply penalties
         if (p2->treaty[p1_idx] < 4 /* TREATY_ALLIANCE */ && old_tribute > 0) {
-            if (p1->personality == 4 /* PERSONALITY_RUTHLESS */) {
+            if (p1->personality == PLAYER_PERSONALITY_HONORABLE) {
                 p1->broken_treaties_modifier[p2_idx] -= 20;
             } else {
                 p1->broken_treaties_modifier[p2_idx] -= 10;
@@ -2292,7 +2292,7 @@ namespace diplomac {
         }
 
         *msg_id = 154 /* 0x9a */;
-        if (MOX::_player[actor_idx].personality != 4) {
+        if (MOX::_player[actor_idx].personality != PLAYER_PERSONALITY_HONORABLE) {
             *msg_id = 153 /* 0x99 */;
         }
 
@@ -2360,7 +2360,7 @@ namespace diplomac {
 
         // Note: The following logic checks the acting player's personality and sets the message ID, 
         // effectively overwriting the value 173 (MSG_WAR_BREAK_TRIBUTE) if war was declared.
-        if (MOX::_player[acting_player_idx].personality == 4 /* PERSONALITY_AGGRESSIVE */) {
+        if (MOX::_player[acting_player_idx].personality == PLAYER_PERSONALITY_HONORABLE) {
             *out_msg_id = 172 /* 0xAC MSG_PERSONALITY_BREAK_TRIBUTE_AGGRESSIVE */;
         } else {
             *out_msg_id = 171 /* 0xAB MSG_PERSONALITY_BREAK_TRIBUTE_NORMAL */;
@@ -2452,7 +2452,7 @@ namespace diplomac {
     void __cdecl Get_Declare_War_Message_(int16_t player_a_idx, int16_t player_b_idx, int16_t* msg_id) {
         // If the player declaring war (player_b_idx) has an honorable personality (4),
         // we check if a treaty is being broken dishonorably.
-        if (MOX::_player[player_b_idx].personality == 4) {
+        if (MOX::_player[player_b_idx].personality == PLAYER_PERSONALITY_HONORABLE) {
             if (MOX::_player[player_a_idx].dishonored_flag[player_b_idx] == 0 &&
                 (MOX::_player[player_b_idx].treaty[player_a_idx] == 1 ||
                  MOX::_player[player_b_idx].treaty[player_a_idx] == 2)) {
@@ -2595,10 +2595,10 @@ namespace diplomac {
         int32_t rnd = game_random::Random_(200);
 
         int16_t pers_mod;
-        if (MOX::_player[player_b].personality != 4 || MOX::_player[player_a].dishonored_flag[player_b] != 1) {
+        if (MOX::_player[player_b].personality != PLAYER_PERSONALITY_HONORABLE || MOX::_player[player_a].dishonored_flag[player_b] != 1) {
             pers_mod = diplodef::_personality_relation_modifiers[MOX::_player[player_b].personality];
         } else {
-            pers_mod = diplodef::_personality_relation_modifiers[6];
+            pers_mod = diplodef::_personality_relation_modifiers[PLAYER_PERSONALITY_DISHONORED];
         }
 
         int16_t modifier = (int16_t)(((tech_comp + fleet_comp + pop_comp) / 3) + worst_mod + rnd + (pers_mod * 2));
@@ -2670,7 +2670,7 @@ namespace diplomac {
 
         int8_t treaty = MOX::_player[player_a].treaty[player_b];
         if (treaty == 1 || treaty == 2) {
-            if (modifier < -100 || Get_Player_Diplomacy_Personality_(player_b, player_a) == 6) {
+            if (modifier < -100 || Get_Player_Diplomacy_Personality_(player_b, player_a) == PLAYER_PERSONALITY_DISHONORED) {
                 *response_code = 0xA5;
                 Declare_War_(player_a, player_b);
                 *accepted = 0;
@@ -2703,7 +2703,7 @@ namespace diplomac {
                 *accepted = 1;
             }
         } else {
-            if (modifier < -150 || Get_Player_Diplomacy_Personality_(player_b, player_a) == 6) {
+            if (modifier < -150 || Get_Player_Diplomacy_Personality_(player_b, player_a) == PLAYER_PERSONALITY_DISHONORED) {
                 *response_code = 0xA5;
                 Declare_War_(player_a, player_b);
                 *accepted = 0;
@@ -2931,7 +2931,7 @@ namespace diplomac {
                     case 0:
                         if (game_random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
                             *response = 0x8B;
-                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
                             *response = 0x8C;
                         } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
@@ -2997,7 +2997,7 @@ namespace diplomac {
                     case 0:
                         if (game_random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
                             *response = 0x8B;
-                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
                             *response = 0x8C;
                         } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
@@ -3077,7 +3077,7 @@ namespace diplomac {
                     case 0:
                         if (game_random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
                             *response = 0x8B;
-                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
                             *response = 0x8C;
                         } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
@@ -3137,7 +3137,7 @@ namespace diplomac {
                     case 0:
                         if (game_random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
                             *response = 0x8B;
-                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
                             *response = 0x8C;
                         } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
@@ -3169,7 +3169,7 @@ namespace diplomac {
                     case 0:
                         if (game_random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
                             *response = 0x8B;
-                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                        } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].personality == PLAYER_PERSONALITY_HONORABLE && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
                             *response = 0x8C;
                         } else if (game_random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
                             *response = 0x8D;
@@ -3259,10 +3259,10 @@ namespace diplomac {
             (int16_t)MOX::_player[evaluator_idx].trust_worthiness[proposer_idx];
 
         int16_t modifier;
-        if (MOX::_player[evaluator_idx].personality == 4) {
+        if (MOX::_player[evaluator_idx].personality == PLAYER_PERSONALITY_HONORABLE) {
             score += (int16_t)MOX::_player[evaluator_idx].trust_worthiness[proposer_idx];
             if (MOX::_player[evaluator_idx].dishonored_flag[proposer_idx] == 1) {
-                modifier = diplodef::_personality_relation_modifiers[6];
+                modifier = diplodef::_personality_relation_modifiers[PLAYER_PERSONALITY_DISHONORED];
             }
             else {
                 modifier = diplodef::_personality_relation_modifiers[MOX::_player[evaluator_idx].personality];

@@ -25,7 +25,7 @@ namespace KEN {
      */
     void __cdecl Ken_Get_Text_Message_(int32_t msg_index, char* buffer, int16_t message_arg);
 
-    extern uint8_t _personalities[140];
+    extern uint8_t _personalities[14][10];
 
     /* Assigns NPC personalities, objectives, and ship themes. */
     void __cdecl Init_NPC_Personalities_Objectives_Themes_();

@@ -2163,14 +2163,14 @@ namespace AIMOVE {
 
         if (result == 2) {
             switch (p_a->personality) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
+                case PLAYER_PERSONALITY_XENOPHOBIC:
+                case PLAYER_PERSONALITY_RUTHLESS:
+                case PLAYER_PERSONALITY_AGGRESSIVE:
+                case PLAYER_PERSONALITY_ERRATIC:
                     result = 1; /* Not Hostile */
                     break;
-                case 4:
-                case 5:
+                case PLAYER_PERSONALITY_HONORABLE:
+                case PLAYER_PERSONALITY_PACIFIST:
                     result = 0; /* Hostile */
                     break;
                 default:
@@ -2237,7 +2237,7 @@ namespace AIMOVE {
 
         bool can_attack = true;
         uint32_t n_pops = (uint8_t)colony->n_pops;
-        if ((int32_t)n_pops < min_pop && colony->outpost_flag == 0 && _p_ai->personality != 1 && n_pops != 0) {
+        if ((int32_t)n_pops < min_pop && colony->outpost_flag == 0 && _p_ai->personality != PLAYER_PERSONALITY_RUTHLESS && n_pops != 0) {
             for (uint32_t i = 0; i < n_pops; ++i) {
                 if (POP::Get_Race(colony->pop[i]) == (uint32_t)_i_ai) {
                     can_attack = false;

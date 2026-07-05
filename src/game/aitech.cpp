@@ -285,7 +285,7 @@ namespace aitech {
                     plr_info->best_computer_delta++;
                 }
 
-                if (plr->personality == 2) {
+                if (plr->personality == PLAYER_PERSONALITY_AGGRESSIVE) {
                     plr_info->best_shield_delta++;
                     plr_info->best_computer_delta++;
                 }

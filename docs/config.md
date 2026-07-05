@@ -98,6 +98,21 @@ There should be no unresolved symbolic selector left in decoded operations.
 
 This assumption was validated against the current schema and sample config with `tools/validate_config_lhs_numeric.py`.
 
+Additional validation against the full mod corpus confirmed:
+
+- parameter names are schema-known
+- symbolic lhs selectors are schema-decodable
+- numeric lhs selectors are also used in real configs and must be accepted
+
+Examples seen in real mod files:
+
+```text
+building 21 maintenance = 1;
+weapon 3 13 = hv,pd,co,nr,af;
+```
+
+So the decode layer must support both symbolic selector names and numeric selector addressing.
+
 ### 4. The runtime is an interpreter, not a byte-offset patch VM
 
 Config application should change live memory immediately.
@@ -125,6 +140,55 @@ The project mapping file should not duplicate external field types.
 
 If generated code does not compile because the schema-implied type does not match the actual internal field type, that is a useful correctness signal.
 
+Additional validation against mod CFG files showed that decode must accept more than one surface encoding for the same schema type:
+
+- symbolic enum names
+- numeric enum ids
+- symbolic mask codes
+- symbolic mask value `none`
+- numeric mask values
+- binary integer mask notation
+
+So `config.json` still defines the type, but decode must allow both symbolic and numeric forms when mods use them.
+
+## Validation findings from existing mod CFG files
+
+The current mod corpus under `C:\Projects\150\150\mods` was scanned with `tools/validate_config_lhs_numeric.py`.
+
+Validated corpus summary:
+
+- 36 CFG files scanned
+- 6712 assignments checked
+- 6073 table assignments
+- 3121 bulk/table-list assignments
+- 141 skip-aware assignments using `-`
+- 0 unknown parameter names
+- 0 selector decode errors
+
+This confirms that the design direction is correct:
+
+- schema-known parameter names are sufficient
+- schema-driven selector decoding is sufficient
+- bulk notation is heavily used in real mods
+- skip-aware traversal is required
+- generated layout-driven interpretation is the right execution model
+
+It also revealed several important requirements that were not fully captured in the first draft:
+
+- numeric lhs selectors are used in real configs
+- enum-valued fields may be written using symbolic names or numeric ids
+- mask-valued fields may be written using symbolic masks, symbolic `none`, numeric masks, or binary integer literals
+- ratio-valued fields are used in real configs and need dedicated readers
+- single-column row-grouped tables may still use bulk traversal across successive rows
+
+Example of real bulk traversal across successive rows in a single-column table:
+
+```text
+skill_cost famous = 3 6 - - 2 4;
+```
+
+So the interpreter must not assume that bulk traversal only walks successive columns inside one row. Depending on schema shape, traversal may walk the flattened logical ordering of multiple row entries as well.
+
 ## External config semantics that must be supported
 
 The 1.50 config format supports more than just scalar assignments and simple table cell updates.
@@ -151,6 +215,10 @@ mount_dmg hef = 75 150 225;
 
 This means a config operation can start at some logical table position and then walk forward through the schema-defined logical order.
 
+Validation against the real mod corpus confirmed that this is common and not just a theoretical/manual feature.
+
+Bulk traversal must be defined against generated logical layout, not against handwritten table-specific rules.
+
 ### Skip marker
 
 The manual also defines `-` as a skip marker inside bulk notation.
@@ -169,6 +237,8 @@ This means:
 
 This must be supported by the interpreter directly.
 
+Validation against existing mods confirmed active use of skip markers in multiple tables.
+
 ### Example: skip-aware partial bulk notation
 
 Example based on existing mod files:
@@ -186,6 +256,21 @@ Using schema order, this means:
 - `weapon_1_amount = 8`
 
 The interpreter must derive this by walking logical schema order from the supplied starting selector. It must not rely on handwritten special cases for this particular parameter.
+
+This same mechanism must also support other real-world cases such as:
+
+```text
+weapon crystal_ray 8 = 80 - - - - 2;
+building warp_interdictor 3 = - 4;
+skill_cost famous = 3 6 - - 2 4;
+```
+
+The common rule is:
+
+- resolve starting logical position from the supplied lhs selectors
+- walk forward through generated logical layout
+- for each rhs item, either skip or decode-and-assign the current logical field
+- advance logical position after every rhs item
 
 ## High-level architecture
 
@@ -215,6 +300,8 @@ Generated code maps:
 - selector identifiers to numeric selector ids
 - enum values to numeric values
 - mask codes to numeric bitmasks
+- numeric enum ids to enum values where legal
+- numeric selector addressing to selector positions where legal
 - raw value shape to decoded operation structure
 
 This layer is driven by `config.json`.
@@ -225,6 +312,26 @@ Output is a decoded operation stream using:
 - numeric selectors
 - typed primitive values
 - explicit skip values where `-` was used
+
+Decode must support the following surface forms observed in real configs:
+
+- symbolic selector names
+- numeric selector ids
+- symbolic enum names
+- numeric enum ids
+- symbolic mask codes such as `hv,pd,co`
+- symbolic mask value `none`
+- numeric masks such as `18`
+- binary numeric masks such as `00000000000010010`
+- ratios such as `1/2`
+
+These mask forms are not theoretical. Existing mod CFG files use all of the following forms today:
+
+- `none`
+- `hv`
+- `pd`
+- `hv,pd,co,nr`
+- `00000000000010010`
 
 ### Stage 3: generated layout-driven interpreter
 
@@ -288,6 +395,15 @@ weapon_1_type = 11 - 00000000000000010 - 8
 
 should decode to five rhs items, two of which are skip values.
 
+The decoded value model must also be able to represent:
+
+- integer values
+- ratio values
+- string values
+- explicit skip values
+
+Enum and mask values should normally be decoded into integer form before application.
+
 ## Generated logical layout
 
 The interpreter must not hardcode table traversal shape by hand.
@@ -311,6 +427,13 @@ The purpose of `s_layout_item` is:
 
 It should not duplicate the field type, because the type already comes from the schema.
 
+`s_layout_item` is generated from both:
+
+- external schema logical ordering from `config.json`
+- internal field mapping from `config_bindings.json`
+
+This generated layout is the foundation for all bulk and skip-aware traversal.
+
 ### Example layout use
 
 For a flat design table like `antaran_titan___defensive`, generated layout would preserve the schema order:
@@ -327,6 +450,10 @@ For a flat design table like `antaran_titan___defensive`, generated layout would
 - ...
 
 If an operation starts at `weapon_1_type`, the generated interpreter resolves that to a starting logical index and then walks the layout forward across rhs items.
+
+For some schema shapes, the generated logical layout will flatten more than one conceptual axis.
+
+Example: `skill_cost` has one row group and one column, but real mod files use bulk notation starting from one row and then continue into successive rows. So generated layout for such parameters must flatten row-major logical order and not assume bulk traversal is column-only.
 
 ## Semantic bindings file
 
@@ -406,6 +533,8 @@ The generated interpreter should contain:
 - generated field write dispatch by generated target field id
 - generic traversal for bulk notation using generated layout items
 
+The generated interpreter must not hardcode semantic chunks like "weapon_1_type implies exactly 5 following fields" as handwritten behavior. Those traversal relationships must come from generated layout.
+
 ### Top-level dispatch
 
 Conceptually:
@@ -420,6 +549,14 @@ case CONFIG_NAME_ANTARAN_TITAN_DEFENSIVE:
     break;
 }
 ```
+
+`Resolve_Start_Logical_Index_()` must be generated from schema shape. It must support:
+
+- full-table start
+- row start
+- row-plus-column start
+- column-only start for rowless tables
+- numeric selector forms where mods use numeric addressing
 
 ### Generated traversal for layout-driven tables
 
@@ -487,6 +624,8 @@ The interpreter should support the following generic shapes.
 disable_vsync = 1;
 ```
 
+Also observed in real configs with enum names and numeric enum ids.
+
 ### Full bulk override
 
 ```text
@@ -499,16 +638,27 @@ mount_dmg = 50 100 125 75;
 mount_dmg hef = 75 150 225;
 ```
 
+This was confirmed to be a real required pattern conceptually and matches the documented manual behavior.
+
 ### Skip-aware partial bulk override
 
 ```text
 mount_dmg nohef pd = 50 - - 75;
 ```
 
+Confirmed in real mod files with many variations.
+
 ### Cell patch
 
 ```text
 building autolab cost = 200;
+```
+
+Real mod files also use numeric selector forms such as:
+
+```text
+building 21 maintenance = 1;
+building recyclotron 5 = 4;
 ```
 
 ### Variable-length keyed payloads
@@ -518,6 +668,8 @@ ai_race_variant_table Alkari hard v1 = 1 7 2;
 ```
 
 These may require a custom helper if not expressible as layout-driven traversal.
+
+At the moment, most real-world irregularity appears to be representable by generated layout plus typed readers. Custom helpers should remain the fallback, not the default.
 
 ## Why not a raw patch engine
 
@@ -598,7 +750,7 @@ The config system should report errors in three phases.
 
 - unknown parameter name
 - invalid selector name
-- invalid enum or mask token
+- invalid enum, mask, or ratio token
 - wrong selector count
 - wrong rhs arity
 - out-of-range numeric value

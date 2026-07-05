@@ -367,7 +367,7 @@ namespace spy {
                 }
 
                 int16_t mission = 0;
-                if (MOX::_player[player_idx].personality == 3) {
+                if (MOX::_player[player_idx].personality == PLAYER_PERSONALITY_ERRATIC) {
                     if (game_random::Random_(8) == 1) {
                         mission = 1;
                     }
