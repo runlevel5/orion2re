@@ -196,15 +196,6 @@ target_include_directories(orion2re_lz4 PUBLIC
     "${ORION2RE_VENDORED_LZ4_DIR}/lib"
 )
 
-if(MSVC AND WIN32 AND ORION2RE_GAME_DIR)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_GAME_DIR}")
-    set(CMAKE_PDB_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
-    set(CMAKE_PDB_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_GAME_DIR}")
-    set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG "${ORION2RE_GAME_DIR}")
-    set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELEASE "${ORION2RE_GAME_DIR}")
-endif()
-
 if(ORION2RE_BUILD_GAME)
     file(GLOB_RECURSE ORION2RE_SOURCES CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -256,6 +247,23 @@ if(ORION2RE_BUILD_GAME)
         orion2re_lz4
         miniz
     )
+
+    if(ORION2RE_GAME_DIR)
+        add_custom_command(TARGET orion2re POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:orion2re>
+                "${ORION2RE_GAME_DIR}/$<TARGET_FILE_NAME:orion2re>"
+        )
+
+        if(MSVC)
+            add_custom_command(TARGET orion2re POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    $<TARGET_PDB_FILE:orion2re>
+                    "${ORION2RE_GAME_DIR}/$<TARGET_PDB_FILE_NAME:orion2re>"
+                COMMAND_EXPAND_LISTS
+            )
+        endif()
+    endif()
 endif()
 
 add_executable(orion2re-router

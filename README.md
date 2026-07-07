@@ -41,22 +41,6 @@ If you already cloned the repository without submodules, initialize and update t
 git submodule update --init --recursive
 ```
 
-Bootstrap dependencies and verify required tools first:
-
-Unix-like shells:
-
-```sh
-tools/bootstrap_deps.sh
-```
-
-Windows `cmd.exe`:
-
-```bat
-tools\bootstrap_deps.bat
-```
-
-The bootstrap scripts verify required tools and sync the pinned submodules used by the project.
-
 ## Build
 
 Configure and build with a preset:
@@ -125,7 +109,7 @@ See `CMakePresets.json` for the available MinGW presets.
 
 The repository includes `tools/create_user_preset.sh` to create a local CMake override file at `cmake/local-user.cmake`.
 
-The script sets `ORION2RE_GAME_DIR`, used as the runtime output directory and debugger working directory for supported builds.
+The script sets `ORION2RE_GAME_DIR`, which is gitignored and used as the debugger working directory. When set, the `orion2re` executable is also copied into that directory after each build. On MSVC builds, the target PDB is copied there too.
 
 Usage:
 
@@ -142,4 +126,4 @@ cmake --preset win32-debug
 cmake --build --preset win32-debug
 ```
 
-If `ORION2RE_GAME_DIR` points to your installed game directory, supported configurations will place the built executable and debug output there.
+If `ORION2RE_GAME_DIR` points to your installed game directory, the normal build outputs stay in the build tree and the finished executable is deployed into the game directory after the build completes.

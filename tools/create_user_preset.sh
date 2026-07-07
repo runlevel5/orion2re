@@ -16,6 +16,7 @@ usage() {
 Usage: $(basename "$0") <game-path>
 
 Creates $OUTPUT_PATH and sets ORION2RE_GAME_DIR to the provided game path.
+The build keeps normal outputs in the build tree and copies the finished game binary there after build.
 EOF
     exit 1
 }
@@ -37,7 +38,7 @@ escaped_game_path=${escaped_game_path//$quote/\\$quote}
 
 {
     printf '%s\n' '# Local user overrides for CMake. This file is gitignored.'
-    printf '%s\n' "set(ORION2RE_GAME_DIR \"$escaped_game_path\" CACHE PATH \"Optional game directory used for runtime output and debugger working directory\" FORCE)"
+    printf '%s\n' "set(ORION2RE_GAME_DIR \"$escaped_game_path\" CACHE PATH \"Optional game directory used for post-build deployment and debugger working directory\" FORCE)"
 } > "$OUTPUT_PATH"
 
 echo "Wrote $OUTPUT_PATH"

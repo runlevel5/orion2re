@@ -128,8 +128,8 @@ So the decode layer must support both symbolic selector names and numeric select
 
 The important boundary is:
 
-- Stage 2 resolves selector syntax into schema-level numeric identities and a logical start position
-- Stage 3 consumes that logical position and performs the actual field write mapping
+- Stage 2 resolves selector syntax into schema-level numeric identities, logical positions, and stable `schema_field_id` values
+- Stage 3 consumes those decoded writes and maps `schema_field_id` values to actual field writes
 
 ### 4. The runtime is an interpreter, not a byte-offset patch VM
 
@@ -317,6 +317,7 @@ Generated code maps:
 - parameter names to numeric ids
 - selector identifiers to numeric selector ids
 - decoded lhs selector shape to a schema logical start position
+- logical positions to stable `schema_field_id` values
 - enum values to numeric values
 - mask codes to numeric bitmasks
 - numeric enum ids to enum values where legal
@@ -331,6 +332,7 @@ Output is a flat decoded write stream using:
 
 - numeric parameter ids
 - resolved schema logical indices
+- resolved `schema_field_id` values
 - typed decoded values
 
 A single parsed assignment may expand into zero or more decoded logical writes.
@@ -389,14 +391,15 @@ column_index = logical_index % num_columns
 Then:
 
 - `row_index` selects the row/object/array entry to mutate
-- `column_index` selects the stable schema field position within that row
-- semantic bindings map that stable field position to the actual typed target write
+- `column_index` identifies the per-row field slot within schema order
+- `schema_field_id` identifies the stable schema field to map
+- semantic bindings map `schema_field_id` to the actual typed target write
 
 No raw memory offsets are involved in this model.
 
 The key rule is:
 
-- traversal order comes from generated logical layout metadata
+- traversal order and `schema_field_id` generation come from `config.json`
 - actual field assignment targets come from generated semantic mapping
 
 ### Stage 4: optional handwritten custom helpers
@@ -427,6 +430,7 @@ struct s_value {
 struct s_decoded_write {
     int32_t parameter_id;
     int32_t logical_index;
+    int32_t schema_field_id;
     s_value value;
 };
 ```
@@ -436,6 +440,7 @@ Stage 2 is responsible for:
 - resolving the starting logical index from lhs selectors
 - walking logical positions across rhs items
 - applying skip semantics
+- resolving `schema_field_id` for each emitted logical write
 - decoding each non-skip rhs item to a typed value
 - emitting one `s_decoded_write` per actual write
 
@@ -458,17 +463,16 @@ The decoded value model must also be able to represent:
 
 Enum and mask values should normally be decoded into integer form before application.
 
-## Generated logical layout
+## Generated schema field ids and apply layout
 
 The interpreter must not hardcode table traversal shape by hand.
 
-Instead, the generator should emit a logical layout for every generated table-like parameter.
+Instead, the generator should emit stable schema field ids from `config.json` and apply metadata from `config_bindings.json`.
 
 Conceptually:
 
 ```cpp
 struct s_layout_item {
-    int32_t logical_index;
     int32_t schema_field_id;
     int32_t target_field_id;
 };
@@ -476,17 +480,16 @@ struct s_layout_item {
 
 The purpose of `s_layout_item` is:
 
-- preserve external logical field order from `config.json`
-- connect external logical field positions to internal semantic target fields
+- connect stable external schema fields to internal semantic target fields
 
 It should not duplicate the field type, because the type already comes from the schema.
 
 `s_layout_item` is generated from both:
 
-- external schema logical ordering from `config.json`
+- external schema field definitions from `config.json`
 - internal field mapping from `config_bindings.json`
 
-This generated layout is the foundation for all bulk and skip-aware traversal.
+Stage 2 traversal still comes from generated schema ordering in `config.json`. Stage 3 uses generated layout items to map `schema_field_id` values to concrete write targets.
 
 ### Example layout use
 
@@ -503,11 +506,11 @@ For a flat design table like `antaran_titan___defensive`, generated layout would
 - `weapon_1_amount`
 - ...
 
-If an operation starts at `weapon_1_type`, the generated interpreter resolves that to a starting logical index and then walks the layout forward across rhs items.
+If an operation starts at `weapon_1_type`, Stage 2 resolves that to a starting logical index, derives the corresponding `schema_field_id`, and then walks forward across rhs items.
 
 For some schema shapes, the generated logical layout will flatten more than one conceptual axis.
 
-Example: `skill_cost` has one row group and one column, but real mod files use bulk notation starting from one row and then continue into successive rows. So generated layout for such parameters must flatten row-major logical order and not assume bulk traversal is column-only.
+Example: `skill_cost` has one row group and one column, but real mod files use bulk notation starting from one row and then continue into successive rows. So generated schema traversal for such parameters must flatten row-major logical order and not assume bulk traversal is column-only.
 
 ## Semantic bindings file
 
@@ -524,7 +527,7 @@ It should define:
 - which parameters are generated
 - which parameters are custom
 - target global/table expression for generated parameters
-- mapping from external field names to internal field names or target field ids
+- mapping from generated `schema_field_id` values to internal field names or target field ids
 
 Example direction:
 
@@ -585,7 +588,7 @@ The generated interpreter should contain:
 - primitive typed readers chosen from schema
 - parameter dispatch by generated parameter id
 - generated field write dispatch by generated target field id
-- generated mapping from logical index to layout item
+- generated mapping from `schema_field_id` to target field id
 
 The generated interpreter must not hardcode semantic chunks like "weapon_1_type implies exactly 5 following fields" as handwritten behavior. Those traversal relationships belong to Stage 2 traversal plus generated layout metadata.
 
@@ -636,6 +639,7 @@ static void Decode_Operation_To_Writes_(
         out_writes.push_back({
             parameter.id,
             logical_index,
+            Resolve_Schema_Field_Id_(parameter, logical_index),
             Decode_Value_For_Logical_Index_(parameter, logical_index, raw_value),
         });
     }
@@ -653,9 +657,9 @@ static void Apply_Decoded_Write_(
 {
     int32_t row_index = write.logical_index / binding.column_count;
     int32_t column_index = write.logical_index % binding.column_count;
-    const s_layout_item& item = binding.layout[write.logical_index];
+    int32_t target_field_id = binding.schema_field_to_target_field[write.schema_field_id];
 
-    switch (item.target_field_id) {
+    switch (target_field_id) {
     case FIELD_WEAPON_1_TYPE:
         MOX::_antaran_titan_defensive.weapon_1_type = Read_Uint16_(write.value);
         break;
@@ -677,7 +681,7 @@ static void Apply_Decoded_Write_(
 
 This gives immediate live-memory updates without exposing a low-level byte-offset patch VM.
 
-For rowless flat tables, `Binding.column_count` is the full logical field count and `Row_Index` remains `0`. For regular row tables, `Row_Index` selects the target entry and `Column_Index` identifies the stable schema field position to map.
+For rowless flat tables, `binding.column_count` is the full logical field count and `row_index` remains `0`. For regular row tables, `row_index` selects the target entry and `schema_field_id` identifies the stable schema field to map.
 
 ## Supported config operation shapes
 

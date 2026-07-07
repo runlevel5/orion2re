@@ -23,13 +23,26 @@ namespace smckplay {
 
     namespace {
         smk Open_Smacker_File_(const char* file_name) {
-            char resolved_path[512];
-
-            if (vfs::Resolve_Read_Path_No_Zip(file_name, resolved_path, sizeof(resolved_path)) == 0) {
+            s_vfs_file* file = vfs::fopen(file_name, "rb");
+            if (file == nullptr) {
                 return nullptr;
             }
 
-            return smk_open_file(resolved_path, SMK_MODE_MEMORY);
+            const int32_t file_size = vfs::fsize(file);
+            if (file_size <= 0) {
+                vfs::fclose(file);
+                return nullptr;
+            }
+
+            std::vector<unsigned char> smacker_file((size_t)file_size);
+            const size_t bytes_read = vfs::fread(smacker_file.data(), 1, smacker_file.size(), file);
+            vfs::fclose(file);
+
+            if (bytes_read != smacker_file.size()) {
+                return nullptr;
+            }
+
+            return smk_open_memory(smacker_file.data(), (unsigned long)smacker_file.size());
         }
     }
 

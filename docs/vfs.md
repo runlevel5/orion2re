@@ -11,6 +11,7 @@ The VFS is used for read-only game assets such as:
 - LBX resources
 - streamed LBX-backed audio
 - animation assets loaded through the normal resource loaders
+- Smacker video playback assets
 - generic asset file reads that go through the VFS API
 
 The VFS does not replace normal local file I/O for:
@@ -95,7 +96,6 @@ This fallback applies to raw asset lookup only. It does not currently scan `data
 ## Current limitations
 
 - The VFS is read-only.
-- Smacker/libsmacker playback still needs real files and does not read zip-backed assets.
 - Write/config/save paths remain normal local file I/O.
 
 ## Summary
@@ -106,4 +106,5 @@ The current VFS behavior is:
 - case-insensitive asset matching
 - direct support for whole-file and per-entry LBX overrides
 - one common read path for migrated asset loaders
-- no VFS handling for writes or Smacker zip playback
+- Smacker videos can be loaded from loose overrides, zip mods, or raw assets
+- no VFS handling for writes
