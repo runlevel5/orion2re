@@ -1325,7 +1325,7 @@ namespace INFO {
         }
 
         fonts::Set_Font_Style_(1, &INFO::_info_normal_color);
-        itoa(max_scale, buffer, 10);
+        snprintf(buffer, sizeof(buffer), "%i", max_scale);
         fonts::Print_(0xF6, 0x8A, buffer);
 
         int16_t draw_count = n_points - 1;
@@ -1634,7 +1634,7 @@ namespace INFO {
                     snprintf(buffer, sizeof(buffer), "%i,%i", whole, fraction);
                 }
             } else {
-                itoa(whole, buffer, 10);
+                snprintf(buffer, sizeof(buffer), "%i", whole);
             }
 
             fonts::Print_Centered_(label_x, 400, buffer);

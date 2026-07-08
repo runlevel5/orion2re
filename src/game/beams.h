@@ -29,13 +29,13 @@ namespace BEAMS {
      */
     void __cdecl Draw_Generic_Beam_(
         int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
-        int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
-        int16_t beam_width, int16_t sprite_id, int16_t draw_core_flag, int16_t draw_glow_flag,
-        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t core_flicker_min,
-        int16_t core_flicker_max, int16_t reverse_draw_flag, int16_t draw_mauler_ball_flag, int16_t mount_scale_mod, int16_t fx_param_1,
-        int16_t fx_param_2, int16_t fx_param_3, int16_t fx_param_4, int16_t frame_index,
+        int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t bolt_color_jitter_chance,
+        int16_t bolt_color_jitter_range, int16_t frame_step_distance, int16_t bolt_sparkle_phase, int16_t bolt_draw_caps_flag,
+        int16_t bolt_point_source_end_flag, int16_t bolt_tip_highlight_flag, int16_t bolt_full_core_gradient_flag, int16_t bolt_apply_sparkles_flag,
+        int16_t bolt_suppress_side_strands_flag, int16_t reverse_draw_flag, int16_t draw_mauler_ball_flag, int16_t beam_renderer_mode, int16_t bolt_core_max_offset,
+        int16_t bolt_core_min_offset, int16_t bolt_outer_max_offset, int16_t bolt_outer_min_offset, int16_t frame_index,
         int16_t target_size_class, uint16_t hit_result_flags, uint16_t special_flag,
-        int16_t is_non_ship_target, int16_t base_damage_class, int16_t reflection_state,
+        int16_t is_non_ship_target, int16_t burst_variant, int16_t reflection_state,
         int16_t attacker_size_class, s_weapon_visual_fx* weapon_visual_fx
     );
 

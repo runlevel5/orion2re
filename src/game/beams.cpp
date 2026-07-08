@@ -826,427 +826,427 @@ namespace BEAMS {
     {
         (void)unused_fighter_beam_flag;
 
-        int16_t v_duration;
-        int16_t v_color;
-        int16_t v_mount_scale_mod;
-        int16_t v_ebx = 0;
-        int16_t v_local_58 = 0;
+        int16_t duration_frames;
+        int16_t palette_fragment_index;
+        int16_t beam_renderer_mode;
+        int16_t draw_mauler_ball_flag = 0;
+        int16_t bolt_apply_sparkles_flag = 0;
+        int16_t burst_variant = 0;
         int16_t loop_count;
-        int16_t v_local_54;
-        int16_t v_local_54_2;
-        int16_t v_local_54_4;
-        int16_t v_local_54_6;
-        int16_t v_local_4c;
-        int16_t v_local_4a;
-        int16_t v_local_4a_2;
-        int16_t v_local_46;
-        int16_t v_local_46_2;
-        int16_t v_local_42;
-        int16_t v_local_42_2;
-        int16_t v_local_3e;
-        int16_t v_local_3e_2;
-        int16_t v_sfx_n;
-        int16_t v_local_38;
-        int16_t v_sfx_sprite_id;
-        int16_t v_is_multi_beam = 0;
+        int16_t bolt_outer_min_offset;
+        int16_t bolt_outer_max_offset;
+        int16_t bolt_core_min_offset;
+        int16_t bolt_suppress_side_strands_flag;
+        int16_t reverse_draw_flag;
+        int16_t bolt_draw_caps_flag;
+        int16_t bolt_point_source_end_flag;
+        int16_t bolt_sparkle_phase;
+        int16_t bolt_color_jitter_range;
+        int16_t bolt_color_jitter_chance;
+        int16_t bolt_core_max_offset;
+        int16_t bolt_full_core_gradient_flag;
+        int16_t beam_fire_sfx_id;
+        int16_t bolt_tip_highlight_flag;
+        int16_t frame_step_distance;
+        int16_t is_multi_beam = 0;
 
         switch (weapon_id) {
         case WEAPON_MASS_DRIVER:
-            v_color = 7;
-            v_duration = 1;
-            v_local_58 = 1;
-            v_ebx = 0;
-            v_sfx_sprite_id = 0x2D;
-            v_local_54_6 = 10;
-            v_local_3e = 0;
-            v_local_42_2 = 0;
-            v_local_42 = 1;
-            v_local_54_4 = 0;
-            v_local_54_2 = 7;
-            v_local_54 = 0;
-            v_local_46_2 = 1;
-            v_local_46 = 1;
-            v_local_38 = 1;
-            v_mount_scale_mod = 1;
-            v_local_3e_2 = 0;
-            v_sfx_n = 12;
-            v_local_4a_2 = 0;
-            v_local_4a = 0;
-            v_local_4c = 0;
-            v_is_multi_beam = 1;
+            palette_fragment_index = 7;
+            duration_frames = 1;
+            burst_variant = 1;
+            draw_mauler_ball_flag = 0;
+            frame_step_distance = 0x2D;
+            bolt_core_max_offset = 10;
+            bolt_color_jitter_chance = 0;
+            bolt_color_jitter_range = 0;
+            bolt_sparkle_phase = 1;
+            bolt_core_min_offset = 0;
+            bolt_outer_max_offset = 7;
+            bolt_outer_min_offset = 0;
+            bolt_draw_caps_flag = 1;
+            bolt_point_source_end_flag = 1;
+            bolt_tip_highlight_flag = 1;
+            beam_renderer_mode = 1;
+            bolt_full_core_gradient_flag = 0;
+            beam_fire_sfx_id = 12;
+            bolt_apply_sparkles_flag = 0;
+            bolt_suppress_side_strands_flag = 0;
+            reverse_draw_flag = 0;
+            is_multi_beam = 1;
             break;
         case WEAPON_GAUSS_CANNON:
-            v_color = 2;
-            v_mount_scale_mod = 1;
-            v_local_3e = 0x28;
-            v_local_42_2 = 3;
-            v_sfx_sprite_id = 0x2D;
-            v_duration = v_color;
-            v_ebx = 0;
-            v_local_54_6 = 10;
-            v_local_54_2 = 7;
-            v_local_58 = v_mount_scale_mod;
-            v_local_42 = v_mount_scale_mod;
-            v_local_54_4 = v_ebx;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_mount_scale_mod;
-            v_local_46 = v_ebx;
-            v_local_38 = v_mount_scale_mod;
-            v_local_3e_2 = v_mount_scale_mod;
-            v_sfx_n = 15;
-            v_local_4a_2 = v_ebx;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
-            v_is_multi_beam = v_mount_scale_mod;
+            palette_fragment_index = 2;
+            beam_renderer_mode = 1;
+            bolt_color_jitter_chance = 0x28;
+            bolt_color_jitter_range = 3;
+            frame_step_distance = 0x2D;
+            duration_frames = palette_fragment_index;
+            draw_mauler_ball_flag = 0;
+            bolt_core_max_offset = 10;
+            bolt_outer_max_offset = 7;
+            burst_variant = beam_renderer_mode;
+            bolt_sparkle_phase = beam_renderer_mode;
+            bolt_core_min_offset = draw_mauler_ball_flag;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = beam_renderer_mode;
+            bolt_point_source_end_flag = draw_mauler_ball_flag;
+            bolt_tip_highlight_flag = beam_renderer_mode;
+            bolt_full_core_gradient_flag = beam_renderer_mode;
+            beam_fire_sfx_id = 15;
+            bolt_apply_sparkles_flag = draw_mauler_ball_flag;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
+            is_multi_beam = beam_renderer_mode;
             break;
         case WEAPON_LASER_CANNON:
-            v_color = 0;
-            v_local_3e = 10;
-            v_duration = 0x5A;
-            v_local_42_2 = 1;
-            v_sfx_sprite_id = 0x37;
-            v_local_54_4 = 7;
-            v_local_42 = v_local_42_2;
-            v_local_54_2 = v_color;
-            v_local_54 = v_color;
-            v_local_54_6 = v_local_3e;
-            v_local_46_2 = v_color;
-            v_local_46 = v_color;
-            v_local_38 = v_color;
-            v_ebx = 0;
-            v_mount_scale_mod = 0;
-            v_local_3e_2 = v_color;
-            v_local_4a_2 = v_local_42_2;
-            v_local_4a = v_color;
-            v_local_4c = v_color;
-            v_sfx_n = v_local_42_2;
+            palette_fragment_index = 0;
+            bolt_color_jitter_chance = 10;
+            duration_frames = 0x5A;
+            bolt_color_jitter_range = 1;
+            frame_step_distance = 0x37;
+            bolt_core_min_offset = 7;
+            bolt_sparkle_phase = bolt_color_jitter_range;
+            bolt_outer_max_offset = palette_fragment_index;
+            bolt_outer_min_offset = palette_fragment_index;
+            bolt_core_max_offset = bolt_color_jitter_chance;
+            bolt_draw_caps_flag = palette_fragment_index;
+            bolt_point_source_end_flag = palette_fragment_index;
+            bolt_tip_highlight_flag = palette_fragment_index;
+            draw_mauler_ball_flag = 0;
+            beam_renderer_mode = 0;
+            bolt_full_core_gradient_flag = palette_fragment_index;
+            bolt_apply_sparkles_flag = bolt_color_jitter_range;
+            bolt_suppress_side_strands_flag = palette_fragment_index;
+            reverse_draw_flag = palette_fragment_index;
+            beam_fire_sfx_id = bolt_color_jitter_range;
             break;
         case WEAPON_PARTICLE_BEAM:
-            v_duration = 0x3C;
-            v_color = 1;
-            v_local_42 = v_color;
-            v_local_42_2 = 3;
-            v_local_3e = 0x32;
-            v_sfx_sprite_id = 0x2D;
-            v_ebx = 0;
-            v_local_54_6 = 15;
-            v_local_54_4 = 7;
-            v_local_54_2 = v_local_42_2;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_color;
-            v_local_46 = v_color;
-            v_local_38 = v_color;
-            v_mount_scale_mod = v_color;
-            v_sfx_n = 23;
-            v_local_3e_2 = v_color;
-            v_local_4a_2 = v_ebx;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            duration_frames = 0x3C;
+            palette_fragment_index = 1;
+            bolt_sparkle_phase = palette_fragment_index;
+            bolt_color_jitter_range = 3;
+            bolt_color_jitter_chance = 0x32;
+            frame_step_distance = 0x2D;
+            draw_mauler_ball_flag = 0;
+            bolt_core_max_offset = 15;
+            bolt_core_min_offset = 7;
+            bolt_outer_max_offset = bolt_color_jitter_range;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = palette_fragment_index;
+            bolt_point_source_end_flag = palette_fragment_index;
+            bolt_tip_highlight_flag = palette_fragment_index;
+            beam_renderer_mode = palette_fragment_index;
+            beam_fire_sfx_id = 23;
+            bolt_full_core_gradient_flag = palette_fragment_index;
+            bolt_apply_sparkles_flag = draw_mauler_ball_flag;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_FUSION_BEAM:
-            v_color = 8;
-            v_local_3e = 0x28;
-            v_duration = 0x280;
-            v_ebx = 0;
-            v_local_42_2 = 5;
-            v_local_54_6 = 15;
-            v_local_54_4 = 10;
-            v_local_54_2 = 7;
-            v_sfx_sprite_id = v_local_3e;
-            v_local_42 = v_ebx;
-            v_local_54 = v_ebx;
-            v_local_46_2 = 1;
-            v_local_46 = 1;
-            v_local_38 = 1;
-            v_mount_scale_mod = 2;
-            v_sfx_n = 9;
-            v_local_3e_2 = 1;
-            v_local_4a_2 = 1;
-            v_local_4a = v_ebx;
-            v_local_4c = 1;
+            palette_fragment_index = 8;
+            bolt_color_jitter_chance = 0x28;
+            duration_frames = 0x280;
+            draw_mauler_ball_flag = 0;
+            bolt_color_jitter_range = 5;
+            bolt_core_max_offset = 15;
+            bolt_core_min_offset = 10;
+            bolt_outer_max_offset = 7;
+            frame_step_distance = bolt_color_jitter_chance;
+            bolt_sparkle_phase = draw_mauler_ball_flag;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = 1;
+            bolt_point_source_end_flag = 1;
+            bolt_tip_highlight_flag = 1;
+            beam_renderer_mode = 2;
+            beam_fire_sfx_id = 9;
+            bolt_full_core_gradient_flag = 1;
+            bolt_apply_sparkles_flag = 1;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = 1;
             break;
         case WEAPON_ION_PULSE_CANNON:
-            v_duration = 0x28;
-            v_color = 3;
-            v_local_42_2 = v_color;
-            v_mount_scale_mod = 1;
-            v_local_3e = 0x32;
-            v_sfx_sprite_id = 0x2D;
-            v_local_42 = v_mount_scale_mod;
-            v_ebx = 0;
-            v_local_54_6 = 15;
-            v_local_54_4 = 7;
-            v_local_54_2 = v_color;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_mount_scale_mod;
-            v_local_46 = v_mount_scale_mod;
-            v_local_38 = v_mount_scale_mod;
-            v_sfx_n = 14;
-            v_local_3e_2 = v_mount_scale_mod;
-            v_local_4a_2 = v_mount_scale_mod;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            duration_frames = 0x28;
+            palette_fragment_index = 3;
+            bolt_color_jitter_range = palette_fragment_index;
+            beam_renderer_mode = 1;
+            bolt_color_jitter_chance = 0x32;
+            frame_step_distance = 0x2D;
+            bolt_sparkle_phase = beam_renderer_mode;
+            draw_mauler_ball_flag = 0;
+            bolt_core_max_offset = 15;
+            bolt_core_min_offset = 7;
+            bolt_outer_max_offset = palette_fragment_index;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = beam_renderer_mode;
+            bolt_point_source_end_flag = beam_renderer_mode;
+            bolt_tip_highlight_flag = beam_renderer_mode;
+            beam_fire_sfx_id = 14;
+            bolt_full_core_gradient_flag = beam_renderer_mode;
+            bolt_apply_sparkles_flag = beam_renderer_mode;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_GRAVITON_BEAM:
-            v_color = 6;
-            v_local_42 = 1;
-            v_local_3e = 0x1E;
-            v_duration = 0x280;
-            v_local_54_6 = 7;
-            v_local_42_2 = 5;
-            v_sfx_sprite_id = 0x23;
-            v_ebx = 0;
-            v_local_54_2 = 3;
-            v_local_54_4 = v_local_54_6;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_local_42;
-            v_local_46 = v_ebx;
-            v_local_38 = v_local_42;
-            v_mount_scale_mod = 2;
-            v_sfx_n = 11;
-            v_local_3e_2 = v_ebx;
-            v_local_4a_2 = v_ebx;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            palette_fragment_index = 6;
+            bolt_sparkle_phase = 1;
+            bolt_color_jitter_chance = 0x1E;
+            duration_frames = 0x280;
+            bolt_core_max_offset = 7;
+            bolt_color_jitter_range = 5;
+            frame_step_distance = 0x23;
+            draw_mauler_ball_flag = 0;
+            bolt_outer_max_offset = 3;
+            bolt_core_min_offset = bolt_core_max_offset;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = bolt_sparkle_phase;
+            bolt_point_source_end_flag = draw_mauler_ball_flag;
+            bolt_tip_highlight_flag = bolt_sparkle_phase;
+            beam_renderer_mode = 2;
+            beam_fire_sfx_id = 11;
+            bolt_full_core_gradient_flag = draw_mauler_ball_flag;
+            bolt_apply_sparkles_flag = draw_mauler_ball_flag;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_NEUTRON_BLASTER:
-            v_color = 2;
-            v_local_42_2 = 3;
-            v_duration = 0x5A;
-            v_mount_scale_mod = 1;
-            v_local_3e = 0x1E;
-            v_sfx_sprite_id = 0x2D;
-            v_local_54_6 = 15;
-            v_ebx = 0;
-            v_local_54_4 = 7;
-            v_local_42 = v_mount_scale_mod;
-            v_local_54_2 = v_local_42_2;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_mount_scale_mod;
-            v_local_46 = v_mount_scale_mod;
-            v_local_38 = v_mount_scale_mod;
-            v_sfx_n = 22;
-            v_local_3e_2 = v_mount_scale_mod;
-            v_local_4a_2 = v_ebx;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            palette_fragment_index = 2;
+            bolt_color_jitter_range = 3;
+            duration_frames = 0x5A;
+            beam_renderer_mode = 1;
+            bolt_color_jitter_chance = 0x1E;
+            frame_step_distance = 0x2D;
+            bolt_core_max_offset = 15;
+            draw_mauler_ball_flag = 0;
+            bolt_core_min_offset = 7;
+            bolt_sparkle_phase = beam_renderer_mode;
+            bolt_outer_max_offset = bolt_color_jitter_range;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = beam_renderer_mode;
+            bolt_point_source_end_flag = beam_renderer_mode;
+            bolt_tip_highlight_flag = beam_renderer_mode;
+            beam_fire_sfx_id = 22;
+            bolt_full_core_gradient_flag = beam_renderer_mode;
+            bolt_apply_sparkles_flag = draw_mauler_ball_flag;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_PHASOR:
         case WEAPON_PHASOR_EYE:
-            v_color = 0;
-            v_ebx = 0;
-            v_duration = 0x5A;
-            v_local_3e = 15;
-            v_mount_scale_mod = 1;
-            v_local_42_2 = 3;
-            v_sfx_sprite_id = 0x32;
-            v_local_54_4 = 7;
-            v_local_54_2 = 6;
-            v_local_54 = 2;
-            v_local_42 = v_mount_scale_mod;
-            v_local_54_6 = v_local_3e;
-            v_local_46_2 = v_mount_scale_mod;
-            v_local_46 = v_ebx;
-            v_local_38 = v_mount_scale_mod;
-            v_sfx_n = 19;
-            v_local_3e_2 = v_ebx;
-            v_local_4a_2 = v_mount_scale_mod;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            palette_fragment_index = 0;
+            draw_mauler_ball_flag = 0;
+            duration_frames = 0x5A;
+            bolt_color_jitter_chance = 15;
+            beam_renderer_mode = 1;
+            bolt_color_jitter_range = 3;
+            frame_step_distance = 0x32;
+            bolt_core_min_offset = 7;
+            bolt_outer_max_offset = 6;
+            bolt_outer_min_offset = 2;
+            bolt_sparkle_phase = beam_renderer_mode;
+            bolt_core_max_offset = bolt_color_jitter_chance;
+            bolt_draw_caps_flag = beam_renderer_mode;
+            bolt_point_source_end_flag = draw_mauler_ball_flag;
+            bolt_tip_highlight_flag = beam_renderer_mode;
+            beam_fire_sfx_id = 19;
+            bolt_full_core_gradient_flag = draw_mauler_ball_flag;
+            bolt_apply_sparkles_flag = beam_renderer_mode;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_DISRUPTER:
-            v_color = 0;
-            v_ebx = 0;
-            v_duration = 0x28;
-            v_local_42_2 = 3;
-            v_local_3e = v_duration;
-            v_mount_scale_mod = 1;
-            v_sfx_sprite_id = 0x2D;
-            v_local_54_6 = 15;
-            v_local_54_4 = 7;
-            v_local_42 = v_mount_scale_mod;
-            v_local_54_2 = v_local_42_2;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_mount_scale_mod;
-            v_local_46 = v_mount_scale_mod;
-            v_local_38 = v_mount_scale_mod;
-            v_sfx_n = 2;
-            v_local_3e_2 = v_mount_scale_mod;
-            v_local_4a_2 = v_ebx;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            palette_fragment_index = 0;
+            draw_mauler_ball_flag = 0;
+            duration_frames = 0x28;
+            bolt_color_jitter_range = 3;
+            bolt_color_jitter_chance = duration_frames;
+            beam_renderer_mode = 1;
+            frame_step_distance = 0x2D;
+            bolt_core_max_offset = 15;
+            bolt_core_min_offset = 7;
+            bolt_sparkle_phase = beam_renderer_mode;
+            bolt_outer_max_offset = bolt_color_jitter_range;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = beam_renderer_mode;
+            bolt_point_source_end_flag = beam_renderer_mode;
+            bolt_tip_highlight_flag = beam_renderer_mode;
+            beam_fire_sfx_id = 2;
+            bolt_full_core_gradient_flag = beam_renderer_mode;
+            bolt_apply_sparkles_flag = draw_mauler_ball_flag;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_DEATH_RAY:
         case WEAPON_CRYSTAL_RAY:
-            v_color = 6;
-            v_local_42_2 = 3;
-            v_duration = 0x5A;
-            v_local_42 = 1;
-            v_local_3e = 0x28;
-            v_sfx_sprite_id = 0x23;
-            v_local_54_6 = 15;
-            v_ebx = 0;
-            v_local_54_4 = 7;
-            v_local_54_2 = v_local_42_2;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_local_42;
-            v_local_46 = v_local_42;
-            v_local_38 = v_local_42;
-            v_mount_scale_mod = 2;
-            v_sfx_n = 21;
-            v_local_3e_2 = v_local_42;
-            v_local_4a_2 = v_ebx;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            palette_fragment_index = 6;
+            bolt_color_jitter_range = 3;
+            duration_frames = 0x5A;
+            bolt_sparkle_phase = 1;
+            bolt_color_jitter_chance = 0x28;
+            frame_step_distance = 0x23;
+            bolt_core_max_offset = 15;
+            draw_mauler_ball_flag = 0;
+            bolt_core_min_offset = 7;
+            bolt_outer_max_offset = bolt_color_jitter_range;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = bolt_sparkle_phase;
+            bolt_point_source_end_flag = bolt_sparkle_phase;
+            bolt_tip_highlight_flag = bolt_sparkle_phase;
+            beam_renderer_mode = 2;
+            beam_fire_sfx_id = 21;
+            bolt_full_core_gradient_flag = bolt_sparkle_phase;
+            bolt_apply_sparkles_flag = draw_mauler_ball_flag;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_PLASMA_CANNON:
-            v_color = 0;
-            v_ebx = 0;
-            v_duration = 0x3C;
-            v_local_3e = 0x32;
-            v_sfx_n = 13;
-            v_local_42_2 = 5;
-            v_local_54_4 = 10;
-            v_local_54_2 = 8;
-            v_sfx_sprite_id = v_local_3e;
-            v_local_42 = 1;
-            v_local_54_6 = v_sfx_n;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_local_42;
-            v_local_46 = v_local_42;
-            v_local_38 = v_local_42;
-            v_mount_scale_mod = 2;
-            v_local_3e_2 = v_local_42;
-            v_local_4a_2 = v_local_42;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
+            palette_fragment_index = 0;
+            draw_mauler_ball_flag = 0;
+            duration_frames = 0x3C;
+            bolt_color_jitter_chance = 0x32;
+            beam_fire_sfx_id = 13;
+            bolt_color_jitter_range = 5;
+            bolt_core_min_offset = 10;
+            bolt_outer_max_offset = 8;
+            frame_step_distance = bolt_color_jitter_chance;
+            bolt_sparkle_phase = 1;
+            bolt_core_max_offset = beam_fire_sfx_id;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = bolt_sparkle_phase;
+            bolt_point_source_end_flag = bolt_sparkle_phase;
+            bolt_tip_highlight_flag = bolt_sparkle_phase;
+            beam_renderer_mode = 2;
+            bolt_full_core_gradient_flag = bolt_sparkle_phase;
+            bolt_apply_sparkles_flag = bolt_sparkle_phase;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
             break;
         case WEAPON_SPATIAL_COMPRESSOR:
-            v_mount_scale_mod = 2;
-            v_local_42 = 1;
-            v_local_3e = 0x1E;
-            v_local_42_2 = 3;
-            v_sfx_sprite_id = 0x37;
-            v_color = v_mount_scale_mod;
-            v_local_54_4 = 10;
-            v_local_54_6 = 15;
-            v_duration = 0x28;
-            v_ebx = 0;
-            v_local_54_2 = v_local_54_4;
-            v_local_54 = v_ebx;
-            v_local_46_2 = v_local_42;
-            v_local_46 = v_local_42;
-            v_local_38 = v_local_42;
-            v_local_3e_2 = v_local_42;
-            v_local_4a_2 = v_local_42;
-            v_local_4a = v_ebx;
-            v_local_4c = v_ebx;
-            v_sfx_n = v_local_42;
+            beam_renderer_mode = 2;
+            bolt_sparkle_phase = 1;
+            bolt_color_jitter_chance = 0x1E;
+            bolt_color_jitter_range = 3;
+            frame_step_distance = 0x37;
+            palette_fragment_index = beam_renderer_mode;
+            bolt_core_min_offset = 10;
+            bolt_core_max_offset = 15;
+            duration_frames = 0x28;
+            draw_mauler_ball_flag = 0;
+            bolt_outer_max_offset = bolt_core_min_offset;
+            bolt_outer_min_offset = draw_mauler_ball_flag;
+            bolt_draw_caps_flag = bolt_sparkle_phase;
+            bolt_point_source_end_flag = bolt_sparkle_phase;
+            bolt_tip_highlight_flag = bolt_sparkle_phase;
+            bolt_full_core_gradient_flag = bolt_sparkle_phase;
+            bolt_apply_sparkles_flag = bolt_sparkle_phase;
+            bolt_suppress_side_strands_flag = draw_mauler_ball_flag;
+            reverse_draw_flag = draw_mauler_ball_flag;
+            beam_fire_sfx_id = bolt_sparkle_phase;
             break;
         case WEAPON_MAULER_DEVICE:
         case WEAPON_DRAGON_BREATH:
         case WEAPON_PLASMA_BREATH:
-            v_duration = 0x14;
-            v_color = 5;
-            v_local_42_2 = v_color;
-            v_mount_scale_mod = 1;
-            v_local_3e = 0x1E;
-            v_sfx_sprite_id = 0x28;
-            v_local_42 = v_mount_scale_mod;
-            v_local_54 = 0;
-            v_local_54_6 = 15;
-            v_local_54_4 = 10;
-            v_local_54_2 = 7;
-            v_local_46_2 = v_mount_scale_mod;
-            v_local_46 = v_mount_scale_mod;
-            v_local_38 = v_mount_scale_mod;
-            v_ebx = v_mount_scale_mod;
-            v_local_3e_2 = v_mount_scale_mod;
-            v_local_4a_2 = v_mount_scale_mod;
-            v_local_4a = v_local_54;
-            v_local_4c = v_local_54;
-            v_is_multi_beam = v_mount_scale_mod;
-            v_sfx_n = v_color;
+            duration_frames = 0x14;
+            palette_fragment_index = 5;
+            bolt_color_jitter_range = palette_fragment_index;
+            beam_renderer_mode = 1;
+            bolt_color_jitter_chance = 0x1E;
+            frame_step_distance = 0x28;
+            bolt_sparkle_phase = beam_renderer_mode;
+            bolt_outer_min_offset = 0;
+            bolt_core_max_offset = 15;
+            bolt_core_min_offset = 10;
+            bolt_outer_max_offset = 7;
+            bolt_draw_caps_flag = beam_renderer_mode;
+            bolt_point_source_end_flag = beam_renderer_mode;
+            bolt_tip_highlight_flag = beam_renderer_mode;
+            draw_mauler_ball_flag = beam_renderer_mode;
+            bolt_full_core_gradient_flag = beam_renderer_mode;
+            bolt_apply_sparkles_flag = beam_renderer_mode;
+            bolt_suppress_side_strands_flag = bolt_outer_min_offset;
+            reverse_draw_flag = bolt_outer_min_offset;
+            is_multi_beam = beam_renderer_mode;
+            beam_fire_sfx_id = palette_fragment_index;
             break;
         case 46:
-            v_color = 6;
-            v_local_3e = 10;
-            v_duration = 0x28;
-            v_local_42 = 1;
-            v_local_42_2 = 3;
-            v_sfx_sprite_id = 0x32;
-            v_local_54_6 = 15;
-            v_local_54 = 7;
-            v_local_54_4 = 10;
-            v_local_54_2 = 10;
-            v_local_46_2 = 1;
-            v_local_46 = 1;
-            v_ebx = 0;
-            v_local_38 = 1;
-            v_mount_scale_mod = 2;
-            v_sfx_n = 18;
-            v_local_3e_2 = 1;
-            v_local_4a_2 = 1;
-            v_local_4a = 1;
-            v_local_4c = 0;
+            palette_fragment_index = 6;
+            bolt_color_jitter_chance = 10;
+            duration_frames = 0x28;
+            bolt_sparkle_phase = 1;
+            bolt_color_jitter_range = 3;
+            frame_step_distance = 0x32;
+            bolt_core_max_offset = 15;
+            bolt_outer_min_offset = 7;
+            bolt_core_min_offset = 10;
+            bolt_outer_max_offset = 10;
+            bolt_draw_caps_flag = 1;
+            bolt_point_source_end_flag = 1;
+            draw_mauler_ball_flag = 0;
+            bolt_tip_highlight_flag = 1;
+            beam_renderer_mode = 2;
+            beam_fire_sfx_id = 18;
+            bolt_full_core_gradient_flag = 1;
+            bolt_apply_sparkles_flag = 1;
+            bolt_suppress_side_strands_flag = 1;
+            reverse_draw_flag = 0;
             break;
         default:
             return;
         }
 
         if (!Is_Steve_Stuff_Weapon_(weapon_id)) {
-            if (_old_color[fx_slot_idx] != v_color) {
-                _old_color[fx_slot_idx] = v_color;
-                Add_Weapon_Palette_Fragment_To_Current_Palette_(v_color, (fx_slot_idx + 9) << 4, 16);
+            if (_old_color[fx_slot_idx] != palette_fragment_index) {
+                _old_color[fx_slot_idx] = palette_fragment_index;
+                Add_Weapon_Palette_Fragment_To_Current_Palette_(palette_fragment_index, (fx_slot_idx + 9) << 4, 16);
             }
             if ((weapon_specials & 2) != 0) {
-                v_mount_scale_mod++;
-                if (v_mount_scale_mod >= 2) {
-                    v_mount_scale_mod = 2;
+                beam_renderer_mode++;
+                if (beam_renderer_mode >= 2) {
+                    beam_renderer_mode = 2;
                 }
             }
             if ((weapon_specials & 0x80) != 0) {
-                v_sfx_sprite_id *= 2;
-                v_duration /= 2;
+                frame_step_distance *= 2;
+                duration_frames /= 2;
             }
             if ((weapon_specials & 4) != 0) {
-                v_mount_scale_mod--;
-                if (v_mount_scale_mod <= 0) {
-                    v_mount_scale_mod = 0;
+                beam_renderer_mode--;
+                if (beam_renderer_mode <= 0) {
+                    beam_renderer_mode = 0;
                 }
             }
             if ((weapon_specials & 8) != 0) {
-                v_local_38 = 1;
+                bolt_tip_highlight_flag = 1;
             }
             if ((weapon_specials & 0x10) != 0) {
-                if (v_duration != 0x280) {
-                    v_duration *= 2;
+                if (duration_frames != 0x280) {
+                    duration_frames *= 2;
                 }
             }
             if ((weapon_specials & 0x20) != 0) {
-                v_local_3e_2 = 0;
+                bolt_full_core_gradient_flag = 0;
             }
             if ((weapon_specials & 0x40) != 0) {
-                v_local_38 = 1;
+                bolt_tip_highlight_flag = 1;
             }
         }
 
-        if (v_is_multi_beam != 0 && attacker_size_class != -1) {
+        if (is_multi_beam != 0 && attacker_size_class != -1) {
             loop_count = 3;
         } else {
             loop_count = 1;
         }
 
         _g_weapon_n = weapon_id;
-        _g_sfx_n = v_sfx_n;
+        _g_sfx_n = beam_fire_sfx_id;
 
         s_weapon_visual_fx fx;
         s_weapon_visual_fx* pfx = nullptr;
 
         if (Is_Steve_Stuff_Weapon_(weapon_id)) {
             Build_Steve_Stuff_Struct_For_Weapon_(weapon_id, weapon_specials, &fx);
-            v_sfx_sprite_id = (int16_t)fx.sfx_sprite_id;
-            v_duration = (int16_t)fx.duration;
+            frame_step_distance = (int16_t)fx.sfx_sprite_id;
+            duration_frames = (int16_t)fx.duration;
             pfx = &fx;
         }
 
@@ -1259,11 +1259,11 @@ namespace BEAMS {
 
                 Draw_Generic_Beam_(
                     attacker_x, attacker_y, target_x, target_y, attacker_facing, target_facing,
-                    v_duration, palette_offset, v_local_3e, v_local_42_2, v_sfx_sprite_id, v_local_42,
-                    v_local_46_2, v_local_46, v_local_38, v_local_3e_2, v_local_4a_2, v_local_4a,
-                    v_local_4c, v_ebx, v_mount_scale_mod, v_local_54_6, v_local_54_4, v_local_54_2,
-                    v_local_54, frame_index, target_size_class, hit_result_flags, special_flag,
-                    is_non_ship_target, v_local_58, reflection_state, attacker_size_class, pfx
+                    duration_frames, palette_offset, bolt_color_jitter_chance, bolt_color_jitter_range, frame_step_distance, bolt_sparkle_phase,
+                    bolt_draw_caps_flag, bolt_point_source_end_flag, bolt_tip_highlight_flag, bolt_full_core_gradient_flag, bolt_apply_sparkles_flag, bolt_suppress_side_strands_flag,
+                    reverse_draw_flag, draw_mauler_ball_flag, beam_renderer_mode, bolt_core_max_offset, bolt_core_min_offset, bolt_outer_max_offset,
+                    bolt_outer_min_offset, frame_index, target_size_class, hit_result_flags, special_flag,
+                    is_non_ship_target, burst_variant, reflection_state, attacker_size_class, pfx
                 );
 
                 frame_idx_offset++;
@@ -1271,7 +1271,7 @@ namespace BEAMS {
         }
 
         if (fire_point_idx == current_frame || current_frame == 0) {
-            _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = ERICNET::Mox_Play_Sound_(v_sfx_n);
+            _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = ERICNET::Mox_Play_Sound_(beam_fire_sfx_id);
         } else if (_ship_firing_now_flag[fx_slot_idx] == 0 || Get_Max_Frames_() - 1 <= current_frame) {
             sound::Fadeout_Sound_(_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
             _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = 0;
@@ -2232,13 +2232,13 @@ namespace BEAMS {
      */
     void __cdecl Draw_Generic_Beam_(
         int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
-        int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
-        int16_t beam_width, int16_t sprite_id, int16_t draw_core_flag, int16_t draw_glow_flag,
-        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t core_flicker_min,
-        int16_t core_flicker_max, int16_t reverse_draw_flag, int16_t draw_mauler_ball_flag, int16_t mount_scale_mod, int16_t fx_param_1,
-        int16_t fx_param_2, int16_t fx_param_3, int16_t fx_param_4, int16_t frame_index,
+        int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t bolt_color_jitter_chance,
+        int16_t bolt_color_jitter_range, int16_t frame_step_distance, int16_t bolt_sparkle_phase, int16_t bolt_draw_caps_flag,
+        int16_t bolt_point_source_end_flag, int16_t bolt_tip_highlight_flag, int16_t bolt_full_core_gradient_flag, int16_t bolt_apply_sparkles_flag,
+        int16_t bolt_suppress_side_strands_flag, int16_t reverse_draw_flag, int16_t draw_mauler_ball_flag, int16_t beam_renderer_mode, int16_t bolt_core_max_offset,
+        int16_t bolt_core_min_offset, int16_t bolt_outer_max_offset, int16_t bolt_outer_min_offset, int16_t frame_index,
         int16_t target_size_class, uint16_t hit_result_flags, uint16_t special_flag,
-        int16_t is_non_ship_target, int16_t base_damage_class, int16_t reflection_state,
+        int16_t is_non_ship_target, int16_t burst_variant, int16_t reflection_state,
         int16_t attacker_size_class, s_weapon_visual_fx* weapon_visual_fx
     ) {
         int16_t angle = angle::Get_Angle_(attacker_x - target_x, target_y - attacker_y);
@@ -2254,17 +2254,17 @@ namespace BEAMS {
         int16_t ship_range = Get_Ship_Range_(attacker_x, attacker_y, target_x, target_y);
 
         if (attacker_size_class == -1) {
-            mount_scale_mod = 0;
+            beam_renderer_mode = 0;
             if (duration_frames > 20) {
                 duration_frames = 20;
             }
-            base_damage_class = 1;
-            sprite_id = 5;
+            burst_variant = 1;
+            frame_step_distance = 5;
         }
 
         if (weapon_visual_fx != nullptr) {
             duration_frames = (int16_t)weapon_visual_fx->sfx_sprite_id;
-            sprite_id = (int16_t)weapon_visual_fx->duration;
+            frame_step_distance = (int16_t)weapon_visual_fx->duration;
         }
 
         int16_t eff_duration = duration_frames;
@@ -2276,16 +2276,16 @@ namespace BEAMS {
         }
 
         int32_t min_frames = (attacker_size_class == -1) ? 2 : 3;
-        int32_t frames = (int32_t)(ship_range + eff_duration) / sprite_id;
+        int32_t frames = (int32_t)(ship_range + eff_duration) / frame_step_distance;
 
         if (frames < min_frames) {
             frames = min_frames;
         }
         if (frames > 6) {
-            sprite_id *= 2;
+            frame_step_distance *= 2;
         }
 
-        frames = (int32_t)(ship_range + eff_duration) / sprite_id;
+        frames = (int32_t)(ship_range + eff_duration) / frame_step_distance;
         if (frames < min_frames) {
             frames = min_frames;
         }
@@ -2296,11 +2296,11 @@ namespace BEAMS {
         }
 
         if (frame_index == 0 && attacker_size_class != -1) {
-            Draw_Ship_Burst_(attacker_x, attacker_y, beam_dir, base_damage_class, 0, is_palette_not_90);
+            Draw_Ship_Burst_(attacker_x, attacker_y, beam_dir, burst_variant, 0, is_palette_not_90);
             return;
         }
 
-        int16_t target_len = sprite_id * frame_index;
+        int16_t target_len = frame_step_distance * frame_index;
         int16_t attacker_len = target_len - duration_frames;
 
         if (weapon_visual_fx != nullptr && weapon_visual_fx->anim_style == 2) {
@@ -2391,22 +2391,22 @@ namespace BEAMS {
 
         if (weapon_visual_fx == nullptr) {
             if (bx1 != bx2 || by1 != by2) {
-                if (mount_scale_mod == 1) {
-                    bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
-                               draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
-                               is_autofiring, core_flicker_min, core_flicker_max, fx_param_1, fx_param_2, fx_param_3, fx_param_4);
-                } else if (mount_scale_mod == 2) {
-                    int16_t mid3 = (fx_param_3 + fx_param_1) / 2;
-                    int16_t mid4 = (fx_param_4 + fx_param_2) / 2;
-                    bolt::Wide_Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
-                                        draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
-                                        is_autofiring, core_flicker_min, core_flicker_max, fx_param_1, fx_param_2, mid3, mid4, fx_param_3, fx_param_4);
-                } else if (mount_scale_mod == 0) {
-                    if (fx_param_4 < fx_param_2) fx_param_4 = fx_param_2;
-                    if (fx_param_3 < fx_param_1) fx_param_3 = fx_param_1;
-                    bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
-                               draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
-                               is_autofiring, core_flicker_min, core_flicker_max, 0, 0, fx_param_3, fx_param_4);
+                if (beam_renderer_mode == 1) {
+                    bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, bolt_color_jitter_chance, bolt_color_jitter_range,
+                               bolt_sparkle_phase, bolt_draw_caps_flag, bolt_point_source_end_flag, bolt_tip_highlight_flag,
+                               bolt_full_core_gradient_flag, bolt_apply_sparkles_flag, bolt_suppress_side_strands_flag, bolt_core_max_offset, bolt_core_min_offset, bolt_outer_max_offset, bolt_outer_min_offset);
+                } else if (beam_renderer_mode == 2) {
+                    int16_t mid3 = (bolt_outer_max_offset + bolt_core_max_offset) / 2;
+                    int16_t mid4 = (bolt_outer_min_offset + bolt_core_min_offset) / 2;
+                    bolt::Wide_Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, bolt_color_jitter_chance, bolt_color_jitter_range,
+                                        bolt_sparkle_phase, bolt_draw_caps_flag, bolt_point_source_end_flag, bolt_tip_highlight_flag,
+                                        bolt_full_core_gradient_flag, bolt_apply_sparkles_flag, bolt_suppress_side_strands_flag, bolt_core_max_offset, bolt_core_min_offset, mid3, mid4, bolt_outer_max_offset, bolt_outer_min_offset);
+                } else if (beam_renderer_mode == 0) {
+                    if (bolt_outer_min_offset < bolt_core_min_offset) bolt_outer_min_offset = bolt_core_min_offset;
+                    if (bolt_outer_max_offset < bolt_core_max_offset) bolt_outer_max_offset = bolt_core_max_offset;
+                    bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, bolt_color_jitter_chance, bolt_color_jitter_range,
+                               bolt_sparkle_phase, bolt_draw_caps_flag, bolt_point_source_end_flag, bolt_tip_highlight_flag,
+                               bolt_full_core_gradient_flag, bolt_apply_sparkles_flag, bolt_suppress_side_strands_flag, 0, 0, bolt_outer_max_offset, bolt_outer_min_offset);
                 }
 
                 if (draw_mauler_ball_flag != 0 && _ship_hit_now_flag[is_palette_not_90] == 0) {
@@ -2435,7 +2435,7 @@ namespace BEAMS {
 
         if (frame_index < 3 || (attacker_x == bx1 && attacker_y == by1)) {
             if (attacker_size_class != -1) {
-                Draw_Ship_Burst_(attacker_x, attacker_y, beam_dir, base_damage_class, frame_index, is_palette_not_90);
+                Draw_Ship_Burst_(attacker_x, attacker_y, beam_dir, burst_variant, frame_index, is_palette_not_90);
             }
             _ship_firing_now_flag[is_palette_not_90] = 1;
         } else {
@@ -2445,7 +2445,7 @@ namespace BEAMS {
         if (_ship_hit_now_flag[is_palette_not_90] != 0 && attacker_size_class != -1) {
             int16_t exp_frame;
             if (frame_index < _max_frames - 1) {
-                exp_frame = (frame_index - 1 + (-10 - ship_range) / sprite_id) % 5;
+                exp_frame = (frame_index - 1 + (-10 - ship_range) / frame_step_distance) % 5;
             } else {
                 exp_frame = frame_index - _max_frames + 7;
             }

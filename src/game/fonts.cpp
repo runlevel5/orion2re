@@ -846,20 +846,20 @@ namespace fonts {
     void __cdecl Print_Integer_(int16_t x, int16_t y, int32_t value) {
         char buffer[12];
 
-        itoa(value, buffer, 10);
+        snprintf(buffer, sizeof(buffer), "%i", value);
         Print_(x, y, buffer);
     }
 
     void __cdecl Print_Integer_Right_(int16_t x, int16_t y, int32_t value) {
         char buffer[12];
-        itoa(value, buffer, 10);
+        snprintf(buffer, sizeof(buffer), "%i", value);
         Print_Right_(x, y, buffer);
     }
 
     void __cdecl Print_Integer_Centered_(int16_t x, int16_t y, int32_t value) {
         char buffer[12];
 
-        itoa(value, buffer, 10);
+        snprintf(buffer, sizeof(buffer), "%i", value);
         Print_Centered_(x, y, buffer);
     }
 

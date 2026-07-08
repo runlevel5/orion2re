@@ -872,14 +872,14 @@ namespace FMTPARA {
 
         case 'B': {
             int val = Get_Item_Value_Set_Plural_(arg_idx);
-            itoa(val, _tmp_str, 10);
+            snprintf(_tmp_str, sizeof(_tmp_str), "%i", val);
             Insert_String_(_tmp_str);
             break;
         }
 
         case 'C': {
             int val = Get_Item_Value_Set_Plural_(arg_idx);
-            itoa(val, _tmp_str, 10);
+            snprintf(_tmp_str, sizeof(_tmp_str), "%i", val);
             int len = (int)strlen(_tmp_str);
             int digit = _tmp_str[len - 1] - '0';
             /* \a^2. renders the ordinal suffix in superscript and \a^0. restores the previous style. */
@@ -893,7 +893,7 @@ namespace FMTPARA {
             if (val >= 0 && val <= 10) {
                 Insert_String_(_ordinal_word[val]);
             } else {
-                itoa(val, _tmp_str, 10);
+                snprintf(_tmp_str, sizeof(_tmp_str), "%i", val);
                 int len = (int)strlen(_tmp_str);
                 int digit = _tmp_str[len - 1] - '0';
                 snprintf(_tmp_str2, sizeof(_tmp_str2), "%s\a^2.%s\a^0.", _tmp_str, _ordinal_ending[digit]);

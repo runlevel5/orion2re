@@ -1012,10 +1012,10 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
                     if (bonus == 1) {
                         strlcpy(bonus_text, "1/2", sizeof(bonus_text));
                     } else {
-                        itoa(static_cast<int32_t>(bonus / 2), bonus_text, 10);
+                        snprintf(bonus_text, sizeof(bonus_text), "%i", static_cast<int32_t>(bonus / 2));
                     }
                 } else {
-                    itoa(static_cast<int32_t>(bonus), bonus_text, 10);
+                    snprintf(bonus_text, sizeof(bonus_text), "%i", static_cast<int32_t>(bonus));
                 }
 
                 if (bonus > 0) {

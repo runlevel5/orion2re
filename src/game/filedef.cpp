@@ -44,7 +44,7 @@ namespace FILEDEF {
         HAROLD::Save_Mouse_List_();
 
         char slot_str[20];
-        itoa(slot_index + 1, slot_str, 10);
+        snprintf(slot_str, sizeof(slot_str), "%i", slot_index + 1);
 
         char filename[260];
         strlcpy(filename, "SAVE", sizeof(filename));
@@ -343,7 +343,7 @@ namespace FILEDEF {
             char num_str[8];
             char filename[16];
 
-            itoa(i + 1, num_str, 10);
+            snprintf(num_str, sizeof(num_str), "%i", i + 1);
 
             strlcpy(filename, "SAVE", sizeof(filename));
             strlcat(filename, num_str, sizeof(filename));

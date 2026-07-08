@@ -1378,7 +1378,7 @@ namespace HAROLD {
         FILE* file = fopen_case(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
 
         if (file != nullptr) {
-            itoa((uint32_t)(uint8_t)MOX::_settings.language, language_text, 10);
+            snprintf(language_text, sizeof(language_text), "%u", (uint32_t)(uint8_t)MOX::_settings.language);
             fputs(language_text, file);
             fclose(file);
         }

@@ -373,7 +373,7 @@ namespace CMBTDRW1 {
             } else {
                 KEN::Ken_Get_Text_Message_(14, msg_buffer, 80);
                 fonts::Print_(x_off + 4, current_y, msg_buffer);
-                itoa(ship->drive_current_hits, itoa_buffer, 10);
+                snprintf(itoa_buffer, sizeof(itoa_buffer), "%i", ship->drive_current_hits);
                 fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
             }
 
@@ -384,26 +384,26 @@ namespace CMBTDRW1 {
             } else {
                 KEN::Ken_Get_Text_Message_(39, msg_buffer, 80);
                 fonts::Print_(x_off + 4, current_y, msg_buffer);
-                itoa(ship->shield_current_hits, itoa_buffer, 10);
+                snprintf(itoa_buffer, sizeof(itoa_buffer), "%i", ship->shield_current_hits);
                 fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
             }
 
             current_y += 10;
             KEN::Ken_Get_Text_Message_(21, msg_buffer, 80);
             fonts::Print_(x_off + 4, current_y, msg_buffer);
-            itoa(ship->computer_current_hits, itoa_buffer, 10);
+            snprintf(itoa_buffer, sizeof(itoa_buffer), "%i", ship->computer_current_hits);
             fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
 
             current_y += 10;
             KEN::Ken_Get_Text_Message_(16, msg_buffer, 80);
             fonts::Print_(x_off + 4, current_y, msg_buffer);
-            itoa(ship->structure_max - ship->structure_damage, itoa_buffer, 10);
+            snprintf(itoa_buffer, sizeof(itoa_buffer), "%i", ship->structure_max - ship->structure_damage);
             fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
 
             current_y += 10;
             KEN::Ken_Get_Text_Message_(18, msg_buffer, 80);
             fonts::Print_(x_off + 4, current_y, msg_buffer);
-            itoa(ship->armor_remaining, itoa_buffer, 10);
+            snprintf(itoa_buffer, sizeof(itoa_buffer), "%i", ship->armor_remaining);
             fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
 
             current_y = y_off + 64;
@@ -2062,9 +2062,9 @@ skip_cursor:
                 strlcpy(colony_status_text, combat_text_segment, sizeof(colony_status_text));
 
                 if (MOX::_cmbt_colony_id == -1) {
-                    itoa(0x23, value_text, 10);
+                    snprintf(value_text, sizeof(value_text), "%i", 0x23);
                 } else {
-                    itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, value_text, 10);
+                    snprintf(value_text, sizeof(value_text), "%i", MOX::_colony[MOX::_cmbt_colony_id].n_pops);
                 }
                 
 
@@ -2075,14 +2075,14 @@ skip_cursor:
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[1] > 0) {
                         KEN::Ken_Get_Text_Message_(1, combat_text_segment, 0x50);
                         strlcat(colony_status_text, combat_text_segment, sizeof(colony_status_text));
-                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], value_text, 10);
+                        snprintf(value_text, sizeof(value_text), "%i", MOX::_colony[MOX::_cmbt_colony_id].military[1]);
                         strlcat(colony_status_text, value_text, sizeof(colony_status_text));
                         strlcat(colony_status_text, "  ", sizeof(colony_status_text));
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[0] > 0) {
                         KEN::Ken_Get_Text_Message_(2, combat_text_segment, 0x50);
                         strlcat(colony_status_text, combat_text_segment, sizeof(colony_status_text));
-                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], value_text, 10);
+                        snprintf(value_text, sizeof(value_text), "%i", MOX::_colony[MOX::_cmbt_colony_id].military[0]);
                         strlcat(colony_status_text, value_text, sizeof(colony_status_text));
                         strlcat(colony_status_text, "  ", sizeof(colony_status_text));
                     }
@@ -2870,12 +2870,12 @@ skip_cursor:
 
                 if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER || w_id == WEAPON_ANTI_MISSILE_ROCKET) {
                     strlcat(weapon_label, " x", sizeof(weapon_label));
-                    _itoa(ammo, ammo_text, 10);
+                    snprintf(ammo_text, sizeof(ammo_text), "%i", ammo);
                     strlcat(weapon_label, ammo_text, sizeof(weapon_label));
                 } else if (weapon_type_class == WEAPON_TYPE_TORPEDO) {
                     if (ammo > 0) {
                         strlcat(weapon_label, " ", sizeof(weapon_label));
-                        _itoa(ammo, ammo_text, 10);
+                        snprintf(ammo_text, sizeof(ammo_text), "%i", ammo);
                         strlcat(weapon_label, ammo_text, sizeof(weapon_label));
                         KEN::Ken_Get_Text_Message_(85, arc_text, 80);
                         strlcat(weapon_label, arc_text, sizeof(weapon_label));

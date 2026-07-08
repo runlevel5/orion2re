@@ -1337,7 +1337,7 @@ namespace CMBTFIR2 {
         KEN::Ken_Get_Text_Message_(92, temp_str, sizeof(temp_str));
         strlcpy(body_str, temp_str, sizeof(body_str));
 
-        itoa(attacker_strength, num_buf, 10);
+        snprintf(num_buf, sizeof(num_buf), "%i", attacker_strength);
         strlcat(body_str, num_buf, sizeof(body_str));
 
         strlcat(body_str, "          ", sizeof(body_str));
@@ -1345,7 +1345,7 @@ namespace CMBTFIR2 {
         KEN::Ken_Get_Text_Message_(93, temp_str, sizeof(temp_str));
         strlcat(body_str, temp_str, sizeof(body_str));
 
-        itoa(target_strength, num_buf, 10);
+        snprintf(num_buf, sizeof(num_buf), "%i", target_strength);
         strlcat(body_str, num_buf, sizeof(body_str));
 
         strlcat(body_str, "\n\n", sizeof(body_str));
@@ -1391,7 +1391,7 @@ namespace CMBTFIR2 {
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 3] > 0) {
-                    itoa(raid_results[k + 3], num_buf, 10);
+                    snprintf(num_buf, sizeof(num_buf), "%i", raid_results[k + 3]);
                     strlcat(body_str, num_buf, sizeof(body_str));
                     strlcat(body_str, " ", sizeof(body_str));
 
@@ -1409,7 +1409,7 @@ namespace CMBTFIR2 {
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 11] > 0) {
-                    itoa(raid_results[k + 11], num_buf, 10);
+                    snprintf(num_buf, sizeof(num_buf), "%i", raid_results[k + 11]);
                     strlcat(body_str, num_buf, sizeof(body_str));
                     strlcat(body_str, " ", sizeof(body_str));
 
@@ -1425,7 +1425,7 @@ namespace CMBTFIR2 {
 
         if (target_raiders < *raiders) {
             int16_t lost = *raiders - target_raiders;
-            itoa(lost, num_buf, 10);
+            snprintf(num_buf, sizeof(num_buf), "%i", lost);
             strlcat(body_str, string::s_Newline, sizeof(body_str));
             strlcat(body_str, num_buf, sizeof(body_str));
             strlcat(body_str, " ", sizeof(body_str));
@@ -1440,7 +1440,7 @@ namespace CMBTFIR2 {
 
         if (marines < (int16_t)(uint8_t)target->marine_count) {
             int16_t lost = (int16_t)(uint8_t)target->marine_count - marines;
-            itoa(lost, num_buf, 10);
+            snprintf(num_buf, sizeof(num_buf), "%i", lost);
             strlcat(body_str, string::s_Newline, sizeof(body_str));
             strlcat(body_str, num_buf, sizeof(body_str));
             strlcat(body_str, " ", sizeof(body_str));

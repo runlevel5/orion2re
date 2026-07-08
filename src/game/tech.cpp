@@ -756,7 +756,7 @@ namespace TECH {
         int32_t cost = New_Get_Tech_Cost_(app_idx, 1, MOX::_PLAYER_NUM);
         JIM::Get_Text_Message_("billtext.lbx", 0x3D, text_buffer, sizeof(text_buffer));
 
-        itoa(cost, cost_str, 10);
+        snprintf(cost_str, sizeof(cost_str), "%i", cost);
         strlcat(text_buffer, cost_str, sizeof(text_buffer));
 
         const char* suffix;

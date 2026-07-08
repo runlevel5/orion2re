@@ -347,7 +347,7 @@ namespace raceopt {
                 str_buf[1] = '\0';
 
                 int cost_idx = opt_string_idx + (-3 - opt_string_idx) / 4;
-                itoa(_ability_costs[cost_idx], num_buf, 10);
+                snprintf(num_buf, sizeof(num_buf), "%i", _ability_costs[cost_idx]);
                 strlcat(str_buf, num_buf, sizeof(str_buf));
 
                 fonts::Print_(col_start_x, current_y, _opt_string[opt_string_idx]);
@@ -395,7 +395,7 @@ namespace raceopt {
             char str_buf[12];
 
             int cost_idx = opt_string_idx + (-3 - opt_string_idx) / 4;
-            itoa(_ability_costs[cost_idx], num_buf, 10);
+            snprintf(num_buf, sizeof(num_buf), "%i", _ability_costs[cost_idx]);
             strlcpy(str_buf, num_buf, sizeof(str_buf));
 
             int16_t dots_start = col_start_x + fonts::Get_String_Width_(_opt_string[opt_string_idx]) - 1;
@@ -439,7 +439,7 @@ namespace raceopt {
                     char num_buf[12];
                     char str_buf[12];
 
-                    itoa(_ability_costs[opt_string_idx - 11], num_buf, 10);
+                    snprintf(num_buf, sizeof(num_buf), "%i", _ability_costs[opt_string_idx - 11]);
                     strlcpy(str_buf, num_buf, sizeof(str_buf));
 
                     int16_t dots_start = col_2_start_x + fonts::Get_String_Width_(_opt_string[opt_string_idx]) - 1;
@@ -609,7 +609,7 @@ namespace raceopt {
                     char ability_cost_digits[12];
                     ability_cost_text[0] = '\0';
                     ability_cost_text[1] = '\0';
-                    itoa(_ability_costs[neg_idx], ability_cost_digits, 10);
+                    snprintf(ability_cost_digits, sizeof(ability_cost_digits), "%i", _ability_costs[neg_idx]);
                     strlcpy(ability_cost_text + 1, ability_cost_digits, sizeof(ability_cost_text) - 1);
 
                     fonts::Print_(x_coords[col_idx], y, _opt_string[item_idx]);
@@ -671,7 +671,7 @@ namespace raceopt {
 
             if (draw_text2) {
                 char ability_cost_digits[12];
-                itoa(_ability_costs[neg_idx], ability_cost_digits, 10);
+                snprintf(ability_cost_digits, sizeof(ability_cost_digits), "%i", _ability_costs[neg_idx]);
                 strlcpy(ability_cost_text, ability_cost_digits, sizeof(ability_cost_text));
 
                 int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
@@ -728,7 +728,7 @@ namespace raceopt {
 
                         if (draw_text3) {
                             char ability_cost_digits[12];
-                            itoa(_ability_costs[item_idx - 11], ability_cost_digits, 10);
+                            snprintf(ability_cost_digits, sizeof(ability_cost_digits), "%i", _ability_costs[item_idx - 11]);
                             strlcpy(ability_cost_text, ability_cost_digits, sizeof(ability_cost_text));
 
                             int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
