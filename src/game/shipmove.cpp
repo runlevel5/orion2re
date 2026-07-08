@@ -607,9 +607,9 @@ namespace SHIPMOVE {
                 s_leader_data* leader = &MOX::_leaders[ship->officer_index];
                 if (leader->eta == 0) {
                     int32_t bonus = 0;
-                    if ((leader->special_skills & 0x200 /* NAVIGATOR */) != 0) {
+                    if ((leader->special_skills & LEADER_SHIP_SKILL_NAVIGATOR2) != 0) {
                         bonus = (OFFICER::Owned_Officer_Level_(ship->officer_index) / 3) + 1;
-                    } else if ((leader->special_skills & 0x100 /* HELMSMAN */) != 0) {
+                    } else if ((leader->special_skills & LEADER_SHIP_SKILL_NAVIGATOR) != 0) {
                         bonus = (OFFICER::Owned_Officer_Level_(ship->officer_index) / 4) + 1;
                     }
                     if (navigator_bonus < bonus) {

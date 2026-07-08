@@ -129,10 +129,10 @@ namespace TRADE {
                 leader->status >= 0 && leader->status < 3) {
 
                 int32_t leader_bonus = 0;
-                if (leader->general_skills & 0x80000) {
+                if (leader->general_skills & LEADER_GENERAL_SKILL_TRADER2) {
                     int16_t level = OFFICER::Owned_Officer_Level_(i);
                     leader_bonus = (level * 3 + 3) * 5;
-                } else if (leader->general_skills & 0x40000) {
+                } else if (leader->general_skills & LEADER_GENERAL_SKILL_TRADER) {
                     int16_t level = OFFICER::Owned_Officer_Level_(i);
                     leader_bonus = (level * 5 + 5) * 2;
                 }

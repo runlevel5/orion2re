@@ -1824,10 +1824,7 @@ namespace COLCALC {
         }
     }
 
-    /**
-     * Finds the highest diplomatic or charisma bonus provided by any leader currently owned by the player.
-     * Bit 0x20 in general_skills corresponds to the Diplomat skill, while 0x10 is Charisma.
-     */
+    /** Finds the highest diplomatic or charisma bonus provided by any owned leader. */
     int __cdecl Best_Leader_Diplomat_Bonus_(int player_idx) {
         int max_bonus = 0;
         s_player* plr = &MOX::_player[player_idx];
@@ -1838,11 +1835,11 @@ namespace COLCALC {
             if (Player_Owns_Officer_(plr, leader)) {
                 int bonus = 0;
 
-                if (leader->general_skills & 0x20 /* DIPLOMAT */) {
+                if (leader->general_skills & LEADER_GENERAL_SKILL_DIPLOMAT2) {
                     int16_t level = OFFICER::Owned_Officer_Level_(i);
                     bonus = (level * 3 + 3) * 5;
                 }
-                else if (leader->general_skills & 0x10 /* CHARISMA */) {
+                else if (leader->general_skills & LEADER_GENERAL_SKILL_DIPLOMAT) {
                     int16_t level = OFFICER::Owned_Officer_Level_(i);
                     bonus = (level * 5 + 5) * 2;
                 }

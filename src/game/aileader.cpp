@@ -13,19 +13,34 @@ namespace aileader {
                     s_leader_data* leader = &MOX::_leaders[leader_idx];
                     uint32_t general_skills = leader->general_skills;
 
-                    if ((general_skills & 0x300) != 0) {
+                    if ((general_skills & (LEADER_GENERAL_SKILL_MEGAWEALTH | LEADER_GENERAL_SKILL_MEGAWEALTH2)) != 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x2000) != 0 && player->do_not_research == 0) {
+                    } else if ((general_skills & LEADER_GENERAL_SKILL_RESEARCHER2) != 0 && player->do_not_research == 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x1000) != 0 && player->do_not_research == 0) {
+                    } else if ((general_skills & LEADER_GENERAL_SKILL_RESEARCHER) != 0 && player->do_not_research == 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x3CCC3) != 0) {
+                    } else if ((general_skills & (
+                                   LEADER_GENERAL_SKILL_ASSASSIN |
+                                   LEADER_GENERAL_SKILL_ASSASSIN2 |
+                                   LEADER_GENERAL_SKILL_FAMOUS |
+                                   LEADER_GENERAL_SKILL_FAMOUS2 |
+                                   LEADER_GENERAL_SKILL_OPERATIONS |
+                                   LEADER_GENERAL_SKILL_OPERATIONS2 |
+                                   LEADER_GENERAL_SKILL_SPY_MASTER |
+                                   LEADER_GENERAL_SKILL_SPY_MASTER2 |
+                                   LEADER_GENERAL_SKILL_TELEPATH |
+                                   LEADER_GENERAL_SKILL_TELEPATH2)) != 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x80000) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
+                    } else if ((general_skills & LEADER_GENERAL_SKILL_TRADER2) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
                         hire_criteria_met = true;
-                    } else if ((general_skills & 0x40000) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
+                    } else if ((general_skills & LEADER_GENERAL_SKILL_TRADER) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
                         hire_criteria_met = true;
-                    } else if (leader->type == 0 && (leader->special_skills & 0xC0C0) != 0) {
+                    } else if (leader->type == 0 &&
+                               (leader->special_skills & (
+                                   LEADER_SHIP_SKILL_HELMSMAN |
+                                   LEADER_SHIP_SKILL_HELMSMAN2 |
+                                   LEADER_SHIP_SKILL_WEAPONRY |
+                                   LEADER_SHIP_SKILL_WEAPONRY2)) != 0) {
                         hire_criteria_met = true;
                     }
 
@@ -79,46 +94,41 @@ namespace aileader {
 
                 if (MOX::_star[star_index].officer_index[player_index] == -1) {
 
-                    // Environmentalist (Bits 0-1)
-                    if ((skills & 0x0003) && (*AIDATA::_ai_colony_info)[i].trait_environment_immune != 0) {
+                    if ((skills & (LEADER_COLONY_SKILL_ENVIRONMENTALIST | LEADER_COLONY_SKILL_ENVIRONMENTALIST2)) &&
+                        (*AIDATA::_ai_colony_info)[i].trait_environment_immune != 0) {
                         star_scores[star_index] += colony->pollution;
                     }
 
-                    // Farmer (Bits 2-3)
-                    if ((skills & 0x000C) && colony->food2_per_farmer != 0) {
+                    if ((skills & (LEADER_COLONY_SKILL_FARMING_LEADER | LEADER_COLONY_SKILL_FARMING_LEADER2)) &&
+                        colony->food2_per_farmer != 0) {
                         star_scores[star_index] += colony->production[ECON_FOOD];
                     }
 
-                    // Administrator (Bits 4-5)
-                    if (skills & 0x0030) {
+                    if (skills & (LEADER_COLONY_SKILL_FINANCIAL_LEADER | LEADER_COLONY_SKILL_FINANCIAL_LEADER2)) {
                         star_scores[star_index] += (uint8_t)colony->n_pops;
                     }
 
-                    // Industrialist (Bits 8-9)
-                    if (skills & 0x0300) {
+                    if (skills & (LEADER_COLONY_SKILL_LABOR_LEADER | LEADER_COLONY_SKILL_LABOR_LEADER2)) {
                         star_scores[star_index] += colony->production[ECON_INDUSTRY];
                     }
 
-                    // Researcher (Bits 12-13)
-                    if (skills & 0x3000) {
+                    if (skills & (LEADER_COLONY_SKILL_SCIENCE_LEADER | LEADER_COLONY_SKILL_SCIENCE_LEADER2)) {
                         star_scores[star_index] += colony->production[ECON_RESEARCH];
                     }
 
-                    // Diplomat/Telepath? (Bits 14-15)
-                    if ((skills & 0xC000) && (MOX::_player[player_index].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3)) {
+                    if ((skills & (LEADER_COLONY_SKILL_SPIRITUAL_LEADER | LEADER_COLONY_SKILL_SPIRITUAL_LEADER2)) &&
+                        (MOX::_player[player_index].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3)) {
                         star_scores[star_index] += (uint8_t)colony->n_pops;
                     }
 
-                    // Expansionist (Bits 10-11)
-                    if (skills & 0x0C00) {
+                    if (skills & (LEADER_COLONY_SKILL_MEDICINE | LEADER_COLONY_SKILL_MEDICINE2)) {
                         int32_t bonus = (uint8_t)(*AIDATA::_ai_colony_info)[i].pop_limit - (uint8_t)colony->n_pops;
                         if (bonus > 0) {
                             star_scores[star_index] += bonus;
                         }
                     }
 
-                    // Fleet Officer (Bits 16-17)
-                    if (skills & 0x00030000) {
+                    if (skills & (LEADER_COLONY_SKILL_TACTICS | LEADER_COLONY_SKILL_TACTICS2)) {
                         star_scores[star_index] += (uint8_t)(*AIDATA::_ai_star_info)[star_index].per_player[player_index].neutral_count +
                                                    (uint8_t)(*AIDATA::_ai_star_info)[star_index].per_player[player_index].alliance_count;
                     }

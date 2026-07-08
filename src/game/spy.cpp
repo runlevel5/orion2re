@@ -49,10 +49,10 @@ namespace spy {
                     if (!COLCALC::Leader_At_Anomaly_(leader)) {
 
                         int32_t current_def_skill = 0;
-                        if (leader->general_skills & 0x8000 /* Agent Mega-skill */) {
+                        if (leader->general_skills & LEADER_GENERAL_SKILL_SPY_MASTER2) {
                             current_def_skill = OFFICER::Owned_Officer_Level_(i) * 3 + 3;
                         }
-                        else if (leader->general_skills & 0x4000 /* Agent skill */) {
+                        else if (leader->general_skills & LEADER_GENERAL_SKILL_SPY_MASTER) {
                             current_def_skill = OFFICER::Owned_Officer_Level_(i) * 2 + 2;
                         }
 
@@ -61,10 +61,10 @@ namespace spy {
                         }
 
                         int32_t current_atk_skill = 0;
-                        if (leader->general_skills & 0x20000 /* Spy Mega-skill */) {
+                        if (leader->general_skills & LEADER_GENERAL_SKILL_TELEPATH2) {
                             current_atk_skill = OFFICER::Owned_Officer_Level_(i) * 3;
                         }
-                        else if (leader->general_skills & 0x10000 /* Spy skill */) {
+                        else if (leader->general_skills & LEADER_GENERAL_SKILL_TELEPATH) {
                             current_atk_skill = OFFICER::Owned_Officer_Level_(i) * 2;
                         }
 
@@ -148,7 +148,7 @@ namespace spy {
                 // player_index != -1 and status is active (0) or assigned (1)
                 if (leader->player_index != -1 && (leader->status == 0 || leader->status == 1)) {
                     int32_t chance = 0;
-                    uint32_t skill_bit = leader->general_skills & 0x00000002;
+                    uint32_t skill_bit = leader->general_skills & LEADER_GENERAL_SKILL_ASSASSIN2;
 
                     if (skill_bit != 0) {
                         int32_t leader_idx = (int32_t)(leader - MOX::_leaders);
