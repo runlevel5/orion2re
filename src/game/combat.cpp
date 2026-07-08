@@ -692,7 +692,7 @@ namespace COMBAT {
 
         qship->player = 8;
         qship->ship_design_idx = -1;
-        qship->size = 8;
+        qship->size = HULL_STAR_FORTRESS;
         qship->status = 0;
         qship->field3_0x4 = -1;
         qship->missile_weapon_id = INITSHIP::Best_Missile_Weapon_(8);
@@ -700,9 +700,9 @@ namespace COMBAT {
         qship->bomb_weapon_id = 0;
         qship->special_weapon_id = 0;
         qship->shield_id = 7;
-        qship->max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[8].strat_hits * 1000) / 100);
+        qship->max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[HULL_STAR_FORTRESS].strat_hits * 1000) / 100);
         qship->missile_defense_bonus = 0;
-        qship->beam_defense_bonus = TECHDATA::_hull_data[8].strat_def_bonus + 45 /* 0x2d */;
+        qship->beam_defense_bonus = TECHDATA::_hull_data[HULL_STAR_FORTRESS].strat_def_bonus + 45 /* 0x2d */;
         qship->base_ocv = AIPOWER::Base_Generic_Ocv_(8) + 45 /* 0x2d */;
         qship->missile_damage_modifier = 0;
         qship->beam_damage_modifier = 105 /* 0x69 */;
@@ -1052,10 +1052,10 @@ namespace COMBAT {
 
         const size_t result_capacity = (size_t)result_msg_size;
         const size_t stats_capacity = (size_t)stats_msg_size;
-        int16_t attacker_total_ships[6];
-        int16_t attacker_lost_ships[6];
-        int16_t defender_total_ships[6];
-        int16_t defender_lost_ships[6];
+        int16_t attacker_total_ships[SHIP_SIZE_COUNT];
+        int16_t attacker_lost_ships[SHIP_SIZE_COUNT];
+        int16_t defender_total_ships[SHIP_SIZE_COUNT];
+        int16_t defender_lost_ships[SHIP_SIZE_COUNT];
         int16_t special_hull_idx = -1;
         int16_t special_alive = 1;
         char attacker_race_name[20];
@@ -1064,7 +1064,7 @@ namespace COMBAT {
         char result_prefix[80];
         char msg_buffer[80];
 
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < SHIP_SIZE_COUNT; ++i) {
             attacker_total_ships[i] = 0;
             attacker_lost_ships[i] = 0;
             defender_total_ships[i] = 0;
@@ -1075,7 +1075,7 @@ namespace COMBAT {
             for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
                 s_qship* ship = &MOX::_qcombat_data[i];
                 uint8_t size = ship->size;
-                if (size < 6) {
+                if (size < SHIP_SIZE_COUNT) {
                     if (ship->player == MOX::_combat_attacker_player) {
                         if (ship->status == 0) {
                             attacker_total_ships[size]++;
@@ -1096,7 +1096,7 @@ namespace COMBAT {
             }
         }
 
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < SHIP_SIZE_COUNT; ++i) {
             attacker_total_ships[i] += attacker_lost_ships[i];
             defender_total_ships[i] += defender_lost_ships[i];
         }
@@ -1148,7 +1148,7 @@ namespace COMBAT {
         strlcat(stats_msg, msg_buffer, stats_capacity);
         strlcat(stats_msg, string::s_Newline, stats_capacity);
 
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < SHIP_SIZE_COUNT; ++i) {
             if (attacker_total_ships[i] + defender_total_ships[i] > 0) {
                 strlcat(stats_msg, string::s_X18, stats_capacity);
                 if (attacker_total_ships[i] == 0) {

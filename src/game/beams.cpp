@@ -480,14 +480,14 @@ namespace BEAMS {
 
     /** Map a combat ship size to the shield animation size index. */
     int16_t __cdecl Ship_Size_To_Shield_Size_(int16_t ship_size) {
-        int16_t shield_sizes[6];
-
-        shield_sizes[0] = 0;
-        shield_sizes[1] = 1;
-        shield_sizes[2] = 1;
-        shield_sizes[3] = 2;
-        shield_sizes[4] = 3;
-        shield_sizes[5] = 3;
+        static const int16_t shield_sizes[SHIP_SIZE_DOOM_STAR + 1] = {
+            0, // SHIP_SIZE_SMALL
+            1, // SHIP_SIZE_MEDIUM
+            1, // SHIP_SIZE_LARGE
+            2, // SHIP_SIZE_HUGE
+            3, // SHIP_SIZE_TITAN
+            3  // SHIP_SIZE_DOOM_STAR
+        };
 
         return shield_sizes[ship_size];
     }
@@ -806,13 +806,13 @@ namespace BEAMS {
 
     /** Map a planet size to the shield animation size index. */
     int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size) {
-        int16_t sizes[6];
-
-        sizes[0] = 4;
-        sizes[1] = 5;
-        sizes[2] = 6;
-        sizes[3] = 7;
-        sizes[4] = 7;
+        static const int16_t sizes[PLANET_SIZE_HUGE + 1] = {
+            4, // PLANET_SIZE_TINY
+            5, // PLANET_SIZE_SMALL
+            6, // PLANET_SIZE_MEDIUM
+            7, // PLANET_SIZE_LARGE
+            7  // PLANET_SIZE_HUGE
+        };
 
         return sizes[planet_size];
     }

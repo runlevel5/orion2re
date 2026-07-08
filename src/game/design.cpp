@@ -11,7 +11,7 @@ namespace DESIGN {
     int16_t _design_computer_replacement_field;
     int32_t _printed_cost;
     uint8_t _changed_design_name;
-    uint8_t _add_size_button_flag[SHIP_SIZE_DOOM_STAR + 1];
+    uint8_t _add_size_button_flag[SHIP_SIZE_COUNT];
 
     const char s_comma_space[3] = ", ";
 
@@ -1134,7 +1134,7 @@ namespace DESIGN {
 
         // shipname.lbx entry: variant_idx + ((race_idx * 6 + design_idx) * 8)
         // original code performs this through 16-bit arithmetic before sign-extension
-        int16_t entry_idx = (int16_t)(variant_idx + (int16_t)((int16_t)(race_idx * (SHIP_SIZE_DOOM_STAR + 1)) + design_idx) * 8);
+        int16_t entry_idx = (int16_t)(variant_idx + (int16_t)((int16_t)(race_idx * SHIP_SIZE_COUNT) + design_idx) * 8);
 
         char* loaded_name = (char*)farload::Far_Reload_Next_Data_(
             "shipname.lbx",
@@ -1251,7 +1251,7 @@ namespace DESIGN {
             animate::Draw_(544, 439, _dark_build_design_button_seg);
         }
 
-        for (int size_idx = 0; size_idx <= SHIP_SIZE_DOOM_STAR; ++size_idx) {
+        for (int size_idx = 0; size_idx < SHIP_SIZE_COUNT; ++size_idx) {
             int16_t btn_x, btn_y, btn_w, btn_h;
             if (MOX::_refit_ship == 0) {
                 if (_add_size_button_flag[size_idx] != 1) {

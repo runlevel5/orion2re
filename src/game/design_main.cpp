@@ -449,7 +449,7 @@ namespace DESIGN {
                 Add_Design_Buttons_();
             }
 
-            for (int16_t i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
+            for (int16_t i = 0; i < SHIP_SIZE_COUNT; ++i) {
                 if (MOX::_design_ship_size_field[i] == input_field) {
                     if (_add_size_button_flag[i] < 241) {
                         _changed_design_name = 0;
@@ -512,10 +512,10 @@ namespace DESIGN {
         MOX::_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 5, MOX::_screen_seg);
         RUSS::Mox_Update_();
 
-        for (int i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
+        for (int i = 0; i < SHIP_SIZE_COUNT; ++i) {
             MOX::_design_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 6 + i, MOX::_screen_seg);
         }
-        for (int i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
+        for (int i = 0; i < SHIP_SIZE_COUNT; ++i) {
             MOX::_darkened_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_("DESIGN.LBX", 6 + i, MOX::_screen_seg);
         }
 
@@ -594,12 +594,12 @@ namespace DESIGN {
      * Rebuilds the clickable controls for the current design-screen state.
      */
     void __cdecl Add_Design_Buttons_() {
-        for (int16_t i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
+        for (int16_t i = 0; i < SHIP_SIZE_COUNT; ++i) {
             _add_size_button_flag[i] = Add_Size_Button_();
         }
 
         int16_t field_x1, field_y1, field_x2, field_y2;
-        for (int16_t i = 0; i <= SHIP_SIZE_DOOM_STAR; ++i) {
+        for (int16_t i = 0; i < SHIP_SIZE_COUNT; ++i) {
             Get_Ship_Size_Button_Field_XY_(i, &field_x1, &field_y1, &field_x2, &field_y2);
             if (_add_size_button_flag[i] == 1) {
                 MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(field_x1, field_y1, "", MOX::_design_size_button_seg[i], &MOX::_design_size, i, "", 0x29 /* ) */);

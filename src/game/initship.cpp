@@ -10,7 +10,7 @@ namespace INITSHIP {
         }
 
         if (MOX::_settings.strategic_combat_flag == 1) {
-            for (int16_t i = 0; i < 6; ++i) {
+            for (int16_t i = 0; i < SHIP_SIZE_COUNT; ++i) {
                 struct_::Clear_Structure_(&plr->ship_designs[i], sizeof(plr->ship_designs[i]));
                 Auto_Strategic_Design_Ship_(player_idx, i, &plr->ship_designs[i]);
             }
@@ -21,22 +21,22 @@ namespace INITSHIP {
         aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[0], 0);
         MOX::_cur_combat_x = 0;
 
-        for (int16_t i = 1; i < 5; ++i) {
+        for (int16_t i = 1; i < SHIP_SIZE_DOOM_STAR; ++i) {
             aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[i], i - design_flag);
         }
 
         if (plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
-            struct_::Clear_Structure_(&plr->ship_designs[5], sizeof(plr->ship_designs[5]));
+            struct_::Clear_Structure_(&plr->ship_designs[SHIP_SIZE_DOOM_STAR], sizeof(plr->ship_designs[SHIP_SIZE_DOOM_STAR]));
         } else {
-            aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[5], 5);
+            aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[SHIP_SIZE_DOOM_STAR], HULL_DOOM_STAR);
 
-            int16_t pic_mod_8 = (int16_t)(plr->ship_designs[5].picture_num % 8);
+            int16_t pic_mod_8 = (int16_t)(plr->ship_designs[SHIP_SIZE_DOOM_STAR].picture_num % 8);
             DESIGN::Get_Ship_Design_Name_(
                 (int16_t)plr->race,
-                (int16_t)plr->ship_designs[5].size,
+                (int16_t)plr->ship_designs[SHIP_SIZE_DOOM_STAR].size,
                 pic_mod_8,
-                plr->ship_designs[5].name,
-                sizeof(plr->ship_designs[5].name)
+                plr->ship_designs[SHIP_SIZE_DOOM_STAR].name,
+                sizeof(plr->ship_designs[SHIP_SIZE_DOOM_STAR].name)
             );
         }
     }
@@ -44,7 +44,7 @@ namespace INITSHIP {
     void __cdecl Update_Player_Strategic_Ship_Designs_(int16_t player_idx) {
         s_player* player = &MOX::_player[player_idx];
 
-        for (int16_t i = 0; i < 6; ++i) {
+        for (int16_t i = 0; i < SHIP_SIZE_COUNT; ++i) {
             s_ship_design* design = &player->ship_designs[i];
             int8_t old_picture_num = design->picture_num;
 
@@ -52,7 +52,7 @@ namespace INITSHIP {
             Auto_Strategic_Design_Ship_(player_idx, i, design);
 
             int8_t new_picture_num;
-            if (i == 5) {
+            if (i == SHIP_SIZE_DOOM_STAR) {
                 new_picture_num = 0x2b; // '+'
             } else {
                 new_picture_num = old_picture_num + 1;
@@ -97,7 +97,7 @@ namespace INITSHIP {
 
         Update_Equipment_On_Ships_Being_Built_(player_idx);
 
-        for (int16_t i = 0; i < 5; ++i) {
+        for (int16_t i = 0; i < SHIP_SIZE_DOOM_STAR; ++i) {
             aidesign::Auto_Design_Ship_(player_idx, &MOX::_player[player_idx].ship_designs[i], i);
         }
     }
@@ -223,7 +223,7 @@ namespace INITSHIP {
 
         s_player* player = &MOX::_player[player_idx];
 
-        for (int design_idx = 0; design_idx < 6; ++design_idx) {
+        for (int design_idx = 0; design_idx < SHIP_SIZE_COUNT; ++design_idx) {
             s_ship_design* design = &player->ship_designs[design_idx];
 
             design->armor_type = static_cast<int8_t>(best_armor_type);
@@ -355,7 +355,7 @@ namespace INITSHIP {
         Update_Strategic_Design_Weapons_Specials_(design, player_idx, design_idx);
 
         // Assign visual representation
-        if (design_idx == 5 /* STAR_BASE_HULL */) {
+        if (design_idx == HULL_DOOM_STAR) {
             design->picture_num = 0x2B; /* '+' sign for starbases */
         } else {
             design->picture_num = static_cast<int8_t>(design_idx) << 3;
@@ -773,8 +773,8 @@ namespace INITSHIP {
     }
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
-        aidesign::Auto_Design_Ship_(owner_idx, design, 5);
-        strlcpy(design->name, TECHDATA::_hull_data[5].name, sizeof(design->name));
+        aidesign::Auto_Design_Ship_(owner_idx, design, HULL_DOOM_STAR);
+        strlcpy(design->name, TECHDATA::_hull_data[HULL_DOOM_STAR].name, sizeof(design->name));
     }
 
     void __cdecl Repair_Ships_At_Colonies_() {
