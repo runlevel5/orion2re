@@ -110,25 +110,6 @@ orion2re_add_unit_test(test_vfs
     LINK_SDL
 )
 
-orion2re_add_unit_test(test_lbx_vfs
-    SOURCES
-        tests/unit/test_lbx_vfs.cpp
-    PRODUCTION_SOURCES
-        src/game/compat.cpp
-        src/game/lbx.cpp
-        src/game/vfs.cpp
-        src/game/vfs_file.cpp
-        src/game/vfs_lbx.cpp
-        src/game/vfs_path.cpp
-        src/game/vfs_zip.cpp
-    FAKE_SOURCES
-        tests/fakes/fake_sound.cpp
-        tests/fakes/fake_test_state.cpp
-    LIBRARIES
-        miniz
-    LINK_SDL
-)
-
 orion2re_add_unit_test(test_farload_buffer_vfs
     SOURCES
         tests/unit/test_farload_buffer_vfs.cpp

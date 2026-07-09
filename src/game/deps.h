@@ -200,7 +200,6 @@
 #include "cmbtspec.h"
 #include "cmbtai.h"
 #include "beams.h"
-#include "lbx.h"
 #include "colbomb.h"
 #include "aibomb.h"
 #include "flcqueue.h"

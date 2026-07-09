@@ -322,7 +322,6 @@ namespace TEXTBOX {
         fonts::Set_Remap_Font_Style_(2, &body_colors);
 
         allocate::Push_Block_(_textbox_seg);
-        s_lbx_stream_header* lbx_header = (s_lbx_stream_header*)allocate::Allocate_Next_Block_(_textbox_seg, sizeof(s_lbx_stream_header));
 
         uint16_t record_count = 0;
         uint32_t help_idx = (uint32_t)help_id;
@@ -345,10 +344,20 @@ namespace TEXTBOX {
 
             has_anim[record_count] = (records[record_count].anim_lbx[0] != '\0');
             if (has_anim[record_count]) {
-                lbx::LBX_init_(lbx_header, records[record_count].anim_lbx);
                 uint16_t rec_idx = (uint16_t)(records[record_count].anim_info & 0xFFFF);
-                total_lbx_size += lbx::LBX_getRecordLength_(lbx_header, rec_idx) + 0x400;
-                lbx::LBX_uninit_(lbx_header);
+                s_vfs_file* anim_file = vfs::fopen_lbx(records[record_count].anim_lbx, rec_idx);
+                if (anim_file == nullptr) {
+                    farload::Error_Handler_(records[record_count].anim_lbx, 1, rec_idx);
+                }
+
+                int32_t anim_size = vfs::fsize(anim_file);
+                if (anim_size < 0) {
+                    vfs::fclose(anim_file);
+                    farload::Error_Handler_(records[record_count].anim_lbx, 7, rec_idx);
+                }
+
+                total_lbx_size += (uint32_t)anim_size + 0x400;
+                vfs::fclose(anim_file);
             }
 
             uint32_t next_idx = records[record_count].next_help_idx;

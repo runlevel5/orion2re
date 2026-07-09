@@ -58,13 +58,10 @@ namespace sound {
     uint8_t _command;
     uint8_t _streamIncVal;
     uint32_t _streamAvailable2;
-    s_lbx_stream_header _musicLbxHandle;
     uint32_t _streamAvailable1;
     int32_t _masterVolume;
     s_sound_index _soundIndices[33];
     s_sound_channel _soundChannels[16];
-    s_lbx_stream_header _soundLbxHandle;
-    s_wave_stream_header _streamLbxHandle;
     uint8_t _close_stream = 1;
     uint8_t _musicActive;
     s_sound_stream _stream_data;
@@ -296,6 +293,22 @@ namespace sound {
             return true;
         }
 
+        bool Stream_File_Exists_(const char* filename) {
+            s_vfs_file* file;
+
+            if (filename == nullptr) {
+                return false;
+            }
+
+            file = vfs::fopen(filename, "rb");
+            if (file == nullptr) {
+                return false;
+            }
+
+            vfs::fclose(file);
+            return true;
+        }
+
         Uint32 SDLCALL Sound_Timer_Thunk_(void* userdata, SDL_TimerID timer_id, Uint32 interval) {
             (void)userdata;
 
@@ -455,8 +468,19 @@ namespace sound {
 
     void __cdecl Set_Stream_Filename_(const char* filename) {
         if (sound::_audioInitialized != 0 && filename != nullptr) {
+            uint8_t was_music_active = _musicActive;
+
             strlcpy(_currentStreamFilename, filename, sizeof(_currentStreamFilename));
-            lbx::LBX_init_stream_(&sound::_streamLbxHandle, filename);
+
+            if (!Stream_File_Exists_(filename)) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: unable to open stream file %s", filename);
+                _musicActive = 0;
+                return;
+            }
+
+            if (was_music_active == 1) {
+                _musicActive = 1;
+            }
         }
     }
 
@@ -572,19 +596,6 @@ namespace sound {
             SDL_LOG_CATEGORY_APPLICATION,
             "sound: SDL audio subsystem initialized, driver: %s",
             audio_driver != nullptr ? audio_driver : "<unknown>");
-
-        memset(&_soundLbxHandle, 0, sizeof(s_lbx_stream_header));
-        memset(&_musicLbxHandle, 0, sizeof(s_lbx_stream_header));
-
-        lbx::LBX_init_(&_soundLbxHandle, "sound.lbx");
-        lbx::LBX_init_(&_musicLbxHandle, "music.lbx");
-        lbx::LBX_init_stream_(&_streamLbxHandle, "stream.lbx");
-        SDL_LogInfo(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "sound: lbx open sound=%d music=%d stream=%d",
-            _soundLbxHandle.file != nullptr ? 1 : 0,
-            _musicLbxHandle.file != nullptr ? 1 : 0,
-            _streamLbxHandle.file != nullptr ? 1 : 0);
 
         if (_soundBuffer != nullptr) {
             _soundBufferSize = allocate::Get_Remaining_Block_Space_(_soundBuffer);
@@ -827,18 +838,12 @@ namespace sound {
             return 0;
         }
 
-        if (_streamLbxHandle.file == nullptr) {
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: no stream file open for %s entry=%d", _currentStreamFilename, entry_index);
-            return 0;
-        }
-
-        if (entry_index < 1 || entry_index > (int32_t)_streamLbxHandle.entry_count) {
+        if (entry_index < 1) {
             SDL_LogWarn(
                 SDL_LOG_CATEGORY_APPLICATION,
-                "stream: invalid entry file=%s entry=%d entry_count=%u",
+                "stream: invalid entry file=%s entry=%d",
                 _currentStreamFilename,
-                entry_index,
-                (unsigned int)_streamLbxHandle.entry_count
+                entry_index
             );
             return 0;
         }
@@ -941,11 +946,6 @@ namespace sound {
 
         _currentStreamId = stream_id;
         _streamReadErrorLogged = 0;
-
-        if (_streamLbxHandle.file == nullptr) {
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: requested play with unopened stream file=%s entry=%d", _currentStreamFilename, _currentStreamId);
-            return;
-        }
 
         Stop_Sound_Timer_();
         int32_t volume_idx = Get_Stream_Volume_();
@@ -1316,18 +1316,32 @@ namespace sound {
             }
         }
 
-        // Cache miss: Load from LBX
-        uint32_t length = (uint32_t)lbx::LBX_getRecordLength_(&_soundLbxHandle, resource_id);
-        if (length == 0) {
+        // Cache miss: Load the selected LBX entry through the VFS.
+        s_vfs_file* sound_file = vfs::fopen_lbx("sound.lbx", resource_id);
+        if (sound_file == nullptr) {
             return -2;
         }
+
+        int32_t length_i32 = vfs::fsize(sound_file);
+        if (length_i32 <= 0) {
+            vfs::fclose(sound_file);
+            return -2;
+        }
+
+        uint32_t length = (uint32_t)length_i32;
 
         void* buffer = Allocate_Sound_Block_(channel_id, resource_id, length);
         if (buffer == nullptr) {
+            vfs::fclose(sound_file);
             return -2;
         }
 
-        lbx::LBX_readRecord_(&_soundLbxHandle, resource_id, buffer);
+        if (vfs::fread(buffer, 1, length, sound_file) != length) {
+            vfs::fclose(sound_file);
+            return -2;
+        }
+
+        vfs::fclose(sound_file);
         return Play_Sound_File_(channel_id, buffer, length);
     }
 

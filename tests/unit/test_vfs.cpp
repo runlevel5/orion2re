@@ -340,7 +340,7 @@ DOCTEST_TEST_CASE("vfs fopen_lbx returns an entry-relative stream from a raw lbx
     const std::string base_path = test_dir.root_path().string();
     DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
 
-    s_vfs_file* file = vfs::fopen_lbx("TEST.LBX", 1);
+    s_vfs_file* file = vfs::fopen_lbx("test.lbx", 1);
     DOCTEST_REQUIRE(file != nullptr);
 
     std::array<char, 16> buffer{};
