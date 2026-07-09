@@ -9,6 +9,8 @@ struct s_net_snapshot_cache {
 };
 
 namespace NETMOX {
+    constexpr uint32_t NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES = 0xE1000u;
+
     extern s_network _net;
 
     extern uint8_t _sending_msg;
@@ -81,6 +83,8 @@ namespace NETMOX {
     int32_t __cdecl Mox_Send_Message_(int16_t recipient_net_id, uint16_t msg_type, void* packet, uint32_t packet_len);
 
     void __cdecl Decode_Game_Orders_(void* data, uint32_t len);
+
+    uint32_t __cdecl Encode_Broadcast_Game_Data_Snapshot_(void* buffer, uint32_t len);
 
     void __cdecl Broadcast_Game_Data_Differential_(uint8_t unknown);
 

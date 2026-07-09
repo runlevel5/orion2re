@@ -546,10 +546,8 @@ namespace NETMOX {
         allocate::Pop_Block_(MOX::_screen_seg);
     }
 
-    void __cdecl Broadcast_Game_Data_Differential_(uint8_t use_diff) {
-        allocate::Push_Block_(MOX::_screen_seg);
-        uint8_t* block = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xe1000);
-        NETPROTO::Packet_Writer_ writer(block, 0xe1000, "invalid broadcast game data payload");
+    uint32_t __cdecl Encode_Broadcast_Game_Data_Snapshot_(void* buffer, uint32_t len) {
+        NETPROTO::Packet_Writer_ writer(buffer, len, "invalid broadcast game data payload");
 
         // Assemble a packed byte stream from primitive values using the original x86 little-endian layout.
         writer.Write_Int16_(_net.host_election_id);
@@ -599,10 +597,10 @@ namespace NETMOX {
 
         writer.Write_Uint16_((uint16_t)REPORT::_n_reports);
 
-        size = 50 * sizeof(s_report);
+        size = sizeof(REPORT::_reports);
         writer.Write_Bytes_(REPORT::_reports, size);
 
-        size = 36 * sizeof(s_event_data);
+        size = sizeof(EVENTS::_event_data);
         writer.Write_Bytes_(EVENTS::_event_data, size);
 
         size = MOX::_NUM_PLAYERS;
@@ -612,7 +610,7 @@ namespace NETMOX {
 
         writer.Write_Bytes_(MSG_::_n_msgs, size);
 
-        size = 100 * sizeof(s_MSG);
+        size = sizeof(MSG_::_msgs);
         writer.Write_Bytes_(MSG_::_msgs, size);
 
         writer.Write_Uint16_((uint16_t)diplodef::_COUNCIL_FLAG);
@@ -634,7 +632,14 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
-        uint32_t block_size = writer.Length_();
+        return writer.Length_();
+    }
+
+    void __cdecl Broadcast_Game_Data_Differential_(uint8_t use_diff) {
+        allocate::Push_Block_(MOX::_screen_seg);
+        uint8_t* block = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES);
+
+        uint32_t block_size = Encode_Broadcast_Game_Data_Snapshot_(block, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES);
         uint8_t* send_ptr;
         int32_t send_size;
         s_net_snapshot_cache* cache;
@@ -648,7 +653,7 @@ namespace NETMOX {
         else {
             cache = Open_Net_Snapshot_Cache_(0);
             send_ptr = block + block_size;
-            send_size = Make_Difference_Buffer_(cache, block, block_size, send_ptr, 0xe1000 - block_size);
+            send_size = Make_Difference_Buffer_(cache, block, block_size, send_ptr, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES - block_size);
 
             cache = Open_Net_Snapshot_Cache_(block_size);
             Write_Net_Snapshot_Cache_(cache, block, block_size);
@@ -670,7 +675,7 @@ namespace NETMOX {
         if (flag == 0) {
             ptr = buffer + size;
             s_net_snapshot_cache* cache = NETMOX::Open_Net_Snapshot_Cache_(0);
-            size = NETMOX::Decode_Difference_Buffer_(cache, ptr, (int)(0xE1000 - size), buffer, (int)size);
+            size = NETMOX::Decode_Difference_Buffer_(cache, ptr, (int)(NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES - size), buffer, (int)size);
 
             if (size == 0) {
                 exitm::Exit_With_message2_("error decoding broadcast");
@@ -683,47 +688,29 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
+        NETPROTO::Packet_Reader_ reader(ptr, (uint32_t)size, "invalid broadcast game data payload");
+
         // Interpret the packed byte stream using the original x86 little-endian layout.
-        _net.host_election_id = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        _net.host_election_id = reader.Read_Int16_();
 
-        MOX::_stardate = *(uint32_t*)ptr;
-        ptr += sizeof(uint32_t);
+        MOX::_stardate = reader.Read_Uint32_();
 
-        MOX::_settings.random_events = *ptr;
-        ptr += sizeof(uint8_t);
+        MOX::_settings.random_events = reader.Read_Uint8_();
+        MOX::_settings.game_difficulty = reader.Read_Uint8_();
+        MOX::_settings.number_of_players = reader.Read_Uint8_();
+        MOX::_settings.galaxy_size = reader.Read_Uint8_();
+        MOX::_settings.galaxy_age = reader.Read_Uint8_();
+        MOX::_settings.strategic_combat_flag = reader.Read_Uint8_();
+        MOX::_settings.starting_civilization_level = reader.Read_Uint8_();
+        MOX::_settings.xenons_exist = reader.Read_Uint8_();
 
-        MOX::_settings.game_difficulty = *ptr;
-        ptr += sizeof(uint8_t);
-
-        MOX::_settings.number_of_players = *ptr;
-        ptr += sizeof(uint8_t);
-
-        MOX::_settings.galaxy_size = *ptr;
-        ptr += sizeof(uint8_t);
-
-        MOX::_settings.galaxy_age = *ptr;
-        ptr += sizeof(uint8_t);
-
-        MOX::_settings.strategic_combat_flag = *ptr;
-        ptr += sizeof(uint8_t);
-
-        MOX::_settings.starting_civilization_level = *ptr;
-        ptr += sizeof(uint8_t);
-
-        MOX::_settings.xenons_exist = *ptr;
-        ptr += sizeof(uint8_t);
-
-        game_random::Set_Random_Seed_(*(uint32_t*)ptr);
-        ptr += sizeof(uint32_t);
+        game_random::Set_Random_Seed_(reader.Read_Uint32_());
 
         RUSS::Mox_Update_();
 
-        MOX::_NUM_PLAYERS = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        MOX::_NUM_PLAYERS = reader.Read_Int16_();
 
-        memcpy(MOX::_player, ptr, MOX::_NUM_PLAYERS * sizeof(s_player));
-        ptr += MOX::_NUM_PLAYERS * sizeof(s_player);
+        reader.Read_Bytes_(MOX::_player, MOX::_NUM_PLAYERS * sizeof(s_player));
 
         _net.num_connected_players = 0;
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
@@ -737,82 +724,56 @@ namespace NETMOX {
             }
         }
 
-        MOX::_NUM_STARS = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        MOX::_NUM_STARS = reader.Read_Int16_();
 
-        memcpy(MOX::_star, ptr, (MOX::_NUM_STARS + 1) * sizeof(s_star_data));
-        ptr += (MOX::_NUM_STARS + 1) * sizeof(s_star_data);
+        reader.Read_Bytes_(MOX::_star, (MOX::_NUM_STARS + 1) * sizeof(s_star_data));
 
         RUSS::Mox_Update_();
 
-        MOX::_planet_count = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        MOX::_planet_count = reader.Read_Int16_();
 
-        memcpy(MOX::_planet, ptr, MOX::_planet_count * sizeof(s_planet_data));
-        ptr += MOX::_planet_count * sizeof(s_planet_data);
+        reader.Read_Bytes_(MOX::_planet, MOX::_planet_count * sizeof(s_planet_data));
 
-        MOX::_NUM_COLONIES = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        MOX::_NUM_COLONIES = reader.Read_Int16_();
 
-        memcpy(MOX::_colony, ptr, MAX_COLONIES * sizeof(s_colony));
-        ptr += MAX_COLONIES * sizeof(s_colony);
+        reader.Read_Bytes_(MOX::_colony, MAX_COLONIES * sizeof(s_colony));
 
-        MOX::_NUM_SHIPS = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        MOX::_NUM_SHIPS = reader.Read_Int16_();
 
-        memcpy(MOX::_ship, ptr, MAX_SHIPS * sizeof(s_ship_data));
-        ptr += MAX_SHIPS * sizeof(s_ship_data);
+        reader.Read_Bytes_(MOX::_ship, MAX_SHIPS * sizeof(s_ship_data));
 
-        memcpy(MOX::_leaders, ptr, MAX_LEADERS * sizeof(s_leader_data));
-        ptr += MAX_LEADERS * sizeof(s_leader_data);
+        reader.Read_Bytes_(MOX::_leaders, MAX_LEADERS * sizeof(s_leader_data));
 
-        REPORT::_n_reports = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        REPORT::_n_reports = reader.Read_Int16_();
 
-        memcpy(REPORT::_reports, ptr, 50 * sizeof(s_report));
-        ptr += 50 * sizeof(s_report);
-
+        reader.Read_Bytes_(REPORT::_reports, sizeof(REPORT::_reports));
         REPORT::Client_Initialize_Reports_();
 
-        memcpy(EVENTS::_event_data, ptr, 36 * sizeof(s_event_data));
-        ptr += 36 * sizeof(s_event_data);
+        reader.Read_Bytes_(EVENTS::_event_data, sizeof(EVENTS::_event_data));
+        reader.Read_Bytes_(MSG_::_first_msg, MOX::_NUM_PLAYERS);
 
-        memcpy(MSG_::_first_msg, ptr, MOX::_NUM_PLAYERS);
-        ptr += MOX::_NUM_PLAYERS;
+        reader.Read_Bytes_(MSG_::_max_msgs, MOX::_NUM_PLAYERS);
 
-        memcpy(MSG_::_max_msgs, ptr, MOX::_NUM_PLAYERS);
-        ptr += MOX::_NUM_PLAYERS;
+        reader.Read_Bytes_(MSG_::_n_msgs, MOX::_NUM_PLAYERS);
 
-        memcpy(MSG_::_n_msgs, ptr, MOX::_NUM_PLAYERS);
-        ptr += MOX::_NUM_PLAYERS;
-
-        memcpy(MSG_::_msgs, ptr, 100 * sizeof(s_MSG));
-        ptr += 100 * sizeof(s_MSG);
-
+        reader.Read_Bytes_(MSG_::_msgs, sizeof(MSG_::_msgs));
         RUSS::Mox_Update_();
 
-        diplodef::_COUNCIL_FLAG = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        diplodef::_COUNCIL_FLAG = reader.Read_Int16_();
 
-        diplodef::_next_council_meeting_turn = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        diplodef::_next_council_meeting_turn = reader.Read_Int16_();
 
-        memcpy(&MOX::_antarans, ptr, sizeof(s_antaran));
-        ptr += sizeof(s_antaran);
+        reader.Read_Bytes_(&MOX::_antarans, sizeof(s_antaran));
 
-        MOX::_NUM_NEBULAS = *ptr;
-        ptr += sizeof(uint8_t);
+        MOX::_NUM_NEBULAS = reader.Read_Uint8_();
 
-        memcpy(MOX::_nebula, ptr, MOX::_NUM_NEBULAS * sizeof(s_nebula));
-        ptr += MOX::_NUM_NEBULAS * sizeof(s_nebula);
+        reader.Read_Bytes_(MOX::_nebula, MOX::_NUM_NEBULAS * sizeof(s_nebula));
 
-        EVENTS::_last_event_year = *(uint32_t*)ptr;
-        ptr += sizeof(uint32_t);
+        EVENTS::_last_event_year = reader.Read_Uint32_();
 
-        EVENTS::_event_delay_count = *(int16_t*)ptr;
-        ptr += sizeof(int16_t);
+        EVENTS::_event_delay_count = reader.Read_Int16_();
 
-        memcpy(MOX::_bill_savegame, ptr, sizeof(MOX::_bill_savegame));
+        reader.Read_Bytes_(MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
 
         RUSS::Mox_Update_();
 
@@ -1690,9 +1651,7 @@ namespace NETMOX {
 
             // Pass the remaining buffer pointer to Decode_Star_Player_Presence_
             reader.Require_(k_star_player_presence_payload_bytes);
-            uint8_t* ptr = reader.Ptr_();
-            COMBFIND::Decode_Star_Player_Presence_(&ptr, -1);
-            reader.Skip_(k_star_player_presence_payload_bytes);
+            COMBFIND::Decode_Star_Player_Presence_(&reader, -1);
 
             // 3. Read Player Tech Applications
             if (MOX::_NUM_PLAYERS > 0) {
@@ -1807,9 +1766,7 @@ namespace NETMOX {
 
             // Pass the remaining buffer pointer
             reader.Require_(k_star_player_presence_payload_bytes);
-            uint8_t* ptr = reader.Ptr_();
-            COMBFIND::Decode_Star_Player_Presence_(&ptr, -1);
-            reader.Skip_(k_star_player_presence_payload_bytes);
+            COMBFIND::Decode_Star_Player_Presence_(&reader, -1);
 
             // 2. Read Player Tech Applications
             if (attacker_id < MAX_PLAYERS) {
@@ -1928,9 +1885,7 @@ namespace NETMOX {
                 reader.Require_(sizeof(int16_t) + k_star_player_presence_payload_bytes + sizeof(int16_t) * 2);
                 int16_t combat_star_id = reader.Read_Int16_();
 
-                uint8_t* ptr = reader.Ptr_();
-                COMBFIND::Decode_Star_Player_Presence_(&ptr, combat_star_id);
-                reader.Skip_(k_star_player_presence_payload_bytes);
+                COMBFIND::Decode_Star_Player_Presence_(&reader, combat_star_id);
 
                 reader.Skip_(sizeof(int16_t));
 
@@ -2085,10 +2040,7 @@ namespace NETMOX {
             writer.Write_Int16_(star_id);
 
             writer.Require_(k_star_player_presence_payload_bytes);
-            uint8_t* star_presence_start = writer.Ptr_();
-            uint8_t* star_presence_ptr = star_presence_start;
-            COMBFIND::Send_Star_Player_Presence_(&star_presence_ptr, -1);
-            writer.Skip_(star_presence_ptr - star_presence_start);
+            COMBFIND::Send_Star_Player_Presence_(&writer, -1);
 
             writer.Write_Int16_(combat_defender_id);
             writer.Write_Int16_(combat_planet_id);
@@ -2177,10 +2129,7 @@ namespace NETMOX {
 
         if (MOX::_player[target_player_idx].network_player_id != _net.local_net_id) {
             writer.Require_(k_star_player_presence_payload_bytes);
-            uint8_t* star_presence_start = writer.Ptr_();
-            uint8_t* star_presence_ptr = star_presence_start;
-            COMBFIND::Send_Star_Player_Presence_(&star_presence_ptr, star_idx);
-            writer.Skip_(star_presence_ptr - star_presence_start);
+            COMBFIND::Send_Star_Player_Presence_(&writer, star_idx);
             RUSS::Mox_Update_();
 
             if (other_player_idx < MAX_PLAYERS) {
@@ -2262,10 +2211,7 @@ namespace NETMOX {
 
         if (MOX::_player[player_idx].network_player_id != _net.local_net_id) {
             writer.Require_(k_star_player_presence_payload_bytes);
-            uint8_t* star_presence_start = writer.Ptr_();
-            uint8_t* star_presence_ptr = star_presence_start;
-            COMBFIND::Send_Star_Player_Presence_(&star_presence_ptr, star_idx);
-            writer.Skip_(star_presence_ptr - star_presence_start);
+            COMBFIND::Send_Star_Player_Presence_(&writer, star_idx);
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {

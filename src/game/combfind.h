@@ -125,7 +125,7 @@ namespace COMBFIND {
 
     void __cdecl Copy_Target_Info_(s_combfind_target* src);
 
-    void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx);
+    void __cdecl Decode_Star_Player_Presence_(NETPROTO::Packet_Reader_* reader, int16_t star_idx);
 
     int32_t __cdecl Do_Bombardment_(int8_t attacker_id, uint8_t colony_idx);
 
@@ -144,5 +144,5 @@ namespace COMBFIND {
     /** Advances multiplayer combat synchronization state. */
     void __cdecl Do_Net_Combat_Update_(bool unused);
 
-    void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx);
+    void __cdecl Send_Star_Player_Presence_(NETPROTO::Packet_Writer_* writer, int16_t star_idx);
 }

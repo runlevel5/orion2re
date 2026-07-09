@@ -1,10 +1,10 @@
 #pragma once
 
 namespace SCIENCE {
-    extern const char _spy_anim_fmt[14];
-    extern const char _trooper_anim_fmt[14];
-    extern const char _spy_anim_find_pat[13];
-    extern const char _trooper_anim_find_pat[13];
+    extern const char* _spy_anim_fmt;
+    extern const char* _trooper_anim_fmt;
+    extern const char* _spy_anim_find_pat;
+    extern const char* _trooper_anim_find_pat;
 
     extern s_colors _science_high_color;
 

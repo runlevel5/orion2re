@@ -1370,7 +1370,7 @@ int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
     return 0;
 }
 
-void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
+void __cdecl Decode_Star_Player_Presence_(NETPROTO::Packet_Reader_* reader, int16_t star_idx) {
     s_combfind_star_has_player *dest;
 
     if (star_idx == -1) {
@@ -1379,16 +1379,13 @@ void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
         dest = (*_star_has_player)[star_idx];
     }
 
-    memcpy(dest, *buffer, MAX_PLAYERS * sizeof(*dest));
-    *buffer += MAX_PLAYERS * sizeof(*dest);
+    reader->Read_Bytes_(dest, MAX_PLAYERS * sizeof(*dest));
 
     if (star_idx == -1) {
-        *_current_star_has_nonplayer = **buffer;
+        *_current_star_has_nonplayer = reader->Read_Uint8_();
     } else {
-        (*_star_has_nonplayer)[star_idx] = **buffer;
+        (*_star_has_nonplayer)[star_idx] = reader->Read_Uint8_();
     }
-
-    *buffer += 1;
 }
 
 void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count) {
@@ -2667,7 +2664,7 @@ void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx) {
     );
 }
 
-void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx) {
+void __cdecl Send_Star_Player_Presence_(NETPROTO::Packet_Writer_* writer, int16_t star_idx) {
     s_combfind_star_has_player *src;
     if (star_idx == -1) {
         src = _current_star_has_player;
@@ -2675,16 +2672,13 @@ void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx) {
         src = (*_star_has_player)[star_idx];
     }
 
-    memcpy(*stream, src, MAX_PLAYERS * sizeof(*src));
-    uint8_t *ptr = *stream + MAX_PLAYERS * sizeof(*src);
-    *stream = ptr;
+    writer->Write_Bytes_(src, MAX_PLAYERS * sizeof(*src));
 
     if (star_idx != -1) {
-        *ptr = (*_star_has_nonplayer)[star_idx];
+        writer->Write_Uint8_((*_star_has_nonplayer)[star_idx]);
     } else {
-        *ptr = *_current_star_has_nonplayer;
+        writer->Write_Uint8_(*_current_star_has_nonplayer);
     }
-    *stream = ptr + 1;
 }
 
 void __cdecl GNN_Reports_Combat_(int player1_idx, int player2_idx) {

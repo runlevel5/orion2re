@@ -66,6 +66,7 @@
 #include "sys.h"
 #include "multplay.h"
 #include "netmox.h"
+#include "netproto.h"
 #include "netstrat.h"
 #include "netadapter.h"
 #include "netcode.h"

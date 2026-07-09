@@ -84,7 +84,27 @@ endif()
 orion2re_add_unit_test(test_netmox_packet_limits
     SOURCES
         tests/unit/test_netmox_packet_limits.cpp
+    PRODUCTION_SOURCES
+        src/game/netmox.cpp
+        src/game/netproto.cpp
+        src/game/random.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_allocate.cpp
+        tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_fields_helpers_runtime.cpp
+        tests/fakes/fake_netturn_runtime.cpp
+        tests/fakes/fake_video.cpp
 )
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_netmox_packet_limits PRIVATE -ffunction-sections -fdata-sections)
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU" AND NOT APPLE)
+    target_link_options(test_netmox_packet_limits PRIVATE -Wl,--gc-sections)
+elseif(APPLE)
+    target_link_options(test_netmox_packet_limits PRIVATE -Wl,-dead_strip)
+endif()
 
 orion2re_add_unit_test(test_video_scan_bounds
     SOURCES

@@ -20,6 +20,7 @@ ORION2RE_STATIC_SIZE_ASSERT_PTR(s_tech_building_data, 0x14, 0x18);
 ORION2RE_STATIC_SIZE_ASSERT(s_star_data, 0x71);
 ORION2RE_STATIC_SIZE_ASSERT_32_ONLY(s_ship_data, 0x81);
 ORION2RE_STATIC_SIZE_ASSERT(s_leader_data, 0x3b);
+ORION2RE_STATIC_SIZE_ASSERT(s_antaran, 0x42);
 ORION2RE_STATIC_SIZE_ASSERT(s_ship_icon, 12);
 ORION2RE_STATIC_SIZE_ASSERT(s_ship_node, 5);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_skill_data, 0x18, 0x20);
@@ -33,6 +34,10 @@ ORION2RE_STATIC_SIZE_ASSERT_PTR(s_tech_computer_data, 24, 32);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_tech_weapon_data, 28, 40);
 ORION2RE_STATIC_SIZE_ASSERT(s_font, 0x235c);
 ORION2RE_STATIC_SIZE_ASSERT(s_MSG, 0x12);
+ORION2RE_STATIC_SIZE_ASSERT(s_report, 0x13);
+static_assert(sizeof(REPORT::_reports) == 50 * sizeof(s_report), "REPORT::_reports size mismatch");
+static_assert(sizeof(EVENTS::_event_data) == 36 * sizeof(s_event_data), "EVENTS::_event_data size mismatch");
+static_assert(sizeof(MSG_::_msgs) == 100 * sizeof(s_MSG), "MSG_::_msgs size mismatch");
 ORION2RE_STATIC_SIZE_ASSERT(s_palette_entry, 4);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_field, 0x35, 0x51);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_network, 0x20e, 0x216);
@@ -46,6 +51,8 @@ ORION2RE_STATIC_SIZE_ASSERT(AIDATA::s_ship_n_turns_to_intermediate_cache_entry, 
 ORION2RE_STATIC_SIZE_ASSERT(s_npcdiplo_tech, 5);
 ORION2RE_STATIC_SIZE_ASSERT(s_combat_weapon_slot, 11);
 ORION2RE_STATIC_SIZE_ASSERT(s_missile, 0x1A);
+ORION2RE_STATIC_SIZE_ASSERT(s_combfind_star_has_player, 0xb);
+ORION2RE_STATIC_SIZE_ASSERT(s_combfind_target, 0x2c);
 
 ORION2RE_STATIC_SIZE_ASSERT(s_player_ship_sizes, 0x38);
 ORION2RE_STATIC_SIZE_ASSERT(s_ai_refit_entry, 6);

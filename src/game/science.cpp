@@ -1,10 +1,10 @@
 #include "pch.h"
 
 namespace SCIENCE {
-    const char _spy_anim_fmt[14] = "SR_R%x_SP.LBX";
-    const char _trooper_anim_fmt[14] = "SR_R%x_TR.LBX";
-    const char _spy_anim_find_pat[13] = "SR_R?_SP.LBX";
-    const char _trooper_anim_find_pat[13] = "SR_R?_TR.LBX";
+    const char* _spy_anim_fmt = "SR_R%x_SP.LBX";
+    const char* _trooper_anim_fmt = "SR_R%x_TR.LBX";
+    const char* _spy_anim_find_pat = "SR_R?_SP.LBX";
+    const char* _trooper_anim_find_pat = "SR_R?_TR.LBX";
 
     s_colors _science_high_color = {{240, 246, 243, 244, 244, 245, 246, 247}};
     s_colors _science_normal_color = {{242, 245, 244, 244, 244, 244, 245, 246}};

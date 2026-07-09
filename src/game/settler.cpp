@@ -8,7 +8,7 @@ namespace settler {
         if (!Room_For_Another_(colony, race_idx, 0)) {
             is_full = true;
         } else {
-            if ((settler_data & 0x03000000) == 0) {
+            if (SETTLER_DATA::Get_Prof(settler_data) == POP::PROF_FARMER) {
                 int32_t farmer_count = 0;
                 uint32_t* target_pop = nullptr;
 
@@ -24,7 +24,7 @@ namespace settler {
 
                 if (farmer_count >= (uint8_t)colony->max_farms) {
                     if (race_idx < (int16_t)POP::RACE_ANDROID) {
-                        settler_data = (settler_data & 0xFEFFFFFF) | 0x02000000;
+                        SETTLER_DATA::Set_Prof(&settler_data, POP::PROF_SCIENTIST);
                     } else if (target_pop != nullptr) {
                         POP::Set_Prof(target_pop, POP::PROF_SCIENTIST);
                     }
@@ -68,10 +68,11 @@ namespace settler {
             if (player->settlers_freighted > 0) {
                 for (int32_t i = 0; i < (int32_t)player->settlers_freighted; ++i) {
                     s_settler_info& settler = player->settlers[i];
-                    uint8_t dest_planet = (uint8_t)((settler.val >> 8) & 0xffu);
+                    const uint32_t settler_data = settler.val;
+                    uint8_t dest_planet = (uint8_t)SETTLER_DATA::Get_Dest_Planet(settler_data);
 
                     if ((int32_t)MOX::_planet[dest_planet].colony_index == colony_idx) {
-                        if (COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)((settler.val >> 16) & 0x0fu)) <= pop_limit) {
+                        if (COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)SETTLER_DATA::Get_Race(settler_data)) <= pop_limit) {
                             matching_pop_count++;
                         }
                     }
@@ -104,12 +105,13 @@ namespace settler {
 
                     // Settler records are packed into one dword: bits 0-7 are source_colony and bits 20-23 are ETA.
                     // Each turn the original code wraps ETA modulo 16 and stamps source_colony to 0xFA.
-                    uint32_t eta = ((val >> 20) - 1u) & 0x0fu;
-                    val = (val & 0xff0fff00u) | (eta << 20) | 0xfau;
+                    uint32_t eta = (SETTLER_DATA::Get_Eta(val) - 1u) & 0x0fu;
+                    SETTLER_DATA::Set_Eta(&val, eta);
+                    SETTLER_DATA::Set_Source_Colony(&val, 0xfau);
                     curr_player->settlers[settler_idx].val = val;
 
-                    if ((val & 0xf00000) == 0) {
-                        uint8_t dest_planet = (val >> 8) & 0xff;
+                    if (SETTLER_DATA::Get_Eta(val) == 0) {
+                        uint8_t dest_planet = (uint8_t)SETTLER_DATA::Get_Dest_Planet(val);
                         has_arrivals = true;
                         arrivals_per_planet[dest_planet]++;
 
