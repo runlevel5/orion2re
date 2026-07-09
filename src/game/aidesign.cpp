@@ -259,7 +259,7 @@ namespace aidesign {
 
         if (MOX::_player[player_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
             target_shield_value = 1;
-            target_defense = TECHDATA::_drives[2].combat_speed_min[2] + 20;
+            target_defense = TECHDATA::_drives[DRIVE_FUSION_DRIVE].combat_speed_min[HULL_CRUISER] + 20;
         } else {
             target_shield_value = AIPOWER::Get_Best_Ship_Shield_Value_(first_living_player);
             int16_t best_drive = INITSHIP::Best_Warp_Drive_(first_living_player);

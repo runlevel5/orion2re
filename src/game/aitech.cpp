@@ -29,8 +29,8 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Rifle_(s_player* player) {
-        int32_t i = 5;
-        while (i > 0) {
+        int32_t i = RIFLE_PLASMA_RIFLE;
+        while (i > RIFLE_NO_RIFLE) {
             if (player->tech_applications[TECHDATA::_rifles[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 return i;
             }
@@ -40,8 +40,8 @@ namespace aitech {
     }
 
     int32_t __cdecl Player_Best_Personal_Shield_(s_player* player) {
-        int32_t index = 1;
-        s_tech_data_personal_shield* shield_data = &TECHDATA::_personal_shields[1];
+        int32_t index = PERSONAL_SHIELD_PERSONAL_SHIELD;
+        s_tech_data_personal_shield* shield_data = &TECHDATA::_personal_shields[PERSONAL_SHIELD_PERSONAL_SHIELD];
 
         do {
             if (player->tech_applications[shield_data->tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
@@ -87,18 +87,18 @@ namespace aitech {
 
     int32_t __cdecl Player_Best_Planetary_Shield_(s_player* player) {
         if (player->tech_applications[TECH_APP_PLANETARY_BARRIER_SHIELD] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            return 3;
+            return PLANETARY_BARRIER_SHIELD;
         }
 
         if (player->tech_applications[TECH_APP_PLANETARY_FLUX_SHIELD] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            return 2;
+            return PLANETARY_FLUX_SHIELD;
         }
 
         if (player->tech_applications[TECH_APP_PLANETARY_RADIATION_SHIELD] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            return 1;
+            return PLANETARY_RADIATION_SHIELD;
         }
 
-        return 0;
+        return PLANETARY_SHIELD_NONE;
     }
 
     int32_t __cdecl Player_Best_Drive_(s_player* player) {

@@ -13,10 +13,10 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
         bonuses->has_powered_armor = 1;
         bonuses->best_armor_tech_app_id = (uint8_t)TECHDATA::_armor[ARMOR_XENTRONIUM_ARMOR].tech_app_id;
         bonuses->troop_bonus = TECHDATA::_armor[ARMOR_XENTRONIUM_ARMOR].troops_bonus;
-        bonuses->rifle_tech_app_id = (uint8_t)TECHDATA::_rifles[5].tech_app_id;
-        bonuses->rifle_bonus = TECHDATA::_rifles[5].bonus;
-        bonuses->personal_shield_tech_app_id = (uint8_t)TECHDATA::_personal_shields[1].tech_app_id;
-        bonuses->personal_shield_bonus = TECHDATA::_personal_shields[1].bonus;
+        bonuses->rifle_tech_app_id = (uint8_t)TECHDATA::_rifles[RIFLE_PLASMA_RIFLE].tech_app_id;
+        bonuses->rifle_bonus = TECHDATA::_rifles[RIFLE_PLASMA_RIFLE].bonus;
+        bonuses->personal_shield_tech_app_id = (uint8_t)TECHDATA::_personal_shields[PERSONAL_SHIELD_PERSONAL_SHIELD].tech_app_id;
+        bonuses->personal_shield_bonus = TECHDATA::_personal_shields[PERSONAL_SHIELD_PERSONAL_SHIELD].bonus;
         bonuses->difficulty_bonus = (MOX::_settings.game_difficulty * 2) - 4;
         return;
     }
@@ -635,13 +635,13 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     colony->auto_building = 0;
 
     if (MOX::_player[new_owner_idx].traits[0] / 2 == 3) {
-        if (colony->buildings[20] != 0) {
-            ERICNET::Remove_Building_(colony_idx, 20);
-            MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[20].cost / 2;
+        if (colony->buildings[BUILDING_HOLO_SIMULATOR] != 0) {
+            ERICNET::Remove_Building_(colony_idx, BUILDING_HOLO_SIMULATOR);
+            MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[BUILDING_HOLO_SIMULATOR].cost / 2;
         }
-        if (colony->buildings[31 /* BUILDING_PLEASURE_DOME */] != 0) {
-            ERICNET::Remove_Building_(colony_idx, 31 /* BUILDING_PLEASURE_DOME */);
-            MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[31].cost / 2;
+        if (colony->buildings[BUILDING_PLEASURE_DOME] != 0) {
+            ERICNET::Remove_Building_(colony_idx, BUILDING_PLEASURE_DOME);
+            MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[BUILDING_PLEASURE_DOME].cost / 2;
         }
     }
 

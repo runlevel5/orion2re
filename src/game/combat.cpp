@@ -714,7 +714,7 @@ namespace COMBAT {
 
     void __cdecl Stellar_Converter_Attack_(int16_t target_idx) {
         for (int i = 0; i < 4; ++i) {
-            Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].max_damage);
+            Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[WEAPON_STELLAR_CONVERTER].max_damage);
         }
     }
 

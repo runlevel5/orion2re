@@ -966,18 +966,18 @@ namespace CMBTFIRE {
 
                             if (bomb_stats.buildings_destroyed[BUILDING_RADIATION_SHIELD] != 0) {
                                 MOX::_combat_data->shield_type = 0;
-                                MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[1].absorption;
-                                MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[1].absorption;
+                                MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[PLANETARY_RADIATION_SHIELD].absorption;
+                                MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[PLANETARY_RADIATION_SHIELD].absorption;
                             }
                             else if (bomb_stats.buildings_destroyed[BUILDING_BARRIER_SHIELD] != 0) {
                                 MOX::_combat_data->shield_type = 0;
-                                MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[3].absorption;
-                                MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[3].absorption;
+                                MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[PLANETARY_BARRIER_SHIELD].absorption;
+                                MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[PLANETARY_BARRIER_SHIELD].absorption;
                             }
                             else if (bomb_stats.buildings_destroyed[BUILDING_FLUX_SHIELD] != 0) {
                                 MOX::_combat_data->shield_type = 0;
-                                MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[2].absorption;
-                                MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[2].absorption;
+                                MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[PLANETARY_FLUX_SHIELD].absorption;
+                                MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[PLANETARY_FLUX_SHIELD].absorption;
                             }
                         }
                         MOX::_combat_data->structure_max += (int16_t)((int16_t)bomb_stats.total_hits_processed * -100);

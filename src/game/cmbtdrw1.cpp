@@ -20,17 +20,17 @@ namespace CMBTDRW1 {
             return;
         }
 
-        char str[4][4] = {0};
+        const char* labels[4];
         if (MOX::_settings.language == 4) {
-            strlcpy(str[0], "A", sizeof(str[0]));
-            strlcpy(str[1], "D", sizeof(str[1]));
-            strlcpy(str[2], "I", sizeof(str[2]));
-            strlcpy(str[3], "S", sizeof(str[3]));
+            labels[0] = "A";
+            labels[1] = "D";
+            labels[2] = "I";
+            labels[3] = "S";
         } else {
-            strlcpy(str[0], "F", sizeof(str[0]));
-            strlcpy(str[1], "R", sizeof(str[1]));
-            strlcpy(str[2], "B", sizeof(str[2]));
-            strlcpy(str[3], "L", sizeof(str[3]));
+            labels[0] = "F";
+            labels[1] = "R";
+            labels[2] = "B";
+            labels[3] = "L";
         }
 
         int16_t ship_center_and_size[7];
@@ -57,10 +57,10 @@ namespace CMBTDRW1 {
 
         int16_t sz = ship_center_and_size[MOX::_combat_data[MOX::_cur_ship].size_class + 1];
 
-        int idx0 = (facing / 4) % 4;
-        int idx1 = (idx0 + 1) % 4;
-        int idx2 = (idx0 + 2) % 4;
-        int idx3 = (idx0 + 3) % 4;
+        int16_t idx0 = (facing / 4) % 4;
+        int16_t idx1 = (idx0 + 1) % 4;
+        int16_t idx2 = (idx0 + 2) % 4;
+        int16_t idx3 = (idx0 + 3) % 4;
 
         switch (facing) {
             case 0:
@@ -135,18 +135,18 @@ namespace CMBTDRW1 {
 
         fonts::Set_Font_Style_(0, &MOX::_combat_green);
 
-        for (int i = 0; i < 4; i++) {
+        for (int16_t i = 0; i < 4; ++i) {
             dx[i] -= 2;
             dy[i] -= 3;
 
-            int x1 = cx - MOX::_cur_combat_x * 20;
-            int y1 = cy - MOX::_cur_combat_y * 20;
-            int x2_coord = x2[i] - MOX::_cur_combat_x * 20 + cx;
-            int y2_coord = y2[i] - MOX::_cur_combat_y * 20 + cy;
+            int16_t x1 = cx - MOX::_cur_combat_x * 20;
+            int16_t y1 = cy - MOX::_cur_combat_y * 20;
+            int16_t x2_coord = x2[i] - MOX::_cur_combat_x * 20 + cx;
+            int16_t y2_coord = y2[i] - MOX::_cur_combat_y * 20 + cy;
 
             line::Line_(x1, y1, x2_coord, y2_coord, 0x54);
 
-            fonts::Print_(x1 + dx[i], y1 + dy[i], str[i]);
+            fonts::Print_(x1 + dx[i], y1 + dy[i], labels[i]);
         }
     }
 
@@ -2846,11 +2846,11 @@ skip_cursor:
                     if ((specials & 4) == 0) {
                         weapon_label[0] = '\0';
                     } else {
-                        strlcpy(weapon_label, TECHDATA::_weapon_modifications[2].name_plural, sizeof(weapon_label));
+                        strlcpy(weapon_label, TECHDATA::_weapon_modifications[WEAPON_MOD_POINT_DEFENSE].name_plural, sizeof(weapon_label));
                         strlcat(weapon_label, " ", sizeof(weapon_label));
                     }
                 } else {
-                    strlcpy(weapon_label, TECHDATA::_weapon_modifications[1].name_plural, sizeof(weapon_label));
+                    strlcpy(weapon_label, TECHDATA::_weapon_modifications[WEAPON_MOD_HEAVY_MOUNT].name_plural, sizeof(weapon_label));
                     strlcat(weapon_label, " ", sizeof(weapon_label));
                 }
 

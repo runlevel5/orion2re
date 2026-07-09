@@ -108,7 +108,7 @@ namespace INITSHIP {
         }
 
         int16_t best_fuel_idx = 0;
-        int16_t best_range = TECHDATA::_fuel[0].ship_range;
+        int16_t best_range = TECHDATA::_fuel[FUEL_NO_FUEL_CELLS].ship_range;
 
         for (int16_t i = 0; i < FUEL_COUNT; ++i) {
             // Check if player has researched this fuel technology (application value 3)
@@ -1033,7 +1033,7 @@ namespace INITSHIP {
                 {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, weapon.tech_app_id);
 
-                    if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[2].level) {
+                    if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[WEAPON_MOD_POINT_DEFENSE].level) {
                         int16_t current_dmg = Point_Defense_Damage_Per_Space_(i, player_idx);
 
                         if (current_dmg >= best_dmg_per_space) {
@@ -1306,7 +1306,7 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
                     
                     // Check if miniaturization level meets requirements for point defense mod
                     // modification index 2 corresponds to Point Defense modification.
-                    if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[2].level) {
+                    if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[WEAPON_MOD_POINT_DEFENSE].level) {
                         if (TECHDATA::_weapons[i].max_damage > max_damage) {
                             max_damage = TECHDATA::_weapons[i].max_damage;
                             best_weapon_idx = i;

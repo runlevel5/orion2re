@@ -1514,13 +1514,13 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     int16_t max_hits = 0;
     if (MOX::_colony[colony_idx].buildings[BUILDING_RADIATION_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x1c;
-        max_hits = TECHDATA::_planetary_shields[1].absorption;
+        max_hits = TECHDATA::_planetary_shields[PLANETARY_RADIATION_SHIELD].absorption;
     } else if (MOX::_colony[colony_idx].buildings[BUILDING_BARRIER_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x17;
-        max_hits = TECHDATA::_planetary_shields[3].absorption;
+        max_hits = TECHDATA::_planetary_shields[PLANETARY_BARRIER_SHIELD].absorption;
     } else if (MOX::_colony[colony_idx].buildings[BUILDING_FLUX_SHIELD] != 0) {
         MOX::_combat_data->shield_type = 0x18;
-        max_hits = TECHDATA::_planetary_shields[2].absorption;
+        max_hits = TECHDATA::_planetary_shields[PLANETARY_FLUX_SHIELD].absorption;
     } else {
         MOX::_combat_data->shield_type = SHIELD_NO_SHIELD;
         max_hits = 0;
@@ -1556,16 +1556,16 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         int16_t mini_level_1 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_1].tech_app_id);
         int16_t specials_1 = 2;
 
-        if (TECHDATA::_weapon_modifications[3].level <= mini_level_1) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_ARMOR_PIERCING].level <= mini_level_1) {
             specials_1 = 0xa;
         }
-        if (TECHDATA::_weapon_modifications[4].level <= mini_level_1) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_CONTINUOUS].level <= mini_level_1) {
             specials_1 |= 0x10;
         }
-        if (TECHDATA::_weapon_modifications[6].level <= mini_level_1) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_SHIELD_PIERCING].level <= mini_level_1) {
             specials_1 |= 0x40;
         }
-        if (TECHDATA::_weapon_modifications[5].level <= mini_level_1) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_NO_RANGE_DISSIPATION].level <= mini_level_1) {
             specials_1 |= 0x20;
         }
         specials_1 &= TECHDATA::_weapons[weapon_id_1].available_mods;
@@ -1586,10 +1586,10 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         int16_t mini_level_2 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_2].tech_app_id);
         int16_t specials_2 = 4;
 
-        if (TECHDATA::_weapon_modifications[4].level <= mini_level_2) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_CONTINUOUS].level <= mini_level_2) {
             specials_2 = 0x14;
         }
-        if (TECHDATA::_weapon_modifications[6].level <= mini_level_2) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_SHIELD_PIERCING].level <= mini_level_2) {
             specials_2 |= 0x40;
         }
         specials_2 &= TECHDATA::_weapons[weapon_id_2].available_mods;
@@ -1649,10 +1649,10 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         int16_t mini_level_m = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_m].tech_app_id);
         int16_t specials_m = 0;
 
-        if (TECHDATA::_weapon_modifications[12].level <= mini_level_m) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_FAST].level <= mini_level_m) {
             specials_m = 0x1000;
         }
-        if (TECHDATA::_weapon_modifications[11].level <= mini_level_m) {
+        if (TECHDATA::_weapon_modifications[WEAPON_MOD_HEAVILY_ARMORED].level <= mini_level_m) {
             specials_m |= 0x800;
         }
 
@@ -1926,10 +1926,10 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     int16_t missile_id = INITSHIP::Best_Missile_Weapon_NT_(defender);
     int16_t miniaturization = DESIGN::Miniaturization_Level_(defender, TECHDATA::_weapons[missile_id].tech_app_id);
     uint16_t missile_specials = 0;
-    if (TECHDATA::_weapon_modifications[12].level <= miniaturization) {
+    if (TECHDATA::_weapon_modifications[WEAPON_MOD_FAST].level <= miniaturization) {
         missile_specials = 0x1000;
     }
-    if (TECHDATA::_weapon_modifications[11].level <= miniaturization) {
+    if (TECHDATA::_weapon_modifications[WEAPON_MOD_HEAVILY_ARMORED].level <= miniaturization) {
         missile_specials |= 0x800;
     }
     missile_specials |= 0x400;

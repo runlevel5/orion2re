@@ -598,17 +598,17 @@ namespace CMBTFIR2 {
             int8_t size = ship->size_class;
             if (ship->ftl_type == 0) {
                 if (size == 2) {
-                    armor_hits = TECHDATA::_hull_data[6].armor_hp + 
+                    armor_hits = TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp + 
                                  (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[6].armor_hp / 100);
+                                           TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp / 100);
                 } else if (size == 3) {
-                    armor_hits = TECHDATA::_hull_data[7].armor_hp + 
+                    armor_hits = TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp + 
                                  (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[6].armor_hp / 100);
+                                           TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp / 100);
                 } else if (size == 4) {
-                    armor_hits = TECHDATA::_hull_data[8].armor_hp + 
+                    armor_hits = TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp + 
                                  (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[6].armor_hp / 100);
+                                           TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp / 100);
                 }
             } else {
                 armor_hits = TECHDATA::_hull_data[size].armor_hp + 
