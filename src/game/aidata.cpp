@@ -989,7 +989,7 @@ namespace AIDATA {
 
         int16_t ship_range = owner_ptr->ship_range;
         int16_t colony_star_idx = MOX::_planet[colony->planet].star_index;
-        int evaluating_player_idx = (evaluating_player - MOX::_player);
+        int16_t evaluating_player_idx = (int16_t)(evaluating_player - MOX::_player);
 
         int16_t total_worth = 0;
 

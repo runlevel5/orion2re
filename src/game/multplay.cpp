@@ -42,7 +42,6 @@ namespace MULTPLAY {
     const char s_S_005569cc[2] = "S";
 
     void __cdecl Draw_Online_Setup_Screen_(void) {
-        char buffer[128];
         s_colors local_colors;
         int16_t x = MOX::_mp_screen->screen_x;
         int16_t y = MOX::_mp_screen->screen_y;
