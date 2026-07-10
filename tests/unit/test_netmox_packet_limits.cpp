@@ -6,7 +6,19 @@
 #include <cstring>
 #include <vector>
 
+namespace netcode {
+    extern void (*g_net_update_hook)();
+}
+
 namespace {
+    int g_net_update_hook_invocations = 0;
+
+    void Snapshot_Encode_Mutation_Hook_() {
+        ++g_net_update_hook_invocations;
+        MOX::_player[1].bc += 999;
+        netcode::g_net_update_hook = nullptr;
+    }
+
     constexpr uint32_t Broadcast_Game_Data_Snapshot_Max_Bytes_() {
         return
             sizeof(NETMOX::_net.host_election_id) +
@@ -505,6 +517,173 @@ DOCTEST_TEST_CASE("broadcast snapshot encode and decode round trip serialized ga
     DOCTEST_CHECK(std::memcmp(&MOX::_antarans, &expected_antarans, sizeof(expected_antarans)) == 0);
     DOCTEST_CHECK(std::memcmp(MOX::_nebula, expected_nebulas.data(), MAX_NEBULAS * sizeof(s_nebula)) == 0);
     DOCTEST_CHECK(std::memcmp(MOX::_bill_savegame, expected_bill.data(), sizeof(MOX::_bill_savegame)) == 0);
+
+    std::vector<uint8_t> payload_roundtrip(Broadcast_Game_Data_Snapshot_Max_Bytes_());
+    const uint32_t payload_roundtrip_len = NETMOX::Encode_Broadcast_Game_Data_Snapshot_(payload_roundtrip.data(), (uint32_t)payload_roundtrip.size());
+    DOCTEST_CHECK(payload_roundtrip_len == payload_len);
+    DOCTEST_CHECK(std::memcmp(payload_roundtrip.data(), payload.data(), payload_len) == 0);
+}
+
+DOCTEST_TEST_CASE("broadcast differential decode round trips against cached prior snapshot") {
+    Scoped_Netmox_Roundtrip_State_ scope;
+    Fill_Netmox_Roundtrip_State_();
+
+    std::vector<uint8_t> base_payload(Broadcast_Game_Data_Snapshot_Max_Bytes_());
+    const uint32_t base_payload_len = NETMOX::Encode_Broadcast_Game_Data_Snapshot_(base_payload.data(), (uint32_t)base_payload.size());
+
+    s_net_snapshot_cache* cache = NETMOX::Open_Net_Snapshot_Cache_(base_payload_len);
+    NETMOX::Write_Net_Snapshot_Cache_(cache, base_payload.data(), base_payload_len);
+
+    MOX::_stardate += 19;
+    MOX::_settings.galaxy_age = 3;
+    MOX::_player[1].bc += 321;
+    MOX::_player[1].tech_applications[3] ^= 0x5a;
+    MOX::_star[2].owner = 2;
+    MOX::_star[2].surrender_to[1] = 7;
+    MOX::_planet[3].planet_type = 9;
+    MOX::_colony[1].morale = 88;
+    MOX::_ship[3].turns_left = 12;
+    MOX::_leaders[4].eta = 21;
+    REPORT::_n_reports = 2;
+    REPORT::_reports[0].type = 9;
+    EVENTS::_event_data[5].status = 6;
+    MSG_::_first_msg[1] = 44;
+    MSG_::_msgs[7].priority = 4;
+    diplodef::_COUNCIL_FLAG = 0;
+    diplodef::_next_council_meeting_turn = 99;
+    MOX::_antarans.attack_pressure = 8;
+    MOX::_nebula[0].x = 44;
+    EVENTS::_last_event_year = 654321u;
+    EVENTS::_event_delay_count = 4;
+    MOX::_bill_savegame[1] = 777;
+
+    const s_network expected_net = NETMOX::_net;
+    const uint32_t expected_stardate = MOX::_stardate;
+    const s_settings expected_settings = MOX::_settings;
+    const uint32_t expected_random_seed = game_random::Get_Random_Seed_();
+    const int16_t expected_num_players = MOX::_NUM_PLAYERS;
+    const int16_t expected_num_stars = MOX::_NUM_STARS;
+    const int16_t expected_planet_count = MOX::_planet_count;
+    const int16_t expected_num_colonies = MOX::_NUM_COLONIES;
+    const int16_t expected_num_ships = MOX::_NUM_SHIPS;
+    const uint8_t expected_num_nebulas = MOX::_NUM_NEBULAS;
+    const int16_t expected_report_count = REPORT::_n_reports;
+    std::vector<s_player> expected_players(MOX::_player, MOX::_player + MAX_PLAYERS);
+    std::vector<s_star_data> expected_stars(MOX::_star, MOX::_star + MAX_STARS + 1);
+    std::vector<s_planet_data> expected_planets(MOX::_planet, MOX::_planet + MAX_PLANETS);
+    std::vector<s_colony> expected_colonies(MOX::_colony, MOX::_colony + MAX_COLONIES);
+    std::vector<s_ship_data> expected_ships(MOX::_ship, MOX::_ship + MAX_SHIPS);
+    std::vector<s_leader_data> expected_leaders(MOX::_leaders, MOX::_leaders + MAX_LEADERS);
+    std::array<s_report, 50> expected_reports = {};
+    std::array<s_event_data, 36> expected_events = {};
+    std::array<uint8_t, MAX_PLAYERS> expected_first_msg = {};
+    std::array<uint8_t, MAX_PLAYERS> expected_max_msgs = {};
+    std::array<uint8_t, MAX_PLAYERS> expected_n_msgs = {};
+    std::array<s_MSG, 100> expected_msgs = {};
+    std::array<int16_t, 6> expected_bill = {};
+    std::vector<s_nebula> expected_nebulas(MOX::_nebula, MOX::_nebula + MAX_NEBULAS);
+    const s_antaran expected_antarans = MOX::_antarans;
+
+    std::memcpy(expected_reports.data(), REPORT::_reports, sizeof(REPORT::_reports));
+    std::memcpy(expected_events.data(), EVENTS::_event_data, sizeof(EVENTS::_event_data));
+    std::memcpy(expected_first_msg.data(), MSG_::_first_msg, sizeof(MSG_::_first_msg));
+    std::memcpy(expected_max_msgs.data(), MSG_::_max_msgs, sizeof(MSG_::_max_msgs));
+    std::memcpy(expected_n_msgs.data(), MSG_::_n_msgs, sizeof(MSG_::_n_msgs));
+    std::memcpy(expected_msgs.data(), MSG_::_msgs, sizeof(MSG_::_msgs));
+    std::memcpy(expected_bill.data(), MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
+
+    std::vector<uint8_t> next_payload(Broadcast_Game_Data_Snapshot_Max_Bytes_());
+    const uint32_t next_payload_len = NETMOX::Encode_Broadcast_Game_Data_Snapshot_(next_payload.data(), (uint32_t)next_payload.size());
+
+    std::vector<uint8_t> diff_payload(NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES - next_payload_len);
+    const int32_t diff_payload_len = NETMOX::Make_Difference_Buffer_(
+        cache,
+        next_payload.data(),
+        (int32_t)next_payload_len,
+        diff_payload.data(),
+        (int32_t)diff_payload.size());
+
+    std::memset(&NETMOX::_net, 0, sizeof(NETMOX::_net));
+    MOX::_stardate = 0;
+    std::memset(&MOX::_settings, 0, sizeof(MOX::_settings));
+    MOX::_NUM_PLAYERS = 0;
+    MOX::_NUM_STARS = 0;
+    MOX::_planet_count = 0;
+    MOX::_NUM_COLONIES = 0;
+    MOX::_NUM_SHIPS = 0;
+    MOX::_NUM_NEBULAS = 0;
+    REPORT::_n_reports = 0;
+    std::memset(MOX::_player, 0, MAX_PLAYERS * sizeof(s_player));
+    std::memset(MOX::_star, 0, (MAX_STARS + 1) * sizeof(s_star_data));
+    std::memset(MOX::_planet, 0, MAX_PLANETS * sizeof(s_planet_data));
+    std::memset(MOX::_colony, 0, MAX_COLONIES * sizeof(s_colony));
+    std::memset(MOX::_ship, 0, MAX_SHIPS * sizeof(s_ship_data));
+    std::memset(MOX::_leaders, 0, MAX_LEADERS * sizeof(s_leader_data));
+    std::memset(REPORT::_reports, 0, sizeof(REPORT::_reports));
+    std::memset(EVENTS::_event_data, 0, sizeof(EVENTS::_event_data));
+    std::memset(MSG_::_first_msg, 0, sizeof(MSG_::_first_msg));
+    std::memset(MSG_::_max_msgs, 0, sizeof(MSG_::_max_msgs));
+    std::memset(MSG_::_n_msgs, 0, sizeof(MSG_::_n_msgs));
+    std::memset(MSG_::_msgs, 0, sizeof(MSG_::_msgs));
+    std::memset(&MOX::_antarans, 0, sizeof(MOX::_antarans));
+    std::memset(MOX::_nebula, 0, MAX_NEBULAS * sizeof(s_nebula));
+    std::memset(MOX::_bill_savegame, 0, sizeof(MOX::_bill_savegame));
+    game_random::Set_Random_Seed_(0);
+
+    DOCTEST_REQUIRE(NETMOX::Decode_Broadcast_Game_Data_Differential_(diff_payload.data(), (size_t)diff_payload_len, 0) == 1);
+
+    DOCTEST_CHECK(NETMOX::_net.host_election_id == expected_net.host_election_id);
+    DOCTEST_CHECK(MOX::_stardate == expected_stardate);
+    DOCTEST_CHECK(std::memcmp(&MOX::_settings, &expected_settings, sizeof(expected_settings)) == 0);
+    DOCTEST_CHECK(game_random::Get_Random_Seed_() == expected_random_seed);
+    DOCTEST_CHECK(MOX::_NUM_PLAYERS == expected_num_players);
+    DOCTEST_CHECK(MOX::_NUM_STARS == expected_num_stars);
+    DOCTEST_CHECK(MOX::_planet_count == expected_planet_count);
+    DOCTEST_CHECK(MOX::_NUM_COLONIES == expected_num_colonies);
+    DOCTEST_CHECK(MOX::_NUM_SHIPS == expected_num_ships);
+    DOCTEST_CHECK(MOX::_NUM_NEBULAS == expected_num_nebulas);
+    DOCTEST_CHECK(REPORT::_n_reports == expected_report_count);
+    DOCTEST_CHECK(std::memcmp(MOX::_player, expected_players.data(), MAX_PLAYERS * sizeof(s_player)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_star, expected_stars.data(), (MAX_STARS + 1) * sizeof(s_star_data)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_planet, expected_planets.data(), MAX_PLANETS * sizeof(s_planet_data)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_colony, expected_colonies.data(), MAX_COLONIES * sizeof(s_colony)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_ship, expected_ships.data(), MAX_SHIPS * sizeof(s_ship_data)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_leaders, expected_leaders.data(), MAX_LEADERS * sizeof(s_leader_data)) == 0);
+    DOCTEST_CHECK(std::memcmp(REPORT::_reports, expected_reports.data(), sizeof(REPORT::_reports)) == 0);
+    DOCTEST_CHECK(std::memcmp(EVENTS::_event_data, expected_events.data(), sizeof(EVENTS::_event_data)) == 0);
+    DOCTEST_CHECK(std::memcmp(MSG_::_first_msg, expected_first_msg.data(), sizeof(MSG_::_first_msg)) == 0);
+    DOCTEST_CHECK(std::memcmp(MSG_::_max_msgs, expected_max_msgs.data(), sizeof(MSG_::_max_msgs)) == 0);
+    DOCTEST_CHECK(std::memcmp(MSG_::_n_msgs, expected_n_msgs.data(), sizeof(MSG_::_n_msgs)) == 0);
+    DOCTEST_CHECK(std::memcmp(MSG_::_msgs, expected_msgs.data(), sizeof(MSG_::_msgs)) == 0);
+    DOCTEST_CHECK(std::memcmp(&MOX::_antarans, &expected_antarans, sizeof(expected_antarans)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_nebula, expected_nebulas.data(), MAX_NEBULAS * sizeof(s_nebula)) == 0);
+    DOCTEST_CHECK(std::memcmp(MOX::_bill_savegame, expected_bill.data(), sizeof(MOX::_bill_savegame)) == 0);
+
+    std::vector<uint8_t> payload_roundtrip(Broadcast_Game_Data_Snapshot_Max_Bytes_());
+    const uint32_t payload_roundtrip_len = NETMOX::Encode_Broadcast_Game_Data_Snapshot_(payload_roundtrip.data(), (uint32_t)payload_roundtrip.size());
+    DOCTEST_CHECK(payload_roundtrip_len == next_payload_len);
+    DOCTEST_CHECK(std::memcmp(payload_roundtrip.data(), next_payload.data(), next_payload_len) == 0);
+}
+
+DOCTEST_TEST_CASE("broadcast snapshot encode suppresses live network updates while serializing") {
+    Scoped_Netmox_Roundtrip_State_ scope;
+    Fill_Netmox_Roundtrip_State_();
+
+    MOX::_game_type = 3;
+    NETMOX::_net.is_network_active = 1;
+    NETMOX::_net.sync_state = NET_SYNC_STATE_READY;
+    g_net_update_hook_invocations = 0;
+    netcode::g_net_update_hook = &Snapshot_Encode_Mutation_Hook_;
+
+    std::vector<uint8_t> payload(Broadcast_Game_Data_Snapshot_Max_Bytes_());
+    const int32_t expected_bc = MOX::_player[1].bc;
+    const uint32_t payload_len = NETMOX::Encode_Broadcast_Game_Data_Snapshot_(payload.data(), (uint32_t)payload.size());
+
+    DOCTEST_CHECK(payload_len > 0);
+    DOCTEST_CHECK(g_net_update_hook_invocations == 0);
+    DOCTEST_CHECK(MOX::_player[1].bc == expected_bc);
+
+    netcode::g_net_update_hook = nullptr;
 }
 
 }

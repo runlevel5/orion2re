@@ -3648,6 +3648,12 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_GAME_DATA_PAYLOAD: {
+            NETMOX::Net_Debug_Log_(
+                "Main_Receive_Message_: GAME_DATA_PAYLOAD from_player=%u sender_net_id=%d bytes=%u sync=%u",
+                (unsigned int)from_player_id,
+                (int)sender_net_id_or_host_id,
+                (unsigned int)payload_len,
+                (unsigned int)NETMOX::_net.sync_state);
             allocate::Push_Block_(MOX::_screen_seg);
             if (payload_len > k_max_game_data_payload_bytes) {
                 exitm::Exit_With_Message("game data payload too large");
@@ -3660,6 +3666,11 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_GAME_ORDERS_PAYLOAD: {
+            NETMOX::Net_Debug_Log_(
+                "Main_Receive_Message_: GAME_ORDERS_PAYLOAD from_player=%u bytes=%u host_sync_counter_before=%d",
+                (unsigned int)from_player_id,
+                (unsigned int)payload_len,
+                (int)NETMOX::_net.host_sync_counter);
             if (payload == nullptr || payload_len == 0 || payload_len > k_max_game_data_payload_bytes) {
                 exitm::Exit_With_Message("game orders payload invalid");
             }
@@ -3675,6 +3686,10 @@ namespace MAINSCR {
             else {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_WAITING_FOR_ORDERS;
             }
+            NETMOX::Net_Debug_Log_(
+                "Main_Receive_Message_: GAME_ORDERS_PAYLOAD complete host_sync_counter_after=%d next_sync=%u",
+                (int)NETMOX::_net.host_sync_counter,
+                (unsigned int)NETMOX::_net.sync_state);
             break;
         }
         case NET_PACKET_HOST_ELECTION_RANK: {
@@ -3760,10 +3775,17 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_TURN_END_REQUEST: {
+            NETMOX::Net_Debug_Log_(
+                "Main_Receive_Message_: TURN_END_REQUEST from_player=%u",
+                (unsigned int)from_player_id);
             NETMOX::_net.player_is_active_flags[from_player_id] = 1;
             break;
         }
         case NET_PACKET_SEND_GAME_ORDERS_REQUEST: {
+            NETMOX::Net_Debug_Log_(
+                "Main_Receive_Message_: SEND_GAME_ORDERS_REQUEST local_player=%d sync_before=%u",
+                (int)MOX::_PLAYER_NUM,
+                (unsigned int)NETMOX::_net.sync_state);
             NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_GAME_ORDERS;
             break;
         }
@@ -3835,6 +3857,9 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_COMBAT_PHASE_COMPLETE: {
+            NETMOX::Net_Debug_Log_(
+                "Main_Receive_Message_: COMBAT_PHASE_COMPLETE local_player=%d",
+                (int)MOX::_PLAYER_NUM);
             NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
             break;
         }

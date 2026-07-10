@@ -5,6 +5,30 @@
 #include "game/netmox.h"
 #include "game/netturn.h"
 
+namespace MULTPLAY {
+    extern void (*g_chat_box_input_loop_hook)();
+}
+
+namespace {
+    void Client_Next_Turn_Payload_Arrives_Before_Final_Wait_() {
+        static int callback_count = 0;
+        ++callback_count;
+
+        if (callback_count == 1) {
+            NETMOX::_net.sync_state = NET_SYNC_STATE_RECEIVING_GAME_ORDERS;
+            return;
+        }
+
+        if (callback_count == 2) {
+            static uint8_t payload = 0x5A;
+            NETMOX::_net.network_data_ptr = &payload;
+            NETMOX::_net.total_bytes_received = 1;
+            NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
+            MULTPLAY::g_chat_box_input_loop_hook = nullptr;
+        }
+    }
+}
+
 DOCTEST_TEST_SUITE("netturn host selection") {
 
 DOCTEST_TEST_CASE("selects the lowest active player slot") {
@@ -72,6 +96,33 @@ DOCTEST_TEST_CASE("returns no host when no active player has a valid network id"
 
 DOCTEST_TEST_CASE("returns no host for empty input") {
     DOCTEST_CHECK(NETTURN::Determine_Lowest_Active_Host_Player_(static_cast<const s_player*>(nullptr), 0) == -1);
+}
+
+DOCTEST_TEST_CASE("client next turn preserves a payload that arrives before the final wait loop") {
+    s_player players[2]{};
+    players[0].network_player_id = 176;
+    players[0].objectives = PLAYER_OBJECTIVE_HUMAN;
+    players[1].network_player_id = 174;
+    players[1].objectives = PLAYER_OBJECTIVE_HUMAN;
+
+    MOX::_player = players;
+    MOX::_PLAYER_NUM = 1;
+    MOX::_NUM_PLAYERS = 2;
+    MOX::_NUM_STARS = 0;
+    MOX::_game_type = 3;
+    MOX::_stardate = 35155;
+
+    NETMOX::_net = {};
+    NETMOX::_net.local_net_id = 174;
+    NETMOX::_net.net_host_id = 176;
+    NETMOX::_net.sync_state = NET_SYNC_STATE_NEXT_TURN_READY;
+    NETMOX::_net.num_connected_players = 2;
+
+    MULTPLAY::g_chat_box_input_loop_hook = &Client_Next_Turn_Payload_Arrives_Before_Final_Wait_;
+    NETTURN::Client_Next_Turn_();
+
+    DOCTEST_CHECK(MULTPLAY::g_chat_box_input_loop_hook == nullptr);
+    DOCTEST_CHECK(NETMOX::_net.total_bytes_received == 1);
 }
 
 }

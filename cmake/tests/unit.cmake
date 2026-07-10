@@ -69,6 +69,7 @@ orion2re_add_unit_test(test_netturn_host_selection
         tests/fakes/fake_fields_helpers_runtime.cpp
         tests/fakes/fake_netturn_runtime.cpp
         tests/fakes/fake_video.cpp
+    LINK_SDL
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
@@ -94,6 +95,7 @@ orion2re_add_unit_test(test_netmox_packet_limits
         tests/fakes/fake_fields_helpers_runtime.cpp
         tests/fakes/fake_netturn_runtime.cpp
         tests/fakes/fake_video.cpp
+    LINK_SDL
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")

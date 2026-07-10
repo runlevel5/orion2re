@@ -30,6 +30,20 @@ namespace NETMOX {
     uint8_t _next_update_player_counter;
 
     namespace {
+        uint32_t _suspended_net_update_depth;
+        int8_t _net_debug_initialized;
+        int8_t _net_debug_enabled;
+
+        struct Scoped_Net_Update_Suspension_ {
+            Scoped_Net_Update_Suspension_() {
+                ++_suspended_net_update_depth;
+            }
+
+            ~Scoped_Net_Update_Suspension_() {
+                --_suspended_net_update_depth;
+            }
+        };
+
 #pragma pack(push, 1)
         struct s_net_pack_player_disconnected_info_ {
             int16_t player_idx;
@@ -508,9 +522,33 @@ namespace NETMOX {
         sound::Sound_Update_();
 
         // Prevent recursive updates if currently processing messages
-        if (NETMOX::_in_receive_message == 0) {
+        if (NETMOX::_in_receive_message == 0 && _suspended_net_update_depth == 0) {
             netcode::Net_Update_();
         }
+    }
+
+    bool __cdecl Net_Debug_Enabled_() {
+        if (_net_debug_initialized == 0) {
+            const char* value = SDL_getenv("ORION2RE_NET_DEBUG");
+            _net_debug_enabled = (value != nullptr && value[0] != '\0' && value[0] != '0');
+            _net_debug_initialized = 1;
+        }
+
+        return _net_debug_enabled != 0;
+    }
+
+    void __cdecl Net_Debug_Log_(const char* format, ...) {
+        if (!Net_Debug_Enabled_()) {
+            return;
+        }
+
+        char buffer[512];
+        va_list args;
+        va_start(args, format);
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        va_end(args);
+
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "netdbg: %s", buffer);
     }
 
     void __cdecl Russ_Event_Monster_Update_(int16_t owner, int16_t param2, int16_t param3) {
@@ -547,6 +585,7 @@ namespace NETMOX {
     }
 
     uint32_t __cdecl Encode_Broadcast_Game_Data_Snapshot_(void* buffer, uint32_t len) {
+        Scoped_Net_Update_Suspension_ suspend_net_updates;
         NETPROTO::Packet_Writer_ writer(buffer, len, "invalid broadcast game data payload");
 
         // Assemble a packed byte stream from primitive values using the original x86 little-endian layout.
@@ -636,13 +675,21 @@ namespace NETMOX {
     }
 
     void __cdecl Broadcast_Game_Data_Differential_(uint8_t use_diff) {
+        Scoped_Net_Update_Suspension_ suspend_net_updates;
         allocate::Push_Block_(MOX::_screen_seg);
         uint8_t* block = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES);
-
-        uint32_t block_size = Encode_Broadcast_Game_Data_Snapshot_(block, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES);
         uint8_t* send_ptr;
-        int32_t send_size;
+        int32_t send_size = 0;
         s_net_snapshot_cache* cache;
+        uint32_t block_size = Encode_Broadcast_Game_Data_Snapshot_(block, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES);
+
+        Net_Debug_Log_(
+            "Broadcast_Game_Data_Differential_: player=%d stardate=%u use_diff=%u block_size=%u sync=%u",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)MOX::_stardate,
+            (unsigned int)use_diff,
+            (unsigned int)block_size,
+            (unsigned int)_net.sync_state);
 
         if (use_diff != 0) {
             cache = Open_Net_Snapshot_Cache_(block_size);
@@ -662,6 +709,10 @@ namespace NETMOX {
         RUSS::Mox_Update_();
 
         if (send_size > 0) {
+            Net_Debug_Log_(
+                "Broadcast_Game_Data_Differential_: sending payload bytes=%d use_diff=%u",
+                send_size,
+                (unsigned int)use_diff);
             Mox_Send_Message_(0x7ffe, NET_PACKET_GAME_DATA_PAYLOAD, send_ptr, (uint32_t)send_size);
         }
 
@@ -669,8 +720,16 @@ namespace NETMOX {
     }
 
     int8_t __cdecl Decode_Broadcast_Game_Data_Differential_(void* buf, size_t size, uint8_t flag) {
+        Scoped_Net_Update_Suspension_ suspend_net_updates;
         uint8_t* buffer = (uint8_t*)buf;
         uint8_t* ptr = (uint8_t*)buf;
+
+        Net_Debug_Log_(
+            "Decode_Broadcast_Game_Data_Differential_: player=%d stardate_before=%u flag=%u size=%u",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)MOX::_stardate,
+            (unsigned int)flag,
+            (unsigned int)size);
 
         if (flag == 0) {
             ptr = buffer + size;
@@ -777,6 +836,15 @@ namespace NETMOX {
 
         RUSS::Mox_Update_();
 
+        Net_Debug_Log_(
+            "Decode_Broadcast_Game_Data_Differential_: player=%d stardate_after=%u final_size=%u num_players=%d num_stars=%d num_ships=%d",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)MOX::_stardate,
+            (unsigned int)size,
+            (int)MOX::_NUM_PLAYERS,
+            (int)MOX::_NUM_STARS,
+            (int)MOX::_NUM_SHIPS);
+
         return 1;
     }
 
@@ -785,7 +853,7 @@ namespace NETMOX {
             return;
         }
 
-        if (NETMOX::_is_updating || NETMOX::_in_receive_message) {
+        if (NETMOX::_is_updating || NETMOX::_in_receive_message || _suspended_net_update_depth != 0) {
             return;
         }
 
@@ -968,9 +1036,16 @@ namespace NETMOX {
     }
 
     void __cdecl Send_Game_Orders_() {
+        Scoped_Net_Update_Suspension_ suspend_net_updates;
         allocate::Push_Block_(MOX::_screen_seg);
         uint8_t* packet = reinterpret_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 350000));
         NETPROTO::Packet_Writer_ writer(packet, 350000, "invalid game orders payload");
+
+        Net_Debug_Log_(
+            "Send_Game_Orders_: player=%d stardate=%u sync=%u",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)MOX::_stardate,
+            (unsigned int)_net.sync_state);
 
         writer.Write_Uint32_(MOX::_stardate);
         writer.Write_Uint8_(static_cast<uint8_t>(MOX::_PLAYER_NUM));
@@ -1055,6 +1130,11 @@ namespace NETMOX {
         int32_t packet_size = (int32_t)writer.Length_();
         _net.sync_state = NET_SYNC_STATE_COMBAT_READY;
         _net.combat_attacker_id = -1;
+        Net_Debug_Log_(
+            "Send_Game_Orders_: player=%d packet_size=%d new_sync=%u",
+            (int)MOX::_PLAYER_NUM,
+            packet_size,
+            (unsigned int)_net.sync_state);
         NETMOX::Mox_Send_Message_(_net.local_net_id, NET_PACKET_GAME_ORDERS_PAYLOAD, packet, (uint32_t)packet_size);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -1402,11 +1482,19 @@ namespace NETMOX {
     }
 
     void __cdecl Decode_Game_Orders_(void* data, uint32_t len) {
+        Scoped_Net_Update_Suspension_ suspend_net_updates;
         NETPROTO::Packet_Reader_ reader(data, len, "invalid game orders payload");
 
         reader.Skip_(sizeof(uint32_t));
 
         uint8_t player_idx = reader.Read_Uint8_();
+
+        Net_Debug_Log_(
+            "Decode_Game_Orders_: local_player=%d sender_player=%u len=%u stardate=%u",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)player_idx,
+            (unsigned int)len,
+            (unsigned int)MOX::_stardate);
 
         if (player_idx >= MAX_PLAYERS || player_idx >= MOX::_NUM_PLAYERS) {
             exitm::Exit_With_Message("invalid game orders payload");

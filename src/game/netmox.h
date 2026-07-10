@@ -69,6 +69,10 @@ namespace NETMOX {
 
     void __cdecl Mox_Net_Update_();
 
+    bool __cdecl Net_Debug_Enabled_();
+
+    void __cdecl Net_Debug_Log_(const char* format, ...);
+
     void __cdecl Send_You_Are_Target_Info_(
         int16_t target_player_idx,
         int16_t other_player_idx,

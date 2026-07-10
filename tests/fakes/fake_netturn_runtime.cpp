@@ -54,10 +54,16 @@ namespace NETSTART {
 }
 
 namespace MULTPLAY {
+    void (*g_chat_box_input_loop_hook)() = nullptr;
+
     void __cdecl Load_Net_Next_Turn_Screen_(int8_t) {}
     void __cdecl Draw_Net_Next_Turn_Screen_() {}
     void __cdecl Add_Net_Next_Turn_Fields_() {}
-    void __cdecl Chat_Box_Input_Loop_() {}
+    void __cdecl Chat_Box_Input_Loop_() {
+        if (g_chat_box_input_loop_hook != nullptr) {
+            g_chat_box_input_loop_hook();
+        }
+    }
 }
 
 namespace fields {
@@ -73,7 +79,10 @@ namespace ERIC {
 }
 
 namespace RUSS {
-    void __cdecl Mox_Update_() {}
+    void __cdecl Mox_Update_() {
+        sound::Sound_Update_();
+        NETMOX::Mox_Net_Update_();
+    }
     void __cdecl Make_Player_Into_AI_(int) {}
 }
 
@@ -149,8 +158,14 @@ namespace CMBTMOV1 {
 }
 
 namespace netcode {
+    void (*g_net_update_hook)() = nullptr;
+
     uint32_t __cdecl Net_Send_Message_(int32_t, int16_t, void*, uint32_t) { return 1; }
-    void __cdecl Net_Update_() {}
+    void __cdecl Net_Update_() {
+        if (g_net_update_hook != nullptr) {
+            g_net_update_hook();
+        }
+    }
     int32_t __cdecl Net_Is_Sending_() { return 0; }
 }
 

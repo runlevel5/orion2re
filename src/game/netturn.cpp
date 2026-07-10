@@ -109,6 +109,11 @@ namespace NETTURN {
     }
 
     void __cdecl Host_Next_Turn_() {
+        NETMOX::Net_Debug_Log_(
+            "Host_Next_Turn_: start local_player=%d stardate=%u connected=%d",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)MOX::_stardate,
+            (int)NETMOX::_net.num_connected_players);
         NETMOX::_net.host_sync_counter = 0;
 
         if (MOX::_NUM_PLAYERS > 0) {
@@ -141,12 +146,21 @@ namespace NETTURN {
 
             if (NETMOX::_net.host_active_player_id != -1) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_HOST_RECEIVING_PLAYER_DATA;
+                NETMOX::Net_Debug_Log_(
+                    "Host_Next_Turn_: requesting game orders from player=%d host_sync_counter=%d",
+                    (int)NETMOX::_net.host_active_player_id,
+                    (int)NETMOX::_net.host_sync_counter);
                 NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.host_active_player_id].network_player_id, NET_PACKET_SEND_GAME_ORDERS_REQUEST, nullptr, 0);
 
                 while (NETMOX::_net.sync_state == NET_SYNC_STATE_HOST_RECEIVING_PLAYER_DATA) {
                     MULTPLAY::Chat_Box_Input_Loop_();
                 }
 
+                NETMOX::Net_Debug_Log_(
+                    "Host_Next_Turn_: received game orders from player=%d bytes=%u next_sync=%u",
+                    (int)NETMOX::_net.host_active_player_id,
+                    (unsigned int)NETMOX::_net.total_bytes_received,
+                    (unsigned int)NETMOX::_net.sync_state);
                 NETMOX::Decode_Game_Orders_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
                 NETMOX::_net.network_data_ptr = nullptr;
                 allocate::Pop_Block_(MOX::_screen_seg);
@@ -191,6 +205,10 @@ namespace NETTURN {
             }
         }
 
+        NETMOX::Net_Debug_Log_(
+            "Host_Next_Turn_: broadcasting differential stardate=%u connected=%d",
+            (unsigned int)MOX::_stardate,
+            (int)NETMOX::_net.num_connected_players);
         NETMOX::Broadcast_Game_Data_Differential_(0);
 
         if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
@@ -214,6 +232,12 @@ namespace NETTURN {
                 REPORT::_something_interesting_happened[MOX::_PLAYER_NUM] = 1;
             }
         }
+
+        NETMOX::Net_Debug_Log_(
+            "Host_Next_Turn_: done stardate=%u sync=%u connected=%d",
+            (unsigned int)MOX::_stardate,
+            (unsigned int)NETMOX::_net.sync_state,
+            (int)NETMOX::_net.num_connected_players);
     }
 
     int8_t __cdecl Must_Broadcast_AI_Player_Data_() {
@@ -277,11 +301,27 @@ namespace NETTURN {
         uint8_t star_has_nonplayer;
         s_combfind_star_has_player star_has_player[MAX_PLAYERS];
 
+        NETMOX::Net_Debug_Log_(
+            "Client_Next_Turn_: start local_player=%d stardate=%u local_net_id=%d host_id=%d sync=%u",
+            (int)MOX::_PLAYER_NUM,
+            (unsigned int)MOX::_stardate,
+            (int)NETMOX::_net.local_net_id,
+            (int)NETMOX::_net.net_host_id,
+            (unsigned int)NETMOX::_net.sync_state);
+
+        NETMOX::_net.network_data_ptr = nullptr;
+        NETMOX::_net.total_bytes_received = 0;
+
         NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, NET_PACKET_TURN_END_REQUEST, nullptr, 0);
+        NETMOX::Net_Debug_Log_("Client_Next_Turn_: sent TURN_END_REQUEST");
 
         do {
             MULTPLAY::Chat_Box_Input_Loop_();
         } while (NETMOX::_net.sync_state == NET_SYNC_STATE_NEXT_TURN_READY);
+
+        NETMOX::Net_Debug_Log_(
+            "Client_Next_Turn_: left NEXT_TURN_READY sync=%u",
+            (unsigned int)NETMOX::_net.sync_state);
 
         COMBFIND::_current_star_has_player = star_has_player;
         COMBFIND::_current_star_has_nonplayer = &star_has_nonplayer;
@@ -291,19 +331,26 @@ namespace NETTURN {
         }
 
         NETMOX::Send_Game_Orders_();
+        NETMOX::Net_Debug_Log_(
+            "Client_Next_Turn_: sent game orders sync=%u",
+            (unsigned int)NETMOX::_net.sync_state);
         COMBFIND::Client_Combat_Loop_();
 
         COMBFIND::_current_star_has_player = nullptr;
         COMBFIND::_current_star_has_nonplayer = nullptr;
 
         strlcpy(MOX::_temp_string, NETTURN::_waiting_message_fmt, sizeof(MOX::_temp_string));
-        NETMOX::_net.network_data_ptr = nullptr;
+        NETMOX::Net_Debug_Log_("Client_Next_Turn_: waiting for broadcast game data payload");
 
         while (NETMOX::_net.network_data_ptr == nullptr && MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             MULTPLAY::Chat_Box_Input_Loop_();
         }
 
         if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
+            NETMOX::Net_Debug_Log_(
+                "Client_Next_Turn_: received payload bytes=%u sync=%u",
+                (unsigned int)NETMOX::_net.total_bytes_received,
+                (unsigned int)NETMOX::_net.sync_state);
             while (!NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 0)) {
                 exitm::Exit_With_Message("craziness");
             }
@@ -320,6 +367,12 @@ namespace NETTURN {
                 NETSTART::Mox_Net_Uninit_();
                 MOX::_game_type = 0;
             }
+
+            NETMOX::Net_Debug_Log_(
+                "Client_Next_Turn_: decode complete stardate=%u sync=%u connected=%d",
+                (unsigned int)MOX::_stardate,
+                (unsigned int)NETMOX::_net.sync_state,
+                (int)NETMOX::_net.num_connected_players);
         }
 
         COMBFIND::_current_star_has_player = nullptr;
