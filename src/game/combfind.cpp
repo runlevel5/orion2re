@@ -2246,7 +2246,14 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                 count--;
             }
         }
-        (*COMBFIND::_star_has_nonplayer)[star_idx] &= 0xFE;
+        uint8_t* star_has_nonplayer = COMBFIND::_current_star_has_nonplayer;
+        if (COMBFIND::_star_has_nonplayer != nullptr) {
+            star_has_nonplayer = &(*COMBFIND::_star_has_nonplayer)[star_idx];
+        }
+        // Multiplayer clients only track the active combat star through _current_star_has_nonplayer.
+        if (star_has_nonplayer != nullptr) {
+            *star_has_nonplayer &= 0xFE;
+        }
     }
 
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
