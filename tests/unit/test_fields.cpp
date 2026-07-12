@@ -554,6 +554,18 @@ DOCTEST_TEST_CASE("get input plays sound for selected field") {
     DOCTEST_CHECK(test::fakes::g_last_played_sound == 12);
 }
 
+DOCTEST_TEST_CASE("get input returns F9 distance command without indexing the field table") {
+    Fields_Test_Reset reset;
+    s_animation_header picture{};
+
+    fields::Add_Button_Field_(10, 20, "Go", &picture, "g", 12);
+    test::fakes::g_keyboard_status = 1;
+    test::fakes::g_read_key_value = 0x4300;
+
+    DOCTEST_CHECK(fields::Get_Input_() == -1009);
+    DOCTEST_CHECK(test::fakes::g_last_played_sound == -1);
+}
+
 DOCTEST_TEST_CASE("add clipped hidden field clips to window bounds and normalizes hotkey") {
     Fields_Test_Reset reset;
 

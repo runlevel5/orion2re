@@ -273,6 +273,7 @@ namespace COMBAT1 {
                         MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
                         next_ship_flag = Next_Ship_(active_player_id);
                         if (MOX::_net_flag != 0) {
+                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                         }
                         timer::Release_Time_(1);
@@ -304,6 +305,7 @@ namespace COMBAT1 {
                                                     }
                                                 }
                                                 if (MOX::_net_flag != 0) {
+                                                    NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                 }
                                             }
@@ -378,6 +380,7 @@ namespace COMBAT1 {
                                                 MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
                                                 next_ship_flag = Next_Ship_(active_player_id);
                                                 if (MOX::_net_flag != 0) {
+                                                    NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                 }
                                             }
@@ -392,6 +395,7 @@ namespace COMBAT1 {
                                         }
                                         MOX::_missile_warning = (MOX::_missile_warning + 1) % 3;
                                         if (MOX::_net_flag != 0) {
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                         Add_Tactical_Combat_Fields_();
@@ -416,6 +420,7 @@ namespace COMBAT1 {
                                         fields::Clear_Fields_();
                                         MOX::_auto_button = fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
                                         if (MOX::_net_flag != 0) {
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                         input_val = 0;
@@ -437,6 +442,7 @@ namespace COMBAT1 {
                                         }
                                         next_ship_flag = Next_Ship_(active_player_id);
                                         if (MOX::_net_flag != 0) {
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                         input_val = 0;
@@ -456,6 +462,7 @@ namespace COMBAT1 {
                                                     MOX::_combat_data[MOX::_cur_ship].special_cooldown = 0xFF;
                                                 }
                                                 if (MOX::_net_flag != 0) {
+                                                    NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                 }
                                                 MOX::_last_ship_status = -1;
@@ -503,6 +510,7 @@ namespace COMBAT1 {
                                                 MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
                                                 next_ship_flag = Next_Ship_(active_player_id);
                                                 if (MOX::_net_flag != 0) {
+                                                    NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                 }
                                             }
@@ -551,6 +559,7 @@ namespace COMBAT1 {
                                         }
                                         CMBTMOV1::Turn_To_Face_(MOX::_cur_ship, face_x, face_y);
                                         if (MOX::_net_flag != 0) {
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                         input_val = 0;
@@ -598,6 +607,7 @@ namespace COMBAT1 {
                                                     next_ship_flag = Next_Ship_(active_player_id);
                                                 }
                                                 if (MOX::_net_flag != 0) {
+                                                    NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                 }
                                             } else if (tgt_idx >= 0 && tgt_idx < MOX::_combat_total_ship_count && MOX::_combat_data[tgt_idx].unit_status == 0) {
@@ -608,6 +618,7 @@ namespace COMBAT1 {
                                                         }
                                                         Set_Cur_Ship_To_(tgt_idx);
                                                         if (MOX::_net_flag != 0) {
+                                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                         }
                                                     }
@@ -623,6 +634,7 @@ namespace COMBAT1 {
                                                             }
                                                             CMBTFIRE::Remove_Stasis_Beam_(tgt_idx);
                                                             if (MOX::_net_flag != 0) {
+                                                                NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                             }
                                                         }
@@ -646,6 +658,7 @@ namespace COMBAT1 {
                                                             }
                                                         }
                                                         if (MOX::_net_flag != 0) {
+                                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                                         }
                                                     }
@@ -670,6 +683,7 @@ namespace COMBAT1 {
                                             next_ship_flag = Next_Ship_(active_player_id);
                                         }
                                         if (MOX::_net_flag != 0) {
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                         input_val = 0;
@@ -683,6 +697,7 @@ namespace COMBAT1 {
                                         MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
                                         next_ship_flag = Next_Ship_(active_player_id);
                                         if (MOX::_net_flag != 0) {
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                         fields::Set_Input_Delay_(3);
@@ -870,6 +885,7 @@ namespace COMBAT1 {
                                                     break;
                                             }
                                             MOX::_tactical_net_choice = 0;
+                                            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
                                     }
@@ -944,6 +960,7 @@ namespace COMBAT1 {
                 MOX::_msl_impact_warning_flag = MOX::_saved_msl_warn;
             }
             if (MOX::_net_flag != 0) {
+                NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
             }
         }
@@ -1054,6 +1071,7 @@ namespace COMBAT1 {
 
         if (ship->is_retreating == 1) {
             if (MOX::_net_flag != 0 && MOX::_combat_init != 0) {
+                NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
             }
             Retreat_Ship_(ship_idx);
@@ -1268,6 +1286,7 @@ namespace COMBAT1 {
                     MOX::_msl_impact_warning_flag = MOX::_saved_msl_warning;
                     NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, TACTICAL_NET_PACKET_MISSILE_WARNING, &MOX::_msl_impact_warning_flag, sizeof(MOX::_msl_impact_warning_flag));
                 }
+                NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
             }
             result = 0;
@@ -1790,6 +1809,7 @@ namespace COMBAT1 {
 
                 MOX::_board_flag = 0;
                 if (MOX::_net_flag != 0) {
+                    NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                 }
             }

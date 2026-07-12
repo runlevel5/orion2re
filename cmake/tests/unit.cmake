@@ -64,7 +64,10 @@ orion2re_add_unit_test(test_netturn_host_selection
     PRODUCTION_SOURCES
         src/game/netturn.cpp
         src/game/netmox.cpp
+        src/game/netproto.cpp
+        src/game/random.cpp
     FAKE_SOURCES
+        tests/fakes/fake_allocate.cpp
         tests/fakes/fake_exitm.cpp
         tests/fakes/fake_fields_helpers_runtime.cpp
         tests/fakes/fake_netturn_runtime.cpp

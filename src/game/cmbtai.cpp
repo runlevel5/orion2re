@@ -1426,6 +1426,7 @@ void __cdecl Resolve_Ai_Boarding_(int16_t attacker_idx, int16_t target_idx, int1
 
         MOX::_board_flag = 0;
         if (MOX::_net_flag != 0) {
+            NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
         }
     }

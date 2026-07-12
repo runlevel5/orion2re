@@ -24,6 +24,7 @@ namespace {
             NETMOX::_net.network_data_ptr = &payload;
             NETMOX::_net.total_bytes_received = 1;
             NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
+            MOX::_player[MOX::_PLAYER_NUM].eliminated = 1;
             MULTPLAY::g_chat_box_input_loop_hook = nullptr;
         }
     }
@@ -100,6 +101,7 @@ DOCTEST_TEST_CASE("returns no host for empty input") {
 
 DOCTEST_TEST_CASE("client next turn preserves a payload that arrives before the final wait loop") {
     s_player players[2]{};
+    s_leader_data leaders[MAX_LEADERS]{};
     players[0].network_player_id = 176;
     players[0].objectives = PLAYER_OBJECTIVE_HUMAN;
     players[1].network_player_id = 174;
@@ -109,8 +111,11 @@ DOCTEST_TEST_CASE("client next turn preserves a payload that arrives before the 
     MOX::_PLAYER_NUM = 1;
     MOX::_NUM_PLAYERS = 2;
     MOX::_NUM_STARS = 0;
+    MOX::_leaders = leaders;
     MOX::_game_type = 3;
     MOX::_stardate = 35155;
+    MOX::_screen_seg = static_cast<s_animation_header*>(allocate::Allocate_Space_(1024 * 1024));
+    NETTURN::_waiting_message_fmt = const_cast<char*>("");
 
     NETMOX::_net = {};
     NETMOX::_net.local_net_id = 174;
@@ -123,6 +128,9 @@ DOCTEST_TEST_CASE("client next turn preserves a payload that arrives before the 
 
     DOCTEST_CHECK(MULTPLAY::g_chat_box_input_loop_hook == nullptr);
     DOCTEST_CHECK(NETMOX::_net.total_bytes_received == 1);
+
+    std::free((s_alloc_header*)MOX::_screen_seg - 1);
+    MOX::_screen_seg = nullptr;
 }
 
 }

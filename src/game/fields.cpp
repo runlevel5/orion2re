@@ -173,7 +173,9 @@ namespace fields {
 
         if (input_result != 0) {
             int16_t field_idx = (input_result < 0) ? -input_result : input_result;
-            sound::Play_Sound_(_fields[field_idx].sound);
+            if (field_idx > 0 && field_idx < _fields_count) {
+                sound::Play_Sound_(_fields[field_idx].sound);
+            }
         }
 
         return input_result;
