@@ -251,7 +251,8 @@ namespace COMBAT1 {
                     }
                 }
 
-                
+                COMBAT1::_start_of_turn = 0;
+
                 while (MOX::_ship_turn_order[MOX::_cur_ptr] >= 0) {
                     if (next_ship_flag != 0) break;
 
@@ -732,13 +733,16 @@ namespace COMBAT1 {
                                             timer::Release_Time_(1);
                                         } else {
                                             net_processed = 1;
-                                            COMBINIT::Snap_Center_Combat_Screen_(MOX::_new_message.viewport_x + 16, MOX::_new_message.viewport_y + 9);
-                                            int16_t f10 = MOX::_new_message.arg1;
-                                            int16_t f12 = MOX::_new_message.arg2;
-                                            int16_t f14 = MOX::_new_message.arg3;
-                                            int16_t f8 = MOX::_new_message.message_code;
-                                            game_random::Set_Random_Seed_(MOX::_new_message.random_seed);
+                                            s_net_tactical_combat_message message = MOX::_new_message;
                                             struct_::Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
+                                            MOX::_tactical_net_choice = 0;
+
+                                            COMBINIT::Snap_Center_Combat_Screen_(message.viewport_x + 16, message.viewport_y + 9);
+                                            int16_t f10 = message.arg1;
+                                            int16_t f12 = message.arg2;
+                                            int16_t f14 = message.arg3;
+                                            int16_t f8 = message.message_code;
+                                            game_random::Set_Random_Seed_(message.random_seed);
 
                                             switch (f8) {
                                                 case TACTICAL_NET_MSG_SELF_DESTRUCT:
@@ -884,7 +888,6 @@ namespace COMBAT1 {
                                                     }
                                                     break;
                                             }
-                                            MOX::_tactical_net_choice = 0;
                                             NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }

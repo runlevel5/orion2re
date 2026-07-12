@@ -6,10 +6,11 @@ debugging:
 know_enabled: false
 variables:
 # OpenAI
-  LLM_ARCHITECT_MODEL: chatgpt/gpt-5.4
+  LLM_ARCHITECT_MODEL: chatgpt/gpt-5.6-sol
   LLM_ARCHITECT_REASONING: high
-  LLM_STRONG_MODEL: chatgpt/gpt-5.4
-  LLM_WEAK_MODEL: chatgpt/gpt-5.4-mini
+  LLM_STRONG_MODEL: chatgpt/gpt-5.6-sol
+  LLM_MEDIUM_MODEL: chatgpt/gpt-5.6-terra
+  LLM_WEAK_MODEL: chatgpt/gpt-5.6-terra
   LLM_REASONING: high
   LLM_DIFF_FORMAT: v4a
 internal_http:
