@@ -257,7 +257,7 @@ namespace buffer {
           const int32_t bytes_to_move =
               (int32_t)(used_end - next_data_ptr);
 
-          struct_::Copy_Structure_(victim_data_ptr, next_data_ptr, bytes_to_move);
+          memmove(victim_data_ptr, next_data_ptr, (size_t)bytes_to_move);
 
           if (buffer::_file_buffer_count > 0) {
             for (int32_t file_buffer_index = 0;
