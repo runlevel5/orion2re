@@ -671,7 +671,8 @@ namespace AIDATA {
                 if (target >= MAX_PLAYERS) {
                     int target_p = target - MAX_PLAYERS;
                     MOX::_star[s].surrender_to[p] = -1;
-                    if (MOX::_player[p].eliminated == 0 && MOX::_player[target_p].eliminated == 0) {
+                    if (target_p >= 0 && target_p < MOX::_NUM_PLAYERS &&
+                        MOX::_player[p].eliminated == 0 && MOX::_player[target_p].eliminated == 0) {
                         if (COLCALC::May_Surrender_Star_((int16_t)s, (int16_t)p, (int16_t)target_p)) {
                             COLCALC::Surrender_Star_((int16_t)s, (int16_t)p, (int16_t)target_p);
                         }

@@ -306,6 +306,7 @@ void Pump(s_adapter* adapter) {
             s_event event;
             event.kind = EVENT_ERROR;
             event.error = client_event.error;
+            event.header = client_event.message.header;
             adapter->state->events.push_back(std::move(event));
             break;
         }

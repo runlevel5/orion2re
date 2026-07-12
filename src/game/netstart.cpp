@@ -50,7 +50,7 @@ namespace NETSTART {
             RUSS::Mox_Sync_Update_();
         }
 
-        
+        NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 1);
         NETMOX::_net.field_1db = 0;
         NETMOX::_net.field_1df = 0;
         NETMOX::_net.network_data_ptr = nullptr;

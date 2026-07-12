@@ -2101,8 +2101,10 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
 
                     if (surrender) {
                         surrendered = 1;
-                        MOX::_star[star_idx].surrender_to[colony_owner] = attacker_id + 8;
-                        diplomac::Declare_Peace_(colony_owner, attacker_id);
+                        if (attacker_id >= 0 && attacker_id < MAX_PLAYERS) {
+                            MOX::_star[star_idx].surrender_to[colony_owner] = attacker_id + MAX_PLAYERS;
+                            diplomac::Declare_Peace_(colony_owner, attacker_id);
+                        }
                     } else if (knows_attacker) {
                         bool success = false;
                         bool done = false;

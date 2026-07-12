@@ -31,6 +31,7 @@ struct s_event {
     e_event_kind kind = EVENT_ERROR;
     uint32_t network_id = 0;
     network::router::s_router_error_payload error;
+    network::router::s_router_message_header header;
 };
 
 enum e_bootstrap_mode {

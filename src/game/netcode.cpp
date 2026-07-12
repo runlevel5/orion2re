@@ -102,7 +102,13 @@ namespace netcode {
                 } else if (event.kind == netadapter::EVENT_DISCONNECTED) {
                     SDL_Log("Router disconnected");
                 } else if (event.kind == netadapter::EVENT_ERROR) {
-                    SDL_Log("Router error: %s", event.error.message);
+                    SDL_Log(
+                        "Router error: %s (code=%u sender=%u target=%u request=%u)",
+                        event.error.message,
+                        (unsigned)event.error.code,
+                        (unsigned)event.header.sender_network_id,
+                        (unsigned)event.header.target_network_id,
+                        (unsigned)event.header.request_id);
                 }
             }
         }
