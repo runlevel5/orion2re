@@ -147,6 +147,18 @@ namespace COMBAT1 {
 
         int16_t net_id = MOX::_player[player_idx].network_player_id;
 
+        NETMOX::Net_Debug_Log_(
+            "tactical action send local_player=%d target_player=%d target_net_id=%d action=%d args=%d,%d,%d turn=%d cur_ship=%d cur_ptr=%d",
+            (int)MOX::_PLAYER_NUM,
+            (int)player_idx,
+            (int)net_id,
+            (int)message_code,
+            (int)arg1,
+            (int)arg2,
+            (int)arg3,
+            (int)MOX::_combat_turn,
+            (int)MOX::_cur_ship,
+            (int)MOX::_cur_ptr);
         return NETMOX::Mox_Send_Message_(net_id, TACTICAL_NET_PACKET_ACTION, &combat_msg, sizeof(combat_msg));
     }
 
@@ -733,17 +745,24 @@ namespace COMBAT1 {
                                             timer::Release_Time_(1);
                                         } else {
                                             net_processed = 1;
-                                            s_net_tactical_combat_message message = MOX::_new_message;
+                                            COMBINIT::Snap_Center_Combat_Screen_(MOX::_new_message.viewport_x + 16, MOX::_new_message.viewport_y + 9);
+                                            int16_t f10 = MOX::_new_message.arg1;
+                                            int16_t f12 = MOX::_new_message.arg2;
+                                            int16_t f14 = MOX::_new_message.arg3;
+                                            int16_t f8 = MOX::_new_message.message_code;
+                                            game_random::Set_Random_Seed_(MOX::_new_message.random_seed);
                                             struct_::Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
-                                            MOX::_tactical_net_choice = 0;
 
-                                            COMBINIT::Snap_Center_Combat_Screen_(message.viewport_x + 16, message.viewport_y + 9);
-                                            int16_t f10 = message.arg1;
-                                            int16_t f12 = message.arg2;
-                                            int16_t f14 = message.arg3;
-                                            int16_t f8 = message.message_code;
-                                            game_random::Set_Random_Seed_(message.random_seed);
-
+                                            NETMOX::Net_Debug_Log_(
+                                                "tactical action consume local_player=%d action=%d args=%d,%d,%d turn=%d cur_ship=%d cur_ptr=%d",
+                                                (int)MOX::_PLAYER_NUM,
+                                                (int)f8,
+                                                (int)f10,
+                                                (int)f12,
+                                                (int)f14,
+                                                (int)MOX::_combat_turn,
+                                                (int)MOX::_cur_ship,
+                                                (int)MOX::_cur_ptr);
                                             switch (f8) {
                                                 case TACTICAL_NET_MSG_SELF_DESTRUCT:
                                                     MOX::_combat_data[MOX::_cur_ship].drive_current_hits = 0;
@@ -888,6 +907,7 @@ namespace COMBAT1 {
                                                     }
                                                     break;
                                             }
+                                            MOX::_tactical_net_choice = 0;
                                             NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
                                         }
@@ -1198,6 +1218,20 @@ namespace COMBAT1 {
             }
         } else if (defender_count <= 0) {
             winner = 1;
+        }
+
+        if (winner != 0 && MOX::_net_flag != 0) {
+            NETMOX::Net_Debug_Log_(
+                "tactical winner local_player=%d winner=%d attackers=%d defenders=%d turn=%d cur_ship=%d cur_ptr=%d choice=%d barrier_counter=%u",
+                (int)MOX::_PLAYER_NUM,
+                (int)winner,
+                (int)attacker_count,
+                (int)defender_count,
+                (int)MOX::_combat_turn,
+                (int)MOX::_cur_ship,
+                (int)MOX::_cur_ptr,
+                (int)MOX::_tactical_net_choice,
+                (unsigned int)MOX::_combat_done_waiting);
         }
 
         return winner;

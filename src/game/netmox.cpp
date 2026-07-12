@@ -350,6 +350,16 @@ namespace NETMOX {
         int32_t player_id = Net_Id_To_Player_Id_(net_id & 0xFFFF);
         _in_receive_message = 1;
 
+        if (packet_id == NET_PACKET_TACTICAL_COMBAT_START || packet_id == NET_PACKET_TACTICAL_COMBAT_END) {
+            Net_Debug_Log_(
+                "tactical handshake recv packet=%u sender_net_id=%d sender_player=%d local_player=%d state_before=%u",
+                (unsigned int)packet_id,
+                (int)net_id,
+                (int)player_id,
+                (int)MOX::_PLAYER_NUM,
+                (unsigned int)_net.tactical_combat_sync_state);
+        }
+
         if (packet_id >= DIP_NET_PACKET_MESSAGE) {
             DIP_SCRN::Diplomacy_Receive_Message_(net_id, packet_id, len, reinterpret_cast<s_dipscrn_net_message*>(packet));
         } else if (packet_id >= TACTICAL_NET_PACKET_ACTION) {
@@ -407,6 +417,16 @@ namespace NETMOX {
         uint8_t dummy_packet;
         uint8_t skip_send;
         int32_t result = 1;
+
+        if (msg_type == NET_PACKET_TACTICAL_COMBAT_START || msg_type == NET_PACKET_TACTICAL_COMBAT_END) {
+            Net_Debug_Log_(
+                "tactical handshake send packet=%u recipient_net_id=%d local_player=%d state=%u turn=%d",
+                (unsigned int)msg_type,
+                (int)recipient_net_id,
+                (int)MOX::_PLAYER_NUM,
+                (unsigned int)_net.tactical_combat_sync_state,
+                (int)MOX::_combat_turn);
+        }
 
         _sending_msg = 1;
 
@@ -530,7 +550,15 @@ namespace NETMOX {
     bool __cdecl Net_Debug_Enabled_() {
         if (_net_debug_initialized == 0) {
             const char* value = SDL_getenv("ORION2RE_NET_DEBUG");
-            _net_debug_enabled = (value != nullptr && value[0] != '\0' && value[0] != '0');
+            if (value != nullptr) {
+                _net_debug_enabled = (value[0] != '\0' && value[0] != '0');
+            } else {
+#if defined(ORION2RE_DEBUG_BUILD)
+                _net_debug_enabled = 1;
+#else
+                _net_debug_enabled = 0;
+#endif
+            }
             _net_debug_initialized = 1;
         }
 

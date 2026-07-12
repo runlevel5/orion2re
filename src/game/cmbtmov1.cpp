@@ -125,6 +125,16 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
         opponent_idx = MOX::_combat_defender_player;
     }
 
+    NETMOX::Net_Debug_Log_(
+        "tactical barrier send local_player=%d opponent=%d turn=%d cur_ship=%d cur_ptr=%d counter_before=%u choice=%d show=%d",
+        (int)MOX::_PLAYER_NUM,
+        (int)opponent_idx,
+        (int)MOX::_combat_turn,
+        (int)MOX::_cur_ship,
+        (int)MOX::_cur_ptr,
+        (unsigned int)MOX::_combat_done_waiting,
+        (int)MOX::_tactical_net_choice,
+        (int)show_wait_message);
     NETMOX::Mox_Send_Message_(MOX::_player[opponent_idx].network_player_id, TACTICAL_NET_PACKET_WAIT_FOR_OPPONENT, &opponent_idx, sizeof(opponent_idx));
 
     while (MOX::_combat_done_waiting == 0) {
@@ -144,6 +154,15 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
     }
 
     MOX::_combat_done_waiting -= 1;
+    NETMOX::Net_Debug_Log_(
+        "tactical barrier complete local_player=%d opponent=%d turn=%d cur_ship=%d cur_ptr=%d counter_after=%u choice=%d",
+        (int)MOX::_PLAYER_NUM,
+        (int)opponent_idx,
+        (int)MOX::_combat_turn,
+        (int)MOX::_cur_ship,
+        (int)MOX::_cur_ptr,
+        (unsigned int)MOX::_combat_done_waiting,
+        (int)MOX::_tactical_net_choice);
 }
 
 int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y) {
@@ -828,12 +847,29 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
     if (message_id >= TACTICAL_NET_PACKET_ACTION && message_id < DIP_NET_PACKET_MESSAGE) {
         switch (message_id) {
             case TACTICAL_NET_PACKET_ACTION:
+                NETMOX::Net_Debug_Log_(
+                    "tactical action recv sender_net_id=%d local_player=%d action=%d args=%d,%d,%d pending=%d choice=%d turn=%d cur_ship=%d",
+                    (int)sender_net_id,
+                    (int)MOX::_PLAYER_NUM,
+                    (int)message->message_code,
+                    (int)message->arg1,
+                    (int)message->arg2,
+                    (int)message->arg3,
+                    (int)MOX::_new_message.message_code,
+                    (int)MOX::_tactical_net_choice,
+                    (int)MOX::_combat_turn,
+                    (int)MOX::_cur_ship);
                 if (MOX::_new_message.message_code == 0) {
                     struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
                     MOX::_tactical_net_choice = MOX::_new_message.message_code;
                     return;
                 }
 
+                NETMOX::Net_Debug_Log_(
+                    "Tactical_Combat_Receive_Message_: overwriting pending action pending=%d incoming=%d choice=%d",
+                    (int)MOX::_new_message.message_code,
+                    (int)message->message_code,
+                    (int)MOX::_tactical_net_choice);
                 struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
                 MOX::_tactical_net_choice = MOX::_new_message.message_code;
                 return;
@@ -863,7 +899,20 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
                 return;
 
             case TACTICAL_NET_PACKET_WAIT_FOR_OPPONENT:
+                NETMOX::Net_Debug_Log_(
+                    "tactical barrier recv sender_net_id=%d local_player=%d turn=%d cur_ship=%d cur_ptr=%d counter_before=%u choice=%d",
+                    (int)sender_net_id,
+                    (int)MOX::_PLAYER_NUM,
+                    (int)MOX::_combat_turn,
+                    (int)MOX::_cur_ship,
+                    (int)MOX::_cur_ptr,
+                    (unsigned int)MOX::_combat_done_waiting,
+                    (int)MOX::_tactical_net_choice);
                 MOX::_combat_done_waiting++;
+                NETMOX::Net_Debug_Log_(
+                    "tactical barrier queued local_player=%d counter_after=%u",
+                    (int)MOX::_PLAYER_NUM,
+                    (unsigned int)MOX::_combat_done_waiting);
                 return;
 
             case TACTICAL_NET_PACKET_INIT_SYNC:

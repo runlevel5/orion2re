@@ -996,6 +996,17 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         
         RUSS::Mox_Update_();
 
+        if (MOX::_net_flag != 0) {
+            NETMOX::Net_Debug_Log_(
+                "tactical combat loop start local_player=%d attacker=%d defender=%d initiative=%d ships=%d winner=%d",
+                (int)MOX::_PLAYER_NUM,
+                (int)MOX::_combat_attacker_player,
+                (int)MOX::_combat_defender_player,
+                (int)MOX::_combat_init,
+                (int)MOX::_combat_total_ship_count,
+                (int)combat_winner);
+        }
+
         while (combat_winner == 0) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (i != 0 || MOX::_cmbt_colony_id != -1) {
@@ -1064,6 +1075,18 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
             MOX::_combat_turn++;
             End_Of_Turn_Bookeeping_();
+        }
+
+        if (MOX::_net_flag != 0) {
+            NETMOX::Net_Debug_Log_(
+                "tactical combat loop end local_player=%d winner=%d turn=%d cur_ship=%d cur_ptr=%d choice=%d barrier_counter=%u",
+                (int)MOX::_PLAYER_NUM,
+                (int)combat_winner,
+                (int)MOX::_combat_turn,
+                (int)MOX::_cur_ship,
+                (int)MOX::_cur_ptr,
+                (int)MOX::_tactical_net_choice,
+                (unsigned int)MOX::_combat_done_waiting);
         }
 
         if (MOX::_cmbt_colony_id != -1) {

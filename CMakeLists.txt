@@ -295,6 +295,12 @@ if(WIN32 AND TARGET orion2re)
     set_target_properties(orion2re PROPERTIES WIN32_EXECUTABLE YES)
 endif()
 
+if(TARGET orion2re)
+    target_compile_definitions(orion2re PRIVATE
+        $<$<CONFIG:Debug>:ORION2RE_DEBUG_BUILD=1>
+    )
+endif()
+
 if(ORION2RE_GAME_DIR AND TARGET orion2re)
     set_target_properties(orion2re PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${ORION2RE_GAME_DIR}"

@@ -2,10 +2,11 @@
 
 #include <SDL3/SDL_main.h>
 
-#if defined(ORION2RE_ASAN_BUILD)
-extern "C" const char* __asan_default_options() {
-    return "log_path=logs/asan";
-}
+#if defined(_WIN32)
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 
 static void Build_Path_(char* output, size_t output_size, const char* base_path, const char* relative_path) {
     if (base_path != nullptr && base_path[0] != '\0') {
@@ -13,6 +14,74 @@ static void Build_Path_(char* output, size_t output_size, const char* base_path,
     } else {
         snprintf(output, output_size, "%s", relative_path);
     }
+}
+
+static FILE* _game_log_file;
+static SDL_LogOutputFunction _console_log_output;
+static void* _console_log_userdata;
+
+static const char* Log_Priority_Name_(SDL_LogPriority priority) {
+    switch (priority) {
+        case SDL_LOG_PRIORITY_TRACE: return "TRACE";
+        case SDL_LOG_PRIORITY_VERBOSE: return "VERBOSE";
+        case SDL_LOG_PRIORITY_DEBUG: return "DEBUG";
+        case SDL_LOG_PRIORITY_INFO: return "INFO";
+        case SDL_LOG_PRIORITY_WARN: return "WARN";
+        case SDL_LOG_PRIORITY_ERROR: return "ERROR";
+        case SDL_LOG_PRIORITY_CRITICAL: return "CRITICAL";
+        default: return "UNKNOWN";
+    }
+}
+
+static void SDLCALL Game_Log_Output_(void* userdata, int category, SDL_LogPriority priority, const char* message) {
+    if (_console_log_output != nullptr) {
+        _console_log_output(_console_log_userdata, category, priority, message);
+    }
+
+    FILE* log_file = static_cast<FILE*>(userdata);
+    if (log_file != nullptr) {
+        fprintf(log_file, "%s: %s\n", Log_Priority_Name_(priority), message);
+        fflush(log_file);
+    }
+}
+
+static void Configure_Game_Log_() {
+    const char* base_path = SDL_GetBasePath();
+    char logs_path[1024];
+    char log_file_path[1024];
+
+    Build_Path_(logs_path, sizeof(logs_path), base_path, "logs");
+    SDL_CreateDirectory(logs_path);
+
+#if defined(_WIN32)
+    const int process_id = _getpid();
+    const char path_separator = '\\';
+#else
+    const int process_id = getpid();
+    const char path_separator = '/';
+#endif
+
+    snprintf(log_file_path, sizeof(log_file_path), "%s%cgame.%d.log", logs_path, path_separator, process_id);
+    _game_log_file = fopen(log_file_path, "w");
+    if (_game_log_file != nullptr) {
+        SDL_GetLogOutputFunction(&_console_log_output, &_console_log_userdata);
+        SDL_SetLogOutputFunction(Game_Log_Output_, _game_log_file);
+    }
+}
+
+static void Shutdown_Game_Log_() {
+    if (_game_log_file == nullptr) {
+        return;
+    }
+
+    SDL_SetLogOutputFunction(_console_log_output, _console_log_userdata);
+    fclose(_game_log_file);
+    _game_log_file = nullptr;
+}
+
+#if defined(ORION2RE_ASAN_BUILD)
+extern "C" const char* __asan_default_options() {
+    return "log_path=logs/asan";
 }
 
 static void Set_Environment_Variable_If_Unset_(const char* name, const char* value) {
@@ -43,6 +112,8 @@ static void Configure_Asan_Runtime_() {
 #endif
 
 int main(int argc, char** argv) {
+    Configure_Game_Log_();
+
 #if defined(ORION2RE_ASAN_BUILD)
     Configure_Asan_Runtime_();
 #endif
@@ -56,6 +127,7 @@ int main(int argc, char** argv) {
         if (current_directory != nullptr) {
             SDL_free(current_directory);
         }
+        Shutdown_Game_Log_();
         return -1;
     }
 
@@ -71,6 +143,11 @@ int main(int argc, char** argv) {
     if (command_line_length != 0) {
         command_line = (char*)malloc(command_line_length + 1);
         if (command_line == nullptr) {
+            vfs::Shutdown();
+            if (current_directory != nullptr) {
+                SDL_free(current_directory);
+            }
+            Shutdown_Game_Log_();
             return -1;
         }
 
@@ -96,6 +173,7 @@ int main(int argc, char** argv) {
     if (current_directory != nullptr) {
         SDL_free(current_directory);
     }
+    Shutdown_Game_Log_();
 
     return result;
 }
