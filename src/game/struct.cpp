@@ -14,33 +14,7 @@ namespace struct_ {
     }
 
     void __cdecl Copy_Structure_(void* dest, void* src, uint32_t size) {
-        uint8_t* dest_bytes = (uint8_t*)dest;
-        uint8_t* src_bytes = (uint8_t*)src;
-
-        std::uintptr_t src_addr = (std::uintptr_t)src_bytes;
-        std::uintptr_t dest_addr = (std::uintptr_t)dest_bytes;
-
-        if ((src_addr & 1) == (dest_addr & 1)) {
-            if ((src_addr & 1) != 0) {
-                *dest_bytes++ = *src_bytes++;
-                size--;
-            }
-
-            uint32_t dword_count = size >> 2;
-            memcpy(dest_bytes, src_bytes, dword_count * sizeof(uint32_t));
-            dest_bytes += dword_count * sizeof(uint32_t);
-            src_bytes += dword_count * sizeof(uint32_t);
-
-            uint32_t remaining_bytes = size & 3;
-            for (uint32_t i = 0; i < remaining_bytes; ++i) {
-                *dest_bytes++ = *src_bytes++;
-            }
-        }
-        else {
-            for (uint32_t i = 0; i < size; ++i) {
-                *dest_bytes++ = *src_bytes++;
-            }
-        }
+        memmove(dest, src, size);
     }
 
     int16_t __cdecl Test_Bit_Field_(void* bit_field, uint16_t bit_index) {
