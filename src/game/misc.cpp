@@ -609,7 +609,7 @@ namespace MISC {
         int32_t abs_val = (value ^ sign) - sign;
 
         char raw_buf[32];
-        snprintf(raw_buf, sizeof(raw_buf), "%ld", abs_val);
+        snprintf(raw_buf, sizeof(raw_buf), "%d", abs_val);
 
         int16_t len = (int16_t)strlen(raw_buf);
         int16_t num_separators = (len - 1) / 3;

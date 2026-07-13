@@ -80,7 +80,7 @@ namespace COLBOMB {
         }
 
         if (line_count > 15) {
-            snprintf(line_buffer, sizeof(line_buffer), ESTRINGS::E_Strings_(0x17A));
+            strlcpy(line_buffer, ESTRINGS::E_Strings_(0x17A), sizeof(line_buffer));
             strlcat(message_buffer, line_buffer, sizeof(message_buffer));
         }
 

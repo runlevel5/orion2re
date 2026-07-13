@@ -44,7 +44,7 @@ namespace HACCESS {
             current_owner = (int32_t)MOX::_ship[ship_idx].owner;
         }
 
-        snprintf(message, sizeof(message), "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %ld\n", (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
+        snprintf(message, sizeof(message), "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %d\n", (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
 
         exitm::Exit_With_Message(message);
 

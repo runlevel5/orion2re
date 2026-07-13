@@ -582,7 +582,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                         MOX::_star[star_idx].system_special == SYSTEM_SPECIAL_NO_SPECIAL &&
                         !HAROLD::Empty_System_(star_idx) &&
                         MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE &&
-                        MOX::_star[star_idx].wormhole_star_id == 0xFF)
+                        MOX::_star[star_idx].wormhole_star_id == -1)
                     {
                         found_star_idx = (int16_t)star_idx;
                         break;
