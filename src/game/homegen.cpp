@@ -857,10 +857,6 @@ namespace HOMEGEN {
 
                 Enforce_3_Planet_Minimum_(i);
 
-                while (!HAROLD::Habitable_Spectral_Class_(i)) {
-                    MOX::_star[i].spectral_class = MAPGEN::Generate_Spectral_Class_(MOX::_settings.galaxy_age);
-                }
-
                 int16_t climate_threshold = PLANET_CLIMATE_TERRAN;
                 if (player->traits[TRAIT_AQUATIC] != 0) { // Aquatic
                     climate_threshold = PLANET_CLIMATE_OCEAN;
@@ -969,15 +965,17 @@ namespace HOMEGEN {
             int8_t current_spectral = MOX::_star[star_idx].spectral_class;
             bool possible_with_spectral = false;
 
-            for (int16_t i = 0; i < 5; ++i) {
-                int8_t allowed_group = MOX::_class_to_group[current_spectral].group[i];
-                for (int16_t j = 0; j < valid_group_count; ++j) {
-                    if ((int16_t)allowed_group == valid_groups[j]) {
-                        possible_with_spectral = true;
-                        break;
+            if (current_spectral >= 0 && current_spectral < STAR_CLASS_BLACK_HOLE) {
+                for (int16_t i = 0; i < 5; ++i) {
+                    int8_t allowed_group = MOX::_class_to_group[current_spectral].group[i];
+                    for (int16_t j = 0; j < valid_group_count; ++j) {
+                        if ((int16_t)allowed_group == valid_groups[j]) {
+                            possible_with_spectral = true;
+                            break;
+                        }
                     }
+                    if (possible_with_spectral) break;
                 }
-                if (possible_with_spectral) break;
             }
 
             if (possible_with_spectral) {
