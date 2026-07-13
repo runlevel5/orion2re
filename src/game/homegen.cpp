@@ -857,6 +857,10 @@ namespace HOMEGEN {
 
                 Enforce_3_Planet_Minimum_(i);
 
+                while (!HAROLD::Habitable_Spectral_Class_(i)) {
+                    MOX::_star[i].spectral_class = MAPGEN::Generate_Spectral_Class_(MOX::_settings.galaxy_age);
+                }
+
                 int16_t climate_threshold = PLANET_CLIMATE_TERRAN;
                 if (player->traits[TRAIT_AQUATIC] != 0) { // Aquatic
                     climate_threshold = PLANET_CLIMATE_OCEAN;
@@ -893,6 +897,9 @@ namespace HOMEGEN {
                     gravity_type = (player->traits[TRAIT_HEAVY_G_WORLD] == 0) ? PLANET_GRAVITY_NORMAL_G : PLANET_GRAVITY_HEAVY_G;
                 }
                 Enforce_Gravity_(home_planet_id, gravity_type, owner_idx);
+
+                MOX::_planet[home_planet_id].food_per_farmer = MAPGEN::Generate_Food_Per_Farmer_(i, home_planet_id);
+                MOX::_planet[home_planet_id].max_farms = MAPGEN::Generate_Max_Farms_(i, home_planet_id);
 
                 ERICNET::Init_Homeworld_Colony_(home_planet_id, owner_idx);
 
