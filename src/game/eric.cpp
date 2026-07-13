@@ -96,9 +96,9 @@ namespace ERIC {
     }
 
     int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus) {
-        int32_t current_time = clock();
-        int32_t cycle_index = current_time / (int32_t)divisor;
-        return (int16_t)(cycle_index % (int32_t)modulus);
+        uint64_t current_time = SDL_GetTicks();
+        uint64_t cycle_index = current_time / (uint16_t)divisor;
+        return (int16_t)(cycle_index % (uint16_t)modulus);
     }
 
     bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {
