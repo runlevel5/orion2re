@@ -98,7 +98,7 @@ namespace MAINSCR {
 
     void __cdecl Draw_Stars_();
 
-    /** Draws visited territories using fuel ranges known through ownership or diplomatic contact. */
+    /** Draws territories for systems visible under the same discovery and contact rules as star labels. */
     void __cdecl Draw_Influence_Overlay_();
 
     void __cdecl Draw_A_Star_(int16_t star_idx);

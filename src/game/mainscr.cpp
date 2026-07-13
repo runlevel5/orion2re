@@ -131,15 +131,16 @@ namespace MAINSCR {
                 int32_t best_radius_squared = 1;
 
                 for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
-                    const bool source_is_known =
-                        HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx) ||
-                        viewer_is_omniscient;
-                    if (!source_is_known) {
+                    const int16_t owner = MOX::_star[star_idx].owner;
+                    if (owner < 0 || owner >= MOX::_NUM_PLAYERS) {
                         continue;
                     }
 
-                    const int16_t owner = MOX::_star[star_idx].owner;
-                    if (owner < 0 || owner >= MOX::_NUM_PLAYERS) {
+                    const bool source_is_known =
+                        viewer_is_omniscient ||
+                        HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx) ||
+                        HAROLD::Contact_With_One_Colony_(star_idx);
+                    if (!source_is_known) {
                         continue;
                     }
 
