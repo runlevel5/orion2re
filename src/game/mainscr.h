@@ -23,6 +23,8 @@ namespace MAINSCR {
     extern uint8_t _debug_enabled;
     extern int16_t _debug_field;
     extern int16_t _exit_game_hot_key;
+    extern int16_t _influence_hot_key;
+    extern bool _influence_view_enabled;
     extern int16_t _main_screen_grid_y;
     extern int16_t _main_screen_grid_x;
     extern s_animation_header* _temp_bitmap;
@@ -95,6 +97,9 @@ namespace MAINSCR {
     bool __cdecl Star_On_Screen_(int16_t star_idx);
 
     void __cdecl Draw_Stars_();
+
+    /** Draws visited territories using fuel ranges known through ownership or diplomatic contact. */
+    void __cdecl Draw_Influence_Overlay_();
 
     void __cdecl Draw_A_Star_(int16_t star_idx);
 

@@ -24,6 +24,8 @@ namespace MAINSCR {
     uint8_t _debug_enabled;
     int16_t _debug_field;
     int16_t _exit_game_hot_key;
+    int16_t _influence_hot_key = -1000;
+    bool _influence_view_enabled = false;
     int16_t _main_screen_grid_y;
     int16_t _main_screen_grid_x;
     s_animation_header* _temp_bitmap;
@@ -103,6 +105,120 @@ namespace MAINSCR {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE && Star_On_Screen_(star_idx)) {
                 Draw_A_Star_(star_idx);
+            }
+        }
+    }
+
+    void __cdecl Draw_Influence_Overlay_() {
+        if (!_influence_view_enabled) {
+            return;
+        }
+
+        constexpr int16_t map_left = 22;
+        constexpr int16_t map_top = 22;
+        constexpr int16_t map_width = 506;
+        constexpr int16_t map_height = 400;
+        static int8_t influence_owner[map_height][map_width];
+
+        memset(influence_owner, -1, sizeof(influence_owner));
+
+        const bool viewer_is_omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
+
+        for (int16_t screen_y = map_top; screen_y < map_top + map_height; ++screen_y) {
+            for (int16_t screen_x = map_left; screen_x < map_left + map_width; ++screen_x) {
+                int16_t best_owner = -1;
+                int32_t best_distance_squared = 0;
+                int32_t best_radius_squared = 1;
+
+                for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+                    const bool source_is_known =
+                        HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx) ||
+                        viewer_is_omniscient;
+                    if (!source_is_known) {
+                        continue;
+                    }
+
+                    const int16_t owner = MOX::_star[star_idx].owner;
+                    if (owner < 0 || owner >= MOX::_NUM_PLAYERS) {
+                        continue;
+                    }
+
+                    if (owner != MOX::_PLAYER_NUM &&
+                        !HAROLD::Contact_With_Player_(MOX::_PLAYER_NUM, owner)) {
+                        continue;
+                    }
+
+                    int32_t owner_range = MOX::_player[owner].ship_range;
+                    if (owner_range == 255) {
+                        owner_range = 16;
+                    }
+                    const int16_t influence_radius = static_cast<int16_t>(
+                        HAROLD::Get_Scaled_Value_(static_cast<int16_t>(owner_range * 30))
+                    );
+                    if (influence_radius < 1) {
+                        continue;
+                    }
+                    const int32_t influence_radius_squared = influence_radius * influence_radius;
+
+                    int16_t center_x;
+                    int16_t center_y;
+                    Get_Star_Draw_Coords_(star_idx, &center_x, &center_y);
+
+                    const int32_t dx = screen_x - center_x;
+                    const int32_t dy = screen_y - center_y;
+                    const int32_t distance_squared = dx * dx + dy * dy;
+                    if (distance_squared > influence_radius_squared) {
+                        continue;
+                    }
+
+                    if (best_owner == -1 ||
+                        static_cast<int64_t>(distance_squared) * best_radius_squared <
+                            static_cast<int64_t>(best_distance_squared) * influence_radius_squared) {
+                        best_owner = owner;
+                        best_distance_squared = distance_squared;
+                        best_radius_squared = influence_radius_squared;
+                    }
+                }
+
+                influence_owner[screen_y - map_top][screen_x - map_left] = static_cast<int8_t>(best_owner);
+            }
+        }
+
+        for (int16_t y = 0; y < map_height; ++y) {
+            for (int16_t x = 0; x < map_width; ++x) {
+                const int16_t owner = influence_owner[y][x];
+                if (owner < 0) {
+                    continue;
+                }
+
+                const uint8_t player_color = static_cast<uint8_t>(MOX::_player[owner].color);
+                if (player_color >= MAX_PLAYERS) {
+                    continue;
+                }
+
+                const uint8_t palette_base = MOX::_main_palette_player_colors[player_color];
+                const uint8_t fill_color = (palette_base == 32) ? 8 : static_cast<uint8_t>(palette_base + 1);
+                const uint8_t border_color = (palette_base == 32) ? 22 : static_cast<uint8_t>(palette_base + 5);
+
+                const bool is_border =
+                    x == 0 || influence_owner[y][x - 1] != owner ||
+                    x == map_width - 1 || influence_owner[y][x + 1] != owner ||
+                    y == 0 || influence_owner[y - 1][x] != owner ||
+                    y == map_height - 1 || influence_owner[y + 1][x] != owner;
+
+                if (is_border) {
+                    graphics::Dot_(
+                        map_left + x,
+                        map_top + y,
+                        border_color
+                    );
+                } else if (((map_left + x) ^ (map_top + y)) & 1) {
+                    graphics::Dot_(
+                        map_left + x,
+                        map_top + y,
+                        fill_color
+                    );
+                }
             }
         }
     }
@@ -777,6 +893,7 @@ namespace MAINSCR {
         graphics::Set_Window_(22, 22, 527, 421);
         video::Clip_On_();
         Draw_Nebulae_();
+        Draw_Influence_Overlay_();
 
         video::Clip_Off_();
         graphics::Reset_Window_();
@@ -1180,6 +1297,7 @@ namespace MAINSCR {
 
         graphics::Reset_Window_();
         _exit_game_hot_key = fields::Add_Multi_Hot_Key_Field_("Q");
+        _influence_hot_key = fields::Add_Multi_Hot_Key_Field_("V");
 
         MOX::_main_screen_grid_field = fields::Add_Grid_Field_(22, 22, 1, 1, 506, 400, &MOX::_main_screen_grid_x, &MOX::_main_screen_grid_y, 0);
     }
@@ -1220,6 +1338,12 @@ namespace MAINSCR {
         (void)unused_param;
         char message_buffer[80];
         char dialog_text[200];
+
+        if (key == _influence_hot_key) {
+            _influence_view_enabled = !_influence_view_enabled;
+            MOX::_draw_main_screen_to_back = 1;
+            return;
+        }
 
         if ((key == _omniscient_hot_key && capture::Check_Release_Version_() == 0) ||
             key == _omniscience_cheat) {
@@ -3285,6 +3409,7 @@ namespace MAINSCR {
         MOX::_fleet_box_transport_button = -1000;
         MOX::_fleet_box_engage_button = -1000;
         MOX::_fleet_box_attack_button = -1000;
+        _influence_hot_key = -1000;
         _all_tech_cheat = -1000;
         _leader_cheat = -1000;
         _more_money_cheat = -1000;

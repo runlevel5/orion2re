@@ -4,7 +4,7 @@
 
 #define MAX_PLAYERS 8
 // Can't go higher than 127 due to int8_t. Change will make game binary-incompatible with previous version.
-#define MAX_STARS 72
+#define MAX_STARS 127 
 // Limited by int16_t ship indices and encoded ship locations. Change will make game binary-incompatible with previous version.
 #define MAX_SHIPS 500
 // Can't go higher than 255 due to uint8_t. Change will make game binary-incompatible with previous version.
