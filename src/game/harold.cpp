@@ -950,7 +950,7 @@ namespace HAROLD {
             return 2;
         }
 
-        if (scale == 30) {
+        if (scale >= 30) {
             return 1;
         }
 
@@ -1042,9 +1042,14 @@ namespace HAROLD {
         if (MOX::_NUM_STARS <= 54) {
             return 2;
         }
-        if (MOX::_NUM_STARS <= MAX_STARS) {
+        if (MOX::_NUM_STARS <= 71) {
             return 3;
         }
+#if MAX_STARS > ORIGINAL_MAX_STARS
+        if (MOX::_NUM_STARS < MAX_STARS) {
+            return GALAXY_SIZE_MAXIMUM;
+        }
+#endif
 
         return default_galaxy_size;
     }
@@ -1141,9 +1146,15 @@ namespace HAROLD {
             }
         } else {
             scale = MOX::_max_map_scale;
+#if MAX_STARS > ORIGINAL_MAX_STARS
+            if (MOX::_settings.galaxy_size != GALAXY_SIZE_MAXIMUM && scale >= 30) {
+                scale = 30;
+            }
+#else
             if (scale >= 30) {
                 scale = 30;
             }
+#endif
         }
 
         // If the resulting scale is unconstrained (equals the max), reset background star shifts

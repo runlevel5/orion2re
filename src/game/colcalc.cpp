@@ -2692,7 +2692,6 @@ namespace COLCALC {
     bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index) {
         bool found = false;
         
-        // s_star_data size is 113 (0x71). planet_index is at offset 0x4a.
         for (int i = 0; i < 5; ++i) {
             short planet_index = MOX::_star[star_index].planet_index[i];
             

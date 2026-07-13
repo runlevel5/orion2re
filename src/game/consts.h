@@ -1,12 +1,22 @@
 #pragma once
 
+#define BITMAP(bit_count) (((bit_count) + 7) / 8)
+
 #define MAX_PLAYERS 8
+#define MAX_STARS 72
 #define MAX_SHIPS 500
 #define MAX_COLONIES 250
-#define MAX_PLANETS 360
-#define MAX_STARS 72
+#define MAX_PLANETS (MAX_STARS * 5)
 #define MAX_LEADERS 67
 #define MAX_NEBULAS 4
+
+#define ORIGINAL_MAX_STARS 72
+#define GALAXY_SIZE_MAXIMUM 4
+#if MAX_STARS > ORIGINAL_MAX_STARS
+#define GALAXY_SIZE_COUNT 5
+#else
+#define GALAXY_SIZE_COUNT 4
+#endif
 
 #define COMBAT_GRID_WIDTH 81
 #define COMBAT_GRID_HEIGHT 68

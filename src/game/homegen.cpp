@@ -165,12 +165,10 @@ namespace HOMEGEN {
             current_star->star_count = 0;
 
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_STARS; ++j) {
-                RUSS::Mox_Update_();
-
                 int32_t dist = Dist_Between_Stars_(i, j);
 
                 if (dist >= min_dist_sq) {
-                    struct_::Set_Bit_Field_(current_star, j);
+                    struct_::Set_Bit_Field_(current_star->star_bitmap, j);
 
                     // Note: Potential out-of-bounds access if MOX::_NUM_STARS > MAX_STARS
                     current_star->star_distances[j] = dist;
@@ -210,19 +208,17 @@ namespace HOMEGEN {
                 }
 
                 for (uint16_t star_j = 1; star_j < MOX::_NUM_STARS; ++star_j) {
-                    RUSS::Mox_Update_();
                     if (star_j == current_star) continue;
 
                     s_good_star* field = &_good_stars[current_star];
-                    if (struct_::Test_Bit_Field_(field, star_j)) {
+                    if (struct_::Test_Bit_Field_(field->star_bitmap, star_j)) {
                         bool valid = true;
                         for (int k = 0; k < list->count; ++k) {
                             int16_t existing_star = list->stars[k];
                             int32_t dist = Dist_Between_Stars_(existing_star, star_j);
                             s_good_star* field_k = &_good_stars[existing_star];
-                            int16_t bit = struct_::Test_Bit_Field_(field_k, star_j);
+                            int16_t bit = struct_::Test_Bit_Field_(field_k->star_bitmap, star_j);
 
-                            RUSS::Mox_Update_();
                             if (existing_star != star_j && (bit == 0 || dist < min_distance_sq)) {
                                 valid = false;
                                 break;
@@ -230,12 +226,9 @@ namespace HOMEGEN {
                         }
 
                         if (valid) {
-                            // Original code has potential OOB here; we replicate it.
-                            // stars[count] writes to 'count' if count == 20.
-                            list->stars[list->count] = star_j;
-                            int32_t next_count = (int32_t)list->count + 1;
-                            if (next_count > 20) next_count = 20;
-                            list->count = (int16_t)next_count;
+                            if (list->count < 20) {
+                                list->stars[list->count++] = star_j;
+                            }
                         }
                     }
                 }
@@ -304,7 +297,7 @@ namespace HOMEGEN {
         s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
         s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
-        _good_stars = (s_good_star*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x5418);
+        _good_stars = (s_good_star*)allocate::Allocate_First_Block_(MOX::_screen_seg, MAX_STARS * sizeof(*_good_stars));
         memset(_good_stars, 0, MAX_STARS * sizeof(*_good_stars));
 
         for (int i = 0; i < MAX_PLAYERS; ++i) {
@@ -330,8 +323,8 @@ namespace HOMEGEN {
                 MOX::_star[i].owner = -1;
             }
 
-            int32_t dx = ((int32_t)MOX::_MAP_MAX_X * (int32_t)MOX::_max_map_scale) / (adj_players * 10);
-            int32_t dy = ((int32_t)MOX::_MAP_MAX_Y * (int32_t)MOX::_max_map_scale) / (adj_players * 10);
+            int32_t dx = ((int32_t)MOX::_MAP_MAX_X * (int32_t)MOX::_cur_map_scale) / (adj_players * 10);
+            int32_t dy = ((int32_t)MOX::_MAP_MAX_Y * (int32_t)MOX::_cur_map_scale) / (adj_players * 10);
             int32_t min_dist_sq = dx * dx + dy * dy;
 
             if (min_dist_sq < 15000) {

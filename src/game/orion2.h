@@ -983,15 +983,7 @@ struct s_glass_color {
 typedef struct s_good_star s_good_star, *Ps_good_star;
 
 struct s_good_star {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
-    undefined field4_0x4;
-    undefined field5_0x5;
-    undefined field6_0x6;
-    undefined field7_0x7;
-    undefined field8_0x8;
+    uint8_t star_bitmap[BITMAP(MAX_STARS)];
     uint32_t star_distances[MAX_STARS];
     uint16_t star_count;
 };
@@ -3083,7 +3075,7 @@ struct s_star_data {
     int8_t pict_type;
     int8_t spectral_class;
     int8_t last_planet_selected[MAX_PLAYERS];
-    int8_t black_hole_blocks[9];
+    int8_t black_hole_blocks[BITMAP(MAX_STARS)];
     int8_t system_special;
     int8_t wormhole_star_id;
     uint8_t blockaded;

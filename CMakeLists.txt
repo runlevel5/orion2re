@@ -101,7 +101,12 @@ option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds"
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
 option(ORION2RE_BUILD_GAME "Build the SDL game executable" ON)
 option(ORION2RE_BUILD_TESTS "Build tests" OFF)
+option(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES "Require structures to retain their original game sizes" OFF)
 option(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL "Exclude runtime executables from the default all target" ${ORION2RE_BUILD_TESTS})
+
+if(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES)
+    add_compile_definitions(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES=1)
+endif()
 
 set(ORION2RE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests")
 

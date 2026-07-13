@@ -40,7 +40,7 @@ namespace PLNTSUM {
     extern int16_t _n_ships_in_summary;
     extern int8_t _can_reach_star[MAX_STARS];
 
-    extern uint8_t _explored_bitmap[MAX_PLANETS / 8];
+    extern uint8_t _explored_bitmap[BITMAP(MAX_PLANETS)];
 
     void __cdecl Reset_Explored_Planets_();
 

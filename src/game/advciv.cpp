@@ -369,11 +369,11 @@ namespace ADVCIV {
         game_random::Get_Random_Seed_();
         allocate::Push_Block_(MOX::_screen_seg);
 
-        _adv_civ_player = (s_adv_civ_player*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x8500);
-        _parsec = (s_parsec*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x5100);
+        _adv_civ_player = (s_adv_civ_player*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_PLAYERS * sizeof(*_adv_civ_player));
+        _parsec = (s_parsec*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_STARS * sizeof(*_parsec));
         _planet_selected_flag = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_PLANETS);
         _star_colony_owner = (int8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_STARS);
-        _planet_worth_to_player = (s_adv_planet_worth*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x3c8);
+        _planet_worth_to_player = (s_adv_planet_worth*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_PLAYERS * sizeof(*_planet_worth_to_player));
 
         memset(_adv_civ_player, 0, MAX_PLAYERS * sizeof(*_adv_civ_player));
         memset(_parsec, 0, MAX_STARS * sizeof(*_parsec));

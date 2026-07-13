@@ -4,6 +4,11 @@
 #define ORION2RE_STATIC_SIZE_ASSERT(type, expected_size) static_assert(sizeof(type) == (expected_size), #type " size mismatch")
 #define ORION2RE_STATIC_SIZE_ASSERT_32_ONLY(type, expected_size) static_assert(ORION2RE_64BIT_BUILD || sizeof(type) == (expected_size), #type " size mismatch")
 #define ORION2RE_STATIC_SIZE_ASSERT_PTR(type, size32, size64) static_assert(sizeof(type) == (ORION2RE_64BIT_BUILD ? (size64) : (size32)), #type " size mismatch")
+#if defined(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES)
+#define ORION2RE_STATIC_CONFIGURABLE_SIZE_ASSERT(type, original_size, configured_size) ORION2RE_STATIC_SIZE_ASSERT(type, original_size)
+#else
+#define ORION2RE_STATIC_CONFIGURABLE_SIZE_ASSERT(type, original_size, configured_size) ORION2RE_STATIC_SIZE_ASSERT(type, configured_size)
+#endif
 
 ORION2RE_STATIC_SIZE_ASSERT(s_current_design, 0x125);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_main_menu, 0xd2, 0x11a);
@@ -17,7 +22,7 @@ ORION2RE_STATIC_SIZE_ASSERT(s_player, 0xea9);
 ORION2RE_STATIC_SIZE_ASSERT(s_planet_data, 0x11);
 ORION2RE_STATIC_SIZE_ASSERT(s_colony, 0x169);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_tech_building_data, 0x14, 0x18);
-ORION2RE_STATIC_SIZE_ASSERT(s_star_data, 0x71);
+ORION2RE_STATIC_CONFIGURABLE_SIZE_ASSERT(s_star_data, 0x71, 0x68 + BITMAP(MAX_STARS));
 ORION2RE_STATIC_SIZE_ASSERT(s_ship_data, 0x81);
 ORION2RE_STATIC_SIZE_ASSERT(s_leader_data, 0x3b);
 ORION2RE_STATIC_SIZE_ASSERT(s_antaran, 0x42);
@@ -73,5 +78,6 @@ ORION2RE_STATIC_SIZE_ASSERT(s_packed_screen_background_run8, 2);
 #undef ORION2RE_STATIC_SIZE_ASSERT
 #undef ORION2RE_STATIC_SIZE_ASSERT_32_ONLY
 #undef ORION2RE_STATIC_SIZE_ASSERT_PTR
+#undef ORION2RE_STATIC_CONFIGURABLE_SIZE_ASSERT
 
 #endif

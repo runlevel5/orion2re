@@ -37,7 +37,7 @@ void __cdecl Search_For_Battles_() {
     s_combfind_star_has_player star_has_player_stack[MAX_STARS + 1][MAX_PLAYERS];
     uint8_t star_has_nonplayer_stack[MAX_STARS + 1];
     uint16_t player_needs_to_attack_stack[MAX_STARS + 1];
-    int8_t battle_stars_stack[76];
+    int8_t battle_stars_stack[MAX_STARS + 2];
     int8_t attack_confirmed_buf[MAX_PLAYERS][MAX_PLAYERS];
 
     _star_has_player = &star_has_player_stack;

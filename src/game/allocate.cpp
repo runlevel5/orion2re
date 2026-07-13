@@ -1,5 +1,32 @@
 #include "pch.h"
 
+namespace {
+    uint32_t AI_Star_Dependent_Bytes_(uint32_t star_count) {
+        uint32_t planet_count = star_count * 5;
+
+        return planet_count * MAX_PLAYERS * sizeof(int16_t) +
+            2 * star_count * MAX_PLAYERS * sizeof(uint32_t) +
+            star_count * star_count * MAX_PLAYERS *
+                (sizeof(uint8_t) + sizeof(AIDATA::s_turns_from_to_intermediate_cache_entry)) +
+            MAX_SHIPS * star_count *
+                (sizeof(int8_t) + sizeof(AIDATA::s_ship_n_turns_to_intermediate_cache_entry)) +
+            2 * star_count * MAX_PLAYERS * MAX_PLAYERS * 10 * sizeof(int32_t) +
+            star_count * sizeof(s_ai_star_info) +
+            2 * star_count * sizeof(uint8_t) +
+            star_count * MAX_PLAYERS * 10 * sizeof(int8_t) +
+            star_count * 10 * sizeof(int8_t) +
+            star_count * MAX_PLAYERS * sizeof(int8_t) +
+            MAX_PLAYERS * (star_count + 1) * sizeof(int16_t);
+    }
+
+    uint32_t Global_Screen_Space_() {
+        uint32_t size = 0x1B5030 + AI_Star_Dependent_Bytes_(MAX_STARS) -
+            AI_Star_Dependent_Bytes_(ORIGINAL_MAX_STARS);
+
+        return (size + 3u) & ~3u;
+    }
+}
+
 namespace allocate {
     int32_t _mark_stack_pos[2];
 
@@ -34,7 +61,7 @@ namespace allocate {
     }
 
     void Allocate_Data_Space_() {
-        MOX::_global_screen_seg = Allocate_Space_(0x1B5030);
+        MOX::_global_screen_seg = Allocate_Space_(Global_Screen_Space_());
         MOX::_techname_seg = Allocate_Space_(30000);
         MOX::_special_names_seg = Allocate_Space_(1000);
 
@@ -47,7 +74,7 @@ namespace allocate {
         MOX::_colony = (s_colony*)Allocate_Space_(MAX_COLONIES * sizeof(s_colony));
         struct_::Clear_Structure_(MOX::_colony, MAX_COLONIES * sizeof(s_colony));
 
-        MOX::_nebula_screen_seg = Allocate_Space_(0x3E800);
+        MOX::_nebula_screen_seg = Allocate_Space_(MAX_NEBULAS * 0x10000);
 
         // Global cache allocation
         MOX::_global_cache_seg = buffer::Allocate_Buffer_Space_(0x174508);

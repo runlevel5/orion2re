@@ -21,7 +21,7 @@ s_animation_header* _num_players_anims[MAX_PLAYERS - 1];
 s_animation_header* _gal_age_anims[3];
 s_animation_header* _gal_size_anims[4];
 s_animation_header* _background_seg;
-char* _gal_size_button_strings[4];
+char* _gal_size_button_strings[GALAXY_SIZE_COUNT];
 char* _civ_button_strings[3];
 char* _diff_button_strings[5];
 char* _gal_age_button_strings[3];
@@ -223,7 +223,11 @@ void __cdecl Draw_Pictures_() {
                 if ((col == 0) && (row == 0)) {
                     anim = _difficulty_anims[_diff_button_variable];
                 } else if ((col == 1) && (row == 0)) {
-                    anim = _gal_size_anims[_gal_size_button_variable];
+                    int16_t preview_idx = _gal_size_button_variable;
+                    if (preview_idx >= GALAXY_SIZE_MAXIMUM) {
+                        preview_idx = GALAXY_SIZE_MAXIMUM - 1;
+                    }
+                    anim = _gal_size_anims[preview_idx];
                 } else if ((col == 2) && (row == 0)) {
                     anim = _gal_age_anims[_gal_age_button_variable];
                 } else if ((col == 0) && (row == 1)) {
@@ -262,7 +266,7 @@ void __cdecl Update_Fields_() {
 
     // Galaxy Size
     int16_t galaxy_size_hidden_field = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_help_text, 0);
-    _fields[1] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0xCC, gx + 0x169, gy + 0xE0, _gal_size_button_strings, 4, &_gal_size_button_variable, 0, common_help_text, 0, galaxy_size_hidden_field);
+    _fields[1] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0xCC, gx + 0x169, gy + 0xE0, _gal_size_button_strings, GALAXY_SIZE_COUNT, &_gal_size_button_variable, 0, common_help_text, 0, galaxy_size_hidden_field);
 
     // Galaxy Age
     int16_t galaxy_age_hidden_field = fields::Add_Hidden_Field_(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_help_text, 0);
@@ -346,6 +350,9 @@ void Load_New_Game_Strings_() {
 
     _gal_size_button_strings[2] = ESTRINGS::E_Strings_(0x168);
     _gal_size_button_strings[3] = ESTRINGS::E_Strings_(0x143);
+#if MAX_STARS > ORIGINAL_MAX_STARS
+    _gal_size_button_strings[GALAXY_SIZE_MAXIMUM] = const_cast<char*>("Maximum");
+#endif
 
     _gal_age_button_strings[0] = ESTRINGS::E_Strings_(0x179);
     _gal_age_button_strings[1] = ESTRINGS::E_Strings_(0xbe /* ESTR_AVERAGE */);

@@ -648,14 +648,14 @@ namespace SHIPS {
 
         allocate::Mark_Block_(MOX::_global_data_seg);
         s_build_ship_icon_item* build_items = (s_build_ship_icon_item*)(
-            allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x168)
+            allocate::Allocate_Next_Block_(MOX::_global_data_seg, MAX_STARS * sizeof(*build_items))
         );
         uint8_t* slot_counts = (uint8_t*)(
-            allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x120)
+            allocate::Allocate_Next_Block_(MOX::_global_data_seg, MAX_STARS * sizeof(*slot_counts))
         );
         allocate::Release_Block_(MOX::_global_data_seg);
 
-        memset(slot_counts, 0x02, MAX_STARS * sizeof(uint32_t));
+        memset(slot_counts, 0x02, MAX_STARS * sizeof(*slot_counts));
         memset(MOX::_ship_icon, 0xFF, sizeof(MOX::_ship_icon));
         memset(build_items, 0xFF, MAX_STARS * sizeof(*build_items));
 

@@ -21,7 +21,7 @@ namespace NEWGAME {
     extern s_animation_header* _gal_age_anims[3];
     extern s_animation_header* _gal_size_anims[4];
     extern s_animation_header* _background_seg;
-    extern char* _gal_size_button_strings[4];
+    extern char* _gal_size_button_strings[GALAXY_SIZE_COUNT];
     extern char* _civ_button_strings[3];
     extern char* _diff_button_strings[5];
     extern char* _gal_age_button_strings[3];

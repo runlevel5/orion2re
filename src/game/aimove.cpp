@@ -651,7 +651,7 @@ namespace AIMOVE {
 
     int __cdecl Number_Of_Attacks_Underway_(int16_t player_idx, int16_t target_player_idx) {
         // attacked_stars tracks which stars have an active threat from the player.
-        // Array size 72 is based on the game's maximum number of stars.
+        // The array is sized to the game's maximum number of stars.
         uint8_t attacked_stars[MAX_STARS];
         memset(attacked_stars, 0, sizeof(attacked_stars));
 

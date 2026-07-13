@@ -21,7 +21,7 @@ s_plntsum_planet* _planet_summary;
 s_plntsum_ship* _ship_summary;
 int16_t _n_ships_in_summary;
 int8_t _can_reach_star[MAX_STARS];
-uint8_t _explored_bitmap[MAX_PLANETS / 8];
+uint8_t _explored_bitmap[BITMAP(MAX_PLANETS)];
 
 uint8_t _found_outpost_ship;
 uint8_t _draw_colony_button_status;

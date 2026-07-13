@@ -28,6 +28,35 @@ namespace MAPGEN {
     const char s_starname_lbx[13] = "starname.lbx";
     uint8_t _MAPGEN_TRACE = 1;
 
+namespace {
+
+int16_t Maximum_Galaxy_Grid_Y_() {
+    const int16_t star_count = MAX_STARS - 1;
+    int16_t grid_y = 8;
+    while ((((grid_y * 5) + 3) / 4) * grid_y < star_count) {
+        ++grid_y;
+    }
+    return grid_y;
+}
+
+int16_t Maximum_Galaxy_Grid_X_() {
+    return (int16_t)(((Maximum_Galaxy_Grid_Y_() * 5) + 3) / 4);
+}
+
+constexpr int16_t MAXIMUM_GALAXY_MAP_SCALE = 30;
+constexpr int16_t MAXIMUM_GALAXY_CELL_SIZE = 50;
+
+int16_t Maximum_Galaxy_Display_Scale_() {
+    const int32_t raw_cell_size = (MAXIMUM_GALAXY_CELL_SIZE * MAXIMUM_GALAXY_MAP_SCALE) / 10;
+    const int32_t map_width = Maximum_Galaxy_Grid_X_() * raw_cell_size;
+    const int32_t map_height = Maximum_Galaxy_Grid_Y_() * raw_cell_size;
+    const int32_t scale_x = (map_width * 10 + 0x1FA - 1) / 0x1FA;
+    const int32_t scale_y = (map_height * 10 + 0x190 - 1) / 0x190;
+    return (int16_t)((scale_x > scale_y) ? scale_x : scale_y);
+}
+
+} // namespace
+
 bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age, int8_t generate_spectral, int8_t use_names) {
     int16_t x_cell_size = MOX::_MAP_MAX_X / x_cells;
     int16_t y_cell_size = MOX::_MAP_MAX_Y / y_cells;
@@ -46,7 +75,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     HAROLD::Set_Player_Font_Style_(0, 0);
     HAROLD::Map_Scale_To_Zoom_Level_();
 
-    int16_t collision_h = 0;
+    int16_t collision_h = 30;
+    y_collision_padding = 4;
     switch (MOX::_cur_map_scale) {
     case 10:
     case 15:
@@ -58,8 +88,6 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         y_collision_padding = 6;
         break;
     case 30:
-        collision_h = 30;
-        y_collision_padding = 4;
         break;
     }
 
@@ -133,10 +161,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             if (++retry_count > 0x96) {
                 int16_t fallback_retries = 0;
                 bool fallback_found = false;
+                int32_t fallback_range_x = std::max(0x189, 0x189 * (int32_t)MOX::_MAP_MAX_X / 0x5EE);
+                int32_t fallback_range_y = std::max(0x155, 0x155 * (int32_t)MOX::_MAP_MAX_Y / 0x4B0);
                 do {
                     RUSS::Mox_Update_();
-                    int32_t fx = (int16_t)game_random::Random_(0x189) + 0x14;
-                    int32_t fy = (int16_t)game_random::Random_(0x155) + 0x14;
+                    int32_t fx = game_random::Random_(fallback_range_x) + 0x14;
+                    int32_t fy = game_random::Random_(fallback_range_y) + 0x14;
                     MOX::_star[i].x = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fx);
                     MOX::_star[i].y = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fy);
 
@@ -493,7 +523,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 s_planet_data* backup_p = &_pl[random_idx];
 
                 if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
-                    int16_t mapped_idx = MOX::_star[(int8_t)backup_p->star_index].planet_index[random_idx];
+                    int16_t mapped_idx = MOX::_star[(uint8_t)backup_p->star_index].planet_index[(uint8_t)backup_p->orbit];
                     if (mapped_idx > -1 && _pl[mapped_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
                         backup_p->colony_index = -2;
                         MOX::_planet_count--;
@@ -793,6 +823,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         case 3:
             MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(3) + 1);
             break;
+#if MAX_STARS > ORIGINAL_MAX_STARS
+        case GALAXY_SIZE_MAXIMUM:
+            MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(3) + 1);
+            break;
+#endif
         default:
             break;
         }
@@ -972,6 +1007,18 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             MOX::_max_zoom_count = 3;
             MOX::_zoom_count = 3;
             break;
+#if MAX_STARS > ORIGINAL_MAX_STARS
+        case GALAXY_SIZE_MAXIMUM: {
+            const int16_t raw_cell_size = (MAXIMUM_GALAXY_CELL_SIZE * MAXIMUM_GALAXY_MAP_SCALE) / 10;
+            MOX::_MAP_MAX_X = (int16_t)(Maximum_Galaxy_Grid_X_() * raw_cell_size);
+            MOX::_MAP_MAX_Y = (int16_t)(Maximum_Galaxy_Grid_Y_() * raw_cell_size);
+            MOX::_cur_map_scale = MAXIMUM_GALAXY_MAP_SCALE;
+            MOX::_max_map_scale = Maximum_Galaxy_Display_Scale_();
+            MOX::_max_zoom_count = 3;
+            MOX::_zoom_count = 3;
+            break;
+        }
+#endif
         default:
             break;
         }
@@ -1354,6 +1401,13 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 grid_x = 9;
                 grid_y = 8;
                 break;
+#if MAX_STARS > ORIGINAL_MAX_STARS
+            case GALAXY_SIZE_MAXIMUM:
+                MOX::_NUM_STARS = MAX_STARS - 1;
+                grid_x = Maximum_Galaxy_Grid_X_();
+                grid_y = Maximum_Galaxy_Grid_Y_();
+                break;
+#endif
             default:
                 snprintf(error_buf, sizeof(error_buf), "Galaxy size %d is undefined", galaxy_size);
                 exitm::Exit_With_Message(error_buf);
