@@ -682,7 +682,7 @@ namespace REPORT {
                         s_ship_data* ship = &MOX::_ship[i];
                         if (ship->owner == 8 /* Antaran */ && ship->status == 1 /* Active */) {
                             if (max_turns_left < (uint8_t)ship->turns_left) {
-                                target_star_idx = ship->location - MAX_SHIPS;
+                                target_star_idx = ship->location - SHIP_LOCATION_MOVING_OFFSET;
                                 max_turns_left = ship->turns_left;
                             }
                         }

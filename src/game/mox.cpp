@@ -524,7 +524,7 @@ namespace MOX {
     void* _global_cache_seg;
     s_animation_header* _mid_star_seg;
     s_animation_header* _far_star_seg;
-    uint8_t _fleet_icon_selection_status[64];
+    uint8_t _fleet_icon_selection_status[BITMAP(MAX_SHIPS)];
     s_animation_header* _star_seg[40];
     s_animation_header* _sun_seg[7];
     uint16_t _n_stats_to_generate;
@@ -754,7 +754,7 @@ namespace MOX {
 
     int16_t _ship_stack_start[MAX_SHIPS];
 
-    uint8_t _fleet_box_ship_ids[63];
+    uint8_t _fleet_box_ship_ids[BITMAP(MAX_SHIPS)];
 
     int8_t _special_bonus[9][3] = {
         {-50, 50, 100},
@@ -773,7 +773,7 @@ namespace MOX {
     int16_t _ship_icon_count;
     int16_t _icon_overlay_x;
     int16_t _fleet_box_ship_stack;
-    s_ship_icon _ship_icon[572];
+    s_ship_icon _ship_icon[SHIP_ICON_COUNT];
     int8_t _black_hole_anim_count[10];
     int16_t _bill_savegame[6] = {2, 0, 0, 0, 0, 0};
     uint16_t _antaran_resource_level;

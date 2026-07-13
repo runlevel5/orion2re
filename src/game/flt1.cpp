@@ -181,7 +181,7 @@ namespace FLT1 {
 
                 if (owner == MOX::_PLAYER_NUM) {
                     int16_t abs_loc = HAROLD::Absolute_Location_(MOX::_ship[ship_id].location);
-                    if (abs_loc != MOX::_NUM_STARS && MOX::_ship[ship_id].location >= 500 && MOX::_ship[ship_id].location < 1500) {
+                    if (abs_loc != MOX::_NUM_STARS && MOX::_ship[ship_id].location >= SHIP_LOCATION_MOVING_OFFSET && MOX::_ship[ship_id].location < SHIP_LOCATION_LIMIT) {
                         draw_dest = true;
                         temp_color = local_green;
                     }
@@ -361,11 +361,11 @@ namespace FLT1 {
 
     void __cdecl Allocate_Fltscrn_Next_Screen_Seg_() {
         MOX::_fltscrn_big_icon = (s_big_icon*)allocate::Allocate_Next_Block_(
-            (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_big_icon));
+            (void*)(uintptr_t)MOX::_screen_seg, SHIP_LIST_CAPACITY * sizeof(*MOX::_fltscrn_big_icon));
         MOX::_fltscrn_icon_selection_status = (int8_t*)allocate::Allocate_Next_Block_(
-            (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_icon_selection_status));
+            (void*)(uintptr_t)MOX::_screen_seg, SHIP_LIST_CAPACITY * sizeof(*MOX::_fltscrn_icon_selection_status));
         MOX::_fltscrn_ship_icon_selection_list = (int16_t*)allocate::Allocate_Next_Block_(
-            (void*)(uintptr_t)MOX::_screen_seg, 250 * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
+            (void*)(uintptr_t)MOX::_screen_seg, SHIP_LIST_CAPACITY * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
         MOX::_officer_id_list = (int16_t*)allocate::Allocate_Next_Block_(
             (void*)(uintptr_t)MOX::_screen_seg, MAX_LEADERS * sizeof(*MOX::_officer_id_list));
         MOX::_scroll_bar = (s_scroll_bar*)allocate::Allocate_Next_Block_(
@@ -398,7 +398,7 @@ namespace FLT1 {
             FLT2::Print_Fltscrn_Scanned_Star_Name_();
         }
 
-        if (MOX::_scanned_big_ship > -1 && MOX::_scanned_big_ship < 250 && MOX::_current_screen == SCREEN_FLEET) {
+        if (MOX::_scanned_big_ship > -1 && MOX::_scanned_big_ship < MAX_SHIPS && MOX::_current_screen == SCREEN_FLEET) {
             graphics::Set_Window_(15, 282, 320, 465);
             video::Clip_On_();
             FLT2::Print_Scanned_Ship_Data_(MOX::_fltscrn_big_icon[MOX::_scanned_big_ship].ship_idx);

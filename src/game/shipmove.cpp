@@ -333,11 +333,11 @@ namespace SHIPMOVE {
         int16_t location = ship->location;
 
         if (ship->status == 1) {
-            return location - 500;
+            return location - SHIP_LOCATION_MOVING_OFFSET;
         }
 
         if (ship->status == 2) {
-            return location - 1000;
+            return location - SHIP_LOCATION_WORMHOLE_OFFSET;
         }
 
         return location;
@@ -410,11 +410,11 @@ namespace SHIPMOVE {
             s_ship_data* ship = &MOX::_ship[i];
 
             if (Ship_Is_Moving_(ship)) {
-                if (ship->location >= 1000) {
-                    ship->location -= 500;
+                if (ship->location >= SHIP_LOCATION_WORMHOLE_OFFSET) {
+                    ship->location -= SHIP_LOCATION_MOVING_OFFSET;
                 }
 
-                int16_t star_idx = ship->location - 500;
+                int16_t star_idx = ship->location - SHIP_LOCATION_MOVING_OFFSET;
                 int16_t star_x = MOX::_star[star_idx].x;
                 int16_t star_y = MOX::_star[star_idx].y;
 
@@ -468,12 +468,12 @@ namespace SHIPMOVE {
             int16_t first_ship_idx = ship_list[0];
             int16_t first_loc = MOX::_ship[first_ship_idx].location;
 
-            if (first_loc < MAX_STARS || first_loc >= 1000) {
+            if (first_loc < MAX_STARS || first_loc >= SHIP_LOCATION_WORMHOLE_OFFSET) {
                 move_status = 2;
-                destination_location += 1000;
+                destination_location += SHIP_LOCATION_WORMHOLE_OFFSET;
             } else {
                 move_status = 1;
-                destination_location += 500;
+                destination_location += SHIP_LOCATION_MOVING_OFFSET;
             }
         }
 
@@ -1064,7 +1064,7 @@ namespace SHIPMOVE {
             int32_t location = selected_ship->location;
             int32_t x = selected_ship->x;
             int32_t y = selected_ship->y;
-            int32_t star_idx = location - 500;
+            int32_t star_idx = location - SHIP_LOCATION_MOVING_OFFSET;
 
             wormhole->success = 1;
             wormhole->count = star_idx;

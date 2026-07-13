@@ -397,7 +397,7 @@ namespace antarans {
                     SHIPMOVE::Make_Ships_Move_To_(ship_list, target_star, &move_info);
                     s_ship_data* ship = &MOX::_ship[ship_idx];
                     ship->status = 1;
-                    ship->location = target_star + 500;
+                    ship->location = target_star + SHIP_LOCATION_MOVING_OFFSET;
                     ship->crew_quality = 2;
                     ship->crew_experience = MOX::_crew_data[2].experience + 1;
                 }

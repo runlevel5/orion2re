@@ -231,7 +231,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         }
     }
 
-    if (nearest_ship_idx <= -1 || MOX::_ship[nearest_ship_idx].location < 500) {
+    if (nearest_ship_idx <= -1 || MOX::_ship[nearest_ship_idx].location < SHIP_LOCATION_MOVING_OFFSET) {
         if (nearest_ship_idx == -1) {
             should_continue = false;
         }
@@ -472,8 +472,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     bool __cdecl Ship_Is_Not_Colonizing_(s_ship_data* ship) {
         int16_t location = ship->location;
 
-        bool is_at_planet = (location >= 0 && location < 500);
-        bool is_in_warp_range = (location >= 1000 && location < 1500);
+        bool is_at_planet = (location >= 0 && location < SHIP_LOCATION_MOVING_OFFSET);
+        bool is_in_warp_range = (location >= SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT);
 
         int16_t auto_col_status = Colony_Ship_Auto_Colonization_(ship);
 
@@ -1068,13 +1068,13 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         int16_t location = MOX::_ship[ship_idx].location;
 
-        if (location >= 1000 && location < 1500) {
+        if (location >= SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT) {
             in_stasis_1000 = true;
         } else {
             in_stasis_1000 = false;
         }
 
-        if (location >= 500 && location < 1000) {
+        if (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET) {
             in_stasis_500 = true;
         } else {
             in_stasis_500 = false;
@@ -1134,9 +1134,9 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         int16_t location = MOX::_ship[ship_idx].location;
 
-        if (location >= 1000 && location < 1500) {
+        if (location >= SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT) {
             in_stasis_1000 = true;
-        } else if (location >= 500 && location < 1000) {
+        } else if (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET) {
             in_stasis_500 = true;
         }
 
@@ -1668,8 +1668,8 @@ void __cdecl Get_Colony_Outpost_Marker_XY_(int16_t summary_idx, int16_t* out_x, 
     s_ship_data* ship = &MOX::_ship[ship_idx];
     int16_t location = ship->location;
 
-    bool is_space_location = (location >= 500 && location < 1000);
-    bool is_travel_location = (location >= 1000 && location < 1500);
+    bool is_space_location = (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET);
+    bool is_travel_location = (location >= SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT);
 
     if (is_space_location) {
         MOVEBOX::Get_Galaxy_Map_Space_XY_(summary->ship_icon_id, 443, 17, 180, 116, out_x, out_y);
@@ -1801,7 +1801,7 @@ void __cdecl Draw_Mini_Planet_Summary_Screen_() {
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
         s_ship_data* ship_ptr = &MOX::_ship[ship_idx];
 
-        if (ship_ptr->location >= 500) {
+        if (ship_ptr->location >= SHIP_LOCATION_MOVING_OFFSET) {
             uint8_t type = ship_ptr->d.ship_type;
             if (type == SHIP_TYPE_COLONY || type == SHIP_TYPE_OUTPOST) {
                 PLNTSUM::Draw_Nearest_Ship_Directional_Line_(ship_ptr->location);

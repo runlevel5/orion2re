@@ -88,7 +88,7 @@ void Fleet_Screen_Big_Icon_Fields_(int16_t* button_id_ptr, int16_t x, int16_t y,
             MOX::_n_fltscrn_rows++;
         }
 
-        if (MOX::_scroll_bar->first_visible_row < 0 || MOX::_scroll_bar->first_visible_row >= 500) {
+        if (MOX::_scroll_bar->first_visible_row < 0 || MOX::_scroll_bar->first_visible_row >= MAX_SHIPS) {
             MOX::_scroll_bar->first_visible_row = 0;
         }
 
@@ -211,7 +211,7 @@ void __cdecl Fix_Palette_(int16_t player_idx) {
 void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx, int16_t first_visible_row) {
     (void)first_visible_row;
 
-    int16_t ship_idx_list[250];
+    int16_t ship_idx_list[MAX_SHIPS];
     int16_t selected_count = 0;
     int16_t target_icon_idx = -1;
     int16_t next_node_idx = -1;
@@ -233,15 +233,15 @@ void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx, int16_t first_vis
         }
     }
 
-    memset(MOX::_fltscrn_big_icon, 0, 250 * sizeof(*MOX::_fltscrn_big_icon));
+    memset(MOX::_fltscrn_big_icon, 0, SHIP_LIST_CAPACITY * sizeof(*MOX::_fltscrn_big_icon));
 
-    for (int i = 0; i < 250; ++i) {
+    for (int i = 0; i < SHIP_LIST_CAPACITY; ++i) {
         MOX::_fltscrn_big_icon[i].button_id = -1000;
     }
 
     MOX::_n_fltscrn_big_icons = 0;
 
-    while (next_node_idx != -1 && MOX::_n_fltscrn_big_icons < 250) {
+    while (next_node_idx != -1 && MOX::_n_fltscrn_big_icons < MAX_SHIPS) {
         int16_t ship_idx = MOX::_ship_node[next_node_idx].ship_idx;
 
         if (FLT2::Ok_To_Add_Ship_(ship_idx) && MOX::_ship[ship_idx].status < 3) {
@@ -351,7 +351,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
 
     visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, MOX::_galaxy_map_scanned_star);
 
-    for (int i = 0; i < 250; ++i) {
+    for (int i = 0; i < SHIP_LIST_CAPACITY; ++i) {
         MOX::_fltscrn_ship_icon_selection_list[i] = -1;
     }
 
@@ -647,7 +647,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     y_cursor = fonts::Get_Font_Height_() + y_cursor + 2;
     
     int16_t loc = MOX::_ship[ship_idx].location;
-    if (loc >= MAX_SHIPS && loc <= MOX::_NUM_STARS + 1000) {
+    if (loc >= SHIP_LOCATION_MOVING_OFFSET && loc <= MOX::_NUM_STARS + SHIP_LOCATION_WORMHOLE_OFFSET) {
         int16_t star_idx = HAROLD::Absolute_Location_(loc);
         bool visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx);
         
@@ -780,7 +780,7 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
     char msg_buf[200];
     char msg_buf2[88];
 
-    memset(MOX::_fltscrn_ship_icon_selection_list, 0xFF, 250 * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
+    memset(MOX::_fltscrn_ship_icon_selection_list, 0xFF, SHIP_LIST_CAPACITY * sizeof(*MOX::_fltscrn_ship_icon_selection_list));
 
     if (Build_Fltscrn_Ship_List_(MOX::_fltscrn_ship_icon_selection_list) != 0) {
         SHIPMOVE::Ships_Try_To_Move_To_(MOX::_fltscrn_ship_icon_selection_list, target_star, &MOX::_g_ship_move_info);
@@ -882,7 +882,7 @@ int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list) {
             if (MOX::_fltscrn_big_icon[i].selected != 0) {
                 ship_list[count] = MOX::_fltscrn_big_icon[i].ship_idx;
                 count++;
-                if (count >= 250) {
+                if (count >= MAX_SHIPS) {
                     HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, "Too many ships in list", 0);
                     error_flag = 1;
                     retval = 0;

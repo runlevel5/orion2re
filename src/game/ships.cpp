@@ -122,7 +122,7 @@ namespace SHIPS {
             }
 
             MOX::_ship[ship_idx].status = 1;
-            MOX::_ship[ship_idx].location = star_idx + 500;
+            MOX::_ship[ship_idx].location = star_idx + SHIP_LOCATION_MOVING_OFFSET;
         } else {
             MOX::_ship[ship_idx].status = 0;
             MOX::_ship[ship_idx].location = star_idx;
@@ -465,7 +465,7 @@ namespace SHIPS {
 
             if (is_player_ship_moving || is_enemy_moving_to_colony || is_selected) {
                 int16_t location = MOX::_ship[ship_id].location;
-                if (location >= 500 && location < 1500) {
+                if (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_LIMIT) {
                     int16_t abs_loc = HAROLD::Absolute_Location_(location);
                     if (abs_loc != MOX::_NUM_STARS) {
                         int16_t star_x, star_y;
@@ -483,7 +483,7 @@ namespace SHIPS {
 
                         SHIPS::Draw_Ship_Destination_Line_(star_x, star_y, ship_x, ship_y, colors);
 
-                        if (location >= 500 && location < 1000) {
+                        if (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET) {
                             int16_t zoom = HAROLD::Map_Scale_To_Zoom_Level_();
                             SHIPS::Print_Eta_On_Ship_Icon_(node_idx, zoom, ship_x, ship_y);
                         }
@@ -680,7 +680,7 @@ namespace SHIPS {
                     MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 5;
                     MOX::_ship_icon_count++;
                 } else {
-                    if (star_id > -1 && star_id < 500) {
+                    if (star_id > -1 && star_id < SHIP_LOCATION_MOVING_OFFSET) {
                         s_build_ship_icon_item* item = &build_items[star_id];
                         int8_t item_player_idx = item->player_idx;
 
@@ -719,7 +719,7 @@ namespace SHIPS {
                             MOX::_ship_icon_count++;
                         }
                     } else {
-                        if (star_id - dest_star_id == 1000) {
+                        if (star_id - dest_star_id == SHIP_LOCATION_WORMHOLE_OFFSET) {
                             int16_t icon_index = -1;
                             for (int16_t j = 0; j < MOX::_ship_icon_count; ++j) {
                                 if (MOX::_ship_icon[j].stack_slot == 1 &&
@@ -730,11 +730,10 @@ namespace SHIPS {
                                 }
                             }
 
-                            // Bug in original code: if star_id >= 1000, this writes out of bounds into build_items.
-                            build_items[star_id].player_idx = owner;
-                            build_items[star_id].ship_idx = MOX::_ship_icon[icon_index].node_idx;
+                            build_items[dest_star_id].player_idx = owner;
+                            build_items[dest_star_id].ship_idx = MOX::_ship_icon[icon_index].node_idx;
                             MOX::_ship_icon[icon_index].stack_slot = 0;
-                        } else if (star_id >= 1000 && dest_star_id > -1) {
+                        } else if (star_id >= SHIP_LOCATION_WORMHOLE_OFFSET && dest_star_id > -1) {
                             MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
                             MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
                             MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 1;

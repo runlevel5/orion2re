@@ -1,14 +1,15 @@
 #include "pch.h"
 
 namespace {
-    uint32_t AI_Star_Dependent_Bytes_(uint32_t star_count) {
+    uint32_t AI_Dependent_Bytes_(uint32_t star_count, uint32_t ship_count) {
         uint32_t planet_count = star_count * 5;
 
-        return planet_count * MAX_PLAYERS * sizeof(int16_t) +
+        return 3 * ship_count * MAX_PLAYERS * sizeof(uint16_t) +
+            planet_count * MAX_PLAYERS * sizeof(int16_t) +
             2 * star_count * MAX_PLAYERS * sizeof(uint32_t) +
             star_count * star_count * MAX_PLAYERS *
                 (sizeof(uint8_t) + sizeof(AIDATA::s_turns_from_to_intermediate_cache_entry)) +
-            MAX_SHIPS * star_count *
+            ship_count * star_count *
                 (sizeof(int8_t) + sizeof(AIDATA::s_ship_n_turns_to_intermediate_cache_entry)) +
             2 * star_count * MAX_PLAYERS * MAX_PLAYERS * 10 * sizeof(int32_t) +
             star_count * sizeof(s_ai_star_info) +
@@ -16,12 +17,15 @@ namespace {
             star_count * MAX_PLAYERS * 10 * sizeof(int8_t) +
             star_count * 10 * sizeof(int8_t) +
             star_count * MAX_PLAYERS * sizeof(int8_t) +
-            MAX_PLAYERS * (star_count + 1) * sizeof(int16_t);
+            ship_count * sizeof(int16_t) +
+            MAX_PLAYERS * (star_count + 1) * sizeof(int16_t) +
+            MAX_PLAYERS * (sizeof(int16_t) + ship_count * sizeof(s_ai_refit_entry)) +
+            ship_count * sizeof(int32_t);
     }
 
     uint32_t Global_Screen_Space_() {
-        uint32_t size = 0x1B5030 + AI_Star_Dependent_Bytes_(MAX_STARS) -
-            AI_Star_Dependent_Bytes_(ORIGINAL_MAX_STARS);
+        uint32_t size = 0x1B5030 + AI_Dependent_Bytes_(MAX_STARS, MAX_SHIPS) -
+            AI_Dependent_Bytes_(ORIGINAL_MAX_STARS, ORIGINAL_MAX_SHIPS);
 
         return (size + 3u) & ~3u;
     }

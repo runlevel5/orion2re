@@ -4,7 +4,7 @@ namespace INITGAME {
 
     /**
      * Initializes the ship data array. 
-     * Zeroes out the entire array (500 ships), then sets default status, 
+     * Zeroes out the entire ship array, then sets default status,
      * location, and officer values for each.
      */
     void Init_Ships_Array_() {

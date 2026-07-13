@@ -474,7 +474,7 @@ namespace MOX {
 
     extern s_animation_header* _mid_star_seg;
     extern s_animation_header* _far_star_seg;
-    extern uint8_t _fleet_icon_selection_status[64];
+    extern uint8_t _fleet_icon_selection_status[BITMAP(MAX_SHIPS)];
 
     // Suggested name: MOX::_star_seg
     extern s_animation_header* _star_seg[40];
@@ -638,7 +638,7 @@ namespace MOX {
 
     extern int16_t _ship_stack_start[MAX_SHIPS];
 
-    extern uint8_t _fleet_box_ship_ids[63];
+    extern uint8_t _fleet_box_ship_ids[BITMAP(MAX_SHIPS)];
 
     extern void* _other_ships_screen_seg;
 
@@ -652,7 +652,7 @@ namespace MOX {
 
     extern int16_t _fleet_box_ship_stack;
 
-    extern s_ship_icon _ship_icon[572];
+    extern s_ship_icon _ship_icon[SHIP_ICON_COUNT];
 
     extern int8_t _black_hole_anim_count[10];
 

@@ -30,6 +30,7 @@ namespace MOX {
     int8_t _game_type = 0;
     char _temp_string[512] = {};
     int16_t _PLAYER_NUM = 0;
+    int16_t _combat_turn = 0;
     s_player* _player = nullptr;
     int16_t _NUM_PLAYERS = 0;
     int16_t _NUM_STARS = 0;

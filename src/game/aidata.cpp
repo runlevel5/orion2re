@@ -208,7 +208,7 @@ namespace AIDATA {
                     star_idx = ship.location;
                     turn_idx = 0;
                 } else if (ship.status == 1) {
-                    star_idx = ship.location - 500;
+                    star_idx = ship.location - SHIP_LOCATION_MOVING_OFFSET;
                     turn_idx = (int)ship.turns_left;
                 } else if (ship.status == 2) {
                     star_idx = HAROLD::XY_To_Star_Id_(ship.x, ship.y);
@@ -542,8 +542,8 @@ namespace AIDATA {
                 initial_delay = 0;
             } else if (start_star < MOX::_NUM_STARS) {
                 initial_delay = 0;
-            } else if (start_star < 1000) {
-                start_star -= 500;
+            } else if (start_star < SHIP_LOCATION_WORMHOLE_OFFSET) {
+                start_star -= SHIP_LOCATION_MOVING_OFFSET;
                 initial_delay = (int)MOX::_ship[i].turns_left;
             } else {
                 start_star = HAROLD::XY_To_Star_Id_(MOX::_ship[i].x, MOX::_ship[i].y);
@@ -1120,9 +1120,9 @@ namespace AIDATA {
 
         if (cached_info.intermediate_star == 0xff) {
             int16_t loc = MOX::_ship[ship_idx].location;
-            if (loc >= MAX_STARS && loc < 1000) {
+            if (loc >= MAX_STARS && loc < SHIP_LOCATION_WORMHOLE_OFFSET) {
                 int owner = MOX::_ship[ship_idx].owner;
-                int ship_dest_star = loc - 500;
+                int ship_dest_star = loc - SHIP_LOCATION_MOVING_OFFSET;
 
                 if (cached_info.turns > 1) {
                     for (int i = MOX::_NUM_STARS - 1; i >= 0; i--) {
@@ -1159,7 +1159,7 @@ namespace AIDATA {
                     cached_info.intermediate_star = MAX_STARS;
                 }
             } else {
-                if (loc >= 1000) {
+                if (loc >= SHIP_LOCATION_WORMHOLE_OFFSET) {
                     loc = HAROLD::XY_To_Star_Id_(MOX::_ship[ship_idx].x, MOX::_ship[ship_idx].y);
                 }
 

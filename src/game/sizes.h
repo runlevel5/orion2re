@@ -61,7 +61,7 @@ ORION2RE_STATIC_SIZE_ASSERT(s_combfind_target, 0x2c);
 
 ORION2RE_STATIC_SIZE_ASSERT(s_player_ship_sizes, 0x38);
 ORION2RE_STATIC_SIZE_ASSERT(s_ai_refit_entry, 6);
-ORION2RE_STATIC_SIZE_ASSERT(s_ai_refit_player, 3002);
+ORION2RE_STATIC_CONFIGURABLE_SIZE_ASSERT(s_ai_refit_player, 3002, 2 + MAX_SHIPS * sizeof(s_ai_refit_entry));
 ORION2RE_STATIC_SIZE_ASSERT(s_animation_header, 0x0c);
 ORION2RE_STATIC_SIZE_ASSERT(s_colony_job_production, 0x256);
 ORION2RE_STATIC_SIZE_ASSERT(s_help_record, 0x57b);

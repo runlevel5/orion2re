@@ -46,7 +46,7 @@ namespace AIMOVE {
                 int8_t stage_point = MOX::_player[_i_ai].offensive_stagepoint;
 
                 if ((*AIDATA::_i_all_combat_ships)[_i_ai][stage_point] != -1) {
-                    int16_t ship_list[502];
+                    int16_t ship_list[SHIP_LIST_CAPACITY];
                     s_ship_move_info move_info;
                     int16_t star_idx = MOX::_planet[target_planet_idx].star_index;
 
@@ -234,9 +234,9 @@ namespace AIMOVE {
                         }
                         star_flags_0[loc] = 1;
                     } else if (status == 1) {
-                        star_flags_0[loc - 500] = 1;
+                        star_flags_0[loc - SHIP_LOCATION_MOVING_OFFSET] = 1;
                     } else if (status == 2) {
-                        star_flags_0[loc - 1000] = 1;
+                        star_flags_0[loc - SHIP_LOCATION_WORMHOLE_OFFSET] = 1;
                     }
                 }
             }
@@ -399,7 +399,7 @@ namespace AIMOVE {
                     ship->status == 1 &&
                     !SHIPMOVE::Can_Order_Ship_(ship))
                 {
-                    int16_t star_idx = ship->location - 500;
+                    int16_t star_idx = ship->location - SHIP_LOCATION_MOVING_OFFSET;
                     for (int j = *num_planets - 1; j >= 0; --j) {
                         if (MOX::_planet[colonizable_planets[j].planet_idx].star_index == star_idx) {
                             int16_t new_count = *num_planets - 1;
@@ -456,8 +456,7 @@ namespace AIMOVE {
                     turn_strengths[0] += (*strength_table)[ship_idx][_i_ai];
                 } else {
                     int location_diff = (int)(int16_t)ship->location - star_idx;
-                    // Location diffs of 500 and 1000 relate to travel/wormhole logic
-                    if ((location_diff == 500 || location_diff == 1000) && ship->turns_left < ENEMY_STRENGTH_TURN_WINDOW) {
+                    if ((location_diff == SHIP_LOCATION_MOVING_OFFSET || location_diff == SHIP_LOCATION_WORMHOLE_OFFSET) && ship->turns_left < ENEMY_STRENGTH_TURN_WINDOW) {
                         uint16_t(*strength_table)[MAX_SHIPS][MAX_PLAYERS] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
                         turn_strengths[ship->turns_left] += (*strength_table)[ship_idx][_i_ai];
                     }
@@ -665,16 +664,16 @@ namespace AIMOVE {
 
                 // Determine the current or destination star index based on ship status.
                 // Status 0: At star
-                // Status 1: Traveling (location offset by 500)
-                // Status 2: Orbiting/Wormhole (location offset by 1000)
+                // Status 1: Traveling (location offset by SHIP_LOCATION_MOVING_OFFSET)
+                // Status 2: Orbiting/Wormhole (location offset by SHIP_LOCATION_WORMHOLE_OFFSET)
                 if (ship->status == 0) {
                     star_idx = (int)ship->location;
                 }
                 else if (ship->status == 1) {
-                    star_idx = (int)ship->location - 500;
+                    star_idx = (int)ship->location - SHIP_LOCATION_MOVING_OFFSET;
                 }
                 else if (ship->status == 2) {
-                    star_idx = (int)ship->location - 1000;
+                    star_idx = (int)ship->location - SHIP_LOCATION_WORMHOLE_OFFSET;
                 }
 
                 if (star_idx != -1) {
@@ -909,7 +908,7 @@ namespace AIMOVE {
             }
 
             if (ship->status == 1) {
-                star_flag2[ship->location - 500] = 1;
+                star_flag2[ship->location - SHIP_LOCATION_MOVING_OFFSET] = 1;
                 continue;
             }
 
@@ -1063,7 +1062,7 @@ namespace AIMOVE {
             }
 
             int32_t diff = (int32_t)ship->location - (int32_t)target_location;
-            if (diff == 500 || diff == 1000) {
+            if (diff == SHIP_LOCATION_MOVING_OFFSET || diff == SHIP_LOCATION_WORMHOLE_OFFSET) {
                 uint16_t turns = (uint8_t)ship->turns_left;
                 if (turns < min_turns) {
                     min_turns = turns;
@@ -1807,7 +1806,7 @@ namespace AIMOVE {
                 }
                 else if (ship->status > 0 && ship->status <= 2) // En-route
                 {
-                    int star_idx = ship->location - (ship->status == 1 ? 500 : 1000);
+                    int star_idx = ship->location - (ship->status == 1 ? SHIP_LOCATION_MOVING_OFFSET : SHIP_LOCATION_WORMHOLE_OFFSET);
                     if ((MOX::_star[star_idx].has_colony >> _i_ai) & 1)
                     {
                         uint32_t strength = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_(s, _i_ai);
@@ -1883,7 +1882,7 @@ namespace AIMOVE {
         uint8_t visited_stars[MAX_STARS];
         int8_t mission_array[252];
         uint16_t scores[MAX_COLONIES];
-        int16_t ship_list[502];
+        int16_t ship_list[SHIP_LIST_CAPACITY];
 
         // Initialize copy of target_info
         if (target_info != nullptr) {
@@ -2500,7 +2499,7 @@ namespace AIMOVE {
         int32_t best_num_escorts_total = -1;
         int32_t c = 0;
 
-        int16_t fleet[502];
+        int16_t fleet[SHIP_LIST_CAPACITY];
 
         if (*num_colony_ships > 0) {
             do {
@@ -2605,7 +2604,7 @@ namespace AIMOVE {
                     }
                     fleet[num_escorts] = -1;
 
-                    if (MOX::_ship[fleet[0]].location - star_idx == 500) {
+                    if (MOX::_ship[fleet[0]].location - star_idx == SHIP_LOCATION_MOVING_OFFSET) {
                         uint8_t turns = MOX::_ship[fleet[0]].turns_left;
                         if (turns < ENEMY_STRENGTH_TURN_WINDOW && turns <= max_turns) {
                             if (turns < best_max_turn && enemy_strength2[turns] < strength) {

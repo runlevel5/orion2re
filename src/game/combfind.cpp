@@ -83,7 +83,7 @@ void __cdecl Search_For_Battles_() {
                 }
             }
         } else if (ship->d.ship_type == SHIP_TYPE_TRANSPORT && ship->status == 1) {
-            int16_t star_idx = loc - 500;
+            int16_t star_idx = loc - SHIP_LOCATION_MOVING_OFFSET;
             if (ship->turns_left == 1) {
                 (*_star_has_player)[star_idx][ship->owner].transport_count++;
             } else {
@@ -300,7 +300,7 @@ void __cdecl Process_Retreating_Ships_(void) {
                 SHIPMOVE::Make_Ships_Move_To_(ship_indices, retreat_star, &move_info);
                 for (int k = 0; k < group_count; ++k) {
                     int16_t idx = ship_indices[k];
-                    MOX::_ship[idx].location -= 500;
+                    MOX::_ship[idx].location -= SHIP_LOCATION_MOVING_OFFSET;
                     MOX::_ship[idx].status = 1;
                 }
             }

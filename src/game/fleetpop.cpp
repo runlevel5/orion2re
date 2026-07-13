@@ -1488,17 +1488,17 @@ uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
     int16_t location = MOX::_ship[ship_idx].location;
 
     bool valid_star_location = false;
-    if (location > -1 && location < 500) {
+    if (location > -1 && location < SHIP_LOCATION_MOVING_OFFSET) {
         valid_star_location = true;
     }
 
     bool valid_offset_location = false;
-    if (location > 1000 && location < 1000 + MAX_STARS) {
+    if (location > SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS) {
         valid_offset_location = true;
     }
 
     if (valid_offset_location) {
-        location -= 1000;
+        location -= SHIP_LOCATION_WORMHOLE_OFFSET;
     }
 
     if (MOX::_PLAYER_NUM != ship_owner) {
@@ -1557,12 +1557,12 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
     int16_t star_idx = MOX::_ship[first_ship_idx].location;
     bool is_valid_star_location = false;
     if (star_idx > -1) {
-        is_valid_star_location = (star_idx < 500);
+        is_valid_star_location = (star_idx < SHIP_LOCATION_MOVING_OFFSET);
     }
 
     bool needs_xy_to_star = false;
-    if (star_idx > 1000) {
-        needs_xy_to_star = (star_idx < 1000 + MAX_STARS);
+    if (star_idx > SHIP_LOCATION_WORMHOLE_OFFSET) {
+        needs_xy_to_star = (star_idx < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS);
     }
 
     if (needs_xy_to_star) {
@@ -1662,11 +1662,11 @@ int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
     bool found_colonizable_planet = false;
 
     int16_t star_index = MOX::_ship[ship_idx].location;
-    const bool is_at_star = (star_index > -1) && (star_index < 500);
-    const bool is_in_transit_to_star = (star_index > 1000) && (star_index < 1000 + MAX_STARS);
+    const bool is_at_star = (star_index > -1) && (star_index < SHIP_LOCATION_MOVING_OFFSET);
+    const bool is_in_transit_to_star = (star_index > SHIP_LOCATION_WORMHOLE_OFFSET) && (star_index < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS);
 
     if (is_in_transit_to_star) {
-        star_index -= 1000;
+        star_index -= SHIP_LOCATION_WORMHOLE_OFFSET;
     }
 
     if ((ship_owner == MOX::_PLAYER_NUM) &&
@@ -1759,8 +1759,8 @@ int8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t ship_count) {
   int16_t primary_owner = HACCESS::Ship_Owner_(primary_ship_idx);
   int16_t star_idx = MOX::_ship[primary_ship_idx].location;
 
-  const bool is_at_star = (star_idx > -1) && (star_idx < 500);
-  const bool is_at_xy_star = (star_idx > 1000) && (star_idx < 1000 + MAX_STARS);
+  const bool is_at_star = (star_idx > -1) && (star_idx < SHIP_LOCATION_MOVING_OFFSET);
+  const bool is_at_xy_star = (star_idx > SHIP_LOCATION_WORMHOLE_OFFSET) && (star_idx < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS);
 
   if (is_at_xy_star) {
     star_idx = HAROLD::XY_To_Star_Id_(MOX::_ship[primary_ship_idx].x, MOX::_ship[primary_ship_idx].y);
