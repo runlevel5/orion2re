@@ -2880,7 +2880,7 @@ namespace DESBOX {
                         fonts::Print_Right_(base_x + 0xe3, local_y, space_str);
                         fonts::Print_Right_(base_x + 0x124, local_y, cost_str);
 
-                        fonts::Get_Colors_(&header_colors);
+                        fonts::Get_Colors_(&saved_font_colors);
                         fonts::Set_Font_Style_(fitted_font_style, &saved_font_colors);
 
                         fonts::Set_Font_Spacing_(1);
