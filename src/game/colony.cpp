@@ -1074,7 +1074,7 @@ namespace COLONY {
         COLONY::Fix_Colony_Queue_(colony_idx);
 
         if (MOX::_colony[colony_idx].producing[0] == COLONY_PRODUCTION_NONE) {
-            MOX::_colony[colony_idx].producing[0] = COLONY_PRODUCTION_RESEARCH;
+            MOX::_colony[colony_idx].producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
         }
     }
 
@@ -1306,7 +1306,7 @@ namespace COLONY {
     }
 
     s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t frame) {
-        if (animation_type == COLONY_PRODUCTION_NONE) {
+        if (animation_type == MILITARY_ANIMATION_MILITIA) {
             return COLONY::Military_Anims_(0, frame);
         }
 

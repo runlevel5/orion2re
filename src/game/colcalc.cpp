@@ -1342,7 +1342,7 @@ namespace COLCALC {
             case COLONY_PRODUCTION_AI_UNASSIGNED:
             case COLONY_PRODUCTION_AI_TRADE_GOODS:
             case COLONY_PRODUCTION_HOUSING:
-            case COLONY_PRODUCTION_RESEARCH:
+            case COLONY_PRODUCTION_TRADE_GOODS:
             case COLONY_PRODUCTION_NONE:
                 // Certain special production projects (e.g., Trade, Housing) cannot be bought.
                 break;
@@ -1421,7 +1421,7 @@ namespace COLCALC {
 
     void __cdecl Normalize_Stored_Production_For_Setting_(s_colony* colony) {
         if (colony->producing[0] == COLONY_PRODUCTION_HOUSING ||
-            colony->producing[0] == COLONY_PRODUCTION_RESEARCH ||
+            colony->producing[0] == COLONY_PRODUCTION_TRADE_GOODS ||
             colony->producing[0] == COLONY_PRODUCTION_NONE) {
             colony->production_spent = 0;
         }
@@ -2471,7 +2471,7 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id) {
-        if (product_id >= 1 && product_id < BUILDING_COUNT) {
+        if (COLBLDG::Colony_Production_Is_Building_(product_id)) {
             int32_t base_cost = TECHDATA::_buildings[product_id].cost;
 
             switch (product_id) {
@@ -2807,7 +2807,7 @@ namespace COLCALC {
     uint8_t __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t product) {
         uint8_t owner = colony->owner;
 
-        if (product > 0 && product < BUILDING_COUNT) {
+        if (COLBLDG::Colony_Production_Is_Building_(product)) {
             if (MOX::_player[owner].tech_applications[TECHDATA::_buildings[product].tech_app] == TECH_RESEARCH_STATUS_RESEARCHED &&
                 colony->buildings[product] == 0) {
                 
@@ -2943,7 +2943,7 @@ namespace COLCALC {
                 }
             }
         } else {
-            if (COLBLDG::Colony_Production_Is_Ship_Design_(product)) {
+            if (COLBLDG::Colony_Production_Is_Ship_(product)) {
                 if (MOX::_player[owner].ship_range == 0 || MOX::_player[owner].ship_speed == 0) return 0;
                 
                 s_ship_design* ship_design;
@@ -2985,7 +2985,7 @@ namespace COLCALC {
                     case COLONY_PRODUCTION_AI_UNASSIGNED:
                     case COLONY_PRODUCTION_AI_TRADE_GOODS:
                     case COLONY_PRODUCTION_SPY:
-                    case COLONY_PRODUCTION_RESEARCH:
+                    case COLONY_PRODUCTION_TRADE_GOODS:
                     case COLONY_PRODUCTION_NONE:
                         return 1;
                     case COLONY_PRODUCTION_FREIGHTERS:
@@ -3483,7 +3483,7 @@ namespace COLCALC {
         int16_t current_product = colony->producing[0];
         if (colony->auto_building != 0 &&
             (current_product == COLONY_PRODUCTION_HOUSING ||
-             current_product == COLONY_PRODUCTION_RESEARCH ||
+             current_product == COLONY_PRODUCTION_TRADE_GOODS ||
              current_product == COLONY_PRODUCTION_NONE)) {
             AIBUILD::Player_Colony_Autobuild_(colony);
         }
@@ -3505,7 +3505,7 @@ namespace COLCALC {
             return;
         }
 
-        if (current_product == COLONY_PRODUCTION_RESEARCH || current_product == COLONY_PRODUCTION_NONE) {
+        if (current_product == COLONY_PRODUCTION_TRADE_GOODS || current_product == COLONY_PRODUCTION_NONE) {
             return;
         }
 
@@ -3543,7 +3543,7 @@ namespace COLCALC {
                 colony->just_produced = colony->producing[0];
             }
 
-            if (current_product > 0 && current_product < BUILDING_COUNT) {
+            if (COLBLDG::Colony_Production_Is_Building_(current_product)) {
                 ERICNET::Add_Building_(static_cast<int16_t>(colony_idx), current_product);
                 player.bc += static_cast<int32_t>(TECHDATA::_buildings[current_product].maintenance);
 

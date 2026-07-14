@@ -440,7 +440,7 @@ namespace AIBUILD {
 
                 int16_t producing = colony->producing[0];
                 if (producing == COLONY_PRODUCTION_NONE ||
-                    producing == COLONY_PRODUCTION_RESEARCH ||
+                    producing == COLONY_PRODUCTION_TRADE_GOODS ||
                     producing == COLONY_PRODUCTION_HOUSING) continue;
 
                 int32_t cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(colony);
@@ -509,7 +509,7 @@ namespace AIBUILD {
 
             if (current_production == COLONY_PRODUCTION_AI_UNASSIGNED ||
                 current_production == COLONY_PRODUCTION_NONE ||
-                current_production == COLONY_PRODUCTION_RESEARCH ||
+                current_production == COLONY_PRODUCTION_TRADE_GOODS ||
                 current_production == COLONY_PRODUCTION_HOUSING) {
                 Assign_Colony_New_Building_(colony);
             }
@@ -517,7 +517,7 @@ namespace AIBUILD {
     }
 
     void __cdecl Find_Buildable_Buildings_(s_colony* colony, uint16_t* buildable_flags) {
-        for (int16_t product_id = 1; product_id < BUILDING_COUNT; ++product_id) {
+        for (int16_t product_id = BUILDING_NO_BUILDING + 1; product_id < BUILDING_COUNT; ++product_id) {
             if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
                 buildable_flags[product_id] = 1;
             }
@@ -983,7 +983,7 @@ namespace AIBUILD {
         } else if (choice == BUILDING_COUNT) {
             colony->producing[0] = COLONY_PRODUCTION_HOUSING;
         } else if (choice == BUILDING_COUNT + 1) {
-            colony->producing[0] = COLONY_PRODUCTION_RESEARCH;
+            colony->producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
         }
     }
 

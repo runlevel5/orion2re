@@ -713,7 +713,7 @@ namespace COLONY {
             return;
         }
 
-        if (col->producing[0] == COLONY_PRODUCTION_HOUSING || col->producing[0] == COLONY_PRODUCTION_RESEARCH) {
+        if (col->producing[0] == COLONY_PRODUCTION_HOUSING || col->producing[0] == COLONY_PRODUCTION_TRADE_GOODS) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_BUY_HOUSING_OR_TRADE_GOODS_AS_THEY_ARE_SETTINGS_NOT_SPECIFIC_ITEMS));
             COLONY::Show_Colony_Screen_();
             return;
@@ -869,7 +869,7 @@ namespace COLONY {
             COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x39 /* 57 */, 0x2f /* 47 */);
             break;
         case COLONY_PRODUCTION_REFIT:
-        case COLONY_PRODUCTION_RESEARCH:
+        case COLONY_PRODUCTION_TRADE_GOODS:
         case COLONY_PRODUCTION_NONE:
         case 0:
             // Do nothing
@@ -893,7 +893,7 @@ namespace COLONY {
             break;
         default:
             COLONY::Set_Colony_Font_();
-            if (producing_id >= 1 && producing_id < BUILDING_COUNT) {
+            if (COLBLDG::Colony_Production_Is_Building_(producing_id)) {
                 COLONY::Draw_Current_Building_(producing_id);
             }
             else if (COLBLDG::Colony_Production_Is_Queued_Ship_(producing_id)) {

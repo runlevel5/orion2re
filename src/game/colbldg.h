@@ -13,6 +13,10 @@ namespace STRBUILD {
 }
 
 namespace COLBLDG {
+    static inline bool Colony_Production_Is_Building_(int16_t production_id) {
+        return production_id > BUILDING_NO_BUILDING && production_id < BUILDING_COUNT;
+    }
+
     static inline bool Colony_Production_Is_Queued_Ship_(int16_t production_id) {
         return production_id <= COLONY_PRODUCTION_QUEUED_SHIP_BASE;
     }
@@ -22,8 +26,13 @@ namespace COLBLDG {
                production_id <= COLONY_PRODUCTION_SHIP_DESIGN_BASE;
     }
 
+    static inline bool Colony_Production_Is_Ship_(int16_t production_id) {
+        return Colony_Production_Is_Queued_Ship_(production_id) ||
+               Colony_Production_Is_Ship_Design_(production_id);
+    }
+
     static inline int16_t Colony_Production_Ship_Index_(int16_t production_id) {
-        return (int16_t)(-production_id - 100);
+        return (int16_t)(COLONY_PRODUCTION_QUEUED_SHIP_BASE - production_id);
     }
 
     static inline int16_t Colony_Production_Ship_Design_Index_(int16_t production_id) {

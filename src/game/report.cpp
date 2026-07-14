@@ -171,13 +171,13 @@ namespace REPORT {
                                 int16_t planet_idx;
                                 if (colony_base == nullptr && (colony_ship == nullptr || outpost_ship != nullptr)) {
                                     planet_idx = PLNTSUM::Colony_Ship_Auto_Colonization_(outpost_ship);
-                                    if (planet_idx == -1) {
+                                    if (planet_idx == PLANET_INDEX_NONE) {
                                         planet_idx = MAINPUPS::New_Outpost_Selection_Popup_(star_idx);
                                     } else if (MOX::_planet[planet_idx].colony_index == -1) {
                                         char msg[200];
                                         snprintf(msg, sizeof(msg), _outpost_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
                                         if (GENDRAW::Do_Confirmation_Box_(msg) == 0) {
-                                            planet_idx = -1;
+                                            planet_idx = PLANET_INDEX_NONE;
                                         } else {
                                             if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
                                                 int16_t y = namestar::Star_Name_Popup_Screen_Center_Y_();
@@ -192,14 +192,14 @@ namespace REPORT {
                                     is_colony = true;
                                     bool auto_colonized = false;
 
-                                    if (colony_base == nullptr && PLNTSUM::Colony_Ship_Auto_Colonization_(colony_ship) != -1) {
+                                    if (colony_base == nullptr && PLNTSUM::Colony_Ship_Auto_Colonization_(colony_ship) != PLANET_INDEX_NONE) {
                                         planet_idx = PLNTSUM::Colony_Ship_Auto_Colonization_(colony_ship);
                                         if (MOX::_planet[planet_idx].colony_index == -1) {
                                             auto_colonized = true;
                                             char msg[200];
                                             snprintf(msg, sizeof(msg), _colonize_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
                                             if (GENDRAW::Do_Confirmation_Box_(msg) == 0) {
-                                                planet_idx = -1;
+                                                planet_idx = PLANET_INDEX_NONE;
                                             } else {
                                                 if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
                                                     int16_t y = namestar::Star_Name_Popup_Screen_Center_Y_();

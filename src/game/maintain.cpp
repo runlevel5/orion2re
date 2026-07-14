@@ -164,7 +164,7 @@ namespace maintain {
                     }
 
                     if (colony->producing[0] == building_id) {
-                        colony->producing[0] = COLONY_PRODUCTION_RESEARCH;
+                        colony->producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
                     }
                 }
             }

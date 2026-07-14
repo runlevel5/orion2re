@@ -1183,7 +1183,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         }
 
         // Handle specific building indices (1-48)
-        if (production_id > 0 && production_id < BUILDING_COUNT) {
+        if (COLBLDG::Colony_Production_Is_Building_(production_id)) {
             return static_cast<int16_t>(TECHDATA::_buildings[production_id].cost) + 10;
         }
 
@@ -1196,7 +1196,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         }
 
         if (production_id == COLONY_PRODUCTION_HOUSING ||
-            production_id == COLONY_PRODUCTION_RESEARCH ||
+            production_id == COLONY_PRODUCTION_TRADE_GOODS ||
             production_id == COLONY_PRODUCTION_REPEAT) {
             return -2;
         }
@@ -1209,7 +1209,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         // Specific indices returning 0
         if (production_id == COLONY_PRODUCTION_TRANSPORT_SHIP ||
             production_id == COLONY_PRODUCTION_COLONY_SHIP ||
-            production_id == COLONY_PRODUCTION_SHIP ||
+            production_id == COLONY_PRODUCTION_CUSTOM_DESIGN ||
             production_id == COLONY_PRODUCTION_OUTPOST_SHIP ||
             production_id == COLONY_PRODUCTION_DOOM_STAR ||
             production_id == COLONY_PRODUCTION_REFIT ||

@@ -32,7 +32,7 @@ namespace aidudes {
         s_colony* end = MOX::_colony + (int16_t)MOX::_NUM_COLONIES;
         while (col < end) {
             if (col->producing[0] == COLONY_PRODUCTION_AI_TRADE_GOODS) {
-                col->producing[0] = COLONY_PRODUCTION_RESEARCH;
+                col->producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
             }
             ++col;
         }
@@ -47,9 +47,9 @@ namespace aidudes {
             uint8_t colony_idx = (uint8_t)info->colony_idx;
             s_colony* col = &MOX::_colony[colony_idx];
 
-            bool is_colony_researching = (col->producing[0] == COLONY_PRODUCTION_RESEARCH);
+            bool is_colony_producing_trade_goods = (col->producing[0] == COLONY_PRODUCTION_TRADE_GOODS);
 
-            if ((is_colony_researching && aidudes::_p_ai->do_not_research == 0) ||
+            if ((is_colony_producing_trade_goods && aidudes::_p_ai->do_not_research == 0) ||
                 EVENTS::Event_Check_Colony_Researching_((int16_t)colony_idx) != 0) {
 
                 for (int j = (int)info->pop_tail_idx - 1; j >= (int)info->first_assignable_pop_idx; --j) {
@@ -128,7 +128,7 @@ namespace aidudes {
                 int16_t producing = colony->producing[0];
                 if (producing == COLONY_PRODUCTION_NONE ||
                     producing == COLONY_PRODUCTION_HOUSING ||
-                    producing == COLONY_PRODUCTION_RESEARCH ||
+                    producing == COLONY_PRODUCTION_TRADE_GOODS ||
                     producing == COLONY_PRODUCTION_REPEAT) {
                     should_rebuild = true;
                 }
@@ -842,7 +842,7 @@ namespace aidudes {
                                 }
                             } else if (prod > COLONY_PRODUCTION_SPY) {
                                 if (prod > COLONY_PRODUCTION_FARMER) {
-                                    if (prod == COLONY_PRODUCTION_RESEARCH) {
+                                    if (prod == COLONY_PRODUCTION_TRADE_GOODS) {
                                         recalculate_colony = true;
                                         delete_from_queue = true;
                                     }
@@ -859,7 +859,7 @@ namespace aidudes {
                         int16_t prod = temp_colony->producing[0];
                         if (prod == COLONY_PRODUCTION_HOUSING) {
                             // pass
-                        } else if (prod == COLONY_PRODUCTION_RESEARCH) {
+                        } else if (prod == COLONY_PRODUCTION_TRADE_GOODS) {
                             recalculate_colony = true;
                         } else if (prod == COLONY_PRODUCTION_NONE) {
                             // pass

@@ -431,7 +431,7 @@ namespace AIMOVE {
                     }
 
                     if (!found) {
-                        colony->producing[0] = COLONY_PRODUCTION_RESEARCH;
+                        colony->producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
                     }
                 }
             }

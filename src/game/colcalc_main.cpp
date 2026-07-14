@@ -1167,7 +1167,7 @@ namespace COLCALC {
         int16_t producing = colony->producing[0];
         if (producing == COLONY_PRODUCTION_AI_TRADE_GOODS ||
             producing == COLONY_PRODUCTION_NONE ||
-            producing == COLONY_PRODUCTION_RESEARCH) {
+            producing == COLONY_PRODUCTION_TRADE_GOODS) {
             int surplus_ind = (int)colony->production[ECON_INDUSTRY] - (int)colony->maintenance[ECON_INDUSTRY];
             if (surplus_ind > 0) {
                 trade_goods_bc = surplus_ind;

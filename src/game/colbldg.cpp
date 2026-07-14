@@ -150,11 +150,11 @@ namespace COLBLDG {
     }
 
     void __cdecl Calculate_Building_Array_() {
-        _building_indexes[0] = COLONY_PRODUCTION_RESEARCH;
+        _building_indexes[0] = COLONY_PRODUCTION_TRADE_GOODS;
         _building_indexes[1] = COLONY_PRODUCTION_HOUSING;
         _n_building_indexes = 2;
 
-        for (int16_t building_id = 1; building_id < BUILDING_COUNT; ++building_id) {
+        for (int16_t building_id = BUILDING_NO_BUILDING + 1; building_id < BUILDING_COUNT; ++building_id) {
             uint8_t can_build = COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], building_id);
 
             if ((((_n_building_indexes <= 54) && can_build == 1) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
@@ -605,7 +605,7 @@ namespace COLBLDG {
                 }
             } else if (mil_idx == COLONY_PRODUCTION_TRANSPORT_SHIP ||
                        mil_idx == COLONY_PRODUCTION_COLONY_SHIP ||
-                       mil_idx == COLONY_PRODUCTION_SHIP ||
+                       mil_idx == COLONY_PRODUCTION_CUSTOM_DESIGN ||
                        mil_idx == COLONY_PRODUCTION_OUTPOST_SHIP ||
                        mil_idx == COLONY_PRODUCTION_DOOM_STAR) {
                 if (Auto_Design_Type_(mil_idx) == 0) {
@@ -757,11 +757,11 @@ namespace COLBLDG {
     }
 
     char* __cdecl Selection_Name_(int16_t id) {
-        if (id > 0 && id < BUILDING_COUNT) {
+        if (COLBLDG::Colony_Production_Is_Building_(id)) {
             return COLONY::Real_Building_Name_(id);
         }
 
-        if (id > COLONY_PRODUCTION_QUEUED_SHIP_BASE) {
+        if (!COLBLDG::Colony_Production_Is_Queued_Ship_(id)) {
             return Option_String_(id);
         }
 
@@ -816,7 +816,7 @@ namespace COLBLDG {
                 COLONY::Remap_Draw_Ship_Seg_N_Centered_(244, 56, 48 /* 0x30 */);
                 break;
             }
-            case COLONY_PRODUCTION_SHIP: {
+            case COLONY_PRODUCTION_CUSTOM_DESIGN: {
                 y_line_count = 1;
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 Draw_Ship_Design_Info_(-54 /* 0x36 */);
@@ -916,7 +916,7 @@ namespace COLBLDG {
                 Print_Setting_Description_(209, 119, 248, 13 /* 0xD */);
                 break;
             }
-            case COLONY_PRODUCTION_RESEARCH: {
+            case COLONY_PRODUCTION_TRADE_GOODS: {
                 fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
                 BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
                 y_line_count += 2;
@@ -929,7 +929,7 @@ namespace COLBLDG {
             case 0:
                 return;
             default: {
-                if (item_id > 0 && item_id < BUILDING_COUNT) {
+                if (COLBLDG::Colony_Production_Is_Building_(item_id)) {
                     Draw_Building_Info_(item_id);
                     return;
                 }
@@ -1090,7 +1090,7 @@ namespace COLBLDG {
         (*line_count)++;
 
         // 2. Draw Maintenance if applicable
-        if (product_idx > 0 && product_idx < BUILDING_COUNT) {
+        if (COLBLDG::Colony_Production_Is_Building_(product_idx)) {
             int32_t maint = (int32_t)TECHDATA::_buildings[product_idx].maintenance;
             format_str = ESTRINGS::E_Strings_(HESTR_16F_PENALTY);
             snprintf(buffer, sizeof(buffer), format_str, maint);
@@ -1122,7 +1122,7 @@ namespace COLBLDG {
         }
 
         // 5. Special case for Gravity Generator (ID 25)
-        if (product_idx > 0 && product_idx < BUILDING_COUNT && product_idx == BUILDING_GRAVITY_GENERATOR) {
+        if (COLBLDG::Colony_Production_Is_Building_(product_idx) && product_idx == BUILDING_GRAVITY_GENERATOR) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
             int8_t gravity_class = MOX::_planet[planet_idx].gravity_class;
             char* gravity_str = MOX::_planet_gravity_string[gravity_class];
@@ -1324,7 +1324,7 @@ namespace COLBLDG {
 
     int16_t __cdecl First_Prod_Queue_Slot_(int16_t prod_idx) {
         for (int16_t i = 0; i < 7; ++i) {
-            if (prod_idx > 0 && prod_idx < BUILDING_COUNT) {
+            if (COLBLDG::Colony_Production_Is_Building_(prod_idx)) {
                 if (_current_item[i] == prod_idx) {
                     return i;
                 }
@@ -1338,8 +1338,8 @@ namespace COLBLDG {
                     if (prod_idx == curr) {
                         return i;
                     }
-                } else if (prod_idx >= 49) {
-                    if (prod_idx - i == 49) {
+                } else if (prod_idx >= BUILDING_COUNT) {
+                    if (prod_idx - i == BUILDING_COUNT) {
                         return i;
                     }
                 } else if (prod_idx == COLONY_PRODUCTION_SCIENTIST ||
@@ -1347,7 +1347,7 @@ namespace COLBLDG {
                            prod_idx == COLONY_PRODUCTION_WORKER ||
                            prod_idx == COLONY_PRODUCTION_SPY ||
                            prod_idx == COLONY_PRODUCTION_HOUSING ||
-                           prod_idx == COLONY_PRODUCTION_RESEARCH ||
+                           prod_idx == COLONY_PRODUCTION_TRADE_GOODS ||
                            prod_idx == COLONY_PRODUCTION_REPEAT ||
                            prod_idx == COLONY_PRODUCTION_FREIGHTERS) {
                     if (prod_idx == curr) {
@@ -1361,7 +1361,7 @@ namespace COLBLDG {
 
     int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t item_id) {
         for (int16_t i = 0; i < 7; ++i) {
-            if (item_id > 0 && item_id < BUILDING_COUNT) {
+            if (COLBLDG::Colony_Production_Is_Building_(item_id)) {
                 if (MOX::_colony[colony_idx].producing[i] == item_id) {
                     return i;
                 }
@@ -1376,8 +1376,8 @@ namespace COLBLDG {
                     if (item_id == produced_item) {
                         return i;
                     }
-                } else if (item_id >= 49) {
-                    if (item_id - i == 49) {
+                } else if (item_id >= BUILDING_COUNT) {
+                    if (item_id - i == BUILDING_COUNT) {
                         return i;
                     }
                 } else {
@@ -1386,7 +1386,7 @@ namespace COLBLDG {
                         item_id == COLONY_PRODUCTION_WORKER ||
                         item_id == COLONY_PRODUCTION_SPY ||
                         item_id == COLONY_PRODUCTION_HOUSING ||
-                        item_id == COLONY_PRODUCTION_RESEARCH ||
+                        item_id == COLONY_PRODUCTION_TRADE_GOODS ||
                         item_id == COLONY_PRODUCTION_REPEAT ||
                         item_id == COLONY_PRODUCTION_FREIGHTERS) {
                         if (item_id == produced_item) {
@@ -1433,7 +1433,7 @@ namespace COLBLDG {
                     for (int i = 0; i < 7; ++i) {
                         int16_t item = _current_item[i];
                         if (item == COLONY_PRODUCTION_HOUSING ||
-                            item == COLONY_PRODUCTION_RESEARCH ||
+                            item == COLONY_PRODUCTION_TRADE_GOODS ||
                             item == COLONY_PRODUCTION_REPEAT) {
                             if (Something_Behind_Settting_() != 0) {
                                 current_item = item;
@@ -1458,7 +1458,7 @@ namespace COLBLDG {
                     for (int i = 0; i < 7; ++i) {
                         int16_t item = _current_item[i];
                         if (item == COLONY_PRODUCTION_HOUSING ||
-                            item == COLONY_PRODUCTION_RESEARCH ||
+                            item == COLONY_PRODUCTION_TRADE_GOODS ||
                             item == COLONY_PRODUCTION_REPEAT) {
                             if (Something_Behind_Settting_() != 0) {
                                 Squish_Out_Queue_Slot_(i);
@@ -1613,10 +1613,10 @@ namespace COLBLDG {
         }
 
         for (int i = 0; i < _n_military_indexes; ++i) {
-            if (*scanned_field_id == _military_fields[i] && _military_indexes[i] != -9) {
+            if (*scanned_field_id == _military_fields[i] && _military_indexes[i] != COLONY_PRODUCTION_SEPARATOR) {
                 _scanned_prod = _military_indexes[i];
             }
-            if (*selected_field_id == _military_fields[i] && _military_indexes[i] != -9) {
+            if (*selected_field_id == _military_fields[i] && _military_indexes[i] != COLONY_PRODUCTION_SEPARATOR) {
                 if (_military_indexes[i] == BUILDING_COLONY_BASE) {
                     Calculate_Military_Array_();
                     COLONY::_full_draw = 1;
@@ -1920,11 +1920,11 @@ namespace COLBLDG {
                 int16_t item = _current_item[i];
                 if (item != COLONY_PRODUCTION_NONE &&
                     (item == COLONY_PRODUCTION_HOUSING ||
-                     item == COLONY_PRODUCTION_RESEARCH ||
+                     item == COLONY_PRODUCTION_TRADE_GOODS ||
                      item == COLONY_PRODUCTION_REPEAT)) {
                     found_idx = i;
                 }
-            } else if (_current_item[i] != -1) {
+            } else if (_current_item[i] != COLONY_PRODUCTION_NONE) {
                 has_other = 1;
             }
         }
@@ -1961,9 +1961,9 @@ namespace COLBLDG {
 
         bool add_to_queue = false;
 
-        if ((product_id > 0 && product_id < BUILDING_COUNT) ||
+        if (COLBLDG::Colony_Production_Is_Building_(product_id) ||
             product_id == COLONY_PRODUCTION_HOUSING ||
-            product_id == COLONY_PRODUCTION_RESEARCH ||
+            product_id == COLONY_PRODUCTION_TRADE_GOODS ||
             product_id == COLONY_PRODUCTION_REPEAT ||
             product_id == COLONY_PRODUCTION_FREIGHTERS ||
             product_id == COLONY_PRODUCTION_SPY ||
@@ -1989,7 +1989,7 @@ namespace COLBLDG {
             }
         } else if (product_id == COLONY_PRODUCTION_TRANSPORT_SHIP ||
                    product_id == COLONY_PRODUCTION_COLONY_SHIP ||
-                   product_id == COLONY_PRODUCTION_SHIP ||
+                   product_id == COLONY_PRODUCTION_CUSTOM_DESIGN ||
                    product_id == COLONY_PRODUCTION_DOOM_STAR ||
                    product_id == COLONY_PRODUCTION_OUTPOST_SHIP) {
             int16_t design_slot = 4;
@@ -2029,7 +2029,7 @@ namespace COLBLDG {
             } else {
                 COLBLDG::_current_item[q_len] = COLBLDG::Colony_Production_From_Ship_Index_(created_ship);
             }
-        } else if (product_id > COLONY_PRODUCTION_SHIP_DESIGN_BASE) {
+        } else if (!COLBLDG::Colony_Production_Is_Ship_Design_(product_id)) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x14c));
             COLBLDG::Do_Draw_Build_Queue_();
             return 0;
@@ -2072,7 +2072,7 @@ namespace COLBLDG {
             COLBLDG::_field_mode = 0;
             COLONY::Reset_Mouse_Picture_();
             if (product_id != COLONY_PRODUCTION_HOUSING &&
-                product_id != COLONY_PRODUCTION_RESEARCH &&
+                product_id != COLONY_PRODUCTION_TRADE_GOODS &&
                 product_id != COLONY_PRODUCTION_REPEAT) {
                 if (COLBLDG::Add_To_Queue_(COLONY_PRODUCTION_REPEAT) == 0) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(0x188));
@@ -2274,7 +2274,7 @@ namespace COLBLDG {
                 return ESTRINGS::E_Strings_(0x10F);
             case COLONY_PRODUCTION_FREIGHTERS:
                 return ESTRINGS::E_Strings_(0x12D);
-            case COLONY_PRODUCTION_SHIP:
+            case COLONY_PRODUCTION_CUSTOM_DESIGN:
                 return ESTRINGS::E_Strings_(0x0FA);
             case COLONY_PRODUCTION_COLONY_SHIP:
                 return ESTRINGS::E_Strings_(0x0E6);
@@ -2298,7 +2298,7 @@ namespace COLBLDG {
                 return ESTRINGS::E_Strings_(0x0B0);
             case COLONY_PRODUCTION_HOUSING:
                 return ESTRINGS::E_Strings_(0x142);
-            case COLONY_PRODUCTION_RESEARCH:
+            case COLONY_PRODUCTION_TRADE_GOODS:
                 return ESTRINGS::E_Strings_(0x21D);
             default:
                 break;
