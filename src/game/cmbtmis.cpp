@@ -291,6 +291,7 @@ namespace CMBTMIS {
         int16_t shield_idx = 0;
         int16_t evade = 0;
         uint16_t weapon_flags = 0;
+        uint16_t applied_hits = 0;
         int16_t shield_hit_dir = 0;
 
         if (is_anti_missile_rocket == 0) {
@@ -448,7 +449,7 @@ namespace CMBTMIS {
                             int16_t applied = CMBTFIRE::Apply_Ship_Damage_(target_unit_idx, &dmg_out, &sys_dmg, shield_idx, specials, weapon_flags, 0, 0, specials & WEAPON_MOD_FLAG_EMISSION_GUIDANCE);
                             dmg_accum += dmg_out;
                             sys_dmg_accum += sys_dmg;
-                            weapon_flags |= applied;
+                            applied_hits |= applied;
                         } else {
                             for (int16_t i = 0; i < 4; ++i) {
                                 int16_t dmg_out = damage;
