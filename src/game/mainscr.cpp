@@ -25,7 +25,7 @@ namespace MAINSCR {
     int16_t _debug_field;
     int16_t _exit_game_hot_key;
     int16_t _influence_hot_key = -1000;
-    bool _influence_view_enabled = false;
+    uint8_t _influence_view_mode = 0;
     int16_t _main_screen_grid_y;
     int16_t _main_screen_grid_x;
     s_animation_header* _temp_bitmap;
@@ -110,7 +110,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Influence_Overlay_() {
-        if (!_influence_view_enabled) {
+        if (_influence_view_mode == 0) {
             return;
         }
 
@@ -118,21 +118,19 @@ namespace MAINSCR {
         constexpr int16_t map_top = 22;
         constexpr int16_t map_width = 506;
         constexpr int16_t map_height = 400;
-        static int8_t influence_owner[map_height][map_width];
+        static uint8_t influence_owners[map_height][map_width];
 
-        memset(influence_owner, -1, sizeof(influence_owner));
+        memset(influence_owners, 0, sizeof(influence_owners));
 
         const bool viewer_is_omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
 
         for (int16_t screen_y = map_top; screen_y < map_top + map_height; ++screen_y) {
             for (int16_t screen_x = map_left; screen_x < map_left + map_width; ++screen_x) {
-                int16_t best_owner = -1;
-                int32_t best_distance_squared = 0;
-                int32_t best_radius_squared = 1;
+                uint8_t owners = 0;
 
                 for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
                     const int16_t owner = MOX::_star[star_idx].owner;
-                    if (owner < 0 || owner >= MOX::_NUM_PLAYERS) {
+                    if (owner < 0 || owner >= MOX::_NUM_PLAYERS || owner >= MAX_PLAYERS) {
                         continue;
                     }
 
@@ -172,53 +170,91 @@ namespace MAINSCR {
                         continue;
                     }
 
-                    if (best_owner == -1 ||
-                        static_cast<int64_t>(distance_squared) * best_radius_squared <
-                            static_cast<int64_t>(best_distance_squared) * influence_radius_squared) {
-                        best_owner = owner;
-                        best_distance_squared = distance_squared;
-                        best_radius_squared = influence_radius_squared;
-                    }
+                    owners |= static_cast<uint8_t>(1u << owner);
                 }
 
-                influence_owner[screen_y - map_top][screen_x - map_left] = static_cast<int8_t>(best_owner);
+                influence_owners[screen_y - map_top][screen_x - map_left] = owners;
             }
         }
 
-        for (int16_t y = 0; y < map_height; ++y) {
-            for (int16_t x = 0; x < map_width; ++x) {
-                const int16_t owner = influence_owner[y][x];
-                if (owner < 0) {
-                    continue;
-                }
+        if (_influence_view_mode == 1) {
+            for (int16_t y = 0; y < map_height; ++y) {
+                for (int16_t x = 0; x < map_width; ++x) {
+                    const uint8_t owners = influence_owners[y][x];
+                    if (owners == 0) {
+                        continue;
+                    }
 
-                const uint8_t player_color = static_cast<uint8_t>(MOX::_player[owner].color);
-                if (player_color >= MAX_PLAYERS) {
-                    continue;
-                }
+                    const int16_t fill_slot = static_cast<int16_t>((y % 2) * 2 + (x % 2));
+                    int16_t owner = -1;
+                    int16_t assigned_slots = 0;
 
-                const uint8_t palette_base = MOX::_main_palette_player_colors[player_color];
-                const uint8_t fill_color = (palette_base == 32) ? 8 : static_cast<uint8_t>(palette_base + 1);
-                const uint8_t border_color = (palette_base == 32) ? 22 : static_cast<uint8_t>(palette_base + 5);
+                    const uint8_t current_player_bit = static_cast<uint8_t>(1u << MOX::_PLAYER_NUM);
+                    if ((owners & current_player_bit) != 0) {
+                        if (fill_slot == assigned_slots) {
+                            owner = MOX::_PLAYER_NUM;
+                        }
+                        assigned_slots++;
+                    }
 
-                const bool is_border =
-                    x == 0 || influence_owner[y][x - 1] != owner ||
-                    x == map_width - 1 || influence_owner[y][x + 1] != owner ||
-                    y == 0 || influence_owner[y - 1][x] != owner ||
-                    y == map_height - 1 || influence_owner[y + 1][x] != owner;
+                    for (int16_t candidate = 0;
+                         candidate < MOX::_NUM_PLAYERS && assigned_slots <= fill_slot;
+                         ++candidate) {
+                        if (candidate == MOX::_PLAYER_NUM || (owners & (1u << candidate)) == 0) {
+                            continue;
+                        }
+                        if (fill_slot == assigned_slots) {
+                            owner = candidate;
+                        }
+                        assigned_slots++;
+                    }
 
-                if (is_border) {
-                    graphics::Dot_(
-                        map_left + x,
-                        map_top + y,
-                        border_color
-                    );
-                } else if (((map_left + x) ^ (map_top + y)) & 1) {
+                    if (owner < 0) {
+                        continue;
+                    }
+
+                    const uint8_t player_color = static_cast<uint8_t>(MOX::_player[owner].color);
+                    if (player_color >= MAX_PLAYERS) {
+                        continue;
+                    }
+
+                    const uint8_t palette_base = MOX::_main_palette_player_colors[player_color];
+                    const uint8_t fill_color = (palette_base == 32) ? 8 : static_cast<uint8_t>(palette_base + 1);
+
                     graphics::Dot_(
                         map_left + x,
                         map_top + y,
                         fill_color
                     );
+                }
+            }
+        }
+
+        for (int16_t owner = 0; owner < MOX::_NUM_PLAYERS && owner < MAX_PLAYERS; ++owner) {
+            const uint8_t player_color = static_cast<uint8_t>(MOX::_player[owner].color);
+            if (player_color >= MAX_PLAYERS) {
+                continue;
+            }
+
+            const uint8_t owner_bit = static_cast<uint8_t>(1u << owner);
+            const uint8_t palette_base = MOX::_main_palette_player_colors[player_color];
+            const uint8_t border_color = (palette_base == 32) ? 22 : static_cast<uint8_t>(palette_base + 5);
+
+            for (int16_t y = 0; y < map_height; ++y) {
+                for (int16_t x = 0; x < map_width; ++x) {
+                    if ((influence_owners[y][x] & owner_bit) == 0) {
+                        continue;
+                    }
+
+                    const bool is_border =
+                        x == 0 || (influence_owners[y][x - 1] & owner_bit) == 0 ||
+                        x == map_width - 1 || (influence_owners[y][x + 1] & owner_bit) == 0 ||
+                        y == 0 || (influence_owners[y - 1][x] & owner_bit) == 0 ||
+                        y == map_height - 1 || (influence_owners[y + 1][x] & owner_bit) == 0;
+
+                    if (is_border) {
+                        graphics::Dot_(map_left + x, map_top + y, border_color);
+                    }
                 }
             }
         }
@@ -1341,7 +1377,7 @@ namespace MAINSCR {
         char dialog_text[200];
 
         if (key == _influence_hot_key) {
-            _influence_view_enabled = !_influence_view_enabled;
+            _influence_view_mode = static_cast<uint8_t>((_influence_view_mode + 1) % 3);
             MOX::_draw_main_screen_to_back = 1;
             return;
         }
