@@ -29,8 +29,16 @@ DOCTEST_TEST_CASE("ship product classification preserves queued and design range
     DOCTEST_CHECK_FALSE(COLBLDG::Colony_Production_Is_Ship_(-49));
 }
 
+DOCTEST_TEST_CASE("ship product classification matches the original binary range") {
+    for (int32_t production_id = INT16_MIN; production_id <= INT16_MAX; ++production_id) {
+        const bool original_is_ship = production_id <= COLONY_PRODUCTION_SHIP_DESIGN_BASE;
+        DOCTEST_CHECK(
+            COLBLDG::Colony_Production_Is_Ship_(static_cast<int16_t>(production_id)) == original_is_ship);
+    }
+}
+
 DOCTEST_TEST_CASE("ship product encodings round trip through their matching ranges") {
-    for (int16_t ship_idx : {int16_t{0}, int16_t{1}, int16_t{MAX_SHIPS - 1}}) {
+    for (int16_t ship_idx = 0; ship_idx < MAX_SHIPS; ++ship_idx) {
         const int16_t production_id = COLBLDG::Colony_Production_From_Ship_Index_(ship_idx);
         DOCTEST_CHECK(COLBLDG::Colony_Production_Is_Queued_Ship_(production_id));
         DOCTEST_CHECK(COLBLDG::Colony_Production_Is_Ship_(production_id));

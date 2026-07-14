@@ -380,7 +380,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         chance += MOX::_settings.game_difficulty * 4 - 8;
     }
 
-    if (colony->buildings[1] != 0) {
+    if (colony->buildings[BUILDING_ALIEN_CONTROL_CENTER] != 0) {
         chance /= 2;
     }
 
@@ -506,14 +506,14 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
     invasion::Change_Pop_Ownership_(colony_idx, new_owner_idx);
 
     // Remove defensive/security buildings upon capture
-    if (colony->buildings[2] != 0 /* Marine Barracks */) {
-        ERICNET::Remove_Building_(colony_idx, 2);
+    if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
+        ERICNET::Remove_Building_(colony_idx, BUILDING_ARMOR_BARRACKS);
     }
-    if (colony->buildings[22] != 0 /* Armor Barracks */) {
-        ERICNET::Remove_Building_(colony_idx, 22);
+    if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0) {
+        ERICNET::Remove_Building_(colony_idx, BUILDING_MARINE_BARRACKS);
     }
-    if (colony->buildings[1] != 0 /* Space Academy */) {
-        ERICNET::Remove_Building_(colony_idx, 1);
+    if (colony->buildings[BUILDING_ALIEN_CONTROL_CENTER] != 0) {
+        ERICNET::Remove_Building_(colony_idx, BUILDING_ALIEN_CONTROL_CENTER);
     }
 
     // Reset military units and roundoff buffers
@@ -617,8 +617,8 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
 
     MOX::_player[old_owner].colony_war_losses[new_owner_idx] += (uint8_t)colony->n_pops;
 
-    if (colony->buildings[9 /* BUILDING_CAPITOL */] != 0) {
-        ERICNET::Remove_Building_(colony_idx, 9 /* BUILDING_CAPITOL */);
+    if (colony->buildings[BUILDING_CAPITOL] != 0) {
+        ERICNET::Remove_Building_(colony_idx, BUILDING_CAPITOL);
     }
 
     if (MOX::_player[old_owner].home_planet_id == colony->planet) {
@@ -677,7 +677,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     colony->just_produced = COLONY_PRODUCTION_JUST_CONQUERED;
     colony->occupation_points = 0;
     colony->occupation_policy = 4;
-    colony->buildings[11] = 0;
+    colony->buildings[BUILDING_COLONY_BASE] = 0;
 
     int star_idx = (uint8_t)MOX::_planet[colony->planet].star_index;
     COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);

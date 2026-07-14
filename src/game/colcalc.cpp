@@ -3036,25 +3036,25 @@ namespace COLCALC {
                 colony_system_count++;
                 
                 if (SHIPMOVE::Star_In_Range_Of_Player_(star, target_player_idx, range)) {
-                    bool has_warp_gate = false;
+                    bool has_capitol = false;
                     
-                    // Check if any planet in the system has a Warp Gate/Stargate (building index 9)
+                    // Check if any colony owned by the surrendering player is their capitol.
                     for (int p = 4; p >= 0; --p) {
                         short planet_idx = star->planet_index[p];
                         if (planet_idx != -1) {
                             short colony_idx = MOX::_planet[planet_idx].colony_index;
                             if (colony_idx != -1) {
                                 s_colony* colony = &MOX::_colony[colony_idx];
-                                if (colony->owner == (char)player_idx && colony->buildings[9] != 0) {
-                                    has_warp_gate = true;
+                                if (colony->owner == (char)player_idx && colony->buildings[BUILDING_CAPITOL] != 0) {
+                                    has_capitol = true;
                                     break;
                                 }
                             }
                         }
                     }
                     
-                    // Systems with Warp Gates are not eligible for surrender in this context
-                    if (!has_warp_gate) {
+                    // A player's capitol system is not eligible for surrender.
+                    if (!has_capitol) {
                         if (star_list != nullptr) {
                             star_list[result_count] = (uint8_t)i;
                         }

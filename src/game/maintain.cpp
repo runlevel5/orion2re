@@ -11,7 +11,7 @@ namespace maintain {
 
     /**
      * Determines if a building is processed in the first maintenance phase.
-     * Buildings with no maintenance, specific AI groups, or the Star Base (index 9) are excluded.
+     * Buildings with no maintenance, specific AI groups, or the Capitol are excluded.
      */
     bool __cdecl Phase1_Building_(int16_t building_idx) {
         if (TECHDATA::_buildings[building_idx].maintenance <= 0) {
@@ -373,11 +373,11 @@ namespace maintain {
 
             if (owner_trait_group >= 0 && owner_trait_group <= 1) {
                 if (building_idx == BUILDING_MARINE_BARRACKS) {
-                    if (colony->buildings[0] == 0) {
+                    if (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0) {
                         return worth * 8;
                     }
                 } else {
-                    if (colony->buildings[20] == 0) {
+                    if (colony->buildings[BUILDING_MARINE_BARRACKS] == 0) {
                         return worth * 8;
                     }
                 }
