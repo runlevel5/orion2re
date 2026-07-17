@@ -1494,7 +1494,6 @@ namespace CMBTFIR2 {
         int16_t defender_marines_start = (uint8_t)defender->marine_count;
         int16_t defender_marines_current = defender_marines_start;
         int16_t attacker_marines_start = attacker_marines;
-        int16_t defender_marines_orig = defender_marines_start;
 
         int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_((int16_t)attacker->owner);
         int16_t has_dashboards = COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_SECURITY_STATIONS);
@@ -1549,9 +1548,9 @@ namespace CMBTFIR2 {
         }
 
         FMTPARA::Set_Paragraph_Sint_Pointer_(0, &attacker_marines_start);
-        FMTPARA::Set_Paragraph_Sint_Pointer_(1, &defender_marines_orig);
+        FMTPARA::Set_Paragraph_Sint_Pointer_(1, &attacker_marines_lost);
         FMTPARA::Set_Paragraph_Sint_Pointer_(2, &attacker_marines);
-        FMTPARA::Set_Paragraph_Sint_Pointer_(3, &attacker_marines_lost);
+        FMTPARA::Set_Paragraph_Sint_Pointer_(3, &defender_marines_start);
         FMTPARA::Set_Paragraph_Sint_Pointer_(4, &defender_marines_lost);
         FMTPARA::Set_Paragraph_Sint_Pointer_(5, &defender_marines_current);
         FMTPARA::Set_Paragraph_Sint_Pointer_(6, &side1.unit_strengths[1]);
