@@ -13,7 +13,7 @@ This repository does not include the original game data. To play, you must own a
 - Either:
   - macOS build environment with an arm64-capable Clang toolchain
   - Windows build environment with an MSVC toolchain
-  - Linux build environment with MinGW-w64 cross-compilers
+  - Linux build environment with optional MinGW-w64 cross-compilers
 - Original Master of Orion II game files from GOG or Steam
 
 Supported build paths:
@@ -21,7 +21,7 @@ Supported build paths:
 - Native macOS arm64 builds
 - Native Linux builds
 - Native Windows builds with MSVC for x86 and x64
-- Linux-hosted MinGW-w64 cross-builds for Win32 and Win64 with networking disabled
+- Linux-hosted MinGW-w64 cross-builds for Win32 and Win64
 
 macOS builds use the native host architecture.
 
