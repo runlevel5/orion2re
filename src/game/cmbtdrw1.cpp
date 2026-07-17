@@ -2120,8 +2120,8 @@ skip_cursor:
             int8_t shield_type = MOX::_combat_data[idx].shield_type;
             int16_t shield_current_hits = MOX::_combat_data[idx].shield_current_hits;
             int16_t current_speed = MOX::_combat_data[idx].current_speed;
-            // The original code uses signed IDIV-style quotient/remainder on facing_dir,
-            // then clamps the quadrant to 0 for the negative case before building the mask index.
+            int32_t shield_quadrant = (int32_t)facing / 4;
+            // Sprite placement groups exact cardinal facings with the preceding quadrant.
             int32_t facing_quadrant = ((int32_t)facing - 1) / 4;
             if (facing_quadrant < 0) {
                 facing_quadrant = 0;
@@ -2151,7 +2151,7 @@ skip_cursor:
                             for (int i = 0; i < 4; i++) {
                                 if (ship->shield_arc_current[i] < 0x0B) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
+                                    int mask_idx = (i - shield_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x52, 1);
                                     if (ship->shield_arc_current[i] < 1) {
@@ -2172,7 +2172,7 @@ skip_cursor:
                             for (int i = 0; i < 4; i++) {
                                 if (ship->shield_arc_current[i] < 0x1F) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
+                                    int mask_idx = (i - shield_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x56, 1);
                                     if (ship->shield_arc_current[i] < 0x16) {
@@ -2201,7 +2201,7 @@ skip_cursor:
                             for (int i = 0; i < 4; i++) {
                                 if (ship->shield_arc_current[i] < 0x33) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
+                                    int mask_idx = (i - shield_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x56, 1);
                                     if (ship->shield_arc_current[i] < 0x2A) {
@@ -2236,7 +2236,7 @@ skip_cursor:
                             for (int i = 0; i < 4; i++) {
                                 if (ship->shield_arc_current[i] < 0x47) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
+                                    int mask_idx = (i - shield_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x57, 1);
                                     if (ship->shield_arc_current[i] < 0x3E) {
@@ -2279,7 +2279,7 @@ skip_cursor:
                             for (int i = 0; i < 4; i++) {
                                 if (ship->shield_arc_current[i] < 0x5B) {
                                     bitmap::Copy_Bitmap_To_Bitmap_(MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
-                                    int mask_idx = (i - facing_quadrant + 4) % 4 + facing_mod * 4;
+                                    int mask_idx = (i - shield_quadrant + 4) % 4 + facing_mod * 4;
                                     bitmap::Mask_Out_Bitmap_With_Bitmap_(0, 0, MOX::_draw_ship_bitmap, MOX::_shield_mask_bitmap[mask_idx], 1);
                                     replace::Replace_Color_(MOX::_draw_ship_bitmap, 0x57, 1);
                                     if (ship->shield_arc_current[i] < 0x52) {
