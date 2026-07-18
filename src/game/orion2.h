@@ -1645,14 +1645,7 @@ struct s_MSG {
     int8_t msg_type;
     uint8_t priority;
     union s_MSG_union u;
-    undefined field3_0xa;
-    undefined field4_0xb;
-    undefined field5_0xc;
-    undefined field6_0xd;
-    undefined field7_0xe;
-    undefined field8_0xf;
-    undefined field9_0x10;
-    undefined field10_0x11;
+    uint8_t reserved[8];
 };
 
 typedef struct s_nebula s_nebula, *Ps_nebula;
