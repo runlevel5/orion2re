@@ -607,10 +607,8 @@ namespace raceopt {
 
                 if (draw_text) {
                     char ability_cost_digits[12];
-                    ability_cost_text[0] = '\0';
-                    ability_cost_text[1] = '\0';
                     snprintf(ability_cost_digits, sizeof(ability_cost_digits), "%i", _ability_costs[neg_idx]);
-                    strlcpy(ability_cost_text + 1, ability_cost_digits, sizeof(ability_cost_text) - 1);
+                    strlcpy(ability_cost_text, ability_cost_digits, sizeof(ability_cost_text));
 
                     fonts::Print_(x_coords[col_idx], y, _opt_string[item_idx]);
                     int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
