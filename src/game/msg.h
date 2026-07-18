@@ -3,7 +3,7 @@
 namespace MSG_ {
     extern uint8_t _first_msg[MAX_PLAYERS];
     extern uint8_t _n_msgs[MAX_PLAYERS];
-    extern s_MSG _msgs[100];
+    extern s_MSG _msgs[MAX_MESSAGES];
     extern uint8_t _max_msgs[MAX_PLAYERS];
 
     void __cdecl Allocate_Msg_Slots_();

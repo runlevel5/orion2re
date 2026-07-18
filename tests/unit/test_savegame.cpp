@@ -4,6 +4,7 @@
 
 #include "game/savegame.h"
 
+#include <cstdio>
 #include <cstring>
 
 namespace {
@@ -38,7 +39,7 @@ namespace {
 
     void Fill_Messages_() {
         memset(MSG_::_msgs, 0, sizeof(MSG_::_msgs));
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < MAX_MESSAGES; ++i) {
             s_MSG& message = MSG_::_msgs[i];
             message.msg_type = static_cast<int8_t>(
                 i < MSG_TYPE_SCRAP_LEADER + 1 ? i :
@@ -175,7 +176,7 @@ namespace {
 
     void Fill_Reports_() {
         memset(REPORT::_reports, 0, sizeof(REPORT::_reports));
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < MAX_REPORTS; ++i) {
             s_report& report = REPORT::_reports[i];
             report.type = static_cast<uint8_t>((i % 2) + 1);
             report.action = static_cast<uint8_t>((i / 2) % 2);
@@ -221,7 +222,7 @@ namespace {
         MOX::_MAP_MAX_Y = 177;
         MOX::_fleet_icon_button_count = 421;
         MOX::_NUM_NEBULAS = 4;
-        REPORT::_n_reports = 50;
+        REPORT::_n_reports = MAX_REPORTS;
         REPORT::_done_player_reports = 0xA5;
         REPORT::_displayed_msgs = 0x5A;
         REPORT::_displayed_gnn = 0xC3;
@@ -293,68 +294,9 @@ namespace {
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
     }
 
-    uint32_t Write_Legacy_Game_(uint8_t* buffer, const char* description, uint32_t random_seed) {
-        SERIAL::Writer_ writer(buffer, SAVEGAME::BUFFER_CAPACITY, "legacy test save overflow");
-        uint8_t padding[1000] = {};
-
-        writer.Write_Uint32_(SAVEGAME::LEGACY_HEADER);
-        writer.Write_Bytes_(description, 37);
-        writer.Write_Int32_(MOX::_stardate);
-        writer.Write_Int8_(MOX::_game_type);
-        writer.Write_Bytes_(&MOX::_settings, sizeof(MOX::_settings));
-        writer.Write_Uint32_(random_seed);
-        writer.Write_Int16_(MOX::_NUM_COLONIES);
-        writer.Write_Bytes_(MOX::_colony, MAX_COLONIES * sizeof(s_colony));
-        writer.Write_Int16_(MOX::_planet_count);
-        writer.Write_Bytes_(MOX::_planet, MAX_PLANETS * sizeof(s_planet_data));
-        writer.Write_Int16_(MOX::_NUM_STARS);
-        writer.Write_Bytes_(MOX::_star, MAX_STARS * sizeof(s_star_data));
-        writer.Write_Bytes_(MOX::_leaders, MAX_LEADERS * sizeof(s_leader_data));
-        writer.Write_Int16_(MOX::_NUM_PLAYERS);
-        writer.Write_Bytes_(MOX::_player, MAX_PLAYERS * sizeof(s_player));
-        writer.Write_Int16_(MOX::_NUM_SHIPS);
-        writer.Write_Bytes_(MOX::_ship, MAX_SHIPS * sizeof(s_ship_data));
-        writer.Write_Bytes_(MOX::_moveable_box, sizeof(MOX::_moveable_box));
-        writer.Write_Bytes_(MOX::_moveable_box_order, sizeof(MOX::_moveable_box_order));
-        writer.Write_Int16_(MOX::_PLAYER_NUM);
-        writer.Write_Int16_(MOX::_max_map_scale);
-        writer.Write_Int16_(MOX::_max_zoom_count);
-        writer.Write_Uint8_(MOX::_star_bg_index);
-        writer.Write_Int16_(MOX::_MAP_MAX_X);
-        writer.Write_Int16_(MOX::_MAP_MAX_Y);
-        writer.Write_Uint16_(MOX::_fleet_icon_button_count);
-        writer.Write_Bytes_(MOX::_nebula, MAX_NEBULAS * sizeof(s_nebula));
-        writer.Write_Uint8_(MOX::_NUM_NEBULAS);
-        writer.Write_Bytes_(MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
-        writer.Write_Int16_(REPORT::_n_reports);
-        writer.Write_Bytes_(REPORT::_reports, sizeof(REPORT::_reports));
-        writer.Write_Uint8_(REPORT::_done_player_reports);
-        writer.Write_Bytes_(REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened));
-        writer.Write_Bytes_(REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check));
-        writer.Write_Bytes_(EVENTS::_event_data, sizeof(EVENTS::_event_data));
-        writer.Write_Bytes_(MSG_::_msgs, sizeof(MSG_::_msgs));
-        writer.Write_Bytes_(MSG_::_first_msg, sizeof(MSG_::_first_msg));
-        writer.Write_Bytes_(MSG_::_max_msgs, sizeof(MSG_::_max_msgs));
-        writer.Write_Bytes_(MSG_::_n_msgs, sizeof(MSG_::_n_msgs));
-        writer.Write_Uint8_(REPORT::_displayed_msgs);
-        writer.Write_Uint8_(REPORT::_displayed_gnn);
-        writer.Write_Int16_(diplodef::_COUNCIL_FLAG);
-        writer.Write_Int16_(diplodef::_next_council_meeting_turn);
-        writer.Write_Uint16_(MOX::_antaran_resource_level);
-        writer.Write_Uint16_(MOX::_chance_for_antaran_invasion);
-        writer.Write_Uint16_(MOX::_disallow_saves_code);
-        writer.Write_Uint32_(EVENTS::_last_event_year);
-        writer.Write_Int16_(EVENTS::_event_delay_count);
-        writer.Write_Bytes_(&MOX::_antarans, sizeof(MOX::_antarans));
-        writer.Write_Int16_(MOX::_cur_map_scale);
-        writer.Write_Int16_(MOX::_cur_map_x);
-        writer.Write_Int16_(MOX::_cur_map_y);
-        writer.Write_Bytes_(padding, sizeof(padding));
-        return writer.Length_();
-    }
 }
 
-DOCTEST_TEST_CASE("versioned and legacy save streams restore the complete persisted state") {
+DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persisted state") {
     State_ expected;
     State_ actual;
     Bind_State_(expected);
@@ -365,9 +307,9 @@ DOCTEST_TEST_CASE("versioned and legacy save streams restore the complete persis
     s_movable_box expected_boxes[5] = {};
     int16_t expected_box_order[5] = {};
     int16_t expected_bill[6] = {};
-    s_report expected_reports[50] = {};
+    s_report expected_reports[MAX_REPORTS] = {};
     s_event_data expected_events[36] = {};
-    s_MSG expected_messages[100] = {};
+    s_MSG expected_messages[MAX_MESSAGES] = {};
     uint8_t expected_interesting[MAX_PLAYERS] = {};
     uint8_t expected_colonize_check[BITMAP(MAX_STARS)] = {};
     uint8_t expected_first_msg[MAX_PLAYERS] = {};
@@ -393,10 +335,17 @@ DOCTEST_TEST_CASE("versioned and legacy save streams restore the complete persis
     SAVEGAME::Write_Game_(&writer, description, random_seed);
     DOCTEST_CHECK(writer.Length_() == 208002);
 
+    FILE* legacy_file = fopen(SAVEGAME_TEST_DATA_DIR "/savegame_v0.sav", "rb");
+    DOCTEST_REQUIRE(legacy_file != nullptr);
+    DOCTEST_REQUIRE(fseek(legacy_file, 0, SEEK_END) == 0);
+    long legacy_size_long = ftell(legacy_file);
+    DOCTEST_REQUIRE(legacy_size_long == 208000);
+    DOCTEST_REQUIRE(fseek(legacy_file, 0, SEEK_SET) == 0);
+    uint32_t legacy_size = static_cast<uint32_t>(legacy_size_long);
     uint8_t* legacy = static_cast<uint8_t*>(malloc(SAVEGAME::BUFFER_CAPACITY));
     DOCTEST_REQUIRE(legacy != nullptr);
-    uint32_t legacy_size = Write_Legacy_Game_(legacy, description, random_seed);
-    DOCTEST_CHECK(legacy_size == 208000);
+    DOCTEST_REQUIRE(fread(legacy, 1, legacy_size, legacy_file) == legacy_size);
+    fclose(legacy_file);
 
     for (int format = 0; format < 2; ++format) {
         Bind_State_(actual);
@@ -411,7 +360,7 @@ DOCTEST_TEST_CASE("versioned and legacy save streams restore the complete persis
         DOCTEST_REQUIRE(SAVEGAME::Read_Game_(&reader, &metadata, &loaded_settings, &loaded_seed));
         DOCTEST_CHECK(reader.Length_() == size);
         DOCTEST_CHECK(metadata.header == (format == 0 ? SAVEGAME::VERSIONED_HEADER : SAVEGAME::LEGACY_HEADER));
-        DOCTEST_CHECK(metadata.version == 0);
+        DOCTEST_CHECK(metadata.version == (format == 0 ? SAVEGAME::CURRENT_VERSION : 0));
         DOCTEST_CHECK(memcmp(metadata.description, description, sizeof(description)) == 0);
         DOCTEST_CHECK(metadata.stardate == 35123);
         DOCTEST_CHECK(metadata.game_type == 2);
@@ -443,7 +392,7 @@ DOCTEST_TEST_CASE("versioned and legacy save streams restore the complete persis
         DOCTEST_CHECK(MOX::_MAP_MAX_Y == 177);
         DOCTEST_CHECK(MOX::_fleet_icon_button_count == 421);
         DOCTEST_CHECK(MOX::_NUM_NEBULAS == 4);
-        DOCTEST_CHECK(REPORT::_n_reports == 50);
+        DOCTEST_CHECK(REPORT::_n_reports == MAX_REPORTS);
         DOCTEST_CHECK(REPORT::_done_player_reports == 0xA5);
         DOCTEST_CHECK(REPORT::_displayed_msgs == 0x5A);
         DOCTEST_CHECK(REPORT::_displayed_gnn == 0xC3);

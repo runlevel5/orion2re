@@ -73,6 +73,10 @@ orion2re_add_unit_test(test_savegame
         tests/fakes/fake_savegame_runtime.cpp
 )
 
+target_compile_definitions(test_savegame PRIVATE
+    SAVEGAME_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/unit"
+)
+
 orion2re_add_unit_test(test_netturn_host_selection
     SOURCES
         tests/unit/test_netturn_host_selection.cpp

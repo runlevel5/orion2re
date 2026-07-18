@@ -38,7 +38,7 @@ namespace MOX {
 
 namespace REPORT {
     int16_t _n_reports = 0;
-    s_report _reports[50] = {};
+    s_report _reports[MAX_REPORTS] = {};
     uint8_t _done_player_reports = 0;
     uint8_t _something_interesting_happened[MAX_PLAYERS] = {};
     uint8_t _done_colonize_check[BITMAP(MAX_STARS)] = {};
@@ -55,7 +55,7 @@ namespace EVENTS {
 namespace MSG_ {
     uint8_t _first_msg[MAX_PLAYERS] = {};
     uint8_t _n_msgs[MAX_PLAYERS] = {};
-    s_MSG _msgs[100] = {};
+    s_MSG _msgs[MAX_MESSAGES] = {};
     uint8_t _max_msgs[MAX_PLAYERS] = {};
 }
 

@@ -11,7 +11,7 @@ namespace MSG_ {
 
     uint8_t _first_msg[MAX_PLAYERS];
     uint8_t _n_msgs[MAX_PLAYERS];
-    s_MSG _msgs[100];
+    s_MSG _msgs[MAX_MESSAGES];
     uint8_t _max_msgs[MAX_PLAYERS];
 
     char* _msg_artifacts_fmt;
@@ -121,10 +121,7 @@ namespace MSG_ {
         return (int16_t)_first_msg[player_idx];
     }
 
-    /**
-     * Calculates and allocates message pool slices (out of 100 slots) 
-     * for all active (non-eliminated) players.
-     */
+    /** Calculates and allocates message pool slices for all active players. */
     void __cdecl Allocate_Msg_Slots_() {
         int active_players = 0;
 
@@ -143,13 +140,13 @@ namespace MSG_ {
             _max_msgs[i] = 0;
         }
 
-        // Second pass: Distribute 100 message slots among active players
+        // Second pass: Distribute message slots among active players
         if (MOX::_NUM_PLAYERS > 0 && active_players > 0) {
             int cumulative_pool = 0;
             for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
                 if (MOX::_player[i].eliminated == 0) {
                     uint8_t start_slot = (uint8_t)(cumulative_pool / active_players);
-                    cumulative_pool += 100;
+                    cumulative_pool += MAX_MESSAGES;
                     uint8_t end_slot = (uint8_t)(cumulative_pool / active_players);
 
                     _first_msg[i] = start_slot;

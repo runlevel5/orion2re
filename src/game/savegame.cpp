@@ -48,8 +48,7 @@ namespace SAVEGAME {
             for (size_t i = 0; i < count; ++i) values[i] = reader->Read_Int32_();
         }
 
-        void Write_Settings_(SERIAL::Writer_* writer, const s_settings* settings, uint16_t version) {
-            (void)version;
+        void Write_Settings_(SERIAL::Writer_* writer, const s_settings* settings) {
             writer->Write_Uint8_(settings->end_of_turn_summary);
             writer->Write_Uint8_(settings->end_of_turn_wait);
             writer->Write_Uint8_(settings->random_events);
@@ -102,8 +101,7 @@ namespace SAVEGAME {
                                  sizeof(*settings) - SETTINGS_RESERVED_OFFSET);
         }
 
-        void Read_Settings_(SERIAL::Reader_* reader, s_settings* settings, uint16_t version) {
-            (void)version;
+        void Read_Settings_(SERIAL::Reader_* reader, s_settings* settings) {
             settings->end_of_turn_summary = reader->Read_Uint8_();
             settings->end_of_turn_wait = reader->Read_Uint8_();
             settings->random_events = reader->Read_Uint8_();
@@ -210,8 +208,7 @@ namespace SAVEGAME {
             design->date_of_design = reader->Read_Uint16_();
         }
 
-        void Write_Colony_(SERIAL::Writer_* writer, const s_colony* colony, uint16_t version) {
-            (void)version;
+        void Write_Colony_(SERIAL::Writer_* writer, const s_colony* colony) {
             writer->Write_Int8_(colony->owner);
             writer->Write_Int8_(colony->allocated_to);
             writer->Write_Int16_(colony->planet);
@@ -264,8 +261,7 @@ namespace SAVEGAME {
             writer->Write_Uint16_(colony->last_turn_building_destroyed);
         }
 
-        void Read_Colony_(SERIAL::Reader_* reader, s_colony* colony, uint16_t version) {
-            (void)version;
+        void Read_Colony_(SERIAL::Reader_* reader, s_colony* colony) {
             colony->owner = reader->Read_Int8_();
             colony->allocated_to = reader->Read_Int8_();
             colony->planet = reader->Read_Int16_();
@@ -318,9 +314,9 @@ namespace SAVEGAME {
             colony->last_turn_building_destroyed = reader->Read_Uint16_();
         }
 
-        void Write_Planet_(SERIAL::Writer_* writer, const s_planet_data* planet, uint16_t version) {
+        void Write_Planet_(SERIAL::Writer_* writer, const s_planet_data* planet) {
             writer->Write_Int16_(planet->colony_index);
-            if (version == 0) writer->Write_Int8_(planet->star_index);
+            writer->Write_Int8_(planet->star_index);
             writer->Write_Int8_(planet->orbit);
             writer->Write_Int8_(planet->planet_type);
             writer->Write_Int8_(planet->size);
@@ -356,7 +352,7 @@ namespace SAVEGAME {
             planet->environmental_alterations = reader->Read_Int8_();
         }
 
-        void Write_Star_(SERIAL::Writer_* writer, const s_star_data* star, uint16_t version) {
+        void Write_Star_(SERIAL::Writer_* writer, const s_star_data* star) {
             writer->Write_Bytes_(star->name, sizeof(star->name));
             writer->Write_Int16_(star->x);
             writer->Write_Int16_(star->y);
@@ -367,7 +363,7 @@ namespace SAVEGAME {
             writer->Write_Bytes_(star->last_planet_selected, sizeof(star->last_planet_selected));
             writer->Write_Bytes_(star->black_hole_blocks, sizeof(star->black_hole_blocks));
             writer->Write_Int8_(star->system_special);
-            if (version == 0) writer->Write_Int8_(star->wormhole_star_id);
+            writer->Write_Int8_(star->wormhole_star_id);
             writer->Write_Uint8_(star->blockaded);
             writer->Write_Bytes_(star->blockaded_by, sizeof(star->blockaded_by));
             writer->Write_Uint8_(star->visited);
@@ -472,7 +468,7 @@ namespace SAVEGAME {
             leader->player_index = reader->Read_Int8_();
         }
 
-        void Write_Player_(SERIAL::Writer_* writer, const s_player* player, uint16_t version) {
+        void Write_Player_(SERIAL::Writer_* writer, const s_player* player) {
             writer->Write_Int8_(player->picture);
             writer->Write_Bytes_(player->name, sizeof(player->name));
             writer->Write_Bytes_(player->race_name, sizeof(player->race_name));
@@ -637,10 +633,9 @@ namespace SAVEGAME {
             writer->Write_Int8_(player->cheated_this_turn);
             writer->Write_Int32_(player->tribute_income);
             writer->Write_Bytes_(player->filler, sizeof(player->filler));
-            (void)version;
         }
 
-        void Read_Player_(SERIAL::Reader_* reader, s_player* player, uint16_t version) {
+        void Read_Player_(SERIAL::Reader_* reader, s_player* player) {
             player->picture = reader->Read_Int8_();
             reader->Read_Bytes_(player->name, sizeof(player->name));
             reader->Read_Bytes_(player->race_name, sizeof(player->race_name));
@@ -805,10 +800,9 @@ namespace SAVEGAME {
             player->cheated_this_turn = reader->Read_Int8_();
             player->tribute_income = reader->Read_Int32_();
             reader->Read_Bytes_(player->filler, sizeof(player->filler));
-            (void)version;
         }
 
-        void Write_Ship_(SERIAL::Writer_* writer, const s_ship_data* ship, uint16_t version) {
+        void Write_Ship_(SERIAL::Writer_* writer, const s_ship_data* ship) {
             Write_Ship_Design_(writer, &ship->d);
             writer->Write_Int8_(ship->owner);
             writer->Write_Int8_(ship->status);
@@ -829,10 +823,9 @@ namespace SAVEGAME {
             writer->Write_Int16_(ship->structural_damage);
             writer->Write_Int8_(ship->mission);
             writer->Write_Int8_(ship->just_built);
-            (void)version;
         }
 
-        void Read_Ship_(SERIAL::Reader_* reader, s_ship_data* ship, uint16_t version) {
+        void Read_Ship_(SERIAL::Reader_* reader, s_ship_data* ship) {
             Read_Ship_Design_(reader, &ship->d);
             ship->owner = reader->Read_Int8_();
             ship->status = reader->Read_Int8_();
@@ -853,7 +846,6 @@ namespace SAVEGAME {
             ship->structural_damage = reader->Read_Int16_();
             ship->mission = reader->Read_Int8_();
             ship->just_built = reader->Read_Int8_();
-            (void)version;
         }
 
         void Write_Movable_Box_(SERIAL::Writer_* writer, const s_movable_box* box) {
@@ -902,7 +894,7 @@ namespace SAVEGAME {
             nebula->type = reader->Read_Int8_();
         }
 
-        void Write_Report_(SERIAL::Writer_* writer, const s_report* report, uint16_t version) {
+        void Write_Report_(SERIAL::Writer_* writer, const s_report* report) {
             writer->Write_Uint8_(report->type);
             writer->Write_Int16_(report->player_idx);
             writer->Write_Uint8_(report->action);
@@ -928,10 +920,9 @@ namespace SAVEGAME {
             writer->Write_Bytes_(reinterpret_cast<const uint8_t*>(report) + 8, 8);
             writer->Write_Int16_(report->field4_0x10);
             writer->Write_Int8_(report->field5_0x12);
-            (void)version;
         }
 
-        void Read_Report_(SERIAL::Reader_* reader, s_report* report, uint16_t version) {
+        void Read_Report_(SERIAL::Reader_* reader, s_report* report) {
             report->type = reader->Read_Uint8_();
             report->player_idx = reader->Read_Int16_();
             report->action = reader->Read_Uint8_();
@@ -957,7 +948,6 @@ namespace SAVEGAME {
             reader->Read_Bytes_(reinterpret_cast<uint8_t*>(report) + 8, 8);
             report->field4_0x10 = reader->Read_Int16_();
             report->field5_0x12 = reader->Read_Int8_();
-            (void)version;
         }
 
         void Write_Event_(SERIAL::Writer_* writer, const s_event_data* event) {
@@ -1072,7 +1062,7 @@ namespace SAVEGAME {
             }
         }
 
-        void Write_Message_(SERIAL::Writer_* writer, const s_MSG* message, uint16_t version) {
+        void Write_Message_(SERIAL::Writer_* writer, const s_MSG* message) {
             writer->Write_Int8_(message->msg_type);
             writer->Write_Uint8_(message->priority);
             switch (message->msg_type) {
@@ -1181,10 +1171,9 @@ namespace SAVEGAME {
                 break;
             }
             writer->Write_Bytes_(reinterpret_cast<const uint8_t*>(message) + 10, 8);
-            (void)version;
         }
 
-        void Read_Message_(SERIAL::Reader_* reader, s_MSG* message, uint16_t version) {
+        void Read_Message_(SERIAL::Reader_* reader, s_MSG* message) {
             message->msg_type = reader->Read_Int8_();
             message->priority = reader->Read_Uint8_();
             memset(&message->u, 0, sizeof(message->u));
@@ -1294,7 +1283,6 @@ namespace SAVEGAME {
                 break;
             }
             reader->Read_Bytes_(reinterpret_cast<uint8_t*>(message) + 10, 8);
-            (void)version;
         }
 
         void Write_Antaran_(SERIAL::Writer_* writer, const s_antaran* antaran) {
@@ -1321,20 +1309,20 @@ namespace SAVEGAME {
             antaran->attack_notified_mask = reader->Read_Uint8_();
         }
 
-        void Write_Game_State_(SERIAL::Writer_* writer, uint16_t version, const s_settings* settings, uint32_t random_seed) {
-            Write_Settings_(writer, settings, version);
+        void Write_Game_State_(SERIAL::Writer_* writer, const s_settings* settings, uint32_t random_seed) {
+            Write_Settings_(writer, settings);
             writer->Write_Uint32_(random_seed);
             writer->Write_Int16_(MOX::_NUM_COLONIES);
-            for (int i = 0; i < MAX_COLONIES; ++i) Write_Colony_(writer, &MOX::_colony[i], version);
+            for (int i = 0; i < MAX_COLONIES; ++i) Write_Colony_(writer, &MOX::_colony[i]);
             writer->Write_Int16_(MOX::_planet_count);
-            for (int i = 0; i < MAX_PLANETS; ++i) Write_Planet_(writer, &MOX::_planet[i], version);
+            for (int i = 0; i < MAX_PLANETS; ++i) Write_Planet_(writer, &MOX::_planet[i]);
             writer->Write_Int16_(MOX::_NUM_STARS);
-            for (int i = 0; i < MAX_STARS; ++i) Write_Star_(writer, &MOX::_star[i], version);
+            for (int i = 0; i < MAX_STARS; ++i) Write_Star_(writer, &MOX::_star[i]);
             for (int i = 0; i < MAX_LEADERS; ++i) Write_Leader_(writer, &MOX::_leaders[i]);
             writer->Write_Int16_(MOX::_NUM_PLAYERS);
-            for (int i = 0; i < MAX_PLAYERS; ++i) Write_Player_(writer, &MOX::_player[i], version);
+            for (int i = 0; i < MAX_PLAYERS; ++i) Write_Player_(writer, &MOX::_player[i]);
             writer->Write_Int16_(MOX::_NUM_SHIPS);
-            for (int i = 0; i < MAX_SHIPS; ++i) Write_Ship_(writer, &MOX::_ship[i], version);
+            for (int i = 0; i < MAX_SHIPS; ++i) Write_Ship_(writer, &MOX::_ship[i]);
             for (int i = 0; i < 5; ++i) Write_Movable_Box_(writer, &MOX::_moveable_box[i]);
             Write_Int16_Array_(writer, MOX::_moveable_box_order, 5);
             writer->Write_Int16_(MOX::_PLAYER_NUM);
@@ -1348,12 +1336,12 @@ namespace SAVEGAME {
             writer->Write_Uint8_(MOX::_NUM_NEBULAS);
             Write_Int16_Array_(writer, MOX::_bill_savegame, 6);
             writer->Write_Int16_(REPORT::_n_reports);
-            for (int i = 0; i < 50; ++i) Write_Report_(writer, &REPORT::_reports[i], version);
+            for (int i = 0; i < MAX_REPORTS; ++i) Write_Report_(writer, &REPORT::_reports[i]);
             writer->Write_Uint8_(REPORT::_done_player_reports);
             writer->Write_Bytes_(REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened));
             writer->Write_Bytes_(REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check));
             for (int i = 0; i < 36; ++i) Write_Event_(writer, &EVENTS::_event_data[i]);
-            for (int i = 0; i < 100; ++i) Write_Message_(writer, &MSG_::_msgs[i], version);
+            for (int i = 0; i < MAX_MESSAGES; ++i) Write_Message_(writer, &MSG_::_msgs[i]);
             writer->Write_Bytes_(MSG_::_first_msg, sizeof(MSG_::_first_msg));
             writer->Write_Bytes_(MSG_::_max_msgs, sizeof(MSG_::_max_msgs));
             writer->Write_Bytes_(MSG_::_n_msgs, sizeof(MSG_::_n_msgs));
@@ -1373,20 +1361,20 @@ namespace SAVEGAME {
             Write_Zeroes_(writer, 1000);
         }
 
-        void Read_Game_State_Internal_(SERIAL::Reader_* reader, uint16_t version, s_settings* settings, uint32_t* random_seed) {
-            Read_Settings_(reader, settings, version);
+        void Read_Game_State_(SERIAL::Reader_* reader, uint16_t version, s_settings* settings, uint32_t* random_seed) {
+            Read_Settings_(reader, settings);
             *random_seed = reader->Read_Uint32_();
             MOX::_NUM_COLONIES = reader->Read_Int16_();
-            for (int i = 0; i < MAX_COLONIES; ++i) Read_Colony_(reader, &MOX::_colony[i], version);
+            for (int i = 0; i < MAX_COLONIES; ++i) Read_Colony_(reader, &MOX::_colony[i]);
             MOX::_planet_count = reader->Read_Int16_();
             for (int i = 0; i < MAX_PLANETS; ++i) Read_Planet_(reader, &MOX::_planet[i], version);
             MOX::_NUM_STARS = reader->Read_Int16_();
             for (int i = 0; i < MAX_STARS; ++i) Read_Star_(reader, &MOX::_star[i], version);
             for (int i = 0; i < MAX_LEADERS; ++i) Read_Leader_(reader, &MOX::_leaders[i]);
             MOX::_NUM_PLAYERS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i], version);
+            for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i]);
             MOX::_NUM_SHIPS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_SHIPS; ++i) Read_Ship_(reader, &MOX::_ship[i], version);
+            for (int i = 0; i < MAX_SHIPS; ++i) Read_Ship_(reader, &MOX::_ship[i]);
             for (int i = 0; i < 5; ++i) Read_Movable_Box_(reader, &MOX::_moveable_box[i]);
             Read_Int16_Array_(reader, MOX::_moveable_box_order, 5);
             MOX::_PLAYER_NUM = reader->Read_Int16_();
@@ -1400,12 +1388,12 @@ namespace SAVEGAME {
             MOX::_NUM_NEBULAS = reader->Read_Uint8_();
             Read_Int16_Array_(reader, MOX::_bill_savegame, 6);
             REPORT::_n_reports = reader->Read_Int16_();
-            for (int i = 0; i < 50; ++i) Read_Report_(reader, &REPORT::_reports[i], version);
+            for (int i = 0; i < MAX_REPORTS; ++i) Read_Report_(reader, &REPORT::_reports[i]);
             REPORT::_done_player_reports = reader->Read_Uint8_();
             reader->Read_Bytes_(REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened));
             reader->Read_Bytes_(REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check));
             for (int i = 0; i < 36; ++i) Read_Event_(reader, &EVENTS::_event_data[i]);
-            for (int i = 0; i < 100; ++i) Read_Message_(reader, &MSG_::_msgs[i], version);
+            for (int i = 0; i < MAX_MESSAGES; ++i) Read_Message_(reader, &MSG_::_msgs[i]);
             reader->Read_Bytes_(MSG_::_first_msg, sizeof(MSG_::_first_msg));
             reader->Read_Bytes_(MSG_::_max_msgs, sizeof(MSG_::_max_msgs));
             reader->Read_Bytes_(MSG_::_n_msgs, sizeof(MSG_::_n_msgs));
@@ -1432,7 +1420,7 @@ namespace SAVEGAME {
         writer->Write_Int32_(MOX::_stardate);
         writer->Write_Int8_(MOX::_game_type);
         writer->Write_Uint16_(CURRENT_VERSION);
-        Write_Game_State_(writer, CURRENT_VERSION, &MOX::_settings, random_seed);
+        Write_Game_State_(writer, &MOX::_settings, random_seed);
     }
 
     bool Read_Game_(SERIAL::Reader_* reader, s_metadata* metadata, s_settings* saved_settings, uint32_t* random_seed) {
@@ -1447,7 +1435,7 @@ namespace SAVEGAME {
         metadata->version = metadata->header == LEGACY_HEADER ? LEGACY_VERSION : reader->Read_Uint16_();
         if (metadata->version > CURRENT_VERSION) return false;
 
-        Read_Game_State_Internal_(reader, metadata->version, saved_settings, random_seed);
+        Read_Game_State_(reader, metadata->version, saved_settings, random_seed);
         return true;
     }
 }
