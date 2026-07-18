@@ -629,7 +629,7 @@ namespace council {
                 prompt_text, 
                 choice_labels[0], 
                 0x19, 
-                list_metadata, 
+                list_metadata,
                 active_mask, 
                 0x11, 
                 nullptr, 

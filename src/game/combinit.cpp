@@ -1575,7 +1575,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
 
     int16_t weapon_index = 0;
 
-    if (MOX::_colony[colony_idx].buildings[BUILDING_STAR_BASE] != 0) {
+    if (MOX::_colony[colony_idx].buildings[BUILDING_GROUND_BATTERIES] != 0) {
         int16_t weapon_id_1 = INITSHIP::Best_Beam_Weapon_(MOX::_colony[colony_idx].owner);
         int16_t mini_level_1 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_1].tech_app_id);
         int16_t specials_1 = 2;
