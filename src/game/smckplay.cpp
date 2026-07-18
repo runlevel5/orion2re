@@ -52,10 +52,7 @@ namespace smckplay {
 
     void Close_Smacker_Audio_Streams_() {
         for (SDL_AudioStream*& stream : _smacker_state.audio_streams) {
-            if (stream != nullptr) {
-                SDL_DestroyAudioStream(stream);
-                stream = nullptr;
-            }
+            sound::Close_Playback_Stream_(stream);
         }
     }
 

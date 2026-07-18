@@ -2,6 +2,7 @@
 
 namespace sound {
     SDL_AudioStream* __cdecl Open_Playback_Stream_(uint16_t bits_per_sample, uint16_t channels, uint32_t sample_rate, int32_t volume_percent);
+    void __cdecl Close_Playback_Stream_(SDL_AudioStream*& stream);
 
     /**
      * Drives periodic sound and stream maintenance from the multimedia timer.

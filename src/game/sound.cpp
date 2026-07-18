@@ -383,6 +383,11 @@ namespace sound {
         return stream;
     }
 
+    void __cdecl Close_Playback_Stream_(SDL_AudioStream*& stream) {
+        Sound_State_Guard_ guard;
+        Destroy_SDL_Stream_(stream);
+    }
+
     /**
      * @brief Sets the internal audio buffer and updates its available size.
      *
