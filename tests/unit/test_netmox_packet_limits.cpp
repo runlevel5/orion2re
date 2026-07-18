@@ -255,8 +255,9 @@ namespace {
             REPORT::_reports[i].player_idx = (int16_t)i;
             REPORT::_reports[i].action = (uint8_t)(7 + i);
             REPORT::_reports[i].d.steal.tech_app_id = (int16_t)(100 + i);
-            REPORT::_reports[i].field4_0x10 = (int16_t)(200 + i);
-            REPORT::_reports[i].field5_0x12 = (int8_t)(10 + i);
+            for (size_t j = 0; j < sizeof(REPORT::_reports[i].reserved); ++j) {
+                REPORT::_reports[i].reserved[j] = (uint8_t)(10 + i + j);
+            }
         }
 
         for (int i = 0; i < 36; ++i) {
