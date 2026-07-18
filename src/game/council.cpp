@@ -598,9 +598,9 @@ namespace council {
     }
 
     void Council_Accept_Ruling_() {
-        char choice_labels[2][25];
+        char choice_labels[3][25];
         char prompt_text[40];
-        int8_t list_metadata;
+        int8_t list_metadata[2];
         uint8_t active_mask[4];
 
         fields::Assign_Auto_Function_(Draw_Main_Council_Screen_, 2);
@@ -616,7 +616,9 @@ namespace council {
             JIM::Get_Text_Message_("jimtext.lbx", 0x1B, choice_labels[1], sizeof(choice_labels[1]));
             JIM::Get_Text_Message_("jimtext.lbx", 0x1C, prompt_text, sizeof(prompt_text));
 
-            list_metadata = 0;
+            choice_labels[2][0] = '\0';
+            list_metadata[0] = 0;
+            list_metadata[1] = 0;
             active_mask[0] = 1;
             active_mask[1] = 1;
             active_mask[2] = 1;
@@ -627,7 +629,7 @@ namespace council {
                 prompt_text, 
                 choice_labels[0], 
                 0x19, 
-                &list_metadata, 
+                list_metadata, 
                 active_mask, 
                 0x11, 
                 nullptr, 
