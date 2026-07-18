@@ -20,7 +20,8 @@ int16_t Get_Winner_() {
 }
 
 void Do_Autosave_() {
-    int32_t autosave_interval = 4;
+    // Original has 4
+    int32_t autosave_interval = 1;
 
     if (MOX::_game_type == 2 || MOX::_game_type == 3) {
         autosave_interval = 1;
