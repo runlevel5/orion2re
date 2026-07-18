@@ -1230,6 +1230,7 @@ namespace MAINPUPS {
         MAINPUPS::_g_state = popup_mode;
 
         while (true) {
+            timer::Mark_Time_();
             COLONY::_full_draw = 1;
             MAINPUPS::Eric_Pop_Fields_();
             MAINPUPS::Update_Colony_Combat_Fields_(popup_mode, &var_1C);
@@ -2591,9 +2592,6 @@ namespace MAINPUPS {
         colors_cfg.colors[2] = 0x13;
         
         char text_buffer[500];
-
-        timer::Release_Time_(1);
-        timer::Mark_Time_();
 
         if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
             Mainpups_Tested_Execute_Autofunction_();

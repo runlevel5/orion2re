@@ -325,6 +325,7 @@ namespace LOADSAVE {
         MOX::_global_var = 0;
 
         do {
+            timer::Mark_Time_();
             int16_t input_id = fields::Get_Input_();
             int16_t selected_slot = -1;
 
@@ -394,6 +395,7 @@ namespace LOADSAVE {
                 video::Set_Page_Off_();
                 fields::Invoke_Auto_Function_();
                 RUSS::Mox_Sync_Update_();
+                timer::Release_Time_(1);
             }
         } while (exit_loop == 0);
 
@@ -425,6 +427,7 @@ namespace LOADSAVE {
         MOX::_global_var = 0;
 
         while (true) {
+            timer::Mark_Time_();
             int16_t input = fields::Get_Input_();
 
             for (int16_t i = 0; i < 13; ++i) {
@@ -457,6 +460,7 @@ namespace LOADSAVE {
             video::Set_Page_Off_();
             _Draw_Options_Game_Popup_();
             RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
         }
     }
 
@@ -483,6 +487,7 @@ namespace LOADSAVE {
         MOX::_global_var = 0;
 
         do {
+            timer::Mark_Time_();
             bool copy_saved_field_text = false;
             bool trigger_save = false;
             int16_t input_id = fields::Get_Input_();
@@ -576,6 +581,7 @@ namespace LOADSAVE {
                 video::Set_Page_Off_();
                 _Draw_Load_Save_Game_Popup_();
                 RUSS::Mox_Sync_Update_();
+                timer::Release_Time_(1);
             }
         } while (exit_popup == 0);
 
@@ -1222,6 +1228,7 @@ namespace LOADSAVE {
         EVANHELP::Set_Main_Game_Screen_Help_List_();
 
         while (true) {
+            timer::Mark_Time_();
             int16_t input = fields::Get_Input_();
 
             if (input == _game_popup_fields->btn_main_close_id) {
@@ -1317,6 +1324,7 @@ namespace LOADSAVE {
             video::Set_Page_Off_();
             LOADSAVE::_Draw_Main_Game_Popup_();
             RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
         }
     }
 

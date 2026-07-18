@@ -118,63 +118,94 @@ namespace MAINSCR {
         constexpr int16_t map_top = 22;
         constexpr int16_t map_width = 506;
         constexpr int16_t map_height = 400;
-        static uint8_t influence_owners[map_height][map_width];
+        struct s_influence_source {
+            int16_t center_x;
+            int16_t center_y;
+            int16_t radius;
+            int16_t owner;
+        };
 
-        memset(influence_owners, 0, sizeof(influence_owners));
+        static uint8_t influence_owners[map_height][map_width];
+        static s_influence_source cached_sources[MAX_STARS];
+        static int16_t cached_star_count = -1;
+        s_influence_source sources[MAX_STARS] = {};
 
         const bool viewer_is_omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
 
-        for (int16_t screen_y = map_top; screen_y < map_top + map_height; ++screen_y) {
-            for (int16_t screen_x = map_left; screen_x < map_left + map_width; ++screen_x) {
-                uint8_t owners = 0;
+        for (int16_t star_idx = 0; star_idx < MAX_STARS; ++star_idx) {
+            sources[star_idx].owner = -1;
+        }
 
-                for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
-                    const int16_t owner = MOX::_star[star_idx].owner;
-                    if (owner < 0 || owner >= MOX::_NUM_PLAYERS || owner >= MAX_PLAYERS) {
-                        continue;
-                    }
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            const int16_t owner = MOX::_star[star_idx].owner;
+            if (owner < 0 || owner >= MOX::_NUM_PLAYERS || owner >= MAX_PLAYERS) {
+                continue;
+            }
 
-                    const bool source_is_known =
-                        viewer_is_omniscient ||
-                        HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx) ||
-                        HAROLD::Contact_With_One_Colony_(star_idx);
-                    if (!source_is_known) {
-                        continue;
-                    }
+            const bool source_is_known =
+                viewer_is_omniscient ||
+                HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx) ||
+                HAROLD::Contact_With_One_Colony_(star_idx);
+            if (!source_is_known ||
+                (owner != MOX::_PLAYER_NUM && !HAROLD::Contact_With_Player_(MOX::_PLAYER_NUM, owner))) {
+                continue;
+            }
 
-                    if (owner != MOX::_PLAYER_NUM &&
-                        !HAROLD::Contact_With_Player_(MOX::_PLAYER_NUM, owner)) {
-                        continue;
-                    }
+            s_influence_source& source = sources[star_idx];
+            source.radius = static_cast<int16_t>(
+                HAROLD::Get_Scaled_Value_(static_cast<int16_t>(MOX::_player[owner].ship_range * 30))
+            );
+            if (source.radius < 1) {
+                continue;
+            }
+            source.owner = owner;
+            Get_Star_Draw_Coords_(star_idx, &source.center_x, &source.center_y);
+        }
 
-                    int32_t owner_range = MOX::_player[owner].ship_range;
-                    if (owner_range == 255) {
-                        owner_range = 16;
-                    }
-                    const int16_t influence_radius = static_cast<int16_t>(
-                        HAROLD::Get_Scaled_Value_(static_cast<int16_t>(owner_range * 30))
-                    );
-                    if (influence_radius < 1) {
-                        continue;
-                    }
-                    const int32_t influence_radius_squared = influence_radius * influence_radius;
+        bool cache_valid = cached_star_count == MOX::_NUM_STARS;
+        for (int16_t star_idx = 0; cache_valid && star_idx < MAX_STARS; ++star_idx) {
+            const s_influence_source& cached = cached_sources[star_idx];
+            const s_influence_source& current = sources[star_idx];
+            cache_valid =
+                cached.center_x == current.center_x &&
+                cached.center_y == current.center_y &&
+                cached.radius == current.radius &&
+                cached.owner == current.owner;
+        }
 
-                    int16_t center_x;
-                    int16_t center_y;
-                    Get_Star_Draw_Coords_(star_idx, &center_x, &center_y);
+        if (!cache_valid) {
+            memset(influence_owners, 0, sizeof(influence_owners));
 
-                    const int32_t dx = screen_x - center_x;
-                    const int32_t dy = screen_y - center_y;
-                    const int32_t distance_squared = dx * dx + dy * dy;
-                    if (distance_squared > influence_radius_squared) {
-                        continue;
-                    }
-
-                    owners |= static_cast<uint8_t>(1u << owner);
+            for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+                const s_influence_source& source = sources[star_idx];
+                if (source.owner < 0) {
+                    continue;
                 }
 
-                influence_owners[screen_y - map_top][screen_x - map_left] = owners;
+                int16_t left = source.center_x - source.radius;
+                int16_t right = source.center_x + source.radius;
+                int16_t top = source.center_y - source.radius;
+                int16_t bottom = source.center_y + source.radius;
+                if (left < map_left) left = map_left;
+                if (right >= map_left + map_width) right = map_left + map_width - 1;
+                if (top < map_top) top = map_top;
+                if (bottom >= map_top + map_height) bottom = map_top + map_height - 1;
+
+                const int32_t radius_squared = source.radius * source.radius;
+                const uint8_t owner_bit = static_cast<uint8_t>(1u << source.owner);
+                for (int16_t screen_y = top; screen_y <= bottom; ++screen_y) {
+                    const int32_t dy = screen_y - source.center_y;
+                    for (int16_t screen_x = left; screen_x <= right; ++screen_x) {
+                        const int32_t dx = screen_x - source.center_x;
+                        if (dx * dx + dy * dy <= radius_squared) {
+                            influence_owners[screen_y - map_top][screen_x - map_left] |= owner_bit;
+                        }
+                    }
+                }
             }
+
+            memcpy(cached_sources, sources, sizeof(sources));
+            cached_star_count = MOX::_NUM_STARS;
         }
 
         if (_influence_view_mode == 1) {
