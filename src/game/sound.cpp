@@ -44,13 +44,9 @@ namespace sound {
     uint8_t _soundOn;
     uint8_t _soundErrorOccurred;
     SDL_TimerID _soundTimerId;
-    uint8_t _soundTimerActive;
-    SDL_AtomicInt _soundTimerRunning;
-    SDL_AtomicInt _soundTimerStopFlag;
+    SDL_Mutex* _soundStateMutex;
     void* _soundBuffer;
     uint32_t _soundBufferSize;
-    SDL_AtomicInt _soundTimerLock;
-    SDL_AtomicInt _soundTimerCallbackCount;
     uint8_t _audioPlaybackActive;
     int32_t _global_stream_volume = 100;
     uint8_t _loopStream;
@@ -72,6 +68,20 @@ namespace sound {
     s_vfs_file* _streamEntryFile;
 
     namespace {
+        class Sound_State_Guard_ {
+        public:
+            Sound_State_Guard_() {
+                SDL_LockMutex(_soundStateMutex);
+            }
+
+            ~Sound_State_Guard_() {
+                SDL_UnlockMutex(_soundStateMutex);
+            }
+
+            Sound_State_Guard_(const Sound_State_Guard_&) = delete;
+            Sound_State_Guard_& operator=(const Sound_State_Guard_&) = delete;
+        };
+
         void Copy_FourCC_Tag_(char* dest, const char* src) {
             memcpy(dest, src, sizeof(uint32_t));
         }
@@ -89,17 +99,6 @@ namespace sound {
             _soundIndices[0].num_active_channels = 1000000;
             _soundIndices[1].buffer_size = buffer_size;
             _soundIndices[1].prev_id = 0;
-        }
-
-        void Stop_Sound_Timer_And_Drain_() {
-            SDL_SetAtomicInt(&_soundTimerStopFlag, 1);
-
-            while (SDL_GetAtomicInt(&_soundTimerCallbackCount) != 0 ||
-                   SDL_GetAtomicInt(&_soundTimerLock) != 0) {
-                SDL_Delay(1);
-            }
-
-            SDL_SetAtomicInt(&_soundTimerRunning, 0);
         }
 
         SDL_AudioFormat Get_SDL_Audio_Format_(uint16_t format_tag, uint16_t bits_per_sample) {
@@ -311,21 +310,7 @@ namespace sound {
 
         Uint32 SDLCALL Sound_Timer_Thunk_(void* userdata, SDL_TimerID timer_id, Uint32 interval) {
             (void)userdata;
-
-            if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
-                SDL_SetAtomicInt(&_soundTimerRunning, 0);
-                return interval;
-            }
-
-            SDL_AddAtomicInt(&_soundTimerCallbackCount, 1);
             sound::Sound_Timer_Callback_(timer_id, 0, 0, 0, 0);
-            SDL_AddAtomicInt(&_soundTimerCallbackCount, -1);
-
-            if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
-                SDL_SetAtomicInt(&_soundTimerRunning, 0);
-                return interval;
-            }
-
             return interval;
         }
 
@@ -336,6 +321,8 @@ namespace sound {
      * Stops and removes channels if the volume delta is out of bounds.
      */
     void __cdecl Sound_Update_() {
+        Sound_State_Guard_ guard;
+
         for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
             s_sound_channel& channel = _soundChannels[i];
 
@@ -364,6 +351,8 @@ namespace sound {
      * Opens a basic PCM playback stream using the already-initialized SDL audio backend.
      */
     SDL_AudioStream* __cdecl Open_Playback_Stream_(uint16_t bits_per_sample, uint16_t channels, uint32_t sample_rate, int32_t volume_percent) {
+        Sound_State_Guard_ guard;
+
         if (_audioInitialized == 0 || channels == 0 || sample_rate == 0) {
             return nullptr;
         }
@@ -400,6 +389,8 @@ namespace sound {
      * @param buffer Pointer to the memory block to be used as the audio buffer.
      */
     void __cdecl Set_Audio_Buffer_(void* buffer) {
+        Sound_State_Guard_ guard;
+
         if (buffer == nullptr) {
             _soundBufferSize = 0;
             _soundBuffer = nullptr;
@@ -444,6 +435,7 @@ namespace sound {
     }
 
     void __cdecl Fade_Stream_Down_(uint8_t fade_rate) {
+        Sound_State_Guard_ guard;
         _command = 2;
         _streamIncVal = fade_rate;
     }
@@ -453,6 +445,8 @@ namespace sound {
     }
 
     void __cdecl Set_Stream_Max_Volume_(int32_t volume) {
+        Sound_State_Guard_ guard;
+
         if (volume >= 0 && volume <= 100) {
             _global_stream_volume = volume;
             Set_Stream_Volume_(volume);
@@ -460,6 +454,8 @@ namespace sound {
     }
 
     void __cdecl Set_Sound_Max_Volume_(int32_t volume) {
+        Sound_State_Guard_ guard;
+
         if (volume >= 0 && volume <= 100) {
             sound::_masterVolume = volume;
             sound::Set_Master_Volume_(volume);
@@ -467,6 +463,8 @@ namespace sound {
     }
 
     void __cdecl Set_Stream_Filename_(const char* filename) {
+        Sound_State_Guard_ guard;
+
         if (sound::_audioInitialized != 0 && filename != nullptr) {
             uint8_t was_music_active = _musicActive;
 
@@ -550,17 +548,12 @@ namespace sound {
      * Releases SDL audio stream resources and stops the periodic sound timer.
      */
     void __cdecl Destroy_Sound_() {
-        Stop_Sound_Timer_And_Drain_();
-
         if (_soundTimerId != 0) {
             SDL_RemoveTimer(_soundTimerId);
             _soundTimerId = 0;
         }
 
-        while (SDL_GetAtomicInt(&_soundTimerCallbackCount) != 0 ||
-               SDL_GetAtomicInt(&_soundTimerLock) != 0) {
-            SDL_Delay(1);
-        }
+        Sound_State_Guard_ guard;
 
         for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
             Destroy_SDL_Stream_(_soundChannels[i].buffer);
@@ -578,6 +571,9 @@ namespace sound {
         }
 
         _audioInitialized = 0;
+
+        // SDL_RemoveTimer does not wait for a callback that was already dispatched.
+        // Keep the mutex alive until SDL_Quit so a late callback remains safe.
     }
 
     void __cdecl Init_Sound_() {
@@ -590,6 +586,17 @@ namespace sound {
                 return;
             }
         }
+
+        if (_soundStateMutex == nullptr) {
+            _soundStateMutex = SDL_CreateMutex();
+            if (_soundStateMutex == nullptr) {
+                _soundErrorOccurred = 1;
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "sound: SDL_CreateMutex failed: %s", SDL_GetError());
+                return;
+            }
+        }
+
+        Sound_State_Guard_ guard;
 
         const char* audio_driver = SDL_GetCurrentAudioDriver();
         SDL_LogInfo(
@@ -610,14 +617,8 @@ namespace sound {
             Reset_Sound_Channel_(i);
         }
 
-        SDL_SetAtomicInt(&_soundTimerRunning, 0);
-        SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
-        SDL_SetAtomicInt(&_soundTimerLock, 0);
-        SDL_SetAtomicInt(&_soundTimerCallbackCount, 0);
-
         _soundTimerId = SDL_AddTimer(SOUND_TIMER_INTERVAL_MS, Sound_Timer_Thunk_, nullptr);
         if (_soundTimerId != 0) {
-            _soundTimerActive = 1;
             _masterVolume = 100;
             _soundOn = 1;
             _audioPlaybackActive = 1;
@@ -631,56 +632,24 @@ namespace sound {
     }
 
     void __stdcall Sound_Timer_Callback_(uint32_t timer_id, uint32_t message, uint32_t user_data, uint32_t param1, uint32_t param2) {
-        if (!SDL_CompareAndSwapAtomicInt(&_soundTimerLock, 0, 1)) {
+        Sound_State_Guard_ guard;
+
+        if (_audioInitialized != 1) {
             return;
         }
 
-        if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
-            SDL_SetAtomicInt(&_soundTimerRunning, 0);
-            SDL_SetAtomicInt(&_soundTimerLock, 0);
-            return;
-        }
-
-        SDL_SetAtomicInt(&_soundTimerRunning, 1);
-
-        if (sound::_soundOn == 1 && sound::_audioInitialized == 1) {
+        if (sound::_soundOn == 1) {
             sound::Update_Sound_Channels_();
         }
 
         if (sound::_audioPlaybackActive == 1 && sound::_musicActive == 1) {
             sound::Adjust_Settings_();
         }
-
-        if (SDL_GetAtomicInt(&_soundTimerStopFlag) != 0) {
-            SDL_SetAtomicInt(&_soundTimerRunning, 0);
-        }
-
-        SDL_SetAtomicInt(&_soundTimerLock, 0);
-    }
-
-    /**
-     * Requests the periodic sound timer to stop and drains in-flight work.
-     */
-    void __cdecl Stop_Sound_Timer_() {
-        Stop_Sound_Timer_And_Drain_();
-    }
-
-    void __cdecl Stop_Sound_Timer_And_Wait2_() {
-        Stop_Sound_Timer_And_Drain_();
-    }
-
-    /**
-     * Enables the sound timer by clearing the stop flag.
-     */
-    void __cdecl Enable_Sound_Timer_() {
-        SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
-    }
-
-    void __cdecl Resume_Timer2_() {
-        SDL_SetAtomicInt(&_soundTimerStopFlag, 0);
     }
 
     void __cdecl Loop_Stream_(int32_t count) {
+        Sound_State_Guard_ guard;
+
         if (count == -1) {
             count = INFINITE_LOOP_COUNT;
         }
@@ -690,6 +659,7 @@ namespace sound {
     }
 
     void __cdecl Fade_Stream_Up_(uint8_t fade_increment) {
+        Sound_State_Guard_ guard;
         _command = 1;
         _streamIncVal = fade_increment;
     }
@@ -699,6 +669,8 @@ namespace sound {
      * @param volume_percent The desired volume as a percentage (0-100).
      */
     void __cdecl Set_Stream_Volume_(int32_t volume_percent) {
+        Sound_State_Guard_ guard;
+
         if (sound::_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
             // Validate that the volume percentage is within the expected range
             if (volume_percent >= 0 && volume_percent <= 100) {
@@ -714,6 +686,8 @@ namespace sound {
     }
 
     void __cdecl Sound_On_() {
+        Sound_State_Guard_ guard;
+
         if (_audioInitialized == 1) {
             _soundOn = 1;
         }
@@ -723,6 +697,8 @@ namespace sound {
      * Sets one channel volume, or updates the master volume when channel_idx is -1.
      */
     void __cdecl Set_Channel_Volume_(int32_t channel_idx, int32_t volume) {
+        Sound_State_Guard_ guard;
+
         if (sound::_soundOn == 0) {
             return;
         }
@@ -745,6 +721,8 @@ namespace sound {
     }
 
     void __cdecl Stop_Sound_(int32_t channel_idx) {
+        Sound_State_Guard_ guard;
+
         if (sound::_soundOn == 0) {
             return;
         }
@@ -765,6 +743,8 @@ namespace sound {
     }
 
     void __cdecl Stop_All_Sounds_() {
+        Sound_State_Guard_ guard;
+
         if (sound::_soundOn != 0) {
             for (int32_t i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
                 sound::Stop_Sound_(i);
@@ -782,6 +762,8 @@ namespace sound {
     }
 
     int32_t __cdecl Get_Stream_Volume_() {
+        Sound_State_Guard_ guard;
+
         if (sound::_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
             return _currentStreamVolume;
         }
@@ -790,21 +772,22 @@ namespace sound {
     }
 
     void __cdecl Stop_Stream_() {
+        Sound_State_Guard_ guard;
+
         if (_audioPlaybackActive != 0 && _stream_data.ds_buffer != nullptr) {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: stopped file=%s entry=%d", _currentStreamFilename, _currentStreamId);
-            Stop_Sound_Timer_();
-
             Stop_Stream_Loop_();
             SDL_AudioStream* destroyed_stream = _stream_data.ds_buffer;
             _stream_data.ds_buffer = nullptr;
             _loopStream = 0;
             _audioPlaybackActive = 0;
             Destroy_SDL_Stream_(destroyed_stream);
-            Enable_Sound_Timer_();
         }
     }
 
     void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch) {
+        Sound_State_Guard_ guard;
+
         if (handle >= 1 && handle < SOUND_CHANNEL_COUNT) {
             s_sound_channel& channel = _soundChannels[handle];
             if (channel.buffer == nullptr || channel.sample_rate == 0) {
@@ -940,6 +923,8 @@ namespace sound {
     }
 
     void __cdecl Play_Stream_(int32_t stream_id) {
+        Sound_State_Guard_ guard;
+
         if (stream_id == 0 || _musicActive == 0) {
             return;
         }
@@ -947,7 +932,6 @@ namespace sound {
         _currentStreamId = stream_id;
         _streamReadErrorLogged = 0;
 
-        Stop_Sound_Timer_();
         int32_t volume_idx = Get_Stream_Volume_();
         Stop_Stream_Loop_();
 
@@ -956,7 +940,6 @@ namespace sound {
         Destroy_SDL_Stream_(destroyed_stream);
 
         if (Load_Stream_Wave_Header_(stream_id, &_stream_data) == 0) {
-            Enable_Sound_Timer_();
             return;
         }
 
@@ -975,14 +958,12 @@ namespace sound {
 
         if (stream_spec.format == SDL_AUDIO_UNKNOWN) {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "stream: unsupported audio format file=%s entry=%d format=%u bits=%u", _currentStreamFilename, _currentStreamId, _stream_data.format_tag, _stream_data.bits_per_sample);
-            Enable_Sound_Timer_();
             return;
         }
 
         _stream_data.ds_buffer = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &stream_spec, nullptr, nullptr);
         if (_stream_data.ds_buffer == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "stream: SDL_OpenAudioDeviceStream failed file=%s entry=%d error=%s", _currentStreamFilename, _currentStreamId, SDL_GetError());
-            Enable_Sound_Timer_();
             return;
         }
 
@@ -995,7 +976,6 @@ namespace sound {
             SDL_AudioStream* failed_stream = _stream_data.ds_buffer;
             _stream_data.ds_buffer = nullptr;
             Destroy_SDL_Stream_(failed_stream);
-            Enable_Sound_Timer_();
             return;
         }
 
@@ -1004,7 +984,6 @@ namespace sound {
         Resume_SDL_Stream_(_stream_data.ds_buffer);
 
         _audioPlaybackActive = 1;
-        Enable_Sound_Timer_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "stream: started file=%s entry=%d", _currentStreamFilename, _currentStreamId);
     }
 
@@ -1043,12 +1022,16 @@ namespace sound {
      * Stores the fade target volume index for a channel.
      */
     void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx) {
+        Sound_State_Guard_ guard;
+
         if (channel_idx >= 0 && channel_idx < SOUND_CHANNEL_COUNT) {
             _soundChannels[channel_idx].volume_index = volume_idx;
         }
     }
 
     void __cdecl Loop_Sound_(int32_t channel_idx, int8_t loop_count) {
+        Sound_State_Guard_ guard;
+
         if (channel_idx >= 1) {
             _soundChannels[channel_idx].flags |= 0x08;
             _soundChannels[channel_idx].loop_count = loop_count;
@@ -1056,6 +1039,8 @@ namespace sound {
     }
 
     void __cdecl Refill_Sound_Channel_Buffer_(int32_t channel_idx) {
+        Sound_State_Guard_ guard;
+
         s_sound_channel* channel = &_soundChannels[channel_idx];
 
         if (channel->buffer == nullptr) {
@@ -1101,6 +1086,8 @@ namespace sound {
     }
 
     void __cdecl Update_Sound_Channels_() {
+        Sound_State_Guard_ guard;
+
         if (sound::_soundOn == 1) {
             for (int i = 0; i < SOUND_CHANNEL_COUNT; ++i) {
                 if (sound::_soundChannels[i].flags & 1) {
@@ -1118,6 +1105,8 @@ namespace sound {
      * Sets the master playback volume for all active sound channels.
      */
     void __cdecl Set_Master_Volume_(int32_t volume) {
+        Sound_State_Guard_ guard;
+
         if (sound::_soundOn != 0 && volume >= 0 && volume <= 100) {
             // Cap volume to master volume limit
             if (volume > sound::_masterVolume) {
@@ -1161,6 +1150,8 @@ namespace sound {
     }
 
     void __cdecl Adjust_Settings_() {
+        Sound_State_Guard_ guard;
+
         if (sound::_audioPlaybackActive != 1 || !(sound::_stream_data.status & 0x01)) {
             return;
         }
@@ -1207,8 +1198,8 @@ namespace sound {
     }
 
     int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t wave_data_size) {
+        Sound_State_Guard_ guard;
         s_sound_wav_header info;
-        Stop_Sound_Timer_And_Wait2_();
 
         (void)wave_data_size;
 
@@ -1249,8 +1240,6 @@ namespace sound {
         SDL_SetAudioStreamFrequencyRatio(_soundChannels[channel_idx].buffer, 1.0f);
         Resume_SDL_Stream_(_soundChannels[channel_idx].buffer);
 
-        Resume_Timer2_();
-
         return channel_idx;
     }
 
@@ -1288,6 +1277,8 @@ namespace sound {
      * @address 0052de10
      */
     int32_t __cdecl Play_Sound_(int32_t resource_id) {
+        Sound_State_Guard_ guard;
+
         int32_t channel_id = (int8_t)Find_Free_Channel_();
         if (channel_id == -2) {
             return -2;
@@ -1350,6 +1341,8 @@ namespace sound {
      * Handles both looping and one-shot sounds, as well as cleanup when playback is finished.
      */
     void __cdecl Update_Sound_Channel_Status_(int32_t channel_idx) {
+        Sound_State_Guard_ guard;
+
         s_sound_channel& channel = _soundChannels[channel_idx];
 
         if (channel.buffer == nullptr) {
@@ -1541,6 +1534,8 @@ namespace sound {
     }
 
     void __cdecl Update_Stream_Status_() {
+        Sound_State_Guard_ guard;
+
         if (_stream_data.ds_buffer == nullptr) {
             return;
         }
@@ -1572,6 +1567,7 @@ namespace sound {
     }
 
     uint8_t __cdecl Is_Stream_Playing_() {
+        Sound_State_Guard_ guard;
         return _audioPlaybackActive;
     }
 }
