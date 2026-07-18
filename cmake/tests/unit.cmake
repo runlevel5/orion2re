@@ -63,6 +63,16 @@ orion2re_add_unit_test(test_colony_production_helpers
         tests/unit/test_colony_production_helpers.cpp
 )
 
+orion2re_add_unit_test(test_savegame
+    SOURCES
+        tests/unit/test_savegame.cpp
+    PRODUCTION_SOURCES
+        src/game/savegame.cpp
+        src/game/serialization.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_savegame_runtime.cpp
+)
+
 orion2re_add_unit_test(test_netturn_host_selection
     SOURCES
         tests/unit/test_netturn_host_selection.cpp
@@ -71,6 +81,7 @@ orion2re_add_unit_test(test_netturn_host_selection
         src/game/netmox.cpp
         src/game/netproto.cpp
         src/game/random.cpp
+        src/game/serialization.cpp
     FAKE_SOURCES
         tests/fakes/fake_allocate.cpp
         tests/fakes/fake_exitm.cpp
@@ -97,6 +108,7 @@ orion2re_add_unit_test(test_netmox_packet_limits
         src/game/netmox.cpp
         src/game/netproto.cpp
         src/game/random.cpp
+        src/game/serialization.cpp
     FAKE_SOURCES
         tests/fakes/fake_allocate.cpp
         tests/fakes/fake_exitm.cpp
