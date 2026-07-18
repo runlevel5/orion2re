@@ -3732,7 +3732,7 @@ namespace COLCALC {
 
             if (colony->producing[0] == COLONY_PRODUCTION_NONE && colony->auto_building != 0) {
                 AIBUILD::Player_Colony_Autobuild_(colony);
-                build_msg.field6_0xd = 1;
+                build_msg.u.colony.c.build.append_fmt = 1;
             }
 
             build_msg.u.colony.c.build.product_id = colony->producing[0];
