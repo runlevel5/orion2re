@@ -2447,16 +2447,7 @@ struct s_report {
     int16_t player_idx;
     uint8_t action;
     union s_report_data d;
-    undefined field4_0x8;
-    undefined field5_0x9;
-    undefined field6_0xa;
-    undefined field7_0xb;
-    undefined field8_0xc;
-    undefined field9_0xd;
-    undefined field10_0xe;
-    undefined field11_0xf;
-    int16_t field4_0x10;
-    int8_t field5_0x12;
+    uint8_t reserved[11];
 };
 
 typedef struct s_retreat_report s_retreat_report, *Ps_retreat_report;
