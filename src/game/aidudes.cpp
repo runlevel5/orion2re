@@ -1058,7 +1058,7 @@ namespace aidudes {
                     freighter_groups_assigned <= 1 &&
                     p->tech_applications[TECH_APP_FREIGHTERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
 
-                    freighter_weight = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - freighter_groups_assigned * 2) * 20 + 100;
+                    freighter_weight = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - freighter_groups_assigned * 2) * 100 + 500;
                     if (war_level > 0) {
                         freighter_weight /= (war_level * war_level);
                     }
