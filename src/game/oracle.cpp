@@ -1084,8 +1084,27 @@ namespace oracle {
             throw platform::process_exit_requested{};
         }
         if (g_record_index != g_records.size()) {
-            Fail_("Oracle turn ended before all recorded input was injected. See the game log.");
-            throw platform::process_exit_requested{};
+            const size_t tail_start = g_record_index;
+            bool passive_mouse_tail = g_replay_mouse_buttons == 0;
+            for (size_t i = tail_start; i < g_records.size(); ++i) {
+                const s_input_record& record = g_records[i];
+                if (record.input_type != k_mouse_input_type || record.mouse_buttons != 0) {
+                    passive_mouse_tail = false;
+                    break;
+                }
+            }
+
+            if (!passive_mouse_tail) {
+                Fail_("Oracle turn ended before all recorded input was injected. See the game log.");
+                throw platform::process_exit_requested{};
+            }
+
+            g_record_index = g_records.size();
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: ignored %zu trailing buttonless mouse event%s at turn %u completion",
+                g_record_index - tail_start,
+                g_record_index - tail_start == 1 ? "" : "s",
+                g_turn);
         }
 
         const uint32_t next_turn = g_turn + 1;
