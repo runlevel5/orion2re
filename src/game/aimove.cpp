@@ -2388,16 +2388,16 @@ namespace AIMOVE {
             }
             else {
                 *out_attack_type = 2;
-                if (defending_space * 3 < total_space_strength) {
+                if (possible_space_strength * 3 < total_space_strength) {
                     total_space_strength = 3;
-                    defending_space = 1;
+                    possible_space_strength = 1;
                 }
                 else if (total_space_strength == 0) {
                     total_space_strength = 1;
-                    defending_space = 1;
+                    possible_space_strength = 1;
                 }
 
-                attack_worthiness = (colony_worth * total_space_strength) / (defending_space * 2);
+                attack_worthiness = (colony_worth * total_space_strength) / (possible_space_strength * 2);
 
                 if ((MOX::_star[star_idx].blockaded >> owner) & 1) {
                     uint8_t blocked_by = MOX::_star[star_idx].blockaded_by[owner];
