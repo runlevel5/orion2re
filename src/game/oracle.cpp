@@ -94,6 +94,7 @@ namespace oracle {
             const char* name;
             size_t offset;
             size_t size;
+            size_t element_size;
         };
 
         bool g_enabled;
@@ -545,6 +546,201 @@ namespace oracle {
                 colony_index, colony_offset);
         }
 
+        void Describe_Player_Offset_(size_t block_offset, char* description, size_t description_size) {
+            const size_t player_index = block_offset / sizeof(s_player);
+            const size_t player_offset = block_offset % sizeof(s_player);
+#define PLAYER_FIELD(name) {#name, offsetof(s_player, name), sizeof(s_player::name), 0}
+#define PLAYER_ARRAY(name) {#name, offsetof(s_player, name), sizeof(s_player::name), sizeof(((s_player*)nullptr)->name[0])}
+            const s_field_range fields[] = {
+                PLAYER_FIELD(picture),
+                PLAYER_ARRAY(name),
+                PLAYER_ARRAY(race_name),
+                PLAYER_FIELD(eliminated),
+                PLAYER_FIELD(race),
+                PLAYER_FIELD(color),
+                PLAYER_FIELD(personality),
+                PLAYER_FIELD(objectives),
+                PLAYER_FIELD(home_planet_id),
+                PLAYER_FIELD(network_player_id),
+                PLAYER_FIELD(player_done_flags),
+                PLAYER_FIELD(dead_field),
+                PLAYER_FIELD(research_breakthrough),
+                PLAYER_FIELD(tax_rate),
+                PLAYER_FIELD(bc),
+                PLAYER_FIELD(n_freighters),
+                PLAYER_FIELD(surplus_freighters),
+                PLAYER_FIELD(command_points),
+                PLAYER_FIELD(command_points_used),
+                PLAYER_FIELD(food_freighted),
+                PLAYER_FIELD(settlers_freighted),
+                PLAYER_ARRAY(settlers),
+                PLAYER_FIELD(total_pop),
+                PLAYER_FIELD(food_produced),
+                PLAYER_FIELD(industry_produced),
+                PLAYER_FIELD(research_produced),
+                PLAYER_FIELD(bc_produced),
+                PLAYER_FIELD(surplus_food),
+                PLAYER_FIELD(surplus_bc),
+                PLAYER_FIELD(total_maintenance),
+                PLAYER_ARRAY(maintenance),
+                PLAYER_ARRAY(tech_fields),
+                PLAYER_ARRAY(tech_applications),
+                PLAYER_FIELD(research_accumulated),
+                PLAYER_FIELD(captured_orion),
+                PLAYER_FIELD(captured_antares),
+                PLAYER_FIELD(won_council_vote),
+                PLAYER_ARRAY(player_defeated),
+                PLAYER_FIELD(captured_population),
+                PLAYER_FIELD(last_attacker),
+                PLAYER_FIELD(ship_design_theme),
+                PLAYER_FIELD(ship_special_theme),
+                PLAYER_ARRAY(tech_apps_learned),
+                PLAYER_ARRAY(tech_modifiers),
+                PLAYER_ARRAY(hyper_advanced_tech),
+                PLAYER_FIELD(total_known_tech_cost),
+                PLAYER_FIELD(knows_racial_stats),
+                PLAYER_ARRAY(last_tech_report_date),
+                PLAYER_ARRAY(player_tech_applications),
+                PLAYER_FIELD(current_research_field),
+                PLAYER_FIELD(current_research_application),
+                PLAYER_FIELD(got_new_app),
+                PLAYER_FIELD(ship_range),
+                PLAYER_ARRAY(ship_designs),
+                PLAYER_ARRAY(ships_built),
+                PLAYER_ARRAY(contact),
+                PLAYER_FIELD(just_established_contact),
+                PLAYER_ARRAY(n_times_established_contact),
+                PLAYER_ARRAY(within_range),
+                PLAYER_FIELD(do_not_research),
+                PLAYER_FIELD(offensive_stagepoint),
+                PLAYER_FIELD(best_ftl_drive),
+                PLAYER_FIELD(ship_speed),
+                PLAYER_FIELD(officer_for_hire),
+                PLAYER_FIELD(n_trade_pops),
+                PLAYER_ARRAY(current_trade_agreement_level),
+                PLAYER_ARRAY(trade_agreement_goal),
+                PLAYER_FIELD(n_research_pops),
+                PLAYER_ARRAY(current_research_agreement_level),
+                PLAYER_ARRAY(research_agreement_goal),
+                PLAYER_FIELD(fighter_beam_type),
+                PLAYER_FIELD(fighter_bomb_type),
+                PLAYER_FIELD(total_research),
+                PLAYER_FIELD(total_ships),
+                PLAYER_ARRAY(total_ship_strength),
+                PLAYER_FIELD(total_colonies),
+                PLAYER_FIELD(failed_to_expand),
+                PLAYER_ARRAY(first_contact),
+                PLAYER_ARRAY(relations),
+                PLAYER_ARRAY(base_relations),
+                PLAYER_ARRAY(treaty),
+                PLAYER_ARRAY(trade_treaty),
+                PLAYER_ARRAY(research_treaty),
+                PLAYER_ARRAY(tribute_treaty),
+                PLAYER_ARRAY(diplomacy_incident),
+                PLAYER_ARRAY(diplomacy_message),
+                PLAYER_ARRAY(diplomacy_severity),
+                PLAYER_ARRAY(diplomacy_value),
+                PLAYER_ARRAY(diplomacy_system),
+                PLAYER_ARRAY(treaty_modifier),
+                PLAYER_ARRAY(trade_modifier),
+                PLAYER_ARRAY(tech_exchange_modifier),
+                PLAYER_ARRAY(peace_modifier),
+                PLAYER_ARRAY(last_bad_diplomatic_incident),
+                PLAYER_ARRAY(broken_treaties_modifier),
+                PLAYER_ARRAY(last_broken_treaty),
+                PLAYER_ARRAY(last_gift),
+                PLAYER_ARRAY(ship_war_losses),
+                PLAYER_ARRAY(colony_war_losses),
+                PLAYER_ARRAY(biological_weapons_flag),
+                PLAYER_ARRAY(time_since_last_attack),
+                PLAYER_ARRAY(threats),
+                PLAYER_ARRAY(dishonored_flag),
+                PLAYER_ARRAY(peace_duration),
+                PLAYER_ARRAY(last_turn_diplomacy_severity),
+                PLAYER_ARRAY(last_broken_treaty_type),
+                PLAYER_ARRAY(last_turn_treaty),
+                PLAYER_ARRAY(diplomacy_proposal_request),
+                PLAYER_ARRAY(diplomacy_proposal_tribute_bribe),
+                PLAYER_ARRAY(diplomacy_proposal_tech_bribe1),
+                PLAYER_ARRAY(diplomacy_proposal_tech_bribe2),
+                PLAYER_ARRAY(diplomacy_proposal_gold_bribe),
+                PLAYER_ARRAY(diplomacy_proposal_war_player),
+                PLAYER_ARRAY(diplomacy_proposal_exchange_max_value),
+                PLAYER_ARRAY(diplomacy_proposal_exchange_tech),
+                PLAYER_ARRAY(diplomacy_proposal_system_bribe),
+                PLAYER_FIELD(sneak_attack_planet),
+                PLAYER_FIELD(sneak_attack_message),
+                PLAYER_FIELD(sneak_attack_player),
+                PLAYER_FIELD(council_threat),
+                PLAYER_ARRAY(reward_amount),
+                PLAYER_ARRAY(reward_tech),
+                PLAYER_ARRAY(reward_attack_player),
+                PLAYER_FIELD(food_shortage_duration),
+                PLAYER_ARRAY(trust_worthiness),
+                PLAYER_ARRAY(trust_breaker_player),
+                PLAYER_ARRAY(trust_breaker_treaty),
+                PLAYER_ARRAY(stop_spying_duration),
+                PLAYER_ARRAY(stop_blockading_duration),
+                PLAYER_FIELD(war_buildup_duration),
+                PLAYER_ARRAY(last_diplomacy_proposal_turn),
+                PLAYER_ARRAY(diplomacy_proposal_rejection),
+                PLAYER_ARRAY(opportunity_planet_num),
+                PLAYER_ARRAY(opportunity_planet_value),
+                PLAYER_ARRAY(opportunity_actual_attacker_ratio),
+                PLAYER_ARRAY(temp_diplomacy_dummy1),
+                PLAYER_ARRAY(diplomacy_demand_rejection_message),
+                PLAYER_ARRAY(last_diplomacy_threat_turn),
+                PLAYER_ARRAY(delayed_diplomacy_orders),
+                PLAYER_ARRAY(traits),
+                PLAYER_ARRAY(evolutionary_upgrade_traits),
+                PLAYER_FIELD(picked_evolutionary_upgrade),
+                PLAYER_FIELD(applied_evolutionary_upgrade),
+                PLAYER_ARRAY(fleet_history),
+                PLAYER_ARRAY(tech_history),
+                PLAYER_ARRAY(population_history),
+                PLAYER_ARRAY(production_history),
+                PLAYER_ARRAY(spies),
+                PLAYER_FIELD(history_btns),
+                PLAYER_FIELD(ignoring),
+                PLAYER_ARRAY(peace_flags),
+                PLAYER_FIELD(cheated),
+                PLAYER_FIELD(stardate_last_offered_hero),
+                PLAYER_FIELD(current_zoom_level),
+                PLAYER_FIELD(cur_map_x),
+                PLAYER_FIELD(cur_map_y),
+                PLAYER_FIELD(council_voted_for),
+                PLAYER_FIELD(surrender_to),
+                PLAYER_FIELD(time_since_last_lucky_event),
+                PLAYER_FIELD(has_galactic_lore),
+                PLAYER_FIELD(warned_about_cheating_player),
+                PLAYER_FIELD(cheated_this_turn),
+                PLAYER_FIELD(tribute_income),
+                PLAYER_ARRAY(filler),
+            };
+#undef PLAYER_ARRAY
+#undef PLAYER_FIELD
+
+            for (const s_field_range& field : fields) {
+                if (player_offset < field.offset || player_offset >= field.offset + field.size) {
+                    continue;
+                }
+
+                const size_t field_offset = player_offset - field.offset;
+                if (field.element_size != 0) {
+                    snprintf(description, description_size, "MOX::_player[%zu].%s[%zu] +%zu",
+                        player_index, field.name, field_offset / field.element_size,
+                        field_offset % field.element_size);
+                } else {
+                    snprintf(description, description_size, "MOX::_player[%zu].%s +%zu",
+                        player_index, field.name, field_offset);
+                }
+                return;
+            }
+
+            snprintf(description, description_size, "MOX::_player[%zu] +%zu",
+                player_index, player_offset);
+        }
+
         bool Compare_Next_State_(uint32_t next_turn) {
             char actual_path[1024];
             char expected_path[1024];
@@ -582,6 +778,8 @@ namespace oracle {
             char field_description[128] = {};
             if (strcmp(block_name, "colonies") == 0) {
                 Describe_Colony_Offset_(block_offset, field_description, sizeof(field_description));
+            } else if (strcmp(block_name, "players") == 0) {
+                Describe_Player_Offset_(block_offset, field_description, sizeof(field_description));
             }
             const int actual_byte = difference < actual.size() ? actual[difference] : -1;
             const int expected_byte = difference < expected.size() ? expected[difference] : -1;
