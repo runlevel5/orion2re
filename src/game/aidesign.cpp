@@ -879,7 +879,8 @@ namespace aidesign {
         return result;
     }
 
-    int16_t __cdecl Get_Competition_Player_Tech_Values_(int16_t player_idx, int16_t tech_type) {
+    // ORACLE: The original ignores player_idx and always checks player 0's technology state.
+    int16_t __cdecl Get_Competition_Player_Tech_Values_(int16_t, int16_t tech_type) {
         int16_t max_ai_group = 0;
         int16_t i = 0;
 
@@ -887,7 +888,7 @@ namespace aidesign {
             auto& app = TECHDATA::_technology_applications[i];
 
             if (app.ai_group == tech_type) {
-                if (MOX::_player[player_idx].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                if (MOX::_player[0].tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     int16_t field_id = app.tech_field_id;
                     uint8_t field_group = TECHDATA::_technology_fields[field_id].ai_group;
 
