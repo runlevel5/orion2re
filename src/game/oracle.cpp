@@ -64,20 +64,38 @@ namespace oracle {
             uint32_t oracle_turn;
             int32_t stardate;
             uint32_t completed;
+            uint32_t random_call_count;
+        };
+
+        struct s_random_record {
+            uint32_t type;
+            uint32_t size;
+            uint32_t oracle_turn;
+            int32_t stardate;
+            uint32_t call_index;
+            uint32_t max_value;
+            uint32_t value;
+            uint32_t random_seed;
+            uint32_t return_address_count;
+            uint32_t return_addresses[10];
         };
 #pragma pack(pop)
 
         static_assert(sizeof(s_input_state) == 64, "oracle input state layout mismatch");
         static_assert(sizeof(s_log_header) == 100, "oracle log header layout mismatch");
         static_assert(sizeof(s_input_record) == 44, "oracle input record layout mismatch");
-        static_assert(sizeof(s_end_record) == 28, "oracle end record layout mismatch");
+        static_assert(sizeof(s_end_record) == 32, "oracle end record layout mismatch");
+        static_assert(sizeof(s_random_record) == 76, "oracle random record layout mismatch");
 
         constexpr uint32_t k_log_magic = 0x4C43524F;
-        constexpr uint32_t k_log_version = 3;
+        constexpr uint32_t k_log_version = 5;
         constexpr uint32_t k_input_record_type = 1;
         constexpr uint32_t k_end_record_type = 2;
+        constexpr uint32_t k_random_record_type = 3;
         constexpr uint32_t k_mouse_input_type = 1;
         constexpr uint32_t k_key_input_type = 2;
+        constexpr uint32_t k_return_address_capacity = 10;
+        constexpr uintptr_t k_original_image_base = 0x00400000;
 
         enum e_prepare_result {
             PREPARE_READY,
@@ -103,10 +121,17 @@ namespace oracle {
         char g_oracle_directory[1024];
         s_log_header g_header;
         std::vector<s_input_record> g_records;
+        std::vector<s_random_record> g_random_records;
         size_t g_record_index;
+        size_t g_random_record_index;
         uint64_t g_last_consumption_counter;
+        uint64_t g_click_pause_until_counter;
         uint32_t g_speed_percent;
         uint32_t g_delay_ms;
+        uint32_t g_click_delay_ms;
+        uint16_t g_replay_mouse_buttons;
+        bool g_click_pause_active;
+        bool g_replay_clock_armed;
 
         constexpr char Native_Separator_() {
 #if defined(_WIN32)
@@ -165,6 +190,10 @@ namespace oracle {
                 (100.0L / (long double)g_speed_percent);
             seconds += (long double)g_delay_ms / 1000.0L;
             return (uint64_t)(seconds * (long double)local_frequency);
+        }
+
+        uint64_t Milliseconds_To_Counters_(uint32_t milliseconds) {
+            return ((uint64_t)milliseconds * SDL_GetPerformanceFrequency()) / 1000;
         }
 
         bool Path_Is_Directory_(const char* path) {
@@ -286,7 +315,8 @@ namespace oracle {
         }
 
         bool Read_Completed_Log_(uint32_t turn, s_log_header* header,
-            std::vector<s_input_record>* records, bool* exists, bool* completed) {
+            std::vector<s_input_record>* records, std::vector<s_random_record>* random_records,
+            bool* exists, bool* completed) {
             char path[1024];
             std::vector<uint8_t> data;
             *exists = false;
@@ -314,6 +344,7 @@ namespace oracle {
             }
 
             records->clear();
+            random_records->clear();
             size_t offset = header->size;
             bool saw_end = false;
             while (offset < data.size()) {
@@ -337,10 +368,20 @@ namespace oracle {
                         return false;
                     }
                     records->push_back(record);
+                } else if (type == k_random_record_type && size == sizeof(s_random_record)) {
+                    s_random_record record;
+                    memcpy(&record, data.data() + offset, sizeof(record));
+                    if (record.oracle_turn != turn || record.stardate != header->stardate ||
+                        record.call_index != random_records->size() ||
+                        record.return_address_count > k_return_address_capacity) {
+                        return false;
+                    }
+                    random_records->push_back(record);
                 } else if (type == k_end_record_type && size == sizeof(s_end_record)) {
                     s_end_record end_record;
                     memcpy(&end_record, data.data() + offset, sizeof(end_record));
-                    if (end_record.oracle_turn != turn) {
+                    if (end_record.oracle_turn != turn ||
+                        end_record.random_call_count != random_records->size()) {
                         return false;
                     }
                     saw_end = true;
@@ -364,12 +405,14 @@ namespace oracle {
                 state.last_scan_code, state.key_buffer);
         }
 
-        e_prepare_result Prepare_Turn_(uint32_t turn) {
+        e_prepare_result Prepare_Turn_(uint32_t turn, bool defer_clock_until_first_poll) {
             bool log_exists;
             bool completed;
             s_log_header header;
             std::vector<s_input_record> records;
-            if (!Read_Completed_Log_(turn, &header, &records, &log_exists, &completed)) {
+            std::vector<s_random_record> random_records;
+            if (!Read_Completed_Log_(turn, &header, &records, &random_records,
+                    &log_exists, &completed)) {
                 return PREPARE_ERROR;
             }
             if (!log_exists || !completed) {
@@ -397,14 +440,21 @@ namespace oracle {
             g_turn = turn;
             g_header = header;
             g_records.swap(records);
+            g_random_records.swap(random_records);
             g_record_index = 0;
+            g_random_record_index = 0;
             g_replay_active = true;
             Restore_Input_State_();
-            g_last_consumption_counter = SDL_GetPerformanceCounter();
+            g_last_consumption_counter = defer_clock_until_first_poll ? 0 : SDL_GetPerformanceCounter();
+            g_click_pause_until_counter = 0;
+            g_click_pause_active = false;
+            g_replay_clock_armed = !defer_clock_until_first_poll;
+            g_replay_mouse_buttons = (uint16_t)header.input_state.mouse_buttons;
 
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-                "oracle: replaying turn %u, stardate %d, %zu input events at %u%% speed with %u ms added per event",
-                turn, header.stardate, g_records.size(), g_speed_percent, g_delay_ms);
+                "oracle: replaying turn %u, stardate %d, %zu input events and %zu random calls at %u%% speed with %u ms added per event and %u ms after clicks",
+                turn, header.stardate, g_records.size(), g_random_records.size(),
+                g_speed_percent, g_delay_ms, g_click_delay_ms);
             return PREPARE_READY;
         }
 
@@ -798,6 +848,38 @@ namespace oracle {
             platform::Request_Exit_(message);
             return false;
         }
+
+        void Log_Original_Return_Addresses_(const s_random_record& record) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: original image base=0x%08X, %u probable return addresses",
+                (uint32_t)k_original_image_base, record.return_address_count);
+            for (uint32_t i = 0; i < record.return_address_count; ++i) {
+                const uint32_t address = record.return_addresses[i];
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: original caller[%u]=0x%08X RVA=0x%08X",
+                    i, address, address - (uint32_t)k_original_image_base);
+            }
+        }
+
+        void Log_Local_Return_Addresses_(const uintptr_t* return_addresses,
+            uint32_t return_address_count, uintptr_t image_base) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: local image base=%p, %u captured return addresses",
+                reinterpret_cast<void*>(image_base), return_address_count);
+            for (uint32_t i = 0; i < return_address_count; ++i) {
+                const uintptr_t address = return_addresses[i];
+                if (image_base != 0 && address >= image_base) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: local caller[%u]=%p RVA=0x%llX",
+                        i, reinterpret_cast<void*>(address),
+                        (unsigned long long)(address - image_base));
+                } else {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: local caller[%u]=%p RVA=unavailable",
+                        i, reinterpret_cast<void*>(address));
+                }
+            }
+        }
     }
 
     bool Configure_(int argc, char** argv) {
@@ -806,6 +888,7 @@ namespace oracle {
         g_turn = 0;
         g_speed_percent = 100;
         g_delay_ms = 0;
+        g_click_delay_ms = 100;
 
         for (int i = 1; i < argc; ++i) {
             const char* value = nullptr;
@@ -846,6 +929,20 @@ namespace oracle {
                     return false;
                 }
                 continue;
+            } else if (strcmp(argv[i], "--oracle-click-delay-ms") == 0) {
+                if (++i >= argc || !Parse_Uint32_(argv[i], 0, 60000, &g_click_delay_ms)) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: --oracle-click-delay-ms requires a value from 0 to 60000");
+                    return false;
+                }
+                continue;
+            } else if (strncmp(argv[i], "--oracle-click-delay-ms=", 24) == 0) {
+                if (!Parse_Uint32_(argv[i] + 24, 0, 60000, &g_click_delay_ms)) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: invalid click delay '%s'", argv[i] + 24);
+                    return false;
+                }
+                continue;
             } else {
                 continue;
             }
@@ -875,8 +972,8 @@ namespace oracle {
         }
 
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-            "oracle: enabled at turn %u using '%s', speed=%u%%, delay=%u ms",
-            g_turn, g_oracle_directory, g_speed_percent, g_delay_ms);
+            "oracle: enabled at turn %u using '%s', speed=%u%%, delay=%u ms, click delay=%u ms",
+            g_turn, g_oracle_directory, g_speed_percent, g_delay_ms, g_click_delay_ms);
         return true;
     }
 
@@ -889,9 +986,18 @@ namespace oracle {
             return Fail_("Oracle could not load the requested turn save. See the game log.");
         }
 
-        MOX::_return_screen = SCREEN_MAIN;
-        MOX::_current_screen = SCREEN_MAIN;
-        const e_prepare_result result = Prepare_Turn_(g_turn);
+        const uint8_t pending_report = REPORT::Must_Display_Reports_(MOX::_PLAYER_NUM);
+        if (pending_report != 0) {
+            MOX::_current_screen = SCREEN_REPORTS;
+            MOX::_return_screen = SCREEN_REPORTS;
+        } else {
+            MOX::_current_screen = SCREEN_MAIN;
+            MOX::_return_screen = SCREEN_MAIN;
+        }
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+            "oracle: isolated turn %u starts on screen %d with pending report %u",
+            g_turn, (int)MOX::_current_screen, (unsigned int)pending_report);
+        const e_prepare_result result = Prepare_Turn_(g_turn, true);
         if (result == PREPARE_ERROR) {
             return Fail_("Oracle could not read the requested turn input. See the game log.");
         }
@@ -903,6 +1009,23 @@ namespace oracle {
 
     void Pump_Input_() {
         if (!g_replay_active || g_record_index >= g_records.size()) {
+            return;
+        }
+
+        if (!g_replay_clock_armed) {
+            g_replay_clock_armed = true;
+            g_last_consumption_counter = SDL_GetPerformanceCounter();
+            return;
+        }
+
+        if (g_click_pause_active) {
+            const uint64_t now = SDL_GetPerformanceCounter();
+            if (now < g_click_pause_until_counter) {
+                return;
+            }
+
+            g_click_pause_active = false;
+            g_last_consumption_counter = now;
             return;
         }
 
@@ -918,8 +1041,11 @@ namespace oracle {
             }
 
             const s_input_record& record = g_records[g_record_index];
+            bool released_click = false;
             if (record.input_type == k_mouse_input_type) {
+                released_click = (g_replay_mouse_buttons & ~record.mouse_buttons) != 0;
                 mouse::User_Mouse_Handler_(record.mouse_x, record.mouse_y, record.mouse_buttons);
+                g_replay_mouse_buttons = record.mouse_buttons;
             } else {
                 key::Push_Key_Code_(record.key_code, record.scan_code);
             }
@@ -927,6 +1053,13 @@ namespace oracle {
             consumed_budget += required_delta;
             consumed_input = true;
             ++g_record_index;
+
+            if (released_click && g_click_delay_ms != 0) {
+                g_click_pause_active = true;
+                g_click_pause_until_counter = SDL_GetPerformanceCounter() +
+                    Milliseconds_To_Counters_(g_click_delay_ms);
+                break;
+            }
         }
 
         if (consumed_input) {
@@ -940,6 +1073,16 @@ namespace oracle {
         }
 
         g_replay_active = false;
+        if (g_random_record_index != g_random_records.size()) {
+            const s_random_record& expected = g_random_records[g_random_record_index];
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: turn %u ended after %zu of %zu random calls; next call #%zu expects max=%u value=%u seed=%u",
+                g_turn, g_random_record_index, g_random_records.size(), g_random_record_index,
+                expected.max_value, expected.value, expected.random_seed);
+            Log_Original_Return_Addresses_(expected);
+            Fail_("Oracle random-call count mismatch. See the game log.");
+            throw platform::process_exit_requested{};
+        }
         if (g_record_index != g_records.size()) {
             Fail_("Oracle turn ended before all recorded input was injected. See the game log.");
             throw platform::process_exit_requested{};
@@ -951,7 +1094,7 @@ namespace oracle {
             throw platform::process_exit_requested{};
         }
 
-        const e_prepare_result result = Prepare_Turn_(next_turn);
+        const e_prepare_result result = Prepare_Turn_(next_turn, false);
         if (result == PREPARE_ERROR) {
             Fail_("Oracle could not read the next turn input. See the game log.");
             throw platform::process_exit_requested{};
@@ -959,6 +1102,40 @@ namespace oracle {
         if (result == PREPARE_DONE) {
             MOX::_current_screen = SCREEN_EXIT;
         }
+    }
+
+    void Verify_Random_(uint32_t max_value, uint32_t value, uint32_t random_seed,
+        const uintptr_t* return_addresses, uint32_t return_address_count,
+        uintptr_t image_base) {
+        if (!g_replay_active) {
+            return;
+        }
+
+        if (g_random_record_index >= g_random_records.size()) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: unexpected random call #%zu in turn %u: max=%u value=%u seed=%u; oracle recorded %zu calls",
+                g_random_record_index, g_turn, max_value, value, random_seed,
+                g_random_records.size());
+            Log_Local_Return_Addresses_(return_addresses, return_address_count, image_base);
+            Fail_("Oracle random-call count mismatch. See the game log.");
+            throw platform::process_exit_requested{};
+        }
+
+        const s_random_record& expected = g_random_records[g_random_record_index];
+        if (max_value != expected.max_value || value != expected.value ||
+            random_seed != expected.random_seed) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: random call #%zu mismatch in turn %u: oracle max=%u value=%u seed=%u; local max=%u value=%u seed=%u",
+                g_random_record_index, g_turn,
+                expected.max_value, expected.value, expected.random_seed,
+                max_value, value, random_seed);
+            Log_Original_Return_Addresses_(expected);
+            Log_Local_Return_Addresses_(return_addresses, return_address_count, image_base);
+            Fail_("Oracle random sequence mismatch. See the game log.");
+            throw platform::process_exit_requested{};
+        }
+
+        ++g_random_record_index;
     }
 
     bool Physical_Input_Enabled_() {

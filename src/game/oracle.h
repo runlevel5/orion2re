@@ -6,6 +6,11 @@ namespace oracle {
     // Parses oracle replay options and enables replay mode.
     bool Configure_(int argc, char** argv);
 
+    // Verifies one locally generated random value against the active oracle turn.
+    void Verify_Random_(uint32_t max_value, uint32_t value, uint32_t random_seed,
+        const uintptr_t* return_addresses, uint32_t return_address_count,
+        uintptr_t image_base);
+
     // Loads the requested turn and prepares replay after normal game initialization.
     bool Start_();
 
