@@ -518,7 +518,7 @@ namespace AIBUILD {
 
     void __cdecl Find_Buildable_Buildings_(s_colony* colony, uint16_t* buildable_flags) {
         for (int16_t product_id = BUILDING_NO_BUILDING + 1; product_id < BUILDING_COUNT; ++product_id) {
-            if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
+            if (COLCALC::Colony_Can_Build_Product_(colony, product_id) == 1) {
                 buildable_flags[product_id] = 1;
             }
         }
