@@ -832,7 +832,7 @@ namespace npcdiplo {
                     int32_t alliance_score = common_score + 
                                              diplodef::_personality_relation_modifiers[(uint8_t)plr_j.personality] +
                                              diplodef::_personality_relation_modifiers[(uint8_t)plr_i.personality] +
-                                             plr_i.treaty_modifier[j] + game_random::Random_(100) + (num_nonplayer_allies * 50);
+                                             plr_i.treaty_modifier[j] + game_random::Random_(100) + (num_player_allies * 50);
 
                     if (alliance_score >= 200 && plr_i.treaty[j] == 1 /* TREATY_PEACE */ && num_nonplayer_allies == 0) {
                         diplomac::Start_Treaty_(i, j, 2 /* ALLIANCE_TYPE */);
