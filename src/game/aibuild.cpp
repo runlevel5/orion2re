@@ -374,8 +374,7 @@ namespace AIBUILD {
                 }
 
                 int32_t spy_trait = MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS];
-                int32_t spy_roll = (int32_t)game_random::Random_(100);
-                if (current_spies < max_spies + 2 && spy_roll <= spy_trait) {
+                if (current_spies < max_spies + 2 && (int32_t)game_random::Random_(100) <= spy_trait) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
