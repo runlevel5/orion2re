@@ -528,6 +528,51 @@ namespace oracle {
             return "trailing data";
         }
 
+        size_t Find_First_Save_Difference_(
+            const std::vector<uint8_t>& actual,
+            const std::vector<uint8_t>& expected) {
+            const size_t common_size = std::min(actual.size(), expected.size());
+            size_t difference = 0;
+            while (difference < common_size && actual[difference] == expected[difference]) {
+                ++difference;
+            }
+            return difference;
+        }
+
+        bool Cleanup_Expected_Save_(
+            std::vector<uint8_t>* expected,
+            size_t difference,
+            const char** rule_name) {
+            size_t block_offset = 0;
+            const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            if (strcmp(block_name, "reports") != 0 ||
+                block_offset % sizeof(s_report) < offsetof(s_report, reserved)) {
+                return false;
+            }
+
+            const size_t reports_offset = difference - block_offset;
+            bool changed = false;
+            for (size_t report_idx = 0; report_idx < 50; ++report_idx) {
+                const size_t reserved_offset =
+                    reports_offset + report_idx * sizeof(s_report) + offsetof(s_report, reserved);
+                if (reserved_offset + sizeof(s_report::reserved) > expected->size()) {
+                    return false;
+                }
+
+                for (size_t i = 0; i < sizeof(s_report::reserved); ++i) {
+                    if ((*expected)[reserved_offset + i] != 0) {
+                        (*expected)[reserved_offset + i] = 0;
+                        changed = true;
+                    }
+                }
+            }
+
+            if (changed) {
+                *rule_name = "zero original uninitialized report reserved bytes";
+            }
+            return changed;
+        }
+
         void Describe_Colony_Offset_(size_t block_offset, char* description, size_t description_size) {
             const size_t colony_index = block_offset / sizeof(s_colony);
             const size_t colony_offset = block_offset % sizeof(s_colony);
@@ -806,14 +851,32 @@ namespace oracle {
                 return false;
             }
 
-            const size_t common_size = std::min(actual.size(), expected.size());
+            size_t applied_cleanup_count = 0;
             size_t difference = 0;
-            while (difference < common_size && actual[difference] == expected[difference]) {
-                ++difference;
+            while (true) {
+                difference = Find_First_Save_Difference_(actual, expected);
+                const size_t common_size = std::min(actual.size(), expected.size());
+                if (difference == common_size) {
+                    break;
+                }
+
+                const char* rule_name = nullptr;
+                if (!Cleanup_Expected_Save_(&expected, difference, &rule_name)) {
+                    break;
+                }
+
+                ++applied_cleanup_count;
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: turn %u cleanup #%zu at save offset %zu: %s; re-verifying",
+                    next_turn, applied_cleanup_count, difference, rule_name);
             }
+
+            const size_t common_size = std::min(actual.size(), expected.size());
             if (difference == common_size && actual.size() == expected.size()) {
                 SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-                    "oracle: turn %u matches '%s' (%zu bytes)", next_turn, expected_path, expected.size());
+                    "oracle: turn %u matches '%s' (%zu bytes, %zu cleanup rule%s applied)",
+                    next_turn, expected_path, expected.size(), applied_cleanup_count,
+                    applied_cleanup_count == 1 ? "" : "s");
                 return true;
             }
 
