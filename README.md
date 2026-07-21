@@ -74,6 +74,13 @@ tools/run-tests.sh
 
 For the full preset list and per-platform details, see `CMakePresets.json`.
 
+Oracle replay accepts `--oracle <turn>`. Use `--oracle-speed <percent>` to scale replay speed, where values below 100 slow playback, and `--oracle-delay-ms <milliseconds>` to add a fixed delay between every recorded input event. For example:
+
+```sh
+orion2re --oracle 1 --oracle-speed 75
+orion2re --oracle 1 --oracle-delay-ms 5
+```
+
 Example release build:
 
 ```sh

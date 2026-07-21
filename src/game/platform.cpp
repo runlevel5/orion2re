@@ -791,7 +791,7 @@ namespace platform {
 		}
 
 		void Sync_Mouse_State_From_SDL_() {
-			if (g_sdl_window == nullptr || g_window_focus_state == 0) {
+			if (!oracle::Physical_Input_Enabled_() || g_sdl_window == nullptr || g_window_focus_state == 0) {
 				return;
 			}
 
@@ -1093,7 +1093,9 @@ namespace platform {
             if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
                 g_window_focus_state = 0;
 				g_sdl_mouse_buttons = 0;
-				Enqueue_Mouse_Input_Event_(g_mouse_x, g_mouse_y, 0);
+				if (oracle::Physical_Input_Enabled_()) {
+					Enqueue_Mouse_Input_Event_(g_mouse_x, g_mouse_y, 0);
+				}
                 continue;
             }
 
@@ -1106,11 +1108,17 @@ namespace platform {
             }
 
             if (event.type == SDL_EVENT_KEY_DOWN) {
-                Handle_SDL_Key_Down_(event.key);
+                if (oracle::Physical_Input_Enabled_()) {
+                    Handle_SDL_Key_Down_(event.key);
+                }
                 continue;
             }
 
             if (event.type == SDL_EVENT_MOUSE_MOTION) {
+                if (!oracle::Physical_Input_Enabled_()) {
+                    continue;
+                }
+
                 int16_t mouse_x = 0;
                 int16_t mouse_y = 0;
                 Map_Window_Point_To_Game_Point_(event.motion.x, event.motion.y, &mouse_x, &mouse_y);
@@ -1121,6 +1129,10 @@ namespace platform {
             }
 
             if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+				if (!oracle::Physical_Input_Enabled_()) {
+					continue;
+				}
+
                 uint16_t mouse_buttons = g_sdl_mouse_buttons;
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
@@ -1217,6 +1229,7 @@ namespace platform {
     void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y) {
         g_mouse_x = x;
         g_mouse_y = y;
+        Set_Present_Mouse_Position_(x, y);
     }
 
     void __cdecl Create_Cursor_Surface() {
@@ -1439,6 +1452,8 @@ namespace platform {
     }
 
     void __cdecl Pump_Game_Input_Queue_() {
+        oracle::Pump_Input_();
+
         if (g_input_queue_mutex == nullptr) {
             return;
         }
