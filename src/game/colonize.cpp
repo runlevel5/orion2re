@@ -82,9 +82,9 @@ namespace COLONIZE {
                         if (star->colonize_player == MAX_PLAYERS) {
                             star->colonize_player = ship->owner;
                             if (ship->d.ship_type == SHIP_TYPE_OUTPOST) {
-                                colony_bits[star_idx] |= (1 << (ship->owner & 0x1F));
-                            } else {
                                 outpost_bits[star_idx] |= (1 << (ship->owner & 0x1F));
+                            } else {
+                                colony_bits[star_idx] |= (1 << (ship->owner & 0x1F));
                             }
                         } else if (star->colonize_player != ship->owner) {
                             star->colonize_player = -1; // Conflict
