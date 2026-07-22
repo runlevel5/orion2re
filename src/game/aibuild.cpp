@@ -878,7 +878,8 @@ namespace AIBUILD {
                 case PLANET_CLIMATE_ARID: base_climate_score = 1; break;
                 default: valid_climate = false; break;
                 }
-                if (valid_climate) score = base_climate_score + ecologist_objective_bonus * 3 + bc_score;
+                score = bc_score;
+                if (valid_climate) score += base_climate_score + ecologist_objective_bonus * 3;
             }
             break;
 
