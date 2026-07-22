@@ -235,7 +235,19 @@ namespace COLGCBT {
             Draw_Colony_Combat_Screen_();
             RUSS::Mox_Sync_Update_();
 
+            const bool replaying_finished_combat = !oracle::Physical_Input_Enabled_() &&
+                ((uint8_t)attacker->current_troop_type_idx >= UNIT_COUNT ||
+                    (uint8_t)defender->current_troop_type_idx >= UNIT_COUNT);
+            if (replaying_finished_combat) {
+                fields::Disable_Mouse_Wait_();
+            }
             int16_t input = fields::Get_Input_();
+            if (replaying_finished_combat) {
+                if (input != 0) {
+                    oracle::Complete_Replay_Click_();
+                }
+                fields::Enable_Mouse_Wait_();
+            }
             fields::Scan_Input_();
 
             if (input != 0) {

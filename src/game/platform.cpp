@@ -1207,7 +1207,7 @@ namespace platform {
         Set_Logical_Mouse_Position_(x, y);
         Set_Present_Mouse_Position_(x, y);
 
-        if (g_sdl_window != nullptr) {
+        if (g_sdl_window != nullptr && oracle::Physical_Input_Enabled_()) {
             float window_x = 0.0f;
             float window_y = 0.0f;
             Map_Game_Point_To_Window_Point_(x, y, &window_x, &window_y);

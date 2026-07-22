@@ -22,4 +22,7 @@ namespace oracle {
 
     // Physical keyboard and mouse input is ignored while oracle mode is enabled.
     bool Physical_Input_Enabled_();
+
+    // Completes a recorded stationary click that has already delivered its press.
+    bool Complete_Replay_Click_();
 }

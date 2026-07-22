@@ -1338,4 +1338,48 @@ namespace oracle {
     bool Physical_Input_Enabled_() {
         return !g_enabled;
     }
+
+    bool Complete_Replay_Click_() {
+        if (!g_replay_active || g_replay_mouse_buttons == 0 || g_record_index == 0 ||
+            g_record_index >= g_records.size()) {
+            return false;
+        }
+
+        const s_input_record& press = g_records[g_record_index - 1];
+        if (press.input_type != k_mouse_input_type || press.mouse_buttons == 0) {
+            return false;
+        }
+
+        size_t release_index = g_record_index;
+        for (; release_index < g_records.size(); ++release_index) {
+            const s_input_record& record = g_records[release_index];
+            if (record.input_type != k_mouse_input_type ||
+                record.mouse_x != press.mouse_x || record.mouse_y != press.mouse_y) {
+                return false;
+            }
+            if (record.mouse_buttons == 0) {
+                break;
+            }
+            if (record.mouse_buttons != press.mouse_buttons) {
+                return false;
+            }
+        }
+        if (release_index >= g_records.size()) {
+            return false;
+        }
+
+        while (g_record_index <= release_index) {
+            const s_input_record& record = g_records[g_record_index++];
+            mouse::User_Mouse_Handler_(record.mouse_x, record.mouse_y, record.mouse_buttons);
+            g_replay_mouse_buttons = record.mouse_buttons;
+        }
+
+        const uint64_t now = SDL_GetPerformanceCounter();
+        g_last_consumption_counter = now;
+        if (g_click_delay_ms != 0) {
+            g_click_pause_active = true;
+            g_click_pause_until_counter = now + Milliseconds_To_Counters_(g_click_delay_ms);
+        }
+        return true;
+    }
 }
