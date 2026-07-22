@@ -1635,6 +1635,7 @@ namespace AIMOVE {
                                 target_met = true;
                                 if (strength_totals[e + star_idx * 10] > strength_needed * 4 + 8) {
                                     target_min_eta[star_idx] = (char)e;
+                                    break;
                                 }
                             }
                         }
