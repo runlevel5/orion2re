@@ -223,6 +223,8 @@ namespace diplomac {
                         *out_message_id = msg_id;
                         return 1; /* ATTACK */
                     }
+
+                    return 0;
                 }
             }
 
