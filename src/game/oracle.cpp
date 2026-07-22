@@ -754,6 +754,45 @@ namespace oracle {
             size_t block_offset = 0;
             const char* block_name = Describe_Save_Offset_(difference, &block_offset);
             if (strcmp(block_name, "messages") == 0 &&
+                block_offset % sizeof(s_MSG) >=
+                    offsetof(s_MSG, u) + sizeof(s_MSG_spy_assasination) &&
+                block_offset % sizeof(s_MSG) < offsetof(s_MSG, reserved)) {
+                const size_t messages_offset = difference - block_offset;
+                bool changed = false;
+                for (size_t message_idx = 0; message_idx < 100; ++message_idx) {
+                    const size_t message_offset =
+                        messages_offset + message_idx * sizeof(s_MSG);
+                    if (message_offset + sizeof(s_MSG) > expected->size()) {
+                        return false;
+                    }
+
+                    if (static_cast<int8_t>((*expected)[message_offset +
+                            offsetof(s_MSG, msg_type)]) !=
+                        MSG_TYPE_SPY_ASSASSINATION) {
+                        continue;
+                    }
+
+                    const size_t tail_offset = message_offset +
+                        offsetof(s_MSG, u) +
+                        sizeof(s_MSG_spy_assasination);
+                    const size_t tail_size = offsetof(s_MSG, reserved) -
+                        offsetof(s_MSG, u) -
+                        sizeof(s_MSG_spy_assasination);
+                    for (size_t i = 0; i < tail_size; ++i) {
+                        if ((*expected)[tail_offset + i] != 0) {
+                            (*expected)[tail_offset + i] = 0;
+                            changed = true;
+                        }
+                    }
+                }
+
+                if (changed) {
+                    *rule_name = "zero original uninitialized spy-assassination payload tail";
+                }
+                return changed;
+            }
+
+            if (strcmp(block_name, "messages") == 0 &&
                 block_offset % sizeof(s_MSG) >= offsetof(s_MSG, reserved)) {
                 const size_t messages_offset = difference - block_offset;
                 bool changed = false;
