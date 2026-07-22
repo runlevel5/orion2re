@@ -26,6 +26,27 @@ namespace oracle {
     // Verifies tactical state immediately before End_Of_Combat_ changes it.
     void Verify_Tactical_Combat_End_();
 
+    // Verifies strategic state after setup and after each completed combat turn.
+    void Verify_Strategic_Combat_State_();
+
+    // Starts a ground-combat presentation with an oracle-controlled terminal input.
+    void Begin_Ground_Combat_Presentation_();
+
+    // Releases the terminal input once local ground-combat simulation has finished.
+    void Allow_Ground_Combat_Completion_();
+
+    // Verifies that ground combat ended at its recorded input and RNG boundary.
+    void End_Ground_Combat_Presentation_();
+
+    // Starts a colony-bombing presentation with an oracle-controlled terminal input.
+    void Begin_Bombing_Presentation_();
+
+    // Releases the terminal input once the bombing text box is ready for input.
+    void Allow_Bombing_Completion_();
+
+    // Verifies that bombing ended at its recorded input and RNG boundary.
+    void End_Bombing_Presentation_();
+
     // Loads the requested turn and prepares replay after normal game initialization.
     bool Start_();
 

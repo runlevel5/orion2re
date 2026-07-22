@@ -67,6 +67,8 @@ namespace oracle {
             uint32_t random_call_count;
             uint32_t random_seed_count;
             uint32_t tactical_state_count;
+            uint32_t strategic_state_count;
+            uint32_t presentation_complete_count;
         };
 
         struct s_random_record {
@@ -141,32 +143,77 @@ namespace oracle {
             uint32_t tactical_arrays_size;
             uint32_t colony_size;
         };
+
+        struct s_strategic_state_record {
+            uint32_t type;
+            uint32_t size;
+            uint32_t oracle_turn;
+            int32_t stardate;
+            uint32_t combat_instance;
+            uint32_t checkpoint_index;
+            int16_t combat_turn;
+            int16_t combat_total_ship_count;
+            int16_t combat_attacker_count;
+            int16_t combat_defender_count;
+            int16_t combat_attacker_player;
+            int16_t combat_defender_player;
+            int16_t combat_colony_id;
+            uint8_t colony_defense_flags;
+            uint8_t reserved;
+            uint32_t random_call_count;
+            uint32_t random_seed_count;
+            uint32_t random_seed;
+            uint32_t quick_combat_data_size;
+            uint32_t colony_size;
+        };
+
+        struct s_presentation_complete_record {
+            uint32_t type;
+            uint32_t size;
+            uint32_t oracle_turn;
+            int32_t stardate;
+            uint32_t sequence;
+            uint32_t presentation_kind;
+            uint32_t input_record_count;
+            uint32_t random_call_count;
+            uint32_t random_seed_count;
+        };
 #pragma pack(pop)
 
         static_assert(sizeof(s_input_state) == 64, "oracle input state layout mismatch");
         static_assert(sizeof(s_log_header) == 100, "oracle log header layout mismatch");
         static_assert(sizeof(s_input_record) == 44, "oracle input record layout mismatch");
-        static_assert(sizeof(s_end_record) == 40, "oracle end record layout mismatch");
+        static_assert(sizeof(s_end_record) == 48, "oracle end record layout mismatch");
         static_assert(sizeof(s_random_record) == 76, "oracle random record layout mismatch");
         static_assert(sizeof(s_random_seed_record) == 68, "oracle random seed record layout mismatch");
         static_assert(sizeof(s_tactical_scalar_state) == 38, "oracle tactical scalar layout mismatch");
         static_assert(sizeof(s_tactical_state_record) == 84, "oracle tactical record layout mismatch");
+        static_assert(sizeof(s_strategic_state_record) == 60,
+            "oracle strategic record layout mismatch");
+        static_assert(sizeof(s_presentation_complete_record) == 36,
+            "oracle presentation completion layout mismatch");
 
         constexpr uint32_t k_log_magic = 0x4C43524F;
-        constexpr uint32_t k_log_version = 7;
+        constexpr uint32_t k_log_version = 9;
         constexpr uint32_t k_input_record_type = 1;
         constexpr uint32_t k_end_record_type = 2;
         constexpr uint32_t k_random_record_type = 3;
         constexpr uint32_t k_random_seed_record_type = 4;
         constexpr uint32_t k_tactical_state_record_type = 5;
+        constexpr uint32_t k_presentation_complete_record_type = 6;
+        constexpr uint32_t k_strategic_state_record_type = 7;
         constexpr uint32_t k_tactical_turn_begin = 1;
         constexpr uint32_t k_tactical_combat_end = 2;
+        constexpr uint32_t k_ground_combat_presentation = 1;
+        constexpr uint32_t k_bombing_presentation = 2;
         constexpr uint32_t k_mouse_input_type = 1;
         constexpr uint32_t k_key_input_type = 2;
         constexpr uint32_t k_return_address_capacity = 10;
         constexpr uintptr_t k_original_image_base = 0x00400000;
         constexpr uint32_t k_original_combat_data_size = 313;
         constexpr uint32_t k_original_missile_size = 26;
+        constexpr uint32_t k_original_quick_combat_data_size = 33;
+        constexpr uint32_t k_original_quick_combat_capacity = 501;
         constexpr uint32_t k_combat_ship_capacity = 210;
         constexpr uint32_t k_missile_capacity = 300;
         constexpr uint32_t k_ship_turn_order_size = 210 * sizeof(int16_t);
@@ -201,9 +248,19 @@ namespace oracle {
             std::vector<uint8_t> payload;
         };
 
+        struct s_strategic_state {
+            s_strategic_state_record record;
+            std::vector<uint8_t> payload;
+        };
+
         struct s_input_position {
             uint32_t random_call_count;
             uint32_t random_seed_count;
+        };
+
+        struct s_presentation_complete {
+            s_presentation_complete_record record;
+            size_t terminal_input_index;
         };
 
         bool g_enabled;
@@ -216,11 +273,18 @@ namespace oracle {
         std::vector<s_random_record> g_random_records;
         std::vector<s_random_seed_record> g_random_seed_records;
         std::vector<s_tactical_state> g_tactical_states;
+        std::vector<s_strategic_state> g_strategic_states;
+        std::vector<s_presentation_complete> g_presentation_completions;
         size_t g_record_index;
         size_t g_random_record_index;
         size_t g_random_seed_record_index;
         size_t g_tactical_state_index;
+        size_t g_strategic_state_index;
+        size_t g_presentation_completion_index;
+        uint32_t g_active_presentation_kind;
+        bool g_active_presentation_ready;
         uint32_t g_active_combat_instance;
+        uint32_t g_active_strategic_combat_instance;
         int16_t g_last_verified_combat_turn;
         bool g_tactical_combat_active;
         uint64_t g_last_consumption_counter;
@@ -413,13 +477,59 @@ namespace oracle {
             return saved;
         }
 
+        bool Find_Presentation_Terminal_Input_(
+            const std::vector<s_input_record>& records,
+            size_t range_begin, size_t range_end,
+            uint16_t initial_mouse_buttons,
+            size_t* terminal_input_index) {
+            if (range_begin >= range_end || range_end > records.size()) {
+                return false;
+            }
+
+            uint16_t mouse_buttons = initial_mouse_buttons;
+            for (size_t i = 0; i < range_begin; ++i) {
+                if (records[i].input_type == k_mouse_input_type) {
+                    mouse_buttons = records[i].mouse_buttons;
+                }
+            }
+
+            bool found = false;
+            size_t candidate = range_begin;
+            for (size_t i = range_begin; i < range_end; ++i) {
+                const s_input_record& record = records[i];
+                if (record.input_type == k_key_input_type) {
+                    candidate = i;
+                    found = true;
+                    continue;
+                }
+
+                const uint16_t pressed =
+                    record.mouse_buttons &
+                    static_cast<uint16_t>(~mouse_buttons);
+                mouse_buttons = record.mouse_buttons;
+                if (pressed != 0) {
+                    candidate = i;
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                return false;
+            }
+
+            *terminal_input_index = candidate;
+            return true;
+        }
+
         bool Read_Completed_Log_(uint32_t turn, s_log_header* header,
             std::vector<s_input_record>* records,
             std::vector<s_input_position>* record_positions,
             std::vector<s_random_record>* random_records,
             std::vector<s_random_seed_record>* random_seed_records,
-            std::vector<s_tactical_state>* tactical_states, bool* exists,
-            bool* completed) {
+            std::vector<s_tactical_state>* tactical_states,
+            std::vector<s_strategic_state>* strategic_states,
+            std::vector<s_presentation_complete>* presentation_completions,
+            bool* exists, bool* completed) {
             char path[1024];
             std::vector<uint8_t> data;
             *exists = false;
@@ -451,6 +561,8 @@ namespace oracle {
             random_records->clear();
             random_seed_records->clear();
             tactical_states->clear();
+            strategic_states->clear();
+            presentation_completions->clear();
             size_t offset = header->size;
             bool saw_end = false;
             while (offset < data.size()) {
@@ -580,6 +692,114 @@ namespace oracle {
                             state.payload.size());
                     }
                     tactical_states->push_back(std::move(state));
+                } else if (type == k_strategic_state_record_type &&
+                    size >= sizeof(s_strategic_state_record)) {
+                    s_strategic_state state;
+                    memcpy(&state.record, data.data() + offset,
+                        sizeof(state.record));
+
+                    const s_strategic_state_record& record = state.record;
+                    const bool valid_colony_size = record.colony_size == 0 ||
+                        record.colony_size == k_colony_size;
+                    uint64_t expected_size = sizeof(s_strategic_state_record);
+                    expected_size += record.quick_combat_data_size;
+                    expected_size += record.colony_size;
+
+                    if (record.oracle_turn != turn ||
+                        record.stardate != header->stardate ||
+                        record.combat_instance == 0 ||
+                        record.combat_turn < 0 || record.combat_turn > 50 ||
+                        record.combat_total_ship_count < 0 ||
+                        record.combat_total_ship_count >
+                            static_cast<int16_t>(
+                                k_original_quick_combat_capacity) ||
+                        record.reserved != 0 || !valid_colony_size ||
+                        record.quick_combat_data_size !=
+                            static_cast<uint32_t>(
+                                record.combat_total_ship_count) *
+                                k_original_quick_combat_data_size ||
+                        expected_size != size ||
+                        record.random_call_count != random_records->size() ||
+                        record.random_seed_count !=
+                            random_seed_records->size()) {
+                        return false;
+                    }
+
+                    if (strategic_states->empty()) {
+                        if (record.combat_instance != 1 ||
+                            record.checkpoint_index != 0 ||
+                            record.combat_turn != 0) {
+                            return false;
+                        }
+                    } else {
+                        const s_strategic_state_record& previous =
+                            strategic_states->back().record;
+                        if (record.combat_instance ==
+                            previous.combat_instance) {
+                            if (record.checkpoint_index !=
+                                    previous.checkpoint_index + 1 ||
+                                record.combat_turn !=
+                                    previous.combat_turn + 1) {
+                                return false;
+                            }
+                        } else if (record.combat_instance !=
+                                previous.combat_instance + 1 ||
+                            record.checkpoint_index != 0 ||
+                            record.combat_turn != 0) {
+                            return false;
+                        }
+                    }
+
+                    const size_t payload_offset =
+                        offset + sizeof(s_strategic_state_record);
+                    state.payload.resize(
+                        size - sizeof(s_strategic_state_record));
+                    if (!state.payload.empty()) {
+                        memcpy(state.payload.data(),
+                            data.data() + payload_offset,
+                            state.payload.size());
+                    }
+                    strategic_states->push_back(std::move(state));
+                } else if (type == k_presentation_complete_record_type &&
+                    size == sizeof(s_presentation_complete_record)) {
+                    s_presentation_complete presentation = {};
+                    memcpy(&presentation.record, data.data() + offset,
+                        sizeof(presentation.record));
+
+                    const s_presentation_complete_record& record =
+                        presentation.record;
+                    if (record.oracle_turn != turn ||
+                        record.stardate != header->stardate ||
+                        record.sequence != presentation_completions->size() ||
+                        (record.presentation_kind !=
+                                k_ground_combat_presentation &&
+                            record.presentation_kind !=
+                                k_bombing_presentation) ||
+                        record.input_record_count != records->size() ||
+                        record.random_call_count != random_records->size() ||
+                        record.random_seed_count !=
+                            random_seed_records->size()) {
+                        return false;
+                    }
+
+                    const size_t range_begin =
+                        presentation_completions->empty()
+                        ? 0
+                        : presentation_completions->back()
+                              .record.input_record_count;
+                    if (!Find_Presentation_Terminal_Input_(
+                            *records,
+                            range_begin,
+                            record.input_record_count,
+                            static_cast<uint16_t>(
+                                header->input_state.mouse_buttons),
+                            &presentation.terminal_input_index) ||
+                        presentation.terminal_input_index >=
+                            record.input_record_count) {
+                        return false;
+                    }
+
+                    presentation_completions->push_back(presentation);
                 } else if (header->version == k_log_version && type == k_end_record_type &&
                     size == sizeof(s_end_record)) {
                     s_end_record end_record;
@@ -588,6 +808,10 @@ namespace oracle {
                         end_record.random_call_count != random_records->size() ||
                         end_record.random_seed_count != random_seed_records->size() ||
                         end_record.tactical_state_count != tactical_states->size() ||
+                        end_record.strategic_state_count !=
+                            strategic_states->size() ||
+                        end_record.presentation_complete_count !=
+                            presentation_completions->size() ||
                         (!tactical_states->empty() &&
                             tactical_states->back().record.checkpoint_kind !=
                                 k_tactical_combat_end)) {
@@ -623,9 +847,12 @@ namespace oracle {
             std::vector<s_random_record> random_records;
             std::vector<s_random_seed_record> random_seed_records;
             std::vector<s_tactical_state> tactical_states;
+            std::vector<s_strategic_state> strategic_states;
+            std::vector<s_presentation_complete> presentation_completions;
             if (!Read_Completed_Log_(turn, &header, &records,
                     &record_positions, &random_records, &random_seed_records,
-                    &tactical_states, &log_exists, &completed)) {
+                    &tactical_states, &strategic_states,
+                    &presentation_completions, &log_exists, &completed)) {
                 return PREPARE_ERROR;
             }
             if (!log_exists || !completed) {
@@ -657,11 +884,18 @@ namespace oracle {
             g_random_records.swap(random_records);
             g_random_seed_records.swap(random_seed_records);
             g_tactical_states.swap(tactical_states);
+            g_strategic_states.swap(strategic_states);
+            g_presentation_completions.swap(presentation_completions);
             g_record_index = 0;
             g_random_record_index = 0;
             g_random_seed_record_index = 0;
             g_tactical_state_index = 0;
+            g_strategic_state_index = 0;
+            g_presentation_completion_index = 0;
+            g_active_presentation_kind = 0;
+            g_active_presentation_ready = false;
             g_active_combat_instance = 0;
+            g_active_strategic_combat_instance = 0;
             g_last_verified_combat_turn =
                 std::numeric_limits<int16_t>::min();
             g_tactical_combat_active = false;
@@ -674,9 +908,11 @@ namespace oracle {
             g_replay_mouse_buttons = (uint16_t)header.input_state.mouse_buttons;
 
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-                "oracle: replaying turn %u, stardate %d, %zu input events, %zu random calls, %zu random seed calls, and %zu tactical states at %u%% speed with %u ms added per event and %u ms after clicks",
+                "oracle: replaying turn %u, stardate %d, %zu input events, %zu random calls, %zu random seed calls, %zu tactical states, %zu strategic states, and %zu presentation completions at %u%% speed with %u ms added per event and %u ms after clicks",
                 turn, header.stardate, g_records.size(), g_random_records.size(),
                 g_random_seed_records.size(), g_tactical_states.size(),
+                g_strategic_states.size(),
+                g_presentation_completions.size(),
                 g_speed_percent, g_delay_ms, g_click_delay_ms);
             return PREPARE_READY;
         }
@@ -1311,7 +1547,8 @@ namespace oracle {
             }
         }
 
-        bool Capture_Tactical_State_(std::vector<uint8_t>* output) {
+        bool Capture_Tactical_State_(std::vector<uint8_t>* output,
+            bool allow_missing_missiles) {
 #if UINTPTR_MAX != UINT32_MAX
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                 "oracle: tactical state replay requires a 32-bit build");
@@ -1328,7 +1565,8 @@ namespace oracle {
             if (MOX::_combat_total_ship_count < 0 ||
                 MOX::_combat_total_ship_count >
                     static_cast<int16_t>(k_combat_ship_capacity) ||
-                MOX::_combat_data == nullptr || MOX::_missile == nullptr) {
+                MOX::_combat_data == nullptr ||
+                (MOX::_missile == nullptr && !allow_missing_missiles)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: invalid local tactical state, ships=%d combat=%p missiles=%p",
                     static_cast<int>(MOX::_combat_total_ship_count),
@@ -1365,8 +1603,13 @@ namespace oracle {
             Append_Tactical_Bytes_(output, MOX::_combat_data,
                 static_cast<size_t>(MOX::_combat_total_ship_count) *
                     sizeof(s_combat_data));
-            Append_Tactical_Bytes_(output, MOX::_missile,
-                k_missile_capacity * sizeof(s_missile));
+            if (MOX::_missile != nullptr) {
+                Append_Tactical_Bytes_(output, MOX::_missile,
+                    k_missile_capacity * sizeof(s_missile));
+            } else {
+                output->resize(output->size() +
+                    k_missile_capacity * sizeof(s_missile), 0);
+            }
             Append_Tactical_Bytes_(output, MOX::_ship_turn_order,
                 sizeof(MOX::_ship_turn_order));
             Append_Tactical_Bytes_(output, MOX::_combat_grid,
@@ -1402,7 +1645,8 @@ namespace oracle {
         }
 
         bool Normalize_Tactical_State_(std::vector<uint8_t>* payload,
-            const s_tactical_state_record& record) {
+            const s_tactical_state_record& record,
+            bool incomplete_tactical_setup) {
             constexpr size_t pointer_offset = 198;
             constexpr size_t pointer_size = sizeof(uint32_t);
 
@@ -1434,6 +1678,32 @@ namespace oracle {
                     sizeof(s_tactical_scalar_state::start_of_turn));
             }
 
+            if (incomplete_tactical_setup) {
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, current_ship), 0,
+                    sizeof(s_tactical_scalar_state::current_ship));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, current_pointer), 0,
+                    sizeof(s_tactical_scalar_state::current_pointer));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state,
+                        current_missile_count), 0,
+                    sizeof(s_tactical_scalar_state::current_missile_count));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, auto_combat), 0,
+                    sizeof(s_tactical_scalar_state::auto_combat));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state,
+                        colony_defense_flags), 0,
+                    sizeof(s_tactical_scalar_state::colony_defense_flags));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, start_of_turn), 0,
+                    sizeof(s_tactical_scalar_state::start_of_turn));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, fleet_target), 0,
+                    sizeof(s_tactical_scalar_state::fleet_target));
+            }
+
             size_t combat_offset = record.scalar_size;
             size_t turn_order_offset = combat_offset +
                 record.combat_data_size + record.missile_data_size;
@@ -1450,10 +1720,25 @@ namespace oracle {
 
             if (payload->size() < global_offset +
                     record.global_combat_data_size +
-                    record.combat_bomb_result_size ||
+                    record.combat_bomb_result_size +
+                    record.tactical_arrays_size ||
                 pointer_offset + pointer_size >
                     k_original_combat_data_size) {
                 return false;
+            }
+
+            if (incomplete_tactical_setup) {
+                memset(payload->data() + combat_offset +
+                    record.combat_data_size, 0,
+                    record.missile_data_size);
+                memset(payload->data() + turn_order_offset, 0,
+                    record.turn_order_size);
+                memset(payload->data() + combat_grid_offset, 0,
+                    record.combat_grid_size);
+                memset(payload->data() + global_offset, 0,
+                    record.global_combat_data_size);
+                memset(payload->data() + tactical_arrays_offset, 0,
+                    record.tactical_arrays_size);
             }
 
             // This block belongs to the separate bombardment combat path and is stale here.
@@ -1619,7 +1904,11 @@ namespace oracle {
             }
 
             std::vector<uint8_t> actual;
-            if (!Capture_Tactical_State_(&actual)) {
+            const bool incomplete_tactical_setup =
+                checkpoint_kind == k_tactical_combat_end &&
+                MOX::_combat_turn == 0 && MOX::_missile == nullptr;
+            if (!Capture_Tactical_State_(&actual,
+                    incomplete_tactical_setup)) {
                 return false;
             }
 
@@ -1634,8 +1923,9 @@ namespace oracle {
             }
 
             if (!Normalize_Tactical_State_(&expected_payload,
-                    expected) ||
-                !Normalize_Tactical_State_(&actual, expected)) {
+                    expected, incomplete_tactical_setup) ||
+                !Normalize_Tactical_State_(&actual, expected,
+                    incomplete_tactical_setup)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: tactical checkpoint #%zu could not be normalized",
                     g_tactical_state_index);
@@ -1697,11 +1987,277 @@ namespace oracle {
             return true;
         }
 
+        bool Capture_Strategic_State_(std::vector<uint8_t>* output) {
+            static_assert(sizeof(s_qship) ==
+                k_original_quick_combat_data_size);
+            static_assert(sizeof(s_colony) == k_colony_size);
+
+            if (MOX::_combat_total_ship_count < 0 ||
+                MOX::_combat_total_ship_count >
+                    static_cast<int16_t>(
+                        k_original_quick_combat_capacity) ||
+                MOX::_qcombat_data == nullptr) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: invalid local strategic state, ships=%d combat=%p",
+                    static_cast<int>(MOX::_combat_total_ship_count),
+                    static_cast<void*>(MOX::_qcombat_data));
+                return false;
+            }
+
+            output->clear();
+            Append_Tactical_Bytes_(output, MOX::_qcombat_data,
+                static_cast<size_t>(MOX::_combat_total_ship_count) *
+                    sizeof(s_qship));
+            if (MOX::_cmbt_colony_id >= 0) {
+                if (MOX::_colony == nullptr ||
+                    MOX::_cmbt_colony_id >= MAX_COLONIES) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: invalid strategic colony index %d",
+                        static_cast<int>(MOX::_cmbt_colony_id));
+                    return false;
+                }
+                Append_Tactical_Value_(output,
+                    MOX::_colony[MOX::_cmbt_colony_id]);
+            }
+            return true;
+        }
+
+        bool Verify_Strategic_State_() {
+            if (g_strategic_state_index >= g_strategic_states.size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: unexpected strategic checkpoint in turn %u, combat %u round %d",
+                    g_turn, g_active_strategic_combat_instance,
+                    static_cast<int>(MOX::_combat_turn));
+                return false;
+            }
+
+            const s_strategic_state& expected_state =
+                g_strategic_states[g_strategic_state_index];
+            const s_strategic_state_record& expected =
+                expected_state.record;
+            const uint32_t colony_size = MOX::_cmbt_colony_id >= 0
+                ? k_colony_size : 0;
+
+            if (expected.combat_instance !=
+                    g_active_strategic_combat_instance ||
+                expected.combat_turn != MOX::_combat_turn ||
+                expected.combat_total_ship_count !=
+                    MOX::_combat_total_ship_count ||
+                expected.combat_attacker_count !=
+                    MOX::_combat_attacker_count ||
+                expected.combat_defender_count !=
+                    MOX::_combat_defender_count ||
+                expected.combat_attacker_player !=
+                    MOX::_combat_attacker_player ||
+                expected.combat_defender_player !=
+                    MOX::_combat_defender_player ||
+                expected.combat_colony_id != MOX::_cmbt_colony_id ||
+                expected.colony_defense_flags !=
+                    MOX::_colony_defense_flags ||
+                expected.random_call_count != g_random_record_index ||
+                expected.random_seed_count !=
+                    g_random_seed_record_index ||
+                expected.random_seed != game_random::Get_Random_Seed_() ||
+                expected.colony_size != colony_size) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: strategic checkpoint #%zu metadata mismatch: oracle combat=%u round=%d ships=%d sides=%d/%d players=%d/%d colony=%d defenses=%u rng=%u/%u seed=%u; local combat=%u round=%d ships=%d sides=%d/%d players=%d/%d colony=%d defenses=%u rng=%zu/%zu seed=%u",
+                    g_strategic_state_index, expected.combat_instance,
+                    static_cast<int>(expected.combat_turn),
+                    static_cast<int>(expected.combat_total_ship_count),
+                    static_cast<int>(expected.combat_attacker_count),
+                    static_cast<int>(expected.combat_defender_count),
+                    static_cast<int>(expected.combat_attacker_player),
+                    static_cast<int>(expected.combat_defender_player),
+                    static_cast<int>(expected.combat_colony_id),
+                    static_cast<unsigned>(expected.colony_defense_flags),
+                    expected.random_call_count, expected.random_seed_count,
+                    expected.random_seed,
+                    g_active_strategic_combat_instance,
+                    static_cast<int>(MOX::_combat_turn),
+                    static_cast<int>(MOX::_combat_total_ship_count),
+                    static_cast<int>(MOX::_combat_attacker_count),
+                    static_cast<int>(MOX::_combat_defender_count),
+                    static_cast<int>(MOX::_combat_attacker_player),
+                    static_cast<int>(MOX::_combat_defender_player),
+                    static_cast<int>(MOX::_cmbt_colony_id),
+                    static_cast<unsigned>(MOX::_colony_defense_flags),
+                    g_random_record_index, g_random_seed_record_index,
+                    game_random::Get_Random_Seed_());
+                return false;
+            }
+
+            std::vector<uint8_t> actual;
+            if (!Capture_Strategic_State_(&actual) ||
+                actual.size() != expected_state.payload.size()) {
+                return false;
+            }
+
+            size_t difference = 0;
+            while (difference < actual.size() &&
+                actual[difference] == expected_state.payload[difference]) {
+                ++difference;
+            }
+            if (difference != actual.size()) {
+                const bool in_quick_combat =
+                    difference < expected.quick_combat_data_size;
+                const size_t section_offset = in_quick_combat
+                    ? difference
+                    : difference - expected.quick_combat_data_size;
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: strategic checkpoint #%zu differs at payload offset %zu (%s +%zu, element %zu +%zu): oracle=%u local=%u; combat=%u round=%d",
+                    g_strategic_state_index, difference,
+                    in_quick_combat ? "quick combat ships" : "colony",
+                    section_offset,
+                    in_quick_combat
+                        ? section_offset / k_original_quick_combat_data_size
+                        : 0,
+                    in_quick_combat
+                        ? section_offset % k_original_quick_combat_data_size
+                        : section_offset,
+                    static_cast<unsigned>(expected_state.payload[difference]),
+                    static_cast<unsigned>(actual[difference]),
+                    expected.combat_instance,
+                    static_cast<int>(expected.combat_turn));
+                return false;
+            }
+
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: strategic checkpoint #%zu matches, combat=%u round=%d, %zu bytes",
+                g_strategic_state_index, expected.combat_instance,
+                static_cast<int>(expected.combat_turn), actual.size());
+            ++g_strategic_state_index;
+            return true;
+        }
+
         bool Fail_(const char* message) {
             g_replay_active = false;
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "oracle: %s", message);
             platform::Request_Exit_(message);
             return false;
+        }
+
+        void Begin_Presentation_(uint32_t presentation_kind) {
+            if (!g_replay_active) {
+                return;
+            }
+
+            if (g_active_presentation_kind != 0) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: presentation %u started while presentation %u is active",
+                    presentation_kind, g_active_presentation_kind);
+                Fail_("Nested oracle presentation encountered.");
+                throw platform::process_exit_requested{};
+            }
+
+            if (g_presentation_completion_index >=
+                    g_presentation_completions.size() ||
+                g_presentation_completions[
+                    g_presentation_completion_index]
+                        .record.presentation_kind != presentation_kind) {
+                const uint32_t expected_kind =
+                    g_presentation_completion_index <
+                            g_presentation_completions.size()
+                        ? g_presentation_completions[
+                              g_presentation_completion_index]
+                              .record.presentation_kind
+                        : 0;
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: unexpected presentation %u in turn %u; next expected kind=%u",
+                    presentation_kind, g_turn, expected_kind);
+                Fail_("Oracle presentation sequence mismatch.");
+                throw platform::process_exit_requested{};
+            }
+
+            g_active_presentation_kind = presentation_kind;
+            g_active_presentation_ready = false;
+        }
+
+        void Allow_Presentation_Completion_(uint32_t presentation_kind) {
+            if (g_replay_active &&
+                g_active_presentation_kind == presentation_kind) {
+                g_active_presentation_ready = true;
+            }
+        }
+
+        void End_Presentation_(uint32_t presentation_kind) {
+            if (!g_replay_active) {
+                return;
+            }
+
+            if (g_active_presentation_kind != presentation_kind ||
+                g_presentation_completion_index >=
+                    g_presentation_completions.size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: presentation %u ended while active kind=%u",
+                    presentation_kind, g_active_presentation_kind);
+                Fail_("Oracle presentation end mismatch.");
+                throw platform::process_exit_requested{};
+            }
+
+            const s_presentation_complete_record& expected =
+                g_presentation_completions[
+                    g_presentation_completion_index]
+                    .record;
+
+            size_t passive_input_count = 0;
+            while (g_record_index < expected.input_record_count) {
+                const s_input_record& record =
+                    g_records[g_record_index];
+                const s_input_position& position =
+                    g_record_positions[g_record_index];
+                if (record.input_type != k_mouse_input_type ||
+                    record.mouse_buttons != 0 ||
+                    position.random_call_count >
+                        expected.random_call_count ||
+                    position.random_seed_count >
+                        expected.random_seed_count) {
+                    break;
+                }
+
+                mouse::User_Mouse_Handler_(record.mouse_x, record.mouse_y,
+                    record.mouse_buttons);
+                g_replay_mouse_buttons = record.mouse_buttons;
+                ++g_record_index;
+                ++passive_input_count;
+            }
+
+            if (!g_active_presentation_ready ||
+                g_record_index != expected.input_record_count ||
+                g_random_record_index != expected.random_call_count ||
+                g_random_seed_record_index !=
+                    expected.random_seed_count) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: presentation %u ended at input=%zu/%u random=%zu/%u seeds=%zu/%u ready=%d",
+                    presentation_kind,
+                    g_record_index, expected.input_record_count,
+                    g_random_record_index, expected.random_call_count,
+                    g_random_seed_record_index,
+                    expected.random_seed_count,
+                    g_active_presentation_ready ? 1 : 0);
+                Fail_("Oracle presentation boundary mismatch.");
+                throw platform::process_exit_requested{};
+            }
+
+            if (passive_input_count != 0) {
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: consumed %zu trailing buttonless mouse event%s at presentation completion",
+                    passive_input_count,
+                    passive_input_count == 1 ? "" : "s");
+            }
+
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: completed presentation #%zu kind=%u at input=%zu random=%zu seeds=%zu",
+                g_presentation_completion_index,
+                presentation_kind,
+                g_record_index,
+                g_random_record_index,
+                g_random_seed_record_index);
+
+            ++g_presentation_completion_index;
+            g_active_presentation_kind = 0;
+            g_active_presentation_ready = false;
+            g_click_pause_active = false;
+            g_last_consumption_counter = SDL_GetPerformanceCounter();
         }
 
         void Log_Original_Return_Addresses_(const s_random_record& record) {
@@ -1795,6 +2351,46 @@ namespace oracle {
             throw platform::process_exit_requested{};
         }
         g_tactical_combat_active = false;
+    }
+
+    void Verify_Strategic_Combat_State_() {
+        if (!g_replay_active) {
+            return;
+        }
+
+        if (MOX::_combat_turn == 0) {
+            ++g_active_strategic_combat_instance;
+        }
+        if (!Verify_Strategic_State_()) {
+            Fail_("Oracle strategic combat state mismatch.");
+            throw platform::process_exit_requested{};
+        }
+    }
+
+    void Begin_Ground_Combat_Presentation_() {
+        Begin_Presentation_(k_ground_combat_presentation);
+    }
+
+    void Allow_Ground_Combat_Completion_() {
+        Allow_Presentation_Completion_(
+            k_ground_combat_presentation);
+    }
+
+    void End_Ground_Combat_Presentation_() {
+        End_Presentation_(k_ground_combat_presentation);
+    }
+
+    void Begin_Bombing_Presentation_() {
+        Begin_Presentation_(k_bombing_presentation);
+    }
+
+    void Allow_Bombing_Completion_() {
+        Allow_Presentation_Completion_(
+            k_bombing_presentation);
+    }
+
+    void End_Bombing_Presentation_() {
+        End_Presentation_(k_bombing_presentation);
     }
 
     bool Configure_(int argc, char** argv) {
@@ -1923,7 +2519,23 @@ namespace oracle {
     }
 
     void Pump_Input_() {
-        if (!g_replay_active || g_record_index >= g_records.size()) {
+        if (!g_replay_active) {
+            return;
+        }
+
+        size_t input_limit = g_records.size();
+        if (g_active_presentation_kind != 0 &&
+            g_presentation_completion_index <
+                g_presentation_completions.size()) {
+            const s_presentation_complete& presentation =
+                g_presentation_completions[
+                    g_presentation_completion_index];
+            input_limit = g_active_presentation_ready
+                ? presentation.record.input_record_count
+                : presentation.terminal_input_index;
+        }
+
+        if (g_record_index >= input_limit) {
             return;
         }
 
@@ -1948,7 +2560,7 @@ namespace oracle {
         uint64_t consumed_budget = 0;
         bool consumed_input = false;
 
-        while (g_record_index < g_records.size()) {
+        while (g_record_index < input_limit) {
             const s_input_position& position =
                 g_record_positions[g_record_index];
             if (g_random_record_index < position.random_call_count ||
@@ -2024,6 +2636,25 @@ namespace oracle {
                 g_tactical_states.size(),
                 g_tactical_combat_active ? 1 : 0);
             Fail_("Oracle tactical checkpoint count mismatch.");
+            throw platform::process_exit_requested{};
+        }
+        if (g_strategic_state_index != g_strategic_states.size()) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: strategic turn %u ended after %zu of %zu strategic checkpoints",
+                g_turn, g_strategic_state_index,
+                g_strategic_states.size());
+            Fail_("Oracle strategic checkpoint count mismatch.");
+            throw platform::process_exit_requested{};
+        }
+        if (g_active_presentation_kind != 0 ||
+            g_presentation_completion_index !=
+                g_presentation_completions.size()) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: turn %u ended after %zu of %zu presentation completions; active kind=%u",
+                g_turn, g_presentation_completion_index,
+                g_presentation_completions.size(),
+                g_active_presentation_kind);
+            Fail_("Oracle presentation completion count mismatch.");
             throw platform::process_exit_requested{};
         }
         if (g_record_index != g_records.size()) {

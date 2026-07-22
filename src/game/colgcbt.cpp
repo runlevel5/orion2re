@@ -163,6 +163,8 @@ namespace COLGCBT {
     }
 
     void __cdecl Colony_Combat_Screen_(s_invasion_side_info* attacker, s_invasion_side_info* defender, uint32_t seed, int16_t colony_idx) {
+        oracle::Begin_Ground_Combat_Presentation_();
+
         bool is_exit = false;
         MOX2::action_func_t auto_function_ptr;
 
@@ -235,19 +237,14 @@ namespace COLGCBT {
             Draw_Colony_Combat_Screen_();
             RUSS::Mox_Sync_Update_();
 
-            const bool replaying_finished_combat = !oracle::Physical_Input_Enabled_() &&
-                ((uint8_t)attacker->current_troop_type_idx >= UNIT_COUNT ||
-                    (uint8_t)defender->current_troop_type_idx >= UNIT_COUNT);
-            if (replaying_finished_combat) {
-                fields::Disable_Mouse_Wait_();
+            const bool combat_finished =
+                (uint8_t)attacker->current_troop_type_idx >= UNIT_COUNT ||
+                (uint8_t)defender->current_troop_type_idx >= UNIT_COUNT;
+            if (combat_finished) {
+                oracle::Allow_Ground_Combat_Completion_();
             }
+
             int16_t input = fields::Get_Input_();
-            if (replaying_finished_combat) {
-                if (input != 0) {
-                    oracle::Complete_Replay_Click_();
-                }
-                fields::Enable_Mouse_Wait_();
-            }
             fields::Scan_Input_();
 
             if (input != 0) {
@@ -282,6 +279,8 @@ namespace COLGCBT {
 
         MOX::_current_screen = MOX::_return_screen;
         COLONY::_using_colony_screen_palette = 0;
+
+        oracle::End_Ground_Combat_Presentation_();
     }
 
     void __cdecl Set_Help_List_() {
