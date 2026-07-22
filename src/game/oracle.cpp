@@ -998,7 +998,8 @@ namespace oracle {
             return difference;
         }
 
-        bool Cleanup_Expected_Save_(
+        bool Cleanup_Save_Comparison_(
+            std::vector<uint8_t>* actual,
             std::vector<uint8_t>* expected,
             size_t difference,
             const char** rule_name) {
@@ -1068,30 +1069,66 @@ namespace oracle {
                 return changed;
             }
 
-            if (strcmp(block_name, "reports") != 0 ||
-                block_offset % sizeof(s_report) < offsetof(s_report, reserved)) {
+            if (strcmp(block_name, "reports") != 0) {
                 return false;
             }
 
             const size_t reports_offset = difference - block_offset;
+            if (reports_offset < sizeof(REPORT::_n_reports)) {
+                return false;
+            }
+
+            int16_t actual_report_count;
+            int16_t expected_report_count;
+            memcpy(&actual_report_count,
+                actual->data() + reports_offset - sizeof(actual_report_count),
+                sizeof(actual_report_count));
+            memcpy(&expected_report_count,
+                expected->data() + reports_offset - sizeof(expected_report_count),
+                sizeof(expected_report_count));
+            if (actual_report_count != expected_report_count ||
+                expected_report_count < 0 || expected_report_count > 50) {
+                return false;
+            }
+
+            const size_t difference_report_idx =
+                block_offset / sizeof(s_report);
+            const size_t difference_report_offset =
+                block_offset % sizeof(s_report);
+            if (difference_report_idx <
+                    static_cast<size_t>(expected_report_count) &&
+                difference_report_offset < offsetof(s_report, reserved)) {
+                return false;
+            }
+
             bool changed = false;
             for (size_t report_idx = 0; report_idx < 50; ++report_idx) {
-                const size_t reserved_offset =
-                    reports_offset + report_idx * sizeof(s_report) + offsetof(s_report, reserved);
-                if (reserved_offset + sizeof(s_report::reserved) > expected->size()) {
+                const bool active = report_idx <
+                    static_cast<size_t>(expected_report_count);
+                const size_t cleanup_offset = reports_offset +
+                    report_idx * sizeof(s_report) +
+                    (active ? offsetof(s_report, reserved) : 0);
+                const size_t cleanup_size = active
+                    ? sizeof(s_report::reserved) : sizeof(s_report);
+                if (cleanup_offset + cleanup_size > actual->size() ||
+                    cleanup_offset + cleanup_size > expected->size()) {
                     return false;
                 }
 
-                for (size_t i = 0; i < sizeof(s_report::reserved); ++i) {
-                    if ((*expected)[reserved_offset + i] != 0) {
-                        (*expected)[reserved_offset + i] = 0;
+                for (size_t i = 0; i < cleanup_size; ++i) {
+                    if ((*actual)[cleanup_offset + i] != 0) {
+                        (*actual)[cleanup_offset + i] = 0;
+                        changed = true;
+                    }
+                    if ((*expected)[cleanup_offset + i] != 0) {
+                        (*expected)[cleanup_offset + i] = 0;
                         changed = true;
                     }
                 }
             }
 
             if (changed) {
-                *rule_name = "zero original uninitialized report reserved bytes";
+                *rule_name = "normalize active report reserved bytes and inactive report slots";
             }
             return changed;
         }
@@ -1471,7 +1508,7 @@ namespace oracle {
                 }
 
                 const char* rule_name = nullptr;
-                if (!Cleanup_Expected_Save_(&expected, difference, &rule_name)) {
+                if (!Cleanup_Save_Comparison_(&actual, &expected, difference, &rule_name)) {
                     break;
                 }
 
