@@ -545,6 +545,31 @@ namespace oracle {
             const char** rule_name) {
             size_t block_offset = 0;
             const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            if (strcmp(block_name, "messages") == 0 &&
+                block_offset % sizeof(s_MSG) >= offsetof(s_MSG, reserved)) {
+                const size_t messages_offset = difference - block_offset;
+                bool changed = false;
+                for (size_t message_idx = 0; message_idx < 100; ++message_idx) {
+                    const size_t reserved_offset =
+                        messages_offset + message_idx * sizeof(s_MSG) + offsetof(s_MSG, reserved);
+                    if (reserved_offset + sizeof(s_MSG::reserved) > expected->size()) {
+                        return false;
+                    }
+
+                    for (size_t i = 0; i < sizeof(s_MSG::reserved); ++i) {
+                        if ((*expected)[reserved_offset + i] != 0) {
+                            (*expected)[reserved_offset + i] = 0;
+                            changed = true;
+                        }
+                    }
+                }
+
+                if (changed) {
+                    *rule_name = "zero original uninitialized message reserved bytes";
+                }
+                return changed;
+            }
+
             if (strcmp(block_name, "reports") != 0 ||
                 block_offset % sizeof(s_report) < offsetof(s_report, reserved)) {
                 return false;
@@ -571,6 +596,81 @@ namespace oracle {
                 *rule_name = "zero original uninitialized report reserved bytes";
             }
             return changed;
+        }
+
+        const char* Message_Type_Name_(int8_t msg_type) {
+            switch (msg_type) {
+                case MSG_TYPE_COLONY: return "colony";
+                case MSG_TYPE_DECLARE_ALLIANCE: return "declare alliance";
+                case MSG_TYPE_DECLARE_WAR: return "declare war";
+                case MSG_TYPE_UNKNOWN_0x3: return "unknown 3";
+                case MSG_TYPE_FINANCIAL: return "financial";
+                case MSG_TYPE_LOST_SHIP: return "lost ship";
+                case MSG_TYPE_SCRAP_SHIP: return "scrap ship";
+                case MSG_TYPE_LOST_COLONY: return "lost colony";
+                case MSG_TYPE_HYPERSPACE_FLUX: return "hyperspace flux";
+                case MSG_TYPE_HYPERSPACE_BEAST: return "hyperspace beast";
+                case MSG_TYPE_LOST_ATTACKING_SPY: return "lost attacking spy";
+                case MSG_TYPE_LOST_DEFENDING_SPY: return "lost defending spy";
+                case MSG_TYPE_ARTEMIS: return "Artemis";
+                case MSG_TYPE_ARTEMIS_LEADER: return "Artemis leader";
+                case MSG_TYPE_FAILED_RETREAT: return "failed retreat";
+                case MSG_TYPE_SPY_ASSASSINATION: return "spy assassination";
+                case MSG_TYPE_ANOMALY: return "anomaly";
+                case MSG_TYPE_DIPLOMACY: return "diplomacy";
+                case MSG_TYPE_EEL_SPAWNED: return "eel spawned";
+                case MSG_TYPE_EEL_VANISHED: return "eel vanished";
+                case MSG_TYPE_ARTIFACTS: return "artifacts";
+                case MSG_TYPE_APRIL1: return "April 1";
+                case MSG_TYPE_SCRAP_LEADER: return "scrap leader";
+                default: return "unknown";
+            }
+        }
+
+        void Describe_Message_Offset_(size_t block_offset, char* description, size_t description_size) {
+            const size_t message_index = block_offset / sizeof(s_MSG);
+            const size_t message_offset = block_offset % sizeof(s_MSG);
+            if (message_offset == offsetof(s_MSG, msg_type)) {
+                snprintf(description, description_size, "MSG_::_msgs[%zu].msg_type", message_index);
+            } else if (message_offset == offsetof(s_MSG, priority)) {
+                snprintf(description, description_size, "MSG_::_msgs[%zu].priority", message_index);
+            } else if (message_offset >= offsetof(s_MSG, reserved)) {
+                snprintf(description, description_size, "MSG_::_msgs[%zu].reserved[%zu]",
+                    message_index, message_offset - offsetof(s_MSG, reserved));
+            } else {
+                snprintf(description, description_size, "MSG_::_msgs[%zu].u +%zu",
+                    message_index, message_offset - offsetof(s_MSG, u));
+            }
+        }
+
+        void Log_Message_Difference_(const std::vector<uint8_t>& actual,
+            const std::vector<uint8_t>& expected, size_t difference, size_t block_offset) {
+            const size_t message_index = block_offset / sizeof(s_MSG);
+            const size_t messages_offset = difference - block_offset;
+            const size_t message_offset = messages_offset + message_index * sizeof(s_MSG);
+            if (message_offset + sizeof(s_MSG) > actual.size() ||
+                message_offset + sizeof(s_MSG) > expected.size()) {
+                return;
+            }
+
+            s_MSG actual_message;
+            s_MSG expected_message;
+            memcpy(&actual_message, actual.data() + message_offset, sizeof(actual_message));
+            memcpy(&expected_message, expected.data() + message_offset, sizeof(expected_message));
+            const uint8_t* actual_payload = reinterpret_cast<const uint8_t*>(&actual_message.u);
+            const uint8_t* expected_payload = reinterpret_cast<const uint8_t*>(&expected_message.u);
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: message slot %zu actual type=%d (%s) priority=%u payload=%02X %02X %02X %02X %02X %02X %02X %02X",
+                message_index, (int)actual_message.msg_type, Message_Type_Name_(actual_message.msg_type),
+                (unsigned int)actual_message.priority,
+                actual_payload[0], actual_payload[1], actual_payload[2], actual_payload[3],
+                actual_payload[4], actual_payload[5], actual_payload[6], actual_payload[7]);
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: message slot %zu expected type=%d (%s) priority=%u payload=%02X %02X %02X %02X %02X %02X %02X %02X",
+                message_index, (int)expected_message.msg_type, Message_Type_Name_(expected_message.msg_type),
+                (unsigned int)expected_message.priority,
+                expected_payload[0], expected_payload[1], expected_payload[2], expected_payload[3],
+                expected_payload[4], expected_payload[5], expected_payload[6], expected_payload[7]);
         }
 
         void Describe_Colony_Offset_(size_t block_offset, char* description, size_t description_size) {
@@ -866,9 +966,19 @@ namespace oracle {
                 }
 
                 ++applied_cleanup_count;
+                size_t cleanup_block_offset;
+                const char* cleanup_block_name = Describe_Save_Offset_(difference, &cleanup_block_offset);
+                char cleanup_field_description[128] = {};
+                if (strcmp(cleanup_block_name, "messages") == 0) {
+                    Describe_Message_Offset_(cleanup_block_offset,
+                        cleanup_field_description, sizeof(cleanup_field_description));
+                }
                 SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-                    "oracle: turn %u cleanup #%zu at save offset %zu: %s; re-verifying",
-                    next_turn, applied_cleanup_count, difference, rule_name);
+                    "oracle: turn %u cleanup #%zu at save offset %zu (%s +%zu%s%s): %s; re-verifying",
+                    next_turn, applied_cleanup_count, difference,
+                    cleanup_block_name, cleanup_block_offset,
+                    cleanup_field_description[0] != '\0' ? ", " : "", cleanup_field_description,
+                    rule_name);
             }
 
             const size_t common_size = std::min(actual.size(), expected.size());
@@ -893,6 +1003,8 @@ namespace oracle {
                 Describe_Colony_Offset_(block_offset, field_description, sizeof(field_description));
             } else if (strcmp(block_name, "players") == 0) {
                 Describe_Player_Offset_(block_offset, field_description, sizeof(field_description));
+            } else if (strcmp(block_name, "messages") == 0) {
+                Describe_Message_Offset_(block_offset, field_description, sizeof(field_description));
             }
             const int actual_byte = difference < actual.size() ? actual[difference] : -1;
             const int expected_byte = difference < expected.size() ? expected[difference] : -1;
@@ -902,6 +1014,9 @@ namespace oracle {
                 field_description[0] != '\0' ? ", " : "", field_description,
                 actual_byte, expected_byte,
                 actual.size(), expected.size());
+            if (strcmp(block_name, "messages") == 0) {
+                Log_Message_Difference_(actual, expected, difference, block_offset);
+            }
             return false;
         }
 
