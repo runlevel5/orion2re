@@ -1000,44 +1000,6 @@ namespace CMBTFIRE {
 
     int16_t __cdecl Fire_Ship_(int16_t source_ship_idx, int16_t sx, int16_t sy, int16_t target_ship_idx, int16_t tx, int16_t ty, int16_t flag) {
         s_beam_fx_entry beam_fx_entries[16];
-        const uint32_t oracle_diagnostic_seed = game_random::Get_Random_Seed_();
-        const bool oracle_diagnostic_fire_ship = source_ship_idx == 5 &&
-            (oracle_diagnostic_seed == 507614600u ||
-             oracle_diagnostic_seed == 212618017u ||
-             oracle_diagnostic_seed == 1623604038u ||
-             oracle_diagnostic_seed == 949666055u ||
-             oracle_diagnostic_seed == 1394508340u ||
-             oracle_diagnostic_seed == 2548136029u ||
-             oracle_diagnostic_seed == 312133074u ||
-             oracle_diagnostic_seed == 1721263779u ||
-             oracle_diagnostic_seed == 3812330912u ||
-             oracle_diagnostic_seed == 255999321u ||
-             oracle_diagnostic_seed == 3116068126u ||
-             oracle_diagnostic_seed == 859884031u ||
-             oracle_diagnostic_seed == 2321277900u);
-        if (oracle_diagnostic_fire_ship) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                "oracle diagnostic: Fire_Ship entry seed=%u source=%d target=%d target_type=%d source_pos=%d,%d target_pos=%d,%d facing=%d slots=%d:%d:%d,%d:%d:%d,%d:%d:%d,%d:%d:%d",
-                (unsigned int)oracle_diagnostic_seed, (int)source_ship_idx,
-                (int)target_ship_idx, (int)flag,
-                (int)MOX::_combat_data[source_ship_idx].x,
-                (int)MOX::_combat_data[source_ship_idx].y,
-                flag == 0 ? (int)MOX::_combat_data[target_ship_idx].x : (int)(MOX::_missile[target_ship_idx].x / 20),
-                flag == 0 ? (int)MOX::_combat_data[target_ship_idx].y : (int)(MOX::_missile[target_ship_idx].y / 20),
-                (int)MOX::_combat_data[source_ship_idx].facing_dir,
-                (int)MOX::_combat_data[source_ship_idx].weapons[0].weapon_id,
-                (int)MOX::_combat_data[source_ship_idx].weapons[0].shots_left,
-                (int)MOX::_combat_data[source_ship_idx].weapons[0].active,
-                (int)MOX::_combat_data[source_ship_idx].weapons[1].weapon_id,
-                (int)MOX::_combat_data[source_ship_idx].weapons[1].shots_left,
-                (int)MOX::_combat_data[source_ship_idx].weapons[1].active,
-                (int)MOX::_combat_data[source_ship_idx].weapons[2].weapon_id,
-                (int)MOX::_combat_data[source_ship_idx].weapons[2].shots_left,
-                (int)MOX::_combat_data[source_ship_idx].weapons[2].active,
-                (int)MOX::_combat_data[source_ship_idx].weapons[3].weapon_id,
-                (int)MOX::_combat_data[source_ship_idx].weapons[3].shots_left,
-                (int)MOX::_combat_data[source_ship_idx].weapons[3].active);
-        }
         int16_t beam_hit_offset_y = 0;
         int16_t beam_hit_offset_x = 0;
         uint8_t target_arc_mask = 0;
@@ -1078,33 +1040,6 @@ namespace CMBTFIRE {
 
         Pre_Weapon_Specials_(source_ship_idx, target_ship_idx, flag);
 
-        if (oracle_diagnostic_fire_ship && flag == 1) {
-            const int16_t diagnostic_slot_idx = 1;
-            s_combat_weapon_slot* diagnostic_weapon =
-                &MOX::_combat_data[source_ship_idx].weapons[diagnostic_slot_idx];
-            const int16_t diagnostic_range =
-                CMBTAI::Range_To_Missile_(source_ship_idx, target_ship_idx);
-            const int16_t diagnostic_is_on =
-                COMBAT1::Weapon_Is_On_(source_ship_idx, diagnostic_slot_idx);
-            const int16_t diagnostic_in_range = CMBTFIRE::Weapon_In_Range_(
-                diagnostic_slot_idx, source_ship_idx, target_ship_idx, flag, 0);
-            const int16_t diagnostic_is_legal = CMBTFIRE::Target_Is_Legal_For_Weapon_(
-                diagnostic_weapon->weapon_id, diagnostic_weapon->specials,
-                target_ship_idx, flag);
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                "oracle diagnostic: Fire_Ship gate slot=%d weapon=%d type=%d arc_mask=%u weapon_arc=%u specials=0x%04x ammo=%d shots=%d status=%d active=%d range=%d on=%d in_range=%d legal=%d missile_type=%d missile_qty=%d missile_hits=%d",
-                (int)diagnostic_slot_idx, (int)diagnostic_weapon->weapon_id,
-                (int)TECHDATA::_weapons[diagnostic_weapon->weapon_id].type,
-                (unsigned int)target_arc_mask, (unsigned int)diagnostic_weapon->arc,
-                (unsigned int)diagnostic_weapon->specials, (int)diagnostic_weapon->ammo,
-                (int)diagnostic_weapon->shots_left, (int)diagnostic_weapon->status,
-                (int)diagnostic_weapon->active, (int)diagnostic_range,
-                (int)diagnostic_is_on, (int)diagnostic_in_range,
-                (int)diagnostic_is_legal, (int)MOX::_missile[target_ship_idx].type,
-                (int)MOX::_missile[target_ship_idx].quantity,
-                (int)MOX::_missile[target_ship_idx].hits_taken);
-        }
-
         if (flag != 1 && CMBTMOV1::Ship_Is_In_Stasis_(target_ship_idx) != 0) {
         } else {
             bool target_dead = false;
@@ -1120,15 +1055,7 @@ namespace CMBTFIRE {
 
             if (!target_dead) {
                 for (weapon_slot_idx = 0; weapon_slot_idx < 8; ++weapon_slot_idx) {
-                    const int16_t source_death_status = Is_Combat_Ship_Dead_(source_ship_idx);
-                    if (oracle_diagnostic_fire_ship && flag == 1) {
-                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                            "oracle diagnostic: Fire_Ship loop slot=%d target_dead=%d source_dead=%d target_qty=%d",
-                            (int)weapon_slot_idx, (int)target_death_status,
-                            (int)source_death_status,
-                            (int)MOX::_missile[target_ship_idx].quantity);
-                    }
-                    if (target_death_status != 0 || source_death_status != 0) {
+                    if (target_death_status != 0 || Is_Combat_Ship_Dead_(source_ship_idx) != 0) {
                         break;
                     }
 
@@ -1212,26 +1139,12 @@ namespace CMBTFIRE {
 
                                 continue_firing = 1;
                                 while (true) {
-                                    if (oracle_diagnostic_fire_ship && flag == 1) {
-                                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                                            "oracle diagnostic: Fire_Ship firing slot=%d weapon=%d type=%d shots=%d continue=%d source_dead=%d",
-                                            (int)weapon_slot_idx, (int)weapon->weapon_id,
-                                            (int)weapon_type_class, (int)weapon->shots_left,
-                                            (int)continue_firing,
-                                            (int)Is_Combat_Ship_Dead_(source_ship_idx));
-                                    }
                                     if (weapon->shots_left <= 0) break;
                                     if (continue_firing != 1) break;
                                     if (Is_Combat_Ship_Dead_(source_ship_idx) != 0) break;
 
                                     switch (weapon_type_class) {
                                         case WEAPON_TYPE_BEAM: {
-                                            if (oracle_diagnostic_fire_ship && flag == 1) {
-                                                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                                                    "oracle diagnostic: Fire_Ship calling Fire_Beam slot=%d weapon=%d seed=%u",
-                                                    (int)weapon_slot_idx, (int)weapon->weapon_id,
-                                                    (unsigned int)game_random::Get_Random_Seed_());
-                                            }
                                             int16_t fire_res = Fire_Beam_Weapon_(
                                                 source_ship_idx, target_ship_idx, weapon->weapon_id,
                                                 weapon->specials, flag, &beam_hit_offset_x, &beam_hit_offset_y, &primary_damage
@@ -1598,15 +1511,6 @@ namespace CMBTFIRE {
 
         for (int16_t loop_counter = 0; loop_counter < total_shots; ++loop_counter) {
             if (continue_firing == 0) break;
-
-            if (source == 5 && target == 5 && weapon_flags == 1 && weapon_id == 1) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-                    "oracle diagnostic: Fire_Beam roll seed=%u iteration=%d/%d continue=%d quantity=%d hits_taken=%d hit_total=%d",
-                    (unsigned int)game_random::Get_Random_Seed_(),
-                    (int)loop_counter, (int)total_shots, (int)continue_firing,
-                    (int)MOX::_missile[target].quantity,
-                    (int)MOX::_missile[target].hits_taken, (int)*hit_x);
-            }
 
             int roll = game_random::Random_(100);
             if ((weapon_flags_00 & 0x400) != 0) {
