@@ -1391,18 +1391,89 @@ namespace oracle {
             constexpr size_t pointer_offset = 198;
             constexpr size_t pointer_size = sizeof(uint32_t);
 
+            if (record.checkpoint_kind == k_tactical_turn_begin) {
+                // Tactical setup leaves these stale; Do_Combat_Turn_ replaces both before use.
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, current_ship), 0,
+                    sizeof(s_tactical_scalar_state::current_ship));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, current_pointer), 0,
+                    sizeof(s_tactical_scalar_state::current_pointer));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, auto_combat), 0,
+                    sizeof(s_tactical_scalar_state::auto_combat));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state,
+                        current_missile_count), 0,
+                    sizeof(s_tactical_scalar_state::current_missile_count));
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, start_of_turn), 0,
+                    sizeof(s_tactical_scalar_state::start_of_turn));
+            }
+
             size_t combat_offset = record.scalar_size;
+            size_t turn_order_offset = combat_offset +
+                record.combat_data_size + record.missile_data_size;
+            size_t combat_grid_offset = turn_order_offset +
+                record.turn_order_size;
             size_t global_offset = combat_offset +
                 record.combat_data_size +
                 record.missile_data_size +
                 record.turn_order_size +
                 record.combat_grid_size;
+            size_t tactical_arrays_offset = global_offset +
+                record.global_combat_data_size +
+                record.combat_bomb_result_size;
 
             if (payload->size() < global_offset +
                     record.global_combat_data_size ||
                 pointer_offset + pointer_size >
                     k_original_combat_data_size) {
                 return false;
+            }
+
+            if (record.checkpoint_kind == k_tactical_turn_begin) {
+                memset(payload->data() + turn_order_offset, 0,
+                    record.turn_order_size);
+                memset(payload->data() + combat_grid_offset, 0,
+                    record.combat_grid_size);
+                memset(payload->data() + tactical_arrays_offset, 0,
+                    sizeof(MOX::_side_end_of_turn) +
+                    sizeof(MOX::_player_mode));
+            }
+
+            s_tactical_scalar_state scalars;
+            memcpy(&scalars, payload->data(), sizeof(scalars));
+            const size_t player_mode_offset = tactical_arrays_offset +
+                sizeof(MOX::_side_end_of_turn);
+            for (size_t i = 0;
+                i < sizeof(MOX::_player_mode) / sizeof(MOX::_player_mode[0]);
+                ++i) {
+                if (i != static_cast<size_t>(
+                        scalars.combat_attacker_player) &&
+                    i != static_cast<size_t>(
+                        scalars.combat_defender_player)) {
+                    memset(payload->data() + player_mode_offset +
+                        i * sizeof(MOX::_player_mode[0]), 0,
+                        sizeof(MOX::_player_mode[0]));
+                }
+            }
+            const size_t ordnance_offset = tactical_arrays_offset +
+                sizeof(MOX::_side_end_of_turn) +
+                sizeof(MOX::_player_mode) +
+                sizeof(MOX::_auto_combat_flag);
+            for (size_t i = 0;
+                i < sizeof(MOX::_ordnance_bonus) /
+                    sizeof(MOX::_ordnance_bonus[0]);
+                ++i) {
+                if (i != static_cast<size_t>(
+                        scalars.combat_attacker_player) &&
+                    i != static_cast<size_t>(
+                        scalars.combat_defender_player)) {
+                    memset(payload->data() + ordnance_offset +
+                        i * sizeof(MOX::_ordnance_bonus[0]), 0,
+                        sizeof(MOX::_ordnance_bonus[0]));
+                }
             }
 
             for (int16_t i = 0;
@@ -1548,6 +1619,28 @@ namespace oracle {
                 ++difference;
             }
             if (difference != actual.size()) {
+                if (difference < sizeof(s_tactical_scalar_state)) {
+                    s_tactical_scalar_state expected_scalars;
+                    s_tactical_scalar_state actual_scalars;
+                    memcpy(&expected_scalars, expected_payload.data(),
+                        sizeof(expected_scalars));
+                    memcpy(&actual_scalars, actual.data(),
+                        sizeof(actual_scalars));
+                    const int16_t* expected_values =
+                        reinterpret_cast<const int16_t*>(&expected_scalars);
+                    const int16_t* actual_values =
+                        reinterpret_cast<const int16_t*>(&actual_scalars);
+                    for (size_t i = 0;
+                        i < sizeof(s_tactical_scalar_state) / sizeof(int16_t);
+                        ++i) {
+                        if (expected_values[i] != actual_values[i]) {
+                            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                                "oracle: tactical scalar word %zu differs: oracle=%d local=%d",
+                                i, (int)expected_values[i],
+                                (int)actual_values[i]);
+                        }
+                    }
+                }
                 size_t section_offset;
                 size_t element_index;
                 size_t element_offset;

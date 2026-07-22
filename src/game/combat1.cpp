@@ -235,6 +235,10 @@ namespace COMBAT1 {
             }
         }
 
+        if (order_idx == num_captured) {
+            return;
+        }
+
         if (order_idx != num_captured) {
             if (MOX::_combat_init != 0) {
                 qsort(MOX::_ship_turn_order, order_idx, sizeof(MOX::_ship_turn_order[0]), qsort_ship_initiative_);
@@ -248,6 +252,10 @@ namespace COMBAT1 {
             COMBAT1::_start_of_turn = 1;
             MOX::_cur_ptr = -1;
             int16_t next_ship_flag = Next_Ship_(active_player_id);
+
+            if (next_ship_flag == 1) {
+                return;
+            }
 
             if (next_ship_flag != 1) {
                 fields::Assign_Auto_Function_(CMBTDRW1::Draw_Main_Combat_Screen_, 2);
