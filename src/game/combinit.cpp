@@ -453,6 +453,8 @@ int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special
 }
 
 int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag) {
+    oracle::Begin_Tactical_Combat_();
+
     int8_t abort_tactical = 0;
     bool no_defender_ships = star_idx != MOX::_NUM_STARS;
     int16_t has_tractor_beam = 0;
@@ -1094,6 +1096,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
     }
 
+    oracle::Verify_Tactical_Combat_End_();
     End_Of_Combat_(star_idx, colony_pop, combat_winner);
 
     if (combat_winner == 1 || combat_winner == 0x29A) {
@@ -1645,15 +1648,17 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
             count_fg = 3;
         }
 
-        MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_fg;
-        MOX::_combat_data->weapons[weapon_index].count = (int8_t)count_fg;
-        MOX::_combat_data->weapons[weapon_index].arc = 0xf;
-        MOX::_combat_data->weapons[weapon_index].specials = 0;
-        MOX::_combat_data->weapons[weapon_index].ammo = 1;
-        MOX::_combat_data->weapons[weapon_index].active = 1;
-        MOX::_combat_data->weapons[weapon_index].status = 0;
-        MOX::_combat_data->weapons[weapon_index].shots_left = (int8_t)count_fg;
-        weapon_index++;
+        for (int i = 0; i < 2; ++i) {
+            MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_fg;
+            MOX::_combat_data->weapons[weapon_index].count = (int8_t)count_fg;
+            MOX::_combat_data->weapons[weapon_index].arc = 0xf;
+            MOX::_combat_data->weapons[weapon_index].specials = 0;
+            MOX::_combat_data->weapons[weapon_index].ammo = 1;
+            MOX::_combat_data->weapons[weapon_index].active = 1;
+            MOX::_combat_data->weapons[weapon_index].status = 0;
+            MOX::_combat_data->weapons[weapon_index].shots_left = (int8_t)count_fg;
+            weapon_index++;
+        }
     }
 
     if (MOX::_colony[colony_idx].buildings[BUILDING_STELLAR_CONVERTER] != 0) {

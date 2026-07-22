@@ -66,6 +66,7 @@ namespace oracle {
             uint32_t completed;
             uint32_t random_call_count;
             uint32_t random_seed_count;
+            uint32_t tactical_state_count;
         };
 
         struct s_random_record {
@@ -91,25 +92,91 @@ namespace oracle {
             uint32_t return_address_count;
             uint32_t return_addresses[10];
         };
+
+        struct s_tactical_scalar_state {
+            int16_t combat_attacker_count;
+            int16_t combat_defender_count;
+            int16_t combat_attacker_player;
+            int16_t combat_defender_player;
+            int16_t combat_turn;
+            int16_t current_ship;
+            int16_t current_pointer;
+            int16_t current_missile_count;
+            uint16_t combat_init;
+            uint16_t apply_damage_to_planet;
+            int16_t in_nebula_flag;
+            int16_t auto_combat;
+            int16_t take_control_flag;
+            uint8_t colony_defense_flags;
+            uint8_t real_attack_flag;
+            int16_t combat_colony_id;
+            uint16_t bio_weapon_flag;
+            int16_t ai_retreat_flag;
+            uint16_t start_of_turn;
+            int16_t fleet_target;
+        };
+
+        struct s_tactical_state_record {
+            uint32_t type;
+            uint32_t size;
+            uint32_t oracle_turn;
+            int32_t stardate;
+            uint32_t combat_instance;
+            uint32_t checkpoint_index;
+            uint32_t checkpoint_kind;
+            int16_t combat_turn;
+            int16_t combat_total_ship_count;
+            int16_t active_player_id;
+            int16_t time_warp_only;
+            uint32_t random_call_count;
+            uint32_t random_seed_count;
+            uint32_t random_seed;
+            uint32_t scalar_size;
+            uint32_t combat_data_size;
+            uint32_t missile_data_size;
+            uint32_t turn_order_size;
+            uint32_t combat_grid_size;
+            uint32_t global_combat_data_size;
+            uint32_t combat_bomb_result_size;
+            uint32_t tactical_arrays_size;
+            uint32_t colony_size;
+        };
 #pragma pack(pop)
 
         static_assert(sizeof(s_input_state) == 64, "oracle input state layout mismatch");
         static_assert(sizeof(s_log_header) == 100, "oracle log header layout mismatch");
         static_assert(sizeof(s_input_record) == 44, "oracle input record layout mismatch");
-        static_assert(sizeof(s_end_record) == 36, "oracle end record layout mismatch");
+        static_assert(sizeof(s_end_record) == 40, "oracle end record layout mismatch");
         static_assert(sizeof(s_random_record) == 76, "oracle random record layout mismatch");
         static_assert(sizeof(s_random_seed_record) == 68, "oracle random seed record layout mismatch");
+        static_assert(sizeof(s_tactical_scalar_state) == 38, "oracle tactical scalar layout mismatch");
+        static_assert(sizeof(s_tactical_state_record) == 84, "oracle tactical record layout mismatch");
 
         constexpr uint32_t k_log_magic = 0x4C43524F;
-        constexpr uint32_t k_log_version = 6;
+        constexpr uint32_t k_log_version = 7;
         constexpr uint32_t k_input_record_type = 1;
         constexpr uint32_t k_end_record_type = 2;
         constexpr uint32_t k_random_record_type = 3;
         constexpr uint32_t k_random_seed_record_type = 4;
+        constexpr uint32_t k_tactical_state_record_type = 5;
+        constexpr uint32_t k_tactical_turn_begin = 1;
+        constexpr uint32_t k_tactical_combat_end = 2;
         constexpr uint32_t k_mouse_input_type = 1;
         constexpr uint32_t k_key_input_type = 2;
         constexpr uint32_t k_return_address_capacity = 10;
         constexpr uintptr_t k_original_image_base = 0x00400000;
+        constexpr uint32_t k_original_combat_data_size = 313;
+        constexpr uint32_t k_original_missile_size = 26;
+        constexpr uint32_t k_combat_ship_capacity = 210;
+        constexpr uint32_t k_missile_capacity = 300;
+        constexpr uint32_t k_ship_turn_order_size = 210 * sizeof(int16_t);
+        constexpr uint32_t k_combat_grid_size = 81 * 68 * sizeof(int16_t);
+        constexpr uint32_t k_global_combat_data_size = 313;
+        constexpr uint32_t k_combat_bomb_result_size = 73;
+        constexpr uint32_t k_colony_size = 361;
+        constexpr uint32_t k_tactical_arrays_size =
+            15 * sizeof(int16_t) + 15 * sizeof(int8_t) + 2 * sizeof(int16_t) +
+            15 * sizeof(int16_t) + 9 * sizeof(int16_t) + 9 * sizeof(int16_t);
 
         enum e_prepare_result {
             PREPARE_READY,
@@ -129,6 +196,11 @@ namespace oracle {
             size_t element_size;
         };
 
+        struct s_tactical_state {
+            s_tactical_state_record record;
+            std::vector<uint8_t> payload;
+        };
+
         bool g_enabled;
         bool g_replay_active;
         uint32_t g_turn;
@@ -137,9 +209,14 @@ namespace oracle {
         std::vector<s_input_record> g_records;
         std::vector<s_random_record> g_random_records;
         std::vector<s_random_seed_record> g_random_seed_records;
+        std::vector<s_tactical_state> g_tactical_states;
         size_t g_record_index;
         size_t g_random_record_index;
         size_t g_random_seed_record_index;
+        size_t g_tactical_state_index;
+        uint32_t g_active_combat_instance;
+        int16_t g_last_verified_combat_turn;
+        bool g_tactical_combat_active;
         uint64_t g_last_consumption_counter;
         uint64_t g_click_pause_until_counter;
         uint32_t g_speed_percent;
@@ -333,7 +410,8 @@ namespace oracle {
         bool Read_Completed_Log_(uint32_t turn, s_log_header* header,
             std::vector<s_input_record>* records, std::vector<s_random_record>* random_records,
             std::vector<s_random_seed_record>* random_seed_records,
-            bool* exists, bool* completed) {
+            std::vector<s_tactical_state>* tactical_states, bool* exists,
+            bool* completed) {
             char path[1024];
             std::vector<uint8_t> data;
             *exists = false;
@@ -363,6 +441,7 @@ namespace oracle {
             records->clear();
             random_records->clear();
             random_seed_records->clear();
+            tactical_states->clear();
             size_t offset = header->size;
             bool saw_end = false;
             while (offset < data.size()) {
@@ -404,13 +483,101 @@ namespace oracle {
                         return false;
                     }
                     random_seed_records->push_back(record);
+                } else if (type == k_tactical_state_record_type &&
+                    size >= sizeof(s_tactical_state_record)) {
+                    s_tactical_state state;
+                    memcpy(&state.record, data.data() + offset, sizeof(state.record));
+
+                    const s_tactical_state_record& record = state.record;
+                    const bool valid_checkpoint_kind =
+                        record.checkpoint_kind == k_tactical_turn_begin ||
+                        record.checkpoint_kind == k_tactical_combat_end;
+                    const bool valid_colony_size =
+                        record.colony_size == 0 || record.colony_size == k_colony_size;
+
+                    uint64_t expected_size = sizeof(s_tactical_state_record);
+                    expected_size += record.scalar_size;
+                    expected_size += record.combat_data_size;
+                    expected_size += record.missile_data_size;
+                    expected_size += record.turn_order_size;
+                    expected_size += record.combat_grid_size;
+                    expected_size += record.global_combat_data_size;
+                    expected_size += record.combat_bomb_result_size;
+                    expected_size += record.tactical_arrays_size;
+                    expected_size += record.colony_size;
+
+                    if (record.oracle_turn != turn ||
+                        record.stardate != header->stardate ||
+                        record.combat_instance == 0 ||
+                        record.combat_total_ship_count < 0 ||
+                        record.combat_total_ship_count >
+                            static_cast<int16_t>(k_combat_ship_capacity) ||
+                        !valid_checkpoint_kind ||
+                        !valid_colony_size ||
+                        record.scalar_size != sizeof(s_tactical_scalar_state) ||
+                        record.combat_data_size !=
+                            static_cast<uint32_t>(record.combat_total_ship_count) *
+                                k_original_combat_data_size ||
+                        record.missile_data_size !=
+                            k_missile_capacity * k_original_missile_size ||
+                        record.turn_order_size != k_ship_turn_order_size ||
+                        record.combat_grid_size != k_combat_grid_size ||
+                        record.global_combat_data_size !=
+                            k_global_combat_data_size ||
+                        record.combat_bomb_result_size !=
+                            k_combat_bomb_result_size ||
+                        record.tactical_arrays_size != k_tactical_arrays_size ||
+                        expected_size != size ||
+                        record.random_call_count != random_records->size() ||
+                        record.random_seed_count != random_seed_records->size()) {
+                        return false;
+                    }
+
+                    if (tactical_states->empty()) {
+                        if (record.combat_instance != 1 ||
+                            record.checkpoint_index != 0) {
+                            return false;
+                        }
+                    } else {
+                        const s_tactical_state_record& previous =
+                            tactical_states->back().record;
+                        if (record.combat_instance == previous.combat_instance) {
+                            if (previous.checkpoint_kind ==
+                                    k_tactical_combat_end ||
+                                record.checkpoint_index !=
+                                    previous.checkpoint_index + 1) {
+                                return false;
+                            }
+                        } else if (record.combat_instance !=
+                                previous.combat_instance + 1 ||
+                            record.checkpoint_index != 0 ||
+                            previous.checkpoint_kind !=
+                                k_tactical_combat_end) {
+                            return false;
+                        }
+                    }
+
+                    const size_t payload_offset =
+                        offset + sizeof(s_tactical_state_record);
+                    state.payload.resize(
+                        size - sizeof(s_tactical_state_record));
+                    if (!state.payload.empty()) {
+                        memcpy(state.payload.data(),
+                            data.data() + payload_offset,
+                            state.payload.size());
+                    }
+                    tactical_states->push_back(std::move(state));
                 } else if (header->version == k_log_version && type == k_end_record_type &&
                     size == sizeof(s_end_record)) {
                     s_end_record end_record;
                     memcpy(&end_record, data.data() + offset, sizeof(end_record));
                     if (end_record.oracle_turn != turn ||
                         end_record.random_call_count != random_records->size() ||
-                        end_record.random_seed_count != random_seed_records->size()) {
+                        end_record.random_seed_count != random_seed_records->size() ||
+                        end_record.tactical_state_count != tactical_states->size() ||
+                        (!tactical_states->empty() &&
+                            tactical_states->back().record.checkpoint_kind !=
+                                k_tactical_combat_end)) {
                         return false;
                     }
                     saw_end = true;
@@ -441,8 +608,10 @@ namespace oracle {
             std::vector<s_input_record> records;
             std::vector<s_random_record> random_records;
             std::vector<s_random_seed_record> random_seed_records;
-            if (!Read_Completed_Log_(turn, &header, &records, &random_records, &random_seed_records,
-                    &log_exists, &completed)) {
+            std::vector<s_tactical_state> tactical_states;
+            if (!Read_Completed_Log_(turn, &header, &records, &random_records,
+                    &random_seed_records, &tactical_states, &log_exists,
+                    &completed)) {
                 return PREPARE_ERROR;
             }
             if (!log_exists || !completed) {
@@ -472,9 +641,15 @@ namespace oracle {
             g_records.swap(records);
             g_random_records.swap(random_records);
             g_random_seed_records.swap(random_seed_records);
+            g_tactical_states.swap(tactical_states);
             g_record_index = 0;
             g_random_record_index = 0;
             g_random_seed_record_index = 0;
+            g_tactical_state_index = 0;
+            g_active_combat_instance = 0;
+            g_last_verified_combat_turn =
+                std::numeric_limits<int16_t>::min();
+            g_tactical_combat_active = false;
             g_replay_active = true;
             Restore_Input_State_();
             g_last_consumption_counter = defer_clock_until_first_poll ? 0 : SDL_GetPerformanceCounter();
@@ -484,9 +659,9 @@ namespace oracle {
             g_replay_mouse_buttons = (uint16_t)header.input_state.mouse_buttons;
 
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-                "oracle: replaying turn %u, stardate %d, %zu input events, %zu random calls, and %zu random seed calls at %u%% speed with %u ms added per event and %u ms after clicks",
+                "oracle: replaying turn %u, stardate %d, %zu input events, %zu random calls, %zu random seed calls, and %zu tactical states at %u%% speed with %u ms added per event and %u ms after clicks",
                 turn, header.stardate, g_records.size(), g_random_records.size(),
-                g_random_seed_records.size(),
+                g_random_seed_records.size(), g_tactical_states.size(),
                 g_speed_percent, g_delay_ms, g_click_delay_ms);
             return PREPARE_READY;
         }
@@ -1065,6 +1240,302 @@ namespace oracle {
             return false;
         }
 
+        template <typename T>
+        void Append_Tactical_Value_(std::vector<uint8_t>* output,
+            const T& value) {
+            const size_t offset = output->size();
+            output->resize(offset + sizeof(value));
+            memcpy(output->data() + offset, &value, sizeof(value));
+        }
+
+        void Append_Tactical_Bytes_(std::vector<uint8_t>* output,
+            const void* data, size_t size) {
+            const size_t offset = output->size();
+            output->resize(offset + size);
+            if (size != 0) {
+                memcpy(output->data() + offset, data, size);
+            }
+        }
+
+        bool Capture_Tactical_State_(std::vector<uint8_t>* output) {
+#if UINTPTR_MAX != UINT32_MAX
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: tactical state replay requires a 32-bit build");
+            return false;
+#else
+            static_assert(sizeof(s_combat_data) ==
+                k_original_combat_data_size);
+            static_assert(sizeof(s_missile) == k_original_missile_size);
+            static_assert(sizeof(s_colony) == k_colony_size);
+            static_assert(sizeof(s_combat_bomb_result) ==
+                k_combat_bomb_result_size);
+            static_assert(offsetof(s_combat_data, ship_image_seg) == 198);
+
+            if (MOX::_combat_total_ship_count < 0 ||
+                MOX::_combat_total_ship_count >
+                    static_cast<int16_t>(k_combat_ship_capacity) ||
+                MOX::_combat_data == nullptr || MOX::_missile == nullptr) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: invalid local tactical state, ships=%d combat=%p missiles=%p",
+                    static_cast<int>(MOX::_combat_total_ship_count),
+                    static_cast<void*>(MOX::_combat_data),
+                    static_cast<void*>(MOX::_missile));
+                return false;
+            }
+
+            const s_tactical_scalar_state scalars = {
+                MOX::_combat_attacker_count,
+                MOX::_combat_defender_count,
+                MOX::_combat_attacker_player,
+                MOX::_combat_defender_player,
+                MOX::_combat_turn,
+                MOX::_cur_ship,
+                MOX::_cur_ptr,
+                MOX::_cur_missile_count,
+                MOX::_combat_init,
+                MOX::_apply_damage_to_planet,
+                MOX::_in_nebula_flag,
+                MOX::_auto_combat,
+                MOX::_take_control_flag,
+                MOX::_colony_defense_flags,
+                COMBINIT::_real_attack_flag,
+                MOX::_cmbt_colony_id,
+                static_cast<uint16_t>(MOX::_bio_weapon_flag),
+                MOX::_ai_retreat_flag,
+                COMBAT1::_start_of_turn,
+                CMBTAI::_fleet_target
+            };
+
+            output->clear();
+            Append_Tactical_Value_(output, scalars);
+            Append_Tactical_Bytes_(output, MOX::_combat_data,
+                static_cast<size_t>(MOX::_combat_total_ship_count) *
+                    sizeof(s_combat_data));
+            Append_Tactical_Bytes_(output, MOX::_missile,
+                k_missile_capacity * sizeof(s_missile));
+            Append_Tactical_Bytes_(output, MOX::_ship_turn_order,
+                sizeof(MOX::_ship_turn_order));
+            Append_Tactical_Bytes_(output, MOX::_combat_grid,
+                sizeof(MOX::_combat_grid));
+            Append_Tactical_Value_(output, MOX::_global_combat_data);
+            Append_Tactical_Value_(output, MOX::_combat_bomb_result);
+            Append_Tactical_Bytes_(output, MOX::_side_end_of_turn,
+                sizeof(MOX::_side_end_of_turn));
+            Append_Tactical_Bytes_(output, MOX::_player_mode,
+                sizeof(MOX::_player_mode));
+            Append_Tactical_Bytes_(output, MOX::_auto_combat_flag,
+                sizeof(MOX::_auto_combat_flag));
+            Append_Tactical_Bytes_(output, MOX::_ordnance_bonus,
+                sizeof(MOX::_ordnance_bonus));
+            Append_Tactical_Bytes_(output, MOX::_ranged_damage_penalty,
+                sizeof(MOX::_ranged_damage_penalty));
+            Append_Tactical_Bytes_(output, MOX::_ranged_to_hit_penalty,
+                sizeof(MOX::_ranged_to_hit_penalty));
+
+            if (MOX::_cmbt_colony_id >= 0) {
+                if (MOX::_colony == nullptr ||
+                    MOX::_cmbt_colony_id >= MAX_COLONIES) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: invalid tactical colony index %d",
+                        static_cast<int>(MOX::_cmbt_colony_id));
+                    return false;
+                }
+                Append_Tactical_Value_(output,
+                    MOX::_colony[MOX::_cmbt_colony_id]);
+            }
+            return true;
+#endif
+        }
+
+        bool Normalize_Tactical_State_(std::vector<uint8_t>* payload,
+            const s_tactical_state_record& record) {
+            constexpr size_t pointer_offset = 198;
+            constexpr size_t pointer_size = sizeof(uint32_t);
+
+            size_t combat_offset = record.scalar_size;
+            size_t global_offset = combat_offset +
+                record.combat_data_size +
+                record.missile_data_size +
+                record.turn_order_size +
+                record.combat_grid_size;
+
+            if (payload->size() < global_offset +
+                    record.global_combat_data_size ||
+                pointer_offset + pointer_size >
+                    k_original_combat_data_size) {
+                return false;
+            }
+
+            for (int16_t i = 0;
+                i < record.combat_total_ship_count; ++i) {
+                const size_t offset = combat_offset +
+                    static_cast<size_t>(i) *
+                        k_original_combat_data_size +
+                    pointer_offset;
+                memset(payload->data() + offset, 0, pointer_size);
+            }
+
+            memset(payload->data() + global_offset + pointer_offset,
+                0, pointer_size);
+            return true;
+        }
+
+        const char* Describe_Tactical_Offset_(
+            const s_tactical_state_record& record, size_t difference,
+            size_t* section_offset, size_t* element_index,
+            size_t* element_offset) {
+            struct s_section {
+                const char* name;
+                size_t size;
+                size_t element_size;
+            };
+
+            const s_section sections[] = {
+                {"scalars", record.scalar_size, record.scalar_size},
+                {"combat ships", record.combat_data_size,
+                    k_original_combat_data_size},
+                {"missiles", record.missile_data_size,
+                    k_original_missile_size},
+                {"turn order", record.turn_order_size, sizeof(int16_t)},
+                {"combat grid", record.combat_grid_size, sizeof(int16_t)},
+                {"global combat data", record.global_combat_data_size,
+                    k_original_combat_data_size},
+                {"combat bomb result", record.combat_bomb_result_size,
+                    record.combat_bomb_result_size},
+                {"tactical arrays", record.tactical_arrays_size, 1},
+                {"colony", record.colony_size,
+                    record.colony_size == 0 ? 1 : record.colony_size},
+            };
+
+            size_t start = 0;
+            for (const s_section& section : sections) {
+                if (difference < start + section.size) {
+                    *section_offset = difference - start;
+                    *element_index =
+                        *section_offset / section.element_size;
+                    *element_offset =
+                        *section_offset % section.element_size;
+                    return section.name;
+                }
+                start += section.size;
+            }
+
+            *section_offset = difference;
+            *element_index = 0;
+            *element_offset = difference;
+            return "unknown";
+        }
+
+        bool Verify_Tactical_State_(uint32_t checkpoint_kind,
+            int16_t active_player_id, int16_t time_warp_only) {
+            if (g_tactical_state_index >= g_tactical_states.size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: unexpected tactical checkpoint in strategic turn %u, combat %u, tactical turn %d",
+                    g_turn, g_active_combat_instance,
+                    static_cast<int>(MOX::_combat_turn));
+                return false;
+            }
+
+            const s_tactical_state& expected_state =
+                g_tactical_states[g_tactical_state_index];
+            const s_tactical_state_record& expected =
+                expected_state.record;
+
+            if (expected.checkpoint_kind != checkpoint_kind ||
+                expected.combat_instance != g_active_combat_instance ||
+                expected.combat_turn != MOX::_combat_turn ||
+                expected.combat_total_ship_count !=
+                    MOX::_combat_total_ship_count ||
+                expected.random_call_count != g_random_record_index ||
+                expected.random_seed_count !=
+                    g_random_seed_record_index ||
+                expected.random_seed !=
+                    game_random::Get_Random_Seed_() ||
+                (checkpoint_kind == k_tactical_turn_begin &&
+                    (expected.active_player_id != active_player_id ||
+                     expected.time_warp_only != time_warp_only))) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: tactical checkpoint #%zu metadata mismatch: oracle kind=%u combat=%u turn=%d ships=%d phase=%d/%d rng=%u/%u seed=%u; local kind=%u combat=%u turn=%d ships=%d phase=%d/%d rng=%zu/%zu seed=%u",
+                    g_tactical_state_index,
+                    expected.checkpoint_kind,
+                    expected.combat_instance,
+                    static_cast<int>(expected.combat_turn),
+                    static_cast<int>(
+                        expected.combat_total_ship_count),
+                    static_cast<int>(expected.active_player_id),
+                    static_cast<int>(expected.time_warp_only),
+                    expected.random_call_count,
+                    expected.random_seed_count,
+                    expected.random_seed,
+                    checkpoint_kind,
+                    g_active_combat_instance,
+                    static_cast<int>(MOX::_combat_turn),
+                    static_cast<int>(MOX::_combat_total_ship_count),
+                    static_cast<int>(active_player_id),
+                    static_cast<int>(time_warp_only),
+                    g_random_record_index,
+                    g_random_seed_record_index,
+                    game_random::Get_Random_Seed_());
+                return false;
+            }
+
+            std::vector<uint8_t> actual;
+            if (!Capture_Tactical_State_(&actual)) {
+                return false;
+            }
+
+            std::vector<uint8_t> expected_payload =
+                expected_state.payload;
+            if (actual.size() != expected_payload.size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: tactical checkpoint #%zu payload size mismatch: oracle=%zu local=%zu",
+                    g_tactical_state_index, expected_payload.size(),
+                    actual.size());
+                return false;
+            }
+
+            if (!Normalize_Tactical_State_(&expected_payload,
+                    expected) ||
+                !Normalize_Tactical_State_(&actual, expected)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: tactical checkpoint #%zu could not be normalized",
+                    g_tactical_state_index);
+                return false;
+            }
+
+            size_t difference = 0;
+            while (difference < actual.size() &&
+                actual[difference] == expected_payload[difference]) {
+                ++difference;
+            }
+            if (difference != actual.size()) {
+                size_t section_offset;
+                size_t element_index;
+                size_t element_offset;
+                const char* section = Describe_Tactical_Offset_(
+                    expected, difference, &section_offset,
+                    &element_index, &element_offset);
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: tactical checkpoint #%zu differs at payload offset %zu (%s +%zu, element %zu +%zu): oracle=%u local=%u; combat=%u turn=%d",
+                    g_tactical_state_index, difference, section,
+                    section_offset, element_index, element_offset,
+                    static_cast<unsigned>(
+                        expected_payload[difference]),
+                    static_cast<unsigned>(actual[difference]),
+                    expected.combat_instance,
+                    static_cast<int>(expected.combat_turn));
+                return false;
+            }
+
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: tactical checkpoint #%zu matches, combat=%u turn=%d kind=%u, %zu bytes",
+                g_tactical_state_index, expected.combat_instance,
+                static_cast<int>(expected.combat_turn),
+                expected.checkpoint_kind, actual.size());
+            ++g_tactical_state_index;
+            return true;
+        }
+
         bool Fail_(const char* message) {
             g_replay_active = false;
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "oracle: %s", message);
@@ -1103,6 +1574,66 @@ namespace oracle {
                 }
             }
         }
+    }
+
+    void Begin_Tactical_Combat_() {
+        if (!g_replay_active) {
+            return;
+        }
+
+        if (g_tactical_combat_active) {
+            Fail_("Nested tactical combat encountered during oracle replay.");
+            throw platform::process_exit_requested{};
+        }
+
+        ++g_active_combat_instance;
+        g_last_verified_combat_turn =
+            std::numeric_limits<int16_t>::min();
+        g_tactical_combat_active = true;
+
+        if (g_tactical_state_index >= g_tactical_states.size() ||
+            g_tactical_states[g_tactical_state_index]
+                    .record.combat_instance !=
+                g_active_combat_instance) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: unexpected tactical combat %u in strategic turn %u",
+                g_active_combat_instance, g_turn);
+            Fail_("Oracle tactical combat sequence mismatch.");
+            throw platform::process_exit_requested{};
+        }
+    }
+
+    void Verify_Tactical_Turn_(int16_t active_player_id,
+        int16_t time_warp_only) {
+        if (!g_replay_active) {
+            return;
+        }
+        if (!g_tactical_combat_active) {
+            Fail_("Tactical turn encountered outside tactical combat.");
+            throw platform::process_exit_requested{};
+        }
+        if (MOX::_combat_turn == g_last_verified_combat_turn) {
+            return;
+        }
+
+        if (!Verify_Tactical_State_(k_tactical_turn_begin,
+                active_player_id, time_warp_only)) {
+            Fail_("Oracle tactical turn state mismatch.");
+            throw platform::process_exit_requested{};
+        }
+        g_last_verified_combat_turn = MOX::_combat_turn;
+    }
+
+    void Verify_Tactical_Combat_End_() {
+        if (!g_replay_active) {
+            return;
+        }
+        if (!g_tactical_combat_active ||
+            !Verify_Tactical_State_(k_tactical_combat_end, 0, 0)) {
+            Fail_("Oracle tactical combat final state mismatch.");
+            throw platform::process_exit_requested{};
+        }
+        g_tactical_combat_active = false;
     }
 
     bool Configure_(int argc, char** argv) {
@@ -1315,6 +1846,16 @@ namespace oracle {
                 g_random_seed_record_index, expected.random_seed);
             Log_Original_Return_Addresses_(expected);
             Fail_("Oracle random-seed call count mismatch. See the game log.");
+            throw platform::process_exit_requested{};
+        }
+        if (g_tactical_combat_active ||
+            g_tactical_state_index != g_tactical_states.size()) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: strategic turn %u ended after %zu of %zu tactical checkpoints; combat active=%d",
+                g_turn, g_tactical_state_index,
+                g_tactical_states.size(),
+                g_tactical_combat_active ? 1 : 0);
+            Fail_("Oracle tactical checkpoint count mismatch.");
             throw platform::process_exit_requested{};
         }
         if (g_record_index != g_records.size()) {

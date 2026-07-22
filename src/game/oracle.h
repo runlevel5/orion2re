@@ -16,6 +16,16 @@ namespace oracle {
         const uintptr_t* return_addresses, uint32_t return_address_count,
         uintptr_t image_base);
 
+    // Starts one tactical-combat checkpoint sequence.
+    void Begin_Tactical_Combat_();
+
+    // Verifies the first Do_Combat_Turn_ call for each tactical turn.
+    void Verify_Tactical_Turn_(int16_t active_player_id,
+        int16_t time_warp_only);
+
+    // Verifies tactical state immediately before End_Of_Combat_ changes it.
+    void Verify_Tactical_Combat_End_();
+
     // Loads the requested turn and prepares replay after normal game initialization.
     bool Start_();
 
