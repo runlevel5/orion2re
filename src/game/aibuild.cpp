@@ -937,7 +937,7 @@ namespace AIBUILD {
 
         Find_Buildable_Buildings_(colony, weights);
 
-        for (int16_t i = BUILDING_NO_BUILDING; i < BUILDING_COUNT; ++i) {
+        for (int16_t i = BUILDING_ASTRO_UNIVERSITY; i < BUILDING_COUNT; ++i) {
             if (weights[i] > 0) {
                 int16_t score = Colony_Building_Score_(colony, i);
                 weights[i] = score;
