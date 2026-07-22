@@ -75,6 +75,7 @@ namespace {
 namespace game_random {
     uint32_t _random_seed;
     uint32_t _saved_random_seed;
+    uint32_t _oracle_ignore_depth;
 
     uint32_t __cdecl Get_Random_Seed_() {
         return _random_seed;
@@ -85,8 +86,18 @@ namespace game_random {
     }
 
     uint32_t __cdecl Set_Random_Seed_(uint32_t seed) {
-        _random_seed = seed;
-        return seed;
+        if (_oracle_ignore_depth != 0) {
+            _random_seed = seed;
+            return seed;
+        }
+
+        uintptr_t return_addresses[k_return_address_capacity] = {};
+        const s_local_image image = Local_Image_();
+        const uint32_t return_address_count = Capture_Return_Addresses_(
+            return_addresses, image);
+        _random_seed = oracle::Replay_Random_Seed_(seed, return_addresses,
+            return_address_count, image.base);
+        return _random_seed;
     }
 
     uint32_t __cdecl Randomize_() {
@@ -106,6 +117,10 @@ namespace game_random {
         _random_seed = seed;
         const uint32_t value = (seed / quotient) + 1;
 
+        if (_oracle_ignore_depth != 0) {
+            return value;
+        }
+
         uintptr_t return_addresses[k_return_address_capacity] = {};
         const s_local_image image = Local_Image_();
         const uint32_t return_address_count = Capture_Return_Addresses_(
@@ -113,6 +128,14 @@ namespace game_random {
         oracle::Verify_Random_(max_val, value, seed, return_addresses,
             return_address_count, image.base);
         return value;
+    }
+
+    void Begin_Oracle_Ignore_() {
+        ++_oracle_ignore_depth;
+    }
+
+    void End_Oracle_Ignore_() {
+        --_oracle_ignore_depth;
     }
 
     void __cdecl Restore_Random_Seed_() {

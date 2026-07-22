@@ -1271,6 +1271,17 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
         }
 
         if (num_possible_moves > 0) {
+            if (game_random::Get_Random_Seed_() == 2321277900u) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle diagnostic: Auto_Move divergence ship=%d owner=%d target=%d target_type=%d ship_pos=%d,%d target_pos=%d,%d mode=%d tactic=%d movement=%d dist=%d score=%d candidates=%d first=%d,%d",
+                    (int)cur_ship_idx, (int)cur_ship->owner, (int)target_idx,
+                    (int)cur_ship->target_type_flag, (int)cur_ship->x, (int)cur_ship->y,
+                    (int)target_x, (int)target_y,
+                    (int)MOX::_player_mode[cur_ship->owner],
+                    (int)cur_ship->ai_range_tactic, (int)cur_ship->movement_left,
+                    (int)dist, (int)score_limit, (int)num_possible_moves,
+                    (int)move_x_coords[0], (int)move_y_coords[0]);
+            }
             int rnd_idx = game_random::Random_((int)num_possible_moves) - 1;
             int16_t mx = move_x_coords[rnd_idx];
             int16_t my = move_y_coords[rnd_idx];
@@ -1657,6 +1668,22 @@ int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t reference_target_i
         missile_target = Get_Current_Missile_Target_(ship_idx, &missile_score);
         ship_target = Get_Current_Ship_Target_(ship_idx, -1, &ship_score);
 
+        const uint32_t diagnostic_seed = game_random::Get_Random_Seed_();
+        if (ship_idx == 5 && diagnostic_seed >= 1394508340u &&
+            diagnostic_seed != 1623604038u && diagnostic_seed != 1721263779u) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle diagnostic: retarget seed=%u branch=ai mode=%d ship=%d:%d missile=%d:%d target_type=%d slots1=%d:%d:%d slots2=%d:%d:%d",
+                (unsigned int)diagnostic_seed, (int)MOX::_player_mode[owner_idx],
+                (int)ship_target, (int)ship_score, (int)missile_target,
+                (int)missile_score, (int)MOX::_combat_data[ship_idx].target_type_flag,
+                (int)MOX::_combat_data[ship_idx].weapons[1].active,
+                (int)MOX::_combat_data[ship_idx].weapons[1].shots_left,
+                (int)MOX::_combat_data[ship_idx].weapons[1].weapon_id,
+                (int)MOX::_combat_data[ship_idx].weapons[2].active,
+                (int)MOX::_combat_data[ship_idx].weapons[2].shots_left,
+                (int)MOX::_combat_data[ship_idx].weapons[2].weapon_id);
+        }
+
         if (ship_score / 2 > missile_score) {
             MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_SHIP;
             return ship_target;
@@ -1668,6 +1695,24 @@ int16_t __cdecl Get_Current_Target_(int16_t ship_idx, int16_t reference_target_i
         // Human/Manual Logic
         ship_target = Get_Current_Ship_Target_(ship_idx, reference_target_idx, &ship_score);
         missile_target = Get_Current_Missile_Target_(ship_idx, &missile_score);
+
+        const uint32_t diagnostic_seed = game_random::Get_Random_Seed_();
+        if (ship_idx == 5 &&
+            (diagnostic_seed == 507614600u || diagnostic_seed == 949666055u ||
+             (diagnostic_seed >= 1394508340u &&
+              diagnostic_seed != 1623604038u && diagnostic_seed != 1721263779u))) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle diagnostic: retarget seed=%u branch=manual mode=%d ship=%d:%d missile=%d:%d target_type=%d slots1=%d:%d:%d slots2=%d:%d:%d",
+                (unsigned int)diagnostic_seed, (int)MOX::_player_mode[owner_idx],
+                (int)ship_target, (int)ship_score, (int)missile_target,
+                (int)missile_score, (int)MOX::_combat_data[ship_idx].target_type_flag,
+                (int)MOX::_combat_data[ship_idx].weapons[1].active,
+                (int)MOX::_combat_data[ship_idx].weapons[1].shots_left,
+                (int)MOX::_combat_data[ship_idx].weapons[1].weapon_id,
+                (int)MOX::_combat_data[ship_idx].weapons[2].active,
+                (int)MOX::_combat_data[ship_idx].weapons[2].shots_left,
+                (int)MOX::_combat_data[ship_idx].weapons[2].weapon_id);
+        }
 
         if (missile_score / 2 > ship_score) {
             MOX::_combat_data[ship_idx].target_type_flag = TARGET_TYPE_MISSILE;
@@ -1694,6 +1739,17 @@ int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out
                     int8_t weapon_type_class = TECHDATA::_weapons[missile->type].type;
                     if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_FIGHTER) {
                         int32_t current_value = CMBTAI::Target_Missile_Value_(unit_idx, i, 1);
+                        if (unit_idx == 5 &&
+                            (game_random::Get_Random_Seed_() == 507614600u ||
+                             game_random::Get_Random_Seed_() == 949666055u)) {
+                            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                                "oracle diagnostic: missile candidate index=%d type=%d source=%d source_owner=%d target=%d quantity=%d hits=%d value=%d",
+                                (int)i, (int)missile->type,
+                                (int)missile->source_unit_idx,
+                                (int)MOX::_combat_data[missile->source_unit_idx].owner,
+                                (int)missile->target_unit_idx, (int)missile->quantity,
+                                (int)missile->hits_taken, (int)current_value);
+                        }
                         if (best_value < current_value) {
                             best_missile_idx = i;
                             best_value = current_value;
@@ -1781,6 +1837,19 @@ int16_t __cdecl Get_Current_Ship_Target_(int16_t current_ship_idx, int16_t refer
     int16_t start_idx = (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() == 0) ? 1 : 0;
 
     for (int16_t target_idx = start_idx; target_idx < MOX::_combat_total_ship_count; ++target_idx) {
+        const bool oracle_diagnostic_ship_eligibility = current_ship_idx == 5 &&
+            game_random::Get_Random_Seed_() == 949666055u;
+        if (oracle_diagnostic_ship_eligibility) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle diagnostic: ship eligibility target=%d owner=%d status=%d captured=%d special=%d stasis=%d pos=%d,%d",
+                (int)target_idx, (int)MOX::_combat_data[target_idx].owner,
+                (int)MOX::_combat_data[target_idx].unit_status,
+                (int)MOX::_combat_data[target_idx].is_captured,
+                (int)MOX::_combat_data[target_idx].special_status_flag,
+                (int)CMBTMOV1::Ship_Is_In_Stasis_(target_idx),
+                (int)MOX::_combat_data[target_idx].x,
+                (int)MOX::_combat_data[target_idx].y);
+        }
         if (MOX::_combat_data[target_idx].unit_status == 0 &&
             MOX::_combat_data[current_ship_idx].owner != MOX::_combat_data[target_idx].owner &&
             MOX::_combat_data[target_idx].special_status_flag != 4 &&
@@ -1796,6 +1865,19 @@ int16_t __cdecl Get_Current_Ship_Target_(int16_t current_ship_idx, int16_t refer
                     int8_t arc_mask = CMBTDRW1::Get_Weapon_Arc_(bearing);
                     
                     int8_t weapon_type_class = TECHDATA::_weapons[weapon->weapon_id].type;
+
+                    if (oracle_diagnostic_ship_eligibility) {
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                            "oracle diagnostic: ship weapon target=%d slot=%d weapon=%d type=%d specials=0x%04x active=%d on=%d shots=%d arc_mask=%d weapon_arc=%d ammo=%d in_range=%d",
+                            (int)target_idx, (int)weapon_idx, (int)weapon->weapon_id,
+                            (int)weapon_type_class, (unsigned int)weapon->specials,
+                            (int)weapon->active,
+                            (int)COMBAT1::Weapon_Is_On_(current_ship_idx, weapon_idx),
+                            (int)weapon->shots_left, (int)arc_mask, (int)weapon->arc,
+                            (int)weapon->ammo,
+                            (int)CMBTFIRE::Weapon_In_Range_(weapon_idx,
+                                current_ship_idx, target_idx, 0, 0));
+                    }
                     
                     if (COMBAT1::Weapon_Is_On_(current_ship_idx, weapon_idx) != 0) {
                         if (weapon->shots_left > 0) {
@@ -1822,6 +1904,18 @@ int16_t __cdecl Get_Current_Ship_Target_(int16_t current_ship_idx, int16_t refer
             
             if (weapon_found) {
                 int32_t value = CMBTAI::Target_Ship_Value_(current_ship_idx, target_idx, 1);
+
+                if (current_ship_idx == 5 &&
+                    (game_random::Get_Random_Seed_() == 507614600u ||
+                     game_random::Get_Random_Seed_() == 949666055u)) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle diagnostic: ship candidate index=%d owner=%d pos=%d,%d shields=%d hits=%d value=%d",
+                        (int)target_idx, (int)MOX::_combat_data[target_idx].owner,
+                        (int)MOX::_combat_data[target_idx].x,
+                        (int)MOX::_combat_data[target_idx].y,
+                        (int)MOX::_combat_data[target_idx].shield_current_hits,
+                        (int)CMBTAI::Get_Total_Hits_(target_idx), (int)value);
+                }
                 
                 if (target_idx == reference_target_idx && value > 0) {
                     if (value <= 6000) {
@@ -2025,25 +2119,19 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     int16_t weapon_damage;
     int16_t missile_type = missile->type;
     if (TECHDATA::_weapons[missile_type].type == WEAPON_TYPE_FIGHTER) {
-        int16_t source_owner = MOX::_combat_data[missile->source_unit_idx].owner;
+        // The original indexes fighter loadouts by the owner evaluating the threat,
+        // not by the owner of the fighter's source unit.
+        int16_t unit_owner = MOX::_combat_data[unit_idx].owner;
         switch (missile_type) {
             case WEAPON_ASSAULT_SHUTTLE:
                 weapon_damage = 100;
                 break;
             case WEAPON_HEAVY_FIGHTER:
             case WEAPON_BOMBER:
-                if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
-                    weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[source_owner]].max_damage;
-                } else {
-                    weapon_damage = 0;
-                }
+                weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[unit_owner]].max_damage;
                 break;
             case WEAPON_INTERCEPTOR:
-                if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
-                    weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[source_owner]].max_damage;
-                } else {
-                    weapon_damage = 0;
-                }
+                weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[unit_owner]].max_damage;
                 break;
             default:
                 weapon_damage = 0;
@@ -2076,6 +2164,20 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
 
     if (!Will_Missile_Do_Damage_(missile->target_unit_idx, m_idx)) {
         final_value = -10000;
+    }
+
+    if (unit_idx == 5 && m_idx == 5 &&
+        (game_random::Get_Random_Seed_() == 507614600u ||
+         game_random::Get_Random_Seed_() == 949666055u)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+            "oracle diagnostic: missile score components missile=%d type=%d quantity=%d hits_taken=%d pd_damage=%d hits_to_kill=%d effective_hits=%d weapon_damage=%d shield_blocked=%d target=%d target_damageable=%d value=%d",
+            (int)m_idx, (int)missile_type, (int)missile->quantity,
+            (int)missile->hits_taken, (int)total_expected_pd_damage,
+            (int)hits_to_kill, (int)effective_missile_hits,
+            (int)weapon_damage, (int)shield_blocked,
+            (int)missile->target_unit_idx,
+            (int)Will_Missile_Do_Damage_(missile->target_unit_idx, m_idx),
+            (int)final_value);
     }
 
     return final_value;

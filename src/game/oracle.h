@@ -11,6 +11,11 @@ namespace oracle {
         const uintptr_t* return_addresses, uint32_t return_address_count,
         uintptr_t image_base);
 
+    // Replaces an explicit local RNG seed with the seed captured from the original game.
+    uint32_t Replay_Random_Seed_(uint32_t local_seed,
+        const uintptr_t* return_addresses, uint32_t return_address_count,
+        uintptr_t image_base);
+
     // Loads the requested turn and prepares replay after normal game initialization.
     bool Start_();
 
