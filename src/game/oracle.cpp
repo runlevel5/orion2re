@@ -201,12 +201,18 @@ namespace oracle {
             std::vector<uint8_t> payload;
         };
 
+        struct s_input_position {
+            uint32_t random_call_count;
+            uint32_t random_seed_count;
+        };
+
         bool g_enabled;
         bool g_replay_active;
         uint32_t g_turn;
         char g_oracle_directory[1024];
         s_log_header g_header;
         std::vector<s_input_record> g_records;
+        std::vector<s_input_position> g_record_positions;
         std::vector<s_random_record> g_random_records;
         std::vector<s_random_seed_record> g_random_seed_records;
         std::vector<s_tactical_state> g_tactical_states;
@@ -408,7 +414,9 @@ namespace oracle {
         }
 
         bool Read_Completed_Log_(uint32_t turn, s_log_header* header,
-            std::vector<s_input_record>* records, std::vector<s_random_record>* random_records,
+            std::vector<s_input_record>* records,
+            std::vector<s_input_position>* record_positions,
+            std::vector<s_random_record>* random_records,
             std::vector<s_random_seed_record>* random_seed_records,
             std::vector<s_tactical_state>* tactical_states, bool* exists,
             bool* completed) {
@@ -439,6 +447,7 @@ namespace oracle {
             }
 
             records->clear();
+            record_positions->clear();
             random_records->clear();
             random_seed_records->clear();
             tactical_states->clear();
@@ -465,6 +474,10 @@ namespace oracle {
                         return false;
                     }
                     records->push_back(record);
+                    record_positions->push_back({
+                        static_cast<uint32_t>(random_records->size()),
+                        static_cast<uint32_t>(random_seed_records->size())
+                    });
                 } else if (type == k_random_record_type && size == sizeof(s_random_record)) {
                     s_random_record record;
                     memcpy(&record, data.data() + offset, sizeof(record));
@@ -606,12 +619,13 @@ namespace oracle {
             bool completed;
             s_log_header header;
             std::vector<s_input_record> records;
+            std::vector<s_input_position> record_positions;
             std::vector<s_random_record> random_records;
             std::vector<s_random_seed_record> random_seed_records;
             std::vector<s_tactical_state> tactical_states;
-            if (!Read_Completed_Log_(turn, &header, &records, &random_records,
-                    &random_seed_records, &tactical_states, &log_exists,
-                    &completed)) {
+            if (!Read_Completed_Log_(turn, &header, &records,
+                    &record_positions, &random_records, &random_seed_records,
+                    &tactical_states, &log_exists, &completed)) {
                 return PREPARE_ERROR;
             }
             if (!log_exists || !completed) {
@@ -639,6 +653,7 @@ namespace oracle {
             g_turn = turn;
             g_header = header;
             g_records.swap(records);
+            g_record_positions.swap(record_positions);
             g_random_records.swap(random_records);
             g_random_seed_records.swap(random_seed_records);
             g_tactical_states.swap(tactical_states);
@@ -1391,6 +1406,14 @@ namespace oracle {
             constexpr size_t pointer_offset = 198;
             constexpr size_t pointer_size = sizeof(uint32_t);
 
+            // Tactical combat neither initializes nor consumes these strategic-combat counters.
+            memset(payload->data() +
+                offsetof(s_tactical_scalar_state, combat_attacker_count), 0,
+                sizeof(s_tactical_scalar_state::combat_attacker_count));
+            memset(payload->data() +
+                offsetof(s_tactical_scalar_state, combat_defender_count), 0,
+                sizeof(s_tactical_scalar_state::combat_defender_count));
+
             if (record.checkpoint_kind == k_tactical_turn_begin) {
                 // Tactical setup leaves these stale; Do_Combat_Turn_ replaces both before use.
                 memset(payload->data() +
@@ -1426,11 +1449,17 @@ namespace oracle {
                 record.combat_bomb_result_size;
 
             if (payload->size() < global_offset +
-                    record.global_combat_data_size ||
+                    record.global_combat_data_size +
+                    record.combat_bomb_result_size ||
                 pointer_offset + pointer_size >
                     k_original_combat_data_size) {
                 return false;
             }
+
+            // This block belongs to the separate bombardment combat path and is stale here.
+            memset(payload->data() + global_offset +
+                record.global_combat_data_size, 0,
+                record.combat_bomb_result_size);
 
             if (record.checkpoint_kind == k_tactical_turn_begin) {
                 memset(payload->data() + turn_order_offset, 0,
@@ -1920,6 +1949,13 @@ namespace oracle {
         bool consumed_input = false;
 
         while (g_record_index < g_records.size()) {
+            const s_input_position& position =
+                g_record_positions[g_record_index];
+            if (g_random_record_index < position.random_call_count ||
+                g_random_seed_record_index < position.random_seed_count) {
+                break;
+            }
+
             const uint64_t required_delta = Replay_Delta_Counters_(
                 g_records[g_record_index].delta_qpc);
             if (required_delta > elapsed_budget - consumed_budget) {
