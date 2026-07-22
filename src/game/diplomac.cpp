@@ -224,11 +224,11 @@ namespace diplomac {
                         return 1; /* ATTACK */
                     }
                 }
-            } else {
-                *out_eval_threshold = severity;
-                *out_message_id = msg_id;
-                return 2; /* THREAT */
             }
+
+            *out_eval_threshold = severity;
+            *out_message_id = msg_id;
+            return 2; /* THREAT */
         }
 
         return 0;
