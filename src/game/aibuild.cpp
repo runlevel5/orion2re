@@ -937,7 +937,7 @@ namespace AIBUILD {
 
         Find_Buildable_Buildings_(colony, weights);
 
-        for (int16_t i = BUILDING_ASTRO_UNIVERSITY; i < BUILDING_COUNT; ++i) {
+        for (int16_t i = BUILDING_NO_BUILDING; i < BUILDING_COUNT; ++i) {
             if (weights[i] > 0) {
                 int16_t score = Colony_Building_Score_(colony, i);
                 weights[i] = score;
@@ -972,6 +972,37 @@ namespace AIBUILD {
         if (colony->n_pops * 3 <= pop_limit) {
             int32_t housing_weight_base = (pop_limit - colony->n_pops) * 3;
             weights[BUILDING_COUNT] = (int16_t)special::isqrt_(housing_weight_base);
+        }
+
+        uint32_t total_weight = 0;
+        for (int16_t i = 0; i <= BUILDING_COUNT + 1; ++i) {
+            total_weight += weights[i];
+        }
+        if (total_weight <= 2) {
+            SDL_LogInfo(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "aibuild: low colony building weight total=%u colony=%d owner=%d planet=%d pops=%d pop_limit=%d max_score=%d difficulty=%d multiplier=%d housing=%u trade_goods=%u",
+                (unsigned)total_weight,
+                colony_idx,
+                (int)colony->owner,
+                (int)colony->planet,
+                (int)colony->n_pops,
+                pop_limit,
+                (int)max_score,
+                (int)difficulty,
+                (int)threshold_multiplier,
+                (unsigned)weights[BUILDING_COUNT],
+                (unsigned)weights[BUILDING_COUNT + 1]);
+            for (int16_t i = 0; i <= BUILDING_COUNT + 1; ++i) {
+                if (weights[i] != 0) {
+                    SDL_LogInfo(
+                        SDL_LOG_CATEGORY_APPLICATION,
+                        "aibuild: low colony building weight colony=%d candidate=%d weight=%u",
+                        colony_idx,
+                        (int)i,
+                        (unsigned)weights[i]);
+                }
+            }
         }
 
         int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, BUILDING_COUNT + 2);
