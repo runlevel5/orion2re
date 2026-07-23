@@ -840,7 +840,7 @@ namespace aidudes {
                                 if (MOX::_ship[COLBLDG::Colony_Production_Ship_Index_(prod)].d.ship_type != SHIP_TYPE_COMBAT) {
                                     delete_from_queue = true;
                                 }
-                            } else if (prod > COLONY_PRODUCTION_SPY) {
+                            } else if (prod > COLONY_PRODUCTION_REFIT) {
                                 if (prod > COLONY_PRODUCTION_FARMER) {
                                     if (prod == COLONY_PRODUCTION_TRADE_GOODS) {
                                         recalculate_colony = true;

@@ -1014,6 +1014,113 @@ namespace oracle {
             const char** rule_name) {
             size_t block_offset = 0;
             const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            if (strcmp(block_name, "messages") == 0) {
+                const size_t messages_offset = difference - block_offset;
+                const size_t differing_message_offset = messages_offset +
+                    (block_offset / sizeof(s_MSG)) * sizeof(s_MSG);
+                if (differing_message_offset + sizeof(s_MSG) > actual->size() ||
+                    differing_message_offset + sizeof(s_MSG) > expected->size()) {
+                    return false;
+                }
+
+                s_MSG differing_actual;
+                s_MSG differing_expected;
+                memcpy(&differing_actual,
+                    actual->data() + differing_message_offset,
+                    sizeof(differing_actual));
+                memcpy(&differing_expected,
+                    expected->data() + differing_message_offset,
+                    sizeof(differing_expected));
+                const bool difference_is_hyperspace_beast =
+                    differing_actual.msg_type == MSG_TYPE_HYPERSPACE_BEAST &&
+                    differing_expected.msg_type == MSG_TYPE_HYPERSPACE_BEAST;
+                bool changed = false;
+                for (size_t message_idx = 0;
+                    difference_is_hyperspace_beast && message_idx < 100;
+                    ++message_idx) {
+                    const size_t message_offset =
+                        messages_offset + message_idx * sizeof(s_MSG);
+                    if (message_offset + sizeof(s_MSG) > actual->size() ||
+                        message_offset + sizeof(s_MSG) > expected->size()) {
+                        return false;
+                    }
+
+                    s_MSG actual_message;
+                    s_MSG expected_message;
+                    memcpy(&actual_message, actual->data() + message_offset,
+                        sizeof(actual_message));
+                    memcpy(&expected_message, expected->data() + message_offset,
+                        sizeof(expected_message));
+                    if (actual_message.msg_type != MSG_TYPE_HYPERSPACE_BEAST ||
+                        expected_message.msg_type != MSG_TYPE_HYPERSPACE_BEAST) {
+                        continue;
+                    }
+
+                    const size_t priority_offset = message_offset +
+                        offsetof(s_MSG, priority);
+                    if ((*actual)[priority_offset] != 0 ||
+                        (*expected)[priority_offset] != 0) {
+                        (*actual)[priority_offset] = 0;
+                        (*expected)[priority_offset] = 0;
+                        changed = true;
+                    }
+
+                    const s_MSG_hyperspace_beast& actual_beast =
+                        actual_message.u.hyperspace_beast;
+                    const s_MSG_hyperspace_beast& expected_beast =
+                        expected_message.u.hyperspace_beast;
+                    const bool actual_own_ship =
+                        actual_beast.ship_idx != -1 && actual_beast.fate != 0;
+                    const bool expected_own_ship =
+                        expected_beast.ship_idx != -1 && expected_beast.fate != 0;
+                    bool meaningful_fields[sizeof(s_MSG_hyperspace_beast)] = {};
+                    meaningful_fields[offsetof(s_MSG_hyperspace_beast, ship_idx)] = true;
+                    meaningful_fields[offsetof(s_MSG_hyperspace_beast, ship_idx) + 1] = true;
+                    const bool both_have_ship =
+                        actual_beast.ship_idx != -1 &&
+                        expected_beast.ship_idx != -1;
+                    meaningful_fields[offsetof(s_MSG_hyperspace_beast, fate)] =
+                        both_have_ship;
+                    if (actual_own_ship && expected_own_ship) {
+                        meaningful_fields[offsetof(s_MSG_hyperspace_beast, star_idx)] = true;
+                        meaningful_fields[offsetof(s_MSG_hyperspace_beast, officer_idx)] = true;
+                        meaningful_fields[offsetof(s_MSG_hyperspace_beast, leader_status)] =
+                            actual_beast.officer_idx != -1 &&
+                            expected_beast.officer_idx != -1;
+                    }
+                    const size_t beast_offset = message_offset +
+                        offsetof(s_MSG, u);
+                    for (size_t i = 0; i < sizeof(meaningful_fields); ++i) {
+                        if (!meaningful_fields[i] &&
+                            ((*actual)[beast_offset + i] != 0 ||
+                                (*expected)[beast_offset + i] != 0)) {
+                            (*actual)[beast_offset + i] = 0;
+                            (*expected)[beast_offset + i] = 0;
+                            changed = true;
+                        }
+                    }
+
+                    const size_t tail_offset = beast_offset +
+                        sizeof(s_MSG_hyperspace_beast);
+                    const size_t tail_size = sizeof(s_MSG) -
+                        offsetof(s_MSG, u) -
+                        sizeof(s_MSG_hyperspace_beast);
+                    for (size_t i = 0; i < tail_size; ++i) {
+                        if ((*actual)[tail_offset + i] != 0 ||
+                            (*expected)[tail_offset + i] != 0) {
+                            (*actual)[tail_offset + i] = 0;
+                            (*expected)[tail_offset + i] = 0;
+                            changed = true;
+                        }
+                    }
+                }
+
+                if (changed) {
+                    *rule_name = "normalize branch-unused hyperspace-beast message fields";
+                    return true;
+                }
+            }
+
             if (strcmp(block_name, "messages") == 0 &&
                 block_offset % sizeof(s_MSG) >=
                     offsetof(s_MSG, u) + sizeof(s_MSG_spy_assasination) &&
