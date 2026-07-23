@@ -739,7 +739,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
     int16_t limit;
     int n_techs;
     int total_valid_techs;
-    s_MSG msg;
+    s_MSG msg = {};
 
     star_idx = (int16_t)(star - MOX::_star);
     Reset_One_Shot_System_Special_(star);
@@ -866,16 +866,11 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
     // System specials with value >= 50 (ASCII '2') are treated as one-shot/temporary events.
     if (star->system_special >= 50) {
-        // Temporary discovered-special markers 50..89 consume one-shot system rewards and
-        // should clear the mirrored per-planet special. The 90..99 range is used for
-        // discovered Ancient Artifacts notifications and must preserve the artifacts world.
-        if (star->system_special < 90) {
-            for (int i = 0; i < 5; ++i) {
-                int16_t planet_idx = star->planet_index[i];
-                if (planet_idx != -1) {
-                    // Reset the special status on each planet belonging to this system.
-                    MOX::_planet[planet_idx].planet_special = 0;
-                }
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star->planet_index[i];
+            if (planet_idx != -1) {
+                // Reset the special status on each planet belonging to this system.
+                MOX::_planet[planet_idx].planet_special = 0;
             }
         }
         // Clear the system special flag

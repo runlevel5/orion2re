@@ -283,6 +283,7 @@ namespace oracle {
         size_t g_presentation_completion_index;
         uint32_t g_active_presentation_kind;
         bool g_active_presentation_ready;
+        bool g_presentation_rng_desynced;
         uint32_t g_active_combat_instance;
         uint32_t g_active_strategic_combat_instance;
         int16_t g_last_verified_combat_turn;
@@ -409,6 +410,7 @@ namespace oracle {
 
             bool loaded = false;
             if (Set_Current_Directory_(directory)) {
+                FILEDEF::Load_Game_Settings_();
                 loaded = FILEDEF::Load_Game_(9) != 0;
                 if (!Set_Current_Directory_(previous_directory)) {
                     SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -424,14 +426,20 @@ namespace oracle {
         bool Load_Turn_State_(uint32_t turn) {
             char directory[1024];
             char save_path[1024];
+            char settings_path[1024];
             const char separator = Native_Separator_();
             if (!Build_Path_(directory, sizeof(directory), "%s%c%u", g_oracle_directory, separator, turn) ||
-                !Build_Path_(save_path, sizeof(save_path), "%s%c%u%cSAVE10.GAM", g_oracle_directory, separator, turn, separator)) {
+                !Build_Path_(save_path, sizeof(save_path), "%s%c%u%cSAVE10.GAM", g_oracle_directory, separator, turn, separator) ||
+                !Build_Path_(settings_path, sizeof(settings_path), "%s%c%u%cMOX.SET", g_oracle_directory, separator, turn, separator)) {
                 return false;
             }
 
             if (!File_Exists_(save_path)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "oracle: missing turn %u save '%s'", turn, save_path);
+                return false;
+            }
+            if (!File_Exists_(settings_path)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "oracle: missing turn %u settings '%s'", turn, settings_path);
                 return false;
             }
 
@@ -894,6 +902,7 @@ namespace oracle {
             g_presentation_completion_index = 0;
             g_active_presentation_kind = 0;
             g_active_presentation_ready = false;
+            g_presentation_rng_desynced = false;
             g_active_combat_instance = 0;
             g_active_strategic_combat_instance = 0;
             g_last_verified_combat_turn =
@@ -2207,6 +2216,7 @@ namespace oracle {
 
             g_active_presentation_kind = presentation_kind;
             g_active_presentation_ready = false;
+            g_presentation_rng_desynced = false;
         }
 
         void Allow_Presentation_Completion_(uint32_t presentation_kind) {
@@ -2258,11 +2268,57 @@ namespace oracle {
                 ++passive_input_count;
             }
 
-            if (!g_active_presentation_ready ||
-                g_record_index != expected.input_record_count ||
+            size_t ignored_mouse_input_count = 0;
+            if (g_record_index < expected.input_record_count) {
+                bool balanced_mouse_tail = true;
+                uint16_t final_mouse_buttons = g_replay_mouse_buttons;
+                for (size_t i = g_record_index;
+                    i < expected.input_record_count; ++i) {
+                    const s_input_record& record = g_records[i];
+                    const s_input_position& position =
+                        g_record_positions[i];
+                    if (record.input_type != k_mouse_input_type ||
+                        position.random_call_count >
+                            expected.random_call_count ||
+                        position.random_seed_count >
+                            expected.random_seed_count) {
+                        balanced_mouse_tail = false;
+                        break;
+                    }
+                    final_mouse_buttons = record.mouse_buttons;
+                }
+
+                if (balanced_mouse_tail && final_mouse_buttons == 0) {
+                    const s_input_record& final_record =
+                        g_records[expected.input_record_count - 1];
+                    ignored_mouse_input_count =
+                        expected.input_record_count - g_record_index;
+                    mouse::User_Mouse_Handler_(final_record.mouse_x,
+                        final_record.mouse_y, final_record.mouse_buttons);
+                    g_replay_mouse_buttons = final_record.mouse_buttons;
+                    g_record_index = expected.input_record_count;
+                    SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: ignored %zu trailing balanced mouse event%s at presentation %u completion",
+                        ignored_mouse_input_count,
+                        ignored_mouse_input_count == 1 ? "" : "s",
+                        presentation_kind);
+                }
+            }
+
+            const bool rng_boundary_mismatch =
                 g_random_record_index != expected.random_call_count ||
-                g_random_seed_record_index !=
-                    expected.random_seed_count) {
+                g_random_seed_record_index != expected.random_seed_count;
+            if (rng_boundary_mismatch && !g_presentation_rng_desynced) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: presentation %u RNG boundary differs: local random=%zu seeds=%zu; oracle random=%u seeds=%u; tolerating until completion marker",
+                    presentation_kind,
+                    g_random_record_index, g_random_seed_record_index,
+                    expected.random_call_count, expected.random_seed_count);
+                g_presentation_rng_desynced = true;
+            }
+
+            if (!g_active_presentation_ready ||
+                g_record_index != expected.input_record_count) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: presentation %u ended at input=%zu/%u random=%zu/%u seeds=%zu/%u ready=%d",
                     presentation_kind,
@@ -2273,6 +2329,16 @@ namespace oracle {
                     g_active_presentation_ready ? 1 : 0);
                 Fail_("Oracle presentation boundary mismatch.");
                 throw platform::process_exit_requested{};
+            }
+
+            if (g_presentation_rng_desynced) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: resynchronized presentation %u RNG counters at completion: random %zu->%u seeds %zu->%u",
+                    presentation_kind,
+                    g_random_record_index, expected.random_call_count,
+                    g_random_seed_record_index, expected.random_seed_count);
+                g_random_record_index = expected.random_call_count;
+                g_random_seed_record_index = expected.random_seed_count;
             }
 
             if (passive_input_count != 0) {
@@ -2293,6 +2359,7 @@ namespace oracle {
             ++g_presentation_completion_index;
             g_active_presentation_kind = 0;
             g_active_presentation_ready = false;
+            g_presentation_rng_desynced = false;
             g_click_pause_active = false;
             g_last_consumption_counter = SDL_GetPerformanceCounter();
         }
@@ -2508,6 +2575,12 @@ namespace oracle {
             return true;
         }
 
+#if UINTPTR_MAX != UINT32_MAX
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+            "oracle: oracle verification requires a 32-bit build because captured structures contain 32-bit pointers");
+        return false;
+#endif
+
         char* current_directory = SDL_GetCurrentDirectory();
         if (current_directory == nullptr) {
             return false;
@@ -2600,8 +2673,9 @@ namespace oracle {
         while (g_record_index < input_limit) {
             const s_input_position& position =
                 g_record_positions[g_record_index];
-            if (g_random_record_index < position.random_call_count ||
-                g_random_seed_record_index < position.random_seed_count) {
+            if (!g_presentation_rng_desynced &&
+                (g_random_record_index < position.random_call_count ||
+                    g_random_seed_record_index < position.random_seed_count)) {
                 break;
             }
 
@@ -2696,23 +2770,32 @@ namespace oracle {
         }
         if (g_record_index != g_records.size()) {
             const size_t tail_start = g_record_index;
-            bool passive_mouse_tail = g_replay_mouse_buttons == 0;
+            bool balanced_mouse_tail = true;
+            uint16_t final_mouse_buttons = g_replay_mouse_buttons;
             for (size_t i = tail_start; i < g_records.size(); ++i) {
                 const s_input_record& record = g_records[i];
-                if (record.input_type != k_mouse_input_type || record.mouse_buttons != 0) {
-                    passive_mouse_tail = false;
+                const s_input_position& position = g_record_positions[i];
+                if (record.input_type != k_mouse_input_type ||
+                    position.random_call_count > g_random_record_index ||
+                    position.random_seed_count > g_random_seed_record_index) {
+                    balanced_mouse_tail = false;
                     break;
                 }
+                final_mouse_buttons = record.mouse_buttons;
             }
 
-            if (!passive_mouse_tail) {
+            if (!balanced_mouse_tail || final_mouse_buttons != 0) {
                 Fail_("Oracle turn ended before all recorded input was injected. See the game log.");
                 throw platform::process_exit_requested{};
             }
 
+            const s_input_record& final_record = g_records.back();
+            mouse::User_Mouse_Handler_(final_record.mouse_x,
+                final_record.mouse_y, final_record.mouse_buttons);
+            g_replay_mouse_buttons = final_record.mouse_buttons;
             g_record_index = g_records.size();
-            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-                "oracle: ignored %zu trailing buttonless mouse event%s at turn %u completion",
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: ignored %zu trailing balanced mouse event%s at turn %u completion",
                 g_record_index - tail_start,
                 g_record_index - tail_start == 1 ? "" : "s",
                 g_turn);
@@ -2741,7 +2824,19 @@ namespace oracle {
             return;
         }
 
+        if (g_presentation_rng_desynced) {
+            return;
+        }
+
         if (g_random_record_index >= g_random_records.size()) {
+            if (g_active_presentation_kind != 0) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: unexpected random call #%zu during presentation %u in turn %u: max=%u value=%u seed=%u; ignoring RNG discrepancies until completion marker",
+                    g_random_record_index, g_active_presentation_kind, g_turn,
+                    max_value, value, random_seed);
+                g_presentation_rng_desynced = true;
+                return;
+            }
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                 "oracle: unexpected random call #%zu in turn %u: max=%u value=%u seed=%u; oracle recorded %zu calls",
                 g_random_record_index, g_turn, max_value, value, random_seed,
@@ -2754,6 +2849,15 @@ namespace oracle {
         const s_random_record& expected = g_random_records[g_random_record_index];
         if (max_value != expected.max_value || value != expected.value ||
             random_seed != expected.random_seed) {
+            if (g_active_presentation_kind != 0) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: random call #%zu differs during presentation %u in turn %u: oracle max=%u value=%u seed=%u; local max=%u value=%u seed=%u; ignoring RNG discrepancies until completion marker",
+                    g_random_record_index, g_active_presentation_kind, g_turn,
+                    expected.max_value, expected.value, expected.random_seed,
+                    max_value, value, random_seed);
+                g_presentation_rng_desynced = true;
+                return;
+            }
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                 "oracle: random call #%zu mismatch in turn %u: oracle max=%u value=%u seed=%u; local max=%u value=%u seed=%u",
                 g_random_record_index, g_turn,
@@ -2775,7 +2879,19 @@ namespace oracle {
             return local_seed;
         }
 
+        if (g_presentation_rng_desynced) {
+            return local_seed;
+        }
+
         if (g_random_seed_record_index >= g_random_seed_records.size()) {
+            if (g_active_presentation_kind != 0) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: unexpected random seed call #%zu during presentation %u in turn %u: local seed=%u; ignoring RNG discrepancies until completion marker",
+                    g_random_seed_record_index, g_active_presentation_kind,
+                    g_turn, local_seed);
+                g_presentation_rng_desynced = true;
+                return local_seed;
+            }
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                 "oracle: unexpected random seed call #%zu in turn %u: local seed=%u; oracle recorded %zu calls",
                 g_random_seed_record_index, g_turn, local_seed,
