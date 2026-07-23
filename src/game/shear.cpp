@@ -588,7 +588,9 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     shear::_noise_threshold = noise_threshold;
     shear::_jumble_mask = jumble_mask;
 
-    shear::_noise_start_index = (game_random::Random_(1000) - 1) & 0xFFFF;
+    // ORACLE: The original loads 1000 into EAX, but Random_ reads the saved ESI stack slot instead.
+    const uint32_t random_max = 0xFFFF0000u | (height & 0xFFFFu);
+    shear::_noise_start_index = (game_random::Random_(random_max) - 1) & 0xFFFF;
 
     uint32_t pixel_count = (width * height) - shear::_jumble_mask - shear::_jumble_mask;
 
