@@ -1014,6 +1014,76 @@ namespace oracle {
             const char** rule_name) {
             size_t block_offset = 0;
             const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            if (strcmp(block_name, "players") == 0) {
+                const size_t players_offset = difference - block_offset;
+                const size_t player_offset = block_offset % sizeof(s_player);
+                const size_t settlers_offset = offsetof(s_player, settlers);
+                if (player_offset >= settlers_offset &&
+                    player_offset < settlers_offset + sizeof(s_player::settlers)) {
+                    constexpr uint32_t meaningful_settler_bits = 0x03FFFFFFu;
+                    const size_t settler_capacity =
+                        sizeof(s_player::settlers) / sizeof(s_player::settlers[0]);
+                    bool changed = false;
+
+                    for (size_t player_idx = 0; player_idx < MAX_PLAYERS; ++player_idx) {
+                        const size_t current_player_offset =
+                            players_offset + player_idx * sizeof(s_player);
+                        const size_t count_offset = current_player_offset +
+                            offsetof(s_player, settlers_freighted);
+                        const size_t current_settlers_offset =
+                            current_player_offset + settlers_offset;
+                        if (current_settlers_offset + sizeof(s_player::settlers) > actual->size() ||
+                            current_settlers_offset + sizeof(s_player::settlers) > expected->size()) {
+                            return false;
+                        }
+
+                        int16_t actual_count;
+                        int16_t expected_count;
+                        memcpy(&actual_count, actual->data() + count_offset, sizeof(actual_count));
+                        memcpy(&expected_count, expected->data() + count_offset, sizeof(expected_count));
+                        if (actual_count != expected_count || actual_count < 0 ||
+                            actual_count > static_cast<int16_t>(settler_capacity)) {
+                            return false;
+                        }
+
+                        for (size_t settler_idx = 0; settler_idx < settler_capacity; ++settler_idx) {
+                            const size_t offset = current_settlers_offset +
+                                settler_idx * sizeof(s_settler_info);
+                            uint32_t actual_value;
+                            uint32_t expected_value;
+                            memcpy(&actual_value, actual->data() + offset, sizeof(actual_value));
+                            memcpy(&expected_value, expected->data() + offset, sizeof(expected_value));
+
+                            if (settler_idx < static_cast<size_t>(actual_count)) {
+                                actual_value &= meaningful_settler_bits;
+                                expected_value &= meaningful_settler_bits;
+                            } else {
+                                actual_value = 0;
+                                expected_value = 0;
+                            }
+
+                            uint32_t original_actual;
+                            uint32_t original_expected;
+                            memcpy(&original_actual, actual->data() + offset, sizeof(original_actual));
+                            memcpy(&original_expected, expected->data() + offset, sizeof(original_expected));
+                            if (actual_value != original_actual) {
+                                memcpy(actual->data() + offset, &actual_value, sizeof(actual_value));
+                                changed = true;
+                            }
+                            if (expected_value != original_expected) {
+                                memcpy(expected->data() + offset, &expected_value, sizeof(expected_value));
+                                changed = true;
+                            }
+                        }
+                    }
+
+                    if (changed) {
+                        *rule_name = "normalize undefined settler bits and inactive settler slots";
+                    }
+                    return changed;
+                }
+            }
+
             if (strcmp(block_name, "messages") == 0) {
                 const size_t messages_offset = difference - block_offset;
                 const size_t differing_message_offset = messages_offset +
@@ -1634,6 +1704,9 @@ namespace oracle {
                 char cleanup_field_description[128] = {};
                 if (strcmp(cleanup_block_name, "messages") == 0) {
                     Describe_Message_Offset_(cleanup_block_offset,
+                        cleanup_field_description, sizeof(cleanup_field_description));
+                } else if (strcmp(cleanup_block_name, "players") == 0) {
+                    Describe_Player_Offset_(cleanup_block_offset,
                         cleanup_field_description, sizeof(cleanup_field_description));
                 }
                 SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
