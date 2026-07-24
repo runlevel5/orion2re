@@ -3217,6 +3217,27 @@ namespace oracle {
         ++g_random_record_index;
     }
 
+    uint32_t Replay_Address_Dependent_Random_Max_(uint32_t local_max_value) {
+        constexpr uint32_t k_vanish_bitmap_random_return_address = 0x0053764B;
+        if (!g_replay_active || g_presentation_rng_desynced ||
+            g_random_record_index >= g_random_records.size()) {
+            return local_max_value;
+        }
+
+        const s_random_record& expected = g_random_records[g_random_record_index];
+        if (expected.return_address_count == 0 ||
+            expected.return_addresses[0] != k_vanish_bitmap_random_return_address) {
+            return local_max_value;
+        }
+
+        if (local_max_value != expected.max_value) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                "oracle: substituting address-dependent random max at call #%zu in turn %u: oracle max=%u; local max=%u",
+                g_random_record_index, g_turn, expected.max_value, local_max_value);
+        }
+        return expected.max_value;
+    }
+
     uint32_t Replay_Random_Seed_(uint32_t local_seed,
         const uintptr_t* return_addresses, uint32_t return_address_count,
         uintptr_t image_base) {

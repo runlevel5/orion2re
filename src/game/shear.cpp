@@ -541,7 +541,13 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
     _noise_threshold = noise_threshold;
     uint8_t threshold = _noise_threshold;
 
-    uint32_t rand_val = game_random::Random_(1000);
+    // ORACLE: The original loads 1000 into EAX but does not push it. Random_ instead
+    // reads Vanish_Bitmap_Pixels_'s saved incoming ESI, which holds the source pointer.
+    const uint32_t local_random_max =
+        static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
+    const uint32_t random_max =
+        oracle::Replay_Address_Dependent_Random_Max_(local_random_max);
+    uint32_t rand_val = game_random::Random_(random_max);
     _noise_start_index = (rand_val - 1) & 0xFFFE;
 
     uint32_t total_pixels = width * height;
