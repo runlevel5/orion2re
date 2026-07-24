@@ -1014,6 +1014,26 @@ namespace oracle {
             const char** rule_name) {
             size_t block_offset = 0;
             const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            if (strcmp(block_name, "save description") == 0) {
+                constexpr size_t auto_save_length = sizeof(FILEDEF::s_Auto_Save_00556938) - 1;
+                const size_t description_offset = difference - block_offset;
+                if (description_offset + auto_save_length + 2 > actual->size() ||
+                    description_offset + auto_save_length + 1 > expected->size() ||
+                    memcmp(actual->data() + description_offset,
+                        FILEDEF::s_Auto_Save_00556938, auto_save_length) != 0 ||
+                    memcmp(expected->data() + description_offset,
+                        FILEDEF::s_Auto_Save_00556938, auto_save_length) != 0 ||
+                    (*actual)[description_offset + auto_save_length] != '_' ||
+                    (*actual)[description_offset + auto_save_length + 1] != 0 ||
+                    (*expected)[description_offset + auto_save_length] != 0) {
+                    return false;
+                }
+
+                (*actual)[description_offset + auto_save_length] = 0;
+                *rule_name = "normalize autosave description cursor marker";
+                return true;
+            }
+
             if (strcmp(block_name, "moveable boxes") == 0) {
                 const size_t member_offset = block_offset % sizeof(s_movable_box);
                 const bool is_position =
@@ -1511,6 +1531,106 @@ namespace oracle {
                 colony_index, colony_offset);
         }
 
+        void Describe_Ship_Offset_(size_t block_offset, char* description, size_t description_size) {
+            const size_t ship_index = block_offset / sizeof(s_ship_data);
+            const size_t ship_offset = block_offset % sizeof(s_ship_data);
+#define SHIP_FIELD(name) {#name, offsetof(s_ship_data, name), sizeof(s_ship_data::name), 0}
+#define SHIP_ARRAY(name) {#name, offsetof(s_ship_data, name), sizeof(s_ship_data::name), sizeof(((s_ship_data*)nullptr)->name[0])}
+            const s_field_range fields[] = {
+                SHIP_FIELD(owner),
+                SHIP_FIELD(status),
+                SHIP_FIELD(location),
+                SHIP_FIELD(x),
+                SHIP_FIELD(y),
+                SHIP_FIELD(group_has_navigator),
+                SHIP_FIELD(travelling_speed),
+                SHIP_FIELD(turns_left),
+                SHIP_FIELD(shield_damage_percent),
+                SHIP_FIELD(drive_damage_percent),
+                SHIP_FIELD(computer_damage),
+                SHIP_FIELD(crew_quality),
+                SHIP_FIELD(crew_experience),
+                SHIP_FIELD(officer_index),
+                SHIP_ARRAY(special_device_damage_flags),
+                SHIP_FIELD(armor_damage),
+                SHIP_FIELD(structural_damage),
+                SHIP_FIELD(mission),
+                SHIP_FIELD(just_built),
+            };
+#undef SHIP_ARRAY
+#undef SHIP_FIELD
+
+            if (ship_offset < sizeof(s_ship_design)) {
+                const size_t design_offset = ship_offset;
+#define DESIGN_FIELD(name) {#name, offsetof(s_ship_design, name), sizeof(s_ship_design::name), 0}
+#define DESIGN_ARRAY(name) {#name, offsetof(s_ship_design, name), sizeof(s_ship_design::name), sizeof(((s_ship_design*)nullptr)->name[0])}
+                const s_field_range design_fields[] = {
+                    DESIGN_ARRAY(name),
+                    DESIGN_FIELD(size),
+                    DESIGN_FIELD(ship_type),
+                    DESIGN_FIELD(shield_type),
+                    DESIGN_FIELD(ftl_type),
+                    DESIGN_FIELD(speed),
+                    DESIGN_FIELD(computer_type),
+                    DESIGN_FIELD(armor_type),
+                    DESIGN_ARRAY(special_device_flags),
+                    DESIGN_ARRAY(ship_weapon),
+                    DESIGN_FIELD(picture_num),
+                    DESIGN_FIELD(previous_owner),
+                    DESIGN_FIELD(cost),
+                    DESIGN_FIELD(combat_speed),
+                    DESIGN_FIELD(date_of_design),
+                };
+#undef DESIGN_ARRAY
+#undef DESIGN_FIELD
+
+                for (const s_field_range& field : design_fields) {
+                    if (design_offset < field.offset ||
+                        design_offset >= field.offset + field.size) {
+                        continue;
+                    }
+
+                    const size_t field_offset = design_offset - field.offset;
+                    if (field.element_size != 0) {
+                        snprintf(description, description_size,
+                            "MOX::_ship[%zu].d.%s[%zu] +%zu",
+                            ship_index, field.name,
+                            field_offset / field.element_size,
+                            field_offset % field.element_size);
+                    } else {
+                        snprintf(description, description_size,
+                            "MOX::_ship[%zu].d.%s +%zu",
+                            ship_index, field.name, field_offset);
+                    }
+                    return;
+                }
+            }
+
+            for (const s_field_range& field : fields) {
+                if (ship_offset < field.offset ||
+                    ship_offset >= field.offset + field.size) {
+                    continue;
+                }
+
+                const size_t field_offset = ship_offset - field.offset;
+                if (field.element_size != 0) {
+                    snprintf(description, description_size,
+                        "MOX::_ship[%zu].%s[%zu] +%zu",
+                        ship_index, field.name,
+                        field_offset / field.element_size,
+                        field_offset % field.element_size);
+                } else {
+                    snprintf(description, description_size,
+                        "MOX::_ship[%zu].%s +%zu",
+                        ship_index, field.name, field_offset);
+                }
+                return;
+            }
+
+            snprintf(description, description_size, "MOX::_ship[%zu] +%zu",
+                ship_index, ship_offset);
+        }
+
         void Describe_Player_Offset_(size_t block_offset, char* description, size_t description_size) {
             const size_t player_index = block_offset / sizeof(s_player);
             const size_t player_offset = block_offset % sizeof(s_player);
@@ -1745,6 +1865,9 @@ namespace oracle {
                 } else if (strcmp(cleanup_block_name, "players") == 0) {
                     Describe_Player_Offset_(cleanup_block_offset,
                         cleanup_field_description, sizeof(cleanup_field_description));
+                } else if (strcmp(cleanup_block_name, "ships") == 0) {
+                    Describe_Ship_Offset_(cleanup_block_offset,
+                        cleanup_field_description, sizeof(cleanup_field_description));
                 }
                 SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: turn %u cleanup #%zu at save offset %zu (%s +%zu%s%s): %s; re-verifying",
@@ -1776,6 +1899,8 @@ namespace oracle {
                 Describe_Colony_Offset_(block_offset, field_description, sizeof(field_description));
             } else if (strcmp(block_name, "players") == 0) {
                 Describe_Player_Offset_(block_offset, field_description, sizeof(field_description));
+            } else if (strcmp(block_name, "ships") == 0) {
+                Describe_Ship_Offset_(block_offset, field_description, sizeof(field_description));
             } else if (strcmp(block_name, "messages") == 0) {
                 Describe_Message_Offset_(block_offset, field_description, sizeof(field_description));
             }

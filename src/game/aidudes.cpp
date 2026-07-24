@@ -1202,52 +1202,7 @@ namespace aidudes {
                             ship_weights[SHIP_SIZE_SMALL] = 0;
                         }
 
-                        const bool trace_oracle_choice =
-                            MOX::_stardate == 35004 && player_idx == 4 && current_colony_idx == 21;
-                        if (trace_oracle_choice) {
-                            SDL_LogInfo(
-                                SDL_LOG_CATEGORY_APPLICATION,
-                                "oracle-debug: colony=21 queue_pos=%d threatened_queue=%u threatened_colony=%u "
-                                "seed=%u war=%d industry=%d target_size=%d large=%d costs=%u,%u,%u,%u "
-                                "star=%u,%u,%u,%u strengths=%d,%d,%d weights=%u,%u,%u,%u,%u,%u,%u,%u,%u",
-                                i,
-                                (unsigned)(*AIDATA::_ai_colony_info)[i].threatened,
-                                (unsigned)(*AIDATA::_ai_colony_info)[current_colony_idx].threatened,
-                                (unsigned)game_random::Get_Random_Seed_(),
-                                war_level,
-                                ind_worth,
-                                AIBUILD::_player_ship_sizes[player_idx].target_ship_size,
-                                COLCALC::Colony_Can_Build_Large_Ships_(temp_colony) ? 1 : 0,
-                                (unsigned)p->ship_designs[SHIP_SIZE_SMALL].cost,
-                                (unsigned)p->ship_designs[SHIP_SIZE_MEDIUM].cost,
-                                (unsigned)p->ship_designs[SHIP_SIZE_LARGE].cost,
-                                (unsigned)p->ship_designs[SHIP_SIZE_HUGE].cost,
-                                (unsigned)(*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count,
-                                (unsigned)(*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count,
-                                (unsigned)(*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count,
-                                (unsigned)(*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].out_of_range_count,
-                                AIBUILD::_player_total_strength_vs_ships[player_idx][0],
-                                AIBUILD::_player_total_strength_vs_ships[player_idx][1],
-                                AIBUILD::_player_total_strength_vs_ships[player_idx][2],
-                                (unsigned)ship_weights[0],
-                                (unsigned)ship_weights[1],
-                                (unsigned)ship_weights[2],
-                                (unsigned)ship_weights[3],
-                                (unsigned)ship_weights[4],
-                                (unsigned)ship_weights[5],
-                                (unsigned)ship_weights[6],
-                                (unsigned)ship_weights[7],
-                                (unsigned)ship_weights[8]);
-                        }
-
                         int ship_choice = RUSS::Get_Weighted_Choice_Short_(ship_weights, 9);
-                        if (trace_oracle_choice) {
-                            SDL_LogInfo(
-                                SDL_LOG_CATEGORY_APPLICATION,
-                                "oracle-debug: colony=21 ship_choice=%d seed_after=%u",
-                                (int)ship_choice,
-                                (unsigned)game_random::Get_Random_Seed_());
-                        }
                         switch (ship_choice + 1) {
                             case 0:
                                 break;

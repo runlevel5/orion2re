@@ -602,7 +602,7 @@ namespace COMBAT1 {
                                                 ty = MOX::_cur_combat_y - 1 + MOX::_ypos / 2;
                                             }
                                         }
-                                        
+
                                         int16_t tgt_idx = -1;
                                         if (tx >= 0 && tx < COMBAT_GRID_WIDTH && ty >= 0 && ty < COMBAT_GRID_HEIGHT) {
                                             tgt_idx = MOX::_combat_grid[tx][ty];

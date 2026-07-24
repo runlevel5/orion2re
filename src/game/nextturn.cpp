@@ -29,7 +29,6 @@ void Do_Autosave_() {
 
     if (MOX::_settings.auto_saves != 0) {
         if (((int32_t)MOX::_stardate % autosave_interval) == 0) {
-            memset(MOX::_save_game_description[9].description, 0, sizeof(MOX::_save_game_description[9].description));
             strlcpy(MOX::_save_game_description[9].description, "(Auto Save)", sizeof(MOX::_save_game_description[9].description));
             FILEDEF::Save_Game_(9);
         }
