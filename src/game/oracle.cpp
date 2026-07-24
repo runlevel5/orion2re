@@ -1014,6 +1014,43 @@ namespace oracle {
             const char** rule_name) {
             size_t block_offset = 0;
             const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            if (strcmp(block_name, "moveable boxes") == 0) {
+                const size_t member_offset = block_offset % sizeof(s_movable_box);
+                const bool is_position =
+                    member_offset >= offsetof(s_movable_box, x) &&
+                    member_offset < offsetof(s_movable_box, y) + sizeof(s_movable_box::y);
+                if (!is_position) {
+                    return false;
+                }
+
+                const size_t boxes_offset = difference - block_offset;
+                bool changed = false;
+                for (size_t box_idx = 0; box_idx < 5; ++box_idx) {
+                    const size_t position_offset = boxes_offset +
+                        box_idx * sizeof(s_movable_box) + offsetof(s_movable_box, x);
+                    const size_t position_size =
+                        sizeof(s_movable_box::x) + sizeof(s_movable_box::y);
+                    if (position_offset + position_size > actual->size() ||
+                        position_offset + position_size > expected->size()) {
+                        return false;
+                    }
+
+                    for (size_t i = 0; i < position_size; ++i) {
+                        if ((*actual)[position_offset + i] != 0 ||
+                            (*expected)[position_offset + i] != 0) {
+                            (*actual)[position_offset + i] = 0;
+                            (*expected)[position_offset + i] = 0;
+                            changed = true;
+                        }
+                    }
+                }
+
+                if (changed) {
+                    *rule_name = "normalize presentation-only moveable-box positions";
+                }
+                return changed;
+            }
+
             if (strcmp(block_name, "players") == 0) {
                 const size_t players_offset = difference - block_offset;
                 const size_t player_offset = block_offset % sizeof(s_player);
