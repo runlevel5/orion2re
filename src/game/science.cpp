@@ -353,6 +353,9 @@ namespace SCIENCE {
             }
         }
 
+        // Native callbacks deliver the release during the closing animation. Oracle
+        // replay is poll-driven, so finish the stationary click before fields change.
+        oracle::Complete_Replay_Click_();
         allocate::Pop_Block_(MOX::_screen_seg);
         fields::Clear_Fields_();
         fields::Clear_Mouse_Buffer_();
