@@ -8,8 +8,8 @@ namespace LOADSAVE {
     uint8_t _draw_down;
     char _empty_save_slot_message[20];
 
-    int16_t _music_level_field;
-    int16_t _sfx_level_field;
+    int16_t _music_level_field = -1000;
+    int16_t _sfx_level_field = -1000;
     uint8_t _print_data_to_bitmap;
     s_animation_header* _bitmap;
 
