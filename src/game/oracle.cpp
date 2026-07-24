@@ -1802,6 +1802,9 @@ namespace oracle {
             bool incomplete_tactical_setup) {
             constexpr size_t pointer_offset = 198;
             constexpr size_t pointer_size = sizeof(uint32_t);
+            const bool no_tactical_turn =
+                record.checkpoint_kind == k_tactical_combat_end &&
+                record.checkpoint_index == 0;
 
             // Tactical combat neither initializes nor consumes these strategic-combat counters.
             memset(payload->data() +
@@ -1811,8 +1814,9 @@ namespace oracle {
                 offsetof(s_tactical_scalar_state, combat_defender_count), 0,
                 sizeof(s_tactical_scalar_state::combat_defender_count));
 
-            if (record.checkpoint_kind == k_tactical_turn_begin) {
-                // Tactical setup leaves these stale; Do_Combat_Turn_ replaces both before use.
+            if (record.checkpoint_kind == k_tactical_turn_begin ||
+                no_tactical_turn) {
+                // Tactical setup leaves these stale; Do_Combat_Turn_ replaces them before use.
                 memset(payload->data() +
                     offsetof(s_tactical_scalar_state, current_ship), 0,
                     sizeof(s_tactical_scalar_state::current_ship));
@@ -1831,13 +1835,14 @@ namespace oracle {
                     sizeof(s_tactical_scalar_state::start_of_turn));
             }
 
+            if (no_tactical_turn) {
+                // The combat loop sets this only immediately before Do_Combat_Turn_.
+                memset(payload->data() +
+                    offsetof(s_tactical_scalar_state, fleet_target), 0,
+                    sizeof(s_tactical_scalar_state::fleet_target));
+            }
+
             if (incomplete_tactical_setup) {
-                memset(payload->data() +
-                    offsetof(s_tactical_scalar_state, current_ship), 0,
-                    sizeof(s_tactical_scalar_state::current_ship));
-                memset(payload->data() +
-                    offsetof(s_tactical_scalar_state, current_pointer), 0,
-                    sizeof(s_tactical_scalar_state::current_pointer));
                 memset(payload->data() +
                     offsetof(s_tactical_scalar_state,
                         current_missile_count), 0,
@@ -1849,12 +1854,6 @@ namespace oracle {
                     offsetof(s_tactical_scalar_state,
                         colony_defense_flags), 0,
                     sizeof(s_tactical_scalar_state::colony_defense_flags));
-                memset(payload->data() +
-                    offsetof(s_tactical_scalar_state, start_of_turn), 0,
-                    sizeof(s_tactical_scalar_state::start_of_turn));
-                memset(payload->data() +
-                    offsetof(s_tactical_scalar_state, fleet_target), 0,
-                    sizeof(s_tactical_scalar_state::fleet_target));
             }
 
             size_t combat_offset = record.scalar_size;
@@ -1888,18 +1887,22 @@ namespace oracle {
                     record.turn_order_size);
                 memset(payload->data() + combat_grid_offset, 0,
                     record.combat_grid_size);
-                memset(payload->data() + global_offset, 0,
-                    record.global_combat_data_size);
                 memset(payload->data() + tactical_arrays_offset, 0,
                     record.tactical_arrays_size);
             }
+
+            // This is a ship-detail presentation scratch record. It is not initialized or
+            // consumed by tactical simulation and can persist across saves and combats.
+            memset(payload->data() + global_offset, 0,
+                record.global_combat_data_size);
 
             // This block belongs to the separate bombardment combat path and is stale here.
             memset(payload->data() + global_offset +
                 record.global_combat_data_size, 0,
                 record.combat_bomb_result_size);
 
-            if (record.checkpoint_kind == k_tactical_turn_begin) {
+            if (record.checkpoint_kind == k_tactical_turn_begin ||
+                no_tactical_turn) {
                 memset(payload->data() + turn_order_offset, 0,
                     record.turn_order_size);
                 memset(payload->data() + combat_grid_offset, 0,
