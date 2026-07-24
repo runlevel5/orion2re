@@ -1177,9 +1177,9 @@ namespace fields {
                         _active_input_field_first = 0;
                     }
                 } else {
+                    _active_input_field_first = 0;
                     int16_t chr = (int16_t)((int32_t)key_code % 0x100);
                     if (chr >= 0x20 && chr <= 0x7E && chr != 0x5F) {
-                        _active_input_field_first = 0;
                         if (_active_input_field_number >= 0 && _active_input_field_number < _fields_count) {
                             int16_t font_shadow = active_cont_input->font_shadow_style;
                             if (font_shadow == -1) {
