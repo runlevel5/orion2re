@@ -1053,6 +1053,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                     CMBTAI::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr1, 1);
                     COMBAT1::Check_For_Winner_();
+                    Increment_Bhg_(turn_plr1);
                 }
 
                 if (MOX::_super_fast_flag != 0) CMBTDRW1::Draw_Super_Fast_Screen_();
@@ -1062,6 +1063,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                     CMBTAI::_fleet_target = -1;
                     COMBAT1::Do_Combat_Turn_(turn_plr2, 1);
                     COMBAT1::Check_For_Winner_();
+                    Increment_Bhg_(turn_plr2);
                 }
 
                 if (MOX::_super_fast_flag != 0) CMBTDRW1::Draw_Super_Fast_Screen_();
@@ -2300,11 +2302,6 @@ void __cdecl End_Of_Turn_Bookeeping_() {
     Recharge_Shields_();
     Repair_All_Combat_Ships_();
     COMBAT1::Update_Phasing_Cloak_Timers_();
-
-    Increment_Bhg_(MOX::_combat_attacker_player);
-    if (MOX::_combat_defender_player != MOX::_combat_attacker_player) {
-        Increment_Bhg_(MOX::_combat_defender_player);
-    }
 
     int16_t turn = MOX::_combat_turn;
     if (MOX::_combat_data->unit_status == 0 && (int16_t)(turn % 10) == 0) {

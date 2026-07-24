@@ -3238,6 +3238,23 @@ namespace oracle {
         return expected.max_value;
     }
 
+    bool Defer_Strategic_Bomb_Hit_() {
+        constexpr uint32_t k_pick_low_attacker_return_address = 0x004BCAF5;
+        constexpr uint32_t k_pick_high_attacker_return_address = 0x004BCABA;
+        if (!g_replay_active || g_random_record_index >= g_random_records.size()) {
+            return false;
+        }
+
+        const s_random_record& expected = g_random_records[g_random_record_index];
+        if (expected.return_address_count == 0) {
+            return false;
+        }
+
+        const uint32_t caller = expected.return_addresses[0];
+        return caller == k_pick_low_attacker_return_address ||
+            caller == k_pick_high_attacker_return_address;
+    }
+
     uint32_t Replay_Random_Seed_(uint32_t local_seed,
         const uintptr_t* return_addresses, uint32_t return_address_count,
         uintptr_t image_base) {

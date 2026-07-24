@@ -1416,6 +1416,12 @@ namespace MAINPUPS {
     void __cdecl Apply_Next_Bomb_Hit_(s_combat_bomb_result *bomb, int16_t *state, int16_t *bomb_hits, int16_t *bio_hits) {
         s_colony *colony = &MOX::_colony[bomb->colony_idx];
 
+        // ORACLE: Strategic bombing advances once per presentation frame. Defer an
+        // extra local frame when the original has already consumed the closing input.
+        if (oracle::Defer_Strategic_Bomb_Hit_()) {
+            return;
+        }
+
         if (*state == 1 || *state == 3 || COLGCBT::_g_ctr % 5 != 0) {
             return;
         }
