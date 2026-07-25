@@ -67,4 +67,10 @@ namespace oracle {
 
     // Completes a recorded stationary click that has already delivered its press.
     bool Complete_Replay_Click_();
+
+    // Returns whether an oracle turn is currently being replayed.
+    bool Replay_Active_();
+
+    // Allows main-screen fleet icons one held-button draw callback before replay release.
+    bool Defer_Replay_Click_Completion_(int16_t field_id);
 }

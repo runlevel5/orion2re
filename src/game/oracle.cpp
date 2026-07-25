@@ -3341,4 +3341,27 @@ namespace oracle {
         }
         return true;
     }
+
+    bool Replay_Active_() {
+        return g_replay_active;
+    }
+
+    bool Defer_Replay_Click_Completion_(int16_t field_id) {
+        if (!g_replay_active || MOX::_current_screen != SCREEN_MAIN ||
+            !MOVEBOX::Moveable_Box_Selected_(2)) {
+            return false;
+        }
+
+        const int16_t first = MOX::_first_fleet_movement_icon;
+        int16_t end = first + MOX::_fleet_icon_buttons_added;
+        if (end > MOX::_fleet_box.count) {
+            end = MOX::_fleet_box.count;
+        }
+        for (int16_t i = first; i < end; ++i) {
+            if (MOX::_fleet_movement_icon[i].field == field_id) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
