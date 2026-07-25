@@ -1213,6 +1213,9 @@ namespace fields {
         }
 
         int16_t mouse_btn = mouse::Mouse_Button_();
+        if (mouse_btn != 0 && oracle::Complete_Replay_Click_()) {
+            mouse_btn = mouse::Mouse_Button_();
+        }
         if (mouse_btn == 0) {
             if (mouse::Mouse_Buffer_() == 0) {
                 _pressed_button_flag = 0;
