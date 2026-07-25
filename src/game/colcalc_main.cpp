@@ -479,7 +479,7 @@ namespace COLCALC {
                 }
 
                 uint32_t base_growth_val_sq = (static_cast<uint32_t>(race_pop_count[i]) * (limit - total_pops) * 2000) / limit;
-                colony->pop_growth[i] += static_cast<int16_t>((special::isqrt_(base_growth_val_sq) * growth_modifier) / 100 + extra_growth);
+                colony->pop_growth[i] += static_cast<int16_t>(((int32_t)special::isqrt_(base_growth_val_sq) * growth_modifier) / 100 + extra_growth);
             }
         }
     }
