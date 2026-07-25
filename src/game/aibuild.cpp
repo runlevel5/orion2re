@@ -903,7 +903,8 @@ namespace AIBUILD {
         case BUILDING_FIGHTER_GARRISON: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus + bc_score;
+            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus;
+            score += bc_score;
         } break;
         }
 
