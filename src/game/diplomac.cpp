@@ -1086,6 +1086,8 @@ namespace diplomac {
             }
         }
 
+        int16_t base_change = scaled_amount;
+
         // Trait modifier: Charismatic
         if (MOX::_player[p_a].traits[TRAIT_CHARISMATIC] == 1) {
             if (scaled_amount < 1) {
@@ -1096,8 +1098,7 @@ namespace diplomac {
         }
 
         int8_t treaty = MOX::_player[p_b].treaty[p_a];
-        int16_t base_change = scaled_amount;
-        int16_t final_change = base_change;
+        int16_t final_change = scaled_amount;
 
         // Alliance (4, 5) logic
         if ((treaty == 4 || treaty == 5) && incident >= 1 && incident <= 9 && final_change < 0) {
