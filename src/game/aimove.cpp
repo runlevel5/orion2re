@@ -1623,6 +1623,7 @@ namespace AIMOVE {
                     bool target_met = false;
                     
                     target_min_eta[star_idx] = 10;
+                    target_best_eta[star_idx] = 0;
 
                     for (int e = 0; e < 10; ++e) {
                         uint32_t strength_needed = (uint32_t)target->strength[e];
@@ -1678,7 +1679,7 @@ namespace AIMOVE {
                                 }
 
                                 if (move_star != -1) {
-                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, move_star, &move_info);
+                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, target_star, &move_info);
                                     (*AIDATA::_i_all_combat_ships)[_i_ai][ship_loc] = -1;
                                 }
                             }
