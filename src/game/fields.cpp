@@ -1217,7 +1217,7 @@ namespace fields {
         if (mouse_btn != 0 && oracle::Replay_Active_()) {
             defer_replay_click_completion =
                 oracle::Defer_Replay_Click_Completion_(Scan_Field_());
-            if (!defer_replay_click_completion && oracle::Complete_Replay_Click_()) {
+            if (!defer_replay_click_completion && oracle::Complete_Replay_Click_(true)) {
                 mouse_btn = mouse::Mouse_Button_();
             }
         }

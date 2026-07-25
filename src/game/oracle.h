@@ -66,7 +66,7 @@ namespace oracle {
     bool Physical_Input_Enabled_();
 
     // Completes a recorded stationary click that has already delivered its press.
-    bool Complete_Replay_Click_();
+    bool Complete_Replay_Click_(bool require_blocked_rng = false);
 
     // Returns whether an oracle turn is currently being replayed.
     bool Replay_Active_();

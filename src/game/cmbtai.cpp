@@ -835,7 +835,7 @@ int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx) {
             for (int16_t slot_idx = 0; slot_idx < 8; ++slot_idx) {
                 int16_t weapon_id = ship->weapons[slot_idx].weapon_id;
 
-                if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_MAULER_DEVICE) {
+                if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_PROTON_TORPEDO) {
                     bool is_long_range = false;
 
                     if ((TECHDATA::_weapons[weapon_id].natural_mods & 4 /* W_CONT_BEAM */) != 0) {
@@ -884,7 +884,7 @@ int16_t __cdecl Get_Effective_Beam_Strength_(int16_t player_idx) {
                 for (int16_t weapon_idx = 0; weapon_idx < 8; ++weapon_idx) {
                     int16_t weapon_id = ship->weapons[weapon_idx].weapon_id;
 
-                    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_SPATIAL_COMPRESSOR) {
+                    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_PROTON_TORPEDO) {
                         total_strength += CMBTAI::Get_Effective_Weapon_Damage_(ship_idx, weapon_idx);
                     }
                 }

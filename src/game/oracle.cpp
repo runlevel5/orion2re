@@ -2143,8 +2143,7 @@ namespace oracle {
                 memset(payload->data() + combat_grid_offset, 0,
                     record.combat_grid_size);
                 memset(payload->data() + tactical_arrays_offset, 0,
-                    sizeof(MOX::_side_end_of_turn) +
-                    sizeof(MOX::_player_mode));
+                    sizeof(MOX::_side_end_of_turn));
             }
 
             s_tactical_scalar_state scalars;
@@ -2292,6 +2291,35 @@ namespace oracle {
                     g_random_seed_record_index,
                     game_random::Get_Random_Seed_());
                 return false;
+            }
+
+            if (checkpoint_kind == k_tactical_turn_begin) {
+                const size_t tactical_arrays_offset =
+                    expected.scalar_size +
+                    expected.combat_data_size +
+                    expected.missile_data_size +
+                    expected.turn_order_size +
+                    expected.combat_grid_size +
+                    expected.global_combat_data_size +
+                    expected.combat_bomb_result_size;
+                const size_t player_mode_offset = tactical_arrays_offset +
+                    sizeof(MOX::_side_end_of_turn);
+                if (expected_state.payload.size() < player_mode_offset +
+                        sizeof(MOX::_player_mode) ||
+                    MOX::_combat_attacker_player < 0 ||
+                    MOX::_combat_attacker_player >= 15 ||
+                    MOX::_combat_defender_player < 0 ||
+                    MOX::_combat_defender_player >= 15) {
+                    return false;
+                }
+
+                const int8_t* expected_player_modes =
+                    reinterpret_cast<const int8_t*>(
+                        expected_state.payload.data() + player_mode_offset);
+                MOX::_player_mode[MOX::_combat_attacker_player] =
+                    expected_player_modes[MOX::_combat_attacker_player];
+                MOX::_player_mode[MOX::_combat_defender_player] =
+                    expected_player_modes[MOX::_combat_defender_player];
             }
 
             std::vector<uint8_t> actual;
@@ -3298,7 +3326,7 @@ namespace oracle {
         return !g_enabled;
     }
 
-    bool Complete_Replay_Click_() {
+    bool Complete_Replay_Click_(bool require_blocked_rng) {
         if (!g_replay_active || g_replay_mouse_buttons == 0 || g_record_index == 0 ||
             g_record_index >= g_records.size()) {
             return false;
@@ -3324,6 +3352,13 @@ namespace oracle {
             }
         }
         if (release_index >= g_records.size()) {
+            return false;
+        }
+
+        const s_input_position& release_position = g_record_positions[release_index];
+        if (require_blocked_rng &&
+            g_random_record_index >= release_position.random_call_count &&
+            g_random_seed_record_index >= release_position.random_seed_count) {
             return false;
         }
 
