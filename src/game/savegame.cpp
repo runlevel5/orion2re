@@ -917,9 +917,7 @@ namespace SAVEGAME {
             } else {
                 writer->Write_Bytes_(&report->d, sizeof(report->d));
             }
-            writer->Write_Bytes_(reinterpret_cast<const uint8_t*>(report) + 8, 8);
-            writer->Write_Int16_(report->field4_0x10);
-            writer->Write_Int8_(report->field5_0x12);
+            writer->Write_Bytes_(report->reserved, sizeof(report->reserved));
         }
 
         void Read_Report_(SERIAL::Reader_* reader, s_report* report) {
@@ -945,9 +943,7 @@ namespace SAVEGAME {
             } else {
                 reader->Read_Bytes_(&report->d, sizeof(report->d));
             }
-            reader->Read_Bytes_(reinterpret_cast<uint8_t*>(report) + 8, 8);
-            report->field4_0x10 = reader->Read_Int16_();
-            report->field5_0x12 = reader->Read_Int8_();
+            reader->Read_Bytes_(report->reserved, sizeof(report->reserved));
         }
 
         void Write_Event_(SERIAL::Writer_* writer, const s_event_data* event) {

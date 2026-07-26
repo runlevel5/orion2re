@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "game/savegame.h"
+
 #include <algorithm>
 #include <limits>
 #include <string>
@@ -996,6 +998,44 @@ namespace oracle {
             return "trailing data";
         }
 
+        bool Canonicalize_Save_Comparison_(std::vector<uint8_t>* save, const char* path) {
+            constexpr size_t version_offset =
+                sizeof(uint32_t) + sizeof(MOX::_save_game_description[0].description) +
+                sizeof(MOX::_stardate) + sizeof(MOX::_game_type);
+            if (save->size() < sizeof(uint32_t)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: save '%s' is too small", path);
+                return false;
+            }
+
+            uint32_t header;
+            memcpy(&header, save->data(), sizeof(header));
+            if (header == SAVEGAME::LEGACY_HEADER) {
+                return true;
+            }
+            if (header != SAVEGAME::VERSIONED_HEADER ||
+                save->size() < version_offset + sizeof(uint16_t)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: save '%s' has an unsupported header", path);
+                return false;
+            }
+
+            uint16_t version;
+            memcpy(&version, save->data() + version_offset, sizeof(version));
+            if (version != 0) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: save '%s' uses unsupported comparison version %u",
+                    path, static_cast<unsigned>(version));
+                return false;
+            }
+
+            save->erase(save->begin() + version_offset,
+                save->begin() + version_offset + sizeof(version));
+            header = SAVEGAME::LEGACY_HEADER;
+            memcpy(save->data(), &header, sizeof(header));
+            return true;
+        }
+
         size_t Find_First_Save_Difference_(
             const std::vector<uint8_t>& actual,
             const std::vector<uint8_t>& expected) {
@@ -1946,6 +1986,10 @@ namespace oracle {
             std::vector<uint8_t> actual;
             std::vector<uint8_t> expected;
             if (!Read_File_(actual_path, &actual, true) || !Read_File_(expected_path, &expected, true)) {
+                return false;
+            }
+            if (!Canonicalize_Save_Comparison_(&actual, actual_path) ||
+                !Canonicalize_Save_Comparison_(&expected, expected_path)) {
                 return false;
             }
 
