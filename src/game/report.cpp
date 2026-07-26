@@ -2,7 +2,7 @@
 
 namespace REPORT {
     int16_t _n_reports;
-    s_report _reports[50];
+    s_report _reports[MAX_REPORTS];
     uint8_t _done_player_reports;
     uint8_t _something_interesting_happened[MAX_PLAYERS];
     uint8_t _done_colonize_check[BITMAP(MAX_STARS)];
@@ -786,7 +786,7 @@ namespace REPORT {
     }
 
     void __cdecl Add_Report_(s_report* report) {
-        if (_n_reports < 50) {
+        if (_n_reports < MAX_REPORTS) {
             _reports[_n_reports] = *report;
             _n_reports++;
         }

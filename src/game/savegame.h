@@ -1,0 +1,21 @@
+#pragma once
+
+#include "game/serialization.h"
+
+namespace SAVEGAME {
+    inline constexpr uint32_t LEGACY_HEADER = 0xE0;
+    inline constexpr uint32_t VERSIONED_HEADER = 0xE1;
+    inline constexpr uint16_t CURRENT_VERSION = 0;
+    inline constexpr uint32_t BUFFER_CAPACITY = 1024 * 1024;
+
+    struct s_metadata {
+        uint32_t header;
+        uint16_t version;
+        char description[37];
+        int32_t stardate;
+        int8_t game_type;
+    };
+
+    void Write_Game_(SERIAL::Writer_* writer, const char* description, uint32_t random_seed);
+    bool Read_Game_(SERIAL::Reader_* reader, s_metadata* metadata, s_settings* saved_settings, uint32_t* random_seed);
+}
