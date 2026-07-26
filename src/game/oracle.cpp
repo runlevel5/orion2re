@@ -1158,6 +1158,61 @@ namespace oracle {
                 memcpy(&differing_expected,
                     expected->data() + differing_message_offset,
                     sizeof(differing_expected));
+                const bool difference_is_eel =
+                    differing_actual.msg_type == differing_expected.msg_type &&
+                    (differing_actual.msg_type == MSG_TYPE_EEL_SPAWNED ||
+                        differing_actual.msg_type == MSG_TYPE_EEL_VANISHED);
+                if (difference_is_eel) {
+                    bool changed = false;
+                    for (size_t message_idx = 0; message_idx < 100; ++message_idx) {
+                        const size_t message_offset =
+                            messages_offset + message_idx * sizeof(s_MSG);
+                        if (message_offset + sizeof(s_MSG) > actual->size() ||
+                            message_offset + sizeof(s_MSG) > expected->size()) {
+                            return false;
+                        }
+
+                        s_MSG actual_message;
+                        s_MSG expected_message;
+                        memcpy(&actual_message, actual->data() + message_offset,
+                            sizeof(actual_message));
+                        memcpy(&expected_message, expected->data() + message_offset,
+                            sizeof(expected_message));
+                        if (actual_message.msg_type != expected_message.msg_type ||
+                            (actual_message.msg_type != MSG_TYPE_EEL_SPAWNED &&
+                                actual_message.msg_type != MSG_TYPE_EEL_VANISHED)) {
+                            continue;
+                        }
+
+                        const size_t priority_offset = message_offset +
+                            offsetof(s_MSG, priority);
+                        if ((*actual)[priority_offset] != 0 ||
+                            (*expected)[priority_offset] != 0) {
+                            (*actual)[priority_offset] = 0;
+                            (*expected)[priority_offset] = 0;
+                            changed = true;
+                        }
+
+                        const size_t unused_offset = message_offset +
+                            offsetof(s_MSG, u) + sizeof(s_MSG_eel);
+                        const size_t unused_size = sizeof(s_MSG) -
+                            offsetof(s_MSG, u) - sizeof(s_MSG_eel);
+                        for (size_t i = 0; i < unused_size; ++i) {
+                            if ((*actual)[unused_offset + i] != 0 ||
+                                (*expected)[unused_offset + i] != 0) {
+                                (*actual)[unused_offset + i] = 0;
+                                (*expected)[unused_offset + i] = 0;
+                                changed = true;
+                            }
+                        }
+                    }
+
+                    if (changed) {
+                        *rule_name = "normalize uninitialized eel message bytes";
+                    }
+                    return changed;
+                }
+
                 const bool difference_is_failed_retreat =
                     differing_actual.msg_type == MSG_TYPE_FAILED_RETREAT &&
                     differing_expected.msg_type == MSG_TYPE_FAILED_RETREAT;
