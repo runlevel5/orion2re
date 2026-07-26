@@ -951,7 +951,7 @@ namespace LOADSAVE {
      * @address 0043d130
      */
     bool __cdecl Is_Valid_Game_Type_(uint32_t game_type) {
-        return game_type == 0xe0;
+        return game_type == 0xe0 || game_type == 0xe1;
     }
 
     /**

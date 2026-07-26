@@ -2,7 +2,7 @@
 
 namespace REPORT {
     extern int16_t _n_reports;
-    extern s_report _reports[50];
+    extern s_report _reports[MAX_REPORTS];
     extern uint8_t _done_player_reports;
     extern uint8_t _something_interesting_happened[MAX_PLAYERS];
     extern uint8_t _done_colonize_check[BITMAP(MAX_STARS)];
