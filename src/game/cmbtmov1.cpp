@@ -356,7 +356,9 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                             if (msl_speed < 2) {
                                 msl_speed = 2;
                             }
-                            if (CMBTMIS::Move_Missile_(m, center_x + cur_x_px, center_y + cur_y_px, (int8_t)msl_speed) != 0) {
+                            // ORACLE: The original passes the full 16-bit distance;
+                            // values above 127 must not be truncated to signed int8_t.
+                            if (CMBTMIS::Move_Missile_(m, center_x + cur_x_px, center_y + cur_y_px, msl_speed) != 0) {
                                 hit_missiles[hit_missile_count++] = m;
                             }
                         }
