@@ -2025,19 +2025,24 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     int16_t weapon_damage;
     int16_t missile_type = missile->type;
     if (TECHDATA::_weapons[missile_type].type == WEAPON_TYPE_FIGHTER) {
-        // The original indexes fighter loadouts by the owner evaluating the threat,
-        // not by the owner of the fighter's source unit.
+        // ORACLE: The original indexes fighter loadouts by the owner evaluating the threat,
+        // but owners above 8 read beyond these nine-element tables into unrelated globals.
         int16_t unit_owner = MOX::_combat_data[unit_idx].owner;
+        const bool has_fighter_loadout = unit_owner >= 0 && unit_owner <= MAX_PLAYERS;
         switch (missile_type) {
             case WEAPON_ASSAULT_SHUTTLE:
                 weapon_damage = 100;
                 break;
             case WEAPON_HEAVY_FIGHTER:
             case WEAPON_BOMBER:
-                weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[unit_owner]].max_damage;
+                weapon_damage = has_fighter_loadout
+                    ? TECHDATA::_weapons[MOX::_fighter_bomb_type[unit_owner]].max_damage
+                    : 0;
                 break;
             case WEAPON_INTERCEPTOR:
-                weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[unit_owner]].max_damage;
+                weapon_damage = has_fighter_loadout
+                    ? TECHDATA::_weapons[MOX::_fighter_beam_type[unit_owner]].max_damage
+                    : 0;
                 break;
             default:
                 weapon_damage = 0;
