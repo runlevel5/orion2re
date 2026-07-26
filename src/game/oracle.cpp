@@ -3085,6 +3085,48 @@ namespace oracle {
         }
     }
 
+    bool Deliver_Science_Input_Before_Jumble_() {
+        if (!g_replay_active || g_record_index >= g_records.size()) {
+            return false;
+        }
+
+        size_t action_index = g_record_index;
+        uint16_t mouse_buttons = g_replay_mouse_buttons;
+        for (; action_index < g_records.size(); ++action_index) {
+            const s_input_position& position =
+                g_record_positions[action_index];
+            if (position.random_call_count != g_random_record_index ||
+                position.random_seed_count != g_random_seed_record_index) {
+                return false;
+            }
+
+            const s_input_record& record = g_records[action_index];
+            if (record.input_type == k_key_input_type ||
+                (record.mouse_buttons & ~mouse_buttons) != 0) {
+                break;
+            }
+            mouse_buttons = record.mouse_buttons;
+        }
+        if (action_index >= g_records.size()) {
+            return false;
+        }
+
+        while (g_record_index <= action_index) {
+            const s_input_record& record = g_records[g_record_index++];
+            if (record.input_type == k_mouse_input_type) {
+                mouse::User_Mouse_Handler_(record.mouse_x, record.mouse_y,
+                    record.mouse_buttons);
+                g_replay_mouse_buttons = record.mouse_buttons;
+            } else {
+                key::Push_Key_Code_(record.key_code, record.scan_code);
+            }
+        }
+
+        g_click_pause_active = false;
+        g_last_consumption_counter = SDL_GetPerformanceCounter();
+        return true;
+    }
+
     void Complete_Turn_() {
         if (!g_replay_active) {
             return;

@@ -59,6 +59,9 @@ namespace oracle {
     // Injects the next due logical input event without compressing overdue event spacing.
     void Pump_Input_();
 
+    // Delivers one pending science-room input before an unrecorded extra jumble step.
+    bool Deliver_Science_Input_Before_Jumble_();
+
     // Saves and verifies the state produced by the completed turn.
     void Complete_Turn_();
 

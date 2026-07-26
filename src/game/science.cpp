@@ -287,13 +287,15 @@ namespace SCIENCE {
                     if (jumble_amount <= 0) {
                         animate::Draw_(0xDD, 0x2C, (s_animation_header*)current_text_bitmap);
                     } else {
-                        bitmap::Jumble_Bitmap_((s_animation_header*)previous_text_bitmap, (s_animation_header*)current_text_bitmap, jumble_amount, jumble_steps);
-                        jumble_amount -= 0x14;
-                        animate::Draw_(0xDD, 0x2C, (s_animation_header*)previous_text_bitmap);
+                        if (!oracle::Deliver_Science_Input_Before_Jumble_()) {
+                            bitmap::Jumble_Bitmap_((s_animation_header*)previous_text_bitmap, (s_animation_header*)current_text_bitmap, jumble_amount, jumble_steps);
+                            jumble_amount -= 0x14;
 
-                        if (jumble_steps > 1) {
-                            --jumble_steps;
+                            if (jumble_steps > 1) {
+                                --jumble_steps;
+                            }
                         }
+                        animate::Draw_(0xDD, 0x2C, (s_animation_header*)previous_text_bitmap);
                     }
                 } else {
                     room_animation_ready = animate::Get_Current_Frame_(
