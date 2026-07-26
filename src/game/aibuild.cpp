@@ -629,7 +629,8 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_CAPITOL:
@@ -735,13 +736,15 @@ namespace AIBUILD {
         case BUILDING_MISSILE_BASE: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_GROUND_BATTERIES: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_RADIATION_SHIELD: {
@@ -822,7 +825,8 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_STAR_FORTRESS: {
@@ -831,13 +835,15 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_STELLAR_CONVERTER: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus + bc_score;
+            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_SUBTERRANEAN_FARMS:
