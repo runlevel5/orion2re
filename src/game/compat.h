@@ -27,6 +27,11 @@
 #define __thiscall
 #endif
 
+using legacy_qsort_compare = int (__cdecl*)(const void*, const void*);
+void Legacy_Qsort_(void* base, size_t count, size_t width, legacy_qsort_compare compare);
+
+#define qsort Legacy_Qsort_
+
 #if !defined(GUID_DEFINED)
 #define GUID_DEFINED
 typedef struct _GUID {

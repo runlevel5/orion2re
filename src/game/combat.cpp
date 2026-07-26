@@ -105,6 +105,8 @@ namespace COMBAT {
 
             colony_defense_flags = MOX::_colony_defense_flags;
 
+            oracle::Verify_Strategic_Combat_State_();
+
             while (MOX::_combat_attacker_count > 0 && MOX::_combat_defender_count > 0) {
                 if (MOX::_combat_turn >= 50) {
                     break;
@@ -163,6 +165,8 @@ namespace COMBAT {
                         }
                     }
                 }
+
+                oracle::Verify_Strategic_Combat_State_();
             }
 
             if (MOX::_combat_turn < 50) {

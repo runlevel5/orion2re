@@ -189,6 +189,8 @@ namespace COMBAT1 {
     }
 
     void __cdecl Do_Combat_Turn_(int16_t active_player_id, int16_t time_warp_only) {
+        oracle::Verify_Tactical_Turn_(active_player_id, time_warp_only);
+
         MOX::_player_mode[MOX::_combat_attacker_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_attacker_player);
         MOX::_player_mode[MOX::_combat_defender_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_defender_player);
 
@@ -233,6 +235,10 @@ namespace COMBAT1 {
             }
         }
 
+        if (order_idx == num_captured) {
+            return;
+        }
+
         if (order_idx != num_captured) {
             if (MOX::_combat_init != 0) {
                 qsort(MOX::_ship_turn_order, order_idx, sizeof(MOX::_ship_turn_order[0]), qsort_ship_initiative_);
@@ -246,6 +252,10 @@ namespace COMBAT1 {
             COMBAT1::_start_of_turn = 1;
             MOX::_cur_ptr = -1;
             int16_t next_ship_flag = Next_Ship_(active_player_id);
+
+            if (next_ship_flag == 1) {
+                return;
+            }
 
             if (next_ship_flag != 1) {
                 fields::Assign_Auto_Function_(CMBTDRW1::Draw_Main_Combat_Screen_, 2);
@@ -592,7 +602,7 @@ namespace COMBAT1 {
                                                 ty = MOX::_cur_combat_y - 1 + MOX::_ypos / 2;
                                             }
                                         }
-                                        
+
                                         int16_t tgt_idx = -1;
                                         if (tx >= 0 && tx < COMBAT_GRID_WIDTH && ty >= 0 && ty < COMBAT_GRID_HEIGHT) {
                                             tgt_idx = MOX::_combat_grid[tx][ty];

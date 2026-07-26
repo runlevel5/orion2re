@@ -30,6 +30,10 @@ namespace game_random {
      */
     uint32_t __cdecl Random_(uint32_t max_val);
 
+    /** Temporarily excludes a save/reseed/use/restore visual RNG scope from oracle logs. */
+    void Begin_Oracle_Ignore_();
+    void End_Oracle_Ignore_();
+
     /** Restores the previously saved random seed.
      *  @param None.
      */

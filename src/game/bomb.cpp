@@ -125,7 +125,8 @@ namespace BOMB {
                     }
 
                     bomb_result->colony_wiped_out = 1;
-                    owner_player->colony_war_losses[(uint8_t)bomb_result->attacker_idx] += 10;
+                    // ORACLE: Preserve the original signed attacker index; industrial accidents use -1.
+                    owner_player->colony_war_losses[bomb_result->attacker_idx] += 10;
                 } else {
                     colony->pop_roundoff[pop_idx] -= 100;
                 }
@@ -201,7 +202,8 @@ namespace BOMB {
                 bomb_result->population_killed++;
                 colony->n_pops--;
                 colony->pop[hit_idx] = colony->pop[colony->n_pops];
-                owner_player->colony_war_losses[(uint8_t)bomb_result->attacker_idx]++;
+                // ORACLE: Preserve the original signed attacker index; industrial accidents use -1.
+                owner_player->colony_war_losses[bomb_result->attacker_idx]++;
             }
             result_code = 1;
             bomb_result->damage_occurred = 1;
@@ -239,7 +241,8 @@ namespace BOMB {
                 colony->n_pops--;
                 colony->pop[target_pop_idx] = colony->pop[(uint8_t)colony->n_pops];
 
-                MOX::_player[(uint8_t)colony->owner].colony_war_losses[(uint8_t)bomb_result->attacker_idx]++;
+                // ORACLE: Preserve the original signed attacker index; industrial accidents use -1.
+                MOX::_player[(uint8_t)colony->owner].colony_war_losses[bomb_result->attacker_idx]++;
                 return;
             }
 
@@ -289,7 +292,8 @@ namespace BOMB {
 
             if (!has_buildings) {
                 bomb_result->colony_wiped_out = 1;
-                MOX::_player[(uint8_t)colony->owner].colony_war_losses[(uint8_t)bomb_result->attacker_idx] += 10;
+                // ORACLE: Preserve the original signed attacker index; industrial accidents use -1.
+                MOX::_player[(uint8_t)colony->owner].colony_war_losses[bomb_result->attacker_idx] += 10;
             }
         } else {
             race_idx = (int32_t)(colony->pop[target_pop_idx] & 0xf);

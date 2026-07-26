@@ -1029,11 +1029,13 @@ namespace CMBTMIS {
             type = Missile_Type_(missile_idx);
 
             if (combat_view_type == 0 && (MOX::_ship_frame % 3 == 0)) {
+                game_random::Begin_Oracle_Ignore_();
                 uint32_t old_seed = game_random::Get_Random_Seed_();
                 game_random::Set_Random_Seed_((uint32_t)clock() + i + missile_idx);
                 rand_x = (int16_t)game_random::Random_(3) - 2;
                 rand_y = (int16_t)game_random::Random_(3) - 2;
                 game_random::Set_Random_Seed_(old_seed);
+                game_random::End_Oracle_Ignore_();
             }
 
             owner = Missile_Owner_(missile_idx);

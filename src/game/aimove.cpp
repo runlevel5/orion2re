@@ -1623,6 +1623,7 @@ namespace AIMOVE {
                     bool target_met = false;
                     
                     target_min_eta[star_idx] = 10;
+                    target_best_eta[star_idx] = 0;
 
                     for (int e = 0; e < 10; ++e) {
                         uint32_t strength_needed = (uint32_t)target->strength[e];
@@ -1635,6 +1636,7 @@ namespace AIMOVE {
                                 target_met = true;
                                 if (strength_totals[e + star_idx * 10] > strength_needed * 4 + 8) {
                                     target_min_eta[star_idx] = (char)e;
+                                    break;
                                 }
                             }
                         }
@@ -1677,7 +1679,7 @@ namespace AIMOVE {
                                 }
 
                                 if (move_star != -1) {
-                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, move_star, &move_info);
+                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, target_star, &move_info);
                                     (*AIDATA::_i_all_combat_ships)[_i_ai][ship_loc] = -1;
                                 }
                             }
@@ -2388,16 +2390,16 @@ namespace AIMOVE {
             }
             else {
                 *out_attack_type = 2;
-                if (defending_space * 3 < total_space_strength) {
+                if (possible_space_strength * 3 < total_space_strength) {
                     total_space_strength = 3;
-                    defending_space = 1;
+                    possible_space_strength = 1;
                 }
                 else if (total_space_strength == 0) {
                     total_space_strength = 1;
-                    defending_space = 1;
+                    possible_space_strength = 1;
                 }
 
-                attack_worthiness = (colony_worth * total_space_strength) / (defending_space * 2);
+                attack_worthiness = (colony_worth * total_space_strength) / (possible_space_strength * 2);
 
                 if ((MOX::_star[star_idx].blockaded >> owner) & 1) {
                     uint8_t blocked_by = MOX::_star[star_idx].blockaded_by[owner];

@@ -840,7 +840,7 @@ namespace aidudes {
                                 if (MOX::_ship[COLBLDG::Colony_Production_Ship_Index_(prod)].d.ship_type != SHIP_TYPE_COMBAT) {
                                     delete_from_queue = true;
                                 }
-                            } else if (prod > COLONY_PRODUCTION_SPY) {
+                            } else if (prod > COLONY_PRODUCTION_REFIT) {
                                 if (prod > COLONY_PRODUCTION_FARMER) {
                                     if (prod == COLONY_PRODUCTION_TRADE_GOODS) {
                                         recalculate_colony = true;
@@ -1058,7 +1058,7 @@ namespace aidudes {
                     freighter_groups_assigned <= 1 &&
                     p->tech_applications[TECH_APP_FREIGHTERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
 
-                    freighter_weight = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - freighter_groups_assigned * 2) * 20 + 100;
+                    freighter_weight = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - freighter_groups_assigned * 2) * 100 + 500;
                     if (war_level > 0) {
                         freighter_weight /= (war_level * war_level);
                     }
@@ -1129,7 +1129,7 @@ namespace aidudes {
                                         COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_STAR_FORTRESS) <= (war_level * 2 + 31) * ind_worth) {
                                         flag_38 = true;
                                         ship_weights[8] = (uint16_t)(((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2 +
-                                                           ((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2) * 2 +
+                                                           ((*AIDATA::_ai_colony_info)[i].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2) * 2 +
                                                            (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count) * 2;
                                         if (p->command_points < p->command_points_used) {
                                             ship_weights[8] += (p->command_points_used - p->command_points) * 2;
@@ -1141,24 +1141,24 @@ namespace aidudes {
                                     if (p->tech_applications[TECH_APP_BATTLESTATION] == TECH_RESEARCH_STATUS_RESEARCHED &&
                                         COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_BATTLESTATION) <= cost_threshold_1) {
                                         flag_34 = true;
-                                        ship_weights[7] = (uint16_t)(((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2 +
+                                        ship_weights[7] = (uint16_t)(((*AIDATA::_ai_colony_info)[i].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2 +
                                                            (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2) * 5 +
                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count * 3;
                                         if (p->command_points < p->command_points_used) {
                                             ship_weights[7] += (p->command_points_used - p->command_points) * 2;
                                         }
                                     }
-                                }
 
-                                if (temp_colony->buildings[BUILDING_STAR_BASE] == 0) {
-                                    if (p->tech_applications[TECH_APP_STAR_BASE] == TECH_RESEARCH_STATUS_RESEARCHED &&
-                                        COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_STAR_BASE) <= (war_level * 2 + 35) * ind_worth) {
-                                        flag_2c = true;
-                                        ship_weights[6] = (uint16_t)((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 10 +
-                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count * 4 + 12 +
-                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 6;
-                                        if (p->command_points < p->command_points_used) {
-                                            ship_weights[6] += (p->command_points_used - p->command_points) * 2;
+                                    if (temp_colony->buildings[BUILDING_STAR_BASE] == 0) {
+                                        if (p->tech_applications[TECH_APP_STAR_BASE] == TECH_RESEARCH_STATUS_RESEARCHED &&
+                                            COLCALC::Colony_Product_Cost_(MOX::_colony, BUILDING_STAR_BASE) <= (war_level * 2 + 35) * ind_worth) {
+                                            flag_2c = true;
+                                            ship_weights[6] = (uint16_t)((*AIDATA::_ai_colony_info)[i].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 10 +
+                                                              (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count * 4 + 12 +
+                                                              (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 6;
+                                            if (p->command_points < p->command_points_used) {
+                                                ship_weights[6] += (p->command_points_used - p->command_points) * 2;
+                                            }
                                         }
                                     }
                                 }

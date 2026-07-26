@@ -1177,9 +1177,9 @@ namespace fields {
                         _active_input_field_first = 0;
                     }
                 } else {
+                    _active_input_field_first = 0;
                     int16_t chr = (int16_t)((int32_t)key_code % 0x100);
                     if (chr >= 0x20 && chr <= 0x7E && chr != 0x5F) {
-                        _active_input_field_first = 0;
                         if (_active_input_field_number >= 0 && _active_input_field_number < _fields_count) {
                             int16_t font_shadow = active_cont_input->font_shadow_style;
                             if (font_shadow == -1) {
@@ -1213,6 +1213,14 @@ namespace fields {
         }
 
         int16_t mouse_btn = mouse::Mouse_Button_();
+        bool defer_replay_click_completion = false;
+        if (mouse_btn != 0 && oracle::Replay_Active_()) {
+            defer_replay_click_completion =
+                oracle::Defer_Replay_Click_Completion_(Scan_Field_());
+            if (!defer_replay_click_completion && oracle::Complete_Replay_Click_(true)) {
+                mouse_btn = mouse::Mouse_Button_();
+            }
+        }
         if (mouse_btn == 0) {
             if (mouse::Mouse_Buffer_() == 0) {
                 _pressed_button_flag = 0;
@@ -1442,6 +1450,9 @@ namespace fields {
                 
                 if (mouse::Mouse_Button_() != 0) {
                     Call_Auto_Function_();
+                    if (defer_replay_click_completion) {
+                        oracle::Complete_Replay_Click_();
+                    }
                 }
                 mouse::Mouse_Buffer_();
                 mouse::Mouse_Buffer2_();

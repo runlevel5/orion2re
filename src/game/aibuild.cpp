@@ -374,8 +374,7 @@ namespace AIBUILD {
                 }
 
                 int32_t spy_trait = MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS];
-                int32_t spy_roll = (int32_t)game_random::Random_(100);
-                if (current_spies < max_spies + 2 && spy_roll <= spy_trait) {
+                if (current_spies < max_spies + 2 && (int32_t)game_random::Random_(100) <= spy_trait) {
                     AIBUILD::_player_n_spies[player_idx][1]++;
                 }
 
@@ -518,7 +517,7 @@ namespace AIBUILD {
 
     void __cdecl Find_Buildable_Buildings_(s_colony* colony, uint16_t* buildable_flags) {
         for (int16_t product_id = BUILDING_NO_BUILDING + 1; product_id < BUILDING_COUNT; ++product_id) {
-            if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
+            if (COLCALC::Colony_Can_Build_Product_(colony, product_id) == 1) {
                 buildable_flags[product_id] = 1;
             }
         }
@@ -630,7 +629,8 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_CAPITOL:
@@ -736,13 +736,15 @@ namespace AIBUILD {
         case BUILDING_MISSILE_BASE: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_GROUND_BATTERIES: {
             if (building_focus && threatened == 0) break;
             int32_t base_threat = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_RADIATION_SHIELD: {
@@ -823,7 +825,8 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_STAR_FORTRESS: {
@@ -832,13 +835,15 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + militarist_objective_bonus + bc_score;
+            if (base_threat != 0) score = base_threat + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_STELLAR_CONVERTER: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus + bc_score;
+            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus;
+            score += bc_score;
         } break;
 
         case BUILDING_SUBTERRANEAN_FARMS:
@@ -879,7 +884,8 @@ namespace AIBUILD {
                 case PLANET_CLIMATE_ARID: base_climate_score = 1; break;
                 default: valid_climate = false; break;
                 }
-                if (valid_climate) score = base_climate_score + ecologist_objective_bonus * 3 + bc_score;
+                score = bc_score;
+                if (valid_climate) score += base_climate_score + ecologist_objective_bonus * 3;
             }
             break;
 
@@ -903,7 +909,8 @@ namespace AIBUILD {
         case BUILDING_FIGHTER_GARRISON: {
             if (building_focus && threatened == 0) break;
             int32_t threatened_score = threatened * 10 + (out_of_range_count + (neutral_count + alliance_count * 2) * 2 + enemy_count) * 4;
-            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus + bc_score;
+            if (threatened_score != 0) score = threatened_score + militarist_objective_bonus;
+            score += bc_score;
         } break;
         }
 
@@ -938,7 +945,7 @@ namespace AIBUILD {
 
         Find_Buildable_Buildings_(colony, weights);
 
-        for (int16_t i = BUILDING_ASTRO_UNIVERSITY; i < BUILDING_COUNT; ++i) {
+        for (int16_t i = BUILDING_NO_BUILDING; i < BUILDING_COUNT; ++i) {
             if (weights[i] > 0) {
                 int16_t score = Colony_Building_Score_(colony, i);
                 weights[i] = score;

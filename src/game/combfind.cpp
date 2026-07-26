@@ -200,7 +200,7 @@ void __cdecl Process_Retreating_Ships_(void) {
         char pad2[13];
     };
 
-    s_retreat_report report[MAX_PLAYERS][MAX_STARS + 1];
+    s_retreat_report report[MAX_PLAYERS * ORIGINAL_MAX_STARS];
     int8_t player_retreat_target[MAX_PLAYERS];
     int16_t ship_indices[MAX_SHIPS];
     s_ship_move_info move_info;
@@ -233,13 +233,13 @@ void __cdecl Process_Retreating_Ships_(void) {
                         MOX::_leaders[leader_idx].location = -1;
                         ship->officer_index = -1;
                         OFFICER::Kill_Officer_(leader_idx);
-                        report[owner][MOX::_NUM_STARS].killed_officers++;
+                        report[owner * ORIGINAL_MAX_STARS + MOX::_NUM_STARS].killed_officers++;
                     } else {
                         OFFICER::Move_Officer_To_Pool_(leader_idx);
                     }
                 }
-                report[owner][MOX::_NUM_STARS].count++;
-                report[owner][MOX::_NUM_STARS].reason = 0;
+                report[owner * ORIGINAL_MAX_STARS + MOX::_NUM_STARS].count++;
+                report[owner * ORIGINAL_MAX_STARS + MOX::_NUM_STARS].reason = 0;
                 SHIPS::Kill_Ship_((int16_t)i);
             } else {
                 int target_loc = (int)player_retreat_target[owner];
@@ -286,13 +286,18 @@ void __cdecl Process_Retreating_Ships_(void) {
                     if (leader_idx != -1) {
                         if (MOX::_leaders[leader_idx].eta < 1) {
                             OFFICER::Kill_Officer_(leader_idx);
-                            report[owner][loc].killed_officers++;
+                            report[owner * ORIGINAL_MAX_STARS + MOX::_ship[i].location].killed_officers++;
                         } else {
                             OFFICER::Move_Officer_To_Pool_(leader_idx);
                         }
                     }
-                    report[owner][loc].count++;
-                    report[owner][loc].reason = fail_reason;
+                    // ORACLE: The original re-reads the outer ship's location after it may have
+                    // been killed. A location of -1 aliases the preceding player's final slot.
+                    // Fix this attribution bug later even though doing so diverges from the oracle.
+                    s_retreat_report& retreat =
+                        report[owner * ORIGINAL_MAX_STARS + MOX::_ship[i].location];
+                    retreat.count++;
+                    retreat.reason = fail_reason;
                     SHIPS::Kill_Ship_(idx);
                 }
             } else {
@@ -328,13 +333,14 @@ void __cdecl Process_Retreating_Ships_(void) {
 
     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
         for (int s = 0; s < MOX::_NUM_STARS + 1; ++s) {
-            if (report[p][s].count != 0) {
-                s_MSG msg;
+            s_retreat_report& retreat = report[p * ORIGINAL_MAX_STARS + s];
+            if (retreat.count != 0) {
+                s_MSG msg = {};
                 msg.msg_type = MSG_TYPE_FAILED_RETREAT;
                 msg.u.retreat.star_idx = (char)s;
-                msg.u.retreat.reason = report[p][s].reason;
-                msg.u.retreat.ships_lost = report[p][s].count;
-                msg.u.retreat.leader_count = report[p][s].killed_officers;
+                msg.u.retreat.reason = retreat.reason;
+                msg.u.retreat.ships_lost = retreat.count;
+                msg.u.retreat.leader_count = retreat.killed_officers;
                 MSG_::Add_Msg_(msg, p);
             }
         }
@@ -739,7 +745,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
     int16_t limit;
     int n_techs;
     int total_valid_techs;
-    s_MSG msg;
+    s_MSG msg = {};
 
     star_idx = (int16_t)(star - MOX::_star);
     Reset_One_Shot_System_Special_(star);
@@ -866,16 +872,11 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
     // System specials with value >= 50 (ASCII '2') are treated as one-shot/temporary events.
     if (star->system_special >= 50) {
-        // Temporary discovered-special markers 50..89 consume one-shot system rewards and
-        // should clear the mirrored per-planet special. The 90..99 range is used for
-        // discovered Ancient Artifacts notifications and must preserve the artifacts world.
-        if (star->system_special < 90) {
-            for (int i = 0; i < 5; ++i) {
-                int16_t planet_idx = star->planet_index[i];
-                if (planet_idx != -1) {
-                    // Reset the special status on each planet belonging to this system.
-                    MOX::_planet[planet_idx].planet_special = 0;
-                }
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star->planet_index[i];
+            if (planet_idx != -1) {
+                // Reset the special status on each planet belonging to this system.
+                MOX::_planet[planet_idx].planet_special = 0;
             }
         }
         // Clear the system special flag

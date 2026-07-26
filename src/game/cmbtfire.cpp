@@ -1576,10 +1576,6 @@ namespace CMBTFIRE {
                 for (int16_t i = 0; i < missile_hits; ++i) {
                     int16_t dmg_val = current_damage;
                     CMBTFIRE::Apply_Damage_To_Missile_(target, &dmg_val, specials, weapon_flags_00);
-                    MOX::_missile[target].quantity -= dmg_val;
-                    if (MOX::_missile[target].quantity <= 0) {
-                        MOX::_missile[target].type = 0;
-                    }
                     if (MOX::_missile[target].quantity <= 0 || MOX::_missile[target].type == 0) {
                         continue_firing = 0;
                     }

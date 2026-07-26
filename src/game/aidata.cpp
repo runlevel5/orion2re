@@ -1220,16 +1220,16 @@ namespace AIDATA {
         int growth_trait = evaluating_player->traits[TRAIT_POP_GROWTH_BONUS];
         int growth_mult;
         switch (growth_trait) {
-            case 50:
+            case -50:
                 growth_mult = (colony->n_pops * 19 + avg_max_pop) * 5;
                 break;
-            case 100:
+            case 0:
                 growth_mult = (colony->n_pops * 9 + avg_max_pop) * 10;
                 break;
-            case 0:
+            case 50:
                 growth_mult = colony->n_pops * 85 + avg_max_pop * 15;
                 break;
-            case -50:
+            case 100:
                 growth_mult = (avg_max_pop + colony->n_pops * 4) * 20;
                 break;
             default:

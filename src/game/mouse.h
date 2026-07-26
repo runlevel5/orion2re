@@ -78,4 +78,9 @@ namespace mouse {
 
     /// Enables the mouse.
     void __cdecl Enable_Mouse_();
+
+    /// Restores the legacy mouse state captured at the start of an oracle turn.
+    void Restore_Input_State_(int16_t mouse_x, int16_t mouse_y, int16_t mouse_buttons,
+        int16_t buffer_button, int16_t buffer_x, int16_t buffer_y,
+        int16_t buffer_flag, uint16_t buffer_flag2);
 }

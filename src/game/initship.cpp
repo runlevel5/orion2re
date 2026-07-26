@@ -1852,12 +1852,12 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 
     // Slot 1
     ship->weapons[1].weapon_id = 4;
-    ship->weapons[1].count = 1;
+    ship->weapons[1].count = 2;
     ship->weapons[1].arc = 1;
     ship->weapons[1].specials = 2;
     ship->weapons[1].ammo = -1;
     ship->weapons[1].active = 1;
-    ship->weapons[1].shots_left = 1;
+    ship->weapons[1].shots_left = 2;
     ship->weapons[1].status = 0;
 
     // Slot 2

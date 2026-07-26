@@ -70,4 +70,13 @@ namespace key {
         g_key_write = (uint8_t)((g_key_write + 1) % kLastKeyPressedCount);
         g_last_scan_code = scan_code;
     }
+
+    void Restore_Input_State_(uint8_t key_pressed, uint8_t key_write, int8_t key_read,
+        uint32_t last_scan_code, const int32_t* key_buffer) {
+        g_key_pressed = key_pressed;
+        g_key_write = key_write;
+        g_key_read = key_read;
+        g_last_scan_code = last_scan_code;
+        memcpy(g_last_key_pressed, key_buffer, sizeof(g_last_key_pressed));
+    }
 }

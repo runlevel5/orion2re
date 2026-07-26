@@ -74,6 +74,8 @@ tools/run-tests.sh
 
 For the full preset list and per-platform details, see `CMakePresets.json`.
 
+Random-sequence mismatches log every recorded original caller and captured local caller, including absolute addresses and executable-relative RVAs for symbol lookup.
+
 Example release build:
 
 ```sh

@@ -26,6 +26,7 @@
 
 #include "random.h"
 #include "platform.h"
+#include "oracle.h"
 #include "allocate.h"
 #include "animate.h"
 #include "clipped.h"

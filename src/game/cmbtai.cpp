@@ -835,7 +835,7 @@ int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx) {
             for (int16_t slot_idx = 0; slot_idx < 8; ++slot_idx) {
                 int16_t weapon_id = ship->weapons[slot_idx].weapon_id;
 
-                if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_MAULER_DEVICE) {
+                if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_PROTON_TORPEDO) {
                     bool is_long_range = false;
 
                     if ((TECHDATA::_weapons[weapon_id].natural_mods & 4 /* W_CONT_BEAM */) != 0) {
@@ -884,7 +884,7 @@ int16_t __cdecl Get_Effective_Beam_Strength_(int16_t player_idx) {
                 for (int16_t weapon_idx = 0; weapon_idx < 8; ++weapon_idx) {
                     int16_t weapon_id = ship->weapons[weapon_idx].weapon_id;
 
-                    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_SPATIAL_COMPRESSOR) {
+                    if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_PROTON_TORPEDO) {
                         total_strength += CMBTAI::Get_Effective_Weapon_Damage_(ship_idx, weapon_idx);
                     }
                 }
@@ -2025,25 +2025,24 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     int16_t weapon_damage;
     int16_t missile_type = missile->type;
     if (TECHDATA::_weapons[missile_type].type == WEAPON_TYPE_FIGHTER) {
-        int16_t source_owner = MOX::_combat_data[missile->source_unit_idx].owner;
+        // ORACLE: The original indexes fighter loadouts by the owner evaluating the threat,
+        // but owners above 8 read beyond these nine-element tables into unrelated globals.
+        int16_t unit_owner = MOX::_combat_data[unit_idx].owner;
+        const bool has_fighter_loadout = unit_owner >= 0 && unit_owner <= MAX_PLAYERS;
         switch (missile_type) {
             case WEAPON_ASSAULT_SHUTTLE:
                 weapon_damage = 100;
                 break;
             case WEAPON_HEAVY_FIGHTER:
             case WEAPON_BOMBER:
-                if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
-                    weapon_damage = TECHDATA::_weapons[MOX::_fighter_bomb_type[source_owner]].max_damage;
-                } else {
-                    weapon_damage = 0;
-                }
+                weapon_damage = has_fighter_loadout
+                    ? TECHDATA::_weapons[MOX::_fighter_bomb_type[unit_owner]].max_damage
+                    : 0;
                 break;
             case WEAPON_INTERCEPTOR:
-                if (source_owner >= 0 && source_owner < MAX_PLAYERS + 1) {
-                    weapon_damage = TECHDATA::_weapons[MOX::_fighter_beam_type[source_owner]].max_damage;
-                } else {
-                    weapon_damage = 0;
-                }
+                weapon_damage = has_fighter_loadout
+                    ? TECHDATA::_weapons[MOX::_fighter_beam_type[unit_owner]].max_damage
+                    : 0;
                 break;
             default:
                 weapon_damage = 0;

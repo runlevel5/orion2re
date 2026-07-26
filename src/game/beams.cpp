@@ -1400,7 +1400,7 @@ namespace BEAMS {
                                 }
                             }
                             else {
-                                if (target_id == 0) {
+                                if (target_id == 0 && fx->accum_hit_x == 0) {
                                     int16_t max_radius = ship_range / 2;
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
