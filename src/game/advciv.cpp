@@ -8,13 +8,13 @@ namespace ADVCIV {
     s_adv_planet_worth* _planet_worth_to_player;
 
     bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
-        return (int16_t)_star_colony_owner[star_idx] == player_idx;
+        return _star_colony_owner[star_idx] == player_idx;
     }
 
     bool __cdecl Enemy_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
         int8_t owner = _star_colony_owner[star_idx];
 
-        if (owner > -1 && (int16_t)owner != player_idx) {
+        if (owner > -1 && owner != player_idx) {
             return true;
         }
 
@@ -26,7 +26,7 @@ namespace ADVCIV {
     }
 
     void __cdecl Assign_Advanced_Civilization_Starting_Ships_() {
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             Init_Advanced_Civilization_Fleet_(i);
         }
     }
@@ -56,7 +56,7 @@ namespace ADVCIV {
         int16_t base_proximity = ADVCIV::Proximity_Bonus_(player_idx, planet_idx);
         *proximity_bonus = (int16_t)((int32_t)base_proximity * (*worth) / 100);
 
-        if (Player_Has_Colony_At_Star_(player_idx, (int16_t)planet->star_index)) {
+        if (Player_Has_Colony_At_Star_(player_idx, planet->star_index)) {
             *worth = (*worth * 67) / 100;
             *has_colony = 1;
         }
@@ -65,7 +65,7 @@ namespace ADVCIV {
     }
 
     void __cdecl Get_Worth_For_All_Planets_() {
-        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+        for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
             s_adv_civ_player& player = _adv_civ_player[player_idx];
 
             for (int16_t i = 0; i < player.candidate_planet_count; ++i) {
@@ -91,10 +91,10 @@ namespace ADVCIV {
     void __cdecl Build_Adv_Civ_Star_List_() {
         int16_t max_dist_so_far = 0;
 
-        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+        for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
             _adv_civ_player[player_idx].candidate_star_count = 0;
 
-            int16_t home_star_idx = (int16_t)MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index;
+            int16_t home_star_idx = MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index;
             for (int16_t star_idx = 1; star_idx < MAX_STARS; ++star_idx) {
                 int16_t distance = (int16_t)_parsec[home_star_idx].dist[star_idx];
                 if (max_dist_so_far < distance) {
@@ -132,7 +132,7 @@ namespace ADVCIV {
             return;
         }
 
-        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+        for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
             s_adv_civ_player* player = &ADVCIV::_adv_civ_player[player_idx];
 
             for (int16_t star_list_idx = 0; star_list_idx < MAX_STARS; ++star_list_idx) {
@@ -176,7 +176,7 @@ namespace ADVCIV {
     int16_t __cdecl Get_Next_Adv_Civ_Planet_(int16_t player_idx, int8_t* availability_map) {
         s_adv_civ_player& adv_player = _adv_civ_player[player_idx];
         int16_t home_planet_id = MOX::_player[player_idx].home_planet_id;
-        int16_t home_star_idx = (int16_t)MOX::_planet[home_planet_id].star_index;
+        int16_t home_star_idx = MOX::_planet[home_planet_id].star_index;
 
         int16_t expansion_cutoff = Num_Adv_Civ_Planets_();
 
@@ -191,7 +191,7 @@ namespace ADVCIV {
                 int16_t p_idx = adv_player.planets[i].planet_idx;
 
                 if (p_idx > -1 && availability_map[p_idx] == -1) {
-                    int16_t star_idx = (int16_t)MOX::_planet[p_idx].star_index;
+                    int16_t star_idx = MOX::_planet[p_idx].star_index;
                     int16_t distance = (int16_t)_parsec[home_star_idx].dist[star_idx];
 
                     if (!Enemy_Has_Colony_At_Star_(player_idx, star_idx)) {
@@ -233,7 +233,7 @@ namespace ADVCIV {
 
     void __cdecl Choose_Adv_Civ_Planets_() {
         int16_t target_planet_count = Num_Adv_Civ_Planets_();
-        int16_t active_players_count = (int16_t)MOX::_NUM_PLAYERS;
+        int16_t active_players_count = MOX::_NUM_PLAYERS;
 
         int16_t active_player_order[MAX_PLAYERS];
         int16_t picked_planet_idx[MAX_PLAYERS];
@@ -243,7 +243,7 @@ namespace ADVCIV {
             active_player_order[i] = -1;
             picked_planet_idx[i] = -1;
         }
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             active_player_order[i] = i;
         }
 
@@ -267,7 +267,7 @@ namespace ADVCIV {
                     active_player_order[i] = -1;
                 } else {
                     int16_t global_planet_idx = _adv_civ_player[player_idx].planets[candidate_planet_idx].planet_idx;
-                    int8_t star_idx = MOX::_planet[global_planet_idx].star_index;
+                    int16_t star_idx = MOX::_planet[global_planet_idx].star_index;
                     picked_planet_idx[player_idx] = candidate_planet_idx;
                     _planet_selected_flag[global_planet_idx] = (int8_t)player_idx;
                     _star_colony_owner[star_idx] = (int8_t)player_idx;
@@ -275,14 +275,14 @@ namespace ADVCIV {
             }
 
             int16_t round_pick_count = 0;
-            for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                 if (picked_planet_idx[i] != -1) {
                     round_pick_count++;
                 }
             }
 
             if (round_pick_count == round_active_players_count) {
-                for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
+                for (int16_t p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                     int16_t candidate_planet_idx = picked_planet_idx[p];
                     if (candidate_planet_idx == -1) continue;
 
@@ -325,7 +325,7 @@ namespace ADVCIV {
                     }
                 }
             } else {
-                for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                     int16_t candidate_planet_idx = picked_planet_idx[i];
                     if (candidate_planet_idx >= 0 && candidate_planet_idx < MAX_PLANETS) {
                         int16_t global_planet_idx = _adv_civ_player[i].planets[candidate_planet_idx].planet_idx;
@@ -342,7 +342,7 @@ namespace ADVCIV {
     int32_t __cdecl Get_Players_Planet_Worthiness_Average_(int16_t player_idx) {
         int32_t total_worth = 0;
 
-        for (int16_t planet_idx = 0; planet_idx < (int16_t)MOX::_planet_count; ++planet_idx) {
+        for (int16_t planet_idx = 0; planet_idx < MOX::_planet_count; ++planet_idx) {
             if (ADVCIV::_planet_selected_flag[planet_idx] == player_idx) {
                 int32_t planet_worth;
                 int8_t has_colony_at_star;
@@ -381,9 +381,9 @@ namespace ADVCIV {
         memset(_star_colony_owner, 0xFF, MAX_STARS);
         memset(_planet_worth_to_player, 0xFF, MAX_PLAYERS * sizeof(*_planet_worth_to_player));
 
-        for (int16_t p_idx = 0; p_idx < (int16_t)MOX::_NUM_PLAYERS; ++p_idx) {
+        for (int16_t p_idx = 0; p_idx < MOX::_NUM_PLAYERS; ++p_idx) {
             int16_t hw_idx = MOX::_player[p_idx].home_planet_id;
-            int16_t star_idx = (int16_t)MOX::_planet[hw_idx].star_index;
+            int16_t star_idx = MOX::_planet[hw_idx].star_index;
 
             for (int16_t i = 0; i < MAX_PLANETS; ++i) {
                 _adv_civ_player[p_idx].planets[i].planet_idx = -1;
@@ -427,7 +427,7 @@ namespace ADVCIV {
         int32_t max_worthiness = 0;
         int16_t best_player_idx = 0;
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             int32_t current_worth = Get_Players_Planet_Worthiness_Average_(i);
             if (current_worth > max_worthiness) {
                 max_worthiness = current_worth;
@@ -435,8 +435,8 @@ namespace ADVCIV {
             }
         }
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
-            for (int16_t j = 0; j < (int16_t)MOX::_planet_count; ++j) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = 0; j < MOX::_planet_count; ++j) {
                 if (_planet_selected_flag[j] == i) {
                     int8_t spec = MOX::_planet[j].planet_special;
                     if (spec == SYSTEM_SPECIAL_GEM_DEPOSITS || spec == SYSTEM_SPECIAL_GOLD_DEPOSITS || spec == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
@@ -446,11 +446,11 @@ namespace ADVCIV {
             }
         }
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (i == best_player_idx) continue;
 
             bool player_satisfied = false;
-            for (int16_t j = 0; j < (int16_t)MOX::_planet_count && !player_satisfied; ++j) {
+            for (int16_t j = 0; j < MOX::_planet_count && !player_satisfied; ++j) {
                 if (_planet_selected_flag[j] == i) {
                     int8_t generated_special = 0;
                     uint8_t targets[3];
@@ -549,7 +549,7 @@ namespace ADVCIV {
     int16_t __cdecl Proximity_Bonus_(int16_t player_idx, int16_t planet_idx) {
         int16_t proximity_bonus = 0;
         int16_t i = 0;
-        const int16_t target_star_idx = (int16_t)MOX::_planet[planet_idx].star_index;
+        const int16_t target_star_idx = MOX::_planet[planet_idx].star_index;
         const int16_t num_stars = MOX::_NUM_STARS;
 
         if (num_stars > 0) {
@@ -590,10 +590,10 @@ namespace ADVCIV {
     }
 
     void __cdecl Init_Non_Homeworld_Colonies_() {
-        for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
+        for (int16_t i = 0; i < MOX::_planet_count; ++i) {
             int8_t selected_player_idx = _planet_selected_flag[i];
             if (selected_player_idx != -1) {
-                ERICNET::Init_Non_Homeworld_Colony_(i, (int16_t)selected_player_idx);
+                ERICNET::Init_Non_Homeworld_Colony_(i, selected_player_idx);
             }
         }
     }

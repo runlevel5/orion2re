@@ -1,23 +1,289 @@
-# Mass workflow
+# Instructions
 
-## Instructions
+## Goal
 
-We need to normalize types used by core game primitives. Right now it is a collection of variously sized
-types, some signed, some unsigned.
+Normalize every internal star, ship, planet, and colony index to `int16_t`.
+This is a type-only mass refactor: preserve gameplay behavior, sentinel behavior,
+savegame compatibility, and the layout of save-backed state.
 
-Make following changes:
-1. player index (max defined by MAX_PLAYERS) shoule be always int8_t
-2. star index (max defined by MAX_STARS) should be always int16_t. canonically, star is defined by int8_t
-3. ship index (max defined by MAX_SHIPS) should be always int16_t. canonically, this might be the case, but type conversions possible.
-4. colony index (max defined by MAX_COLONIES) should be always int16_t. canonically, it is represented by uint8_t to fit 250 into single byte with various hacks to handle -1 as 0xFF in various places
-5. planet index (max defined by MAX_PLANETS) should be always int16_t
+The legacy representations currently include:
 
-You are only allowed to change structures that are not part of the save game. Even though star and colony indexes
-will be widened to 16 bits, publicly observable data structures should not change. We're not going to change maximum
-values in this round. This can be validated by checking structures touched by savegame logic and making sure that
-static assertions are not failing for these structures.
+- star indexes: commonly `int8_t`
+- ship indexes: commonly `int16_t`
+- colony indexes: commonly `uint8_t`, often widened to signed types; `0xFF`
+  represents no colony in byte-sized contexts
+- planet indexes: commonly `int16_t`
 
-## Files
+These are historical facts, not the desired runtime types. After this refactor,
+all four index domains use signed `int16_t` internally.
+
+## Non-negotiable constraints
+
+1. Do not change the savegame format, savegame field widths, or savegame version.
+2. Do not change the declaration, size, alignment, member order, or array extent
+   of save-backed records listed below, including nested members.
+3. Do not change save-backed global declarations merely to normalize an index.
+4. Do not reinterpret an index as an ID, count, bit mask, enum, coordinate, ship
+   design index, icon index, or other unrelated value based only on its name.
+5. Networking packets and their encode/decode logic may change without backward
+   compatibility. Embedded copies of save-backed records remain protected even
+   when networking transfers them as raw bytes.
+6. Preserve all existing invalid-index semantics. Internally, use the signed
+   value `-1`; translate an unsigned colony index value of `0xFF` to `-1` when
+   it enters internal code and translate it back only at a protected boundary.
+7. Do not introduce a new public packed index type or change unrelated integer
+   parameters during this work.
+
+## Savegame boundary inventory
+
+`src/game/savegame.cpp` is the source of truth. Its `Write_Game_State_` and
+`Read_Game_State_` paths serialize fields individually, but several members are
+written as byte arrays. Treat every populated record and nested record as
+layout-sensitive.
+
+Do not normalize fields inside these save-backed types:
+
+- `s_settings`
+- `s_ship_weapons`
+- `s_ship_design`
+- `s_colony`
+- `s_planet_data`
+- `s_star_data`
+- `s_leader_data`
+- `s_player`
+- `s_ship_data`
+- `s_movable_box`
+- `s_nebula`
+- `s_report`
+- `s_event_data`
+- `s_MSG_colony`
+- `s_MSG` and its variant payload records
+- `s_antaran`
+
+The serialized global state is also protected. This includes:
+
+- `MOX::_settings`, `MOX::_colony`, `MOX::_planet`, `MOX::_star`,
+  `MOX::_leaders`, `MOX::_player`, `MOX::_ship`, `MOX::_moveable_box`,
+  `MOX::_moveable_box_order`, `MOX::_nebula`, `MOX::_antarans`, and
+  `MOX::_bill_savegame`
+- the scalar counts, map state, stardate, game state, and Antaran state written
+  by `Write_Game_State_`
+- `REPORT::_reports` and the serialized report state
+- `EVENTS::_event_data` and the serialized event state
+- `MSG_::_msgs` and the serialized message-list state
+
+Before changing any questionable struct or global, trace it through
+`Write_Game_State_` and `Read_Game_State_`. If either path serializes it, or a
+nested object containing it, leave its declaration unchanged. Add newly found
+save-backed types to this inventory before continuing.
+
+Known protected index-bearing fields include, but are not limited to:
+
+- `s_planet_data::colony_index` and `s_planet_data::star_index`
+- `s_star_data::wormhole_star_id`, `s_star_data::planet_index`, and other
+  index-bearing star members
+- `s_colony::planet`
+- index-bearing fields in `s_ship_data`, `s_player`, `s_leader_data`, reports,
+  events, and `s_MSG` payloads
+
+Protection applies to the declaration and stored representation, not to values
+after they have crossed into runtime logic.
+
+## Canonical internal representation
+
+Use `int16_t` for a value when it represents an index into any of these global
+collections:
+
+- `MOX::_star`
+- `MOX::_ship`
+- `MOX::_planet`
+- `MOX::_colony`
+
+Normalize all non-protected occurrences, including:
+
+- function parameters and return values
+- matching declarations, definitions, callbacks, and function-pointer types
+- locals, loop indexes used as entity indexes, and temporaries
+- runtime-only struct and union fields
+- runtime arrays that store indexes
+- test fakes, fixtures, and assertions matching changed interfaces
+- gameplay network packet fields and their encode/decode temporaries
+
+Do not blindly convert every `int`, `char`, or field containing one of the four
+words. Establish that the value denotes an entity index by tracing its producer,
+consumer, array access, or pointer difference.
+
+Use `int16_t`, not plain `short`, `int`, `char`, `signed char`, `uint16_t`, or
+`uint8_t`. Keep counts and container lengths in their existing appropriate type;
+only an iterator that is itself passed or stored as an entity index must be
+normalized.
+
+## Conversion and narrowing-cast rules
+
+Once a value enters internal code, convert it to `int16_t` and keep it there.
+Do not repeatedly widen, narrow, or switch signedness through the call chain.
+
+Do not add explicit widening casts. In particular, do not cast signed `int8_t`,
+`int16_t`, or other narrower signed values merely to assign, pass, compare, or
+return them as `int16_t` or a wider type. Use the canonical type throughout and
+allow ordinary value-preserving conversion where a protected field remains
+narrower.
+
+The exception is a semantically meaningful unsigned-colony conversion where
+`UINT8_MAX` means no colony. The conversion must explicitly translate that
+sentinel to internal `-1`; it must not rely on a signedness cast to produce `-1`.
+
+Every explicit narrowing cast of a star, ship, planet, or colony index must be
+necessary for a protected externally facing representation. Put this exact
+stable marker on every such narrowing cast so all narrowing sites can be found
+later:
+
+```cpp
+/* INDEX_NARROWING */
+```
+
+Keep the marker on the same line as the cast. Reading a narrower signed field
+does not require a cast; writing one does:
+
+```cpp
+const int16_t star_idx = planet.star_index;
+planet.star_index = static_cast<int8_t>(star_idx); /* INDEX_NARROWING */
+```
+
+For an unsigned byte with `0xFF` as the invalid value, preserve the sentinel
+explicitly. The widening cast is allowed here because the unsigned-to-signed
+colony conversion is semantic rather than cosmetic:
+
+```cpp
+const int16_t colony_idx = stored_colony_idx == UINT8_MAX
+    ? int16_t{-1}
+    : static_cast<int16_t>(stored_colony_idx);
+stored_colony_idx = colony_idx < 0
+    ? UINT8_MAX
+    : static_cast<uint8_t>(colony_idx); /* INDEX_NARROWING */
+```
+
+If a protected field is already `int16_t`, assignment to or from the canonical
+runtime type needs no cast or marker. Never add a cast merely to silence a
+conversion that is already value-preserving.
+
+Every remaining cast directly between an entity index and `int8_t`, `uint8_t`,
+`uint16_t`, `int32_t`, `uint32_t`, `int`, or `char` must either:
+
+- be removed because both sides can use `int16_t`; or
+- be a semantically necessary unsigned-colony conversion; or
+- be a necessary narrowing conversion and carry `INDEX_NARROWING`.
+
+Pointer subtraction may be explicitly converted once to `int16_t` after the
+result is known to fit. This is an index construction, not a save boundary, so
+do not attach the narrowing marker.
+
+## Networking
+
+Networking is not a compatibility boundary for this task. Normalize star, ship,
+planet, and colony index fields in packet structs, packet-local records, encoder
+and decoder parameters, and packet validation to `int16_t` together.
+
+Update packet size checks and tests when wire widths change. Do not widen raw
+embedded save-backed records such as `s_player`, `s_colony`, `s_ship_data`, or
+`s_leader_data`; those records remain protected even when sent over the network.
+Any unavoidable narrowing cast in networking code still requires
+`INDEX_NARROWING`, although packet fields should normally be changed to
+`int16_t` so no such cast remains.
+
+## Per-file workflow
+
+The workflow provides one claimed file name at a time. Treat that file as the
+entry point for the current iteration. Use the provided queue as-is and do not
+create a replacement file list.
+
+1. Read and validate every line of the claimed file as required below.
+2. Trace only the declarations, definitions, callers, callbacks, data
+   definitions, packet code, and tests needed to make that file coherent.
+3. Normalize interfaces.
+   - Change the header declaration and implementation together.
+   - Propagate `int16_t` through affected callers and callees.
+4. Normalize storage and expressions.
+   - Change runtime-only fields, arrays, locals, returns, and loop variables.
+   - Replace unsigned invalid values with internal `-1` semantics.
+5. Clean casts.
+   - Remove cosmetic widening casts and casts made redundant by the canonical
+     type.
+   - Mark every necessary narrowing cast with `INDEX_NARROWING`.
+6. Update affected networking code and tests.
+7. Search for stale declarations and call sites specifically related to the
+   claimed file and the interfaces changed in this iteration.
+8. Build and run focused tests before the iteration is complete.
+
+## Mandatory line-by-line source validation
+
+Every single line of the claimed source file must be read and validated; search
+results and symbol matches are not a substitute for reading the complete file.
+This requirement also applies when the claimed file appears unrelated to the
+four index domains.
+
+For each line, determine whether it declares, receives, returns, stores,
+converts, compares, performs arithmetic on, indexes with, serializes, or sends a
+star, ship, planet, or colony index. Inspect unnamed temporaries, loop variables,
+plain `char` values, aliases, union members, macros, callbacks, and pointer
+subtractions as carefully as explicitly named `*_idx` variables.
+
+Validate every function body and every declaration in context. Follow a
+dependency outside the claimed file when necessary to establish the value's
+meaning or keep an interface consistent, but do not use that as a reason to skip
+any line in the claimed file. Before finishing, make a second complete pass over
+the claimed file and confirm that no relevant line was missed.
+
+## Verification
+
+After each cluster:
+
+```sh
+cmake --build build-tests -j
+ctest --test-dir build-tests --output-on-failure
+```
+
+Run the focused savegame test whenever code touches a protected record, a
+save-boundary conversion, or save/load code:
+
+```sh
+ctest --test-dir build-tests --output-on-failure -R savegame
+```
+
+Run networking-focused tests after packet changes:
+
+```sh
+ctest --test-dir build-tests --output-on-failure -R 'net|router'
+```
+
+Before completion, perform repository-wide audits for mixed-width declarations,
+casts involving the four index domains, unmarked protected conversions, and
+unexpected changes to `src/game/savegame.cpp` or protected declarations.
+
+## Completion criteria
+
+The refactor is complete only when all of the following are true:
+
+- all confirmed internal star, ship, planet, and colony indexes are `int16_t`
+- all related signatures agree across headers, implementations, callbacks, and
+  tests
+- all runtime-only index fields and networking index fields are normalized
+- internal invalid indexes consistently use `-1`
+- cosmetic widening casts and redundant narrowing or signedness casts have been
+  removed
+- every necessary narrowing cast has the exact `INDEX_NARROWING` marker
+- do not use C++ style casts, follow existing project style
+- every line of each claimed file has been validated and reviewed a second time
+- protected save-backed declarations and serialized widths are unchanged
+- existing versioned and legacy savegame tests pass without a version bump
+- focused networking tests and the full test suite pass
+- every remaining mixed-width occurrence has been manually classified as a
+  protected boundary or as unrelated to an entity index
+
+Do not mark work complete merely because the project compiles. The final cast
+audit, protected-layout review, savegame tests, and network tests are required.
+
+# Files
 
 [ ] src/game/advciv.cpp
 [ ] src/game/advciv.h
