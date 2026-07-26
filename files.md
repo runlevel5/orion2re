@@ -285,8 +285,8 @@ audit, protected-layout review, savegame tests, and network tests are required.
 
 # Files
 
-[ ] src/game/advciv.cpp
-[ ] src/game/advciv.h
+[X] src/game/advciv.cpp
+[X] src/game/advciv.h
 [ ] src/game/aibomb.cpp
 [ ] src/game/aibomb.h
 [ ] src/game/aibuild.cpp

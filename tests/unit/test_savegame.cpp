@@ -182,8 +182,10 @@ namespace {
             report.action = static_cast<uint8_t>((i / 2) % 2);
             report.player_idx = static_cast<int16_t>(i % MAX_PLAYERS);
             Fill_Bytes_(&report.d, sizeof(report.d), 0x56780000u + static_cast<uint32_t>(i));
-            report.field4_0x10 = static_cast<int16_t>(i * 17);
-            report.field5_0x12 = static_cast<int8_t>(i * 5);
+            const uint16_t legacy_value = static_cast<uint16_t>(i * 17);
+            report.reserved[8] = static_cast<uint8_t>(legacy_value);
+            report.reserved[9] = static_cast<uint8_t>(legacy_value >> 8);
+            report.reserved[10] = static_cast<uint8_t>(i * 5);
         }
     }
 
