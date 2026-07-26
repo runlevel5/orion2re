@@ -12,3 +12,4 @@ out/
 /cmake/local-user.cmake
 build-*/
 Testing
+*.pyc
