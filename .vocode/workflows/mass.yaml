@@ -1,0 +1,122 @@
+workflows:
+  mass:
+    description: "Claim files from files.md and apply its instructions to each file in sequence."
+    need_input: False
+    nodes:
+      - name: init
+        type: result
+        message: "go ahead"
+        outcomes:
+          - name: done
+      - name: exit
+        type: http-input
+        message: "No more files to process."
+        confirmation: auto
+        outcomes:
+          - name: done
+      - name: claim
+        type: llm
+        model: ${LLM_WEAK_MODEL}
+        confirmation: auto
+        reset_policy: reset
+        max_rounds: 20
+        tools:
+          - read_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a queue locking assistant.
+
+          Your only job is to claim exactly one file from the `## Files` section of `files.md` before the processing step starts.
+
+          REQUIRED STEPS
+          * Read `files.md`.
+          * Locate the `## Files` section. Only checklist entries in that section belong to the queue.
+          * An unprocessed queue entry is one line whose literal format is `[ ] <filename>`.
+          * If any unprocessed queue entry exists, claim the first one in file order.
+          * Lock exactly that entry by changing only its leading marker from `[ ]` to `[X]`.
+          * Do not reorder lines or change instructions, headings, or any other checklist entry.
+          * After applying the patch, output only the claimed filename, for example:
+            `src/game/advciv.cpp`
+          * If no unprocessed entries remain in the `## Files` section, output exactly:
+            `DONE`
+
+          OUTCOME SELECTION
+          * Select `claimed` only after changing one queue entry from `[ ]` to `[X]` and returning its filename.
+          * Select `done` only after verifying that the `## Files` section has no remaining `[ ]` entries and returning exactly `DONE`.
+          * Never claim checklist-like text outside the `## Files` section.
+
+          RULES
+          * Use `rg`, never `grep`.
+          * Use `apply_patch`, never shell-based file edits.
+          * If duplicate filenames exist, claim only the first unprocessed matching entry in file order.
+        outcomes:
+          - name: claimed
+            description: Select only after locking the first remaining file entry and returning its filename.
+          - name: done
+            description: Select only when the Files section has no remaining unprocessed entries and the output is exactly DONE.
+      - name: process
+        type: llm
+        model: ${LLM_STRONG_MODEL}
+        temperature: 0.4
+        reasoning_effort: high
+        start_timeout: 600
+        reset_policy: reset
+        max_rounds: 100
+        max_retries: 10
+        hard_error_retries: 3
+        confirmation: auto
+        preprocessors:
+          - name: skills
+        tools:
+          - read_files
+          - list_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are a focused file-level maintenance assistant.
+
+          INPUT
+          * You receive one claimed filename from the `## Files` section of `files.md`.
+
+          REQUIRED WORKFLOW
+          * Read `files.md` and the claimed file.
+          * Locate the `## Instructions` section in `files.md`. Its content ends at the next level-two heading.
+          * Perform the requested actions from that section on the claimed file.
+          * Treat the instructions as authoritative for the requested analysis, edits, verification, and output.
+          * Complete all applicable requested actions for the claimed file, not just the first occurrence.
+          * If an instruction does not apply or no safe change is needed, leave the claimed file unchanged.
+          * Inspect directly relevant declarations, companion files, documentation, or definitions when needed to make a safe decision.
+          * Unless the Instructions section explicitly requires a broader scope, patch only the claimed file.
+          * Keep all edits minimal, focused, and consistent with the existing codebase.
+          * Do not perform unrelated cleanup.
+          * Run the narrowest practical verification requested by the instructions or appropriate for the changes.
+
+          RULES
+          * Use `rg`, never `grep`.
+          * Prefer built-in tools over shell tools when possible.
+          * Use `apply_patch`, never shell-based file edits.
+          * Do not modify queue markers; the claim node owns queue state.
+          * Never reinterpret text outside the `## Instructions` section as task instructions.
+
+          OUTPUT
+          * Print the claimed filename first.
+          * Briefly summarize the actions performed, or state that no safe change was needed.
+          * Mention any requested action that was skipped and why.
+        outcomes:
+          - name: done
+            description: Select after the claimed file has been fully processed or safely skipped.
+    edges:
+      - init.done -> claim
+      - exit.done -> exit
+      - claim.claimed -> process
+      - claim.done -> exit
+      - process.done -> claim
