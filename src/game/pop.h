@@ -107,20 +107,26 @@ namespace SETTLER_DATA {
     constexpr value_type MASK_ETA = 0x00F00000u;
     constexpr value_type MASK_PROF = 0x03000000u;
 
-    inline uint32_t __cdecl Get_Source_Colony(value_type settler_data) {
-        return settler_data & MASK_SOURCE_COLONY;
+    inline int16_t __cdecl Get_Source_Colony(value_type settler_data) {
+        const uint8_t stored_source_colony = (uint8_t)(settler_data & MASK_SOURCE_COLONY); /* INDEX_NARROWING */
+        return stored_source_colony == UINT8_MAX ? -1 : stored_source_colony;
     }
 
-    inline void __cdecl Set_Source_Colony(value_type* settler_data, uint32_t source_colony) {
-        *settler_data = (*settler_data & ~MASK_SOURCE_COLONY) | (source_colony & 0xFFu);
+    inline void __cdecl Set_Source_Colony(value_type* settler_data, int16_t source_colony) {
+        const uint8_t stored_source_colony = source_colony < 0
+                ? UINT8_MAX
+                : (uint8_t)source_colony; /* INDEX_NARROWING */
+        *settler_data = (*settler_data & ~MASK_SOURCE_COLONY) | stored_source_colony;
     }
 
-    inline uint32_t __cdecl Get_Dest_Planet(value_type settler_data) {
-        return (settler_data & MASK_DEST_PLANET) >> 8;
+    inline int16_t __cdecl Get_Dest_Planet(value_type settler_data) {
+        const uint8_t stored_dest_planet = (uint8_t)((settler_data & MASK_DEST_PLANET) >> 8); /* INDEX_NARROWING */
+        return stored_dest_planet;
     }
 
-    inline void __cdecl Set_Dest_Planet(value_type* settler_data, uint32_t dest_planet) {
-        *settler_data = (*settler_data & ~MASK_DEST_PLANET) | ((dest_planet & 0xFFu) << 8);
+    inline void __cdecl Set_Dest_Planet(value_type* settler_data, int16_t dest_planet) {
+        const uint8_t stored_dest_planet = (uint8_t)dest_planet; /* INDEX_NARROWING */
+        *settler_data = (*settler_data & ~MASK_DEST_PLANET) | (stored_dest_planet << 8);
     }
 
     inline uint32_t __cdecl Get_Race(value_type settler_data) {

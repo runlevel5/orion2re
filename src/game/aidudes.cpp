@@ -44,13 +44,13 @@ namespace aidudes {
 
         for (int i = 0; i < n_colonies; ++i) {
             s_aidudes_colony_info* info = &colony_infos[i];
-            uint8_t colony_idx = (uint8_t)info->colony_idx;
+            int16_t colony_idx = info->colony_idx;
             s_colony* col = &MOX::_colony[colony_idx];
 
             bool is_colony_producing_trade_goods = (col->producing[0] == COLONY_PRODUCTION_TRADE_GOODS);
 
             if ((is_colony_producing_trade_goods && aidudes::_p_ai->do_not_research == 0) ||
-                EVENTS::Event_Check_Colony_Researching_((int16_t)colony_idx) != 0) {
+                EVENTS::Event_Check_Colony_Researching_(colony_idx) != 0) {
 
                 for (int j = (int)info->pop_tail_idx - 1; j >= (int)info->first_assignable_pop_idx; --j) {
                     uint32_t* pop_entry = &col->pop[j];
@@ -62,7 +62,7 @@ namespace aidudes {
                     POP::Set_Prof(pop_entry, POP::PROF_SCIENTIST);
                 }
 
-                COLCALC::Colony_Calculation_((int16_t)colony_idx);
+                COLCALC::Colony_Calculation_(colony_idx);
             }
         }
     }
@@ -120,7 +120,7 @@ namespace aidudes {
         if (num_colonies == 0) return;
 
         for (int i = 0; i < num_colonies; ++i, ++current_info) {
-            uint8_t colony_idx = current_info->colony_idx;
+            int16_t colony_idx = current_info->colony_idx;
             s_colony* colony = &MOX::_colony[colony_idx];
 
             bool should_rebuild = force_clear;
@@ -137,7 +137,7 @@ namespace aidudes {
             if (should_rebuild) {
                 int16_t producing = colony->producing[0];
                 if (COLBLDG::Colony_Production_Is_Queued_Ship_(producing)) {
-                    int ship_idx = COLBLDG::Colony_Production_Ship_Index_(producing);
+                    int16_t ship_idx = COLBLDG::Colony_Production_Ship_Index_(producing);
                     if (MOX::_ship[ship_idx].status == 4) {
                         return; // Abandon evaluation entirely if an outdated ship is being built
                     }
@@ -291,11 +291,11 @@ namespace aidudes {
         doom_star_design.cost = 0;
 
         for (int i = 0; i < (int)aidudes::_n_our_colonies; ++i) {
-            uint8_t colony_idx = (*aidudes::_our_colonies)[i].colony_idx;
+            int16_t colony_idx = (*aidudes::_our_colonies)[i].colony_idx;
             short producing_id = MOX::_colony[colony_idx].producing[0];
 
             if (COLBLDG::Colony_Production_Is_Queued_Ship_(producing_id)) {
-                int ship_idx = COLBLDG::Colony_Production_Ship_Index_(producing_id);
+                int16_t ship_idx = COLBLDG::Colony_Production_Ship_Index_(producing_id);
                 s_ship_data& ship = MOX::_ship[ship_idx];
 
                 if (ship.d.ship_type == SHIP_TYPE_COMBAT) {
@@ -321,12 +321,12 @@ namespace aidudes {
 
         memset(*_our_colonies, 0, (size_t)MOX::_NUM_COLONIES * sizeof(s_aidudes_colony_info));
 
-        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
             s_colony* colony_ptr = &MOX::_colony[i];
 
             if (colony_ptr->owner == (char)_i_ai) {
                 if (EVENTS::Event_Check_Space_Anomaly_(i) == 0 && colony_ptr->outpost_flag == 0) {
-                    (*_our_colonies)[_n_our_colonies].colony_idx = (uint8_t)i;
+                    (*_our_colonies)[_n_our_colonies].colony_idx = i;
 
                     if (COLCALC::Colony_Is_Blockaded(colony_ptr)) {
                         _n_our_blockaded++;
@@ -430,7 +430,7 @@ namespace aidudes {
 
             s_ai_refit_entry* entry = &refit_player->entry[i - 1];
             s_ship_data* ship = &MOX::_ship[entry->ship_idx];
-            int location = ship->location;
+            int16_t location = ship->location;
 
             // Skip ships in systems with incoming human activity
             if ((*AIDATA::_enroute_human_ships)[location][3] != 0) {
@@ -513,12 +513,12 @@ namespace aidudes {
                 aidudes::Grab_Worker_(best_colony);
             }
 
-            COLCALC::Colony_Calculation_((int16_t)best_colony->colony_idx);
+            COLCALC::Colony_Calculation_(best_colony->colony_idx);
         }
     }
 
     void __cdecl Grab_Scientist_(s_aidudes_colony_info* colony_info) {
-        uint8_t colony_idx = (uint8_t)colony_info->colony_idx;
+        int16_t colony_idx = colony_info->colony_idx;
         uint8_t cur_pop_idx = (uint8_t)colony_info->cur_pop_idx;
 
         s_colony& colony = MOX::_colony[colony_idx];
@@ -534,7 +534,7 @@ namespace aidudes {
     }
 
     void __cdecl Grab_Worker_(s_aidudes_colony_info* info) {
-        s_colony* colony = &MOX::_colony[(uint8_t)info->colony_idx];
+        s_colony* colony = &MOX::_colony[info->colony_idx];
 
         info->pop_end_idx--;
 
@@ -561,7 +561,7 @@ namespace aidudes {
               4,
               Sort_Pops_FR_I_);
 
-        if (EVENTS::Event_Check_Colony_Researching_((int16_t)info->colony_idx)) {
+        if (EVENTS::Event_Check_Colony_Researching_(info->colony_idx)) {
             n_required_workers = 0;
         }
 
@@ -600,7 +600,7 @@ namespace aidudes {
     }
 
     void __cdecl Do_Blockaded_Colony_(s_aidudes_colony_info* colony_info) {
-        s_colony* colony = &MOX::_colony[(uint8_t)colony_info->colony_idx];
+        s_colony* colony = &MOX::_colony[colony_info->colony_idx];
         Assign_Required_Colonists_(colony_info);
 
         _Sort_Pops_colony_data = colony;
@@ -611,7 +611,7 @@ namespace aidudes {
               Sort_Pops_FI_);
 
         if (colony->food2_per_farmer == 0) {
-            int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((uint16_t)(uint8_t)colony_info->colony_idx);
+            int16_t is_researching = EVENTS::Event_Check_Colony_Researching_(colony_info->colony_idx);
             POP::e_prof prof = (is_researching == 0) ? POP::PROF_WORKER : POP::PROF_SCIENTIST;
 
             while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
@@ -817,10 +817,10 @@ namespace aidudes {
         }
 
         bool recalculate_colony = false;
-        uint8_t colony_queue[256];
+        int16_t colony_queue[256];
 
         if (MOX::_NUM_COLONIES > 0) {
-            for (int current_colony_idx = 0; current_colony_idx < MOX::_NUM_COLONIES; ++current_colony_idx) {
+            for (int16_t current_colony_idx = 0; current_colony_idx < MOX::_NUM_COLONIES; ++current_colony_idx) {
                 s_colony* temp_colony = &MOX::_colony[current_colony_idx];
 
                 if (temp_colony->owner == (char)player_idx &&
@@ -968,7 +968,7 @@ namespace aidudes {
         }
 
         RUSS::Mox_Update_();
-        qsort(colony_queue, (uint32_t)colony_queue_count, 1, aidudes::colony_less_industry_cmp_);
+        qsort(colony_queue, (uint32_t)colony_queue_count, sizeof(int16_t), aidudes::colony_less_industry_cmp_);
 
         if (p->tech_applications[TECH_APP_COLONY_BASE] == TECH_RESEARCH_STATUS_RESEARCHED) {
             int i = colony_queue_count;
@@ -1003,7 +1003,7 @@ namespace aidudes {
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
                         if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < (int32_t)game_random::Random_(100)) {
                             INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[TEMP_SHIP_DESIGN_SLOT]);
-                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, TEMP_SHIP_DESIGN_SLOT, (int16_t)colony_queue[i]);
+                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, TEMP_SHIP_DESIGN_SLOT, colony_queue[i]);
                             if (ship_idx == -1) {
                                 no_range_or_speed = true;
                             } else {
@@ -1029,14 +1029,14 @@ namespace aidudes {
                 p->surplus_bc < 0 &&
                 temp_colony->maintenance[1] < temp_colony->production[1]) {
 
-                int current_colony_idx = colony_queue[i];
+                int16_t current_colony_idx = colony_queue[i];
                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, COLONY_PRODUCTION_AI_TRADE_GOODS);
-                COLCALC::Colony_Calculation_((int16_t)current_colony_idx);
+                COLCALC::Colony_Calculation_(current_colony_idx);
                 continue;
             }
 
             int vs_ships_2 = AIBUILD::_player_total_strength_vs_ships[player_idx][2];
-            int current_colony_idx = colony_queue[i];
+            int16_t current_colony_idx = colony_queue[i];
 
             int ship_build_weight = 0;
             if (vs_ships_2 > 0 && p->ship_range != 0 && p->ship_speed != 0 && !no_range_or_speed) {
@@ -1212,7 +1212,7 @@ namespace aidudes {
                             case 4:
                             case 5:
                             {
-                                int16_t created_idx = COLBLDG::Create_Ship_(player_idx, (int16_t)ship_choice, (int16_t)current_colony_idx);
+                                int16_t created_idx = COLBLDG::Create_Ship_(player_idx, (int16_t)ship_choice, current_colony_idx);
                                 if (created_idx == -1) {
                                     no_range_or_speed = true;
                                 } else {
@@ -1225,7 +1225,7 @@ namespace aidudes {
                             case 6:
                             {
                                 memcpy(&p->ship_designs[SHIP_SIZE_DOOM_STAR], &ship_design, sizeof(s_ship_design));
-                                int16_t ds_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, (int16_t)current_colony_idx);
+                                int16_t ds_idx = COLBLDG::Create_Ship_(player_idx, SHIP_SIZE_DOOM_STAR, current_colony_idx);
                                 if (ds_idx == -1) {
                                     no_range_or_speed = true;
                                 } else {
@@ -1261,7 +1261,7 @@ namespace aidudes {
                         break;
                     case 2:
                     {
-                        int refit_planet_idx = MOX::_planet[temp_colony->planet].star_index;
+                        int16_t refit_planet_idx = MOX::_planet[temp_colony->planet].star_index;
                         int n_entries = p_refit->n_entries - 1;
                         bool refitted = false;
                         for (int j = n_entries; j >= 0; j--) {
@@ -1320,7 +1320,7 @@ namespace aidudes {
                                 AIBUILD::_player_n_transports[player_idx][1]--;
                             } else {
                                 INITSHIP::Load_Transport_Ship_Design_(player_idx, &p->ship_designs[TEMP_SHIP_DESIGN_SLOT]);
-                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, TEMP_SHIP_DESIGN_SLOT, (int16_t)current_colony_idx);
+                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, TEMP_SHIP_DESIGN_SLOT, current_colony_idx);
                                 if (tr_idx == -1) {
                                     no_range_or_speed = true;
                                 } else {
@@ -1387,7 +1387,7 @@ namespace aidudes {
     }
 
     void __cdecl Make_First_Unassigned_Into_Farmer_(s_aidudes_colony_info* info) {
-        s_colony* colony = &MOX::_colony[(uint8_t)info->colony_idx];
+        s_colony* colony = &MOX::_colony[info->colony_idx];
         int16_t old_pollution = colony->pollution;
 
         uint32_t& pop = colony->pop[(uint8_t)info->cur_pop_idx];
@@ -1425,7 +1425,7 @@ namespace aidudes {
             s_aidudes_colony_info* end = aidudes::_our_unblockaded + aidudes::_n_our_unblockaded;
 
             while (info < end) {
-                s_colony* col = &MOX::_colony[(uint8_t)info->colony_idx];
+                s_colony* col = &MOX::_colony[info->colony_idx];
                 info->cur_pop_idx = info->first_assignable_pop_idx;
                 info->pop_end_idx = info->pop_tail_idx;
 
@@ -1460,7 +1460,7 @@ namespace aidudes {
 
                     for (int i = 0; i < num_candidates; ++i) {
                         s_aidudes_colony_info* candidate = candidates[i];
-                        s_colony* col = &MOX::_colony[(uint8_t)candidate->colony_idx];
+                        s_colony* col = &MOX::_colony[candidate->colony_idx];
 
                         int food_needed = (uint8_t)col->food2_needed_for_our_empire + 
                                           (uint8_t)col->food2_needed_for_assimilated + 
@@ -1489,7 +1489,7 @@ namespace aidudes {
                     aidudes::Make_First_Unassigned_Into_Farmer_(target_info);
                     COLCALC::Colony_Calculation_(target_info->colony_idx);
 
-                    s_colony* target_col = &MOX::_colony[(uint8_t)target_info->colony_idx];
+                    s_colony* target_col = &MOX::_colony[target_info->colony_idx];
                     if ((uint8_t)target_info->cur_pop_idx >= (uint8_t)target_info->pop_end_idx || 
                         (uint8_t)target_info->n_farmers >= (uint8_t)target_col->max_farms) 
                     {
@@ -1531,8 +1531,8 @@ namespace aidudes {
     }
 
     int __cdecl colony_less_industry_cmp_(const void* p1, const void* p2) {
-        int16_t worth1 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p1)]);
-        int16_t worth2 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p2)]);
+        int16_t worth1 = AIBUILD::Industry_Worth(&MOX::_colony[*((const int16_t*)p1)]);
+        int16_t worth2 = AIBUILD::Industry_Worth(&MOX::_colony[*((const int16_t*)p2)]);
 
         return (int)worth1 - (int)worth2;
     }

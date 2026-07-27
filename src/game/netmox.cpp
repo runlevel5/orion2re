@@ -133,7 +133,7 @@ namespace NETMOX {
             memcpy(&packet->player_data, &MOX::_player[player_idx], sizeof(s_player));
 
             if (MOX::_NUM_STARS > 0) {
-                for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                     packet->star_surrender_to[i] = MOX::_star[i].surrender_to[player_idx];
                 }
             }
@@ -588,7 +588,7 @@ namespace NETMOX {
 
         s_net_pack_monster_update msg;
         msg.param_1 = (int32_t)owner;
-        msg.param_2 = (int32_t)param2;
+        msg.param_2 = param2;
         msg.param_3 = (int32_t)param3;
 
         NETMOX::Mox_Send_Message_(_net.local_net_id, NET_PACKET_MONSTER_UPDATE, &msg, sizeof(msg));
@@ -938,7 +938,7 @@ namespace NETMOX {
                 sync_pkt.player1_idx = i;
                 memcpy(&sync_pkt.player1, &MOX::_player[i], sizeof(s_player));
 
-                for (int star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+                for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
                     sync_pkt.surrender_to[star_idx] = MOX::_star[star_idx].surrender_to[i];
                 }
 
@@ -1179,7 +1179,7 @@ namespace NETMOX {
         memcpy(&packet.player_data, &MOX::_player[player_idx], sizeof(s_player));
 
         if (MOX::_NUM_STARS > 0) {
-            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 packet.star_surrender_to[i] = MOX::_star[i].surrender_to[player_idx];
             }
         }
@@ -1538,7 +1538,7 @@ namespace NETMOX {
         reader.Read_Bytes_(star_updates, MOX::_NUM_STARS * sizeof(s_net_pack_star_order));
 
         if (MOX::_NUM_STARS > 0) {
-            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 uint8_t* update = star_updates + i * sizeof(s_net_pack_star_order);
                 uint32_t flags;
                 memcpy(&flags, update, sizeof(flags));
@@ -1614,14 +1614,14 @@ namespace NETMOX {
             MOX::_NUM_SHIPS = max_ships;
         }
 
-        int ship_idx_prev = 0;
+        int16_t ship_idx_prev = 0;
         while (true) {
             int16_t ship_idx = reader.Read_Int16_();
             if (ship_idx == -1) {
                 break;
             }
 
-            for (int i = ship_idx_prev; i < ship_idx; ++i) {
+            for (int16_t i = ship_idx_prev; i < ship_idx; ++i) {
                 if (MOX::_ship[i].owner == player_idx && MOX::_ship[i].status != 5) {
                     MOX::_ship[i].officer_index = -1;
                     SHIPS::Kill_Ship_(i);
@@ -1634,7 +1634,7 @@ namespace NETMOX {
             RUSS::Mox_Update_();
         }
 
-        for (int i = ship_idx_prev; i < MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = ship_idx_prev; i < MOX::_NUM_SHIPS; ++i) {
             if (MOX::_ship[i].owner == player_idx && MOX::_ship[i].status != 5) {
                 MOX::_ship[i].officer_index = -1;
                 SHIPS::Kill_Ship_(i);
@@ -1753,7 +1753,7 @@ namespace NETMOX {
         int16_t combat_star_id = reader.Read_Int16_();
 
         NETMOX::_net.combat_attacker_id = static_cast<int8_t>(MOX::_PLAYER_NUM);
-        NETMOX::_net.combat_star_id = static_cast<int8_t>(combat_star_id);
+        NETMOX::_net.combat_star_id = combat_star_id;
 
         // 2. Read Target Info
         s_combfind_target target_info;
@@ -1837,7 +1837,7 @@ namespace NETMOX {
             MOX::_NUM_SHIPS = reader.Read_Int16_();
 
             if (MOX::_NUM_SHIPS > 0) {
-                for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                     MOX::_ship[i].status = 5; // Status 5 = travelling / in combat
                 }
             }
@@ -1872,7 +1872,7 @@ namespace NETMOX {
         int16_t defender_id = reader.Read_Int16_();
         int16_t target_colony_id = reader.Read_Int16_();
 
-        NETMOX::_net.combat_star_id = static_cast<int8_t>(star_id);
+        NETMOX::_net.combat_star_id = star_id;
         NETMOX::_net.combat_attacker_id = static_cast<int8_t>(attacker_id);
         NETMOX::_net.combat_defender_id = defender_id;
         NETMOX::_net.combat_target_player_id = MOX::_PLAYER_NUM;
@@ -1943,7 +1943,7 @@ namespace NETMOX {
             MOX::_NUM_SHIPS = reader.Read_Int16_();
 
             if (MOX::_NUM_SHIPS > 0) {
-                for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                     MOX::_ship[i].status = 5; // Status 5 = travelling / in combat
                 }
             }
@@ -2105,15 +2105,18 @@ namespace NETMOX {
         NETMOX::_net.player_net_info[reporting_player_id].player_state = NET_PLAYER_STATE_HUMAN_DIPLOMACY_ACTIVE;
     }
 
-    void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr, uint16_t len) {
-        (void)len;
+    void __cdecl Decode_Dragon_Info_(int16_t* colony_id_ptr, uint16_t len) {
+        if (colony_id_ptr == nullptr || len != sizeof(s_packet_dragon_info)) {
+            return;
+        }
+
         int16_t planet_idx = MOX::_colony[*colony_id_ptr].planet;
 
         _net.combat_planet_id = planet_idx;
         _net.combat_star_id = MOX::_planet[planet_idx].star_index;
     }
 
-    void __cdecl Send_Dragon_Info_(int32_t colony_id) {
+    void __cdecl Send_Dragon_Info_(int16_t colony_id) {
         s_packet_dragon_info packet;
         packet.colony_id = colony_id;
 

@@ -113,7 +113,7 @@ namespace COLCALC {
     int16_t __cdecl Get_Player_Max_Population_(int16_t player_idx);
     int __cdecl Best_Leader_Diplomat_Bonus_(int player_idx);
 
-    bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index);
+    bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int16_t star_index);
 
     /**
      * Sums building construction costs for each player's completed colonies.
@@ -199,7 +199,7 @@ namespace COLCALC {
     void __cdecl Compute_All_Star_Colony_Stuff_();
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star);
 
-    void __cdecl Star_Colony_Calculation_(short star_idx, short player_idx);
+    void __cdecl Star_Colony_Calculation_(int16_t star_idx, int16_t player_idx);
 
     void __cdecl Init_Surrenders_();
 
@@ -223,7 +223,7 @@ namespace COLCALC {
 
     int32_t __cdecl Sort_star_weights_(const void* a, const void* b);
 
-    short __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode);
+    int16_t __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode);
 
     void __cdecl No_Op1_();
 
@@ -237,7 +237,7 @@ namespace COLCALC {
 
     int16_t __cdecl Get_First_Player_Colony_Idx(int32_t player_idx);
 
-    inline bool __cdecl Monster_At_Star_(int star_idx);
+    inline bool __cdecl Monster_At_Star_(int16_t star_idx);
 
     void __cdecl Delete_Obsolete_Artifical_Planets_Under_Construction_(int16_t star_idx);
 
@@ -275,7 +275,7 @@ namespace COLCALC {
      */
     void __cdecl Colony_Industry_Production_(s_colony* colony, STRBUILD::s_builder* debug_out);
 
-    void __cdecl Show_Industry_Production_(short colony_idx);
+    void __cdecl Show_Industry_Production_(int16_t colony_idx);
 
     void __cdecl Show_Research_Production_(int16_t colony_idx);
 
@@ -374,12 +374,12 @@ namespace COLCALC {
 
     void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* player);
 
-    short __cdecl N_Prods_In_Colony_Queue_(short colony_idx, short item_id);
+    short __cdecl N_Prods_In_Colony_Queue_(int16_t colony_idx, short item_id);
 
     int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony);
 
     void __cdecl Show_Command_Points_(int player_idx);
     int16_t __cdecl Get_System_Population_(int16_t player_idx, int16_t star_idx);
 
-    short __cdecl Get_Possible_Surrender_Systems_(short player_idx, short target_player_idx, uint8_t *star_list);
+    short __cdecl Get_Possible_Surrender_Systems_(short player_idx, short target_player_idx, int16_t *star_list);
 }

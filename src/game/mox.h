@@ -315,7 +315,7 @@ namespace MOX {
     extern int16_t _eta_star_id;
     extern int16_t _stencil_box_id;
     extern int16_t _draw_main_screen_stencilled;
-    extern uint16_t _animated_star;
+    extern int16_t _animated_star;
     extern s_mouse_list _mouse_list_zoom_mode[5];
     extern int8_t _just_moved_stack;
     extern int16_t _first_fleet_movement_icon;

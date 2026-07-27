@@ -431,13 +431,13 @@ namespace INITGAME {
         memset(colony, 0, sizeof(s_colony));
 
         s_planet_data* planet = &MOX::_planet[planet_idx];
-        planet->colony_index = (int16_t)colony_idx;
+        planet->colony_index = colony_idx;
 
-        colony->planet = (int16_t)planet_idx;
+        colony->planet = planet_idx;
         colony->owner = player_num;
         colony->officer = -1;
 
-        int8_t star_idx = planet->star_index;
+        int16_t star_idx = planet->star_index;
         // Mark the star system as visited/seen by the player
         uint8_t visited_player_mask = (uint8_t)(1u << (player_num & 0x1f));
         MOX::_star[star_idx].visited |= visited_player_mask;

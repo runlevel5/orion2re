@@ -13,7 +13,7 @@ namespace AIBUILD {
     int32_t _player_total_strength_vs_ships[MAX_PLAYERS][3];
 
     int16_t __cdecl Mean_Ship_Strength_(s_ship_data* ship) {
-        int32_t ship_idx = (int32_t)(ship - MOX::_ship);
+        int16_t ship_idx = (int16_t)(ship - MOX::_ship);
         int32_t owner = (int32_t)ship->owner;
         int16_t result_strength = 0;
 
@@ -130,7 +130,7 @@ namespace AIBUILD {
         memset(_player_n_colony_ships, 0, sizeof(_player_n_colony_ships));
         memset(_player_n_transports, 0, sizeof(_player_n_transports));
 
-        for (int32_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
 
             if ((ship->status < 5 || ship->status == 6) && ship->owner < MAX_PLAYERS) {
@@ -427,14 +427,14 @@ namespace AIBUILD {
             uint16_t weights[MAX_COLONIES];
             memset(weights, 0, sizeof(weights));
 
-            for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
                 s_colony* colony = &MOX::_colony[i];
                 
                 if (colony->owner != (int8_t)player_idx) continue;
                 if (colony->bought_outright != 0) continue;
 
                 int16_t planet_idx = colony->planet;
-                int8_t star_idx = MOX::_planet[planet_idx].star_index;
+                int16_t star_idx = MOX::_planet[planet_idx].star_index;
                 if ((MOX::_star[star_idx].blockaded >> (player_idx & 0x1F)) & 1) continue;
 
                 int16_t producing = colony->producing[0];
@@ -476,7 +476,7 @@ namespace AIBUILD {
             }
 
             if (max_weight_safe != 0 || max_weight_threatened != 0) {
-                for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
                     if (weights[i] == 0) continue;
 
                     if (has_threatened) {
@@ -527,7 +527,7 @@ namespace AIBUILD {
         uint8_t owner_u8 = (uint8_t)colony->owner;
         int32_t owner = owner_u8;
         s_player* player = &MOX::_player[owner];
-        int32_t colony_idx = (int32_t)(colony - MOX::_colony);
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         s_ai_colony_info* ai_colony = &(*AIDATA::_ai_colony_info)[colony_idx];
 
         int32_t ecologist_objective_bonus = (player->objectives == PLAYER_OBJECTIVE_ECOLOGIST);
@@ -543,7 +543,7 @@ namespace AIBUILD {
         if (bc_score > 10) bc_score = 10;
 
         s_planet_data* planet = &MOX::_planet[colony->planet];
-        int8_t star_idx = planet->star_index;
+        int16_t star_idx = planet->star_index;
         s_ai_star_info* ai_star = &(*AIDATA::_ai_star_info)[star_idx];
         s_ai_star_player_block* star_player_info = &ai_star->per_player[owner];
 
@@ -974,7 +974,7 @@ namespace AIBUILD {
             }
         }
 
-        int32_t colony_idx = (int32_t)(colony - MOX::_colony);
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         int32_t pop_limit = (*AIDATA::_ai_colony_info)[colony_idx].pop_limit;
 
         if (colony->n_pops * 3 <= pop_limit) {
@@ -994,12 +994,12 @@ namespace AIBUILD {
         }
     }
 
-    void __cdecl Force_Produce_(uint8_t* id_list, int16_t list_index, int32_t* list_count, int16_t production_id) {
-        uint8_t colony_idx = id_list[list_index];
+    void __cdecl Force_Produce_(int16_t* id_list, int16_t list_index, int32_t* list_count, int16_t production_id) {
+        int16_t colony_idx = id_list[list_index];
         MOX::_colony[colony_idx].producing[0] = production_id;
         *list_count -= 1;
         int32_t items_to_move = *list_count - list_index;
-        memmove(&id_list[list_index], &id_list[list_index + 1], items_to_move);
+        memmove(&id_list[list_index], &id_list[list_index + 1], items_to_move * sizeof(int16_t));
     }
 
     int16_t __cdecl Industry_Worth(s_colony* colony) {
@@ -1015,8 +1015,8 @@ namespace AIBUILD {
     }
 
     void __cdecl Player_Colony_Autobuild_(s_colony* colony) {
-        const int32_t colony_idx = (int32_t)(colony - MOX::_colony);
-        COLCALC::Colony_Calculation_((int16_t)colony_idx);
+        const int16_t colony_idx = (int16_t)(colony - MOX::_colony);
+        COLCALC::Colony_Calculation_(colony_idx);
         AIBUILD::Assign_Colony_New_Building_(colony);
     }
 }

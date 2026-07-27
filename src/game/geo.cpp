@@ -47,8 +47,8 @@ namespace GEO {
                     
                     if (Point_Within_D_Of_Seg_(MOX::_star[bh_idx].x, MOX::_star[bh_idx].y, distance, x1, y1, x2, y2)) {
                         // Mark path as blocked in both stars' bitfields
-                        struct_::Set_Bit_Field_(MOX::_star[i].black_hole_blocks, (uint16_t)j);
-                        struct_::Set_Bit_Field_(MOX::_star[j].black_hole_blocks, (uint16_t)i);
+                        struct_::Set_Bit_Field_(MOX::_star[i].black_hole_blocks, j);
+                        struct_::Set_Bit_Field_(MOX::_star[j].black_hole_blocks, i);
                         break;
                     }
                 }
@@ -61,7 +61,7 @@ namespace GEO {
      */
     void __cdecl Initialize_Star_In_Nebula_Info_() {
         if (MOX::_NUM_STARS > 0) {
-            for (int32_t i = 0; i < (int32_t)MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 MOX::_star[i].in_nebula = Star_Is_In_Some_Nebula_(i);
             }
         }
@@ -106,7 +106,7 @@ namespace GEO {
      * Checks if a specific star is located within a nebula.
      * @param star_index The index into the global star array.
      */
-    uint8_t __cdecl Star_Is_In_Some_Nebula_(int32_t star_index) {
+    uint8_t __cdecl Star_Is_In_Some_Nebula_(int16_t star_index) {
         const auto& star = MOX::_star[star_index];
         return Point_Is_In_Some_Nebula_(star.x, star.y);
     }
@@ -185,7 +185,7 @@ namespace GEO {
                 for (int16_t j = i + 1; j < MOX::_NUM_STARS; ++j) {
                     if (MOX::_star[j].spectral_class != STAR_CLASS_BLACK_HOLE) {
                         // Check if star 'i' is blocked from star 'j' by a black hole
-                        if (!struct_::Test_Bit_Field_(MOX::_star[i].black_hole_blocks, (uint16_t)j)) {
+                        if (!struct_::Test_Bit_Field_(MOX::_star[i].black_hole_blocks, j)) {
                             if (Parsecs_Between_Stars_(i, j) <= 8) {
                                 Union_Find_(i, j, 1);
                             }
@@ -252,7 +252,7 @@ namespace GEO {
         return black_hole_count;
     }
 
-    void __cdecl Get_Orbit_Display_X_Y_(int32_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos) {
+    void __cdecl Get_Orbit_Display_X_Y_(int16_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos) {
         const int32_t orbit_time = (star_idx * 7) + (int32_t)MOX::_stardate;
         const int32_t angle_numerator = orbit_time * 5311;
         const int32_t angle_divisor = (orbit_idx * 100) + star_idx + 150;
@@ -365,7 +365,7 @@ namespace GEO {
      * Calculates the movement of a player's fleet towards a target star for one turn or multiple turns, 
      * accounting for movement speed (30 units/turn), nebula entry, and warp interdictors.
      */
-    void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int32_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag) {
+    void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int16_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag) {
         s_star_data* target_star = &MOX::_star[star_idx];
         int16_t target_x = target_star->x;
         int16_t target_y = target_star->y;

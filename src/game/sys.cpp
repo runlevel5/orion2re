@@ -25,7 +25,7 @@ namespace SYS {
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_idx) {
         char buffer[120];
 
-        snprintf(buffer, sizeof(buffer), "%d> %s", (int)star_idx, MOX::_star[star_idx].name);
+        snprintf(buffer, sizeof(buffer), "%d> %s", star_idx, MOX::_star[star_idx].name);
 
         size_t len = strlen(buffer);
         if (len >= SYSTEM_DISPLAY_LOADED_FLAG_LENGTH) {
@@ -59,7 +59,7 @@ namespace SYS {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        snprintf(temp_buffer, sizeof(temp_buffer), "%d> %s", (int)star_idx, star->name);
+        snprintf(temp_buffer, sizeof(temp_buffer), "%d> %s", star_idx, star->name);
 
         if (strlen(temp_buffer) >= SYSTEM_DISPLAY_LOADED_FLAG_LENGTH) {
             temp_buffer[SYSTEM_DISPLAY_LOADED_FLAG_LENGTH - 1] = '\0';
@@ -210,7 +210,7 @@ namespace SYS {
             size = PLANET_SIZE_HUGE;
         }
 
-        if (colony_idx > -1 && colony_idx < (int16_t)MOX::_NUM_COLONIES && planet->planet_type != PLANET_TYPE_GAS_GIANT) {
+        if (colony_idx > -1 && colony_idx < MOX::_NUM_COLONIES && planet->planet_type != PLANET_TYPE_GAS_GIANT) {
             if (MOX::_colony[colony_idx].outpost_flag == 0) {
                 climate = (uint16_t)(uint8_t)MOX::_colony[colony_idx].climate;
             }
@@ -735,9 +735,9 @@ namespace SYS {
         }
 
         MOX::_system_star_id_for_auto_select = star_idx;
-        int star_index = (int)star_idx;
+        int16_t star_index = star_idx;
         if (MOX::_star[star_index].wormhole_star_id > -1) {
-            short wormhole_star_id = (short)MOX::_star[star_index].wormhole_star_id;
+            int16_t wormhole_star_id = MOX::_star[star_index].wormhole_star_id;
             s_colors* wormhole_font_colors = MISC::Font_Colors2_(1, 'n', 's');
             s_colors wormhole_title_colors;
             memcpy(&wormhole_title_colors, wormhole_font_colors, sizeof(s_colors));
@@ -821,7 +821,7 @@ namespace SYS {
         }
 
         for (short orbit_slot = 0; orbit_slot < 5; ++orbit_slot) {
-            short planet_idx = MOX::_sys_disp[orbit_slot].orbit;
+            int16_t planet_idx = MOX::_sys_disp[orbit_slot].orbit;
             if (planet_idx > -1) {
                 int8_t planet_size = MOX::_planet[planet_idx].size;
                 if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_GAS_GIANT) {
@@ -866,7 +866,7 @@ namespace SYS {
             return;
         }
 
-        for (int16_t ship_idx = 0; ship_idx < (int16_t)MOX::_NUM_SHIPS; ++ship_idx) {
+        for (int16_t ship_idx = 0; ship_idx < MOX::_NUM_SHIPS; ++ship_idx) {
             if (HACCESS::Ship_Owner_(ship_idx) != target_owner) {
                 continue;
             }
@@ -1360,7 +1360,7 @@ namespace SYS {
                 (MOX::_player_has_ship_in_system != 0) ||
                 HAROLD::Player_Has_Colony_(
                         MOX::_PLAYER_NUM,
-                        static_cast<int16_t>(static_cast<int8_t>(planet->star_index))) ||
+                        planet->star_index) ||
                 HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
 
         *max_width = 0;
@@ -1779,7 +1779,7 @@ namespace SYS {
             return;
         }
 
-        if (star_idx >= static_cast<int16_t>(MOX::_NUM_STARS)) {
+        if (star_idx >= MOX::_NUM_STARS) {
             return;
         }
 

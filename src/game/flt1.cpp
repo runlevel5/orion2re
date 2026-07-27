@@ -59,7 +59,7 @@ namespace FLT1 {
             damage_width = 1;
         }
 
-        int16_t index_global = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
+        int16_t index_global = MOX::_scroll_bar->first_visible_row * MOX::_big_icon_display_columns;
 
         bool done = false;
         int16_t index = 0;
@@ -412,8 +412,8 @@ namespace FLT1 {
 
         if (FLT1::_relocate_button_mode != 1) {
             if (mouse::Mouse_Button_() == 1) {
-                int16_t icon_limit = MOX::_big_icon_display_rows * (int16_t)MOX::_big_icon_display_columns;
-                int16_t start_idx = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
+                int16_t icon_limit = MOX::_big_icon_display_rows * MOX::_big_icon_display_columns;
+                int16_t start_idx = MOX::_scroll_bar->first_visible_row * MOX::_big_icon_display_columns;
 
                 for (int16_t i = 0; i < icon_limit; ++i) {
                     int16_t icon_idx = start_idx + i;
@@ -937,7 +937,7 @@ namespace FLT1 {
         *list_count = 0;
 
         if (MOX::_n_fltscrn_big_icons > 0) {
-            for (int16_t i = 0; i < (int16_t)MOX::_n_fltscrn_big_icons; ++i) {
+            for (int16_t i = 0; i < MOX::_n_fltscrn_big_icons; ++i) {
                 s_big_icon& icon = MOX::_fltscrn_big_icon[i];
 
                 if (icon.ship_idx > -1 && icon.ship_idx < MAX_SHIPS && icon.selected != 0) {
@@ -976,7 +976,7 @@ namespace FLT1 {
     /** Counts selected fleet-screen ships from the current scroll position onward. */
     int16_t __cdecl N_Fltscrn_Ships_Selected_() {
         int16_t selected_count = 0;
-        int16_t start_index = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
+        int16_t start_index = MOX::_scroll_bar->first_visible_row * MOX::_big_icon_display_columns;
 
         for (int16_t i = start_index; i < MOX::_n_fltscrn_big_icons; ++i) {
             if (MOX::_fltscrn_big_icon[i].selected != 0) {
@@ -1244,7 +1244,7 @@ namespace FLT1 {
 
         if (MOX::_small_ship_stack_ptr > -1) {
             FLT2::Fleet_Screen_Big_Icon_Fields_(scroll_field_id, 605, 86, 14, 234);
-            MOX::_scroll_bar->total_rows = (int16_t)MOX::_n_fltscrn_rows;
+            MOX::_scroll_bar->total_rows = MOX::_n_fltscrn_rows;
         }
 
         MOVEBOX::Add_Galaxy_Map_Fields_2_(15, 52, 305, 182, 0, 0, 0, 0, 1, &temp_field_id, MOX::_galaxy_map_star_field, &MOX::_galaxy_map_grid_field);
@@ -1457,7 +1457,7 @@ namespace FLT1 {
             zoom = 169 /* 0xA9 */;
         }
 
-        for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (HACCESS::Star_Has_Relocation_(star_idx, MOX::_PLAYER_NUM)) {
                 int16_t relocation_target_idx = HACCESS::Relocation_(star_idx, MOX::_PLAYER_NUM);
 

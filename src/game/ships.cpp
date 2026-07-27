@@ -114,7 +114,7 @@ namespace SHIPS {
             SHIPMOVE::Ships_Try_To_Move_To_(ship_list, star_idx, &move_info);
 
             if (move_info.moving == 0) {
-                RUSS::PFMT_(0, 1, "Monster (ship id: %d) cannot move to %s (%d)!", (int)ship_idx, MOX::_star[star_idx].name, (int)star_idx);
+                RUSS::PFMT_(0, 1, "Monster (ship id: %d) cannot move to %s (%d)!", ship_idx, MOX::_star[star_idx].name, star_idx);
                 key::Wait_For_Key_();
             } else {
                 SHIPMOVE::Make_Ships_Move_To_(ship_list, star_idx, &move_info);
@@ -209,7 +209,7 @@ namespace SHIPS {
             final_y_upscaled = (int16_t)HAROLD::Get_Up_Scaled_Value_(final_y_scaled);
         }
 
-        return (int16_t)SHIPMOVE::Create_Nonplayer_Ship_((int8_t)type, design, final_x_upscaled, final_y_upscaled);
+        return SHIPMOVE::Create_Nonplayer_Ship_((int8_t)type, design, final_x_upscaled, final_y_upscaled);
     }
 
     void __cdecl Get_Ship_Icon_Coords_(int16_t ship_icon_idx, int16_t* x, int16_t* y) {

@@ -27,11 +27,11 @@ namespace {
         return (((eta << 20) ^ settler_data) & 0x00F00000u) ^ settler_data;
     }
 
-    uint32_t Legacy_Set_Settler_Source(uint32_t settler_data, uint32_t source_colony) {
+    uint32_t Legacy_Set_Settler_Source(uint32_t settler_data, int16_t source_colony) {
         return ((source_colony ^ settler_data) & 0x000000FFu) ^ settler_data;
     }
 
-    uint32_t Legacy_Set_Settler_Dest(uint32_t settler_data, uint32_t dest_planet) {
+    uint32_t Legacy_Set_Settler_Dest(uint32_t settler_data, int16_t dest_planet) {
         return (((dest_planet << 8) ^ settler_data) & 0x0000FF00u) ^ settler_data;
     }
 
@@ -123,16 +123,18 @@ DOCTEST_TEST_CASE("settler subfield setters match the legacy masked updates") {
             DOCTEST_CHECK(actual == Legacy_Set_Settler_Eta(settler_data, eta));
         }
 
-        for (uint32_t source_colony : {0u, 1u, 0x7Fu, 0xFFu}) {
+        for (int16_t source_colony : {-1, 0, 1, 0x7F}) {
             uint32_t actual = settler_data;
             SETTLER_DATA::Set_Source_Colony(&actual, source_colony);
             DOCTEST_CHECK(actual == Legacy_Set_Settler_Source(settler_data, source_colony));
+            DOCTEST_CHECK(SETTLER_DATA::Get_Source_Colony(actual) == source_colony);
         }
 
-        for (uint32_t dest_planet : {0u, 1u, 0x80u, 0xFFu}) {
+        for (int16_t dest_planet : {0, 1, 0x80, 0xFF}) {
             uint32_t actual = settler_data;
             SETTLER_DATA::Set_Dest_Planet(&actual, dest_planet);
             DOCTEST_CHECK(actual == Legacy_Set_Settler_Dest(settler_data, dest_planet));
+            DOCTEST_CHECK(SETTLER_DATA::Get_Dest_Planet(actual) == dest_planet);
         }
     }
 }

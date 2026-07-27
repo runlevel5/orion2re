@@ -175,7 +175,7 @@ struct s_aidesign_ship_design {
 typedef struct s_aidudes_colony_info s_aidudes_colony_info, *Ps_aidudes_colony_info;
 
 struct s_aidudes_colony_info {
-    uint8_t colony_idx;
+    int16_t colony_idx;
     uint8_t n_farmers;
     uint8_t n_workers;
     uint8_t first_assignable_pop_idx;
@@ -204,7 +204,7 @@ struct s_aimove_intercept_player {
 };
 
 struct s_aimove_intercept_entry {
-    int32_t star_idx;
+    int16_t star_idx;
     uint16_t player_mask;
     uint8_t min_eta;
     int32_t strength[10];
@@ -214,7 +214,7 @@ struct s_aimove_intercept_entry {
 typedef struct s_aimove_npc_dest s_aimove_npc_dest, *Ps_aimove_npc_dest;
 
 struct s_aimove_npc_dest {
-    uint8_t star_idx;
+    int16_t star_idx;
     uint8_t dist;
     uint8_t has_lucky;
     uint8_t has_unlucky;
@@ -339,7 +339,7 @@ struct s_battle_results_info {
 
 struct s_combat_bomb_result {
     int8_t attacker_idx;
-    uint8_t colony_idx;
+    int16_t colony_idx;
     int8_t is_planetary_hit;
     int16_t bomb_hits_remaining;
     int8_t is_bio_weapon;
@@ -357,7 +357,7 @@ struct s_combat_bomb_result {
 
 struct s_net_player_info {
     int8_t player_state;
-    uint8_t combat_star_id;
+    int16_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;
     int16_t combat_target_player_id;
@@ -1942,7 +1942,7 @@ typedef struct s_net_pack_monster_update s_net_pack_monster_update, *Ps_net_pack
 
 struct s_net_pack_monster_update {
     int32_t param_1;
-    int32_t param_2;
+    int16_t param_2;
     int32_t param_3;
 };
 
@@ -2115,7 +2115,7 @@ struct s_network {
     undefined field107_0x179;
     undefined field108_0x17a;
     uint8_t sync_state;
-    int8_t combat_star_id;
+    int16_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;
     int16_t combat_target_player_id;
@@ -2172,7 +2172,7 @@ struct s_network {
     undefined field165_0x206;
     int8_t diplomacy_initiator_id;
     int8_t diplomacy_active_flag;
-    undefined field168_0x209;
+    int16_t field168_0x209;
     uint32_t cur_session_id;
 };
 
@@ -3093,7 +3093,7 @@ struct s_star_data {
 typedef struct s_star_weight s_star_weight, *Ps_star_weight;
 
 struct s_star_weight {
-    uint8_t star_idx;
+    int16_t star_idx;
     uint8_t weight;
 };
 
@@ -3210,8 +3210,8 @@ typedef struct s_wormhole_data s_wormhole_data, *Ps_wormhole_data;
 
 struct s_wormhole_data {
     uint8_t success;
-    int32_t dest_star_idx;
-    int32_t count;
+    int16_t dest_star_idx;
+    int16_t count;
 };
 
 struct s_palette_header {

@@ -63,15 +63,15 @@ namespace settler {
 
         if (include_freighters != 0) {
             s_player* player = &MOX::_player[(int)colony->owner];
-            int32_t colony_idx = (int32_t)(colony - MOX::_colony);
+            int16_t colony_idx = (int16_t)(colony - MOX::_colony);
 
             if (player->settlers_freighted > 0) {
                 for (int32_t i = 0; i < (int32_t)player->settlers_freighted; ++i) {
                     s_settler_info& settler = player->settlers[i];
                     const uint32_t settler_data = settler.val;
-                    uint8_t dest_planet = (uint8_t)SETTLER_DATA::Get_Dest_Planet(settler_data);
+                    int16_t dest_planet = SETTLER_DATA::Get_Dest_Planet(settler_data);
 
-                    if ((int32_t)MOX::_planet[dest_planet].colony_index == colony_idx) {
+                    if (MOX::_planet[dest_planet].colony_index == colony_idx) {
                         if (COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)SETTLER_DATA::Get_Race(settler_data)) <= pop_limit) {
                             matching_pop_count++;
                         }
@@ -111,17 +111,17 @@ namespace settler {
                     curr_player->settlers[settler_idx].val = val;
 
                     if (SETTLER_DATA::Get_Eta(val) == 0) {
-                        uint8_t dest_planet = (uint8_t)SETTLER_DATA::Get_Dest_Planet(val);
+                        int16_t dest_planet = SETTLER_DATA::Get_Dest_Planet(val);
                         has_arrivals = true;
                         arrivals_per_planet[dest_planet]++;
 
                         int32_t player_idx = (int32_t)(curr_player - MOX::_player);
-                        int16_t star_index = (int16_t)MOX::_planet[dest_planet].star_index;
+                        int16_t star_index = MOX::_planet[dest_planet].star_index;
                         uint8_t blockaded = MOX::_star[star_index].blockaded;
 
                         if ((((uint8_t)(blockaded >> ((uint8_t)player_idx & 0x1f))) & 1) == 0) {
                             if (EVENTS::Event_Check_Space_Anomaly_At_Star_(star_index) == 0) {
-                                int32_t colony_index = MOX::_planet[dest_planet].colony_index;
+                                int16_t colony_index = MOX::_planet[dest_planet].colony_index;
                                 if (colony_index != -1) {
                                     s_colony* colony = &MOX::_colony[colony_index];
                                     if (colony->outpost_flag == 0) {
@@ -148,20 +148,20 @@ namespace settler {
             }
 
             if (has_arrivals) {
-                for (int32_t planet_idx = 0; planet_idx < planet_count; ++planet_idx) {
+                for (int16_t planet_idx = 0; planet_idx < planet_count; ++planet_idx) {
                     if (arrivals_per_planet[planet_idx] != 0) {
                         s_MSG msg;
                         memset(&msg, 0, sizeof(msg));
 
                         msg.msg_type = MSG_TYPE_COLONY;
                         // Note: Original game truncates planet_idx > 255 due to 8-bit field, which we accurately preserve.
-                        msg.u.colony.planet_idx = planet_idx;
+                        msg.u.colony.planet_idx = (uint8_t)planet_idx; /* INDEX_NARROWING */
                         msg.u.colony.subtype = 5 /* s_MSG_colony_settlers */;
                         msg.u.colony.c.settlers.settlers = arrivals_per_planet[planet_idx];
                         msg.u.colony.c.settlers.over_limit = over_limit_per_planet[planet_idx];
                         
                         int32_t player_idx = (int32_t)(curr_player - MOX::_player);
-                        int16_t star_index = (int16_t)MOX::_planet[planet_idx].star_index;
+                        int16_t star_index = MOX::_planet[planet_idx].star_index;
                         msg.u.colony.c.settlers.blockaded =
                                 (uint8_t)(MOX::_star[star_index].blockaded >> ((uint8_t)player_idx & 0x1f)) & 1;
 
@@ -200,8 +200,8 @@ namespace settler {
             s_settler_settle_result *result) {
         s_player *player = &MOX::_player[source_colony->owner];
         const int16_t max_freighted_settlers = (int16_t)(sizeof(player->settlers) / sizeof(player->settlers[0]));
-        const int32_t source_star_idx = (int32_t)MOX::_planet[source_colony->planet].star_index;
-        const int32_t dest_star_idx = (int32_t)MOX::_planet[dest_colony->planet].star_index;
+        const int16_t source_star_idx = MOX::_planet[source_colony->planet].star_index;
+        const int16_t dest_star_idx = MOX::_planet[dest_colony->planet].star_index;
 
         memset(result, 0, sizeof(*result));
 
@@ -217,12 +217,12 @@ namespace settler {
             return;
         }
 
-        if (EVENTS::Event_Check_Space_Anomaly_((int32_t)(source_colony - MOX::_colony)) != 0) {
+        if (EVENTS::Event_Check_Space_Anomaly_((int16_t)(source_colony - MOX::_colony)) != 0) {
             result->source_space_anomaly = 1;
             return;
         }
 
-        if (EVENTS::Event_Check_Plague_((int32_t)(source_colony - MOX::_colony)) != 0) {
+        if (EVENTS::Event_Check_Plague_((int16_t)(source_colony - MOX::_colony)) != 0) {
             result->source_plague = 1;
             return;
         }
@@ -269,7 +269,7 @@ namespace settler {
             result->dest_blockaded = 1;
         }
 
-        if (EVENTS::Event_Check_Space_Anomaly_((int32_t)(dest_colony - MOX::_colony)) != 0) {
+        if (EVENTS::Event_Check_Space_Anomaly_((int16_t)(dest_colony - MOX::_colony)) != 0) {
             result->dest_space_anomaly = 1;
         }
 
@@ -280,12 +280,10 @@ namespace settler {
     void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
         if (dest_colony != source_colony) {
             s_player* owner_player = &MOX::_player[(int32_t)source_colony->owner];
-            const int32_t source_planet_index = (int32_t)source_colony->planet;
-            const int32_t dest_planet_index = (int32_t)dest_colony->planet;
-            const int16_t source_star_index =
-                    (int16_t)(int8_t)MOX::_planet[source_planet_index].star_index;
-            const int16_t dest_star_index =
-                    (int16_t)(int8_t)MOX::_planet[dest_planet_index].star_index;
+            const int16_t source_planet_index = source_colony->planet;
+            const int16_t dest_planet_index = dest_colony->planet;
+            const int16_t source_star_index = MOX::_planet[source_planet_index].star_index;
+            const int16_t dest_star_index = MOX::_planet[dest_planet_index].star_index;
             uint32_t* pop_slot = &source_colony->pop[(int32_t)pop_index];
             const uint32_t pop_value = *pop_slot;
             uint32_t encoded_settler = pop_value;
@@ -301,8 +299,8 @@ namespace settler {
                         (uint32_t)Settler_ETA_(owner_player, source_star_index, dest_star_index));
                 SETTLER_DATA::Set_Source_Colony(
                         &encoded_settler,
-                        (uint32_t)(int32_t)(source_colony - MOX::_colony));
-                SETTLER_DATA::Set_Dest_Planet(&encoded_settler, (uint32_t)dest_colony->planet);
+                        (int16_t)(source_colony - MOX::_colony));
+                SETTLER_DATA::Set_Dest_Planet(&encoded_settler, dest_colony->planet);
 
                 const int32_t freighted_index = (int32_t)owner_player->settlers_freighted;
                 owner_player->settlers[freighted_index].val = encoded_settler;

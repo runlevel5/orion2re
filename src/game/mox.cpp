@@ -403,7 +403,7 @@ namespace MOX {
     int16_t _eta_star_id;
     int16_t _stencil_box_id;
     int16_t _draw_main_screen_stencilled;
-    uint16_t _animated_star;
+    int16_t _animated_star;
     int8_t _just_moved_stack;
     int16_t _first_fleet_movement_icon;
     int16_t _next_free_node;

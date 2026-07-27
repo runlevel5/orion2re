@@ -221,7 +221,7 @@ namespace oracle {
         constexpr uint32_t k_ship_turn_order_size = 210 * sizeof(int16_t);
         constexpr uint32_t k_combat_grid_size = 81 * 68 * sizeof(int16_t);
         constexpr uint32_t k_global_combat_data_size = 313;
-        constexpr uint32_t k_combat_bomb_result_size = 73;
+        constexpr uint32_t k_combat_bomb_result_size = sizeof(s_combat_bomb_result);
         constexpr uint32_t k_colony_size = 361;
         constexpr uint32_t k_tactical_arrays_size =
             15 * sizeof(int16_t) + 15 * sizeof(int8_t) + 2 * sizeof(int16_t) +
@@ -1612,7 +1612,7 @@ namespace oracle {
         }
 
         void Describe_Colony_Offset_(size_t block_offset, char* description, size_t description_size) {
-            const size_t colony_index = block_offset / sizeof(s_colony);
+            const int16_t colony_index = (int16_t)(block_offset / sizeof(s_colony));
             const size_t colony_offset = block_offset % sizeof(s_colony);
             const s_field_range fields[] = {
                 {"owner", offsetof(s_colony, owner), sizeof(s_colony::owner)},
@@ -1669,18 +1669,18 @@ namespace oracle {
 
             for (const s_field_range& field : fields) {
                 if (colony_offset >= field.offset && colony_offset < field.offset + field.size) {
-                    snprintf(description, description_size, "MOX::_colony[%zu].%s +%zu",
+                    snprintf(description, description_size, "MOX::_colony[%d].%s +%zu",
                         colony_index, field.name, colony_offset - field.offset);
                     return;
                 }
             }
 
-            snprintf(description, description_size, "MOX::_colony[%zu] +%zu",
+            snprintf(description, description_size, "MOX::_colony[%d] +%zu",
                 colony_index, colony_offset);
         }
 
         void Describe_Ship_Offset_(size_t block_offset, char* description, size_t description_size) {
-            const size_t ship_index = block_offset / sizeof(s_ship_data);
+            const int16_t ship_index = (int16_t)(block_offset / sizeof(s_ship_data));
             const size_t ship_offset = block_offset % sizeof(s_ship_data);
 #define SHIP_FIELD(name) {#name, offsetof(s_ship_data, name), sizeof(s_ship_data::name), 0}
 #define SHIP_ARRAY(name) {#name, offsetof(s_ship_data, name), sizeof(s_ship_data::name), sizeof(((s_ship_data*)nullptr)->name[0])}
@@ -1741,13 +1741,13 @@ namespace oracle {
                     const size_t field_offset = design_offset - field.offset;
                     if (field.element_size != 0) {
                         snprintf(description, description_size,
-                            "MOX::_ship[%zu].d.%s[%zu] +%zu",
+                            "MOX::_ship[%d].d.%s[%zu] +%zu",
                             ship_index, field.name,
                             field_offset / field.element_size,
                             field_offset % field.element_size);
                     } else {
                         snprintf(description, description_size,
-                            "MOX::_ship[%zu].d.%s +%zu",
+                            "MOX::_ship[%d].d.%s +%zu",
                             ship_index, field.name, field_offset);
                     }
                     return;
@@ -1763,19 +1763,19 @@ namespace oracle {
                 const size_t field_offset = ship_offset - field.offset;
                 if (field.element_size != 0) {
                     snprintf(description, description_size,
-                        "MOX::_ship[%zu].%s[%zu] +%zu",
+                        "MOX::_ship[%d].%s[%zu] +%zu",
                         ship_index, field.name,
                         field_offset / field.element_size,
                         field_offset % field.element_size);
                 } else {
                     snprintf(description, description_size,
-                        "MOX::_ship[%zu].%s +%zu",
+                        "MOX::_ship[%d].%s +%zu",
                         ship_index, field.name, field_offset);
                 }
                 return;
             }
 
-            snprintf(description, description_size, "MOX::_ship[%zu] +%zu",
+            snprintf(description, description_size, "MOX::_ship[%d] +%zu",
                 ship_index, ship_offset);
         }
 

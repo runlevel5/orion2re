@@ -107,9 +107,10 @@ namespace HOMEGEN {
 
                 for (int j = 0; j < 2; ++j) {
                     char orbit = MAPGEN::Generate_Orbit_(target_star_idx);
-                    target_star->planet_index[(uint8_t)orbit] = MOX::_planet_count;
+                    int16_t new_planet_idx = MOX::_planet_count;
+                    target_star->planet_index[(uint8_t)orbit] = new_planet_idx;
 
-                    s_planet_data* new_planet = &MOX::_planet[MOX::_planet_count];
+                    s_planet_data* new_planet = &MOX::_planet[new_planet_idx];
                     new_planet->orbit = orbit;
                     new_planet->planet_type = PLANET_TYPE_PLANET;
 
@@ -158,13 +159,13 @@ namespace HOMEGEN {
     }
 
     void __cdecl Build_Min_Star_Distances_(int32_t min_dist_sq) {
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             RUSS::Mox_Update_();
 
             s_good_star* current_star = &_good_stars[i];
             current_star->star_count = 0;
 
-            for (int16_t j = 0; j < (int16_t)MOX::_NUM_STARS; ++j) {
+            for (int16_t j = 0; j < MOX::_NUM_STARS; ++j) {
                 int32_t dist = Dist_Between_Stars_(i, j);
 
                 if (dist >= min_dist_sq) {
@@ -189,7 +190,7 @@ namespace HOMEGEN {
         }
 
         if (MOX::_NUM_STARS > 1) {
-            for (uint16_t current_star = 1; current_star < MOX::_NUM_STARS; ++current_star) {
+            for (int16_t current_star = 1; current_star < MOX::_NUM_STARS; ++current_star) {
                 RUSS::Mox_Update_();
 
                 CandidateList* list = &candidates[current_star]; // Note: Original code uses index up to NUM_STARS
@@ -207,7 +208,7 @@ namespace HOMEGEN {
                     Set_Up_Home_Gen_Msg_();
                 }
 
-                for (uint16_t star_j = 1; star_j < MOX::_NUM_STARS; ++star_j) {
+                for (int16_t star_j = 1; star_j < MOX::_NUM_STARS; ++star_j) {
                     if (star_j == current_star) continue;
 
                     s_good_star* field = &_good_stars[current_star];
@@ -237,11 +238,11 @@ namespace HOMEGEN {
 
         int16_t selected_index = -1;
         int32_t pick_count = 1;
-        for (uint16_t si = 0; si < MAX_STARS; ++si) {
+        for (int16_t si = 0; si < MAX_STARS; ++si) {
             RUSS::Mox_Update_();
             if (candidates[si].count >= MOX::_NUM_PLAYERS) {
                 if (game_random::Random_(pick_count) == 1) {
-                    selected_index = (int16_t)si;
+                    selected_index = si;
                     pick_count++;
                 }
             }
@@ -435,7 +436,7 @@ namespace HOMEGEN {
             if (is_race_assigned[race_idx] == 0) {
                 char* src_name = &star_names[race_idx * 15];
                 int16_t home_planet_id = plr->home_planet_id;
-                int8_t star_idx = (int8_t)MOX::_planet[home_planet_id].star_index;
+                int16_t star_idx = MOX::_planet[home_planet_id].star_index;
                 s_star_data* star = &MOX::_star[star_idx];
 
                 char* dst = star->name;
@@ -782,7 +783,7 @@ namespace HOMEGEN {
         }
 
         int16_t planet_index = (int16_t)(planet - MOX::_planet);
-        int16_t star_idx = (int16_t)planet->star_index;
+        int16_t star_idx = planet->star_index;
         MAPGEN::Set_Secondary_Planet_Data_(star_idx, planet_index);
 
         s_star_data* star = &MOX::_star[star_idx];
@@ -807,12 +808,13 @@ namespace HOMEGEN {
 
                 if (existing_planet_idx == -1) {
                     // Create a brand new planet record
-                    Make_One_Planet_(star_idx, MOX::_planet_count, orbit, 0);
+                    int16_t new_planet_idx = MOX::_planet_count;
+                    Make_One_Planet_(star_idx, new_planet_idx, orbit, 0);
                     MOX::_planet_count++;
                 } else {
                     // Convert an existing non-planet object (e.g. asteroid belt) into a planet
                     uint16_t saved_global_count = MOX::_planet_count;
-                    MOX::_planet_count = (uint16_t)existing_planet_idx;
+                    MOX::_planet_count = (uint16_t)existing_planet_idx; /* INDEX_NARROWING */
 
                     MOX::_planet[existing_planet_idx].orbit = (int8_t)orbit;
                     MOX::_planet[existing_planet_idx].planet_type = PLANET_TYPE_PLANET;
@@ -841,7 +843,7 @@ namespace HOMEGEN {
         home_star_ids[MAX_PLAYERS] = -1;
 
         // Pass 1: Collect star IDs of all home worlds
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             int8_t owner = MOX::_star[i].owner;
             if (owner >= 0 && owner < MAX_PLAYERS) {
                 home_star_ids[home_star_count + 1] = i;
@@ -850,7 +852,7 @@ namespace HOMEGEN {
         }
 
         // Pass 2: Process and enforce traits on each home world
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             int16_t owner_idx = (int16_t)MOX::_star[i].owner;
             if (owner_idx >= 0 && owner_idx < MAX_PLAYERS) {
                 s_player* player = &MOX::_player[owner_idx];
@@ -1086,7 +1088,7 @@ namespace HOMEGEN {
                 int16_t min_dist = 999;
                 uint8_t found_food_system = 0;
 
-                int8_t colony_star = MOX::_planet[planet_idx].star_index;
+                int16_t colony_star = MOX::_planet[planet_idx].star_index;
 
                 for (int16_t star_idx = 1; star_idx < MOX::_NUM_STARS; ++star_idx) {
                     if (found_food_system != 0) break;
@@ -1123,7 +1125,8 @@ namespace HOMEGEN {
                 if (found_food_system == 0) {
                     if (nearest_empty_star != -1) {
                         int16_t orbit = Usable_Orbit_(nearest_empty_star);
-                        Make_One_Planet_(nearest_empty_star, MOX::_planet_count, orbit, 1);
+                        int16_t new_planet_idx = MOX::_planet_count;
+                        Make_One_Planet_(nearest_empty_star, new_planet_idx, orbit, 1);
                         food_star = nearest_empty_star;
                         MOX::_planet_count++;
                     } else if (nearest_star_in_range != -1) {
@@ -1133,8 +1136,8 @@ namespace HOMEGEN {
                         int16_t star_of_planet = MOX::_planet[target_p_idx].star_index;
                         food_star = star_of_planet;
 
-                        int16_t saved_planet_count = MOX::_planet_count;
-                        MOX::_planet_count = target_p_idx;
+                        uint16_t saved_planet_count = MOX::_planet_count;
+                        MOX::_planet_count = (uint16_t)target_p_idx; /* INDEX_NARROWING */
 
                         uint32_t orbit_index = ERIC::Get_Sint_Index_From_List_(target_p_idx, MOX::_star[star_of_planet].planet_index, 5);
                         Make_One_Planet_(star_of_planet, target_p_idx, (int16_t)orbit_index, 1);
@@ -1191,7 +1194,7 @@ namespace HOMEGEN {
         do {
             if (dist_limit >= 8) break;
 
-            for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 // Potential buffer overflow if _NUM_STARS > MAX_STARS
                 if (visited[i] == 0) {
                     if (HAROLD::Is_Home_Star_(i) == 0 && Is_Added_Food_World_(i) == 0) {
@@ -1224,8 +1227,7 @@ namespace HOMEGEN {
         if (valid_count < 2) {
             bool found = false;
             do {
-                int r = game_random::Random_((int)MOX::_NUM_STARS);
-                selected_star = (int16_t)(r - 1);
+                selected_star = game_random::Random_((int)MOX::_NUM_STARS) - 1;
                 if (HAROLD::Is_Home_Star_(selected_star) == 0 && Is_Added_Food_World_(selected_star) == 0) {
                     found = true;
                 }
@@ -1242,7 +1244,7 @@ namespace HOMEGEN {
         s_planet_data* planet = &MOX::_planet[planet_index];
         planet->mineral_class = (int8_t)mineral_class;
 
-        int8_t star_idx = planet->star_index;
+        int16_t star_idx = planet->star_index;
         s_star_data* star = &MOX::_star[star_idx];
 
         while (true) {
@@ -1295,7 +1297,7 @@ namespace HOMEGEN {
         int16_t target_planet_idx = MOX::_star[0].planet_index[selected_orbit];
         if (target_planet_idx == -1) {
             target_planet_idx = MOX::_planet_count;
-            MOX::_star[0].planet_index[selected_orbit] = MOX::_planet_count;
+            MOX::_star[0].planet_index[selected_orbit] = target_planet_idx;
             MOX::_planet_count++;
         }
 

@@ -499,8 +499,10 @@ namespace CMBTDRW1 {
 
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].unit_status == 0 && i != MOX::_dont_draw_ship) {
-                    uint8_t cooldown = MOX::_combat_data[i].special_cooldown;
-                    if (cooldown != 0xFF && (int16_t)cooldown != MOX::_dont_draw_ship) {
+                    int16_t cooldown = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                        ? int16_t{-1}
+                        : MOX::_combat_data[i].special_cooldown;
+                    if (cooldown != -1 && cooldown != MOX::_dont_draw_ship) {
                         CMBTSPEC::Draw_Continuing_Tractor_(i);
                     }
                 }
@@ -1659,7 +1661,7 @@ skip_cursor:
     }
 
     int16_t __cdecl Ship_Completely_On_Screen_(int16_t ship_idx) {
-        int idx = (int)ship_idx;
+        int16_t idx = ship_idx;
         int16_t x = (int16_t)MOX::_combat_data[idx].x;
         int16_t y = (int16_t)MOX::_combat_data[idx].y;
 
@@ -1674,8 +1676,8 @@ skip_cursor:
             if (MOX::_combat_defender_player == 8) {
                 planet_size = 2;
             } else {
-                int colony_idx = (int)MOX::_cmbt_colony_id;
-                int planet_idx = (int)MOX::_colony[colony_idx].planet;
+                int16_t colony_idx = MOX::_cmbt_colony_id;
+                int16_t planet_idx = MOX::_colony[colony_idx].planet;
                 planet_size = (int16_t)MOX::_planet[planet_idx].size;
             }
 
@@ -1815,8 +1817,10 @@ skip_cursor:
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
             if (MOX::_combat_data[i].unit_status == 0) {
                 if (MOX::_dont_draw_ship != i) {
-                    uint8_t cooldown = MOX::_combat_data[i].special_cooldown;
-                    if (cooldown != 0xFF && (int16_t)cooldown != MOX::_dont_draw_ship) {
+                    int16_t cooldown = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                        ? int16_t{-1}
+                        : MOX::_combat_data[i].special_cooldown;
+                    if (cooldown != -1 && cooldown != MOX::_dont_draw_ship) {
                         CMBTSPEC::Draw_Continuing_Tractor_(i);
                     }
                 }
@@ -2114,7 +2118,7 @@ skip_cursor:
             Draw_Ship_To_Bitmap_(ship_idx, 0, 0, 0);
             bitmap::Create_Blank_Bitmap_(0x62, 0x62, MOX::_combat_bitmap);
             
-            int idx = (int)ship_idx;
+            int16_t idx = ship_idx;
             s_combat_data* ship = &MOX::_combat_data[idx];
             int8_t facing = MOX::_combat_data[idx].facing_dir;
             int8_t shield_type = MOX::_combat_data[idx].shield_type;

@@ -1137,7 +1137,7 @@ namespace SCORE {
     int16_t __cdecl Get_Total_Population_(int16_t player_idx) {
         int16_t total_pop = 0;
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             if ((int16_t)MOX::_colony[i].owner == player_idx) {
                 // Assembly zero-extends the n_pops byte into CX before adding to AX
                 total_pop += (uint8_t)MOX::_colony[i].n_pops;
@@ -1164,7 +1164,7 @@ namespace SCORE {
         s_hiscore_tmp_pop* temp_buffer = (s_hiscore_tmp_pop*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
         memset(temp_buffer, 0, alloc_size);
 
-        for (int16_t col_idx = 0; col_idx < (int16_t)MOX::_NUM_COLONIES; ++col_idx) {
+        for (int16_t col_idx = 0; col_idx < MOX::_NUM_COLONIES; ++col_idx) {
             if (limit_reached) break;
 
             if (MOX::_colony[col_idx].owner == player_idx) {

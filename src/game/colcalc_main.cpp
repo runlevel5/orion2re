@@ -41,10 +41,10 @@ namespace COLCALC {
             int8_t owner_trait0 = MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT];
             int8_t owner_gov = owner_trait0 / 2;
             if (owner_gov != 3) {
-                short home_id = player->home_planet_id;
+                int16_t home_id = player->home_planet_id;
                 bool has_capitol = false;
                 if (home_id != -1) {
-                    short cap_col_idx = MOX::_planet[home_id].colony_index;
+                    int16_t cap_col_idx = MOX::_planet[home_id].colony_index;
                     if (MOX::_colony[cap_col_idx].buildings[BUILDING_CAPITOL]) has_capitol = true;
                 }
                 if (!has_capitol) no_capital_penalty = _non_capital_morale_lookup[owner_gov];
@@ -135,7 +135,7 @@ namespace COLCALC {
             *p = (*p & 0xffffff7f) | 0x00000100; // Scientist flag set, Worker flag cleared
         }
 
-        int8_t star_idx = MOX::_planet[colony->planet].star_index;
+        int16_t star_idx = MOX::_planet[colony->planet].star_index;
         MOX::_star[star_idx].ignore_colony_ships |= (1 << (colony->owner & 0x1F));
 
         Recalculate_Colony_(colony);
@@ -213,7 +213,7 @@ namespace COLCALC {
         int16_t total_deficit = 0;
         int16_t capacity = player->n_freighters - (player->settlers_freighted * 5);
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* c = &MOX::_colony[i];
             if (c->owner == player_idx && c->outpost_flag == 0) {
                 if (EVENTS::Event_Check_Space_Anomaly_(i) == 0) {
@@ -364,7 +364,7 @@ namespace COLCALC {
             return;
         }
 
-        int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             for (int i = 0; i < 10; ++i) {
                 colony->pop_growth[i] = 0;
@@ -578,7 +578,7 @@ namespace COLCALC {
         int total_food_maintenance = 0;
 
         // Process Colonies
-        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
             if (colony->owner == player_idx && colony->outpost_flag == 0) {
                 total_pop += static_cast<uint8_t>(colony->n_pops);
@@ -591,7 +591,7 @@ namespace COLCALC {
 
                 total_industry += colony->production[ECON_INDUSTRY];
 
-                if (EVENTS::Event_Check_Colony_Researching_(static_cast<int16_t>(i)) == 0) {
+                if (EVENTS::Event_Check_Colony_Researching_(i) == 0) {
                     total_research += colony->production[2];
                 }
                 total_bc += colony->production[ECON_BC];
@@ -599,7 +599,7 @@ namespace COLCALC {
         }
 
         // Process Ships (Science Labs)
-        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == player_idx) {
                 // Check for Scout Lab bit.
@@ -938,7 +938,7 @@ namespace COLCALC {
         int32_t n_fortresses = 0;
         int32_t warlord_bonus = 0;
 
-        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* col = &MOX::_colony[i];
             if (col->owner == player_idx && col->outpost_flag == 0) {
                 plr->maintenance[0] += (uint16_t)(uint8_t)col->maintenance[ECON_BC];
@@ -1032,7 +1032,7 @@ namespace COLCALC {
         int32_t ship_counts[HULL_CLASS_COUNT] = { 0 };
         int32_t noncombat_ships = 0;
 
-        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* s = &MOX::_ship[i];
             if (s->owner == player_idx && s->status < 3 && s->just_built == 0) {
                 if (s->d.ship_type == SHIP_TYPE_COMBAT) {
@@ -1105,7 +1105,7 @@ namespace COLCALC {
             return;
         }
 
-        int colony_idx = (int)(colony - MOX::_colony);
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
             colony->production[ECON_BC] = 0;
             if (debug_buf) {
@@ -1509,7 +1509,7 @@ namespace COLCALC {
             return;
         }
 
-        int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             colony->production[ECON_INDUSTRY] = 0;
             if (debug_out) {

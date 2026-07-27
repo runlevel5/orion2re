@@ -107,7 +107,7 @@ namespace COLLAND {
 
             COLONY::Set_Colony_Font_To_(4);
 
-            char* planet_name = HACCESS::Get_Planet_Name_((int16_t)COLONY::_planet_handle);
+            char* planet_name = HACCESS::Get_Planet_Name_(COLONY::_planet_handle);
             char* title_fmt = ESTRINGS::E_Strings_(0xE5 /* ESTR_COLONY_BUILT_ON_S */);
             snprintf(buffer, sizeof(buffer), title_fmt, planet_name);
             fonts::Print_Centered_(0x13F, 10, buffer);
@@ -125,7 +125,7 @@ namespace COLLAND {
         int16_t frame_count = animate::Get_Animation_Frame_Count_(COLLAND::_l_anims);
 
         if (((int32_t)frame_count - 2) <= (int32_t)current_frame) {
-            COLLAND::Print_Planet_Data_((int16_t)COLONY::_planet_handle);
+            COLLAND::Print_Planet_Data_(COLONY::_planet_handle);
         }
 
         if (current_frame == 1) {
@@ -159,11 +159,11 @@ namespace COLLAND {
         video::Clip_Off_();
         COLONY::_using_colony_screen_palette = 1;
 
-        COLONY::_star_handle = (int32_t)MOX::_screen_data;
-        COLONY::_orbit_n = (int32_t)COLONY::_orbit_temp;
+        COLONY::_star_handle = MOX::_screen_data;
+        COLONY::_orbit_n = COLONY::_orbit_temp;
 
-        COLONY::_planet_handle = (int32_t)HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
-        COLONY::_colony_handle = (int32_t)MOX::_planet[COLONY::_planet_handle].colony_index;
+        COLONY::_planet_handle = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+        COLONY::_colony_handle = MOX::_planet[COLONY::_planet_handle].colony_index;
         COLONY::_valid_colony = 1;
         COLONY::_drawing_display = 0;
         COLONY::_sys_disp_star_handle = COLONY::_star_handle;

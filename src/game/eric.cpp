@@ -385,7 +385,7 @@ namespace ERIC {
         int16_t count = 0;
         int16_t chosen_colony = -1;
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             if (MOX::_colony[i].owner == owner_idx) {
                 count++;
                 if (game_random::Random_(count) == 1) {

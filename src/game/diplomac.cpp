@@ -1888,9 +1888,9 @@ namespace diplomac {
         for (int p1 = 0; p1 < (int)MOX::_NUM_PLAYERS; ++p1) {
             for (int p2 = 0; p2 < (int)MOX::_NUM_PLAYERS; ++p2) {
                 if (MOX::_player[p1].objectives == PLAYER_OBJECTIVE_HUMAN && MOX::_player[p2].objectives != PLAYER_OBJECTIVE_HUMAN && MOX::_player[p1].treaty[p2] != 2) {
-                    int star_id = -1;
+                    int16_t star_id = -1;
                     int threat_val;
-                    int planet_id = -1;
+                    int16_t planet_id = -1;
                     AIMOVE::Player_Threatens_Player_(p1, p2, &star_id, &threat_val, &planet_id);
 
                     if (planet_id != -1) {
@@ -2895,7 +2895,7 @@ namespace diplomac {
             int16_t system_idx = COLCALC::Get_Surrender_System_(target_idx, player_idx, severity > 6 ? 1 : 0);
             if (system_idx != -1) {
                 if (COLCALC::May_Surrender_Star_(system_idx, target_idx, player_idx)) {
-                    _diplomacy_proposal_system_bribe = (int16_t)(int8_t)system_idx;
+                    _diplomacy_proposal_system_bribe = system_idx;
                     return 1;
                 }
             }

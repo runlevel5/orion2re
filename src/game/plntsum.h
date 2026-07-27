@@ -87,7 +87,7 @@ namespace PLNTSUM {
 
     int16_t __cdecl Summary_Planet_Index_(int16_t star_index);
 
-    int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx);
+    int16_t __cdecl Get_ETA_To_Star_(int16_t star_idx);
 
     void __cdecl Set_Planet_Explored_Flags_();
 

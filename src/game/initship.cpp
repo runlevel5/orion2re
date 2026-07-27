@@ -195,7 +195,7 @@ namespace INITSHIP {
         int16_t best_armor = Best_Armor_(player_idx);
         int16_t best_ftl = Best_Warp_Drive_(player_idx);
 
-        for (int16_t ship_idx = 0; ship_idx < static_cast<int16_t>(MOX::_NUM_SHIPS); ++ship_idx) {
+        for (int16_t ship_idx = 0; ship_idx < MOX::_NUM_SHIPS; ++ship_idx) {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
             if (ship->owner == static_cast<int8_t>(player_idx) && (ship->status == 4 || ship->status == 6)) {
@@ -785,7 +785,7 @@ namespace INITSHIP {
         }
 
         if (MOX::_NUM_SHIPS > 0) {
-            for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                 s_ship_data& ship = MOX::_ship[i];
 
                 if (ship.owner < MAX_PLAYERS && ship.status == 0) {
@@ -2407,7 +2407,7 @@ void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
 }
 
 void __cdecl Update_Ship_Names_To_New_Language_(void) {
-    for (int32_t ship_index = 0; ship_index < MAX_SHIPS; ++ship_index) {
+    for (int16_t ship_index = 0; ship_index < MAX_SHIPS; ++ship_index) {
         s_ship_data* ship = &MOX::_ship[ship_index];
         const int32_t ship_type = (int32_t)ship->d.ship_type;
 

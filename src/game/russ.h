@@ -31,7 +31,7 @@ namespace RUSS {
     /** Returns the display name for a star index, or a fallback name when out of range.
      * @param star_index Star table index to resolve.
      */
-    char* __cdecl Star_Name_(int32_t star_index);
+    char* __cdecl Star_Name_(int16_t star_index);
 
     /** Maps a star index to its monster group identifier.
      * @param star_index Star table index to classify.

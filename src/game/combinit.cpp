@@ -1184,7 +1184,7 @@ void __cdecl Load_Antaran_Defense_Fleet_() {
 }
 
 void __cdecl Load_Antaran_Star_Fortress_() {
-    int n = MOX::_combat_total_ship_count;
+    int16_t n = MOX::_combat_total_ship_count;
     s_combat_data* ship = &MOX::_combat_data[n];
 
     ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
@@ -2055,7 +2055,7 @@ void __cdecl Deploy_Ships_() {
     MOX::_combat_data[0].y = 34;
     MOX::_combat_data[0].size_class = 100;
 
-    for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
             saved_size = MOX::_combat_data[i].size_class;
             MOX::_combat_data[i].size_class = 99;
@@ -2066,13 +2066,13 @@ void __cdecl Deploy_Ships_() {
 
     MOX::_combat_data[0].size_class = SHIP_SIZE_HUGE;
 
-    for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
             MOX::_combat_data[i].size_class = saved_size;
         }
     }
 
-    for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
         if (ship->ftl_type == DRIVE_NO_DRIVE) {
             int8_t x_pos;
@@ -2083,7 +2083,7 @@ void __cdecl Deploy_Ships_() {
             }
             ship->x = x_pos;
             ship->y = MOX::_combat_data[0].y + 1;
-            stationary_ship_idx = (int16_t)i;
+            stationary_ship_idx = i;
         } else {
             if (ship->owner == MOX::_combat_attacker_player) {
                 if (!(attacker_ship_count & 1)) {

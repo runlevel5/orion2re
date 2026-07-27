@@ -115,7 +115,7 @@ namespace HAROLD {
     }
 
     int8_t __cdecl Planet_Number_(int16_t planet_index) {
-        int8_t star_idx = MOX::_planet[planet_index].star_index;
+        int16_t star_idx = MOX::_planet[planet_index].star_index;
         s_star_data* star = &MOX::_star[star_idx];
 
         int8_t relative_planet_num = 0;
@@ -279,8 +279,8 @@ namespace HAROLD {
                 }
 
                 if (wormhole_exit_id != -1) {
-                    MOX::_star[wormhole_exit_id].wormhole_star_id = (int8_t)star_idx;
-                    MOX::_star[star_idx].wormhole_star_id = (int8_t)wormhole_exit_id;
+                    MOX::_star[wormhole_exit_id].wormhole_star_id = (int8_t)star_idx; /* INDEX_NARROWING */
+                    MOX::_star[star_idx].wormhole_star_id = (int8_t)wormhole_exit_id; /* INDEX_NARROWING */
                     return;
                 }
             }
@@ -670,7 +670,7 @@ namespace HAROLD {
                     int8_t planet_orbit = planet->orbit;
 
                     if (orbit_taken[planet_orbit] != 0) {
-                        RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, (int32_t)star_idx);
+                        RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, star_idx);
                         RUSS::PFMT_(0, 2, "relate game conditions EXACTLY as they just happened");
                         RUSS::PFMT_(0, 3, s___s__00556ae4, star->name);
                         key::Wait_For_Key_();

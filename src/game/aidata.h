@@ -3,14 +3,16 @@
 namespace AIDATA {
     struct s_turns_from_to_intermediate_cache_entry {
         uint8_t turns;
-        uint8_t intermediate_star;
+        int16_t intermediate_star;
         uint8_t extended_turns;
-        uint8_t extended_intermediate_star;
+        int16_t extended_intermediate_star;
+        int8_t computed;
     };
 
     struct s_ship_n_turns_to_intermediate_cache_entry {
         uint8_t turns;
-        uint8_t intermediate_star;
+        int16_t intermediate_star;
+        int8_t computed;
     };
 
     extern uint16_t _g_base_planet_values[MAX_PLAYERS][MAX_PLANETS];

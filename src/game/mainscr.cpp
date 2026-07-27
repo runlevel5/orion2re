@@ -568,7 +568,7 @@ namespace MAINSCR {
         video::Clip_On_();
 
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
-            int8_t wormhole_id = MOX::_star[star_idx].wormhole_star_id;
+            int16_t wormhole_id = MOX::_star[star_idx].wormhole_star_id;
             if (wormhole_id != -1) {
                 bool is_visible = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx);
                 if (!is_visible) {
@@ -578,7 +578,7 @@ namespace MAINSCR {
                 if (is_visible) {
                     int16_t x1, y1, x2, y2;
                     MAINSCR::Get_Star_Draw_Coords_(star_idx, &x1, &y1);
-                    MAINSCR::Get_Star_Draw_Coords_(static_cast<int16_t>(wormhole_id), &x2, &y2);
+                    MAINSCR::Get_Star_Draw_Coords_(wormhole_id, &x2, &y2);
                     line::Line_(x1, y1, x2, y2, 4);
                 }
             }
@@ -1524,7 +1524,7 @@ namespace MAINSCR {
                     MOX::_return_screen = SCREEN_MAIN;
 
                     s_planet_data* planet = &MOX::_planet[planet_idx];
-                    MOX::_screen_data = static_cast<int16_t>(planet->star_index);
+                    MOX::_screen_data = planet->star_index;
                     COLONY::_orbit_temp = static_cast<int16_t>(planet->orbit);
 
                     *status_flag = 1;
@@ -1828,7 +1828,7 @@ namespace MAINSCR {
         s_colors text_colors;
         char print_buffer[80];
 
-        int16_t star_idx = (int16_t)MOX::_galaxy_map_scanned_star;
+        int16_t star_idx = MOX::_galaxy_map_scanned_star;
         s_star_data* star = &MOX::_star[star_idx];
         int16_t owner = (int16_t)star->owner;
 
@@ -2123,7 +2123,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Clear_Twinkling_Star_Data_() {
-        for (int32_t i = 0; i < MAX_STARS; ++i) {
+        for (int16_t i = 0; i < MAX_STARS; ++i) {
             MOX::_star[i].twinkling1 = -1;
             MOX::_star[i].twinkling2 = -1;
         }
@@ -2174,7 +2174,7 @@ namespace MAINSCR {
     void __cdecl Change_Home_Star_Name_() {
         int16_t player_idx = MOX::_PLAYER_NUM;
         s_player* player = &MOX::_player[player_idx];
-        int16_t star_idx = (int16_t)MOX::_planet[player->home_planet_id].star_index;
+        int16_t star_idx = MOX::_planet[player->home_planet_id].star_index;
 
         int16_t center_y = namestar::Star_Name_Popup_Map_Center_Y_();
         int16_t center_x = namestar::Star_Name_Popup_Map_Center_X_();
@@ -2275,14 +2275,14 @@ namespace MAINSCR {
         }
 
         // Search for the first star system where the player has a colony, starting from home
-        int16_t home_star_idx = (int16_t)MOX::_planet[home_planet_id].star_index;
+        int16_t home_star_idx = MOX::_planet[home_planet_id].star_index;
         star_idx = home_star_idx;
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             if (HAROLD::Player_Has_Colony_(player_num, star_idx)) {
                 return star_idx;
             }
-            star_idx = (int16_t)((star_idx + 1) % MOX::_NUM_STARS);
+            star_idx = (star_idx + 1) % MOX::_NUM_STARS;
         }
 
         // Fallback to home star if no colony found or galaxy has no stars
@@ -2569,7 +2569,7 @@ namespace MAINSCR {
                     MAINSCR::Get_New_Paralax_XYs_(target_x, target_y, num_steps);
                     special::Interpolate_Line_(&MOX::_cur_map_x, &MOX::_cur_map_y, target_x, target_y, 50);
 
-                    MOX::_animated_star = 0xFFFF;
+                    MOX::_animated_star = -1;
                     video::Set_Page_Off_();
                     MAINSCR::Draw_Main_Screen_Filled_(0);
                     MAINSCR::Draw_Main_Screen_();
@@ -2578,7 +2578,7 @@ namespace MAINSCR {
                 } while (count != 0);
             }
 
-            MOX::_animated_star = 0xFFFF;
+            MOX::_animated_star = -1;
             video::Set_Page_Off_();
             MAINSCR::Draw_Main_Screen_Filled_(1);
             video::Set_Refresh_Stencil_();
@@ -2586,7 +2586,7 @@ namespace MAINSCR {
             // Immediate update for small or no movement
             MOX::_cur_map_x = target_x;
             MOX::_draw_main_screen_to_back = 1;
-            MOX::_animated_star = 0xFFFF;
+            MOX::_animated_star = -1;
             MOX::_cur_map_y = target_y;
         }
     }
@@ -2614,7 +2614,7 @@ namespace MAINSCR {
         MOX::_at_least_one_report = 0;
         MOX::_previous_report = 0;
         MOX::_just_moved_stack = 0;
-        MOX::_animated_star = 0xFFFF;
+        MOX::_animated_star = -1;
 
         _warn_about_cheaters = static_cast<uint8_t>(1 << (MOX::_PLAYER_NUM & 0x1F));
 
@@ -3587,7 +3587,7 @@ namespace MAINSCR {
     void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, int16_t x_box, int16_t y_box, int16_t width, int16_t height, int16_t mode)
     {
         uint32_t random_seed = game_random::Get_Random_Seed_();
-        MOX::_animated_star = 0xFFFF;
+        MOX::_animated_star = -1;
 
         if (mode == 2) {
             int16_t node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
@@ -3952,7 +3952,7 @@ namespace MAINSCR {
             memcpy(&MOX::_player[remote_id], &pack->target_player, sizeof(s_player));
             memcpy(&MOX::_player[from_player_id], &pack->player, sizeof(s_player));
 
-            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 MOX::_star[i].surrender_to[remote_id] = pack->surrender_to[i];
             }
 
@@ -4031,7 +4031,7 @@ namespace MAINSCR {
         }
         case NET_PACKET_STRATEGIC_BATTLE_RESULTS:
         case NET_PACKET_STRATEGIC_RESULTS_READY: {
-            memcpy(NETMOX::_net.combat_results_data, payload, sizeof(s_battle_results)); // 1742 bytes copied
+            memcpy(NETMOX::_net.combat_results_data, payload, sizeof(s_battle_results));
             if (msg_type == NET_PACKET_STRATEGIC_BATTLE_RESULTS) {
                 NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_RESULTS_DISPLAY;
             }
@@ -4062,7 +4062,7 @@ namespace MAINSCR {
             if (NETMOX::_net.players_hit_next_turn[MOX::_PLAYER_NUM] == 0) {
                 memcpy(&MOX::_player[from_player_id], &pack->player, sizeof(s_player));
 
-                for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                     MOX::_star[i].surrender_to[from_player_id] = pack->surrender_to[i];
                 }
 
@@ -4152,14 +4152,14 @@ namespace MAINSCR {
             memcpy(&MOX::_player[target_id], &pack->target_player, sizeof(s_player));
             memcpy(&MOX::_player[pack->player_num], &pack->player, sizeof(s_player));
 
-            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 pack->surrender_to[i] = MOX::_star[i].surrender_to[target_id];
             }
             break;
         }
         case NET_PACKET_DRAGON_INFO: {
             NETMOX::_net.sync_state = NET_SYNC_STATE_DRAGON_BRIBE_PROMPT;
-            NETMOX::Decode_Dragon_Info_((int32_t*)payload, (uint16_t)payload_len);
+            NETMOX::Decode_Dragon_Info_((int16_t*)payload, (uint16_t)payload_len);
             break;
         }
         case NET_PACKET_DRAGON_NO_BRIBE: {
@@ -4167,7 +4167,10 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_DRAGON_BRIBE_DESTINATION: {
-            NETMOX::_net.field168_0x209 = *(uint8_t*)payload;
+            if (payload_len != sizeof(int16_t)) {
+                break;
+            }
+            memcpy(&NETMOX::_net.field168_0x209, payload, sizeof(int16_t));
             NETMOX::_net.player_net_info[from_player_id].player_state = NET_PLAYER_STATE_DRAGON_BRIBE_DESTINATION;
             break;
         }
@@ -4258,9 +4261,12 @@ namespace MAINSCR {
             break;
         }
         case NET_PACKET_MONSTER_UPDATE: {
+            if (payload_len != sizeof(s_net_pack_monster_update)) {
+                break;
+            }
             s_net_pack_monster_update monster_update;
             memcpy(&monster_update, payload, sizeof(monster_update));
-            EVENTS::Event_Monster_Update_((int16_t)monster_update.param_1, (int16_t)monster_update.param_2,
+            EVENTS::Event_Monster_Update_((int16_t)monster_update.param_1, monster_update.param_2,
                                           (int16_t)monster_update.param_3);
             break;
         }

@@ -392,6 +392,9 @@ DOCTEST_TEST_CASE("differential decode requires full shared payload workspace on
 }
 
 DOCTEST_TEST_CASE("network packet structs stay byte packed and size stable") {
+    DOCTEST_CHECK(alignof(NETMOX::s_packet_dragon_info) == 1);
+    DOCTEST_CHECK(sizeof(NETMOX::s_packet_dragon_info) == sizeof(int16_t));
+
     DOCTEST_CHECK(alignof(NETMOX::s_packet_0x12) == 1);
     DOCTEST_CHECK(sizeof(NETMOX::s_packet_0x12) ==
                   sizeof(int16_t) * 4);

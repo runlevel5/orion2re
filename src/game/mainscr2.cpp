@@ -42,6 +42,7 @@ namespace MAINSCR2 {
 
     void __cdecl Draw_Main_Screen_For_Star_Distan() {
         int16_t star_idx = MOX::_screen_mouse_list_type;
+        int16_t previous_temp_star_handle = MOX::_temp_star_handle;
         s_colors distance_outline_colors = {{0x70, 0x72, 0x71, 0x72, 0x72, 0x72, 0x72, 0x72}};
         s_colors blocked_path_outline_colors = {{0x4C, 0x50, 0x4E, 0x50, 0x50, 0x50, 0x50, 0x50}};
 
@@ -49,8 +50,6 @@ namespace MAINSCR2 {
         MAINSCR::Draw_Main_Main_Screen_();
         graphics::Set_Window_(22, 22, 527, 421);
         video::Clip_On_();
-
-        MOX::_global_var = (int8_t)MOX::_temp_star_handle;
 
         if (star_idx > -1) {
             MAINSCR::Highlight_Star_(star_idx);
@@ -68,7 +67,7 @@ namespace MAINSCR2 {
                     }
 
                     if (MOX::_temp_star_handle > -1 && MOX::_temp_star_handle != star_idx) {
-                        if ((int16_t)MOX::_global_var == MOX::_temp_star_handle) {
+                        if (previous_temp_star_handle == MOX::_temp_star_handle) {
                             int16_t x1, y1;
                             int16_t x2, y2;
 
@@ -220,8 +219,6 @@ namespace MAINSCR2 {
 
         video::Copy_Off_To_Back_();
 
-        MOX::_global_var = (int8_t)0xFF;
-
         do {
             timer::Mark_Time_();
 
@@ -346,7 +343,7 @@ namespace MAINSCR2 {
 
         if (new_outpost_star_id > -1) {
             bool found_outpost_ship = false;
-            int16_t outpost_ship_id = 0;
+            int16_t outpost_ship_id = -1;
 
             if (MOX::_fleet_box.count > 0) {
                 for (int16_t i = 0; i < MOX::_fleet_box.count; ++i) {
@@ -425,7 +422,7 @@ namespace MAINSCR2 {
 
         if (planet_idx > -1) {
             bool found_colony_ship = false;
-            int16_t ship_idx = saved_expanding_help;
+            int16_t ship_idx = -1;
 
             if (MOX::_fleet_box.count > 0) {
                 for (int16_t box_idx = 0; box_idx < MOX::_fleet_box.count; ++box_idx) {

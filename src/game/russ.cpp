@@ -171,7 +171,7 @@ namespace RUSS {
         return (int16_t)(star_index % 5 + 1);
     }
 
-    char* __cdecl Star_Name_(int32_t star_index) {
+    char* __cdecl Star_Name_(int16_t star_index) {
         if (star_index < MOX::_NUM_STARS) {
             return MOX::_star[star_index].name;
         }
@@ -228,7 +228,7 @@ namespace RUSS {
 
         INITSHIP::Update_Player_Ship_Designs_((int16_t)player_idx);
 
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             if (MOX::_colony[i].owner == player_idx) {
                 COLBLDG::Clear_Colony_Queue_(i);
             }

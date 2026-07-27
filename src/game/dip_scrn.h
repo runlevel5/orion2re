@@ -219,7 +219,7 @@ namespace DIP_SCRN {
     extern char* _offer_diplomacy_list[7];
     extern char* _offer_title;
 
-    extern uint8_t _diplomacy_system_planet_list[5];
+    extern int16_t _diplomacy_system_planet_list[5];
     extern int16_t _diplomacy_system_population;
     extern uint8_t _diplomacy_system_receiver;
     extern int16_t _diplomacy_system_planet_count;
@@ -282,7 +282,7 @@ namespace DIP_SCRN {
 
     void __cdecl Start_Diplomacy_Music_(int16_t music_type);
 
-    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* capitol_planet_idx, int16_t* owned_count, uint8_t* planet_indices);
+    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* capitol_planet_idx, int16_t* owned_count, int16_t* planet_indices);
 
     void __cdecl Diplomacy_Generic_System_List_Draw_();
 }

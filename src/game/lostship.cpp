@@ -31,7 +31,7 @@ namespace lostship {
         int32_t ship_count = (int32_t)MOX::_NUM_SHIPS;
         s_ship_data* ship_array = MOX::_ship;
 
-        for (int32_t i = 0; i < ship_count; ++i) {
+        for (int16_t i = 0; i < ship_count; ++i) {
             s_ship_data* ship = &ship_array[i];
 
             if (ship->status == 0 && (int16_t)ship->owner == player_idx) {

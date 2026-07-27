@@ -5,7 +5,7 @@ namespace AIMOVE {
 
 #pragma pack(push, 1)
     struct s_ai_stage_point {
-        uint8_t star_idx;
+        int16_t star_idx;
         uint32_t strength;
     };
 
@@ -83,7 +83,7 @@ namespace AIMOVE {
 
     void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count);
 
-    bool __cdecl Star_Has_Monster_(int star_idx);
+    bool __cdecl Star_Has_Monster_(int16_t star_idx);
 
     void __cdecl Get_Best_Unescorted_Colony_Ship_(int16_t* ship_indices, int16_t* ship_count, int16_t destination);
 
@@ -122,11 +122,11 @@ namespace AIMOVE {
 
     void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int8_t* intercept_map);
 
-    void __cdecl Knock_Out_Impossible_Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* temp_arr, int* temp_count, int keep_one_entry);
+    void __cdecl Knock_Out_Impossible_Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int16_t* temp_arr, int* temp_count, int keep_one_entry);
 
-    uint16_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int star_idx);
+    uint16_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int16_t star_idx);
 
-    void __cdecl Player_Threatens_Player_(int plr1, int plr2, int* star_idx, int* aux_info, int* planet_idx);
+    void __cdecl Player_Threatens_Player_(int plr1, int plr2, int16_t* star_idx, int* aux_info, int16_t* planet_idx);
 
     int16_t __cdecl Best_Uncolonized_Undestined_Planet_(int16_t player_idx);
 

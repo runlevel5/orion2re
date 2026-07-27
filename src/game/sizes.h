@@ -45,14 +45,14 @@ static_assert(sizeof(EVENTS::_event_data) == 36 * sizeof(s_event_data), "EVENTS:
 static_assert(sizeof(MSG_::_msgs) == 100 * sizeof(s_MSG), "MSG_::_msgs size mismatch");
 ORION2RE_STATIC_SIZE_ASSERT(s_palette_entry, 4);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_field, 0x35, 0x51);
-ORION2RE_STATIC_SIZE_ASSERT_PTR(s_network, 0x20e, 0x216);
-ORION2RE_STATIC_SIZE_ASSERT(s_net_player_info, 0xc);
+ORION2RE_STATIC_SIZE_ASSERT_PTR(s_network, 0x218, 0x220);
+ORION2RE_STATIC_SIZE_ASSERT(s_net_player_info, 0xd);
 ORION2RE_STATIC_SIZE_ASSERT(s_net_tactical_combat_message, 0x10);
-ORION2RE_STATIC_SIZE_ASSERT_PTR(s_battle_results, 0x6ce, 0x6d6);
+ORION2RE_STATIC_SIZE_ASSERT_PTR(s_battle_results, 0x6d0, 0x6d8);
 ORION2RE_STATIC_SIZE_ASSERT(s_load_net_screen_packet, 0x60);
 
-ORION2RE_STATIC_SIZE_ASSERT(AIDATA::s_turns_from_to_intermediate_cache_entry, 4);
-ORION2RE_STATIC_SIZE_ASSERT(AIDATA::s_ship_n_turns_to_intermediate_cache_entry, 2);
+ORION2RE_STATIC_SIZE_ASSERT(AIDATA::s_turns_from_to_intermediate_cache_entry, 10);
+ORION2RE_STATIC_SIZE_ASSERT(AIDATA::s_ship_n_turns_to_intermediate_cache_entry, 6);
 ORION2RE_STATIC_SIZE_ASSERT(s_npcdiplo_tech, 5);
 ORION2RE_STATIC_SIZE_ASSERT(s_combat_weapon_slot, 11);
 ORION2RE_STATIC_SIZE_ASSERT(s_missile, 0x1A);

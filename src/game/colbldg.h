@@ -32,19 +32,19 @@ namespace COLBLDG {
     }
 
     static inline int16_t Colony_Production_Ship_Index_(int16_t production_id) {
-        return (int16_t)(COLONY_PRODUCTION_QUEUED_SHIP_BASE - production_id);
+        return COLONY_PRODUCTION_QUEUED_SHIP_BASE - production_id;
     }
 
     static inline int16_t Colony_Production_Ship_Design_Index_(int16_t production_id) {
-        return (int16_t)(COLONY_PRODUCTION_SHIP_DESIGN_BASE - production_id);
+        return COLONY_PRODUCTION_SHIP_DESIGN_BASE - production_id;
     }
 
     static inline int16_t Colony_Production_From_Ship_Index_(int16_t ship_idx) {
-        return (int16_t)(COLONY_PRODUCTION_QUEUED_SHIP_BASE - ship_idx);
+        return COLONY_PRODUCTION_QUEUED_SHIP_BASE - ship_idx;
     }
 
     static inline int16_t Colony_Production_From_Ship_Design_Index_(int16_t design_idx) {
-        return (int16_t)(COLONY_PRODUCTION_SHIP_DESIGN_BASE - design_idx);
+        return COLONY_PRODUCTION_SHIP_DESIGN_BASE - design_idx;
     }
 
     extern int16_t _building_indexes[54];

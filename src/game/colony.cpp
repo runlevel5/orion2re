@@ -104,7 +104,7 @@ namespace COLONY {
     int16_t _scanned_bldg_C = -1;
     int16_t _scanned_bldg_R = -1;
     uint8_t _full_draw = 1;
-    int32_t _colony_handle;
+    int16_t _colony_handle;
     int16_t _building_cr_xy[7][7][4] = {
         316, 0, 492, 0, 225, 0, 461, 0, 153, 0, 428, 0, 96, 0, 401, 0,
         50, 0, 379, 0, 10, 0, 361, 0, -21, -1, 348, 0, 406, 0, 461, 0,
@@ -127,12 +127,12 @@ namespace COLONY {
 
     int16_t _pop_fields_ref[3][42];
 
-    int32_t _planet_handle;
-    int32_t _star_handle;
+    int16_t _planet_handle;
+    int16_t _star_handle;
     int32_t _orbit_n;
     uint8_t _cheats;
-    int32_t _sys_disp_star_handle;
-    int32_t _sys_disp_scanned_star_handle;
+    int16_t _sys_disp_star_handle;
+    int16_t _sys_disp_scanned_star_handle;
 
     int16_t _g_colony_n = -1;
     s_colors _bright_blue_font_color_array = {{228, 229, 229, 0, 0, 0, 0, 0}};
@@ -587,7 +587,7 @@ namespace COLONY {
 
     bool __cdecl Colonize_Planet_(int16_t planet_idx) {
         if (MOX::_planet[planet_idx].colony_index == -1) {
-            int16_t colony_idx = static_cast<int16_t>(MOX::_NUM_COLONIES);
+            int16_t colony_idx = MOX::_NUM_COLONIES;
             MOX::_NUM_COLONIES++;
 
             INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)MOX::_PLAYER_NUM);
@@ -604,7 +604,7 @@ namespace COLONY {
 
             if (colony.bought_outright == 0) {
                 int16_t planet_idx = colony.planet;
-                int8_t star_idx = MOX::_planet[planet_idx].star_index;
+                int16_t star_idx = MOX::_planet[planet_idx].star_index;
                 s_star_data& star = MOX::_star[star_idx];
 
                 if (!struct_::Test_Bit_Field_(&star.blockaded, MOX::_PLAYER_NUM)) {
@@ -622,7 +622,7 @@ namespace COLONY {
         if (_full_draw != 0) {
             graphics::Darken_Fill_(0, 0, 640, 150);
 
-            int16_t unemployed_idx = COLMOVE::Get_First_Unemployed_(static_cast<int16_t>(_colony_handle));
+            int16_t unemployed_idx = COLMOVE::Get_First_Unemployed_(_colony_handle);
 
             if (unemployed_idx == -1) {
                 s_animation_header* anim = C_Anims_(3);
@@ -755,7 +755,7 @@ namespace COLONY {
         int16_t y_offset = (row_index * 0x1e) + row_adjust + 0x41;
 
         COLDRAW::Draw_Colony_Prod_(
-            (int16_t)_colony_handle,
+            _colony_handle,
             selection,
             128,
             y_offset,
@@ -912,7 +912,7 @@ namespace COLONY {
         char buffer[500];
 
         if (COLONY::_scanned_pop != -1) {
-            int16_t handle_s = (int16_t)COLONY::_colony_handle;
+            int16_t handle_s = COLONY::_colony_handle;
             uint32_t pop_data = MOX::_colony[COLONY::_colony_handle].pop[COLONY::_scanned_pop];
 
             char* str_state;
@@ -982,7 +982,7 @@ namespace COLONY {
         int16_t turns;
         char* format;
 
-        turns = Calculate_Current_Production_Turn_Count_(static_cast<int16_t>(_colony_handle));
+        turns = Calculate_Current_Production_Turn_Count_(_colony_handle);
 
         fonts::Set_Font_Style_Shadow_Down_(0, &_font_color_array);
 
@@ -998,14 +998,14 @@ namespace COLONY {
         s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
 
         if (colony->occupation_policy == 4) {
-            int16_t population_count = Sum_Colonists_(static_cast<int16_t>(COLONY::_colony_handle), -1, -1, -1, -1, 1);
+            int16_t population_count = Sum_Colonists_(COLONY::_colony_handle, -1, -1, -1, -1, 1);
             if (population_count < 1) {
-                if (!Colony_Has_Natives_(static_cast<int16_t>(COLONY::_colony_handle))) {
+                if (!Colony_Has_Natives_(COLONY::_colony_handle)) {
                     goto check_production;
                 }
             }
             OCPOLPUP::Occupation_Policy_Popup_();
-            Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+            Col_Calc_Wrapper_(COLONY::_colony_handle);
             Show_Colony_Screen_();
         }
 
@@ -1106,7 +1106,7 @@ namespace COLONY {
     }
 
     void __cdecl Reset_Field_Mode_() {
-        int16_t unemployed_index = COLMOVE::Get_First_Unemployed_(static_cast<int16_t>(COLONY::_colony_handle));
+        int16_t unemployed_index = COLMOVE::Get_First_Unemployed_(COLONY::_colony_handle);
 
         if (unemployed_index != -1) {
             if (COLONY::_field_mode == 1) {
@@ -1116,7 +1116,7 @@ namespace COLONY {
                 COLONY::Drop_Military_();
             }
 
-            COLONY::Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+            COLONY::Col_Calc_Wrapper_(COLONY::_colony_handle);
         }
 
         COLONY::_field_mode = 0;
@@ -1133,7 +1133,7 @@ namespace COLONY {
         MOX::_colony[COLONY::_colony_handle].military[COLONY::_move_colonist]++;
 
         Clear_Move_Military_();
-        Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+        Col_Calc_Wrapper_(COLONY::_colony_handle);
         Reset_Field_Mode_();
     }
 
@@ -1145,7 +1145,7 @@ namespace COLONY {
         TEXTBOX::Text_Box_(COLCALC::_food_summary_msg, buffer);
     }
 
-    char* __cdecl Colony_Type_(int32_t colony_idx) {
+    char* __cdecl Colony_Type_(int16_t colony_idx) {
         int8_t specialty = MOX::_colony[colony_idx].specialty;
 
         switch (specialty) {
@@ -1335,7 +1335,7 @@ namespace COLONY {
         int16_t y_coord = static_cast<int16_t>(type * 30 + 62);
 
         COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-            static_cast<int16_t>(COLONY::_colony_handle),
+            COLONY::_colony_handle,
             static_cast<int16_t>(type),
             0,
             0x136 /* 310 */,
@@ -1437,10 +1437,10 @@ namespace COLONY {
     }
 
     int16_t __cdecl Get_Scanned_Pop_(int16_t field_idx) {
-        _g_colony_n = static_cast<int16_t>(_colony_handle);
+        _g_colony_n = _colony_handle;
 
         return COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-            static_cast<int16_t>(_colony_handle),
+            _colony_handle,
             field_idx,
             4,
             310,
@@ -1459,7 +1459,7 @@ namespace COLONY {
 
         // Note: The assembly calculates (short)(job_type * 30 + 62) as the 5th argument.
         return COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-            static_cast<int16_t>(_colony_handle),
+            _colony_handle,
             job_type,
             3,
             310,
@@ -1477,7 +1477,7 @@ namespace COLONY {
         int32_t arg5_calc = (int32_t)((int16_t)(index * 30 + 62));
 
         COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-            static_cast<int16_t>(_colony_handle),
+            _colony_handle,
             index,
             1,
             310,
@@ -1525,7 +1525,7 @@ namespace COLONY {
         } else if (_field_mode == 1) {
             for (int16_t i = 0; i < 3; ++i) {
                 if (_job_fields[i] == *p_clicked_id) {
-                    COLMOVE::Send_Cluster_((int16_t)_colony_handle, i);
+                    COLMOVE::Send_Cluster_(_colony_handle, i);
                     Show_Colony_Screen_();
                     *p_clicked_id = 0;
                 }
@@ -1551,11 +1551,11 @@ namespace COLONY {
     }
 
     void __cdecl Set_Colony_Screen_To_New_Colony_(int16_t colony_idx) {
-        Cleanup_Colony_Queue_(static_cast<int16_t>(_colony_handle));
+        Cleanup_Colony_Queue_(_colony_handle);
 
         int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
-        MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+        MOX::_screen_data = MOX::_planet[planet_idx].star_index;
         _orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
         _temp_colony_idx = colony_idx;
 
@@ -1597,9 +1597,9 @@ namespace COLONY {
 
                     if (GENDRAW::Do_Confirmation_Box_(local_buffer) != 0) {
                         MOX::_colony[_colony_handle].last_turn_building_destroyed = (uint16_t)MOX::_stardate;
-                        ERICNET::Remove_Building_(static_cast<int16_t>(_colony_handle), building_idx);
+                        ERICNET::Remove_Building_(_colony_handle, building_idx);
                         Remove_Satellite_From_Array_(building_idx);
-                        COLCALC::Colony_Calculation_(static_cast<int16_t>(_colony_handle));
+                        COLCALC::Colony_Calculation_(_colony_handle);
                         MOX::_player[MOX::_PLAYER_NUM].bc += scrap_value;
                         Restore_Control_();
                     } else {
@@ -1621,9 +1621,9 @@ namespace COLONY {
 
     void __cdecl Pickup_Colonists_(int16_t colonists) {
         _field_mode = 1;
-        COLMOVE::Get_Cluster_(static_cast<int16_t>(_colony_handle), colonists);
+        COLMOVE::Get_Cluster_(_colony_handle, colonists);
         _full_draw = 1;
-        Col_Calc_Wrapper_(static_cast<int16_t>(_colony_handle));
+        Col_Calc_Wrapper_(_colony_handle);
     }
 
     int16_t __cdecl Get_Next_Colony_(int16_t current_idx, int16_t direction) {
@@ -1633,7 +1633,7 @@ namespace COLONY {
         do {
             if (direction == 0) {
                 // Next colony logic: (current + 1) % _NUM_COLONIES
-                search_idx = (short)((search_idx + 1) % (int)(int16_t)MOX::_NUM_COLONIES);
+                search_idx = (search_idx + 1) % MOX::_NUM_COLONIES;
             }
             else {
                 // Previous colony logic
@@ -1641,7 +1641,7 @@ namespace COLONY {
                 if (search_idx < 0) {
                     // Wrap around to the end of the list
                     // BUG: This should likely be MOX::_NUM_COLONIES - 1
-                    search_idx = (short)MOX::_NUM_COLONIES;
+                    search_idx = MOX::_NUM_COLONIES;
                 }
             }
 
@@ -1769,7 +1769,7 @@ namespace COLONY {
             _colony_fields[8] = -1000;
         }
 
-        int16_t first_unemployed = COLMOVE::Get_First_Unemployed_((int16_t)_colony_handle);
+        int16_t first_unemployed = COLMOVE::Get_First_Unemployed_(_colony_handle);
 
         if (first_unemployed != -1 && _valid_colony != 0) {
             char* str = ESTRINGS::E_Strings_(12);
@@ -1807,7 +1807,7 @@ namespace COLONY {
                                 col_idx != COLONY::_colony_handle &&
                                 MOX::_colony[col_idx].owner == MOX::_PLAYER_NUM) 
                             {
-                                MOX::_screen_data = (int16_t)COLONY::_sys_disp_star_handle;
+                                MOX::_screen_data = COLONY::_sys_disp_star_handle;
                                 COLONY::_orbit_temp = i;
                                 COLONY::_temp_colony_idx = col_idx;
 
@@ -1856,7 +1856,7 @@ namespace COLONY {
                 }
                 COLONY::_drawing_display = 0;
                 COLONY::_full_draw = 1;
-                COLONY::_sys_disp_star_handle = (int32_t)scanned_val_out;
+                COLONY::_sys_disp_star_handle = scanned_val_out;
                 COLONY::_g_scanned_planet = -1;
             }
         } else if (COLONY::_drawing_display == 2) {
@@ -1913,7 +1913,7 @@ namespace COLONY {
 
         if (strcasecmp(input_buf, ESTRINGS::E_Strings_(ESTR_C1)) == 0) {
             if (COLONY::_drawing_display == 2) {
-                if (!COLONY::Colonize_Planet_(static_cast<int16_t>(COLONY::_planet_display_handle))) {
+                if (!COLONY::Colonize_Planet_(COLONY::_planet_display_handle)) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_PLANET_ALREADY_COLONIZED));
                     COLONY::Restore_Control_();
                     return;
@@ -1926,7 +1926,7 @@ namespace COLONY {
             MOX::_player[MOX::_PLAYER_NUM].bc += 100;
             return;
         } else {
-            COLONY::Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+            COLONY::Col_Calc_Wrapper_(COLONY::_colony_handle);
         }
     }
 
@@ -1977,8 +1977,8 @@ namespace COLONY {
                     if (GENDRAW::Confirmation_Box_(buffer)) {
                         col_ref.last_turn_building_destroyed = (uint16_t)MOX::_stardate;
                         Turn_To_Rubble_CR_Bldg_((int16_t)bldg_id);
-                        ERICNET::Remove_Building_((int16_t)_colony_handle, (int16_t)bldg_id);
-                        COLCALC::Colony_Calculation_((int16_t)_colony_handle);
+                        ERICNET::Remove_Building_(_colony_handle, (int16_t)bldg_id);
+                        COLCALC::Colony_Calculation_(_colony_handle);
                         MOX::_player[MOX::_PLAYER_NUM].bc += refund_val;
                     }
 
@@ -2065,7 +2065,7 @@ namespace COLONY {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
             // Note: star_index and orbit are extracted from the planet associated with the colony
-            int8_t star_idx = MOX::_planet[planet_idx].star_index;
+            int16_t star_idx = MOX::_planet[planet_idx].star_index;
             char orbit = MOX::_planet[planet_idx].orbit;
 
             // Update the player's last selected planet in the system's star data

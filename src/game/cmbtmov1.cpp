@@ -17,7 +17,10 @@ namespace CMBTMOV1 {
     }
 
     int8_t __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
-        return MOX::_combat_data[ship_idx].stasis_source_idx != 0xFF;
+        const int16_t stasis_source_idx = MOX::_combat_data[ship_idx].stasis_source_idx == UINT8_MAX
+            ? int16_t{-1}
+            : MOX::_combat_data[ship_idx].stasis_source_idx;
+        return stasis_source_idx != -1;
     }
 
 void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t screen_x, int16_t screen_y)
@@ -79,7 +82,10 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
         if (MOX::_super_fast_flag == 0 && CMBTDRW1::Ship_On_Screen_(ship_idx) != 0) {
             video::Set_Page_Off_();
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                if (MOX::_combat_data[i].unit_status == 0 && MOX::_combat_data[i].special_cooldown != 0xFF) {
+                const int16_t tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                    ? int16_t{-1}
+                    : MOX::_combat_data[i].special_cooldown;
+                if (MOX::_combat_data[i].unit_status == 0 && tractor_target_idx != -1) {
                     CMBTSPEC::Draw_Continuing_Tractor_(i);
                 }
             }
@@ -130,7 +136,7 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
         (int)MOX::_PLAYER_NUM,
         (int)opponent_idx,
         (int)MOX::_combat_turn,
-        (int)MOX::_cur_ship,
+        MOX::_cur_ship,
         (int)MOX::_cur_ptr,
         (unsigned int)MOX::_combat_done_waiting,
         (int)MOX::_tactical_net_choice,
@@ -159,7 +165,7 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
         (int)MOX::_PLAYER_NUM,
         (int)opponent_idx,
         (int)MOX::_combat_turn,
-        (int)MOX::_cur_ship,
+        MOX::_cur_ship,
         (int)MOX::_cur_ptr,
         (unsigned int)MOX::_combat_done_waiting,
         (int)MOX::_tactical_net_choice);
@@ -244,7 +250,10 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             }
 
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                if (MOX::_combat_data[i].special_cooldown == ship_idx &&
+                const int16_t active_tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                    ? int16_t{-1}
+                    : MOX::_combat_data[i].special_cooldown;
+                if (active_tractor_target_idx == ship_idx &&
                     CMBTSPEC::Try_Get_Active_Tractor_Target_(i, &tractor_target_idx)) {
                     tractor_ships[tractor_count++] = i;
                 }
@@ -507,7 +516,8 @@ void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y)
 }
 
 bool __cdecl Ship_In_Black_Hole_(int16_t ship_idx) {
-    return MOX::_combat_data[ship_idx].black_hole_source_idx != -1;
+    const int16_t black_hole_source_idx = MOX::_combat_data[ship_idx].black_hole_source_idx;
+    return black_hole_source_idx != -1;
 }
 
 int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
@@ -860,7 +870,7 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
                     (int)MOX::_new_message.message_code,
                     (int)MOX::_tactical_net_choice,
                     (int)MOX::_combat_turn,
-                    (int)MOX::_cur_ship);
+                    MOX::_cur_ship);
                 if (MOX::_new_message.message_code == 0) {
                     struct_::Copy_Structure_(&MOX::_new_message, message, sizeof(MOX::_new_message));
                     MOX::_tactical_net_choice = MOX::_new_message.message_code;
@@ -906,7 +916,7 @@ void __cdecl Tactical_Combat_Receive_Message_(int32_t sender_net_id, uint16_t me
                     (int)sender_net_id,
                     (int)MOX::_PLAYER_NUM,
                     (int)MOX::_combat_turn,
-                    (int)MOX::_cur_ship,
+                    MOX::_cur_ship,
                     (int)MOX::_cur_ptr,
                     (unsigned int)MOX::_combat_done_waiting,
                     (int)MOX::_tactical_net_choice);

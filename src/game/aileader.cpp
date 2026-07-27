@@ -60,7 +60,7 @@ namespace aileader {
             }
         }
 
-        for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             s_star_data* star = &MOX::_star[star_idx];
             int8_t system_special = star->system_special;
 
@@ -86,11 +86,11 @@ namespace aileader {
 
         uint32_t skills = MOX::_leaders[leader_index].special_skills;
 
-        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
 
             if (colony->owner == player_index && colony->outpost_flag == 0) {
-                int32_t star_index = MOX::_planet[colony->planet].star_index;
+                int16_t star_index = MOX::_planet[colony->planet].star_index;
 
                 if (MOX::_star[star_index].officer_index[player_index] == -1) {
 
@@ -136,8 +136,8 @@ namespace aileader {
             }
         }
 
-        int32_t best_star_idx = MOX::_NUM_STARS - 1;
-        for (int32_t i = MOX::_NUM_STARS - 2; i >= 0; --i) {
+        int16_t best_star_idx = MOX::_NUM_STARS - 1;
+        for (int16_t i = MOX::_NUM_STARS - 2; i >= 0; --i) {
             if (star_scores[i] > star_scores[best_star_idx]) {
                 best_star_idx = i;
             }
@@ -153,7 +153,7 @@ namespace aileader {
         s_ship_data* ship_list = MOX::_ship;
         int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
 
-        for (int32_t i = 0; i < num_ships; ++i) {
+        for (int16_t i = 0; i < num_ships; ++i) {
             s_ship_data* current_ship = &ship_list[i];
 
             if (current_ship->owner == (char)player_index &&

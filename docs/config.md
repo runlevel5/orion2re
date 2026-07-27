@@ -54,7 +54,7 @@ The parser does not decide whether `autolab` is a row, a field, or something els
 
 ### 2. `config.json` is the external schema
 
-`c:\Projects\150\150\docs\config.json` defines the external config schema.
+`config/config.json` defines the external config schema.
 
 It provides:
 
@@ -171,7 +171,7 @@ So `config.json` still defines the type, but decode must allow both symbolic and
 
 ## Validation findings from existing mod CFG files
 
-The current mod corpus under `C:\Projects\150\150\mods` was scanned with `tools/validate_config_lhs_numeric.py`.
+The current mod corpus under `150\150\mods` was scanned with `tools/validate_config_lhs_numeric.py`.
 
 Validated corpus summary:
 

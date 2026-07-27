@@ -153,11 +153,11 @@ namespace COMBAT1 {
             (int)player_idx,
             (int)net_id,
             (int)message_code,
-            (int)arg1,
-            (int)arg2,
-            (int)arg3,
+            arg1,
+            arg2,
+            arg3,
             (int)MOX::_combat_turn,
-            (int)MOX::_cur_ship,
+            MOX::_cur_ship,
             (int)MOX::_cur_ptr);
         return NETMOX::Mox_Send_Message_(net_id, TACTICAL_NET_PACKET_ACTION, &combat_msg, sizeof(combat_msg));
     }
@@ -767,11 +767,11 @@ namespace COMBAT1 {
                                                 "tactical action consume local_player=%d action=%d args=%d,%d,%d turn=%d cur_ship=%d cur_ptr=%d",
                                                 (int)MOX::_PLAYER_NUM,
                                                 (int)f8,
-                                                (int)f10,
-                                                (int)f12,
-                                                (int)f14,
+                                                f10,
+                                                f12,
+                                                f14,
                                                 (int)MOX::_combat_turn,
-                                                (int)MOX::_cur_ship,
+                                                MOX::_cur_ship,
                                                 (int)MOX::_cur_ptr);
                                             switch (f8) {
                                                 case TACTICAL_NET_MSG_SELF_DESTRUCT:
@@ -1063,7 +1063,10 @@ namespace COMBAT1 {
             if (speed > 0) {
                 int16_t tractor_beams = 0;
                 for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                    if (MOX::_combat_data[i].special_cooldown == ship_idx && 
+                    const int16_t tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                        ? -1
+                        : MOX::_combat_data[i].special_cooldown;
+                    if (tractor_target_idx == ship_idx &&
                         Combat_Ship_Is_Functional_(i)) {
                         for (int j = 0; j < 8; ++j) {
                             if (MOX::_combat_data[i].weapons[j].weapon_id == WEAPON_TRACTOR_BEAM) {
@@ -1238,7 +1241,7 @@ namespace COMBAT1 {
                 (int)attacker_count,
                 (int)defender_count,
                 (int)MOX::_combat_turn,
-                (int)MOX::_cur_ship,
+                MOX::_cur_ship,
                 (int)MOX::_cur_ptr,
                 (int)MOX::_tactical_net_choice,
                 (unsigned int)MOX::_combat_done_waiting);
@@ -1384,7 +1387,10 @@ namespace COMBAT1 {
         int16_t count = 0;
 
         for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-            if (MOX::_combat_data[i].stasis_source_idx == source_ship_idx) {
+            const int16_t stasis_source_idx = MOX::_combat_data[i].stasis_source_idx == UINT8_MAX
+                ? -1
+                : MOX::_combat_data[i].stasis_source_idx;
+            if (source_ship_idx >= 0 && stasis_source_idx == source_ship_idx) {
                 count++;
             }
         }
@@ -1441,18 +1447,25 @@ namespace COMBAT1 {
     void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx) {
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
             // Check if this ship is being held in stasis by the source ship
-            if (MOX::_combat_data[i].stasis_source_idx == source_idx) {
+            const int16_t stasis_source_idx = MOX::_combat_data[i].stasis_source_idx == UINT8_MAX
+                ? -1
+                : MOX::_combat_data[i].stasis_source_idx;
+            if (source_idx >= 0 && stasis_source_idx == source_idx) {
                 CMBTFIRE::Remove_Stasis_Beam_(i);
             }
 
             // Check if this ship is affected by a black hole created by the source ship
-            if ((uint8_t)MOX::_combat_data[i].black_hole_source_idx == source_idx) {
+            const int16_t black_hole_source_idx = MOX::_combat_data[i].black_hole_source_idx;
+            if (source_idx >= 0 && black_hole_source_idx == source_idx) {
                 MOX::_combat_data[i].black_hole_flag = 0;
                 MOX::_combat_data[i].black_hole_source_idx = -1;
             }
 
             // Check if special cooldown (or effect tracking) matches the source ship
-            if (MOX::_combat_data[i].special_cooldown == source_idx) {
+            const int16_t tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                ? -1
+                : MOX::_combat_data[i].special_cooldown;
+            if (source_idx >= 0 && tractor_target_idx == source_idx) {
                 MOX::_combat_data[i].special_cooldown = 0xFF;
             }
         }
@@ -1765,7 +1778,7 @@ namespace COMBAT1 {
         } else if (range > max_range) {
             can_board = false;
             msg_idx = 0x42; // Out of range
-        } else if (max_range != 4 && COMBAT1::Calc_Current_Speed_((int16_t)defender_idx) > 0) {
+        } else if (max_range != 4 && COMBAT1::Calc_Current_Speed_(defender_idx) > 0) {
             can_board = false;
             msg_idx = 0x43; // Ship moving too fast
         } else if (MOX::_combat_data[MOX::_cur_ship].marine_count == 0) {
@@ -1774,8 +1787,8 @@ namespace COMBAT1 {
         } else {
             if (max_range == 4) {
                 if (range > 1 || MOX::_combat_data[defender_idx].current_speed > 0) {
-                    uint32_t bearing = CMBTDRW1::Relative_Bearing_((int16_t)defender_idx, attacker_idx);
-                    int16_t shield_idx = CMBTFIRE::Facing_Shield_((int16_t)bearing);
+                    int16_t bearing = CMBTDRW1::Relative_Bearing_(defender_idx, attacker_idx);
+                    int16_t shield_idx = CMBTFIRE::Facing_Shield_(bearing);
                     if (target->shield_arc_current[shield_idx] > 0) {
                         can_board = false;
                         KEN::Ken_Get_Text_Message_(0x45, msg_buffer, sizeof(msg_buffer));
