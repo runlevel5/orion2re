@@ -243,7 +243,6 @@ namespace oracle {
         constexpr uint32_t k_global_combat_data_size = 313;
         constexpr uint32_t k_historical_combat_bomb_result_size =
             sizeof(s_historical_combat_bomb_result);
-        constexpr uint32_t k_historical_combat_bomb_result_size = 73;
         constexpr uint32_t k_combat_bomb_result_size = sizeof(s_combat_bomb_result);
         constexpr uint32_t k_colony_size = 361;
         constexpr uint32_t k_tactical_arrays_size =
