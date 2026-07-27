@@ -120,6 +120,24 @@ namespace oracle {
             int16_t fleet_target;
         };
 
+        struct s_historical_combat_bomb_result {
+            int8_t attacker_idx;
+            uint8_t colony_idx;
+            int8_t is_planetary_hit;
+            int16_t bomb_hits_remaining;
+            int8_t is_bio_weapon;
+            int16_t bio_hits_remaining;
+            int16_t infantry_killed;
+            int16_t tanks_killed;
+            int16_t population_killed;
+            int8_t buildings_destroyed[BUILDING_COUNT];
+            int16_t bio_pop_killed;
+            int8_t damage_occurred;
+            int8_t colony_wiped_out;
+            int16_t production_lost;
+            int32_t total_hits_processed;
+        };
+
         struct s_tactical_state_record {
             uint32_t type;
             uint32_t size;
@@ -189,6 +207,8 @@ namespace oracle {
         static_assert(sizeof(s_random_record) == 76, "oracle random record layout mismatch");
         static_assert(sizeof(s_random_seed_record) == 68, "oracle random seed record layout mismatch");
         static_assert(sizeof(s_tactical_scalar_state) == 38, "oracle tactical scalar layout mismatch");
+        static_assert(sizeof(s_historical_combat_bomb_result) == 73,
+            "historical oracle combat bomb result layout mismatch");
         static_assert(sizeof(s_tactical_state_record) == 84, "oracle tactical record layout mismatch");
         static_assert(sizeof(s_strategic_state_record) == 60,
             "oracle strategic record layout mismatch");
@@ -221,6 +241,9 @@ namespace oracle {
         constexpr uint32_t k_ship_turn_order_size = 210 * sizeof(int16_t);
         constexpr uint32_t k_combat_grid_size = 81 * 68 * sizeof(int16_t);
         constexpr uint32_t k_global_combat_data_size = 313;
+        constexpr uint32_t k_historical_combat_bomb_result_size =
+            sizeof(s_historical_combat_bomb_result);
+        constexpr uint32_t k_historical_combat_bomb_result_size = 73;
         constexpr uint32_t k_combat_bomb_result_size = sizeof(s_combat_bomb_result);
         constexpr uint32_t k_colony_size = 361;
         constexpr uint32_t k_tactical_arrays_size =
@@ -531,6 +554,71 @@ namespace oracle {
             return true;
         }
 
+        bool Normalize_Historical_Tactical_State_(s_tactical_state* state) {
+            s_tactical_state_record& record = state->record;
+            if (record.combat_bomb_result_size == k_combat_bomb_result_size) {
+                return true;
+            }
+            if (record.combat_bomb_result_size !=
+                    k_historical_combat_bomb_result_size) {
+                return false;
+            }
+
+            const size_t bomb_result_offset =
+                record.scalar_size +
+                record.combat_data_size +
+                record.missile_data_size +
+                record.turn_order_size +
+                record.combat_grid_size +
+                record.global_combat_data_size;
+            if (bomb_result_offset + k_historical_combat_bomb_result_size >
+                    state->payload.size()) {
+                return false;
+            }
+
+            s_historical_combat_bomb_result historical;
+            memcpy(&historical, state->payload.data() + bomb_result_offset,
+                sizeof(historical));
+            s_combat_bomb_result normalized = {};
+            normalized.attacker_idx = historical.attacker_idx;
+            normalized.colony_idx = historical.colony_idx;
+            normalized.is_planetary_hit = historical.is_planetary_hit;
+            normalized.bomb_hits_remaining = historical.bomb_hits_remaining;
+            normalized.is_bio_weapon = historical.is_bio_weapon;
+            normalized.bio_hits_remaining = historical.bio_hits_remaining;
+            normalized.infantry_killed = historical.infantry_killed;
+            normalized.tanks_killed = historical.tanks_killed;
+            normalized.population_killed = historical.population_killed;
+            memcpy(normalized.buildings_destroyed,
+                historical.buildings_destroyed,
+                sizeof(normalized.buildings_destroyed));
+            normalized.bio_pop_killed = historical.bio_pop_killed;
+            normalized.damage_occurred = historical.damage_occurred;
+            normalized.colony_wiped_out = historical.colony_wiped_out;
+            normalized.production_lost = historical.production_lost;
+            normalized.total_hits_processed = historical.total_hits_processed;
+
+            const size_t historical_tail_offset = bomb_result_offset +
+                k_historical_combat_bomb_result_size;
+            const size_t normalized_tail_offset = bomb_result_offset +
+                k_combat_bomb_result_size;
+            std::vector<uint8_t> normalized_payload(
+                state->payload.size() + k_combat_bomb_result_size -
+                    k_historical_combat_bomb_result_size);
+            memcpy(normalized_payload.data(), state->payload.data(),
+                bomb_result_offset);
+            memcpy(normalized_payload.data() + bomb_result_offset,
+                &normalized, sizeof(normalized));
+            memcpy(normalized_payload.data() + normalized_tail_offset,
+                state->payload.data() + historical_tail_offset,
+                state->payload.size() - historical_tail_offset);
+            state->payload.swap(normalized_payload);
+            record.combat_bomb_result_size = k_combat_bomb_result_size;
+            record.size += k_combat_bomb_result_size -
+                k_historical_combat_bomb_result_size;
+            return true;
+        }
+
         bool Read_Completed_Log_(uint32_t turn, s_log_header* header,
             std::vector<s_input_record>* records,
             std::vector<s_input_position>* record_positions,
@@ -629,6 +717,11 @@ namespace oracle {
                         record.checkpoint_kind == k_tactical_combat_end;
                     const bool valid_colony_size =
                         record.colony_size == 0 || record.colony_size == k_colony_size;
+                    const bool valid_combat_bomb_result_size =
+                        record.combat_bomb_result_size ==
+                            k_historical_combat_bomb_result_size ||
+                        record.combat_bomb_result_size ==
+                            k_combat_bomb_result_size;
 
                     uint64_t expected_size = sizeof(s_tactical_state_record);
                     expected_size += record.scalar_size;
@@ -659,8 +752,7 @@ namespace oracle {
                         record.combat_grid_size != k_combat_grid_size ||
                         record.global_combat_data_size !=
                             k_global_combat_data_size ||
-                        record.combat_bomb_result_size !=
-                            k_combat_bomb_result_size ||
+                        !valid_combat_bomb_result_size ||
                         record.tactical_arrays_size != k_tactical_arrays_size ||
                         expected_size != size ||
                         record.random_call_count != random_records->size() ||
@@ -700,6 +792,9 @@ namespace oracle {
                         memcpy(state.payload.data(),
                             data.data() + payload_offset,
                             state.payload.size());
+                    }
+                    if (!Normalize_Historical_Tactical_State_(&state)) {
+                        return false;
                     }
                     tactical_states->push_back(std::move(state));
                 } else if (type == k_strategic_state_record_type &&
