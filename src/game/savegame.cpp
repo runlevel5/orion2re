@@ -333,9 +333,9 @@ namespace SAVEGAME {
             writer->Write_Int8_(planet->environmental_alterations);
         }
 
-        void Read_Planet_(SERIAL::Reader_* reader, s_planet_data* planet, uint16_t version) {
+        void Read_Planet_(SERIAL::Reader_* reader, s_planet_data* planet) {
             planet->colony_index = reader->Read_Int16_();
-            if (version == 0) planet->star_index = reader->Read_Int8_();
+            planet->star_index = reader->Read_Int8_();
             planet->orbit = reader->Read_Int8_();
             planet->planet_type = reader->Read_Int8_();
             planet->size = reader->Read_Int8_();
@@ -392,7 +392,7 @@ namespace SAVEGAME {
             writer->Write_Uint8_(star->artifacts_gave_app);
         }
 
-        void Read_Star_(SERIAL::Reader_* reader, s_star_data* star, uint16_t version) {
+        void Read_Star_(SERIAL::Reader_* reader, s_star_data* star) {
             reader->Read_Bytes_(star->name, sizeof(star->name));
             star->x = reader->Read_Int16_();
             star->y = reader->Read_Int16_();
@@ -403,7 +403,7 @@ namespace SAVEGAME {
             reader->Read_Bytes_(star->last_planet_selected, sizeof(star->last_planet_selected));
             reader->Read_Bytes_(star->black_hole_blocks, sizeof(star->black_hole_blocks));
             star->system_special = reader->Read_Int8_();
-            if (version == 0) star->wormhole_star_id = reader->Read_Int8_();
+            star->wormhole_star_id = reader->Read_Int8_();
             star->blockaded = reader->Read_Uint8_();
             reader->Read_Bytes_(star->blockaded_by, sizeof(star->blockaded_by));
             star->visited = reader->Read_Uint8_();
@@ -490,7 +490,7 @@ namespace SAVEGAME {
             writer->Write_Int16_(player->command_points_used);
             writer->Write_Int16_(player->food_freighted);
             writer->Write_Int16_(player->settlers_freighted);
-            for (int i = 0; i < 25; ++i) writer->Write_Uint32_(player->settlers[i].val);
+            for (int i = 0; i < 25; ++i) writer->Write_Uint64_(player->settlers[i].val);
             writer->Write_Int16_(player->total_pop);
             writer->Write_Int16_(player->food_produced);
             writer->Write_Int16_(player->industry_produced);
@@ -635,7 +635,7 @@ namespace SAVEGAME {
             writer->Write_Bytes_(player->filler, sizeof(player->filler));
         }
 
-        void Read_Player_(SERIAL::Reader_* reader, s_player* player) {
+        void Read_Player_(SERIAL::Reader_* reader, s_player* player, uint16_t version) {
             player->picture = reader->Read_Int8_();
             reader->Read_Bytes_(player->name, sizeof(player->name));
             reader->Read_Bytes_(player->race_name, sizeof(player->race_name));
@@ -657,7 +657,11 @@ namespace SAVEGAME {
             player->command_points_used = reader->Read_Int16_();
             player->food_freighted = reader->Read_Int16_();
             player->settlers_freighted = reader->Read_Int16_();
-            for (int i = 0; i < 25; ++i) player->settlers[i].val = reader->Read_Uint32_();
+            for (int i = 0; i < 25; ++i) {
+                player->settlers[i].val = version == LEGACY_VERSION
+                        ? SETTLER::From_Legacy(reader->Read_Uint32_())
+                        : reader->Read_Uint64_();
+            }
             player->total_pop = reader->Read_Int16_();
             player->food_produced = reader->Read_Int16_();
             player->industry_produced = reader->Read_Int16_();
@@ -1363,12 +1367,12 @@ namespace SAVEGAME {
             MOX::_NUM_COLONIES = reader->Read_Int16_();
             for (int i = 0; i < MAX_COLONIES; ++i) Read_Colony_(reader, &MOX::_colony[i]);
             MOX::_planet_count = reader->Read_Int16_();
-            for (int i = 0; i < MAX_PLANETS; ++i) Read_Planet_(reader, &MOX::_planet[i], version);
+            for (int i = 0; i < MAX_PLANETS; ++i) Read_Planet_(reader, &MOX::_planet[i]);
             MOX::_NUM_STARS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_STARS; ++i) Read_Star_(reader, &MOX::_star[i], version);
+            for (int i = 0; i < MAX_STARS; ++i) Read_Star_(reader, &MOX::_star[i]);
             for (int i = 0; i < MAX_LEADERS; ++i) Read_Leader_(reader, &MOX::_leaders[i]);
             MOX::_NUM_PLAYERS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i]);
+            for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i], version);
             MOX::_NUM_SHIPS = reader->Read_Int16_();
             for (int i = 0; i < MAX_SHIPS; ++i) Read_Ship_(reader, &MOX::_ship[i]);
             for (int i = 0; i < 5; ++i) Read_Movable_Box_(reader, &MOX::_moveable_box[i]);

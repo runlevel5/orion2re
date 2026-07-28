@@ -176,7 +176,7 @@ namespace COLMOVE {
                 s_colony* const source_colony = &MOX::_colony[COLMOVE::_cluster_colony_n];
                 s_colony* const destination_colony = &MOX::_colony[colony_idx];
 
-                settler::Pop_Tries_To_Settle_(
+                SETTLER::Pop_Tries_To_Settle_(
                         source_colony,
                         unemployed_pop_idx,
                         destination_colony,
@@ -269,7 +269,7 @@ namespace COLMOVE {
                             pop_flags &= 0xFFFFFDFFu;
                         }
 
-                        settler::Settle_Pop_(source_colony, unemployed_pop_idx, destination_colony);
+                        SETTLER::Settle_Pop_(source_colony, unemployed_pop_idx, destination_colony);
                         ++moved_count;
                     } else {
                         int16_t line_count = 0;

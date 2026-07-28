@@ -265,7 +265,7 @@ namespace MAINSCR2 {
         char message_text[200];
 
         int16_t selected_box = MOVEBOX::Moveable_Box_Selected_(2);
-        int16_t scrap_amount = settler::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
+        int16_t scrap_amount = SETTLER::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
 
         if (scrap_amount <= 0) {
             strlcpy(message_text, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(message_text));

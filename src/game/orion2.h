@@ -1748,9 +1748,8 @@ struct s_ship_design {
 };
 
 struct s_settler_info {
-    // Packed transit-settler record used as a raw dword by the original code:
-    // bits 0-7 source_colony, 8-15 dest_planet, 16-19 race, 20-23 eta, 24-25 job.
-    uint32_t val;
+    // bits 0-15 source_colony, 16-31 dest_planet, 32-35 race, 36-39 eta, 40-41 job.
+    SETTLER::value_type val;
 };
 
 struct s_player {

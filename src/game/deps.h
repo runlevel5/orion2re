@@ -18,8 +18,9 @@
 
 #include "orion2_consts.h"
 #include "orion2_str.h"
-#include "orion2.h"
 #include "pop.h"
+#include "settler.h"
+#include "orion2.h"
 
 #include "lbx_types.h"
 #include "sound_types.h"
@@ -192,7 +193,6 @@
 #include "aistage.h"
 #include "spy.h"
 #include "lostship.h"
-#include "settler.h"
 #include "invasion.h"
 #include "council.h"
 #include "global.h"

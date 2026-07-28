@@ -1,6 +1,84 @@
 #pragma once
 
-namespace settler {
+#include "pop.h"
+
+struct s_colony;
+struct s_player;
+struct s_settler_settle_result;
+
+namespace SETTLER {
+    using value_type = uint64_t;
+    using legacy_value_type = uint32_t;
+
+    constexpr int16_t SOURCE_COLONY_IN_TRANSIT = -1;
+    constexpr uint8_t LEGACY_SOURCE_COLONY_IN_TRANSIT = 0xFA;
+
+    constexpr value_type MASK_SOURCE_COLONY = 0x000000000000FFFFull;
+    constexpr value_type MASK_DEST_PLANET = 0x00000000FFFF0000ull;
+    constexpr value_type MASK_RACE = 0x0000000F00000000ull;
+    constexpr value_type MASK_ETA = 0x000000F000000000ull;
+    constexpr value_type MASK_PROF = 0x0000030000000000ull;
+    constexpr value_type MASK_RESERVED = 0x0000FC0000000000ull;
+
+    inline int16_t __cdecl Get_Source_Colony(value_type settler_data) {
+        return static_cast<int16_t>(settler_data & MASK_SOURCE_COLONY);
+    }
+
+    inline void __cdecl Set_Source_Colony(value_type* settler_data, int16_t source_colony) {
+        *settler_data = (*settler_data & ~MASK_SOURCE_COLONY) |
+                        static_cast<uint16_t>(source_colony);
+    }
+
+    inline int16_t __cdecl Get_Dest_Planet(value_type settler_data) {
+        return static_cast<int16_t>((settler_data & MASK_DEST_PLANET) >> 16);
+    }
+
+    inline void __cdecl Set_Dest_Planet(value_type* settler_data, int16_t dest_planet) {
+        *settler_data = (*settler_data & ~MASK_DEST_PLANET) |
+                        (static_cast<value_type>(static_cast<uint16_t>(dest_planet)) << 16);
+    }
+
+    inline uint32_t __cdecl Get_Race(value_type settler_data) {
+        return static_cast<uint32_t>((settler_data & MASK_RACE) >> 32);
+    }
+
+    inline void __cdecl Set_Race(value_type* settler_data, uint32_t race) {
+        *settler_data = (*settler_data & ~MASK_RACE) |
+                        ((static_cast<value_type>(race) & 0x0Fu) << 32);
+    }
+
+    inline uint32_t __cdecl Get_Eta(value_type settler_data) {
+        return static_cast<uint32_t>((settler_data & MASK_ETA) >> 36);
+    }
+
+    inline void __cdecl Set_Eta(value_type* settler_data, uint32_t eta) {
+        *settler_data = (*settler_data & ~MASK_ETA) |
+                        ((static_cast<value_type>(eta) & 0x0Fu) << 36);
+    }
+
+    inline POP::e_prof __cdecl Get_Prof(value_type settler_data) {
+        return static_cast<POP::e_prof>((settler_data & MASK_PROF) >> 40);
+    }
+
+    inline void __cdecl Set_Prof(value_type* settler_data, POP::e_prof prof) {
+        *settler_data = (*settler_data & ~MASK_PROF) |
+                        ((static_cast<value_type>(prof) & 0x03u) << 40);
+    }
+
+    inline value_type __cdecl From_Legacy(legacy_value_type settler_data) {
+        value_type result = 0;
+        const uint8_t legacy_source = static_cast<uint8_t>(settler_data);
+        Set_Source_Colony(&result, legacy_source >= LEGACY_SOURCE_COLONY_IN_TRANSIT
+                ? SOURCE_COLONY_IN_TRANSIT
+                : legacy_source);
+        Set_Dest_Planet(&result, static_cast<uint8_t>(settler_data >> 8));
+        Set_Race(&result, (settler_data >> 16) & 0x0Fu);
+        Set_Eta(&result, (settler_data >> 20) & 0x0Fu);
+        Set_Prof(&result, static_cast<POP::e_prof>((settler_data >> 24) & 0x03u));
+        result |= static_cast<value_type>((settler_data >> 26) & 0x3Fu) << 42;
+        return result;
+    }
+
     /**
      * Returns how many freighters the player can scrap without stranding settlers already in transit.
      * @param player_idx Player index to inspect.
@@ -20,7 +98,7 @@ namespace settler {
      * @param settler_data Packed settler data to decode into a colony pop slot.
      * @param colony Destination colony receiving the pop.
      */
-    int8_t __cdecl Add_Settler_To_Colony_(uint32_t settler_data, s_colony* colony);
+    int8_t __cdecl Add_Settler_To_Colony_(value_type settler_data, s_colony* colony);
 
     /**
      * Advances all in-transit settlers by one turn and resolves arrivals.

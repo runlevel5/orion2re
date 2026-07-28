@@ -1028,6 +1028,7 @@ namespace oracle {
                 {"save description", sizeof(MOX::_save_game_description[0].description)},
                 {"stardate", sizeof(MOX::_stardate)},
                 {"game type", sizeof(MOX::_game_type)},
+                {"save version", sizeof(uint16_t)},
                 {"settings", sizeof(MOX::_settings)},
                 {"random seed", sizeof(uint32_t)},
                 {"colony count", sizeof(MOX::_NUM_COLONIES)},
@@ -1096,6 +1097,19 @@ namespace oracle {
             constexpr size_t version_offset =
                 sizeof(uint32_t) + sizeof(MOX::_save_game_description[0].description) +
                 sizeof(MOX::_stardate) + sizeof(MOX::_game_type);
+            constexpr size_t players_offset =
+                version_offset + sizeof(uint16_t) + sizeof(MOX::_settings) +
+                sizeof(uint32_t) + sizeof(MOX::_NUM_COLONIES) +
+                sizeof(s_colony) * MAX_COLONIES + sizeof(MOX::_planet_count) +
+                sizeof(s_planet_data) * MAX_PLANETS + sizeof(MOX::_NUM_STARS) +
+                sizeof(s_star_data) * MAX_STARS +
+                sizeof(s_leader_data) * MAX_LEADERS + sizeof(MOX::_NUM_PLAYERS);
+            constexpr size_t settler_count =
+                sizeof(s_player::settlers) / sizeof(s_player::settlers[0]);
+            constexpr size_t legacy_settlers_size =
+                settler_count * sizeof(SETTLER::legacy_value_type);
+            constexpr size_t legacy_player_size =
+                sizeof(s_player) - sizeof(s_player::settlers) + legacy_settlers_size;
             if (save->size() < sizeof(uint32_t)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: save '%s' is too small", path);
@@ -1105,7 +1119,17 @@ namespace oracle {
             uint32_t header;
             memcpy(&header, save->data(), sizeof(header));
             if (header == SAVEGAME::LEGACY_HEADER) {
-                return true;
+                if (save->size() < version_offset) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: legacy save '%s' is too small", path);
+                    return false;
+                }
+                const uint16_t version = 0;
+                save->insert(save->begin() + version_offset,
+                    reinterpret_cast<const uint8_t*>(&version),
+                    reinterpret_cast<const uint8_t*>(&version) + sizeof(version));
+                header = SAVEGAME::VERSIONED_HEADER;
+                memcpy(save->data(), &header, sizeof(header));
             }
             if (header != SAVEGAME::VERSIONED_HEADER ||
                 save->size() < version_offset + sizeof(uint16_t)) {
@@ -1116,17 +1140,60 @@ namespace oracle {
 
             uint16_t version;
             memcpy(&version, save->data() + version_offset, sizeof(version));
-            if (version != 0) {
+            if (version == SAVEGAME::CURRENT_VERSION) {
+                return true;
+            }
+            if (version != 0 ||
+                save->size() < players_offset + MAX_PLAYERS * legacy_player_size) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: save '%s' uses unsupported comparison version %u",
                     path, static_cast<unsigned>(version));
                 return false;
             }
 
-            save->erase(save->begin() + version_offset,
-                save->begin() + version_offset + sizeof(version));
-            header = SAVEGAME::LEGACY_HEADER;
-            memcpy(save->data(), &header, sizeof(header));
+            std::vector<uint8_t> canonical;
+            canonical.reserve(save->size() +
+                MAX_PLAYERS * (sizeof(s_player) - legacy_player_size));
+            canonical.insert(canonical.end(), save->begin(),
+                save->begin() + players_offset);
+
+            size_t legacy_player_offset = players_offset;
+            for (size_t player_idx = 0; player_idx < MAX_PLAYERS; ++player_idx) {
+                const size_t legacy_settlers_offset = legacy_player_offset +
+                    offsetof(s_player, settlers);
+                canonical.insert(canonical.end(),
+                    save->begin() + legacy_player_offset,
+                    save->begin() + legacy_settlers_offset);
+
+                for (size_t settler_idx = 0; settler_idx < settler_count;
+                    ++settler_idx) {
+                    SETTLER::legacy_value_type legacy_settler;
+                    memcpy(&legacy_settler,
+                        save->data() + legacy_settlers_offset +
+                            settler_idx * sizeof(legacy_settler),
+                        sizeof(legacy_settler));
+                    const SETTLER::value_type settler =
+                        SETTLER::From_Legacy(legacy_settler);
+                    const uint8_t* settler_bytes =
+                        reinterpret_cast<const uint8_t*>(&settler);
+                    canonical.insert(canonical.end(), settler_bytes,
+                        settler_bytes + sizeof(settler));
+                }
+
+                const size_t legacy_player_end =
+                    legacy_player_offset + legacy_player_size;
+                canonical.insert(canonical.end(),
+                    save->begin() + legacy_settlers_offset +
+                        legacy_settlers_size,
+                    save->begin() + legacy_player_end);
+                legacy_player_offset = legacy_player_end;
+            }
+
+            canonical.insert(canonical.end(),
+                save->begin() + legacy_player_offset, save->end());
+            version = SAVEGAME::CURRENT_VERSION;
+            memcpy(canonical.data() + version_offset, &version, sizeof(version));
+            save->swap(canonical);
             return true;
         }
 
@@ -1211,7 +1278,12 @@ namespace oracle {
                 const size_t settlers_offset = offsetof(s_player, settlers);
                 if (player_offset >= settlers_offset &&
                     player_offset < settlers_offset + sizeof(s_player::settlers)) {
-                    constexpr uint32_t meaningful_settler_bits = 0x03FFFFFFu;
+                    constexpr SETTLER::value_type meaningful_settler_bits =
+                        SETTLER::MASK_SOURCE_COLONY |
+                        SETTLER::MASK_DEST_PLANET |
+                        SETTLER::MASK_RACE |
+                        SETTLER::MASK_ETA |
+                        SETTLER::MASK_PROF;
                     const size_t settler_capacity =
                         sizeof(s_player::settlers) / sizeof(s_player::settlers[0]);
                     bool changed = false;
@@ -1240,8 +1312,8 @@ namespace oracle {
                         for (size_t settler_idx = 0; settler_idx < settler_capacity; ++settler_idx) {
                             const size_t offset = current_settlers_offset +
                                 settler_idx * sizeof(s_settler_info);
-                            uint32_t actual_value;
-                            uint32_t expected_value;
+                            SETTLER::value_type actual_value;
+                            SETTLER::value_type expected_value;
                             memcpy(&actual_value, actual->data() + offset, sizeof(actual_value));
                             memcpy(&expected_value, expected->data() + offset, sizeof(expected_value));
 
@@ -1253,8 +1325,8 @@ namespace oracle {
                                 expected_value = 0;
                             }
 
-                            uint32_t original_actual;
-                            uint32_t original_expected;
+                            SETTLER::value_type original_actual;
+                            SETTLER::value_type original_expected;
                             memcpy(&original_actual, actual->data() + offset, sizeof(original_actual));
                             memcpy(&original_expected, expected->data() + offset, sizeof(original_expected));
                             if (actual_value != original_actual) {

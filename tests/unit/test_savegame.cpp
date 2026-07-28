@@ -296,6 +296,15 @@ namespace {
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
     }
 
+    void Check_Legacy_State_Except_Players_(const State_& expected, const State_& actual) {
+        DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies, sizeof(expected.colonies)) == 0);
+        DOCTEST_CHECK(memcmp(expected.planets, actual.planets, sizeof(expected.planets)) == 0);
+        DOCTEST_CHECK(memcmp(expected.stars, actual.stars, sizeof(expected.stars)) == 0);
+        DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
+        DOCTEST_CHECK(memcmp(expected.ships, actual.ships, sizeof(expected.ships)) == 0);
+        DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
+    }
+
 }
 
 DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persisted state") {
@@ -317,6 +326,12 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     uint8_t expected_first_msg[MAX_PLAYERS] = {};
     uint8_t expected_max_msgs[MAX_PLAYERS] = {};
     uint8_t expected_n_msgs[MAX_PLAYERS] = {};
+    expected.players[0].settlers[0].val = 0;
+    SETTLER::Set_Source_Colony(&expected.players[0].settlers[0].val, 0x1234);
+    SETTLER::Set_Dest_Planet(&expected.players[0].settlers[0].val, 0x2345);
+    SETTLER::Set_Race(&expected.players[0].settlers[0].val, 7);
+    SETTLER::Set_Eta(&expected.players[0].settlers[0].val, 12);
+    SETTLER::Set_Prof(&expected.players[0].settlers[0].val, POP::PROF_SCIENTIST);
     memcpy(expected_boxes, MOX::_moveable_box, sizeof(MOX::_moveable_box));
     memcpy(expected_box_order, MOX::_moveable_box_order, sizeof(MOX::_moveable_box_order));
     memcpy(expected_bill, MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
@@ -335,7 +350,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     char description[37] = "Exhaustive save state";
     constexpr uint32_t random_seed = 0xCAFEBABE;
     SAVEGAME::Write_Game_(&writer, description, random_seed);
-    DOCTEST_CHECK(writer.Length_() == 208002);
+    DOCTEST_CHECK(writer.Length_() == 208802);
 
     FILE* legacy_file = fopen(SAVEGAME_TEST_DATA_DIR "/savegame_v0.sav", "rb");
     DOCTEST_REQUIRE(legacy_file != nullptr);
@@ -349,11 +364,40 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     DOCTEST_REQUIRE(fread(legacy, 1, legacy_size, legacy_file) == legacy_size);
     fclose(legacy_file);
 
-    for (int format = 0; format < 2; ++format) {
+    const SETTLER::legacy_value_type first_legacy_settler = 0x7C17F2EAu;
+    uint8_t* first_legacy_settler_ptr = nullptr;
+    for (uint32_t offset = 0;
+         offset + sizeof(first_legacy_settler) <= legacy_size; ++offset) {
+        if (memcmp(legacy + offset, &first_legacy_settler,
+                   sizeof(first_legacy_settler)) == 0) {
+            DOCTEST_REQUIRE(first_legacy_settler_ptr == nullptr);
+            first_legacy_settler_ptr = legacy + offset;
+        }
+    }
+    DOCTEST_REQUIRE(first_legacy_settler_ptr != nullptr);
+    *first_legacy_settler_ptr = SETTLER::LEGACY_SOURCE_COLONY_IN_TRANSIT;
+
+    constexpr uint32_t version_offset =
+            sizeof(uint32_t) + sizeof(SAVEGAME::s_metadata::description) +
+            sizeof(int32_t) + sizeof(int8_t);
+    uint8_t* version_zero = static_cast<uint8_t*>(malloc(SAVEGAME::BUFFER_CAPACITY));
+    DOCTEST_REQUIRE(version_zero != nullptr);
+    memcpy(version_zero, legacy, version_offset);
+    const uint32_t versioned_header = SAVEGAME::VERSIONED_HEADER;
+    const uint16_t legacy_version = 0;
+    memcpy(version_zero, &versioned_header, sizeof(versioned_header));
+    memcpy(version_zero + version_offset, &legacy_version, sizeof(legacy_version));
+    memcpy(version_zero + version_offset + sizeof(legacy_version),
+           legacy + version_offset, legacy_size - version_offset);
+    const uint32_t version_zero_size = legacy_size + sizeof(legacy_version);
+
+    for (int format = 0; format < 3; ++format) {
         Bind_State_(actual);
         Clear_State_(actual);
-        const uint8_t* data = format == 0 ? versioned : legacy;
-        uint32_t size = format == 0 ? writer.Length_() : legacy_size;
+        const uint8_t* data = format == 0 ? versioned :
+                              format == 1 ? legacy : version_zero;
+        uint32_t size = format == 0 ? writer.Length_() :
+                        format == 1 ? legacy_size : version_zero_size;
         SERIAL::Reader_ reader(data, size, "test save underflow");
         SAVEGAME::s_metadata metadata = {};
         s_settings loaded_settings = {};
@@ -361,14 +405,27 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
 
         DOCTEST_REQUIRE(SAVEGAME::Read_Game_(&reader, &metadata, &loaded_settings, &loaded_seed));
         DOCTEST_CHECK(reader.Length_() == size);
-        DOCTEST_CHECK(metadata.header == (format == 0 ? SAVEGAME::VERSIONED_HEADER : SAVEGAME::LEGACY_HEADER));
+        DOCTEST_CHECK(metadata.header == (format == 1 ? SAVEGAME::LEGACY_HEADER : SAVEGAME::VERSIONED_HEADER));
         DOCTEST_CHECK(metadata.version == (format == 0 ? SAVEGAME::CURRENT_VERSION : 0));
         DOCTEST_CHECK(memcmp(metadata.description, description, sizeof(description)) == 0);
         DOCTEST_CHECK(metadata.stardate == 35123);
         DOCTEST_CHECK(metadata.game_type == 2);
         DOCTEST_CHECK(loaded_seed == random_seed);
         DOCTEST_CHECK(memcmp(&loaded_settings, &expected_settings, sizeof(expected_settings)) == 0);
-        Check_State_(expected, actual);
+        if (format == 0) {
+            Check_State_(expected, actual);
+            DOCTEST_CHECK(SETTLER::Get_Source_Colony(actual.players[0].settlers[0].val) == 0x1234);
+            DOCTEST_CHECK(SETTLER::Get_Dest_Planet(actual.players[0].settlers[0].val) == 0x2345);
+        } else {
+            Check_Legacy_State_Except_Players_(expected, actual);
+            DOCTEST_CHECK(actual.players[0].settlers[0].val == 0x00007C1700F2FFFFull);
+            DOCTEST_CHECK(SETTLER::Get_Source_Colony(actual.players[0].settlers[0].val) ==
+                          SETTLER::SOURCE_COLONY_IN_TRANSIT);
+            DOCTEST_CHECK(actual.players[0].settlers[1].val == 0x0000A01400730027ull);
+            DOCTEST_CHECK(actual.players[0].settlers[24].val == 0x0000A58E00130067ull);
+            DOCTEST_CHECK(actual.players[7].settlers[0].val == 0x0000478B00CD000Aull);
+            DOCTEST_CHECK(actual.players[7].settlers[24].val == 0x0000D81700EE00D1ull);
+        }
         DOCTEST_CHECK(memcmp(&MOX::_antarans, &expected_antarans, sizeof(expected_antarans)) == 0);
         DOCTEST_CHECK(memcmp(MOX::_moveable_box, expected_boxes, sizeof(MOX::_moveable_box)) == 0);
         DOCTEST_CHECK(memcmp(MOX::_moveable_box_order, expected_box_order, sizeof(MOX::_moveable_box_order)) == 0);
@@ -409,6 +466,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         DOCTEST_CHECK(MOX::_cur_map_x == -144);
         DOCTEST_CHECK(MOX::_cur_map_y == 155);
     }
+    free(version_zero);
     free(legacy);
     free(versioned);
 }
