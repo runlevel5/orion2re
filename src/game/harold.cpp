@@ -809,12 +809,12 @@ namespace HAROLD {
      * @address 004f05c0
      */
     int16_t __cdecl Absolute_Location_(int16_t location) {
-        if (location >= MAX_SHIPS && location < (MAX_SHIPS * 2)) {
-            return location - MAX_SHIPS;
+        if (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET) {
+            return location - SHIP_LOCATION_MOVING_OFFSET;
         }
 
-        if (location >= (MAX_SHIPS * 2) && location < (MAX_SHIPS * 2) + MAX_STARS /* 0x430 */) {
-            return location - (MAX_SHIPS * 2);
+        if (location >= SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT) {
+            return location - SHIP_LOCATION_WORMHOLE_OFFSET;
         }
 
         return location;
@@ -826,19 +826,16 @@ namespace HAROLD {
     int16_t __cdecl Actual_Star_Id_(int16_t star_id, int16_t* out_actual_id) {
         int16_t type = 0;
 
-        // Range [MAX_SHIPS, (MAX_SHIPS * 2) - 1]
-        if (star_id >= MAX_SHIPS && star_id < (MAX_SHIPS * 2)) {
-            *out_actual_id = star_id - MAX_SHIPS;
+        if (star_id >= SHIP_LOCATION_MOVING_OFFSET && star_id < SHIP_LOCATION_WORMHOLE_OFFSET) {
+            *out_actual_id = star_id - SHIP_LOCATION_MOVING_OFFSET;
             return 1;
         }
 
-        // Range [(MAX_SHIPS * 2), (MAX_SHIPS * 3) - 1]
-        if (star_id >= (MAX_SHIPS * 2) && star_id < (MAX_SHIPS * 3)) {
-            star_id -= (MAX_SHIPS * 2);
+        if (star_id >= SHIP_LOCATION_WORMHOLE_OFFSET && star_id < SHIP_LOCATION_LIMIT) {
+            star_id -= SHIP_LOCATION_WORMHOLE_OFFSET;
             type = 2;
         }
 
-        // Default or Range >= 1500
         *out_actual_id = star_id;
         return type;
     }
