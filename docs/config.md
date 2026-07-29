@@ -15,14 +15,15 @@ The assignment language preserves the strongest part of the 1.50 format: one sta
 
 - Preserve a compact configuration syntax suitable for hand-authored mods.
 - Support scalars, records, arrays, nested arrays, enums, masks, ratios, strings, and partial updates.
-- Apply RHS values sequentially only when the LHS selects an aggregate.
-- Require exactly one RHS value when the LHS selects a scalar.
-- Bound sequential traversal to the aggregate explicitly selected by the LHS.
+- Apply RHS values sequentially beginning at the first leaf selected by the LHS.
+- Allow a scalar LHS to act as a starting field within its nearest containing aggregate.
+- Bound traversal to the selected aggregate, or to a scalar's nearest containing aggregate, so assignment cannot spill into a sibling object.
 - Represent arrays as arrays instead of expanding them into names such as `weapon_1_type`.
 - Use cleaned, stable external names and cleaned native bindings.
 - Define finite value domains for semantic IDs, enums, and masks whenever the engine has a finite domain.
 - Support explicit-width primitive types and reusable semantic type aliases with stricter constraints.
 - Store human-readable titles, descriptions, remarks, units, and examples as schema data for generated documentation.
+- Store typed logical defaults, including record and array defaults, without embedding native initializer text.
 - Generate typed C++ bindings and validation from a no-code JSON5 schema.
 - Load configuration transactionally: validate the complete operation before changing live state.
 - Make `enable` load a complete mod package, including dependencies, configuration, and resources.
@@ -98,7 +99,9 @@ An aggregate LHS selects both:
 - the first leaf to update
 - the aggregate that bounds sequential propagation
 
-A scalar LHS selects exactly one value and never acts as a cursor into its containing record. Partial aggregate updates use skip items from the beginning of the selected aggregate.
+A scalar LHS selects its leaf as the first leaf to update. Its nearest containing aggregate is the traversal boundary. For example, a field inside one array element may update the remaining fields of that element, but it may not continue into the next element. A scalar parameter with no containing aggregate remains a one-value assignment.
+
+Partial updates may start directly at a scalar field or use skip items from the beginning of an aggregate.
 
 The complete statement is decoded and validated before any write is committed.
 
@@ -178,13 +181,21 @@ The language supports:
 
 Canonical output uses explicit `0b` for binary.
 
-### Scalar assignment
+### Scalar-start assignment
 
 ```text
 combat fighters_use_point_defense = true;
 ```
 
-The LHS resolves to a scalar. Exactly one non-skip RHS value is allowed.
+The LHS resolves to a scalar parameter with no containing aggregate, so exactly one RHS value is allowed.
+
+A scalar field inside an aggregate acts as a bounded starting cursor:
+
+```text
+guardian weapon 1 mods = heavy,eccm 0 2;
+```
+
+This updates `mods`, `ammo`, and `amount`. The boundary is the containing weapon 1 record, so another value is an error rather than an update to weapon 2.
 
 ### Record assignment
 
@@ -208,13 +219,13 @@ The selected aggregate is `guardian.weapon[1]`. The RHS cannot overflow into wea
 guardian weapon 1 = - - heavy,eccm - 2;
 ```
 
-The LHS selects the complete weapon 1 record. The first two skips preserve `type` and `arc`, `mods` and `amount` are changed, and `ammo` is preserved. The scalar form changes only one field:
+The LHS selects the complete weapon 1 record. The first two skips preserve `type` and `arc`, `mods` and `amount` are changed, and `ammo` is preserved. The scalar-start form can express the same suffix more directly:
 
 ```text
-guardian weapon 1 mods = heavy,eccm;
+guardian weapon 1 mods = heavy,eccm - 2;
 ```
 
-It cannot carry additional RHS values.
+It may carry values only through the end of weapon 1.
 
 ### Array assignment
 
@@ -236,13 +247,13 @@ guardian special = 13 1 5 25 19 21 18 3;
 
 may update the complete special array.
 
-Selecting one scalar array element does not select the array:
+Selecting one scalar array element starts within the containing array:
 
 ```text
-guardian special 3 = battle_scanner;
+guardian special 3 = battle_scanner augmented_engines damper_field;
 ```
 
-Only one value is allowed because `special[3]` is scalar.
+This updates elements 3 through 5. Traversal may continue through the remaining `special` elements, but it cannot continue into the field after the array.
 
 ### Table assignment
 
@@ -254,7 +265,7 @@ mount_damage high_energy_focus = 75 150 225;
 mount_damage high_energy_focus point_defense = 75;
 ```
 
-The first statement selects the complete table. The second selects one row and may update every field in that row. The third selects one scalar cell and therefore accepts exactly one value. To update the final two fields of a row, select the row and skip the first field:
+The first statement selects the complete table. The second selects one row and may update every field in that row. The third starts at one scalar cell; with one RHS value it changes only that cell, while additional values may update later cells in the same row. It cannot continue into the next row. To update the final two fields of a row, selecting the row and skipping the first field remains valid:
 
 ```text
 mount_damage high_energy_focus = - 150 225;
@@ -270,15 +281,15 @@ The schema defines each aggregate's declaration order and therefore its sequenti
 mount_damage no_high_energy_focus = 50 - -;
 ```
 
-A skip is valid only when the LHS selects an aggregate. It still counts toward that aggregate's boundary. A scalar assignment cannot use a skip because it would perform no update.
+A skip advances one leaf from the current cursor and still counts toward the boundary. It is valid for aggregate and scalar-start assignments. A statement containing only skips is rejected because it performs no update.
 
 ### Atomic behavior
 
 Before applying a statement, the decoder must:
 
 1. Resolve the complete LHS.
-2. Determine whether the selected node is a scalar or aggregate.
-3. Require one value for a scalar, or walk RHS items within the selected aggregate.
+2. Determine the first leaf and traversal boundary.
+3. Walk all RHS items from the first leaf without crossing the boundary.
 4. Type-check and range-check every non-skip item.
 5. Verify that no item exceeds the boundary.
 6. Produce a temporary write list.
@@ -290,12 +301,17 @@ There must never be a partially applied statement.
 
 ### Boundary rule
 
-Sequential traversal exists only when the LHS resolves to an aggregate. That selected aggregate is the traversal boundary.
+Every assignment resolves to a first writable leaf and a traversal boundary.
 
 - If the LHS resolves to a record, that record is the boundary.
 - If it resolves to an array, that array is the boundary.
 - If it explicitly selects an array element that is a record or array, that element is the boundary.
-- If it resolves to any scalar field or scalar array element, exactly one RHS value is allowed and no sequential traversal occurs.
+- If it resolves to a scalar field, the nearest aggregate containing that field is the boundary.
+- A record-valued array element contains its own fields, so a scalar inside that element is bounded to the element record rather than the containing array.
+- A scalar array element is bounded to its containing array and may update that element and later elements.
+- If a scalar parameter has no containing aggregate within the parameter, the scalar itself is the boundary and exactly one RHS value is allowed.
+
+Traversal always begins at the selected scalar or at the first leaf of the selected aggregate. It proceeds only forward and never wraps to the beginning of a boundary.
 
 Examples:
 
@@ -304,9 +320,10 @@ Examples:
 | `guardian =` | `appearance` | Guardian record |
 | `guardian weapon =` | `weapon[1].type` | Complete weapon array |
 | `guardian weapon 1 =` | `weapon[1].type` | Weapon 1 record |
-| `guardian weapon 1 mods =` | `weapon[1].mods` | Scalar; one value only |
+| `guardian weapon 1 mods =` | `weapon[1].mods` | Weapon 1 record |
 | `guardian special =` | `special[1]` | Complete special array |
-| `guardian special 3 =` | `special[3]` | Scalar; one value only |
+| `guardian special 3 =` | `special[3]` | Complete special array, starting at element 3 |
+| `combat fighters_use_point_defense =` | selected scalar | Scalar parameter; one value only |
 
 ### Leaf order
 
@@ -333,6 +350,14 @@ Diagnostic direction:
 guardian weapon 1: value 6 exceeds the selected weapon record;
 5 writable fields are available: type, arc, mods, ammo, amount
 ```
+
+The same rule applies to scalar starts:
+
+```text
+guardian weapon 1 mods = heavy 0 2 4;
+```
+
+The fourth item exceeds the weapon 1 boundary even though weapon 2 follows it in native or logical storage.
 
 ## JSON5 schema and binding format
 
@@ -403,6 +428,79 @@ Example:
   ],
 }
 ```
+
+### Defaults
+
+`default` is a property of the value definition it initializes; defaults are not stored in a separate table. For a record field it appears beside `id` and `type` or `value`. For a parameter root it appears inside `value`. Defaults use logical schema values rather than C++ initializer strings, native enum spellings, or memory representations.
+
+Scalar defaults use the JSON5 representation appropriate to their type:
+
+- booleans, integers, and strings use JSON5 scalars
+- enums use a quoted canonical value name, or a numeric ID when the enum permits numeric values
+- masks use an array of quoted flag names, or a numeric value when the mask permits it
+- ratios use a quoted canonical ratio such as `"1/3"`
+
+Record defaults normally come from the defaults on their field definitions. A record value may instead declare a complete object default keyed by stable field ID when one use of a reusable record needs different values.
+
+An array with one default for every element declares it on the `element` definition. An array whose elements have different defaults declares an exact JSON5 array on the array definition. An exact array must contain the declared number of elements; its first item corresponds to the array's lowest external index.
+
+```json5
+{
+  parameters: {
+    hit_threshold_fixed_value: {
+      title: "Fixed hit threshold value",
+      description: "The fixed term in the beam hit-threshold formula.",
+      value: {
+        type: "vtype_lucky_divisor",
+        default: 40,
+      },
+    },
+
+    anti_missile_rocket_chance_to_hit: {
+      title: "Anti-missile rocket accuracy",
+      description: "Terms used by the anti-missile rocket hit formula.",
+      value: {
+        kind: "record",
+        fields: [
+          { id: "base", type: "uint8", default: 70 },
+          { id: "range_multiplier", type: "uint8", default: 10 },
+          { id: "range_divisor", type: "uint8", default: 3 },
+        ],
+      },
+    },
+
+    research_percent: {
+      title: "Research percentages",
+      description: "Research multipliers for all seven difficulty levels.",
+      value: {
+        kind: "array",
+        count: 7,
+        index_base: 1,
+        element: {
+          type: "uint8",
+          default: 100,
+        },
+      },
+    },
+
+    terrain_food_bonus: {
+      title: "Terrain food bonuses",
+      description: "Food bonuses ordered by the terrain array's declared indexes.",
+      value: {
+        kind: "array",
+        count: 10,
+        index_base: 0,
+        default: [0, 0, 0, 2, 2, 4, 4, 2, 4, 6],
+        element: { type: "int8" },
+      },
+    },
+  },
+}
+```
+
+An aggregate default is always complete: record objects contain every writable field and exact arrays contain every element. There is no skip marker or partial aggregate default. If an aggregate has no `default`, its field or element definitions provide defaults recursively. An `element.default` is repeated for every array element. Every writable leaf must receive exactly one effective default. Schema validation rejects missing defaults, an exact array of the wrong length, and overlapping aggregate and descendant defaults.
+
+Defaults are decoded, normalized, type-checked, range-checked, and cross-field validated using the same rules as configuration input. They establish the initial candidate state before base-game configuration or mod overrides are applied. Defaults are logical data: the generator converts them to typed native initialization and never accepts declarations such as `"{ .base = 70 }"`.
 
 Generated documentation must not depend on comments adjacent to a declaration.
 
@@ -594,6 +692,13 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
               count: 5,
               index_base: 1,
               element: { record: "weapon_slot" },
+              default: [
+                { type: 11, arc: 15, mods: 2, ammo: 0, amount: 2 },
+                { type: 4, arc: 15, mods: 4, ammo: 0, amount: 10 },
+                { type: 20, arc: 15, mods: 17664, ammo: 0, amount: 1 },
+                { type: 20, arc: 15, mods: 17664, ammo: 0, amount: 1 },
+                { type: 13, arc: 15, mods: 0, ammo: 0, amount: 2 },
+              ],
             },
           },
 
@@ -633,7 +738,7 @@ If changing a setting requires procedural behavior, the preferred design is to s
 
 Derived caches and resources may be rebuilt by explicit configuration lifecycle services after a successful transaction. Those services are engine code, not field mappings.
 
-Generated code must compile against the declared native headers and types. The generator should emit static checks for fixed array extents and compatible field types where possible; the C++ compiler is the final authority on binding validity.
+Generated code must compile against the declared native headers and types. The generator should emit static checks for fixed array extents and compatible field types where possible; the C++ compiler is the final authority on binding validity. Generated initialization must preserve the same logical-to-native conversions and replicated bindings used by ordinary writes.
 
 ## Strong typing policy
 
@@ -829,12 +934,12 @@ It handles comments, quoting, escapes, semicolons, and includes no game-specific
 Generated schema code resolves the path through records, arrays, and keyed collections. It returns:
 
 - selected node
-- scalar cardinality or aggregate traversal boundary
+- first writable leaf and traversal boundary
 - canonical path
 
 ### Stage 3: sequential decode
 
-For a scalar, the decoder requires and converts exactly one RHS value. For an aggregate, it walks leaves inside that aggregate and converts each RHS token according to the current leaf's type.
+The decoder walks forward from the resolved first leaf to the boundary and converts each RHS token according to the current leaf's type. A root scalar has a one-leaf boundary; a scalar inside an aggregate may consume the remaining leaves within that boundary.
 
 Its output is an atomic write set containing stable schema field identities, resolved indexes, typed values, and source provenance.
 
@@ -1025,6 +1130,8 @@ The build should provide validation for:
 - invalid defaults
 - invalid native binding paths
 - array-size mismatches
+- missing, overlapping, or invalid defaults
+- exact array defaults with the wrong length
 - replicated targets with incompatible types
 - unstable field-order changes
 - undocumented weak integer IDs
@@ -1053,7 +1160,6 @@ Errors should identify the relevant phase.
 ### Sequential decode errors
 
 - too many RHS items for the selected boundary
-- more than one RHS item for a scalar
 - invalid skip use
 - invalid enum name
 - unknown numeric enum ID
@@ -1086,6 +1192,7 @@ Errors should identify the relevant phase.
 - Define JSON5 document structure.
 - Implement JSON5 loading for build tools.
 - Define explicit-width primitive, semantic alias, enum, mask, ratio, string, record, array, and parameter nodes.
+- Define typed scalar, record, exact-array, and repeated element defaults.
 - Define documentation metadata and field-level constraints.
 - Import and verify a small set of value catalogs from 1.50 and restored source.
 - Generate schema IDs and documentation.
@@ -1100,9 +1207,9 @@ Errors should identify the relevant phase.
 
 - Resolve records and arrays.
 - Implement the boundary rules in this document.
-- Enforce one RHS value for scalar selections.
+- Implement scalar-start traversal within the nearest containing aggregate.
 - Decode complete statements atomically.
-- Add exhaustive tests for record, array, nested-array, skip, and overflow behavior.
+- Add exhaustive tests for record, array, nested-array, scalar-start, skip, and overflow behavior.
 
 ### Phase 4: generated native bindings
 
@@ -1168,10 +1275,10 @@ guardian weapon 1 = ...;
 
 may modify only weapon 1. Terseness is retained without allowing a missing or extra value to spill into an unrelated object.
 
-A scalar selection is stricter still:
+A scalar selection starts at that field but remains structurally contained:
 
 ```text
-guardian weapon 1 mods = heavy,eccm;
+guardian weapon 1 mods = heavy,eccm 0 2;
 ```
 
-accepts exactly one value. Updating several fields requires selecting their containing aggregate and using positional values or skips.
+may update the remaining fields of weapon 1, but cannot spill into weapon 2. Root scalar parameters still accept exactly one value because they have no containing aggregate.
