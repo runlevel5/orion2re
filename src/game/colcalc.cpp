@@ -2007,7 +2007,7 @@ namespace COLCALC {
 
                     s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_COLONY;
-                    msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+                    msg.u.colony.planet_idx = colony->planet;
                     msg.u.colony.subtype = 2;
                     msg.u.colony.c.assimilation.val = static_cast<uint8_t>(*selected_pop & 0x0f);
 
@@ -2124,7 +2124,7 @@ namespace COLCALC {
             if (food_shortage > 0 || industry_shortage > 0) {
                 s_MSG msg = {};
                 msg.msg_type = MSG_TYPE_COLONY;
-                msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+                msg.u.colony.planet_idx = colony->planet;
                 msg.u.colony.subtype = 4;
 
                 if (food_shortage > 0) {
@@ -3446,7 +3446,7 @@ namespace COLCALC {
 
                         s_MSG msg = {};
                         msg.msg_type = MSG_TYPE_COLONY;
-                        msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+                        msg.u.colony.planet_idx = colony->planet;
                         msg.u.colony.subtype = 3;
                         msg.u.colony.c.assimilation.val =
                             static_cast<uint8_t>(colony->pop[chosen_pop_idx] & 0x0Fu);
@@ -3515,7 +3515,7 @@ namespace COLCALC {
         if (production_pool >= product_cost) {
             s_MSG build_msg{};
             build_msg.msg_type = MSG_TYPE_COLONY;
-            build_msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+            build_msg.u.colony.planet_idx = colony->planet;
             build_msg.u.colony.subtype = 1;
             build_msg.u.colony.c.build.build_id = current_product;
 
@@ -3663,7 +3663,7 @@ namespace COLCALC {
                             } else {
                                 s_MSG pop_removed_msg{};
                                 pop_removed_msg.msg_type = MSG_TYPE_COLONY;
-                                pop_removed_msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+                                pop_removed_msg.u.colony.planet_idx = colony->planet;
                                 pop_removed_msg.u.colony.subtype = 11;
                                 pop_removed_msg.u.colony.c.android_killed.race_idx =
                                     static_cast<int8_t>(*selected_pop & 0x0F);
@@ -3696,7 +3696,7 @@ namespace COLCALC {
                         } else {
                             s_MSG pop_failed_msg{};
                             pop_failed_msg.msg_type = MSG_TYPE_COLONY;
-                            pop_failed_msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+                            pop_failed_msg.u.colony.planet_idx = colony->planet;
                             pop_failed_msg.u.colony.subtype = 10;
                             MSG_::Add_Msg_(pop_failed_msg, static_cast<int16_t>(owner_player_idx));
 

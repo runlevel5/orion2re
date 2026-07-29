@@ -337,7 +337,7 @@ void __cdecl Process_Retreating_Ships_(void) {
             if (retreat.count != 0) {
                 s_MSG msg = {};
                 msg.msg_type = MSG_TYPE_FAILED_RETREAT;
-                msg.u.retreat.star_idx = (int8_t)s; /* INDEX_NARROWING */
+                msg.u.retreat.star_idx = s;
                 msg.u.retreat.reason = retreat.reason;
                 msg.u.retreat.ships_lost = retreat.count;
                 msg.u.retreat.leader_count = retreat.killed_officers;
@@ -831,7 +831,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                     star->artifacts_gave_app = 1;
 
                     msg.msg_type = MSG_TYPE_ARTIFACTS;
-                    msg.u.artifacts.star_idx = (uint8_t)star_idx; /* INDEX_NARROWING */
+                    msg.u.artifacts.star_idx = star_idx;
                     picked_tech_ids = (uint8_t*)&msg.u.artifacts.tech1;
                     picked_tech_ids[0] = 0;
                     picked_tech_ids[1] = 0;

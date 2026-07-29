@@ -1699,7 +1699,7 @@ namespace CMBTFIRE {
     }
 
     void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int16_t source_idx) {
-        MOX::_combat_data[ship_idx].stasis_source_idx = (uint8_t)source_idx; /* INDEX_NARROWING */
+        MOX::_combat_data[ship_idx].stasis_source_idx = (uint8_t)source_idx;
         CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
     }
 
@@ -1767,6 +1767,6 @@ namespace CMBTFIRE {
         }
 
         MOX::_combat_data[target_idx].black_hole_flag = 1;
-        MOX::_combat_data[target_idx].black_hole_source_idx = (int8_t)source_idx; /* INDEX_NARROWING */
+        MOX::_combat_data[target_idx].black_hole_source_idx = (uint8_t)source_idx;
     }
 }

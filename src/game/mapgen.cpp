@@ -347,7 +347,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int16_t type) {
         s_planet_data* planet = &MOX::_planet[MOX::_planet_count];
 
-        planet->star_index = (int8_t)star_idx; /* INDEX_NARROWING */
+        planet->star_index = star_idx;
 
         planet->size = Generate_Size_();
 

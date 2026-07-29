@@ -959,7 +959,7 @@ namespace AIMOVE {
                         if (new_ship_idx != -1) {
                             s_MSG msg = {};
                             msg.msg_type = MSG_TYPE_EEL_SPAWNED;
-                            msg.u.eel.star_idx = (uint8_t)ship->location; /* INDEX_NARROWING */
+                            msg.u.eel.star_idx = ship->location;
                             MSG_::Add_Msg_All_(msg);
 
                             // Assembly clears the same +0x61 timer field on the spawned eel.
@@ -976,7 +976,7 @@ namespace AIMOVE {
                 if (dest == -1) {
                     s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_EEL_VANISHED;
-                    msg.u.eel.star_idx = (uint8_t)ship->location; /* INDEX_NARROWING */
+                    msg.u.eel.star_idx = ship->location;
                     MSG_::Add_Msg_All_(msg);
 
                     SHIPS::Kill_Ship_(ship_idx);

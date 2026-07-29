@@ -8,6 +8,9 @@
 #include <cstring>
 
 namespace {
+    constexpr size_t LEGACY_PLANET_SIZE = sizeof(s_planet_data) - sizeof(int8_t);
+    constexpr size_t LEGACY_STAR_SIZE = sizeof(s_star_data) - 2 * sizeof(int8_t);
+
     struct State_ {
         s_colony colonies[MAX_COLONIES] = {};
         s_planet_data planets[MAX_PLANETS] = {};
@@ -294,6 +297,43 @@ namespace {
         return true;
     }
 
+    void Expand_Legacy_Planets_(s_planet_data* planets) {
+        uint8_t legacy[MAX_PLANETS * LEGACY_PLANET_SIZE];
+        Fill_Bytes_(legacy, sizeof(legacy), 2);
+        const size_t star_offset = offsetof(s_planet_data, star_index);
+        for (size_t i = 0; i < MAX_PLANETS; ++i) {
+            const uint8_t* source = legacy + i * LEGACY_PLANET_SIZE;
+            uint8_t* destination = reinterpret_cast<uint8_t*>(&planets[i]);
+            memcpy(destination, source, star_offset);
+            planets[i].star_index = static_cast<int8_t>(source[star_offset]);
+            memcpy(destination + star_offset + sizeof(planets[i].star_index),
+                   source + star_offset + sizeof(int8_t),
+                   LEGACY_PLANET_SIZE - star_offset - sizeof(int8_t));
+        }
+    }
+
+    void Expand_Legacy_Stars_(s_star_data* stars) {
+        uint8_t legacy[MAX_STARS * LEGACY_STAR_SIZE];
+        Fill_Bytes_(legacy, sizeof(legacy), 3);
+        const size_t wormhole_offset = offsetof(s_star_data, wormhole_star_id);
+        const size_t legacy_next_wfi_offset =
+                offsetof(s_star_data, next_wfi_in_list) - sizeof(int8_t);
+        for (size_t i = 0; i < MAX_STARS; ++i) {
+            const uint8_t* source = legacy + i * LEGACY_STAR_SIZE;
+            uint8_t* destination = reinterpret_cast<uint8_t*>(&stars[i]);
+            memcpy(destination, source, wormhole_offset);
+            stars[i].wormhole_star_id = static_cast<int8_t>(source[wormhole_offset]);
+            memcpy(destination + wormhole_offset + sizeof(stars[i].wormhole_star_id),
+                   source + wormhole_offset + sizeof(int8_t),
+                   legacy_next_wfi_offset - wormhole_offset - sizeof(int8_t));
+            stars[i].next_wfi_in_list = source[legacy_next_wfi_offset];
+            memcpy(destination + offsetof(s_star_data, next_wfi_in_list) +
+                       sizeof(stars[i].next_wfi_in_list),
+                   source + legacy_next_wfi_offset + sizeof(uint8_t),
+                   LEGACY_STAR_SIZE - legacy_next_wfi_offset - sizeof(uint8_t));
+        }
+    }
+
     void Check_Version_1_State_(const State_& expected, const State_& actual) {
         DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
                              MOX::_NUM_COLONIES * sizeof(*expected.colonies)) == 0);
@@ -317,9 +357,13 @@ namespace {
     }
 
     void Check_Legacy_State_Except_Players_(const State_& expected, const State_& actual) {
+        s_planet_data expected_planets[MAX_PLANETS] = {};
+        s_star_data expected_stars[MAX_STARS] = {};
+        Expand_Legacy_Planets_(expected_planets);
+        Expand_Legacy_Stars_(expected_stars);
         DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies, sizeof(expected.colonies)) == 0);
-        DOCTEST_CHECK(memcmp(expected.planets, actual.planets, sizeof(expected.planets)) == 0);
-        DOCTEST_CHECK(memcmp(expected.stars, actual.stars, sizeof(expected.stars)) == 0);
+        DOCTEST_CHECK(memcmp(expected_planets, actual.planets, sizeof(expected_planets)) == 0);
+        DOCTEST_CHECK(memcmp(expected_stars, actual.stars, sizeof(expected_stars)) == 0);
         DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
         int converted_locations = 0;
         for (int i = 0; i < ORIGINAL_MAX_SHIPS; ++i) {
@@ -335,6 +379,41 @@ namespace {
         }
         DOCTEST_CHECK(converted_locations > 0);
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
+    }
+
+    void Check_Reports_(const s_report* expected) {
+        for (int i = 0; i < MAX_REPORTS; ++i) {
+            const s_report& actual = REPORT::_reports[i];
+            DOCTEST_CHECK(actual.type == expected[i].type);
+            DOCTEST_CHECK(actual.player_idx == expected[i].player_idx);
+            DOCTEST_CHECK(actual.action == expected[i].action);
+            if (actual.type == 1 && actual.action == 0) {
+                DOCTEST_CHECK(memcmp(&actual.d.steal, &expected[i].d.steal,
+                                     sizeof(actual.d.steal)) == 0);
+            } else if (actual.type == 1 && actual.action == 1) {
+                DOCTEST_CHECK(actual.d.sabotage.framed_player_idx ==
+                              expected[i].d.sabotage.framed_player_idx);
+                DOCTEST_CHECK(actual.d.sabotage.victim_player_idx ==
+                              expected[i].d.sabotage.victim_player_idx);
+                DOCTEST_CHECK(actual.d.sabotage.planet_idx ==
+                              expected[i].d.sabotage.planet_idx);
+                DOCTEST_CHECK(actual.d.sabotage.building_id ==
+                              expected[i].d.sabotage.building_id);
+            } else if (actual.type == 2 && actual.action == 0) {
+                DOCTEST_CHECK(memcmp(&actual.d.enemy_steal,
+                                     &expected[i].d.enemy_steal,
+                                     sizeof(actual.d.enemy_steal)) == 0);
+            } else {
+                DOCTEST_CHECK(actual.d.enemy_sabotage.enemy_player_idx ==
+                              expected[i].d.enemy_sabotage.enemy_player_idx);
+                DOCTEST_CHECK(actual.d.enemy_sabotage.planet_idx ==
+                              expected[i].d.enemy_sabotage.planet_idx);
+                DOCTEST_CHECK(actual.d.enemy_sabotage.building_id ==
+                              expected[i].d.enemy_sabotage.building_id);
+            }
+            DOCTEST_CHECK(memcmp(actual.reserved, expected[i].reserved,
+                                 sizeof(actual.reserved)) == 0);
+        }
     }
 
 }
@@ -364,8 +443,10 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     int16_t expected_box_order[5] = {};
     int16_t expected_bill[6] = {};
     s_report expected_reports[MAX_REPORTS] = {};
+    s_report expected_legacy_reports[MAX_REPORTS] = {};
     s_event_data expected_events[36] = {};
     s_MSG expected_messages[MAX_MESSAGES] = {};
+    s_MSG expected_legacy_messages[MAX_MESSAGES] = {};
     uint8_t expected_interesting[MAX_PLAYERS] = {};
     uint8_t expected_colonize_check[BITMAP(MAX_STARS)] = {};
     uint8_t expected_first_msg[MAX_PLAYERS] = {};
@@ -377,6 +458,55 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     SETTLER::Set_Race(&expected.players[0].settlers[0].val, 7);
     SETTLER::Set_Eta(&expected.players[0].settlers[0].val, 12);
     SETTLER::Set_Prof(&expected.players[0].settlers[0].val, POP::PROF_SCIENTIST);
+    memcpy(expected_legacy_reports, REPORT::_reports, sizeof(expected_legacy_reports));
+    memcpy(expected_legacy_messages, MSG_::_msgs, sizeof(expected_legacy_messages));
+    for (s_report& report : expected_legacy_reports) {
+        uint8_t* data = reinterpret_cast<uint8_t*>(&report.d);
+        if (report.type == 1 && report.action == 1) {
+            report.d.sabotage.building_id = data[3];
+            report.d.sabotage.planet_idx = data[2];
+        } else if (report.type == 2 && report.action == 1) {
+            report.d.enemy_sabotage.building_id = data[3];
+            report.d.enemy_sabotage.planet_idx = data[2];
+        } else {
+            data[4] = 0;
+        }
+    }
+
+    expected.planets[358].star_index = 511;
+    expected.stars[70].wormhole_star_id = 510;
+    expected.stars[70].next_wfi_in_list = 509;
+    expected.players[0].offensive_stagepoint = 508;
+    REPORT::_reports[2].d.sabotage.planet_idx = 359;
+    REPORT::_reports[3].d.enemy_sabotage.planet_idx = 358;
+    for (s_MSG& message : MSG_::_msgs) {
+        switch (message.msg_type) {
+        case MSG_TYPE_COLONY:
+            message.u.colony.planet_idx = 359;
+            break;
+        case MSG_TYPE_HYPERSPACE_BEAST:
+            message.u.hyperspace_beast.star_idx = 511;
+            break;
+        case MSG_TYPE_ARTEMIS_LEADER:
+            message.u.artemis_leader.star_idx = 510;
+            break;
+        case MSG_TYPE_FAILED_RETREAT:
+            message.u.retreat.star_idx = 509;
+            break;
+        case MSG_TYPE_ANOMALY:
+            message.u.anomaly.star_idx = 508;
+            break;
+        case MSG_TYPE_EEL_SPAWNED:
+        case MSG_TYPE_EEL_VANISHED:
+            message.u.eel.star_idx = 507;
+            break;
+        case MSG_TYPE_ARTIFACTS:
+            message.u.artifacts.star_idx = 506;
+            break;
+        default:
+            break;
+        }
+    }
     memcpy(expected_boxes, MOX::_moveable_box, sizeof(MOX::_moveable_box));
     memcpy(expected_box_order, MOX::_moveable_box_order, sizeof(MOX::_moveable_box_order));
     memcpy(expected_bill, MOX::_bill_savegame, sizeof(MOX::_bill_savegame));
@@ -395,7 +525,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     char description[37] = "Exhaustive save state";
     constexpr uint32_t random_seed = 0xCAFEBABE;
     SAVEGAME::Write_Game_(&writer, description, random_seed);
-    DOCTEST_CHECK(writer.Length_() == 208182);
+    DOCTEST_CHECK(writer.Length_() == 208841);
 
     FILE* legacy_file = fopen(SAVEGAME_TEST_DATA_DIR "/savegame_v0.sav", "rb");
     DOCTEST_REQUIRE(legacy_file != nullptr);
@@ -475,9 +605,11 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         DOCTEST_CHECK(memcmp(MOX::_moveable_box, expected_boxes, sizeof(MOX::_moveable_box)) == 0);
         DOCTEST_CHECK(memcmp(MOX::_moveable_box_order, expected_box_order, sizeof(MOX::_moveable_box_order)) == 0);
         DOCTEST_CHECK(memcmp(MOX::_bill_savegame, expected_bill, sizeof(MOX::_bill_savegame)) == 0);
-        DOCTEST_CHECK(memcmp(REPORT::_reports, expected_reports, sizeof(REPORT::_reports)) == 0);
+        Check_Reports_(format == 0 ? expected_reports : expected_legacy_reports);
         DOCTEST_CHECK(memcmp(EVENTS::_event_data, expected_events, sizeof(EVENTS::_event_data)) == 0);
-        DOCTEST_CHECK(memcmp(MSG_::_msgs, expected_messages, sizeof(MSG_::_msgs)) == 0);
+        DOCTEST_CHECK(memcmp(MSG_::_msgs,
+                             format == 0 ? expected_messages : expected_legacy_messages,
+                             sizeof(MSG_::_msgs)) == 0);
         DOCTEST_CHECK(memcmp(REPORT::_something_interesting_happened, expected_interesting, sizeof(expected_interesting)) == 0);
         DOCTEST_CHECK(memcmp(REPORT::_done_colonize_check, expected_colonize_check, sizeof(expected_colonize_check)) == 0);
         DOCTEST_CHECK(memcmp(MSG_::_first_msg, expected_first_msg, sizeof(expected_first_msg)) == 0);

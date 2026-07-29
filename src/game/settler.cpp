@@ -152,8 +152,7 @@ namespace SETTLER {
                         memset(&msg, 0, sizeof(msg));
 
                         msg.msg_type = MSG_TYPE_COLONY;
-                        // Note: Original game truncates planet_idx > 255 due to 8-bit field, which we accurately preserve.
-                        msg.u.colony.planet_idx = (uint8_t)planet_idx; /* INDEX_NARROWING */
+                        msg.u.colony.planet_idx = planet_idx;
                         msg.u.colony.subtype = 5 /* s_MSG_colony_settlers */;
                         msg.u.colony.c.settlers.settlers = arrivals_per_planet[planet_idx];
                         msg.u.colony.c.settlers.over_limit = over_limit_per_planet[planet_idx];

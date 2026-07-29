@@ -469,7 +469,7 @@ namespace maintain {
                 s_MSG msg;
                 memset(&msg, 0, sizeof(msg));
                 msg.msg_type = MSG_TYPE_COLONY;
-                msg.u.colony.planet_idx = (uint8_t)best_colony->planet; /* INDEX_NARROWING */
+                msg.u.colony.planet_idx = best_colony->planet;
                 msg.u.colony.subtype = 0 /* s_MSG_colony_scrap_building */;
                 msg.u.colony.c.scrap.building_id = (int16_t)best_building;
                 msg.u.colony.c.scrap.bc = scrap_value;

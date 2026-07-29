@@ -279,8 +279,8 @@ namespace HAROLD {
                 }
 
                 if (wormhole_exit_id != -1) {
-                    MOX::_star[wormhole_exit_id].wormhole_star_id = (int8_t)star_idx; /* INDEX_NARROWING */
-                    MOX::_star[star_idx].wormhole_star_id = (int8_t)wormhole_exit_id; /* INDEX_NARROWING */
+                    MOX::_star[wormhole_exit_id].wormhole_star_id = star_idx;
+                    MOX::_star[star_idx].wormhole_star_id = wormhole_exit_id;
                     return;
                 }
             }

@@ -555,7 +555,7 @@ namespace MSG_ {
                 if (EVENTS::Event_Check_Plague_(colony_idx) != 0) {
                     memset(&msg, 0, sizeof(msg));
                     msg.msg_type = MSG_TYPE_COLONY;
-                    msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet; /* INDEX_NARROWING */
+                    msg.u.colony.planet_idx = MOX::_colony[colony_idx].planet;
                     msg.u.colony.subtype = 6;
                     Add_Msg_(msg, owner);
                 }
@@ -563,7 +563,7 @@ namespace MSG_ {
                 if (EVENTS::Event_Check_Population_Boom_(colony_idx) != 0) {
                     memset(&msg, 0, sizeof(msg));
                     msg.msg_type = MSG_TYPE_COLONY;
-                    msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet; /* INDEX_NARROWING */
+                    msg.u.colony.planet_idx = MOX::_colony[colony_idx].planet;
                     msg.u.colony.subtype = 7;
                     Add_Msg_(msg, owner);
                 }
@@ -571,7 +571,7 @@ namespace MSG_ {
                 if (EVENTS::Event_Check_Comet_(colony_idx) != 0) {
                     memset(&msg, 0, sizeof(msg));
                     msg.msg_type = MSG_TYPE_COLONY;
-                    msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet; /* INDEX_NARROWING */
+                    msg.u.colony.planet_idx = MOX::_colony[colony_idx].planet;
                     msg.u.colony.subtype = 8;
                     Add_Msg_(msg, owner);
                 }
@@ -582,7 +582,7 @@ namespace MSG_ {
             if (EVENTS::Event_Check_Space_Anomaly_At_Star_(star_idx) != 0) {
                 memset(&msg, 0, sizeof(msg));
                 msg.msg_type = MSG_TYPE_ANOMALY;
-                msg.u.anomaly.star_idx = (uint8_t)star_idx; /* INDEX_NARROWING */
+                msg.u.anomaly.star_idx = star_idx;
 
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                     Add_Msg_(msg, player_idx);

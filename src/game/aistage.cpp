@@ -41,7 +41,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
             MOX::_star[best_star].is_stagepoint |= (1 << (player_idx & 0x1F));
 
             if (selected_stagepoint_count == 0) {
-                MOX::_player[player_idx].offensive_stagepoint = (int8_t)best_star; /* INDEX_NARROWING */
+                MOX::_player[player_idx].offensive_stagepoint = best_star;
             }
 
             ++selected_stagepoint_count;
@@ -122,7 +122,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
             }
         }
 
-        MOX::_player[player_idx].offensive_stagepoint = (int8_t)candidate_star; /* INDEX_NARROWING */
+        MOX::_player[player_idx].offensive_stagepoint = candidate_star;
         MOX::_star[candidate_star].is_stagepoint |= (1 << (player_idx & 0x1F));
     }
 }

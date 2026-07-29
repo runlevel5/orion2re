@@ -398,7 +398,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
 
         s_MSG msg = {};
         msg.msg_type = MSG_TYPE_COLONY;
-        msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+        msg.u.colony.planet_idx = colony->planet;
         msg.u.colony.subtype = 9 /* s_MSG_colony_rebellion */;
         msg.u.colony.c.rebels.owner_player = (int8_t)rebel_player;
         msg.u.colony.c.rebels.rebels = (int8_t)rebel_count;

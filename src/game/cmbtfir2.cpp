@@ -1163,7 +1163,7 @@ namespace CMBTFIR2 {
                             if (MOX::_combat_data[i].black_hole_source_idx == target_ship_idx) {
                                 if (new_count == 0) {
                                     MOX::_combat_data[i].black_hole_flag = 0;
-                                    MOX::_combat_data[i].black_hole_source_idx = -1;
+                                    MOX::_combat_data[i].black_hole_source_idx = UINT8_MAX;
                                 } else {
                                     new_count--;
                                 }

@@ -665,7 +665,7 @@ namespace CMBTSPEC {
             allocate::Pop_Block_(MOX::_screen_seg);
         }
 
-        MOX::_combat_data[source_ship_idx].special_cooldown = (uint8_t)target_ship_idx; /* INDEX_NARROWING */
+        MOX::_combat_data[source_ship_idx].special_cooldown = (uint8_t)target_ship_idx;
         int16_t current_speed = COMBAT1::Calc_Current_Speed_(target_ship_idx);
         MOX::_combat_data[target_ship_idx].current_speed = current_speed;
         CMBTDRW1::Refresh_Combat_Screen_Full_();

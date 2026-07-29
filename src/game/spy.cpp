@@ -717,7 +717,7 @@ namespace spy {
             report.action = 1;
             report.d.sabotage.framed_player_idx = (framed_player_idx == (int16_t)acting_player_idx) ? -1 : (int8_t)acting_player_idx;
             report.d.sabotage.victim_player_idx = (uint8_t)victim_player_idx;
-            report.d.sabotage.planet_idx = (uint8_t)planet_idx; /* INDEX_NARROWING */
+            report.d.sabotage.planet_idx = planet_idx;
             report.d.sabotage.building_id = (uint8_t)target_building;
             REPORT::Add_Report_(&report);
 
@@ -726,7 +726,7 @@ namespace spy {
             report.player_idx = victim_player_idx;
             report.action = 1;
             report.d.enemy_sabotage.enemy_player_idx = (int16_t)acting_player_idx;
-            report.d.enemy_sabotage.planet_idx = (uint8_t)planet_idx; /* INDEX_NARROWING */
+            report.d.enemy_sabotage.planet_idx = planet_idx;
             report.d.enemy_sabotage.building_id = (uint8_t)target_building;
             REPORT::Add_Report_(&report);
         }

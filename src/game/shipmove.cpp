@@ -973,7 +973,7 @@ namespace SHIPMOVE {
 
             msg.u.hyperspace_beast.ship_idx = ship_index;
             msg.u.hyperspace_beast.officer_idx = (int8_t)officer_index;
-            msg.u.hyperspace_beast.star_idx = (int8_t)(selected_ship->location + 12); /* INDEX_NARROWING */
+            msg.u.hyperspace_beast.star_idx = selected_ship->location + 12;
 
             if (officer_index != -1) {
                 OFFICER::Move_Officer_To_Pool_(officer_index);

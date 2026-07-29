@@ -1163,7 +1163,12 @@ namespace oracle {
             constexpr size_t legacy_settlers_size =
                 settler_count * sizeof(SETTLER::legacy_value_type);
             constexpr size_t legacy_player_size =
-                sizeof(s_player) - sizeof(s_player::settlers) + legacy_settlers_size;
+                sizeof(s_player) - sizeof(s_player::settlers) + legacy_settlers_size -
+                sizeof(s_player::offensive_stagepoint) + sizeof(int8_t);
+            constexpr size_t legacy_planet_size = sizeof(s_planet_data) - sizeof(int8_t);
+            constexpr size_t legacy_star_size = sizeof(s_star_data) - 2 * sizeof(int8_t);
+            constexpr size_t legacy_report_size = sizeof(s_report) - sizeof(int8_t);
+            constexpr size_t legacy_message_size = sizeof(s_MSG) - sizeof(int8_t);
             if (save->size() < sizeof(uint32_t)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: save '%s' is too small", path);
@@ -1244,13 +1249,82 @@ namespace oracle {
             };
 
             if (!append_counted_records(MAX_COLONIES, sizeof(s_colony),
-                    "colony") ||
-                !append_counted_records(MAX_PLANETS, sizeof(s_planet_data),
-                    "planet") ||
-                !append_counted_records(MAX_STARS, sizeof(s_star_data),
-                    "star")) {
+                    "colony")) {
                 return false;
             }
+
+            int16_t planet_count;
+            if (!Read_Save_Count_(*save, source_offset, MAX_PLANETS,
+                    &planet_count)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has an invalid planet count", path);
+                return false;
+            }
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset + sizeof(planet_count));
+            source_offset += sizeof(planet_count);
+            if (source_offset + legacy_planet_size * MAX_PLANETS > save->size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has a truncated planet block", path);
+                return false;
+            }
+            for (int16_t planet_idx = 0; planet_idx < planet_count; ++planet_idx) {
+                const size_t record_offset = source_offset +
+                    static_cast<size_t>(planet_idx) * legacy_planet_size;
+                const size_t star_offset = offsetof(s_planet_data, star_index);
+                canonical.insert(canonical.end(), save->begin() + record_offset,
+                    save->begin() + record_offset + star_offset);
+                const int16_t star_index = static_cast<int8_t>((*save)[record_offset + star_offset]);
+                const uint8_t* star_bytes = reinterpret_cast<const uint8_t*>(&star_index);
+                canonical.insert(canonical.end(), star_bytes,
+                    star_bytes + sizeof(star_index));
+                canonical.insert(canonical.end(),
+                    save->begin() + record_offset + star_offset + sizeof(int8_t),
+                    save->begin() + record_offset + legacy_planet_size);
+            }
+            source_offset += legacy_planet_size * MAX_PLANETS;
+
+            int16_t star_count;
+            if (!Read_Save_Count_(*save, source_offset, MAX_STARS, &star_count)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has an invalid star count", path);
+                return false;
+            }
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset + sizeof(star_count));
+            source_offset += sizeof(star_count);
+            if (source_offset + legacy_star_size * MAX_STARS > save->size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has a truncated star block", path);
+                return false;
+            }
+            const size_t wormhole_offset = offsetof(s_star_data, wormhole_star_id);
+            const size_t legacy_next_wfi_offset =
+                offsetof(s_star_data, next_wfi_in_list) - sizeof(int8_t);
+            for (int16_t star_idx = 0; star_idx < star_count; ++star_idx) {
+                const size_t record_offset = source_offset +
+                    static_cast<size_t>(star_idx) * legacy_star_size;
+                canonical.insert(canonical.end(), save->begin() + record_offset,
+                    save->begin() + record_offset + wormhole_offset);
+                const int16_t wormhole_star =
+                    static_cast<int8_t>((*save)[record_offset + wormhole_offset]);
+                const uint8_t* wormhole_bytes =
+                    reinterpret_cast<const uint8_t*>(&wormhole_star);
+                canonical.insert(canonical.end(), wormhole_bytes,
+                    wormhole_bytes + sizeof(wormhole_star));
+                canonical.insert(canonical.end(),
+                    save->begin() + record_offset + wormhole_offset + sizeof(int8_t),
+                    save->begin() + record_offset + legacy_next_wfi_offset);
+                const int16_t next_wfi = (*save)[record_offset + legacy_next_wfi_offset];
+                const uint8_t* next_wfi_bytes =
+                    reinterpret_cast<const uint8_t*>(&next_wfi);
+                canonical.insert(canonical.end(), next_wfi_bytes,
+                    next_wfi_bytes + sizeof(next_wfi));
+                canonical.insert(canonical.end(),
+                    save->begin() + record_offset + legacy_next_wfi_offset + sizeof(uint8_t),
+                    save->begin() + record_offset + legacy_star_size);
+            }
+            source_offset += legacy_star_size * MAX_STARS;
 
             const size_t leaders_and_player_count_size =
                 sizeof(s_leader_data) * MAX_LEADERS + sizeof(MOX::_NUM_PLAYERS);
@@ -1296,6 +1370,20 @@ namespace oracle {
                 canonical.insert(canonical.end(),
                     save->begin() + legacy_settlers_offset +
                         legacy_settlers_size,
+                    save->begin() + legacy_player_offset +
+                        offsetof(s_player, offensive_stagepoint) -
+                        (sizeof(s_player::settlers) - legacy_settlers_size));
+                const size_t legacy_offensive_stagepoint_offset =
+                    legacy_player_offset + offsetof(s_player, offensive_stagepoint) -
+                    (sizeof(s_player::settlers) - legacy_settlers_size);
+                const int16_t offensive_stagepoint = static_cast<int8_t>(
+                    (*save)[legacy_offensive_stagepoint_offset]);
+                const uint8_t* offensive_stagepoint_bytes =
+                    reinterpret_cast<const uint8_t*>(&offensive_stagepoint);
+                canonical.insert(canonical.end(), offensive_stagepoint_bytes,
+                    offensive_stagepoint_bytes + sizeof(offensive_stagepoint));
+                canonical.insert(canonical.end(),
+                    save->begin() + legacy_offensive_stagepoint_offset + sizeof(int8_t),
                     save->begin() + legacy_player_end);
                 source_offset = legacy_player_end;
             }
@@ -1322,8 +1410,6 @@ namespace oracle {
                 save->begin() + source_offset +
                     sizeof(s_ship_data) * static_cast<size_t>(ship_count));
             source_offset += legacy_ships_size;
-            canonical.insert(canonical.end(), save->begin() + source_offset,
-                save->end());
 
             for (size_t ship_idx = 0;
                 ship_idx < static_cast<size_t>(ship_count); ++ship_idx) {
@@ -1335,8 +1421,7 @@ namespace oracle {
                 memcpy(canonical.data() + location_offset, &location, sizeof(location));
             }
 
-            const size_t messages_offset = ships_offset +
-                sizeof(s_ship_data) * static_cast<size_t>(ship_count) +
+            const size_t trailing_before_reports_size =
                 sizeof(MOX::_moveable_box[0]) * 5 +
                 sizeof(MOX::_moveable_box_order[0]) * 5 +
                 sizeof(MOX::_PLAYER_NUM) + sizeof(MOX::_max_map_scale) +
@@ -1345,28 +1430,114 @@ namespace oracle {
                 sizeof(MOX::_fleet_icon_button_count) +
                 sizeof(*MOX::_nebula) * MAX_NEBULAS +
                 sizeof(MOX::_NUM_NEBULAS) + sizeof(MOX::_bill_savegame) +
-                sizeof(REPORT::_n_reports) + sizeof(REPORT::_reports) +
+                sizeof(REPORT::_n_reports);
+            if (source_offset + trailing_before_reports_size +
+                    legacy_report_size * MAX_REPORTS > save->size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has a truncated report block", path);
+                return false;
+            }
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset + trailing_before_reports_size);
+            source_offset += trailing_before_reports_size;
+            for (size_t report_idx = 0; report_idx < MAX_REPORTS; ++report_idx) {
+                const size_t report_offset = source_offset +
+                    report_idx * legacy_report_size;
+                const uint8_t type = (*save)[report_offset];
+                const uint8_t action = (*save)[report_offset + offsetof(s_report, action)];
+                canonical.insert(canonical.end(), save->begin() + report_offset,
+                    save->begin() + report_offset + offsetof(s_report, d));
+                const size_t data_offset = report_offset + offsetof(s_report, d);
+                if (type == 1 && action == 1) {
+                    canonical.insert(canonical.end(), save->begin() + data_offset,
+                        save->begin() + data_offset + 3);
+                    canonical.push_back(0);
+                    canonical.push_back((*save)[data_offset + 3]);
+                } else if (type == 2 && action == 1) {
+                    canonical.insert(canonical.end(), save->begin() + data_offset,
+                        save->begin() + data_offset + 3);
+                    canonical.push_back(0);
+                    canonical.push_back((*save)[data_offset + 3]);
+                } else {
+                    canonical.insert(canonical.end(), save->begin() + data_offset,
+                        save->begin() + data_offset + 4);
+                    canonical.push_back(0);
+                }
+                canonical.insert(canonical.end(), save->begin() + data_offset + 4,
+                    save->begin() + report_offset + legacy_report_size);
+            }
+            source_offset += legacy_report_size * MAX_REPORTS;
+
+            const size_t trailing_before_messages_size =
                 sizeof(REPORT::_done_player_reports) +
                 sizeof(REPORT::_something_interesting_happened) +
                 sizeof(REPORT::_done_colonize_check) +
                 sizeof(EVENTS::_event_data[0]) * 36;
-            if (canonical.size() < messages_offset + sizeof(MSG_::_msgs)) {
+            if (source_offset + trailing_before_messages_size +
+                    legacy_message_size * MAX_MESSAGES > save->size()) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has a truncated message block", path);
                 return false;
             }
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset + trailing_before_messages_size);
+            source_offset += trailing_before_messages_size;
+            const size_t messages_offset = canonical.size();
             for (size_t message_idx = 0; message_idx < MAX_MESSAGES; ++message_idx) {
-                const size_t message_offset = messages_offset + message_idx * sizeof(s_MSG);
-                if (static_cast<int8_t>(canonical[message_offset + offsetof(s_MSG, msg_type)]) !=
-                    MSG_TYPE_SCRAP_SHIP) {
-                    continue;
+                const size_t source_message_offset = source_offset +
+                    message_idx * legacy_message_size;
+                const int8_t type = static_cast<int8_t>((*save)[source_message_offset]);
+                canonical.insert(canonical.end(), save->begin() + source_message_offset,
+                    save->begin() + source_message_offset + offsetof(s_MSG, u));
+                const size_t payload_offset = source_message_offset + offsetof(s_MSG, u);
+                const bool signed_star =
+                    type == MSG_TYPE_HYPERSPACE_BEAST ||
+                    type == MSG_TYPE_ARTEMIS_LEADER ||
+                    type == MSG_TYPE_FAILED_RETREAT;
+                const bool unsigned_star =
+                    type == MSG_TYPE_ANOMALY || type == MSG_TYPE_EEL_SPAWNED ||
+                    type == MSG_TYPE_EEL_VANISHED || type == MSG_TYPE_ARTIFACTS;
+                if (type == MSG_TYPE_COLONY || signed_star || unsigned_star) {
+                    size_t index_offset = 0;
+                    if (type == MSG_TYPE_HYPERSPACE_BEAST) index_offset = sizeof(int16_t);
+                    canonical.insert(canonical.end(), save->begin() + payload_offset,
+                        save->begin() + payload_offset + index_offset);
+                    const int16_t index = signed_star
+                        ? static_cast<int8_t>((*save)[payload_offset + index_offset])
+                        : (*save)[payload_offset + index_offset];
+                    const uint8_t* index_bytes = reinterpret_cast<const uint8_t*>(&index);
+                    canonical.insert(canonical.end(), index_bytes,
+                        index_bytes + sizeof(index));
+                    canonical.insert(canonical.end(),
+                        save->begin() + payload_offset + index_offset + sizeof(int8_t),
+                        save->begin() + payload_offset + 8);
+                } else {
+                    canonical.insert(canonical.end(), save->begin() + payload_offset,
+                        save->begin() + payload_offset + 8);
+                    canonical.push_back(0);
                 }
-                const size_t location_offset = message_offset + offsetof(s_MSG, u) +
-                    offsetof(s_MSG_scrap_ship, where);
-                int16_t location;
-                memcpy(&location, canonical.data() + location_offset, sizeof(location));
-                location = SAVEGAME::Convert_Legacy_Ship_Location_(location);
-                memcpy(canonical.data() + location_offset, &location, sizeof(location));
+                canonical.insert(canonical.end(),
+                    save->begin() + payload_offset + 8,
+                    save->begin() + source_message_offset + legacy_message_size);
+            }
+            source_offset += legacy_message_size * MAX_MESSAGES;
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->end());
+
+            for (size_t message_idx = 0; message_idx < MAX_MESSAGES; ++message_idx) {
+                const size_t message_offset = messages_offset +
+                    message_idx * sizeof(s_MSG);
+                if (static_cast<int8_t>(canonical[message_offset]) ==
+                        MSG_TYPE_SCRAP_SHIP) {
+                    const size_t location_offset = message_offset +
+                        offsetof(s_MSG, u) + offsetof(s_MSG_scrap_ship, where);
+                    int16_t location;
+                    memcpy(&location, canonical.data() + location_offset,
+                        sizeof(location));
+                    location = SAVEGAME::Convert_Legacy_Ship_Location_(location);
+                    memcpy(canonical.data() + location_offset, &location,
+                        sizeof(location));
+                }
             }
 
             version = SAVEGAME::CURRENT_VERSION;
@@ -1703,6 +1874,7 @@ namespace oracle {
                         both_have_ship;
                     if (actual_own_ship && expected_own_ship) {
                         meaningful_fields[offsetof(s_MSG_hyperspace_beast, star_idx)] = true;
+                        meaningful_fields[offsetof(s_MSG_hyperspace_beast, star_idx) + 1] = true;
                         meaningful_fields[offsetof(s_MSG_hyperspace_beast, officer_idx)] = true;
                         meaningful_fields[offsetof(s_MSG_hyperspace_beast, leader_status)] =
                             actual_beast.officer_idx != -1 &&

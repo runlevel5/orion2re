@@ -516,8 +516,7 @@ void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y)
 }
 
 bool __cdecl Ship_In_Black_Hole_(int16_t ship_idx) {
-    const int16_t black_hole_source_idx = MOX::_combat_data[ship_idx].black_hole_source_idx;
-    return black_hole_source_idx != -1;
+    return MOX::_combat_data[ship_idx].black_hole_source_idx != UINT8_MAX;
 }
 
 int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {

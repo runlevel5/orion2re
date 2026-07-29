@@ -1137,7 +1137,7 @@ namespace HOMEGEN {
                         food_star = star_of_planet;
 
                         uint16_t saved_planet_count = MOX::_planet_count;
-                        MOX::_planet_count = (uint16_t)target_p_idx; /* INDEX_NARROWING */
+                        MOX::_planet_count = target_p_idx;
 
                         uint32_t orbit_index = ERIC::Get_Sint_Index_From_List_(target_p_idx, MOX::_star[star_of_planet].planet_index, 5);
                         Make_One_Planet_(star_of_planet, target_p_idx, (int16_t)orbit_index, 1);

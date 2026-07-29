@@ -1447,25 +1447,18 @@ namespace COMBAT1 {
     void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx) {
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
             // Check if this ship is being held in stasis by the source ship
-            const int16_t stasis_source_idx = MOX::_combat_data[i].stasis_source_idx == UINT8_MAX
-                ? -1
-                : MOX::_combat_data[i].stasis_source_idx;
-            if (source_idx >= 0 && stasis_source_idx == source_idx) {
+            if (MOX::_combat_data[i].stasis_source_idx == source_idx) {
                 CMBTFIRE::Remove_Stasis_Beam_(i);
             }
 
             // Check if this ship is affected by a black hole created by the source ship
-            const int16_t black_hole_source_idx = MOX::_combat_data[i].black_hole_source_idx;
-            if (source_idx >= 0 && black_hole_source_idx == source_idx) {
+            if (MOX::_combat_data[i].black_hole_source_idx == source_idx) {
                 MOX::_combat_data[i].black_hole_flag = 0;
-                MOX::_combat_data[i].black_hole_source_idx = -1;
+                MOX::_combat_data[i].black_hole_source_idx = UINT8_MAX;
             }
 
             // Check if special cooldown (or effect tracking) matches the source ship
-            const int16_t tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
-                ? -1
-                : MOX::_combat_data[i].special_cooldown;
-            if (source_idx >= 0 && tractor_target_idx == source_idx) {
+            if (MOX::_combat_data[i].special_cooldown == source_idx) {
                 MOX::_combat_data[i].special_cooldown = 0xFF;
             }
         }

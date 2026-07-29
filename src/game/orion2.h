@@ -653,7 +653,7 @@ struct s_combat_data {
     int16_t special_hits[8];
     int16_t shield_current_hits;
     int8_t black_hole_flag;
-    int8_t black_hole_source_idx;
+    uint8_t black_hole_source_idx;
     uint8_t previous_owner;
 };
 
@@ -1502,7 +1502,7 @@ struct s_MSG_artemis {
 };
 
 struct s_MSG_artifacts {
-    uint8_t star_idx;
+    int16_t star_idx;
     int8_t tech1;
     int8_t tech2;
 };
@@ -1512,20 +1512,20 @@ struct s_MSG_scrap_leader {
 };
 
 struct s_MSG_failed_retreat {
-    int8_t star_idx;
+    int16_t star_idx;
     int8_t reason;
     int16_t ships_lost;
     int8_t leader_count;
 };
 
 struct s_MSG_artemis_leader {
-    int8_t star_idx;
+    int16_t star_idx;
     int8_t leader_idx;
     int8_t fate;
 };
 
 struct s_MSG_eel {
-    uint8_t star_idx;
+    int16_t star_idx;
 };
 
 struct s_MSG_scrap_ship {
@@ -1536,7 +1536,7 @@ struct s_MSG_scrap_ship {
 
 struct s_MSG_hyperspace_beast {
     int16_t ship_idx;
-    int8_t star_idx;
+    int16_t star_idx;
     int8_t officer_idx;
     int8_t leader_status;
     int8_t fate;
@@ -1587,7 +1587,7 @@ union s_MSG_colony_union {
 };
 
 struct s_MSG_colony {
-    uint8_t planet_idx;
+    int16_t planet_idx;
     int8_t subtype;
     union s_MSG_colony_union c;
 };
@@ -1617,7 +1617,7 @@ struct s_MSG_spy_assasination {
 };
 
 struct s_MSG_anomaly {
-    uint8_t star_idx;
+    int16_t star_idx;
 };
 
 union s_MSG_union {
@@ -1813,7 +1813,7 @@ struct s_player {
     int8_t n_times_established_contact[MAX_PLAYERS];
     sbyte within_range[MAX_PLAYERS];
     int8_t do_not_research;
-    int8_t offensive_stagepoint;
+    int16_t offensive_stagepoint;
     int8_t best_ftl_drive;
     uint8_t ship_speed;
     int8_t officer_for_hire;
@@ -2229,7 +2229,7 @@ typedef struct s_planet_data s_planet_data, *Ps_planet_data;
 
 struct s_planet_data {
     int16_t colony_index;
-    int8_t star_index;
+    int16_t star_index;
     int8_t orbit;
     int8_t planet_type;
     int8_t size;
@@ -2412,14 +2412,14 @@ typedef struct s_report_enemy_sabotage s_report_enemy_sabotage, *Ps_report_enemy
 
 struct s_report_enemy_sabotage {
     int16_t enemy_player_idx;
-    uint8_t planet_idx;
+    int16_t planet_idx;
     uint8_t building_id;
 };
 
 struct s_report_sabotage {
     int8_t framed_player_idx;
     uint8_t victim_player_idx;
-    uint8_t planet_idx;
+    int16_t planet_idx;
     uint8_t building_id;
 };
 
@@ -3060,7 +3060,7 @@ struct s_star_data {
     int8_t last_planet_selected[MAX_PLAYERS];
     int8_t black_hole_blocks[BITMAP(MAX_STARS)];
     int8_t system_special;
-    int8_t wormhole_star_id;
+    int16_t wormhole_star_id;
     uint8_t blockaded;
     uint8_t blockaded_by[MAX_PLAYERS];
     uint8_t visited;
@@ -3070,7 +3070,7 @@ struct s_star_data {
     int8_t colonize_player;
     uint8_t has_colony;
     uint8_t has_warp_field_interdictor;
-    uint8_t next_wfi_in_list;
+    int16_t next_wfi_in_list;
     uint8_t has_tachyon;
     uint8_t has_subspace;
     uint8_t has_stargate;

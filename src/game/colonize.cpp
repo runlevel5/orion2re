@@ -180,7 +180,7 @@ namespace COLONIZE {
 
                     s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_COLONY;
-                    msg.u.colony.planet_idx = (uint8_t)colony->planet; /* INDEX_NARROWING */
+                    msg.u.colony.planet_idx = colony->planet;
                     msg.u.colony.subtype = 0;
                     msg.u.colony.c.scrap.building_id = BUILDING_COLONY_BASE;
                     msg.u.colony.c.scrap.bc = refund16;
