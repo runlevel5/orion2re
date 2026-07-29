@@ -431,14 +431,29 @@ Example:
 
 ### Defaults
 
-`default` is a property of the value definition it initializes; defaults are not stored in a separate table. For a record field it appears beside `id` and `type` or `value`. For a parameter root it appears inside `value`. Defaults use logical schema values rather than C++ initializer strings, native enum spellings, or memory representations.
+`default` is a property of the parameter, record field, or array element it initializes; defaults are not stored in a separate table. It appears beside `type`. Defaults use logical schema values rather than C++ initializer strings, native enum spellings, or memory representations.
 
-Scalar defaults use the JSON5 representation appropriate to their type:
+Scalar defaults use the JSON5 representation appropriate to their type. Quoted semantic values are decoded by the referenced type, so defaults and CFG assignments use the same names and mask grammar:
 
 - booleans, integers, and strings use JSON5 scalars
 - enums use a quoted canonical value name, or a numeric ID when the enum permits numeric values
-- masks use an array of quoted flag names, or a numeric value when the mask permits it
+- masks use one quoted comma-separated string of canonical flag names, such as `"forward,aft"`; named zero or composite values such as `"none"` and `"all"` must be declared by the mask type
+- masks may use a numeric value when the mask permits numeric input; canonical schema defaults should prefer names
 - ratios use a quoted canonical ratio such as `"1/3"`
+
+For example, a weapon-slot default may be written as:
+
+```json5
+{
+  type: "missile",
+  arc: "forward,aft",
+  mods: "continuous",
+  ammo: 0,
+  amount: 2,
+}
+```
+
+Each string is checked against the selected field's type. It is not an untyped string stored in native state.
 
 Record defaults normally come from the defaults on their field definitions. A record value may instead declare a complete object default keyed by stable field ID when one use of a reusable record needs different values.
 
@@ -450,16 +465,14 @@ An array with one default for every element declares it on the `element` definit
     hit_threshold_fixed_value: {
       title: "Fixed hit threshold value",
       description: "The fixed term in the beam hit-threshold formula.",
-      value: {
-        type: "vtype_lucky_divisor",
-        default: 40,
-      },
+      type: "vtype_lucky_divisor",
+      default: 40,
     },
 
     anti_missile_rocket_chance_to_hit: {
       title: "Anti-missile rocket accuracy",
       description: "Terms used by the anti-missile rocket hit formula.",
-      value: {
+      type: {
         kind: "record",
         fields: [
           { id: "base", type: "uint8", default: 70 },
@@ -472,7 +485,7 @@ An array with one default for every element declares it on the `element` definit
     research_percent: {
       title: "Research percentages",
       description: "Research multipliers for all seven difficulty levels.",
-      value: {
+      type: {
         kind: "array",
         count: 7,
         index_base: 1,
@@ -486,13 +499,13 @@ An array with one default for every element declares it on the `element` definit
     terrain_food_bonus: {
       title: "Terrain food bonuses",
       description: "Food bonuses ordered by the terrain array's declared indexes.",
-      value: {
+      type: {
         kind: "array",
         count: 10,
         index_base: 0,
-        default: [0, 0, 0, 2, 2, 4, 4, 2, 4, 6],
         element: { type: "int8" },
       },
+      default: [0, 0, 0, 2, 2, 4, 4, 2, 4, 6],
     },
   },
 }
@@ -536,6 +549,7 @@ Generated documentation must not depend on comments adjacent to a declaration.
 
     weapon_id: {
       kind: "enum",
+      base_type: "uint8",
       allow_numeric: true,
       reject_unknown_numeric: true,
       values: {
@@ -552,6 +566,7 @@ Generated documentation must not depend on comments adjacent to a declaration.
 
     special_id: {
       kind: "enum",
+      base_type: "uint8",
       allow_numeric: true,
       reject_unknown_numeric: true,
       values: {
@@ -566,6 +581,10 @@ Generated documentation must not depend on comments adjacent to a declaration.
       kind: "mask",
       allow_numeric: true,
       reject_unknown_bits: true,
+      values: {
+        none: 0,
+        all: 15,
+      },
       flags: {
         forward: { value: 1, title: "Forward" },
         aft: { value: 2, title: "Aft" },
@@ -578,6 +597,9 @@ Generated documentation must not depend on comments adjacent to a declaration.
       kind: "mask",
       allow_numeric: true,
       reject_unknown_bits: true,
+      values: {
+        none: 0,
+      },
       flags: {
         heavy: {
           value: 0x0002,
@@ -672,7 +694,7 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
         symbol: "SHIPDATA::_guardian_design",
         cpp_type: "s_ship_design",
       },
-      value: {
+      type: {
         kind: "record",
         fields: [
           { id: "appearance", type: "ship_appearance_id", bind: ["appearance"] },
@@ -687,19 +709,19 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
             title: "Weapon slots",
             description: "The Guardian's five weapon slots in firing priority order.",
             bind: ["weapons"],
-            value: {
+            type: {
               kind: "array",
               count: 5,
               index_base: 1,
-              element: { record: "weapon_slot" },
-              default: [
-                { type: 11, arc: 15, mods: 2, ammo: 0, amount: 2 },
-                { type: 4, arc: 15, mods: 4, ammo: 0, amount: 10 },
-                { type: 20, arc: 15, mods: 17664, ammo: 0, amount: 1 },
-                { type: 20, arc: 15, mods: 17664, ammo: 0, amount: 1 },
-                { type: 13, arc: 15, mods: 0, ammo: 0, amount: 2 },
-              ],
+              element: { type: "weapon_slot" },
             },
+            default: [
+              { type: "plasma_cannon", arc: "all", mods: "heavy", ammo: 0, amount: 2 },
+              { type: "mass_driver", arc: "all", mods: "point_defense", ammo: 0, amount: 10 },
+              { type: 20, arc: 15, mods: 17664, ammo: 0, amount: 1 },
+              { type: 20, arc: 15, mods: 17664, ammo: 0, amount: 1 },
+              { type: 13, arc: "all", mods: "none", ammo: 0, amount: 2 },
+            ],
           },
 
           {
@@ -707,7 +729,7 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
             title: "Special systems",
             description: "Special systems installed on the Guardian.",
             bind: ["specials"],
-            value: {
+            type: {
               kind: "array",
               count: 8,
               index_base: 1,
@@ -775,6 +797,66 @@ A semantic alias refines a primitive or another alias without changing its stora
 
 Aliases provide reusable constraints, documentation, units, and stronger generated diagnostics. Use an enum instead when every valid identity has a stable finite catalog.
 
+### Field types
+
+Every parameter, record field, and array element has a `type`. The property has one of two forms:
+
+- a string references a previously defined built-in, alias, enum, mask, ratio, record, or other named type
+- an object defines the type directly using the same properties accepted by a named type definition
+
+Both forms have identical decoding, validation, binding, save, network, and documentation rules.
+
+For example, the design-screen CLEAR button behavior has a local three-value enum:
+
+```json5
+{
+  parameters: {
+    clear_button_computer: {
+      title: "CLEAR button computer behavior",
+      description: "Controls how the design-screen CLEAR button changes the selected computer.",
+      group: "interface",
+      bind_root: {
+        header: "game/config.h",
+        symbol: "config::clear_button_computer",
+        cpp_type: "uint8_t",
+      },
+      type: {
+        kind: "enum",
+        base_type: "uint8",
+        values: {
+          update: {
+            value: 0,
+            title: "Update",
+            description: "Select the best available computer.",
+          },
+          clear: {
+            value: 1,
+            title: "Clear",
+            description: "Remove the selected computer.",
+          },
+          intact: {
+            value: 2,
+            title: "Leave intact",
+            description: "Keep the currently selected computer.",
+          },
+        },
+      },
+      default: "update",
+    },
+  },
+}
+```
+
+The assignment remains semantic:
+
+```text
+clear_button_computer = update;
+```
+
+The decoder maps `update`, `clear`, and `intact` to integer values 0, 1, and 2. Generated binding code stores the selected value using the enum's `base_type`. An object-valued field type follows the same uniqueness, numeric-input, default-validation, save, network, and documentation rules as a referenced named type.
+
+Define a named type under `types` when the same domain is used by more than one field or is independently meaningful in generated APIs or documentation. Otherwise, define the type directly on the field.
+
 ### Field-level constraints
 
 A field may narrow, but never broaden, its referenced type:
@@ -813,6 +895,7 @@ Enums declare every recognized semantic value and its stable numeric identity.
 ```json5
 {
   kind: "enum",
+  base_type: "uint8",
   allow_numeric: true,
   reject_unknown_numeric: true,
   values: {
@@ -822,6 +905,8 @@ Enums declare every recognized semantic value and its stable numeric identity.
   },
 }
 ```
+
+`base_type` is required and must reference an integer primitive or integer alias capable of representing every declared value. It controls generated storage and native compatibility; it does not change the user-facing symbolic syntax.
 
 Policies are independent:
 
@@ -839,6 +924,9 @@ Masks declare every known bit:
   kind: "mask",
   allow_numeric: true,
   reject_unknown_bits: true,
+  values: {
+    none: 0,
+  },
   flags: {
     heavy: 0x0002,
     point_defense: 0x0004,
@@ -851,6 +939,14 @@ Symbolic masks use comma-separated names:
 ```text
 heavy,point_defense
 ```
+
+The same value is a quoted string in JSON5 because a comma is structural JSON5 syntax:
+
+```json5
+{ default: "heavy,point_defense" }
+```
+
+`values` declares canonical names for zero or useful composite masks. Its values must contain no unknown bits. A `values` entry may duplicate a combination of `flags`, but `flags` must still declare each independently addressable bit. Canonical output may use a declared composite name only when it represents the complete value; otherwise it emits the individual flag names in declaration order.
 
 ### Integers
 
