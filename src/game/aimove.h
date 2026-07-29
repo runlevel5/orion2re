@@ -79,7 +79,7 @@ namespace AIMOVE {
 
     void __cdecl Intercept_Invaders_();
 
-    void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate);
+    void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int16_t* star_to_intercept_idx, int is_desperate);
 
     void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count);
 
@@ -120,7 +120,7 @@ namespace AIMOVE {
 
     int __cdecl Gather_Player_Ships_At_Star_(int16_t player_id, int16_t star_id, int16_t* ships_list);
 
-    void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int8_t* intercept_map);
+    void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int16_t* intercept_map);
 
     void __cdecl Knock_Out_Impossible_Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int16_t* temp_arr, int* temp_count, int keep_one_entry);
 

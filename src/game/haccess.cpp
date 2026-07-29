@@ -600,7 +600,7 @@ namespace HACCESS {
         return MOX::_ship[ship_idx].location;
     }
 
-    int8_t __cdecl N_Star_Relocations_(int16_t player_idx) {
+    int16_t __cdecl N_Star_Relocations_(int16_t player_idx) {
         int16_t relocation_count = 0;
 
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
@@ -609,7 +609,7 @@ namespace HACCESS {
             }
         }
 
-        return (int8_t)relocation_count;
+        return relocation_count;
     }
 
     void __cdecl Clear_Star_Relocation_(int16_t star_idx, int16_t player_idx) {

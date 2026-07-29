@@ -3050,7 +3050,7 @@ namespace MAINSCR {
 
         case 6: /* DI = -1004 (Relocations) */
         {
-            int8_t reloc_count = HACCESS::N_Star_Relocations_(MOX::_PLAYER_NUM);
+            int16_t reloc_count = HACCESS::N_Star_Relocations_(MOX::_PLAYER_NUM);
             if (reloc_count > 1) {
                 if (MAINSCR::_merging_relocations != 0) {
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);

@@ -708,7 +708,7 @@ namespace AIMOVE {
         int32_t total_stage_weight = 0;
         int16_t num_stage_points = 0;
         int16_t num_ships = 0;
-        int8_t stage_point_map[MAX_STARS];
+        int16_t stage_point_map[MAX_STARS];
         s_ai_stage_point stage_points[MAX_STARS];
         int16_t ship_indices[MAX_SHIPS];
 
@@ -719,7 +719,7 @@ namespace AIMOVE {
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (_flee_stars[star_idx * 10 + 9] == 0) {
                 if ((MOX::_star[star_idx].is_stagepoint >> _i_ai) & 1) {
-                    stage_point_map[star_idx] = (int8_t)num_stage_points;
+                    stage_point_map[star_idx] = num_stage_points;
                     stage_points[num_stage_points].star_idx = star_idx;
                     stage_points[num_stage_points].strength = 0;
                     total_stage_weight += (*AIDATA::_star_stage_weights)[star_idx][_i_ai];
@@ -747,7 +747,7 @@ namespace AIMOVE {
                         num_ships++;
                     } else {
                         int16_t dest_star = SHIPMOVE::Ship_Destination_Star_(ship);
-                        int8_t sp_idx = stage_point_map[dest_star];
+                        int16_t sp_idx = stage_point_map[dest_star];
                         if (sp_idx != -1) {
                             stage_points[sp_idx].strength += (int16_t)Ship_Rough_Strength_At_Star_(ship_idx, dest_star);
                         }
@@ -1343,7 +1343,7 @@ namespace AIMOVE {
         }
     }
 
-    void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int8_t* intercept_map) {
+    void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int16_t* intercept_map) {
         *ship_count = 0;
 
         for (int32_t i = 0; i < (int32_t)AIDATA::_n_all_ships; ++i) {
@@ -1486,7 +1486,7 @@ namespace AIMOVE {
         }
     }
 
-    void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate) {
+    void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int16_t* star_to_intercept_idx, int is_desperate) {
         int num_intercepting_ships;
         int16_t intercepting_ships[MAX_SHIPS];
         int16_t knocked_out_stars[MAX_STARS];
@@ -1701,7 +1701,7 @@ namespace AIMOVE {
         intercepts[0].star_idx = -1;
         memset(intercepts, 0, sizeof(intercepts));
 
-        int8_t star_to_intercept_idx[MAX_STARS];
+        int16_t star_to_intercept_idx[MAX_STARS];
         memset(star_to_intercept_idx, -1, sizeof(star_to_intercept_idx));
 
         if (MOX::_NUM_STARS > 0)
