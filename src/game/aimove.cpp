@@ -689,7 +689,7 @@ namespace AIMOVE {
         }
 
         int total_attacks = 0;
-        int num_stars = MOX::_NUM_STARS;
+        int16_t num_stars = MOX::_NUM_STARS;
         for (int16_t i = 0; i < num_stars; ++i) {
             total_attacks += attacked_stars[i];
         }
@@ -712,7 +712,7 @@ namespace AIMOVE {
         s_ai_stage_point stage_points[MAX_STARS];
         int16_t ship_indices[MAX_SHIPS];
 
-        for (int i = 0; i < MAX_STARS; ++i) {
+        for (int16_t i = 0; i < MAX_STARS; ++i) {
             stage_point_map[i] = -1;
         }
 
@@ -1129,7 +1129,7 @@ namespace AIMOVE {
         uint8_t dest_turns_outpost[MAX_STARS];
         int16_t dest_star_arr[MAX_STARS];
 
-        for (int i = 0; i < MAX_STARS; i++) {
+        for (int16_t i = 0; i < MAX_STARS; i++) {
             dest_turns_colony[i] = 0;
             dest_turns_outpost[i] = 0;
             dest_star_arr[i] = -1;
@@ -1893,11 +1893,11 @@ namespace AIMOVE {
             puVar8 = &target_info_copy;
         }
 
-        for (int i = 0; i < MAX_STARS; i++) {
+        for (int16_t i = 0; i < MAX_STARS; i++) {
             visited_stars[i] = 0;
         }
 
-        for (int i = 0; i < MAX_COLONIES; i++) {
+        for (int16_t i = 0; i < MAX_COLONIES; i++) {
             scores[i] = 0;
         }
 
@@ -1978,7 +1978,7 @@ namespace AIMOVE {
         }
 
         if (valid_target_found && target_info == nullptr) {
-            for (int i = 0; i < MAX_COLONIES; i++) {
+            for (int16_t i = 0; i < MAX_COLONIES; i++) {
                 // Drop scores below 2/3 of maximum
                 if ((uint32_t)scores[i] * 3 < (uint32_t)max_score * 2) {
                     scores[i] = 0;
@@ -2494,7 +2494,7 @@ namespace AIMOVE {
 
         int32_t best_max_turn = 0x7FFF;
         int8_t success = 0;
-        int32_t best_colony_ship_idx = -1;
+        int16_t best_colony_ship_idx = -1;
         int32_t best_strategy = -1;
         int16_t best_dest = -1;
         int32_t best_num_escorts = -1;

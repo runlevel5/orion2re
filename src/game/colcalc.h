@@ -223,7 +223,7 @@ namespace COLCALC {
 
     int32_t __cdecl Sort_star_weights_(const void* a, const void* b);
 
-    int16_t __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode);
+    int16_t __cdecl Get_Surrender_System_(int16_t player_idx, int16_t target_player_idx, int16_t selection_mode);
 
     void __cdecl No_Op1_();
 
@@ -381,5 +381,5 @@ namespace COLCALC {
     void __cdecl Show_Command_Points_(int player_idx);
     int16_t __cdecl Get_System_Population_(int16_t player_idx, int16_t star_idx);
 
-    short __cdecl Get_Possible_Surrender_Systems_(short player_idx, short target_player_idx, int16_t *star_list);
+    int16_t __cdecl Get_Possible_Surrender_Systems_(int16_t player_idx, int16_t target_player_idx, int16_t *star_list);
 }

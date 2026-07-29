@@ -3018,10 +3018,10 @@ namespace COLCALC {
      * @param star_list Output array to store indices of eligible stars.
      * @return Number of eligible systems found.
      */
-    short __cdecl Get_Possible_Surrender_Systems_(short player_idx, short target_player_idx, int16_t *star_list) {
-        short result_count = 0;
-        short range = MOX::_player[target_player_idx].ship_range;
-        short colony_system_count = 0;
+    int16_t __cdecl Get_Possible_Surrender_Systems_(int16_t player_idx, int16_t target_player_idx, int16_t *star_list) {
+        int16_t result_count = 0;
+        int16_t range = MOX::_player[target_player_idx].ship_range;
+        int16_t colony_system_count = 0;
         
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
@@ -3067,7 +3067,7 @@ namespace COLCALC {
         return result_count;
     }
 
-    int16_t __cdecl Get_Surrender_System_(short player_idx, short target_player_idx, short selection_mode) {
+    int16_t __cdecl Get_Surrender_System_(int16_t player_idx, int16_t target_player_idx, int16_t selection_mode) {
         int16_t possible_stars[MAX_STARS];
         s_star_weight star_weights[MAX_STARS];
         int16_t result_star_idx = -1;
