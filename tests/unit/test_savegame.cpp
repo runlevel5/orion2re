@@ -286,13 +286,33 @@ namespace {
         MOX::_cur_map_y = 0;
     }
 
-    void Check_State_(const State_& expected, const State_& actual) {
-        DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies, sizeof(expected.colonies)) == 0);
-        DOCTEST_CHECK(memcmp(expected.planets, actual.planets, sizeof(expected.planets)) == 0);
-        DOCTEST_CHECK(memcmp(expected.stars, actual.stars, sizeof(expected.stars)) == 0);
+    bool Is_Zero_(const void* data, size_t size) {
+        const uint8_t* bytes = static_cast<const uint8_t*>(data);
+        for (size_t i = 0; i < size; ++i) {
+            if (bytes[i] != 0) return false;
+        }
+        return true;
+    }
+
+    void Check_Version_1_State_(const State_& expected, const State_& actual) {
+        DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
+                             MOX::_NUM_COLONIES * sizeof(*expected.colonies)) == 0);
+        DOCTEST_CHECK(Is_Zero_(&actual.colonies[MOX::_NUM_COLONIES],
+                               (MAX_COLONIES - MOX::_NUM_COLONIES) * sizeof(*actual.colonies)));
+        DOCTEST_CHECK(memcmp(expected.planets, actual.planets,
+                             MOX::_planet_count * sizeof(*expected.planets)) == 0);
+        DOCTEST_CHECK(Is_Zero_(&actual.planets[MOX::_planet_count],
+                               (MAX_PLANETS - MOX::_planet_count) * sizeof(*actual.planets)));
+        DOCTEST_CHECK(memcmp(expected.stars, actual.stars,
+                             MOX::_NUM_STARS * sizeof(*expected.stars)) == 0);
+        DOCTEST_CHECK(Is_Zero_(&actual.stars[MOX::_NUM_STARS],
+                               (MAX_STARS - MOX::_NUM_STARS) * sizeof(*actual.stars)));
         DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
         DOCTEST_CHECK(memcmp(expected.players, actual.players, sizeof(expected.players)) == 0);
-        DOCTEST_CHECK(memcmp(expected.ships, actual.ships, sizeof(expected.ships)) == 0);
+        DOCTEST_CHECK(memcmp(expected.ships, actual.ships,
+                             MOX::_NUM_SHIPS * sizeof(*expected.ships)) == 0);
+        DOCTEST_CHECK(Is_Zero_(&actual.ships[MOX::_NUM_SHIPS],
+                               (MAX_SHIPS - MOX::_NUM_SHIPS) * sizeof(*actual.ships)));
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
     }
 
@@ -375,7 +395,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     char description[37] = "Exhaustive save state";
     constexpr uint32_t random_seed = 0xCAFEBABE;
     SAVEGAME::Write_Game_(&writer, description, random_seed);
-    DOCTEST_CHECK(writer.Length_() == 208802);
+    DOCTEST_CHECK(writer.Length_() == 208182);
 
     FILE* legacy_file = fopen(SAVEGAME_TEST_DATA_DIR "/savegame_v0.sav", "rb");
     DOCTEST_REQUIRE(legacy_file != nullptr);
@@ -438,7 +458,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         DOCTEST_CHECK(loaded_seed == random_seed);
         DOCTEST_CHECK(memcmp(&loaded_settings, &expected_settings, sizeof(expected_settings)) == 0);
         if (format == 0) {
-            Check_State_(expected, actual);
+            Check_Version_1_State_(expected, actual);
             DOCTEST_CHECK(SETTLER::Get_Source_Colony(actual.players[0].settlers[0].val) == 0x1234);
             DOCTEST_CHECK(SETTLER::Get_Dest_Planet(actual.players[0].settlers[0].val) == 0x2345);
         } else {

@@ -1022,8 +1022,18 @@ namespace oracle {
             return PREPARE_READY;
         }
 
-        const char* Describe_Save_Offset_(size_t difference_offset, size_t* block_offset) {
-            const s_save_block blocks[] = {
+        bool Read_Save_Count_(const std::vector<uint8_t>& save, size_t offset,
+            int16_t maximum, int16_t* count) {
+            if (offset + sizeof(*count) > save.size()) {
+                return false;
+            }
+            memcpy(count, save.data() + offset, sizeof(*count));
+            return *count >= 0 && *count <= maximum;
+        }
+
+        const char* Describe_Save_Offset_(const std::vector<uint8_t>& save,
+            size_t difference_offset, size_t* block_offset) {
+            std::vector<s_save_block> blocks = {
                 {"save header", sizeof(uint32_t)},
                 {"save description", sizeof(MOX::_save_game_description[0].description)},
                 {"stardate", sizeof(MOX::_stardate)},
@@ -1032,16 +1042,65 @@ namespace oracle {
                 {"settings", sizeof(MOX::_settings)},
                 {"random seed", sizeof(uint32_t)},
                 {"colony count", sizeof(MOX::_NUM_COLONIES)},
-                {"colonies", sizeof(s_colony) * MAX_COLONIES},
-                {"planet count", sizeof(MOX::_planet_count)},
-                {"planets", sizeof(s_planet_data) * MAX_PLANETS},
-                {"star count", sizeof(MOX::_NUM_STARS)},
-                {"stars", sizeof(s_star_data) * MAX_STARS},
-                {"leaders", sizeof(s_leader_data) * MAX_LEADERS},
-                {"player count", sizeof(MOX::_NUM_PLAYERS)},
-                {"players", sizeof(s_player) * MAX_PLAYERS},
-                {"ship count", sizeof(MOX::_NUM_SHIPS)},
-                {"ships", sizeof(s_ship_data) * MAX_SHIPS},
+            };
+
+            size_t count_offset = 0;
+            for (const s_save_block& block : blocks) {
+                count_offset += block.size;
+            }
+            count_offset -= sizeof(MOX::_NUM_COLONIES);
+
+            int16_t colony_count;
+            if (!Read_Save_Count_(save, count_offset, MAX_COLONIES,
+                    &colony_count)) {
+                *block_offset = difference_offset;
+                return "invalid save layout";
+            }
+            blocks.push_back({"colonies",
+                sizeof(s_colony) * static_cast<size_t>(colony_count)});
+            count_offset += sizeof(MOX::_NUM_COLONIES) +
+                sizeof(s_colony) * static_cast<size_t>(colony_count);
+            blocks.push_back({"planet count", sizeof(MOX::_planet_count)});
+
+            int16_t planet_count;
+            if (!Read_Save_Count_(save, count_offset, MAX_PLANETS,
+                    &planet_count)) {
+                *block_offset = difference_offset;
+                return "invalid save layout";
+            }
+            blocks.push_back({"planets",
+                sizeof(s_planet_data) * static_cast<size_t>(planet_count)});
+            count_offset += sizeof(MOX::_planet_count) +
+                sizeof(s_planet_data) * static_cast<size_t>(planet_count);
+            blocks.push_back({"star count", sizeof(MOX::_NUM_STARS)});
+
+            int16_t star_count;
+            if (!Read_Save_Count_(save, count_offset, MAX_STARS,
+                    &star_count)) {
+                *block_offset = difference_offset;
+                return "invalid save layout";
+            }
+            blocks.push_back({"stars",
+                sizeof(s_star_data) * static_cast<size_t>(star_count)});
+            blocks.push_back({"leaders", sizeof(s_leader_data) * MAX_LEADERS});
+            blocks.push_back({"player count", sizeof(MOX::_NUM_PLAYERS)});
+            blocks.push_back({"players", sizeof(s_player) * MAX_PLAYERS});
+
+            count_offset += sizeof(MOX::_NUM_STARS) +
+                sizeof(s_star_data) * static_cast<size_t>(star_count) +
+                sizeof(s_leader_data) * MAX_LEADERS +
+                sizeof(MOX::_NUM_PLAYERS) + sizeof(s_player) * MAX_PLAYERS;
+            blocks.push_back({"ship count", sizeof(MOX::_NUM_SHIPS)});
+
+            int16_t ship_count;
+            if (!Read_Save_Count_(save, count_offset, MAX_SHIPS,
+                    &ship_count)) {
+                *block_offset = difference_offset;
+                return "invalid save layout";
+            }
+            blocks.push_back({"ships",
+                sizeof(s_ship_data) * static_cast<size_t>(ship_count)});
+            const s_save_block trailing_blocks[] = {
                 {"moveable boxes", sizeof(MOX::_moveable_box[0]) * 5},
                 {"moveable box order", sizeof(MOX::_moveable_box_order[0]) * 5},
                 {"player number", sizeof(MOX::_PLAYER_NUM)},
@@ -1079,6 +1138,8 @@ namespace oracle {
                 {"current map y", sizeof(MOX::_cur_map_y)},
                 {"save padding", 1000},
             };
+            blocks.insert(blocks.end(), std::begin(trailing_blocks),
+                std::end(trailing_blocks));
 
             size_t start = 0;
             for (const s_save_block& block : blocks) {
@@ -1097,38 +1158,12 @@ namespace oracle {
             constexpr size_t version_offset =
                 sizeof(uint32_t) + sizeof(MOX::_save_game_description[0].description) +
                 sizeof(MOX::_stardate) + sizeof(MOX::_game_type);
-            constexpr size_t players_offset =
-                version_offset + sizeof(uint16_t) + sizeof(MOX::_settings) +
-                sizeof(uint32_t) + sizeof(MOX::_NUM_COLONIES) +
-                sizeof(s_colony) * MAX_COLONIES + sizeof(MOX::_planet_count) +
-                sizeof(s_planet_data) * MAX_PLANETS + sizeof(MOX::_NUM_STARS) +
-                sizeof(s_star_data) * MAX_STARS +
-                sizeof(s_leader_data) * MAX_LEADERS + sizeof(MOX::_NUM_PLAYERS);
             constexpr size_t settler_count =
                 sizeof(s_player::settlers) / sizeof(s_player::settlers[0]);
             constexpr size_t legacy_settlers_size =
                 settler_count * sizeof(SETTLER::legacy_value_type);
             constexpr size_t legacy_player_size =
                 sizeof(s_player) - sizeof(s_player::settlers) + legacy_settlers_size;
-            constexpr size_t ships_offset = players_offset +
-                sizeof(s_player) * MAX_PLAYERS + sizeof(MOX::_NUM_SHIPS);
-            constexpr size_t legacy_ships_size =
-                sizeof(s_ship_data) * ORIGINAL_MAX_SHIPS;
-            constexpr size_t messages_offset = ships_offset +
-                sizeof(s_ship_data) * MAX_SHIPS +
-                sizeof(MOX::_moveable_box[0]) * 5 +
-                sizeof(MOX::_moveable_box_order[0]) * 5 +
-                sizeof(MOX::_PLAYER_NUM) + sizeof(MOX::_max_map_scale) +
-                sizeof(MOX::_max_zoom_count) + sizeof(MOX::_star_bg_index) +
-                sizeof(MOX::_MAP_MAX_X) + sizeof(MOX::_MAP_MAX_Y) +
-                sizeof(MOX::_fleet_icon_button_count) +
-                sizeof(*MOX::_nebula) * MAX_NEBULAS +
-                sizeof(MOX::_NUM_NEBULAS) + sizeof(MOX::_bill_savegame) +
-                sizeof(REPORT::_n_reports) + sizeof(REPORT::_reports) +
-                sizeof(REPORT::_done_player_reports) +
-                sizeof(REPORT::_something_interesting_happened) +
-                sizeof(REPORT::_done_colonize_check) +
-                sizeof(EVENTS::_event_data[0]) * 36;
             if (save->size() < sizeof(uint32_t)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: save '%s' is too small", path);
@@ -1162,8 +1197,7 @@ namespace oracle {
             if (version == SAVEGAME::CURRENT_VERSION) {
                 return true;
             }
-            if (version != 0 ||
-                save->size() < players_offset + MAX_PLAYERS * legacy_player_size) {
+            if (version != 0) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: save '%s' uses unsupported comparison version %u",
                     path, static_cast<unsigned>(version));
@@ -1172,15 +1206,74 @@ namespace oracle {
 
             std::vector<uint8_t> canonical;
             canonical.reserve(save->size() +
-                MAX_PLAYERS * (sizeof(s_player) - legacy_player_size) +
-                (MAX_SHIPS - ORIGINAL_MAX_SHIPS) * sizeof(s_ship_data));
+                MAX_PLAYERS * (sizeof(s_player) - legacy_player_size));
+            const size_t state_offset = version_offset + sizeof(uint16_t) +
+                sizeof(MOX::_settings) + sizeof(uint32_t);
+            if (state_offset > save->size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' is truncated before game state", path);
+                return false;
+            }
             canonical.insert(canonical.end(), save->begin(),
-                save->begin() + players_offset);
+                save->begin() + state_offset);
 
-            size_t legacy_player_offset = players_offset;
+            size_t source_offset = state_offset;
+            auto append_counted_records = [&](int16_t maximum,
+                size_t element_size, const char* block_name) {
+                int16_t count;
+                if (!Read_Save_Count_(*save, source_offset, maximum, &count)) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: version 0 save '%s' has an invalid %s count", path,
+                        block_name);
+                    return false;
+                }
+                const size_t records_offset = source_offset + sizeof(count);
+                const size_t legacy_size = element_size *
+                    static_cast<size_t>(maximum);
+                if (records_offset + legacy_size > save->size()) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: version 0 save '%s' has a truncated %s block", path,
+                        block_name);
+                    return false;
+                }
+                canonical.insert(canonical.end(), save->begin() + source_offset,
+                    save->begin() + records_offset +
+                        element_size * static_cast<size_t>(count));
+                source_offset = records_offset + legacy_size;
+                return true;
+            };
+
+            if (!append_counted_records(MAX_COLONIES, sizeof(s_colony),
+                    "colony") ||
+                !append_counted_records(MAX_PLANETS, sizeof(s_planet_data),
+                    "planet") ||
+                !append_counted_records(MAX_STARS, sizeof(s_star_data),
+                    "star")) {
+                return false;
+            }
+
+            const size_t leaders_and_player_count_size =
+                sizeof(s_leader_data) * MAX_LEADERS + sizeof(MOX::_NUM_PLAYERS);
+            if (source_offset + leaders_and_player_count_size > save->size()) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has a truncated leader block", path);
+                return false;
+            }
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset + leaders_and_player_count_size);
+            source_offset += leaders_and_player_count_size;
+
             for (size_t player_idx = 0; player_idx < MAX_PLAYERS; ++player_idx) {
+                const size_t legacy_player_offset = source_offset;
                 const size_t legacy_settlers_offset = legacy_player_offset +
                     offsetof(s_player, settlers);
+                const size_t legacy_player_end =
+                    legacy_player_offset + legacy_player_size;
+                if (legacy_player_end > save->size()) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                        "oracle: version 0 save '%s' has a truncated player block", path);
+                    return false;
+                }
                 canonical.insert(canonical.end(),
                     save->begin() + legacy_player_offset,
                     save->begin() + legacy_settlers_offset);
@@ -1200,26 +1293,40 @@ namespace oracle {
                         settler_bytes + sizeof(settler));
                 }
 
-                const size_t legacy_player_end =
-                    legacy_player_offset + legacy_player_size;
                 canonical.insert(canonical.end(),
                     save->begin() + legacy_settlers_offset +
                         legacy_settlers_size,
                     save->begin() + legacy_player_end);
-                legacy_player_offset = legacy_player_end;
+                source_offset = legacy_player_end;
             }
 
-            canonical.insert(canonical.end(),
-                save->begin() + legacy_player_offset, save->end());
-            if (canonical.size() < ships_offset + legacy_ships_size) {
+            int16_t ship_count;
+            if (!Read_Save_Count_(*save, source_offset, ORIGINAL_MAX_SHIPS,
+                    &ship_count)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has an invalid ship count", path);
+                return false;
+            }
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset + sizeof(ship_count));
+            source_offset += sizeof(ship_count);
+            const size_t legacy_ships_size =
+                sizeof(s_ship_data) * ORIGINAL_MAX_SHIPS;
+            if (source_offset + legacy_ships_size > save->size()) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has a truncated ship block", path);
                 return false;
             }
-            canonical.insert(canonical.begin() + ships_offset + legacy_ships_size,
-                (MAX_SHIPS - ORIGINAL_MAX_SHIPS) * sizeof(s_ship_data), 0);
+            const size_t ships_offset = canonical.size();
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->begin() + source_offset +
+                    sizeof(s_ship_data) * static_cast<size_t>(ship_count));
+            source_offset += legacy_ships_size;
+            canonical.insert(canonical.end(), save->begin() + source_offset,
+                save->end());
 
-            for (size_t ship_idx = 0; ship_idx < MAX_SHIPS; ++ship_idx) {
+            for (size_t ship_idx = 0;
+                ship_idx < static_cast<size_t>(ship_count); ++ship_idx) {
                 const size_t location_offset = ships_offset +
                     ship_idx * sizeof(s_ship_data) + offsetof(s_ship_data, location);
                 int16_t location;
@@ -1228,6 +1335,21 @@ namespace oracle {
                 memcpy(canonical.data() + location_offset, &location, sizeof(location));
             }
 
+            const size_t messages_offset = ships_offset +
+                sizeof(s_ship_data) * static_cast<size_t>(ship_count) +
+                sizeof(MOX::_moveable_box[0]) * 5 +
+                sizeof(MOX::_moveable_box_order[0]) * 5 +
+                sizeof(MOX::_PLAYER_NUM) + sizeof(MOX::_max_map_scale) +
+                sizeof(MOX::_max_zoom_count) + sizeof(MOX::_star_bg_index) +
+                sizeof(MOX::_MAP_MAX_X) + sizeof(MOX::_MAP_MAX_Y) +
+                sizeof(MOX::_fleet_icon_button_count) +
+                sizeof(*MOX::_nebula) * MAX_NEBULAS +
+                sizeof(MOX::_NUM_NEBULAS) + sizeof(MOX::_bill_savegame) +
+                sizeof(REPORT::_n_reports) + sizeof(REPORT::_reports) +
+                sizeof(REPORT::_done_player_reports) +
+                sizeof(REPORT::_something_interesting_happened) +
+                sizeof(REPORT::_done_colonize_check) +
+                sizeof(EVENTS::_event_data[0]) * 36;
             if (canonical.size() < messages_offset + sizeof(MSG_::_msgs)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has a truncated message block", path);
@@ -1270,7 +1392,8 @@ namespace oracle {
             size_t difference,
             const char** rule_name) {
             size_t block_offset = 0;
-            const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            const char* block_name = Describe_Save_Offset_(*actual, difference,
+                &block_offset);
             if (strcmp(block_name, "save description") == 0) {
                 constexpr size_t auto_save_length = sizeof(FILEDEF::s_Auto_Save_00556938) - 1;
                 const size_t description_offset = difference - block_offset;
@@ -2231,7 +2354,8 @@ namespace oracle {
 
                 ++applied_cleanup_count;
                 size_t cleanup_block_offset;
-                const char* cleanup_block_name = Describe_Save_Offset_(difference, &cleanup_block_offset);
+                const char* cleanup_block_name = Describe_Save_Offset_(actual,
+                    difference, &cleanup_block_offset);
                 char cleanup_field_description[128] = {};
                 if (strcmp(cleanup_block_name, "messages") == 0) {
                     Describe_Message_Offset_(cleanup_block_offset,
@@ -2267,7 +2391,8 @@ namespace oracle {
             }
 
             size_t block_offset;
-            const char* block_name = Describe_Save_Offset_(difference, &block_offset);
+            const char* block_name = Describe_Save_Offset_(actual, difference,
+                &block_offset);
             char field_description[128] = {};
             if (strcmp(block_name, "colonies") == 0) {
                 Describe_Colony_Offset_(block_offset, field_description, sizeof(field_description));

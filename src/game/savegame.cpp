@@ -1320,16 +1320,16 @@ namespace SAVEGAME {
             Write_Settings_(writer, settings);
             writer->Write_Uint32_(random_seed);
             writer->Write_Int16_(MOX::_NUM_COLONIES);
-            for (int i = 0; i < MAX_COLONIES; ++i) Write_Colony_(writer, &MOX::_colony[i]);
+            for (int i = 0; i < MOX::_NUM_COLONIES; ++i) Write_Colony_(writer, &MOX::_colony[i]);
             writer->Write_Int16_(MOX::_planet_count);
-            for (int i = 0; i < MAX_PLANETS; ++i) Write_Planet_(writer, &MOX::_planet[i]);
+            for (int i = 0; i < MOX::_planet_count; ++i) Write_Planet_(writer, &MOX::_planet[i]);
             writer->Write_Int16_(MOX::_NUM_STARS);
-            for (int i = 0; i < MAX_STARS; ++i) Write_Star_(writer, &MOX::_star[i]);
+            for (int i = 0; i < MOX::_NUM_STARS; ++i) Write_Star_(writer, &MOX::_star[i]);
             for (int i = 0; i < MAX_LEADERS; ++i) Write_Leader_(writer, &MOX::_leaders[i]);
             writer->Write_Int16_(MOX::_NUM_PLAYERS);
             for (int i = 0; i < MAX_PLAYERS; ++i) Write_Player_(writer, &MOX::_player[i]);
             writer->Write_Int16_(MOX::_NUM_SHIPS);
-            for (int i = 0; i < MAX_SHIPS; ++i) Write_Ship_(writer, &MOX::_ship[i]);
+            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) Write_Ship_(writer, &MOX::_ship[i]);
             for (int i = 0; i < 5; ++i) Write_Movable_Box_(writer, &MOX::_moveable_box[i]);
             Write_Int16_Array_(writer, MOX::_moveable_box_order, 5);
             writer->Write_Int16_(MOX::_PLAYER_NUM);
@@ -1368,22 +1368,36 @@ namespace SAVEGAME {
             Write_Zeroes_(writer, 1000);
         }
 
-        void Read_Game_State_(SERIAL::Reader_* reader, uint16_t version, s_settings* settings, uint32_t* random_seed) {
+        bool Read_Game_State_(SERIAL::Reader_* reader, uint16_t version, s_settings* settings, uint32_t* random_seed) {
             Read_Settings_(reader, settings);
             *random_seed = reader->Read_Uint32_();
             MOX::_NUM_COLONIES = reader->Read_Int16_();
-            for (int i = 0; i < MAX_COLONIES; ++i) Read_Colony_(reader, &MOX::_colony[i]);
+            if (MOX::_NUM_COLONIES < 0 || MOX::_NUM_COLONIES > MAX_COLONIES) return false;
+            const int colony_record_count = version == LEGACY_VERSION ? MAX_COLONIES : MOX::_NUM_COLONIES;
+            for (int i = 0; i < colony_record_count; ++i) Read_Colony_(reader, &MOX::_colony[i]);
+            memset(&MOX::_colony[colony_record_count], 0,
+                   (MAX_COLONIES - colony_record_count) * sizeof(*MOX::_colony));
             MOX::_planet_count = reader->Read_Int16_();
-            for (int i = 0; i < MAX_PLANETS; ++i) Read_Planet_(reader, &MOX::_planet[i]);
+            if (MOX::_planet_count < 0 || MOX::_planet_count > MAX_PLANETS) return false;
+            const int planet_record_count = version == LEGACY_VERSION ? MAX_PLANETS : MOX::_planet_count;
+            for (int i = 0; i < planet_record_count; ++i) Read_Planet_(reader, &MOX::_planet[i]);
+            memset(&MOX::_planet[planet_record_count], 0,
+                   (MAX_PLANETS - planet_record_count) * sizeof(*MOX::_planet));
             MOX::_NUM_STARS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_STARS; ++i) Read_Star_(reader, &MOX::_star[i]);
+            if (MOX::_NUM_STARS < 0 || MOX::_NUM_STARS > MAX_STARS) return false;
+            const int star_record_count = version == LEGACY_VERSION ? MAX_STARS : MOX::_NUM_STARS;
+            for (int i = 0; i < star_record_count; ++i) Read_Star_(reader, &MOX::_star[i]);
+            memset(&MOX::_star[star_record_count], 0,
+                   (MAX_STARS - star_record_count) * sizeof(*MOX::_star));
             for (int i = 0; i < MAX_LEADERS; ++i) Read_Leader_(reader, &MOX::_leaders[i]);
             MOX::_NUM_PLAYERS = reader->Read_Int16_();
             for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i], version);
             MOX::_NUM_SHIPS = reader->Read_Int16_();
-            const int ship_capacity = version == LEGACY_VERSION ? ORIGINAL_MAX_SHIPS : MAX_SHIPS;
-            for (int i = 0; i < ship_capacity; ++i) Read_Ship_(reader, &MOX::_ship[i], version);
-            for (int i = ship_capacity; i < MAX_SHIPS; ++i) memset(&MOX::_ship[i], 0, sizeof(MOX::_ship[i]));
+            if (MOX::_NUM_SHIPS < 0 || MOX::_NUM_SHIPS > MAX_SHIPS) return false;
+            const int ship_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_SHIPS : MOX::_NUM_SHIPS;
+            for (int i = 0; i < ship_record_count; ++i) Read_Ship_(reader, &MOX::_ship[i], version);
+            memset(&MOX::_ship[ship_record_count], 0,
+                   (MAX_SHIPS - ship_record_count) * sizeof(*MOX::_ship));
             for (int i = 0; i < 5; ++i) Read_Movable_Box_(reader, &MOX::_moveable_box[i]);
             Read_Int16_Array_(reader, MOX::_moveable_box_order, 5);
             MOX::_PLAYER_NUM = reader->Read_Int16_();
@@ -1420,6 +1434,7 @@ namespace SAVEGAME {
             MOX::_cur_map_x = reader->Read_Int16_();
             MOX::_cur_map_y = reader->Read_Int16_();
             reader->Skip_(1000);
+            return true;
         }
     }
 
@@ -1458,7 +1473,6 @@ namespace SAVEGAME {
         metadata->version = metadata->header == LEGACY_HEADER ? LEGACY_VERSION : reader->Read_Uint16_();
         if (metadata->version > CURRENT_VERSION) return false;
 
-        Read_Game_State_(reader, metadata->version, saved_settings, random_seed);
-        return true;
+        return Read_Game_State_(reader, metadata->version, saved_settings, random_seed);
     }
 }
