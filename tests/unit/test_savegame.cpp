@@ -301,10 +301,35 @@ namespace {
         DOCTEST_CHECK(memcmp(expected.planets, actual.planets, sizeof(expected.planets)) == 0);
         DOCTEST_CHECK(memcmp(expected.stars, actual.stars, sizeof(expected.stars)) == 0);
         DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
-        DOCTEST_CHECK(memcmp(expected.ships, actual.ships, sizeof(expected.ships)) == 0);
+        int converted_locations = 0;
+        for (int i = 0; i < ORIGINAL_MAX_SHIPS; ++i) {
+            s_ship_data expected_ship = expected.ships[i];
+            const int16_t old_location = expected_ship.location;
+            expected_ship.location = SAVEGAME::Convert_Legacy_Ship_Location_(old_location);
+            converted_locations += expected_ship.location != old_location;
+            DOCTEST_CHECK(memcmp(&expected_ship, &actual.ships[i], sizeof(expected_ship)) == 0);
+        }
+        for (int i = ORIGINAL_MAX_SHIPS; i < MAX_SHIPS; ++i) {
+            const s_ship_data empty_ship = {};
+            DOCTEST_CHECK(memcmp(&empty_ship, &actual.ships[i], sizeof(empty_ship)) == 0);
+        }
+        DOCTEST_CHECK(converted_locations > 0);
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
     }
 
+}
+
+DOCTEST_TEST_CASE("version 0 ship locations migrate to 5000-based ranges") {
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(-1) == -1);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(71) == 71);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(499) == 499);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(500) == SHIP_LOCATION_MOVING_OFFSET);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(571) == SHIP_LOCATION_MOVING_OFFSET + 71);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(999) == SHIP_LOCATION_MOVING_OFFSET + 499);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(1000) == SHIP_LOCATION_WORMHOLE_OFFSET);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(1071) == SHIP_LOCATION_WORMHOLE_OFFSET + 71);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(1499) == SHIP_LOCATION_WORMHOLE_OFFSET + 499);
+    DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(1500) == 1500);
 }
 
 DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persisted state") {

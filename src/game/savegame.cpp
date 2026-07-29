@@ -13,7 +13,8 @@ namespace SAVEGAME {
         static_assert(MAX_STARS == 72, "save version 0 requires 72 stars");
         static_assert(MAX_PLANETS == 360, "save version 0 requires 360 planets");
         static_assert(MAX_COLONIES == 250, "save version 0 requires 250 colonies");
-        static_assert(MAX_SHIPS == 500, "save version 0 requires 500 ships");
+        static_assert(ORIGINAL_MAX_SHIPS == 500, "save version 0 requires 500 ships");
+        static_assert(MAX_SHIPS >= ORIGINAL_MAX_SHIPS, "ship capacity cannot load version 0 saves");
         static_assert(offsetof(s_settings, version) == 0xE2, "settings version offset mismatch");
 
         void Write_Zeroes_(SERIAL::Writer_* writer, size_t size) {
@@ -829,11 +830,14 @@ namespace SAVEGAME {
             writer->Write_Int8_(ship->just_built);
         }
 
-        void Read_Ship_(SERIAL::Reader_* reader, s_ship_data* ship) {
+        void Read_Ship_(SERIAL::Reader_* reader, s_ship_data* ship, uint16_t version) {
             Read_Ship_Design_(reader, &ship->d);
             ship->owner = reader->Read_Int8_();
             ship->status = reader->Read_Int8_();
             ship->location = reader->Read_Int16_();
+            if (version == LEGACY_VERSION) {
+                ship->location = Convert_Legacy_Ship_Location_(ship->location);
+            }
             ship->x = reader->Read_Int16_();
             ship->y = reader->Read_Int16_();
             ship->group_has_navigator = reader->Read_Int8_();
@@ -1173,7 +1177,7 @@ namespace SAVEGAME {
             writer->Write_Bytes_(reinterpret_cast<const uint8_t*>(message) + 10, 8);
         }
 
-        void Read_Message_(SERIAL::Reader_* reader, s_MSG* message) {
+        void Read_Message_(SERIAL::Reader_* reader, s_MSG* message, uint16_t version) {
             message->msg_type = reader->Read_Int8_();
             message->priority = reader->Read_Uint8_();
             memset(&message->u, 0, sizeof(message->u));
@@ -1201,6 +1205,9 @@ namespace SAVEGAME {
                 break;
             case MSG_TYPE_SCRAP_SHIP:
                 message->u.scrap_ship.where = reader->Read_Int16_();
+                if (version == LEGACY_VERSION) {
+                    message->u.scrap_ship.where = Convert_Legacy_Ship_Location_(message->u.scrap_ship.where);
+                }
                 message->u.scrap_ship.bc = reader->Read_Int16_();
                 message->u.scrap_ship.ship_idx = reader->Read_Int16_();
                 reader->Skip_(2);
@@ -1374,7 +1381,9 @@ namespace SAVEGAME {
             MOX::_NUM_PLAYERS = reader->Read_Int16_();
             for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i], version);
             MOX::_NUM_SHIPS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_SHIPS; ++i) Read_Ship_(reader, &MOX::_ship[i]);
+            const int ship_capacity = version == LEGACY_VERSION ? ORIGINAL_MAX_SHIPS : MAX_SHIPS;
+            for (int i = 0; i < ship_capacity; ++i) Read_Ship_(reader, &MOX::_ship[i], version);
+            for (int i = ship_capacity; i < MAX_SHIPS; ++i) memset(&MOX::_ship[i], 0, sizeof(MOX::_ship[i]));
             for (int i = 0; i < 5; ++i) Read_Movable_Box_(reader, &MOX::_moveable_box[i]);
             Read_Int16_Array_(reader, MOX::_moveable_box_order, 5);
             MOX::_PLAYER_NUM = reader->Read_Int16_();
@@ -1393,7 +1402,7 @@ namespace SAVEGAME {
             reader->Read_Bytes_(REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened));
             reader->Read_Bytes_(REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check));
             for (int i = 0; i < 36; ++i) Read_Event_(reader, &EVENTS::_event_data[i]);
-            for (int i = 0; i < MAX_MESSAGES; ++i) Read_Message_(reader, &MSG_::_msgs[i]);
+            for (int i = 0; i < MAX_MESSAGES; ++i) Read_Message_(reader, &MSG_::_msgs[i], version);
             reader->Read_Bytes_(MSG_::_first_msg, sizeof(MSG_::_first_msg));
             reader->Read_Bytes_(MSG_::_max_msgs, sizeof(MSG_::_max_msgs));
             reader->Read_Bytes_(MSG_::_n_msgs, sizeof(MSG_::_n_msgs));
@@ -1412,6 +1421,20 @@ namespace SAVEGAME {
             MOX::_cur_map_y = reader->Read_Int16_();
             reader->Skip_(1000);
         }
+    }
+
+    int16_t Convert_Legacy_Ship_Location_(int16_t location) {
+        constexpr int16_t legacy_moving_offset = ORIGINAL_MAX_SHIPS;
+        constexpr int16_t legacy_wormhole_offset = ORIGINAL_MAX_SHIPS * 2;
+        constexpr int16_t legacy_location_limit = ORIGINAL_MAX_SHIPS * 3;
+
+        if (location >= legacy_moving_offset && location < legacy_wormhole_offset) {
+            return location - legacy_moving_offset + SHIP_LOCATION_MOVING_OFFSET;
+        }
+        if (location >= legacy_wormhole_offset && location < legacy_location_limit) {
+            return location - legacy_wormhole_offset + SHIP_LOCATION_WORMHOLE_OFFSET;
+        }
+        return location;
     }
 
     void Write_Game_(SERIAL::Writer_* writer, const char* description, uint32_t random_seed) {

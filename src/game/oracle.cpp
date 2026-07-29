@@ -1110,6 +1110,25 @@ namespace oracle {
                 settler_count * sizeof(SETTLER::legacy_value_type);
             constexpr size_t legacy_player_size =
                 sizeof(s_player) - sizeof(s_player::settlers) + legacy_settlers_size;
+            constexpr size_t ships_offset = players_offset +
+                sizeof(s_player) * MAX_PLAYERS + sizeof(MOX::_NUM_SHIPS);
+            constexpr size_t legacy_ships_size =
+                sizeof(s_ship_data) * ORIGINAL_MAX_SHIPS;
+            constexpr size_t messages_offset = ships_offset +
+                sizeof(s_ship_data) * MAX_SHIPS +
+                sizeof(MOX::_moveable_box[0]) * 5 +
+                sizeof(MOX::_moveable_box_order[0]) * 5 +
+                sizeof(MOX::_PLAYER_NUM) + sizeof(MOX::_max_map_scale) +
+                sizeof(MOX::_max_zoom_count) + sizeof(MOX::_star_bg_index) +
+                sizeof(MOX::_MAP_MAX_X) + sizeof(MOX::_MAP_MAX_Y) +
+                sizeof(MOX::_fleet_icon_button_count) +
+                sizeof(*MOX::_nebula) * MAX_NEBULAS +
+                sizeof(MOX::_NUM_NEBULAS) + sizeof(MOX::_bill_savegame) +
+                sizeof(REPORT::_n_reports) + sizeof(REPORT::_reports) +
+                sizeof(REPORT::_done_player_reports) +
+                sizeof(REPORT::_something_interesting_happened) +
+                sizeof(REPORT::_done_colonize_check) +
+                sizeof(EVENTS::_event_data[0]) * 36;
             if (save->size() < sizeof(uint32_t)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: save '%s' is too small", path);
@@ -1153,7 +1172,8 @@ namespace oracle {
 
             std::vector<uint8_t> canonical;
             canonical.reserve(save->size() +
-                MAX_PLAYERS * (sizeof(s_player) - legacy_player_size));
+                MAX_PLAYERS * (sizeof(s_player) - legacy_player_size) +
+                (MAX_SHIPS - ORIGINAL_MAX_SHIPS) * sizeof(s_ship_data));
             canonical.insert(canonical.end(), save->begin(),
                 save->begin() + players_offset);
 
@@ -1191,6 +1211,42 @@ namespace oracle {
 
             canonical.insert(canonical.end(),
                 save->begin() + legacy_player_offset, save->end());
+            if (canonical.size() < ships_offset + legacy_ships_size) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has a truncated ship block", path);
+                return false;
+            }
+            canonical.insert(canonical.begin() + ships_offset + legacy_ships_size,
+                (MAX_SHIPS - ORIGINAL_MAX_SHIPS) * sizeof(s_ship_data), 0);
+
+            for (size_t ship_idx = 0; ship_idx < MAX_SHIPS; ++ship_idx) {
+                const size_t location_offset = ships_offset +
+                    ship_idx * sizeof(s_ship_data) + offsetof(s_ship_data, location);
+                int16_t location;
+                memcpy(&location, canonical.data() + location_offset, sizeof(location));
+                location = SAVEGAME::Convert_Legacy_Ship_Location_(location);
+                memcpy(canonical.data() + location_offset, &location, sizeof(location));
+            }
+
+            if (canonical.size() < messages_offset + sizeof(MSG_::_msgs)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                    "oracle: version 0 save '%s' has a truncated message block", path);
+                return false;
+            }
+            for (size_t message_idx = 0; message_idx < MAX_MESSAGES; ++message_idx) {
+                const size_t message_offset = messages_offset + message_idx * sizeof(s_MSG);
+                if (static_cast<int8_t>(canonical[message_offset + offsetof(s_MSG, msg_type)]) !=
+                    MSG_TYPE_SCRAP_SHIP) {
+                    continue;
+                }
+                const size_t location_offset = message_offset + offsetof(s_MSG, u) +
+                    offsetof(s_MSG_scrap_ship, where);
+                int16_t location;
+                memcpy(&location, canonical.data() + location_offset, sizeof(location));
+                location = SAVEGAME::Convert_Legacy_Ship_Location_(location);
+                memcpy(canonical.data() + location_offset, &location, sizeof(location));
+            }
+
             version = SAVEGAME::CURRENT_VERSION;
             memcpy(canonical.data() + version_offset, &version, sizeof(version));
             save->swap(canonical);

@@ -18,4 +18,5 @@ namespace SAVEGAME {
 
     void Write_Game_(SERIAL::Writer_* writer, const char* description, uint32_t random_seed);
     bool Read_Game_(SERIAL::Reader_* reader, s_metadata* metadata, s_settings* saved_settings, uint32_t* random_seed);
+    int16_t Convert_Legacy_Ship_Location_(int16_t location);
 }
