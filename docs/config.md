@@ -15,12 +15,14 @@ The assignment language preserves the strongest part of the 1.50 format: one sta
 
 - Preserve a compact configuration syntax suitable for hand-authored mods.
 - Support scalars, records, arrays, nested arrays, enums, masks, ratios, strings, and partial updates.
-- Apply RHS values sequentially from the field selected by the LHS.
+- Apply RHS values sequentially only when the LHS selects an aggregate.
+- Require exactly one RHS value when the LHS selects a scalar.
 - Bound sequential traversal to the aggregate explicitly selected by the LHS.
 - Represent arrays as arrays instead of expanding them into names such as `weapon_1_type`.
 - Use cleaned, stable external names and cleaned native bindings.
 - Define finite value domains for semantic IDs, enums, and masks whenever the engine has a finite domain.
-- Accept symbolic values while optionally preserving known numeric forms for compatibility.
+- Support explicit-width primitive types and reusable semantic type aliases with stricter constraints.
+- Store human-readable titles, descriptions, remarks, units, and examples as schema data for generated documentation.
 - Generate typed C++ bindings and validation from a no-code JSON5 schema.
 - Load configuration transactionally: validate the complete operation before changing live state.
 - Make `enable` load a complete mod package, including dependencies, configuration, and resources.
@@ -91,10 +93,12 @@ weapon_1_amount
 
 Terse assignment is safe only when traversal cannot silently escape the object selected by the author.
 
-The LHS selects both:
+An aggregate LHS selects both:
 
 - the first leaf to update
 - the aggregate that bounds sequential propagation
+
+A scalar LHS selects exactly one value and never acts as a cursor into its containing record. Partial aggregate updates use skip items from the beginning of the selected aggregate.
 
 The complete statement is decoded and validated before any write is committed.
 
@@ -102,7 +106,7 @@ The complete statement is decoded and validated before any write is committed.
 
 If a field identifies one of a finite set of weapons, specials, buildings, drives, or other game concepts, its schema type should list those values. It should not be represented merely as an unrestricted `uint8` because the original patch did so.
 
-Numeric compatibility and semantic validity are separate policies. A type may accept numeric IDs while still rejecting numbers that do not identify a declared value.
+Numeric syntax and semantic validity are separate policies. A type may accept numeric IDs while still rejecting numbers that do not identify a declared value.
 
 ### 6. Mod activation is package loading
 
@@ -158,7 +162,6 @@ The parser retains raw path tokens. The schema decides whether a token is:
 - a record field
 - an array index
 - a symbolic key in a keyed collection
-- a compatibility alias
 
 ### Value syntax
 
@@ -173,7 +176,7 @@ The language supports:
 - quoted strings
 - `-` as a skip item during sequential assignment
 
-Canonical output uses explicit `0b` for binary. A compatibility reader may accept 1.50's leading-zero binary notation, but new files should not depend on it.
+Canonical output uses explicit `0b` for binary.
 
 ### Scalar assignment
 
@@ -202,10 +205,16 @@ The selected aggregate is `guardian.weapon[1]`. The RHS cannot overflow into wea
 ### Partial record assignment
 
 ```text
-guardian weapon 1 mods = heavy,eccm - 2;
+guardian weapon 1 = - - heavy,eccm - 2;
 ```
 
-Traversal starts at `mods` and continues through `ammo` and `amount`. The skip leaves `ammo` unchanged. A fourth item would be an error because it would exceed weapon 1.
+The LHS selects the complete weapon 1 record. The first two skips preserve `type` and `arc`, `mods` and `amount` are changed, and `ammo` is preserved. The scalar form changes only one field:
+
+```text
+guardian weapon 1 mods = heavy,eccm;
+```
+
+It cannot carry additional RHS values.
 
 ### Array assignment
 
@@ -242,7 +251,13 @@ Nested arrays and records use the same rules. Selecting a table permits traversa
 ```text
 mount_damage = 50 100 150 75 150 225;
 mount_damage high_energy_focus = 75 150 225;
-mount_damage high_energy_focus point_defense = 75 150 225;
+mount_damage high_energy_focus point_defense = 75;
+```
+
+The first statement selects the complete table. The second selects one row and may update every field in that row. The third selects one scalar cell and therefore accepts exactly one value. To update the final two fields of a row, select the row and skip the first field:
+
+```text
+mount_damage high_energy_focus = - 150 225;
 ```
 
 The schema defines each aggregate's declaration order and therefore its sequential order.
@@ -252,18 +267,18 @@ The schema defines each aggregate's declaration order and therefore its sequenti
 `-` advances one leaf without changing it:
 
 ```text
-mount_damage no_high_energy_focus point_defense = 50 - - 75;
+mount_damage no_high_energy_focus = 50 - -;
 ```
 
-A skip is valid only in a sequential assignment. It still counts toward the selected aggregate's boundary.
+A skip is valid only when the LHS selects an aggregate. It still counts toward that aggregate's boundary. A scalar assignment cannot use a skip because it would perform no update.
 
 ### Atomic behavior
 
 Before applying a statement, the decoder must:
 
 1. Resolve the complete LHS.
-2. Determine the selected aggregate and first writable leaf.
-3. Walk every RHS item within that boundary.
+2. Determine whether the selected node is a scalar or aggregate.
+3. Require one value for a scalar, or walk RHS items within the selected aggregate.
 4. Type-check and range-check every non-skip item.
 5. Verify that no item exceeds the boundary.
 6. Produce a temporary write list.
@@ -275,14 +290,12 @@ There must never be a partially applied statement.
 
 ### Boundary rule
 
-The traversal boundary is the most specific aggregate explicitly selected by the LHS.
+Sequential traversal exists only when the LHS resolves to an aggregate. That selected aggregate is the traversal boundary.
 
 - If the LHS resolves to a record, that record is the boundary.
 - If it resolves to an array, that array is the boundary.
 - If it explicitly selects an array element that is a record or array, that element is the boundary.
-- If it resolves to a field inside an explicitly selected array element, that element is the boundary.
-- If it resolves to a scalar array element, only that scalar is writable.
-- If it resolves to a scalar field outside an array element, the containing record is the boundary, starting at that field.
+- If it resolves to any scalar field or scalar array element, exactly one RHS value is allowed and no sequential traversal occurs.
 
 Examples:
 
@@ -291,9 +304,9 @@ Examples:
 | `guardian =` | `appearance` | Guardian record |
 | `guardian weapon =` | `weapon[1].type` | Complete weapon array |
 | `guardian weapon 1 =` | `weapon[1].type` | Weapon 1 record |
-| `guardian weapon 1 mods =` | `weapon[1].mods` | Weapon 1 record |
+| `guardian weapon 1 mods =` | `weapon[1].mods` | Scalar; one value only |
 | `guardian special =` | `special[1]` | Complete special array |
-| `guardian special 3 =` | `special[3]` | Scalar element 3 |
+| `guardian special 3 =` | `special[3]` | Scalar; one value only |
 
 ### Leaf order
 
@@ -302,7 +315,6 @@ Sequential order is depth-first declaration order:
 - record fields follow their order in JSON5
 - array elements follow ascending external index
 - nested aggregates are recursively flattened into leaves
-- aliases do not affect order
 - computed or read-only fields are omitted
 
 Declaration order is therefore part of the public schema contract. Reordering fields can change the meaning of terse assignments and requires a schema compatibility decision.
@@ -341,20 +353,20 @@ YAML is not preferred because implicit scalar conversions and its larger syntax 
 
 The JSON5 documents define:
 
-- primitive numeric types and ranges
+- explicit-width primitive types and ranges
+- reusable semantic type aliases and field-level constraints
 - enums and their stable numeric values
 - masks and their stable bit values
 - ratios and strings
 - reusable records
 - arrays and index bases
 - parameter roots
-- field aliases
 - defaults
 - declaration and traversal order
+- titles, descriptions, remarks, units, and examples for generated documentation
 - mutability and synchronization groups
-- native binding roots and member paths
+- native headers, symbols, C++ types, and member paths
 - replicated writes to more than one native field
-- compatibility aliases and deprecation metadata
 
 The documents do not contain:
 
@@ -364,21 +376,64 @@ The documents do not contain:
 - embedded scripts
 - instruction bytes
 
+### Documentation metadata
+
+JSON5 comments explain the schema source to its maintainers, but comments are not documentation data and are not consumed by generators. Human-facing text must therefore be stored explicitly on schema nodes.
+
+Public types, parameters, records, fields, arrays, enum values, mask flags, constraints, and groups define human-facing metadata where it adds meaning. Public parameters and reusable semantic types require at least `title` and `description`. Other nodes may inherit sufficient context from their parent, but schema tooling should require explicit text whenever generated documentation would otherwise be ambiguous.
+
+Available metadata fields are:
+
+- `title`: a short heading or table label
+- `description`: game-facing Markdown suitable for generated manuals
+- `remarks`: optional technical details or caveats
+- `units`: a structured or textual unit such as `percent`, `turns`, or `BC`
+- `examples`: canonical assignment examples
+
+Example:
+
+```json5
+{
+  id: "weapon",
+  title: "Weapon slots",
+  description: "The Guardian's five weapon slots in firing priority order.",
+  remarks: "External slot indexes are one-based.",
+  examples: [
+    "guardian weapon 1 = plasma_cannon all heavy 0 2;",
+  ],
+}
+```
+
+Generated documentation must not depend on comments adjacent to a declaration.
+
 ### Value type example
 
 ```json5
 {
   types: {
-    uint8: {
-      kind: "integer",
-      min: 0,
-      max: 255,
+    // Built-in explicit-width primitives are supplied by the schema runtime:
+    // bool, int8, uint8, int16, uint16, int32, and uint32.
+
+    officer_id: {
+      kind: "alias",
+      type: "int16",
+      title: "Officer ID",
+      description: "Identifies an entry in the fixed officer table.",
+      constraints: {
+        min: 0,
+        max: 66,
+      },
     },
 
     weapon_count: {
-      kind: "integer",
-      min: 0,
-      max: 99,
+      kind: "alias",
+      type: "uint8",
+      title: "Weapon count",
+      description: "Number of weapon units installed in one slot.",
+      constraints: {
+        min: 0,
+        max: 99,
+      },
     },
 
     weapon_id: {
@@ -386,10 +441,14 @@ The documents do not contain:
       allow_numeric: true,
       reject_unknown_numeric: true,
       values: {
-        none: 0,
-        laser_cannon: 3,
-        mass_driver: 4,
-        plasma_cannon: 11,
+        none: {
+          value: 0,
+          title: "No weapon",
+          description: "Leaves the weapon slot empty.",
+        },
+        laser_cannon: { value: 3, title: "Laser Cannon" },
+        mass_driver: { value: 4, title: "Mass Driver" },
+        plasma_cannon: { value: 11, title: "Plasma Cannon" },
       },
     },
 
@@ -410,13 +469,10 @@ The documents do not contain:
       allow_numeric: true,
       reject_unknown_bits: true,
       flags: {
-        forward: 1,
-        aft: 2,
-        left: 4,
-        right: 8,
-      },
-      aliases: {
-        all: ["forward", "aft", "left", "right"],
+        forward: { value: 1, title: "Forward" },
+        aft: { value: 2, title: "Aft" },
+        left: { value: 4, title: "Left" },
+        right: { value: 8, title: "Right" },
       },
     },
 
@@ -425,21 +481,33 @@ The documents do not contain:
       allow_numeric: true,
       reject_unknown_bits: true,
       flags: {
-        heavy: 0x0002,
-        point_defense: 0x0004,
-        armor_piercing: 0x0008,
-        continuous: 0x0010,
-        enveloping: 0x0100,
-        eccm: 0x0200,
-        overloaded: 0x4000,
+        heavy: {
+          value: 0x0002,
+          title: "Heavy mount",
+          description: "Uses the heavy weapon mount variant.",
+        },
+        point_defense: { value: 0x0004, title: "Point defense" },
+        armor_piercing: { value: 0x0008, title: "Armor piercing" },
+        continuous: { value: 0x0010, title: "Continuous" },
+        enveloping: { value: 0x0100, title: "Enveloping" },
+        eccm: { value: 0x0200, title: "ECCM" },
+        overloaded: { value: 0x4000, title: "Overloaded" },
       },
-      aliases: {
-        hv: ["heavy"],
-        pd: ["point_defense"],
-        ap: ["armor_piercing"],
-        co: ["continuous"],
-        env: ["enveloping"],
-        ovr: ["overloaded"],
+    },
+
+    ratio16: {
+      kind: "ratio",
+      component_type: "int16",
+      title: "16-bit ratio",
+      description: "An exact rational value stored as a numerator and denominator.",
+      constraints: {
+        denominator_nonzero: true,
+      },
+      cpp: {
+        header: "game/config_types.h",
+        type: "s_ratio16",
+        numerator_member: "numerator",
+        denominator_member: "denominator",
       },
     },
   },
@@ -454,6 +522,8 @@ The values above illustrate the schema shape. Imported numeric catalogs must be 
 {
   records: {
     weapon_slot: {
+      title: "Weapon slot",
+      description: "One installed weapon type and its firing properties.",
       fields: [
         {
           id: "type",
@@ -478,6 +548,8 @@ The values above illustrate the schema shape. Imported numeric catalogs must be 
         {
           id: "amount",
           type: "weapon_count",
+          title: "Amount",
+          description: "Number of weapon units installed in this slot.",
           bind: ["amount", "current_amount"],
         },
       ],
@@ -494,8 +566,14 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
 {
   parameters: {
     guardian: {
+      title: "Orion Guardian",
+      description: "Defines the equipment and combat design used by the Guardian at Orion.",
       group: "gameplay",
-      bind_root: "game_data.guardian",
+      bind_root: {
+        header: "game/ships.h",
+        symbol: "SHIPDATA::_guardian_design",
+        cpp_type: "s_ship_design",
+      },
       value: {
         kind: "record",
         fields: [
@@ -508,7 +586,8 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
 
           {
             id: "weapon",
-            aliases: ["weapons"],
+            title: "Weapon slots",
+            description: "The Guardian's five weapon slots in firing priority order.",
             bind: ["weapons"],
             value: {
               kind: "array",
@@ -520,7 +599,8 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
 
           {
             id: "special",
-            aliases: ["specials"],
+            title: "Special systems",
+            description: "Special systems installed on the Guardian.",
             bind: ["specials"],
             value: {
               kind: "array",
@@ -540,6 +620,8 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
 
 Bindings are structured member paths, not arbitrary source expressions. The generator may support only a small set of declarative binding operations:
 
+- include the declared native header
+- resolve the declared root symbol and expected C++ type
 - bind one logical leaf to one native field
 - bind one leaf to several native fields
 - bind an array to a native fixed-size array
@@ -551,7 +633,73 @@ If changing a setting requires procedural behavior, the preferred design is to s
 
 Derived caches and resources may be rebuilt by explicit configuration lifecycle services after a successful transaction. Those services are engine code, not field mappings.
 
+Generated code must compile against the declared native headers and types. The generator should emit static checks for fixed array extents and compatible field types where possible; the C++ compiler is the final authority on binding validity.
+
 ## Strong typing policy
+
+### Explicit-width primitives
+
+The built-in scalar types are:
+
+- `bool`
+- `int8` and `uint8`
+- `int16` and `uint16`
+- `int32` and `uint32`
+- `string`
+
+The schema does not expose an ambiguous platform-sized `int`. Numeric literals are decoded into a sufficiently wide temporary representation and then checked against the selected explicit-width type and field constraints.
+
+### Semantic type aliases
+
+A semantic alias refines a primitive or another alias without changing its storage representation:
+
+```json5
+{
+  star_id: {
+    kind: "alias",
+    type: "int16",
+    title: "Star ID",
+    description: "Identifies a star slot in the galaxy arrays.",
+    constraints: {
+      min: 0,
+      max: 70,
+    },
+  },
+}
+```
+
+Aliases provide reusable constraints, documentation, units, and stronger generated diagnostics. Use an enum instead when every valid identity has a stable finite catalog.
+
+### Field-level constraints
+
+A field may narrow, but never broaden, its referenced type:
+
+```json5
+{
+  id: "starting_officer",
+  type: "officer_id",
+  constraints: {
+    max: 20,
+  },
+}
+```
+
+Numeric constraints include `min` and `max`. String constraints include `min_length`, `max_length`, `encoding`, and either a predefined `format` or an explicit `pattern`.
+
+```json5
+{
+  id: "id",
+  type: "string",
+  constraints: {
+    min_length: 1,
+    max_length: 63,
+    encoding: "utf8",
+    format: "identifier",
+  },
+}
+```
+
+`pattern` denotes a regular expression and is unrelated to bit masks. The schema version must define the supported regular-expression dialect and whether matching covers the complete string. Reusable formats such as `identifier`, `mod_id`, `semantic_version`, and `vfs_path` are preferred over repeated patterns.
 
 ### Enums
 
@@ -575,7 +723,7 @@ Policies are independent:
 - `allow_numeric` permits `11` in addition to `plasma_cannon`.
 - `reject_unknown_numeric` rejects numeric values absent from the catalog.
 
-New canonical configs should prefer names. Numeric IDs remain useful for imported 1.50 files, incomplete reverse engineering, and values whose names are not yet stable.
+Canonical configs should prefer names. Numeric IDs remain useful for incomplete reverse engineering and values whose names are not yet stable.
 
 ### Masks
 
@@ -599,8 +747,6 @@ Symbolic masks use comma-separated names:
 heavy,point_defense
 ```
 
-The schema may define short compatibility aliases such as `hv` and `pd`, while extraction uses canonical names.
-
 ### Integers
 
 Integers are used only when every value in a numeric range is meaningful, or when the domain has not yet been recovered well enough to define an enum.
@@ -609,13 +755,36 @@ Semantically finite IDs should not remain generic integers permanently. Schema r
 
 ### Ratios
 
-Ratios are represented as a numerator and denominator with explicit bounds. A zero denominator is rejected unless a particular type assigns it a documented meaning.
+Ratios are one logical scalar even though their native representation contains two components. A ratio consumes one RHS position:
+
+```text
+government_bonus feudal_reduction = 1/3;
+```
+
+The built-in ratio family declares an explicit-width signed or unsigned component type and binds to a native ratio structure:
+
+```cpp
+struct s_ratio16 {
+    int16_t numerator;
+    int16_t denominator;
+};
+```
+
+The JSON5 type identifies the C++ type and its numerator and denominator members, allowing generated typed binding code. A field may alternatively map the two components to two declared native members, but a dedicated ratio structure is preferred because it cannot be updated partially.
+
+Ratios are normalized during decoding:
+
+- the denominator must be nonzero
+- the denominator is made positive
+- numerator and denominator are reduced by their greatest common divisor
+- zero is represented as `0/1`
+- an integer token such as `2` is accepted as `2/1`
 
 ### Strings and paths
 
-Strings have explicit length limits and synchronization policy. Paths are a distinct type with VFS-aware normalization and package-relative resolution.
+Strings have explicit length, encoding, format, and pattern constraints. Paths are semantic string aliases with VFS-aware normalization and package-relative resolution.
 
-## Names, aliases, and compatibility
+## Names and schema evolution
 
 ### Canonical names
 
@@ -627,33 +796,7 @@ Canonical names should:
 - avoid embedded indexes such as `weapon_1_type`
 - remain stable once published
 
-### Legacy aliases
-
-1.50 names may be accepted through explicit aliases or an import tool:
-
-```text
-weapon_1_type   -> weapon 1 type
-weapon_1_arc    -> weapon 1 arc
-weapon_1_mods   -> weapon 1 mods
-weapon_1_ammo   -> weapon 1 ammo
-weapon_1_amount -> weapon 1 amount
-```
-
-Aliases do not create additional schema fields and do not affect traversal order.
-
-Deprecated aliases should produce a diagnostic that includes the canonical replacement. Canonical extraction never emits deprecated names.
-
-### Flat numeric positions
-
-Original 1.50 supports flattened numeric positions such as:
-
-```text
-guardian 16 = 13 15 none 0 2;
-```
-
-This is not the same as structured array indexing and is fragile when fields are inserted or reordered.
-
-The native format should reserve numeric selectors for actual arrays and keyed numeric collections. A dedicated 1.50 importer may decode flattened positions using the pinned 1.50 schema and rewrite them into canonical paths.
+There is no legacy alias layer for old 1.50 field names or flattened positions. Numeric selectors are reserved for actual arrays and keyed numeric collections.
 
 ### Schema versioning
 
@@ -662,7 +805,6 @@ The schema has its own version independent of the executable version. A mod mani
 Changes are classified as:
 
 - additive: new parameter or new trailing field with a default
-- aliasing: old path remains valid through an alias
 - behavioral: same syntax receives changed semantics
 - breaking: field removal, field reordering, type change, or numeric identity change
 
@@ -687,14 +829,12 @@ It handles comments, quoting, escapes, semicolons, and includes no game-specific
 Generated schema code resolves the path through records, arrays, and keyed collections. It returns:
 
 - selected node
-- first writable leaf
-- traversal boundary
+- scalar cardinality or aggregate traversal boundary
 - canonical path
-- alias/deprecation diagnostics
 
 ### Stage 3: sequential decode
 
-The decoder walks leaves inside the boundary and converts each RHS token according to the current leaf's type.
+For a scalar, the decoder requires and converts exactly one RHS value. For an aggregate, it walks leaves inside that aggregate and converts each RHS token according to the current leaf's type.
 
 Its output is an atomic write set containing stable schema field identities, resolved indexes, typed values, and source provenance.
 
@@ -764,6 +904,12 @@ Each mod has a JSON5 manifest containing at least:
 - resource roots or archives
 - declared capabilities
 
+The manifest is separate from the CFG entry point because package discovery and dependency resolution happen before game configuration can be applied. The loader must know a package's stable ID, version, requirements, dependencies, conflicts, resource roots, and entry point before it can establish load order or resolve package-relative files.
+
+Keeping this metadata in ordinary configuration variables would require partially executing every installed mod merely to discover it, would allow includes to overwrite package identity, and would create a cycle between resource mounting and configuration parsing. A JSON5 manifest is directly inspectable by launchers, package managers, multiplayer compatibility checks, and dependency tools without loading the game configuration schema.
+
+CFG remains responsible for concise game-state overrides. JSON5 remains responsible for describing the package that contains those overrides.
+
 Example direction:
 
 ```json5
@@ -823,7 +969,7 @@ Diagnostics should be able to answer:
 - which config statement selected it
 - whether multiplayer peers have the same deterministic resource set
 
-Individual parameters such as `help.lbx` may be imported for compatibility, but the native model should prefer package resource mounts.
+The native model uses package resource mounts rather than binary-era per-file substitution parameters.
 
 ## Save games and multiplayer
 
@@ -869,25 +1015,11 @@ The engine can write the effective configuration using:
 
 Extraction should favor readability. It need not minimize line count at the expense of understanding.
 
-### Importing 1.50 configuration
-
-A separate import tool should:
-
-- parse known 1.50 syntax
-- use a pinned 1.50 schema
-- resolve flattened numeric positions
-- translate flattened names into records and arrays
-- translate short enum and mask names into canonical names
-- identify values that 1.50 accepted only because of weak integer typing
-- emit canonical native configuration with warnings for ambiguous cases
-
-The runtime does not need to preserve every historical ambiguity if the importer can make it explicit.
-
 ### Schema tooling
 
 The build should provide validation for:
 
-- duplicate names and aliases
+- duplicate names
 - duplicate enum values or mask bits
 - unknown type references
 - invalid defaults
@@ -897,8 +1029,9 @@ The build should provide validation for:
 - unstable field-order changes
 - undocumented weak integer IDs
 - save/network fields lacking stable identities
+- missing human-facing titles or descriptions on public nodes
 
-Generated documentation can list every parameter, path, type, default, enum value, mask bit, group, and compatibility alias.
+Generated documentation can list every parameter, path, type, constraint, default, enum value, mask bit, group, unit, example, and native binding.
 
 ## Error handling
 
@@ -916,12 +1049,11 @@ Errors should identify the relevant phase.
 - unknown parameter or field
 - indexing a non-array
 - missing or out-of-range array index
-- ambiguous alias
-- use of a removed field
 
 ### Sequential decode errors
 
 - too many RHS items for the selected boundary
+- more than one RHS item for a scalar
 - invalid skip use
 - invalid enum name
 - unknown numeric enum ID
@@ -953,7 +1085,8 @@ Errors should identify the relevant phase.
 
 - Define JSON5 document structure.
 - Implement JSON5 loading for build tools.
-- Define primitive, enum, mask, record, array, and parameter nodes.
+- Define explicit-width primitive, semantic alias, enum, mask, ratio, string, record, array, and parameter nodes.
+- Define documentation metadata and field-level constraints.
 - Import and verify a small set of value catalogs from 1.50 and restored source.
 - Generate schema IDs and documentation.
 
@@ -967,6 +1100,7 @@ Errors should identify the relevant phase.
 
 - Resolve records and arrays.
 - Implement the boundary rules in this document.
+- Enforce one RHS value for scalar selections.
 - Decode complete statements atomically.
 - Add exhaustive tests for record, array, nested-array, skip, and overflow behavior.
 
@@ -982,7 +1116,6 @@ Errors should identify the relevant phase.
 - Add include stacks and cycle detection.
 - Add canonical extraction.
 - Track the source mod, file, line, and statement responsible for each value.
-- Add a 1.50 config importer.
 
 ### Phase 6: native mod loader
 
@@ -1008,10 +1141,11 @@ Errors should identify the relevant phase.
 ## Open decisions
 
 - Exact JSON5 parser/library or whether to implement the required subset in-tree.
-- Exact quoted-string escape rules for canonical files and 1.50 compatibility mode.
+- Exact quoted-string escape rules for canonical files.
 - Whether optional include syntax is retained or replaced with an explicit statement form.
 - Whether whole-record assignment may omit trailing values without warnings.
 - Whether explicit array ranges are needed after whole-array assignment and skips are available.
+- Exact regular-expression dialect and string-length unit.
 - How schema stable field identities are assigned and reviewed.
 - Which interface settings belong in saves or multiplayer synchronization.
 - Whether unknown deterministic resource files are rejected or merely excluded from identity hashes.
@@ -1033,3 +1167,11 @@ guardian weapon 1 = ...;
 ```
 
 may modify only weapon 1. Terseness is retained without allowing a missing or extra value to spill into an unrelated object.
+
+A scalar selection is stricter still:
+
+```text
+guardian weapon 1 mods = heavy,eccm;
+```
+
+accepts exactly one value. Updating several fields requires selecting their containing aggregate and using positional values or skips.

@@ -512,6 +512,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_cmbt_colony_id = colony_idx;
 
     MOX::_combat_data = (s_combat_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, kCombatDataBytes);
+    // Resetting the screen pool invalidates the missile table from the previous combat.
+    MOX::_missile = nullptr;
     struct_::Clear_Structure_(MOX::_combat_data, kCombatDataBytes);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
