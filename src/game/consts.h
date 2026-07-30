@@ -4,7 +4,7 @@
 
 #define MAX_PLAYERS 8
 #define MAX_STARS 1024
-#define MAX_SHIPS 5000
+#define MAX_SHIPS 9000
 #define MAX_PLANETS 4096
 #define MAX_COLONIES MAX_PLANETS
 #define MAX_LEADERS 67
