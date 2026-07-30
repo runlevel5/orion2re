@@ -1166,7 +1166,10 @@ namespace oracle {
                 sizeof(s_player) - sizeof(s_player::settlers) + legacy_settlers_size -
                 sizeof(s_player::offensive_stagepoint) + sizeof(int8_t);
             constexpr size_t legacy_planet_size = sizeof(s_planet_data) - sizeof(int8_t);
-            constexpr size_t legacy_star_size = sizeof(s_star_data) - 2 * sizeof(int8_t);
+            constexpr size_t expanded_star_bitmap_size =
+                BITMAP(MAX_STARS) - BITMAP(ORIGINAL_MAX_STARS);
+            constexpr size_t legacy_star_size =
+                sizeof(s_star_data) - expanded_star_bitmap_size - 2 * sizeof(int8_t);
             constexpr size_t legacy_report_size = sizeof(s_report) - sizeof(int8_t);
             constexpr size_t legacy_message_size = sizeof(s_MSG) - sizeof(int8_t);
             if (save->size() < sizeof(uint32_t)) {
@@ -1248,13 +1251,13 @@ namespace oracle {
                 return true;
             };
 
-            if (!append_counted_records(MAX_COLONIES, sizeof(s_colony),
+            if (!append_counted_records(ORIGINAL_MAX_COLONIES, sizeof(s_colony),
                     "colony")) {
                 return false;
             }
 
             int16_t planet_count;
-            if (!Read_Save_Count_(*save, source_offset, MAX_PLANETS,
+            if (!Read_Save_Count_(*save, source_offset, ORIGINAL_MAX_PLANETS,
                     &planet_count)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has an invalid planet count", path);
@@ -1263,7 +1266,7 @@ namespace oracle {
             canonical.insert(canonical.end(), save->begin() + source_offset,
                 save->begin() + source_offset + sizeof(planet_count));
             source_offset += sizeof(planet_count);
-            if (source_offset + legacy_planet_size * MAX_PLANETS > save->size()) {
+            if (source_offset + legacy_planet_size * ORIGINAL_MAX_PLANETS > save->size()) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has a truncated planet block", path);
                 return false;
@@ -1282,10 +1285,10 @@ namespace oracle {
                     save->begin() + record_offset + star_offset + sizeof(int8_t),
                     save->begin() + record_offset + legacy_planet_size);
             }
-            source_offset += legacy_planet_size * MAX_PLANETS;
+            source_offset += legacy_planet_size * ORIGINAL_MAX_PLANETS;
 
             int16_t star_count;
-            if (!Read_Save_Count_(*save, source_offset, MAX_STARS, &star_count)) {
+            if (!Read_Save_Count_(*save, source_offset, ORIGINAL_MAX_STARS, &star_count)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has an invalid star count", path);
                 return false;
@@ -1293,27 +1296,36 @@ namespace oracle {
             canonical.insert(canonical.end(), save->begin() + source_offset,
                 save->begin() + source_offset + sizeof(star_count));
             source_offset += sizeof(star_count);
-            if (source_offset + legacy_star_size * MAX_STARS > save->size()) {
+            if (source_offset + legacy_star_size * ORIGINAL_MAX_STARS > save->size()) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has a truncated star block", path);
                 return false;
             }
-            const size_t wormhole_offset = offsetof(s_star_data, wormhole_star_id);
+            const size_t black_hole_blocks_offset = offsetof(s_star_data, black_hole_blocks);
+            const size_t legacy_black_hole_blocks_size = BITMAP(ORIGINAL_MAX_STARS);
+            const size_t legacy_wormhole_offset =
+                offsetof(s_star_data, wormhole_star_id) - expanded_star_bitmap_size;
             const size_t legacy_next_wfi_offset =
-                offsetof(s_star_data, next_wfi_in_list) - sizeof(int8_t);
+                offsetof(s_star_data, next_wfi_in_list) - expanded_star_bitmap_size - sizeof(int8_t);
             for (int16_t star_idx = 0; star_idx < star_count; ++star_idx) {
                 const size_t record_offset = source_offset +
                     static_cast<size_t>(star_idx) * legacy_star_size;
                 canonical.insert(canonical.end(), save->begin() + record_offset,
-                    save->begin() + record_offset + wormhole_offset);
+                    save->begin() + record_offset + black_hole_blocks_offset +
+                        legacy_black_hole_blocks_size);
+                canonical.insert(canonical.end(), expanded_star_bitmap_size, 0);
+                canonical.insert(canonical.end(),
+                    save->begin() + record_offset + black_hole_blocks_offset +
+                        legacy_black_hole_blocks_size,
+                    save->begin() + record_offset + legacy_wormhole_offset);
                 const int16_t wormhole_star =
-                    static_cast<int8_t>((*save)[record_offset + wormhole_offset]);
+                    static_cast<int8_t>((*save)[record_offset + legacy_wormhole_offset]);
                 const uint8_t* wormhole_bytes =
                     reinterpret_cast<const uint8_t*>(&wormhole_star);
                 canonical.insert(canonical.end(), wormhole_bytes,
                     wormhole_bytes + sizeof(wormhole_star));
                 canonical.insert(canonical.end(),
-                    save->begin() + record_offset + wormhole_offset + sizeof(int8_t),
+                    save->begin() + record_offset + legacy_wormhole_offset + sizeof(int8_t),
                     save->begin() + record_offset + legacy_next_wfi_offset);
                 const int16_t next_wfi = (*save)[record_offset + legacy_next_wfi_offset];
                 const uint8_t* next_wfi_bytes =
@@ -1324,7 +1336,7 @@ namespace oracle {
                     save->begin() + record_offset + legacy_next_wfi_offset + sizeof(uint8_t),
                     save->begin() + record_offset + legacy_star_size);
             }
-            source_offset += legacy_star_size * MAX_STARS;
+            source_offset += legacy_star_size * ORIGINAL_MAX_STARS;
 
             const size_t leaders_and_player_count_size =
                 sizeof(s_leader_data) * MAX_LEADERS + sizeof(MOX::_NUM_PLAYERS);
@@ -1468,20 +1480,31 @@ namespace oracle {
             }
             source_offset += legacy_report_size * MAX_REPORTS;
 
-            const size_t trailing_before_messages_size =
+            const size_t trailing_before_colonize_check_size =
                 sizeof(REPORT::_done_player_reports) +
-                sizeof(REPORT::_something_interesting_happened) +
-                sizeof(REPORT::_done_colonize_check) +
+                sizeof(REPORT::_something_interesting_happened);
+            const size_t legacy_colonize_check_size = BITMAP(ORIGINAL_MAX_STARS);
+            const size_t trailing_after_colonize_check_size =
                 sizeof(EVENTS::_event_data[0]) * 36;
-            if (source_offset + trailing_before_messages_size +
+            const size_t legacy_trailing_before_messages_size =
+                trailing_before_colonize_check_size + legacy_colonize_check_size +
+                trailing_after_colonize_check_size;
+            if (source_offset + legacy_trailing_before_messages_size +
                     legacy_message_size * MAX_MESSAGES > save->size()) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                     "oracle: version 0 save '%s' has a truncated message block", path);
                 return false;
             }
             canonical.insert(canonical.end(), save->begin() + source_offset,
-                save->begin() + source_offset + trailing_before_messages_size);
-            source_offset += trailing_before_messages_size;
+                save->begin() + source_offset + trailing_before_colonize_check_size +
+                    legacy_colonize_check_size);
+            canonical.insert(canonical.end(),
+                sizeof(REPORT::_done_colonize_check) - legacy_colonize_check_size, 0);
+            canonical.insert(canonical.end(),
+                save->begin() + source_offset + trailing_before_colonize_check_size +
+                    legacy_colonize_check_size,
+                save->begin() + source_offset + legacy_trailing_before_messages_size);
+            source_offset += legacy_trailing_before_messages_size;
             const size_t messages_offset = canonical.size();
             for (size_t message_idx = 0; message_idx < MAX_MESSAGES; ++message_idx) {
                 const size_t source_message_offset = source_offset +

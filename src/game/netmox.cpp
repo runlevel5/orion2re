@@ -51,12 +51,6 @@ namespace NETMOX {
         };
 #pragma pack(pop)
 
-        // Verified with a size probe against current packed structures:
-        // Send_Battle_Results_ max ~= 70489 bytes,
-        // Send_You_Are_Target_Info_ max ~= 70485 bytes,
-        // Send_Pick_Target_Info_ max ~= 73269 bytes.
-        // Send_Game_Orders_ max ~= 165833 bytes.
-        constexpr uint32_t k_medium_network_payload_bytes = 200 * 1024u;
         constexpr size_t k_star_player_presence_payload_bytes = MAX_PLAYERS * sizeof(s_combfind_star_has_player) + sizeof(uint8_t);
 
         bool Is_Valid_Game_Player_(int player_idx) {
@@ -1066,8 +1060,8 @@ namespace NETMOX {
     void __cdecl Send_Game_Orders_() {
         Scoped_Net_Update_Suspension_ suspend_net_updates;
         allocate::Push_Block_(MOX::_screen_seg);
-        uint8_t* packet = reinterpret_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 350000));
-        NETPROTO::Packet_Writer_ writer(packet, 350000, "invalid game orders payload");
+        uint8_t* packet = reinterpret_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES));
+        NETPROTO::Packet_Writer_ writer(packet, NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES, "invalid game orders payload");
 
         Net_Debug_Log_(
             "Send_Game_Orders_: player=%d stardate=%u sync=%u",
@@ -2146,7 +2140,7 @@ namespace NETMOX {
             (player_num != target_player_id || player_id >= MAX_PLAYERS || MOX::_player[player_id].objectives != PLAYER_OBJECTIVE_HUMAN);
 
         allocate::Push_Block_(MOX::_screen_seg);
-        uint32_t alloc_size = include_remote_state ? k_medium_network_payload_bytes : sizeof(int16_t) * 4;
+        uint32_t alloc_size = include_remote_state ? NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES : sizeof(int16_t) * 4;
         uint8_t* packet = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
         NETPROTO::Packet_Writer_ writer(packet, alloc_size, "invalid combat payload");
 
@@ -2237,7 +2231,7 @@ namespace NETMOX {
         allocate::Push_Block_(MOX::_screen_seg);
 
         uint32_t alloc_size =
-            (target_player_idx == MOX::_PLAYER_NUM) ? sizeof(s_packet_0x12) : k_medium_network_payload_bytes;
+            (target_player_idx == MOX::_PLAYER_NUM) ? sizeof(s_packet_0x12) : NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
         uint8_t* packet = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
         NETPROTO::Packet_Writer_ writer(packet, alloc_size, "invalid combat payload");
 
@@ -2321,7 +2315,7 @@ namespace NETMOX {
         allocate::Push_Block_(MOX::_screen_seg);
 
         uint32_t alloc_size =
-            (player_idx == MOX::_PLAYER_NUM) ? (sizeof(int16_t) + sizeof(s_combfind_target)) : k_medium_network_payload_bytes;
+            (player_idx == MOX::_PLAYER_NUM) ? (sizeof(int16_t) + sizeof(s_combfind_target)) : NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
         uint8_t* packet = static_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size));
         NETPROTO::Packet_Writer_ writer(packet, alloc_size, "invalid combat payload");
 

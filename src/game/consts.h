@@ -3,13 +3,10 @@
 #define BITMAP(bit_count) (((bit_count) + 7) / 8)
 
 #define MAX_PLAYERS 8
-// Can't go higher than 127 due to int8_t. Change will make game binary-incompatible with previous version.
-#define MAX_STARS 72
-// Limited by int16_t ship indices and encoded ship locations. Change will make game binary-incompatible with previous version.
-#define MAX_SHIPS 500
-// Can't go higher than 255 due to uint8_t. Change will make game binary-incompatible with previous version.
-#define MAX_COLONIES 250
-#define MAX_PLANETS (MAX_STARS * 5)
+#define MAX_STARS 1024
+#define MAX_SHIPS 5000
+#define MAX_PLANETS 4096
+#define MAX_COLONIES MAX_PLANETS
 #define MAX_LEADERS 67
 #define MAX_NEBULAS 4
 #define MAX_REPORTS 50
@@ -17,6 +14,8 @@
 
 #define ORIGINAL_MAX_STARS 72
 #define ORIGINAL_MAX_SHIPS 500
+#define ORIGINAL_MAX_PLANETS 360
+#define ORIGINAL_MAX_COLONIES 250
 #define SHIP_LOCATION_STEP 10000
 #define SHIP_LOCATION_MOVING_OFFSET SHIP_LOCATION_STEP
 #define SHIP_LOCATION_WORMHOLE_OFFSET (SHIP_LOCATION_STEP * 2)

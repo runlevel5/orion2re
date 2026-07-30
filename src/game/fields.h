@@ -154,7 +154,14 @@ struct s_field {
 #pragma pack(pop)
 
 namespace fields {
-    inline constexpr int32_t MAX_FIELDS_COUNT = 250;
+    inline constexpr int32_t NON_ENTITY_FIELDS_COUNT = 250;
+    inline constexpr int32_t MAX_ENTITY_FIELDS_COUNT =
+        MAX_SHIPS > MAX_COLONIES
+            ? (MAX_SHIPS > MAX_STARS ? MAX_SHIPS : MAX_STARS)
+            : (MAX_COLONIES > MAX_STARS ? MAX_COLONIES : MAX_STARS);
+    inline constexpr int32_t MAX_FIELDS_COUNT =
+        NON_ENTITY_FIELDS_COUNT + MAX_ENTITY_FIELDS_COUNT;
+    static_assert(MAX_FIELDS_COUNT <= INT16_MAX, "field indices do not fit in int16_t");
 
     extern MOX2::action_func_t _update_function;
     extern uint16_t _auto_active_flag;

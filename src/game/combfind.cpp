@@ -200,7 +200,8 @@ void __cdecl Process_Retreating_Ships_(void) {
         char pad2[13];
     };
 
-    s_retreat_report report[MAX_PLAYERS * ORIGINAL_MAX_STARS];
+    constexpr int16_t retreat_location_count = MAX_STARS + 1;
+    s_retreat_report report[MAX_PLAYERS * retreat_location_count];
     int16_t player_retreat_target[MAX_PLAYERS];
     int16_t ship_indices[MAX_SHIPS];
     s_ship_move_info move_info;
@@ -233,13 +234,13 @@ void __cdecl Process_Retreating_Ships_(void) {
                         MOX::_leaders[leader_idx].location = -1;
                         ship->officer_index = -1;
                         OFFICER::Kill_Officer_(leader_idx);
-                        report[owner * ORIGINAL_MAX_STARS + MOX::_NUM_STARS].killed_officers++;
+                        report[owner * retreat_location_count + MOX::_NUM_STARS].killed_officers++;
                     } else {
                         OFFICER::Move_Officer_To_Pool_(leader_idx);
                     }
                 }
-                report[owner * ORIGINAL_MAX_STARS + MOX::_NUM_STARS].count++;
-                report[owner * ORIGINAL_MAX_STARS + MOX::_NUM_STARS].reason = 0;
+                report[owner * retreat_location_count + MOX::_NUM_STARS].count++;
+                report[owner * retreat_location_count + MOX::_NUM_STARS].reason = 0;
                 SHIPS::Kill_Ship_(i);
             } else {
                 int16_t target_loc = player_retreat_target[owner];
@@ -286,7 +287,7 @@ void __cdecl Process_Retreating_Ships_(void) {
                     if (leader_idx != -1) {
                         if (MOX::_leaders[leader_idx].eta < 1) {
                             OFFICER::Kill_Officer_(leader_idx);
-                            report[owner * ORIGINAL_MAX_STARS + MOX::_ship[i].location].killed_officers++;
+                            report[owner * retreat_location_count + MOX::_ship[i].location].killed_officers++;
                         } else {
                             OFFICER::Move_Officer_To_Pool_(leader_idx);
                         }
@@ -295,7 +296,7 @@ void __cdecl Process_Retreating_Ships_(void) {
                     // been killed. A location of -1 aliases the preceding player's final slot.
                     // Fix this attribution bug later even though doing so diverges from the oracle.
                     s_retreat_report& retreat =
-                        report[owner * ORIGINAL_MAX_STARS + MOX::_ship[i].location];
+                        report[owner * retreat_location_count + MOX::_ship[i].location];
                     retreat.count++;
                     retreat.reason = fail_reason;
                     SHIPS::Kill_Ship_(idx);
@@ -333,7 +334,7 @@ void __cdecl Process_Retreating_Ships_(void) {
 
     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
         for (int16_t s = 0; s < MOX::_NUM_STARS + 1; ++s) {
-            s_retreat_report& retreat = report[p * ORIGINAL_MAX_STARS + s];
+            s_retreat_report& retreat = report[p * retreat_location_count + s];
             if (retreat.count != 0) {
                 s_MSG msg = {};
                 msg.msg_type = MSG_TYPE_FAILED_RETREAT;

@@ -9,7 +9,7 @@ struct s_net_snapshot_cache {
 };
 
 namespace NETMOX {
-    constexpr uint32_t NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES = 0xE1000u;
+    constexpr uint32_t NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES = 8 * 1024 * 1024;
 
     extern s_network _net;
 

@@ -3852,6 +3852,8 @@ namespace MAINSCR {
             if (payload_len > k_max_game_data_payload_bytes) {
                 exitm::Exit_With_Message("game data payload too large");
             }
+            // TODO: Differential decoding writes the reconstructed snapshot after this payload,
+            // relying on unused contiguous screen-pool space beyond the declared sub-block.
             NETMOX::_net.network_data_ptr = allocate::Allocate_Next_Block_(MOX::_screen_seg, payload_len);
             memcpy(NETMOX::_net.network_data_ptr, payload, payload_len);
             NETMOX::_net.host_election_winner_id = sender_net_id_or_host_id;

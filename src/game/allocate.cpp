@@ -1,9 +1,8 @@
 #include "pch.h"
 
 namespace {
-    uint32_t AI_Dependent_Bytes_(uint32_t star_count, uint32_t ship_count) {
-        uint32_t planet_count = star_count * 5;
-
+    uint32_t AI_Dependent_Bytes_(uint32_t star_count, uint32_t planet_count,
+        uint32_t colony_count, uint32_t ship_count) {
         return 3 * ship_count * MAX_PLAYERS * sizeof(uint16_t) +
             planet_count * MAX_PLAYERS * sizeof(int16_t) +
             2 * star_count * MAX_PLAYERS * sizeof(uint32_t) +
@@ -12,6 +11,7 @@ namespace {
             ship_count * star_count *
                 (sizeof(int8_t) + sizeof(AIDATA::s_ship_n_turns_to_intermediate_cache_entry)) +
             2 * star_count * MAX_PLAYERS * MAX_PLAYERS * 10 * sizeof(int32_t) +
+            colony_count * sizeof(s_ai_colony_info) +
             star_count * sizeof(s_ai_star_info) +
             2 * star_count * sizeof(uint8_t) +
             star_count * MAX_PLAYERS * 10 * sizeof(int8_t) +
@@ -24,10 +24,17 @@ namespace {
     }
 
     uint32_t Global_Screen_Space_() {
-        uint32_t size = 0x1B5030 + AI_Dependent_Bytes_(MAX_STARS, MAX_SHIPS) -
-            AI_Dependent_Bytes_(ORIGINAL_MAX_STARS, ORIGINAL_MAX_SHIPS);
+        uint32_t size = 0x1B5030 +
+            AI_Dependent_Bytes_(MAX_STARS, MAX_PLANETS, MAX_COLONIES, MAX_SHIPS) -
+            AI_Dependent_Bytes_(ORIGINAL_MAX_STARS, ORIGINAL_MAX_PLANETS,
+                ORIGINAL_MAX_COLONIES, ORIGINAL_MAX_SHIPS) +
+            NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES - 0xE1000u;
 
         return (size + 3u) & ~3u;
+    }
+
+    constexpr uint32_t Global_Data_Space_() {
+        return 0x2800 + MAX_SHIPS - ORIGINAL_MAX_SHIPS;
     }
 }
 
@@ -85,7 +92,7 @@ namespace allocate {
         MOX::_global_cache_size = 0x174508;
 
         // DOS-space allocations for low-level segments
-        MOX::_global_data_seg = Allocate_Dos_Space_(0x2800);
+        MOX::_global_data_seg = Allocate_Dos_Space_(Global_Data_Space_());
 
         MOX::_nebula = (s_nebula*)Allocate_Dos_Space_(MAX_NEBULAS * sizeof(s_nebula));
         struct_::Clear_Structure_(MOX::_nebula, MAX_NEBULAS * sizeof(s_nebula));

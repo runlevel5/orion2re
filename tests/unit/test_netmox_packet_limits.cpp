@@ -303,8 +303,7 @@ namespace {
 DOCTEST_TEST_SUITE("netmox packet limits") {
 
 DOCTEST_TEST_CASE("large combat payload allocations stay within the shared limit") {
-    constexpr uint32_t k_medium_network_payload_bytes = 200 * 1024u;
-    constexpr uint32_t k_large_network_payload_bytes = NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
+    constexpr uint32_t max_network_payload_bytes = NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
     constexpr uint32_t game_orders_payload_bytes =
         sizeof(uint32_t) +
         sizeof(uint8_t) +
@@ -361,10 +360,10 @@ DOCTEST_TEST_CASE("large combat payload allocations stay within the shared limit
         MAX_SHIPS * (sizeof(int16_t) + sizeof(s_ship_data)) +
         sizeof(int16_t);
 
-    DOCTEST_CHECK(game_orders_payload_bytes <= k_large_network_payload_bytes);
-    DOCTEST_CHECK(battle_results_remote_payload_bytes <= k_medium_network_payload_bytes);
-    DOCTEST_CHECK(you_are_target_remote_payload_bytes <= k_medium_network_payload_bytes);
-    DOCTEST_CHECK(pick_target_remote_payload_bytes <= k_medium_network_payload_bytes);
+    DOCTEST_CHECK(game_orders_payload_bytes <= max_network_payload_bytes);
+    DOCTEST_CHECK(battle_results_remote_payload_bytes <= max_network_payload_bytes);
+    DOCTEST_CHECK(you_are_target_remote_payload_bytes <= max_network_payload_bytes);
+    DOCTEST_CHECK(pick_target_remote_payload_bytes <= max_network_payload_bytes);
 }
 
 DOCTEST_TEST_CASE("broadcast differential layout still matches legacy fixed-size arrays") {
@@ -384,11 +383,12 @@ DOCTEST_TEST_CASE("broadcast snapshot maximum fits the shared network payload li
 }
 
 DOCTEST_TEST_CASE("differential decode requires full shared payload workspace on the receive side") {
-    constexpr uint32_t worst_case_received_diff_bytes = NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
+    constexpr uint32_t worst_case_received_diff_bytes = Broadcast_Game_Data_Snapshot_Max_Bytes_() + 1;
     constexpr uint32_t required_decode_workspace_bytes = NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
 
     DOCTEST_CHECK(required_decode_workspace_bytes >= worst_case_received_diff_bytes);
-    DOCTEST_CHECK(Broadcast_Game_Data_Snapshot_Max_Bytes_() <= required_decode_workspace_bytes);
+    DOCTEST_CHECK(Broadcast_Game_Data_Snapshot_Max_Bytes_() +
+                  worst_case_received_diff_bytes <= required_decode_workspace_bytes);
 }
 
 DOCTEST_TEST_CASE("network packet structs stay byte packed and size stable") {

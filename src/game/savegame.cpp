@@ -10,10 +10,11 @@ namespace SAVEGAME {
         constexpr size_t SETTINGS_RESERVED_OFFSET = 0xE4;
         const uint8_t ZEROES[512] = {};
 
-        static_assert(MAX_STARS == 72, "save version 0 requires 72 stars");
-        static_assert(MAX_PLANETS == 360, "save version 0 requires 360 planets");
-        static_assert(MAX_COLONIES == 250, "save version 0 requires 250 colonies");
-        static_assert(ORIGINAL_MAX_SHIPS == 500, "save version 0 requires 500 ships");
+        static_assert(ORIGINAL_MAX_STARS == 72, "save version 0 requires 72 stars");
+        static_assert(MAX_STARS >= ORIGINAL_MAX_STARS, "star capacity cannot load version 0 saves");
+        static_assert(MAX_PLANETS >= ORIGINAL_MAX_PLANETS, "planet capacity cannot load version 0 saves");
+        static_assert(MAX_COLONIES >= ORIGINAL_MAX_COLONIES, "colony capacity cannot load version 0 saves");
+        static_assert(ORIGINAL_MAX_SHIPS == 500, "save version 0 requires 500 ship records");
         static_assert(MAX_SHIPS >= ORIGINAL_MAX_SHIPS, "ship capacity cannot load version 0 saves");
         static_assert(offsetof(s_settings, version) == 0xE2, "settings version offset mismatch");
 
@@ -402,7 +403,11 @@ namespace SAVEGAME {
             star->pict_type = reader->Read_Int8_();
             star->spectral_class = reader->Read_Int8_();
             reader->Read_Bytes_(star->last_planet_selected, sizeof(star->last_planet_selected));
-            reader->Read_Bytes_(star->black_hole_blocks, sizeof(star->black_hole_blocks));
+            const size_t black_hole_blocks_size = version == LEGACY_VERSION ?
+                    BITMAP(ORIGINAL_MAX_STARS) : sizeof(star->black_hole_blocks);
+            reader->Read_Bytes_(star->black_hole_blocks, black_hole_blocks_size);
+            memset(star->black_hole_blocks + black_hole_blocks_size, 0,
+                   sizeof(star->black_hole_blocks) - black_hole_blocks_size);
             star->system_special = reader->Read_Int8_();
             star->wormhole_star_id = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
             star->blockaded = reader->Read_Uint8_();
@@ -1378,19 +1383,19 @@ namespace SAVEGAME {
             *random_seed = reader->Read_Uint32_();
             MOX::_NUM_COLONIES = reader->Read_Int16_();
             if (MOX::_NUM_COLONIES < 0 || MOX::_NUM_COLONIES > MAX_COLONIES) return false;
-            const int colony_record_count = version == LEGACY_VERSION ? MAX_COLONIES : MOX::_NUM_COLONIES;
+            const int colony_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_COLONIES : MOX::_NUM_COLONIES;
             for (int i = 0; i < colony_record_count; ++i) Read_Colony_(reader, &MOX::_colony[i]);
             memset(&MOX::_colony[colony_record_count], 0,
                    (MAX_COLONIES - colony_record_count) * sizeof(*MOX::_colony));
             MOX::_planet_count = reader->Read_Int16_();
             if (MOX::_planet_count < 0 || MOX::_planet_count > MAX_PLANETS) return false;
-            const int planet_record_count = version == LEGACY_VERSION ? MAX_PLANETS : MOX::_planet_count;
+            const int planet_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_PLANETS : MOX::_planet_count;
             for (int i = 0; i < planet_record_count; ++i) Read_Planet_(reader, &MOX::_planet[i], version);
             memset(&MOX::_planet[planet_record_count], 0,
                    (MAX_PLANETS - planet_record_count) * sizeof(*MOX::_planet));
             MOX::_NUM_STARS = reader->Read_Int16_();
             if (MOX::_NUM_STARS < 0 || MOX::_NUM_STARS > MAX_STARS) return false;
-            const int star_record_count = version == LEGACY_VERSION ? MAX_STARS : MOX::_NUM_STARS;
+            const int star_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_STARS : MOX::_NUM_STARS;
             for (int i = 0; i < star_record_count; ++i) Read_Star_(reader, &MOX::_star[i], version);
             memset(&MOX::_star[star_record_count], 0,
                    (MAX_STARS - star_record_count) * sizeof(*MOX::_star));
@@ -1419,7 +1424,11 @@ namespace SAVEGAME {
             for (int i = 0; i < MAX_REPORTS; ++i) Read_Report_(reader, &REPORT::_reports[i], version);
             REPORT::_done_player_reports = reader->Read_Uint8_();
             reader->Read_Bytes_(REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened));
-            reader->Read_Bytes_(REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check));
+            const size_t colonize_check_size = version == LEGACY_VERSION ?
+                    BITMAP(ORIGINAL_MAX_STARS) : sizeof(REPORT::_done_colonize_check);
+            reader->Read_Bytes_(REPORT::_done_colonize_check, colonize_check_size);
+            memset(REPORT::_done_colonize_check + colonize_check_size, 0,
+                   sizeof(REPORT::_done_colonize_check) - colonize_check_size);
             for (int i = 0; i < 36; ++i) Read_Event_(reader, &EVENTS::_event_data[i]);
             for (int i = 0; i < MAX_MESSAGES; ++i) Read_Message_(reader, &MSG_::_msgs[i], version);
             reader->Read_Bytes_(MSG_::_first_msg, sizeof(MSG_::_first_msg));

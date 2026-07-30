@@ -9,7 +9,8 @@
 
 namespace {
     constexpr size_t LEGACY_PLANET_SIZE = sizeof(s_planet_data) - sizeof(int8_t);
-    constexpr size_t LEGACY_STAR_SIZE = sizeof(s_star_data) - 2 * sizeof(int8_t);
+    constexpr size_t LEGACY_STAR_SIZE = sizeof(s_star_data) -
+        (BITMAP(MAX_STARS) - BITMAP(ORIGINAL_MAX_STARS)) - 2 * sizeof(int8_t);
 
     struct State_ {
         s_colony colonies[MAX_COLONIES] = {};
@@ -119,7 +120,7 @@ namespace {
                 break;
             case MSG_TYPE_HYPERSPACE_BEAST:
                 message.u.hyperspace_beast.ship_idx = static_cast<int16_t>(i);
-                message.u.hyperspace_beast.star_idx = static_cast<int8_t>(i % MAX_STARS);
+                message.u.hyperspace_beast.star_idx = static_cast<int16_t>(i % ORIGINAL_MAX_STARS);
                 message.u.hyperspace_beast.officer_idx = static_cast<int8_t>(i % MAX_LEADERS);
                 message.u.hyperspace_beast.leader_status = static_cast<int8_t>(i % 6);
                 message.u.hyperspace_beast.fate = static_cast<int8_t>(i % 4);
@@ -135,12 +136,12 @@ namespace {
                 message.u.artemis.star_idx = static_cast<int16_t>(i % MAX_STARS);
                 break;
             case MSG_TYPE_ARTEMIS_LEADER:
-                message.u.artemis_leader.star_idx = static_cast<int8_t>(i % MAX_STARS);
+                message.u.artemis_leader.star_idx = static_cast<int16_t>(i % ORIGINAL_MAX_STARS);
                 message.u.artemis_leader.leader_idx = static_cast<int8_t>(i % MAX_LEADERS);
                 message.u.artemis_leader.fate = static_cast<int8_t>(i % 4);
                 break;
             case MSG_TYPE_FAILED_RETREAT:
-                message.u.retreat.star_idx = static_cast<int8_t>(i % MAX_STARS);
+                message.u.retreat.star_idx = static_cast<int16_t>(i % ORIGINAL_MAX_STARS);
                 message.u.retreat.reason = static_cast<int8_t>(i % 4);
                 message.u.retreat.ships_lost = static_cast<int16_t>(i);
                 message.u.retreat.leader_count = static_cast<int8_t>(i % 5);
@@ -152,7 +153,7 @@ namespace {
                 message.u.spy_assasination.victim_id = static_cast<int8_t>((i + 2) % MAX_PLAYERS);
                 break;
             case MSG_TYPE_ANOMALY:
-                message.u.anomaly.star_idx = static_cast<uint8_t>(i % MAX_STARS);
+                message.u.anomaly.star_idx = static_cast<int16_t>(i % ORIGINAL_MAX_STARS);
                 break;
             case MSG_TYPE_DIPLOMACY:
                 message.u.diplomacy.diplomacy_idx = static_cast<int8_t>(i % 6);
@@ -161,10 +162,10 @@ namespace {
                 break;
             case MSG_TYPE_EEL_SPAWNED:
             case MSG_TYPE_EEL_VANISHED:
-                message.u.eel.star_idx = static_cast<uint8_t>(i % MAX_STARS);
+                message.u.eel.star_idx = static_cast<int16_t>(i % ORIGINAL_MAX_STARS);
                 break;
             case MSG_TYPE_ARTIFACTS:
-                message.u.artifacts.star_idx = static_cast<uint8_t>(i % MAX_STARS);
+                message.u.artifacts.star_idx = static_cast<int16_t>(i % ORIGINAL_MAX_STARS);
                 message.u.artifacts.tech1 = static_cast<int8_t>(i);
                 message.u.artifacts.tech2 = static_cast<int8_t>(i + 1);
                 break;
@@ -214,11 +215,11 @@ namespace {
         Fill_Reports_();
         Fill_Messages_();
 
-        MOX::_NUM_COLONIES = 249;
-        MOX::_planet_count = 359;
-        MOX::_NUM_STARS = 71;
+        MOX::_NUM_COLONIES = 700;
+        MOX::_planet_count = 900;
+        MOX::_NUM_STARS = 512;
         MOX::_NUM_PLAYERS = 8;
-        MOX::_NUM_SHIPS = 499;
+        MOX::_NUM_SHIPS = 1000;
         MOX::_PLAYER_NUM = 7;
         MOX::_max_map_scale = 31;
         MOX::_max_zoom_count = 19;
@@ -298,10 +299,10 @@ namespace {
     }
 
     void Expand_Legacy_Planets_(s_planet_data* planets) {
-        uint8_t legacy[MAX_PLANETS * LEGACY_PLANET_SIZE];
+        uint8_t legacy[ORIGINAL_MAX_PLANETS * LEGACY_PLANET_SIZE];
         Fill_Bytes_(legacy, sizeof(legacy), 2);
         const size_t star_offset = offsetof(s_planet_data, star_index);
-        for (size_t i = 0; i < MAX_PLANETS; ++i) {
+        for (size_t i = 0; i < ORIGINAL_MAX_PLANETS; ++i) {
             const uint8_t* source = legacy + i * LEGACY_PLANET_SIZE;
             uint8_t* destination = reinterpret_cast<uint8_t*>(&planets[i]);
             memcpy(destination, source, star_offset);
@@ -313,19 +314,30 @@ namespace {
     }
 
     void Expand_Legacy_Stars_(s_star_data* stars) {
-        uint8_t legacy[MAX_STARS * LEGACY_STAR_SIZE];
+        uint8_t legacy[ORIGINAL_MAX_STARS * LEGACY_STAR_SIZE];
         Fill_Bytes_(legacy, sizeof(legacy), 3);
-        const size_t wormhole_offset = offsetof(s_star_data, wormhole_star_id);
+        const size_t black_hole_offset = offsetof(s_star_data, black_hole_blocks);
+        const size_t legacy_black_hole_size = BITMAP(ORIGINAL_MAX_STARS);
+        const size_t expanded_black_hole_size =
+            BITMAP(MAX_STARS) - legacy_black_hole_size;
+        const size_t legacy_wormhole_offset =
+            offsetof(s_star_data, wormhole_star_id) - expanded_black_hole_size;
         const size_t legacy_next_wfi_offset =
-                offsetof(s_star_data, next_wfi_in_list) - sizeof(int8_t);
-        for (size_t i = 0; i < MAX_STARS; ++i) {
+                offsetof(s_star_data, next_wfi_in_list) - expanded_black_hole_size - sizeof(int8_t);
+        for (size_t i = 0; i < ORIGINAL_MAX_STARS; ++i) {
             const uint8_t* source = legacy + i * LEGACY_STAR_SIZE;
             uint8_t* destination = reinterpret_cast<uint8_t*>(&stars[i]);
-            memcpy(destination, source, wormhole_offset);
-            stars[i].wormhole_star_id = static_cast<int8_t>(source[wormhole_offset]);
-            memcpy(destination + wormhole_offset + sizeof(stars[i].wormhole_star_id),
-                   source + wormhole_offset + sizeof(int8_t),
-                   legacy_next_wfi_offset - wormhole_offset - sizeof(int8_t));
+            memcpy(destination, source, black_hole_offset + legacy_black_hole_size);
+            memset(destination + black_hole_offset + legacy_black_hole_size, 0,
+                   expanded_black_hole_size);
+            memcpy(destination + black_hole_offset + BITMAP(MAX_STARS),
+                   source + black_hole_offset + legacy_black_hole_size,
+                   legacy_wormhole_offset - black_hole_offset - legacy_black_hole_size);
+            stars[i].wormhole_star_id = static_cast<int8_t>(source[legacy_wormhole_offset]);
+            memcpy(destination + offsetof(s_star_data, wormhole_star_id) +
+                       sizeof(stars[i].wormhole_star_id),
+                   source + legacy_wormhole_offset + sizeof(int8_t),
+                   legacy_next_wfi_offset - legacy_wormhole_offset - sizeof(int8_t));
             stars[i].next_wfi_in_list = source[legacy_next_wfi_offset];
             memcpy(destination + offsetof(s_star_data, next_wfi_in_list) +
                        sizeof(stars[i].next_wfi_in_list),
@@ -361,7 +373,10 @@ namespace {
         s_star_data expected_stars[MAX_STARS] = {};
         Expand_Legacy_Planets_(expected_planets);
         Expand_Legacy_Stars_(expected_stars);
-        DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies, sizeof(expected.colonies)) == 0);
+        DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
+                             ORIGINAL_MAX_COLONIES * sizeof(*expected.colonies)) == 0);
+        DOCTEST_CHECK(Is_Zero_(&actual.colonies[ORIGINAL_MAX_COLONIES],
+                               (MAX_COLONIES - ORIGINAL_MAX_COLONIES) * sizeof(*actual.colonies)));
         DOCTEST_CHECK(memcmp(expected_planets, actual.planets, sizeof(expected_planets)) == 0);
         DOCTEST_CHECK(memcmp(expected_stars, actual.stars, sizeof(expected_stars)) == 0);
         DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
@@ -418,7 +433,7 @@ namespace {
 
 }
 
-DOCTEST_TEST_CASE("version 0 ship locations migrate to 5000-based ranges") {
+DOCTEST_TEST_CASE("version 0 ship locations migrate to configured ranges") {
     DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(-1) == -1);
     DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(71) == 71);
     DOCTEST_CHECK(SAVEGAME::Convert_Legacy_Ship_Location_(499) == 499);
@@ -453,13 +468,28 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     uint8_t expected_max_msgs[MAX_PLAYERS] = {};
     uint8_t expected_n_msgs[MAX_PLAYERS] = {};
     expected.players[0].settlers[0].val = 0;
-    SETTLER::Set_Source_Colony(&expected.players[0].settlers[0].val, 0x1234);
-    SETTLER::Set_Dest_Planet(&expected.players[0].settlers[0].val, 0x2345);
+    SETTLER::Set_Source_Colony(&expected.players[0].settlers[0].val, 699);
+    SETTLER::Set_Dest_Planet(&expected.players[0].settlers[0].val, 899);
     SETTLER::Set_Race(&expected.players[0].settlers[0].val, 7);
     SETTLER::Set_Eta(&expected.players[0].settlers[0].val, 12);
     SETTLER::Set_Prof(&expected.players[0].settlers[0].val, POP::PROF_SCIENTIST);
     memcpy(expected_legacy_reports, REPORT::_reports, sizeof(expected_legacy_reports));
     memcpy(expected_legacy_messages, MSG_::_msgs, sizeof(expected_legacy_messages));
+    for (s_MSG& message : expected_legacy_messages) {
+        switch (message.msg_type) {
+        case MSG_TYPE_LOST_SHIP:
+            message.u.lost_ship.star_idx %= ORIGINAL_MAX_STARS;
+            break;
+        case MSG_TYPE_SCRAP_SHIP:
+            message.u.scrap_ship.where %= ORIGINAL_MAX_STARS;
+            break;
+        case MSG_TYPE_ARTEMIS:
+            message.u.artemis.star_idx %= ORIGINAL_MAX_STARS;
+            break;
+        default:
+            break;
+        }
+    }
     for (s_report& report : expected_legacy_reports) {
         uint8_t* data = reinterpret_cast<uint8_t*>(&report.d);
         if (report.type == 1 && report.action == 1) {
@@ -484,8 +514,22 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         case MSG_TYPE_COLONY:
             message.u.colony.planet_idx = 359;
             break;
+        case MSG_TYPE_LOST_SHIP:
+            message.u.lost_ship.star_idx = 511;
+            message.u.lost_ship.ship_idx = 999;
+            break;
+        case MSG_TYPE_SCRAP_SHIP:
+            message.u.scrap_ship.where = 510;
+            message.u.scrap_ship.ship_idx = 998;
+            break;
+        case MSG_TYPE_LOST_COLONY:
+            message.u.lost_colony.planet_idx = 899;
+            break;
         case MSG_TYPE_HYPERSPACE_BEAST:
             message.u.hyperspace_beast.star_idx = 511;
+            break;
+        case MSG_TYPE_ARTEMIS:
+            message.u.artemis.star_idx = 511;
             break;
         case MSG_TYPE_ARTEMIS_LEADER:
             message.u.artemis_leader.star_idx = 510;
@@ -525,7 +569,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     char description[37] = "Exhaustive save state";
     constexpr uint32_t random_seed = 0xCAFEBABE;
     SAVEGAME::Write_Game_(&writer, description, random_seed);
-    DOCTEST_CHECK(writer.Length_() == 208841);
+    DOCTEST_CHECK(writer.Length_() < SAVEGAME::BUFFER_CAPACITY);
 
     FILE* legacy_file = fopen(SAVEGAME_TEST_DATA_DIR "/savegame_v0.sav", "rb");
     DOCTEST_REQUIRE(legacy_file != nullptr);
@@ -589,8 +633,8 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         DOCTEST_CHECK(memcmp(&loaded_settings, &expected_settings, sizeof(expected_settings)) == 0);
         if (format == 0) {
             Check_Version_1_State_(expected, actual);
-            DOCTEST_CHECK(SETTLER::Get_Source_Colony(actual.players[0].settlers[0].val) == 0x1234);
-            DOCTEST_CHECK(SETTLER::Get_Dest_Planet(actual.players[0].settlers[0].val) == 0x2345);
+            DOCTEST_CHECK(SETTLER::Get_Source_Colony(actual.players[0].settlers[0].val) == 699);
+            DOCTEST_CHECK(SETTLER::Get_Dest_Planet(actual.players[0].settlers[0].val) == 899);
         } else {
             Check_Legacy_State_Except_Players_(expected, actual);
             DOCTEST_CHECK(actual.players[0].settlers[0].val == 0x00007C1700F2FFFFull);
@@ -611,15 +655,20 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
                              format == 0 ? expected_messages : expected_legacy_messages,
                              sizeof(MSG_::_msgs)) == 0);
         DOCTEST_CHECK(memcmp(REPORT::_something_interesting_happened, expected_interesting, sizeof(expected_interesting)) == 0);
-        DOCTEST_CHECK(memcmp(REPORT::_done_colonize_check, expected_colonize_check, sizeof(expected_colonize_check)) == 0);
+        const size_t colonize_check_size = format == 0 ?
+            sizeof(expected_colonize_check) : BITMAP(ORIGINAL_MAX_STARS);
+        DOCTEST_CHECK(memcmp(REPORT::_done_colonize_check, expected_colonize_check,
+                             colonize_check_size) == 0);
+        DOCTEST_CHECK(Is_Zero_(REPORT::_done_colonize_check + colonize_check_size,
+                               sizeof(expected_colonize_check) - colonize_check_size));
         DOCTEST_CHECK(memcmp(MSG_::_first_msg, expected_first_msg, sizeof(expected_first_msg)) == 0);
         DOCTEST_CHECK(memcmp(MSG_::_max_msgs, expected_max_msgs, sizeof(expected_max_msgs)) == 0);
         DOCTEST_CHECK(memcmp(MSG_::_n_msgs, expected_n_msgs, sizeof(expected_n_msgs)) == 0);
-        DOCTEST_CHECK(MOX::_NUM_COLONIES == 249);
-        DOCTEST_CHECK(MOX::_planet_count == 359);
-        DOCTEST_CHECK(MOX::_NUM_STARS == 71);
+        DOCTEST_CHECK(MOX::_NUM_COLONIES == (format == 0 ? 700 : 249));
+        DOCTEST_CHECK(MOX::_planet_count == (format == 0 ? 900 : 359));
+        DOCTEST_CHECK(MOX::_NUM_STARS == (format == 0 ? 512 : 71));
         DOCTEST_CHECK(MOX::_NUM_PLAYERS == 8);
-        DOCTEST_CHECK(MOX::_NUM_SHIPS == 499);
+        DOCTEST_CHECK(MOX::_NUM_SHIPS == (format == 0 ? 1000 : 499));
         DOCTEST_CHECK(MOX::_PLAYER_NUM == 7);
         DOCTEST_CHECK(MOX::_max_map_scale == 31);
         DOCTEST_CHECK(MOX::_max_zoom_count == 19);

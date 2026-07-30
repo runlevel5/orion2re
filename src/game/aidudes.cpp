@@ -817,7 +817,7 @@ namespace aidudes {
         }
 
         bool recalculate_colony = false;
-        int16_t colony_queue[256];
+        int16_t colony_queue[MAX_COLONIES];
 
         if (MOX::_NUM_COLONIES > 0) {
             for (int16_t current_colony_idx = 0; current_colony_idx < MOX::_NUM_COLONIES; ++current_colony_idx) {
