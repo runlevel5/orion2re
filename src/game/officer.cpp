@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace OFFICER {
+    // Legacy galaxy-map UI encoding for race-only fleet labels. The first tagged
+    // value represents ship-stack head node 9; subsequent values are contiguous.
+    constexpr int16_t RACE_ONLY_SHIP_NODE_FIRST_INDEX = MAX_PLAYERS + 1;
+
     char s_OFFICER_LBX_00556980[16] = "OFFICER.LBX";
     s_colors _normal_text_colors = {{61, 68, 67, 68, 68, 68, 68, 68}};
     s_colors _red_colors = {{75, 129, 77, 129, 129, 129, 129, 129}};
@@ -2060,8 +2064,8 @@ namespace OFFICER {
     }
 
     void __cdecl Print_Galmap_Scanned_Ship_(int16_t icon_idx) {
-        int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
-        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+        int16_t ship_stack_head_node_idx = MOX::_ship_icon[icon_idx].node_idx;
+        int16_t ship_idx = MOX::_ship_node[ship_stack_head_node_idx].ship_idx;
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int16_t ship_x = ship->x;
         int16_t ship_y = ship->y;
@@ -2083,13 +2087,14 @@ namespace OFFICER {
         char race_name[256];
         race_name[0] = '\0';
 
-        if (node_idx >= 5000) {
-            int16_t adjusted_node_idx = node_idx - 0x137F;
-            adjusted_node_idx = HACCESS::Ship_Stack_Owner_(adjusted_node_idx);
-            HACCESS::Race_Name_(adjusted_node_idx, race_name, sizeof(race_name));
+        if (ship_stack_head_node_idx >= SHIP_NODE_UI_TAG_BASE) {
+            int16_t decoded_node_idx = ship_stack_head_node_idx - SHIP_NODE_UI_TAG_BASE +
+                                       RACE_ONLY_SHIP_NODE_FIRST_INDEX;
+            int16_t race_idx = HACCESS::Ship_Stack_Owner_(decoded_node_idx);
+            HACCESS::Race_Name_(race_idx, race_name, sizeof(race_name));
         } else if (owner > 8) {
-            int16_t adjusted_node_idx = HACCESS::Ship_Stack_Owner_(node_idx);
-            HACCESS::Race_Name_(adjusted_node_idx, race_name, sizeof(race_name));
+            int16_t race_idx = HACCESS::Ship_Stack_Owner_(ship_stack_head_node_idx);
+            HACCESS::Race_Name_(race_idx, race_name, sizeof(race_name));
         }
 
         if (race_name[0] != '\0') {

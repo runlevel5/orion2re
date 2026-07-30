@@ -1153,8 +1153,8 @@ namespace SYS {
             print_y = static_cast<int16_t>(base_y + y_offset + 0x36);
         }
 
-        if (ship_node_num >= 5000) {
-            ship_idx = MOX::_ship_node[static_cast<int16_t>(ship_node_num - 5000)].ship_idx;
+        if (ship_node_num >= SHIP_NODE_UI_TAG_BASE) {
+            ship_idx = MOX::_ship_node[static_cast<int16_t>(ship_node_num - SHIP_NODE_UI_TAG_BASE)].ship_idx;
             strlcpy(ship_name, MOX::_ship[ship_idx].d.name, sizeof(ship_name));
         } else {
             ship_idx = MOX::_ship_node[ship_node_num].ship_idx;
